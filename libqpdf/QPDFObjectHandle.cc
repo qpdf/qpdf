@@ -1556,8 +1556,9 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
                     item.getOwningQPDF(),
                     QPDFExc(
                         qpdf_e_damaged_pdf,
-                        description,
-                        "item index " + QUtil::int_to_string(i) + " (from 0)",
+                        "",
+                        description + ": item index " +
+                            QUtil::int_to_string(i) + " (from 0)",
                         0,
                         "ignoring non-stream in an array of streams"));
             }

@@ -1,5 +1,10 @@
 2022-04-23  Jay Berkenbilt  <ejb@ql.org>
 
+        * Add a new QPDF::warn method that takes the parameters of
+        QPDFExc's constructor except for the filename, which is taken from
+        the QPDF object. This is a shorter way to issue warnings on behalf
+        of a QPDF object.
+
 	* Add new method QUtil::is_explicit_utf8 that tests whether a
 	string is explicitly marked as being UTF-8 encoded, as allowed by
 	the PDF 2.0 spec. Such a string starts with the bytes 0xEF 0xBB

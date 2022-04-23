@@ -266,15 +266,14 @@ QPDF::pushInheritedAttributesToPageInternal(
                         "Pages object",
                         cur_pages.getObjectID(),
                         cur_pages.getGeneration());
-                    warn(QPDFExc(
+                    warn(
                         qpdf_e_pages,
-                        this->m->file->getName(),
                         this->m->last_object_description,
                         0,
-                        "Unknown key " + key +
-                            " in /Pages object"
-                            " is being discarded as a result of"
-                            " flattening the /Pages tree"));
+                        ("Unknown key " + key +
+                         " in /Pages object"
+                         " is being discarded as a result of"
+                         " flattening the /Pages tree"));
                 }
             }
         }

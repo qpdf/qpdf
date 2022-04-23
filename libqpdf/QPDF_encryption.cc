@@ -803,12 +803,11 @@ QPDF::initializeEncryption()
         // Treating a missing ID as the empty string enables qpdf to
         // decrypt some invalid encrypted files with no /ID that
         // poppler can read but Adobe Reader can't.
-        warn(QPDFExc(
+        warn(
             qpdf_e_damaged_pdf,
-            this->m->file->getName(),
             "trailer",
             this->m->file->getLastOffset(),
-            "invalid /ID in trailer dictionary"));
+            "invalid /ID in trailer dictionary");
     }
 
     QPDFObjectHandle encryption_dict = this->m->trailer.getKey("/Encrypt");
@@ -831,13 +830,12 @@ QPDF::initializeEncryption()
             "unsupported encryption filter");
     }
     if (!encryption_dict.getKey("/SubFilter").isNull()) {
-        warn(QPDFExc(
+        warn(
             qpdf_e_unsupported,
-            this->m->file->getName(),
             "encryption dictionary",
             this->m->file->getLastOffset(),
             "file uses encryption SubFilters,"
-            " which qpdf does not support"));
+            " which qpdf does not support");
     }
 
     if (!(encryption_dict.getKey("/V").isInteger() &&
@@ -1067,13 +1065,12 @@ QPDF::initializeEncryption()
         this->m->encp->encryption_key = recover_encryption_key_with_password(
             this->m->encp->provided_password, data, perms_valid);
         if (!perms_valid) {
-            warn(QPDFExc(
+            warn(
                 qpdf_e_damaged_pdf,
-                this->m->file->getName(),
                 "encryption dictionary",
                 this->m->file->getLastOffset(),
                 "/Perms field in encryption dictionary"
-                " doesn't match expected value"));
+                " doesn't match expected value");
         }
     }
 }
@@ -1130,14 +1127,13 @@ QPDF::decryptString(std::string& str, int objid, int generation)
             break;
 
         default:
-            warn(QPDFExc(
+            warn(
                 qpdf_e_damaged_pdf,
-                this->m->file->getName(),
                 this->m->last_object_description,
                 this->m->file->getLastOffset(),
                 "unknown encryption filter for strings"
                 " (check /StrF in /Encrypt dictionary);"
-                " strings may be decrypted improperly"));
+                " strings may be decrypted improperly");
             // To avoid repeated warnings, reset cf_string.  Assume
             // we'd want to use AES if V == 4.
             this->m->encp->cf_string = e_aes;

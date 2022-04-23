@@ -21,8 +21,6 @@ Misc
   --show-encryption could potentially retry with this option if the
   first time doesn't work. Then, with the file open, we can read the
   encryption dictionary normally.
-* Have a warn in QPDF that passes its variable arguments onto QPDFExc
-  so you don't have to do warn(QPDFExc(...))
 * Find all places in the code that write to std::cout, std::err,
   stdout, or stderr to make sure they obey default output stream
   settings for QPDF and QPDFJob. This probably includes adding a

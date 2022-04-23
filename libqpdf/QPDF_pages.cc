@@ -130,12 +130,11 @@ QPDF::getAllPagesInternal(
     }
 
     if (!cur_node.isDictionaryOfType(wanted_type)) {
-        warn(QPDFExc(
+        warn(
             qpdf_e_damaged_pdf,
-            this->m->file->getName(),
             "page tree node",
             this->m->file->getLastOffset(),
-            "/Type key should be " + wanted_type + " but is not; overriding"));
+            "/Type key should be " + wanted_type + " but is not; overriding");
         cur_node.replaceKey("/Type", QPDFObjectHandle::newName(wanted_type));
     }
     visited.erase(this_og);

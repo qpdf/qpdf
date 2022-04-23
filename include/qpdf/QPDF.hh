@@ -262,6 +262,16 @@ class QPDF
     // rules, and it will be available with getWarnings().
     QPDF_DLL
     void warn(QPDFExc const& e);
+    // Same as above but creates the QPDFExc object using the
+    // arguments passed to warn. The filename argument to QPDFExc is
+    // omitted. This method uses the filename associated with the QPDF
+    // object.
+    QPDF_DLL
+    void warn(
+        qpdf_error_code_e error_code,
+        std::string const& object,
+        qpdf_offset_t offset,
+        std::string const& message);
 
     QPDF_DLL
     std::string getFilename() const;

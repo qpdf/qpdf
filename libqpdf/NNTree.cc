@@ -18,14 +18,7 @@ get_description(QPDFObjectHandle& node)
 static void
 warn(QPDF& qpdf, QPDFObjectHandle& node, std::string const& msg)
 {
-    qpdf.warn(
-        // line-break
-        QPDFExc(
-            qpdf_e_damaged_pdf,
-            qpdf.getFilename(),
-            get_description(node),
-            0,
-            msg));
+    qpdf.warn(qpdf_e_damaged_pdf, get_description(node), 0, msg);
 }
 
 static void

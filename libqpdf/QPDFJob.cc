@@ -2677,14 +2677,13 @@ QPDFJob::handlePageSpecs(
                         *other_afdh,
                         &referenced_fields);
                 } catch (std::exception& e) {
-                    pdf.warn(QPDFExc(
+                    pdf.warn(
                         qpdf_e_damaged_pdf,
-                        pdf.getFilename(),
                         "",
                         0,
                         ("Exception caught while fixing copied"
                          " annotations. This may be a qpdf bug. " +
-                         std::string("Exception: ") + e.what())));
+                         std::string("Exception: ") + e.what()));
                 }
             }
         }
@@ -3127,14 +3126,13 @@ QPDFJob::doSplitPages(QPDF& pdf, bool& warnings)
                 try {
                     out_afdh->fixCopiedAnnotations(new_page, page, afdh);
                 } catch (std::exception& e) {
-                    pdf.warn(QPDFExc(
+                    pdf.warn(
                         qpdf_e_damaged_pdf,
-                        pdf.getFilename(),
                         "",
                         0,
-                        "Exception caught while fixing copied"
-                        " annotations. This may be a qpdf bug." +
-                            std::string("Exception: ") + e.what()));
+                        ("Exception caught while fixing copied"
+                         " annotations. This may be a qpdf bug." +
+                         std::string("Exception: ") + e.what()));
                 }
             }
         }
