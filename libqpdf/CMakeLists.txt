@@ -1,8 +1,26 @@
+set(auto_job_inputs
+  # Keep in sync with SOURCES in generate_auto_job
+  ../generate_auto_job
+  ../manual/_ext/qpdf.py
+  ../job.yml
+  ../manual/cli.rst)
+
+set(auto_job_outputs
+  # Keep in sync with DESTS in generate_auto_job
+  qpdf/auto_job_decl.hh
+  qpdf/auto_job_init.hh
+  qpdf/auto_job_help.hh
+  qpdf/auto_job_schema.hh
+  qpdf/auto_job_json_decl.hh
+  qpdf/auto_job_json_init.hh)
 
 if(GENERATE_AUTO_JOB)
-  execute_process(
+  add_custom_command(
+    OUTPUT ${auto_job_outputs}
     COMMAND ${qpdf_SOURCE_DIR}/generate_auto_job --generate
-    WORKING_DIRECTORY ${qpdf_SOURCE_DIR})
+    WORKING_DIRECTORY ${qpdf_SOURCE_DIR}
+    DEPENDS ${auto_job_inputs})
+  add_custom_target(auto_job_files ALL DEPENDS ${auto_job_outputs})
 endif()
 
 set(libqpdf_crypto_native
