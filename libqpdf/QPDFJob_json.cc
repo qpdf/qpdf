@@ -413,6 +413,17 @@ Handlers::setupAddAttachmentFile()
 }
 
 void
+Handlers::beginRemoveAttachmentArray(JSON)
+{
+    // nothing needed
+}
+
+void
+Handlers::endRemoveAttachmentArray()
+{
+    // nothing needed
+}
+void
 Handlers::beginCopyAttachmentsFromArray(JSON)
 {
     // nothing needed

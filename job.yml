@@ -372,6 +372,7 @@ json:
       moddate:
       replace:
   remove-attachment:
+    - null
   copy-attachments-from:
     - _file: "file to copy attachments from"
       CopyAtt.password:

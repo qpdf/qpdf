@@ -1,0 +1,10 @@
+{
+  "verbose": "",
+  "staticId": "",
+  "inputFile": "add-attachments-1.pdf",
+  "outputFile": "b.pdf",
+  "removeAttachment": [
+    "auto-1",
+    "auto-Two"
+  ]
+}

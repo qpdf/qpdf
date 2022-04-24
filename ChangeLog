@@ -1,5 +1,10 @@
 2022-04-24  Jay Berkenbilt  <ejb@ql.org>
 
+        * Bug fix: "removeAttachment" in the job JSON now takes an array
+        of strings instead of a string. It should have taken an array of
+        strings since the corresponding command-line argument,
+        --remove-attachment, is repeatable. Fixes #693.
+
         * Deprecate QPDFObjectHandle::replaceOrRemoveKey -- it does and
         always has done the same thing as replaceKey.
 

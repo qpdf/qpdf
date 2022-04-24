@@ -723,7 +723,7 @@ $td->runtest("check overlay with no resources output",
 show_ntests();
 # ----------
 $td->notify("--- File Attachments ---");
-$n_tests += 33;
+$n_tests += 37;
 
 open(F, ">auto-txt") or die;
 print F "from file";
@@ -907,6 +907,25 @@ $td->runtest("check dates",
              {$td->REGEXP => ".*CreationDate \\(D:\\d+.*ModDate \\(D:\\d+.*",
                   $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+$td->runtest("remove multiple attachments",
+             {$td->COMMAND =>
+                  "qpdf --verbose --static-id add-attachments-1.pdf a.pdf" .
+                  " --remove-attachment=auto-1 --remove-attachment=auto-Two"},
+             {$td->FILE => "remove-multiple-attachments.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "remove-multiple-attachments.pdf"});
+$td->runtest("remove multiple attachments (json)",
+             {$td->COMMAND =>
+                  "qpdf --job-json-file=remove-multiple-attachments.json"},
+             {$td->FILE => "remove-multiple-attachments-json.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "b.pdf"},
+             {$td->FILE => "remove-multiple-attachments.pdf"});
 
 show_ntests();
 # ----------

@@ -111,7 +111,9 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
       "replace": "replace attachment with same key"
     }
   ],
-  "removeAttachment": "remove an embedded file",
+  "removeAttachment": [
+    "remove an embedded file"
+  ],
   "copyAttachmentsFrom": [
     {
       "file": "file to copy attachments from",

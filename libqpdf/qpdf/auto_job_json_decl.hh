@@ -29,6 +29,8 @@ void endAddAttachmentArray();
 void beginAddAttachment(JSON);
 void endAddAttachment();
 void setupAddAttachmentFile();
+void beginRemoveAttachmentArray(JSON);
+void endRemoveAttachmentArray();
 void beginCopyAttachmentsFromArray(JSON);
 void endCopyAttachmentsFromArray();
 void beginCopyAttachmentsFrom(JSON);

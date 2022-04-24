@@ -327,7 +327,9 @@ popHandler(); // key: replace
 popHandler(); // array: .addAttachment[]
 popHandler(); // key: addAttachment
 pushKey("removeAttachment");
+beginArray(bindJSON(&Handlers::beginRemoveAttachmentArray), bindBare(&Handlers::endRemoveAttachmentArray)); // .removeAttachment[]
 addParameter([this](std::string const& p) { c_main->removeAttachment(p); });
+popHandler(); // array: .removeAttachment[]
 popHandler(); // key: removeAttachment
 pushKey("copyAttachmentsFrom");
 beginArray(bindJSON(&Handlers::beginCopyAttachmentsFromArray), bindBare(&Handlers::endCopyAttachmentsFromArray)); // .copyAttachmentsFrom[]
