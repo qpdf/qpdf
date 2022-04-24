@@ -617,11 +617,11 @@ QPDF_Stream::replaceFilterData(
 }
 
 void
-QPDF_Stream::replaceDict(QPDFObjectHandle new_dict)
+QPDF_Stream::replaceDict(QPDFObjectHandle const& new_dict)
 {
     this->stream_dict = new_dict;
     setDictDescription();
-    QPDFObjectHandle length_obj = new_dict.getKey("/Length");
+    QPDFObjectHandle length_obj = this->stream_dict.getKey("/Length");
     if (length_obj.isInteger()) {
         this->length = QIntC::to_size(length_obj.getUIntValue());
     } else {

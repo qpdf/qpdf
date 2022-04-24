@@ -1268,7 +1268,8 @@ QPDFObjectHandle::getOwningQPDF()
 // Dictionary mutators
 
 void
-QPDFObjectHandle::replaceKey(std::string const& key, QPDFObjectHandle value)
+QPDFObjectHandle::replaceKey(
+    std::string const& key, QPDFObjectHandle const& value)
 {
     if (isDictionary()) {
         checkOwnership(value);
@@ -1292,7 +1293,7 @@ QPDFObjectHandle::removeKey(std::string const& key)
 
 void
 QPDFObjectHandle::replaceOrRemoveKey(
-    std::string const& key, QPDFObjectHandle value)
+    std::string const& key, QPDFObjectHandle const& value)
 {
     if (isDictionary()) {
         checkOwnership(value);
@@ -1334,7 +1335,7 @@ QPDFObjectHandle::isDataModified()
 }
 
 void
-QPDFObjectHandle::replaceDict(QPDFObjectHandle new_dict)
+QPDFObjectHandle::replaceDict(QPDFObjectHandle const& new_dict)
 {
     assertStream();
     dynamic_cast<QPDF_Stream*>(obj.get())->replaceDict(new_dict);

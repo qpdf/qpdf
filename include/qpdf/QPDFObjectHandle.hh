@@ -1025,13 +1025,13 @@ class QPDFObjectHandle
 
     // Replace value of key, adding it if it does not exist
     QPDF_DLL
-    void replaceKey(std::string const& key, QPDFObjectHandle);
+    void replaceKey(std::string const& key, QPDFObjectHandle const&);
     // Remove key, doing nothing if key does not exist
     QPDF_DLL
     void removeKey(std::string const& key);
     // If the object is null, remove the key.  Otherwise, replace it.
     QPDF_DLL
-    void replaceOrRemoveKey(std::string const& key, QPDFObjectHandle);
+    void replaceOrRemoveKey(std::string const& key, QPDFObjectHandle const&);
 
     // Methods for stream objects
     QPDF_DLL
@@ -1164,7 +1164,7 @@ class QPDFObjectHandle
     // may be more convenient in this case than calling getDict and
     // modifying it for each key.  The pdf-create example does this.
     QPDF_DLL
-    void replaceDict(QPDFObjectHandle);
+    void replaceDict(QPDFObjectHandle const&);
 
     // Replace this stream's stream data with the given data buffer,
     // and replace the /Filter and /DecodeParms keys in the stream

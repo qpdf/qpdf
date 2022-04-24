@@ -115,7 +115,8 @@ QPDF_Dictionary::getAsMap() const
 }
 
 void
-QPDF_Dictionary::replaceKey(std::string const& key, QPDFObjectHandle value)
+QPDF_Dictionary::replaceKey(
+    std::string const& key, QPDFObjectHandle const& value)
 {
     // add or replace value
     this->items[key] = value;

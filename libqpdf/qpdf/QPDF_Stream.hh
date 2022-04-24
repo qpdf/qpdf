@@ -62,7 +62,7 @@ class QPDF_Stream: public QPDFObject
     void
     addTokenFilter(std::shared_ptr<QPDFObjectHandle::TokenFilter> token_filter);
 
-    void replaceDict(QPDFObjectHandle new_dict);
+    void replaceDict(QPDFObjectHandle const& new_dict);
 
     static void registerStreamFilter(
         std::string const& filter_name,
