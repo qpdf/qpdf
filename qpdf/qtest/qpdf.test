@@ -1421,6 +1421,17 @@ foreach (my $i = 1; $i <= 3; ++$i)
 
 show_ntests();
 # ----------
+$td->notify("--- Dictionary keys ---");
+$n_tests += 1;
+
+$td->runtest("dictionary keys",
+             {$td->COMMAND => "test_driver 87 - -"},
+             {$td->STRING => "test 87 done\n",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 $td->notify("--- Stream data ---");
 $n_tests += 2;
 

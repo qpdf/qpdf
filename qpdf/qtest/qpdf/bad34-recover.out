@@ -2,7 +2,7 @@ WARNING: bad34.pdf: file is damaged
 WARNING: bad34.pdf (object 4 0, offset 322): expected n n obj
 WARNING: bad34.pdf: Attempting to reconstruct cross-reference table
 /QTest is indirect and has type stream (10)
-/QTest is a stream.  Dictionary: << /Length 44 /Quack 9 0 R >>
+/QTest is a stream.  Dictionary: << /Length 44 >>
 Raw stream data:
 BT
   /F1 24 Tf

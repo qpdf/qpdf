@@ -24,12 +24,11 @@ std::string
 QPDF_Dictionary::unparse()
 {
     std::string result = "<< ";
-    for (std::map<std::string, QPDFObjectHandle>::iterator iter =
-             this->items.begin();
-         iter != this->items.end();
-         ++iter) {
-        result += QPDF_Name::normalizeName((*iter).first) + " " +
-            (*iter).second.unparse() + " ";
+    for (auto& iter : this->items) {
+        if (!iter.second.isNull()) {
+            result += QPDF_Name::normalizeName(iter.first) + " " +
+                iter.second.unparse() + " ";
+        }
     }
     result += ">>";
     return result;
@@ -39,12 +38,11 @@ JSON
 QPDF_Dictionary::getJSON()
 {
     JSON j = JSON::makeDictionary();
-    for (std::map<std::string, QPDFObjectHandle>::iterator iter =
-             this->items.begin();
-         iter != this->items.end();
-         ++iter) {
-        j.addDictionaryMember(
-            QPDF_Name::normalizeName((*iter).first), (*iter).second.getJSON());
+    for (auto& iter : this->items) {
+        if (!iter.second.isNull()) {
+            j.addDictionaryMember(
+                QPDF_Name::normalizeName(iter.first), iter.second.getJSON());
+        }
     }
     return j;
 }
@@ -78,9 +76,10 @@ QPDF_Dictionary::getKey(std::string const& key)
 {
     // PDF spec says fetching a non-existent key from a dictionary
     // returns the null object.
-    if (this->items.count(key)) {
+    auto item = this->items.find(key);
+    if (item != this->items.end()) {
         // May be a null object
-        return (*(this->items.find(key))).second;
+        return item->second;
     } else {
         QPDFObjectHandle null = QPDFObjectHandle::newNull();
         QPDF* qpdf = 0;
@@ -97,12 +96,9 @@ std::set<std::string>
 QPDF_Dictionary::getKeys()
 {
     std::set<std::string> result;
-    for (std::map<std::string, QPDFObjectHandle>::const_iterator iter =
-             this->items.begin();
-         iter != this->items.end();
-         ++iter) {
-        if (hasKey((*iter).first)) {
-            result.insert((*iter).first);
+    for (auto& iter : this->items) {
+        if (!iter.second.isNull()) {
+            result.insert(iter.first);
         }
     }
     return result;
