@@ -16,8 +16,7 @@ WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary at
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: treating as empty
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: returning false for a key containment request
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: ignoring key removal request
-WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: ignoring key removal/replacement request
-WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: ignoring key removal/replacement request
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: ignoring key replacement request
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: ignoring key replacement request
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: returning null for attempted key retrieval
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: returning null for attempted key retrieval

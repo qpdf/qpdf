@@ -44,9 +44,9 @@ QPDFPageLabelDocumentHelper::getLabelForPage(long long page_idx)
     QIntC::range_check(start, offset);
     start += offset;
     result = QPDFObjectHandle::newDictionary();
-    result.replaceOrRemoveKey("/S", S);
-    result.replaceOrRemoveKey("/P", P);
-    result.replaceOrRemoveKey("/St", QPDFObjectHandle::newInteger(start));
+    result.replaceKey("/S", S);
+    result.replaceKey("/P", P);
+    result.replaceKey("/St", QPDFObjectHandle::newInteger(start));
     return result;
 }
 

@@ -1,3 +1,8 @@
+2022-04-24  Jay Berkenbilt  <ejb@ql.org>
+
+        * Deprecate QPDFObjectHandle::replaceOrRemoveKey -- it does and
+        always has done the same thing as replaceKey.
+
 2022-04-23  Jay Berkenbilt  <ejb@ql.org>
 
         * Add a new QPDF::warn method that takes the parameters of

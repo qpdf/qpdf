@@ -1023,13 +1023,16 @@ class QPDFObjectHandle
 
     // Mutator methods for dictionary objects
 
-    // Replace value of key, adding it if it does not exist
+    // Replace value of key, adding it if it does not exist. If value
+    // is null, remove the key.
     QPDF_DLL
-    void replaceKey(std::string const& key, QPDFObjectHandle const&);
+    void replaceKey(std::string const& key, QPDFObjectHandle const& value);
     // Remove key, doing nothing if key does not exist
     QPDF_DLL
     void removeKey(std::string const& key);
-    // If the object is null, remove the key.  Otherwise, replace it.
+
+    // ABI: Remove in qpdf 12
+    [[deprecated("use replaceKey -- it does the same thing")]]
     QPDF_DLL
     void replaceOrRemoveKey(std::string const& key, QPDFObjectHandle const&);
 

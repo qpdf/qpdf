@@ -1481,8 +1481,7 @@ test_42(QPDF& pdf, char const* arg2)
     assert(integer.getKeys().empty());
     assert(false == integer.hasKey("/Potato"));
     integer.removeKey("/Potato");
-    integer.replaceOrRemoveKey("/Potato", null);
-    integer.replaceOrRemoveKey("/Potato", QPDFObjectHandle::newInteger(1));
+    integer.replaceKey("/Potato", null);
     integer.replaceKey("/Potato", QPDFObjectHandle::newInteger(1));
     null.getKeyIfDict("/Integer").getKeyIfDict("/Potato").assertNull();
     qtest.getKey("/Integer").getKeyIfDict("/Potato");

@@ -438,7 +438,7 @@ qpdf_set_info_key(qpdf_data qpdf, char const* key, char const* value)
     }
 
     QPDFObjectHandle info = trailer.getKey("/Info");
-    info.replaceOrRemoveKey(key, value_object);
+    info.replaceKey(key, value_object);
 }
 
 QPDF_BOOL
@@ -1919,7 +1919,7 @@ qpdf_oh_replace_or_remove_key(
 {
     do_with_oh_void(qpdf, oh, [qpdf, key, item](QPDFObjectHandle& o) {
         QTC::TC("qpdf", "qpdf-c called qpdf_oh_replace_or_remove_key");
-        o.replaceOrRemoveKey(key, qpdf_oh_item_internal(qpdf, item));
+        o.replaceKey(key, qpdf_oh_item_internal(qpdf, item));
     });
 }
 

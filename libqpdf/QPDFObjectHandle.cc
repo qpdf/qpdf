@@ -1295,14 +1295,7 @@ void
 QPDFObjectHandle::replaceOrRemoveKey(
     std::string const& key, QPDFObjectHandle const& value)
 {
-    if (isDictionary()) {
-        checkOwnership(value);
-        dynamic_cast<QPDF_Dictionary*>(obj.get())->replaceOrRemoveKey(
-            key, value);
-    } else {
-        typeWarning("dictionary", "ignoring key removal/replacement request");
-        QTC::TC("qpdf", "QPDFObjectHandle dictionary ignoring removereplace");
-    }
+    replaceKey(key, value);
 }
 
 // Stream accessors
