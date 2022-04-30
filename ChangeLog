@@ -1,3 +1,12 @@
+2022-04-30  Jay Berkenbilt  <ejb@ql.org>
+
+        * Remove QPDFObjectHandle::replaceOrRemoveKey. Call replaceKey
+        instead. Its functionality is identical. Note: usually I would
+        deprecate this for a release cycle, but the release of qpdf 11
+        will require virtually all users to touch their source code, so it
+        actually seems better to just break this now than to put it off,
+        particularly since the fix so trivial.
+
 2022-04-29  Jay Berkenbilt  <ejb@ql.org>
 
         * QPDFObjectHandle: for the methods insertItem, appendItem,
