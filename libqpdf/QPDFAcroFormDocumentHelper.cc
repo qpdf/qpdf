@@ -40,9 +40,9 @@ QPDFAcroFormDocumentHelper::getOrCreateAcroForm()
 {
     auto acroform = this->qpdf.getRoot().getKey("/AcroForm");
     if (!acroform.isDictionary()) {
-        acroform =
-            this->qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
-        this->qpdf.getRoot().replaceKey("/AcroForm", acroform);
+        acroform = this->qpdf.getRoot().replaceKeyAndGet(
+            "/AcroForm",
+            this->qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary()));
     }
     return acroform;
 }
@@ -53,8 +53,8 @@ QPDFAcroFormDocumentHelper::addFormField(QPDFFormFieldObjectHelper ff)
     auto acroform = getOrCreateAcroForm();
     auto fields = acroform.getKey("/Fields");
     if (!fields.isArray()) {
-        fields = QPDFObjectHandle::newArray();
-        acroform.replaceKey("/Fields", fields);
+        fields =
+            acroform.replaceKeyAndGet("/Fields", QPDFObjectHandle::newArray());
     }
     fields.appendItem(ff.getObjectHandle());
     std::set<QPDFObjGen> visited;
@@ -877,8 +877,8 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             }
             dr.makeResourcesIndirect(this->qpdf);
             if (!dr.isIndirect()) {
-                dr = this->qpdf.makeIndirectObject(dr);
-                acroform.replaceKey("/DR", dr);
+                dr = acroform.replaceKeyAndGet(
+                    "/DR", this->qpdf.makeIndirectObject(dr));
             }
             // Merge the other document's /DR, creating a conflict
             // map. mergeResources checks to make sure both objects
@@ -1099,9 +1099,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         auto apdict = ah.getAppearanceDictionary();
         std::vector<QPDFObjectHandle> streams;
         auto replace_stream = [](auto& dict, auto& key, auto& old) {
-            auto new_stream = old.copyStream();
-            dict.replaceKey(key, new_stream);
-            return new_stream;
+            return dict.replaceKeyAndGet(key, old.copyStream());
         };
         if (apdict.isDictionary()) {
             for (auto& ap : apdict.ditems()) {

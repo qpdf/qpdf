@@ -1662,8 +1662,8 @@ QPDFWriter::unparseObject(
                         "qpdf",
                         "QPDFWriter create Extensions",
                         this->m->qdf_mode ? 0 : 1);
-                    extensions = QPDFObjectHandle::newDictionary();
-                    object.replaceKey("/Extensions", extensions);
+                    extensions = object.replaceKeyAndGet(
+                        "/Extensions", QPDFObjectHandle::newDictionary());
                 }
             } else if (!have_extensions_other) {
                 // We have Extensions dictionary and don't want one.
@@ -2387,8 +2387,7 @@ QPDFWriter::prepareFileForWrite()
             if (oh.isIndirect()) {
                 QTC::TC("qpdf", "QPDFWriter make Extensions direct");
                 extensions_indirect = true;
-                oh = oh.shallowCopy();
-                root.replaceKey(key, oh);
+                oh = root.replaceKeyAndGet(key, oh.shallowCopy());
             }
             if (oh.hasKey("/ADBE")) {
                 QPDFObjectHandle adbe = oh.getKey("/ADBE");

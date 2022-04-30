@@ -62,8 +62,8 @@ QPDFEmbeddedFileDocumentHelper::initEmbeddedFiles()
     auto root = qpdf.getRoot();
     auto names = root.getKey("/Names");
     if (!names.isDictionary()) {
-        names = QPDFObjectHandle::newDictionary();
-        root.replaceKey("/Names", names);
+        names =
+            root.replaceKeyAndGet("/Names", QPDFObjectHandle::newDictionary());
     }
     auto embedded_files = names.getKey("/EmbeddedFiles");
     if (!embedded_files.isDictionary()) {

@@ -597,8 +597,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
         for (auto const& iter : to_filter) {
             QPDFObjectHandle dict = resources.getKey(iter);
             if (dict.isDictionary()) {
-                dict = dict.shallowCopy();
-                resources.replaceKey(iter, dict);
+                dict = resources.replaceKeyAndGet(iter, dict.shallowCopy());
                 rdicts.push_back(dict);
                 auto keys = dict.getKeys();
                 known_names.insert(keys.begin(), keys.end());
@@ -1113,8 +1112,8 @@ QPDFPageObjectHelper::copyAnnotations(
     afdh->addAndRenameFormFields(new_fields);
     auto annots = this->oh.getKey("/Annots");
     if (!annots.isArray()) {
-        annots = QPDFObjectHandle::newArray();
-        this->oh.replaceKey("/Annots", annots);
+        annots =
+            this->oh.replaceKeyAndGet("/Annots", QPDFObjectHandle::newArray());
     }
     for (auto const& annot : new_annots) {
         annots.appendItem(annot);

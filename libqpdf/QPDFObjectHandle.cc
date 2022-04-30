@@ -1172,8 +1172,7 @@ QPDFObjectHandle::mergeResources(
                     // subdictionaries just to get this shallow copy
                     // functionality.
                     QTC::TC("qpdf", "QPDFObjectHandle replace with copy");
-                    this_val = this_val.shallowCopy();
-                    replaceKey(rtype, this_val);
+                    this_val = replaceKeyAndGet(rtype, this_val.shallowCopy());
                 }
                 std::map<QPDFObjGen, std::string> og_to_name;
                 std::set<std::string> rnames;
