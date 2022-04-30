@@ -27,10 +27,8 @@ main(int argc, char* argv[])
     }
     char const* infilename = argv[1];
     std::list<std::string> lines = QUtil::read_lines_from_file(infilename);
-    for (std::list<std::string>::iterator iter = lines.begin();
-         iter != lines.end();
-         ++iter) {
-        QPDFObjectHandle str = QPDFObjectHandle::newString(*iter);
+    for (auto const& line: lines) {
+        QPDFObjectHandle str = QPDFObjectHandle::newString(line);
         std::cout << str.getUTF8Value() << std::endl;
     }
     return 0;

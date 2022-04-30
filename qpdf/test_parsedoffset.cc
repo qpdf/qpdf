@@ -52,21 +52,17 @@ walk(
 
     if (obj.isArray()) {
         std::vector<QPDFObjectHandle> array = obj.getArrayAsVector();
-        for (std::vector<QPDFObjectHandle>::iterator iter = array.begin();
-             iter != array.end();
-             ++iter) {
-            if (!iter->isIndirect()) {
+        for (auto& oh: array) {
+            if (!oh.isIndirect()) {
                 // QPDF::GetAllObjects() enumerates all indirect objects.
                 // So only the direct objects are recursed here.
-                walk(stream_number, *iter, result);
+                walk(stream_number, oh, result);
             }
         }
     } else if (obj.isDictionary()) {
         std::set<std::string> keys = obj.getKeys();
-        for (std::set<std::string>::iterator iter = keys.begin();
-             iter != keys.end();
-             ++iter) {
-            QPDFObjectHandle item = obj.getKey(*iter);
+        for (auto const& key: keys) {
+            QPDFObjectHandle item = obj.getKey(key);
             if (!item.isIndirect()) {
                 // QPDF::GetAllObjects() enumerates all indirect objects.
                 // So only the direct objects are recursed here.
@@ -88,21 +84,19 @@ process(
     std::vector<QPDFObjectHandle> objs = qpdf.getAllObjects();
     std::map<QPDFObjGen, QPDFXRefEntry> xrefs = qpdf.getXRefTable();
 
-    for (std::vector<QPDFObjectHandle>::iterator iter = objs.begin();
-         iter != objs.end();
-         ++iter) {
-        if (xrefs.count(iter->getObjGen()) == 0) {
-            std::cerr << iter->getObjectID() << "/" << iter->getGeneration()
+    for (auto const& oh: objs) {
+        if (xrefs.count(oh.getObjGen()) == 0) {
+            std::cerr << oh.getObjectID() << "/" << oh.getGeneration()
                       << " is not found in xref table" << std::endl;
             std::exit(2);
         }
 
-        QPDFXRefEntry xref = xrefs[iter->getObjGen()];
+        QPDFXRefEntry xref = xrefs[oh.getObjGen()];
         size_t stream_number;
 
         switch (xref.getType()) {
         case 0:
-            std::cerr << iter->getObjectID() << "/" << iter->getGeneration()
+            std::cerr << oh.getObjectID() << "/" << oh.getGeneration()
                       << " xref entry is free" << std::endl;
             std::exit(2);
         case 1:
@@ -116,7 +110,7 @@ process(
             std::exit(2);
         }
 
-        walk(stream_number, *iter, result);
+        walk(stream_number, oh, result);
     }
 }
 
@@ -146,11 +140,8 @@ main(int argc, char* argv[])
                           << std::endl;
             }
 
-            for (std::vector<std::pair<qpdf_offset_t, std::string>>::iterator
-                     iter = table[i].begin();
-                 iter != table[i].end();
-                 ++iter) {
-                std::cout << iter->second << std::endl;
+            for (auto const& iter: table[i]) {
+                std::cout << iter.second << std::endl;
             }
         }
 

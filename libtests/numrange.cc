@@ -9,10 +9,8 @@ test_numrange(char const* range)
     } else {
         std::vector<int> result = QUtil::parse_numrange(range, 15);
         std::cout << "numeric range " << range << " ->";
-        for (std::vector<int>::iterator iter = result.begin();
-             iter != result.end();
-             ++iter) {
-            std::cout << " " << *iter;
+        for (int i: result) {
+            std::cout << " " << i;
         }
         std::cout << std::endl;
     }

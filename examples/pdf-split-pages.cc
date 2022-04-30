@@ -27,10 +27,7 @@ process(char const* whoami, char const* infile, std::string outprefix)
     int pageno_len =
         QIntC::to_int(QUtil::uint_to_string(pages.size()).length());
     int pageno = 0;
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter) {
-        QPDFPageObjectHelper& page(*iter);
+    for (auto& page: pages) {
         std::string outfile =
             outprefix + QUtil::int_to_string(++pageno, pageno_len) + ".pdf";
         QPDF outpdf;

@@ -97,10 +97,8 @@ compare(QPDFObjectHandle a, QPDFObjectHandle b)
                 return false;
             }
 
-            for (std::set<std::string>::iterator iter = keys_a.begin();
-                 iter != keys_a.end();
-                 ++iter) {
-                if (!compare(a.getKey(*iter), b.getKey(*iter))) {
+            for (auto const& key: keys_a) {
+                if (!compare(a.getKey(key), b.getKey(key))) {
                     std::cerr << "different dictionary item" << std::endl;
                     return false;
                 }
@@ -130,19 +128,17 @@ compare_xref_table(
         return false;
     }
 
-    for (std::map<QPDFObjGen, QPDFXRefEntry>::iterator iter = a.begin();
-         iter != a.end();
-         ++iter) {
-        std::cout << "xref entry for " << iter->first.getObj() << "/"
-                  << iter->first.getGen() << std::endl;
+    for (auto const& iter: a) {
+        std::cout << "xref entry for " << iter.first.getObj() << "/"
+                  << iter.first.getGen() << std::endl;
 
-        if (b.count(iter->first) == 0) {
+        if (b.count(iter.first) == 0) {
             std::cerr << "not found" << std::endl;
             return false;
         }
 
-        QPDFXRefEntry xref_a = iter->second;
-        QPDFXRefEntry xref_b = b[iter->first];
+        QPDFXRefEntry xref_a = iter.second;
+        QPDFXRefEntry xref_b = b[iter.first];
         if (xref_a.getType() != xref_b.getType()) {
             std::cerr << "different xref entry type" << std::endl;
             return false;
@@ -235,10 +231,8 @@ main(int argc, char* argv[])
 
         std::cout << "--- compare between input and renumbered objects ---"
                   << std::endl;
-        for (std::vector<QPDFObjectHandle>::iterator iter = objs_in.begin();
-             iter != objs_in.end();
-             ++iter) {
-            QPDFObjGen og_in = iter->getObjGen();
+        for (auto const& iter: objs_in) {
+            QPDFObjGen og_in = iter.getObjGen();
             QPDFObjGen og_ren = w.getRenumberedObjGen(og_in);
 
             std::cout << "input " << og_in.getObj() << "/" << og_in.getGen()
@@ -250,7 +244,7 @@ main(int argc, char* argv[])
                 continue;
             }
 
-            if (!compare(*iter, qpdf_ren.getObjectByObjGen(og_ren))) {
+            if (!compare(iter, qpdf_ren.getObjectByObjGen(og_ren))) {
                 std::cerr << "different" << std::endl;
                 std::exit(2);
             }

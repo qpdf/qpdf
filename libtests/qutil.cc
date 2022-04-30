@@ -229,12 +229,10 @@ print_utf8(unsigned long val)
         // Emacs has trouble with utf-8 encoding files with characters
         // outside the 16-bit portion, so just show the character
         // values.
-        for (std::string::iterator iter = result.begin(); iter != result.end();
-             ++iter) {
+        for (auto const& ch: result) {
             std::cout << " "
                       << QUtil::int_to_string_base(
-                             static_cast<int>(
-                                 static_cast<unsigned char>(*iter)),
+                             static_cast<int>(static_cast<unsigned char>(ch)),
                              16,
                              2);
         }
@@ -289,11 +287,10 @@ print_utf16(unsigned long val)
 {
     std::string result = QUtil::toUTF16(val);
     std::cout << "0x" << QUtil::uint_to_string_base(val, 16) << " ->";
-    for (std::string::iterator iter = result.begin(); iter != result.end();
-         ++iter) {
+    for (auto const& ch: result) {
         std::cout << " "
                   << QUtil::int_to_string_base(
-                         static_cast<int>(static_cast<unsigned char>(*iter)),
+                         static_cast<int>(static_cast<unsigned char>(ch)),
                          16,
                          2);
     }
@@ -516,10 +513,8 @@ void
 read_from_file_test()
 {
     std::list<std::string> lines = QUtil::read_lines_from_file("other-file");
-    for (std::list<std::string>::iterator iter = lines.begin();
-         iter != lines.end();
-         ++iter) {
-        std::cout << *iter << std::endl;
+    for (auto const& line: lines) {
+        std::cout << line << std::endl;
     }
     // Test the other versions and make sure we get the same results
     {

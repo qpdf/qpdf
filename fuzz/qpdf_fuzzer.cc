@@ -134,10 +134,7 @@ FuzzHelper::testPages()
     std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
     DiscardContents discard_contents;
     int pageno = 0;
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter) {
-        QPDFPageObjectHelper& page(*iter);
+    for (auto& page: pages) {
         ++pageno;
         try {
             page.coalesceContentStreams();
@@ -150,11 +147,7 @@ FuzzHelper::testPages()
 
             std::vector<QPDFAnnotationObjectHelper> annotations =
                 afdh.getWidgetAnnotationsForPage(page);
-            for (std::vector<QPDFAnnotationObjectHelper>::iterator annot_iter =
-                     annotations.begin();
-                 annot_iter != annotations.end();
-                 ++annot_iter) {
-                QPDFAnnotationObjectHelper& aoh = *annot_iter;
+            for (auto& aoh: annotations) {
                 afdh.getFieldForAnnotation(aoh);
             }
         } catch (QPDFExc& e) {
@@ -172,11 +165,7 @@ FuzzHelper::testOutlines()
     queue.push_back(odh.getTopLevelOutlines());
     while (!queue.empty()) {
         std::vector<QPDFOutlineObjectHelper>& outlines = *(queue.begin());
-        for (std::vector<QPDFOutlineObjectHelper>::iterator iter =
-                 outlines.begin();
-             iter != outlines.end();
-             ++iter) {
-            QPDFOutlineObjectHelper& ol = *iter;
+        for (auto& ol: outlines) {
             ol.getDestPage();
             queue.push_back(ol.getKids());
         }

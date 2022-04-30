@@ -262,11 +262,8 @@ QPDF::~QPDF()
     // have the effect of undoing any modifications that may have been
     // made to any of the objects.
     this->m->xref_table.clear();
-    for (std::map<QPDFObjGen, ObjCache>::iterator iter =
-             this->m->obj_cache.begin();
-         iter != this->m->obj_cache.end();
-         ++iter) {
-        QPDFObject::ObjAccessor::releaseResolved((*iter).second.object.get());
+    for (auto const& iter: this->m->obj_cache) {
+        QPDFObject::ObjAccessor::releaseResolved(iter.second.object.get());
     }
 }
 
@@ -577,18 +574,13 @@ QPDF::reconstruct_xref(QPDFExc& e)
 
     // Delete all references to type 1 (uncompressed) objects
     std::set<QPDFObjGen> to_delete;
-    for (std::map<QPDFObjGen, QPDFXRefEntry>::iterator iter =
-             this->m->xref_table.begin();
-         iter != this->m->xref_table.end();
-         ++iter) {
-        if (((*iter).second).getType() == 1) {
-            to_delete.insert((*iter).first);
+    for (auto const& iter: this->m->xref_table) {
+        if (iter.second.getType() == 1) {
+            to_delete.insert(iter.first);
         }
     }
-    for (std::set<QPDFObjGen>::iterator iter = to_delete.begin();
-         iter != to_delete.end();
-         ++iter) {
-        this->m->xref_table.erase(*iter);
+    for (auto const& iter: to_delete) {
+        this->m->xref_table.erase(iter);
     }
 
     this->m->file->seek(0, SEEK_END);
@@ -1015,10 +1007,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
     }
 
     // Handle any deleted items now that we've read the /XRefStm.
-    for (std::vector<QPDFObjGen>::iterator iter = deleted_items.begin();
-         iter != deleted_items.end();
-         ++iter) {
-        QPDFObjGen& og = *iter;
+    for (auto const& og: deleted_items) {
         insertXrefEntry(og.getObj(), 0, 0, og.getGen());
     }
 
@@ -1351,12 +1340,9 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2, bool overwrite)
 void
 QPDF::showXRefTable()
 {
-    for (std::map<QPDFObjGen, QPDFXRefEntry>::iterator iter =
-             this->m->xref_table.begin();
-         iter != this->m->xref_table.end();
-         ++iter) {
-        QPDFObjGen const& og = (*iter).first;
-        QPDFXRefEntry const& entry = (*iter).second;
+    for (auto const& iter: this->m->xref_table) {
+        QPDFObjGen const& og = iter.first;
+        QPDFXRefEntry const& entry = iter.second;
         *this->m->out_stream << og.getObj() << "/" << og.getGen() << ": ";
         switch (entry.getType()) {
         case 1:
@@ -1390,27 +1376,19 @@ QPDF::fixDanglingReferences(bool force)
     // Create a set of all known indirect objects including those
     // we've previously resolved and those that we have created.
     std::set<QPDFObjGen> to_process;
-    for (std::map<QPDFObjGen, ObjCache>::iterator iter =
-             this->m->obj_cache.begin();
-         iter != this->m->obj_cache.end();
-         ++iter) {
-        to_process.insert((*iter).first);
+    for (auto const& iter: this->m->obj_cache) {
+        to_process.insert(iter.first);
     }
-    for (std::map<QPDFObjGen, QPDFXRefEntry>::iterator iter =
-             this->m->xref_table.begin();
-         iter != this->m->xref_table.end();
-         ++iter) {
-        to_process.insert((*iter).first);
+    for (auto const& iter: this->m->xref_table) {
+        to_process.insert(iter.first);
     }
 
     // For each non-scalar item to process, put it in the queue.
     std::list<QPDFObjectHandle> queue;
     queue.push_back(this->m->trailer);
-    for (std::set<QPDFObjGen>::iterator iter = to_process.begin();
-         iter != to_process.end();
-         ++iter) {
+    for (auto const& iter: to_process) {
         QPDFObjectHandle obj = QPDFObjectHandle::Factory::newIndirect(
-            this, (*iter).getObj(), (*iter).getGen());
+            this, iter.getObj(), iter.getGen());
         if (obj.isDictionary() || obj.isArray()) {
             queue.push_back(obj);
         } else if (obj.isStream()) {
@@ -1428,21 +1406,15 @@ QPDF::fixDanglingReferences(bool force)
         if (obj.isDictionary()) {
             std::map<std::string, QPDFObjectHandle> members =
                 obj.getDictAsMap();
-            for (std::map<std::string, QPDFObjectHandle>::iterator iter =
-                     members.begin();
-                 iter != members.end();
-                 ++iter) {
-                to_check.push_back((*iter).second);
+            for (auto const& iter: members) {
+                to_check.push_back(iter.second);
             }
         } else if (obj.isArray()) {
             QPDF_Array* arr = dynamic_cast<QPDF_Array*>(
                 QPDFObjectHandle::ObjAccessor::getObject(obj).get());
             arr->addExplicitElementsToList(to_check);
         }
-        for (std::list<QPDFObjectHandle>::iterator iter = to_check.begin();
-             iter != to_check.end();
-             ++iter) {
-            QPDFObjectHandle sub = *iter;
+        for (auto sub: to_check) {
             if (sub.isIndirect()) {
                 if (sub.getOwningQPDF() == this) {
                     QPDFObjGen og(sub.getObjGen());
@@ -1480,11 +1452,8 @@ QPDF::getAllObjects()
     // object cache.
     fixDanglingReferences(true);
     std::vector<QPDFObjectHandle> result;
-    for (std::map<QPDFObjGen, ObjCache>::iterator iter =
-             this->m->obj_cache.begin();
-         iter != this->m->obj_cache.end();
-         ++iter) {
-        QPDFObjGen const& og = (*iter).first;
+    for (auto const& iter: this->m->obj_cache) {
+        QPDFObjGen const& og = iter.first;
         result.push_back(
             // line-break
             QPDFObjectHandle::Factory::newIndirect(
@@ -1733,12 +1702,9 @@ QPDF::recoverStreamLength(
         QPDFObjGen this_obj(0, 0);
 
         // Make sure this is inside this object
-        for (std::map<QPDFObjGen, QPDFXRefEntry>::iterator iter =
-                 this->m->xref_table.begin();
-             iter != this->m->xref_table.end();
-             ++iter) {
-            QPDFObjGen const& og = (*iter).first;
-            QPDFXRefEntry const& entry = (*iter).second;
+        for (auto const& iter: this->m->xref_table) {
+            QPDFObjGen const& og = iter.first;
+            QPDFXRefEntry const& entry = iter.second;
             if (entry.getType() == 1) {
                 qpdf_offset_t obj_offset = entry.getOffset();
                 if ((obj_offset > stream_offset) &&
@@ -2157,15 +2123,13 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     // that some objects stored here might have been overridden by new
     // objects appended to the file, so it is necessary to recheck the
     // xref table and only cache what would actually be resolved here.
-    for (std::map<int, int>::iterator iter = offsets.begin();
-         iter != offsets.end();
-         ++iter) {
-        int obj = (*iter).first;
+    for (auto const& iter: offsets) {
+        int obj = iter.first;
         QPDFObjGen og(obj, 0);
         QPDFXRefEntry const& entry = this->m->xref_table[og];
         if ((entry.getType() == 2) &&
             (entry.getObjStreamNumber() == obj_stream_number)) {
-            int offset = (*iter).second;
+            int offset = iter.second;
             input->seek(offset, SEEK_SET);
             QPDFObjectHandle oh = readObject(input, "", obj, 0, true);
             this->m->obj_cache[og] = ObjCache(
@@ -2317,11 +2281,7 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
     }
 
     // Copy any new objects and replace the reservations.
-    for (std::vector<QPDFObjectHandle>::iterator iter =
-             obj_copier.to_copy.begin();
-         iter != obj_copier.to_copy.end();
-         ++iter) {
-        QPDFObjectHandle& to_copy = *iter;
+    for (auto& to_copy: obj_copier.to_copy) {
         QPDFObjectHandle copy =
             replaceForeignIndirectObjects(to_copy, obj_copier, true);
         if (!to_copy.isStream()) {
@@ -2365,8 +2325,7 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
         }
         QTC::TC("qpdf", "QPDF copy indirect");
         obj_copier.visiting.insert(foreign_og);
-        std::map<QPDFObjGen, QPDFObjectHandle>::iterator mapping =
-            obj_copier.object_map.find(foreign_og);
+        auto mapping = obj_copier.object_map.find(foreign_og);
         if (mapping == obj_copier.object_map.end()) {
             obj_copier.to_copy.push_back(foreign);
             QPDFObjectHandle reservation;
@@ -2388,10 +2347,8 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
     } else if (foreign.isDictionary()) {
         QTC::TC("qpdf", "QPDF reserve dictionary");
         std::set<std::string> keys = foreign.getKeys();
-        for (std::set<std::string>::iterator iter = keys.begin();
-             iter != keys.end();
-             ++iter) {
-            reserveObjects(foreign.getKey(*iter), obj_copier, false);
+        for (auto const& key: keys) {
+            reserveObjects(foreign.getKey(key), obj_copier, false);
         }
     } else if (foreign.isStream()) {
         QTC::TC("qpdf", "QPDF reserve stream");
@@ -2412,8 +2369,7 @@ QPDF::replaceForeignIndirectObjects(
     if ((!top) && foreign.isIndirect()) {
         QTC::TC("qpdf", "QPDF replace indirect");
         QPDFObjGen foreign_og(foreign.getObjGen());
-        std::map<QPDFObjGen, QPDFObjectHandle>::iterator mapping =
-            obj_copier.object_map.find(foreign_og);
+        auto mapping = obj_copier.object_map.find(foreign_og);
         if (mapping == obj_copier.object_map.end()) {
             // This case would occur if this is a reference to a Page
             // or Pages object that we didn't traverse into.
@@ -2657,12 +2613,9 @@ QPDF::getXRefTable()
 void
 QPDF::getObjectStreamData(std::map<int, int>& omap)
 {
-    for (std::map<QPDFObjGen, QPDFXRefEntry>::iterator iter =
-             this->m->xref_table.begin();
-         iter != this->m->xref_table.end();
-         ++iter) {
-        QPDFObjGen const& og = (*iter).first;
-        QPDFXRefEntry const& entry = (*iter).second;
+    for (auto const& iter: this->m->xref_table) {
+        QPDFObjGen const& og = iter.first;
+        QPDFXRefEntry const& entry = iter.second;
         if (entry.getType() == 2) {
             omap[og.getObj()] = entry.getObjStreamNumber();
         }

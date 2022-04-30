@@ -193,15 +193,12 @@ main(int argc, char* argv[])
         pdf.processFile(infilename);
         std::vector<QPDFPageObjectHelper> pages =
             QPDFPageDocumentHelper(pdf).getAllPages();
-        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-             iter != pages.end();
-             ++iter) {
+        for (auto& page: pages) {
             // Attach two token filters to each page of this file.
             // When the file is written, or when the pages' contents
             // are retrieved in any other way, the filters will be
             // applied. See comments on the filters for additional
             // details.
-            QPDFPageObjectHelper& page(*iter);
             page.addContentTokenFilter(
                 std::shared_ptr<QPDFObjectHandle::TokenFilter>(
                     new StringReverser));

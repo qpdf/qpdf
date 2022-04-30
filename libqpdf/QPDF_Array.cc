@@ -99,10 +99,8 @@ void
 QPDF_Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
 {
     this->elements = SparseOHArray();
-    for (std::vector<QPDFObjectHandle>::const_iterator iter = v.begin();
-         iter != v.end();
-         ++iter) {
-        this->elements.append(*iter);
+    for (auto const& iter: v) {
+        this->elements.append(iter);
     }
 }
 

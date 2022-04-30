@@ -14,10 +14,8 @@ QPDFPageDocumentHelper::getAllPages()
 {
     std::vector<QPDFObjectHandle> const& pages_v = this->qpdf.getAllPages();
     std::vector<QPDFPageObjectHelper> pages;
-    for (std::vector<QPDFObjectHandle>::const_iterator iter = pages_v.begin();
-         iter != pages_v.end();
-         ++iter) {
-        pages.push_back(QPDFPageObjectHelper(*iter));
+    for (auto const& iter: pages_v) {
+        pages.push_back(QPDFPageObjectHelper(iter));
     }
     return pages;
 }
@@ -32,10 +30,8 @@ void
 QPDFPageDocumentHelper::removeUnreferencedResources()
 {
     std::vector<QPDFPageObjectHelper> pages = getAllPages();
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter) {
-        (*iter).removeUnreferencedResources();
+    for (auto& ph: pages) {
+        ph.removeUnreferencedResources();
     }
 }
 
@@ -71,10 +67,7 @@ QPDFPageDocumentHelper::flattenAnnotations(
                             " so form fields will not be flattened");
     }
     std::vector<QPDFPageObjectHelper> pages = getAllPages();
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter) {
-        QPDFPageObjectHelper ph(*iter);
+    for (auto& ph: pages) {
         QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
         if (!resources.isDictionary()) {
             // This should never happen and is not exercised in the
@@ -107,11 +100,7 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
         rotate = rotate_obj.getIntValueAsInt();
     }
     int next_fx = 1;
-    for (std::vector<QPDFAnnotationObjectHelper>::iterator iter =
-             annots.begin();
-         iter != annots.end();
-         ++iter) {
-        QPDFAnnotationObjectHelper& aoh(*iter);
+    for (auto& aoh: annots) {
         QPDFObjectHandle as = aoh.getAppearanceStream("/N");
         bool is_widget = (aoh.getSubtype() == "/Widget");
         bool process = true;

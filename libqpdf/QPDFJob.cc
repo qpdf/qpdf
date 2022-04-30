@@ -852,10 +852,7 @@ QPDFJob::doCheck(QPDF& pdf)
         std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
         DiscardContents discard_contents;
         int pageno = 0;
-        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-             iter != pages.end();
-             ++iter) {
-            QPDFPageObjectHelper& page(*iter);
+        for (auto& page: pages) {
             ++pageno;
             try {
                 page.parseContents(&discard_contents);
@@ -927,10 +924,7 @@ QPDFJob::doShowPages(QPDF& pdf)
     std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     int pageno = 0;
     auto& cout = *this->m->cout;
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter) {
-        QPDFPageObjectHelper& ph(*iter);
+    for (auto& ph: pages) {
         QPDFObjectHandle page = ph.getObjectHandle();
         ++pageno;
 
@@ -1058,12 +1052,9 @@ QPDFJob::doJSONObjects(QPDF& pdf, JSON& j)
             "trailer", pdf.getTrailer().getJSON(true));
     }
     std::vector<QPDFObjectHandle> objects = pdf.getAllObjects();
-    for (std::vector<QPDFObjectHandle>::iterator iter = objects.begin();
-         iter != objects.end();
-         ++iter) {
-        if (all_objects || wanted_og.count((*iter).getObjGen())) {
-            j_objects.addDictionaryMember(
-                (*iter).unparse(), (*iter).getJSON(true));
+    for (auto& obj: objects) {
+        if (all_objects || wanted_og.count(obj.getObjGen())) {
+            j_objects.addDictionaryMember(obj.unparse(), obj.getJSON(true));
         }
     }
 }
@@ -1106,12 +1097,10 @@ QPDFJob::doJSONPages(QPDF& pdf, JSON& j)
     QPDFOutlineDocumentHelper odh(pdf);
     pdh.pushInheritedAttributesToPage();
     std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
-    int pageno = 0;
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter, ++pageno) {
+    int pageno = -1;
+    for (auto& ph: pages) {
+        ++pageno;
         JSON j_page = j_pages.addArrayElement(JSON::makeDictionary());
-        QPDFPageObjectHelper& ph(*iter);
         QPDFObjectHandle page = ph.getObjectHandle();
         j_page.addDictionaryMember("object", page.getJSON());
         JSON j_images = j_page.addDictionaryMember("images", JSON::makeArray());
@@ -1161,17 +1150,14 @@ QPDFJob::doJSONPages(QPDF& pdf, JSON& j)
             j_page.addDictionaryMember("outlines", JSON::makeArray());
         std::vector<QPDFOutlineObjectHelper> outlines =
             odh.getOutlinesForPage(page.getObjGen());
-        for (std::vector<QPDFOutlineObjectHelper>::iterator oiter =
-                 outlines.begin();
-             oiter != outlines.end();
-             ++oiter) {
+        for (auto& oiter: outlines) {
             JSON j_outline = j_outlines.addArrayElement(JSON::makeDictionary());
             j_outline.addDictionaryMember(
-                "object", (*oiter).getObjectHandle().getJSON());
+                "object", oiter.getObjectHandle().getJSON());
             j_outline.addDictionaryMember(
-                "title", JSON::makeString((*oiter).getTitle()));
+                "title", JSON::makeString(oiter.getTitle()));
             j_outline.addDictionaryMember(
-                "dest", (*oiter).getDest().getJSON(true));
+                "dest", oiter.getDest().getJSON(true));
         }
         j_page.addDictionaryMember("pageposfrom1", JSON::makeInt(1 + pageno));
     }
@@ -1188,10 +1174,8 @@ QPDFJob::doJSONPageLabels(QPDF& pdf, JSON& j)
         std::vector<QPDFObjectHandle> labels;
         pldh.getLabelsForPageRange(
             0, QIntC::to_int(pages.size()) - 1, 0, labels);
-        for (std::vector<QPDFObjectHandle>::iterator iter = labels.begin();
-             iter != labels.end();
-             ++iter) {
-            std::vector<QPDFObjectHandle>::iterator next = iter;
+        for (auto iter = labels.begin(); iter != labels.end(); ++iter) {
+            auto next = iter;
             ++next;
             if (next == labels.end()) {
                 // This can't happen, so ignore it. This could only
@@ -1213,10 +1197,7 @@ add_outlines_to_json(
     JSON& j,
     std::map<QPDFObjGen, int>& page_numbers)
 {
-    for (std::vector<QPDFOutlineObjectHelper>::iterator iter = outlines.begin();
-         iter != outlines.end();
-         ++iter) {
-        QPDFOutlineObjectHelper& ol = *iter;
+    for (auto& ol: outlines) {
         JSON jo = j.addArrayElement(JSON::makeDictionary());
         jo.addDictionaryMember("object", ol.getObjectHandle().getJSON());
         jo.addDictionaryMember("title", JSON::makeString(ol.getTitle()));
@@ -1243,10 +1224,8 @@ QPDFJob::doJSONOutlines(QPDF& pdf, JSON& j)
     QPDFPageDocumentHelper dh(pdf);
     std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     int n = 0;
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter) {
-        QPDFObjectHandle oh = (*iter).getObjectHandle();
+    for (auto const& ph: pages) {
+        QPDFObjectHandle oh = ph.getObjectHandle();
         page_numbers[oh.getObjGen()] = ++n;
     }
 
@@ -1268,17 +1247,11 @@ QPDFJob::doJSONAcroform(QPDF& pdf, JSON& j)
     QPDFPageDocumentHelper pdh(pdf);
     std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
     int pagepos1 = 0;
-    for (std::vector<QPDFPageObjectHelper>::iterator page_iter = pages.begin();
-         page_iter != pages.end();
-         ++page_iter) {
+    for (auto const& page: pages) {
         ++pagepos1;
         std::vector<QPDFAnnotationObjectHelper> annotations =
-            afdh.getWidgetAnnotationsForPage(*page_iter);
-        for (std::vector<QPDFAnnotationObjectHelper>::iterator annot_iter =
-                 annotations.begin();
-             annot_iter != annotations.end();
-             ++annot_iter) {
-            QPDFAnnotationObjectHelper& aoh = *annot_iter;
+            afdh.getWidgetAnnotationsForPage(page);
+        for (auto& aoh: annotations) {
             QPDFFormFieldObjectHelper ffh = afdh.getFieldForAnnotation(aoh);
             JSON j_field = j_fields.addArrayElement(JSON::makeDictionary());
             j_field.addDictionaryMember(
@@ -1314,10 +1287,8 @@ QPDFJob::doJSONAcroform(QPDF& pdf, JSON& j)
             JSON j_choices =
                 j_field.addDictionaryMember("choices", JSON::makeArray());
             std::vector<std::string> choices = ffh.getChoices();
-            for (std::vector<std::string>::iterator iter = choices.begin();
-                 iter != choices.end();
-                 ++iter) {
-                j_choices.addArrayElement(JSON::makeString(*iter));
+            for (auto const& choice: choices) {
+                j_choices.addArrayElement(JSON::makeString(choice));
             }
             JSON j_annot = j_field.addDictionaryMember(
                 "annotation", JSON::makeDictionary());
@@ -1688,10 +1659,8 @@ Please report this as a bug at\n\
    https://github.com/qpdf/qpdf/issues/new\n\
 ideally with the file that caused the error and the output below. Thanks!\n\
 \n";
-        for (std::list<std::string>::iterator iter = errors.begin();
-             iter != errors.end();
-             ++iter) {
-            *(this->m->cerr) << (*iter) << std::endl;
+        for (auto const& error: errors) {
+            *(this->m->cerr) << error << std::endl;
         }
     }
 
@@ -1816,10 +1785,8 @@ QPDFJob::doProcess(
         QUtil::possible_repaired_encodings(password);
     // Represent to char const*, as required by the QPDF class.
     std::vector<char const*> passwords;
-    for (std::vector<std::string>::iterator iter = passwords_str.begin();
-         iter != passwords_str.end();
-         ++iter) {
-        passwords.push_back((*iter).c_str());
+    for (auto const& iter: passwords_str) {
+        passwords.push_back(iter.c_str());
     }
     // We always try the supplied password first because it is the
     // first string returned by possible_repaired_encodings. If there
@@ -1835,13 +1802,11 @@ QPDFJob::doProcess(
     // attempt, which, like the first attempt, will be with the
     // supplied password.
     bool warned = false;
-    for (std::vector<char const*>::iterator iter = passwords.begin();
-         iter != passwords.end();
-         ++iter) {
+    for (auto iter = passwords.begin(); iter != passwords.end(); ++iter) {
         try {
             return doProcessOnce(fn, *iter, empty, used_for_input);
         } catch (QPDFExc& e) {
-            std::vector<char const*>::iterator next = iter;
+            auto next = iter;
             ++next;
             if (next == passwords.end()) {
                 throw e;
@@ -1961,10 +1926,7 @@ QPDFJob::doUnderOverlayForPage(
         resources = dest_page.getObjectHandle().replaceKeyAndGet(
             "/Resources", QPDFObjectHandle::newDictionary());
     }
-    for (std::vector<int>::iterator iter = pagenos[pageno].begin();
-         iter != pagenos[pageno].end();
-         ++iter) {
-        int from_pageno = *iter;
+    for (int from_pageno: pagenos[pageno]) {
         doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
             cout << "    " << uo.which << " " << from_pageno << std::endl;
         });
@@ -2017,15 +1979,14 @@ QPDFJob::getUOPagenos(
     size_t idx = 0;
     size_t from_size = uo.from_pagenos.size();
     size_t repeat_size = uo.repeat_pagenos.size();
-    for (std::vector<int>::iterator iter = uo.to_pagenos.begin();
-         iter != uo.to_pagenos.end();
-         ++iter, ++idx) {
+    for (int to_pageno: uo.to_pagenos) {
         if (idx < from_size) {
-            pagenos[*iter].push_back(uo.from_pagenos.at(idx));
+            pagenos[to_pageno].push_back(uo.from_pagenos.at(idx));
         } else if (repeat_size) {
-            pagenos[*iter].push_back(
+            pagenos[to_pageno].push_back(
                 uo.repeat_pagenos.at((idx - from_size) % repeat_size));
         }
+        ++idx;
     }
 }
 
@@ -2206,21 +2167,15 @@ QPDFJob::handleTransformations(QPDF& pdf)
     if (m->externalize_inline_images ||
         (m->optimize_images && (!m->keep_inline_images))) {
         std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
-        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-             iter != pages.end();
-             ++iter) {
-            QPDFPageObjectHelper& ph(*iter);
+        for (auto& ph: pages) {
             ph.externalizeInlineImages(m->ii_min_bytes);
         }
     }
     if (m->optimize_images) {
         int pageno = 0;
         std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
-        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-             iter != pages.end();
-             ++iter) {
+        for (auto& ph: pages) {
             ++pageno;
-            QPDFPageObjectHelper& ph(*iter);
             QPDFObjectHandle page = ph.getObjectHandle();
             std::map<std::string, QPDFObjectHandle> images = ph.getImages();
             for (auto& iter2: images) {
@@ -2260,10 +2215,8 @@ QPDFJob::handleTransformations(QPDF& pdf)
     }
     if (m->coalesce_contents) {
         std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
-        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-             iter != pages.end();
-             ++iter) {
-            (*iter).coalesceContentStreams();
+        for (auto& page: pages) {
+            page.coalesceContentStreams();
         }
     }
     if (m->flatten_rotation) {
@@ -2428,10 +2381,7 @@ QPDFJob::handlePageSpecs(
     // actual pages.
 
     // Handle "." as a shortcut for the input file
-    for (std::vector<QPDFJob::PageSpec>::iterator iter = m->page_specs.begin();
-         iter != m->page_specs.end();
-         ++iter) {
-        QPDFJob::PageSpec& page_spec = *iter;
+    for (auto& page_spec: m->page_specs) {
         if (page_spec.filename == ".") {
             page_spec.filename = m->infilename.get();
         }
@@ -2463,10 +2413,7 @@ QPDFJob::handlePageSpecs(
     page_spec_qpdfs[m->infilename.get()] = &pdf;
     std::vector<QPDFPageData> parsed_specs;
     std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
-    for (std::vector<QPDFJob::PageSpec>::iterator iter = m->page_specs.begin();
-         iter != m->page_specs.end();
-         ++iter) {
-        QPDFJob::PageSpec& page_spec = *iter;
+    for (auto& page_spec: m->page_specs) {
         if (page_spec_qpdfs.count(page_spec.filename) == 0) {
             // Open the PDF file and store the QPDF object. Throw a
             // std::shared_ptr to the qpdf into a heap so that it
@@ -2523,17 +2470,14 @@ QPDFJob::handlePageSpecs(
 
     std::map<unsigned long long, bool> remove_unreferenced;
     if (m->remove_unreferenced_page_resources != QPDFJob::re_no) {
-        for (std::map<std::string, QPDF*>::iterator iter =
-                 page_spec_qpdfs.begin();
-             iter != page_spec_qpdfs.end();
-             ++iter) {
-            std::string const& filename = (*iter).first;
+        for (auto const& iter: page_spec_qpdfs) {
+            std::string const& filename = iter.first;
             ClosedFileInputSource* cis = 0;
             if (page_spec_cfis.count(filename)) {
                 cis = page_spec_cfis[filename];
                 cis->stayOpen(true);
             }
-            QPDF& other(*((*iter).second));
+            QPDF& other(*(iter.second));
             auto other_uuid = other.getUniqueId();
             if (remove_unreferenced.count(other_uuid) == 0) {
                 remove_unreferenced[other_uuid] =
@@ -2556,10 +2500,8 @@ QPDFJob::handlePageSpecs(
     });
     QPDFPageDocumentHelper dh(pdf);
     std::vector<QPDFPageObjectHelper> orig_pages = dh.getAllPages();
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = orig_pages.begin();
-         iter != orig_pages.end();
-         ++iter) {
-        dh.removePage(*iter);
+    for (auto const& page: orig_pages) {
+        dh.removePage(page);
     }
 
     if (m->collate && (parsed_specs.size() > 1)) {
@@ -2601,10 +2543,7 @@ QPDFJob::handlePageSpecs(
         afdh_map;
     auto this_afdh = get_afdh_for_qpdf(afdh_map, &pdf);
     std::set<QPDFObjGen> referenced_fields;
-    for (std::vector<QPDFPageData>::iterator iter = parsed_specs.begin();
-         iter != parsed_specs.end();
-         ++iter) {
-        QPDFPageData& page_data = *iter;
+    for (auto& page_data: parsed_specs) {
         ClosedFileInputSource* cis = 0;
         if (page_spec_cfis.count(page_data.filename)) {
             cis = page_spec_cfis[page_data.filename];
@@ -2619,14 +2558,12 @@ QPDFJob::handlePageSpecs(
             cout << prefix << ": adding pages from " << page_data.filename
                  << std::endl;
         });
-        for (std::vector<int>::iterator pageno_iter =
-                 page_data.selected_pages.begin();
-             pageno_iter != page_data.selected_pages.end();
-             ++pageno_iter, ++out_pageno) {
+        for (auto pageno_iter: page_data.selected_pages) {
             // Pages are specified from 1 but numbered from 0 in the
             // vector
-            int pageno = *pageno_iter - 1;
-            pldh.getLabelsForPageRange(pageno, pageno, out_pageno, new_labels);
+            int pageno = pageno_iter - 1;
+            pldh.getLabelsForPageRange(
+                pageno, pageno, out_pageno++, new_labels);
             QPDFPageObjectHelper to_copy =
                 page_data.orig_pages.at(QIntC::to_size(pageno));
             QPDFObjGen to_copy_og = to_copy.getObjectHandle().getObjGen();
@@ -2748,19 +2685,14 @@ QPDFJob::handleRotations(QPDF& pdf)
     QPDFPageDocumentHelper dh(pdf);
     std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     int npages = QIntC::to_int(pages.size());
-    for (std::map<std::string, QPDFJob::RotationSpec>::iterator iter =
-             m->rotations.begin();
-         iter != m->rotations.end();
-         ++iter) {
-        std::string const& range = (*iter).first;
-        QPDFJob::RotationSpec const& rspec = (*iter).second;
+    for (auto const& iter: m->rotations) {
+        std::string const& range = iter.first;
+        QPDFJob::RotationSpec const& rspec = iter.second;
         // range has been previously validated
         std::vector<int> to_rotate =
             QUtil::parse_numrange(range.c_str(), npages);
-        for (std::vector<int>::iterator i2 = to_rotate.begin();
-             i2 != to_rotate.end();
-             ++i2) {
-            int pageno = *i2 - 1;
+        for (int pageno_iter: to_rotate) {
+            int pageno = pageno_iter - 1;
             if ((pageno >= 0) && (pageno < npages)) {
                 pages.at(QIntC::to_size(pageno))
                     .rotatePage(rspec.angle, rspec.relative);

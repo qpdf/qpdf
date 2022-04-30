@@ -131,14 +131,11 @@ main(int argc, char* argv[])
         // For each page...
         std::vector<QPDFPageObjectHelper> pages =
             QPDFPageDocumentHelper(qpdf).getAllPages();
-        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-             iter != pages.end();
-             ++iter) {
-            QPDFPageObjectHelper& page(*iter);
+        for (auto& page: pages) {
             // Get all images on the page.
             std::map<std::string, QPDFObjectHandle> images = page.getImages();
-            for (auto& iter2: images) {
-                QPDFObjectHandle& image = iter2.second;
+            for (auto& iter: images) {
+                QPDFObjectHandle& image = iter.second;
                 QPDFObjectHandle image_dict = image.getDict();
                 QPDFObjectHandle color_space = image_dict.getKey("/ColorSpace");
                 QPDFObjectHandle bits_per_component =

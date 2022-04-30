@@ -755,10 +755,8 @@ QPDFWriter::setEncryptionParameters(
 
     int P = 0;
     // Create the complement of P, then invert.
-    for (std::set<int>::iterator iter = bits_to_clear.begin();
-         iter != bits_to_clear.end();
-         ++iter) {
-        P |= (1 << ((*iter) - 1));
+    for (int b: bits_to_clear) {
+        P |= (1 << (b - 1));
     }
     P = ~P;
 
@@ -1277,11 +1275,8 @@ QPDFWriter::assignCompressedObjectNumbers(QPDFObjGen const& og)
 
     // Reserve numbers for the objects that belong to this object
     // stream.
-    for (std::set<QPDFObjGen>::iterator iter =
-             this->m->object_stream_to_objects[objid].begin();
-         iter != this->m->object_stream_to_objects[objid].end();
-         ++iter) {
-        this->m->obj_renumber[*iter] = this->m->next_objid++;
+    for (auto const& iter: this->m->object_stream_to_objects[objid]) {
+        this->m->obj_renumber[iter] = this->m->next_objid++;
     }
 }
 
@@ -1353,11 +1348,9 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
         }
     } else if (object.isDictionary()) {
         std::set<std::string> keys = object.getKeys();
-        for (std::set<std::string>::iterator iter = keys.begin();
-             iter != keys.end();
-             ++iter) {
+        for (auto const& key: keys) {
             if (!this->m->linearized) {
-                enqueueObject(object.getKey(*iter));
+                enqueueObject(object.getKey(key));
             }
         }
     } else {
@@ -1401,10 +1394,7 @@ QPDFWriter::writeTrailer(
         writeString(QUtil::int_to_string(size));
     } else {
         std::set<std::string> keys = trailer.getKeys();
-        for (std::set<std::string>::iterator iter = keys.begin();
-             iter != keys.end();
-             ++iter) {
-            std::string const& key = *iter;
+        for (auto const& key: keys) {
             writeStringQDF("  ");
             writeStringNoQDF(" ");
             writeString(QPDF_Name::normalizeName(key));
@@ -1758,11 +1748,7 @@ QPDFWriter::unparseObject(
         writeStringQDF("\n");
 
         std::set<std::string> keys = object.getKeys();
-        for (std::set<std::string>::iterator iter = keys.begin();
-             iter != keys.end();
-             ++iter) {
-            std::string const& key = *iter;
-
+        for (auto const& key: keys) {
             writeStringQDF(indent);
             writeStringQDF("  ");
             writeStringNoQDF(" ");
@@ -1930,12 +1916,9 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
             pushDiscardFilter(pp_ostream);
         } else {
             // Adjust offsets to skip over comment before first object
-
             first = offsets.at(0);
-            for (std::vector<qpdf_offset_t>::iterator iter = offsets.begin();
-                 iter != offsets.end();
-                 ++iter) {
-                *iter -= first;
+            for (auto& iter: offsets) {
+                iter -= first;
             }
 
             // Take one pass at writing pairs of numbers so we can get
@@ -1960,12 +1943,9 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
             writeObjectStreamOffsets(offsets, first_obj);
         }
 
-        int count = 0;
-        for (std::set<QPDFObjGen>::iterator iter =
-                 this->m->object_stream_to_objects[old_id].begin();
-             iter != this->m->object_stream_to_objects[old_id].end();
-             ++iter, ++count) {
-            QPDFObjGen obj = *iter;
+        int count = -1;
+        for (auto const& obj: this->m->object_stream_to_objects[old_id]) {
+            ++count;
             int new_obj = this->m->obj_renumber[obj];
             if (first_obj == -1) {
                 first_obj = new_obj;
@@ -2197,10 +2177,8 @@ QPDFWriter::generateID()
         if (trailer.hasKey("/Info")) {
             QPDFObjectHandle info = trailer.getKey("/Info");
             std::set<std::string> keys = info.getKeys();
-            for (std::set<std::string>::iterator iter = keys.begin();
-                 iter != keys.end();
-                 ++iter) {
-                QPDFObjectHandle obj = info.getKey(*iter);
+            for (auto const& key: keys) {
+                QPDFObjectHandle obj = info.getKey(key);
                 if (obj.isString()) {
                     seed += " ";
                     seed += obj.getStringValue();
@@ -2235,10 +2213,7 @@ QPDFWriter::initializeSpecialStreams()
     // normalizing.
     std::vector<QPDFObjectHandle> pages = this->m->pdf.getAllPages();
     int num = 0;
-    for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter) {
-        QPDFObjectHandle& page = *iter;
+    for (auto& page: pages) {
         this->m->page_object_to_seq[page.getObjGen()] = ++num;
         QPDFObjectHandle contents = page.getKey("/Contents");
         std::vector<QPDFObjGen> contents_objects;
@@ -2322,9 +2297,7 @@ QPDFWriter::generateObjectStreams()
     }
     unsigned int n = 0;
     int cur_ostream = 0;
-    for (std::vector<QPDFObjGen>::const_iterator iter = eligible.begin();
-         iter != eligible.end();
-         ++iter) {
+    for (auto const& iter: eligible) {
         if ((n % n_per) == 0) {
             if (n > 0) {
                 QTC::TC("qpdf", "QPDFWriter generate >1 ostream");
@@ -2339,7 +2312,7 @@ QPDFWriter::generateObjectStreams()
                 this->m->pdf.makeIndirectObject(QPDFObjectHandle::newNull())
                     .getObjectID();
         }
-        this->m->object_to_object_stream[*iter] = cur_ostream;
+        this->m->object_to_object_stream[iter] = cur_ostream;
         ++n;
     }
 }
@@ -2495,10 +2468,7 @@ QPDFWriter::doWriteSetup()
     if (this->m->linearized) {
         // Page dictionaries are not allowed to be compressed objects.
         std::vector<QPDFObjectHandle> pages = this->m->pdf.getAllPages();
-        for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
-             iter != pages.end();
-             ++iter) {
-            QPDFObjectHandle& page = *iter;
+        for (auto& page: pages) {
             QPDFObjGen og = page.getObjGen();
             if (this->m->object_to_object_stream.count(og)) {
                 QTC::TC("qpdf", "QPDFWriter uncompressing page dictionary");
@@ -2521,12 +2491,9 @@ QPDFWriter::doWriteSetup()
     }
 
     // Generate reverse mapping from object stream to objects
-    for (std::map<QPDFObjGen, int>::iterator iter =
-             this->m->object_to_object_stream.begin();
-         iter != this->m->object_to_object_stream.end();
-         ++iter) {
-        QPDFObjGen obj = (*iter).first;
-        int stream = (*iter).second;
+    for (auto const& iter: this->m->object_to_object_stream) {
+        QPDFObjGen const& obj = iter.first;
+        int stream = iter.second;
         this->m->object_stream_to_objects[stream].insert(obj);
         this->m->max_ostream_index = std::max(
             this->m->max_ostream_index,
@@ -2591,11 +2558,9 @@ QPDFWriter::getWrittenXRefTable()
 {
     std::map<QPDFObjGen, QPDFXRefEntry> result;
 
-    for (std::map<int, QPDFXRefEntry>::iterator iter = this->m->xref.begin();
-         iter != this->m->xref.end();
-         ++iter) {
-        if (iter->first != 0 && iter->second.getType() != 0) {
-            result[QPDFObjGen(iter->first, 0)] = iter->second;
+    for (auto const& iter: this->m->xref) {
+        if (iter.first != 0 && iter.second.getType() != 0) {
+            result[QPDFObjGen(iter.first, 0)] = iter.second;
         }
     }
 
@@ -2605,10 +2570,8 @@ QPDFWriter::getWrittenXRefTable()
 void
 QPDFWriter::enqueuePart(std::vector<QPDFObjectHandle>& part)
 {
-    for (std::vector<QPDFObjectHandle>::iterator iter = part.begin();
-         iter != part.end();
-         ++iter) {
-        enqueueObject(*iter);
+    for (auto const& oh: part) {
+        enqueueObject(oh);
     }
 }
 
@@ -2617,14 +2580,11 @@ QPDFWriter::writeEncryptionDictionary()
 {
     this->m->encryption_dict_objid = openObject(this->m->encryption_dict_objid);
     writeString("<<");
-    for (std::map<std::string, std::string>::iterator iter =
-             this->m->encryption_dictionary.begin();
-         iter != this->m->encryption_dictionary.end();
-         ++iter) {
+    for (auto const& iter: this->m->encryption_dictionary) {
         writeString(" ");
-        writeString((*iter).first);
+        writeString(iter.first);
         writeString(" ");
-        writeString((*iter).second);
+        writeString(iter.second);
     }
     writeString(" >>");
     closeObject(this->m->encryption_dict_objid);
@@ -2937,10 +2897,8 @@ QPDFWriter::discardGeneration(
     // maps for QPDF that throw away generation numbers.
 
     out.clear();
-    for (std::map<QPDFObjGen, int>::const_iterator iter = in.begin();
-         iter != in.end();
-         ++iter) {
-        if (out.count((*iter).first.getObj())) {
+    for (auto const& iter: in) {
+        if (out.count(iter.first.getObj())) {
             throw std::runtime_error(
                 "QPDF cannot currently linearize files that contain"
                 " multiple objects with the same object ID and different"
@@ -2950,7 +2908,7 @@ QPDFWriter::discardGeneration(
                 " linearizing, and then linearize the result of that"
                 " conversion.");
         }
-        out[(*iter).first.getObj()] = (*iter).second;
+        out[iter.first.getObj()] = iter.second;
     }
 }
 
@@ -3020,10 +2978,8 @@ QPDFWriter::writeLinearized()
     // Assign numbers to all compressed objects in the second half.
     std::vector<QPDFObjectHandle>* vecs2[] = {&part7, &part8, &part9};
     for (int i = 0; i < 3; ++i) {
-        for (std::vector<QPDFObjectHandle>::iterator iter = (*vecs2[i]).begin();
-             iter != (*vecs2[i]).end();
-             ++iter) {
-            assignCompressedObjectNumbers((*iter).getObjGen());
+        for (auto const& oh: *vecs2[i]) {
+            assignCompressedObjectNumbers(oh.getObjGen());
         }
     }
     int second_half_end = this->m->next_objid - 1;
@@ -3049,10 +3005,8 @@ QPDFWriter::writeLinearized()
     // Assign numbers to all compressed objects in the first half
     std::vector<QPDFObjectHandle>* vecs1[] = {&part4, &part6};
     for (int i = 0; i < 2; ++i) {
-        for (std::vector<QPDFObjectHandle>::iterator iter = (*vecs1[i]).begin();
-             iter != (*vecs1[i]).end();
-             ++iter) {
-            assignCompressedObjectNumbers((*iter).getObjGen());
+        for (auto const& oh: *vecs1[i]) {
+            assignCompressedObjectNumbers(oh.getObjGen());
         }
     }
     int first_half_end = this->m->next_objid - 1;
@@ -3240,11 +3194,7 @@ QPDFWriter::writeLinearized()
 
         // Parts 4 through 9
 
-        for (std::list<QPDFObjectHandle>::iterator iter =
-                 this->m->object_queue.begin();
-             iter != this->m->object_queue.end();
-             ++iter) {
-            QPDFObjectHandle cur_object = (*iter);
+        for (auto const& cur_object: this->m->object_queue) {
             if (cur_object.getObjectID() == part6_end_marker) {
                 first_half_max_obj_offset = this->m->pipeline->getCount();
             }
@@ -3390,11 +3340,8 @@ QPDFWriter::enqueueObjectsStandard()
 {
     if (this->m->preserve_unreferenced_objects) {
         QTC::TC("qpdf", "QPDFWriter preserve unreferenced standard");
-        std::vector<QPDFObjectHandle> all = this->m->pdf.getAllObjects();
-        for (std::vector<QPDFObjectHandle>::iterator iter = all.begin();
-             iter != all.end();
-             ++iter) {
-            enqueueObject(*iter);
+        for (auto const& oh: this->m->pdf.getAllObjects()) {
+            enqueueObject(oh);
         }
     }
 
@@ -3407,10 +3354,8 @@ QPDFWriter::enqueueObjectsStandard()
     // Root is already there, so enqueuing it a second time is a
     // no-op.
     std::set<std::string> keys = trailer.getKeys();
-    for (std::set<std::string>::iterator iter = keys.begin();
-         iter != keys.end();
-         ++iter) {
-        enqueueObject(trailer.getKey(*iter));
+    for (auto const& key: keys) {
+        enqueueObject(trailer.getKey(key));
     }
 }
 
@@ -3424,23 +3369,18 @@ QPDFWriter::enqueueObjectsPCLm()
 
     // enqueue all pages first
     std::vector<QPDFObjectHandle> all = this->m->pdf.getAllPages();
-    for (std::vector<QPDFObjectHandle>::iterator iter = all.begin();
-         iter != all.end();
-         ++iter) {
+    for (auto& page: all) {
         // enqueue page
-        enqueueObject(*iter);
+        enqueueObject(page);
 
         // enqueue page contents stream
-        enqueueObject((*iter).getKey("/Contents"));
+        enqueueObject(page.getKey("/Contents"));
 
         // enqueue all the strips for each page
-        QPDFObjectHandle strips =
-            (*iter).getKey("/Resources").getKey("/XObject");
+        QPDFObjectHandle strips = page.getKey("/Resources").getKey("/XObject");
         std::set<std::string> keys = strips.getKeys();
-        for (std::set<std::string>::iterator image = keys.begin();
-             image != keys.end();
-             ++image) {
-            enqueueObject(strips.getKey(*image));
+        for (auto const& image: keys) {
+            enqueueObject(strips.getKey(image));
             enqueueObject(QPDFObjectHandle::newStream(
                 &this->m->pdf, image_transform_content));
         }

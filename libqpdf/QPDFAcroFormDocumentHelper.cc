@@ -182,11 +182,8 @@ QPDFAcroFormDocumentHelper::getFormFields()
 {
     analyze();
     std::vector<QPDFFormFieldObjectHelper> result;
-    for (std::map<QPDFObjGen, std::vector<QPDFAnnotationObjectHelper>>::iterator
-             iter = this->m->field_to_annotations.begin();
-         iter != this->m->field_to_annotations.end();
-         ++iter) {
-        result.push_back(this->qpdf.getObjectByObjGen((*iter).first));
+    for (auto const& iter: this->m->field_to_annotations) {
+        result.push_back(this->qpdf.getObjectByObjGen(iter.first));
     }
     return result;
 }
@@ -299,17 +296,11 @@ QPDFAcroFormDocumentHelper::analyze()
 
     QPDFPageDocumentHelper dh(this->qpdf);
     std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter) {
-        QPDFPageObjectHelper ph(*iter);
+    for (auto const& ph: pages) {
         std::vector<QPDFAnnotationObjectHelper> annots =
             getWidgetAnnotationsForPage(ph);
-        for (std::vector<QPDFAnnotationObjectHelper>::iterator i2 =
-                 annots.begin();
-             i2 != annots.end();
-             ++i2) {
-            QPDFObjectHandle annot((*i2).getObjectHandle());
+        for (auto const& iter: annots) {
+            QPDFObjectHandle annot(iter.getObjectHandle());
             QPDFObjGen og(annot.getObjGen());
             if (this->m->annotation_to_field.count(og) == 0) {
                 QTC::TC("qpdf", "QPDFAcroFormDocumentHelper orphaned widget");
@@ -462,16 +453,10 @@ QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded()
 
     QPDFPageDocumentHelper pdh(this->qpdf);
     std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
-    for (std::vector<QPDFPageObjectHelper>::iterator page_iter = pages.begin();
-         page_iter != pages.end();
-         ++page_iter) {
+    for (auto const& page: pages) {
         std::vector<QPDFAnnotationObjectHelper> annotations =
-            getWidgetAnnotationsForPage(*page_iter);
-        for (std::vector<QPDFAnnotationObjectHelper>::iterator annot_iter =
-                 annotations.begin();
-             annot_iter != annotations.end();
-             ++annot_iter) {
-            QPDFAnnotationObjectHelper& aoh = *annot_iter;
+            getWidgetAnnotationsForPage(page);
+        for (auto& aoh: annotations) {
             QPDFFormFieldObjectHelper ffh = getFieldForAnnotation(aoh);
             if (ffh.getFieldType() == "/Btn") {
                 // Rather than generating appearances for button

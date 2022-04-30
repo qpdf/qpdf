@@ -52,23 +52,17 @@ main(int argc, char* argv[])
         QPDFAcroFormDocumentHelper afdh(qpdf);
         QPDFPageDocumentHelper pdh(qpdf);
         std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
-        for (std::vector<QPDFPageObjectHelper>::iterator page_iter =
-                 pages.begin();
-             page_iter != pages.end();
-             ++page_iter) {
+        for (auto const& page: pages) {
             // Get all widget annotations for each page. Widget
             // annotations are the ones that contain the details of
             // what's in a form field.
             std::vector<QPDFAnnotationObjectHelper> annotations =
-                afdh.getWidgetAnnotationsForPage(*page_iter);
-            for (std::vector<QPDFAnnotationObjectHelper>::iterator annot_iter =
-                     annotations.begin();
-                 annot_iter != annotations.end();
-                 ++annot_iter) {
+                afdh.getWidgetAnnotationsForPage(page);
+            for (auto& annot: annotations) {
                 // For each annotation, find its associated field. If
                 // it's a text field, set its value.
                 QPDFFormFieldObjectHelper ffh =
-                    afdh.getFieldForAnnotation(*annot_iter);
+                    afdh.getFieldForAnnotation(annot);
                 if (ffh.getFieldType() == "/Tx") {
                     // Set the value. Passing false as the second
                     // value prevents qpdf from setting
@@ -81,7 +75,7 @@ main(int argc, char* argv[])
                     // additional details, please see comments in
                     // QPDFFormFieldObjectHelper.hh for this method.
                     ffh.setV(value, false);
-                    ffh.generateAppearance(*annot_iter);
+                    ffh.generateAppearance(annot);
                 }
             }
         }

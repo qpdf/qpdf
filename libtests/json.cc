@@ -130,10 +130,8 @@ check_schema(
     std::list<std::string> errors;
     std::cout << "--- " << description << std::endl;
     assert(exp == obj.checkSchema(schema, flags, errors));
-    for (std::list<std::string>::iterator iter = errors.begin();
-         iter != errors.end();
-         ++iter) {
-        std::cout << *iter << std::endl;
+    for (auto const& error: errors) {
+        std::cout << error << std::endl;
     }
     std::cout << "---" << std::endl;
 }

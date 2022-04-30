@@ -1244,17 +1244,12 @@ QPDFObjectHandle::getResourceNames()
         return result;
     }
     std::set<std::string> keys = getKeys();
-    for (std::set<std::string>::iterator iter = keys.begin();
-         iter != keys.end();
-         ++iter) {
-        std::string const& key = *iter;
+    for (auto const& key: keys) {
         QPDFObjectHandle val = getKey(key);
         if (val.isDictionary()) {
             std::set<std::string> val_keys = val.getKeys();
-            for (std::set<std::string>::iterator i2 = val_keys.begin();
-                 i2 != val_keys.end();
-                 ++i2) {
-                result.insert(*i2);
+            for (auto const& val_key: val_keys) {
+                result.insert(val_key);
             }
         }
     }
@@ -1620,10 +1615,7 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
     }
 
     bool first = true;
-    for (std::vector<QPDFObjectHandle>::iterator iter = result.begin();
-         iter != result.end();
-         ++iter) {
-        QPDFObjectHandle item = *iter;
+    for (auto const& item: result) {
         std::string og = QUtil::int_to_string(item.getObjectID()) + " " +
             QUtil::int_to_string(item.getGeneration());
         if (first) {
@@ -1660,11 +1652,9 @@ QPDFObjectHandle::addPageContents(QPDFObjectHandle new_contents, bool first)
         QTC::TC("qpdf", "QPDFObjectHandle prepend page contents");
         content_streams.push_back(new_contents);
     }
-    for (std::vector<QPDFObjectHandle>::iterator iter = orig_contents.begin();
-         iter != orig_contents.end();
-         ++iter) {
+    for (auto const& iter: orig_contents) {
         QTC::TC("qpdf", "QPDFObjectHandle append page contents");
-        content_streams.push_back(*iter);
+        content_streams.push_back(iter);
     }
     if (!first) {
         content_streams.push_back(new_contents);
@@ -1865,14 +1855,11 @@ QPDFObjectHandle::pipeContentStreams(
         arrayOrStreamToStreamArray(description, all_description);
     bool need_newline = false;
     Pl_Buffer buf("concatenated content stream buffer");
-    for (std::vector<QPDFObjectHandle>::iterator iter = streams.begin();
-         iter != streams.end();
-         ++iter) {
+    for (auto stream: streams) {
         if (need_newline) {
             buf.write(QUtil::unsigned_char_pointer("\n"), 1);
         }
         LastChar lc(&buf);
-        QPDFObjectHandle stream = *iter;
         std::string og = QUtil::int_to_string(stream.getObjectID()) + " " +
             QUtil::int_to_string(stream.getGeneration());
         std::string w_description = "content stream object " + og;
@@ -2920,13 +2907,11 @@ QPDFObjectHandle::copyObject(
         QTC::TC("qpdf", "QPDFObjectHandle clone dictionary");
         std::set<std::string> keys = getKeys();
         std::map<std::string, QPDFObjectHandle> items;
-        for (std::set<std::string>::iterator iter = keys.begin();
-             iter != keys.end();
-             ++iter) {
-            items[*iter] = getKey(*iter);
+        for (auto const& key: keys) {
+            items[key] = getKey(key);
             if ((!first_level_only) &&
-                (cross_indirect || (!items[*iter].isIndirect()))) {
-                items[*iter].copyObject(
+                (cross_indirect || (!items[key].isIndirect()))) {
+                items[key].copyObject(
                     visited, cross_indirect, first_level_only, stop_at_streams);
             }
         }

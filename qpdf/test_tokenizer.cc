@@ -99,14 +99,13 @@ static std::string
 sanitize(std::string const& value)
 {
     std::string result;
-    for (std::string::const_iterator iter = value.begin(); iter != value.end();
-         ++iter) {
-        if ((*iter >= 32) && (*iter <= 126)) {
-            result.append(1, *iter);
+    for (auto const& iter: value) {
+        if ((iter >= 32) && (iter <= 126)) {
+            result.append(1, iter);
         } else {
             result += "\\x" +
                 QUtil::int_to_string_base(
-                          static_cast<unsigned char>(*iter), 16, 2);
+                          static_cast<unsigned char>(iter), 16, 2);
         }
     }
     return result;
@@ -203,12 +202,10 @@ process(char const* filename, bool include_ignorable, size_t max_len)
     std::vector<QPDFPageObjectHelper> pages =
         QPDFPageDocumentHelper(qpdf).getAllPages();
     int pageno = 0;
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter) {
+    for (auto& page: pages) {
         ++pageno;
         Pl_Buffer plb("buffer");
-        (*iter).pipeContents(&plb);
+        page.pipeContents(&plb);
         auto content_data = plb.getBufferSharedPointer();
         BufferInputSource* bis =
             new BufferInputSource("content data", content_data.get());
@@ -223,20 +220,16 @@ process(char const* filename, bool include_ignorable, size_t max_len)
     }
 
     // Tokenize object streams
-    std::vector<QPDFObjectHandle> all = qpdf.getAllObjects();
-    for (std::vector<QPDFObjectHandle>::iterator iter = all.begin();
-         iter != all.end();
-         ++iter) {
-        if ((*iter).isStream() && (*iter).getDict().getKey("/Type").isName() &&
-            (*iter).getDict().getKey("/Type").getName() == "/ObjStm") {
-            std::shared_ptr<Buffer> b =
-                (*iter).getStreamData(qpdf_dl_specialized);
+    for (auto& obj: qpdf.getAllObjects()) {
+        if (obj.isStream() && obj.getDict().getKey("/Type").isName() &&
+            obj.getDict().getKey("/Type").getName() == "/ObjStm") {
+            std::shared_ptr<Buffer> b = obj.getStreamData(qpdf_dl_specialized);
             BufferInputSource* bis =
                 new BufferInputSource("object stream data", b.get());
             is = std::shared_ptr<InputSource>(bis);
             dump_tokens(
                 is,
-                "OBJECT STREAM " + QUtil::int_to_string((*iter).getObjectID()),
+                "OBJECT STREAM " + QUtil::int_to_string(obj.getObjectID()),
                 max_len,
                 include_ignorable,
                 false,

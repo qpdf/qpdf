@@ -294,10 +294,7 @@ QPDFArgParser::handleBashArguments()
     bool last_was_backslash = false;
     enum { st_top, st_squote, st_dquote } state = st_top;
     std::string arg;
-    for (std::string::iterator iter = this->m->bash_line.begin();
-         iter != this->m->bash_line.end();
-         ++iter) {
-        char ch = (*iter);
+    for (char ch: this->m->bash_line) {
         if (last_was_backslash) {
             arg.append(1, ch);
             last_was_backslash = false;
@@ -560,13 +557,14 @@ QPDFArgParser::parseArgs()
             } else if (!oe.choices.empty()) {
                 QTC::TC("libtests", "QPDFArgParser required choices");
                 message += "{";
-                for (std::set<std::string>::iterator iter = oe.choices.begin();
-                     iter != oe.choices.end();
-                     ++iter) {
-                    if (iter != oe.choices.begin()) {
+                bool first = true;
+                for (auto const& choice: oe.choices) {
+                    if (first) {
+                        first = false;
+                    } else {
                         message += ",";
                     }
-                    message += *iter;
+                    message += choice;
                 }
                 message += "}";
             } else if (!oe.parameter_name.empty()) {
@@ -624,11 +622,9 @@ QPDFArgParser::addChoicesToCompletions(
 {
     if (option_table.count(option) != 0) {
         OptionEntry& oe = option_table[option];
-        for (std::set<std::string>::iterator iter = oe.choices.begin();
-             iter != oe.choices.end();
-             ++iter) {
+        for (auto const& choice: oe.choices) {
             QTC::TC("libtests", "QPDFArgParser complete choices");
-            this->m->completions.insert(extra_prefix + *iter);
+            this->m->completions.insert(extra_prefix + choice);
         }
     }
 }
@@ -714,11 +710,9 @@ QPDFArgParser::handleCompletion()
         }
     }
     std::string prefix = extra_prefix + this->m->bash_cur;
-    for (std::set<std::string>::iterator iter = this->m->completions.begin();
-         iter != this->m->completions.end();
-         ++iter) {
-        if (prefix.empty() || ((*iter).substr(0, prefix.length()) == prefix)) {
-            std::cout << *iter << std::endl;
+    for (auto const& iter: this->m->completions) {
+        if (prefix.empty() || (iter.substr(0, prefix.length()) == prefix)) {
+            std::cout << iter << std::endl;
         }
     }
     exit(0);

@@ -90,10 +90,7 @@ QPDF::optimize(
 
     // Traverse document-level items
     std::set<std::string> keys = this->m->trailer.getKeys();
-    for (std::set<std::string>::iterator iter = keys.begin();
-         iter != keys.end();
-         ++iter) {
-        std::string const& key = *iter;
+    for (auto const& key: keys) {
         if (key == "/Root") {
             // handled separately
         } else {
@@ -105,17 +102,13 @@ QPDF::optimize(
     }
 
     keys = root.getKeys();
-    for (std::set<std::string>::iterator iter = keys.begin();
-         iter != keys.end();
-         ++iter) {
+    for (auto const& key: keys) {
         // Technically, /I keys from /Thread dictionaries are supposed
         // to be handled separately, but we are going to disregard
         // that specification for now.  There is loads of evidence
         // that pdlin and Acrobat both disregard things like this from
         // time to time, so this is almost certain not to cause any
         // problems.
-
-        std::string const& key = *iter;
         updateObjectMaps(
             ObjUser(ObjUser::ou_root_key, key),
             root.getKey(key),
@@ -212,10 +205,7 @@ QPDF::pushInheritedAttributesToPageInternal(
 
         std::set<std::string> inheritable_keys;
         std::set<std::string> keys = cur_pages.getKeys();
-        for (std::set<std::string>::iterator iter = keys.begin();
-             iter != keys.end();
-             ++iter) {
-            std::string const& key = *iter;
+        for (auto const& key: keys) {
             if ((key == "/MediaBox") || (key == "/CropBox") ||
                 (key == "/Resources") || (key == "/Rotate")) {
                 if (!allow_changes) {
@@ -298,11 +288,7 @@ QPDF::pushInheritedAttributesToPageInternal(
 
         if (!inheritable_keys.empty()) {
             QTC::TC("qpdf", "QPDF opt inheritable keys");
-            for (std::set<std::string>::iterator iter =
-                     inheritable_keys.begin();
-                 iter != inheritable_keys.end();
-                 ++iter) {
-                std::string const& key = (*iter);
+            for (auto const& key: inheritable_keys) {
                 key_ancestors[key].pop_back();
                 if (key_ancestors[key].empty()) {
                     QTC::TC("qpdf", "QPDF opt erase empty key ancestor");
@@ -315,14 +301,11 @@ QPDF::pushInheritedAttributesToPageInternal(
     } else if (type == "/Page") {
         // Add all available inheritable attributes not present in
         // this object to this object.
-        for (std::map<std::string, std::vector<QPDFObjectHandle>>::iterator
-                 iter = key_ancestors.begin();
-             iter != key_ancestors.end();
-             ++iter) {
-            std::string const& key = (*iter).first;
+        for (auto const& iter: key_ancestors) {
+            std::string const& key = iter.first;
             if (!cur_pages.hasKey(key)) {
                 QTC::TC("qpdf", "QPDF opt resource inherited");
-                cur_pages.replaceKey(key, (*iter).second.back());
+                cur_pages.replaceKey(key, iter.second.back());
             } else {
                 QTC::TC("qpdf", "QPDF opt page resource hides ancestor");
             }
@@ -404,10 +387,7 @@ QPDF::updateObjectMapsInternal(
         }
 
         std::set<std::string> keys = dict.getKeys();
-        for (std::set<std::string>::iterator iter = keys.begin();
-             iter != keys.end();
-             ++iter) {
-            std::string const& key = *iter;
+        for (auto const& key: keys) {
             if (is_page_node && (key == "/Thumb")) {
                 // Traverse page thumbnail dictionaries as a special
                 // case.
@@ -454,42 +434,28 @@ QPDF::filterCompressedObjects(std::map<int, int> const& object_stream_data)
     std::map<ObjUser, std::set<QPDFObjGen>> t_obj_user_to_objects;
     std::map<QPDFObjGen, std::set<ObjUser>> t_object_to_obj_users;
 
-    for (std::map<ObjUser, std::set<QPDFObjGen>>::iterator i1 =
-             this->m->obj_user_to_objects.begin();
-         i1 != this->m->obj_user_to_objects.end();
-         ++i1) {
-        ObjUser const& ou = (*i1).first;
-        std::set<QPDFObjGen> const& objects = (*i1).second;
-        for (std::set<QPDFObjGen>::const_iterator i2 = objects.begin();
-             i2 != objects.end();
-             ++i2) {
-            QPDFObjGen const& og = (*i2);
-            std::map<int, int>::const_iterator i3 =
-                object_stream_data.find(og.getObj());
-            if (i3 == object_stream_data.end()) {
+    for (auto const& i1: this->m->obj_user_to_objects) {
+        ObjUser const& ou = i1.first;
+        std::set<QPDFObjGen> const& objects = i1.second;
+        for (auto const& og: objects) {
+            auto i2 = object_stream_data.find(og.getObj());
+            if (i2 == object_stream_data.end()) {
                 t_obj_user_to_objects[ou].insert(og);
             } else {
-                t_obj_user_to_objects[ou].insert(QPDFObjGen((*i3).second, 0));
+                t_obj_user_to_objects[ou].insert(QPDFObjGen(i2->second, 0));
             }
         }
     }
 
-    for (std::map<QPDFObjGen, std::set<ObjUser>>::iterator i1 =
-             this->m->object_to_obj_users.begin();
-         i1 != this->m->object_to_obj_users.end();
-         ++i1) {
-        QPDFObjGen const& og = (*i1).first;
-        std::set<ObjUser> const& objusers = (*i1).second;
-        for (std::set<ObjUser>::const_iterator i2 = objusers.begin();
-             i2 != objusers.end();
-             ++i2) {
-            ObjUser const& ou = (*i2);
-            std::map<int, int>::const_iterator i3 =
-                object_stream_data.find(og.getObj());
-            if (i3 == object_stream_data.end()) {
+    for (auto const& i1: this->m->object_to_obj_users) {
+        QPDFObjGen const& og = i1.first;
+        std::set<ObjUser> const& objusers = i1.second;
+        for (auto const& ou: objusers) {
+            auto i2 = object_stream_data.find(og.getObj());
+            if (i2 == object_stream_data.end()) {
                 t_object_to_obj_users[og].insert(ou);
             } else {
-                t_object_to_obj_users[QPDFObjGen((*i3).second, 0)].insert(ou);
+                t_object_to_obj_users[QPDFObjGen(i2->second, 0)].insert(ou);
             }
         }
     }

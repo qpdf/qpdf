@@ -21,26 +21,24 @@ main(int argc, char* argv[])
 
         std::map<QPDFObjGen, QPDFXRefEntry> xref = qpdf.getXRefTable();
 
-        for (std::map<QPDFObjGen, QPDFXRefEntry>::iterator iter = xref.begin();
-             iter != xref.end();
-             ++iter) {
-            std::cout << iter->first.getObj() << "/" << iter->first.getGen()
+        for (auto const& iter: xref) {
+            std::cout << iter.first.getObj() << "/" << iter.first.getGen()
                       << ", ";
-            switch (iter->second.getType()) {
+            switch (iter.second.getType()) {
             case 0:
                 std::cout << "free entry" << std::endl;
                 break;
             case 1:
                 std::cout << "uncompressed, offset = "
-                          << iter->second.getOffset() << " (0x" << std::hex
-                          << iter->second.getOffset() << std::dec << ")"
+                          << iter.second.getOffset() << " (0x" << std::hex
+                          << iter.second.getOffset() << std::dec << ")"
                           << std::endl;
                 break;
             case 2:
                 std::cout << "compressed, stream number = "
-                          << iter->second.getObjStreamNumber()
+                          << iter.second.getObjStreamNumber()
                           << ", stream index = "
-                          << iter->second.getObjStreamIndex() << std::endl;
+                          << iter.second.getObjStreamIndex() << std::endl;
                 break;
             default:
                 std::cerr << "unknown" << std::endl;

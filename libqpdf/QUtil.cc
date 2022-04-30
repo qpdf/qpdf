@@ -786,14 +786,13 @@ QUtil::hex_decode(std::string const& input)
 {
     std::string result;
     size_t pos = 0;
-    for (std::string::const_iterator p = input.begin(); p != input.end(); ++p) {
-        char ch = *p;
+    for (auto ch: input) {
         bool skip = false;
-        if ((*p >= 'A') && (*p <= 'F')) {
+        if ((ch >= 'A') && (ch <= 'F')) {
             ch = QIntC::to_char(ch - 'A' + 10);
-        } else if ((*p >= 'a') && (*p <= 'f')) {
+        } else if ((ch >= 'a') && (ch <= 'f')) {
             ch = QIntC::to_char(ch - 'a' + 10);
-        } else if ((*p >= '0') && (*p <= '9')) {
+        } else if ((ch >= '0') && (ch <= '9')) {
             ch = QIntC::to_char(ch - '0');
         } else {
             skip = true;
@@ -1921,12 +1920,10 @@ QUtil::possible_repaired_encodings(std::string supplied)
     // De-duplicate
     std::vector<std::string> t;
     std::set<std::string> seen;
-    for (std::vector<std::string>::iterator iter = result.begin();
-         iter != result.end();
-         ++iter) {
-        if (!seen.count(*iter)) {
-            seen.insert(*iter);
-            t.push_back(*iter);
+    for (auto const& iter: result) {
+        if (!seen.count(iter)) {
+            seen.insert(iter);
+            t.push_back(iter);
         }
     }
     return t;

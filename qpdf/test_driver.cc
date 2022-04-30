@@ -383,14 +383,9 @@ test_5(QPDF& pdf, char const* arg2)
     QPDFPageDocumentHelper dh(pdf);
     std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     int pageno = 0;
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter) {
-        QPDFPageObjectHelper& page(*iter);
+    for (auto& page: pages) {
         ++pageno;
-
         std::cout << "page " << pageno << ":" << std::endl;
-
         std::cout << "  images:" << std::endl;
         std::map<std::string, QPDFObjectHandle> images = page.getImages();
         for (auto const& iter2: images) {
@@ -714,19 +709,19 @@ test_15(QPDF& pdf, char const* arg2)
     // a shallow copy.
     QPDFObjectHandle page_template = pages.at(0);
     std::vector<QPDFObjectHandle> new_pages;
-    for (std::vector<QPDFObjectHandle>::iterator iter = contents.begin();
-         iter != contents.end();
-         ++iter) {
+    bool first = true;
+    for (auto const& iter: contents) {
         // We will retain indirect object references to other
         // indirect objects other than page content.
         QPDFObjectHandle page = page_template.shallowCopy();
-        page.replaceKey("/Contents", *iter);
-        if (iter == contents.begin()) {
+        page.replaceKey("/Contents", iter);
+        if (first) {
             // leave direct
-            new_pages.push_back(page);
+            first = false;
         } else {
-            new_pages.push_back(pdf.makeIndirectObject(page));
+            page = pdf.makeIndirectObject(page);
         }
+        new_pages.push_back(page);
     }
 
     // Now insert the pages
@@ -1269,14 +1264,11 @@ test_35(QPDF& pdf, char const* arg2)
             attachments[filename] = stream.getStreamData();
         }
     }
-    for (std::map<std::string, std::shared_ptr<Buffer>>::iterator iter =
-             attachments.begin();
-         iter != attachments.end();
-         ++iter) {
-        std::string const& filename = (*iter).first;
+    for (auto const& iter: attachments) {
+        std::string const& filename = iter.first;
         std::string data = std::string(
-            reinterpret_cast<char const*>((*iter).second->getBuffer()),
-            (*iter).second->getSize());
+            reinterpret_cast<char const*>(iter.second->getBuffer()),
+            iter.second->getSize());
         bool is_binary = false;
         for (size_t i = 0; i < data.size(); ++i) {
             if ((data.at(i) < 0) || (data.at(i) > 126)) {
@@ -1338,10 +1330,7 @@ test_37(QPDF& pdf, char const* arg2)
     // Parse content streams of all pages
     std::vector<QPDFPageObjectHelper> pages =
         QPDFPageDocumentHelper(pdf).getAllPages();
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter) {
-        QPDFPageObjectHelper& page(*iter);
+    for (auto& page: pages) {
         ParserCallbacks cb;
         page.parseContents(&cb);
     }
@@ -1364,16 +1353,11 @@ test_39(QPDF& pdf, char const* arg2)
     std::vector<QPDFPageObjectHelper> pages =
         QPDFPageDocumentHelper(pdf).getAllPages();
     int pageno = 0;
-    for (std::vector<QPDFPageObjectHelper>::iterator p_iter = pages.begin();
-         p_iter != pages.end();
-         ++p_iter) {
+    for (auto& page: pages) {
         std::cout << "page " << ++pageno << std::endl;
-        std::map<std::string, QPDFObjectHandle> images = (*p_iter).getImages();
-        for (std::map<std::string, QPDFObjectHandle>::iterator i_iter =
-                 images.begin();
-             i_iter != images.end();
-             ++i_iter) {
-            QPDFObjectHandle image_dict = (*i_iter).second.getDict();
+        std::map<std::string, QPDFObjectHandle> images = page.getImages();
+        for (auto& i_iter: images) {
+            QPDFObjectHandle image_dict = i_iter.second.getDict();
             std::cout << "filter: "
                       << image_dict.getKey("/Filter").unparseResolved()
                       << ", color space: "
@@ -1404,10 +1388,8 @@ test_41(QPDF& pdf, char const* arg2)
     // with coalesce.pdf.
     std::vector<QPDFPageObjectHelper> pages =
         QPDFPageDocumentHelper(pdf).getAllPages();
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter) {
-        (*iter).addContentTokenFilter(
+    for (auto& page: pages) {
+        page.addContentTokenFilter(
             std::shared_ptr<QPDFObjectHandle::TokenFilter>(new TokenFilter()));
     }
     QPDFWriter w(pdf, "a.pdf");
@@ -1537,11 +1519,7 @@ test_43(QPDF& pdf, char const* arg2)
     }
     std::cout << "iterating over form fields\n";
     std::vector<QPDFFormFieldObjectHelper> form_fields = afdh.getFormFields();
-    for (std::vector<QPDFFormFieldObjectHelper>::iterator iter =
-             form_fields.begin();
-         iter != form_fields.end();
-         ++iter) {
-        QPDFFormFieldObjectHelper ffh(*iter);
+    for (auto& ffh: form_fields) {
         std::cout << "Field: " << ffh.getObjectHandle().unparse() << std::endl;
         QPDFFormFieldObjectHelper node = ffh;
         while (!node.isNull()) {
@@ -1571,29 +1549,17 @@ test_43(QPDF& pdf, char const* arg2)
         std::cout << "  Quadding: " << ffh.getQuadding() << std::endl;
         std::vector<QPDFAnnotationObjectHelper> annotations =
             afdh.getAnnotationsForField(ffh);
-        for (std::vector<QPDFAnnotationObjectHelper>::iterator i2 =
-                 annotations.begin();
-             i2 != annotations.end();
-             ++i2) {
-            std::cout << "  Annotation: " << (*i2).getObjectHandle().unparse()
+        for (auto& aoh: annotations) {
+            std::cout << "  Annotation: " << aoh.getObjectHandle().unparse()
                       << std::endl;
         }
     }
     std::cout << "iterating over annotations per page\n";
-    std::vector<QPDFPageObjectHelper> pages =
-        QPDFPageDocumentHelper(pdf).getAllPages();
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter) {
-        std::cout << "Page: " << (*iter).getObjectHandle().unparse()
-                  << std::endl;
+    for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
+        std::cout << "Page: " << page.getObjectHandle().unparse() << std::endl;
         std::vector<QPDFAnnotationObjectHelper> annotations =
-            afdh.getWidgetAnnotationsForPage(*iter);
-        for (std::vector<QPDFAnnotationObjectHelper>::iterator i2 =
-                 annotations.begin();
-             i2 != annotations.end();
-             ++i2) {
-            QPDFAnnotationObjectHelper ah(*i2);
+            afdh.getWidgetAnnotationsForPage(page);
+        for (auto& ah: annotations) {
             std::cout << "  Annotation: " << ah.getObjectHandle().unparse()
                       << std::endl;
             std::cout
@@ -1623,10 +1589,7 @@ test_44(QPDF& pdf, char const* arg2)
     // Set form fields.
     QPDFAcroFormDocumentHelper afdh(pdf);
     std::vector<QPDFFormFieldObjectHelper> fields = afdh.getFormFields();
-    for (std::vector<QPDFFormFieldObjectHelper>::iterator iter = fields.begin();
-         iter != fields.end();
-         ++iter) {
-        QPDFFormFieldObjectHelper& field(*iter);
+    for (auto& field: fields) {
         QPDFObjectHandle ft = field.getInheritableFieldValue("/FT");
         if (ft.isName() && (ft.getName() == "/Tx")) {
             // \xc3\xb7 is utf-8 for U+00F7 (divided by)
@@ -1950,23 +1913,16 @@ static void
 test_49(QPDF& pdf, char const* arg2)
 {
     // Outlines
-    std::vector<QPDFPageObjectHelper> pages =
-        QPDFPageDocumentHelper(pdf).getAllPages();
     QPDFOutlineDocumentHelper odh(pdf);
     int pageno = 0;
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter, ++pageno) {
-        std::vector<QPDFOutlineObjectHelper> outlines =
-            odh.getOutlinesForPage((*iter).getObjectHandle().getObjGen());
-        for (std::vector<QPDFOutlineObjectHelper>::iterator oiter =
-                 outlines.begin();
-             oiter != outlines.end();
-             ++oiter) {
-            std::cout << "page " << pageno << ": " << (*oiter).getTitle()
-                      << " -> " << (*oiter).getDest().unparseResolved()
-                      << std::endl;
+    for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
+        auto outlines =
+            odh.getOutlinesForPage(page.getObjectHandle().getObjGen());
+        for (auto& ol: outlines) {
+            std::cout << "page " << pageno << ": " << ol.getTitle() << " -> "
+                      << ol.getDest().unparseResolved() << std::endl;
         }
+        ++pageno;
     }
 }
 
@@ -1981,11 +1937,8 @@ test_50(QPDF& pdf, char const* arg2)
     std::cout << d1.getJSON().unparse() << std::endl;
     // Top-level type mismatch
     d1.mergeResources(d2.getKey("/k1"));
-    std::set<std::string> names = d1.getResourceNames();
-    for (std::set<std::string>::iterator iter = names.begin();
-         iter != names.end();
-         ++iter) {
-        std::cout << *iter << std::endl;
+    for (auto const& name: d1.getResourceNames()) {
+        std::cout << name << std::endl;
     }
 }
 
@@ -2064,11 +2017,8 @@ test_53(QPDF& pdf, char const* arg2)
     root.replaceKey(
         "/Q1", pdf.makeIndirectObject(QPDFObjectHandle::newString("potato")));
     std::cout << "all objects" << std::endl;
-    std::vector<QPDFObjectHandle> all = pdf.getAllObjects();
-    for (std::vector<QPDFObjectHandle>::iterator iter = all.begin();
-         iter != all.end();
-         ++iter) {
-        std::cout << (*iter).unparse() << std::endl;
+    for (auto& obj: pdf.getAllObjects()) {
+        std::cout << obj.unparse() << std::endl;
     }
 
     QPDFWriter w(pdf, "a.pdf");

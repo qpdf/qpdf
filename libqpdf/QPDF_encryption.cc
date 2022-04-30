@@ -945,11 +945,7 @@ QPDF::initializeEncryption()
 
     if ((V == 4) || (V == 5)) {
         QPDFObjectHandle CF = encryption_dict.getKey("/CF");
-        std::set<std::string> keys = CF.getKeys();
-        for (std::set<std::string>::iterator iter = keys.begin();
-             iter != keys.end();
-             ++iter) {
-            std::string const& filter = *iter;
+        for (auto const& filter: CF.getKeys()) {
             QPDFObjectHandle cdict = CF.getKey(filter);
             if (cdict.isDictionary()) {
                 encryption_method_e method = e_none;

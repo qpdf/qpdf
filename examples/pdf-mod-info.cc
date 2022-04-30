@@ -132,10 +132,7 @@ main(int argc, char* argv[])
         QPDFObjectHandle filetrailer = file.getTrailer();
         QPDFObjectHandle fileinfo;
 
-        for (std::map<std::string, std::string>::const_iterator it =
-                 Keys.begin();
-             Keys.end() != it;
-             ++it) {
+        for (auto const& it: Keys) {
             if (!fileinfo.isInitialized()) {
                 if (filetrailer.hasKey("/Info")) {
                     QTC::TC("examples", "pdf-mod-info has info");
@@ -146,12 +143,12 @@ main(int argc, char* argv[])
                     filetrailer.replaceKey("/Info", fileinfo);
                 }
             }
-            if (it->second == "") {
-                fileinfo.removeKey(it->first);
+            if (it.second == "") {
+                fileinfo.removeKey(it.first);
             } else {
-                QPDFObjectHandle elt = fileinfo.newString(it->second);
+                QPDFObjectHandle elt = fileinfo.newString(it.second);
                 elt.makeDirect();
-                fileinfo.replaceKey(it->first, elt);
+                fileinfo.replaceKey(it.first, elt);
             }
         }
         QPDFWriter w(file, fl_tmp.c_str());
