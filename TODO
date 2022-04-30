@@ -486,16 +486,6 @@ in source and header files to find items not listed here.
     developer and user experience. We don't want to create a situation
     where exactly the same code fails to work in 11 but worked on 10.
     See #576 for latest notes.
-  * Change deterministic id to use something other than MD5 but allow
-    the old way for compatibility -- maybe rename the method to force
-    the developer to make a choice
-  * Find other uses of MD5 and find the ones that are discretionary,
-    if any
-  * Have QPDFWriter raise an exception if it's about to write using
-    weak crypto and hasn't been given permission
-  * Search for --allow-weak-crypto in the manual and in qpdf.cc's help
-    information
-  * Update the ref.weak-crypto section of the manual
 
 Page splitting/merging
 ======================

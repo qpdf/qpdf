@@ -3983,16 +3983,15 @@ $td->runtest("128-bit with AES: no warning",
                   ' minimal.pdf a.pdf'},
              {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
-# Note: we intentionally have exit status 0 for this warning.
-$td->runtest("128-bit without AES: warning",
+$td->runtest("128-bit without AES: error",
              {$td->COMMAND => 'qpdf --encrypt "" "" 128 -- minimal.pdf a.pdf'},
-             {$td->REGEXP => "Pass --allow-weak-crypto to suppress",
-                  $td->EXIT_STATUS => 0},
+             {$td->REGEXP => "Pass --allow-weak-crypto to enable",
+                  $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
-$td->runtest("40-bit: warning",
+$td->runtest("40-bit: error",
              {$td->COMMAND => 'qpdf --encrypt "" "" 40 -- minimal.pdf a.pdf'},
-             {$td->REGEXP => "Pass --allow-weak-crypto to suppress",
-                  $td->EXIT_STATUS => 0},
+             {$td->REGEXP => "Pass --allow-weak-crypto to enable",
+                  $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

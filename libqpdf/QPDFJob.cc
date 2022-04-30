@@ -2812,18 +2812,17 @@ QPDFJob::setEncryptionOptions(QPDF& pdf, QPDFWriter& w)
     maybeFixWritePassword(R, m->owner_password);
     if ((R < 4) || ((R == 4) && (!m->use_aes))) {
         if (!m->allow_weak_crypto) {
-            // Do not set warnings = true for this case as this does
-            // not reflect a potential problem with the input file.
-            QTC::TC("qpdf", "QPDFJob weak crypto warning");
+            QTC::TC("qpdf", "QPDFJob weak crypto error");
             *(this->m->cerr)
                 << this->m->message_prefix
-                << ": writing a file with RC4, a weak cryptographic algorithm"
+                << ": refusing to write a file with RC4, a weak cryptographic algorithm"
                 << std::endl
                 << "Please use 256-bit keys for better security." << std::endl
-                << "Pass --allow-weak-crypto to suppress this warning."
+                << "Pass --allow-weak-crypto to enable writing insecure files."
                 << std::endl
-                << "This will become an error in a future version of qpdf."
+                << "See also https://qpdf.readthedocs.io/en/stable/weak-crypto.html"
                 << std::endl;
+            throw std::runtime_error("refusing to write a file with weak crypto");
         }
     }
     switch (R) {

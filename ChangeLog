@@ -1,3 +1,9 @@
+2022-04-30  Jay Berkenbilt  <ejb@ql.org>
+
+        * Make attempting to write encrypted files that use RC4 (40-bit or
+        128-bit without AES) an error rather than a warning when
+        --allow-weak-crypto is not specified.
+
 2022-04-29  Jay Berkenbilt  <ejb@ql.org>
 
         * QPDFObjectHandle: for the methods insertItem, appendItem,
