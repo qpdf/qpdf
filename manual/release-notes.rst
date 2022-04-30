@@ -64,10 +64,6 @@ For a detailed list of changes, please see the file
 
   - API: breaking changes
 
-    - Remove ``QPDFObjectHandle::replaceOrRemoveKey``. This does the
-      same thing as ``QPDFObjectHandle::replaceKey``. Just call
-      ``replaceKey`` instead.
-
     - Remove
       ``QPDFAcroFormDocumentHelper::copyFieldsFromForeignPage``. This
       method never worked and only did something in qpdf version

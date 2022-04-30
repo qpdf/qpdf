@@ -1068,6 +1068,10 @@ class QPDFObjectHandle
     QPDF_DLL
     QPDFObjectHandle removeKeyAndGet(std::string const& key);
 
+    // ABI: Remove in qpdf 12
+    [[deprecated("use replaceKey -- it does the same thing")]] QPDF_DLL void
+    replaceOrRemoveKey(std::string const& key, QPDFObjectHandle const&);
+
     // Methods for stream objects
     QPDF_DLL
     QPDFObjectHandle getDict();
