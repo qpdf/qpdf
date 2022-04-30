@@ -199,18 +199,18 @@ create_pdf(char const* filename)
 
     QPDFObjectHandle procset =
         pdf.makeIndirectObject(QPDFObjectHandle::newArray());
-    procset.appendItem(newName("/PDF"));
-    procset.appendItem(newName("/Text"));
-    procset.appendItem(newName("/ImageC"));
+    procset.appendItem(newName("/PDF"))
+        .appendItem(newName("/Text"))
+        .appendItem(newName("/ImageC"));
 
     QPDFObjectHandle rfont = QPDFObjectHandle::newDictionary();
     rfont.replaceKey("/F1", font);
 
     QPDFObjectHandle mediabox = QPDFObjectHandle::newArray();
-    mediabox.appendItem(newInteger(0));
-    mediabox.appendItem(newInteger(0));
-    mediabox.appendItem(newInteger(612));
-    mediabox.appendItem(newInteger(792));
+    mediabox.appendItem(newInteger(0))
+        .appendItem(newInteger(0))
+        .appendItem(newInteger(612))
+        .appendItem(newInteger(792));
 
     QPDFPageDocumentHelper dh(pdf);
     for (size_t pageno = 1; pageno <= npages; ++pageno) {

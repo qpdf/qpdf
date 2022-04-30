@@ -912,10 +912,8 @@ test_24(QPDF& pdf, char const* arg2)
 
     QPDFObjectHandle array1 = QPDFObjectHandle::newArray();
     QPDFObjectHandle array2 = QPDFObjectHandle::newArray();
-    array1.appendItem(res2);
-    array1.appendItem(QPDFObjectHandle::newInteger(1));
-    array2.appendItem(res1);
-    array2.appendItem(QPDFObjectHandle::newInteger(2));
+    array1.appendItem(res2).appendItem(QPDFObjectHandle::newInteger(1));
+    array2.appendItem(res1).appendItem(QPDFObjectHandle::newInteger(2));
     // Make sure trying to ask questions about a reserved object
     // doesn't break it.
     if (res1.isArray()) {
@@ -1087,12 +1085,11 @@ test_27(QPDF& pdf, char const* arg2)
         pdf.getTrailer()
             .replaceKey("/QTest", pdf.copyForeignObject(qtest))
             .replaceKey("/QTest2", QPDFObjectHandle::newArray());
-        pdf.getTrailer().getKey("/QTest2").appendItem(
-            pdf.copyForeignObject(s1));
-        pdf.getTrailer().getKey("/QTest2").appendItem(
-            pdf.copyForeignObject(s2));
-        pdf.getTrailer().getKey("/QTest2").appendItem(
-            pdf.copyForeignObject(s3));
+        pdf.getTrailer()
+            .getKey("/QTest2")
+            .appendItem(pdf.copyForeignObject(s1))
+            .appendItem(pdf.copyForeignObject(s2))
+            .appendItem(pdf.copyForeignObject(s3));
     }
 
     QPDFWriter w(pdf, "a.pdf");
@@ -2099,10 +2096,13 @@ test_55(QPDF& pdf, char const* arg2)
     std::vector<QPDFPageObjectHelper> pages =
         QPDFPageDocumentHelper(pdf).getAllPages();
     QPDFObjectHandle qtest = QPDFObjectHandle::newArray();
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end();
-         ++iter) {
-        QPDFPageObjectHelper& ph(*iter);
+    for (auto& ph: pages) {
+        // Note: using fluent appendItem causes a test failure with
+        // MSVC 19.31.31107, which appears to evaluate the argument to
+        // the second appendItem before the first. Since these
+        // arguments have the side effect of creating objects, the
+        // object numbers end up being different even though the
+        // resulting file is semantically correct.
         qtest.appendItem(ph.getFormXObjectForPage());
         qtest.appendItem(ph.getFormXObjectForPage(false));
     }

@@ -208,9 +208,8 @@ NNTreeIterator::resetLimits(
             }
         }
         if (first.isInitialized() && last.isInitialized()) {
-            auto limits = QPDFObjectHandle::newArray();
-            limits.appendItem(first);
-            limits.appendItem(last);
+            auto limits =
+                QPDFObjectHandle::newArray().appendItem(first).appendItem(last);
             auto olimits = node.getKey("/Limits");
             if (olimits.isArray() && (olimits.getArrayNItems() == 2)) {
                 auto ofirst = olimits.getArrayItem(0);
