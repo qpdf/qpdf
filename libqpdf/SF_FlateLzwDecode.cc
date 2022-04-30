@@ -27,7 +27,7 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
 
     bool filterable = true;
     std::set<std::string> keys = decode_parms.getKeys();
-    for (auto const& key : keys) {
+    for (auto const& key: keys) {
         QPDFObjectHandle value = decode_parms.getKey(key);
         if (key == "/Predictor") {
             if (value.isInteger()) {

@@ -24,7 +24,7 @@ std::string
 QPDF_Dictionary::unparse()
 {
     std::string result = "<< ";
-    for (auto& iter : this->items) {
+    for (auto& iter: this->items) {
         if (!iter.second.isNull()) {
             result += QPDF_Name::normalizeName(iter.first) + " " +
                 iter.second.unparse() + " ";
@@ -38,7 +38,7 @@ JSON
 QPDF_Dictionary::getJSON()
 {
     JSON j = JSON::makeDictionary();
-    for (auto& iter : this->items) {
+    for (auto& iter: this->items) {
         if (!iter.second.isNull()) {
             j.addDictionaryMember(
                 QPDF_Name::normalizeName(iter.first), iter.second.getJSON());
@@ -96,7 +96,7 @@ std::set<std::string>
 QPDF_Dictionary::getKeys()
 {
     std::set<std::string> result;
-    for (auto& iter : this->items) {
+    for (auto& iter: this->items) {
         if (!iter.second.isNull()) {
             result.insert(iter.first);
         }

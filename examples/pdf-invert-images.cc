@@ -137,7 +137,7 @@ main(int argc, char* argv[])
             QPDFPageObjectHelper& page(*iter);
             // Get all images on the page.
             std::map<std::string, QPDFObjectHandle> images = page.getImages();
-            for (auto& iter2 : images) {
+            for (auto& iter2: images) {
                 QPDFObjectHandle& image = iter2.second;
                 QPDFObjectHandle image_dict = image.getDict();
                 QPDFObjectHandle color_space = image_dict.getKey("/ColorSpace");

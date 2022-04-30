@@ -82,7 +82,7 @@ main(int argc, char* argv[])
         QPDF pdf;
         pdf.processFile(infilename);
         int pageno = 0;
-        for (auto& page : QPDFPageDocumentHelper(pdf).getAllPages()) {
+        for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
             ++pageno;
             // Pass the contents of a page through our string counter.
             // If it's an even page, capture the output. This

@@ -2436,7 +2436,7 @@ QPDF::replaceForeignIndirectObjects(
         QTC::TC("qpdf", "QPDF replace dictionary");
         result = QPDFObjectHandle::newDictionary();
         std::set<std::string> keys = foreign.getKeys();
-        for (auto const& iter : keys) {
+        for (auto const& iter: keys) {
             result.replaceKey(
                 iter,
                 replaceForeignIndirectObjects(
@@ -2450,7 +2450,7 @@ QPDF::replaceForeignIndirectObjects(
         QPDFObjectHandle dict = result.getDict();
         QPDFObjectHandle old_dict = foreign.getDict();
         std::set<std::string> keys = old_dict.getKeys();
-        for (auto const& iter : keys) {
+        for (auto const& iter: keys) {
             dict.replaceKey(
                 iter,
                 replaceForeignIndirectObjects(

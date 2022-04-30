@@ -122,7 +122,7 @@ do_iteration()
     std::vector<int> v = {1, 2, 3, 4};
     assert(v.size() == 4);
     int sum = 0;
-    for (auto& i : v) {
+    for (auto& i: v) {
         sum += i;
     }
     assert(10 == sum);
@@ -299,7 +299,7 @@ do_smart_pointers()
     auto p1 = make_c(1);
     C::check(1, 1, 1);
     auto p2 = make_c_array({2, 3, 4, 5});
-    for (auto i : {1, 2, 3, 4, 5}) {
+    for (auto i: {1, 2, 3, 4, 5}) {
         C::check(5, i, 1);
     }
     {

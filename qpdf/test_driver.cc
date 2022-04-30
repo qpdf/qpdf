@@ -235,7 +235,7 @@ test_0_1(QPDF& pdf, char const* arg2)
         std::cout << "/QTest is an array with " << qtest.getArrayNItems()
                   << " items" << std::endl;
         int i = 0;
-        for (auto& iter : qtest.aitems()) {
+        for (auto& iter: qtest.aitems()) {
             QTC::TC(
                 "qpdf", "main QTest array indirect", iter.isIndirect() ? 1 : 0);
             std::cout << "  item " << i << " is "
@@ -246,7 +246,7 @@ test_0_1(QPDF& pdf, char const* arg2)
     } else if (qtest.isDictionary()) {
         QTC::TC("qpdf", "main QTest dictionary");
         std::cout << "/QTest is a dictionary" << std::endl;
-        for (auto& iter : qtest.ditems()) {
+        for (auto& iter: qtest.ditems()) {
             QTC::TC(
                 "qpdf",
                 "main QTest dictionary indirect",
@@ -393,7 +393,7 @@ test_5(QPDF& pdf, char const* arg2)
 
         std::cout << "  images:" << std::endl;
         std::map<std::string, QPDFObjectHandle> images = page.getImages();
-        for (auto const& iter2 : images) {
+        for (auto const& iter2: images) {
             std::string const& name = iter2.first;
             QPDFObjectHandle image = iter2.second;
             QPDFObjectHandle dict = image.getDict();
@@ -405,7 +405,7 @@ test_5(QPDF& pdf, char const* arg2)
 
         std::cout << "  content:" << std::endl;
         std::vector<QPDFObjectHandle> content = page.getPageContents();
-        for (auto& iter2 : content) {
+        for (auto& iter2: content) {
             std::cout << "    " << iter2.unparse() << std::endl;
         }
 
@@ -1663,12 +1663,12 @@ test_46(QPDF& pdf, char const* arg2)
     // number-tree.pdf
     QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
     QPDFNumberTreeObjectHelper ntoh(qtest, pdf);
-    for (auto& iter : ntoh) {
+    for (auto& iter: ntoh) {
         std::cout << iter.first << " " << iter.second.getStringValue()
                   << std::endl;
     }
     QPDFNumberTreeObjectHelper::idx_map ntoh_map = ntoh.getAsMap();
-    for (auto& iter : ntoh_map) {
+    for (auto& iter: ntoh_map) {
         std::cout << iter.first << " " << iter.second.getStringValue()
                   << std::endl;
     }
@@ -1724,7 +1724,7 @@ test_46(QPDF& pdf, char const* arg2)
     assert(iter2->first == 3);
     iter2.insertAfter(4, QPDFObjectHandle::newString("4!"));
     assert(iter2->first == 4);
-    for (auto& i : new2) {
+    for (auto& i: new2) {
         std::cout << i.first << " " << i.second.unparse() << std::endl;
     }
 
@@ -1737,12 +1737,12 @@ test_46(QPDF& pdf, char const* arg2)
     std::cout << "/Bad2" << std::endl;
     auto bad2 =
         QPDFNumberTreeObjectHelper(pdf.getTrailer().getKey("/Bad2"), pdf);
-    for (auto& i : bad2) {
+    for (auto& i: bad2) {
         std::cout << i.first << " " << i.second.unparse() << std::endl;
     }
 
     std::vector<std::string> empties = {"/Empty1", "/Empty2"};
-    for (auto const& k : empties) {
+    for (auto const& k: empties) {
         std::cout << k << std::endl;
         auto empty =
             QPDFNumberTreeObjectHelper(pdf.getTrailer().getKey(k), pdf);
@@ -1777,14 +1777,14 @@ test_46(QPDF& pdf, char const* arg2)
     std::cout << "/Bad3, no repair" << std::endl;
     auto bad3_oh = pdf.getTrailer().getKey("/Bad3");
     auto bad3 = QPDFNumberTreeObjectHelper(bad3_oh, pdf, false);
-    for (auto& i : bad3) {
+    for (auto& i: bad3) {
         std::cout << i.first << " " << i.second.unparse() << std::endl;
     }
     assert(!bad3_oh.getKey("/Kids").getArrayItem(0).isIndirect());
 
     std::cout << "/Bad3, repair" << std::endl;
     bad3 = QPDFNumberTreeObjectHelper(bad3_oh, pdf, true);
-    for (auto& i : bad3) {
+    for (auto& i: bad3) {
         std::cout << i.first << " " << i.second.unparse() << std::endl;
     }
     assert(bad3_oh.getKey("/Kids").getArrayItem(0).isIndirect());
@@ -1793,7 +1793,7 @@ test_46(QPDF& pdf, char const* arg2)
     auto bad4 =
         QPDFNumberTreeObjectHelper(pdf.getTrailer().getKey("/Bad4"), pdf);
     bad4.insert(5, QPDFObjectHandle::newString("5"));
-    for (auto& i : bad4) {
+    for (auto& i: bad4) {
         std::cout << i.first << " " << i.second.unparse() << std::endl;
     }
 
@@ -1826,12 +1826,12 @@ test_48(QPDF& pdf, char const* arg2)
     // name-tree.pdf
     QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
     QPDFNameTreeObjectHelper ntoh(qtest, pdf);
-    for (auto& iter : ntoh) {
+    for (auto& iter: ntoh) {
         std::cout << iter.first << " -> " << iter.second.getStringValue()
                   << std::endl;
     }
     std::map<std::string, QPDFObjectHandle> ntoh_map = ntoh.getAsMap();
-    for (auto& iter : ntoh_map) {
+    for (auto& iter: ntoh_map) {
         std::cout << iter.first << " -> " << iter.second.getStringValue()
                   << std::endl;
     }
@@ -1884,12 +1884,12 @@ test_48(QPDF& pdf, char const* arg2)
     assert(iter2->first == "3");
     iter2.insertAfter("4", QPDFObjectHandle::newString("4!"));
     assert(iter2->first == "4");
-    for (auto& i : new2) {
+    for (auto& i: new2) {
         std::cout << i.first << " " << i.second.unparse() << std::endl;
     }
 
     std::vector<std::string> empties = {"/Empty1", "/Empty2"};
-    for (auto const& k : empties) {
+    for (auto const& k: empties) {
         std::cout << k << std::endl;
         auto empty = QPDFNameTreeObjectHelper(pdf.getTrailer().getKey(k), pdf);
         assert(empty.begin() == empty.end());
@@ -1915,14 +1915,14 @@ test_48(QPDF& pdf, char const* arg2)
     std::cout << "/Bad1 -- wrong key type" << std::endl;
     auto bad1 = QPDFNameTreeObjectHelper(pdf.getTrailer().getKey("/Bad1"), pdf);
     assert(bad1.find("G", true)->first == "A");
-    for (auto const& i : bad1) {
+    for (auto const& i: bad1) {
         std::cout << i.first << std::endl;
     }
 
     std::cout << "/Bad2 -- invalid kid" << std::endl;
     auto bad2 = QPDFNameTreeObjectHelper(pdf.getTrailer().getKey("/Bad2"), pdf);
     assert(bad2.find("G", true)->first == "B");
-    for (auto const& i : bad2) {
+    for (auto const& i: bad2) {
         std::cout << i.first << std::endl;
     }
 
@@ -1933,7 +1933,7 @@ test_48(QPDF& pdf, char const* arg2)
     std::cout << "/Bad4 -- invalid kid" << std::endl;
     auto bad4 = QPDFNameTreeObjectHelper(pdf.getTrailer().getKey("/Bad4"), pdf);
     assert(bad4.find("F", true)->first == "C");
-    for (auto const& i : bad4) {
+    for (auto const& i: bad4) {
         std::cout << i.first << std::endl;
     }
 
@@ -2230,9 +2230,9 @@ test_60(QPDF& pdf, char const* arg2)
     std::map<std::string, std::map<std::string, std::string>> conflicts;
     auto show_conflicts = [&](std::string const& msg) {
         std::cout << msg << std::endl;
-        for (auto const& i1 : conflicts) {
+        for (auto const& i1: conflicts) {
             std::cout << i1.first << ":" << std::endl;
-            for (auto const& i2 : i1.second) {
+            for (auto const& i2: i1.second) {
                 std::cout << "  " << i2.first << " -> " << i2.second
                           << std::endl;
             }
@@ -2510,19 +2510,19 @@ test_71(QPDF& pdf, char const* arg2)
     std::cout << "--- non-recursive, all, from fx1 ---" << std::endl;
     fx1.forEachXObject(false, show);
     std::cout << "--- get images, page ---" << std::endl;
-    for (auto& i : page.getImages()) {
+    for (auto& i: page.getImages()) {
         std::cout << i.first << " -> " << i.second.unparse() << std::endl;
     }
     std::cout << "--- get images, fx ---" << std::endl;
-    for (auto& i : fx1.getImages()) {
+    for (auto& i: fx1.getImages()) {
         std::cout << i.first << " -> " << i.second.unparse() << std::endl;
     }
     std::cout << "--- get form XObjects, page ---" << std::endl;
-    for (auto& i : page.getFormXObjects()) {
+    for (auto& i: page.getFormXObjects()) {
         std::cout << i.first << " -> " << i.second.unparse() << std::endl;
     }
     std::cout << "--- get form XObjects, fx ---" << std::endl;
-    for (auto& i : fx1.getFormXObjects()) {
+    for (auto& i: fx1.getFormXObjects()) {
         std::cout << i.first << " -> " << i.second.unparse() << std::endl;
     }
 }
@@ -2591,7 +2591,7 @@ test_74(QPDF& pdf, char const* arg2)
     check_split1(15);
     check_split1(35);
     check_split1(125);
-    for (auto const& i : split1) {
+    for (auto const& i: split1) {
         std::cout << i.first << std::endl;
     }
 
@@ -2605,7 +2605,7 @@ test_74(QPDF& pdf, char const* arg2)
         assert(i->first == k);
     };
     check_split2(split2, "C");
-    for (auto const& i : split2) {
+    for (auto const& i: split2) {
         std::cout << i.first << std::endl;
     }
 
@@ -2615,7 +2615,7 @@ test_74(QPDF& pdf, char const* arg2)
     split3.setSplitThreshold(4);
     check_split2(split3, "P");
     check_split2(split3, "\xcf\x80");
-    for (auto& i : split3) {
+    for (auto& i: split3) {
         std::cout << i.first << " " << i.second.unparse() << std::endl;
     }
 
@@ -2722,7 +2722,7 @@ test_76(QPDF& pdf, char const* arg2)
         QUtil::hex_encode(efs2.getChecksum()) ==
         "2fce9c8228e360ba9b04a1bd1bf63d6b");
 
-    for (auto iter : efdh.getEmbeddedFiles()) {
+    for (auto iter: efdh.getEmbeddedFiles()) {
         std::cout << iter.first << " -> " << iter.second->getFilename()
                   << std::endl;
     }
@@ -2831,7 +2831,7 @@ test_79(QPDF& pdf, char const* arg2)
         "/Originals", QPDFObjectHandle::newArray(streams));
 
     int i = 0;
-    for (auto orig : streams) {
+    for (auto orig: streams) {
         ++i;
         auto istr = QUtil::int_to_string(i);
         auto orig_data = orig.getStreamData();
@@ -2879,7 +2879,7 @@ test_80(QPDF& pdf, char const* arg2)
     // Use defaults for from_qpdf and from_afdh.
     afdh.transformAnnotations(
         old_annots, new_annots, new_fields, old_fields, m);
-    for (auto const& annot : new_annots) {
+    for (auto const& annot: new_annots) {
         old_annots.appendItem(annot);
     }
     afdh.addAndRenameFormFields(new_fields);

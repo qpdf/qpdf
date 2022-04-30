@@ -92,7 +92,7 @@ QPDFEmbeddedFileDocumentHelper::getEmbeddedFiles()
 {
     std::map<std::string, std::shared_ptr<QPDFFileSpecObjectHelper>> result;
     if (this->m->embedded_files) {
-        for (auto const& i : *(this->m->embedded_files)) {
+        for (auto const& i: *(this->m->embedded_files)) {
             result[i.first] =
                 std::make_shared<QPDFFileSpecObjectHelper>(i.second);
         }

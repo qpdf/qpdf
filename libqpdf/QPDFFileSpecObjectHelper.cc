@@ -36,7 +36,7 @@ QPDFFileSpecObjectHelper::getDescription()
 std::string
 QPDFFileSpecObjectHelper::getFilename()
 {
-    for (auto const& i : name_keys) {
+    for (auto const& i: name_keys) {
         auto k = this->oh.getKey(i);
         if (k.isString()) {
             return k.getUTF8Value();
@@ -49,7 +49,7 @@ std::map<std::string, std::string>
 QPDFFileSpecObjectHelper::getFilenames()
 {
     std::map<std::string, std::string> result;
-    for (auto const& i : name_keys) {
+    for (auto const& i: name_keys) {
         auto k = this->oh.getKey(i);
         if (k.isString()) {
             result[i] = k.getUTF8Value();
@@ -68,7 +68,7 @@ QPDFFileSpecObjectHelper::getEmbeddedFileStream(std::string const& key)
     if (!key.empty()) {
         return ef.getKey(key);
     }
-    for (auto const& i : name_keys) {
+    for (auto const& i: name_keys) {
         auto k = ef.getKey(i);
         if (k.isStream()) {
             return k;

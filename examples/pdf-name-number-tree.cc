@@ -77,7 +77,7 @@ main(int argc, char* argv[])
 
     // Use range-for iteration
     std::cout << "Name tree items:" << std::endl;
-    for (auto i : name_tree) {
+    for (auto i: name_tree) {
         std::cout << "  " << i.first << " -> " << i.second.unparse()
                   << std::endl;
     }
@@ -86,7 +86,7 @@ main(int argc, char* argv[])
     // look at it using dictionary and array iterators.
     std::cout << "Keys in name tree object:" << std::endl;
     QPDFObjectHandle names;
-    for (auto const& i : name_tree_oh.ditems()) {
+    for (auto const& i: name_tree_oh.ditems()) {
         std::cout << i.first << std::endl;
         if (i.first == "/Names") {
             names = i.second;
@@ -94,7 +94,7 @@ main(int argc, char* argv[])
     }
     // Values in names array:
     std::cout << "Values in names:" << std::endl;
-    for (auto& i : names.aitems()) {
+    for (auto& i: names.aitems()) {
         std::cout << "  " << i.unparse() << std::endl;
     }
 
@@ -149,7 +149,7 @@ main(int argc, char* argv[])
     }
     std::cout << "Numbers:" << std::endl;
     int n = 1;
-    for (auto& i : number_tree) {
+    for (auto& i: number_tree) {
         std::cout << i.first << " -> " << i.second.getUTF8Value();
         if (n % 5) {
             std::cout << ", ";
@@ -172,7 +172,7 @@ main(int argc, char* argv[])
     }
     std::cout << "Numbers after filtering:" << std::endl;
     n = 1;
-    for (auto& i : number_tree) {
+    for (auto& i: number_tree) {
         std::cout << i.first << " -> " << i.second.getUTF8Value();
         if (n % 5) {
             std::cout << ", ";

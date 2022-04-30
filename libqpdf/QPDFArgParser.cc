@@ -381,7 +381,7 @@ QPDFArgParser::readArgsFromFile(std::string const& filename)
         QTC::TC("libtests", "QPDFArgParser read args from file");
         lines = QUtil::read_lines_from_file(filename.c_str());
     }
-    for (auto const& line : lines) {
+    for (auto const& line: lines) {
         this->m->new_argv.push_back(QUtil::make_shared_cstr(line));
     }
 }
@@ -636,7 +636,7 @@ QPDFArgParser::addChoicesToCompletions(
 void
 QPDFArgParser::addOptionsToCompletions(option_table_t& option_table)
 {
-    for (auto& iter : option_table) {
+    for (auto& iter: option_table) {
         std::string const& arg = iter.first;
         if (arg == "--") {
             continue;
@@ -797,7 +797,7 @@ QPDFArgParser::getTopHelp(std::ostringstream& msg)
         << " --help=all\" to see all available help." << std::endl
         << std::endl
         << "Topics:" << std::endl;
-    for (auto const& i : this->m->help_topics) {
+    for (auto const& i: this->m->help_topics) {
         msg << "  " << i.first << ": " << i.second.short_text << std::endl;
     }
 }
@@ -807,7 +807,7 @@ QPDFArgParser::getAllHelp(std::ostringstream& msg)
 {
     getTopHelp(msg);
     auto show = [this, &msg](std::map<std::string, HelpTopic>& topics) {
-        for (auto const& i : topics) {
+        for (auto const& i: topics) {
             auto const& topic = i.first;
             msg << std::endl
                 << "== " << topic << " (" << i.second.short_text
@@ -832,7 +832,7 @@ QPDFArgParser::getTopicHelp(
     }
     if (!ht.options.empty()) {
         msg << std::endl << "Related options:" << std::endl;
-        for (auto const& i : ht.options) {
+        for (auto const& i: ht.options) {
             msg << "  " << i << ": " << this->m->option_help[i].short_text
                 << std::endl;
         }

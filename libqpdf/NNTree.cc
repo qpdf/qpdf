@@ -640,7 +640,7 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
     bool failed = false;
 
     std::set<QPDFObjGen> seen;
-    for (auto i : this->path) {
+    for (auto i: this->path) {
         if (i.node.isIndirect()) {
             seen.insert(i.node.getObjGen());
         }
@@ -881,7 +881,7 @@ NNTreeImpl::repair()
     auto new_node = QPDFObjectHandle::newDictionary();
     new_node.replaceKey(details.itemsKey(), QPDFObjectHandle::newArray());
     NNTreeImpl repl(details, qpdf, new_node, false);
-    for (auto const& i : *this) {
+    for (auto const& i: *this) {
         repl.insert(i.first, i.second);
     }
     this->oh.replaceKey("/Kids", new_node.getKey("/Kids"))

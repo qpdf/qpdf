@@ -82,7 +82,7 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(
         seen.insert(og);
         auto kids = obj.getKey("/Kids");
         if (kids.isArray()) {
-            for (auto kid : kids.aitems()) {
+            for (auto kid: kids.aitems()) {
                 queue.push_back(kid);
             }
         }
@@ -119,7 +119,7 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(
         }
     }
 
-    for (auto i : fields) {
+    for (auto i: fields) {
         addFormField(i);
     }
 }
@@ -137,10 +137,10 @@ QPDFAcroFormDocumentHelper::removeFormFields(
         return;
     }
 
-    for (auto const& og : to_remove) {
+    for (auto const& og: to_remove) {
         auto annotations = this->m->field_to_annotations.find(og);
         if (annotations != this->m->field_to_annotations.end()) {
-            for (auto aoh : annotations->second) {
+            for (auto aoh: annotations->second) {
                 this->m->annotation_to_field.erase(
                     aoh.getObjectHandle().getObjGen());
             }
@@ -229,7 +229,7 @@ QPDFAcroFormDocumentHelper::getFormFieldsForPage(QPDFPageObjectHelper ph)
     std::set<QPDFObjGen> added;
     std::vector<QPDFFormFieldObjectHelper> result;
     auto widget_annotations = getWidgetAnnotationsForPage(ph);
-    for (auto annot : widget_annotations) {
+    for (auto annot: widget_annotations) {
         auto field = getFieldForAnnotation(annot);
         field = field.getTopLevelField();
         auto og = field.getObjectHandle().getObjGen();
@@ -576,21 +576,21 @@ ResourceReplacer::ResourceReplacer(
     // We want:
     // * to_replace[key][offset] = new_key
 
-    for (auto const& rn_iter : rnames) {
+    for (auto const& rn_iter: rnames) {
         std::string const& rtype = rn_iter.first;
         auto dr_map_rtype = dr_map.find(rtype);
         if (dr_map_rtype == dr_map.end()) {
             continue;
         }
         auto const& key_offsets = rn_iter.second;
-        for (auto const& ko_iter : key_offsets) {
+        for (auto const& ko_iter: key_offsets) {
             std::string const& old_key = ko_iter.first;
             auto dr_map_rtype_old = dr_map_rtype->second.find(old_key);
             if (dr_map_rtype_old == dr_map_rtype->second.end()) {
                 continue;
             }
             auto const& offsets = ko_iter.second;
-            for (auto const& o_iter : offsets) {
+            for (auto const& o_iter: offsets) {
                 to_replace[old_key][o_iter] = dr_map_rtype_old->second;
             }
         }
@@ -719,19 +719,19 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
     // this to resolve conflicts that may already be in the resource
     // dictionary.
     auto merge_with = QPDFObjectHandle::newDictionary();
-    for (auto const& top_key : dr_map) {
+    for (auto const& top_key: dr_map) {
         merge_with.replaceKey(top_key.first, QPDFObjectHandle::newDictionary());
     }
     resources.mergeResources(merge_with);
     // Rename any keys in the resource dictionary that we
     // remapped.
-    for (auto const& i1 : dr_map) {
+    for (auto const& i1: dr_map) {
         std::string const& top_key = i1.first;
         auto subdict = resources.getKey(top_key);
         if (!subdict.isDictionary()) {
             continue;
         }
-        for (auto const& i2 : i1.second) {
+        for (auto const& i2: i1.second) {
             std::string const& old_key = i2.first;
             std::string const& new_key = i2.second;
             auto existing_new = subdict.getKey(new_key);
@@ -757,7 +757,7 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
     // the stream contents.
     resources.mergeResources(merge_with, &dr_map);
     // Remove empty subdictionaries
-    for (auto iter : resources.ditems()) {
+    for (auto iter: resources.ditems()) {
         if (iter.second.isDictionary() && (iter.second.getKeys().size() == 0)) {
             resources.removeKey(iter.first);
         }
@@ -911,7 +911,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     // Now do the actual copies.
 
     std::set<QPDFObjGen> added_new_fields;
-    for (auto annot : old_annots.aitems()) {
+    for (auto annot: old_annots.aitems()) {
         if (annot.isStream()) {
             annot.warnIfPossible("ignoring annotation that's a stream");
             continue;
@@ -1101,12 +1101,12 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             return dict.replaceKeyAndGet(key, old.copyStream());
         };
         if (apdict.isDictionary()) {
-            for (auto& ap : apdict.ditems()) {
+            for (auto& ap: apdict.ditems()) {
                 if (ap.second.isStream()) {
                     streams.push_back(
                         replace_stream(apdict, ap.first, ap.second));
                 } else if (ap.second.isDictionary()) {
-                    for (auto& ap2 : ap.second.ditems()) {
+                    for (auto& ap2: ap.second.ditems()) {
                         if (ap2.second.isStream()) {
                             streams.push_back(
                                 // line-break
@@ -1120,7 +1120,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
 
         // Now we can safely mutate the annotation and its appearance
         // streams.
-        for (auto& stream : streams) {
+        for (auto& stream: streams) {
             auto dict = stream.getDict();
             auto omatrix = dict.getKey("/Matrix");
             QPDFMatrix apcm;
@@ -1172,7 +1172,7 @@ QPDFAcroFormDocumentHelper::fixCopiedAnnotations(
     to_page.replaceKey("/Annots", QPDFObjectHandle::newArray(new_annots));
     addAndRenameFormFields(new_fields);
     if (added_fields) {
-        for (auto f : new_fields) {
+        for (auto f: new_fields) {
             added_fields->insert(f.getObjGen());
         }
     }

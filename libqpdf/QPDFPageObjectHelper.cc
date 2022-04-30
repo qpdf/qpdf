@@ -81,7 +81,7 @@ InlineImageTracker::convertIIDict(QPDFObjectHandle odict)
     dict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"))
         .replaceKey("/Subtype", QPDFObjectHandle::newName("/Image"));
     std::set<std::string> keys = odict.getKeys();
-    for (auto key : keys) {
+    for (auto key: keys) {
         QPDFObjectHandle value = odict.getKey(key);
         if (key == "/BPC") {
             key = "/BitsPerComponent";
@@ -142,7 +142,7 @@ InlineImageTracker::convertIIDict(QPDFObjectHandle odict)
             } else if (value.isArray()) {
                 filters = value.getArrayAsVector();
             }
-            for (auto& iter : filters) {
+            for (auto& iter: filters) {
                 std::string name;
                 if (iter.isName()) {
                     name = iter.getName();
@@ -334,7 +334,7 @@ QPDFPageObjectHelper::forEachXObject(
         QPDFObjectHandle resources = ph.getAttribute("/Resources", false);
         if (resources.isDictionary() && resources.hasKey("/XObject")) {
             QPDFObjectHandle xobj_dict = resources.getKey("/XObject");
-            for (auto const& key : xobj_dict.getKeys()) {
+            for (auto const& key: xobj_dict.getKeys()) {
                 QPDFObjectHandle obj = xobj_dict.getKey(key);
                 if ((!selector) || selector(obj)) {
                     action(obj, xobj_dict, key);
@@ -594,7 +594,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     std::set<std::string> known_names;
     std::vector<std::string> to_filter = {"/Font", "/XObject"};
     if (resources.isDictionary()) {
-        for (auto const& iter : to_filter) {
+        for (auto const& iter: to_filter) {
             QPDFObjectHandle dict = resources.getKey(iter);
             if (dict.isDictionary()) {
                 dict = resources.replaceKeyAndGet(iter, dict.shallowCopy());
@@ -607,8 +607,8 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
 
     std::set<std::string> local_unresolved;
     auto names_by_rtype = rf.getNamesByResourceType();
-    for (auto const& i1 : to_filter) {
-        for (auto const& n_iter : names_by_rtype[i1]) {
+    for (auto const& i1: to_filter) {
+        for (auto const& n_iter: names_by_rtype[i1]) {
             std::string const& name = n_iter.first;
             if (!known_names.count(name)) {
                 unresolved.insert(name);
@@ -647,8 +647,8 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
         return false;
     }
 
-    for (auto& dict : rdicts) {
-        for (auto const& key : dict.getKeys()) {
+    for (auto& dict: rdicts) {
+        for (auto const& key: dict.getKeys()) {
             if (is_page && unresolved.count(key)) {
                 // This name is referenced by some nested form
                 // xobject, so don't remove it.
@@ -946,7 +946,7 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
         "/TrimBox",
         "/ArtBox",
     };
-    for (auto const& boxkey : boxes) {
+    for (auto const& boxkey: boxes) {
         auto box = this->oh.getKey(boxkey);
         if (!box.isRectangle()) {
             continue;
@@ -1049,7 +1049,7 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
         afdh->transformAnnotations(
             annots, new_annots, new_fields, old_fields, cm);
         afdh->removeFormFields(old_fields);
-        for (auto const& f : new_fields) {
+        for (auto const& f: new_fields) {
             afdh->addFormField(QPDFFormFieldObjectHelper(f));
         }
         this->oh.replaceKey("/Annots", QPDFObjectHandle::newArray(new_annots));
@@ -1115,7 +1115,7 @@ QPDFPageObjectHelper::copyAnnotations(
         annots =
             this->oh.replaceKeyAndGet("/Annots", QPDFObjectHandle::newArray());
     }
-    for (auto const& annot : new_annots) {
+    for (auto const& annot: new_annots) {
         annots.appendItem(annot);
     }
 }

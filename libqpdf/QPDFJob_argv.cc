@@ -167,7 +167,7 @@ ArgParser::argShowCrypto()
     auto crypto = QPDFCryptoProvider::getRegisteredImpls();
     std::string default_crypto = QPDFCryptoProvider::getDefaultProvider();
     std::cout << default_crypto << std::endl;
-    for (auto const& iter : crypto) {
+    for (auto const& iter: crypto) {
         if (iter != default_crypto) {
             std::cout << iter << std::endl;
         }

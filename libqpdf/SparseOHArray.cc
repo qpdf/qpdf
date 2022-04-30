@@ -51,7 +51,7 @@ SparseOHArray::remove_last()
 void
 SparseOHArray::releaseResolved()
 {
-    for (auto& iter : this->elements) {
+    for (auto& iter: this->elements) {
         QPDFObjectHandle::ReleaseResolver::releaseResolved(iter.second);
     }
 }
@@ -76,7 +76,7 @@ SparseOHArray::erase(size_t idx)
         throw std::logic_error("bounds error erasing item from SparseOHArray");
     }
     decltype(this->elements) dest;
-    for (auto const& iter : this->elements) {
+    for (auto const& iter: this->elements) {
         if (iter.first < idx) {
             dest.insert(iter);
         } else if (iter.first > idx) {
@@ -97,7 +97,7 @@ SparseOHArray::insert(size_t idx, QPDFObjectHandle oh)
         append(oh);
     } else {
         decltype(this->elements) dest;
-        for (auto const& iter : this->elements) {
+        for (auto const& iter: this->elements) {
             if (iter.first < idx) {
                 dest.insert(iter);
             } else {

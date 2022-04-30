@@ -949,7 +949,7 @@ void
 QPDFObjectHandle::setArrayFromVector(std::vector<QPDFObjectHandle> const& items)
 {
     if (isArray()) {
-        for (auto const& item : items) {
+        for (auto const& item: items) {
             checkOwnership(item);
         }
         dynamic_cast<QPDF_Array*>(obj.get())->setFromVector(items);
@@ -1108,7 +1108,7 @@ QPDFObjectHandle::isOrHasName(std::string const& value)
     if (isNameAndEquals(value)) {
         return true;
     } else if (isArray()) {
-        for (auto& item : aitems()) {
+        for (auto& item: aitems()) {
             if (item.isNameAndEquals(value)) {
                 return true;
             }
@@ -1123,12 +1123,12 @@ QPDFObjectHandle::makeResourcesIndirect(QPDF& owning_qpdf)
     if (!isDictionary()) {
         return;
     }
-    for (auto const& i1 : ditems()) {
+    for (auto const& i1: ditems()) {
         QPDFObjectHandle sub = i1.second;
         if (!sub.isDictionary()) {
             continue;
         }
-        for (auto i2 : sub.ditems()) {
+        for (auto i2: sub.ditems()) {
             std::string const& key = i2.first;
             QPDFObjectHandle val = i2.second;
             if (!val.isIndirect()) {
@@ -1150,7 +1150,7 @@ QPDFObjectHandle::mergeResources(
 
     auto make_og_to_name = [](QPDFObjectHandle& dict,
                               std::map<QPDFObjGen, std::string>& og_to_name) {
-        for (auto i : dict.ditems()) {
+        for (auto i: dict.ditems()) {
             if (i.second.isIndirect()) {
                 og_to_name[i.second.getObjGen()] = i.first;
             }
@@ -1159,7 +1159,7 @@ QPDFObjectHandle::mergeResources(
 
     // This algorithm is described in comments in QPDFObjectHandle.hh
     // above the declaration of mergeResources.
-    for (auto o_top : other.ditems()) {
+    for (auto o_top: other.ditems()) {
         std::string const& rtype = o_top.first;
         QPDFObjectHandle other_val = o_top.second;
         if (hasKey(rtype)) {
@@ -1178,7 +1178,7 @@ QPDFObjectHandle::mergeResources(
                 std::set<std::string> rnames;
                 int min_suffix = 1;
                 bool initialized_maps = false;
-                for (auto ov_iter : other_val.ditems()) {
+                for (auto ov_iter: other_val.ditems()) {
                     std::string const& key = ov_iter.first;
                     QPDFObjectHandle rval = ov_iter.second;
                     if (!this_val.hasKey(key)) {
@@ -1212,12 +1212,12 @@ QPDFObjectHandle::mergeResources(
                 }
             } else if (this_val.isArray() && other_val.isArray()) {
                 std::set<std::string> scalars;
-                for (auto this_item : this_val.aitems()) {
+                for (auto this_item: this_val.aitems()) {
                     if (this_item.isScalar()) {
                         scalars.insert(this_item.unparse());
                     }
                 }
-                for (auto other_item : other_val.aitems()) {
+                for (auto other_item: other_val.aitems()) {
                     if (other_item.isScalar()) {
                         if (scalars.count(other_item.unparse()) == 0) {
                             QTC::TC("qpdf", "QPDFObjectHandle merge array");
@@ -2950,7 +2950,7 @@ QPDFObjectHandle::copyStream()
     QPDFObjectHandle result = newStream(this->getOwningQPDF());
     QPDFObjectHandle dict = result.getDict();
     QPDFObjectHandle old_dict = getDict();
-    for (auto& iter : QPDFDictItems(old_dict)) {
+    for (auto& iter: QPDFDictItems(old_dict)) {
         if (iter.second.isIndirect()) {
             dict.replaceKey(iter.first, iter.second);
         } else {

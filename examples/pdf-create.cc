@@ -253,7 +253,7 @@ check(
     }
     size_t pageno = 1;
     bool errors = false;
-    for (auto& page : pages) {
+    for (auto& page: pages) {
         auto images = page.getImages();
         if (images.size() != 1) {
             throw std::logic_error("incorrect number of images on page");
@@ -368,8 +368,8 @@ create_pdf(char const* filename)
     filters.push_back("/DCTDecode");
     filters.push_back("/RunLengthDecode");
     QPDFPageDocumentHelper dh(pdf);
-    for (auto const& color_space : color_spaces) {
-        for (auto const& filter : filters) {
+    for (auto const& color_space: color_spaces) {
+        for (auto const& filter: filters) {
             add_page(dh, font, color_space, filter);
         }
     }

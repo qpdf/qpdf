@@ -37,7 +37,7 @@ doubleBoxSize(QPDFPageObjectHelper& page, char const* box_name)
             " is not an array of four elements");
     }
     std::vector<QPDFObjectHandle> doubled;
-    for (auto& item : box.aitems()) {
+    for (auto& item: box.aitems()) {
         doubled.push_back(
             QPDFObjectHandle::newReal(item.getNumericValue() * 2.0, 2));
     }
@@ -73,7 +73,7 @@ main(int argc, char* argv[])
         QPDF qpdf;
         qpdf.processFile(infilename, password);
 
-        for (auto& page : QPDFPageDocumentHelper(qpdf).getAllPages()) {
+        for (auto& page: QPDFPageDocumentHelper(qpdf).getAllPages()) {
             // Prepend the buffer to the page's contents
             page.addPageContents(
                 QPDFObjectHandle::newStream(&qpdf, content), true);

@@ -61,7 +61,7 @@ test_bsearch()
 
     auto mk = [&q](std::vector<int> const& v) {
         auto nums = QPDFObjectHandle::newArray();
-        for (auto i : v) {
+        for (auto i: v) {
             nums.appendItem(QPDFObjectHandle::newInteger(i))
                 .appendItem(QPDFObjectHandle::newString(
                     "-" + QUtil::int_to_string(i) + "-"));
@@ -199,7 +199,7 @@ test_depth()
 
     QPDFNameTreeObjectHelper nh(n0, q);
     std::cout << "--- forward ---" << std::endl;
-    for (auto i : nh) {
+    for (auto i: nh) {
         std::cout << i.first << " -> " << i.second.unparse() << std::endl;
     }
     std::cout << "--- backward ---" << std::endl;

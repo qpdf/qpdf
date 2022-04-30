@@ -53,7 +53,7 @@ generate_page_map(QPDF& qpdf)
 {
     QPDFPageDocumentHelper dh(qpdf);
     int n = 0;
-    for (auto const& page : dh.getAllPages()) {
+    for (auto const& page: dh.getAllPages()) {
         page_map[page.getObjectHandle().getObjGen()] = ++n;
     }
 }
@@ -69,7 +69,7 @@ show_bookmark_details(QPDFOutlineObjectHelper outline, std::vector<int> numbers)
 
     case st_numbers:
         QTC::TC("examples", "pdf-bookmarks numbers");
-        for (auto const& number : numbers) {
+        for (auto const& number: numbers) {
             std::cout << number << ".";
         }
         std::cout << " ";
@@ -130,7 +130,7 @@ extract_bookmarks(
     // is, so we count up to zero.
     numbers.push_back(
         (style == st_lines) ? -QIntC::to_int(outlines.size()) : 0);
-    for (auto& outline : outlines) {
+    for (auto& outline: outlines) {
         ++(numbers.back());
         show_bookmark_details(outline, numbers);
         extract_bookmarks(outline.getKids(), numbers);

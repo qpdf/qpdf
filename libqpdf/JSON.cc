@@ -20,7 +20,7 @@ JSON::JSON_dictionary::unparse(size_t depth) const
 {
     std::string result = "{";
     bool first = true;
-    for (auto const& iter : members) {
+    for (auto const& iter: members) {
         if (first) {
             first = false;
         } else {
@@ -44,7 +44,7 @@ JSON::JSON_array::unparse(size_t depth) const
 {
     std::string result = "[";
     bool first = true;
-    for (auto const& element : elements) {
+    for (auto const& element: elements) {
         if (first) {
             first = false;
         } else {
@@ -304,7 +304,7 @@ JSON::forEachDictItem(
     if (v == nullptr) {
         return false;
     }
-    for (auto const& k : v->members) {
+    for (auto const& k: v->members) {
         fn(k.first, JSON(k.second));
     }
     return true;
@@ -317,7 +317,7 @@ JSON::forEachArrayItem(std::function<void(JSON value)> fn) const
     if (v == nullptr) {
         return false;
     }
-    for (auto const& i : v->elements) {
+    for (auto const& i: v->elements) {
         fn(JSON(i));
     }
     return true;
@@ -379,7 +379,7 @@ JSON::checkSchemaInternal(
 
     if (sch_dict && (!pattern_key.empty())) {
         auto pattern_schema = sch_dict->members[pattern_key].get();
-        for (auto const& iter : this_dict->members) {
+        for (auto const& iter: this_dict->members) {
             std::string const& key = iter.first;
             checkSchemaInternal(
                 this_dict->members[key].get(),
@@ -389,7 +389,7 @@ JSON::checkSchemaInternal(
                 prefix + "." + key);
         }
     } else if (sch_dict) {
-        for (auto& iter : sch_dict->members) {
+        for (auto& iter: sch_dict->members) {
             std::string const& key = iter.first;
             if (this_dict->members.count(key)) {
                 checkSchemaInternal(
@@ -409,7 +409,7 @@ JSON::checkSchemaInternal(
                 }
             }
         }
-        for (auto const& iter : this_dict->members) {
+        for (auto const& iter: this_dict->members) {
             std::string const& key = iter.first;
             if (sch_dict->members.count(key) == 0) {
                 QTC::TC("libtests", "JSON key extra in object");
@@ -431,7 +431,7 @@ JSON::checkSchemaInternal(
             return false;
         }
         int i = 0;
-        for (auto const& element : this_arr->elements) {
+        for (auto const& element: this_arr->elements) {
             checkSchemaInternal(
                 element.get(),
                 sch_arr->elements.at(0).get(),

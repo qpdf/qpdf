@@ -583,7 +583,7 @@ QPDFJob::initializeFromJson(std::string const& json, bool partial)
     if (!j.checkSchema(JOB_SCHEMA, JSON::f_optional, errors)) {
         std::ostringstream msg;
         msg << this->m->message_prefix << ": job json has errors:";
-        for (auto const& error : errors) {
+        for (auto const& error: errors) {
             msg << std::endl << "  " << error;
         }
         throw std::runtime_error(msg.str());

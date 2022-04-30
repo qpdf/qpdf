@@ -44,4 +44,7 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 NamespaceIndentation: All
 PointerAlignment: Left
 PPIndentWidth: 1
+SpaceBeforeCaseColon: false
+SpaceBeforeCtorInitializerColon: true
 SpaceBeforeInheritanceColon: false
+SpaceBeforeRangeBasedForLoopColon: false

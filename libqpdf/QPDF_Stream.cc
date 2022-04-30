@@ -34,7 +34,7 @@ namespace
                 return true;
             }
             bool filterable = true;
-            for (auto const& key : decode_parms.getKeys()) {
+            for (auto const& key: decode_parms.getKeys()) {
                 if (((key == "/Type") || (key == "/Name")) &&
                     ((!decode_parms.hasKey("/Type")) ||
                      decode_parms.isDictionaryOfType(
@@ -311,7 +311,7 @@ QPDF_Stream::filterable(
 
     bool filterable = true;
 
-    for (auto& filter_name : filter_names) {
+    for (auto& filter_name: filter_names) {
         if (filter_abbreviations.count(filter_name)) {
             QTC::TC("qpdf", "QPDF_Stream expand filter abbreviation");
             filter_name = filter_abbreviations[filter_name];

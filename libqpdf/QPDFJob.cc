@@ -940,7 +940,7 @@ QPDFJob::doShowPages(QPDF& pdf)
             std::map<std::string, QPDFObjectHandle> images = ph.getImages();
             if (!images.empty()) {
                 cout << "  images:" << std::endl;
-                for (auto const& iter2 : images) {
+                for (auto const& iter2: images) {
                     std::string const& name = iter2.first;
                     QPDFObjectHandle image = iter2.second;
                     QPDFObjectHandle dict = image.getDict();
@@ -954,7 +954,7 @@ QPDFJob::doShowPages(QPDF& pdf)
 
         cout << "  content:" << std::endl;
         std::vector<QPDFObjectHandle> content = ph.getPageContents();
-        for (auto& iter2 : content) {
+        for (auto& iter2: content) {
             cout << "    " << iter2.unparse() << std::endl;
         }
     }
@@ -965,7 +965,7 @@ QPDFJob::doListAttachments(QPDF& pdf)
 {
     QPDFEmbeddedFileDocumentHelper efdh(pdf);
     if (efdh.hasEmbeddedFiles()) {
-        for (auto const& i : efdh.getEmbeddedFiles()) {
+        for (auto const& i: efdh.getEmbeddedFiles()) {
             std::string const& key = i.first;
             auto efoh = i.second;
             *(this->m->cout)
@@ -979,12 +979,12 @@ QPDFJob::doListAttachments(QPDF& pdf)
                 cout << "  preferred name: " << efoh->getFilename()
                      << std::endl;
                 cout << "  all names:" << std::endl;
-                for (auto const& i2 : efoh->getFilenames()) {
+                for (auto const& i2: efoh->getFilenames()) {
                     cout << "    " << i2.first << " -> " << i2.second
                          << std::endl;
                 }
                 cout << "  all data streams:" << std::endl;
-                for (auto i2 : efoh->getEmbeddedFileStreams().ditems()) {
+                for (auto i2: efoh->getEmbeddedFileStreams().ditems()) {
                     cout << "    " << i2.first << " -> "
                          << i2.second.getObjGen() << std::endl;
                 }
@@ -1032,7 +1032,7 @@ std::set<QPDFObjGen>
 QPDFJob::getWantedJSONObjects()
 {
     std::set<QPDFObjGen> wanted_og;
-    for (auto const& iter : m->json_objects) {
+    for (auto const& iter: m->json_objects) {
         bool trailer;
         int obj = 0;
         int gen = 0;
@@ -1077,7 +1077,7 @@ QPDFJob::doJSONObjectinfo(QPDF& pdf, JSON& j)
     std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
     JSON j_objectinfo =
         j.addDictionaryMember("objectinfo", JSON::makeDictionary());
-    for (auto& obj : pdf.getAllObjects()) {
+    for (auto& obj: pdf.getAllObjects()) {
         if (all_objects || wanted_og.count(obj.getObjGen())) {
             auto j_details = j_objectinfo.addDictionaryMember(
                 obj.unparse(), JSON::makeDictionary());
@@ -1116,7 +1116,7 @@ QPDFJob::doJSONPages(QPDF& pdf, JSON& j)
         j_page.addDictionaryMember("object", page.getJSON());
         JSON j_images = j_page.addDictionaryMember("images", JSON::makeArray());
         std::map<std::string, QPDFObjectHandle> images = ph.getImages();
-        for (auto const& iter2 : images) {
+        for (auto const& iter2: images) {
             JSON j_image = j_images.addArrayElement(JSON::makeDictionary());
             j_image.addDictionaryMember("name", JSON::makeString(iter2.first));
             QPDFObjectHandle image = iter2.second;
@@ -1152,7 +1152,7 @@ QPDFJob::doJSONPages(QPDF& pdf, JSON& j)
         JSON j_contents =
             j_page.addDictionaryMember("contents", JSON::makeArray());
         std::vector<QPDFObjectHandle> content = ph.getPageContents();
-        for (auto& iter2 : content) {
+        for (auto& iter2: content) {
             j_contents.addArrayElement(iter2.getJSON());
         }
         j_page.addDictionaryMember(
@@ -1419,7 +1419,7 @@ QPDFJob::doJSONAttachments(QPDF& pdf, JSON& j)
     JSON j_attachments =
         j.addDictionaryMember("attachments", JSON::makeDictionary());
     QPDFEmbeddedFileDocumentHelper efdh(pdf);
-    for (auto const& iter : efdh.getEmbeddedFiles()) {
+    for (auto const& iter: efdh.getEmbeddedFiles()) {
         std::string const& key = iter.first;
         auto fsoh = iter.second;
         auto j_details =
@@ -2099,7 +2099,7 @@ QPDFJob::addAttachments(QPDF& pdf)
     maybe_set_pagemode(pdf, "/UseAttachments");
     QPDFEmbeddedFileDocumentHelper efdh(pdf);
     std::vector<std::string> duplicated_keys;
-    for (auto const& to_add : m->attachments_to_add) {
+    for (auto const& to_add: m->attachments_to_add) {
         if ((!to_add.replace) && efdh.getEmbeddedFile(to_add.key)) {
             duplicated_keys.push_back(to_add.key);
             continue;
@@ -2125,7 +2125,7 @@ QPDFJob::addAttachments(QPDF& pdf)
 
     if (!duplicated_keys.empty()) {
         std::string message;
-        for (auto const& k : duplicated_keys) {
+        for (auto const& k: duplicated_keys) {
             if (!message.empty()) {
                 message += ", ";
             }
@@ -2144,7 +2144,7 @@ QPDFJob::copyAttachments(QPDF& pdf)
     maybe_set_pagemode(pdf, "/UseAttachments");
     QPDFEmbeddedFileDocumentHelper efdh(pdf);
     std::vector<std::string> duplicates;
-    for (auto const& to_copy : m->attachments_to_copy) {
+    for (auto const& to_copy: m->attachments_to_copy) {
         doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
             cout << prefix << ": copying attachments from " << to_copy.path
                  << std::endl;
@@ -2153,7 +2153,7 @@ QPDFJob::copyAttachments(QPDF& pdf)
             processFile(to_copy.path.c_str(), to_copy.password.c_str(), false);
         QPDFEmbeddedFileDocumentHelper other_efdh(*other);
         auto other_attachments = other_efdh.getEmbeddedFiles();
-        for (auto const& iter : other_attachments) {
+        for (auto const& iter: other_attachments) {
             std::string new_key = to_copy.prefix + iter.first;
             if (efdh.getEmbeddedFile(new_key)) {
                 duplicates.push_back(
@@ -2177,7 +2177,7 @@ QPDFJob::copyAttachments(QPDF& pdf)
 
     if (!duplicates.empty()) {
         std::string message;
-        for (auto const& i : duplicates) {
+        for (auto const& i: duplicates) {
             if (!message.empty()) {
                 message += "; ";
             }
@@ -2223,7 +2223,7 @@ QPDFJob::handleTransformations(QPDF& pdf)
             QPDFPageObjectHelper& ph(*iter);
             QPDFObjectHandle page = ph.getObjectHandle();
             std::map<std::string, QPDFObjectHandle> images = ph.getImages();
-            for (auto& iter2 : images) {
+            for (auto& iter2: images) {
                 std::string name = iter2.first;
                 QPDFObjectHandle& image = iter2.second;
                 ImageOptimizer* io = new ImageOptimizer(
@@ -2268,7 +2268,7 @@ QPDFJob::handleTransformations(QPDF& pdf)
     }
     if (m->flatten_rotation) {
         make_afdh();
-        for (auto& page : dh.getAllPages()) {
+        for (auto& page: dh.getAllPages()) {
             page.flattenRotation(afdh.get());
         }
     }
@@ -2277,7 +2277,7 @@ QPDFJob::handleTransformations(QPDF& pdf)
     }
     if (!m->attachments_to_remove.empty()) {
         QPDFEmbeddedFileDocumentHelper efdh(pdf);
-        for (auto const& key : m->attachments_to_remove) {
+        for (auto const& key: m->attachments_to_remove) {
             if (efdh.removeEmbeddedFile(key)) {
                 doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
                     cout << prefix << ": removed attachment " << key
@@ -2386,7 +2386,7 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                 resources_seen.insert(xobject_og);
             }
             if (xobject.isDictionary()) {
-                for (auto const& k : xobject.getKeys()) {
+                for (auto const& k: xobject.getKeys()) {
                     QPDFObjectHandle xobj = xobject.getKey(k);
                     if (xobj.isFormXObject()) {
                         queue.push_back(xobj);
@@ -2443,7 +2443,7 @@ QPDFJob::handlePageSpecs(
         // some portable heuristic based on OS limits, just hard-code
         // this at a given number and allow users to override.
         std::set<std::string> filenames;
-        for (auto& page_spec : m->page_specs) {
+        for (auto& page_spec: m->page_specs) {
             filenames.insert(page_spec.filename);
         }
         m->keep_files_open = (filenames.size() <= m->keep_files_open_threshold);
@@ -2707,7 +2707,7 @@ QPDFJob::handlePageSpecs(
     for (size_t pageno = 0; pageno < orig_pages.size(); ++pageno) {
         auto page = orig_pages.at(pageno);
         if (selected_from_orig.count(QIntC::to_int(pageno))) {
-            for (auto field : this_afdh->getFormFieldsForPage(page)) {
+            for (auto field: this_afdh->getFormFieldsForPage(page)) {
                 QTC::TC("qpdf", "QPDFJob pages keeping field from original");
                 referenced_fields.insert(field.getObjectHandle().getObjGen());
             }
@@ -2726,7 +2726,7 @@ QPDFJob::handlePageSpecs(
             if (fields.isIndirect()) {
                 new_fields = pdf.makeIndirectObject(new_fields);
             }
-            for (auto const& field : fields.aitems()) {
+            for (auto const& field: fields.aitems()) {
                 if (referenced_fields.count(field.getObjGen())) {
                     new_fields.appendItem(field);
                 }

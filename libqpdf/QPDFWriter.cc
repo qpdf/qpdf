@@ -2252,7 +2252,7 @@ QPDFWriter::initializeSpecialStreams()
             contents_objects.push_back(contents.getObjGen());
         }
 
-        for (auto const& c : contents_objects) {
+        for (auto const& c: contents_objects) {
             this->m->contents_to_page_seq[c] = num;
             this->m->normalized_streams.insert(c);
         }
@@ -2287,7 +2287,7 @@ QPDFWriter::preserveObjectStreams()
         "qpdf",
         "QPDFWriter preserve object streams",
         this->m->preserve_unreferenced_objects ? 0 : 1);
-    for (auto iter : omap) {
+    for (auto iter: omap) {
         QPDFObjGen og(iter.first, 0);
         if (eligible.count(og) || this->m->preserve_unreferenced_objects) {
             this->m->object_to_object_stream[og] = iter.second;
@@ -2380,7 +2380,7 @@ QPDFWriter::prepareFileForWrite()
 
     this->m->pdf.fixDanglingReferences(true);
     QPDFObjectHandle root = this->m->pdf.getRoot();
-    for (auto const& key : root.getKeys()) {
+    for (auto const& key: root.getKeys()) {
         QPDFObjectHandle oh = root.getKey(key);
         if ((key == "/Extensions") && (oh.isDictionary())) {
             bool extensions_indirect = false;

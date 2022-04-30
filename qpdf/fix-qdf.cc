@@ -112,7 +112,7 @@ QdfFixer::processLines(std::list<std::string>& lines)
     static std::regex re_dict_end("^>>\n$");
 
     lineno = 0;
-    for (auto const& line : lines) {
+    for (auto const& line: lines) {
         ++lineno;
         last_offset = offset;
         offset += QIntC::to_offset(line.length());
@@ -151,7 +151,7 @@ QdfFixer::processLines(std::list<std::string>& lines)
                 // index. Make sure we get at least 1 byte even if
                 // there are no object streams.
                 int max_objects = 1;
-                for (auto const& e : xref) {
+                for (auto const& e: xref) {
                     if ((e.getType() == 2) &&
                         (e.getObjStreamIndex() > max_objects)) {
                         max_objects = e.getObjStreamIndex();
@@ -218,7 +218,7 @@ QdfFixer::processLines(std::list<std::string>& lines)
                 writeBinary(0, 1);
                 writeBinary(0, xref_f1_nbytes);
                 writeBinary(0, xref_f2_nbytes);
-                for (auto const& x : xref) {
+                for (auto const& x: xref) {
                     unsigned long long f1 = 0;
                     unsigned long long f2 = 0;
                     unsigned int type = QIntC::to_uint(x.getType());
@@ -268,7 +268,7 @@ QdfFixer::processLines(std::list<std::string>& lines)
         } else if (state == st_at_xref) {
             auto n = xref.size();
             std::cout << "0 " << 1 + n << "\n0000000000 65535 f \n";
-            for (auto const& e : xref) {
+            for (auto const& e: xref) {
                 std::cout << QUtil::int_to_string(e.getOffset(), 10)
                           << " 00000 n \n";
             }
@@ -322,7 +322,7 @@ QdfFixer::writeOstream()
     auto onum = ostream_id;
     std::string offsets;
     auto n = ostream_offsets.size();
-    for (auto iter : ostream_offsets) {
+    for (auto iter: ostream_offsets) {
         iter -= QIntC::to_offset(first);
         ++onum;
         offsets += QUtil::int_to_string(onum) + " " +
@@ -341,11 +341,11 @@ QdfFixer::writeOstream()
     dict_data += ">>\n";
     offset_adjust += QIntC::to_offset(dict_data.length());
     std::cout << dict_data << "stream\n" << offsets;
-    for (auto const& o : ostream) {
+    for (auto const& o: ostream) {
         std::cout << o;
     }
 
-    for (auto const& o : ostream_discarded) {
+    for (auto const& o: ostream_discarded) {
         offset -= QIntC::to_offset(o.length());
     }
     offset += offset_adjust;

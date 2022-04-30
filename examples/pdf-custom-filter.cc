@@ -357,7 +357,7 @@ StreamReplacer::registerStream(
         this->copied_streams[og] = stream.copyStream();
         // Update the stream dictionary with any changes.
         auto dict = stream.getDict();
-        for (auto const& k : dict_updates.getKeys()) {
+        for (auto const& k: dict_updates.getKeys()) {
             dict.replaceKey(k, dict_updates.getKey(k));
         }
         // Create the key stream that will be referenced from
@@ -414,7 +414,7 @@ process(
     StreamReplacer* replacer = new StreamReplacer(&qpdf);
     std::shared_ptr<QPDFObjectHandle::StreamDataProvider> p(replacer);
 
-    for (auto& o : qpdf.getAllObjects()) {
+    for (auto& o: qpdf.getAllObjects()) {
         if (o.isStream()) {
             // Call registerStream for every stream. Only ones that
             // registerStream decides to replace will actually be
