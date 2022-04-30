@@ -1440,13 +1440,16 @@ foreach (my $i = 1; $i <= 3; ++$i)
 
 show_ntests();
 # ----------
-$td->notify("--- Dictionary keys ---");
-$n_tests += 1;
+$td->notify("--- Miscellaneous QPDFObjectHandle API ---");
+$n_tests += 2;
 
 $td->runtest("dictionary keys",
              {$td->COMMAND => "test_driver 87 - -"},
-             {$td->STRING => "test 87 done\n",
-                  $td->EXIT_STATUS => 0},
+             {$td->STRING => "test 87 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("fluent interfaces",
+             {$td->COMMAND => "test_driver 88 minimal.pdf -"},
+             {$td->FILE => "test88.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

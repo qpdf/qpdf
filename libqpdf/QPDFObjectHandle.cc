@@ -959,7 +959,7 @@ QPDFObjectHandle::setArrayFromVector(std::vector<QPDFObjectHandle> const& items)
     }
 }
 
-void
+QPDFObjectHandle&
 QPDFObjectHandle::insertItem(int at, QPDFObjectHandle const& item)
 {
     if (isArray()) {
@@ -968,9 +968,17 @@ QPDFObjectHandle::insertItem(int at, QPDFObjectHandle const& item)
         typeWarning("array", "ignoring attempt to insert item");
         QTC::TC("qpdf", "QPDFObjectHandle array ignoring insert item");
     }
+    return *this;
 }
 
-void
+QPDFObjectHandle
+QPDFObjectHandle::insertItemAndGet(int at, QPDFObjectHandle const& item)
+{
+    insertItem(at, item);
+    return item;
+}
+
+QPDFObjectHandle&
 QPDFObjectHandle::appendItem(QPDFObjectHandle const& item)
 {
     if (isArray()) {
@@ -980,9 +988,17 @@ QPDFObjectHandle::appendItem(QPDFObjectHandle const& item)
         typeWarning("array", "ignoring attempt to append item");
         QTC::TC("qpdf", "QPDFObjectHandle array ignoring append item");
     }
+    return *this;
 }
 
-void
+QPDFObjectHandle
+QPDFObjectHandle::appendItemAndGet(QPDFObjectHandle const& item)
+{
+    appendItem(item);
+    return item;
+}
+
+QPDFObjectHandle&
 QPDFObjectHandle::eraseItem(int at)
 {
     if (isArray() && (at < getArrayNItems()) && (at >= 0)) {
@@ -996,6 +1012,18 @@ QPDFObjectHandle::eraseItem(int at)
             QTC::TC("qpdf", "QPDFObjectHandle array ignoring erase item");
         }
     }
+    return *this;
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::eraseItemAndGet(int at)
+{
+    auto result = QPDFObjectHandle::newNull();
+    if (isArray() && (at < getArrayNItems()) && (at >= 0)) {
+        result = getArrayItem(at);
+    }
+    eraseItem(at);
+    return result;
 }
 
 // Dictionary accessors
@@ -1267,7 +1295,7 @@ QPDFObjectHandle::getOwningQPDF()
 
 // Dictionary mutators
 
-void
+QPDFObjectHandle&
 QPDFObjectHandle::replaceKey(
     std::string const& key, QPDFObjectHandle const& value)
 {
@@ -1278,9 +1306,18 @@ QPDFObjectHandle::replaceKey(
         typeWarning("dictionary", "ignoring key replacement request");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary ignoring replaceKey");
     }
+    return *this;
 }
 
-void
+QPDFObjectHandle
+QPDFObjectHandle::replaceKeyAndGet(
+    std::string const& key, QPDFObjectHandle const& value)
+{
+    replaceKey(key, value);
+    return value;
+}
+
+QPDFObjectHandle&
 QPDFObjectHandle::removeKey(std::string const& key)
 {
     if (isDictionary()) {
@@ -1289,6 +1326,18 @@ QPDFObjectHandle::removeKey(std::string const& key)
         typeWarning("dictionary", "ignoring key removal request");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary ignoring removeKey");
     }
+    return *this;
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::removeKeyAndGet(std::string const& key)
+{
+    auto result = QPDFObjectHandle::newNull();
+    if (isDictionary()) {
+        result = getKey(key);
+    }
+    removeKey(key);
+    return result;
 }
 
 void

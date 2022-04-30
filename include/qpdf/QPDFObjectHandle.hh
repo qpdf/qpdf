@@ -990,7 +990,20 @@ class QPDFObjectHandle
     QPDF_DLL
     QPDFObjectHandle copyStream();
 
-    // Mutator methods.  Use with caution.
+    // Mutator methods.
+
+    // Since qpdf 11: when a mutator object returns QPDFObjectHandle&,
+    // it is a reference to the object itself. This makes it possible
+    // to use a fluent style. For example:
+    //
+    //   array.appendItem(i1).appendItem(i2);
+    //
+    // would append i1 and then i2 to the array. There are also items
+    // that end with AndGet and return a QPDFObjectHandle. These
+    // return the newly added object. For example:
+    //
+    //   auto new_dict = dict.replaceKeyAndGet(
+    //       "/New", QPDFObjectHandle::newDictionary());
 
     // Recursively copy this object, making it direct. An exception is
     // thrown if a loop is detected. With allow_streams true, keep
@@ -1010,31 +1023,54 @@ class QPDFObjectHandle
     QPDF_DLL
     void setArrayFromVector(std::vector<QPDFObjectHandle> const& items);
     // Insert an item before the item at the given position ("at") so
-    // that it has that position after insertion.  If "at" is equal to
-    // the size of the array, insert the item at the end.
+    // that it has that position after insertion. If "at" is equal to
+    // the size of the array, insert the item at the end. Return a
+    // reference to the array (not the new item).
     QPDF_DLL
-    void insertItem(int at, QPDFObjectHandle const& item);
+    QPDFObjectHandle& insertItem(int at, QPDFObjectHandle const& item);
+    // Like insertItem but return the item that was inserted.
     QPDF_DLL
-    void appendItem(QPDFObjectHandle const& item);
+    QPDFObjectHandle insertItemAndGet(int at, QPDFObjectHandle const& item);
+    // Append an item, and return a reference to the original array
+    // (not the new item).
+    QPDF_DLL
+    QPDFObjectHandle& appendItem(QPDFObjectHandle const& item);
+    // Append an item, and return the newly added item.
+    QPDF_DLL
+    QPDFObjectHandle appendItemAndGet(QPDFObjectHandle const& item);
     // Remove the item at that position, reducing the size of the
-    // array by one.
+    // array by one. Return a reference the original array (not the
+    // item that was removed).
     QPDF_DLL
-    void eraseItem(int at);
+    QPDFObjectHandle& eraseItem(int at);
+    // Erase and item and return the item that was removed.
+    QPDF_DLL
+    QPDFObjectHandle eraseItemAndGet(int at);
 
     // Mutator methods for dictionary objects
 
     // Replace value of key, adding it if it does not exist. If value
-    // is null, remove the key.
+    // is null, remove the key. Return a reference to the original
+    // dictionary (not the new item).
     QPDF_DLL
-    void replaceKey(std::string const& key, QPDFObjectHandle const& value);
-    // Remove key, doing nothing if key does not exist
+    QPDFObjectHandle&
+    replaceKey(std::string const& key, QPDFObjectHandle const& value);
+    // Replace value of key and return the value.
     QPDF_DLL
-    void removeKey(std::string const& key);
+    QPDFObjectHandle
+    replaceKeyAndGet(std::string const& key, QPDFObjectHandle const& value);
+    // Remove key, doing nothing if key does not exist. Return the
+    // original dictionary (not the removed item).
+    QPDF_DLL
+    QPDFObjectHandle& removeKey(std::string const& key);
+    // Remove key and return the old value. If the old value didn't
+    // exist, return a null object.
+    QPDF_DLL
+    QPDFObjectHandle removeKeyAndGet(std::string const& key);
 
     // ABI: Remove in qpdf 12
-    [[deprecated("use replaceKey -- it does the same thing")]]
-    QPDF_DLL
-    void replaceOrRemoveKey(std::string const& key, QPDFObjectHandle const&);
+    [[deprecated("use replaceKey -- it does the same thing")]] QPDF_DLL void
+    replaceOrRemoveKey(std::string const& key, QPDFObjectHandle const&);
 
     // Methods for stream objects
     QPDF_DLL

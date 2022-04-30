@@ -474,13 +474,6 @@ This is a list of changes to make next time there is an ABI change.
 Comments appear in the code prefixed by "ABI". Always Search for ABI
 in source and header files to find items not listed here.
 
-* Having QPDFObjectHandle setters return Class& to allow for
-  use of fluent interfaces. This includes array and dictionary
-  mutators.
-  newDictionary().replaceKey("/X", "1"_qpdf).replaceKey("/Y", "(asdf)"_qpdf);
-* Add replaceKeyAndGet, appendItemAndGet, setArrayItemAndGet,
-  insertItemAndGet that return the new item so you can say
-  auto oh = dict.replaceKeyAndGet("/Key", QPDFObjectHandle::newSomething());
 * Add getKeyOrInsert("/X", oh) that returns the existing value or adds
   oh as the new value and returns it.
 * Add default values to the getters, like getIntValue(default_value).

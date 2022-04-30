@@ -73,6 +73,15 @@ For a detailed list of changes, please see the file
       ``QPDFNumberTreeObjectHelper`` constructors that don't take a
       ``QPDF&`` argument.
 
+  - Library Enhancements
+
+    - Support for more fluent programming with ``QPDFObjectHandle``.
+      The methods ``insertItem``, ``appendItem``, ``eraseItem``,
+      ``replaceKey``, and ``removeKey`` all return a reference to the
+      object being modified. New methods ``insertItemAndGet``,
+      ``appendItemAndGet``, ``eraseItemAndGet``, ``replaceKeyAndGet``,
+      and ``removeKeyAndGet`` return the newly added or removed object.
+
   - Other changes
 
     - A new chapter on contributing to qpdf has been added to the

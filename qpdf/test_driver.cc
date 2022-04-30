@@ -3178,6 +3178,63 @@ test_87(QPDF& pdf, char const* arg2)
     assert(dict.getJSON().unparse() == "{\n  \"/A\": 2\n}");
 }
 
+static void
+test_88(QPDF& pdf, char const* arg2)
+{
+    // Exercise fluent QPDFObjectHandle mutators and similar methods
+    // added for qpdf 11.
+    auto dict = QPDFObjectHandle::newDictionary()
+                    .replaceKey("/One", QPDFObjectHandle::newInteger(1))
+                    .replaceKey("/Two", QPDFObjectHandle::newInteger(2));
+    dict.replaceKeyAndGet("/Three", QPDFObjectHandle::newArray())
+        .appendItem("(a)"_qpdf)
+        .appendItem("(b)"_qpdf)
+        .appendItemAndGet(QPDFObjectHandle::newDictionary())
+        .replaceKey("/Z", "/Y"_qpdf)
+        .replaceKey("/X", "/W"_qpdf);
+    assert(dict.unparse() == R"(
+      <<
+        /One 1
+        /Two 2
+        /Three [ (a) (b) << /Z /Y /X /W >> ]
+      >>
+    )"_qpdf.unparse());
+    auto arr = dict.getKey("/Three")
+                   .insertItem(0, QPDFObjectHandle::newString("0"))
+                   .insertItem(0, QPDFObjectHandle::newString("00"));
+    assert(
+        arr.unparse() ==
+        "[ (00) (0) (a) (b) << /Z /Y /X /W >> ]"_qpdf.unparse());
+    auto new_dict = arr.insertItemAndGet(1, "<< /P /Q /R /S >>"_qpdf);
+    arr.eraseItem(2).eraseItem(0);
+    assert(
+        arr.unparse() ==
+        "[ << /P /Q /R /S >> (a) (b) << /Z /Y /X /W >> ]"_qpdf.unparse());
+
+    // new_dict shares internals with the one in the array. It has
+    // always been this way, and there is code that relies on this
+    // behavior. Maybe it would be different if I could start over
+    // again...
+    new_dict.removeKey("/R").replaceKey("/T", "/U"_qpdf);
+    assert(
+        arr.unparse() ==
+        "[ << /P /Q /T /U >> (a) (b) << /Z /Y /X /W >> ]"_qpdf.unparse());
+    auto s = arr.eraseItemAndGet(1);
+    assert(s.unparse() == "(a)");
+    assert(
+        arr.unparse() ==
+        "[ << /P /Q /T /U >> (b) << /Z /Y /X /W >> ]"_qpdf.unparse());
+
+    assert(new_dict.removeKeyAndGet("/M").isNull());
+    assert(new_dict.removeKeyAndGet("/P").unparse() == "/Q");
+    assert(new_dict.unparse() == "<< /T /U >>"_qpdf.unparse());
+
+    // Test errors
+    auto arr2 = pdf.getRoot().replaceKeyAndGet("/QTest", "[1 2]"_qpdf);
+    arr2.setObjectDescription(&pdf, "test array");
+    assert(arr2.eraseItemAndGet(50).isNull());
+}
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -3280,7 +3337,7 @@ runtest(int n, char const* filename1, char const* arg2)
         {76, test_76}, {77, test_77}, {78, test_78}, {79, test_79},
         {80, test_80}, {81, test_81}, {82, test_82}, {83, test_83},
         {84, test_84}, {85, test_85}, {86, test_86}, {87, test_87},
-    };
+        {88, test_88}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {
