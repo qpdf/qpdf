@@ -470,11 +470,17 @@ Related Options
       option is necessary to create 40-bit files or 128-bit files that
       use RC4 encryption.
 
-   Starting with version 10.4, qpdf issues warnings when requested to
-   create files using RC4 encryption. This option suppresses those
-   warnings. In future versions of qpdf, qpdf will refuse to create
-   files with weak cryptography when this flag is not given. See
+   Encrypted PDF files using 40-bit keys or 128-bit keys without AES
+   use the insecure *RC4* encryption algorithm. Starting with version
+   11.0, qpdf's default behavior is to refuse to write files using RC4
+   encryption. Use this option to allow creation of such files. In
+   versions 10.4 through 10.6, attempting to create weak encrypted
+   files was a warning, rather than an error, without this flag. See
    :ref:`weak-crypto` for additional details.
+
+   No check is performed for weak crypto when preserving encryption
+   parameters from or copying encryption parameters from other files.
+   The rationale for this is discussed in :ref:`weak-crypto`.
 
 .. qpdf:option:: --keep-files-open=[y|n]
 
@@ -740,6 +746,9 @@ Related Options
    of qpdf, and then want to restore the original encryption on the
    file without having to manual specify all the individual settings.
    See also :qpdf:ref:`--decrypt`.
+
+   Checks for weak cryptographic algorithms are intentionally not made
+   by this operation. See :ref:`weak-crypto` for the rationale.
 
 .. qpdf:option:: --encryption-file-password=password
 

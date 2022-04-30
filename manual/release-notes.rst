@@ -62,6 +62,10 @@ For a detailed list of changes, please see the file
     - The default json output version when :qpdf:ref:`--json` is
       specified has been changed from ``1`` to ``latest``.
 
+    - The :qpdf:ref:`--allow-weak-crypto` flag is now mandatory when
+      explicitly creating files with weak cryptographic algorithms.
+      See :ref:`weak-crypto` for a discussion.
+
   - API: breaking changes
 
     - Remove
@@ -72,6 +76,19 @@ For a detailed list of changes, please see the file
     - Remove ``QPDFNameTreeObjectHelper`` and
       ``QPDFNumberTreeObjectHelper`` constructors that don't take a
       ``QPDF&`` argument.
+
+    - Intentionally break API to call attention to operations that
+      write files with insecure encryption:
+
+      - Remove pre qpdf-8.4.0 encryption API methods from ``QPDFWriter``
+        and their corresponding C API functions
+
+      - Add ``Insecure`` to the names of some ``QPDFWriter`` methods
+        and ``_insecure`` to the names of some C API functions without
+        otherwise changing their behavior
+
+      - See :ref:`breaking-crypto-api` for specific details, and see
+        :ref:`weak-crypto` for a general discussion.
 
   - Library Enhancements
 

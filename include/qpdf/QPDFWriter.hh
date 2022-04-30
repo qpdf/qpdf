@@ -366,10 +366,12 @@ class QPDFWriter
     // functions that could be useful to you, most notably
     // utf8_to_pdf_doc.
 
-    // R3 uses RC4, which is a weak cryptographic algorithm. Don't use
-    // it unless you have to.
+    // R2 uses RC4, which is a weak cryptographic algorithm. Don't use
+    // it unless you have to. See "Weak Cryptography" in the manual.
+    // This encryption format is deprecated in the PDF 2.0
+    // specification.
     QPDF_DLL
-    void setR2EncryptionParameters(
+    void setR2EncryptionParametersInsecure(
         char const* user_password,
         char const* owner_password,
         bool allow_print,
@@ -377,9 +379,11 @@ class QPDFWriter
         bool allow_extract,
         bool allow_annotate);
     // R3 uses RC4, which is a weak cryptographic algorithm. Don't use
-    // it unless you have to.
+    // it unless you have to. See "Weak Cryptography" in the manual.
+    // This encryption format is deprecated in the PDF 2.0
+    // specification.
     QPDF_DLL
-    void setR3EncryptionParameters(
+    void setR3EncryptionParametersInsecure(
         char const* user_password,
         char const* owner_password,
         bool allow_accessibility,
@@ -389,10 +393,13 @@ class QPDFWriter
         bool allow_form_filling,
         bool allow_modify_other,
         qpdf_r3_print_e print);
-    // R4 uses RC4, which is a weak cryptographic algorithm, when
-    // use_aes=false. Don't use it unless you have to.
+    // When use_aes=false, this call enables R4 with RC4, which is a
+    // weak cryptographic algorithm. Even with use_aes=true, the
+    // overall encryption scheme is weak. Don't use it unless you have
+    // to. See "Weak Cryptography" in the manual. This encryption
+    // format is deprecated in the PDF 2.0 specification.
     QPDF_DLL
-    void setR4EncryptionParameters(
+    void setR4EncryptionParametersInsecure(
         char const* user_password,
         char const* owner_password,
         bool allow_accessibility,
@@ -419,6 +426,8 @@ class QPDFWriter
         bool allow_modify_other,
         qpdf_r3_print_e print,
         bool encrypt_metadata);
+    // This is the only password-based encryption format supported by
+    // the PDF specification.
     QPDF_DLL
     void setR6EncryptionParameters(
         char const* user_password,

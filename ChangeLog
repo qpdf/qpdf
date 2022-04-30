@@ -1,8 +1,32 @@
 2022-04-30  Jay Berkenbilt  <ejb@ql.org>
 
+        * QPDFWriter: change encryption API calls
+          - Remove deprecated versions of setR*EncryptionParameters
+            methods from before qpdf 8.4.0
+          - Replace setR2EncryptionParameters with
+            setR2EncryptionParametersInsecure
+          - Replace setR3EncryptionParameters with
+            setR3EncryptionParametersInsecure
+          - Replace setR4EncryptionParameters with
+            setR4EncryptionParametersInsecure
+
+        * C API: change encryption API calls to match C++ interface
+          - Remove pre-8.4.0 functions:
+            - qpdf_set_r3_encryption_parameters
+            - qpdf_set_r4_encryption_parameters
+            - qpdf_set_r5_encryption_parameters
+            - qpdf_set_r6_encryption_parameters
+          - Add "_insecure" to insecure encryption triggers:
+            - Replace void qpdf_set_r2_encryption_parameters
+              with qpdf_set_r2_encryption_parameters_insecure
+            - Replace void qpdf_set_r3_encryption_parameters2
+              with qpdf_set_r3_encryption_parameters_insecure
+            - Replace void qpdf_set_r4_encryption_parameters2
+              with qpdf_set_r4_encryption_parameters_insecure
+
         * Make attempting to write encrypted files that use RC4 (40-bit or
         128-bit without AES) an error rather than a warning when
-        --allow-weak-crypto is not specified.
+        --allow-weak-crypto is not specified. Fixes #576.
 
 2022-04-29  Jay Berkenbilt  <ejb@ql.org>
 

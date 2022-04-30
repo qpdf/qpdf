@@ -475,18 +475,6 @@ Comments appear in the code prefixed by "ABI". Always Search for ABI
 in source and header files to find items not listed here. Also search
 for "[[deprecated" to find deprecated APIs that can be removed.
 
-* Deal with weak cryptographic algorithms:
-  * Github issue #576
-  * Add something to QPDFWriter that you must call in order to allow
-    creation of files with insecure crypto. Maybe
-    QPDFWriter::allowWeakCrypto. Call this when --allow-weak-crypto is
-    passed and probably also when copying encryption by default from
-    an input file. There should be some API change so that, when
-    people recompile with qpdf 11, their code won't suddenly stop
-    working. Getting this right will take careful consideration of the
-    developer and user experience. We don't want to create a situation
-    where exactly the same code fails to work in 11 but worked on 10.
-    See #576 for latest notes.
 
 Page splitting/merging
 ======================

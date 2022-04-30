@@ -674,7 +674,7 @@ qpdf_set_preserve_encryption(qpdf_data qpdf, QPDF_BOOL value)
 }
 
 void
-qpdf_set_r2_encryption_parameters(
+qpdf_set_r2_encryption_parameters_insecure(
     qpdf_data qpdf,
     char const* user_password,
     char const* owner_password,
@@ -683,8 +683,8 @@ qpdf_set_r2_encryption_parameters(
     QPDF_BOOL allow_extract,
     QPDF_BOOL allow_annotate)
 {
-    QTC::TC("qpdf", "qpdf-c called qpdf_set_r2_encryption_parameters");
-    qpdf->qpdf_writer->setR2EncryptionParameters(
+    QTC::TC("qpdf", "qpdf-c called qpdf_set_r2_encryption_parameters_insecure");
+    qpdf->qpdf_writer->setR2EncryptionParametersInsecure(
         user_password,
         owner_password,
         allow_print != QPDF_FALSE,
@@ -694,7 +694,7 @@ qpdf_set_r2_encryption_parameters(
 }
 
 void
-qpdf_set_r3_encryption_parameters2(
+qpdf_set_r3_encryption_parameters_insecure(
     qpdf_data qpdf,
     char const* user_password,
     char const* owner_password,
@@ -706,8 +706,8 @@ qpdf_set_r3_encryption_parameters2(
     QPDF_BOOL allow_modify_other,
     enum qpdf_r3_print_e print)
 {
-    QTC::TC("qpdf", "qpdf-c called qpdf_set_r3_encryption_parameters");
-    qpdf->qpdf_writer->setR3EncryptionParameters(
+    QTC::TC("qpdf", "qpdf-c called qpdf_set_r3_encryption_parameters_insecure");
+    qpdf->qpdf_writer->setR3EncryptionParametersInsecure(
         user_password,
         owner_password,
         allow_accessibility != QPDF_FALSE,
@@ -720,7 +720,7 @@ qpdf_set_r3_encryption_parameters2(
 }
 
 void
-qpdf_set_r4_encryption_parameters2(
+qpdf_set_r4_encryption_parameters_insecure(
     qpdf_data qpdf,
     char const* user_password,
     char const* owner_password,
@@ -734,8 +734,8 @@ qpdf_set_r4_encryption_parameters2(
     QPDF_BOOL encrypt_metadata,
     QPDF_BOOL use_aes)
 {
-    QTC::TC("qpdf", "qpdf-c called qpdf_set_r4_encryption_parameters");
-    qpdf->qpdf_writer->setR4EncryptionParameters(
+    QTC::TC("qpdf", "qpdf-c called qpdf_set_r4_encryption_parameters_insecure");
+    qpdf->qpdf_writer->setR4EncryptionParametersInsecure(
         user_password,
         owner_password,
         allow_accessibility != QPDF_FALSE,

@@ -320,7 +320,7 @@ test11(
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
-    qpdf_set_r2_encryption_parameters(
+    qpdf_set_r2_encryption_parameters_insecure(
         qpdf, "user1", "owner1", QPDF_FALSE, QPDF_TRUE, QPDF_TRUE, QPDF_TRUE);
     qpdf_write(qpdf);
     report_errors();
@@ -336,7 +336,7 @@ test12(
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
-    qpdf_set_r3_encryption_parameters2(
+    qpdf_set_r3_encryption_parameters_insecure(
         qpdf,
         "user2",
         "owner2",
@@ -397,7 +397,7 @@ test15(
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
     qpdf_set_static_aes_IV(qpdf, QPDF_TRUE);
-    qpdf_set_r4_encryption_parameters2(
+    qpdf_set_r4_encryption_parameters_insecure(
         qpdf,
         "user2",
         "owner2",

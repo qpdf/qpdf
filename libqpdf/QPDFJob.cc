@@ -2815,19 +2815,22 @@ QPDFJob::setEncryptionOptions(QPDF& pdf, QPDFWriter& w)
             QTC::TC("qpdf", "QPDFJob weak crypto error");
             *(this->m->cerr)
                 << this->m->message_prefix
-                << ": refusing to write a file with RC4, a weak cryptographic algorithm"
+                << ": refusing to write a file with RC4, a weak cryptographic "
+                   "algorithm"
                 << std::endl
                 << "Please use 256-bit keys for better security." << std::endl
                 << "Pass --allow-weak-crypto to enable writing insecure files."
                 << std::endl
-                << "See also https://qpdf.readthedocs.io/en/stable/weak-crypto.html"
+                << "See also "
+                   "https://qpdf.readthedocs.io/en/stable/weak-crypto.html"
                 << std::endl;
-            throw std::runtime_error("refusing to write a file with weak crypto");
+            throw std::runtime_error(
+                "refusing to write a file with weak crypto");
         }
     }
     switch (R) {
     case 2:
-        w.setR2EncryptionParameters(
+        w.setR2EncryptionParametersInsecure(
             m->user_password.c_str(),
             m->owner_password.c_str(),
             m->r2_print,
@@ -2836,7 +2839,7 @@ QPDFJob::setEncryptionOptions(QPDF& pdf, QPDFWriter& w)
             m->r2_annotate);
         break;
     case 3:
-        w.setR3EncryptionParameters(
+        w.setR3EncryptionParametersInsecure(
             m->user_password.c_str(),
             m->owner_password.c_str(),
             m->r3_accessibility,
@@ -2848,7 +2851,7 @@ QPDFJob::setEncryptionOptions(QPDF& pdf, QPDFWriter& w)
             m->r3_print);
         break;
     case 4:
-        w.setR4EncryptionParameters(
+        w.setR4EncryptionParametersInsecure(
             m->user_password.c_str(),
             m->owner_password.c_str(),
             m->r3_accessibility,

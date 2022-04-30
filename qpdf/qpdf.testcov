@@ -130,8 +130,8 @@ qpdf-c called qpdf_set_qdf_mode 0
 qpdf-c called qpdf_set_static_ID 0
 qpdf-c called qpdf_set_suppress_original_object_IDs 0
 qpdf-c called qpdf_set_preserve_encryption 0
-qpdf-c called qpdf_set_r2_encryption_parameters 0
-qpdf-c called qpdf_set_r3_encryption_parameters 0
+qpdf-c called qpdf_set_r2_encryption_parameters_insecure 0
+qpdf-c called qpdf_set_r3_encryption_parameters_insecure 0
 qpdf-c called qpdf_set_linearization 0
 qpdf-c called qpdf_write 1
 qpdf-c called qpdf_allow_accessibility 0
@@ -158,7 +158,7 @@ QPDF_encryption cleartext metadata 0
 QPDF_encryption aes decode stream 0
 QPDFWriter forcing object stream disable 0
 QPDFWriter forced version disabled encryption 0
-qpdf-c called qpdf_set_r4_encryption_parameters 0
+qpdf-c called qpdf_set_r4_encryption_parameters_insecure 0
 qpdf-c called qpdf_set_static_aes_IV 0
 QPDF_encryption stream crypt filter 0
 QPDF ERR object stream with wrong type 0

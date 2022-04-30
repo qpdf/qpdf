@@ -365,7 +365,7 @@ QPDFWriter::setPCLm(bool val)
 }
 
 void
-QPDFWriter::setR2EncryptionParameters(
+QPDFWriter::setR2EncryptionParametersInsecure(
     char const* user_password,
     char const* owner_password,
     bool allow_print,
@@ -391,7 +391,7 @@ QPDFWriter::setR2EncryptionParameters(
 }
 
 void
-QPDFWriter::setR3EncryptionParameters(
+QPDFWriter::setR3EncryptionParametersInsecure(
     char const* user_password,
     char const* owner_password,
     bool allow_accessibility,
@@ -419,7 +419,7 @@ QPDFWriter::setR3EncryptionParameters(
 }
 
 void
-QPDFWriter::setR4EncryptionParameters(
+QPDFWriter::setR4EncryptionParametersInsecure(
     char const* user_password,
     char const* owner_password,
     bool allow_accessibility,

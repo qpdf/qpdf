@@ -458,8 +458,13 @@ extern "C" {
     QPDF_DLL
     void qpdf_set_preserve_encryption(qpdf_data qpdf, QPDF_BOOL value);
 
+    /* The *_insecure functions are identical to the old versions but
+     * have been renamed as a an alert to the caller that they are
+     * insecure. See "Weak Cryptographic" in the manual for
+     * details.
+     */
     QPDF_DLL
-    void qpdf_set_r2_encryption_parameters(
+    void qpdf_set_r2_encryption_parameters_insecure(
         qpdf_data qpdf,
         char const* user_password,
         char const* owner_password,
@@ -469,7 +474,7 @@ extern "C" {
         QPDF_BOOL allow_annotate);
 
     QPDF_DLL
-    void qpdf_set_r3_encryption_parameters2(
+    void qpdf_set_r3_encryption_parameters_insecure(
         qpdf_data qpdf,
         char const* user_password,
         char const* owner_password,
@@ -482,7 +487,7 @@ extern "C" {
         enum qpdf_r3_print_e print);
 
     QPDF_DLL
-    void qpdf_set_r4_encryption_parameters2(
+    void qpdf_set_r4_encryption_parameters_insecure(
         qpdf_data qpdf,
         char const* user_password,
         char const* owner_password,
