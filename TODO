@@ -474,19 +474,6 @@ This is a list of changes to make next time there is an ABI change.
 Comments appear in the code prefixed by "ABI". Always Search for ABI
 in source and header files to find items not listed here.
 
-* Add getKeyOrInsert("/X", oh) that returns the existing value or adds
-  oh as the new value and returns it.
-* Add default values to the getters, like getIntValue(default_value).
-  If a default value is passed in, you never get a type warning.
-* Make it easier to deal with objects that should be indirect. Search
-  for makeIndirectObject in the code to find patterns. For example, it
-  would be nice to have a one-liner for the case of one or all
-  dictionary values or array items being replaced with an indirect
-  objects if direct. Maybe we want a version of copyForeignObject that
-  takes the foreign qpdf and converts the source object to indirect
-  before copying, though maybe we don't because it could cause
-  multiple copies to be made...usually it's better to handle that
-  explicitly.
 * Deal with weak cryptographic algorithms:
   * Github issue #576
   * Add something to QPDFWriter that you must call in order to allow
