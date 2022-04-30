@@ -70,8 +70,7 @@ test_bsearch()
         limits.appendItem(QPDFObjectHandle::newInteger(v.at(0)));
         limits.appendItem(QPDFObjectHandle::newInteger(v.at(v.size() - 1)));
         auto node = q.makeIndirectObject(QPDFObjectHandle::newDictionary());
-        node.replaceKey("/Nums", nums);
-        node.replaceKey("/Limits", limits);
+        node.replaceKey("/Nums", nums).replaceKey("/Limits", limits);
         return node;
     };
 

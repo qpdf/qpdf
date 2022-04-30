@@ -2436,13 +2436,11 @@ QPDF::replaceForeignIndirectObjects(
         QTC::TC("qpdf", "QPDF replace dictionary");
         result = QPDFObjectHandle::newDictionary();
         std::set<std::string> keys = foreign.getKeys();
-        for (std::set<std::string>::iterator iter = keys.begin();
-             iter != keys.end();
-             ++iter) {
+        for (auto const& iter : keys) {
             result.replaceKey(
-                *iter,
+                iter,
                 replaceForeignIndirectObjects(
-                    foreign.getKey(*iter), obj_copier, false));
+                    foreign.getKey(iter), obj_copier, false));
         }
     } else if (foreign.isStream()) {
         QTC::TC("qpdf", "QPDF replace stream");
@@ -2452,13 +2450,11 @@ QPDF::replaceForeignIndirectObjects(
         QPDFObjectHandle dict = result.getDict();
         QPDFObjectHandle old_dict = foreign.getDict();
         std::set<std::string> keys = old_dict.getKeys();
-        for (std::set<std::string>::iterator iter = keys.begin();
-             iter != keys.end();
-             ++iter) {
+        for (auto const& iter : keys) {
             dict.replaceKey(
-                *iter,
+                iter,
                 replaceForeignIndirectObjects(
-                    old_dict.getKey(*iter), obj_copier, false));
+                    old_dict.getKey(iter), obj_copier, false));
         }
         copyStreamData(result, foreign);
     } else {

@@ -106,10 +106,10 @@ process(
     // apdict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
     // apdict.replaceKey("/Subtype", QPDFObjectHandle::newName("/Form"));
     // apdict.replaceKey("/BBox", QPDFObjectHandle::parse("[ 0 0 20 20 ]"));
-    apdict.replaceKey("/Resources", "<< >>"_qpdf);
-    apdict.replaceKey("/Type", "/XObject"_qpdf);
-    apdict.replaceKey("/Subtype", "/Form"_qpdf);
-    apdict.replaceKey("/BBox", "[ 0 0 20 20 ]"_qpdf);
+    apdict.replaceKey("/Resources", "<< >>"_qpdf)
+        .replaceKey("/Type", "/XObject"_qpdf)
+        .replaceKey("/Subtype", "/Form"_qpdf)
+        .replaceKey("/BBox", "[ 0 0 20 20 ]"_qpdf);
     auto annot = q.makeIndirectObject(QPDFObjectHandle::parse(
         &q,
         ("<<"

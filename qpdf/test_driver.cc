@@ -538,8 +538,7 @@ test_9(QPDF& pdf, char const* arg2)
         "data for other stream\n",
         QPDFObjectHandle::newNull(),
         QPDFObjectHandle::newNull());
-    root.replaceKey("/QStream", qstream);
-    root.replaceKey("/RStream", rstream);
+    root.replaceKey("/QStream", qstream).replaceKey("/RStream", rstream);
     QPDFWriter w(pdf, "a.pdf");
     w.setStaticID(true);
     w.setStreamDataMode(qpdf_s_preserve);
@@ -909,8 +908,7 @@ test_24(QPDF& pdf, char const* arg2)
     QPDFObjectHandle res1 = QPDFObjectHandle::newReserved(&pdf);
     QPDFObjectHandle res2 = QPDFObjectHandle::newReserved(&pdf);
     QPDFObjectHandle trailer = pdf.getTrailer();
-    trailer.replaceKey("Array1", res1);
-    trailer.replaceKey("Array2", res2);
+    trailer.replaceKey("Array1", res1).replaceKey("Array2", res2);
 
     QPDFObjectHandle array1 = QPDFObjectHandle::newArray();
     QPDFObjectHandle array2 = QPDFObjectHandle::newArray();
@@ -1086,8 +1084,9 @@ test_27(QPDF& pdf, char const* arg2)
         dh.addPage(O3.getKey("/OtherPage"), false);
         dh.addPage(O3, false);
         QPDFObjectHandle s2 = QPDFObjectHandle::newStream(&oldpdf, "potato\n");
-        pdf.getTrailer().replaceKey("/QTest", pdf.copyForeignObject(qtest));
-        pdf.getTrailer().replaceKey("/QTest2", QPDFObjectHandle::newArray());
+        pdf.getTrailer()
+            .replaceKey("/QTest", pdf.copyForeignObject(qtest))
+            .replaceKey("/QTest2", QPDFObjectHandle::newArray());
         pdf.getTrailer().getKey("/QTest2").appendItem(
             pdf.copyForeignObject(s1));
         pdf.getTrailer().getKey("/QTest2").appendItem(
@@ -2259,9 +2258,10 @@ test_60(QPDF& pdf, char const* arg2)
 
     // The only differences between /QTest and /QTest3 should be
     // the direct objects merged from r2.
-    pdf.getTrailer().replaceKey("/QTest1", r1);
-    pdf.getTrailer().replaceKey("/QTest2", r2);
-    pdf.getTrailer().replaceKey("/QTest3", r3);
+    pdf.getTrailer()
+        .replaceKey("/QTest1", r1)
+        .replaceKey("/QTest2", r2)
+        .replaceKey("/QTest3", r3);
     QPDFWriter w(pdf, "a.pdf");
     w.setQDFMode(true);
     w.setStaticID(true);
@@ -2321,9 +2321,9 @@ test_62(QPDF& pdf, char const* arg2)
     long long q2 = QIntC::to_longlong(q2_l);
     unsigned int q3_i = UINT_MAX;
     long long q3 = QIntC::to_longlong(q3_i);
-    t.replaceKey("/Q1", QPDFObjectHandle::newInteger(q1));
-    t.replaceKey("/Q2", QPDFObjectHandle::newInteger(q2));
-    t.replaceKey("/Q3", QPDFObjectHandle::newInteger(q3));
+    t.replaceKey("/Q1", QPDFObjectHandle::newInteger(q1))
+        .replaceKey("/Q2", QPDFObjectHandle::newInteger(q2))
+        .replaceKey("/Q3", QPDFObjectHandle::newInteger(q3));
     assert_compare_numbers(q1, t.getKey("/Q1").getIntValue());
     assert_compare_numbers(q1_l, t.getKey("/Q1").getUIntValue());
     assert_compare_numbers(INT_MAX, t.getKey("/Q1").getIntValueAsInt());

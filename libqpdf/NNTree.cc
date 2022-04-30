@@ -341,9 +341,10 @@ NNTreeIterator::split(
         first_node.replaceKey(key, first_half);
         QPDFObjectHandle new_kids = QPDFObjectHandle::newArray();
         new_kids.appendItem(first_node);
-        to_split.removeKey("/Limits"); // already shouldn't be there for root
-        to_split.removeKey(impl.details.itemsKey());
-        to_split.replaceKey("/Kids", new_kids);
+        to_split
+            .removeKey("/Limits") // already shouldn't be there for root
+            .removeKey(impl.details.itemsKey())
+            .replaceKey("/Kids", new_kids);
         if (is_leaf) {
             QTC::TC("qpdf", "NNTree split root + leaf");
             this->node = first_node;
@@ -884,9 +885,8 @@ NNTreeImpl::repair()
     for (auto const& i : *this) {
         repl.insert(i.first, i.second);
     }
-    this->oh.replaceKey("/Kids", new_node.getKey("/Kids"));
-    this->oh.replaceKey(
-        details.itemsKey(), new_node.getKey(details.itemsKey()));
+    this->oh.replaceKey("/Kids", new_node.getKey("/Kids"))
+        .replaceKey(details.itemsKey(), new_node.getKey(details.itemsKey()));
 }
 
 NNTreeImpl::iterator

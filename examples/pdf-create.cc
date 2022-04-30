@@ -183,9 +183,9 @@ add_page(
         " /Subtype /Image"
         " /BitsPerComponent 8"
         ">>"_qpdf;
-    image_dict.replaceKey("/ColorSpace", newName(color_space));
-    image_dict.replaceKey("/Width", newInteger(width));
-    image_dict.replaceKey("/Height", newInteger(height));
+    image_dict.replaceKey("/ColorSpace", newName(color_space))
+        .replaceKey("/Width", newInteger(width))
+        .replaceKey("/Height", newInteger(height));
     image.replaceDict(image_dict);
 
     // Provide the stream data.
@@ -202,9 +202,9 @@ add_page(
     xobject.replaceKey("/Im1", image);
 
     QPDFObjectHandle resources = QPDFObjectHandle::newDictionary();
-    resources.replaceKey("/ProcSet", procset);
-    resources.replaceKey("/Font", rfont);
-    resources.replaceKey("/XObject", xobject);
+    resources.replaceKey("/ProcSet", procset)
+        .replaceKey("/Font", rfont)
+        .replaceKey("/XObject", xobject);
 
     // Create the page content stream
     QPDFObjectHandle contents =
@@ -215,8 +215,7 @@ add_page(
                                                    " /Type /Page"
                                                    " /MediaBox [0 0 612 392]"
                                                    ">>"_qpdf);
-    page.replaceKey("/Contents", contents);
-    page.replaceKey("/Resources", resources);
+    page.replaceKey("/Contents", contents).replaceKey("/Resources", resources);
 
     // Add the page to the PDF file
     dh.addPage(page, false);

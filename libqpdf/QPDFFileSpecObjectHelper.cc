@@ -103,8 +103,8 @@ QPDFFileSpecObjectHelper::createFileSpec(
     QPDFFileSpecObjectHelper result(oh);
     result.setFilename(filename);
     auto ef = QPDFObjectHandle::newDictionary();
-    ef.replaceKey("/F", efsoh.getObjectHandle());
-    ef.replaceKey("/UF", efsoh.getObjectHandle());
+    ef.replaceKey("/F", efsoh.getObjectHandle())
+        .replaceKey("/UF", efsoh.getObjectHandle());
     oh.replaceKey("/EF", ef);
     return result;
 }
