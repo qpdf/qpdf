@@ -524,51 +524,6 @@ extern "C" {
         enum qpdf_r3_print_e print,
         QPDF_BOOL encrypt_metadata);
 
-    /* Pre 8.4.0 encryption API */
-    QPDF_DLL
-    void qpdf_set_r3_encryption_parameters(
-        qpdf_data qpdf,
-        char const* user_password,
-        char const* owner_password,
-        QPDF_BOOL allow_accessibility,
-        QPDF_BOOL allow_extract,
-        enum qpdf_r3_print_e print,
-        enum qpdf_r3_modify_e modify);
-
-    QPDF_DLL
-    void qpdf_set_r4_encryption_parameters(
-        qpdf_data qpdf,
-        char const* user_password,
-        char const* owner_password,
-        QPDF_BOOL allow_accessibility,
-        QPDF_BOOL allow_extract,
-        enum qpdf_r3_print_e print,
-        enum qpdf_r3_modify_e modify,
-        QPDF_BOOL encrypt_metadata,
-        QPDF_BOOL use_aes);
-
-    QPDF_DLL
-    void qpdf_set_r5_encryption_parameters(
-        qpdf_data qpdf,
-        char const* user_password,
-        char const* owner_password,
-        QPDF_BOOL allow_accessibility,
-        QPDF_BOOL allow_extract,
-        enum qpdf_r3_print_e print,
-        enum qpdf_r3_modify_e modify,
-        QPDF_BOOL encrypt_metadata);
-
-    QPDF_DLL
-    void qpdf_set_r6_encryption_parameters(
-        qpdf_data qpdf,
-        char const* user_password,
-        char const* owner_password,
-        QPDF_BOOL allow_accessibility,
-        QPDF_BOOL allow_extract,
-        enum qpdf_r3_print_e print,
-        enum qpdf_r3_modify_e modify,
-        QPDF_BOOL encrypt_metadata);
-
     QPDF_DLL
     void qpdf_set_linearization(qpdf_data qpdf, QPDF_BOOL value);
 

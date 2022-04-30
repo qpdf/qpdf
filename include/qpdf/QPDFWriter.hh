@@ -432,44 +432,6 @@ class QPDFWriter
         qpdf_r3_print_e print,
         bool encrypt_metadata_aes);
 
-    // Pre qpdf 8.4.0 API
-    [[deprecated("see newer API above")]] QPDF_DLL void
-    setR3EncryptionParameters(
-        char const* user_password,
-        char const* owner_password,
-        bool allow_accessibility,
-        bool allow_extract,
-        qpdf_r3_print_e print,
-        qpdf_r3_modify_e modify);
-    [[deprecated("see newer API above")]] QPDF_DLL void
-    setR4EncryptionParameters(
-        char const* user_password,
-        char const* owner_password,
-        bool allow_accessibility,
-        bool allow_extract,
-        qpdf_r3_print_e print,
-        qpdf_r3_modify_e modify,
-        bool encrypt_metadata,
-        bool use_aes);
-    [[deprecated("see newer API above")]] QPDF_DLL void
-    setR5EncryptionParameters(
-        char const* user_password,
-        char const* owner_password,
-        bool allow_accessibility,
-        bool allow_extract,
-        qpdf_r3_print_e print,
-        qpdf_r3_modify_e modify,
-        bool encrypt_metadata);
-    [[deprecated("see newer API above")]] QPDF_DLL void
-    setR6EncryptionParameters(
-        char const* user_password,
-        char const* owner_password,
-        bool allow_accessibility,
-        bool allow_extract,
-        qpdf_r3_print_e print,
-        qpdf_r3_modify_e modify,
-        bool encrypt_metadata_aes);
-
     // Create linearized output.  Disables qdf mode, content
     // normalization, and stream prefiltering.
     QPDF_DLL
