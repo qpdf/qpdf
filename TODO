@@ -472,7 +472,8 @@ ABI Changes
 
 This is a list of changes to make next time there is an ABI change.
 Comments appear in the code prefixed by "ABI". Always Search for ABI
-in source and header files to find items not listed here.
+in source and header files to find items not listed here. Also search
+for "[[deprecated" to find deprecated APIs that can be removed.
 
 * Deal with weak cryptographic algorithms:
   * Github issue #576
