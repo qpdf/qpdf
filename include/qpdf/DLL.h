@@ -63,7 +63,7 @@ for a more in-depth discussion.
 
 * A class's runtime type information is need if the class is going to
   be used as an exception, inherited from, or tested with
-  dynamic_claass. To do these things across a shared object boundary,
+  dynamic_class. To do these things across a shared object boundary,
   runtime type information must be exported.
 
 * On Windows:

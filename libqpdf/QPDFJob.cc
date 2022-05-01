@@ -1335,6 +1335,8 @@ QPDFJob::doJSONEncrypt(QPDF& pdf, JSON& j)
         "modifyassembly", JSON::makeBool(pdf.allowModifyAssembly()));
     j_capabilities.addDictionaryMember(
         "modifyforms", JSON::makeBool(pdf.allowModifyForm()));
+    // Typo will be fixed for json v2
+    /* cSpell:ignore moddifyannotations */
     j_capabilities.addDictionaryMember(
         "moddifyannotations", JSON::makeBool(pdf.allowModifyAnnotation()));
     j_capabilities.addDictionaryMember(

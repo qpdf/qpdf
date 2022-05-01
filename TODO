@@ -39,6 +39,8 @@ Soon: Break ground on "Document-level work"
 Output JSON v2
 ==============
 
+Remember typo: search for "Typo" In QPDFJob::doJSONEncrypt.
+
 Output JSON v2 will contain enough information to completely recreate
 a PDF file. In other words, qpdf will have full, bidirectional,
 lossless json serialization/deserialization of PDF.

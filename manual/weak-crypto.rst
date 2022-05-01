@@ -32,7 +32,7 @@ hash or two documents with the same hash.
 
 When we say that an encryption algorithm is weak, we either mean that
 a mathematical flaw has been discovered that makes it inherently
-crackable or that it is sufficiently simple that modern computer
+insecure or that it is sufficiently simple that modern computer
 technology makes it possible to use "brute force" to crack. For
 example, when 40-bit keys were originally introduced, it wasn't
 practical to consider trying all possible keys, but today such a thing
@@ -50,7 +50,7 @@ other words, you can't use a weak hash as a digital signature. There
 is no harm, however, in using a weak hash as a way to sort or index
 documents as long as hash collisions are tolerated. It is also common
 to use weak hashes as checksums, which are often used a check that a
-file wasn't damanged in transit or storage, though for true integrity,
+file wasn't damaged in transit or storage, though for true integrity,
 a strong hash would be better.
 
 Note that qpdf must always retain support for weak cryptographic
@@ -138,7 +138,7 @@ MD5 is used in the following non-security-sensitive ways:
 
 It is therefore not possible completely avoid the use of MD5 with
 qpdf, but as long as you are using 256-bit encryption, it is not used
-in a securty-sensitive fashion.
+in a security-sensitive fashion.
 
 .. _breaking-crypto-api:
 
