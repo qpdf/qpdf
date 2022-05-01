@@ -10,7 +10,10 @@ In order:
 
 Other (do in any order):
 
-Misc
+* Make job JSON accept a single element and treat as an array of one
+  when an array is expected. This allows for making things repeatable
+  in the future without breaking compatibility and is needed for the
+  remote-attachment fix to be backward-compatible.
 * Add an option --ignore-encryption to ignore encryption information
   and treat encrypted files as if they weren't encrypted. This should
   make it possible to solve #598 (--show-encryption without a
