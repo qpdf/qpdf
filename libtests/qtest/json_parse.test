@@ -12,13 +12,22 @@ require TestDriver;
 my $td = new TestDriver('json_parse');
 
 my $json_mod = 0;
-eval {
-    require JSON;
-    $json_mod = 1;
-};
-if ($@)
+if ($^O ne 'msys')
 {
-    $td->emphasize("JSON.pm not found -- using stored actual outputs");
+    # Emperical evidence and considerable debugging reveals that in
+    # some versions of perl (e.g. the one with git bash on the GitHub
+    # actions Windows 2022 build environment), using the JSON module
+    # defeats the functionality of binmode when writing test output
+    # files, thus invalidating NORMALIZE_NEWLINES. This causes test
+    # failures and spurious upadtes to save files in CI on MSVC.
+    eval {
+        require JSON;
+        $json_mod = 1;
+    };
+    if ($@)
+    {
+        $td->emphasize("JSON.pm not found -- using stored actual outputs");
+    }
 }
 
 cleanup();
