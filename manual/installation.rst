@@ -144,7 +144,17 @@ Run ``ctest`` to run the test suite. Since the real tests are
 implemented with `qtest <https://qtest.sourceforge.io/>`__, you will
 want to pass ``--verbose`` to ``cmake`` so you can see the individual
 test outputs. Otherwise, you will see a small number of ``ctest``
-commands that take a very long to run.
+commands that take a very long to run. If you want to run only a
+specific test file in a specific test suite, you can set the ``TESTS``
+environment variable (used by ``qtest-driver``) and pass the ``-R``
+parameter to ``ctest``. For example:
+
+::
+
+   TESTS=qutil ctest --verbose -R libtests
+
+would run only ``qutil.test`` from the ``libtests`` test suite.
+
 
 .. _installation:
 

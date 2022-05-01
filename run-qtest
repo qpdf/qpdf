@@ -58,8 +58,16 @@ while (@ARGV)
         {
             # On Windows, a literal glob in quotes is expanded by the
             # shell, so we have to handle globs when expanded by the
-            # shell.
-            push(@tc, shift(@ARGV));
+            # shell by consuming arguments until the next --.
+
+            my $t = shift(@ARGV);
+            if (exists $ENV{'TESTS'})
+            {
+                # No point enabling coverage if we're intentionally
+                # running only a subset of tests.
+                next;
+            }
+            push(@tc, $t);
         }
     }
     elsif ($arg eq '--env')
