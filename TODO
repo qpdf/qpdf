@@ -41,6 +41,26 @@ Output JSON v2
 
 Remember typo: search for "Typo" In QPDFJob::doJSONEncrypt.
 
+Remember to test interaction between generators and schemas.
+
+Should I have allowed array and object generators? Or maybe just
+string generators for stream data?
+
+When switching to generators for output, it's going to be very
+important not to break the logic around having things that look at all
+objects going first. Right now, there are good tests for it -- if you
+either comment out pushInheritedAttributesToPage or do something that
+postpones serializing the objects from allObjects (or even getting
+them), you get test failures either way. However, if we were to
+blindly overwrite test files, we might accidentally lose this. We will
+have to try to get most of the logic working before trying to use
+generators. Or maybe we shouldn't use generators at all for the
+objects and only use it for the stream data. Or maybe we can use
+generators but write it out early by exposing the depth() parameter.
+That might actually the safest way to do it. But that will be hard
+with schemas. Another thing might be to not combine serializing with
+other kinds of metadata.
+
 Output JSON v2 will contain enough information to completely recreate
 a PDF file. In other words, qpdf will have full, bidirectional,
 lossless json serialization/deserialization of PDF.
