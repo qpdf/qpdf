@@ -32,7 +32,7 @@ if ($^O ne 'msys')
 
 cleanup();
 
-my $good = 9;
+my $good = 10;
 
 for (my $i = 1; $i <= $good; ++$i)
 {
@@ -73,6 +73,11 @@ for (my $i = 1; $i <= $good; ++$i)
                      {$td->FILE => "out.json"},
                      {$td->STRING => ""});
     }
+
+    $td->runtest("good $n reactor",
+                 {$td->COMMAND => "json_parse good-$n.json --react"},
+                 {$td->FILE => "good-$n-react.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
 }
 
 my @bad = (
@@ -127,7 +132,7 @@ foreach my $d (@bad)
 
 cleanup();
 
-$td->report((2 * $good) + scalar(@bad));
+$td->report((3 * $good) + scalar(@bad));
 
 sub cleanup
 {

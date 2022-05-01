@@ -1,0 +1,8 @@
+array start
+array item: [1, 7): "aπb"
+array item: [9, 23): "a\b\f\n\r\tc"
+array item: [25, 42): "aπbπc"
+array item: [44, 52): "π"
+array item: [54, 71): "a\u0018bʬc"
+container end: [0, 72): []
+[]

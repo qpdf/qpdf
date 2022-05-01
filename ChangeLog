@@ -1,3 +1,10 @@
+2022-05-01  Jay Berkenbilt  <ejb@ql.org>
+
+        * JSON: add reactors to the JSON parser, making it possible to
+        react to JSON parsing events as they occur and to block the
+        results from being stored. This makes it possible to incrementally
+        parse arbitrarily large JSON inputs.
+
 2022-04-30  Jay Berkenbilt  <ejb@ql.org>
 
         * QPDFWriter: change encryption API calls

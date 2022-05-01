@@ -1,0 +1,11 @@
+array start
+array item: [1, 2): 1
+array item: [4, 6): -2
+array item: [8, 11): 3.4
+array item: [13, 17): -5.6
+array item: [19, 23): -9e1
+array item: [25, 29): 10e2
+array item: [31, 37): 12.3e5
+array item: [39, 46): 12.6e-7
+container end: [0, 47): []
+[]

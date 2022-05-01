@@ -1,12 +1,15 @@
 #include <qpdf/JSON.hh>
 
+#include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <cstring>
 #include <stdexcept>
 
 JSON::Members::Members(std::shared_ptr<JSON_value> value) :
-    value(value)
+    value(value),
+    start(0),
+    end(0)
 {
 }
 
@@ -455,7 +458,8 @@ namespace
     class JSONParser
     {
       public:
-        JSONParser() :
+        JSONParser(JSON::Reactor* reactor) :
+            reactor(reactor),
             lex_state(ls_top),
             number_before_point(0),
             number_after_point(0),
@@ -499,6 +503,7 @@ namespace
             ls_backslash,
         };
 
+        JSON::Reactor* reactor;
         lex_state_e lex_state;
         size_t number_before_point;
         size_t number_after_point;
@@ -828,10 +833,18 @@ JSONParser::handleToken()
         switch (*tok_start) {
         case '{':
             item = std::make_shared<JSON>(JSON::makeDictionary());
+            item->setStart(QIntC::to_size(tok_start - cstr));
+            if (reactor) {
+                reactor->dictionaryStart();
+            }
             break;
 
         case '[':
             item = std::make_shared<JSON>(JSON::makeArray());
+            item->setStart(QIntC::to_size(tok_start - cstr));
+            if (reactor) {
+                reactor->arrayStart();
+            }
             break;
 
         default:
@@ -997,6 +1010,11 @@ JSONParser::handleToken()
     } else if ((delimiter == '}') || (delimiter == ']')) {
         next_state = ps_stack.back();
         ps_stack.pop_back();
+        auto tos = stack.back();
+        tos->setEnd(QIntC::to_size(tok_end - cstr));
+        if (reactor) {
+            reactor->containerEnd(*tos);
+        }
         if (next_state != ps_done) {
             stack.pop_back();
         }
@@ -1004,6 +1022,11 @@ JSONParser::handleToken()
         throw std::logic_error(
             "JSONParser::handleToken: unexpected delimiter in transition");
     } else if (item.get()) {
+        if (!(item->isArray() || item->isDictionary())) {
+            item->setStart(QIntC::to_size(tok_start - cstr));
+            item->setEnd(QIntC::to_size(tok_end - cstr));
+        }
+
         std::shared_ptr<JSON> tos;
         if (!stack.empty()) {
             tos = stack.back();
@@ -1017,14 +1040,18 @@ JSONParser::handleToken()
             break;
 
         case ps_dict_after_colon:
-            tos->addDictionaryMember(dict_key, *item);
+            if (!reactor || !reactor->dictionaryItem(dict_key, *item)) {
+                tos->addDictionaryMember(dict_key, *item);
+            }
             next_state = ps_dict_after_item;
             break;
 
         case ps_array_begin:
         case ps_array_after_comma:
+            if (!reactor || !reactor->arrayItem(*item)) {
+                tos->addArrayElement(*item);
+            }
             next_state = ps_array_after_item;
-            tos->addArrayElement(*item);
             break;
 
         case ps_top:
@@ -1083,12 +1110,40 @@ JSONParser::parse(std::string const& s)
         QTC::TC("libtests", "JSON parse premature EOF");
         throw std::runtime_error("JSON: premature end of input");
     }
-    return stack.back();
+    auto const& tos = stack.back();
+    if (reactor && tos.get() && !(tos->isArray() || tos->isDictionary())) {
+        reactor->topLevelScalar();
+    }
+    return tos;
 }
 
 JSON
-JSON::parse(std::string const& s)
+JSON::parse(std::string const& s, Reactor* reactor)
 {
-    JSONParser jp;
+    JSONParser jp(reactor);
     return *jp.parse(s);
+}
+
+void
+JSON::setStart(size_t start)
+{
+    this->m->start = start;
+}
+
+void
+JSON::setEnd(size_t end)
+{
+    this->m->end = end;
+}
+
+size_t
+JSON::getStart() const
+{
+    return this->m->start;
+}
+
+size_t
+JSON::getEnd() const
+{
+    return this->m->end;
 }

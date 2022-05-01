@@ -1,0 +1,27 @@
+{
+  "a": [
+    1,
+    2,
+    {
+      "x": "y"
+    },
+    3,
+    {
+      "keep": "not in final output"
+    }
+  ],
+  "keep": [
+    1,
+    null,
+    2,
+    false,
+    "keep",
+    3,
+    [
+      "this",
+      "keep",
+      "not",
+      "final"
+    ]
+  ]
+}

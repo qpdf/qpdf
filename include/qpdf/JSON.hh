@@ -141,9 +141,86 @@ class JSON
     QPDF_DLL
     bool checkSchema(JSON schema, std::list<std::string>& errors);
 
-    // Create a JSON object from a string.
+    // An pointer to a Reactor class can be passed to parse, which
+    // will enable the caller to react to incremental events in the
+    // construction of the JSON object. This makes it possible to
+    // implement SAX-like handling of very large JSON objects.
+    class QPDF_DLL_CLASS Reactor
+    {
+      public:
+        QPDF_DLL
+        virtual ~Reactor() = default;
+
+        // The start/end methods are called when parsing of a
+        // dictionary or array is started or ended. The item methods
+        // are called when an item is added to a dictionary or array.
+        // See important notes in "Item methods" below.
+
+        // During parsing of a JSON string, the parser is operating on
+        // a single object at a time. When a dictionary or array is
+        // started, a new context begins, and when that dictionary or
+        // array is ended, the previous context is resumed. So, for
+        // example, if you have `{"a": [1]}`, you will receive the
+        // following method calls
+        //
+        // dictionaryStart -- current object is the top-level dictionary
+        // arrayStart      -- current object is the array
+        // arrayItem       -- called with the "1" object
+        // containerEnd    -- now current object is the dictionary again
+        // dictionaryItem  -- called with "a" and the just-completed array
+        // containerEnd    -- current object is undefined
+        //
+        // If the top-level item in a JSON string is a scalar, the
+        // topLevelScalar() method will be called. No argument is
+        // passed since the object is the same as what is returned by
+        // parse().
+
+        QPDF_DLL
+        virtual void dictionaryStart() = 0;
+        QPDF_DLL
+        virtual void arrayStart() = 0;
+        QPDF_DLL
+        virtual void containerEnd(JSON const& value) = 0;
+        QPDF_DLL
+        virtual void topLevelScalar() = 0;
+
+        // Item methods:
+        //
+        // The return value of the item methods indicate whether the
+        // item has been "consumed". If the item method returns true,
+        // then the item will not be added to the containing JSON
+        // object. This is what allows arbitrarily large JSON objects
+        // to be parsed and not have to be kept in memory.
+        //
+        // NOTE: When a dictionary or an array is added to a
+        // container, the dictionaryItem or arrayItem method is called
+        // when the child item's start delimiter is encountered, so
+        // the JSON object passed in at that time will always be
+        // in its initial, empty state.
+
+        QPDF_DLL
+        virtual bool
+        dictionaryItem(std::string const& key, JSON const& value) = 0;
+        QPDF_DLL
+        virtual bool arrayItem(JSON const& value) = 0;
+    };
+
+    // Create a JSON object from a string. See above for information
+    // about how to use the Reactor.
     QPDF_DLL
-    static JSON parse(std::string const&);
+    static JSON parse(std::string const&, Reactor* reactor = nullptr);
+
+    // parse calls setOffsets to set the inclusive start and
+    // non-inclusive end offsets of an object relative to its input
+    // string. Otherwise, both values are 0.
+    QPDF_DLL
+    void setStart(size_t);
+    QPDF_DLL
+    void setEnd(size_t);
+    QPDF_DLL
+    size_t getStart() const;
+    QPDF_DLL
+    size_t getEnd() const;
 
   private:
     static std::string encode_string(std::string const& utf8);
@@ -217,6 +294,9 @@ class JSON
         Members(Members const&) = delete;
 
         std::shared_ptr<JSON_value> value;
+        // start and end are only populated for objects created by parse
+        size_t start;
+        size_t end;
     };
 
     std::shared_ptr<Members> m;
