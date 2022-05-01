@@ -102,6 +102,7 @@ my @bad = (
     "leading zero negative",    # 33
     "premature end after u",    # 34
     "bad hex digit",            # 35
+    "parser depth exceeded",    # 36
     );
 
 my $i = 0;

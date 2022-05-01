@@ -1057,6 +1057,11 @@ JSONParser::handleToken()
             stack.push_back(item);
         }
     }
+    if (ps_stack.size() > 500) {
+        throw std::runtime_error(
+            "JSON: offset " + QUtil::int_to_string(p - cstr) +
+            ": maximum object depth exceeded");
+    }
     parser_state = next_state;
     tok_start = nullptr;
     tok_end = nullptr;
