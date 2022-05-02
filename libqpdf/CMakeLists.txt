@@ -35,6 +35,7 @@ set(libqpdf_SOURCES
   Pl_AES_PDF.cc
   Pl_ASCII85Decoder.cc
   Pl_ASCIIHexDecoder.cc
+  Pl_Base64.cc
   Pl_Buffer.cc
   Pl_Concatenate.cc
   Pl_Count.cc

@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("base64") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('base64');
+
+cleanup();
+
+# ** Do not use normalize newlines on these tests. **
+
+my $n = 5;
+for (my $i = 1; $i <= $n; ++$i)
+{
+    $td->runtest("encode $i",
+                 {$td->COMMAND => "base64 encode < $i.dec"},
+                 {$td->FILE => "$i.enc", $td->EXIT_STATUS => 0});
+    $td->runtest("code $i",
+                 {$td->COMMAND => "base64 decode < $i.enc"},
+                 {$td->FILE => "$i.dec", $td->EXIT_STATUS => 0});
+}
+
+$td->runtest("non-zero discard bits",
+             {$td->COMMAND => "echo c2FsYWR= | base64 decode"},
+             {$td->STRING => "salad", $td->EXIT_STATUS => 0});
+$td->runtest("write with +/",
+             {$td->COMMAND => "echo +/== | base64 decode > a"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("write with -_",
+             {$td->COMMAND => "echo -_== | base64 decode > b"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("interchangeability of +/ and -_",
+             {$td->FILE => "a"},
+             {$td->FILE => "b"});
+
+$td->runtest("invalid characters",
+             {$td->COMMAND => "echo aaaaa! | base64 decode"},
+             {$td->REGEXP => ".*invalid input.*", $td->EXIT_STATUS => 2});
+$td->runtest("invalid pad",
+             {$td->COMMAND => "echo a= | base64 decode"},
+             {$td->REGEXP => ".*invalid input.*", $td->EXIT_STATUS => 2});
+$td->runtest("data after pad",
+             {$td->COMMAND => "echo aa==potato | base64 decode"},
+             {$td->REGEXP => ".*data follows pad characters.*",
+                  $td->EXIT_STATUS => 2});
+
+cleanup();
+
+$td->report(7 + (2 * $n));
+
+sub cleanup
+{
+    unlink('a', 'b');
+}

@@ -45,7 +45,6 @@ notes from 5/2:
 Need new pipelines:
 * Pl_OStream(std::ostream) with semantics like Pl_StdioFile
 * Pl_String to std::string with semantics like Pl_Buffer
-* Pl_Base64
 
 New Pipeline methods:
 * writeString(std::string const&)

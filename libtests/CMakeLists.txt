@@ -3,6 +3,7 @@ set(TEST_PROGRAMS
   aes
   arg_parser
   ascii85
+  base64
   bits
   buffer
   closed_file_input_source
