@@ -39,6 +39,108 @@ Soon: Break ground on "Document-level work"
 Output JSON v2
 ==============
 
+----
+notes from 5/2:
+
+Need new pipelines:
+* Pl_OStream(std::ostream) with semantics like Pl_StdioFile
+* Pl_String to std::string with semantics like Pl_Buffer
+* Pl_Base64
+
+New Pipeline methods:
+* writeString(std::string const&)
+* writeCString(char*)
+* writeChars(char*, size_t)
+
+* Consider templated operator<< which could specialize for char* and
+  std::string and could use std::ostringstream otherwise
+
+See if I can change all output and error messages issued by the
+library, when context is available, to have a pipeline rather than a
+FILE* or std::ostream. This makes it possible for people to capture
+output more flexibly.
+
+JSON: rather than unparse() -> string, there should be write method
+that takes a pipeline and a depth. Then rewrite all the unparse
+methods to use it. This makes incremental write possible as well as
+writing arbitrarily large amounts of output.
+
+JSON::parse should work from an InputSource. BufferInputSource can
+already start with a std::string.
+
+Have a json blob defined by a function that takes a pipeline and
+writes data to the pipeline. It's writer should create a Pl_Base64 ->
+Pl_Concatenate in front of the pipeline passed to write and call the
+function with that.
+
+Add methods needed to do incremental writes. Basically we need to
+expose functionality the array and dictionary unparse methods. Maybe
+we can have a DictionaryWriter and an ArrayWriter that deal with the
+first/depth logic and have writeElement or writeEntry(key, value)
+methods.
+
+For json output, do not unparse to string. Use the writers instead.
+Write incrementally. This changes ordering only, but we should be able
+manually update the test output for those cases. Objects should be
+written in numerical order, not lexically sorted. It probably makes
+sense to put the trailer at the end since that's where it is in a
+regular PDF.
+
+When we get to full serialization, add json serialization performance
+test.
+
+Some if not all of the json output functionality for v2 should move
+into QPDF proper rather than living in QPDFJob. There can be a
+top-level QPDF method that takes a pipeline and writes the JSON
+serialization to it.
+
+Decide what the API/CLI will be for serializing to v2. Will it just be
+part of --json or will it be its own separate thing? Probably we
+should make it so that a serialized PDF is different but uses the same
+object format as regular json mode.
+
+For going back from JSON to PDF, a separate utility will be needed.
+It's not practical for QPDFObjectHandle to be able to read JSON
+because of the special handling that is required for indirect objects,
+and QPDF can't just accept JSON because the way InputSource is used is
+complete different. Instead, we will need a separate utility that has
+logic similar to what copyForeignObject does. It will go something
+like this:
+
+* Create an empty QPDF (not emptyPDF, one with no objects in it at
+  all). This works:
+
+```
+%PDF-1.3
+xref
+0 1
+0000000000 65535 f 
+trailer << /Size 1 >>
+startxref
+9
+%%EOF
+```
+
+For each object:
+
+* Walk through the object detecting any indirect objects. For each one
+  that is not already known, reserve the object. We can also validate
+  but we should try to do the best we can with invalid JSON so people
+  can get good error messages.
+* Construct a QPDFObjectHandle from the JSON
+* If the object is the trailer, update the trailer
+* Else if the object doesn't exist, reserve it
+* If the object is reserved, call replaceReserved()
+* Else the object already exists; this is an error.
+
+This can almost be done through public API. I think all we need is the
+ability to create a reserved object with a specific object ID.
+
+The choices for json_key (job.yml) will be different for v1 and v2.
+That information is already duplicated in multiple places.
+
+----
+
 Remember typo: search for "Typo" In QPDFJob::doJSONEncrypt.
 
 Remember to test interaction between generators and schemas.
@@ -173,21 +275,25 @@ JSON:
   object. No dictionary merges or anything like that are performed.
   It will call replaceObject.
 
-Within .qpdf.objects, the key is "obj:o,g" or "obj:trailer", and the
+Within .qpdf.objects, the key is "obj:o g R" or "obj:trailer", and the
 value is a dictionary with exactly one of "value" or "stream" as its
 single key.
+
+Rationale of "obj:o g R" is that indirect object references are just
+"o g R", and so code that wants to resolve one can do so easily by
+just prepending "obj:" and not having to parse or split the string.
 
 For non-streams:
 
 {
-  "obj:o,g": {
+  "obj:o g R": {
     "value": ...
   }
 }
 
 For streams:
 
-  "obj:o,g": {
+  "obj:o g R": {
     "stream": {
       "dict": { ... stream dictionary ... },
       "filterable": bool,
