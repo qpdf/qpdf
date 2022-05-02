@@ -280,6 +280,31 @@ if(WIN32)
   include(InstallRequiredSystemLibraries)
 endif()
 
+set(auto_job_inputs
+  # Keep in sync with SOURCES in generate_auto_job
+  generate_auto_job
+  manual/_ext/qpdf.py
+  job.yml
+  manual/cli.rst)
+
+set(auto_job_outputs
+  # Keep in sync with DESTS in generate_auto_job
+  libqpdf/qpdf/auto_job_decl.hh
+  libqpdf/qpdf/auto_job_init.hh
+  libqpdf/qpdf/auto_job_help.hh
+  libqpdf/qpdf/auto_job_schema.hh
+  libqpdf/qpdf/auto_job_json_decl.hh
+  libqpdf/qpdf/auto_job_json_init.hh)
+
+if(GENERATE_AUTO_JOB)
+  add_custom_command(
+    OUTPUT ${auto_job_outputs}
+    COMMAND ${qpdf_SOURCE_DIR}/generate_auto_job --generate
+    WORKING_DIRECTORY ${qpdf_SOURCE_DIR}
+    DEPENDS ${auto_job_inputs})
+  add_custom_target(auto_job_files ALL DEPENDS ${auto_job_outputs})
+endif()
+
 # add_subdirectory order affects test order
 add_subdirectory(include)
 add_subdirectory(libqpdf)

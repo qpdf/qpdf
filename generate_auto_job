@@ -154,7 +154,7 @@ class Main:
     # SOURCES is a list of source files whose contents are used by
     # this program. If they change, we are out of date.
     SOURCES = [
-        # Keep this list in sync with libqpdf/CMakeLists.txt: auto_job_inputs
+        # Keep this list in sync with CMakeLists.txt: auto_job_inputs
         whoami,
         'manual/_ext/qpdf.py',
         'job.yml',
@@ -165,7 +165,7 @@ class Main:
     # code, are included in various places by QPDFJob.hh or any of the
     # implementing QPDFJob*.cc files.
     DESTS = {
-        # Keep this list in sync with libqpdf/CMakeLists.txt: auto_job_outputs
+        # Keep this list in sync with CMakeLists.txt: auto_job_outputs
         'decl': 'libqpdf/qpdf/auto_job_decl.hh',
         'init': 'libqpdf/qpdf/auto_job_init.hh',
         'help': 'libqpdf/qpdf/auto_job_help.hh',
