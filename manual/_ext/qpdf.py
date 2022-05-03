@@ -12,6 +12,13 @@ from sphinx.util.nodes import make_refnode
 #   https://www.sphinx-doc.org/en/master/development/tutorials/todo.html
 #   https://www.sphinx-doc.org/en/master/development/tutorials/recipe.html
 
+# cSpell:ignore contnode
+# cSpell:ignore docname
+# cSpell:ignore docnames
+# cSpell:ignore localname
+# cSpell:ignore refnode
+# cSpell:ignore signode
+
 
 class OptionDirective(ObjectDescription):
     has_content = True

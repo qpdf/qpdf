@@ -321,6 +321,7 @@
     "orred",
     "ossl",
     "ostream",
+    "ostringstream",
     "ostringstreams",
     "outdoc",
     "outfile",
