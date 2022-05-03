@@ -51,6 +51,7 @@ set(libqpdf_SOURCES
   Pl_RunLength.cc
   Pl_SHA2.cc
   Pl_StdioFile.cc
+  Pl_String.cc
   Pl_TIFFPredictor.cc
   QPDF.cc
   QPDFAcroFormDocumentHelper.cc

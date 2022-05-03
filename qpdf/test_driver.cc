@@ -10,6 +10,7 @@
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_StdioFile.hh>
+#include <qpdf/Pl_String.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
@@ -435,16 +436,13 @@ test_6(QPDF& pdf, char const* arg2)
     if (!metadata.isStream()) {
         throw std::logic_error("test 6 run on file with no metadata");
     }
-    Pl_Buffer bufpl("buffer");
+    std::string buf;
+    Pl_String bufpl("buffer", buf);
     metadata.pipeStreamData(&bufpl, 0, qpdf_dl_none);
-    Buffer* buf = bufpl.getBuffer();
-    unsigned char const* data = buf->getBuffer();
     bool cleartext = false;
-    if ((buf->getSize() > 9) &&
-        (strncmp(reinterpret_cast<char const*>(data), "<?xpacket", 9) == 0)) {
+    if (buf.substr(0, 9) == "<?xpacket") {
         cleartext = true;
     }
-    delete buf;
     std::cout << "encrypted=" << (pdf.isEncrypted() ? 1 : 0)
               << "; cleartext=" << (cleartext ? 1 : 0) << std::endl;
 }

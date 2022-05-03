@@ -120,6 +120,9 @@ For a detailed list of changes, please see the file
     - Add new ``Pipeline`` type ``Pl_OStream`` to write to a
       ``std::ostream``.
 
+    - Add new ``Pipeline`` type ``Pl_String`` to append to a
+      ``std::string``.
+
   - Other changes
 
     - A new chapter on contributing to qpdf has been added to the

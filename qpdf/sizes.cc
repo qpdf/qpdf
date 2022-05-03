@@ -20,6 +20,7 @@
 #include <qpdf/Pl_QPDFTokenizer.hh>
 #include <qpdf/Pl_RunLength.hh>
 #include <qpdf/Pl_StdioFile.hh>
+#include <qpdf/Pl_String.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFAnnotationObjectHelper.hh>
@@ -80,6 +81,7 @@ main()
     print_size(Pl_QPDFTokenizer);
     print_size(Pl_RunLength);
     print_size(Pl_StdioFile);
+    print_size(Pl_String);
     print_size(QPDF);
     print_size(QPDFAcroFormDocumentHelper);
     print_size(QPDFAnnotationObjectHelper);
