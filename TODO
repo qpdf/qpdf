@@ -30,6 +30,10 @@ Other (do in any order):
   Pl_Ostream pipeline.
 * Nice to have:
   * Split qpdf.test into multiple tests
+  * In libtests, separate executables that need the object library
+    from those that strictly use public API. Move as many of the test
+    drivers from the qpdf directory into the latter category as long
+    as doing so isn't too troublesome from a coverage standpoint.
   * Rework tests so that nothing is written into the source directory.
   * Ideally then the entire build could be done with a read-only
     source tree.
