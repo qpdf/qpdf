@@ -2,7 +2,7 @@
 
 #include <qpdf/Pl_Base64.hh>
 
-#include <qpdf/Pl_StdioFile.hh>
+#include <qpdf/Pl_OStream.hh>
 #include <qpdf/QUtil.hh>
 #include <cstdlib>
 #include <cstring>
@@ -52,7 +52,7 @@ main(int argc, char* argv[])
     }
 
     try {
-        Pl_StdioFile out("stdout", stdout);
+        Pl_OStream out("stdout", std::cout);
         Pl_Base64 decode("decode", &out, action);
         // The comments are "n: n%4 n%3", where n is the number of
         // bytes read at the end of the call, and are there to

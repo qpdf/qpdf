@@ -47,7 +47,6 @@ Output JSON v2
 notes from 5/2:
 
 Need new pipelines:
-* Pl_OStream(std::ostream) with semantics like Pl_StdioFile
 * Pl_String to std::string with semantics like Pl_Buffer
 
 See if I can change all output and error messages issued by the

@@ -117,6 +117,9 @@ For a detailed list of changes, please see the file
 
       - ``operator <<``: for null-terminated C strings and std::strings
 
+    - Add new ``Pipeline`` type ``Pl_OStream`` to write to a
+      ``std::ostream``.
+
   - Other changes
 
     - A new chapter on contributing to qpdf has been added to the

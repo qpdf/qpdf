@@ -16,6 +16,7 @@
 #include <qpdf/Pl_DCT.hh>
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/Pl_Flate.hh>
+#include <qpdf/Pl_OStream.hh>
 #include <qpdf/Pl_QPDFTokenizer.hh>
 #include <qpdf/Pl_RunLength.hh>
 #include <qpdf/Pl_StdioFile.hh>
@@ -75,6 +76,7 @@ main()
     print_size(Pl_DCT);
     print_size(Pl_Discard);
     print_size(Pl_Flate);
+    print_size(Pl_OStream);
     print_size(Pl_QPDFTokenizer);
     print_size(Pl_RunLength);
     print_size(Pl_StdioFile);

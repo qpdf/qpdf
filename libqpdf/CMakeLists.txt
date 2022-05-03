@@ -44,6 +44,7 @@ set(libqpdf_SOURCES
   Pl_Flate.cc
   Pl_LZWDecoder.cc
   Pl_MD5.cc
+  Pl_OStream.cc
   Pl_PNGFilter.cc
   Pl_QPDFTokenizer.cc
   Pl_RC4.cc
