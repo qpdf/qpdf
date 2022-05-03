@@ -4,7 +4,6 @@
 #include <qpdf/QPDFCryptoImpl.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/rijndael.h>
-#include <assert.h>
 #include <cstring>
 #include <stdexcept>
 #include <stdlib.h>

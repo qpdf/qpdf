@@ -15,7 +15,7 @@
 #include <qpdf/RC4.hh>
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <string.h>
 
 static unsigned char const padding_string[] = {

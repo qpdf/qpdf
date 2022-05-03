@@ -1,7 +1,5 @@
 #include <qpdf/QPDF.hh>
 
-#include <assert.h>
-
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -233,6 +231,11 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
         QTC::TC("qpdf", "QPDF insert indirect page");
     }
 
+    if ((pos < 0) || (QIntC::to_size(pos) > this->m->all_pages.size())) {
+        throw std::runtime_error(
+            "QPDF::insertPage called with pos out of range");
+    }
+
     QTC::TC(
         "qpdf",
         "QPDF insert page",
@@ -249,7 +252,6 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
 
     QPDFObjectHandle pages = getRoot().getKey("/Pages");
     QPDFObjectHandle kids = pages.getKey("/Kids");
-    assert((pos >= 0) && (QIntC::to_size(pos) <= this->m->all_pages.size()));
 
     newpage.replaceKey("/Parent", pages);
     kids.insertItem(pos, newpage);

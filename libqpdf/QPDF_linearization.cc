@@ -12,7 +12,6 @@
 #include <qpdf/QUtil.hh>
 
 #include <algorithm>
-#include <assert.h>
 #include <iostream>
 #include <math.h>
 #include <string.h>
@@ -171,9 +170,6 @@ QPDF::readLinearizationData()
 {
     // This function throws an exception (which is trapped by
     // checkLinearization()) for any errors that prevent loading.
-
-    // Hint table parsing code needs at least 32 bits in a long.
-    assert(sizeof(long) >= 4);
 
     if (!isLinearized()) {
         throw std::logic_error("called readLinearizationData for file"

@@ -3,7 +3,6 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
-#include <assert.h>
 #include <stdexcept>
 #include <string.h>
 

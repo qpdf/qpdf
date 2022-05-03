@@ -6,7 +6,7 @@
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QTC.hh>
-#include <assert.h>
+#include <cassert>
 
 QPDF::ObjUser::ObjUser() :
     ou_type(ou_bad),

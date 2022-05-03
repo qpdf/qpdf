@@ -1,7 +1,6 @@
 #include <qpdf/Pl_Buffer.hh>
 
 #include <algorithm>
-#include <assert.h>
 #include <stdexcept>
 #include <stdlib.h>
 #include <string.h>

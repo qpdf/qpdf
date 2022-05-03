@@ -11,18 +11,17 @@
 #include <qpdf/Pl_PNGFilter.hh>
 #include <qpdf/Pl_RC4.hh>
 #include <qpdf/Pl_StdioFile.hh>
-#include <qpdf/QTC.hh>
-#include <qpdf/QUtil.hh>
-#include <qpdf/RC4.hh>
-#include <assert.h>
-
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDF_Name.hh>
 #include <qpdf/QPDF_String.hh>
+#include <qpdf/QTC.hh>
+#include <qpdf/QUtil.hh>
+#include <qpdf/RC4.hh>
 
 #include <algorithm>
+#include <cassert>
 #include <stdlib.h>
 
 QPDFWriter::Members::Members(QPDF& pdf) :

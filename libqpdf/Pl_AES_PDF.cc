@@ -3,7 +3,6 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFCryptoProvider.hh>
 #include <qpdf/QUtil.hh>
-#include <assert.h>
 #include <cstring>
 #include <stdexcept>
 #include <stdlib.h>
@@ -115,7 +114,10 @@ Pl_AES_PDF::finish()
             // encountered files for which the output is not a
             // multiple of the block size.  In this case, pad with
             // zeroes and hope for the best.
-            assert(this->buf_size > this->offset);
+            if (this->offset >= this->buf_size) {
+                throw std::logic_error("buffer overflow in AES encryption"
+                                       " pipeline");
+            }
             std::memset(
                 this->inbuf + this->offset, 0, this->buf_size - this->offset);
             this->offset = this->buf_size;
@@ -147,7 +149,10 @@ Pl_AES_PDF::initializeVector()
 void
 Pl_AES_PDF::flush(bool strip_padding)
 {
-    assert(this->offset == this->buf_size);
+    if (this->offset != this->buf_size) {
+        throw std::logic_error(
+            "AES pipeline: flush called when buffer was not full");
+    }
 
     if (first) {
         first = false;
