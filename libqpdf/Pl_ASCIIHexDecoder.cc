@@ -16,7 +16,7 @@ Pl_ASCIIHexDecoder::Pl_ASCIIHexDecoder(char const* identifier, Pipeline* next) :
 }
 
 void
-Pl_ASCIIHexDecoder::write(unsigned char* buf, size_t len)
+Pl_ASCIIHexDecoder::write(unsigned char const* buf, size_t len)
 {
     if (this->eod) {
         return;

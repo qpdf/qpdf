@@ -49,7 +49,7 @@ class Pl_XOR: public Pipeline
   public:
     Pl_XOR(char const* identifier, Pipeline* next, unsigned char key);
     virtual ~Pl_XOR() = default;
-    virtual void write(unsigned char* data, size_t len) override;
+    virtual void write(unsigned char const* data, size_t len) override;
     virtual void finish() override;
 
   private:
@@ -63,7 +63,7 @@ Pl_XOR::Pl_XOR(char const* identifier, Pipeline* next, unsigned char key) :
 }
 
 void
-Pl_XOR::write(unsigned char* data, size_t len)
+Pl_XOR::write(unsigned char const* data, size_t len)
 {
     for (size_t i = 0; i < len; ++i) {
         unsigned char p = data[i] ^ this->key;

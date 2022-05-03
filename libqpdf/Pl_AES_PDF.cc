@@ -72,10 +72,10 @@ Pl_AES_PDF::useStaticIV()
 }
 
 void
-Pl_AES_PDF::write(unsigned char* data, size_t len)
+Pl_AES_PDF::write(unsigned char const* data, size_t len)
 {
     size_t bytes_left = len;
-    unsigned char* p = data;
+    unsigned char const* p = data;
 
     while (bytes_left > 0) {
         if (this->offset == this->buf_size) {

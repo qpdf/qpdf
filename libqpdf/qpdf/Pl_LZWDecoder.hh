@@ -12,7 +12,7 @@ class Pl_LZWDecoder: public Pipeline
     Pl_LZWDecoder(
         char const* identifier, Pipeline* next, bool early_code_change);
     virtual ~Pl_LZWDecoder() = default;
-    virtual void write(unsigned char* buf, size_t len);
+    virtual void write(unsigned char const* buf, size_t len);
     virtual void finish();
 
   private:

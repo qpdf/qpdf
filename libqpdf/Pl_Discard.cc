@@ -14,7 +14,7 @@ Pl_Discard::~Pl_Discard()
 }
 
 void
-Pl_Discard::write(unsigned char* buf, size_t len)
+Pl_Discard::write(unsigned char const* buf, size_t len)
 {
 }
 

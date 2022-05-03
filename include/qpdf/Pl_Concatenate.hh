@@ -39,7 +39,7 @@ class QPDF_DLL_CLASS Pl_Concatenate: public Pipeline
     virtual ~Pl_Concatenate();
 
     QPDF_DLL
-    virtual void write(unsigned char* data, size_t len);
+    virtual void write(unsigned char const* data, size_t len);
 
     QPDF_DLL
     virtual void finish();

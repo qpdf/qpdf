@@ -11,7 +11,7 @@ RC4::RC4(unsigned char const* key_data, int key_len) :
 }
 
 void
-RC4::process(unsigned char* in_data, size_t len, unsigned char* out_data)
+RC4::process(unsigned char const* in_data, size_t len, unsigned char* out_data)
 {
     this->crypto->RC4_process(in_data, len, out_data);
 }

@@ -16,7 +16,7 @@ Pl_RC4::Pl_RC4(
 }
 
 void
-Pl_RC4::write(unsigned char* data, size_t len)
+Pl_RC4::write(unsigned char const* data, size_t len)
 {
     if (this->outbuf.get() == 0) {
         throw std::logic_error(
@@ -25,7 +25,7 @@ Pl_RC4::write(unsigned char* data, size_t len)
     }
 
     size_t bytes_left = len;
-    unsigned char* p = data;
+    unsigned char const* p = data;
 
     while (bytes_left > 0) {
         size_t bytes =

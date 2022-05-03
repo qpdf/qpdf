@@ -12,7 +12,7 @@ Pl_Concatenate::~Pl_Concatenate()
 }
 
 void
-Pl_Concatenate::write(unsigned char* data, size_t len)
+Pl_Concatenate::write(unsigned char const* data, size_t len)
 {
     getNext()->write(data, len);
 }

@@ -24,7 +24,7 @@ Pl_RunLength::~Pl_RunLength()
 }
 
 void
-Pl_RunLength::write(unsigned char* data, size_t len)
+Pl_RunLength::write(unsigned char const* data, size_t len)
 {
     if (this->m->action == a_encode) {
         encode(data, len);
@@ -34,7 +34,7 @@ Pl_RunLength::write(unsigned char* data, size_t len)
 }
 
 void
-Pl_RunLength::encode(unsigned char* data, size_t len)
+Pl_RunLength::encode(unsigned char const* data, size_t len)
 {
     for (size_t i = 0; i < len; ++i) {
         if ((this->m->state == st_top) != (this->m->length <= 1)) {
@@ -71,7 +71,7 @@ Pl_RunLength::encode(unsigned char* data, size_t len)
 }
 
 void
-Pl_RunLength::decode(unsigned char* data, size_t len)
+Pl_RunLength::decode(unsigned char const* data, size_t len)
 {
     for (size_t i = 0; i < len; ++i) {
         unsigned char ch = data[i];

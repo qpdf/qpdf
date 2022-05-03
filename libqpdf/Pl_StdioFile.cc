@@ -24,7 +24,7 @@ Pl_StdioFile::~Pl_StdioFile()
 }
 
 void
-Pl_StdioFile::write(unsigned char* buf, size_t len)
+Pl_StdioFile::write(unsigned char const* buf, size_t len)
 {
     size_t so_far = 0;
     while (len > 0) {

@@ -35,15 +35,15 @@ class QPDF_DLL_CLASS Pl_RunLength: public Pipeline
     virtual ~Pl_RunLength();
 
     QPDF_DLL
-    virtual void write(unsigned char* data, size_t len);
+    virtual void write(unsigned char const* data, size_t len);
     QPDF_DLL
     virtual void finish();
 
   private:
     QPDF_DLL_PRIVATE
-    void encode(unsigned char* data, size_t len);
+    void encode(unsigned char const* data, size_t len);
     QPDF_DLL_PRIVATE
-    void decode(unsigned char* data, size_t len);
+    void decode(unsigned char const* data, size_t len);
     QPDF_DLL_PRIVATE
     void flush_encode();
 

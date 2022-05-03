@@ -86,7 +86,7 @@ Pl_DCT::~Pl_DCT()
 }
 
 void
-Pl_DCT::write(unsigned char* data, size_t len)
+Pl_DCT::write(unsigned char const* data, size_t len)
 {
     this->m->buf.write(data, len);
 }

@@ -11,9 +11,10 @@ class RC4
     // key_len of -1 means treat key_data as a null-terminated string
     RC4(unsigned char const* key_data, int key_len = -1);
 
-    // out_data = 0 means to encrypt/decrypt in place
+    // It is safe to pass the same pointer to in_data and out_data to
+    // encrypt/decrypt in place
     void
-    process(unsigned char* in_data, size_t len, unsigned char* out_data = 0);
+    process(unsigned char const* in_data, size_t len, unsigned char* out_data);
 
   private:
     std::shared_ptr<QPDFCryptoImpl> crypto;

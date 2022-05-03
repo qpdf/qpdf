@@ -62,7 +62,7 @@ Pl_PNGFilter::Pl_PNGFilter(
 }
 
 void
-Pl_PNGFilter::write(unsigned char* data, size_t len)
+Pl_PNGFilter::write(unsigned char const* data, size_t len)
 {
     size_t left = this->incoming - this->pos;
     size_t offset = 0;

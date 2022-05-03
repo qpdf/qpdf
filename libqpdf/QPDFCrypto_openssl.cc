@@ -217,11 +217,8 @@ QPDFCrypto_openssl::rijndael_init(
 
 void
 QPDFCrypto_openssl::RC4_process(
-    unsigned char* in_data, size_t len, unsigned char* out_data)
+    unsigned char const* in_data, size_t len, unsigned char* out_data)
 {
-    if (nullptr == out_data) {
-        out_data = in_data;
-    }
     int out_len = static_cast<int>(len);
     check_openssl(
         EVP_EncryptUpdate(cipher_ctx, out_data, &out_len, in_data, out_len));

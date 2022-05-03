@@ -47,7 +47,7 @@ class QPDF_DLL_CLASS Pl_Buffer: public Pipeline
     QPDF_DLL
     virtual ~Pl_Buffer();
     QPDF_DLL
-    virtual void write(unsigned char*, size_t);
+    virtual void write(unsigned char const*, size_t);
     QPDF_DLL
     virtual void finish();
 

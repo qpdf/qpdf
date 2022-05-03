@@ -15,7 +15,7 @@ Pl_SHA2::Pl_SHA2(int bits, Pipeline* next) :
 }
 
 void
-Pl_SHA2::write(unsigned char* buf, size_t len)
+Pl_SHA2::write(unsigned char const* buf, size_t len)
 {
     if (!this->in_progress) {
         this->in_progress = true;
@@ -25,7 +25,7 @@ Pl_SHA2::write(unsigned char* buf, size_t len)
     // Assume int is at least 32 bits.
     static size_t const max_bytes = 1 << 30;
     size_t bytes_left = len;
-    unsigned char* data = buf;
+    unsigned char const* data = buf;
     while (bytes_left > 0) {
         size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
         this->crypto->SHA2_update(data, bytes);

@@ -180,7 +180,7 @@ namespace
       public:
         LastChar(Pipeline* next);
         virtual ~LastChar() = default;
-        virtual void write(unsigned char* data, size_t len);
+        virtual void write(unsigned char const* data, size_t len);
         virtual void finish();
         unsigned char getLastChar();
 
@@ -196,7 +196,7 @@ LastChar::LastChar(Pipeline* next) :
 }
 
 void
-LastChar::write(unsigned char* data, size_t len)
+LastChar::write(unsigned char const* data, size_t len)
 {
     if (len > 0) {
         this->last_char = data[len - 1];

@@ -55,7 +55,7 @@ class QPDF_DLL_CLASS Pl_QPDFTokenizer: public Pipeline
     QPDF_DLL
     virtual ~Pl_QPDFTokenizer();
     QPDF_DLL
-    virtual void write(unsigned char* buf, size_t len);
+    virtual void write(unsigned char const* buf, size_t len);
     QPDF_DLL
     virtual void finish();
 

@@ -1,5 +1,6 @@
 #include <qpdf/Pipeline.hh>
 
+#include <cstring>
 #include <stdexcept>
 
 Pipeline::Pipeline(char const* identifier, Pipeline* next) :

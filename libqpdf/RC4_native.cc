@@ -37,13 +37,9 @@ RC4_native::RC4_native(unsigned char const* key_data, int key_len)
 }
 
 void
-RC4_native::process(unsigned char* in_data, size_t len, unsigned char* out_data)
+RC4_native::process(
+    unsigned char const* in_data, size_t len, unsigned char* out_data)
 {
-    if (out_data == 0) {
-        // Convert in place
-        out_data = in_data;
-    }
-
     for (size_t i = 0; i < len; ++i) {
         key.x = static_cast<unsigned char>((key.x + 1) % 256);
         key.y = static_cast<unsigned char>((key.state[key.x] + key.y) % 256);

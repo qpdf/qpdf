@@ -13,7 +13,7 @@ Pl_ASCII85Decoder::Pl_ASCII85Decoder(char const* identifier, Pipeline* next) :
 }
 
 void
-Pl_ASCII85Decoder::write(unsigned char* buf, size_t len)
+Pl_ASCII85Decoder::write(unsigned char const* buf, size_t len)
 {
     if (eod > 1) {
         return;

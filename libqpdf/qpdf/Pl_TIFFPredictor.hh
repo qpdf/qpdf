@@ -20,7 +20,7 @@ class Pl_TIFFPredictor: public Pipeline
         unsigned int bits_per_sample = 8);
     virtual ~Pl_TIFFPredictor() = default;
 
-    virtual void write(unsigned char* data, size_t len);
+    virtual void write(unsigned char const* data, size_t len);
     virtual void finish();
 
   private:

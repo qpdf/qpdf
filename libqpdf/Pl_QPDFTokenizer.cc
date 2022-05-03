@@ -33,7 +33,7 @@ Pl_QPDFTokenizer::~Pl_QPDFTokenizer()
 }
 
 void
-Pl_QPDFTokenizer::write(unsigned char* data, size_t len)
+Pl_QPDFTokenizer::write(unsigned char const* data, size_t len)
 {
     this->m->buf.write(data, len);
 }

@@ -24,7 +24,7 @@ class QPDFCrypto_native: public QPDFCryptoImpl
 
     virtual void RC4_init(unsigned char const* key_data, int key_len = -1);
     virtual void RC4_process(
-        unsigned char* in_data, size_t len, unsigned char* out_data = 0);
+        unsigned char const* in_data, size_t len, unsigned char* out_data = 0);
     virtual void RC4_finalize();
 
     virtual void SHA2_init(int bits);

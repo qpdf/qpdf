@@ -24,7 +24,7 @@ Pl_Buffer::~Pl_Buffer()
 }
 
 void
-Pl_Buffer::write(unsigned char* buf, size_t len)
+Pl_Buffer::write(unsigned char const* buf, size_t len)
 {
     if (this->m->data.get() == 0) {
         this->m->data = std::make_shared<Buffer>(len);

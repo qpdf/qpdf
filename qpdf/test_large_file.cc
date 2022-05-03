@@ -63,7 +63,7 @@ class ImageChecker: public Pipeline
   public:
     ImageChecker(size_t n);
     virtual ~ImageChecker() = default;
-    virtual void write(unsigned char* data, size_t len);
+    virtual void write(unsigned char const* data, size_t len);
     virtual void finish();
 
   private:
@@ -81,7 +81,7 @@ ImageChecker::ImageChecker(size_t n) :
 }
 
 void
-ImageChecker::write(unsigned char* data, size_t len)
+ImageChecker::write(unsigned char const* data, size_t len)
 {
     for (size_t i = 0; i < len; ++i) {
         size_t y = (this->offset + i) / width / stripesize;

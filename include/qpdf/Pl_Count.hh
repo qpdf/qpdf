@@ -36,7 +36,7 @@ class QPDF_DLL_CLASS Pl_Count: public Pipeline
     QPDF_DLL
     virtual ~Pl_Count();
     QPDF_DLL
-    virtual void write(unsigned char*, size_t);
+    virtual void write(unsigned char const*, size_t);
     QPDF_DLL
     virtual void finish();
     // Returns the number of bytes written

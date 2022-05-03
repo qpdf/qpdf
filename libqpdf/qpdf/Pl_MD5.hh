@@ -17,7 +17,7 @@ class Pl_MD5: public Pipeline
   public:
     Pl_MD5(char const* identifier, Pipeline* next);
     virtual ~Pl_MD5() = default;
-    virtual void write(unsigned char*, size_t);
+    virtual void write(unsigned char const*, size_t);
     virtual void finish();
     std::string getHexDigest();
     // Enable/disable. Disabling the pipeline causes it to become a

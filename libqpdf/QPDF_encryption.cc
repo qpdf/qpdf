@@ -207,7 +207,7 @@ iterate_rc4(
             key[j] = static_cast<unsigned char>(okey[j] ^ xor_value);
         }
         RC4 rc4(key, QIntC::to_int(key_len));
-        rc4.process(data, data_len);
+        rc4.process(data, data_len, data);
     }
 }
 
@@ -1163,7 +1163,8 @@ QPDF::decryptString(std::string& str, int objid, int generation)
             // be freed even if rc4.process throws an exception.
             auto tmp = QUtil::make_unique_cstr(str);
             RC4 rc4(QUtil::unsigned_char_pointer(key), toI(key.length()));
-            rc4.process(QUtil::unsigned_char_pointer(tmp.get()), vlen);
+            auto data = QUtil::unsigned_char_pointer(tmp.get());
+            rc4.process(data, vlen, data);
             str = std::string(tmp.get(), vlen);
         }
     } catch (QPDFExc&) {

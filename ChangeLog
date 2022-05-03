@@ -1,3 +1,12 @@
+2022-05-03  Jay Berkenbilt  <ejb@ql.org>
+
+        * API change: Pipeline::write now takes "unsigned char const *"
+        instead of "unsigned char*". Callers shouldn't have to change
+        anything, though can stop using writable strings or
+        QUtil::unsigned_char_pointer. If you have implemented your own
+        pipelines, you should change your write method to take a const
+        pointer.
+
 2022-05-01  Jay Berkenbilt  <ejb@ql.org>
 
         * JSON: add reactors to the JSON parser, making it possible to

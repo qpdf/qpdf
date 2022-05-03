@@ -18,7 +18,7 @@ other_tests()
     RC4 r(reinterpret_cast<unsigned char const*>("quack"));
     auto data = std::make_unique<unsigned char[]>(6);
     memcpy(data.get(), "potato", 6);
-    r.process(data.get(), 6);
+    r.process(data.get(), 6, data.get());
     assert(memcmp(data.get(), "\xa5\x6f\xe7\x27\x2b\x5c", 6) == 0);
     std::cout << "passed" << std::endl;
 }

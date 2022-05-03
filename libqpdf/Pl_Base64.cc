@@ -35,7 +35,7 @@ Pl_Base64::Pl_Base64(char const* identifier, Pipeline* next, action_e action) :
 }
 
 void
-Pl_Base64::write(unsigned char* data, size_t len)
+Pl_Base64::write(unsigned char const* data, size_t len)
 {
     if (finished) {
         throw std::logic_error("Pl_Base64 used after finished");
@@ -48,9 +48,9 @@ Pl_Base64::write(unsigned char* data, size_t len)
 }
 
 void
-Pl_Base64::decode(unsigned char* data, size_t len)
+Pl_Base64::decode(unsigned char const* data, size_t len)
 {
-    unsigned char* p = data;
+    unsigned char const* p = data;
     while (len > 0) {
         if (!QUtil::is_space(to_c(*p))) {
             this->buf[this->pos++] = *p;
@@ -64,9 +64,9 @@ Pl_Base64::decode(unsigned char* data, size_t len)
 }
 
 void
-Pl_Base64::encode(unsigned char* data, size_t len)
+Pl_Base64::encode(unsigned char const* data, size_t len)
 {
-    unsigned char* p = data;
+    unsigned char const* p = data;
     while (len > 0) {
         this->buf[this->pos++] = *p;
         if (this->pos == 3) {

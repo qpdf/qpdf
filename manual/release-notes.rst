@@ -68,12 +68,18 @@ For a detailed list of changes, please see the file
 
   - API: breaking changes
 
-    - Remove
+    - Pipeline::write now takes ``unsigned char const*`` instead of
+      ``unsigned char*``. Callers don't need to change anything, but
+      you no longer have to pass writable pointers to pipelines. If
+      you've implemented your own pipeline classes, you will need to
+      update them.
+
+    - Remove deprecated
       ``QPDFAcroFormDocumentHelper::copyFieldsFromForeignPage``. This
       method never worked and only did something in qpdf version
       10.2.x.
 
-    - Remove ``QPDFNameTreeObjectHelper`` and
+    - Remove deprecated ``QPDFNameTreeObjectHelper`` and
       ``QPDFNumberTreeObjectHelper`` constructors that don't take a
       ``QPDF&`` argument.
 

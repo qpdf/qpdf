@@ -46,7 +46,7 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(
 }
 
 void
-Pl_TIFFPredictor::write(unsigned char* data, size_t len)
+Pl_TIFFPredictor::write(unsigned char const* data, size_t len)
 {
     size_t left = this->bytes_per_row - this->pos;
     size_t offset = 0;

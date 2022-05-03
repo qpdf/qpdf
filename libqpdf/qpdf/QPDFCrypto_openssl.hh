@@ -37,7 +37,7 @@ class QPDFCrypto_openssl: public QPDFCryptoImpl
 
     void RC4_init(unsigned char const* key_data, int key_len = -1) override;
     void RC4_process(
-        unsigned char* in_data,
+        unsigned char const* in_data,
         size_t len,
         unsigned char* out_data = 0) override;
     void RC4_finalize() override;

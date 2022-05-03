@@ -11,7 +11,7 @@ Pl_MD5::Pl_MD5(char const* identifier, Pipeline* next) :
 }
 
 void
-Pl_MD5::write(unsigned char* buf, size_t len)
+Pl_MD5::write(unsigned char const* buf, size_t len)
 {
     if (this->enabled) {
         if (!this->in_progress) {
@@ -23,11 +23,11 @@ Pl_MD5::write(unsigned char* buf, size_t len)
         // Assume int is at least 32 bits.
         static size_t const max_bytes = 1 << 30;
         size_t bytes_left = len;
-        unsigned char* data = buf;
+        unsigned char const* data = buf;
         while (bytes_left > 0) {
             size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
             this->md5.encodeDataIncrementally(
-                reinterpret_cast<char*>(data), bytes);
+                reinterpret_cast<char const*>(data), bytes);
             bytes_left -= bytes;
             data += bytes;
         }

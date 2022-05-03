@@ -97,11 +97,8 @@ QPDFCrypto_gnutls::RC4_init(unsigned char const* key_data, int key_len)
 
 void
 QPDFCrypto_gnutls::RC4_process(
-    unsigned char* in_data, size_t len, unsigned char* out_data)
+    unsigned char const* in_data, size_t len, unsigned char* out_data)
 {
-    if (nullptr == out_data) {
-        out_data = in_data;
-    }
     gnutls_cipher_encrypt2(this->cipher_ctx, in_data, len, out_data, len);
 }
 

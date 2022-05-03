@@ -1750,7 +1750,8 @@ QPDFWriter::unparseObject(
                 RC4 rc4(
                     QUtil::unsigned_char_pointer(this->m->cur_data_key),
                     QIntC::to_int(this->m->cur_data_key.length()));
-                rc4.process(QUtil::unsigned_char_pointer(tmp), vlen);
+                auto data = QUtil::unsigned_char_pointer(tmp);
+                rc4.process(data, vlen, data);
                 val = QPDF_String(std::string(tmp, vlen)).unparse();
             }
         } else if (flags & f_hex_string) {

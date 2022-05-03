@@ -19,7 +19,7 @@ class Pl_RC4: public Pipeline
         size_t out_bufsize = def_bufsize);
     virtual ~Pl_RC4() = default;
 
-    virtual void write(unsigned char* data, size_t len);
+    virtual void write(unsigned char const* data, size_t len);
     virtual void finish();
 
   private:

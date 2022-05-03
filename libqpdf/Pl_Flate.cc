@@ -84,7 +84,7 @@ Pl_Flate::warn(char const* msg, int code)
 }
 
 void
-Pl_Flate::write(unsigned char* data, size_t len)
+Pl_Flate::write(unsigned char const* data, size_t len)
 {
     if (this->m->outbuf.get() == 0) {
         throw std::logic_error(
@@ -96,7 +96,7 @@ Pl_Flate::write(unsigned char* data, size_t len)
     // Assume int is at least 32 bits.
     static size_t const max_bytes = 1 << 30;
     size_t bytes_left = len;
-    unsigned char* buf = data;
+    unsigned char const* buf = data;
     while (bytes_left > 0) {
         size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
         handleData(
@@ -109,14 +109,16 @@ Pl_Flate::write(unsigned char* data, size_t len)
 }
 
 void
-Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
+Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
 {
     if (len > UINT_MAX) {
         throw std::runtime_error("Pl_Flate: zlib doesn't support data"
                                  " blocks larger than int");
     }
     z_stream& zstream = *(static_cast<z_stream*>(this->m->zdata));
-    zstream.next_in = data;
+    // zlib is known not to modify the data pointed to by next_in but
+    // doesn't declare the field value const unless compiled to do so.
+    zstream.next_in = const_cast<unsigned char*>(data);
     zstream.avail_in = QIntC::to_uint(len);
 
     if (!this->m->initialized) {

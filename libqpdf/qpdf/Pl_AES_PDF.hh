@@ -20,7 +20,7 @@ class Pl_AES_PDF: public Pipeline
         size_t key_bytes);
     virtual ~Pl_AES_PDF() = default;
 
-    virtual void write(unsigned char* data, size_t len);
+    virtual void write(unsigned char const* data, size_t len);
     virtual void finish();
 
     // Use zero initialization vector; needed for AESV3

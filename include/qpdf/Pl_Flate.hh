@@ -43,7 +43,7 @@ class QPDF_DLL_CLASS Pl_Flate: public Pipeline
     virtual ~Pl_Flate();
 
     QPDF_DLL
-    virtual void write(unsigned char* data, size_t len);
+    virtual void write(unsigned char const* data, size_t len);
     QPDF_DLL
     virtual void finish();
 
@@ -61,7 +61,7 @@ class QPDF_DLL_CLASS Pl_Flate: public Pipeline
 
   private:
     QPDF_DLL_PRIVATE
-    void handleData(unsigned char* data, size_t len, int flush);
+    void handleData(unsigned char const* data, size_t len, int flush);
     QPDF_DLL_PRIVATE
     void checkError(char const* prefix, int error_code);
     QPDF_DLL_PRIVATE

@@ -69,7 +69,7 @@ QPDFCrypto_native::RC4_init(unsigned char const* key_data, int key_len)
 
 void
 QPDFCrypto_native::RC4_process(
-    unsigned char* in_data, size_t len, unsigned char* out_data)
+    unsigned char const* in_data, size_t len, unsigned char* out_data)
 {
     this->rc4->process(in_data, len, out_data);
 }

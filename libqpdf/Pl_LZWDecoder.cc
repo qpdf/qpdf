@@ -22,7 +22,7 @@ Pl_LZWDecoder::Pl_LZWDecoder(
 }
 
 void
-Pl_LZWDecoder::write(unsigned char* bytes, size_t len)
+Pl_LZWDecoder::write(unsigned char const* bytes, size_t len)
 {
     for (size_t i = 0; i < len; ++i) {
         this->buf[next++] = bytes[i];

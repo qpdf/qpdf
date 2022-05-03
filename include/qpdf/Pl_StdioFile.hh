@@ -43,7 +43,7 @@ class QPDF_DLL_CLASS Pl_StdioFile: public Pipeline
     virtual ~Pl_StdioFile();
 
     QPDF_DLL
-    virtual void write(unsigned char* buf, size_t len);
+    virtual void write(unsigned char const* buf, size_t len);
     QPDF_DLL
     virtual void finish();
 

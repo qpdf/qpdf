@@ -78,7 +78,9 @@ class QPDF_DLL_CLASS QPDFCryptoImpl
     // out_data = 0 means to encrypt/decrypt in place
     QPDF_DLL
     virtual void RC4_process(
-        unsigned char* in_data, size_t len, unsigned char* out_data = 0) = 0;
+        unsigned char const* in_data,
+        size_t len,
+        unsigned char* out_data = 0) = 0;
     QPDF_DLL
     virtual void RC4_finalize() = 0;
 
