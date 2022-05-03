@@ -863,7 +863,7 @@ QPDFFormFieldObjectHelper::generateTextAppearance(
 
     TfFinder tff;
     Pl_QPDFTokenizer tok("tf", &tff);
-    tok.write(QUtil::unsigned_char_pointer(DA.c_str()), DA.length());
+    tok.writeString(DA);
     tok.finish();
     double tf = tff.getTf();
     DA = tff.getDA();

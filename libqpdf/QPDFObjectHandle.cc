@@ -127,7 +127,7 @@ QPDFObjectHandle::TokenFilter::write(char const* data, size_t len)
         return;
     }
     if (len) {
-        this->pipeline->write(QUtil::unsigned_char_pointer(data), len);
+        this->pipeline->write(data, len);
     }
 }
 
@@ -1857,7 +1857,7 @@ QPDFObjectHandle::pipeContentStreams(
     Pl_Buffer buf("concatenated content stream buffer");
     for (auto stream: streams) {
         if (need_newline) {
-            buf.write(QUtil::unsigned_char_pointer("\n"), 1);
+            buf.writeCStr("\n");
         }
         LastChar lc(&buf);
         std::string og = QUtil::int_to_string(stream.getObjectID()) + " " +

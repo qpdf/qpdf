@@ -235,7 +235,7 @@ process_with_aes(
     }
     aes.disablePadding();
     for (unsigned int i = 0; i < repetitions; ++i) {
-        aes.write(QUtil::unsigned_char_pointer(data), data.length());
+        aes.writeString(data);
     }
     aes.finish();
     auto bufp = buffer.getBufferSharedPointer();
@@ -255,9 +255,9 @@ hash_V5(
     QPDF::EncryptionData const& data)
 {
     Pl_SHA2 hash(256);
-    hash.write(QUtil::unsigned_char_pointer(password), password.length());
-    hash.write(QUtil::unsigned_char_pointer(salt), salt.length());
-    hash.write(QUtil::unsigned_char_pointer(udata), udata.length());
+    hash.writeString(password);
+    hash.writeString(salt);
+    hash.writeString(udata);
     hash.finish();
     std::string K = hash.getRawDigest();
 
@@ -311,7 +311,7 @@ hash_V5(
             E_mod_3 %= 3;
             int next_hash = ((E_mod_3 == 0) ? 256 : (E_mod_3 == 1) ? 384 : 512);
             Pl_SHA2 sha2(next_hash);
-            sha2.write(QUtil::unsigned_char_pointer(E), E.length());
+            sha2.writeString(E);
             sha2.finish();
             K = sha2.getRawDigest();
 
@@ -1151,7 +1151,7 @@ QPDF::decryptString(std::string& str, int objid, int generation)
                 false,
                 QUtil::unsigned_char_pointer(key),
                 key.length());
-            pl.write(QUtil::unsigned_char_pointer(str), str.length());
+            pl.writeString(str);
             pl.finish();
             auto buf = bufpl.getBufferSharedPointer();
             str = std::string(

@@ -477,9 +477,7 @@ test_8(QPDF& pdf, char const* arg2)
     }
     Pl_Buffer p1("buffer");
     Pl_Flate p2("compress", &p1, Pl_Flate::a_deflate);
-    p2.write(
-        QUtil::unsigned_char_pointer("new data for stream\n"),
-        20); // no null!
+    p2 << "new data for stream\n";
     p2.finish();
     auto b = p1.getBufferSharedPointer();
     // This is a bogus way to use StreamDataProvider, but it does
@@ -1021,9 +1019,7 @@ test_27(QPDF& pdf, char const* arg2)
     {
         // Local scope
         Pl_Buffer pl("buffer");
-        pl.write(
-            QUtil::unsigned_char_pointer("new data for stream\n"),
-            20); // no null!
+        pl.writeCStr("new data for stream\n");
         pl.finish();
         auto b = pl.getBufferSharedPointer();
         Provider* provider = new Provider(b);
@@ -1050,9 +1046,7 @@ test_27(QPDF& pdf, char const* arg2)
         {
             // Local scope
             Pl_Buffer pl("buffer");
-            pl.write(
-                QUtil::unsigned_char_pointer("more data for stream\n"),
-                21); // no null!
+            pl.writeCStr("more data for stream\n");
             pl.finish();
             auto b = pl.getBufferSharedPointer();
             Provider* provider = new Provider(b);
@@ -2648,7 +2642,8 @@ test_76(QPDF& pdf, char const* arg2)
     auto efs2 = QPDFEFStreamObjectHelper::createEFStream(pdf, "from string");
     efs2.setSubtype("text/plain");
     Pl_Buffer p("buffer");
-    p.write(QUtil::unsigned_char_pointer("from buffer"), 11);
+    // exercise Pipeline::operator<<(std::string const&)
+    p << std::string("from buffer");
     p.finish();
     auto efs3 = QPDFEFStreamObjectHelper::createEFStream(
         pdf, p.getBufferSharedPointer());
@@ -2700,7 +2695,7 @@ test_78(QPDF& pdf, char const* arg2)
     // Test functional versions of replaceStreamData()
 
     auto f1 = [](Pipeline* p) {
-        p->write(QUtil::unsigned_char_pointer("potato"), 6);
+        p->writeCStr("potato");
         p->finish();
     };
     auto f2 = [](Pipeline* p, bool suppress_warnings, bool will_retry) {
@@ -2712,7 +2707,7 @@ test_78(QPDF& pdf, char const* arg2)
         if (!suppress_warnings) {
             std::cerr << "warning" << std::endl;
         }
-        p->write(QUtil::unsigned_char_pointer("salad"), 5);
+        p->writeCStr("salad");
         p->finish();
         std::cerr << "f2 done" << std::endl;
         return true;
@@ -2767,7 +2762,7 @@ test_79(QPDF& pdf, char const* arg2)
 
     // Use a provider
     Pl_Buffer b("buffer");
-    b.write(QUtil::unsigned_char_pointer("from buffer"), 11);
+    b.writeCStr("from buffer");
     b.finish();
     auto bp = b.getBufferSharedPointer();
     auto s3 = QPDFObjectHandle::newStream(&pdf, bp);

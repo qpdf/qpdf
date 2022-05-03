@@ -118,9 +118,7 @@ ImageProvider::provideStreamData(int objid, int generation, Pipeline* pipeline)
 
     for (size_t i = 0; i < n_stripes; ++i) {
         for (size_t j = 0; j < width * stripe_height; ++j) {
-            p->write(
-                QUtil::unsigned_char_pointer(stripes[i].c_str()),
-                stripes[i].length());
+            p->writeString(stripes[i]);
         }
     }
     p->finish();

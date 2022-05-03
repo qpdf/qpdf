@@ -348,9 +348,7 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
     (void)jpeg_start_decompress(cinfo);
     while (cinfo->output_scanline < cinfo->output_height) {
         (void)jpeg_read_scanlines(cinfo, buffer, 1);
-        this->getNext()->write(
-            reinterpret_cast<unsigned char*>(buffer[0]),
-            width * sizeof(buffer[0][0]));
+        this->getNext()->write(buffer[0], width * sizeof(buffer[0][0]));
     }
     (void)jpeg_finish_decompress(cinfo);
     this->getNext()->finish();

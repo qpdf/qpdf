@@ -961,7 +961,7 @@ QPDFWriter::writeBinary(unsigned long long val, unsigned int bytes)
 void
 QPDFWriter::writeString(std::string const& str)
 {
-    this->m->pipeline->write(QUtil::unsigned_char_pointer(str), str.length());
+    this->m->pipeline->writeString(str);
 }
 
 void
@@ -1736,7 +1736,7 @@ QPDFWriter::unparseObject(
                     true,
                     QUtil::unsigned_char_pointer(this->m->cur_data_key),
                     this->m->cur_data_key.length());
-                pl.write(QUtil::unsigned_char_pointer(val), val.length());
+                pl.writeString(val);
                 pl.finish();
                 auto buf = bufpl.getBufferSharedPointer();
                 val = QPDF_String(std::string(

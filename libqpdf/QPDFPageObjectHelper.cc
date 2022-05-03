@@ -190,7 +190,7 @@ InlineImageTracker::handleToken(QPDFTokenizer::Token const& token)
                 QTC::TC(
                     "qpdf", "QPDFPageObjectHelper externalize inline image");
                 Pl_Buffer b("image_data");
-                b.write(QUtil::unsigned_char_pointer(image_data), len);
+                b.writeString(image_data);
                 b.finish();
                 QPDFObjectHandle dict =
                     convertIIDict(QPDFObjectHandle::parse(dict_str));

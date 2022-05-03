@@ -2739,7 +2739,7 @@ QPDF::pipeStreamData(
                     "unexpected EOF reading stream data");
             }
             length -= len;
-            pipeline->write(QUtil::unsigned_char_pointer(buf), len);
+            pipeline->write(buf, len);
         }
         pipeline->finish();
         success = true;
