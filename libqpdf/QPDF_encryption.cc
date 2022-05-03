@@ -1,6 +1,8 @@
 // This file implements methods from the QPDF class that involve
 // encryption.
 
+#include <qpdf/assert_debug.h>
+
 #include <qpdf/QPDF.hh>
 
 #include <qpdf/QPDFExc.hh>
@@ -15,7 +17,6 @@
 #include <qpdf/RC4.hh>
 
 #include <algorithm>
-#include <cassert>
 #include <string.h>
 
 static unsigned char const padding_string[] = {
@@ -288,7 +289,7 @@ hash_V5(
 
             ++round_number;
             std::string K1 = password + K + udata;
-            assert(K.length() >= 32);
+            qpdf_assert_debug(K.length() >= 32);
             std::string E = process_with_aes(
                 K.substr(0, 16),
                 true,

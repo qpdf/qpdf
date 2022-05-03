@@ -1,3 +1,5 @@
+#include <qpdf/assert_test.h>
+
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
@@ -8,12 +10,6 @@
 #include <regex>
 #include <type_traits>
 #include <vector>
-
-#ifdef NDEBUG
-// We need assert even in a release build for test code.
-# undef NDEBUG
-#endif
-#include <cassert>
 
 // Functional programming
 

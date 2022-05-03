@@ -1,8 +1,9 @@
+#include <qpdf/assert_test.h>
+
 #include <qpdf/Pl_Base64.hh>
 
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QUtil.hh>
-#include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>

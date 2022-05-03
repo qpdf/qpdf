@@ -1,3 +1,5 @@
+#include <qpdf/assert_test.h>
+
 // This program tests miscellaneous functionality in the qpdf library
 // that we don't want to pollute the qpdf program with.
 
@@ -31,12 +33,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef NDEBUG
-// We need assert even in a release build for test code.
-# undef NDEBUG
-#endif
-#include <cassert>
 
 static char const* whoami = 0;
 

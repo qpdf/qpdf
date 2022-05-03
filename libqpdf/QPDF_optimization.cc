@@ -1,12 +1,13 @@
 // See the "Optimization" section of the manual.
 
+#include <qpdf/assert_debug.h>
+
 #include <qpdf/QPDF.hh>
 
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QTC.hh>
-#include <cassert>
 
 QPDF::ObjUser::ObjUser() :
     ou_type(ou_bad),
@@ -18,14 +19,14 @@ QPDF::ObjUser::ObjUser(user_e type) :
     ou_type(type),
     pageno(0)
 {
-    assert(type == ou_root);
+    qpdf_assert_debug(type == ou_root);
 }
 
 QPDF::ObjUser::ObjUser(user_e type, int pageno) :
     ou_type(type),
     pageno(pageno)
 {
-    assert((type == ou_page) || (type == ou_thumb));
+    qpdf_assert_debug((type == ou_page) || (type == ou_thumb));
 }
 
 QPDF::ObjUser::ObjUser(user_e type, std::string const& key) :
@@ -33,7 +34,7 @@ QPDF::ObjUser::ObjUser(user_e type, std::string const& key) :
     pageno(0),
     key(key)
 {
-    assert((type == ou_trailer_key) || (type == ou_root_key));
+    qpdf_assert_debug((type == ou_trailer_key) || (type == ou_root_key));
 }
 
 bool

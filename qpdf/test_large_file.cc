@@ -1,3 +1,5 @@
+#include <qpdf/assert_test.h>
+
 // NOTE: This test program doesn't do anything special to enable large
 // file support.  This is important since it verifies that programs
 // don't have to do anything special -- all the work is done
@@ -13,12 +15,6 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef NDEBUG
-// We need assert even in a release build for test code.
-# undef NDEBUG
-#endif
-#include <cassert>
 
 // Run "test_large_file write small a.pdf" to get a PDF file that you
 // can look at in a reader.

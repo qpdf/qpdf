@@ -1,3 +1,5 @@
+#include <qpdf/assert_test.h>
+
 #include <qpdf/Pl_PNGFilter.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/Pl_TIFFPredictor.hh>
@@ -8,12 +10,6 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef NDEBUG
-// We need assert even in a release build for test code.
-# undef NDEBUG
-#endif
-#include <cassert>
 
 void
 run(char const* filename,

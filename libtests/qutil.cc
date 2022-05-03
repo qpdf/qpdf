@@ -1,3 +1,5 @@
+#include <qpdf/assert_test.h>
+
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QUtil.hh>
@@ -16,12 +18,6 @@
 #else
 # include <unistd.h>
 #endif
-
-#ifdef NDEBUG
-// We need assert even in a release build for test code.
-# undef NDEBUG
-#endif
-#include <cassert>
 
 template <class int_T>
 void

@@ -29,6 +29,16 @@ endforeach()
 target_include_directories(qpdf-ctest PRIVATE ${CMAKE_BINARY_DIR}/libqpdf)
 target_include_directories(sizes PRIVATE ${JPEG_INCLUDE})
 
+set(needs_private_headers
+  test_large_file
+  test_driver
+  qpdf-ctest
+  qpdfjob-ctest
+  )
+foreach(TARGET ${needs_private_headers})
+  target_include_directories(${TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/libqpdf)
+endforeach()
+
 foreach(B qpdf test_unicode_filenames fix-qdf test_shell_glob)
   if(WINDOWS_WMAIN_COMPILE)
     target_compile_options(${B} PRIVATE ${WINDOWS_WMAIN_COMPILE})

@@ -1,3 +1,5 @@
+#include <qpdf/assert_test.h>
+
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Count.hh>
 #include <qpdf/Pl_Discard.hh>
@@ -6,12 +8,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <stdlib.h>
-
-#ifdef NDEBUG
-// We need assert even in a release build for test code.
-# undef NDEBUG
-#endif
-#include <cassert>
 
 static unsigned char*
 uc(char const* s)

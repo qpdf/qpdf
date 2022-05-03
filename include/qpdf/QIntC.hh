@@ -24,7 +24,6 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
-#include <cassert>
 #include <iostream>
 #include <limits>
 #include <locale>

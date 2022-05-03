@@ -1,11 +1,7 @@
+#include <qpdf/assert_test.h>
+
 #include <qpdf/QIntC.hh>
 #include <stdint.h>
-
-#ifdef NDEBUG
-// We need assert even in a release build for test code.
-# undef NDEBUG
-#endif
-#include <cassert>
 
 #define try_convert(exp_pass, fn, i) \
  try_convert_real(#fn "(" #i ")", exp_pass, fn, i)

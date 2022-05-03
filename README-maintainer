@@ -123,11 +123,23 @@ CODING RULES
   "Code Formatting" section in manual/contributing.rst for details.
   See also "CODE FORMATTING" below.
 
-* Do not use assert in non-test code for any purpose other than as a
-  sanity check during development that would be safe to remove in
-  production. assert is for strong invariant checking. When developing
-  and using assert for that purpose, make sure to use the Debug
-  configuration since assert is disabled in other configurations.
+* Use of assert:
+
+  * Test code: #include <qpdf/assert_test.h> first.
+  * Debug code: #include <qpdf/assert_debug.h> first and use
+    qpdf_assert_debug instead of assert.
+
+  These rules are enforced by the check-assert test. This practices
+  serves to
+
+  * remind us that assert in release code disappears and so should only
+    be used for debugging; when doing so use a Debug build
+    configuration
+
+  * protect us from using assert in test code without explicitly
+    removing the NDEBUG definition, since that would cause the assert
+    not to actually be testing anything in non-Debug build
+    configurations.
 
 * In a source file, include the header file that declares the source
   class first followed by a blank line. If a config file is needed

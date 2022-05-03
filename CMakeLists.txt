@@ -305,6 +305,10 @@ if(GENERATE_AUTO_JOB)
   add_custom_target(auto_job_files ALL DEPENDS ${auto_job_outputs})
 endif()
 
+add_test(
+  NAME check-assert
+  COMMAND perl ${qpdf_SOURCE_DIR}/check_assert)
+
 # add_subdirectory order affects test order
 add_subdirectory(include)
 add_subdirectory(libqpdf)

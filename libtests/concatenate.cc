@@ -1,14 +1,10 @@
+#include <qpdf/assert_test.h>
+
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Concatenate.hh>
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
-
-#ifdef NDEBUG
-// We need assert even in a release build for test code.
-# undef NDEBUG
-#endif
-#include <cassert>
 
 static void
 pipeStringAndFinish(Pipeline* p, std::string const& str)

@@ -1,14 +1,10 @@
+#include <qpdf/assert_test.h>
+
 #include <qpdf/QPDFArgParser.hh>
 #include <qpdf/QPDFUsage.hh>
 #include <qpdf/QUtil.hh>
 #include <cstring>
 #include <iostream>
-
-#ifdef NDEBUG
-// We need assert even in a release build for test code.
-# undef NDEBUG
-#endif
-#include <cassert>
 
 class ArgParser
 {

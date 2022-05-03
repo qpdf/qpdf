@@ -1,4 +1,6 @@
-#include <qpdf/qpdf-config.h> // include first for large file support
+#include <qpdf/assert_debug.h>
+
+#include <qpdf/qpdf-config.h> // include early for large file support
 
 #include <qpdf/QPDFWriter.hh>
 
@@ -21,7 +23,6 @@
 #include <qpdf/RC4.hh>
 
 #include <algorithm>
-#include <cassert>
 #include <stdlib.h>
 
 QPDFWriter::Members::Members(QPDF& pdf) :
@@ -996,7 +997,7 @@ QPDFWriter::writePad(int nspaces)
 Pipeline*
 QPDFWriter::pushPipeline(Pipeline* p)
 {
-    assert(dynamic_cast<Pl_Count*>(p) == 0);
+    qpdf_assert_debug(dynamic_cast<Pl_Count*>(p) == 0);
     this->m->pipeline_stack.push_back(p);
     return p;
 }
@@ -1027,9 +1028,9 @@ QPDFWriter::PipelinePopper::~PipelinePopper()
     if (stack_id.empty()) {
         return;
     }
-    assert(qw->m->pipeline_stack.size() >= 2);
+    qpdf_assert_debug(qw->m->pipeline_stack.size() >= 2);
     qw->m->pipeline->finish();
-    assert(
+    qpdf_assert_debug(
         dynamic_cast<Pl_Count*>(qw->m->pipeline_stack.back()) ==
         qw->m->pipeline);
     // It might be possible for this assertion to fail if
@@ -1038,7 +1039,7 @@ QPDFWriter::PipelinePopper::~PipelinePopper()
     // which two dynamically allocated PipelinePopper objects ever
     // exist at the same time, so the assertion will fail if they get
     // popped out of order from automatic destruction.
-    assert(qw->m->pipeline->getIdentifier() == stack_id);
+    qpdf_assert_debug(qw->m->pipeline->getIdentifier() == stack_id);
     delete qw->m->pipeline_stack.back();
     qw->m->pipeline_stack.pop_back();
     while (dynamic_cast<Pl_Count*>(qw->m->pipeline_stack.back()) == 0) {
@@ -1109,9 +1110,9 @@ QPDFWriter::pushMD5Pipeline(PipelinePopper& pp)
         throw std::logic_error("Deterministic ID computation enabled after ID"
                                " generation has already occurred.");
     }
-    assert(this->m->deterministic_id);
-    assert(this->m->md5_pipeline == 0);
-    assert(this->m->pipeline->getCount() == 0);
+    qpdf_assert_debug(this->m->deterministic_id);
+    qpdf_assert_debug(this->m->md5_pipeline == 0);
+    qpdf_assert_debug(this->m->pipeline->getCount() == 0);
     this->m->md5_pipeline = new Pl_MD5("qpdf md5", this->m->pipeline);
     this->m->md5_pipeline->persistAcrossFinish(true);
     // Special case code in popPipelineStack clears this->m->md5_pipeline
@@ -1123,8 +1124,8 @@ QPDFWriter::pushMD5Pipeline(PipelinePopper& pp)
 void
 QPDFWriter::computeDeterministicIDData()
 {
-    assert(this->m->md5_pipeline != 0);
-    assert(this->m->deterministic_id_data.empty());
+    qpdf_assert_debug(this->m->md5_pipeline != 0);
+    qpdf_assert_debug(this->m->deterministic_id_data.empty());
     this->m->deterministic_id_data = this->m->md5_pipeline->getHexDigest();
     this->m->md5_pipeline->enable(false);
 }
@@ -1786,7 +1787,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
     // object stream that we are generating from scratch.
 
     QPDFObjGen old_og = object.getObjGen();
-    assert(old_og.getGen() == 0);
+    qpdf_assert_debug(old_og.getGen() == 0);
     int old_id = old_og.getObj();
     int new_id = this->m->obj_renumber[old_og];
 
@@ -3003,7 +3004,7 @@ QPDFWriter::writeLinearized()
         closeObject(lindict_id);
         static int const pad = 200;
         int spaces = QIntC::to_int(pos - this->m->pipeline->getCount() + pad);
-        assert(spaces >= 0);
+        qpdf_assert_debug(spaces >= 0);
         writePad(spaces);
         writeString("\n");
 
@@ -3177,7 +3178,7 @@ QPDFWriter::writeLinearized()
                     need_xref_stream ? 0 : 1);
                 computeDeterministicIDData();
                 pp_md5 = 0;
-                assert(this->m->md5_pipeline == 0);
+                qpdf_assert_debug(this->m->md5_pipeline == 0);
             }
 
             // Close first pass pipeline
@@ -3377,6 +3378,6 @@ QPDFWriter::writeStandard()
             "QPDFWriter standard deterministic ID",
             this->m->object_stream_to_objects.empty() ? 0 : 1);
         pp_md5 = 0;
-        assert(this->m->md5_pipeline == 0);
+        qpdf_assert_debug(this->m->md5_pipeline == 0);
     }
 }

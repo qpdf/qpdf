@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+use File::Basename;
+
+my $whoami = basename($0);
+chdir(dirname($0)) or die;
+
+my $errors = 0;
+foreach my $file (glob('*/*.c'), glob('*/*.cc'),
+                  glob('*/*/*.h'), glob('*/*/*.hh'))
+{
+    my $assert_test = 0;
+    if ($file =~ m,^libqpdf/qpdf/assert_,)
+    {
+        next;
+    }
+    open(F, "<$file") or die;
+    my $first_include = undef;
+    while (<F>)
+    {
+        if (m,^\s*#\s*include <qpdf/assert_(.*?).h>,)
+        {
+            if ($1 eq 'test')
+            {
+                $assert_test = 1;
+            }
+            if (defined $first_include)
+            {
+                error("$file:$.: qpdf/assert header must be first");
+            }
+        }
+        if (m,^\s*#\s*include <(.*?)>,)
+        {
+            my $header = $1;
+            if (($header eq 'cassert') || ($header eq 'assert.h'))
+            {
+                error("$file:$.: assert.h and cassert are not allowed --" .
+                      " use one of the qpdf/assert_ files instead");
+            }
+            $first_include = 1;
+        }
+        if ((! $assert_test) && (m/assert\(/))
+        {
+            error("$file:$.: call qpdf_assert_debug instead of assert");
+        }
+    }
+    close(F);
+}
+if ($errors)
+{
+    die "$whoami: errors detected\n";
+}
+print "$whoami: no incorrect use of assert found\n";
+
+sub error
+{
+    my $msg = shift;
+    warn $msg, "\n";
+    $errors = 1;
+}
