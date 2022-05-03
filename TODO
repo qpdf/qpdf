@@ -50,14 +50,6 @@ Need new pipelines:
 * Pl_OStream(std::ostream) with semantics like Pl_StdioFile
 * Pl_String to std::string with semantics like Pl_Buffer
 
-New Pipeline methods:
-* writeString(std::string const&)
-* writeCString(char*)
-* writeChars(char*, size_t)
-
-* Consider templated operator<< which could specialize for char* and
-  std::string and could use std::ostringstream otherwise
-
 See if I can change all output and error messages issued by the
 library, when context is available, to have a pipeline rather than a
 FILE* or std::ostream. This makes it possible for people to capture

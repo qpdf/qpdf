@@ -71,6 +71,26 @@ class QPDF_DLL_CLASS Pipeline
     QPDF_DLL
     std::string getIdentifier() const;
 
+    // These are convenience methods for making it easier to write
+    // certain other types of data to pipelines without having to
+    // cast. The methods that take char const* expect null-terminated
+    // C strings and do not write the null terminators.
+    QPDF_DLL
+    void writeCStr(char const* cstr);
+    QPDF_DLL
+    void writeString(std::string const&);
+    // This allows *p << "x" << "y" but is not intended to be a
+    // general purpose << compatible with ostream and does not have
+    // local awareness or the ability to be "imbued" with properties.
+    QPDF_DLL
+    Pipeline& operator<<(char const* cstr);
+    QPDF_DLL
+    Pipeline& operator<<(std::string const&);
+
+    // Overloaded write to reduce casting
+    QPDF_DLL
+    void write(char const* data, size_t len);
+
   protected:
     QPDF_DLL
     Pipeline* getNext(bool allow_null = false);

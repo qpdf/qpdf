@@ -105,6 +105,18 @@ For a detailed list of changes, please see the file
       ``appendItemAndGet``, ``eraseItemAndGet``, ``replaceKeyAndGet``,
       and ``removeKeyAndGet`` return the newly added or removed object.
 
+    - Add new ``Pipeline`` methods to reduce the amount of casting that is
+      needed:
+
+      - ``write``: overloaded version that takes `char const*` in
+        addition to the one that takes `unsigned char const*`
+
+      - ``writeCstr``: writes a null-terminated C string
+
+      - ``writeString``: writes a std::string
+
+      - ``operator <<``: for null-terminated C strings and std::strings
+
   - Other changes
 
     - A new chapter on contributing to qpdf has been added to the

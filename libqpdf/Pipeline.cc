@@ -25,3 +25,35 @@ Pipeline::getIdentifier() const
 {
     return this->identifier;
 }
+
+void
+Pipeline::writeCStr(char const* cstr)
+{
+    this->write(cstr, strlen(cstr));
+}
+
+void
+Pipeline::writeString(std::string const& str)
+{
+    this->write(str.c_str(), str.length());
+}
+
+Pipeline&
+Pipeline::operator<<(char const* cstr)
+{
+    this->writeCStr(cstr);
+    return *this;
+}
+
+Pipeline&
+Pipeline::operator<<(std::string const& str)
+{
+    this->writeString(str);
+    return *this;
+}
+
+void
+Pipeline::write(char const* data, size_t len)
+{
+    this->write(reinterpret_cast<unsigned char const*>(data), len);
+}

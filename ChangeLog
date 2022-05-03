@@ -1,5 +1,10 @@
 2022-05-03  Jay Berkenbilt  <ejb@ql.org>
 
+        * Add new convenience methods to Pipeline: writeCStr and
+        writeString. Also add a limit << operator that takes C strings and
+        std::strings. Also add an overloaded version of write that takes
+        "char const*".
+
         * API change: Pipeline::write now takes "unsigned char const *"
         instead of "unsigned char*". Callers shouldn't have to change
         anything, though can stop using writable strings or
