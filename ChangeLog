@@ -1,5 +1,10 @@
 2022-05-04  Jay Berkenbilt  <ejb@ql.org>
 
+        * Enhance JSON by adding a write method that takes a Pipeline* and
+        depth, and add several helper methods to make it easier to write
+        large amounts of JSON incrementally without having to have the
+        whole thing in memory.
+
         * json v1 output: make "pages" and "objects" consistent.
         Previously, "objects" always reflected the objects exactly as they
         appeared in the original file, while "pages" reflected objects

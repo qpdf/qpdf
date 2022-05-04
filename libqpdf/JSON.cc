@@ -1,5 +1,7 @@
 #include <qpdf/JSON.hh>
 
+#include <qpdf/Pipeline.hh>
+#include <qpdf/Pl_String.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -18,51 +20,103 @@ JSON::JSON(std::shared_ptr<JSON_value> value) :
 {
 }
 
-std::string
-JSON::JSON_dictionary::unparse(size_t depth) const
+void
+JSON::writeClose(Pipeline* p, bool first, size_t depth, char const* delimiter)
 {
-    std::string result = "{";
-    bool first = true;
-    for (auto const& iter: members) {
-        if (first) {
-            first = false;
-        } else {
-            result.append(1, ',');
-        }
-        result.append(1, '\n');
-        result.append(2 * (1 + depth), ' ');
-        result +=
-            ("\"" + iter.first + "\": " + iter.second->unparse(1 + depth));
-    }
     if (!first) {
-        result.append(1, '\n');
-        result.append(2 * depth, ' ');
+        *p << "\n";
+        writeIndent(p, depth);
     }
-    result.append(1, '}');
-    return result;
+    *p << delimiter;
 }
 
-std::string
-JSON::JSON_array::unparse(size_t depth) const
+void
+JSON::writeIndent(Pipeline* p, size_t depth)
 {
-    std::string result = "[";
+    for (size_t i = 0; i < depth; ++i) {
+        *p << "  ";
+    }
+}
+
+void
+JSON::writeNext(Pipeline* p, bool& first, size_t depth)
+{
+    if (first) {
+        first = false;
+    } else {
+        *p << ",";
+    }
+    *p << "\n";
+    writeIndent(p, 1 + depth);
+}
+
+void
+JSON::writeDictionaryOpen(Pipeline* p, bool& first, size_t depth)
+{
+    *p << "{";
+    first = true;
+}
+
+void
+JSON::writeArrayOpen(Pipeline* p, bool& first, size_t depth)
+{
+    *p << "[";
+    first = true;
+}
+
+void
+JSON::writeDictionaryClose(Pipeline* p, bool first, size_t depth)
+{
+    writeClose(p, first, depth, "}");
+}
+
+void
+JSON::writeArrayClose(Pipeline* p, bool first, size_t depth)
+{
+    writeClose(p, first, depth, "]");
+}
+
+void
+JSON::writeDictionaryItem(
+    Pipeline* p,
+    bool& first,
+    std::string const& key,
+    JSON const& value,
+    size_t depth)
+{
+    writeNext(p, first, depth);
+    *p << "\"" << key << "\": ";
+    value.write(p, 1 + depth);
+}
+
+void
+JSON::writeArrayItem(
+    Pipeline* p, bool& first, JSON const& element, size_t depth)
+{
+    writeNext(p, first, depth);
+    element.write(p, 1 + depth);
+}
+
+void
+JSON::JSON_dictionary::write(Pipeline* p, size_t depth) const
+{
     bool first = true;
+    writeDictionaryOpen(p, first, depth);
+    for (auto const& iter: members) {
+        writeDictionaryItem(p, first, iter.first, iter.second, depth);
+    }
+    writeDictionaryClose(p, first, depth);
+}
+
+void
+JSON::JSON_array::write(Pipeline* p, size_t depth) const
+{
+    bool first = true;
+    writeArrayOpen(p, first, depth);
     for (auto const& element: elements) {
-        if (first) {
-            first = false;
-        } else {
-            result.append(1, ',');
-        }
-        result.append(1, '\n');
-        result.append(2 * (1 + depth), ' ');
-        result += element->unparse(1 + depth);
+        writeArrayItem(p, first, element, depth);
     }
-    if (!first) {
-        result.append(1, '\n');
-        result.append(2 * depth, ' ');
-    }
-    result.append(1, ']');
-    return result;
+    writeArrayClose(p, first, depth);
 }
 
 JSON::JSON_string::JSON_string(std::string const& utf8) :
@@ -71,10 +125,10 @@ JSON::JSON_string::JSON_string(std::string const& utf8) :
 {
 }
 
-std::string
-JSON::JSON_string::unparse(size_t) const
+void
+JSON::JSON_string::write(Pipeline* p, size_t) const
 {
-    return "\"" + encoded + "\"";
+    *p << "\"" << encoded << "\"";
 }
 
 JSON::JSON_number::JSON_number(long long value) :
@@ -92,10 +146,10 @@ JSON::JSON_number::JSON_number(std::string const& value) :
 {
 }
 
-std::string
-JSON::JSON_number::unparse(size_t) const
+void
+JSON::JSON_number::write(Pipeline* p, size_t) const
 {
-    return encoded;
+    *p << encoded;
 }
 
 JSON::JSON_bool::JSON_bool(bool val) :
@@ -103,26 +157,35 @@ JSON::JSON_bool::JSON_bool(bool val) :
 {
 }
 
-std::string
-JSON::JSON_bool::unparse(size_t) const
+void
+JSON::JSON_bool::write(Pipeline* p, size_t) const
 {
-    return value ? "true" : "false";
+    *p << (value ? "true" : "false");
 }
 
-std::string
-JSON::JSON_null::unparse(size_t) const
+void
+JSON::JSON_null::write(Pipeline* p, size_t) const
 {
-    return "null";
+    *p << "null";
+}
+
+void
+JSON::write(Pipeline* p, size_t depth) const
+{
+    if (0 == this->m->value.get()) {
+        *p << "null";
+    } else {
+        this->m->value->write(p, depth);
+    }
 }
 
 std::string
 JSON::unparse() const
 {
-    if (0 == this->m->value.get()) {
-        return "null";
-    } else {
-        return this->m->value->unparse(0);
-    }
+    std::string s;
+    Pl_String p("unparse", s);
+    write(&p, 0);
+    return s;
 }
 
 std::string

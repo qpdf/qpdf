@@ -123,6 +123,10 @@ For a detailed list of changes, please see the file
     - Add new ``Pipeline`` type ``Pl_String`` to append to a
       ``std::string``.
 
+    - Enhance JSON class to better support incrementally reading and
+      writing large amounts of data without having to keep everything
+      in memory.
+
   - Other changes
 
     - In JSON v1 mode, the ``"objects"`` key now reflects the repaired

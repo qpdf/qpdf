@@ -45,11 +45,55 @@
 #include <string>
 #include <vector>
 
+class Pipeline;
+
 class JSON
 {
   public:
     QPDF_DLL
     std::string unparse() const;
+
+    // Write the JSON object through a pipline. The `depth` parameter
+    // specifies how deeply nested this in another JSON structure,
+    // which makes it possible to write clean-looking JSON
+    // incrementally.
+    QPDF_DLL
+    void write(Pipeline*, size_t depth = 0) const;
+
+    // Helper methods for writing JSON incrementally. Several methods
+    // take a `bool& first` parameter. The open methods always set it
+    // to true, and the methods to output items always set it to
+    // false. This way, the item and close methods can always know
+    // whether or not a first item is being written. The intended mode
+    // of operation is to start with `bool first = true` (though it
+    // doesn't matter how it's initialized) and just pass the same
+    // `first` through to all the methods, letting the JSON object use
+    // it to keep track of when it's writing a first object and when
+    // it's not.
+
+    // Open methods ignore the value of first and set it to false
+    QPDF_DLL
+    static void writeDictionaryOpen(Pipeline*, bool& first, size_t depth = 0);
+    QPDF_DLL
+    static void writeArrayOpen(Pipeline*, bool& first, size_t depth = 0);
+    // Close methods don't modify first. A true value indicates that
+    // we are closing an empty object.
+    QPDF_DLL
+    static void writeDictionaryClose(Pipeline*, bool first, size_t depth = 0);
+    QPDF_DLL
+    static void writeArrayClose(Pipeline*, bool first, size_t depth = 0);
+    // The item methods use the value of first to determine if this is
+    // the first item and always set it to false.
+    QPDF_DLL
+    static void writeDictionaryItem(
+        Pipeline*,
+        bool& first,
+        std::string const& key,
+        JSON const& value,
+        size_t depth = 0);
+    QPDF_DLL
+    static void writeArrayItem(
+        Pipeline*, bool& first, JSON const& element, size_t depth = 0);
 
     // The JSON spec calls dictionaries "objects", but that creates
     // too much confusion when referring to instances of the JSON
@@ -224,29 +268,33 @@ class JSON
 
   private:
     static std::string encode_string(std::string const& utf8);
+    static void
+    writeClose(Pipeline* p, bool first, size_t depth, char const* delimeter);
+    static void writeIndent(Pipeline* p, size_t depth);
+    static void writeNext(Pipeline* p, bool& first, size_t depth);
 
     struct JSON_value
     {
         virtual ~JSON_value() = default;
-        virtual std::string unparse(size_t depth) const = 0;
+        virtual void write(Pipeline*, size_t depth) const = 0;
     };
     struct JSON_dictionary: public JSON_value
     {
         virtual ~JSON_dictionary() = default;
-        virtual std::string unparse(size_t depth) const;
+        virtual void write(Pipeline*, size_t depth) const;
         std::map<std::string, std::shared_ptr<JSON_value>> members;
     };
     struct JSON_array: public JSON_value
     {
         virtual ~JSON_array() = default;
-        virtual std::string unparse(size_t depth) const;
+        virtual void write(Pipeline*, size_t depth) const;
         std::vector<std::shared_ptr<JSON_value>> elements;
     };
     struct JSON_string: public JSON_value
     {
         JSON_string(std::string const& utf8);
         virtual ~JSON_string() = default;
-        virtual std::string unparse(size_t depth) const;
+        virtual void write(Pipeline*, size_t depth) const;
         std::string utf8;
         std::string encoded;
     };
@@ -256,20 +304,20 @@ class JSON
         JSON_number(double val);
         JSON_number(std::string const& val);
         virtual ~JSON_number() = default;
-        virtual std::string unparse(size_t depth) const;
+        virtual void write(Pipeline*, size_t depth) const;
         std::string encoded;
     };
     struct JSON_bool: public JSON_value
     {
         JSON_bool(bool val);
         virtual ~JSON_bool() = default;
-        virtual std::string unparse(size_t depth) const;
+        virtual void write(Pipeline*, size_t depth) const;
         bool value;
     };
     struct JSON_null: public JSON_value
     {
         virtual ~JSON_null() = default;
-        virtual std::string unparse(size_t depth) const;
+        virtual void write(Pipeline*, size_t depth) const;
     };
 
     JSON(std::shared_ptr<JSON_value>);
