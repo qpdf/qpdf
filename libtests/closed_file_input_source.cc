@@ -73,8 +73,7 @@ main()
     do_tests(&cf2);
     cf2.stayOpen(false);
     std::cout << "testing with FileInputSource\n";
-    FileInputSource f;
-    f.setFilename("input");
+    FileInputSource f("input");
     do_tests(&f);
     std::cout << "all assertions passed" << std::endl;
     return 0;

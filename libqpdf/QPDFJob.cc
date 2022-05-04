@@ -2445,9 +2445,9 @@ QPDFJob::handlePageSpecs(
                 cis->stayOpen(true);
             } else {
                 QTC::TC("qpdf", "QPDFJob keep files open y");
-                FileInputSource* fis = new FileInputSource();
+                FileInputSource* fis =
+                    new FileInputSource(page_spec.filename.c_str());
                 is = std::shared_ptr<InputSource>(fis);
-                fis->setFilename(page_spec.filename.c_str());
             }
             std::shared_ptr<QPDF> qpdf_ph =
                 processInputSource(is, password, true);

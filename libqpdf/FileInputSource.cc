@@ -23,6 +23,19 @@ FileInputSource::FileInputSource() :
 {
 }
 
+FileInputSource::FileInputSource(char const* filename) :
+    m(new Members(false))
+{
+    setFilename(filename);
+}
+
+FileInputSource::FileInputSource(
+    char const* description, FILE* filep, bool close_file) :
+    m(new Members(false))
+{
+    setFile(description, filep, close_file);
+}
+
 void
 FileInputSource::setFilename(char const* filename)
 {

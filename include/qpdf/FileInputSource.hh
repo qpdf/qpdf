@@ -30,6 +30,10 @@ class QPDF_DLL_CLASS FileInputSource: public InputSource
     QPDF_DLL
     FileInputSource();
     QPDF_DLL
+    FileInputSource(char const* filename);
+    QPDF_DLL
+    FileInputSource(char const* description, FILE* filep, bool close_file);
+    QPDF_DLL
     void setFilename(char const* filename);
     QPDF_DLL
     void setFile(char const* description, FILE* filep, bool close_file);

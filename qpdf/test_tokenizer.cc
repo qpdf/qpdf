@@ -191,8 +191,7 @@ process(char const* filename, bool include_ignorable, size_t max_len)
     std::shared_ptr<InputSource> is;
 
     // Tokenize file, skipping streams
-    FileInputSource* fis = new FileInputSource();
-    fis->setFilename(filename);
+    FileInputSource* fis = new FileInputSource(filename);
     is = std::shared_ptr<InputSource>(fis);
     dump_tokens(is, "FILE", max_len, include_ignorable, true, false);
 

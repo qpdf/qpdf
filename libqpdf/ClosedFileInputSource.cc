@@ -24,8 +24,8 @@ void
 ClosedFileInputSource::before()
 {
     if (0 == this->m->fis.get()) {
-        this->m->fis = std::make_shared<FileInputSource>();
-        this->m->fis->setFilename(this->m->filename.c_str());
+        this->m->fis =
+            std::make_shared<FileInputSource>(this->m->filename.c_str());
         this->m->fis->seek(this->m->offset, SEEK_SET);
         this->m->fis->setLastOffset(this->last_offset);
     }
