@@ -1,6 +1,7 @@
 #include <qpdf/assert_test.h>
 
 #include <qpdf/JSON.hh>
+#include <qpdf/Pipeline.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <iostream>
 
@@ -113,6 +114,19 @@ test_main()
         {"c", "[\n  true\n]"},
     };
     assert(dvalue == xdvalue);
+    auto blob_data = [](Pipeline* p) {
+        *p << "\x01\x02\x03\x04\x05\xff\xfe\xfd\xfc\xfb";
+    };
+    JSON jblob = JSON::makeDictionary();
+    jblob.addDictionaryMember("normal", JSON::parse(R"("string")"));
+    jblob.addDictionaryMember("blob", JSON::makeBlob(blob_data));
+    // cSpell:ignore AQIDBAX
+    check(
+        jblob,
+        "{\n"
+        "  \"blob\": \"AQIDBAX//v38+w==\",\n"
+        "  \"normal\": \"string\"\n"
+        "}");
 }
 
 static void

@@ -51,11 +51,6 @@ library, when context is available, to have a pipeline rather than a
 FILE* or std::ostream. This makes it possible for people to capture
 output more flexibly.
 
-Have a json blob defined by a function that takes a pipeline and
-writes data to the pipeline. It's writer should create a Pl_Base64 ->
-Pl_Concatenate in front of the pipeline passed to write and call the
-function with that.
-
 For json output, do not unparse to string. Use the writers instead.
 Write incrementally. This changes ordering only, but we should be able
 manually update the test output for those cases. Objects should be

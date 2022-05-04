@@ -122,6 +122,13 @@ class JSON
     QPDF_DLL
     static JSON makeNull();
 
+    // A blob serializes as a string. The function will be called by
+    // JSON with a pipeline and should write binary data to the
+    // pipeline but not call finish(). JSON will call finish() at the
+    // right time.
+    QPDF_DLL
+    static JSON makeBlob(std::function<void(Pipeline*)>);
+
     QPDF_DLL
     bool isArray() const;
 
@@ -322,6 +329,13 @@ class JSON
     {
         virtual ~JSON_null() = default;
         virtual void write(Pipeline*, size_t depth) const;
+    };
+    struct JSON_blob: public JSON_value
+    {
+        JSON_blob(std::function<void(Pipeline*)> fn);
+        virtual ~JSON_blob() = default;
+        virtual void write(Pipeline*, size_t depth) const;
+        std::function<void(Pipeline*)> fn;
     };
 
     JSON(std::shared_ptr<JSON_value>);

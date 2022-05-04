@@ -1,6 +1,8 @@
 #include <qpdf/JSON.hh>
 
 #include <qpdf/BufferInputSource.hh>
+#include <qpdf/Pl_Base64.hh>
+#include <qpdf/Pl_Concatenate.hh>
 #include <qpdf/Pl_String.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -168,6 +170,22 @@ JSON::JSON_null::write(Pipeline* p, size_t) const
     *p << "null";
 }
 
+JSON::JSON_blob::JSON_blob(std::function<void(Pipeline*)> fn) :
+    fn(fn)
+{
+}
+
+void
+JSON::JSON_blob::write(Pipeline* p, size_t) const
+{
+    *p << "\"";
+    Pl_Concatenate cat("blob concatenate", p);
+    Pl_Base64 base64("blob base64", &cat, Pl_Base64::a_encode);
+    fn(&base64);
+    base64.finish();
+    *p << "\"";
+}
+
 void
 JSON::write(Pipeline* p, size_t depth) const
 {
@@ -304,6 +322,12 @@ JSON
 JSON::makeNull()
 {
     return JSON(std::make_shared<JSON_null>());
+}
+
+JSON
+JSON::makeBlob(std::function<void(Pipeline*)> fn)
+{
+    return JSON(std::make_shared<JSON_blob>(fn));
 }
 
 bool

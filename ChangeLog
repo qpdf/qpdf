@@ -1,5 +1,9 @@
 2022-05-04  Jay Berkenbilt  <ejb@ql.org>
 
+        * JSON: add a new "blob" type that takes a function to write data
+        into. The blob is serialized as a base64-encoded representation of
+        whatever is written to the function.
+
         * FileInputSource has new constructors that eliminate the need to
         call setFilename or setFile in most cases.
 
