@@ -1041,9 +1041,6 @@ QPDFJob::getWantedJSONObjects()
 void
 QPDFJob::doJSONObjects(QPDF& pdf, JSON& j)
 {
-    // Add all objects. Do this first before other code below modifies
-    // things by doing stuff like calling
-    // pushInheritedAttributesToPage.
     bool all_objects = m->json_objects.empty();
     std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
     JSON j_objects = j.addDictionaryMember("objects", JSON::makeDictionary());
@@ -1062,8 +1059,6 @@ QPDFJob::doJSONObjects(QPDF& pdf, JSON& j)
 void
 QPDFJob::doJSONObjectinfo(QPDF& pdf, JSON& j)
 {
-    // Do this first before other code below modifies things by doing
-    // stuff like calling pushInheritedAttributesToPage.
     bool all_objects = m->json_objects.empty();
     std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
     JSON j_objectinfo =
@@ -1095,7 +1090,6 @@ QPDFJob::doJSONPages(QPDF& pdf, JSON& j)
     QPDFPageDocumentHelper pdh(pdf);
     QPDFPageLabelDocumentHelper pldh(pdf);
     QPDFOutlineDocumentHelper odh(pdf);
-    pdh.pushInheritedAttributesToPage();
     std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
     int pageno = -1;
     for (auto& ph: pages) {
@@ -1624,7 +1618,9 @@ QPDFJob::doJSON(QPDF& pdf)
     bool all_keys = m->json_keys.empty();
     // The list of selectable top-level keys id duplicated in the
     // following places: job.yml, QPDFJob::json_schema, and
-    // QPDFJob::doJSON.
+    // QPDFJob::doJSON. We do objects and objectinfo first so they
+    // reflect the original file without any side effects caused by
+    // other operations, such as repairing the pages tree.
     if (all_keys || m->json_keys.count("objects")) {
         doJSONObjects(pdf, j);
     }
