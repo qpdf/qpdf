@@ -1,37 +1,4 @@
 {
-  "acroform": {
-    "fields": [],
-    "hasacroform": false,
-    "needappearances": false
-  },
-  "attachments": {},
-  "encrypt": {
-    "capabilities": {
-      "accessibility": true,
-      "extract": true,
-      "moddifyannotations": true,
-      "modify": true,
-      "modifyassembly": true,
-      "modifyforms": true,
-      "modifyother": true,
-      "printhigh": true,
-      "printlow": true
-    },
-    "encrypted": false,
-    "ownerpasswordmatched": false,
-    "parameters": {
-      "P": 0,
-      "R": 0,
-      "V": 0,
-      "bits": 0,
-      "filemethod": "none",
-      "key": null,
-      "method": "none",
-      "streammethod": "none",
-      "stringmethod": "none"
-    },
-    "userpasswordmatched": false
-  },
   "objectinfo": {
     "1 0 R": {
       "stream": {
@@ -186,40 +153,6 @@
       "/Size": 11
     }
   },
-  "outlines": [],
-  "pagelabels": [],
-  "pages": [
-    {
-      "contents": [
-        "6 0 R"
-      ],
-      "images": [],
-      "label": null,
-      "object": "4 0 R",
-      "outlines": [],
-      "pageposfrom1": 1
-    },
-    {
-      "contents": [
-        "6 0 R"
-      ],
-      "images": [],
-      "label": null,
-      "object": "11 0 R",
-      "outlines": [],
-      "pageposfrom1": 2
-    },
-    {
-      "contents": [
-        "9 0 R"
-      ],
-      "images": [],
-      "label": null,
-      "object": "5 0 R",
-      "outlines": [],
-      "pageposfrom1": 3
-    }
-  ],
   "parameters": {
     "decodelevel": "generalized"
   },

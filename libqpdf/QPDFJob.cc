@@ -1618,15 +1618,7 @@ QPDFJob::doJSON(QPDF& pdf)
     bool all_keys = m->json_keys.empty();
     // The list of selectable top-level keys id duplicated in the
     // following places: job.yml, QPDFJob::json_schema, and
-    // QPDFJob::doJSON. We do objects and objectinfo first so they
-    // reflect the original file without any side effects caused by
-    // other operations, such as repairing the pages tree.
-    if (all_keys || m->json_keys.count("objects")) {
-        doJSONObjects(pdf, j);
-    }
-    if (all_keys || m->json_keys.count("objectinfo")) {
-        doJSONObjectinfo(pdf, j);
-    }
+    // QPDFJob::doJSON.
     if (all_keys || m->json_keys.count("pages")) {
         doJSONPages(pdf, j);
     }
@@ -1644,6 +1636,17 @@ QPDFJob::doJSON(QPDF& pdf)
     }
     if (all_keys || m->json_keys.count("attachments")) {
         doJSONAttachments(pdf, j);
+    }
+
+    // We do objects and objectinfo last so their information is
+    // consistent with repairing the page tree. To see the original
+    // file with any page tree problems and the page tree not
+    // flattened, select objects/objectinfo without other keys.
+    if (all_keys || m->json_keys.count("objects")) {
+        doJSONObjects(pdf, j);
+    }
+    if (all_keys || m->json_keys.count("objectinfo")) {
+        doJSONObjectinfo(pdf, j);
     }
 
     // Check against schema

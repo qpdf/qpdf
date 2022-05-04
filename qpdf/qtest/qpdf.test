@@ -2829,7 +2829,7 @@ $td->runtest("check output",
 show_ntests();
 # ----------
 $td->notify("--- Page Tree Issues ---");
-$n_tests += 9;
+$n_tests += 11;
 
 $td->runtest("linearize duplicated pages",
              {$td->COMMAND =>
@@ -2864,14 +2864,22 @@ $td->runtest("show direct pages",
              $td->NORMALIZE_NEWLINES);
 
 # Json mode for direct and duplicated pages illustrates that the
-# "objects" section still shows the original objects before correction
-# but the "pages" section shows the pages with their new object
-# numbers.
+# "objects" section the original objects before correction when
+# "pages" is not output but after correct when it is.# numbers.
 foreach my $f (qw(page_api_2 direct-pages))
 {
-    $td->runtest("json for $f",
-                 {$td->COMMAND => "qpdf --json=latest $f.pdf"},
-                 {$td->FILE => "$f-json.out", $td->EXIT_STATUS => 0},
+    $td->runtest("json for $f (objects only)",
+                 {$td->COMMAND =>
+                      "qpdf --json=latest $f.pdf" .
+                      " --json-key=objects --json-key=objectinfo"},
+                 {$td->FILE => "$f-json-objects.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("json for $f (with pages)",
+                 {$td->COMMAND =>
+                      "qpdf --json=latest $f.pdf" .
+                      " --json-key=objects --json-key=objectinfo" .
+                      " --json-key=pages"},
+                 {$td->FILE => "$f-json-pages.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 }
 

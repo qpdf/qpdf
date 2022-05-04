@@ -147,6 +147,16 @@ For the most part, the built-in JSON help tells you everything you need
 to know about the JSON format, but there are a few non-obvious things to
 be aware of:
 
+- If a PDF file has certain types of errors in its pages tree (such as
+  page objects that are direct or multiple pages sharing the same
+  object ID), qpdf will automatically repair the pages tree. If you
+  specify ``"objects"`` and/or ``"objectinfo"`` without any other
+  keys, you will see the original pages tree without any corrections.
+  If you specify any of keys that require page tree traversal (for
+  example, ``"pages"``, ``"outlines"``, or ``"pagelabel"``), then
+  ``"objects"`` and ``"objectinfo"`` will show the repaired page tree
+  so that object references will be consistent throughout the file.
+
 - While qpdf guarantees that keys present in the help will be present
   in the output, those fields may be null or empty if the information
   is not known or absent in the file. Also, if you specify

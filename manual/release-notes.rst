@@ -125,6 +125,13 @@ For a detailed list of changes, please see the file
 
   - Other changes
 
+    - In JSON v1 mode, the ``"objects"`` key now reflects the repaired
+      pages tree if ``"pages"`` (or any other key that has the side
+      effect of repairing the page tree) is specified. To see the
+      original objects with any unrepaired page tree errors, specify
+      ``"objects"`` and/or ``"objectinfo"`` by themselves. This is
+      consistent with how JSON v2 behaves.
+
     - A new chapter on contributing to qpdf has been added to the
       documentation. See :ref:`contributing`.
 

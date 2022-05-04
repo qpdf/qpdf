@@ -1,3 +1,14 @@
+2022-05-04  Jay Berkenbilt  <ejb@ql.org>
+
+        * json v1 output: make "pages" and "objects" consistent.
+        Previously, "objects" always reflected the objects exactly as they
+        appeared in the original file, while "pages" reflected objects
+        after repair of the pages tree. This could be misleading. Now, if
+        "pages" is specified, "objects" shows the effects of repairing the
+        page tree, and if not, it doesn't. This makes no difference for
+        correct PDF files that don't have problems in the pages tree. JSON
+        v2 will behave in a similar way.
+
 2022-05-03  Jay Berkenbilt  <ejb@ql.org>
 
         * Add new Pipeline class Pl_String which appends to a std::string&
