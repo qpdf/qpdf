@@ -1,3 +1,4 @@
+#include <qpdf/FileInputSource.hh>
 #include <qpdf/JSON.hh>
 #include <qpdf/QUtil.hh>
 #include <cstdlib>
@@ -103,11 +104,8 @@ main(int argc, char* argv[])
         }
     }
     try {
-        std::shared_ptr<char> buf;
-        size_t size;
-        QUtil::read_file_into_memory(filename, buf, size);
-        std::string s(buf.get(), size);
-        std::cout << JSON::parse(s, reactor.get()).unparse() << std::endl;
+        FileInputSource is(filename);
+        std::cout << JSON::parse(is, reactor.get()).unparse() << std::endl;
     } catch (std::exception& e) {
         std::cerr << "exception: " << filename << ": " << e.what() << std::endl;
         return 2;

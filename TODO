@@ -51,9 +51,6 @@ library, when context is available, to have a pipeline rather than a
 FILE* or std::ostream. This makes it possible for people to capture
 output more flexibly.
 
-JSON::parse should work from an InputSource. BufferInputSource can
-already start with a std::string.
-
 Have a json blob defined by a function that takes a pipeline and
 writes data to the pipeline. It's writer should create a Pl_Base64 ->
 Pl_Concatenate in front of the pipeline passed to write and call the

@@ -46,6 +46,7 @@
 #include <vector>
 
 class Pipeline;
+class InputSource;
 
 class JSON
 {
@@ -249,10 +250,13 @@ class JSON
         virtual bool arrayItem(JSON const& value) = 0;
     };
 
-    // Create a JSON object from a string. See above for information
-    // about how to use the Reactor.
+    // Create a JSON object from a string.
     QPDF_DLL
-    static JSON parse(std::string const&, Reactor* reactor = nullptr);
+    static JSON parse(std::string const&);
+    // Create a JSON object from an input source. See above for
+    // information about how to use the Reactor.
+    QPDF_DLL
+    static JSON parse(InputSource&, Reactor* reactor = nullptr);
 
     // parse calls setOffsets to set the inclusive start and
     // non-inclusive end offsets of an object relative to its input

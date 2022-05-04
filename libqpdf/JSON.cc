@@ -1,8 +1,7 @@
 #include <qpdf/JSON.hh>
 
-#include <qpdf/Pipeline.hh>
+#include <qpdf/BufferInputSource.hh>
 #include <qpdf/Pl_String.hh>
-#include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <cstring>
@@ -521,7 +520,8 @@ namespace
     class JSONParser
     {
       public:
-        JSONParser(JSON::Reactor* reactor) :
+        JSONParser(InputSource& is, JSON::Reactor* reactor) :
+            is(is),
             reactor(reactor),
             lex_state(ls_top),
             number_before_point(0),
@@ -529,16 +529,16 @@ namespace
             number_after_e(0),
             number_saw_point(false),
             number_saw_e(false),
-            cstr(nullptr),
-            end(nullptr),
-            tok_start(nullptr),
-            tok_end(nullptr),
-            p(nullptr),
+            bytes(0),
+            p(buf),
+            u_count(0),
+            offset(0),
+            done(false),
             parser_state(ps_top)
         {
         }
 
-        std::shared_ptr<JSON> parse(std::string const& s);
+        std::shared_ptr<JSON> parse();
 
       private:
         void getToken();
@@ -564,8 +564,10 @@ namespace
             ls_alpha,
             ls_string,
             ls_backslash,
+            ls_u4,
         };
 
+        InputSource& is;
         JSON::Reactor* reactor;
         lex_state_e lex_state;
         size_t number_before_point;
@@ -573,11 +575,13 @@ namespace
         size_t number_after_e;
         bool number_saw_point;
         bool number_saw_e;
-        char const* cstr;
-        char const* end;
-        char const* tok_start;
-        char const* tok_end;
+        char buf[16384];
+        size_t bytes;
         char const* p;
+        size_t u_count;
+        size_t offset;
+        bool done;
+        std::string token;
         parser_state_e parser_state;
         std::vector<std::shared_ptr<JSON>> stack;
         std::vector<parser_state_e> ps_stack;
@@ -661,28 +665,35 @@ JSONParser::decode_string(std::string const& str)
 void
 JSONParser::getToken()
 {
-    while (p < end) {
+    enum { append, ignore, reread } action = append;
+    bool ready = false;
+    token.clear();
+    while (!done) {
+        if (p == (buf + bytes)) {
+            p = buf;
+            bytes = is.read(buf, sizeof(buf));
+            if (bytes == 0) {
+                done = true;
+                break;
+            }
+        }
+
         if (*p == 0) {
             QTC::TC("libtests", "JSON parse null character");
             throw std::runtime_error(
                 "JSON: null character at offset " +
-                QUtil::int_to_string(p - cstr));
+                QUtil::uint_to_string(offset));
         }
+        action = append;
         switch (lex_state) {
         case ls_top:
             if (*p == '"') {
-                tok_start = p;
-                tok_end = nullptr;
                 lex_state = ls_string;
             } else if (QUtil::is_space(*p)) {
-                // ignore
+                action = ignore;
             } else if ((*p >= 'a') && (*p <= 'z')) {
-                tok_start = p;
-                tok_end = nullptr;
                 lex_state = ls_alpha;
             } else if (*p == '-') {
-                tok_start = p;
-                tok_end = nullptr;
                 lex_state = ls_number;
                 number_before_point = 0;
                 number_after_point = 0;
@@ -690,8 +701,6 @@ JSONParser::getToken()
                 number_saw_point = false;
                 number_saw_e = false;
             } else if ((*p >= '0') && (*p <= '9')) {
-                tok_start = p;
-                tok_end = nullptr;
                 lex_state = ls_number;
                 number_before_point = 1;
                 number_after_point = 0;
@@ -699,8 +708,6 @@ JSONParser::getToken()
                 number_saw_point = false;
                 number_saw_e = false;
             } else if (*p == '.') {
-                tok_start = p;
-                tok_end = nullptr;
                 lex_state = ls_number;
                 number_before_point = 0;
                 number_after_point = 0;
@@ -708,12 +715,11 @@ JSONParser::getToken()
                 number_saw_point = true;
                 number_saw_e = false;
             } else if (strchr("{}[]:,", *p)) {
-                tok_start = p;
-                tok_end = p + 1;
+                ready = true;
             } else {
                 QTC::TC("libtests", "JSON parse bad character");
                 throw std::runtime_error(
-                    "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                    "JSON: offset " + QUtil::uint_to_string(offset) +
                     ": unexpected character " + std::string(p, 1));
             }
             break;
@@ -731,12 +737,12 @@ JSONParser::getToken()
                 if (number_saw_e) {
                     QTC::TC("libtests", "JSON parse point after e");
                     throw std::runtime_error(
-                        "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                        "JSON: offset " + QUtil::uint_to_string(offset) +
                         ": numeric literal: decimal point after e");
                 } else if (number_saw_point) {
                     QTC::TC("libtests", "JSON parse duplicate point");
                     throw std::runtime_error(
-                        "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                        "JSON: offset " + QUtil::uint_to_string(offset) +
                         ": numeric literal: decimal point already seen");
                 } else {
                     number_saw_point = true;
@@ -745,7 +751,7 @@ JSONParser::getToken()
                 if (number_saw_e) {
                     QTC::TC("libtests", "JSON parse duplicate e");
                     throw std::runtime_error(
-                        "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                        "JSON: offset " + QUtil::uint_to_string(offset) +
                         ": numeric literal: e already seen");
                 } else {
                     number_saw_e = true;
@@ -756,18 +762,19 @@ JSONParser::getToken()
                 } else {
                     QTC::TC("libtests", "JSON parse unexpected sign");
                     throw std::runtime_error(
-                        "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                        "JSON: offset " + QUtil::uint_to_string(offset) +
                         ": numeric literal: unexpected sign");
                 }
             } else if (QUtil::is_space(*p)) {
-                tok_end = p;
+                action = ignore;
+                ready = true;
             } else if (strchr("{}[]:,", *p)) {
-                tok_end = p;
-                --p;
+                action = reread;
+                ready = true;
             } else {
                 QTC::TC("libtests", "JSON parse numeric bad character");
                 throw std::runtime_error(
-                    "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                    "JSON: offset " + QUtil::uint_to_string(offset) +
                     ": numeric literal: unexpected character " +
                     std::string(p, 1));
             }
@@ -777,21 +784,22 @@ JSONParser::getToken()
             if ((*p >= 'a') && (*p <= 'z')) {
                 // okay
             } else if (QUtil::is_space(*p)) {
-                tok_end = p;
+                action = ignore;
+                ready = true;
             } else if (strchr("{}[]:,", *p)) {
-                tok_end = p;
-                --p;
+                action = reread;
+                ready = true;
             } else {
                 QTC::TC("libtests", "JSON parse keyword bad character");
                 throw std::runtime_error(
-                    "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                    "JSON: offset " + QUtil::uint_to_string(offset) +
                     ": keyword: unexpected character " + std::string(p, 1));
             }
             break;
 
         case ls_string:
             if (*p == '"') {
-                tok_end = p + 1;
+                ready = true;
             } else if (*p == '\\') {
                 lex_state = ls_backslash;
             }
@@ -802,56 +810,70 @@ JSONParser::getToken()
             if (strchr("\\\"/bfnrt", *p)) {
                 lex_state = ls_string;
             } else if (*p == 'u') {
-                if (p + 4 >= end) {
-                    QTC::TC("libtests", "JSON parse premature end of u");
-                    throw std::runtime_error(
-                        "JSON: offset " + QUtil::int_to_string(p - cstr) +
-                        ": \\u must be followed by four characters");
-                }
-                for (size_t i = 1; i <= 4; ++i) {
-                    if (!QUtil::is_hex_digit(p[i])) {
-                        QTC::TC("libtests", "JSON parse bad hex after u");
-                        throw std::runtime_error(
-                            "JSON: offset " + QUtil::int_to_string(p - cstr) +
-                            ": \\u must be followed by four hex digits");
-                    }
-                }
-                p += 4;
-                lex_state = ls_string;
+                lex_state = ls_u4;
+                u_count = 0;
             } else {
                 QTC::TC("libtests", "JSON parse backslash bad character");
                 throw std::runtime_error(
-                    "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                    "JSON: offset " + QUtil::uint_to_string(offset) +
                     ": invalid character after backslash: " +
                     std::string(p, 1));
             }
             break;
+
+        case ls_u4:
+            if (!QUtil::is_hex_digit(*p)) {
+                QTC::TC("libtests", "JSON parse bad hex after u");
+                throw std::runtime_error(
+                    "JSON: offset " +
+                    QUtil::uint_to_string(offset - u_count - 1) +
+                    ": \\u must be followed by four hex digits");
+            }
+            if (++u_count == 4) {
+                lex_state = ls_string;
+            }
+            break;
         }
-        ++p;
-        if (tok_start && tok_end) {
+        switch (action) {
+        case reread:
+            break;
+        case append:
+            token.append(1, *p);
+            // fall through
+        case ignore:
+            ++p;
+            ++offset;
+            break;
+        }
+        if (ready) {
             break;
         }
     }
-    if (p == end) {
-        if (tok_start && (!tok_end)) {
+    if (done) {
+        if ((!token.empty()) && (!ready)) {
             switch (lex_state) {
             case ls_top:
                 // Can't happen
-                throw std::logic_error(
-                    "tok_start set in ls_top while parsing " +
-                    std::string(cstr));
+                throw std::logic_error("tok_start set in ls_top while parsing");
                 break;
 
             case ls_number:
             case ls_alpha:
-                tok_end = p;
+                // okay
                 break;
+
+            case ls_u4:
+                QTC::TC("libtests", "JSON parse premature end of u");
+                throw std::runtime_error(
+                    "JSON: offset " +
+                    QUtil::uint_to_string(offset - u_count - 1) +
+                    ": \\u must be followed by four characters");
 
             case ls_string:
             case ls_backslash:
                 QTC::TC("libtests", "JSON parse unterminated string");
                 throw std::runtime_error(
-                    "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                    "JSON: offset " + QUtil::uint_to_string(offset) +
                     ": unterminated string");
                 break;
             }
@@ -862,28 +884,25 @@ JSONParser::getToken()
 void
 JSONParser::handleToken()
 {
-    if (!(tok_start && tok_end)) {
+    if (token.empty()) {
         return;
     }
-
-    // Get token value.
-    std::string value(tok_start, tok_end);
 
     if (parser_state == ps_done) {
         QTC::TC("libtests", "JSON parse junk after object");
         throw std::runtime_error(
-            "JSON: offset " + QUtil::int_to_string(p - cstr) +
-            ": material follows end of object: " + value);
+            "JSON: offset " + QUtil::uint_to_string(offset) +
+            ": material follows end of object: " + token);
     }
 
     // Git string value
     std::string s_value;
     if (lex_state == ls_string) {
         // Token includes the quotation marks
-        if (tok_end - tok_start < 2) {
+        if (token.length() < 2) {
             throw std::logic_error("JSON string length < 2");
         }
-        s_value = decode_string(value);
+        s_value = decode_string(token);
     }
     // Based on the lexical state and value, figure out whether we are
     // looking at an item or a delimiter. It will always be exactly
@@ -891,12 +910,14 @@ JSONParser::handleToken()
 
     std::shared_ptr<JSON> item;
     char delimiter = '\0';
+    // Already verified that token is not empty
+    char first_char = token.at(0);
     switch (lex_state) {
     case ls_top:
-        switch (*tok_start) {
+        switch (first_char) {
         case '{':
             item = std::make_shared<JSON>(JSON::makeDictionary());
-            item->setStart(QIntC::to_size(tok_start - cstr));
+            item->setStart(offset - token.length());
             if (reactor) {
                 reactor->dictionaryStart();
             }
@@ -904,14 +925,14 @@ JSONParser::handleToken()
 
         case '[':
             item = std::make_shared<JSON>(JSON::makeArray());
-            item->setStart(QIntC::to_size(tok_start - cstr));
+            item->setStart(offset - token.length());
             if (reactor) {
                 reactor->arrayStart();
             }
             break;
 
         default:
-            delimiter = *tok_start;
+            delimiter = first_char;
             break;
         }
         break;
@@ -920,38 +941,38 @@ JSONParser::handleToken()
         if (number_saw_point && (number_after_point == 0)) {
             QTC::TC("libtests", "JSON parse decimal with no digits");
             throw std::runtime_error(
-                "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                "JSON: offset " + QUtil::uint_to_string(offset) +
                 ": decimal point with no digits");
         }
         if ((number_before_point > 1) &&
-            ((tok_start[0] == '0') ||
-             ((tok_start[0] == '-') && (tok_start[1] == '0')))) {
+            ((first_char == '0') ||
+             ((first_char == '-') && (token.at(1) == '0')))) {
             QTC::TC("libtests", "JSON parse leading zero");
             throw std::runtime_error(
-                "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                "JSON: offset " + QUtil::uint_to_string(offset) +
                 ": number with leading zero");
         }
         if ((number_before_point == 0) && (number_after_point == 0)) {
             QTC::TC("libtests", "JSON parse number no digits");
             throw std::runtime_error(
-                "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                "JSON: offset " + QUtil::uint_to_string(offset) +
                 ": number with no digits");
         }
-        item = std::make_shared<JSON>(JSON::makeNumber(value));
+        item = std::make_shared<JSON>(JSON::makeNumber(token));
         break;
 
     case ls_alpha:
-        if (value == "true") {
+        if (token == "true") {
             item = std::make_shared<JSON>(JSON::makeBool(true));
-        } else if (value == "false") {
+        } else if (token == "false") {
             item = std::make_shared<JSON>(JSON::makeBool(false));
-        } else if (value == "null") {
+        } else if (token == "null") {
             item = std::make_shared<JSON>(JSON::makeNull());
         } else {
             QTC::TC("libtests", "JSON parse invalid keyword");
             throw std::runtime_error(
-                "JSON: offset " + QUtil::int_to_string(p - cstr) +
-                ": invalid keyword " + value);
+                "JSON: offset " + QUtil::uint_to_string(offset) +
+                ": invalid keyword " + token);
         }
         break;
 
@@ -960,7 +981,9 @@ JSONParser::handleToken()
         break;
 
     case ls_backslash:
-        throw std::logic_error("tok_end is set while state = ls_backslash");
+    case ls_u4:
+        throw std::logic_error(
+            "tok_end is set while state = ls_backslash or ls_u4");
         break;
     }
 
@@ -981,21 +1004,21 @@ JSONParser::handleToken()
         case ps_dict_after_key:
             QTC::TC("libtests", "JSON parse expected colon");
             throw std::runtime_error(
-                "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                "JSON: offset " + QUtil::uint_to_string(offset) +
                 ": expected ':'");
             break;
 
         case ps_dict_after_item:
             QTC::TC("libtests", "JSON parse expected , or }");
             throw std::runtime_error(
-                "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                "JSON: offset " + QUtil::uint_to_string(offset) +
                 ": expected ',' or '}'");
             break;
 
         case ps_array_after_item:
             QTC::TC("libtests", "JSON parse expected, or ]");
             throw std::runtime_error(
-                "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                "JSON: offset " + QUtil::uint_to_string(offset) +
                 ": expected ',' or ']'");
             break;
 
@@ -1004,7 +1027,7 @@ JSONParser::handleToken()
             if (lex_state != ls_string) {
                 QTC::TC("libtests", "JSON parse string as dict key");
                 throw std::runtime_error(
-                    "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                    "JSON: offset " + QUtil::uint_to_string(offset) +
                     ": expect string as dictionary key");
             }
             break;
@@ -1023,7 +1046,7 @@ JSONParser::handleToken()
         {
             QTC::TC("libtests", "JSON parse unexpected }");
             throw std::runtime_error(
-                "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                "JSON: offset " + QUtil::uint_to_string(offset) +
                 ": unexpected dictionary end delimiter");
         }
     } else if (delimiter == ']') {
@@ -1033,14 +1056,14 @@ JSONParser::handleToken()
         {
             QTC::TC("libtests", "JSON parse unexpected ]");
             throw std::runtime_error(
-                "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                "JSON: offset " + QUtil::uint_to_string(offset) +
                 ": unexpected array end delimiter");
         }
     } else if (delimiter == ':') {
         if (parser_state != ps_dict_after_key) {
             QTC::TC("libtests", "JSON parse unexpected :");
             throw std::runtime_error(
-                "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                "JSON: offset " + QUtil::uint_to_string(offset) +
                 ": unexpected colon");
         }
     } else if (delimiter == ',') {
@@ -1048,7 +1071,7 @@ JSONParser::handleToken()
               (parser_state == ps_array_after_item))) {
             QTC::TC("libtests", "JSON parse unexpected ,");
             throw std::runtime_error(
-                "JSON: offset " + QUtil::int_to_string(p - cstr) +
+                "JSON: offset " + QUtil::uint_to_string(offset) +
                 ": unexpected comma");
         }
     } else if (delimiter != '\0') {
@@ -1074,7 +1097,7 @@ JSONParser::handleToken()
         next_state = ps_stack.back();
         ps_stack.pop_back();
         auto tos = stack.back();
-        tos->setEnd(QIntC::to_size(tok_end - cstr));
+        tos->setEnd(offset);
         if (reactor) {
             reactor->containerEnd(*tos);
         }
@@ -1086,8 +1109,8 @@ JSONParser::handleToken()
             "JSONParser::handleToken: unexpected delimiter in transition");
     } else if (item.get()) {
         if (!(item->isArray() || item->isDictionary())) {
-            item->setStart(QIntC::to_size(tok_start - cstr));
-            item->setEnd(QIntC::to_size(tok_end - cstr));
+            item->setStart(offset - token.length());
+            item->setEnd(offset);
         }
 
         std::shared_ptr<JSON> tos;
@@ -1149,23 +1172,17 @@ JSONParser::handleToken()
     }
     if (ps_stack.size() > 500) {
         throw std::runtime_error(
-            "JSON: offset " + QUtil::int_to_string(p - cstr) +
+            "JSON: offset " + QUtil::uint_to_string(offset) +
             ": maximum object depth exceeded");
     }
     parser_state = next_state;
-    tok_start = nullptr;
-    tok_end = nullptr;
     lex_state = ls_top;
 }
 
 std::shared_ptr<JSON>
-JSONParser::parse(std::string const& s)
+JSONParser::parse()
 {
-    cstr = s.c_str();
-    end = cstr + s.length();
-    p = cstr;
-
-    while (p < end) {
+    while (!done) {
         getToken();
         handleToken();
     }
@@ -1181,10 +1198,18 @@ JSONParser::parse(std::string const& s)
 }
 
 JSON
-JSON::parse(std::string const& s, Reactor* reactor)
+JSON::parse(InputSource& is, Reactor* reactor)
 {
-    JSONParser jp(reactor);
-    return *jp.parse(s);
+    JSONParser jp(is, reactor);
+    return *jp.parse();
+}
+
+JSON
+JSON::parse(std::string const& s)
+{
+    BufferInputSource bis("json input", s);
+    JSONParser jp(bis, nullptr);
+    return *jp.parse();
 }
 
 void
