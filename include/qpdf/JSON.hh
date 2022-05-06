@@ -95,6 +95,13 @@ class JSON
     QPDF_DLL
     static void writeArrayItem(
         Pipeline*, bool& first, JSON const& element, size_t depth = 0);
+    // If writing nested structures incrementally, call writeNext
+    // before opening a new array or container in the midst of an
+    // existing one. The first you pass to writeNext should be the one
+    // for the parent object. Then start a new first for the nested
+    // item.
+    QPDF_DLL
+    static void writeNext(Pipeline* p, bool& first, size_t depth);
 
     // The JSON spec calls dictionaries "objects", but that creates
     // too much confusion when referring to instances of the JSON
@@ -282,7 +289,6 @@ class JSON
     static void
     writeClose(Pipeline* p, bool first, size_t depth, char const* delimeter);
     static void writeIndent(Pipeline* p, size_t depth);
-    static void writeNext(Pipeline* p, bool& first, size_t depth);
 
     struct JSON_value
     {
