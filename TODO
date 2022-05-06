@@ -48,16 +48,6 @@ Soon: Break ground on "Document-level work"
 Output JSON v2
 ==============
 
-Before starting on v2 format:
-
-* Writing objects should write in numerical order with the trailer at
-  the end.
-
-* Having QPDFJob call these methods will change output ordering. We
-  should fix the json test outputs manually (or programmatically from
-  the input), not by overwriting, in case this has any unwanted side
-  effects.
-
 General things to remember:
 
 * deprecate getJSON without a version

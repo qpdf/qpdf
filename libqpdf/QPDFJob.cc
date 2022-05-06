@@ -1066,13 +1066,14 @@ QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
 void
 QPDFJob::doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf)
 {
+    JSON::writeDictionaryKey(p, first, "objectinfo", 0);
+    bool first_object = true;
+    JSON::writeDictionaryOpen(p, first_object, 1);
     bool all_objects = m->json_objects.empty();
     std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
-    JSON j_objectinfo = JSON::makeDictionary();
     for (auto& obj: pdf.getAllObjects()) {
         if (all_objects || wanted_og.count(obj.getObjGen())) {
-            auto j_details = j_objectinfo.addDictionaryMember(
-                obj.unparse(), JSON::makeDictionary());
+            auto j_details = JSON::makeDictionary();
             auto j_stream =
                 j_details.addDictionaryMember("stream", JSON::makeDictionary());
             bool is_stream = obj.isStream();
@@ -1085,9 +1086,11 @@ QPDFJob::doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf)
                 "filter",
                 (is_stream ? obj.getDict().getKey("/Filter").getJSON(true)
                            : JSON::makeNull()));
+            JSON::writeDictionaryItem(
+                p, first_object, obj.unparse(), j_details, 1);
         }
     }
-    JSON::writeDictionaryItem(p, first, "objectinfo", j_objectinfo, 0);
+    JSON::writeDictionaryClose(p, first_object, 1);
 }
 
 void
