@@ -14,6 +14,7 @@
 #include <qpdf/Pl_DCT.hh>
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/Pl_Flate.hh>
+#include <qpdf/Pl_OStream.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -1588,7 +1589,7 @@ QPDFJob::json_out_schema_v1()
 }
 
 void
-QPDFJob::doJSON(QPDF& pdf)
+QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
 {
     JSON j = JSON::makeDictionary();
     // This version is updated every time a non-backward-compatible
@@ -1665,7 +1666,7 @@ ideally with the file that caused the error and the output below. Thanks!\n\
         }
     }
 
-    *(this->m->cout) << j.unparse() << std::endl;
+    *p << j.unparse() << "\n";
 }
 
 void
@@ -1675,7 +1676,9 @@ QPDFJob::doInspection(QPDF& pdf)
         doCheck(pdf);
     }
     if (m->json_version) {
-        doJSON(pdf);
+        Pl_OStream os("stdout", *(this->m->cout));
+        doJSON(pdf, &os);
+        os.finish();
     }
     if (m->show_npages) {
         QTC::TC("qpdf", "QPDFJob npages");

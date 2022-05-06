@@ -39,6 +39,7 @@
 #include <vector>
 
 class QPDFWriter;
+class Pipeline;
 
 class QPDFJob
 {
@@ -509,7 +510,7 @@ class QPDFJob
     void writeOutfile(QPDF& pdf);
 
     // JSON
-    void doJSON(QPDF& pdf);
+    void doJSON(QPDF& pdf, Pipeline*);
     std::set<QPDFObjGen> getWantedJSONObjects();
     void doJSONObjects(QPDF& pdf, JSON& j);
     void doJSONObjectinfo(QPDF& pdf, JSON& j);
