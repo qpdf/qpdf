@@ -50,18 +50,6 @@ Output JSON v2
 
 Before starting on v2 format:
 
-* Some if not all of the json output functionality should move from
-  QPDFJob to QPDF. There can top-level QPDF methods that take a
-  pipeline and write the JSON serialization to it. For things that
-  generate smaller amounts of output (constant-size stuff, lists of
-  attachments), we can also have a version that returns a string. For
-  the benefit of users of other languages, we can have something that
-  takes a FILE* or writes to stdout as well. This would be a good time
-  to make sure all the information from --check and other
-  informational options (--show-linearization, --show-encryption,
-  --show-xref, --list-attachments, --show-npages) is available in the
-  json output.
-
 * Writing objects should write in numerical order with the trailer at
   the end.
 
@@ -70,14 +58,17 @@ Before starting on v2 format:
   the input), not by overwriting, in case this has any unwanted side
   effects.
 
-* Figure out how/whether to do schema checks with incremental write.
-  Consider changing the contract to allow fields to be absent even
-  when present in the schema. It's reasonable for people to check for
-  presence of a key. Most languages make this easy to do.
-
 General things to remember:
 
 * deprecate getJSON without a version
+
+* Make sure all the information from --check and other informational
+  options (--show-linearization, --show-encryption, --show-xref,
+  --list-attachments, --show-npages) is available in the json output.
+
+* Consider changing the contract to allow fields to be absent even
+  when present in the schema. It's reasonable for people to check for
+  presence of a key. Most languages make this easy to do.
 
 * The choices for json_key (job.yml) will be different for v1 and v2.
   That information is already duplicated in multiple places.

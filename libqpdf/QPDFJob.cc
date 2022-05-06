@@ -16,6 +16,7 @@
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_OStream.hh>
 #include <qpdf/Pl_StdioFile.hh>
+#include <qpdf/Pl_String.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
@@ -1592,6 +1593,13 @@ QPDFJob::json_out_schema_v1()
 void
 QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
 {
+    std::string captured_json;
+    std::shared_ptr<Pl_String> pl_str;
+    if (this->m->test_json_schema) {
+        pl_str = std::make_shared<Pl_String>("capture json", p, captured_json);
+        p = pl_str.get();
+    }
+
     JSON j = JSON::makeDictionary();
     // This version is updated every time a non-backward-compatible
     // change is made to the JSON format. Clients of the JSON are to
@@ -1651,23 +1659,22 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
         doJSONObjectinfo(pdf, j);
     }
 
-    // Check against schema
+    *p << j.unparse() << "\n";
 
-    JSON schema = json_schema(&m->json_keys);
-    std::list<std::string> errors;
-    if (!j.checkSchema(schema, errors)) {
-        *(this->m->cerr)
-            << "QPDFJob didn't create JSON that complies with its own rules.\n\
-Please report this as a bug at\n\
-   https://github.com/qpdf/qpdf/issues/new\n\
-ideally with the file that caused the error and the output below. Thanks!\n\
-\n";
-        for (auto const& error: errors) {
-            *(this->m->cerr) << error << std::endl;
+    if (this->m->test_json_schema) {
+        // Check against schema
+        JSON schema = json_schema(&m->json_keys);
+        std::list<std::string> errors;
+        JSON captured = JSON::parse(captured_json);
+        if (!captured.checkSchema(schema, errors)) {
+            *(this->m->cerr) << "QPDFJob didn't create JSON that complies with"
+                                " its own rules."
+                             << std::endl;
+            for (auto const& error: errors) {
+                *(this->m->cerr) << error << std::endl;
+            }
         }
     }
-
-    *p << j.unparse() << "\n";
 }
 
 void

@@ -1124,7 +1124,8 @@ foreach my $d (@json_files)
     }
     my $in = "$file.pdf";
     $td->runtest("json $out",
-                 {$td->COMMAND => ['qpdf', '--json', @$xargs, $in]},
+                 {$td->COMMAND =>
+                      ['qpdf', '--json=1', '--test-json-schema', @$xargs, $in]},
                  {$td->FILE => "$out.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 }

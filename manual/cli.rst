@@ -3336,6 +3336,9 @@ Related Options
 
    This is used by qpdf's test suite to check consistency between the
    output of ``qpdf --json`` and the output of ``qpdf --json-help``.
+   This option causes an extra copy of the generated json to appear in
+   memory and is therefore unsuitable for use with large files. This
+   is why it's also not on by default.
 
 .. _unicode-passwords:
 
