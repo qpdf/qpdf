@@ -1090,7 +1090,10 @@ QPDFJob::doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf)
 void
 QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
 {
-    JSON j_pages = JSON::makeArray();
+    JSON::writeNext(p, first, 0);
+    *p << "\"pages\": ";
+    bool first_page = true;
+    JSON::writeArrayOpen(p, first_page, 1);
     QPDFPageDocumentHelper pdh(pdf);
     QPDFPageLabelDocumentHelper pldh(pdf);
     QPDFOutlineDocumentHelper odh(pdf);
@@ -1098,7 +1101,7 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
     int pageno = -1;
     for (auto& ph: pages) {
         ++pageno;
-        JSON j_page = j_pages.addArrayElement(JSON::makeDictionary());
+        JSON j_page = JSON::makeDictionary();
         QPDFObjectHandle page = ph.getObjectHandle();
         j_page.addDictionaryMember("object", page.getJSON());
         JSON j_images = j_page.addDictionaryMember("images", JSON::makeArray());
@@ -1158,8 +1161,9 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
                 "dest", oiter.getDest().getJSON(true));
         }
         j_page.addDictionaryMember("pageposfrom1", JSON::makeInt(1 + pageno));
+        JSON::writeArrayItem(p, first_page, j_page, 1);
     }
-    JSON::writeDictionaryItem(p, first, "pages", j_pages, 0);
+    JSON::writeArrayClose(p, first_page, 1);
 }
 
 void
