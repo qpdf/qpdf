@@ -1044,20 +1044,23 @@ QPDFJob::getWantedJSONObjects()
 void
 QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
 {
+    JSON::writeDictionaryKey(p, first, "objects", 0);
+    bool first_object = true;
+    JSON::writeDictionaryOpen(p, first_object, 1);
     bool all_objects = m->json_objects.empty();
     std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
-    JSON j_objects = JSON::makeDictionary();
-    if (all_objects || m->json_objects.count("trailer")) {
-        j_objects.addDictionaryMember(
-            "trailer", pdf.getTrailer().getJSON(true));
-    }
     std::vector<QPDFObjectHandle> objects = pdf.getAllObjects();
     for (auto& obj: objects) {
         if (all_objects || wanted_og.count(obj.getObjGen())) {
-            j_objects.addDictionaryMember(obj.unparse(), obj.getJSON(true));
+            JSON::writeDictionaryItem(
+                p, first_object, obj.unparse(), obj.getJSON(true), 1);
         }
     }
-    JSON::writeDictionaryItem(p, first, "objects", j_objects, 0);
+    if (all_objects || m->json_objects.count("trailer")) {
+        JSON::writeDictionaryItem(
+            p, first_object, "trailer", pdf.getTrailer().getJSON(true), 1);
+    }
+    JSON::writeDictionaryClose(p, first_object, 1);
 }
 
 void
@@ -1090,8 +1093,7 @@ QPDFJob::doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf)
 void
 QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
 {
-    JSON::writeNext(p, first, 0);
-    *p << "\"pages\": ";
+    JSON::writeDictionaryKey(p, first, "pages", 0);
     bool first_page = true;
     JSON::writeArrayOpen(p, first_page, 1);
     QPDFPageDocumentHelper pdh(pdf);

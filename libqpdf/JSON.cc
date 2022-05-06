@@ -78,6 +78,14 @@ JSON::writeArrayClose(Pipeline* p, bool first, size_t depth)
 }
 
 void
+JSON::writeDictionaryKey(
+    Pipeline* p, bool& first, std::string const& key, size_t depth)
+{
+    writeNext(p, first, depth);
+    *p << "\"" << key << "\": ";
+}
+
+void
 JSON::writeDictionaryItem(
     Pipeline* p,
     bool& first,
@@ -85,8 +93,7 @@ JSON::writeDictionaryItem(
     JSON const& value,
     size_t depth)
 {
-    writeNext(p, first, depth);
-    *p << "\"" << key << "\": ";
+    writeDictionaryKey(p, first, key, depth);
     value.write(p, 1 + depth);
 }
 

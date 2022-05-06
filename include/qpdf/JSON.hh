@@ -92,6 +92,11 @@ class JSON
         std::string const& key,
         JSON const& value,
         size_t depth = 0);
+    // Write just the key of a new dictionary item, useful if writing
+    // nested structures. Calls writeNext.
+    QPDF_DLL
+    static void writeDictionaryKey(
+        Pipeline* p, bool& first, std::string const& key, size_t depth = 0);
     QPDF_DLL
     static void writeArrayItem(
         Pipeline*, bool& first, JSON const& element, size_t depth = 0);
@@ -101,7 +106,7 @@ class JSON
     // for the parent object. Then start a new first for the nested
     // item.
     QPDF_DLL
-    static void writeNext(Pipeline* p, bool& first, size_t depth);
+    static void writeNext(Pipeline* p, bool& first, size_t depth = 0);
 
     // The JSON spec calls dictionaries "objects", but that creates
     // too much confusion when referring to instances of the JSON
