@@ -437,7 +437,7 @@ test_6(QPDF& pdf, char const* arg2)
         throw std::logic_error("test 6 run on file with no metadata");
     }
     std::string buf;
-    Pl_String bufpl("buffer", buf);
+    Pl_String bufpl("buffer", nullptr, buf);
     metadata.pipeStreamData(&bufpl, 0, qpdf_dl_none);
     bool cleartext = false;
     if (buf.substr(0, 9) == "<?xpacket") {

@@ -200,7 +200,7 @@ std::string
 JSON::unparse() const
 {
     std::string s;
-    Pl_String p("unparse", s);
+    Pl_String p("unparse", nullptr, s);
     write(&p, 0);
     return s;
 }

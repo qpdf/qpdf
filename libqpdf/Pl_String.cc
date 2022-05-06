@@ -9,8 +9,8 @@ Pl_String::Members::Members(std::string& s) :
 {
 }
 
-Pl_String::Pl_String(char const* identifier, std::string& s) :
-    Pipeline(identifier, 0),
+Pl_String::Pl_String(char const* identifier, Pipeline* next, std::string& s) :
+    Pipeline(identifier, next),
     m(new Members(s))
 {
 }
@@ -25,9 +25,15 @@ void
 Pl_String::write(unsigned char const* buf, size_t len)
 {
     this->m->s.append(reinterpret_cast<char const*>(buf), len);
+    if (getNext(true)) {
+        getNext()->write(buf, len);
+    }
 }
 
 void
 Pl_String::finish()
 {
+    if (getNext(true)) {
+        getNext()->finish();
+    }
 }
