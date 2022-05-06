@@ -1042,11 +1042,11 @@ QPDFJob::getWantedJSONObjects()
 }
 
 void
-QPDFJob::doJSONObjects(QPDF& pdf, JSON& j)
+QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
 {
     bool all_objects = m->json_objects.empty();
     std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
-    JSON j_objects = j.addDictionaryMember("objects", JSON::makeDictionary());
+    JSON j_objects = JSON::makeDictionary();
     if (all_objects || m->json_objects.count("trailer")) {
         j_objects.addDictionaryMember(
             "trailer", pdf.getTrailer().getJSON(true));
@@ -1057,15 +1057,15 @@ QPDFJob::doJSONObjects(QPDF& pdf, JSON& j)
             j_objects.addDictionaryMember(obj.unparse(), obj.getJSON(true));
         }
     }
+    JSON::writeDictionaryItem(p, first, "objects", j_objects, 0);
 }
 
 void
-QPDFJob::doJSONObjectinfo(QPDF& pdf, JSON& j)
+QPDFJob::doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf)
 {
     bool all_objects = m->json_objects.empty();
     std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
-    JSON j_objectinfo =
-        j.addDictionaryMember("objectinfo", JSON::makeDictionary());
+    JSON j_objectinfo = JSON::makeDictionary();
     for (auto& obj: pdf.getAllObjects()) {
         if (all_objects || wanted_og.count(obj.getObjGen())) {
             auto j_details = j_objectinfo.addDictionaryMember(
@@ -1084,12 +1084,13 @@ QPDFJob::doJSONObjectinfo(QPDF& pdf, JSON& j)
                            : JSON::makeNull()));
         }
     }
+    JSON::writeDictionaryItem(p, first, "objectinfo", j_objectinfo, 0);
 }
 
 void
-QPDFJob::doJSONPages(QPDF& pdf, JSON& j)
+QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
 {
-    JSON j_pages = j.addDictionaryMember("pages", JSON::makeArray());
+    JSON j_pages = JSON::makeArray();
     QPDFPageDocumentHelper pdh(pdf);
     QPDFPageLabelDocumentHelper pldh(pdf);
     QPDFOutlineDocumentHelper odh(pdf);
@@ -1158,12 +1159,13 @@ QPDFJob::doJSONPages(QPDF& pdf, JSON& j)
         }
         j_page.addDictionaryMember("pageposfrom1", JSON::makeInt(1 + pageno));
     }
+    JSON::writeDictionaryItem(p, first, "pages", j_pages, 0);
 }
 
 void
-QPDFJob::doJSONPageLabels(QPDF& pdf, JSON& j)
+QPDFJob::doJSONPageLabels(Pipeline* p, bool& first, QPDF& pdf)
 {
-    JSON j_labels = j.addDictionaryMember("pagelabels", JSON::makeArray());
+    JSON j_labels = JSON::makeArray();
     QPDFPageLabelDocumentHelper pldh(pdf);
     QPDFPageDocumentHelper pdh(pdf);
     std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
@@ -1186,6 +1188,7 @@ QPDFJob::doJSONPageLabels(QPDF& pdf, JSON& j)
             j_label.addDictionaryMember("label", (*iter).getJSON());
         }
     }
+    JSON::writeDictionaryItem(p, first, "pagelabels", j_labels, 0);
 }
 
 static void
@@ -1215,7 +1218,7 @@ add_outlines_to_json(
 }
 
 void
-QPDFJob::doJSONOutlines(QPDF& pdf, JSON& j)
+QPDFJob::doJSONOutlines(Pipeline* p, bool& first, QPDF& pdf)
 {
     std::map<QPDFObjGen, int> page_numbers;
     QPDFPageDocumentHelper dh(pdf);
@@ -1226,15 +1229,16 @@ QPDFJob::doJSONOutlines(QPDF& pdf, JSON& j)
         page_numbers[oh.getObjGen()] = ++n;
     }
 
-    JSON j_outlines = j.addDictionaryMember("outlines", JSON::makeArray());
+    JSON j_outlines = JSON::makeArray();
     QPDFOutlineDocumentHelper odh(pdf);
     add_outlines_to_json(odh.getTopLevelOutlines(), j_outlines, page_numbers);
+    JSON::writeDictionaryItem(p, first, "outlines", j_outlines, 0);
 }
 
 void
-QPDFJob::doJSONAcroform(QPDF& pdf, JSON& j)
+QPDFJob::doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf)
 {
-    JSON j_acroform = j.addDictionaryMember("acroform", JSON::makeDictionary());
+    JSON j_acroform = JSON::makeDictionary();
     QPDFAcroFormDocumentHelper afdh(pdf);
     j_acroform.addDictionaryMember(
         "hasacroform", JSON::makeBool(afdh.hasAcroForm()));
@@ -1297,10 +1301,11 @@ QPDFJob::doJSONAcroform(QPDF& pdf, JSON& j)
                 "annotationflags", JSON::makeInt(aoh.getFlags()));
         }
     }
+    JSON::writeDictionaryItem(p, first, "acroform", j_acroform, 0);
 }
 
 void
-QPDFJob::doJSONEncrypt(QPDF& pdf, JSON& j)
+QPDFJob::doJSONEncrypt(Pipeline* p, bool& first, QPDF& pdf)
 {
     int R = 0;
     int P = 0;
@@ -1310,7 +1315,7 @@ QPDFJob::doJSONEncrypt(QPDF& pdf, JSON& j)
     QPDF::encryption_method_e file_method = QPDF::e_none;
     bool is_encrypted =
         pdf.isEncrypted(R, P, V, stream_method, string_method, file_method);
-    JSON j_encrypt = j.addDictionaryMember("encrypt", JSON::makeDictionary());
+    JSON j_encrypt = JSON::makeDictionary();
     j_encrypt.addDictionaryMember("encrypted", JSON::makeBool(is_encrypted));
     j_encrypt.addDictionaryMember(
         "userpasswordmatched",
@@ -1381,13 +1386,13 @@ QPDFJob::doJSONEncrypt(QPDF& pdf, JSON& j)
         "stringmethod", JSON::makeString(s_string_method));
     j_parameters.addDictionaryMember(
         "filemethod", JSON::makeString(s_file_method));
+    JSON::writeDictionaryItem(p, first, "encrypt", j_encrypt, 0);
 }
 
 void
-QPDFJob::doJSONAttachments(QPDF& pdf, JSON& j)
+QPDFJob::doJSONAttachments(Pipeline* p, bool& first, QPDF& pdf)
 {
-    JSON j_attachments =
-        j.addDictionaryMember("attachments", JSON::makeDictionary());
+    JSON j_attachments = JSON::makeDictionary();
     QPDFEmbeddedFileDocumentHelper efdh(pdf);
     for (auto const& iter: efdh.getEmbeddedFiles()) {
         std::string const& key = iter.first;
@@ -1402,6 +1407,7 @@ QPDFJob::doJSONAttachments(QPDF& pdf, JSON& j)
             "preferredcontents",
             JSON::makeString(fsoh->getEmbeddedFileStream().unparse()));
     }
+    JSON::writeDictionaryItem(p, first, "attachments", j_attachments, 0);
 }
 
 JSON
@@ -1600,13 +1606,14 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
         p = pl_str.get();
     }
 
-    JSON j = JSON::makeDictionary();
+    bool first = true;
+    JSON::writeDictionaryOpen(p, first, 0);
     // This version is updated every time a non-backward-compatible
     // change is made to the JSON format. Clients of the JSON are to
     // ignore unrecognized keys, so we only update the version of a
     // key disappears or if its value changes meaning.
-    j.addDictionaryMember("version", JSON::makeInt(1));
-    JSON j_params = j.addDictionaryMember("parameters", JSON::makeDictionary());
+    JSON::writeDictionaryItem(p, first, "version", JSON::makeInt(1), 0);
+    JSON j_params = JSON::makeDictionary();
     std::string decode_level_str;
     switch (m->decode_level) {
     case qpdf_dl_none:
@@ -1624,28 +1631,36 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
     }
     j_params.addDictionaryMember(
         "decodelevel", JSON::makeString(decode_level_str));
+    JSON::writeDictionaryItem(p, first, "parameters", j_params, 0);
 
     bool all_keys = m->json_keys.empty();
     // The list of selectable top-level keys id duplicated in the
     // following places: job.yml, QPDFJob::json_schema, and
     // QPDFJob::doJSON.
+
+    // We do pages and pagelabels first since they have the side
+    // effect of repairing the pages tree, which could potentially
+    // impact object references in remaining items.
     if (all_keys || m->json_keys.count("pages")) {
-        doJSONPages(pdf, j);
+        doJSONPages(p, first, pdf);
     }
     if (all_keys || m->json_keys.count("pagelabels")) {
-        doJSONPageLabels(pdf, j);
+        doJSONPageLabels(p, first, pdf);
     }
-    if (all_keys || m->json_keys.count("outlines")) {
-        doJSONOutlines(pdf, j);
-    }
+
+    // The non-special keys are output in alphabetical order, but the
+    // order doesn't actually matter.
     if (all_keys || m->json_keys.count("acroform")) {
-        doJSONAcroform(pdf, j);
-    }
-    if (all_keys || m->json_keys.count("encrypt")) {
-        doJSONEncrypt(pdf, j);
+        doJSONAcroform(p, first, pdf);
     }
     if (all_keys || m->json_keys.count("attachments")) {
-        doJSONAttachments(pdf, j);
+        doJSONAttachments(p, first, pdf);
+    }
+    if (all_keys || m->json_keys.count("encrypt")) {
+        doJSONEncrypt(p, first, pdf);
+    }
+    if (all_keys || m->json_keys.count("outlines")) {
+        doJSONOutlines(p, first, pdf);
     }
 
     // We do objects and objectinfo last so their information is
@@ -1653,13 +1668,14 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
     // file with any page tree problems and the page tree not
     // flattened, select objects/objectinfo without other keys.
     if (all_keys || m->json_keys.count("objects")) {
-        doJSONObjects(pdf, j);
+        doJSONObjects(p, first, pdf);
     }
     if (all_keys || m->json_keys.count("objectinfo")) {
-        doJSONObjectinfo(pdf, j);
+        doJSONObjectinfo(p, first, pdf);
     }
 
-    *p << j.unparse() << "\n";
+    JSON::writeDictionaryClose(p, first, 0);
+    *p << "\n";
 
     if (this->m->test_json_schema) {
         // Check against schema

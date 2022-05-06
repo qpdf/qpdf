@@ -1,4 +1,8 @@
 {
+  "version": 1,
+  "parameters": {
+    "decodelevel": "generalized"
+  },
   "attachments": {
     "att1": {
       "filespec": "4 0 R",
@@ -15,9 +19,5 @@
       "preferredcontents": "12 0 R",
       "preferredname": "π.txt"
     }
-  },
-  "parameters": {
-    "decodelevel": "generalized"
-  },
-  "version": 1
+  }
 }

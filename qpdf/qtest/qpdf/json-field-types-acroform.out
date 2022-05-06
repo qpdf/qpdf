@@ -1,4 +1,8 @@
 {
+  "version": 1,
+  "parameters": {
+    "decodelevel": "generalized"
+  },
   "acroform": {
     "fields": [
       {
@@ -384,9 +388,5 @@
     ],
     "hasacroform": true,
     "needappearances": true
-  },
-  "parameters": {
-    "decodelevel": "generalized"
-  },
-  "version": 1
+  }
 }

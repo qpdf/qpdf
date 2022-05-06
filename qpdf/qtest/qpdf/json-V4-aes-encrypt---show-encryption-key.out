@@ -1,4 +1,8 @@
 {
+  "version": 1,
+  "parameters": {
+    "decodelevel": "generalized"
+  },
   "encrypt": {
     "capabilities": {
       "accessibility": true,
@@ -25,9 +29,5 @@
       "stringmethod": "AESv2"
     },
     "userpasswordmatched": true
-  },
-  "parameters": {
-    "decodelevel": "generalized"
-  },
-  "version": 1
+  }
 }

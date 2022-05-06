@@ -1,4 +1,8 @@
 {
+  "version": 1,
+  "parameters": {
+    "decodelevel": "generalized"
+  },
   "pages": [
     {
       "contents": [
@@ -41,9 +45,5 @@
       "outlines": [],
       "pageposfrom1": 1
     }
-  ],
-  "parameters": {
-    "decodelevel": "generalized"
-  },
-  "version": 1
+  ]
 }

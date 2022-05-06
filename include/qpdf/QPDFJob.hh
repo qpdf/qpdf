@@ -512,14 +512,14 @@ class QPDFJob
     // JSON
     void doJSON(QPDF& pdf, Pipeline*);
     std::set<QPDFObjGen> getWantedJSONObjects();
-    void doJSONObjects(QPDF& pdf, JSON& j);
-    void doJSONObjectinfo(QPDF& pdf, JSON& j);
-    void doJSONPages(QPDF& pdf, JSON& j);
-    void doJSONPageLabels(QPDF& pdf, JSON& j);
-    void doJSONOutlines(QPDF& pdf, JSON& j);
-    void doJSONAcroform(QPDF& pdf, JSON& j);
-    void doJSONEncrypt(QPDF& pdf, JSON& j);
-    void doJSONAttachments(QPDF& pdf, JSON& j);
+    void doJSONObjects(Pipeline* p, bool& first, QPDF& pdf);
+    void doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf);
+    void doJSONPages(Pipeline* p, bool& first, QPDF& pdf);
+    void doJSONPageLabels(Pipeline* p, bool& first, QPDF& pdf);
+    void doJSONOutlines(Pipeline* p, bool& first, QPDF& pdf);
+    void doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf);
+    void doJSONEncrypt(Pipeline* p, bool& first, QPDF& pdf);
+    void doJSONAttachments(Pipeline* p, bool& first, QPDF& pdf);
 
     enum remove_unref_e { re_auto, re_yes, re_no };
 

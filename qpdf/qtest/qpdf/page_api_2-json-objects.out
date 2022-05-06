@@ -1,75 +1,7 @@
 {
-  "objectinfo": {
-    "1 0 R": {
-      "stream": {
-        "filter": null,
-        "is": false,
-        "length": null
-      }
-    },
-    "10 0 R": {
-      "stream": {
-        "filter": null,
-        "is": false,
-        "length": null
-      }
-    },
-    "2 0 R": {
-      "stream": {
-        "filter": null,
-        "is": false,
-        "length": null
-      }
-    },
-    "3 0 R": {
-      "stream": {
-        "filter": null,
-        "is": false,
-        "length": null
-      }
-    },
-    "4 0 R": {
-      "stream": {
-        "filter": null,
-        "is": false,
-        "length": null
-      }
-    },
-    "5 0 R": {
-      "stream": {
-        "filter": null,
-        "is": false,
-        "length": null
-      }
-    },
-    "6 0 R": {
-      "stream": {
-        "filter": null,
-        "is": true,
-        "length": 47
-      }
-    },
-    "7 0 R": {
-      "stream": {
-        "filter": null,
-        "is": false,
-        "length": null
-      }
-    },
-    "8 0 R": {
-      "stream": {
-        "filter": null,
-        "is": false,
-        "length": null
-      }
-    },
-    "9 0 R": {
-      "stream": {
-        "filter": null,
-        "is": true,
-        "length": 47
-      }
-    }
+  "version": 1,
+  "parameters": {
+    "decodelevel": "generalized"
   },
   "objects": {
     "1 0 R": {
@@ -153,8 +85,76 @@
       "/Size": 11
     }
   },
-  "parameters": {
-    "decodelevel": "generalized"
-  },
-  "version": 1
+  "objectinfo": {
+    "1 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "10 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "2 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "3 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "4 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "5 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "6 0 R": {
+      "stream": {
+        "filter": null,
+        "is": true,
+        "length": 47
+      }
+    },
+    "7 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "8 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "9 0 R": {
+      "stream": {
+        "filter": null,
+        "is": true,
+        "length": 47
+      }
+    }
+  }
 }

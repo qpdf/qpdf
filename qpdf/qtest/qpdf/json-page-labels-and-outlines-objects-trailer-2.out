@@ -1,4 +1,8 @@
 {
+  "version": 1,
+  "parameters": {
+    "decodelevel": "generalized"
+  },
   "objects": {
     "2 0 R": {
       "/Count": 30,
@@ -40,9 +44,5 @@
       "/Root": "1 0 R",
       "/Size": 107
     }
-  },
-  "parameters": {
-    "decodelevel": "generalized"
-  },
-  "version": 1
+  }
 }

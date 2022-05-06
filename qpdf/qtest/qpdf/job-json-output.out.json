@@ -1,13 +1,7 @@
 {
-  "objects": {
-    "5 0 R": [
-      "/PDF",
-      "/Text"
-    ],
-    "trailer": {
-      "/Root": "1 0 R",
-      "/Size": 7
-    }
+  "version": 1,
+  "parameters": {
+    "decodelevel": "generalized"
   },
   "pages": [
     {
@@ -21,8 +15,14 @@
       "pageposfrom1": 1
     }
   ],
-  "parameters": {
-    "decodelevel": "generalized"
-  },
-  "version": 1
+  "objects": {
+    "5 0 R": [
+      "/PDF",
+      "/Text"
+    ],
+    "trailer": {
+      "/Root": "1 0 R",
+      "/Size": 7
+    }
+  }
 }

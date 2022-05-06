@@ -1,4 +1,8 @@
 {
+  "version": 1,
+  "parameters": {
+    "decodelevel": "generalized"
+  },
   "outlines": [
     {
       "dest": [
@@ -153,9 +157,5 @@
       "open": true,
       "title": "Trepak 2 -> 15: /XYZ 66 756 3"
     }
-  ],
-  "parameters": {
-    "decodelevel": "generalized"
-  },
-  "version": 1
+  ]
 }

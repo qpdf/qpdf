@@ -1,4 +1,8 @@
 {
+  "version": 1,
+  "parameters": {
+    "decodelevel": "generalized"
+  },
   "pagelabels": [
     {
       "index": 0,
@@ -84,9 +88,5 @@
         "/St": 54
       }
     }
-  ],
-  "parameters": {
-    "decodelevel": "generalized"
-  },
-  "version": 1
+  ]
 }

@@ -4277,7 +4277,14 @@ foreach my $d (@encrypted_files)
     my $f = sub { $_[0] ? "allowed" : "not allowed" };
     my $jf = sub { $_[0] ? "true" : "false" };
     my $enc_details = "";
-    my $enc_json = "{\n  \"encrypt\": {\n    \"capabilities\": {\n";
+    my $enc_json =
+        "{\n" .
+        "  \"version\": 1,\n" .
+        "  \"parameters\": {\n" .
+        "    \"decodelevel\": \"generalized\"\n" .
+        "  },\n" .
+        "  \"encrypt\": {\n" .
+        "    \"capabilities\": {\n";
     if ($match_owner)
     {
         $enc_details .= "Supplied password is owner password\n";
@@ -4321,11 +4328,7 @@ foreach my $d (@encrypted_files)
         "      \"stringmethod\": \"---method---\"\n" .
         "    },\n" .
         "    \"userpasswordmatched\": ---upm---\n" .
-        "  },\n" .
-        "  \"parameters\": {\n" .
-        "    \"decodelevel\": \"generalized\"\n" .
-        "  },\n" .
-        "  \"version\": 1\n" .
+        "  }\n" .
         "}\n";
     if ($file =~ m/XI-/)
     {
