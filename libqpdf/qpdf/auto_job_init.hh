@@ -77,6 +77,7 @@ this->ap.addBare("static-aes-iv", [this](){c_main->staticAesIv();});
 this->ap.addBare("static-id", [this](){c_main->staticId();});
 this->ap.addBare("suppress-password-recovery", [this](){c_main->suppressPasswordRecovery();});
 this->ap.addBare("suppress-recovery", [this](){c_main->suppressRecovery();});
+this->ap.addBare("test-json-schema", [this](){c_main->testJsonSchema();});
 this->ap.addBare("underlay", b(&ArgParser::argUnderlay));
 this->ap.addBare("verbose", [this](){c_main->verbose();});
 this->ap.addBare("warning-exit-0", [this](){c_main->warningExit0();});

@@ -43,6 +43,7 @@ QPDF_DLL Config* staticAesIv();
 QPDF_DLL Config* staticId();
 QPDF_DLL Config* suppressPasswordRecovery();
 QPDF_DLL Config* suppressRecovery();
+QPDF_DLL Config* testJsonSchema();
 QPDF_DLL Config* verbose();
 QPDF_DLL Config* warningExit0();
 QPDF_DLL Config* withImages();

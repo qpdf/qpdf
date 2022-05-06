@@ -89,6 +89,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "keepFilesOpenThreshold": "set threshold for keepFilesOpen",
   "noWarn": "suppress printing of warning messages",
   "verbose": "print additional information",
+  "testJsonSchema": "test generated json against schema",
   "ignoreXrefStreams": "use xref tables rather than streams",
   "passwordIsHexKey": "provide hex-encoded encryption key",
   "passwordMode": "tweak how qpdf encodes passwords",

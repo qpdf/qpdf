@@ -400,6 +400,7 @@ QPDFJob::Members::Members() :
     flatten_rotation(false),
     list_attachments(false),
     json_version(0),
+    test_json_schema(false),
     check(false),
     optimize_images(false),
     externalize_inline_images(false),

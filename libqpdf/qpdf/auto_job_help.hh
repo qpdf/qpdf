@@ -835,6 +835,12 @@ Write the first pass of linearization to the named file. The
 resulting file is not a valid PDF file. This option is useful only
 for debugging qpdf.
 )");
+ap.addOptionHelp("--test-json-schema", "testing", "test generated json against schema", R"(This is used by qpdf's test suite to check consistency between
+the output of qpdf --json and the output of qpdf --json-help.
+)");
+}
+static void add_help_8(QPDFArgParser& ap)
+{
 }
 static void add_help(QPDFArgParser& ap)
 {
@@ -845,6 +851,7 @@ static void add_help(QPDFArgParser& ap)
     add_help_5(ap);
     add_help_6(ap);
     add_help_7(ap);
+    add_help_8(ap);
 ap.addHelpFooter("For detailed help, visit the qpdf manual: https://qpdf.readthedocs.io\n");
 }
 

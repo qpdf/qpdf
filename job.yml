@@ -127,6 +127,7 @@ options:
       - static-id
       - suppress-password-recovery
       - suppress-recovery
+      - test-json-schema
       - underlay
       - verbose
       - warning-exit-0
@@ -352,6 +353,7 @@ json:
   keep-files-open-threshold:
   no-warn:
   verbose:
+  test-json-schema:
   ignore-xref-streams:
   password-is-hex-key:
   password-mode:

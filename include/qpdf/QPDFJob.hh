@@ -633,6 +633,7 @@ class QPDFJob
         int json_version;
         std::set<std::string> json_keys;
         std::set<std::string> json_objects;
+        bool test_json_schema;
         bool check;
         bool optimize_images;
         bool externalize_inline_images;

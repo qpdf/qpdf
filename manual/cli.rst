@@ -3327,6 +3327,16 @@ Related Options
    inspection of the file before values calculated in pass 1 are
    inserted into the file for pass 2.
 
+.. qpdf:option:: --test-json-schema
+
+   .. help: test generated json against schema
+
+      This is used by qpdf's test suite to check consistency between
+      the output of qpdf --json and the output of qpdf --json-help.
+
+   This is used by qpdf's test suite to check consistency between the
+   output of ``qpdf --json`` and the output of ``qpdf --json-help``.
+
 .. _unicode-passwords:
 
 Unicode Passwords

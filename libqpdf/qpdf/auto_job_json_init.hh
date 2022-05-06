@@ -267,6 +267,9 @@ popHandler(); // key: noWarn
 pushKey("verbose");
 addBare([this]() { c_main->verbose(); });
 popHandler(); // key: verbose
+pushKey("testJsonSchema");
+addBare([this]() { c_main->testJsonSchema(); });
+popHandler(); // key: testJsonSchema
 pushKey("ignoreXrefStreams");
 addBare([this]() { c_main->ignoreXrefStreams(); });
 popHandler(); // key: ignoreXrefStreams

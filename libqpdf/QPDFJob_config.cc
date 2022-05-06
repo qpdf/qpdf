@@ -261,6 +261,13 @@ QPDFJob::Config::jsonObject(std::string const& parameter)
 }
 
 QPDFJob::Config*
+QPDFJob::Config::testJsonSchema()
+{
+    o.m->test_json_schema = true;
+    return this;
+}
+
+QPDFJob::Config*
 QPDFJob::Config::keepFilesOpen(std::string const& parameter)
 {
     o.m->keep_files_open_set = true;
