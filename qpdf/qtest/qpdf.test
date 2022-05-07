@@ -6,6 +6,7 @@ use Cwd;
 use Digest::MD5;
 use File::Basename;
 use File::Copy;
+use File::Compare;
 use File::Spec;
 
 unshift(@INC, '../../libtests/qtest/arg_parser');
@@ -1110,7 +1111,7 @@ my @json_files = (
     ['V4-aes', ['--json-key=encrypt']],
     ['V4-aes', ['--json-key=encrypt', '--show-encryption-key']],
 );
-$n_tests += 5 + (2 * scalar(@json_files));
+$n_tests += 24 + (2 * scalar(@json_files));
 foreach my $d (@json_files)
 {
     my ($file, $xargs) = @$d;
@@ -1169,6 +1170,64 @@ $td->runtest("check (file)",
 $td->runtest("check stream (file)",
              {$td->FILE => "auto-4"},
              {$td->FILE => "bad-data-4.out"});
+
+foreach my $l (qw(none generalized specialized all))
+{
+    if ($l ne 'all')
+    {
+        # We don't want a dependency on the exact value of the
+        # uncompressed jpeg, which can differ depending on which jpeg
+        # library is use.
+        $td->runtest("image-streams json inline: $l",
+                     {$td->COMMAND =>
+                          "qpdf image-streams-small.pdf --json=2" .
+                          " --decode-level=$l --json-stream-data=inline"},
+                     {$td->FILE => "json-image-streams-$l-inline-v2.out",
+                          $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
+    }
+    $td->runtest("image-streams json file: $l",
+                 {$td->COMMAND =>
+                      "qpdf image-streams-small.pdf --json=2" .
+                      " --decode-level=$l --json-stream-data=file" .
+                      " --json-stream-prefix=auto --json-key=qpdf" .
+                      " --json-object=12 --json-object=16 --json-object=18"},
+                 {$td->FILE => "json-image-streams-$l-file-v2.out",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    # object 12: /FlateDecode
+    # object 16: /DCTDecode
+    # object 18: /RunLengthDecode
+    my %exp_compression = (
+        '12' => {'none' => 1},
+        '16' => {'none' => 1, 'generalized' => 1, 'specialized' => 1},
+        '18' => {'none' => 1, 'generalized' => 1},
+        );
+
+    foreach my $obj (qw(12 16 18))
+    {
+        my $compressed = (exists $exp_compression{$obj}{$l});
+        my $suf = $compressed ? "compressed" : "uncompressed";
+        if (($obj eq '16') && (! $compressed))
+        {
+            # Rather than testing the uncompressed DCT, just make sure
+            # it is different from the compressed DCT.
+            my $same = (compare(
+                            "auto-$obj",
+                            "image-streams-small-$obj-compressed.out") ?
+                        "same" : "different");
+            $td->runtest("check stream data ($obj, $l)",
+                         {$td->STRING => $same},
+                         {$td->STRING => "same"});
+        }
+        else
+        {
+            $td->runtest("check stream data ($obj, $l)",
+                         {$td->FILE => "auto-$obj"},
+                         {$td->FILE => "image-streams-small-$obj-$suf.out"});
+        }
+    }
+}
 
 show_ntests();
 # ----------

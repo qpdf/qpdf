@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "parameters": {
+    "decodelevel": "all"
+  },
+  "qpdf": {
+    "jsonversion": 2,
+    "pdfversion": "1.3",
+    "objects": {
+      "obj:12 0 R": {
+        "stream": {
+          "datafile": "auto-12",
+          "dict": {}
+        }
+      },
+      "obj:16 0 R": {
+        "stream": {
+          "datafile": "auto-16",
+          "dict": {
+            "/BitsPerComponent": 8,
+            "/ColorSpace": "/DeviceCMYK",
+            "/Height": 48,
+            "/Subtype": "/Image",
+            "/Type": "/XObject",
+            "/Width": 40
+          }
+        }
+      },
+      "obj:18 0 R": {
+        "stream": {
+          "datafile": "auto-18",
+          "dict": {
+            "/BitsPerComponent": 8,
+            "/ColorSpace": "/DeviceCMYK",
+            "/Height": 48,
+            "/Subtype": "/Image",
+            "/Type": "/XObject",
+            "/Width": 40
+          }
+        }
+      }
+    }
+  }
+}
