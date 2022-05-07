@@ -20,6 +20,7 @@ class QPDF_String: public QPDFObject
     std::string getUTF8Val() const;
 
   private:
+    bool useHexString() const;
     std::string val;
 };
 
