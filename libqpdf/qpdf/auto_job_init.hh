@@ -20,7 +20,8 @@ static char const* object_streams_choices[] = {"disable", "preserve", "generate"
 static char const* remove_unref_choices[] = {"auto", "yes", "no", 0};
 static char const* flatten_choices[] = {"all", "print", "screen", 0};
 static char const* json_version_choices[] = {"1", "2", "latest", 0};
-static char const* json_key_choices[] = {"acroform", "attachments", "encrypt", "objectinfo", "objects", "outlines", "pagelabels", "pages", 0};
+static char const* json_key_choices[] = {"acroform", "attachments", "encrypt", "objectinfo", "objects", "outlines", "pagelabels", "pages", "qpdf", 0};
+static char const* json_stream_data_choices[] = {"none", "inline", "file", 0};
 static char const* print128_choices[] = {"full", "low", "none", 0};
 static char const* modify128_choices[] = {"all", "annotate", "form", "assembly", "none", 0};
 
@@ -101,6 +102,7 @@ this->ap.addRequiredParameter("remove-attachment", [this](std::string const& x){
 this->ap.addRequiredParameter("rotate", [this](std::string const& x){c_main->rotate(x);}, "[+|-]angle");
 this->ap.addRequiredParameter("show-attachment", [this](std::string const& x){c_main->showAttachment(x);}, "attachment");
 this->ap.addRequiredParameter("show-object", [this](std::string const& x){c_main->showObject(x);}, "trailer");
+this->ap.addRequiredParameter("json-stream-prefix", [this](std::string const& x){c_main->jsonStreamPrefix(x);}, "stream-file-prefix");
 this->ap.addOptionalParameter("collate", [this](std::string const& x){c_main->collate(x);});
 this->ap.addOptionalParameter("split-pages", [this](std::string const& x){c_main->splitPages(x);});
 this->ap.addChoices("compress-streams", [this](std::string const& x){c_main->compressStreams(x);}, true, yn_choices);
@@ -113,6 +115,7 @@ this->ap.addChoices("object-streams", [this](std::string const& x){c_main->objec
 this->ap.addChoices("password-mode", [this](std::string const& x){c_main->passwordMode(x);}, true, password_mode_choices);
 this->ap.addChoices("remove-unreferenced-resources", [this](std::string const& x){c_main->removeUnreferencedResources(x);}, true, remove_unref_choices);
 this->ap.addChoices("stream-data", [this](std::string const& x){c_main->streamData(x);}, true, stream_data_choices);
+this->ap.addChoices("json-stream-data", [this](std::string const& x){c_main->jsonStreamData(x);}, true, json_stream_data_choices);
 this->ap.addChoices("json", [this](std::string const& x){c_main->json(x);}, false, json_version_choices);
 this->ap.registerOptionTable("pages", b(&ArgParser::argEndPages));
 this->ap.addPositional(p(&ArgParser::argPagesPositional));

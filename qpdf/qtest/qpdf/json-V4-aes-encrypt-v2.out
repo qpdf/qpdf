@@ -7,8 +7,8 @@
     "capabilities": {
       "accessibility": true,
       "extract": true,
-      "moddifyannotations": true,
       "modify": true,
+      "modifyannotations": true,
       "modifyassembly": true,
       "modifyforms": true,
       "modifyother": true,

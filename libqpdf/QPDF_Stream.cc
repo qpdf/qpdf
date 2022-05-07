@@ -189,7 +189,7 @@ QPDF_Stream::getJSON(int json_version)
 JSON
 QPDF_Stream::getStreamJSON(
     int json_version,
-    qpdf_stream_data_json_e json_data,
+    qpdf_json_stream_data_e json_data,
     qpdf_stream_decode_level_e decode_level,
     Pipeline* p,
     std::string const& data_filename)
@@ -231,11 +231,17 @@ QPDF_Stream::getStreamJSON(
             } else {
                 data_pipeline = &discard;
             }
-            filtered = pipeStreamData(
-                data_pipeline, nullptr, 0, decode_level, false, (attempt == 1));
-            if (filter && (!filtered)) {
+            bool succeeded = pipeStreamData(
+                data_pipeline,
+                &filtered,
+                0,
+                decode_level,
+                false,
+                (attempt == 1));
+            if ((!succeeded) || (filter && (!filtered))) {
                 // Try again
                 filter = false;
+                decode_level = qpdf_dl_none;
             } else {
                 if (buf_pl.get()) {
                     buf = buf_pl->getBufferSharedPointer();
@@ -247,7 +253,7 @@ QPDF_Stream::getStreamJSON(
         // touching top-level keys.
         dict = this->stream_dict.unsafeShallowCopy();
         dict.removeKey("/Length");
-        if (filtered) {
+        if (filter && filtered) {
             dict.removeKey("/Filter");
             dict.removeKey("/DecodeParms");
         }

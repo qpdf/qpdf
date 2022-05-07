@@ -13,7 +13,8 @@ static char const* object_streams_choices[] = {"disable", "preserve", "generate"
 static char const* remove_unref_choices[] = {"auto", "yes", "no", 0};
 static char const* flatten_choices[] = {"all", "print", "screen", 0};
 static char const* json_version_choices[] = {"1", "2", "latest", 0};
-static char const* json_key_choices[] = {"acroform", "attachments", "encrypt", "objectinfo", "objects", "outlines", "pagelabels", "pages", 0};
+static char const* json_key_choices[] = {"acroform", "attachments", "encrypt", "objectinfo", "objects", "outlines", "pagelabels", "pages", "qpdf", 0};
+static char const* json_stream_data_choices[] = {"none", "inline", "file", 0};
 static char const* print128_choices[] = {"full", "low", "none", 0};
 static char const* modify128_choices[] = {"all", "annotate", "form", "assembly", "none", 0};
 
@@ -252,6 +253,12 @@ beginArray(bindJSON(&Handlers::beginJsonObjectArray), bindBare(&Handlers::endJso
 addParameter([this](std::string const& p) { c_main->jsonObject(p); });
 popHandler(); // array: .jsonObject[]
 popHandler(); // key: jsonObject
+pushKey("jsonStreamData");
+addChoices(json_stream_data_choices, true, [this](std::string const& p) { c_main->jsonStreamData(p); });
+popHandler(); // key: jsonStreamData
+pushKey("jsonStreamPrefix");
+addParameter([this](std::string const& p) { c_main->jsonStreamPrefix(p); });
+popHandler(); // key: jsonStreamPrefix
 pushKey("allowWeakCrypto");
 addBare([this]() { c_main->allowWeakCrypto(); });
 popHandler(); // key: allowWeakCrypto

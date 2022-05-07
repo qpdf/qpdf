@@ -100,7 +100,7 @@ enum qpdf_stream_decode_level_e {
     qpdf_dl_all          /* also decode lossy filters */
 };
 /* For JSON encoding */
-enum qpdf_stream_data_json_e {
+enum qpdf_json_stream_data_e {
     qpdf_sj_none = 0,
     qpdf_sj_inline,
     qpdf_sj_file,

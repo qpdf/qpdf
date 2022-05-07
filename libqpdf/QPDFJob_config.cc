@@ -261,6 +261,29 @@ QPDFJob::Config::jsonObject(std::string const& parameter)
 }
 
 QPDFJob::Config*
+QPDFJob::Config::jsonStreamData(std::string const& parameter)
+{
+    if (parameter == "none") {
+        o.m->json_stream_data = qpdf_sj_none;
+    } else if (parameter == "inline") {
+        o.m->json_stream_data = qpdf_sj_inline;
+    } else if (parameter == "file") {
+        o.m->json_stream_data = qpdf_sj_file;
+    } else {
+        usage("invalid json-streams option");
+    }
+
+    return this;
+}
+
+QPDFJob::Config*
+QPDFJob::Config::jsonStreamPrefix(std::string const& parameter)
+{
+    o.m->json_stream_prefix = parameter;
+    return this;
+}
+
+QPDFJob::Config*
 QPDFJob::Config::testJsonSchema()
 {
     o.m->test_json_schema = true;

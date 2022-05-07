@@ -817,6 +817,21 @@ objects will be shown.
 ap.addOptionHelp("--job-json-help", "json", "show format of job JSON", R"(Describe the format of the QPDFJob JSON input used by
 --job-json-file.
 )");
+ap.addOptionHelp("--json-stream-data", "json", "how to handle streams in json output", R"(--json-stream-data={none|inline|file}
+
+Control whether streams in json output should be omitted,
+written inline (base64-encoded) or written to a file. If "file"
+is chosen, the file will be the name of the input file appended
+with -nnn where nnn is the object number. The prefix can be
+overridden with --json-stream-prefix.
+)");
+ap.addOptionHelp("--json-stream-prefix", "json", "prefix for json stream data files", R"(--json-stream-prefix=file-prefix
+
+When --json-stream-data=file is given, override the input file
+name as the prefix for stream data files. Whatever is given here
+will be appended with -nnn to create the name of the file that
+will contain the data for the stream stream in object nnn.
+)");
 ap.addHelpTopic("testing", "options for testing or debugging", R"(The options below are useful when writing automated test code that
 includes files created by qpdf or when testing qpdf itself.
 )");
@@ -829,6 +844,9 @@ for testing only so that output files can be reproducible. Never
 use it for production files. This option is not secure since it
 significantly weakens the encryption.
 )");
+}
+static void add_help_8(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--linearize-pass1", "testing", "save pass 1 of linearization", R"(--linearize-pass1=file
 
 Write the first pass of linearization to the named file. The
@@ -838,9 +856,6 @@ for debugging qpdf.
 ap.addOptionHelp("--test-json-schema", "testing", "test generated json against schema", R"(This is used by qpdf's test suite to check consistency between
 the output of qpdf --json and the output of qpdf --json-help.
 )");
-}
-static void add_help_8(QPDFArgParser& ap)
-{
 }
 static void add_help(QPDFArgParser& ap)
 {
