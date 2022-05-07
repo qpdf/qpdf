@@ -401,6 +401,7 @@ QPDFJob::Members::Members() :
     flatten_rotation(false),
     list_attachments(false),
     json_version(0),
+    json_stream_data(qpdf_sj_none),
     test_json_schema(false),
     check(false),
     optimize_images(false),
@@ -694,6 +695,17 @@ QPDFJob::checkConfiguration()
         usage("input file and output file are the same;"
               " use --replace-input to intentionally"
               " overwrite the input file");
+    }
+
+    if (m->json_version == 1) {
+        if (m->json_keys.count("qpdf")) {
+            usage("json key \"qpdf\" is not valid for json version 1");
+        }
+    } else {
+        if (m->json_keys.count("objects") || m->json_keys.count("objectinfo")) {
+            usage("json keys \"objects\" and \"objectinfo\" are only valid for "
+                  "json version 1");
+        }
     }
 }
 
@@ -1104,6 +1116,102 @@ QPDFJob::doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf)
 }
 
 void
+QPDFJob::doJSONStream(
+    Pipeline* p,
+    bool& first,
+    QPDF& pdf,
+    QPDFObjectHandle& obj,
+    std::string const& file_prefix)
+{
+    Pipeline* stream_p = nullptr;
+    FILE* f = nullptr;
+    std::shared_ptr<Pl_StdioFile> f_pl;
+    std::string filename;
+    if (this->m->json_stream_data == qpdf_sj_file) {
+        filename = file_prefix + "-" + QUtil::int_to_string(obj.getObjectID());
+        f = QUtil::safe_fopen(filename.c_str(), "wb");
+        f_pl = std::make_shared<Pl_StdioFile>("stream data", f);
+        stream_p = f_pl.get();
+    }
+    auto j = JSON::makeDictionary();
+    j.addDictionaryMember(
+        "stream",
+        obj.getStreamJSON(
+            this->m->json_version,
+            this->m->json_stream_data,
+            this->m->decode_level,
+            stream_p,
+            filename));
+
+    JSON::writeDictionaryItem(p, first, "obj:" + obj.unparse(), j, 2);
+    if (f) {
+        f_pl->finish();
+        f_pl = nullptr;
+        fclose(f);
+    }
+}
+
+void
+QPDFJob::doJSONObject(
+    Pipeline* p,
+    bool& first,
+    QPDF& pdf,
+    std::string const& key,
+    QPDFObjectHandle& obj)
+{
+    auto j = JSON::makeDictionary();
+    j.addDictionaryMember("value", obj.getJSON(this->m->json_version, true));
+    JSON::writeDictionaryItem(p, first, key, j, 2);
+}
+
+void
+QPDFJob::doJSONQpdf(Pipeline* p, bool& first, QPDF& pdf)
+{
+    std::string file_prefix = this->m->json_stream_prefix;
+    if (this->m->json_stream_data == qpdf_sj_file) {
+        if (file_prefix.empty()) {
+            if (this->m->infilename.get()) {
+                file_prefix = this->m->infilename.get();
+            }
+            if (file_prefix.empty()) {
+                usage(
+                    "please specify --json-stream-prefix since the input file "
+                    "name is unknown");
+            }
+        }
+    }
+
+    JSON::writeDictionaryKey(p, first, "qpdf", 0);
+    bool first_qpdf = true;
+    JSON::writeDictionaryOpen(p, first_qpdf, 1);
+    JSON::writeDictionaryItem(
+        p, first_qpdf, "jsonversion", JSON::makeInt(this->m->json_version), 1);
+    JSON::writeDictionaryItem(
+        p, first_qpdf, "pdfversion", JSON::makeString(pdf.getPDFVersion()), 1);
+    JSON::writeDictionaryKey(p, first_qpdf, "objects", 1);
+    bool first_object = true;
+    JSON::writeDictionaryOpen(p, first_object, 2);
+    bool all_objects = m->json_objects.empty();
+    std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
+    std::vector<QPDFObjectHandle> objects = pdf.getAllObjects();
+    for (auto& obj: objects) {
+        if (all_objects || wanted_og.count(obj.getObjGen())) {
+            if (obj.isStream()) {
+                doJSONStream(p, first_object, pdf, obj, file_prefix);
+            } else {
+                doJSONObject(p, first_object, pdf, "obj:" + obj.unparse(), obj);
+            }
+        }
+    }
+    if (all_objects || m->json_objects.count("trailer")) {
+        auto trailer = pdf.getTrailer();
+        doJSONObject(p, first_object, pdf, "trailer", trailer);
+    }
+    JSON::writeDictionaryClose(p, first_object, 2);
+    JSON::writeDictionaryClose(p, first_qpdf, 1);
+}
+
+void
 QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
 {
     JSON::writeDictionaryKey(p, first, "pages", 0);
@@ -1482,14 +1590,15 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
     // The list of selectable top-level keys id duplicated in the
     // following places: job.yml, QPDFJob::json_schema, and
     // QPDFJob::doJSON.
-    if (all_keys || keys->count("objects")) {
-        schema.addDictionaryMember("objects", JSON::parse(R"({
+    if (json_version == 1) {
+        if (all_keys || keys->count("objects")) {
+            schema.addDictionaryMember("objects", JSON::parse(R"({
   "<n n R|trailer>": "json representation of object"
 })"));
-    }
-    if (all_keys || keys->count("objectinfo")) {
-        JSON objectinfo =
-            schema.addDictionaryMember("objectinfo", JSON::parse(R"({
+        }
+        if (all_keys || keys->count("objectinfo")) {
+            JSON objectinfo =
+                schema.addDictionaryMember("objectinfo", JSON::parse(R"({
   "<object-id>": {
     "stream": {
       "filter": "if stream, its filters, otherwise null",
@@ -1498,6 +1607,17 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
     }
   }
 })"));
+        }
+    } else {
+        if (all_keys || keys->count("qpdf")) {
+            schema.addDictionaryMember("qpdf", JSON::parse(R"({
+  "jsonversion": "qpdf json output version",
+  "pdfversion": "PDF version from PDF header",
+  "objects": {
+    "<obj:n n R|trailer>": "json representation of object"
+  }
+})"));
+        }
     }
     if (all_keys || keys->count("pages")) {
         JSON page = schema.addDictionaryMember("pages", JSON::parse(R"([
@@ -1705,15 +1825,21 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
         doJSONOutlines(p, first, pdf);
     }
 
-    // We do objects and objectinfo last so their information is
-    // consistent with repairing the page tree. To see the original
-    // file with any page tree problems and the page tree not
-    // flattened, select objects/objectinfo without other keys.
-    if (all_keys || m->json_keys.count("objects")) {
-        doJSONObjects(p, first, pdf);
-    }
-    if (all_keys || m->json_keys.count("objectinfo")) {
-        doJSONObjectinfo(p, first, pdf);
+    // We do objects last so their information is consistent with
+    // repairing the page tree. To see the original file with any page
+    // tree problems and the page tree not flattened, select
+    // objects/objectinfo without other keys.
+    if (this->m->json_version == 1) {
+        if (all_keys || m->json_keys.count("objects")) {
+            doJSONObjects(p, first, pdf);
+        }
+        if (all_keys || m->json_keys.count("objectinfo")) {
+            doJSONObjectinfo(p, first, pdf);
+        }
+    } else {
+        if (all_keys || m->json_keys.count("qpdf")) {
+            doJSONQpdf(p, first, pdf);
+        }
     }
 
     JSON::writeDictionaryClose(p, first, 0);

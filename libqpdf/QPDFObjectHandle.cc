@@ -1800,7 +1800,7 @@ QPDFObjectHandle::getJSON(int json_version, bool dereference_indirect)
 JSON
 QPDFObjectHandle::getStreamJSON(
     int json_version,
-    qpdf_stream_data_json_e json_data,
+    qpdf_json_stream_data_e json_data,
     qpdf_stream_decode_level_e decode_level,
     Pipeline* p,
     std::string const& data_filename)

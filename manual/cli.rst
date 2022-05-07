@@ -3225,6 +3225,37 @@ Related Options
    :qpdf:ref:`--job-json-file`. For more information about QPDFJob,
    see :ref:`qpdf-job`.
 
+.. qpdf:option:: --json-stream-data={none|inline|file}
+
+   .. help: how to handle streams in json output
+
+      Control whether streams in json output should be omitted,
+      written inline (base64-encoded) or written to a file. If "file"
+      is chosen, the file will be the name of the input file appended
+      with -nnn where nnn is the object number. The prefix can be
+      overridden with --json-stream-prefix.
+
+   Control whether streams in json output should be omitted, written
+   inline (base64-encoded) or written to a file. If ``file`` is
+   chosen, the file will be the name of the input file appended with
+   :samp:`-{nnn}` where :samp:`{nnn}` is the object number. The prefix
+   can be overridden with :qpdf:ref:`--json-stream-prefix`.
+
+.. qpdf:option:: --json-stream-prefix=file-prefix
+
+   .. help: prefix for json stream data files
+
+      When --json-stream-data=file is given, override the input file
+      name as the prefix for stream data files. Whatever is given here
+      will be appended with -nnn to create the name of the file that
+      will contain the data for the stream stream in object nnn.
+
+   When :qpdf:ref:`--json-stream-data` is given with the value
+   ``file``, override the input file name as the prefix for stream
+   data files. Whatever is given here will be appended with
+   :samp:`-{nnn}` to create the name of the file that will contain the
+   data for the stream stream in object :samp:`{nnn}`.
+
 .. _test-options:
 
 Options for Testing or Debugging

@@ -50,6 +50,8 @@ Output JSON v2
 
 General things to remember:
 
+* Test inline and file stream data.
+
 * Make sure all the information from --check and other informational
   options (--show-linearization, --show-encryption, --show-xref,
   --list-attachments, --show-npages) is available in the json output.
@@ -57,9 +59,6 @@ General things to remember:
 * Consider changing the contract to allow fields to be absent even
   when present in the schema. It's reasonable for people to check for
   presence of a key. Most languages make this easy to do.
-
-* The choices for json_key (job.yml) will be different for v1 and v2.
-  That information is already duplicated in multiple places.
 
 * Test stream with invalid data
 
@@ -76,89 +75,11 @@ General things to remember:
   * "b:cf80", "b:CF80", "u:π", "u:\u03c0"
   * "b:d83edd54", "u:🥔", "u:\ud83e\udd54"
 
+JSON to PDF:
+
 When reading a JSON string, any string that doesn't follow the above rules
 is an error. Just use newUnicodeString on "u:" strings. For "b:"
 strings, decode the bytes with hex_decode and use newString.
-
-Serialized PDF:
-
-The JSON output will have a "qpdf" key containing
-* jsonVersion
-* pdfVersion
-* objects
-
-The "qpdf" key replaces "objects" and "objectinfo" in v1 JSON.
-
-Within .qpdf.objects, the key is "obj:o g R" or "obj:trailer", and the
-value is a dictionary with exactly one of "value" or "stream" as its
-single key.
-
-Rationale of "obj:o g R" is that indirect object references are just
-"o g R", and so code that wants to resolve one can do so easily by
-just prepending "obj:" and not having to parse or split the string.
-Having a prefix rather than making the key just "o g R" makes it much
-easier to search in the JSON for the definition of an object.
-
-For non-streams:
-
-{
-  "obj:o g R": {
-    "value": ...
-  }
-}
-
-For streams:
-
-  "obj:o g R": {
-    "stream": {
-      "dict": { ... stream dictionary ... },
-      "data": "base64-encoded data",
-      "dataFile": "path to base64-encoded data"
-    }
-  }
-}
-
-At most one of "data" or "dataFile" will be present. When serializing,
-stream decode parameters will be obeyed, and the stream dictionary
-will reflect the result. There will be the option to omit stream data.
-
-In the stream dictionary, "/Length" is always removed.
-
-Streams are filtered or not based on the --decode-level parameter. If
-a stream is filtered, "/Filter" and "/DecodeParms" are removed from
-the stream dictionary. This makes the stream data and dictionary match
-for when the file is read back in.
-
-CLI:
-
-* Add new flags
-
-  * --from-json=input.json -- signals reading from a JSON and counts
-    as an input file.
-
-  * --json-streams-omit -- stream data is omitted, the default
-
-  * --json-streams-inline -- stream data is included in the "data"
-    key as base64-encoded
-
-  * --json-streams-file-prefix=prefix -- stream is written to $prefix-$obj
-    where $obj is the object number. The path to the file is stored
-    in the "dataFile" key. A relative path is recommended and will be
-    interpreted as relative to the current directory. If a relative
-    prefix is given, a relative path will stored in "dataFile".
-    Example:
-    mkdir in-streams
-    qpdf in.pdf --json-streams-file-prefix=in-streams/ > out.json
-
-  * --to-json -- changes default to --json-streams-inline implies
-    --json-key=qpdf
-
-Example workflow:
-* qpdf in.pdf --to-json > pdf.json
-* edit pdf.json
-* qpdf --from-json=pdf.json out.pdf
-
-JSON to PDF:
 
 For going back from JSON to PDF, we can have
 QPDF::fromJSON(std::shared_ptr<InputSource> which will have logic
@@ -198,6 +119,63 @@ the file. For the inline case, we have to keep the json InputSource
 around. Otherwise, we don't. It is an error if there is no stream data.
 
 Documentation:
+
+Serialized PDF:
+
+The JSON output will have a "qpdf" key containing
+* jsonversion
+* pdfversion
+* objects
+
+The "qpdf" key replaces "objects" and "objectinfo" in v1 JSON.
+
+Within .qpdf.objects, the key is "obj:o g R" or "trailer", and the
+value is a dictionary with exactly one of "value" or "stream" as its
+single key.
+
+Rationale of "obj:o g R" is that indirect object references are just
+"o g R", and so code that wants to resolve one can do so easily by
+just prepending "obj:" and not having to parse or split the string.
+Having a prefix rather than making the key just "o g R" makes it much
+easier to search in the JSON for the definition of an object.
+
+For non-streams:
+
+{
+  "obj:o g R": {
+    "value": ...
+  }
+}
+
+For streams:
+
+  "obj:o g R": {
+    "stream": {
+      "dict": { ... stream dictionary ... },
+      "data": "base64-encoded data",
+      "datafile": "path to base64-encoded data"
+    }
+  }
+}
+
+At most one of "data" or "datafile" will be present. When serializing,
+stream decode parameters will be obeyed, and the stream dictionary
+will reflect the result. There will be the option to omit stream data.
+
+When data is included, "/Length" is removed from the stream
+dictionary.
+
+Streams are filtered or not based on the --decode-level parameter. If
+a stream is filtered, "/Filter" and "/DecodeParms" are removed from
+the stream dictionary. This makes the stream data and dictionary match
+for when the file is read back in.
+
+CLI:
+
+Example workflow:
+* qpdf in.pdf --to-json > pdf.json
+* edit pdf.json
+* qpdf --from-json=pdf.json out.pdf
 
 Update --json option in cli.rst to mention v2 and update json.rst.
 

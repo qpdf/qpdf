@@ -13,7 +13,7 @@
           "object": "4 0 R"
         },
         "choices": [],
-        "defaultvalue": "",
+        "defaultvalue": "u:",
         "fieldflags": 0,
         "fieldtype": "/Tx",
         "fullname": "text",
@@ -27,7 +27,7 @@
         "parent": null,
         "partialname": "text",
         "quadding": 0,
-        "value": ""
+        "value": "u:"
       },
       {
         "alternativename": "r1",
@@ -253,7 +253,7 @@
           "object": "10 0 R"
         },
         "choices": [],
-        "defaultvalue": "salad πʬ",
+        "defaultvalue": "u:salad πʬ",
         "fieldflags": 0,
         "fieldtype": "/Tx",
         "fullname": "text2",
@@ -267,7 +267,7 @@
         "parent": null,
         "partialname": "text2",
         "quadding": 0,
-        "value": "salad πʬ"
+        "value": "u:salad πʬ"
       },
       {
         "alternativename": "combolist1",
@@ -282,7 +282,7 @@
           "pi",
           "four"
         ],
-        "defaultvalue": "",
+        "defaultvalue": "u:",
         "fieldflags": 393216,
         "fieldtype": "/Ch",
         "fullname": "combolist1",
@@ -296,7 +296,7 @@
         "parent": null,
         "partialname": "combolist1",
         "quadding": 0,
-        "value": ""
+        "value": "u:"
       },
       {
         "alternativename": "list1",
@@ -311,7 +311,7 @@
           "seven",
           "eight"
         ],
-        "defaultvalue": "",
+        "defaultvalue": "u:",
         "fieldflags": 0,
         "fieldtype": "/Ch",
         "fullname": "list1",
@@ -325,7 +325,7 @@
         "parent": null,
         "partialname": "list1",
         "quadding": 0,
-        "value": ""
+        "value": "u:"
       },
       {
         "alternativename": "drop1",
@@ -340,7 +340,7 @@
           "elephant",
           "twelve"
         ],
-        "defaultvalue": "",
+        "defaultvalue": "u:",
         "fieldflags": 131072,
         "fieldtype": "/Ch",
         "fullname": "drop1",
@@ -354,7 +354,7 @@
         "parent": null,
         "partialname": "drop1",
         "quadding": 0,
-        "value": ""
+        "value": "u:"
       },
       {
         "alternativename": "combodrop1",
@@ -369,7 +369,7 @@
           "gamma",
           "delta"
         ],
-        "defaultvalue": "",
+        "defaultvalue": "u:",
         "fieldflags": 393216,
         "fieldtype": "/Ch",
         "fullname": "combodrop1",
@@ -383,7 +383,7 @@
         "parent": null,
         "partialname": "combodrop1",
         "quadding": 0,
-        "value": ""
+        "value": "u:"
       }
     ],
     "hasacroform": true,

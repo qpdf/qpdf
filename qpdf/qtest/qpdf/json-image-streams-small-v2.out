@@ -250,8 +250,8 @@
     "capabilities": {
       "accessibility": true,
       "extract": true,
-      "moddifyannotations": true,
       "modify": true,
+      "modifyannotations": true,
       "modifyassembly": true,
       "modifyforms": true,
       "modifyother": true,
@@ -745,8 +745,8 @@
       "trailer": {
         "value": {
           "/ID": [
-            "Z§¯•Py»’~’46˛ı\u0011¢",
-            "Z§¯•Py»’~’46˛ı\u0011¢"
+            "b:5aa7af805079bb907e9034361d9a11a2",
+            "b:5aa7af805079bb907e9034361d9a11a2"
           ],
           "/Root": "1 0 R",
           "/Size": 31

@@ -1139,9 +1139,9 @@ foreach my $d (@json_files)
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("json v2 $out",
                  {$td->COMMAND =>
-                      ['qpdf', '--json=2', '--test-json-schema', @v1_xargs, $in]},
+                      ['qpdf', '--json=2', '--test-json-schema', @$xargs, $in]},
                  {$td->FILE => "$out-v2.out", $td->EXIT_STATUS => 0},
-                 $td->NORMALIZE_NEWLINES | $td->EXPECT_FAILURE);
+                 $td->NORMALIZE_NEWLINES);
 }
 
 show_ntests();
@@ -2886,14 +2886,13 @@ foreach my $f (qw(page_api_2 direct-pages))
     $td->runtest("json for $f (objects only)",
                  {$td->COMMAND =>
                       "qpdf --json=latest $f.pdf" .
-                      " --json-key=objects --json-key=objectinfo"},
+                      " --json-key=qpdf"},
                  {$td->FILE => "$f-json-objects.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("json for $f (with pages)",
                  {$td->COMMAND =>
                       "qpdf --json=latest $f.pdf" .
-                      " --json-key=objects --json-key=objectinfo" .
-                      " --json-key=pages"},
+                      " --json-key=qpdf --json-key=pages"},
                  {$td->FILE => "$f-json-pages.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 }

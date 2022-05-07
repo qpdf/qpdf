@@ -1377,12 +1377,16 @@ class QPDFObjectHandle
     // data_filename argument must be supplied. The value of
     // data_filename is stored in the resulting json in the "datafile"
     // key but is not otherwise use. The stream data itself (raw or
-    // filtered depending on decode level), is written to the
-    // pipeline via pipeStreamData().
+    // filtered depending on decode level), is written to the pipeline
+    // via pipeStreamData().
+    //
+    // NOTE: When json_data is qpdf_sj_inline, the QPDF object from
+    // which the stream originates must remain valid until after the
+    // JSON object is written.
     QPDF_DLL
     JSON getStreamJSON(
         int json_version,
-        qpdf_stream_data_json_e json_data,
+        qpdf_json_stream_data_e json_data,
         qpdf_stream_decode_level_e decode_level,
         Pipeline* p,
         std::string const& data_filename);

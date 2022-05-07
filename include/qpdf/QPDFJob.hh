@@ -515,12 +515,25 @@ class QPDFJob
     std::set<QPDFObjGen> getWantedJSONObjects();
     void doJSONObjects(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf);
+    void doJSONQpdf(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONPages(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONPageLabels(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONOutlines(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONEncrypt(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONAttachments(Pipeline* p, bool& first, QPDF& pdf);
+    void doJSONStream(
+        Pipeline* p,
+        bool& first,
+        QPDF& pdf,
+        QPDFObjectHandle& obj,
+        std::string const& file_prefix);
+    void doJSONObject(
+        Pipeline* p,
+        bool& first,
+        QPDF& pdf,
+        std::string const& key,
+        QPDFObjectHandle& obj);
     void addOutlinesToJson(
         std::vector<QPDFOutlineObjectHelper> outlines,
         JSON& j,
@@ -638,6 +651,8 @@ class QPDFJob
         int json_version;
         std::set<std::string> json_keys;
         std::set<std::string> json_objects;
+        qpdf_json_stream_data_e json_stream_data;
+        std::string json_stream_prefix;
         bool test_json_schema;
         bool check;
         bool optimize_images;

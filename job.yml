@@ -47,11 +47,16 @@ choices:
     - acroform
     - attachments
     - encrypt
-    - objectinfo
-    - objects
+    - objectinfo   # only v1
+    - objects      # only v1
     - outlines
     - pagelabels
     - pages
+    - qpdf         # only v2
+  json_stream_data:
+    - none
+    - inline
+    - file
   print128:
     - full
     - low
@@ -156,6 +161,7 @@ options:
       rotate: "[+|-]angle"
       show-attachment: attachment
       show-object: trailer
+      json-stream-prefix: stream-file-prefix
     required_choices:
       compress-streams: yn
       decode-level: decode_level
@@ -167,6 +173,7 @@ options:
       password-mode: password_mode
       remove-unreferenced-resources: remove_unref
       stream-data: stream_data
+      json-stream-data: json_stream_data
     optional_choices:
       json: json_version
   - table: pages
@@ -348,6 +355,8 @@ json:
     - null
   json-object:
     - null
+  json-stream-data:
+  json-stream-prefix:
   # other options
   allow-weak-crypto:
   keep-files-open:
