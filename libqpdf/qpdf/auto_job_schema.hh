@@ -86,6 +86,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   ],
   "jsonStreamData": "how to handle streams in json output",
   "jsonStreamPrefix": "prefix for json stream data files",
+  "toJson": "serialize to JSON",
   "allowWeakCrypto": "allow insecure cryptographic algorithms",
   "keepFilesOpen": "manage keeping multiple files open",
   "keepFilesOpenThreshold": "set threshold for keepFilesOpen",

@@ -3174,6 +3174,20 @@ Related Options
    :qpdf:ref:`--json-help` option to get a description of the JSON
    object.
 
+.. qpdf:option:: --to-json
+
+   .. help: serialize to JSON
+
+      Shortcut for options useful for serializing PDF to JSON:
+      --json=latest --json-stream-data=inline
+        --json-key=qpdf --decode-level=none
+
+   This option is a shorthand for
+   ``--json=latest --json-stream-data=inline --json-key=qpdf --decode-level=none``.
+   These are good options for serializing a PDF to JSON in manner that
+   allows qpdf to read it back in. You can override any of these
+   options by specifying other options after them.
+
 .. qpdf:option:: --json-help
 
    .. help: show format of JSON output
