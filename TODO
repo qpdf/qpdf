@@ -63,10 +63,6 @@ General things to remember:
 
 * Test stream with invalid data
 
-* Consider using camelCase in multi-word key names to be consistent
-  with job JSON and with how JSON is often represented in languages
-  that use it more natively.
-
 * When we get to full serialization, add json serialization
   performance test.
 
@@ -76,30 +72,9 @@ General things to remember:
   JSON representation of the object and could include indirect
   references, etc. We could also add --delete object.
 
-Object Representation:
-
-* Arrays, dictionaries, booleans, nulls, integers, and real numbers
-  are represented as their native JSON type. Real numbers that are out
-  of range will just be dealt with by however whatever JSON parser is
-  in use deals with it. Numbers like that shouldn't appear in PDF and,
-  if they do, they won't work right for anything. QPDF's JSON
-  representation allows for arbitrary precision.
-* Names: "/Name" -- internal/canonical representation (e.g.
-  "/Text/Plain", not #xx quoted)
-* Indirect objects: "n n R"
-* Strings: one of
-  "u:json utf-8-encoded string"
-  "b:hex-encoded bytes"
-  Test cases: these are the same:
+* Object representation tests
   * "b:cf80", "b:CF80", "u:π", "u:\u03c0"
   * "b:d83edd54", "u:🥔", "u:\ud83e\udd54"
-
-When creating output from a string:
-* If the string is explicitly unicode (UTF-8 or UTF-16), encode as
-  "u:" without the leading U+FEFF
-* Else if the string can be bidirectionally mapped between pdf-doc and
-  unicode, transcode to unicode and encode as "u:"
-* Else encode as "b:"
 
 When reading a JSON string, any string that doesn't follow the above rules
 is an error. Just use newUnicodeString on "u:" strings. For "b:"
