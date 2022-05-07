@@ -1374,10 +1374,12 @@ QPDFJob::doJSONEncrypt(Pipeline* p, bool& first, QPDF& pdf)
         "modifyassembly", JSON::makeBool(pdf.allowModifyAssembly()));
     j_capabilities.addDictionaryMember(
         "modifyforms", JSON::makeBool(pdf.allowModifyForm()));
-    // Typo will be fixed for json v2
     /* cSpell:ignore moddifyannotations */
+    std::string MODIFY_ANNOTATIONS =
+        (this->m->json_version == 1 ? "moddifyannotations"
+                                    : "modifyannotations");
     j_capabilities.addDictionaryMember(
-        "moddifyannotations", JSON::makeBool(pdf.allowModifyAnnotation()));
+        MODIFY_ANNOTATIONS, JSON::makeBool(pdf.allowModifyAnnotation()));
     j_capabilities.addDictionaryMember(
         "modifyother", JSON::makeBool(pdf.allowModifyOther()));
     j_capabilities.addDictionaryMember(
@@ -1448,7 +1450,7 @@ QPDFJob::doJSONAttachments(Pipeline* p, bool& first, QPDF& pdf)
 }
 
 JSON
-QPDFJob::json_schema(std::set<std::string>* keys)
+QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
 {
     // Style: use all lower-case keys with no dashes or underscores.
     // Choose array or dictionary based on indexing. For example, we
@@ -1585,12 +1587,14 @@ QPDFJob::json_schema(std::set<std::string>* keys)
   "needappearances": "whether the form fields' appearance streams need to be regenerated"
 })"));
     }
+    std::string MODIFY_ANNOTATIONS =
+        (json_version == 1 ? "moddifyannotations" : "modifyannotations");
     if (all_keys || keys->count("encrypt")) {
         JSON encrypt = schema.addDictionaryMember("encrypt", JSON::parse(R"({
   "capabilities": {
     "accessibility": "allow extraction for accessibility?",
     "extract": "allow extraction?",
-    "moddifyannotations": "allow modifying annotations?",
+    ")" + MODIFY_ANNOTATIONS + R"(": "allow modifying annotations?",
     "modify": "allow all modifications?",
     "modifyassembly": "allow modifying document assembly?",
     "modifyforms": "allow modifying forms?",
@@ -1630,7 +1634,7 @@ QPDFJob::json_schema(std::set<std::string>* keys)
 std::string
 QPDFJob::json_out_schema_v1()
 {
-    return json_schema().unparse();
+    return json_schema(1).unparse();
 }
 
 void
@@ -1717,7 +1721,7 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
 
     if (this->m->test_json_schema) {
         // Check against schema
-        JSON schema = json_schema(&m->json_keys);
+        JSON schema = json_schema(this->m->json_version, &m->json_keys);
         std::list<std::string> errors;
         JSON captured = JSON::parse(captured_json);
         if (!captured.checkSchema(schema, errors)) {

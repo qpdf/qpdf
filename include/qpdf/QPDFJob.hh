@@ -445,7 +445,7 @@ class QPDFJob
 
     // Helper functions
     static void usage(std::string const& msg);
-    static JSON json_schema(std::set<std::string>* keys = 0);
+    static JSON json_schema(int json_version, std::set<std::string>* keys = 0);
     static void parse_object_id(
         std::string const& objspec, bool& trailer, int& obj, int& gen);
     void parseRotationParameter(std::string const&);
