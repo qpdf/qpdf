@@ -1095,39 +1095,53 @@ my @json_files = (
     ['field-types', ['--show-encryption-key']],
     ['image-streams', ['--decode-level=all']],
     ['image-streams', ['--decode-level=specialized']],
-    ['page-labels-and-outlines', ['--json-key=objects']],
+    ['page-labels-and-outlines', ['--json-key=qpdf']],
     ['page-labels-and-outlines', ['--json-key=pages']],
     ['page-labels-and-outlines', ['--json-key=pagelabels']],
     ['page-labels-and-outlines', ['--json-key=outlines']],
     ['page-labels-and-outlines',
      ['--json-key=outlines', '--json-key=pages']],
     ['page-labels-and-outlines',
-     ['--json-key=objects', '--json-object=trailer']],
+     ['--json-key=qpdf', '--json-object=trailer']],
     ['page-labels-and-outlines',
-     ['--json-key=objects', '--json-object=trailer', '--json-object=2 0 R']],
+     ['--json-key=qpdf', '--json-object=trailer', '--json-object=2 0 R']],
     ['field-types', ['--json-key=acroform']],
     ['need-appearances', ['--json-key=acroform']],
     ['V4-aes', ['--json-key=encrypt']],
     ['V4-aes', ['--json-key=encrypt', '--show-encryption-key']],
 );
-$n_tests += scalar(@json_files);
+$n_tests += 2 * scalar(@json_files);
 foreach my $d (@json_files)
 {
     my ($file, $xargs) = @$d;
     my $out = "json-$file";
+    my @v1_xargs = ();
     foreach my $x (@$xargs)
     {
         my $y = $x;
         $y =~ s/^.*=//;
         $y =~ s/\s.*//;
         $out .= "-$y";
+        if ($x eq '--json-key=qpdf')
+        {
+            push(@v1_xargs, '--json-key=objects');
+        }
+        else
+        {
+            push(@v1_xargs, $x);
+        }
     }
     my $in = "$file.pdf";
-    $td->runtest("json $out",
+    $td->runtest("json v1 $out",
                  {$td->COMMAND =>
-                      ['qpdf', '--json=1', '--test-json-schema', @$xargs, $in]},
-                 {$td->FILE => "$out.out", $td->EXIT_STATUS => 0},
+                      ['qpdf', '--json=1', '--test-json-schema', @v1_xargs, $in]},
+                 {$td->FILE => "$out-v1.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
+    $td->runtest("json v2 $out",
+                 {$td->COMMAND =>
+                      ['qpdf', '--json=2', '--test-json-schema', @v1_xargs, $in]},
+                 {$td->FILE => "$out-v2.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES | $td->EXPECT_FAILURE);
 }
 
 show_ntests();
