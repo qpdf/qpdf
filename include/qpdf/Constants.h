@@ -99,6 +99,12 @@ enum qpdf_stream_decode_level_e {
     qpdf_dl_specialized, /* also decode other non-lossy filters */
     qpdf_dl_all          /* also decode lossy filters */
 };
+/* For JSON encoding */
+enum qpdf_stream_data_json_e {
+    qpdf_sj_none = 0,
+    qpdf_sj_inline,
+    qpdf_sj_file,
+};
 
 /* R3 Encryption Parameters */
 

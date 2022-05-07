@@ -1339,8 +1339,8 @@ class QPDFObjectHandle
     //     unambiguous. The getStreamJSON() call can be used to add
     //     encoding of the stream's data.
     // * Object types that are only valid in content streams (inline
-    //   image, operator) as well as "reserved" objects are not
-    //   representable and will be serialized as "null".
+    //   image, operator) are serialized as "null". Attempting to
+    //   serialize a "reserved" object is an error.
     // If dereference_indirect is true and this is an indirect object,
     // show the actual contents of the object. The effect of
     // dereference_indirect applies only to this object. It is not
@@ -1350,9 +1350,42 @@ class QPDFObjectHandle
 
     // Deprecated version uses v1 for backward compatibility.
     // ABI: remove for qpdf 12
-    [[deprecated("Use getJSON(int version)")]]
+    [[deprecated("Use getJSON(int version)")]] QPDF_DLL JSON
+    getJSON(bool dereference_indirect = false);
+
+    // This method can be called on a stream to get a more extended
+    // JSON representation of the stream that includes the stream's
+    // data. The JSON object returned is always a dictionary whose
+    // "dict" key is an encoding of the stream's dictionary. The
+    // representation of the data is determined by the json_data
+    // field.
+    //
+    // The json_data field may have the value qpdf_sj_none,
+    // qpdf_sj_inline, or qpdf_sj_file.
+    //
+    // If json_data is qpdf_sj_none, stream data is not represented.
+    //
+    // If json_data is qpdf_sj_inline or qpdf_sj_file, then stream
+    // data is filtered or not based on the value of decode_level,
+    // which has the same meaning as with pipeStreamData.
+    //
+    // If json_data is qpdf_sj_inline, the base64-encoded stream data
+    // is included in the "data" field of the dictionary that is
+    // returned.
+    //
+    // If json_data is qpdf_sj_file, then the Pipeline ("p") and
+    // data_filename argument must be supplied. The value of
+    // data_filename is stored in the resulting json in the "datafile"
+    // key but is not otherwise use. The stream data itself (raw or
+    // filtered depending on decode level), is written to the
+    // pipeline via pipeStreamData().
     QPDF_DLL
-    JSON getJSON(bool dereference_indirect = false);
+    JSON getStreamJSON(
+        int json_version,
+        qpdf_stream_data_json_e json_data,
+        qpdf_stream_decode_level_e decode_level,
+        Pipeline* p,
+        std::string const& data_filename);
 
     // Legacy helper methods for commonly performed operations on
     // pages. Newer code should use QPDFPageObjectHelper instead. The
