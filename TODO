@@ -61,8 +61,6 @@ General things to remember:
 * The choices for json_key (job.yml) will be different for v1 and v2.
   That information is already duplicated in multiple places.
 
-* Remember typo: search for "Typo" In QPDFJob::doJSONEncrypt.
-
 * Test stream with invalid data
 
 * Consider using camelCase in multi-word key names to be consistent

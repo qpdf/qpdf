@@ -4306,8 +4306,8 @@ foreach my $d (@encrypted_files)
     $enc_json .=
         "      \"accessibility\": " . &$jf($accessible) . ",\n" .
         "      \"extract\": " . &$jf($extract) . ",\n" .
-        "      \"moddifyannotations\": " . &$jf($modifyannot) . ",\n" .
         "      \"modify\": " . &$jf($modifyall) . ",\n" .
+        "      \"modifyannotations\": " . &$jf($modifyannot) . ",\n" .
         "      \"modifyassembly\": " . &$jf($modifyassembly) . ",\n" .
         "      \"modifyforms\": " . &$jf($modifyform) . ",\n" .
         "      \"modifyother\": " . &$jf($modifyother) . ",\n" .
