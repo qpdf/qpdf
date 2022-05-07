@@ -1797,6 +1797,19 @@ QPDFObjectHandle::getJSON(int json_version, bool dereference_indirect)
     }
 }
 
+JSON
+QPDFObjectHandle::getStreamJSON(
+    int json_version,
+    qpdf_stream_data_json_e json_data,
+    qpdf_stream_decode_level_e decode_level,
+    Pipeline* p,
+    std::string const& data_filename)
+{
+    assertStream();
+    return dynamic_cast<QPDF_Stream*>(obj.get())->getStreamJSON(
+        json_version, json_data, decode_level, p, data_filename);
+}
+
 QPDFObjectHandle
 QPDFObjectHandle::wrapInArray()
 {

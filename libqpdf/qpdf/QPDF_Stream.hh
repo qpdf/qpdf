@@ -61,6 +61,12 @@ class QPDF_Stream: public QPDFObject
         QPDFObjectHandle const& decode_parms);
     void
     addTokenFilter(std::shared_ptr<QPDFObjectHandle::TokenFilter> token_filter);
+    JSON getStreamJSON(
+        int json_version,
+        qpdf_stream_data_json_e json_data,
+        qpdf_stream_decode_level_e decode_level,
+        Pipeline* p,
+        std::string const& data_filename);
 
     void replaceDict(QPDFObjectHandle const& new_dict);
 

@@ -63,6 +63,8 @@ General things to remember:
 
 * Remember typo: search for "Typo" In QPDFJob::doJSONEncrypt.
 
+* Test stream with invalid data
+
 * Consider using camelCase in multi-word key names to be consistent
   with job JSON and with how JSON is often represented in languages
   that use it more natively.
