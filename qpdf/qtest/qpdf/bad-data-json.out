@@ -1,0 +1,3 @@
+WARNING: bad-data.pdf (offset 319): error decoding stream data for object 4 0: LZWDecoder: bad code received
+WARNING: bad-data.pdf (offset 319): stream will be re-processed without filtering to avoid data loss
+qpdf: operation succeeded with warnings

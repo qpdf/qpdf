@@ -60,8 +60,6 @@ General things to remember:
   when present in the schema. It's reasonable for people to check for
   presence of a key. Most languages make this easy to do.
 
-* Test stream with invalid data
-
 * When we get to full serialization, add json serialization
   performance test.
 
