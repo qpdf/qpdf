@@ -284,6 +284,16 @@ QPDFJob::Config::jsonStreamPrefix(std::string const& parameter)
 }
 
 QPDFJob::Config*
+QPDFJob::Config::toJson()
+{
+    json("latest");
+    jsonStreamData("inline");
+    jsonKey("qpdf");
+    decodeLevel("none");
+    return this;
+}
+
+QPDFJob::Config*
 QPDFJob::Config::testJsonSchema()
 {
     o.m->test_json_schema = true;

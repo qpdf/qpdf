@@ -1111,7 +1111,7 @@ my @json_files = (
     ['V4-aes', ['--json-key=encrypt']],
     ['V4-aes', ['--json-key=encrypt', '--show-encryption-key']],
 );
-$n_tests += 24 + (2 * scalar(@json_files));
+$n_tests += 25 + (2 * scalar(@json_files));
 foreach my $d (@json_files)
 {
     my ($file, $xargs) = @$d;
@@ -1228,6 +1228,12 @@ foreach my $l (qw(none generalized specialized all))
         }
     }
 }
+
+$td->runtest("use --to-json option",
+             {$td->COMMAND => "qpdf --to-json image-streams-small.pdf"},
+             {$td->FILE => "image-streams-small-to-json.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------

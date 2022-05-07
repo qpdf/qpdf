@@ -134,6 +134,7 @@ options:
       - suppress-password-recovery
       - suppress-recovery
       - test-json-schema
+      - to-json
       - underlay
       - verbose
       - warning-exit-0
@@ -357,6 +358,7 @@ json:
     - null
   json-stream-data:
   json-stream-prefix:
+  to-json:
   # other options
   allow-weak-crypto:
   keep-files-open:

@@ -259,6 +259,9 @@ popHandler(); // key: jsonStreamData
 pushKey("jsonStreamPrefix");
 addParameter([this](std::string const& p) { c_main->jsonStreamPrefix(p); });
 popHandler(); // key: jsonStreamPrefix
+pushKey("toJson");
+addBare([this]() { c_main->toJson(); });
+popHandler(); // key: toJson
 pushKey("allowWeakCrypto");
 addBare([this]() { c_main->allowWeakCrypto(); });
 popHandler(); // key: allowWeakCrypto

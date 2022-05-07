@@ -798,6 +798,10 @@ depth in the JSON section of the manual. "version" may be a
 specific version or "latest". Run qpdf --json-help for a
 description of the generated JSON object.
 )");
+ap.addOptionHelp("--to-json", "json", "serialize to JSON", R"(Shortcut for options useful for serializing PDF to JSON:
+--json=latest --json-stream-data=inline
+  --json-key=qpdf --decode-level=none
+)");
 ap.addOptionHelp("--json-help", "json", "show format of JSON output", R"(Describe the format of the JSON output by writing to standard
 output a JSON object with the same keys and with values
 containing descriptive text.
@@ -839,14 +843,14 @@ ap.addOptionHelp("--static-id", "testing", "use a fixed document ID", R"(Use a f
 testing only. Never use it for production files. See also
 qpdf --help=--deterministic-id.
 )");
+}
+static void add_help_8(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--static-aes-iv", "testing", "use a fixed AES vector", R"(Use a static initialization vector for AES-CBC. This is intended
 for testing only so that output files can be reproducible. Never
 use it for production files. This option is not secure since it
 significantly weakens the encryption.
 )");
-}
-static void add_help_8(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--linearize-pass1", "testing", "save pass 1 of linearization", R"(--linearize-pass1=file
 
 Write the first pass of linearization to the named file. The
