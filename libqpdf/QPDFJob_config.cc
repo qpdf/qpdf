@@ -235,11 +235,11 @@ QPDFJob::Config*
 QPDFJob::Config::json(std::string const& parameter)
 {
     if (parameter.empty() || (parameter == "latest")) {
-        o.m->json_version = 1;
+        o.m->json_version = JSON::LATEST;
     } else {
         o.m->json_version = QUtil::string_to_int(parameter.c_str());
     }
-    if (o.m->json_version != 1) {
+    if ((o.m->json_version < 1) || (o.m->json_version > JSON::LATEST)) {
         usage(std::string("unsupported json version ") + parameter);
     }
     o.m->require_outfile = false;

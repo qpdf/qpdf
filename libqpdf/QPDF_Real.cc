@@ -20,7 +20,7 @@ QPDF_Real::unparse()
 }
 
 JSON
-QPDF_Real::getJSON()
+QPDF_Real::getJSON(int json_version)
 {
     // While PDF allows .x or -.x, JSON does not. Rather than
     // converting from string to double and back, just handle this as a

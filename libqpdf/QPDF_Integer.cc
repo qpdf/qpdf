@@ -14,7 +14,7 @@ QPDF_Integer::unparse()
 }
 
 JSON
-QPDF_Integer::getJSON()
+QPDF_Integer::getJSON(int json_version)
 {
     return JSON::makeInt(this->val);
 }

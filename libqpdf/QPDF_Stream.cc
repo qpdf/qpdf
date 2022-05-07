@@ -151,9 +151,10 @@ QPDF_Stream::unparse()
 }
 
 JSON
-QPDF_Stream::getJSON()
+QPDF_Stream::getJSON(int json_version)
 {
-    return this->stream_dict.getJSON();
+    // QXXXQ
+    return this->stream_dict.getJSON(json_version);
 }
 
 QPDFObject::object_type_e

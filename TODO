@@ -50,8 +50,6 @@ Output JSON v2
 
 General things to remember:
 
-* deprecate getJSON without a version
-
 * Make sure all the information from --check and other informational
   options (--show-linearization, --show-encryption, --show-xref,
   --list-attachments, --show-npages) is available in the json output.

@@ -10,7 +10,7 @@ QPDF_Reserved::unparse()
 }
 
 JSON
-QPDF_Reserved::getJSON()
+QPDF_Reserved::getJSON(int json_version)
 {
     throw std::logic_error("attempt to generate JSON from QPDF_Reserved");
     return JSON::makeNull();

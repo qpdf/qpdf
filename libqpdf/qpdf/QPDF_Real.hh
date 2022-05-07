@@ -10,7 +10,7 @@ class QPDF_Real: public QPDFObject
     QPDF_Real(double value, int decimal_places, bool trim_trailing_zeroes);
     virtual ~QPDF_Real() = default;
     virtual std::string unparse();
-    virtual JSON getJSON();
+    virtual JSON getJSON(int json_version);
     virtual QPDFObject::object_type_e getTypeCode() const;
     virtual char const* getTypeName() const;
     std::string getVal();

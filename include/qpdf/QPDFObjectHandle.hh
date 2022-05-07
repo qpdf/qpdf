@@ -1304,15 +1304,40 @@ class QPDFObjectHandle
     QPDF_DLL
     std::string unparseBinary();
 
-    // Return encoded as JSON. For most object types, there is an
-    // obvious mapping. The JSON is generated as follows:
-    // * Names are encoded as strings representing the normalized name
-    //   in PDF syntax as returned by unparse()
+    // Return encoded as JSON. The constant JSON::LATEST can be used
+    // to specify the latest available JSON version. The JSON is
+    // generated as follows:
+    // * Arrays, dictionaries, booleans, nulls, integers, and real
+    //   numbers are represented by their native JSON types.
+    // * Names are encoded as strings representing the canonical
+    //   representation (after parsing #xx) and preceded by a slash,
+    //   just as unparse() returns. For example, the JSON for the
+    //   PDF-syntax name /Text#2fPlain would be "/Text/Plain".
     // * Indirect references are encoded as strings containing "obj gen R"
-    // * Strings are encoded as UTF-8 strings with unrepresentable binary
-    //   characters encoded as \uHHHH
-    // * Encoding streams just encodes the stream's dictionary; the stream
-    //   data is not represented
+    // * Strings
+    //   * JSON v1: Strings are encoded as UTF-8 strings with
+    //     unrepresentable binary characters encoded as \uHHHH.
+    //     Characters in PDF Doc encoding that don't have
+    //     bidirectional unicode mappings are not reversible. There is
+    //     no way to tell the difference between a string that looks
+    //     like a name or indirect object from an actual name or
+    //     indirect object.
+    //   * JSON v2:
+    //     * Unicode strings and strings encoded with PDF Doc encoding
+    //       that can be bidrectionally mapped two Unicode (which is
+    //       all strings without undefined characters) are represented
+    //       as "u:" followed by the UTF-8 encoded string. Example:
+    //       "u:potato".
+    //     * All other strings are represented as "b:" followed by a
+    //       hexadecimal encoding of the string. Example: "b:0102cacb"
+    // * Streams
+    //   * JSON v1: Only the stream's dictionary is encoded. There is
+    //     no way tell a stream from a dictionary other than context.
+    //   * JSON v2: A stream is encoded as {"dict": {...}} with the
+    //     value being the encoding of the stream's dictionary. Since
+    //     "dict" does not otherwise represent anything, this is
+    //     unambiguous. The getStreamJSON() call can be used to add
+    //     encoding of the stream's data.
     // * Object types that are only valid in content streams (inline
     //   image, operator) as well as "reserved" objects are not
     //   representable and will be serialized as "null".
@@ -1320,6 +1345,12 @@ class QPDFObjectHandle
     // show the actual contents of the object. The effect of
     // dereference_indirect applies only to this object. It is not
     // recursive.
+    QPDF_DLL
+    JSON getJSON(int json_version, bool dereference_indirect = false);
+
+    // Deprecated version uses v1 for backward compatibility.
+    // ABI: remove for qpdf 12
+    [[deprecated("Use getJSON(int version)")]]
     QPDF_DLL
     JSON getJSON(bool dereference_indirect = false);
 

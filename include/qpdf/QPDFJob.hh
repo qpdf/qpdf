@@ -26,6 +26,7 @@
 #include <qpdf/DLL.h>
 #include <qpdf/PDFVersion.hh>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFOutlineObjectHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 
 #include <functional>
@@ -520,6 +521,10 @@ class QPDFJob
     void doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONEncrypt(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONAttachments(Pipeline* p, bool& first, QPDF& pdf);
+    void addOutlinesToJson(
+        std::vector<QPDFOutlineObjectHelper> outlines,
+        JSON& j,
+        std::map<QPDFObjGen, int>& page_numbers);
 
     enum remove_unref_e { re_auto, re_yes, re_no };
 

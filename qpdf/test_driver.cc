@@ -1922,7 +1922,7 @@ test_50(QPDF& pdf, char const* arg2)
     QPDFObjectHandle d1 = pdf.getTrailer().getKey("/Dict1");
     QPDFObjectHandle d2 = pdf.getTrailer().getKey("/Dict2");
     d1.mergeResources(d2);
-    std::cout << d1.getJSON().unparse() << std::endl;
+    std::cout << d1.getJSON(JSON::LATEST).unparse() << std::endl;
     // Top-level type mismatch
     d1.mergeResources(d2.getKey("/k1"));
     for (auto const& name: d1.getResourceNames()) {
@@ -3114,7 +3114,7 @@ test_87(QPDF& pdf, char const* arg2)
     });
     assert(dict.unparse() == "<< /A 2 >>");
     assert(dict.getKeys() == std::set<std::string>({"/A"}));
-    assert(dict.getJSON().unparse() == "{\n  \"/A\": 2\n}");
+    assert(dict.getJSON(JSON::LATEST).unparse() == "{\n  \"/A\": 2\n}");
 }
 
 static void

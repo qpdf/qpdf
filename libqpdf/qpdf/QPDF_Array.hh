@@ -14,7 +14,7 @@ class QPDF_Array: public QPDFObject
     QPDF_Array(SparseOHArray const& items);
     virtual ~QPDF_Array() = default;
     virtual std::string unparse();
-    virtual JSON getJSON();
+    virtual JSON getJSON(int json_version);
     virtual QPDFObject::object_type_e getTypeCode() const;
     virtual char const* getTypeName() const;
     virtual void setDescription(QPDF*, std::string const&);

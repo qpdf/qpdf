@@ -14,7 +14,7 @@ QPDF_InlineImage::unparse()
 }
 
 JSON
-QPDF_InlineImage::getJSON()
+QPDF_InlineImage::getJSON(int json_version)
 {
     return JSON::makeNull();
 }

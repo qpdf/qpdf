@@ -43,8 +43,9 @@ QPDF_String::unparse()
 }
 
 JSON
-QPDF_String::getJSON()
+QPDF_String::getJSON(int json_version)
 {
+    // QXXXQ
     return JSON::makeString(getUTF8Val());
 }
 

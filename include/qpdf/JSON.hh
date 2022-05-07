@@ -51,6 +51,8 @@ class InputSource;
 class JSON
 {
   public:
+    static int constexpr LATEST = 2;
+
     QPDF_DLL
     std::string unparse() const;
 

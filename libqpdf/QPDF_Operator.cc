@@ -14,7 +14,7 @@ QPDF_Operator::unparse()
 }
 
 JSON
-QPDF_Operator::getJSON()
+QPDF_Operator::getJSON(int json_version)
 {
     return JSON::makeNull();
 }

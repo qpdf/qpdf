@@ -1775,8 +1775,15 @@ QPDFObjectHandle::unparseBinary()
     }
 }
 
+// Deprecated versionless getJSON to be removed in qpdf 12
 JSON
 QPDFObjectHandle::getJSON(bool dereference_indirect)
+{
+    return getJSON(1, dereference_indirect);
+}
+
+JSON
+QPDFObjectHandle::getJSON(int json_version, bool dereference_indirect)
 {
     if ((!dereference_indirect) && this->isIndirect()) {
         return JSON::makeString(unparse());
@@ -1786,7 +1793,7 @@ QPDFObjectHandle::getJSON(bool dereference_indirect)
             throw std::logic_error(
                 "QPDFObjectHandle: attempting to unparse a reserved object");
         }
-        return this->obj->getJSON();
+        return this->obj->getJSON(json_version);
     }
 }
 

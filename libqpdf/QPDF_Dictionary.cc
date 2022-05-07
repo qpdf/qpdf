@@ -32,13 +32,14 @@ QPDF_Dictionary::unparse()
 }
 
 JSON
-QPDF_Dictionary::getJSON()
+QPDF_Dictionary::getJSON(int json_version)
 {
     JSON j = JSON::makeDictionary();
     for (auto& iter: this->items) {
         if (!iter.second.isNull()) {
             j.addDictionaryMember(
-                QPDF_Name::normalizeName(iter.first), iter.second.getJSON());
+                QPDF_Name::normalizeName(iter.first),
+                iter.second.getJSON(json_version));
         }
     }
     return j;

@@ -40,7 +40,7 @@ QPDF_Name::unparse()
 }
 
 JSON
-QPDF_Name::getJSON()
+QPDF_Name::getJSON(int json_version)
 {
     return JSON::makeString(normalizeName(this->name));
 }

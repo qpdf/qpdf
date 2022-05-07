@@ -142,7 +142,7 @@ FuzzHelper::testPages()
             page.getImages();
             pldh.getLabelForPage(pageno);
             QPDFObjectHandle page_obj(page.getObjectHandle());
-            page_obj.getJSON(true).unparse();
+            page_obj.getJSON(JSON::LATEST, true).unparse();
             odh.getOutlinesForPage(page_obj.getObjGen());
 
             std::vector<QPDFAnnotationObjectHelper> annotations =

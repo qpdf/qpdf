@@ -4279,7 +4279,7 @@ foreach my $d (@encrypted_files)
     my $enc_details = "";
     my $enc_json =
         "{\n" .
-        "  \"version\": 1,\n" .
+        "  \"version\": 2,\n" .
         "  \"parameters\": {\n" .
         "    \"decodelevel\": \"generalized\"\n" .
         "  },\n" .

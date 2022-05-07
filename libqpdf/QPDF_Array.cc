@@ -34,12 +34,12 @@ QPDF_Array::unparse()
 }
 
 JSON
-QPDF_Array::getJSON()
+QPDF_Array::getJSON(int json_version)
 {
     JSON j = JSON::makeArray();
     size_t size = this->elements.size();
     for (size_t i = 0; i < size; ++i) {
-        j.addArrayElement(this->elements.at(i).getJSON());
+        j.addArrayElement(this->elements.at(i).getJSON(json_version));
     }
     return j;
 }

@@ -38,6 +38,7 @@ choices:
     - screen
   json_version:
     - 1
+    - 2
     - latest
   json_key:
     # The list of selectable top-level keys id duplicated in the

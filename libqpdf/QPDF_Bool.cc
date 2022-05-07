@@ -12,7 +12,7 @@ QPDF_Bool::unparse()
 }
 
 JSON
-QPDF_Bool::getJSON()
+QPDF_Bool::getJSON(int json_version)
 {
     return JSON::makeBool(this->val);
 }

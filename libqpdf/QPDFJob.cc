@@ -1053,12 +1053,20 @@ QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
     for (auto& obj: objects) {
         if (all_objects || wanted_og.count(obj.getObjGen())) {
             JSON::writeDictionaryItem(
-                p, first_object, obj.unparse(), obj.getJSON(true), 1);
+                p,
+                first_object,
+                obj.unparse(),
+                obj.getJSON(this->m->json_version, true),
+                1);
         }
     }
     if (all_objects || m->json_objects.count("trailer")) {
         JSON::writeDictionaryItem(
-            p, first_object, "trailer", pdf.getTrailer().getJSON(true), 1);
+            p,
+            first_object,
+            "trailer",
+            pdf.getTrailer().getJSON(this->m->json_version, true),
+            1);
     }
     JSON::writeDictionaryClose(p, first_object, 1);
 }
@@ -1080,11 +1088,13 @@ QPDFJob::doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf)
             j_stream.addDictionaryMember("is", JSON::makeBool(is_stream));
             j_stream.addDictionaryMember(
                 "length",
-                (is_stream ? obj.getDict().getKey("/Length").getJSON(true)
+                (is_stream ? obj.getDict().getKey("/Length").getJSON(
+                                 this->m->json_version, true)
                            : JSON::makeNull()));
             j_stream.addDictionaryMember(
                 "filter",
-                (is_stream ? obj.getDict().getKey("/Filter").getJSON(true)
+                (is_stream ? obj.getDict().getKey("/Filter").getJSON(
+                                 this->m->json_version, true)
                            : JSON::makeNull()));
             JSON::writeDictionaryItem(
                 p, first_object, obj.unparse(), j_details, 1);
@@ -1108,7 +1118,8 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
         ++pageno;
         JSON j_page = JSON::makeDictionary();
         QPDFObjectHandle page = ph.getObjectHandle();
-        j_page.addDictionaryMember("object", page.getJSON());
+        j_page.addDictionaryMember(
+            "object", page.getJSON(this->m->json_version));
         JSON j_images = j_page.addDictionaryMember("images", JSON::makeArray());
         std::map<std::string, QPDFObjectHandle> images = ph.getImages();
         for (auto const& iter2: images) {
@@ -1116,17 +1127,23 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
             j_image.addDictionaryMember("name", JSON::makeString(iter2.first));
             QPDFObjectHandle image = iter2.second;
             QPDFObjectHandle dict = image.getDict();
-            j_image.addDictionaryMember("object", image.getJSON());
             j_image.addDictionaryMember(
-                "width", dict.getKey("/Width").getJSON());
+                "object", image.getJSON(this->m->json_version));
             j_image.addDictionaryMember(
-                "height", dict.getKey("/Height").getJSON());
+                "width", dict.getKey("/Width").getJSON(this->m->json_version));
             j_image.addDictionaryMember(
-                "colorspace", dict.getKey("/ColorSpace").getJSON());
+                "height",
+                dict.getKey("/Height").getJSON(this->m->json_version));
             j_image.addDictionaryMember(
-                "bitspercomponent", dict.getKey("/BitsPerComponent").getJSON());
+                "colorspace",
+                dict.getKey("/ColorSpace").getJSON(this->m->json_version));
+            j_image.addDictionaryMember(
+                "bitspercomponent",
+                dict.getKey("/BitsPerComponent")
+                    .getJSON(this->m->json_version));
             QPDFObjectHandle filters = dict.getKey("/Filter").wrapInArray();
-            j_image.addDictionaryMember("filter", filters.getJSON());
+            j_image.addDictionaryMember(
+                "filter", filters.getJSON(this->m->json_version));
             QPDFObjectHandle decode_parms = dict.getKey("/DecodeParms");
             QPDFObjectHandle dp_array;
             if (decode_parms.isArray()) {
@@ -1137,7 +1154,8 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
                     dp_array.appendItem(decode_parms);
                 }
             }
-            j_image.addDictionaryMember("decodeparms", dp_array.getJSON());
+            j_image.addDictionaryMember(
+                "decodeparms", dp_array.getJSON(this->m->json_version));
             j_image.addDictionaryMember(
                 "filterable",
                 JSON::makeBool(
@@ -1148,10 +1166,11 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
             j_page.addDictionaryMember("contents", JSON::makeArray());
         std::vector<QPDFObjectHandle> content = ph.getPageContents();
         for (auto& iter2: content) {
-            j_contents.addArrayElement(iter2.getJSON());
+            j_contents.addArrayElement(iter2.getJSON(this->m->json_version));
         }
         j_page.addDictionaryMember(
-            "label", pldh.getLabelForPage(pageno).getJSON());
+            "label",
+            pldh.getLabelForPage(pageno).getJSON(this->m->json_version));
         JSON j_outlines =
             j_page.addDictionaryMember("outlines", JSON::makeArray());
         std::vector<QPDFOutlineObjectHelper> outlines =
@@ -1159,11 +1178,12 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
         for (auto& oiter: outlines) {
             JSON j_outline = j_outlines.addArrayElement(JSON::makeDictionary());
             j_outline.addDictionaryMember(
-                "object", oiter.getObjectHandle().getJSON());
+                "object",
+                oiter.getObjectHandle().getJSON(this->m->json_version));
             j_outline.addDictionaryMember(
                 "title", JSON::makeString(oiter.getTitle()));
             j_outline.addDictionaryMember(
-                "dest", oiter.getDest().getJSON(true));
+                "dest", oiter.getDest().getJSON(this->m->json_version, true));
         }
         j_page.addDictionaryMember("pageposfrom1", JSON::makeInt(1 + pageno));
         JSON::writeArrayItem(p, first_page, j_page, 1);
@@ -1192,25 +1212,29 @@ QPDFJob::doJSONPageLabels(Pipeline* p, bool& first, QPDF& pdf)
                 break;
             }
             JSON j_label = j_labels.addArrayElement(JSON::makeDictionary());
-            j_label.addDictionaryMember("index", (*iter).getJSON());
+            j_label.addDictionaryMember(
+                "index", (*iter).getJSON(this->m->json_version));
             ++iter;
-            j_label.addDictionaryMember("label", (*iter).getJSON());
+            j_label.addDictionaryMember(
+                "label", (*iter).getJSON(this->m->json_version));
         }
     }
     JSON::writeDictionaryItem(p, first, "pagelabels", j_labels, 0);
 }
 
-static void
-add_outlines_to_json(
+void
+QPDFJob::addOutlinesToJson(
     std::vector<QPDFOutlineObjectHelper> outlines,
     JSON& j,
     std::map<QPDFObjGen, int>& page_numbers)
 {
     for (auto& ol: outlines) {
         JSON jo = j.addArrayElement(JSON::makeDictionary());
-        jo.addDictionaryMember("object", ol.getObjectHandle().getJSON());
+        jo.addDictionaryMember(
+            "object", ol.getObjectHandle().getJSON(this->m->json_version));
         jo.addDictionaryMember("title", JSON::makeString(ol.getTitle()));
-        jo.addDictionaryMember("dest", ol.getDest().getJSON(true));
+        jo.addDictionaryMember(
+            "dest", ol.getDest().getJSON(this->m->json_version, true));
         jo.addDictionaryMember("open", JSON::makeBool(ol.getCount() >= 0));
         QPDFObjectHandle page = ol.getDestPage();
         JSON j_destpage = JSON::makeNull();
@@ -1222,7 +1246,7 @@ add_outlines_to_json(
         }
         jo.addDictionaryMember("destpageposfrom1", j_destpage);
         JSON j_kids = jo.addDictionaryMember("kids", JSON::makeArray());
-        add_outlines_to_json(ol.getKids(), j_kids, page_numbers);
+        addOutlinesToJson(ol.getKids(), j_kids, page_numbers);
     }
 }
 
@@ -1240,7 +1264,7 @@ QPDFJob::doJSONOutlines(Pipeline* p, bool& first, QPDF& pdf)
 
     JSON j_outlines = JSON::makeArray();
     QPDFOutlineDocumentHelper odh(pdf);
-    add_outlines_to_json(odh.getTopLevelOutlines(), j_outlines, page_numbers);
+    addOutlinesToJson(odh.getTopLevelOutlines(), j_outlines, page_numbers);
     JSON::writeDictionaryItem(p, first, "outlines", j_outlines, 0);
 }
 
@@ -1265,9 +1289,11 @@ QPDFJob::doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf)
             QPDFFormFieldObjectHelper ffh = afdh.getFieldForAnnotation(aoh);
             JSON j_field = j_fields.addArrayElement(JSON::makeDictionary());
             j_field.addDictionaryMember(
-                "object", ffh.getObjectHandle().getJSON());
+                "object", ffh.getObjectHandle().getJSON(this->m->json_version));
             j_field.addDictionaryMember(
-                "parent", ffh.getObjectHandle().getKey("/Parent").getJSON());
+                "parent",
+                ffh.getObjectHandle().getKey("/Parent").getJSON(
+                    this->m->json_version));
             j_field.addDictionaryMember(
                 "pageposfrom1", JSON::makeInt(pagepos1));
             j_field.addDictionaryMember(
@@ -1282,9 +1308,11 @@ QPDFJob::doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf)
                 "alternativename", JSON::makeString(ffh.getAlternativeName()));
             j_field.addDictionaryMember(
                 "mappingname", JSON::makeString(ffh.getMappingName()));
-            j_field.addDictionaryMember("value", ffh.getValue().getJSON());
             j_field.addDictionaryMember(
-                "defaultvalue", ffh.getDefaultValue().getJSON());
+                "value", ffh.getValue().getJSON(this->m->json_version));
+            j_field.addDictionaryMember(
+                "defaultvalue",
+                ffh.getDefaultValue().getJSON(this->m->json_version));
             j_field.addDictionaryMember(
                 "quadding", JSON::makeInt(ffh.getQuadding()));
             j_field.addDictionaryMember(
@@ -1303,7 +1331,7 @@ QPDFJob::doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf)
             JSON j_annot = j_field.addDictionaryMember(
                 "annotation", JSON::makeDictionary());
             j_annot.addDictionaryMember(
-                "object", aoh.getObjectHandle().getJSON());
+                "object", aoh.getObjectHandle().getJSON(this->m->json_version));
             j_annot.addDictionaryMember(
                 "appearancestate", JSON::makeString(aoh.getAppearanceState()));
             j_annot.addDictionaryMember(
@@ -1621,7 +1649,8 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
     // change is made to the JSON format. Clients of the JSON are to
     // ignore unrecognized keys, so we only update the version of a
     // key disappears or if its value changes meaning.
-    JSON::writeDictionaryItem(p, first, "version", JSON::makeInt(1), 0);
+    JSON::writeDictionaryItem(
+        p, first, "version", JSON::makeInt(this->m->json_version), 0);
     JSON j_params = JSON::makeDictionary();
     std::string decode_level_str;
     switch (m->decode_level) {

@@ -100,10 +100,12 @@ test_main()
         "  ],\n"
         "  \"yes\": false\n"
         "}");
-    check(QPDFObjectHandle::newReal("0.12").getJSON(), "0.12");
-    check(QPDFObjectHandle::newReal(".34").getJSON(), "0.34");
-    check(QPDFObjectHandle::newReal("-0.56").getJSON(), "-0.56");
-    check(QPDFObjectHandle::newReal("-.78").getJSON(), "-0.78");
+    for (int i = 1; i <= JSON::LATEST; ++i) {
+        check(QPDFObjectHandle::newReal("0.12").getJSON(i), "0.12");
+        check(QPDFObjectHandle::newReal(".34").getJSON(i), "0.34");
+        check(QPDFObjectHandle::newReal("-0.56").getJSON(i), "-0.56");
+        check(QPDFObjectHandle::newReal("-.78").getJSON(i), "-0.78");
+    }
     JSON jmap2 = JSON::parse(R"({"a": 1, "b": "two", "c": [true]})");
     std::map<std::string, std::string> dvalue;
     assert(jmap2.forEachDictItem(
