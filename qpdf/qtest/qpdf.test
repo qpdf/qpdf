@@ -1110,7 +1110,7 @@ my @json_files = (
     ['V4-aes', ['--json-key=encrypt']],
     ['V4-aes', ['--json-key=encrypt', '--show-encryption-key']],
 );
-$n_tests += 2 * scalar(@json_files);
+$n_tests += 5 + (2 * scalar(@json_files));
 foreach my $d (@json_files)
 {
     my ($file, $xargs) = @$d;
@@ -1134,7 +1134,8 @@ foreach my $d (@json_files)
     my $in = "$file.pdf";
     $td->runtest("json v1 $out",
                  {$td->COMMAND =>
-                      ['qpdf', '--json=1', '--test-json-schema', @v1_xargs, $in]},
+                      ['qpdf', '--json=1', '--test-json-schema',
+                       @v1_xargs, $in]},
                  {$td->FILE => "$out-v1.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("json v2 $out",
@@ -1143,6 +1144,31 @@ foreach my $d (@json_files)
                  {$td->FILE => "$out-v2.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 }
+
+$td->runtest("bad json stream data (inline)",
+             {$td->COMMAND =>
+                  "qpdf --json=2 --test-json-schema" .
+                  " --json-stream-data=inline bad-data.pdf > a.json"},
+             {$td->FILE => "bad-data-json.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check (inline)",
+             {$td->FILE => "a.json"},
+             {$td->FILE => "json-bad-data-json-inline-v2.out"},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("bad json stream data (file)",
+             {$td->COMMAND =>
+                  "qpdf --json=2 --test-json-schema" .
+                  " --json-stream-data=file --json-stream-prefix=auto" .
+                  " bad-data.pdf > a.json"},
+             {$td->FILE => "bad-data-json.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check (file)",
+             {$td->FILE => "a.json"},
+             {$td->FILE => "json-bad-data-json-file-v2.out"},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check stream (file)",
+             {$td->FILE => "auto-4"},
+             {$td->FILE => "bad-data-4.out"});
 
 show_ntests();
 # ----------
@@ -5778,6 +5804,6 @@ sub get_md5_checksum
 
 sub cleanup
 {
-    system("rm -rf *.ps *.pnm ?.pdf ?.qdf *.enc* tif1 tif2 tiff-cache");
+    system("rm -rf a.json *.ps *.pnm ?.pdf ?.qdf *.enc* tif1 tif2 tiff-cache");
     system("rm -rf *split-out* ???-kfo.pdf *.tmpout \@file.pdf auto-*");
 }
