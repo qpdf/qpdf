@@ -1,12 +1,18 @@
 {
-  "version": 1,
+  "version": 2,
   "parameters": {
     "decodelevel": "generalized"
   },
-  "objects": {
-    "trailer": {
-      "/Root": "1 0 R",
-      "/Size": 107
+  "qpdf": {
+    "jsonversion": 2,
+    "pdfversion": "1.3",
+    "objects": {
+      "trailer": {
+        "value": {
+          "/Root": "1 0 R",
+          "/Size": 107
+        }
+      }
     }
   }
 }
