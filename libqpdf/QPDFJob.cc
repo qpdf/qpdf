@@ -1188,6 +1188,12 @@ QPDFJob::doJSONQpdf(Pipeline* p, bool& first, QPDF& pdf)
         p, first_qpdf, "jsonversion", JSON::makeInt(this->m->json_version), 1);
     JSON::writeDictionaryItem(
         p, first_qpdf, "pdfversion", JSON::makeString(pdf.getPDFVersion()), 1);
+    JSON::writeDictionaryItem(
+        p,
+        first_qpdf,
+        "maxobjectid",
+        JSON::makeInt(QIntC::to_longlong(pdf.getObjectCount())),
+        1);
     JSON::writeDictionaryKey(p, first_qpdf, "objects", 1);
     bool first_object = true;
     JSON::writeDictionaryOpen(p, first_object, 2);
@@ -1613,6 +1619,7 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
             schema.addDictionaryMember("qpdf", JSON::parse(R"({
   "jsonversion": "qpdf json output version",
   "pdfversion": "PDF version from PDF header",
+  "maxobjectid": "Highest object ID; needed for adding new objects",
   "objects": {
     "<obj:n n R|trailer>": "json representation of object"
   }

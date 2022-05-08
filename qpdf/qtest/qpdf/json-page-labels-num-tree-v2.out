@@ -540,6 +540,7 @@
   "qpdf": {
     "jsonversion": 2,
     "pdfversion": "1.3",
+    "maxobjectid": 99,
     "objects": {
       "obj:1 0 R": {
         "value": {
