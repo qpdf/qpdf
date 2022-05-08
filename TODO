@@ -10,6 +10,10 @@ In order:
 
 Other (do in any order):
 
+* Check about runpath in the linux-bin distribution. I think the
+  appimage build specifically is setting the runpath, which is
+  actually desirable in this case. Make sure to understand and
+  document this. Maybe add a check for it in the build.
 * See if I can change all output and error messages issued by the
   library, when context is available, to have a pipeline rather than a
   FILE* or std::ostream. This makes it possible for people to capture
