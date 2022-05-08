@@ -18,7 +18,9 @@ Other (do in any order):
 * See if I can change all output and error messages issued by the
   library, when context is available, to have a pipeline rather than a
   FILE* or std::ostream. This makes it possible for people to capture
-  output more flexibly.
+  output more flexibly. We could also add a generic pipeline that
+  takes std::function<void(char const*, size_t)> or even a
+  void(*)(char const*, unsigned long) for the C API.
 * Make job JSON accept a single element and treat as an array of one
   when an array is expected. This allows for making things repeatable
   in the future without breaking compatibility and is needed for the
@@ -62,14 +64,14 @@ General things to remember:
   when present in the schema. It's reasonable for people to check for
   presence of a key. Most languages make this easy to do.
 
+* Document typo fix in encrypt in release notes along with any other
+  non-compatible json 2 changes. Scrutinize all the output to decide
+  what should change.
+
 * When we get to full serialization, add json serialization
   performance test.
 
 * Add json to the large file tests.
-
-* We could consider arguments like --replace-object that would take a
-  JSON representation of the object and could include indirect
-  references, etc. We could also add --delete object.
 
 * Object representation tests
   * "b:cf80", "b:CF80", "u:π", "u:\u03c0"
@@ -77,16 +79,44 @@ General things to remember:
 
 JSON to PDF:
 
-When reading a JSON string, any string that doesn't follow the above rules
-is an error. Just use newUnicodeString on "u:" strings. For "b:"
-strings, decode the bytes with hex_decode and use newString.
+Have --create-from-json and --update-from-json. With
+--create-from-json, the json file must be complete, meaning all stream
+data, the trailer, and the PDF version must be present. In
+--update-from-json, an object explicitly set to null (not "value":
+null) is deleted. For streams with no stream data, the dictionary is
+updated but the data is left untouched. Other things that are omitted
+are left alone. Make sure document that, when writing a PDF file from
+QPDF, there is no expectation of object numbers being preserved. As
+such, --update-from-json can only be used to update the exact file
+that the json was created from. You can put multiple objects in the
+update file, but you can't use a json from one file to update the
+output of a previous update since the object numbers will have
+changed. Note that, when creating from a JSON, object numbers are
+preserved in the resulting QPDF object but still modified by
+QPDFWriter for the output. This would be visible by combining
+--to-json and --create-from-json. Also using --qdf with
+--create-from-json would show original object IDs in comments. It will
+be important to capture this in the documentation.
+
+When reading a JSON string, any string that doesn't look like a name
+or indirect object or start with "b:" or "u:" should be considered an
+error. Just use newUnicodeString on "u:" strings. For "b:" strings,
+decode the bytes with hex_decode and use newString.
 
 For going back from JSON to PDF, we can have
-QPDF::fromJSON(std::shared_ptr<InputSource> which will have logic
-similar to copyForeignObject. Note that this InputSource is not going
-to be this->file. We have to keep it separately.
+QPDF::createFromJSON(std::shared_ptr<InputSource>)
+which will have logic similar to copyForeignObject. Note that this
+InputSource is not going to be this->file. We have to keep it
+separately. There's also non-static QPDF::updateFromJSON. Both
+createFromJSON and updateFromJSON will call the same internal method
+with different options. That method will use a reactor that is a
+private QPDF class that just proxies to private QPDF methods.
 
-The backing input source is this memory block:
+Test case: combine --create-from-json and --to-json to preservation of
+object numbers. QPDFWriter won't show that although --qdf with the
+original object ID comments would.
+
+The backing input source for createFromJSON is this memory block:
 
 ```
 %PDF-1.3
@@ -116,7 +146,9 @@ startxref
 For streams, have a stream data provider that, for inline streams,
 does a base64 from the file offsets and for file-based streams, reads
 the file. For the inline case, we have to keep the json InputSource
-around. Otherwise, we don't. It is an error if there is no stream data.
+around. Otherwise, we don't. It is an error if there is no stream
+data. For files, we can have a stream data provider that just reads
+the file. Remember QUtil::file_provider.
 
 Documentation:
 
@@ -125,6 +157,7 @@ Serialized PDF:
 The JSON output will have a "qpdf" key containing
 * jsonversion
 * pdfversion
+* maxobjectid
 * objects
 
 The "qpdf" key replaces "objects" and "objectinfo" in v1 JSON.
@@ -175,7 +208,11 @@ CLI:
 Example workflow:
 * qpdf in.pdf --to-json > pdf.json
 * edit pdf.json
-* qpdf --from-json=pdf.json out.pdf
+* qpdf --create-from-json=pdf.json out.pdf
+
+* qpdf in.pdf --to-json > pdf.json
+* edit pdf.json keeping only objects that need to be changed
+* qpdf in.pdf --update-from-json=pdf.json out.pdf
 
 Update --json option in cli.rst to mention v2 and update json.rst.
 
