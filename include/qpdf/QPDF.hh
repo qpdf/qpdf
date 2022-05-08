@@ -110,6 +110,28 @@ class QPDF
     void
     processInputSource(std::shared_ptr<InputSource>, char const* password = 0);
 
+    // Create a PDF from an input source that contains JSON as written
+    // by qpdf --json (version 2 or higher). The JSON must be a
+    // complete representation of a PDF. See "QPDF JSON Format" in the
+    // manual for details.
+    QPDF_DLL
+    void
+    createFromJSON(std::string const& json_file);
+    QPDF_DLL
+    void
+    createFromJSON(std::shared_ptr<InputSource>);
+
+    // Update a PDF from an input source that contains JSON in the
+    // same format as is written by qpdf --json (version 2 or higher).
+    // Objects in the PDF and not in the JSON are not modified. See
+    // "QPDF JSON Format" in the manual for details.
+    QPDF_DLL
+    void
+    updateFromJSON(std::string const& json_file);
+    QPDF_DLL
+    void
+    updateFromJSON(std::shared_ptr<InputSource>);
+
     // Close or otherwise release the input source. Once this has been
     // called, no other methods of qpdf can be called safely except
     // for getWarnings and anyWarnings(). After this has been called,

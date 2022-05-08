@@ -86,6 +86,7 @@ options:
       - underlay
       - empty
       - replace-input
+      - create-from-json
     positional: true
     bare:
       - add-attachment
@@ -163,6 +164,8 @@ options:
       show-attachment: attachment
       show-object: trailer
       json-stream-prefix: stream-file-prefix
+      create-from-json: qpdf-json file
+      update-from-json: qpdf-json file
     required_choices:
       compress-streams: yn
       decode-level: decode_level
@@ -278,6 +281,7 @@ json:
   main.password:
   password-file:
   empty:
+  create-from-json:
   # output
   _outputFile: "output filename"
   replace-input:
@@ -360,6 +364,7 @@ json:
   json-stream-prefix:
   to-json:
   # other options
+  update-from-json:
   allow-weak-crypto:
   keep-files-open:
   keep-files-open-threshold:

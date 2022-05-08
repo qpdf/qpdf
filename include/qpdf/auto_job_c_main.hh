@@ -68,6 +68,7 @@ QPDF_DLL Config* rotate(std::string const& parameter);
 QPDF_DLL Config* showAttachment(std::string const& parameter);
 QPDF_DLL Config* showObject(std::string const& parameter);
 QPDF_DLL Config* jsonStreamPrefix(std::string const& parameter);
+QPDF_DLL Config* updateFromJson(std::string const& parameter);
 QPDF_DLL Config* collate(std::string const& parameter);
 QPDF_DLL Config* collate();
 QPDF_DLL Config* splitPages(std::string const& parameter);

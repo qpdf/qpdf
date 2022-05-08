@@ -30,6 +30,9 @@ popHandler(); // key: passwordFile
 pushKey("empty");
 setupEmpty();
 popHandler(); // key: empty
+pushKey("createFromJson");
+setupCreateFromJson();
+popHandler(); // key: createFromJson
 pushKey("outputFile");
 setupOutputFile();
 popHandler(); // key: outputFile
@@ -262,6 +265,9 @@ popHandler(); // key: jsonStreamPrefix
 pushKey("toJson");
 addBare([this]() { c_main->toJson(); });
 popHandler(); // key: toJson
+pushKey("updateFromJson");
+addParameter([this](std::string const& p) { c_main->updateFromJson(p); });
+popHandler(); // key: updateFromJson
 pushKey("allowWeakCrypto");
 addBare([this]() { c_main->allowWeakCrypto(); });
 popHandler(); // key: allowWeakCrypto

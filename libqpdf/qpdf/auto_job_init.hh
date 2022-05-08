@@ -104,6 +104,8 @@ this->ap.addRequiredParameter("rotate", [this](std::string const& x){c_main->rot
 this->ap.addRequiredParameter("show-attachment", [this](std::string const& x){c_main->showAttachment(x);}, "attachment");
 this->ap.addRequiredParameter("show-object", [this](std::string const& x){c_main->showObject(x);}, "trailer");
 this->ap.addRequiredParameter("json-stream-prefix", [this](std::string const& x){c_main->jsonStreamPrefix(x);}, "stream-file-prefix");
+this->ap.addRequiredParameter("create-from-json", p(&ArgParser::argCreateFromJson), "qpdf-json file");
+this->ap.addRequiredParameter("update-from-json", [this](std::string const& x){c_main->updateFromJson(x);}, "qpdf-json file");
 this->ap.addOptionalParameter("collate", [this](std::string const& x){c_main->collate(x);});
 this->ap.addOptionalParameter("split-pages", [this](std::string const& x){c_main->splitPages(x);});
 this->ap.addChoices("compress-streams", [this](std::string const& x){c_main->compressStreams(x);}, true, yn_choices);

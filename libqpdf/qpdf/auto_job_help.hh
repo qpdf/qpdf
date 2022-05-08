@@ -836,6 +836,21 @@ name as the prefix for stream data files. Whatever is given here
 will be appended with -nnn to create the name of the file that
 will contain the data for the stream stream in object nnn.
 )");
+ap.addOptionHelp("--create-from-json", "json", "create PDF from qpdf JSON", R"(--create-from-json=qpdf-json-file
+
+Create a PDF file from the prior output of qpdf --json. See the
+"QPDF JSON Format" section of the manual for information about
+how to use this option.
+)");
+ap.addOptionHelp("--update-from-json", "json", "update a PDF from qpdf JSON", R"(--update-from-json=qpdf-json-file
+
+Update a PDF file from a JSON file. Please see the "QPDF JSON
+Format" section of the manual for information about how to use
+this option.
+)");
+}
+static void add_help_8(QPDFArgParser& ap)
+{
 ap.addHelpTopic("testing", "options for testing or debugging", R"(The options below are useful when writing automated test code that
 includes files created by qpdf or when testing qpdf itself.
 )");
@@ -843,9 +858,6 @@ ap.addOptionHelp("--static-id", "testing", "use a fixed document ID", R"(Use a f
 testing only. Never use it for production files. See also
 qpdf --help=--deterministic-id.
 )");
-}
-static void add_help_8(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--static-aes-iv", "testing", "use a fixed AES vector", R"(Use a static initialization vector for AES-CBC. This is intended
 for testing only so that output files can be reproducible. Never
 use it for production files. This option is not secure since it

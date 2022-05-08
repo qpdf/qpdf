@@ -323,6 +323,8 @@ class QPDFJob
         Config* outputFile(std::string const& filename);
         QPDF_DLL
         Config* replaceInput();
+        QPDF_DLL
+        Config* createFromJson(std::string const& filename);
 
         QPDF_DLL
         std::shared_ptr<CopyAttConfig> copyAttachmentsFrom();
@@ -674,6 +676,8 @@ class QPDFJob
         bool check_requires_password;
         std::shared_ptr<char> infilename;
         std::shared_ptr<char> outfilename;
+        std::string create_from_json;
+        std::string update_from_json;
     };
     std::shared_ptr<Members> m;
 };

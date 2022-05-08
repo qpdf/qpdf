@@ -3270,6 +3270,31 @@ Related Options
    :samp:`-{nnn}` to create the name of the file that will contain the
    data for the stream stream in object :samp:`{nnn}`.
 
+.. qpdf:option:: --create-from-json=qpdf-json-file
+
+   .. help: create PDF from qpdf JSON
+
+      Create a PDF file from the prior output of qpdf --json. See the
+      "QPDF JSON Format" section of the manual for information about
+      how to use this option.
+
+   This option creates a PDF file from the previous output of ``qpdf
+   --json`` that includes stream data and information about all
+   objects. For information about converting between PDF and JSON,
+   please see :ref:`qpdf-json`.
+
+.. qpdf:option:: --update-from-json=qpdf-json-file
+
+   .. help: update a PDF from qpdf JSON
+
+      Update a PDF file from a JSON file. Please see the "QPDF JSON
+      Format" section of the manual for information about how to use
+      this option.
+
+   This option updates a PDF file from a qpdf JSON file. For a
+   information about how to use this option, please see
+   :ref:`qpdf-json`.
+
 .. _test-options:
 
 Options for Testing or Debugging

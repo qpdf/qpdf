@@ -25,12 +25,14 @@ QPDFJob::Config::emptyInput()
 {
     if (o.m->infilename == 0) {
         // Various places in QPDFJob.cc know that the empty string for
-        // infile means empty. This means that passing "" as the
-        // argument to inputFile, or equivalently using "" as a
-        // positional command-line argument would be the same as
-        // --empty. This probably isn't worth blocking or coding
-        // around, but it would be better if we had a tighter way of
-        // knowing that the input file is empty.
+        // infile means empty. We set it to something other than a
+        // null pointer as an indication that some input source has
+        // been specified. The --create-from-json option also sets
+        // infilename to empty. This approach means that passing "" as
+        // the argument to inputFile in job JSON, or equivalently
+        // using "" as a positional command-line argument would be the
+        // same as --empty. This probably isn't worth blocking or
+        // coding around.
         o.m->infilename = QUtil::make_shared_cstr("");
     } else {
         usage("empty input can't be used"
@@ -290,6 +292,23 @@ QPDFJob::Config::toJson()
     jsonStreamData("inline");
     jsonKey("qpdf");
     decodeLevel("none");
+    return this;
+}
+
+QPDFJob::Config*
+QPDFJob::Config::createFromJson(std::string const& parameter)
+{
+    // See comments in emptyInput() about setting infilename to the
+    // empty string.
+    o.m->infilename = QUtil::make_shared_cstr("");
+    o.m->create_from_json = parameter;
+    return this;
+}
+
+QPDFJob::Config*
+QPDFJob::Config::updateFromJson(std::string const& parameter)
+{
+    o.m->update_from_json = parameter;
     return this;
 }
 

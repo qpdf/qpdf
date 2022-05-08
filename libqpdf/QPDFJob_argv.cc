@@ -101,6 +101,13 @@ ArgParser::argReplaceInput()
 }
 
 void
+ArgParser::argCreateFromJson(std::string const& arg)
+{
+    c_main->createFromJson(arg);
+    this->gave_input = true;
+}
+
+void
 ArgParser::argVersion()
 {
     auto whoami = this->ap.getProgname();

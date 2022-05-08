@@ -553,6 +553,13 @@ QPDFJob::run()
     if (m->check_is_encrypted || m->check_requires_password) {
         return;
     }
+
+    // If we are updating from JSON, this has to be done first before
+    // other options may cause transformations to the input.
+    if (!this->m->update_from_json.empty()) {
+        pdf.updateFromJSON(this->m->update_from_json);
+    }
+
     bool other_warnings = false;
     std::vector<std::shared_ptr<QPDF>> page_heap;
     if (!m->page_specs.empty()) {
@@ -1937,7 +1944,11 @@ QPDFJob::doProcessOnce(
     auto pdf = std::make_shared<QPDF>();
     setQPDFOptions(*pdf);
     if (empty) {
-        pdf->emptyPDF();
+        if (!this->m->create_from_json.empty()) {
+            pdf->createFromJSON(this->m->create_from_json);
+        } else {
+            pdf->emptyPDF();
+        }
     } else {
         fn(pdf.get(), password);
     }

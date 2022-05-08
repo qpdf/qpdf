@@ -8,6 +8,7 @@
 void setupInputFile();
 void setupPassword();
 void setupEmpty();
+void setupCreateFromJson();
 void setupOutputFile();
 void setupReplaceInput();
 void beginEncrypt(JSON);

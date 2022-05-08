@@ -215,6 +215,14 @@ CODING RULES
 
 HOW TO ADD A COMMAND-LINE ARGUMENT
 
+Quick reminder:
+
+* Add an entry to the top half of job.yml for the command-line
+  argument
+* Add an entry to the bottom half of job.yml for the job JSON field
+* Add documentation for the new option to cli.rst
+* Implement the QPDFJob::Config method in QPDFJob_config.cc.
+
 QPDFJob is documented in three places:
 
 * This section provides a quick reminder for how to add a command-line
