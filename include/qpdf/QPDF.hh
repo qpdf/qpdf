@@ -115,22 +115,18 @@ class QPDF
     // complete representation of a PDF. See "QPDF JSON Format" in the
     // manual for details.
     QPDF_DLL
-    void
-    createFromJSON(std::string const& json_file);
+    void createFromJSON(std::string const& json_file);
     QPDF_DLL
-    void
-    createFromJSON(std::shared_ptr<InputSource>);
+    void createFromJSON(std::shared_ptr<InputSource>);
 
     // Update a PDF from an input source that contains JSON in the
     // same format as is written by qpdf --json (version 2 or higher).
     // Objects in the PDF and not in the JSON are not modified. See
     // "QPDF JSON Format" in the manual for details.
     QPDF_DLL
-    void
-    updateFromJSON(std::string const& json_file);
+    void updateFromJSON(std::string const& json_file);
     QPDF_DLL
-    void
-    updateFromJSON(std::shared_ptr<InputSource>);
+    void updateFromJSON(std::shared_ptr<InputSource>);
 
     // Close or otherwise release the input source. Once this has been
     // called, no other methods of qpdf can be called safely except
@@ -999,6 +995,20 @@ class QPDF
     };
     friend class ResolveRecorder;
 
+    class JSONReactor: public JSON::Reactor
+    {
+      public:
+        virtual ~JSONReactor() = default;
+        virtual void dictionaryStart() override;
+        virtual void arrayStart() override;
+        virtual void containerEnd(JSON const& value) override;
+        virtual void topLevelScalar() override;
+        virtual bool
+        dictionaryItem(std::string const& key, JSON const& value) override;
+        virtual bool arrayItem(JSON const& value) override;
+    };
+    friend class JSONReactor;
+
     void parse(char const* password);
     void inParse(bool);
     void setTrailer(QPDFObjectHandle obj);
@@ -1507,6 +1517,9 @@ class QPDF
         bool top,
         int depth);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
+
+    // JSON import
+    void importJSON(std::shared_ptr<InputSource>, bool must_be_complete);
 
     // Type conversion helper methods
     template <typename T>
