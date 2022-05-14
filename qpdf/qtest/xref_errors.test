@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('xref_errors');
+
+my $n_tests = 6;
+
+# Handle file with invalid xref table and object 0 as a regular object
+# (bug 3159950).
+$td->runtest("check obj0.pdf",
+             {$td->COMMAND => "qpdf --check obj0.pdf"},
+             {$td->FILE => "obj0-check.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+# Demonstrate show-xref after check and not after check to illustrate
+# that it can dump the real xref or the recovered xref.
+$td->runtest("dump bad xref",
+             {$td->COMMAND => "qpdf --show-xref bad-xref-entry.pdf"},
+             {$td->FILE => "bad-xref-entry.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+# Test @file here too.
+open(F, ">args") or die;
+print F "--check\n";
+print F "--show-xref\n";
+close(F);
+$td->runtest("dump corrected bad xref",
+             {$td->COMMAND => "qpdf \@args bad-xref-entry.pdf"},
+             {$td->FILE => "bad-xref-entry-corrected.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+unlink "args";
+
+$td->runtest("combine show and --pages",
+             {$td->COMMAND =>
+                  "qpdf --empty --pages minimal.pdf -- --show-pages"},
+             {$td->FILE => "show-pages-pages.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("show number of pages",
+             {$td->COMMAND =>
+                  "qpdf --show-npages 20-pages.pdf --password=user"},
+             {$td->STRING => "20\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# Issue 482 -- don't range check fields[2] for xref entry type 0.
+$td->runtest("out of range in deleted object",
+             {$td->COMMAND => "qpdf --check xref-range.pdf"},
+             {$td->FILE => "xref-range.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

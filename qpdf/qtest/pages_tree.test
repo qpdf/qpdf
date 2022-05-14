@@ -1,0 +1,71 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('pages_tree');
+
+my $n_tests = 11;
+
+$td->runtest("linearize duplicated pages",
+             {$td->COMMAND =>
+                  "qpdf --static-id --linearize" .
+                  " page_api_2.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "linearize-duplicate-page.pdf"});
+$td->runtest("extract duplicated pages",
+             {$td->COMMAND =>
+                  "qpdf --static-id page_api_2.pdf" .
+                  " --pages . -- a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "extract-duplicate-page.pdf"});
+$td->runtest("direct pages",
+             {$td->COMMAND =>
+                  "qpdf --static-id direct-pages.pdf --pages . -- a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "direct-pages-fixed.pdf"});
+$td->runtest("show direct pages",
+             {$td->COMMAND =>
+                  "qpdf --show-pages direct-pages.pdf"},
+             {$td->FILE => "direct-pages.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# Json mode for direct and duplicated pages illustrates that the
+# "objects" section the original objects before correction when
+# "pages" is not output but after correct when it is.# numbers.
+foreach my $f (qw(page_api_2 direct-pages))
+{
+    $td->runtest("json for $f (objects only)",
+                 {$td->COMMAND =>
+                      "qpdf --json=latest $f.pdf" .
+                      " --json-key=qpdf"},
+                 {$td->FILE => "$f-json-objects.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("json for $f (with pages)",
+                 {$td->COMMAND =>
+                      "qpdf --json=latest $f.pdf" .
+                      " --json-key=qpdf --json-key=pages"},
+                 {$td->FILE => "$f-json-pages.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+cleanup();
+$td->report($n_tests);

@@ -1,0 +1,130 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+use File::Copy;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('qpdfjob');
+
+open(F, ">auto-txt") or die;
+print F "from file";
+close(F);
+
+my @bad_json = (
+    "bare-option-false",
+    "choice-mismatch",
+    "encrypt-duplicate-key-length",
+    "encrypt-missing-password",
+    "encrypt-no-key-length",
+    "pages-no-file",
+    "schema-error",
+    "json-error"
+    );
+my @good_json = (
+    "choice-match",
+    "input-file-password",
+    "empty-input",
+    "replace-input",
+    "encrypt-40",
+    "encrypt-128",
+    "encrypt-256-with-restrictions",
+    "add-attachments",
+    "copy-attachments",
+    "underlay-overlay",
+    "underlay-overlay-password",
+    "misc-options",
+    );
+my $n_tests = 10 + scalar(@bad_json) + (2 * scalar(@good_json));
+
+
+foreach my $i (@bad_json)
+{
+    $td->runtest("QPDFJob bad json: $i",
+                 {$td->COMMAND => "qpdf --job-json-file=bad-json-$i.json"},
+                 {$td->FILE => "bad-$i-json.out", $td->EXIT_STATUS => 2},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+foreach my $i (@good_json)
+{
+    if ($i eq 'replace-input')
+    {
+        copy("minimal.pdf", 'a.pdf');
+    }
+    $td->runtest("QPDFJob good json: $i",
+                 {$td->COMMAND => "qpdf --job-json-file=job-json-$i.json"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    if ($i =~ m/encrypt-256/)
+    {
+        $td->runtest("check encryption $i",
+                     {$td->COMMAND =>
+                          "qpdf a.pdf --password=u" .
+                          " --job-json-file=job-show-encryption.json"},
+                     {$td->FILE => "job-json-$i.out", $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
+    }
+    else
+    {
+        $td->runtest("check good json $i output",
+                     {$td->FILE => "a.pdf"},
+                     {$td->FILE => "job-json-$i.pdf"});
+    }
+}
+
+
+$td->runtest("QPDFJob json partial",
+             {$td->COMMAND => "test_driver 83 - job-partial.json"},
+             {$td->FILE => "job-partial-json.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("QPDFJob API",
+             {$td->COMMAND => "test_driver 84 -"},
+             {$td->FILE => "job-api.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "test84.pdf"});
+$td->runtest("json output from job",
+             {$td->COMMAND => "qpdf --job-json-file=job-json-output.json"},
+             {$td->FILE => "job-json-output.out.json", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("C job API",
+             {$td->COMMAND => "qpdfjob-ctest"},
+             {$td->FILE => "qpdfjob-ctest.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+foreach my $i (['a.pdf', 1], ['b.pdf', 2], ['c.pdf', 3])
+{
+    $td->runtest("check output",
+                 {$td->FILE => $i->[0]},
+                 {$td->FILE => "qpdfjob-ctest$i->[1].pdf"});
+}
+my $wide_out = `qpdfjob-ctest wide`;
+$td->runtest("qpdfjob-ctest wide",
+             {$td->STRING => "$?: $wide_out"},
+             {$td->REGEXP => "0: (wide test passed|skipped wide)\n"},
+             $td->NORMALIZE_NEWLINES);
+if ($wide_out =~ m/skipped/)
+{
+    $td->runtest("skipped wide",
+                 {$td->STRING => "yes"},
+                 {$td->STRING => "yes"});
+}
+else
+{
+    $td->runtest("check output",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "qpdfjob-ctest-wide.pdf"});
+}
+
+cleanup();
+$td->report($n_tests);

@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('filter_abbreviations');
+
+my $n_tests = 2;
+
+# Stream filter abbreviations from table H.1
+$td->runtest("stream filter abbreviations",
+             {$td->COMMAND => "qpdf --static-id filter-abbreviation.pdf a.pdf"},
+             {$td->STRING => "",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "filter-abbreviation.out"});
+
+cleanup();
+$td->report($n_tests);

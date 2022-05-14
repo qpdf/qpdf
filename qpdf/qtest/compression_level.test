@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('compression_level');
+
+my $n_tests = 4;
+
+check_pdf($td, "recompress with level",
+          "qpdf --static-id --recompress-flate --compression-level=9" .
+          " --object-streams=generate minimal.pdf",
+          "minimal-9.pdf", 0);
+check_pdf($td, "recompress with level",
+          "qpdf --static-id --recompress-flate --compression-level=1" .
+          " --object-streams=generate minimal.pdf",
+          "minimal-1.pdf", 0);
+
+cleanup();
+$td->report($n_tests);

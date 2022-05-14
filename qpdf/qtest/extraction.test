@@ -1,0 +1,105 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('extraction');
+
+my $n_tests = 13;
+
+$td->runtest("show xref",
+             {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
+                  " --show-xref"},
+             {$td->FILE => "show-xref.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("show pages",
+             {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
+                  " --show-pages"},
+             {$td->FILE => "show-pages.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("show-pages-images",
+             {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
+                  " --show-pages --with-images"},
+             {$td->FILE => "show-pages-images.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("show-pages-images",
+             {$td->COMMAND => "qpdf shared-images.pdf" .
+                  " --show-pages --with-images"},
+             {$td->FILE => "shared-images-show.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("show-page-1",
+             {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
+                  " --show-object=5,0"},
+             {$td->FILE => "show-page-1.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("show-page-1-content-raw",
+             {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
+                  " --show-object=7 --raw-stream-data"},
+             {$td->FILE => "show-page-1-content-raw.out",
+              $td->EXIT_STATUS => 0});
+
+$td->runtest("show-page-1-content-filtered",
+             {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
+                  " --show-object=7 --filtered-stream-data"},
+             {$td->FILE => "show-page-1-content-filtered.out",
+              $td->EXIT_STATUS => 0});
+
+$td->runtest("show-page-1-content-normalized",
+             {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
+                  " --show-object=7,0 --filtered-stream-data --normalize-content=y"},
+             {$td->FILE => "show-page-1-content-normalized.out",
+              $td->EXIT_STATUS => 0});
+
+$td->runtest("show-page-1-image",
+             {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
+                  " --show-object=8 --raw-stream-data"},
+             {$td->FILE => "show-page-1-image.out",
+              $td->EXIT_STATUS => 0});
+
+$td->runtest("unfilterable stream data",
+             {$td->COMMAND => "qpdf unfilterable.pdf" .
+                  " --show-object=4 --filtered-stream-data"},
+             {$td->FILE => "show-unfilterable.out",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("show-xref-by-id",
+             {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
+                  " --show-object=12"},
+             {$td->FILE => "show-xref-by-id.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("show-xref-by-id-filtered",
+             {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
+                  " --show-object=12 --filtered-stream-data"},
+             {$td->FILE => "show-xref-by-id-filtered.out",
+              $td->EXIT_STATUS => 0});
+
+$td->runtest("show trailer",
+             {$td->COMMAND => "qpdf minimal.pdf --show-object=trailer"},
+             {$td->FILE => "show-trailer.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

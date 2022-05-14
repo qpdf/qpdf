@@ -1,0 +1,719 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('encryption');
+
+my $n_tests = 0;
+# $n_tests incremented below
+
+# The enc-file.pdf files were encrypted using Acrobat 5.0, not the
+# qpdf library.  The files are decrypted using qpdf, then re-encrypted
+# using qpdf with specific flags.  The /P value is checked.  The
+# resulting files were saved and manually checked with Acrobat 5.0 to
+# ensure that the security settings were as intended.
+
+# The enc-XI-file.pdf files were treated the same way but with Acrobat
+# XI instead of Acrobat 5.0.  They were used to create test files with
+# newer encryption formats.
+
+# Values: basename, password, encryption flags, /P Encrypt key,
+# extract-for-accessibility, extract-for-any-purpose,
+# print-low-res, print-high-res, modify-assembly, modify-forms,
+# modify-annotate, modify-other, modify-all
+my @encrypted_files =
+    (['base', ''],              # 1
+     ['R3,V2', '',              # 2
+      '-accessibility=n -extract=n -print=full -modify=all', -532,
+      1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+     ['R3,V2,U=view,O=view', 'view', # 3
+      '-accessibility=y -extract=n -print=none -modify=none', -3392,
+      1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+     ['R3,V2,O=master', 'master', # 4
+      '-accessibility=n -extract=y -print=none -modify=annotate', -2576,
+      1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0],
+     ['R3,V2,O=master', '',     # 5
+      '-accessibility=n -extract=n -print=none -modify=form', -2624,
+      0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0],
+     ['R3,V2,U=view,O=master', 'view', # 6
+      '-accessibility=n -extract=n -print=none -modify=assembly', -2880,
+      0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+     ['R3,V2,U=view,O=master', 'master', # 7
+      '-accessibility=n -print=low', -2564,
+      1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1],
+     ['R3,V2,U=view,O=master', 'master', # 8
+      '-modify=all -assemble=n', -1028,
+      1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0],
+     ['R3,V2,U=view,O=master', 'master', # 9
+      '-modify=none -form=y', -1068,
+      1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0],
+     ['R3,V2,U=view,O=master', 'master', # 10
+      '-modify=annotate -assemble=n', -1036,
+      1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0],
+     ['R3,V2,U=view,O=master', 'master', # 11
+      '-form=n', -260,
+      1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0],
+     ['R3,V2,U=view,O=master', 'master', # 12
+      '-annotate=n', -36,
+      1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0],
+     ['R3,V2,U=view,O=master', 'master', # 13
+      '-modify-other=n', -12,
+      1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+     ['R2,V1', '',              # 14
+      '-print=n -modify=n -extract=n -annotate=n', -64,
+      1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+     ['R2,V1,U=view,O=view', 'view', # 15
+      '-print=y -modify=n -extract=n -annotate=n', -60,
+      1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0],
+     ['R2,V1,O=master', 'master', # 16
+      '-print=n -modify=y -extract=n -annotate=n', -56,
+      1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+     ['R2,V1,O=master', '',     # 17
+      '-print=n -modify=n -extract=y -annotate=n', -48,
+      0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+     ['R2,V1,U=view,O=master', 'view', # 18
+      '-print=n -modify=n -extract=n -annotate=y', -32,
+      0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0],
+     ['R2,V1,U=view,O=master', 'master', # 19
+      '', -4,
+      1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+     ['long-password', 'asdf asdf asdf asdf asdf asdf qwer'], # 20
+     ['long-password', 'asdf asdf asdf asdf asdf asdf qw'],   # 21
+     ['XI-base', ''],                                         # 22
+     ['XI-R6,V5,O=master', '',                                # 23
+      '-extract=n -print=none -modify=assembly', -2368,
+      0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+     ['XI-R6,V5,O=master', 'master', # 24
+      '-extract=n -print=none -modify=assembly', -2368,
+      1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+     ['XI-R6,V5,U=view,O=master', 'view', # 25
+      '-print=low', -2052,
+      0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1],
+     ['XI-R6,V5,U=view,O=master', 'master', # 26
+      '-print=low', -2052,
+      1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1],
+     ['XI-R6,V5,U=view,O=master', 'master', # 27
+      '-accessibility=n', -4, # -accessibility=n has no effect
+      1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+     ['XI-long-password', 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'], # 28; -accessibility=n has no effect
+     ['XI-long-password', 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcv'], # 29
+     ['XI-R6,V5,U=wwwww,O=wwwww', 'wwwww', # 30
+      '', -4,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    );
+
+$n_tests += 8 + (2 * (@encrypted_files)) + (7 * (@encrypted_files - 6)) + 9;
+
+$td->runtest("encrypted file",
+             {$td->COMMAND => "test_driver 2 encrypted-with-images.pdf"},
+             {$td->FILE => "encrypted1.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("preserve encryption",
+             {$td->COMMAND => "qpdf encrypted-with-images.pdf encrypted-with-images.enc"},
+             {$td->STRING => "",
+              $td->EXIT_STATUS => 0});
+$td->runtest("recheck encrypted file",
+             {$td->COMMAND => "test_driver 2 encrypted-with-images.enc"},
+             {$td->FILE => "encrypted1.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("empty owner password",
+             {$td->COMMAND => "qpdf --encrypt u '' 256 -- minimal.pdf a.pdf"},
+             {$td->REGEXP => ".*is insecure.*--allow-insecure.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("allow insecure",
+             {$td->COMMAND => "qpdf --encrypt u '' 256 --allow-insecure --" .
+                  " minimal.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check insecure",
+             {$td->COMMAND => "qpdf --check a.pdf"},
+             {$td->FILE => "insecure-passwords.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# Test that long passwords that are one character too short fail.  We
+# test the truncation cases in the loop below by using passwords
+# longer than the supported length.
+$td->runtest("significant password characters (V < 5)",
+             {$td->COMMAND => "qpdf --check enc-long-password.pdf" .
+                  " --password='asdf asdf asdf asdf asdf asdf q'"},
+             {$td->REGEXP => ".*invalid password.*", $td->EXIT_STATUS => 2});
+$td->runtest("significant password characters (V = 5)",
+             {$td->COMMAND => "qpdf --check enc-XI-long-password.pdf" .
+                  " --password=qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxc"},
+             {$td->REGEXP => ".*invalid password.*", $td->EXIT_STATUS => 2});
+
+my $enc_base = undef;
+my $enc_n = 0;
+foreach my $d (@encrypted_files)
+{
+    ++$enc_n;
+    my ($file, $pass, $xeflags, $P, $match_owner, $match_user,
+        $accessible, $extract, $printlow, $printhigh,
+        $modifyassembly, $modifyform, $modifyannot,
+        $modifyother, $modifyall) = @$d;
+
+    my $f = sub { $_[0] ? "allowed" : "not allowed" };
+    my $jf = sub { $_[0] ? "true" : "false" };
+    my $enc_details = "";
+    my $enc_json =
+        "{\n" .
+        "  \"version\": 2,\n" .
+        "  \"parameters\": {\n" .
+        "    \"decodelevel\": \"generalized\"\n" .
+        "  },\n" .
+        "  \"encrypt\": {\n" .
+        "    \"capabilities\": {\n";
+    if ($match_owner)
+    {
+        $enc_details .= "Supplied password is owner password\n";
+    }
+    if ($match_user)
+    {
+        $enc_details .= "Supplied password is user password\n";
+    }
+    $enc_details .=
+        "extract for accessibility: " . &$f($accessible) . "\n" .
+        "extract for any purpose: " . &$f($extract) . "\n" .
+        "print low resolution: " . &$f($printlow) . "\n" .
+        "print high resolution: " . &$f($printhigh) . "\n" .
+        "modify document assembly: " . &$f($modifyassembly) . "\n" .
+        "modify forms: " . &$f($modifyform) . "\n" .
+        "modify annotations: " . &$f($modifyannot) . "\n" .
+        "modify other: " . &$f($modifyother) . "\n" .
+        "modify anything: " . &$f($modifyall) . "\n";
+    $enc_json .=
+        "      \"accessibility\": " . &$jf($accessible) . ",\n" .
+        "      \"extract\": " . &$jf($extract) . ",\n" .
+        "      \"modify\": " . &$jf($modifyall) . ",\n" .
+        "      \"modifyannotations\": " . &$jf($modifyannot) . ",\n" .
+        "      \"modifyassembly\": " . &$jf($modifyassembly) . ",\n" .
+        "      \"modifyforms\": " . &$jf($modifyform) . ",\n" .
+        "      \"modifyother\": " . &$jf($modifyother) . ",\n" .
+        "      \"printhigh\": " . &$jf($printhigh) . ",\n" .
+        "      \"printlow\": " . &$jf($printlow) . "\n" .
+        "    },\n" .
+        "    \"encrypted\": true,\n" .
+        "    \"ownerpasswordmatched\": ---opm---,\n" .
+        "    \"parameters\": {\n" .
+        "      \"P\": ---P---,\n" .
+        "      \"R\": ---R---,\n" .
+        "      \"V\": ---V---,\n" .
+        "      \"bits\": ---bits---,\n" .
+        "      \"filemethod\": \"---method---\",\n" .
+        "      \"key\": null,\n" .
+        "      \"method\": \"---method---\",\n" .
+        "      \"streammethod\": \"---method---\",\n" .
+        "      \"stringmethod\": \"---method---\"\n" .
+        "    },\n" .
+        "    \"userpasswordmatched\": ---upm---\n" .
+        "  }\n" .
+        "}\n";
+    if ($file =~ m/XI-/)
+    {
+        $enc_details .=
+            "stream encryption method: AESv3\n" .
+            "string encryption method: AESv3\n" .
+            "file encryption method: AESv3\n";
+    }
+
+    # Test writing to stdout
+    $td->runtest("decrypt $file",
+                 {$td->COMMAND =>
+                      "qpdf --static-id -qdf --object-streams=disable" .
+                      " --no-original-object-ids" .
+                      " --password=\"$pass\" enc-$file.pdf -" .
+                      " > $file.enc"},
+                 {$td->STRING => "",
+                  $td->EXIT_STATUS => 0});
+    if ($file =~ m/base$/)
+    {
+        $enc_base = $file;
+        $td->runtest("check ID",
+                     {$td->COMMAND => "perl check-ID.pl $file.enc"},
+                     {$td->STRING => "ID okay\n",
+                      $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
+    }
+    else
+    {
+        $td->runtest("check against base",
+                     {$td->COMMAND =>
+                          "sh ./diff-encrypted $enc_base.enc $file.enc"},
+                     {$td->STRING => "okay\n",
+                      $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
+    }
+    if ($file =~ m/^(?:XI-)?R(\d),V(\d)(?:,U=(\w+))?(?:,O=(\w+))?$/)
+    {
+        my $R = $1;
+        my $V = $2;
+        my $upass = $3 || "";
+        my $opass = $4 || "";
+        my $bits = (($V == 5) ? 256 : ($V == 2) ? 128 : 40);
+        my $method = $bits == 256 ? "AESv3" : "RC4";
+        my $opm = ($pass eq $opass ? "true" : "false");
+        my $upm = ($pass eq $upass ? "true" : "false");
+        $enc_json =~ s/---R---/$R/;
+        $enc_json =~ s/---P---/$P/;
+        $enc_json =~ s/---V---/$V/;
+        $enc_json =~ s/---bits---/$bits/;
+        $enc_json =~ s/---method---/$method/g;
+        $enc_json =~ s/---opm---/$opm/;
+        $enc_json =~ s/---upm---/$upm/;
+
+        my $eflags = "--allow-weak-crypto" .
+            " -encrypt \"$upass\" \"$opass\" $bits $xeflags --";
+        if (($opass eq "") && ($bits == 256))
+        {
+            $eflags =~ s/--$/--allow-insecure --/;
+        }
+        if (($pass ne $upass) && ($V >= 5))
+        {
+            # V >= 5 can no longer recover user password with owner
+            # password.
+            $upass = "";
+        }
+        my $accessibility_warning = "";
+        if (($R > 3) && ($eflags =~ /accessibility=n/))
+        {
+            $accessibility_warning =
+                "qpdf: -accessibility=n is ignored" .
+                " for modern encryption formats\n";
+        }
+        $td->runtest("encrypt $file",
+                     {$td->COMMAND =>
+                          "qpdf --static-id --no-original-object-ids -qdf" .
+                          " $eflags $file.enc $file.enc2"},
+                     {$td->STRING => $accessibility_warning,
+                      $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
+        $td->runtest("check /P enc2 ($enc_n)",
+                     {$td->COMMAND =>
+                          "qpdf --show-encryption --password=\"$pass\"" .
+                          " $file.enc2"},
+                     {$td->STRING => "R = $R\nP = $P\n" .
+                          "User password = $upass\n$enc_details",
+                          $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
+        $td->runtest("json encrypt key ($enc_n)",
+                     {$td->COMMAND =>
+                          "qpdf --json --json-key=encrypt" .
+                          " --password=\"$pass\"" .
+                          " $file.enc2"},
+                     {$td->STRING => $enc_json, $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
+        $td->runtest("decrypt again",
+                     {$td->COMMAND =>
+                          "qpdf --static-id --no-original-object-ids -qdf" .
+                          " --password=\"$pass\"" .
+                          " $file.enc2 $file.enc3"},
+                     {$td->STRING => "",
+                      $td->EXIT_STATUS => 0});
+        $td->runtest("compare",
+                     {$td->FILE => "$file.enc"},
+                     {$td->FILE => "$file.enc3"});
+        $td->runtest("preserve encryption",
+                     {$td->COMMAND =>
+                          "qpdf --static-id --password=\"$pass\"" .
+                          " $file.enc2 $file.enc4"},
+                     {$td->STRING => "",
+                      $td->EXIT_STATUS => 0});
+        $td->runtest("check /P enc4 ($enc_n)",
+                     {$td->COMMAND =>
+                          "qpdf --show-encryption --password=\"$pass\"" .
+                          " $file.enc4"},
+                     {$td->STRING => "R = $R\nP = $P\n" .
+                          "User password = $upass\n$enc_details",
+                          $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
+    }
+}
+
+$td->runtest("non-encrypted",
+             {$td->COMMAND => "qpdf --show-encryption enc-base.pdf"},
+             {$td->STRING => "File is not encrypted\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("invalid password",
+             {$td->COMMAND => "qpdf -qdf --password=quack" .
+                  " enc-R2,V1,U=view,O=view.pdf a.qdf"},
+             {$td->STRING =>
+                  "qpdf: enc-R2,V1,U=view,O=view.pdf: invalid password\n",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C API: invalid password",
+             {$td->COMMAND =>
+                  "qpdf-ctest 2 enc-R2,V1,U=view,O=view.pdf '' a.qdf"},
+             {$td->FILE => "c-invalid-password.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+my @cenc = (
+    [11, 'hybrid-xref.pdf', "''", 'r2', "", ""],
+    [12, 'hybrid-xref.pdf', "''", 'r3', "", ""],
+    [15, 'hybrid-xref.pdf', "''", 'r4', "", ""],
+    [17, 'hybrid-xref.pdf', "''", 'r5', "", "owner3"],
+    [18, 'hybrid-xref.pdf', "''", 'r6', "", "user4"],
+    [13, 'c-r2.pdf', 'user1', 'decrypt with user',
+     "user password: user1\n", ""],
+    [13, 'c-r3.pdf', 'owner2', 'decrypt with owner',
+     "user password: user2\n", ""],
+    [13, 'c-r5-in.pdf', 'user3', 'decrypt R5 with user',
+     "user password: user3\n", ""],
+    [13, 'c-r6-in.pdf', 'owner4', 'decrypt R6 with owner',
+     "user password: \n", ""],
+    );
+$n_tests += 2 * @cenc;
+
+foreach my $d (@cenc)
+{
+    my ($n, $infile, $pass, $description, $output, $checkpass) = @$d;
+    my $outfile = $description;
+    $outfile =~ s/ /-/g;
+    my $pdf_outfile = "c-$outfile.pdf";
+    my $check_outfile = "c-$outfile.out";
+    $td->runtest("C API encryption: $description",
+                 {$td->COMMAND => "qpdf-ctest $n $infile $pass a.pdf"},
+                 {$td->STRING => $output . "C test $n done\n",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    if (-f $pdf_outfile)
+    {
+        $td->runtest("check $description content",
+                     {$td->FILE => "a.pdf"},
+                     {$td->FILE => $pdf_outfile});
+    }
+    else
+    {
+        # QPDF doesn't provide any way to make the random bits in
+        # /Perms static, so we have no way to predictably create a
+        # /V=5 encrypted file.  It's not worth adding this...the test
+        # suite is adequate without having a statically predictable
+        # file.
+        $td->runtest("check $description",
+                     {$td->COMMAND =>
+                          "qpdf --check a.pdf --password=$checkpass"},
+                     {$td->FILE => $check_outfile, $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
+    }
+}
+
+# Test combinations of linearization and encryption.  Note that we do
+# content checks on encrypted and linearized files in various
+# combinations below.  Here we are just making sure that they are
+# linearized and/or encrypted as desired.
+
+$td->runtest("linearize encrypted file",
+             {$td->COMMAND => "qpdf --linearize encrypted-with-images.pdf a.pdf"},
+             {$td->STRING => "",
+              $td->EXIT_STATUS => 0});
+$td->runtest("check encryption",
+             {$td->COMMAND => "qpdf --show-encryption a.pdf",
+              $td->FILTER => "grep -v allowed | grep -v Supplied"},
+             {$td->STRING => "R = 3\nP = -4\nUser password = \n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check linearization",
+             {$td->COMMAND => "qpdf --check-linearization a.pdf"},
+             {$td->STRING => "a.pdf: no linearization errors\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("linearize and encrypt file",
+             {$td->COMMAND =>
+                  "qpdf --linearize --encrypt user owner 128 --use-aes=y --" .
+                  " lin-special.pdf a.pdf"},
+             {$td->STRING => "",
+              $td->EXIT_STATUS => 0});
+$td->runtest("check encryption",
+             {$td->COMMAND => "qpdf --show-encryption --password=owner a.pdf",
+              $td->FILTER => "grep -v allowed | grep -v method | grep -v Supplied"},
+             {$td->STRING => "R = 4\nP = -4\nUser password = user\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check linearization",
+             {$td->COMMAND => "qpdf --check-linearization" .
+                  " --password=user a.pdf"},
+             {$td->STRING => "a.pdf: no linearization errors\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# Test --check-linearization of non-linearized file
+$n_tests += 1;
+$td->runtest("check linearization of non-linearized file",
+             {$td->COMMAND => "qpdf --check-linearization minimal.pdf"},
+             {$td->STRING => "minimal.pdf is not linearized\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+
+# Test AES encryption in various ways.
+$n_tests += 18;
+$td->runtest("encrypt with AES",
+             {$td->COMMAND => "qpdf --encrypt '' o 128 --use-aes=y --" .
+                  " enc-base.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check encryption",
+             {$td->COMMAND => "qpdf --show-encryption a.pdf",
+              $td->FILTER => "grep -v allowed | grep -v method | grep -v Supplied"},
+             {$td->STRING => "R = 4\nP = -4\nUser password = \n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("convert original to qdf",
+             {$td->COMMAND => "qpdf --static-id --no-original-object-ids" .
+                  " --qdf --min-version=1.6 enc-base.pdf a.qdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("convert encrypted to qdf",
+             {$td->COMMAND => "qpdf --static-id --no-original-object-ids" .
+                  " --qdf a.pdf b.qdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("compare files",
+             {$td->FILE => 'a.qdf'},
+             {$td->FILE => 'b.qdf'});
+$td->runtest("linearize with AES and object streams",
+             {$td->COMMAND => "qpdf --encrypt '' o 128 --use-aes=y --" .
+                  " --linearize --object-streams=generate enc-base.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check encryption",
+             {$td->COMMAND => "qpdf --show-encryption a.pdf",
+              $td->FILTER => "grep -v allowed | grep -v method | grep -v Supplied"},
+             {$td->STRING => "R = 4\nP = -4\nUser password = \n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("linearize original",
+             {$td->COMMAND => "qpdf --linearize --object-streams=generate" .
+                  " enc-base.pdf b.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("convert linearized original to qdf",
+             {$td->COMMAND => "qpdf --static-id --no-original-object-ids" .
+                  " --qdf --object-streams=generate --min-version=1.6" .
+                  " b.pdf a.qdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("convert encrypted to qdf",
+             {$td->COMMAND => "qpdf --static-id --no-original-object-ids" .
+                  " --qdf --object-streams=generate a.pdf b.qdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("compare files",
+             {$td->FILE => 'a.qdf'},
+             {$td->FILE => 'b.qdf'});
+$td->runtest("force version on aes encrypted",
+             {$td->COMMAND => "qpdf --force-version=1.4 a.pdf b.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check",
+             {$td->COMMAND => "qpdf --check b.pdf"},
+             {$td->FILE => "aes-forced-check.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("make sure there is no xref stream",
+             {$td->COMMAND => "grep /ObjStm b.pdf | wc -l"},
+             {$td->REGEXP => "\\s*0\\s*", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("encrypt with V=5,R=5",
+             {$td->COMMAND =>
+                  "qpdf --encrypt user owner 256 --force-R5 -- " .
+                  "minimal.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check encryption",
+             {$td->COMMAND => "qpdf --check a.pdf --password=owner"},
+             {$td->FILE => "V5R5.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("encrypt with V=5,R=6",
+             {$td->COMMAND =>
+                  "qpdf --encrypt user owner 256 -- " .
+                  "minimal.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check encryption",
+             {$td->COMMAND => "qpdf --check a.pdf --password=user"},
+             {$td->FILE => "V5R6.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# Look at some actual V4 files
+$n_tests += 17;
+foreach my $d (['--force-V4', 'V4'],
+               ['--cleartext-metadata', 'V4-clearmeta'],
+               ['--use-aes=y', 'V4-aes'],
+               ['--cleartext-metadata --use-aes=y', 'V4-aes-clearmeta'])
+{
+    my ($args, $out) = @$d;
+    $td->runtest("encrypt $args",
+                 {$td->COMMAND => "qpdf --static-aes-iv --static-id" .
+                      " --allow-weak-crypto --encrypt '' '' 128 $args --" .
+                      " enc-base.pdf a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("check output",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "$out.pdf"});
+    $td->runtest("show encryption",
+                 {$td->COMMAND => "qpdf --show-encryption a.pdf"},
+                 {$td->FILE => "$out-encryption.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+# Crypt Filter
+$td->runtest("decrypt with crypt filter",
+             {$td->COMMAND => "qpdf --decrypt --static-id" .
+                  " metadata-crypt-filter.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => 'a.pdf'},
+             {$td->FILE => 'decrypted-crypt-filter.pdf'});
+$td->runtest("nontrivial crypt filter",
+             {$td->COMMAND => "qpdf --qdf --decrypt --static-id" .
+                  " nontrivial-crypt-filter.pdf --password=asdfqwer a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => 'a.pdf'},
+             {$td->FILE => 'nontrivial-crypt-filter-decrypted.pdf'});
+$td->runtest("show nontrivial EFF",
+             {$td->COMMAND => "qpdf --show-encryption" .
+                  " nontrivial-crypt-filter.pdf --password=asdfqwer"},
+             {$td->FILE => "nontrivial-crypt-filter.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# Copy encryption parameters
+$n_tests += 10;
+$td->runtest("create reference qdf",
+             {$td->COMMAND =>
+                  "qpdf --qdf --no-original-object-ids minimal.pdf a.qdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("create encrypted file",
+             {$td->COMMAND =>
+                  "qpdf --encrypt user owner 128 --use-aes=y --extract=n --" .
+                  " minimal.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("copy encryption parameters",
+             {$td->COMMAND => "test_driver 30 minimal.pdf a.pdf"},
+             {$td->STRING => "test 30 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output encryption",
+             {$td->COMMAND => "qpdf --show-encryption b.pdf --password=owner"},
+             {$td->FILE => "copied-encryption.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("convert to qdf",
+             {$td->COMMAND =>
+                  "qpdf --qdf b.pdf b.qdf" .
+                  " --password=owner --no-original-object-ids"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("compare qdf",
+             {$td->COMMAND => "sh ./diff-ignore-ID-version a.qdf b.qdf"},
+             {$td->STRING => "okay\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("copy encryption with qpdf",
+             {$td->COMMAND =>
+                  "qpdf --copy-encryption=a.pdf".
+                  " --encryption-file-password=user" .
+                  " minimal.pdf c.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output encryption",
+             {$td->COMMAND => "qpdf --show-encryption c.pdf --password=owner"},
+             {$td->FILE => "copied-encryption.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("convert to qdf",
+             {$td->COMMAND =>
+                  "qpdf --qdf c.pdf c.qdf" .
+                  " --password=owner --no-original-object-ids"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("compare qdf",
+             {$td->COMMAND => "sh ./diff-ignore-ID-version a.qdf c.qdf"},
+             {$td->STRING => "okay\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# Files with attachments
+my @attachments = (
+    'enc-XI-attachments-base.pdf',
+    'enc-XI-R6,V5,U=attachment,encrypted-attachments.pdf',
+    'enc-XI-R6,V5,U=view,attachments,cleartext-metadata.pdf');
+$n_tests += 4 * @attachments + 3;
+foreach my $f (@attachments)
+{
+    my $pass = '';
+    my $tpass = '';
+    if ($f =~ m/U=([^,\.]+)/)
+    {
+        $pass = "--password=$1";
+        $tpass = $1;
+    }
+    $td->runtest("decrypt $f",
+                 {$td->COMMAND => "qpdf --decrypt $pass $f a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("extract attachments",
+                 {$td->COMMAND => "test_driver 35 a.pdf"},
+                 {$td->FILE => "attachments.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("copy $f",
+                 {$td->COMMAND => "qpdf $pass $f a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("extract attachments",
+                 {$td->COMMAND => "test_driver 35 a.pdf $tpass"},
+                 {$td->FILE => "attachments.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+$td->runtest("unfilterable with crypt",
+             {$td->COMMAND =>
+                  "test_driver 36 unfilterable-with-crypt.pdf attachment"},
+             {$td->FILE => "unfilterable-with-crypt-before.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+unlink "a.pdf";
+$td->runtest("decrypt file",
+             {$td->COMMAND => "qpdf -decrypt --password=attachment" .
+                  " unfilterable-with-crypt.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("copy of unfilterable with crypt",
+             {$td->COMMAND =>
+                  "test_driver 36 a.pdf attachment"},
+             {$td->FILE => "unfilterable-with-crypt-after.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# Raw encryption key
+my @enc_key = (['user', '--password=user3'],
+               ['owner', '--password=owner3'],
+               ['hex', '--password-is-hex-key --password=35ea16a48b6a3045133b69ac0906c2e8fb0a2cc97903ae17b51a5786ebdba020']);
+$n_tests += scalar(@enc_key);
+foreach my $d (@enc_key)
+{
+    my ($description, $pass) = @$d;
+    $td->runtest("use/show encryption key ($description)",
+                 {$td->COMMAND =>
+                      "qpdf --check --show-encryption-key c-r5-in.pdf $pass"},
+             {$td->FILE => "c-r5-key-$description.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+}
+
+# Miscellaneous encryption tests
+$n_tests += 3;
+
+$td->runtest("set encryption before set filename",
+             {$td->COMMAND => "test_driver 63 minimal.pdf"},
+             {$td->STRING => "test 63 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check file's validity",
+             {$td->COMMAND => "qpdf --check --password=u a.pdf"},
+             {$td->FILE => "encrypt-before-filename.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("handle missing/invalid Length",
+             {$td->COMMAND => "qpdf --check bad-encryption-length.pdf"},
+             {$td->FILE => "bad-encryption-length.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

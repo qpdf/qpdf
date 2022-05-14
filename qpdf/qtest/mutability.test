@@ -1,0 +1,47 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('mutability');
+
+my $n_tests = 5;
+
+$td->runtest("no normalization",
+             {$td->COMMAND => "test_driver 4 test4-1.pdf"},
+             {$td->FILE => "test4-1.qdf",
+              $td->EXIT_STATUS => 0});
+
+$td->runtest("object ordering",
+             {$td->COMMAND => "test_driver 4 test4-4.pdf"},
+             {$td->FILE => "test4-4.qdf",
+              $td->EXIT_STATUS => 0});
+
+$td->runtest("make direct with allow_streams",
+             {$td->COMMAND => "test_driver 4 test4-5.pdf"},
+             {$td->FILE => "test4-5.qdf",
+              $td->EXIT_STATUS => 0});
+
+$td->runtest("stream detected",
+             {$td->COMMAND => "test_driver 4 test4-2.pdf"},
+             {$td->FILE => "test4-2.out",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("loop detected",
+             {$td->COMMAND => "test_driver 4 test4-3.pdf"},
+             {$td->FILE => "test4-3.out",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

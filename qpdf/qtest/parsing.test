@@ -1,0 +1,97 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('parsing');
+
+my $n_tests = 17;
+
+$td->runtest("parse objects from string",
+             {$td->COMMAND => "test_driver 31 minimal.pdf"}, # file not used
+             {$td->FILE => "parse-object.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("EOF terminating literal tokens",
+             {$td->COMMAND => "qpdf --check eof-terminates-literal.pdf"},
+             {$td->FILE => "eof-terminates-literal.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("EOF reading token",
+             {$td->COMMAND => "qpdf --check eof-reading-token.pdf"},
+             {$td->FILE => "eof-reading-token.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("extra header text",
+             {$td->COMMAND => "test_driver 32 minimal.pdf"},
+             {$td->FILE => "test-32.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "extra-header-no-newline.pdf"});
+$td->runtest("check output",
+             {$td->FILE => "b.pdf"},
+             {$td->FILE => "extra-header-lin-no-newline.pdf"});
+$td->runtest("check output",
+             {$td->FILE => "c.pdf"},
+             {$td->FILE => "extra-header-newline.pdf"});
+$td->runtest("check output",
+             {$td->FILE => "d.pdf"},
+             {$td->FILE => "extra-header-lin-newline.pdf"});
+
+# leading-junk also has a space instead of a newline after xref
+$td->runtest("check file with leading junk",
+             {$td->COMMAND => "qpdf --check leading-junk.pdf"},
+             {$td->FILE => "leading-junk.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("EOF inside inline image",
+             {$td->COMMAND => "test_driver 37 eof-in-inline-image.pdf"},
+             {$td->FILE => "eof-in-inline-image.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("tokenize content streams",
+             {$td->COMMAND => "test_driver 37 tokenize-content-streams.pdf"},
+             {$td->FILE => "tokenize-content-streams.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("terminate parsing",
+             {$td->COMMAND => "test_driver 37 terminate-parsing.pdf"},
+             {$td->FILE => "terminate-parsing.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("content stream errors",
+             {$td->COMMAND => "qpdf --check content-stream-errors.pdf"},
+             {$td->FILE => "content-stream-errors.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("ensure arguments to R are direct",
+             {$td->COMMAND => "qpdf --check indirect-r-arg.pdf"},
+             {$td->FILE => "indirect-r-arg.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("no trailing space in xref table",
+             {$td->COMMAND => "qpdf --check no-space-in-xref.pdf"},
+             {$td->FILE => "no-space-in-xref.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# An array is split across multiple content streams starting object
+# 42. This was reported in github issue 73. The file is modified from
+# that example.
+$td->runtest("parse split content stream",
+             {$td->COMMAND => "qpdf --check split-content-stream.pdf"},
+             {$td->FILE => "split-content-stream.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("split content stream errors",
+             {$td->COMMAND => "qpdf --check split-content-stream-errors.pdf"},
+             {$td->FILE => "split-content-stream-errors.out",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

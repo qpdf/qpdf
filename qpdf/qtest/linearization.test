@@ -1,0 +1,133 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('linearization');
+
+my $n_tests = 0;
+# $n_tests incremented after initialization of @linearized_files and
+# @to_linearize.
+
+# *'ed files were linearized with Pdlin.
+my @linearized_files =
+    ('lin0',                    #   not linearized
+     'lin1',                    # * outlines, page labels, pdlin
+     'lin2',                    # * lin1 with null and newline
+     'lin3',                    #   same file saved with acrobat
+     'lin4',                    # * lin1 with no /PageMode
+     'lin5',                    #   lin3 with embedded thumbnails
+     'lin6',                    # * lin5 with pdlin
+     'lin7',                    #   lin5 with /PageMode /UseThumbs
+     'lin8',                    # * lin7 with pdlin
+     'lin9',                    # * shared objects, indirect null
+     'badlin1',                 #   parameter dictionary errors
+     );
+
+my @to_linearize =
+    ('lin-special',             # lots of weird cases -- see file comments
+     'delete-and-reuse',        # deleted, reused objects
+     'lin-delete-and-reuse',    # linearized, then delete and reuse
+     'object-stream',           # contains object streams
+     'hybrid-xref',             # contains both xref tables and streams
+     'gen1',                    # has objects with generation > 0
+     'direct-outlines',         # /Outlines is a direct object
+     @linearized_files,         # we should be able to relinearize
+     );
+
+$n_tests += @linearized_files + 6;
+$n_tests += (3 * @to_linearize * 5) + 6;
+
+foreach my $base (@linearized_files)
+{
+    $td->runtest("dump linearization: $base",
+                 {$td->COMMAND => "qpdf --show-linearization $base.pdf"},
+                 {$td->FILE => "$base.out",
+                  $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+# Check normal modified and linearized modified files, making sure
+# that their qdf files are identical.  The next two tests have the
+# same expected output files and different input files.
+check_pdf($td, "modified",
+          "qpdf --static-id --qdf --no-original-object-ids" .
+          " delete-and-reuse.pdf", "delete-and-reuse.qdf",
+          0);
+check_pdf($td, "linearized and modified",
+          "qpdf --static-id --qdf --no-original-object-ids" .
+          " lin-delete-and-reuse.pdf", "delete-and-reuse.qdf", # same output
+          0);
+
+$td->runtest("check linearized and modified",
+             {$td->COMMAND => "qpdf --check lin-delete-and-reuse.pdf"},
+             {$td->FILE => "lin-delete-and-reuse-check.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check multiple modifications",
+             {$td->COMMAND => "qpdf --check delete-and-reuse.pdf"},
+             {$td->FILE => "delete-and-reuse-check.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+foreach my $base (@to_linearize)
+{
+    foreach my $omode (qw(disable preserve generate))
+    {
+        my $oarg = "-object-streams=$omode";
+        my $sdarg = "";
+        if (($base eq 'lin-special') || ($base eq 'object-stream'))
+        {
+            $sdarg = "--stream-data=uncompress";
+        }
+        $td->runtest("linearize $base ($omode)",
+                     {$td->COMMAND =>
+                          "qpdf -linearize $oarg $sdarg" .
+                          " --static-id $base.pdf a.pdf"},
+                     {$td->STRING => "",
+                      $td->EXIT_STATUS => 0});
+        $td->runtest("check linearization",
+                     {$td->COMMAND => "qpdf --check-linearization a.pdf"},
+                     {$td->STRING => "a.pdf: no linearization errors\n",
+                      $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
+        # Relinearizing twice should produce identical results.  We
+        # have to do it twice because, if objects changed ordering
+        # during the original linearization, the hint tables won't
+        # exactly match.  This is because object identifiers are
+        # inserted into the hint table in their original order since
+        # we don't yet have renumbering information when we compute
+        # the table values.
+        $td->runtest("relinearize $base 1",
+                     {$td->COMMAND =>
+                          "qpdf -linearize $sdarg --static-id a.pdf b.pdf"},
+                     {$td->STRING => "",
+                      $td->EXIT_STATUS => 0});
+        $td->runtest("relinearize $base 2",
+                     {$td->COMMAND =>
+                          "qpdf -linearize $sdarg --static-id b.pdf c.pdf"},
+                     {$td->STRING => "",
+                      $td->EXIT_STATUS => 0});
+        $td->runtest("compare files ($omode)",
+                     {$td->FILE => "b.pdf"},
+                     {$td->FILE => "c.pdf"});
+        if (($base eq 'lin-special') || ($base eq 'object-stream'))
+        {
+            $td->runtest("check $base ($omode)",
+                         {$td->FILE => "a.pdf"},
+                         {$td->FILE => "$base.$omode.exp"});
+        }
+    }
+}
+
+cleanup();
+$td->report($n_tests);

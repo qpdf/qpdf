@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('renumber_objects');
+
+my $n_tests = 8;
+
+$td->runtest("w/o objstm",
+             {$td->COMMAND => "test_renumber minimal.pdf"},
+             {$td->REGEXP => "succeeded\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("w/ objstm",
+             {$td->COMMAND => "test_renumber digitally-signed.pdf"},
+             {$td->REGEXP => "succeeded\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("w/o objstm, --object-streams=generate",
+             {$td->COMMAND =>
+                  "test_renumber --object-streams=generate minimal.pdf"},
+             {$td->REGEXP => "succeeded\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("w/ objstm, --object-streams=generate",
+             {$td->COMMAND =>
+                  "test_renumber --object-streams=generate digitally-signed.pdf"},
+             {$td->REGEXP => "succeeded\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("w/o objstm, --linearize",
+             {$td->COMMAND =>
+                  "test_renumber --linearize minimal.pdf"},
+             {$td->REGEXP => "succeeded\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("w/ objstm, --linearize",
+             {$td->COMMAND =>
+                  "test_renumber --linearize digitally-signed.pdf"},
+             {$td->REGEXP => "succeeded\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("w/o objstm, --preserve-unreferenced",
+             {$td->COMMAND =>
+                  "test_renumber --preserve-unreferenced minimal.pdf"},
+             {$td->REGEXP => "succeeded\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("w/ objstm, --preserve-unreferenced",
+             {$td->COMMAND =>
+                  "test_renumber --preserve-unreferenced digitally-signed.pdf"},
+             {$td->REGEXP => "succeeded\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

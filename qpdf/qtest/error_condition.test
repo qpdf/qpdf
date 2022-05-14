@@ -1,0 +1,211 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('error_condition');
+
+my $n_tests = 0;
+# $n_tests incremented after initialization of badfiles below.
+
+my @badfiles = ("not a PDF file",                       # 1
+                "no startxref",                         # 2
+                "bad primary xref offset",              # 3
+                "invalid xref syntax",                  # 4
+                "invalid xref entry",                   # 5
+                "free table inconsistency",             # 6
+                "no trailer dictionary",                # 7
+                "bad secondary xref",                   # 8
+                "no /Size in trailer",                  # 9
+                "/Size not integer",                    # 10
+                "/Prev not integer",                    # 11
+                "/Size inconsistency",                  # 12
+                "bad {",                                # 13
+                "bad }",                                # 14
+                "bad ]",                                # 15
+                "bad >>",                               # 16
+                "dictionary errors",                    # 17
+                "bad )",                                # 18
+                "bad >",                                # 19
+                "invalid hexstring character",          # 20
+                "invalid name token",                   # 21
+                "no /Length for stream dictionary",     # 22
+                "/Length not integer",                  # 23
+                "expected endstream",                   # 24
+                "bad obj declaration (objid)",          # 25
+                "bad obj declaration (generation)",     # 26
+                "bad obj declaration (obj)",            # 27
+                "expected endobj",                      # 28
+                "null in name",                         # 29
+                "invalid stream /Filter",               # 30
+                "unknown stream /Filter",               # 31
+                "obj/gen mismatch",                     # 32
+                "invalid stream /Filter and xref",      # 33
+                "obj/gen in wrong place",               # 34
+                "object stream of wrong type",          # 35
+                "bad dictionary key",                   # 36
+                "space before xref",                    # 37
+                "startxref to space then eof",          # 38
+                );
+
+$n_tests += @badfiles + 8;
+
+# Test 6 contains errors in the free table consistency, but we no
+# longer have any consistency check for this since it is not important
+# neither Acrobat nor other PDF viewers really care.  Tests 12 and 28
+# have error conditions that used to be fatal but are now considered
+# non-fatal.
+my %badtest_overrides = ();
+for(6, 12..15, 17, 18..32, 34..37)
+{
+    $badtest_overrides{$_} = 0;
+}
+
+for (my $i = 1; $i <= scalar(@badfiles); ++$i)
+{
+    my $status = $badtest_overrides{$i};
+    $status = 2 unless defined $status;
+    $td->runtest($badfiles[$i-1],
+                 {$td->COMMAND => "test_driver 0 bad$i.pdf"},
+                 {$td->FILE => "bad$i.out",
+                  $td->EXIT_STATUS => $status},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+$td->runtest("Suppress warnings",
+             {$td->COMMAND => "qpdf --no-warn bad14.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 3});
+$td->runtest("Suppress warnings",
+             {$td->COMMAND =>
+                  "qpdf --no-warn --warning-exit-0 bad14.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("Suppress warnings with --check",
+             {$td->COMMAND => "qpdf --check --no-warn bad14.pdf"},
+             {$td->FILE => "bad14-check-no-warn.out",
+                  $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C API: errors",
+             {$td->COMMAND => "qpdf-ctest 2 bad1.pdf '' a.pdf"},
+             {$td->FILE => "c-read-errors.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C API: warnings writing",
+             {$td->COMMAND => "qpdf-ctest 2 bad33.pdf '' a.pdf"},
+             {$td->FILE => "c-write-warnings.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C API: no recovery",
+             {$td->COMMAND => "qpdf-ctest 10 bad33.pdf '' a.pdf"},
+             {$td->FILE => "c-no-recovery.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("integer type checks",
+             {$td->COMMAND => "test_driver 62 minimal.pdf"},
+             {$td->STRING => "test 62 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("getValueAs... accessor checks",
+             {$td->COMMAND => "test_driver 85 -"},
+             {$td->STRING => "test 85 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$n_tests += @badfiles + 11;
+
+# Recovery tests.  These are mostly after-the-fact -- when recovery
+# was implemented, some degree of recovery was possible on many of the
+# files.  Mostly the recovery does not actually repair the error,
+# though in some cases it may.  Acrobat Reader would not be able to
+# recover any of these files any better.
+my %recover_failures = ();
+for (1, 7, 16)
+{
+    $recover_failures{$_} = 1;
+}
+for (my $i = 1; $i <= scalar(@badfiles); ++$i)
+{
+    my $status = 0;
+    if (exists $recover_failures{$i})
+    {
+        $status = 2;
+    }
+    $td->runtest("recover " . $badfiles[$i-1],
+                 {$td->COMMAND => "test_driver 1 bad$i.pdf"},
+                 {$td->FILE => "bad$i-recover.out",
+                  $td->EXIT_STATUS => $status},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+# See if we can recover the cross reference table on a file that has
+# been appended to even when it deletes and reuses objects.  We can't
+# completely do it in the case of deleted objects, but we can get
+# mostly there.
+$td->runtest("good replaced page contents",
+             {$td->COMMAND =>
+                  "qpdf --static-id -qdf --no-original-object-ids" .
+                  " append-page-content.pdf a.pdf"},
+             {$td->STRING => "",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "append-page-content-good.qdf"});
+$td->runtest("damaged replaced page contents",
+             {$td->COMMAND =>
+                  "qpdf --static-id -qdf --no-original-object-ids" .
+                  " append-page-content-damaged.pdf a.pdf"},
+             {$td->FILE => "append-page-content-damaged.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "append-page-content-damaged.qdf"});
+$td->runtest("run check on damaged file",
+             {$td->COMMAND => "qpdf --check append-page-content-damaged.pdf"},
+             {$td->FILE => "append-page-content-damaged-check.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check with C API",
+             {$td->COMMAND =>
+                  "qpdf-ctest 1 append-page-content-damaged.pdf '' ''"},
+             {$td->FILE => "append-page-content-damaged-c-check.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("recoverable xref errors",
+             {$td->COMMAND =>
+                  "qpdf --check --show-xref xref-errors.pdf"},
+             {$td->FILE => "xref-errors.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("xref loop with append",
+             {$td->COMMAND =>
+                  "qpdf --deterministic-id append-xref-loop.pdf a.pdf"},
+             {$td->FILE => "append-xref-loop.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "append-xref-loop-fixed.pdf"});
+
+$td->runtest("endobj not at newline",
+             {$td->COMMAND =>
+                  "qpdf --deterministic-id endobj-at-eol.pdf a.pdf"},
+             {$td->FILE => "endobj-at-eol.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "endobj-at-eol-fixed.pdf"});
+
+cleanup();
+$td->report($n_tests);

@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('disable_filter_on_write');
+
+my $n_tests = 2;
+
+$td->runtest("no filter on write",
+             {$td->COMMAND => "test_driver 70 filter-on-write.pdf"},
+             {$td->STRING => "test 70 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "filter-on-write-out.pdf"});
+
+cleanup();
+$td->report($n_tests);

@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('exceptions');
+
+my $n_tests = 2;
+
+$td->runtest("check exception handling",
+             {$td->COMMAND => "test_driver 61 -"},
+             {$td->FILE => "exceptions.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check certain exception types",
+             {$td->COMMAND => "test_driver 81 -"},
+             {$td->STRING => "test 81 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

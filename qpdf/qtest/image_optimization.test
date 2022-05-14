@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('image_optimization');
+
+my @image_opt = (
+    ['image-streams', 'image-streams', ''],
+    ['small-images', 'defaults', ''],
+    ['small-images', 'min-width',
+     '--oi-min-width=150 --oi-min-height=0 --oi-min-area=0'],
+    ['small-images', 'min-height',
+     '--oi-min-width=0 --oi-min-height=150 --oi-min-area=0'],
+    ['small-images', 'min-area',
+     '--oi-min-width=0 --oi-min-height=0 --oi-min-area=30000'],
+    ['small-images', 'min-area-all',
+     '--oi-min-width=0 --oi-min-height=0 --oi-min-area=30000'],
+    ['large-inline-image', 'inline-images',
+     '--ii-min-bytes=0'],
+    ['large-inline-image', 'inline-images-all-size',
+     '--oi-min-width=0 --oi-min-height=0 --oi-min-area=0 --ii-min-bytes=0'],
+    ['large-inline-image', 'inline-images-keep-some', ''],
+    ['large-inline-image', 'inline-images-keep-all', '--keep-inline-images'],
+    ['unsupported-optimization', 'unsupported',
+     '--oi-min-width=0 --oi-min-height=0 --oi-min-area=0'],
+    );
+
+my $n_tests = 2 * scalar(@image_opt);
+
+foreach my $d (@image_opt)
+{
+    my ($f, $description, $args) = @$d;
+
+    $td->runtest("optimize images: $description",
+                 {$td->COMMAND =>
+                      "qpdf --static-id --optimize-images --verbose" .
+                      " $args $f.pdf a.pdf",
+                      $td->FILTER => "perl filter-optimize-images.pl"},
+                 {$td->FILE => "optimize-images-$description.out",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check json: $description",
+                 {$td->COMMAND => "qpdf --json --json-key=pages a.pdf"},
+                 {$td->FILE => "optimize-images-$description-json.out",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+cleanup();
+$td->report($n_tests);

@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('c_api_key');
+
+my $n_tests = 4;
+
+$td->runtest("C API info key functions",
+             {$td->COMMAND => "qpdf-ctest 16 minimal.pdf '' a.pdf"},
+             {$td->FILE => "c-info1.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "c-info-out.pdf"});
+unlink "a.pdf" or die;
+
+$td->runtest("C API info key functions",
+             {$td->COMMAND => "qpdf-ctest 16 c-info2-in.pdf '' a.pdf"},
+             {$td->FILE => "c-info2.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "c-info-out.pdf"});
+unlink "a.pdf" or die;
+
+cleanup();
+$td->report($n_tests);

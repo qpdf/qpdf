@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('dangling_refs');
+
+my @dangling = (qw(minimal dangling-refs));
+my $n_tests = 2 * scalar(@dangling);
+
+foreach my $f (@dangling)
+{
+    $td->runtest("dangling refs: $f",
+                 {$td->COMMAND => "test_driver 53 $f.pdf"},
+                 {$td->FILE => "$f-dangling.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "$f-dangling-out.pdf"});
+}
+cleanup();
+$td->report($n_tests);

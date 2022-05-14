@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('outlines');
+
+my @outline_files = (
+    'page-labels-and-outlines',
+    'outlines-with-actions',
+    'outlines-with-old-root-dests',
+    'outlines-with-loop',
+    );
+my $n_tests = scalar(@outline_files);
+foreach my $f (@outline_files)
+{
+    $td->runtest("outlines: $f",
+                 {$td->COMMAND => "test_driver 49 $f.pdf"},
+                 {$td->FILE => "$f.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+cleanup();
+$td->report($n_tests);

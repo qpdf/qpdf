@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('swap_and_replace');
+
+my $n_tests = 3;
+
+$td->runtest("swap and replace",
+             {$td->COMMAND => "test_driver 14 test14-in.pdf"},
+             {$td->FILE => "test14.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "test14-out.pdf"});
+
+# Most of the test suite uses static or deterministic ID. This test
+# case exercises regular ID generation. Test 14 also exercises writing
+# to memory without static ID.
+$td->runtest("check non-static ID version",
+             {$td->COMMAND => "sh ./diff-ignore-ID-version a.pdf b.pdf"},
+             {$td->STRING => "okay\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

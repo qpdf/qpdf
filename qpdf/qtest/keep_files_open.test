@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('keep_files_open');
+
+my $n_tests = 4;
+
+{ # local scope
+    open(F, "<minimal.pdf") or die;
+    local $/ = undef;
+    binmode F;
+    my $content = <F>;
+    close(F);
+    for (my $i = 1; $i <= 51; ++$i)
+    {
+        open(F, sprintf(">%03d-kfo.pdf", $i)) or die;
+        binmode F;
+        print F $content;
+        close(F);
+    }
+}
+$td->runtest("automatic disable keep files open",
+             {$td->COMMAND =>
+                  "qpdf --verbose --static-id --empty" .
+                  " --keep-files-open-threshold=50" .
+                  " --pages *kfo.pdf -- a.pdf"},
+             {$td->FILE => "disable-kfo.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("don't disable keep files open",
+             {$td->COMMAND =>
+                  "qpdf --verbose --static-id --empty" .
+                  " --pages 01*kfo.pdf -- a.pdf"},
+             {$td->FILE => "enable-kfo.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("explict keep files open",
+             {$td->COMMAND =>
+                  "qpdf --verbose --static-id --keep-files-open=y --empty" .
+                  " --pages 00?-kfo.pdf -- a.pdf"},
+             {$td->FILE => "kfo-y.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("explicit keep files open = n",
+             {$td->COMMAND =>
+                  "qpdf --verbose --static-id --keep-files-open=n --empty" .
+                  " --pages 00?-kfo.pdf -- a.pdf"},
+             {$td->FILE => "kfo-n.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

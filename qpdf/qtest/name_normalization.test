@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('name_normalization');
+
+my $n_tests = 6;
+
+$td->runtest("check pound in name",
+             {$td->COMMAND =>
+                  "test_driver 1 pound-in-name.pdf"},
+             {$td->FILE => "pound-in-name.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("convert pound in name",
+             {$td->COMMAND => "qpdf --static-id --qdf" .
+                  " pound-in-name.pdf a.pdf"},
+             {$td->FILE => "pound-in-name-qdf.out",
+                  $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "pound-in-name.qdf"});
+
+$td->runtest("check pound in image names",
+             {$td->COMMAND =>
+                  "qpdf --check name-pound-images.pdf"},
+             {$td->FILE => "name-pound-images.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("convert pound in image names",
+             {$td->COMMAND => "qpdf --static-id --qdf" .
+                  " name-pound-images.pdf a.pdf"},
+             {$td->FILE => "name-pound-images-qdf.out",
+                  $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "name-pound-images.qdf"});
+
+cleanup();
+$td->report($n_tests);

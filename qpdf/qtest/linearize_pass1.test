@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('linearize_pass1');
+
+my $n_tests = 3;
+
+$td->runtest("linearize pass 1 file",
+             {$td->COMMAND => "qpdf --linearize --static-id" .
+                  " --linearize-pass1=b.pdf minimal.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "minimal-linearized.pdf"});
+$td->runtest("check pass1 file",
+             {$td->FILE => "b.pdf"},
+             {$td->FILE => "minimal-linearize-pass1.pdf"});
+
+cleanup();
+$td->report($n_tests);

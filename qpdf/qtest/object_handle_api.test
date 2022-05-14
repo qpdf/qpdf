@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('object_handle_api');
+
+my $n_tests = 2;
+
+$td->runtest("dictionary keys",
+             {$td->COMMAND => "test_driver 87 - -"},
+             {$td->STRING => "test 87 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("fluent interfaces",
+             {$td->COMMAND => "test_driver 88 minimal.pdf -"},
+             {$td->FILE => "test88.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

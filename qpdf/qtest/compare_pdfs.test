@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+use Digest::MD5;
+use File::Copy;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('compare_pdfs');
+
+my $n_compare_pdfs = 5;
+
+# Check compare_pdfs to make sure that it works properly.  Each call
+# to compare_pdfs is worth three test cases.
+compare_pdfs($td, "p1-a-p2-b.pdf", "p1-a-p2-b.pdf");
+compare_pdfs($td, "p1-a.pdf", "p1-a.pdf");
+compare_pdfs($td, "p1-a.pdf", "p1-b.pdf", 1);
+compare_pdfs($td, "p1-a.pdf", "p1-a-p2-b.pdf", 1);
+compare_pdfs($td, "p1-a-p2-a.pdf", "p1-a-p2-b.pdf", 1);
+flush_tiff_cache();
+
+cleanup();
+$td->report(calc_ntests(0, $n_compare_pdfs));

@@ -1,0 +1,78 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+unshift(@INC, '../../libtests/qtest/arg_parser');
+require completion_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('completion');
+
+# Tests to exercise QPDFArgParser belong in arg_parser.test in
+# libtests. These tests are supposed to be specific to the qpdf cli.
+# Since they were written prior to moving QPDFArgParser into the
+# library, there are several tests here that also exercise
+# QPDFArgParser logic.
+my @completion_tests = (
+    ['', 0, 'bad-input-1'],
+    ['', 1, 'bad-input-2'],
+    ['', 2, 'bad-input-3'],
+    ['qpdf', 2, 'bad-input-4'],
+    ['qpdf ', undef, 'top'],
+    ['qpdf -', undef, 'top-arg'],
+    ['qpdf --enc', undef, 'enc'],
+    ['qpdf --encrypt ', undef, 'encrypt'],
+    ['qpdf --encrypt u ', undef, 'encrypt-u'],
+    ['qpdf --encrypt u o ', undef, 'encrypt-u-o'],
+    ['qpdf @encrypt-u o ', undef, 'encrypt-u-o'],
+    ['qpdf --encrypt u o 40 --', undef, 'encrypt-40'],
+    ['qpdf --encrypt u o 128 --', undef, 'encrypt-128'],
+    ['qpdf --encrypt u o 256 --', undef, 'encrypt-256'],
+    ['qpdf --encrypt u o bad --', undef, 'encrypt-bad'],
+    ['qpdf --split-pag', undef, 'split'],
+    ['qpdf --decode-l', undef, 'decode-l'],
+    ['qpdf --decode-lzzz', 15, 'decode-l'],
+    ['qpdf --decode-level=', undef, 'decode-level'],
+    ['qpdf --decode-level=g', undef, 'decode-level-g'],
+    ['qpdf --check -', undef, 'later-arg'],
+    ['qpdf infile outfile oops --ch', undef, 'usage-empty'],
+    ['qpdf --encrypt \'user " password\' ', undef, 'quoting'],
+    ['qpdf --encrypt \'user password\' ', undef, 'quoting'],
+    ['qpdf --encrypt "user password" ', undef, 'quoting'],
+    ['qpdf --encrypt "user pass\'word" ', undef, 'quoting'],
+    ['qpdf --encrypt user\ password ', undef, 'quoting'],
+    );
+my $n_tests = 2 * scalar(@completion_tests);
+my $completion_filter =
+    "perl ../../../libtests/qtest/arg_parser/filter-completion.pl";
+foreach my $c (@completion_tests)
+{
+    my ($cmd, $point, $description) = @$c;
+    my $out = "completion-$description.out";
+    my $zout = "completion-$description-zsh.out";
+    if (! -f $zout)
+    {
+        $zout = $out;
+    }
+    $td->runtest("bash completion: $description",
+                 {$td->COMMAND => [@{bash_completion("qpdf", $cmd, $point)}],
+                      $td->FILTER => "$completion_filter $out"},
+                 {$td->FILE => "$out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("zsh completion: $description",
+                 {$td->COMMAND => [@{zsh_completion("qpdf", $cmd, $point)}],
+                      $td->FILTER => "$completion_filter $zout"},
+                 {$td->FILE => "$zout", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+cleanup();
+$td->report($n_tests);

@@ -1,0 +1,75 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('c_api_object_handle');
+
+my $n_tests = 13;
+
+$td->runtest("C check object handles",
+             {$td->COMMAND => "qpdf-ctest 24 minimal.pdf '' a.pdf"},
+             {$td->FILE => "c-object-handles.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => 'a.pdf'},
+             {$td->FILE => 'c-object-handles-out.pdf'});
+
+$td->runtest("C check object handle creation",
+             {$td->COMMAND => "qpdf-ctest 25 minimal.pdf '' a.pdf"},
+             {$td->STRING => "C test 25 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => 'a.pdf'},
+             {$td->FILE => 'c-object-handle-creation-out.pdf'});
+
+$td->runtest("C indirect objects",
+             {$td->COMMAND => "qpdf-ctest 33 minimal.pdf '' a.pdf"},
+             {$td->STRING => "C test 33 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => 'a.pdf'},
+             {$td->FILE => 'c-indirect-objects-out.pdf'});
+
+$td->runtest("C uninitialized objects",
+             {$td->COMMAND => "qpdf-ctest 26 '' '' ''"},
+             {$td->FILE => "c-oh-uninitialized-objects.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C string with embedded null",
+             {$td->COMMAND => "qpdf-ctest 27 '' '' ''"},
+             {$td->STRING => "C test 27 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C wrap and clone objects",
+             {$td->COMMAND => "qpdf-ctest 28 minimal.pdf '' ''"},
+             {$td->STRING => "C test 28 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C object handle errors",
+             {$td->COMMAND => "qpdf-ctest 29 minimal.pdf '' ''"},
+             {$td->FILE => "c-oh-errors.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C unhandled error warning",
+             {$td->COMMAND => "qpdf-ctest 30 bad1.pdf '' ''"},
+             {$td->FILE => "c-unhandled-error.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C type mismatch warning",
+             {$td->COMMAND => "qpdf-ctest 31 minimal.pdf '' ''"},
+             {$td->FILE => "c-type-warning.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C get object by ID",
+             {$td->COMMAND => "qpdf-ctest 32 minimal.pdf '' ''"},
+             {$td->STRING => "C test 32 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

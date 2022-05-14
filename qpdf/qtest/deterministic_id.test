@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('deterministic_id');
+
+my $n_tests = 11;
+
+foreach my $d ('nn', 'ny', 'yn', 'yy')
+{
+    my $linearize = ($d =~ m/^y/);
+    my $ostream = ($d =~ m/y$/);
+    $td->runtest("deterministic ID: linearize/ostream=$d",
+                 {$td->COMMAND =>
+                      "qpdf -deterministic-id" .
+                      ($linearize ? " -linearize" : "") .
+                      " -object-streams=" . ($ostream ? "generate" : "disable") .
+                      " deterministic-id-in.pdf a.pdf"},
+                 {$td->STRING => "",
+                  $td->EXIT_STATUS => 0});
+    $td->runtest("compare files",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "deterministic-id-$d.pdf"});
+}
+
+$td->runtest("deterministic ID with encryption",
+             {$td->COMMAND => "qpdf -deterministic-id encrypted-with-images.pdf a.pdf"},
+             {$td->STRING => "qpdf: INTERNAL ERROR: QPDFWriter::generateID" .
+                  " has no data for deterministic ID." .
+                  "  This may happen if deterministic ID and" .
+                  " file encryption are requested together.\n",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("deterministic ID (C API)",
+             {$td->COMMAND =>
+                  "qpdf-ctest 19 deterministic-id-in.pdf '' a.pdf"},
+             {$td->STRING => "C test 19 done\n",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "deterministic-id-nn.pdf"});
+
+cleanup();
+$td->report($n_tests);

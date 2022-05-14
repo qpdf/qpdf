@@ -1,0 +1,72 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('cleartext_metadata');
+
+my $n_tests = 58;
+
+# args: file, exp_encrypted, exp_cleartext
+check_metadata($td, "compressed-metadata.pdf", 0, 0);
+check_metadata($td, "enc-base.pdf", 0, 1);
+
+foreach my $f (qw(compressed-metadata.pdf enc-base.pdf))
+{
+    foreach my $w (qw(compress preserve))
+    {
+        $td->runtest("$w streams ($f)",
+                     {$td->COMMAND => "qpdf --stream-data=$w $f a.pdf"},
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
+        check_metadata($td, "a.pdf", 0, 1);
+        $td->runtest("encrypt normally",
+                     {$td->COMMAND =>
+                          "qpdf --allow-weak-crypto" .
+                          " --encrypt '' o 128 -- a.pdf b.pdf"},
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
+        check_metadata($td, "b.pdf", 1, 0);
+        unlink "b.pdf";
+        $td->runtest("encrypt V4",
+                     {$td->COMMAND =>
+                          "qpdf --allow-weak-crypto" .
+                          " --encrypt '' o 128 --force-V4 -- a.pdf b.pdf"},
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
+        check_metadata($td, "b.pdf", 1, 0);
+        unlink "b.pdf";
+        $td->runtest("encrypt with cleartext metadata",
+                     {$td->COMMAND =>
+                          "qpdf --allow-weak-crypto" .
+                          " --encrypt '' o 128 --cleartext-metadata --" .
+                          " a.pdf b.pdf"},
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
+        check_metadata($td, "b.pdf", 1, 1);
+        $td->runtest("preserve encryption",
+                     {$td->COMMAND => "qpdf b.pdf c.pdf"},
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
+        check_metadata($td, "c.pdf", 1, 1);
+        unlink "b.pdf", "c.pdf";
+        $td->runtest("encrypt with aes and cleartext metadata",
+                     {$td->COMMAND =>
+                          "qpdf --encrypt '' o 128" .
+                          " --cleartext-metadata --use-aes=y -- a.pdf b.pdf"},
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
+        check_metadata($td, "b.pdf", 1, 1);
+        $td->runtest("preserve encryption",
+                     {$td->COMMAND => "qpdf b.pdf c.pdf"},
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
+        check_metadata($td, "c.pdf", 1, 1);
+        unlink "b.pdf", "c.pdf";
+    }
+}
+
+cleanup();
+$td->report($n_tests);

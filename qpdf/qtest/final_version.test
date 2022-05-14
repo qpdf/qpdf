@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('final_version');
+
+my $n_tests = 1;
+
+$td->runtest("check final version",
+             {$td->COMMAND => "test_driver 54 minimal.pdf"},
+             {$td->STRING => "test 54 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);
