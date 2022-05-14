@@ -1,30 +1,30 @@
 dictionary start
-array start
 dictionary item: a -> [9, 0): []
+array start
 array item: [10, 11): 1
 array item: [13, 14): 2
-dictionary start
 array item: [16, 0): {}
+dictionary start
 dictionary item: x -> [22, 25): "y"
 container end: [16, 26): {}
 array item: [28, 29): 3
-dictionary start
 array item: [31, 0): {}
+dictionary start
 dictionary item: keep -> [40, 61): "not in final output"
 container end: [31, 62): {
   "keep": "not in final output"
 }
 container end: [9, 63): []
-array start
 dictionary item: keep -> [75, 0): []
+array start
 array item: [76, 77): 1
 array item: [79, 83): null
 array item: [85, 86): 2
 array item: [88, 93): false
 array item: [95, 101): "keep"
 array item: [103, 104): 3
-array start
 array item: [106, 0): []
+array start
 array item: [107, 113): "this"
 array item: [115, 121): "keep"
 array item: [123, 128): "not"

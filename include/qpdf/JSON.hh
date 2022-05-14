@@ -220,7 +220,10 @@ class JSON
         // The start/end methods are called when parsing of a
         // dictionary or array is started or ended. The item methods
         // are called when an item is added to a dictionary or array.
-        // See important notes in "Item methods" below.
+        // When adding a container to another container, the item
+        // method is called with an empty container before the lower
+        // container's start method is called. See important notes in
+        // "Item methods" below.
 
         // During parsing of a JSON string, the parser is operating on
         // a single object at a time. When a dictionary or array is
@@ -230,10 +233,10 @@ class JSON
         // following method calls
         //
         // dictionaryStart -- current object is the top-level dictionary
+        // dictionaryItem  -- called with "a" and an empty array
         // arrayStart      -- current object is the array
         // arrayItem       -- called with the "1" object
         // containerEnd    -- now current object is the dictionary again
-        // dictionaryItem  -- called with "a" and the just-completed array
         // containerEnd    -- current object is undefined
         //
         // If the top-level item in a JSON string is a scalar, the
@@ -261,8 +264,12 @@ class JSON
         // NOTE: When a dictionary or an array is added to a
         // container, the dictionaryItem or arrayItem method is called
         // when the child item's start delimiter is encountered, so
-        // the JSON object passed in at that time will always be
-        // in its initial, empty state.
+        // the JSON object passed in at that time will always be in
+        // its initial, empty state. Additionally, the child item's
+        // start method is not called until after the parent item's
+        // item method is called. This makes it possible to keep track
+        // of the current depth level by incrementing level on start
+        // methods and decrementing on end methods.
 
         QPDF_DLL
         virtual bool

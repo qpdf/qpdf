@@ -949,17 +949,11 @@ JSONParser::handleToken()
         case '{':
             item = std::make_shared<JSON>(JSON::makeDictionary());
             item->setStart(offset - token.length());
-            if (reactor) {
-                reactor->dictionaryStart();
-            }
             break;
 
         case '[':
             item = std::make_shared<JSON>(JSON::makeArray());
             item->setStart(offset - token.length());
-            if (reactor) {
-                reactor->arrayStart();
-            }
             break;
 
         default:
@@ -1185,6 +1179,18 @@ JSONParser::handleToken()
     } else {
         throw std::logic_error(
             "JSONParser::handleToken: unexpected null item in transition");
+    }
+
+    if (reactor && item.get()) {
+        // Calling container start method is postponed until after
+        // adding the containers to their parent containers, if any.
+        // This makes it much easier to keep track of the current
+        // nesting level.
+        if (item->isDictionary()) {
+            reactor->dictionaryStart();
+        } else if (item->isArray()) {
+            reactor->arrayStart();
+        }
     }
 
     // Prepare for next token

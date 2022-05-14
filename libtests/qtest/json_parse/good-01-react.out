@@ -1,14 +1,14 @@
 dictionary start
 dictionary item: a -> [6, 11): "bcd"
-array start
 dictionary item: e -> [18, 0): []
+array start
 array item: [19, 20): 1
 array item: [41, 42): 2
 array item: [44, 45): 3
 array item: [46, 47): 4
 array item: [48, 54): "five"
-dictionary start
 array item: [56, 0): {}
+dictionary start
 dictionary item: six -> [64, 65): 7
 dictionary item: 8 -> [72, 73): 9
 container end: [56, 74): {}
