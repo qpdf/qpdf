@@ -65,6 +65,13 @@ namespace QUtil
     QPDF_DLL
     unsigned int string_to_uint(char const* str);
 
+    // Returns true if this exactly represents a long long. The
+    // determination is made by converting the string to a long long,
+    // then converting the result back to a string, and then comparing
+    // that result with the original string.
+    QPDF_DLL
+    bool is_long_long(char const* str);
+
     // Pipeline's write method wants unsigned char*, but we often have
     // some other type of string.  These methods do combinations of
     // const_cast and reinterpret_cast to give us an unsigned char*.

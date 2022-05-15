@@ -467,6 +467,19 @@ QUtil::string_to_uint(char const* str)
     return QIntC::to_uint(string_to_ull(str));
 }
 
+bool
+QUtil::is_long_long(char const* str)
+{
+    try {
+        auto i1 = string_to_ll(str);
+        std::string s1 = int_to_string(i1);
+        return str == s1;
+    } catch (std::exception&) {
+        // overflow or other error
+    }
+    return false;
+}
+
 unsigned char*
 QUtil::unsigned_char_pointer(std::string const& str)
 {

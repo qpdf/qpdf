@@ -676,6 +676,29 @@ timestamp_test()
         QUtil::qpdf_time_to_pdf_time(QUtil::get_current_qpdf_time())));
 }
 
+void
+is_long_long_test()
+{
+    auto check = [](char const* s, bool v) {
+        if (QUtil::is_long_long(s) != v) {
+            std::cout << "failed: " << s << std::endl;
+        }
+    };
+    check("12312312", true);
+    check("12312312.34", false);
+    check("-12312312", true);
+    check("-12312312.34", false);
+    check("1e2", false);
+    check("9223372036854775807", true);
+    check("9223372036854775808", false);
+    check("-9223372036854775808", true);
+    check("-9223372036854775809", false);
+    check("123123123123123123123123123123123123", false);
+    check("potato", false);
+    check("0123", false);
+    std::cout << "done" << std::endl;
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -710,6 +733,8 @@ main(int argc, char* argv[])
         rename_delete_test();
         std::cout << "---- timestamp" << std::endl;
         timestamp_test();
+        std::cout << "---- is_long_long" << std::endl;
+        is_long_long_test();
     } catch (std::exception& e) {
         std::cout << "unexpected exception: " << e.what() << std::endl;
     }
