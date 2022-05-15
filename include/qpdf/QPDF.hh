@@ -998,7 +998,7 @@ class QPDF
     class JSONReactor: public JSON::Reactor
     {
       public:
-        JSONReactor(QPDF&, bool must_be_complete);
+        JSONReactor(QPDF&, std::string const& filename, bool must_be_complete);
         virtual ~JSONReactor() = default;
         virtual void dictionaryStart() override;
         virtual void arrayStart() override;
@@ -1008,31 +1008,51 @@ class QPDF
         dictionaryItem(std::string const& key, JSON const& value) override;
         virtual bool arrayItem(JSON const& value) override;
 
+        bool anyErrors() const;
+
       private:
         enum state_e {
             st_initial,
             st_top,
-            st_ignore,
             st_qpdf,
-            st_objects_top,
-            st_trailer_top,
+            st_objects,
+            st_trailer,
             st_object_top,
             st_stream,
             st_object,
+            st_ignore,
         };
 
         void containerStart();
         void nestedState(std::string const& key, JSON const& value, state_e);
+        QPDFObjectHandle makeObject(JSON const& value);
+        void error(size_t offset, std::string const& message);
+        QPDFObjectHandle
+        reserveObject(std::string const& obj, std::string const& gen);
+        void replaceObject(
+            QPDFObjectHandle to_replace, QPDFObjectHandle replacement);
 
         QPDF& pdf;
+        std::string filename;
         bool must_be_complete;
+        bool errors;
+        bool parse_error;
         bool saw_qpdf;
+        bool saw_objects;
         bool saw_json_version;
         bool saw_pdf_version;
         bool saw_trailer;
         state_e state;
         state_e next_state;
+        std::string cur_object;
+        bool saw_value;
+        bool saw_stream;
+        bool saw_dict;
+        bool saw_data;
+        bool saw_datafile;
         std::vector<state_e> state_stack;
+        std::vector<QPDFObjectHandle> object_stack;
+        std::set<QPDFObjGen> reserved;
     };
     friend class JSONReactor;
 
@@ -1080,6 +1100,7 @@ class QPDF
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
     QPDFObjectHandle reserveObjectIfNotExists(int objid, int gen);
+    QPDFObjectHandle reserveStream(int objid, int gen);
 
     // Calls finish() on the pipeline when done but does not delete it
     bool pipeStreamData(

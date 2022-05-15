@@ -1,1 +1,5 @@
-qpdf: qjson-stream-dict-not-dict.json: offset 137: "stream.dict" must be a dictionary
+WARNING: qjson-stream-dict-not-dict.json (obj:1 0 R, offset 137): "stream.dict" must be a dictionary
+WARNING: qjson-stream-dict-not-dict.json (obj:1 0 R, offset 137): unrecognized string value
+WARNING: qjson-stream-dict-not-dict.json (obj:1 0 R, offset 117): "stream" must have exactly one of "data" or "datafile"
+WARNING: qjson-stream-dict-not-dict.json: "qpdf.objects.trailer" was not seen
+qpdf: qjson-stream-dict-not-dict.json: errors found in JSON

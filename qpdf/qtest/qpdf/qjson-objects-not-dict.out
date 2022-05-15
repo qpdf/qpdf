@@ -1,1 +1,3 @@
-qpdf: qjson-objects-not-dict.json: offset 77: "objects" must be a dictionary
+WARNING: qjson-objects-not-dict.json (offset 77): "objects" must be a dictionary
+WARNING: qjson-objects-not-dict.json: "qpdf.objects.trailer" was not seen
+qpdf: qjson-objects-not-dict.json: errors found in JSON

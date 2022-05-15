@@ -2167,6 +2167,13 @@ QPDF::reserveObjectIfNotExists(int objid, int gen)
 }
 
 QPDFObjectHandle
+QPDF::reserveStream(int objid, int gen)
+{
+    return QPDFObjectHandle::Factory::newStream(
+        this, objid, gen, QPDFObjectHandle::newDictionary(), 0, 0);
+}
+
+QPDFObjectHandle
 QPDF::getObjectByObjGen(QPDFObjGen const& og)
 {
     return getObjectByID(og.getObj(), og.getGen());

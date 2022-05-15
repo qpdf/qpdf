@@ -21,38 +21,29 @@
             "3 0 R"
           ],
           "/Type": "/Pages"
-        }
-      },
-      "obj:3 0 R": {
-        "value": {
-          "/Contents": "4 0 R",
-          "/MediaBox": [
-            0,
-            0,
-            612,
-            792
-          ],
-          "/Parent": "2 0 R",
-          "/Resources": {
-            "/Font": {
-              "/F1": "6 0 R"
-            },
-            "/ProcSet": "5 0 R"
-          },
-          "/Type": "/Page"
-        }
-      },
-      "obj:4 0 R": {
+        },
         "stream": {
           "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo=",
           "dict": {}
         }
       },
+      "obj:3 0 R": {
+        "potato": {
+          "salad": "ignored-so-no-string-error",
+          "nested": [1, 2, {"x": "y"}]
+        }
+      },
+      "obj:4 0 R": {
+        "stream": {
+          "potato": "u:salad"
+        }
+      },
       "obj:5 0 R": {
-        "value": [
-          "/PDF",
-          "/Text"
-        ]
+        "stream": {
+          "dict": {"/A": "/B"},
+          "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo=",
+          "datafile": "abc"
+        }
       },
       "obj:6 0 R": {
         "value": {
@@ -63,7 +54,10 @@
         }
       },
       "trailer": {
-        "stream": {}
+        "potato": {
+          "/Root": "1 0 R",
+          "/Size": 7
+        }
       }
     }
   }

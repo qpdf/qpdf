@@ -54,6 +54,15 @@ Soon: Break ground on "Document-level work"
 Output JSON v2
 ==============
 
+XXX
+
+* Reread from perspective of update
+* Test all ignore cases with QTC
+* Test case of correct file with dict before data/datafile
+* Have a test case if possible that exercises the object description
+  which means we need some kind of semantic error that gets caught
+  after creation.
+
 Try to never flatten pages tree. Make sure we do something reasonable
 with pages tree repair. The problem is that if pages tree repair is
 done as a side effect of running --json, the qpdf part of the json may

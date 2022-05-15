@@ -659,3 +659,12 @@ QPDF_json bad pdf version 0
 QPDF_json top-level array 0
 QPDF_json bad object key 0
 QPDF_json trailer stream 0
+QPDF_json missing trailer 0
+QPDF_json missing objects 0
+QPDF_json ignoring in st_ignore 0
+QPDF_json stream dict not dict 0
+QPDF_json unrecognized string value 0
+QPDF_json data datafile both or neither 0
+QPDF_json stream no dict 0
+QPDF_json trailer no value 0
+QPDF_json value stream both or neither 0

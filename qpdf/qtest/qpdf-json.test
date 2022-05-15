@@ -33,6 +33,9 @@ my @badfiles = (
     'stream-dict-not-dict',
     'trailer-not-dict',
     'trailer-stream',
+    'missing-trailer',
+    'missing-objects',
+    'obj-key-errors',
     );
 
 $n_tests += scalar(@badfiles);

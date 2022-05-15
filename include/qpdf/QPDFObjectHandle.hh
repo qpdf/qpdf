@@ -1431,7 +1431,6 @@ class QPDFObjectHandle
         {
             return QPDFObjectHandle::newIndirect(qpdf, objid, generation);
         }
-        // object must be dictionary object
         static QPDFObjectHandle
         newStream(
             QPDF* qpdf,

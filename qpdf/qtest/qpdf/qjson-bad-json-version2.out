@@ -1,1 +1,2 @@
-qpdf: qjson-bad-json-version2.json: offset 98: only JSON version 2 is supported
+WARNING: qjson-bad-json-version2.json (offset 98): only JSON version 2 is supported
+qpdf: qjson-bad-json-version2.json: errors found in JSON

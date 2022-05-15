@@ -1,1 +1,2 @@
-qpdf: qjson-no-qpdf-object.json: "qpdf" object was not seen
+WARNING: qjson-no-qpdf-object.json: "qpdf" object was not seen
+qpdf: qjson-no-qpdf-object.json: errors found in JSON

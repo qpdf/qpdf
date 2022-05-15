@@ -61,9 +61,6 @@
           "/Subtype": "/Type1",
           "/Type": "/Font"
         }
-      },
-      "trailer": {
-        "stream": {}
       }
     }
   }
