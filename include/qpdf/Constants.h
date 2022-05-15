@@ -38,6 +38,7 @@ enum qpdf_error_code_e {
     qpdf_e_damaged_pdf, /* syntax errors or other damage in PDF */
     qpdf_e_pages,       /* erroneous or unsupported pages structure */
     qpdf_e_object,      /* type/bounds errors accessing objects */
+    qpdf_e_json,        /* error in qpdf JSON */
 };
 
 /* Object Types */
