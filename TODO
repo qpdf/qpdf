@@ -54,6 +54,13 @@ Soon: Break ground on "Document-level work"
 Output JSON v2
 ==============
 
+Try to never flatten pages tree. Make sure we do something reasonable
+with pages tree repair. The problem is that if pages tree repair is
+done as a side effect of running --json, the qpdf part of the json may
+contain object numbers that aren't there. Maybe we need to indicate
+whether pages tree repair has been done in the json, but this would
+have to be known early in parsing, which is a problem.
+
 General things to remember:
 
 * Make sure all the information from --check and other informational

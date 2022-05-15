@@ -650,3 +650,12 @@ QPDFJob json encrypt duplicate key length 0
 QPDFJob json encrypt missing password 0
 QPDFJob json pages no file 0
 qpdf-c called qpdf_empty_pdf 0
+QPDF_json missing qpdf 0
+QPDF_json missing json version 0
+QPDF_json missing pdf version 0
+QPDF_json top-level scalar 0
+QPDF_json bad json version 0
+QPDF_json bad pdf version 0
+QPDF_json top-level array 0
+QPDF_json bad object key 0
+QPDF_json trailer stream 0

@@ -1,0 +1,1 @@
+qpdf: qjson-trailer-not-dict.json: offset 1326: "trailer.value" must be a dictionary

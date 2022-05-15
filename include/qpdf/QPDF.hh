@@ -998,6 +998,7 @@ class QPDF
     class JSONReactor: public JSON::Reactor
     {
       public:
+        JSONReactor(QPDF&, bool must_be_complete);
         virtual ~JSONReactor() = default;
         virtual void dictionaryStart() override;
         virtual void arrayStart() override;
@@ -1006,6 +1007,32 @@ class QPDF
         virtual bool
         dictionaryItem(std::string const& key, JSON const& value) override;
         virtual bool arrayItem(JSON const& value) override;
+
+      private:
+        enum state_e {
+            st_initial,
+            st_top,
+            st_ignore,
+            st_qpdf,
+            st_objects_top,
+            st_trailer_top,
+            st_object_top,
+            st_stream,
+            st_object,
+        };
+
+        void containerStart();
+        void nestedState(std::string const& key, JSON const& value, state_e);
+
+        QPDF& pdf;
+        bool must_be_complete;
+        bool saw_qpdf;
+        bool saw_json_version;
+        bool saw_pdf_version;
+        bool saw_trailer;
+        state_e state;
+        state_e next_state;
+        std::vector<state_e> state_stack;
     };
     friend class JSONReactor;
 
