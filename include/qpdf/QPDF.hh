@@ -1079,6 +1079,7 @@ class QPDF
     std::shared_ptr<QPDFObject> resolve(int objid, int generation);
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
+    QPDFObjectHandle reserveObjectIfNotExists(int objid, int gen);
 
     // Calls finish() on the pipeline when done but does not delete it
     bool pipeStreamData(

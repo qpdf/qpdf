@@ -2156,6 +2156,17 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
 }
 
 QPDFObjectHandle
+QPDF::reserveObjectIfNotExists(int objid, int gen)
+{
+    QPDFObjGen og(objid, gen);
+    if ((!this->m->obj_cache.count(og)) && (!this->m->xref_table.count(og))) {
+        resolve(objid, gen);
+        replaceObject(objid, gen, QPDFObjectHandle::Factory::makeReserved());
+    }
+    return getObjectByID(objid, gen);
+}
+
+QPDFObjectHandle
 QPDF::getObjectByObjGen(QPDFObjGen const& og)
 {
     return getObjectByID(og.getObj(), og.getGen());
