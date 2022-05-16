@@ -2592,7 +2592,7 @@ QPDF::getRoot()
             qpdf_e_damaged_pdf,
             this->m->file->getName(),
             "",
-            this->m->file->getLastOffset(),
+            0,
             "unable to find /Root dictionary");
     }
     return root;

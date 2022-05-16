@@ -1313,4 +1313,4 @@ WARNING: issue-335a.pdf (object 5 0, offset 23485): attempting to recover stream
 WARNING: issue-335a.pdf (object 5 0, offset 23485): unable to recover stream data; treating stream as empty
 WARNING: issue-335a.pdf (object 5 0, offset 24974): expected endobj
 WARNING: issue-335a.pdf (object 5 0, offset 24974): EOF after endobj
-qpdf: issue-335a.pdf (offset 24974): unable to find /Root dictionary
+qpdf: issue-335a.pdf: unable to find /Root dictionary

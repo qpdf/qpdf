@@ -2,4 +2,4 @@ WARNING: issue-99b.pdf: file is damaged
 WARNING: issue-99b.pdf (object 1 0, offset 9): object with ID 0
 WARNING: issue-99b.pdf: Attempting to reconstruct cross-reference table
 WARNING: issue-99b.pdf: object 1 0 not found in file after regenerating cross reference table
-qpdf: issue-99b.pdf (offset 763): unable to find /Root dictionary
+qpdf: issue-99b.pdf: unable to find /Root dictionary
