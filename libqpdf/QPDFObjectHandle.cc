@@ -1468,7 +1468,9 @@ QPDFObjectHandle::replaceStreamData(
     assertStream();
     auto b = std::make_shared<Buffer>(data.length());
     unsigned char* bp = b->getBuffer();
-    memcpy(bp, data.c_str(), data.length());
+    if (bp) {
+        memcpy(bp, data.c_str(), data.length());
+    }
     dynamic_cast<QPDF_Stream*>(obj.get())->replaceStreamData(
         b, filter, decode_parms);
 }
