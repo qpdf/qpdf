@@ -1199,13 +1199,21 @@ class QPDFObjectHandle
     QPDF_DLL
     void replaceDict(QPDFObjectHandle const&);
 
-    // Replace this stream's stream data with the given data buffer,
-    // and replace the /Filter and /DecodeParms keys in the stream
-    // dictionary with the given values.  (If either value is empty,
-    // the corresponding key is removed.)  The stream's /Length key is
-    // replaced with the length of the data buffer.  The stream is
-    // interpreted as if the data read from the file, after any
-    // decryption filters have been applied, is as presented.
+    // REPLACING STREAM DATA
+
+    // Note about all replaceStreamData methods: whatever values are
+    // passed as filter and decode_parms will overwrite /Filter and
+    // /DecodeParms in the stream. Passing a null object
+    // (QPDFObjectHandle::newNull()) will remove those values from the
+    // stream dictionary. From qpdf 11, passing an *uninitialized*
+    // QPDFObjectHandle (QPDFObjectHandle()) will leave any existing
+    // values untouched.
+
+    // Replace this stream's stream data with the given data buffer.
+    // The stream's /Length key is replaced with the length of the
+    // data buffer. The stream is interpreted as if the data read from
+    // the file, after any decryption filters have been applied, is as
+    // presented.
     QPDF_DLL
     void replaceStreamData(
         std::shared_ptr<Buffer> data,

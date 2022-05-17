@@ -1,3 +1,9 @@
+2022-05-17  Jay Berkenbilt  <ejb@ql.org>
+
+        * Allow passing *uninitialized* (not null) objects to
+        replaceStreamData as filter and/or decode_parms to leave any
+        existing values for /Filter and /DecodeParms untouched.
+
 2022-05-15  Jay Berkenbilt  <ejb@ql.org>
 
         * Add QUtil::is_long_long to test whether a string can be
