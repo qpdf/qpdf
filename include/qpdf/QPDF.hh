@@ -998,7 +998,8 @@ class QPDF
     class JSONReactor: public JSON::Reactor
     {
       public:
-        JSONReactor(QPDF&, std::string const& filename, bool must_be_complete);
+        JSONReactor(
+            QPDF&, std::shared_ptr<InputSource> is, bool must_be_complete);
         virtual ~JSONReactor() = default;
         virtual void dictionaryStart() override;
         virtual void arrayStart() override;
@@ -1033,7 +1034,7 @@ class QPDF
             QPDFObjectHandle to_replace, QPDFObjectHandle replacement);
 
         QPDF& pdf;
-        std::string filename;
+        std::shared_ptr<InputSource> is;
         bool must_be_complete;
         bool errors;
         bool parse_error;

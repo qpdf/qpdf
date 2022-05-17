@@ -37,9 +37,10 @@ QPDF_Dictionary::getJSON(int json_version)
     JSON j = JSON::makeDictionary();
     for (auto& iter: this->items) {
         if (!iter.second.isNull()) {
-            j.addDictionaryMember(
-                QPDF_Name::normalizeName(iter.first),
-                iter.second.getJSON(json_version));
+            std::string key =
+                (json_version == 1 ? QPDF_Name::normalizeName(iter.first)
+                                   : iter.first);
+            j.addDictionaryMember(key, iter.second.getJSON(json_version));
         }
     }
     return j;

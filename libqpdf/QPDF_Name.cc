@@ -42,7 +42,11 @@ QPDF_Name::unparse()
 JSON
 QPDF_Name::getJSON(int json_version)
 {
-    return JSON::makeString(normalizeName(this->name));
+    if (json_version == 1) {
+        return JSON::makeString(normalizeName(this->name));
+    } else {
+        return JSON::makeString(this->name);
+    }
 }
 
 QPDFObject::object_type_e

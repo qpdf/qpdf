@@ -54,14 +54,14 @@ Soon: Break ground on "Document-level work"
 Output JSON v2
 ==============
 
-XXX
-
 * Reread from perspective of update
 * Test all ignore cases with QTC
 * Test case of correct file with dict before data/datafile
 * Have a test case if possible that exercises the object description
   which means we need some kind of semantic error that gets caught
   after creation.
+* Test invalid data, invalid data file
+* Tests: round-trip through json, round-trip through qpdf --qdf
 
 Try to never flatten pages tree. Make sure we do something reasonable
 with pages tree repair. The problem is that if pages tree repair is
@@ -235,6 +235,11 @@ Update --json option in cli.rst to mention v2 and update json.rst.
 Other documentation fodder:
 
 You can't create a PDF from v1 json because
+
+* Change: names are written in canonical form with a leading slash
+  just as they are treated in the code. In v1, they were written in
+  PDF syntax in the json file. Example: /text#2fplain in pdf will be
+  written as /text/plain in json v2 and as /text#2fplain in json v1.
 
 * The PDF version header is not recorded
 

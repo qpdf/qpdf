@@ -1,9 +1,11 @@
 #include <qpdf/QPDF.hh>
 
 #include <qpdf/FileInputSource.hh>
+#include <qpdf/Pl_Base64.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <algorithm>
 #include <regex>
 
 // This chart shows an example of the state transitions that would
@@ -52,17 +54,40 @@ static char const* JSON_PDF = (
     "9\n"
     "%%EOF\n");
 
+// Note use of [\\s\\S] rather than . to match any character since .
+// doesn't match newlines.
 static std::regex PDF_VERSION_RE("^\\d+\\.\\d+$");
 static std::regex OBJ_KEY_RE("^obj:(\\d+) (\\d+) R$");
 static std::regex INDIRECT_OBJ_RE("^(\\d+) (\\d+) R$");
-static std::regex UNICODE_RE("^u:(.*)$");
+static std::regex UNICODE_RE("^u:([\\s\\S]*)$");
 static std::regex BINARY_RE("^b:((?:[0-9a-fA-F]{2})*)$");
-static std::regex NAME_RE("^/.*$");
+static std::regex NAME_RE("^/[\\s\\S]*$");
+
+static std::function<void(Pipeline*)>
+provide_data(std::shared_ptr<InputSource> is, size_t start, size_t end)
+{
+    return [is, start, end](Pipeline* p) {
+        Pl_Base64 decode("base64-decode", p, Pl_Base64::a_decode);
+        p = &decode;
+        size_t bytes = end - start;
+        char buf[8192];
+        is->seek(QIntC::to_offset(start), SEEK_SET);
+        size_t len = 0;
+        while ((len = is->read(buf, std::min(bytes, sizeof(buf)))) > 0) {
+            p->write(buf, len);
+            bytes -= len;
+            if (bytes == 0) {
+                break;
+            }
+        }
+        decode.finish();
+    };
+}
 
 QPDF::JSONReactor::JSONReactor(
-    QPDF& pdf, std::string const& filename, bool must_be_complete) :
+    QPDF& pdf, std::shared_ptr<InputSource> is, bool must_be_complete) :
     pdf(pdf),
-    filename(filename),
+    is(is),
     must_be_complete(must_be_complete),
     errors(false),
     parse_error(false),
@@ -334,8 +359,6 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                 replacement =
                     pdf.reserveStream(tos.getObjectID(), tos.getGeneration());
                 replaceObject(tos, replacement);
-                replacement.replaceStreamData(
-                    "", "<<>>"_qpdf, "<<>>"_qpdf); // QXXXQ
             }
         } else {
             // Ignore unknown keys for forward compatibility
@@ -369,6 +392,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             throw std::logic_error("no object on stack in st_stream");
         }
         auto tos = object_stack.back();
+        auto uninitialized = QPDFObjectHandle();
         if (!tos.isStream()) {
             // QXXXQ QTC in update mode
             error(value.getStart(), "this object is not a stream");
@@ -388,10 +412,33 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             }
         } else if (key == "data") {
             this->saw_data = true;
-            // QXXXQ
+            std::string v;
+            if (!value.getString(v)) {
+                error(value.getStart(), "\"stream.data\" must be a string");
+            } else {
+                // The range includes the quotes.
+                auto start = value.getStart() + 1;
+                auto end = value.getEnd() - 1;
+                if (end < start) {
+                    throw std::logic_error("QPDF_json: JSON string length < 0");
+                }
+                tos.replaceStreamData(
+                    provide_data(is, start, end), uninitialized, uninitialized);
+            }
         } else if (key == "datafile") {
             this->saw_datafile = true;
-            // QXXXQ
+            std::string filename;
+            if (value.getString(filename)) {
+                tos.replaceStreamData(
+                    QUtil::file_provider(filename),
+                    uninitialized,
+                    uninitialized);
+            } else {
+                error(
+                    value.getStart(),
+                    "\"stream.datafile\" must be a string containing a file "
+                    "name");
+            }
         } else {
             // Ignore unknown keys for forward compatibility.
             // QXXXQ QTC
@@ -471,7 +518,8 @@ QPDF::JSONReactor::makeObject(JSON const& value)
     // QXXXQ include object number in description
     result.setObjectDescription(
         &this->pdf,
-        this->filename + " offset " + QUtil::uint_to_string(value.getStart()));
+        this->is->getName() + " offset " +
+            QUtil::uint_to_string(value.getStart()));
     return result;
 }
 
@@ -503,7 +551,7 @@ QPDF::updateFromJSON(std::shared_ptr<InputSource> is)
 void
 QPDF::importJSON(std::shared_ptr<InputSource> is, bool must_be_complete)
 {
-    JSONReactor reactor(*this, is->getName(), must_be_complete);
+    JSONReactor reactor(*this, is, must_be_complete);
     try {
         JSON::parse(*is, &reactor);
     } catch (std::runtime_error& e) {
