@@ -86,15 +86,12 @@
 2022-04-29  Jay Berkenbilt  <ejb@ql.org>
 
         * QPDFObjectHandle: for the methods insertItem, appendItem,
-        eraseItem, replaceKey, and removeKey, have the methods return a
-        reference to the original object, making a fluent interface to
-        initializing or modifying QPDFObjectHandle possible. Also, for
-        each one, add a corresponding "AndGet" method (insertItemAndGet,
-        appendItemAndGet, eraseItemAndGet, replaceKeyAndGet, and
-        removeKeyAndGet) that returns the newly inserted, replaced, or
-        removed item. This makes it possible to create a new object, add
-        it to an array or dictionary, and get a handle to it all in one
-        line.
+        eraseItem, replaceKey, and removeKey, add a corresponding "AndGet"
+        method (insertItemAndGet, appendItemAndGet, eraseItemAndGet,
+        replaceKeyAndGet, and removeKeyAndGet) that returns the newly
+        inserted, replaced, or removed item. This makes it possible to
+        create a new object, add it to an array or dictionary, and get a
+        handle to it all in one line.
 
 2022-04-24  Jay Berkenbilt  <ejb@ql.org>
 

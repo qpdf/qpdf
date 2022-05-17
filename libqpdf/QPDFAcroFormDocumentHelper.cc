@@ -733,7 +733,8 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
             auto existing_old = subdict.getKey(old_key);
             if (!existing_old.isNull()) {
                 QTC::TC("qpdf", "QPDFAcroFormDocumentHelper ap rename");
-                subdict.replaceKey(new_key, existing_old).removeKey(old_key);
+                subdict.replaceKey(new_key, existing_old);
+                subdict.removeKey(old_key);
             }
         }
     }

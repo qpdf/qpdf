@@ -60,14 +60,15 @@ runtest(int n)
         rfont.replaceKey("/F1", font);
 
         QPDFObjectHandle resources = QPDFObjectHandle::newDictionary();
-        resources.replaceKey("/ProcSet", procset).replaceKey("/Font", rfont);
+        resources.replaceKey("/ProcSet", procset);
+        resources.replaceKey("/Font", rfont);
 
         QPDFObjectHandle page =
             pdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
-        page.replaceKey("/Type", newName("/Page"))
-            .replaceKey("/MediaBox", mediabox)
-            .replaceKey("/Contents", contents)
-            .replaceKey("/Resources", resources);
+        page.replaceKey("/Type", newName("/Page"));
+        page.replaceKey("/MediaBox", mediabox);
+        page.replaceKey("/Contents", contents);
+        page.replaceKey("/Resources", resources);
 
         QPDFPageDocumentHelper(pdf).addPage(page, true);
 

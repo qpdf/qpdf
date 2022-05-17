@@ -187,37 +187,37 @@ create_pdf(char const* filename)
 
     QPDFObjectHandle font =
         pdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
-    font.replaceKey("/Type", newName("/Font"))
-        .replaceKey("/Subtype", newName("/Type1"))
-        .replaceKey("/Name", newName("/F1"))
-        .replaceKey("/BaseFont", newName("/Helvetica"))
-        .replaceKey("/Encoding", newName("/WinAnsiEncoding"));
+    font.replaceKey("/Type", newName("/Font"));
+    font.replaceKey("/Subtype", newName("/Type1"));
+    font.replaceKey("/Name", newName("/F1"));
+    font.replaceKey("/BaseFont", newName("/Helvetica"));
+    font.replaceKey("/Encoding", newName("/WinAnsiEncoding"));
 
     QPDFObjectHandle procset =
         pdf.makeIndirectObject(QPDFObjectHandle::newArray());
-    procset.appendItem(newName("/PDF"))
-        .appendItem(newName("/Text"))
-        .appendItem(newName("/ImageC"));
+    procset.appendItem(newName("/PDF"));
+    procset.appendItem(newName("/Text"));
+    procset.appendItem(newName("/ImageC"));
 
     QPDFObjectHandle rfont = QPDFObjectHandle::newDictionary();
     rfont.replaceKey("/F1", font);
 
     QPDFObjectHandle mediabox = QPDFObjectHandle::newArray();
-    mediabox.appendItem(newInteger(0))
-        .appendItem(newInteger(0))
-        .appendItem(newInteger(612))
-        .appendItem(newInteger(792));
+    mediabox.appendItem(newInteger(0));
+    mediabox.appendItem(newInteger(0));
+    mediabox.appendItem(newInteger(612));
+    mediabox.appendItem(newInteger(792));
 
     QPDFPageDocumentHelper dh(pdf);
     for (size_t pageno = 1; pageno <= npages; ++pageno) {
         QPDFObjectHandle image = QPDFObjectHandle::newStream(&pdf);
         QPDFObjectHandle image_dict = image.getDict();
-        image_dict.replaceKey("/Type", newName("/XObject"))
-            .replaceKey("/Subtype", newName("/Image"))
-            .replaceKey("/ColorSpace", newName("/DeviceGray"))
-            .replaceKey("/BitsPerComponent", newInteger(8))
-            .replaceKey("/Width", newInteger(width))
-            .replaceKey("/Height", newInteger(height));
+        image_dict.replaceKey("/Type", newName("/XObject"));
+        image_dict.replaceKey("/Subtype", newName("/Image"));
+        image_dict.replaceKey("/ColorSpace", newName("/DeviceGray"));
+        image_dict.replaceKey("/BitsPerComponent", newInteger(8));
+        image_dict.replaceKey("/Width", newInteger(width));
+        image_dict.replaceKey("/Height", newInteger(height));
         ImageProvider* p = new ImageProvider(pageno);
         std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider(p);
         image.replaceStreamData(
@@ -227,18 +227,18 @@ create_pdf(char const* filename)
         xobject.replaceKey("/Im1", image);
 
         QPDFObjectHandle resources = QPDFObjectHandle::newDictionary();
-        resources.replaceKey("/ProcSet", procset)
-            .replaceKey("/Font", rfont)
-            .replaceKey("/XObject", xobject);
+        resources.replaceKey("/ProcSet", procset);
+        resources.replaceKey("/Font", rfont);
+        resources.replaceKey("/XObject", xobject);
 
         QPDFObjectHandle contents = create_page_contents(pdf, pageno);
 
         QPDFObjectHandle page =
             pdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
-        page.replaceKey("/Type", newName("/Page"))
-            .replaceKey("/MediaBox", mediabox)
-            .replaceKey("/Contents", contents)
-            .replaceKey("/Resources", resources);
+        page.replaceKey("/Type", newName("/Page"));
+        page.replaceKey("/MediaBox", mediabox);
+        page.replaceKey("/Contents", contents);
+        page.replaceKey("/Resources", resources);
 
         dh.addPage(page, false);
     }

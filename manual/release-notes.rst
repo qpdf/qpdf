@@ -98,12 +98,9 @@ For a detailed list of changes, please see the file
 
   - Library Enhancements
 
-    - Support for more fluent programming with ``QPDFObjectHandle``.
-      The methods ``insertItem``, ``appendItem``, ``eraseItem``,
-      ``replaceKey``, and ``removeKey`` all return a reference to the
-      object being modified. New methods ``insertItemAndGet``,
-      ``appendItemAndGet``, ``eraseItemAndGet``, ``replaceKeyAndGet``,
-      and ``removeKeyAndGet`` return the newly added or removed object.
+    - New methods ``insertItemAndGet``, ``appendItemAndGet``,
+      ``eraseItemAndGet``, ``replaceKeyAndGet``, and
+      ``removeKeyAndGet`` return the newly added or removed object.
 
     - Add new ``Pipeline`` methods to reduce the amount of casting that is
       needed:

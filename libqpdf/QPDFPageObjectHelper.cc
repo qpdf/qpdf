@@ -78,8 +78,8 @@ QPDFObjectHandle
 InlineImageTracker::convertIIDict(QPDFObjectHandle odict)
 {
     QPDFObjectHandle dict = QPDFObjectHandle::newDictionary();
-    dict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"))
-        .replaceKey("/Subtype", QPDFObjectHandle::newName("/Image"));
+    dict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
+    dict.replaceKey("/Subtype", QPDFObjectHandle::newName("/Image"));
     std::set<std::string> keys = odict.getKeys();
     for (auto key: keys) {
         QPDFObjectHandle value = odict.getKey(key);
@@ -752,11 +752,11 @@ QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
     }
     QPDFObjectHandle result = QPDFObjectHandle::newStream(qpdf);
     QPDFObjectHandle newdict = result.getDict();
-    newdict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"))
-        .replaceKey("/Subtype", QPDFObjectHandle::newName("/Form"))
-        .replaceKey(
-            "/Resources", getAttribute("/Resources", false).shallowCopy())
-        .replaceKey("/Group", getAttribute("/Group", false).shallowCopy());
+    newdict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
+    newdict.replaceKey("/Subtype", QPDFObjectHandle::newName("/Form"));
+    newdict.replaceKey(
+        "/Resources", getAttribute("/Resources", false).shallowCopy());
+    newdict.replaceKey("/Group", getAttribute("/Group", false).shallowCopy());
     QPDFObjectHandle bbox = getTrimBox(false).shallowCopy();
     if (!bbox.isRectangle()) {
         this->oh.warnIfPossible("bounding box is invalid; form"

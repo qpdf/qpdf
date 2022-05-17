@@ -62,15 +62,16 @@ test_bsearch()
     auto mk = [&q](std::vector<int> const& v) {
         auto nums = QPDFObjectHandle::newArray();
         for (auto i: v) {
-            nums.appendItem(QPDFObjectHandle::newInteger(i))
-                .appendItem(QPDFObjectHandle::newString(
-                    "-" + QUtil::int_to_string(i) + "-"));
+            nums.appendItem(QPDFObjectHandle::newInteger(i));
+            nums.appendItem(QPDFObjectHandle::newString(
+                "-" + QUtil::int_to_string(i) + "-"));
         }
         auto limits = QPDFObjectHandle::newArray();
-        limits.appendItem(QPDFObjectHandle::newInteger(v.at(0)))
-            .appendItem(QPDFObjectHandle::newInteger(v.at(v.size() - 1)));
+        limits.appendItem(QPDFObjectHandle::newInteger(v.at(0)));
+        limits.appendItem(QPDFObjectHandle::newInteger(v.at(v.size() - 1)));
         auto node = q.makeIndirectObject(QPDFObjectHandle::newDictionary());
-        node.replaceKey("/Nums", nums).replaceKey("/Limits", limits);
+        node.replaceKey("/Nums", nums);
+        node.replaceKey("/Limits", limits);
         return node;
     };
 
@@ -168,8 +169,8 @@ test_depth()
                     int val =
                         (((((i1 * NITEMS) + i2) * NITEMS) + i3) * NITEMS) + i4;
                     std::string str = QUtil::int_to_string(10 * val, 6);
-                    items.appendItem(QPDFObjectHandle::newString(str))
-                        .appendItem(QPDFObjectHandle::newString("val " + str));
+                    items.appendItem(QPDFObjectHandle::newString(str));
+                    items.appendItem(QPDFObjectHandle::newString("val " + str));
                     if (i4 == 0) {
                         first = str;
                     } else if (i4 == NITEMS - 1) {
@@ -178,23 +179,21 @@ test_depth()
                 }
                 auto limits = QPDFObjectHandle::newArray();
                 n3.replaceKey("/Limits", limits);
-                limits.appendItem(QPDFObjectHandle::newString(first))
-                    .appendItem(QPDFObjectHandle::newString(last));
+                limits.appendItem(QPDFObjectHandle::newString(first));
+                limits.appendItem(QPDFObjectHandle::newString(last));
             }
             auto limits = QPDFObjectHandle::newArray();
             n2.replaceKey("/Limits", limits);
-            limits
-                .appendItem(
-                    k2.getArrayItem(0).getKey("/Limits").getArrayItem(0))
-                .appendItem(k2.getArrayItem(NITEMS - 1)
-                                .getKey("/Limits")
-                                .getArrayItem(1));
+            limits.appendItem(
+                k2.getArrayItem(0).getKey("/Limits").getArrayItem(0));
+            limits.appendItem(
+                k2.getArrayItem(NITEMS - 1).getKey("/Limits").getArrayItem(1));
         }
         auto limits = QPDFObjectHandle::newArray();
         n1.replaceKey("/Limits", limits);
-        limits.appendItem(k1.getArrayItem(0).getKey("/Limits").getArrayItem(0))
-            .appendItem(
-                k1.getArrayItem(NITEMS - 1).getKey("/Limits").getArrayItem(1));
+        limits.appendItem(k1.getArrayItem(0).getKey("/Limits").getArrayItem(0));
+        limits.appendItem(
+            k1.getArrayItem(NITEMS - 1).getKey("/Limits").getArrayItem(1));
     }
 
     QPDFNameTreeObjectHelper nh(n0, q);

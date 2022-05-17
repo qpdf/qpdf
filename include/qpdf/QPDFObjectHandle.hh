@@ -1024,25 +1024,22 @@ class QPDFObjectHandle
     void setArrayFromVector(std::vector<QPDFObjectHandle> const& items);
     // Insert an item before the item at the given position ("at") so
     // that it has that position after insertion. If "at" is equal to
-    // the size of the array, insert the item at the end. Return a
-    // reference to the array (not the new item).
+    // the size of the array, insert the item at the end.
     QPDF_DLL
-    QPDFObjectHandle& insertItem(int at, QPDFObjectHandle const& item);
+    void insertItem(int at, QPDFObjectHandle const& item);
     // Like insertItem but return the item that was inserted.
     QPDF_DLL
     QPDFObjectHandle insertItemAndGet(int at, QPDFObjectHandle const& item);
-    // Append an item, and return a reference to the original array
-    // (not the new item).
+    // Append an item to an array.
     QPDF_DLL
-    QPDFObjectHandle& appendItem(QPDFObjectHandle const& item);
+    void appendItem(QPDFObjectHandle const& item);
     // Append an item, and return the newly added item.
     QPDF_DLL
     QPDFObjectHandle appendItemAndGet(QPDFObjectHandle const& item);
     // Remove the item at that position, reducing the size of the
-    // array by one. Return a reference the original array (not the
-    // item that was removed).
+    // array by one.
     QPDF_DLL
-    QPDFObjectHandle& eraseItem(int at);
+    void eraseItem(int at);
     // Erase and item and return the item that was removed.
     QPDF_DLL
     QPDFObjectHandle eraseItemAndGet(int at);
@@ -1050,19 +1047,16 @@ class QPDFObjectHandle
     // Mutator methods for dictionary objects
 
     // Replace value of key, adding it if it does not exist. If value
-    // is null, remove the key. Return a reference to the original
-    // dictionary (not the new item).
+    // is null, remove the key.
     QPDF_DLL
-    QPDFObjectHandle&
-    replaceKey(std::string const& key, QPDFObjectHandle const& value);
+    void replaceKey(std::string const& key, QPDFObjectHandle const& value);
     // Replace value of key and return the value.
     QPDF_DLL
     QPDFObjectHandle
     replaceKeyAndGet(std::string const& key, QPDFObjectHandle const& value);
-    // Remove key, doing nothing if key does not exist. Return the
-    // original dictionary (not the removed item).
+    // Remove key, doing nothing if key does not exist.
     QPDF_DLL
-    QPDFObjectHandle& removeKey(std::string const& key);
+    void removeKey(std::string const& key);
     // Remove key and return the old value. If the old value didn't
     // exist, return a null object.
     QPDF_DLL

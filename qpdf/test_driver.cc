@@ -525,7 +525,8 @@ test_9(QPDF& pdf, char const* arg2)
         "data for other stream\n",
         QPDFObjectHandle::newNull(),
         QPDFObjectHandle::newNull());
-    root.replaceKey("/QStream", qstream).replaceKey("/RStream", rstream);
+    root.replaceKey("/QStream", qstream);
+    root.replaceKey("/RStream", rstream);
     QPDFWriter w(pdf, "a.pdf");
     w.setStaticID(true);
     w.setStreamDataMode(qpdf_s_preserve);
@@ -895,12 +896,15 @@ test_24(QPDF& pdf, char const* arg2)
     QPDFObjectHandle res1 = QPDFObjectHandle::newReserved(&pdf);
     QPDFObjectHandle res2 = QPDFObjectHandle::newReserved(&pdf);
     QPDFObjectHandle trailer = pdf.getTrailer();
-    trailer.replaceKey("Array1", res1).replaceKey("Array2", res2);
+    trailer.replaceKey("Array1", res1);
+    trailer.replaceKey("Array2", res2);
 
     QPDFObjectHandle array1 = QPDFObjectHandle::newArray();
     QPDFObjectHandle array2 = QPDFObjectHandle::newArray();
-    array1.appendItem(res2).appendItem(QPDFObjectHandle::newInteger(1));
-    array2.appendItem(res1).appendItem(QPDFObjectHandle::newInteger(2));
+    array1.appendItem(res2);
+    array1.appendItem(QPDFObjectHandle::newInteger(1));
+    array2.appendItem(res1);
+    array2.appendItem(QPDFObjectHandle::newInteger(2));
     // Make sure trying to ask questions about a reserved object
     // doesn't break it.
     if (res1.isArray()) {
@@ -1065,14 +1069,13 @@ test_27(QPDF& pdf, char const* arg2)
         dh.addPage(O3.getKey("/OtherPage"), false);
         dh.addPage(O3, false);
         QPDFObjectHandle s2 = QPDFObjectHandle::newStream(&oldpdf, "potato\n");
-        pdf.getTrailer()
-            .replaceKey("/QTest", pdf.copyForeignObject(qtest))
-            .replaceKey("/QTest2", QPDFObjectHandle::newArray());
-        pdf.getTrailer()
-            .getKey("/QTest2")
-            .appendItem(pdf.copyForeignObject(s1))
-            .appendItem(pdf.copyForeignObject(s2))
-            .appendItem(pdf.copyForeignObject(s3));
+        auto trailer = pdf.getTrailer();
+        trailer.replaceKey("/QTest", pdf.copyForeignObject(qtest));
+        auto qtest2 =
+            trailer.replaceKeyAndGet("/QTest2", QPDFObjectHandle::newArray());
+        qtest2.appendItem(pdf.copyForeignObject(s1));
+        qtest2.appendItem(pdf.copyForeignObject(s2));
+        qtest2.appendItem(pdf.copyForeignObject(s3));
     }
 
     QPDFWriter w(pdf, "a.pdf");
@@ -2035,12 +2038,6 @@ test_55(QPDF& pdf, char const* arg2)
         QPDFPageDocumentHelper(pdf).getAllPages();
     QPDFObjectHandle qtest = QPDFObjectHandle::newArray();
     for (auto& ph: pages) {
-        // Note: using fluent appendItem causes a test failure with
-        // MSVC 19.31.31107, which appears to evaluate the argument to
-        // the second appendItem before the first. Since these
-        // arguments have the side effect of creating objects, the
-        // object numbers end up being different even though the
-        // resulting file is semantically correct.
         qtest.appendItem(ph.getFormXObjectForPage());
         qtest.appendItem(ph.getFormXObjectForPage(false));
     }
@@ -2196,10 +2193,10 @@ test_60(QPDF& pdf, char const* arg2)
 
     // The only differences between /QTest and /QTest3 should be
     // the direct objects merged from r2.
-    pdf.getTrailer()
-        .replaceKey("/QTest1", r1)
-        .replaceKey("/QTest2", r2)
-        .replaceKey("/QTest3", r3);
+    auto trailer = pdf.getTrailer();
+    trailer.replaceKey("/QTest1", r1);
+    trailer.replaceKey("/QTest2", r2);
+    trailer.replaceKey("/QTest3", r3);
     QPDFWriter w(pdf, "a.pdf");
     w.setQDFMode(true);
     w.setStaticID(true);
@@ -2259,9 +2256,9 @@ test_62(QPDF& pdf, char const* arg2)
     long long q2 = QIntC::to_longlong(q2_l);
     unsigned int q3_i = UINT_MAX;
     long long q3 = QIntC::to_longlong(q3_i);
-    t.replaceKey("/Q1", QPDFObjectHandle::newInteger(q1))
-        .replaceKey("/Q2", QPDFObjectHandle::newInteger(q2))
-        .replaceKey("/Q3", QPDFObjectHandle::newInteger(q3));
+    t.replaceKey("/Q1", QPDFObjectHandle::newInteger(q1));
+    t.replaceKey("/Q2", QPDFObjectHandle::newInteger(q2));
+    t.replaceKey("/Q3", QPDFObjectHandle::newInteger(q3));
     assert_compare_numbers(q1, t.getKey("/Q1").getIntValue());
     assert_compare_numbers(q1_l, t.getKey("/Q1").getUIntValue());
     assert_compare_numbers(INT_MAX, t.getKey("/Q1").getIntValueAsInt());
@@ -3120,17 +3117,16 @@ test_87(QPDF& pdf, char const* arg2)
 static void
 test_88(QPDF& pdf, char const* arg2)
 {
-    // Exercise fluent QPDFObjectHandle mutators and similar methods
-    // added for qpdf 11.
-    auto dict = QPDFObjectHandle::newDictionary()
-                    .replaceKey("/One", QPDFObjectHandle::newInteger(1))
-                    .replaceKey("/Two", QPDFObjectHandle::newInteger(2));
-    dict.replaceKeyAndGet("/Three", QPDFObjectHandle::newArray())
-        .appendItem("(a)"_qpdf)
-        .appendItem("(b)"_qpdf)
-        .appendItemAndGet(QPDFObjectHandle::newDictionary())
-        .replaceKey("/Z", "/Y"_qpdf)
-        .replaceKey("/X", "/W"_qpdf);
+    // Exercise mutate and get methods added for qpdf 11.
+    auto dict = QPDFObjectHandle::newDictionary();
+    dict.replaceKey("/One", QPDFObjectHandle::newInteger(1));
+    dict.replaceKey("/Two", QPDFObjectHandle::newInteger(2));
+    auto three = dict.replaceKeyAndGet("/Three", QPDFObjectHandle::newArray());
+    three.appendItem("(a)"_qpdf);
+    three.appendItem("(b)"_qpdf);
+    auto newdict = three.appendItemAndGet(QPDFObjectHandle::newDictionary());
+    newdict.replaceKey("/Z", "/Y"_qpdf);
+    newdict.replaceKey("/X", "/W"_qpdf);
     assert(dict.unparse() == R"(
       <<
         /One 1
@@ -3138,14 +3134,15 @@ test_88(QPDF& pdf, char const* arg2)
         /Three [ (a) (b) << /Z /Y /X /W >> ]
       >>
     )"_qpdf.unparse());
-    auto arr = dict.getKey("/Three")
-                   .insertItem(0, QPDFObjectHandle::newString("0"))
-                   .insertItem(0, QPDFObjectHandle::newString("00"));
+    auto arr = dict.getKey("/Three");
+    arr.insertItem(0, QPDFObjectHandle::newString("0"));
+    arr.insertItem(0, QPDFObjectHandle::newString("00"));
     assert(
         arr.unparse() ==
         "[ (00) (0) (a) (b) << /Z /Y /X /W >> ]"_qpdf.unparse());
     auto new_dict = arr.insertItemAndGet(1, "<< /P /Q /R /S >>"_qpdf);
-    arr.eraseItem(2).eraseItem(0);
+    arr.eraseItem(2);
+    arr.eraseItem(0);
     assert(
         arr.unparse() ==
         "[ << /P /Q /R /S >> (a) (b) << /Z /Y /X /W >> ]"_qpdf.unparse());
@@ -3154,7 +3151,8 @@ test_88(QPDF& pdf, char const* arg2)
     // always been this way, and there is code that relies on this
     // behavior. Maybe it would be different if I could start over
     // again...
-    new_dict.removeKey("/R").replaceKey("/T", "/U"_qpdf);
+    new_dict.removeKey("/R");
+    new_dict.replaceKey("/T", "/U"_qpdf);
     assert(
         arr.unparse() ==
         "[ << /P /Q /T /U >> (a) (b) << /Z /Y /X /W >> ]"_qpdf.unparse());
