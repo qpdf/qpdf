@@ -2,6 +2,7 @@
 
 #include <qpdf/FileInputSource.hh>
 #include <qpdf/Pl_Base64.hh>
+#include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -13,7 +14,7 @@
 
 //                                | st_initial
 // {                              |   -> st_top
-//   "qpdf": {                    |   -> st_qpdf
+//   "qpdf-v2": {                 |   -> st_qpdf
 //     "objects": {               |   -> st_objects
 //       "obj:1 0 R": {           |   -> st_object_top
 //         "value": {             |   -> st_object
@@ -93,7 +94,6 @@ QPDF::JSONReactor::JSONReactor(
     parse_error(false),
     saw_qpdf(false),
     saw_objects(false),
-    saw_json_version(false),
     saw_pdf_version(false),
     saw_trailer(false),
     state(st_initial),
@@ -154,21 +154,17 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
             QTC::TC("qpdf", "QPDF_json missing qpdf");
             error(0, "\"qpdf\" object was not seen");
         } else {
-            if (!this->saw_json_version) {
-                QTC::TC("qpdf", "QPDF_json missing json version");
-                error(0, "\"qpdf.jsonversion\" was not seen");
-            }
             if (must_be_complete && !this->saw_pdf_version) {
                 QTC::TC("qpdf", "QPDF_json missing pdf version");
-                error(0, "\"qpdf.pdfversion\" was not seen");
+                error(0, "\"qpdf-v2.pdfversion\" was not seen");
             }
             if (!this->saw_objects) {
                 QTC::TC("qpdf", "QPDF_json missing objects");
-                error(0, "\"qpdf.objects\" was not seen");
+                error(0, "\"qpdf-v2.objects\" was not seen");
             } else {
                 if (must_be_complete && !this->saw_trailer) {
                     QTC::TC("qpdf", "QPDF_json missing trailer");
-                    error(0, "\"qpdf.objects.trailer\" was not seen");
+                    error(0, "\"qpdf-v2.objects.trailer\" was not seen");
                 }
             }
         }
@@ -279,7 +275,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
         QTC::TC("qpdf", "QPDF_json ignoring in st_ignore");
         // ignore
     } else if (state == st_top) {
-        if (key == "qpdf") {
+        if (key == "qpdf-v2") {
             this->saw_qpdf = true;
             nestedState(key, value, st_qpdf);
         } else {
@@ -289,14 +285,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             next_state = st_ignore;
         }
     } else if (state == st_qpdf) {
-        if (key == "jsonversion") {
-            this->saw_json_version = true;
-            std::string v;
-            if (!(value.getNumber(v) && (v == "2"))) {
-                QTC::TC("qpdf", "QPDF_json bad json version");
-                error(value.getStart(), "only JSON version 2 is supported");
-            }
-        } else if (key == "pdfversion") {
+        if (key == "pdfversion") {
             this->saw_pdf_version = true;
             bool version_okay = false;
             std::string v;
@@ -566,4 +555,111 @@ QPDF::importJSON(std::shared_ptr<InputSource> is, bool must_be_complete)
     //     std::cout << oh.unparse() << ":" << std::endl;
     //     std::cout << oh.unparseResolved() << std::endl;
     // }
+}
+
+void
+QPDF::writeJSONStream(
+    int version,
+    Pipeline* p,
+    bool& first,
+    std::string const& key,
+    QPDFObjectHandle& obj,
+    qpdf_stream_decode_level_e decode_level,
+    qpdf_json_stream_data_e json_stream_data,
+    std::string const& file_prefix)
+{
+    Pipeline* stream_p = nullptr;
+    FILE* f = nullptr;
+    std::shared_ptr<Pl_StdioFile> f_pl;
+    std::string filename;
+    if (json_stream_data == qpdf_sj_file) {
+        filename = file_prefix + "-" + QUtil::int_to_string(obj.getObjectID());
+        f = QUtil::safe_fopen(filename.c_str(), "wb");
+        f_pl = std::make_shared<Pl_StdioFile>("stream data", f);
+        stream_p = f_pl.get();
+    }
+    auto j = JSON::makeDictionary();
+    j.addDictionaryMember(
+        "stream",
+        obj.getStreamJSON(
+            version, json_stream_data, decode_level, stream_p, filename));
+
+    JSON::writeDictionaryItem(p, first, key, j, 2);
+    if (f) {
+        f_pl->finish();
+        f_pl = nullptr;
+        fclose(f);
+    }
+}
+
+void
+QPDF::writeJSONObject(
+    int version,
+    Pipeline* p,
+    bool& first,
+    std::string const& key,
+    QPDFObjectHandle& obj)
+{
+    auto j = JSON::makeDictionary();
+    j.addDictionaryMember("value", obj.getJSON(version, true));
+    JSON::writeDictionaryItem(p, first, key, j, 2);
+}
+
+void
+QPDF::writeJSON(
+    int version,
+    Pipeline* p,
+    qpdf_stream_decode_level_e decode_level,
+    qpdf_json_stream_data_e json_stream_data,
+    std::string const& file_prefix,
+    std::set<std::string> wanted_objects)
+{
+    if (version != 2) {
+        throw std::runtime_error(
+            "QPDF::writeJSON: only version 2 is supported");
+    }
+    bool first = true;
+    JSON::writeDictionaryOpen(p, first, 0);
+    JSON::writeDictionaryKey(p, first, "qpdf-v2", 0);
+    bool first_qpdf = true;
+    JSON::writeDictionaryOpen(p, first_qpdf, 1);
+    JSON::writeDictionaryItem(
+        p, first_qpdf, "pdfversion", JSON::makeString(getPDFVersion()), 1);
+    JSON::writeDictionaryItem(
+        p,
+        first_qpdf,
+        "maxobjectid",
+        JSON::makeInt(QIntC::to_longlong(getObjectCount())),
+        1);
+    JSON::writeDictionaryKey(p, first_qpdf, "objects", 1);
+    bool first_object = true;
+    JSON::writeDictionaryOpen(p, first_object, 2);
+    bool all_objects = wanted_objects.empty();
+    std::vector<QPDFObjectHandle> objects = getAllObjects();
+    for (auto& obj: objects) {
+        std::string key = "obj:" + obj.unparse();
+        if (all_objects || wanted_objects.count(key)) {
+            if (obj.isStream()) {
+                writeJSONStream(
+                    version,
+                    p,
+                    first_object,
+                    key,
+                    obj,
+                    decode_level,
+                    json_stream_data,
+                    file_prefix);
+            } else {
+                writeJSONObject(version, p, first_object, key, obj);
+            }
+        }
+    }
+    if (all_objects || wanted_objects.count("trailer")) {
+        auto trailer = getTrailer();
+        writeJSONObject(version, p, first_object, "trailer", trailer);
+    }
+    JSON::writeDictionaryClose(p, first_object, 2);
+    JSON::writeDictionaryClose(p, first_qpdf, 1);
+    JSON::writeDictionaryClose(p, first, 0);
+    *p << "\n";
 }

@@ -28,7 +28,6 @@ void argOverlay();
 void argPages();
 void argReplaceInput();
 void argUnderlay();
-void argCreateFromJson(std::string const&);
 void argPagesPositional(std::string const&);
 void argPagesPassword(std::string const&);
 void argEndPages();

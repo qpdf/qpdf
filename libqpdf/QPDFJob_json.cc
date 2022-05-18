@@ -251,12 +251,6 @@ Handlers::setupEmpty()
 }
 
 void
-Handlers::setupCreateFromJson()
-{
-    addParameter([this](char const* p) { c_main->createFromJson(p); });
-}
-
-void
 Handlers::setupOutputFile()
 {
     addParameter([this](char const* p) { c_main->outputFile(p); });

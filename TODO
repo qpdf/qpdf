@@ -54,6 +54,10 @@ Soon: Break ground on "Document-level work"
 Output JSON v2
 ==============
 
+Some of this documentation has drifted from the actual implementation.
+
+Make sure pages tree repair generates warnings.
+
 * Reread from perspective of update
 * Test all ignore cases with QTC
 * Test case of correct file with dict before data/datafile
@@ -62,6 +66,7 @@ Output JSON v2
   after creation.
 * Test invalid data, invalid data file
 * Tests: round-trip through json, round-trip through qpdf --qdf
+* Test to see if we get CR/NL on Windows, which is okay
 
 Try to never flatten pages tree. Make sure we do something reasonable
 with pages tree repair. The problem is that if pages tree repair is
@@ -75,6 +80,9 @@ General things to remember:
 * Make sure all the information from --check and other informational
   options (--show-linearization, --show-encryption, --show-xref,
   --list-attachments, --show-npages) is available in the json output.
+  Consider having --check, --show-encryption, etc., just select the
+  right keys when in json mode. I don't think I want check on by
+  default, so that might be different.
 
 * Consider changing the contract to allow fields to be absent even
   when present in the schema. It's reasonable for people to check for
@@ -95,41 +103,32 @@ General things to remember:
 
 JSON to PDF:
 
-Have --create-from-json and --update-from-json. With
---create-from-json, the json file must be complete, meaning all stream
-data, the trailer, and the PDF version must be present. In
---update-from-json, an object explicitly set to null (not "value":
-null) is deleted. For streams with no stream data, the dictionary is
-updated but the data is left untouched. Other things that are omitted
-are left alone. Make sure document that, when writing a PDF file from
-QPDF, there is no expectation of object numbers being preserved. As
-such, --update-from-json can only be used to update the exact file
-that the json was created from. You can put multiple objects in the
-update file, but you can't use a json from one file to update the
-output of a previous update since the object numbers will have
-changed. Note that, when creating from a JSON, object numbers are
-preserved in the resulting QPDF object but still modified by
-QPDFWriter for the output. This would be visible by combining
---to-json and --create-from-json. Also using --qdf with
---create-from-json would show original object IDs in comments. It will
-be important to capture this in the documentation.
+Have --json-input and --update-from-json. With --json-input, the json
+file must be complete, meaning all stream data, the trailer, and the
+PDF version must be present. In --update-from-json, an object
+explicitly set to null (not "value": null) is deleted. For streams
+with no stream data, the dictionary is updated but the data is left
+untouched. Other things that are omitted are left alone. Make sure
+document that, when writing a PDF file from QPDF, there is no
+expectation of object numbers being preserved. As such,
+--update-from-json can only be used to update the exact file that the
+json was created from. You can put multiple objects in the update
+file, but you can't use a json from one file to update the output of a
+previous update since the object numbers will have changed. Note that,
+when creating from a JSON, object numbers are preserved in the
+resulting QPDF object but still modified by QPDFWriter for the output.
+This would be visible by combining --json-output and --json-input.
+Also using --qdf with --create-from-json would show original object
+IDs in comments. It will be important to capture this in the
+documentation.
 
 When reading a JSON string, any string that doesn't look like a name
 or indirect object or start with "b:" or "u:" should be considered an
 error. Just use newUnicodeString on "u:" strings. For "b:" strings,
 decode the bytes with hex_decode and use newString.
 
-For going back from JSON to PDF, we can have
-QPDF::createFromJSON(std::shared_ptr<InputSource>)
-which will have logic similar to copyForeignObject. Note that this
-InputSource is not going to be this->file. We have to keep it
-separately. There's also non-static QPDF::updateFromJSON. Both
-createFromJSON and updateFromJSON will call the same internal method
-with different options. That method will use a reactor that is a
-private QPDF class that just proxies to private QPDF methods.
-
-Test case: combine --create-from-json and --to-json to preservation of
-object numbers. QPDFWriter won't show that although --qdf with the
+Test case: combine --json-input and --json-output to show preservation
+of object numbers. QPDFWriter won't show that although --qdf with the
 original object ID comments would.
 
 The backing input source for createFromJSON is this memory block:
@@ -145,8 +144,7 @@ startxref
 %%EOF
 ```
 
-* Ignore all keys except .qpdf.
-* Verify that .qpdf.jsonVersion is 2
+* Ignore all keys except .qpdf-v2.
 * Set this->m->pdf_version based on the .qpdf.pdfVersion key
 * For each object in .qpdf.objects:
   * Walk through the object detecting any indirect objects. For each
@@ -170,15 +168,14 @@ Documentation:
 
 Serialized PDF:
 
-The JSON output will have a "qpdf" key containing
-* jsonversion
+The JSON output will have a "qpdf-v2" key containing
 * pdfversion
 * maxobjectid
 * objects
 
-The "qpdf" key replaces "objects" and "objectinfo" in v1 JSON.
+In regular json mode, "objectinfo" is gone.
 
-Within .qpdf.objects, the key is "obj:o g R" or "trailer", and the
+Within .objects, the key is "obj:o g R" or "trailer", and the
 value is a dictionary with exactly one of "value" or "stream" as its
 single key.
 
@@ -222,11 +219,11 @@ for when the file is read back in.
 CLI:
 
 Example workflow:
-* qpdf in.pdf --to-json > pdf.json
+* qpdf in.pdf --json-output=2 pdf.json
 * edit pdf.json
-* qpdf --create-from-json=pdf.json out.pdf
+* qpdf --json-input pdf.json out.pdf
 
-* qpdf in.pdf --to-json > pdf.json
+* qpdf in.pdf --json-output=2 pdf.json
 * edit pdf.json keeping only objects that need to be changed
 * qpdf in.pdf --update-from-json=pdf.json out.pdf
 

@@ -27,8 +27,7 @@ QPDFJob::Config::emptyInput()
         // Various places in QPDFJob.cc know that the empty string for
         // infile means empty. We set it to something other than a
         // null pointer as an indication that some input source has
-        // been specified. The --create-from-json option also sets
-        // infilename to empty. This approach means that passing "" as
+        // been specified. This approach means that passing "" as
         // the argument to inputFile in job JSON, or equivalently
         // using "" as a positional command-line argument would be the
         // same as --empty. This probably isn't worth blocking or
@@ -265,6 +264,7 @@ QPDFJob::Config::jsonObject(std::string const& parameter)
 QPDFJob::Config*
 QPDFJob::Config::jsonStreamData(std::string const& parameter)
 {
+    o.m->json_stream_data_set = true;
     if (parameter == "none") {
         o.m->json_stream_data = qpdf_sj_none;
     } else if (parameter == "inline") {
@@ -286,22 +286,28 @@ QPDFJob::Config::jsonStreamPrefix(std::string const& parameter)
 }
 
 QPDFJob::Config*
-QPDFJob::Config::toJson()
+QPDFJob::Config::jsonInput()
 {
-    json("latest");
-    jsonStreamData("inline");
-    jsonKey("qpdf");
-    decodeLevel("none");
+    o.m->json_input = true;
     return this;
 }
 
 QPDFJob::Config*
-QPDFJob::Config::createFromJson(std::string const& parameter)
+QPDFJob::Config::jsonOutput(std::string const& parameter)
 {
-    // See comments in emptyInput() about setting infilename to the
-    // empty string.
-    o.m->infilename = QUtil::make_shared_cstr("");
-    o.m->create_from_json = parameter;
+    std::string v = parameter;
+    if (parameter == "latest") {
+        v = "2";
+    }
+    if (v != "2") {
+        usage("only version 2 is supported for --json-output");
+    }
+    o.m->json_output = QUtil::string_to_int(v.c_str());
+    if (!o.m->json_stream_data_set) {
+        // No need to set json_stream_data_set -- that indicates
+        // explicit use of --json-stream-data.
+        o.m->json_stream_data = qpdf_sj_inline;
+    }
     return this;
 }
 

@@ -26,16 +26,16 @@ my @json_files = (
     ['field-types', ['--show-encryption-key']],
     ['image-streams', ['--decode-level=all']],
     ['image-streams', ['--decode-level=specialized']],
-    ['page-labels-and-outlines', ['--json-key=qpdf']],
+    ['page-labels-and-outlines', ['--json-key=objects']],
     ['page-labels-and-outlines', ['--json-key=pages']],
     ['page-labels-and-outlines', ['--json-key=pagelabels']],
     ['page-labels-and-outlines', ['--json-key=outlines']],
     ['page-labels-and-outlines',
      ['--json-key=outlines', '--json-key=pages']],
     ['page-labels-and-outlines',
-     ['--json-key=qpdf', '--json-object=trailer']],
+     ['--json-key=objects', '--json-object=trailer']],
     ['page-labels-and-outlines',
-     ['--json-key=qpdf', '--json-object=trailer', '--json-object=2 0 R']],
+     ['--json-key=objects', '--json-object=trailer', '--json-object=2 0 R']],
     ['field-types', ['--json-key=acroform']],
     ['need-appearances', ['--json-key=acroform']],
     ['V4-aes', ['--json-key=encrypt']],
@@ -46,27 +46,18 @@ foreach my $d (@json_files)
 {
     my ($file, $xargs) = @$d;
     my $out = "json-$file";
-    my @v1_xargs = ();
     foreach my $x (@$xargs)
     {
         my $y = $x;
         $y =~ s/^.*=//;
         $y =~ s/\s.*//;
         $out .= "-$y";
-        if ($x eq '--json-key=qpdf')
-        {
-            push(@v1_xargs, '--json-key=objects');
-        }
-        else
-        {
-            push(@v1_xargs, $x);
-        }
     }
     my $in = "$file.pdf";
     $td->runtest("json v1 $out",
                  {$td->COMMAND =>
                       ['qpdf', '--json=1', '--test-json-schema',
-                       @v1_xargs, $in]},
+                       @$xargs, $in]},
                  {$td->FILE => "$out-v1.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("json v2 $out",
@@ -78,8 +69,8 @@ foreach my $d (@json_files)
 
 $td->runtest("bad json stream data (inline)",
              {$td->COMMAND =>
-                  "qpdf --json=2 --test-json-schema" .
-                  " --json-stream-data=inline bad-data.pdf > a.json"},
+                  "qpdf --json-output=2" .
+                  " --json-stream-data=inline bad-data.pdf a.json"},
              {$td->FILE => "bad-data-json.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check (inline)",
@@ -88,9 +79,9 @@ $td->runtest("check (inline)",
              $td->NORMALIZE_NEWLINES);
 $td->runtest("bad json stream data (file)",
              {$td->COMMAND =>
-                  "qpdf --json=2 --test-json-schema" .
+                  "qpdf --json-output=2 " .
                   " --json-stream-data=file --json-stream-prefix=auto" .
-                  " bad-data.pdf > a.json"},
+                  " bad-data.pdf a.json"},
              {$td->FILE => "bad-data-json.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check (file)",
@@ -110,7 +101,7 @@ foreach my $l (qw(none generalized specialized all))
         # library is use.
         $td->runtest("image-streams json inline: $l",
                      {$td->COMMAND =>
-                          "qpdf image-streams-small.pdf --json=2" .
+                          "qpdf image-streams-small.pdf - --json-output=2" .
                           " --decode-level=$l --json-stream-data=inline"},
                      {$td->FILE => "json-image-streams-$l-inline-v2.out",
                           $td->EXIT_STATUS => 0},
@@ -118,9 +109,9 @@ foreach my $l (qw(none generalized specialized all))
     }
     $td->runtest("image-streams json file: $l",
                  {$td->COMMAND =>
-                      "qpdf image-streams-small.pdf --json=2" .
+                      "qpdf image-streams-small.pdf - --json-output=2" .
                       " --decode-level=$l --json-stream-data=file" .
-                      " --json-stream-prefix=auto --json-key=qpdf" .
+                      " --json-stream-prefix=auto" .
                       " --json-object=12 --json-object=16 --json-object=18"},
                  {$td->FILE => "json-image-streams-$l-file-v2.out",
                       $td->EXIT_STATUS => 0},
@@ -159,10 +150,12 @@ foreach my $l (qw(none generalized specialized all))
     }
 }
 
-$td->runtest("use --to-json option",
-             {$td->COMMAND => "qpdf --to-json image-streams-small.pdf"},
-             {$td->FILE => "image-streams-small-to-json.out",
-                  $td->EXIT_STATUS => 0},
+$td->runtest("file to stdout without prefix",
+             {$td->COMMAND =>
+                  "qpdf image-streams-small.pdf - --json-output=2" .
+                  " -json-stream-data=file"},
+             {$td->FILE => "file-stdout-needs-prefix.out",
+                  $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();

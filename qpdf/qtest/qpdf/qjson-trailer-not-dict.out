@@ -1,2 +1,2 @@
-WARNING: qjson-trailer-not-dict.json (trailer, offset 1327): "trailer.value" must be a dictionary
+WARNING: qjson-trailer-not-dict.json (trailer, offset 1243): "trailer.value" must be a dictionary
 qpdf: qjson-trailer-not-dict.json: errors found in JSON

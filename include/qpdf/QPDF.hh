@@ -111,22 +111,37 @@ class QPDF
     processInputSource(std::shared_ptr<InputSource>, char const* password = 0);
 
     // Create a PDF from an input source that contains JSON as written
-    // by qpdf --json (version 2 or higher). The JSON must be a
-    // complete representation of a PDF. See "QPDF JSON Format" in the
-    // manual for details.
+    // by writeJSON (or qpdf --json-output, version 2 or higher). The
+    // JSON must be a complete representation of a PDF. See "QPDF JSON
+    // Format" in the manual for details.
     QPDF_DLL
     void createFromJSON(std::string const& json_file);
     QPDF_DLL
     void createFromJSON(std::shared_ptr<InputSource>);
 
     // Update a PDF from an input source that contains JSON in the
-    // same format as is written by qpdf --json (version 2 or higher).
-    // Objects in the PDF and not in the JSON are not modified. See
-    // "QPDF JSON Format" in the manual for details.
+    // same format as is written by writeJSON (or qpdf --json-output,
+    // version 2 or higher). Objects in the PDF and not in the JSON
+    // are not modified. See "QPDF JSON Format" in the manual for
+    // details.
     QPDF_DLL
     void updateFromJSON(std::string const& json_file);
     QPDF_DLL
     void updateFromJSON(std::shared_ptr<InputSource>);
+
+    // Write qpdf json format. The only supported version is 2. If
+    // wanted_objects is empty, write all objects. Otherwise, write
+    // only objects whose keys are in wanted_objects. Keys may be
+    // either "trailer" or of the form "obj:n n R". Invalid keys are
+    // ignored.
+    QPDF_DLL
+    void writeJSON(
+        int version,
+        Pipeline*,
+        qpdf_stream_decode_level_e,
+        qpdf_json_stream_data_e,
+        std::string const& file_prefix,
+        std::set<std::string> wanted_objects);
 
     // Close or otherwise release the input source. Once this has been
     // called, no other methods of qpdf can be called safely except
@@ -1040,7 +1055,6 @@ class QPDF
         bool parse_error;
         bool saw_qpdf;
         bool saw_objects;
-        bool saw_json_version;
         bool saw_pdf_version;
         bool saw_trailer;
         state_e state;
@@ -1570,6 +1584,23 @@ class QPDF
 
     // JSON import
     void importJSON(std::shared_ptr<InputSource>, bool must_be_complete);
+
+    // JSON write
+    void writeJSONStream(
+        int version,
+        Pipeline* p,
+        bool& first,
+        std::string const& key,
+        QPDFObjectHandle&,
+        qpdf_stream_decode_level_e,
+        qpdf_json_stream_data_e,
+        std::string const& file_prefix);
+    void writeJSONObject(
+        int version,
+        Pipeline* p,
+        bool& first,
+        std::string const& key,
+        QPDFObjectHandle&);
 
     // Type conversion helper methods
     template <typename T>

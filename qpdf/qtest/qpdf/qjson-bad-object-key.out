@@ -1,2 +1,2 @@
-WARNING: qjson-bad-object-key.json (offset 181): object key should be "trailer" or "obj:n n R"
+WARNING: qjson-bad-object-key.json (offset 97): object key should be "trailer" or "obj:n n R"
 qpdf: qjson-bad-object-key.json: errors found in JSON

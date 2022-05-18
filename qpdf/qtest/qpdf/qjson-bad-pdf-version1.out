@@ -1,2 +1,2 @@
-WARNING: qjson-bad-pdf-version1.json (offset 119): invalid PDF version (must be x.y)
+WARNING: qjson-bad-pdf-version1.json (offset 35): invalid PDF version (must be x.y)
 qpdf: qjson-bad-pdf-version1.json: errors found in JSON

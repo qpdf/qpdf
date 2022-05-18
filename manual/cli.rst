@@ -3174,20 +3174,6 @@ Related Options
    :qpdf:ref:`--json-help` option to get a description of the JSON
    object.
 
-.. qpdf:option:: --to-json
-
-   .. help: serialize to JSON
-
-      Shortcut for options useful for serializing PDF to JSON:
-      --json=latest --json-stream-data=inline
-        --json-key=qpdf --decode-level=none
-
-   This option is a shorthand for
-   ``--json=latest --json-stream-data=inline --json-key=qpdf --decode-level=none``.
-   These are good options for serializing a PDF to JSON in manner that
-   allows qpdf to read it back in. You can override any of these
-   options by specifying other options after them.
-
 .. qpdf:option:: --json-help
 
    .. help: show format of JSON output
@@ -3253,7 +3239,8 @@ Related Options
    inline (base64-encoded) or written to a file. If ``file`` is
    chosen, the file will be the name of the input file appended with
    :samp:`-{nnn}` where :samp:`{nnn}` is the object number. The prefix
-   can be overridden with :qpdf:ref:`--json-stream-prefix`.
+   can be overridden with :qpdf:ref:`--json-stream-prefix`. This
+   option only applies when used with :qpdf:ref:`--json-output`.
 
 .. qpdf:option:: --json-stream-prefix=file-prefix
 
@@ -3268,20 +3255,34 @@ Related Options
    ``file``, override the input file name as the prefix for stream
    data files. Whatever is given here will be appended with
    :samp:`-{nnn}` to create the name of the file that will contain the
-   data for the stream stream in object :samp:`{nnn}`.
+   data for the stream stream in object :samp:`{nnn}`. This
+   option only applies when used with :qpdf:ref:`--json-output`.
 
-.. qpdf:option:: --create-from-json=qpdf-json-file
+.. qpdf:option:: --json-output=version
 
-   .. help: create PDF from qpdf JSON
+   .. help: serialize to JSON
 
-      Create a PDF file from the prior output of qpdf --json. See the
-      "QPDF JSON Format" section of the manual for information about
-      how to use this option.
+      The output file will be qpdf JSON format at the given version.
+      Only version 2 is supported. See also --json-stream-data
+      and --json-stream-prefix
 
-   This option creates a PDF file from the previous output of ``qpdf
-   --json`` that includes stream data and information about all
-   objects. For information about converting between PDF and JSON,
-   please see :ref:`qpdf-json`.
+   The output file will be qpdf JSON format at the given version. Only
+   version 2 is supported. See also :qpdf:ref:`--json-stream-data` and
+   :qpdf:ref:`--json-stream-prefix`.
+
+.. qpdf:option:: --json-input
+
+   .. help: input file is qpdf JSON
+
+      Treat the input file as a JSON file in qpdf JSON format as
+      written by qpdf --json-output. See the "QPDF JSON Format"
+      section of the manual for information about how to use this
+      option.
+
+   Treat the input file as a JSON file in qpdf JSON format as written
+   by ``qpdf --json-output``. The input file must be complete and
+   include all stream data. For information about converting between
+   PDF and JSON, please see :ref:`qpdf-json`.
 
 .. qpdf:option:: --update-from-json=qpdf-json-file
 

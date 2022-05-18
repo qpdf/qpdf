@@ -12,9 +12,10 @@ static char const* decode_level_choices[] = {"none", "generalized", "specialized
 static char const* object_streams_choices[] = {"disable", "preserve", "generate", 0};
 static char const* remove_unref_choices[] = {"auto", "yes", "no", 0};
 static char const* flatten_choices[] = {"all", "print", "screen", 0};
-static char const* json_version_choices[] = {"1", "2", "latest", 0};
-static char const* json_key_choices[] = {"acroform", "attachments", "encrypt", "objectinfo", "objects", "outlines", "pagelabels", "pages", "qpdf", 0};
+static char const* json_key_choices[] = {"acroform", "attachments", "encrypt", "objectinfo", "objects", "outlines", "pagelabels", "pages", 0};
+static char const* json_output_choices[] = {"2", "latest", 0};
 static char const* json_stream_data_choices[] = {"none", "inline", "file", 0};
+static char const* json_version_choices[] = {"1", "2", "latest", 0};
 static char const* print128_choices[] = {"full", "low", "none", 0};
 static char const* modify128_choices[] = {"all", "annotate", "form", "assembly", "none", 0};
 
@@ -30,9 +31,9 @@ popHandler(); // key: passwordFile
 pushKey("empty");
 setupEmpty();
 popHandler(); // key: empty
-pushKey("createFromJson");
-setupCreateFromJson();
-popHandler(); // key: createFromJson
+pushKey("jsonInput");
+addBare([this]() { c_main->jsonInput(); });
+popHandler(); // key: jsonInput
 pushKey("outputFile");
 setupOutputFile();
 popHandler(); // key: outputFile
@@ -105,6 +106,9 @@ popHandler(); // key: progress
 pushKey("splitPages");
 addParameter([this](std::string const& p) { c_main->splitPages(p); });
 popHandler(); // key: splitPages
+pushKey("jsonOutput");
+addChoices(json_output_choices, true, [this](std::string const& p) { c_main->jsonOutput(p); });
+popHandler(); // key: jsonOutput
 pushKey("encrypt");
 beginDict(bindJSON(&Handlers::beginEncrypt), bindBare(&Handlers::endEncrypt)); // .encrypt
 pushKey("userPassword");
@@ -262,9 +266,6 @@ popHandler(); // key: jsonStreamData
 pushKey("jsonStreamPrefix");
 addParameter([this](std::string const& p) { c_main->jsonStreamPrefix(p); });
 popHandler(); // key: jsonStreamPrefix
-pushKey("toJson");
-addBare([this]() { c_main->toJson(); });
-popHandler(); // key: toJson
 pushKey("updateFromJson");
 addParameter([this](std::string const& p) { c_main->updateFromJson(p); });
 popHandler(); // key: updateFromJson

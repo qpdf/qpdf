@@ -323,8 +323,6 @@ class QPDFJob
         Config* outputFile(std::string const& filename);
         QPDF_DLL
         Config* replaceInput();
-        QPDF_DLL
-        Config* createFromJson(std::string const& filename);
 
         QPDF_DLL
         std::shared_ptr<CopyAttConfig> copyAttachmentsFrom();
@@ -455,7 +453,10 @@ class QPDFJob
 
     // Basic file processing
     std::shared_ptr<QPDF> processFile(
-        char const* filename, char const* password, bool used_for_input);
+        char const* filename,
+        char const* password,
+        bool used_for_input,
+        bool main_input);
     std::shared_ptr<QPDF> processInputSource(
         std::shared_ptr<InputSource> is,
         char const* password,
@@ -464,12 +465,14 @@ class QPDFJob
         std::function<void(QPDF*, char const*)> fn,
         char const* password,
         bool empty,
-        bool used_for_input);
+        bool used_for_input,
+        bool main_input);
     std::shared_ptr<QPDF> doProcessOnce(
         std::function<void(QPDF*, char const*)> fn,
         char const* password,
         bool empty,
-        bool used_for_input);
+        bool used_for_input,
+        bool main_input);
 
     // Transformations
     void setQPDFOptions(QPDF& pdf);
@@ -511,31 +514,21 @@ class QPDFJob
     void setEncryptionOptions(QPDF&, QPDFWriter&);
     void maybeFixWritePassword(int R, std::string& password);
     void writeOutfile(QPDF& pdf);
+    void writeJSON(QPDF& pdf);
 
     // JSON
     void doJSON(QPDF& pdf, Pipeline*);
     std::set<QPDFObjGen> getWantedJSONObjects();
+    void doJSONObject(
+        Pipeline* p, bool& first, std::string const& key, QPDFObjectHandle&);
     void doJSONObjects(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf);
-    void doJSONQpdf(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONPages(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONPageLabels(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONOutlines(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONEncrypt(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONAttachments(Pipeline* p, bool& first, QPDF& pdf);
-    void doJSONStream(
-        Pipeline* p,
-        bool& first,
-        QPDF& pdf,
-        QPDFObjectHandle& obj,
-        std::string const& file_prefix);
-    void doJSONObject(
-        Pipeline* p,
-        bool& first,
-        QPDF& pdf,
-        std::string const& key,
-        QPDFObjectHandle& obj);
     void addOutlinesToJson(
         std::vector<QPDFOutlineObjectHelper> outlines,
         JSON& j,
@@ -654,6 +647,7 @@ class QPDFJob
         std::set<std::string> json_keys;
         std::set<std::string> json_objects;
         qpdf_json_stream_data_e json_stream_data;
+        bool json_stream_data_set;
         std::string json_stream_prefix;
         bool test_json_schema;
         bool check;
@@ -676,7 +670,8 @@ class QPDFJob
         bool check_requires_password;
         std::shared_ptr<char> infilename;
         std::shared_ptr<char> outfilename;
-        std::string create_from_json;
+        bool json_input;
+        int json_output;
         std::string update_from_json;
     };
     std::shared_ptr<Members> m;

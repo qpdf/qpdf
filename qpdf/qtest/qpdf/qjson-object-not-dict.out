@@ -1,2 +1,2 @@
-WARNING: qjson-object-not-dict.json (offset 184): "obj:1 0 R" must be a dictionary
+WARNING: qjson-object-not-dict.json (offset 100): "obj:1 0 R" must be a dictionary
 qpdf: qjson-object-not-dict.json: errors found in JSON

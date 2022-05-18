@@ -1,10 +1,5 @@
 {
-  "version": 2,
-  "parameters": {
-    "decodelevel": "none"
-  },
-  "qpdf": {
-    "jsonversion": 2,
+  "qpdf-v2": {
     "maxobjectid": 6,
     "objects": {
       "obj:1 0 R": {

@@ -36,10 +36,6 @@ choices:
     - all
     - print
     - screen
-  json_version:
-    - 1
-    - 2
-    - latest
   json_key:
     # The list of selectable top-level keys id duplicated in the
     # following places: job.yml, QPDFJob::json_schema, and
@@ -48,15 +44,21 @@ choices:
     - attachments
     - encrypt
     - objectinfo   # only v1
-    - objects      # only v1
+    - objects
     - outlines
     - pagelabels
     - pages
-    - qpdf         # only v2
+  json_output:
+    - 2
+    - latest
   json_stream_data:
     - none
     - inline
     - file
+  json_version:
+    - 1
+    - 2
+    - latest
   print128:
     - full
     - low
@@ -86,7 +88,6 @@ options:
       - underlay
       - empty
       - replace-input
-      - create-from-json
     positional: true
     bare:
       - add-attachment
@@ -105,6 +106,7 @@ options:
       - generate-appearances
       - ignore-xref-streams
       - is-encrypted
+      - json-input
       - keep-inline-images
       - linearize
       - list-attachments
@@ -135,7 +137,6 @@ options:
       - suppress-password-recovery
       - suppress-recovery
       - test-json-schema
-      - to-json
       - underlay
       - verbose
       - warning-exit-0
@@ -164,20 +165,20 @@ options:
       show-attachment: attachment
       show-object: trailer
       json-stream-prefix: stream-file-prefix
-      create-from-json: qpdf-json file
       update-from-json: qpdf-json file
     required_choices:
       compress-streams: yn
       decode-level: decode_level
       flatten-annotations: flatten
       json-key: json_key
+      json-output: json_output
+      json-stream-data: json_stream_data
       keep-files-open: yn
       normalize-content: yn
       object-streams: object_streams
       password-mode: password_mode
       remove-unreferenced-resources: remove_unref
       stream-data: stream_data
-      json-stream-data: json_stream_data
     optional_choices:
       json: json_version
   - table: pages
@@ -281,7 +282,7 @@ json:
   main.password:
   password-file:
   empty:
-  create-from-json:
+  json-input:
   # output
   _outputFile: "output filename"
   replace-input:
@@ -308,6 +309,7 @@ json:
   force-version:
   progress:
   split-pages:
+  json-output:
   encrypt:
     _user-password: "user password"
     _owner-password: "owner password"
@@ -362,7 +364,6 @@ json:
     - null
   json-stream-data:
   json-stream-prefix:
-  to-json:
   # other options
   update-from-json:
   allow-weak-crypto:

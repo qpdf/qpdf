@@ -50,19 +50,19 @@ $td->runtest("show direct pages",
 
 # Json mode for direct and duplicated pages illustrates that the
 # "objects" section the original objects before correction when
-# "pages" is not output but after correct when it is.# numbers.
+# "pages" is not output but after correct when it is.
 foreach my $f (qw(page_api_2 direct-pages))
 {
     $td->runtest("json for $f (objects only)",
                  {$td->COMMAND =>
                       "qpdf --json=latest $f.pdf" .
-                      " --json-key=qpdf"},
+                      " --json-key=objects"},
                  {$td->FILE => "$f-json-objects.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("json for $f (with pages)",
                  {$td->COMMAND =>
                       "qpdf --json=latest $f.pdf" .
-                      " --json-key=qpdf --json-key=pages"},
+                      " --json-key=objects --json-key=pages"},
                  {$td->FILE => "$f-json-pages.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 }

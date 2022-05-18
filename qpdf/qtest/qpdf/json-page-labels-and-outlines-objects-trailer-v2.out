@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "parameters": {
+    "decodelevel": "generalized"
+  },
+  "objects": {
+    "trailer": {
+      "value": {
+        "/Root": "1 0 R",
+        "/Size": 107
+      }
+    }
+  }
+}

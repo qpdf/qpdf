@@ -402,6 +402,7 @@ QPDFJob::Members::Members() :
     list_attachments(false),
     json_version(0),
     json_stream_data(qpdf_sj_none),
+    json_stream_data_set(false),
     test_json_schema(false),
     check(false),
     optimize_images(false),
@@ -418,7 +419,9 @@ QPDFJob::Members::Members() :
     require_outfile(true),
     replace_input(false),
     check_is_encrypted(false),
-    check_requires_password(false)
+    check_requires_password(false),
+    json_input(false),
+    json_output(0)
 {
 }
 
@@ -533,7 +536,8 @@ QPDFJob::run()
     checkConfiguration();
     std::shared_ptr<QPDF> pdf_ph;
     try {
-        pdf_ph = processFile(m->infilename.get(), m->password.get(), true);
+        pdf_ph =
+            processFile(m->infilename.get(), m->password.get(), true, true);
     } catch (QPDFExc& e) {
         if ((e.getErrorCode() == qpdf_e_password) &&
             (m->check_is_encrypted || m->check_requires_password)) {
@@ -704,15 +708,8 @@ QPDFJob::checkConfiguration()
               " overwrite the input file");
     }
 
-    if (m->json_version == 1) {
-        if (m->json_keys.count("qpdf")) {
-            usage("json key \"qpdf\" is not valid for json version 1");
-        }
-    } else {
-        if (m->json_keys.count("objects") || m->json_keys.count("objectinfo")) {
-            usage("json keys \"objects\" and \"objectinfo\" are only valid for "
-                  "json version 1");
-        }
+    if (m->json_keys.count("objectinfo")) {
+        usage("json key \"objectinfo\" is only valid for json version 1");
     }
 }
 
@@ -1061,6 +1058,26 @@ QPDFJob::getWantedJSONObjects()
 }
 
 void
+QPDFJob::doJSONObject(
+    Pipeline* p, bool& first, std::string const& key, QPDFObjectHandle& obj)
+{
+    if (this->m->json_version == 1) {
+        JSON::writeDictionaryItem(p, first, key, obj.getJSON(1, true), 1);
+    } else {
+        auto j = JSON::makeDictionary();
+        if (obj.isStream()) {
+            j.addDictionaryMember("stream", JSON::makeDictionary())
+                .addDictionaryMember(
+                    "dict", obj.getDict().getJSON(this->m->json_version, true));
+        } else {
+            j.addDictionaryMember(
+                "value", obj.getJSON(this->m->json_version, true));
+        }
+        JSON::writeDictionaryItem(p, first, key, j, 1);
+    }
+}
+
+void
 QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
 {
     JSON::writeDictionaryKey(p, first, "objects", 0);
@@ -1070,22 +1087,17 @@ QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
     std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
     std::vector<QPDFObjectHandle> objects = pdf.getAllObjects();
     for (auto& obj: objects) {
+        std::string key = obj.unparse();
+        if (this->m->json_version > 1) {
+            key = "obj:" + key;
+        }
         if (all_objects || wanted_og.count(obj.getObjGen())) {
-            JSON::writeDictionaryItem(
-                p,
-                first_object,
-                obj.unparse(),
-                obj.getJSON(this->m->json_version, true),
-                1);
+            doJSONObject(p, first_object, key, obj);
         }
     }
     if (all_objects || m->json_objects.count("trailer")) {
-        JSON::writeDictionaryItem(
-            p,
-            first_object,
-            "trailer",
-            pdf.getTrailer().getJSON(this->m->json_version, true),
-            1);
+        auto trailer = pdf.getTrailer();
+        doJSONObject(p, first_object, "trailer", trailer);
     }
     JSON::writeDictionaryClose(p, first_object, 1);
 }
@@ -1120,108 +1132,6 @@ QPDFJob::doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf)
         }
     }
     JSON::writeDictionaryClose(p, first_object, 1);
-}
-
-void
-QPDFJob::doJSONStream(
-    Pipeline* p,
-    bool& first,
-    QPDF& pdf,
-    QPDFObjectHandle& obj,
-    std::string const& file_prefix)
-{
-    Pipeline* stream_p = nullptr;
-    FILE* f = nullptr;
-    std::shared_ptr<Pl_StdioFile> f_pl;
-    std::string filename;
-    if (this->m->json_stream_data == qpdf_sj_file) {
-        filename = file_prefix + "-" + QUtil::int_to_string(obj.getObjectID());
-        f = QUtil::safe_fopen(filename.c_str(), "wb");
-        f_pl = std::make_shared<Pl_StdioFile>("stream data", f);
-        stream_p = f_pl.get();
-    }
-    auto j = JSON::makeDictionary();
-    j.addDictionaryMember(
-        "stream",
-        obj.getStreamJSON(
-            this->m->json_version,
-            this->m->json_stream_data,
-            this->m->decode_level,
-            stream_p,
-            filename));
-
-    JSON::writeDictionaryItem(p, first, "obj:" + obj.unparse(), j, 2);
-    if (f) {
-        f_pl->finish();
-        f_pl = nullptr;
-        fclose(f);
-    }
-}
-
-void
-QPDFJob::doJSONObject(
-    Pipeline* p,
-    bool& first,
-    QPDF& pdf,
-    std::string const& key,
-    QPDFObjectHandle& obj)
-{
-    auto j = JSON::makeDictionary();
-    j.addDictionaryMember("value", obj.getJSON(this->m->json_version, true));
-    JSON::writeDictionaryItem(p, first, key, j, 2);
-}
-
-void
-QPDFJob::doJSONQpdf(Pipeline* p, bool& first, QPDF& pdf)
-{
-    std::string file_prefix = this->m->json_stream_prefix;
-    if (this->m->json_stream_data == qpdf_sj_file) {
-        if (file_prefix.empty()) {
-            if (this->m->infilename.get()) {
-                file_prefix = this->m->infilename.get();
-            }
-            if (file_prefix.empty()) {
-                usage(
-                    "please specify --json-stream-prefix since the input file "
-                    "name is unknown");
-            }
-        }
-    }
-
-    JSON::writeDictionaryKey(p, first, "qpdf", 0);
-    bool first_qpdf = true;
-    JSON::writeDictionaryOpen(p, first_qpdf, 1);
-    JSON::writeDictionaryItem(
-        p, first_qpdf, "jsonversion", JSON::makeInt(this->m->json_version), 1);
-    JSON::writeDictionaryItem(
-        p, first_qpdf, "pdfversion", JSON::makeString(pdf.getPDFVersion()), 1);
-    JSON::writeDictionaryItem(
-        p,
-        first_qpdf,
-        "maxobjectid",
-        JSON::makeInt(QIntC::to_longlong(pdf.getObjectCount())),
-        1);
-    JSON::writeDictionaryKey(p, first_qpdf, "objects", 1);
-    bool first_object = true;
-    JSON::writeDictionaryOpen(p, first_object, 2);
-    bool all_objects = m->json_objects.empty();
-    std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
-    std::vector<QPDFObjectHandle> objects = pdf.getAllObjects();
-    for (auto& obj: objects) {
-        if (all_objects || wanted_og.count(obj.getObjGen())) {
-            if (obj.isStream()) {
-                doJSONStream(p, first_object, pdf, obj, file_prefix);
-            } else {
-                doJSONObject(p, first_object, pdf, "obj:" + obj.unparse(), obj);
-            }
-        }
-    }
-    if (all_objects || m->json_objects.count("trailer")) {
-        auto trailer = pdf.getTrailer();
-        doJSONObject(p, first_object, pdf, "trailer", trailer);
-    }
-    JSON::writeDictionaryClose(p, first_object, 2);
-    JSON::writeDictionaryClose(p, first_qpdf, 1);
 }
 
 void
@@ -1603,12 +1513,12 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
     // The list of selectable top-level keys id duplicated in the
     // following places: job.yml, QPDFJob::json_schema, and
     // QPDFJob::doJSON.
-    if (json_version == 1) {
-        if (all_keys || keys->count("objects")) {
-            schema.addDictionaryMember("objects", JSON::parse(R"({
+    if (all_keys || keys->count("objects")) {
+        schema.addDictionaryMember("objects", JSON::parse(R"({
   "<n n R|trailer>": "json representation of object"
 })"));
-        }
+    }
+    if (json_version == 1) {
         if (all_keys || keys->count("objectinfo")) {
             JSON objectinfo =
                 schema.addDictionaryMember("objectinfo", JSON::parse(R"({
@@ -1618,17 +1528,6 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
       "is": "whether the object is a stream",
       "length": "if stream, its length, otherwise null"
     }
-  }
-})"));
-        }
-    } else {
-        if (all_keys || keys->count("qpdf")) {
-            schema.addDictionaryMember("qpdf", JSON::parse(R"({
-  "jsonversion": "qpdf json output version",
-  "pdfversion": "PDF version from PDF header",
-  "maxobjectid": "Highest object ID; needed for adding new objects",
-  "objects": {
-    "<obj:n n R|trailer>": "json representation of object"
   }
 })"));
         }
@@ -1843,16 +1742,14 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
     // repairing the page tree. To see the original file with any page
     // tree problems and the page tree not flattened, select
     // objects/objectinfo without other keys.
+    if (all_keys || m->json_keys.count("objects")) {
+        doJSONObjects(p, first, pdf);
+    }
     if (this->m->json_version == 1) {
-        if (all_keys || m->json_keys.count("objects")) {
-            doJSONObjects(p, first, pdf);
-        }
+        // "objectinfo" is not needed for version >1 since you can
+        // tell streams from other objects in "objects".
         if (all_keys || m->json_keys.count("objectinfo")) {
             doJSONObjectinfo(p, first, pdf);
-        }
-    } else {
-        if (all_keys || m->json_keys.count("qpdf")) {
-            doJSONQpdf(p, first, pdf);
         }
     }
 
@@ -1939,16 +1836,15 @@ QPDFJob::doProcessOnce(
     std::function<void(QPDF*, char const*)> fn,
     char const* password,
     bool empty,
-    bool used_for_input)
+    bool used_for_input,
+    bool main_input)
 {
     auto pdf = std::make_shared<QPDF>();
     setQPDFOptions(*pdf);
     if (empty) {
-        if (!this->m->create_from_json.empty()) {
-            pdf->createFromJSON(this->m->create_from_json);
-        } else {
-            pdf->emptyPDF();
-        }
+        pdf->emptyPDF();
+    } else if (main_input && this->m->json_input) {
+        pdf->createFromJSON(this->m->infilename.get());
     } else {
         fn(pdf.get(), password);
     }
@@ -1964,7 +1860,8 @@ QPDFJob::doProcess(
     std::function<void(QPDF*, char const*)> fn,
     char const* password,
     bool empty,
-    bool used_for_input)
+    bool used_for_input,
+    bool main_input)
 {
     // If a password has been specified but doesn't work, try other
     // passwords that are equivalent in different character encodings.
@@ -1990,7 +1887,7 @@ QPDFJob::doProcess(
         m->suppress_password_recovery) {
         // There is no password, or we're not doing recovery, so just
         // do the normal processing with the supplied password.
-        return doProcessOnce(fn, password, empty, used_for_input);
+        return doProcessOnce(fn, password, empty, used_for_input, main_input);
     }
 
     // Get a list of otherwise encoded strings. Keep in scope for this
@@ -2018,7 +1915,7 @@ QPDFJob::doProcess(
     bool warned = false;
     for (auto iter = passwords.begin(); iter != passwords.end(); ++iter) {
         try {
-            return doProcessOnce(fn, *iter, empty, used_for_input);
+            return doProcessOnce(fn, *iter, empty, used_for_input, main_input);
         } catch (QPDFExc& e) {
             auto next = iter;
             ++next;
@@ -2042,12 +1939,16 @@ QPDFJob::doProcess(
 
 std::shared_ptr<QPDF>
 QPDFJob::processFile(
-    char const* filename, char const* password, bool used_for_input)
+    char const* filename,
+    char const* password,
+    bool used_for_input,
+    bool main_input)
 {
     auto f1 = std::mem_fn<void(char const*, char const*)>(&QPDF::processFile);
     auto fn =
         std::bind(f1, std::placeholders::_1, filename, std::placeholders::_2);
-    return doProcess(fn, password, strcmp(filename, "") == 0, used_for_input);
+    return doProcess(
+        fn, password, strcmp(filename, "") == 0, used_for_input, main_input);
 }
 
 std::shared_ptr<QPDF>
@@ -2056,7 +1957,7 @@ QPDFJob::processInputSource(
 {
     auto f1 = std::mem_fn(&QPDF::processInputSource);
     auto fn = std::bind(f1, std::placeholders::_1, is, std::placeholders::_2);
-    return doProcess(fn, password, false, used_for_input);
+    return doProcess(fn, password, false, used_for_input, false);
 }
 
 void
@@ -2067,7 +1968,8 @@ QPDFJob::validateUnderOverlay(QPDF& pdf, UnderOverlay* uo)
     }
     QPDFPageDocumentHelper main_pdh(pdf);
     int main_npages = QIntC::to_int(main_pdh.getAllPages().size());
-    uo->pdf = processFile(uo->filename.c_str(), uo->password.get(), true);
+    uo->pdf =
+        processFile(uo->filename.c_str(), uo->password.get(), true, false);
     QPDFPageDocumentHelper uo_pdh(*(uo->pdf));
     int uo_npages = QIntC::to_int(uo_pdh.getAllPages().size());
     try {
@@ -2324,8 +2226,8 @@ QPDFJob::copyAttachments(QPDF& pdf)
             cout << prefix << ": copying attachments from " << to_copy.path
                  << std::endl;
         });
-        auto other =
-            processFile(to_copy.path.c_str(), to_copy.password.c_str(), false);
+        auto other = processFile(
+            to_copy.path.c_str(), to_copy.password.c_str(), false, false);
         QPDFEmbeddedFileDocumentHelper other_efdh(*other);
         auto other_attachments = other_efdh.getEmbeddedFiles();
         for (auto const& iter: other_attachments) {
@@ -3176,6 +3078,7 @@ QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
         std::shared_ptr<QPDF> encryption_pdf = processFile(
             m->encryption_file.c_str(),
             m->encryption_file_password.get(),
+            false,
             false);
         w.copyEncryptionParameters(*encryption_pdf);
     }
@@ -3332,10 +3235,13 @@ QPDFJob::writeOutfile(QPDF& pdf)
         // goes out of scope.
         m->outfilename = temp_out;
     } else if (strcmp(m->outfilename.get(), "-") == 0) {
-        m->outfilename = 0;
+        m->outfilename = nullptr;
     }
-    {
-        // Private scope so QPDFWriter will close the output file
+    if (this->m->json_output) {
+        writeJSON(pdf);
+    } else {
+        // QPDFWriter must have block scope so the output file will be
+        // closed after write() finishes.
         QPDFWriter w(pdf, m->outfilename.get());
         setWriterOptions(pdf, w);
         w.write();
@@ -3374,4 +3280,48 @@ QPDFJob::writeOutfile(QPDF& pdf)
             }
         }
     }
+}
+
+void
+QPDFJob::writeJSON(QPDF& pdf)
+{
+    // File pipeline must have block scope so it will be closed
+    // after write.
+    std::shared_ptr<QUtil::FileCloser> fc;
+    std::shared_ptr<Pipeline> fp;
+    std::string file_prefix = this->m->json_stream_prefix;
+    if (m->outfilename.get()) {
+        QTC::TC("qpdf", "QPDFJob write json to file");
+        if (file_prefix.empty()) {
+            file_prefix = this->m->outfilename.get();
+        }
+        fc = std::make_shared<QUtil::FileCloser>(
+            QUtil::safe_fopen(this->m->outfilename.get(), "w"));
+        fp = std::make_shared<Pl_StdioFile>("json output", fc->f);
+    } else if (
+        (this->m->json_stream_data == qpdf_sj_file) && file_prefix.empty()) {
+        QTC::TC("qpdf", "QPDFJob need json-stream-prefix for stdout");
+        usage("please specify --json-stream-prefix since the input file "
+              "name is unknown");
+    } else {
+        QTC::TC("qpdf", "QPDFJob write json to stdout");
+        fp = std::make_shared<Pl_OStream>("json output", *this->m->cout);
+    }
+    std::set<std::string> json_objects;
+    if (this->m->json_objects.count("trailer")) {
+        json_objects.insert("trailer");
+    }
+    auto wanted = getWantedJSONObjects();
+    for (auto const& og: wanted) {
+        std::ostringstream s;
+        s << "obj:" << og.getObj() << " " << og.getGen() << " R";
+        json_objects.insert(s.str());
+    }
+    pdf.writeJSON(
+        this->m->json_output,
+        fp.get(),
+        this->m->decode_level,
+        this->m->json_stream_data,
+        file_prefix,
+        json_objects);
 }

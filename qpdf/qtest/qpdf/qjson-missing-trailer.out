@@ -1,2 +1,2 @@
-WARNING: qjson-missing-trailer.json: "qpdf.objects.trailer" was not seen
+WARNING: qjson-missing-trailer.json: "qpdf-v2.objects.trailer" was not seen
 qpdf: qjson-missing-trailer.json: errors found in JSON

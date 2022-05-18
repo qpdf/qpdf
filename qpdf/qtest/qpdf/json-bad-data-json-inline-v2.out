@@ -1,57 +1,5 @@
 {
-  "version": 2,
-  "parameters": {
-    "decodelevel": "generalized"
-  },
-  "pages": [
-    {
-      "contents": [
-        "4 0 R"
-      ],
-      "images": [],
-      "label": null,
-      "object": "3 0 R",
-      "outlines": [],
-      "pageposfrom1": 1
-    }
-  ],
-  "pagelabels": [],
-  "acroform": {
-    "fields": [],
-    "hasacroform": false,
-    "needappearances": false
-  },
-  "attachments": {},
-  "encrypt": {
-    "capabilities": {
-      "accessibility": true,
-      "extract": true,
-      "modify": true,
-      "modifyannotations": true,
-      "modifyassembly": true,
-      "modifyforms": true,
-      "modifyother": true,
-      "printhigh": true,
-      "printlow": true
-    },
-    "encrypted": false,
-    "ownerpasswordmatched": false,
-    "parameters": {
-      "P": 0,
-      "R": 0,
-      "V": 0,
-      "bits": 0,
-      "filemethod": "none",
-      "key": null,
-      "method": "none",
-      "streammethod": "none",
-      "stringmethod": "none"
-    },
-    "userpasswordmatched": false
-  },
-  "outlines": [],
-  "qpdf": {
-    "jsonversion": 2,
+  "qpdf-v2": {
     "pdfversion": "1.3",
     "maxobjectid": 6,
     "objects": {
