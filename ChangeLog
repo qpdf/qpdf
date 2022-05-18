@@ -1,3 +1,8 @@
+2022-05-18  Jay Berkenbilt  <ejb@ql.org>
+
+        * Add QUtil::FileCloser to the public API. This is a simple inline
+        class to help with automatic file closing.
+
 2022-05-17  Jay Berkenbilt  <ejb@ql.org>
 
         * Allow passing *uninitialized* (not null) objects to

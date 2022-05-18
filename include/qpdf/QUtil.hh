@@ -114,6 +114,33 @@ namespace QUtil
     QPDF_DLL
     FILE* fopen_wrapper(std::string const&, FILE*);
 
+    // This is a little class to help with automatic closing files.
+    // You can do something like
+    //
+    // QUtil::FileCloser fc(QUtil::safe_fopen(filename, "rb"));
+    //
+    // and then use fc.f to the file. Be sure to actually declare a
+    // variable of type FileCloser. Using it as a temporary won't work
+    // because it will close the file as soon as it goes out of scope.
+    class FileCloser
+    {
+      public:
+        FileCloser(FILE* f) :
+            f(f)
+        {
+        }
+
+        ~FileCloser()
+        {
+            if (f) {
+                fclose(f);
+                f = nullptr;
+            }
+        }
+
+        FILE* f;
+    };
+
     // Attempt to open the file read only and then close again
     QPDF_DLL
     bool file_can_be_opened(char const* filename);

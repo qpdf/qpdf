@@ -305,26 +305,6 @@ static std::map<unsigned long, unsigned char> unicode_to_pdf_doc = {
     {0x20ac, 0xa0},
 };
 
-namespace
-{
-    class FileCloser
-    {
-      public:
-        FileCloser(FILE* f) :
-            f(f)
-        {
-        }
-
-        ~FileCloser()
-        {
-            fclose(f);
-        }
-
-      private:
-        FILE* f;
-    };
-} // namespace
-
 template <typename T>
 static std::string
 int_to_string_base_internal(T num, int base, int length)
