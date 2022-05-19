@@ -2,8 +2,9 @@
 /QTest is a dictionary
   /hex strings is direct
   /indirect is indirect
+  /names is direct
   /nesting is direct
   /strings is direct
 unparse: 7 0 R
-unparseResolved: << /hex#20strings [ (Potato) <01020300040560> (AB) ] /indirect 8 0 R /nesting << /a [ 1 2 << /x (y) >> [ (z) ] ] /b << / (legal) /a [ 1 2 ] >> >> /strings [ (one) <24a2> () (\(\)) (\() (\)) (a\f\b\t\r\nb) <410042> (a\nb) (a b) ] >>
+unparseResolved: << /hex#20strings [ (Potato) <01020300040560> (AB) ] /indirect 8 0 R /names [ /nesting /hex#20strings /text#2fplain ] /nesting << /a [ 1 2 << /x (y) >> [ (z) ] ] /b << / (legal) /a [ 1 2 ] >> >> /strings [ (one) <24a2> () (\(\)) (\() (\)) (a\f\b\t\r\nb) (") ("") ("\("\)") <410042> (a\nb) (a b) <efbbbfcf80> <efbbbff09fa594> ] >>
 test 1 done
