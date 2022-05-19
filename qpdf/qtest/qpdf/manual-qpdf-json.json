@@ -1,0 +1,120 @@
+{
+  "qpdf-v2": {
+    "pdfversion": "2.0",
+    "objects": {
+      "obj:3 0 R": {
+        "value": {
+          "/Contents": "4 0 R",
+          "/MediaBox": [
+            0,
+            0,
+            612,
+            792
+          ],
+          "/Parent": "2 0 R",
+          "/Resources": {
+            "/Font": {
+              "/F1": "6 0 R"
+            },
+            "/ProcSet": "5 0 R"
+          },
+          "/Type": "/Page"
+        }
+      },
+      "obj:2 0 R": {
+        "value": {
+          "/Count": 1,
+          "/Kids": [
+            "3 0 R"
+          ],
+          "/Type": "/Pages"
+        }
+      },
+      "obj:1 0 R": {
+        "value": {
+          "/Pages": "2 0 R",
+          "/Type": "/Catalog"
+        }
+      },
+      "obj:4 0 R": {
+        "stream": {
+          "dict": {},
+          "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo="
+        }
+      },
+      "obj:5 0 R": {
+        "value": [
+          "/PDF",
+          "/Text"
+        ]
+      },
+      "obj:6 0 R": {
+        "value": {
+          "/BaseFont": "/Helvetica",
+          "/Encoding": "/WinAnsiEncoding",
+          "/Name": "/F1",
+          "/Subtype": "/Type1",
+          "/Type": "/Font"
+        }
+      },
+      "trailer": {
+        "value": {
+          "/QTest": "7 0 R",
+          "/Root": "1 0 R",
+          "/Size": 9
+        }
+      },
+      "obj:7 0 R": {
+        "value": {
+          "/hex strings": [
+            "u:Potato",
+            "b:01020300040560",
+            "u:AB"
+          ],
+          "/indirect": "8 0 R",
+          "/names": [
+            "/nesting",
+            "/hex strings",
+            "/text/plain"
+          ],
+          "/nesting": {
+            "/a": [
+              1,
+              2,
+              {
+                "/x": "u:y"
+              },
+              [
+                "u:z"
+              ]
+            ],
+            "/b": {
+              "/": "u:legal",
+              "/a": [
+                1,
+                2
+              ]
+            }
+          },
+          "/strings": [
+            "u:one",
+            "b:24a2",
+            "u:",
+            "u:()",
+            "u:(",
+            "u:)",
+            "u:a\f\b\t\r\nb",
+            "b:410042",
+            "u:a\nb",
+            "u:a b",
+            "u:π",
+            "u:🥔"
+          ]
+        }
+      },
+      "obj:8 0 R": {
+        "value": "u:hello"
+      }
+    }
+  }
+}

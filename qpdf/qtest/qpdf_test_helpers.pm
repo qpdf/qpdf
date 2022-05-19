@@ -135,7 +135,7 @@ sub get_md5_checksum
 
 sub cleanup
 {
-    system("rm -rf a.json *.ps *.pnm ?.pdf ?.qdf *.enc* tif1 tif2 tiff-cache");
+    system("rm -rf ?.json *.ps *.pnm ?.pdf ?.qdf *.enc* tif1 tif2 tiff-cache");
     system("rm -rf *split-out* ???-kfo.pdf *.tmpout \@file.pdf auto-*");
 }
 

@@ -46,5 +46,76 @@ foreach my $f (@badfiles)
                  $td->NORMALIZE_NEWLINES);
 }
 
+my @goodfiles = (
+    'good1.pdf',
+    'good9.pdf',
+    'good13.pdf',
+    'good15.pdf',
+    'inline-images.pdf',
+    ['20-pages.pdf', '--password=user'],
+    'outlines-with-actions.pdf',
+    'form-fields-and-annotations.pdf',
+    'need-appearances.pdf',
+    'fxo-blue.pdf',
+    );
+$n_tests += 6 * scalar(@goodfiles);
+
+foreach my $i (@goodfiles)
+{
+    my $f = $i;
+    my $xargs = "";
+    if (ref($i) eq 'ARRAY') {
+        ($f, $xargs) = @$i;
+    }
+    $td->runtest("good: $f -> json",
+                 {$td->COMMAND => "qpdf $xargs --decode-level=none" .
+                      " --json-output=latest $f a.json"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("good: $f json -> json",
+                 {$td->COMMAND =>
+                      "qpdf --decode-level=none" .
+                      " --json-input --json-output=latest a.json b.json"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("good: $f json -> qdf",
+                 {$td->COMMAND =>
+                      "qpdf --qdf --json-input --stream-data=preserve" .
+                      " --static-id a.json a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("good: $f compare json",
+                 {$td->FILE => "a.json"},
+                 {$td->FILE => "b.json"});
+    my $exp = "json-changed-$f";
+    if (! -f $exp)
+    {
+        $td->runtest("good: $f -> qdf",
+                     {$td->COMMAND =>
+                          "qpdf $xargs --object-streams=disable --qdf" .
+                          " --stream-data=preserve --static-id $f b.pdf"},
+                     {$td->STRING => "", $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
+        $exp = "b.pdf";
+    }
+    else
+    {
+        # Sometimes passing through json may make semantically
+        # equivalent changes such as
+        #
+        # * adding leading 0 to a floating point (.1 -> 0.1)
+        # * changing the Unicode representation of a string
+        # * changing the representation of a name (/n#65st -> /nest)
+        $td->runtest("good: json changes $f",
+                     {$td->STRING => ""},
+                     {$td->STRING => ""});
+    }
+    $td->runtest("good: $f compare qdf",
+                 {$td->FILE => "a.pdf"}, # from json
+                 {$td->FILE => $exp});   # from original PDF
+}
+
+
+
 cleanup();
 $td->report($n_tests);
