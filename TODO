@@ -97,10 +97,6 @@ General things to remember:
 
 * Add json to the large file tests.
 
-* Object representation tests
-  * "b:cf80", "b:CF80", "u:π", "u:\u03c0"
-  * "b:d83edd54", "u:🥔", "u:\ud83e\udd54"
-
 JSON to PDF:
 
 Have --json-input and --update-from-json. With --json-input, the json

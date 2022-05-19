@@ -1,7 +1,23 @@
 {
   "qpdf-v2": {
     "pdfversion": "2.0",
+    "maxobjectid": 8,
     "objects": {
+      "obj:1 0 R": {
+        "value": {
+          "/Pages": "2 0 R",
+          "/Type": "/Catalog"
+        }
+      },
+      "obj:2 0 R": {
+        "value": {
+          "/Count": 1,
+          "/Kids": [
+            "3 0 R"
+          ],
+          "/Type": "/Pages"
+        }
+      },
       "obj:3 0 R": {
         "value": {
           "/Contents": "4 0 R",
@@ -21,25 +37,10 @@
           "/Type": "/Page"
         }
       },
-      "obj:2 0 R": {
-        "value": {
-          "/Count": 1,
-          "/Kids": [
-            "3 0 R"
-          ],
-          "/Type": "/Pages"
-        }
-      },
-      "obj:1 0 R": {
-        "value": {
-          "/Pages": "2 0 R",
-          "/Type": "/Catalog"
-        }
-      },
       "obj:4 0 R": {
         "stream": {
-          "dict": {},
-          "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo="
+          "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo=",
+          "dict": {}
         }
       },
       "obj:5 0 R": {
@@ -55,13 +56,6 @@
           "/Name": "/F1",
           "/Subtype": "/Type1",
           "/Type": "/Font"
-        }
-      },
-      "trailer": {
-        "value": {
-          "/QTest": "7 0 R",
-          "/Root": "1 0 R",
-          "/Size": 9
         }
       },
       "obj:7 0 R": {
@@ -110,13 +104,29 @@
             "b:410042",
             "u:a\nb",
             "u:a b",
-            ["u:π", "u:\u03c0", "b:EFBBBFCF80", "b:feff03c0"],
-            ["u:🥔", "u:\ud83e\udd54", "b:feffd83eDD54"]
+            [
+              "u:π",
+              "u:π",
+              "u:π",
+              "u:π"
+            ],
+            [
+              "u:🥔",
+              "u:🥔",
+              "u:🥔"
+            ]
           ]
         }
       },
       "obj:8 0 R": {
         "value": "u:hello"
+      },
+      "trailer": {
+        "value": {
+          "/QTest": "7 0 R",
+          "/Root": "1 0 R",
+          "/Size": 9
+        }
       }
     }
   }

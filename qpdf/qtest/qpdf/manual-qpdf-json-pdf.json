@@ -1,0 +1,140 @@
+{
+  "qpdf-v2": {
+    "pdfversion": "2.0",
+    "maxobjectid": 9,
+    "objects": {
+      "obj:1 0 R": {
+        "value": {
+          "/Pages": "3 0 R",
+          "/Type": "/Catalog"
+        }
+      },
+      "obj:2 0 R": {
+        "value": {
+          "/hex strings": [
+            "u:Potato",
+            "b:01020300040560",
+            "u:AB"
+          ],
+          "/indirect": "4 0 R",
+          "/names": [
+            "/nesting",
+            "/hex strings",
+            "/text/plain"
+          ],
+          "/nesting": {
+            "/a": [
+              1,
+              2,
+              {
+                "/x": "u:y"
+              },
+              [
+                "u:z"
+              ]
+            ],
+            "/b": {
+              "/": "u:legal",
+              "/a": [
+                1,
+                2
+              ]
+            }
+          },
+          "/strings": [
+            "u:one",
+            "b:24a2",
+            "u:",
+            "u:()",
+            "u:(",
+            "u:)",
+            "u:a\f\b\t\r\nb",
+            "u:\"",
+            "u:\"\"",
+            "u:\"(\")\"",
+            "b:410042",
+            "u:a\nb",
+            "u:a b",
+            [
+              "u:π",
+              "u:π",
+              "u:π",
+              "u:π"
+            ],
+            [
+              "u:🥔",
+              "u:🥔",
+              "u:🥔"
+            ]
+          ]
+        }
+      },
+      "obj:3 0 R": {
+        "value": {
+          "/Count": 1,
+          "/Kids": [
+            "5 0 R"
+          ],
+          "/Type": "/Pages"
+        }
+      },
+      "obj:4 0 R": {
+        "value": "u:hello"
+      },
+      "obj:5 0 R": {
+        "value": {
+          "/Contents": "6 0 R",
+          "/MediaBox": [
+            0,
+            0,
+            612,
+            792
+          ],
+          "/Parent": "3 0 R",
+          "/Resources": {
+            "/Font": {
+              "/F1": "8 0 R"
+            },
+            "/ProcSet": "9 0 R"
+          },
+          "/Type": "/Page"
+        }
+      },
+      "obj:6 0 R": {
+        "stream": {
+          "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo=",
+          "dict": {}
+        }
+      },
+      "obj:7 0 R": {
+        "value": 44
+      },
+      "obj:8 0 R": {
+        "value": {
+          "/BaseFont": "/Helvetica",
+          "/Encoding": "/WinAnsiEncoding",
+          "/Name": "/F1",
+          "/Subtype": "/Type1",
+          "/Type": "/Font"
+        }
+      },
+      "obj:9 0 R": {
+        "value": [
+          "/PDF",
+          "/Text"
+        ]
+      },
+      "trailer": {
+        "value": {
+          "/ID": [
+            "b:31415926535897932384626433832795",
+            "b:31415926535897932384626433832795"
+          ],
+          "/QTest": "2 0 R",
+          "/Root": "1 0 R",
+          "/Size": 10
+        }
+      }
+    }
+  }
+}

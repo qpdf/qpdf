@@ -67,30 +67,30 @@ foreach my $i (@goodfiles)
     if (ref($i) eq 'ARRAY') {
         ($f, $xargs) = @$i;
     }
-    $td->runtest("good: $f -> json",
+    $td->runtest("good: $f -> JSON",
                  {$td->COMMAND => "qpdf $xargs --decode-level=none" .
                       " --json-output=latest $f a.json"},
                  {$td->STRING => "", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
-    $td->runtest("good: $f json -> json",
+    $td->runtest("good: $f JSON -> JSON",
                  {$td->COMMAND =>
                       "qpdf --decode-level=none" .
                       " --json-input --json-output=latest a.json b.json"},
                  {$td->STRING => "", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
-    $td->runtest("good: $f json -> qdf",
+    $td->runtest("good: $f JSON -> QDF",
                  {$td->COMMAND =>
                       "qpdf --qdf --json-input --stream-data=preserve" .
                       " --static-id a.json a.pdf"},
                  {$td->STRING => "", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
-    $td->runtest("good: $f compare json",
+    $td->runtest("good: $f compare JSON",
                  {$td->FILE => "a.json"},
                  {$td->FILE => "b.json"});
     my $exp = "json-changed-$f";
     if (! -f $exp)
     {
-        $td->runtest("good: $f -> qdf",
+        $td->runtest("good: $f -> aqdf",
                      {$td->COMMAND =>
                           "qpdf $xargs --object-streams=disable --qdf" .
                           " --stream-data=preserve --static-id $f b.pdf"},
@@ -115,7 +115,34 @@ foreach my $i (@goodfiles)
                  {$td->FILE => $exp});   # from original PDF
 }
 
+$n_tests += 6;
+$td->runtest("manual JSON to PDF",
+             {$td->COMMAND => "qpdf --json-input --static-id --qdf" .
+                  " manual-qpdf-json.json a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check manual JSON to PDF",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "manual-qpdf-json.pdf"});
+$td->runtest("check manual JSON to PDF to JSON",
+             {$td->COMMAND => "qpdf --json-output=2 a.pdf -"},
+             {$td->FILE => "manual-qpdf-json-pdf.json", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("manual JSON to JSON",
+             {$td->COMMAND => "qpdf --json-input --json-output=2" .
+                  " manual-qpdf-json.json a.json"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check manual JSON to JSON",
+             {$td->FILE => "a.json"},
+             {$td->FILE => "manual-qpdf-json-out.json"},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check manual JSON to JSON to JSON",
+             {$td->COMMAND => "qpdf --json-output=2 --json-input a.json -"},
+             {$td->FILE => "a.json", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
+# QXXXQ file
 
 cleanup();
 $td->report($n_tests);
