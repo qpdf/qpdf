@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('interactive-form');
+
+my @form_tests = (
+    'minimal',
+    'form-empty-from-odt',
+    'form-mod1',
+    # Atril (MATE Document Viewer) 1.20.1 dumps appearance streams
+    # when modifying form fields, leaving /NeedAppearances true.
+    'form-filled-with-atril',
+    'form-bad-fields-array',
+    'form-errors',
+    'form-document-defaults',
+    );
+
+my $n_tests = scalar(@form_tests) + 6;
+
+# Many of the form*.pdf files were created by converting the
+# LibreOffice document storage/form.odt to PDF and then manually
+# modifying the resulting PDF in various ways. That file would be good
+# starting point for generation of more complex forms should that be
+# required in the future. The file storage/form.pdf is a direct export
+# from LibreOffice with no modifications. The files
+# storage/field-types.odt and storage/field-types.pdf are the basis of
+# field-types.pdf used elsewhere in the test suite.
+
+foreach my $f (@form_tests)
+{
+    $td->runtest("form test: $f",
+                 {$td->COMMAND => "test_driver 43 $f.pdf"},
+                 {$td->FILE => "form-$f.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+$td->runtest("fill fields",
+             {$td->COMMAND => "test_driver 44 form-no-need-appearances.pdf"},
+             {$td->FILE => "form-no-need-appearances.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "form-no-need-appearances-filled.pdf"});
+
+$td->runtest("button fields",
+             {$td->COMMAND => "test_driver 51 button-set.pdf"},
+             {$td->FILE => "button-set.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "button-set-out.pdf"});
+
+$td->runtest("broken button fields",
+             {$td->COMMAND => "test_driver 51 button-set-broken.pdf"},
+             {$td->FILE => "button-set-broken.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "button-set-broken-out.pdf"});
+
+cleanup();
+$td->report($n_tests);

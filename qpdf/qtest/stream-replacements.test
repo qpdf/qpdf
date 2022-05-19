@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('stream-replacements');
+
+my $n_tests = 10;
+
+$td->runtest("replace stream data",
+             {$td->COMMAND => "test_driver 7 qstream.pdf"},
+             {$td->STRING => "test 7 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "replaced-stream-data.pdf"});
+$td->runtest("replace stream data compressed",
+             {$td->COMMAND => "test_driver 8 qstream.pdf"},
+             {$td->FILE => "test8.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "replaced-stream-data-flate.pdf"});
+$td->runtest("new streams",
+             {$td->COMMAND => "test_driver 9 minimal.pdf"},
+             {$td->FILE => "test9.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("new stream",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "new-streams.pdf"});
+$td->runtest("add page contents",
+             {$td->COMMAND => "test_driver 10 minimal.pdf"},
+             {$td->STRING => "test 10 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("new stream",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "add-contents.pdf"});
+$td->runtest("functional replace stream data",
+             {$td->COMMAND => "test_driver 78 minimal.pdf"},
+             {$td->FILE => "test78.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "test78.pdf"});
+
+cleanup();
+$td->report($n_tests);

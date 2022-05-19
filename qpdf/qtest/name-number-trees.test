@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('name-number-trees');
+
+my $n_tests = 6;
+
+$td->runtest("number trees",
+             {$td->COMMAND => "test_driver 46 number-tree.pdf"},
+             {$td->FILE => "number-tree.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("name trees",
+             {$td->COMMAND => "test_driver 48 name-tree.pdf"},
+             {$td->FILE => "name-tree.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("nntree split",
+             {$td->COMMAND => "test_driver 74 split-nntree.pdf"},
+             {$td->FILE => "split-nntree.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "split-nntree-out.pdf"});
+$td->runtest("nntree erase",
+             {$td->COMMAND => "test_driver 75 erase-nntree.pdf"},
+             {$td->FILE => "erase-nntree.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "erase-nntree-out.pdf"});
+
+cleanup();
+$td->report($n_tests);

@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+use File::Copy;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('overwrite-self');
+
+my $n_tests = 3;
+
+copy("minimal.pdf", "a.pdf");
+copy("minimal.pdf", "split-out.pdf");
+# Also tests @- for reading args from stdin
+$td->runtest("don't overwrite self",
+             {$td->COMMAND => "(echo a.pdf; echo a.pdf) | qpdf \@-"},
+             {$td->REGEXP => "input file and output file are the same.*",
+              $td->EXIT_STATUS => 2});
+$td->runtest("output is not really output for split",
+             {$td->COMMAND => "qpdf --split-pages split-out.pdf split-out.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("don't overwrite self (split)",
+             {$td->COMMAND =>
+                  "qpdf --split-pages split-out-1.pdf split-out.pdf"},
+             {$td->REGEXP =>
+                  ".*split pages would overwrite.* split-out-1.pdf",
+                  $td->EXIT_STATUS => 2});
+
+cleanup();
+$td->report($n_tests);

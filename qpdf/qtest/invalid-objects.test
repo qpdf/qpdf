@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('invalid-objects');
+
+my $n_tests = 3;
+
+$td->runtest("closed input source",
+             {$td->COMMAND => "test_driver 73 minimal.pdf"},
+             {$td->FILE => "test73.out",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("empty object",
+             {$td->COMMAND => "qpdf -show-object=7,0 empty-object.pdf"},
+             {$td->FILE => "empty-object.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("object with zero offset",
+             {$td->COMMAND => "qpdf --check zero-offset.pdf"},
+             {$td->FILE => "zero-offset.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

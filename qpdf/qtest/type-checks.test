@@ -1,0 +1,48 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('type-checks');
+
+my $n_tests = 5;
+
+# Whenever object-types.pdf is edited, object-types-os.pdf should be
+# regenerated.
+$td->runtest("ensure object-types-os is up-to-date",
+             {$td->COMMAND =>
+                  "qpdf" .
+                  " --object-streams=generate" .
+                  " --deterministic-id" .
+                  " --stream-data=uncompress" .
+                  " object-types.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "object-types-os.pdf"});
+$td->runtest("type checks",
+             {$td->COMMAND => "test_driver 42 object-types.pdf"},
+             {$td->FILE => "object-types.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("type checks with object streams",
+             {$td->COMMAND => "test_driver 42 object-types-os.pdf"},
+             {$td->FILE => "object-types-os.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compound type checks",
+             {$td->COMMAND => "test_driver 82 object-types-os.pdf"},
+             {$td->STRING => "test 82 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

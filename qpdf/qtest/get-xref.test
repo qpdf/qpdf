@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('get-xref');
+
+my $n_tests = 2;
+
+$td->runtest("without object streams",
+             {$td->COMMAND => "test_xref minimal.pdf"},
+             {$td->FILE => "minimal-xref.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("with object streams",
+             {$td->COMMAND => "test_xref digitally-signed.pdf"},
+             {$td->FILE => "digitally-signed-xref.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

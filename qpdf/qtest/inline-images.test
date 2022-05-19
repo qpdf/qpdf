@@ -1,0 +1,110 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+use Digest::MD5;
+use File::Copy;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('inline-images');
+
+my $n_compare_pdfs = 0;
+my $n_tests = 10;
+
+# The file large-inline-image.pdf is a hand-crafted file with several
+# inline images of various sizes including one that is two megabytes,
+# encoded in base85, and has a base85-encoding that contains EI
+# surrounded by delimiters several times. This exercises the EI
+# detection code added in qpdf 8.4.
+
+$td->runtest("complex inline image parsing",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id large-inline-image.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "large-inline-image.qdf"});
+
+$td->runtest("eof in inline image",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id eof-in-inline-image.pdf a.pdf"},
+             {$td->FILE => "eof-inline-qdf.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "eof-in-inline-image.qdf"});
+$td->runtest("externalize eof in inline image",
+             {$td->COMMAND =>
+                  "qpdf --qdf --externalize-inline-images" .
+                  " --static-id eof-in-inline-image.pdf a.pdf"},
+             {$td->FILE => "eof-inline-qdf.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "eof-in-inline-image-ii.qdf"});
+$td->runtest("externalize damaged image",
+             {$td->COMMAND =>
+                  "qpdf --externalize-inline-images" .
+                  " --compress-streams=n --static-id" .
+                  " damaged-inline-image.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "damaged-inline-image-out.pdf"});
+$td->runtest("named colorspace",
+             {$td->COMMAND =>
+                  "qpdf --static-id --externalize-inline-images" .
+                  " --ii-min-bytes=0 inline-image-colorspace-lookup.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "inline-image-colorspace-lookup-out.pdf"});
+
+
+my @eii_tests = (
+    ['inline-images', 80],
+    ['large-inline-image', 1024],
+    ['nested-form-xobjects-inline-images', 20],
+    );
+$n_tests += 4 * scalar(@eii_tests);
+$n_compare_pdfs += 2 * scalar(@eii_tests);
+
+foreach my $d (@eii_tests)
+{
+    my ($file, $threshold) = @$d;
+    $td->runtest("inline image $file (all)",
+                 {$td->COMMAND =>
+                      "qpdf --qdf --static-id --externalize-inline-images" .
+                      " --ii-min-bytes=0 $file.pdf a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "$file-ii-all.pdf"});
+    compare_pdfs($td, "$file.pdf", "a.pdf");
+
+    $td->runtest("inline image $file (some)",
+                 {$td->COMMAND =>
+                      "qpdf --qdf --static-id --externalize-inline-images" .
+                      " --ii-min-bytes=$threshold $file.pdf a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "$file-ii-some.pdf"});
+    compare_pdfs($td, "$file.pdf", "a.pdf");
+}
+
+cleanup();
+$td->report(calc_ntests($n_tests, $n_compare_pdfs));

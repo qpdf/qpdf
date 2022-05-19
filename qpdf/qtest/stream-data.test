@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('stream-data');
+
+my $n_tests = 2;
+
+$td->runtest("get stream data",
+             {$td->COMMAND => "test_driver 11 stream-data.pdf"},
+             {$td->FILE => "test11.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("get stream data fails on jpeg",
+             {$td->COMMAND => "test_driver 68 jpeg-qstream.pdf"},
+             {$td->FILE => "test68.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

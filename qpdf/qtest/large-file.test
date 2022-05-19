@@ -1,0 +1,132 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('large-file');
+
+my $large_file_test_path = $ENV{'QPDF_LARGE_FILE_TEST_PATH'} || undef;
+if (defined($large_file_test_path))
+{
+    $large_file_test_path = File::Spec->rel2abs($large_file_test_path);
+    $large_file_test_path =~ s!\\!/!g;
+}
+
+
+my $nlarge = 1;
+if (defined $large_file_test_path)
+{
+    $nlarge = 2;
+}
+else
+{
+    $td->notify("--- Skipping tests on actual large files ---");
+}
+
+my $n_tests = $nlarge * 13;
+for (my $large = 0; $large < $nlarge; ++$large)
+{
+    if ($large)
+    {
+        $td->notify("--- Running tests on actual large files ---");
+    }
+    else
+    {
+        $td->notify("--- Running large file tests on small files ---");
+    }
+    my $size = ($large ? "large" : "small");
+    my $file = $large ? "$large_file_test_path/a.pdf" : "a.pdf";
+    $td->runtest("write test file",
+                 {$td->COMMAND => "test_large_file write $size '$file'"},
+                 {$td->FILE => "large_file.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("read test file",
+                 {$td->COMMAND => "test_large_file read $size '$file'"},
+                 {$td->FILE => "large_file.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check",
+                 {$td->COMMAND => "qpdf --suppress-recovery --check '$file'",
+                  $td->FILTER => "grep -v checking"},
+                 {$td->FILE => "large_file-check-normal.out",
+                  $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+
+    for my $ostream (0, 1)
+    {
+        for my $linearize (0, 1)
+        {
+            if (($ostream == 0) && ($linearize == 0))
+            {
+                # Original file has no object streams and is not linearized.
+                next;
+            }
+            my $args = "";
+            my $omode = $ostream ? "generate" : "disable";
+            my $lin = $linearize ? "--linearize" : "";
+            my $newfile = "$file-new";
+
+            $td->runtest("transform: ostream=$ostream, linearize=$linearize",
+                         {$td->COMMAND =>
+                              "qpdf --stream-data=preserve" .
+                              " --object-streams=$omode" .
+                              " $lin '$file' '$newfile'"},
+                         {$td->STRING => "", $td->EXIT_STATUS => 0});
+            $td->runtest("read: ostream=$ostream, linearize=$linearize",
+                         {$td->COMMAND =>
+                              "test_large_file read $size '$newfile'"},
+                         {$td->FILE => "large_file.out", $td->EXIT_STATUS => 0},
+                         $td->NORMALIZE_NEWLINES);
+            my $check_out =
+                ($linearize
+                 ? ($ostream
+                    ? "large_file-check-ostream-linearized.out"
+                    : "large_file-check-linearized.out")
+                 : ($ostream
+                    ? "large_file-check-ostream.out"
+                    : "large_file-check-normal.out"));
+            $td->runtest("check: ostream=$ostream, linearize=$linearize",
+                         {$td->COMMAND =>
+                              "qpdf --suppress-recovery --check '$newfile'",
+                          $td->FILTER => "grep -v checking"},
+                         {$td->FILE => $check_out, $td->EXIT_STATUS => 0},
+                         $td->NORMALIZE_NEWLINES);
+            unlink $newfile;
+        }
+    }
+
+    # Clobber xref
+    open(F, "+<$file") or die;
+    seek(F, -50, 2);
+    my $pos = tell F;
+    my $buf;
+    read(F, $buf, 50);
+    die unless $buf =~ m/^(.*startxref\n)\d+/s;
+    $pos += length($1);
+    seek(F, $pos, 0) or die;
+    print F "oops" or die;
+    close(F);
+
+    my $cmd = +{$td->COMMAND => "test_large_file read $size '$file'"};
+    if ($large)
+    {
+        $cmd->{$td->FILTER} = "sed -e 's,$large_file_test_path/,,'";
+    }
+    $td->runtest("reconstruct xref table",
+                 $cmd,
+                 {$td->FILE => "large_file_xref_reconstruct.out",
+                  $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    unlink $file;
+}
+
+cleanup();
+$td->report($n_tests);

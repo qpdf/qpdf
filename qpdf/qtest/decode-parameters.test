@@ -1,0 +1,48 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('decode-parameters');
+
+my $n_tests = 6;
+
+# Make sure we ignore decode parameters that we don't understand
+$td->runtest("unknown decode parameters",
+             {$td->COMMAND => "qpdf --check fax-decode-parms.pdf"},
+             {$td->FILE => "fax-decode-parms.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("ignore broken decode parms with no filters",
+             {$td->COMMAND => "qpdf --check broken-decode-parms-no-filter.pdf"},
+             {$td->FILE => "broken-decode-parms-no-filter.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("stream with indirect decode parms",
+             {$td->COMMAND =>
+                  "qpdf --static-id indirect-decode-parms.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "indirect-decode-parms-out.pdf"});
+
+$td->runtest("decode parameters empty list",
+             {$td->COMMAND => "qpdf --static-id empty-decode-parms.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "empty-decode-parms-out.pdf"});
+
+cleanup();
+$td->report($n_tests);

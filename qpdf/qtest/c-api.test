@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('c-api');
+
+my @capi = (
+    [2, 'no options'],
+    [3, 'normalized content'],
+    [4, 'ignore xref streams'],
+    [5, 'linearized'],
+    [6, 'object streams'],
+    [7, 'qdf'],
+    [8, 'no original object ids'],
+    [9, 'uncompressed streams'],
+    );
+my $n_tests = (2 * @capi) + 5;
+foreach my $d (@capi)
+{
+    my ($n, $description) = @$d;
+    my $outfile = $description;
+    $outfile =~ s/ /-/g;
+    $outfile = "c-$outfile.pdf";
+    $td->runtest($description,
+                 {$td->COMMAND => "qpdf-ctest $n hybrid-xref.pdf '' a.pdf"},
+                 {$td->STRING => "C test $n done\n", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check $description",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => $outfile});
+}
+$td->runtest("write to bad file name",
+             {$td->COMMAND => "qpdf-ctest 2 hybrid-xref.pdf '' /:a:/:b:"},
+             {$td->REGEXP => "error: open /:a:/:b:: .*",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("write damaged to bad file name",
+             {$td->COMMAND => "qpdf-ctest 2 append-page-content-damaged.pdf" .
+                  " '' /:a:/:b:"},
+             {$td->REGEXP =>
+                  "warning:(?s:.*)\n" .
+                  "error: open /:a:/:b:: .*",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("write damaged",
+             {$td->COMMAND => "qpdf-ctest 2 append-page-content-damaged.pdf" .
+                  " '' a.pdf"},
+             {$td->FILE => "c-write-damaged.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("empty PDF",
+             {$td->COMMAND => "qpdf-ctest 41 - '' a.pdf"},
+             {$td->STRING => "C test 41 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "c-empty.pdf"});
+
+cleanup();
+$td->report($n_tests);

@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('library-version');
+
+my $n_tests = 3;
+
+$td->runtest("qpdf version",
+             {$td->COMMAND => "qpdf --version"},
+             {$td->REGEXP => ".*qpdf version \\S+\n.*", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("qpdf copyright contains version too",
+             {$td->COMMAND => "qpdf --copyright"},
+             {$td->REGEXP => "(?s)qpdf version \\S+\n.*Apache.*",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C API: qpdf version",
+             {$td->COMMAND => "qpdf-ctest --version"},
+             {$td->REGEXP => "qpdf-ctest version \\S+\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

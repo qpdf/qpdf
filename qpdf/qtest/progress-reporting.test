@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('progress-reporting');
+
+my $n_tests = 1;
+
+$td->runtest("progress report on small file",
+             {$td->COMMAND => "qpdf --progress minimal.pdf a.pdf",
+                  $td->FILTER => "perl filter-progress.pl"},
+             {$td->FILE => "small-progress.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

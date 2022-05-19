@@ -1,0 +1,53 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('coalesce-contents');
+
+my $n_tests = 8;
+
+$td->runtest("qdf with normalize warnings",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id split-tokens.pdf a.pdf"},
+             {$td->FILE => "normalize-warnings.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "split-tokens.qdf"});
+$td->runtest("coalesce to qdf",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id coalesce.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "coalesce.qdf"});
+$td->runtest("coalesce contents with qdf",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id" .
+                  " --coalesce-contents coalesce.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "coalesce-out.qdf"});
+$td->runtest("coalesce contents without qdf",
+             {$td->COMMAND =>
+                  "qpdf --static-id" .
+                  " --coalesce-contents coalesce.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "coalesce-out.pdf"});
+
+cleanup();
+$td->report($n_tests);

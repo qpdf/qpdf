@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('object-copying');
+
+my $n_tests = 9;
+
+$td->runtest("shallow copy an array",
+             {$td->COMMAND => "test_driver 20 shallow_array.pdf"},
+             {$td->STRING => "test 20 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "shallow_array-out.pdf"});
+$td->runtest("shallow copy a stream",
+             {$td->COMMAND => "test_driver 21 shallow_array.pdf"},
+             {$td->FILE => "shallow_stream.out", $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("warn for unknown key in Pages",
+             {$td->COMMAND => "test_driver 23 lin-special.pdf"},
+             {$td->FILE => "pages-warning.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("reserved objects",
+             {$td->COMMAND => "test_driver 24 minimal.pdf"},
+             {$td->FILE => "reserved-objects.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "reserved-objects.pdf"});
+$td->runtest("detect foreign object in write",
+             {$td->COMMAND => "test_driver 29" .
+                  " copy-foreign-objects-in.pdf minimal.pdf"},
+             {$td->FILE => "foreign-in-write.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("copy a stream",
+             {$td->COMMAND => "test_driver 79 minimal.pdf"},
+             {$td->STRING => "test 79 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "test79.pdf"});
+
+cleanup();
+$td->report($n_tests);

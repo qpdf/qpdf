@@ -1,0 +1,91 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+use Digest::MD5;
+use File::Copy;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('object-stream');
+
+my $n_tests = 3 + (36 * 4) + (12 * 2);
+my $n_compare_pdfs = 36;
+
+for (my $n = 16; $n <= 19; ++$n)
+{
+    my $in = "good$n.pdf";
+    foreach my $flags ('-object-streams=disable',
+                       '-object-streams=preserve',
+                       '-object-streams=generate')
+    {
+        foreach my $qdf ('-qdf', '', '-allow-weak-crypto -encrypt "" x 128 --')
+        {
+            # 4 tests + 1 compare_pdfs * 36 cases
+            # 2 additional tests * 12 cases
+            $td->runtest("object stream mode",
+                         {$td->COMMAND =>
+                              "qpdf --static-id $flags $qdf $in a.pdf"},
+                         {$td->STRING => "",
+                          $td->EXIT_STATUS => 0});
+            compare_pdfs($td, "good$n.pdf", "a.pdf");
+            if ($qdf eq '-qdf')
+            {
+                $td->runtest("fix-qdf identity check",
+                             {$td->COMMAND => "fix-qdf a.pdf >| b.pdf"},
+                             {$td->STRING => "", $td->EXIT_STATUS => 0});
+                $td->runtest("compare files",
+                             {$td->FILE => "a.pdf"},
+                             {$td->FILE => "b.pdf"});
+            }
+            $td->runtest("convert to qdf",
+                         {$td->COMMAND =>
+                              "qpdf --static-id --no-original-object-ids" .
+                              " -qdf -decrypt" .
+                              " -object-streams=disable $in a.qdf"},
+                         {$td->STRING => "",
+                          $td->EXIT_STATUS => 0});
+            $td->runtest("convert output to qdf",
+                         {$td->COMMAND =>
+                              "qpdf --static-id --no-original-object-ids" .
+                              " -qdf -object-streams=disable a.pdf b.qdf"},
+                         {$td->STRING => "",
+                          $td->EXIT_STATUS => 0});
+            $td->runtest("compare files",
+                         {$td->FILE => "a.qdf"},
+                         {$td->FILE => "b.qdf"});
+        }
+    }
+    flush_tiff_cache();
+}
+
+# The file override-compressed-object.pdf contains an object stream
+# with four strings in it.  The file is then appended.  The appended
+# section overrides one of the four strings with a string in another
+# object stream and another one in an uncompressed object.  The other
+# two strings are left alone.  The test case exercises that all four
+# objects have the correct value.
+$td->runtest("overridden compressed objects",
+             {$td->COMMAND => "test_driver 38 override-compressed-object.pdf"},
+             {$td->FILE => "override-compressed-object.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("generate object streams for gen > 0",
+             {$td->COMMAND => "qpdf --qdf --static-id" .
+                  " --object-streams=generate gen1.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "gen1.qdf"});
+
+
+cleanup();
+$td->report(calc_ntests($n_tests, $n_compare_pdfs));

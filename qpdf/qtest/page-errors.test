@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('page-errors');
+
+my $n_tests = 5;
+
+$td->runtest("handle page no with contents",
+             {$td->COMMAND => "qpdf --show-pages page-no-content.pdf"},
+             {$td->FILE => "page-no-content.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check no type key for page nodes",
+             {$td->COMMAND => "qpdf --check no-pages-types.pdf"},
+             {$td->FILE => "no-pages-types.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("no type key for page nodes",
+             {$td->COMMAND => "qpdf --static-id --split-pages no-pages-types.pdf a-split-out.pdf"},
+             {$td->FILE => "no-pages-types-fix.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a-split-out-1.pdf"},
+             {$td->FILE => "no-pages-types-fixed.pdf"});
+$td->runtest("detect loops in pages structure",
+             {$td->COMMAND => "qpdf --check pages-loop.pdf"},
+             {$td->FILE => "pages-loop.out", $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

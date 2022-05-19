@@ -1,0 +1,77 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('basic-parsing');
+
+my @goodfiles = ("implicit null",                       # 1
+                 "direct null",                         # 2
+                 "unresolved null",                     # 3
+                 "indirect null",                       # 4
+                 "indirect bool, real",                 # 5
+                 "direct bool",                         # 6
+                 "integer",                             # 7
+                 "real, ASCIIHexDecode",                # 8
+                 "string",                              # 9
+                 "array",                               # 10
+                 "dictionary",                          # 11
+                 "stream",                              # 12
+                 "nesting, strings, names",             # 13
+                 "tokenizing pipeline",                 # 14
+                 "name",                                # 15
+                 "object-stream",                       # 16
+                 "hybrid xref",                         # 17
+                 "hybrid xref old mode",                # 18
+                 "xref with prev",                      # 19
+                 "lots of compressible objects",        # 20
+                 "array with indirect nulls",           # 21
+                 );
+
+my $n_tests = (3 * @goodfiles) + 6;
+
+my %goodtest_overrides = ('14' => 3);
+my %goodtest_flags =
+    ('18' => '-ignore-xref-streams',
+     '20' => '-object-streams=generate',
+    );
+for (my $i = 1; $i <= scalar(@goodfiles); ++$i)
+{
+    my $n = $goodtest_overrides{$i} || 1;
+    $td->runtest("$goodfiles[$i-1]",
+                 {$td->COMMAND => "test_driver $n good$i.pdf"},
+                 {$td->FILE => "good$i.out",
+                  $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    my $xflags = $goodtest_flags{$i} || '';
+    check_pdf($td, "create qdf",
+              "qpdf --static-id -qdf $xflags good$i.pdf",
+              "good$i.qdf", 0);
+}
+
+check_pdf($td, "no normalization",
+          "qpdf -qdf --static-id --normalize-content=n good7.pdf",
+          "good7-not-normalized.qdf",
+          0);
+
+check_pdf($td, "no qdf",
+          "qpdf --static-id good17.pdf",
+          "good17-not-qdf.pdf",
+          0);
+
+check_pdf($td, "no recompression",
+          "qpdf --static-id --stream-data=preserve good17.pdf",
+          "good17-not-recompressed.pdf",
+          0);
+
+cleanup();
+$td->report($n_tests);

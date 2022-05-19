@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('c-api-page');
+
+my $n_tests = 5;
+
+$td->runtest("C page normal",
+             {$td->COMMAND =>
+                  "qpdf-ctest 34 11-pages.pdf '' a.pdf minimal.pdf"},
+             {$td->STRING => "C test 34 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => 'a.pdf'},
+             {$td->FILE => 'c-pages.pdf'});
+
+$td->runtest("C page errors",
+             {$td->COMMAND =>
+                  "qpdf-ctest 35 11-pages.pdf '' ''"},
+             {$td->FILE => "c-page-errors.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C inherited page resources",
+             {$td->COMMAND =>
+                  "qpdf-ctest 36 inherited-rotate.pdf '' ''"},
+             {$td->STRING => "C test 36 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C pages cache",
+             {$td->COMMAND =>
+                  "qpdf-ctest 37 11-pages.pdf '' ''"},
+             {$td->STRING => "C test 37 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('c-api-stream');
+
+my $n_tests = 5;
+
+$td->runtest("C read streams",
+             {$td->COMMAND =>
+                  "qpdf-ctest 38 11-pages.pdf '' ''"},
+             {$td->FILE => "c-get-stream.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("C foreign object",
+             {$td->COMMAND =>
+                  "qpdf-ctest 39 11-pages.pdf '' a.pdf minimal.pdf"},
+             {$td->STRING => "C test 39 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => 'a.pdf'},
+             {$td->FILE => 'c-foreign.pdf'});
+
+$td->runtest("C new stream",
+             {$td->COMMAND =>
+                  "qpdf-ctest 40 minimal.pdf '' a.pdf"},
+             {$td->STRING => "C test 40 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => 'a.pdf'},
+             {$td->FILE => 'c-new-stream.pdf'});
+cleanup();
+$td->report($n_tests);
