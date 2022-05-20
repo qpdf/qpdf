@@ -3228,6 +3228,7 @@ QPDFObjectHandle::dereference()
             this->obj = std::shared_ptr<QPDFObject>(new QPDF_Null());
         } else if (dynamic_cast<QPDF_Reserved*>(obj.get())) {
             // Do not resolve
+            this->reserved = true;
         } else {
             this->reserved = false;
             this->obj = obj;
