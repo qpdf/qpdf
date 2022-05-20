@@ -1419,14 +1419,21 @@ QPDFWriter::willFilterStream(
         pushPipeline(new Pl_Buffer("stream data"));
         PipelinePopper pp_stream_data(this, stream_data);
         activatePipelineStack(pp_stream_data);
-        filtered = stream.pipeStreamData(
-            this->m->pipeline,
-            (((filter && normalize) ? qpdf_ef_normalize : 0) |
-             ((filter && compress_stream) ? qpdf_ef_compress : 0)),
-            (filter ? (uncompress ? qpdf_dl_all : this->m->stream_decode_level)
-                    : qpdf_dl_none),
-            false,
-            (attempt == 1));
+        try {
+            filtered = stream.pipeStreamData(
+                this->m->pipeline,
+                (((filter && normalize) ? qpdf_ef_normalize : 0) |
+                 ((filter && compress_stream) ? qpdf_ef_compress : 0)),
+                (filter
+                     ? (uncompress ? qpdf_dl_all : this->m->stream_decode_level)
+                     : qpdf_dl_none),
+                false,
+                (attempt == 1));
+        } catch (std::runtime_error& e) {
+            throw std::runtime_error(
+                "error while getting stream data for " + stream.unparse() +
+                ": " + e.what());
+        }
         if (filter && (!filtered)) {
             // Try again
             filter = false;

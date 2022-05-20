@@ -61,7 +61,7 @@ Make sure pages tree repair generates warnings.
 * Have a test case if possible that exercises the object description
   which means we need some kind of semantic error that gets caught
   after creation.
-* Test invalid data, invalid data file
+* Document that /Length is ignored in stream dictionary replacements
 
 Try to never flatten pages tree. Make sure we do something reasonable
 with pages tree repair. The problem is that if pages tree repair is
