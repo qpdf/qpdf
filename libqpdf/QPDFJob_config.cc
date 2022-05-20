@@ -295,14 +295,14 @@ QPDFJob::Config::jsonInput()
 QPDFJob::Config*
 QPDFJob::Config::jsonOutput(std::string const& parameter)
 {
-    std::string v = parameter;
-    if (parameter == "latest") {
-        v = "2";
+    if (parameter.empty() || (parameter == "latest")) {
+        o.m->json_output = JSON::LATEST;
+    } else {
+        o.m->json_output = QUtil::string_to_int(parameter.c_str());
     }
-    if (v != "2") {
-        usage("only version 2 is supported for --json-output");
+    if ((o.m->json_output < 2) || (o.m->json_output > JSON::LATEST)) {
+        usage(std::string("unsupported json output version ") + parameter);
     }
-    o.m->json_output = QUtil::string_to_int(v.c_str());
     if (!o.m->json_stream_data_set) {
         // No need to set json_stream_data_set -- that indicates
         // explicit use of --json-stream-data.

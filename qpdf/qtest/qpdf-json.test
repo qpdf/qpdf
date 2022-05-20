@@ -67,15 +67,17 @@ foreach my $i (@goodfiles)
     if (ref($i) eq 'ARRAY') {
         ($f, $xargs) = @$i;
     }
+    # explicit "latest" as --json-output version
     $td->runtest("good: $f -> JSON",
                  {$td->COMMAND => "qpdf $xargs --decode-level=none" .
                       " --json-output=latest $f a.json"},
                  {$td->STRING => "", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
+    # default --json-output version
     $td->runtest("good: $f JSON -> JSON",
                  {$td->COMMAND =>
                       "qpdf --decode-level=none" .
-                      " --json-input --json-output=latest a.json b.json"},
+                      " --json-input --json-output a.json b.json"},
                  {$td->STRING => "", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("good: $f JSON -> QDF",

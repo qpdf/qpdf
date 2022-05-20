@@ -107,7 +107,7 @@ pushKey("splitPages");
 addParameter([this](std::string const& p) { c_main->splitPages(p); });
 popHandler(); // key: splitPages
 pushKey("jsonOutput");
-addChoices(json_output_choices, true, [this](std::string const& p) { c_main->jsonOutput(p); });
+addChoices(json_output_choices, false, [this](std::string const& p) { c_main->jsonOutput(p); });
 popHandler(); // key: jsonOutput
 pushKey("encrypt");
 beginDict(bindJSON(&Handlers::beginEncrypt), bindBare(&Handlers::endEncrypt)); // .encrypt

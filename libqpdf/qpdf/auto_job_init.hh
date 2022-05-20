@@ -112,7 +112,6 @@ this->ap.addChoices("compress-streams", [this](std::string const& x){c_main->com
 this->ap.addChoices("decode-level", [this](std::string const& x){c_main->decodeLevel(x);}, true, decode_level_choices);
 this->ap.addChoices("flatten-annotations", [this](std::string const& x){c_main->flattenAnnotations(x);}, true, flatten_choices);
 this->ap.addChoices("json-key", [this](std::string const& x){c_main->jsonKey(x);}, true, json_key_choices);
-this->ap.addChoices("json-output", [this](std::string const& x){c_main->jsonOutput(x);}, true, json_output_choices);
 this->ap.addChoices("json-stream-data", [this](std::string const& x){c_main->jsonStreamData(x);}, true, json_stream_data_choices);
 this->ap.addChoices("keep-files-open", [this](std::string const& x){c_main->keepFilesOpen(x);}, true, yn_choices);
 this->ap.addChoices("normalize-content", [this](std::string const& x){c_main->normalizeContent(x);}, true, yn_choices);
@@ -121,6 +120,7 @@ this->ap.addChoices("password-mode", [this](std::string const& x){c_main->passwo
 this->ap.addChoices("remove-unreferenced-resources", [this](std::string const& x){c_main->removeUnreferencedResources(x);}, true, remove_unref_choices);
 this->ap.addChoices("stream-data", [this](std::string const& x){c_main->streamData(x);}, true, stream_data_choices);
 this->ap.addChoices("json", [this](std::string const& x){c_main->json(x);}, false, json_version_choices);
+this->ap.addChoices("json-output", [this](std::string const& x){c_main->jsonOutput(x);}, false, json_output_choices);
 this->ap.registerOptionTable("pages", b(&ArgParser::argEndPages));
 this->ap.addPositional(p(&ArgParser::argPagesPositional));
 this->ap.addRequiredParameter("password", p(&ArgParser::argPagesPassword), "password");

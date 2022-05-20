@@ -795,8 +795,8 @@ ap.addOptionHelp("--json", "json", "show file in JSON format", R"(--json[=versio
 
 Generate a JSON representation of the file. This is described in
 depth in the JSON section of the manual. "version" may be a
-specific version or "latest". Run qpdf --json-help for a
-description of the generated JSON object.
+specific version or "latest" (the default). Run qpdf --json-help
+for a description of the generated JSON object.
 )");
 ap.addOptionHelp("--json-help", "json", "show format of JSON output", R"(Describe the format of the JSON output by writing to standard
 output a JSON object with the same keys and with values
@@ -832,11 +832,12 @@ name as the prefix for stream data files. Whatever is given here
 will be appended with -nnn to create the name of the file that
 will contain the data for the stream stream in object nnn.
 )");
-ap.addOptionHelp("--json-output", "json", "serialize to JSON", R"(--json-output=version
+ap.addOptionHelp("--json-output", "json", "serialize to JSON", R"(--json-output[=version]
 
 The output file will be qpdf JSON format at the given version.
-Only version 2 is supported. See also --json-stream-data
-and --json-stream-prefix
+"version" may be a specific version or "latest" (the default).
+Version 1 is not supported. See also --json-stream-data
+and --json-stream-prefix.
 )");
 ap.addOptionHelp("--json-input", "json", "input file is qpdf JSON", R"(Treat the input file as a JSON file in qpdf JSON format as
 written by qpdf --json-output. See the "QPDF JSON Format"

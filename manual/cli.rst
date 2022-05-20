@@ -3158,8 +3158,8 @@ Related Options
 
       Generate a JSON representation of the file. This is described in
       depth in the JSON section of the manual. "version" may be a
-      specific version or "latest". Run qpdf --json-help for a
-      description of the generated JSON object.
+      specific version or "latest" (the default). Run qpdf --json-help
+      for a description of the generated JSON object.
 
    Generate a JSON representation of the file. This is described in
    depth in :ref:`json`. The version parameter can be used to specify
@@ -3258,17 +3258,19 @@ Related Options
    data for the stream stream in object :samp:`{nnn}`. This
    option only applies when used with :qpdf:ref:`--json-output`.
 
-.. qpdf:option:: --json-output=version
+.. qpdf:option:: --json-output[=version]
 
    .. help: serialize to JSON
 
       The output file will be qpdf JSON format at the given version.
-      Only version 2 is supported. See also --json-stream-data
-      and --json-stream-prefix
+      "version" may be a specific version or "latest" (the default).
+      Version 1 is not supported. See also --json-stream-data
+      and --json-stream-prefix.
 
-   The output file will be qpdf JSON format at the given version. Only
-   version 2 is supported. See also :qpdf:ref:`--json-stream-data` and
-   :qpdf:ref:`--json-stream-prefix`.
+   The output file will be qpdf JSON format at the given version.
+   ``version`` may be a specific version or ``latest`` (the default).
+   Version 1 is not supported. See also :qpdf:ref:`--json-stream-data`
+   and :qpdf:ref:`--json-stream-prefix`.
 
 .. qpdf:option:: --json-input
 
