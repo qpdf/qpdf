@@ -1,0 +1,5 @@
+WARNING: various-updates.json, trailer at offset 580: operation for array attempted on object of type dictionary: ignoring attempt to append item
+WARNING: various-updates.json, obj:7 0 R at offset 171: operation for array attempted on object of type dictionary: ignoring attempt to append item
+WARNING: various-updates.json, obj:7 0 R at offset 283: operation for integer attempted on object of type array: returning 0
+WARNING: good13.pdf, object 1 0 at offset 19: operation for array attempted on object of type dictionary: ignoring attempt to append item
+test 90 done

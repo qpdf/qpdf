@@ -1041,12 +1041,15 @@ class QPDF
 
         void containerStart();
         void nestedState(std::string const& key, JSON const& value, state_e);
+        void setObjectDescription(QPDFObjectHandle& oh, JSON const& value);
         QPDFObjectHandle makeObject(JSON const& value);
         void error(size_t offset, std::string const& message);
         QPDFObjectHandle
         reserveObject(std::string const& obj, std::string const& gen);
         void replaceObject(
-            QPDFObjectHandle to_replace, QPDFObjectHandle replacement);
+            QPDFObjectHandle to_replace,
+            QPDFObjectHandle replacement,
+            JSON const& value);
 
         QPDF& pdf;
         std::shared_ptr<InputSource> is;

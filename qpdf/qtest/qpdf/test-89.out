@@ -1,0 +1,5 @@
+WARNING: manual-qpdf-json.json, trailer at offset 1761: operation for array attempted on object of type dictionary: ignoring attempt to append item
+WARNING: manual-qpdf-json.json, obj:1 0 R at offset 1079: operation for array attempted on object of type dictionary: ignoring attempt to append item
+WARNING: manual-qpdf-json.json, obj:5 0 R at offset 1404: operation for dictionary attempted on object of type array: ignoring key replacement request
+WARNING: manual-qpdf-json.json, obj:5 0 R at offset 1416: operation for dictionary attempted on object of type name: ignoring key replacement request
+test 89 done

@@ -58,9 +58,6 @@ Some of this documentation has drifted from the actual implementation.
 
 Make sure pages tree repair generates warnings.
 
-* Have a test case if possible that exercises the object description
-  which means we need some kind of semantic error that gets caught
-  after creation.
 * Document that /Length is ignored in stream dictionary replacements
 
 Try to never flatten pages tree. Make sure we do something reasonable

@@ -202,6 +202,16 @@ foreach my $f (@update_files) {
                  {$td->FILE => "$f-updated.pdf"});
 }
 
+# Exercise object description
+$n_tests += 2;
+$td->runtest("json-input object description",
+             {$td->COMMAND => "test_driver 89 manual-qpdf-json.json"},
+             {$td->FILE => "test-89.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("update-from-json object description",
+             {$td->COMMAND => "test_driver 90 good13.pdf various-updates.json"},
+             {$td->FILE => "test-90.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 cleanup();
 $td->report($n_tests);

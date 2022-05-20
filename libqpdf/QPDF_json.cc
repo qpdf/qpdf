@@ -249,11 +249,15 @@ QPDF::JSONReactor::reserveObject(std::string const& obj, std::string const& gen)
 
 void
 QPDF::JSONReactor::replaceObject(
-    QPDFObjectHandle to_replace, QPDFObjectHandle replacement)
+    QPDFObjectHandle to_replace,
+    QPDFObjectHandle replacement,
+    JSON const& value)
 {
     auto og = to_replace.getObjGen();
     this->reserved.erase(og);
     this->pdf.replaceObject(og, replacement);
+    auto oh = pdf.getObjectByObjGen(og);
+    setObjectDescription(oh, value);
 }
 
 void
@@ -326,9 +330,10 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             nestedState(key, value, st_trailer);
             this->cur_object = "trailer";
         } else if (std::regex_match(key, m, OBJ_KEY_RE)) {
-            object_stack.push_back(reserveObject(m[1].str(), m[2].str()));
-            nestedState(key, value, st_object_top);
             this->cur_object = key;
+            auto oh = reserveObject(m[1].str(), m[2].str());
+            object_stack.push_back(oh);
+            nestedState(key, value, st_object_top);
         } else {
             QTC::TC("qpdf", "QPDF_json bad object key");
             error(
@@ -348,7 +353,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             this->saw_value = true;
             next_state = st_object;
             replacement = makeObject(value);
-            replaceObject(tos, replacement);
+            replaceObject(tos, replacement, value);
         } else if (key == "stream") {
             this->saw_stream = true;
             nestedState(key, value, st_stream);
@@ -359,7 +364,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                 this->this_stream_needs_data = true;
                 replacement =
                     pdf.reserveStream(tos.getObjectID(), tos.getGeneration());
-                replaceObject(tos, replacement);
+                replaceObject(tos, replacement, value);
             }
         } else {
             // Ignore unknown keys for forward compatibility
@@ -376,6 +381,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             // The trailer must be a dictionary, so we can use nestedState.
             nestedState("trailer.value", value, st_object);
             this->pdf.m->trailer = makeObject(value);
+            setObjectDescription(this->pdf.m->trailer, value);
         } else if (key == "stream") {
             // Don't need to set saw_stream here since there's already
             // an error.
@@ -471,6 +477,17 @@ QPDF::JSONReactor::arrayItem(JSON const& value)
     return true;
 }
 
+void
+QPDF::JSONReactor::setObjectDescription(QPDFObjectHandle& oh, JSON const& value)
+{
+    std::string description = this->is->getName();
+    if (!this->cur_object.empty()) {
+        description += ", " + this->cur_object;
+    }
+    description += " at offset " + QUtil::uint_to_string(value.getStart());
+    oh.setObjectDescription(&this->pdf, description);
+}
+
 QPDFObjectHandle
 QPDF::JSONReactor::makeObject(JSON const& value)
 {
@@ -515,12 +532,9 @@ QPDF::JSONReactor::makeObject(JSON const& value)
             "JSONReactor::makeObject didn't initialize the object");
     }
 
-    std::string description = this->is->getName();
-    if (!this->cur_object.empty()) {
-        description += " " + this->cur_object + ",";
+    if (!result.hasObjectDescription()) {
+        setObjectDescription(result, value);
     }
-    description += " offset " + QUtil::uint_to_string(value.getStart());
-    result.setObjectDescription(&this->pdf, description);
     return result;
 }
 
