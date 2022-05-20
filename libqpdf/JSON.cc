@@ -574,7 +574,15 @@ namespace
       private:
         void getToken();
         void handleToken();
-        static std::string decode_string(std::string const& json);
+        static std::string
+        decode_string(std::string const& json, size_t offset);
+        static void handle_u_code(
+            char const* s,
+            size_t offset,
+            size_t i,
+            unsigned long& high_surrogate,
+            size_t& high_offset,
+            std::string& result);
 
         enum parser_state_e {
             ps_top,
@@ -620,8 +628,54 @@ namespace
     };
 } // namespace
 
+void
+JSONParser::handle_u_code(
+    char const* s,
+    size_t offset,
+    size_t i,
+    unsigned long& high_surrogate,
+    size_t& high_offset,
+    std::string& result)
+{
+    std::string hex = QUtil::hex_decode(std::string(s + i + 1, s + i + 5));
+    unsigned char high = static_cast<unsigned char>(hex.at(0));
+    unsigned char low = static_cast<unsigned char>(hex.at(1));
+    unsigned long codepoint = high;
+    codepoint <<= 8;
+    codepoint += low;
+    if ((codepoint & 0xFC00) == 0xD800) {
+        // high surrogate
+        size_t new_high_offset = offset + i;
+        if (high_offset) {
+            QTC::TC("libtests", "JSON 16 high high");
+            throw std::runtime_error(
+                "JSON: offset " + QUtil::uint_to_string(new_high_offset) +
+                ": UTF-16 high surrogate found after previous high surrogate"
+                " at offset " +
+                QUtil::uint_to_string(high_offset));
+        }
+        high_offset = new_high_offset;
+        high_surrogate = codepoint;
+    } else if ((codepoint & 0xFC00) == 0xDC00) {
+        // low surrogate
+        if (offset + i != (high_offset + 6)) {
+            QTC::TC("libtests", "JSON 16 low not after high");
+            throw std::runtime_error(
+                "JSON: offset " + QUtil::uint_to_string(offset + i) +
+                ": UTF-16 low surrogate found not immediately after high"
+                " surrogate");
+        }
+        high_offset = 0;
+        codepoint =
+            0x10000U + ((high_surrogate & 0x3FFU) << 10U) + (codepoint & 0x3FF);
+        result += QUtil::toUTF8(codepoint);
+    } else {
+        result += QUtil::toUTF8(codepoint);
+    }
+}
+
 std::string
-JSONParser::decode_string(std::string const& str)
+JSONParser::decode_string(std::string const& str, size_t offset)
 {
     // The string has already been validated when this private method
     // is called, so errors are logic errors instead of runtime
@@ -635,6 +689,9 @@ JSONParser::decode_string(std::string const& str)
     // Move inside the quotation marks
     ++s;
     len -= 2;
+    // Keep track of UTF-16 surrogate pairs.
+    unsigned long high_surrogate = 0;
+    size_t high_offset = 0;
     std::string result;
     for (size_t i = 0; i < len; ++i) {
         if (s[i] == '\\') {
@@ -670,17 +727,9 @@ JSONParser::decode_string(std::string const& str)
                     throw std::logic_error(
                         "JSON parse: not enough characters after \\u");
                 }
-                {
-                    std::string hex =
-                        QUtil::hex_decode(std::string(s + i + 1, s + i + 5));
-                    i += 4;
-                    unsigned char high = static_cast<unsigned char>(hex.at(0));
-                    unsigned char low = static_cast<unsigned char>(hex.at(1));
-                    unsigned long codepoint = high;
-                    codepoint <<= 8;
-                    codepoint += low;
-                    result += QUtil::toUTF8(codepoint);
-                }
+                handle_u_code(
+                    s, offset, i, high_surrogate, high_offset, result);
+                i += 4;
                 break;
             default:
                 throw std::logic_error("JSON parse: bad character after \\");
@@ -689,6 +738,12 @@ JSONParser::decode_string(std::string const& str)
         } else {
             result.append(1, s[i]);
         }
+    }
+    if (high_offset) {
+        QTC::TC("libtests", "JSON 16 dangling high");
+        throw std::runtime_error(
+            "JSON: offset " + QUtil::uint_to_string(high_offset) +
+            ": UTF-16 high surrogate not followed by low surrogate");
     }
     return result;
 }
@@ -933,7 +988,7 @@ JSONParser::handleToken()
         if (token.length() < 2) {
             throw std::logic_error("JSON string length < 2");
         }
-        s_value = decode_string(token);
+        s_value = decode_string(token, offset - token.length());
     }
     // Based on the lexical state and value, figure out whether we are
     // looking at an item or a delimiter. It will always be exactly

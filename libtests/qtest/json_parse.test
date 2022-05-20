@@ -32,7 +32,7 @@ if ($^O ne 'msys')
 
 cleanup();
 
-my $good = 10;
+my $good = 11;
 
 for (my $i = 1; $i <= $good; ++$i)
 {
@@ -117,6 +117,9 @@ my @bad = (
     "premature end after u",    # 34
     "bad hex digit",            # 35
     "parser depth exceeded",    # 36
+    "stray low surrogate",      # 37
+    "high high surrogate",      # 38
+    "dangling high surrogate",  # 39
     );
 
 my $i = 0;

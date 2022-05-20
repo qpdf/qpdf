@@ -89,3 +89,6 @@ JSONHandler unhandled value 0
 JSONHandler unexpected key 0
 JSON schema other type 0
 JSON optional key 0
+JSON 16 high high 0
+JSON 16 low not after high 0
+JSON 16 dangling high 0

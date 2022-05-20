@@ -1,0 +1,16 @@
+array start
+array item: [4, 0): []
+array start
+array item: [5, 11): "u:π"
+array item: [13, 23): "u:π"
+array item: [25, 39): "b:EFBBBFCF80"
+array item: [41, 53): "b:feff03c0"
+container end: [4, 54): []
+array item: [58, 0): []
+array start
+array item: [59, 67): "u:🥔"
+array item: [69, 85): "u:🥔"
+array item: [87, 103): "b:feffd83eDD54"
+container end: [58, 104): []
+container end: [0, 106): []
+[]
