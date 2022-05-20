@@ -1,7 +1,7 @@
 {
   "qpdf-v2": {
     "pdfversion": "2.0",
-    "maxobjectid": 9,
+    "maxobjectid": 10,
     "objects": {
       "obj:1 0 R": {
         "value": {
@@ -79,11 +79,16 @@
         }
       },
       "obj:4 0 R": {
-        "value": "u:hello"
+        "value": {
+          "/dangling": [
+            "6 0 R"
+          ],
+          "/k1": "u:hello"
+        }
       },
       "obj:5 0 R": {
         "value": {
-          "/Contents": "6 0 R",
+          "/Contents": "7 0 R",
           "/MediaBox": [
             0,
             0,
@@ -93,23 +98,26 @@
           "/Parent": "3 0 R",
           "/Resources": {
             "/Font": {
-              "/F1": "8 0 R"
+              "/F1": "9 0 R"
             },
-            "/ProcSet": "9 0 R"
+            "/ProcSet": "10 0 R"
           },
           "/Type": "/Page"
         }
       },
       "obj:6 0 R": {
+        "value": null
+      },
+      "obj:7 0 R": {
         "stream": {
           "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo=",
           "dict": {}
         }
       },
-      "obj:7 0 R": {
+      "obj:8 0 R": {
         "value": 44
       },
-      "obj:8 0 R": {
+      "obj:9 0 R": {
         "value": {
           "/BaseFont": "/Helvetica",
           "/Encoding": "/WinAnsiEncoding",
@@ -118,7 +126,7 @@
           "/Type": "/Font"
         }
       },
-      "obj:9 0 R": {
+      "obj:10 0 R": {
         "value": [
           "/PDF",
           "/Text"
@@ -132,7 +140,7 @@
           ],
           "/QTest": "2 0 R",
           "/Root": "1 0 R",
-          "/Size": 10
+          "/Size": 11
         }
       }
     }

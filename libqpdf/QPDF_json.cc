@@ -147,6 +147,7 @@ QPDF::JSONReactor::arrayStart()
 void
 QPDF::JSONReactor::containerEnd(JSON const& value)
 {
+    auto from_state = state;
     state = state_stack.back();
     state_stack.pop_back();
     if (state == st_initial) {
@@ -215,10 +216,13 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
         if (!parse_error) {
             object_stack.pop_back();
         }
-    } else if (state == st_qpdf) {
+    } else if ((state == st_top) && (from_state == st_qpdf)) {
         for (auto const& og: this->reserved) {
-            // QXXXQ
-            // QTC::TC("qpdf", "QPDF_json non-trivial null reserved");
+            // Handle dangling indirect object references which the
+            // PDF spec says to treat as nulls. It's tempting to make
+            // this an error, but that would be wrong since valid
+            // input files may have these.
+            QTC::TC("qpdf", "QPDF_json non-trivial null reserved");
             this->pdf.replaceObject(og, QPDFObjectHandle::newNull());
         }
         this->reserved.clear();

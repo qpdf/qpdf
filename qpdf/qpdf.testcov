@@ -675,3 +675,4 @@ QPDF_json ignore second-level key 0
 QPDF_json ignore unknown key in object_top 0
 QPDF_json ignore unknown key in trailer 0
 QPDF_json ignore unknown key in stream 0
+QPDF_json non-trivial null reserved 0

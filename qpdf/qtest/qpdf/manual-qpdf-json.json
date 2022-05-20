@@ -134,7 +134,10 @@
         }
       },
       "obj:8 0 R": {
-        "value": "u:hello"
+        "value": {
+          "/k1": "u:hello",
+          "/dangling": ["100 0 R"]
+        }
       }
     }
   }

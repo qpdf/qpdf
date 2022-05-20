@@ -74,12 +74,19 @@ b) (﻿π) (﻿🥔)]
     /b <</a [1 2] / (legal)>>
   >>
   /names [/n#65sting /hex#20strings /text#2fplain]
+  /dangling-ref-for-json-test [9 0 R]
 >>
 endobj
 
 8 0 obj
 (hello)
 endobj
+
+% NOTE:
+%
+% If adding a new object, update /dangling-ref-for-json-test to point
+% to something that's not here.
+%
 
 xref
 0 9
@@ -91,12 +98,12 @@ xref
 0000000403 00000 n 
 0000000438 00000 n 
 0000000556 00000 n 
-0000000908 00000 n 
+0000000946 00000 n 
 trailer <<
   /Size 9
   /Root 1 0 R
   /QTest 7 0 R
 >>
 startxref
-932
+1085
 %%EOF

@@ -1,7 +1,7 @@
 {
   "qpdf-v2": {
     "pdfversion": "2.0",
-    "maxobjectid": 8,
+    "maxobjectid": 100,
     "objects": {
       "obj:1 0 R": {
         "value": {
@@ -119,7 +119,15 @@
         }
       },
       "obj:8 0 R": {
-        "value": "u:hello"
+        "value": {
+          "/dangling": [
+            "100 0 R"
+          ],
+          "/k1": "u:hello"
+        }
+      },
+      "obj:100 0 R": {
+        "value": null
       },
       "trailer": {
         "value": {
