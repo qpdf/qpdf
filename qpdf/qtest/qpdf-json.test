@@ -142,7 +142,32 @@ $td->runtest("check manual JSON to JSON to JSON",
              {$td->FILE => "a.json", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
-# QXXXQ file
+$n_tests += 6;
+$td->runtest("json-output with file",
+             {$td->COMMAND => "qpdf --json-output=2" .
+                  " --json-stream-prefix=auto-1 --json-stream-data=file" .
+                  " minimal.pdf a.json"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check file mode",
+             {$td->FILE => "a.json"},
+             {$td->FILE => "minimal-json-file.out"},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("JSON to JSON with file",
+             {$td->COMMAND => "qpdf --json-input --json-output=2" .
+                  " --json-stream-prefix=auto-2 --json-stream-data=file" .
+                  " a.json -"},
+             {$td->FILE => "minimal-json-file-2.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("JSON with file to qdf",
+             {$td->COMMAND => "qpdf --json-input --qdf --static-id" .
+                  " a.json a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("PDF to qdf",
+             {$td->COMMAND => "qpdf --qdf --static-id minimal.pdf b.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check PDF",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "b.pdf"});
 
 cleanup();
 $td->report($n_tests);
