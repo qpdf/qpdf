@@ -42,6 +42,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -148,6 +149,14 @@ class JSON
 
     QPDF_DLL
     bool isDictionary() const;
+
+    // If the key is already in the dictionary, return true.
+    // Otherwise, mark it has seen and return false. This is primarily
+    // intended to used by the parser to detect duplicate keys when
+    // the reactor blocks them from being added to the final
+    // dictionary.
+    QPDF_DLL
+    bool checkDictionaryKeySeen(std::string const& key);
 
     // Accessors. Accessor behavior:
     //
@@ -314,6 +323,7 @@ class JSON
         virtual ~JSON_dictionary() = default;
         virtual void write(Pipeline*, size_t depth) const;
         std::map<std::string, std::shared_ptr<JSON_value>> members;
+        std::set<std::string> parsed_keys;
     };
     struct JSON_array: public JSON_value
     {

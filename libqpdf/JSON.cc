@@ -274,6 +274,21 @@ JSON::addDictionaryMember(std::string const& key, JSON const& val)
     return obj->members[encode_string(key)];
 }
 
+bool
+JSON::checkDictionaryKeySeen(std::string const& key)
+{
+    JSON_dictionary* obj = dynamic_cast<JSON_dictionary*>(this->m->value.get());
+    if (0 == obj) {
+        throw std::logic_error(
+            "JSON::checkDictionaryKey called on non-dictionary");
+    }
+    if (obj->parsed_keys.count(key)) {
+        return true;
+    }
+    obj->parsed_keys.insert(key);
+    return false;
+}
+
 JSON
 JSON::makeArray()
 {
@@ -565,7 +580,8 @@ namespace
             u_count(0),
             offset(0),
             done(false),
-            parser_state(ps_top)
+            parser_state(ps_top),
+            dict_key_offset(0)
         {
         }
 
@@ -625,6 +641,7 @@ namespace
         std::vector<std::shared_ptr<JSON>> stack;
         std::vector<parser_state_e> ps_stack;
         std::string dict_key;
+        size_t dict_key_offset;
     };
 } // namespace
 
@@ -1201,11 +1218,18 @@ JSONParser::handleToken()
         case ps_dict_begin:
         case ps_dict_after_comma:
             this->dict_key = s_value;
+            this->dict_key_offset = item->getStart();
             item = nullptr;
             next_state = ps_dict_after_key;
             break;
 
         case ps_dict_after_colon:
+            if (tos->checkDictionaryKeySeen(dict_key)) {
+                QTC::TC("libtests", "JSON parse duplicate key");
+                throw std::runtime_error(
+                    "JSON: offset " + QUtil::uint_to_string(dict_key_offset) +
+                    ": duplicated dictionary key");
+            }
             if (!reactor || !reactor->dictionaryItem(dict_key, *item)) {
                 tos->addDictionaryMember(dict_key, *item);
             }

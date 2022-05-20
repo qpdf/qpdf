@@ -120,6 +120,7 @@ my @bad = (
     "stray low surrogate",      # 37
     "high high surrogate",      # 38
     "dangling high surrogate",  # 39
+    "duplicate dictionary key", # 40
     );
 
 my $i = 0;
