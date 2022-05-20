@@ -1,6 +1,17 @@
 {
+  "comment": [
+    "We allow and ignore other top-level keys"
+  ],
   "qpdf-v2": {
     "pdfversion": "2.0",
+    "maybe-future-key": {
+      "x": [
+        "Lots of times we ignore things",
+        "for forward-compatibility so we don't have",
+        "to change the version number if we add stuff",
+        "in the future"
+      ]
+    },
     "objects": {
       "obj:3 0 R": {
         "value": {
@@ -19,7 +30,8 @@
             "/ProcSet": "5 0 R"
           },
           "/Type": "/Page"
-        }
+        },
+        "ignore": "this is ignored"
       },
       "obj:2 0 R": {
         "value": {
@@ -28,6 +40,10 @@
             "3 0 R"
           ],
           "/Type": "/Pages"
+        },
+        "ignore": {
+          "potato": "salad",
+          "this": ["is ignored too"]
         }
       },
       "obj:1 0 R": {
@@ -38,6 +54,7 @@
       },
       "obj:4 0 R": {
         "stream": {
+          "what-is-this": "doesn't matter",
           "dict": {},
           "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo="
         }
@@ -58,6 +75,7 @@
         }
       },
       "trailer": {
+        "even-here-we-ignore": "stuff",
         "value": {
           "/QTest": "7 0 R",
           "/Root": "1 0 R",

@@ -97,6 +97,9 @@ General things to remember:
 
 * Add json to the large file tests.
 
+* Document that keys other than "qpdf-v2" are ignored so people can
+  stash their own stuff.
+
 JSON to PDF:
 
 Have --json-input and --update-from-json. With --json-input, the json

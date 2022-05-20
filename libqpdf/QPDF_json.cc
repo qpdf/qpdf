@@ -170,7 +170,7 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
         }
     } else if (state == st_objects) {
         if (parse_error) {
-            // ignore
+            QTC::TC("qpdf", "QPDF_json don't check object after parse error");
         } else if (cur_object == "trailer") {
             if (!saw_value) {
                 QTC::TC("qpdf", "QPDF_json trailer no value");
@@ -279,9 +279,9 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             this->saw_qpdf = true;
             nestedState(key, value, st_qpdf);
         } else {
-            // Ignore all other fields for forward compatibility.
-            // Don't use nestedState since this can be any type.
-            // QXXXQ QTC
+            // Ignore all other fields. We explicitly allow people to
+            // add other top-level keys for their own use.
+            QTC::TC("qpdf", "QPDF_json ignoring unknown top-level key");
             next_state = st_ignore;
         }
     } else if (state == st_qpdf) {
@@ -304,8 +304,9 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             this->saw_objects = true;
             nestedState(key, value, st_objects);
         } else {
-            // ignore unknown keys for forward compatibility
-            // QXXXQ QTC
+            // ignore unknown keys for forward compatibility and to
+            // skip keys we don't care about like "maxobjectid".
+            QTC::TC("qpdf", "QPDF_json ignore second-level key");
             next_state = st_ignore;
         }
     } else if (state == st_objects) {
@@ -351,7 +352,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             }
         } else {
             // Ignore unknown keys for forward compatibility
-            // QXXXQ QTC
+            QTC::TC("qpdf", "QPDF_json ignore unknown key in object_top");
             next_state = st_ignore;
         }
         if (replacement.isInitialized()) {
@@ -373,7 +374,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             parse_error = true;
         } else {
             // Ignore unknown keys for forward compatibility
-            // QXXXQ QTC
+            QTC::TC("qpdf", "QPDF_json ignore unknown key in trailer");
             next_state = st_ignore;
         }
     } else if (state == st_stream) {
@@ -430,7 +431,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             }
         } else {
             // Ignore unknown keys for forward compatibility.
-            // QXXXQ QTC
+            QTC::TC("qpdf", "QPDF_json ignore unknown key in stream");
             next_state = st_ignore;
         }
     } else if (state == st_object) {
@@ -549,12 +550,6 @@ QPDF::importJSON(std::shared_ptr<InputSource> is, bool must_be_complete)
     if (reactor.anyErrors()) {
         throw std::runtime_error(is->getName() + ": errors found in JSON");
     }
-    // QXXXQ
-    // std::cout << "trailer:\n" << getTrailer().unparse() << std::endl;
-    // for (auto& oh: getAllObjects()) {
-    //     std::cout << oh.unparse() << ":" << std::endl;
-    //     std::cout << oh.unparseResolved() << std::endl;
-    // }
 }
 
 void
