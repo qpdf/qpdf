@@ -676,3 +676,6 @@ QPDF_json ignore unknown key in object_top 0
 QPDF_json ignore unknown key in trailer 0
 QPDF_json ignore unknown key in stream 0
 QPDF_json non-trivial null reserved 0
+QPDF_json data and datafile 0
+QPDF_json no stream data in update mode 0
+QPDF_json updating existing stream 0

@@ -1,0 +1,15 @@
+{
+  "qpdf-v2": {
+    "pdfversion": "2.0",
+    "maxobjectid": 9,
+    "objects": {
+      "obj:4 0 R": {
+        "stream": {
+          "dict": {
+            "/Potato": "u:salad"
+          }
+        }
+      }
+    }
+  }
+}

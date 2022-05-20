@@ -1,0 +1,20 @@
+{
+  "qpdf-v2": {
+    "objects": {
+      "obj:4 0 R": {
+        "stream": {
+          "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo=",
+          "datafile": "file-too",
+          "dict": {}
+        }
+      },
+      "obj:20 0 R": {
+        "stream": {
+          "dict": {
+            "/Bad": "string-value"
+          }
+        }
+      }
+    }
+  }
+}

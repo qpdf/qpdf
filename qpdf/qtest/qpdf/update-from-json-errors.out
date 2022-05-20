@@ -1,0 +1,4 @@
+WARNING: good13.pdf (obj:4 0 R from qpdf-json-update-errors.json, offset 73): existing "stream" may at most one of "data" or "datafile"
+WARNING: good13.pdf (obj:20 0 R from qpdf-json-update-errors.json, offset 313): unrecognized string value
+WARNING: good13.pdf (obj:20 0 R from qpdf-json-update-errors.json, offset 271): new "stream" must have exactly one of "data" or "datafile"
+qpdf: qpdf-json-update-errors.json: errors found in JSON

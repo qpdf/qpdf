@@ -171,5 +171,35 @@ $td->runtest("check PDF",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "b.pdf"});
 
+# Replace mode tests
+
+$n_tests += 1;
+$td->runtest("create PDF for replace",
+             {$td->COMMAND => "qpdf good13.pdf a.pdf" .
+                  " --update-from-json=qpdf-json-update-errors.json"},
+             {$td->FILE => "update-from-json-errors.out",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+my @update_files = (
+    "update-stream-dict-only",
+    "update-stream-data",
+    "replace-with-stream",
+    "various-updates",
+    );
+$n_tests += 2 * scalar(@update_files);
+
+foreach my $f (@update_files) {
+    $td->runtest("update: $f",
+                 {$td->COMMAND =>
+                      "qpdf good13.pdf a.pdf --qdf --static-id" .
+                      " --update-from-json=$f.json"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("$f: check updated",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "$f-updated.pdf"});
+}
+
+
 cleanup();
 $td->report($n_tests);

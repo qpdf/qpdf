@@ -1065,6 +1065,7 @@ class QPDF
         bool saw_dict;
         bool saw_data;
         bool saw_datafile;
+        bool this_stream_needs_data;
         std::vector<state_e> state_stack;
         std::vector<QPDFObjectHandle> object_stack;
         std::set<QPDFObjGen> reserved;

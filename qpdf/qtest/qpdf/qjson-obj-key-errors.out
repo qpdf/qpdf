@@ -1,7 +1,7 @@
 WARNING: qjson-obj-key-errors.json (obj:2 0 R, offset 218): object must have exactly one of "value" or "stream"
 WARNING: qjson-obj-key-errors.json (obj:3 0 R, offset 516): object must have exactly one of "value" or "stream"
 WARNING: qjson-obj-key-errors.json (obj:4 0 R, offset 684): "stream" is missing "dict"
-WARNING: qjson-obj-key-errors.json (obj:4 0 R, offset 684): "stream" must have exactly one of "data" or "datafile"
-WARNING: qjson-obj-key-errors.json (obj:5 0 R, offset 774): "stream" must have exactly one of "data" or "datafile"
+WARNING: qjson-obj-key-errors.json (obj:4 0 R, offset 684): new "stream" must have exactly one of "data" or "datafile"
+WARNING: qjson-obj-key-errors.json (obj:5 0 R, offset 774): new "stream" must have exactly one of "data" or "datafile"
 WARNING: qjson-obj-key-errors.json (trailer, offset 1152): "trailer" is missing "value"
 qpdf: qjson-obj-key-errors.json: errors found in JSON

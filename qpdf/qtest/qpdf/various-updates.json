@@ -1,0 +1,39 @@
+{
+  "qpdf-v2": {
+    "pdfversion": "2.0",
+    "maxobjectid": 9,
+    "objects": {
+      "obj:5 0 R": {
+        "value": null
+      },
+      "obj:7 0 R": {
+        "value": {
+          "/now-π": [
+            "9 0 R"
+          ],
+          "/indirect": "8 0 R",
+          "/strings": [
+            "u:one",
+            "u:π"
+          ]
+        }
+      },
+      "obj:8 0 R": {
+        "value": ["u:hello", "10 0 R"]
+      },
+      "obj:9 0 R": {
+        "value": 3.14159
+      },
+      "obj:10 0 R": {
+        "value": "u:this is new"
+      },
+      "trailer": {
+        "value": {
+          "/QTest": "7 0 R",
+          "/Root": "1 0 R",
+          "/Size": 9
+        }
+      }
+    }
+  }
+}

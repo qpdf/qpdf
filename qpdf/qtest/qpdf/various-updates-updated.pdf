@@ -1,0 +1,128 @@
+%PDF-2.0
+%¿÷¢þ
+%QDF-1.0
+
+%% Original object ID: 1 0
+1 0 obj
+<<
+  /Pages 3 0 R
+  /Type /Catalog
+>>
+endobj
+
+%% Original object ID: 7 0
+2 0 obj
+<<
+  /indirect 4 0 R
+  /now-#cf#80 [
+    5 0 R
+  ]
+  /strings [
+    (one)
+    <feff03c0>
+  ]
+>>
+endobj
+
+%% Original object ID: 2 0
+3 0 obj
+<<
+  /Count 1
+  /Kids [
+    6 0 R
+  ]
+  /Type /Pages
+>>
+endobj
+
+%% Original object ID: 8 0
+4 0 obj
+[
+  (hello)
+  7 0 R
+]
+endobj
+
+%% Original object ID: 9 0
+5 0 obj
+3.14159
+endobj
+
+%% Page 1
+%% Original object ID: 3 0
+6 0 obj
+<<
+  /Contents 8 0 R
+  /MediaBox [
+    0
+    0
+    612
+    792
+  ]
+  /Parent 3 0 R
+  /Resources <<
+    /Font <<
+      /F1 10 0 R
+    >>
+  >>
+  /Type /Page
+>>
+endobj
+
+%% Original object ID: 10 0
+7 0 obj
+(this is new)
+endobj
+
+%% Contents for page 1
+%% Original object ID: 4 0
+8 0 obj
+<<
+  /Length 9 0 R
+>>
+stream
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ET
+endstream
+endobj
+
+9 0 obj
+44
+endobj
+
+%% Original object ID: 6 0
+10 0 obj
+<<
+  /BaseFont /Helvetica
+  /Encoding /WinAnsiEncoding
+  /Name /F1
+  /Subtype /Type1
+  /Type /Font
+>>
+endobj
+
+xref
+0 11
+0000000000 65535 f 
+0000000052 00000 n 
+0000000133 00000 n 
+0000000272 00000 n 
+0000000371 00000 n 
+0000000436 00000 n 
+0000000497 00000 n 
+0000000699 00000 n 
+0000000779 00000 n 
+0000000878 00000 n 
+0000000924 00000 n 
+trailer <<
+  /QTest 2 0 R
+  /Root 1 0 R
+  /Size 11
+  /ID [<31415926535897932384626433832795><31415926535897932384626433832795>]
+>>
+startxref
+1043
+%%EOF

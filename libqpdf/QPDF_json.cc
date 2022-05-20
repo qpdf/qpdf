@@ -102,7 +102,8 @@ QPDF::JSONReactor::JSONReactor(
     saw_stream(false),
     saw_dict(false),
     saw_data(false),
-    saw_datafile(false)
+    saw_datafile(false),
+    this_stream_needs_data(false)
 {
     state_stack.push_back(st_initial);
 }
@@ -111,8 +112,11 @@ void
 QPDF::JSONReactor::error(size_t offset, std::string const& msg)
 {
     this->errors = true;
-    this->pdf.warn(
-        qpdf_e_json, this->cur_object, QIntC::to_offset(offset), msg);
+    std::string object = this->cur_object;
+    if (is->getName() != pdf.getFilename()) {
+        object += " from " + is->getName();
+    }
+    this->pdf.warn(qpdf_e_json, object, QIntC::to_offset(offset), msg);
 }
 
 bool
@@ -196,20 +200,22 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
                 QTC::TC("qpdf", "QPDF_json stream no dict");
                 error(value.getStart(), "\"stream\" is missing \"dict\"");
             }
-            if (must_be_complete) {
-                if (saw_data == saw_datafile) {
+            if (saw_data == saw_datafile) {
+                if (this_stream_needs_data) {
                     QTC::TC("qpdf", "QPDF_json data datafile both or neither");
                     error(
                         value.getStart(),
-                        "\"stream\" must have exactly one of \"data\" or "
+                        "new \"stream\" must have exactly one of \"data\" or "
                         "\"datafile\"");
+                } else if (saw_datafile) {
+                    QTC::TC("qpdf", "QPDF_json data and datafile");
+                    error(
+                        value.getStart(),
+                        "existing \"stream\" may at most one of \"data\" or "
+                        "\"datafile\"");
+                } else {
+                    QTC::TC("qpdf", "QPDF_json no stream data in update mode");
                 }
-            } else if (saw_data && saw_datafile) {
-                // QXXXQ
-                /// QTC::TC("qpdf", "QPDF_json data and datafile");
-                error(
-                    value.getStart(),
-                    "\"stream\" may at most one of \"data\" or \"datafile\"");
             }
         }
     } else if ((state == st_stream) || (state == st_object)) {
@@ -320,7 +326,6 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             nestedState(key, value, st_trailer);
             this->cur_object = "trailer";
         } else if (std::regex_match(key, m, OBJ_KEY_RE)) {
-            // QXXXQ remember to handle null for delete
             object_stack.push_back(reserveObject(m[1].str(), m[2].str()));
             nestedState(key, value, st_object_top);
             this->cur_object = key;
@@ -347,9 +352,11 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
         } else if (key == "stream") {
             this->saw_stream = true;
             nestedState(key, value, st_stream);
+            this->this_stream_needs_data = false;
             if (tos.isStream()) {
-                // QXXXQ reusing -- need QTC
+                QTC::TC("qpdf", "QPDF_json updating existing stream");
             } else {
+                this->this_stream_needs_data = true;
                 replacement =
                     pdf.reserveStream(tos.getObjectID(), tos.getGeneration());
                 replaceObject(tos, replacement);
@@ -386,12 +393,11 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             throw std::logic_error("no object on stack in st_stream");
         }
         auto tos = object_stack.back();
-        auto uninitialized = QPDFObjectHandle();
         if (!tos.isStream()) {
-            // QXXXQ QTC in update mode
-            error(value.getStart(), "this object is not a stream");
-            parse_error = true;
-        } else if (key == "dict") {
+            throw std::logic_error("top of stack is not stream in st_stream");
+        }
+        auto uninitialized = QPDFObjectHandle();
+        if (key == "dict") {
             this->saw_dict = true;
             // Since a stream dictionary must be a dictionary, we can
             // use nestedState to transition to st_value.
@@ -509,11 +515,12 @@ QPDF::JSONReactor::makeObject(JSON const& value)
             "JSONReactor::makeObject didn't initialize the object");
     }
 
-    // QXXXQ include object number in description
-    result.setObjectDescription(
-        &this->pdf,
-        this->is->getName() + " offset " +
-            QUtil::uint_to_string(value.getStart()));
+    std::string description = this->is->getName();
+    if (!this->cur_object.empty()) {
+        description += " " + this->cur_object + ",";
+    }
+    description += " offset " + QUtil::uint_to_string(value.getStart());
+    result.setObjectDescription(&this->pdf, description);
     return result;
 }
 

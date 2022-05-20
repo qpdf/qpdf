@@ -58,15 +58,10 @@ Some of this documentation has drifted from the actual implementation.
 
 Make sure pages tree repair generates warnings.
 
-* Reread from perspective of update
-* Test all ignore cases with QTC
-* Test case of correct file with dict before data/datafile
 * Have a test case if possible that exercises the object description
   which means we need some kind of semantic error that gets caught
   after creation.
 * Test invalid data, invalid data file
-* Tests: round-trip through json, round-trip through qpdf --qdf
-* Test to see if we get CR/NL on Windows, which is okay
 
 Try to never flatten pages tree. Make sure we do something reasonable
 with pages tree repair. The problem is that if pages tree repair is
@@ -104,22 +99,20 @@ JSON to PDF:
 
 Have --json-input and --update-from-json. With --json-input, the json
 file must be complete, meaning all stream data, the trailer, and the
-PDF version must be present. In --update-from-json, an object
-explicitly set to null (not "value": null) is deleted. For streams
-with no stream data, the dictionary is updated but the data is left
-untouched. Other things that are omitted are left alone. Make sure
-document that, when writing a PDF file from QPDF, there is no
-expectation of object numbers being preserved. As such,
---update-from-json can only be used to update the exact file that the
-json was created from. You can put multiple objects in the update
-file, but you can't use a json from one file to update the output of a
-previous update since the object numbers will have changed. Note that,
-when creating from a JSON, object numbers are preserved in the
-resulting QPDF object but still modified by QPDFWriter for the output.
-This would be visible by combining --json-output and --json-input.
-Also using --qdf with --create-from-json would show original object
-IDs in comments. It will be important to capture this in the
-documentation.
+PDF version must be present. For streams with no stream data, the
+dictionary is updated but the data is left untouched. Other things
+that are omitted are left alone. Make sure document that, when writing
+a PDF file from QPDF, there is no expectation of object numbers being
+preserved. As such, --update-from-json can only be used to update the
+exact file that the json was created from. You can put multiple
+objects in the update file, but you can't use a json from one file to
+update the output of a previous update since the object numbers will
+have changed. Note that, when creating from a JSON, object numbers are
+preserved in the resulting QPDF object but still modified by
+QPDFWriter for the output. This would be visible by combining
+--json-output and --json-input. Also using --qdf with
+--create-from-json would show original object IDs in comments. It will
+be important to capture this in the documentation.
 
 When reading a JSON string, any string that doesn't look like a name
 or indirect object or start with "b:" or "u:" should be considered an
