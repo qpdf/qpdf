@@ -37,6 +37,7 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/PointerHolder.hh>
+#include <qpdf/Types.h>
 
 #include <functional>
 #include <list>
@@ -299,13 +300,13 @@ class JSON
     // non-inclusive end offsets of an object relative to its input
     // string. Otherwise, both values are 0.
     QPDF_DLL
-    void setStart(size_t);
+    void setStart(qpdf_offset_t);
     QPDF_DLL
-    void setEnd(size_t);
+    void setEnd(qpdf_offset_t);
     QPDF_DLL
-    size_t getStart() const;
+    qpdf_offset_t getStart() const;
     QPDF_DLL
-    size_t getEnd() const;
+    qpdf_offset_t getEnd() const;
 
   private:
     static std::string encode_string(std::string const& utf8);
@@ -391,8 +392,8 @@ class JSON
 
         std::shared_ptr<JSON_value> value;
         // start and end are only populated for objects created by parse
-        size_t start;
-        size_t end;
+        qpdf_offset_t start;
+        qpdf_offset_t end;
     };
 
     std::shared_ptr<Members> m;

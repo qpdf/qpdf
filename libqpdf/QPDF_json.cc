@@ -197,14 +197,14 @@ QPDF::test_json_validators()
 }
 
 static std::function<void(Pipeline*)>
-provide_data(std::shared_ptr<InputSource> is, size_t start, size_t end)
+provide_data(std::shared_ptr<InputSource> is, qpdf_offset_t start, qpdf_offset_t end)
 {
     return [is, start, end](Pipeline* p) {
         Pl_Base64 decode("base64-decode", p, Pl_Base64::a_decode);
         p = &decode;
-        size_t bytes = end - start;
+        size_t bytes = QIntC::to_size(end - start);
         char buf[8192];
-        is->seek(QIntC::to_offset(start), SEEK_SET);
+        is->seek(start, SEEK_SET);
         size_t len = 0;
         while ((len = is->read(buf, std::min(bytes, sizeof(buf)))) > 0) {
             p->write(buf, len);
@@ -241,14 +241,14 @@ QPDF::JSONReactor::JSONReactor(
 }
 
 void
-QPDF::JSONReactor::error(size_t offset, std::string const& msg)
+QPDF::JSONReactor::error(qpdf_offset_t offset, std::string const& msg)
 {
     this->errors = true;
     std::string object = this->cur_object;
     if (is->getName() != pdf.getFilename()) {
         object += " from " + is->getName();
     }
-    this->pdf.warn(qpdf_e_json, object, QIntC::to_offset(offset), msg);
+    this->pdf.warn(qpdf_e_json, object, offset, msg);
 }
 
 bool
@@ -616,7 +616,7 @@ QPDF::JSONReactor::setObjectDescription(QPDFObjectHandle& oh, JSON const& value)
     if (!this->cur_object.empty()) {
         description += ", " + this->cur_object;
     }
-    description += " at offset " + QUtil::uint_to_string(value.getStart());
+    description += " at offset " + QUtil::int_to_string(value.getStart());
     oh.setObjectDescription(&this->pdf, description);
 }
 

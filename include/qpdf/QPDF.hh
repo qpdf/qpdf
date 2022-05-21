@@ -1046,7 +1046,7 @@ class QPDF
         void nestedState(std::string const& key, JSON const& value, state_e);
         void setObjectDescription(QPDFObjectHandle& oh, JSON const& value);
         QPDFObjectHandle makeObject(JSON const& value);
-        void error(size_t offset, std::string const& message);
+        void error(qpdf_offset_t offset, std::string const& message);
         QPDFObjectHandle
         reserveObject(int obj, int gen);
         void replaceObject(
