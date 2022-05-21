@@ -18,6 +18,8 @@ my @tests = (
     ['shared resource check', ['--split-pages', '--remove-unreferenced-resources=auto']],
     ['linearize', ['--linearize']],
     ['encrypt', ['--encrypt', 'u', 'o', '256', '--']],
+    ['json-output', ['--json-output']],
+    ['json-input', ['--json-input']],
     );
 
 # If arg is not found in help output, look here. If not here, skip test.
@@ -34,12 +36,14 @@ my $test_dir = undef;
 my $test_file = undef;
 my $workdir = undef;
 my $maxtime = undef;
+my $iterations = undef;
 
 my $default_executable = 'build/qpdf/qpdf';
 my $default_test_dir = '../performance-test-files';
 my $default_test_file = undef;
 my $default_workdir = 'build/perf';
 my $default_maxtime = 20;
+my $default_iterations = 20;
 
 sub usage
 {
@@ -50,6 +54,7 @@ Usage: $whoami [ args ]
   --executable qpdf   use the specified qpdf (default: $default_executable)
   --workdir           where to write output pdfs (default: $default_workdir)
   --maxtime           maximum time for a test; 0 means unlimited (default: $default_maxtime)
+  --iterations        number of iterations (default: $default_iterations)
 ";
 }
 
@@ -83,6 +88,11 @@ while (@ARGV)
         usage() unless @ARGV;
         $maxtime = shift(@ARGV);
     }
+    elsif ('--iterations' eq $arg)
+    {
+        usage() unless @ARGV;
+        $iterations = shift(@ARGV);
+    }
     else
     {
         usage();
@@ -105,21 +115,40 @@ if (! defined $maxtime)
 {
     $maxtime = $default_maxtime;
 }
+if (! defined $iterations)
+{
+    $iterations = $default_iterations;
+}
 
 my @test_files = ();
-if (defined $test_file)
-{
-    push(@test_files, $test_file);
-}
-else
-{
-    opendir(D, $test_dir) or
-        die "$whoami: can't open directory $test_dir: $!\n";
-    my @entries = readdir(D);
-    closedir(D);
-    for (sort @entries)
+my @json_test_files = ();
+{ # private scope
+    my @tmp = ();
+    if (defined $test_file)
     {
-        push(@test_files, "$test_dir/$_") unless (('.' eq $_) || ('..' eq $_));
+        push(@tmp, $test_file);
+    }
+    else
+    {
+        opendir(D, $test_dir) or
+            die "$whoami: can't open directory $test_dir: $!\n";
+        my @entries = readdir(D);
+        closedir(D);
+        for (sort @entries)
+        {
+            push(@tmp, "$test_dir/$_") unless (('.' eq $_) || ('..' eq $_));
+        }
+    }
+    foreach my $i (@tmp)
+    {
+        if ($i =~ m/.json$/)
+        {
+            push(@json_test_files, $i);
+        }
+        else
+        {
+            push(@test_files, $i);
+        }
     }
 }
 
@@ -173,7 +202,16 @@ sub run_tests
             print "  skipping (unknown arguments)\n";
             next;
         }
-        foreach my $file (@test_files)
+        my $test_files = \@test_files;
+        foreach my $arg (@$args)
+        {
+            if ($arg eq '--json-input')
+            {
+                $test_files = \@json_test_files;
+                last;
+            }
+        }
+        foreach my $file (@$test_files)
         {
             my $time = run_test($file, $args);
             if (defined $time)
@@ -192,8 +230,16 @@ sub run_test
 {
     my ($file, $args) = @_;
 
-    my $iterations = 20;
-    my @cmd = ($executable, @$args, $file, "$workdir/out.pdf");
+    my $outfile = "out.pdf";
+    foreach my $arg (@$args)
+    {
+        if ($arg eq '--json-output')
+        {
+            $outfile = "out.json";
+            last;
+        }
+    }
+    my @cmd = ($executable, @$args, $file, "$workdir/$outfile");
     # Run once and discard to update caches
     system("sync");
     system(@cmd);

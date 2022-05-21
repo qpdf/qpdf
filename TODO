@@ -84,9 +84,6 @@ General things to remember:
   non-compatible json 2 changes. Scrutinize all the output to decide
   what should change.
 
-* When we get to full serialization, add json serialization
-  performance test.
-
 * Document that keys other than "qpdf-v2" are ignored so people can
   stash their own stuff.
 
