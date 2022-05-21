@@ -128,7 +128,7 @@ is_binary_string(std::string const& v, std::string& str)
             }
             ++count;
         }
-        return ((count > 0) && (count % 2 == 0));
+        return (count % 2 == 0);
     }
     return false;
 }
@@ -180,10 +180,10 @@ QPDF::test_json_validators()
     check(str == "");
     check(!is_binary_string("", str));
     check(!is_binary_string("x:", str));
-    check(!is_binary_string("b:", str));
     check(!is_binary_string("b:1", str));
     check(!is_binary_string("b:123", str));
     check(!is_binary_string("b:gh", str));
+    check(is_binary_string("b:", str));
     check(is_binary_string("b:12", str));
     check(is_binary_string("b:123aBC", str));
     check(!is_name(""));
