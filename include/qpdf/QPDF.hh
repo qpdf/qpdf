@@ -41,6 +41,7 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDFPagesTree.hh>
 #include <qpdf/QPDFStreamFilter.hh>
 #include <qpdf/QPDFTokenizer.hh>
 #include <qpdf/QPDFXRefEntry.hh>
@@ -693,6 +694,13 @@ class QPDF
         std::map<int, int> const& object_stream_data,
         bool allow_changes = true,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters = nullptr);
+
+    // Return a QPDFPagesTree for this file. The pages tree is not
+    // immediately traversed. You can iterate over the result and
+    // perform various manipulations on the pages tree. See comments
+    // in QPDFPagesTree.hh for additional details.
+    QPDF_DLL
+    QPDFPagesTree getPagesTree();
 
     // Traverse page tree return all /Page objects. It also detects
     // and resolves cases in which the same /Page object is
