@@ -2,5 +2,6 @@ checking pages-loop.pdf
 PDF Version: 1.3
 File is not encrypted
 File is not linearized
-ERROR: pages-loop.pdf (object 3 0): Loop detected in /Pages structure (getAllPages)
-qpdf: errors detected
+WARNING: pages-loop.pdf (page tree node (object 2)): loop detected while traversing pages tree
+WARNING: pages-loop.pdf (page tree node (object 2)): loop detected while traversing pages tree
+qpdf: operation succeeded with warnings
