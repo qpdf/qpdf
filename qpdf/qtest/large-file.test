@@ -10,8 +10,6 @@ chdir("qpdf") or die "chdir testdir failed: $!\n";
 
 require TestDriver;
 
-cleanup();
-
 my $td = new TestDriver('large-file');
 
 my $large_file_test_path = $ENV{'QPDF_LARGE_FILE_TEST_PATH'} || undef;
@@ -21,6 +19,7 @@ if (defined($large_file_test_path))
     $large_file_test_path =~ s!\\!/!g;
 }
 
+large_cleanup();
 
 my $nlarge = 1;
 if (defined $large_file_test_path)
@@ -32,12 +31,17 @@ else
     $td->notify("--- Skipping tests on actual large files ---");
 }
 
-my $n_tests = $nlarge * 13;
+my $n_tests = $nlarge * 21;
 for (my $large = 0; $large < $nlarge; ++$large)
 {
+    my $now = time();
+    my $show_time = sub {};
     if ($large)
     {
         $td->notify("--- Running tests on actual large files ---");
+        $show_time = sub {
+            $td->notify("--- time: " . (time() - $now));
+        };
     }
     else
     {
@@ -45,19 +49,69 @@ for (my $large = 0; $large < $nlarge; ++$large)
     }
     my $size = ($large ? "large" : "small");
     my $file = $large ? "$large_file_test_path/a.pdf" : "a.pdf";
+    my $json = $large ? "$large_file_test_path/a.json" : "a.json";
+    # Pick a stream near the end of the file to test.
+    my $stream = $large ? "$large_file_test_path/a.json-603" : "a.json-603";
+    $now = time();
     $td->runtest("write test file",
                  {$td->COMMAND => "test_large_file write $size '$file'"},
                  {$td->FILE => "large_file.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
+    &$show_time();
+    $now = time();
     $td->runtest("read test file",
                  {$td->COMMAND => "test_large_file read $size '$file'"},
                  {$td->FILE => "large_file.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
+    &$show_time();
     $td->runtest("check",
                  {$td->COMMAND => "qpdf --suppress-recovery --check '$file'",
                   $td->FILTER => "grep -v checking"},
                  {$td->FILE => "large_file-check-normal.out",
                   $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+
+    $now = time();
+    $td->runtest("large to json inline",
+                 {$td->COMMAND => "qpdf --json-output '$file' '$json'"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    &$show_time();
+    $now = time();
+    $td->runtest("json inline to large",
+                 {$td->COMMAND =>
+                      "qpdf --json-input --compress-streams=n" .
+                      " --static-id '$json' '$file'"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    &$show_time();
+    $td->runtest("read test file",
+                 {$td->COMMAND => "test_large_file read $size '$file'"},
+                 {$td->FILE => "large_file.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $now = time();
+    $td->runtest("large to json with file",
+                 {$td->COMMAND =>
+                      "qpdf --json-output --json-stream-data=file" .
+                      " '$file' '$json'"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    &$show_time();
+    $td->runtest("inspect json",
+                 {$td->FILE => $json, $td->FILTER => "perl filter-json.pl"},
+                 {$td->FILE => "exp-large-json.json"},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("spot check stream",
+                 {$td->FILE => $stream},
+                 {$td->FILE => "exp-large-stream"},
+                 $td->NORMALIZE_NEWLINES);
+    $now = time();
+    $td->runtest("json with file to large",
+                 {$td->COMMAND =>
+                      "qpdf --json-input" .
+                      " --compress-streams=n '$json' '$file'"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    &$show_time();
+    $td->runtest("read test file",
+                 {$td->COMMAND => "test_large_file read $size '$file'"},
+                 {$td->FILE => "large_file.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 
     for my $ostream (0, 1)
@@ -126,7 +180,20 @@ for (my $large = 0; $large < $nlarge; ++$large)
                   $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     unlink $file;
+    large_cleanup();
 }
 
-cleanup();
+large_cleanup();
+
+sub large_cleanup
+{
+    cleanup();
+    system("rm -f a.json* a.pdf*");
+    if (defined $large_file_test_path)
+    {
+        system("rm -f $large_file_test_path/a.pdf*" .
+               " $large_file_test_path/a.json*");
+    }
+}
+
 $td->report($n_tests);
