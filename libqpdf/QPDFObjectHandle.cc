@@ -1240,12 +1240,10 @@ QPDFObjectHandle::getResourceNames()
     if (!isDictionary()) {
         return result;
     }
-    std::set<std::string> keys = getKeys();
-    for (auto const& key: keys) {
+    for (auto const& key: getKeys()) {
         QPDFObjectHandle val = getKey(key);
         if (val.isDictionary()) {
-            std::set<std::string> val_keys = val.getKeys();
-            for (auto const& val_key: val_keys) {
+            for (auto const& val_key: val.getKeys()) {
                 result.insert(val_key);
             }
         }
@@ -1642,14 +1640,12 @@ QPDFObjectHandle::addPageContents(QPDFObjectHandle new_contents, bool first)
 {
     new_contents.assertStream();
 
-    std::vector<QPDFObjectHandle> orig_contents = getPageContents();
-
     std::vector<QPDFObjectHandle> content_streams;
     if (first) {
         QTC::TC("qpdf", "QPDFObjectHandle prepend page contents");
         content_streams.push_back(new_contents);
     }
-    for (auto const& iter: orig_contents) {
+    for (auto const& iter: getPageContents()) {
         QTC::TC("qpdf", "QPDFObjectHandle append page contents");
         content_streams.push_back(iter);
     }
@@ -1657,8 +1653,7 @@ QPDFObjectHandle::addPageContents(QPDFObjectHandle new_contents, bool first)
         content_streams.push_back(new_contents);
     }
 
-    QPDFObjectHandle contents = QPDFObjectHandle::newArray(content_streams);
-    this->replaceKey("/Contents", contents);
+    this->replaceKey("/Contents", newArray(content_streams));
 }
 
 void
@@ -2927,9 +2922,8 @@ QPDFObjectHandle::copyObject(
         new_obj = std::shared_ptr<QPDFObject>(new QPDF_Array(items));
     } else if (isDictionary()) {
         QTC::TC("qpdf", "QPDFObjectHandle clone dictionary");
-        std::set<std::string> keys = getKeys();
         std::map<std::string, QPDFObjectHandle> items;
-        for (auto const& key: keys) {
+        for (auto const& key: getKeys()) {
             items[key] = getKey(key);
             if ((!first_level_only) &&
                 (cross_indirect || (!items[key].isIndirect()))) {

@@ -867,11 +867,9 @@ QPDFJob::doCheck(QPDF& pdf)
         w.write();
 
         // Parse all content streams
-        QPDFPageDocumentHelper dh(pdf);
-        std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
         DiscardContents discard_contents;
         int pageno = 0;
-        for (auto& page: pages) {
+        for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
             ++pageno;
             try {
                 page.parseContents(&discard_contents);
@@ -939,11 +937,9 @@ QPDFJob::doShowObj(QPDF& pdf)
 void
 QPDFJob::doShowPages(QPDF& pdf)
 {
-    QPDFPageDocumentHelper dh(pdf);
-    std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     int pageno = 0;
     auto& cout = *this->m->cout;
-    for (auto& ph: pages) {
+    for (auto& ph: QPDFPageDocumentHelper(pdf).getAllPages()) {
         QPDFObjectHandle page = ph.getObjectHandle();
         ++pageno;
 
@@ -966,8 +962,7 @@ QPDFJob::doShowPages(QPDF& pdf)
         }
 
         cout << "  content:" << std::endl;
-        std::vector<QPDFObjectHandle> content = ph.getPageContents();
-        for (auto& iter2: content) {
+        for (auto& iter2: ph.getPageContents()) {
             cout << "    " << iter2.unparse() << std::endl;
         }
     }
@@ -1085,8 +1080,7 @@ QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
     JSON::writeDictionaryOpen(p, first_object, 1);
     bool all_objects = m->json_objects.empty();
     std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
-    std::vector<QPDFObjectHandle> objects = pdf.getAllObjects();
-    for (auto& obj: objects) {
+    for (auto& obj: pdf.getAllObjects()) {
         std::string key = obj.unparse();
         if (this->m->json_version > 1) {
             key = "obj:" + key;
@@ -1140,20 +1134,17 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
     JSON::writeDictionaryKey(p, first, "pages", 0);
     bool first_page = true;
     JSON::writeArrayOpen(p, first_page, 1);
-    QPDFPageDocumentHelper pdh(pdf);
     QPDFPageLabelDocumentHelper pldh(pdf);
     QPDFOutlineDocumentHelper odh(pdf);
-    std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
     int pageno = -1;
-    for (auto& ph: pages) {
+    for (auto& ph: QPDFPageDocumentHelper(pdf).getAllPages()) {
         ++pageno;
         JSON j_page = JSON::makeDictionary();
         QPDFObjectHandle page = ph.getObjectHandle();
         j_page.addDictionaryMember(
             "object", page.getJSON(this->m->json_version));
         JSON j_images = j_page.addDictionaryMember("images", JSON::makeArray());
-        std::map<std::string, QPDFObjectHandle> images = ph.getImages();
-        for (auto const& iter2: images) {
+        for (auto const& iter2: ph.getImages()) {
             JSON j_image = j_images.addArrayElement(JSON::makeDictionary());
             j_image.addDictionaryMember("name", JSON::makeString(iter2.first));
             QPDFObjectHandle image = iter2.second;
@@ -1195,8 +1186,7 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
         j_page.addDictionaryMember("images", j_images);
         JSON j_contents =
             j_page.addDictionaryMember("contents", JSON::makeArray());
-        std::vector<QPDFObjectHandle> content = ph.getPageContents();
-        for (auto& iter2: content) {
+        for (auto& iter2: ph.getPageContents()) {
             j_contents.addArrayElement(iter2.getJSON(this->m->json_version));
         }
         j_page.addDictionaryMember(
@@ -1285,10 +1275,8 @@ void
 QPDFJob::doJSONOutlines(Pipeline* p, bool& first, QPDF& pdf)
 {
     std::map<QPDFObjGen, int> page_numbers;
-    QPDFPageDocumentHelper dh(pdf);
-    std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     int n = 0;
-    for (auto const& ph: pages) {
+    for (auto const& ph: QPDFPageDocumentHelper(pdf).getAllPages()) {
         QPDFObjectHandle oh = ph.getObjectHandle();
         page_numbers[oh.getObjGen()] = ++n;
     }
@@ -1309,14 +1297,10 @@ QPDFJob::doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf)
     j_acroform.addDictionaryMember(
         "needappearances", JSON::makeBool(afdh.getNeedAppearances()));
     JSON j_fields = j_acroform.addDictionaryMember("fields", JSON::makeArray());
-    QPDFPageDocumentHelper pdh(pdf);
-    std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
     int pagepos1 = 0;
-    for (auto const& page: pages) {
+    for (auto const& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
         ++pagepos1;
-        std::vector<QPDFAnnotationObjectHelper> annotations =
-            afdh.getWidgetAnnotationsForPage(page);
-        for (auto& aoh: annotations) {
+        for (auto& aoh: afdh.getWidgetAnnotationsForPage(page)) {
             QPDFFormFieldObjectHelper ffh = afdh.getFieldForAnnotation(aoh);
             JSON j_field = j_fields.addArrayElement(JSON::makeDictionary());
             j_field.addDictionaryMember(
@@ -1355,8 +1339,7 @@ QPDFJob::doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf)
             j_field.addDictionaryMember("istext", JSON::makeBool(ffh.isText()));
             JSON j_choices =
                 j_field.addDictionaryMember("choices", JSON::makeArray());
-            std::vector<std::string> choices = ffh.getChoices();
-            for (auto const& choice: choices) {
+            for (auto const& choice: ffh.getChoices()) {
                 j_choices.addArrayElement(JSON::makeString(choice));
             }
             JSON j_annot = j_field.addDictionaryMember(
@@ -2282,19 +2265,16 @@ QPDFJob::handleTransformations(QPDF& pdf)
     };
     if (m->externalize_inline_images ||
         (m->optimize_images && (!m->keep_inline_images))) {
-        std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
-        for (auto& ph: pages) {
+        for (auto& ph: dh.getAllPages()) {
             ph.externalizeInlineImages(m->ii_min_bytes);
         }
     }
     if (m->optimize_images) {
         int pageno = 0;
-        std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
-        for (auto& ph: pages) {
+        for (auto& ph: dh.getAllPages()) {
             ++pageno;
             QPDFObjectHandle page = ph.getObjectHandle();
-            std::map<std::string, QPDFObjectHandle> images = ph.getImages();
-            for (auto& iter2: images) {
+            for (auto& iter2: ph.getImages()) {
                 std::string name = iter2.first;
                 QPDFObjectHandle& image = iter2.second;
                 ImageOptimizer* io = new ImageOptimizer(
@@ -2330,8 +2310,7 @@ QPDFJob::handleTransformations(QPDF& pdf)
             m->flatten_annotations_required, m->flatten_annotations_forbidden);
     }
     if (m->coalesce_contents) {
-        std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
-        for (auto& page: pages) {
+        for (auto& page: dh.getAllPages()) {
             page.coalesceContentStreams();
         }
     }
@@ -2805,9 +2784,7 @@ QPDFJob::handleRotations(QPDF& pdf)
         std::string const& range = iter.first;
         QPDFJob::RotationSpec const& rspec = iter.second;
         // range has been previously validated
-        std::vector<int> to_rotate =
-            QUtil::parse_numrange(range.c_str(), npages);
-        for (int pageno_iter: to_rotate) {
+        for (int pageno_iter: QUtil::parse_numrange(range.c_str(), npages)) {
             int pageno = pageno_iter - 1;
             if ((pageno >= 0) && (pageno < npages)) {
                 pages.at(QIntC::to_size(pageno))

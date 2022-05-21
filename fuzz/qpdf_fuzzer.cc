@@ -131,10 +131,9 @@ FuzzHelper::testPages()
     QPDFAcroFormDocumentHelper afdh(*q);
     afdh.generateAppearancesIfNeeded();
     pdh.flattenAnnotations();
-    std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
     DiscardContents discard_contents;
     int pageno = 0;
-    for (auto& page: pages) {
+    for (auto& page: pdh.getAllPages()) {
         ++pageno;
         try {
             page.coalesceContentStreams();
@@ -145,9 +144,7 @@ FuzzHelper::testPages()
             page_obj.getJSON(JSON::LATEST, true).unparse();
             odh.getOutlinesForPage(page_obj.getObjGen());
 
-            std::vector<QPDFAnnotationObjectHelper> annotations =
-                afdh.getWidgetAnnotationsForPage(page);
-            for (auto& aoh: annotations) {
+            for (auto& aoh: afdh.getWidgetAnnotationsForPage(page)) {
                 afdh.getFieldForAnnotation(aoh);
             }
         } catch (QPDFExc& e) {
@@ -164,8 +161,7 @@ FuzzHelper::testOutlines()
     QPDFOutlineDocumentHelper odh(*q);
     queue.push_back(odh.getTopLevelOutlines());
     while (!queue.empty()) {
-        std::vector<QPDFOutlineObjectHelper>& outlines = *(queue.begin());
-        for (auto& ol: outlines) {
+        for (auto& ol: *(queue.begin())) {
             ol.getDestPage();
             queue.push_back(ol.getKids());
         }

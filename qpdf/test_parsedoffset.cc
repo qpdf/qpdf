@@ -51,8 +51,7 @@ walk(
     result[stream_number].push_back(p);
 
     if (obj.isArray()) {
-        std::vector<QPDFObjectHandle> array = obj.getArrayAsVector();
-        for (auto& oh: array) {
+        for (auto& oh: obj.getArrayAsVector()) {
             if (!oh.isIndirect()) {
                 // QPDF::GetAllObjects() enumerates all indirect objects.
                 // So only the direct objects are recursed here.
@@ -60,8 +59,7 @@ walk(
             }
         }
     } else if (obj.isDictionary()) {
-        std::set<std::string> keys = obj.getKeys();
-        for (auto const& key: keys) {
+        for (auto const& key: obj.getKeys()) {
             QPDFObjectHandle item = obj.getKey(key);
             if (!item.isIndirect()) {
                 // QPDF::GetAllObjects() enumerates all indirect objects.
@@ -81,10 +79,9 @@ process(
 {
     QPDF qpdf;
     qpdf.processFile(fn.c_str());
-    std::vector<QPDFObjectHandle> objs = qpdf.getAllObjects();
     std::map<QPDFObjGen, QPDFXRefEntry> xrefs = qpdf.getXRefTable();
 
-    for (auto const& oh: objs) {
+    for (auto const& oh: qpdf.getAllObjects()) {
         if (xrefs.count(oh.getObjGen()) == 0) {
             std::cerr << oh.getObjectID() << "/" << oh.getGeneration()
                       << " is not found in xref table" << std::endl;

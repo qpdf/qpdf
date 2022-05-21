@@ -1237,8 +1237,7 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
             }
         }
     } else if (object.isDictionary()) {
-        std::set<std::string> keys = object.getKeys();
-        for (auto const& key: keys) {
+        for (auto const& key: object.getKeys()) {
             if (!this->m->linearized) {
                 enqueueObject(object.getKey(key));
             }
@@ -1283,8 +1282,7 @@ QPDFWriter::writeTrailer(
         writeString(" /Size ");
         writeString(QUtil::int_to_string(size));
     } else {
-        std::set<std::string> keys = trailer.getKeys();
-        for (auto const& key: keys) {
+        for (auto const& key: trailer.getKeys()) {
             writeStringQDF("  ");
             writeStringNoQDF(" ");
             writeString(QPDF_Name::normalizeName(key));
@@ -1644,8 +1642,7 @@ QPDFWriter::unparseObject(
         writeString("<<");
         writeStringQDF("\n");
 
-        std::set<std::string> keys = object.getKeys();
-        for (auto const& key: keys) {
+        for (auto const& key: object.getKeys()) {
             writeStringQDF(indent);
             writeStringQDF("  ");
             writeStringNoQDF(" ");
@@ -2074,8 +2071,7 @@ QPDFWriter::generateID()
         seed += " QPDF ";
         if (trailer.hasKey("/Info")) {
             QPDFObjectHandle info = trailer.getKey("/Info");
-            std::set<std::string> keys = info.getKeys();
-            for (auto const& key: keys) {
+            for (auto const& key: info.getKeys()) {
                 QPDFObjectHandle obj = info.getKey(key);
                 if (obj.isString()) {
                     seed += " ";
@@ -2365,8 +2361,7 @@ QPDFWriter::doWriteSetup()
 
     if (this->m->linearized) {
         // Page dictionaries are not allowed to be compressed objects.
-        std::vector<QPDFObjectHandle> pages = this->m->pdf.getAllPages();
-        for (auto& page: pages) {
+        for (auto& page: this->m->pdf.getAllPages()) {
             QPDFObjGen og = page.getObjGen();
             if (this->m->object_to_object_stream.count(og)) {
                 QTC::TC("qpdf", "QPDFWriter uncompressing page dictionary");
@@ -3251,8 +3246,7 @@ QPDFWriter::enqueueObjectsStandard()
     // dictionary into the queue, handling direct objects recursively.
     // Root is already there, so enqueuing it a second time is a
     // no-op.
-    std::set<std::string> keys = trailer.getKeys();
-    for (auto const& key: keys) {
+    for (auto const& key: trailer.getKeys()) {
         enqueueObject(trailer.getKey(key));
     }
 }
@@ -3276,8 +3270,7 @@ QPDFWriter::enqueueObjectsPCLm()
 
         // enqueue all the strips for each page
         QPDFObjectHandle strips = page.getKey("/Resources").getKey("/XObject");
-        std::set<std::string> keys = strips.getKeys();
-        for (auto const& image: keys) {
+        for (auto const& image: strips.getKeys()) {
             enqueueObject(strips.getKey(image));
             enqueueObject(QPDFObjectHandle::newStream(
                 &this->m->pdf, image_transform_content));

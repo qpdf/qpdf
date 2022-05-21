@@ -198,10 +198,8 @@ process(char const* filename, bool include_ignorable, size_t max_len)
     // Tokenize content streams, skipping inline images
     QPDF qpdf;
     qpdf.processFile(filename);
-    std::vector<QPDFPageObjectHelper> pages =
-        QPDFPageDocumentHelper(qpdf).getAllPages();
     int pageno = 0;
-    for (auto& page: pages) {
+    for (auto& page: QPDFPageDocumentHelper(qpdf).getAllPages()) {
         ++pageno;
         Pl_Buffer plb("buffer");
         page.pipeContents(&plb);

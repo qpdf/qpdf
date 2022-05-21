@@ -90,8 +90,7 @@ QPDF::optimize(
     }
 
     // Traverse document-level items
-    std::set<std::string> keys = this->m->trailer.getKeys();
-    for (auto const& key: keys) {
+    for (auto const& key: this->m->trailer.getKeys()) {
         if (key == "/Root") {
             // handled separately
         } else {
@@ -102,8 +101,7 @@ QPDF::optimize(
         }
     }
 
-    keys = root.getKeys();
-    for (auto const& key: keys) {
+    for (auto const& key: root.getKeys()) {
         // Technically, /I keys from /Thread dictionaries are supposed
         // to be handled separately, but we are going to disregard
         // that specification for now.  There is loads of evidence
@@ -205,8 +203,7 @@ QPDF::pushInheritedAttributesToPageInternal(
         // that have values for this attribute.
 
         std::set<std::string> inheritable_keys;
-        std::set<std::string> keys = cur_pages.getKeys();
-        for (auto const& key: keys) {
+        for (auto const& key: cur_pages.getKeys()) {
             if ((key == "/MediaBox") || (key == "/CropBox") ||
                 (key == "/Resources") || (key == "/Rotate")) {
                 if (!allow_changes) {
@@ -387,8 +384,7 @@ QPDF::updateObjectMapsInternal(
             }
         }
 
-        std::set<std::string> keys = dict.getKeys();
-        for (auto const& key: keys) {
+        for (auto const& key: dict.getKeys()) {
             if (is_page_node && (key == "/Thumb")) {
                 // Traverse page thumbnail dictionaries as a special
                 // case.
@@ -437,8 +433,8 @@ QPDF::filterCompressedObjects(std::map<int, int> const& object_stream_data)
 
     for (auto const& i1: this->m->obj_user_to_objects) {
         ObjUser const& ou = i1.first;
-        std::set<QPDFObjGen> const& objects = i1.second;
-        for (auto const& og: objects) {
+        // Loop over objects.
+        for (auto const& og: i1.second) {
             auto i2 = object_stream_data.find(og.getObj());
             if (i2 == object_stream_data.end()) {
                 t_obj_user_to_objects[ou].insert(og);
@@ -450,8 +446,8 @@ QPDF::filterCompressedObjects(std::map<int, int> const& object_stream_data)
 
     for (auto const& i1: this->m->object_to_obj_users) {
         QPDFObjGen const& og = i1.first;
-        std::set<ObjUser> const& objusers = i1.second;
-        for (auto const& ou: objusers) {
+        // Loop over obj_users.
+        for (auto const& ou: i1.second) {
             auto i2 = object_stream_data.find(og.getObj());
             if (i2 == object_stream_data.end()) {
                 t_object_to_obj_users[og].insert(ou);

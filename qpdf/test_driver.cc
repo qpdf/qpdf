@@ -377,15 +377,12 @@ test_4(QPDF& pdf, char const* arg2)
 static void
 test_5(QPDF& pdf, char const* arg2)
 {
-    QPDFPageDocumentHelper dh(pdf);
-    std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     int pageno = 0;
-    for (auto& page: pages) {
+    for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
         ++pageno;
         std::cout << "page " << pageno << ":" << std::endl;
         std::cout << "  images:" << std::endl;
-        std::map<std::string, QPDFObjectHandle> images = page.getImages();
-        for (auto const& iter2: images) {
+        for (auto const& iter2: page.getImages()) {
             std::string const& name = iter2.first;
             QPDFObjectHandle image = iter2.second;
             QPDFObjectHandle dict = image.getDict();
@@ -1319,9 +1316,7 @@ static void
 test_37(QPDF& pdf, char const* arg2)
 {
     // Parse content streams of all pages
-    std::vector<QPDFPageObjectHelper> pages =
-        QPDFPageDocumentHelper(pdf).getAllPages();
-    for (auto& page: pages) {
+    for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
         ParserCallbacks cb;
         page.parseContents(&cb);
     }
@@ -1341,10 +1336,8 @@ static void
 test_39(QPDF& pdf, char const* arg2)
 {
     // Display image filter and color set for each image on each page
-    std::vector<QPDFPageObjectHelper> pages =
-        QPDFPageDocumentHelper(pdf).getAllPages();
     int pageno = 0;
-    for (auto& page: pages) {
+    for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
         std::cout << "page " << ++pageno << std::endl;
         std::map<std::string, QPDFObjectHandle> images = page.getImages();
         for (auto& i_iter: images) {
@@ -1377,9 +1370,7 @@ test_41(QPDF& pdf, char const* arg2)
 {
     // Apply a token filter. This test case is crafted to work
     // with coalesce.pdf.
-    std::vector<QPDFPageObjectHelper> pages =
-        QPDFPageDocumentHelper(pdf).getAllPages();
-    for (auto& page: pages) {
+    for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
         page.addContentTokenFilter(
             std::shared_ptr<QPDFObjectHandle::TokenFilter>(new TokenFilter()));
     }
@@ -1509,8 +1500,7 @@ test_43(QPDF& pdf, char const* arg2)
         return;
     }
     std::cout << "iterating over form fields\n";
-    std::vector<QPDFFormFieldObjectHelper> form_fields = afdh.getFormFields();
-    for (auto& ffh: form_fields) {
+    for (auto& ffh: afdh.getFormFields()) {
         std::cout << "Field: " << ffh.getObjectHandle().unparse() << std::endl;
         QPDFFormFieldObjectHelper node = ffh;
         while (!node.isNull()) {
@@ -1548,9 +1538,7 @@ test_43(QPDF& pdf, char const* arg2)
     std::cout << "iterating over annotations per page\n";
     for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
         std::cout << "Page: " << page.getObjectHandle().unparse() << std::endl;
-        std::vector<QPDFAnnotationObjectHelper> annotations =
-            afdh.getWidgetAnnotationsForPage(page);
-        for (auto& ah: annotations) {
+        for (auto& ah: afdh.getWidgetAnnotationsForPage(page)) {
             std::cout << "  Annotation: " << ah.getObjectHandle().unparse()
                       << std::endl;
             std::cout
@@ -1578,9 +1566,7 @@ static void
 test_44(QPDF& pdf, char const* arg2)
 {
     // Set form fields.
-    QPDFAcroFormDocumentHelper afdh(pdf);
-    std::vector<QPDFFormFieldObjectHelper> fields = afdh.getFormFields();
-    for (auto& field: fields) {
+    for (auto& field: QPDFAcroFormDocumentHelper(pdf).getFormFields()) {
         QPDFObjectHandle ft = field.getInheritableFieldValue("/FT");
         if (ft.isName() && (ft.getName() == "/Tx")) {
             // \xc3\xb7 is utf-8 for U+00F7 (divided by)

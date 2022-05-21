@@ -12,9 +12,8 @@ QPDFPageDocumentHelper::QPDFPageDocumentHelper(QPDF& qpdf) :
 std::vector<QPDFPageObjectHelper>
 QPDFPageDocumentHelper::getAllPages()
 {
-    std::vector<QPDFObjectHandle> const& pages_v = this->qpdf.getAllPages();
     std::vector<QPDFPageObjectHelper> pages;
-    for (auto const& iter: pages_v) {
+    for (auto const& iter: this->qpdf.getAllPages()) {
         pages.push_back(QPDFPageObjectHelper(iter));
     }
     return pages;
@@ -29,8 +28,7 @@ QPDFPageDocumentHelper::pushInheritedAttributesToPage()
 void
 QPDFPageDocumentHelper::removeUnreferencedResources()
 {
-    std::vector<QPDFPageObjectHelper> pages = getAllPages();
-    for (auto& ph: pages) {
+    for (auto& ph: getAllPages()) {
         ph.removeUnreferencedResources();
     }
 }
@@ -66,8 +64,7 @@ QPDFPageDocumentHelper::flattenAnnotations(
             .warnIfPossible("document does not have updated appearance streams,"
                             " so form fields will not be flattened");
     }
-    std::vector<QPDFPageObjectHelper> pages = getAllPages();
-    for (auto& ph: pages) {
+    for (auto& ph: getAllPages()) {
         QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
         if (!resources.isDictionary()) {
             // This should never happen and is not exercised in the

@@ -2369,8 +2369,7 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
         }
     } else if (foreign.isDictionary()) {
         QTC::TC("qpdf", "QPDF reserve dictionary");
-        std::set<std::string> keys = foreign.getKeys();
-        for (auto const& key: keys) {
+        for (auto const& key: foreign.getKeys()) {
             reserveObjects(foreign.getKey(key), obj_copier, false);
         }
     } else if (foreign.isStream()) {
