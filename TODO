@@ -11,6 +11,7 @@ In order:
 
 Other (do in any order):
 
+* QPDFPagesTree -- avoid ever flattening the pages tree.
 * Check about runpath in the linux-bin distribution. I think the
   appimage build specifically is setting the runpath, which is
   actually desirable in this case. Make sure to understand and
@@ -56,16 +57,7 @@ Output JSON v2
 
 Some of this documentation has drifted from the actual implementation.
 
-Make sure pages tree repair generates warnings.
-
 * Document that /Length is ignored in stream dictionary replacements
-
-Try to never flatten pages tree. Make sure we do something reasonable
-with pages tree repair. The problem is that if pages tree repair is
-done as a side effect of running --json, the qpdf part of the json may
-contain object numbers that aren't there. Maybe we need to indicate
-whether pages tree repair has been done in the json, but this would
-have to be known early in parsing, which is a problem.
 
 General things to remember:
 
@@ -239,6 +231,38 @@ You can't create a PDF from v1 json because
 Additionally, using "n n R" as a key in "objects" and "objectinfo"
 messes up searching for things.
 
+
+QPDFPagesTree
+=============
+
+Partial work is on qpdf-pages-tree branch. QPDFPageTree is mostly
+implemented and mostly tested. There are not enough cases of different
+kinds of operations (pclm, linearize, json, etc.) with non-flat pages
+trees. Insertion is not implemented.
+
+Page tree repair is silent (no warnings) and has a comment saying that
+we don't need warnings, but I think we should have warnings now that
+we have json v2. The reason is that page tree repair will change
+object numbers, and it's useful to know that.
+
+I'm thinking we will want to keep a pages cache for efficient
+insertion. There's no reason we can't keep a vector of page objects up
+to date and just do a traversal the first time we do getAllPages just
+like we do now. The difference is that we would not flatten the pages
+tree. It would be useful to go through QPDF_pages and re-reimplement
+everything without calling flattenPagesTree. Then we can remove
+flattenPagesTree, which is private.
+
+In its current state, QPDFPagesTree does not proactively fix /Type or
+correct page objects that are used multiple times. You have to
+traverse the pages tree to trigger this operation. It would be nice if
+we would do that somewhere but not do it more often than necessary so
+isPagesObject and isPageObject are reliable and can be made more
+reliable. Maybe add a validate or repair function? It should also make
+sure /Count and /Parent are correct.
+
+refs/attic/QPDFPagesTree-old -- original, abndoned branch -- clean up
+when done.
 
 QPDFJob
 =======
