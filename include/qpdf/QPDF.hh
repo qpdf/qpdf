@@ -1047,8 +1047,7 @@ class QPDF
         void setObjectDescription(QPDFObjectHandle& oh, JSON const& value);
         QPDFObjectHandle makeObject(JSON const& value);
         void error(qpdf_offset_t offset, std::string const& message);
-        QPDFObjectHandle
-        reserveObject(int obj, int gen);
+        QPDFObjectHandle reserveObject(int obj, int gen);
         void replaceObject(
             QPDFObjectHandle to_replace,
             QPDFObjectHandle replacement,

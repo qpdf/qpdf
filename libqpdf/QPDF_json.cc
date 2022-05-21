@@ -197,7 +197,8 @@ QPDF::test_json_validators()
 }
 
 static std::function<void(Pipeline*)>
-provide_data(std::shared_ptr<InputSource> is, qpdf_offset_t start, qpdf_offset_t end)
+provide_data(
+    std::shared_ptr<InputSource> is, qpdf_offset_t start, qpdf_offset_t end)
 {
     return [is, start, end](Pipeline* p) {
         Pl_Base64 decode("base64-decode", p, Pl_Base64::a_decode);
