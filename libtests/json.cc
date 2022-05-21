@@ -3,6 +3,7 @@
 #include <qpdf/JSON.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDF.hh>
 #include <iostream>
 
 static void
@@ -271,6 +272,7 @@ main()
 {
     test_main();
     test_schema();
+    assert(QPDF::test_json_validators());
 
     std::cout << "end of json tests\n";
     return 0;

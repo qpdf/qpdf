@@ -867,6 +867,9 @@ class QPDF
     };
     friend class Pipe;
 
+    // For testing only -- do not add to DLL
+    static bool test_json_validators();
+
   private:
     static std::string const qpdf_version;
 
@@ -1045,7 +1048,7 @@ class QPDF
         QPDFObjectHandle makeObject(JSON const& value);
         void error(size_t offset, std::string const& message);
         QPDFObjectHandle
-        reserveObject(std::string const& obj, std::string const& gen);
+        reserveObject(int obj, int gen);
         void replaceObject(
             QPDFObjectHandle to_replace,
             QPDFObjectHandle replacement,
@@ -1500,6 +1503,7 @@ class QPDF
     };
 
     // Methods to support pattern finding
+    static bool validatePDFVersion(char const*&, std::string& version);
     bool findHeader();
     bool findStartxref();
     bool findEndstream();

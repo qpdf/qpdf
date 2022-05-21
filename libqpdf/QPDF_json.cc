@@ -7,7 +7,7 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <algorithm>
-#include <regex>
+#include <cstring>
 
 // This chart shows an example of the state transitions that would
 // occur in parsing a minimal file.
@@ -55,14 +55,146 @@ static char const* JSON_PDF = (
     "9\n"
     "%%EOF\n");
 
-// Note use of [\\s\\S] rather than . to match any character since .
-// doesn't match newlines.
-static std::regex PDF_VERSION_RE("^\\d+\\.\\d+$");
-static std::regex OBJ_KEY_RE("^obj:(\\d+) (\\d+) R$");
-static std::regex INDIRECT_OBJ_RE("^(\\d+) (\\d+) R$");
-static std::regex UNICODE_RE("^u:([\\s\\S]*)$");
-static std::regex BINARY_RE("^b:((?:[0-9a-fA-F]{2})*)$");
-static std::regex NAME_RE("^/[\\s\\S]*$");
+// Validator methods -- these are much more performant than std::regex.
+static bool
+is_indirect_object(std::string const& v, int& obj, int& gen)
+{
+    char const* p = v.c_str();
+    std::string o_str;
+    std::string g_str;
+    if (!QUtil::is_digit(*p)) {
+        return false;
+    }
+    while (QUtil::is_digit(*p)) {
+        o_str.append(1, *p++);
+    }
+    if (*p != ' ') {
+        return false;
+    }
+    while (*p == ' ') {
+        ++p;
+    }
+    if (!QUtil::is_digit(*p)) {
+        return false;
+    }
+    while (QUtil::is_digit(*p)) {
+        g_str.append(1, *p++);
+    }
+    if (*p != ' ') {
+        return false;
+    }
+    while (*p == ' ') {
+        ++p;
+    }
+    if (*p++ != 'R') {
+        return false;
+    }
+    if (*p) {
+        return false;
+    }
+    obj = QUtil::string_to_int(o_str.c_str());
+    gen = QUtil::string_to_int(g_str.c_str());
+    return true;
+}
+
+static bool
+is_obj_key(std::string const& v, int& obj, int& gen)
+{
+    if (v.substr(0, 4) != "obj:") {
+        return false;
+    }
+    return is_indirect_object(v.substr(4), obj, gen);
+}
+
+static bool
+is_unicode_string(std::string const& v, std::string& str)
+{
+    if (v.substr(0, 2) == "u:") {
+        str = v.substr(2);
+        return true;
+    }
+    return false;
+}
+
+static bool
+is_binary_string(std::string const& v, std::string& str)
+{
+    if (v.substr(0, 2) == "b:") {
+        str = v.substr(2);
+        int count = 0;
+        for (char c: str) {
+            if (!QUtil::is_hex_digit(c)) {
+                return false;
+            }
+            ++count;
+        }
+        return ((count > 0) && (count % 2 == 0));
+    }
+    return false;
+}
+
+static bool
+is_name(std::string const& v)
+{
+    return ((v.length() > 1) && (v.at(0) == '/'));
+}
+
+bool
+QPDF::test_json_validators()
+{
+    bool passed = true;
+    auto check_fn = [&passed](char const* msg, bool expr) {
+        if (!expr) {
+            passed = false;
+            std::cerr << msg << std::endl;
+        }
+    };
+#define check(expr) check_fn(#expr, expr)
+
+    int obj = 0;
+    int gen = 0;
+    check(!is_indirect_object("", obj, gen));
+    check(!is_indirect_object("12", obj, gen));
+    check(!is_indirect_object("x12 0 R", obj, gen));
+    check(!is_indirect_object("12 0 Rx", obj, gen));
+    check(!is_indirect_object("12 0R", obj, gen));
+    check(is_indirect_object("52 1 R", obj, gen));
+    check(obj == 52);
+    check(gen == 1);
+    check(is_indirect_object("53  20  R", obj, gen));
+    check(obj == 53);
+    check(gen == 20);
+    check(!is_obj_key("", obj, gen));
+    check(!is_obj_key("obj:x", obj, gen));
+    check(!is_obj_key("obj:x", obj, gen));
+    check(is_obj_key("obj:12 13 R", obj, gen));
+    check(obj == 12);
+    check(gen == 13);
+    std::string str;
+    check(!is_unicode_string("", str));
+    check(!is_unicode_string("xyz", str));
+    check(!is_unicode_string("x:", str));
+    check(is_unicode_string("u:potato", str));
+    check(str == "potato");
+    check(is_unicode_string("u:", str));
+    check(str == "");
+    check(!is_binary_string("", str));
+    check(!is_binary_string("x:", str));
+    check(!is_binary_string("b:", str));
+    check(!is_binary_string("b:1", str));
+    check(!is_binary_string("b:123", str));
+    check(!is_binary_string("b:gh", str));
+    check(is_binary_string("b:12", str));
+    check(is_binary_string("b:123aBC", str));
+    check(!is_name(""));
+    check(!is_name("/"));
+    check(!is_name("xyz"));
+    check(is_name("/Potato"));
+    check(is_name("/Potato Salad"));
+
+    return passed;
+#undef check_arg
+}
 
 static std::function<void(Pipeline*)>
 provide_data(std::shared_ptr<InputSource> is, size_t start, size_t end)
@@ -236,13 +368,11 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
 }
 
 QPDFObjectHandle
-QPDF::JSONReactor::reserveObject(std::string const& obj, std::string const& gen)
+QPDF::JSONReactor::reserveObject(int obj, int gen)
 {
-    int o = QUtil::string_to_int(obj.c_str());
-    int g = QUtil::string_to_int(gen.c_str());
-    auto oh = pdf.reserveObjectIfNotExists(o, g);
+    auto oh = pdf.reserveObjectIfNotExists(obj, gen);
     if (oh.isReserved()) {
-        this->reserved.insert(QPDFObjGen(o, g));
+        this->reserved.insert(QPDFObjGen(obj, gen));
     }
     return oh;
 }
@@ -304,10 +434,11 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             bool version_okay = false;
             std::string v;
             if (value.getString(v)) {
-                std::smatch m;
-                if (std::regex_match(v, m, PDF_VERSION_RE)) {
+                std::string version;
+                char const* p = v.c_str();
+                if (QPDF::validatePDFVersion(p, version) && (*p == '\0')) {
                     version_okay = true;
-                    this->pdf.m->pdf_version = v;
+                    this->pdf.m->pdf_version = version;
                 }
             }
             if (!version_okay) {
@@ -324,14 +455,15 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             next_state = st_ignore;
         }
     } else if (state == st_objects) {
-        std::smatch m;
+        int obj = 0;
+        int gen = 0;
         if (key == "trailer") {
             this->saw_trailer = true;
             nestedState(key, value, st_trailer);
             this->cur_object = "trailer";
-        } else if (std::regex_match(key, m, OBJ_KEY_RE)) {
+        } else if (is_obj_key(key, obj, gen)) {
             this->cur_object = key;
-            auto oh = reserveObject(m[1].str(), m[2].str());
+            auto oh = reserveObject(obj, gen);
             object_stack.push_back(oh);
             nestedState(key, value, st_object_top);
         } else {
@@ -494,7 +626,6 @@ QPDF::JSONReactor::makeObject(JSON const& value)
     QPDFObjectHandle result;
     std::string str_v;
     bool bool_v = false;
-    std::smatch m;
     if (value.isDictionary()) {
         result = QPDFObjectHandle::newDictionary();
         object_stack.push_back(result);
@@ -513,13 +644,16 @@ QPDF::JSONReactor::makeObject(JSON const& value)
             result = QPDFObjectHandle::newReal(str_v);
         }
     } else if (value.getString(str_v)) {
-        if (std::regex_match(str_v, m, INDIRECT_OBJ_RE)) {
-            result = reserveObject(m[1].str(), m[2].str());
-        } else if (std::regex_match(str_v, m, UNICODE_RE)) {
-            result = QPDFObjectHandle::newUnicodeString(m[1].str());
-        } else if (std::regex_match(str_v, m, BINARY_RE)) {
-            result = QPDFObjectHandle::newString(QUtil::hex_decode(m[1].str()));
-        } else if (std::regex_match(str_v, m, NAME_RE)) {
+        int obj = 0;
+        int gen = 0;
+        std::string str;
+        if (is_indirect_object(str_v, obj, gen)) {
+            result = reserveObject(obj, gen);
+        } else if (is_unicode_string(str_v, str)) {
+            result = QPDFObjectHandle::newUnicodeString(str);
+        } else if (is_binary_string(str_v, str)) {
+            result = QPDFObjectHandle::newString(QUtil::hex_decode(str));
+        } else if (is_name(str_v)) {
             result = QPDFObjectHandle::newName(str_v);
         } else {
             QTC::TC("qpdf", "QPDF_json unrecognized string value");

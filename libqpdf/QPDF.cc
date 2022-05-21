@@ -385,20 +385,8 @@ QPDF::numWarnings() const
 }
 
 bool
-QPDF::findHeader()
+QPDF::validatePDFVersion(char const*& p, std::string& version)
 {
-    qpdf_offset_t global_offset = this->m->file->tell();
-    std::string line = this->m->file->readLine(1024);
-    char const* p = line.c_str();
-    if (strncmp(p, "%PDF-", 5) != 0) {
-        throw std::logic_error("findHeader is not looking at %PDF-");
-    }
-    p += 5;
-    std::string version;
-    // Note: The string returned by line.c_str() is always
-    // null-terminated. The code below never overruns the buffer
-    // because a null character always short-circuits further
-    // advancement.
     bool valid = QUtil::is_digit(*p);
     if (valid) {
         while (QUtil::is_digit(*p)) {
@@ -413,6 +401,25 @@ QPDF::findHeader()
             valid = false;
         }
     }
+    return valid;
+}
+
+bool
+QPDF::findHeader()
+{
+    qpdf_offset_t global_offset = this->m->file->tell();
+    std::string line = this->m->file->readLine(1024);
+    char const* p = line.c_str();
+    if (strncmp(p, "%PDF-", 5) != 0) {
+        throw std::logic_error("findHeader is not looking at %PDF-");
+    }
+    p += 5;
+    std::string version;
+    // Note: The string returned by line.c_str() is always
+    // null-terminated. The code below never overruns the buffer
+    // because a null character always short-circuits further
+    // advancement.
+    bool valid = validatePDFVersion(p, version);
     if (valid) {
         this->m->pdf_version = version;
         if (global_offset != 0) {
