@@ -55,11 +55,7 @@ Soon: Break ground on "Document-level work"
 Output JSON v2
 ==============
 
-Some of this documentation has drifted from the actual implementation.
-
-* Document that /Length is ignored in stream dictionary replacements
-
-General things to remember:
+Remaining work:
 
 * Make sure all the information from --check and other informational
   options (--show-linearization, --show-encryption, --show-xref,
@@ -68,106 +64,98 @@ General things to remember:
   right keys when in json mode. I don't think I want check on by
   default, so that might be different.
 
-* Consider changing the contract to allow fields to be absent even
-  when present in the schema. It's reasonable for people to check for
-  presence of a key. Most languages make this easy to do.
+Notes for documentation:
+
+* Find all mentions of json in the manual and update.
 
 * Document typo fix in encrypt in release notes along with any other
   non-compatible json 2 changes. Scrutinize all the output to decide
   what should change.
 
-* Document that keys other than "qpdf-v2" are ignored so people can
-  stash their own stuff.
+* Keys other than "qpdf-v2" are ignored so people can stash their own
+  stuff. Unknown keys are ignored at other places for future
+  compatibility. Readers of qpdf json should continue to ignore keys
+  they don't recognize.
 
-JSON to PDF:
+* Change: names are written in canonical form with a leading slash
+  just as they are treated in the code. In v1, they were written in
+  PDF syntax in the json file. Example: /text#2fplain in pdf will be
+  written as /text/plain in json v2 and as /text#2fplain in json v1.
 
-Have --json-input and --update-from-json. With --json-input, the json
-file must be complete, meaning all stream data, the trailer, and the
-PDF version must be present. For streams with no stream data, the
-dictionary is updated but the data is left untouched. Other things
-that are omitted are left alone. Make sure document that, when writing
-a PDF file from QPDF, there is no expectation of object numbers being
-preserved. As such, --update-from-json can only be used to update the
-exact file that the json was created from. You can put multiple
-objects in the update file, but you can't use a json from one file to
-update the output of a previous update since the object numbers will
-have changed. Note that, when creating from a JSON, object numbers are
-preserved in the resulting QPDF object but still modified by
-QPDFWriter for the output. This would be visible by combining
---json-output and --json-input. Also using --qdf with
---create-from-json would show original object IDs in comments. It will
-be important to capture this in the documentation.
+* Document changes to strings, objects, streams, object keys.
 
-When reading a JSON string, any string that doesn't look like a name
-or indirect object or start with "b:" or "u:" should be considered an
-error. Just use newUnicodeString on "u:" strings. For "b:" strings,
-decode the bytes with hex_decode and use newString.
+* CLI: --json-input, --json-output[=version], --update-from-json. With
+  --json-input, the input file is a JSON file instead of a PDF file.
+  It must be complete, meaning that a PDF version must be given, all
+  streams must have exactly one of data or datafile, and a trailer
+  dictionary must be present, even if empty.
 
-Test case: combine --json-input and --json-output to show preservation
-of object numbers. QPDFWriter won't show that although --qdf with the
-original object ID comments would.
+  With --update-from-json, the JSON file updates objects in place. If
+  updating an old stream, if stream data is omitted, the data remains
+  untouched. The dictionary is always required. Remember that
+  QPDFWriter does not preserve object numbers, though --json-output
+  does. Therefore, if you want to update a PDF with a JSON, the input
+  to --update-from-json must be the same PDF as the one that
+  --json-output was run on previously. Otherwise, object numbers won't
+  match. Show this with an example. When updating,
 
-The backing input source for createFromJSON is this memory block:
+* Certain fields are ignored when reading the JSON. This includes
+  maxobjectid, any computed fields in trailer (such as /Size), and all
+  /Length keys in stream dictionaries. There is no need for the user
+  to correct, remove, or otherwise worry about any values those keys
+  might have. The maxobjectid field is present in the original output
+  to assist with adding new objects to the file.
 
-```
-%PDF-1.3
-xref
-0 1
-0000000000 65535 f 
-trailer << /Size 1 >>
-startxref
-9
-%%EOF
-```
+* JSON strings within PDF objects:
 
-* Ignore all keys except .qpdf-v2.
-* Set this->m->pdf_version based on the .qpdf.pdfVersion key
-* For each object in .qpdf.objects:
-  * Walk through the object detecting any indirect objects. For each
-    one that is not already known, reserve the object. We can also
-    validate but we should try to do the best we can with invalid JSON
-    so people can get good error messages.
-  * Construct a QPDFObjectHandle from the JSON
-  * If the object is the trailer, update the trailer
-  * Else if the object doesn't exist, reserve it
-  * If the object is reserved, call replaceReserved()
-  * Else the object already exists; this is an error.
+  * "n n R" is an indirect object
 
-For streams, have a stream data provider that, for inline streams,
-does a base64 from the file offsets and for file-based streams, reads
-the file. For the inline case, we have to keep the json InputSource
-around. Otherwise, we don't. It is an error if there is no stream
-data. For files, we can have a stream data provider that just reads
-the file. Remember QUtil::file_provider.
+  * "/Name" is a name in canonical form with a leading slash (like
+    "/text/plain"), not PDF syntax (like "/text#2fplain").
 
-Documentation:
+  * "b:hex-digits" is a binary string ("b:feff03c0"). Hex digits may be
+    mixed case. There must be an even number of digits.
 
-Serialized PDF:
+  * "u:utf-8" is a UTF-8 encoded string ("u:π", "u:\u03c0"). UTF-16
+    surrogate pairs are allowed. These are all equivalent: "u:🥔",
+    "u:\ud83e\udd54", "b:FEFFD83EDD54", "b:efbbbff09fa594".
 
-The JSON output will have a "qpdf-v2" key containing
-* pdfversion
-* maxobjectid
-* objects
+  * Both "b:" and "u:" are valid representations of the empty string.
 
-In regular json mode, "objectinfo" is gone.
+  * Anything else is an error
 
-Within .objects, the key is "obj:o g R" or "trailer", and the
-value is a dictionary with exactly one of "value" or "stream" as its
-single key.
+* Document use of --json-input and --json-output together to show
+  preservation of object numbers. Draw attention to "original object
+  ID" comments in qdf as another way to show it.
 
-Rationale of "obj:o g R" is that indirect object references are just
-"o g R", and so code that wants to resolve one can do so easily by
-just prepending "obj:" and not having to parse or split the string.
-Having a prefix rather than making the key just "o g R" makes it much
-easier to search in the JSON for the definition of an object.
+* Document top-level keys of "qpdf-v2" ("pdfversion", "objects",
+  "maxobjectid") noting that "maxobjectid" is ignored when reading.
+
+* Stream data: "data" is base64-encoded stream data. "datafile" is the
+  path to a file (relative path recommended but not required)
+  containing the binary data. As with any PDF representation, the data
+  must be consistent with the filters. --decode-level is honored by
+  --json-output.
+
+* Other changes from v1:
+
+  * in "objects", keys are "obj:o g R" or "trailer"
+
+  * Non-stream objects are dictionaries with a "value" key whose value
+    is the object. Stream objects are dictionaries with a "stream" key
+    whose value is {"dict": stream-dictionary}. The "/Length" key is
+    omitted from the stream dictionary.
+
+  * "objectinfo" is gone as it is now possible to tell a stream from a
+    non-stream directly. To get stream data, use the --json-output
+    option. Note about how "pages" may cause the pages tree to be
+    corrected.
 
 For non-streams:
 
-{
   "obj:o g R": {
     "value": ...
   }
-}
 
 For streams:
 
@@ -178,41 +166,31 @@ For streams:
       "datafile": "path to base64-encoded data"
     }
   }
-}
 
-At most one of "data" or "datafile" will be present. When serializing,
-stream decode parameters will be obeyed, and the stream dictionary
-will reflect the result. There will be the option to omit stream data.
-
-When data is included, "/Length" is removed from the stream
-dictionary.
-
-Streams are filtered or not based on the --decode-level parameter. If
-a stream is filtered, "/Filter" and "/DecodeParms" are removed from
-the stream dictionary. This makes the stream data and dictionary match
-for when the file is read back in.
+Rationale of "obj:o g R" is that indirect object references are just
+"o g R", and so code that wants to resolve one can do so easily by
+just prepending "obj:" and not having to parse or split the string.
+Having a prefix rather than making the key just "o g R" makes it much
+easier to search in the JSON for the definition of an object.
 
 CLI:
 
 Example workflow:
-* qpdf in.pdf --json-output=2 pdf.json
+* qpdf in.pdf --json-output pdf.json
 * edit pdf.json
 * qpdf --json-input pdf.json out.pdf
 
-* qpdf in.pdf --json-output=2 pdf.json
+* qpdf in.pdf --json-output pdf.json
 * edit pdf.json keeping only objects that need to be changed
 * qpdf in.pdf --update-from-json=pdf.json out.pdf
 
-Update --json option in cli.rst to mention v2 and update json.rst.
+To modify a single object:
 
-Other documentation fodder:
+* qpdf in.pdf --json-output pdf.json --json-object=o,g
+* edit pdf.json
+* qpdf in.pdf --update-from-json=pdf.json out.pdf
 
-You can't create a PDF from v1 json because
-
-* Change: names are written in canonical form with a leading slash
-  just as they are treated in the code. In v1, they were written in
-  PDF syntax in the json file. Example: /text#2fplain in pdf will be
-  written as /text/plain in json v2 and as /text#2fplain in json v1.
+Historical note: you can't create a PDF from v1 json because
 
 * The PDF version header is not recorded
 
@@ -221,15 +199,16 @@ You can't create a PDF from v1 json because
   * Can't tell string from name from indirect object
 
   * Strings are treated as PDF doc encoding and output as UTF-8, which
-    doesn't work since multiple PDF doc code points are undefined
+    doesn't work since multiple PDF doc code points are undefined and
+    is absurd for binary strings
 
 * There is no representation of stream data
 
 * You can't tell a stream from a dictionary except by looking in both
-  "object" and "objectinfo". Fix this, and then remove "objectinfo".
+  "object" and "objectinfo".
 
-Additionally, using "n n R" as a key in "objects" and "objectinfo"
-messes up searching for things.
+* Using "n n R" as a key in "objects" and "objectinfo" makes it hard
+  to search for things when viewing the JSON file in an editor.
 
 
 QPDFPagesTree
@@ -249,7 +228,7 @@ I'm thinking we will want to keep a pages cache for efficient
 insertion. There's no reason we can't keep a vector of page objects up
 to date and just do a traversal the first time we do getAllPages just
 like we do now. The difference is that we would not flatten the pages
-tree. It would be useful to go through QPDF_pages and re-reimplement
+tree. It would be useful to go through QPDF_pages and reimplement
 everything without calling flattenPagesTree. Then we can remove
 flattenPagesTree, which is private.
 
@@ -261,7 +240,7 @@ isPagesObject and isPageObject are reliable and can be made more
 reliable. Maybe add a validate or repair function? It should also make
 sure /Count and /Parent are correct.
 
-refs/attic/QPDFPagesTree-old -- original, abndoned branch -- clean up
+refs/attic/QPDFPagesTree-old -- original, abandoned branch -- clean up
 when done.
 
 QPDFJob

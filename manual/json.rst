@@ -23,7 +23,7 @@ be extracted from PDF files using other qpdf command-line options.
 QPDF JSON Format
 ----------------
 
-QXXXQ Write this.
+XXX Write this.
 
 .. _json-guarantees:
 
