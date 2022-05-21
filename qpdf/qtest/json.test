@@ -69,7 +69,7 @@ foreach my $d (@json_files)
 
 $td->runtest("bad json stream data (inline)",
              {$td->COMMAND =>
-                  "qpdf --json-output=2" .
+                  "qpdf --json-output=2 --decode-level=all" .
                   " --json-stream-data=inline bad-data.pdf a.json"},
              {$td->FILE => "bad-data-json.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
@@ -79,7 +79,7 @@ $td->runtest("check (inline)",
              $td->NORMALIZE_NEWLINES);
 $td->runtest("bad json stream data (file)",
              {$td->COMMAND =>
-                  "qpdf --json-output=2 " .
+                  "qpdf --json-output=2 --decode-level=all" .
                   " --json-stream-data=file --json-stream-prefix=auto" .
                   " bad-data.pdf a.json"},
              {$td->FILE => "bad-data-json.out", $td->EXIT_STATUS => 3},

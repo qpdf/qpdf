@@ -308,6 +308,9 @@ QPDFJob::Config::jsonOutput(std::string const& parameter)
         // explicit use of --json-stream-data.
         o.m->json_stream_data = qpdf_sj_inline;
     }
+    if (!o.m->decode_level_set) {
+        o.m->decode_level = qpdf_dl_none;
+    }
     return this;
 }
 

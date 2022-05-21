@@ -852,7 +852,7 @@ Related Options
 
       When uncompressing streams, control which types of compression
       schemes should be uncompressed:
-      - none: don't uncompress anything
+      - none: don't uncompress anything. This is the default with --json-output.
       - generalized: uncompress streams compressed with a
         general-purpose compression algorithm. This is the default.
       - specialized: in addition to generalized, also uncompress
@@ -867,14 +867,15 @@ Related Options
 
    The following values for :samp:`{parameter}` are available:
 
-   - :samp:`none`: do not attempt to decode any streams
+   - :samp:`none`: do not attempt to decode any streams. This is the
+     default with :qpdf:ref:`--json-output`.
 
    - :samp:`generalized`: decode streams filtered with supported
      generalized filters: ``/LZWDecode``, ``/FlateDecode``,
      ``/ASCII85Decode``, and ``/ASCIIHexDecode``. We define
      generalized filters as those to be used for general-purpose
      compression or encoding, as opposed to filters specifically
-     designed for image data.
+     designed for image data. This is the default.
 
    - :samp:`specialized`: in addition to generalized, decode streams
      with supported non-lossy specialized filters; currently this is
@@ -896,7 +897,9 @@ Related Options
    qpdf will recompress streams with generalized filters using flate
    compression, effectively eliminating LZW and ASCII-based filters.
    This is usually desirable behavior but can be disabled with
-   ``--decode-level=none``.
+   ``--decode-level=none``. Note that ``--decode-level=node`` is the
+   default when :qpdf:ref:`--json-output` is specified, but it can be
+   overridden in that case as well.
 
    As a special case, streams already compressed with ``/FlateDecode``
    are not uncompressed and recompressed. You can change this behavior
@@ -3264,13 +3267,18 @@ Related Options
 
       The output file will be qpdf JSON format at the given version.
       "version" may be a specific version or "latest" (the default).
-      Version 1 is not supported. See also --json-stream-data
-      and --json-stream-prefix.
+      Version 1 is not supported. See also --json-stream-data,
+      --json-stream-prefix, and --decode-level.
 
    The output file will be qpdf JSON format at the given version.
    ``version`` may be a specific version or ``latest`` (the default).
    Version 1 is not supported. See also :qpdf:ref:`--json-stream-data`
-   and :qpdf:ref:`--json-stream-prefix`.
+   and :qpdf:ref:`--json-stream-prefix`. The default decode level is
+   ``none``, but you can override it with :qpdf:ref:`--decode-level`.
+   If you want to look at the contents of streams easily as you would
+   in QDF mode (see :ref:`qdf`), you can use
+   ``--decode-level=generalized`` and ``--json-stream-data=file`` for
+   a convenient way to do that.
 
 .. qpdf:option:: --json-input
 

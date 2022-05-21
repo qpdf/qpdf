@@ -188,7 +188,7 @@ ap.addOptionHelp("--decode-level", "transformation", "control which streams to u
 
 When uncompressing streams, control which types of compression
 schemes should be uncompressed:
-- none: don't uncompress anything
+- none: don't uncompress anything. This is the default with --json-output.
 - generalized: uncompress streams compressed with a
   general-purpose compression algorithm. This is the default.
 - specialized: in addition to generalized, also uncompress
@@ -836,8 +836,8 @@ ap.addOptionHelp("--json-output", "json", "serialize to JSON", R"(--json-output[
 
 The output file will be qpdf JSON format at the given version.
 "version" may be a specific version or "latest" (the default).
-Version 1 is not supported. See also --json-stream-data
-and --json-stream-prefix.
+Version 1 is not supported. See also --json-stream-data,
+--json-stream-prefix, and --decode-level.
 )");
 ap.addOptionHelp("--json-input", "json", "input file is qpdf JSON", R"(Treat the input file as a JSON file in qpdf JSON format as
 written by qpdf --json-output. See the "QPDF JSON Format"
