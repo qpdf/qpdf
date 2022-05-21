@@ -2129,9 +2129,8 @@ QPDFWriter::initializeSpecialStreams()
 {
     // Mark all page content streams in case we are filtering or
     // normalizing.
-    std::vector<QPDFObjectHandle> pages = this->m->pdf.getAllPages();
     int num = 0;
-    for (auto& page: pages) {
+    for (auto& page: this->m->pdf.getPagesTree()) {
         this->m->page_object_to_seq[page.getObjGen()] = ++num;
         QPDFObjectHandle contents = page.getKey("/Contents");
         std::vector<QPDFObjGen> contents_objects;
@@ -2385,7 +2384,7 @@ QPDFWriter::doWriteSetup()
 
     if (this->m->linearized) {
         // Page dictionaries are not allowed to be compressed objects.
-        for (auto& page: this->m->pdf.getAllPages()) {
+        for (auto& page: this->m->pdf.getPagesTree()) {
             QPDFObjGen og = page.getObjGen();
             if (this->m->object_to_object_stream.count(og)) {
                 QTC::TC("qpdf", "QPDFWriter uncompressing page dictionary");
@@ -3284,8 +3283,7 @@ QPDFWriter::enqueueObjectsPCLm()
     std::string image_transform_content = "q /image Do Q\n";
 
     // enqueue all pages first
-    std::vector<QPDFObjectHandle> all = this->m->pdf.getAllPages();
-    for (auto& page: all) {
+    for (auto page: this->m->pdf.getPagesTree()) {
         // enqueue page
         enqueueObject(page);
 
