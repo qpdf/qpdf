@@ -17,8 +17,7 @@ get_description(QPDFObjectHandle& node)
 static void
 warn(QPDF& qpdf, QPDFObjectHandle& node, std::string const& msg)
 {
-    qpdf.warn(QPDFExc(
-        qpdf_e_damaged_pdf, qpdf.getFilename(), get_description(node), 0, msg));
+    qpdf.warn(qpdf_e_damaged_pdf, get_description(node), 0, msg);
 }
 
 QPDFPagesTree::iterator::PathElement::PathElement(
@@ -157,7 +156,7 @@ QPDFPagesTree::iterator::maybeSetType(
     QPDFObjectHandle node, std::string const& type)
 {
     auto type_oh = node.getKey("/Type");
-    if (!(type_oh.isName() && (type_oh.getName() == type))) {
+    if (!type_oh.isNameAndEquals(type)) {
         QTC::TC("qpdf", "QPDFPagesTree set /Type");
         warn(
             this->m->qpdf,
