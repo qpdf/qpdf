@@ -679,3 +679,13 @@ QPDF_json non-trivial null reserved 0
 QPDF_json data and datafile 0
 QPDF_json no stream data in update mode 0
 QPDF_json updating existing stream 0
+QPDFPagesTree deepen: loop 0
+QPDFPagesTree node is not a dictionary 0
+QPDFPagesTree fix direct kid 0
+QPDFPagesTree increment end() 0
+QPDFPagesTree skip invalid node 0
+QPDFPagesTree set /Type 0
+QPDFPagesTree split root 0
+QPDFPagesTree split parent 0
+QPDFPagesTree empty 0
+QPDFPagesTree can't deepen 0
