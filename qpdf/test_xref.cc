@@ -19,9 +19,7 @@ main(int argc, char* argv[])
         QPDF qpdf;
         qpdf.processFile(argv[1]);
 
-        std::map<QPDFObjGen, QPDFXRefEntry> xref = qpdf.getXRefTable();
-
-        for (auto const& iter: xref) {
+        for (auto const& iter: qpdf.getXRefTable()) {
             std::cout << iter.first.getObj() << "/" << iter.first.getGen()
                       << ", ";
             switch (iter.second.getType()) {

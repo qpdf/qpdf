@@ -50,15 +50,11 @@ main(int argc, char* argv[])
         // illustrates how we can map from annotations to fields.
 
         QPDFAcroFormDocumentHelper afdh(qpdf);
-        QPDFPageDocumentHelper pdh(qpdf);
-        std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
-        for (auto const& page: pages) {
+        for (auto const& page: QPDFPageDocumentHelper(qpdf).getAllPages()) {
             // Get all widget annotations for each page. Widget
             // annotations are the ones that contain the details of
             // what's in a form field.
-            std::vector<QPDFAnnotationObjectHelper> annotations =
-                afdh.getWidgetAnnotationsForPage(page);
-            for (auto& annot: annotations) {
+            for (auto& annot: afdh.getWidgetAnnotationsForPage(page)) {
                 // For each annotation, find its associated field. If
                 // it's a text field, set its value.
                 QPDFFormFieldObjectHelper ffh =

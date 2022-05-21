@@ -294,12 +294,8 @@ QPDFAcroFormDocumentHelper::analyze()
     // a file that contains this kind of error will probably not
     // actually work with most viewers.
 
-    QPDFPageDocumentHelper dh(this->qpdf);
-    std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
-    for (auto const& ph: pages) {
-        std::vector<QPDFAnnotationObjectHelper> annots =
-            getWidgetAnnotationsForPage(ph);
-        for (auto const& iter: annots) {
+    for (auto const& ph: QPDFPageDocumentHelper(this->qpdf).getAllPages()) {
+        for (auto const& iter: getWidgetAnnotationsForPage(ph)) {
             QPDFObjectHandle annot(iter.getObjectHandle());
             QPDFObjGen og(annot.getObjGen());
             if (this->m->annotation_to_field.count(og) == 0) {
@@ -451,12 +447,8 @@ QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded()
         return;
     }
 
-    QPDFPageDocumentHelper pdh(this->qpdf);
-    std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
-    for (auto const& page: pages) {
-        std::vector<QPDFAnnotationObjectHelper> annotations =
-            getWidgetAnnotationsForPage(page);
-        for (auto& aoh: annotations) {
+    for (auto const& page: QPDFPageDocumentHelper(this->qpdf).getAllPages()) {
+        for (auto& aoh: getWidgetAnnotationsForPage(page)) {
             QPDFFormFieldObjectHelper ffh = getFieldForAnnotation(aoh);
             if (ffh.getFieldType() == "/Btn") {
                 // Rather than generating appearances for button

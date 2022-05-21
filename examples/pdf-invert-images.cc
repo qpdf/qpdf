@@ -129,12 +129,9 @@ main(int argc, char* argv[])
         auto p = std::shared_ptr<QPDFObjectHandle::StreamDataProvider>(inv);
 
         // For each page...
-        std::vector<QPDFPageObjectHelper> pages =
-            QPDFPageDocumentHelper(qpdf).getAllPages();
-        for (auto& page: pages) {
+        for (auto& page: QPDFPageDocumentHelper(qpdf).getAllPages()) {
             // Get all images on the page.
-            std::map<std::string, QPDFObjectHandle> images = page.getImages();
-            for (auto& iter: images) {
+            for (auto& iter: page.getImages()) {
                 QPDFObjectHandle& image = iter.second;
                 QPDFObjectHandle image_dict = image.getDict();
                 QPDFObjectHandle color_space = image_dict.getKey("/ColorSpace");

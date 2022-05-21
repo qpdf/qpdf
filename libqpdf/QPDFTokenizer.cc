@@ -567,8 +567,7 @@ QPDFTokenizer::findEI(std::shared_ptr<InputSource> input)
                 bool found_alpha = false;
                 bool found_non_printable = false;
                 bool found_other = false;
-                std::string value = t.getValue();
-                for (char ch: value) {
+                for (char ch: t.getValue()) {
                     if (((ch >= 'a') && (ch <= 'z')) ||
                         ((ch >= 'A') && (ch <= 'Z')) || (ch == '*')) {
                         // Treat '*' as alpha since there are valid

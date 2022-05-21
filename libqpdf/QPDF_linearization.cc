@@ -663,9 +663,8 @@ QPDF::maxEnd(ObjUser const& ou)
     if (this->m->obj_user_to_objects.count(ou) == 0) {
         stopOnError("no entry in object user table for requested object user");
     }
-    std::set<QPDFObjGen> const& ogs = this->m->obj_user_to_objects[ou];
     qpdf_offset_t end = 0;
-    for (auto const& og: ogs) {
+    for (auto const& og: this->m->obj_user_to_objects[ou]) {
         if (this->m->obj_cache.count(og) == 0) {
             stopOnError("unknown object referenced in object user table");
         }
@@ -1474,8 +1473,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
             stopOnError("found unreferenced page while"
                         " calculating linearization data");
         }
-        std::set<QPDFObjGen> ogs = this->m->obj_user_to_objects[ou];
-        for (auto const& og: ogs) {
+        for (auto const& og: this->m->obj_user_to_objects[ou]) {
             if (lc_other_page_private.count(og)) {
                 lc_other_page_private.erase(og);
                 this->m->part7.push_back(objGenToIndirect(og));
@@ -1637,8 +1635,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
             stopOnError("found unreferenced page while"
                         " calculating linearization data");
         }
-        std::set<QPDFObjGen> const& ogs = this->m->obj_user_to_objects[ou];
-        for (auto const& og: ogs) {
+        for (auto const& og: this->m->obj_user_to_objects[ou]) {
             if ((this->m->object_to_obj_users[og].size() > 1) &&
                 (obj_to_index.count(og.getObj()) > 0)) {
                 int idx = obj_to_index[og.getObj()];

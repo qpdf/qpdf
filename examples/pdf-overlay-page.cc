@@ -40,9 +40,7 @@ stamp_page(char const* infile, char const* stampfile, char const* outfile)
     QPDFObjectHandle stamp_fo = inpdf.copyForeignObject(foreign_fo);
 
     // For each page...
-    std::vector<QPDFPageObjectHelper> pages =
-        QPDFPageDocumentHelper(inpdf).getAllPages();
-    for (auto& ph: pages) {
+    for (auto& ph: QPDFPageDocumentHelper(inpdf).getAllPages()) {
         // Find a unique resource name for the new form XObject
         QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
         int min_suffix = 1;
