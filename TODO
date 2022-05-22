@@ -11,6 +11,7 @@ In order:
 
 Other (do in any order):
 
+* Good C API for json v2
 * QPDFPagesTree -- avoid ever flattening the pages tree.
 * Check about runpath in the linux-bin distribution. I think the
   appimage build specifically is setting the runpath, which is
@@ -57,12 +58,29 @@ Output JSON v2
 
 Remaining work:
 
-* Make sure all the information from --check and other informational
-  options (--show-linearization, --show-encryption, --show-xref,
-  --list-attachments, --show-npages) is available in the json output.
-  Consider having --check, --show-encryption, etc., just select the
+* Make sure all the information from informational options is
+  available in the json output.
+
+  * --check: add but maybe not by default?
+
+  * --show-linearization: add but maybe not by default? Also figure
+    out whether warnings reported for some of the PDF specs (1.7) are
+    qpdf problems. This may not be worth adding in the first
+    increment.
+
+  * --show-xref: add
+
+  * --encryption: show recovered user password when available
+
+  * --list-attachments: add information from --verbose. Add to a
+      "details" subkey.
+
+* Consider having --check, --show-encryption, etc., just select the
   right keys when in json mode. I don't think I want check on by
   default, so that might be different.
+
+* Consider having warnings be included in the json in a "warnings" key
+  in json mode.
 
 Notes for documentation:
 
