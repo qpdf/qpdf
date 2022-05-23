@@ -102,7 +102,7 @@ What is the reason for this change? Prior to qpdf 10.5, the qpdf
 manual was a docbook XML file. The generated documents were the
 product of running the file through build-time style sheets and
 contained no copyrighted material of their own. Starting with version
-10.5, the manual is written produced with `Sphinx
+10.5, the manual is written in reStructured Text and built with `Sphinx
 <https://www.sphinx-doc.org>`__. This change was made to make it much
 easier to automatically generate portions of the documentation and to
 make the documentation easier to work with. The HTML output of Sphinx
