@@ -223,7 +223,7 @@ BUILD_DOC
 BUILD_DOC_HTML
   Visible when BUILD_DOC is selected. This option controls building
   HTML documentation separately from PDF documentation since
-  the sphinx theme only needed for the HTML documentation.
+  the sphinx theme is only needed for the HTML documentation.
 
 BUILD_DOC_PDF
   Visible when BUILD_DOC is selected. This option controls building
