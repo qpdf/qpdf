@@ -984,6 +984,32 @@ QUtil::qpdf_time_to_pdf_time(QPDFTime const& qtm)
         QUtil::int_to_string(qtm.second, 2) + tz_offset);
 }
 
+std::string
+QUtil::qpdf_time_to_iso8601(QPDFTime const& qtm)
+{
+    std::string tz_offset;
+    int t = qtm.tz_delta;
+    if (t == 0) {
+        tz_offset = "Z";
+    } else {
+        if (t < 0) {
+            t = -t;
+            tz_offset += "+";
+        } else {
+            tz_offset += "-";
+        }
+        tz_offset += QUtil::int_to_string(t / 60, 2) + ":" +
+            QUtil::int_to_string(t % 60, 2);
+    }
+    return (
+        QUtil::int_to_string(qtm.year, 4) + "-" +
+        QUtil::int_to_string(qtm.month, 2) + "-" +
+        QUtil::int_to_string(qtm.day, 2) + "T" +
+        QUtil::int_to_string(qtm.hour, 2) + ":" +
+        QUtil::int_to_string(qtm.minute, 2) + ":" +
+        QUtil::int_to_string(qtm.second, 2) + tz_offset);
+}
+
 bool
 QUtil::pdf_time_to_qpdf_time(std::string const& str, QPDFTime* qtm)
 {
@@ -1016,6 +1042,17 @@ QUtil::pdf_time_to_qpdf_time(std::string const& str, QPDFTime* qtm)
             tz_delta);
     }
     return true;
+}
+
+bool
+QUtil::pdf_time_to_iso8601(std::string const& pdf_time, std::string& iso8601)
+{
+    QPDFTime qtm;
+    if (pdf_time_to_qpdf_time(pdf_time, &qtm)) {
+        iso8601 = qpdf_time_to_iso8601(qtm);
+        return true;
+    }
+    return false;
 }
 
 std::string

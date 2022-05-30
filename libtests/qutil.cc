@@ -656,10 +656,14 @@ timestamp_test()
 {
     auto check = [](QUtil::QPDFTime const& t) {
         std::string pdf = QUtil::qpdf_time_to_pdf_time(t);
-        std::cout << pdf << std::endl;
+        std::string iso8601 = QUtil::qpdf_time_to_iso8601(t);
+        std::cout << pdf << std::endl << iso8601 << std::endl;
         QUtil::QPDFTime t2;
+        std::string iso8601_2;
         assert(QUtil::pdf_time_to_qpdf_time(pdf, &t2));
         assert(QUtil::qpdf_time_to_pdf_time(t2) == pdf);
+        assert(QUtil::pdf_time_to_iso8601(pdf, iso8601_2));
+        assert(iso8601 == iso8601_2);
     };
     check(QUtil::QPDFTime(2021, 2, 9, 14, 49, 25, 300));
     check(QUtil::QPDFTime(2021, 2, 10, 1, 19, 25, -330));

@@ -1,3 +1,8 @@
+2022-05-30  Jay Berkenbilt  <ejb@ql.org>
+
+        * Add QUtil::qpdf_time_to_iso8601 and QUtil::pdf_time_to_iso8601
+        for converting PDF/qpdf timestamps to ISO-8601 date format.
+
 2022-05-18  Jay Berkenbilt  <ejb@ql.org>
 
         * Add QUtil::FileCloser to the public API. This is a simple inline

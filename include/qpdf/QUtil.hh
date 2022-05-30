@@ -284,12 +284,21 @@ namespace QUtil
     QPDF_DLL
     std::string qpdf_time_to_pdf_time(QPDFTime const&);
 
+    // Convert QPDFTime to a second-granularity ISO-8601 timestamp.
+    QPDF_DLL
+    std::string qpdf_time_to_iso8601(QPDFTime const&);
+
     // Convert a PDF timestamp string to a QPDFTime. If syntactically
     // valid, return true and fill in qtm. If not valid, return false,
     // and do not modify qtm. If qtm is null, just check the validity
     // of the string.
     QPDF_DLL
     bool pdf_time_to_qpdf_time(std::string const&, QPDFTime* qtm = nullptr);
+
+    // Convert PDF timestamp to a second-granularity ISO-8601
+    // timestamp. If syntactically valid, return true and initialize
+    // iso8601. Otherwise, return false.
+    bool pdf_time_to_iso8601(std::string const& pdf_time, std::string& iso8601);
 
     // Return a string containing the byte representation of the UTF-8
     // encoding for the unicode value passed in.
