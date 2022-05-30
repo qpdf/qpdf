@@ -189,7 +189,8 @@ $td->runtest("add attachments: current date",
              $td->NORMALIZE_NEWLINES);
 $td->runtest("list attachments",
              {$td->COMMAND =>
-                  "qpdf --password=u --list-attachments a.pdf --verbose"},
+                  "qpdf --password=u --list-attachments a.pdf --verbose",
+                  $td->FILTER => "perl filter-attachment-date.pl"},
              {$td->FILE => "list-attachments-4.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 # The object to show here is the one in list-attachments-4.out

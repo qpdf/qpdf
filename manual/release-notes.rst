@@ -96,6 +96,13 @@ For a detailed list of changes, please see the file
       - See :ref:`breaking-crypto-api` for specific details, and see
         :ref:`weak-crypto` for a general discussion.
 
+  - CLI Enhancements
+
+    - ``qpdf --list-attachments --verbose`` include some additional
+      information about attachments. Additional information about
+      attachments is also included in the ``attachments`` json key
+      with ``--json``.
+
   - Library Enhancements
 
     - New methods ``insertItemAndGet``, ``appendItemAndGet``,
@@ -119,6 +126,9 @@ For a detailed list of changes, please see the file
 
     - Add new ``Pipeline`` type ``Pl_String`` to append to a
       ``std::string``.
+
+    - Add methods to QUtil for converting PDF timestamps and QPDFTime
+      objects to ISO-8601 timestamps.
 
     - Enhance JSON class to better support incrementally reading and
       writing large amounts of data without having to keep everything

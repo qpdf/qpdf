@@ -993,8 +993,16 @@ QPDFJob::doListAttachments(QPDF& pdf)
                 }
                 cout << "  all data streams:" << std::endl;
                 for (auto i2: efoh->getEmbeddedFileStreams().ditems()) {
+                    auto efs = QPDFEFStreamObjectHelper(i2.second);
                     cout << "    " << i2.first << " -> "
-                         << i2.second.getObjGen() << std::endl;
+                         << efs.getObjectHandle().getObjGen() << std::endl;
+                    cout << "      creation date: " << efs.getCreationDate()
+                         << std::endl
+                         << "      modification date: " << efs.getModDate()
+                         << std::endl
+                         << "      mime type: " << efs.getSubtype() << std::endl
+                         << "      checksum: "
+                         << QUtil::hex_encode(efs.getChecksum()) << std::endl;
                 }
             });
         }
@@ -1445,6 +1453,22 @@ QPDFJob::doJSONEncrypt(Pipeline* p, bool& first, QPDF& pdf)
 void
 QPDFJob::doJSONAttachments(Pipeline* p, bool& first, QPDF& pdf)
 {
+    auto to_iso8601 = [](std::string const& d) {
+        // Convert PDF date to iso8601 if not empty; if empty, return
+        // empty.
+        std::string iso8601;
+        QUtil::pdf_time_to_iso8601(d, iso8601);
+        return iso8601;
+    };
+
+    auto null_or_string = [](std::string const& s) {
+        if (s.empty()) {
+            return JSON::makeNull();
+        } else {
+            return JSON::makeString(s);
+        }
+    };
+
     JSON j_attachments = JSON::makeDictionary();
     QPDFEmbeddedFileDocumentHelper efdh(pdf);
     for (auto const& iter: efdh.getEmbeddedFiles()) {
@@ -1459,6 +1483,31 @@ QPDFJob::doJSONAttachments(Pipeline* p, bool& first, QPDF& pdf)
         j_details.addDictionaryMember(
             "preferredcontents",
             JSON::makeString(fsoh->getEmbeddedFileStream().unparse()));
+        j_details.addDictionaryMember(
+            "description", null_or_string(fsoh->getDescription()));
+        auto j_names =
+            j_details.addDictionaryMember("names", JSON::makeDictionary());
+        for (auto const& i2: fsoh->getFilenames()) {
+            j_names.addDictionaryMember(i2.first, JSON::makeString(i2.second));
+        }
+        auto j_streams =
+            j_details.addDictionaryMember("streams", JSON::makeDictionary());
+        for (auto i2: fsoh->getEmbeddedFileStreams().ditems()) {
+            auto efs = QPDFEFStreamObjectHelper(i2.second);
+            auto j_stream =
+                j_streams.addDictionaryMember(i2.first, JSON::makeDictionary());
+            j_stream.addDictionaryMember(
+                "creationdate",
+                null_or_string(to_iso8601(efs.getCreationDate())));
+            j_stream.addDictionaryMember(
+                "modificationdate",
+                null_or_string(to_iso8601(efs.getCreationDate())));
+            j_stream.addDictionaryMember(
+                "mimetype", null_or_string(efs.getSubtype()));
+            j_stream.addDictionaryMember(
+                "checksum",
+                null_or_string(QUtil::hex_encode(efs.getChecksum())));
+        }
     }
     JSON::writeDictionaryItem(p, first, "attachments", j_attachments, 0);
 }
@@ -1640,7 +1689,19 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
   "<attachment-key>": {
     "filespec": "object containing the file spec",
     "preferredcontents": "most preferred embedded file stream",
-    "preferredname": "most preferred file name"
+    "preferredname": "most preferred file name",
+    "description": "description of attachment",
+    "names": {
+      "<name-key>": "file name for key"
+    },
+    "streams": {
+      "<stream-key>": {
+        "creationdate": "ISO-8601 creation date or null",
+        "modificationdate": "ISO-8601 modification date or null",
+        "mimetype": "mime type or null",
+        "checksum": "MD5 checksum or null"
+      }
+    }
   }
 })"));
     }

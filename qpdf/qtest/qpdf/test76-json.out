@@ -5,19 +5,76 @@
   },
   "attachments": {
     "att1": {
+      "description": "some text",
       "filespec": "4 0 R",
+      "names": {
+        "/F": "att1.txt",
+        "/UF": "att1.txt"
+      },
       "preferredcontents": "8 0 R",
-      "preferredname": "att1.txt"
+      "preferredname": "att1.txt",
+      "streams": {
+        "/F": {
+          "checksum": "2e10f186a4cdf5be438747f4bdc2d4d4",
+          "creationdate": "2021-02-07T19:11:21-05:00",
+          "mimetype": "text/plain",
+          "modificationdate": "2021-02-07T19:11:21-05:00"
+        },
+        "/UF": {
+          "checksum": "2e10f186a4cdf5be438747f4bdc2d4d4",
+          "creationdate": "2021-02-07T19:11:21-05:00",
+          "mimetype": "text/plain",
+          "modificationdate": "2021-02-07T19:11:21-05:00"
+        }
+      }
     },
     "att2": {
+      "description": null,
       "filespec": "5 0 R",
+      "names": {
+        "/F": "att2.txt",
+        "/UF": "att2.txt"
+      },
       "preferredcontents": "10 0 R",
-      "preferredname": "att2.txt"
+      "preferredname": "att2.txt",
+      "streams": {
+        "/F": {
+          "checksum": "2fce9c8228e360ba9b04a1bd1bf63d6b",
+          "creationdate": null,
+          "mimetype": "text/plain",
+          "modificationdate": null
+        },
+        "/UF": {
+          "checksum": "2fce9c8228e360ba9b04a1bd1bf63d6b",
+          "creationdate": null,
+          "mimetype": "text/plain",
+          "modificationdate": null
+        }
+      }
     },
     "att3": {
+      "description": null,
       "filespec": "6 0 R",
+      "names": {
+        "/F": "att3.txt",
+        "/UF": "π.txt"
+      },
       "preferredcontents": "12 0 R",
-      "preferredname": "π.txt"
+      "preferredname": "π.txt",
+      "streams": {
+        "/F": {
+          "checksum": "2236c155b1d62b7f00285bba081d4336",
+          "creationdate": null,
+          "mimetype": "text/plain",
+          "modificationdate": null
+        },
+        "/UF": {
+          "checksum": "2236c155b1d62b7f00285bba081d4336",
+          "creationdate": null,
+          "mimetype": "text/plain",
+          "modificationdate": null
+        }
+      }
     }
   }
 }

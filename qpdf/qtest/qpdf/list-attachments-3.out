@@ -5,7 +5,15 @@ auto-1 -> 8,0
     /UF -> auto-2
   all data streams:
     /F -> 8,0
+      creation date: D:20210210091359-05'00'
+      modification date: D:20210210141359Z
+      mime type: 
+      checksum: 9f991a5669c47a94f9350f53e3953e57
     /UF -> 8,0
+      creation date: D:20210210091359-05'00'
+      modification date: D:20210210141359Z
+      mime type: 
+      checksum: 9f991a5669c47a94f9350f53e3953e57
 auto-3 -> 10,0
   description: two words
   preferred name: auto-Three.txt
@@ -14,7 +22,15 @@ auto-3 -> 10,0
     /UF -> auto-Three.txt
   all data streams:
     /F -> 10,0
+      creation date: D:20210210091359-05'00'
+      modification date: D:20210210141359Z
+      mime type: 
+      checksum: d6c7ac7cf295ae133fea186cfd068dab
     /UF -> 10,0
+      creation date: D:20210210091359-05'00'
+      modification date: D:20210210141359Z
+      mime type: 
+      checksum: d6c7ac7cf295ae133fea186cfd068dab
 auto-Two -> 12,0
   preferred name: auto-2
   all names:
@@ -22,4 +38,12 @@ auto-Two -> 12,0
     /UF -> auto-2
   all data streams:
     /F -> 12,0
+      creation date: D:20210210091359-05'00'
+      modification date: D:20210210141359Z
+      mime type: 
+      checksum: 9f991a5669c47a94f9350f53e3953e57
     /UF -> 12,0
+      creation date: D:20210210091359-05'00'
+      modification date: D:20210210141359Z
+      mime type: 
+      checksum: 9f991a5669c47a94f9350f53e3953e57

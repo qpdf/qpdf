@@ -72,9 +72,6 @@ Remaining work:
 
   * --encryption: show recovered user password when available
 
-  * --list-attachments: add information from --verbose. Add to a
-      "details" subkey.
-
 * Consider having --check, --show-encryption, etc., just select the
   right keys when in json mode. I don't think I want check on by
   default, so that might be different.

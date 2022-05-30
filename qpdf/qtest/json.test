@@ -26,6 +26,7 @@ my @json_files = (
     ['field-types', ['--show-encryption-key']],
     ['image-streams', ['--decode-level=all']],
     ['image-streams', ['--decode-level=specialized']],
+    ['attachment-fields', []],
     ['page-labels-and-outlines', ['--json-key=objects']],
     ['page-labels-and-outlines', ['--json-key=pages']],
     ['page-labels-and-outlines', ['--json-key=pagelabels']],

@@ -1,0 +1,305 @@
+{
+  "version": 1,
+  "parameters": {
+    "decodelevel": "generalized"
+  },
+  "pages": [
+    {
+      "contents": [
+        "11 0 R"
+      ],
+      "images": [],
+      "label": null,
+      "object": "6 0 R",
+      "outlines": [],
+      "pageposfrom1": 1
+    }
+  ],
+  "pagelabels": [],
+  "acroform": {
+    "fields": [],
+    "hasacroform": false,
+    "needappearances": false
+  },
+  "attachments": {
+    "a.txt": {
+      "description": null,
+      "filespec": "4 0 R",
+      "names": {
+        "/F": "a.txt",
+        "/UF": "a.txt"
+      },
+      "preferredcontents": "7 0 R",
+      "preferredname": "a.txt",
+      "streams": {
+        "/F": {
+          "checksum": null,
+          "creationdate": null,
+          "mimetype": null,
+          "modificationdate": null
+        },
+        "/UF": {
+          "checksum": null,
+          "creationdate": null,
+          "mimetype": null,
+          "modificationdate": null
+        }
+      }
+    },
+    "π.txt": {
+      "description": "Two filenames",
+      "filespec": "5 0 R",
+      "names": {
+        "/F": "pi.txt",
+        "/UF": "π.txt"
+      },
+      "preferredcontents": "9 0 R",
+      "preferredname": "π.txt",
+      "streams": {
+        "/F": {
+          "checksum": "e561f9248d7563d15dd93457b02ebbb6",
+          "creationdate": "2022-05-30T09:41:16-05:00",
+          "mimetype": "text/plain",
+          "modificationdate": "2022-05-30T09:41:16-05:00"
+        },
+        "/UF": {
+          "checksum": "e561f9248d7563d15dd93457b02ebbb6",
+          "creationdate": "2022-05-30T09:41:16-05:00",
+          "mimetype": "text/plain",
+          "modificationdate": "2022-05-30T09:41:16-05:00"
+        }
+      }
+    }
+  },
+  "encrypt": {
+    "capabilities": {
+      "accessibility": true,
+      "extract": true,
+      "moddifyannotations": true,
+      "modify": true,
+      "modifyassembly": true,
+      "modifyforms": true,
+      "modifyother": true,
+      "printhigh": true,
+      "printlow": true
+    },
+    "encrypted": false,
+    "ownerpasswordmatched": false,
+    "parameters": {
+      "P": 0,
+      "R": 0,
+      "V": 0,
+      "bits": 0,
+      "filemethod": "none",
+      "key": null,
+      "method": "none",
+      "streammethod": "none",
+      "stringmethod": "none"
+    },
+    "userpasswordmatched": false
+  },
+  "outlines": [],
+  "objects": {
+    "1 0 R": {
+      "/Names": {
+        "/EmbeddedFiles": "2 0 R"
+      },
+      "/PageMode": "/UseAttachments",
+      "/Pages": "3 0 R",
+      "/Type": "/Catalog"
+    },
+    "2 0 R": {
+      "/Names": [
+        "a.txt",
+        "4 0 R",
+        "π.txt",
+        "5 0 R"
+      ]
+    },
+    "3 0 R": {
+      "/Count": 1,
+      "/Kids": [
+        "6 0 R"
+      ],
+      "/Type": "/Pages"
+    },
+    "4 0 R": {
+      "/EF": {
+        "/F": "7 0 R",
+        "/UF": "7 0 R"
+      },
+      "/F": "a.txt",
+      "/Type": "/Filespec",
+      "/UF": "a.txt"
+    },
+    "5 0 R": {
+      "/Desc": "Two filenames",
+      "/EF": {
+        "/F": "9 0 R",
+        "/UF": "9 0 R"
+      },
+      "/F": "pi.txt",
+      "/Type": "/Filespec",
+      "/UF": "π.txt"
+    },
+    "6 0 R": {
+      "/Contents": "11 0 R",
+      "/MediaBox": [
+        0,
+        0,
+        612,
+        792
+      ],
+      "/Parent": "3 0 R",
+      "/Resources": {
+        "/Font": {
+          "/F1": "13 0 R"
+        },
+        "/ProcSet": "14 0 R"
+      },
+      "/Type": "/Page"
+    },
+    "7 0 R": {
+      "/Length": "8 0 R",
+      "/Params": {
+        "/Size": 7
+      },
+      "/Type": "/EmbeddedFile"
+    },
+    "8 0 R": 7,
+    "9 0 R": {
+      "/Length": "10 0 R",
+      "/Params": {
+        "/CheckSum": "åaù$“ucÑ]Ù4W°.»¶",
+        "/CreationDate": "D:20220530094116-05'00'",
+        "/ModDate": "D:20220530094116-05'00'",
+        "/Size": 7
+      },
+      "/Subtype": "/text#2fplain",
+      "/Type": "/EmbeddedFile"
+    },
+    "10 0 R": 7,
+    "11 0 R": {
+      "/Length": "12 0 R"
+    },
+    "12 0 R": 44,
+    "13 0 R": {
+      "/BaseFont": "/Helvetica",
+      "/Encoding": "/WinAnsiEncoding",
+      "/Subtype": "/Type1",
+      "/Type": "/Font"
+    },
+    "14 0 R": [
+      "/PDF",
+      "/Text"
+    ],
+    "trailer": {
+      "/ID": [
+        "=ˆ›à‘šk>˜x}\u0004üîÔ@",
+        "N\u0013Þ8#\u000b±\n\u0003ä™–§BÃ™"
+      ],
+      "/Root": "1 0 R",
+      "/Size": 15
+    }
+  },
+  "objectinfo": {
+    "1 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "2 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "3 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "4 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "5 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "6 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "7 0 R": {
+      "stream": {
+        "filter": null,
+        "is": true,
+        "length": 7
+      }
+    },
+    "8 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "9 0 R": {
+      "stream": {
+        "filter": null,
+        "is": true,
+        "length": 7
+      }
+    },
+    "10 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "11 0 R": {
+      "stream": {
+        "filter": null,
+        "is": true,
+        "length": 44
+      }
+    },
+    "12 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "13 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "14 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    }
+  }
+}

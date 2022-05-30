@@ -1,0 +1,190 @@
+%PDF-1.3
+%¿÷¢þ
+%QDF-1.0
+
+%% Original object ID: 1 0
+1 0 obj
+<<
+  /Names <<
+    /EmbeddedFiles 2 0 R
+  >>
+  /PageMode /UseAttachments
+  /Pages 3 0 R
+  /Type /Catalog
+>>
+endobj
+
+%% Original object ID: 2 0
+2 0 obj
+<<
+  /Names [
+    (a.txt)
+    4 0 R
+    <feff03c0002e007400780074>
+    5 0 R
+  ]
+>>
+endobj
+
+%% Original object ID: 3 0
+3 0 obj
+<<
+  /Count 1
+  /Kids [
+    6 0 R
+  ]
+  /Type /Pages
+>>
+endobj
+
+%% Original object ID: 4 0
+4 0 obj
+<<
+  /EF <<
+    /F 7 0 R
+    /UF 7 0 R
+  >>
+  /F (a.txt)
+  /Type /Filespec
+  /UF (a.txt)
+>>
+endobj
+
+%% Original object ID: 5 0
+5 0 obj
+<<
+  /Desc (Two filenames)
+  /EF <<
+    /F 9 0 R
+    /UF 9 0 R
+  >>
+  /F (pi.txt)
+  /Type /Filespec
+  /UF <feff03c0002e007400780074>
+>>
+endobj
+
+%% Page 1
+%% Original object ID: 6 0
+6 0 obj
+<<
+  /Contents 11 0 R
+  /MediaBox [
+    0
+    0
+    612
+    792
+  ]
+  /Parent 3 0 R
+  /Resources <<
+    /Font <<
+      /F1 13 0 R
+    >>
+    /ProcSet 14 0 R
+  >>
+  /Type /Page
+>>
+endobj
+
+%% Original object ID: 7 0
+7 0 obj
+<<
+  /Params <<
+    /Size 7
+  >>
+  /Type /EmbeddedFile
+  /Length 8 0 R
+>>
+stream
+potato
+endstream
+endobj
+
+8 0 obj
+7
+endobj
+
+%% Original object ID: 8 0
+9 0 obj
+<<
+  /Params <<
+    /CheckSum <e561f9248d7563d15dd93457b02ebbb6>
+    /CreationDate (D:20220530094116-05'00')
+    /ModDate (D:20220530094116-05'00')
+    /Size 7
+  >>
+  /Subtype /text#2fplain
+  /Type /EmbeddedFile
+  /Length 10 0 R
+>>
+stream
+potato
+endstream
+endobj
+
+10 0 obj
+7
+endobj
+
+%% Contents for page 1
+%% Original object ID: 9 0
+11 0 obj
+<<
+  /Length 12 0 R
+>>
+stream
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ET
+endstream
+endobj
+
+12 0 obj
+44
+endobj
+
+%% Original object ID: 10 0
+13 0 obj
+<<
+  /BaseFont /Helvetica
+  /Encoding /WinAnsiEncoding
+  /Subtype /Type1
+  /Type /Font
+>>
+endobj
+
+%% Original object ID: 11 0
+14 0 obj
+[
+  /PDF
+  /Text
+]
+endobj
+
+xref
+0 15
+0000000000 65535 f 
+0000000052 00000 n 
+0000000203 00000 n 
+0000000330 00000 n 
+0000000429 00000 n 
+0000000564 00000 n 
+0000000753 00000 n 
+0000000975 00000 n 
+0000001089 00000 n 
+0000001134 00000 n 
+0000001406 00000 n 
+0000001475 00000 n 
+0000001576 00000 n 
+0000001624 00000 n 
+0000001759 00000 n 
+trailer <<
+  /Root 1 0 R
+  /Size 15
+  /ID [<3d1a89e08f9d6b3e1f787d04fceed440><4e13de38230bb10a03e49285a742c392>]
+>>
+startxref
+1795
+%%EOF

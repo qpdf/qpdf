@@ -6,7 +6,15 @@ att1 -> 8,0
     /UF -> att1.txt
   all data streams:
     /F -> 8,0
+      creation date: D:20210207191121-05'00'
+      modification date: D:20210208001122Z
+      mime type: text/plain
+      checksum: 2e10f186a4cdf5be438747f4bdc2d4d4
     /UF -> 8,0
+      creation date: D:20210207191121-05'00'
+      modification date: D:20210208001122Z
+      mime type: text/plain
+      checksum: 2e10f186a4cdf5be438747f4bdc2d4d4
 att2 -> 10,0
   preferred name: att2.txt
   all names:
@@ -14,7 +22,15 @@ att2 -> 10,0
     /UF -> att2.txt
   all data streams:
     /F -> 10,0
+      creation date: 
+      modification date: 
+      mime type: text/plain
+      checksum: 2fce9c8228e360ba9b04a1bd1bf63d6b
     /UF -> 10,0
+      creation date: 
+      modification date: 
+      mime type: text/plain
+      checksum: 2fce9c8228e360ba9b04a1bd1bf63d6b
 att3 -> 12,0
   preferred name: π.txt
   all names:
@@ -22,4 +38,12 @@ att3 -> 12,0
     /UF -> π.txt
   all data streams:
     /F -> 12,0
+      creation date: 
+      modification date: 
+      mime type: text/plain
+      checksum: 2236c155b1d62b7f00285bba081d4336
     /UF -> 12,0
+      creation date: 
+      modification date: 
+      mime type: text/plain
+      checksum: 2236c155b1d62b7f00285bba081d4336

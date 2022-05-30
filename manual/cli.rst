@@ -3124,7 +3124,10 @@ Related Options
    :qpdf:ref:`--verbose`, additional information, including preferred
    file name, description, dates, and more are also displayed. The key
    is usually but not always equal to the file name and is needed by
-   some of the other options. See also :ref:`attachments`.
+   some of the other options. See also :ref:`attachments`. Note that
+   this option displays dates in PDF timestamp syntax. When attachment
+   information is included in json output (see :ref:`--json`), dates
+   are shown in ISO-8601 format.
 
 .. qpdf:option:: --show-attachment=key
 
