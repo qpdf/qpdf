@@ -28,6 +28,7 @@
       "streammethod": "AESv2",
       "stringmethod": "AESv2"
     },
+    "recovereduserpassword": null,
     "userpasswordmatched": true
   }
 }

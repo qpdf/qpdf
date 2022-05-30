@@ -103,6 +103,12 @@ For a detailed list of changes, please see the file
       attachments is also included in the ``attachments`` json key
       with ``--json``.
 
+    - For encrypted files, ``qpdf --json`` reveals the user password
+      when the specified password did not match the user password and
+      the owner password was used to recover the user password. The
+      user password is not recoverable from the owner password when
+      256-bit keys are in use.
+
   - Library Enhancements
 
     - New methods ``insertItemAndGet``, ``appendItemAndGet``,

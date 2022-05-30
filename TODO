@@ -70,8 +70,6 @@ Remaining work:
 
   * --show-xref: add
 
-  * --encryption: show recovered user password when available
-
 * Consider having --check, --show-encryption, etc., just select the
   right keys when in json mode. I don't think I want check on by
   default, so that might be different.

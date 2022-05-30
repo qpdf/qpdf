@@ -1,5 +1,10 @@
 2022-05-30  Jay Berkenbilt  <ejb@ql.org>
 
+        * When showing encryption data in json output, when the user
+        password was recovered with by the owner password and the
+        specified password does not match the user password, reveal the
+        user password. This is not possible with 256-bit keys.
+
         * Include additional information in --list-attachments --verbose
         and in --json --json-key=attachments.
 

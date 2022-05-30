@@ -219,6 +219,7 @@ foreach my $d (@encrypted_files)
         "      \"streammethod\": \"---method---\",\n" .
         "      \"stringmethod\": \"---method---\"\n" .
         "    },\n" .
+        "    \"recovereduserpassword\": ---rup---,\n" .
         "    \"userpasswordmatched\": ---upm---\n" .
         "  }\n" .
         "}\n";
@@ -267,6 +268,8 @@ foreach my $d (@encrypted_files)
         my $method = $bits == 256 ? "AESv3" : "RC4";
         my $opm = ($pass eq $opass ? "true" : "false");
         my $upm = ($pass eq $upass ? "true" : "false");
+        my $rup = (($pass eq $opass) && ($pass ne $upass) && ($V < 5))
+            ? "\"$upass\"" : "null";
         $enc_json =~ s/---R---/$R/;
         $enc_json =~ s/---P---/$P/;
         $enc_json =~ s/---V---/$V/;
@@ -274,6 +277,7 @@ foreach my $d (@encrypted_files)
         $enc_json =~ s/---method---/$method/g;
         $enc_json =~ s/---opm---/$opm/;
         $enc_json =~ s/---upm---/$upm/;
+        $enc_json =~ s/---rup---/$rup/;
 
         my $eflags = "--allow-weak-crypto" .
             " -encrypt \"$upass\" \"$opass\" $bits $xeflags --";

@@ -1382,6 +1382,15 @@ QPDFJob::doJSONEncrypt(Pipeline* p, bool& first, QPDF& pdf)
     j_encrypt.addDictionaryMember(
         "ownerpasswordmatched",
         JSON::makeBool(is_encrypted && pdf.ownerPasswordMatched()));
+    if (is_encrypted && (V < 5) && pdf.ownerPasswordMatched() &&
+        (!pdf.userPasswordMatched())) {
+        std::string user_password = pdf.getTrimmedUserPassword();
+        j_encrypt.addDictionaryMember(
+            "recovereduserpassword", JSON::makeString(user_password));
+    } else {
+        j_encrypt.addDictionaryMember(
+            "recovereduserpassword", JSON::makeNull());
+    }
     JSON j_capabilities =
         j_encrypt.addDictionaryMember("capabilities", JSON::makeDictionary());
     j_capabilities.addDictionaryMember(
@@ -1669,6 +1678,7 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
   },
   "encrypted": "whether the document is encrypted",
   "ownerpasswordmatched": "whether supplied password matched owner password; always false for non-encrypted files",
+  "recovereduserpassword": "If the owner password was used to recover the user password, reveal user password; otherwise null",
   "parameters": {
     "P": "P value from Encrypt dictionary",
     "R": "R value from Encrypt dictionary",
