@@ -817,4 +817,5 @@ QPDF::writeJSON(
     JSON::writeDictionaryClose(p, first_qpdf, 1);
     JSON::writeDictionaryClose(p, first, 0);
     *p << "\n";
+    p->finish();
 }

@@ -271,6 +271,7 @@
     "mkinstalldirs",
     "mklink",
     "moddate",
+    "modifyannotations",
     "monoseq",
     "msvc",
     "msvcrt",

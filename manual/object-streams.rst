@@ -122,7 +122,7 @@ entries in ``/W`` above. Each entry consists of one or more fields, the
 first of which is the type of the field. The number of bytes for each
 field is given by ``/W`` above. A 0 in ``/W`` indicates that the field
 is omitted and has the default value. The default value for the field
-type is "``1``". All other default values are "``0``".
+type is ``1``. All other default values are ``0``.
 
 PDF 1.5 has three field types:
 

@@ -242,7 +242,7 @@ the current file position. If the token is a not either a dictionary or
 array opener, an object is immediately constructed from the single token
 and the parser returns. Otherwise, the parser iterates in a special mode
 in which it accumulates objects until it finds a balancing closer.
-During this process, the "``R``" keyword is recognized and an indirect
+During this process, the ``R`` keyword is recognized and an indirect
 ``QPDFObjectHandle`` may be constructed.
 
 The ``QPDF::resolve()`` method, which is used to resolve an indirect
@@ -280,15 +280,15 @@ file.
   it is looking before the last ``%%EOF``. After getting to ``trailer``
   keyword, it invokes the parser.
 
-- The parser sees "``<<``", so it calls itself recursively in
+- The parser sees ``<<``, so it calls itself recursively in
   dictionary creation mode.
 
 - In dictionary creation mode, the parser keeps accumulating objects
-  until it encounters "``>>``". Each object that is read is pushed onto
-  a stack. If "``R``" is read, the last two objects on the stack are
+  until it encounters ``>>``. Each object that is read is pushed onto
+  a stack. If ``R`` is read, the last two objects on the stack are
   inspected. If they are integers, they are popped off the stack and
   their values are used to construct an indirect object handle which is
-  then pushed onto the stack. When "``>>``" is finally read, the stack
+  then pushed onto the stack. When ``>>`` is finally read, the stack
   is converted into a ``QPDF_Dictionary`` which is placed in a
   ``QPDFObjectHandle`` and returned.
 

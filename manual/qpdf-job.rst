@@ -27,6 +27,10 @@ executable is available from inside the C++ library using the
 
   - Use from the C API with ``qpdfjob_run_from_json`` from :file:`qpdfjob-c.h`
 
+  - Note: this is unrelated to :qpdf:ref:`--json` but can be combined
+    with it. For more information on qpdf JSON (vs. QPDFJob JSON), see
+    :ref:`json`.
+
 - The ``QPDFJob`` C++ API
 
 If you can understand how to use the :command:`qpdf` CLI, you can

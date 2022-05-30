@@ -112,8 +112,11 @@ class QPDF
 
     // Create a PDF from an input source that contains JSON as written
     // by writeJSON (or qpdf --json-output, version 2 or higher). The
-    // JSON must be a complete representation of a PDF. See "QPDF JSON
-    // Format" in the manual for details.
+    // JSON must be a complete representation of a PDF. See "qpdf
+    // JSON" in the manual for details. The input JSON may be
+    // arbitrarily large. QPDF does not load stream data into memory
+    // for more than one stream at a time, even if the stream data is
+    // specified inline.
     QPDF_DLL
     void createFromJSON(std::string const& json_file);
     QPDF_DLL
@@ -122,24 +125,40 @@ class QPDF
     // Update a PDF from an input source that contains JSON in the
     // same format as is written by writeJSON (or qpdf --json-output,
     // version 2 or higher). Objects in the PDF and not in the JSON
-    // are not modified. See "QPDF JSON Format" in the manual for
-    // details.
+    // are not modified. See "qpdf JSON" in the manual for details. As
+    // with createFromJSON, the input JSON may be arbitrarily large.
     QPDF_DLL
     void updateFromJSON(std::string const& json_file);
     QPDF_DLL
     void updateFromJSON(std::shared_ptr<InputSource>);
 
-    // Write qpdf json format. The only supported version is 2. If
-    // wanted_objects is empty, write all objects. Otherwise, write
-    // only objects whose keys are in wanted_objects. Keys may be
-    // either "trailer" or of the form "obj:n n R". Invalid keys are
-    // ignored.
+    // Write qpdf json format to the pipeline "p". The only supported
+    // version is 2. The finish() method is called on the pipeline at
+    // the end. The decode_level parameter controls which streams are
+    // uncompressed in the JSON. Use qpdf_dl_none to preserve all
+    // stream data exactly as it appears in the input. The possible
+    // values for json_stream_data can be found in qpdf/Constants.h
+    // and correspond to the --json-stream-data command-line argument.
+    // If json_stream_data is qpdf_sj_file, file_prefix must be
+    // specified. Each stream will be written to a file whose path is
+    // constructed by appending "-nnn" to file_prefix, where "nnn" is
+    // the object number (not zero-filled). If wanted_objects is
+    // empty, write all objects. Otherwise, write only objects whose
+    // keys are in wanted_objects. Keys may be either "trailer" or of
+    // the form "obj:n n R". Invalid keys are ignored. This
+    // corresponds to the --json-object command-line argument.
+    //
+    // QPDF is efficient with regard to memory when writing, allowing
+    // you to write arbitrarily large PDF files to a pipeline. You can
+    // use a pipeline like Pl_Buffer or Pl_String to capture the JSON
+    // output in memory, but do so with caution as this will allocate
+    // enough memory to hold the entire PDF file.
     QPDF_DLL
     void writeJSON(
         int version,
-        Pipeline*,
-        qpdf_stream_decode_level_e,
-        qpdf_json_stream_data_e,
+        Pipeline* p,
+        qpdf_stream_decode_level_e decode_level,
+        qpdf_json_stream_data_e json_stream_data,
         std::string const& file_prefix,
         std::set<std::string> wanted_objects);
 

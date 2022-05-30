@@ -60,7 +60,8 @@ For a detailed list of changes, please see the file
   - CLI: breaking changes
 
     - The default json output version when :qpdf:ref:`--json` is
-      specified has been changed from ``1`` to ``latest``.
+      specified has been changed from ``1`` to ``latest``, which is
+      now ``2``.
 
     - The :qpdf:ref:`--allow-weak-crypto` flag is now mandatory when
       explicitly creating files with weak cryptographic algorithms.
@@ -100,7 +101,7 @@ For a detailed list of changes, please see the file
 
     - ``qpdf --list-attachments --verbose`` include some additional
       information about attachments. Additional information about
-      attachments is also included in the ``attachments`` json key
+      attachments is also included in the ``attachments`` JSON key
       with ``--json``.
 
     - For encrypted files, ``qpdf --json`` reveals the user password
@@ -647,8 +648,8 @@ For a detailed list of changes, please see the file
       passwords from files or standard input than using
       :samp:`@file` for this purpose.
 
-    - Add some information about attachments to the json output, and
-      added ``attachments`` as an additional json key. The
+    - Add some information about attachments to the JSON output, and
+      added ``attachments`` as an additional JSON key. The
       information included here is limited to the preferred name and
       content stream and a reference to the file spec object. This is
       enough detail for clients to avoid the hassle of navigating a

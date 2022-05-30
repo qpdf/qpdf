@@ -28,6 +28,13 @@ able to restore edited files to a correct state. The
 arguments. It reads a possibly edited QDF file from standard input and
 writes a repaired file to standard output.
 
+For another way to work with PDF files in an editor, see :ref:`json`.
+Using qpdf JSON format allows you to edit the PDF file semantically
+without having to be concerned about PDF syntax. However, QDF files
+are actually valid PDF files, so the feedback cycle may be faster if
+previewing with a PDF reader. Also, since QDF files are valid PDF, you
+can experiment with all aspects of the PDF file, including syntax.
+
 The following attributes characterize a QDF file:
 
 - All objects appear in numerical order in the PDF file, including when

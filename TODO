@@ -2,14 +2,13 @@
 Next
 ====
 
+Before Release:
+
 * At next release, hide release-qpdf-10.6.3.0cmake* versions at readthedocs
 * Stay on top of https://github.com/pikepdf/pikepdf/pull/315
 * Release qtest with updates to qtest-driver and copy back into qpdf
 
-In order:
-* json v2
-
-Other (do in any order):
+Pending changes:
 
 * Good C API for json v2
 * QPDFPagesTree -- avoid ever flattening the pages tree.
@@ -50,179 +49,9 @@ Other (do in any order):
   * Rework tests so that nothing is written into the source directory.
     Ideally then the entire build could be done with a read-only
     source tree.
+* Consider adding fuzzer code for JSON
 
 Soon: Break ground on "Document-level work"
-
-Output JSON v2
-==============
-
-Remaining work:
-
-* Make sure all the information from informational options is
-  available in the json output.
-
-  * --check: add but maybe not by default?
-
-  * --show-linearization: add but maybe not by default? Also figure
-    out whether warnings reported for some of the PDF specs (1.7) are
-    qpdf problems. This may not be worth adding in the first
-    increment.
-
-  * --show-xref: add
-
-* Consider having --check, --show-encryption, etc., just select the
-  right keys when in json mode. I don't think I want check on by
-  default, so that might be different.
-
-* Consider having warnings be included in the json in a "warnings" key
-  in json mode.
-
-Notes for documentation:
-
-* Find all mentions of json in the manual and update.
-
-* Document typo fix in encrypt in release notes along with any other
-  non-compatible json 2 changes. Scrutinize all the output to decide
-  what should change.
-
-* Keys other than "qpdf-v2" are ignored so people can stash their own
-  stuff. Unknown keys are ignored at other places for future
-  compatibility. Readers of qpdf json should continue to ignore keys
-  they don't recognize.
-
-* Change: names are written in canonical form with a leading slash
-  just as they are treated in the code. In v1, they were written in
-  PDF syntax in the json file. Example: /text#2fplain in pdf will be
-  written as /text/plain in json v2 and as /text#2fplain in json v1.
-
-* Document changes to strings, objects, streams, object keys.
-
-* CLI: --json-input, --json-output[=version], --update-from-json. With
-  --json-input, the input file is a JSON file instead of a PDF file.
-  It must be complete, meaning that a PDF version must be given, all
-  streams must have exactly one of data or datafile, and a trailer
-  dictionary must be present, even if empty.
-
-  With --update-from-json, the JSON file updates objects in place. If
-  updating an old stream, if stream data is omitted, the data remains
-  untouched. The dictionary is always required. Remember that
-  QPDFWriter does not preserve object numbers, though --json-output
-  does. Therefore, if you want to update a PDF with a JSON, the input
-  to --update-from-json must be the same PDF as the one that
-  --json-output was run on previously. Otherwise, object numbers won't
-  match. Show this with an example. When updating,
-
-* Certain fields are ignored when reading the JSON. This includes
-  maxobjectid, any computed fields in trailer (such as /Size), and all
-  /Length keys in stream dictionaries. There is no need for the user
-  to correct, remove, or otherwise worry about any values those keys
-  might have. The maxobjectid field is present in the original output
-  to assist with adding new objects to the file.
-
-* JSON strings within PDF objects:
-
-  * "n n R" is an indirect object
-
-  * "/Name" is a name in canonical form with a leading slash (like
-    "/text/plain"), not PDF syntax (like "/text#2fplain").
-
-  * "b:hex-digits" is a binary string ("b:feff03c0"). Hex digits may be
-    mixed case. There must be an even number of digits.
-
-  * "u:utf-8" is a UTF-8 encoded string ("u:π", "u:\u03c0"). UTF-16
-    surrogate pairs are allowed. These are all equivalent: "u:🥔",
-    "u:\ud83e\udd54", "b:FEFFD83EDD54", "b:efbbbff09fa594".
-
-  * Both "b:" and "u:" are valid representations of the empty string.
-
-  * Anything else is an error
-
-* Document use of --json-input and --json-output together to show
-  preservation of object numbers. Draw attention to "original object
-  ID" comments in qdf as another way to show it.
-
-* Document top-level keys of "qpdf-v2" ("pdfversion", "objects",
-  "maxobjectid") noting that "maxobjectid" is ignored when reading.
-
-* Stream data: "data" is base64-encoded stream data. "datafile" is the
-  path to a file (relative path recommended but not required)
-  containing the binary data. As with any PDF representation, the data
-  must be consistent with the filters. --decode-level is honored by
-  --json-output.
-
-* Other changes from v1:
-
-  * in "objects", keys are "obj:o g R" or "trailer"
-
-  * Non-stream objects are dictionaries with a "value" key whose value
-    is the object. Stream objects are dictionaries with a "stream" key
-    whose value is {"dict": stream-dictionary}. The "/Length" key is
-    omitted from the stream dictionary.
-
-  * "objectinfo" is gone as it is now possible to tell a stream from a
-    non-stream directly. To get stream data, use the --json-output
-    option. Note about how "pages" may cause the pages tree to be
-    corrected.
-
-For non-streams:
-
-  "obj:o g R": {
-    "value": ...
-  }
-
-For streams:
-
-  "obj:o g R": {
-    "stream": {
-      "dict": { ... stream dictionary ... },
-      "data": "base64-encoded data",
-      "datafile": "path to base64-encoded data"
-    }
-  }
-
-Rationale of "obj:o g R" is that indirect object references are just
-"o g R", and so code that wants to resolve one can do so easily by
-just prepending "obj:" and not having to parse or split the string.
-Having a prefix rather than making the key just "o g R" makes it much
-easier to search in the JSON for the definition of an object.
-
-CLI:
-
-Example workflow:
-* qpdf in.pdf --json-output pdf.json
-* edit pdf.json
-* qpdf --json-input pdf.json out.pdf
-
-* qpdf in.pdf --json-output pdf.json
-* edit pdf.json keeping only objects that need to be changed
-* qpdf in.pdf --update-from-json=pdf.json out.pdf
-
-To modify a single object:
-
-* qpdf in.pdf --json-output pdf.json --json-object=o,g
-* edit pdf.json
-* qpdf in.pdf --update-from-json=pdf.json out.pdf
-
-Historical note: you can't create a PDF from v1 json because
-
-* The PDF version header is not recorded
-
-* Strings cannot be unambiguously encoded/decoded
-
-  * Can't tell string from name from indirect object
-
-  * Strings are treated as PDF doc encoding and output as UTF-8, which
-    doesn't work since multiple PDF doc code points are undefined and
-    is absurd for binary strings
-
-* There is no representation of stream data
-
-* You can't tell a stream from a dictionary except by looking in both
-  "object" and "objectinfo".
-
-* Using "n n R" as a key in "objects" and "objectinfo" makes it hard
-  to search for things when viewing the JSON file in an editor.
-
 
 QPDFPagesTree
 =============
@@ -255,6 +84,28 @@ sure /Count and /Parent are correct.
 
 refs/attic/QPDFPagesTree-old -- original, abandoned branch -- clean up
 when done.
+
+Possible future JSON enhancements
+=================================
+
+* Add to JSON output the information available from a few additional
+  informational options:
+
+  * --check: add but maybe not by default?
+
+  * --show-linearization: add but maybe not by default? Also figure
+    out whether warnings reported for some of the PDF specs (1.7) are
+    qpdf problems. This may not be worth adding in the first
+    increment.
+
+  * --show-xref: add
+
+* Consider having --check, --show-encryption, etc., just select the
+  right keys when in json mode. I don't think I want check on by
+  default, so that might be different.
+
+* Consider having warnings be included in the json in a "warnings" key
+  in json mode.
 
 QPDFJob
 =======

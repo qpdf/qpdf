@@ -70,12 +70,14 @@ Python
    qpdf's capabilities with other functionality provided by Python's
    rich standard library and available modules.
 
-Other Languages
-   Starting with version 8.3.0, the :command:`qpdf`
-   command-line tool can produce a JSON representation of the PDF file's
-   non-content data. This can facilitate interacting programmatically
-   with PDF files through qpdf's command line interface. For more
-   information, please see :ref:`json`.
+Other Languages Starting with version 11.0.0, the :command:`qpdf`
+   command-line tool can produce an unambiguous JSON representation of
+   a PDF file and can also create or update PDF files using this JSON
+   representation. qpdf versions from 8.3.0 through 10.6.3 had a more
+   limited JSON output format. The qpdf JSON format makes it possible
+   to inspect and modify the structure of a PDF file down to the
+   object level from the command-line or from any language that can
+   handle JSON data. Please see :ref:`json` for details.
 
 Wrappers
    The `qpdf Wiki <https://github.com/qpdf/qpdf/wiki>`__ contains a
