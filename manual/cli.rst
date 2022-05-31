@@ -3143,8 +3143,8 @@ Related Options
    some of the other options. See also :ref:`attachments`. Note that
    this option displays dates in PDF timestamp syntax. When attachment
    information is included in json output in the ``"attachments"`` key
-   (see :ref:`--json`), dates are shown (just within that object) in
-   ISO-8601 format.
+   (see :qpdf:ref:`--json`), dates are shown (just within that object)
+   in ISO-8601 format.
 
 .. qpdf:option:: --show-attachment=key
 
