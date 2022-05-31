@@ -18,6 +18,25 @@ For a detailed list of changes, please see the file
       this can be turned off by following the migration steps outlined
       in the manual.
 
+  - qpdf JSON version 2
+
+    - qpdf's JSON output mode is now at version 2. This fixes several
+      flaws with version 1. Version 2 JSON output is unambiguous and
+      complete, and bidrectional conversion between JSON and PDF is
+      supported. Command-line options and library API are available
+      for creating JSON from PDF, creating PDF from JSON and updating
+      existing PDF at the object level from JSON.
+
+    - New command-line arguments: :qpdf:ref:`--json-output`,
+      :qpdf:ref:`--json-input`, :qpdf:ref:`--update-from-json`
+
+    - New C++ API calls: ``QPDF::writeJSON``,
+      ``QPDF::createFromJSON``, ``QPDF::updateFromJSON``
+
+    - Complete documentation can be found at :ref:`json`. A
+      comprehensive list of changes from version 1 to version 2 can be
+      found at :ref:`json-v2-changes`.
+
   - Build replaced with cmake
 
     - The old autoconf-based build has been replaced with CMake. Version

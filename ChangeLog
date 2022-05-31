@@ -1,5 +1,10 @@
 2022-05-30  Jay Berkenbilt  <ejb@ql.org>
 
+        * qpdf JSON is now at version 2. New command-line arguments:
+        --json-output, --json-input, --update-from-json. New methods
+        QPDF::writeJSON, QPDF::createFromJSON, QPDF::updateFromJSON. For
+        details, see the "qpdf JSON" chapter of the manual.
+
         * When showing encryption data in json output, when the user
         password was recovered with by the owner password and the
         specified password does not match the user password, reveal the
