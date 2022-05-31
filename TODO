@@ -8,6 +8,10 @@ Before Release:
 * Stay on top of https://github.com/pikepdf/pikepdf/pull/315
 * Release qtest with updates to qtest-driver and copy back into qpdf
 
+Next:
+* output capture
+* QPDFPagesTree -- avoid ever flattening the pages tree.
+
 Pending changes:
 
 * Think about whether additional JSON use cases would be served by
@@ -20,17 +24,10 @@ Pending changes:
   json.rst" from June 5
   (04ad60e5-3274-4a9e-abde-3de97640d370@www.fastmail.com)
 * Good C API for json v2
-* QPDFPagesTree -- avoid ever flattening the pages tree.
 * Check about runpath in the linux-bin distribution. I think the
   appimage build specifically is setting the runpath, which is
   actually desirable in this case. Make sure to understand and
   document this. Maybe add a check for it in the build.
-* See if I can change all output and error messages issued by the
-  library, when context is available, to have a pipeline rather than a
-  FILE* or std::ostream. This makes it possible for people to capture
-  output more flexibly. We could also add a generic pipeline that
-  takes std::function<void(char const*, size_t)> or even a
-  void(*)(char const*, unsigned long) for the C API.
 * Make job JSON accept a single element and treat as an array of one
   when an array is expected. This allows for making things repeatable
   in the future without breaking compatibility and is needed for the
@@ -46,10 +43,6 @@ Pending changes:
   reveal additional details, --show-encryption could potentially retry
   with this option if the first time doesn't work. Then, with the file
   open, we can read the encryption dictionary normally.
-* Find all places in the code that write to std::cout, std::err,
-  stdout, or stderr to make sure they obey default output stream
-  settings for QPDF and QPDFJob. This probably includes adding a
-  Pl_Ostream pipeline.
 * Nice to have:
   * In libtests, separate executables that need the object library
     from those that strictly use public API. Move as many of the test
@@ -61,6 +54,47 @@ Pending changes:
 * Consider adding fuzzer code for JSON
 
 Soon: Break ground on "Document-level work"
+
+Output Capture + QPDFJob
+========================
+
+QPDFJob:
+
+* Expose the meanings of the return values of qpdfjob functions to the
+  C API.
+* Allow users to supply a custom progress reporter for QPDFJob
+
+Output Capture
+
+See https://github.com/qpdf/qpdf/issues/691
+
+QPDFLogger maintains pipelines for info, warn, error, and save.
+
+There is a singleton, default QPDFLogger which all QPDF and QPDFJob
+objects get on construction. In most cases, it is not necessary to
+override this. Allow QPDFJob and QPDF to be passed a new logger
+instance. QPDFJob should pass its QPDFLogger to all QPDF objects it
+creates. The main uses cases for this would be for multithreading or
+for having a library that uses QPDF privately and modifies logger
+settings so that it wouldn't interfere with a downstream library or
+application also using qpdf.
+
+There needs to be a C API to QPDFLogger. Use functions like this:
+
+void set_info((*f)(char* data, unsigned int len, void* udata), void* udata);
+
+We should probably deprecate the output/error setters in QPDF and
+QPDFJob. In the meantime, document that they won't work anymore to set
+different outputs with different QPDF objects. We may need to delete
+rather than deprecate these methods.
+
+Find all places in the library that write to stdout/stderr/cout/cerr.
+Also find places that raise exceptions if unable to warn. These should
+use the global output writer.
+
+Figure out a good way to use the save pipeline for QPDFWriter as well
+as saving attachments, showing stream data, etc.
+
 
 QPDFPagesTree
 =============
@@ -116,31 +150,12 @@ Possible future JSON enhancements
 * Consider having warnings be included in the json in a "warnings" key
   in json mode.
 
+
 QPDFJob
 =======
 
 Here are some ideas for QPDFJob that didn't make it into 10.6. Not all
 of these are necessarily good -- just things to consider.
-
-* replace mode: --replace-object, --replace-stream-raw,
-  --replace-stream-filtered
-  * update first paragraph of QPDF JSON in the manual to mention this
-  * object numbers are not preserved by write, so object ID lookup
-    has to be done separately for each invocation
-  * you don't have to specify length for streams
-  * you only have to specify filtering for streams if providing raw data
-
-* Allow users to supply a custom progress reporter for QPDFJob
-
-* Better interoperability with json output:
-
-  * Make sure all the things that print stuff to stdout have json
-    equivalents (check, showLinearizationData, etc.)
-  * There should be a way to get json output other than having it
-    print to stdout. It should be multi-language friendly and allow
-    for large amounts of data, such as providing a callback that qpdf
-    can write to (like a pipeline)
-  * See also JSON v2
 
 * How do we chain jobs? The idea would be that the input and/or output
   of a QPDFJob could be a QPDF object rather than a file. For input,
