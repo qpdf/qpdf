@@ -145,7 +145,8 @@ For a detailed list of changes, please see the file
 
       - ``writeString``: writes a std::string
 
-      - ``operator <<``: for null-terminated C strings and std::strings
+      - ``operator <<``: for null-terminated C strings, std::strings,
+        and integer types
 
     - Add new ``Pipeline`` type ``Pl_OStream`` to write to a
       ``std::ostream``.

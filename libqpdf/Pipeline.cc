@@ -1,5 +1,7 @@
 #include <qpdf/Pipeline.hh>
 
+#include <qpdf/QUtil.hh>
+
 #include <cstring>
 #include <stdexcept>
 
@@ -49,6 +51,62 @@ Pipeline&
 Pipeline::operator<<(std::string const& str)
 {
     this->writeString(str);
+    return *this;
+}
+
+Pipeline&
+Pipeline::operator<<(short i)
+{
+    this->writeString(QUtil::int_to_string(i));
+    return *this;
+}
+
+Pipeline&
+Pipeline::operator<<(int i)
+{
+    this->writeString(QUtil::int_to_string(i));
+    return *this;
+}
+
+Pipeline&
+Pipeline::operator<<(long i)
+{
+    this->writeString(QUtil::int_to_string(i));
+    return *this;
+}
+
+Pipeline&
+Pipeline::operator<<(long long i)
+{
+    this->writeString(QUtil::int_to_string(i));
+    return *this;
+}
+
+Pipeline&
+Pipeline::operator<<(unsigned short i)
+{
+    this->writeString(QUtil::uint_to_string(i));
+    return *this;
+}
+
+Pipeline&
+Pipeline::operator<<(unsigned int i)
+{
+    this->writeString(QUtil::uint_to_string(i));
+    return *this;
+}
+
+Pipeline&
+Pipeline::operator<<(unsigned long i)
+{
+    this->writeString(QUtil::uint_to_string(i));
+    return *this;
+}
+
+Pipeline&
+Pipeline::operator<<(unsigned long long i)
+{
+    this->writeString(QUtil::uint_to_string(i));
     return *this;
 }
 

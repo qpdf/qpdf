@@ -86,6 +86,24 @@ class QPDF_DLL_CLASS Pipeline
     Pipeline& operator<<(char const* cstr);
     QPDF_DLL
     Pipeline& operator<<(std::string const&);
+    // Calls QUtil::int_to_string
+    QPDF_DLL
+    Pipeline& operator<<(short);
+    QPDF_DLL
+    Pipeline& operator<<(int);
+    QPDF_DLL
+    Pipeline& operator<<(long);
+    QPDF_DLL
+    Pipeline& operator<<(long long);
+    // Calls QUtil::uint_to_string
+    QPDF_DLL
+    Pipeline& operator<<(unsigned short);
+    QPDF_DLL
+    Pipeline& operator<<(unsigned int);
+    QPDF_DLL
+    Pipeline& operator<<(unsigned long);
+    QPDF_DLL
+    Pipeline& operator<<(unsigned long long);
 
     // Overloaded write to reduce casting
     QPDF_DLL

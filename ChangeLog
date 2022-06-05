@@ -1,3 +1,9 @@
+2022-06-05  Jay Berkenbilt  <ejb@ql.org>
+
+        * Add integer types to pipeline's operator<<: short, int, long,
+        long long, unsigned short, unsigned int, unsigned long, unsigned
+        long long.
+
 2022-05-30  Jay Berkenbilt  <ejb@ql.org>
 
         * qpdf JSON is now at version 2. New command-line arguments:
