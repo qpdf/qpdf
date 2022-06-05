@@ -1,5 +1,9 @@
 2022-06-05  Jay Berkenbilt  <ejb@ql.org>
 
+        * QPDFJob: API breaking change: QPDFJob::doIfVerbose passes a
+        Pipeline& rather than a std::ostream& to the the callback
+        function.
+
         * Add integer types to pipeline's operator<<: short, int, long,
         long long, unsigned short, unsigned int, unsigned long, unsigned
         long long.

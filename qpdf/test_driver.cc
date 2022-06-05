@@ -570,7 +570,17 @@ test_11(QPDF& pdf, char const* arg2)
 static void
 test_12(QPDF& pdf, char const* arg2)
 {
+#ifdef _MSC_VER
+# pragma warning(disable : 4996)
+#endif
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     pdf.setOutputStreams(0, 0);
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic pop
+#endif
     pdf.showLinearizationData();
 }
 
@@ -579,7 +589,17 @@ test_13(QPDF& pdf, char const* arg2)
 {
     std::ostringstream out;
     std::ostringstream err;
+#ifdef _MSC_VER
+# pragma warning(disable : 4996)
+#endif
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     pdf.setOutputStreams(&out, &err);
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic pop
+#endif
     pdf.showLinearizationData();
     std::cout << "---output---" << std::endl
               << out.str() << "---error---" << std::endl
@@ -2951,7 +2971,17 @@ test_84(QPDF& pdf, char const* arg2)
     std::ostringstream cerr;
     {
         QPDFJob j;
+#ifdef _MSC_VER
+# pragma warning(disable : 4996)
+#endif
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         j.setOutputStreams(&cout, &cerr);
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic pop
+#endif
         j.config()
             ->inputFile("bad2.pdf")
             ->showObject("4,0")

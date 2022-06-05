@@ -8,6 +8,7 @@
 #include <qpdf/Pl_Count.hh>
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/QPDFExc.hh>
+#include <qpdf/QPDFLogger.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
@@ -72,9 +73,9 @@ QPDF::checkLinearization()
         readLinearizationData();
         result = checkLinearizationInternal();
     } catch (std::runtime_error& e) {
-        *this->m->err_stream
+        *this->m->log->getError()
             << "WARNING: error encountered while checking linearization data: "
-            << e.what() << std::endl;
+            << e.what() << "\n";
     }
     return result;
 }
@@ -360,9 +361,9 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
     }
     qpdf_offset_t computed_end = offset + toO(length);
     if ((computed_end < min_end_offset) || (computed_end > max_end_offset)) {
-        *this->m->err_stream << "expected = " << computed_end
-                             << "; actual = " << min_end_offset << ".."
-                             << max_end_offset << std::endl;
+        *this->m->log->getError()
+            << "expected = " << computed_end << "; actual = " << min_end_offset
+            << ".." << max_end_offset << "\n";
         throw QPDFExc(
             qpdf_e_damaged_pdf,
             this->m->file->getName(),
@@ -643,14 +644,14 @@ QPDF::checkLinearizationInternal()
     if (!errors.empty()) {
         result = false;
         for (auto const& error: errors) {
-            *this->m->err_stream << "WARNING: " << error << std::endl;
+            *this->m->log->getError() << "WARNING: " << error << "\n";
         }
     }
 
     if (!warnings.empty()) {
         result = false;
         for (auto const& warning: warnings) {
-            *this->m->err_stream << "WARNING: " << warning << std::endl;
+            *this->m->log->getError() << "WARNING: " << warning << "\n";
         }
     }
 
@@ -1013,39 +1014,34 @@ QPDF::showLinearizationData()
         checkLinearizationInternal();
         dumpLinearizationDataInternal();
     } catch (QPDFExc& e) {
-        *this->m->err_stream << e.what() << std::endl;
+        *this->m->log->getError() << e.what() << "\n";
     }
 }
 
 void
 QPDF::dumpLinearizationDataInternal()
 {
-    *this->m->out_stream << this->m->file->getName()
-                         << ": linearization data:" << std::endl
-                         << std::endl;
+    *this->m->log->getInfo()
+        << this->m->file->getName() << ": linearization data:\n\n";
 
-    *this->m->out_stream
-        << "file_size: " << this->m->linp.file_size << std::endl
-        << "first_page_object: " << this->m->linp.first_page_object << std::endl
-        << "first_page_end: " << this->m->linp.first_page_end << std::endl
-        << "npages: " << this->m->linp.npages << std::endl
-        << "xref_zero_offset: " << this->m->linp.xref_zero_offset << std::endl
-        << "first_page: " << this->m->linp.first_page << std::endl
-        << "H_offset: " << this->m->linp.H_offset << std::endl
-        << "H_length: " << this->m->linp.H_length << std::endl
-        << std::endl;
+    *this->m->log->getInfo()
+        << "file_size: " << this->m->linp.file_size << "\n"
+        << "first_page_object: " << this->m->linp.first_page_object << "\n"
+        << "first_page_end: " << this->m->linp.first_page_end << "\n"
+        << "npages: " << this->m->linp.npages << "\n"
+        << "xref_zero_offset: " << this->m->linp.xref_zero_offset << "\n"
+        << "first_page: " << this->m->linp.first_page << "\n"
+        << "H_offset: " << this->m->linp.H_offset << "\n"
+        << "H_length: " << this->m->linp.H_length << "\n"
+        << "\n";
 
-    *this->m->out_stream << "Page Offsets Hint Table" << std::endl << std::endl;
+    *this->m->log->getInfo() << "Page Offsets Hint Table\n\n";
     dumpHPageOffset();
-    *this->m->out_stream << std::endl
-                         << "Shared Objects Hint Table" << std::endl
-                         << std::endl;
+    *this->m->log->getInfo() << "\nShared Objects Hint Table\n\n";
     dumpHSharedObject();
 
     if (this->m->outline_hints.nobjects > 0) {
-        *this->m->out_stream << std::endl
-                             << "Outlines Hint Table" << std::endl
-                             << std::endl;
+        *this->m->log->getInfo() << "\nOutlines Hint Table\n\n";
         dumpHGeneric(this->m->outline_hints);
     }
 }
@@ -1066,42 +1062,41 @@ void
 QPDF::dumpHPageOffset()
 {
     HPageOffset& t = this->m->page_offset_hints;
-    *this->m->out_stream
-        << "min_nobjects: " << t.min_nobjects << std::endl
-        << "first_page_offset: " << adjusted_offset(t.first_page_offset)
-        << std::endl
-        << "nbits_delta_nobjects: " << t.nbits_delta_nobjects << std::endl
-        << "min_page_length: " << t.min_page_length << std::endl
-        << "nbits_delta_page_length: " << t.nbits_delta_page_length << std::endl
-        << "min_content_offset: " << t.min_content_offset << std::endl
+    *this->m->log->getInfo()
+        << "min_nobjects: " << t.min_nobjects << "\n"
+        << "first_page_offset: " << adjusted_offset(t.first_page_offset) << "\n"
+        << "nbits_delta_nobjects: " << t.nbits_delta_nobjects << "\n"
+        << "min_page_length: " << t.min_page_length << "\n"
+        << "nbits_delta_page_length: " << t.nbits_delta_page_length << "\n"
+        << "min_content_offset: " << t.min_content_offset << "\n"
         << "nbits_delta_content_offset: " << t.nbits_delta_content_offset
-        << std::endl
-        << "min_content_length: " << t.min_content_length << std::endl
+        << "\n"
+        << "min_content_length: " << t.min_content_length << "\n"
         << "nbits_delta_content_length: " << t.nbits_delta_content_length
-        << std::endl
-        << "nbits_nshared_objects: " << t.nbits_nshared_objects << std::endl
-        << "nbits_shared_identifier: " << t.nbits_shared_identifier << std::endl
-        << "nbits_shared_numerator: " << t.nbits_shared_numerator << std::endl
-        << "shared_denominator: " << t.shared_denominator << std::endl;
+        << "\n"
+        << "nbits_nshared_objects: " << t.nbits_nshared_objects << "\n"
+        << "nbits_shared_identifier: " << t.nbits_shared_identifier << "\n"
+        << "nbits_shared_numerator: " << t.nbits_shared_numerator << "\n"
+        << "shared_denominator: " << t.shared_denominator << "\n";
 
     for (size_t i1 = 0; i1 < toS(this->m->linp.npages); ++i1) {
         HPageOffsetEntry& pe = t.entries.at(i1);
-        *this->m->out_stream
-            << "Page " << i1 << ":" << std::endl
-            << "  nobjects: " << pe.delta_nobjects + t.min_nobjects << std::endl
+        *this->m->log->getInfo()
+            << "Page " << i1 << ":\n"
+            << "  nobjects: " << pe.delta_nobjects + t.min_nobjects << "\n"
             << "  length: " << pe.delta_page_length + t.min_page_length
-            << std::endl
+            << "\n"
             // content offset is relative to page, not file
             << "  content_offset: "
-            << pe.delta_content_offset + t.min_content_offset << std::endl
+            << pe.delta_content_offset + t.min_content_offset << "\n"
             << "  content_length: "
-            << pe.delta_content_length + t.min_content_length << std::endl
-            << "  nshared_objects: " << pe.nshared_objects << std::endl;
+            << pe.delta_content_length + t.min_content_length << "\n"
+            << "  nshared_objects: " << pe.nshared_objects << "\n";
         for (size_t i2 = 0; i2 < toS(pe.nshared_objects); ++i2) {
-            *this->m->out_stream << "    identifier " << i2 << ": "
-                                 << pe.shared_identifiers.at(i2) << std::endl;
-            *this->m->out_stream << "    numerator " << i2 << ": "
-                                 << pe.shared_numerators.at(i2) << std::endl;
+            *this->m->log->getInfo() << "    identifier " << i2 << ": "
+                                     << pe.shared_identifiers.at(i2) << "\n";
+            *this->m->log->getInfo() << "    numerator " << i2 << ": "
+                                     << pe.shared_numerators.at(i2) << "\n";
         }
     }
 }
@@ -1110,33 +1105,30 @@ void
 QPDF::dumpHSharedObject()
 {
     HSharedObject& t = this->m->shared_object_hints;
-    *this->m->out_stream << "first_shared_obj: " << t.first_shared_obj
-                         << std::endl
-                         << "first_shared_offset: "
-                         << adjusted_offset(t.first_shared_offset) << std::endl
-                         << "nshared_first_page: " << t.nshared_first_page
-                         << std::endl
-                         << "nshared_total: " << t.nshared_total << std::endl
-                         << "nbits_nobjects: " << t.nbits_nobjects << std::endl
-                         << "min_group_length: " << t.min_group_length
-                         << std::endl
-                         << "nbits_delta_group_length: "
-                         << t.nbits_delta_group_length << std::endl;
+    *this->m->log->getInfo()
+        << "first_shared_obj: " << t.first_shared_obj << "\n"
+        << "first_shared_offset: " << adjusted_offset(t.first_shared_offset)
+        << "\n"
+        << "nshared_first_page: " << t.nshared_first_page << "\n"
+        << "nshared_total: " << t.nshared_total << "\n"
+        << "nbits_nobjects: " << t.nbits_nobjects << "\n"
+        << "min_group_length: " << t.min_group_length << "\n"
+        << "nbits_delta_group_length: " << t.nbits_delta_group_length << "\n";
 
     for (size_t i = 0; i < toS(t.nshared_total); ++i) {
         HSharedObjectEntry& se = t.entries.at(i);
-        *this->m->out_stream
-            << "Shared Object " << i << ":" << std::endl
+        *this->m->log->getInfo()
+            << "Shared Object " << i << ":\n"
             << "  group length: " << se.delta_group_length + t.min_group_length
-            << std::endl;
+            << "\n";
         // PDF spec says signature present nobjects_minus_one are
         // always 0, so print them only if they have a non-zero value.
         if (se.signature_present) {
-            *this->m->out_stream << "  signature present" << std::endl;
+            *this->m->log->getInfo() << "  signature present\n";
         }
         if (se.nobjects_minus_one != 0) {
-            *this->m->out_stream << "  nobjects: " << se.nobjects_minus_one + 1
-                                 << std::endl;
+            *this->m->log->getInfo()
+                << "  nobjects: " << se.nobjects_minus_one + 1 << "\n";
         }
     }
 }
@@ -1144,11 +1136,12 @@ QPDF::dumpHSharedObject()
 void
 QPDF::dumpHGeneric(HGeneric& t)
 {
-    *this->m->out_stream << "first_object: " << t.first_object << std::endl
-                         << "first_object_offset: "
-                         << adjusted_offset(t.first_object_offset) << std::endl
-                         << "nobjects: " << t.nobjects << std::endl
-                         << "group_length: " << t.group_length << std::endl;
+    *this->m->log->getInfo()
+        << "first_object: " << t.first_object << "\n"
+        << "first_object_offset: " << adjusted_offset(t.first_object_offset)
+        << "\n"
+        << "nobjects: " << t.nobjects << "\n"
+        << "group_length: " << t.group_length << "\n";
 }
 
 QPDFObjectHandle

@@ -512,6 +512,28 @@ to the owner of the parent directory source tree.
 Note: this will leave some extra files (like .bash_history) in the
 parent directory of the source tree. You will want to clean those up.
 
+DEPRECATION
+
+This is a reminder of how to use and test deprecation.
+
+To temporarily disable deprecation warnings for testing:
+
+#ifdef _MSC_VER
+# pragma warning(disable : 4996)
+#endif
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+    // Do deprecated thing here
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic pop
+#endif
+
+To declare something as deprecated:
+
+[[deprecated("explanation")]]
+
 
 LOCAL WINDOWS TESTING PROCEDURE
 

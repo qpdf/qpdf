@@ -103,6 +103,10 @@ For a detailed list of changes, please see the file
       ``QPDFNumberTreeObjectHelper`` constructors that don't take a
       ``QPDF&`` argument.
 
+    - The function passed to and called by ``QPDFJob::doIfVerbose``
+      now takes a ``Pipeline&` argument instead of a ``std::ostream&``
+      argument.
+
     - Intentionally break API to call attention to operations that
       write files with insecure encryption:
 

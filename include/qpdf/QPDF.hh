@@ -48,6 +48,7 @@
 class QPDF_Stream;
 class BitStream;
 class BitWriter;
+class QPDFLogger;
 
 class QPDF
 {
@@ -209,20 +210,30 @@ class QPDF
 
     // Parameter settings
 
-    // By default, warning messages are issued to std::cerr and output
-    // messages printed by certain check calls are issued to
-    // std::cout.  This method allows you to specify alternative
-    // streams for this purpose.  Note that no normal QPDF operations
-    // generate output to std::cout, so for applications that just
-    // wish to avoid creating output and don't call any check
-    // functions, calling setSuppressWarnings(true) is sufficient.
-    // Applications that wish to present check or warning information
-    // to users may replace the output and error streams to capture
-    // the output and errors for other use.  A null value for either
-    // stream will cause QPDF to use std::cout or std::cerr as
-    // appropriate.
+    // To capture or redirect output, configure the logger returned by
+    // getLogger(). By default, all QPDF and QPDFJob objects share the
+    // global logger. If you need a private logger for some reason,
+    // pass a new one to setLogger(). See comments in QPDFLogger.hh
+    // for details on configuring the logger.
+    //
+    // Note that no normal QPDF operations generate output to standard
+    // output, so for applications that just wish to avoid creating
+    // output for warnings and don't call any check functions, calling
+    // setSuppressWarnings(true) is sufficient.
     QPDF_DLL
-    void setOutputStreams(std::ostream* out_stream, std::ostream* err_stream);
+    std::shared_ptr<QPDFLogger> getLogger();
+    QPDF_DLL
+    void setLogger(std::shared_ptr<QPDFLogger>);
+
+    // This deprecated method is the old way to capture output, but it
+    // didn't capture all output. See comments above for getLogger and
+    // setLogger. This will be removed in QPDF 12. For now, it
+    // configures a private logger, separating this object from the
+    // default logger, and calls setOutputStreams on that logger. See
+    // QPDFLogger.hh for additional details.
+    [[deprecated(
+        "configure logger from getLogger() or call setLogger()")]] QPDF_DLL void
+    setOutputStreams(std::ostream* out_stream, std::ostream* err_stream);
 
     // If true, ignore any cross-reference streams in a hybrid file
     // (one that contains both cross-reference streams and
@@ -618,18 +629,17 @@ class QPDF
 
     // Performs various sanity checks on a linearized file. Return
     // true if no errors or warnings. Otherwise, return false and
-    // output errors and warnings to std::cout or the output stream
-    // specified in a call to setOutputStreams. It is recommended for
-    // linearization errors to be treated as warnings.
+    // output errors and warnings to the default output stream
+    // (std::cout or whatever is configured in the logger). It is
+    // recommended for linearization errors to be treated as warnings.
     QPDF_DLL
     bool checkLinearization();
 
     // Calls checkLinearization() and, if possible, prints normalized
-    // contents of some of the hints tables to std::cout or the output
-    // stream specified in a call to setOutputStreams.  Normalization
-    // includes adding min values to delta values and adjusting
-    // offsets based on the location and size of the primary hint
-    // stream.
+    // contents of some of the hints tables to the default output
+    // stream. Normalization includes adding min values to delta
+    // values and adjusting offsets based on the location and size of
+    // the primary hint stream.
     QPDF_DLL
     void showLinearizationData();
 
@@ -1661,6 +1671,7 @@ class QPDF
         Members();
         Members(Members const&) = delete;
 
+        std::shared_ptr<QPDFLogger> log;
         unsigned long long unique_id;
         QPDFTokenizer tokenizer;
         std::shared_ptr<InputSource> file;
@@ -1668,8 +1679,6 @@ class QPDF
         bool provided_password_is_hex_key;
         bool ignore_xref_streams;
         bool suppress_warnings;
-        std::ostream* out_stream;
-        std::ostream* err_stream;
         bool attempt_recovery;
         std::shared_ptr<EncryptionParameters> encp;
         std::string pdf_version;

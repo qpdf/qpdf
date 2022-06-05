@@ -41,6 +41,7 @@
 
 class QPDFWriter;
 class Pipeline;
+class QPDFLogger;
 
 class QPDFJob
 {
@@ -108,10 +109,28 @@ class QPDFJob
     QPDF_DLL
     void setMessagePrefix(std::string const&);
 
-    // Override streams that errors and output go to. Defaults are
-    // std::cout and std::cerr. Pass nullptr to use the default.
+    // To capture or redirect output, configure the logger returned by
+    // getLogger(). By default, all QPDF and QPDFJob objects share the
+    // global logger. If you need a private logger for some reason,
+    // pass a new one to setLogger(). See comments in QPDFLogger.hh
+    // for details on configuring the logger.
+    //
+    // If you set a custom logger here, the logger will be passed to
+    // all subsequent QPDF objects created by this QPDFJob object.
     QPDF_DLL
-    void setOutputStreams(std::ostream* out_stream, std::ostream* err_stream);
+    std::shared_ptr<QPDFLogger> getLogger();
+    QPDF_DLL
+    void setLogger(std::shared_ptr<QPDFLogger>);
+
+    // This deprecated method is the old way to capture output, but it
+    // didn't capture all output. See comments above for getLogger and
+    // setLogger. This will be removed in QPDF 12. For now, it
+    // configures a private logger, separating this object from the
+    // default logger, and calls setOutputStreams on that logger. See
+    // QPDFLogger.hh for additional details.
+    [[deprecated(
+        "configure logger from getLogger() or call setLogger()")]] QPDF_DLL void
+    setOutputStreams(std::ostream* out_stream, std::ostream* err_stream);
 
     // Check to make sure no contradictory options have been
     // specified. This is called automatically after initializing from
@@ -393,8 +412,8 @@ class QPDFJob
     // If in verbose mode, call the given function, passing in the
     // output stream and message prefix.
     QPDF_DLL
-    void doIfVerbose(
-        std::function<void(std::ostream&, std::string const& prefix)> fn);
+    void
+    doIfVerbose(std::function<void(Pipeline&, std::string const& prefix)> fn);
 
     // Provide a string that is the help information ("schema" for the
     // qpdf-specific JSON object) for version 1 of the JSON output.
@@ -548,10 +567,9 @@ class QPDFJob
         Members();
         Members(Members const&) = delete;
 
+        std::shared_ptr<QPDFLogger> log;
         std::string message_prefix;
         bool warnings;
-        std::ostream* cout;
-        std::ostream* cerr;
         unsigned long encryption_status;
         bool verbose;
         std::shared_ptr<char> password;

@@ -18,14 +18,15 @@
 #include <qpdf/OffsetInputSource.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Pl_Discard.hh>
-#include <qpdf/QTC.hh>
-#include <qpdf/QUtil.hh>
-
+#include <qpdf/Pl_OStream.hh>
 #include <qpdf/QPDFExc.hh>
+#include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QPDF_Null.hh>
 #include <qpdf/QPDF_Stream.hh>
+#include <qpdf/QTC.hh>
+#include <qpdf/QUtil.hh>
 
 // This must be a fixed value. This API returns a const reference to
 // it, and the C API relies on its being static as well.
@@ -212,13 +213,12 @@ QPDF::EncryptionParameters::EncryptionParameters() :
 }
 
 QPDF::Members::Members() :
+    log(QPDFLogger::defaultLogger()),
     unique_id(0),
     file(new InvalidInputSource()),
     provided_password_is_hex_key(false),
     ignore_xref_streams(false),
     suppress_warnings(false),
-    out_stream(&std::cout),
-    err_stream(&std::cerr),
     attempt_recovery(true),
     encp(new EncryptionParameters),
     pushed_inherited_attributes_to_pages(false),
@@ -339,11 +339,23 @@ QPDF::setIgnoreXRefStreams(bool val)
     this->m->ignore_xref_streams = val;
 }
 
+std::shared_ptr<QPDFLogger>
+QPDF::getLogger()
+{
+    return this->m->log;
+}
+
+void
+QPDF::setLogger(std::shared_ptr<QPDFLogger> l)
+{
+    this->m->log = l;
+}
+
 void
 QPDF::setOutputStreams(std::ostream* out, std::ostream* err)
 {
-    this->m->out_stream = out ? out : &std::cout;
-    this->m->err_stream = err ? err : &std::cerr;
+    setLogger(std::make_shared<QPDFLogger>());
+    this->m->log->setOutputStreams(out, err);
 }
 
 void
@@ -533,8 +545,8 @@ QPDF::warn(QPDFExc const& e)
 {
     this->m->warnings.push_back(e);
     if (!this->m->suppress_warnings) {
-        *this->m->err_stream << "WARNING: " << this->m->warnings.back().what()
-                             << std::endl;
+        *this->m->log->getWarn()
+            << "WARNING: " << this->m->warnings.back().what() << "\n";
     }
 }
 
@@ -1345,18 +1357,18 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2, bool overwrite)
 void
 QPDF::showXRefTable()
 {
+    auto& cout = *this->m->log->getInfo();
     for (auto const& iter: this->m->xref_table) {
         QPDFObjGen const& og = iter.first;
         QPDFXRefEntry const& entry = iter.second;
-        *this->m->out_stream << og.getObj() << "/" << og.getGen() << ": ";
+        cout << og.getObj() << "/" << og.getGen() << ": ";
         switch (entry.getType()) {
         case 1:
-            *this->m->out_stream << "uncompressed; offset = "
-                                 << entry.getOffset();
+            cout << "uncompressed; offset = " << entry.getOffset();
             break;
 
         case 2:
-            *this->m->out_stream
+            *this->m->log->getInfo()
                 << "compressed; stream = " << entry.getObjStreamNumber()
                 << ", index = " << entry.getObjStreamIndex();
             break;
@@ -1366,7 +1378,7 @@ QPDF::showXRefTable()
                                    " showing xref_table");
             break;
         }
-        *this->m->out_stream << std::endl;
+        this->m->log->info("\n");
     }
 }
 
