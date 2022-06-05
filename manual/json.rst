@@ -12,12 +12,11 @@ Overview
 --------
 
 Beginning with qpdf version 11.0.0, the qpdf library and command-line
-program can produce a JSON representation of the in a PDF file. qpdf
-version 11 introduces JSON format version 2. Prior to qpdf 11,
-versions 8.3.0 onward had a more limited JSON representation
-accessible only from the command-line. For details on what changed,
-see :ref:`json-v2-changes`. The rest of this chapter documents qpdf
-JSON version 2.
+program can produce a JSON representation of a PDF file. qpdf version
+11 introduces JSON format version 2. Prior to qpdf 11, versions 8.3.0
+onward had a more limited JSON representation accessible only from the
+command-line. For details on what changed, see :ref:`json-v2-changes`.
+The rest of this chapter documents qpdf JSON version 2.
 
 Please note: this chapter discusses *qpdf JSON format*, which
 represents the contents of a PDF file. This is distinct from the
@@ -289,7 +288,8 @@ As such, none of the things ``QPDFWriter`` does apply. This includes
 recompression of streams, renumbering of objects, anything to do with
 object streams (which are not represented by qpdf JSON at all since
 they are PDF syntax, not semantics), encryption, decryption,
-linearization, QDF mode, etc.
+linearization, QDF mode, etc. See :ref:`rewriting` for a more in-depth
+discussion.
 
 .. _json.example:
 

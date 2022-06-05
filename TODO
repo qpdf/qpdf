@@ -10,6 +10,15 @@ Before Release:
 
 Pending changes:
 
+* Think about whether additional JSON use cases would be served by
+  having qpdf-v2 contain things other than "objects" or making qpdf
+  --json include everything that --json-output includes. Right now, if
+  you wanted to do something in json objects based on page
+  information, you'd have to run qpdf --json and also qpdf
+  --json-output separately. Also "qpdf-v2" doesn't follow the naming
+  convention. See pinned email from m-holger with subject "qpdf
+  json.rst" from June 5
+  (04ad60e5-3274-4a9e-abde-3de97640d370@www.fastmail.com)
 * Good C API for json v2
 * QPDFPagesTree -- avoid ever flattening the pages tree.
 * Check about runpath in the linux-bin distribution. I think the
