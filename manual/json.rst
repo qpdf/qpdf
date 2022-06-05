@@ -28,7 +28,7 @@ information about that, see :ref:`qpdf-job`.
 The qpdf JSON format is specific to qpdf. There are two ways to use
 qpdf JSON:
 
-- The :qpdf:ref:`--json` command-ine flag causes creation of a JSON
+- The :qpdf:ref:`--json` command-line flag causes creation of a JSON
   representation of all the objects in a PDF file, excluding stream
   data. This includes an unambiguous representation of the PDF object
   structure and also provides JSON-formatted summaries of other
