@@ -790,8 +790,7 @@ QPDF::writeJSON(
     bool first_object = true;
     JSON::writeDictionaryOpen(p, first_object, 2);
     bool all_objects = wanted_objects.empty();
-    std::vector<QPDFObjectHandle> objects = getAllObjects();
-    for (auto& obj: objects) {
+    for (auto& obj: getAllObjects()) {
         std::string key = "obj:" + obj.unparse();
         if (all_objects || wanted_objects.count(key)) {
             if (obj.isStream()) {
