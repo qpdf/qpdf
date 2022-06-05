@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("logger") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('logger');
+
+cleanup();
+
+$td->runtest("logger",
+             {$td->COMMAND => "logger >stdout 2>stderr"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check stdout",
+             {$td->FILE => "stdout"},
+             {$td->FILE => "exp-stdout"},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check stderr",
+             {$td->FILE => "stderr"},
+             {$td->FILE => "exp-stderr"},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report(3);
+
+sub cleanup
+{
+    unlink "stdout", "stderr";
+}

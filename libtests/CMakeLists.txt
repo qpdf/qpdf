@@ -16,6 +16,7 @@ set(TEST_PROGRAMS
   json
   json_handler
   json_parse
+  logger
   lzw
   main_from_wmain
   matrix

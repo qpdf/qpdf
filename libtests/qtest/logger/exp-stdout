@@ -1,0 +1,6 @@
+info to stdout
+getSave exception: QPDFLogger: requested a null pipeline without null_okay == true
+saveToStandardOutput exception: QPDFLogger: called setSave on standard output after standard output has already been used
+save to stdout
+info back to stdout
+after reset, info to stdout

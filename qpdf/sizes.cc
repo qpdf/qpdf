@@ -31,6 +31,7 @@
 #include <qpdf/QPDFFileSpecObjectHelper.hh>
 #include <qpdf/QPDFFormFieldObjectHelper.hh>
 #include <qpdf/QPDFJob.hh>
+#include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFMatrix.hh>
 #include <qpdf/QPDFNameTreeObjectHelper.hh>
 #include <qpdf/QPDFNumberTreeObjectHelper.hh>
@@ -98,6 +99,7 @@ main()
     print_size(QPDFJob::EncConfig);
     print_size(QPDFJob::PagesConfig);
     print_size(QPDFJob::UOConfig);
+    print_size(QPDFLogger);
     print_size(QPDFMatrix);
     print_size(QPDFNameTreeObjectHelper);
     print_size(QPDFNameTreeObjectHelper::iterator);

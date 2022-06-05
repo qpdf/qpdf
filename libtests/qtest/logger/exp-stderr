@@ -1,0 +1,7 @@
+warn to stderr
+error to stderr
+restored warning to stderr
+info to stderr
+info still to stderr
+after reset, warn to stderr
+after reset, error to stderr
