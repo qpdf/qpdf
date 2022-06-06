@@ -11,19 +11,10 @@ Before Release:
 Next:
 * output capture
 * QPDFPagesTree -- avoid ever flattening the pages tree.
+* JSON v2 fixes
 
 Pending changes:
 
-* Think about whether additional JSON use cases would be served by
-  having qpdf-v2 contain things other than "objects" or making qpdf
-  --json include everything that --json-output includes. Right now, if
-  you wanted to do something in json objects based on page
-  information, you'd have to run qpdf --json and also qpdf
-  --json-output separately. Also "qpdf-v2" doesn't follow the naming
-  convention. See pinned email from m-holger with subject "qpdf
-  json.rst" from June 5
-  (04ad60e5-3274-4a9e-abde-3de97640d370@www.fastmail.com)
-* Good C API for json v2
 * Check about runpath in the linux-bin distribution. I think the
   appimage build specifically is setting the runpath, which is
   actually desirable in this case. Make sure to understand and
@@ -43,14 +34,10 @@ Pending changes:
   reveal additional details, --show-encryption could potentially retry
   with this option if the first time doesn't work. Then, with the file
   open, we can read the encryption dictionary normally.
-* Nice to have:
-  * In libtests, separate executables that need the object library
-    from those that strictly use public API. Move as many of the test
-    drivers from the qpdf directory into the latter category as long
-    as doing so isn't too troublesome from a coverage standpoint.
-  * Rework tests so that nothing is written into the source directory.
-    Ideally then the entire build could be done with a read-only
-    source tree.
+* In libtests, separate executables that need the object library
+  from those that strictly use public API. Move as many of the test
+  drivers from the qpdf directory into the latter category as long
+  as doing so isn't too troublesome from a coverage standpoint.
 * Consider adding fuzzer code for JSON
 
 Soon: Break ground on "Document-level work"
@@ -127,6 +114,78 @@ sure /Count and /Parent are correct.
 
 refs/attic/QPDFPagesTree-old -- original, abandoned branch -- clean up
 when done.
+
+
+JSON v2 fixes
+=============
+
+* Get rid of separate format for --json and --json-output. Instead,
+  --json-output can just require an outfile and change some defaults
+  like which keys are present and json-stream-data. This makes it
+  easier to support use cases like being able to use information in
+  other top-level keys ("pages", "attachments", etc.) to drive
+  modifications made to objects without having to run qpdf twice. I
+  think --json-output should make the default key be only "qpdf" and
+  the default json-stream-data mode be inline, but make it so you can
+  use --json-stream-data and --json-stream-prefix with --json and
+  --json-keys with --json-output. These would be exactly the same:
+
+  --json-output --json-keys=all -
+  --json --json-stream-data=inline
+
+  And these:
+
+  --json-output -
+  --json --json-stream-data=inline --json-key=qpdf
+
+* Change the name of the "qpdf-v2" key to "qpdf". Use that in place of
+  "objects" and change its content to a two-element array whose first
+  element is metadata required (or useful) for parsing and whose
+  second element contains the actual data. Use of an array is the only
+  way to ensure that the metadata is guaranteed to be parsed before we
+  start parsing the objects. Example:
+
+  {
+    "qpdf": [
+      {
+        "jsonversion": 2,
+        "repairpagestree": false,
+        "maxobjectid": 10
+      },
+      {
+        "pdfversion": "1.3",
+        "objects": {
+          ...
+        }
+      }
+    ]
+  }
+
+  This implies a few things:
+
+  * QPDF::writeJSON will have to take an argument indicating whether
+    additional keys are being written which determines whether it
+    outputs the outer braces or not.
+
+  * This changes the policy about additional extra keys. Have a
+    guarantee that qpdf will never add a key whose name is or starts
+    with "xdata". We still have to ignore unknown keys for future
+    compatibility, but at least this gives people a namespace they can
+    know will never conflict with future keys.
+
+  * Change schema validation so that if the schema contains an array
+    with more than one element, the output has to have an array with
+    the same number of elements whose individual elements are
+    validated according to the regular rules.
+
+* Support json v2 in the C API. At a minimum, write_json,
+  create_from_json, and update_from_json need to be there and should
+  take the same kinds of functions as the C API for logger.
+
+* Address json.rst comment from m-holger: "The discussion of stream
+  objects is very wordy. Would a table similar to the style of the PDF
+  spec be easier to use?"
+
 
 Possible future JSON enhancements
 =================================
@@ -439,7 +498,9 @@ I find it useful to make reference to them in this list.
 
  * Look at https://bestpractices.coreinfrastructure.org/en
 
- * Get rid of remaining assert() calls from non-test code.
+ * Rework tests so that nothing is written into the source directory.
+   Ideally then the entire build could be done with a read-only
+   source tree.
 
  * Large file tests fail with linux32 before and after cmake. This was
    first noticed after 10.6.3. I don't think it's worth fixing.
