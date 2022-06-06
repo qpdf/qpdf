@@ -58,8 +58,8 @@ class JSON
     QPDF_DLL
     std::string unparse() const;
 
-    // Write the JSON object through a pipline. The `depth` parameter
-    // specifies how deeply nested this in another JSON structure,
+    // Write the JSON object through a pipeline. The `depth` parameter
+    // specifies how deeply nested this is in another JSON structure,
     // which makes it possible to write clean-looking JSON
     // incrementally.
     QPDF_DLL
@@ -152,8 +152,8 @@ class JSON
     bool isDictionary() const;
 
     // If the key is already in the dictionary, return true.
-    // Otherwise, mark it has seen and return false. This is primarily
-    // intended to used by the parser to detect duplicate keys when
+    // Otherwise, mark it as seen and return false. This is primarily
+    // intended to be used by the parser to detect duplicate keys when
     // the reactor blocks them from being added to the final
     // dictionary.
     QPDF_DLL
