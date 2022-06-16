@@ -14,6 +14,24 @@ QPDF_Array::QPDF_Array(SparseOHArray const& items) :
 {
 }
 
+std::shared_ptr<QPDFObject>
+QPDF_Array::create(std::vector<QPDFObjectHandle> const& items)
+{
+    return do_create(new QPDF_Array(items));
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_Array::create(SparseOHArray const& items)
+{
+    return do_create(new QPDF_Array(items));
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_Array::shallowCopy()
+{
+    return create(elements);
+}
+
 void
 QPDF_Array::releaseResolved()
 {
@@ -119,12 +137,6 @@ void
 QPDF_Array::eraseItem(int at)
 {
     this->elements.erase(QIntC::to_size(at));
-}
-
-SparseOHArray const&
-QPDF_Array::getElementsForShallowCopy() const
-{
-    return this->elements;
 }
 
 void

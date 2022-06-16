@@ -6,8 +6,9 @@
 class QPDF_InlineImage: public QPDFObject
 {
   public:
-    QPDF_InlineImage(std::string const& val);
     virtual ~QPDF_InlineImage() = default;
+    static std::shared_ptr<QPDFObject> create(std::string const& val);
+    virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
     virtual QPDFObject::object_type_e getTypeCode() const;
@@ -15,6 +16,7 @@ class QPDF_InlineImage: public QPDFObject
     std::string getVal() const;
 
   private:
+    QPDF_InlineImage(std::string const& val);
     std::string val;
 };
 

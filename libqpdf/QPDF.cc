@@ -1989,7 +1989,7 @@ QPDF::resolve(int objid, int generation)
             this->m->file->getLastOffset(),
             ("loop detected resolving object " + QUtil::int_to_string(objid) +
              " " + QUtil::int_to_string(generation)));
-        return std::shared_ptr<QPDFObject>(new QPDF_Null);
+        return QPDF_Null::create();
     }
     ResolveRecorder rr(this, og);
 

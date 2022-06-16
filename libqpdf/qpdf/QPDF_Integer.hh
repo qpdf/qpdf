@@ -6,8 +6,9 @@
 class QPDF_Integer: public QPDFObject
 {
   public:
-    QPDF_Integer(long long val);
     virtual ~QPDF_Integer() = default;
+    static std::shared_ptr<QPDFObject> create(long long value);
+    virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
     virtual QPDFObject::object_type_e getTypeCode() const;
@@ -15,6 +16,7 @@ class QPDF_Integer: public QPDFObject
     long long getVal() const;
 
   private:
+    QPDF_Integer(long long val);
     long long val;
 };
 

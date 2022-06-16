@@ -63,6 +63,7 @@ class QPDFObject
     static constexpr object_type_e ot_inlineimage = ::ot_inlineimage;
 
     virtual ~QPDFObject() = default;
+    virtual std::shared_ptr<QPDFObject> shallowCopy() = 0;
     virtual std::string unparse() = 0;
     virtual JSON getJSON(int json_version) = 0;
 
@@ -102,6 +103,7 @@ class QPDFObject
     releaseResolved()
     {
     }
+    static std::shared_ptr<QPDFObject> do_create(QPDFObject*);
 
   private:
     QPDFObject(QPDFObject const&) = delete;

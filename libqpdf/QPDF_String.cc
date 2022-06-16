@@ -1,6 +1,5 @@
 #include <qpdf/QPDF_String.hh>
 
-#include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
 // DO NOT USE ctype -- it is locale dependent for some things, and
@@ -26,14 +25,26 @@ QPDF_String::QPDF_String(std::string const& val) :
 {
 }
 
-QPDF_String*
-QPDF_String::new_utf16(std::string const& utf8_val)
+std::shared_ptr<QPDFObject>
+QPDF_String::create(std::string const& val)
+{
+    return do_create(new QPDF_String(val));
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_String::create_utf16(std::string const& utf8_val)
 {
     std::string result;
     if (!QUtil::utf8_to_pdf_doc(utf8_val, result, '?')) {
         result = QUtil::utf8_to_utf16(utf8_val);
     }
-    return new QPDF_String(result);
+    return do_create(new QPDF_String(result));
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_String::shallowCopy()
+{
+    return create(val);
 }
 
 std::string

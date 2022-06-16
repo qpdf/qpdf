@@ -70,14 +70,6 @@ QPDFTokenizer null in name 0
 QPDFTokenizer bad name 0
 QPDF_Stream invalid filter 0
 QPDF UseOutlines but no Outlines 0
-QPDFObjectHandle clone bool 0
-QPDFObjectHandle clone null 0
-QPDFObjectHandle clone integer 0
-QPDFObjectHandle clone real 0
-QPDFObjectHandle clone name 0
-QPDFObjectHandle clone string 0
-QPDFObjectHandle clone array 0
-QPDFObjectHandle clone dictionary 0
 QPDFObjectHandle makeDirect loop 0
 QPDFObjectHandle copy stream 1
 QPDF default for xref stream field 0 0
@@ -199,9 +191,6 @@ QPDF updateAllPagesCache 0
 QPDF insert non-indirect page 0
 QPDF insert indirect page 0
 QPDFObjectHandle ERR shallow copy stream 0
-QPDFObjectHandle shallow copy array 0
-QPDFObjectHandle shallow copy dictionary 0
-QPDFObjectHandle shallow copy scalar 0
 QPDFObjectHandle newStream with string 0
 QPDF unknown key not inherited 0
 QPDF_Stream provider length not provided 0

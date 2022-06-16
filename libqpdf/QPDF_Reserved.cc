@@ -2,6 +2,18 @@
 
 #include <stdexcept>
 
+std::shared_ptr<QPDFObject>
+QPDF_Reserved::create()
+{
+    return do_create(new QPDF_Reserved());
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_Reserved::shallowCopy()
+{
+    return create();
+}
+
 std::string
 QPDF_Reserved::unparse()
 {

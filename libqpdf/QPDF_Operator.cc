@@ -1,10 +1,20 @@
 #include <qpdf/QPDF_Operator.hh>
 
-#include <qpdf/QUtil.hh>
-
 QPDF_Operator::QPDF_Operator(std::string const& val) :
     val(val)
 {
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_Operator::create(std::string const& val)
+{
+    return do_create(new QPDF_Operator(val));
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_Operator::shallowCopy()
+{
+    return create(val);
 }
 
 std::string
