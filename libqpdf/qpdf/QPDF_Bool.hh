@@ -6,8 +6,9 @@
 class QPDF_Bool: public QPDFObject
 {
   public:
-    QPDF_Bool(bool val);
     virtual ~QPDF_Bool() = default;
+    static std::shared_ptr<QPDFObject> create(bool val);
+    virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
     virtual QPDFObject::object_type_e getTypeCode() const;
@@ -15,6 +16,7 @@ class QPDF_Bool: public QPDFObject
     bool getVal() const;
 
   private:
+    QPDF_Bool(bool val);
     bool val;
 };
 

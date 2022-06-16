@@ -134,6 +134,25 @@ QPDF_Stream::QPDF_Stream(
             QUtil::int_to_string(this->generation));
 }
 
+std::shared_ptr<QPDFObject>
+QPDF_Stream::create(
+    QPDF* qpdf,
+    int objid,
+    int generation,
+    QPDFObjectHandle stream_dict,
+    qpdf_offset_t offset,
+    size_t length)
+{
+    return do_create(
+        new QPDF_Stream(qpdf, objid, generation, stream_dict, offset,length));
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_Stream::shallowCopy()
+{
+    throw std::logic_error("stream objects cannot be cloned");
+}
+
 void
 QPDF_Stream::registerStreamFilter(
     std::string const& filter_name,

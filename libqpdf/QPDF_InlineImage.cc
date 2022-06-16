@@ -1,10 +1,20 @@
 #include <qpdf/QPDF_InlineImage.hh>
 
-#include <qpdf/QUtil.hh>
-
 QPDF_InlineImage::QPDF_InlineImage(std::string const& val) :
     val(val)
 {
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_InlineImage::create(std::string const& val)
+{
+    return do_create(new QPDF_InlineImage(val));
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_InlineImage::shallowCopy()
+{
+    return create(val);
 }
 
 std::string

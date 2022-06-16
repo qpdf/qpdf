@@ -7,10 +7,13 @@
 
 class QPDF_String: public QPDFObject
 {
+    friend class QPDFWriter;
+
   public:
-    QPDF_String(std::string const& val);
-    static QPDF_String* new_utf16(std::string const& utf8_val);
     virtual ~QPDF_String() = default;
+    static std::shared_ptr<QPDFObject> create(std::string const& val);
+    static std::shared_ptr<QPDFObject> create_utf16(std::string const& utf8_val);
+    virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual QPDFObject::object_type_e getTypeCode() const;
     virtual char const* getTypeName() const;
@@ -20,6 +23,7 @@ class QPDF_String: public QPDFObject
     std::string getUTF8Val() const;
 
   private:
+    QPDF_String(std::string const& val);
     bool useHexString() const;
     std::string val;
 };

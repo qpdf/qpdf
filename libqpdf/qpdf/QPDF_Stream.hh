@@ -16,14 +16,15 @@ class QPDF;
 class QPDF_Stream: public QPDFObject
 {
   public:
-    QPDF_Stream(
+    virtual ~QPDF_Stream() = default;
+    static std::shared_ptr<QPDFObject> create(
         QPDF*,
         int objid,
         int generation,
         QPDFObjectHandle stream_dict,
         qpdf_offset_t offset,
         size_t length);
-    virtual ~QPDF_Stream() = default;
+    virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
     virtual QPDFObject::object_type_e getTypeCode() const;
@@ -83,6 +84,13 @@ class QPDF_Stream: public QPDFObject
     virtual void releaseResolved();
 
   private:
+    QPDF_Stream(
+        QPDF*,
+        int objid,
+        int generation,
+        QPDFObjectHandle stream_dict,
+        qpdf_offset_t offset,
+        size_t length);
     static std::map<std::string, std::string> filter_abbreviations;
     static std::
         map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>>

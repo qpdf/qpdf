@@ -9,6 +9,18 @@ QPDF_Name::QPDF_Name(std::string const& name) :
 {
 }
 
+std::shared_ptr<QPDFObject>
+QPDF_Name::create(std::string const& name)
+{
+    return do_create(new QPDF_Name(name));
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_Name::shallowCopy()
+{
+    return create(name);
+}
+
 std::string
 QPDF_Name::normalizeName(std::string const& name)
 {

@@ -1551,7 +1551,7 @@ class QPDFObjectHandle
 
   private:
     QPDFObjectHandle(QPDF*, int objid, int generation);
-    QPDFObjectHandle(QPDFObject*);
+    QPDFObjectHandle(std::shared_ptr<QPDFObject> const&);
 
     enum parser_state_e {
         st_top,

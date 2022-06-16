@@ -6,6 +6,13 @@ QPDFObject::QPDFObject() :
 {
 }
 
+std::shared_ptr<QPDFObject>
+QPDFObject::do_create(QPDFObject* object)
+{
+    std::shared_ptr<QPDFObject> obj(object);
+    return obj;
+}
+
 void
 QPDFObject::setDescription(QPDF* qpdf, std::string const& description)
 {

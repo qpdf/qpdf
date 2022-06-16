@@ -13,6 +13,25 @@ QPDF_Real::QPDF_Real(
 {
 }
 
+std::shared_ptr<QPDFObject>
+QPDF_Real::create(std::string const& val)
+{
+    return do_create(new QPDF_Real(val));
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_Real::create(double value, int decimal_places, bool trim_trailing_zeroes)
+{
+    return do_create(
+        new QPDF_Real(value, decimal_places, trim_trailing_zeroes));
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_Real::shallowCopy()
+{
+    return create(val);
+}
+
 std::string
 QPDF_Real::unparse()
 {
