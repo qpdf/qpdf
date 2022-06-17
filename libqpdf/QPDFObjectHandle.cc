@@ -2804,25 +2804,20 @@ QPDFObjectHandle::hasObjectDescription()
 QPDFObjectHandle
 QPDFObjectHandle::shallowCopy()
 {
-    QPDFObjectHandle result;
-    shallowCopyInternal(result, false);
-    return result;
+    return shallowCopy(false);
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::unsafeShallowCopy()
 {
-    QPDFObjectHandle result;
-    shallowCopyInternal(result, true);
-    return result;
+    return shallowCopy(true);
 }
 
-void
-QPDFObjectHandle::shallowCopyInternal(
-    QPDFObjectHandle& new_obj, bool first_level_only)
+QPDFObjectHandle
+QPDFObjectHandle::shallowCopy(bool first_level_only)
 {
     assertInitialized();
-
+    QPDFObjectHandle new_obj;
     if (isStream()) {
         QTC::TC("qpdf", "QPDFObjectHandle ERR shallow copy stream");
         throw std::runtime_error("attempt to make a shallow copy of a stream");
@@ -2844,6 +2839,7 @@ QPDFObjectHandle::shallowCopyInternal(
 
     std::set<QPDFObjGen> visited;
     new_obj.copyObject(visited, false, first_level_only, false);
+    return new_obj;
 }
 
 void

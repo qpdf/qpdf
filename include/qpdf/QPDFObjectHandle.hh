@@ -1579,7 +1579,7 @@ class QPDFObjectHandle
         bool cross_indirect,
         bool first_level_only,
         bool stop_at_streams);
-    void shallowCopyInternal(QPDFObjectHandle& oh, bool first_level_only);
+    QPDFObjectHandle shallowCopy(bool first_level_only);
     void releaseResolved();
     static void setObjectDescriptionFromInput(
         QPDFObjectHandle,
