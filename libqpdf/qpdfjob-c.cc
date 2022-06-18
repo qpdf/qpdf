@@ -1,6 +1,7 @@
 #include <qpdf/qpdfjob-c.h>
 
 #include <qpdf/QPDFJob.hh>
+#include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFUsage.hh>
 #include <qpdf/QUtil.hh>
 
@@ -19,7 +20,8 @@ qpdfjob_run_from_argv(char const* const argv[])
         j.initializeFromArgv(argv);
         j.run();
     } catch (std::exception& e) {
-        std::cerr << whoami << ": " << e.what() << std::endl;
+        *QPDFLogger::defaultLogger()->getError()
+            << whoami << ": " << e.what() << "\n";
         return QPDFJob::EXIT_ERROR;
     }
     return j.getExitCode();
@@ -48,7 +50,8 @@ qpdfjob_run_from_json(char const* json)
         j.initializeFromJson(json);
         j.run();
     } catch (std::exception& e) {
-        std::cerr << "qpdfjob json: " << e.what() << std::endl;
+        *QPDFLogger::defaultLogger()->getError()
+            << "qpdfjob json: " << e.what() << "\n";
         return QPDFJob::EXIT_ERROR;
     }
     return j.getExitCode();

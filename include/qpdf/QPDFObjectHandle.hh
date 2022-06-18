@@ -1411,14 +1411,14 @@ class QPDFObjectHandle
     // End legacy page helpers
 
     // Issue a warning about this object if possible. If the object
-    // has a description, a warning will be issued. Otherwise, if
-    // throw_if_no_description is true, throw an exception. Otherwise
-    // do nothing. Objects read normally from the file have
+    // has a description, a warning will be issued using the owning
+    // QPDF as context. Otherwise, a message will be written to the
+    // default logger's error stream, which is standard error if not
+    // overridden. Objects read normally from the file have
     // descriptions. See comments on setObjectDescription for
     // additional details.
     QPDF_DLL
-    void warnIfPossible(
-        std::string const& warning, bool throw_if_no_description = false);
+    void warnIfPossible(std::string const& warning);
 
     // Initializers for objects.  This Factory class gives the QPDF
     // class specific permission to call factory methods without

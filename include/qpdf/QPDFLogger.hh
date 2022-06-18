@@ -33,6 +33,19 @@ class QPDFLogger
     QPDF_DLL
     QPDFLogger();
 
+    // Return the default logger. In general, you should use the
+    // default logger. You can also create your own loggers and use
+    // them QPDF and QPDFJob objects, but there are few reasons to do
+    // so. One reason may if you are using multiple QPDF or QPDFJob
+    // objects in different threads and want to capture output and
+    // errors to different streams. (Note that a single QPDF or
+    // QPDFJob can't be safely used from multiple threads, but it is
+    // safe to use separate QPDF and QPDFJob objects on separate
+    // threads.) Another possible reason would be if you are writing
+    // an application that uses the qpdf library directly and qpdf is
+    // also used by a downstream library or if you are using qpdf from
+    // a library and don't want to interfere with potential uses of
+    // qpdf by other libraries or applications.
     QPDF_DLL
     static std::shared_ptr<QPDFLogger> defaultLogger();
 

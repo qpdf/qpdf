@@ -120,6 +120,11 @@ For a detailed list of changes, please see the file
       - See :ref:`breaking-crypto-api` for specific details, and see
         :ref:`weak-crypto` for a general discussion.
 
+    - QPDFObjectHandle::warnIfPossible no longer takes an optional
+      argument to throw an exception if there is no description. If
+      there is no description, it writes to the default logger's error
+      stream.
+
   - CLI Enhancements
 
     - ``qpdf --list-attachments --verbose`` include some additional
@@ -138,6 +143,20 @@ For a detailed list of changes, please see the file
       progress messages are written to standard error.
 
   - Library Enhancements
+
+    - A new object ``QPDFLogger`` has been added. Details are in
+      :file:`include/qpdf/QPDFLogger.hh`.
+
+      - ``QPDF`` and ``QPDFJob`` both use the default logger by
+        default but can have their loggers overridden. The
+        ``setOutputStreams`` method is deprecated in both classes.
+
+      - A few things from ``QPDFObjectHandle`` that used to be
+        exceptions now write errors with the default logger.
+
+      - By configuring the default logger, it is possible to capture
+        output and errors that slipped through the cracks with
+        ``setOutputStreams``.
 
     - New methods ``insertItemAndGet``, ``appendItemAndGet``,
       ``eraseItemAndGet``, ``replaceKeyAndGet``, and

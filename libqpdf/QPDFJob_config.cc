@@ -1,5 +1,6 @@
 #include <qpdf/QPDFJob.hh>
 
+#include <qpdf/QPDFLogger.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
@@ -648,9 +649,10 @@ QPDFJob::Config::passwordFile(std::string const& parameter)
         o.m->password = QUtil::make_shared_cstr(lines.front());
 
         if (lines.size() > 1) {
-            std::cerr << this->o.m->message_prefix
-                      << ": WARNING: all but the first line of"
-                      << " the password file are ignored" << std::endl;
+            *QPDFLogger::defaultLogger()->getError()
+                << this->o.m->message_prefix
+                << ": WARNING: all but the first line of"
+                << " the password file are ignored\n";
         }
     }
     return this;

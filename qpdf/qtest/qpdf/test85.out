@@ -1,0 +1,6 @@
+requested value of integer is too big; returning INT_MAX
+requested value of integer is too small; returning INT_MIN
+unsigned value request for negative number; returning 0
+unsigned integer value request for negative number; returning 0
+requested value of unsigned integer is too big; returning UINT_MAX
+test 85 done

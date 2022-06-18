@@ -5,6 +5,7 @@
 #include <qpdf/Pl_QPDFTokenizer.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFExc.hh>
+#include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFMatrix.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDF_Array.hh>
@@ -578,13 +579,12 @@ QPDFObjectHandle::getIntValueAsInt()
     if (v < INT_MIN) {
         QTC::TC("qpdf", "QPDFObjectHandle int returning INT_MIN");
         warnIfPossible(
-            "requested value of integer is too small; returning INT_MIN",
-            false);
+            "requested value of integer is too small; returning INT_MIN");
         result = INT_MIN;
     } else if (v > INT_MAX) {
         QTC::TC("qpdf", "QPDFObjectHandle int returning INT_MAX");
         warnIfPossible(
-            "requested value of integer is too big; returning INT_MAX", false);
+            "requested value of integer is too big; returning INT_MAX");
         result = INT_MAX;
     } else {
         result = static_cast<int>(v);
@@ -610,7 +610,7 @@ QPDFObjectHandle::getUIntValue()
     if (v < 0) {
         QTC::TC("qpdf", "QPDFObjectHandle uint returning 0");
         warnIfPossible(
-            "unsigned value request for negative number; returning 0", false);
+            "unsigned value request for negative number; returning 0");
     } else {
         result = static_cast<unsigned long long>(v);
     }
@@ -635,15 +635,12 @@ QPDFObjectHandle::getUIntValueAsUInt()
     if (v < 0) {
         QTC::TC("qpdf", "QPDFObjectHandle uint uint returning 0");
         warnIfPossible(
-            "unsigned integer value request for negative number; returning 0",
-            false);
+            "unsigned integer value request for negative number; returning 0");
         result = 0;
     } else if (v > UINT_MAX) {
         QTC::TC("qpdf", "QPDFObjectHandle uint returning UINT_MAX");
-        warnIfPossible(
-            "requested value of unsigned integer is too big;"
-            " returning UINT_MAX",
-            false);
+        warnIfPossible("requested value of unsigned integer is too big;"
+                       " returning UINT_MAX");
         result = UINT_MAX;
     } else {
         result = static_cast<unsigned int>(v);
@@ -3000,16 +2997,15 @@ QPDFObjectHandle::typeWarning(
 }
 
 void
-QPDFObjectHandle::warnIfPossible(
-    std::string const& warning, bool throw_if_no_description)
+QPDFObjectHandle::warnIfPossible(std::string const& warning)
 {
     QPDF* context = 0;
     std::string description;
     dereference();
     if (this->obj->getDescription(context, description)) {
         warn(context, QPDFExc(qpdf_e_damaged_pdf, "", description, 0, warning));
-    } else if (throw_if_no_description) {
-        throw std::runtime_error(warning);
+    } else {
+        *QPDFLogger::defaultLogger()->getError() << warning << "\n";
     }
 }
 

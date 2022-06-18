@@ -14,6 +14,7 @@
 #include <qpdf/QPDFArgParser.hh>
 #include <qpdf/QPDFCryptoProvider.hh>
 #include <qpdf/QPDFJob.hh>
+#include <qpdf/QPDFLogger.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
@@ -104,10 +105,10 @@ void
 ArgParser::argVersion()
 {
     auto whoami = this->ap.getProgname();
-    std::cout << whoami << " version " << QPDF::QPDFVersion() << std::endl
-              << "Run " << whoami
-              << " --copyright to see copyright and license information."
-              << std::endl;
+    *QPDFLogger::defaultLogger()->getInfo()
+        << whoami << " version " << QPDF::QPDFVersion() << "\n"
+        << "Run " << whoami
+        << " --copyright to see copyright and license information.\n";
 }
 
 void
@@ -117,48 +118,35 @@ ArgParser::argCopyright()
     // Make sure the output looks right on an 80-column display.
     //               1         2         3         4         5         6         7         8
     //      12345678901234567890123456789012345678901234567890123456789012345678901234567890
-    std::cout
+    *QPDFLogger::defaultLogger()->getInfo()
         << this->ap.getProgname()
-        << " version " << QPDF::QPDFVersion() << std::endl
-        << std::endl
-        << "Copyright (c) 2005-2022 Jay Berkenbilt"
-        << std::endl
-        << "QPDF is licensed under the Apache License, Version 2.0 (the \"License\");"
-        << std::endl
-        << "you may not use this file except in compliance with the License."
-        << std::endl
-        << "You may obtain a copy of the License at"
-        << std::endl
-        << std::endl
-        << "  http://www.apache.org/licenses/LICENSE-2.0"
-        << std::endl
-        << std::endl
-        << "Unless required by applicable law or agreed to in writing, software"
-        << std::endl
-        << "distributed under the License is distributed on an \"AS IS\" BASIS,"
-        << std::endl
-        << "WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."
-        << std::endl
-        << "See the License for the specific language governing permissions and"
-        << std::endl
-        << "limitations under the License."
-        << std::endl
-        << std::endl
-        << "Versions of qpdf prior to version 7 were released under the terms"
-        << std::endl
-        << "of version 2.0 of the Artistic License. At your option, you may"
-        << std::endl
-        << "continue to consider qpdf to be licensed under those terms. Please"
-        << std::endl
-        << "see the manual for additional information."
-        << std::endl;
+        << " version " << QPDF::QPDFVersion() << "\n"
+        << "\n"
+        << "Copyright (c) 2005-2022 Jay Berkenbilt\n"
+        << "QPDF is licensed under the Apache License, Version 2.0 (the \"License\");\n"
+        << "you may not use this file except in compliance with the License.\n"
+        << "You may obtain a copy of the License at\n"
+        << "\n"
+        << "  http://www.apache.org/licenses/LICENSE-2.0\n"
+        << "\n"
+        << "Unless required by applicable law or agreed to in writing, software\n"
+        << "distributed under the License is distributed on an \"AS IS\" BASIS,\n"
+        << "WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n"
+        << "See the License for the specific language governing permissions and\n"
+        << "limitations under the License.\n"
+        << "\n"
+        << "Versions of qpdf prior to version 7 were released under the terms\n"
+        << "of version 2.0 of the Artistic License. At your option, you may\n"
+        << "continue to consider qpdf to be licensed under those terms. Please\n"
+        << "see the manual for additional information.\n";
     // clang-format on
 }
 
 void
 ArgParser::argJsonHelp()
 {
-    std::cout << QPDFJob::json_out_schema_v1() << std::endl;
+    *QPDFLogger::defaultLogger()->getInfo()
+        << QPDFJob::json_out_schema_v1() << "\n";
 }
 
 void
@@ -166,10 +154,10 @@ ArgParser::argShowCrypto()
 {
     auto crypto = QPDFCryptoProvider::getRegisteredImpls();
     std::string default_crypto = QPDFCryptoProvider::getDefaultProvider();
-    std::cout << default_crypto << std::endl;
+    *QPDFLogger::defaultLogger()->getInfo() << default_crypto << "\n";
     for (auto const& iter: crypto) {
         if (iter != default_crypto) {
-            std::cout << iter << std::endl;
+            *QPDFLogger::defaultLogger()->getInfo() << iter << "\n";
         }
     }
 }
@@ -407,7 +395,8 @@ ArgParser::argEndCopyAttachment()
 void
 ArgParser::argJobJsonHelp()
 {
-    std::cout << QPDFJob::job_json_schema_v1() << std::endl;
+    *QPDFLogger::defaultLogger()->getInfo()
+        << QPDFJob::job_json_schema_v1() << "\n";
 }
 
 void

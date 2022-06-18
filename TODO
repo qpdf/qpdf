@@ -55,29 +55,9 @@ Output Capture
 
 See https://github.com/qpdf/qpdf/issues/691
 
-QPDFLogger maintains pipelines for info, warn, error, and save.
-
-There is a singleton, default QPDFLogger which all QPDF and QPDFJob
-objects get on construction. In most cases, it is not necessary to
-override this. Allow QPDFJob and QPDF to be passed a new logger
-instance. QPDFJob should pass its QPDFLogger to all QPDF objects it
-creates. The main uses cases for this would be for multithreading or
-for having a library that uses QPDF privately and modifies logger
-settings so that it wouldn't interfere with a downstream library or
-application also using qpdf.
-
 There needs to be a C API to QPDFLogger. Use functions like this:
 
 void set_info((*f)(char* data, unsigned int len, void* udata), void* udata);
-
-We should probably deprecate the output/error setters in QPDF and
-QPDFJob. In the meantime, document that they won't work anymore to set
-different outputs with different QPDF objects. We may need to delete
-rather than deprecate these methods.
-
-Find all places in the library that write to stdout/stderr/cout/cerr.
-Also find places that raise exceptions if unable to warn. These should
-use the global output writer.
 
 
 QPDFPagesTree

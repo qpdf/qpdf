@@ -1,6 +1,7 @@
 #include <qpdf/QPDFArgParser.hh>
 
 #include <qpdf/QIntC.hh>
+#include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFUsage.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -235,7 +236,7 @@ QPDFArgParser::argCompletionZsh()
 void
 QPDFArgParser::argHelp(std::string const& p)
 {
-    std::cout << getHelp(p);
+    QPDFLogger::defaultLogger()->info(getHelp(p));
     exit(0);
 }
 

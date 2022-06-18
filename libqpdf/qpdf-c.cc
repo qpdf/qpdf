@@ -6,6 +6,7 @@
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFExc.hh>
+#include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -185,8 +186,9 @@ qpdf_cleanup(qpdf_data* qpdf)
     qpdf_oh_release_all(*qpdf);
     if ((*qpdf)->error.get()) {
         QTC::TC("qpdf", "qpdf-c cleanup warned about unhandled error");
-        std::cerr << "WARNING: application did not handle error: "
-                  << (*qpdf)->error->what() << std::endl;
+        *QPDFLogger::defaultLogger()->getWarn()
+            << "WARNING: application did not handle error: "
+            << (*qpdf)->error->what() << "\n";
     }
     delete *qpdf;
     *qpdf = 0;
@@ -898,7 +900,8 @@ trap_oh_errors(
                     " to ERROR HANDLING in qpdf-c.h"));
                 qpdf->oh_error_occurred = true;
             }
-            std::cerr << qpdf->error->what() << std::endl;
+            *QPDFLogger::defaultLogger()->getError()
+                << qpdf->error->what() << "\n";
         }
         return fallback();
     }
