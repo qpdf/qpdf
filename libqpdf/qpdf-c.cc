@@ -61,33 +61,6 @@ _qpdf_data::_qpdf_data() :
 {
 }
 
-namespace
-{
-    class ProgressReporter: public QPDFWriter::ProgressReporter
-    {
-      public:
-        ProgressReporter(void (*handler)(int, void*), void* data);
-        virtual ~ProgressReporter() = default;
-        virtual void reportProgress(int);
-
-      private:
-        void (*handler)(int, void*);
-        void* data;
-    };
-} // namespace
-
-ProgressReporter::ProgressReporter(void (*handler)(int, void*), void* data) :
-    handler(handler),
-    data(data)
-{
-}
-
-void
-ProgressReporter::reportProgress(int progress)
-{
-    this->handler(progress, this->data);
-}
-
 // must set qpdf->filename and qpdf->password
 static void
 call_read(qpdf_data qpdf)
@@ -851,7 +824,8 @@ qpdf_register_progress_reporter(
     QTC::TC("qpdf", "qpdf-c registered progress reporter");
     qpdf->qpdf_writer->registerProgressReporter(
         std::shared_ptr<QPDFWriter::ProgressReporter>(
-            new ProgressReporter(report_progress, data)));
+            new QPDFWriter::FunctionProgressReporter(
+                std::bind(report_progress, std::placeholders::_1, data))));
 }
 
 QPDF_ERROR_CODE

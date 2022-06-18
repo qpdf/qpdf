@@ -125,6 +125,7 @@ main()
     print_size(QPDFTokenizer::Token);
     print_size(QPDFUsage);
     print_size(QPDFWriter);
+    print_size(QPDFWriter::FunctionProgressReporter);
     print_size(QPDFXRefEntry);
     return 0;
 }

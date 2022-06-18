@@ -25,6 +25,30 @@
 #include <algorithm>
 #include <stdlib.h>
 
+QPDFWriter::ProgressReporter::~ProgressReporter()
+{
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
+    // README-maintainer
+}
+
+QPDFWriter::FunctionProgressReporter::FunctionProgressReporter(
+    std::function<void(int)> handler) :
+    handler(handler)
+{
+}
+
+QPDFWriter::FunctionProgressReporter::~FunctionProgressReporter()
+{
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
+    // README-maintainer
+}
+
+void
+QPDFWriter::FunctionProgressReporter::reportProgress(int progress)
+{
+    this->handler(progress);
+}
+
 QPDFWriter::Members::Members(QPDF& pdf) :
     pdf(pdf),
     filename("unspecified"),

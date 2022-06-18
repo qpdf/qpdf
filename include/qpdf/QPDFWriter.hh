@@ -29,6 +29,7 @@
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
 
+#include <functional>
 #include <list>
 #include <map>
 #include <memory>
@@ -80,12 +81,26 @@ class QPDFWriter
     class QPDF_DLL_CLASS ProgressReporter
     {
       public:
-        virtual ~ProgressReporter() = default;
+        virtual ~ProgressReporter();
 
         // This method is called with a value from 0 to 100 to
         // indicate approximate progress through the write process.
         // See registerProgressReporter.
         virtual void reportProgress(int) = 0;
+    };
+
+    // This is a progress reporter that takes a function. It is used
+    // by the C APIs, but it is available if you want to just register
+    // a C function as a handler.
+    class QPDF_DLL_CLASS FunctionProgressReporter: public ProgressReporter
+    {
+      public:
+        FunctionProgressReporter(std::function<void(int)>);
+        virtual ~FunctionProgressReporter();
+        virtual void reportProgress(int) override;
+
+      private:
+        std::function<void(int)> handler;
     };
 
     // Setting Output.  Output may be set only one time.  If you don't
