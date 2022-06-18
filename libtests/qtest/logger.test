@@ -24,10 +24,22 @@ $td->runtest("check stderr",
              {$td->FILE => "exp-stderr"},
              $td->NORMALIZE_NEWLINES);
 
+$td->runtest("logger C API",
+             {$td->COMMAND => "logger_c >stdout 2>stderr"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+foreach my $f (qw(stdout stderr info warn error save save2))
+{
+    $td->runtest("check $f (C)",
+                 {$td->FILE => "$f"},
+                 {$td->FILE => "c-exp-$f"},
+                 $td->NORMALIZE_NEWLINES);
+}
+
 cleanup();
-$td->report(3);
+$td->report(11);
 
 sub cleanup
 {
-    unlink "stdout", "stderr";
+    unlink "stdout", "stderr", "info", "warn", "error", "save", "save2";
 }

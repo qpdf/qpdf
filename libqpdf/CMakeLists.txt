@@ -110,7 +110,8 @@ set(libqpdf_SOURCES
   SF_FlateLzwDecode.cc
   SparseOHArray.cc
   qpdf-c.cc
-  qpdfjob-c.cc)
+  qpdfjob-c.cc
+  qpdflogger-c.cc)
 
 include(FindPkgConfig)
 include(CheckTypeSize)

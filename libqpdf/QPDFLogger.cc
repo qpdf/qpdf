@@ -181,8 +181,11 @@ QPDFLogger::setError(std::shared_ptr<Pipeline> p)
 }
 
 void
-QPDFLogger::setSave(std::shared_ptr<Pipeline> p)
+QPDFLogger::setSave(std::shared_ptr<Pipeline> p, bool only_if_not_set)
 {
+    if (only_if_not_set && (this->m->p_save != nullptr)) {
+        return;
+    }
     if (this->m->p_save == p) {
         return;
     }
@@ -202,9 +205,9 @@ QPDFLogger::setSave(std::shared_ptr<Pipeline> p)
 }
 
 void
-QPDFLogger::saveToStandardOutput()
+QPDFLogger::saveToStandardOutput(bool only_if_not_set)
 {
-    setSave(standardOutput());
+    setSave(standardOutput(), only_if_not_set);
 }
 
 void

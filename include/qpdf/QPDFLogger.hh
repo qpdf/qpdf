@@ -130,9 +130,9 @@ class QPDFLogger
     void setError(std::shared_ptr<Pipeline>);
     // See notes above about the save pipeline
     QPDF_DLL
-    void setSave(std::shared_ptr<Pipeline>);
+    void setSave(std::shared_ptr<Pipeline>, bool only_if_not_set);
     QPDF_DLL
-    void saveToStandardOutput();
+    void saveToStandardOutput(bool only_if_not_set);
 
     // Shortcut for logic to reset output to new output/error streams.
     // out_stream is used for info, err_stream is used for error, and

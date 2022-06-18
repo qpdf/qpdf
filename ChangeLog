@@ -1,5 +1,11 @@
 2022-06-18  Jay Berkenbilt  <ejb@ql.org>
 
+        * Add examples that show how to capture QPDFJob's output by
+        configuring the default logger (qpdfjob-save-attachment.cc,
+        qpdfjob-c-save-attachment.c). Fixes #691.
+
+        * Add C API for QPDFLogger -- see qpdflogger-c.h
+
         * Add additional qpdfjob C API functions take a handle.
 
         * Add qpdf_exit_code_e to Constants.h so that exit codes from

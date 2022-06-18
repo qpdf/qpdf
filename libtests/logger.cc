@@ -22,7 +22,7 @@ test1()
         *(logger->getInfo()) << "getSave exception: " << e.what() << "\n";
     }
     try {
-        logger->saveToStandardOutput();
+        logger->saveToStandardOutput(true);
         assert(false);
     } catch (std::logic_error& e) {
         *(logger->getInfo())
@@ -40,12 +40,12 @@ test2()
     // First call saveToStandardOutput. Then use info, which then to
     // go stderr.
     QPDFLogger l;
-    l.saveToStandardOutput();
+    l.saveToStandardOutput(true);
     l.info(std::string("info to stderr\n"));
     *(l.getSave()) << "save to stdout\n";
     l.setInfo(nullptr);
     l.info("info still to stderr\n");
-    l.setSave(nullptr);
+    l.setSave(nullptr, false);
     l.setInfo(nullptr);
     l.info("info back to stdout\n");
 }

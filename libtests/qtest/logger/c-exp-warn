@@ -1,0 +1,4 @@
+WARNING: warning.pdf: file is damaged
+WARNING: warning.pdf (offset 1556): xref not found
+WARNING: warning.pdf: Attempting to reconstruct cross-reference table
+qpdfjob json: operation succeeded with warnings

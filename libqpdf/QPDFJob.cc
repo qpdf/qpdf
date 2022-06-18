@@ -710,7 +710,7 @@ QPDFJob::checkConfiguration()
         save_to_stdout = true;
     }
     if (save_to_stdout) {
-        this->m->log->saveToStandardOutput();
+        this->m->log->saveToStandardOutput(true);
     }
     if ((!m->split_pages) &&
         QUtil::same_file(m->infilename.get(), m->outfilename.get())) {
@@ -925,7 +925,7 @@ QPDFJob::doShowObj(QPDF& pdf)
             } else {
                 // If anything has been written to standard output,
                 // this will fail.
-                this->m->log->saveToStandardOutput();
+                this->m->log->saveToStandardOutput(true);
                 obj.pipeStreamData(
                     this->m->log->getSave().get(),
                     (filter && m->normalize) ? qpdf_ef_normalize : 0,
@@ -1031,7 +1031,7 @@ QPDFJob::doShowAttachment(QPDF& pdf)
     auto efs = fs->getEmbeddedFileStream();
     // saveToStandardOutput has already been called, but it's harmless
     // to call it again, so do as defensive coding.
-    this->m->log->saveToStandardOutput();
+    this->m->log->saveToStandardOutput(true);
     efs.pipeStreamData(this->m->log->getSave().get(), 0, qpdf_dl_all);
 }
 
@@ -3289,7 +3289,7 @@ QPDFJob::writeOutfile(QPDF& pdf)
         } else {
             // saveToStandardOutput has already been called, but
             // calling it again is defensive and harmless.
-            this->m->log->saveToStandardOutput();
+            this->m->log->saveToStandardOutput(true);
             w.setOutputPipeline(this->m->log->getSave().get());
         }
         setWriterOptions(pdf, w);

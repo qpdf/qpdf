@@ -33,9 +33,17 @@ set(TEST_PROGRAMS
   runlength
   sha2
   sparse_array)
+set(TEST_C_PROGRAMS
+  logger_c)
+
 foreach(PROG ${TEST_PROGRAMS})
   add_executable(${PROG} ${PROG}.cc)
   target_link_libraries(${PROG} libqpdf_object)
+endforeach()
+foreach(PROG ${TEST_C_PROGRAMS})
+  add_executable(${PROG} ${PROG}.c)
+  target_link_libraries(${PROG} libqpdf_object)
+  set_property(TARGET ${PROG} PROPERTY LINKER_LANGUAGE CXX)
 endforeach()
 
 # Since libtests link with the object library and don't use the DLL,
