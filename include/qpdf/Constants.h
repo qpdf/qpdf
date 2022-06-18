@@ -27,6 +27,18 @@
  * interfaces.
  */
 
+/* Exit Codes from QPDFJob and the qpdf CLI */
+
+enum qpdf_exit_code_e {
+    qpdf_exit_success = 0,
+    /* Normal exit codes */
+    qpdf_exit_error = 2,
+    qpdf_exit_warning = 3,
+    /* For --is-encrypted and --requires-password */
+    qpdf_exit_is_not_encrypted = 2,
+    qpdf_exit_correct_password = 3,
+};
+
 /* Error Codes */
 
 enum qpdf_error_code_e {

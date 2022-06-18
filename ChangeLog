@@ -1,5 +1,8 @@
 2022-06-18  Jay Berkenbilt  <ejb@ql.org>
 
+        * Add qpdf_exit_code_e to Constants.h so that exit codes from
+        QPDFJob are accessible to the C API.
+
         * When --progress or --verbose is combined with writing to
         standard output, progress reporting and verbose messages go to
         standard error. Previously it was disabled in this case.

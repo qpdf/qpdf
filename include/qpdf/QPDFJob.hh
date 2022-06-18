@@ -47,11 +47,11 @@ class QPDFJob
 {
   public:
     // Exit codes -- returned by getExitCode() after calling run()
-    static int constexpr EXIT_ERROR = 2;
-    static int constexpr EXIT_WARNING = 3;
+    static int constexpr EXIT_ERROR = qpdf_exit_error;
+    static int constexpr EXIT_WARNING = qpdf_exit_warning;
     // For is-encrypted and requires-password
-    static int constexpr EXIT_IS_NOT_ENCRYPTED = 2;
-    static int constexpr EXIT_CORRECT_PASSWORD = 3;
+    static int constexpr EXIT_IS_NOT_ENCRYPTED = qpdf_exit_is_not_encrypted;
+    static int constexpr EXIT_CORRECT_PASSWORD = qpdf_exit_correct_password;
 
     // QPDFUsage is thrown if there are any usage-like errors when
     // calling Config methods.

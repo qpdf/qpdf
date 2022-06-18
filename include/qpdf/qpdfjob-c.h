@@ -49,7 +49,9 @@ extern "C" {
      * command-line with the given arguments and returns the exit code
      * that qpdf would use. argv must be a null-terminated array of
      * null-terminated UTF8-encoded strings. If calling this from
-     * wmain on Windows, use qpdfjob_run_from_wide_argv instead.
+     * wmain on Windows, use qpdfjob_run_from_wide_argv instead. Exit
+     * code values are defined in Constants.h in the qpdf_exit_code_e
+     * type.
      */
     QPDF_DLL
     int qpdfjob_run_from_argv(char const* const argv[]);
@@ -66,7 +68,8 @@ extern "C" {
     /* This function runs QPDFJob from a job JSON file. See the "QPDF
      * Job" section of the manual for details. The JSON string must be
      * UTF8-encoded. It returns the error code that qpdf would return
-     * with the equivalent command-line invocation.
+     * with the equivalent command-line invocation. Exit code values
+     * are defined in Constants.h in the qpdf_exit_code_e type.
      */
     QPDF_DLL
     int qpdfjob_run_from_json(char const* json);

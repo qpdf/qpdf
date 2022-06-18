@@ -1717,6 +1717,12 @@ For a detailed list of changes, please see the file
       and may optionally compensate for rotation or scaling of the
       destination page.
 
+    - Exit codes returned by ``QPDFJob::run()`` and the C API wrappers
+      are now defined in :file:`qpdf/Constants.h` in the
+      ``qpdf_exit_code_e`` type so that they are accessible from the C
+      API. They were previously only defined as constants in
+      :file:`qpdf/QPDFJob.hh`.
+
   - Build Improvements
 
     - Add new configure option

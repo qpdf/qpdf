@@ -47,8 +47,6 @@ Output Capture + QPDFJob
 
 QPDFJob:
 
-* Expose the meanings of the return values of qpdfjob functions to the
-  C API.
 * Allow users to supply a custom progress reporter for QPDFJob
 
 Output Capture
