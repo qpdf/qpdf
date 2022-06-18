@@ -160,6 +160,9 @@ For a detailed list of changes, please see the file
 
       - A C API is available in :file:`include/qpdf/qpdflogger-c.h`.
 
+      - See examples :file:`examples/qpdfjob-save-attachment.cc` and
+        :file:`examples/qpdfjob-c-save-attachment.cc`.
+
     - New methods ``insertItemAndGet``, ``appendItemAndGet``,
       ``eraseItemAndGet``, ``replaceKeyAndGet``, and
       ``removeKeyAndGet`` return the newly added or removed object.

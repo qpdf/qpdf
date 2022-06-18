@@ -56,6 +56,10 @@ class QPDFLogger
     // error -- standard error
     // save -- undefined unless set
     //
+    // "info" is used for diagnostic messages, verbose messages, and
+    // progress messages. "warn" is used for warnings. "error" is used
+    // for errors. "save" is used for saving output -- see below.
+    //
     // On deletion, finish() is called for the standard output and
     // standard error pipelines, which flushes output. If you supply
     // any custom pipelines, you must call finish() on them yourself.
@@ -63,6 +67,13 @@ class QPDFLogger
     // ostream pipelines.
     //
     // NOTES ABOUT THE SAVE PIPELINE
+    //
+    // The save pipeline is used by QPDFJob when some kind of binary
+    // output is being saved. This includes saving attachments and
+    // stream data and also includes when the output file is standard
+    // output. If you want to grab that output, you can call setSave.
+    // See examples/qpdfjob-save-attachment.cc and
+    // examples/qpdfjob-c-save-attachment.c.
     //
     // You should never set the save pipeline to the same destination
     // as something else. Doing so will corrupt your save output. If

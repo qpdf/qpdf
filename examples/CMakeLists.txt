@@ -14,11 +14,13 @@ set(EXAMPLE_CXX_PROGRAMS
   pdf-parse-content
   pdf-set-form-values
   pdf-split-pages
-  qpdf-job)
+  qpdf-job
+  qpdfjob-save-attachment)
 set(EXAMPLE_C_PROGRAMS
   pdf-c-objects
   pdf-linearize
-  qpdfjob-c)
+  qpdfjob-c
+  qpdfjob-c-save-attachment)
 
 foreach(PROG ${EXAMPLE_CXX_PROGRAMS})
   add_executable(${PROG} ${PROG}.cc)

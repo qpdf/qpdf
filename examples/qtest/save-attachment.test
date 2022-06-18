@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("qpdfjob-attachment") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('qpdfjob-attachment');
+
+$td->runtest("save attachment (C)",
+             {$td->COMMAND => "qpdfjob-c-save-attachment attach.pdf a a"},
+             {$td->STRING =>
+                  "qpdfjob-c-save-attachment: wrote attachment to a\n",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a"},
+             {$td->STRING => "quack\n"},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("save attachment (C++)",
+             {$td->COMMAND => "qpdfjob-save-attachment attach.pdf a b"},
+             {$td->STRING =>
+                  "qpdfjob-save-attachment: wrote attachment to b\n",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "b"},
+             {$td->STRING => "quack\n"},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+
+$td->report(4);
+
+sub cleanup
+{
+    unlink "a", "b";
+}

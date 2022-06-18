@@ -52,6 +52,10 @@ main(int argc, char* argv[])
      * To use that from C just like the argv one, call
      * qpdfjob_run_from_json instead and pass the json string as a
      * single char const* argument.
+     *
+     * See qpdfjob-c-save-attachment.c for an example of using the
+     * full form of the qpdfjob interface with init and cleanup
+     * functions.
      */
     r = qpdfjob_run_from_argv(new_argv);
     return r;

@@ -9,12 +9,12 @@ Before Release:
 * Release qtest with updates to qtest-driver and copy back into qpdf
 
 Next:
-* output capture
 * QPDFPagesTree -- avoid ever flattening the pages tree.
 * JSON v2 fixes
 
 Pending changes:
 
+* Allow users to supply a custom progress reporter for QPDFJob
 * Check about runpath in the linux-bin distribution. I think the
   appimage build specifically is setting the runpath, which is
   actually desirable in this case. Make sure to understand and
@@ -41,21 +41,6 @@ Pending changes:
 * Consider adding fuzzer code for JSON
 
 Soon: Break ground on "Document-level work"
-
-Output Capture + QPDFJob
-========================
-
-QPDFJob:
-
-* Allow users to supply a custom progress reporter for QPDFJob
-
-Output Capture
-
-See https://github.com/qpdf/qpdf/issues/691
-
-There needs to be a C API to QPDFLogger. Use functions like this:
-
-void set_info((*f)(char* data, unsigned int len, void* udata), void* udata);
 
 
 QPDFPagesTree

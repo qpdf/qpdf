@@ -25,7 +25,8 @@
 
 /*
  * This file provides a C API for QPDFLogger. See QPDFLogger.hh for
- * information about the logger.
+ * information about the logger and
+ * examples/qpdfjob-c-save-attachment.c for an example.
  */
 
 #include <qpdf/DLL.h>
