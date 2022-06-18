@@ -79,9 +79,6 @@ Find all places in the library that write to stdout/stderr/cout/cerr.
 Also find places that raise exceptions if unable to warn. These should
 use the global output writer.
 
-Figure out a good way to use the save pipeline for QPDFWriter as well
-as saving attachments, showing stream data, etc.
-
 
 QPDFPagesTree
 =============

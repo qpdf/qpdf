@@ -1,3 +1,9 @@
+2022-06-18  Jay Berkenbilt  <ejb@ql.org>
+
+        * When --progress or --verbose is combined with writing to
+        standard output, progress reporting and verbose messages go to
+        standard error. Previously it was disabled in this case.
+
 2022-06-05  Jay Berkenbilt  <ejb@ql.org>
 
         * QPDFJob: API breaking change: QPDFJob::doIfVerbose passes a

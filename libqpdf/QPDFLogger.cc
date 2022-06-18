@@ -2,6 +2,7 @@
 
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/Pl_OStream.hh>
+#include <qpdf/QUtil.hh>
 #include <iostream>
 #include <stdexcept>
 
@@ -182,6 +183,9 @@ QPDFLogger::setError(std::shared_ptr<Pipeline> p)
 void
 QPDFLogger::setSave(std::shared_ptr<Pipeline> p)
 {
+    if (this->m->p_save == p) {
+        return;
+    }
     if (p == this->m->p_stdout) {
         auto pt = dynamic_cast<Pl_Track*>(p.get());
         if (pt->getUsed()) {
@@ -192,6 +196,7 @@ QPDFLogger::setSave(std::shared_ptr<Pipeline> p)
         if (this->m->p_info == this->m->p_stdout) {
             this->m->p_info = this->m->p_stderr;
         }
+        QUtil::binary_stdout();
     }
     this->m->p_save = p;
 }

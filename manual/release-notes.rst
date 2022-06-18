@@ -133,6 +133,10 @@ For a detailed list of changes, please see the file
       user password is not recoverable from the owner password when
       256-bit keys are in use.
 
+    - ``--verbose`` and ``--progress`` may be now used when writing
+      the output PDF to standard output. In that case, the verbose and
+      progress messages are written to standard error.
+
   - Library Enhancements
 
     - New methods ``insertItemAndGet``, ``appendItemAndGet``,

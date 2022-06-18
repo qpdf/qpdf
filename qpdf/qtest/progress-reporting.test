@@ -14,13 +14,23 @@ cleanup();
 
 my $td = new TestDriver('progress-reporting');
 
-my $n_tests = 1;
+my $n_tests = 3;
 
 $td->runtest("progress report on small file",
-             {$td->COMMAND => "qpdf --progress minimal.pdf a.pdf",
+             {$td->COMMAND =>
+                  "qpdf --progress --deterministic-id minimal.pdf a.pdf",
                   $td->FILTER => "perl filter-progress.pl"},
              {$td->FILE => "small-progress.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+$td->runtest("progress report to stdout",
+             {$td->COMMAND =>
+                  "qpdf --progress --deterministic-id minimal.pdf - > b.pdf",
+                  $td->FILTER => "perl filter-progress.pl"},
+             {$td->FILE => "small-stdout-progress.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "b.pdf"});
 
 cleanup();
 $td->report($n_tests);

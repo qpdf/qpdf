@@ -691,22 +691,21 @@ QPDFJob::checkConfiguration()
               " before the -- that follows --encrypt.");
     }
 
+    bool save_to_stdout = false;
     if (m->require_outfile && m->outfilename &&
         (strcmp(m->outfilename.get(), "-") == 0)) {
         if (m->split_pages) {
             usage("--split-pages may not be used when"
                   " writing to standard output");
         }
-        if (this->m->verbose) {
-            usage("--verbose may not be used when"
-                  " writing to standard output");
-        }
-        if (m->progress) {
-            usage("--progress may not be used when"
-                  " writing to standard output");
-        }
+        save_to_stdout = true;
     }
-
+    if (!m->attachment_to_show.empty()) {
+        save_to_stdout = true;
+    }
+    if (save_to_stdout) {
+        this->m->log->saveToStandardOutput();
+    }
     if ((!m->split_pages) &&
         QUtil::same_file(m->infilename.get(), m->outfilename.get())) {
         QTC::TC("qpdf", "QPDFJob same file error");
@@ -918,10 +917,11 @@ QPDFJob::doShowObj(QPDF& pdf)
                 obj.warnIfPossible("unable to filter stream data");
                 error = true;
             } else {
-                QUtil::binary_stdout();
-                Pl_StdioFile out("stdout", stdout);
+                // If anything has been written to standard output,
+                // this will fail.
+                this->m->log->saveToStandardOutput();
                 obj.pipeStreamData(
-                    &out,
+                    this->m->log->getSave().get(),
                     (filter && m->normalize) ? qpdf_ef_normalize : 0,
                     filter ? qpdf_dl_all : qpdf_dl_none);
             }
@@ -1023,9 +1023,10 @@ QPDFJob::doShowAttachment(QPDF& pdf)
             "attachment " + m->attachment_to_show + " not found");
     }
     auto efs = fs->getEmbeddedFileStream();
-    QUtil::binary_stdout();
-    Pl_StdioFile out("stdout", stdout);
-    efs.pipeStreamData(&out, 0, qpdf_dl_all);
+    // saveToStandardOutput has already been called, but it's harmless
+    // to call it again, so do as defensive coding.
+    this->m->log->saveToStandardOutput();
+    efs.pipeStreamData(this->m->log->getSave().get(), 0, qpdf_dl_all);
 }
 
 void
@@ -3138,14 +3139,17 @@ QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
         parse_version(m->force_version, version, extension_level);
         w.forcePDFVersion(version, extension_level);
     }
-    if (m->progress && m->outfilename) {
+    if (m->progress) {
+        char const* outfilename = this->m->outfilename
+            ? this->m->outfilename.get()
+            : "standard output";
         w.registerProgressReporter(
             std::shared_ptr<QPDFWriter::ProgressReporter>(
                 // line-break
                 new ProgressReporter(
                     *this->m->log->getInfo(),
                     this->m->message_prefix,
-                    m->outfilename.get())));
+                    outfilename)));
     }
 }
 
@@ -3273,7 +3277,15 @@ QPDFJob::writeOutfile(QPDF& pdf)
     } else {
         // QPDFWriter must have block scope so the output file will be
         // closed after write() finishes.
-        QPDFWriter w(pdf, m->outfilename.get());
+        QPDFWriter w(pdf);
+        if (this->m->outfilename) {
+            w.setOutputFilename(m->outfilename.get());
+        } else {
+            // saveToStandardOutput has already been called, but
+            // calling it again is defensive and harmless.
+            this->m->log->saveToStandardOutput();
+            w.setOutputPipeline(this->m->log->getSave().get());
+        }
         setWriterOptions(pdf, w);
         w.write();
     }
