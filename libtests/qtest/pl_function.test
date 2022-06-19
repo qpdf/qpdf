@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("pl_function") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('pl_function');
+
+$td->runtest("pl_function",
+             {$td->COMMAND => "pl_function"},
+             {$td->FILE => "exp", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->report(1);

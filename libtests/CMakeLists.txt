@@ -24,6 +24,7 @@ set(TEST_PROGRAMS
   nntree
   numrange
   pdf_version
+  pl_function
   pointer_holder
   predictors
   qintc

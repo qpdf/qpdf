@@ -42,6 +42,7 @@ set(libqpdf_SOURCES
   Pl_DCT.cc
   Pl_Discard.cc
   Pl_Flate.cc
+  Pl_Function.cc
   Pl_LZWDecoder.cc
   Pl_MD5.cc
   Pl_OStream.cc
