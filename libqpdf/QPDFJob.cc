@@ -323,6 +323,7 @@ QPDFJob::Members::Members() :
     decrypt(false),
     split_pages(0),
     progress(false),
+    progress_handler(nullptr),
     suppress_warnings(false),
     warnings_exit_zero(false),
     copy_encryption(false),
@@ -461,6 +462,11 @@ QPDFJob::setOutputStreams(std::ostream* out, std::ostream* err)
 {
     setLogger(std::make_shared<QPDFLogger>());
     this->m->log->setOutputStreams(out, err);
+}
+
+void
+QPDFJob::registerProgressReporter(std::function<void(int)> handler) {
+    this->m->progress_handler = handler;
 }
 
 void
@@ -3146,16 +3152,23 @@ QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
         w.forcePDFVersion(version, extension_level);
     }
     if (m->progress) {
-        char const* outfilename = this->m->outfilename
-            ? this->m->outfilename.get()
-            : "standard output";
-        w.registerProgressReporter(
-            std::shared_ptr<QPDFWriter::ProgressReporter>(
-                // line-break
-                new ProgressReporter(
-                    *this->m->log->getInfo(),
-                    this->m->message_prefix,
-                    outfilename)));
+        if (this->m->progress_handler) {
+            w.registerProgressReporter(
+                std::shared_ptr<QPDFWriter::ProgressReporter>(
+                    new QPDFWriter::FunctionProgressReporter(
+                        this->m->progress_handler)));
+        } else {
+            char const* outfilename = this->m->outfilename
+                ? this->m->outfilename.get()
+                : "standard output";
+            w.registerProgressReporter(
+                std::shared_ptr<QPDFWriter::ProgressReporter>(
+                    // line-break
+                    new ProgressReporter(
+                        *this->m->log->getInfo(),
+                        this->m->message_prefix,
+                        outfilename)));
+        }
     }
 }
 

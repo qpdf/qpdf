@@ -14,7 +14,10 @@ Next:
 
 Pending changes:
 
-* Allow users to supply a custom progress reporter for QPDFJob
+* Allow users to supply a custom progress reporter for QPDFJob. If one
+  is provided, use it instead of creating one. Then expose to the C
+  API. Consider also exposing a way to set a new logger and to get the
+  logger from QPDF and QPDFJob in the C API.
 * Check about runpath in the linux-bin distribution. I think the
   appimage build specifically is setting the runpath, which is
   actually desirable in this case. Make sure to understand and

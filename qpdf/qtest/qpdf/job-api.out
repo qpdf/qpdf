@@ -1,4 +1,11 @@
 normal
+qpdf: a.pdf: write progress: 0%
+....other write progress....
+qpdf: a.pdf: write progress: 100%
+custom progress reporter
+custom write progress: 0%
+....other write progress....
+custom write progress: 100%
 error caught by check
 finished config
 usage: an input file name is required

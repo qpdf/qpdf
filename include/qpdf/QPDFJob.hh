@@ -134,6 +134,14 @@ class QPDFJob
         "configure logger from getLogger() or call setLogger()")]] QPDF_DLL void
     setOutputStreams(std::ostream* out_stream, std::ostream* err_stream);
 
+    // You can register a custom progress reporter to be called by
+    // QPDFWriter (see QPDFWriter::registerProgressReporter). This is
+    // only called if you also request progress reporting through
+    // normal configuration methods (e.g., pass --progress, call
+    // config()->progress, etc.)
+    QPDF_DLL
+    void registerProgressReporter(std::function<void(int)>);
+
     // Check to make sure no contradictory options have been
     // specified. This is called automatically after initializing from
     // argv or json and is also called by run, but you can call it
@@ -579,6 +587,7 @@ class QPDFJob
         bool decrypt;
         int split_pages;
         bool progress;
+        std::function<void(int)> progress_handler;
         bool suppress_warnings;
         bool warnings_exit_zero;
         bool copy_encryption;

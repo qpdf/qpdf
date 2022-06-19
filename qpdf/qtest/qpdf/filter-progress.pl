@@ -4,9 +4,14 @@ use warnings;
 my $seen = 0;
 while (<>)
 {
-    if (m/write progress: (?:10)?0\%/)
+    if (m/write progress: 0\%/)
     {
         print;
+    }
+    elsif (m/write progress: 100\%/)
+    {
+        print;
+        $seen = 0;
     }
     elsif (m/write progress: /)
     {

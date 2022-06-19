@@ -87,7 +87,8 @@ $td->runtest("QPDFJob json partial",
              {$td->FILE => "job-partial-json.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("QPDFJob API",
-             {$td->COMMAND => "test_driver 84 -"},
+             {$td->COMMAND => "test_driver 84 -",
+                  $td->FILTER => "perl filter-progress.pl"},
              {$td->FILE => "job-api.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",

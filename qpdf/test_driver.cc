@@ -2937,6 +2937,27 @@ test_84(QPDF& pdf, char const* arg2)
             ->qdf()
             ->deterministicId()
             ->objectStreams("preserve")
+            ->progress()
+            ->checkConfiguration();
+        j.run();
+        assert(j.getExitCode() == 0);
+        assert(!j.hasWarnings());
+        assert(j.getEncryptionStatus() == 0);
+    }
+
+    std::cout << "custom progress reporter" << std::endl;
+    {
+        QPDFJob j;
+        j.registerProgressReporter([](int p) {
+            std::cout << "custom write progress: " << p << "%" << std::endl;
+        });
+        j.config()
+            ->inputFile("minimal.pdf")
+            ->outputFile("a.pdf")
+            ->qdf()
+            ->deterministicId()
+            ->objectStreams("preserve")
+            ->progress()
             ->checkConfiguration();
         j.run();
         assert(j.getExitCode() == 0);
