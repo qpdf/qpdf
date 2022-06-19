@@ -120,3 +120,12 @@ int qpdfjob_run_from_json(char const* json)
     });
 }
 
+void
+qpdfjob_register_progress_reporter(
+    qpdfjob_handle j,
+    void (*report_progress)(int percent, void* data),
+    void* data)
+{
+    j->j.registerProgressReporter(
+        std::bind(report_progress, std::placeholders::_1, data));
+}

@@ -21,17 +21,29 @@ wide_test()
 #endif // QPDF_NO_WCHAR_T
 
 static void
+custom_progress(int progress, void* data)
+{
+    printf("%s: write progress: %d%%\n", (char const*)data, progress);
+}
+
+static void
 run_tests()
 {
     /* Be sure to use a different output file for each test. */
+    qpdfjob_handle j = NULL;
 
-    char const* argv[5];
+    char const* argv[6];
     argv[0] = "qpdfjob";
     argv[1] = "minimal.pdf";
     argv[2] = "a.pdf";
     argv[3] = "--deterministic-id";
-    argv[4] = NULL;
-    assert(qpdfjob_run_from_argv(argv) == 0);
+    argv[4] = "--progress";
+    argv[5] = NULL;
+    j = qpdfjob_init();
+    qpdfjob_register_progress_reporter(j, custom_progress, (void*)"potato");
+    assert(qpdfjob_initialize_from_argv(j, argv) == 0);
+    assert(qpdfjob_run(j) == 0);
+    qpdfjob_cleanup(&j);
     printf("argv test passed\n");
 
     assert(qpdfjob_run_from_json("{\n\

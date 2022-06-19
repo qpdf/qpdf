@@ -1,3 +1,6 @@
+potato: write progress: 0%
+....other write progress....
+potato: write progress: 100%
 argv test passed
 json test passed
 WARNING: xref-with-short-size.pdf (xref stream, offset 16227): Cross-reference stream data has the wrong size; expected = 52; actual = 56

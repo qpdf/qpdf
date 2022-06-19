@@ -100,7 +100,8 @@ $td->runtest("json output from job",
              $td->NORMALIZE_NEWLINES);
 
 $td->runtest("C job API",
-             {$td->COMMAND => "qpdfjob-ctest"},
+             {$td->COMMAND => "qpdfjob-ctest",
+                  $td->FILTER => "perl filter-progress.pl"},
              {$td->FILE => "qpdfjob-ctest.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 foreach my $i (['a.pdf', 1], ['b.pdf', 2], ['c.pdf', 3])

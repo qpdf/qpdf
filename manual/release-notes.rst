@@ -186,8 +186,8 @@ For a detailed list of changes, please see the file
     - Add new ``Pipeline`` type ``Pl_String`` to append to a
       ``std::string``.
 
-    - Add methods to QUtil for converting PDF timestamps and QPDFTime
-      objects to ISO-8601 timestamps.
+    - Add methods to ``QUtil`` for converting PDF timestamps and
+      ``QPDFTime`` objects to ISO-8601 timestamps.
 
     - Enhance JSON class to better support incrementally reading and
       writing large amounts of data without having to keep everything
@@ -199,6 +199,12 @@ For a detailed list of changes, please see the file
       functions, and call ``qpdfjob_cleanup`` at the end. This
       interface offers more flexibility than the old interface, which
       remains available.
+
+    - Add ``QPDFJob::registerProgressReporter`` and
+      ``qpdfjob_register_progress_reporter`` to allow a custom
+      progress reporter to be used with ``QPDFJob``. The ``QPDFJob``
+      object must be configured to report progress (via command-line
+      argument or otherwise) for this to be used.
 
   - Other changes
 

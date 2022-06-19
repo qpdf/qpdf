@@ -1,5 +1,10 @@
 2022-06-18  Jay Berkenbilt  <ejb@ql.org>
 
+        * Add QPDFJob::registerProgressReporter, making it possible to
+        override the progress reporter that is used when --progress (or
+        the equivalent) is configured with QPDFJob. This is
+        qpdfjob_register_progress_reporter in the C API.
+
         * Add examples that show how to capture QPDFJob's output by
         configuring the default logger (qpdfjob-save-attachment.cc,
         qpdfjob-c-save-attachment.c). Fixes #691.

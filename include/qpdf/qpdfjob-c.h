@@ -125,6 +125,16 @@ extern "C" {
     QPDF_DLL
     int qpdfjob_run(qpdfjob_handle j);
 
+    /* Allow specification of a custom progress reporter. The progress
+     * reporter is only used if progress is otherwise requested (with
+     * the --progress option or "progress": "" in the JSON).
+     */
+    QPDF_DLL
+    void qpdfjob_register_progress_reporter(
+        qpdfjob_handle j,
+        void (*report_progress)(int percent, void* data),
+        void* data);
+
 #ifdef __cplusplus
 }
 #endif
