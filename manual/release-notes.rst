@@ -188,6 +188,13 @@ For a detailed list of changes, please see the file
       writing large amounts of data without having to keep everything
       in memory.
 
+    - Add new functions to the C API for qpdfjob that use a
+      ``qpdfjob_handle``. Like with the regular C API for qpdf, you
+      have to call ``qpdfjob_init`` first, pass the handle to the
+      functions, and call ``qpdfjob_cleanup`` at the end. This
+      interface offers more flexibility than the old interface, which
+      remains available.
+
   - Other changes
 
     - In JSON v1 mode, the ``"objects"`` key now reflects the repaired

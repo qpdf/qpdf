@@ -438,6 +438,12 @@ QPDFJob::setMessagePrefix(std::string const& message_prefix)
     this->m->message_prefix = message_prefix;
 }
 
+std::string
+QPDFJob::getMessagePrefix() const
+{
+    return this->m->message_prefix;
+}
+
 std::shared_ptr<QPDFLogger>
 QPDFJob::getLogger()
 {

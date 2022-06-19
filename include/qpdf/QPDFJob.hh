@@ -108,6 +108,8 @@ class QPDFJob
     // and error streams on the caller's behalf. Defaults to "qpdf".
     QPDF_DLL
     void setMessagePrefix(std::string const&);
+    QPDF_DLL
+    std::string getMessagePrefix() const;
 
     // To capture or redirect output, configure the logger returned by
     // getLogger(). By default, all QPDF and QPDFJob objects share the

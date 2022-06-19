@@ -1,5 +1,7 @@
 2022-06-18  Jay Berkenbilt  <ejb@ql.org>
 
+        * Add additional qpdfjob C API functions take a handle.
+
         * Add qpdf_exit_code_e to Constants.h so that exit codes from
         QPDFJob are accessible to the C API.
 
