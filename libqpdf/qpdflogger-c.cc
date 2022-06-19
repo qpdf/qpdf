@@ -1,6 +1,7 @@
 #include <qpdf/qpdflogger-c.h>
 
 #include <qpdf/Pipeline.hh>
+#include <qpdf/Pl_Function.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFLogger.hh>
 #include <functional>
@@ -13,43 +14,6 @@ struct _qpdflogger_handle
 
     std::shared_ptr<QPDFLogger> l;
 };
-
-namespace
-{
-    class FunctionPipeline: public Pipeline
-    {
-      public:
-        FunctionPipeline(char const* identifier, qpdf_log_fn_t fn, void* udata);
-        virtual ~FunctionPipeline() = default;
-
-        virtual void write(unsigned char const* buf, size_t len) override;
-        virtual void finish() override;
-
-      private:
-        qpdf_log_fn_t fn;
-        void* udata;
-    };
-}; // namespace
-
-FunctionPipeline::FunctionPipeline(
-    char const* identifier, qpdf_log_fn_t fn, void* udata) :
-    Pipeline(identifier, nullptr),
-    fn(fn),
-    udata(udata)
-{
-}
-
-void
-FunctionPipeline::write(unsigned char const* buf, size_t len)
-{
-    fn(reinterpret_cast<char const*>(buf), QIntC::to_ulong(len), udata);
-}
-
-void
-FunctionPipeline::finish()
-{
-    // Nothing needed
-}
 
 _qpdflogger_handle::_qpdflogger_handle(std::shared_ptr<QPDFLogger> l) :
     l(l)
@@ -92,7 +56,12 @@ set_log_dest(
         method(l->discard());
         break;
     case qpdf_log_dest_custom:
-        method(std::make_shared<FunctionPipeline>(identifier, fn, udata));
+        method(std::make_shared<Pl_Function>(
+            identifier,
+            nullptr,
+            [fn, udata](unsigned char const* data, size_t len) {
+                fn(reinterpret_cast<char const*>(data), len, udata);
+            }));
         break;
     }
 }
