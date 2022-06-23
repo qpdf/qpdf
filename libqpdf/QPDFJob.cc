@@ -1239,16 +1239,13 @@ QPDFJob::doJSONPageLabels(Pipeline* p, bool& first, QPDF& pdf)
 {
     JSON j_labels = JSON::makeArray();
     QPDFPageLabelDocumentHelper pldh(pdf);
-    QPDFPageDocumentHelper pdh(pdf);
-    std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
+    long long npages = QIntC::to_longlong(
+        QPDFPageDocumentHelper(pdf).getAllPages().size());
     if (pldh.hasPageLabels()) {
         std::vector<QPDFObjectHandle> labels;
-        pldh.getLabelsForPageRange(
-            0, QIntC::to_int(pages.size()) - 1, 0, labels);
+        pldh.getLabelsForPageRange(0, npages - 1, 0, labels);
         for (auto iter = labels.begin(); iter != labels.end(); ++iter) {
-            auto next = iter;
-            ++next;
-            if (next == labels.end()) {
+            if ((iter + 1) == labels.end()) {
                 // This can't happen, so ignore it. This could only
                 // happen if getLabelsForPageRange somehow returned an
                 // odd number of items.
