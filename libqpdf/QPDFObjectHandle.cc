@@ -338,7 +338,7 @@ QPDFObjectHandle::isDirectNull() const
     // Don't call dereference() -- this is a const method, and we know
     // objid == 0, so there's nothing to resolve.
     return (
-        this->initialized && (this->objid == 0) &&
+        this->initialized && (getObjectID() == 0) &&
         QPDFObjectTypeAccessor<QPDF_Null>::check(obj.get()));
 }
 
@@ -490,7 +490,7 @@ QPDFObjectHandle::isIndirect()
     if (!this->initialized) {
         return false;
     }
-    return (this->objid != 0);
+    return (getObjectID() != 0);
 }
 
 bool
@@ -1549,6 +1549,13 @@ QPDFObjectHandle::getObjGen() const
     return QPDFObjGen(this->objid, this->generation);
 }
 
+std::string
+QPDFObjectHandle::getObjGenAsStr() const
+{
+    return  QUtil::int_to_string(this->objid) + " " +
+        QUtil::int_to_string(this->generation);
+}
+
 int
 QPDFObjectHandle::getObjectID() const
 {
@@ -1608,14 +1615,12 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
 
     bool first = true;
     for (auto const& item: result) {
-        std::string og = QUtil::int_to_string(item.getObjectID()) + " " +
-            QUtil::int_to_string(item.getGeneration());
         if (first) {
             first = false;
         } else {
             all_description += ",";
         }
-        all_description += " stream " + og;
+        all_description += " stream " + item.getObjGenAsStr();
     }
 
     return result;
@@ -1624,9 +1629,7 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
 std::vector<QPDFObjectHandle>
 QPDFObjectHandle::getPageContents()
 {
-    std::string description = "page object " +
-        QUtil::int_to_string(this->objid) + " " +
-        QUtil::int_to_string(this->generation);
+    std::string description = "page object " + getObjGenAsStr();
     std::string all_description;
     return this->getKey("/Contents")
         .arrayOrStreamToStreamArray(description, all_description);
@@ -1735,8 +1738,7 @@ QPDFObjectHandle::unparse()
 {
     std::string result;
     if (this->isIndirect()) {
-        result = QUtil::int_to_string(this->objid) + " " +
-            QUtil::int_to_string(this->generation) + " R";
+        result = getObjGenAsStr() + " R";
     } else {
         result = unparseResolved();
     }
@@ -1848,9 +1850,7 @@ QPDFObjectHandle::parse(
 void
 QPDFObjectHandle::pipePageContents(Pipeline* p)
 {
-    std::string description = "page object " +
-        QUtil::int_to_string(this->objid) + " " +
-        QUtil::int_to_string(this->generation);
+    std::string description = "page object " + getObjGenAsStr();
     std::string all_description;
     this->getKey("/Contents")
         .pipeContentStreams(p, description, all_description);
@@ -1869,15 +1869,12 @@ QPDFObjectHandle::pipeContentStreams(
             buf.writeCStr("\n");
         }
         LastChar lc(&buf);
-        std::string og = QUtil::int_to_string(stream.getObjectID()) + " " +
-            QUtil::int_to_string(stream.getGeneration());
-        std::string w_description = "content stream object " + og;
         if (!stream.pipeStreamData(&lc, 0, qpdf_dl_specialized)) {
             QTC::TC("qpdf", "QPDFObjectHandle errors in parsecontent");
             throw QPDFExc(
                 qpdf_e_damaged_pdf,
                 "content stream",
-                w_description,
+                "content stream object " + stream.getObjGenAsStr(),
                 0,
                 "errors while decoding content stream");
         }
@@ -1893,9 +1890,7 @@ QPDFObjectHandle::pipeContentStreams(
 void
 QPDFObjectHandle::parsePageContents(ParserCallbacks* callbacks)
 {
-    std::string description = "page object " +
-        QUtil::int_to_string(this->objid) + " " +
-        QUtil::int_to_string(this->generation);
+    std::string description = "page object " + getObjGenAsStr();
     this->getKey("/Contents")
         .parseContentStream_internal(description, callbacks);
 }
@@ -1903,17 +1898,14 @@ QPDFObjectHandle::parsePageContents(ParserCallbacks* callbacks)
 void
 QPDFObjectHandle::parseAsContents(ParserCallbacks* callbacks)
 {
-    std::string description = "object " + QUtil::int_to_string(this->objid) +
-        " " + QUtil::int_to_string(this->generation);
+    std::string description = "object " + getObjGenAsStr();
     this->parseContentStream_internal(description, callbacks);
 }
 
 void
 QPDFObjectHandle::filterPageContents(TokenFilter* filter, Pipeline* next)
 {
-    std::string description = "token filter for page object " +
-        QUtil::int_to_string(this->objid) + " " +
-        QUtil::int_to_string(this->generation);
+    auto description = "token filter for page object " + getObjGenAsStr();
     Pl_QPDFTokenizer token_pipeline(description.c_str(), filter, next);
     this->pipePageContents(&token_pipeline);
 }
@@ -1921,9 +1913,7 @@ QPDFObjectHandle::filterPageContents(TokenFilter* filter, Pipeline* next)
 void
 QPDFObjectHandle::filterAsContents(TokenFilter* filter, Pipeline* next)
 {
-    std::string description = "token filter for object " +
-        QUtil::int_to_string(this->objid) + " " +
-        QUtil::int_to_string(this->generation);
+    auto description = "token filter for object " + getObjGenAsStr();
     Pl_QPDFTokenizer token_pipeline(description.c_str(), filter, next);
     this->pipeStreamData(&token_pipeline, 0, qpdf_dl_specialized);
 }
@@ -2862,7 +2852,7 @@ QPDFObjectHandle::copyObject(
             "attempt to make a stream into a direct object");
     }
 
-    QPDFObjGen cur_og(this->objid, this->generation);
+    auto cur_og = getObjGen();
     if (cur_og.getObj() != 0) {
         if (visited.count(cur_og)) {
             QTC::TC("qpdf", "QPDFObjectHandle makeDirect loop");
@@ -3204,14 +3194,13 @@ QPDFObjectHandle::dereference()
         throw std::logic_error(
             "attempted to dereference an uninitialized QPDFObjectHandle");
     }
-    if (this->obj.get() && this->objid &&
-        QPDF::Resolver::objectChanged(
-            this->qpdf, QPDFObjGen(this->objid, this->generation), this->obj)) {
+    if (this->obj.get() && getObjectID() &&
+        QPDF::Resolver::objectChanged(this->qpdf, getObjGen(), this->obj)) {
         this->obj = nullptr;
     }
     if (this->obj.get() == 0) {
         std::shared_ptr<QPDFObject> obj =
-            QPDF::Resolver::resolve(this->qpdf, this->objid, this->generation);
+            QPDF::Resolver::resolve(this->qpdf, getObjectID(), getGeneration());
         if (obj.get() == 0) {
             // QPDF::resolve never returns an uninitialized object, but
             // check just in case.
