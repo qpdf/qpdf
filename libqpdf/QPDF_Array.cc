@@ -56,12 +56,6 @@ QPDF_Array::getTypeName() const
     return "array";
 }
 
-void
-QPDF_Array::setDescription(QPDF* qpdf, std::string const& description)
-{
-    this->QPDFObject::setDescription(qpdf, description);
-}
-
 int
 QPDF_Array::getNItems() const
 {

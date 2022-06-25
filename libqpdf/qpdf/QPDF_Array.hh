@@ -17,7 +17,6 @@ class QPDF_Array: public QPDFObject
     virtual JSON getJSON(int json_version);
     virtual QPDFObject::object_type_e getTypeCode() const;
     virtual char const* getTypeName() const;
-    virtual void setDescription(QPDF*, std::string const&);
 
     int getNItems() const;
     QPDFObjectHandle getItem(int n) const;
