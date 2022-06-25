@@ -4,22 +4,6 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
-static std::string
-get_description(QPDFObjectHandle& node)
-{
-    std::string result("page tree node");
-    if (node.isIndirect()) {
-        result += " (object " + QUtil::int_to_string(node.getObjectID()) + ")";
-    }
-    return result;
-}
-
-static void
-warn(QPDF& qpdf, QPDFObjectHandle& node, std::string const& msg)
-{
-    qpdf.warn(qpdf_e_damaged_pdf, get_description(node), 0, msg);
-}
-
 QPDFPagesTree::iterator::PathElement::PathElement(
     QPDFObjectHandle const& node, int kid_number) :
     node(node),
@@ -129,11 +113,9 @@ QPDFPagesTree::iterator::increment(bool backward)
             if (!kid.isDictionary()) {
                 // XXX Maybe remove rather than skip
                 QTC::TC("qpdf", "QPDFPagesTree skip invalid node");
-                warn(
-                    this->m->qpdf,
-                    cur.node,
+                cur.node.warnIfPossible(
                     "item " + QUtil::int_to_string(cur.kid_number) +
-                        " is not a dictionary");
+                    " is not a dictionary");
             } else if (kid.getKey("/Kids").isArray()) {
                 if (deepen(kid, !backward)) {
                     found_valid_key = true;
@@ -158,10 +140,7 @@ QPDFPagesTree::iterator::maybeSetType(
     auto type_oh = node.getKey("/Type");
     if (!type_oh.isNameAndEquals(type)) {
         QTC::TC("qpdf", "QPDFPagesTree set /Type");
-        warn(
-            this->m->qpdf,
-            node,
-            "setting /Type to " + type + " in page tree node");
+        node.warnIfPossible("setting /Type to " + type + " in page tree node");
         node.replaceKey("/Type", QPDFObjectHandle::newName(type));
     }
 }
@@ -173,11 +152,9 @@ QPDFPagesTree::iterator::getKidIndirect(QPDFObjectHandle node, int kid_number)
     auto kid = kids.getArrayItem(kid_number);
     if (!kid.isIndirect()) {
         QTC::TC("qpdf", "QPDFPagesTree fix direct kid");
-        warn(
-            this->m->qpdf,
-            node,
-            ("kid " + QUtil::int_to_string(kid_number) +
-             " (from 0) is direct; converting to indirect"));
+        node.warnIfPossible(
+            "kid " + QUtil::int_to_string(kid_number) +
+            " (from 0) is direct; converting to indirect");
         kid = this->m->qpdf.makeIndirectObject(kid);
         kids.setArrayItem(kid_number, kid);
     }
@@ -209,9 +186,7 @@ QPDFPagesTree::iterator::deepen(QPDFObjectHandle node, bool first)
             auto og = node.getObjGen();
             if (seen.count(og)) {
                 QTC::TC("qpdf", "QPDFPagesTree deepen: loop");
-                warn(
-                    this->m->qpdf,
-                    node,
+                node.warnIfPossible(
                     "loop detected while traversing pages tree");
                 failed = true;
                 break;
@@ -220,9 +195,7 @@ QPDFPagesTree::iterator::deepen(QPDFObjectHandle node, bool first)
         }
         if (!node.isDictionary()) {
             QTC::TC("qpdf", "QPDFPagesTree node is not a dictionary");
-            warn(
-                this->m->qpdf,
-                node,
+            node.warnIfPossible(
                 "non-dictionary node while traversing pages tree");
             failed = true;
             break;
