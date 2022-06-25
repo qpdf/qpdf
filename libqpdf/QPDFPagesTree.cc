@@ -173,9 +173,11 @@ QPDFPagesTree::iterator::getKidIndirect(QPDFObjectHandle node, int kid_number)
     auto kid = kids.getArrayItem(kid_number);
     if (!kid.isIndirect()) {
         QTC::TC("qpdf", "QPDFPagesTree fix direct kid");
-        // No need to warn for this. It's safe, and there's nothing
-        // the user can/should do about it. Besides, qpdf has been
-        // fixing direct kids for a while without issuing warnings.
+        warn(
+            this->m->qpdf,
+            node,
+            ("kid " + QUtil::int_to_string(kid_number) +
+             " (from 0) is direct; converting to indirect"));
         kid = this->m->qpdf.makeIndirectObject(kid);
         kids.setArrayItem(kid_number, kid);
     }
