@@ -54,6 +54,7 @@ QPDF::getAllPages()
     // Note that pushInheritedAttributesToPage may also be used to
     // initialize this->m->all_pages.
     if (this->m->all_pages.empty()) {
+        this->m->ever_called_get_all_pages = true;
         std::set<QPDFObjGen> visited;
         std::set<QPDFObjGen> seen;
         QPDFObjectHandle pages = getRoot().getKey("/Pages");

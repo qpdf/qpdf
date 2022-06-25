@@ -9,10 +9,6 @@ Before Release:
 * Release qtest with updates to qtest-driver and copy back into qpdf
 
 Next:
-* QPDF -- track whether the pages tree was modified (whether
-  getAllPages was ever called. If so, consider generating a non-flat
-  pages tree before creating output to better handle files with lots
-  of pages.
 * JSON v2 fixes
 
 Pending changes:
@@ -44,6 +40,12 @@ Pending changes:
   drivers from the qpdf directory into the latter category as long
   as doing so isn't too troublesome from a coverage standpoint.
 * Consider adding fuzzer code for JSON
+* Consider generating a non-flat pages tree before creating output to
+  better handle files with lots of pages. If there are more than 256
+  pages, add a second layer with the second layer nodes having no more
+  than 256 nodes and being as evenly sizes as possible. Don't worry
+  about the case of more than 65,536 pages. If the top node has more
+  than 256 children, we'll live with it.
 
 Soon: Break ground on "Document-level work"
 
@@ -81,7 +83,8 @@ JSON v2 fixes
     "qpdf": [
       {
         "jsonversion": 2,
-        "repairpagestree": false,
+        "pushedinheritedpageresources": false,
+        "calledgetallpages": false,
         "maxobjectid": 10
       },
       {
@@ -109,6 +112,10 @@ JSON v2 fixes
     with more than one element, the output has to have an array with
     the same number of elements whose individual elements are
     validated according to the regular rules.
+
+  * When reading back in, we'll have to call
+    pushInheritedAttributesToPage or getAllPages based on the values
+    of the metadata.
 
 * Support json v2 in the C API. At a minimum, write_json,
   create_from_json, and update_from_json need to be there and should

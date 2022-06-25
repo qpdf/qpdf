@@ -709,6 +709,11 @@ class QPDF
     QPDF_DLL
     std::vector<QPDFObjectHandle> const& getAllPages();
 
+    QPDF_DLL
+    bool everCalledGetAllPages() const;
+    QPDF_DLL
+    bool everPushedInheritedAttributesToPages() const;
+
     // These methods, given a page object or its object/generation
     // number, returns the 0-based index into the array returned by
     // getAllPages() for that page. An exception is thrown if the page
@@ -1690,6 +1695,8 @@ class QPDF
         std::vector<QPDFObjectHandle> all_pages;
         std::map<QPDFObjGen, int> pageobj_to_pages_pos;
         bool pushed_inherited_attributes_to_pages;
+        bool ever_pushed_inherited_attributes_to_pages;
+        bool ever_called_get_all_pages;
         std::vector<QPDFExc> warnings;
         std::map<unsigned long long, ObjCopier> object_copiers;
         std::shared_ptr<QPDFObjectHandle::StreamDataProvider> copied_streams;

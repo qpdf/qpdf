@@ -691,7 +691,9 @@ test_15(QPDF& pdf, char const* arg2)
     // Remove pages from various places, checking to make sure
     // that our pages reference is getting updated.
     assert(pages.size() == 10);
+    assert(!pdf.everPushedInheritedAttributesToPages());
     pdf.removePage(pages.back()); // original page 9
+    assert(pdf.everPushedInheritedAttributesToPages());
     assert(pages.size() == 9);
     pdf.removePage(*pages.begin()); // original page 0
     assert(pages.size() == 8);
@@ -767,7 +769,9 @@ static void
 test_16(QPDF& pdf, char const* arg2)
 {
     // Insert a page manually and then update the cache.
+    assert(!pdf.everCalledGetAllPages());
     std::vector<QPDFObjectHandle> const& all_pages = pdf.getAllPages();
+    assert(pdf.everCalledGetAllPages());
 
     QPDFObjectHandle contents = createPageContents(pdf, "New page 10");
     QPDFObjectHandle page =
@@ -785,6 +789,7 @@ test_16(QPDF& pdf, char const* arg2)
     kids.appendItem(page);
     assert(all_pages.size() == 10);
     pdf.updateAllPagesCache();
+    assert(pdf.everCalledGetAllPages());
     assert(all_pages.size() == 11);
     assert(all_pages.back().getObjGen() == page.getObjGen());
 

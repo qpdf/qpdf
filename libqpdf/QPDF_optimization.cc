@@ -162,6 +162,7 @@ QPDF::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
                                " pushing inherited attributes to pages");
     }
     this->m->pushed_inherited_attributes_to_pages = true;
+    this->m->ever_pushed_inherited_attributes_to_pages = true;
 }
 
 void

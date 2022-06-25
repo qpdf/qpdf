@@ -222,6 +222,8 @@ QPDF::Members::Members() :
     attempt_recovery(true),
     encp(new EncryptionParameters),
     pushed_inherited_attributes_to_pages(false),
+    ever_pushed_inherited_attributes_to_pages(false),
+    ever_called_get_all_pages(false),
     copied_stream_data_provider(0),
     reconstructed_xref(false),
     fixed_dangling_refs(false),
@@ -2878,4 +2880,16 @@ QPDF::stopOnError(std::string const& message)
         "",
         this->m->file->getLastOffset(),
         message);
+}
+
+bool
+QPDF::everCalledGetAllPages() const
+{
+    return this->m->ever_called_get_all_pages;
+}
+
+bool
+QPDF::everPushedInheritedAttributesToPages() const
+{
+    return this->m->ever_pushed_inherited_attributes_to_pages;
 }
