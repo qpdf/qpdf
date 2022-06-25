@@ -1,2 +1,2 @@
 WARNING: page_api_2.pdf, object 3 0 at offset 175: kid 1 (from 0) appears more than once in the pages tree; creating a new page object as a copy
-test 17 done
+qpdf: operation succeeded with warnings

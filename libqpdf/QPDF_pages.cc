@@ -110,12 +110,19 @@ QPDF::getAllPagesInternal(
             QPDFObjectHandle kid = kids.getArrayItem(i);
             if (!kid.isIndirect()) {
                 QTC::TC("qpdf", "QPDF handle direct page object");
+                cur_node.warnIfPossible(
+                    "kid " + QUtil::int_to_string(i) +
+                    " (from 0) is direct; converting to indirect");
                 kid = makeIndirectObject(kid);
                 kids.setArrayItem(i, kid);
             } else if (seen.count(kid.getObjGen())) {
                 // Make a copy of the page. This does the same as
                 // shallowCopyPage in QPDFPageObjectHelper.
                 QTC::TC("qpdf", "QPDF resolve duplicated page object");
+                cur_node.warnIfPossible(
+                    "kid " + QUtil::int_to_string(i) +
+                    " (from 0) appears more than once in the pages tree;"
+                    " creating a new page object as a copy");
                 kid = makeIndirectObject(QPDFObjectHandle(kid).shallowCopy());
                 kids.setArrayItem(i, kid);
             }
