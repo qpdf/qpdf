@@ -127,7 +127,11 @@ QPDF_Stream::QPDF_Stream(
         throw std::logic_error("stream object instantiated with non-dictionary "
                                "object for dictionary");
     }
-    setStreamDescription();
+    setDescription(
+        this->qpdf,
+        this->qpdf->getFilename() + ", stream object " +
+            QUtil::int_to_string(this->objid) + " " +
+            QUtil::int_to_string(this->generation));
 }
 
 void
@@ -294,16 +298,6 @@ QPDF_Stream::setDescription(QPDF* qpdf, std::string const& description)
 {
     this->QPDFObject::setDescription(qpdf, description);
     setDictDescription();
-}
-
-void
-QPDF_Stream::setStreamDescription()
-{
-    setDescription(
-        this->qpdf,
-        this->qpdf->getFilename() + ", stream object " +
-            QUtil::int_to_string(this->objid) + " " +
-            QUtil::int_to_string(this->generation));
 }
 
 void
