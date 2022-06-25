@@ -58,12 +58,6 @@ QPDF_Dictionary::getTypeName() const
     return "dictionary";
 }
 
-void
-QPDF_Dictionary::setDescription(QPDF* qpdf, std::string const& description)
-{
-    this->QPDFObject::setDescription(qpdf, description);
-}
-
 bool
 QPDF_Dictionary::hasKey(std::string const& key)
 {

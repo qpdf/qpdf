@@ -17,7 +17,6 @@ class QPDF_Dictionary: public QPDFObject
     virtual JSON getJSON(int json_version);
     virtual QPDFObject::object_type_e getTypeCode() const;
     virtual char const* getTypeName() const;
-    virtual void setDescription(QPDF*, std::string const&);
 
     // hasKey() and getKeys() treat keys with null values as if they
     // aren't there.  getKey() returns null for the value of a
