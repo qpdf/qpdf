@@ -1,3 +1,11 @@
+2022-06-25  Jay Berkenbilt  <ejb@ql.org>
+
+        * Add tracking methods QPDF::everCalledGetAllPages() and
+        QPDF::everPushedInheritedAttributesToPages(). Since those methods
+        may have the side effect of creating new objects and replace
+        objects in various places in the pages tree, it's useful to be
+        able to find out whether they've ever been called.
+
 2022-06-18  Jay Berkenbilt  <ejb@ql.org>
 
         * Add QPDFJob::registerProgressReporter, making it possible to
