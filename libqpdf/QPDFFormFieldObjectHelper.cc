@@ -878,7 +878,7 @@ QPDFFormFieldObjectHelper::generateTextAppearance(
         if (!font.isInitialized()) {
             QPDFObjectHandle dr = getDefaultResources();
             font = getFontFromResource(dr, font_name);
-            found_font_in_dr = (font.isInitialized() && font.isDictionary());
+            found_font_in_dr = font.isDictionary();
         }
         if (found_font_in_dr && resources.isDictionary()) {
             QTC::TC("qpdf", "QPDFFormFieldObjectHelper get font from /DR");
@@ -892,8 +892,7 @@ QPDFFormFieldObjectHelper::generateTextAppearance(
             resources.getKey("/Font").replaceKey(font_name, font);
         }
 
-        if (font.isInitialized() && font.isDictionary() &&
-            font.getKey("/Encoding").isName()) {
+        if (font.isDictionary() && font.getKey("/Encoding").isName()) {
             std::string encoding = font.getKey("/Encoding").getName();
             if (encoding == "/WinAnsiEncoding") {
                 QTC::TC("qpdf", "QPDFFormFieldObjectHelper WinAnsi");
