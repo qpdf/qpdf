@@ -465,7 +465,8 @@ QPDFJob::setOutputStreams(std::ostream* out, std::ostream* err)
 }
 
 void
-QPDFJob::registerProgressReporter(std::function<void(int)> handler) {
+QPDFJob::registerProgressReporter(std::function<void(int)> handler)
+{
     this->m->progress_handler = handler;
 }
 
@@ -1239,8 +1240,8 @@ QPDFJob::doJSONPageLabels(Pipeline* p, bool& first, QPDF& pdf)
 {
     JSON j_labels = JSON::makeArray();
     QPDFPageLabelDocumentHelper pldh(pdf);
-    long long npages = QIntC::to_longlong(
-        QPDFPageDocumentHelper(pdf).getAllPages().size());
+    long long npages =
+        QIntC::to_longlong(QPDFPageDocumentHelper(pdf).getAllPages().size());
     if (pldh.hasPageLabels()) {
         std::vector<QPDFObjectHandle> labels;
         pldh.getLabelsForPageRange(0, npages - 1, 0, labels);

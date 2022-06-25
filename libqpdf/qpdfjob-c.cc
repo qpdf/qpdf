@@ -85,7 +85,8 @@ qpdfjob_run(qpdfjob_handle j)
     });
 }
 
-static int run_with_handle(std::function<int(qpdfjob_handle)> fn)
+static int
+run_with_handle(std::function<int(qpdfjob_handle)> fn)
 {
     auto j = qpdfjob_init();
     int status = fn(j);
@@ -96,7 +97,8 @@ static int run_with_handle(std::function<int(qpdfjob_handle)> fn)
     return status;
 }
 
-int qpdfjob_run_from_argv(char const* const argv[])
+int
+qpdfjob_run_from_argv(char const* const argv[])
 {
     return run_with_handle([argv](qpdfjob_handle j) {
         return qpdfjob_initialize_from_argv(j, argv);
@@ -113,7 +115,8 @@ qpdfjob_run_from_wide_argv(wchar_t const* const argv[])
 }
 #endif /* QPDF_NO_WCHAR_T */
 
-int qpdfjob_run_from_json(char const* json)
+int
+qpdfjob_run_from_json(char const* json)
 {
     return run_with_handle([json](qpdfjob_handle j) {
         return qpdfjob_initialize_from_json(j, json);

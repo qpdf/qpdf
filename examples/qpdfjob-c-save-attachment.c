@@ -88,8 +88,7 @@ main(int argc, char* argv[])
         l, qpdf_log_dest_custom, save_to_file, (void*)outfile, 0);
     qpdflogger_cleanup(&l);
     j = qpdfjob_init();
-    status = (qpdfjob_initialize_from_argv(j, j_argv) ||
-              qpdfjob_run(j));
+    status = (qpdfjob_initialize_from_argv(j, j_argv) || qpdfjob_run(j));
     qpdfjob_cleanup(&j);
     free(attachment_arg);
     fclose(outfile);

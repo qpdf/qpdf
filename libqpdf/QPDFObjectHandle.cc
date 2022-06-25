@@ -1552,7 +1552,7 @@ QPDFObjectHandle::getObjGen() const
 std::string
 QPDFObjectHandle::getObjGenAsStr() const
 {
-    return  QUtil::int_to_string(this->objid) + " " +
+    return QUtil::int_to_string(this->objid) + " " +
         QUtil::int_to_string(this->generation);
 }
 
