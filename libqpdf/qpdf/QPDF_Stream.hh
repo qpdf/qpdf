@@ -101,7 +101,6 @@ class QPDF_Stream: public QPDFObject
         qpdf_offset_t offset,
         std::string const& message);
     void setDictDescription();
-    void setStreamDescription();
 
     QPDF* qpdf;
     int objid;
