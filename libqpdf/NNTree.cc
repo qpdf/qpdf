@@ -56,8 +56,7 @@ NNTreeIterator::updateIValue(bool allow_invalid)
     // measure, we also call updateIValue in operator* and operator->.
 
     bool okay = false;
-    if ((item_number >= 0) && this->node.isInitialized() &&
-        this->node.isDictionary()) {
+    if ((item_number >= 0) && this->node.isDictionary()) {
         auto items = this->node.getKey(impl.details.itemsKey());
         if (this->item_number + 1 < items.getArrayNItems()) {
             okay = true;
@@ -987,10 +986,10 @@ NNTreeImpl::insertFirst(QPDFObjectHandle key, QPDFObjectHandle value)
 {
     auto iter = begin();
     QPDFObjectHandle items;
-    if (iter.node.isInitialized() && iter.node.isDictionary()) {
+    if (iter.node.isDictionary()) {
         items = iter.node.getKey(details.itemsKey());
     }
-    if (!(items.isInitialized() && items.isArray())) {
+    if (!(items.isArray())) {
         QTC::TC("qpdf", "NNTree no valid items node in insertFirst");
         error(qpdf, this->oh, "unable to find a valid items node");
     }
