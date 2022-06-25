@@ -21,6 +21,8 @@
 // reference is returned, the current code is fine and does not need
 // to be replaced. A partial implementation of QPDFPagesTree is in
 // github in attic in case there is ever a reason to resurrect it.
+// There are additional notes in README-maintainer, which also refers
+// to this comment.
 
 // The goal of this code is to ensure that the all_pages vector, which
 // users may have a reference to, and the pageobj_to_pages_pos map,

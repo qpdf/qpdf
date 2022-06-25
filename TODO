@@ -9,7 +9,10 @@ Before Release:
 * Release qtest with updates to qtest-driver and copy back into qpdf
 
 Next:
-* QPDFPagesTree -- avoid ever flattening the pages tree.
+* QPDF -- track whether the pages tree was modified (whether
+  getAllPages was ever called. If so, consider generating a non-flat
+  pages tree before creating output to better handle files with lots
+  of pages.
 * JSON v2 fixes
 
 Pending changes:
@@ -43,39 +46,6 @@ Pending changes:
 * Consider adding fuzzer code for JSON
 
 Soon: Break ground on "Document-level work"
-
-
-QPDFPagesTree
-=============
-
-Partial work is on qpdf-pages-tree branch. QPDFPageTree is mostly
-implemented and mostly tested. There are not enough cases of different
-kinds of operations (pclm, linearize, json, etc.) with non-flat pages
-trees. Insertion is not implemented.
-
-Page tree repair is silent (no warnings) and has a comment saying that
-we don't need warnings, but I think we should have warnings now that
-we have json v2. The reason is that page tree repair will change
-object numbers, and it's useful to know that.
-
-I'm thinking we will want to keep a pages cache for efficient
-insertion. There's no reason we can't keep a vector of page objects up
-to date and just do a traversal the first time we do getAllPages just
-like we do now. The difference is that we would not flatten the pages
-tree. It would be useful to go through QPDF_pages and reimplement
-everything without calling flattenPagesTree. Then we can remove
-flattenPagesTree, which is private.
-
-In its current state, QPDFPagesTree does not proactively fix /Type or
-correct page objects that are used multiple times. You have to
-traverse the pages tree to trigger this operation. It would be nice if
-we would do that somewhere but not do it more often than necessary so
-isPagesObject and isPageObject are reliable and can be made more
-reliable. Maybe add a validate or repair function? It should also make
-sure /Count and /Parent are correct.
-
-refs/attic/QPDFPagesTree-old -- original, abandoned branch -- clean up
-when done.
 
 
 JSON v2 fixes
@@ -676,7 +646,47 @@ A few important lessons (in README-maintainer)
   possible.
 
 Also, it turns out that PointerHolder is more performant than
-std::shared_ptr.
+std::shared_ptr. (This was true at the time but subsequent
+implementations of std::shared_ptr became much more efficient.)
+
+QPDFPagesTree
+=============
+
+On a few occasions, I have considered implementing a QPDFPagesTree
+object that would allow the document's original page tree structure to
+be preserved. See comments at the top QPDF_pages.cc for why this was
+abandoned.
+
+Partial work is in refs/attic/QPDFPagesTree. QPDFPageTree is mostly
+implemented and mostly tested. There are not enough cases of different
+kinds of operations (pclm, linearize, json, etc.) with non-flat pages
+trees. Insertion is not implemented. Insertion is potentially complex
+because of the issue of inherited objects. We will have to call
+pushInheritedAttributesToPage before adding any pages to the pages
+tree. The test suite is failing on that branch.
+
+Some parts of page tree repair are silent (no warnings). All page tree
+repair should warn. The reason is that page tree repair will change
+object numbers, and knowing that is important when working with JSON
+output.
+
+If we were to do this, we would still need keep a pages cache for
+efficient insertion. There's no reason we can't keep a vector of page
+objects up to date and just do a traversal the first time we do
+getAllPages just like we do now. The difference is that we would not
+flatten the pages tree. It would be useful to go through QPDF_pages
+and reimplement everything without calling flattenPagesTree. Then we
+can remove flattenPagesTree, which is private. That said, with the
+addition of creating non-flat pages trees, there is really no reason
+not to flatten the pages tree for internal use.
+
+In its current state, QPDFPagesTree does not proactively fix /Type or
+correct page objects that are used multiple times. You have to
+traverse the pages tree to trigger this operation. It would be nice if
+we would do that somewhere but not do it more often than necessary so
+isPagesObject and isPageObject are reliable and can be made more
+reliable. Maybe add a validate or repair function? It should also make
+sure /Count and /Parent are correct.
 
 Rejected Ideas
 ==============
