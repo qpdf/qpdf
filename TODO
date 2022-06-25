@@ -24,6 +24,7 @@ Pending changes:
   when an array is expected. This allows for making things repeatable
   in the future without breaking compatibility and is needed for the
   remote-attachment fix to be backward-compatible.
+* Decide what to do about #664 (get*Box)
 * Add an option --ignore-encryption to ignore encryption information
   and treat encrypted files as if they weren't encrypted. This should
   make it possible to solve #598 (--show-encryption without a
