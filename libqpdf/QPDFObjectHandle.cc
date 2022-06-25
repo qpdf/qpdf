@@ -284,23 +284,14 @@ QPDFObjectHandle::isInitialized() const
 QPDFObject::object_type_e
 QPDFObjectHandle::getTypeCode()
 {
-    if (this->initialized) {
-        dereference();
-        return this->obj->getTypeCode();
-    } else {
-        return QPDFObject::ot_uninitialized;
-    }
+    return dereference() ?
+        this->obj->getTypeCode() : QPDFObject::ot_uninitialized;
 }
 
 char const*
 QPDFObjectHandle::getTypeName()
 {
-    if (this->initialized) {
-        dereference();
-        return this->obj->getTypeName();
-    } else {
-        return "uninitialized";
-    }
+    return dereference() ? this->obj->getTypeName() : "uninitialized";
 }
 
 namespace
@@ -310,14 +301,9 @@ namespace
     {
       public:
         static bool
-        check(QPDFObject* o)
+        check(std::shared_ptr<QPDFObject> const& o)
         {
-            return (o && dynamic_cast<T*>(o));
-        }
-        static bool
-        check(QPDFObject const* o)
-        {
-            return (o && dynamic_cast<T const*>(o));
+            return (o && dynamic_cast<T const*>(o.get()));
         }
     };
 } // namespace
@@ -325,11 +311,7 @@ namespace
 bool
 QPDFObjectHandle::isBool()
 {
-    if (!this->initialized) {
-        return false;
-    }
-    dereference();
-    return QPDFObjectTypeAccessor<QPDF_Bool>::check(obj.get());
+    return dereference() && QPDFObjectTypeAccessor<QPDF_Bool>::check(obj);
 }
 
 bool
@@ -339,37 +321,25 @@ QPDFObjectHandle::isDirectNull() const
     // objid == 0, so there's nothing to resolve.
     return (
         this->initialized && (getObjectID() == 0) &&
-        QPDFObjectTypeAccessor<QPDF_Null>::check(obj.get()));
+        QPDFObjectTypeAccessor<QPDF_Null>::check(obj));
 }
 
 bool
 QPDFObjectHandle::isNull()
 {
-    if (!this->initialized) {
-        return false;
-    }
-    dereference();
-    return QPDFObjectTypeAccessor<QPDF_Null>::check(obj.get());
+    return dereference() && QPDFObjectTypeAccessor<QPDF_Null>::check(obj);
 }
 
 bool
 QPDFObjectHandle::isInteger()
 {
-    if (!this->initialized) {
-        return false;
-    }
-    dereference();
-    return QPDFObjectTypeAccessor<QPDF_Integer>::check(obj.get());
+    return dereference() && QPDFObjectTypeAccessor<QPDF_Integer>::check(obj);
 }
 
 bool
 QPDFObjectHandle::isReal()
 {
-    if (!this->initialized) {
-        return false;
-    }
-    dereference();
-    return QPDFObjectTypeAccessor<QPDF_Real>::check(obj.get());
+    return dereference() && QPDFObjectTypeAccessor<QPDF_Real>::check(obj);
 }
 
 bool
@@ -406,91 +376,58 @@ QPDFObjectHandle::getValueAsNumber(double& value)
 bool
 QPDFObjectHandle::isName()
 {
-    if (!this->initialized) {
-        return false;
-    }
-    dereference();
-    return QPDFObjectTypeAccessor<QPDF_Name>::check(obj.get());
+    return dereference() && QPDFObjectTypeAccessor<QPDF_Name>::check(obj);
 }
 
 bool
 QPDFObjectHandle::isString()
 {
-    if (!this->initialized) {
-        return false;
-    }
-    dereference();
-    return QPDFObjectTypeAccessor<QPDF_String>::check(obj.get());
+    return dereference() && QPDFObjectTypeAccessor<QPDF_String>::check(obj);
 }
 
 bool
 QPDFObjectHandle::isOperator()
 {
-    if (!this->initialized) {
-        return false;
-    }
-    dereference();
-    return QPDFObjectTypeAccessor<QPDF_Operator>::check(obj.get());
+    return dereference() && QPDFObjectTypeAccessor<QPDF_Operator>::check(obj);
 }
 
 bool
 QPDFObjectHandle::isInlineImage()
 {
-    if (!this->initialized) {
-        return false;
-    }
-    dereference();
-    return QPDFObjectTypeAccessor<QPDF_InlineImage>::check(obj.get());
+    return dereference() &&
+        QPDFObjectTypeAccessor<QPDF_InlineImage>::check(obj);
 }
 
 bool
 QPDFObjectHandle::isArray()
 {
-    if (!this->initialized) {
-        return false;
-    }
-    dereference();
-    return QPDFObjectTypeAccessor<QPDF_Array>::check(obj.get());
+    return dereference() && QPDFObjectTypeAccessor<QPDF_Array>::check(obj);
 }
 
 bool
 QPDFObjectHandle::isDictionary()
 {
-    if (!this->initialized) {
-        return false;
-    }
-    dereference();
-    return QPDFObjectTypeAccessor<QPDF_Dictionary>::check(obj.get());
+    return dereference() &&
+        QPDFObjectTypeAccessor<QPDF_Dictionary>::check(obj);
 }
 
 bool
 QPDFObjectHandle::isStream()
 {
-    if (!this->initialized) {
-        return false;
-    }
-    dereference();
-    return QPDFObjectTypeAccessor<QPDF_Stream>::check(obj.get());
+    return dereference() && QPDFObjectTypeAccessor<QPDF_Stream>::check(obj);
 }
 
 bool
 QPDFObjectHandle::isReserved()
 {
-    if (!this->initialized) {
-        return false;
-    }
     // dereference will clear reserved if this has been replaced
-    dereference();
-    return this->reserved;
+    return dereference() && this->reserved;
 }
 
 bool
 QPDFObjectHandle::isIndirect()
 {
-    if (!this->initialized) {
-        return false;
-    }
-    return (getObjectID() != 0);
+    return this->initialized && (getObjectID() != 0);
 }
 
 bool
@@ -1748,8 +1685,10 @@ QPDFObjectHandle::unparse()
 std::string
 QPDFObjectHandle::unparseResolved()
 {
-    dereference();
-    if (this->reserved) {
+    if (!dereference()) {
+        throw std::logic_error(
+            "attempted to dereference an uninitialized QPDFObjectHandle");
+    } else if (this->reserved) {
         throw std::logic_error(
             "QPDFObjectHandle: attempting to unparse a reserved object");
     }
@@ -1778,12 +1717,13 @@ QPDFObjectHandle::getJSON(int json_version, bool dereference_indirect)
 {
     if ((!dereference_indirect) && this->isIndirect()) {
         return JSON::makeString(unparse());
+    } else if (!dereference()) {
+        throw std::logic_error(
+            "attempted to dereference an uninitialized QPDFObjectHandle");
+    } else if (this->reserved) {
+        throw std::logic_error(
+            "QPDFObjectHandle: attempting to unparse a reserved object");
     } else {
-        dereference();
-        if (this->reserved) {
-            throw std::logic_error(
-                "QPDFObjectHandle: attempting to unparse a reserved object");
-        }
         return this->obj->getJSON(json_version);
     }
 }
@@ -2524,8 +2464,11 @@ QPDFObjectHandle::parseInternal(
 qpdf_offset_t
 QPDFObjectHandle::getParsedOffset()
 {
-    dereference();
-    return this->obj->getParsedOffset();
+    if (dereference()) {
+        return this->obj->getParsedOffset();
+    } else {
+        return -1;
+    }
 }
 
 void
@@ -2723,6 +2666,7 @@ QPDFObjectHandle::newStream(QPDF* qpdf)
     QPDFObjectHandle stream_dict = newDictionary();
     QPDFObjectHandle result = qpdf->makeIndirectObject(
         QPDFObjectHandle(new QPDF_Stream(qpdf, 0, 0, stream_dict, 0, 0)));
+    // Indirect objects are guaranteed to be initialized
     result.dereference();
     QPDF_Stream* stream = dynamic_cast<QPDF_Stream*>(result.obj.get());
     stream->setObjGen(result.getObjectID(), result.getGeneration());
@@ -2771,21 +2715,15 @@ QPDFObjectHandle::setObjectDescription(
 {
     // This is called during parsing on newly created direct objects,
     // so we can't call dereference() here.
-    if (isInitialized() && this->obj.get()) {
-        this->obj->setDescription(owning_qpdf, object_description);
+    if (isInitialized() && obj.get()) {
+        obj->setDescription(owning_qpdf, object_description);
     }
 }
 
 bool
 QPDFObjectHandle::hasObjectDescription()
 {
-    if (isInitialized()) {
-        dereference();
-        if (this->obj.get()) {
-            return this->obj->hasDescription();
-        }
-    }
-    return false;
+    return dereference() && obj.get() && obj->hasDescription();
 }
 
 QPDFObjectHandle
@@ -2868,7 +2806,6 @@ QPDFObjectHandle::copyObject(
                                " reserved object handle direct");
     }
 
-    dereference();
     this->qpdf = 0;
     this->objid = 0;
     this->generation = 0;
@@ -2971,7 +2908,12 @@ QPDFObjectHandle::typeWarning(
 {
     QPDF* context = nullptr;
     std::string description;
-    dereference();
+    // Type checks above guarantee that the object has been dereferenced.
+    // Nevertheless, dereference throws exceptions in the test suite
+    if (!dereference()) {
+        throw std::logic_error(
+            "attempted to dereference an uninitialized QPDFObjectHandle");
+    }
     this->obj->getDescription(context, description);
     // Null context handled by warn
     warn(
@@ -2991,8 +2933,7 @@ QPDFObjectHandle::warnIfPossible(std::string const& warning)
 {
     QPDF* context = 0;
     std::string description;
-    dereference();
-    if (this->obj->getDescription(context, description)) {
+    if (dereference() && obj->getDescription(context, description)) {
         warn(context, QPDFExc(qpdf_e_damaged_pdf, "", description, 0, warning));
     } else {
         *QPDFLogger::defaultLogger()->getError() << warning << "\n";
@@ -3004,7 +2945,7 @@ QPDFObjectHandle::objectWarning(std::string const& warning)
 {
     QPDF* context = nullptr;
     std::string description;
-    dereference();
+    // Type checks above guarantee that the object has been dereferenced.
     this->obj->getDescription(context, description);
     // Null context handled by warn
     warn(context, QPDFExc(qpdf_e_object, "", description, 0, warning));
@@ -3187,12 +3128,11 @@ QPDFObjectHandle::assertPageObject()
     }
 }
 
-void
+bool
 QPDFObjectHandle::dereference()
 {
     if (!this->initialized) {
-        throw std::logic_error(
-            "attempted to dereference an uninitialized QPDFObjectHandle");
+        return false;
     }
     if (this->obj.get() && getObjectID() &&
         QPDF::Resolver::objectChanged(this->qpdf, getObjGen(), this->obj)) {
@@ -3213,6 +3153,7 @@ QPDFObjectHandle::dereference()
             this->obj = obj;
         }
     }
+    return true;
 }
 
 void

@@ -1464,7 +1464,10 @@ class QPDFObjectHandle
         static std::shared_ptr<QPDFObject>
         getObject(QPDFObjectHandle& o)
         {
-            o.dereference();
+            if (!o.dereference()) {
+                throw std::logic_error("attempted to dereference an"
+                    " uninitialized QPDFObjectHandle");
+            };
             return o.obj;
         }
     };
@@ -1573,7 +1576,7 @@ class QPDFObjectHandle
     void typeWarning(char const* expected_type, std::string const& warning);
     void objectWarning(std::string const& warning);
     void assertType(char const* type_name, bool istype);
-    void dereference();
+    bool dereference();
     void copyObject(
         std::set<QPDFObjGen>& visited,
         bool cross_indirect,
