@@ -12,7 +12,8 @@ class QPDF_String: public QPDFObject
   public:
     virtual ~QPDF_String() = default;
     static std::shared_ptr<QPDFObject> create(std::string const& val);
-    static std::shared_ptr<QPDFObject> create_utf16(std::string const& utf8_val);
+    static std::shared_ptr<QPDFObject>
+    create_utf16(std::string const& utf8_val);
     virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual QPDFObject::object_type_e getTypeCode() const;

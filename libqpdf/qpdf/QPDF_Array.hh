@@ -11,7 +11,8 @@ class QPDF_Array: public QPDFObject
 {
   public:
     virtual ~QPDF_Array() = default;
-    static std::shared_ptr<QPDFObject> create(std::vector<QPDFObjectHandle> const& items);
+    static std::shared_ptr<QPDFObject>
+    create(std::vector<QPDFObjectHandle> const& items);
     static std::shared_ptr<QPDFObject> create(SparseOHArray const& items);
     virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();

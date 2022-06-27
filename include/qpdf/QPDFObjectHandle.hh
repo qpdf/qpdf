@@ -1466,7 +1466,7 @@ class QPDFObjectHandle
         {
             if (!o.dereference()) {
                 throw std::logic_error("attempted to dereference an"
-                    " uninitialized QPDFObjectHandle");
+                                       " uninitialized QPDFObjectHandle");
             };
             return o.obj;
         }

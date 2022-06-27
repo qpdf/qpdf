@@ -144,7 +144,7 @@ QPDF_Stream::create(
     size_t length)
 {
     return do_create(
-        new QPDF_Stream(qpdf, objid, generation, stream_dict, offset,length));
+        new QPDF_Stream(qpdf, objid, generation, stream_dict, offset, length));
 }
 
 std::shared_ptr<QPDFObject>

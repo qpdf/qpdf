@@ -284,8 +284,8 @@ QPDFObjectHandle::isInitialized() const
 QPDFObject::object_type_e
 QPDFObjectHandle::getTypeCode()
 {
-    return dereference() ?
-        this->obj->getTypeCode() : QPDFObject::ot_uninitialized;
+    return dereference() ? this->obj->getTypeCode()
+                         : QPDFObject::ot_uninitialized;
 }
 
 char const*
@@ -407,8 +407,7 @@ QPDFObjectHandle::isArray()
 bool
 QPDFObjectHandle::isDictionary()
 {
-    return dereference() &&
-        QPDFObjectTypeAccessor<QPDF_Dictionary>::check(obj);
+    return dereference() && QPDFObjectTypeAccessor<QPDF_Dictionary>::check(obj);
 }
 
 bool
@@ -2803,11 +2802,7 @@ QPDFObjectHandle::copyObject(
 
     std::shared_ptr<QPDFObject> new_obj;
 
-    if (isBool() ||
-        isInteger() ||
-        isName() ||
-        isNull() ||
-        isReal() ||
+    if (isBool() || isInteger() || isName() || isNull() || isReal() ||
         isString()) {
         new_obj = obj->shallowCopy();
     } else if (isArray()) {

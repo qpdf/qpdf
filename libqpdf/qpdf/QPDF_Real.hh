@@ -8,8 +8,8 @@ class QPDF_Real: public QPDFObject
   public:
     virtual ~QPDF_Real() = default;
     static std::shared_ptr<QPDFObject> create(std::string const& val);
-    static std::shared_ptr<QPDFObject> create(
-        double value, int decimal_places, bool trim_trailing_zeroes);
+    static std::shared_ptr<QPDFObject>
+    create(double value, int decimal_places, bool trim_trailing_zeroes);
     virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);

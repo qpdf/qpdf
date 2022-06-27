@@ -13,6 +13,7 @@ class QPDF_Reserved: public QPDFObject
     virtual JSON getJSON(int json_version);
     virtual QPDFObject::object_type_e getTypeCode() const;
     virtual char const* getTypeName() const;
+
   private:
     QPDF_Reserved() = default;
 };
