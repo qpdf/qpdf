@@ -43,8 +43,18 @@
 
 class Pipeline;
 class QPDF;
-class QPDF_Dictionary;
 class QPDF_Array;
+class QPDF_Bool;
+class QPDF_Dictionary;
+class QPDF_InlineImage;
+class QPDF_Integer;
+class QPDF_Name;
+class QPDF_Null;
+class QPDF_Operator;
+class QPDF_Real;
+class QPDF_Reserved;
+class QPDF_Stream;
+class QPDF_String;
 class QPDFTokenizer;
 class QPDFExc;
 class Pl_QPDFTokenizer;
@@ -1572,6 +1582,20 @@ class QPDFObjectHandle
         qpdf_offset_t offset,
         size_t length);
     static QPDFObjectHandle makeReserved();
+
+    QPDF_Array* asArray();
+    QPDF_Bool* asBool();
+    QPDF_Dictionary* asDictionary();
+    QPDF_InlineImage* asInlineImage();
+    QPDF_Integer* asInteger();
+    QPDF_Name* asName();
+    QPDF_Null* asNull();
+    QPDF_Operator* asOperator();
+    QPDF_Real* asReal();
+    QPDF_Reserved* asReserved();
+    QPDF_Stream* asStream();
+    QPDF_Stream* asStreamWithAssert();
+    QPDF_String* asString();
 
     void typeWarning(char const* expected_type, std::string const& warning);
     void objectWarning(std::string const& warning);
