@@ -82,7 +82,7 @@ QPDF::getAllPages()
             getRoot().replaceKey("/Pages", pages);
         }
         seen.clear();
-        getAllPagesInternal(pages, this->m->all_pages, visited, seen);
+        getAllPagesInternal(pages, visited, seen);
     }
     return this->m->all_pages;
 }
@@ -90,7 +90,6 @@ QPDF::getAllPages()
 void
 QPDF::getAllPagesInternal(
     QPDFObjectHandle cur_node,
-    std::vector<QPDFObjectHandle>& result,
     std::set<QPDFObjGen>& visited,
     std::set<QPDFObjGen>& seen)
 {
@@ -129,12 +128,12 @@ QPDF::getAllPagesInternal(
                 kid = makeIndirectObject(QPDFObjectHandle(kid).shallowCopy());
                 kids.setArrayItem(i, kid);
             }
-            getAllPagesInternal(kid, result, visited, seen);
+            getAllPagesInternal(kid, visited, seen);
         }
     } else {
         wanted_type = "/Page";
         seen.insert(this_og);
-        result.push_back(cur_node);
+        m->all_pages.push_back(cur_node);
     }
 
     if (!cur_node.isDictionaryOfType(wanted_type)) {
