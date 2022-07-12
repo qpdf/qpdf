@@ -107,10 +107,7 @@ QPDF::getAllPagesInternal(
     }
     visited.insert(cur_node_og);
     if (!cur_node.isDictionaryOfType("/Pages")) {
-        warn(
-            qpdf_e_damaged_pdf,
-            "page tree node",
-            m->file->getLastOffset(),
+        cur_node.warnIfPossible(
             "/Type key should be /Pages but is not; overriding");
         cur_node.replaceKey("/Type", "/Pages"_qpdf);
     }
@@ -140,10 +137,7 @@ QPDF::getAllPagesInternal(
                 kids.setArrayItem(i, kid);
             }
             if (!kid.isDictionaryOfType("/Page")) {
-                warn(
-                    qpdf_e_damaged_pdf,
-                    "page tree node",
-                    this->m->file->getLastOffset(),
+                kid.warnIfPossible(
                     "/Type key should be /Page but is not; overriding");
                 kid.replaceKey("/Type", "/Page"_qpdf);
             }
