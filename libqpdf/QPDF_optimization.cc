@@ -168,111 +168,109 @@ QPDF::pushInheritedAttributesToPageInternal(
     bool allow_changes,
     bool warn_skipped_keys)
 {
-        // Make a list of inheritable keys. Only the keys /MediaBox,
-        // /CropBox, /Resources, and /Rotate are inheritable
-        // attributes. Push this object onto the stack of pages nodes
-        // that have values for this attribute.
+    // Make a list of inheritable keys. Only the keys /MediaBox,
+    // /CropBox, /Resources, and /Rotate are inheritable
+    // attributes. Push this object onto the stack of pages nodes
+    // that have values for this attribute.
 
-        std::set<std::string> inheritable_keys;
-        for (auto const& key: cur_pages.getKeys()) {
-            if ((key == "/MediaBox") || (key == "/CropBox") ||
-                (key == "/Resources") || (key == "/Rotate")) {
-                if (!allow_changes) {
-                    throw QPDFExc(
-                        qpdf_e_internal,
-                        this->m->file->getName(),
-                        this->m->last_object_description,
-                        this->m->file->getLastOffset(),
-                        "optimize detected an "
-                        "inheritable attribute when called "
-                        "in no-change mode");
-                }
+    std::set<std::string> inheritable_keys;
+    for (auto const& key: cur_pages.getKeys()) {
+        if ((key == "/MediaBox") || (key == "/CropBox") ||
+            (key == "/Resources") || (key == "/Rotate")) {
+            if (!allow_changes) {
+                throw QPDFExc(
+                    qpdf_e_internal,
+                    this->m->file->getName(),
+                    this->m->last_object_description,
+                    this->m->file->getLastOffset(),
+                    "optimize detected an "
+                    "inheritable attribute when called "
+                    "in no-change mode");
+            }
 
-                // This is an inheritable resource
-                inheritable_keys.insert(key);
-                QPDFObjectHandle oh = cur_pages.getKey(key);
-                QTC::TC(
-                    "qpdf",
-                    "QPDF opt direct pages resource",
-                    oh.isIndirect() ? 0 : 1);
-                if (!oh.isIndirect()) {
-                    if (!oh.isScalar()) {
-                        // Replace shared direct object non-scalar
-                        // resources with indirect objects to avoid
-                        // copying large structures around.
-                        cur_pages.replaceKey(key, makeIndirectObject(oh));
-                        oh = cur_pages.getKey(key);
-                    } else {
-                        // It's okay to copy scalars.
-                        QTC::TC("qpdf", "QPDF opt inherited scalar");
-                    }
+            // This is an inheritable resource
+            inheritable_keys.insert(key);
+            QPDFObjectHandle oh = cur_pages.getKey(key);
+            QTC::TC(
+                "qpdf",
+                "QPDF opt direct pages resource",
+                oh.isIndirect() ? 0 : 1);
+            if (!oh.isIndirect()) {
+                if (!oh.isScalar()) {
+                    // Replace shared direct object non-scalar
+                    // resources with indirect objects to avoid
+                    // copying large structures around.
+                    cur_pages.replaceKey(key, makeIndirectObject(oh));
+                    oh = cur_pages.getKey(key);
+                } else {
+                    // It's okay to copy scalars.
+                    QTC::TC("qpdf", "QPDF opt inherited scalar");
                 }
-                key_ancestors[key].push_back(oh);
-                if (key_ancestors[key].size() > 1) {
-                    QTC::TC("qpdf", "QPDF opt key ancestors depth > 1");
-                }
-                // Remove this resource from this node.  It will be
-                // reattached at the page level.
-                cur_pages.removeKey(key);
-            } else if (!((key == "/Type") || (key == "/Parent") ||
-                         (key == "/Kids") || (key == "/Count"))) {
-                // Warn when flattening, but not if the key is at the top
-                // level (i.e. "/Parent" not set), as we don't change these;
-                // but flattening removes intermediate /Pages nodes.
-                if ((warn_skipped_keys) && (cur_pages.hasKey("/Parent"))) {
-                    QTC::TC("qpdf", "QPDF unknown key not inherited");
-                    setLastObjectDescription(
-                        "Pages object", cur_pages.getObjGen());
-                    warn(
-                        qpdf_e_pages,
-                        this->m->last_object_description,
-                        0,
-                        ("Unknown key " + key +
-                         " in /Pages object"
-                         " is being discarded as a result of"
-                         " flattening the /Pages tree"));
-                }
+            }
+            key_ancestors[key].push_back(oh);
+            if (key_ancestors[key].size() > 1) {
+                QTC::TC("qpdf", "QPDF opt key ancestors depth > 1");
+            }
+            // Remove this resource from this node.  It will be
+            // reattached at the page level.
+            cur_pages.removeKey(key);
+        } else if (!((key == "/Type") || (key == "/Parent") ||
+                     (key == "/Kids") || (key == "/Count"))) {
+            // Warn when flattening, but not if the key is at the top
+            // level (i.e. "/Parent" not set), as we don't change these;
+            // but flattening removes intermediate /Pages nodes.
+            if ((warn_skipped_keys) && (cur_pages.hasKey("/Parent"))) {
+                QTC::TC("qpdf", "QPDF unknown key not inherited");
+                setLastObjectDescription("Pages object", cur_pages.getObjGen());
+                warn(
+                    qpdf_e_pages,
+                    this->m->last_object_description,
+                    0,
+                    ("Unknown key " + key +
+                     " in /Pages object"
+                     " is being discarded as a result of"
+                     " flattening the /Pages tree"));
             }
         }
+    }
 
-        // Process descendant nodes.
-        for (auto& kid: cur_pages.getKey("/Kids").aitems()) {
-            if (kid.isDictionaryOfType("/Pages")) {
-                pushInheritedAttributesToPageInternal(
-                    kid, key_ancestors, allow_changes, warn_skipped_keys);
-            } else {
-                // Add all available inheritable attributes not present in
-                // this object to this object.
-                for (auto const& iter: key_ancestors) {
-                    std::string const& key = iter.first;
-                    if (!kid.hasKey(key)) {
-                        QTC::TC("qpdf", "QPDF opt resource inherited");
-                        kid.replaceKey(key, iter.second.back());
-                    } else {
-                        QTC::TC(
-                            "qpdf", "QPDF opt page resource hides ancestor");
-                    }
-                }
-            }
-        }
-
-        // For each inheritable key, pop the stack.  If the stack
-        // becomes empty, remove it from the map.  That way, the
-        // invariant that the list of keys in key_ancestors is exactly
-        // those keys for which inheritable attributes are available.
-
-        if (!inheritable_keys.empty()) {
-            QTC::TC("qpdf", "QPDF opt inheritable keys");
-            for (auto const& key: inheritable_keys) {
-                key_ancestors[key].pop_back();
-                if (key_ancestors[key].empty()) {
-                    QTC::TC("qpdf", "QPDF opt erase empty key ancestor");
-                    key_ancestors.erase(key);
-                }
-            }
+    // Process descendant nodes.
+    for (auto& kid: cur_pages.getKey("/Kids").aitems()) {
+        if (kid.isDictionaryOfType("/Pages")) {
+            pushInheritedAttributesToPageInternal(
+                kid, key_ancestors, allow_changes, warn_skipped_keys);
         } else {
-            QTC::TC("qpdf", "QPDF opt no inheritable keys");
+            // Add all available inheritable attributes not present in
+            // this object to this object.
+            for (auto const& iter: key_ancestors) {
+                std::string const& key = iter.first;
+                if (!kid.hasKey(key)) {
+                    QTC::TC("qpdf", "QPDF opt resource inherited");
+                    kid.replaceKey(key, iter.second.back());
+                } else {
+                    QTC::TC("qpdf", "QPDF opt page resource hides ancestor");
+                }
+            }
         }
+    }
+
+    // For each inheritable key, pop the stack.  If the stack
+    // becomes empty, remove it from the map.  That way, the
+    // invariant that the list of keys in key_ancestors is exactly
+    // those keys for which inheritable attributes are available.
+
+    if (!inheritable_keys.empty()) {
+        QTC::TC("qpdf", "QPDF opt inheritable keys");
+        for (auto const& key: inheritable_keys) {
+            key_ancestors[key].pop_back();
+            if (key_ancestors[key].empty()) {
+                QTC::TC("qpdf", "QPDF opt erase empty key ancestor");
+                key_ancestors.erase(key);
+            }
+        }
+    } else {
+        QTC::TC("qpdf", "QPDF opt no inheritable keys");
+    }
 }
 
 void
