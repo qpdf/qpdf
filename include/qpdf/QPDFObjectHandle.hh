@@ -1439,10 +1439,13 @@ class QPDFObjectHandle
 
       private:
         static QPDFObjectHandle
-        newIndirect(QPDF* qpdf, QPDFObjGen const& og)
+        newIndirect(
+            QPDF* qpdf,
+            QPDFObjGen const& og,
+            std::shared_ptr<QPDFObject> const& obj)
         {
             return QPDFObjectHandle::newIndirect(
-                qpdf, og.getObj(), og.getGen());
+                qpdf, og.getObj(), og.getGen(), obj);
         }
         static QPDFObjectHandle
         newStream(
@@ -1565,7 +1568,8 @@ class QPDFObjectHandle
     bool isImage(bool exclude_imagemask = true);
 
   private:
-    QPDFObjectHandle(QPDF*, int objid, int generation);
+    QPDFObjectHandle(
+        QPDF*, int objid, int generation, std::shared_ptr<QPDFObject> const&);
     QPDFObjectHandle(std::shared_ptr<QPDFObject> const&);
 
     enum parser_state_e {
@@ -1579,6 +1583,8 @@ class QPDFObjectHandle
 
     // Private object factory methods
     static QPDFObjectHandle newIndirect(QPDF*, int objid, int generation);
+    static QPDFObjectHandle newIndirect(
+        QPDF*, int objid, int generation, std::shared_ptr<QPDFObject> const&);
     static QPDFObjectHandle newStream(
         QPDF* qpdf,
         int objid,

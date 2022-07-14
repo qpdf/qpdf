@@ -20,6 +20,7 @@
 #include <qpdf/QPDF_Reserved.hh>
 #include <qpdf/QPDF_Stream.hh>
 #include <qpdf/QPDF_String.hh>
+#include <qpdf/QPDF_Unresolved.hh>
 #include <qpdf/SparseOHArray.hh>
 
 #include <qpdf/QIntC.hh>
@@ -227,11 +228,16 @@ QPDFObjectHandle::QPDFObjectHandle() :
     reserved = false;
 }
 
-QPDFObjectHandle::QPDFObjectHandle(QPDF* qpdf, int objid, int generation) :
+QPDFObjectHandle::QPDFObjectHandle(
+    QPDF* qpdf,
+    int objid,
+    int generation,
+    std::shared_ptr<QPDFObject> const& obj) :
     initialized(true),
     qpdf(qpdf),
     objid(objid),
-    generation(generation)
+    generation(generation),
+    obj(obj)
 {
 }
 
@@ -293,20 +299,6 @@ QPDFObjectHandle::getTypeName()
 {
     return dereference() ? this->obj->getTypeName() : "uninitialized";
 }
-
-namespace
-{
-    template <class T>
-    class QPDFObjectTypeAccessor
-    {
-      public:
-        static bool
-        check(std::shared_ptr<QPDFObject> const& o)
-        {
-            return (o && dynamic_cast<T const*>(o.get()));
-        }
-    };
-} // namespace
 
 QPDF_Array*
 QPDFObjectHandle::asArray()
@@ -401,7 +393,7 @@ QPDFObjectHandle::isDirectNull() const
     // objid == 0, so there's nothing to resolve.
     return (
         initialized && (getObjectID() == 0) &&
-        QPDFObjectTypeAccessor<QPDF_Null>::check(obj));
+        (obj->getTypeCode() == QPDFObject::ot_null));
 }
 
 bool
@@ -1774,14 +1766,8 @@ QPDFObjectHandle::unparse()
 std::string
 QPDFObjectHandle::unparseResolved()
 {
-    if (!dereference()) {
-        throw std::logic_error(
-            "attempted to dereference an uninitialized QPDFObjectHandle");
-    } else if (isReserved()) {
-        throw std::logic_error(
-            "QPDFObjectHandle: attempting to unparse a reserved object");
-    }
-    return this->obj->unparse();
+    dereference();
+    return obj->unparse();
 }
 
 std::string
@@ -1805,16 +1791,10 @@ QPDFObjectHandle::getJSON(bool dereference_indirect)
 JSON
 QPDFObjectHandle::getJSON(int json_version, bool dereference_indirect)
 {
-    if ((!dereference_indirect) && this->isIndirect()) {
+    if ((!dereference_indirect) && isIndirect()) {
         return JSON::makeString(unparse());
-    } else if (!dereference()) {
-        throw std::logic_error(
-            "attempted to dereference an uninitialized QPDFObjectHandle");
-    } else if (isReserved()) {
-        throw std::logic_error(
-            "QPDFObjectHandle: attempting to unparse a reserved object");
     } else {
-        return this->obj->getJSON(json_version);
+        return obj->getJSON(json_version);
     }
 }
 
@@ -2572,6 +2552,16 @@ QPDFObjectHandle::setParsedOffset(qpdf_offset_t offset)
 QPDFObjectHandle
 QPDFObjectHandle::newIndirect(QPDF* qpdf, int objid, int generation)
 {
+    return newIndirect(qpdf, objid, generation, QPDF_Unresolved::create());
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::newIndirect(
+    QPDF* qpdf,
+    int objid,
+    int generation,
+    std::shared_ptr<QPDFObject> const& obj)
+{
     if (objid == 0) {
         // Special case: QPDF uses objid 0 as a sentinel for direct
         // objects, and the PDF specification doesn't allow for object
@@ -2581,7 +2571,7 @@ QPDFObjectHandle::newIndirect(QPDF* qpdf, int objid, int generation)
         return newNull();
     }
 
-    return QPDFObjectHandle(qpdf, objid, generation);
+    return QPDFObjectHandle(qpdf, objid, generation, obj);
 }
 
 QPDFObjectHandle
@@ -3184,15 +3174,10 @@ QPDFObjectHandle::dereference()
     if (!isInitialized()) {
         return false;
     }
-    if (obj.get() && getObjectID() &&
-        QPDF::Resolver::objectChanged(qpdf, getObjGen(), obj)) {
-        obj = nullptr;
-    }
-    if (obj.get() == nullptr) {
-        auto new_obj = QPDF::Resolver::resolve(qpdf, getObjGen());
-        // QPDF::resolve never returns an uninitialized object, but
-        // check just in case.
-        obj = new_obj.get() ? new_obj : QPDF_Null::create();
+    if ((obj->getTypeCode() == QPDFObject::ot_unresolved) ||
+        (getObjectID() &&
+         QPDF::Resolver::objectChanged(qpdf, getObjGen(), obj))) {
+        obj = QPDF::Resolver::resolve(qpdf, getObjGen());
     }
     return true;
 }
