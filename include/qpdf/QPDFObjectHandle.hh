@@ -1480,6 +1480,16 @@ class QPDFObjectHandle
             };
             return o.obj;
         }
+        static QPDF_Array*
+        asArray(QPDFObjectHandle& oh)
+        {
+            return oh.asArray();
+        }
+        static QPDF_Stream*
+        asStream(QPDFObjectHandle& oh)
+        {
+            return oh.asStream();
+        }
     };
     friend class ObjAccessor;
 
