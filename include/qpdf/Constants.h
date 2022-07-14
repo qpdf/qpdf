@@ -82,6 +82,8 @@ enum qpdf_object_type_e {
     /* Additional object types that can occur in content streams */
     ot_operator,
     ot_inlineimage,
+    /* Object types internal to qpdf - to be moved */
+    ot_unresolved,
     /* NOTE: if adding to this list, update QPDFObject.hh */
 };
 
