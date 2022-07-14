@@ -1,7 +1,7 @@
 11-pages.pdf (page object: object 1 0): page object not referenced in /Pages tree
 11-pages.pdf (C API object handle 1000): attempted access to unknown object handle
-WARNING: object 27 0: operation for dictionary attempted on object of type null: ignoring key replacement request
-warning: object 27 0: operation for dictionary attempted on object of type null: ignoring key replacement request
+WARNING: object 27,0: operation for dictionary attempted on object of type null: ignoring key replacement request
+warning: object 27,0: operation for dictionary attempted on object of type null: ignoring key replacement request
   code: 7
   file: 
   pos : 0

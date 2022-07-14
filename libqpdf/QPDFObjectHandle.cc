@@ -3189,8 +3189,7 @@ QPDFObjectHandle::dereference()
         obj = nullptr;
     }
     if (obj.get() == nullptr) {
-        auto new_obj =
-            QPDF::Resolver::resolve(qpdf, getObjectID(), getGeneration());
+        auto new_obj = QPDF::Resolver::resolve(qpdf, getObjGen());
         // QPDF::resolve never returns an uninitialized object, but
         // check just in case.
         obj = new_obj.get() ? new_obj : QPDF_Null::create();

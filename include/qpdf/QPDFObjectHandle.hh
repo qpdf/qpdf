@@ -1439,9 +1439,10 @@ class QPDFObjectHandle
 
       private:
         static QPDFObjectHandle
-        newIndirect(QPDF* qpdf, int objid, int generation)
+        newIndirect(QPDF* qpdf, QPDFObjGen const& og)
         {
-            return QPDFObjectHandle::newIndirect(qpdf, objid, generation);
+            return QPDFObjectHandle::newIndirect(
+                qpdf, og.getObj(), og.getGen());
         }
         static QPDFObjectHandle
         newStream(
