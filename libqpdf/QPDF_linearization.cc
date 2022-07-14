@@ -128,8 +128,7 @@ QPDF::isLinearized()
             (t2.getType() == QPDFTokenizer::tt_integer) &&
             (t3 == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "obj")) &&
             (t4.getType() == QPDFTokenizer::tt_dict_open)) {
-            lindict_obj =
-                QIntC::to_int(QUtil::string_to_ll(t1.getValue().c_str()));
+            lindict_obj = toI(QUtil::string_to_ll(t1.getValue().c_str()));
         }
     }
 
@@ -144,8 +143,7 @@ QPDF::isLinearized()
     }
 
     QPDFObjectHandle linkey = candidate.getKey("/Linearized");
-    if (!(linkey.isNumber() &&
-          (QIntC::to_int(floor(linkey.getNumericValue())) == 1))) {
+    if (!(linkey.isNumber() && (toI(floor(linkey.getNumericValue())) == 1))) {
         return false;
     }
 
@@ -1830,7 +1828,7 @@ QPDF::calculateHSharedObject(
         soe.push_back(HSharedObjectEntry());
         soe.at(i).delta_group_length = length;
     }
-    if (soe.size() != QIntC::to_size(cso.nshared_total)) {
+    if (soe.size() != toS(cso.nshared_total)) {
         stopOnError("soe has wrong size after initialization");
     }
 
