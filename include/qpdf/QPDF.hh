@@ -1576,7 +1576,6 @@ class QPDF
     void dumpHSharedObject();
     void dumpHGeneric(HGeneric&);
     qpdf_offset_t adjusted_offset(qpdf_offset_t offset);
-    QPDFObjectHandle objGenToIndirect(QPDFObjGen const&);
     void
     calculateLinearizationData(std::map<int, int> const& object_stream_data);
     void pushOutlinesToPart(
