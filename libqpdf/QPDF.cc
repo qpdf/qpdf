@@ -1939,10 +1939,8 @@ QPDF::readObjectAtOffset(
         }
         qpdf_offset_t end_after_space = this->m->file->tell();
 
-        this->m->obj_cache[og] = ObjCache(
-            QPDFObjectHandle::ObjAccessor::getObject(oh),
-            end_before_space,
-            end_after_space);
+        this->m->obj_cache[og] =
+            ObjCache(oh, end_before_space, end_after_space);
     }
 
     return oh;
@@ -2043,8 +2041,7 @@ QPDF::resolve(int objid, int generation)
         // PDF spec says unknown objects resolve to the null object.
         QTC::TC("qpdf", "QPDF resolve failure to null");
         QPDFObjectHandle oh = QPDFObjectHandle::newNull();
-        this->m->obj_cache[og] =
-            ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
+        this->m->obj_cache[og] = ObjCache(oh, -1, -1);
     }
 
     std::shared_ptr<QPDFObject> result(this->m->obj_cache[og].object);
@@ -2150,10 +2147,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             int offset = iter.second;
             input->seek(offset, SEEK_SET);
             QPDFObjectHandle oh = readObject(input, "", obj, 0, true);
-            this->m->obj_cache[og] = ObjCache(
-                QPDFObjectHandle::ObjAccessor::getObject(oh),
-                end_before_space,
-                end_after_space);
+            this->m->obj_cache[og] =
+                ObjCache(oh, end_before_space, end_after_space);
         } else {
             QTC::TC("qpdf", "QPDF not caching overridden objstm object");
         }
@@ -2169,8 +2164,7 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
             "max object id is too high to create new objects");
     }
     QPDFObjGen next(max_objid + 1, 0);
-    this->m->obj_cache[next] =
-        ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
+    this->m->obj_cache[next] = ObjCache(oh, -1, -1);
     return QPDFObjectHandle::Factory::newIndirect(
         this, next.getObj(), next.getGen());
 }
@@ -2226,8 +2220,7 @@ QPDF::replaceObject(int objid, int generation, QPDFObjectHandle oh)
     // Replace the object in the object cache
     QPDFObjGen og(objid, generation);
     this->m->ever_replaced_objects = true;
-    this->m->obj_cache[og] =
-        ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
+    this->m->obj_cache[og] = ObjCache(oh, -1, -1);
 }
 
 void

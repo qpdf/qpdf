@@ -916,10 +916,10 @@ class QPDF
         {
         }
         ObjCache(
-            std::shared_ptr<QPDFObject> object,
+            QPDFObjectHandle& oh,
             qpdf_offset_t end_before_space,
             qpdf_offset_t end_after_space) :
-            object(object),
+            object(QPDFObjectHandle::ObjAccessor::getObject(oh)),
             end_before_space(end_before_space),
             end_after_space(end_after_space)
         {

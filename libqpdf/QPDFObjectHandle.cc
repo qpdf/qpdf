@@ -221,8 +221,7 @@ QPDFObjectHandle::QPDFObjectHandle() :
     initialized(false),
     qpdf(0),
     objid(0),
-    generation(0),
-    reserved(false)
+    generation(0)
 {
     // Dummy statement to satisfy sanitizer pending removal of reserved.
     reserved = false;
@@ -232,8 +231,7 @@ QPDFObjectHandle::QPDFObjectHandle(QPDF* qpdf, int objid, int generation) :
     initialized(true),
     qpdf(qpdf),
     objid(objid),
-    generation(generation),
-    reserved(false)
+    generation(generation)
 {
 }
 
@@ -242,8 +240,7 @@ QPDFObjectHandle::QPDFObjectHandle(std::shared_ptr<QPDFObject> const& data) :
     qpdf(0),
     objid(0),
     generation(0),
-    obj(data),
-    reserved(false)
+    obj(data)
 {
 }
 
@@ -280,7 +277,8 @@ QPDFObjectHandle::setObjectDescriptionFromInput(
 bool
 QPDFObjectHandle::isInitialized() const
 {
-    return this->initialized;
+    // Unresolved indirect objects still have obj == nullptr.
+    return initialized;
 }
 
 QPDFObject::object_type_e
@@ -402,7 +400,7 @@ QPDFObjectHandle::isDirectNull() const
     // Don't call dereference() -- this is a const method, and we know
     // objid == 0, so there's nothing to resolve.
     return (
-        this->initialized && (getObjectID() == 0) &&
+        initialized && (getObjectID() == 0) &&
         QPDFObjectTypeAccessor<QPDF_Null>::check(obj));
 }
 
@@ -506,7 +504,7 @@ QPDFObjectHandle::isReserved()
 bool
 QPDFObjectHandle::isIndirect()
 {
-    return this->initialized && (getObjectID() != 0);
+    return initialized && getObjectID() != 0;
 }
 
 bool
@@ -2954,7 +2952,7 @@ QPDFObjectHandle::makeDirect(bool allow_streams)
 void
 QPDFObjectHandle::assertInitialized() const
 {
-    if (!this->initialized) {
+    if (!initialized) {
         throw std::logic_error("operation attempted on uninitialized "
                                "QPDFObjectHandle");
     }
