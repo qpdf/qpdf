@@ -244,7 +244,7 @@ main(int argc, char* argv[])
                 continue;
             }
 
-            if (!compare(iter, qpdf_ren.getObjectByObjGen(og_ren))) {
+            if (!compare(iter, qpdf_ren.getObject(og_ren))) {
                 std::cerr << "different" << std::endl;
                 std::exit(2);
             }

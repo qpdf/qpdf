@@ -2062,7 +2062,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     }
     this->m->resolved_object_streams.insert(obj_stream_number);
     // Force resolution of object stream
-    QPDFObjectHandle obj_stream = getObjectByID(obj_stream_number, 0);
+    QPDFObjectHandle obj_stream = getObject(obj_stream_number, 0);
     if (!obj_stream.isStream()) {
         throw QPDFExc(
             qpdf_e_damaged_pdf,
@@ -2177,7 +2177,7 @@ QPDF::reserveObjectIfNotExists(int objid, int gen)
         resolve(objid, gen);
         replaceObject(objid, gen, QPDFObjectHandle::Factory::makeReserved());
     }
-    return getObjectByID(objid, gen);
+    return getObject(objid, gen);
 }
 
 QPDFObjectHandle
@@ -2188,15 +2188,27 @@ QPDF::reserveStream(int objid, int gen)
 }
 
 QPDFObjectHandle
+QPDF::getObject(QPDFObjGen const& og)
+{
+    return getObject(og.getObj(), og.getGen());
+}
+
+QPDFObjectHandle
+QPDF::getObject(int objid, int generation)
+{
+    return QPDFObjectHandle::Factory::newIndirect(this, objid, generation);
+}
+
+QPDFObjectHandle
 QPDF::getObjectByObjGen(QPDFObjGen const& og)
 {
-    return getObjectByID(og.getObj(), og.getGen());
+    return getObject(og);
 }
 
 QPDFObjectHandle
 QPDF::getObjectByID(int objid, int generation)
 {
-    return QPDFObjectHandle::Factory::newIndirect(this, objid, generation);
+    return getObject(objid, generation);
 }
 
 void

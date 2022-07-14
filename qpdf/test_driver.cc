@@ -650,7 +650,7 @@ test_14(QPDF& pdf, char const* arg2)
     std::cout << "new dict: " << qarray.getKey("/NewDict").getIntValue()
               << std::endl;
     // Reread qdict, still pointing to an array
-    qdict = pdf.getObjectByObjGen(qdict.getObjGen());
+    qdict = pdf.getObject(qdict.getObjGen());
     std::cout << "swapped array: " << qdict.getArrayItem(0).getName()
               << std::endl;
 
@@ -2891,10 +2891,10 @@ test_82(QPDF& pdf, char const* arg2)
     assert(!dict.isDictionaryOfType("Test"));
     dict = QPDFObjectHandle::parse("<</A 1 /Subtype /Marvin>>");
     assert(!dict.isDictionaryOfType("/Test", "Marvin"));
-    auto stream = pdf.getObjectByID(1, 0);
+    auto stream = pdf.getObject(1, 0);
     assert(stream.isStreamOfType("/ObjStm"));
     assert(!stream.isStreamOfType("/Test"));
-    assert(!pdf.getObjectByID(2, 0).isStreamOfType("/Pages"));
+    assert(!pdf.getObject(2, 0).isStreamOfType("/Pages"));
     /* cSpell: ignore Blaah Blaaah Blaaaah */
     auto array = QPDFObjectHandle::parse("[/Blah /Blaah /Blaaah]");
     assert(array.isOrHasName("/Blah"));
@@ -3222,8 +3222,8 @@ test_89(QPDF& pdf, char const* arg2)
     auto null = QPDFObjectHandle::newNull();
     pdf.getTrailer().appendItem(null);
     pdf.getRoot().appendItem(null);
-    pdf.getObjectByID(5, 0).replaceKey("/X", null);
-    pdf.getObjectByID(5, 0).getArrayItem(0).replaceKey("/X", null);
+    pdf.getObject(5, 0).replaceKey("/X", null);
+    pdf.getObject(5, 0).getArrayItem(0).replaceKey("/X", null);
 }
 
 static void

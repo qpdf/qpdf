@@ -1147,7 +1147,7 @@ QPDF::dumpHGeneric(HGeneric& t)
 QPDFObjectHandle
 QPDF::objGenToIndirect(QPDFObjGen const& og)
 {
-    return getObjectByID(og.getObj(), og.getGen());
+    return getObject(og.getObj(), og.getGen());
 }
 
 void

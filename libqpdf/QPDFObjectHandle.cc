@@ -3187,7 +3187,7 @@ QPDFObjectHandle::assertPageObject()
 bool
 QPDFObjectHandle::dereference()
 {
-    if (!initialized) {
+    if (!isInitialized()) {
         return false;
     }
     if (obj.get() && getObjectID() &&

@@ -919,7 +919,7 @@ QPDFJob::doShowObj(QPDF& pdf)
     if (m->show_trailer) {
         obj = pdf.getTrailer();
     } else {
-        obj = pdf.getObjectByID(m->show_obj, m->show_gen);
+        obj = pdf.getObject(m->show_obj, m->show_gen);
     }
     bool error = false;
     if (obj.isStream()) {

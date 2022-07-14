@@ -1229,7 +1229,7 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
                 // Detect loops by storing invalid object ID 0, which
                 // will get overwritten later.
                 this->m->obj_renumber[og] = 0;
-                enqueueObject(this->m->pdf.getObjectByID(stream_id, 0));
+                enqueueObject(m->pdf.getObject(stream_id, 0));
             } else {
                 this->m->object_queue.push_back(object);
                 this->m->obj_renumber[og] = this->m->next_objid++;
@@ -1897,7 +1897,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
                 // pass 1.
                 indicateProgress(true, false);
             }
-            QPDFObjectHandle obj_to_write = this->m->pdf.getObjectByObjGen(obj);
+            QPDFObjectHandle obj_to_write = m->pdf.getObject(obj);
             if (obj_to_write.isStream()) {
                 // This condition occurred in a fuzz input. Ideally we
                 // should block it at at parse time, but it's not
