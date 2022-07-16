@@ -1990,9 +1990,8 @@ QPDFWriter::writeObject(QPDFObjectHandle object, int object_stream_index)
     if (object_stream_index == -1) {
         if (this->m->qdf_mode && (!this->m->suppress_original_object_ids)) {
             writeString(
-                "%% Original object ID: " +
-                QUtil::int_to_string(object.getObjectID()) + " " +
-                QUtil::int_to_string(object.getGeneration()) + "\n");
+                "%% Original object ID: " + object.getObjGen().unparse(' ') +
+                "\n");
         }
         openObject(new_id);
         setDataKey(new_id);

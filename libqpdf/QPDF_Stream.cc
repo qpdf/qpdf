@@ -130,8 +130,7 @@ QPDF_Stream::QPDF_Stream(
     setDescription(
         this->qpdf,
         this->qpdf->getFilename() + ", stream object " +
-            QUtil::int_to_string(this->objid) + " " +
-            QUtil::int_to_string(this->generation));
+            QPDFObjGen(objid, generation).unparse(' '));
 }
 
 std::shared_ptr<QPDFObject>
@@ -196,8 +195,7 @@ std::string
 QPDF_Stream::unparse()
 {
     // Unparse stream objects as indirect references
-    return QUtil::int_to_string(this->objid) + " " +
-        QUtil::int_to_string(this->generation) + " R";
+    return QPDFObjGen(objid, generation).unparse(' ') + " R";
 }
 
 JSON
@@ -643,8 +641,7 @@ QPDF_Stream::pipeStreamData(
                 // part of a library user, not by invalid input data.
                 throw std::runtime_error(
                     "stream data provider for " +
-                    QUtil::int_to_string(this->objid) + " " +
-                    QUtil::int_to_string(this->generation) + " provided " +
+                    QPDFObjGen(objid, generation).unparse(' ') + " provided " +
                     QUtil::int_to_string(actual_length) +
                     " bytes instead of expected " +
                     QUtil::int_to_string(desired_length) + " bytes");

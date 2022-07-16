@@ -1584,7 +1584,6 @@ class QPDFObjectHandle
         bool stop_at_streams);
     void shallowCopyInternal(QPDFObjectHandle& oh, bool first_level_only);
     void releaseResolved();
-    std::string getObjGenAsStr() const;
     static void setObjectDescriptionFromInput(
         QPDFObjectHandle,
         QPDF*,

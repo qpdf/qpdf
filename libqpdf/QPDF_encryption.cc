@@ -1176,8 +1176,7 @@ QPDF::decryptString(std::string& str, int objid, int generation)
             this->m->last_object_description,
             this->m->file->getLastOffset(),
             "error decrypting string for object " +
-                QUtil::int_to_string(objid) + " " +
-                QUtil::int_to_string(generation) + ": " + e.what());
+                QPDFObjGen(objid, generation).unparse() + ": " + e.what());
     }
 }
 

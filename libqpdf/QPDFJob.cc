@@ -947,7 +947,7 @@ QPDFJob::doShowObj(QPDF& pdf)
     }
     if (error) {
         throw std::runtime_error(
-            "unable to get object " + obj.getObjGen().unparse());
+            "unable to get object " + obj.getObjGen().unparse(','));
     }
 }
 
@@ -995,7 +995,8 @@ QPDFJob::doListAttachments(QPDF& pdf)
             auto efoh = i.second;
             *this->m->log->getInfo()
                 << key << " -> "
-                << efoh->getEmbeddedFileStream().getObjGen().unparse() << "\n";
+                << efoh->getEmbeddedFileStream().getObjGen().unparse(',')
+                << "\n";
             doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                 auto desc = efoh->getDescription();
                 if (!desc.empty()) {
@@ -1010,7 +1011,7 @@ QPDFJob::doListAttachments(QPDF& pdf)
                 for (auto i2: efoh->getEmbeddedFileStreams().ditems()) {
                     auto efs = QPDFEFStreamObjectHelper(i2.second);
                     v << "    " << i2.first << " -> "
-                      << efs.getObjectHandle().getObjGen().unparse() << "\n";
+                      << efs.getObjectHandle().getObjGen().unparse(',') << "\n";
                     v << "      creation date: " << efs.getCreationDate()
                       << "\n"
                       << "      modification date: " << efs.getModDate() << "\n"

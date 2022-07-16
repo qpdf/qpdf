@@ -23,7 +23,6 @@
 #define QPDFOBJGEN_HH
 
 #include <qpdf/DLL.h>
-#include <qpdf/QUtil.hh>
 #include <iostream>
 
 // This class represents an object ID and generation pair.  It is
@@ -69,18 +68,9 @@ class QPDFObjGen
         return gen;
     }
     QPDF_DLL
-    std::string
-    unparse() const
-    {
-        return QUtil::int_to_string(obj) + "," + QUtil::int_to_string(gen);
-    }
+    std::string unparse(char separator = ',') const;
     QPDF_DLL
-    friend std::ostream&
-    operator<<(std::ostream& os, const QPDFObjGen& og)
-    {
-        os << og.obj << "," << og.gen;
-        return os;
-    }
+    friend std::ostream& operator<<(std::ostream& os, const QPDFObjGen& og);
 
   private:
     // This class does not use the Members pattern to avoid a memory

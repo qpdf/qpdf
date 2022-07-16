@@ -103,9 +103,8 @@ void
 CoalesceProvider::provideStreamData(int, int, Pipeline* p)
 {
     QTC::TC("qpdf", "QPDFObjectHandle coalesce provide stream data");
-    std::string description = "page object " +
-        QUtil::int_to_string(containing_page.getObjectID()) + " " +
-        QUtil::int_to_string(containing_page.getGeneration());
+    std::string description =
+        "page object " + containing_page.getObjGen().unparse(' ');
     std::string all_description;
     old_contents.pipeContentStreams(p, description, all_description);
 }
@@ -1485,13 +1484,6 @@ QPDFObjectHandle::getObjGen() const
     return QPDFObjGen(this->objid, this->generation);
 }
 
-std::string
-QPDFObjectHandle::getObjGenAsStr() const
-{
-    return QUtil::int_to_string(this->objid) + " " +
-        QUtil::int_to_string(this->generation);
-}
-
 int
 QPDFObjectHandle::getObjectID() const
 {
@@ -1556,7 +1548,7 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
         } else {
             all_description += ",";
         }
-        all_description += " stream " + item.getObjGenAsStr();
+        all_description += " stream " + item.getObjGen().unparse(' ');
     }
 
     return result;
@@ -1565,7 +1557,7 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
 std::vector<QPDFObjectHandle>
 QPDFObjectHandle::getPageContents()
 {
-    std::string description = "page object " + getObjGenAsStr();
+    std::string description = "page object " + getObjGen().unparse(' ');
     std::string all_description;
     return this->getKey("/Contents")
         .arrayOrStreamToStreamArray(description, all_description);
@@ -1674,7 +1666,7 @@ QPDFObjectHandle::unparse()
 {
     std::string result;
     if (this->isIndirect()) {
-        result = getObjGenAsStr() + " R";
+        result = getObjGen().unparse(' ') + " R";
     } else {
         result = unparseResolved();
     }
@@ -1789,7 +1781,7 @@ QPDFObjectHandle::parse(
 void
 QPDFObjectHandle::pipePageContents(Pipeline* p)
 {
-    std::string description = "page object " + getObjGenAsStr();
+    std::string description = "page object " + getObjGen().unparse(' ');
     std::string all_description;
     this->getKey("/Contents")
         .pipeContentStreams(p, description, all_description);
@@ -1813,7 +1805,7 @@ QPDFObjectHandle::pipeContentStreams(
             throw QPDFExc(
                 qpdf_e_damaged_pdf,
                 "content stream",
-                "content stream object " + stream.getObjGenAsStr(),
+                "content stream object " + stream.getObjGen().unparse(' '),
                 0,
                 "errors while decoding content stream");
         }
@@ -1829,7 +1821,7 @@ QPDFObjectHandle::pipeContentStreams(
 void
 QPDFObjectHandle::parsePageContents(ParserCallbacks* callbacks)
 {
-    std::string description = "page object " + getObjGenAsStr();
+    std::string description = "page object " + getObjGen().unparse(' ');
     this->getKey("/Contents")
         .parseContentStream_internal(description, callbacks);
 }
@@ -1837,14 +1829,15 @@ QPDFObjectHandle::parsePageContents(ParserCallbacks* callbacks)
 void
 QPDFObjectHandle::parseAsContents(ParserCallbacks* callbacks)
 {
-    std::string description = "object " + getObjGenAsStr();
+    std::string description = "object " + getObjGen().unparse(' ');
     this->parseContentStream_internal(description, callbacks);
 }
 
 void
 QPDFObjectHandle::filterPageContents(TokenFilter* filter, Pipeline* next)
 {
-    auto description = "token filter for page object " + getObjGenAsStr();
+    auto description =
+        "token filter for page object " + getObjGen().unparse(' ');
     Pl_QPDFTokenizer token_pipeline(description.c_str(), filter, next);
     this->pipePageContents(&token_pipeline);
 }
@@ -1852,7 +1845,7 @@ QPDFObjectHandle::filterPageContents(TokenFilter* filter, Pipeline* next)
 void
 QPDFObjectHandle::filterAsContents(TokenFilter* filter, Pipeline* next)
 {
-    auto description = "token filter for object " + getObjGenAsStr();
+    auto description = "token filter for object " + getObjGen().unparse(' ');
     Pl_QPDFTokenizer token_pipeline(description.c_str(), filter, next);
     this->pipeStreamData(&token_pipeline, 0, qpdf_dl_specialized);
 }

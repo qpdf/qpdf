@@ -1493,9 +1493,8 @@ QPDF::setLastObjectDescription(
         }
     }
     if (objid > 0) {
-        this->m->last_object_description += "object " +
-            QUtil::int_to_string(objid) + " " +
-            QUtil::int_to_string(generation);
+        this->m->last_object_description +=
+            "object " + QPDFObjGen(objid, generation).unparse(' ');
     }
 }
 
@@ -1862,8 +1861,8 @@ QPDF::readObjectAtOffset(
                 this->m->file->getName(),
                 this->m->last_object_description,
                 offset,
-                (std::string("expected ") + QUtil::int_to_string(exp_objid) +
-                 " " + QUtil::int_to_string(exp_generation) + " obj"));
+                (std::string("expected ") +
+                 QPDFObjGen(exp_objid, exp_generation).unparse(' ') + " obj"));
             if (try_recovery) {
                 // Will be retried below
                 throw e;
@@ -1898,8 +1897,8 @@ QPDF::readObjectAtOffset(
                     "",
                     0,
                     std::string(
-                        "object " + QUtil::int_to_string(exp_objid) + " " +
-                        QUtil::int_to_string(exp_generation) +
+                        "object " +
+                        QPDFObjGen(exp_objid, exp_generation).unparse(' ') +
                         " not found in file after regenerating"
                         " cross reference table"));
                 return QPDFObjectHandle::newNull();
@@ -2002,8 +2001,7 @@ QPDF::resolve(int objid, int generation)
             qpdf_e_damaged_pdf,
             "",
             this->m->file->getLastOffset(),
-            ("loop detected resolving object " + QUtil::int_to_string(objid) +
-             " " + QUtil::int_to_string(generation)));
+            ("loop detected resolving object " + og.unparse(' ')));
         return QPDF_Null::create();
     }
     ResolveRecorder rr(this, og);
@@ -2039,8 +2037,7 @@ QPDF::resolve(int objid, int generation)
                     this->m->file->getName(),
                     "",
                     0,
-                    ("object " + QUtil::int_to_string(objid) + "/" +
-                     QUtil::int_to_string(generation) +
+                    ("object " + og.unparse('/') +
                      " has unexpected xref entry type"));
             }
         } catch (QPDFExc& e) {
@@ -2050,8 +2047,7 @@ QPDF::resolve(int objid, int generation)
                 qpdf_e_damaged_pdf,
                 "",
                 0,
-                ("object " + QUtil::int_to_string(objid) + "/" +
-                 QUtil::int_to_string(generation) +
+                ("object " + og.unparse('/') +
                  ": error reading object: " + e.what()));
         }
     }
@@ -2065,10 +2061,7 @@ QPDF::resolve(int objid, int generation)
 
     std::shared_ptr<QPDFObject> result(this->m->obj_cache[og].object);
     if (!result->hasDescription()) {
-        result->setDescription(
-            this,
-            ("object " + QUtil::int_to_string(objid) + " " +
-             QUtil::int_to_string(generation)));
+        result->setDescription(this, ("object " + og.unparse(' ')));
     }
     return result;
 }
@@ -2809,8 +2802,8 @@ QPDF::pipeStreamData(
                     "",
                     file->getLastOffset(),
                     ("error decoding stream data for object " +
-                     QUtil::int_to_string(objid) + " " +
-                     QUtil::int_to_string(generation) + ": " + e.what())));
+                     QPDFObjGen(objid, generation).unparse(' ') + ": " +
+                     e.what())));
             if (will_retry) {
                 qpdf_for_warning.warn(
                     // line-break
