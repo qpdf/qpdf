@@ -34,43 +34,49 @@ class QPDFObjGen
   public:
     QPDF_DLL
     QPDFObjGen() :
-    obj(0),
-    gen(0)
+        obj(0),
+        gen(0)
     {
     }
     QPDF_DLL
     QPDFObjGen(int obj, int gen) :
-    obj(obj),
-    gen(gen)
+        obj(obj),
+        gen(gen)
     {
     }
     QPDF_DLL
-    bool operator<(QPDFObjGen const& rhs) const
+    bool
+    operator<(QPDFObjGen const& rhs) const
     {
         return ((obj < rhs.obj) || ((obj == rhs.obj) && (gen < rhs.gen)));
     }
     QPDF_DLL
-    bool operator==(QPDFObjGen const& rhs) const
+    bool
+    operator==(QPDFObjGen const& rhs) const
     {
         return ((obj == rhs.obj) && (gen == rhs.gen));
     }
     QPDF_DLL
-    int getObj() const
+    int
+    getObj() const
     {
         return obj;
     }
     QPDF_DLL
-    int getGen() const
+    int
+    getGen() const
     {
         return gen;
     }
     QPDF_DLL
-    std::string unparse() const
+    std::string
+    unparse() const
     {
         return QUtil::int_to_string(obj) + "," + QUtil::int_to_string(gen);
     }
     QPDF_DLL
-    friend std::ostream& operator<<(std::ostream& os, const QPDFObjGen& og)
+    friend std::ostream&
+    operator<<(std::ostream& os, const QPDFObjGen& og)
     {
         os << og.obj << "," << og.gen;
         return os;
