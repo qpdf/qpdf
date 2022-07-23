@@ -38,7 +38,7 @@ class QPDFObjGen
     {
     }
     QPDF_DLL
-    QPDFObjGen(int obj, int gen) :
+    explicit QPDFObjGen(int obj, int gen = 0) :
         obj(obj),
         gen(gen)
     {
