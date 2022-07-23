@@ -47,13 +47,19 @@ class QPDFObjGen
     bool
     operator<(QPDFObjGen const& rhs) const
     {
-        return ((obj < rhs.obj) || ((obj == rhs.obj) && (gen < rhs.gen)));
+        return (obj < rhs.obj) || ((obj == rhs.obj) && (gen < rhs.gen));
     }
     QPDF_DLL
     bool
     operator==(QPDFObjGen const& rhs) const
     {
-        return ((obj == rhs.obj) && (gen == rhs.gen));
+        return (obj == rhs.obj) && (gen == rhs.gen);
+    }
+    QPDF_DLL
+    bool
+    operator!=(QPDFObjGen const& rhs) const
+    {
+        return (obj != rhs.obj) || (gen != rhs.gen);
     }
     QPDF_DLL
     int
