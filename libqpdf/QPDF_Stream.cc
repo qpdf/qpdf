@@ -658,8 +658,7 @@ QPDF_Stream::pipeStreamData(
         QTC::TC("qpdf", "QPDF_Stream pipe original stream data");
         if (!QPDF::Pipe::pipeStreamData(
                 this->qpdf,
-                this->objid,
-                this->generation,
+                QPDFObjGen(this->objid, this->generation),
                 this->offset,
                 this->length,
                 this->stream_dict,

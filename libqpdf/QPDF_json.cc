@@ -371,9 +371,10 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
 QPDFObjectHandle
 QPDF::JSONReactor::reserveObject(int obj, int gen)
 {
-    auto oh = pdf.reserveObjectIfNotExists(obj, gen);
+    QPDFObjGen og(obj, gen);
+    auto oh = pdf.reserveObjectIfNotExists(og);
     if (oh.isReserved()) {
-        this->reserved.insert(QPDFObjGen(obj, gen));
+        this->reserved.insert(og);
     }
     return oh;
 }
@@ -495,8 +496,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                 QTC::TC("qpdf", "QPDF_json updating existing stream");
             } else {
                 this->this_stream_needs_data = true;
-                replacement =
-                    pdf.reserveStream(tos.getObjectID(), tos.getGeneration());
+                replacement = pdf.reserveStream(tos.getObjGen());
                 replaceObject(tos, replacement, value);
             }
         } else {

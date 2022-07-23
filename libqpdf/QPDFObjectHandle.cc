@@ -3098,7 +3098,7 @@ QPDFObjectHandle::dereference()
     }
     if (this->obj.get() == 0) {
         std::shared_ptr<QPDFObject> obj =
-            QPDF::Resolver::resolve(this->qpdf, getObjectID(), getGeneration());
+            QPDF::Resolver::resolve(this->qpdf, getObjGen());
         if (obj.get() == 0) {
             // QPDF::resolve never returns an uninitialized object, but
             // check just in case.

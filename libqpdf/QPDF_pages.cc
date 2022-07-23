@@ -207,8 +207,7 @@ QPDF::insertPageobjToPage(
             // that causes this to happen.
             setLastObjectDescription(
                 "page " + QUtil::int_to_string(pos) + " (numbered from zero)",
-                og.getObj(),
-                og.getGen());
+                og);
             throw QPDFExc(
                 qpdf_e_pages,
                 this->m->file->getName(),
@@ -334,7 +333,7 @@ QPDF::findPage(QPDFObjGen const& og)
     auto it = this->m->pageobj_to_pages_pos.find(og);
     if (it == this->m->pageobj_to_pages_pos.end()) {
         QTC::TC("qpdf", "QPDF_pages findPage not found");
-        setLastObjectDescription("page object", og.getObj(), og.getGen());
+        setLastObjectDescription("page object", og);
         throw QPDFExc(
             qpdf_e_pages,
             this->m->file->getName(),
