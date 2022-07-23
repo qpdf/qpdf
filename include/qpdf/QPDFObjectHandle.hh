@@ -1550,7 +1550,7 @@ class QPDFObjectHandle
     bool isImage(bool exclude_imagemask = true);
 
   private:
-    QPDFObjectHandle(QPDF*, int objid, int generation);
+    QPDFObjectHandle(QPDF*, QPDFObjGen const& og);
     QPDFObjectHandle(std::shared_ptr<QPDFObject> const&);
 
     enum parser_state_e {
@@ -1617,8 +1617,7 @@ class QPDFObjectHandle
     // a substantial performance penalty since QPDFObjectHandle
     // objects are copied around so frequently.
     QPDF* qpdf;
-    int objid; // 0 for direct object
-    int generation;
+    QPDFObjGen og;
     std::shared_ptr<QPDFObject> obj;
     bool reserved;
 };

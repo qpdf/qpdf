@@ -218,27 +218,22 @@ LastChar::getLastChar()
 
 QPDFObjectHandle::QPDFObjectHandle() :
     initialized(false),
-    qpdf(0),
-    objid(0),
-    generation(0),
+    qpdf(nullptr),
     reserved(false)
 {
 }
 
-QPDFObjectHandle::QPDFObjectHandle(QPDF* qpdf, int objid, int generation) :
+QPDFObjectHandle::QPDFObjectHandle(QPDF* qpdf, QPDFObjGen const& og) :
     initialized(true),
     qpdf(qpdf),
-    objid(objid),
-    generation(generation),
+    og(og),
     reserved(false)
 {
 }
 
 QPDFObjectHandle::QPDFObjectHandle(std::shared_ptr<QPDFObject> const& data) :
     initialized(true),
-    qpdf(0),
-    objid(0),
-    generation(0),
+    qpdf(nullptr),
     obj(data),
     reserved(false)
 {
@@ -1481,19 +1476,19 @@ QPDFObjectHandle::replaceStreamData(
 QPDFObjGen
 QPDFObjectHandle::getObjGen() const
 {
-    return QPDFObjGen(this->objid, this->generation);
+    return og;
 }
 
 int
 QPDFObjectHandle::getObjectID() const
 {
-    return this->objid;
+    return og.getObj();
 }
 
 int
 QPDFObjectHandle::getGeneration() const
 {
-    return this->generation;
+    return og.getGen();
 }
 
 std::map<std::string, QPDFObjectHandle>
@@ -2485,7 +2480,7 @@ QPDFObjectHandle::newIndirect(QPDF* qpdf, int objid, int generation)
         return newNull();
     }
 
-    return QPDFObjectHandle(qpdf, objid, generation);
+    return QPDFObjectHandle(qpdf, QPDFObjGen(objid, generation));
 }
 
 QPDFObjectHandle
@@ -2689,7 +2684,7 @@ QPDFObjectHandle::newReserved(QPDF* qpdf)
     // number, but then return an unresolved handle to the object.
     QPDFObjectHandle reserved = qpdf->makeIndirectObject(makeReserved());
     QPDFObjectHandle result =
-        newIndirect(qpdf, reserved.objid, reserved.generation);
+        newIndirect(qpdf, reserved.getObjectID(), reserved.getGeneration());
     result.reserved = true;
     return result;
 }
@@ -2789,9 +2784,8 @@ QPDFObjectHandle::copyObject(
                                " reserved object handle direct");
     }
 
-    this->qpdf = 0;
-    this->objid = 0;
-    this->generation = 0;
+    qpdf = nullptr;
+    og = QPDFObjGen();
 
     std::shared_ptr<QPDFObject> new_obj;
 
