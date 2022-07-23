@@ -2634,8 +2634,8 @@ QPDFObjectHandle::newStream(
     qpdf_offset_t offset,
     size_t length)
 {
-    QPDFObjectHandle result = QPDFObjectHandle(QPDF_Stream::create(
-        qpdf, og.getObj(), og.getGen(), stream_dict, offset, length));
+    QPDFObjectHandle result = QPDFObjectHandle(
+        QPDF_Stream::create(qpdf, og, stream_dict, offset, length));
     if (offset) {
         result.setParsedOffset(offset);
     }
@@ -2651,11 +2651,11 @@ QPDFObjectHandle::newStream(QPDF* qpdf)
     }
     QTC::TC("qpdf", "QPDFObjectHandle newStream");
     QPDFObjectHandle stream_dict = newDictionary();
-    QPDFObjectHandle result = qpdf->makeIndirectObject(
-        QPDFObjectHandle(QPDF_Stream::create(qpdf, 0, 0, stream_dict, 0, 0)));
+    QPDFObjectHandle result = qpdf->makeIndirectObject(QPDFObjectHandle(
+        QPDF_Stream::create(qpdf, QPDFObjGen(), stream_dict, 0, 0)));
     result.dereference();
     QPDF_Stream* stream = dynamic_cast<QPDF_Stream*>(result.obj.get());
-    stream->setObjGen(result.getObjectID(), result.getGeneration());
+    stream->setObjGen(result.getObjGen());
     return result;
 }
 

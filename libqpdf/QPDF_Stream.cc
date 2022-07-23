@@ -110,14 +110,12 @@ StreamBlobProvider::operator()(Pipeline* p)
 
 QPDF_Stream::QPDF_Stream(
     QPDF* qpdf,
-    int objid,
-    int generation,
+    QPDFObjGen const& og,
     QPDFObjectHandle stream_dict,
     qpdf_offset_t offset,
     size_t length) :
     qpdf(qpdf),
-    objid(objid),
-    generation(generation),
+    og(og),
     filter_on_write(true),
     stream_dict(stream_dict),
     offset(offset),
@@ -128,22 +126,18 @@ QPDF_Stream::QPDF_Stream(
                                "object for dictionary");
     }
     setDescription(
-        this->qpdf,
-        this->qpdf->getFilename() + ", stream object " +
-            QPDFObjGen(objid, generation).unparse(' '));
+        qpdf, qpdf->getFilename() + ", stream object " + og.unparse(' '));
 }
 
 std::shared_ptr<QPDFObject>
 QPDF_Stream::create(
     QPDF* qpdf,
-    int objid,
-    int generation,
+    QPDFObjGen const& og,
     QPDFObjectHandle stream_dict,
     qpdf_offset_t offset,
     size_t length)
 {
-    return do_create(
-        new QPDF_Stream(qpdf, objid, generation, stream_dict, offset, length));
+    return do_create(new QPDF_Stream(qpdf, og, stream_dict, offset, length));
 }
 
 std::shared_ptr<QPDFObject>
@@ -180,22 +174,21 @@ QPDF_Stream::releaseResolved()
 }
 
 void
-QPDF_Stream::setObjGen(int objid, int generation)
+QPDF_Stream::setObjGen(QPDFObjGen const& og)
 {
-    if (!((this->objid == 0) && (this->generation == 0))) {
+    if (this->og.isIndirect()) {
         throw std::logic_error(
             "attempt to set object ID and generation of a stream"
             " that already has them");
     }
-    this->objid = objid;
-    this->generation = generation;
+    this->og = og;
 }
 
 std::string
 QPDF_Stream::unparse()
 {
     // Unparse stream objects as indirect references
-    return QPDFObjGen(objid, generation).unparse(' ') + " R";
+    return og.unparse(' ') + " R";
 }
 
 JSON
@@ -617,8 +610,8 @@ QPDF_Stream::pipeStreamData(
         Pl_Count count("stream provider count", pipeline);
         if (this->stream_provider->supportsRetry()) {
             if (!this->stream_provider->provideStreamData(
-                    this->objid,
-                    this->generation,
+                    og.getObj(),
+                    og.getGen(),
                     &count,
                     suppress_warnings,
                     will_retry)) {
@@ -627,7 +620,7 @@ QPDF_Stream::pipeStreamData(
             }
         } else {
             this->stream_provider->provideStreamData(
-                this->objid, this->generation, &count);
+                og.getObj(), og.getGen(), &count);
         }
         qpdf_offset_t actual_length = count.getCount();
         qpdf_offset_t desired_length = 0;
@@ -640,9 +633,8 @@ QPDF_Stream::pipeStreamData(
                 // This would be caused by programmer error on the
                 // part of a library user, not by invalid input data.
                 throw std::runtime_error(
-                    "stream data provider for " +
-                    QPDFObjGen(objid, generation).unparse(' ') + " provided " +
-                    QUtil::int_to_string(actual_length) +
+                    "stream data provider for " + og.unparse(' ') +
+                    " provided " + QUtil::int_to_string(actual_length) +
                     " bytes instead of expected " +
                     QUtil::int_to_string(desired_length) + " bytes");
             }
@@ -658,7 +650,7 @@ QPDF_Stream::pipeStreamData(
         QTC::TC("qpdf", "QPDF_Stream pipe original stream data");
         if (!QPDF::Pipe::pipeStreamData(
                 this->qpdf,
-                QPDFObjGen(this->objid, this->generation),
+                og,
                 this->offset,
                 this->length,
                 this->stream_dict,
