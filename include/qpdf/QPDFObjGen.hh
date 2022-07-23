@@ -68,6 +68,12 @@ class QPDFObjGen
         return gen;
     }
     QPDF_DLL
+    bool
+    isIndirect() const
+    {
+        return obj > 0;
+    }
+    QPDF_DLL
     std::string unparse(char separator = ',') const;
     QPDF_DLL
     friend std::ostream& operator<<(std::ostream& os, const QPDFObjGen& og);
