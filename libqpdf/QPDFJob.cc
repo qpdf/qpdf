@@ -2464,7 +2464,7 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                 QTC::TC("qpdf", "QPDFJob found resources in non-leaf");
                 doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                     v << "  found resources in non-leaf page node "
-                      << og.getObj() << " " << og.getGen() << "\n";
+                      << og.unparse(' ') << "\n";
                 });
                 return true;
             }
@@ -2481,9 +2481,8 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                     QTC::TC("qpdf", "QPDFJob found shared resources in leaf");
                     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                         v << "  found shared resources in leaf node "
-                          << og.getObj() << " " << og.getGen() << ": "
-                          << resources_og.getObj() << " "
-                          << resources_og.getGen() << "\n";
+                          << og.unparse(' ') << ": "
+                          << resources_og.unparse(' ') << "\n";
                     });
                     return true;
                 }
@@ -2498,8 +2497,7 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                     QTC::TC("qpdf", "QPDFJob found shared xobject in leaf");
                     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                         v << "  found shared xobject in leaf node "
-                          << og.getObj() << " " << og.getGen() << ": "
-                          << xobject_og.getObj() << " " << xobject_og.getGen()
+                          << og.unparse(' ') << ": " << xobject_og.unparse(' ')
                           << "\n";
                     });
                     return true;
@@ -3376,7 +3374,7 @@ QPDFJob::writeJSON(QPDF& pdf)
     auto wanted = getWantedJSONObjects();
     for (auto const& og: wanted) {
         std::ostringstream s;
-        s << "obj:" << og.getObj() << " " << og.getGen() << " R";
+        s << "obj:" << og.unparse(' ') << " R";
         json_objects.insert(s.str());
     }
     pdf.writeJSON(
