@@ -1429,21 +1429,20 @@ class QPDFObjectHandle
 
       private:
         static QPDFObjectHandle
-        newIndirect(QPDF* qpdf, int objid, int generation)
+        newIndirect(QPDF* qpdf, QPDFObjGen const& og)
         {
-            return QPDFObjectHandle::newIndirect(qpdf, objid, generation);
+            return QPDFObjectHandle::newIndirect(qpdf, og);
         }
         static QPDFObjectHandle
         newStream(
             QPDF* qpdf,
-            int objid,
-            int generation,
+            QPDFObjGen const& og,
             QPDFObjectHandle stream_dict,
             qpdf_offset_t offset,
             size_t length)
         {
             return QPDFObjectHandle::newStream(
-                qpdf, objid, generation, stream_dict, offset, length);
+                qpdf, og, stream_dict, offset, length);
         }
         // Reserve an object with a specific ID
         static QPDFObjectHandle
@@ -1563,11 +1562,10 @@ class QPDFObjectHandle
     };
 
     // Private object factory methods
-    static QPDFObjectHandle newIndirect(QPDF*, int objid, int generation);
+    static QPDFObjectHandle newIndirect(QPDF*, QPDFObjGen const& og);
     static QPDFObjectHandle newStream(
         QPDF* qpdf,
-        int objid,
-        int generation,
+        QPDFObjGen const& og,
         QPDFObjectHandle stream_dict,
         qpdf_offset_t offset,
         size_t length);

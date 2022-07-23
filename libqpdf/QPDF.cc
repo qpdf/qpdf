@@ -1404,9 +1404,8 @@ QPDF::fixDanglingReferences(bool force)
     // For each non-scalar item to process, put it in the queue.
     std::list<QPDFObjectHandle> queue;
     queue.push_back(this->m->trailer);
-    for (auto const& iter: to_process) {
-        QPDFObjectHandle obj = QPDFObjectHandle::Factory::newIndirect(
-            this, iter.getObj(), iter.getGen());
+    for (auto const& og: to_process) {
+        QPDFObjectHandle obj = QPDFObjectHandle::Factory::newIndirect(this, og);
         if (obj.isDictionary() || obj.isArray()) {
             queue.push_back(obj);
         } else if (obj.isStream()) {
@@ -1472,10 +1471,7 @@ QPDF::getAllObjects()
     std::vector<QPDFObjectHandle> result;
     for (auto const& iter: this->m->obj_cache) {
         QPDFObjGen const& og = iter.first;
-        result.push_back(
-            // line-break
-            QPDFObjectHandle::Factory::newIndirect(
-                this, og.getObj(), og.getGen()));
+        result.push_back(QPDFObjectHandle::Factory::newIndirect(this, og));
     }
     return result;
 }
@@ -1662,7 +1658,11 @@ QPDF::readObject(
                 }
             }
             object = QPDFObjectHandle::Factory::newStream(
-                this, objid, generation, object, stream_offset, length);
+                this,
+                QPDFObjGen(objid, generation),
+                object,
+                stream_offset,
+                length);
         } else {
             input->seek(cur_offset, SEEK_SET);
         }
@@ -2159,8 +2159,7 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
     QPDFObjGen next(max_objid + 1, 0);
     this->m->obj_cache[next] =
         ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
-    return QPDFObjectHandle::Factory::newIndirect(
-        this, next.getObj(), next.getGen());
+    return QPDFObjectHandle::Factory::newIndirect(this, next);
 }
 
 QPDFObjectHandle
@@ -2178,19 +2177,19 @@ QPDFObjectHandle
 QPDF::reserveStream(int objid, int gen)
 {
     return QPDFObjectHandle::Factory::newStream(
-        this, objid, gen, QPDFObjectHandle::newDictionary(), 0, 0);
+        this, QPDFObjGen(objid, gen), QPDFObjectHandle::newDictionary(), 0, 0);
 }
 
 QPDFObjectHandle
 QPDF::getObjectByObjGen(QPDFObjGen const& og)
 {
-    return getObjectByID(og.getObj(), og.getGen());
+    return QPDFObjectHandle::Factory::newIndirect(this, og);
 }
 
 QPDFObjectHandle
 QPDF::getObjectByID(int objid, int generation)
 {
-    return QPDFObjectHandle::Factory::newIndirect(this, objid, generation);
+    return getObjectByObjGen(QPDFObjGen(objid, generation));
 }
 
 void

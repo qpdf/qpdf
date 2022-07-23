@@ -2180,8 +2180,9 @@ QPDFObjectHandle::parseInternal(
                     // Try to resolve indirect objects
                     object = newIndirect(
                         context,
-                        olist.at(olist.size() - 2).getIntValueAsInt(),
-                        olist.at(olist.size() - 1).getIntValueAsInt());
+                        QPDFObjGen(
+                            olist.at(olist.size() - 2).getIntValueAsInt(),
+                            olist.at(olist.size() - 1).getIntValueAsInt()));
                     olist.remove_last();
                     olist.remove_last();
                 } else if ((value == "endobj") && (state == st_top)) {
@@ -2469,9 +2470,9 @@ QPDFObjectHandle::setParsedOffset(qpdf_offset_t offset)
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::newIndirect(QPDF* qpdf, int objid, int generation)
+QPDFObjectHandle::newIndirect(QPDF* qpdf, QPDFObjGen const& og)
 {
-    if (objid == 0) {
+    if (!og.isIndirect()) {
         // Special case: QPDF uses objid 0 as a sentinel for direct
         // objects, and the PDF specification doesn't allow for object
         // 0. Treat indirect references to object 0 as null so that we
@@ -2480,7 +2481,7 @@ QPDFObjectHandle::newIndirect(QPDF* qpdf, int objid, int generation)
         return newNull();
     }
 
-    return QPDFObjectHandle(qpdf, QPDFObjGen(objid, generation));
+    return QPDFObjectHandle(qpdf, og);
 }
 
 QPDFObjectHandle
@@ -2628,14 +2629,13 @@ QPDFObjectHandle::newDictionary(
 QPDFObjectHandle
 QPDFObjectHandle::newStream(
     QPDF* qpdf,
-    int objid,
-    int generation,
+    QPDFObjGen const& og,
     QPDFObjectHandle stream_dict,
     qpdf_offset_t offset,
     size_t length)
 {
     QPDFObjectHandle result = QPDFObjectHandle(QPDF_Stream::create(
-        qpdf, objid, generation, stream_dict, offset, length));
+        qpdf, og.getObj(), og.getGen(), stream_dict, offset, length));
     if (offset) {
         result.setParsedOffset(offset);
     }
@@ -2683,8 +2683,7 @@ QPDFObjectHandle::newReserved(QPDF* qpdf)
     // Reserve a spot for this object by assigning it an object
     // number, but then return an unresolved handle to the object.
     QPDFObjectHandle reserved = qpdf->makeIndirectObject(makeReserved());
-    QPDFObjectHandle result =
-        newIndirect(qpdf, reserved.getObjectID(), reserved.getGeneration());
+    QPDFObjectHandle result = newIndirect(qpdf, reserved.getObjGen());
     result.reserved = true;
     return result;
 }

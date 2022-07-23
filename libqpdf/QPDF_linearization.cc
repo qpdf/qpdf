@@ -138,7 +138,7 @@ QPDF::isLinearized()
     }
 
     QPDFObjectHandle candidate =
-        QPDFObjectHandle::Factory::newIndirect(this, lindict_obj, 0);
+        QPDFObjectHandle::Factory::newIndirect(this, QPDFObjGen(lindict_obj));
     if (!candidate.isDictionary()) {
         return false;
     }
