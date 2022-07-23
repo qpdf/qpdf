@@ -1055,12 +1055,11 @@ QPDF::read_xrefStream(qpdf_offset_t xref_offset)
 {
     bool found = false;
     if (!this->m->ignore_xref_streams) {
-        int xobj;
-        int xgen;
+        QPDFObjGen x_og;
         QPDFObjectHandle xref_obj;
         try {
             xref_obj = readObjectAtOffset(
-                false, xref_offset, "xref stream", 0, 0, xobj, xgen);
+                false, xref_offset, "xref stream", QPDFObjGen(), x_og);
         } catch (QPDFExc&) {
             // ignore -- report error below
         }
@@ -1776,13 +1775,11 @@ QPDF::readObjectAtOffset(
     bool try_recovery,
     qpdf_offset_t offset,
     std::string const& description,
-    int exp_objid,
-    int exp_generation,
-    int& objid,
-    int& generation)
+    QPDFObjGen const& exp_og,
+    QPDFObjGen& og)
 {
     bool check_og = true;
-    if (exp_objid == 0) {
+    if (exp_og.getObj() == 0) {
         // This method uses an expect object ID of 0 to indicate that
         // we don't know or don't care what the actual object ID is at
         // this offset. This is true when we read the xref stream and
@@ -1794,7 +1791,7 @@ QPDF::readObjectAtOffset(
         check_og = false;
         try_recovery = false;
     } else {
-        setLastObjectDescription(description, exp_objid, exp_generation);
+        setLastObjectDescription(description, exp_og.getObj(), exp_og.getGen());
     }
 
     if (!this->m->attempt_recovery) {
@@ -1840,9 +1837,9 @@ QPDF::readObjectAtOffset(
                 offset,
                 "expected n n obj");
         }
-        objid = QUtil::string_to_int(tobjid.getValue().c_str());
-        generation = QUtil::string_to_int(tgen.getValue().c_str());
-
+        int objid = QUtil::string_to_int(tobjid.getValue().c_str());
+        int generation = QUtil::string_to_int(tgen.getValue().c_str());
+        og = QPDFObjGen(objid, generation);
         if (objid == 0) {
             QTC::TC("qpdf", "QPDF object id 0");
             throw QPDFExc(
@@ -1852,17 +1849,14 @@ QPDF::readObjectAtOffset(
                 offset,
                 "object with ID 0");
         }
-
-        if (check_og &&
-            (!((objid == exp_objid) && (generation == exp_generation)))) {
+        if (check_og && (exp_og != og)) {
             QTC::TC("qpdf", "QPDF err wrong objid/generation");
             QPDFExc e(
                 qpdf_e_damaged_pdf,
                 this->m->file->getName(),
                 this->m->last_object_description,
                 offset,
-                (std::string("expected ") +
-                 QPDFObjGen(exp_objid, exp_generation).unparse(' ') + " obj"));
+                (std::string("expected ") + exp_og.unparse(' ') + " obj"));
             if (try_recovery) {
                 // Will be retried below
                 throw e;
@@ -1876,18 +1870,12 @@ QPDF::readObjectAtOffset(
         if (try_recovery) {
             // Try again after reconstructing xref table
             reconstruct_xref(e);
-            QPDFObjGen og(exp_objid, exp_generation);
-            if (this->m->xref_table.count(og) &&
-                (this->m->xref_table[og].getType() == 1)) {
-                qpdf_offset_t new_offset = this->m->xref_table[og].getOffset();
+            if (this->m->xref_table.count(exp_og) &&
+                (this->m->xref_table[exp_og].getType() == 1)) {
+                qpdf_offset_t new_offset =
+                    this->m->xref_table[exp_og].getOffset();
                 QPDFObjectHandle result = readObjectAtOffset(
-                    false,
-                    new_offset,
-                    description,
-                    exp_objid,
-                    exp_generation,
-                    objid,
-                    generation);
+                    false, new_offset, description, exp_og, og);
                 QTC::TC("qpdf", "QPDF recovered in readObjectAtOffset");
                 return result;
             } else {
@@ -1897,8 +1885,7 @@ QPDF::readObjectAtOffset(
                     "",
                     0,
                     std::string(
-                        "object " +
-                        QPDFObjGen(exp_objid, exp_generation).unparse(' ') +
+                        "object " + exp_og.unparse(' ') +
                         " not found in file after regenerating"
                         " cross reference table"));
                 return QPDFObjectHandle::newNull();
@@ -1909,7 +1896,7 @@ QPDF::readObjectAtOffset(
     }
 
     QPDFObjectHandle oh =
-        readObject(this->m->file, description, objid, generation, false);
+        readObject(this->m->file, description, og.getObj(), og.getGen(), false);
 
     if (!(readToken(this->m->file) ==
           QPDFTokenizer::Token(QPDFTokenizer::tt_word, "endobj"))) {
@@ -1921,7 +1908,6 @@ QPDF::readObjectAtOffset(
             "expected endobj");
     }
 
-    QPDFObjGen og(objid, generation);
     if (!this->m->obj_cache.count(og)) {
         // Store the object in the cache here so it gets cached
         // whether we first know the offset or whether we first know
@@ -2014,16 +2000,9 @@ QPDF::resolve(int objid, int generation)
                 {
                     qpdf_offset_t offset = entry.getOffset();
                     // Object stored in cache by readObjectAtOffset
-                    int aobjid;
-                    int ageneration;
-                    QPDFObjectHandle oh = readObjectAtOffset(
-                        true,
-                        offset,
-                        "",
-                        objid,
-                        generation,
-                        aobjid,
-                        ageneration);
+                    QPDFObjGen a_og;
+                    QPDFObjectHandle oh =
+                        readObjectAtOffset(true, offset, "", og, a_og);
                 }
                 break;
 

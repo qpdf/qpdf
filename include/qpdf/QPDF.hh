@@ -1146,10 +1146,8 @@ class QPDF
         bool attempt_recovery,
         qpdf_offset_t offset,
         std::string const& description,
-        int exp_objid,
-        int exp_generation,
-        int& act_objid,
-        int& act_generation);
+        QPDFObjGen const& exp_og,
+        QPDFObjGen& og);
     bool objectChanged(QPDFObjGen const& og, std::shared_ptr<QPDFObject>& oph);
     std::shared_ptr<QPDFObject> resolve(int objid, int generation);
     void resolveObjectsInStream(int obj_stream_number);
