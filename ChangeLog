@@ -1,3 +1,19 @@
+2022-07-24  Jay Berkenbilt  <ejb@ql.org>
+
+        * Thanks to m-holger for doing significant cleanup of private APIs
+        and internals around QPDFObjGen and for significantly improving
+        the performance of QPDFObjGen -- See #731. This includes a few
+        user-visible changes:
+        - Addition of QPDFObjectHandle::StreamDataProvider::provideStreamData
+          overloads that take QPDFObjGen
+        - Addition of an optional argument to QPDFObjGen::unparse allowing
+          specification of a separator character, with the default
+          resulting in the old behavior
+        Examples have been updated to use improved APIs. The old
+        provideStreamData overloads will continue to be supported, so
+        updating older code to use the new interfaces is entirely at the
+        programmer's descretion.
+
 2022-06-25  Jay Berkenbilt  <ejb@ql.org>
 
         * Add tracking methods QPDF::everCalledGetAllPages() and

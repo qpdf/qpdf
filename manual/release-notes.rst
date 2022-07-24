@@ -206,6 +206,12 @@ For a detailed list of changes, please see the file
       object must be configured to report progress (via command-line
       argument or otherwise) for this to be used.
 
+    - Add new overloads to
+      ``QPDFObjectHandle::StreamDataProvider::provideStreamData`` that
+      take ``QPDFObjGen const&`` instead of separate object ID and
+      generation parameters. The old versions will continue to be
+      supported and are not deprecated.
+
   - Other changes
 
     - In JSON v1 mode, the ``"objects"`` key now reflects the repaired
