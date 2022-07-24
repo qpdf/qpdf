@@ -2098,7 +2098,7 @@ QPDFJob::doUnderOverlayForPage(
     QPDFObjectHandle resources = dest_page.getAttribute("/Resources", true);
     if (!resources.isDictionary()) {
         QTC::TC("qpdf", "QPDFJob overlay page with no resources");
-        resources = dest_page.getObjectHandle().replaceKeyAndGet(
+        resources = dest_page.getObjectHandle().replaceKeyAndGetNew(
             "/Resources", QPDFObjectHandle::newDictionary());
     }
     for (int from_pageno: pagenos[pageno]) {

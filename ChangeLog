@@ -1,5 +1,14 @@
 2022-07-24  Jay Berkenbilt  <ejb@ql.org>
 
+        * QPDFObjectHandle: for the methods insertItem, appendItem,
+        eraseItem, replaceKey, and removeKey, add a corresponding
+        "AndGetNew" and/or "AndGetOld" methods. The ones that end with
+        "AndGetNew" return the newly added item. The ones that end with
+        "AndGetOld" return the old value. The AndGetNew methods make it
+        possible to create a new object, add it to an array or dictionary,
+        and get a handle to it all in one line. The AndGetOld methods make
+        it easier to retrieve an old value when removing or replacing it.
+
         * Thanks to m-holger for doing significant cleanup of private APIs
         and internals around QPDFObjGen and for significantly improving
         the performance of QPDFObjGen -- See #731. This includes a few
@@ -167,16 +176,6 @@
         * Make attempting to write encrypted files that use RC4 (40-bit or
         128-bit without AES) an error rather than a warning when
         --allow-weak-crypto is not specified. Fixes #576.
-
-2022-04-29  Jay Berkenbilt  <ejb@ql.org>
-
-        * QPDFObjectHandle: for the methods insertItem, appendItem,
-        eraseItem, replaceKey, and removeKey, add a corresponding "AndGet"
-        method (insertItemAndGet, appendItemAndGet, eraseItemAndGet,
-        replaceKeyAndGet, and removeKeyAndGet) that returns the newly
-        inserted, replaced, or removed item. This makes it possible to
-        create a new object, add it to an array or dictionary, and get a
-        handle to it all in one line.
 
 2022-04-24  Jay Berkenbilt  <ejb@ql.org>
 

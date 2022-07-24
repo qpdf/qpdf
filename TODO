@@ -8,29 +8,6 @@ Before Release:
 * Stay on top of https://github.com/pikepdf/pikepdf/pull/315
 * Release qtest with updates to qtest-driver and copy back into qpdf
 
-Parent pointer idea:
-
-* Have replaceKey, removeKey, and eraseItem return the old values. The
-  comments will clarify the difference between these and the andGet
-  versions.
-* Add std::weak_ptr<QPDFObject> parent to QPDFObject. When adding a
-  direct object to an array or dictionary, set its parent. When
-  removing it, clear the parent pointer.
-* When a direct object that already has a parent is added to
-  something, it is a warning and will become an error in qpdf 12.
-  There needs to be unsafe add methods used by unsafeShallowCopy.
-  These will add but not modify the parent pointer.
-
-This allows an object to be moved from one object to another by
-removing it, which returns the now orphaned object, and then inserting
-it somewhere else. It also doesn't break the pattern of adding a
-direct object to something and subsequently mutating it. It just
-prevents the same object from being added to more than one thing.
-
-Note that arrays and dictionaries still need to contain
-QPDFObjectHandle because of indirect objects. This only pertains to
-direct objects, which are always "resolved" in QPDFObjectHandle.
-
 Next:
 * JSON v2 fixes
 
@@ -69,6 +46,26 @@ Pending changes:
   than 256 nodes and being as evenly sizes as possible. Don't worry
   about the case of more than 65,536 pages. If the top node has more
   than 256 children, we'll live with it.
+
+Parent pointer idea:
+
+* Add std::weak_ptr<QPDFObject> parent to QPDFObject. When adding a
+  direct object to an array or dictionary, set its parent. When
+  removing it, clear the parent pointer.
+* When a direct object that already has a parent is added to
+  something, it is a warning and will become an error in qpdf 12.
+  There needs to be unsafe add methods used by unsafeShallowCopy.
+  These will add but not modify the parent pointer.
+
+This allows an object to be moved from one object to another by
+removing it, which returns the now orphaned object, and then inserting
+it somewhere else. It also doesn't break the pattern of adding a
+direct object to something and subsequently mutating it. It just
+prevents the same object from being added to more than one thing.
+
+Note that arrays and dictionaries still need to contain
+QPDFObjectHandle because of indirect objects. This only pertains to
+direct objects, which are always "resolved" in QPDFObjectHandle.
 
 Soon: Break ground on "Document-level work"
 

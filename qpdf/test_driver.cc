@@ -1095,8 +1095,8 @@ test_27(QPDF& pdf, char const* arg2)
         QPDFObjectHandle s2 = QPDFObjectHandle::newStream(&oldpdf, "potato\n");
         auto trailer = pdf.getTrailer();
         trailer.replaceKey("/QTest", pdf.copyForeignObject(qtest));
-        auto qtest2 =
-            trailer.replaceKeyAndGet("/QTest2", QPDFObjectHandle::newArray());
+        auto qtest2 = trailer.replaceKeyAndGetNew(
+            "/QTest2", QPDFObjectHandle::newArray());
         qtest2.appendItem(pdf.copyForeignObject(s1));
         qtest2.appendItem(pdf.copyForeignObject(s2));
         qtest2.appendItem(pdf.copyForeignObject(s3));
@@ -3165,15 +3165,23 @@ test_88(QPDF& pdf, char const* arg2)
     auto dict = QPDFObjectHandle::newDictionary();
     dict.replaceKey("/One", QPDFObjectHandle::newInteger(1));
     dict.replaceKey("/Two", QPDFObjectHandle::newInteger(2));
-    auto three = dict.replaceKeyAndGet("/Three", QPDFObjectHandle::newArray());
+    auto three =
+        dict.replaceKeyAndGetNew("/Three", QPDFObjectHandle::newArray());
     three.appendItem("(a)"_qpdf);
     three.appendItem("(b)"_qpdf);
-    auto newdict = three.appendItemAndGet(QPDFObjectHandle::newDictionary());
+    auto newdict = three.appendItemAndGetNew(QPDFObjectHandle::newDictionary());
     newdict.replaceKey("/Z", "/Y"_qpdf);
     newdict.replaceKey("/X", "/W"_qpdf);
+    dict.replaceKey("/Quack", "[1 2 3]"_qpdf);
+    auto quack = dict.replaceKeyAndGetOld("/Quack", "/Moo"_qpdf);
+    assert(quack.unparse() == "[ 1 2 3 ]");
+    auto nothing =
+        dict.replaceKeyAndGetOld("/NotThere", QPDFObjectHandle::newNull());
+    assert(nothing.isNull());
     assert(dict.unparse() == R"(
       <<
         /One 1
+        /Quack /Moo
         /Two 2
         /Three [ (a) (b) << /Z /Y /X /W >> ]
       >>
@@ -3184,7 +3192,7 @@ test_88(QPDF& pdf, char const* arg2)
     assert(
         arr.unparse() ==
         "[ (00) (0) (a) (b) << /Z /Y /X /W >> ]"_qpdf.unparse());
-    auto new_dict = arr.insertItemAndGet(1, "<< /P /Q /R /S >>"_qpdf);
+    auto new_dict = arr.insertItemAndGetNew(1, "<< /P /Q /R /S >>"_qpdf);
     arr.eraseItem(2);
     arr.eraseItem(0);
     assert(
@@ -3200,20 +3208,20 @@ test_88(QPDF& pdf, char const* arg2)
     assert(
         arr.unparse() ==
         "[ << /P /Q /T /U >> (a) (b) << /Z /Y /X /W >> ]"_qpdf.unparse());
-    auto s = arr.eraseItemAndGet(1);
+    auto s = arr.eraseItemAndGetOld(1);
     assert(s.unparse() == "(a)");
     assert(
         arr.unparse() ==
         "[ << /P /Q /T /U >> (b) << /Z /Y /X /W >> ]"_qpdf.unparse());
 
-    assert(new_dict.removeKeyAndGet("/M").isNull());
-    assert(new_dict.removeKeyAndGet("/P").unparse() == "/Q");
+    assert(new_dict.removeKeyAndGetOld("/M").isNull());
+    assert(new_dict.removeKeyAndGetOld("/P").unparse() == "/Q");
     assert(new_dict.unparse() == "<< /T /U >>"_qpdf.unparse());
 
     // Test errors
-    auto arr2 = pdf.getRoot().replaceKeyAndGet("/QTest", "[1 2]"_qpdf);
+    auto arr2 = pdf.getRoot().replaceKeyAndGetNew("/QTest", "[1 2]"_qpdf);
     arr2.setObjectDescription(&pdf, "test array");
-    assert(arr2.eraseItemAndGet(50).isNull());
+    assert(arr2.eraseItemAndGetOld(50).isNull());
 }
 
 static void

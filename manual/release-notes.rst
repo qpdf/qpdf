@@ -163,9 +163,13 @@ For a detailed list of changes, please see the file
       - See examples :file:`examples/qpdfjob-save-attachment.cc` and
         :file:`examples/qpdfjob-c-save-attachment.cc`.
 
-    - New methods ``insertItemAndGet``, ``appendItemAndGet``,
-      ``eraseItemAndGet``, ``replaceKeyAndGet``, and
-      ``removeKeyAndGet`` return the newly added or removed object.
+    - In ``QPDFObjectHandle``, new methods ``insertItemAndGetNew``,
+      ``appendItemAndGetNew``, and ``replaceKeyAndGetNew`` return the
+      newly added item. New methods ``eraseItemAndGetOld``,
+      ``replaceKeyAndGetOld``, and ``removeKeyAndGetOld`` return the
+      item that was just removed or, in the case of
+      ``replaceKeyAndGetOld``, a ``null`` object if the object was not
+      previously there.
 
     - Add new ``Pipeline`` methods to reduce the amount of casting that is
       needed:

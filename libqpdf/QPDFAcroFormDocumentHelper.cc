@@ -40,7 +40,7 @@ QPDFAcroFormDocumentHelper::getOrCreateAcroForm()
 {
     auto acroform = this->qpdf.getRoot().getKey("/AcroForm");
     if (!acroform.isDictionary()) {
-        acroform = this->qpdf.getRoot().replaceKeyAndGet(
+        acroform = this->qpdf.getRoot().replaceKeyAndGetNew(
             "/AcroForm",
             this->qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary()));
     }
@@ -53,8 +53,8 @@ QPDFAcroFormDocumentHelper::addFormField(QPDFFormFieldObjectHelper ff)
     auto acroform = getOrCreateAcroForm();
     auto fields = acroform.getKey("/Fields");
     if (!fields.isArray()) {
-        fields =
-            acroform.replaceKeyAndGet("/Fields", QPDFObjectHandle::newArray());
+        fields = acroform.replaceKeyAndGetNew(
+            "/Fields", QPDFObjectHandle::newArray());
     }
     fields.appendItem(ff.getObjectHandle());
     std::set<QPDFObjGen> visited;
@@ -854,7 +854,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             }
             dr.makeResourcesIndirect(this->qpdf);
             if (!dr.isIndirect()) {
-                dr = acroform.replaceKeyAndGet(
+                dr = acroform.replaceKeyAndGetNew(
                     "/DR", this->qpdf.makeIndirectObject(dr));
             }
             // Merge the other document's /DR, creating a conflict
@@ -1076,7 +1076,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         auto apdict = ah.getAppearanceDictionary();
         std::vector<QPDFObjectHandle> streams;
         auto replace_stream = [](auto& dict, auto& key, auto& old) {
-            return dict.replaceKeyAndGet(key, old.copyStream());
+            return dict.replaceKeyAndGetNew(key, old.copyStream());
         };
         if (apdict.isDictionary()) {
             for (auto& ap: apdict.ditems()) {

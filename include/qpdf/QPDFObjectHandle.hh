@@ -999,18 +999,15 @@ class QPDFObjectHandle
 
     // Mutator methods.
 
-    // Since qpdf 11: when a mutator object returns QPDFObjectHandle&,
-    // it is a reference to the object itself. This makes it possible
-    // to use a fluent style. For example:
+    // Since qpdf 11: for mutators that may add or remove an item,
+    // there are additional versions whose names contain "AndGet" that
+    // return the added or removed item. For example:
     //
-    //   array.appendItem(i1).appendItem(i2);
-    //
-    // would append i1 and then i2 to the array. There are also items
-    // that end with AndGet and return a QPDFObjectHandle. These
-    // return the newly added object. For example:
-    //
-    //   auto new_dict = dict.replaceKeyAndGet(
+    //   auto new_dict = dict.replaceKeyAndGetNew(
     //       "/New", QPDFObjectHandle::newDictionary());
+    //
+    //   auto old_value = dict.replaceKeyAndGetOld(
+    //       "/New", "(something)"_qpdf);
 
     // Recursively copy this object, making it direct. An exception is
     // thrown if a loop is detected. With allow_streams true, keep
@@ -1036,20 +1033,20 @@ class QPDFObjectHandle
     void insertItem(int at, QPDFObjectHandle const& item);
     // Like insertItem but return the item that was inserted.
     QPDF_DLL
-    QPDFObjectHandle insertItemAndGet(int at, QPDFObjectHandle const& item);
+    QPDFObjectHandle insertItemAndGetNew(int at, QPDFObjectHandle const& item);
     // Append an item to an array.
     QPDF_DLL
     void appendItem(QPDFObjectHandle const& item);
     // Append an item, and return the newly added item.
     QPDF_DLL
-    QPDFObjectHandle appendItemAndGet(QPDFObjectHandle const& item);
+    QPDFObjectHandle appendItemAndGetNew(QPDFObjectHandle const& item);
     // Remove the item at that position, reducing the size of the
     // array by one.
     QPDF_DLL
     void eraseItem(int at);
     // Erase and item and return the item that was removed.
     QPDF_DLL
-    QPDFObjectHandle eraseItemAndGet(int at);
+    QPDFObjectHandle eraseItemAndGetOld(int at);
 
     // Mutator methods for dictionary objects
 
@@ -1060,14 +1057,19 @@ class QPDFObjectHandle
     // Replace value of key and return the value.
     QPDF_DLL
     QPDFObjectHandle
-    replaceKeyAndGet(std::string const& key, QPDFObjectHandle const& value);
+    replaceKeyAndGetNew(std::string const& key, QPDFObjectHandle const& value);
+    // Replace value of key and return the old value, or null if the
+    // key was previously not present.
+    QPDF_DLL
+    QPDFObjectHandle
+    replaceKeyAndGetOld(std::string const& key, QPDFObjectHandle const& value);
     // Remove key, doing nothing if key does not exist.
     QPDF_DLL
     void removeKey(std::string const& key);
     // Remove key and return the old value. If the old value didn't
     // exist, return a null object.
     QPDF_DLL
-    QPDFObjectHandle removeKeyAndGet(std::string const& key);
+    QPDFObjectHandle removeKeyAndGetOld(std::string const& key);
 
     // ABI: Remove in qpdf 12
     [[deprecated("use replaceKey -- it does the same thing")]] QPDF_DLL void

@@ -28,7 +28,7 @@ QPDFEFStreamObjectHelper::setParam(
 {
     auto params = this->oh.getDict().getKey("/Params");
     if (!params.isDictionary()) {
-        params = this->oh.getDict().replaceKeyAndGet(
+        params = this->oh.getDict().replaceKeyAndGetNew(
             "/Params", QPDFObjectHandle::newDictionary());
     }
     params.replaceKey(pkey, pval);

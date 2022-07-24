@@ -915,7 +915,7 @@ QPDFObjectHandle::insertItem(int at, QPDFObjectHandle const& item)
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::insertItemAndGet(int at, QPDFObjectHandle const& item)
+QPDFObjectHandle::insertItemAndGetNew(int at, QPDFObjectHandle const& item)
 {
     insertItem(at, item);
     return item;
@@ -934,7 +934,7 @@ QPDFObjectHandle::appendItem(QPDFObjectHandle const& item)
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::appendItemAndGet(QPDFObjectHandle const& item)
+QPDFObjectHandle::appendItemAndGetNew(QPDFObjectHandle const& item)
 {
     appendItem(item);
     return item;
@@ -957,7 +957,7 @@ QPDFObjectHandle::eraseItem(int at)
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::eraseItemAndGet(int at)
+QPDFObjectHandle::eraseItemAndGetOld(int at)
 {
     auto result = QPDFObjectHandle::newNull();
     if (isArray() && (at < getArrayNItems()) && (at >= 0)) {
@@ -1113,7 +1113,8 @@ QPDFObjectHandle::mergeResources(
                     // subdictionaries just to get this shallow copy
                     // functionality.
                     QTC::TC("qpdf", "QPDFObjectHandle replace with copy");
-                    this_val = replaceKeyAndGet(rtype, this_val.shallowCopy());
+                    this_val =
+                        replaceKeyAndGetNew(rtype, this_val.shallowCopy());
                 }
                 std::map<QPDFObjGen, std::string> og_to_name;
                 std::set<std::string> rnames;
@@ -1242,11 +1243,20 @@ QPDFObjectHandle::replaceKey(
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::replaceKeyAndGet(
+QPDFObjectHandle::replaceKeyAndGetNew(
     std::string const& key, QPDFObjectHandle const& value)
 {
     replaceKey(key, value);
     return value;
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::replaceKeyAndGetOld(
+    std::string const& key, QPDFObjectHandle const& value)
+{
+    QPDFObjectHandle old = removeKeyAndGetOld(key);
+    replaceKey(key, value);
+    return old;
 }
 
 void
@@ -1261,7 +1271,7 @@ QPDFObjectHandle::removeKey(std::string const& key)
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::removeKeyAndGet(std::string const& key)
+QPDFObjectHandle::removeKeyAndGetOld(std::string const& key)
 {
     auto result = QPDFObjectHandle::newNull();
     if (isDictionary()) {
