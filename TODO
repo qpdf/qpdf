@@ -124,11 +124,6 @@ JSON v2 fixes
     compatibility, but at least this gives people a namespace they can
     know will never conflict with future keys.
 
-  * Change schema validation so that if the schema contains an array
-    with more than one element, the output has to have an array with
-    the same number of elements whose individual elements are
-    validated according to the regular rules.
-
   * When reading back in, we'll have to call
     pushInheritedAttributesToPage or getAllPages based on the values
     of the metadata.

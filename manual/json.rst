@@ -595,11 +595,17 @@ Documentation
      appears in the corresponding location of the actual output. The
      corresponding output can have any value including ``null``.
 
-   - An array in the help output always contains a single element. It
-     indicates that the corresponding location in the actual output is
-     an array of any length, and that each element of the array has
-     whatever format is implied by the single element of the help
-     output's array.
+   - A single-element array in the help output indicates that the
+     corresponding location in the actual output is either a single
+     item or is an array of any length. The single item or each
+     element of the array has whatever format is implied by the single
+     element of the help output's array.
+
+   - A multi-element array in the help output indicates that the
+     corresponding location in the actual output is an array of the
+     same length. Each element of the output array has whatever format
+     is implied by the corresponding element of the help output's
+     array.
 
    For example, the help output indicates includes a ``"pagelabels"``
    key whose value is an array of one element. That element is a

@@ -179,7 +179,11 @@ test_schema()
       "z": "ebra",
       "o": "ptional"
     }
-  }
+  },
+  "four": [
+    { "first": "first element" },
+    { "second": "second element" }
+  ]
 }
 )");
 
@@ -227,16 +231,27 @@ test_schema()
     "else": {
       "z": "okay"
     }
-  }
+  },
+  "four": [
+    {"first": "missing second"}
+  ]
 }
 )");
 
     check_schema(b, schema, 0, false, "missing items");
-    check_schema(a, a, 0, false, "top-level schema array error");
-    check_schema(b, b, 0, false, "lower-level schema array error");
 
     JSON bad_schema = JSON::parse(R"({"a": true, "b": "potato?"})");
     check_schema(bad_schema, bad_schema, 0, false, "bad schema field type");
+
+    JSON c = JSON::parse(R"(
+{
+  "four": [
+    { "first": 1 },
+    { "oops": [2] }
+  ]
+}
+)");
+    check_schema(c, schema, JSON::f_optional, false, "array element mismatch");
 
     // "two" exercises the case of the JSON containing a single
     // element where the schema has an array.
@@ -262,7 +277,11 @@ test_schema()
     "<objid>": {
       "z": "ebra"
     }
-  }
+  },
+  "four": [
+    { "first": 1 },
+    { "second": [2] }
+  ]
 }
 )");
     check_schema(good, schema, 0, false, "not optional");

@@ -8,7 +8,11 @@
         allow QPDFJob JSON to start accepting multiple items where a
         single item used to be expected without breaking backward
         compatibility. Without this change, the earlier fix to
-        removeAttachment would be a breaking change.
+        removeAttachment would be a breaking change. Also allow the schema
+        to contain a multi-element array, which means that the output has
+        to have an array of the same length in the corresponding location,
+        and each element is validated against the corresponding schema
+        element.
 
         * QPDFObjectHandle: for the methods insertItem, appendItem,
         eraseItem, replaceKey, and removeKey, add a corresponding

@@ -183,25 +183,30 @@ class JSON
     //
     //   * The schema is a nested structure containing dictionaries,
     //     single-element arrays, and strings only.
-    //   * Recursively walk the schema.
-    //   * Whenever the schema has an array of length 1 and the object
-    //     does not have an array in the corresponding location,
-    //     validate the object against the array's single element.
-    //     This effectively enables a single element to appear in
-    //     place of an array and be treated as if it were an array of
-    //     one element. This makes it possible to decide later that
-    //     something that used to contain a single element now allows
-    //     an array without invalidating any old data.
-    //   * If the current value is a dictionary, this object must have
-    //     a dictionary in the same place with the same keys. If flags
-    //     contains f_optional, a key in the schema does not have to
-    //     be present in the object. Otherwise, all keys have to be
-    //     present. Any key in the object must be present in the
-    //     schema.
-    //   * If the current value is an array, this object must have an
-    //     array in the same place. The schema's array must contain a
-    //     single element, which is used as a schema to validate each
-    //     element of this object's corresponding array.
+    //   * Recursively walk the schema. In the items below, "schema
+    //     object" refers to an object in the schema, and "checked
+    //     object" refers to the correspondingi part of the object
+    //     being checked.
+    //   * If the schema object is a dictionary, the checked object
+    //     must have a dictionary in the same place with the same
+    //     keys. If flags contains f_optional, a key in the schema
+    //     does not have to be present in the object. Otherwise, all
+    //     keys have to be present. Any key in the object must be
+    //     present in the schema.
+    //   * If the schema object is an array of length 1, the checked
+    //     object may either be a single item or an array of items.
+    //     The single item or each element of the checked object's
+    //     array is validated against the single element of the
+    //     schema's array. The rationale behind this logic is that a
+    //     single element may appear wherever the schema allows a
+    //     variable-length array. This makes it possible to start
+    //     allowing an array in the future where a single element was
+    //     previously required without breaking backward
+    //     compatibility.
+    //   * If the schema object is an array of length > 1, the checked
+    //     object must be an array of the same length. In this case,
+    //     each element of the checked object array is validated
+    //     against the corresponding element of the schema array.
     //   * Otherwise, the value must be a string whose value is a
     //     description of the object's corresponding value, which may
     //     have any type.

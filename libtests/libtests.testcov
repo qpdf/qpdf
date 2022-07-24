@@ -36,7 +36,6 @@ Pl_PNGFilter decodePaeth 0
 Pl_TIFFPredictor processRow 1
 JSON wanted dictionary 0
 JSON key missing in object 0
-JSON schema array error 0
 JSON key extra in object 0
 QPDFArgParser read args from stdin 0
 QPDFArgParser read args from file 0
@@ -93,3 +92,4 @@ JSON 16 low not after high 0
 JSON 16 dangling high 0
 JSON parse duplicate key 0
 JSON schema array for single item 0
+JSON schema array length mismatch 0

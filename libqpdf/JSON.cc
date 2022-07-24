@@ -538,27 +538,55 @@ JSON::checkSchemaInternal(
             }
         }
     } else if (sch_arr) {
-        if (sch_arr->elements.size() != 1) {
-            QTC::TC("libtests", "JSON schema array error");
-            errors.push_back(
-                err_prefix + " schema array contains other than one item");
-            return false;
-        }
-        if (this_arr) {
-            int i = 0;
-            for (auto const& element: this_arr->elements) {
+        auto n_elements = sch_arr->elements.size();
+        if (n_elements == 1) {
+            // A single-element array in the schema allows a single
+            // element in the object or a variable-length array, each
+            // of whose items must conform to the single element of
+            // the schema array. This doesn't apply to arrays of
+            // arrays -- we fall back to the behavior of allowing a
+            // single item only when the object is not an array.
+            if (this_arr) {
+                int i = 0;
+                for (auto const& element: this_arr->elements) {
+                    checkSchemaInternal(
+                        element.get(),
+                        sch_arr->elements.at(0).get(),
+                        flags,
+                        errors,
+                        prefix + "." + QUtil::int_to_string(i));
+                    ++i;
+                }
+            } else {
+                QTC::TC("libtests", "JSON schema array for single item");
                 checkSchemaInternal(
-                    element.get(),
+                    this_v,
                     sch_arr->elements.at(0).get(),
                     flags,
                     errors,
-                    prefix + "." + QUtil::int_to_string(i));
+                    prefix);
+            }
+        } else if (!this_arr || (this_arr->elements.size() != n_elements)) {
+            QTC::TC("libtests", "JSON schema array length mismatch");
+            errors.push_back(
+                err_prefix + " is supposed to be an array of length " +
+                QUtil::uint_to_string(n_elements));
+            return false;
+        } else {
+            // A multi-element array in the schema must correspond to
+            // an element of the same length in the object. Each
+            // element in the object is validated against the
+            // corresponding element in the schema.
+            size_t i = 0;
+            for (auto const& element: this_arr->elements) {
+                checkSchemaInternal(
+                    element.get(),
+                    sch_arr->elements.at(i).get(),
+                    flags,
+                    errors,
+                    prefix + "." + QUtil::uint_to_string(i));
                 ++i;
             }
-        } else {
-            QTC::TC("libtests", "JSON schema array for single item");
-            checkSchemaInternal(
-                this_v, sch_arr->elements.at(0).get(), flags, errors, prefix);
         }
     } else if (!sch_str) {
         QTC::TC("libtests", "JSON schema other type");
