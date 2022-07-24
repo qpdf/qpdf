@@ -38,7 +38,7 @@ class QPDFObjGen
     {
     }
     QPDF_DLL
-    explicit QPDFObjGen(int obj, int gen = 0) :
+    explicit QPDFObjGen(int obj, int gen) :
         obj(obj),
         gen(gen)
     {
@@ -77,7 +77,7 @@ class QPDFObjGen
     bool
     isIndirect() const
     {
-        return obj > 0;
+        return obj != 0;
     }
     QPDF_DLL
     std::string unparse(char separator = ',') const;

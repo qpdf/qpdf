@@ -1051,7 +1051,7 @@ QPDF::read_xrefStream(qpdf_offset_t xref_offset)
         QPDFObjectHandle xref_obj;
         try {
             xref_obj = readObjectAtOffset(
-                false, xref_offset, "xref stream", QPDFObjGen(), x_og);
+                false, xref_offset, "xref stream", QPDFObjGen(0, 0), x_og);
         } catch (QPDFExc&) {
             // ignore -- report error below
         }
@@ -1333,7 +1333,7 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2, bool overwrite)
         break;
 
     case 2:
-        this->m->xref_table[QPDFObjGen(obj)] = QPDFXRefEntry(f0, f1, f2);
+        this->m->xref_table[QPDFObjGen(obj, 0)] = QPDFXRefEntry(f0, f1, f2);
         break;
 
     default:
@@ -2110,7 +2110,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     // xref table and only cache what would actually be resolved here.
     for (auto const& iter: offsets) {
         int obj = iter.first;
-        QPDFObjGen og(obj);
+        QPDFObjGen og(obj, 0);
         QPDFXRefEntry const& entry = this->m->xref_table[og];
         if ((entry.getType() == 2) &&
             (entry.getObjStreamNumber() == obj_stream_number)) {

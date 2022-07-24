@@ -123,7 +123,6 @@ class QPDFObjectHandle
             Pipeline* pipeline,
             bool suppress_warnings,
             bool will_retry);
-        // The following two overloads are deprecated.
         QPDF_DLL virtual void
         provideStreamData(int objid, int generation, Pipeline* pipeline);
         QPDF_DLL virtual bool provideStreamData(
