@@ -69,24 +69,9 @@ Soon: Break ground on "Document-level work"
 JSON v2 fixes
 =============
 
-* Get rid of separate format for --json and --json-output. Instead,
-  --json-output can just require an outfile and change some defaults
-  like which keys are present and json-stream-data. This makes it
-  easier to support use cases like being able to use information in
-  other top-level keys ("pages", "attachments", etc.) to drive
-  modifications made to objects without having to run qpdf twice. I
-  think --json-output should make the default key be only "qpdf" and
-  the default json-stream-data mode be inline, but make it so you can
-  use --json-stream-data and --json-stream-prefix with --json and
-  --json-keys with --json-output. These would be exactly the same:
-
-  --json-output --json-keys=all -
-  --json --json-stream-data=inline
-
-  And these:
-
-  --json-output -
-  --json --json-stream-data=inline --json-key=qpdf
+* Unify code between QPDFJob::doJSONObjects and QPDF::writeJSON. Make
+  sure that the "qpdf" key is always present when json-output is
+  specified.
 
 * Change the name of the "qpdf-v2" key to "qpdf". Use that in place of
   "objects" and change its content to a two-element array whose first
@@ -114,9 +99,10 @@ JSON v2 fixes
 
   This implies a few things:
 
-  * QPDF::writeJSON will have to take an argument indicating whether
-    additional keys are being written which determines whether it
-    outputs the outer braces or not.
+  * Fix --json-help
+
+  * --json-key=objects is only valid for v1. --json-key=qpdf is only
+    valid for v2.
 
   * This changes the policy about additional extra keys. Have a
     guarantee that qpdf will never add a key whose name is or starts

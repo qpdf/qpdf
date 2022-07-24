@@ -134,8 +134,17 @@ class QPDF
     void updateFromJSON(std::shared_ptr<InputSource>);
 
     // Write qpdf json format to the pipeline "p". The only supported
-    // version is 2. The finish() method is called on the pipeline at
-    // the end. The decode_level parameter controls which streams are
+    // version is 2.
+    //
+    // If the value of "complete" is true, a complete JSON object
+    // containing only the "qpdf" key is written to the pipeline, and
+    // finish() is called on the pipeline at the end. If the value of
+    // "complete" is false, the "qpdf" key and its value are written
+    // to the pipeline assuming that a dictionary is already open, and
+    // finish() is not called. The parameter first_key indicates
+    // whether this is the first key if in-progress dictionary.
+    //
+    // The decode_level parameter controls which streams are
     // uncompressed in the JSON. Use qpdf_dl_none to preserve all
     // stream data exactly as it appears in the input. The possible
     // values for json_stream_data can be found in qpdf/Constants.h
@@ -158,6 +167,8 @@ class QPDF
     void writeJSON(
         int version,
         Pipeline* p,
+        bool complete,
+        bool first_key,
         qpdf_stream_decode_level_e decode_level,
         qpdf_json_stream_data_e json_stream_data,
         std::string const& file_prefix,

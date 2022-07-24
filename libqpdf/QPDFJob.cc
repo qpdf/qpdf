@@ -3381,6 +3381,8 @@ QPDFJob::writeJSON(QPDF& pdf)
     pdf.writeJSON(
         this->m->json_output,
         fp.get(),
+        true,
+        true,
         this->m->decode_level,
         this->m->json_stream_data,
         file_prefix,

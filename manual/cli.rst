@@ -3220,7 +3220,9 @@ Related Options
    This option is repeatable. If given, only the specified top-level
    keys will be included in the JSON output. Otherwise, all keys will
    be included. ``version`` and ``parameters`` will always appear in
-   the output.
+   the output. If not given, all keys will be included, unless
+   :qpdf:ref:`--json-output` was specified, in which case, only the
+   ``"qpdf"`` key will be included by default.
 
 .. qpdf:option:: --json-object={trailer|obj[,gen]}
 
@@ -3241,39 +3243,41 @@ Related Options
 
    .. help: how to handle streams in json output
 
-      When used with --json-output, this option controls whether
-      streams in json output should be omitted, written inline
-      (base64-encoded) or written to a file. If "file" is chosen, the
-      file will be the name of the output file appended with -nnn where
-      nnn is the object number. The prefix can be overridden with
-      --json-stream-prefix.
+      When used with --json, this option controls whether streams in
+      json output should be omitted, written inline (base64-encoded)
+      or written to a file. If "file" is chosen, the file will be the
+      name of the output file appended with -nnn where nnn is the
+      object number. The prefix can be overridden with
+      --json-stream-prefix. The default is "none", except
+      when --json-output is specified, in which case the default is
+      "inline".
 
-   When used with :qpdf:ref:`--json-output`, this option controls
+   When used with :qpdf:ref:`--json`, this option controls
    whether streams in JSON output should be omitted, written inline
    (base64-encoded) or written to a file. If ``file`` is chosen, the
    file will be the name of the output file appended with
    :samp:`-{nnn}` where :samp:`{nnn}` is the object number. The stream
    data file prefix can be overridden with
-   :qpdf:ref:`--json-stream-prefix`. This option only applies when
-   used with :qpdf:ref:`--json-output`.
+   :qpdf:ref:`--json-stream-prefix`. The default value is ``none``,
+   except when :qpdf:ref:`--json-output` is specified, in which case
+   the default is ``inline``.
 
 .. qpdf:option:: --json-stream-prefix=file-prefix
 
    .. help: prefix for json stream data files
 
-      When used with --json-output, --json-stream-data=file-prefix
+      When used with --json-stream-data=file, --json-stream-data=file-prefix
       sets the prefix for stream data files, overriding the default,
       which is to use the output file name. Whatever is given here
       will be appended with -nnn to create the name of the file that
       will contain the data for the stream stream in object nnn.
 
-   When used with :qpdf:ref:`--json-output`,
+   When used with ``--json-stream-data=file``,
    ``--json-stream-data=file-prefix`` sets the prefix for stream data
    files, overriding the default, which is to use the output file
    name. Whatever is given here will be appended with :samp:`-{nnn}`
    to create the name of the file that will contain the data for the
-   stream stream in object :samp:`{nnn}`. This option only applies
-   when used with :qpdf:ref:`--json-output`.
+   stream stream in object :samp:`{nnn}`.
 
 .. qpdf:option:: --json-output[=version]
 
@@ -3288,12 +3292,22 @@ Related Options
    in qpdf JSON format at the given version. ``version`` may be a
    specific version or ``latest`` (the default). The only supported
    version is 2. See also :qpdf:ref:`--json-stream-data` and
-   :qpdf:ref:`--json-stream-prefix`. When this option is specified,
-   the default decode level for stream data is ``none``, but you can
-   override it with :qpdf:ref:`--decode-level`. If you want to look at
-   the contents of streams easily as you would in QDF mode (see
-   :ref:`qdf`), you can use ``--decode-level=generalized`` and
-   ``--json-stream-data=file`` for a convenient way to do that.
+   :qpdf:ref:`--json-stream-prefix`. This option also changes the
+   following defaults:
+
+   - The default value for :qpdf:ref:`--json-stream-data` changes from
+     ``none`` to ``inline``.
+
+   - The default decode level for stream data becomes ``none``, but you can
+     override it with :qpdf:ref:`--decode-level`.
+
+   - Only the ``"qpdf"`` key is included in the JSON output, but you
+     can add additional keys with :qpdf:ref:`--json-key`.
+
+   If you want to look at the contents of streams easily as you would
+   in QDF mode (see :ref:`qdf`), you can use
+   ``--decode-level=generalized`` and ``--json-stream-data=file`` for
+   a convenient way to do that.
 
 .. qpdf:option:: --json-input
 

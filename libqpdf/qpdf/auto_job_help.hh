@@ -821,16 +821,18 @@ objects will be shown.
 )");
 ap.addOptionHelp("--json-stream-data", "json", "how to handle streams in json output", R"(--json-stream-data={none|inline|file}
 
-When used with --json-output, this option controls whether
-streams in json output should be omitted, written inline
-(base64-encoded) or written to a file. If "file" is chosen, the
-file will be the name of the output file appended with -nnn where
-nnn is the object number. The prefix can be overridden with
---json-stream-prefix.
+When used with --json, this option controls whether streams in
+json output should be omitted, written inline (base64-encoded)
+or written to a file. If "file" is chosen, the file will be the
+name of the output file appended with -nnn where nnn is the
+object number. The prefix can be overridden with
+--json-stream-prefix. The default is "none", except
+when --json-output is specified, in which case the default is
+"inline".
 )");
 ap.addOptionHelp("--json-stream-prefix", "json", "prefix for json stream data files", R"(--json-stream-prefix=file-prefix
 
-When used with --json-output, --json-stream-data=file-prefix
+When used with --json-stream-data=file, --json-stream-data=file-prefix
 sets the prefix for stream data files, overriding the default,
 which is to use the output file name. Whatever is given here
 will be appended with -nnn to create the name of the file that

@@ -312,6 +312,9 @@ QPDFJob::Config::jsonOutput(std::string const& parameter)
     if (!o.m->decode_level_set) {
         o.m->decode_level = qpdf_dl_none;
     }
+    if (o.m->json_keys.empty()) {
+        o.m->json_keys.insert("qpdf");
+    }
     return this;
 }
 

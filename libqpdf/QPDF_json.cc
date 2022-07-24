@@ -764,6 +764,8 @@ void
 QPDF::writeJSON(
     int version,
     Pipeline* p,
+    bool complete,
+    bool first_key,
     qpdf_stream_decode_level_e decode_level,
     qpdf_json_stream_data_e json_stream_data,
     std::string const& file_prefix,
@@ -818,7 +820,9 @@ QPDF::writeJSON(
     }
     JSON::writeDictionaryClose(p, first_object, 2);
     JSON::writeDictionaryClose(p, first_qpdf, 1);
-    JSON::writeDictionaryClose(p, first, 0);
-    *p << "\n";
-    p->finish();
+    if (complete) {
+        JSON::writeDictionaryClose(p, first, 0);
+        *p << "\n";
+        p->finish();
+    }
 }
