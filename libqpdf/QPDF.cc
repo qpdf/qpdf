@@ -1060,7 +1060,7 @@ QPDF::read_xrefStream(qpdf_offset_t xref_offset)
         QPDFObjectHandle xref_obj;
         try {
             xref_obj = readObjectAtOffset(
-                false, xref_offset, "xref stream", -1, 0, xobj, xgen);
+                false, xref_offset, "xref stream", 0, 0, xobj, xgen);
         } catch (QPDFExc&) {
             // ignore -- report error below
         }
@@ -1782,10 +1782,25 @@ QPDF::readObjectAtOffset(
     int& objid,
     int& generation)
 {
+    bool check_og = true;
+    if (exp_objid == 0) {
+        // This method uses an expect object ID of 0 to indicate that
+        // we don't know or don't care what the actual object ID is at
+        // this offset. This is true when we read the xref stream and
+        // linearization hint streams. In this case, we don't verify
+        // the expect object ID/generation against what was read from
+        // the file. There is also no reason to attempt xref recovery
+        // if we get a failure in this case since the read attempt was
+        // not triggered by an xref lookup.
+        check_og = false;
+        try_recovery = false;
+    } else {
+        setLastObjectDescription(description, exp_objid, exp_generation);
+    }
+
     if (!this->m->attempt_recovery) {
         try_recovery = false;
     }
-    setLastObjectDescription(description, exp_objid, exp_generation);
 
     // Special case: if offset is 0, just return null.  Some PDF
     // writers, in particular "Mac OS X 10.7.5 Quartz PDFContext", may
@@ -1839,7 +1854,7 @@ QPDF::readObjectAtOffset(
                 "object with ID 0");
         }
 
-        if ((exp_objid >= 0) &&
+        if (check_og &&
             (!((objid == exp_objid) && (generation == exp_generation)))) {
             QTC::TC("qpdf", "QPDF err wrong objid/generation");
             QPDFExc e(
@@ -1859,7 +1874,7 @@ QPDF::readObjectAtOffset(
             }
         }
     } catch (QPDFExc& e) {
-        if ((exp_objid >= 0) && try_recovery) {
+        if (try_recovery) {
             // Try again after reconstructing xref table
             reconstruct_xref(e);
             QPDFObjGen og(exp_objid, exp_generation);
