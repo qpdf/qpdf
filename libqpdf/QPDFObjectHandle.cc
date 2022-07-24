@@ -53,6 +53,24 @@ QPDFObjectHandle::StreamDataProvider::~StreamDataProvider()
 
 void
 QPDFObjectHandle::StreamDataProvider::provideStreamData(
+    QPDFObjGen const& og, Pipeline* pipeline)
+{
+    return provideStreamData(og.getObj(), og.getGen(), pipeline);
+}
+
+bool
+QPDFObjectHandle::StreamDataProvider::provideStreamData(
+    QPDFObjGen const& og,
+    Pipeline* pipeline,
+    bool suppress_warnings,
+    bool will_retry)
+{
+    return provideStreamData(
+        og.getObj(), og.getGen(), pipeline, suppress_warnings, will_retry);
+}
+
+void
+QPDFObjectHandle::StreamDataProvider::provideStreamData(
     int objid, int generation, Pipeline* pipeline)
 {
     throw std::logic_error(
@@ -90,8 +108,7 @@ namespace
         {
         }
         virtual ~CoalesceProvider() = default;
-        virtual void
-        provideStreamData(int objid, int generation, Pipeline* pipeline);
+        virtual void provideStreamData(QPDFObjGen const&, Pipeline* pipeline);
 
       private:
         QPDFObjectHandle containing_page;
@@ -100,7 +117,7 @@ namespace
 } // namespace
 
 void
-CoalesceProvider::provideStreamData(int, int, Pipeline* p)
+CoalesceProvider::provideStreamData(QPDFObjGen const&, Pipeline* p)
 {
     QTC::TC("qpdf", "QPDFObjectHandle coalesce provide stream data");
     std::string description =
@@ -1425,15 +1442,14 @@ namespace
         }
 
         virtual void
-        provideStreamData(int, int, Pipeline* pipeline) override
+        provideStreamData(QPDFObjGen const&, Pipeline* pipeline) override
         {
             p1(pipeline);
         }
 
         virtual bool
         provideStreamData(
-            int,
-            int,
+            QPDFObjGen const&,
             Pipeline* pipeline,
             bool suppress_warnings,
             bool will_retry) override

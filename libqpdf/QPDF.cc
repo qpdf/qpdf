@@ -135,22 +135,19 @@ QPDF::CopiedStreamDataProvider::CopiedStreamDataProvider(
 
 bool
 QPDF::CopiedStreamDataProvider::provideStreamData(
-    int objid,
-    int generation,
+    QPDFObjGen const& og,
     Pipeline* pipeline,
     bool suppress_warnings,
     bool will_retry)
 {
-    std::shared_ptr<ForeignStreamData> foreign_data =
-        this->foreign_stream_data[QPDFObjGen(objid, generation)];
+    std::shared_ptr<ForeignStreamData> foreign_data = foreign_stream_data[og];
     bool result = false;
     if (foreign_data.get()) {
         result = destination_qpdf.pipeForeignStreamData(
             foreign_data, pipeline, suppress_warnings, will_retry);
         QTC::TC("qpdf", "QPDF copy foreign with data", result ? 0 : 1);
     } else {
-        QPDFObjectHandle foreign_stream =
-            this->foreign_streams[QPDFObjGen(objid, generation)];
+        auto foreign_stream = foreign_streams[og];
         result = foreign_stream.pipeStreamData(
             pipeline, nullptr, 0, qpdf_dl_none, suppress_warnings, will_retry);
         QTC::TC(

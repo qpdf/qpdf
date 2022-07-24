@@ -35,7 +35,7 @@ class ImageInverter: public QPDFObjectHandle::StreamDataProvider
   public:
     virtual ~ImageInverter() = default;
     virtual void
-    provideStreamData(int objid, int generation, Pipeline* pipeline) override;
+    provideStreamData(QPDFObjGen const& og, Pipeline* pipeline) override;
 
     void registerImage(
         QPDFObjectHandle image,
@@ -82,12 +82,11 @@ ImageInverter::registerImage(
 }
 
 void
-ImageInverter::provideStreamData(int objid, int generation, Pipeline* pipeline)
+ImageInverter::provideStreamData(QPDFObjGen const& og, Pipeline* pipeline)
 {
     // Use the object and generation number supplied to look up the
     // image data.  Then invert the image data and write the inverted
     // data to the pipeline.
-    QPDFObjGen og(objid, generation);
     std::shared_ptr<Buffer> data =
         this->copied_images[og].getStreamData(qpdf_dl_all);
     size_t size = data->getSize();

@@ -49,8 +49,7 @@ namespace
             size_t oi_min_area,
             QPDFObjectHandle& image);
         virtual ~ImageOptimizer() = default;
-        virtual void
-        provideStreamData(int objid, int generation, Pipeline* pipeline);
+        virtual void provideStreamData(QPDFObjGen const&, Pipeline* pipeline);
         std::shared_ptr<Pipeline>
         makePipeline(std::string const& description, Pipeline* next);
         bool evaluate(std::string const& description);
@@ -250,7 +249,7 @@ ImageOptimizer::evaluate(std::string const& description)
 }
 
 void
-ImageOptimizer::provideStreamData(int, int, Pipeline* pipeline)
+ImageOptimizer::provideStreamData(QPDFObjGen const&, Pipeline* pipeline)
 {
     std::shared_ptr<Pipeline> p = makePipeline("", pipeline);
     if (p.get() == nullptr) {

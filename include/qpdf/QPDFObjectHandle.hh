@@ -116,9 +116,17 @@ class QPDFObjectHandle
         // indicating whether it ran without errors.
         QPDF_DLL
         virtual void
-        provideStreamData(int objid, int generation, Pipeline* pipeline);
+        provideStreamData(QPDFObjGen const& og, Pipeline* pipeline);
         QPDF_DLL
         virtual bool provideStreamData(
+            QPDFObjGen const& og,
+            Pipeline* pipeline,
+            bool suppress_warnings,
+            bool will_retry);
+        // The following two overloads are deprecated.
+        QPDF_DLL virtual void
+        provideStreamData(int objid, int generation, Pipeline* pipeline);
+        QPDF_DLL virtual bool provideStreamData(
             int objid,
             int generation,
             Pipeline* pipeline,

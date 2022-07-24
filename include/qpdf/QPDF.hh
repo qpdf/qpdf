@@ -990,8 +990,7 @@ class QPDF
         CopiedStreamDataProvider(QPDF& destination_qpdf);
         virtual ~CopiedStreamDataProvider() = default;
         virtual bool provideStreamData(
-            int objid,
-            int generation,
+            QPDFObjGen const& og,
             Pipeline* pipeline,
             bool suppress_warnings,
             bool will_retry) override;

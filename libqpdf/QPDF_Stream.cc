@@ -610,17 +610,12 @@ QPDF_Stream::pipeStreamData(
         Pl_Count count("stream provider count", pipeline);
         if (this->stream_provider->supportsRetry()) {
             if (!this->stream_provider->provideStreamData(
-                    og.getObj(),
-                    og.getGen(),
-                    &count,
-                    suppress_warnings,
-                    will_retry)) {
+                    og, &count, suppress_warnings, will_retry)) {
                 filter = false;
                 success = false;
             }
         } else {
-            this->stream_provider->provideStreamData(
-                og.getObj(), og.getGen(), &count);
+            this->stream_provider->provideStreamData(og, &count);
         }
         qpdf_offset_t actual_length = count.getCount();
         qpdf_offset_t desired_length = 0;
