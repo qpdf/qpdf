@@ -111,7 +111,9 @@ class Main:
         classes = set()
         for i in sorted(lib):
             # Find a symbol that looks like a class method.
-            m = re.match(r'(((?:^\S*?::)?(?:[^:\s]+))::([^:\s]+))\(', i)
+            m = re.match(
+                r'(((?:^\S*?::)?(?:[^:\s]+))::([^:\s]+))(?:\[[^\]]+\])?\(',
+                i)
             if m:
                 full = m.group(1)
                 clas = m.group(2)
