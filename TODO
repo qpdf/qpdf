@@ -19,10 +19,6 @@ Pending changes:
   appimage build specifically is setting the runpath, which is
   actually desirable in this case. Make sure to understand and
   document this. Maybe add a check for it in the build.
-* Make job JSON accept a single element and treat as an array of one
-  when an array is expected. This allows for making things repeatable
-  in the future without breaking compatibility and is needed for the
-  remote-attachment fix to be backward-compatible.
 * Decide what to do about #664 (get*Box)
 * Add an option --ignore-encryption to ignore encryption information
   and treat encrypted files as if they weren't encrypted. This should

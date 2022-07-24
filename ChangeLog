@@ -1,5 +1,15 @@
 2022-07-24  Jay Berkenbilt  <ejb@ql.org>
 
+        * include/qpdf/JSON.hh: Schema validation: allow a single item to
+        appear anywhere that the schema has an array of a single item.
+        This makes it possible to change an element of the schema from an
+        item to an array to allow the data to accept an array where a
+        single value was previously required. This change is needed to
+        allow QPDFJob JSON to start accepting multiple items where a
+        single item used to be expected without breaking backward
+        compatibility. Without this change, the earlier fix to
+        removeAttachment would be a breaking change.
+
         * QPDFObjectHandle: for the methods insertItem, appendItem,
         eraseItem, replaceKey, and removeKey, add a corresponding
         "AndGetNew" and/or "AndGetOld" methods. The ones that end with

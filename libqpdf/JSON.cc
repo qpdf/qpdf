@@ -538,26 +538,27 @@ JSON::checkSchemaInternal(
             }
         }
     } else if (sch_arr) {
-        if (!this_arr) {
-            QTC::TC("libtests", "JSON wanted array");
-            errors.push_back(err_prefix + " is supposed to be an array");
-            return false;
-        }
         if (sch_arr->elements.size() != 1) {
             QTC::TC("libtests", "JSON schema array error");
             errors.push_back(
                 err_prefix + " schema array contains other than one item");
             return false;
         }
-        int i = 0;
-        for (auto const& element: this_arr->elements) {
+        if (this_arr) {
+            int i = 0;
+            for (auto const& element: this_arr->elements) {
+                checkSchemaInternal(
+                    element.get(),
+                    sch_arr->elements.at(0).get(),
+                    flags,
+                    errors,
+                    prefix + "." + QUtil::int_to_string(i));
+                ++i;
+            }
+        } else {
+            QTC::TC("libtests", "JSON schema array for single item");
             checkSchemaInternal(
-                element.get(),
-                sch_arr->elements.at(0).get(),
-                flags,
-                errors,
-                prefix + "." + QUtil::int_to_string(i));
-            ++i;
+                this_v, sch_arr->elements.at(0).get(), flags, errors, prefix);
         }
     } else if (!sch_str) {
         QTC::TC("libtests", "JSON schema other type");

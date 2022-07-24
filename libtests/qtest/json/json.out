@@ -4,7 +4,8 @@ top-level object is supposed to be a dictionary
 --- missing items
 json key ".one.a": key "q" is present in schema but missing in object
 json key ".one.a.r" is supposed to be a dictionary
-json key ".one.a.s" is supposed to be an array
+json key ".one.a.s": key "ss" is present in schema but missing in object
+json key ".one.a.s": key "z" is not present in schema but appears in object
 json key ".one.a": key "t" is not present in schema but appears in object
 json key ".three.anything": key "z" is present in schema but missing in object
 json key ".three.anything": key "x" is not present in schema but appears in object

@@ -184,6 +184,14 @@ class JSON
     //   * The schema is a nested structure containing dictionaries,
     //     single-element arrays, and strings only.
     //   * Recursively walk the schema.
+    //   * Whenever the schema has an array of length 1 and the object
+    //     does not have an array in the corresponding location,
+    //     validate the object against the array's single element.
+    //     This effectively enables a single element to appear in
+    //     place of an array and be treated as if it were an array of
+    //     one element. This makes it possible to decide later that
+    //     something that used to contain a single element now allows
+    //     an array without invalidating any old data.
     //   * If the current value is a dictionary, this object must have
     //     a dictionary in the same place with the same keys. If flags
     //     contains f_optional, a key in the schema does not have to

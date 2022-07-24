@@ -162,7 +162,9 @@ test_schema()
         "x": "ecks"
       },
       "s": [
-        "esses"
+        {
+          "ss": "esses"
+        }
       ]
     }
   },
@@ -236,6 +238,8 @@ test_schema()
     JSON bad_schema = JSON::parse(R"({"a": true, "b": "potato?"})");
     check_schema(bad_schema, bad_schema, 0, false, "bad schema field type");
 
+    // "two" exercises the case of the JSON containing a single
+    // element where the schema has an array.
     JSON good = JSON::parse(R"(
 {
   "one": {
@@ -245,17 +249,15 @@ test_schema()
         "x": [1, null]
       },
       "s": [
-        null,
-        "anything"
+        {"ss": null},
+        {"ss": "anything"}
       ]
     }
   },
-  "two": [
-    {
-      "glarp": "enspliel",
-      "goose": 3.14
-    }
-  ],
+  "two": {
+    "glarp": "enspliel",
+    "goose": 3.14
+  },
   "three": {
     "<objid>": {
       "z": "ebra"
