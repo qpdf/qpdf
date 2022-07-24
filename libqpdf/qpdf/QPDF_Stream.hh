@@ -19,8 +19,7 @@ class QPDF_Stream: public QPDFObject
     virtual ~QPDF_Stream() = default;
     static std::shared_ptr<QPDFObject> create(
         QPDF*,
-        int objid,
-        int generation,
+        QPDFObjGen const& og,
         QPDFObjectHandle stream_dict,
         qpdf_offset_t offset,
         size_t length);
@@ -78,7 +77,7 @@ class QPDF_Stream: public QPDFObject
     // Replace object ID and generation.  This may only be called if
     // object ID and generation are 0.  It is used by QPDFObjectHandle
     // when adding streams to files.
-    void setObjGen(int objid, int generation);
+    void setObjGen(QPDFObjGen const& og);
 
   protected:
     virtual void releaseResolved();
@@ -86,8 +85,7 @@ class QPDF_Stream: public QPDFObject
   private:
     QPDF_Stream(
         QPDF*,
-        int objid,
-        int generation,
+        QPDFObjGen const& og,
         QPDFObjectHandle stream_dict,
         qpdf_offset_t offset,
         size_t length);
@@ -111,8 +109,7 @@ class QPDF_Stream: public QPDFObject
     void setDictDescription();
 
     QPDF* qpdf;
-    int objid;
-    int generation;
+    QPDFObjGen og;
     bool filter_on_write;
     QPDFObjectHandle stream_dict;
     qpdf_offset_t offset;

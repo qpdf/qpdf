@@ -23,7 +23,6 @@
 #define QPDFOBJGEN_HH
 
 #include <qpdf/DLL.h>
-#include <qpdf/QUtil.hh>
 #include <iostream>
 
 // This class represents an object ID and generation pair.  It is
@@ -39,7 +38,7 @@ class QPDFObjGen
     {
     }
     QPDF_DLL
-    QPDFObjGen(int obj, int gen) :
+    explicit QPDFObjGen(int obj, int gen) :
         obj(obj),
         gen(gen)
     {
@@ -48,13 +47,19 @@ class QPDFObjGen
     bool
     operator<(QPDFObjGen const& rhs) const
     {
-        return ((obj < rhs.obj) || ((obj == rhs.obj) && (gen < rhs.gen)));
+        return (obj < rhs.obj) || ((obj == rhs.obj) && (gen < rhs.gen));
     }
     QPDF_DLL
     bool
     operator==(QPDFObjGen const& rhs) const
     {
-        return ((obj == rhs.obj) && (gen == rhs.gen));
+        return (obj == rhs.obj) && (gen == rhs.gen);
+    }
+    QPDF_DLL
+    bool
+    operator!=(QPDFObjGen const& rhs) const
+    {
+        return (obj != rhs.obj) || (gen != rhs.gen);
     }
     QPDF_DLL
     int
@@ -69,18 +74,15 @@ class QPDFObjGen
         return gen;
     }
     QPDF_DLL
-    std::string
-    unparse() const
+    bool
+    isIndirect() const
     {
-        return QUtil::int_to_string(obj) + "," + QUtil::int_to_string(gen);
+        return obj != 0;
     }
     QPDF_DLL
-    friend std::ostream&
-    operator<<(std::ostream& os, const QPDFObjGen& og)
-    {
-        os << og.obj << "," << og.gen;
-        return os;
-    }
+    std::string unparse(char separator = ',') const;
+    QPDF_DLL
+    friend std::ostream& operator<<(std::ostream& os, const QPDFObjGen& og);
 
   private:
     // This class does not use the Members pattern to avoid a memory

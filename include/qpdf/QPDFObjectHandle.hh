@@ -116,9 +116,16 @@ class QPDFObjectHandle
         // indicating whether it ran without errors.
         QPDF_DLL
         virtual void
-        provideStreamData(int objid, int generation, Pipeline* pipeline);
+        provideStreamData(QPDFObjGen const& og, Pipeline* pipeline);
         QPDF_DLL
         virtual bool provideStreamData(
+            QPDFObjGen const& og,
+            Pipeline* pipeline,
+            bool suppress_warnings,
+            bool will_retry);
+        QPDF_DLL virtual void
+        provideStreamData(int objid, int generation, Pipeline* pipeline);
+        QPDF_DLL virtual bool provideStreamData(
             int objid,
             int generation,
             Pipeline* pipeline,
@@ -1429,21 +1436,20 @@ class QPDFObjectHandle
 
       private:
         static QPDFObjectHandle
-        newIndirect(QPDF* qpdf, int objid, int generation)
+        newIndirect(QPDF* qpdf, QPDFObjGen const& og)
         {
-            return QPDFObjectHandle::newIndirect(qpdf, objid, generation);
+            return QPDFObjectHandle::newIndirect(qpdf, og);
         }
         static QPDFObjectHandle
         newStream(
             QPDF* qpdf,
-            int objid,
-            int generation,
+            QPDFObjGen const& og,
             QPDFObjectHandle stream_dict,
             qpdf_offset_t offset,
             size_t length)
         {
             return QPDFObjectHandle::newStream(
-                qpdf, objid, generation, stream_dict, offset, length);
+                qpdf, og, stream_dict, offset, length);
         }
         // Reserve an object with a specific ID
         static QPDFObjectHandle
@@ -1550,7 +1556,7 @@ class QPDFObjectHandle
     bool isImage(bool exclude_imagemask = true);
 
   private:
-    QPDFObjectHandle(QPDF*, int objid, int generation);
+    QPDFObjectHandle(QPDF*, QPDFObjGen const& og);
     QPDFObjectHandle(std::shared_ptr<QPDFObject> const&);
 
     enum parser_state_e {
@@ -1563,11 +1569,10 @@ class QPDFObjectHandle
     };
 
     // Private object factory methods
-    static QPDFObjectHandle newIndirect(QPDF*, int objid, int generation);
+    static QPDFObjectHandle newIndirect(QPDF*, QPDFObjGen const& og);
     static QPDFObjectHandle newStream(
         QPDF* qpdf,
-        int objid,
-        int generation,
+        QPDFObjGen const& og,
         QPDFObjectHandle stream_dict,
         qpdf_offset_t offset,
         size_t length);
@@ -1584,7 +1589,6 @@ class QPDFObjectHandle
         bool stop_at_streams);
     void shallowCopyInternal(QPDFObjectHandle& oh, bool first_level_only);
     void releaseResolved();
-    std::string getObjGenAsStr() const;
     static void setObjectDescriptionFromInput(
         QPDFObjectHandle,
         QPDF*,
@@ -1618,8 +1622,7 @@ class QPDFObjectHandle
     // a substantial performance penalty since QPDFObjectHandle
     // objects are copied around so frequently.
     QPDF* qpdf;
-    int objid; // 0 for direct object
-    int generation;
+    QPDFObjGen og;
     std::shared_ptr<QPDFObject> obj;
     bool reserved;
 };

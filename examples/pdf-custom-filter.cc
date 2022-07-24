@@ -201,7 +201,7 @@ class StreamReplacer: public QPDFObjectHandle::StreamDataProvider
     StreamReplacer(QPDF* pdf);
     virtual ~StreamReplacer() = default;
     virtual void
-    provideStreamData(int objid, int generation, Pipeline* pipeline) override;
+    provideStreamData(QPDFObjGen const& og, Pipeline* pipeline) override;
 
     void registerStream(
         QPDFObjectHandle stream,
@@ -384,9 +384,8 @@ StreamReplacer::registerStream(
 }
 
 void
-StreamReplacer::provideStreamData(int objid, int generation, Pipeline* pipeline)
+StreamReplacer::provideStreamData(QPDFObjGen const& og, Pipeline* pipeline)
 {
-    QPDFObjGen og(objid, generation);
     QPDFObjectHandle orig = this->copied_streams[og];
     // call maybeReplace again, this time with the pipeline and no
     // dict_updates. In this mode, maybeReplace doesn't make any

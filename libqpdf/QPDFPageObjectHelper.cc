@@ -21,8 +21,7 @@ namespace
         {
         }
         virtual ~ContentProvider() = default;
-        virtual void
-        provideStreamData(int objid, int generation, Pipeline* pipeline);
+        virtual void provideStreamData(QPDFObjGen const&, Pipeline* pipeline);
 
       private:
         QPDFObjectHandle from_page;
@@ -30,12 +29,11 @@ namespace
 } // namespace
 
 void
-ContentProvider::provideStreamData(int, int, Pipeline* p)
+ContentProvider::provideStreamData(QPDFObjGen const&, Pipeline* p)
 {
     Pl_Concatenate concat("concatenate", p);
-    std::string description = "contents from page object " +
-        QUtil::int_to_string(from_page.getObjectID()) + " " +
-        QUtil::int_to_string(from_page.getGeneration());
+    std::string description =
+        "contents from page object " + from_page.getObjGen().unparse(' ');
     std::string all_description;
     from_page.getKey("/Contents")
         .pipeContentStreams(&concat, description, all_description);

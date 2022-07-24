@@ -252,9 +252,7 @@ QPDF::pushInheritedAttributesToPageInternal(
                 if ((warn_skipped_keys) && (cur_pages.hasKey("/Parent"))) {
                     QTC::TC("qpdf", "QPDF unknown key not inherited");
                     setLastObjectDescription(
-                        "Pages object",
-                        cur_pages.getObjectID(),
-                        cur_pages.getGeneration());
+                        "Pages object", cur_pages.getObjGen());
                     warn(
                         qpdf_e_pages,
                         this->m->last_object_description,

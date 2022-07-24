@@ -49,8 +49,7 @@ namespace
             size_t oi_min_area,
             QPDFObjectHandle& image);
         virtual ~ImageOptimizer() = default;
-        virtual void
-        provideStreamData(int objid, int generation, Pipeline* pipeline);
+        virtual void provideStreamData(QPDFObjGen const&, Pipeline* pipeline);
         std::shared_ptr<Pipeline>
         makePipeline(std::string const& description, Pipeline* next);
         bool evaluate(std::string const& description);
@@ -250,7 +249,7 @@ ImageOptimizer::evaluate(std::string const& description)
 }
 
 void
-ImageOptimizer::provideStreamData(int, int, Pipeline* pipeline)
+ImageOptimizer::provideStreamData(QPDFObjGen const&, Pipeline* pipeline)
 {
     std::shared_ptr<Pipeline> p = makePipeline("", pipeline);
     if (p.get() == nullptr) {
@@ -947,7 +946,7 @@ QPDFJob::doShowObj(QPDF& pdf)
     }
     if (error) {
         throw std::runtime_error(
-            "unable to get object " + obj.getObjGen().unparse());
+            "unable to get object " + obj.getObjGen().unparse(','));
     }
 }
 
@@ -995,7 +994,8 @@ QPDFJob::doListAttachments(QPDF& pdf)
             auto efoh = i.second;
             *this->m->log->getInfo()
                 << key << " -> "
-                << efoh->getEmbeddedFileStream().getObjGen().unparse() << "\n";
+                << efoh->getEmbeddedFileStream().getObjGen().unparse(',')
+                << "\n";
             doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                 auto desc = efoh->getDescription();
                 if (!desc.empty()) {
@@ -1010,7 +1010,7 @@ QPDFJob::doListAttachments(QPDF& pdf)
                 for (auto i2: efoh->getEmbeddedFileStreams().ditems()) {
                     auto efs = QPDFEFStreamObjectHelper(i2.second);
                     v << "    " << i2.first << " -> "
-                      << efs.getObjectHandle().getObjGen().unparse() << "\n";
+                      << efs.getObjectHandle().getObjGen().unparse(',') << "\n";
                     v << "      creation date: " << efs.getCreationDate()
                       << "\n"
                       << "      modification date: " << efs.getModDate() << "\n"
@@ -2463,7 +2463,7 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                 QTC::TC("qpdf", "QPDFJob found resources in non-leaf");
                 doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                     v << "  found resources in non-leaf page node "
-                      << og.getObj() << " " << og.getGen() << "\n";
+                      << og.unparse(' ') << "\n";
                 });
                 return true;
             }
@@ -2480,9 +2480,8 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                     QTC::TC("qpdf", "QPDFJob found shared resources in leaf");
                     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                         v << "  found shared resources in leaf node "
-                          << og.getObj() << " " << og.getGen() << ": "
-                          << resources_og.getObj() << " "
-                          << resources_og.getGen() << "\n";
+                          << og.unparse(' ') << ": "
+                          << resources_og.unparse(' ') << "\n";
                     });
                     return true;
                 }
@@ -2497,8 +2496,7 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                     QTC::TC("qpdf", "QPDFJob found shared xobject in leaf");
                     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                         v << "  found shared xobject in leaf node "
-                          << og.getObj() << " " << og.getGen() << ": "
-                          << xobject_og.getObj() << " " << xobject_og.getGen()
+                          << og.unparse(' ') << ": " << xobject_og.unparse(' ')
                           << "\n";
                     });
                     return true;
@@ -3375,7 +3373,7 @@ QPDFJob::writeJSON(QPDF& pdf)
     auto wanted = getWantedJSONObjects();
     for (auto const& og: wanted) {
         std::ostringstream s;
-        s << "obj:" << og.getObj() << " " << og.getGen() << " R";
+        s << "obj:" << og.unparse(' ') << " R";
         json_objects.insert(s.str());
     }
     pdf.writeJSON(

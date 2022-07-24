@@ -56,6 +56,8 @@ class Provider: public QPDFObjectHandle::StreamDataProvider
     virtual void
     provideStreamData(int objid, int generation, Pipeline* p)
     {
+        // Don't change signature to use QPDFObjGen const& to detect
+        // problems forwarding to legacy implementations.
         p->write(b->getBuffer(), b->getSize());
         if (this->bad_length) {
             unsigned char ch = ' ';

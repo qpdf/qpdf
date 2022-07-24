@@ -29,8 +29,7 @@ class ImageProvider: public QPDFObjectHandle::StreamDataProvider
   public:
     ImageProvider(std::string const& color_space, std::string const& filter);
     virtual ~ImageProvider() = default;
-    virtual void
-    provideStreamData(int objid, int generation, Pipeline* pipeline);
+    virtual void provideStreamData(QPDFObjGen const&, Pipeline* pipeline);
     size_t getWidth() const;
     size_t getHeight() const;
 
@@ -93,7 +92,7 @@ ImageProvider::getHeight() const
 }
 
 void
-ImageProvider::provideStreamData(int objid, int generation, Pipeline* pipeline)
+ImageProvider::provideStreamData(QPDFObjGen const&, Pipeline* pipeline)
 {
     std::vector<std::shared_ptr<Pipeline>> to_delete;
     Pipeline* p = pipeline;
@@ -292,7 +291,7 @@ check(
             ImageProvider* p = new ImageProvider(desired_color_space, "null");
             std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider(p);
             Pl_Buffer b_p("get image data");
-            provider->provideStreamData(0, 0, &b_p);
+            provider->provideStreamData(QPDFObjGen(), &b_p);
             std::shared_ptr<Buffer> desired_data(b_p.getBuffer());
 
             if (desired_data->getSize() != actual_data->getSize()) {

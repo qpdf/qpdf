@@ -137,8 +137,8 @@ QPDF::isLinearized()
         return false;
     }
 
-    QPDFObjectHandle candidate =
-        QPDFObjectHandle::Factory::newIndirect(this, lindict_obj, 0);
+    QPDFObjectHandle candidate = QPDFObjectHandle::Factory::newIndirect(
+        this, QPDFObjGen(lindict_obj, 0));
     if (!candidate.isDictionary()) {
         return false;
     }
@@ -325,11 +325,10 @@ QPDF::readLinearizationData()
 QPDFObjectHandle
 QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
 {
-    int obj;
-    int gen;
+    QPDFObjGen og;
     QPDFObjectHandle H = readObjectAtOffset(
-        false, offset, "linearization hint stream", 0, 0, obj, gen);
-    ObjCache& oc = this->m->obj_cache[QPDFObjGen(obj, gen)];
+        false, offset, "linearization hint stream", QPDFObjGen(0, 0), og);
+    ObjCache& oc = this->m->obj_cache[og];
     qpdf_offset_t min_end_offset = oc.end_before_space;
     qpdf_offset_t max_end_offset = oc.end_after_space;
     if (!H.isStream()) {
@@ -707,7 +706,7 @@ QPDF::getUncompressedObject(
         return obj;
     } else {
         int repl = (*(object_stream_data.find(obj.getObjectID()))).second;
-        return objGenToIndirect(QPDFObjGen(repl, 0));
+        return getObjectByObjGen(QPDFObjGen(repl, 0));
     }
 }
 
@@ -1144,12 +1143,6 @@ QPDF::dumpHGeneric(HGeneric& t)
         << "group_length: " << t.group_length << "\n";
 }
 
-QPDFObjectHandle
-QPDF::objGenToIndirect(QPDFObjGen const& og)
-{
-    return getObjectByID(og.getObj(), og.getGen());
-}
-
 void
 QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 {
@@ -1388,9 +1381,9 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         stopOnError("found other than one root while"
                     " calculating linearization data");
     }
-    this->m->part4.push_back(objGenToIndirect(*(lc_root.begin())));
+    this->m->part4.push_back(getObjectByObjGen(*(lc_root.begin())));
     for (auto const& og: lc_open_document) {
-        this->m->part4.push_back(objGenToIndirect(og));
+        this->m->part4.push_back(getObjectByObjGen(og));
     }
 
     // Part 6: first page objects.  Note: implementation note 124
@@ -1419,11 +1412,11 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     // hint tables.
 
     for (auto const& og: lc_first_page_private) {
-        this->m->part6.push_back(objGenToIndirect(og));
+        this->m->part6.push_back(getObjectByObjGen(og));
     }
 
     for (auto const& og: lc_first_page_shared) {
-        this->m->part6.push_back(objGenToIndirect(og));
+        this->m->part6.push_back(getObjectByObjGen(og));
     }
 
     // Place the outline dictionary if it goes in the first page section.
@@ -1469,7 +1462,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         for (auto const& og: this->m->obj_user_to_objects[ou]) {
             if (lc_other_page_private.count(og)) {
                 lc_other_page_private.erase(og);
-                this->m->part7.push_back(objGenToIndirect(og));
+                this->m->part7.push_back(getObjectByObjGen(og));
                 ++this->m->c_page_offset_data.entries.at(i).nobjects;
             }
         }
@@ -1486,7 +1479,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     // Order is unimportant.
     for (auto const& og: lc_other_page_shared) {
-        this->m->part8.push_back(objGenToIndirect(og));
+        this->m->part8.push_back(getObjectByObjGen(og));
     }
 
     // Part 9: other objects
@@ -1508,7 +1501,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     for (auto const& og: pages_ogs) {
         if (lc_other.count(og)) {
             lc_other.erase(og);
-            this->m->part9.push_back(objGenToIndirect(og));
+            this->m->part9.push_back(getObjectByObjGen(og));
         }
     }
 
@@ -1538,7 +1531,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
             for (auto const& og: ogs) {
                 if (lc_thumbnail_private.count(og)) {
                     lc_thumbnail_private.erase(og);
-                    this->m->part9.push_back(objGenToIndirect(og));
+                    this->m->part9.push_back(getObjectByObjGen(og));
                 }
             }
         }
@@ -1551,7 +1544,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     // Place shared thumbnail objects
     for (auto const& og: lc_thumbnail_shared) {
-        this->m->part9.push_back(objGenToIndirect(og));
+        this->m->part9.push_back(getObjectByObjGen(og));
     }
 
     // Place outlines unless in first page
@@ -1561,7 +1554,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     // Place all remaining objects
     for (auto const& og: lc_other) {
-        this->m->part9.push_back(objGenToIndirect(og));
+        this->m->part9.push_back(getObjectByObjGen(og));
     }
 
     // Make sure we got everything exactly once.
@@ -1663,7 +1656,7 @@ QPDF::pushOutlinesToPart(
     lc_outlines.erase(outlines_og);
     part.push_back(outlines);
     for (auto const& og: lc_outlines) {
-        part.push_back(objGenToIndirect(og));
+        part.push_back(getObjectByObjGen(og));
         ++this->m->c_outline_data.nobjects;
     }
 }

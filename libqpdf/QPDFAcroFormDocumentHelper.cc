@@ -991,8 +991,8 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                     } else {
                         parent.warnIfPossible(
                             "while traversing field " +
-                            obj.getObjGen().unparse() + ", found parent (" +
-                            parent_og.unparse() +
+                            obj.getObjGen().unparse(',') + ", found parent (" +
+                            parent_og.unparse(',') +
                             ") that had not been seen, indicating likely"
                             " invalid field structure");
                     }

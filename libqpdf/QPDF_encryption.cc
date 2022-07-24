@@ -1075,8 +1075,7 @@ QPDF::initializeEncryption()
 std::string
 QPDF::getKeyForObject(
     std::shared_ptr<EncryptionParameters> encp,
-    int objid,
-    int generation,
+    QPDFObjGen const& og,
     bool use_aes)
 {
     if (!encp->encrypted) {
@@ -1084,26 +1083,24 @@ QPDF::getKeyForObject(
             "request for encryption key in non-encrypted PDF");
     }
 
-    if (!((objid == encp->cached_key_objid) &&
-          (generation == encp->cached_key_generation))) {
+    if (og != encp->cached_key_og) {
         encp->cached_object_encryption_key = compute_data_key(
             encp->encryption_key,
-            objid,
-            generation,
+            og.getObj(),
+            og.getGen(),
             use_aes,
             encp->encryption_V,
             encp->encryption_R);
-        encp->cached_key_objid = objid;
-        encp->cached_key_generation = generation;
+        encp->cached_key_og = og;
     }
 
     return encp->cached_object_encryption_key;
 }
 
 void
-QPDF::decryptString(std::string& str, int objid, int generation)
+QPDF::decryptString(std::string& str, QPDFObjGen const& og)
 {
-    if (objid == 0) {
+    if (!og.isIndirect()) {
         return;
     }
     bool use_aes = false;
@@ -1139,8 +1136,7 @@ QPDF::decryptString(std::string& str, int objid, int generation)
         }
     }
 
-    std::string key =
-        getKeyForObject(this->m->encp, objid, generation, use_aes);
+    std::string key = getKeyForObject(this->m->encp, og, use_aes);
     try {
         if (use_aes) {
             QTC::TC("qpdf", "QPDF_encryption aes decode string");
@@ -1175,9 +1171,8 @@ QPDF::decryptString(std::string& str, int objid, int generation)
             this->m->file->getName(),
             this->m->last_object_description,
             this->m->file->getLastOffset(),
-            "error decrypting string for object " +
-                QUtil::int_to_string(objid) + " " +
-                QUtil::int_to_string(generation) + ": " + e.what());
+            "error decrypting string for object " + og.unparse() + ": " +
+                e.what());
     }
 }
 
@@ -1187,8 +1182,7 @@ QPDF::decryptStream(
     std::shared_ptr<InputSource> file,
     QPDF& qpdf_for_warning,
     Pipeline*& pipeline,
-    int objid,
-    int generation,
+    QPDFObjGen const& og,
     QPDFObjectHandle& stream_dict,
     std::vector<std::shared_ptr<Pipeline>>& heap)
 {
@@ -1283,7 +1277,7 @@ QPDF::decryptStream(
             break;
         }
     }
-    std::string key = getKeyForObject(encp, objid, generation, use_aes);
+    std::string key = getKeyForObject(encp, og, use_aes);
     std::shared_ptr<Pipeline> new_pipeline;
     if (use_aes) {
         QTC::TC("qpdf", "QPDF_encryption aes decode stream");
