@@ -10,7 +10,7 @@ Pl_OStream::Members::Members(std::ostream& os) :
 }
 
 Pl_OStream::Pl_OStream(char const* identifier, std::ostream& os) :
-    Pipeline(identifier, 0),
+    Pipeline(identifier, nullptr),
     m(new Members(os))
 {
 }

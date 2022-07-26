@@ -82,7 +82,7 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
             result = this->m->dest_dict.getKey(name.getName());
         }
     } else if (name.isString()) {
-        if (0 == this->m->names_dest.get()) {
+        if (nullptr == this->m->names_dest.get()) {
             QPDFObjectHandle names = this->qpdf.getRoot().getKey("/Names");
             if (names.isDictionary()) {
                 QPDFObjectHandle dests = names.getKey("/Dests");

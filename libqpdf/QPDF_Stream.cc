@@ -169,7 +169,7 @@ QPDF_Stream::getFilterOnWrite() const
 void
 QPDF_Stream::releaseResolved()
 {
-    this->stream_provider = 0;
+    this->stream_provider = nullptr;
     QPDFObjectHandle::ReleaseResolver::releaseResolved(this->stream_dict);
 }
 
@@ -313,7 +313,7 @@ QPDF_Stream::setDescription(QPDF* qpdf, std::string const& description)
 void
 QPDF_Stream::setDictDescription()
 {
-    QPDF* qpdf = 0;
+    QPDF* qpdf = nullptr;
     std::string description;
     if ((!this->stream_dict.hasObjectDescription()) &&
         getDescription(qpdf, description)) {
@@ -547,7 +547,7 @@ QPDF_Stream::pipeStreamData(
                                           : 3);
     }
 
-    if (pipeline == 0) {
+    if (pipeline == nullptr) {
         QTC::TC("qpdf", "QPDF_Stream pipeStreamData with null pipeline");
         // Return value is whether we can filter in this case.
         return filter;
@@ -693,7 +693,7 @@ QPDF_Stream::replaceStreamData(
     QPDFObjectHandle const& decode_parms)
 {
     this->stream_data = data;
-    this->stream_provider = 0;
+    this->stream_provider = nullptr;
     replaceFilterData(filter, decode_parms, data->getSize());
 }
 
@@ -704,7 +704,7 @@ QPDF_Stream::replaceStreamData(
     QPDFObjectHandle const& decode_parms)
 {
     this->stream_provider = provider;
-    this->stream_data = 0;
+    this->stream_data = nullptr;
     replaceFilterData(filter, decode_parms, 0);
 }
 

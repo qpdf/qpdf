@@ -7,7 +7,7 @@
 #include <string.h>
 
 Pl_QPDFTokenizer::Members::Members() :
-    filter(0),
+    filter(nullptr),
     buf("tokenizer buffer")
 {
 }
@@ -68,7 +68,8 @@ Pl_QPDFTokenizer::finish()
         }
     }
     this->m->filter->handleEOF();
-    QPDFObjectHandle::TokenFilter::PipelineAccessor::setPipeline(m->filter, 0);
+    QPDFObjectHandle::TokenFilter::PipelineAccessor::setPipeline(
+        m->filter, nullptr);
     Pipeline* next = this->getNext(true);
     if (next) {
         next->finish();

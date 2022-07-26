@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 // This is a simple StreamDataProvider that writes image data for an
 // orange square of the given width and height.

@@ -37,7 +37,7 @@
 // of running this example on test files that are specifically crafted
 // for it.
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 class Pl_XOR: public Pipeline
 {
@@ -447,8 +447,8 @@ main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
 
-    char const* infilename = 0;
-    char const* outfilename = 0;
+    char const* infilename = nullptr;
+    char const* outfilename = nullptr;
     bool decode_specialized = false;
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--decode-specialized") == 0) {

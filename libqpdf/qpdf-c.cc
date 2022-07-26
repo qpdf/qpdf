@@ -164,7 +164,7 @@ qpdf_cleanup(qpdf_data* qpdf)
             << (*qpdf)->error->what() << "\n";
     }
     delete *qpdf;
-    *qpdf = 0;
+    *qpdf = nullptr;
 }
 
 size_t
@@ -203,11 +203,11 @@ qpdf_get_error(qpdf_data qpdf)
 {
     if (qpdf->error.get()) {
         qpdf->tmp_error.exc = qpdf->error;
-        qpdf->error = 0;
+        qpdf->error = nullptr;
         QTC::TC("qpdf", "qpdf-c qpdf_get_error returned error");
         return &qpdf->tmp_error;
     } else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -220,14 +220,14 @@ qpdf_next_warning(qpdf_data qpdf)
         QTC::TC("qpdf", "qpdf-c qpdf_next_warning returned warning");
         return &qpdf->tmp_error;
     } else {
-        return 0;
+        return nullptr;
     }
 }
 
 char const*
 qpdf_get_error_full_text(qpdf_data qpdf, qpdf_error e)
 {
-    if (e == 0) {
+    if (e == nullptr) {
         return "";
     }
     return e->exc->what();
@@ -236,7 +236,7 @@ qpdf_get_error_full_text(qpdf_data qpdf, qpdf_error e)
 enum qpdf_error_code_e
 qpdf_get_error_code(qpdf_data qpdf, qpdf_error e)
 {
-    if (e == 0) {
+    if (e == nullptr) {
         return qpdf_e_success;
     }
     return e->exc->getErrorCode();
@@ -245,7 +245,7 @@ qpdf_get_error_code(qpdf_data qpdf, qpdf_error e)
 char const*
 qpdf_get_error_filename(qpdf_data qpdf, qpdf_error e)
 {
-    if (e == 0) {
+    if (e == nullptr) {
         return "";
     }
     return e->exc->getFilename().c_str();
@@ -254,7 +254,7 @@ qpdf_get_error_filename(qpdf_data qpdf, qpdf_error e)
 unsigned long long
 qpdf_get_error_file_position(qpdf_data qpdf, qpdf_error e)
 {
-    if (e == 0) {
+    if (e == nullptr) {
         return 0;
     }
     return QIntC::to_ulonglong(e->exc->getFilePosition());
@@ -263,7 +263,7 @@ qpdf_get_error_file_position(qpdf_data qpdf, qpdf_error e)
 char const*
 qpdf_get_error_message_detail(qpdf_data qpdf, qpdf_error e)
 {
-    if (e == 0) {
+    if (e == nullptr) {
         return "";
     }
     return e->exc->getMessageDetail().c_str();
@@ -371,7 +371,7 @@ qpdf_get_user_password(qpdf_data qpdf)
 char const*
 qpdf_get_info_key(qpdf_data qpdf, char const* key)
 {
-    char const* result = 0;
+    char const* result = nullptr;
     QPDFObjectHandle trailer = qpdf->qpdf->getTrailer();
     if (trailer.hasKey("/Info")) {
         QPDFObjectHandle info = trailer.getKey("/Info");
@@ -383,14 +383,14 @@ qpdf_get_info_key(qpdf_data qpdf, char const* key)
             }
         }
     }
-    QTC::TC("qpdf", "qpdf-c get_info_key", (result == 0 ? 0 : 1));
+    QTC::TC("qpdf", "qpdf-c get_info_key", (result == nullptr ? 0 : 1));
     return result;
 }
 
 void
 qpdf_set_info_key(qpdf_data qpdf, char const* key, char const* value)
 {
-    if ((key == 0) || (std::strlen(key) == 0) || (key[0] != '/')) {
+    if ((key == nullptr) || (std::strlen(key) == 0) || (key[0] != '/')) {
         return;
     }
     QPDFObjectHandle value_object;
@@ -498,11 +498,11 @@ qpdf_init_write_internal(qpdf_data qpdf)
 {
     if (qpdf->qpdf_writer.get()) {
         QTC::TC("qpdf", "qpdf-c called qpdf_init_write multiple times");
-        qpdf->qpdf_writer = 0;
+        qpdf->qpdf_writer = nullptr;
         if (qpdf->output_buffer.get()) {
-            qpdf->output_buffer = 0;
+            qpdf->output_buffer = nullptr;
             qpdf->write_memory = false;
-            qpdf->filename = 0;
+            qpdf->filename = nullptr;
         }
     }
 }
@@ -530,7 +530,7 @@ qpdf_init_write_memory(qpdf_data qpdf)
 static void
 qpdf_get_buffer_internal(qpdf_data qpdf)
 {
-    if (qpdf->write_memory && (qpdf->output_buffer == 0)) {
+    if (qpdf->write_memory && (qpdf->output_buffer == nullptr)) {
         qpdf->output_buffer = qpdf->qpdf_writer->getBufferSharedPointer();
     }
 }
@@ -549,7 +549,7 @@ qpdf_get_buffer_length(qpdf_data qpdf)
 unsigned char const*
 qpdf_get_buffer(qpdf_data qpdf)
 {
-    unsigned char const* result = 0;
+    unsigned char const* result = nullptr;
     qpdf_get_buffer_internal(qpdf);
     if (qpdf->output_buffer.get()) {
         result = qpdf->output_buffer->getBuffer();

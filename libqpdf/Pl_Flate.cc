@@ -13,7 +13,7 @@ Pl_Flate::Members::Members(size_t out_bufsize, action_e action) :
     out_bufsize(out_bufsize),
     action(action),
     initialized(false),
-    zdata(0)
+    zdata(nullptr)
 {
     this->outbuf = QUtil::make_shared_array<unsigned char>(out_bufsize);
     // Indirect through zdata to reach the z_stream so we don't have
@@ -29,10 +29,10 @@ Pl_Flate::Members::Members(size_t out_bufsize, action_e action) :
     }
 
     z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
-    zstream.zalloc = 0;
-    zstream.zfree = 0;
-    zstream.opaque = 0;
-    zstream.next_in = 0;
+    zstream.zalloc = nullptr;
+    zstream.zfree = nullptr;
+    zstream.opaque = nullptr;
+    zstream.next_in = nullptr;
     zstream.avail_in = 0;
     zstream.next_out = this->outbuf.get();
     zstream.avail_out = QIntC::to_uint(out_bufsize);
@@ -50,7 +50,7 @@ Pl_Flate::Members::~Members()
     }
 
     delete static_cast<z_stream*>(this->zdata);
-    this->zdata = 0;
+    this->zdata = nullptr;
 }
 
 Pl_Flate::Pl_Flate(
@@ -86,7 +86,7 @@ Pl_Flate::warn(char const* msg, int code)
 void
 Pl_Flate::write(unsigned char const* data, size_t len)
 {
-    if (this->m->outbuf.get() == 0) {
+    if (this->m->outbuf.get() == nullptr) {
         throw std::logic_error(
             this->identifier +
             ": Pl_Flate: write() called after finish() called");
@@ -227,7 +227,7 @@ Pl_Flate::finish()
                 checkError("End", err);
             }
 
-            this->m->outbuf = 0;
+            this->m->outbuf = nullptr;
         }
     } catch (std::exception& e) {
         try {

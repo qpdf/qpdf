@@ -69,7 +69,7 @@ InputSource::findFirst(
             " too small or too large of a character sequence");
     }
 
-    char* p = 0;
+    char* p = nullptr;
     qpdf_offset_t buf_offset = offset;
     size_t bytes_read = 0;
 
@@ -86,7 +86,8 @@ InputSource::findFirst(
         // If p points to buf[size], since strlen(start_chars) is
         // always >= 1, this overflow test will be correct for that
         // case regardless of start_chars.
-        if ((p == 0) || ((p + strlen(start_chars)) > (buf + bytes_read))) {
+        if ((p == nullptr) ||
+            ((p + strlen(start_chars)) > (buf + bytes_read))) {
             if (p) {
                 QTC::TC(
                     "libtests",
@@ -117,7 +118,7 @@ InputSource::findFirst(
                  memchr(
                      p,
                      start_chars[0],
-                     bytes_read - QIntC::to_size(p - buf)))) != 0) {
+                     bytes_read - QIntC::to_size(p - buf)))) != nullptr) {
             if (p == buf) {
                 QTC::TC("libtests", "InputSource found match at buf[0]");
             }

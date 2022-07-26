@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 void
 usage()
@@ -142,7 +142,8 @@ main(int argc, char* argv[])
                 // pipeStreamData with a null pipeline to determine
                 // whether the image is filterable.  Directly inspect
                 // keys to determine the image type.
-                if (image.pipeStreamData(0, qpdf_ef_compress, qpdf_dl_all) &&
+                if (image.pipeStreamData(
+                        nullptr, qpdf_ef_compress, qpdf_dl_all) &&
                     color_space.isNameAndEquals("/DeviceGray") &&
                     bits_per_component.isInteger() &&
                     (bits_per_component.getIntValue() == 8)) {

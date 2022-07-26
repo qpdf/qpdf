@@ -25,7 +25,7 @@ BufferInputSource::BufferInputSource(
 
 BufferInputSource::BufferInputSource(
     std::string const& description, std::string const& contents) :
-    m(new Members(true, description, 0))
+    m(new Members(true, description, nullptr))
 {
     this->m->buf = new Buffer(contents.length());
     this->m->max_offset = QIntC::to_offset(this->m->buf->getSize());

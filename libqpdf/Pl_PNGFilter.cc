@@ -22,10 +22,10 @@ Pl_PNGFilter::Pl_PNGFilter(
     unsigned int bits_per_sample) :
     Pipeline(identifier, next),
     action(action),
-    cur_row(0),
-    prev_row(0),
-    buf1(0),
-    buf2(0),
+    cur_row(nullptr),
+    prev_row(nullptr),
+    buf1(nullptr),
+    buf2(nullptr),
     pos(0)
 {
     if (samples_per_pixel < 1) {
@@ -243,7 +243,7 @@ Pl_PNGFilter::finish()
         // write partial row
         processRow();
     }
-    this->prev_row = 0;
+    this->prev_row = nullptr;
     this->cur_row = buf1.get();
     this->pos = 0;
     memset(this->cur_row, 0, this->bytes_per_row + 1);

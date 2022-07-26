@@ -3,7 +3,7 @@
 // Exercised in md5 test suite
 
 Pl_Discard::Pl_Discard() :
-    Pipeline("discard", 0)
+    Pipeline("discard", nullptr)
 {
 }
 

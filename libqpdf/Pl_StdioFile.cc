@@ -12,7 +12,7 @@ Pl_StdioFile::Members::Members(FILE* f) :
 }
 
 Pl_StdioFile::Pl_StdioFile(char const* identifier, FILE* f) :
-    Pipeline(identifier, 0),
+    Pipeline(identifier, nullptr),
     m(new Members(f))
 {
 }

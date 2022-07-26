@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 void
 usage()

@@ -265,7 +265,7 @@ QPDFObjectHandle::releaseResolved()
     // destruction.  See comments in QPDF::~QPDF().
     if (isIndirect()) {
         if (this->obj.get()) {
-            this->obj = 0;
+            this->obj = nullptr;
         }
     } else {
         QPDFObject::ObjAccessor::releaseResolved(this->obj.get());
@@ -780,7 +780,7 @@ QPDFObjectHandle::getArrayItem(int n)
             typeWarning("array", "returning null");
             QTC::TC("qpdf", "QPDFObjectHandle array null for non-array");
         }
-        QPDF* context = 0;
+        QPDF* context = nullptr;
         std::string description;
         if (this->obj->getDescription(context, description)) {
             result.setObjectDescription(
@@ -998,7 +998,7 @@ QPDFObjectHandle::getKey(std::string const& key)
         typeWarning("dictionary", "returning null for attempted key retrieval");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary null for getKey");
         result = newNull();
-        QPDF* qpdf = 0;
+        QPDF* qpdf = nullptr;
         std::string description;
         if (this->obj->getDescription(qpdf, description)) {
             result.setObjectDescription(
@@ -1655,7 +1655,7 @@ QPDFObjectHandle::coalesceContentStreams()
         return;
     }
     QPDF* qpdf = getOwningQPDF();
-    if (qpdf == 0) {
+    if (qpdf == nullptr) {
         // Should not be possible for a page object to not have an
         // owning PDF unless it was manually constructed in some
         // incorrect way. However, it can happen in a PDF file whose
@@ -1772,7 +1772,7 @@ QPDFObjectHandle::parse(
     QPDFTokenizer tokenizer;
     bool empty = false;
     QPDFObjectHandle result =
-        parse(input, object_description, tokenizer, empty, 0, context);
+        parse(input, object_description, tokenizer, empty, nullptr, context);
     size_t offset = QIntC::to_size(input->tell());
     while (offset < object_str.length()) {
         if (!isspace(object_str.at(offset))) {
@@ -1908,8 +1908,8 @@ QPDFObjectHandle::parseContentStream_data(
         tokenizer.readToken(input, "content", true);
         qpdf_offset_t offset = input->getLastOffset();
         input->seek(offset, SEEK_SET);
-        QPDFObjectHandle obj =
-            parseInternal(input, "content", tokenizer, empty, 0, context, true);
+        QPDFObjectHandle obj = parseInternal(
+            input, "content", tokenizer, empty, nullptr, context, true);
         if (!obj.isInitialized()) {
             // EOF
             break;
@@ -2185,7 +2185,7 @@ QPDFObjectHandle::parseInternal(
                     (olist.at(olist.size() - 1).isInteger()) &&
                     (!olist.at(olist.size() - 2).isIndirect()) &&
                     (olist.at(olist.size() - 2).isInteger())) {
-                    if (context == 0) {
+                    if (context == nullptr) {
                         QTC::TC(
                             "qpdf",
                             "QPDFObjectHandle indirect without context");
@@ -2661,7 +2661,7 @@ QPDFObjectHandle::newStream(
 QPDFObjectHandle
 QPDFObjectHandle::newStream(QPDF* qpdf)
 {
-    if (qpdf == 0) {
+    if (qpdf == nullptr) {
         throw std::runtime_error(
             "attempt to create stream in null qpdf object");
     }
@@ -2905,7 +2905,7 @@ QPDFObjectHandle::typeWarning(
 void
 QPDFObjectHandle::warnIfPossible(std::string const& warning)
 {
-    QPDF* context = 0;
+    QPDF* context = nullptr;
     std::string description;
     if (dereference() && obj->getDescription(context, description)) {
         warn(context, QPDFExc(qpdf_e_damaged_pdf, "", description, 0, warning));
@@ -3112,10 +3112,10 @@ QPDFObjectHandle::dereference()
         QPDF::Resolver::objectChanged(this->qpdf, getObjGen(), this->obj)) {
         this->obj = nullptr;
     }
-    if (this->obj.get() == 0) {
+    if (this->obj.get() == nullptr) {
         std::shared_ptr<QPDFObject> obj =
             QPDF::Resolver::resolve(this->qpdf, getObjGen());
-        if (obj.get() == 0) {
+        if (obj.get() == nullptr) {
             // QPDF::resolve never returns an uninitialized object, but
             // check just in case.
             this->obj = QPDF_Null::create();

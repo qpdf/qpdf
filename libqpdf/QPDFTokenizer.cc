@@ -17,7 +17,7 @@
 static bool
 is_delimiter(char ch)
 {
-    return (strchr(" \t\n\v\f\r()<>[]{}/%", ch) != 0);
+    return (strchr(" \t\n\v\f\r()<>[]{}/%", ch) != nullptr);
 }
 
 namespace
@@ -158,7 +158,7 @@ QPDFTokenizer::resolveLiteral()
                     num[0] = this->m->val.at(i + 1);
                     num[1] = this->m->val.at(i + 2);
                     num[2] = '\0';
-                    char ch2 = static_cast<char>(strtol(num, 0, 16));
+                    char ch2 = static_cast<char>(strtol(num, nullptr, 16));
                     if (ch2 == '\0') {
                         this->m->type = tt_bad;
                         QTC::TC("qpdf", "QPDFTokenizer null in name");
@@ -323,7 +323,7 @@ QPDFTokenizer::presentCharacter(char ch)
             // We've accumulated \ddd.  PDF Spec says to ignore
             // high-order overflow.
             this->m->val +=
-                static_cast<char>(strtol(this->m->bs_num_register, 0, 8));
+                static_cast<char>(strtol(this->m->bs_num_register, nullptr, 8));
             memset(
                 this->m->bs_num_register,
                 '\0',
@@ -447,7 +447,7 @@ QPDFTokenizer::presentCharacter(char ch)
             for (unsigned int i = 0; i < this->m->val.length(); i += 2) {
                 num[0] = this->m->val.at(i);
                 num[1] = this->m->val.at(i + 1);
-                char nch = static_cast<char>(strtol(num, 0, 16));
+                char nch = static_cast<char>(strtol(num, nullptr, 16));
                 nval += nch;
             }
             this->m->val = nval;

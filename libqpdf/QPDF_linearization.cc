@@ -542,7 +542,7 @@ QPDF::checkLinearizationInternal()
 
     // T: offset of whitespace character preceding xref entry for object 0
     this->m->file->seek(p.xref_zero_offset, SEEK_SET);
-    while (1) {
+    while (true) {
         char ch;
         this->m->file->read(&ch, 1);
         if (!((ch == ' ') || (ch == '\r') || (ch == '\n'))) {

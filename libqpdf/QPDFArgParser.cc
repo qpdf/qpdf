@@ -30,7 +30,7 @@ QPDFArgParser::QPDFArgParser(
     m(new Members(argc, argv, progname_env))
 {
     selectHelpOptionTable();
-    char const* help_choices[] = {"all", 0};
+    char const* help_choices[] = {"all", nullptr};
     // More help choices are added dynamically.
     addChoices(
         "help", bindParam(&QPDFArgParser::argHelp, this), false, help_choices);
@@ -254,7 +254,7 @@ QPDFArgParser::handleArgFileArguments()
     // deleted by using shared pointers to back the pointers in argv.
     this->m->new_argv.push_back(QUtil::make_shared_cstr(this->m->argv[0]));
     for (int i = 1; i < this->m->argc; ++i) {
-        char const* argfile = 0;
+        char const* argfile = nullptr;
         if ((strlen(this->m->argv[i]) > 1) && (this->m->argv[i][0] == '@')) {
             argfile = 1 + this->m->argv[i];
             if (strcmp(argfile, "-") != 0) {

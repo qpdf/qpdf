@@ -14,7 +14,7 @@ Pipeline::Pipeline(char const* identifier, Pipeline* next) :
 Pipeline*
 Pipeline::getNext(bool allow_null)
 {
-    if ((this->next == 0) && (!allow_null)) {
+    if ((this->next == nullptr) && (!allow_null)) {
         throw std::logic_error(
             this->identifier +
             ": Pipeline::getNext() called on pipeline with no next");

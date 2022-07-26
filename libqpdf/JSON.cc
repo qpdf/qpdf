@@ -204,7 +204,7 @@ JSON::JSON_blob::write(Pipeline* p, size_t) const
 void
 JSON::write(Pipeline* p, size_t depth) const
 {
-    if (0 == this->m->value.get()) {
+    if (nullptr == this->m->value.get()) {
         *p << "null";
     } else {
         this->m->value->write(p, depth);
@@ -270,7 +270,7 @@ JSON
 JSON::addDictionaryMember(std::string const& key, JSON const& val)
 {
     JSON_dictionary* obj = dynamic_cast<JSON_dictionary*>(this->m->value.get());
-    if (0 == obj) {
+    if (nullptr == obj) {
         throw std::runtime_error(
             "JSON::addDictionaryMember called on non-dictionary");
     }
@@ -286,7 +286,7 @@ bool
 JSON::checkDictionaryKeySeen(std::string const& key)
 {
     JSON_dictionary* obj = dynamic_cast<JSON_dictionary*>(this->m->value.get());
-    if (0 == obj) {
+    if (nullptr == obj) {
         throw std::logic_error(
             "JSON::checkDictionaryKey called on non-dictionary");
     }
@@ -307,7 +307,7 @@ JSON
 JSON::addArrayElement(JSON const& val)
 {
     JSON_array* arr = dynamic_cast<JSON_array*>(this->m->value.get());
-    if (0 == arr) {
+    if (nullptr == arr) {
         throw std::runtime_error("JSON::addArrayElement called on non-array");
     }
     if (val.m->value.get()) {
