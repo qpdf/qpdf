@@ -56,8 +56,33 @@ QPDFNameTreeObjectHelper::newEmpty(QPDF& qpdf, bool auto_repair)
 
 QPDFNameTreeObjectHelper::iterator::iterator(
     std::shared_ptr<NNTreeIterator> const& i) :
-    impl(i)
+    impl(i),
+    ivalue(new value_type)
 {
+}
+
+QPDFNameTreeObjectHelper::iterator::iterator(
+    QPDFNameTreeObjectHelper::iterator const& other) :
+    impl(other.impl),
+    ivalue(new value_type(*(other.ivalue)))
+{
+}
+
+QPDFNameTreeObjectHelper::iterator&
+QPDFNameTreeObjectHelper::iterator::operator=(
+    QPDFNameTreeObjectHelper::iterator const& other)
+{
+    if (this == &other) {
+        return *this;
+    }
+    impl = other.impl;
+    *ivalue = *(other.ivalue);
+    return *this;
+}
+
+QPDFNameTreeObjectHelper::iterator::~iterator()
+{
+    delete ivalue;
 }
 
 bool
@@ -87,11 +112,11 @@ QPDFNameTreeObjectHelper::iterator::updateIValue()
 {
     if (impl->valid()) {
         auto p = *impl;
-        this->ivalue.first = p->first.getUTF8Value();
-        this->ivalue.second = p->second;
+        this->ivalue->first = p->first.getUTF8Value();
+        this->ivalue->second = p->second;
     } else {
-        this->ivalue.first = "";
-        this->ivalue.second = QPDFObjectHandle();
+        this->ivalue->first = "";
+        this->ivalue->second = QPDFObjectHandle();
     }
 }
 
@@ -99,14 +124,14 @@ QPDFNameTreeObjectHelper::iterator::reference
 QPDFNameTreeObjectHelper::iterator::operator*()
 {
     updateIValue();
-    return this->ivalue;
+    return *(this->ivalue);
 }
 
 QPDFNameTreeObjectHelper::iterator::pointer
 QPDFNameTreeObjectHelper::iterator::operator->()
 {
     updateIValue();
-    return &this->ivalue;
+    return this->ivalue;
 }
 
 bool

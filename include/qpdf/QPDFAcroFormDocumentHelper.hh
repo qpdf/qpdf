@@ -159,7 +159,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     // Return top-level form fields for a page.
     QPDF_DLL
     std::vector<QPDFFormFieldObjectHelper>
-        getFormFieldsForPage(QPDFPageObjectHelper);
+    getFormFieldsForPage(QPDFPageObjectHelper const&);
 
     // Return the terminal field that is associated with this
     // annotation. If the annotation dictionary is merged with the

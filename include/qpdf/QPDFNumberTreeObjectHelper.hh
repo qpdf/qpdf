@@ -97,7 +97,12 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
         using pointer = T*;
         using reference = T&;
 
-        virtual ~iterator() = default;
+        QPDF_DLL
+        iterator(iterator const&);
+        QPDF_DLL
+        iterator& operator=(iterator const&);
+        QPDF_DLL
+        virtual ~iterator();
         QPDF_DLL
         bool valid() const;
         QPDF_DLL
@@ -156,7 +161,7 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
 
         iterator(std::shared_ptr<NNTreeIterator> const&);
         std::shared_ptr<NNTreeIterator> impl;
-        value_type ivalue;
+        value_type* ivalue;
     };
 
     // The iterator looks like map iterator, so i.first is a string

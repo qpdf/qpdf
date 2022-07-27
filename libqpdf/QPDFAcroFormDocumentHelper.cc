@@ -220,7 +220,7 @@ QPDFAcroFormDocumentHelper::getWidgetAnnotationsForPage(QPDFPageObjectHelper h)
 }
 
 std::vector<QPDFFormFieldObjectHelper>
-QPDFAcroFormDocumentHelper::getFormFieldsForPage(QPDFPageObjectHelper ph)
+QPDFAcroFormDocumentHelper::getFormFieldsForPage(QPDFPageObjectHelper const& ph)
 {
     analyze();
     std::set<QPDFObjGen> added;
