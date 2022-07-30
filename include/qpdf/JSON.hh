@@ -65,16 +65,26 @@ class JSON
     QPDF_DLL
     void write(Pipeline*, size_t depth = 0) const;
 
-    // Helper methods for writing JSON incrementally. Several methods
-    // take a `bool& first` parameter. The open methods always set it
-    // to true, and the methods to output items always set it to
-    // false. This way, the item and close methods can always know
-    // whether or not a first item is being written. The intended mode
-    // of operation is to start with `bool first = true` (though it
-    // doesn't matter how it's initialized) and just pass the same
-    // `first` through to all the methods, letting the JSON object use
-    // it to keep track of when it's writing a first object and when
-    // it's not.
+    // Helper methods for writing JSON incrementally.
+    //
+    // "first" -- Several methods take a `bool& first` parameter. The
+    // open methods always set it to true, and the methods to output
+    // items always set it to false. This way, the item and close
+    // methods can always know whether or not a first item is being
+    // written. The intended mode of operation is to start with a new
+    // `bool first = true` each time a new container is opened and
+    // to pass that `first` through to all the methods that are
+    // called to add top-level items to the container as well as to
+    // close the container. This lets the JSON object use it to keep
+    // track of when it's writing a first object and when it's not. If
+    // incrementally writing multiple levels of depth, a new `first`
+    // should used for each new container that is opened.
+    //
+    // "depth" -- Indicate the level of depth. This is used for
+    // consistent indentation. When writing incrementally, whenever
+    // you call a method to add an item to a container, the value of
+    // `depth` should be one more than whatever value is passed to the
+    // container open and close methods.
 
     // Open methods ignore the value of first and set it to false
     QPDF_DLL
@@ -106,9 +116,12 @@ class JSON
         Pipeline*, bool& first, JSON const& element, size_t depth = 0);
     // If writing nested structures incrementally, call writeNext
     // before opening a new array or container in the midst of an
-    // existing one. The first you pass to writeNext should be the one
-    // for the parent object. Then start a new first for the nested
-    // item.
+    // existing one. The `first` you pass to writeNext should be the
+    // one for the parent object. The depth should be the one for the
+    // child object. Then start a new `first` for the nested item.
+    // Note that writeDictionaryKey and writeArrayItem call writeNext
+    // for you, so this is most important when writing subsequent
+    // items or container openers to an array.
     QPDF_DLL
     static void writeNext(Pipeline* p, bool& first, size_t depth = 0);
 

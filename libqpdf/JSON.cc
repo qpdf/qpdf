@@ -56,7 +56,7 @@ JSON::writeNext(Pipeline* p, bool& first, size_t depth)
         *p << ",";
     }
     *p << "\n";
-    writeIndent(p, 1 + depth);
+    writeIndent(p, depth);
 }
 
 void
@@ -102,7 +102,7 @@ JSON::writeDictionaryItem(
     size_t depth)
 {
     writeDictionaryKey(p, first, key, depth);
-    value.write(p, 1 + depth);
+    value.write(p, depth);
 }
 
 void
@@ -110,7 +110,7 @@ JSON::writeArrayItem(
     Pipeline* p, bool& first, JSON const& element, size_t depth)
 {
     writeNext(p, first, depth);
-    element.write(p, 1 + depth);
+    element.write(p, depth);
 }
 
 void
@@ -119,7 +119,7 @@ JSON::JSON_dictionary::write(Pipeline* p, size_t depth) const
     bool first = true;
     writeDictionaryOpen(p, first, depth);
     for (auto const& iter: members) {
-        writeDictionaryItem(p, first, iter.first, iter.second, depth);
+        writeDictionaryItem(p, first, iter.first, iter.second, 1 + depth);
     }
     writeDictionaryClose(p, first, depth);
 }
@@ -130,7 +130,7 @@ JSON::JSON_array::write(Pipeline* p, size_t depth) const
     bool first = true;
     writeArrayOpen(p, first, depth);
     for (auto const& element: elements) {
-        writeArrayItem(p, first, element, depth);
+        writeArrayItem(p, first, element, 1 + depth);
     }
     writeArrayClose(p, first, depth);
 }

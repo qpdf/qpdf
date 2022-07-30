@@ -739,7 +739,7 @@ QPDF::writeJSONStream(
         obj.getStreamJSON(
             version, json_stream_data, decode_level, stream_p, filename));
 
-    JSON::writeDictionaryItem(p, first, key, j, 2);
+    JSON::writeDictionaryItem(p, first, key, j, 3);
     if (f) {
         f_pl->finish();
         f_pl = nullptr;
@@ -757,7 +757,7 @@ QPDF::writeJSONObject(
 {
     auto j = JSON::makeDictionary();
     j.addDictionaryMember("value", obj.getJSON(version, true));
-    JSON::writeDictionaryItem(p, first, key, j, 2);
+    JSON::writeDictionaryItem(p, first, key, j, 3);
 }
 
 void
@@ -774,19 +774,23 @@ QPDF::writeJSON(
             "QPDF::writeJSON: only version 2 is supported");
     }
     bool first = true;
-    JSON::writeDictionaryOpen(p, first, 0);
-    JSON::writeDictionaryKey(p, first, "qpdf-v2", 0);
+    if (complete) {
+        JSON::writeDictionaryOpen(p, first, 0);
+    } else {
+        first = first_key;
+    }
+    JSON::writeDictionaryKey(p, first, "qpdf-v2", 1);
     bool first_qpdf = true;
-    JSON::writeDictionaryOpen(p, first_qpdf, 1);
+    JSON::writeDictionaryOpen(p, first_qpdf, 2);
     JSON::writeDictionaryItem(
-        p, first_qpdf, "pdfversion", JSON::makeString(getPDFVersion()), 1);
+        p, first_qpdf, "pdfversion", JSON::makeString(getPDFVersion()), 2);
     JSON::writeDictionaryItem(
         p,
         first_qpdf,
         "maxobjectid",
         JSON::makeInt(QIntC::to_longlong(getObjectCount())),
-        1);
-    JSON::writeDictionaryKey(p, first_qpdf, "objects", 1);
+        2);
+    JSON::writeDictionaryKey(p, first_qpdf, "objects", 2);
     bool first_object = true;
     JSON::writeDictionaryOpen(p, first_object, 2);
     bool all_objects = wanted_objects.empty();
