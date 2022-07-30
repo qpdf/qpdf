@@ -1072,6 +1072,7 @@ class QPDF
             st_initial,
             st_top,
             st_qpdf,
+            st_qpdf_meta,
             st_objects,
             st_trailer,
             st_object_top,
@@ -1097,7 +1098,9 @@ class QPDF
         bool errors;
         bool parse_error;
         bool saw_qpdf;
+        bool saw_qpdf_meta;
         bool saw_objects;
+        bool saw_json_version;
         bool saw_pdf_version;
         bool saw_trailer;
         state_e state;

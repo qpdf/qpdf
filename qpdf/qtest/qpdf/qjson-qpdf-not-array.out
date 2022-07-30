@@ -1,0 +1,5 @@
+WARNING: qjson-qpdf-not-array.json (offset 12): "qpdf" must be an array
+WARNING: qjson-qpdf-not-array.json: "qpdf[0].jsonversion" was not seen
+WARNING: qjson-qpdf-not-array.json: "qpdf[0].pdfversion" was not seen
+WARNING: qjson-qpdf-not-array.json: "qpdf[1]" was not seen
+qpdf: qjson-qpdf-not-array.json: errors found in JSON

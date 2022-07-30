@@ -2,17 +2,20 @@
   "comment": [
     "We allow and ignore other top-level keys"
   ],
-  "qpdf-v2": {
-    "pdfversion": "2.0",
-    "maybe-future-key": {
-      "x": [
-        "Lots of times we ignore things",
-        "for forward-compatibility so we don't have",
-        "to change the version number if we add stuff",
-        "in the future"
-      ]
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "2.0",
+      "maybe-future-key": {
+        "x": [
+          "Lots of times we ignore things",
+          "for forward-compatibility so we don't have",
+          "to change the version number if we add stuff",
+          "in the future"
+        ]
+      }
     },
-    "objects": {
+    {
       "obj:3 0 R": {
         "value": {
           "/Contents": "4 0 R",
@@ -141,5 +144,5 @@
         }
       }
     }
-  }
+  ]
 }

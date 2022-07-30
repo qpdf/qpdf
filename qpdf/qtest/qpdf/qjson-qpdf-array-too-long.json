@@ -6,8 +6,6 @@
       "maxobjectid": 6
     },
     {
-      "potato": {
-      },
       "obj:1 0 R": {
         "value": {
           "/Pages": "2 0 R",
@@ -68,6 +66,7 @@
           "/Size": 7
         }
       }
-    }
+    },
+    "this doesn't belong here"
   ]
 }

@@ -1,6 +1,9 @@
 {
-  "qpdf-v2": {
-    "pdfversion": "1.7",
-    "objects": false
-  }
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "1.7"
+    },
+    false
+  ]
 }

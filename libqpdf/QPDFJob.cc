@@ -1741,6 +1741,9 @@ QPDFJob::json_out_schema_v1()
 void
 QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
 {
+    // qpdf guarantees that no new top-level keys whose names start
+    // with "xdata" will be added. These are reserved for users.
+
     std::string captured_json;
     std::shared_ptr<Pl_String> pl_str;
     if (this->m->test_json_schema) {

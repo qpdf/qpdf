@@ -1,8 +1,13 @@
 {
-  "qpdf-v2": {
-    "pdfversion": "2.0",
-    "maxobjectid": 10,
-    "objects": {
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "2.0",
+      "pushedinheritedpageresources": false,
+      "calledgetallpages": false,
+      "maxobjectid": 10
+    },
+    {
       "obj:1 0 R": {
         "value": {
           "/Pages": "3 0 R",
@@ -146,5 +151,5 @@
         }
       }
     }
-  }
+  ]
 }

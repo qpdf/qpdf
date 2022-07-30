@@ -1,6 +1,9 @@
 {
-  "qpdf-v2": {
-    "objects": {
+  "qpdf": [
+    {
+      "jsonversion": 2
+    },
+    {
       "obj:4 0 R": {
         "stream": {
           "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo=",
@@ -16,5 +19,5 @@
         }
       }
     }
-  }
+  ]
 }

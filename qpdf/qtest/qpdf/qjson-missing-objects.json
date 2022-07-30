@@ -1,6 +1,9 @@
 {
-  "qpdf-v2": {
-    "pdfversion": "1.3",
-    "maxobjectid": 6
-  }
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "1.3",
+      "maxobjectid": 6
+    }
+  ]
 }

@@ -256,16 +256,33 @@ qpdf JSON Output
 
 The format of the JSON written by qpdf's :qpdf:ref:`--json-output`
 flag or the ``QPDF::writeJSON`` API call is a JSON object consisting
-of a single key: ``"qpdf-v2"``. Any other top-level keys are ignored.
-While unknown keys in other places are ignored for future
-compatibility, in this case, ignoring other top-level keys is an
-explicit decision to allow users to include other keys for their own
-use. No new top-level keys will be added in JSON version 2.
+of a single key: ``"qpdf"``. This may be the only key, or it may be
+embedded in the output of ``qpdf --json``. Unknown keys are ignored
+for future compatibility. It is guaranteed that qpdf will never add
+any keys whose names start with ``xdata``, so users are free to add
+their own metadata using keys whose names start with ``xdata`` without
+fear of clashing with a future version of qpdf.
 
-The ``"qpdf-v2"`` key points to a JSON object with the following keys:
+The ``"qpdf"`` key points to a two-element JSON array. The first element is
+a JSON object with the following keys:
+
+- ``"jsonversion"`` -- a number indicating the JSON version used for
+  writing. This will always be ``2``.
 
 - ``"pdfversion"`` -- a string containing PDF version as indicated in
   the PDF header (e.g. ``"1.7"``, ``"2.0"``)
+
+- ``pushedinheritedpageresources`` -- a boolean indicating whether
+  the library pushed inherited resources down to the page level.
+  Certain library calls cause this to happen, and qpdf needs to know
+  when reading a JSON file back in whether it should do this as it may
+  cause certain objects to be renumbered.
+
+- ``calledgetallpages`` -- a boolean indicating whether
+  ``getAllPages`` was called prior to writing the JSON output. This
+  method causes page tree repair to occur, which may renumber some
+  objects (in very rare cases of corrupted page trees), so qpdf needs
+  to know this information when reading a JSON file back in.
 
 - ``"maxobjectid"`` -- a number indicating the object ID of the
   highest numbered object in the file. This is provided to make it
@@ -280,8 +297,8 @@ The ``"qpdf-v2"`` key points to a JSON object with the following keys:
   dangling references and says to treat them as nulls. This can happen
   if objects are removed from a PDF file.)
 
-- ``"objects"`` -- the actual PDF objects as described in
-  :ref:`json.objects`.
+The second element is a JSON object containing the actual PDF objects
+as described in :ref:`json.objects`.
 
 Note that writing JSON output is done by ``QPDF``, not ``QPDFWriter``.
 As such, none of the things ``QPDFWriter`` does apply. This includes
@@ -302,10 +319,15 @@ qpdf JSON format.
 .. code-block:: json
 
    {
-     "qpdf-v2": {
-       "pdfversion": "1.3",
-       "maxobjectid": 5,
-       "objects": {
+     "qpdf": [
+       {
+         "jsonversion": 2,
+         "pdfversion": "1.3",
+         "pushedinheritedpageresources": false,
+         "calledgetallpages": false,
+         "maxobjectid": 5,
+       },
+       {
          "obj:1 0 R": {
            "value": {
              "/Pages": "2 0 R",
@@ -359,7 +381,7 @@ qpdf JSON format.
            }
          }
        }
-     }
+     ]
    }
 
 .. _json.input:

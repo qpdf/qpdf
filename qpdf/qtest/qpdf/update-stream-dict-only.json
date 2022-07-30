@@ -1,8 +1,11 @@
 {
-  "qpdf-v2": {
-    "pdfversion": "2.0",
-    "maxobjectid": 9,
-    "objects": {
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "2.0",
+      "maxobjectid": 9
+    },
+    {
       "obj:4 0 R": {
         "stream": {
           "dict": {
@@ -11,5 +14,5 @@
         }
       }
     }
-  }
+  ]
 }

@@ -226,7 +226,9 @@ QPDF::JSONReactor::JSONReactor(
     errors(false),
     parse_error(false),
     saw_qpdf(false),
+    saw_qpdf_meta(false),
     saw_objects(false),
+    saw_json_version(false),
     saw_pdf_version(false),
     saw_trailer(false),
     state(st_initial),
@@ -292,17 +294,21 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
             QTC::TC("qpdf", "QPDF_json missing qpdf");
             error(0, "\"qpdf\" object was not seen");
         } else {
+            if (!this->saw_json_version) {
+                QTC::TC("qpdf", "QPDF_json missing json version");
+                error(0, "\"qpdf[0].jsonversion\" was not seen");
+            }
             if (must_be_complete && !this->saw_pdf_version) {
                 QTC::TC("qpdf", "QPDF_json missing pdf version");
-                error(0, "\"qpdf-v2.pdfversion\" was not seen");
+                error(0, "\"qpdf[0].pdfversion\" was not seen");
             }
             if (!this->saw_objects) {
                 QTC::TC("qpdf", "QPDF_json missing objects");
-                error(0, "\"qpdf-v2.objects\" was not seen");
+                error(0, "\"qpdf[1]\" was not seen");
             } else {
                 if (must_be_complete && !this->saw_trailer) {
                     QTC::TC("qpdf", "QPDF_json missing trailer");
-                    error(0, "\"qpdf-v2.objects.trailer\" was not seen");
+                    error(0, "\"qpdf[1].trailer\" was not seen");
                 }
             }
         }
@@ -421,16 +427,22 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
         QTC::TC("qpdf", "QPDF_json ignoring in st_ignore");
         // ignore
     } else if (state == st_top) {
-        if (key == "qpdf-v2") {
+        if (key == "qpdf") {
             this->saw_qpdf = true;
-            nestedState(key, value, st_qpdf);
+            if (!value.isArray()) {
+                QTC::TC("qpdf", "QPDF_json qpdf not array");
+                error(value.getStart(), "\"qpdf\" must be an array");
+                next_state = st_ignore;
+                parse_error = true;
+            } else {
+                next_state = st_qpdf;
+            }
         } else {
-            // Ignore all other fields. We explicitly allow people to
-            // add other top-level keys for their own use.
+            // Ignore all other fields.
             QTC::TC("qpdf", "QPDF_json ignoring unknown top-level key");
             next_state = st_ignore;
         }
-    } else if (state == st_qpdf) {
+    } else if (state == st_qpdf_meta) {
         if (key == "pdfversion") {
             this->saw_pdf_version = true;
             bool version_okay = false;
@@ -447,9 +459,20 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                 QTC::TC("qpdf", "QPDF_json bad pdf version");
                 error(value.getStart(), "invalid PDF version (must be x.y)");
             }
-        } else if (key == "objects") {
-            this->saw_objects = true;
-            nestedState(key, value, st_objects);
+        } else if (key == "jsonversion") {
+            this->saw_json_version = true;
+            bool version_okay = false;
+            std::string v;
+            if (value.getNumber(v)) {
+                std::string version;
+                if (QUtil::string_to_int(v.c_str()) == 2) {
+                    version_okay = true;
+                }
+            }
+            if (!version_okay) {
+                QTC::TC("qpdf", "QPDF_json bad json version");
+                error(value.getStart(), "invalid JSON version (must be 2)");
+            }
         } else {
             // ignore unknown keys for forward compatibility and to
             // skip keys we don't care about like "maxobjectid".
@@ -601,6 +624,20 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
 bool
 QPDF::JSONReactor::arrayItem(JSON const& value)
 {
+    if (state == st_qpdf) {
+        if (!this->saw_qpdf_meta) {
+            this->saw_qpdf_meta = true;
+            nestedState("qpdf[0]", value, st_qpdf_meta);
+        } else if (!this->saw_objects) {
+            this->saw_objects = true;
+            nestedState("qpdf[1]", value, st_objects);
+        } else {
+            QTC::TC("qpdf", "QPDF_json more than two qpdf elements");
+            error(value.getStart(), "\"qpdf\" must have two elements");
+            next_state = st_ignore;
+            parse_error = true;
+        }
+    }
     if (state == st_object) {
         if (!parse_error) {
             auto tos = object_stack.back();
@@ -771,30 +808,60 @@ QPDF::writeJSON(
     std::string const& file_prefix,
     std::set<std::string> wanted_objects)
 {
+    int const depth_outer = 1;
+    int const depth_top = 1;
+    int const depth_qpdf = 2;
+    int const depth_qpdf_inner = 3;
+
     if (version != 2) {
         throw std::runtime_error(
             "QPDF::writeJSON: only version 2 is supported");
     }
     bool first = true;
     if (complete) {
-        JSON::writeDictionaryOpen(p, first, 0);
+        JSON::writeDictionaryOpen(p, first, depth_outer);
     } else {
         first = first_key;
     }
-    JSON::writeDictionaryKey(p, first, "qpdf-v2", 1);
+    JSON::writeDictionaryKey(p, first, "qpdf", depth_top);
     bool first_qpdf = true;
-    JSON::writeDictionaryOpen(p, first_qpdf, 2);
-    JSON::writeDictionaryItem(
-        p, first_qpdf, "pdfversion", JSON::makeString(getPDFVersion()), 2);
+    JSON::writeArrayOpen(p, first_qpdf, depth_top);
+    JSON::writeNext(p, first_qpdf, depth_qpdf);
+    bool first_qpdf_inner = true;
+    JSON::writeDictionaryOpen(p, first_qpdf_inner, depth_qpdf);
     JSON::writeDictionaryItem(
         p,
-        first_qpdf,
+        first_qpdf_inner,
+        "jsonversion",
+        JSON::makeInt(version),
+        depth_qpdf_inner);
+    JSON::writeDictionaryItem(
+        p,
+        first_qpdf_inner,
+        "pdfversion",
+        JSON::makeString(getPDFVersion()),
+        depth_qpdf_inner);
+    JSON::writeDictionaryItem(
+        p,
+        first_qpdf_inner,
+        "pushedinheritedpageresources",
+        JSON::makeBool(everPushedInheritedAttributesToPages()),
+        depth_qpdf_inner);
+    JSON::writeDictionaryItem(
+        p,
+        first_qpdf_inner,
+        "calledgetallpages",
+        JSON::makeBool(everCalledGetAllPages()),
+        depth_qpdf_inner);
+    JSON::writeDictionaryItem(
+        p,
+        first_qpdf_inner,
         "maxobjectid",
         JSON::makeInt(QIntC::to_longlong(getObjectCount())),
-        2);
-    JSON::writeDictionaryKey(p, first_qpdf, "objects", 2);
-    bool first_object = true;
-    JSON::writeDictionaryOpen(p, first_object, 2);
+        depth_qpdf_inner);
+    JSON::writeDictionaryClose(p, first_qpdf_inner, depth_qpdf);
+    JSON::writeNext(p, first_qpdf, depth_qpdf);
+    JSON::writeDictionaryOpen(p, first_qpdf_inner, depth_qpdf);
     bool all_objects = wanted_objects.empty();
     for (auto& obj: getAllObjects()) {
         std::string key = "obj:" + obj.unparse();
@@ -803,23 +870,23 @@ QPDF::writeJSON(
                 writeJSONStream(
                     version,
                     p,
-                    first_object,
+                    first_qpdf_inner,
                     key,
                     obj,
                     decode_level,
                     json_stream_data,
                     file_prefix);
             } else {
-                writeJSONObject(version, p, first_object, key, obj);
+                writeJSONObject(version, p, first_qpdf_inner, key, obj);
             }
         }
     }
     if (all_objects || wanted_objects.count("trailer")) {
         auto trailer = getTrailer();
-        writeJSONObject(version, p, first_object, "trailer", trailer);
+        writeJSONObject(version, p, first_qpdf_inner, "trailer", trailer);
     }
-    JSON::writeDictionaryClose(p, first_object, 2);
-    JSON::writeDictionaryClose(p, first_qpdf, 1);
+    JSON::writeDictionaryClose(p, first_qpdf_inner, depth_qpdf);
+    JSON::writeArrayClose(p, first_qpdf, depth_top);
     if (complete) {
         JSON::writeDictionaryClose(p, first, 0);
         *p << "\n";

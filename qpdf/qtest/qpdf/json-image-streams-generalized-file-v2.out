@@ -1,8 +1,13 @@
 {
-  "qpdf-v2": {
-    "pdfversion": "1.3",
-    "maxobjectid": 30,
-    "objects": {
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "1.3",
+      "pushedinheritedpageresources": false,
+      "calledgetallpages": false,
+      "maxobjectid": 30
+    },
+    {
       "obj:12 0 R": {
         "stream": {
           "datafile": "auto-12",
@@ -38,5 +43,5 @@
         }
       }
     }
-  }
+  ]
 }

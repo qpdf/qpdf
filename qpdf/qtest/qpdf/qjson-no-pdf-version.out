@@ -1,2 +1,3 @@
-WARNING: qjson-no-pdf-version.json: "qpdf-v2.pdfversion" was not seen
+WARNING: qjson-no-pdf-version.json: "qpdf[0].jsonversion" was not seen
+WARNING: qjson-no-pdf-version.json: "qpdf[0].pdfversion" was not seen
 qpdf: qjson-no-pdf-version.json: errors found in JSON

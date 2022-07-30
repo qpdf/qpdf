@@ -84,15 +84,13 @@ JSON v2 fixes
     "qpdf": [
       {
         "jsonversion": 2,
+        "pdfversion": "1.3",
         "pushedinheritedpageresources": false,
         "calledgetallpages": false,
         "maxobjectid": 10
       },
       {
-        "pdfversion": "1.3",
-        "objects": {
-          ...
-        }
+        ... objects ...
       }
     ]
   }

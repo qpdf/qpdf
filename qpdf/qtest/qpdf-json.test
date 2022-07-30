@@ -18,6 +18,8 @@ my $n_tests = 0;
 
 my @badfiles = (
     'no-qpdf-object',
+    'qpdf-not-array',
+    'qpdf-array-too-long',
     'no-pdf-version',
     'top-level-scalar',
     'bad-pdf-version1',

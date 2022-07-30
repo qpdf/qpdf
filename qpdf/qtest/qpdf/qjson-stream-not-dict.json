@@ -1,10 +1,13 @@
 {
-  "qpdf-v2": {
-    "pdfversion": "1.7",
-    "objects": {
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "1.7"
+    },
+    {
       "obj:1 0 R": {
         "stream": 3
       }
     }
-  }
+  ]
 }
