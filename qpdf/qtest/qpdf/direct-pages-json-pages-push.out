@@ -29,7 +29,7 @@
     {
       "jsonversion": 2,
       "pdfversion": "1.3",
-      "pushedinheritedpageresources": false,
+      "pushedinheritedpageresources": true,
       "calledgetallpages": true,
       "maxobjectid": 8
     },

@@ -61,6 +61,10 @@ foreach my $d (@json_files)
                        @$xargs, $in]},
                  {$td->FILE => "$out-v1.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
+    for (@$xargs)
+    {
+        s/--json-key=objects/--json-key=qpdf/;
+    }
     $td->runtest("json v2 $out",
                  {$td->COMMAND =>
                       ['qpdf', '--json=2', '--test-json-schema', @$xargs, $in]},

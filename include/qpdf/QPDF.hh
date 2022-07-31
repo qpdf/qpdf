@@ -142,7 +142,8 @@ class QPDF
     // "complete" is false, the "qpdf" key and its value are written
     // to the pipeline assuming that a dictionary is already open, and
     // finish() is not called. The parameter first_key indicates
-    // whether this is the first key if in-progress dictionary.
+    // whether this is the first key in an in-progress dictionary. It
+    // will be set to false by writeJSON.
     //
     // The decode_level parameter controls which streams are
     // uncompressed in the JSON. Use qpdf_dl_none to preserve all
@@ -168,7 +169,7 @@ class QPDF
         int version,
         Pipeline* p,
         bool complete,
-        bool first_key,
+        bool& first_key,
         qpdf_stream_decode_level_e decode_level,
         qpdf_json_stream_data_e json_stream_data,
         std::string const& file_prefix,

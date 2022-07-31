@@ -296,12 +296,13 @@ QPDFJob::Config::jsonInput()
 QPDFJob::Config*
 QPDFJob::Config::jsonOutput(std::string const& parameter)
 {
+    o.m->json_output = true;
     if (parameter.empty() || (parameter == "latest")) {
-        o.m->json_output = JSON::LATEST;
+        o.m->json_version = JSON::LATEST;
     } else {
-        o.m->json_output = QUtil::string_to_int(parameter.c_str());
+        o.m->json_version = QUtil::string_to_int(parameter.c_str());
     }
-    if ((o.m->json_output < 2) || (o.m->json_output > JSON::LATEST)) {
+    if ((o.m->json_version < 2) || (o.m->json_version > JSON::LATEST)) {
         usage(std::string("unsupported json output version ") + parameter);
     }
     if (!o.m->json_stream_data_set) {

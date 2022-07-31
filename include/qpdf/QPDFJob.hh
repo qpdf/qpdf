@@ -543,7 +543,7 @@ class QPDFJob
     void setEncryptionOptions(QPDF&, QPDFWriter&);
     void maybeFixWritePassword(int R, std::string& password);
     void writeOutfile(QPDF& pdf);
-    void writeJSON(QPDF& pdf);
+    void writeJSON(Pipeline* p, QPDF& pdf, bool complete, bool& first_key);
 
     // JSON
     void doJSON(QPDF& pdf, Pipeline*);
@@ -700,7 +700,7 @@ class QPDFJob
         std::shared_ptr<char> infilename;
         std::shared_ptr<char> outfilename;
         bool json_input;
-        int json_output;
+        bool json_output;
         std::string update_from_json;
     };
     std::shared_ptr<Members> m;

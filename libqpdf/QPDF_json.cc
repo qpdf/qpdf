@@ -802,7 +802,7 @@ QPDF::writeJSON(
     int version,
     Pipeline* p,
     bool complete,
-    bool first_key,
+    bool& first_key,
     qpdf_stream_decode_level_e decode_level,
     qpdf_json_stream_data_e json_stream_data,
     std::string const& file_prefix,
@@ -892,4 +892,5 @@ QPDF::writeJSON(
         *p << "\n";
         p->finish();
     }
+    first_key = false;
 }

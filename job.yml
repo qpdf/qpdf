@@ -44,10 +44,11 @@ choices:
     - attachments
     - encrypt
     - objectinfo   # only v1
-    - objects
+    - objects      # only v1
     - outlines
     - pagelabels
     - pages
+    - qpdf         # only v2
   json_output:
     - 2
     - latest

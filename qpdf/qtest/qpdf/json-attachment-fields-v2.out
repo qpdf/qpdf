@@ -100,143 +100,152 @@
     "userpasswordmatched": false
   },
   "outlines": [],
-  "objects": {
-    "obj:1 0 R": {
-      "value": {
-        "/Names": {
-          "/EmbeddedFiles": "2 0 R"
-        },
-        "/PageMode": "/UseAttachments",
-        "/Pages": "3 0 R",
-        "/Type": "/Catalog"
-      }
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "1.3",
+      "pushedinheritedpageresources": false,
+      "calledgetallpages": true,
+      "maxobjectid": 14
     },
-    "obj:2 0 R": {
-      "value": {
-        "/Names": [
-          "u:a.txt",
-          "4 0 R",
-          "u:π.txt",
-          "5 0 R"
+    {
+      "obj:1 0 R": {
+        "value": {
+          "/Names": {
+            "/EmbeddedFiles": "2 0 R"
+          },
+          "/PageMode": "/UseAttachments",
+          "/Pages": "3 0 R",
+          "/Type": "/Catalog"
+        }
+      },
+      "obj:2 0 R": {
+        "value": {
+          "/Names": [
+            "u:a.txt",
+            "4 0 R",
+            "u:π.txt",
+            "5 0 R"
+          ]
+        }
+      },
+      "obj:3 0 R": {
+        "value": {
+          "/Count": 1,
+          "/Kids": [
+            "6 0 R"
+          ],
+          "/Type": "/Pages"
+        }
+      },
+      "obj:4 0 R": {
+        "value": {
+          "/EF": {
+            "/F": "7 0 R",
+            "/UF": "7 0 R"
+          },
+          "/F": "u:a.txt",
+          "/Type": "/Filespec",
+          "/UF": "u:a.txt"
+        }
+      },
+      "obj:5 0 R": {
+        "value": {
+          "/Desc": "u:Two filenames",
+          "/EF": {
+            "/F": "9 0 R",
+            "/UF": "9 0 R"
+          },
+          "/F": "u:pi.txt",
+          "/Type": "/Filespec",
+          "/UF": "u:π.txt"
+        }
+      },
+      "obj:6 0 R": {
+        "value": {
+          "/Contents": "11 0 R",
+          "/MediaBox": [
+            0,
+            0,
+            612,
+            792
+          ],
+          "/Parent": "3 0 R",
+          "/Resources": {
+            "/Font": {
+              "/F1": "13 0 R"
+            },
+            "/ProcSet": "14 0 R"
+          },
+          "/Type": "/Page"
+        }
+      },
+      "obj:7 0 R": {
+        "stream": {
+          "dict": {
+            "/Length": "8 0 R",
+            "/Params": {
+              "/Size": 7
+            },
+            "/Type": "/EmbeddedFile"
+          }
+        }
+      },
+      "obj:8 0 R": {
+        "value": 7
+      },
+      "obj:9 0 R": {
+        "stream": {
+          "dict": {
+            "/Length": "10 0 R",
+            "/Params": {
+              "/CheckSum": "b:e561f9248d7563d15dd93457b02ebbb6",
+              "/CreationDate": "u:D:20220530094116-05'00'",
+              "/ModDate": "u:D:20220530094116-05'00'",
+              "/Size": 7
+            },
+            "/Subtype": "/text/plain",
+            "/Type": "/EmbeddedFile"
+          }
+        }
+      },
+      "obj:10 0 R": {
+        "value": 7
+      },
+      "obj:11 0 R": {
+        "stream": {
+          "dict": {
+            "/Length": "12 0 R"
+          }
+        }
+      },
+      "obj:12 0 R": {
+        "value": 44
+      },
+      "obj:13 0 R": {
+        "value": {
+          "/BaseFont": "/Helvetica",
+          "/Encoding": "/WinAnsiEncoding",
+          "/Subtype": "/Type1",
+          "/Type": "/Font"
+        }
+      },
+      "obj:14 0 R": {
+        "value": [
+          "/PDF",
+          "/Text"
         ]
-      }
-    },
-    "obj:3 0 R": {
-      "value": {
-        "/Count": 1,
-        "/Kids": [
-          "6 0 R"
-        ],
-        "/Type": "/Pages"
-      }
-    },
-    "obj:4 0 R": {
-      "value": {
-        "/EF": {
-          "/F": "7 0 R",
-          "/UF": "7 0 R"
-        },
-        "/F": "u:a.txt",
-        "/Type": "/Filespec",
-        "/UF": "u:a.txt"
-      }
-    },
-    "obj:5 0 R": {
-      "value": {
-        "/Desc": "u:Two filenames",
-        "/EF": {
-          "/F": "9 0 R",
-          "/UF": "9 0 R"
-        },
-        "/F": "u:pi.txt",
-        "/Type": "/Filespec",
-        "/UF": "u:π.txt"
-      }
-    },
-    "obj:6 0 R": {
-      "value": {
-        "/Contents": "11 0 R",
-        "/MediaBox": [
-          0,
-          0,
-          612,
-          792
-        ],
-        "/Parent": "3 0 R",
-        "/Resources": {
-          "/Font": {
-            "/F1": "13 0 R"
-          },
-          "/ProcSet": "14 0 R"
-        },
-        "/Type": "/Page"
-      }
-    },
-    "obj:7 0 R": {
-      "stream": {
-        "dict": {
-          "/Length": "8 0 R",
-          "/Params": {
-            "/Size": 7
-          },
-          "/Type": "/EmbeddedFile"
+      },
+      "trailer": {
+        "value": {
+          "/ID": [
+            "b:3d1a89e08f9d6b3e1f787d04fceed440",
+            "b:4e13de38230bb10a03e49285a742c392"
+          ],
+          "/Root": "1 0 R",
+          "/Size": 15
         }
-      }
-    },
-    "obj:8 0 R": {
-      "value": 7
-    },
-    "obj:9 0 R": {
-      "stream": {
-        "dict": {
-          "/Length": "10 0 R",
-          "/Params": {
-            "/CheckSum": "b:e561f9248d7563d15dd93457b02ebbb6",
-            "/CreationDate": "u:D:20220530094116-05'00'",
-            "/ModDate": "u:D:20220530094116-05'00'",
-            "/Size": 7
-          },
-          "/Subtype": "/text/plain",
-          "/Type": "/EmbeddedFile"
-        }
-      }
-    },
-    "obj:10 0 R": {
-      "value": 7
-    },
-    "obj:11 0 R": {
-      "stream": {
-        "dict": {
-          "/Length": "12 0 R"
-        }
-      }
-    },
-    "obj:12 0 R": {
-      "value": 44
-    },
-    "obj:13 0 R": {
-      "value": {
-        "/BaseFont": "/Helvetica",
-        "/Encoding": "/WinAnsiEncoding",
-        "/Subtype": "/Type1",
-        "/Type": "/Font"
-      }
-    },
-    "obj:14 0 R": {
-      "value": [
-        "/PDF",
-        "/Text"
-      ]
-    },
-    "trailer": {
-      "value": {
-        "/ID": [
-          "b:3d1a89e08f9d6b3e1f787d04fceed440",
-          "b:4e13de38230bb10a03e49285a742c392"
-        ],
-        "/Root": "1 0 R",
-        "/Size": 15
       }
     }
-  }
+  ]
 }

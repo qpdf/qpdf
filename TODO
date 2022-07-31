@@ -97,20 +97,18 @@ JSON v2 fixes
 
   This implies a few things:
 
+  * Still need to test pushedinheritedpageresources and
+    calledgetallpages and check/use their values when reading
+
   * Fix --json-help
-
-  * --json-key=objects is only valid for v1. --json-key=qpdf is only
-    valid for v2.
-
-  * This changes the policy about additional extra keys. Have a
-    guarantee that qpdf will never add a key whose name is or starts
-    with "xdata". We still have to ignore unknown keys for future
-    compatibility, but at least this gives people a namespace they can
-    know will never conflict with future keys.
 
   * When reading back in, we'll have to call
     pushInheritedAttributesToPage or getAllPages based on the values
     of the metadata.
+
+  * Test --json with --json-stream-data and --json-output with
+    --json-stream-data=none. Recheck writeJSON's handling of the
+    pipeline argument.
 
 * Support json v2 in the C API. At a minimum, write_json,
   create_from_json, and update_from_json need to be there and should

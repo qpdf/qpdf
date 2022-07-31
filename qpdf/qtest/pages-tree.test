@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('pages-tree');
 
-my $n_tests = 13;
+my $n_tests = 17;
 
 $td->runtest("linearize duplicated pages",
              {$td->COMMAND =>
@@ -58,17 +58,27 @@ foreach my $f (qw(page_api_2 direct-pages))
     $td->runtest("json for $f (objects only)",
                  {$td->COMMAND =>
                       "qpdf --json=latest $f.pdf" .
-                      " --json-key=objects"},
+                      " --json-key=qpdf"},
                  {$td->FILE => "$f-json-objects.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("json for $f (with pages)",
                  {$td->COMMAND =>
                       "qpdf --json=latest $f.pdf" .
-                      " --json-key=objects --json-key=pages 2>warn.tmpout"},
+                      " --json-key=qpdf --json-key=pages 2>warn.tmpout"},
                  {$td->FILE => "$f-json-pages.out", $td->EXIT_STATUS => 3},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("check page warnings",
                  {$td->FILE => "warn.tmpout"},
+                 {$td->FILE => "$f-json-warning.out"},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("json for $f (with push)",
+                 {$td->COMMAND =>
+                      "qpdf --pages . -- --json=latest $f.pdf" .
+                      " --json-key=qpdf --json-key=pages 2>warn2.tmpout"},
+                 {$td->FILE => "$f-json-pages-push.out", $td->EXIT_STATUS => 3},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check page warnings",
+                 {$td->FILE => "warn2.tmpout"},
                  {$td->FILE => "$f-json-warning.out"},
                  $td->NORMALIZE_NEWLINES);
 }

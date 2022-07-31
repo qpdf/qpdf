@@ -3,12 +3,21 @@
   "parameters": {
     "decodelevel": "generalized"
   },
-  "objects": {
-    "trailer": {
-      "value": {
-        "/Root": "1 0 R",
-        "/Size": 107
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "1.3",
+      "pushedinheritedpageresources": false,
+      "calledgetallpages": false,
+      "maxobjectid": 106
+    },
+    {
+      "trailer": {
+        "value": {
+          "/Root": "1 0 R",
+          "/Size": 107
+        }
       }
     }
-  }
+  ]
 }

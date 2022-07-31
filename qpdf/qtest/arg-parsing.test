@@ -15,7 +15,7 @@ cleanup();
 
 my $td = new TestDriver('arg-parsing');
 
-my $n_tests = 13;
+my $n_tests = 16;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -75,6 +75,23 @@ $td->runtest("misplaced pages password 2",
 $td->runtest("duplicated pages password",
              {$td->COMMAND => "qpdf --pages . --password=z --password=z --"},
              {$td->REGEXP => ".*password already specified.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("v1-only objects json-key",
+             {$td->COMMAND => "qpdf --json=2 --json-key=objects minimal.pdf"},
+             {$td->REGEXP => ".*\"objects\" and \"objectinfo\" are " .
+                  "only valid for json version 1.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("v1-only objectinfo json-key",
+             {$td->COMMAND => "qpdf --json=2 --json-key=objectinfo minimal.pdf"},
+             {$td->REGEXP => ".*\"objects\" and \"objectinfo\" are " .
+                  "only valid for json version 1.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("v2-only qpdf json-key",
+             {$td->COMMAND => "qpdf --json=1 --json-key=qpdf minimal.pdf"},
+             {$td->REGEXP => ".*\"qpdf\" is only valid for json version > 1.*",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 # Ignoring -- at the top level was never intended but turned out to

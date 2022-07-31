@@ -417,7 +417,7 @@ QPDFJob::Members::Members() :
     check_is_encrypted(false),
     check_requires_password(false),
     json_input(false),
-    json_output(0)
+    json_output(false)
 {
 }
 
@@ -728,8 +728,15 @@ QPDFJob::checkConfiguration()
               " overwrite the input file");
     }
 
-    if (m->json_keys.count("objectinfo")) {
-        usage("json key \"objectinfo\" is only valid for json version 1");
+    if (m->json_version == 1) {
+        if (m->json_keys.count("qpdf")) {
+            usage("json key \"qpdf\" is only valid for json version > 1");
+        }
+    } else {
+        if (m->json_keys.count("objectinfo") || m->json_keys.count("objects")) {
+            usage("json keys \"objects\" and \"objectinfo\" are only valid for"
+                  " json version 1");
+        }
     }
 }
 
@@ -1568,12 +1575,12 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
     // The list of selectable top-level keys id duplicated in the
     // following places: job.yml, QPDFJob::json_schema, and
     // QPDFJob::doJSON.
-    if (all_keys || keys->count("objects")) {
-        schema.addDictionaryMember("objects", JSON::parse(R"({
+    if (json_version == 1) {
+        if (all_keys || keys->count("objects")) {
+            schema.addDictionaryMember("objects", JSON::parse(R"({
   "<n n R|trailer>": "json representation of object"
 })"));
-    }
-    if (json_version == 1) {
+        }
         if (all_keys || keys->count("objectinfo")) {
             JSON objectinfo =
                 schema.addDictionaryMember("objectinfo", JSON::parse(R"({
@@ -1585,6 +1592,19 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
     }
   }
 })"));
+        }
+    } else {
+        if (all_keys || keys->count("qpdf")) {
+            schema.addDictionaryMember("qpdf", JSON::parse(R"([{
+  "jsonversion": "numeric JSON version",
+  "pdfversion": "PDF version as x.y",
+  "pushedinheritedpageresources": "whether inherited attributes were pushed to the page level",
+  "calledgetallpages": "whether getAllPages was called",
+  "maxobjectid": "highest object ID in output, ignored on input"
+},
+{
+  "<obj:n n R|trailer>": "json representation of object"
+}])"));
         }
     }
     if (all_keys || keys->count("pages")) {
@@ -1812,9 +1832,14 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
     // We do objects last so their information is consistent with
     // repairing the page tree. To see the original file with any page
     // tree problems and the page tree not flattened, select
-    // objects/objectinfo without other keys.
-    if (all_keys || m->json_keys.count("objects")) {
-        doJSONObjects(p, first, pdf);
+    // qpdf/objects/objectinfo without other keys.
+    if (all_keys || m->json_keys.count("objects") ||
+        m->json_keys.count("qpdf")) {
+        if (this->m->json_version == 1) {
+            doJSONObjects(p, first, pdf);
+        } else {
+            writeJSON(p, pdf, false, first);
+        }
     }
     if (this->m->json_version == 1) {
         // "objectinfo" is not needed for version >1 since you can
@@ -2274,7 +2299,8 @@ QPDFJob::addAttachments(QPDF& pdf)
         }
         message = pdf.getFilename() +
             " already has attachments with the following keys: " + message +
-            "; use --replace to replace or --key to specify a different key";
+            "; use --replace to replace or --key to specify a different "
+            "key";
         throw std::runtime_error(message);
     }
 }
@@ -2925,10 +2951,12 @@ QPDFJob::maybeFixWritePassword(int R, std::string& password)
                             << this->m->message_prefix << ": WARNING: "
                             << "supplied password looks like a Unicode"
                             << " password with characters not allowed in"
-                            << " passwords for 40-bit and 128-bit encryption;"
+                            << " passwords for 40-bit and 128-bit "
+                               "encryption;"
                             << " most readers will not be able to open this"
                             << " file with the supplied password."
-                            << " (Use --password-mode=bytes to suppress this"
+                            << " (Use --password-mode=bytes to suppress "
+                               "this"
                             << " warning and use the password anyway.)\n";
                     }
                 } else if ((R >= 5) && (!is_valid_utf8)) {
@@ -2978,13 +3006,15 @@ QPDFJob::setEncryptionOptions(QPDF& pdf, QPDFWriter& w)
             QTC::TC("qpdf", "QPDFJob weak crypto error");
             *this->m->log->getError()
                 << this->m->message_prefix
-                << ": refusing to write a file with RC4, a weak cryptographic "
+                << ": refusing to write a file with RC4, a weak "
+                   "cryptographic "
                    "algorithm\n"
                 << "Please use 256-bit keys for better security.\n"
                 << "Pass --allow-weak-crypto to enable writing insecure "
                    "files.\n"
                 << "See also "
-                   "https://qpdf.readthedocs.io/en/stable/weak-crypto.html\n";
+                   "https://qpdf.readthedocs.io/en/stable/"
+                   "weak-crypto.html\n";
             throw std::runtime_error(
                 "refusing to write a file with weak crypto");
         }
@@ -3293,7 +3323,8 @@ QPDFJob::writeOutfile(QPDF& pdf)
         m->outfilename = nullptr;
     }
     if (this->m->json_output) {
-        writeJSON(pdf);
+        bool unused = true;
+        writeJSON(nullptr, pdf, true, unused);
     } else {
         // QPDFWriter must have block scope so the output file will be
         // closed after write() finishes.
@@ -3347,7 +3378,7 @@ QPDFJob::writeOutfile(QPDF& pdf)
 }
 
 void
-QPDFJob::writeJSON(QPDF& pdf)
+QPDFJob::writeJSON(Pipeline* p, QPDF& pdf, bool complete, bool& first_key)
 {
     // File pipeline must have block scope so it will be closed
     // after write.
@@ -3369,7 +3400,12 @@ QPDFJob::writeJSON(QPDF& pdf)
               "name is unknown");
     } else {
         QTC::TC("qpdf", "QPDFJob write json to stdout");
-        fp = this->m->log->getInfo();
+        if (p == nullptr) {
+            fp = this->m->log->getInfo();
+        }
+    }
+    if (p == nullptr) {
+        p = fp.get();
     }
     std::set<std::string> json_objects;
     if (this->m->json_objects.count("trailer")) {
@@ -3382,10 +3418,10 @@ QPDFJob::writeJSON(QPDF& pdf)
         json_objects.insert(s.str());
     }
     pdf.writeJSON(
-        this->m->json_output,
-        fp.get(),
-        true,
-        true,
+        this->m->json_version,
+        p,
+        complete,
+        first_key,
         this->m->decode_level,
         this->m->json_stream_data,
         file_prefix,
