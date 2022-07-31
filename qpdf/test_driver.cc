@@ -3249,6 +3249,15 @@ test_90(QPDF& pdf, char const* arg2)
     pdf.getRoot().appendItem(QPDFObjectHandle::newNull());
 }
 
+static void
+test_91(QPDF& pdf, char const* arg2)
+{
+    // Exercise the simpler version of writeJSON.
+    Pl_StdioFile p("stdout", stdout);
+    pdf.writeJSON(
+        2, &p, qpdf_dl_none, qpdf_sj_inline, "", std::set<std::string>());
+}
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -3353,7 +3362,7 @@ runtest(int n, char const* filename1, char const* arg2)
         {76, test_76}, {77, test_77}, {78, test_78}, {79, test_79},
         {80, test_80}, {81, test_81}, {82, test_82}, {83, test_83},
         {84, test_84}, {85, test_85}, {86, test_86}, {87, test_87},
-        {88, test_88}, {89, test_89}, {90, test_90}};
+        {88, test_88}, {89, test_89}, {90, test_90}, {91, test_91}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {

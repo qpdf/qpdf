@@ -282,5 +282,11 @@ $td->runtest("check PDF (2)",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "duplicate-page-inherited-2-fixed.pdf"});
 
+$n_tests += 1;
+$td->runtest("simple version of writeJSON",
+             {$td->COMMAND => "test_driver 91 minimal.pdf"},
+             {$td->FILE => "minimal-write-json.json", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
 cleanup();
 $td->report($n_tests);

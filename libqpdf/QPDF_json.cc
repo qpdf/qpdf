@@ -493,9 +493,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                 }
             } else {
                 QTC::TC("qpdf", "QPDF_json bad calledgetallpages");
-                error(
-                    value.getStart(),
-                    "calledgetallpages must be a boolean");
+                error(value.getStart(), "calledgetallpages must be a boolean");
             }
         } else {
             // ignore unknown keys for forward compatibility and to
@@ -819,6 +817,27 @@ QPDF::writeJSONObject(
     auto j = JSON::makeDictionary();
     j.addDictionaryMember("value", obj.getJSON(version, true));
     JSON::writeDictionaryItem(p, first, key, j, 3);
+}
+
+void
+QPDF::writeJSON(
+    int version,
+    Pipeline* p,
+    qpdf_stream_decode_level_e decode_level,
+    qpdf_json_stream_data_e json_stream_data,
+    std::string const& file_prefix,
+    std::set<std::string> wanted_objects)
+{
+    bool first = true;
+    writeJSON(
+        version,
+        p,
+        true,
+        first,
+        decode_level,
+        json_stream_data,
+        file_prefix,
+        wanted_objects);
 }
 
 void

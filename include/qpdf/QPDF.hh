@@ -134,16 +134,8 @@ class QPDF
     void updateFromJSON(std::shared_ptr<InputSource>);
 
     // Write qpdf JSON format to the pipeline "p". The only supported
-    // version is 2.
-    //
-    // If the value of "complete" is true, a complete JSON object
-    // containing only the "qpdf" key is written to the pipeline, and
-    // finish() is called on the pipeline at the end. If the value of
-    // "complete" is false, the "qpdf" key and its value are written
-    // to the pipeline assuming that a dictionary is already open, and
-    // finish() is not called. The parameter first_key indicates
-    // whether this is the first key in an in-progress dictionary. It
-    // will be set to false by writeJSON.
+    // version is 2. The finish() method is not called on the
+    // pipeline.
     //
     // The decode_level parameter controls which streams are
     // uncompressed in the JSON. Use qpdf_dl_none to preserve all
@@ -164,6 +156,26 @@ class QPDF
     // use a pipeline like Pl_Buffer or Pl_String to capture the JSON
     // output in memory, but do so with caution as this will allocate
     // enough memory to hold the entire PDF file.
+    QPDF_DLL
+    void writeJSON(
+        int version,
+        Pipeline* p,
+        qpdf_stream_decode_level_e decode_level,
+        qpdf_json_stream_data_e json_stream_data,
+        std::string const& file_prefix,
+        std::set<std::string> wanted_objects);
+
+    // This version of writeJSON enables writing only the "qpdf" key
+    // of an in-progress dictionary. If the value of "complete" is
+    // true, a complete JSON object containing only the "qpdf" key is
+    // written to the pipeline. If the value of "complete" is false,
+    // the "qpdf" key and its value are written to the pipeline
+    // assuming that a dictionary is already open. The parameter
+    // first_key indicates whether this is the first key in an
+    // in-progress dictionary. It will be set to false by writeJSON.
+    // The "qpdf" key and value are written as if at depth 1 in a
+    // prettified JSON output. Remaining arguments are the same as the
+    // above version.
     QPDF_DLL
     void writeJSON(
         int version,
