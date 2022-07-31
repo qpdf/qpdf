@@ -377,7 +377,6 @@ class Main:
                         state = st_option_help
                 else:
                     raise Exception('option without help text')
-                    state = st_top
             elif state == st_option_help:
                 if append_long_text(line, option):
                     if option in self.options_without_help:
