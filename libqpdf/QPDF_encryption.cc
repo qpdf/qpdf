@@ -149,8 +149,8 @@ QPDF::trim_user_password(std::string& user_password)
     }
 
     char const* p1 = cstr;
-    char const* p2 = 0;
-    while ((p2 = strchr(p1, '\x28')) != 0) {
+    char const* p2 = nullptr;
+    while ((p2 = strchr(p1, '\x28')) != nullptr) {
         size_t idx = toS(p2 - cstr);
         if (memcmp(p2, padding_string, len - idx) == 0) {
             user_password = user_password.substr(0, idx);
@@ -218,7 +218,7 @@ process_with_aes(
     std::string const& data,
     size_t outlength = 0,
     unsigned int repetitions = 1,
-    unsigned char const* iv = 0,
+    unsigned char const* iv = nullptr,
     size_t iv_length = 0)
 {
     Pl_Buffer buffer("buffer");

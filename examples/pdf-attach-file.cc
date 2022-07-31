@@ -15,7 +15,7 @@
 // the use of the qpdf literal syntax introduced in qpdf 10.6.
 //
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 static void
 usage(std::string const& msg)
@@ -167,11 +167,11 @@ main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
 
-    char const* infilename = 0;
-    char const* password = 0;
-    char const* attachment = 0;
-    char const* outfilename = 0;
-    char const* mimetype = 0;
+    char const* infilename = nullptr;
+    char const* password = nullptr;
+    char const* attachment = nullptr;
+    char const* outfilename = nullptr;
+    char const* mimetype = nullptr;
 
     auto check_arg = [](char const* arg, std::string const& msg) {
         if (arg == nullptr) {

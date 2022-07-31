@@ -6,7 +6,7 @@
 #include <cstring>
 #include <iostream>
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 void
 usage()

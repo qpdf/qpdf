@@ -14,7 +14,7 @@ getRandomProvider()
     static RandomDataProvider* insecure_random_data_provider =
         InsecureRandomDataProvider::getInstance();
 #else
-    static RandomDataProvider* insecure_random_data_provider = 0;
+    static RandomDataProvider* insecure_random_data_provider = nullptr;
 #endif
     static RandomDataProvider* secure_random_data_provider =
         SecureRandomDataProvider::getInstance();
@@ -22,9 +22,9 @@ getRandomProvider()
     static RandomDataProvider* provider =
         (secure_random_data_provider         ? secure_random_data_provider
              : insecure_random_data_provider ? insecure_random_data_provider
-                                             : 0);
+                                             : nullptr);
 
-    if (provider == 0) {
+    if (provider == nullptr) {
         throw std::logic_error("QPDFCrypto_native has no random data provider");
     }
 

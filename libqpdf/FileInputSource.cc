@@ -7,7 +7,7 @@
 
 FileInputSource::Members::Members(bool close_file) :
     close_file(close_file),
-    file(0)
+    file(nullptr)
 {
 }
 

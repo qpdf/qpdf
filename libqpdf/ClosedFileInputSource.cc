@@ -23,7 +23,7 @@ ClosedFileInputSource::~ClosedFileInputSource()
 void
 ClosedFileInputSource::before()
 {
-    if (0 == this->m->fis.get()) {
+    if (nullptr == this->m->fis.get()) {
         this->m->fis =
             std::make_shared<FileInputSource>(this->m->filename.c_str());
         this->m->fis->seek(this->m->offset, SEEK_SET);
@@ -39,7 +39,7 @@ ClosedFileInputSource::after()
     if (this->m->stay_open) {
         return;
     }
-    this->m->fis = 0;
+    this->m->fis = nullptr;
 }
 
 qpdf_offset_t

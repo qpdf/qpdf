@@ -14,7 +14,7 @@
 //
 // Ignore calls to QTC::TC - they are for qpdf CI testing only.
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 static enum { st_none, st_numbers, st_lines } style = st_none;
 static bool show_open = false;
 static bool show_targets = false;

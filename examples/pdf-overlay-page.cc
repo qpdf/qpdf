@@ -12,7 +12,7 @@
 // --overlay and --underlay options provide a more general version of
 // this capability.
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 void
 usage()

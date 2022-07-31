@@ -211,7 +211,7 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
 bool
 ImageOptimizer::evaluate(std::string const& description)
 {
-    if (!image.pipeStreamData(0, 0, qpdf_dl_specialized, true)) {
+    if (!image.pipeStreamData(nullptr, 0, qpdf_dl_specialized, true)) {
         QTC::TC("qpdf", "QPDFJob image optimize no pipeline");
         o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << prefix << ": " << description
@@ -317,7 +317,7 @@ QPDFJob::Members::Members() :
     warnings(false),
     encryption_status(0),
     verbose(false),
-    password(0),
+    password(nullptr),
     linearize(false),
     decrypt(false),
     split_pages(0),
@@ -326,7 +326,7 @@ QPDFJob::Members::Members() :
     suppress_warnings(false),
     warnings_exit_zero(false),
     copy_encryption(false),
-    encryption_file_password(0),
+    encryption_file_password(nullptr),
     encrypt(false),
     password_is_hex_key(false),
     suppress_password_recovery(false),
@@ -411,7 +411,7 @@ QPDFJob::Members::Members() :
     ii_min_bytes(DEFAULT_II_MIN_BYTES),
     underlay("underlay"),
     overlay("overlay"),
-    under_overlay(0),
+    under_overlay(nullptr),
     require_outfile(true),
     replace_input(false),
     check_is_encrypted(false),
@@ -673,13 +673,15 @@ QPDFJob::checkConfiguration()
             usage("--split-pages may not be used with --replace-input");
         }
     }
-    if (m->infilename == 0) {
+    if (m->infilename == nullptr) {
         usage("an input file name is required");
     } else if (
-        m->require_outfile && (m->outfilename == 0) && (!m->replace_input)) {
+        m->require_outfile && (m->outfilename == nullptr) &&
+        (!m->replace_input)) {
         usage("an output file name is required; use - for standard output");
     } else if (
-        (!m->require_outfile) && ((m->outfilename != 0) || m->replace_input)) {
+        (!m->require_outfile) &&
+        ((m->outfilename != nullptr) || m->replace_input)) {
         usage("no output file may be given for this option");
     }
     if (m->check_requires_password && m->check_is_encrypted) {
@@ -924,7 +926,7 @@ QPDFJob::doShowObj(QPDF& pdf)
     if (obj.isStream()) {
         if (m->show_raw_stream_data || m->show_filtered_stream_data) {
             bool filter = m->show_filtered_stream_data;
-            if (filter && (!obj.pipeStreamData(0, 0, qpdf_dl_all))) {
+            if (filter && (!obj.pipeStreamData(nullptr, 0, qpdf_dl_all))) {
                 QTC::TC("qpdf", "QPDFJob unable to filter");
                 obj.warnIfPossible("unable to filter stream data");
                 error = true;
@@ -1204,7 +1206,7 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
             j_image.addDictionaryMember(
                 "filterable",
                 JSON::makeBool(
-                    image.pipeStreamData(0, 0, m->decode_level, true)));
+                    image.pipeStreamData(nullptr, 0, m->decode_level, true)));
         }
         j_page.addDictionaryMember("images", j_images);
         JSON j_contents =
@@ -1561,7 +1563,7 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
   "decodelevel": "decode level used to determine stream filterability"
 })"));
 
-    bool all_keys = ((keys == 0) || keys->empty());
+    bool all_keys = ((keys == nullptr) || keys->empty());
 
     // The list of selectable top-level keys id duplicated in the
     // following places: job.yml, QPDFJob::json_schema, and
@@ -1943,7 +1945,7 @@ QPDFJob::doProcess(
             password = ptemp.c_str();
         }
     }
-    if ((password == 0) || empty || m->password_is_hex_key ||
+    if ((password == nullptr) || empty || m->password_is_hex_key ||
         m->suppress_password_recovery) {
         // There is no password, or we're not doing recovery, so just
         // do the normal processing with the supplied password.
@@ -2591,7 +2593,7 @@ QPDFJob::handlePageSpecs(
             // to the same underlying file with the same path to
             // achieve the same affect.
             char const* password = page_spec.password.get();
-            if ((!m->encryption_file.empty()) && (password == 0) &&
+            if ((!m->encryption_file.empty()) && (password == nullptr) &&
                 (page_spec.filename == m->encryption_file)) {
                 QTC::TC("qpdf", "QPDFJob pages encryption password");
                 password = m->encryption_file_password.get();
@@ -2600,7 +2602,7 @@ QPDFJob::handlePageSpecs(
                 v << prefix << ": processing " << page_spec.filename << "\n";
             });
             std::shared_ptr<InputSource> is;
-            ClosedFileInputSource* cis = 0;
+            ClosedFileInputSource* cis = nullptr;
             if (!m->keep_files_open) {
                 QTC::TC("qpdf", "QPDFJob keep files open n");
                 cis = new ClosedFileInputSource(page_spec.filename.c_str());
@@ -2636,7 +2638,7 @@ QPDFJob::handlePageSpecs(
     if (m->remove_unreferenced_page_resources != QPDFJob::re_no) {
         for (auto const& iter: page_spec_qpdfs) {
             std::string const& filename = iter.first;
-            ClosedFileInputSource* cis = 0;
+            ClosedFileInputSource* cis = nullptr;
             if (page_spec_cfis.count(filename)) {
                 cis = page_spec_cfis[filename];
                 cis->stayOpen(true);
@@ -2707,7 +2709,7 @@ QPDFJob::handlePageSpecs(
     auto this_afdh = get_afdh_for_qpdf(afdh_map, &pdf);
     std::set<QPDFObjGen> referenced_fields;
     for (auto& page_data: parsed_specs) {
-        ClosedFileInputSource* cis = 0;
+        ClosedFileInputSource* cis = nullptr;
         if (page_spec_cfis.count(page_data.filename)) {
             cis = page_spec_cfis[page_data.filename];
             cis->stayOpen(true);
@@ -3061,7 +3063,7 @@ parse_version(
     auto vp = QUtil::make_unique_cstr(full_version_string);
     char* v = vp.get();
     char* p1 = strchr(v, '.');
-    char* p2 = (p1 ? strchr(1 + p1, '.') : 0);
+    char* p2 = (p1 ? strchr(1 + p1, '.') : nullptr);
     if (p2 && *(p2 + 1)) {
         *p2++ = '\0';
         extension_level = QUtil::string_to_int(p2);
@@ -3176,7 +3178,7 @@ QPDFJob::doSplitPages(QPDF& pdf, bool& warnings)
     std::string after;
     size_t len = strlen(m->outfilename.get());
     char* num_spot = strstr(const_cast<char*>(m->outfilename.get()), "%d");
-    if (num_spot != 0) {
+    if (num_spot != nullptr) {
         QTC::TC("qpdf", "QPDFJob split-pages %d");
         before = std::string(
             m->outfilename.get(),
@@ -3310,7 +3312,7 @@ QPDFJob::writeOutfile(QPDF& pdf)
         });
     }
     if (m->replace_input) {
-        m->outfilename = 0;
+        m->outfilename = nullptr;
     }
     if (m->replace_input) {
         // We must close the input before we can rename files

@@ -87,7 +87,7 @@ QPDF_Dictionary::getKey(std::string const& key)
         return item->second;
     } else {
         QPDFObjectHandle null = QPDFObjectHandle::newNull();
-        QPDF* qpdf = 0;
+        QPDF* qpdf = nullptr;
         std::string description;
         if (getDescription(qpdf, description)) {
             null.setObjectDescription(

@@ -26,7 +26,7 @@ Pl_Buffer::~Pl_Buffer()
 void
 Pl_Buffer::write(unsigned char const* buf, size_t len)
 {
-    if (this->m->data.get() == 0) {
+    if (this->m->data.get() == nullptr) {
         this->m->data = std::make_shared<Buffer>(len);
     }
     size_t cur_size = this->m->data->getSize();

@@ -52,10 +52,10 @@ QPDFWriter::FunctionProgressReporter::reportProgress(int progress)
 QPDFWriter::Members::Members(QPDF& pdf) :
     pdf(pdf),
     filename("unspecified"),
-    file(0),
+    file(nullptr),
     close_file(false),
-    buffer_pipeline(0),
-    output_buffer(0),
+    buffer_pipeline(nullptr),
+    output_buffer(nullptr),
     normalize_content_set(false),
     normalize_content(false),
     compress_streams(true),
@@ -82,7 +82,7 @@ QPDFWriter::Members::Members(QPDF& pdf) :
     min_extension_level(0),
     forced_extension_level(0),
     encryption_dict_objid(0),
-    pipeline(0),
+    pipeline(nullptr),
     next_objid(1),
     cur_stream_length_id(0),
     cur_stream_length(0),
@@ -90,7 +90,7 @@ QPDFWriter::Members::Members(QPDF& pdf) :
     max_ostream_index(0),
     next_stack_id(0),
     deterministic_id(false),
-    md5_pipeline(0),
+    md5_pipeline(nullptr),
     did_write_setup(false),
     events_expected(0),
     events_seen(0),
@@ -128,9 +128,9 @@ void
 QPDFWriter::setOutputFilename(char const* filename)
 {
     char const* description = filename;
-    FILE* f = 0;
+    FILE* f = nullptr;
     bool close_file = false;
-    if (filename == 0) {
+    if (filename == nullptr) {
         description = "standard output";
         QTC::TC("qpdf", "QPDFWriter write to stdout");
         f = stdout;
@@ -169,7 +169,7 @@ Buffer*
 QPDFWriter::getBuffer()
 {
     Buffer* result = this->m->output_buffer;
-    this->m->output_buffer = 0;
+    this->m->output_buffer = nullptr;
     return result;
 }
 
@@ -1021,7 +1021,7 @@ QPDFWriter::writePad(int nspaces)
 Pipeline*
 QPDFWriter::pushPipeline(Pipeline* p)
 {
-    qpdf_assert_debug(dynamic_cast<Pl_Count*>(p) == 0);
+    qpdf_assert_debug(dynamic_cast<Pl_Count*>(p) == nullptr);
     this->m->pipeline_stack.push_back(p);
     return p;
 }
@@ -1066,10 +1066,10 @@ QPDFWriter::PipelinePopper::~PipelinePopper()
     qpdf_assert_debug(qw->m->pipeline->getIdentifier() == stack_id);
     delete qw->m->pipeline_stack.back();
     qw->m->pipeline_stack.pop_back();
-    while (dynamic_cast<Pl_Count*>(qw->m->pipeline_stack.back()) == 0) {
+    while (dynamic_cast<Pl_Count*>(qw->m->pipeline_stack.back()) == nullptr) {
         Pipeline* p = qw->m->pipeline_stack.back();
         if (dynamic_cast<Pl_MD5*>(p) == qw->m->md5_pipeline) {
-            qw->m->md5_pipeline = 0;
+            qw->m->md5_pipeline = nullptr;
         }
         qw->m->pipeline_stack.pop_back();
         Pl_Buffer* buf = dynamic_cast<Pl_Buffer*>(p);
@@ -1097,7 +1097,7 @@ void
 QPDFWriter::pushEncryptionFilter(PipelinePopper& pp)
 {
     if (this->m->encrypted && (!this->m->cur_data_key.empty())) {
-        Pipeline* p = 0;
+        Pipeline* p = nullptr;
         if (this->m->encrypt_use_aes) {
             p = new Pl_AES_PDF(
                 "aes stream encryption",
@@ -1135,7 +1135,7 @@ QPDFWriter::pushMD5Pipeline(PipelinePopper& pp)
                                " generation has already occurred.");
     }
     qpdf_assert_debug(this->m->deterministic_id);
-    qpdf_assert_debug(this->m->md5_pipeline == 0);
+    qpdf_assert_debug(this->m->md5_pipeline == nullptr);
     qpdf_assert_debug(this->m->pipeline->getCount() == 0);
     this->m->md5_pipeline = new Pl_MD5("qpdf md5", this->m->pipeline);
     this->m->md5_pipeline->persistAcrossFinish(true);
@@ -1148,7 +1148,7 @@ QPDFWriter::pushMD5Pipeline(PipelinePopper& pp)
 void
 QPDFWriter::computeDeterministicIDData()
 {
-    qpdf_assert_debug(this->m->md5_pipeline != 0);
+    qpdf_assert_debug(this->m->md5_pipeline != nullptr);
     qpdf_assert_debug(this->m->deterministic_id_data.empty());
     this->m->deterministic_id_data = this->m->md5_pipeline->getHexDigest();
     this->m->md5_pipeline->enable(false);
@@ -2455,10 +2455,10 @@ QPDFWriter::write()
     if (this->m->close_file) {
         fclose(this->m->file);
     }
-    this->m->file = 0;
+    this->m->file = nullptr;
     if (this->m->buffer_pipeline) {
         this->m->output_buffer = this->m->buffer_pipeline->getBuffer();
-        this->m->buffer_pipeline = 0;
+        this->m->buffer_pipeline = nullptr;
     }
     indicateProgress(false, true);
 }
@@ -2967,7 +2967,7 @@ QPDFWriter::writeLinearized()
 
     // Write file in two passes.  Part numbers refer to PDF spec 1.4.
 
-    FILE* lin_pass1_file = 0;
+    FILE* lin_pass1_file = nullptr;
     auto pp_pass1 = std::make_shared<PipelinePopper>(this);
     auto pp_md5 = std::make_shared<PipelinePopper>(this);
     for (int pass = 1; pass <= 2; ++pass) {
@@ -3203,13 +3203,13 @@ QPDFWriter::writeLinearized()
                     "QPDFWriter linearized deterministic ID",
                     need_xref_stream ? 0 : 1);
                 computeDeterministicIDData();
-                pp_md5 = 0;
-                qpdf_assert_debug(this->m->md5_pipeline == 0);
+                pp_md5 = nullptr;
+                qpdf_assert_debug(this->m->md5_pipeline == nullptr);
             }
 
             // Close first pass pipeline
             file_size = this->m->pipeline->getCount();
-            pp_pass1 = 0;
+            pp_pass1 = nullptr;
 
             // Save hint offset since it will be set to zero by
             // calling openObject.
@@ -3245,7 +3245,7 @@ QPDFWriter::writeLinearized()
                     "%% second_xref_end=%s\n",
                     QUtil::int_to_string(second_xref_end).c_str());
                 fclose(lin_pass1_file);
-                lin_pass1_file = 0;
+                lin_pass1_file = nullptr;
             }
         }
     }
@@ -3401,7 +3401,7 @@ QPDFWriter::writeStandard()
             "qpdf",
             "QPDFWriter standard deterministic ID",
             this->m->object_stream_to_objects.empty() ? 0 : 1);
-        pp_md5 = 0;
-        qpdf_assert_debug(this->m->md5_pipeline == 0);
+        pp_md5 = nullptr;
+        qpdf_assert_debug(this->m->md5_pipeline == nullptr);
     }
 }

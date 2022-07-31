@@ -746,7 +746,7 @@ TfFinder::handleToken(QPDFTokenizer::Token const& token)
     switch (ttype) {
     case QPDFTokenizer::tt_integer:
     case QPDFTokenizer::tt_real:
-        last_num = strtod(value.c_str(), 0);
+        last_num = strtod(value.c_str(), nullptr);
         last_num_idx = QIntC::to_int(DA.size() - 1);
         break;
 
@@ -785,7 +785,7 @@ TfFinder::getDA()
     for (size_t i = 0; i < n; ++i) {
         std::string cur = this->DA.at(i);
         if (QIntC::to_int(i) == tf_idx) {
-            double delta = strtod(cur.c_str(), 0) - this->tf;
+            double delta = strtod(cur.c_str(), nullptr) - this->tf;
             if ((delta > 0.001) || (delta < -0.001)) {
                 // tf doesn't match the font size passed to Tf, so
                 // substitute.

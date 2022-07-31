@@ -396,7 +396,7 @@ QUtil::string_to_ll(char const* str)
 #ifdef _MSC_VER
     long long result = _strtoi64(str, 0, 10);
 #else
-    long long result = strtoll(str, 0, 10);
+    long long result = strtoll(str, nullptr, 10);
 #endif
     if (errno == ERANGE) {
         throw std::range_error(
@@ -430,7 +430,7 @@ QUtil::string_to_ull(char const* str)
 #ifdef _MSC_VER
     unsigned long long result = _strtoui64(str, 0, 10);
 #else
-    unsigned long long result = strtoull(str, 0, 10);
+    unsigned long long result = strtoull(str, nullptr, 10);
 #endif
     if (errno == ERANGE) {
         throw std::runtime_error(
@@ -512,7 +512,7 @@ win_convert_filename(char const* filename)
 FILE*
 QUtil::safe_fopen(char const* filename, char const* mode)
 {
-    FILE* f = 0;
+    FILE* f = nullptr;
 #ifdef _WIN32
     std::shared_ptr<wchar_t> wfilenamep = win_convert_filename(filename);
     wchar_t* wfilename = wfilenamep.get();
@@ -543,7 +543,7 @@ QUtil::safe_fopen(char const* filename, char const* mode)
 FILE*
 QUtil::fopen_wrapper(std::string const& description, FILE* f)
 {
-    if (f == 0) {
+    if (f == nullptr) {
         throw_system_error(description);
     }
     return f;
@@ -599,7 +599,7 @@ QUtil::tell(FILE* stream)
 bool
 QUtil::same_file(char const* name1, char const* name2)
 {
-    if ((name1 == 0) || (strlen(name1) == 0) || (name2 == 0) ||
+    if ((name1 == nullptr) || (strlen(name1) == 0) || (name2 == nullptr) ||
         (strlen(name2) == 0)) {
         return false;
     }
@@ -834,7 +834,7 @@ QUtil::setLineBuf(FILE* f)
 char*
 QUtil::getWhoami(char* argv0)
 {
-    char* whoami = 0;
+    char* whoami = nullptr;
     if (((whoami = strrchr(argv0, '/')) == NULL) &&
         ((whoami = strrchr(argv0, '\\')) == NULL)) {
         whoami = argv0;
@@ -875,7 +875,7 @@ QUtil::get_env(std::string const& var, std::string* value)
 # endif
 #else
     char* p = getenv(var.c_str());
-    if (p == 0) {
+    if (p == nullptr) {
         return false;
     }
     if (value) {
@@ -908,7 +908,7 @@ QUtil::get_current_time()
     ULONGLONG now = uinow.QuadPart;
     return static_cast<time_t>((now / 10000000ULL) - 11644473600ULL);
 #else
-    return time(0);
+    return time(nullptr);
 #endif
 }
 
@@ -931,7 +931,7 @@ QUtil::get_current_qpdf_time()
         static_cast<int>(tzinfo.Bias));
 #else
     struct tm ltime;
-    time_t now = time(0);
+    time_t now = time(nullptr);
     tzset();
 # ifdef HAVE_LOCALTIME_R
     localtime_r(&now, &ltime);
@@ -1155,7 +1155,7 @@ namespace
 
 RandomDataProviderProvider::RandomDataProviderProvider() :
     default_provider(CryptoRandomDataProvider::getInstance()),
-    current_provider(0)
+    current_provider(nullptr)
 {
     this->current_provider = default_provider;
 }
@@ -1210,13 +1210,13 @@ QUtil::random()
 bool
 QUtil::is_hex_digit(char ch)
 {
-    return (ch && (strchr("0123456789abcdefABCDEF", ch) != 0));
+    return (ch && (strchr("0123456789abcdefABCDEF", ch) != nullptr));
 }
 
 bool
 QUtil::is_space(char ch)
 {
-    return (ch && (strchr(" \f\n\r\t\v", ch) != 0));
+    return (ch && (strchr(" \f\n\r\t\v", ch) != nullptr));
 }
 
 bool
@@ -1332,10 +1332,10 @@ QUtil::read_lines_from_file(
     std::list<std::string>& lines,
     bool preserve_eol)
 {
-    std::string* buf = 0;
+    std::string* buf = nullptr;
     char c;
     while (next_char(c)) {
-        if (buf == 0) {
+        if (buf == nullptr) {
             lines.push_back("");
             buf = &(lines.back());
             buf->reserve(80);
@@ -1354,7 +1354,7 @@ QUtil::read_lines_from_file(
                     buf->erase(buf->length() - 1);
                 }
             }
-            buf = 0;
+            buf = nullptr;
         } else {
             buf->append(1, c);
         }
@@ -1471,7 +1471,7 @@ QUtil::parse_numrange(char const* range, int max)
             }
         }
 
-        p = 0;
+        p = nullptr;
         for (size_t i = 0; i < work.size(); i += 2) {
             int num = work.at(i);
             // max == 0 means we don't know the max and are just
@@ -1990,7 +1990,7 @@ call_main_from_wmain(
         new_argv[i] = utf8_argv.at(i).get();
     }
     argc = QIntC::to_int(utf8_argv.size());
-    new_argv[argc] = 0;
+    new_argv[argc] = nullptr;
     return realmain(argc, new_argv);
 }
 

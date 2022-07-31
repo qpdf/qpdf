@@ -5,10 +5,10 @@
 Buffer::Members::Members(size_t size, unsigned char* buf, bool own_memory) :
     own_memory(own_memory),
     size(size),
-    buf(0)
+    buf(nullptr)
 {
     if (own_memory) {
-        this->buf = (size ? new unsigned char[size] : 0);
+        this->buf = (size ? new unsigned char[size] : nullptr);
     } else {
         this->buf = buf;
     }
@@ -22,12 +22,12 @@ Buffer::Members::~Members()
 }
 
 Buffer::Buffer() :
-    m(new Members(0, 0, true))
+    m(new Members(0, nullptr, true))
 {
 }
 
 Buffer::Buffer(size_t size) :
-    m(new Members(size, 0, true))
+    m(new Members(size, nullptr, true))
 {
 }
 
@@ -52,7 +52,8 @@ void
 Buffer::copy(Buffer const& rhs)
 {
     if (this != &rhs) {
-        this->m = std::shared_ptr<Members>(new Members(rhs.m->size, 0, true));
+        this->m =
+            std::shared_ptr<Members>(new Members(rhs.m->size, nullptr, true));
         if (this->m->size) {
             memcpy(this->m->buf, rhs.m->buf, this->m->size);
         }

@@ -11,7 +11,7 @@
 #include <string.h>
 
 static char const* version = "1.1";
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 void
 usage()
@@ -77,8 +77,8 @@ main(int argc, char* argv[])
         exit(0);
     }
 
-    char* fl_in = 0;
-    char* fl_out = 0;
+    char* fl_in = nullptr;
+    char* fl_out = nullptr;
     std::string cur_key;
 
     for (int i = 1; i < argc; ++i) {

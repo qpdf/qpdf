@@ -5,7 +5,7 @@
 #include <qpdf/QPDF.hh>
 #include <qpdf/QUtil.hh>
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 void
 usage()

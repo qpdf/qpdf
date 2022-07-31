@@ -14,7 +14,7 @@ Pl_LZWDecoder::Pl_LZWDecoder(
     byte_pos(0),
     bit_pos(0),
     bits_available(0),
-    code_change_delta(early_code_change ? 1 : 0),
+    code_change_delta(early_code_change),
     eod(false),
     last_code(256)
 {
@@ -107,7 +107,7 @@ void
 Pl_LZWDecoder::addToTable(unsigned char next)
 {
     unsigned int last_size = 0;
-    unsigned char const* last_data = 0;
+    unsigned char const* last_data = nullptr;
     unsigned char tmp[1];
 
     if (this->last_code < 256) {

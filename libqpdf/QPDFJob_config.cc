@@ -13,7 +13,7 @@ QPDFJob::Config::checkConfiguration()
 QPDFJob::Config*
 QPDFJob::Config::inputFile(std::string const& filename)
 {
-    if (o.m->infilename == 0) {
+    if (o.m->infilename == nullptr) {
         o.m->infilename = QUtil::make_shared_cstr(filename);
     } else {
         usage("input file has already been given");
@@ -24,7 +24,7 @@ QPDFJob::Config::inputFile(std::string const& filename)
 QPDFJob::Config*
 QPDFJob::Config::emptyInput()
 {
-    if (o.m->infilename == 0) {
+    if (o.m->infilename == nullptr) {
         // Various places in QPDFJob.cc know that the empty string for
         // infile means empty. We set it to something other than a
         // null pointer as an indication that some input source has
@@ -44,7 +44,7 @@ QPDFJob::Config::emptyInput()
 QPDFJob::Config*
 QPDFJob::Config::outputFile(std::string const& filename)
 {
-    if ((o.m->outfilename == 0) && (!o.m->replace_input)) {
+    if ((o.m->outfilename == nullptr) && (!o.m->replace_input)) {
         o.m->outfilename = QUtil::make_shared_cstr(filename);
     } else {
         usage("output file has already been given");
@@ -55,7 +55,7 @@ QPDFJob::Config::outputFile(std::string const& filename)
 QPDFJob::Config*
 QPDFJob::Config::replaceInput()
 {
-    if ((o.m->outfilename == 0) && (!o.m->replace_input)) {
+    if ((o.m->outfilename == nullptr) && (!o.m->replace_input)) {
         o.m->replace_input = true;
     } else {
         usage("replace-input can't be used"
@@ -977,7 +977,7 @@ QPDFJob::UOConfig::endUnderlayOverlay()
     if (config->o.m->under_overlay->filename.empty()) {
         usage(config->o.m->under_overlay->which + " file not specified");
     }
-    config->o.m->under_overlay = 0;
+    config->o.m->under_overlay = nullptr;
     return this->config;
 }
 

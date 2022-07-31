@@ -216,7 +216,7 @@ QPDF::Members::Members() :
     pushed_inherited_attributes_to_pages(false),
     ever_pushed_inherited_attributes_to_pages(false),
     ever_called_get_all_pages(false),
-    copied_stream_data_provider(0),
+    copied_stream_data_provider(nullptr),
     reconstructed_xref(false),
     fixed_dangling_refs(false),
     immediate_copy_from(false),
@@ -1496,7 +1496,7 @@ QPDF::readObject(
 
     bool empty = false;
     std::shared_ptr<StringDecrypter> decrypter_ph;
-    StringDecrypter* decrypter = 0;
+    StringDecrypter* decrypter = nullptr;
     if (this->m->encp->encrypted && (!in_object_stream)) {
         decrypter_ph = std::make_shared<StringDecrypter>(this, og);
         decrypter = decrypter_ph.get();
@@ -2434,7 +2434,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
 
     QPDFObjectHandle dict = result.getDict();
     QPDFObjectHandle old_dict = foreign.getDict();
-    if (this->m->copied_stream_data_provider == 0) {
+    if (this->m->copied_stream_data_provider == nullptr) {
         this->m->copied_stream_data_provider =
             new CopiedStreamDataProvider(*this);
         this->m->copied_streams =
@@ -2457,7 +2457,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
     }
     std::shared_ptr<Buffer> stream_buffer = stream->getStreamDataBuffer();
     if ((foreign_stream_qpdf->m->immediate_copy_from) &&
-        (stream_buffer.get() == 0)) {
+        (stream_buffer.get() == nullptr)) {
         // Pull the stream data into a buffer before attempting
         // the copy operation. Do it on the source stream so that
         // if the source stream is copied multiple times, we don't
