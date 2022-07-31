@@ -244,7 +244,6 @@ QPDFJob::Config::json(std::string const& parameter)
     if ((o.m->json_version < 1) || (o.m->json_version > JSON::LATEST)) {
         usage(std::string("unsupported json version ") + parameter);
     }
-    o.m->require_outfile = false;
     return this;
 }
 
@@ -297,14 +296,7 @@ QPDFJob::Config*
 QPDFJob::Config::jsonOutput(std::string const& parameter)
 {
     o.m->json_output = true;
-    if (parameter.empty() || (parameter == "latest")) {
-        o.m->json_version = JSON::LATEST;
-    } else {
-        o.m->json_version = QUtil::string_to_int(parameter.c_str());
-    }
-    if ((o.m->json_version < 2) || (o.m->json_version > JSON::LATEST)) {
-        usage(std::string("unsupported json output version ") + parameter);
-    }
+    json(parameter);
     if (!o.m->json_stream_data_set) {
         // No need to set json_stream_data_set -- that indicates
         // explicit use of --json-stream-data.
@@ -313,9 +305,7 @@ QPDFJob::Config::jsonOutput(std::string const& parameter)
     if (!o.m->decode_level_set) {
         o.m->decode_level = qpdf_dl_none;
     }
-    if (o.m->json_keys.empty()) {
-        o.m->json_keys.insert("qpdf");
-    }
+    o.m->json_keys.insert("qpdf");
     return this;
 }
 

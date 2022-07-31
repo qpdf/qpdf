@@ -133,7 +133,7 @@ class QPDF
     QPDF_DLL
     void updateFromJSON(std::shared_ptr<InputSource>);
 
-    // Write qpdf json format to the pipeline "p". The only supported
+    // Write qpdf JSON format to the pipeline "p". The only supported
     // version is 2.
     //
     // If the value of "complete" is true, a complete JSON object

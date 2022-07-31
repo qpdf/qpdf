@@ -554,7 +554,7 @@ class QPDFJob
     void setEncryptionOptions(QPDF&, QPDFWriter&);
     void maybeFixWritePassword(int R, std::string& password);
     void writeOutfile(QPDF& pdf);
-    void writeJSON(Pipeline* p, QPDF& pdf, bool complete, bool& first_key);
+    void writeJSON(QPDF& pdf);
 
     // JSON
     void doJSON(QPDF& pdf, Pipeline*);

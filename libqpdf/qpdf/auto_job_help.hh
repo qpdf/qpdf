@@ -803,7 +803,9 @@ depth in the JSON section of the manual. "version" may be a
 specific version or "latest" (the default). Run qpdf --json-help
 for a description of the generated JSON object.
 )");
-ap.addOptionHelp("--json-help", "json", "show format of JSON output", R"(Describe the format of the JSON output by writing to standard
+ap.addOptionHelp("--json-help", "json", "show format of JSON output", R"(--json-help[=version]
+
+Describe the format of the JSON output by writing to standard
 output a JSON object with the same keys and with values
 containing descriptive text.
 )");
@@ -838,17 +840,17 @@ which is to use the output file name. Whatever is given here
 will be appended with -nnn to create the name of the file that
 will contain the data for the stream stream in object nnn.
 )");
-ap.addOptionHelp("--json-output", "json", "serialize to JSON", R"(--json-output[=version]
+ap.addOptionHelp("--json-output", "json", "apply defaults for JSON serialization", R"(--json-output[=version]
 
-The output file will be qpdf JSON format at the given version.
-"version" may be a specific version or "latest" (the default).
-The only supported version is 2. See also --json-stream-data,
---json-stream-prefix, and --decode-level.
+Implies --json=version. Changes default values for certain
+options so that the JSON output written is the most faithful
+representation of the original PDF and contains no additional
+JSON keys. See also --json-stream-data, --json-stream-prefix,
+and --decode-level.
 )");
-ap.addOptionHelp("--json-input", "json", "input file is qpdf JSON", R"(Treat the input file as a JSON file in qpdf JSON format as
-written by qpdf --json-output. See the "qpdf JSON Format"
-section of the manual for information about how to use this
-option.
+ap.addOptionHelp("--json-input", "json", "input file is qpdf JSON", R"(Treat the input file as a JSON file in qpdf JSON format. See the
+"qpdf JSON Format" section of the manual for information about
+how to use this option.
 )");
 ap.addOptionHelp("--update-from-json", "json", "update a PDF from qpdf JSON", R"(--update-from-json=qpdf-json-file
 

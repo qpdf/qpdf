@@ -69,46 +69,11 @@ Soon: Break ground on "Document-level work"
 JSON v2 fixes
 =============
 
-* Unify code between QPDFJob::doJSONObjects and QPDF::writeJSON. Make
-  sure that the "qpdf" key is always present when json-output is
-  specified.
+* Rethink QPDF::writeJSON. Maybe provide a simpler overload?
 
-* Change the name of the "qpdf-v2" key to "qpdf". Use that in place of
-  "objects" and change its content to a two-element array whose first
-  element is metadata required (or useful) for parsing and whose
-  second element contains the actual data. Use of an array is the only
-  way to ensure that the metadata is guaranteed to be parsed before we
-  start parsing the objects. Example:
-
-  {
-    "qpdf": [
-      {
-        "jsonversion": 2,
-        "pdfversion": "1.3",
-        "pushedinheritedpageresources": false,
-        "calledgetallpages": false,
-        "maxobjectid": 10
-      },
-      {
-        ... objects ...
-      }
-    ]
-  }
-
-  This implies a few things:
-
-  * Still need to test pushedinheritedpageresources and
-    calledgetallpages and check/use their values when reading
-
-  * Fix --json-help
-
-  * When reading back in, we'll have to call
-    pushInheritedAttributesToPage or getAllPages based on the values
-    of the metadata.
-
-  * Test --json with --json-stream-data and --json-output with
-    --json-stream-data=none. Recheck writeJSON's handling of the
-    pipeline argument.
+* When reading back in, we'll have to call
+  pushInheritedAttributesToPage or getAllPages based on the values
+  of the metadata.
 
 * Support json v2 in the C API. At a minimum, write_json,
   create_from_json, and update_from_json need to be there and should

@@ -28,7 +28,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "forceVersion": "set output PDF version",
   "progress": "show progress when writing",
   "splitPages": "write pages to separate files",
-  "jsonOutput": "serialize to JSON",
+  "jsonOutput": "apply defaults for JSON serialization",
   "encrypt": {
     "userPassword": "user password",
     "ownerPassword": "owner password",
