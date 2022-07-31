@@ -473,6 +473,30 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                 QTC::TC("qpdf", "QPDF_json bad json version");
                 error(value.getStart(), "invalid JSON version (must be 2)");
             }
+        } else if (key == "pushedinheritedpageresources") {
+            bool v;
+            if (value.getBool(v)) {
+                if ((!this->must_be_complete) && v) {
+                    this->pdf.pushInheritedAttributesToPage();
+                }
+            } else {
+                QTC::TC("qpdf", "QPDF_json bad pushedinheritedpageresources");
+                error(
+                    value.getStart(),
+                    "pushedinheritedpageresources must be a boolean");
+            }
+        } else if (key == "calledgetallpages") {
+            bool v;
+            if (value.getBool(v)) {
+                if ((!this->must_be_complete) && v) {
+                    this->pdf.getAllPages();
+                }
+            } else {
+                QTC::TC("qpdf", "QPDF_json bad calledgetallpages");
+                error(
+                    value.getStart(),
+                    "calledgetallpages must be a boolean");
+            }
         } else {
             // ignore unknown keys for forward compatibility and to
             // skip keys we don't care about like "maxobjectid".

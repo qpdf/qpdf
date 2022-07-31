@@ -672,3 +672,5 @@ QPDF_json qpdf not array 0
 QPDF_json more than two qpdf elements 0
 QPDF_json missing json version 0
 QPDF_json bad json version 0
+QPDF_json bad calledgetallpages 0
+QPDF_json bad pushedinheritedpageresources 0

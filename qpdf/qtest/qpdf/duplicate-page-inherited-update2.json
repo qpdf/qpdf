@@ -1,0 +1,35 @@
+{
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pushedinheritedpageresources": true,
+      "calledgetallpages": true
+    },
+    {
+      "obj:9 0 R": {
+        "stream": {
+          "data": "QlQKICAvRjIgMjQgVGYKICA3MiA3MjAgVGQKICAoU2FsYWQpIFRqCkVUCg==",
+          "dict": {}
+        }
+      },
+      "obj:7 0 R": {
+        "value": {
+          "/Contents": "9 0 R",
+          "/MediaBox": [
+            0,
+            0,
+            612,
+            792
+          ],
+          "/Parent": "2 0 R",
+          "/Resources": {
+            "/Font": {
+              "/F2": "6 0 R"
+            }
+          },
+          "/Type": "/Page"
+        }
+      }
+    }
+  ]
+}

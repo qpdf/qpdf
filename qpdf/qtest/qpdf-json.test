@@ -214,5 +214,73 @@ $td->runtest("update-from-json object description",
              {$td->FILE => "test-90.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
+# Exercise pushedinheritedpageresources and calledgetallpages
+$n_tests += 12;
+$td->runtest("call getAllPages",
+             {$td->COMMAND =>
+                  "qpdf --json-output duplicate-page-inherited.pdf" .
+                  " --json-key=pages a.json"},
+             {$td->FILE => "duplicate-page-inherited.out",
+                  $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check json (1)",
+             {$td->FILE => "a.json"},
+             {$td->FILE => "duplicate-page-inherited-1.json"},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("update (1)",
+             {$td->COMMAND =>
+                  "qpdf" .
+                  " --update-from-json=duplicate-page-inherited-update.json" .
+                  " --json-output duplicate-page-inherited.pdf" .
+                  " a.json"},
+             {$td->FILE => "duplicate-page-inherited.out",
+                  $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check json (2)",
+             {$td->FILE => "a.json"},
+             {$td->FILE => "duplicate-page-inherited-1-fixed.json"},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("create PDF (1)",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id --json-input a.json a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check PDF (1)",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "duplicate-page-inherited-1-fixed.pdf"});
+
+$td->runtest("call pushInheritedAttributesToPage",
+             {$td->COMMAND =>
+                  "qpdf --json-output duplicate-page-inherited.pdf" .
+                  " --json-key=pages --pages . -- a.json"},
+             {$td->FILE => "duplicate-page-inherited.out",
+                  $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check json (2)",
+             {$td->FILE => "a.json"},
+             {$td->FILE => "duplicate-page-inherited-2.json"},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("update (2)",
+             {$td->COMMAND =>
+                  "qpdf" .
+                  " --update-from-json=duplicate-page-inherited-update2.json" .
+                  " --json-output duplicate-page-inherited.pdf" .
+                  " a.json"},
+             {$td->FILE => "duplicate-page-inherited.out",
+                  $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check json (3)",
+             {$td->FILE => "a.json"},
+             {$td->FILE => "duplicate-page-inherited-2-fixed.json"},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("create PDF (2)",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id --json-input a.json a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check PDF (2)",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "duplicate-page-inherited-2-fixed.pdf"});
+
 cleanup();
 $td->report($n_tests);

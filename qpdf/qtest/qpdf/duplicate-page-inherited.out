@@ -1,0 +1,2 @@
+WARNING: duplicate-page-inherited.pdf, object 3 0 at offset 202: kid 1 (from 0) appears more than once in the pages tree; creating a new page object as a copy
+qpdf: operation succeeded with warnings; resulting file may have some problems

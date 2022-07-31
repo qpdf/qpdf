@@ -1,0 +1,31 @@
+{
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pushedinheritedpageresources": false,
+      "calledgetallpages": true,
+      "maxobjectid": 7
+    },
+    {
+      "obj:8 0 R": {
+        "stream": {
+          "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoU2FsYWQpIFRqCkVUCg==",
+          "dict": {}
+        }
+      },
+      "obj:7 0 R": {
+        "value": {
+          "/Contents": "8 0 R",
+          "/MediaBox": [
+            0,
+            0,
+            612,
+            792
+          ],
+          "/Parent": "3 0 R",
+          "/Type": "/Page"
+        }
+      }
+    }
+  ]
+}
