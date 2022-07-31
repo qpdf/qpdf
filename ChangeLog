@@ -35,7 +35,7 @@
         Examples have been updated to use improved APIs. The old
         provideStreamData overloads will continue to be supported, so
         updating older code to use the new interfaces is entirely at the
-        programmer's descretion.
+        programmer's discretion.
 
 2022-06-25  Jay Berkenbilt  <ejb@ql.org>
 

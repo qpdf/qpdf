@@ -47,7 +47,7 @@ extern "C" {
 #endif
     /* SHORT INTERFACE -- These functions are single calls that take
      * care of the whole life cycle of QPDFJob. They can be used for
-     * one-shot ooperations where no additional configuration is
+     * one-shot operations where no additional configuration is
      * needed. See FULL INTERFACE below. */
 
     /* This function does the equivalent of running the qpdf

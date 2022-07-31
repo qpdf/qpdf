@@ -185,7 +185,7 @@ class JSON
     //     single-element arrays, and strings only.
     //   * Recursively walk the schema. In the items below, "schema
     //     object" refers to an object in the schema, and "checked
-    //     object" refers to the correspondingi part of the object
+    //     object" refers to the corresponding part of the object
     //     being checked.
     //   * If the schema object is a dictionary, the checked object
     //     must have a dictionary in the same place with the same
