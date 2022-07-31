@@ -433,8 +433,7 @@ class QPDFJob
     QPDF_DLL
     static std::string json_out_schema(int version);
 
-    QPDF_DLL
-    [[deprecated("use json_out_schema(version)")]] static std::string
+    [[deprecated("use json_out_schema(version)")]] static std::string QPDF_DLL
     json_out_schema_v1();
 
     // Provide a string that is the help information for specified
@@ -442,8 +441,7 @@ class QPDFJob
     QPDF_DLL
     static std::string job_json_schema(int version);
 
-    QPDF_DLL
-    [[deprecated("use job_json_schema(version)")]] static std::string
+    [[deprecated("use job_json_schema(version)")]] static std::string QPDF_DLL
     job_json_schema_v1();
 
   private:
