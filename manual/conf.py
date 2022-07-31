@@ -35,6 +35,7 @@ latex_elements = {
     'preamble': r'''
 \sphinxDUC{2264}{$\leq$}
 \sphinxDUC{2265}{$\geq$}
+\sphinxDUC{03C0}{$\pi$}
 ''',
 }
 highlight_language = 'none'

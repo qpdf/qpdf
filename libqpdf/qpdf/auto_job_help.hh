@@ -813,7 +813,8 @@ ap.addOptionHelp("--json-key", "json", "limit which keys are in JSON output", R"
 
 This option is repeatable. If given, only the specified
 top-level keys will be included in the JSON output. Otherwise,
-all keys will be included.
+all keys will be included. With --json-output, when not given,
+only the "qpdf" key will appear in the output.
 )");
 ap.addOptionHelp("--json-object", "json", "limit which objects are in JSON", R"(--json-object={trailer|obj[,gen]}
 

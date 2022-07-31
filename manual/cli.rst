@@ -913,7 +913,7 @@ Related Options
    qpdf will recompress streams with generalized filters using flate
    compression, effectively eliminating LZW and ASCII-based filters.
    This is usually desirable behavior but can be disabled with
-   ``--decode-level=none``. Note that ``--decode-level=node`` is the
+   ``--decode-level=none``. Note that ``--decode-level=none`` is the
    default when :qpdf:ref:`--json-output` is specified, but it can be
    overridden in that case as well.
 
@@ -3197,7 +3197,8 @@ Related Options
    Starting with qpdf 11, when this option is specified, an output
    file is optional (for backward compatibility) and defaults to
    standard output. You may specify an output file to write the JSON
-   to a file rather than standard output.
+   to a file rather than standard output. (Example: ``qpdf --json
+   in.pdf out.json``)
 
    Stream data is only included if :qpdf:ref:`--json-output` is
    specified or if a value other than ``none`` is passed to
@@ -3225,14 +3226,16 @@ Related Options
 
       This option is repeatable. If given, only the specified
       top-level keys will be included in the JSON output. Otherwise,
-      all keys will be included.
+      all keys will be included. With --json-output, when not given,
+      only the "qpdf" key will appear in the output.
 
    This option is repeatable. If given, only the specified top-level
    keys will be included in the JSON output. Otherwise, all keys will
-   be included. ``version`` and ``parameters`` will always appear in
-   the output. If not given, all keys will be included, unless
+   be included. If not given, all keys will be included, unless
    :qpdf:ref:`--json-output` was specified, in which case, only the
-   ``"qpdf"`` key will be included by default.
+   ``"qpdf"`` key will be included by default. If
+   :qpdf:ref:`--json-output` was not given, the ``version`` and
+   ``parameters`` keys will always appear in the output.
 
 .. qpdf:option:: --json-object={trailer|obj[,gen]}
 
@@ -3311,8 +3314,8 @@ Related Options
      output, but you can add additional keys with
      :qpdf:ref:`--json-key`.
 
-   - Excludes the ``"version"`` and ``"parameters"`` keys from the
-     JSON output.
+   - The ``"version"`` and ``"parameters"`` keys will be excluded from
+     the JSON output.
 
    If you want to look at the contents of streams easily as you would
    in QDF mode (see :ref:`qdf`), you can use

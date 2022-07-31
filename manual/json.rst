@@ -24,28 +24,33 @@ represents the contents of a PDF file. This is distinct from the
 interacting with qpdf the way the command-line tool does. For
 information about that, see :ref:`qpdf-job`.
 
-The qpdf JSON format is specific to qpdf. With JSON version 2, the
-:qpdf:ref:`--json` command-line flag causes creation of a JSON
-representation of all the objects in a PDF file. This includes an
-unambiguous representation of the PDF object structure and also
-provides JSON-formatted summaries of other information about the file.
-This functionality is built into ``QPDFJob`` and can be accessed from
-the ``qpdf`` command-line tool or from the ``QPDFJob`` C or C++ API.
+The qpdf JSON format is specific to qpdf. The :qpdf:ref:`--json`
+command-line flag causes creation of a JSON representation the objects
+in a PDF file along with JSON-formatted summaries of other information
+about the file. This functionality is built into ``QPDFJob`` and can
+be accessed from the ``qpdf`` command-line tool or from the
+``QPDFJob`` C or C++ API.
 
-By default, stream data is omitted, but it can be included by
-specifying the :qpdf:ref:`--json-stream-data` option. With stream data
-included, the generated JSON file completely represents a PDF file.
-You can think of this as using JSON as an *alternative syntax* for
-representing a PDF file. Using qpdf JSON, it is possible to convert a
-PDF file to JSON, manipulate the structure or contents of the objects
-at a low level, and convert the results back to a PDF file. This
-functionality can be accessed from the command-line with the
-:qpdf:ref:`--json-input`, and :qpdf:ref:`--update-from-json` flags, or
-from the API using the ``QPDF::writeJSON``, ``QPDF::createFromJSON``,
-and ``QPDF::updateFromJSON`` methods. The :qpdf:ref:`--json-output`
-flag changes a handful of defaults so that the resulting JSON is as
-close as possible to the original input and is ready for being
-converted back to PDF.
+Starting with qpdf JSON version 2, from qpdf 11.0.0, the JSON output
+includes an unambiguous and complete representation of the PDF objects
+and header. The information without the JSON-formatted summaries of
+other information is also available using the ``QPDF::writeJSON``
+method.
+
+By default, stream data is omitted from the JSON data, but it can be
+included by specifying the :qpdf:ref:`--json-stream-data` option. With
+stream data included, the generated JSON file completely represents a
+PDF file. You can think of this as using JSON as an *alternative
+syntax* for representing a PDF file. Using qpdf JSON, it is possible
+to convert a PDF file to JSON, manipulate the structure or contents of
+the objects at a low level, and convert the results back to a PDF
+file. This functionality can be accessed from the command-line with
+the :qpdf:ref:`--json-input`, and :qpdf:ref:`--update-from-json`
+flags, or from the API using the ``QPDF::createFromJSON``, and
+``QPDF::updateFromJSON`` methods. The :qpdf:ref:`--json-output` flag
+changes a handful of defaults so that the resulting JSON is as close
+as possible to the original input and is ready for being converted
+back to PDF.
 
 .. _json-terminology:
 
@@ -71,7 +76,8 @@ This manual is not entirely consistent about its use of *dictionary*
 vs. *object* because sometimes one term or another is clearer in
 context. Just be aware of the ambiguity when reading the manual. We
 frequently use the term *dictionary* to refer to a JSON object because
-of the consistency with PDF terminology.
+of the consistency with PDF terminology, particular when referring to
+a dictionary that contains information PDF objects.
 
 .. _what-qpdf-json-is-not:
 
@@ -121,12 +127,14 @@ qpdf JSON Object Representation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This section describes the representation of PDF objects in qpdf JSON
-version 2. PDF objects are represented within the ``"qpdf"`` entry of
-a qpdf JSON file. The ``"qpdf"`` entry is a two-element array. The
-first element is a dictionary containing header-like information about
-the file such as the PDF version. The second element is a dictionary
-containing all the objects in the PDF file. We refer to this as the
-*objects dictionary*.
+version 2. An example appears in :ref:`json.example`.
+
+PDF objects are represented within the ``"qpdf"`` entry of a qpdf JSON
+file. The ``"qpdf"`` entry is a two-element array. The first element
+is a dictionary containing header-like information about the file such
+as the PDF version. The second element is a dictionary containing all
+the objects in the PDF file. We refer to this as the *objects
+dictionary*.
 
 The first element contains the following keys:
 
@@ -136,17 +144,19 @@ The first element contains the following keys:
 - ``"pdfversion"`` -- a string containing PDF version as indicated in
   the PDF header (e.g. ``"1.7"``, ``"2.0"``)
 
-- ``pushedinheritedpageresources`` -- a boolean indicating whether
-  the library pushed inherited resources down to the page level.
-  Certain library calls cause this to happen, and qpdf needs to know
-  when reading a JSON file back in whether it should do this as it may
-  cause certain objects to be renumbered.
+- ``pushedinheritedpageresources`` -- a boolean indicating whether the
+  library pushed inherited resources down to the page level. Certain
+  library calls cause this to happen, and qpdf needs to know when
+  reading a JSON file back in whether it should do this as it may
+  cause certain objects to be renumbered. This field is ignored when
+  :qpdf:ref:`--update-from-json` was not given.
 
 - ``calledgetallpages`` -- a boolean indicating whether
   ``getAllPages`` was called prior to writing the JSON output. This
   method causes page tree repair to occur, which may renumber some
   objects (in very rare cases of corrupted page trees), so qpdf needs
-  to know this information when reading a JSON file back in.
+  to know this information when reading a JSON file back in. This
+  field is ignored when :qpdf:ref:`--update-from-json` was not given.
 
 - ``"maxobjectid"`` -- a number indicating the object ID of the
   highest numbered object in the file. This is provided to make it
@@ -162,12 +172,12 @@ The first element contains the following keys:
   if objects are removed from a PDF file.)
 
 The second element is the objects dictionary. Each key in the objects
-dictionary is either ``"trailer"`` or a string of the form ``"obj:O G
-R"`` where ``O`` and ``G`` are the object and generation numbers and
-``R`` is the literal string ``R``. This is the PDF syntax for the
-indirect object reference prepended by ``obj:``. The value,
-representing the object itself, is a JSON object whose structure is
-described below.
+dictionary is either ``"trailer"`` or a string of the form
+:samp:`"obj:{O} {G} R"` where :samp:`{O}` and :samp:`{G}` are the
+object and generation numbers and ``R`` is the literal string ``R``.
+This is the PDF syntax for the indirect object reference prepended by
+``obj:``. The value, representing the object itself, is a JSON object
+whose structure is described below.
 
 Top-level Stream Objects
   Stream objects are represented as a JSON object with the single key
@@ -234,11 +244,11 @@ Object Values
     JSON as ``"/text/plain"`` and in PDF as ``"/text#2fplain"``.
 
   - Indirect object references are represented as JSON strings that
-    look like a PDF indirect object reference and have the form ``"O G
-    R"`` where ``O`` and ``G`` are the object and generation numbers
-    and ``R`` is the literal string ``R``. For example, ``"3 0 R"``
-    would represent a reference to the object with object ID 3 and
-    generation 0.
+    look like a PDF indirect object reference and have the form
+    :samp:`"{O} {G} R"` where :samp:`{O}` and :samp:`{G}` are the
+    object and generation numbers and ``R`` is the literal string
+    ``R``. For example, ``"3 0 R"`` would represent a reference to the
+    object with object ID 3 and generation 0.
 
   - PDF strings are represented as JSON strings in one of two ways:
 
@@ -288,11 +298,11 @@ Object Values
 
 Note that writing JSON output is done by ``QPDF``, not ``QPDFWriter``.
 As such, none of the things ``QPDFWriter`` does apply. This includes
-recompression of streams, renumbering of objects, anything to do with
-object streams (which are not represented by qpdf JSON at all since
-they are PDF syntax, not semantics), encryption, decryption,
-linearization, QDF mode, etc. See :ref:`rewriting` for a more in-depth
-discussion.
+recompression of streams, renumbering of objects, removal of
+unreferenced objects, anything to do with object streams (which are
+not represented by qpdf JSON at all since they are PDF syntax, not
+semantics), encryption, decryption, linearization, QDF mode, etc. See
+:ref:`rewriting` for a more in-depth discussion.
 
 .. _json.example:
 
@@ -311,36 +321,55 @@ qpdf JSON format.
          "pdfversion": "1.3",
          "pushedinheritedpageresources": false,
          "calledgetallpages": false,
-         "maxobjectid": 5
+         "maxobjectid": 6
        },
        {
          "obj:1 0 R": {
            "value": {
-             "/Pages": "2 0 R",
+             "/Pages": "3 0 R",
              "/Type": "/Catalog"
            }
          },
          "obj:2 0 R": {
            "value": {
-             "/Count": 1,
-             "/Kids": [ "3 0 R" ],
-             "/Type": "/Pages"
+             "/Author": "u:Digits of π",
+             "/CreationDate": "u:D:20220731155308-05'00'",
+             "/Creator": "u:A person typing in Emacs",
+             "/Keywords": "u:potato, example",
+             "/ModDate": "u:D:20220731155308-05'00'",
+             "/Producer": "u:qpdf",
+             "/Subject": "u:Example",
+             "/Title": "u:Something potato-related"
            }
          },
          "obj:3 0 R": {
            "value": {
-             "/Contents": "4 0 R",
-             "/MediaBox": [ 0, 0, 612, 792 ],
-             "/Parent": "2 0 R",
+             "/Count": 1,
+             "/Kids": [
+               "4 0 R"
+             ],
+             "/Type": "/Pages"
+           }
+         },
+         "obj:4 0 R": {
+           "value": {
+             "/Contents": "5 0 R",
+             "/MediaBox": [
+               0,
+               0,
+               612,
+               792
+             ],
+             "/Parent": "3 0 R",
              "/Resources": {
                "/Font": {
-                 "/F1": "5 0 R"
+                 "/F1": "6 0 R"
                }
              },
              "/Type": "/Page"
            }
          },
-         "obj:4 0 R": {
+         "obj:5 0 R": {
            "stream": {
              "data": "eJxzCuFSUNB3M1QwMlEISQOyzY2AyEAhJAXI1gjIL0ksyddUCMnicg3hAgDLAQnI",
              "dict": {
@@ -348,7 +377,7 @@ qpdf JSON format.
              }
            }
          },
-         "obj:5 0 R": {
+         "obj:6 0 R": {
            "value": {
              "/BaseFont": "/Helvetica",
              "/Encoding": "/WinAnsiEncoding",
@@ -360,10 +389,11 @@ qpdf JSON format.
            "value": {
              "/ID": [
                "b:98b5a26966fba4d3a769b715b2558da6",
-               "b:98b5a26966fba4d3a769b715b2558da6"
+               "b:6bea23330e0b9ff0ddb47b6757fb002e"
              ],
+             "/Info": "2 0 R",
              "/Root": "1 0 R",
-             "/Size": 6
+             "/Size": 7
            }
          }
        }
@@ -410,9 +440,6 @@ Here are some important things to know about qpdf JSON input.
   - ``"maxobjectid"`` is ignored, so it is not necessary to update it
     when adding new objects.
 
-  - ``"calledgetallpages"`` and ``"pushedinheritedpageresources"`` are
-    treated as false if omitted.
-
   - ``"/Length"`` is ignored in all stream dictionaries. qpdf doesn't
     put it there when it creates JSON output, and it is not necessary
     to add it.
@@ -420,16 +447,24 @@ Here are some important things to know about qpdf JSON input.
   - ``"/Size"`` is ignored if it appears in a trailer dictionary as
     that is always recomputed by ``QPDFWriter``.
 
-  - Unknown keys at the to top level of the file, within ``objects``,
-    at the top level of each individual object (inside the object that
-    has the ``"value"`` or ``"stream"`` key) and directly within
-    ``"stream"`` are ignored for future compatibility. This includes
-    other top-level keys generated by ``qpdf`` itself (such as
-    ``"pages"``). As such, those keys don't have to be consistent with
-    the ``"qpdf"`` key if modifying a JSON file for conversion back to
-    PDF. If you wish to store application-specific metadata, you can
-    do so by adding a key whose name starts with ``x-``. qpdf is
-    guaranteed not to add any of its own keys that starts with ``x-``.
+  - Unknown keys at the top level of the file, within ``"qpdf"``, and
+    at the top level of each individual PDF object (inside the
+    dictionary that has the ``"value"`` or ``"stream"`` key) and
+    directly within ``"stream"`` are ignored for future compatibility.
+    This includes other top-level keys generated by ``qpdf`` itself
+    (such as ``"pages"``). As such, those keys don't have to be
+    consistent with the ``"qpdf"`` key if modifying a JSON file for
+    conversion back to PDF. If you wish to store application-specific
+    metadata, you can do so by adding a key whose name starts with
+    ``x-``. qpdf is guaranteed not to add any of its own keys that
+    starts with ``x-``. Note that any ``"version"`` key at the top
+    level is ignored. The JSON version is obtained from the
+    ``"jsonversion"`` key of the first element of the ``"qpdf"``
+    field.
+
+- The values of ``"calledgetallpages"`` and
+  ``"pushedinheritedpageresources"`` are ignored when creating a file.
+  When updating a file, they treated as ``false`` if omitted.
 
 - When qpdf reads a PDF file, the internal object numbers are always
   preserved. However, when qpdf writes a file using ``QPDFWriter``,
@@ -465,14 +500,14 @@ Here are some important things to know about qpdf JSON input.
   ``QPDF::updateFromJSON``), existing objects are updated in place.
   This has the following implications:
 
-  - You may omit both ``"data"`` and ``"datafile"`` if the object you
-    are updating is already a stream. In that case the original stream
+  - If the object you are updating is a stream, you may omit both
+    ``"data"`` and ``"datafile"``. In that case the original stream
     data is preserved. You must always provide a stream dictionary,
     but it may be empty. Note that an empty stream dictionary will
     clear the old dictionary. There is no way to indicate that an old
     stream dictionary should be left alone, so if your intention is to
-    replace the stream data and preserve the dictionary, the
-    original dictionary must appear in the JSON file.
+    replace the stream data and preserve the dictionary, the original
+    dictionary must appear in the JSON file.
 
   - You can change one object type to another object type including
     replacing a stream with a non-stream or a non-stream with a
@@ -577,11 +612,14 @@ Compatibility
    change would be any change that involves removal of a key, a change
    to the format of data pointed to by a key, or a semantic change
    that requires a different interpretation of a previously existing
-   key.
+   key. Note that, starting with version 2, the JSON version also
+   appears in the ``"jsonversion"`` field of the first element of
+   ``"qpdf"`` field.
 
-   With a specific qpdf JSON version, future versions of qpdf are free
-   to add additional keys but not to remove keys or change the type of
-   object that a key points to.
+   Within a specific qpdf JSON version, future versions of qpdf are
+   free to add additional keys but not to remove keys or change the
+   type of object that a key points to. That means that consumers of
+   qpdf JSON should ignore keys they don't know about.
 
 Documentation
    The :command:`qpdf` command can be invoked with the
@@ -634,7 +672,13 @@ Directness and Simplicity
    functions in that it allows you to look at certain aspects of the
    PDF file without having to understand all the nuances of the PDF
    specification, while the raw objects allow you to mine the PDF for
-   anything that the higher-level interfaces are lacking.
+   anything that the higher-level interfaces are lacking. It is
+   especially useful to create a JSON file with the ``"pages"`` and
+   ``"qpdf"`` keys and to use the ``"pages"`` information to find a
+   page rather than navigating the pages tree manually. This can be
+   done safely, and changes can made to the objects dictionary without
+   worrying about keeping ``"pages"`` up to date since it is ignored
+   when reading the file back in.
 
 .. _json.considerations:
 
@@ -741,10 +785,11 @@ version 2.
   dictionary within ``"objects"``, and the PDF version was not
   captured at all.
 
-- Within the objects dictionary, keys are now ``"obj:O G R"`` where
-  ``O`` and ``G`` are the object and generation number. ``"trailer"``
-  remains the key for the trailer dictionary. In v1, the ``obj:``
-  prefix was not present. The rationale for this change is as follows:
+- Within the objects dictionary, keys are now :samp:`"obj:{O} {G} R"`
+  where :samp:`{O}` and :samp:`{G}` are the object and generation
+  number. ``"trailer"`` remains the key for the trailer dictionary. In
+  v1, the ``obj:`` prefix was not present. The rationale for this
+  change is as follows:
 
   - Having a unique prefix (``obj:``) makes it much easier to search
     in the JSON file for the definition of an object

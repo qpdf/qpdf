@@ -9,7 +9,9 @@ Before Release:
 * Release qtest with updates to qtest-driver and copy back into qpdf
 
 Next:
-* JSON v2 fixes
+* Support json v2 in the C API. At a minimum, write_json,
+  create_from_json, and update_from_json need to be there and should
+  take the same kinds of functions as the C API for logger.
 
 Pending changes:
 
@@ -64,19 +66,6 @@ QPDFObjectHandle because of indirect objects. This only pertains to
 direct objects, which are always "resolved" in QPDFObjectHandle.
 
 Soon: Break ground on "Document-level work"
-
-
-JSON v2 fixes
-=============
-
-* Support json v2 in the C API. At a minimum, write_json,
-  create_from_json, and update_from_json need to be there and should
-  take the same kinds of functions as the C API for logger.
-
-* Address json.rst comment from m-holger: "The discussion of stream
-  objects is very wordy. Would a table similar to the style of the PDF
-  spec be easier to use?"
-
 
 Possible future JSON enhancements
 =================================
