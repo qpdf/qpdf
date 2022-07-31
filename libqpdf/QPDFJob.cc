@@ -487,6 +487,15 @@ QPDFJob::config()
 std::string
 QPDFJob::job_json_schema_v1()
 {
+    return job_json_schema(1);
+}
+
+std::string
+QPDFJob::job_json_schema(int version)
+{
+    if (version != LATEST_JOB_JSON) {
+        throw std::runtime_error("job_json_schema: version must be 1");
+    }
     return JOB_SCHEMA_DATA;
 }
 
@@ -1750,6 +1759,12 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
 })"));
     }
     return schema;
+}
+
+std::string
+QPDFJob::json_out_schema(int version)
+{
+    return json_schema(version).unparse();
 }
 
 std::string

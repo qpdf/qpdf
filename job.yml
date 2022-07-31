@@ -75,9 +75,10 @@ options:
     bare:
       - version
       - copyright
-      - json-help
       - show-crypto
       - job-json-help
+    optional_choices:
+      json-help: json_version
   - table: main
     config: c_main
     manual:

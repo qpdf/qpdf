@@ -10,7 +10,7 @@
 #include <sstream>
 #include <stdexcept>
 
-static JSON JOB_SCHEMA = JSON::parse(QPDFJob::job_json_schema_v1().c_str());
+static JSON JOB_SCHEMA = JSON::parse(QPDFJob::job_json_schema(1).c_str());
 
 namespace
 {

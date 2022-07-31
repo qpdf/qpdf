@@ -29,9 +29,9 @@ static char const* modify128_choices[] = {"all", "annotate", "form", "assembly",
 this->ap.selectHelpOptionTable();
 this->ap.addBare("version", b(&ArgParser::argVersion));
 this->ap.addBare("copyright", b(&ArgParser::argCopyright));
-this->ap.addBare("json-help", b(&ArgParser::argJsonHelp));
 this->ap.addBare("show-crypto", b(&ArgParser::argShowCrypto));
 this->ap.addBare("job-json-help", b(&ArgParser::argJobJsonHelp));
+this->ap.addChoices("json-help", p(&ArgParser::argJsonHelp), false, json_version_choices);
 this->ap.selectMainOptionTable();
 this->ap.addPositional(p(&ArgParser::argPositional));
 this->ap.addBare("add-attachment", b(&ArgParser::argAddAttachment));

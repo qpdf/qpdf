@@ -16,9 +16,9 @@ static constexpr char const* O_COPY_ATTACHMENT = "copy attachment";
 
 void argVersion();
 void argCopyright();
-void argJsonHelp();
 void argShowCrypto();
 void argJobJsonHelp();
+void argJsonHelp(std::string const&);
 void argPositional(std::string const&);
 void argAddAttachment();
 void argCopyAttachmentsFrom();

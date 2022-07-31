@@ -143,10 +143,17 @@ ArgParser::argCopyright()
 }
 
 void
-ArgParser::argJsonHelp()
+ArgParser::argJsonHelp(std::string const& parameter)
 {
+    int version = JSON::LATEST;
+    if (!(parameter.empty() || (parameter == "latest"))) {
+        version = QUtil::string_to_int(parameter.c_str());
+    }
+    if ((version < 1) || (version > JSON::LATEST)) {
+        usage(std::string("unsupported json version ") + parameter);
+    }
     *QPDFLogger::defaultLogger()->getInfo()
-        << QPDFJob::json_out_schema_v1() << "\n";
+        << QPDFJob::json_out_schema(version) << "\n";
 }
 
 void
@@ -396,7 +403,7 @@ void
 ArgParser::argJobJsonHelp()
 {
     *QPDFLogger::defaultLogger()->getInfo()
-        << QPDFJob::job_json_schema_v1() << "\n";
+        << QPDFJob::job_json_schema(QPDFJob::LATEST_JOB_JSON) << "\n";
 }
 
 void

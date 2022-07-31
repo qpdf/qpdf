@@ -46,6 +46,8 @@ class QPDFLogger;
 class QPDFJob
 {
   public:
+    static int constexpr LATEST_JOB_JSON = 1;
+
     // Exit codes -- returned by getExitCode() after calling run()
     static int constexpr EXIT_ERROR = qpdf_exit_error;
     static int constexpr EXIT_WARNING = qpdf_exit_warning;
@@ -426,14 +428,23 @@ class QPDFJob
     doIfVerbose(std::function<void(Pipeline&, std::string const& prefix)> fn);
 
     // Provide a string that is the help information ("schema" for the
-    // qpdf-specific JSON object) for version 1 of the JSON output.
+    // qpdf-specific JSON object) for the specified version of JSON
+    // output.
     QPDF_DLL
-    static std::string json_out_schema_v1();
+    static std::string json_out_schema(int version);
 
-    // Provide a string that is the help information for the version 1
-    // of JSON format for QPDFJob.
     QPDF_DLL
-    static std::string job_json_schema_v1();
+    [[deprecated("use json_out_schema(version)")]] static std::string
+    json_out_schema_v1();
+
+    // Provide a string that is the help information for specified
+    // version of JSON format for QPDFJob.
+    QPDF_DLL
+    static std::string job_json_schema(int version);
+
+    QPDF_DLL
+    [[deprecated("use job_json_schema(version)")]] static std::string
+    job_json_schema_v1();
 
   private:
     struct RotationSpec
