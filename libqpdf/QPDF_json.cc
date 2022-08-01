@@ -14,8 +14,11 @@
 
 //                                | st_initial
 // {                              |   -> st_top
-//   "qpdf-v2": {                 |   -> st_qpdf
-//     "objects": {               |   -> st_objects
+//   "qpdf": [                    |   -> st_qpdf
+//     {                          |   -> st_qpdf_meta
+//       ...                      |   ...
+//     },                         |   ...
+//     {                          |   -> st_objects
 //       "obj:1 0 R": {           |   -> st_object_top
 //         "value": {             |   -> st_object
 //           "/Pages": "2 0 R",   |   ...
@@ -41,7 +44,7 @@
 //         }                      |   <- st_trailer
 //       }                        |   <- st_objects
 //     }                          |   <- st_qpdf
-//   }                            |   <- st_top
+//   ]                            |   <- st_top
 // }                              |   <- st_initial
 
 static char const* JSON_PDF = (
