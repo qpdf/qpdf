@@ -183,7 +183,7 @@ QPDFAcroFormDocumentHelper::getFormFields()
     analyze();
     std::vector<QPDFFormFieldObjectHelper> result;
     for (auto const& iter: this->m->field_to_annotations) {
-        result.push_back(this->qpdf.getObjectByObjGen(iter.first));
+        result.push_back(this->qpdf.getObject(iter.first));
     }
     return result;
 }

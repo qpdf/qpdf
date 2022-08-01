@@ -385,6 +385,10 @@ class QPDF
     // Retrieve an object by object ID and generation.  Returns an
     // indirect reference to it.
     QPDF_DLL
+    QPDFObjectHandle getObject(QPDFObjGen const&);
+    QPDF_DLL
+    QPDFObjectHandle getObject(int objid, int generation);
+    QPDF_DLL
     QPDFObjectHandle getObjectByObjGen(QPDFObjGen const&);
     QPDF_DLL
     QPDFObjectHandle getObjectByID(int objid, int generation);

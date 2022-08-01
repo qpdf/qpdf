@@ -394,7 +394,7 @@ QPDF::JSONReactor::replaceObject(
     auto og = to_replace.getObjGen();
     this->reserved.erase(og);
     this->pdf.replaceObject(og, replacement);
-    auto oh = pdf.getObjectByObjGen(og);
+    auto oh = pdf.getObject(og);
     setObjectDescription(oh, value);
 }
 
