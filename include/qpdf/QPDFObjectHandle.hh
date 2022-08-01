@@ -319,7 +319,7 @@ class QPDFObjectHandle
     QPDF_DLL
     QPDFObjectHandle& operator=(QPDFObjectHandle const&) = default;
     QPDF_DLL
-    bool isInitialized() const;
+    inline bool isInitialized() const;
 
     // Return type code and type name of underlying object.  These are
     // useful for doing rapid type tests (like switch statements) or
@@ -367,7 +367,7 @@ class QPDFObjectHandle
     // This returns true in addition to the query for the specific
     // type for indirect objects.
     QPDF_DLL
-    bool isIndirect();
+    inline bool isIndirect() const;
 
     // True for everything except array, dictionary, stream, word, and
     // inline image.
@@ -1300,11 +1300,11 @@ class QPDFObjectHandle
     // QPDFObjGen instead.
 
     QPDF_DLL
-    QPDFObjGen getObjGen() const;
+    inline QPDFObjGen getObjGen() const;
     QPDF_DLL
-    int getObjectID() const;
+    inline int getObjectID() const;
     QPDF_DLL
-    int getGeneration() const;
+    inline int getGeneration() const;
 
     QPDF_DLL
     std::string unparse();
@@ -1845,5 +1845,35 @@ class QPDFObjectHandle::QPDFArrayItems
   private:
     QPDFObjectHandle oh;
 };
+
+inline QPDFObjGen
+QPDFObjectHandle::getObjGen() const
+{
+    return og;
+}
+
+inline int
+QPDFObjectHandle::getObjectID() const
+{
+    return og.getObj();
+}
+
+inline int
+QPDFObjectHandle::getGeneration() const
+{
+    return og.getGen();
+}
+
+inline bool
+QPDFObjectHandle::isIndirect() const
+{
+    return initialized && (getObjectID() != 0);
+}
+
+inline bool
+QPDFObjectHandle::isInitialized() const
+{
+    return initialized;
+}
 
 #endif // QPDFOBJECTHANDLE_HH

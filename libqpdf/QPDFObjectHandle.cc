@@ -286,12 +286,6 @@ QPDFObjectHandle::setObjectDescriptionFromInput(
          QUtil::int_to_string(offset)));
 }
 
-bool
-QPDFObjectHandle::isInitialized() const
-{
-    return this->initialized;
-}
-
 QPDFObject::object_type_e
 QPDFObjectHandle::getTypeCode()
 {
@@ -432,12 +426,6 @@ QPDFObjectHandle::isReserved()
 {
     // dereference will clear reserved if this has been replaced
     return dereference() && this->reserved;
-}
-
-bool
-QPDFObjectHandle::isIndirect()
-{
-    return this->initialized && (getObjectID() != 0);
 }
 
 bool
@@ -1497,24 +1485,6 @@ QPDFObjectHandle::replaceStreamData(
         std::shared_ptr<StreamDataProvider>(new FunctionProvider(provider));
     dynamic_cast<QPDF_Stream*>(obj.get())->replaceStreamData(
         sdp, filter, decode_parms);
-}
-
-QPDFObjGen
-QPDFObjectHandle::getObjGen() const
-{
-    return og;
-}
-
-int
-QPDFObjectHandle::getObjectID() const
-{
-    return og.getObj();
-}
-
-int
-QPDFObjectHandle::getGeneration() const
-{
-    return og.getGen();
 }
 
 std::map<std::string, QPDFObjectHandle>
