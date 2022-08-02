@@ -2,6 +2,11 @@
 
 #include <stdexcept>
 
+QPDF_Unresolved::QPDF_Unresolved() :
+    QPDFValue(::ot_unresolved, "unresolved")
+{
+}
+
 std::shared_ptr<QPDFObject>
 QPDF_Unresolved::create()
 {
@@ -26,16 +31,4 @@ JSON
 QPDF_Unresolved::getJSON(int json_version)
 {
     return JSON::makeNull();
-}
-
-qpdf_object_type_e
-QPDF_Unresolved::getTypeCode() const
-{
-    return ::ot_unresolved;
-}
-
-char const*
-QPDF_Unresolved::getTypeName() const
-{
-    return "unresolved";
 }

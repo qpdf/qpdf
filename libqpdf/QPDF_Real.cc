@@ -3,12 +3,14 @@
 #include <qpdf/QUtil.hh>
 
 QPDF_Real::QPDF_Real(std::string const& val) :
+    QPDFValue(::ot_real, "real"),
     val(val)
 {
 }
 
 QPDF_Real::QPDF_Real(
     double value, int decimal_places, bool trim_trailing_zeroes) :
+    QPDFValue(::ot_real, "real"),
     val(QUtil::double_to_string(value, decimal_places, trim_trailing_zeroes))
 {
 }
@@ -58,18 +60,6 @@ QPDF_Real::getJSON(int json_version)
         result = this->val;
     }
     return JSON::makeNumber(result);
-}
-
-qpdf_object_type_e
-QPDF_Real::getTypeCode() const
-{
-    return ::ot_real;
-}
-
-char const*
-QPDF_Real::getTypeName() const
-{
-    return "real";
 }
 
 std::string

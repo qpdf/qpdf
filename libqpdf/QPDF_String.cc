@@ -21,6 +21,7 @@ is_iso_latin1_printable(char ch)
 }
 
 QPDF_String::QPDF_String(std::string const& val) :
+    QPDFValue(::ot_string, "string"),
     val(val)
 {
 }
@@ -82,18 +83,6 @@ QPDF_String::getJSON(int json_version)
         result = "b:" + QUtil::hex_encode(this->val);
     }
     return JSON::makeString(result);
-}
-
-qpdf_object_type_e
-QPDF_String::getTypeCode() const
-{
-    return ::ot_string;
-}
-
-char const*
-QPDF_String::getTypeName() const
-{
-    return "string";
 }
 
 bool

@@ -1,6 +1,7 @@
 #include <qpdf/QPDF_InlineImage.hh>
 
 QPDF_InlineImage::QPDF_InlineImage(std::string const& val) :
+    QPDFValue(::ot_inlineimage, "inline-image"),
     val(val)
 {
 }
@@ -27,18 +28,6 @@ JSON
 QPDF_InlineImage::getJSON(int json_version)
 {
     return JSON::makeNull();
-}
-
-qpdf_object_type_e
-QPDF_InlineImage::getTypeCode() const
-{
-    return ::ot_inlineimage;
-}
-
-char const*
-QPDF_InlineImage::getTypeName() const
-{
-    return "inline-image";
 }
 
 std::string

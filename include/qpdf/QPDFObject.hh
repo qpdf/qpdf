@@ -87,7 +87,7 @@ class QPDFObject
     object_type_e
     getTypeCode() const
     {
-        return value->getTypeCode();
+        return value->type_code;
     }
 
     // Return a string literal that describes the type, useful for
@@ -95,9 +95,8 @@ class QPDFObject
     char const*
     getTypeName() const
     {
-        return value->getTypeName();
+        return value->type_name;
     }
-
     void
     setDescription(QPDF* qpdf, std::string const& description)
     {

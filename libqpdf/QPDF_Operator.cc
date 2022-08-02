@@ -1,6 +1,7 @@
 #include <qpdf/QPDF_Operator.hh>
 
 QPDF_Operator::QPDF_Operator(std::string const& val) :
+    QPDFValue(::ot_operator, "operator"),
     val(val)
 {
 }
@@ -27,18 +28,6 @@ JSON
 QPDF_Operator::getJSON(int json_version)
 {
     return JSON::makeNull();
-}
-
-qpdf_object_type_e
-QPDF_Operator::getTypeCode() const
-{
-    return ::ot_operator;
-}
-
-char const*
-QPDF_Operator::getTypeName() const
-{
-    return "operator";
 }
 
 std::string

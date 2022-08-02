@@ -16,8 +16,6 @@ class QPDF_String: public QPDFValue
     create_utf16(std::string const& utf8_val);
     virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
-    virtual qpdf_object_type_e getTypeCode() const;
-    virtual char const* getTypeName() const;
     std::string unparse(bool force_binary);
     virtual JSON getJSON(int json_version);
     std::string getVal() const;

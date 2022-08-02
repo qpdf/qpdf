@@ -11,11 +11,9 @@ class QPDF_Reserved: public QPDFValue
     virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
-    virtual qpdf_object_type_e getTypeCode() const;
-    virtual char const* getTypeName() const;
 
   private:
-    QPDF_Reserved() = default;
+    QPDF_Reserved();
 };
 
 #endif // QPDF_RESERVED_HH

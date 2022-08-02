@@ -4,12 +4,14 @@
 #include <qpdf/QUtil.hh>
 #include <stdexcept>
 
-QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v)
+QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v) :
+    QPDFValue(::ot_array, "array")
 {
     setFromVector(v);
 }
 
 QPDF_Array::QPDF_Array(SparseOHArray const& items) :
+    QPDFValue(::ot_array, "array"),
     elements(items)
 {
 }
@@ -60,18 +62,6 @@ QPDF_Array::getJSON(int json_version)
         j.addArrayElement(this->elements.at(i).getJSON(json_version));
     }
     return j;
-}
-
-qpdf_object_type_e
-QPDF_Array::getTypeCode() const
-{
-    return ::ot_array;
-}
-
-char const*
-QPDF_Array::getTypeName() const
-{
-    return "array";
 }
 
 int

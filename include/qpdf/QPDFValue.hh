@@ -43,8 +43,6 @@ class QPDFValue
     virtual std::shared_ptr<QPDFObject> shallowCopy() = 0;
     virtual std::string unparse() = 0;
     virtual JSON getJSON(int json_version) = 0;
-    virtual qpdf_object_type_e getTypeCode() const = 0;
-    virtual char const* getTypeName() const = 0;
     virtual void
     setDescription(QPDF* qpdf, std::string const& description)
     {
@@ -75,7 +73,17 @@ class QPDFValue
     }
 
   protected:
-    QPDFValue() = default;
+    QPDFValue() :
+        type_code(::ot_uninitialized),
+        type_name("uninitilized")
+    {
+    }
+    QPDFValue(qpdf_object_type_e type_code, char const* type_name) :
+        type_code(type_code),
+        type_name(type_name)
+    {
+    }
+
     virtual void
     releaseResolved()
     {
@@ -88,6 +96,8 @@ class QPDFValue
     QPDF* owning_qpdf{nullptr};
     std::string object_description;
     qpdf_offset_t parsed_offset{-1};
+    const qpdf_object_type_e type_code;
+    char const* type_name;
 };
 
 #endif // QPDFVALUE_HH

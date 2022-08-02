@@ -4,6 +4,7 @@
 
 QPDF_Dictionary::QPDF_Dictionary(
     std::map<std::string, QPDFObjectHandle> const& items) :
+    QPDFValue(::ot_dictionary, "dictionary"),
     items(items)
 {
 }
@@ -55,18 +56,6 @@ QPDF_Dictionary::getJSON(int json_version)
         }
     }
     return j;
-}
-
-qpdf_object_type_e
-QPDF_Dictionary::getTypeCode() const
-{
-    return ::ot_dictionary;
-}
-
-char const*
-QPDF_Dictionary::getTypeName() const
-{
-    return "dictionary";
 }
 
 bool
