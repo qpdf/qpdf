@@ -280,68 +280,67 @@ QPDFObjectHandle::getTypeName()
 QPDF_Array*
 QPDFObjectHandle::asArray()
 {
-    return isArray() ? dynamic_cast<QPDF_Array*>(obj.get()) : nullptr;
+    return dereference() ? obj->as<QPDF_Array>() : nullptr;
 }
 
 QPDF_Bool*
 QPDFObjectHandle::asBool()
 {
-    return isBool() ? dynamic_cast<QPDF_Bool*>(obj.get()) : nullptr;
+    return dereference() ? obj->as<QPDF_Bool>() : nullptr;
 }
 
 QPDF_Dictionary*
 QPDFObjectHandle::asDictionary()
 {
-    return isDictionary() ? dynamic_cast<QPDF_Dictionary*>(obj.get()) : nullptr;
+    return dereference() ? obj->as<QPDF_Dictionary>() : nullptr;
 }
 
 QPDF_InlineImage*
 QPDFObjectHandle::asInlineImage()
 {
-    return isInlineImage() ? dynamic_cast<QPDF_InlineImage*>(obj.get())
-                           : nullptr;
+    return dereference() ? obj->as<QPDF_InlineImage>() : nullptr;
 }
 
 QPDF_Integer*
 QPDFObjectHandle::asInteger()
 {
-    return isInteger() ? dynamic_cast<QPDF_Integer*>(obj.get()) : nullptr;
+    return dereference() ? obj->as<QPDF_Integer>() : nullptr;
 }
 
 QPDF_Name*
 QPDFObjectHandle::asName()
 {
-    return isName() ? dynamic_cast<QPDF_Name*>(obj.get()) : nullptr;
+    return dereference() ? obj->as<QPDF_Name>() : nullptr;
 }
 
 QPDF_Null*
 QPDFObjectHandle::asNull()
 {
-    return isNull() ? dynamic_cast<QPDF_Null*>(obj.get()) : nullptr;
+    return dereference() ? obj->as<QPDF_Null>() : nullptr;
 }
 
 QPDF_Operator*
 QPDFObjectHandle::asOperator()
 {
-    return isOperator() ? dynamic_cast<QPDF_Operator*>(obj.get()) : nullptr;
+    return dereference() ? obj->as<QPDF_Operator>() : nullptr;
 }
 
 QPDF_Real*
 QPDFObjectHandle::asReal()
 {
-    return isReal() ? dynamic_cast<QPDF_Real*>(obj.get()) : nullptr;
+    return dereference() ? obj->as<QPDF_Real>() : nullptr;
 }
 
 QPDF_Reserved*
 QPDFObjectHandle::asReserved()
 {
-    return isReserved() ? dynamic_cast<QPDF_Reserved*>(obj.get()) : nullptr;
+    return dereference() ? obj->as<QPDF_Reserved>() : nullptr;
 }
 
 QPDF_Stream*
 QPDFObjectHandle::asStream()
 {
-    return isStream() ? dynamic_cast<QPDF_Stream*>(obj.get()) : nullptr;
+    return dereference() ? obj->as<QPDF_Stream>() : nullptr;
 }
 
 QPDF_Stream*
@@ -355,7 +354,7 @@ QPDFObjectHandle::asStreamWithAssert()
 QPDF_String*
 QPDFObjectHandle::asString()
 {
-    return isString() ? dynamic_cast<QPDF_String*>(obj.get()) : nullptr;
+    return dereference() ? obj->as<QPDF_String>() : nullptr;
 }
 
 bool
@@ -1716,11 +1715,8 @@ QPDFObjectHandle::unparseResolved()
     if (!dereference()) {
         throw std::logic_error(
             "attempted to dereference an uninitialized QPDFObjectHandle");
-    } else if (isReserved()) {
-        throw std::logic_error(
-            "QPDFObjectHandle: attempting to unparse a reserved object");
     }
-    return this->obj->unparse();
+    return obj->unparse();
 }
 
 std::string
@@ -1749,9 +1745,6 @@ QPDFObjectHandle::getJSON(int json_version, bool dereference_indirect)
     } else if (!dereference()) {
         throw std::logic_error(
             "attempted to dereference an uninitialized QPDFObjectHandle");
-    } else if (isReserved()) {
-        throw std::logic_error(
-            "QPDFObjectHandle: attempting to unparse a reserved object");
     } else {
         return obj->getJSON(json_version);
     }

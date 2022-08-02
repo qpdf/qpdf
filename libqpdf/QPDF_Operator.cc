@@ -20,7 +20,7 @@ QPDF_Operator::shallowCopy()
 std::string
 QPDF_Operator::unparse()
 {
-    return this->val;
+    return val;
 }
 
 JSON
@@ -29,10 +29,10 @@ QPDF_Operator::getJSON(int json_version)
     return JSON::makeNull();
 }
 
-QPDFObject::object_type_e
+qpdf_object_type_e
 QPDF_Operator::getTypeCode() const
 {
-    return QPDFObject::ot_operator;
+    return ::ot_operator;
 }
 
 char const*

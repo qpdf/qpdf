@@ -31,10 +31,10 @@ QPDF_Integer::getJSON(int json_version)
     return JSON::makeInt(this->val);
 }
 
-QPDFObject::object_type_e
+qpdf_object_type_e
 QPDF_Integer::getTypeCode() const
 {
-    return QPDFObject::ot_integer;
+    return ::ot_integer;
 }
 
 char const*

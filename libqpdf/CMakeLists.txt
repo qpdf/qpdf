@@ -85,6 +85,7 @@ set(libqpdf_SOURCES
   QPDFSystemError.cc
   QPDFTokenizer.cc
   QPDFUsage.cc
+  QPDFValue.cc
   QPDFWriter.cc
   QPDFXRefEntry.cc
   QPDF_Array.cc

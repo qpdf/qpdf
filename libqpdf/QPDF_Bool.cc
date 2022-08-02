@@ -29,10 +29,10 @@ QPDF_Bool::getJSON(int json_version)
     return JSON::makeBool(this->val);
 }
 
-QPDFObject::object_type_e
+qpdf_object_type_e
 QPDF_Bool::getTypeCode() const
 {
-    return QPDFObject::ot_boolean;
+    return ::ot_boolean;
 }
 
 char const*

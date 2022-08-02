@@ -25,6 +25,7 @@
 #include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
 #include <qpdf/JSON.hh>
+#include <qpdf/QPDFValue.hh>
 #include <qpdf/Types.h>
 
 #include <string>
@@ -34,9 +35,9 @@ class QPDFObjectHandle;
 
 class QPDFObject
 {
-  public:
-    QPDFObject();
+    friend class QPDFValue;
 
+  public:
     // Objects derived from QPDFObject are accessible through
     // QPDFObjectHandle. Each object returns a unique type code that
     // has one of the valid qpdf_object_type_e values. As new object
@@ -63,17 +64,84 @@ class QPDFObject
     static constexpr object_type_e ot_inlineimage = ::ot_inlineimage;
     static constexpr object_type_e ot_unresolved = ::ot_unresolved;
 
+    QPDFObject() = default;
     virtual ~QPDFObject() = default;
-    virtual std::shared_ptr<QPDFObject> shallowCopy() = 0;
-    virtual std::string unparse() = 0;
-    virtual JSON getJSON(int json_version) = 0;
+
+    std::shared_ptr<QPDFObject>
+    shallowCopy()
+    {
+        return value->shallowCopy();
+    }
+    std::string
+    unparse()
+    {
+        return value->unparse();
+    }
+    JSON
+    getJSON(int json_version)
+    {
+        return value->getJSON(json_version);
+    }
 
     // Return a unique type code for the object
-    virtual object_type_e getTypeCode() const = 0;
+    object_type_e
+    getTypeCode() const
+    {
+        return value->getTypeCode();
+    }
 
     // Return a string literal that describes the type, useful for
     // debugging and testing
-    virtual char const* getTypeName() const = 0;
+    char const*
+    getTypeName() const
+    {
+        return value->getTypeName();
+    }
+
+    void
+    setDescription(QPDF* qpdf, std::string const& description)
+    {
+        return value->setDescription(qpdf, description);
+    }
+    bool
+    getDescription(QPDF*& qpdf, std::string& description)
+    {
+        return value->getDescription(qpdf, description);
+    }
+    bool
+    hasDescription()
+    {
+        return value->hasDescription();
+    }
+    void
+    setParsedOffset(qpdf_offset_t offset)
+    {
+        value->setParsedOffset(offset);
+    }
+    qpdf_offset_t
+    getParsedOffset()
+    {
+        return value->getParsedOffset();
+    }
+    void
+    assign(std::shared_ptr<QPDFObject> o)
+    {
+        value = o->value;
+    }
+    void
+    swapWith(std::shared_ptr<QPDFObject> o)
+    {
+        auto v = value;
+        value = o->value;
+        o->value = v;
+    }
+
+    template <typename T>
+    T*
+    as()
+    {
+        return dynamic_cast<T*>(value.get());
+    }
 
     // Accessor to give specific access to non-public methods
     class ObjAccessor
@@ -90,29 +158,20 @@ class QPDFObject
             }
         }
     };
+
     friend class ObjAccessor;
-
-    virtual void setDescription(QPDF*, std::string const&);
-    bool getDescription(QPDF*&, std::string&);
-    bool hasDescription();
-
-    void setParsedOffset(qpdf_offset_t offset);
-    qpdf_offset_t getParsedOffset();
 
   protected:
     virtual void
     releaseResolved()
     {
+        value->releaseResolved();
     }
-    static std::shared_ptr<QPDFObject> do_create(QPDFObject*);
 
   private:
     QPDFObject(QPDFObject const&) = delete;
     QPDFObject& operator=(QPDFObject const&) = delete;
-
-    QPDF* owning_qpdf;
-    std::string object_description;
-    qpdf_offset_t parsed_offset;
+    std::shared_ptr<QPDFValue> value;
 };
 
 #endif // QPDFOBJECT_HH

@@ -291,10 +291,10 @@ QPDF_Stream::getStreamJSON(
     return result;
 }
 
-QPDFObject::object_type_e
+qpdf_object_type_e
 QPDF_Stream::getTypeCode() const
 {
-    return QPDFObject::ot_stream;
+    return ::ot_stream;
 }
 
 char const*
@@ -306,7 +306,7 @@ QPDF_Stream::getTypeName() const
 void
 QPDF_Stream::setDescription(QPDF* qpdf, std::string const& description)
 {
-    this->QPDFObject::setDescription(qpdf, description);
+    this->QPDFValue::setDescription(qpdf, description);
     setDictDescription();
 }
 

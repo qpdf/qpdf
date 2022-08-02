@@ -1,7 +1,6 @@
 #include <qpdf/QPDF_Dictionary.hh>
 
 #include <qpdf/QPDF_Name.hh>
-#include <qpdf/QPDF_Null.hh>
 
 QPDF_Dictionary::QPDF_Dictionary(
     std::map<std::string, QPDFObjectHandle> const& items) :
@@ -58,10 +57,10 @@ QPDF_Dictionary::getJSON(int json_version)
     return j;
 }
 
-QPDFObject::object_type_e
+qpdf_object_type_e
 QPDF_Dictionary::getTypeCode() const
 {
-    return QPDFObject::ot_dictionary;
+    return ::ot_dictionary;
 }
 
 char const*

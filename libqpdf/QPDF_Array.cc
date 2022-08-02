@@ -62,10 +62,10 @@ QPDF_Array::getJSON(int json_version)
     return j;
 }
 
-QPDFObject::object_type_e
+qpdf_object_type_e
 QPDF_Array::getTypeCode() const
 {
-    return QPDFObject::ot_array;
+    return ::ot_array;
 }
 
 char const*

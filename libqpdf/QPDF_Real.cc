@@ -60,10 +60,10 @@ QPDF_Real::getJSON(int json_version)
     return JSON::makeNumber(result);
 }
 
-QPDFObject::object_type_e
+qpdf_object_type_e
 QPDF_Real::getTypeCode() const
 {
-    return QPDFObject::ot_real;
+    return ::ot_real;
 }
 
 char const*

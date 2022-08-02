@@ -24,10 +24,10 @@ QPDF_Null::getJSON(int json_version)
     return JSON::makeNull();
 }
 
-QPDFObject::object_type_e
+qpdf_object_type_e
 QPDF_Null::getTypeCode() const
 {
-    return QPDFObject::ot_null;
+    return ::ot_null;
 }
 
 char const*

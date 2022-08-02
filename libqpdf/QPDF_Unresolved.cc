@@ -18,7 +18,7 @@ std::string
 QPDF_Unresolved::unparse()
 {
     throw std::logic_error(
-        "attempted to unparse an unresolveded QPDFObjectHandle");
+        "attempted to unparse an unresolved QPDFObjectHandle");
     return "";
 }
 
@@ -28,10 +28,10 @@ QPDF_Unresolved::getJSON(int json_version)
     return JSON::makeNull();
 }
 
-QPDFObject::object_type_e
+qpdf_object_type_e
 QPDF_Unresolved::getTypeCode() const
 {
-    return QPDFObject::ot_unresolved;
+    return ::ot_unresolved;
 }
 
 char const*

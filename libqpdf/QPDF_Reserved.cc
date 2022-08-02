@@ -30,10 +30,10 @@ QPDF_Reserved::getJSON(int json_version)
     return JSON::makeNull();
 }
 
-QPDFObject::object_type_e
+qpdf_object_type_e
 QPDF_Reserved::getTypeCode() const
 {
-    return QPDFObject::ot_reserved;
+    return ::ot_reserved;
 }
 
 char const*

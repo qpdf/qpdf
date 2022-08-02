@@ -84,10 +84,10 @@ QPDF_String::getJSON(int json_version)
     return JSON::makeString(result);
 }
 
-QPDFObject::object_type_e
+qpdf_object_type_e
 QPDF_String::getTypeCode() const
 {
-    return QPDFObject::ot_string;
+    return ::ot_string;
 }
 
 char const*
