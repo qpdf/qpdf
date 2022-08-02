@@ -2266,12 +2266,7 @@ QPDFObjectHandle::shallowCopyInternal(
         QTC::TC("qpdf", "QPDFObjectHandle ERR shallow copy stream");
         throw std::runtime_error("attempt to make a shallow copy of a stream");
     }
-
-    if (isArray() || isDictionary()) {
-        new_obj = QPDFObjectHandle(obj->shallowCopy());
-    } else {
-        new_obj = *this;
-    }
+    new_obj = QPDFObjectHandle(obj->shallowCopy());
 
     std::set<QPDFObjGen> visited;
     new_obj.copyObject(visited, false, first_level_only, false);
