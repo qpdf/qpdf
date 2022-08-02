@@ -1420,8 +1420,7 @@ QPDF::fixDanglingReferences(bool force)
                 to_check.push_back(iter.second);
             }
         } else if (obj.isArray()) {
-            QPDF_Array* arr = dynamic_cast<QPDF_Array*>(
-                QPDFObjectHandle::ObjAccessor::getObject(obj).get());
+            auto arr = QPDFObjectHandle::ObjAccessor::asArray(obj);
             arr->addExplicitElementsToList(to_check);
         }
         for (auto sub: to_check) {
@@ -2468,12 +2467,12 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
     QPDFObjGen local_og(result.getObjGen());
     // Copy information from the foreign stream so we can pipe its
     // data later without keeping the original QPDF object around.
+
     QPDF* foreign_stream_qpdf = foreign.getOwningQPDF(
         false, "unable to retrieve owning qpdf from foreign stream");
 
-    QPDF_Stream* stream = dynamic_cast<QPDF_Stream*>(
-        QPDFObjectHandle::ObjAccessor::getObject(foreign).get());
-    if (!stream) {
+    auto stream = QPDFObjectHandle::ObjAccessor::asStream(foreign);
+    if (stream == nullptr) {
         throw std::logic_error("unable to retrieve underlying"
                                " stream object from foreign stream");
     }

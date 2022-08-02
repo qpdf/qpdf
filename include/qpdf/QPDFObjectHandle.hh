@@ -43,8 +43,18 @@
 
 class Pipeline;
 class QPDF;
-class QPDF_Dictionary;
 class QPDF_Array;
+class QPDF_Bool;
+class QPDF_Dictionary;
+class QPDF_InlineImage;
+class QPDF_Integer;
+class QPDF_Name;
+class QPDF_Null;
+class QPDF_Operator;
+class QPDF_Real;
+class QPDF_Reserved;
+class QPDF_Stream;
+class QPDF_String;
 class QPDFTokenizer;
 class QPDFExc;
 class Pl_QPDFTokenizer;
@@ -1480,6 +1490,16 @@ class QPDFObjectHandle
             };
             return o.obj;
         }
+        static QPDF_Array*
+        asArray(QPDFObjectHandle& oh)
+        {
+            return oh.asArray();
+        }
+        static QPDF_Stream*
+        asStream(QPDFObjectHandle& oh)
+        {
+            return oh.asStream();
+        }
     };
     friend class ObjAccessor;
 
@@ -1580,6 +1600,20 @@ class QPDFObjectHandle
         QPDFObjectHandle stream_dict,
         qpdf_offset_t offset,
         size_t length);
+
+    QPDF_Array* asArray();
+    QPDF_Bool* asBool();
+    QPDF_Dictionary* asDictionary();
+    QPDF_InlineImage* asInlineImage();
+    QPDF_Integer* asInteger();
+    QPDF_Name* asName();
+    QPDF_Null* asNull();
+    QPDF_Operator* asOperator();
+    QPDF_Real* asReal();
+    QPDF_Reserved* asReserved();
+    QPDF_Stream* asStream();
+    QPDF_Stream* asStreamWithAssert();
+    QPDF_String* asString();
 
     void typeWarning(char const* expected_type, std::string const& warning);
     void objectWarning(std::string const& warning);
@@ -1881,7 +1915,7 @@ QPDFObjectHandle::setParsedOffset(qpdf_offset_t offset)
 {
     // This is called during parsing on newly created direct objects,
     // so we can't call dereference() here.
-    if (this->obj.get()) {
+    if (initialized) {
         this->obj->setParsedOffset(offset);
     }
 }
