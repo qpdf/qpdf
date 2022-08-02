@@ -2152,17 +2152,7 @@ QPDFObjectHandle::newStream(QPDF* qpdf, std::string const& data)
 QPDFObjectHandle
 QPDFObjectHandle::newReserved(QPDF* qpdf)
 {
-    // Reserve a spot for this object by assigning it an object
-    // number, but then return an unresolved handle to the object.
-    QPDFObjectHandle reserved = qpdf->makeIndirectObject(makeReserved());
-    QPDFObjectHandle result = newIndirect(qpdf, reserved.getObjGen());
-    return result;
-}
-
-QPDFObjectHandle
-QPDFObjectHandle::makeReserved()
-{
-    return QPDFObjectHandle(QPDF_Reserved::create());
+    return qpdf->makeIndirectObject(QPDFObjectHandle(QPDF_Reserved::create()));
 }
 
 void

@@ -24,6 +24,7 @@
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QPDF_Null.hh>
+#include <qpdf/QPDF_Reserved.hh>
 #include <qpdf/QPDF_Stream.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -2144,9 +2145,9 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
 QPDFObjectHandle
 QPDF::reserveObjectIfNotExists(QPDFObjGen const& og)
 {
-    if ((!this->m->obj_cache.count(og)) && (!this->m->xref_table.count(og))) {
+    if ((!m->obj_cache.count(og)) && (!m->xref_table.count(og))) {
         resolve(og);
-        replaceObject(og, QPDFObjectHandle::Factory::makeReserved());
+        m->obj_cache[og].object = QPDF_Reserved::create();
     }
     return getObject(og);
 }
