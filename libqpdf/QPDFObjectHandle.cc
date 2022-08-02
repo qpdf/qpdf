@@ -2611,9 +2611,7 @@ QPDFObjectHandle::dereference()
     if (!this->initialized) {
         return false;
     }
-    if ((this->obj->getTypeCode() == QPDFObject::ot_unresolved) ||
-        (getObjectID() &&
-         QPDF::Resolver::objectChanged(this->qpdf, getObjGen(), this->obj))) {
+    if (this->obj->getTypeCode() == QPDFObject::ot_unresolved) {
         this->obj = QPDF::Resolver::resolve(this->qpdf, getObjGen());
     }
     return true;
