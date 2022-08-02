@@ -1180,6 +1180,8 @@ class QPDF
     void stopOnError(std::string const& message);
     QPDFObjectHandle reserveObjectIfNotExists(QPDFObjGen const& og);
     QPDFObjectHandle reserveStream(QPDFObjGen const& og);
+    QPDFObjectHandle
+    newIndirect(QPDFObjGen const&, std::shared_ptr<QPDFObject> const&);
 
     // Calls finish() on the pipeline when done but does not delete it
     bool pipeStreamData(

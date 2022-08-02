@@ -21,6 +21,7 @@
 #include <qpdf/QPDF_Reserved.hh>
 #include <qpdf/QPDF_Stream.hh>
 #include <qpdf/QPDF_String.hh>
+#include <qpdf/QPDF_Unresolved.hh>
 #include <qpdf/SparseOHArray.hh>
 
 #include <qpdf/QIntC.hh>
@@ -237,13 +238,6 @@ LastChar::getLastChar()
 QPDFObjectHandle::QPDFObjectHandle() :
     initialized(false),
     qpdf(nullptr)
-{
-}
-
-QPDFObjectHandle::QPDFObjectHandle(QPDF* qpdf, QPDFObjGen const& og) :
-    initialized(true),
-    qpdf(qpdf),
-    og(og)
 {
 }
 
@@ -1953,7 +1947,7 @@ QPDFObjectHandle::newIndirect(QPDF* qpdf, QPDFObjGen const& og)
         return newNull();
     }
 
-    return QPDFObjectHandle(qpdf, og);
+    return QPDFObjectHandle(qpdf, og, QPDF_Unresolved::create());
 }
 
 QPDFObjectHandle
@@ -2553,10 +2547,11 @@ QPDFObjectHandle::dereference()
     if (!this->initialized) {
         return false;
     }
-    if (this->obj() == nullptr ||
+    if ((this->obj->getTypeCode() == QPDFObject::ot_unresolved) ||
         (getObjectID() &&
          QPDF::Resolver::objectChanged(this->qpdf, getObjGen(), this->obj))) {
-        obj = QPDF::Resolver::resolve(this->qpdf, getObjGen());
+        this->obj = QPDF::Resolver::resolve(this->qpdf, getObjGen());
+
     }
     return true;
 }

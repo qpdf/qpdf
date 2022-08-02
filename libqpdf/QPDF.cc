@@ -1463,8 +1463,7 @@ QPDF::getAllObjects()
     fixDanglingReferences(true);
     std::vector<QPDFObjectHandle> result;
     for (auto const& iter: this->m->obj_cache) {
-        QPDFObjGen const& og = iter.first;
-        result.push_back(getObjectByObjGen(og));
+        result.push_back(newIndirect(iter.first, iter.second.object));
     }
     return result;
 }
@@ -2129,6 +2128,15 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 }
 
 QPDFObjectHandle
+QPDF::newIndirect(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& obj)
+{
+    if (!obj->hasDescription()) {
+        obj->setDescription(this, "object " + og.unparse(' '));
+    }
+    return QPDFObjectHandle::Factory::newIndirect(this, og, obj);
+}
+
+QPDFObjectHandle
 QPDF::makeIndirectObject(QPDFObjectHandle oh)
 {
     int max_objid = toI(getObjectCount());
@@ -2137,9 +2145,9 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
             "max object id is too high to create new objects");
     }
     QPDFObjGen next(max_objid + 1, 0);
-    this->m->obj_cache[next] =
+    m->obj_cache[next] =
         ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
-    return QPDFObjectHandle::Factory::newIndirect(this, next);
+    return newIndirect(next, m->obj_cache[next].object);
 }
 
 QPDFObjectHandle
@@ -2148,8 +2156,10 @@ QPDF::reserveObjectIfNotExists(QPDFObjGen const& og)
     if ((!m->obj_cache.count(og)) && (!m->xref_table.count(og))) {
         resolve(og);
         m->obj_cache[og].object = QPDF_Reserved::create();
+        return newIndirect(og, m->obj_cache[og].object);
+    } else {
+        return getObject(og);
     }
-    return getObject(og);
 }
 
 QPDFObjectHandle
@@ -2162,7 +2172,8 @@ QPDF::reserveStream(QPDFObjGen const& og)
 QPDFObjectHandle
 QPDF::getObject(QPDFObjGen const& og)
 {
-    return QPDFObjectHandle::Factory::newIndirect(this, og);
+    auto obj = (og.getObj() != 0) ? resolve(og) : QPDF_Null::create();
+    return newIndirect(og, obj);
 }
 
 QPDFObjectHandle

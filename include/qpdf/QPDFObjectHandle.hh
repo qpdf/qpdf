@@ -1443,9 +1443,12 @@ class QPDFObjectHandle
 
       private:
         static QPDFObjectHandle
-        newIndirect(QPDF* qpdf, QPDFObjGen const& og)
+        newIndirect(
+            QPDF* qpdf,
+            QPDFObjGen const& og,
+            std::shared_ptr<QPDFObject> const& obj)
         {
-            return QPDFObjectHandle::newIndirect(qpdf, og);
+            return QPDFObjectHandle(qpdf, og, obj);
         }
         static QPDFObjectHandle
         newStream(
@@ -1557,7 +1560,16 @@ class QPDFObjectHandle
     bool isImage(bool exclude_imagemask = true);
 
   private:
-    QPDFObjectHandle(QPDF*, QPDFObjGen const& og);
+    QPDFObjectHandle(
+        QPDF* qpdf,
+        QPDFObjGen const& og,
+        std::shared_ptr<QPDFObject> const& obj) :
+        initialized(true),
+        qpdf(qpdf),
+        og(og),
+        obj(obj)
+    {
+    }
     QPDFObjectHandle(std::shared_ptr<QPDFObject> const&);
 
     // Private object factory methods
