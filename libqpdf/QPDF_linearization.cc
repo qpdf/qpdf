@@ -137,8 +137,7 @@ QPDF::isLinearized()
         return false;
     }
 
-    QPDFObjectHandle candidate = QPDFObjectHandle::Factory::newIndirect(
-        this, QPDFObjGen(lindict_obj, 0));
+    auto candidate = getObjectByID(lindict_obj, 0);
     if (!candidate.isDictionary()) {
         return false;
     }

@@ -1397,7 +1397,7 @@ QPDF::fixDanglingReferences(bool force)
     std::list<QPDFObjectHandle> queue;
     queue.push_back(this->m->trailer);
     for (auto const& og: to_process) {
-        QPDFObjectHandle obj = QPDFObjectHandle::Factory::newIndirect(this, og);
+        auto obj = getObjectByObjGen(og);
         if (obj.isDictionary() || obj.isArray()) {
             queue.push_back(obj);
         } else if (obj.isStream()) {
@@ -1463,7 +1463,7 @@ QPDF::getAllObjects()
     std::vector<QPDFObjectHandle> result;
     for (auto const& iter: this->m->obj_cache) {
         QPDFObjGen const& og = iter.first;
-        result.push_back(QPDFObjectHandle::Factory::newIndirect(this, og));
+        result.push_back(getObjectByObjGen(og));
     }
     return result;
 }
