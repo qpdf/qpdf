@@ -61,6 +61,7 @@ class QPDFObject
     static constexpr object_type_e ot_stream = ::ot_stream;
     static constexpr object_type_e ot_operator = ::ot_operator;
     static constexpr object_type_e ot_inlineimage = ::ot_inlineimage;
+    static constexpr object_type_e ot_unresolved = ::ot_unresolved;
 
     virtual ~QPDFObject() = default;
     virtual std::shared_ptr<QPDFObject> shallowCopy() = 0;
