@@ -1609,7 +1609,6 @@ class QPDFObjectHandle
     QPDF* qpdf;
     QPDFObjGen og;
     std::shared_ptr<QPDFObject> obj;
-    bool reserved;
 };
 
 #ifndef QPDF_NO_QPDF_STRING

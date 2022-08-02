@@ -236,24 +236,21 @@ LastChar::getLastChar()
 
 QPDFObjectHandle::QPDFObjectHandle() :
     initialized(false),
-    qpdf(nullptr),
-    reserved(false)
+    qpdf(nullptr)
 {
 }
 
 QPDFObjectHandle::QPDFObjectHandle(QPDF* qpdf, QPDFObjGen const& og) :
     initialized(true),
     qpdf(qpdf),
-    og(og),
-    reserved(false)
+    og(og)
 {
 }
 
 QPDFObjectHandle::QPDFObjectHandle(std::shared_ptr<QPDFObject> const& data) :
     initialized(true),
     qpdf(nullptr),
-    obj(data),
-    reserved(false)
+    obj(data)
 {
 }
 
@@ -412,7 +409,7 @@ bool
 QPDFObjectHandle::isReserved()
 {
     // dereference will clear reserved if this has been replaced
-    return dereference() && this->reserved;
+    return dereference() && QPDFObjectTypeAccessor<QPDF_Reserved>::check(obj);
 }
 
 bool
@@ -1648,7 +1645,7 @@ QPDFObjectHandle::unparseResolved()
     if (!dereference()) {
         throw std::logic_error(
             "attempted to dereference an uninitialized QPDFObjectHandle");
-    } else if (this->reserved) {
+    } else if (isReserved()) {
         throw std::logic_error(
             "QPDFObjectHandle: attempting to unparse a reserved object");
     }
@@ -1680,7 +1677,7 @@ QPDFObjectHandle::getJSON(int json_version, bool dereference_indirect)
     } else if (!dereference()) {
         throw std::logic_error(
             "attempted to dereference an uninitialized QPDFObjectHandle");
-    } else if (this->reserved) {
+    } else if (isReserved()) {
         throw std::logic_error(
             "QPDFObjectHandle: attempting to unparse a reserved object");
     } else {
@@ -2159,7 +2156,6 @@ QPDFObjectHandle::newReserved(QPDF* qpdf)
     // number, but then return an unresolved handle to the object.
     QPDFObjectHandle reserved = qpdf->makeIndirectObject(makeReserved());
     QPDFObjectHandle result = newIndirect(qpdf, reserved.getObjGen());
-    result.reserved = true;
     return result;
 }
 
@@ -2567,24 +2563,10 @@ QPDFObjectHandle::dereference()
     if (!this->initialized) {
         return false;
     }
-    if (this->obj.get() && getObjectID() &&
-        QPDF::Resolver::objectChanged(this->qpdf, getObjGen(), this->obj)) {
-        this->obj = nullptr;
-    }
-    if (this->obj == nullptr) {
-        std::shared_ptr<QPDFObject> obj =
-            QPDF::Resolver::resolve(this->qpdf, getObjGen());
-        if (obj == nullptr) {
-            // QPDF::resolve never returns an uninitialized object, but
-            // check just in case.
-            this->obj = QPDF_Null::create();
-        } else if (dynamic_cast<QPDF_Reserved*>(obj.get())) {
-            // Do not resolve
-            this->reserved = true;
-        } else {
-            this->reserved = false;
-            this->obj = obj;
-        }
+    if (this->obj() == nullptr ||
+        (getObjectID() &&
+         QPDF::Resolver::objectChanged(this->qpdf, getObjGen(), this->obj))) {
+        obj = QPDF::Resolver::resolve(this->qpdf, getObjGen());
     }
     return true;
 }
