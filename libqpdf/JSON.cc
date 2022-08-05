@@ -409,10 +409,7 @@ JSON::getBool(bool& value) const
 bool
 JSON::isNull() const
 {
-    if (dynamic_cast<JSON_null const*>(this->m->value.get())) {
-        return true;
-    }
-    return false;
+    return dynamic_cast<JSON_null const*>(this->m->value.get()) != nullptr;
 }
 
 bool
@@ -1175,8 +1172,8 @@ JSONParser::handleToken()
             // okay
         }
     } else if (delimiter == '}') {
-        if (!((parser_state == ps_dict_begin) ||
-              (parser_state == ps_dict_after_item)))
+        if ((parser_state != ps_dict_begin) &&
+            (parser_state != ps_dict_after_item))
 
         {
             QTC::TC("libtests", "JSON parse unexpected }");
@@ -1185,8 +1182,8 @@ JSONParser::handleToken()
                 ": unexpected dictionary end delimiter");
         }
     } else if (delimiter == ']') {
-        if (!((parser_state == ps_array_begin) ||
-              (parser_state == ps_array_after_item)))
+        if ((parser_state != ps_array_begin) &&
+            (parser_state != ps_array_after_item))
 
         {
             QTC::TC("libtests", "JSON parse unexpected ]");
@@ -1202,8 +1199,8 @@ JSONParser::handleToken()
                 ": unexpected colon");
         }
     } else if (delimiter == ',') {
-        if (!((parser_state == ps_dict_after_item) ||
-              (parser_state == ps_array_after_item))) {
+        if ((parser_state != ps_dict_after_item) &&
+            (parser_state != ps_array_after_item)) {
             QTC::TC("libtests", "JSON parse unexpected ,");
             throw std::runtime_error(
                 "JSON: offset " + QUtil::int_to_string(offset) +

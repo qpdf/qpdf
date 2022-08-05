@@ -861,8 +861,7 @@ QPDF::initializeEncryption()
 
     // If supporting new encryption R/V values, remember to update
     // error message inside this if statement.
-    if (!(((R >= 2) && (R <= 6)) &&
-          ((V == 1) || (V == 2) || (V == 4) || (V == 5)))) {
+    if ((R < 2) || (R > 6) || ((V != 1) && (V != 2) && (V != 4) && (V != 5))) {
         throw QPDFExc(
             qpdf_e_unsupported,
             this->m->file->getName(),
@@ -885,7 +884,7 @@ QPDF::initializeEncryption()
         // These must be exactly the right number of bytes.
         pad_short_parameter(O, key_bytes);
         pad_short_parameter(U, key_bytes);
-        if (!((O.length() == key_bytes) && (U.length() == key_bytes))) {
+        if ((O.length() != key_bytes) || (U.length() != key_bytes)) {
             throw QPDFExc(
                 qpdf_e_damaged_pdf,
                 this->m->file->getName(),

@@ -471,8 +471,8 @@ QPDFTokenizer::presentCharacter(char ch)
         resolveLiteral();
     }
 
-    if (!(betweenTokens() ||
-          ((this->m->state == st_token_ready) && this->m->unread_char))) {
+    if (!betweenTokens() &&
+        ((this->m->state != st_token_ready) || !this->m->unread_char)) {
         this->m->raw_val += orig_ch;
     }
 }

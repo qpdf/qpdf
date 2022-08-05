@@ -141,7 +141,7 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         return result;
     }
     QPDFObjectHandle components_obj = dict.getKey("/BitsPerComponent");
-    if (!(components_obj.isInteger() && (components_obj.getIntValue() == 8))) {
+    if (!components_obj.isInteger() || (components_obj.getIntValue() != 8)) {
         QTC::TC("qpdf", "QPDFJob image optimize bits per component");
         if (!description.empty()) {
             o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -3037,7 +3037,7 @@ QPDFJob::setEncryptionOptions(QPDF& pdf, QPDFWriter& w)
     } else {
         throw std::logic_error("bad encryption keylen");
     }
-    if ((R > 3) && (m->r3_accessibility == false)) {
+    if ((R > 3) && (!m->r3_accessibility)) {
         *this->m->log->getError() << this->m->message_prefix
                                   << ": -accessibility=n is ignored for modern"
                                   << " encryption formats\n";

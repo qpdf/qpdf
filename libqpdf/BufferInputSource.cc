@@ -58,7 +58,7 @@ BufferInputSource::findAndSkipNextEOL()
     unsigned char const* end = buffer + end_pos;
     unsigned char const* p = buffer + this->m->cur_offset;
 
-    while ((p < end) && !((*p == '\r') || (*p == '\n'))) {
+    while ((p < end) && (*p != '\r') && (*p != '\n')) {
         ++p;
     }
     if (p < end) {

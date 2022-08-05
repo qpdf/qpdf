@@ -84,7 +84,7 @@ FileInputSource::findAndSkipNextEOL()
                 while (!done) {
                     if (this->read(&ch, 1) == 0) {
                         done = true;
-                    } else if (!((ch == '\r') || (ch == '\n'))) {
+                    } else if ((ch != '\r') && (ch != '\n')) {
                         this->unreadCh(ch);
                         done = true;
                     }

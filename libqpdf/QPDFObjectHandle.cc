@@ -2175,11 +2175,7 @@ QPDFObjectHandle::parseInternal(
                 std::string name = token.getValue();
                 object = newName(name);
 
-                if (name == "/Contents") {
-                    b_contents = true;
-                } else {
-                    b_contents = false;
-                }
+                b_contents = name == "/Contents";
             }
             break;
 
@@ -2267,8 +2263,7 @@ QPDFObjectHandle::parseInternal(
         }
 
         if ((!object.isInitialized()) &&
-            (!((state == st_start) || (state == st_stop) ||
-               (state == st_eof)))) {
+            ((state != st_start) && (state != st_stop) && (state != st_eof))) {
             throw std::logic_error("QPDFObjectHandle::parseInternal: "
                                    "unexpected uninitialized object");
             object = newNull();

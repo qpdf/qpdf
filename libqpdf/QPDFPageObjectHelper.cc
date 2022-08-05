@@ -928,7 +928,7 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
     if (rotate_oh.isInteger()) {
         rotate = rotate_oh.getIntValueAsInt();
     }
-    if (!((rotate == 90) || (rotate == 180) || (rotate == 270))) {
+    if ((rotate != 90) && (rotate != 180) && (rotate != 270)) {
         return;
     }
     auto mediabox = this->oh.getKey("/MediaBox");

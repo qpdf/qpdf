@@ -32,9 +32,9 @@ Pl_PNGFilter::Pl_PNGFilter(
         throw std::runtime_error(
             "PNGFilter created with invalid samples_per_pixel");
     }
-    if (!((bits_per_sample == 1) || (bits_per_sample == 2) ||
-          (bits_per_sample == 4) || (bits_per_sample == 8) ||
-          (bits_per_sample == 16))) {
+    if ((bits_per_sample != 1) && (bits_per_sample != 2) &&
+        (bits_per_sample != 4) && (bits_per_sample != 8) &&
+        (bits_per_sample != 16)) {
         throw std::runtime_error(
             "PNGFilter created with invalid bits_per_sample not"
             " 1, 2, 4, 8, or 16");

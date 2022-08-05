@@ -19,12 +19,12 @@ bool
 PDFVersion::operator<(PDFVersion const& rhs) const
 {
     return (
-        (this->major_version < rhs.major_version)           ? true
-            : (this->major_version > rhs.major_version)     ? false
-            : (this->minor_version < rhs.minor_version)     ? true
-            : (this->minor_version > rhs.minor_version)     ? false
-            : (this->extension_level < rhs.extension_level) ? true
-                                                            : false);
+        (this->major_version < rhs.major_version)       ? true
+            : (this->major_version > rhs.major_version) ? false
+            : (this->minor_version < rhs.minor_version) ? true
+            : (this->minor_version > rhs.minor_version)
+            ? false
+            : this->extension_level < rhs.extension_level);
 }
 
 bool

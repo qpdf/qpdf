@@ -112,7 +112,7 @@ main(int argc, char* argv[])
         ++argv;
     }
 
-    if (!((argc == 3) || (argc == 4))) {
+    if ((argc != 3) && (argc != 4)) {
         usage();
     }
 

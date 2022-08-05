@@ -2088,8 +2088,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     for (int i = 0; i < n; ++i) {
         QPDFTokenizer::Token tnum = readToken(input);
         QPDFTokenizer::Token toffset = readToken(input);
-        if (!((tnum.getType() == QPDFTokenizer::tt_integer) &&
-              (toffset.getType() == QPDFTokenizer::tt_integer))) {
+        if ((tnum.getType() != QPDFTokenizer::tt_integer) ||
+            (toffset.getType() != QPDFTokenizer::tt_integer)) {
             throw QPDFExc(
                 qpdf_e_damaged_pdf,
                 input->getName(),

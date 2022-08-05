@@ -608,10 +608,7 @@ NNTreeIterator::operator==(NNTreeIterator const& other) const
         ++tpi;
         ++opi;
     }
-    if (this->item_number != other.item_number) {
-        return false;
-    }
-    return true;
+    return this->item_number == other.item_number;
 }
 
 void
@@ -863,8 +860,8 @@ int
 NNTreeImpl::compareKeyKid(
     QPDFObjectHandle& key, QPDFObjectHandle& kids, int idx)
 {
-    if (!(kids.isArray() && (idx < kids.getArrayNItems()) &&
-          kids.getArrayItem(idx).isDictionary())) {
+    if (!kids.isArray() || (idx >= kids.getArrayNItems()) ||
+        !kids.getArrayItem(idx).isDictionary()) {
         QTC::TC("qpdf", "NNTree kid is invalid");
         error(
             qpdf,

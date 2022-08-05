@@ -1421,7 +1421,7 @@ QPDFWriter::willFilterStream(
     bool normalize = false;
     bool uncompress = false;
     if (filter_on_write && is_metadata &&
-        ((!this->m->encrypted) || (this->m->encrypt_metadata == false))) {
+        ((!this->m->encrypted) || (!this->m->encrypt_metadata))) {
         QTC::TC("qpdf", "QPDFWriter not compressing metadata");
         filter = true;
         compress_stream = false;
@@ -2769,7 +2769,7 @@ QPDFWriter::writeXRefStream(
     writeString(
         " /W [ 1 " + QUtil::int_to_string(f1_size) + " " +
         QUtil::int_to_string(f2_size) + " ]");
-    if (!((first == 0) && (last == size - 1))) {
+    if ((first != 0) || (last != size - 1)) {
         writeString(
             " /Index [ " + QUtil::int_to_string(first) + " " +
             QUtil::int_to_string(last - first + 1) + " ]");

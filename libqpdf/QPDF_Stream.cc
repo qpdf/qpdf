@@ -527,7 +527,7 @@ QPDF_Stream::pipeStreamData(
         filterp = &ignored;
     }
     bool& filter = *filterp;
-    filter = (!((encode_flags == 0) && (decode_level == qpdf_dl_none)));
+    filter = ((encode_flags != 0) || (decode_level != qpdf_dl_none));
     bool success = true;
     if (filter) {
         filter =

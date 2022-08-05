@@ -28,7 +28,7 @@ QPDFExc::createWhat(
     if (!filename.empty()) {
         result += filename;
     }
-    if (!(object.empty() && offset == 0)) {
+    if (!object.empty() || offset != 0) {
         if (!filename.empty()) {
             result += " (";
         }

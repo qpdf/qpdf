@@ -493,10 +493,7 @@ QPDFAcroFormDocumentHelper::adjustInheritedFields(
             return true;
         }
         auto oh = field.getInheritableFieldValue(key);
-        if (!oh.isNull()) {
-            return true;
-        }
-        return false;
+        return !oh.isNull();
     };
 
     if (override_da || override_q) {

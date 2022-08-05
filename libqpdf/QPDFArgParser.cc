@@ -523,7 +523,7 @@ QPDFArgParser::parseArgs()
                 help_option = true;
             }
 
-            if (!(help_option || arg_s.empty() || (arg_s.at(0) == '-'))) {
+            if (!help_option && !arg_s.empty() && (arg_s.at(0) != '-')) {
                 oep = this->m->option_table->find(arg_s);
             }
         } else {
@@ -736,7 +736,7 @@ QPDFArgParser::addHelpTopic(
         throw std::logic_error(
             "QPDFArgParser: can't register reserved help topic " + topic);
     }
-    if (!((topic.length() > 0) && (topic.at(0) != '-'))) {
+    if ((topic.length() <= 0) || (topic.at(0) == '-')) {
         QTC::TC("libtests", "QPDFArgParser bad topic for help");
         throw std::logic_error(
             "QPDFArgParser: help topics must not start with -");
@@ -758,8 +758,8 @@ QPDFArgParser::addOptionHelp(
     std::string const& short_text,
     std::string const& long_text)
 {
-    if (!((option_name.length() > 2) && (option_name.at(0) == '-') &&
-          (option_name.at(1) == '-'))) {
+    if ((option_name.length() <= 2) || (option_name.at(0) != '-') ||
+        (option_name.at(1) != '-')) {
         QTC::TC("libtests", "QPDFArgParser bad option for help");
         throw std::logic_error(
             "QPDFArgParser: options for help must start with --");

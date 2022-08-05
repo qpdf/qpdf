@@ -144,8 +144,8 @@ QPDF::isLinearized()
     }
 
     QPDFObjectHandle linkey = candidate.getKey("/Linearized");
-    if (!(linkey.isNumber() &&
-          (QIntC::to_int(floor(linkey.getNumericValue())) == 1))) {
+    if (!linkey.isNumber() ||
+        (QIntC::to_int(floor(linkey.getNumericValue())) != 1)) {
         return false;
     }
 
@@ -198,7 +198,7 @@ QPDF::readLinearizationData()
 
     // Hint table array: offset length [ offset length ]
     size_t n_H_items = toS(H.getArrayNItems());
-    if (!((n_H_items == 2) || (n_H_items == 4))) {
+    if ((n_H_items != 2) && (n_H_items != 4)) {
         throw QPDFExc(
             qpdf_e_damaged_pdf,
             this->m->file->getName(),
@@ -545,7 +545,7 @@ QPDF::checkLinearizationInternal()
     while (true) {
         char ch;
         this->m->file->read(&ch, 1);
-        if (!((ch == ' ') || (ch == '\r') || (ch == '\n'))) {
+        if ((ch != ' ') && (ch != '\r') && (ch != '\n')) {
             this->m->file->seek(-1, SEEK_CUR);
             break;
         }

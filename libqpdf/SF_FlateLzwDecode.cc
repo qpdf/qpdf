@@ -32,8 +32,8 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
         if (key == "/Predictor") {
             if (value.isInteger()) {
                 this->predictor = value.getIntValueAsInt();
-                if (!((this->predictor == 1) || (this->predictor == 2) ||
-                      ((this->predictor >= 10) && (this->predictor <= 15)))) {
+                if ((this->predictor != 1) && (this->predictor != 2) &&
+                    ((this->predictor < 10) || (this->predictor > 15))) {
                     filterable = false;
                 }
             } else {
@@ -58,7 +58,7 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
             if (value.isInteger()) {
                 int earlychange = value.getIntValueAsInt();
                 this->early_code_change = (earlychange == 1);
-                if (!((earlychange == 0) || (earlychange == 1))) {
+                if ((earlychange != 0) && (earlychange != 1)) {
                     filterable = false;
                 }
             } else {

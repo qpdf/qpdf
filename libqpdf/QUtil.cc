@@ -313,7 +313,7 @@ int_to_string_base_internal(T num, int base, int length)
     // function, used to use sprintf with %0*d, so we interpret length
     // such that a negative value appends spaces and a positive value
     // prepends zeroes.
-    if (!((base == 8) || (base == 10) || (base == 16))) {
+    if ((base != 8) && (base != 10) && (base != 16)) {
         throw std::logic_error(
             "int_to_string_base called with unsupported base");
     }
@@ -1312,7 +1312,9 @@ std::list<std::string>
 QUtil::read_lines_from_file(std::istream& in, bool preserve_eol)
 {
     std::list<std::string> lines;
-    auto next_char = [&in](char& ch) { return (in.get(ch)) ? true : false; };
+    auto next_char = [&in](char& ch) {
+        return static_cast<bool>((in.get(ch)));
+    };
     read_lines_from_file(next_char, lines, preserve_eol);
     return lines;
 }
@@ -1405,7 +1407,7 @@ QUtil::parse_numrange(char const* range, int max)
         while (*p) {
             char ch = *p;
             if (isdigit(ch)) {
-                if (!((state == st_top) || (state == st_in_number))) {
+                if ((state != st_top) && (state != st_in_number)) {
                     throw std::runtime_error("digit not expected");
                 }
                 state = st_in_number;
@@ -1425,7 +1427,7 @@ QUtil::parse_numrange(char const* range, int max)
                 state = st_in_number;
                 from_end = true;
             } else if ((ch == ',') || (ch == '-')) {
-                if (!((state == st_in_number) || (state == st_after_number))) {
+                if ((state != st_in_number) && (state != st_after_number)) {
                     throw std::runtime_error("unexpected separator");
                 }
                 cur_number = maybe_from_end(cur_number, from_end, max);
@@ -1445,7 +1447,7 @@ QUtil::parse_numrange(char const* range, int max)
                     work.push_back(dash);
                 }
             } else if (ch == ':') {
-                if (!((state == st_in_number) || (state == st_after_number))) {
+                if ((state != st_in_number) && (state != st_after_number)) {
                     throw std::runtime_error("unexpected colon");
                 }
                 break;
