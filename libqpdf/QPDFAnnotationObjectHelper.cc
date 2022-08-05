@@ -168,7 +168,7 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
     QPDFObjectHandle matrix_obj = as.getKey("/Matrix");
 
     int flags = getFlags();
-    if (flags & forbidden_flags) {
+    if ((flags & forbidden_flags) != 0) {
         QTC::TC("qpdf", "QPDFAnnotationObjectHelper forbidden flags");
         return "";
     }
@@ -188,7 +188,7 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
         QTC::TC("qpdf", "QPDFAnnotationObjectHelper default matrix");
     }
     QPDFObjectHandle::Rectangle rect = rect_obj.getArrayAsRectangle();
-    bool do_rotate = (rotate && (flags & an_no_rotate));
+    bool do_rotate = ((rotate != 0) && ((flags & an_no_rotate) != 0));
     if (do_rotate) {
         // If the the annotation flags include the NoRotate bit and
         // the page is rotated, we have to rotate the annotation about

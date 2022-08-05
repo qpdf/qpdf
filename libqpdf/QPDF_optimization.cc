@@ -352,7 +352,7 @@ QPDF::updateObjectMapsInternal(
 
     if (oh.isIndirect()) {
         QPDFObjGen og(oh.getObjGen());
-        if (visited.count(og)) {
+        if (visited.count(og) != 0u) {
             QTC::TC("qpdf", "QPDF opt loop detected");
             return;
         }

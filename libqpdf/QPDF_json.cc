@@ -89,7 +89,7 @@ is_indirect_object(std::string const& v, int& obj, int& gen)
     if (*p++ != 'R') {
         return false;
     }
-    if (*p) {
+    if (*p != 0) {
         return false;
     }
     obj = QUtil::string_to_int(o_str.c_str());
@@ -799,7 +799,7 @@ QPDF::writeJSONStream(
             version, json_stream_data, decode_level, stream_p, filename));
 
     JSON::writeDictionaryItem(p, first, key, j, 3);
-    if (f) {
+    if (f != nullptr) {
         f_pl->finish();
         f_pl = nullptr;
         fclose(f);
@@ -908,7 +908,7 @@ QPDF::writeJSON(
     bool all_objects = wanted_objects.empty();
     for (auto& obj: getAllObjects()) {
         std::string key = "obj:" + obj.unparse();
-        if (all_objects || wanted_objects.count(key)) {
+        if (all_objects || (wanted_objects.count(key) != 0u)) {
             if (obj.isStream()) {
                 writeJSONStream(
                     version,
@@ -924,7 +924,7 @@ QPDF::writeJSON(
             }
         }
     }
-    if (all_objects || wanted_objects.count("trailer")) {
+    if (all_objects || (wanted_objects.count("trailer") != 0u)) {
         auto trailer = getTrailer();
         writeJSONObject(version, p, first_qpdf_inner, "trailer", trailer);
     }

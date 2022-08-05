@@ -25,7 +25,7 @@ void
 Pl_String::write(unsigned char const* buf, size_t len)
 {
     this->m->s.append(reinterpret_cast<char const*>(buf), len);
-    if (getNext(true)) {
+    if (getNext(true) != nullptr) {
         getNext()->write(buf, len);
     }
 }
@@ -33,7 +33,7 @@ Pl_String::write(unsigned char const* buf, size_t len)
 void
 Pl_String::finish()
 {
-    if (getNext(true)) {
+    if (getNext(true) != nullptr) {
         getNext()->finish();
     }
 }

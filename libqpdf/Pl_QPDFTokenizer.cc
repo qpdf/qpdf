@@ -71,7 +71,7 @@ Pl_QPDFTokenizer::finish()
     QPDFObjectHandle::TokenFilter::PipelineAccessor::setPipeline(
         m->filter, nullptr);
     Pipeline* next = this->getNext(true);
-    if (next) {
+    if (next != nullptr) {
         next->finish();
     }
 }

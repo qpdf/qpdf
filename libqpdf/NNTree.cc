@@ -647,7 +647,7 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
     while (!failed) {
         if (node.isIndirect()) {
             auto og = node.getObjGen();
-            if (seen.count(og)) {
+            if (seen.count(og) != 0u) {
                 QTC::TC("qpdf", "NNTree deepen: loop");
                 warn(
                     impl.qpdf,
@@ -938,7 +938,7 @@ NNTreeImpl::findInternal(QPDFObjectHandle key, bool return_prev_if_not_found)
 
     while (true) {
         auto og = node.getObjGen();
-        if (seen.count(og)) {
+        if (seen.count(og) != 0u) {
             QTC::TC("qpdf", "NNTree loop in find");
             error(qpdf, node, "loop detected in find");
         }
@@ -1028,7 +1028,7 @@ NNTreeImpl::remove(QPDFObjectHandle key, QPDFObjectHandle* value)
         QTC::TC("qpdf", "NNTree remove not found");
         return false;
     }
-    if (value) {
+    if (value != nullptr) {
         *value = iter->second;
     }
     iter.remove();

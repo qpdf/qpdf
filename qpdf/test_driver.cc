@@ -3319,7 +3319,7 @@ runtest(int n, char const* filename1, char const* arg2)
         }
         pdf.processMemoryFile(
             (std::string(filename1) + ".pdf").c_str(), p, size);
-    } else if (ignore_filename.count(n)) {
+    } else if (ignore_filename.count(n) != 0u) {
         // Ignore filename argument entirely
     } else if (n == 89) {
         pdf.createFromJSON(filename1);
@@ -3371,7 +3371,7 @@ runtest(int n, char const* filename1, char const* arg2)
     }
     (fn->second)(pdf, arg2);
 
-    if (filep) {
+    if (filep != nullptr) {
         fclose(filep);
     }
     std::cout << "test " << n << " done" << std::endl;

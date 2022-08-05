@@ -151,7 +151,7 @@ main(int argc, char* argv[])
     int n = 1;
     for (auto& i: number_tree) {
         std::cout << i.first << " -> " << i.second.getUTF8Value();
-        if (n % 5) {
+        if ((n % 5) != 0) {
             std::cout << ", ";
         } else {
             std::cout << std::endl;
@@ -174,7 +174,7 @@ main(int argc, char* argv[])
     n = 1;
     for (auto& i: number_tree) {
         std::cout << i.first << " -> " << i.second.getUTF8Value();
-        if (n % 5) {
+        if ((n % 5) != 0) {
             std::cout << ", ";
         } else {
             std::cout << std::endl;

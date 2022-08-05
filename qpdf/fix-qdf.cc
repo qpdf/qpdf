@@ -143,7 +143,7 @@ QdfFixer::processLines(std::list<std::string>& lines)
                 xref_offset = xref.back().getOffset();
                 xref_f1_nbytes = 0;
                 auto t = xref_offset;
-                while (t) {
+                while (t != 0) {
                     t >>= 8;
                     ++xref_f1_nbytes;
                 }
@@ -157,7 +157,7 @@ QdfFixer::processLines(std::list<std::string>& lines)
                         max_objects = e.getObjStreamIndex();
                     }
                 }
-                while (max_objects) {
+                while (max_objects != 0) {
                     max_objects >>= 8;
                     ++xref_f2_nbytes;
                 }

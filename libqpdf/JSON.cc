@@ -274,7 +274,7 @@ JSON::addDictionaryMember(std::string const& key, JSON const& val)
         throw std::runtime_error(
             "JSON::addDictionaryMember called on non-dictionary");
     }
-    if (val.m->value.get()) {
+    if (val.m->value.get() != nullptr) {
         obj->members[encode_string(key)] = val.m->value;
     } else {
         obj->members[encode_string(key)] = std::make_shared<JSON_null>();
@@ -290,7 +290,7 @@ JSON::checkDictionaryKeySeen(std::string const& key)
         throw std::logic_error(
             "JSON::checkDictionaryKey called on non-dictionary");
     }
-    if (obj->parsed_keys.count(key)) {
+    if (obj->parsed_keys.count(key) != 0u) {
         return true;
     }
     obj->parsed_keys.insert(key);
@@ -310,7 +310,7 @@ JSON::addArrayElement(JSON const& val)
     if (nullptr == arr) {
         throw std::runtime_error("JSON::addArrayElement called on non-array");
     }
-    if (val.m->value.get()) {
+    if (val.m->value.get() != nullptr) {
         arr->elements.push_back(val.m->value);
     } else {
         arr->elements.push_back(std::make_shared<JSON_null>());
@@ -409,7 +409,7 @@ JSON::getBool(bool& value) const
 bool
 JSON::isNull() const
 {
-    if (dynamic_cast<JSON_null const*>(this->m->value.get())) {
+    if (dynamic_cast<JSON_null const*>(this->m->value.get()) != nullptr) {
         return true;
     }
     return false;
@@ -481,8 +481,8 @@ JSON::checkSchemaInternal(
     }
 
     std::string pattern_key;
-    if (sch_dict) {
-        if (!this_dict) {
+    if (sch_dict != nullptr) {
+        if (this_dict == nullptr) {
             QTC::TC("libtests", "JSON wanted dictionary");
             errors.push_back(err_prefix + " is supposed to be a dictionary");
             return false;
@@ -496,7 +496,7 @@ JSON::checkSchemaInternal(
         }
     }
 
-    if (sch_dict && (!pattern_key.empty())) {
+    if ((sch_dict != nullptr) && (!pattern_key.empty())) {
         auto pattern_schema = sch_dict->members[pattern_key].get();
         for (auto const& iter: this_dict->members) {
             std::string const& key = iter.first;
@@ -507,10 +507,10 @@ JSON::checkSchemaInternal(
                 errors,
                 prefix + "." + key);
         }
-    } else if (sch_dict) {
+    } else if (sch_dict != nullptr) {
         for (auto& iter: sch_dict->members) {
             std::string const& key = iter.first;
-            if (this_dict->members.count(key)) {
+            if (this_dict->members.count(key) != 0u) {
                 checkSchemaInternal(
                     this_dict->members[key].get(),
                     iter.second.get(),
@@ -518,7 +518,7 @@ JSON::checkSchemaInternal(
                     errors,
                     prefix + "." + key);
             } else {
-                if (flags & f_optional) {
+                if ((flags & f_optional) != 0u) {
                     QTC::TC("libtests", "JSON optional key");
                 } else {
                     QTC::TC("libtests", "JSON key missing in object");
@@ -537,7 +537,7 @@ JSON::checkSchemaInternal(
                     "\" is not present in schema but appears in object");
             }
         }
-    } else if (sch_arr) {
+    } else if (sch_arr != nullptr) {
         auto n_elements = sch_arr->elements.size();
         if (n_elements == 1) {
             // A single-element array in the schema allows a single
@@ -546,7 +546,7 @@ JSON::checkSchemaInternal(
             // the schema array. This doesn't apply to arrays of
             // arrays -- we fall back to the behavior of allowing a
             // single item only when the object is not an array.
-            if (this_arr) {
+            if (this_arr != nullptr) {
                 int i = 0;
                 for (auto const& element: this_arr->elements) {
                     checkSchemaInternal(
@@ -566,7 +566,9 @@ JSON::checkSchemaInternal(
                     errors,
                     prefix);
             }
-        } else if (!this_arr || (this_arr->elements.size() != n_elements)) {
+        } else if (
+            (this_arr == nullptr) ||
+            (this_arr->elements.size() != n_elements)) {
             QTC::TC("libtests", "JSON schema array length mismatch");
             errors.push_back(
                 err_prefix + " is supposed to be an array of length " +
@@ -588,7 +590,7 @@ JSON::checkSchemaInternal(
                 ++i;
             }
         }
-    } else if (!sch_str) {
+    } else if (sch_str == nullptr) {
         QTC::TC("libtests", "JSON schema other type");
         errors.push_back(
             err_prefix + " schema value is not dictionary, array, or string");
@@ -700,7 +702,7 @@ JSONParser::handle_u_code(
     if ((codepoint & 0xFC00) == 0xD800) {
         // high surrogate
         qpdf_offset_t new_high_offset = offset + i;
-        if (high_offset) {
+        if (high_offset != 0) {
             QTC::TC("libtests", "JSON 16 high high");
             throw std::runtime_error(
                 "JSON: offset " + QUtil::int_to_string(new_high_offset) +
@@ -794,7 +796,7 @@ JSONParser::decode_string(std::string const& str, qpdf_offset_t offset)
             result.append(1, s[i]);
         }
     }
-    if (high_offset) {
+    if (high_offset != 0) {
         QTC::TC("libtests", "JSON 16 dangling high");
         throw std::runtime_error(
             "JSON: offset " + QUtil::int_to_string(high_offset) +
@@ -855,7 +857,7 @@ JSONParser::getToken()
                 number_after_e = 0;
                 number_saw_point = true;
                 number_saw_e = false;
-            } else if (strchr("{}[]:,", *p)) {
+            } else if (strchr("{}[]:,", *p) != nullptr) {
                 ready = true;
             } else {
                 QTC::TC("libtests", "JSON parse bad character");
@@ -909,7 +911,7 @@ JSONParser::getToken()
             } else if (QUtil::is_space(*p)) {
                 action = ignore;
                 ready = true;
-            } else if (strchr("{}[]:,", *p)) {
+            } else if (strchr("{}[]:,", *p) != nullptr) {
                 action = reread;
                 ready = true;
             } else {
@@ -927,7 +929,7 @@ JSONParser::getToken()
             } else if (QUtil::is_space(*p)) {
                 action = ignore;
                 ready = true;
-            } else if (strchr("{}[]:,", *p)) {
+            } else if (strchr("{}[]:,", *p) != nullptr) {
                 action = reread;
                 ready = true;
             } else {
@@ -948,7 +950,7 @@ JSONParser::getToken()
 
         case ls_backslash:
             /* cSpell: ignore bfnrt */
-            if (strchr("\\\"/bfnrt", *p)) {
+            if (strchr("\\\"/bfnrt", *p) != nullptr) {
                 lex_state = ls_string;
             } else if (*p == 'u') {
                 lex_state = ls_u4;
@@ -1130,7 +1132,7 @@ JSONParser::handleToken()
 
     // See whether what we have is allowed at this point.
 
-    if (item.get()) {
+    if (item.get() != nullptr) {
         switch (parser_state) {
         case ps_done:
             throw std::logic_error("can't happen; ps_done already handled");
@@ -1233,7 +1235,7 @@ JSONParser::handleToken()
         ps_stack.pop_back();
         auto tos = stack.back();
         tos->setEnd(offset);
-        if (reactor) {
+        if (reactor != nullptr) {
             reactor->containerEnd(*tos);
         }
         if (next_state != ps_done) {
@@ -1242,7 +1244,7 @@ JSONParser::handleToken()
     } else if (delimiter != '\0') {
         throw std::logic_error(
             "JSONParser::handleToken: unexpected delimiter in transition");
-    } else if (item.get()) {
+    } else if (item.get() != nullptr) {
         if (!(item->isArray() || item->isDictionary())) {
             item->setStart(offset - toO(token.length()));
             item->setEnd(offset);
@@ -1268,7 +1270,8 @@ JSONParser::handleToken()
                     "JSON: offset " + QUtil::int_to_string(dict_key_offset) +
                     ": duplicated dictionary key");
             }
-            if (!reactor || !reactor->dictionaryItem(dict_key, *item)) {
+            if ((reactor == nullptr) ||
+                !reactor->dictionaryItem(dict_key, *item)) {
                 tos->addDictionaryMember(dict_key, *item);
             }
             next_state = ps_dict_after_item;
@@ -1276,7 +1279,7 @@ JSONParser::handleToken()
 
         case ps_array_begin:
         case ps_array_after_comma:
-            if (!reactor || !reactor->arrayItem(*item)) {
+            if ((reactor == nullptr) || !reactor->arrayItem(*item)) {
                 tos->addArrayElement(*item);
             }
             next_state = ps_array_after_item;
@@ -1298,7 +1301,7 @@ JSONParser::handleToken()
             "JSONParser::handleToken: unexpected null item in transition");
     }
 
-    if (reactor && item.get()) {
+    if ((reactor != nullptr) && (item.get() != nullptr)) {
         // Calling container start method is postponed until after
         // adding the containers to their parent containers, if any.
         // This makes it much easier to keep track of the current
@@ -1311,7 +1314,7 @@ JSONParser::handleToken()
     }
 
     // Prepare for next token
-    if (item.get()) {
+    if (item.get() != nullptr) {
         if (item->isDictionary()) {
             stack.push_back(item);
             ps_stack.push_back(next_state);
@@ -1345,7 +1348,8 @@ JSONParser::parse()
         throw std::runtime_error("JSON: premature end of input");
     }
     auto const& tos = stack.back();
-    if (reactor && tos.get() && !(tos->isArray() || tos->isDictionary())) {
+    if ((reactor != nullptr) && (tos.get() != nullptr) &&
+        !(tos->isArray() || tos->isDictionary())) {
         reactor->topLevelScalar();
     }
     return tos;

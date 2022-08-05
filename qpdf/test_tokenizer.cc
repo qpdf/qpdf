@@ -147,8 +147,9 @@ dump_tokens(
     qpdf_offset_t inline_image_offset = 0;
     while (!done) {
         QPDFTokenizer::Token token = tokenizer.readToken(
-            is, "test", true, inline_image_offset ? 0 : max_len);
-        if (inline_image_offset && (token.getType() == QPDFTokenizer::tt_bad)) {
+            is, "test", true, inline_image_offset != 0 ? 0 : max_len);
+        if ((inline_image_offset != 0) &&
+            (token.getType() == QPDFTokenizer::tt_bad)) {
             std::cout << "EI not found; resuming normal scanning" << std::endl;
             is->seek(inline_image_offset, SEEK_SET);
             inline_image_offset = 0;
@@ -260,7 +261,7 @@ main(int argc, char* argv[])
             } else {
                 usage();
             }
-        } else if (filename) {
+        } else if (filename != nullptr) {
             usage();
         } else {
             filename = argv[i];

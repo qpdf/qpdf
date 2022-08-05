@@ -228,7 +228,7 @@ process_with_aes(
         encrypt,
         QUtil::unsigned_char_pointer(key),
         QIntC::to_uint(key.length()));
-    if (iv) {
+    if (iv != nullptr) {
         aes.setIV(iv, iv_length);
     } else {
         aes.useZeroIV();
@@ -928,7 +928,7 @@ QPDF::initializeEncryption()
     } else {
         if (encryption_dict.getKey("/Length").isInteger()) {
             Length = encryption_dict.getKey("/Length").getIntValueAsInt();
-            if ((Length % 8) || (Length < 40) || (Length > 128)) {
+            if (((Length % 8) != 0) || (Length < 40) || (Length > 128)) {
                 Length = 0;
             }
         }

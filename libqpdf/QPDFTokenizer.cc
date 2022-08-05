@@ -373,7 +373,7 @@ QPDFTokenizer::presentCharacter(char ch)
             }
         } else if (ch == '\\') {
             // last_char_was_bs is set/cleared below as appropriate
-            if (bs_num_count) {
+            if (bs_num_count != 0u) {
                 throw std::logic_error(
                     "INTERNAL ERROR: QPDFTokenizer: bs_num_count != 0 "
                     "when ch == '\\'");
@@ -436,7 +436,7 @@ QPDFTokenizer::presentCharacter(char ch)
         if (ch == '>') {
             this->m->type = tt_string;
             this->m->state = st_token_ready;
-            if (this->m->val.length() % 2) {
+            if ((this->m->val.length() % 2) != 0u) {
                 // PDF spec says odd hexstrings have implicit
                 // trailing 0.
                 this->m->val += '0';
@@ -514,7 +514,7 @@ QPDFTokenizer::expectInlineImage(std::shared_ptr<InputSource> input)
 void
 QPDFTokenizer::findEI(std::shared_ptr<InputSource> input)
 {
-    if (!input.get()) {
+    if (input.get() == nullptr) {
         return;
     }
 
@@ -672,7 +672,7 @@ QPDFTokenizer::readToken(
             if (betweenTokens() && (input->getLastOffset() == offset)) {
                 ++offset;
             }
-            if (max_len && (this->m->raw_val.length() >= max_len) &&
+            if ((max_len != 0u) && (this->m->raw_val.length() >= max_len) &&
                 (this->m->state != st_token_ready)) {
                 // terminate this token now
                 QTC::TC("qpdf", "QPDFTokenizer block long token");

@@ -140,10 +140,10 @@ QPDFObjectHandle::TokenFilter::setPipeline(Pipeline* p)
 void
 QPDFObjectHandle::TokenFilter::write(char const* data, size_t len)
 {
-    if (!this->pipeline) {
+    if (this->pipeline == nullptr) {
         return;
     }
-    if (len) {
+    if (len != 0u) {
         this->pipeline->write(data, len);
     }
 }
@@ -264,7 +264,7 @@ QPDFObjectHandle::releaseResolved()
     // infinite loop.  This method may only be called during final
     // destruction.  See comments in QPDF::~QPDF().
     if (isIndirect()) {
-        if (this->obj.get()) {
+        if (this->obj.get() != nullptr) {
             this->obj = nullptr;
         }
     } else {
@@ -1130,14 +1130,15 @@ QPDFObjectHandle::mergeResources(
                             rval = rval.shallowCopy();
                         }
                         this_val.replaceKey(key, rval);
-                    } else if (conflicts) {
+                    } else if (conflicts != nullptr) {
                         if (!initialized_maps) {
                             make_og_to_name(this_val, og_to_name);
                             rnames = this_val.getResourceNames();
                             initialized_maps = true;
                         }
                         auto rval_og = rval.getObjGen();
-                        if (rval.isIndirect() && og_to_name.count(rval_og)) {
+                        if (rval.isIndirect() &&
+                            (og_to_name.count(rval_og) != 0u)) {
                             QTC::TC("qpdf", "QPDFObjectHandle merge reuse");
                             auto new_key = og_to_name[rval_og];
                             if (new_key != key) {
@@ -1201,7 +1202,8 @@ QPDFObjectHandle::getUniqueResourceName(
     std::string const& prefix, int& min_suffix, std::set<std::string>* namesp)
 
 {
-    std::set<std::string> names = (namesp ? *namesp : getResourceNames());
+    std::set<std::string> names =
+        (namesp != nullptr ? *namesp : getResourceNames());
     int max_suffix = min_suffix + QIntC::to_int(names.size());
     while (min_suffix <= max_suffix) {
         std::string candidate = prefix + QUtil::int_to_string(min_suffix);
@@ -1415,7 +1417,7 @@ QPDFObjectHandle::replaceStreamData(
     assertStream();
     auto b = std::make_shared<Buffer>(data.length());
     unsigned char* bp = b->getBuffer();
-    if (bp) {
+    if (bp != nullptr) {
         memcpy(bp, data.c_str(), data.length());
     }
     dynamic_cast<QPDF_Stream*>(obj.get())->replaceStreamData(
@@ -1620,7 +1622,7 @@ QPDFObjectHandle::rotatePage(int angle, bool relative)
         bool searched_parent = false;
         std::set<QPDFObjGen> visited;
         while (!found_rotate) {
-            if (visited.count(cur_obj.getObjGen())) {
+            if (visited.count(cur_obj.getObjGen()) != 0u) {
                 // Don't get stuck in an infinite loop
                 break;
             }
@@ -1785,7 +1787,7 @@ QPDFObjectHandle::parse(
         parse(input, object_description, tokenizer, empty, nullptr, context);
     size_t offset = QIntC::to_size(input->tell());
     while (offset < object_str.length()) {
-        if (!isspace(object_str.at(offset))) {
+        if (isspace(object_str.at(offset)) == 0) {
             QTC::TC("qpdf", "QPDFObjectHandle trailing data in parse");
             throw QPDFExc(
                 qpdf_e_damaged_pdf,
@@ -2238,7 +2240,7 @@ QPDFObjectHandle::parseInternal(
         case QPDFTokenizer::tt_string:
             {
                 std::string val = token.getValue();
-                if (decrypter) {
+                if (decrypter != nullptr) {
                     if (b_contents) {
                         contents_string = val;
                         contents_offset = input->getLastOffset();
@@ -2435,9 +2437,10 @@ QPDFObjectHandle::parseInternal(
                     }
                     dict[key] = val;
                 }
-                if (!contents_string.empty() && dict.count("/Type") &&
+                if (!contents_string.empty() && (dict.count("/Type") != 0u) &&
                     dict["/Type"].isNameAndEquals("/Sig") &&
-                    dict.count("/ByteRange") && dict.count("/Contents") &&
+                    (dict.count("/ByteRange") != 0u) &&
+                    (dict.count("/Contents") != 0u) &&
                     dict["/Contents"].isString()) {
                     dict["/Contents"] =
                         QPDFObjectHandle::newString(contents_string);
@@ -2490,7 +2493,7 @@ QPDFObjectHandle::setParsedOffset(qpdf_offset_t offset)
 {
     // This is called during parsing on newly created direct objects,
     // so we can't call dereference() here.
-    if (this->obj.get()) {
+    if (this->obj.get() != nullptr) {
         this->obj->setParsedOffset(offset);
     }
 }
@@ -2662,7 +2665,7 @@ QPDFObjectHandle::newStream(
 {
     QPDFObjectHandle result = QPDFObjectHandle(
         QPDF_Stream::create(qpdf, og, stream_dict, offset, length));
-    if (offset) {
+    if (offset != 0) {
         result.setParsedOffset(offset);
     }
     return result;
@@ -2726,7 +2729,7 @@ QPDFObjectHandle::setObjectDescription(
 {
     // This is called during parsing on newly created direct objects,
     // so we can't call dereference() here.
-    if (isInitialized() && obj.get()) {
+    if (isInitialized() && (obj.get() != nullptr)) {
         obj->setDescription(owning_qpdf, object_description);
     }
 }
@@ -2734,7 +2737,7 @@ QPDFObjectHandle::setObjectDescription(
 bool
 QPDFObjectHandle::hasObjectDescription()
 {
-    return dereference() && obj.get() && obj->hasDescription();
+    return dereference() && (obj.get() != nullptr) && obj->hasDescription();
 }
 
 QPDFObjectHandle
@@ -2795,7 +2798,7 @@ QPDFObjectHandle::copyObject(
 
     auto cur_og = getObjGen();
     if (cur_og.getObj() != 0) {
-        if (visited.count(cur_og)) {
+        if (visited.count(cur_og) != 0u) {
             QTC::TC("qpdf", "QPDFObjectHandle makeDirect loop");
             throw std::runtime_error(
                 "loop detected while converting object from "
@@ -2847,7 +2850,7 @@ QPDFObjectHandle::copyObject(
 
     this->obj = new_obj;
 
-    if (cur_og.getObj()) {
+    if (cur_og.getObj() != 0) {
         visited.erase(cur_og);
     }
 }
@@ -3118,7 +3121,7 @@ QPDFObjectHandle::dereference()
     if (!this->initialized) {
         return false;
     }
-    if (this->obj.get() && getObjectID() &&
+    if ((this->obj.get() != nullptr) && (getObjectID() != 0) &&
         QPDF::Resolver::objectChanged(this->qpdf, getObjGen(), this->obj)) {
         this->obj = nullptr;
     }
@@ -3129,7 +3132,7 @@ QPDFObjectHandle::dereference()
             // QPDF::resolve never returns an uninitialized object, but
             // check just in case.
             this->obj = QPDF_Null::create();
-        } else if (dynamic_cast<QPDF_Reserved*>(obj.get())) {
+        } else if (dynamic_cast<QPDF_Reserved*>(obj.get()) != nullptr) {
             // Do not resolve
             this->reserved = true;
         } else {
@@ -3147,7 +3150,7 @@ QPDFObjectHandle::warn(QPDF* qpdf, QPDFExc const& e)
     // warning, we can warn through the object. If parsing for some
     // other reason, such as an explicit creation of an object from a
     // string, then just throw the exception.
-    if (qpdf) {
+    if (qpdf != nullptr) {
         qpdf->warn(e);
     } else {
         throw e;

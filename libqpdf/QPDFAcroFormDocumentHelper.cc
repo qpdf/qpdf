@@ -75,7 +75,7 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(
         QPDFObjectHandle obj = queue.front();
         queue.pop_front();
         auto og = obj.getObjGen();
-        if (seen.count(og)) {
+        if (seen.count(og) != 0u) {
             // loop
             continue;
         }
@@ -159,7 +159,7 @@ QPDFAcroFormDocumentHelper::removeFormFields(
     int i = 0;
     while (i < fields.getArrayNItems()) {
         auto field = fields.getArrayItem(i);
-        if (to_remove.count(field.getObjGen())) {
+        if (to_remove.count(field.getObjGen()) != 0u) {
             fields.eraseItem(i);
         } else {
             ++i;
@@ -207,7 +207,7 @@ QPDFAcroFormDocumentHelper::getAnnotationsForField(QPDFFormFieldObjectHelper h)
     analyze();
     std::vector<QPDFAnnotationObjectHelper> result;
     QPDFObjGen og(h.getObjectHandle().getObjGen());
-    if (this->m->field_to_annotations.count(og)) {
+    if (this->m->field_to_annotations.count(og) != 0u) {
         result = this->m->field_to_annotations[og];
     }
     return result;
@@ -230,7 +230,7 @@ QPDFAcroFormDocumentHelper::getFormFieldsForPage(QPDFPageObjectHelper ph)
         auto field = getFieldForAnnotation(annot);
         field = field.getTopLevelField();
         auto og = field.getObjectHandle().getObjGen();
-        if (!added.count(og)) {
+        if (added.count(og) == 0u) {
             added.insert(og);
             if (field.getObjectHandle().isDictionary()) {
                 result.push_back(field);
@@ -250,7 +250,7 @@ QPDFAcroFormDocumentHelper::getFieldForAnnotation(QPDFAnnotationObjectHelper h)
     }
     analyze();
     QPDFObjGen og(oh.getObjGen());
-    if (this->m->annotation_to_field.count(og)) {
+    if (this->m->annotation_to_field.count(og) != 0u) {
         result = this->m->annotation_to_field[og];
     }
     return result;
@@ -581,7 +581,8 @@ ResourceReplacer::handleToken(QPDFTokenizer::Token const& token)
     if (token.getType() == QPDFTokenizer::tt_name) {
         std::string name =
             QPDFObjectHandle::newName(token.getValue()).getName();
-        if (to_replace.count(name) && to_replace[name].count(offset)) {
+        if ((to_replace.count(name) != 0u) &&
+            (to_replace[name].count(offset) != 0u)) {
             QTC::TC("qpdf", "QPDFAcroFormDocumentHelper replaced DA token");
             write(to_replace[name][offset]);
             wrote = true;
@@ -771,11 +772,11 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     QPDFAcroFormDocumentHelper* from_afdh)
 {
     std::shared_ptr<QPDFAcroFormDocumentHelper> afdhph;
-    if (!from_qpdf) {
+    if (from_qpdf == nullptr) {
         // Assume these are from the same QPDF.
         from_qpdf = &this->qpdf;
         from_afdh = this;
-    } else if ((from_qpdf != &this->qpdf) && (!from_afdh)) {
+    } else if ((from_qpdf != &this->qpdf) && (from_afdh == nullptr)) {
         afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(*from_qpdf);
         from_afdh = afdhph.get();
     }
@@ -876,7 +877,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     std::map<QPDFObjGen, QPDFObjectHandle> orig_to_copy;
     auto maybe_copy_object = [&](QPDFObjectHandle& to_copy) {
         auto og = to_copy.getObjGen();
-        if (orig_to_copy.count(og)) {
+        if (orig_to_copy.count(og) != 0u) {
             to_copy = orig_to_copy[og];
             return false;
         } else {
@@ -978,7 +979,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                 QPDFObjectHandle obj = queue.front();
                 queue.pop_front();
                 auto orig_og = obj.getObjGen();
-                if (seen.count(orig_og)) {
+                if (seen.count(orig_og) != 0u) {
                     // loop
                     break;
                 }
@@ -986,7 +987,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                 auto parent = obj.getKey("/Parent");
                 if (parent.isIndirect()) {
                     auto parent_og = parent.getObjGen();
-                    if (orig_to_copy.count(parent_og)) {
+                    if (orig_to_copy.count(parent_og) != 0u) {
                         obj.replaceKey("/Parent", orig_to_copy[parent_og]);
                     } else {
                         parent.warnIfPossible(
@@ -1064,7 +1065,8 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         maybe_copy_object(annot);
 
         // Now we have copies, so we can safely mutate.
-        if (have_field && !added_new_fields.count(top_field.getObjGen())) {
+        if (have_field &&
+            (added_new_fields.count(top_field.getObjGen()) == 0u)) {
             new_fields.push_back(top_field);
             added_new_fields.insert(top_field.getObjGen());
         }
@@ -1149,7 +1151,7 @@ QPDFAcroFormDocumentHelper::fixCopiedAnnotations(
 
     to_page.replaceKey("/Annots", QPDFObjectHandle::newArray(new_annots));
     addAndRenameFormFields(new_fields);
-    if (added_fields) {
+    if (added_fields != nullptr) {
         for (auto f: new_fields) {
             added_fields->insert(f.getObjGen());
         }

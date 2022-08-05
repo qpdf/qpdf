@@ -67,11 +67,11 @@ main(int argc, char* argv[])
 
     whoami = QUtil::getWhoami(argv[0]);
 
-    if ((argc == 2) && (!strcmp(argv[1], "--version"))) {
+    if ((argc == 2) && (strcmp(argv[1], "--version") == 0)) {
         std::cout << whoami << " version " << version << std::endl;
         exit(0);
     }
-    if ((argc == 3) && (!strcmp(argv[1], "--dump"))) {
+    if ((argc == 3) && (strcmp(argv[1], "--dump") == 0)) {
         QTC::TC("examples", "pdf-mod-info --dump");
         pdfDumpInfoDict(argv[2]);
         exit(0);
@@ -82,21 +82,21 @@ main(int argc, char* argv[])
     std::string cur_key;
 
     for (int i = 1; i < argc; ++i) {
-        if ((!strcmp(argv[i], "--in")) && (++i < argc)) {
+        if ((strcmp(argv[i], "--in") == 0) && (++i < argc)) {
             fl_in = argv[i];
-        } else if ((!strcmp(argv[i], "--out")) && (++i < argc)) {
+        } else if ((strcmp(argv[i], "--out") == 0) && (++i < argc)) {
             fl_out = argv[i];
-        } else if (!strcmp(argv[i], "--static-id")) // don't document
+        } else if (strcmp(argv[i], "--static-id") == 0) // don't document
         {
             static_id = true; // this should be used in test suites only
-        } else if ((!strcmp(argv[i], "--key")) && (++i < argc)) {
+        } else if ((strcmp(argv[i], "--key") == 0) && (++i < argc)) {
             QTC::TC("examples", "pdf-mod-info -key");
             cur_key = argv[i];
             if (!((cur_key.length() > 0) && (cur_key.at(0) == '/'))) {
                 cur_key = "/" + cur_key;
             }
             Keys[cur_key] = "";
-        } else if ((!strcmp(argv[i], "--val")) && (++i < argc)) {
+        } else if ((strcmp(argv[i], "--val") == 0) && (++i < argc)) {
             if (cur_key.empty()) {
                 QTC::TC("examples", "pdf-mod-info usage wrong val");
                 usage();
@@ -109,11 +109,11 @@ main(int argc, char* argv[])
             usage();
         }
     }
-    if (!fl_in) {
+    if (fl_in == nullptr) {
         QTC::TC("examples", "pdf-mod-info no in file");
         usage();
     }
-    if (!fl_out) {
+    if (fl_out == nullptr) {
         QTC::TC("examples", "pdf-mod-info in-place");
         fl_out = fl_in;
     }

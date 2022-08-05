@@ -142,7 +142,7 @@ QPDFArgParser::addChoices(
     OptionEntry& oe = registerArg(arg);
     oe.parameter_needed = required;
     oe.param_arg_handler = handler;
-    for (char const** i = choices; *i; ++i) {
+    for (char const** i = choices; *i != nullptr; ++i) {
         oe.choices.insert(*i);
     }
 }
@@ -264,7 +264,7 @@ QPDFArgParser::handleArgFileArguments()
                 }
             }
         }
-        if (argfile) {
+        if (argfile != nullptr) {
             readArgsFromFile(1 + this->m->argv[i]);
         } else {
             this->m->new_argv.push_back(
@@ -515,7 +515,7 @@ QPDFArgParser::parseArgs()
 
             if ((!this->m->bash_completion) && (this->m->argc == 2) &&
                 (this->m->cur_arg == 1) &&
-                this->m->help_option_table.count(arg_s)) {
+                (this->m->help_option_table.count(arg_s) != 0u)) {
                 // Handle help option, which is only valid as the sole
                 // option.
                 QTC::TC("libtests", "QPDFArgParser help option");
@@ -741,7 +741,7 @@ QPDFArgParser::addHelpTopic(
         throw std::logic_error(
             "QPDFArgParser: help topics must not start with -");
     }
-    if (this->m->help_topics.count(topic)) {
+    if (this->m->help_topics.count(topic) != 0u) {
         QTC::TC("libtests", "QPDFArgParser add existing topic");
         throw std::logic_error(
             "QPDFArgParser: topic " + topic + " has already been added");
@@ -764,7 +764,7 @@ QPDFArgParser::addOptionHelp(
         throw std::logic_error(
             "QPDFArgParser: options for help must start with --");
     }
-    if (this->m->option_help.count(option_name)) {
+    if (this->m->option_help.count(option_name) != 0u) {
         QTC::TC("libtests", "QPDFArgParser duplicate option help");
         throw std::logic_error(
             "QPDFArgParser: option " + option_name + " already has help");
@@ -843,9 +843,9 @@ QPDFArgParser::getHelp(std::string const& arg)
     } else {
         if (arg == "all") {
             getAllHelp(msg);
-        } else if (this->m->option_help.count(arg)) {
+        } else if (this->m->option_help.count(arg) != 0u) {
             getTopicHelp(arg, this->m->option_help[arg], msg);
-        } else if (this->m->help_topics.count(arg)) {
+        } else if (this->m->help_topics.count(arg) != 0u) {
             getTopicHelp(arg, this->m->help_topics[arg], msg);
         } else {
             // should not be possible

@@ -290,7 +290,7 @@ ArgParser::argPagesPositional(std::string const& arg)
             range_p = nullptr;
         }
     }
-    std::string range(range_p ? range_p : "1-z");
+    std::string range(range_p != nullptr ? range_p : "1-z");
     this->c_pages->pageSpec(file, range, this->pages_password.get());
     this->accumulated_args.clear();
     this->pages_password = nullptr;
@@ -429,7 +429,7 @@ QPDFJob::initializeFromArgv(char const* const argv[], char const* progname_env)
         progname_env = "QPDF_EXECUTABLE";
     }
     int argc = 0;
-    for (auto k = argv; *k; ++k) {
+    for (auto k = argv; *k != nullptr; ++k) {
         ++argc;
     }
     QPDFArgParser qap(argc, argv, progname_env);

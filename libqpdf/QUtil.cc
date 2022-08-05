@@ -417,7 +417,7 @@ unsigned long long
 QUtil::string_to_ull(char const* str)
 {
     char const* p = str;
-    while (*p && is_space(*p)) {
+    while ((*p != 0) && is_space(*p)) {
         ++p;
     }
     if (*p == '-') {
@@ -696,7 +696,7 @@ QUtil::pipe_file(char const* filename, Pipeline* p)
         p->write(buf, len);
     }
     p->finish();
-    if (ferror(f)) {
+    if (ferror(f) != 0) {
         throw std::runtime_error(
             std::string("failure reading file ") + filename);
     }
@@ -878,7 +878,7 @@ QUtil::get_env(std::string const& var, std::string* value)
     if (p == nullptr) {
         return false;
     }
-    if (value) {
+    if (value != nullptr) {
         *value = p;
     }
 
@@ -1031,7 +1031,7 @@ QUtil::pdf_time_to_qpdf_time(std::string const& str, QPDFTime* qtm)
             tz_delta = -tz_delta;
         }
     }
-    if (qtm) {
+    if (qtm != nullptr) {
         *qtm = QPDFTime(
             to_i(m[1]),
             to_i(m[2]),
@@ -1169,7 +1169,7 @@ RandomDataProviderProvider::getProvider()
 void
 RandomDataProviderProvider::setProvider(RandomDataProvider* p)
 {
-    this->current_provider = p ? p : this->default_provider;
+    this->current_provider = p != nullptr ? p : this->default_provider;
 }
 
 static RandomDataProviderProvider*
@@ -1210,13 +1210,13 @@ QUtil::random()
 bool
 QUtil::is_hex_digit(char ch)
 {
-    return (ch && (strchr("0123456789abcdefABCDEF", ch) != nullptr));
+    return ((ch != 0) && (strchr("0123456789abcdefABCDEF", ch) != nullptr));
 }
 
 bool
 QUtil::is_space(char ch)
 {
-    return (ch && (strchr(" \f\n\r\t\v", ch) != nullptr));
+    return ((ch != 0) && (strchr(" \f\n\r\t\v", ch) != nullptr));
 }
 
 bool
@@ -1229,7 +1229,7 @@ bool
 QUtil::is_number(char const* p)
 {
     // ^[\+\-]?(\.\d*|\d+(\.\d*)?)$
-    if (!*p) {
+    if (*p == 0) {
         return false;
     }
     if ((*p == '-') || (*p == '+')) {
@@ -1237,7 +1237,7 @@ QUtil::is_number(char const* p)
     }
     bool found_dot = false;
     bool found_digit = false;
-    for (; *p; ++p) {
+    for (; *p != 0; ++p) {
         if (*p == '.') {
             if (found_dot) {
                 // only one dot
@@ -1270,7 +1270,7 @@ QUtil::read_file_into_memory(
         bytes_read += len;
     }
     if (bytes_read != size) {
-        if (ferror(f)) {
+        if (ferror(f) != 0) {
             throw std::runtime_error(
                 std::string("failure reading file ") + filename +
                 " into memory: read " + uint_to_string(bytes_read) +
@@ -1289,7 +1289,7 @@ read_char_from_FILE(char& ch, FILE* f)
 {
     auto len = fread(&ch, 1, 1, f);
     if (len == 0) {
-        if (ferror(f)) {
+        if (ferror(f) != 0) {
             throw std::runtime_error("failure reading character from file");
         }
         return false;
@@ -1402,9 +1402,9 @@ QUtil::parse_numrange(char const* range, int max)
         bool last_separator_was_dash = false;
         int cur_number = 0;
         bool from_end = false;
-        while (*p) {
+        while (*p != 0) {
             char ch = *p;
-            if (isdigit(ch)) {
+            if (isdigit(ch) != 0) {
                 if (!((state == st_top) || (state == st_in_number))) {
                     throw std::runtime_error("digit not expected");
                 }
@@ -1512,7 +1512,7 @@ QUtil::parse_numrange(char const* range, int max)
         }
     } catch (std::runtime_error const& e) {
         std::string message;
-        if (p) {
+        if (p != nullptr) {
             message = "error at * in numeric range " +
                 std::string(range, QIntC::to_size(p - range)) + "*" + p + ": " +
                 e.what();
@@ -1571,7 +1571,7 @@ QUtil::get_next_utf8_codepoint(
     size_t bytes_needed = 0;
     unsigned bit_check = 0x40;
     unsigned char to_clear = 0x80;
-    while (ch & bit_check) {
+    while ((ch & bit_check) != 0u) {
         ++bytes_needed;
         to_clear = static_cast<unsigned char>(to_clear | bit_check);
         bit_check >>= 1;
@@ -1951,7 +1951,7 @@ QUtil::possible_repaired_encodings(std::string supplied)
     std::vector<std::string> t;
     std::set<std::string> seen;
     for (auto const& iter: result) {
-        if (!seen.count(iter)) {
+        if (seen.count(iter) == 0u) {
             seen.insert(iter);
             t.push_back(iter);
         }

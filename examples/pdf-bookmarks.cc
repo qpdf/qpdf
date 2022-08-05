@@ -40,7 +40,7 @@ void
 print_lines(std::vector<int>& numbers)
 {
     for (unsigned int i = 0; i < numbers.size() - 1; ++i) {
-        if (numbers.at(i)) {
+        if (numbers.at(i) != 0) {
             std::cout << "| ";
         } else {
             std::cout << "  ";
@@ -86,7 +86,7 @@ show_bookmark_details(QPDFOutlineObjectHelper outline, std::vector<int> numbers)
 
     if (show_open) {
         int count = outline.getCount();
-        if (count) {
+        if (count != 0) {
             QTC::TC("examples", "pdf-bookmarks has count");
             if (count > 0) {
                 // hierarchy is open at this point
@@ -109,7 +109,7 @@ show_bookmark_details(QPDFOutlineObjectHelper outline, std::vector<int> numbers)
         if (!dest_page.isNull()) {
             QTC::TC("examples", "pdf-bookmarks dest");
             QPDFObjGen og = dest_page.getObjGen();
-            if (page_map.count(og)) {
+            if (page_map.count(og) != 0u) {
                 target = QUtil::int_to_string(page_map[og]);
             }
         }

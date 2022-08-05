@@ -63,7 +63,7 @@ Pl_TIFFPredictor::write(unsigned char const* data, size_t len)
         left = this->bytes_per_row;
         this->pos = 0;
     }
-    if (len) {
+    if (len != 0u) {
         memcpy(this->cur_row.get() + this->pos, data + offset, len);
     }
     this->pos += len;
@@ -104,7 +104,7 @@ Pl_TIFFPredictor::processRow()
 void
 Pl_TIFFPredictor::finish()
 {
-    if (this->pos) {
+    if (this->pos != 0u) {
         // write partial row
         processRow();
     }

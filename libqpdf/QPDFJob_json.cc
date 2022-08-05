@@ -157,7 +157,7 @@ Handlers::addChoices(char const** choices, bool required, param_handler_t fn)
                 matches = true;
             }
             if (!matches) {
-                for (char const** i = choices; *i; ++i) {
+                for (char const** i = choices; *i != nullptr; ++i) {
                     if (strcmp(*i, p) == 0) {
                         QTC::TC("qpdf", "QPDFJob json choice match");
                         matches = true;
@@ -170,7 +170,7 @@ Handlers::addChoices(char const** choices, bool required, param_handler_t fn)
                 std::ostringstream msg;
                 msg << path + ": unexpected value; expected one of ";
                 bool first = true;
-                for (char const** i = choices; *i; ++i) {
+                for (char const** i = choices; *i != nullptr; ++i) {
                     if (first) {
                         first = false;
                     } else {

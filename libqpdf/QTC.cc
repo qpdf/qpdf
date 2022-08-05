@@ -31,7 +31,7 @@ QTC::TC(char const* const scope, char const* const ccase, int n)
     }
 #undef TC_ENV
 
-    if (cache.count(std::make_pair(ccase, n))) {
+    if (cache.count(std::make_pair(ccase, n)) != 0u) {
         return;
     }
     cache.insert(std::make_pair(ccase, n));

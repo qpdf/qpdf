@@ -18,7 +18,7 @@ QPDFOutlineDocumentHelper::QPDFOutlineDocumentHelper(QPDF& qpdf) :
     std::set<QPDFObjGen> seen;
     while (!cur.isNull()) {
         auto og = cur.getObjGen();
-        if (seen.count(og)) {
+        if (seen.count(og) != 0u) {
             break;
         }
         seen.insert(og);
@@ -63,7 +63,7 @@ QPDFOutlineDocumentHelper::getOutlinesForPage(QPDFObjGen const& og)
         initializeByPage();
     }
     std::vector<QPDFOutlineObjectHelper> result;
-    if (this->m->by_page.count(og)) {
+    if (this->m->by_page.count(og) != 0u) {
         result = this->m->by_page[og];
     }
     return result;
@@ -93,7 +93,7 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
                 }
             }
         }
-        if (this->m->names_dest.get()) {
+        if (this->m->names_dest.get() != nullptr) {
             if (this->m->names_dest->findObject(name.getUTF8Value(), result)) {
                 QTC::TC("qpdf", "QPDFOutlineDocumentHelper string named dest");
             }

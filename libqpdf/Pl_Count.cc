@@ -23,7 +23,7 @@ Pl_Count::~Pl_Count()
 void
 Pl_Count::write(unsigned char const* buf, size_t len)
 {
-    if (len) {
+    if (len != 0u) {
         this->m->count += QIntC::to_offset(len);
         this->m->last_char = buf[len - 1];
         getNext()->write(buf, len);

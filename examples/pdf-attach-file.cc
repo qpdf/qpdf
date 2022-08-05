@@ -75,7 +75,7 @@ process(
               << std::endl;
     auto fs = QPDFFileSpecObjectHelper::createFileSpec(q, key, attachment);
 
-    if (mimetype) {
+    if (mimetype != nullptr) {
         // Get an embedded file stream and set mimetype
         auto ef = QPDFEFStreamObjectHelper(fs.getEmbeddedFileStream());
         ef.setSubtype(mimetype);
@@ -206,7 +206,8 @@ main(int argc, char* argv[])
             usage("unknown argument " + std::string(arg));
         }
     }
-    if (!(infilename && attachment && outfilename)) {
+    if (!((infilename != nullptr) && (attachment != nullptr) &&
+          (outfilename != nullptr))) {
         usage("required arguments were not provided");
     }
 

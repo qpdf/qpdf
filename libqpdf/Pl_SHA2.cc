@@ -9,7 +9,7 @@ Pl_SHA2::Pl_SHA2(int bits, Pipeline* next) :
     Pipeline("sha2", next),
     in_progress(false)
 {
-    if (bits) {
+    if (bits != 0) {
         resetBits(bits);
     }
 }
@@ -33,7 +33,7 @@ Pl_SHA2::write(unsigned char const* buf, size_t len)
         data += bytes;
     }
 
-    if (this->getNext(true)) {
+    if (this->getNext(true) != nullptr) {
         this->getNext()->write(buf, len);
     }
 }
@@ -41,7 +41,7 @@ Pl_SHA2::write(unsigned char const* buf, size_t len)
 void
 Pl_SHA2::finish()
 {
-    if (this->getNext(true)) {
+    if (this->getNext(true) != nullptr) {
         this->getNext()->finish();
     }
     this->crypto->SHA2_finalize();

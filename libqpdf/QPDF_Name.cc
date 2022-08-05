@@ -36,7 +36,8 @@ QPDF_Name::normalizeName(std::string const& name)
             // QPDFTokenizer embeds a null character to encode an
             // invalid #.
             result += "#";
-        } else if (strchr("#()<>[]{}/%", ch) || (ch < 33) || (ch > 126)) {
+        } else if (
+            (strchr("#()<>[]{}/%", ch) != nullptr) || (ch < 33) || (ch > 126)) {
             result += "#" + QUtil::hex_encode(std::string(&ch, 1));
         } else {
             result += ch;

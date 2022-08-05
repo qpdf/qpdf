@@ -53,7 +53,7 @@ static inline unsigned char
 get_pixel_color(size_t n, size_t row)
 {
     return (
-        (n & (1LLU << (nstripes - 1LLU - row)))
+        (n & (1LLU << (nstripes - 1LLU - row))) != 0u
             ? static_cast<unsigned char>('\xc0')
             : static_cast<unsigned char>('\x40'));
 }

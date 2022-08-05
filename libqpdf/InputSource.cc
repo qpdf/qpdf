@@ -88,7 +88,7 @@ InputSource::findFirst(
         // case regardless of start_chars.
         if ((p == nullptr) ||
             ((p + strlen(start_chars)) > (buf + bytes_read))) {
-            if (p) {
+            if (p != nullptr) {
                 QTC::TC(
                     "libtests",
                     "InputSource read next block",

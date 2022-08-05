@@ -290,7 +290,7 @@ StreamReplacer::maybeReplace(
         return false;
     }
 
-    if (dict_updates) {
+    if (dict_updates != nullptr) {
         // It's not safe to make any modifications to any objects
         // during the writing process since the updated objects may
         // have already been written. In this mode, when dict_updates
@@ -309,7 +309,7 @@ StreamReplacer::maybeReplace(
             (og.getObj() * QIntC::to_int(out->getSize())) & 0xff);
     }
 
-    if (pipeline) {
+    if (pipeline != nullptr) {
         unsigned char key = this->keys[og];
         Pl_XOR p("xor", pipeline, key);
         p.write(out->getBuffer(), out->getSize());
@@ -453,15 +453,15 @@ main(int argc, char* argv[])
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--decode-specialized") == 0) {
             decode_specialized = true;
-        } else if (!infilename) {
+        } else if (infilename == nullptr) {
             infilename = argv[i];
-        } else if (!outfilename) {
+        } else if (outfilename == nullptr) {
             outfilename = argv[i];
         } else {
             usage();
         }
     }
-    if (!(infilename && outfilename)) {
+    if (!((infilename != nullptr) && (outfilename != nullptr))) {
         usage();
     }
 

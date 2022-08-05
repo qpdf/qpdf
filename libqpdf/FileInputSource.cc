@@ -13,7 +13,7 @@ FileInputSource::Members::Members(bool close_file) :
 
 FileInputSource::Members::~Members()
 {
-    if (this->file && this->close_file) {
+    if ((this->file != nullptr) && this->close_file) {
         fclose(this->file);
     }
 }
@@ -74,8 +74,10 @@ FileInputSource::findAndSkipNextEOL()
         } else {
             char* p1 = static_cast<char*>(memchr(buf, '\r', len));
             char* p2 = static_cast<char*>(memchr(buf, '\n', len));
-            char* p = (p1 && p2) ? std::min(p1, p2) : p1 ? p1 : p2;
-            if (p) {
+            char* p = ((p1 != nullptr) && (p2 != nullptr)) ? std::min(p1, p2)
+                : p1 != nullptr                            ? p1
+                                                           : p2;
+            if (p != nullptr) {
                 result = cur_offset + (p - buf);
                 // We found \r or \n.  Keep reading until we get past
                 // \r and \n characters.
@@ -129,7 +131,7 @@ FileInputSource::read(char* buffer, size_t length)
     this->last_offset = this->tell();
     size_t len = fread(buffer, 1, length, this->m->file);
     if (len == 0) {
-        if (ferror(this->m->file)) {
+        if (ferror(this->m->file) != 0) {
             throw QPDFExc(
                 qpdf_e_system,
                 this->m->filename,

@@ -156,7 +156,8 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
         } else {
             err = inflate(&zstream, flush);
         }
-        if ((this->m->action == a_inflate) && (err != Z_OK) && zstream.msg &&
+        if ((this->m->action == a_inflate) && (err != Z_OK) &&
+            (zstream.msg != nullptr) &&
             (strcmp(zstream.msg, "incorrect data check") == 0)) {
             // Other PDF readers ignore this specific error. Combining
             // this with Z_SYNC_FLUSH enables qpdf to handle some
@@ -211,7 +212,7 @@ void
 Pl_Flate::finish()
 {
     try {
-        if (this->m->outbuf.get()) {
+        if (this->m->outbuf.get() != nullptr) {
             if (this->m->initialized) {
                 z_stream& zstream = *(static_cast<z_stream*>(this->m->zdata));
                 unsigned char buf[1];
@@ -256,7 +257,7 @@ Pl_Flate::checkError(char const* prefix, int error_code)
         std::string msg =
             this->identifier + ": " + action_str + ": " + prefix + ": ";
 
-        if (zstream.msg) {
+        if (zstream.msg != nullptr) {
             msg += zstream.msg;
         } else {
             switch (error_code) {

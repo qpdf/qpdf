@@ -25,7 +25,7 @@ void
 Pl_Function::write(unsigned char const* buf, size_t len)
 {
     this->m->fn(buf, len);
-    if (getNext(true)) {
+    if (getNext(true) != nullptr) {
         getNext()->write(buf, len);
     }
 }
@@ -33,7 +33,7 @@ Pl_Function::write(unsigned char const* buf, size_t len)
 void
 Pl_Function::finish()
 {
-    if (getNext(true)) {
+    if (getNext(true) != nullptr) {
         getNext()->finish();
     }
 }

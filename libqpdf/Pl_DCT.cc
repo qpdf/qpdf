@@ -289,7 +289,7 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
     cinfo->input_components = this->m->components;
     cinfo->in_color_space = this->m->color_space;
     jpeg_set_defaults(cinfo);
-    if (this->m->config_callback) {
+    if (this->m->config_callback != nullptr) {
         this->m->config_callback->apply(cinfo);
     }
 

@@ -89,7 +89,7 @@ main(int argc, char* argv[])
             // illustrates that you may capture any output generated
             // by the filter, or you may ignore it.
             StringCounter counter;
-            if (pageno % 2) {
+            if ((pageno % 2) != 0) {
                 // Ignore output for odd pages.
                 page.filterContents(&counter);
             } else {

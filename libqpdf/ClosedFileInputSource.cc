@@ -78,7 +78,7 @@ void
 ClosedFileInputSource::rewind()
 {
     this->m->offset = 0;
-    if (this->m->fis.get()) {
+    if (this->m->fis.get() != nullptr) {
         this->m->fis->rewind();
     }
 }
@@ -105,7 +105,7 @@ void
 ClosedFileInputSource::stayOpen(bool val)
 {
     this->m->stay_open = val;
-    if ((!val) && this->m->fis.get()) {
+    if ((!val) && (this->m->fis.get() != nullptr)) {
         after();
     }
 }

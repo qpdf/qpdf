@@ -13,7 +13,7 @@ BufferInputSource::Members::Members(
     description(description),
     buf(buf),
     cur_offset(0),
-    max_offset(buf ? QIntC::to_offset(buf->getSize()) : 0)
+    max_offset(buf != nullptr ? QIntC::to_offset(buf->getSize()) : 0)
 {
 }
 

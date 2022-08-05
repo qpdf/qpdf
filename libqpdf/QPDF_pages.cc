@@ -61,7 +61,7 @@ QPDF::getAllPages()
         bool warned = false;
         bool changed_pages = false;
         while (pages.isDictionary() && pages.hasKey("/Parent")) {
-            if (seen.count(pages.getObjGen())) {
+            if (seen.count(pages.getObjGen()) != 0u) {
                 // loop -- will be detected again and reported later
                 break;
             }
@@ -118,7 +118,7 @@ QPDF::getAllPagesInternal(
                     " (from 0) is direct; converting to indirect");
                 kid = makeIndirectObject(kid);
                 kids.setArrayItem(i, kid);
-            } else if (seen.count(kid.getObjGen())) {
+            } else if (seen.count(kid.getObjGen()) != 0u) {
                 // Make a copy of the page. This does the same as
                 // shallowCopyPage in QPDFPageObjectHelper.
                 QTC::TC("qpdf", "QPDF resolve duplicated page object");
@@ -254,7 +254,7 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
             2); // insert in middle
 
     auto og = newpage.getObjGen();
-    if (this->m->pageobj_to_pages_pos.count(og)) {
+    if (this->m->pageobj_to_pages_pos.count(og) != 0u) {
         QTC::TC("qpdf", "QPDF resolve duplicated page in insert");
         newpage = makeIndirectObject(QPDFObjectHandle(newpage).shallowCopy());
     }

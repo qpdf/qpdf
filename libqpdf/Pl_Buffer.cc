@@ -37,13 +37,13 @@ Pl_Buffer::write(unsigned char const* buf, size_t len)
         memcpy(b->getBuffer(), this->m->data->getBuffer(), this->m->total_size);
         this->m->data = b;
     }
-    if (len) {
+    if (len != 0u) {
         memcpy(this->m->data->getBuffer() + this->m->total_size, buf, len);
         this->m->total_size += len;
     }
     this->m->ready = false;
 
-    if (getNext(true)) {
+    if (getNext(true) != nullptr) {
         getNext()->write(buf, len);
     }
 }
@@ -52,7 +52,7 @@ void
 Pl_Buffer::finish()
 {
     this->m->ready = true;
-    if (getNext(true)) {
+    if (getNext(true) != nullptr) {
         getNext()->finish();
     }
 }

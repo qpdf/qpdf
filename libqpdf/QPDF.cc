@@ -142,7 +142,7 @@ QPDF::CopiedStreamDataProvider::provideStreamData(
 {
     std::shared_ptr<ForeignStreamData> foreign_data = foreign_stream_data[og];
     bool result = false;
-    if (foreign_data.get()) {
+    if (foreign_data.get() != nullptr) {
         result = destination_qpdf.pipeForeignStreamData(
             foreign_data, pipeline, suppress_warnings, will_retry);
         QTC::TC("qpdf", "QPDF copy foreign with data", result ? 0 : 1);
@@ -459,7 +459,7 @@ QPDF::findStartxref()
 void
 QPDF::parse(char const* password)
 {
-    if (password) {
+    if (password != nullptr) {
         this->m->encp->provided_password = password;
     }
 
@@ -664,7 +664,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
 {
     std::map<int, int> free_table;
     std::set<qpdf_offset_t> visited;
-    while (xref_offset) {
+    while (xref_offset != 0) {
         visited.insert(xref_offset);
         char buf[7];
         memset(buf, 0, sizeof(buf));
@@ -1127,7 +1127,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
     std::vector<long long> indx;
     if (Index_obj.isArray()) {
         int n_index = Index_obj.getArrayNItems();
-        if ((n_index % 2) || (n_index < 2)) {
+        if (((n_index % 2) != 0) || (n_index < 2)) {
             throw QPDFExc(
                 qpdf_e_damaged_pdf,
                 this->m->file->getName(),
@@ -1306,7 +1306,7 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2, bool overwrite)
     { // private scope
         int gen = (f0 == 2 ? 0 : f2);
         QPDFObjGen og(obj, gen);
-        if (this->m->xref_table.count(og)) {
+        if (this->m->xref_table.count(og) != 0u) {
             if (overwrite) {
                 QTC::TC("qpdf", "QPDF xref overwrite object");
                 this->m->xref_table.erase(og);
@@ -1315,7 +1315,7 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2, bool overwrite)
                 return;
             }
         }
-        if (this->m->deleted_objects.count(obj)) {
+        if (this->m->deleted_objects.count(obj) != 0u) {
             QTC::TC("qpdf", "QPDF xref deleted object");
             return;
         }
@@ -1697,7 +1697,7 @@ QPDF::recoverStreamLength(
         }
     }
 
-    if (length) {
+    if (length != 0u) {
         qpdf_offset_t this_obj_offset = 0;
         QPDFObjGen this_og;
 
@@ -1714,7 +1714,7 @@ QPDF::recoverStreamLength(
                 }
             }
         }
-        if (this_obj_offset && (this_og == og)) {
+        if ((this_obj_offset != 0) && (this_og == og)) {
             // Well, we found endstream\nendobj within the space
             // allowed for this object, so we're probably in good
             // shape.
@@ -1801,15 +1801,16 @@ QPDF::readObjectAtOffset(
     QPDFTokenizer::Token tobj = readToken(this->m->file);
 
     bool objidok = (tobjid.getType() == QPDFTokenizer::tt_integer);
-    int genok = (tgen.getType() == QPDFTokenizer::tt_integer);
-    int objok = (tobj == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "obj"));
+    int genok = static_cast<int>(tgen.getType() == QPDFTokenizer::tt_integer);
+    int objok = static_cast<int>(
+        tobj == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "obj"));
 
     QTC::TC("qpdf", "QPDF check objid", objidok ? 1 : 0);
-    QTC::TC("qpdf", "QPDF check generation", genok ? 1 : 0);
-    QTC::TC("qpdf", "QPDF check obj", objok ? 1 : 0);
+    QTC::TC("qpdf", "QPDF check generation", genok != 0 ? 1 : 0);
+    QTC::TC("qpdf", "QPDF check obj", objok != 0 ? 1 : 0);
 
     try {
-        if (!(objidok && genok && objok)) {
+        if (!(objidok && (genok != 0) && (objok != 0))) {
             QTC::TC("qpdf", "QPDF expected n n obj");
             throw QPDFExc(
                 qpdf_e_damaged_pdf,
@@ -1851,7 +1852,7 @@ QPDF::readObjectAtOffset(
         if (try_recovery) {
             // Try again after reconstructing xref table
             reconstruct_xref(e);
-            if (this->m->xref_table.count(exp_og) &&
+            if ((this->m->xref_table.count(exp_og) != 0u) &&
                 (this->m->xref_table[exp_og].getType() == 1)) {
                 qpdf_offset_t new_offset =
                     this->m->xref_table[exp_og].getOffset();
@@ -1888,7 +1889,7 @@ QPDF::readObjectAtOffset(
             "expected endobj");
     }
 
-    if (!this->m->obj_cache.count(og)) {
+    if (this->m->obj_cache.count(og) == 0u) {
         // Store the object in the cache here so it gets cached
         // whether we first know the offset or whether we first know
         // the object ID and generation (in which we case we would get
@@ -1904,8 +1905,8 @@ QPDF::readObjectAtOffset(
         // skip over spaces
         while (true) {
             char ch;
-            if (this->m->file->read(&ch, 1)) {
-                if (!isspace(static_cast<unsigned char>(ch))) {
+            if (this->m->file->read(&ch, 1) != 0u) {
+                if (isspace(static_cast<unsigned char>(ch)) == 0) {
                     this->m->file->seek(-1, SEEK_CUR);
                     break;
                 }
@@ -1957,7 +1958,7 @@ QPDF::resolve(QPDFObjGen const& og)
     // Check object cache before checking xref table.  This allows us
     // to insert things into the object cache that don't actually
     // exist in the file.
-    if (this->m->resolving.count(og)) {
+    if (this->m->resolving.count(og) != 0u) {
         // This can happen if an object references itself directly or
         // indirectly in some key that has to be resolved during
         // object parsing, such as stream length.
@@ -1971,7 +1972,8 @@ QPDF::resolve(QPDFObjGen const& og)
     }
     ResolveRecorder rr(this, og);
 
-    if ((!this->m->obj_cache.count(og)) && this->m->xref_table.count(og)) {
+    if ((this->m->obj_cache.count(og) == 0u) &&
+        (this->m->xref_table.count(og) != 0u)) {
         QPDFXRefEntry const& entry = this->m->xref_table[og];
         try {
             switch (entry.getType()) {
@@ -2027,7 +2029,7 @@ QPDF::resolve(QPDFObjGen const& og)
 void
 QPDF::resolveObjectsInStream(int obj_stream_number)
 {
-    if (this->m->resolved_object_streams.count(obj_stream_number)) {
+    if (this->m->resolved_object_streams.count(obj_stream_number) != 0u) {
         return;
     }
     this->m->resolved_object_streams.insert(obj_stream_number);
@@ -2144,7 +2146,8 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
 QPDFObjectHandle
 QPDF::reserveObjectIfNotExists(QPDFObjGen const& og)
 {
-    if ((!this->m->obj_cache.count(og)) && (!this->m->xref_table.count(og))) {
+    if ((this->m->obj_cache.count(og) == 0u) &&
+        (this->m->xref_table.count(og) == 0u)) {
         resolve(og);
         replaceObject(og, QPDFObjectHandle::Factory::makeReserved());
     }
@@ -2445,13 +2448,13 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
     // Copy information from the foreign stream so we can pipe its
     // data later without keeping the original QPDF object around.
     QPDF* foreign_stream_qpdf = foreign.getOwningQPDF();
-    if (!foreign_stream_qpdf) {
+    if (foreign_stream_qpdf == nullptr) {
         throw std::logic_error("unable to retrieve owning qpdf"
                                " from foreign stream");
     }
     QPDF_Stream* stream = dynamic_cast<QPDF_Stream*>(
         QPDFObjectHandle::ObjAccessor::getObject(foreign).get());
-    if (!stream) {
+    if (stream == nullptr) {
         throw std::logic_error("unable to retrieve underlying"
                                " stream object from foreign stream");
     }
@@ -2471,11 +2474,11 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
     }
     std::shared_ptr<QPDFObjectHandle::StreamDataProvider> stream_provider =
         stream->getStreamDataProvider();
-    if (stream_buffer.get()) {
+    if (stream_buffer.get() != nullptr) {
         QTC::TC("qpdf", "QPDF copy foreign stream with buffer");
         result.replaceStreamData(
             stream_buffer, dict.getKey("/Filter"), dict.getKey("/DecodeParms"));
-    } else if (stream_provider.get()) {
+    } else if (stream_provider.get() != nullptr) {
         // In this case, the remote stream's QPDF must stay in scope.
         QTC::TC("qpdf", "QPDF copy foreign stream with provider");
         this->m->copied_stream_data_provider->registerForeignStream(
@@ -2644,7 +2647,7 @@ QPDF::getCompressibleObjGens()
         queue.pop_front();
         if (obj.isIndirect()) {
             QPDFObjGen og = obj.getObjGen();
-            if (visited.count(og)) {
+            if (visited.count(og) != 0u) {
                 QTC::TC("qpdf", "QPDF loop detected traversing objects");
                 continue;
             }

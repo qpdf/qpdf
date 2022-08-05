@@ -112,7 +112,7 @@ JSONHandler::handle(std::string const& path, JSON j)
                               std::string const& k, JSON v) {
             auto i = this->m->h.dict_handlers.find(k);
             if (i == this->m->h.dict_handlers.end()) {
-                if (this->m->h.fallback_dict_handler.get()) {
+                if (this->m->h.fallback_dict_handler.get() != nullptr) {
                     this->m->h.fallback_dict_handler->handle(path_base + k, v);
                 } else {
                     QTC::TC("libtests", "JSONHandler unexpected key");

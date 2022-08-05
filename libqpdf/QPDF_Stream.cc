@@ -257,7 +257,7 @@ QPDF_Stream::getStreamJSON(
                 filter = false;
                 decode_level = qpdf_dl_none;
             } else {
-                if (buf_pl.get()) {
+                if (buf_pl.get() != nullptr) {
                     buf = buf_pl->getBufferSharedPointer();
                 }
                 break;
@@ -274,7 +274,7 @@ QPDF_Stream::getStreamJSON(
         if (json_data == qpdf_sj_file) {
             result.addDictionaryMember(
                 "datafile", JSON::makeString(data_filename));
-            if (!buf.get()) {
+            if (buf.get() == nullptr) {
                 throw std::logic_error(
                     "QPDF_Stream: failed to get stream data in json file mode");
             }
@@ -437,7 +437,7 @@ QPDF_Stream::filterable(
     bool filterable = true;
 
     for (auto& filter_name: filter_names) {
-        if (filter_abbreviations.count(filter_name)) {
+        if (filter_abbreviations.count(filter_name) != 0u) {
             QTC::TC("qpdf", "QPDF_Stream expand filter abbreviation");
             filter_name = filter_abbreviations[filter_name];
         }
@@ -562,14 +562,14 @@ QPDF_Stream::pipeStreamData(
     std::shared_ptr<ContentNormalizer> normalizer;
     std::shared_ptr<Pipeline> new_pipeline;
     if (filter) {
-        if (encode_flags & qpdf_ef_compress) {
+        if ((encode_flags & qpdf_ef_compress) != 0) {
             new_pipeline = std::make_shared<Pl_Flate>(
                 "compress stream", pipeline, Pl_Flate::a_deflate);
             to_delete.push_back(new_pipeline);
             pipeline = new_pipeline.get();
         }
 
-        if (encode_flags & qpdf_ef_normalize) {
+        if ((encode_flags & qpdf_ef_normalize) != 0) {
             normalizer = std::make_shared<ContentNormalizer>();
             new_pipeline = std::make_shared<Pl_QPDFTokenizer>(
                 "normalizer", normalizer.get(), pipeline);
@@ -589,7 +589,7 @@ QPDF_Stream::pipeStreamData(
         for (auto f_iter = filters.rbegin(); f_iter != filters.rend();
              ++f_iter) {
             auto decode_pipeline = (*f_iter)->getDecodePipeline(pipeline);
-            if (decode_pipeline) {
+            if (decode_pipeline != nullptr) {
                 pipeline = decode_pipeline;
             }
             Pl_Flate* flate = dynamic_cast<Pl_Flate*>(pipeline);
@@ -601,12 +601,12 @@ QPDF_Stream::pipeStreamData(
         }
     }
 
-    if (this->stream_data.get()) {
+    if (this->stream_data.get() != nullptr) {
         QTC::TC("qpdf", "QPDF_Stream pipe replaced stream data");
         pipeline->write(
             this->stream_data->getBuffer(), this->stream_data->getSize());
         pipeline->finish();
-    } else if (this->stream_provider.get()) {
+    } else if (this->stream_provider.get() != nullptr) {
         Pl_Count count("stream provider count", pipeline);
         if (this->stream_provider->supportsRetry()) {
             if (!this->stream_provider->provideStreamData(
@@ -657,7 +657,7 @@ QPDF_Stream::pipeStreamData(
         }
     }
 
-    if (filter && (!suppress_warnings) && normalizer.get() &&
+    if (filter && (!suppress_warnings) && (normalizer.get() != nullptr) &&
         normalizer->anyBadTokens()) {
         warn(
             qpdf_e_damaged_pdf,

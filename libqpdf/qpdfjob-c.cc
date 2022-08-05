@@ -55,7 +55,7 @@ int
 qpdfjob_initialize_from_wide_argv(qpdfjob_handle j, wchar_t const* const argv[])
 {
     int argc = 0;
-    for (auto k = argv; *k; ++k) {
+    for (auto k = argv; *k != nullptr; ++k) {
         ++argc;
     }
     return QUtil::call_main_from_wmain(

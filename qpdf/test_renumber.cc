@@ -28,7 +28,7 @@ compare(QPDFObjectHandle a, QPDFObjectHandle b)
 {
     static std::set<QPDFObjGen> visited;
     if (a.isIndirect()) {
-        if (visited.count(a.getObjGen())) {
+        if (visited.count(a.getObjGen()) != 0u) {
             return true;
         }
         visited.insert(a.getObjGen());

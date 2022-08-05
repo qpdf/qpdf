@@ -141,7 +141,7 @@ QPDFCrypto_openssl::MD5_finalize()
 #else
     auto md = EVP_MD_CTX_get0_md(md_ctx);
 #endif
-    if (md) {
+    if (md != nullptr) {
         check_openssl(EVP_DigestFinal(md_ctx, md_out + 0, nullptr));
     }
 }
@@ -154,7 +154,7 @@ QPDFCrypto_openssl::SHA2_finalize()
 #else
     auto md = EVP_MD_CTX_get0_md(md_ctx);
 #endif
-    if (md) {
+    if (md != nullptr) {
         check_openssl(EVP_DigestFinal(md_ctx, md_out + 0, nullptr));
     }
 }
@@ -211,7 +211,12 @@ QPDFCrypto_openssl::rijndael_init(
     check_openssl(
         // line-break
         EVP_CipherInit_ex(
-            cipher_ctx, cipher, nullptr, key_data, cbc_block, encrypt));
+            cipher_ctx,
+            cipher,
+            nullptr,
+            key_data,
+            cbc_block,
+            static_cast<int>(encrypt)));
     check_openssl(EVP_CIPHER_CTX_set_padding(cipher_ctx, 0));
 }
 
@@ -235,7 +240,7 @@ QPDFCrypto_openssl::rijndael_process(
 void
 QPDFCrypto_openssl::RC4_finalize()
 {
-    if (EVP_CIPHER_CTX_cipher(cipher_ctx)) {
+    if (EVP_CIPHER_CTX_cipher(cipher_ctx) != nullptr) {
         check_openssl(EVP_CIPHER_CTX_reset(cipher_ctx));
     }
 }
@@ -243,7 +248,7 @@ QPDFCrypto_openssl::RC4_finalize()
 void
 QPDFCrypto_openssl::rijndael_finalize()
 {
-    if (EVP_CIPHER_CTX_cipher(cipher_ctx)) {
+    if (EVP_CIPHER_CTX_cipher(cipher_ctx) != nullptr) {
         check_openssl(EVP_CIPHER_CTX_reset(cipher_ctx));
     }
 }

@@ -8,7 +8,7 @@ Buffer::Members::Members(size_t size, unsigned char* buf, bool own_memory) :
     buf(nullptr)
 {
     if (own_memory) {
-        this->buf = (size ? new unsigned char[size] : nullptr);
+        this->buf = (size != 0u ? new unsigned char[size] : nullptr);
     } else {
         this->buf = buf;
     }
@@ -54,7 +54,7 @@ Buffer::copy(Buffer const& rhs)
     if (this != &rhs) {
         this->m =
             std::shared_ptr<Members>(new Members(rhs.m->size, nullptr, true));
-        if (this->m->size) {
+        if (this->m->size != 0u) {
             memcpy(this->m->buf, rhs.m->buf, this->m->size);
         }
     }

@@ -77,12 +77,12 @@ Pl_PNGFilter::write(unsigned char const* data, size_t len)
         // Swap rows
         unsigned char* t = this->prev_row;
         this->prev_row = this->cur_row;
-        this->cur_row = t ? t : this->buf2.get();
+        this->cur_row = t != nullptr ? t : this->buf2.get();
         memset(this->cur_row, 0, this->bytes_per_row + 1);
         left = this->incoming;
         this->pos = 0;
     }
-    if (len) {
+    if (len != 0u) {
         memcpy(this->cur_row + this->pos, data + offset, len);
     }
     this->pos += len;
@@ -102,7 +102,7 @@ void
 Pl_PNGFilter::decodeRow()
 {
     int filter = this->cur_row[0];
-    if (this->prev_row) {
+    if (this->prev_row != nullptr) {
         switch (filter) {
         case 0:
             break;
@@ -225,7 +225,7 @@ Pl_PNGFilter::encodeRow()
     // For now, hard-code to using UP filter.
     unsigned char ch = 2;
     getNext()->write(&ch, 1);
-    if (this->prev_row) {
+    if (this->prev_row != nullptr) {
         for (unsigned int i = 0; i < this->bytes_per_row; ++i) {
             ch = static_cast<unsigned char>(
                 this->cur_row[i] - this->prev_row[i]);
@@ -239,7 +239,7 @@ Pl_PNGFilter::encodeRow()
 void
 Pl_PNGFilter::finish()
 {
-    if (this->pos) {
+    if (this->pos != 0u) {
         // write partial row
         processRow();
     }

@@ -62,7 +62,7 @@ Pl_LZWDecoder::sendNextCode()
     unsigned int code = 0;
     code += (this->buf[high] & high_mask) << bits_from_med;
     code += ((this->buf[med] & med_mask) >> (8 - bits_from_med));
-    if (bits_from_low) {
+    if (bits_from_low != 0u) {
         code <<= bits_from_low;
         code += ((this->buf[low] & low_mask) >> (8 - bits_from_low));
         this->byte_pos = low;
@@ -181,7 +181,8 @@ Pl_LZWDecoder::handleCode(unsigned int code)
                 throw std::runtime_error("LZWDecoder: table full");
             }
             addToTable(next);
-            unsigned int change_idx = new_idx + code_change_delta;
+            unsigned int change_idx =
+                new_idx + static_cast<unsigned int>(code_change_delta);
             if ((change_idx == 511) || (change_idx == 1023) ||
                 (change_idx == 2047)) {
                 ++this->code_size;

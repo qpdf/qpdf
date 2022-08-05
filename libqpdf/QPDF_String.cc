@@ -108,7 +108,8 @@ QPDF_String::useHexString() const
     for (unsigned int i = 0; i < this->val.length(); ++i) {
         char ch = this->val.at(i);
         if ((ch == 0) ||
-            (!(is_ascii_printable(ch) || strchr("\n\r\t\b\f", ch)))) {
+            (!(is_ascii_printable(ch) ||
+               (strchr("\n\r\t\b\f", ch) != nullptr)))) {
             if ((ch >= 0) && (ch < 24)) {
                 nonprintable = true;
             }

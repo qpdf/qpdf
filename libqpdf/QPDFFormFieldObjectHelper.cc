@@ -40,11 +40,11 @@ QPDFFormFieldObjectHelper::getTopLevelField(bool* is_different)
     while (top_field.isDictionary() &&
            (!top_field.getKey("/Parent").isNull())) {
         top_field = top_field.getKey("/Parent");
-        if (is_different) {
+        if (is_different != nullptr) {
             *is_different = true;
         }
         auto og = top_field.getObjGen();
-        if (seen.count(og)) {
+        if (seen.count(og) != 0u) {
             break;
         }
         seen.insert(og);
@@ -58,7 +58,7 @@ QPDFFormFieldObjectHelper::getFieldFromAcroForm(std::string const& name)
     QPDFObjectHandle result = QPDFObjectHandle::newNull();
     // Fields are supposed to be indirect, so this should work.
     QPDF* q = this->oh.getOwningQPDF();
-    if (!q) {
+    if (q == nullptr) {
         return result;
     }
     auto acroform = q->getRoot().getKey("/AcroForm");
@@ -80,7 +80,7 @@ QPDFFormFieldObjectHelper::getInheritableFieldValue(std::string const& name)
     while (result.isNull() && node.hasKey("/Parent")) {
         seen.insert(node.getObjGen());
         node = node.getKey("/Parent");
-        if (seen.count(node.getObjGen())) {
+        if (seen.count(node.getObjGen()) != 0u) {
             break;
         }
         result = node.getKey(name);
@@ -363,7 +363,7 @@ QPDFFormFieldObjectHelper::setV(QPDFObjectHandle value, bool need_appearances)
     }
     if (need_appearances) {
         QPDF* qpdf = this->oh.getOwningQPDF();
-        if (!qpdf) {
+        if (qpdf == nullptr) {
             throw std::logic_error(
                 "QPDFFormFieldObjectHelper::setV called with"
                 " need_appearances = true on an object that is"

@@ -271,7 +271,7 @@ QPDF::readLinearizationData()
 
     Pl_Buffer pb("hint buffer");
     QPDFObjectHandle H0 = readHintStream(pb, H0_offset, toS(H0_length));
-    if (H1_offset) {
+    if (H1_offset != 0) {
         (void)readHintStream(pb, H1_offset, toS(H1_length));
     }
 
@@ -475,7 +475,7 @@ QPDF::readHSharedObject(BitStream h)
     load_vector_int(
         h, nitems, entries, 1, &HSharedObjectEntry::signature_present);
     for (size_t i = 0; i < toS(nitems); ++i) {
-        if (entries.at(i).signature_present) {
+        if (entries.at(i).signature_present != 0) {
             // Skip 128-bit MD5 hash.  These are not supported by
             // acrobat, so they should probably never be there.  We
             // have no test case for this.
@@ -839,7 +839,7 @@ QPDF::checkHPageOffset(
         }
 
         for (int iter: hint_shared) {
-            if (!computed_shared.count(iter)) {
+            if (computed_shared.count(iter) == 0u) {
                 // pdlin puts thumbnails here even though it shouldn't
                 warnings.push_back(
                     "page " + QUtil::int_to_string(pageno) +
@@ -849,7 +849,7 @@ QPDF::checkHPageOffset(
         }
 
         for (int iter: computed_shared) {
-            if (!hint_shared.count(iter)) {
+            if (hint_shared.count(iter) == 0u) {
                 // Acrobat does not put some things including at least
                 // built-in fonts and procsets here, at least in some
                 // cases.
@@ -1122,7 +1122,7 @@ QPDF::dumpHSharedObject()
             << "\n";
         // PDF spec says signature present nobjects_minus_one are
         // always 0, so print them only if they have a non-zero value.
-        if (se.signature_present) {
+        if (se.signature_present != 0) {
             *this->m->log->getInfo() << "  signature present\n";
         }
         if (se.nobjects_minus_one != 0) {
@@ -1397,7 +1397,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         stopOnError("no pages found while calculating linearization data");
     }
     QPDFObjGen first_page_og(pages.at(0).getObjGen());
-    if (!lc_first_page_private.count(first_page_og)) {
+    if (lc_first_page_private.count(first_page_og) == 0u) {
         stopOnError(
             "INTERNAL ERROR: QPDF::calculateLinearizationData: first page "
             "object not in lc_first_page_private");
@@ -1440,7 +1440,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         // Place this page's page object
 
         QPDFObjGen page_og(pages.at(i).getObjGen());
-        if (!lc_other_page_private.count(page_og)) {
+        if (lc_other_page_private.count(page_og) == 0u) {
             stopOnError(
                 "INTERNAL ERROR: "
                 "QPDF::calculateLinearizationData: page object for page " +
@@ -1460,7 +1460,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
                         " calculating linearization data");
         }
         for (auto const& og: this->m->obj_user_to_objects[ou]) {
-            if (lc_other_page_private.count(og)) {
+            if (lc_other_page_private.count(og) != 0u) {
                 lc_other_page_private.erase(og);
                 this->m->part7.push_back(getObjectByObjGen(og));
                 ++this->m->c_page_offset_data.entries.at(i).nobjects;
@@ -1499,7 +1499,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
                     " calculating linearization data");
     }
     for (auto const& og: pages_ogs) {
-        if (lc_other.count(og)) {
+        if (lc_other.count(og) != 0u) {
             lc_other.erase(og);
             this->m->part9.push_back(getObjectByObjGen(og));
         }
@@ -1514,7 +1514,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         if (!thumb.isNull()) {
             // Output the thumbnail itself
             QPDFObjGen thumb_og(thumb.getObjGen());
-            if (lc_thumbnail_private.count(thumb_og)) {
+            if (lc_thumbnail_private.count(thumb_og) != 0u) {
                 lc_thumbnail_private.erase(thumb_og);
                 this->m->part9.push_back(thumb);
             } else {
@@ -1529,7 +1529,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
                 this->m
                     ->obj_user_to_objects[ObjUser(ObjUser::ou_thumb, toI(i))];
             for (auto const& og: ogs) {
-                if (lc_thumbnail_private.count(og)) {
+                if (lc_thumbnail_private.count(og) != 0u) {
                     lc_thumbnail_private.erase(og);
                     this->m->part9.push_back(getObjectByObjGen(og));
                 }

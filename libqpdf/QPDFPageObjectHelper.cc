@@ -257,7 +257,7 @@ QPDFPageObjectHelper::getAttribute(std::string const& name, bool copy_if_shared)
         while (inheritable && result.isNull() && node.hasKey("/Parent")) {
             seen.insert(node.getObjGen());
             node = node.getKey("/Parent");
-            if (seen.count(node.getObjGen())) {
+            if (seen.count(node.getObjGen()) != 0u) {
                 break;
             }
             result = node.getKey(name);
@@ -325,7 +325,7 @@ QPDFPageObjectHelper::forEachXObject(
         QPDFPageObjectHelper ph = queue.front();
         queue.pop_front();
         QPDFObjGen og = ph.oh.getObjGen();
-        if (seen.count(og)) {
+        if (seen.count(og) != 0u) {
             continue;
         }
         seen.insert(og);
@@ -563,9 +563,9 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     ResourceFinder rf;
     try {
         auto q = ph.oh.getOwningQPDF();
-        size_t before_nw = (q ? q->numWarnings() : 0);
+        size_t before_nw = (q != nullptr ? q->numWarnings() : 0);
         ph.parseContents(&rf);
-        size_t after_nw = (q ? q->numWarnings() : 0);
+        size_t after_nw = (q != nullptr ? q->numWarnings() : 0);
         if (after_nw > before_nw) {
             ph.oh.warnIfPossible(
                 "Bad token found while scanning content stream; "
@@ -608,7 +608,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     for (auto const& i1: to_filter) {
         for (auto const& n_iter: names_by_rtype[i1]) {
             std::string const& name = n_iter.first;
-            if (!known_names.count(name)) {
+            if (known_names.count(name) == 0u) {
                 unresolved.insert(name);
                 local_unresolved.insert(name);
             }
@@ -647,11 +647,11 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
 
     for (auto& dict: rdicts) {
         for (auto const& key: dict.getKeys()) {
-            if (is_page && unresolved.count(key)) {
+            if (is_page && (unresolved.count(key) != 0u)) {
                 // This name is referenced by some nested form
                 // xobject, so don't remove it.
                 QTC::TC("qpdf", "QPDFPageObjectHelper resolving unresolved");
-            } else if (!rf.getNames().count(key)) {
+            } else if (rf.getNames().count(key) == 0u) {
                 dict.removeKey(key);
             }
         }
@@ -684,7 +684,7 @@ QPDFPageObjectHelper
 QPDFPageObjectHelper::shallowCopyPage()
 {
     QPDF* qpdf = this->oh.getOwningQPDF();
-    if (!qpdf) {
+    if (qpdf == nullptr) {
         throw std::runtime_error("QPDFPageObjectHelper::shallowCopyPage"
                                  " called with a direct object");
     }
@@ -744,7 +744,7 @@ QPDFObjectHandle
 QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
 {
     QPDF* qpdf = this->oh.getOwningQPDF();
-    if (!qpdf) {
+    if (qpdf == nullptr) {
         throw std::runtime_error("QPDFPageObjectHelper::getFormXObjectForPage"
                                  " called with a direct object");
     }
@@ -918,7 +918,7 @@ void
 QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
 {
     QPDF* qpdf = this->oh.getOwningQPDF();
-    if (!qpdf) {
+    if (qpdf == nullptr) {
         throw std::runtime_error("QPDFPageObjectHelper::flattenRotation"
                                  " called with a direct object");
     }
@@ -1040,7 +1040,7 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
         std::vector<QPDFObjectHandle> new_fields;
         std::set<QPDFObjGen> old_fields;
         std::shared_ptr<QPDFAcroFormDocumentHelper> afdhph;
-        if (!afdh) {
+        if (afdh == nullptr) {
             afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(*qpdf);
             afdh = afdhph.get();
         }
@@ -1067,12 +1067,12 @@ QPDFPageObjectHelper::copyAnnotations(
     }
 
     QPDF* from_qpdf = from_page.getObjectHandle().getOwningQPDF();
-    if (!from_qpdf) {
+    if (from_qpdf == nullptr) {
         throw std::runtime_error("QPDFPageObjectHelper::copyAnnotations:"
                                  " from page is a direct object");
     }
     QPDF* this_qpdf = this->oh.getOwningQPDF();
-    if (!this_qpdf) {
+    if (this_qpdf == nullptr) {
         throw std::runtime_error("QPDFPageObjectHelper::copyAnnotations:"
                                  " this page is a direct object");
     }
@@ -1082,13 +1082,13 @@ QPDFPageObjectHelper::copyAnnotations(
     std::set<QPDFObjGen> old_fields;
     std::shared_ptr<QPDFAcroFormDocumentHelper> afdhph;
     std::shared_ptr<QPDFAcroFormDocumentHelper> from_afdhph;
-    if (!afdh) {
+    if (afdh == nullptr) {
         afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(*this_qpdf);
         afdh = afdhph.get();
     }
     if (this_qpdf == from_qpdf) {
         from_afdh = afdh;
-    } else if (from_afdh) {
+    } else if (from_afdh != nullptr) {
         if (from_afdh->getQPDF().getUniqueId() != from_qpdf->getUniqueId()) {
             throw std::logic_error(
                 "QPDFAcroFormDocumentHelper::copyAnnotations: from_afdh"

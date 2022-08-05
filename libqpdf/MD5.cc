@@ -81,7 +81,7 @@ MD5::encodeFile(char const* filename, qpdf_offset_t up_to_offset)
             }
         }
     } while (len > 0);
-    if (ferror(file)) {
+    if (ferror(file) != 0) {
         // Assume, perhaps incorrectly, that errno was set by the
         // underlying call to read....
         (void)fclose(file);

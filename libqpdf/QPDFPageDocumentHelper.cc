@@ -93,7 +93,7 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
     std::string new_content;
     int rotate = 0;
     QPDFObjectHandle rotate_obj = page.getObjectHandle().getKey("/Rotate");
-    if (rotate_obj.isInteger() && rotate_obj.getIntValue()) {
+    if (rotate_obj.isInteger() && (rotate_obj.getIntValue() != 0)) {
         rotate = rotate_obj.getIntValueAsInt();
     }
     int next_fx = 1;
