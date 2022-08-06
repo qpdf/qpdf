@@ -382,12 +382,15 @@ class QPDF
     QPDF_DLL
     QPDFObjectHandle makeIndirectObject(QPDFObjectHandle);
 
-    // Retrieve an object by object ID and generation.  Returns an
-    // indirect reference to it.
+    // Retrieve an object by object ID and generation. Returns an
+    // indirect reference to it. The getObject() methods were added
+    // for qpdf 11.
     QPDF_DLL
     QPDFObjectHandle getObject(QPDFObjGen const&);
     QPDF_DLL
     QPDFObjectHandle getObject(int objid, int generation);
+    // These are older methods, but there is no intention to deprecate
+    // them.
     QPDF_DLL
     QPDFObjectHandle getObjectByObjGen(QPDFObjGen const&);
     QPDF_DLL
