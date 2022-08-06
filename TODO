@@ -21,31 +21,15 @@ Pending changes:
   appimage build specifically is setting the runpath, which is
   actually desirable in this case. Make sure to understand and
   document this. Maybe add a check for it in the build.
-* Decide what to do about #664 (get*Box)
-* Add an option --ignore-encryption to ignore encryption information
-  and treat encrypted files as if they weren't encrypted. This should
-  make it possible to solve #598 (--show-encryption without a
-  password). We'll need to make sure we don't try to filter any
-  streams in this mode. Ideally we should be able to combine this with
-  --json so we can look at the raw encrypted strings and streams if we
-  want to, though be sure to document that the resulting JSON won't be
-  convertible back to a valid PDF. Since providing the password may
-  reveal additional details, --show-encryption could potentially retry
-  with this option if the first time doesn't work. Then, with the file
-  open, we can read the encryption dictionary normally.
-* In libtests, separate executables that need the object library
-  from those that strictly use public API. Move as many of the test
-  drivers from the qpdf directory into the latter category as long
-  as doing so isn't too troublesome from a coverage standpoint.
-* Consider adding fuzzer code for JSON
-* Consider generating a non-flat pages tree before creating output to
-  better handle files with lots of pages. If there are more than 256
-  pages, add a second layer with the second layer nodes having no more
-  than 256 nodes and being as evenly sizes as possible. Don't worry
-  about the case of more than 65,536 pages. If the top node has more
-  than 256 children, we'll live with it.
 
-Parent pointer idea:
+Soon: Break ground on "Document-level work"
+
+Fix Multiple Direct Object Owner Issue
+======================================
+
+These are some ideas I've had, but I'm parking them until I fully
+understand m-holger's proposal to split QPDFObject into QPDFObject and
+QPDFValue.
 
 * Add std::weak_ptr<QPDFObject> parent to QPDFObject. When adding a
   direct object to an array or dictionary, set its parent. When
@@ -64,8 +48,6 @@ prevents the same object from being added to more than one thing.
 Note that arrays and dictionaries still need to contain
 QPDFObjectHandle because of indirect objects. This only pertains to
 direct objects, which are always "resolved" in QPDFObjectHandle.
-
-Soon: Break ground on "Document-level work"
 
 Possible future JSON enhancements
 =================================
@@ -376,169 +358,196 @@ directory or that are otherwise not publicly accessible. This includes
 things sent to me by email that are specifically not public. Even so,
 I find it useful to make reference to them in this list.
 
- * Look at https://bestpractices.coreinfrastructure.org/en
+* Add an option --ignore-encryption to ignore encryption information
+  and treat encrypted files as if they weren't encrypted. This should
+  make it possible to solve #598 (--show-encryption without a
+  password). We'll need to make sure we don't try to filter any
+  streams in this mode. Ideally we should be able to combine this with
+  --json so we can look at the raw encrypted strings and streams if we
+  want to, though be sure to document that the resulting JSON won't be
+  convertible back to a valid PDF. Since providing the password may
+  reveal additional details, --show-encryption could potentially retry
+  with this option if the first time doesn't work. Then, with the file
+  open, we can read the encryption dictionary normally.
 
- * Rework tests so that nothing is written into the source directory.
-   Ideally then the entire build could be done with a read-only
-   source tree.
+* In libtests, separate executables that need the object library
+  from those that strictly use public API. Move as many of the test
+  drivers from the qpdf directory into the latter category as long
+  as doing so isn't too troublesome from a coverage standpoint.
 
- * Large file tests fail with linux32 before and after cmake. This was
-   first noticed after 10.6.3. I don't think it's worth fixing.
+* Consider generating a non-flat pages tree before creating output to
+  better handle files with lots of pages. If there are more than 256
+  pages, add a second layer with the second layer nodes having no more
+  than 256 nodes and being as evenly sizes as possible. Don't worry
+  about the case of more than 65,536 pages. If the top node has more
+  than 256 children, we'll live with it. This is only safe if all
+  intermediate page nodes have only /Kids, /Parent, /Type, and /Count.
 
- * Consider updating the fuzzer with code that exercises
-   copyAnnotations, file attachments, and name and number trees. Check
-   fuzzer coverage.
+* Look at https://bestpractices.coreinfrastructure.org/en
 
- * Add code for creation of a file attachment annotation. It should
-   also be possible to create a widget annotation and a form field.
-   Update the pdf-attach-file.cc example with new APIs when ready.
+* Consider adding fuzzer code for JSON
 
- * Flattening of form XObjects seems like something that would be
-   useful in the library. We are seeing more cases of completely valid
-   PDF files with form XObjects that cause problems in other software.
-   Flattening of form XObjects could be a useful way to work around
-   those issues or to prepare files for additional processing, making
-   it possible for users of the qpdf library to not be concerned about
-   form XObjects. This could be done recursively; i.e., we could have a
-   method to embed a form XObject into whatever contains it, whether
-   that is a form XObject or a page. This would require more
-   significant interpretation of the content stream. We would need a
-   test file in which the placement of the form XObject has to be in
-   the right place, e.g., the form XObject partially obscures earlier
-   code and is partially obscured by later code. Keys in the resource
-   dictionary may need to be changed -- create test cases with lots of
-   duplicated/overlapping keys.
+* Rework tests so that nothing is written into the source directory.
+  Ideally then the entire build could be done with a read-only
+  source tree.
 
- * Part of closed_file_input_source.cc is disabled on Windows because
-   of odd failures. It might be worth investigating so we can fully
-   exercise this in the test suite. That said, ClosedFileInputSource
-   is exercised elsewhere in qpdf's test suite, so this is not that
-   pressing.
+* Large file tests fail with linux32 before and after cmake. This was
+  first noticed after 10.6.3. I don't think it's worth fixing.
 
- * If possible, consider adding CCITT3, CCITT4, or any other easy
-   filters. For some reference code that we probably can't use but may
-   be handy anyway, see
-   http://partners.adobe.com/public/developer/ps/sdk/index_archive.html
+* Consider updating the fuzzer with code that exercises
+  copyAnnotations, file attachments, and name and number trees. Check
+  fuzzer coverage.
 
- * If possible, support the following types of broken files:
+* Add code for creation of a file attachment annotation. It should
+  also be possible to create a widget annotation and a form field.
+  Update the pdf-attach-file.cc example with new APIs when ready.
 
-    - Files that have no whitespace token after "endobj" such that
-      endobj collides with the start of the next object
+* Flattening of form XObjects seems like something that would be
+  useful in the library. We are seeing more cases of completely valid
+  PDF files with form XObjects that cause problems in other software.
+  Flattening of form XObjects could be a useful way to work around
+  those issues or to prepare files for additional processing, making
+  it possible for users of the qpdf library to not be concerned about
+  form XObjects. This could be done recursively; i.e., we could have a
+  method to embed a form XObject into whatever contains it, whether
+  that is a form XObject or a page. This would require more
+  significant interpretation of the content stream. We would need a
+  test file in which the placement of the form XObject has to be in
+  the right place, e.g., the form XObject partially obscures earlier
+  code and is partially obscured by later code. Keys in the resource
+  dictionary may need to be changed -- create test cases with lots of
+  duplicated/overlapping keys.
 
-    - See ../misc/broken-files
+* Part of closed_file_input_source.cc is disabled on Windows because
+  of odd failures. It might be worth investigating so we can fully
+  exercise this in the test suite. That said, ClosedFileInputSource
+  is exercised elsewhere in qpdf's test suite, so this is not that
+  pressing.
 
-    - See ../misc/bad-files-issue-476. This directory contains a
-      snapshot of the google doc and linked PDF files from issue #476.
-      Please see the issue for details.
+* If possible, consider adding CCITT3, CCITT4, or any other easy
+  filters. For some reference code that we probably can't use but may
+  be handy anyway, see
+  http://partners.adobe.com/public/developer/ps/sdk/index_archive.html
 
- * Additional form features
-   * set value from CLI? Specify title, and provide way to
-     disambiguate, probably by giving objgen of field
+* If possible, support the following types of broken files:
 
- * Pl_TIFFPredictor is pretty slow.
+   - Files that have no whitespace token after "endobj" such that
+     endobj collides with the start of the next object
 
- * Support for handling file names with Unicode characters in Windows
-   is incomplete. qpdf seems to support them okay from a functionality
-   standpoint, and the right thing happens if you pass in UTF-8
-   encoded filenames to QPDF library routines in Windows (they are
-   converted internally to wchar_t*), but file names are encoded in
-   UTF-8 on output, which doesn't produce nice error messages or
-   output on Windows in some cases.
+   - See ../misc/broken-files
 
- * If we ever wanted to do anything more with character encoding, see
-   ../misc/character-encoding/, which includes machine-readable dump
-   of table D.2 in the ISO-32000 PDF spec. This shows the mapping
-   between Unicode, StandardEncoding, WinAnsiEncoding,
-   MacRomanEncoding, and PDFDocEncoding.
+   - See ../misc/bad-files-issue-476. This directory contains a
+     snapshot of the google doc and linked PDF files from issue #476.
+     Please see the issue for details.
 
- * Some test cases on bad files fail because qpdf is unable to find
-   the root dictionary when it fails to read the trailer. Recovery
-   could find the root dictionary and even the info dictionary in
-   other ways. In particular, issue-202.pdf can be opened by evince,
-   and there's no real reason that qpdf couldn't be made to be able to
-   recover that file as well.
+* Additional form features
+  * set value from CLI? Specify title, and provide way to
+    disambiguate, probably by giving objgen of field
 
- * Audit every place where qpdf allocates memory to see whether there
-   are cases where malicious inputs could cause qpdf to attempt to
-   grab very large amounts of memory. Certainly there are cases like
-   this, such as if a very highly compressed, very large image stream
-   is requested in a buffer. Hopefully normal input to output
-   filtering doesn't ever try to do this. QPDFWriter should be checked
-   carefully too. See also bugs/private/from-email-663916/
+* Pl_TIFFPredictor is pretty slow.
 
- * Interactive form modification:
-   https://github.com/qpdf/qpdf/issues/213 contains a good discussion
-   of some ideas for adding methods to modify annotations and form
-   fields if we want to make it easier to support modifications to
-   interactive forms. Some of the ideas have been implemented, and
-   some of the probably never will be implemented, but it's worth a
-   read if there is an intention to work on this. In the issue, search
-   for "Regarding write functionality", and read that comment and the
-   responses to it.
+* Support for handling file names with Unicode characters in Windows
+  is incomplete. qpdf seems to support them okay from a functionality
+  standpoint, and the right thing happens if you pass in UTF-8
+  encoded filenames to QPDF library routines in Windows (they are
+  converted internally to wchar_t*), but file names are encoded in
+  UTF-8 on output, which doesn't produce nice error messages or
+  output on Windows in some cases.
 
- * Look at ~/Q/pdf-collection/forms-from-appian/
+* If we ever wanted to do anything more with character encoding, see
+  ../misc/character-encoding/, which includes machine-readable dump
+  of table D.2 in the ISO-32000 PDF spec. This shows the mapping
+  between Unicode, StandardEncoding, WinAnsiEncoding,
+  MacRomanEncoding, and PDFDocEncoding.
 
- * When decrypting files with /R=6, hash_V5 is called more than once
-   with the same inputs.  Caching the results or refactoring to reduce
-   the number of identical calls could improve performance for
-   workloads that involve processing large numbers of small files.
+* Some test cases on bad files fail because qpdf is unable to find
+  the root dictionary when it fails to read the trailer. Recovery
+  could find the root dictionary and even the info dictionary in
+  other ways. In particular, issue-202.pdf can be opened by evince,
+  and there's no real reason that qpdf couldn't be made to be able to
+  recover that file as well.
 
- * Consider adding a method to balance the pages tree.  It would call
-   pushInheritedAttributesToPage, construct a pages tree from scratch,
-   and replace the /Pages key of the root dictionary with the new
-   tree.
+* Audit every place where qpdf allocates memory to see whether there
+  are cases where malicious inputs could cause qpdf to attempt to
+  grab very large amounts of memory. Certainly there are cases like
+  this, such as if a very highly compressed, very large image stream
+  is requested in a buffer. Hopefully normal input to output
+  filtering doesn't ever try to do this. QPDFWriter should be checked
+  carefully too. See also bugs/private/from-email-663916/
 
- * Study what's required to support savable forms that can be saved by
-   Adobe Reader. Does this require actually signing the document with
-   an Adobe private key? Search for "Digital signatures" in the PDF
-   spec, and look at ~/Q/pdf-collection/form-with-full-save.pdf, which
-   came from Adobe's example site. See also
-   ../misc/digital-sign-from-trueroad/. If digital signatures are
-   implemented, update the docs on crypto providers, which mention
-   that this may happen in the future.
+* Interactive form modification:
+  https://github.com/qpdf/qpdf/issues/213 contains a good discussion
+  of some ideas for adding methods to modify annotations and form
+  fields if we want to make it easier to support modifications to
+  interactive forms. Some of the ideas have been implemented, and
+  some of the probably never will be implemented, but it's worth a
+  read if there is an intention to work on this. In the issue, search
+  for "Regarding write functionality", and read that comment and the
+  responses to it.
 
- * Qpdf does not honor /EFF when adding new file attachments. When it
-   encrypts, it never generates streams with explicit crypt filters.
-   Prior to 10.2, there was an incorrect attempt to treat /EFF as a
-   default value for decrypting file attachment streams, but it is not
-   supposed to mean that. Instead, it is intended for conforming
-   writers to obey this when adding new attachments. Qpdf is not a
-   conforming writer in that respect.
+* Look at ~/Q/pdf-collection/forms-from-appian/
 
- * The whole xref handling code in the QPDF object allows the same
-   object with more than one generation to coexist, but a lot of logic
-   assumes this isn't the case.  Anything that creates mappings only
-   with the object number and not the generation is this way,
-   including most of the interaction between QPDFWriter and QPDF.  If
-   we wanted to allow the same object with more than one generation to
-   coexist, which I'm not sure is allowed, we could fix this by
-   changing xref_table.  Alternatively, we could detect and disallow
-   that case.  In fact, it appears that Adobe reader and other PDF
-   viewing software silently ignores objects of this type, so this is
-   probably not a big deal.
+* When decrypting files with /R=6, hash_V5 is called more than once
+  with the same inputs.  Caching the results or refactoring to reduce
+  the number of identical calls could improve performance for
+  workloads that involve processing large numbers of small files.
 
- * From a suggestion in bug 3152169, consider having an option to
-   re-encode inline images with an ASCII encoding.
+* Consider adding a method to balance the pages tree.  It would call
+  pushInheritedAttributesToPage, construct a pages tree from scratch,
+  and replace the /Pages key of the root dictionary with the new
+  tree.
 
- * From github issue 2, provide more in-depth output for examining
-   hint stream contents. Consider adding on option to provide a
-   human-readable dump of linearization hint tables. This should
-   include improving the 'overflow reading bit stream' message as
-   reported in issue #2. There are multiple calls to stopOnError in
-   the linearization checking code. Ideally, these should not
-   terminate checking. It would require re-acquiring an understanding
-   of all that code to make the checks more robust. In particular,
-   it's hard to look at the code and quickly determine what is a true
-   logic error and what could happen because of malformed user input.
-   See also ../misc/linearization-errors.
+* Study what's required to support savable forms that can be saved by
+  Adobe Reader. Does this require actually signing the document with
+  an Adobe private key? Search for "Digital signatures" in the PDF
+  spec, and look at ~/Q/pdf-collection/form-with-full-save.pdf, which
+  came from Adobe's example site. See also
+  ../misc/digital-sign-from-trueroad/. If digital signatures are
+  implemented, update the docs on crypto providers, which mention
+  that this may happen in the future.
 
- * If I ever decide to make appearance stream-generation aware of
-   fonts or font metrics, see email from Tobias with Message-ID
-   <5C3C9C6C.8000102@thax.hardliners.org> dated 2019-01-14.
+* Qpdf does not honor /EFF when adding new file attachments. When it
+  encrypts, it never generates streams with explicit crypt filters.
+  Prior to 10.2, there was an incorrect attempt to treat /EFF as a
+  default value for decrypting file attachment streams, but it is not
+  supposed to mean that. Instead, it is intended for conforming
+  writers to obey this when adding new attachments. Qpdf is not a
+  conforming writer in that respect.
 
- * Look at places in the code where object traversal is being done and,
-   where possible, try to avoid it entirely or at least avoid ever
-   traversing the same objects multiple times.
+* The whole xref handling code in the QPDF object allows the same
+  object with more than one generation to coexist, but a lot of logic
+  assumes this isn't the case.  Anything that creates mappings only
+  with the object number and not the generation is this way,
+  including most of the interaction between QPDFWriter and QPDF.  If
+  we wanted to allow the same object with more than one generation to
+  coexist, which I'm not sure is allowed, we could fix this by
+  changing xref_table.  Alternatively, we could detect and disallow
+  that case.  In fact, it appears that Adobe reader and other PDF
+  viewing software silently ignores objects of this type, so this is
+  probably not a big deal.
+
+* From a suggestion in bug 3152169, consider having an option to
+  re-encode inline images with an ASCII encoding.
+
+* From github issue 2, provide more in-depth output for examining
+  hint stream contents. Consider adding on option to provide a
+  human-readable dump of linearization hint tables. This should
+  include improving the 'overflow reading bit stream' message as
+  reported in issue #2. There are multiple calls to stopOnError in
+  the linearization checking code. Ideally, these should not
+  terminate checking. It would require re-acquiring an understanding
+  of all that code to make the checks more robust. In particular,
+  it's hard to look at the code and quickly determine what is a true
+  logic error and what could happen because of malformed user input.
+  See also ../misc/linearization-errors.
+
+* If I ever decide to make appearance stream-generation aware of
+  fonts or font metrics, see email from Tobias with Message-ID
+  <5C3C9C6C.8000102@thax.hardliners.org> dated 2019-01-14.
+
+* Look at places in the code where object traversal is being done and,
+  where possible, try to avoid it entirely or at least avoid ever
+  traversing the same objects multiple times.
 
 ----------------------------------------------------------------------
 
