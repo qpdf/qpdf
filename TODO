@@ -4,6 +4,13 @@ Next
 
 Before Release:
 
+* Improve performance around QTC
+  * Make it possible to compile it out and deal with it in the tests
+  * Make sure at least some CI test is run with coverage enabled
+  * Cache environment variables
+  * Remove coverage cases for things that are heavily exercised or are
+    in critical paths
+* Evaluate issues tagged with `next`
 * Stay on top of https://github.com/pikepdf/pikepdf/pull/315
 
 Next:
