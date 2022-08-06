@@ -6,7 +6,6 @@ Before Release:
 
 * At next release, hide release-qpdf-10.6.3.0cmake* versions at readthedocs
 * Stay on top of https://github.com/pikepdf/pikepdf/pull/315
-* Release qtest with updates to qtest-driver and copy back into qpdf
 
 Next:
 * Support json v2 in the C API. At a minimum, write_json,

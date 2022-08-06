@@ -33,7 +33,7 @@ require TestDriver;
 
 if ((@ARGV == 1) && ($ARGV[0] eq '--version'))
 {
-    print "$whoami version 1.8\n";
+    print "$whoami version 1.9\n";
     exit 0;
 }
 if ((@ARGV == 1) && ($ARGV[0] eq '--print-path'))
