@@ -1,3 +1,9 @@
+2022-08-06  Jay Berkenbilt  <ejb@ql.org>
+
+        * Added by m-holger: QPDF::getObject() method as a simpler form of
+        getObjectByID or getObjectByObjGen. The older methods are being
+        retained for compatibility and are not deprecated.
+
 2022-07-24  Jay Berkenbilt  <ejb@ql.org>
 
         * include/qpdf/JSON.hh: Schema validation: allow a single item to
