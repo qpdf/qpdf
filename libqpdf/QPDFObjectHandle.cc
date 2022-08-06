@@ -1207,14 +1207,6 @@ QPDFObjectHandle::getUniqueResourceName(
                            " QPDFObjectHandle::getUniqueResourceName");
 }
 
-// Indirect object accessors
-QPDF*
-QPDFObjectHandle::getOwningQPDF()
-{
-    // Will be null for direct objects
-    return this->qpdf;
-}
-
 // Dictionary mutators
 
 void
@@ -1634,16 +1626,15 @@ QPDFObjectHandle::coalesceContentStreams()
         // files may have pages that are invalid in other ways.
         return;
     }
-    QPDF* qpdf = getOwningQPDF();
-    if (qpdf == nullptr) {
-        // Should not be possible for a page object to not have an
-        // owning PDF unless it was manually constructed in some
-        // incorrect way. However, it can happen in a PDF file whose
-        // page structure is direct, which is against spec but still
-        // possible to hand construct, as in fuzz issue 27393.
-        throw std::runtime_error("coalesceContentStreams called on object"
-                                 " with no associated PDF file");
-    }
+    // Should not be possible for a page object to not have an
+    // owning PDF unless it was manually constructed in some
+    // incorrect way. However, it can happen in a PDF file whose
+    // page structure is direct, which is against spec but still
+    // possible to hand construct, as in fuzz issue 27393.
+    QPDF* qpdf = getOwningQPDF(
+        false,
+        "coalesceContentStreams called on object  with no associated PDF file");
+
     QPDFObjectHandle new_contents = newStream(qpdf);
     this->replaceKey("/Contents", new_contents);
 

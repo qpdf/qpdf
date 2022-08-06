@@ -2161,7 +2161,7 @@ QPDFJob::doUnderOverlayForPage(
     std::map<unsigned long long, std::shared_ptr<QPDFAcroFormDocumentHelper>>
         afdh;
     auto make_afdh = [&](QPDFPageObjectHelper& ph) {
-        QPDF* q = ph.getObjectHandle().getOwningQPDF();
+        QPDF* q = ph.getObjectHandle().getOwningQPDF(false);
         return get_afdh_for_qpdf(afdh, q);
     };
     auto dest_afdh = make_afdh(dest_page);
@@ -2597,7 +2597,7 @@ static QPDFObjectHandle
 added_page(QPDF& pdf, QPDFObjectHandle page)
 {
     QPDFObjectHandle result = page;
-    if (page.getOwningQPDF() != &pdf) {
+    if (page.getOwningQPDF(false) != &pdf) {
         // Calling copyForeignObject on an object we already copied
         // will give us the already existing copy.
         result = pdf.copyForeignObject(page);

@@ -1,8 +1,8 @@
 #include <qpdf/QTC.hh>
 
 #include <qpdf/QUtil.hh>
-#include <set>
 #include <map>
+#include <set>
 #include <stdio.h>
 
 static bool

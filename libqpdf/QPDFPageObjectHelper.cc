@@ -432,7 +432,8 @@ QPDFPageObjectHelper::externalizeInlineImages(size_t min_size, bool shallow)
                 this->oh.replaceKey(
                     "/Contents",
                     QPDFObjectHandle::newStream(
-                        this->oh.getOwningQPDF(), b.getBufferSharedPointer()));
+                        this->oh.getOwningQPDF(false),
+                        b.getBufferSharedPointer()));
             }
         }
     } else {
@@ -683,11 +684,10 @@ QPDFPageObjectHelper::removeUnreferencedResources()
 QPDFPageObjectHelper
 QPDFPageObjectHelper::shallowCopyPage()
 {
-    QPDF* qpdf = this->oh.getOwningQPDF();
-    if (!qpdf) {
-        throw std::runtime_error("QPDFPageObjectHelper::shallowCopyPage"
-                                 " called with a direct object");
-    }
+    QPDF* qpdf = this->oh.getOwningQPDF(
+        false,
+        "QPDFPageObjectHelper::shallowCopyPage called with a direct object");
+
     QPDFObjectHandle new_page = this->oh.shallowCopy();
     return QPDFPageObjectHelper(qpdf->makeIndirectObject(new_page));
 }
@@ -743,11 +743,10 @@ QPDFPageObjectHelper::getMatrixForTransformations(bool invert)
 QPDFObjectHandle
 QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
 {
-    QPDF* qpdf = this->oh.getOwningQPDF();
-    if (!qpdf) {
-        throw std::runtime_error("QPDFPageObjectHelper::getFormXObjectForPage"
-                                 " called with a direct object");
-    }
+    QPDF* qpdf = this->oh.getOwningQPDF(
+        false,
+        "QPDFPageObjectHelper::getFormXObjectForPage called with a direct "
+        "object");
     QPDFObjectHandle result = QPDFObjectHandle::newStream(qpdf);
     QPDFObjectHandle newdict = result.getDict();
     newdict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
@@ -917,11 +916,9 @@ QPDFPageObjectHelper::placeFormXObject(
 void
 QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
 {
-    QPDF* qpdf = this->oh.getOwningQPDF();
-    if (!qpdf) {
-        throw std::runtime_error("QPDFPageObjectHelper::flattenRotation"
-                                 " called with a direct object");
-    }
+    QPDF* qpdf = this->oh.getOwningQPDF(
+        false,
+        "QPDFPageObjectHelper::flattenRotation called with a direct object");
 
     auto rotate_oh = this->oh.getKey("/Rotate");
     int rotate = 0;
@@ -1066,16 +1063,12 @@ QPDFPageObjectHelper::copyAnnotations(
         return;
     }
 
-    QPDF* from_qpdf = from_page.getObjectHandle().getOwningQPDF();
-    if (!from_qpdf) {
-        throw std::runtime_error("QPDFPageObjectHelper::copyAnnotations:"
-                                 " from page is a direct object");
-    }
-    QPDF* this_qpdf = this->oh.getOwningQPDF();
-    if (!this_qpdf) {
-        throw std::runtime_error("QPDFPageObjectHelper::copyAnnotations:"
-                                 " this page is a direct object");
-    }
+    QPDF* from_qpdf = from_page.getObjectHandle().getOwningQPDF(
+        false,
+        "QPDFPageObjectHelper::copyAnnotations: from page is a direct object");
+    QPDF* this_qpdf = this->oh.getOwningQPDF(
+        false,
+        "QPDFPageObjectHelper::copyAnnotations: this page is a direct object");
 
     std::vector<QPDFObjectHandle> new_annots;
     std::vector<QPDFObjectHandle> new_fields;

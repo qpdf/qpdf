@@ -362,13 +362,11 @@ QPDFFormFieldObjectHelper::setV(QPDFObjectHandle value, bool need_appearances)
         setFieldAttribute("/V", value);
     }
     if (need_appearances) {
-        QPDF* qpdf = this->oh.getOwningQPDF();
-        if (!qpdf) {
-            throw std::logic_error(
-                "QPDFFormFieldObjectHelper::setV called with"
-                " need_appearances = true on an object that is"
-                " not associated with an owning QPDF");
-        }
+        QPDF* qpdf = this->oh.getOwningQPDF(
+            false,
+            "QPDFFormFieldObjectHelper::setV called with need_appearances = "
+            "true on an object that is not associated with an owning QPDF");
+
         QPDFAcroFormDocumentHelper(*qpdf).setNeedAppearances(true);
     }
 }
@@ -883,7 +881,7 @@ QPDFFormFieldObjectHelper::generateTextAppearance(
         if (found_font_in_dr && resources.isDictionary()) {
             QTC::TC("qpdf", "QPDFFormFieldObjectHelper get font from /DR");
             if (resources.isIndirect()) {
-                resources = resources.getOwningQPDF()->makeIndirectObject(
+                resources = resources.getOwningQPDF(false)->makeIndirectObject(
                     resources.shallowCopy());
                 AS.getDict().replaceKey("/Resources", resources);
             }
