@@ -1897,7 +1897,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
                 // pass 1.
                 indicateProgress(true, false);
             }
-            QPDFObjectHandle obj_to_write = this->m->pdf.getObjectByObjGen(obj);
+            QPDFObjectHandle obj_to_write = this->m->pdf.getObject(obj);
             if (obj_to_write.isStream()) {
                 // This condition occurred in a fuzz input. Ideally we
                 // should block it at at parse time, but it's not

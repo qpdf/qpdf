@@ -2148,7 +2148,7 @@ QPDF::reserveObjectIfNotExists(QPDFObjGen const& og)
         resolve(og);
         replaceObject(og, QPDFObjectHandle::Factory::makeReserved());
     }
-    return getObjectByObjGen(og);
+    return getObject(og);
 }
 
 QPDFObjectHandle
@@ -2159,15 +2159,27 @@ QPDF::reserveStream(QPDFObjGen const& og)
 }
 
 QPDFObjectHandle
-QPDF::getObjectByObjGen(QPDFObjGen const& og)
+QPDF::getObject(QPDFObjGen const& og)
 {
     return QPDFObjectHandle::Factory::newIndirect(this, og);
 }
 
 QPDFObjectHandle
+QPDF::getObject(int objid, int generation)
+{
+    return getObject(QPDFObjGen(objid, generation));
+}
+
+QPDFObjectHandle
+QPDF::getObjectByObjGen(QPDFObjGen const& og)
+{
+    return getObject(og);
+}
+
+QPDFObjectHandle
 QPDF::getObjectByID(int objid, int generation)
 {
-    return getObjectByObjGen(QPDFObjGen(objid, generation));
+    return getObject(QPDFObjGen(objid, generation));
 }
 
 void
