@@ -204,7 +204,7 @@ JSON::JSON_blob::write(Pipeline* p, size_t) const
 void
 JSON::write(Pipeline* p, size_t depth) const
 {
-    if (nullptr == this->m->value.get()) {
+    if (nullptr == this->m->value) {
         *p << "null";
     } else {
         this->m->value->write(p, depth);
@@ -1122,7 +1122,7 @@ JSONParser::handleToken()
         break;
     }
 
-    if ((item.get() == nullptr) == (delimiter == '\0')) {
+    if ((item == nullptr) == (delimiter == '\0')) {
         throw std::logic_error(
             "JSONParser::handleToken: logic error: exactly one of item"
             " or delimiter must be set");

@@ -16,7 +16,7 @@ QPDFPageLabelDocumentHelper::QPDFPageLabelDocumentHelper(QPDF& qpdf) :
 bool
 QPDFPageLabelDocumentHelper::hasPageLabels()
 {
-    return nullptr != this->m->labels.get();
+    return nullptr != this->m->labels;
 }
 
 QPDFObjectHandle

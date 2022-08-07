@@ -86,7 +86,7 @@ Pl_Flate::warn(char const* msg, int code)
 void
 Pl_Flate::write(unsigned char const* data, size_t len)
 {
-    if (this->m->outbuf.get() == nullptr) {
+    if (this->m->outbuf == nullptr) {
         throw std::logic_error(
             this->identifier +
             ": Pl_Flate: write() called after finish() called");

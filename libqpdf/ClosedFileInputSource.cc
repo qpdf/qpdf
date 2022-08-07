@@ -23,7 +23,7 @@ ClosedFileInputSource::~ClosedFileInputSource()
 void
 ClosedFileInputSource::before()
 {
-    if (nullptr == this->m->fis.get()) {
+    if (nullptr == this->m->fis) {
         this->m->fis =
             std::make_shared<FileInputSource>(this->m->filename.c_str());
         this->m->fis->seek(this->m->offset, SEEK_SET);
