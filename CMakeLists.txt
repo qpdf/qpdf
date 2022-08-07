@@ -43,6 +43,9 @@ CMAKE_DEPENDENT_OPTION(
   GENERATE_AUTO_JOB "Automatically regenerate job files" OFF
   "NOT MAINTAINER_MODE" ON)
 CMAKE_DEPENDENT_OPTION(
+  ENABLE_QTC "Enable QTC test coverage" OFF
+  "NOT MAINTAINER_MODE" ON)
+CMAKE_DEPENDENT_OPTION(
   SHOW_FAILED_TEST_OUTPUT "Show qtest output on failure" OFF
   "NOT CI_MODE" ON)
 
@@ -110,8 +113,15 @@ endif()
 
 add_compile_definitions($<$<COMPILE_LANGUAGE:CXX>:POINTERHOLDER_TRANSITION=4>)
 
+if(ENABLE_QTC)
+  set(ENABLE_QTC_ARG)
+else()
+  add_compile_definitions(QPDF_DISABLE_QTC=1)
+  set(ENABLE_QTC_ARG --disable-tc)
+endif()
+
 enable_testing()
-set(RUN_QTEST perl ${qpdf_SOURCE_DIR}/run-qtest)
+set(RUN_QTEST perl ${qpdf_SOURCE_DIR}/run-qtest ${ENABLE_QTC_ARG})
 
 if(WIN32)
   find_program(COPY_COMMAND NAMES cp copy)
@@ -335,6 +345,7 @@ message(STATUS "  build shared libraries: ${BUILD_SHARED_LIBS}")
 message(STATUS "  build static libraries: ${BUILD_STATIC_LIBS}")
 message(STATUS "  build manual: ${BUILD_DOC}")
 message(STATUS "  compiler warnings are errors: ${WERROR}")
+message(STATUS "  QTC test coverage: ${ENABLE_QTC}")
 message(STATUS "  system: ${CPACK_SYSTEM_NAME}")
 message(STATUS "")
 message(STATUS "*** Options Summary ***")

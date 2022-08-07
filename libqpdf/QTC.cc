@@ -13,7 +13,7 @@ tc_active(char const* const scope)
 }
 
 void
-QTC::TC(char const* const scope, char const* const ccase, int n)
+QTC::TC_real(char const* const scope, char const* const ccase, int n)
 {
     static std::map<std::string, bool> active;
     auto is_active = active.find(scope);

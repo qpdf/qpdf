@@ -1,3 +1,11 @@
+2022-08-07  Jay Berkenbilt  <ejb@ql.org>
+
+        * Add new build configuration option ENABLE_QTC, which is off by
+        default when not running in MAINTAINER_MODE. When this is off,
+        QTC coverage calls sprinkled throughout the qpdf source code are
+        compiled out for increased performance. See "Build Options" in the
+        manual for a discussion. Fixes #714.
+
 2022-08-06  Jay Berkenbilt  <ejb@ql.org>
 
         * Added by m-holger: QPDF::getObject() method as a simpler form of

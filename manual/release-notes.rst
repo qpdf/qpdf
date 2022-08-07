@@ -7,6 +7,12 @@ For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
 11.0.0
+  - Performance improvements
+
+    - Many performance enhancements have been added. In developer
+      performance benchmarks, gains on the order of 20% have been
+      observed.
+
   - Replacement of ``PointerHolder`` with ``std::shared_ptr``
 
     - The qpdf-specific ``PointerHolder`` smart pointer implementation
@@ -231,6 +237,14 @@ For a detailed list of changes, please see the file
     - The qpdf source code is now formatted automatically with
       ``clang-format``. See :ref:`code-formatting` for information.
 
+    - Test coverage with ``QTC`` is enabled during development but
+      compiled out of distributed qpdf binaries by default. This
+      results in a significant performance improvement, especially on
+      Windows. ``QTC::TC`` is still available in the library and is
+      still usable by end user code even though calls to it made
+      internally by the library are turned off. Internally, there is
+      some additional caching to reduce the overhead of repeatedly
+      reading environment variables at runtime.
 
 10.6.3: March 8, 2022
   - Announcement of upcoming change:

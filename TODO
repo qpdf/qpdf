@@ -4,14 +4,9 @@ Next
 
 Before Release:
 
-* Improve performance around QTC
-  * Make it possible to compile it out and deal with it in the tests
-  * Make sure at least some CI test is run with coverage enabled
-  * Cache environment variables
-  * Remove coverage cases for things that are heavily exercised or are
-    in critical paths
 * Make ./performance_check usable by other people by having published
   files to use for testing.
+  * https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf
 * Evaluate issues tagged with `next`
 * Stay on top of https://github.com/pikepdf/pikepdf/pull/315
 

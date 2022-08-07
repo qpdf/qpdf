@@ -24,10 +24,24 @@
 
 #include <qpdf/DLL.h>
 
+// Defining QPDF_DISABLE_QTC will effectively compile out any QTC::TC
+// calls in any code that includes this file, but QTC will still be
+// built into the library. That way, it is possible to build and
+// package qpdf with QPDF_DISABLE_QTC while still making QTC::TC
+// available to end users.
+
 namespace QTC
 {
     QPDF_DLL
-    void TC(char const* const scope, char const* const ccase, int n = 0);
+    void TC_real(char const* const scope, char const* const ccase, int n = 0);
+
+    inline void
+    TC(char const* const scope, char const* const ccase, int n = 0)
+    {
+#ifndef QPDF_DISABLE_QTC
+        TC_real(scope, ccase, n);
+#endif // QPDF_DISABLE_QTC
+    }
 }; // namespace QTC
 
 #endif // QTC_HH

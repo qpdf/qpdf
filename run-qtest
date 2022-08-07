@@ -13,6 +13,7 @@ my $code = undef;
 my @bin = ();
 my $color = undef;
 my $show_on_failure = 0;
+my $disable_tc = 0;
 my @tc = ();
 
 if ($^O =~ m/^MSWin32|msys$/)
@@ -50,6 +51,10 @@ while (@ARGV)
     {
         usage() unless @ARGV;
         $show_on_failure = cmake_bool(shift(@ARGV));
+    }
+    elsif ($arg eq '--disable-tc')
+    {
+        $disable_tc = 1;
     }
     elsif ($arg eq '--tc')
     {
@@ -94,7 +99,7 @@ push(@cmd,
      "-datadir", "$code/qtest",
      "-junit-suffix", basename($code));
 
-if (scalar(@tc))
+if (scalar(@tc) && (! $disable_tc))
 {
     my @tc_srcs = map {
         File::Spec->abs2rel(abs_path($_))

@@ -257,6 +257,16 @@ CHECK_SIZES
   that ensures an exact match between classes in ``sizes.cc`` and
   classes in the library's public API. This option requires Python 3.
 
+ENABLE_QTC
+  This is off by default, except in maintainer mode. When off,
+  ``QTC::TC`` calls are compiled out by having ``QTC::TC`` be an empty
+  inline function. The underlying ``QTC::TC`` remains in the library,
+  so it is possible to build and package the qpdf library with
+  ``ENABLE_QTC`` turned off while still allowing developer code to use
+  ``QTC::TC`` if desired. If you are modifying qpdf code, it's a good
+  idea to have this on for more robust automated testing. Otherwise,
+  there's no reason to have it on.
+
 GENERATE_AUTO_JOB
   Some qpdf source files are automatically generated from
   :file:`job.yml` and the CLI documentation. If you are adding new
@@ -296,6 +306,8 @@ MAINTAINER_MODE
   - ``BUILD_DOC``
 
   - ``CHECK_SIZES``
+
+  - ``ENABLE_QTC``
 
   - ``GENERATE_AUTO_JOB``
 

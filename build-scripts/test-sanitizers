@@ -10,7 +10,8 @@ env CFLAGS="-fsanitize=address -fsanitize=undefined" \
     CC=clang CXX=clang++ \
     cmake -S . -B build \
     -DCI_MODE=1 -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=Debug \
-    -DREQUIRE_CRYPTO_OPENSSL=1 -DREQUIRE_CRYPTO_GNUTLS=1
+    -DREQUIRE_CRYPTO_OPENSSL=1 -DREQUIRE_CRYPTO_GNUTLS=1 \
+    -DENABLE_QTC=1
 cmake --build build -j$(nproc) -- -k
 cd build
 # libtests automatically runs with all crypto providers.
