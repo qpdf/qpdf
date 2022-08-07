@@ -35,6 +35,13 @@ namespace
 
 static NumberTreeDetails number_tree_details;
 
+QPDFNumberTreeObjectHelper::~QPDFNumberTreeObjectHelper()
+{
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
+    // README-maintainer. For this specific class, see github issue
+    // #745.
+}
+
 QPDFNumberTreeObjectHelper::Members::Members(
     QPDFObjectHandle& oh, QPDF& q, bool auto_repair) :
     impl(std::make_shared<NNTreeImpl>(number_tree_details, q, oh, auto_repair))

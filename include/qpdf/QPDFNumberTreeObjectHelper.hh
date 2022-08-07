@@ -39,7 +39,7 @@ class NNTreeImpl;
 class NNTreeIterator;
 class NNTreeDetails;
 
-class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
+class QPDF_DLL_CLASS QPDFNumberTreeObjectHelper: public QPDFObjectHelper
 {
   public:
     // The qpdf object is required so that this class can issue
@@ -49,7 +49,7 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
         QPDFObjectHandle, QPDF&, bool auto_repair = true);
 
     QPDF_DLL
-    virtual ~QPDFNumberTreeObjectHelper() = default;
+    virtual ~QPDFNumberTreeObjectHelper();
 
     // Create an empty number tree
     QPDF_DLL
@@ -85,7 +85,7 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     bool findObjectAtOrBelow(
         numtree_number idx, QPDFObjectHandle& oh, numtree_number& offset);
 
-    class iterator
+    class QPDF_DLL_PRIVATE iterator
     {
         friend class QPDFNumberTreeObjectHelper;
 
@@ -200,7 +200,7 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     void setSplitThreshold(int);
 
   private:
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class QPDFNumberTreeObjectHelper;
         typedef QPDFNumberTreeObjectHelper::numtree_number numtree_number;

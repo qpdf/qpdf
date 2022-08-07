@@ -42,7 +42,7 @@ class NNTreeImpl;
 class NNTreeIterator;
 class NNTreeDetails;
 
-class QPDFNameTreeObjectHelper: public QPDFObjectHelper
+class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
 {
   public:
     // The qpdf object is required so that this class can issue
@@ -55,7 +55,7 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     static QPDFNameTreeObjectHelper newEmpty(QPDF&, bool auto_repair = true);
 
     QPDF_DLL
-    virtual ~QPDFNameTreeObjectHelper() = default;
+    virtual ~QPDFNameTreeObjectHelper();
 
     // Return whether the number tree has an explicit entry for this
     // number.
@@ -67,7 +67,7 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     bool findObject(std::string const& utf8, QPDFObjectHandle& oh);
 
-    class iterator
+    class QPDF_DLL_PRIVATE iterator
     {
         friend class QPDFNameTreeObjectHelper;
 
@@ -181,7 +181,7 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     void setSplitThreshold(int);
 
   private:
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class QPDFNameTreeObjectHelper;
 
