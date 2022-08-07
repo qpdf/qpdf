@@ -18,7 +18,7 @@ Pl_RC4::Pl_RC4(
 void
 Pl_RC4::write(unsigned char const* data, size_t len)
 {
-    if (this->outbuf.get() == nullptr) {
+    if (this->outbuf == nullptr) {
         throw std::logic_error(
             this->identifier +
             ": Pl_RC4: write() called after finish() called");

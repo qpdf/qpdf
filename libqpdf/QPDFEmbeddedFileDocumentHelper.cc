@@ -50,7 +50,7 @@ QPDFEmbeddedFileDocumentHelper::QPDFEmbeddedFileDocumentHelper(QPDF& qpdf) :
 bool
 QPDFEmbeddedFileDocumentHelper::hasEmbeddedFiles() const
 {
-    return (this->m->embedded_files.get() != nullptr);
+    return (this->m->embedded_files != nullptr);
 }
 
 void

@@ -2457,7 +2457,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
     }
     std::shared_ptr<Buffer> stream_buffer = stream->getStreamDataBuffer();
     if ((foreign_stream_qpdf->m->immediate_copy_from) &&
-        (stream_buffer.get() == nullptr)) {
+        (stream_buffer == nullptr)) {
         // Pull the stream data into a buffer before attempting
         // the copy operation. Do it on the source stream so that
         // if the source stream is copied multiple times, we don't

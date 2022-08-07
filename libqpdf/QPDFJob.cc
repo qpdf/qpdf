@@ -223,7 +223,7 @@ ImageOptimizer::evaluate(std::string const& description)
     Pl_Discard d;
     Pl_Count c("count", &d);
     std::shared_ptr<Pipeline> p = makePipeline(description, &c);
-    if (p.get() == nullptr) {
+    if (p == nullptr) {
         // message issued by makePipeline
         return false;
     }
@@ -252,7 +252,7 @@ void
 ImageOptimizer::provideStreamData(QPDFObjGen const&, Pipeline* pipeline)
 {
     std::shared_ptr<Pipeline> p = makePipeline("", pipeline);
-    if (p.get() == nullptr) {
+    if (p == nullptr) {
         // Should not be possible
         image.warnIfPossible("unable to create pipeline after previous"
                              " success; image data will be lost");
@@ -2243,8 +2243,7 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
 {
     validateUnderOverlay(pdf, &m->underlay);
     validateUnderOverlay(pdf, &m->overlay);
-    if ((nullptr == m->underlay.pdf.get()) &&
-        (nullptr == m->overlay.pdf.get())) {
+    if ((nullptr == m->underlay.pdf) && (nullptr == m->overlay.pdf)) {
         return;
     }
     std::map<int, std::vector<int>> underlay_pagenos;
