@@ -10,6 +10,8 @@ Before Release:
   * Cache environment variables
   * Remove coverage cases for things that are heavily exercised or are
     in critical paths
+* Make ./performance_check usable by other people by having published
+  files to use for testing.
 * Evaluate issues tagged with `next`
 * Stay on top of https://github.com/pikepdf/pikepdf/pull/315
 

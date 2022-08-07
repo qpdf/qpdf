@@ -2,6 +2,7 @@
 
 #include <qpdf/QUtil.hh>
 #include <set>
+#include <map>
 #include <stdio.h>
 
 static bool
@@ -14,11 +15,18 @@ tc_active(char const* const scope)
 void
 QTC::TC(char const* const scope, char const* const ccase, int n)
 {
-    static std::set<std::pair<std::string, int>> cache;
+    static std::map<std::string, bool> active;
+    auto is_active = active.find(scope);
+    if (is_active == active.end()) {
+        active[scope] = tc_active(scope);
+        is_active = active.find(scope);
+    }
 
-    if (!tc_active(scope)) {
+    if (!is_active->second) {
         return;
     }
+
+    static std::set<std::pair<std::string, int>> cache;
 
     std::string filename;
 #ifdef _WIN32
