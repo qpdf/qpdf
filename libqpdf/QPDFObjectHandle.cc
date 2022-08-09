@@ -236,13 +236,11 @@ LastChar::getLastChar()
 }
 
 QPDFObjectHandle::QPDFObjectHandle() :
-    initialized(false),
     qpdf(nullptr)
 {
 }
 
 QPDFObjectHandle::QPDFObjectHandle(std::shared_ptr<QPDFObject> const& data) :
-    initialized(true),
     qpdf(nullptr),
     obj(data)
 {
@@ -369,7 +367,7 @@ QPDFObjectHandle::isDirectNull() const
     // Don't call dereference() -- this is a const method, and we know
     // objid == 0, so there's nothing to resolve.
     return (
-        initialized && (getObjectID() == 0) &&
+        isInitialized() && (getObjectID() == 0) &&
         (obj->getTypeCode() == QPDFObject::ot_null));
 }
 
@@ -2373,7 +2371,7 @@ QPDFObjectHandle::makeDirect(bool allow_streams)
 void
 QPDFObjectHandle::assertInitialized() const
 {
-    if (!initialized) {
+    if (!isInitialized()) {
         throw std::logic_error("operation attempted on uninitialized "
                                "QPDFObjectHandle");
     }
@@ -2608,7 +2606,7 @@ QPDFObjectHandle::assertPageObject()
 bool
 QPDFObjectHandle::dereference()
 {
-    if (!this->initialized) {
+    if (!isInitialized()) {
         return false;
     }
     if (this->obj->getTypeCode() == QPDFObject::ot_unresolved) {
