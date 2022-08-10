@@ -64,7 +64,9 @@ class QPDFValue
     void
     setParsedOffset(qpdf_offset_t offset)
     {
-        parsed_offset = offset;
+        if (parsed_offset < 0) {
+            parsed_offset = offset;
+        }
     }
     qpdf_offset_t
     getParsedOffset()

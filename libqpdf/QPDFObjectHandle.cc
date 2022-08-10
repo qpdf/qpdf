@@ -2003,20 +2003,6 @@ QPDFObjectHandle::getParsedOffset()
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::newIndirect(QPDF* qpdf, QPDFObjGen const& og)
-{
-    if (!og.isIndirect()) {
-        // Special case: QPDF uses objid 0 as a sentinel for direct
-        // objects, and the PDF specification doesn't allow for object
-        // 0. Treat indirect references to object 0 as null so that we
-        // never create an indirect object with objid 0.
-        QTC::TC("qpdf", "QPDFObjectHandle indirect with 0 objid");
-        return newNull();
-    }
-    return QPDFObjectHandle(qpdf, og, QPDF_Unresolved::create());
-}
-
-QPDFObjectHandle
 QPDFObjectHandle::newBool(bool value)
 {
     return QPDFObjectHandle(QPDF_Bool::create(value));

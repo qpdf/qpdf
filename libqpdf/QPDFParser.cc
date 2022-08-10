@@ -1,8 +1,8 @@
 #include <qpdf/QPDFParser.hh>
 
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFObjectHandle.hh>
-#include <qpdf/QPDF_Array.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
@@ -55,6 +55,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
     while (!done) {
         bool bad = false;
+        bool indirect_ref = false;
         is_null = false;
         auto& frame = stack.back();
         auto& olist = frame.olist;
@@ -185,12 +186,16 @@ QPDFParser::parse(bool& empty, bool content_stream)
                             "QPDFObjectHandle::parse called without context"
                             " on an object with indirect references");
                     }
-                    // Try to resolve indirect objects
-                    object = QPDFObjectHandle::newIndirect(
-                        context,
-                        QPDFObjGen(
-                            olist.at(size - 2).getIntValueAsInt(),
-                            olist.back().getIntValueAsInt()));
+                    auto ref_og = QPDFObjGen(
+                        olist.at(size - 2).getIntValueAsInt(),
+                        olist.back().getIntValueAsInt());
+                    if (ref_og.isIndirect()) {
+                        object = context->getObject(ref_og);
+                        indirect_ref = true;
+                    } else {
+                        QTC::TC("qpdf", "QPDFParser indirect with 0 objid");
+                        is_null = true;
+                    }
                     olist.pop_back();
                     olist.pop_back();
                 } else if ((value == "endobj") && (state == st_top)) {
@@ -274,8 +279,8 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         case st_dictionary:
         case st_array:
-            if (!object.isDirectNull()) {
-                // No need to set description for direct nulls- they will
+            if (!indirect_ref && !object.isDirectNull()) {
+                // No need to set description for direct nulls - they will
                 // become implicit.
                 setDescriptionFromInput(object, input->getLastOffset());
                 object.setParsedOffset(input->getLastOffset());
