@@ -2111,6 +2111,23 @@ QPDF::newIndirect(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& obj)
     return QPDFObjectHandle::Factory::newIndirect(this, og, obj);
 }
 
+void
+QPDF::updateCache(
+    QPDFObjGen const& og,
+    std::shared_ptr<QPDFObject> const& object,
+    qpdf_offset_t end_before_space,
+    qpdf_offset_t end_after_space)
+{
+    if (isCached(og)) {
+        auto& cache = m->obj_cache[og];
+        cache.object->assign(object);
+        cache.end_before_space = end_before_space;
+        cache.end_after_space = end_after_space;
+    } else {
+        m->obj_cache[og] = ObjCache(object, end_before_space, end_after_space);
+    }
+}
+
 bool
 QPDF::isCached(QPDFObjGen const& og)
 {
@@ -2199,8 +2216,7 @@ QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
     resolve(og);
 
     // Replace the object in the object cache
-    m->obj_cache[og].object->assign(
-        QPDFObjectHandle::ObjAccessor::getObject(oh));
+    updateCache(og, QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
 }
 
 void

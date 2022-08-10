@@ -1177,6 +1177,11 @@ class QPDF
     newIndirect(QPDFObjGen const&, std::shared_ptr<QPDFObject> const&);
     bool isCached(QPDFObjGen const& og);
     bool isUnresolved(QPDFObjGen const& og);
+    void updateCache(
+        QPDFObjGen const& og,
+        std::shared_ptr<QPDFObject> const& object,
+        qpdf_offset_t end_before_space,
+        qpdf_offset_t end_after_space);
 
     // Calls finish() on the pipeline when done but does not delete it
     bool pipeStreamData(
