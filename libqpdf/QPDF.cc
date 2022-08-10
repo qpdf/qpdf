@@ -1425,8 +1425,7 @@ QPDF::fixDanglingReferences(bool force)
         for (auto sub: to_check) {
             if (sub.isIndirect()) {
                 if (sub.getOwningQPDF() == this) {
-                    QPDFObjGen og(sub.getObjGen());
-                    if (this->m->obj_cache.count(og) == 0) {
+                    if (!isCached(sub.getObjGen())) {
                         QTC::TC("qpdf", "QPDF detected dangling ref");
                         queue.push_back(sub);
                     }
@@ -1886,7 +1885,7 @@ QPDF::readObjectAtOffset(
             "expected endobj");
     }
 
-    if (!this->m->obj_cache.count(og)) {
+    if (!isCached(og)) {
         // Store the object in the cache here so it gets cached
         // whether we first know the offset or whether we first know
         // the object ID and generation (in which we case we would get
@@ -1947,7 +1946,7 @@ QPDF::resolve(QPDFObjGen const& og)
     }
     ResolveRecorder rr(this, og);
 
-    if ((!this->m->obj_cache.count(og)) && this->m->xref_table.count(og)) {
+    if ((!isCached(og)) && this->m->xref_table.count(og)) {
         QPDFXRefEntry const& entry = this->m->xref_table[og];
         try {
             switch (entry.getType()) {
@@ -1985,7 +1984,7 @@ QPDF::resolve(QPDFObjGen const& og)
                  ": error reading object: " + e.what()));
         }
     }
-    if (this->m->obj_cache.count(og) == 0) {
+    if (!isCached(og)) {
         // PDF spec says unknown objects resolve to the null object.
         QTC::TC("qpdf", "QPDF resolve failure to null");
         QPDFObjectHandle oh = QPDFObjectHandle::newNull();
@@ -2112,6 +2111,18 @@ QPDF::newIndirect(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& obj)
     return QPDFObjectHandle::Factory::newIndirect(this, og, obj);
 }
 
+bool
+QPDF::isCached(QPDFObjGen const& og)
+{
+    return m->obj_cache.count(og) != 0;
+}
+
+bool
+QPDF::isUnresolved(QPDFObjGen const& og)
+{
+    return !isCached(og) || m->obj_cache[og].object->isUnresolved();
+}
+
 QPDFObjectHandle
 QPDF::makeIndirectObject(QPDFObjectHandle oh)
 {
@@ -2129,7 +2140,7 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
 QPDFObjectHandle
 QPDF::reserveObjectIfNotExists(QPDFObjGen const& og)
 {
-    if ((!m->obj_cache.count(og)) && (!m->xref_table.count(og))) {
+    if (!isCached(og) && !m->xref_table.count(og)) {
         resolve(og);
         m->obj_cache[og].object = QPDF_Reserved::create();
         return newIndirect(og, m->obj_cache[og].object);

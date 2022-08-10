@@ -134,7 +134,11 @@ class QPDFObject
         value = o->value;
         o->value = v;
     }
-
+    bool
+    isUnresolved()
+    {
+        return value->type_code == ::ot_unresolved;
+    }
     template <typename T>
     T*
     as()
