@@ -1926,12 +1926,12 @@ QPDF::readObjectAtOffset(
     return oh;
 }
 
-std::shared_ptr<QPDFObject>
+void
 QPDF::resolve(QPDFObjGen const& og)
 {
     if (isCached(og) && !isUnresolved(og)) {
         // We only need to resolve unresolved objects
-        return m->obj_cache[og].object;
+        return;
     }
 
     // Check object cache before checking xref table.  This allows us
@@ -1947,9 +1947,8 @@ QPDF::resolve(QPDFObjGen const& og)
             "",
             this->m->file->getLastOffset(),
             ("loop detected resolving object " + og.unparse(' ')));
-
         updateCache(og, QPDF_Null::create(), -1, -1);
-        return m->obj_cache[og].object;
+        return;
     }
     ResolveRecorder rr(this, og);
 
@@ -1998,11 +1997,10 @@ QPDF::resolve(QPDFObjGen const& og)
         updateCache(og, QPDF_Null::create(), -1, -1);
     }
 
-    std::shared_ptr<QPDFObject> result(this->m->obj_cache[og].object);
+    auto result(this->m->obj_cache[og].object);
     if (!result->hasDescription()) {
         result->setDescription(this, ("object " + og.unparse(' ')));
     }
-    return result;
 }
 
 void
