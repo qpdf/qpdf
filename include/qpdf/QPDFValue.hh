@@ -25,6 +25,7 @@
 #include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
 #include <qpdf/JSON.hh>
+#include <qpdf/QPDFObjGen.hh>
 #include <qpdf/Types.h>
 
 #include <string>
@@ -73,11 +74,21 @@ class QPDFValue
     {
         return parsed_offset;
     }
+    QPDF*
+    getQPDF()
+    {
+        return qpdf;
+    }
+    QPDFObjGen
+    getObjGen()
+    {
+        return og;
+    }
 
   protected:
     QPDFValue() :
         type_code(::ot_uninitialized),
-        type_name("uninitilized")
+        type_name("uninitialized")
     {
     }
     QPDFValue(qpdf_object_type_e type_code, char const* type_name) :
@@ -85,7 +96,17 @@ class QPDFValue
         type_name(type_name)
     {
     }
-
+    QPDFValue(
+        qpdf_object_type_e type_code,
+        char const* type_name,
+        QPDF* qpdf,
+        QPDFObjGen const& og) :
+        type_code(type_code),
+        type_name(type_name),
+        qpdf(qpdf),
+        og(og)
+    {
+    }
     virtual void
     releaseResolved()
     {
@@ -100,6 +121,10 @@ class QPDFValue
     qpdf_offset_t parsed_offset{-1};
     const qpdf_object_type_e type_code;
     char const* type_name;
+
+  protected:
+    QPDF* qpdf{nullptr};
+    QPDFObjGen og;
 };
 
 #endif // QPDFVALUE_HH

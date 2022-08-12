@@ -2183,9 +2183,8 @@ QPDF::getObject(QPDFObjGen const& og)
     if (!og.isIndirect()) {
         return QPDFObjectHandle::newNull();
     }
-    // auto obj = (og.getObj() != 0) ? resolve(og) : QPDF_Null::create();
-    if (!m->obj_cache.count(og)) {
-        m->obj_cache[og] = ObjCache(QPDF_Unresolved::create(), -1, -1);
+    if (!isCached(og)) {
+        m->obj_cache[og] = ObjCache(QPDF_Unresolved::create(this, og), -1, -1);
     }
     return newIndirect(og, m->obj_cache[og].object);
 }
