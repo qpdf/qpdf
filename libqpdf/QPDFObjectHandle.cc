@@ -2282,8 +2282,6 @@ QPDFObjectHandle::copyObject(
                                " reserved object handle direct");
     }
 
-    og = QPDFObjGen();
-
     std::shared_ptr<QPDFObject> new_obj;
 
     if (isBool() || isInteger() || isName() || isNull() || isReal() ||

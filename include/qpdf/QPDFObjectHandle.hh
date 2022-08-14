@@ -1584,7 +1584,6 @@ class QPDFObjectHandle
         QPDF* qpdf,
         QPDFObjGen const& og,
         std::shared_ptr<QPDFObject> const& obj) :
-        og(og),
         obj(obj)
     {
     }
@@ -1640,7 +1639,6 @@ class QPDFObjectHandle
     // Moving members of QPDFObjectHandle into a smart pointer incurs
     // a substantial performance penalty since QPDFObjectHandle
     // objects are copied around so frequently.
-    QPDFObjGen og;
     std::shared_ptr<QPDFObject> obj;
 };
 
@@ -1864,19 +1862,19 @@ class QPDFObjectHandle::QPDFArrayItems
 inline QPDFObjGen
 QPDFObjectHandle::getObjGen() const
 {
-    return og;
+    return isInitialized() ? obj->getObjGen() : QPDFObjGen();
 }
 
 inline int
 QPDFObjectHandle::getObjectID() const
 {
-    return og.getObj();
+    return getObjGen().getObj();
 }
 
 inline int
 QPDFObjectHandle::getGeneration() const
 {
-    return og.getGen();
+    return getObjGen().getGen();
 }
 
 inline bool

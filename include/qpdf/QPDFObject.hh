@@ -103,6 +103,12 @@ class QPDFObject
     {
         return value->qpdf;
     }
+    QPDFObjGen
+    getObjGen() const
+    {
+        return value->og;
+    }
+
     void
     setDescription(QPDF* qpdf, std::string const& description)
     {
