@@ -2113,7 +2113,7 @@ QPDF::newIndirect(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& obj)
     if (!obj->hasDescription()) {
         obj->setDescription(this, "object " + og.unparse(' '));
     }
-    return QPDFObjectHandle::Factory::newIndirect(this, og, obj);
+    return QPDFObjectHandle::Factory::newIndirect(obj);
 }
 
 void
