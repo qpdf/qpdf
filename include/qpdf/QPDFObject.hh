@@ -133,7 +133,25 @@ class QPDFObject
         auto v = value;
         value = o->value;
         o->value = v;
+        auto og = value->og;
+        value->og = o->value->og;
+        o->value->og = og;
     }
+
+    // The following two methods are for use by class QPDF only
+    void
+    setObjGen(QPDF* qpdf, QPDFObjGen const& og)
+    {
+        value->qpdf = qpdf;
+        value->og = og;
+    }
+    void
+    resetObjGen()
+    {
+        value->qpdf = nullptr;
+        value->og = QPDFObjGen();
+    }
+
     bool
     isUnresolved()
     {
