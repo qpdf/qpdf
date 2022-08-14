@@ -153,10 +153,19 @@ class QPDFObject
     }
 
     bool
-    isUnresolved()
+    isUnresolved() const
     {
         return value->type_code == ::ot_unresolved;
     }
+    void
+    resolve()
+    {
+        if (isUnresolved()) {
+            doResolve();
+        }
+    }
+    void doResolve();
+
     template <typename T>
     T*
     as()

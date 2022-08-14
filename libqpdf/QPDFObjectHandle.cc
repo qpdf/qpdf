@@ -2595,9 +2595,7 @@ QPDFObjectHandle::dereference()
     if (!isInitialized()) {
         return false;
     }
-    if (this->obj->isUnresolved()) {
-        QPDF::Resolver::resolve(this->qpdf, getObjGen());
-    }
+    this->obj->resolve();
     return true;
 }
 
