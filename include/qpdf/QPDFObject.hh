@@ -97,6 +97,12 @@ class QPDFObject
     {
         return value->type_name;
     }
+    // Returns nullptr for direct objects
+    QPDF*
+    getQPDF() const
+    {
+        return value->qpdf;
+    }
     void
     setDescription(QPDF* qpdf, std::string const& description)
     {
