@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('type-checks');
 
-my $n_tests = 5;
+my $n_tests = 6;
 
 # Whenever object-types.pdf is edited, object-types-os.pdf should be
 # regenerated.
@@ -42,6 +42,10 @@ $td->runtest("type checks with object streams",
 $td->runtest("compound type checks",
              {$td->COMMAND => "test_driver 82 object-types-os.pdf"},
              {$td->STRING => "test 82 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("indirect objects belonging to destroyed QPDF",
+             {$td->COMMAND => "test_driver 92 -"},
+             {$td->STRING => "test 92 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();
