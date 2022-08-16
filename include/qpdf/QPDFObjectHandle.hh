@@ -49,9 +49,12 @@ class QPDFTokenizer;
 class QPDFExc;
 class Pl_QPDFTokenizer;
 class QPDFMatrix;
+class QPDFParser;
 
 class QPDFObjectHandle
 {
+    friend class QPDFParser;
+
   public:
     // This class is used by replaceStreamData.  It provides an
     // alternative way of associating stream data with a stream.  See
@@ -1563,15 +1566,6 @@ class QPDFObjectHandle
     QPDFObjectHandle(QPDF*, QPDFObjGen const& og);
     QPDFObjectHandle(std::shared_ptr<QPDFObject> const&);
 
-    enum parser_state_e {
-        st_top,
-        st_start,
-        st_stop,
-        st_eof,
-        st_dictionary,
-        st_array
-    };
-
     // Private object factory methods
     static QPDFObjectHandle newIndirect(QPDF*, QPDFObjGen const& og);
     static QPDFObjectHandle newStream(
@@ -1599,14 +1593,7 @@ class QPDFObjectHandle
         std::string const&,
         std::shared_ptr<InputSource>,
         qpdf_offset_t);
-    static QPDFObjectHandle parseInternal(
-        std::shared_ptr<InputSource> input,
-        std::string const& object_description,
-        QPDFTokenizer& tokenizer,
-        bool& empty,
-        StringDecrypter* decrypter,
-        QPDF* context,
-        bool content_stream);
+
     void setParsedOffset(qpdf_offset_t offset);
     void parseContentStream_internal(
         std::string const& description, ParserCallbacks* callbacks);

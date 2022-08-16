@@ -80,6 +80,7 @@ set(libqpdf_SOURCES
   QPDFPageDocumentHelper.cc
   QPDFPageLabelDocumentHelper.cc
   QPDFPageObjectHelper.cc
+  QPDFParser.cc
   QPDFStreamFilter.cc
   QPDFSystemError.cc
   QPDFTokenizer.cc

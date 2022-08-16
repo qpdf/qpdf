@@ -56,12 +56,12 @@ QPDF missing trailer 0
 QPDF trailer lacks size 0
 QPDF trailer size not integer 0
 QPDF trailer prev not integer 0
-QPDFObjectHandle bad brace 0
-QPDFObjectHandle bad array close 0
+QPDFParser bad brace 0
+QPDFParser bad array close 0
 QPDF stream without length 0
 QPDF stream length not integer 0
 QPDF missing endstream 0
-QPDFObjectHandle bad dictionary close 0
+QPDFParser bad dictionary close 0
 QPDF can't find xref 0
 QPDFTokenizer bad ) 0
 QPDFTokenizer bad > 0
@@ -215,7 +215,7 @@ QPDF not copying pages object 0
 QPDF insert foreign page 0
 QPDFWriter foreign object 0
 QPDFWriter copy use_aes 1
-QPDFObjectHandle indirect without context 0
+QPDFParser indirect without context 0
 QPDFObjectHandle trailing data in parse 0
 QPDFJob pages encryption password 0
 QPDFTokenizer EOF reading token 0
@@ -257,9 +257,9 @@ qpdf-c called qpdf_set_deterministic_ID 0
 QPDFObjectHandle indirect with 0 objid 0
 QPDF object id 0 0
 QPDF recursion loop in resolve 0
-QPDFObjectHandle treat word as string 0
-QPDFObjectHandle found fake 1
-QPDFObjectHandle no val for last key 0
+QPDFParser treat word as string 0
+QPDFParser found fake 1
+QPDFParser no val for last key 0
 QPDF resolve failure to null 0
 QPDFWriter preserve unreferenced standard 0
 QPDFObjectHandle errors in parsecontent 0
@@ -288,8 +288,8 @@ QPDFObjectHandle non-stream in stream array 0
 QPDFObjectHandle coalesce called on stream 0
 QPDFObjectHandle coalesce provide stream data 0
 QPDF_Stream bad token at end during normalize 0
-QPDFObjectHandle bad token in parse 0
-QPDFObjectHandle eof in parseInternal 0
+QPDFParser bad token in parse 0
+QPDFParser eof in parse 0
 QPDFObjectHandle array bounds 0
 QPDFObjectHandle boolean returning false 0
 QPDFObjectHandle integer returning 0 0
@@ -317,7 +317,7 @@ QPDFObjectHandle numeric non-numeric 0
 QPDFObjectHandle erase array bounds 0
 qpdf-c called qpdf_check_pdf 0
 QPDF xref loop 0
-QPDFObjectHandle too deep 0
+QPDFParser too deep 0
 QPDFFormFieldObjectHelper non-trivial inheritance 0
 QPDFFormFieldObjectHelper non-trivial qualified name 0
 QPDFFormFieldObjectHelper TU present 0
@@ -428,7 +428,7 @@ QPDF eof skipping spaces before xref 1
 QPDF_encryption user matches owner V < 5 0
 QPDF_encryption same password 1
 QPDFWriter stream in ostream 0
-QPDFObjectHandle duplicate dict key 0
+QPDFParser duplicate dict key 0
 QPDFWriter no encryption sig contents 0
 QPDFPageObjectHelper colorspace lookup 0
 QPDFWriter ignore XRef in qdf mode 0

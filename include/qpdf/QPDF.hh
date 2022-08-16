@@ -49,6 +49,7 @@ class QPDF_Stream;
 class BitStream;
 class BitWriter;
 class QPDFLogger;
+class QPDFParser;
 
 class QPDF
 {
@@ -881,7 +882,7 @@ class QPDF
     // resolution
     class ParseGuard
     {
-        friend class QPDFObjectHandle;
+        friend class QPDFParser;
 
       private:
         ParseGuard(QPDF* qpdf) :
