@@ -55,28 +55,14 @@ QPDFParser::parse(bool& empty, bool content_stream)
         std::string const& token_error_message = token.getErrorMessage();
         if (!token_error_message.empty()) {
             // Tokens other than tt_bad can still generate warnings.
-            warn(
-                context,
-                QPDFExc(
-                    qpdf_e_damaged_pdf,
-                    input->getName(),
-                    object_description,
-                    input->getLastOffset(),
-                    token_error_message));
+            warn(token_error_message);
         }
 
         switch (token.getType()) {
         case QPDFTokenizer::tt_eof:
             if (!content_stream) {
                 QTC::TC("qpdf", "QPDFParser eof in parse");
-                warn(
-                    context,
-                    QPDFExc(
-                        qpdf_e_damaged_pdf,
-                        input->getName(),
-                        object_description,
-                        input->getLastOffset(),
-                        "unexpected EOF"));
+                warn("unexpected EOF");
             }
             bad = true;
             state = st_eof;
@@ -91,14 +77,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
         case QPDFTokenizer::tt_brace_open:
         case QPDFTokenizer::tt_brace_close:
             QTC::TC("qpdf", "QPDFParser bad brace");
-            warn(
-                context,
-                QPDFExc(
-                    qpdf_e_damaged_pdf,
-                    input->getName(),
-                    object_description,
-                    input->getLastOffset(),
-                    "treating unexpected brace token as null"));
+            warn("treating unexpected brace token as null");
             bad = true;
             object = QPDFObjectHandle::newNull();
             break;
@@ -108,14 +87,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 state = st_stop;
             } else {
                 QTC::TC("qpdf", "QPDFParser bad array close");
-                warn(
-                    context,
-                    QPDFExc(
-                        qpdf_e_damaged_pdf,
-                        input->getName(),
-                        object_description,
-                        input->getLastOffset(),
-                        "treating unexpected array close token as null"));
+                warn("treating unexpected array close token as null");
                 bad = true;
                 object = QPDFObjectHandle::newNull();
             }
@@ -126,14 +98,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 state = st_stop;
             } else {
                 QTC::TC("qpdf", "QPDFParser bad dictionary close");
-                warn(
-                    context,
-                    QPDFExc(
-                        qpdf_e_damaged_pdf,
-                        input->getName(),
-                        object_description,
-                        input->getLastOffset(),
-                        "unexpected dictionary close token"));
+                warn("unexpected dictionary close token");
                 bad = true;
                 object = QPDFObjectHandle::newNull();
             }
@@ -143,14 +108,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
         case QPDFTokenizer::tt_dict_open:
             if (olist_stack.size() > 500) {
                 QTC::TC("qpdf", "QPDFParser too deep");
-                warn(
-                    context,
-                    QPDFExc(
-                        qpdf_e_damaged_pdf,
-                        input->getName(),
-                        object_description,
-                        input->getLastOffset(),
-                        "ignoring excessively deeply nested data structure"));
+                warn("ignoring excessively deeply nested data structure");
                 bad = true;
                 object = QPDFObjectHandle::newNull();
                 state = st_top;
@@ -233,15 +191,8 @@ QPDFParser::parse(bool& empty, bool content_stream)
                     empty = true;
                 } else {
                     QTC::TC("qpdf", "QPDFParser treat word as string");
-                    warn(
-                        context,
-                        QPDFExc(
-                            qpdf_e_damaged_pdf,
-                            input->getName(),
-                            object_description,
-                            input->getLastOffset(),
-                            "unknown token while reading object;"
-                            " treating as string"));
+                    warn("unknown token while reading object;"
+                         " treating as string");
                     bad = true;
                     object = QPDFObjectHandle::newString(value);
                 }
@@ -265,15 +216,8 @@ QPDFParser::parse(bool& empty, bool content_stream)
             break;
 
         default:
-            warn(
-                context,
-                QPDFExc(
-                    qpdf_e_damaged_pdf,
-                    input->getName(),
-                    object_description,
-                    input->getLastOffset(),
-                    "treating unknown token type as null while "
-                    "reading object"));
+            warn("treating unknown token type as null while "
+                 "reading object");
             bad = true;
             object = QPDFObjectHandle::newNull();
             break;
@@ -299,14 +243,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
         if (bad_count > 5) {
             // We had too many consecutive errors without enough
             // intervening successful objects. Give up.
-            warn(
-                context,
-                QPDFExc(
-                    qpdf_e_damaged_pdf,
-                    input->getName(),
-                    object_description,
-                    input->getLastOffset(),
-                    "too many errors; giving up on reading object"));
+            warn("too many errors; giving up on reading object");
             state = st_top;
             object = QPDFObjectHandle::newNull();
         }
@@ -314,14 +251,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
         switch (state) {
         case st_eof:
             if (state_stack.size() > 1) {
-                warn(
-                    context,
-                    QPDFExc(
-                        qpdf_e_damaged_pdf,
-                        input->getName(),
-                        object_description,
-                        input->getLastOffset(),
-                        "parse error while reading object"));
+                warn("parse error while reading object");
             }
             done = true;
             // In content stream mode, leave object uninitialized to
@@ -404,28 +334,18 @@ QPDFParser::parse(bool& empty, bool content_stream)
                                 (found_fake ? 0 : 1));
                         }
                         warn(
-                            context,
-                            QPDFExc(
-                                qpdf_e_damaged_pdf,
-                                input->getName(),
-                                object_description,
-                                offset,
-                                "expected dictionary key but found"
-                                " non-name object; inserting key " +
-                                    candidate));
+                            offset,
+                            "expected dictionary key but found"
+                            " non-name object; inserting key " +
+                                candidate);
                         val = key_obj;
                         key_obj = QPDFObjectHandle::newName(candidate);
                     } else if (i + 1 >= olist.size()) {
                         QTC::TC("qpdf", "QPDFParser no val for last key");
                         warn(
-                            context,
-                            QPDFExc(
-                                qpdf_e_damaged_pdf,
-                                input->getName(),
-                                object_description,
-                                offset,
-                                "dictionary ended prematurely; "
-                                "using null as value for last key"));
+                            offset,
+                            "dictionary ended prematurely; "
+                            "using null as value for last key");
                         val = QPDFObjectHandle::newNull();
                         QPDFObjectHandle::setObjectDescriptionFromInput(
                             val, context, object_description, input, offset);
@@ -436,15 +356,10 @@ QPDFParser::parse(bool& empty, bool content_stream)
                     if (dict.count(key) > 0) {
                         QTC::TC("qpdf", "QPDFParser duplicate dict key");
                         warn(
-                            context,
-                            QPDFExc(
-                                qpdf_e_damaged_pdf,
-                                input->getName(),
-                                object_description,
-                                offset,
-                                "dictionary has duplicated key " + key +
-                                    "; last occurrence overrides earlier "
-                                    "ones"));
+                            offset,
+                            "dictionary has duplicated key " + key +
+                                "; last occurrence overrides earlier "
+                                "ones");
                     }
                     dict[key] = val;
                 }
@@ -500,4 +415,23 @@ QPDFParser::warn(QPDF* qpdf, QPDFExc const& e)
     } else {
         throw e;
     }
+}
+
+void
+QPDFParser::warn(qpdf_offset_t offset, std::string const& msg) const
+{
+    warn(
+        context,
+        QPDFExc(
+            qpdf_e_damaged_pdf,
+            input->getName(),
+            object_description,
+            offset,
+            msg));
+}
+
+void
+QPDFParser::warn(std::string const& msg) const
+{
+    warn(input->getLastOffset(), msg);
 }

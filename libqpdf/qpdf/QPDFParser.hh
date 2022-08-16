@@ -37,6 +37,8 @@ class QPDFParser
         st_array
     };
 
+    void warn(qpdf_offset_t offset, std::string const& msg) const;
+    void warn(std::string const& msg) const;
     static void warn(QPDF*, QPDFExc const&);
     void setParsedOffset(qpdf_offset_t offset);
 
