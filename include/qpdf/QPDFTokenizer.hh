@@ -213,6 +213,7 @@ class QPDFTokenizer
 
     void handleCharacter(char);
     void inHexstring(char);
+    void inString(char, size_t);
     void reset();
 
     // Lexer state

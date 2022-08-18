@@ -368,70 +368,7 @@ QPDFTokenizer::handleCharacter(char ch)
                 bs_num_count = 0;
             }
 
-            if (this->string_ignoring_newline && (ch == '\n')) {
-                // ignore
-                this->string_ignoring_newline = false;
-            } else if (
-                ch_is_octal && (this->last_char_was_bs || (bs_num_count > 0))) {
-                this->bs_num_register[bs_num_count++] = ch;
-            } else if (this->last_char_was_bs) {
-                switch (ch) {
-                case 'n':
-                    this->val += '\n';
-                    break;
-
-                case 'r':
-                    this->val += '\r';
-                    break;
-
-                case 't':
-                    this->val += '\t';
-                    break;
-
-                case 'b':
-                    this->val += '\b';
-                    break;
-
-                case 'f':
-                    this->val += '\f';
-                    break;
-
-                case '\n':
-                    break;
-
-                case '\r':
-                    this->string_ignoring_newline = true;
-                    break;
-
-                default:
-                    // PDF spec says backslash is ignored before anything else
-                    this->val += ch;
-                    break;
-                }
-            } else if (ch == '\\') {
-                // last_char_was_bs is set/cleared below as appropriate
-                if (bs_num_count) {
-                    throw std::logic_error(
-                        "INTERNAL ERROR: QPDFTokenizer: bs_num_count != 0 "
-                        "when ch == '\\'");
-                }
-            } else if (ch == '(') {
-                this->val += ch;
-                ++this->string_depth;
-            } else if ((ch == ')') && (--this->string_depth == 0)) {
-                this->type = tt_string;
-                this->state = st_token_ready;
-            } else if (ch == '\r') {
-                // CR by itself is converted to LF
-                this->val += '\n';
-            } else if (ch == '\n') {
-                // CR LF is converted to LF
-                if (!this->last_char_was_cr) {
-                    this->val += ch;
-                }
-            } else {
-                this->val += ch;
-            }
+            inString(ch, bs_num_count);
 
             this->last_char_was_cr =
                 ((!this->string_ignoring_newline) && (ch == '\r'));
@@ -511,6 +448,82 @@ QPDFTokenizer::inHexstring(char ch)
         this->error_message =
             std::string("invalid character (") + ch + ") in hexstring";
         this->state = st_token_ready;
+    }
+}
+
+void
+QPDFTokenizer::inString(char ch, size_t bs_num_count)
+{
+    bool ch_is_octal = ((ch >= '0') && (ch <= '7'));
+    if (this->string_ignoring_newline && (ch == '\n')) {
+        // ignore
+        this->string_ignoring_newline = false;
+        return;
+    } else if (ch_is_octal && (this->last_char_was_bs || (bs_num_count > 0))) {
+        this->bs_num_register[bs_num_count++] = ch;
+        return;
+    } else if (this->last_char_was_bs) {
+        switch (ch) {
+        case 'n':
+            this->val += '\n';
+            return;
+
+        case 'r':
+            this->val += '\r';
+            return;
+
+        case 't':
+            this->val += '\t';
+            return;
+
+        case 'b':
+            this->val += '\b';
+            return;
+
+        case 'f':
+            this->val += '\f';
+            return;
+
+        case '\n':
+            return;
+
+        case '\r':
+            this->string_ignoring_newline = true;
+            return;
+
+        default:
+            // PDF spec says backslash is ignored before anything else
+            this->val += ch;
+            return;
+        }
+    } else if (ch == '\\') {
+        // last_char_was_bs is set/cleared below as appropriate
+        if (bs_num_count) {
+            throw std::logic_error(
+                "INTERNAL ERROR: QPDFTokenizer: bs_num_count != 0 "
+                "when ch == '\\'");
+        }
+    } else if (ch == '(') {
+        this->val += ch;
+        ++this->string_depth;
+        return;
+    } else if ((ch == ')') && (--this->string_depth == 0)) {
+        this->type = tt_string;
+        this->state = st_token_ready;
+        return;
+    } else if (ch == '\r') {
+        // CR by itself is converted to LF
+        this->val += '\n';
+        return;
+    } else if (ch == '\n') {
+        // CR LF is converted to LF
+        if (!this->last_char_was_cr) {
+            this->val += ch;
+        }
+        return;
+    } else {
+        this->val += ch;
+        return;
     }
 }
 
