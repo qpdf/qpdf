@@ -197,6 +197,7 @@ class QPDFTokenizer
     bool isSpace(char);
     bool isDelimiter(char);
     void findEI(std::shared_ptr<InputSource> input);
+    void handleCharacter(char);
 
     enum state_e {
         st_top,

@@ -200,11 +200,24 @@ QPDFTokenizer::presentCharacter(char ch)
 {
     char orig_ch = ch;
 
+    handleCharacter(ch);
+
+    if ((this->state == st_token_ready) && (this->type == tt_word)) {
+        resolveLiteral();
+    }
+
+    if (!(betweenTokens() ||
+          ((this->state == st_token_ready) && this->unread_char))) {
+        this->raw_val += orig_ch;
+    }
+}
+
+void
+QPDFTokenizer::handleCharacter(char ch)
+{
     // State machine is implemented such that some characters may be
     // handled more than once.  This happens whenever you have to use
     // the character that caused a state change in the new state.
-
-    bool handled = true;
 
     switch (this->state) {
     case (st_token_ready):
@@ -259,7 +272,7 @@ QPDFTokenizer::presentCharacter(char ch)
                 this->state = st_literal;
             }
         }
-        break;
+        return;
 
     case st_in_space:
         // We only enter this state if include_ignorable is true.
@@ -271,7 +284,7 @@ QPDFTokenizer::presentCharacter(char ch)
         } else {
             this->val += ch;
         }
-        break;
+        return;
 
     case st_in_comment:
         if ((ch == '\r') || (ch == '\n')) {
@@ -286,17 +299,16 @@ QPDFTokenizer::presentCharacter(char ch)
         } else if (this->include_ignorable) {
             this->val += ch;
         }
-        break;
+        return;
 
     case st_lt:
         if (ch == '<') {
             this->val += "<<";
             this->type = tt_dict_open;
             this->state = st_token_ready;
-        } else {
-            handled = false;
-            this->state = st_in_hexstring;
+            return;
         }
+        this->state = st_in_hexstring;
         break;
 
     case st_gt:
@@ -313,7 +325,7 @@ QPDFTokenizer::presentCharacter(char ch)
             this->char_to_unread = ch;
             this->state = st_token_ready;
         }
-        break;
+        return;
 
     case st_in_string:
         {
@@ -403,7 +415,7 @@ QPDFTokenizer::presentCharacter(char ch)
             this->last_char_was_bs =
                 ((!this->last_char_was_bs) && (ch == '\\'));
         }
-        break;
+        return;
 
     case st_literal:
         if (isDelimiter(ch)) {
@@ -422,7 +434,7 @@ QPDFTokenizer::presentCharacter(char ch)
         } else {
             this->val += ch;
         }
-        break;
+        return;
 
     case st_inline_image:
         this->val += ch;
@@ -432,57 +444,45 @@ QPDFTokenizer::presentCharacter(char ch)
             this->inline_image_bytes = 0;
             this->state = st_token_ready;
         }
+        return;
+
+    case (st_in_hexstring):
         break;
 
     default:
-        handled = false;
-    }
-
-    if (handled) {
-        // okay
-    } else if (this->state == st_in_hexstring) {
-        if (ch == '>') {
-            this->type = tt_string;
-            this->state = st_token_ready;
-            if (this->val.length() % 2) {
-                // PDF spec says odd hexstrings have implicit
-                // trailing 0.
-                this->val += '0';
-            }
-            char num[3];
-            num[2] = '\0';
-            std::string nval;
-            for (unsigned int i = 0; i < this->val.length(); i += 2) {
-                num[0] = this->val.at(i);
-                num[1] = this->val.at(i + 1);
-                char nch = static_cast<char>(strtol(num, nullptr, 16));
-                nval += nch;
-            }
-            this->val.clear();
-            this->val += nval;
-        } else if (QUtil::is_hex_digit(ch)) {
-            this->val += ch;
-        } else if (isSpace(ch)) {
-            // ignore
-        } else {
-            this->type = tt_bad;
-            QTC::TC("qpdf", "QPDFTokenizer bad hexstring character");
-            this->error_message =
-                std::string("invalid character (") + ch + ") in hexstring";
-            this->state = st_token_ready;
-        }
-    } else {
         throw std::logic_error(
             "INTERNAL ERROR: invalid state while reading token");
     }
 
-    if ((this->state == st_token_ready) && (this->type == tt_word)) {
-        resolveLiteral();
-    }
-
-    if (!(betweenTokens() ||
-          ((this->state == st_token_ready) && this->unread_char))) {
-        this->raw_val += orig_ch;
+    if (ch == '>') {
+        this->type = tt_string;
+        this->state = st_token_ready;
+        if (this->val.length() % 2) {
+            // PDF spec says odd hexstrings have implicit
+            // trailing 0.
+            this->val += '0';
+        }
+        char num[3];
+        num[2] = '\0';
+        std::string nval;
+        for (unsigned int i = 0; i < this->val.length(); i += 2) {
+            num[0] = this->val.at(i);
+            num[1] = this->val.at(i + 1);
+            char nch = static_cast<char>(strtol(num, nullptr, 16));
+            nval += nch;
+        }
+        this->val.clear();
+        this->val += nval;
+    } else if (QUtil::is_hex_digit(ch)) {
+        this->val += ch;
+    } else if (isSpace(ch)) {
+        // ignore
+    } else {
+        this->type = tt_bad;
+        QTC::TC("qpdf", "QPDFTokenizer bad hexstring character");
+        this->error_message =
+            std::string("invalid character (") + ch + ") in hexstring";
+        this->state = st_token_ready;
     }
 }
 
