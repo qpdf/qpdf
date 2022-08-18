@@ -197,7 +197,6 @@ class QPDFTokenizer
     bool isSpace(char);
     bool isDelimiter(char);
     void findEI(std::shared_ptr<InputSource> input);
-    void handleCharacter(char);
 
     enum state_e {
         st_top,
@@ -212,6 +211,8 @@ class QPDFTokenizer
         st_token_ready
     };
 
+    void handleCharacter(char);
+    void inHexstring(char);
     void reset();
 
     // Lexer state

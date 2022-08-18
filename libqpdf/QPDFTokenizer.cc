@@ -331,7 +331,8 @@ QPDFTokenizer::handleCharacter(char ch)
             return;
         }
         this->state = st_in_hexstring;
-        break;
+        inHexstring(ch);
+        return;
 
     case st_gt:
         if (ch == '>') {
@@ -469,13 +470,18 @@ QPDFTokenizer::handleCharacter(char ch)
         return;
 
     case (st_in_hexstring):
-        break;
+        inHexstring(ch);
+        return;
 
     default:
         throw std::logic_error(
             "INTERNAL ERROR: invalid state while reading token");
     }
+}
 
+void
+QPDFTokenizer::inHexstring(char ch)
+{
     if (ch == '>') {
         this->type = tt_string;
         this->state = st_token_ready;
