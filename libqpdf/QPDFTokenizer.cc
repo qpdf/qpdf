@@ -233,46 +233,68 @@ QPDFTokenizer::handleCharacter(char ch)
                 this->state = st_in_space;
                 this->val += ch;
             }
-        } else if (ch == '%') {
+            return;
+        }
+        switch (ch) {
+        case '%':
             this->state = st_in_comment;
             if (this->include_ignorable) {
                 this->val += ch;
             }
-        } else if (ch == '(') {
+            return;
+
+        case '(':
             this->string_depth = 1;
             this->string_ignoring_newline = false;
             memset(this->bs_num_register, '\0', sizeof(this->bs_num_register));
             this->last_char_was_bs = false;
             this->last_char_was_cr = false;
             this->state = st_in_string;
-        } else if (ch == '<') {
+            return;
+
+        case '<':
             this->state = st_lt;
-        } else if (ch == '>') {
+            return;
+
+        case '>':
             this->state = st_gt;
-        } else {
+            return;
+
+        default:
             this->val += ch;
-            if (ch == ')') {
+            switch (ch) {
+            case ')':
                 this->type = tt_bad;
                 QTC::TC("qpdf", "QPDFTokenizer bad )");
                 this->error_message = "unexpected )";
                 this->state = st_token_ready;
-            } else if (ch == '[') {
+                return;
+
+            case '[':
                 this->type = tt_array_open;
                 this->state = st_token_ready;
-            } else if (ch == ']') {
+                return;
+
+            case ']':
                 this->type = tt_array_close;
                 this->state = st_token_ready;
-            } else if (ch == '{') {
+                return;
+
+            case '{':
                 this->type = tt_brace_open;
                 this->state = st_token_ready;
-            } else if (ch == '}') {
+                return;
+
+            case '}':
                 this->type = tt_brace_close;
                 this->state = st_token_ready;
-            } else {
+                return;
+
+            default:
                 this->state = st_literal;
+                return;
             }
         }
-        return;
 
     case st_in_space:
         // We only enter this state if include_ignorable is true.
