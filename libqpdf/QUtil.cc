@@ -1207,52 +1207,6 @@ QUtil::random()
     return result;
 }
 
-bool
-QUtil::is_hex_digit(char ch)
-{
-    return (ch && (strchr("0123456789abcdefABCDEF", ch) != nullptr));
-}
-
-bool
-QUtil::is_space(char ch)
-{
-    return (ch && (strchr(" \f\n\r\t\v", ch) != nullptr));
-}
-
-bool
-QUtil::is_digit(char ch)
-{
-    return ((ch >= '0') && (ch <= '9'));
-}
-
-bool
-QUtil::is_number(char const* p)
-{
-    // ^[\+\-]?(\.\d*|\d+(\.\d*)?)$
-    if (!*p) {
-        return false;
-    }
-    if ((*p == '-') || (*p == '+')) {
-        ++p;
-    }
-    bool found_dot = false;
-    bool found_digit = false;
-    for (; *p; ++p) {
-        if (*p == '.') {
-            if (found_dot) {
-                // only one dot
-                return false;
-            }
-            found_dot = true;
-        } else if (QUtil::is_digit(*p)) {
-            found_digit = true;
-        } else {
-            return false;
-        }
-    }
-    return found_digit;
-}
-
 void
 QUtil::read_file_into_memory(
     char const* filename, std::shared_ptr<char>& file_buf, size_t& size)

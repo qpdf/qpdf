@@ -25,6 +25,7 @@
 #include <qpdf/DLL.h>
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/Types.h>
+#include <cstring>
 #include <functional>
 #include <list>
 #include <memory>
@@ -489,16 +490,16 @@ namespace QUtil
     // classes without using ctype, which we avoid because of locale
     // considerations.
     QPDF_DLL
-    bool is_hex_digit(char);
+    inline bool is_hex_digit(char);
 
     QPDF_DLL
-    bool is_space(char);
+    inline bool is_space(char);
 
     QPDF_DLL
-    bool is_digit(char);
+    inline bool is_digit(char);
 
     QPDF_DLL
-    bool is_number(char const*);
+    inline bool is_number(char const*);
 
     // This method parses the numeric range syntax used by the qpdf
     // command-line tool. May throw std::runtime_error.
@@ -525,5 +526,51 @@ namespace QUtil
         std::function<int(int, char const* const[])> realmain);
 #endif // QPDF_NO_WCHAR_T
 };     // namespace QUtil
+
+inline bool
+QUtil::is_hex_digit(char ch)
+{
+    return (ch && (strchr("0123456789abcdefABCDEF", ch) != nullptr));
+}
+
+inline bool
+QUtil::is_space(char ch)
+{
+    return (ch && (strchr(" \f\n\r\t\v", ch) != nullptr));
+}
+
+inline bool
+QUtil::is_digit(char ch)
+{
+    return ((ch >= '0') && (ch <= '9'));
+}
+
+inline bool
+QUtil::is_number(char const* p)
+{
+    // ^[\+\-]?(\.\d*|\d+(\.\d*)?)$
+    if (!*p) {
+        return false;
+    }
+    if ((*p == '-') || (*p == '+')) {
+        ++p;
+    }
+    bool found_dot = false;
+    bool found_digit = false;
+    for (; *p; ++p) {
+        if (*p == '.') {
+            if (found_dot) {
+                // only one dot
+                return false;
+            }
+            found_dot = true;
+        } else if (QUtil::is_digit(*p)) {
+            found_digit = true;
+        } else {
+            return false;
+        }
+    }
+    return found_digit;
+}
 
 #endif // QUTIL_HH
