@@ -211,42 +211,29 @@ class QPDFTokenizer
         st_token_ready
     };
 
-    class Members
-    {
-        friend class QPDFTokenizer;
+    void reset();
 
-      public:
-        QPDF_DLL
-        ~Members() = default;
+    // Lexer state
+    state_e state;
 
-      private:
-        Members();
-        Members(Members const&) = delete;
-        void reset();
+    bool allow_eof;
+    bool include_ignorable;
 
-        // Lexer state
-        state_e state;
+    // Current token accumulation
+    token_type_e type;
+    std::string val;
+    std::string raw_val;
+    std::string error_message;
+    bool unread_char;
+    char char_to_unread;
+    size_t inline_image_bytes;
 
-        bool allow_eof;
-        bool include_ignorable;
-
-        // Current token accumulation
-        token_type_e type;
-        std::string val;
-        std::string raw_val;
-        std::string error_message;
-        bool unread_char;
-        char char_to_unread;
-        size_t inline_image_bytes;
-
-        // State for strings
-        int string_depth;
-        bool string_ignoring_newline;
-        char bs_num_register[4];
-        bool last_char_was_bs;
-        bool last_char_was_cr;
-    };
-    std::shared_ptr<Members> m;
+    // State for strings
+    int string_depth;
+    bool string_ignoring_newline;
+    char bs_num_register[4];
+    bool last_char_was_bs;
+    bool last_char_was_cr;
 };
 
 #endif // QPDFTOKENIZER_HH
