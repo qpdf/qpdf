@@ -198,12 +198,6 @@ QPDFTokenizer::resolveLiteral()
 void
 QPDFTokenizer::presentCharacter(char ch)
 {
-    if (this->state == st_token_ready) {
-        throw std::logic_error(
-            "INTERNAL ERROR: QPDF tokenizer presented character "
-            "while token is waiting");
-    }
-
     char orig_ch = ch;
 
     // State machine is implemented such that some characters may be
@@ -211,7 +205,14 @@ QPDFTokenizer::presentCharacter(char ch)
     // the character that caused a state change in the new state.
 
     bool handled = true;
-    if (this->state == st_top) {
+
+    switch (this->state) {
+    case (st_token_ready):
+        throw std::logic_error(
+            "INTERNAL ERROR: QPDF tokenizer presented character "
+            "while token is waiting");
+
+    case (st_top):
         // Note: we specifically do not use ctype here.  It is
         // locale-dependent.
         if (isSpace(ch)) {
@@ -258,7 +259,9 @@ QPDFTokenizer::presentCharacter(char ch)
                 this->state = st_literal;
             }
         }
-    } else if (this->state == st_in_space) {
+        break;
+
+    case st_in_space:
         // We only enter this state if include_ignorable is true.
         if (!isSpace(ch)) {
             this->type = tt_space;
@@ -268,7 +271,9 @@ QPDFTokenizer::presentCharacter(char ch)
         } else {
             this->val += ch;
         }
-    } else if (this->state == st_in_comment) {
+        break;
+
+    case st_in_comment:
         if ((ch == '\r') || (ch == '\n')) {
             if (this->include_ignorable) {
                 this->type = tt_comment;
@@ -281,7 +286,9 @@ QPDFTokenizer::presentCharacter(char ch)
         } else if (this->include_ignorable) {
             this->val += ch;
         }
-    } else if (this->state == st_lt) {
+        break;
+
+    case st_lt:
         if (ch == '<') {
             this->val += "<<";
             this->type = tt_dict_open;
@@ -290,7 +297,9 @@ QPDFTokenizer::presentCharacter(char ch)
             handled = false;
             this->state = st_in_hexstring;
         }
-    } else if (this->state == st_gt) {
+        break;
+
+    case st_gt:
         if (ch == '>') {
             this->val += ">>";
             this->type = tt_dict_close;
@@ -304,91 +313,99 @@ QPDFTokenizer::presentCharacter(char ch)
             this->char_to_unread = ch;
             this->state = st_token_ready;
         }
-    } else if (this->state == st_in_string) {
-        if (this->string_ignoring_newline && (ch != '\n')) {
-            this->string_ignoring_newline = false;
-        }
+        break;
 
-        size_t bs_num_count = strlen(this->bs_num_register);
-        bool ch_is_octal = ((ch >= '0') && (ch <= '7'));
-        if ((bs_num_count == 3) || ((bs_num_count > 0) && (!ch_is_octal))) {
-            // We've accumulated \ddd.  PDF Spec says to ignore
-            // high-order overflow.
-            this->val +=
-                static_cast<char>(strtol(this->bs_num_register, nullptr, 8));
-            memset(this->bs_num_register, '\0', sizeof(this->bs_num_register));
-            bs_num_count = 0;
-        }
+    case st_in_string:
+        {
+            if (this->string_ignoring_newline && (ch != '\n')) {
+                this->string_ignoring_newline = false;
+            }
 
-        if (this->string_ignoring_newline && (ch == '\n')) {
-            // ignore
-            this->string_ignoring_newline = false;
-        } else if (
-            ch_is_octal && (this->last_char_was_bs || (bs_num_count > 0))) {
-            this->bs_num_register[bs_num_count++] = ch;
-        } else if (this->last_char_was_bs) {
-            switch (ch) {
-            case 'n':
+            size_t bs_num_count = strlen(this->bs_num_register);
+            bool ch_is_octal = ((ch >= '0') && (ch <= '7'));
+            if ((bs_num_count == 3) || ((bs_num_count > 0) && (!ch_is_octal))) {
+                // We've accumulated \ddd.  PDF Spec says to ignore
+                // high-order overflow.
+                this->val += static_cast<char>(
+                    strtol(this->bs_num_register, nullptr, 8));
+                memset(
+                    this->bs_num_register, '\0', sizeof(this->bs_num_register));
+                bs_num_count = 0;
+            }
+
+            if (this->string_ignoring_newline && (ch == '\n')) {
+                // ignore
+                this->string_ignoring_newline = false;
+            } else if (
+                ch_is_octal && (this->last_char_was_bs || (bs_num_count > 0))) {
+                this->bs_num_register[bs_num_count++] = ch;
+            } else if (this->last_char_was_bs) {
+                switch (ch) {
+                case 'n':
+                    this->val += '\n';
+                    break;
+
+                case 'r':
+                    this->val += '\r';
+                    break;
+
+                case 't':
+                    this->val += '\t';
+                    break;
+
+                case 'b':
+                    this->val += '\b';
+                    break;
+
+                case 'f':
+                    this->val += '\f';
+                    break;
+
+                case '\n':
+                    break;
+
+                case '\r':
+                    this->string_ignoring_newline = true;
+                    break;
+
+                default:
+                    // PDF spec says backslash is ignored before anything else
+                    this->val += ch;
+                    break;
+                }
+            } else if (ch == '\\') {
+                // last_char_was_bs is set/cleared below as appropriate
+                if (bs_num_count) {
+                    throw std::logic_error(
+                        "INTERNAL ERROR: QPDFTokenizer: bs_num_count != 0 "
+                        "when ch == '\\'");
+                }
+            } else if (ch == '(') {
+                this->val += ch;
+                ++this->string_depth;
+            } else if ((ch == ')') && (--this->string_depth == 0)) {
+                this->type = tt_string;
+                this->state = st_token_ready;
+            } else if (ch == '\r') {
+                // CR by itself is converted to LF
                 this->val += '\n';
-                break;
-
-            case 'r':
-                this->val += '\r';
-                break;
-
-            case 't':
-                this->val += '\t';
-                break;
-
-            case 'b':
-                this->val += '\b';
-                break;
-
-            case 'f':
-                this->val += '\f';
-                break;
-
-            case '\n':
-                break;
-
-            case '\r':
-                this->string_ignoring_newline = true;
-                break;
-
-            default:
-                // PDF spec says backslash is ignored before anything else
-                this->val += ch;
-                break;
-            }
-        } else if (ch == '\\') {
-            // last_char_was_bs is set/cleared below as appropriate
-            if (bs_num_count) {
-                throw std::logic_error(
-                    "INTERNAL ERROR: QPDFTokenizer: bs_num_count != 0 "
-                    "when ch == '\\'");
-            }
-        } else if (ch == '(') {
-            this->val += ch;
-            ++this->string_depth;
-        } else if ((ch == ')') && (--this->string_depth == 0)) {
-            this->type = tt_string;
-            this->state = st_token_ready;
-        } else if (ch == '\r') {
-            // CR by itself is converted to LF
-            this->val += '\n';
-        } else if (ch == '\n') {
-            // CR LF is converted to LF
-            if (!this->last_char_was_cr) {
+            } else if (ch == '\n') {
+                // CR LF is converted to LF
+                if (!this->last_char_was_cr) {
+                    this->val += ch;
+                }
+            } else {
                 this->val += ch;
             }
-        } else {
-            this->val += ch;
+
+            this->last_char_was_cr =
+                ((!this->string_ignoring_newline) && (ch == '\r'));
+            this->last_char_was_bs =
+                ((!this->last_char_was_bs) && (ch == '\\'));
         }
+        break;
 
-        this->last_char_was_cr =
-            ((!this->string_ignoring_newline) && (ch == '\r'));
-        this->last_char_was_bs = ((!this->last_char_was_bs) && (ch == '\\'));
-    } else if (this->state == st_literal) {
+    case st_literal:
         if (isDelimiter(ch)) {
             // A C-locale whitespace character or delimiter terminates
             // token.  It is important to unread the whitespace
@@ -405,16 +422,19 @@ QPDFTokenizer::presentCharacter(char ch)
         } else {
             this->val += ch;
         }
-    } else if (this->state == st_inline_image) {
+        break;
+
+    case st_inline_image:
         this->val += ch;
-        size_t len = this->val.length();
-        if (len == this->inline_image_bytes) {
+        if (this->val.length() == this->inline_image_bytes) {
             QTC::TC("qpdf", "QPDFTokenizer found EI by byte count");
             this->type = tt_inline_image;
             this->inline_image_bytes = 0;
             this->state = st_token_ready;
         }
-    } else {
+        break;
+
+    default:
         handled = false;
     }
 
