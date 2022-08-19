@@ -85,9 +85,7 @@ QPDFTokenizer::reset()
     char_to_unread = '\0';
     inline_image_bytes = 0;
     string_depth = 0;
-    string_ignoring_newline = false;
     last_char_was_bs = false;
-    last_char_was_cr = false;
 }
 
 QPDFTokenizer::Token::Token(token_type_e type, std::string const& value) :
@@ -245,10 +243,8 @@ QPDFTokenizer::handleCharacter(char ch)
 
         case '(':
             this->string_depth = 1;
-            this->string_ignoring_newline = false;
             memset(this->bs_num_register, '\0', sizeof(this->bs_num_register));
             this->last_char_was_bs = false;
-            this->last_char_was_cr = false;
             this->state = st_in_string;
             return;
 
@@ -353,15 +349,17 @@ QPDFTokenizer::handleCharacter(char ch)
 
     case st_in_string:
         {
-            if (this->string_ignoring_newline && (ch != '\n')) {
-                this->string_ignoring_newline = false;
-            }
             inString(ch);
-
-            this->last_char_was_cr =
-                ((!this->string_ignoring_newline) && (ch == '\r'));
             this->last_char_was_bs =
                 ((!this->last_char_was_bs) && (ch == '\\'));
+        }
+        return;
+
+    case (st_string_after_cr):
+        // CR LF in strings are either ignored or normalized to CR
+        this->state = st_in_string;
+        if (ch != '\n') {
+            handleCharacter(ch);
         }
         return;
 
@@ -447,11 +445,7 @@ void
 QPDFTokenizer::inString(char ch)
 {
     bool ch_is_octal = ((ch >= '0') && (ch <= '7'));
-    if (this->string_ignoring_newline && (ch == '\n')) {
-        // ignore
-        this->string_ignoring_newline = false;
-        return;
-    } else if (ch_is_octal && this->last_char_was_bs) {
+    if (ch_is_octal && this->last_char_was_bs) {
         this->state = st_char_code;
         inCharCode(ch);
         return;
@@ -481,7 +475,7 @@ QPDFTokenizer::inString(char ch)
             return;
 
         case '\r':
-            this->string_ignoring_newline = true;
+            this->state = st_string_after_cr;
             return;
 
         default:
@@ -502,12 +496,10 @@ QPDFTokenizer::inString(char ch)
     } else if (ch == '\r') {
         // CR by itself is converted to LF
         this->val += '\n';
+        this->state = st_string_after_cr;
         return;
     } else if (ch == '\n') {
-        // CR LF is converted to LF
-        if (!this->last_char_was_cr) {
-            this->val += ch;
-        }
+        this->val += ch;
         return;
     } else {
         this->val += ch;

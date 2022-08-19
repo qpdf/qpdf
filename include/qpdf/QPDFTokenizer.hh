@@ -204,6 +204,7 @@ class QPDFTokenizer
         st_in_comment,
         st_in_string,
         st_char_code,
+        st_string_after_cr,
         st_lt,
         st_gt,
         st_literal,
@@ -236,10 +237,8 @@ class QPDFTokenizer
 
     // State for strings
     int string_depth;
-    bool string_ignoring_newline;
     char bs_num_register[4];
     bool last_char_was_bs;
-    bool last_char_was_cr;
 };
 
 #endif // QPDFTOKENIZER_HH
