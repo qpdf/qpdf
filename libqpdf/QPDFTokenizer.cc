@@ -330,6 +330,7 @@ QPDFTokenizer::handleCharacter(char ch)
             this->state = st_token_ready;
             return;
         }
+
         this->state = st_in_hexstring;
         inHexstring(ch);
         return;
@@ -355,26 +356,17 @@ QPDFTokenizer::handleCharacter(char ch)
             if (this->string_ignoring_newline && (ch != '\n')) {
                 this->string_ignoring_newline = false;
             }
-
-            size_t bs_num_count = strlen(this->bs_num_register);
-            bool ch_is_octal = ((ch >= '0') && (ch <= '7'));
-            if ((bs_num_count == 3) || ((bs_num_count > 0) && (!ch_is_octal))) {
-                // We've accumulated \ddd.  PDF Spec says to ignore
-                // high-order overflow.
-                this->val += static_cast<char>(
-                    strtol(this->bs_num_register, nullptr, 8));
-                memset(
-                    this->bs_num_register, '\0', sizeof(this->bs_num_register));
-                bs_num_count = 0;
-            }
-
-            inString(ch, bs_num_count);
+            inString(ch);
 
             this->last_char_was_cr =
                 ((!this->string_ignoring_newline) && (ch == '\r'));
             this->last_char_was_bs =
                 ((!this->last_char_was_bs) && (ch == '\\'));
         }
+        return;
+
+    case (st_char_code):
+        inCharCode(ch);
         return;
 
     case st_literal:
@@ -452,15 +444,16 @@ QPDFTokenizer::inHexstring(char ch)
 }
 
 void
-QPDFTokenizer::inString(char ch, size_t bs_num_count)
+QPDFTokenizer::inString(char ch)
 {
     bool ch_is_octal = ((ch >= '0') && (ch <= '7'));
     if (this->string_ignoring_newline && (ch == '\n')) {
         // ignore
         this->string_ignoring_newline = false;
         return;
-    } else if (ch_is_octal && (this->last_char_was_bs || (bs_num_count > 0))) {
-        this->bs_num_register[bs_num_count++] = ch;
+    } else if (ch_is_octal && this->last_char_was_bs) {
+        this->state = st_char_code;
+        inCharCode(ch);
         return;
     } else if (this->last_char_was_bs) {
         switch (ch) {
@@ -498,11 +491,6 @@ QPDFTokenizer::inString(char ch, size_t bs_num_count)
         }
     } else if (ch == '\\') {
         // last_char_was_bs is set/cleared below as appropriate
-        if (bs_num_count) {
-            throw std::logic_error(
-                "INTERNAL ERROR: QPDFTokenizer: bs_num_count != 0 "
-                "when ch == '\\'");
-        }
     } else if (ch == '(') {
         this->val += ch;
         ++this->string_depth;
@@ -523,6 +511,27 @@ QPDFTokenizer::inString(char ch, size_t bs_num_count)
         return;
     } else {
         this->val += ch;
+        return;
+    }
+}
+
+void
+QPDFTokenizer::inCharCode(char ch)
+{
+    size_t bs_num_count = strlen(this->bs_num_register);
+    bool ch_is_octal = ((ch >= '0') && (ch <= '7'));
+    if ((bs_num_count == 3) || ((bs_num_count > 0) && (!ch_is_octal))) {
+        // We've accumulated \ddd.  PDF Spec says to ignore
+        // high-order overflow.
+        this->val +=
+            static_cast<char>(strtol(this->bs_num_register, nullptr, 8));
+        memset(this->bs_num_register, '\0', sizeof(this->bs_num_register));
+        bs_num_count = 0;
+        this->state = st_in_string;
+        handleCharacter(ch);
+        return;
+    } else if (ch_is_octal) {
+        this->bs_num_register[bs_num_count++] = ch;
         return;
     }
 }

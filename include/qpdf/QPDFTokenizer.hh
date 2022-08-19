@@ -203,6 +203,7 @@ class QPDFTokenizer
         st_in_space,
         st_in_comment,
         st_in_string,
+        st_char_code,
         st_lt,
         st_gt,
         st_literal,
@@ -212,8 +213,10 @@ class QPDFTokenizer
     };
 
     void handleCharacter(char);
+    void inCharCode(char);
     void inHexstring(char);
-    void inString(char, size_t);
+    void inString(char);
+
     void reset();
 
     // Lexer state
