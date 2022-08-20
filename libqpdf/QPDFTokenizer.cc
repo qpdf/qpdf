@@ -442,6 +442,10 @@ QPDFTokenizer::handleCharacter(char ch)
         inHexstring(ch);
         return;
 
+    case (st_in_hexstring_2nd):
+        inHexstring2nd(ch);
+        return;
+
     default:
         throw std::logic_error(
             "INTERNAL ERROR: invalid state while reading token");
@@ -451,32 +455,61 @@ QPDFTokenizer::handleCharacter(char ch)
 void
 QPDFTokenizer::inHexstring(char ch)
 {
-    if (ch == '>') {
+    if ('0' <= ch && ch <= '9') {
+        this->char_code = 16 * (int(ch) - int('0'));
+        this->state = st_in_hexstring_2nd;
+
+    } else if ('A' <= ch && ch <= 'F') {
+        this->char_code = 16 * (10 + int(ch) - int('A'));
+        this->state = st_in_hexstring_2nd;
+
+    } else if ('a' <= ch && ch <= 'f') {
+        this->char_code = 16 * (10 + int(ch) - int('a'));
+        this->state = st_in_hexstring_2nd;
+
+    } else if (ch == '>') {
         this->type = tt_string;
         this->state = st_token_ready;
-        if (this->val.length() % 2) {
-            // PDF spec says odd hexstrings have implicit
-            // trailing 0.
-            this->val += '0';
-        }
-        char num[3];
-        num[2] = '\0';
-        std::string nval;
-        for (unsigned int i = 0; i < this->val.length(); i += 2) {
-            num[0] = this->val.at(i);
-            num[1] = this->val.at(i + 1);
-            char nch = static_cast<char>(strtol(num, nullptr, 16));
-            nval += nch;
-        }
-        this->val.clear();
-        this->val += nval;
-    } else if (QUtil::is_hex_digit(ch)) {
-        this->val += ch;
+
     } else if (isSpace(ch)) {
         // ignore
+
     } else {
         this->type = tt_bad;
         QTC::TC("qpdf", "QPDFTokenizer bad hexstring character");
+        this->error_message =
+            std::string("invalid character (") + ch + ") in hexstring";
+        this->state = st_token_ready;
+    }
+}
+
+void
+QPDFTokenizer::inHexstring2nd(char ch)
+{
+    if ('0' <= ch && ch <= '9') {
+        this->val += char(this->char_code + int(ch) - int('0'));
+        this->state = st_in_hexstring;
+
+    } else if ('A' <= ch && ch <= 'F') {
+        this->val += char(this->char_code + 10 + int(ch) - int('A'));
+        this->state = st_in_hexstring;
+
+    } else if ('a' <= ch && ch <= 'f') {
+        this->val += char(this->char_code + 10 + int(ch) - int('a'));
+        this->state = st_in_hexstring;
+
+    } else if (ch == '>') {
+        // PDF spec says odd hexstrings have implicit trailing 0.
+        this->val += char(this->char_code);
+        this->type = tt_string;
+        this->state = st_token_ready;
+
+    } else if (isSpace(ch)) {
+        // ignore
+
+    } else {
+        this->type = tt_bad;
+        QTC::TC("qpdf", "QPDFTokenizer bad hexstring 2nd character");
         this->error_message =
             std::string("invalid character (") + ch + ") in hexstring";
         this->state = st_token_ready;
@@ -526,7 +559,7 @@ void
 QPDFTokenizer::inCharCode(char ch)
 {
     size_t bs_num_count = strlen(this->bs_num_register);
-    bool ch_is_octal = ((ch >= '0') && (ch <= '7'));
+    bool ch_is_octal = ('0' <= ch && ch <= '7');
     if ((bs_num_count == 3) || ((bs_num_count > 0) && (!ch_is_octal))) {
         // We've accumulated \ddd.  PDF Spec says to ignore
         // high-order overflow.

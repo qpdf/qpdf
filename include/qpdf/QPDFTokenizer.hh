@@ -210,6 +210,7 @@ class QPDFTokenizer
         st_gt,
         st_literal,
         st_in_hexstring,
+        st_in_hexstring_2nd,
         st_inline_image,
         st_token_ready
     };
@@ -217,6 +218,7 @@ class QPDFTokenizer
     void handleCharacter(char);
     void inCharCode(char);
     void inHexstring(char);
+    void inHexstring2nd(char);
     void inString(char);
 
     void reset();
@@ -238,6 +240,7 @@ class QPDFTokenizer
 
     // State for strings
     int string_depth;
+    int char_code;
     char bs_num_register[4];
 };
 
