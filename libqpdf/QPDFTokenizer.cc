@@ -78,8 +78,8 @@ QPDFTokenizer::reset()
 {
     state = st_top;
     type = tt_bad;
-    val = "";
-    raw_val = "";
+    val.clear();
+    raw_val.clear();
     error_message = "";
     unread_char = false;
     char_to_unread = '\0';
@@ -175,7 +175,8 @@ QPDFTokenizer::resolveLiteral()
                 nval.append(1, ch);
             }
         }
-        this->val = nval;
+        this->val.clear();
+        this->val += nval;
     } else if (QUtil::is_number(this->val.c_str())) {
         if (this->val.find('.') != std::string::npos) {
             this->type = tt_real;
@@ -282,7 +283,7 @@ QPDFTokenizer::presentCharacter(char ch)
         }
     } else if (this->state == st_lt) {
         if (ch == '<') {
-            this->val = "<<";
+            this->val += "<<";
             this->type = tt_dict_open;
             this->state = st_token_ready;
         } else {
@@ -291,11 +292,11 @@ QPDFTokenizer::presentCharacter(char ch)
         }
     } else if (this->state == st_gt) {
         if (ch == '>') {
-            this->val = ">>";
+            this->val += ">>";
             this->type = tt_dict_close;
             this->state = st_token_ready;
         } else {
-            this->val = ">";
+            this->val += ">";
             this->type = tt_bad;
             QTC::TC("qpdf", "QPDFTokenizer bad >");
             this->error_message = "unexpected >";
@@ -437,7 +438,8 @@ QPDFTokenizer::presentCharacter(char ch)
                 char nch = static_cast<char>(strtol(num, nullptr, 16));
                 nval += nch;
             }
-            this->val = nval;
+            this->val.clear();
+            this->val += nval;
         } else if (QUtil::is_hex_digit(ch)) {
             this->val += ch;
         } else if (isSpace(ch)) {
@@ -600,7 +602,8 @@ QPDFTokenizer::getToken(Token& token, bool& unread_char, char& ch)
     ch = this->char_to_unread;
     if (ready) {
         if (this->type == tt_bad) {
-            this->val = this->raw_val;
+            this->val.clear();
+            this->val += this->raw_val;
         }
         token =
             Token(this->type, this->val, this->raw_val, this->error_message);
