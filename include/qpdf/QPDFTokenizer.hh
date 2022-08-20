@@ -241,7 +241,7 @@ class QPDFTokenizer
     // State for strings
     int string_depth;
     int char_code;
-    char bs_num_register[4];
+    int digit_count;
 };
 
 #endif // QPDFTOKENIZER_HH
