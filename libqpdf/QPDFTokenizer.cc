@@ -222,7 +222,7 @@ QPDFTokenizer::handleCharacter(char ch)
             "INTERNAL ERROR: QPDF tokenizer presented character "
             "while token is waiting");
 
-    case (st_top):
+    case st_top:
         // Note: we specifically do not use ctype here.  It is
         // locale-dependent.
         if (isSpace(ch)) {
@@ -254,40 +254,42 @@ QPDFTokenizer::handleCharacter(char ch)
             this->state = st_gt;
             return;
 
-        default:
+        case (')'):
+            this->type = tt_bad;
+            QTC::TC("qpdf", "QPDFTokenizer bad )");
+            this->error_message = "unexpected )";
             this->val += ch;
-            switch (ch) {
-            case ')':
-                this->type = tt_bad;
-                QTC::TC("qpdf", "QPDFTokenizer bad )");
-                this->error_message = "unexpected )";
-                this->state = st_token_ready;
-                return;
+            this->state = st_token_ready;
+            return;
 
-            case '[':
-                this->type = tt_array_open;
-                this->state = st_token_ready;
-                return;
+        case '[':
+            this->type = tt_array_open;
+            this->state = st_token_ready;
+            this->val += ch;
+            return;
 
-            case ']':
-                this->type = tt_array_close;
-                this->state = st_token_ready;
-                return;
+        case ']':
+            this->type = tt_array_close;
+            this->val += ch;
+            this->state = st_token_ready;
+            return;
 
-            case '{':
-                this->type = tt_brace_open;
-                this->state = st_token_ready;
-                return;
+        case '{':
+            this->type = tt_brace_open;
+            this->state = st_token_ready;
+            this->val += ch;
+            return;
 
-            case '}':
-                this->type = tt_brace_close;
-                this->state = st_token_ready;
-                return;
+        case '}':
+            this->type = tt_brace_close;
+            this->state = st_token_ready;
+            this->val += ch;
+            return;
 
-            default:
-                this->state = st_literal;
-                return;
-            }
+        default:
+            this->state = st_literal;
+            this->val += ch;
+            return;
         }
 
     case st_in_space:
@@ -297,10 +299,11 @@ QPDFTokenizer::handleCharacter(char ch)
             this->unread_char = true;
             this->char_to_unread = ch;
             this->state = st_token_ready;
+            return;
         } else {
             this->val += ch;
+            return;
         }
-        return;
 
     case st_in_comment:
         if ((ch == '\r') || (ch == '\n')) {
@@ -345,7 +348,7 @@ QPDFTokenizer::handleCharacter(char ch)
         }
         return;
 
-    case st_in_string:
+    case (st_in_string):
         inString(ch);
         return;
 
@@ -438,11 +441,11 @@ QPDFTokenizer::handleCharacter(char ch)
         }
         return;
 
-    case (st_in_hexstring):
+    case st_in_hexstring:
         inHexstring(ch);
         return;
 
-    case (st_in_hexstring_2nd):
+    case st_in_hexstring_2nd:
         inHexstring2nd(ch);
         return;
 
