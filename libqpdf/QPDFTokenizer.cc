@@ -486,26 +486,37 @@ QPDFTokenizer::inHexstring(char ch)
 void
 QPDFTokenizer::inString(char ch)
 {
-    if (ch == '\\') {
+    switch (ch) {
+    case '\\':
         this->state = st_string_escape;
         return;
-    } else if (ch == '(') {
+
+    case '(':
         this->val += ch;
         ++this->string_depth;
         return;
-    } else if ((ch == ')') && (--this->string_depth == 0)) {
-        this->type = tt_string;
-        this->state = st_token_ready;
+
+    case ')':
+        if (--this->string_depth == 0) {
+            this->type = tt_string;
+            this->state = st_token_ready;
+            return;
+        }
+
+        this->val += ch;
         return;
-    } else if (ch == '\r') {
+
+    case '\r':
         // CR by itself is converted to LF
         this->val += '\n';
         this->state = st_string_after_cr;
         return;
-    } else if (ch == '\n') {
+
+    case '\n':
         this->val += ch;
         return;
-    } else {
+
+    default:
         this->val += ch;
         return;
     }
@@ -524,7 +535,7 @@ QPDFTokenizer::inCharCode(char ch)
         memset(this->bs_num_register, '\0', sizeof(this->bs_num_register));
         bs_num_count = 0;
         this->state = st_in_string;
-        handleCharacter(ch);
+        inString(ch);
         return;
     } else if (ch_is_octal) {
         this->bs_num_register[bs_num_count++] = ch;
