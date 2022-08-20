@@ -85,7 +85,6 @@ QPDFTokenizer::reset()
     char_to_unread = '\0';
     inline_image_bytes = 0;
     string_depth = 0;
-    last_char_was_bs = false;
 }
 
 QPDFTokenizer::Token::Token(token_type_e type, std::string const& value) :
@@ -244,7 +243,6 @@ QPDFTokenizer::handleCharacter(char ch)
         case '(':
             this->string_depth = 1;
             memset(this->bs_num_register, '\0', sizeof(this->bs_num_register));
-            this->last_char_was_bs = false;
             this->state = st_in_string;
             return;
 
@@ -348,22 +346,66 @@ QPDFTokenizer::handleCharacter(char ch)
         return;
 
     case st_in_string:
-        {
-            inString(ch);
-            this->last_char_was_bs =
-                ((!this->last_char_was_bs) && (ch == '\\'));
-        }
+        inString(ch);
         return;
 
-    case (st_string_after_cr):
+    case st_string_after_cr:
         // CR LF in strings are either ignored or normalized to CR
         this->state = st_in_string;
         if (ch != '\n') {
-            handleCharacter(ch);
+            inString(ch);
         }
         return;
 
-    case (st_char_code):
+    case st_string_escape:
+        this->state = st_in_string;
+        switch (ch) {
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+            this->state = st_char_code;
+            inCharCode(ch);
+            return;
+
+        case 'n':
+            this->val += '\n';
+            return;
+
+        case 'r':
+            this->val += '\r';
+            return;
+
+        case 't':
+            this->val += '\t';
+            return;
+
+        case 'b':
+            this->val += '\b';
+            return;
+
+        case 'f':
+            this->val += '\f';
+            return;
+
+        case '\n':
+            return;
+
+        case '\r':
+            this->state = st_string_after_cr;
+            return;
+
+        default:
+            // PDF spec says backslash is ignored before anything else
+            this->val += ch;
+            return;
+        }
+
+    case st_char_code:
         inCharCode(ch);
         return;
 
@@ -444,47 +486,9 @@ QPDFTokenizer::inHexstring(char ch)
 void
 QPDFTokenizer::inString(char ch)
 {
-    bool ch_is_octal = ((ch >= '0') && (ch <= '7'));
-    if (ch_is_octal && this->last_char_was_bs) {
-        this->state = st_char_code;
-        inCharCode(ch);
+    if (ch == '\\') {
+        this->state = st_string_escape;
         return;
-    } else if (this->last_char_was_bs) {
-        switch (ch) {
-        case 'n':
-            this->val += '\n';
-            return;
-
-        case 'r':
-            this->val += '\r';
-            return;
-
-        case 't':
-            this->val += '\t';
-            return;
-
-        case 'b':
-            this->val += '\b';
-            return;
-
-        case 'f':
-            this->val += '\f';
-            return;
-
-        case '\n':
-            return;
-
-        case '\r':
-            this->state = st_string_after_cr;
-            return;
-
-        default:
-            // PDF spec says backslash is ignored before anything else
-            this->val += ch;
-            return;
-        }
-    } else if (ch == '\\') {
-        // last_char_was_bs is set/cleared below as appropriate
     } else if (ch == '(') {
         this->val += ch;
         ++this->string_depth;
