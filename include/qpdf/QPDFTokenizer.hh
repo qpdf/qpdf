@@ -200,26 +200,36 @@ class QPDFTokenizer
 
     enum state_e {
         st_top,
+        st_in_hexstring,
+        st_in_string,
+        st_in_hexstring_2nd,
+        st_literal,
         st_in_space,
         st_in_comment,
-        st_in_string,
         st_string_escape,
         st_char_code,
         st_string_after_cr,
         st_lt,
         st_gt,
-        st_literal,
-        st_in_hexstring,
-        st_in_hexstring_2nd,
         st_inline_image,
         st_token_ready
     };
 
     void handleCharacter(char);
+    void inTop(char);
+    void inSpace(char);
+    void inComment(char);
+    void inString(char);
+    void inLt(char);
+    void inGt(char);
+    void inStringAfterCR(char);
+    void inStringEscape(char);
+    void inLiteral(char);
     void inCharCode(char);
     void inHexstring(char);
     void inHexstring2nd(char);
-    void inString(char);
+    void inInlineImage(char);
+    void inTokenReady(char);
 
     void reset();
 

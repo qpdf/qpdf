@@ -217,134 +217,24 @@ QPDFTokenizer::handleCharacter(char ch)
     // the character that caused a state change in the new state.
 
     switch (this->state) {
-    case (st_token_ready):
-        throw std::logic_error(
-            "INTERNAL ERROR: QPDF tokenizer presented character "
-            "while token is waiting");
-
     case st_top:
-        // Note: we specifically do not use ctype here.  It is
-        // locale-dependent.
-        if (isSpace(ch)) {
-            if (this->include_ignorable) {
-                this->state = st_in_space;
-                this->val += ch;
-            }
-            return;
-        }
-        switch (ch) {
-        case '%':
-            this->state = st_in_comment;
-            if (this->include_ignorable) {
-                this->val += ch;
-            }
-            return;
-
-        case '(':
-            this->string_depth = 1;
-            this->state = st_in_string;
-            return;
-
-        case '<':
-            this->state = st_lt;
-            return;
-
-        case '>':
-            this->state = st_gt;
-            return;
-
-        case (')'):
-            this->type = tt_bad;
-            QTC::TC("qpdf", "QPDFTokenizer bad )");
-            this->error_message = "unexpected )";
-            this->val += ch;
-            this->state = st_token_ready;
-            return;
-
-        case '[':
-            this->type = tt_array_open;
-            this->state = st_token_ready;
-            this->val += ch;
-            return;
-
-        case ']':
-            this->type = tt_array_close;
-            this->val += ch;
-            this->state = st_token_ready;
-            return;
-
-        case '{':
-            this->type = tt_brace_open;
-            this->state = st_token_ready;
-            this->val += ch;
-            return;
-
-        case '}':
-            this->type = tt_brace_close;
-            this->state = st_token_ready;
-            this->val += ch;
-            return;
-
-        default:
-            this->state = st_literal;
-            this->val += ch;
-            return;
-        }
+        inTop(ch);
+        return;
 
     case st_in_space:
-        // We only enter this state if include_ignorable is true.
-        if (!isSpace(ch)) {
-            this->type = tt_space;
-            this->unread_char = true;
-            this->char_to_unread = ch;
-            this->state = st_token_ready;
-            return;
-        } else {
-            this->val += ch;
-            return;
-        }
+        inSpace(ch);
+        return;
 
     case st_in_comment:
-        if ((ch == '\r') || (ch == '\n')) {
-            if (this->include_ignorable) {
-                this->type = tt_comment;
-                this->unread_char = true;
-                this->char_to_unread = ch;
-                this->state = st_token_ready;
-            } else {
-                this->state = st_top;
-            }
-        } else if (this->include_ignorable) {
-            this->val += ch;
-        }
+        inComment(ch);
         return;
 
     case st_lt:
-        if (ch == '<') {
-            this->val += "<<";
-            this->type = tt_dict_open;
-            this->state = st_token_ready;
-            return;
-        }
-
-        this->state = st_in_hexstring;
-        inHexstring(ch);
+        inLt(ch);
         return;
 
     case st_gt:
-        if (ch == '>') {
-            this->val += ">>";
-            this->type = tt_dict_close;
-            this->state = st_token_ready;
-        } else {
-            this->val += ">";
-            this->type = tt_bad;
-            QTC::TC("qpdf", "QPDFTokenizer bad >");
-            this->error_message = "unexpected >";
-            this->unread_char = true;
-            this->char_to_unread = ch;
-            this->state = st_token_ready;
-        }
+        inGt(ch);
         return;
 
     case st_in_string:
@@ -352,95 +242,25 @@ QPDFTokenizer::handleCharacter(char ch)
         return;
 
     case st_string_after_cr:
-        // CR LF in strings are either ignored or normalized to CR
-        this->state = st_in_string;
-        if (ch != '\n') {
-            inString(ch);
-        }
+        inStringAfterCR(ch);
         return;
 
     case st_string_escape:
-        this->state = st_in_string;
-        switch (ch) {
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-            this->state = st_char_code;
-            this->char_code = 0;
-            this->digit_count = 0;
-            inCharCode(ch);
-            return;
-
-        case 'n':
-            this->val += '\n';
-            return;
-
-        case 'r':
-            this->val += '\r';
-            return;
-
-        case 't':
-            this->val += '\t';
-            return;
-
-        case 'b':
-            this->val += '\b';
-            return;
-
-        case 'f':
-            this->val += '\f';
-            return;
-
-        case '\n':
-            return;
-
-        case '\r':
-            this->state = st_string_after_cr;
-            return;
-
-        default:
-            // PDF spec says backslash is ignored before anything else
-            this->val += ch;
-            return;
-        }
+        inStringEscape(ch);
+        return;
 
     case st_char_code:
         inCharCode(ch);
         return;
 
     case st_literal:
-        if (isDelimiter(ch)) {
-            // A C-locale whitespace character or delimiter terminates
-            // token.  It is important to unread the whitespace
-            // character even though it is ignored since it may be the
-            // newline after a stream keyword.  Removing it here could
-            // make the stream-reading code break on some files,
-            // though not on any files in the test suite as of this
-            // writing.
-
-            this->type = tt_word;
-            this->unread_char = true;
-            this->char_to_unread = ch;
-            this->state = st_token_ready;
-        } else {
-            this->val += ch;
-        }
+        inLiteral(ch);
         return;
 
     case st_inline_image:
-        this->val += ch;
-        if (this->val.length() == this->inline_image_bytes) {
-            QTC::TC("qpdf", "QPDFTokenizer found EI by byte count");
-            this->type = tt_inline_image;
-            this->inline_image_bytes = 0;
-            this->state = st_token_ready;
-        }
+        inInlineImage(ch);
         return;
+        this->val += ch;
 
     case st_in_hexstring:
         inHexstring(ch);
@@ -450,9 +270,280 @@ QPDFTokenizer::handleCharacter(char ch)
         inHexstring2nd(ch);
         return;
 
+    case (st_token_ready):
+        inTokenReady(ch);
+        return;
+
     default:
         throw std::logic_error(
             "INTERNAL ERROR: invalid state while reading token");
+    }
+}
+
+void
+QPDFTokenizer::inTokenReady(char ch)
+{
+    throw std::logic_error("INTERNAL ERROR: QPDF tokenizer presented character "
+                           "while token is waiting");
+}
+
+void
+QPDFTokenizer::inTop(char ch)
+{
+    // Note: we specifically do not use ctype here.  It is
+    // locale-dependent.
+    if (isSpace(ch)) {
+        if (this->include_ignorable) {
+            this->state = st_in_space;
+            this->val += ch;
+            return;
+        }
+        return;
+    }
+    switch (ch) {
+    case '%':
+        this->state = st_in_comment;
+        if (this->include_ignorable) {
+            this->val += ch;
+        }
+        return;
+
+    case '(':
+        this->string_depth = 1;
+        this->state = st_in_string;
+        return;
+
+    case '<':
+        this->state = st_lt;
+        return;
+
+    case '>':
+        this->state = st_gt;
+        return;
+
+    case (')'):
+        this->type = tt_bad;
+        QTC::TC("qpdf", "QPDFTokenizer bad )");
+        this->error_message = "unexpected )";
+        this->val += ch;
+        this->state = st_token_ready;
+        return;
+
+    case '[':
+        this->type = tt_array_open;
+        this->state = st_token_ready;
+        this->val += ch;
+        return;
+
+    case ']':
+        this->type = tt_array_close;
+        this->val += ch;
+        this->state = st_token_ready;
+        return;
+
+    case '{':
+        this->type = tt_brace_open;
+        this->state = st_token_ready;
+        this->val += ch;
+        return;
+
+    case '}':
+        this->type = tt_brace_close;
+        this->state = st_token_ready;
+        this->val += ch;
+        return;
+
+    default:
+        this->state = st_literal;
+        this->val += ch;
+        return;
+    }
+}
+
+void
+QPDFTokenizer::inSpace(char ch)
+{
+    // We only enter this state if include_ignorable is true.
+    if (!isSpace(ch)) {
+        this->type = tt_space;
+        this->unread_char = true;
+        this->char_to_unread = ch;
+        this->state = st_token_ready;
+        return;
+    } else {
+        this->val += ch;
+        return;
+    }
+}
+
+void
+QPDFTokenizer::inComment(char ch)
+{
+    if ((ch == '\r') || (ch == '\n')) {
+        if (this->include_ignorable) {
+            this->type = tt_comment;
+            this->unread_char = true;
+            this->char_to_unread = ch;
+            this->state = st_token_ready;
+        } else {
+            this->state = st_top;
+        }
+    } else if (this->include_ignorable) {
+        this->val += ch;
+    }
+}
+
+void
+QPDFTokenizer::inString(char ch)
+{
+    switch (ch) {
+    case '\\':
+        this->state = st_string_escape;
+        return;
+
+    case '(':
+        this->val += ch;
+        ++this->string_depth;
+        return;
+
+    case ')':
+        if (--this->string_depth == 0) {
+            this->type = tt_string;
+            this->state = st_token_ready;
+            return;
+        }
+
+        this->val += ch;
+        return;
+
+    case '\r':
+        // CR by itself is converted to LF
+        this->val += '\n';
+        this->state = st_string_after_cr;
+        return;
+
+    case '\n':
+        this->val += ch;
+        return;
+
+    default:
+        this->val += ch;
+        return;
+    }
+}
+
+void
+QPDFTokenizer::inStringEscape(char ch)
+{
+    this->state = st_in_string;
+    switch (ch) {
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+        this->state = st_char_code;
+        this->char_code = 0;
+        this->digit_count = 0;
+        inCharCode(ch);
+        return;
+
+    case 'n':
+        this->val += '\n';
+        return;
+
+    case 'r':
+        this->val += '\r';
+        return;
+
+    case 't':
+        this->val += '\t';
+        return;
+
+    case 'b':
+        this->val += '\b';
+        return;
+
+    case 'f':
+        this->val += '\f';
+        return;
+
+    case '\n':
+        return;
+
+    case '\r':
+        this->state = st_string_after_cr;
+        return;
+
+    default:
+        // PDF spec says backslash is ignored before anything else
+        this->val += ch;
+        return;
+    }
+}
+
+void
+QPDFTokenizer::inStringAfterCR(char ch)
+{
+    this->state = st_in_string;
+    if (ch != '\n') {
+        inString(ch);
+    }
+}
+
+void
+QPDFTokenizer::inLt(char ch)
+{
+    if (ch == '<') {
+        this->val += "<<";
+        this->type = tt_dict_open;
+        this->state = st_token_ready;
+        return;
+    }
+
+    this->state = st_in_hexstring;
+    inHexstring(ch);
+}
+
+void
+QPDFTokenizer::inGt(char ch)
+{
+    if (ch == '>') {
+        this->val += ">>";
+        this->type = tt_dict_close;
+        this->state = st_token_ready;
+    } else {
+        this->val += ">";
+        this->type = tt_bad;
+        QTC::TC("qpdf", "QPDFTokenizer bad >");
+        this->error_message = "unexpected >";
+        this->unread_char = true;
+        this->char_to_unread = ch;
+        this->state = st_token_ready;
+    }
+}
+
+void
+QPDFTokenizer::inLiteral(char ch)
+{
+    if (isDelimiter(ch)) {
+        // A C-locale whitespace character or delimiter terminates
+        // token.  It is important to unread the whitespace
+        // character even though it is ignored since it may be the
+        // newline after a stream keyword.  Removing it here could
+        // make the stream-reading code break on some files,
+        // though not on any files in the test suite as of this
+        // writing.
+
+        this->type = tt_word;
+        this->unread_char = true;
+        this->char_to_unread = ch;
+        this->state = st_token_ready;
+    } else {
+        this->val += ch;
     }
 }
 
@@ -521,45 +612,6 @@ QPDFTokenizer::inHexstring2nd(char ch)
 }
 
 void
-QPDFTokenizer::inString(char ch)
-{
-    switch (ch) {
-    case '\\':
-        this->state = st_string_escape;
-        return;
-
-    case '(':
-        this->val += ch;
-        ++this->string_depth;
-        return;
-
-    case ')':
-        if (--this->string_depth == 0) {
-            this->type = tt_string;
-            this->state = st_token_ready;
-            return;
-        }
-
-        this->val += ch;
-        return;
-
-    case '\r':
-        // CR by itself is converted to LF
-        this->val += '\n';
-        this->state = st_string_after_cr;
-        return;
-
-    case '\n':
-        this->val += ch;
-        return;
-
-    default:
-        this->val += ch;
-        return;
-    }
-}
-
-void
 QPDFTokenizer::inCharCode(char ch)
 {
     if (('0' <= ch) && (ch <= '7')) {
@@ -573,6 +625,18 @@ QPDFTokenizer::inCharCode(char ch)
     this->val += char(this->char_code % 256);
     this->state = st_in_string;
     return;
+}
+
+void
+QPDFTokenizer::inInlineImage(char ch)
+{
+    this->val += ch;
+    if (this->val.length() == this->inline_image_bytes) {
+        QTC::TC("qpdf", "QPDFTokenizer found EI by byte count");
+        this->type = tt_inline_image;
+        this->inline_image_bytes = 0;
+        this->state = st_token_ready;
+    }
 }
 
 void
