@@ -203,6 +203,7 @@ class QPDFTokenizer
         st_in_hexstring,
         st_in_string,
         st_in_hexstring_2nd,
+        st_name,
         st_literal,
         st_in_space,
         st_in_comment,
@@ -212,6 +213,8 @@ class QPDFTokenizer
         st_lt,
         st_gt,
         st_inline_image,
+        st_name_hex1,
+        st_name_hex2,
         st_token_ready
     };
 
@@ -220,6 +223,7 @@ class QPDFTokenizer
     void inSpace(char);
     void inComment(char);
     void inString(char);
+    void inName(char);
     void inLt(char);
     void inGt(char);
     void inStringAfterCR(char);
@@ -230,7 +234,8 @@ class QPDFTokenizer
     void inHexstring2nd(char);
     void inInlineImage(char);
     void inTokenReady(char);
-
+    void inNameHex1(char);
+    void inNameHex2(char);
     void reset();
 
     // Lexer state
@@ -247,10 +252,12 @@ class QPDFTokenizer
     bool unread_char;
     char char_to_unread;
     size_t inline_image_bytes;
+    bool bad;
 
     // State for strings
     int string_depth;
     int char_code;
+    char hex_char;
     int digit_count;
 };
 

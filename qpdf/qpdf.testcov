@@ -68,7 +68,8 @@ QPDFTokenizer bad > 0
 QPDFTokenizer bad hexstring character 0
 QPDFTokenizer bad hexstring 2nd character 0
 QPDFTokenizer null in name 0
-QPDFTokenizer bad name 0
+QPDFTokenizer bad name 1 0
+QPDFTokenizer bad name 2 0
 QPDF_Stream invalid filter 0
 QPDF UseOutlines but no Outlines 0
 QPDFObjectHandle makeDirect loop 0
