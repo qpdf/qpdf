@@ -975,25 +975,21 @@ QPDFTokenizer::readToken(
     size_t max_len)
 {
     qpdf_offset_t offset = input->tell();
-    Token token;
-    bool unread_char;
-    char char_to_unread;
-    bool presented_eof = false;
-    while (!getToken(token, unread_char, char_to_unread)) {
+
+    while (this->state != st_token_ready) {
         char ch;
         if (input->read(&ch, 1) == 0) {
-            if (!presented_eof) {
-                presentEOF();
-                presented_eof = true;
-                if ((this->type == tt_eof) && (!this->allow_eof)) {
-                    // Nothing in the qpdf library calls readToken
-                    // without allowEOF anymore, so this case is not
-                    // exercised.
-                    this->type = tt_bad;
-                    this->error_message = "unexpected EOF";
-                    offset = input->getLastOffset();
-                }
-            } else {
+            presentEOF();
+
+            if ((this->type == tt_eof) && (!this->allow_eof)) {
+                // Nothing in the qpdf library calls readToken
+                // without allowEOF anymore, so this case is not
+                // exercised.
+                this->type = tt_bad;
+                this->error_message = "unexpected EOF";
+                offset = input->getLastOffset();
+            }
+            if (this->state != st_token_ready) {
                 throw std::logic_error(
                     "getToken returned false after presenting EOF");
             }
@@ -1014,6 +1010,10 @@ QPDFTokenizer::readToken(
         }
     }
 
+    Token token;
+    bool unread_char;
+    char char_to_unread;
+    getToken(token, unread_char, char_to_unread);
     if (unread_char) {
         input->unreadCh(char_to_unread);
     }
