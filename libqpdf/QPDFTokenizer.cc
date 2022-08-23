@@ -782,23 +782,38 @@ QPDFTokenizer::inInlineImage(char ch)
 void
 QPDFTokenizer::presentEOF()
 {
-    if (this->state == st_name || this->state == st_name_hex1 ||
-        this->state == st_name_hex2 || this->state == st_number ||
-        this->state == st_real || this->state == st_sign ||
-        this->state == st_decimal || this->state == st_literal) {
-
+    switch (this->state) {
+    case st_name:
+    case st_name_hex1:
+    case st_name_hex2:
+    case st_number:
+    case st_real:
+    case st_sign:
+    case st_decimal:
+    case st_literal:
         QTC::TC("qpdf", "QPDFTokenizer EOF reading appendable token");
         // Push any delimiter to the state machine to finish off the final
         // token.
         presentCharacter('\f');
         this->unread_char = false;
-    } else if ((this->include_ignorable) && (this->state == st_in_space)) {
-        this->type = tt_space;
-    } else if ((this->include_ignorable) && (this->state == st_in_comment)) {
-        this->type = tt_comment;
-    } else if (betweenTokens()) {
+        break;
+
+    case st_top:
         this->type = tt_eof;
-    } else if (this->state != st_token_ready) {
+        break;
+
+    case st_in_space:
+        this->type = this->include_ignorable ? tt_space : tt_eof;
+        break;
+
+    case st_in_comment:
+        this->type = this->include_ignorable ? tt_comment : tt_bad;
+        break;
+
+    case st_token_ready:
+        break;
+
+    default:
         QTC::TC("qpdf", "QPDFTokenizer EOF reading token");
         this->type = tt_bad;
         this->error_message = "EOF while reading token";
