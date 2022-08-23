@@ -193,7 +193,6 @@ class QPDFTokenizer
     QPDFTokenizer(QPDFTokenizer const&) = delete;
     QPDFTokenizer& operator=(QPDFTokenizer const&) = delete;
 
-    void resolveLiteral();
     bool isSpace(char);
     bool isDelimiter(char);
     void findEI(std::shared_ptr<InputSource> input);

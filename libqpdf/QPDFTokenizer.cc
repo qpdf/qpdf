@@ -132,34 +132,13 @@ QPDFTokenizer::isDelimiter(char ch)
 }
 
 void
-QPDFTokenizer::resolveLiteral()
-{
-    if ((this->val == "true") || (this->val == "false")) {
-        this->type = tt_bool;
-    } else if (this->val == "null") {
-        this->type = tt_null;
-    } else {
-        // I don't really know what it is, so leave it as tt_word.
-        // Lots of cases ($, #, etc.) other than actual words fall
-        // into this category, but that's okay at least for now.
-        this->type = tt_word;
-    }
-}
-
-void
 QPDFTokenizer::presentCharacter(char ch)
 {
-    char orig_ch = ch;
-
     handleCharacter(ch);
-
-    if ((this->state == st_token_ready) && (this->type == tt_word)) {
-        resolveLiteral();
-    }
 
     if (!(betweenTokens() ||
           ((this->state == st_token_ready) && this->unread_char))) {
-        this->raw_val += orig_ch;
+        this->raw_val += ch;
     }
 }
 
@@ -697,10 +676,12 @@ QPDFTokenizer::inLiteral(char ch)
         // though not on any files in the test suite as of this
         // writing.
 
-        this->type = tt_word;
         this->unread_char = true;
         this->char_to_unread = ch;
         this->state = st_token_ready;
+        this->type = (this->val == "true") || (this->val == "false")
+            ? tt_bool
+            : (this->val == "null" ? tt_null : tt_word);
     } else {
         this->val += ch;
     }
@@ -804,14 +785,13 @@ QPDFTokenizer::presentEOF()
     if (this->state == st_name || this->state == st_name_hex1 ||
         this->state == st_name_hex2 || this->state == st_number ||
         this->state == st_real || this->state == st_sign ||
-        this->state == st_decimal) {
+        this->state == st_decimal || this->state == st_literal) {
+
+        QTC::TC("qpdf", "QPDFTokenizer EOF reading appendable token");
         // Push any delimiter to the state machine to finish off the final
         // token.
         presentCharacter('\f');
         this->unread_char = false;
-    } else if (this->state == st_literal) {
-        QTC::TC("qpdf", "QPDFTokenizer EOF reading appendable token");
-        resolveLiteral();
     } else if ((this->include_ignorable) && (this->state == st_in_space)) {
         this->type = tt_space;
     } else if ((this->include_ignorable) && (this->state == st_in_comment)) {
@@ -823,7 +803,6 @@ QPDFTokenizer::presentEOF()
         this->type = tt_bad;
         this->error_message = "EOF while reading token";
     }
-
     this->state = st_token_ready;
 }
 
