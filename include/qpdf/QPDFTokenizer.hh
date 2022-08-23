@@ -213,6 +213,11 @@ class QPDFTokenizer
         st_lt,
         st_gt,
         st_inline_image,
+        st_sign,
+        st_number,
+        st_real,
+        st_decimal,
+
         st_name_hex1,
         st_name_hex2,
         st_token_ready
@@ -236,6 +241,10 @@ class QPDFTokenizer
     void inTokenReady(char);
     void inNameHex1(char);
     void inNameHex2(char);
+    void inSign(char);
+    void inDecimal(char);
+    void inNumber(char);
+    void inReal(char);
     void reset();
 
     // Lexer state

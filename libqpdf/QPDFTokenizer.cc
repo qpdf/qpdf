@@ -134,13 +134,7 @@ QPDFTokenizer::isDelimiter(char ch)
 void
 QPDFTokenizer::resolveLiteral()
 {
-    if (QUtil::is_number(this->val.c_str())) {
-        if (this->val.find('.') != std::string::npos) {
-            this->type = tt_real;
-        } else {
-            this->type = tt_integer;
-        }
-    } else if ((this->val == "true") || (this->val == "false")) {
+    if ((this->val == "true") || (this->val == "false")) {
         this->type = tt_bool;
     } else if (this->val == "null") {
         this->type = tt_null;
@@ -205,6 +199,14 @@ QPDFTokenizer::handleCharacter(char ch)
         inName(ch);
         return;
 
+    case st_number:
+        inNumber(ch);
+        return;
+
+    case st_real:
+        inReal(ch);
+        return;
+
     case st_string_after_cr:
         inStringAfterCR(ch);
         return;
@@ -224,7 +226,6 @@ QPDFTokenizer::handleCharacter(char ch)
     case st_inline_image:
         inInlineImage(ch);
         return;
-        this->val += ch;
 
     case st_in_hexstring:
         inHexstring(ch);
@@ -240,6 +241,14 @@ QPDFTokenizer::handleCharacter(char ch)
 
     case st_name_hex2:
         inNameHex2(ch);
+        return;
+
+    case st_sign:
+        inSign(ch);
+        return;
+
+    case st_decimal:
+        inDecimal(ch);
         return;
 
     case (st_token_ready):
@@ -327,6 +336,31 @@ QPDFTokenizer::inTop(char ch)
 
     case '/':
         this->state = st_name;
+        this->val += ch;
+        return;
+
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+        this->state = st_number;
+        this->val += ch;
+        return;
+
+    case '+':
+    case '-':
+        this->state = st_sign;
+        this->val += ch;
+        return;
+
+    case '.':
+        this->state = st_decimal;
         this->val += ch;
         return;
 
@@ -496,6 +530,67 @@ QPDFTokenizer::inNameHex2(char ch)
     }
 }
 
+void
+QPDFTokenizer::inSign(char ch)
+{
+    if (QUtil::is_digit(ch)) {
+        this->state = st_number;
+        this->val += ch;
+    } else if (ch == '.') {
+        this->state = st_decimal;
+        this->val += ch;
+    } else {
+        this->state = st_literal;
+        inLiteral(ch);
+    }
+}
+
+void
+QPDFTokenizer::inDecimal(char ch)
+{
+    if (QUtil::is_digit(ch)) {
+        this->state = st_real;
+        this->val += ch;
+    } else {
+        this->state = st_literal;
+        inLiteral(ch);
+    }
+}
+
+void
+QPDFTokenizer::inNumber(char ch)
+{
+    if (QUtil::is_digit(ch)) {
+        this->val += ch;
+    } else if (ch == '.') {
+        this->state = st_real;
+        this->val += ch;
+    } else if (isDelimiter(ch)) {
+        this->type = tt_integer;
+        this->state = st_token_ready;
+        this->unread_char = true;
+        this->char_to_unread = ch;
+    } else {
+        this->state = st_literal;
+        this->val += ch;
+    }
+}
+
+void
+QPDFTokenizer::inReal(char ch)
+{
+    if (QUtil::is_digit(ch)) {
+        this->val += ch;
+    } else if (isDelimiter(ch)) {
+        this->type = tt_real;
+        this->state = st_token_ready;
+        this->unread_char = true;
+        this->char_to_unread = ch;
+    } else {
+        this->state = st_literal;
+        this->val += ch;
+    }
+}
 void
 QPDFTokenizer::inStringEscape(char ch)
 {
@@ -707,7 +802,9 @@ void
 QPDFTokenizer::presentEOF()
 {
     if (this->state == st_name || this->state == st_name_hex1 ||
-        this->state == st_name_hex2) {
+        this->state == st_name_hex2 || this->state == st_number ||
+        this->state == st_real || this->state == st_sign ||
+        this->state == st_decimal) {
         // Push any delimiter to the state machine to finish off the final
         // token.
         presentCharacter('\f');
@@ -715,7 +812,6 @@ QPDFTokenizer::presentEOF()
     } else if (this->state == st_literal) {
         QTC::TC("qpdf", "QPDFTokenizer EOF reading appendable token");
         resolveLiteral();
-
     } else if ((this->include_ignorable) && (this->state == st_in_space)) {
         this->type = tt_space;
     } else if ((this->include_ignorable) && (this->state == st_in_comment)) {
