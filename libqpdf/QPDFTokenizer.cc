@@ -951,12 +951,11 @@ QPDFTokenizer::getToken(Token& token, bool& unread_char, char& ch)
     unread_char = !this->in_token && !this->before_token;
     ch = this->char_to_unread;
     if (ready) {
-        if (this->type == tt_bad) {
-            this->val.clear();
-            this->val += this->raw_val;
-        }
-        token =
-            Token(this->type, this->val, this->raw_val, this->error_message);
+        token = (this->type == tt_bad)
+            ? Token(
+                  this->type, this->raw_val, this->raw_val, this->error_message)
+            : Token(this->type, this->val, this->raw_val, this->error_message);
+
         this->reset();
     }
     return ready;
