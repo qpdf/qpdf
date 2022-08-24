@@ -83,7 +83,6 @@ QPDFTokenizer::reset()
     error_message = "";
     before_token = true;
     in_token = false;
-    unread_char = false;
     char_to_unread = '\0';
     inline_image_bytes = 0;
     string_depth = 0;
@@ -138,7 +137,7 @@ QPDFTokenizer::presentCharacter(char ch)
 {
     handleCharacter(ch);
 
-    if (this->in_token && !this->unread_char) {
+    if (this->in_token) { //} && !this->unread_char) {
         this->raw_val += ch;
     }
 }
@@ -370,7 +369,7 @@ QPDFTokenizer::inSpace(char ch)
     // We only enter this state if include_ignorable is true.
     if (!isSpace(ch)) {
         this->type = tt_space;
-        this->unread_char = true;
+        this->in_token = false;
         this->char_to_unread = ch;
         this->state = st_token_ready;
         return;
@@ -386,7 +385,7 @@ QPDFTokenizer::inComment(char ch)
     if ((ch == '\r') || (ch == '\n')) {
         if (this->include_ignorable) {
             this->type = tt_comment;
-            this->unread_char = true;
+            this->in_token = false;
             this->char_to_unread = ch;
             this->state = st_token_ready;
         } else {
@@ -449,7 +448,7 @@ QPDFTokenizer::inName(char ch)
         // writing.
 
         this->type = this->bad ? tt_bad : tt_name;
-        this->unread_char = true;
+        this->in_token = false;
         this->char_to_unread = ch;
         this->state = st_token_ready;
     } else if (ch == '#') {
@@ -561,7 +560,7 @@ QPDFTokenizer::inNumber(char ch)
     } else if (isDelimiter(ch)) {
         this->type = tt_integer;
         this->state = st_token_ready;
-        this->unread_char = true;
+        this->in_token = false;
         this->char_to_unread = ch;
     } else {
         this->state = st_literal;
@@ -577,7 +576,7 @@ QPDFTokenizer::inReal(char ch)
     } else if (isDelimiter(ch)) {
         this->type = tt_real;
         this->state = st_token_ready;
-        this->unread_char = true;
+        this->in_token = false;
         this->char_to_unread = ch;
     } else {
         this->state = st_literal;
@@ -672,7 +671,7 @@ QPDFTokenizer::inGt(char ch)
         this->type = tt_bad;
         QTC::TC("qpdf", "QPDFTokenizer bad >");
         this->error_message = "unexpected >";
-        this->unread_char = true;
+        this->in_token = false;
         this->char_to_unread = ch;
         this->state = st_token_ready;
     }
@@ -690,7 +689,7 @@ QPDFTokenizer::inLiteral(char ch)
         // though not on any files in the test suite as of this
         // writing.
 
-        this->unread_char = true;
+        this->in_token = false;
         this->char_to_unread = ch;
         this->state = st_token_ready;
         this->type = (this->val == "true") || (this->val == "false")
@@ -809,7 +808,7 @@ QPDFTokenizer::presentEOF()
         // Push any delimiter to the state machine to finish off the final
         // token.
         presentCharacter('\f');
-        this->unread_char = false;
+        this->in_token = true;
         break;
 
     case st_top:
@@ -949,7 +948,7 @@ bool
 QPDFTokenizer::getToken(Token& token, bool& unread_char, char& ch)
 {
     bool ready = (this->state == st_token_ready);
-    unread_char = this->unread_char;
+    unread_char = !this->in_token && !this->before_token;
     ch = this->char_to_unread;
     if (ready) {
         if (this->type == tt_bad) {

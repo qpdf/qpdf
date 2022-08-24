@@ -260,7 +260,6 @@ class QPDFTokenizer
     std::string error_message;
     bool before_token;
     bool in_token;
-    bool unread_char;
     char char_to_unread;
     size_t inline_image_bytes;
     bool bad;
