@@ -989,14 +989,13 @@ QPDFTokenizer::readToken(
                 this->error_message = "unexpected EOF";
                 offset = input->getLastOffset();
             }
-            if (this->state != st_token_ready) {
-                throw std::logic_error(
-                    "getToken returned false after presenting EOF");
-            }
         } else {
-            presentCharacter(ch);
-            if (this->before_token && (input->getLastOffset() == offset)) {
+            handleCharacter(ch);
+            if (this->before_token) {
                 ++offset;
+            }
+            if (this->in_token) {
+                this->raw_val += ch;
             }
             if (max_len && (this->raw_val.length() >= max_len) &&
                 (this->state != st_token_ready)) {
