@@ -216,13 +216,14 @@ class QPDFTokenizer
         st_number,
         st_real,
         st_decimal,
-
         st_name_hex1,
         st_name_hex2,
+        st_before_token,
         st_token_ready
     };
 
     void handleCharacter(char);
+    void inBeforeToken(char);
     void inTop(char);
     void inSpace(char);
     void inComment(char);
@@ -257,6 +258,8 @@ class QPDFTokenizer
     std::string val;
     std::string raw_val;
     std::string error_message;
+    bool before_token;
+    bool in_token;
     bool unread_char;
     char char_to_unread;
     size_t inline_image_bytes;

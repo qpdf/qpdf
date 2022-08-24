@@ -76,11 +76,13 @@ QPDFWordTokenFinder::check()
 void
 QPDFTokenizer::reset()
 {
-    state = st_top;
+    state = st_before_token;
     type = tt_bad;
     val.clear();
     raw_val.clear();
     error_message = "";
+    before_token = true;
+    in_token = false;
     unread_char = false;
     char_to_unread = '\0';
     inline_image_bytes = 0;
@@ -136,8 +138,7 @@ QPDFTokenizer::presentCharacter(char ch)
 {
     handleCharacter(ch);
 
-    if (!(betweenTokens() ||
-          ((this->state == st_token_ready) && this->unread_char))) {
+    if (this->in_token && !this->unread_char) {
         this->raw_val += ch;
     }
 }
@@ -230,6 +231,10 @@ QPDFTokenizer::handleCharacter(char ch)
         inDecimal(ch);
         return;
 
+    case (st_before_token):
+        inBeforeToken(ch);
+        return;
+
     case (st_token_ready):
         inTokenReady(ch);
         return;
@@ -248,26 +253,35 @@ QPDFTokenizer::inTokenReady(char ch)
 }
 
 void
-QPDFTokenizer::inTop(char ch)
+QPDFTokenizer::inBeforeToken(char ch)
 {
     // Note: we specifically do not use ctype here.  It is
     // locale-dependent.
     if (isSpace(ch)) {
+        this->before_token = !this->include_ignorable;
+        this->in_token = this->include_ignorable;
         if (this->include_ignorable) {
             this->state = st_in_space;
             this->val += ch;
-            return;
         }
-        return;
-    }
-    switch (ch) {
-    case '%':
+    } else if (ch == '%') {
+        this->before_token = !this->include_ignorable;
+        this->in_token = this->include_ignorable;
         this->state = st_in_comment;
         if (this->include_ignorable) {
             this->val += ch;
         }
-        return;
+    } else {
+        this->before_token = false;
+        this->in_token = true;
+        inTop(ch);
+    }
+}
 
+void
+QPDFTokenizer::inTop(char ch)
+{
+    switch (ch) {
     case '(':
         this->string_depth = 1;
         this->state = st_in_string;
@@ -376,7 +390,7 @@ QPDFTokenizer::inComment(char ch)
             this->char_to_unread = ch;
             this->state = st_token_ready;
         } else {
-            this->state = st_top;
+            this->state = st_before_token;
         }
     } else if (this->include_ignorable) {
         this->val += ch;
@@ -799,6 +813,7 @@ QPDFTokenizer::presentEOF()
         break;
 
     case st_top:
+    case st_before_token:
         this->type = tt_eof;
         break;
 
@@ -824,11 +839,13 @@ QPDFTokenizer::presentEOF()
 void
 QPDFTokenizer::expectInlineImage(std::shared_ptr<InputSource> input)
 {
-    if (this->state != st_top) {
+    if (this->state != st_before_token) {
         throw std::logic_error("QPDFTokenizer::expectInlineImage called"
                                " when tokenizer is in improper state");
     }
     findEI(input);
+    this->before_token = false;
+    this->in_token = true;
     this->state = st_inline_image;
 }
 
@@ -949,10 +966,7 @@ QPDFTokenizer::getToken(Token& token, bool& unread_char, char& ch)
 bool
 QPDFTokenizer::betweenTokens()
 {
-    return (
-        (this->state == st_top) ||
-        ((!this->include_ignorable) &&
-         ((this->state == st_in_comment) || (this->state == st_in_space))));
+    return this->before_token;
 }
 
 QPDFTokenizer::Token
@@ -987,7 +1001,7 @@ QPDFTokenizer::readToken(
             }
         } else {
             presentCharacter(ch);
-            if (betweenTokens() && (input->getLastOffset() == offset)) {
+            if (this->before_token && (input->getLastOffset() == offset)) {
                 ++offset;
             }
             if (max_len && (this->raw_val.length() >= max_len) &&
