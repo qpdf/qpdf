@@ -73,23 +73,10 @@ class QPDF_DLL_CLASS ClosedFileInputSource: public InputSource
     QPDF_DLL_PRIVATE
     void after();
 
-    class QPDF_DLL_PRIVATE Members
-    {
-        friend class ClosedFileInputSource;
-
-      public:
-        QPDF_DLL
-        ~Members() = default;
-
-      private:
-        Members(char const* filename);
-
-        std::string filename;
-        qpdf_offset_t offset;
-        std::shared_ptr<FileInputSource> fis;
-        bool stay_open;
-    };
-    std::shared_ptr<Members> m;
+    std::string filename;
+    qpdf_offset_t offset;
+    std::shared_ptr<FileInputSource> fis;
+    bool stay_open;
 };
 
 #endif // QPDF_CLOSEDFILEINPUTSOURCE_HH
