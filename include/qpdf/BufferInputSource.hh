@@ -54,26 +54,11 @@ class QPDF_DLL_CLASS BufferInputSource: public InputSource
     virtual void unreadCh(char ch);
 
   private:
-    class QPDF_DLL_PRIVATE Members
-    {
-        friend class BufferInputSource;
-
-      public:
-        QPDF_DLL
-        ~Members() = default;
-
-      private:
-        Members(bool own_memory, std::string const& description, Buffer* buf);
-        Members(Members const&) = delete;
-
-        bool own_memory;
-        std::string description;
-        Buffer* buf;
-        qpdf_offset_t cur_offset;
-        qpdf_offset_t max_offset;
-    };
-
-    std::shared_ptr<Members> m;
+    bool own_memory;
+    std::string description;
+    Buffer* buf;
+    qpdf_offset_t cur_offset;
+    qpdf_offset_t max_offset;
 };
 
 #endif // QPDF_BUFFERINPUTSOURCE_HH
