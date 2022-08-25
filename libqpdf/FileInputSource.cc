@@ -5,58 +5,50 @@
 #include <algorithm>
 #include <string.h>
 
-FileInputSource::Members::Members(bool close_file) :
-    close_file(close_file),
+FileInputSource::FileInputSource() :
+    close_file(false),
     file(nullptr)
 {
 }
 
-FileInputSource::Members::~Members()
-{
-    if (this->file && this->close_file) {
-        fclose(this->file);
-    }
-}
-
-FileInputSource::FileInputSource() :
-    m(new Members(false))
-{
-}
-
 FileInputSource::FileInputSource(char const* filename) :
-    m(new Members(false))
+    close_file(true),
+    filename(filename),
+    file(QUtil::safe_fopen(filename, "rb"))
 {
-    setFilename(filename);
 }
 
 FileInputSource::FileInputSource(
     char const* description, FILE* filep, bool close_file) :
-    m(new Members(false))
+    close_file(close_file),
+    filename(description),
+    file(filep)
 {
-    setFile(description, filep, close_file);
-}
-
-void
-FileInputSource::setFilename(char const* filename)
-{
-    this->m = std::shared_ptr<Members>(new Members(true));
-    this->m->filename = filename;
-    this->m->file = QUtil::safe_fopen(filename, "rb");
-}
-
-void
-FileInputSource::setFile(char const* description, FILE* filep, bool close_file)
-{
-    this->m = std::shared_ptr<Members>(new Members(close_file));
-    this->m->filename = description;
-    this->m->file = filep;
-    this->seek(0, SEEK_SET);
 }
 
 FileInputSource::~FileInputSource()
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in
     // README-maintainer
+    if (this->file && this->close_file) {
+        fclose(this->file);
+    }
+}
+
+void
+FileInputSource::setFilename(char const* filename)
+{
+    this->close_file = true;
+    this->filename = filename;
+    this->file = QUtil::safe_fopen(filename, "rb");
+}
+
+void
+FileInputSource::setFile(char const* description, FILE* filep, bool close_file)
+{
+    this->filename = description;
+    this->file = filep;
+    this->seek(0, SEEK_SET);
 }
 
 qpdf_offset_t
@@ -66,7 +58,7 @@ FileInputSource::findAndSkipNextEOL()
     bool done = false;
     char buf[10240];
     while (!done) {
-        qpdf_offset_t cur_offset = QUtil::tell(this->m->file);
+        qpdf_offset_t cur_offset = QUtil::tell(this->file);
         size_t len = this->read(buf, sizeof(buf));
         if (len == 0) {
             done = true;
@@ -98,41 +90,41 @@ FileInputSource::findAndSkipNextEOL()
 std::string const&
 FileInputSource::getName() const
 {
-    return this->m->filename;
+    return this->filename;
 }
 
 qpdf_offset_t
 FileInputSource::tell()
 {
-    return QUtil::tell(this->m->file);
+    return QUtil::tell(this->file);
 }
 
 void
 FileInputSource::seek(qpdf_offset_t offset, int whence)
 {
     QUtil::os_wrapper(
-        (std::string("seek to ") + this->m->filename + ", offset " +
+        (std::string("seek to ") + this->filename + ", offset " +
          QUtil::int_to_string(offset) + " (" + QUtil::int_to_string(whence) +
          ")"),
-        QUtil::seek(this->m->file, offset, whence));
+        QUtil::seek(this->file, offset, whence));
 }
 
 void
 FileInputSource::rewind()
 {
-    ::rewind(this->m->file);
+    ::rewind(this->file);
 }
 
 size_t
 FileInputSource::read(char* buffer, size_t length)
 {
     this->last_offset = this->tell();
-    size_t len = fread(buffer, 1, length, this->m->file);
+    size_t len = fread(buffer, 1, length, this->file);
     if (len == 0) {
-        if (ferror(this->m->file)) {
+        if (ferror(this->file)) {
             throw QPDFExc(
                 qpdf_e_system,
-                this->m->filename,
+                this->filename,
                 "",
                 this->last_offset,
                 (std::string("read ") + QUtil::uint_to_string(length) +
@@ -149,6 +141,6 @@ void
 FileInputSource::unreadCh(char ch)
 {
     QUtil::os_wrapper(
-        this->m->filename + ": unread character",
-        ungetc(static_cast<unsigned char>(ch), this->m->file));
+        this->filename + ": unread character",
+        ungetc(static_cast<unsigned char>(ch), this->file));
 }

@@ -58,24 +58,9 @@ class QPDF_DLL_CLASS FileInputSource: public InputSource
     FileInputSource(FileInputSource const&) = delete;
     FileInputSource& operator=(FileInputSource const&) = delete;
 
-    class QPDF_DLL_PRIVATE Members
-    {
-        friend class FileInputSource;
-
-      public:
-        QPDF_DLL
-        ~Members();
-
-      private:
-        Members(bool close_file);
-        Members(Members const&) = delete;
-
-        bool close_file;
-        std::string filename;
-        FILE* file;
-    };
-
-    std::shared_ptr<Members> m;
+    bool close_file;
+    std::string filename;
+    FILE* file;
 };
 
 #endif // QPDF_FILEINPUTSOURCE_HH
