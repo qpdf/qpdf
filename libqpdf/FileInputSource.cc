@@ -119,7 +119,7 @@ FileInputSource::rewind()
 size_t
 FileInputSource::read(char* buffer, size_t length)
 {
-    this->last_offset = this->tell();
+    this->last_offset = QUtil::tell(this->file);
     size_t len = fread(buffer, 1, length, this->file);
     if (len == 0) {
         if (ferror(this->file)) {
