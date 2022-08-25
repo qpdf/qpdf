@@ -102,11 +102,12 @@ FileInputSource::tell()
 void
 FileInputSource::seek(qpdf_offset_t offset, int whence)
 {
-    QUtil::os_wrapper(
-        (std::string("seek to ") + this->filename + ", offset " +
-         QUtil::int_to_string(offset) + " (" + QUtil::int_to_string(whence) +
-         ")"),
-        QUtil::seek(this->file, offset, whence));
+    if (QUtil::seek(this->file, offset, whence) == -1) {
+        QUtil::throw_system_error(
+            std::string("seek to ") + this->filename + ", offset " +
+            QUtil::int_to_string(offset) + " (" + QUtil::int_to_string(whence) +
+            ")");
+    }
 }
 
 void
@@ -140,7 +141,7 @@ FileInputSource::read(char* buffer, size_t length)
 void
 FileInputSource::unreadCh(char ch)
 {
-    QUtil::os_wrapper(
-        this->filename + ": unread character",
-        ungetc(static_cast<unsigned char>(ch), this->file));
+    if (ungetc(static_cast<unsigned char>(ch), this->file) == -1) {
+        QUtil::throw_system_error(this->filename + ": unread character");
+    }
 }
