@@ -974,11 +974,11 @@ QPDFTokenizer::readToken(
     bool allow_bad,
     size_t max_len)
 {
-    qpdf_offset_t offset = input->tell();
+    qpdf_offset_t offset = input->fastTell();
 
     while (this->state != st_token_ready) {
         char ch;
-        if (input->read(&ch, 1) == 0) {
+        if (!input->fastRead(ch)) {
             presentEOF();
 
             if ((this->type == tt_eof) && (!this->allow_eof)) {
@@ -1013,9 +1013,7 @@ QPDFTokenizer::readToken(
     bool unread_char;
     char char_to_unread;
     getToken(token, unread_char, char_to_unread);
-    if (unread_char) {
-        input->unreadCh(char_to_unread);
-    }
+    input->fastUnread(unread_char);
 
     if (token.getType() != tt_eof) {
         input->setLastOffset(offset);
