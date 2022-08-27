@@ -11,7 +11,8 @@ For a detailed list of changes, please see the file
 
     - Many performance enhancements have been added. In developer
       performance benchmarks, gains on the order of 20% have been
-      observed.
+      observed. Most of that work, including major optimization of
+      qpdf's lexical layer, was done by M. Holger.
 
   - Replacement of ``PointerHolder`` with ``std::shared_ptr``
 
