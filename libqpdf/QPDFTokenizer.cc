@@ -137,7 +137,7 @@ QPDFTokenizer::presentCharacter(char ch)
 {
     handleCharacter(ch);
 
-    if (this->in_token) { //} && !this->unread_char) {
+    if (this->in_token) {
         this->raw_val += ch;
     }
 }
@@ -145,9 +145,9 @@ QPDFTokenizer::presentCharacter(char ch)
 void
 QPDFTokenizer::handleCharacter(char ch)
 {
-    // State machine is implemented such that some characters may be
-    // handled more than once.  This happens whenever you have to use
-    // the character that caused a state change in the new state.
+    // State machine is implemented such that the final character may not be
+    // handled.  This happens whenever you have to use a character from the
+    // next token to detect the end of the current token.
 
     switch (this->state) {
     case st_top:
