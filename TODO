@@ -26,6 +26,14 @@ Pending changes:
 
 Soon: Break ground on "Document-level work"
 
+Remove raw pointers from the API
+================================
+
+(For qpdf >= 12)
+
+See if we can remove raw pointers from the QPDF API. There's a
+discussion in https://github.com/qpdf/qpdf/pull/747.
+
 Fix Multiple Direct Object Owner Issue
 ======================================
 
