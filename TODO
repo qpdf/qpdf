@@ -4,6 +4,7 @@ Next
 
 Before Release:
 
+* Review in order #729, #726, #747
 * Make ./performance_check usable by other people by having published
   files to use for testing.
   * https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf
