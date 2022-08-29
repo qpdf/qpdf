@@ -2266,7 +2266,7 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
         throw std::logic_error(
             "QPDF::copyForeign called with direct object handle");
     }
-    QPDF* other = foreign.getOwningQPDF();
+    QPDF* other = foreign.getOwningQPDF(false);
     if (other == this) {
         QTC::TC("qpdf", "QPDF copyForeign not foreign");
         throw std::logic_error(
@@ -2456,11 +2456,9 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
     QPDFObjGen local_og(result.getObjGen());
     // Copy information from the foreign stream so we can pipe its
     // data later without keeping the original QPDF object around.
-    QPDF* foreign_stream_qpdf = foreign.getOwningQPDF();
-    if (!foreign_stream_qpdf) {
-        throw std::logic_error("unable to retrieve owning qpdf"
-                               " from foreign stream");
-    }
+    QPDF* foreign_stream_qpdf = foreign.getOwningQPDF(
+        false, "unable to retrieve owning qpdf from foreign stream");
+
     QPDF_Stream* stream = dynamic_cast<QPDF_Stream*>(
         QPDFObjectHandle::ObjAccessor::getObject(foreign).get());
     if (!stream) {
