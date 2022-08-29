@@ -63,6 +63,16 @@ class QPDF
     QPDF_DLL
     ~QPDF();
 
+    // Copying QPDF objects has never been blocked by the API but has
+    // never been safe. If you have been copying QPDF objects around,
+    // please switch to using std::shared_ptr or use getHandle(),
+    // added in qpdf 11. Copying and assignment of QPDF objects will
+    // be removed in QPDF 12.
+    [[deprecated("use shared_ptr or getHandle instead")]] QPDF(QPDF const&) =
+        default;
+    [[deprecated("use shared_ptr or getHandle instead")]] QPDF&
+    operator=(QPDF const&) = default;
+
     // If you need to keep a raw (non-shared) pointer of a QPDF object
     // around and need to protect against its having become invalid,
     // use getHandle() to get a weak pointer to a QPDF::Handle. If the
@@ -109,7 +119,8 @@ class QPDF
 
         QPDF* qpdf;
     };
-    QPDF_DLL inline std::weak_ptr<Handle> getHandle();
+    QPDF_DLL
+    inline std::weak_ptr<Handle> getHandle();
 
     // Associate a file with a QPDF object and do initial parsing of
     // the file.  PDF objects are not read until they are needed.  A
@@ -125,7 +136,8 @@ class QPDF
     // or any of the other process methods to force the password to be
     // interpreted as a raw encryption key. See comments on
     // setPasswordIsHexKey for more information.
-    QPDF_DLL void processFile(char const* filename, char const* password = 0);
+    QPDF_DLL
+    void processFile(char const* filename, char const* password = 0);
 
     // Parse a PDF from a stdio FILE*.  The FILE must be open in
     // binary mode and must be seekable.  It may be open read only.
