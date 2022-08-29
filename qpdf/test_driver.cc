@@ -3258,6 +3258,41 @@ test_91(QPDF& pdf, char const* arg2)
         2, &p, qpdf_dl_none, qpdf_sj_inline, "", std::set<std::string>());
 }
 
+static void
+test_92(QPDF& pdf, char const* arg2)
+{
+    // Exercise handle
+    auto h1 = pdf.getHandle();
+    std::weak_ptr<QPDF::Handle> h2;
+    {
+        QPDF pdf2;
+        h2 = pdf2.getHandle();
+        auto s2 = h2.lock();
+        assert(s2 && s2->getQPDF() == &pdf2);
+    }
+    {
+        auto s1 = h1.lock();
+        assert(s1 && s1->getQPDF() == &pdf);
+    }
+    assert(h2.lock() == nullptr);
+
+    // You're not supposed keep a shared_ptr to a handle around at
+    // all, but if someone does it by accident, this exercises
+    // clearing of the internal pointer.
+    std::shared_ptr<QPDF::Handle> s3; // Don't do this
+    std::weak_ptr<QPDF::Handle> h3;
+    {
+        QPDF pdf3;
+        h3 = pdf3.getHandle();
+        s3 = h3.lock();
+        assert(s3->getQPDF() == &pdf3);
+    }
+    // The shared pointer keeps h3 alive, but the internal pointer is
+    // gone.
+    assert(h3.lock() != nullptr);
+    assert(s3->getQPDF() == nullptr);
+}
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -3362,7 +3397,8 @@ runtest(int n, char const* filename1, char const* arg2)
         {76, test_76}, {77, test_77}, {78, test_78}, {79, test_79},
         {80, test_80}, {81, test_81}, {82, test_82}, {83, test_83},
         {84, test_84}, {85, test_85}, {86, test_86}, {87, test_87},
-        {88, test_88}, {89, test_89}, {90, test_90}, {91, test_91}};
+        {88, test_88}, {89, test_89}, {90, test_90}, {91, test_91},
+        {92, test_92}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {

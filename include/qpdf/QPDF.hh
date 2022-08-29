@@ -63,6 +63,54 @@ class QPDF
     QPDF_DLL
     ~QPDF();
 
+    // If you need to keep a raw (non-shared) pointer of a QPDF object
+    // around and need to protect against its having become invalid,
+    // use getHandle() to get a weak pointer to a QPDF::Handle. If the
+    // weak pointer is valid, you can call its getQPDF() method to
+    // retrieve the raw QPDF*. You should not keep a shared_ptr
+    // created from a weak_ptr<QPDF::Handle> around as doing so
+    // prevents the weak pointer from becoming invalid. To protect
+    // against this error, the raw pointer contained inside the
+    // QPDF::Handle is cleared when the QPDF object's destructor is
+    // called.
+    //
+    // Example:
+    //
+    // QPDF q;
+    // ...
+    // auto wp = q.getHandle();
+    // ...
+    // QPDF* p = nullptr;
+    // {
+    //     auto sp = wp.lock();
+    //     if (sp) {
+    //         p = sp->getQPDF();
+    //     }
+    // }
+    // if (p) {
+    //     // The original QPDF is still valid
+    // }
+    class Handle
+    {
+        friend class QPDF;
+
+      public:
+        QPDF*
+        getQPDF()
+        {
+            return qpdf;
+        }
+
+      private:
+        Handle(QPDF* qpdf) :
+            qpdf(qpdf)
+        {
+        }
+
+        QPDF* qpdf;
+    };
+    QPDF_DLL inline std::weak_ptr<Handle> getHandle();
+
     // Associate a file with a QPDF object and do initial parsing of
     // the file.  PDF objects are not read until they are needed.  A
     // QPDF object may be associated with only one file in its
@@ -77,8 +125,7 @@ class QPDF
     // or any of the other process methods to force the password to be
     // interpreted as a raw encryption key. See comments on
     // setPasswordIsHexKey for more information.
-    QPDF_DLL
-    void processFile(char const* filename, char const* password = 0);
+    QPDF_DLL void processFile(char const* filename, char const* password = 0);
 
     // Parse a PDF from a stdio FILE*.  The FILE must be open in
     // binary mode and must be seekable.  It may be open read only.
@@ -1691,9 +1738,10 @@ class QPDF
         ~Members() = default;
 
       private:
-        Members();
+        Members(std::shared_ptr<Handle>);
         Members(Members const&) = delete;
 
+        std::shared_ptr<Handle> handle;
         std::shared_ptr<QPDFLogger> log;
         unsigned long long unique_id;
         QPDFTokenizer tokenizer;
@@ -1767,5 +1815,11 @@ class QPDF
     // members without breaking binary compatibility.
     std::shared_ptr<Members> m;
 };
+
+inline std::weak_ptr<QPDF::Handle>
+QPDF::getHandle()
+{
+    return std::weak_ptr<Handle>(m->handle);
+}
 
 #endif // QPDF_HH

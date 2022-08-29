@@ -204,7 +204,8 @@ QPDF::EncryptionParameters::EncryptionParameters() :
 {
 }
 
-QPDF::Members::Members() :
+QPDF::Members::Members(std::shared_ptr<Handle> h) :
+    handle(h),
     log(QPDFLogger::defaultLogger()),
     unique_id(0),
     file(new InvalidInputSource()),
@@ -229,7 +230,7 @@ QPDF::Members::Members() :
 }
 
 QPDF::QPDF() :
-    m(new Members())
+    m(new Members(std::shared_ptr<Handle>(new Handle(this))))
 {
     m->tokenizer.allowEOF();
     // Generate a unique ID. It just has to be unique among all QPDF
@@ -259,6 +260,10 @@ QPDF::~QPDF()
     for (auto const& iter: this->m->obj_cache) {
         QPDFObject::ObjAccessor::releaseResolved(iter.second.object.get());
     }
+
+    // In case anyone kept a shared_ptr created from the handle
+    // around, clear the pointer.
+    this->m->handle->qpdf = nullptr;
 }
 
 void
