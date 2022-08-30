@@ -51,9 +51,12 @@ QPDFParser::parse(bool& empty, bool content_stream)
     int bad_count = 0;
     int good_count = 0;
     bool b_contents = false;
+    bool is_null = false;
+    auto null_oh = QPDFObjectHandle::newNull();
 
     while (!done) {
         bool bad = false;
+        is_null = false;
         auto& frame = stack.back();
         auto& olist = frame.olist;
         parser_state_e state = state_stack.back();
@@ -83,7 +86,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
         case QPDFTokenizer::tt_bad:
             QTC::TC("qpdf", "QPDFParser bad token in parse");
             bad = true;
-            object = QPDFObjectHandle::newNull();
+            is_null = true;
             break;
 
         case QPDFTokenizer::tt_brace_open:
@@ -91,7 +94,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             QTC::TC("qpdf", "QPDFParser bad brace");
             warn("treating unexpected brace token as null");
             bad = true;
-            object = QPDFObjectHandle::newNull();
+            is_null = true;
             break;
 
         case QPDFTokenizer::tt_array_close:
@@ -101,7 +104,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 QTC::TC("qpdf", "QPDFParser bad array close");
                 warn("treating unexpected array close token as null");
                 bad = true;
-                object = QPDFObjectHandle::newNull();
+                is_null = true;
             }
             break;
 
@@ -112,7 +115,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 QTC::TC("qpdf", "QPDFParser bad dictionary close");
                 warn("unexpected dictionary close token");
                 bad = true;
-                object = QPDFObjectHandle::newNull();
+                is_null = true;
             }
             break;
 
@@ -122,7 +125,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 QTC::TC("qpdf", "QPDFParser too deep");
                 warn("ignoring excessively deeply nested data structure");
                 bad = true;
-                object = QPDFObjectHandle::newNull();
+                is_null = true;
                 state = st_top;
             } else {
                 state = st_start;
@@ -140,7 +143,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             break;
 
         case QPDFTokenizer::tt_null:
-            object = QPDFObjectHandle::newNull();
+            is_null = true;
             break;
 
         case QPDFTokenizer::tt_integer:
@@ -195,7 +198,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                     // We just saw endobj without having read
                     // anything.  Treat this as a null and do not move
                     // the input source's offset.
-                    object = QPDFObjectHandle::newNull();
+                    is_null = true;
                     input->seek(input->getLastOffset(), SEEK_SET);
                     empty = true;
                 } else {
@@ -228,16 +231,16 @@ QPDFParser::parse(bool& empty, bool content_stream)
             warn("treating unknown token type as null while "
                  "reading object");
             bad = true;
-            object = QPDFObjectHandle::newNull();
+            is_null = true;
             break;
         }
 
-        if ((!object.isInitialized()) &&
+        if (!object.isInitialized() && !is_null &&
             (!((state == st_start) || (state == st_stop) ||
                (state == st_eof)))) {
             throw std::logic_error("QPDFObjectHandle::parseInternal: "
                                    "unexpected uninitialized object");
-            object = QPDFObjectHandle::newNull();
+            is_null = true;
         }
 
         if (bad) {
@@ -254,7 +257,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             // intervening successful objects. Give up.
             warn("too many errors; giving up on reading object");
             state = st_top;
-            object = QPDFObjectHandle::newNull();
+            is_null = true;
         }
 
         switch (state) {
@@ -266,7 +269,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             // In content stream mode, leave object uninitialized to
             // indicate EOF
             if (!content_stream) {
-                object = QPDFObjectHandle::newNull();
+                is_null = true;
             }
             break;
 
@@ -279,7 +282,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 object.setParsedOffset(input->getLastOffset());
             }
             set_offset = true;
-            olist.push_back(object);
+            olist.push_back(is_null ? null_oh : object);
             break;
 
         case st_top:
@@ -387,11 +390,14 @@ QPDFParser::parse(bool& empty, bool content_stream)
             if (state_stack.back() == st_top) {
                 done = true;
             } else {
-                stack.back().olist.push_back(object);
+                stack.back().olist.push_back(is_null ? null_oh : object);
             }
         }
     }
 
+    if (is_null) {
+        object = QPDFObjectHandle::newNull();
+    }
     if (!set_offset) {
         setDescriptionFromInput(object, offset);
         object.setParsedOffset(offset);
