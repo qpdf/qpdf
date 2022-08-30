@@ -1588,7 +1588,7 @@ class QPDFObjectHandle
     void shallowCopyInternal(QPDFObjectHandle& oh, bool first_level_only);
     void releaseResolved();
 
-    void setParsedOffset(qpdf_offset_t offset);
+    inline void setParsedOffset(qpdf_offset_t offset);
     void parseContentStream_internal(
         std::string const& description, ParserCallbacks* callbacks);
     static void parseContentStream_data(
@@ -1870,6 +1870,16 @@ QPDFObjectHandle::getOwningQPDF(
             error_msg == "" ? "attempt to use a null qpdf object" : error_msg);
     }
     return this->qpdf;
+}
+
+inline void
+QPDFObjectHandle::setParsedOffset(qpdf_offset_t offset)
+{
+    // This is called during parsing on newly created direct objects,
+    // so we can't call dereference() here.
+    if (this->obj.get()) {
+        this->obj->setParsedOffset(offset);
+    }
 }
 
 #endif // QPDFOBJECTHANDLE_HH

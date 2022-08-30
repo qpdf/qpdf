@@ -1944,16 +1944,6 @@ QPDFObjectHandle::getParsedOffset()
     }
 }
 
-void
-QPDFObjectHandle::setParsedOffset(qpdf_offset_t offset)
-{
-    // This is called during parsing on newly created direct objects,
-    // so we can't call dereference() here.
-    if (this->obj.get()) {
-        this->obj->setParsedOffset(offset);
-    }
-}
-
 QPDFObjectHandle
 QPDFObjectHandle::newIndirect(QPDF* qpdf, QPDFObjGen const& og)
 {
