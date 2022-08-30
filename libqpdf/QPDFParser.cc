@@ -272,8 +272,12 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         case st_dictionary:
         case st_array:
-            setDescriptionFromInput(object, input->getLastOffset());
-            object.setParsedOffset(input->getLastOffset());
+            if (!object.isDirectNull()) {
+                // No need to set description for direct nulls- they will
+                // become implicit.
+                setDescriptionFromInput(object, input->getLastOffset());
+                object.setParsedOffset(input->getLastOffset());
+            }
             set_offset = true;
             olist.push_back(object);
             break;
