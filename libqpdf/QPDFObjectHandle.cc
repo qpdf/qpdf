@@ -273,20 +273,6 @@ QPDFObjectHandle::releaseResolved()
     }
 }
 
-void
-QPDFObjectHandle::setObjectDescriptionFromInput(
-    QPDFObjectHandle object,
-    QPDF* context,
-    std::string const& description,
-    std::shared_ptr<InputSource> input,
-    qpdf_offset_t offset)
-{
-    object.setObjectDescription(
-        context,
-        (input->getName() + ", " + description + " at offset " +
-         QUtil::int_to_string(offset)));
-}
-
 QPDFObject::object_type_e
 QPDFObjectHandle::getTypeCode()
 {

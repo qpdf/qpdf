@@ -263,12 +263,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         case st_dictionary:
         case st_array:
-            QPDFObjectHandle::setObjectDescriptionFromInput(
-                object,
-                context,
-                object_description,
-                input,
-                input->getLastOffset());
+            setDescriptionFromInput(object, input->getLastOffset());
             object.setParsedOffset(input->getLastOffset());
             set_offset = true;
             olist.append(object);
@@ -293,8 +288,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 // There's no newArray(SparseOHArray) since
                 // SparseOHArray is not part of the public API.
                 object = QPDFObjectHandle(QPDF_Array::create(olist));
-                QPDFObjectHandle::setObjectDescriptionFromInput(
-                    object, context, object_description, input, offset);
+                setDescriptionFromInput(object, offset);
                 // The `offset` points to the next of "[". Set the
                 // rewind offset to point to the beginning of "[".
                 // This has been explicitly tested with whitespace
@@ -347,8 +341,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                             "dictionary ended prematurely; "
                             "using null as value for last key");
                         val = QPDFObjectHandle::newNull();
-                        QPDFObjectHandle::setObjectDescriptionFromInput(
-                            val, context, object_description, input, offset);
+                        setDescriptionFromInput(val, offset);
                     } else {
                         val = olist.at(++i);
                     }
@@ -372,8 +365,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                     dict["/Contents"].setParsedOffset(contents_offset);
                 }
                 object = QPDFObjectHandle::newDictionary(dict);
-                QPDFObjectHandle::setObjectDescriptionFromInput(
-                    object, context, object_description, input, offset);
+                setDescriptionFromInput(object, offset);
                 // The `offset` points to the next of "<<". Set the
                 // rewind offset to point to the beginning of "<<".
                 // This has been explicitly tested with whitespace
@@ -396,11 +388,20 @@ QPDFParser::parse(bool& empty, bool content_stream)
     }
 
     if (!set_offset) {
-        QPDFObjectHandle::setObjectDescriptionFromInput(
-            object, context, object_description, input, offset);
+        setDescriptionFromInput(object, offset);
         object.setParsedOffset(offset);
     }
     return object;
+}
+
+void
+QPDFParser::setDescriptionFromInput(
+    QPDFObjectHandle oh, qpdf_offset_t offset) const
+{
+    oh.setObjectDescription(
+        context,
+        (input->getName() + ", " + object_description + " at offset " +
+         QUtil::int_to_string(offset)));
 }
 
 void

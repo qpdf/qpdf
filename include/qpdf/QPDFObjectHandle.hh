@@ -1587,12 +1587,6 @@ class QPDFObjectHandle
         bool stop_at_streams);
     void shallowCopyInternal(QPDFObjectHandle& oh, bool first_level_only);
     void releaseResolved();
-    static void setObjectDescriptionFromInput(
-        QPDFObjectHandle,
-        QPDF*,
-        std::string const&,
-        std::shared_ptr<InputSource>,
-        qpdf_offset_t);
 
     void setParsedOffset(qpdf_offset_t offset);
     void parseContentStream_internal(
