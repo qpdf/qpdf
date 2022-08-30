@@ -7,6 +7,24 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/SparseOHArray.hh>
 
+namespace
+{
+    struct StackFrame
+    {
+        StackFrame(std::shared_ptr<InputSource> input) :
+            offset(input->tell()),
+            contents_string(""),
+            contents_offset(-1)
+        {
+        }
+
+        std::vector<QPDFObjectHandle> olist;
+        qpdf_offset_t offset;
+        std::string contents_string;
+        qpdf_offset_t contents_offset;
+    };
+} // namespace
+
 QPDFObjectHandle
 QPDFParser::parse(bool& empty, bool content_stream)
 {
@@ -17,8 +35,6 @@ QPDFParser::parse(bool& empty, bool content_stream)
     // this, it will cause a logic error to be thrown from
     // QPDF::inParse().
 
-    using OHVector = std::vector<QPDFObjectHandle>;
-
     QPDF::ParseGuard pg(context);
 
     empty = false;
@@ -26,28 +42,22 @@ QPDFParser::parse(bool& empty, bool content_stream)
     QPDFObjectHandle object;
     bool set_offset = false;
 
-    std::vector<OHVector> olist_stack;
-    olist_stack.push_back(OHVector());
+    std::vector<StackFrame> stack;
+    stack.push_back(StackFrame(input));
     std::vector<parser_state_e> state_stack;
     state_stack.push_back(st_top);
-    std::vector<qpdf_offset_t> offset_stack;
-    qpdf_offset_t offset = input->tell();
-    offset_stack.push_back(offset);
+    qpdf_offset_t offset;
     bool done = false;
     int bad_count = 0;
     int good_count = 0;
     bool b_contents = false;
-    std::vector<std::string> contents_string_stack;
-    contents_string_stack.push_back("");
-    std::vector<qpdf_offset_t> contents_offset_stack;
-    contents_offset_stack.push_back(-1);
+
     while (!done) {
         bool bad = false;
-        auto& olist = olist_stack.back();
+        auto& frame = stack.back();
+        auto& olist = frame.olist;
         parser_state_e state = state_stack.back();
-        offset = offset_stack.back();
-        std::string& contents_string = contents_string_stack.back();
-        qpdf_offset_t& contents_offset = contents_offset_stack.back();
+        offset = frame.offset;
 
         object = QPDFObjectHandle();
         set_offset = false;
@@ -108,23 +118,20 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         case QPDFTokenizer::tt_array_open:
         case QPDFTokenizer::tt_dict_open:
-            if (olist_stack.size() > 500) {
+            if (stack.size() > 500) {
                 QTC::TC("qpdf", "QPDFParser too deep");
                 warn("ignoring excessively deeply nested data structure");
                 bad = true;
                 object = QPDFObjectHandle::newNull();
                 state = st_top;
             } else {
-                olist_stack.push_back(OHVector());
                 state = st_start;
-                offset_stack.push_back(input->tell());
                 state_stack.push_back(
                     (token.getType() == QPDFTokenizer::tt_array_open)
                         ? st_array
                         : st_dictionary);
                 b_contents = false;
-                contents_string_stack.push_back("");
-                contents_offset_stack.push_back(-1);
+                stack.push_back(StackFrame(input));
             }
             break;
 
@@ -206,8 +213,8 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 std::string val = token.getValue();
                 if (decrypter) {
                     if (b_contents) {
-                        contents_string = val;
-                        contents_offset = input->getLastOffset();
+                        frame.contents_string = val;
+                        frame.contents_offset = input->getLastOffset();
                         b_contents = false;
                     }
                     decrypter->decryptString(val);
@@ -279,7 +286,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             break;
 
         case st_stop:
-            if ((state_stack.size() < 2) || (olist_stack.size() < 2)) {
+            if ((state_stack.size() < 2) || (stack.size() < 2)) {
                 throw std::logic_error(
                     "QPDFObjectHandle::parseInternal: st_stop encountered"
                     " with insufficient elements in stack");
@@ -354,13 +361,13 @@ QPDFParser::parse(bool& empty, bool content_stream)
                     }
                     dict[key] = val;
                 }
-                if (!contents_string.empty() && dict.count("/Type") &&
+                if (!frame.contents_string.empty() && dict.count("/Type") &&
                     dict["/Type"].isNameAndEquals("/Sig") &&
                     dict.count("/ByteRange") && dict.count("/Contents") &&
                     dict["/Contents"].isString()) {
                     dict["/Contents"] =
-                        QPDFObjectHandle::newString(contents_string);
-                    dict["/Contents"].setParsedOffset(contents_offset);
+                        QPDFObjectHandle::newString(frame.contents_string);
+                    dict["/Contents"].setParsedOffset(frame.contents_offset);
                 }
                 object = QPDFObjectHandle::newDictionary(dict);
                 setDescriptionFromInput(object, offset);
@@ -372,15 +379,12 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 object.setParsedOffset(offset - 2);
                 set_offset = true;
             }
-            olist_stack.pop_back();
-            offset_stack.pop_back();
+            stack.pop_back();
             if (state_stack.back() == st_top) {
                 done = true;
             } else {
-                olist_stack.back().push_back(object);
+                stack.back().olist.push_back(object);
             }
-            contents_string_stack.pop_back();
-            contents_offset_stack.pop_back();
         }
     }
 
