@@ -17,6 +17,8 @@ QPDFParser::parse(bool& empty, bool content_stream)
     // this, it will cause a logic error to be thrown from
     // QPDF::inParse().
 
+    using OHVector = std::vector<QPDFObjectHandle>;
+
     QPDF::ParseGuard pg(context);
 
     empty = false;
@@ -24,8 +26,8 @@ QPDFParser::parse(bool& empty, bool content_stream)
     QPDFObjectHandle object;
     bool set_offset = false;
 
-    std::vector<SparseOHArray> olist_stack;
-    olist_stack.push_back(SparseOHArray());
+    std::vector<OHVector> olist_stack;
+    olist_stack.push_back(OHVector());
     std::vector<parser_state_e> state_stack;
     state_stack.push_back(st_top);
     std::vector<qpdf_offset_t> offset_stack;
@@ -41,7 +43,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
     contents_offset_stack.push_back(-1);
     while (!done) {
         bool bad = false;
-        SparseOHArray& olist = olist_stack.back();
+        auto& olist = olist_stack.back();
         parser_state_e state = state_stack.back();
         offset = offset_stack.back();
         std::string& contents_string = contents_string_stack.back();
@@ -113,7 +115,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 object = QPDFObjectHandle::newNull();
                 state = st_top;
             } else {
-                olist_stack.push_back(SparseOHArray());
+                olist_stack.push_back(OHVector());
                 state = st_start;
                 offset_stack.push_back(input->tell());
                 state_stack.push_back(
@@ -159,15 +161,15 @@ QPDFParser::parse(bool& empty, bool content_stream)
         case QPDFTokenizer::tt_word:
             {
                 std::string const& value = token.getValue();
+                auto size = olist.size();
                 if (content_stream) {
                     object = QPDFObjectHandle::newOperator(value);
                 } else if (
-                    (value == "R") && (state != st_top) &&
-                    (olist.size() >= 2) &&
-                    (!olist.at(olist.size() - 1).isIndirect()) &&
-                    (olist.at(olist.size() - 1).isInteger()) &&
-                    (!olist.at(olist.size() - 2).isIndirect()) &&
-                    (olist.at(olist.size() - 2).isInteger())) {
+                    (value == "R") && (state != st_top) && (size >= 2) &&
+                    (!olist.back().isIndirect()) &&
+                    (olist.back().isInteger()) &&
+                    (!olist.at(size - 2).isIndirect()) &&
+                    (olist.at(size - 2).isInteger())) {
                     if (context == nullptr) {
                         QTC::TC("qpdf", "QPDFParser indirect without context");
                         throw std::logic_error(
@@ -178,10 +180,10 @@ QPDFParser::parse(bool& empty, bool content_stream)
                     object = QPDFObjectHandle::newIndirect(
                         context,
                         QPDFObjGen(
-                            olist.at(olist.size() - 2).getIntValueAsInt(),
-                            olist.at(olist.size() - 1).getIntValueAsInt()));
-                    olist.remove_last();
-                    olist.remove_last();
+                            olist.at(size - 2).getIntValueAsInt(),
+                            olist.back().getIntValueAsInt()));
+                    olist.pop_back();
+                    olist.pop_back();
                 } else if ((value == "endobj") && (state == st_top)) {
                     // We just saw endobj without having read
                     // anything.  Treat this as a null and do not move
@@ -266,7 +268,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             setDescriptionFromInput(object, input->getLastOffset());
             object.setParsedOffset(input->getLastOffset());
             set_offset = true;
-            olist.append(object);
+            olist.push_back(object);
             break;
 
         case st_top:
@@ -285,22 +287,18 @@ QPDFParser::parse(bool& empty, bool content_stream)
             parser_state_e old_state = state_stack.back();
             state_stack.pop_back();
             if (old_state == st_array) {
-                // There's no newArray(SparseOHArray) since
-                // SparseOHArray is not part of the public API.
-                object = QPDFObjectHandle(QPDF_Array::create(olist));
+                object = QPDFObjectHandle::newArray(olist);
                 setDescriptionFromInput(object, offset);
-                // The `offset` points to the next of "[". Set the
-                // rewind offset to point to the beginning of "[".
-                // This has been explicitly tested with whitespace
-                // surrounding the array start delimiter.
-                // getLastOffset points to the array end token and
+                // The `offset` points to the next of "[".  Set the rewind
+                // offset to point to the beginning of "[". This has been
+                // explicitly tested with whitespace surrounding the array start
+                // delimiter. getLastOffset points to the array end token and
                 // therefore can't be used here.
                 object.setParsedOffset(offset - 1);
                 set_offset = true;
             } else if (old_state == st_dictionary) {
-                // Convert list to map. Alternating elements are keys.
-                // Attempt to recover more or less gracefully from
-                // invalid dictionaries.
+                // Convert list to map. Alternating elements are keys.  Attempt
+                // to recover more or less gracefully from invalid dictionaries.
                 std::set<std::string> names;
                 size_t n_elements = olist.size();
                 for (size_t i = 0; i < n_elements; ++i) {
@@ -312,7 +310,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
                 std::map<std::string, QPDFObjectHandle> dict;
                 int next_fake_key = 1;
-                for (unsigned int i = 0; i < olist.size(); ++i) {
+                for (unsigned int i = 0; i < n_elements; ++i) {
                     QPDFObjectHandle key_obj = olist.at(i);
                     QPDFObjectHandle val;
                     if (key_obj.isIndirect() || (!key_obj.isName())) {
@@ -366,12 +364,11 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 }
                 object = QPDFObjectHandle::newDictionary(dict);
                 setDescriptionFromInput(object, offset);
-                // The `offset` points to the next of "<<". Set the
-                // rewind offset to point to the beginning of "<<".
-                // This has been explicitly tested with whitespace
-                // surrounding the dictionary start delimiter.
-                // getLastOffset points to the dictionary end token
-                // and therefore can't be used here.
+                // The `offset` points to the next of "<<". Set the rewind
+                // offset to point to the beginning of "<<". This has been
+                // explicitly tested with whitespace surrounding the dictionary
+                // start delimiter. getLastOffset points to the dictionary end
+                // token and therefore can't be used here.
                 object.setParsedOffset(offset - 2);
                 set_offset = true;
             }
@@ -380,7 +377,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             if (state_stack.back() == st_top) {
                 done = true;
             } else {
-                olist_stack.back().append(object);
+                olist_stack.back().push_back(object);
             }
             contents_string_stack.pop_back();
             contents_offset_stack.pop_back();
