@@ -21,6 +21,8 @@
 #cmakedefine HAVE_LOCALTIME_R 1
 #cmakedefine HAVE_RANDOM 1
 #cmakedefine HAVE_TM_GMTOFF 1
+#cmakedefine HAVE_MALLOC_INFO 1
+#cmakedefine HAVE_OPEN_MEMSTREAM 1
 
 /* printf format for long long */
 #cmakedefine LL_FMT "${LL_FMT}"

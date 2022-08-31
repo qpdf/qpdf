@@ -703,6 +703,18 @@ is_long_long_test()
     std::cout << "done" << std::endl;
 }
 
+void
+memory_usage_test()
+{
+    auto u1 = QUtil::get_max_memory_usage();
+    if (u1 > 0) {
+        auto x = QUtil::make_shared_array<int>(10 << 20);
+        auto u2 = QUtil::get_max_memory_usage();
+        assert(u2 > u1);
+    }
+    std::cout << "memory usage okay" << std::endl;
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -739,6 +751,8 @@ main(int argc, char* argv[])
         timestamp_test();
         std::cout << "---- is_long_long" << std::endl;
         is_long_long_test();
+        std::cout << "---- memory usage" << std::endl;
+        memory_usage_test();
     } catch (std::exception& e) {
         std::cout << "unexpected exception: " << e.what() << std::endl;
     }
