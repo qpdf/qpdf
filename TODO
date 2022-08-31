@@ -7,9 +7,9 @@ Before Release:
 * Review in order #726
 * Make ./performance_check usable by other people by having published
   files to use for testing.
-  * https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf
-* Incorporate --report-mem-usage into performance testing. Make sure
-  there is some test somewhere that exercises the millions of nulls case.
+  * Site https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf
+  * Incorporate --report-mem-usage into performance testing.
+  * Include output of test_many_nulls
 * Evaluate issues tagged with `next`
 * Stay on top of https://github.com/pikepdf/pikepdf/pull/315
 

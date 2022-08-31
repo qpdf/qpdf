@@ -5,6 +5,7 @@ set(MAIN_CXX_PROGRAMS
   sizes
   test_driver
   test_large_file
+  test_many_nulls
   test_parsedoffset
   test_pdf_doc_encoding
   test_pdf_unicode
