@@ -5,7 +5,6 @@
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
-#include <qpdf/SparseOHArray.hh>
 
 namespace
 {

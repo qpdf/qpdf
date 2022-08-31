@@ -1,3 +1,9 @@
+2022-08-31  Jay Berkenbilt  <ejb@ql.org>
+
+        * From m-holger (#729): refactor QPDF's parser into a new
+        QPDFParser class, cleaning the code, significantly improving
+        performance.
+
 2022-08-27  Jay Berkenbilt  <ejb@ql.org>
 
         * From m-holger: major refactoring of QPDFTokenizer to improve
