@@ -33,6 +33,7 @@ QPDF_DLL Config* qdf();
 QPDF_DLL Config* rawStreamData();
 QPDF_DLL Config* recompressFlate();
 QPDF_DLL Config* removePageLabels();
+QPDF_DLL Config* reportMemUsage();
 QPDF_DLL Config* requiresPassword();
 QPDF_DLL Config* showEncryption();
 QPDF_DLL Config* showEncryptionKey();

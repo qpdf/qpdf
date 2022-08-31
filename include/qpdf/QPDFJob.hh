@@ -711,6 +711,7 @@ class QPDFJob
         bool json_input;
         bool json_output;
         std::string update_from_json;
+        bool report_mem_usage;
     };
     std::shared_ptr<Members> m;
 };

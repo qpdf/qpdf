@@ -409,6 +409,9 @@ popHandler(); // key: pages
 pushKey("removePageLabels");
 addBare([this]() { c_main->removePageLabels(); });
 popHandler(); // key: removePageLabels
+pushKey("reportMemUsage");
+addBare([this]() { c_main->reportMemUsage(); });
+popHandler(); // key: reportMemUsage
 pushKey("rotate");
 addParameter([this](std::string const& p) { c_main->rotate(p); });
 popHandler(); // key: rotate

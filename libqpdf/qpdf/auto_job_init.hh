@@ -69,6 +69,7 @@ this->ap.addBare("raw-stream-data", [this](){c_main->rawStreamData();});
 this->ap.addBare("recompress-flate", [this](){c_main->recompressFlate();});
 this->ap.addBare("remove-page-labels", [this](){c_main->removePageLabels();});
 this->ap.addBare("replace-input", b(&ArgParser::argReplaceInput));
+this->ap.addBare("report-mem-usage", [this](){c_main->reportMemUsage();});
 this->ap.addBare("requires-password", [this](){c_main->requiresPassword();});
 this->ap.addBare("show-encryption", [this](){c_main->showEncryption();});
 this->ap.addBare("show-encryption-key", [this](){c_main->showEncryptionKey();});

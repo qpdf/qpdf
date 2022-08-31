@@ -37,6 +37,9 @@
 # include <sys/stat.h>
 # include <unistd.h>
 #endif
+#ifdef HAVE_MALLOC_INFO
+# include <malloc.h>
+#endif
 
 // First element is 24
 static unsigned short pdf_doc_low_to_unicode[] = {
@@ -1968,3 +1971,73 @@ QUtil::call_main_from_wmain(
 }
 
 #endif // QPDF_NO_WCHAR_T
+
+size_t
+QUtil::get_max_memory_usage()
+{
+#if defined(HAVE_MALLOC_INFO) && defined(HAVE_OPEN_MEMSTREAM)
+    static std::regex tag_re("<(/?\\w+)([^>]*?)>");
+    static std::regex attr_re("(\\w+)=\"(.*?)\"");
+
+    char* buf;
+    size_t size;
+    FILE* f = open_memstream(&buf, &size);
+    if (f == nullptr) {
+        return 0;
+    }
+    malloc_info(0, f);
+    fclose(f);
+    if (QUtil::get_env("QPDF_DEBUG_MEM_USAGE")) {
+        fprintf(stderr, "%s", buf);
+    }
+
+    // Warning: this code uses regular expression to extract data from
+    // an XML string. This is generally a bad idea, but we're going to
+    // do it anyway because QUtil.hh warns against using this function
+    // for other than development/testing, and if this function fails
+    // to generate reasonable output during performance testing, it
+    // will be noticed.
+
+    // This is my best guess at how to interpret malloc_info. Anyway
+    // it seems to provide useful information for detecting code
+    // changes that drastically change memory usage.
+    size_t result = 0;
+    try {
+        std::cregex_iterator m_begin(buf, buf + size, tag_re);
+        std::cregex_iterator cr_end;
+        std::sregex_iterator sr_end;
+
+        int in_heap = 0;
+        for (auto m = m_begin; m != cr_end; ++m) {
+            std::string tag(m->str(1));
+            if (tag == "heap") {
+                ++in_heap;
+            } else if (tag == "/heap") {
+                --in_heap;
+            } else if (in_heap == 0) {
+                std::string rest = m->str(2);
+                std::map<std::string, std::string> attrs;
+                std::sregex_iterator a_begin(rest.begin(), rest.end(), attr_re);
+                for (auto m2 = a_begin; m2 != sr_end; ++m2) {
+                    attrs[m2->str(1)] = m2->str(2);
+                }
+                if (tag == "total") {
+                    if (attrs.count("size") > 0) {
+                        result += QIntC::to_size(
+                            QUtil::string_to_ull(attrs["size"].c_str()));
+                    }
+                } else if (tag == "system" && attrs["type"] == "max") {
+                    result += QIntC::to_size(
+                        QUtil::string_to_ull(attrs["size"].c_str()));
+                }
+            }
+        }
+    } catch (...) {
+        // ignore -- just return 0
+    }
+    free(buf);
+    return result;
+#else
+    return 0;
+#endif
+}

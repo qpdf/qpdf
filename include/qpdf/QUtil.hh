@@ -525,7 +525,17 @@ namespace QUtil
         wchar_t const* const argv[],
         std::function<int(int, char const* const[])> realmain);
 #endif // QPDF_NO_WCHAR_T
-};     // namespace QUtil
+
+    // Try to return the maximum amount of memory allocated by the
+    // current process and its threads. Return 0 if unable to
+    // determine. This is Linux-specific and not implemented to be
+    // completely reliable. It is used during development for
+    // performance testing to detect changes that may significantly
+    // change memory usage. It is not recommended for use for other
+    // purposes.
+    QPDF_DLL
+    size_t get_max_memory_usage();
+}; // namespace QUtil
 
 inline bool
 QUtil::is_hex_digit(char ch)

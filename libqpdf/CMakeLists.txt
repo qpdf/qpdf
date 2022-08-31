@@ -376,6 +376,29 @@ int main(int argc, char* argv[]) {
   endif()
 endfunction()
 
+check_c_source_compiles(
+"#include <malloc.h>
+#include <stdio.h>
+int main(int argc, char* argv[]) {
+    malloc_info(0, stdout);
+    return 0;
+}"
+    HAVE_MALLOC_INFO)
+
+check_c_source_compiles(
+"#include <stdio.h>
+#include <stdlib.h>
+int main(int argc, char* argv[]) {
+    char* buf;
+    size_t size;
+    FILE* f;
+    f = open_memstream(&buf, &size);
+    fclose(f);
+    free(buf);
+    return 0;
+}"
+    HAVE_OPEN_MEMSTREAM)
+
 qpdf_check_ll_fmt("%lld" fmt_lld)
 qpdf_check_ll_fmt("%I64d" fmt_i64d)
 qpdf_check_ll_fmt("%I64lld" fmt_i64lld)
