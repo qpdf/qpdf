@@ -127,6 +127,7 @@ options:
       - recompress-flate
       - remove-page-labels
       - replace-input
+      - report-mem-usage
       - requires-password
       - show-encryption
       - show-encryption-key
@@ -413,6 +414,7 @@ json:
       Pages.password:
       _range: "page range"
   remove-page-labels:
+  report-mem-usage:
   rotate:
   overlay:
     _file: "source file for overlay"

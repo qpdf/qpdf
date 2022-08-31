@@ -417,7 +417,8 @@ QPDFJob::Members::Members() :
     check_is_encrypted(false),
     check_requires_password(false),
     json_input(false),
-    json_output(false)
+    json_output(false),
+    report_mem_usage(false)
 {
 }
 
@@ -624,6 +625,14 @@ QPDFJob::run()
             *this->m->log->getWarn() << this->m->message_prefix
                                      << ": operation succeeded with warnings\n";
         }
+    }
+    if (m->report_mem_usage) {
+        // Call get_max_memory_usage before generating output. When
+        // debugging, it's easier if print statements from
+        // get_max_memory_usage are not interleaved with the output.
+        auto mem_usage = QUtil::get_max_memory_usage();
+        *this->m->log->getWarn()
+            << "qpdf-max-memory-usage " << mem_usage << "\n";
     }
 }
 

@@ -3463,6 +3463,16 @@ Related Options
    memory and is therefore unsuitable for use with large files. This
    is why it's also not on by default.
 
+.. qpdf:option:: --report-mem-usage
+
+   .. help: best effort report of memory usage
+
+      This is used by qpdf's performance test suite to report the
+      maximum amount of memory used in supported environments.
+
+   This is used by qpdf's performance test suite to report the maximum
+   amount of memory used in supported environments.
+
 .. _unicode-passwords:
 
 Unicode Passwords

@@ -503,6 +503,13 @@ QPDFJob::Config::removePageLabels()
 }
 
 QPDFJob::Config*
+QPDFJob::Config::reportMemUsage()
+{
+    o.m->report_mem_usage = true;
+    return this;
+}
+
+QPDFJob::Config*
 QPDFJob::Config::requiresPassword()
 {
     o.m->check_requires_password = true;
