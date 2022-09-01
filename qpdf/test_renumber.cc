@@ -1,7 +1,7 @@
 #include <qpdf/Buffer.hh>
+#include <qpdf/Constants.h>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjGen.hh>
-#include <qpdf/QPDFObject.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QPDFXRefEntry.hh>

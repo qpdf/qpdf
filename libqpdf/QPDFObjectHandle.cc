@@ -7,6 +7,7 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFMatrix.hh>
+#include <qpdf/QPDFObject.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFParser.hh>
 #include <qpdf/QPDF_Array.hh>
@@ -2768,6 +2769,36 @@ QPDFObjectHandle::QPDFArrayItems::iterator
 QPDFObjectHandle::QPDFArrayItems::end()
 {
     return iterator(oh, false);
+}
+
+QPDFObjGen
+QPDFObjectHandle::getObjGen() const
+{
+    return isInitialized() ? obj->getObjGen() : QPDFObjGen();
+}
+
+// Indirect object accessors
+QPDF*
+QPDFObjectHandle::getOwningQPDF(
+    bool allow_nullptr, std::string const& error_msg) const
+{
+    // Will be null for direct objects
+    auto result = isInitialized() ? this->obj->getQPDF() : nullptr;
+    if (!allow_nullptr && (result == nullptr)) {
+        throw std::runtime_error(
+            error_msg == "" ? "attempt to use a null qpdf object" : error_msg);
+    }
+    return result;
+}
+
+void
+QPDFObjectHandle::setParsedOffset(qpdf_offset_t offset)
+{
+    // This is called during parsing on newly created direct objects,
+    // so we can't call dereference() here.
+    if (isInitialized()) {
+        this->obj->setParsedOffset(offset);
+    }
 }
 
 QPDFObjectHandle operator""_qpdf(char const* v, size_t len)

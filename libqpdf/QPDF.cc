@@ -21,6 +21,7 @@
 #include <qpdf/Pl_OStream.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
+#include <qpdf/QPDFObject.hh>
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QPDF_Null.hh>

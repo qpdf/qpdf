@@ -35,11 +35,10 @@
 
 #include <qpdf/Buffer.hh>
 #include <qpdf/InputSource.hh>
+#include <qpdf/JSON.hh>
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFTokenizer.hh>
-
-#include <qpdf/QPDFObject.hh>
 
 class Pipeline;
 class QPDF;
@@ -55,6 +54,7 @@ class QPDF_Real;
 class QPDF_Reserved;
 class QPDF_Stream;
 class QPDF_String;
+class QPDFObject;
 class QPDFTokenizer;
 class QPDFExc;
 class Pl_QPDFTokenizer;
@@ -973,7 +973,7 @@ class QPDFObjectHandle
     // null for a direct object if allow_nullptr is set to true or
     // throws a runtime error otherwise.
     QPDF_DLL
-    inline QPDF* getOwningQPDF(
+    QPDF* getOwningQPDF(
         bool allow_nullptr = true, std::string const& error_msg = "") const;
 
     // Create a shallow copy of an object as a direct object, but do not
@@ -1315,7 +1315,7 @@ class QPDFObjectHandle
     // QPDFObjGen instead.
 
     QPDF_DLL
-    inline QPDFObjGen getObjGen() const;
+    QPDFObjGen getObjGen() const;
     QPDF_DLL
     inline int getObjectID() const;
     QPDF_DLL
@@ -1616,7 +1616,7 @@ class QPDFObjectHandle
     void shallowCopyInternal(QPDFObjectHandle& oh, bool first_level_only);
     void releaseResolved();
 
-    inline void setParsedOffset(qpdf_offset_t offset);
+    void setParsedOffset(qpdf_offset_t offset);
     void parseContentStream_internal(
         std::string const& description, ParserCallbacks* callbacks);
     static void parseContentStream_data(
@@ -1852,12 +1852,6 @@ class QPDFObjectHandle::QPDFArrayItems
     QPDFObjectHandle oh;
 };
 
-inline QPDFObjGen
-QPDFObjectHandle::getObjGen() const
-{
-    return isInitialized() ? obj->getObjGen() : QPDFObjGen();
-}
-
 inline int
 QPDFObjectHandle::getObjectID() const
 {
@@ -1880,30 +1874,6 @@ inline bool
 QPDFObjectHandle::isInitialized() const
 {
     return obj != nullptr;
-}
-
-// Indirect object accessors
-inline QPDF*
-QPDFObjectHandle::getOwningQPDF(
-    bool allow_nullptr, std::string const& error_msg) const
-{
-    // Will be null for direct objects
-    auto result = isInitialized() ? this->obj->getQPDF() : nullptr;
-    if (!allow_nullptr && (result == nullptr)) {
-        throw std::runtime_error(
-            error_msg == "" ? "attempt to use a null qpdf object" : error_msg);
-    }
-    return result;
-}
-
-inline void
-QPDFObjectHandle::setParsedOffset(qpdf_offset_t offset)
-{
-    // This is called during parsing on newly created direct objects,
-    // so we can't call dereference() here.
-    if (isInitialized()) {
-        this->obj->setParsedOffset(offset);
-    }
 }
 
 #endif // QPDFOBJECTHANDLE_HH
