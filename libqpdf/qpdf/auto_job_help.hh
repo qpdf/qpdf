@@ -883,7 +883,7 @@ for debugging qpdf.
 ap.addOptionHelp("--test-json-schema", "testing", "test generated json against schema", R"(This is used by qpdf's test suite to check consistency between
 the output of qpdf --json and the output of qpdf --json-help.
 )");
-ap.addOptionHelp("--report-mem-usage", "testing", "best effort report of memory usage", R"(This is used by qpdf's performance test suite to report the
+ap.addOptionHelp("--report-memory-usage", "testing", "best effort report of memory usage", R"(This is used by qpdf's performance test suite to report the
 maximum amount of memory used in supported environments.
 )");
 }

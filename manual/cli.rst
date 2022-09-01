@@ -3463,7 +3463,7 @@ Related Options
    memory and is therefore unsuitable for use with large files. This
    is why it's also not on by default.
 
-.. qpdf:option:: --report-mem-usage
+.. qpdf:option:: --report-memory-usage
 
    .. help: best effort report of memory usage
 

@@ -144,7 +144,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
     }
   ],
   "removePageLabels": "remove explicit page numbers",
-  "reportMemUsage": "best effort report of memory usage",
+  "reportMemoryUsage": "best effort report of memory usage",
   "rotate": "rotate pages",
   "overlay": {
     "file": "source file for overlay",

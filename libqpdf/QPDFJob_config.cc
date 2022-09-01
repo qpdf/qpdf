@@ -503,7 +503,7 @@ QPDFJob::Config::removePageLabels()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::reportMemUsage()
+QPDFJob::Config::reportMemoryUsage()
 {
     o.m->report_mem_usage = true;
     return this;
