@@ -5,6 +5,8 @@ use strict;
 use File::Basename;
 use Time::HiRes qw(gettimeofday tv_interval);
 use File::Path qw(make_path);
+use IPC::Open3;
+use IO::Pipe;
 
 my $whoami = basename($0);
 $| = 1;
@@ -29,6 +31,7 @@ my %arg_compat = (
     '--remove-unreferenced-resources=no' => '--preserve-unreferenced-resources',
     '--remove-unreferenced-resources=yes' => '',
     '--remove-unreferenced-resources=auto' => undef,
+    '--report-memory-usage' => '',
     );
 
 my $executable = undef;
@@ -172,6 +175,20 @@ Repository URL: https://github.com/qpdf/performance-test-files
     }
 }
 
+my $report_mem = filter_args(["--report-memory-usage"]);
+{
+    my ($r, $mem) = run_cmd($executable, @$report_mem,
+                            "--empty", File::Spec->devnull());
+    if ($r != 0)
+    {
+        die "$whoami: $executable doesn't seem to work\n";
+    }
+    if ($mem == 0)
+    {
+        print "** Note: memory information is not available **\n";
+    }
+}
+
 run_tests();
 print "\n";
 
@@ -211,6 +228,7 @@ sub run_tests
 
     chomp(my $commit = `git describe @`);
     print "commit: $commit\n";
+    print "Format: time-in-seconds  RAM-in-MiB  filename\n";
     make_path($workdir);
     foreach my $test (@tests)
     {
@@ -259,16 +277,17 @@ sub run_test
             last;
         }
     }
-    my @cmd = ($executable, @$args, $file, "$workdir/$outfile");
+    my @cmd = ($executable, @$args, @$report_mem, $file, "$workdir/$outfile");
     # Run once and discard to update caches
     system("sync");
-    system(@cmd);
+    run_cmd(@cmd);
     my $i = 0;
     my $total = 0;
+    my $max_mem = 0;
     while ($i < $iterations)
     {
         my $start = [gettimeofday];
-        my $r = system(@cmd);
+        my ($r, $mem) = run_cmd(@cmd);
         if ($r == 2)
         {
             # interrupt
@@ -280,6 +299,7 @@ sub run_test
             print "  command failed; ignoring results\n";
             return undef;
         }
+        $max_mem = $mem > $max_mem ? $mem : $max_mem;
         my $elapsed = tv_interval($start, $end);
         $total += $elapsed;
         ++$i;
@@ -289,5 +309,28 @@ sub run_test
             last;
         }
     }
-    return sprintf("%0.4f", $total / $i);
+    return sprintf("%8.4f  %8.4f", $total / $i, $max_mem / 1048576);
+}
+
+sub run_cmd
+{
+    my @cmd = @_;
+    my $pipe = IO::Pipe->new();
+    my $pid = open3(my $child_in, '>&STDOUT', $pipe->writer(), @cmd);
+    $child_in->close();
+    waitpid($pid, 0);
+    my $r = $?;
+    my $mem = 0;
+    while (<$pipe>)
+    {
+        if (m/qpdf-max-memory-usage (\d+)/)
+        {
+            $mem = $1;
+        }
+        else
+        {
+            warn $_;
+        }
+    }
+    ($r, $mem);
 }

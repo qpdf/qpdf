@@ -253,6 +253,14 @@ For a detailed list of changes, please see the file
       some additional caching to reduce the overhead of repeatedly
       reading environment variables at runtime.
 
+    - The test files used by the ``performance_check`` script at the
+      top of the repository are now available in the
+      `qpdf/performance-test-files github repository
+      <https://github.com/qpdf/performance-test-files>`__. In addition
+      to running time, memory usage is also included in performance
+      test results. The ``performance_check`` tool has only been
+      tested on Linux.
+
     - Lots of code cleanup and refactoring work was contributed in
       multiple pull requests by M. Holger.
 
