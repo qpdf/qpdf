@@ -4,16 +4,12 @@ Next
 
 Before Release:
 
-* Review in order #726
-* Make ./performance_check usable by other people by having published
-  files to use for testing.
-  * Site https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf
-  * Incorporate --report-mem-usage into performance testing.
-  * Include output of test_many_nulls
+* Consider a transition symbol for deprecation of stack-allocated QPDF
+  objects and also make QPDF non-copiable.
 * Evaluate issues tagged with `next`
 * Stay on top of https://github.com/pikepdf/pikepdf/pull/315
-
-Next:
+* Consider whether otherwise unreferenced object streams should be
+  included in json output. Probably not. Or maybe optionally.
 * Support json v2 in the C API. At a minimum, write_json,
   create_from_json, and update_from_json need to be there and should
   take the same kinds of functions as the C API for logger.
@@ -35,7 +31,9 @@ Remove raw pointers from the API
 (For qpdf >= 12)
 
 See if we can remove raw pointers from the QPDF API. There's a
-discussion in https://github.com/qpdf/qpdf/pull/747.
+discussion in https://github.com/qpdf/qpdf/pull/747. Possibly
+deprecate creation of QPDF objects by any means other than
+QPDF::create(), which returns a std::shared_ptr<QPDF>.
 
 Fix Multiple Direct Object Owner Issue
 ======================================
