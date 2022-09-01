@@ -259,7 +259,7 @@ QPDF::~QPDF()
     // made to any of the objects.
     this->m->xref_table.clear();
     for (auto const& iter: this->m->obj_cache) {
-        QPDFObject::ObjAccessor::releaseResolved(iter.second.object.get());
+        iter.second.object->releaseResolved();
         iter.second.object->resetObjGen();
     }
 }

@@ -243,12 +243,12 @@ QPDFObjectHandle::releaseResolved()
     // Do not cross over indirect object boundaries to avoid an
     // infinite loop.  This method may only be called during final
     // destruction.  See comments in QPDF::~QPDF().
-    if (isIndirect()) {
-        if (this->obj.get()) {
+    if (this->obj.get()) {
+        if (isIndirect()) {
             this->obj = nullptr;
+        } else {
+            this->obj->releaseResolved();
         }
-    } else {
-        QPDFObject::ObjAccessor::releaseResolved(this->obj.get());
     }
 }
 

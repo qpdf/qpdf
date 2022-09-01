@@ -138,26 +138,7 @@ class QPDFObject
         return dynamic_cast<T*>(value.get());
     }
 
-    // Accessor to give specific access to non-public methods
-    class ObjAccessor
-    {
-        friend class QPDF;
-        friend class QPDFObjectHandle;
-
-      private:
-        static void
-        releaseResolved(QPDFObject* o)
-        {
-            if (o) {
-                o->releaseResolved();
-            }
-        }
-    };
-
-    friend class ObjAccessor;
-
-  protected:
-    virtual void
+    void
     releaseResolved()
     {
         value->releaseResolved();
