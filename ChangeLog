@@ -1,3 +1,15 @@
+2022-09-01  Jay Berkenbilt  <ejb@ql.org>
+
+        * More optimizations and cleanup from m-holger (#726, #730)
+        including major refactor of QPDF's internal representations of
+        objects. In addition to a large performance improvement, this also
+        made it possible for QPDFObjectHandle::getOwningQPDF() to return a
+        null pointer if the owning QPDF had been destroyed. (A more
+        complete solution to this problem will be introduced for qpdf 12.)
+        This work also paves the way for a future alternative to
+        QPDFObjectHandle that is more idiomatic C++ and has greater type
+        safety.
+
 2022-08-31  Jay Berkenbilt  <ejb@ql.org>
 
         * From m-holger (#729): refactor QPDF's parser into a new

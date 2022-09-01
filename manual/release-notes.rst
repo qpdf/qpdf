@@ -12,7 +12,7 @@ For a detailed list of changes, please see the file
     - Many performance enhancements have been added. In developer
       performance benchmarks, gains on the order of 20% have been
       observed. Most of that work, including major optimization of
-      qpdf's lexical layer, was done by M. Holger.
+      qpdf's lexical and parsing layers, was done by M. Holger.
 
   - Replacement of ``PointerHolder`` with ``std::shared_ptr``
 
@@ -178,6 +178,12 @@ For a detailed list of changes, please see the file
       ``replaceKeyAndGetOld``, a ``null`` object if the object was not
       previously there.
 
+    - The method ``QPDFObjectHandle::getOwningQPDF`` now returns a
+      null pointer (rather than an invalid pointer) if the owning
+      ``QPDF`` object has been destroyed. This situation should
+      generally not happen for correct code, but at least the
+      situation is detectible now.
+
     - Add new ``Pipeline`` methods to reduce the amount of casting that is
       needed:
 
@@ -246,6 +252,9 @@ For a detailed list of changes, please see the file
       internally by the library are turned off. Internally, there is
       some additional caching to reduce the overhead of repeatedly
       reading environment variables at runtime.
+
+    - Lots of code cleanup and refactoring work was contributed in
+      multiple pull requests by M. Holger.
 
 10.6.3: March 8, 2022
   - Announcement of upcoming change:
