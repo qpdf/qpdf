@@ -18,7 +18,6 @@ class QPDFObject
 
   public:
     QPDFObject() = default;
-    virtual ~QPDFObject() = default;
 
     std::shared_ptr<QPDFObject>
     shallowCopy()
