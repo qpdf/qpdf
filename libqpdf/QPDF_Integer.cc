@@ -3,6 +3,7 @@
 #include <qpdf/QUtil.hh>
 
 QPDF_Integer::QPDF_Integer(long long val) :
+    QPDFValue(::ot_integer, "integer"),
     val(val)
 {
 }
@@ -29,18 +30,6 @@ JSON
 QPDF_Integer::getJSON(int json_version)
 {
     return JSON::makeInt(this->val);
-}
-
-QPDFObject::object_type_e
-QPDF_Integer::getTypeCode() const
-{
-    return QPDFObject::ot_integer;
-}
-
-char const*
-QPDF_Integer::getTypeName() const
-{
-    return "integer";
 }
 
 long long

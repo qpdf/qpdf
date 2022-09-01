@@ -1,13 +1,13 @@
 #ifndef QPDF_ARRAY_HH
 #define QPDF_ARRAY_HH
 
-#include <qpdf/QPDFObject.hh>
+#include <qpdf/QPDFValue.hh>
 
 #include <qpdf/SparseOHArray.hh>
 #include <list>
 #include <vector>
 
-class QPDF_Array: public QPDFObject
+class QPDF_Array: public QPDFValue
 {
   public:
     virtual ~QPDF_Array() = default;
@@ -17,8 +17,6 @@ class QPDF_Array: public QPDFObject
     virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
-    virtual QPDFObject::object_type_e getTypeCode() const;
-    virtual char const* getTypeName() const;
 
     int getNItems() const;
     QPDFObjectHandle getItem(int n) const;

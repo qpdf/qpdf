@@ -5,6 +5,7 @@
 #include <string.h>
 
 QPDF_Name::QPDF_Name(std::string const& name) :
+    QPDFValue(::ot_name, "name"),
     name(name)
 {
 }
@@ -59,18 +60,6 @@ QPDF_Name::getJSON(int json_version)
     } else {
         return JSON::makeString(this->name);
     }
-}
-
-QPDFObject::object_type_e
-QPDF_Name::getTypeCode() const
-{
-    return QPDFObject::ot_name;
-}
-
-char const*
-QPDF_Name::getTypeName() const
-{
-    return "name";
 }
 
 std::string

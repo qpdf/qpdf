@@ -1,6 +1,7 @@
 #include <qpdf/QPDF_Bool.hh>
 
 QPDF_Bool::QPDF_Bool(bool val) :
+    QPDFValue(::ot_boolean, "boolean"),
     val(val)
 {
 }
@@ -27,18 +28,6 @@ JSON
 QPDF_Bool::getJSON(int json_version)
 {
     return JSON::makeBool(this->val);
-}
-
-QPDFObject::object_type_e
-QPDF_Bool::getTypeCode() const
-{
-    return QPDFObject::ot_boolean;
-}
-
-char const*
-QPDF_Bool::getTypeName() const
-{
-    return "boolean";
 }
 
 bool

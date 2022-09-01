@@ -1,9 +1,9 @@
 #ifndef QPDF_REAL_HH
 #define QPDF_REAL_HH
 
-#include <qpdf/QPDFObject.hh>
+#include <qpdf/QPDFValue.hh>
 
-class QPDF_Real: public QPDFObject
+class QPDF_Real: public QPDFValue
 {
   public:
     virtual ~QPDF_Real() = default;
@@ -13,8 +13,6 @@ class QPDF_Real: public QPDFObject
     virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
-    virtual QPDFObject::object_type_e getTypeCode() const;
-    virtual char const* getTypeName() const;
     std::string getVal();
 
   private:

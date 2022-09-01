@@ -2,6 +2,11 @@
 
 #include <stdexcept>
 
+QPDF_Reserved::QPDF_Reserved() :
+    QPDFValue(::ot_reserved, "reserved")
+{
+}
+
 std::shared_ptr<QPDFObject>
 QPDF_Reserved::create()
 {
@@ -17,25 +22,15 @@ QPDF_Reserved::shallowCopy()
 std::string
 QPDF_Reserved::unparse()
 {
-    throw std::logic_error("attempt to unparse QPDF_Reserved");
+    throw std::logic_error(
+        "QPDFObjectHandle: attempting to unparse a reserved object");
     return "";
 }
 
 JSON
 QPDF_Reserved::getJSON(int json_version)
 {
-    throw std::logic_error("attempt to generate JSON from QPDF_Reserved");
+    throw std::logic_error(
+        "QPDFObjectHandle: attempting to unparse a reserved object");
     return JSON::makeNull();
-}
-
-QPDFObject::object_type_e
-QPDF_Reserved::getTypeCode() const
-{
-    return QPDFObject::ot_reserved;
-}
-
-char const*
-QPDF_Reserved::getTypeName() const
-{
-    return "reserved";
 }

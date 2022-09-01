@@ -1,5 +1,10 @@
 #include <qpdf/QPDF_Null.hh>
 
+QPDF_Null::QPDF_Null() :
+    QPDFValue(::ot_null, "null")
+{
+}
+
 std::shared_ptr<QPDFObject>
 QPDF_Null::create()
 {
@@ -22,16 +27,4 @@ JSON
 QPDF_Null::getJSON(int json_version)
 {
     return JSON::makeNull();
-}
-
-QPDFObject::object_type_e
-QPDF_Null::getTypeCode() const
-{
-    return QPDFObject::ot_null;
-}
-
-char const*
-QPDF_Null::getTypeName() const
-{
-    return "null";
 }

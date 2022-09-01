@@ -43,8 +43,18 @@
 
 class Pipeline;
 class QPDF;
-class QPDF_Dictionary;
 class QPDF_Array;
+class QPDF_Bool;
+class QPDF_Dictionary;
+class QPDF_InlineImage;
+class QPDF_Integer;
+class QPDF_Name;
+class QPDF_Null;
+class QPDF_Operator;
+class QPDF_Real;
+class QPDF_Reserved;
+class QPDF_Stream;
+class QPDF_String;
 class QPDFTokenizer;
 class QPDFExc;
 class Pl_QPDFTokenizer;
@@ -316,7 +326,7 @@ class QPDFObjectHandle
     };
 
     QPDF_DLL
-    QPDFObjectHandle();
+    QPDFObjectHandle() = default;
     QPDF_DLL
     QPDFObjectHandle(QPDFObjectHandle const&) = default;
     QPDF_DLL
@@ -963,8 +973,8 @@ class QPDFObjectHandle
     // null for a direct object if allow_nullptr is set to true or
     // throws a runtime error otherwise.
     QPDF_DLL
-    inline QPDF*
-    getOwningQPDF(bool allow_nullptr = true, std::string const& error_msg = "");
+    inline QPDF* getOwningQPDF(
+        bool allow_nullptr = true, std::string const& error_msg = "") const;
 
     // Create a shallow copy of an object as a direct object, but do not
     // traverse across indirect object boundaries. That means that,
@@ -1443,9 +1453,9 @@ class QPDFObjectHandle
 
       private:
         static QPDFObjectHandle
-        newIndirect(QPDF* qpdf, QPDFObjGen const& og)
+        newIndirect(std::shared_ptr<QPDFObject> const& obj)
         {
-            return QPDFObjectHandle::newIndirect(qpdf, og);
+            return QPDFObjectHandle(obj);
         }
         static QPDFObjectHandle
         newStream(
@@ -1457,12 +1467,6 @@ class QPDFObjectHandle
         {
             return QPDFObjectHandle::newStream(
                 qpdf, og, stream_dict, offset, length);
-        }
-        // Reserve an object with a specific ID
-        static QPDFObjectHandle
-        makeReserved()
-        {
-            return QPDFObjectHandle::makeReserved();
         }
     };
     friend class Factory;
@@ -1482,6 +1486,16 @@ class QPDFObjectHandle
                                        " uninitialized QPDFObjectHandle");
             };
             return o.obj;
+        }
+        static QPDF_Array*
+        asArray(QPDFObjectHandle& oh)
+        {
+            return oh.asArray();
+        }
+        static QPDF_Stream*
+        asStream(QPDFObjectHandle& oh)
+        {
+            return oh.asStream();
         }
     };
     friend class ObjAccessor;
@@ -1563,18 +1577,32 @@ class QPDFObjectHandle
     bool isImage(bool exclude_imagemask = true);
 
   private:
-    QPDFObjectHandle(QPDF*, QPDFObjGen const& og);
-    QPDFObjectHandle(std::shared_ptr<QPDFObject> const&);
+    QPDFObjectHandle(std::shared_ptr<QPDFObject> const& obj) :
+        obj(obj)
+    {
+    }
 
     // Private object factory methods
-    static QPDFObjectHandle newIndirect(QPDF*, QPDFObjGen const& og);
     static QPDFObjectHandle newStream(
         QPDF* qpdf,
         QPDFObjGen const& og,
         QPDFObjectHandle stream_dict,
         qpdf_offset_t offset,
         size_t length);
-    static QPDFObjectHandle makeReserved();
+
+    QPDF_Array* asArray();
+    QPDF_Bool* asBool();
+    QPDF_Dictionary* asDictionary();
+    QPDF_InlineImage* asInlineImage();
+    QPDF_Integer* asInteger();
+    QPDF_Name* asName();
+    QPDF_Null* asNull();
+    QPDF_Operator* asOperator();
+    QPDF_Real* asReal();
+    QPDF_Reserved* asReserved();
+    QPDF_Stream* asStream();
+    QPDF_Stream* asStreamWithAssert();
+    QPDF_String* asString();
 
     void typeWarning(char const* expected_type, std::string const& warning);
     void objectWarning(std::string const& warning);
@@ -1601,15 +1629,10 @@ class QPDFObjectHandle
     static void warn(QPDF*, QPDFExc const&);
     void checkOwnership(QPDFObjectHandle const&) const;
 
-    bool initialized;
-
     // Moving members of QPDFObjectHandle into a smart pointer incurs
     // a substantial performance penalty since QPDFObjectHandle
     // objects are copied around so frequently.
-    QPDF* qpdf;
-    QPDFObjGen og;
     std::shared_ptr<QPDFObject> obj;
-    bool reserved;
 };
 
 #ifndef QPDF_NO_QPDF_STRING
@@ -1832,44 +1855,45 @@ class QPDFObjectHandle::QPDFArrayItems
 inline QPDFObjGen
 QPDFObjectHandle::getObjGen() const
 {
-    return og;
+    return isInitialized() ? obj->getObjGen() : QPDFObjGen();
 }
 
 inline int
 QPDFObjectHandle::getObjectID() const
 {
-    return og.getObj();
+    return getObjGen().getObj();
 }
 
 inline int
 QPDFObjectHandle::getGeneration() const
 {
-    return og.getGen();
+    return getObjGen().getGen();
 }
 
 inline bool
 QPDFObjectHandle::isIndirect() const
 {
-    return initialized && (getObjectID() != 0);
+    return (obj != nullptr) && (getObjectID() != 0);
 }
 
 inline bool
 QPDFObjectHandle::isInitialized() const
 {
-    return initialized;
+    return obj != nullptr;
 }
 
 // Indirect object accessors
 inline QPDF*
 QPDFObjectHandle::getOwningQPDF(
-    bool allow_nullptr, std::string const& error_msg)
+    bool allow_nullptr, std::string const& error_msg) const
 {
     // Will be null for direct objects
-    if (!allow_nullptr && (this->qpdf == nullptr)) {
+    auto result = isInitialized() ? this->obj->getQPDF() : nullptr;
+    if (!allow_nullptr && (result == nullptr)) {
         throw std::runtime_error(
             error_msg == "" ? "attempt to use a null qpdf object" : error_msg);
     }
-    return this->qpdf;
+    return result;
 }
 
 inline void
@@ -1877,7 +1901,7 @@ QPDFObjectHandle::setParsedOffset(qpdf_offset_t offset)
 {
     // This is called during parsing on newly created direct objects,
     // so we can't call dereference() here.
-    if (this->obj.get()) {
+    if (isInitialized()) {
         this->obj->setParsedOffset(offset);
     }
 }

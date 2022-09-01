@@ -85,6 +85,7 @@ set(libqpdf_SOURCES
   QPDFSystemError.cc
   QPDFTokenizer.cc
   QPDFUsage.cc
+  QPDFValue.cc
   QPDFWriter.cc
   QPDFXRefEntry.cc
   QPDF_Array.cc
@@ -99,6 +100,7 @@ set(libqpdf_SOURCES
   QPDF_Reserved.cc
   QPDF_Stream.cc
   QPDF_String.cc
+  QPDF_Unresolved.cc
   QPDF_encryption.cc
   QPDF_json.cc
   QPDF_linearization.cc

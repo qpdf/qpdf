@@ -3,9 +3,9 @@
 
 #include <qpdf/Types.h>
 
-#include <qpdf/QPDFObject.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFStreamFilter.hh>
+#include <qpdf/QPDFValue.hh>
 
 #include <functional>
 #include <memory>
@@ -13,7 +13,7 @@
 class Pipeline;
 class QPDF;
 
-class QPDF_Stream: public QPDFObject
+class QPDF_Stream: public QPDFValue
 {
   public:
     virtual ~QPDF_Stream() = default;
@@ -26,8 +26,6 @@ class QPDF_Stream: public QPDFObject
     virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
-    virtual QPDFObject::object_type_e getTypeCode() const;
-    virtual char const* getTypeName() const;
     virtual void setDescription(QPDF*, std::string const&);
     QPDFObjectHandle getDict() const;
     bool isDataModified() const;

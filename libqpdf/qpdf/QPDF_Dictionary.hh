@@ -1,14 +1,14 @@
 #ifndef QPDF_DICTIONARY_HH
 #define QPDF_DICTIONARY_HH
 
-#include <qpdf/QPDFObject.hh>
+#include <qpdf/QPDFValue.hh>
 
 #include <map>
 #include <set>
 
 #include <qpdf/QPDFObjectHandle.hh>
 
-class QPDF_Dictionary: public QPDFObject
+class QPDF_Dictionary: public QPDFValue
 {
   public:
     virtual ~QPDF_Dictionary() = default;
@@ -17,8 +17,6 @@ class QPDF_Dictionary: public QPDFObject
     virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
-    virtual QPDFObject::object_type_e getTypeCode() const;
-    virtual char const* getTypeName() const;
 
     // hasKey() and getKeys() treat keys with null values as if they
     // aren't there.  getKey() returns null for the value of a

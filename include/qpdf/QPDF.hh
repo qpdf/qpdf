@@ -843,19 +843,13 @@ class QPDF
     // it can resolve indirect references.
     class Resolver
     {
-        friend class QPDFObjectHandle;
+        friend class QPDFObject;
 
       private:
-        static std::shared_ptr<QPDFObject>
+        static void
         resolve(QPDF* qpdf, QPDFObjGen const& og)
         {
-            return qpdf->resolve(og);
-        }
-        static bool
-        objectChanged(
-            QPDF* qpdf, QPDFObjGen const& og, std::shared_ptr<QPDFObject>& oph)
-        {
-            return qpdf->objectChanged(og, oph);
+            qpdf->resolve(og);
         }
     };
     friend class Resolver;
@@ -1174,12 +1168,20 @@ class QPDF
         std::string const& description,
         QPDFObjGen const& exp_og,
         QPDFObjGen& og);
-    bool objectChanged(QPDFObjGen const& og, std::shared_ptr<QPDFObject>& oph);
-    std::shared_ptr<QPDFObject> resolve(QPDFObjGen const& og);
+    void resolve(QPDFObjGen const& og);
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
     QPDFObjectHandle reserveObjectIfNotExists(QPDFObjGen const& og);
     QPDFObjectHandle reserveStream(QPDFObjGen const& og);
+    QPDFObjectHandle
+    newIndirect(QPDFObjGen const&, std::shared_ptr<QPDFObject> const&);
+    bool isCached(QPDFObjGen const& og);
+    bool isUnresolved(QPDFObjGen const& og);
+    void updateCache(
+        QPDFObjGen const& og,
+        std::shared_ptr<QPDFObject> const& object,
+        qpdf_offset_t end_before_space,
+        qpdf_offset_t end_after_space);
 
     // Calls finish() on the pipeline when done but does not delete it
     bool pipeStreamData(
@@ -1727,7 +1729,6 @@ class QPDF
         bool in_parse;
         bool parsed;
         std::set<int> resolved_object_streams;
-        bool ever_replaced_objects;
 
         // Linearization data
         qpdf_offset_t first_xref_item_offset; // actual value from file
