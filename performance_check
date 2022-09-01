@@ -55,6 +55,12 @@ Usage: $whoami [ args ]
   --workdir           where to write output pdfs (default: $default_workdir)
   --maxtime           maximum time for a test; 0 means unlimited (default: $default_maxtime)
   --iterations        number of iterations (default: $default_iterations)
+
+Populate $test_dir with files you want to use for performance
+benchmarking. PDF files and qpdf JSON files are allowed. The qpdf
+release process uses a clone of
+https://github.com/qpdf/performance-test-files for this purpose.
+
 ";
 }
 
@@ -130,13 +136,27 @@ my @json_test_files = ();
     }
     else
     {
-        opendir(D, $test_dir) or
-            die "$whoami: can't open directory $test_dir: $!\n";
+        opendir(D, $test_dir) or die "
+$whoami: can't open test directory: $!
+
+Configured test directory: $test_dir
+
+Populate $test_dir with a clone of the
+qpdf/performance-test-files github repository.
+Run $whoami --help for details.
+
+Repository URL: https://github.com/qpdf/performance-test-files
+
+";
         my @entries = readdir(D);
         closedir(D);
         for (sort @entries)
         {
-            push(@tmp, "$test_dir/$_") unless (('.' eq $_) || ('..' eq $_));
+            my $file = "$test_dir/$_";
+            if (-f $file && $file =~ m/.(pdf|json)$/i)
+            {
+                push(@tmp, $file);
+            }
         }
     }
     foreach my $i (@tmp)
