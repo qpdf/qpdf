@@ -1,5 +1,9 @@
 2022-09-01  Jay Berkenbilt  <ejb@ql.org>
 
+        * Remove QPDFObject.hh from include/qpdf. The only reason to
+        include was to get QPDFObject::object_type_e. Instead, include
+        qpdf/Constants.h, and change `QPDFObject::ot_` to `::ot_`.
+
         * More optimizations and cleanup from m-holger (#726, #730)
         including major refactor of QPDF's internal representations of
         objects. In addition to a large performance improvement, this also

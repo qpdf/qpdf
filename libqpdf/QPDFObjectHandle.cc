@@ -251,11 +251,10 @@ QPDFObjectHandle::releaseResolved()
     }
 }
 
-QPDFObject::object_type_e
+qpdf_object_type_e
 QPDFObjectHandle::getTypeCode()
 {
-    return dereference() ? this->obj->getTypeCode()
-                         : QPDFObject::ot_uninitialized;
+    return dereference() ? this->obj->getTypeCode() : ::ot_uninitialized;
 }
 
 char const*
@@ -347,7 +346,7 @@ QPDFObjectHandle::asString()
 bool
 QPDFObjectHandle::isBool()
 {
-    return dereference() && (obj->getTypeCode() == QPDFObject::ot_boolean);
+    return dereference() && (obj->getTypeCode() == ::ot_boolean);
 }
 
 bool
@@ -357,25 +356,25 @@ QPDFObjectHandle::isDirectNull() const
     // objid == 0, so there's nothing to resolve.
     return (
         isInitialized() && (getObjectID() == 0) &&
-        (obj->getTypeCode() == QPDFObject::ot_null));
+        (obj->getTypeCode() == ::ot_null));
 }
 
 bool
 QPDFObjectHandle::isNull()
 {
-    return dereference() && (obj->getTypeCode() == QPDFObject::ot_null);
+    return dereference() && (obj->getTypeCode() == ::ot_null);
 }
 
 bool
 QPDFObjectHandle::isInteger()
 {
-    return dereference() && (obj->getTypeCode() == QPDFObject::ot_integer);
+    return dereference() && (obj->getTypeCode() == ::ot_integer);
 }
 
 bool
 QPDFObjectHandle::isReal()
 {
-    return dereference() && (obj->getTypeCode() == QPDFObject::ot_real);
+    return dereference() && (obj->getTypeCode() == ::ot_real);
 }
 
 bool
@@ -412,49 +411,49 @@ QPDFObjectHandle::getValueAsNumber(double& value)
 bool
 QPDFObjectHandle::isName()
 {
-    return dereference() && (obj->getTypeCode() == QPDFObject::ot_name);
+    return dereference() && (obj->getTypeCode() == ::ot_name);
 }
 
 bool
 QPDFObjectHandle::isString()
 {
-    return dereference() && (obj->getTypeCode() == QPDFObject::ot_string);
+    return dereference() && (obj->getTypeCode() == ::ot_string);
 }
 
 bool
 QPDFObjectHandle::isOperator()
 {
-    return dereference() && (obj->getTypeCode() == QPDFObject::ot_operator);
+    return dereference() && (obj->getTypeCode() == ::ot_operator);
 }
 
 bool
 QPDFObjectHandle::isInlineImage()
 {
-    return dereference() && (obj->getTypeCode() == QPDFObject::ot_inlineimage);
+    return dereference() && (obj->getTypeCode() == ::ot_inlineimage);
 }
 
 bool
 QPDFObjectHandle::isArray()
 {
-    return dereference() && (obj->getTypeCode() == QPDFObject::ot_array);
+    return dereference() && (obj->getTypeCode() == ::ot_array);
 }
 
 bool
 QPDFObjectHandle::isDictionary()
 {
-    return dereference() && (obj->getTypeCode() == QPDFObject::ot_dictionary);
+    return dereference() && (obj->getTypeCode() == ::ot_dictionary);
 }
 
 bool
 QPDFObjectHandle::isStream()
 {
-    return dereference() && (obj->getTypeCode() == QPDFObject::ot_stream);
+    return dereference() && (obj->getTypeCode() == ::ot_stream);
 }
 
 bool
 QPDFObjectHandle::isReserved()
 {
-    return dereference() && (obj->getTypeCode() == QPDFObject::ot_reserved);
+    return dereference() && (obj->getTypeCode() == ::ot_reserved);
 }
 
 bool

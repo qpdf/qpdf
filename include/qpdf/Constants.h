@@ -61,9 +61,8 @@ enum qpdf_error_code_e {
  * may be added to the list, so code that switches on these values
  * should take that into consideration. (Maintainer note: it would be
  * better to call this qpdf_ot_* rather than ot_* to reduce likelihood
- * of name collision, but since QPDFObject::object_type_e is an alias
- * to this type, changing the names of the values breaks backward
- * compatibility.)
+ * of name collision, but changing the names of the values breaks
+ * backward compatibility.)
  */
 enum qpdf_object_type_e {
     /* Object types internal to qpdf */
@@ -84,7 +83,6 @@ enum qpdf_object_type_e {
     ot_inlineimage,
     /* Object types internal to qpdf */
     ot_unresolved,
-    /* NOTE: if adding to this list, update QPDFObject.hh */
 };
 
 /* Write Parameters. See QPDFWriter.hh for details. */

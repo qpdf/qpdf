@@ -103,7 +103,7 @@ ParserCallbacks::handleObject(
               << ", length=" << length << ": ";
     if (obj.isInlineImage()) {
         // Exercise getTypeCode
-        assert(obj.getTypeCode() == QPDFObject::ot_inlineimage);
+        assert(obj.getTypeCode() == ::ot_inlineimage);
         std::cout << QUtil::hex_encode(obj.getInlineImageValue()) << std::endl;
     } else {
         std::cout << obj.unparse() << std::endl;
@@ -3296,7 +3296,7 @@ runtest(int n, char const* filename1, char const* arg2)
         assert(password == "1234567890123456789012(45678");
 
         QPDFObjectHandle uninitialized;
-        assert(uninitialized.getTypeCode() == QPDFObject::ot_uninitialized);
+        assert(uninitialized.getTypeCode() == ::ot_uninitialized);
         assert(strcmp(uninitialized.getTypeName(), "uninitialized") == 0);
     }
 

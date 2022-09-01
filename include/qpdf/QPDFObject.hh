@@ -38,32 +38,6 @@ class QPDFObject
     friend class QPDFValue;
 
   public:
-    // Objects derived from QPDFObject are accessible through
-    // QPDFObjectHandle. Each object returns a unique type code that
-    // has one of the valid qpdf_object_type_e values. As new object
-    // types are added to qpdf, additional items may be added to the
-    // list, so code that switches on these values should take that
-    // into consideration.
-
-    // Prior to qpdf 10.5, qpdf_object_type_e was
-    // QPDFObject::object_type_e but was moved to make it accessible
-    // to the C API. The code below is for backward compatibility.
-    typedef enum qpdf_object_type_e object_type_e;
-    static constexpr object_type_e ot_uninitialized = ::ot_uninitialized;
-    static constexpr object_type_e ot_reserved = ::ot_reserved;
-    static constexpr object_type_e ot_null = ::ot_null;
-    static constexpr object_type_e ot_boolean = ::ot_boolean;
-    static constexpr object_type_e ot_integer = ::ot_integer;
-    static constexpr object_type_e ot_real = ::ot_real;
-    static constexpr object_type_e ot_string = ::ot_string;
-    static constexpr object_type_e ot_name = ::ot_name;
-    static constexpr object_type_e ot_array = ::ot_array;
-    static constexpr object_type_e ot_dictionary = ::ot_dictionary;
-    static constexpr object_type_e ot_stream = ::ot_stream;
-    static constexpr object_type_e ot_operator = ::ot_operator;
-    static constexpr object_type_e ot_inlineimage = ::ot_inlineimage;
-    static constexpr object_type_e ot_unresolved = ::ot_unresolved;
-
     QPDFObject() = default;
     virtual ~QPDFObject() = default;
 
@@ -84,7 +58,7 @@ class QPDFObject
     }
 
     // Return a unique type code for the object
-    object_type_e
+    qpdf_object_type_e
     getTypeCode() const
     {
         return value->type_code;

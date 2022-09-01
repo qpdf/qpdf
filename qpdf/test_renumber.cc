@@ -40,37 +40,37 @@ compare(QPDFObjectHandle a, QPDFObjectHandle b)
     }
 
     switch (a.getTypeCode()) {
-    case QPDFObject::ot_boolean:
+    case ::ot_boolean:
         if (a.getBoolValue() != b.getBoolValue()) {
             std::cerr << "different boolean" << std::endl;
             return false;
         }
         break;
-    case QPDFObject::ot_integer:
+    case ::ot_integer:
         if (a.getIntValue() != b.getIntValue()) {
             std::cerr << "different integer" << std::endl;
             return false;
         }
         break;
-    case QPDFObject::ot_real:
+    case ::ot_real:
         if (a.getRealValue() != b.getRealValue()) {
             std::cerr << "different real" << std::endl;
             return false;
         }
         break;
-    case QPDFObject::ot_string:
+    case ::ot_string:
         if (a.getStringValue() != b.getStringValue()) {
             std::cerr << "different string" << std::endl;
             return false;
         }
         break;
-    case QPDFObject::ot_name:
+    case ::ot_name:
         if (a.getName() != b.getName()) {
             std::cerr << "different name" << std::endl;
             return false;
         }
         break;
-    case QPDFObject::ot_array:
+    case ::ot_array:
         {
             std::vector<QPDFObjectHandle> objs_a = a.getArrayAsVector();
             std::vector<QPDFObjectHandle> objs_b = b.getArrayAsVector();
@@ -88,7 +88,7 @@ compare(QPDFObjectHandle a, QPDFObjectHandle b)
             }
         }
         break;
-    case QPDFObject::ot_dictionary:
+    case ::ot_dictionary:
         {
             std::set<std::string> keys_a = a.getKeys();
             std::set<std::string> keys_b = b.getKeys();
@@ -105,9 +105,9 @@ compare(QPDFObjectHandle a, QPDFObjectHandle b)
             }
         }
         break;
-    case QPDFObject::ot_null:
+    case ::ot_null:
         break;
-    case QPDFObject::ot_stream:
+    case ::ot_stream:
         std::cout << "stream objects are not compared" << std::endl;
         break;
     default:

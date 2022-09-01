@@ -338,7 +338,7 @@ class QPDFObjectHandle
     // useful for doing rapid type tests (like switch statements) or
     // for testing and debugging.
     QPDF_DLL
-    QPDFObject::object_type_e getTypeCode();
+    qpdf_object_type_e getTypeCode();
     QPDF_DLL
     char const* getTypeName();
 
