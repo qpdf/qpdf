@@ -82,7 +82,10 @@ QPDF::getAllPages()
             getRoot().replaceKey("/Pages", pages);
         }
         seen.clear();
-        getAllPagesInternal(pages, this->m->all_pages, visited, seen);
+        if (pages.hasKey("/Kids")) {
+            // Ensure we actually found a /Pages object.
+            getAllPagesInternal(pages, visited, seen);
+        }
     }
     return this->m->all_pages;
 }
@@ -90,12 +93,11 @@ QPDF::getAllPages()
 void
 QPDF::getAllPagesInternal(
     QPDFObjectHandle cur_node,
-    std::vector<QPDFObjectHandle>& result,
     std::set<QPDFObjGen>& visited,
     std::set<QPDFObjGen>& seen)
 {
-    QPDFObjGen this_og = cur_node.getObjGen();
-    if (visited.count(this_og) > 0) {
+    QPDFObjGen cur_node_og = cur_node.getObjGen();
+    if (visited.count(cur_node_og) > 0) {
         throw QPDFExc(
             qpdf_e_pages,
             this->m->file->getName(),
@@ -103,14 +105,19 @@ QPDF::getAllPagesInternal(
             0,
             "Loop detected in /Pages structure (getAllPages)");
     }
-    visited.insert(this_og);
-    std::string wanted_type;
-    if (cur_node.hasKey("/Kids")) {
-        wanted_type = "/Pages";
-        QPDFObjectHandle kids = cur_node.getKey("/Kids");
-        int n = kids.getArrayNItems();
-        for (int i = 0; i < n; ++i) {
-            QPDFObjectHandle kid = kids.getArrayItem(i);
+    visited.insert(cur_node_og);
+    if (!cur_node.isDictionaryOfType("/Pages")) {
+        cur_node.warnIfPossible(
+            "/Type key should be /Pages but is not; overriding");
+        cur_node.replaceKey("/Type", "/Pages"_qpdf);
+    }
+    auto kids = cur_node.getKey("/Kids");
+    int n = kids.getArrayNItems();
+    for (int i = 0; i < n; ++i) {
+        auto kid = kids.getArrayItem(i);
+        if (kid.hasKey("/Kids")) {
+            getAllPagesInternal(kid, visited, seen);
+        } else {
             if (!kid.isIndirect()) {
                 QTC::TC("qpdf", "QPDF handle direct page object");
                 cur_node.warnIfPossible(
@@ -129,23 +136,15 @@ QPDF::getAllPagesInternal(
                 kid = makeIndirectObject(QPDFObjectHandle(kid).shallowCopy());
                 kids.setArrayItem(i, kid);
             }
-            getAllPagesInternal(kid, result, visited, seen);
+            if (!kid.isDictionaryOfType("/Page")) {
+                kid.warnIfPossible(
+                    "/Type key should be /Page but is not; overriding");
+                kid.replaceKey("/Type", "/Page"_qpdf);
+            }
+            seen.insert(kid.getObjGen());
+            m->all_pages.push_back(kid);
         }
-    } else {
-        wanted_type = "/Page";
-        seen.insert(this_og);
-        result.push_back(cur_node);
     }
-
-    if (!cur_node.isDictionaryOfType(wanted_type)) {
-        warn(
-            qpdf_e_damaged_pdf,
-            "page tree node",
-            this->m->file->getLastOffset(),
-            "/Type key should be " + wanted_type + " but is not; overriding");
-        cur_node.replaceKey("/Type", QPDFObjectHandle::newName(wanted_type));
-    }
-    visited.erase(this_og);
 }
 
 void

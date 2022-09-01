@@ -1,3 +1,3 @@
-WARNING: no-pages-types.pdf (page tree node, offset 307): /Type key should be /Page but is not; overriding
-WARNING: no-pages-types.pdf (page tree node, offset 307): /Type key should be /Pages but is not; overriding
+WARNING: no-pages-types.pdf, object 2 0 at offset 73: /Type key should be /Pages but is not; overriding
+WARNING: no-pages-types.pdf, object 3 0 at offset 145: /Type key should be /Page but is not; overriding
 qpdf: operation succeeded with warnings; resulting file may have some problems
