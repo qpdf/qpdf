@@ -142,7 +142,9 @@ QPDF::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
         return;
     }
 
-    // Calling getAllPages() resolves any duplicated page objects.
+    // Calling getAllPages() resolves any duplicated page objects,
+    // repairs broken nodes, and detects loops, so we don't have to do
+    // those activities here.
     getAllPages();
 
     // key_ancestors is a mapping of page attribute keys to a stack of
@@ -234,7 +236,10 @@ QPDF::pushInheritedAttributesToPageInternal(
         }
     }
 
-    // Process descendant nodes.
+    // Process descendant nodes. This method does not perform loop
+    // detection because all code paths that lead here follow a call
+    // to getAllPages, which already throws an exception in the event
+    // of a loop in the pages tree.
     for (auto& kid: cur_pages.getKey("/Kids").aitems()) {
         if (kid.isDictionaryOfType("/Pages")) {
             pushInheritedAttributesToPageInternal(
