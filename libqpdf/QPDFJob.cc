@@ -683,7 +683,13 @@ QPDFJob::getExitCode() const
 void
 QPDFJob::checkConfiguration()
 {
+    // Do final checks for command-line consistency. (I always think
+    // this is called doFinalChecks, so I'm putting that in a
+    // comment.)
+
     if (m->replace_input) {
+        // Check for --empty appears later after we have checked
+        // m->infilename.
         if (m->outfilename) {
             usage("--replace-input may not be used when"
                   " an output file is specified");
@@ -700,6 +706,8 @@ QPDFJob::checkConfiguration()
     }
     if (m->infilename == nullptr) {
         usage("an input file name is required");
+    } else if (m->replace_input && (strlen(m->infilename.get()) == 0)) {
+        usage("--replace-input may not be used with --empty");
     } else if (
         m->require_outfile && (m->outfilename == nullptr) &&
         (!m->replace_input)) {

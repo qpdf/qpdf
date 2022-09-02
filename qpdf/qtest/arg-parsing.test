@@ -15,7 +15,7 @@ cleanup();
 
 my $td = new TestDriver('arg-parsing');
 
-my $n_tests = 16;
+my $n_tests = 17;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -101,6 +101,11 @@ $td->runtest("ignore -- at top level",
              {$td->COMMAND => "qpdf -- --check -- minimal.pdf --"},
              {$td->REGEXP => ".*No syntax or stream encoding errors found.*",
                   $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("empty and replace-input",
+             {$td->COMMAND => "qpdf --empty --replace-input"},
+             {$td->REGEXP => ".*--replace-input may not be used with --empty.*",
+                  $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();
