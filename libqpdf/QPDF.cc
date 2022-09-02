@@ -264,6 +264,12 @@ QPDF::~QPDF()
     }
 }
 
+std::shared_ptr<QPDF>
+QPDF::create()
+{
+    return std::make_shared<QPDF>();
+}
+
 void
 QPDF::processFile(char const* filename, char const* password)
 {

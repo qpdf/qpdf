@@ -64,6 +64,9 @@ class QPDF
     QPDF_DLL
     ~QPDF();
 
+    QPDF_DLL
+    static std::shared_ptr<QPDF> create();
+
     // Associate a file with a QPDF object and do initial parsing of
     // the file.  PDF objects are not read until they are needed.  A
     // QPDF object may be associated with only one file in its
@@ -929,6 +932,15 @@ class QPDF
     static bool test_json_validators();
 
   private:
+    // It has never been safe to copy QPDF objects as there is code in
+    // the library that assumes there are no copies of a QPDF object.
+    // Copying QPDF objects was not prevented by the API until qpdf
+    // 11. If you have been copying QPDF objects, use
+    // std::shared_ptr<QPDF> instead. From qpdf 11, you can use
+    // QPDF::create to create them.
+    QPDF(QPDF const&) = delete;
+    QPDF& operator=(QPDF const&) = delete;
+
     static std::string const qpdf_version;
 
     class ObjCache

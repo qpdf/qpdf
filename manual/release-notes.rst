@@ -139,10 +139,17 @@ For a detailed list of changes, please see the file
       - See :ref:`breaking-crypto-api` for specific details, and see
         :ref:`weak-crypto` for a general discussion.
 
-    - QPDFObjectHandle::warnIfPossible no longer takes an optional
+    - ``QPDFObjectHandle::warnIfPossible`` no longer takes an optional
       argument to throw an exception if there is no description. If
       there is no description, it writes to the default logger's error
       stream.
+
+    - ``QPDF`` objects can no longer be copied or assigned to. It has
+      never been safe to do this because of assumptions made by
+      library code. Now it is prevented by the API. If you run into
+      trouble, use ``QPDF::create()`` to create ``QPDF`` shared
+      pointers (or create them in some other way if you need backward
+      compatibility with older qpdf versions).
 
   - CLI Enhancements
 
@@ -195,6 +202,9 @@ For a detailed list of changes, please see the file
       ``QPDF`` object has been destroyed. This situation should
       generally not happen for correct code, but at least the
       situation is detectible now.
+
+    - Add new factory method ``QPDF::create()`` that returns a
+      ``std::shared_ptr<QPDF>``.
 
     - Add new ``Pipeline`` methods to reduce the amount of casting that is
       needed:

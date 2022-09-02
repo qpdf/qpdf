@@ -3262,12 +3262,12 @@ static void
 test_92(QPDF& pdf, char const* arg2)
 {
     // Exercise indirect objects owned by destroyed QPDF object.
-    QPDF* qpdf = new QPDF();
+    auto qpdf = QPDF::create();
     qpdf->emptyPDF();
     auto root = qpdf->getRoot();
     assert(root.getOwningQPDF() != nullptr);
     assert(root.isIndirect());
-    delete qpdf;
+    qpdf = nullptr;
     assert(root.getOwningQPDF() == nullptr);
     assert(!root.isIndirect());
 }

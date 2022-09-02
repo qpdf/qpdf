@@ -1981,7 +1981,7 @@ QPDFJob::doProcessOnce(
     bool used_for_input,
     bool main_input)
 {
-    auto pdf = std::make_shared<QPDF>();
+    auto pdf = QPDF::create();
     setQPDFOptions(*pdf);
     if (empty) {
         pdf->emptyPDF();

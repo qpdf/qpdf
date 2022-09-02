@@ -4,8 +4,6 @@ Next
 
 Before Release:
 
-* Consider a transition symbol for deprecation of stack-allocated QPDF
-  objects and also make QPDF non-copiable.
 * Evaluate issues tagged with `next`
 * Stay on top of https://github.com/pikepdf/pikepdf/pull/315
 * Consider whether otherwise unreferenced object streams should be

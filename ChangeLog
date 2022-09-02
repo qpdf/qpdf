@@ -1,3 +1,11 @@
+2022-09-02  Jay Berkenbilt  <ejb@ql.org>
+
+        * Add new QPDF::create() factory method that returns
+        std::shared_ptr<QPDF>.
+
+        * Prevent copying/assigning to QPDF objects in the API. It has
+        never been safe to do this, but the API wasn't preventing it.
+
 2022-09-01  Jay Berkenbilt  <ejb@ql.org>
 
         * Remove QPDFObject.hh from include/qpdf. The only reason to
