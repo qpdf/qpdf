@@ -839,8 +839,8 @@ class QPDF
         }
     };
 
-    // Resolver class is restricted to QPDFObjectHandle so that only
-    // it can resolve indirect references.
+    // Resolver class is restricted to QPDFObject so that only it can
+    // resolve indirect references.
     class Resolver
     {
         friend class QPDFObject;
