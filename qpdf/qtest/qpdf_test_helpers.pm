@@ -9,6 +9,23 @@ if ((exists $ENV{'QPDF_TEST_COMPARE_IMAGES'}) &&
     $compare_images = 1;
 }
 
+chomp(my $gs_version = `gs --version`);
+my $x_gs_args = "";
+if ($gs_version =~ m/^(\d+).(\d+)/)
+{
+    my $major = $1;
+    my $minor = $2;
+    if (($major == 9) && ($minor >= 56))
+    {
+        # There are some PDF files in the test suite that ghostscript
+        # 9.56, the first version to have the "new" PDF interpreter,
+        # can't handle. The bug is fixed for 10.0.0. Fall back to the
+        # old interpreter in the meantime. See
+        # https://bugs.ghostscript.com/show_bug.cgi?id=705842
+        $x_gs_args = "-dNEWPDF=false";
+    }
+}
+
 sub calc_ntests
 {
     my ($n_tests, $n_compare_pdfs) = @_;
@@ -78,7 +95,8 @@ sub compare_pdfs
         $td->runtest("convert original file to image",
                      {$td->COMMAND =>
                           "(cd tif1;" .
-                          " gs 2>$devNull -q -dNOPAUSE -sDEVICE=tiff24nc" .
+                          " gs 2>$devNull $x_gs_args" .
+                          " -q -dNOPAUSE -sDEVICE=tiff24nc" .
                           " -sOutputFile=a.tif - < ../$f1)"},
                      {$td->STRING => "",
                       $td->EXIT_STATUS => 0});
@@ -97,7 +115,8 @@ sub compare_pdfs
         $td->runtest("convert new file to image",
                      {$td->COMMAND =>
                           "(cd tif2;" .
-                          " gs 2>$devNull -q -dNOPAUSE -sDEVICE=tiff24nc" .
+                          " gs 2>$devNull $x_gs_args" .
+                          " -q -dNOPAUSE -sDEVICE=tiff24nc" .
                           " -sOutputFile=a.tif - < ../$f2)"},
                      {$td->STRING => "",
                       $td->EXIT_STATUS => 0});
