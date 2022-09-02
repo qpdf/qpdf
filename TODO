@@ -1,10 +1,15 @@
 
+Always
+======
+
+* Evaluate issues tagged with `next` and `bug`. Remember to check
+  discussions and pull requests in addition to regular issues.
+
 Next
 ====
 
 Before Release:
 
-* Evaluate issues tagged with `next`
 * Stay on top of https://github.com/pikepdf/pikepdf/pull/315
 * Consider whether otherwise unreferenced object streams should be
   included in json output. Probably not. Or maybe optionally.
