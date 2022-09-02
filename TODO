@@ -23,16 +23,6 @@ Pending changes:
 
 Soon: Break ground on "Document-level work"
 
-Remove raw pointers from the API
-================================
-
-(For qpdf >= 12)
-
-See if we can remove raw pointers from the QPDF API. There's a
-discussion in https://github.com/qpdf/qpdf/pull/747. Possibly
-deprecate creation of QPDF objects by any means other than
-QPDF::create(), which returns a std::shared_ptr<QPDF>.
-
 Fix Multiple Direct Object Owner Issue
 ======================================
 
@@ -774,3 +764,32 @@ Rejected Ideas
   stream filter, as well as modification of a stream's dictionary to
   include creation of a new stream that is referenced from
   /DecodeParms.
+
+* Removal of raw QPDF* from the API. Discussions in #747 and #754.
+  This is a summary of the arguments I put forth in #754. The idea was
+  to make QPDF::QPDF() private and require all QPDF objects to be
+  shared pointers created with QPDF::create(). This would enable us to
+  have QPDFObjectHandle::getOwningQPDF() return a std::weak_ptr<QPDF>.
+  Prior to #726 (QPDFObject/QPDFValue split, released in qpdf 11.0.0),
+  getOwningQPDF() could return an invalid pointer if the owning QPDF
+  disappeared, but this is no longer the case, which removes the main
+  motivation. QPDF 11 added QPDF::create() anyway though.
+
+  Removing raw QPDF* would look something like this. Note that you
+  can't use std::make_shared<T> unless T has a public constructor.
+
+  QPDF_POINTER_TRANSITION = 0 -- no warnings around calling the QPDF constructor
+  QPDF_POINTER_TRANSITION = 1 -- calls to QPDF() are deprecated, but QPDF is still available so code can be backward compatible and use std::make_shared<QPDF>
+  QPDF_POINTER_TRANSITION = 2 -- the QPDF constructor is private; all calls to std::make_shared<QPDF> have to be replaced with QPDF::create
+
+  If we were to do this, we'd have to look at each use of QPDF* in the
+  interface and decide whether to use a std::shared_ptr or a
+  std::weak_ptr. The answer would almost always be to use a
+  std::weak_ptr, which means we'd have to take the extra step of
+  calling lock(), and it means there would be lots of code changes
+  cause people would have to pass weak pointers instead of raw
+  pointers around, and those have to be constructed and locked.
+  Passing std::shared_ptr around leaves the possibility of creating
+  circular references. It seems to be too much trouble in the library
+  and too much toil for library users to be worth the small benefit of
+  not having to call resetObjGen in QPDF's destructor.
