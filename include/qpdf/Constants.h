@@ -23,9 +23,49 @@
 #ifndef QPDFCONSTANTS_H
 #define QPDFCONSTANTS_H
 
-/* Keep this file 'C' compatible so it can be used from the C and C++
+/*
+ * REMEMBER:
+ *
+ * Keep this file 'C' compatible so it can be used from the C and C++
  * interfaces.
  */
+
+/* ******************************  NOTE  ******************************
+
+Tl;Dr: new values must be added to the end such that no constant's
+numerical value changes, even across major releases.
+
+Details:
+
+As new values are added to existing enumerated types in this file,
+it is important not to change the actual values of any constants.
+This means that, in the absence of explicit assignment of values,
+the order of entries can't change even across major releases. Why?
+Here are the reasons:
+
+* Many of these constants are used by the C API. The C API is used
+  through foreign function call interfaces by users of other languages
+  who may not have access to or the ability to parse a C header file.
+  As such, users are likely to hard-code numerical values or create
+  their own constants whose values match. If we change values here,
+  their code would break, and there would be no way to detect it short
+  of noticing a bug. Furthermore, it would be difficult to write code
+  that properly handled more than one version of the qpdf shared
+  object (e.g. DLL) since the information about what version of qpdf
+  is involved is only available at runtime.
+
+- It has happened from time to time that a user builds an application
+  with an incorrectly installed qpdf, such as having mismatched header
+  files and library files. In the event that they are only using qpdf
+  interfaces that have been stable across the versions in question,
+  this turns out to be harmless. If they happen to use non-compatible
+  interfaces, this results usually in a failure to load or an obvious
+  runtime error. If we change values of constants, it is possible that
+  code that links and runs may have mismatched values for constants.
+  This would create a bug that would be extremely difficult to track
+  down and impossible for qpdf maintainers to reproduce.
+
+*/
 
 /* Exit Codes from QPDFJob and the qpdf CLI */
 
