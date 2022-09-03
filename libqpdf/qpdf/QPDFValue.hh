@@ -86,10 +86,7 @@ class QPDFValue
         og(og)
     {
     }
-    virtual void
-    releaseResolved()
-    {
-    }
+
     static std::shared_ptr<QPDFObject> do_create(QPDFValue*);
 
   private:

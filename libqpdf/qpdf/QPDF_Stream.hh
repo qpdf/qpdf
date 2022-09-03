@@ -77,9 +77,6 @@ class QPDF_Stream: public QPDFValue
     // when adding streams to files.
     void setObjGen(QPDFObjGen const& og);
 
-  protected:
-    virtual void releaseResolved();
-
   private:
     QPDF_Stream(
         QPDF*,

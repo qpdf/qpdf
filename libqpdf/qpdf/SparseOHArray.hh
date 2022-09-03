@@ -12,7 +12,6 @@ class SparseOHArray
     void append(QPDFObjectHandle oh);
     QPDFObjectHandle at(size_t idx) const;
     void remove_last();
-    void releaseResolved();
     void setAt(size_t idx, QPDFObjectHandle oh);
     void erase(size_t idx);
     void insert(size_t idx, QPDFObjectHandle oh);

@@ -137,12 +137,6 @@ class QPDFObject
         return dynamic_cast<T*>(value.get());
     }
 
-    void
-    releaseResolved()
-    {
-        value->releaseResolved();
-    }
-
   private:
     QPDFObject(QPDFObject const&) = delete;
     QPDFObject& operator=(QPDFObject const&) = delete;

@@ -34,12 +34,6 @@ QPDF_Array::shallowCopy()
     return create(elements);
 }
 
-void
-QPDF_Array::releaseResolved()
-{
-    this->elements.releaseResolved();
-}
-
 std::string
 QPDF_Array::unparse()
 {

@@ -21,14 +21,6 @@ QPDF_Dictionary::shallowCopy()
     return create(items);
 }
 
-void
-QPDF_Dictionary::releaseResolved()
-{
-    for (auto& iter: this->items) {
-        QPDFObjectHandle::ReleaseResolver::releaseResolved(iter.second);
-    }
-}
-
 std::string
 QPDF_Dictionary::unparse()
 {

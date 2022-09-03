@@ -249,17 +249,16 @@ QPDF::~QPDF()
     // std::shared_ptr objects will prevent the objects from being
     // deleted.  Walk through all objects in the object cache, which
     // is those objects that we read from the file, and break all
-    // resolved references.  At this point, obviously no one is still
+    // resolved indirect references by replacing them with direct
+    // null objects.  At this point, obviously no one is still
     // using the QPDF object, but we'll explicitly clear the xref
     // table anyway just to prevent any possibility of resolve()
     // succeeding.  Note that we can't break references like this at
-    // any time when the QPDF object is active.  If we do, the next
-    // reference will reread the object from the file, which would
-    // have the effect of undoing any modifications that may have been
-    // made to any of the objects.
+    // any time when the QPDF object is active.
     this->m->xref_table.clear();
+    auto null_obj = QPDF_Null::create();
     for (auto const& iter: this->m->obj_cache) {
-        iter.second.object->releaseResolved();
+        iter.second.object->assign(null_obj);
         iter.second.object->resetObjGen();
     }
 }
