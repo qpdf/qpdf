@@ -37,6 +37,23 @@ main()
         assert(bc2p[1] == 'W');
     }
 
+    {
+        // Test that buffers can be moved.
+        Buffer bm1(2);
+        unsigned char* bm1p = bm1.getBuffer();
+        bm1p[0] = 'Q';
+        bm1p[1] = 'W';
+        Buffer bm2(std::move(bm1));
+        bm1p[0] = 'R';
+        unsigned char* bm2p = bm2.getBuffer();
+        assert(bm2p == bm1p);
+        assert(bm2p[0] == 'R');
+
+        Buffer bm3 = std::move(bm2);
+        unsigned char* bm3p = bm3.getBuffer();
+        assert(bm3p == bm2p);
+    }
+
     try {
         Pl_Discard discard;
         Pl_Count count("count", &discard);
