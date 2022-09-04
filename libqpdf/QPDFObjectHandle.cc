@@ -236,22 +236,6 @@ LastChar::getLastChar()
     return this->last_char;
 }
 
-void
-QPDFObjectHandle::releaseResolved()
-{
-    // Recursively break any resolved references to indirect objects.
-    // Do not cross over indirect object boundaries to avoid an
-    // infinite loop.  This method may only be called during final
-    // destruction.  See comments in QPDF::~QPDF().
-    if (this->obj.get()) {
-        if (isIndirect()) {
-            this->obj = nullptr;
-        } else {
-            this->obj->releaseResolved();
-        }
-    }
-}
-
 qpdf_object_type_e
 QPDFObjectHandle::getTypeCode()
 {

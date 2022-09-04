@@ -168,13 +168,6 @@ QPDF_Stream::getFilterOnWrite() const
 }
 
 void
-QPDF_Stream::releaseResolved()
-{
-    this->stream_provider = nullptr;
-    QPDFObjectHandle::ReleaseResolver::releaseResolved(this->stream_dict);
-}
-
-void
 QPDF_Stream::setObjGen(QPDFObjGen const& og)
 {
     if (this->og.isIndirect()) {
