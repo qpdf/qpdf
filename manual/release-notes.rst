@@ -251,6 +251,8 @@ For a detailed list of changes, please see the file
       generation parameters. The old versions will continue to be
       supported and are not deprecated.
 
+    - Add a move constructor to the ``Buffer`` class.
+
   - Other changes
 
     - In JSON v1 mode, the ``"objects"`` key now reflects the repaired

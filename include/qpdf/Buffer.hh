@@ -49,9 +49,9 @@ class Buffer
     QPDF_DLL
     Buffer& operator=(Buffer const&);
     QPDF_DLL
-    Buffer(Buffer &&) noexcept;
+    Buffer(Buffer&&) noexcept;
     QPDF_DLL
-    Buffer& operator=(Buffer &&) noexcept;
+    Buffer& operator=(Buffer&&) noexcept;
     QPDF_DLL
     size_t getSize() const;
     QPDF_DLL

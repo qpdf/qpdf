@@ -1,3 +1,9 @@
+2022-09-05  Jay Berkenbilt  <ejb@ql.org>
+
+        * Add a move constructor to Buffer, making it possible to move
+        rather than copy the internal buffer. Thanks to jbarlow83 for the
+        contribution.
+
 2022-09-02  Jay Berkenbilt  <ejb@ql.org>
 
         * Add new QPDF::create() factory method that returns
