@@ -67,17 +67,20 @@ files.
 The primary class for interacting with PDF objects is
 ``QPDFObjectHandle``. Instances of this class can be passed around by
 value, copied, stored in containers, etc. with very low overhead. The
-``QPDFObjectHandle`` object contains an internal shared pointer to an
-underlying ``QPDFObject``. Instances of ``QPDFObjectHandle`` created
-by reading from a file will always contain a reference back to the
+``QPDFObjectHandle`` object contains an internal shared pointer to the
+underlying object. Instances of ``QPDFObjectHandle`` created by
+reading from a file will always contain a reference back to the
 ``QPDF`` object from which they were created. A ``QPDFObjectHandle``
-may be direct or indirect. If indirect, the ``QPDFObject`` shared
-pointer is initially null. In this case, the first attempt to access
-the underlying ``QPDFObject`` will result in the ``QPDFObject`` being
-resolved via a call to the referenced ``QPDF`` instance. This makes it
-essentially impossible to make coding errors in which certain things
-will work for some PDF files and not for others based on which objects
-are direct and which objects are indirect.
+may be direct or indirect. If indirect, object is initially
+*unresolved*. In this case, the first attempt to access the underlying
+object will result in the object being resolved via a call to the
+referenced ``QPDF`` instance. This makes it essentially impossible to
+make coding errors in which certain things will work for some PDF
+files and not for others based on which objects are direct and which
+objects are indirect. In cases where it is necessary to know whether
+an object is indirect or not, this information can be obtained from
+the ``QPDFObjectHandle``. It is also possible to convert direct
+objects to indirect objects and vice versa.
 
 Instances of ``QPDFObjectHandle`` can be directly created and modified
 using static factory methods in the ``QPDFObjectHandle`` class. There
@@ -230,43 +233,46 @@ could serve as a starting point to someone trying to understand the
 implementation. There is nothing in this section that you need to know
 to use the qpdf library.
 
-``QPDFObject`` is the basic PDF Object class. It is an abstract base
-class from which are derived classes for each type of PDF object.
-Clients do not interact with Objects directly but instead interact with
-``QPDFObjectHandle``.
+In a PDF file, objects may be direct or indirect. Direct objects are
+objects whose representations appear directly in PDF syntax. Indirect
+objects are references to objects by their ID. The qpdf library uses
+the ``QPDFObjectHandle`` type to hold onto objects and to abstract
+away in most cases whether the object is direct or indirect.
 
-When the ``QPDF`` class creates a new object, it dynamically allocates
-the appropriate type of ``QPDFObject`` and immediately hands the pointer
-to an instance of ``QPDFObjectHandle``. The parser reads a token from
-the current file position. If the token is a not either a dictionary or
-array opener, an object is immediately constructed from the single token
-and the parser returns. Otherwise, the parser iterates in a special mode
-in which it accumulates objects until it finds a balancing closer.
-During this process, the ``R`` keyword is recognized and an indirect
-``QPDFObjectHandle`` may be constructed.
+Internally, ``QPDFObjectHandle`` holds onto a shared pointer to the
+underlying object value. When direct object is created, the
+``QPDFObjectHandle`` that holds it is not associated with a ``QPDF``
+object. When an indirect object reference is created, it starts off in
+an *unresolved* state and must be associated with a ``QPDF`` object,
+which is considered its *owner*. To access the actual value of the
+object, the object must be *resolved*. This happens automatically when
+the the object is accessed in any way.
 
-The ``QPDF::resolve()`` method, which is used to resolve an indirect
-object, may be invoked from the ``QPDFObjectHandle`` class. It first
-checks a cache to see whether this object has already been read. If
-not, it reads the object from the PDF file and caches it. It the
-returns the resulting ``QPDFObjectHandle``. The calling object handle
-then replaces its ``std::shared_ptr<QDFObject>`` with the one from the
-newly returned ``QPDFObjectHandle``. In this way, only a single copy
-of any direct object need exist and clients can access objects
-transparently without knowing or caring whether they are direct or
-indirect objects. Additionally, no object is ever read from the file
-more than once. That means that only the portions of the PDF file that
-are actually needed are ever read from the input file, thus allowing
-the qpdf package to take advantage of this important design goal of
-PDF files.
+To resolve an object, qpdf checks its object cache. If not found in
+the cache, it attempts to read the object from the input source
+associated with the ``QPDF`` object. If it is not found, a ``null``
+object is returned. A ``null`` object is an object type, just like
+boolean, string, number, etc. It is not a null pointer. The PDF
+specification states that an indirect reference to an object that
+doesn't exist is to be treated as a ``null``. The resulting object,
+whether a ``null`` or the actual object that was read, is stored in
+the cache. If the object is later replaced or swapped, the underlying
+object remains the same, but its value is replaced. This way, if you
+have a ``QPDFObjectHandle`` to an indirect object and the object by
+that number is replaced (by calling ``QPDF::replaceObject`` or
+``QPDF::swapObjects``), your ``QPDFObjectHandle`` will reflect the new
+value of the object. This is consistent with what would happen to PDF
+objects if you were to replace the definition of an object in the
+file.
 
-If the requested object is inside of an object stream, the object stream
-itself is first read into memory. Then the tokenizer reads objects from
-the memory stream based on the offset information stored in the stream.
-Those individual objects are cached, after which the temporary buffer
-holding the object stream contents is discarded. In this way, the first
-time an object in an object stream is requested, all objects in the
-stream are cached.
+When reading an object from the input source, if the requested object
+is inside of an object stream, the object stream itself is first read
+into memory. Then the tokenizer reads objects from the memory stream
+based on the offset information stored in the stream. Those individual
+objects are cached, after which the temporary buffer holding the
+object stream contents is discarded. In this way, the first time an
+object in an object stream is requested, all objects in the stream are
+cached.
 
 The following example should clarify how ``QPDF`` processes a simple
 file.
@@ -287,9 +293,10 @@ file.
   until it encounters ``>>``. Each object that is read is pushed onto
   a stack. If ``R`` is read, the last two objects on the stack are
   inspected. If they are integers, they are popped off the stack and
-  their values are used to construct an indirect object handle which is
-  then pushed onto the stack. When ``>>`` is finally read, the stack
-  is converted into a ``QPDF_Dictionary`` which is placed in a
+  their values are used to construct an indirect object handle which
+  is then pushed onto the stack. When ``>>`` is finally read, the
+  stack is converted into a ``QPDF_Dictionary`` (not directly
+  accessible through the API) which is placed in a
   ``QPDFObjectHandle`` and returned.
 
 - The resulting dictionary is saved as the trailer dictionary.
@@ -299,7 +306,7 @@ file.
   saved. If ``/Prev`` is not present, the initial parsing process is
   complete.
 
-  If there is an encryption dictionary, the document's encryption
+- If there is an encryption dictionary, the document's encryption
   parameters are initialized.
 
 - The client requests root object. The ``QPDF`` class gets the value of
@@ -312,14 +319,103 @@ file.
   object cache for an object with the root dictionary's object ID and
   generation number. Upon not seeing it, it checks the cross reference
   table, gets the offset, and reads the object present at that offset.
-  It stores the result in the object cache and returns the cached
-  result. The calling ``QPDFObjectHandle`` replaces its object pointer
-  with the one from the resolved ``QPDFObjectHandle``, verifies that it
-  a valid dictionary object, and returns the (unresolved indirect)
-  ``QPDFObject`` handle to the top of the Pages hierarchy.
+  It stores the result in the object cache. The cache entry's value is
+  replaced by the actual value, which causes any previously unresolved
+  ``QPDFObjectHandle`` objects that that pointed there to now have a
+  shared copy of the actual object. Modifications through any such
+  ``QPDFObjectHandle`` will be reflected in all of them. As the client
+  continues to request objects, the same process is followed for each
+  new requested object.
 
-  As the client continues to request objects, the same process is
-  followed for each new requested object.
+.. _object_internals:
+
+QPDF Object Internals
+---------------------
+
+The internals of ``QPDFObjectHandle`` and how qpdf stores objects were
+significantly rewritten for QPDF 11. Here are some additional details.
+
+Object Internals
+~~~~~~~~~~~~~~~~
+
+The ``QPDF`` object has an object cache which contains a shared
+pointer to each object that was read from the file. Changes can be
+made to any of those objects through ``QPDFObjectHandle`` methods. Any
+such changes are visible to all ``QPDFObjectHandle`` instances that
+point to the same object. When a ``QPDF`` object is written by
+``QPDFWriter`` or serialized to JSON, any changes are reflected.
+
+Objects in qpdf 11 and Newer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The object cache in ``QPDF`` contains a shared pointer to
+``QPDFValueProxy``. Any ``QPDFObjectHandle`` resolved from an indirect
+reference to that object has a copy of that shared pointer. Each
+``QPDFValueProxy`` object contains a shared pointer to an object of
+type ``QPDFValue``. The ``QPDFValue`` type is an abstract base class.
+There is an implementation for each of the basic object types (array,
+dictionary, null, boolean, string, number, etc.) as well as a few
+special ones including ``uninitialized``, ``unresolved``, and
+``reserved``. When an object is first referenced, its underlying
+``QPDFValue`` has type ``unresolved``. When the object is first
+resolved, the ``QPDFValueProxy`` in the cache has its internal
+``QPDFValue`` replaced with the object as read from the file. Since it
+is the ``QPDFValueProxy`` object that is shared by all referencing
+``QPDFObjectHandle`` objects as well as by the owning ``QPDF`` object,
+this ensures that any future changes to the object, including
+replacing the object with a completely different one, will be
+reflected across all ``QPDFObjectHandle`` objects that reference it.
+
+A ``QPDFValue`` that originated from a PDF input source maintains a
+pointer to the ``QPDF`` object that read it (its *owner*). When that
+``QPDF`` object is destroyed, it replaces the value of each
+``QPDFValueProxy`` in its cache with a direct ``null`` object and
+clears the pointer to the owning ``QPDF``. This means that, if there
+are still any referencing ``QPDFObjectHandle`` objects floating
+around, requesting their owning ``QPDF`` will return a null pointer
+rather than a pointer to a ``QPDF`` object that is either invalid or
+points to something else. This operation also has the effect of
+breaking any circular references (which are common and, in some cases,
+required by the PDF specification), thus preventing memory leaks when
+``QPDF`` objects are destroyed.
+
+Objects prior to qpdf 11
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Prior to qpdf 11, the functionality of the ``QPDFValue`` and
+``QPDFValueProxy`` classes were combined into a single ``QPDFObject``
+class, which served the dual purpose of being the cache entry for
+``QPDF`` and being the abstract base class for all the different PDF
+object types. The behavior was nearly the same, but there were a few
+problems:
+
+- While changes to a ``QPDFObjectHandle`` through mutation were
+  visible across all referencing ``QPDFObjectHandle`` objects,
+  *replacing* an object with ``QPDF::replaceObject`` or
+  ``QPDF::swapObjects`` would leave ``QPDF`` with no way of notifying
+  ``QPDFObjectHandle`` objects that pointed to the old ``QPDFObject``.
+  To work around this, every attempt to access the underlying object
+  that a ``QPDFObjectHandle`` pointed to had to ask the owning
+  ``QPDF`` whether the object had changed, and if so, it had to
+  replace its internal ``QPDFObject`` pointer. This added overhead to
+  every indirect object access even if no objects were ever changed.
+
+- When a ``QPDF`` object was destroyed, it was necessary to
+  recursively traverse the structure of every object in the file to
+  break any circular references. For complex files, this significantly
+  increased the cost of destroying ``QPDF`` objects.
+
+- When a ``QPDF`` object was destroyed, any ``QPDFObjectHandle``
+  objects that referenced it would maintain a potentially invalid
+  pointer as the owning ``QPDF``. In practice, this wasn't usually a
+  problem since generally people would have no need to maintain copies
+  of a ``QPDFObjectHandle`` from a destroyed ``QPDF`` object, but
+  in cases where this was possible, it was necessary for other
+  software to do its own bookkeeping to ensure that an object's owner
+  was still valid.
+
+All of these problems were effectively solved by splitting
+``QPDFObject`` into ``QPDFValueProxy`` and ``QPDFValue``.
 
 .. _casting:
 
