@@ -48,12 +48,24 @@ Buffer::operator=(Buffer const& rhs)
     return *this;
 }
 
+Buffer::Buffer(Buffer&& rhs) noexcept :
+    m(std::move(rhs.m))
+{
+}
+
+Buffer&
+Buffer::operator=(Buffer&& rhs) noexcept
+{
+    std::swap(this->m, rhs.m);
+    return *this;
+}
+
 void
 Buffer::copy(Buffer const& rhs)
 {
     if (this != &rhs) {
         this->m =
-            std::shared_ptr<Members>(new Members(rhs.m->size, nullptr, true));
+            std::unique_ptr<Members>(new Members(rhs.m->size, nullptr, true));
         if (this->m->size) {
             memcpy(this->m->buf, rhs.m->buf, this->m->size);
         }

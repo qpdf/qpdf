@@ -49,6 +49,10 @@ class Buffer
     QPDF_DLL
     Buffer& operator=(Buffer const&);
     QPDF_DLL
+    Buffer(Buffer &&) noexcept;
+    QPDF_DLL
+    Buffer& operator=(Buffer &&) noexcept;
+    QPDF_DLL
     size_t getSize() const;
     QPDF_DLL
     unsigned char const* getBuffer() const;
@@ -75,7 +79,7 @@ class Buffer
 
     void copy(Buffer const&);
 
-    std::shared_ptr<Members> m;
+    std::unique_ptr<Members> m;
 };
 
 #endif // BUFFER_HH
