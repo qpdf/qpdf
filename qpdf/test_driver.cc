@@ -35,6 +35,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define QPDF_OBJECT_NOWARN
+#include <qpdf/QPDFObject.hh>
+
 static char const* whoami = 0;
 
 void
@@ -3298,6 +3301,10 @@ runtest(int n, char const* filename1, char const* arg2)
         QPDFObjectHandle uninitialized;
         assert(uninitialized.getTypeCode() == ::ot_uninitialized);
         assert(strcmp(uninitialized.getTypeName(), "uninitialized") == 0);
+
+        // ABI: until QPDF 12, spot check deprecated constants
+        assert(QPDFObject::ot_unresolved == ::ot_unresolved);
+        assert(QPDFObject::ot_uninitialized == ::ot_uninitialized);
     }
 
     QPDF pdf;

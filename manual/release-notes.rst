@@ -95,17 +95,17 @@ For a detailed list of changes, please see the file
 
   - API: breaking changes
 
-    - Remove ``QPDFObject.hh`` from the public ``include/qpdf``
-      directory. The only use case for including
-      ``qpdf/QPDFObject.hh`` was to get ``QPDFObject::object_type_e``.
-      Since 10.5.0, this has been an alias to ``qpdf_object_type_e``,
-      defined in ``qpdf/Constants.h``. To fix your code, replace any
-      includes of ``qpdf/QPDFObject.hh`` with ``qpdf/Constants.h``,
-      and replace all occurrences of ``QPDFObject::ot_`` with
-      ``::ot_``. If you need your code to be backward compatible to
-      qpdf versions prior to 10.5.0, you can check that the
-      preprocessor symbol ``QPDF_MAJOR_VERSION`` is defined and ``>=
-      11``.
+    - Deprecate ``QPDFObject.hh`` for removal in qpdf 12. The only use
+      case for including ``qpdf/QPDFObject.hh`` was to get
+      ``QPDFObject::object_type_e``. Since 10.5.0, this has been an
+      alias to ``qpdf_object_type_e``, defined in
+      ``qpdf/Constants.h``. To fix your code, replace any includes of
+      ``qpdf/QPDFObject.hh`` with ``qpdf/Constants.h``, and replace
+      all occurrences of ``QPDFObject::ot_`` with ``::ot_``. If you
+      need your code to be backward compatible to qpdf versions prior
+      to 10.5.0, you can check that the preprocessor symbol
+      ``QPDF_MAJOR_VERSION`` is defined and ``>= 11``. As a stop-gap,
+      you can `#define QPDF_OBJECT_NOWARN` to suppress the warning.
 
     - Pipeline::write now takes ``unsigned char const*`` instead of
       ``unsigned char*``. Callers don't need to change anything, but
