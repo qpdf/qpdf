@@ -99,7 +99,7 @@ class QPDF_DLL_CLASS InputSource
     inline qpdf_offset_t fastTell();
     inline bool fastRead(char&);
     inline void fastUnread(bool);
-    inline void loadBuffer();
+    inline void loadCache();
 
   protected:
     qpdf_offset_t last_offset;
@@ -121,35 +121,35 @@ class QPDF_DLL_CLASS InputSource
     std::shared_ptr<Members> m;
 
     // State for fast... methods
-    static const qpdf_offset_t buf_size = 128;
-    char buffer[buf_size];
-    qpdf_offset_t buf_len = 0;
-    qpdf_offset_t buf_idx = 0;
-    qpdf_offset_t buf_start = 0;
+    static const qpdf_offset_t cache_size{128};
+    char cache[cache_size];
+    qpdf_offset_t cache_len{0};
+    qpdf_offset_t cache_idx{0};
+    qpdf_offset_t cache_start{0};
 };
 
 inline void
-InputSource::loadBuffer()
+InputSource::loadCache()
 {
-    this->buf_idx = 0;
-    this->buf_len = qpdf_offset_t(read(this->buffer, this->buf_size));
+    this->cache_idx = 0;
+    this->cache_len = qpdf_offset_t(read(this->cache, this->cache_size));
     // NB read sets last_offset
-    this->buf_start = this->last_offset;
+    this->cache_start = this->last_offset;
 }
 
 inline qpdf_offset_t
 InputSource::fastTell()
 {
-    if (this->buf_len == 0) {
-        loadBuffer();
+    if (this->cache_len == 0) {
+        loadCache();
     } else {
         auto curr = tell();
-        if (curr < this->buf_start ||
-            curr >= (this->buf_start + this->buf_len)) {
-            loadBuffer();
+        if (curr < this->cache_start ||
+            curr >= (this->cache_start + this->cache_len)) {
+            loadCache();
         } else {
             this->last_offset = curr;
-            this->buf_idx = curr - this->buf_start;
+            this->cache_idx = curr - this->cache_start;
         }
     }
     return this->last_offset;
@@ -158,19 +158,19 @@ InputSource::fastTell()
 inline bool
 InputSource::fastRead(char& ch)
 {
-    // Before calling fastRead, fastTell must be called to prepare the buffer.
+    // Before calling fastRead, fastTell must be called to prepare the cache.
     // Once reading is complete, fastUnread must be called to set the correct
     // file position.
-    if (this->buf_idx < this->buf_len) {
-        ch = this->buffer[this->buf_idx];
-        ++(this->buf_idx);
+    if (this->cache_idx < this->cache_len) {
+        ch = this->cache[this->cache_idx];
+        ++(this->cache_idx);
         ++(this->last_offset);
         return true;
 
-    } else if (this->buf_len == 0) {
+    } else if (this->cache_len == 0) {
         return false;
     } else {
-        seek(this->buf_start + this->buf_len, SEEK_SET);
+        seek(this->cache_start + this->cache_len, SEEK_SET);
         fastTell();
         return fastRead(ch);
     }
