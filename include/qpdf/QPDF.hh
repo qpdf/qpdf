@@ -842,11 +842,11 @@ class QPDF
         }
     };
 
-    // Resolver class is restricted to QPDFObject so that only it can
-    // resolve indirect references.
+    // Resolver class is restricted to QPDFValueProxy so that only it
+    // can resolve indirect references.
     class Resolver
     {
-        friend class QPDFObject;
+        friend class QPDFValueProxy;
 
       private:
         static void
@@ -952,7 +952,7 @@ class QPDF
         {
         }
         ObjCache(
-            std::shared_ptr<QPDFObject> object,
+            std::shared_ptr<QPDFValueProxy> object,
             qpdf_offset_t end_before_space,
             qpdf_offset_t end_after_space) :
             object(object),
@@ -961,7 +961,7 @@ class QPDF
         {
         }
 
-        std::shared_ptr<QPDFObject> object;
+        std::shared_ptr<QPDFValueProxy> object;
         qpdf_offset_t end_before_space;
         qpdf_offset_t end_after_space;
     };
@@ -1186,12 +1186,12 @@ class QPDF
     QPDFObjectHandle reserveObjectIfNotExists(QPDFObjGen const& og);
     QPDFObjectHandle reserveStream(QPDFObjGen const& og);
     QPDFObjectHandle
-    newIndirect(QPDFObjGen const&, std::shared_ptr<QPDFObject> const&);
+    newIndirect(QPDFObjGen const&, std::shared_ptr<QPDFValueProxy> const&);
     bool isCached(QPDFObjGen const& og);
     bool isUnresolved(QPDFObjGen const& og);
     void updateCache(
         QPDFObjGen const& og,
-        std::shared_ptr<QPDFObject> const& object,
+        std::shared_ptr<QPDFValueProxy> const& object,
         qpdf_offset_t end_before_space,
         qpdf_offset_t end_after_space);
 

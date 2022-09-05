@@ -7,13 +7,13 @@ QPDF_Reserved::QPDF_Reserved() :
 {
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Reserved::create()
 {
     return do_create(new QPDF_Reserved());
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Reserved::shallowCopy()
 {
     return create();

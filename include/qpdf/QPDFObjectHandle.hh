@@ -54,7 +54,7 @@ class QPDF_Real;
 class QPDF_Reserved;
 class QPDF_Stream;
 class QPDF_String;
-class QPDFObject;
+class QPDFValueProxy;
 class QPDFTokenizer;
 class QPDFExc;
 class Pl_QPDFTokenizer;
@@ -1453,7 +1453,7 @@ class QPDFObjectHandle
 
       private:
         static QPDFObjectHandle
-        newIndirect(std::shared_ptr<QPDFObject> const& obj)
+        newIndirect(std::shared_ptr<QPDFValueProxy> const& obj)
         {
             return QPDFObjectHandle(obj);
         }
@@ -1478,7 +1478,7 @@ class QPDFObjectHandle
         friend class QPDF;
 
       private:
-        static std::shared_ptr<QPDFObject>
+        static std::shared_ptr<QPDFValueProxy>
         getObject(QPDFObjectHandle& o)
         {
             if (!o.dereference()) {
@@ -1560,7 +1560,7 @@ class QPDFObjectHandle
     bool isImage(bool exclude_imagemask = true);
 
   private:
-    QPDFObjectHandle(std::shared_ptr<QPDFObject> const& obj) :
+    QPDFObjectHandle(std::shared_ptr<QPDFValueProxy> const& obj) :
         obj(obj)
     {
     }
@@ -1613,7 +1613,7 @@ class QPDFObjectHandle
     // Moving members of QPDFObjectHandle into a smart pointer incurs
     // a substantial performance penalty since QPDFObjectHandle
     // objects are copied around so frequently.
-    std::shared_ptr<QPDFObject> obj;
+    std::shared_ptr<QPDFValueProxy> obj;
 };
 
 #ifndef QPDF_NO_QPDF_STRING

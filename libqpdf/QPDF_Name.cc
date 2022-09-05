@@ -10,13 +10,13 @@ QPDF_Name::QPDF_Name(std::string const& name) :
 {
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Name::create(std::string const& name)
 {
     return do_create(new QPDF_Name(name));
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Name::shallowCopy()
 {
     return create(name);

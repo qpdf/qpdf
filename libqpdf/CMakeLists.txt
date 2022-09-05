@@ -72,7 +72,6 @@ set(libqpdf_SOURCES
   QPDFMatrix.cc
   QPDFNameTreeObjectHelper.cc
   QPDFNumberTreeObjectHelper.cc
-  QPDFObject.cc
   QPDFObjectHandle.cc
   QPDFObjGen.cc
   QPDFOutlineDocumentHelper.cc
@@ -86,6 +85,7 @@ set(libqpdf_SOURCES
   QPDFTokenizer.cc
   QPDFUsage.cc
   QPDFValue.cc
+  QPDFValueProxy.cc
   QPDFWriter.cc
   QPDFXRefEntry.cc
   QPDF_Array.cc

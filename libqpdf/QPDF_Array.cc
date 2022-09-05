@@ -16,19 +16,19 @@ QPDF_Array::QPDF_Array(SparseOHArray const& items) :
 {
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Array::create(std::vector<QPDFObjectHandle> const& items)
 {
     return do_create(new QPDF_Array(items));
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Array::create(SparseOHArray const& items)
 {
     return do_create(new QPDF_Array(items));
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Array::shallowCopy()
 {
     return create(elements);

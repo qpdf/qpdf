@@ -9,13 +9,13 @@ QPDF_Dictionary::QPDF_Dictionary(
 {
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Dictionary::create(std::map<std::string, QPDFObjectHandle> const& items)
 {
     return do_create(new QPDF_Dictionary(items));
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Dictionary::shallowCopy()
 {
     return create(items);

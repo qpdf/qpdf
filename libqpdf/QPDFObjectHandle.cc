@@ -7,9 +7,9 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFMatrix.hh>
-#include <qpdf/QPDFObject.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFParser.hh>
+#include <qpdf/QPDFValueProxy.hh>
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Bool.hh>
 #include <qpdf/QPDF_Dictionary.hh>
@@ -2257,7 +2257,7 @@ QPDFObjectHandle::copyObject(
                                " reserved object handle direct");
     }
 
-    std::shared_ptr<QPDFObject> new_obj;
+    std::shared_ptr<QPDFValueProxy> new_obj;
 
     if (isBool() || isInteger() || isName() || isNull() || isReal() ||
         isString()) {

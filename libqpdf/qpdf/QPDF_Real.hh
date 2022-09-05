@@ -7,10 +7,10 @@ class QPDF_Real: public QPDFValue
 {
   public:
     virtual ~QPDF_Real() = default;
-    static std::shared_ptr<QPDFObject> create(std::string const& val);
-    static std::shared_ptr<QPDFObject>
+    static std::shared_ptr<QPDFValueProxy> create(std::string const& val);
+    static std::shared_ptr<QPDFValueProxy>
     create(double value, int decimal_places, bool trim_trailing_zeroes);
-    virtual std::shared_ptr<QPDFObject> shallowCopy();
+    virtual std::shared_ptr<QPDFValueProxy> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
     std::string getVal();

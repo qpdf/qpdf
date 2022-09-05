@@ -130,7 +130,7 @@ QPDF_Stream::QPDF_Stream(
         qpdf, qpdf->getFilename() + ", stream object " + og.unparse(' '));
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Stream::create(
     QPDF* qpdf,
     QPDFObjGen const& og,
@@ -141,7 +141,7 @@ QPDF_Stream::create(
     return do_create(new QPDF_Stream(qpdf, og, stream_dict, offset, length));
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Stream::shallowCopy()
 {
     throw std::logic_error("stream objects cannot be cloned");

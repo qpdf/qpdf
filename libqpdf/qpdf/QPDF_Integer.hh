@@ -7,8 +7,8 @@ class QPDF_Integer: public QPDFValue
 {
   public:
     virtual ~QPDF_Integer() = default;
-    static std::shared_ptr<QPDFObject> create(long long value);
-    virtual std::shared_ptr<QPDFObject> shallowCopy();
+    static std::shared_ptr<QPDFValueProxy> create(long long value);
+    virtual std::shared_ptr<QPDFValueProxy> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
     long long getVal() const;

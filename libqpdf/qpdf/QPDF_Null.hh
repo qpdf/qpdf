@@ -7,8 +7,8 @@ class QPDF_Null: public QPDFValue
 {
   public:
     virtual ~QPDF_Null() = default;
-    static std::shared_ptr<QPDFObject> create();
-    virtual std::shared_ptr<QPDFObject> shallowCopy();
+    static std::shared_ptr<QPDFValueProxy> create();
+    virtual std::shared_ptr<QPDFValueProxy> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
 

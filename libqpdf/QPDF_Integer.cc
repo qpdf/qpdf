@@ -8,13 +8,13 @@ QPDF_Integer::QPDF_Integer(long long val) :
 {
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Integer::create(long long value)
 {
     return do_create(new QPDF_Integer(value));
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Integer::shallowCopy()
 {
     return create(val);

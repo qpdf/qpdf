@@ -1,5 +1,5 @@
-#ifndef QPDFOBJECT_HH
-#define QPDFOBJECT_HH
+#ifndef QPDFVALUEPROXY_HH
+#define QPDFVALUEPROXY_HH
 
 #include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
@@ -12,14 +12,14 @@
 class QPDF;
 class QPDFObjectHandle;
 
-class QPDFObject
+class QPDFValueProxy
 {
     friend class QPDFValue;
 
   public:
-    QPDFObject() = default;
+    QPDFValueProxy() = default;
 
-    std::shared_ptr<QPDFObject>
+    std::shared_ptr<QPDFValueProxy>
     shallowCopy()
     {
         return value->shallowCopy();
@@ -87,12 +87,12 @@ class QPDFObject
         return value->getParsedOffset();
     }
     void
-    assign(std::shared_ptr<QPDFObject> o)
+    assign(std::shared_ptr<QPDFValueProxy> o)
     {
         value = o->value;
     }
     void
-    swapWith(std::shared_ptr<QPDFObject> o)
+    swapWith(std::shared_ptr<QPDFValueProxy> o)
     {
         auto v = value;
         value = o->value;
@@ -138,9 +138,9 @@ class QPDFObject
     }
 
   private:
-    QPDFObject(QPDFObject const&) = delete;
-    QPDFObject& operator=(QPDFObject const&) = delete;
+    QPDFValueProxy(QPDFValueProxy const&) = delete;
+    QPDFValueProxy& operator=(QPDFValueProxy const&) = delete;
     std::shared_ptr<QPDFValue> value;
 };
 
-#endif // QPDFOBJECT_HH
+#endif // QPDFVALUEPROXY_HH

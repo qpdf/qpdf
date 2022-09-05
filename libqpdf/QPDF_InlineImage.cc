@@ -6,13 +6,13 @@ QPDF_InlineImage::QPDF_InlineImage(std::string const& val) :
 {
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_InlineImage::create(std::string const& val)
 {
     return do_create(new QPDF_InlineImage(val));
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_InlineImage::shallowCopy()
 {
     return create(val);

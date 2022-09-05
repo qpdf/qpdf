@@ -6,13 +6,13 @@ QPDF_Bool::QPDF_Bool(bool val) :
 {
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Bool::create(bool value)
 {
     return do_create(new QPDF_Bool(value));
 }
 
-std::shared_ptr<QPDFObject>
+std::shared_ptr<QPDFValueProxy>
 QPDF_Bool::shallowCopy()
 {
     return create(val);
