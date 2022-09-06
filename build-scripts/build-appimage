@@ -26,6 +26,13 @@ done
 version=$(basename distribution/qpdf*AppImage | cut -d- -f 2)
 ./distribution/qpdf*AppImage --appimage-extract
 D=$PWD/distribution
+if ! (readelf -d squashfs-root/usr/bin/qpdf | \
+          grep RUNPATH | grep -q -F ..); then
+    # We are relying on the AppImage build to create an executable
+    # whose runpath is relative to the binary so that the extract zip
+    # file is relocatable.
+    echo "Standalone linux binary lacks relative RUNPATH"
+fi
 (cd squashfs-root/usr; \
  zip -9 --symlinks $D/qpdf-$version-bin-linux-x86_64-ci.zip \
      bin/{qpdf,fix-qdf,zlib-flate} lib/*)
