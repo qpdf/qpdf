@@ -11,8 +11,6 @@ Next
 Before Release:
 
 * Stay on top of https://github.com/pikepdf/pikepdf/pull/315
-* Consider whether otherwise unreferenced object streams should be
-  included in json output. Probably not. Or maybe optionally.
 * Support json v2 in the C API. At a minimum, write_json,
   create_from_json, and update_from_json need to be there and should
   take the same kinds of functions as the C API for logger.
@@ -55,6 +53,20 @@ direct objects, which are always "resolved" in QPDFObjectHandle.
 
 Possible future JSON enhancements
 =================================
+
+* Consider not including unreferenced objects and trimming the trailer
+  in the same way that QPDFWriter does (except don't remove `/ID`).
+  This means excluding the linearization dictionary and hint stream,
+  the encryption dictionary, all keys from trailer that are removed by
+  QPDFWriter::getTrimmedTrailer except `/ID`, any object streams, and
+  the xref stream as long as all those objects are unreferenced. (They
+  always should be, but there could be some bizarre case of someone
+  creating a PDF file that has an indirect reference to one of those,
+  in which case we need to preserve it.) If this is done, make
+  `--preserve-unreferenced` preserve unreference objects and also
+  those extra keys. Search for "linear" and "trailer" in json.rst to
+  update the various places in the documentation that discuss this.
+  Also update the help for --json and --preserve-unreferenced.
 
 * Add to JSON output the information available from a few additional
   informational options:
@@ -376,7 +388,8 @@ I find it useful to make reference to them in this list.
   convertible back to a valid PDF. Since providing the password may
   reveal additional details, --show-encryption could potentially retry
   with this option if the first time doesn't work. Then, with the file
-  open, we can read the encryption dictionary normally.
+  open, we can read the encryption dictionary normally. If this is
+  done, search for "raw, encrypted" in json.rst.
 
 * In libtests, separate executables that need the object library
   from those that strictly use public API. Move as many of the test

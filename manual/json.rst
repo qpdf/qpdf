@@ -52,6 +52,22 @@ changes a handful of defaults so that the resulting JSON is as close
 as possible to the original input and is ready for being converted
 back to PDF.
 
+The qpdf JSON data includes unreferenced objects. This may be
+addressed in a future version of qpdf. For now, that means that
+certain objects that are not useful in the JSON representation are
+included. This includes linearization and encryption dictionaries,
+linearization hint streams, object streams, and the cross-reference
+(xref) stream associated with the trailer dictionary where applicable.
+For the best experience with qpdf JSON, you can run the file through
+qpdf first to remove encryption, linearization, and object streams.
+For example:
+
+::
+
+   qpdf --decrypt --object-streams=disable in.pdf out.pdf
+   qpdf --json-output out.pdf out.json
+
+
 .. _json-terminology:
 
 JSON Terminology
@@ -299,10 +315,46 @@ Object Values
 Note that writing JSON output is done by ``QPDF``, not ``QPDFWriter``.
 As such, none of the things ``QPDFWriter`` does apply. This includes
 recompression of streams, renumbering of objects, removal of
-unreferenced objects, anything to do with object streams (which are
-not represented by qpdf JSON at all since they are PDF syntax, not
-semantics), encryption, decryption, linearization, QDF mode, etc. See
-:ref:`rewriting` for a more in-depth discussion.
+unreferenced objects, encryption, decryption, linearization, QDF
+mode, etc. See :ref:`rewriting` for a more in-depth discussion. This
+has a few noteworthy implications:
+
+- Decryption is handled transparently by qpdf. As there are no QPDF
+  APIs, even internal to the library, that allow retrieval of
+  encrypted data in its raw, encrypted form, qpdf JSON always includes
+  decrypted data. It is possible that a future version of qpdf may
+  allow access to raw, encrypted string and stream data.
+
+- Objects that are related to a PDF file's structure, rather than its
+  content, are included in the JSON output, even though they are not
+  particularly useful. In a future version of qpdf, this may be fixed,
+  and the :qpdf:ref:`--preserve-unreferenced` flag may be able to be
+  used to get the existing behavior. For now, to avoid this, run the
+  file through ``qpdf --decrypt --object-streams=disable in.pdf
+  out.pdf`` to generate a new PDF file that contains no unreferenced
+  or structural objects.
+
+  - Linearized PDF files include a linearization dictionary which is not
+    referenced from any other object and which references the
+    linearization hint stream by offset. The JSON from a linearized PDF
+    file contains both of these objects, even though they are not useful
+    in the JSON. Offset information is not represented in the JSON, so
+    there's no way to find the linearization hint stream from the
+    JSON. If a new PDF is created from JSON that was written, the
+    objects will be read back in but will just be unreferenced objects
+    that will be ignored by ``QPDFWriter`` when the file is rewritten.
+
+  - The JSON from a file with object streams will include the original
+    object stream and will also include all the objects in the stream
+    as top-level objects.
+
+  - In files with object streams, the trailer "dictionary" is a
+    stream. In qpdf JSON files, the ``"trailer"`` key will contain a
+    dictionary with all the keys in it relating to the stream, and the
+    stream will also appear as an unreferenced object.
+
+  - Encrypted files are decrypted, but the encryption dictionary still
+    appears in the JSON output.
 
 .. _json.example:
 
