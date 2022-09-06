@@ -969,9 +969,20 @@ class QPDFObjectHandle
         int& min_suffix,
         std::set<std::string>* resource_names = nullptr);
 
-    // Return the QPDF object that owns an indirect object.  Returns
-    // null for a direct object if allow_nullptr is set to true or
-    // throws a runtime error otherwise.
+    // If this is an indirect object, return a pointer to the QPDF
+    // object that owns an indirect object. Direct objects are not
+    // owned by a QPDF. Usage notes:
+    //
+    // * When allow_nullptr is true, this method will return a null
+    //   pointer if the object is not owned by a QPDF. Otherwise, an
+    //   exception is thrown.
+    //
+    // * You should not retain the value returned by this method for
+    //   longer than the lifetime of the owning QPDF object. If you
+    //   retain a QPDFObjectHandle longer than the owning QPDF, when
+    //   the QPDF object is destroyed, the QPDFObjectHandle will turn
+    //   into a direct "null" object, and getOwningQPDF() called on it
+    //   at that time will return a null pointer.
     QPDF_DLL
     QPDF* getOwningQPDF(
         bool allow_nullptr = true, std::string const& error_msg = "") const;
