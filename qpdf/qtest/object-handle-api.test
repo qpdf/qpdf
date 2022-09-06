@@ -14,8 +14,6 @@ cleanup();
 
 my $td = new TestDriver('object-handle-api');
 
-my $n_tests = 2;
-
 $td->runtest("dictionary keys",
              {$td->COMMAND => "test_driver 87 - -"},
              {$td->STRING => "test 87 done\n", $td->EXIT_STATUS => 0},
@@ -24,6 +22,10 @@ $td->runtest("fluent interfaces",
              {$td->COMMAND => "test_driver 88 minimal.pdf -"},
              {$td->FILE => "test88.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+$td->runtest("equality",
+             {$td->COMMAND => "test_driver 93 minimal.pdf -"},
+             {$td->STRING => "test 93 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 cleanup();
-$td->report($n_tests);
+$td->report(3);

@@ -236,6 +236,18 @@ LastChar::getLastChar()
     return this->last_char;
 }
 
+bool
+QPDFObjectHandle::operator==(QPDFObjectHandle const& rhs) const
+{
+    return this->obj == rhs.obj;
+}
+
+bool
+QPDFObjectHandle::operator!=(QPDFObjectHandle const& rhs) const
+{
+    return this->obj != rhs.obj;
+}
+
 qpdf_object_type_e
 QPDFObjectHandle::getTypeCode()
 {

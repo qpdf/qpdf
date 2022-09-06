@@ -208,6 +208,11 @@ For a detailed list of changes, please see the file
       generally not happen for correct code, but at least the
       situation is detectible now.
 
+    - It is now possible to test ``QPDFObjectHandle`` equality with
+      ``==`` and ``!=``. Two ``QPDFObjectHandle`` objects are equal if
+      they point to the same underlying object, meaning changes to one
+      will be reflected in the other.
+
     - Add new factory method ``QPDF::create()`` that returns a
       ``std::shared_ptr<QPDF>``.
 

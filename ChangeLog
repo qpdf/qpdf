@@ -1,5 +1,9 @@
 2022-09-06  Jay Berkenbilt  <ejb@ql.org>
 
+        * Add == equality for QPDFObjectHandle. Two QPDFObjectHandle
+        objects are equal if they point to the same underlying object,
+        meaning changes to one will be reflected in the other.
+
         * The --show-encryption option now works even if a correct
         password is not supplied. If you were using --show-encryption to
         test whether you have the right password, use --requires-password
