@@ -10,7 +10,6 @@ Next
 
 Before Release:
 
-* Stay on top of https://github.com/pikepdf/pikepdf/pull/315
 * Support json v2 in the C API. At a minimum, write_json,
   create_from_json, and update_from_json need to be there and should
   take the same kinds of functions as the C API for logger.
