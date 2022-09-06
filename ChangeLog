@@ -1,5 +1,13 @@
 2022-09-06  Jay Berkenbilt  <ejb@ql.org>
 
+        * For all bounding box methods in QPDFPageObjectHelper other than
+        MediaBox, add a parameter `copy_if_fallback`, and add comments
+        explaining in depth exactly what copy_if_shared and
+        copy_if_fallback mean. Fixes #664.
+
+        * Add new methods getArtBox and getBleedBox to
+        QPDFPageObjectHelper, completing the set of bounding box methods.
+
         * Add == equality for QPDFObjectHandle. Two QPDFObjectHandle
         objects are equal if they point to the same underlying object,
         meaning changes to one will be reflected in the other.

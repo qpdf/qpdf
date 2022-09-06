@@ -261,6 +261,11 @@ For a detailed list of changes, please see the file
       generation parameters. The old versions will continue to be
       supported and are not deprecated.
 
+    - In ``QPDFPageObjectHelper``, add a ``copy_if_fallback``
+      parameter to most of the page bounding box methods, and clarify
+      in the comments about the difference between ``copy_if_shared``
+      and ``copy_if_fallback``.
+
     - Add a move constructor to the ``Buffer`` class.
 
   - Other changes

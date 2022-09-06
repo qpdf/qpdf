@@ -238,6 +238,16 @@ QPDFPageObjectHelper::QPDFPageObjectHelper(QPDFObjectHandle oh) :
 QPDFObjectHandle
 QPDFPageObjectHelper::getAttribute(std::string const& name, bool copy_if_shared)
 {
+    return getAttribute(name, copy_if_shared, nullptr, false);
+}
+
+QPDFObjectHandle
+QPDFPageObjectHelper::getAttribute(
+    std::string const& name,
+    bool copy_if_shared,
+    std::function<QPDFObjectHandle()> get_fallback,
+    bool copy_if_fallback)
+{
     QPDFObjectHandle result;
     QPDFObjectHandle dict;
     bool is_form_xobject = this->oh.isFormXObject();
@@ -272,28 +282,17 @@ QPDFPageObjectHelper::getAttribute(std::string const& name, bool copy_if_shared)
             "qpdf",
             "QPDFPageObjectHelper copy shared attribute",
             is_form_xobject ? 0 : 1);
-        result = result.shallowCopy();
-        dict.replaceKey(name, result);
+        result = dict.replaceKeyAndGetNew(name, result.shallowCopy());
     }
-    return result;
-}
-
-QPDFObjectHandle
-QPDFPageObjectHelper::getTrimBox(bool copy_if_shared)
-{
-    QPDFObjectHandle result = getAttribute("/TrimBox", copy_if_shared);
-    if (result.isNull()) {
-        result = getCropBox(copy_if_shared);
-    }
-    return result;
-}
-
-QPDFObjectHandle
-QPDFPageObjectHelper::getCropBox(bool copy_if_shared)
-{
-    QPDFObjectHandle result = getAttribute("/CropBox", copy_if_shared);
-    if (result.isNull()) {
-        result = getMediaBox();
+    if (result.isNull() && get_fallback) {
+        result = get_fallback();
+        if (copy_if_fallback && !result.isNull()) {
+            QTC::TC("qpdf", "QPDFPageObjectHelper copied fallback");
+            result = dict.replaceKeyAndGetNew(name, result.shallowCopy());
+        } else {
+            QTC::TC(
+                "qpdf", "QPDFPageObjectHelper used fallback without copying");
+        }
     }
     return result;
 }
@@ -302,6 +301,52 @@ QPDFObjectHandle
 QPDFPageObjectHelper::getMediaBox(bool copy_if_shared)
 {
     return getAttribute("/MediaBox", copy_if_shared);
+}
+
+QPDFObjectHandle
+QPDFPageObjectHelper::getCropBox(bool copy_if_shared, bool copy_if_fallback)
+{
+    return getAttribute(
+        "/CropBox",
+        copy_if_shared,
+        [this, copy_if_shared]() { return this->getMediaBox(copy_if_shared); },
+        copy_if_fallback);
+}
+
+QPDFObjectHandle
+QPDFPageObjectHelper::getTrimBox(bool copy_if_shared, bool copy_if_fallback)
+{
+    return getAttribute(
+        "/TrimBox",
+        copy_if_shared,
+        [this, copy_if_shared, copy_if_fallback]() {
+            return this->getCropBox(copy_if_shared, copy_if_fallback);
+        },
+        copy_if_fallback);
+}
+
+QPDFObjectHandle
+QPDFPageObjectHelper::getArtBox(bool copy_if_shared, bool copy_if_fallback)
+{
+    return getAttribute(
+        "/ArtBox",
+        copy_if_shared,
+        [this, copy_if_shared, copy_if_fallback]() {
+            return this->getCropBox(copy_if_shared, copy_if_fallback);
+        },
+        copy_if_fallback);
+}
+
+QPDFObjectHandle
+QPDFPageObjectHelper::getBleedBox(bool copy_if_shared, bool copy_if_fallback)
+{
+    return getAttribute(
+        "/BleedBox",
+        copy_if_shared,
+        [this, copy_if_shared, copy_if_fallback]() {
+            return this->getCropBox(copy_if_shared, copy_if_fallback);
+        },
+        copy_if_fallback);
 }
 
 void

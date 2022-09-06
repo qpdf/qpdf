@@ -14,8 +14,6 @@ cleanup();
 
 my $td = new TestDriver('page-api');
 
-my $n_tests = 11;
-
 $td->runtest("basic page API",
              {$td->COMMAND => "test_driver 15 page_api_1.pdf"},
              {$td->STRING => "test 15 done\n", $td->EXIT_STATUS => 0},
@@ -58,5 +56,10 @@ $td->runtest("flatten rotation",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "boxes-flattened.pdf"});
+$td->runtest("get box methods",
+             {$td->COMMAND => "test_driver 94 boxes2.pdf"},
+             {$td->STRING => "test 94 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
 cleanup();
-$td->report($n_tests);
+$td->report(12);

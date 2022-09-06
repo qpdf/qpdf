@@ -676,3 +676,5 @@ QPDF_json missing json version 0
 QPDF_json bad json version 0
 QPDF_json bad calledgetallpages 0
 QPDF_json bad pushedinheritedpageresources 0
+QPDFPageObjectHelper copied fallback 0
+QPDFPageObjectHelper used fallback without copying 0

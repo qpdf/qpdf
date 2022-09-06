@@ -3302,6 +3302,108 @@ test_93(QPDF& pdf, char const* arg2)
     assert(trailer.getKey("/Potato") == oh2);
 }
 
+static void
+test_94(QPDF& pdf, char const* arg2)
+{
+    // Exercise methods to get page boxes. This test is built for
+    // boxes2.pdf.
+
+    // /MediaBox is present in the pages tree root.
+    // Each page has the following boxes present directly:
+    // 1. none
+    // 2. crop
+    // 3. media, crop
+    // 4. media, crop, trim, bleed; crop is indirect
+    // 5. trim, art
+
+    auto pages_root = pdf.getRoot().getKey("/Pages");
+    auto root_media = pages_root.getKey("/MediaBox");
+    auto root_media_unparse = root_media.unparse();
+    auto pages = QPDFPageDocumentHelper(pdf).getAllPages();
+    assert(pages.size() == 5);
+    auto& p1 = pages[0];
+    auto& p2 = pages[1];
+    auto& p3 = pages[2];
+    auto& p4 = pages[3];
+    auto& p5 = pages[4];
+
+    assert(p1.getObjectHandle().getKey("/MediaBox").isNull());
+    // MediaBox not present, so get inherited one
+    assert(p1.getMediaBox(false) == root_media);
+    // Other boxesBox not present, so fall back to MediaBox
+    assert(p1.getCropBox(false, false) == root_media);
+    assert(p1.getBleedBox(false, false) == root_media);
+    assert(p1.getTrimBox(false, false) == root_media);
+    assert(p1.getArtBox(false, false) == root_media);
+    // Make copy of artbox
+    auto p1_new_art = p1.getArtBox(false, true);
+    assert(p1_new_art.unparse() == root_media_unparse);
+    assert(p1_new_art != root_media);
+    // This also copied cropbox
+    auto p1_new_crop = p1.getCropBox(false, false);
+    assert(p1_new_crop != root_media);
+    assert(p1_new_crop != p1_new_art);
+    assert(p1_new_crop.unparse() == root_media_unparse);
+    // But it didn't copy Media
+    assert(p1.getMediaBox(false) == root_media);
+    // Now fall back to new crop
+    assert(p1.getTrimBox(false, false) == p1_new_crop);
+    // Request copy. The value returned has the same structure but is
+    // a different object.
+    auto p1_effective_media = p1.getMediaBox(true);
+    assert(p1_effective_media.unparse() == root_media_unparse);
+    assert(p1_effective_media != root_media);
+
+    // copy_on_fallback didn't have to copy media to crop
+    assert(p2.getMediaBox(false) == root_media);
+    auto p2_crop = p2.getCropBox(false, false);
+    auto p2_new_trim = p2.getTrimBox(false, true);
+    assert(p2_new_trim.unparse() == p2_crop.unparse());
+    assert(p2_new_trim != p2_crop);
+    assert(p2.getMediaBox(false) == root_media);
+
+    // We didn't need to copy anything
+    auto p3_media = p3.getMediaBox(false);
+    auto p3_crop = p3.getCropBox(false, false);
+    assert(p3.getMediaBox(true) == p3_media);
+    assert(p3.getCropBox(true, true) == p3_crop);
+
+    // We didn't have to copy for bleed but we did for art
+    auto p4_orig_crop = p4.getObjectHandle().getKey("/CropBox");
+    auto p4_crop = p4.getCropBox(false, false);
+    assert(p4_orig_crop == p4_crop);
+    auto p4_bleed1 = p4.getBleedBox(false, false);
+    auto p4_bleed2 = p4.getBleedBox(false, true);
+    assert(p4_bleed1 != p4_crop);
+    assert(p4_bleed1 == p4_bleed2);
+    auto p4_art1 = p4.getArtBox(false, false);
+    assert(p4_art1 == p4_crop);
+    auto p4_art2 = p4.getArtBox(false, true);
+    assert(p4_art2 != p4_crop);
+    auto p4_new_crop = p4.getCropBox(true, false);
+    assert(p4_new_crop != p4_orig_crop);
+    assert(p4_orig_crop.isIndirect());
+    assert(!p4_new_crop.isIndirect());
+    assert(p4_new_crop.unparse() == p4_orig_crop.unparseResolved());
+
+    // Exercise copying for inheritence and fallback
+    assert(p5.getMediaBox(false) == root_media);
+    assert(p5.getCropBox(false, false) == root_media);
+    assert(p5.getBleedBox(false, false) == root_media);
+    auto p5_new_bleed = p5.getBleedBox(true, true);
+    auto p5_new_media = p5.getMediaBox(false);
+    auto p5_new_crop = p5.getCropBox(false, false);
+    assert(p5_new_media != root_media);
+    assert(p5_new_crop != root_media);
+    assert(p5_new_crop != p5_new_media);
+    assert(p5_new_bleed != root_media);
+    assert(p5_new_bleed != p5_new_media);
+    assert(p5_new_bleed != p5_new_crop);
+    assert(p5_new_media.unparse() == root_media_unparse);
+    assert(p5_new_crop.unparse() == root_media_unparse);
+    assert(p5_new_bleed.unparse() == root_media_unparse);
+}
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -3411,7 +3513,7 @@ runtest(int n, char const* filename1, char const* arg2)
         {80, test_80}, {81, test_81}, {82, test_82}, {83, test_83},
         {84, test_84}, {85, test_85}, {86, test_86}, {87, test_87},
         {88, test_88}, {89, test_89}, {90, test_90}, {91, test_91},
-        {92, test_92}, {93, test_93}};
+        {92, test_92}, {93, test_93}, {94, test_94}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {
