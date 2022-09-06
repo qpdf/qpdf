@@ -564,22 +564,27 @@ void
 QPDFJob::run()
 {
     checkConfiguration();
-    std::shared_ptr<QPDF> pdf_ph;
+    std::shared_ptr<QPDF> pdf_sp;
     try {
-        pdf_ph =
-            processFile(m->infilename.get(), m->password.get(), true, true);
+        processFile(pdf_sp, m->infilename.get(), m->password.get(), true, true);
     } catch (QPDFExc& e) {
-        if ((e.getErrorCode() == qpdf_e_password) &&
-            (m->check_is_encrypted || m->check_requires_password)) {
-            // Allow --is-encrypted and --requires-password to
-            // work when an incorrect password is supplied.
-            this->m->encryption_status =
-                qpdf_es_encrypted | qpdf_es_password_incorrect;
-            return;
+        if (e.getErrorCode() == qpdf_e_password) {
+            // Allow certain operations to work when an incorrect
+            // password is supplied.
+            if (m->check_is_encrypted || m->check_requires_password) {
+                this->m->encryption_status =
+                    qpdf_es_encrypted | qpdf_es_password_incorrect;
+                return;
+            }
+            if (m->show_encryption && pdf_sp) {
+                this->m->log->info("Incorrect password supplied\n");
+                showEncryption(*pdf_sp);
+                return;
+            }
         }
         throw e;
     }
-    QPDF& pdf = *pdf_ph;
+    QPDF& pdf = *pdf_sp;
     if (pdf.isEncrypted()) {
         this->m->encryption_status = qpdf_es_encrypted;
     }
@@ -1981,15 +1986,16 @@ QPDFJob::doInspection(QPDF& pdf)
     }
 }
 
-std::shared_ptr<QPDF>
+void
 QPDFJob::doProcessOnce(
+    std::shared_ptr<QPDF>& pdf,
     std::function<void(QPDF*, char const*)> fn,
     char const* password,
     bool empty,
     bool used_for_input,
     bool main_input)
 {
-    auto pdf = QPDF::create();
+    pdf = QPDF::create();
     setQPDFOptions(*pdf);
     if (empty) {
         pdf->emptyPDF();
@@ -2002,11 +2008,11 @@ QPDFJob::doProcessOnce(
         this->m->max_input_version.updateIfGreater(
             pdf->getVersionAsPDFVersion());
     }
-    return pdf;
 }
 
-std::shared_ptr<QPDF>
+void
 QPDFJob::doProcess(
+    std::shared_ptr<QPDF>& pdf,
     std::function<void(QPDF*, char const*)> fn,
     char const* password,
     bool empty,
@@ -2037,7 +2043,8 @@ QPDFJob::doProcess(
         m->suppress_password_recovery) {
         // There is no password, or we're not doing recovery, so just
         // do the normal processing with the supplied password.
-        return doProcessOnce(fn, password, empty, used_for_input, main_input);
+        doProcessOnce(pdf, fn, password, empty, used_for_input, main_input);
+        return;
     }
 
     // Get a list of otherwise encoded strings. Keep in scope for this
@@ -2065,7 +2072,8 @@ QPDFJob::doProcess(
     bool warned = false;
     for (auto iter = passwords.begin(); iter != passwords.end(); ++iter) {
         try {
-            return doProcessOnce(fn, *iter, empty, used_for_input, main_input);
+            doProcessOnce(pdf, fn, *iter, empty, used_for_input, main_input);
+            return;
         } catch (QPDFExc& e) {
             auto next = iter;
             ++next;
@@ -2086,8 +2094,9 @@ QPDFJob::doProcess(
     throw std::logic_error("do_process returned");
 }
 
-std::shared_ptr<QPDF>
+void
 QPDFJob::processFile(
+    std::shared_ptr<QPDF>& pdf,
     char const* filename,
     char const* password,
     bool used_for_input,
@@ -2096,17 +2105,25 @@ QPDFJob::processFile(
     auto f1 = std::mem_fn<void(char const*, char const*)>(&QPDF::processFile);
     auto fn =
         std::bind(f1, std::placeholders::_1, filename, std::placeholders::_2);
-    return doProcess(
-        fn, password, strcmp(filename, "") == 0, used_for_input, main_input);
+    doProcess(
+        pdf,
+        fn,
+        password,
+        strcmp(filename, "") == 0,
+        used_for_input,
+        main_input);
 }
 
-std::shared_ptr<QPDF>
+void
 QPDFJob::processInputSource(
-    std::shared_ptr<InputSource> is, char const* password, bool used_for_input)
+    std::shared_ptr<QPDF>& pdf,
+    std::shared_ptr<InputSource> is,
+    char const* password,
+    bool used_for_input)
 {
     auto f1 = std::mem_fn(&QPDF::processInputSource);
     auto fn = std::bind(f1, std::placeholders::_1, is, std::placeholders::_2);
-    return doProcess(fn, password, false, used_for_input, false);
+    doProcess(pdf, fn, password, false, used_for_input, false);
 }
 
 void
@@ -2117,8 +2134,7 @@ QPDFJob::validateUnderOverlay(QPDF& pdf, UnderOverlay* uo)
     }
     QPDFPageDocumentHelper main_pdh(pdf);
     int main_npages = QIntC::to_int(main_pdh.getAllPages().size());
-    uo->pdf =
-        processFile(uo->filename.c_str(), uo->password.get(), true, false);
+    processFile(uo->pdf, uo->filename.c_str(), uo->password.get(), true, false);
     QPDFPageDocumentHelper uo_pdh(*(uo->pdf));
     int uo_npages = QIntC::to_int(uo_pdh.getAllPages().size());
     try {
@@ -2375,8 +2391,13 @@ QPDFJob::copyAttachments(QPDF& pdf)
             v << prefix << ": copying attachments from " << to_copy.path
               << "\n";
         });
-        auto other = processFile(
-            to_copy.path.c_str(), to_copy.password.c_str(), false, false);
+        std::shared_ptr<QPDF> other;
+        processFile(
+            other,
+            to_copy.path.c_str(),
+            to_copy.password.c_str(),
+            false,
+            false);
         QPDFEmbeddedFileDocumentHelper other_efdh(*other);
         auto other_attachments = other_efdh.getEmbeddedFiles();
         for (auto const& iter: other_attachments) {
@@ -2702,10 +2723,10 @@ QPDFJob::handlePageSpecs(
                     new FileInputSource(page_spec.filename.c_str());
                 is = std::shared_ptr<InputSource>(fis);
             }
-            std::shared_ptr<QPDF> qpdf_ph =
-                processInputSource(is, password, true);
-            page_heap.push_back(qpdf_ph);
-            page_spec_qpdfs[page_spec.filename] = qpdf_ph.get();
+            std::shared_ptr<QPDF> qpdf_sp;
+            processInputSource(qpdf_sp, is, password, true);
+            page_heap.push_back(qpdf_sp);
+            page_spec_qpdfs[page_spec.filename] = qpdf_sp.get();
             if (cis) {
                 cis->stayOpen(false);
                 page_spec_cfis[page_spec.filename] = cis;
@@ -3209,7 +3230,9 @@ QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
         w.setSuppressOriginalObjectIDs(true);
     }
     if (m->copy_encryption) {
-        std::shared_ptr<QPDF> encryption_pdf = processFile(
+        std::shared_ptr<QPDF> encryption_pdf;
+        processFile(
+            encryption_pdf,
             m->encryption_file.c_str(),
             m->encryption_file_password.get(),
             false,

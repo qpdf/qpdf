@@ -490,22 +490,26 @@ class QPDFJob
     std::vector<int> parseNumrange(char const* range, int max);
 
     // Basic file processing
-    std::shared_ptr<QPDF> processFile(
+    void processFile(
+        std::shared_ptr<QPDF>&,
         char const* filename,
         char const* password,
         bool used_for_input,
         bool main_input);
-    std::shared_ptr<QPDF> processInputSource(
+    void processInputSource(
+        std::shared_ptr<QPDF>&,
         std::shared_ptr<InputSource> is,
         char const* password,
         bool used_for_input);
-    std::shared_ptr<QPDF> doProcess(
+    void doProcess(
+        std::shared_ptr<QPDF>&,
         std::function<void(QPDF*, char const*)> fn,
         char const* password,
         bool empty,
         bool used_for_input,
         bool main_input);
-    std::shared_ptr<QPDF> doProcessOnce(
+    void doProcessOnce(
+        std::shared_ptr<QPDF>&,
         std::function<void(QPDF*, char const*)> fn,
         char const* password,
         bool empty,

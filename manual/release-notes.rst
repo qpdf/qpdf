@@ -85,6 +85,11 @@ For a detailed list of changes, please see the file
 
   - CLI: breaking changes
 
+    - The :qpdf:ref:`--show-encryption` flag now provides encryption
+      information even if a correct password is not supplied. If you
+      were relying on its not working in this case, see
+      :qpdf:ref:`--requires-password` for a reliable test.
+
     - The default json output version when :qpdf:ref:`--json` is
       specified has been changed from ``1`` to ``latest``, which is
       now ``2``.

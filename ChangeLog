@@ -1,3 +1,10 @@
+2022-09-06  Jay Berkenbilt  <ejb@ql.org>
+
+        * The --show-encryption option now works even if a correct
+        password is not supplied. If you were using --show-encryption to
+        test whether you have the right password, use --requires-password
+        instead. Fixes #598.
+
 2022-09-05  Jay Berkenbilt  <ejb@ql.org>
 
         * Add a move constructor to Buffer, making it possible to move

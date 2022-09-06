@@ -112,7 +112,7 @@ my @encrypted_files =
       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     );
 
-$n_tests += 8 + (2 * (@encrypted_files)) + (7 * (@encrypted_files - 6)) + 9;
+$n_tests += 8 + (2 * (@encrypted_files)) + (7 * (@encrypted_files - 6)) + 10;
 
 $td->runtest("encrypted file",
              {$td->COMMAND => "test_driver 2 encrypted-with-images.pdf"},
@@ -364,6 +364,12 @@ $td->runtest("C API: invalid password",
              {$td->COMMAND =>
                   "qpdf-ctest 2 enc-R2,V1,U=view,O=view.pdf '' a.qdf"},
              {$td->FILE => "c-invalid-password.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("show-encryption works invalid password",
+             {$td->COMMAND => "qpdf --show-encryption --password=quack" .
+                  " enc-R2,V1,U=view,O=view.pdf"},
+             {$td->FILE => "invalid-password-encrypt.out",
+                  $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 my @cenc = (
