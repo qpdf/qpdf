@@ -146,7 +146,7 @@ InputSource::fastTell()
     if (this->cache_len == 0) {
         loadCache();
     } else {
-        auto curr = tell();
+        auto curr = this->fast_enabled ? this->cur_offset : tell();
         if (curr < this->cache_start ||
             curr >= (this->cache_start + this->cache_len)) {
             loadCache();
@@ -183,7 +183,11 @@ inline void
 InputSource::fastUnread(bool back)
 {
     this->last_offset -= back ? 1 : 0;
-    seek(this->last_offset, SEEK_SET);
+    if (this->fast_enabled) {
+        this->cur_offset = this->last_offset;
+    } else {
+        seek(this->last_offset, SEEK_SET);
+    }
 }
 
 #endif // QPDF_INPUTSOURCE_HH
