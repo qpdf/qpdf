@@ -22,6 +22,7 @@
 #ifndef QPDF_INPUTSOURCE_HH
 #define QPDF_INPUTSOURCE_HH
 
+#include <qpdf/Buffer.hh>
 #include <qpdf/DLL.h>
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/Types.h>
@@ -37,10 +38,8 @@ class QPDF_DLL_CLASS InputSource
 {
   public:
     QPDF_DLL
-    InputSource() :
-        last_offset(0)
-    {
-    }
+    InputSource() = default;
+
     QPDF_DLL
     virtual ~InputSource() = default;
 
@@ -102,7 +101,11 @@ class QPDF_DLL_CLASS InputSource
     inline void loadCache();
 
   protected:
-    qpdf_offset_t last_offset;
+    bool fast_enabled{false};
+    char* buf_ptr{nullptr};
+    qpdf_offset_t cur_offset{0};
+    qpdf_offset_t max_offset{0};
+    qpdf_offset_t last_offset{0};
 
   private:
     class QPDF_DLL_PRIVATE Members

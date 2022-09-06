@@ -57,8 +57,6 @@ class QPDF_DLL_CLASS BufferInputSource: public InputSource
     bool own_memory;
     std::string description;
     Buffer* buf;
-    qpdf_offset_t cur_offset;
-    qpdf_offset_t max_offset;
 };
 
 #endif // QPDF_BUFFERINPUTSOURCE_HH

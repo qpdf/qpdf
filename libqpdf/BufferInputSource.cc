@@ -11,20 +11,22 @@ BufferInputSource::BufferInputSource(
     std::string const& description, Buffer* buf, bool own_memory) :
     own_memory(own_memory),
     description(description),
-    buf(buf),
-    cur_offset(0),
-    max_offset(buf ? QIntC::to_offset(buf->getSize()) : 0)
+    buf(buf)
 {
+    this->buf_ptr = reinterpret_cast<char*>(buf->getBuffer());
+    this->max_offset = buf ? QIntC::to_offset(buf->getSize()) : 0;
+    this->fast_enabled = true;
 }
 
 BufferInputSource::BufferInputSource(
     std::string const& description, std::string const& contents) :
     own_memory(true),
     description(description),
-    buf(new Buffer(contents.length())),
-    cur_offset(0),
-    max_offset(QIntC::to_offset(buf->getSize()))
+    buf(new Buffer(contents.length()))
 {
+    this->buf_ptr = reinterpret_cast<char*>(this->buf->getBuffer());
+    this->max_offset = QIntC::to_offset(buf->getSize());
+    this->fast_enabled = true;
     memcpy(buf->getBuffer(), contents.c_str(), contents.length());
 }
 
