@@ -1534,6 +1534,23 @@ class QPDFObjectHandle
     };
     friend class ObjAccessor;
 
+    // Provide access to specific classes for recursive
+    // reset().
+    class Resetter
+    {
+        friend class QPDF_Dictionary;
+        friend class QPDF_Stream;
+        friend class SparseOHArray;
+
+      private:
+        static void
+        reset(QPDFObjectHandle& o)
+        {
+            o.reset();
+        }
+    };
+    friend class Resetter;
+
     // Convenience routine: Throws if the assumption is violated. Your
     // code will be better if you call one of the isType methods and
     // handle the case of the type being wrong, but these can be
@@ -1631,6 +1648,7 @@ class QPDFObjectHandle
         bool first_level_only,
         bool stop_at_streams);
     void shallowCopyInternal(QPDFObjectHandle& oh, bool first_level_only);
+    void reset();
     void setParsedOffset(qpdf_offset_t offset);
     void parseContentStream_internal(
         std::string const& description, ParserCallbacks* callbacks);

@@ -248,6 +248,17 @@ QPDFObjectHandle::operator!=(QPDFObjectHandle const& rhs) const
     return this->obj != rhs.obj;
 }
 
+void
+QPDFObjectHandle::reset()
+{
+    // Recursively remove association with any QPDF object. This
+    // method may only be called during final destruction. See
+    // comments in QPDF::~QPDF().
+    if (!isIndirect()) {
+        this->obj->reset();
+    }
+}
+
 qpdf_object_type_e
 QPDFObjectHandle::getTypeCode()
 {

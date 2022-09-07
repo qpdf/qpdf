@@ -811,3 +811,10 @@ Rejected Ideas
   Note that arrays and dictionaries still need to contain
   QPDFObjectHandle because of indirect objects. This only pertains to
   direct objects, which are always "resolved" in QPDFObjectHandle.
+
+  If this is addressed, read comments in QPDFWriter.cc::enqueueObject
+  near the call to getOwningQPDF, comments in QPDFValueProxy::reset,
+  and comments in QPDF::~QPDF() near the line that assigns to null.
+  This will also affect test 92 in test_driver.cc. All these
+  references were from the release of qpdf 11 (in case they have moved
+  by such time as this might be resurrected).

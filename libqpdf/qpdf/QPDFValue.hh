@@ -63,6 +63,10 @@ class QPDFValue
     {
         return og;
     }
+    virtual void
+    reset()
+    {
+    }
 
   protected:
     QPDFValue() :

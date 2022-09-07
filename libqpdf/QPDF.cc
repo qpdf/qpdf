@@ -247,19 +247,24 @@ QPDF::~QPDF()
     // having an array or dictionary that contains an indirect
     // reference to the other), the circular references in the
     // std::shared_ptr objects will prevent the objects from being
-    // deleted.  Walk through all objects in the object cache, which
-    // is those objects that we read from the file, and break all
-    // resolved indirect references by replacing them with direct
-    // null objects.  At this point, obviously no one is still
-    // using the QPDF object, but we'll explicitly clear the xref
-    // table anyway just to prevent any possibility of resolve()
-    // succeeding.  Note that we can't break references like this at
-    // any time when the QPDF object is active.
+    // deleted. Walk through all objects in the object cache, which is
+    // those objects that we read from the file, and break all
+    // resolved indirect references by replacing them with direct null
+    // objects. At this point, obviously no one is still using the
+    // QPDF object, but we'll explicitly clear the xref table anyway
+    // just to prevent any possibility of resolve() succeeding. Note
+    // that we can't break references like this at any time when the
+    // QPDF object is active. This also causes all QPDFObjectHandle
+    // objects that are reachable from this object to become nulls and
+    // release their association with this QPDF.
     this->m->xref_table.clear();
     auto null_obj = QPDF_Null::create();
     for (auto const& iter: this->m->obj_cache) {
+        iter.second.object->reset();
+        // If the issue discussed in QPDFValueProxy::reset were
+        // resolved, then this assignment to null_obj could be
+        // removed.
         iter.second.object->assign(null_obj);
-        iter.second.object->resetObjGen();
     }
 }
 

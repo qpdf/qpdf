@@ -3274,13 +3274,40 @@ test_92(QPDF& pdf, char const* arg2)
 {
     // Exercise indirect objects owned by destroyed QPDF object.
     auto qpdf = QPDF::create();
-    qpdf->emptyPDF();
+    qpdf->processFile("minimal.pdf");
     auto root = qpdf->getRoot();
-    assert(root.getOwningQPDF() != nullptr);
+    assert(root.getOwningQPDF() == qpdf.get());
     assert(root.isIndirect());
+    assert(root.isDictionary());
+    auto page1 = root.getKey("/Pages").getKey("/Kids").getArrayItem(0);
+    assert(page1.getOwningQPDF() == qpdf.get());
+    assert(page1.isIndirect());
+    assert(page1.isDictionary());
+    auto resources = page1.getKey("/Resources");
+    assert(resources.getOwningQPDF() == qpdf.get());
+    assert(resources.isDictionary());
+    assert(!resources.isIndirect());
+    auto contents = page1.getKey("/Contents");
+    auto contents_dict = contents.getDict();
     qpdf = nullptr;
-    assert(root.getOwningQPDF() == nullptr);
-    assert(!root.isIndirect());
+    auto check = [](QPDFObjectHandle& oh) {
+        assert(oh.getOwningQPDF() == nullptr);
+        assert(!oh.isIndirect());
+    };
+    // All objects should no longer have an owning QPDF or be indirect.
+    check(root);
+    check(page1);
+    check(resources);
+    check(contents);
+    check(contents_dict);
+    // Objects that were originally indirect should be null.
+    // Otherwise, they should have retained their old values. See
+    // comments in QPDFValueProxy::reset for why this is the case.
+    assert(root.isNull());
+    assert(page1.isNull());
+    assert(contents.isNull());
+    assert(!resources.isNull());
+    assert(!contents_dict.isNull());
 }
 
 static void

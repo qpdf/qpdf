@@ -49,6 +49,14 @@ SparseOHArray::remove_last()
 }
 
 void
+SparseOHArray::reset()
+{
+    for (auto& iter: this->elements) {
+        QPDFObjectHandle::Resetter::reset(iter.second);
+    }
+}
+
+void
 SparseOHArray::setAt(size_t idx, QPDFObjectHandle oh)
 {
     if (idx >= this->n_elements) {

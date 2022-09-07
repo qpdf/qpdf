@@ -110,8 +110,21 @@ class QPDFValueProxy
         value->og = og;
     }
     void
-    resetObjGen()
+    reset()
     {
+        value->reset();
+        // It would be better if, rather than clearing value->qpdf and
+        // value->og, we completely replaced value with a null object.
+        // However, at the time of the release of qpdf 11, this causes
+        // test failures and would likely break a lot of code since it
+        // possible for a direct object that recursively contains no
+        // indirect objects to be copied into multiple QPDF objects.
+        // For that reason, we have to break the association with the
+        // owning QPDF but not otherwise mutate the object. For
+        // indirect objects, QPDF::~QPDF replaces the object with
+        // null, which clears circular references. If this code were
+        // able to do the null replacement, that code would not have
+        // to.
         value->qpdf = nullptr;
         value->og = QPDFObjGen();
     }

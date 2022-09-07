@@ -21,6 +21,14 @@ QPDF_Dictionary::shallowCopy()
     return create(items);
 }
 
+void
+QPDF_Dictionary::reset()
+{
+    for (auto& iter: this->items) {
+        QPDFObjectHandle::Resetter::reset(iter.second);
+    }
+}
+
 std::string
 QPDF_Dictionary::unparse()
 {
