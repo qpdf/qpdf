@@ -3386,7 +3386,7 @@ test_94(QPDF& pdf, char const* arg2)
     assert(!p4_new_crop.isIndirect());
     assert(p4_new_crop.unparse() == p4_orig_crop.unparseResolved());
 
-    // Exercise copying for inheritence and fallback
+    // Exercise copying for inheritance and fallback
     assert(p5.getMediaBox(false) == root_media);
     assert(p5.getCropBox(false, false) == root_media);
     assert(p5.getBleedBox(false, false) == root_media);
