@@ -1668,11 +1668,10 @@ QPDFObjectHandle::coalesceContentStreams()
     // incorrect way. However, it can happen in a PDF file whose
     // page structure is direct, which is against spec but still
     // possible to hand construct, as in fuzz issue 27393.
-    QPDF* qpdf = getOwningQPDF(
-        false,
+    QPDF& qpdf = getQPDF(
         "coalesceContentStreams called on object  with no associated PDF file");
 
-    QPDFObjectHandle new_contents = newStream(qpdf);
+    QPDFObjectHandle new_contents = newStream(&qpdf);
     this->replaceKey("/Contents", new_contents);
 
     auto provider = std::shared_ptr<StreamDataProvider>(
@@ -2775,16 +2774,20 @@ QPDFObjectHandle::getObjGen() const
 
 // Indirect object accessors
 QPDF*
-QPDFObjectHandle::getOwningQPDF(
-    bool allow_nullptr, std::string const& error_msg) const
+QPDFObjectHandle::getOwningQPDF() const
 {
-    // Will be null for direct objects
+    return isInitialized() ? this->obj->getQPDF() : nullptr;
+}
+
+QPDF&
+QPDFObjectHandle::getQPDF(std::string const& error_msg) const
+{
     auto result = isInitialized() ? this->obj->getQPDF() : nullptr;
-    if (!allow_nullptr && (result == nullptr)) {
+    if (result == nullptr) {
         throw std::runtime_error(
             error_msg == "" ? "attempt to use a null qpdf object" : error_msg);
     }
-    return result;
+    return *result;
 }
 
 void

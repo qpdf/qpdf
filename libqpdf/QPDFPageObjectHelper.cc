@@ -477,8 +477,7 @@ QPDFPageObjectHelper::externalizeInlineImages(size_t min_size, bool shallow)
                 this->oh.replaceKey(
                     "/Contents",
                     QPDFObjectHandle::newStream(
-                        this->oh.getOwningQPDF(false),
-                        b.getBufferSharedPointer()));
+                        &this->oh.getQPDF(), b.getBufferSharedPointer()));
             }
         }
     } else {
@@ -729,12 +728,10 @@ QPDFPageObjectHelper::removeUnreferencedResources()
 QPDFPageObjectHelper
 QPDFPageObjectHelper::shallowCopyPage()
 {
-    QPDF* qpdf = this->oh.getOwningQPDF(
-        false,
+    QPDF& qpdf = this->oh.getQPDF(
         "QPDFPageObjectHelper::shallowCopyPage called with a direct object");
-
     QPDFObjectHandle new_page = this->oh.shallowCopy();
-    return QPDFPageObjectHelper(qpdf->makeIndirectObject(new_page));
+    return QPDFPageObjectHelper(qpdf.makeIndirectObject(new_page));
 }
 
 QPDFObjectHandle::Matrix
@@ -788,11 +785,10 @@ QPDFPageObjectHelper::getMatrixForTransformations(bool invert)
 QPDFObjectHandle
 QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
 {
-    QPDF* qpdf = this->oh.getOwningQPDF(
-        false,
+    QPDF& qpdf = this->oh.getQPDF(
         "QPDFPageObjectHelper::getFormXObjectForPage called with a direct "
         "object");
-    QPDFObjectHandle result = QPDFObjectHandle::newStream(qpdf);
+    QPDFObjectHandle result = QPDFObjectHandle::newStream(&qpdf);
     QPDFObjectHandle newdict = result.getDict();
     newdict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
     newdict.replaceKey("/Subtype", QPDFObjectHandle::newName("/Form"));
@@ -961,10 +957,8 @@ QPDFPageObjectHelper::placeFormXObject(
 void
 QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
 {
-    QPDF* qpdf = this->oh.getOwningQPDF(
-        false,
+    QPDF& qpdf = this->oh.getQPDF(
         "QPDFPageObjectHelper::flattenRotation called with a direct object");
-
     auto rotate_oh = this->oh.getKey("/Rotate");
     int rotate = 0;
     if (rotate_oh.isInteger()) {
@@ -1067,8 +1061,9 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
         break;
     }
     std::string cm_str = std::string("q\n") + cm.unparse() + " cm\n";
-    this->oh.addPageContents(QPDFObjectHandle::newStream(qpdf, cm_str), true);
-    this->oh.addPageContents(QPDFObjectHandle::newStream(qpdf, "\nQ\n"), false);
+    this->oh.addPageContents(QPDFObjectHandle::newStream(&qpdf, cm_str), true);
+    this->oh.addPageContents(
+        QPDFObjectHandle::newStream(&qpdf, "\nQ\n"), false);
     this->oh.removeKey("/Rotate");
     QPDFObjectHandle rotate_obj = getAttribute("/Rotate", false);
     if (!rotate_obj.isNull()) {
@@ -1083,7 +1078,7 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
         std::set<QPDFObjGen> old_fields;
         std::shared_ptr<QPDFAcroFormDocumentHelper> afdhph;
         if (!afdh) {
-            afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(*qpdf);
+            afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(qpdf);
             afdh = afdhph.get();
         }
         afdh->transformAnnotations(
@@ -1108,11 +1103,9 @@ QPDFPageObjectHelper::copyAnnotations(
         return;
     }
 
-    QPDF* from_qpdf = from_page.getObjectHandle().getOwningQPDF(
-        false,
+    QPDF& from_qpdf = from_page.getObjectHandle().getQPDF(
         "QPDFPageObjectHelper::copyAnnotations: from page is a direct object");
-    QPDF* this_qpdf = this->oh.getOwningQPDF(
-        false,
+    QPDF& this_qpdf = this->oh.getQPDF(
         "QPDFPageObjectHelper::copyAnnotations: this page is a direct object");
 
     std::vector<QPDFObjectHandle> new_annots;
@@ -1121,19 +1114,19 @@ QPDFPageObjectHelper::copyAnnotations(
     std::shared_ptr<QPDFAcroFormDocumentHelper> afdhph;
     std::shared_ptr<QPDFAcroFormDocumentHelper> from_afdhph;
     if (!afdh) {
-        afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(*this_qpdf);
+        afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(this_qpdf);
         afdh = afdhph.get();
     }
-    if (this_qpdf == from_qpdf) {
+    if (&this_qpdf == &from_qpdf) {
         from_afdh = afdh;
     } else if (from_afdh) {
-        if (from_afdh->getQPDF().getUniqueId() != from_qpdf->getUniqueId()) {
+        if (from_afdh->getQPDF().getUniqueId() != from_qpdf.getUniqueId()) {
             throw std::logic_error(
                 "QPDFAcroFormDocumentHelper::copyAnnotations: from_afdh"
                 " is not from the same QPDF as from_page");
         }
     } else {
-        from_afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(*from_qpdf);
+        from_afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(from_qpdf);
         from_afdh = from_afdhph.get();
     }
 
@@ -1143,7 +1136,7 @@ QPDFPageObjectHelper::copyAnnotations(
         new_fields,
         old_fields,
         cm,
-        from_qpdf,
+        &from_qpdf,
         from_afdh);
     afdh->addAndRenameFormFields(new_fields);
     auto annots = this->oh.getKey("/Annots");

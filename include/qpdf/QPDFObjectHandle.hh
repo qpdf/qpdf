@@ -661,14 +661,17 @@ class QPDFObjectHandle
     static QPDFObjectHandle newReserved(QPDF* qpdf);
 
     // Provide an owning qpdf and object description. The library does
-    // this automatically with objects that are read from the
-    // input PDF and with objects that are created programmatically
-    // and inserted into the QPDF by adding them to an array or a
-    // dictionary or creating a new indirect object. Most end user
+    // this automatically with objects that are read from the input
+    // PDF and with objects that are created programmatically and
+    // inserted into the QPDF as a new indirect object. Most end user
     // code will not need to call this. If an object has an owning
     // qpdf and object description, it enables qpdf to give warnings
     // with proper context in some cases where it would otherwise
-    // raise exceptions.
+    // raise exceptions. It is okay to add objects without an
+    // owning_qpdf to objects that have one, but it is an error to
+    // have a QPDF contain objects with owning_qpdf set to something
+    // else. To add objects from another qpdf, use copyForeignObject
+    // instead.
     QPDF_DLL
     void setObjectDescription(
         QPDF* owning_qpdf, std::string const& object_description);
@@ -978,23 +981,34 @@ class QPDFObjectHandle
         int& min_suffix,
         std::set<std::string>* resource_names = nullptr);
 
-    // If this is an indirect object, return a pointer to the QPDF
-    // object that owns an indirect object. Direct objects are not
-    // owned by a QPDF. Usage notes:
+    // A QPDFObjectHandle has an owning QPDF if it is associated with
+    // ("owned by") a specific QPDF object. Indirect objects always
+    // have an owning QPDF. Direct objects that are read from the
+    // input source will also have an owning QPDF. Programmatically
+    // created objects will only have one if setObjectDescription was
+    // called.
     //
-    // * When allow_nullptr is true, this method will return a null
-    //   pointer if the object is not owned by a QPDF. Otherwise, an
-    //   exception is thrown.
-    //
-    // * You should not retain the value returned by this method for
-    //   longer than the lifetime of the owning QPDF object. If you
-    //   retain a QPDFObjectHandle longer than the owning QPDF, when
-    //   the QPDF object is destroyed, the QPDFObjectHandle will turn
-    //   into a direct "null" object, and getOwningQPDF() called on it
-    //   at that time will return a null pointer.
+    // When the QPDF object that owns an object is destroyed, the
+    // object is changed into a null, and its owner is cleared.
+    // Therefore you should not retain the value of an owning QPDF
+    // beyond the life of the QPDF. If in doubt, ask for it each time
+    // you need it.
+
+    // getOwningQPDF returns a pointer to the owning QPDF is the
+    // object has one. Otherwise, it returns a null pointer. Use this
+    // when you are able to handle the case of an object that doesn't
+    // have an owning QPDF.
     QPDF_DLL
-    QPDF* getOwningQPDF(
-        bool allow_nullptr = true, std::string const& error_msg = "") const;
+    QPDF* getOwningQPDF() const;
+    // getQPDF, new in qpdf 11, returns a reference owning QPDF. If
+    // there is none, it throws a runtime_error. Use this when you
+    // know the object has to have an owning QPDF, such as when it's a
+    // known indirect object. Since streams are always indirect
+    // objects, this method can be used safely for streams. If
+    // error_msg is specified, it will be used at the contents of the
+    // runtime_error if there is now owner.
+    QPDF_DLL
+    QPDF& getQPDF(std::string const& error_msg = "") const;
 
     // Create a shallow copy of an object as a direct object, but do not
     // traverse across indirect object boundaries. That means that,

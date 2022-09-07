@@ -2299,14 +2299,14 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
         throw std::logic_error(
             "QPDF::copyForeign called with direct object handle");
     }
-    QPDF* other = foreign.getOwningQPDF(false);
-    if (other == this) {
+    QPDF& other = foreign.getQPDF();
+    if (&other == this) {
         QTC::TC("qpdf", "QPDF copyForeign not foreign");
         throw std::logic_error(
             "QPDF::copyForeign called with object from this QPDF");
     }
 
-    ObjCopier& obj_copier = this->m->object_copiers[other->m->unique_id];
+    ObjCopier& obj_copier = this->m->object_copiers[other.m->unique_id];
     if (!obj_copier.visiting.empty()) {
         throw std::logic_error("obj_copier.visiting is not empty"
                                " at the beginning of copyForeignObject");
@@ -2490,8 +2490,8 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
     // Copy information from the foreign stream so we can pipe its
     // data later without keeping the original QPDF object around.
 
-    QPDF* foreign_stream_qpdf = foreign.getOwningQPDF(
-        false, "unable to retrieve owning qpdf from foreign stream");
+    QPDF& foreign_stream_qpdf =
+        foreign.getQPDF("unable to retrieve owning qpdf from foreign stream");
 
     auto stream = QPDFObjectHandle::ObjAccessor::asStream(foreign);
     if (stream == nullptr) {
@@ -2499,7 +2499,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
                                " stream object from foreign stream");
     }
     std::shared_ptr<Buffer> stream_buffer = stream->getStreamDataBuffer();
-    if ((foreign_stream_qpdf->m->immediate_copy_from) &&
+    if ((foreign_stream_qpdf.m->immediate_copy_from) &&
         (stream_buffer == nullptr)) {
         // Pull the stream data into a buffer before attempting
         // the copy operation. Do it on the source stream so that
@@ -2529,8 +2529,8 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
             dict.getKey("/DecodeParms"));
     } else {
         auto foreign_stream_data = std::make_shared<ForeignStreamData>(
-            foreign_stream_qpdf->m->encp,
-            foreign_stream_qpdf->m->file,
+            foreign_stream_qpdf.m->encp,
+            foreign_stream_qpdf.m->file,
             foreign.getObjGen(),
             stream->getOffset(),
             stream->getLength(),

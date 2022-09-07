@@ -208,6 +208,11 @@ For a detailed list of changes, please see the file
       generally not happen for correct code, but at least the
       situation is detectible now.
 
+    - The method ``QPDFObjectHandle::getQPDF`` returns a ``QPDF&``
+      (rather than a ``QPDF*``) and is an alternative to
+      ``QPDFObjectHandle::getOwningQPDF`` for when the object is known
+      to have an owning ``QPDF``.
+
     - It is now possible to test ``QPDFObjectHandle`` equality with
       ``==`` and ``!=``. Two ``QPDFObjectHandle`` objects are equal if
       they point to the same underlying object, meaning changes to one
