@@ -27,7 +27,7 @@ BufferInputSource::BufferInputSource(
     this->buf_ptr = reinterpret_cast<char*>(this->buf->getBuffer());
     this->max_offset = QIntC::to_offset(buf->getSize());
     this->fast_enabled = true;
-    memcpy(buf->getBuffer(), contents.c_str(), contents.length());
+    memcpy(this->buf_ptr, contents.c_str(), contents.length());
 }
 
 BufferInputSource::~BufferInputSource()
@@ -51,9 +51,9 @@ BufferInputSource::findAndSkipNextEOL()
     }
 
     qpdf_offset_t result = 0;
-    unsigned char const* buffer = this->buf->getBuffer();
-    unsigned char const* end = buffer + end_pos;
-    unsigned char const* p = buffer + this->cur_offset;
+    char const* buffer = this->buf_ptr;
+    char const* end = buffer + end_pos;
+    char const* p = buffer + this->cur_offset;
 
     while ((p < end) && !((*p == '\r') || (*p == '\n'))) {
         ++p;
@@ -135,7 +135,7 @@ BufferInputSource::read(char* buffer, size_t length)
 
     this->last_offset = this->cur_offset;
     size_t len = std::min(QIntC::to_size(end_pos - this->cur_offset), length);
-    memcpy(buffer, this->buf->getBuffer() + this->cur_offset, len);
+    memcpy(buffer, this->buf_ptr + this->cur_offset, len);
     this->cur_offset += QIntC::to_offset(len);
     return len;
 }
