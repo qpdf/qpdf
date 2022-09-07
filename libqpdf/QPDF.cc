@@ -2134,7 +2134,6 @@ QPDF::updateCache(
     object->setObjGen(this, og);
     if (isCached(og)) {
         auto& cache = m->obj_cache[og];
-        cache.object->resetObjGen();
         cache.object->assign(object);
         cache.end_before_space = end_before_space;
         cache.end_after_space = end_after_space;
