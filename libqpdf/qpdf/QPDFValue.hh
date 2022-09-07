@@ -24,22 +24,22 @@ class QPDFValue
     virtual std::string unparse() = 0;
     virtual JSON getJSON(int json_version) = 0;
     virtual void
-    setDescription(QPDF* qpdf, std::string const& description)
+    setDescription(QPDF* qpdf_p, std::string const& description)
     {
-        owning_qpdf = qpdf;
+        qpdf = qpdf_p;
         object_description = description;
     }
     bool
-    getDescription(QPDF*& qpdf, std::string& description)
+    getDescription(QPDF*& qpdf_p, std::string& description)
     {
-        qpdf = owning_qpdf;
+        qpdf_p = qpdf;
         description = object_description;
-        return owning_qpdf != nullptr;
+        return qpdf != nullptr;
     }
     bool
     hasDescription()
     {
-        return owning_qpdf != nullptr;
+        return qpdf != nullptr && !object_description.empty();
     }
     void
     setParsedOffset(qpdf_offset_t offset)
@@ -92,7 +92,6 @@ class QPDFValue
   private:
     QPDFValue(QPDFValue const&) = delete;
     QPDFValue& operator=(QPDFValue const&) = delete;
-    QPDF* owning_qpdf{nullptr};
     std::string object_description;
     qpdf_offset_t parsed_offset{-1};
     const qpdf_object_type_e type_code;

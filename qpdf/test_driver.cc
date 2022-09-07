@@ -1137,8 +1137,16 @@ test_29(QPDF& pdf, char const* arg2)
     assert(arg2 != 0);
     QPDF other;
     other.processFile(arg2);
-    // Should use copyForeignObject instead
-    other.getTrailer().replaceKey("/QTest", pdf.getTrailer().getKey("/QTest"));
+    // We need to create a QPDF with mixed ownership to exercise
+    // QPDFWriter's ownership check. To do this, we have to sneak the
+    // foreign object inside an ownerless direct object to avoid
+    // detection prior to calling QPDFWriter. Maybe a future version
+    // of qpdf will be able prevent creating mixed ownership. Another
+    // way to fake it out would be to call setDescription to
+    // explicitly change the ownership to the wrong value.
+    auto dict = QPDFObjectHandle::newDictionary();
+    dict.replaceKey("/QTest", pdf.getTrailer().getKey("/QTest"));
+    other.getTrailer().replaceKey("/QTest", dict);
 
     try {
         QPDFWriter w(other, "a.pdf");

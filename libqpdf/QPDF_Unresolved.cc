@@ -18,7 +18,7 @@ QPDF_Unresolved::shallowCopy()
 {
     throw std::logic_error(
         "attempted to shallow copy unresolved QPDFObjectHandle");
-    return create(qpdf, og);
+    return nullptr;
 }
 
 std::string

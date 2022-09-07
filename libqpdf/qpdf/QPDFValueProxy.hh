@@ -49,7 +49,7 @@ class QPDFValueProxy
     {
         return value->type_name;
     }
-    // Returns nullptr for direct objects
+
     QPDF*
     getQPDF() const
     {
