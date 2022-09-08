@@ -1,5 +1,11 @@
 2022-09-08  Jay Berkenbilt  <ejb@ql.org>
 
+        * Added new functions to the C API to support qpdf JSON:
+        qpdf_create_from_json_file, qpdf_create_from_json_data,
+        qpdf_update_from_json_file, qpdf_update_from_json_data, and
+        qpdf_write_json. Examples can be found in qpdf-ctest.c (in the
+        source tree), tests 42 through 47.
+
         * Add QPDFObjectHandle::isDestroyed() to test whether an indirect
         object was from a QPDF that has been destroyed.
 

@@ -288,5 +288,58 @@ $td->runtest("simple version of writeJSON",
              {$td->FILE => "minimal-write-json.json", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
+$n_tests += 13;
+$td->runtest("C API create from json file",
+             {$td->COMMAND => "qpdf-ctest 42 minimal.json '' a.pdf"},
+             {$td->STRING => "C test 42 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check C API create from file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "qpdf-ctest-42-43.pdf"});
+$td->runtest("C API create from json buffer",
+             {$td->COMMAND => "qpdf-ctest 43 minimal.json '' a.pdf"},
+             {$td->STRING => "C test 43 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check C API create from buffer",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "qpdf-ctest-42-43.pdf"});
+$td->runtest("C API update from json file",
+             {$td->COMMAND =>
+                  "qpdf-ctest 44 minimal.pdf '' a.pdf minimal-update.json"},
+             {$td->STRING => "C test 44 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check C API update from file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "qpdf-ctest-44-45.pdf"});
+$td->runtest("C API update from json buffer",
+             {$td->COMMAND =>
+                  "qpdf-ctest 45 minimal.pdf '' a.pdf minimal-update.json"},
+             {$td->STRING => "C test 45 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check C API update from buffer",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "qpdf-ctest-44-45.pdf"});
+$td->runtest("C API write to JSON 1",
+             {$td->COMMAND =>
+                  "qpdf-ctest 46 minimal.pdf '' a.json"},
+             {$td->STRING => "C test 46 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check C API write to JSON 1",
+             {$td->FILE => "a.json"},
+             {$td->FILE => "qpdf-ctest-46.json"},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C API write to JSON 2",
+             {$td->COMMAND =>
+                  "qpdf-ctest 47 minimal.pdf '' a.json auto"},
+             {$td->STRING => "C test 47 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check C API write to JSON 2",
+             {$td->FILE => "a.json"},
+             {$td->FILE => "qpdf-ctest-47.json"},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check C API write to JSON stream",
+             {$td->FILE => "auto-4"},
+             {$td->FILE => "qpdf-ctest-47-4"});
+
 cleanup();
 $td->report($n_tests);

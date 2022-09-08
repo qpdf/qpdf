@@ -257,8 +257,6 @@ extern "C" {
     QPDF_DLL
     QPDF_ERROR_CODE qpdf_check_pdf(qpdf_data qpdf);
 
-    /* READ FUNCTIONS */
-
     /* READ PARAMETER FUNCTIONS -- must be called before qpdf_read */
 
     QPDF_DLL
@@ -266,6 +264,10 @@ extern "C" {
 
     QPDF_DLL
     void qpdf_set_attempt_recovery(qpdf_data qpdf, QPDF_BOOL value);
+
+    /* PROCESS FUNCTIONS */
+
+    /* This functions process a PDF or JSON input source. */
 
     /* Calling qpdf_read causes processFile to be called in the C++
      * API.  Basic parsing is performed, but data from the file is
@@ -297,8 +299,40 @@ extern "C" {
     QPDF_DLL
     QPDF_ERROR_CODE qpdf_empty_pdf(qpdf_data qpdf);
 
-    /* Read functions below must be called after qpdf_read or
-     * qpdf_read_memory. */
+    /* Create a PDF from a JSON file. This calls createFromJSON in the
+     * C++ API.
+     */
+    QPDF_DLL
+    QPDF_ERROR_CODE
+    qpdf_create_from_json_file(qpdf_data qpdf, char const* filename);
+
+    /* Create a PDF from JSON data in a null-terminated string. This
+     * calls createFromJSON in the C++ API.
+     */
+    QPDF_DLL
+    QPDF_ERROR_CODE
+    qpdf_create_from_json_data(
+        qpdf_data qpdf, char const* buffer, unsigned long long size);
+
+    /* JSON UPDATE FUNCTIONS */
+
+    /* Update a QPDF object from a JSON file or buffer. These
+     * functions call updateFromJSON. One of the other processing
+     * functions has to be called first so that the QPDF object is
+     * initialized with PDF data.
+     */
+    QPDF_DLL
+    QPDF_ERROR_CODE
+    qpdf_update_from_json_file(qpdf_data qpdf, char const* filename);
+    QPDF_DLL
+    QPDF_ERROR_CODE
+    qpdf_update_from_json_data(
+        qpdf_data qpdf, char const* buffer, unsigned long long size);
+
+    /* READ FUNCTIONS */
+
+    /* Read functions below must be called after qpdf_read or any of
+     * the other functions that process a PDF. */
 
     /*
      * NOTE: Functions that return char* are returning a pointer to an
@@ -370,6 +404,39 @@ extern "C" {
     QPDF_BOOL qpdf_allow_modify_other(qpdf_data qpdf);
     QPDF_DLL
     QPDF_BOOL qpdf_allow_modify_all(qpdf_data qpdf);
+
+    /* JSON WRITE FUNCTIONS */
+
+    /* This function serializes the PDF to JSON. This calls writeJSON
+     * from the C++ API.
+     *
+     * - version: the JSON version, currently must be 2
+     * - fn: a function that will be called with blocks of JSON data;
+     *   will be called with data, a length, and the value of the
+     *   udata parameter to this function
+     * - udata: will be passed as the third argument to fn with each
+     *   call; use this for your own tracking or pass a null pointer
+     *   if you don't need it
+     * - For decode_level, json_stream_data, file_prefix, and
+     *   wanted_objects, see comments in QPDF.hh. For this API,
+     *   wanted_objects should be a null-terminated array of
+     *   null-terminated strings. Pass a null pointer if you want all
+     *   objects.
+     */
+
+    /* Function should return 0 on success. */
+    typedef int (*qpdf_write_fn_t)(char const* data, size_t len, void* udata);
+
+    QPDF_DLL
+    QPDF_ERROR_CODE qpdf_write_json(
+        qpdf_data qpdf,
+        int version,
+        qpdf_write_fn_t fn,
+        void* udata,
+        enum qpdf_stream_decode_level_e decode_level,
+        enum qpdf_json_stream_data_e json_stream_data,
+        char const* file_prefix,
+        char const* const* wanted_objects);
 
     /* WRITE FUNCTIONS */
 

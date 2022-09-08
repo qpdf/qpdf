@@ -40,6 +40,10 @@ For a detailed list of changes, please see the file
     - New C++ API calls: ``QPDF::writeJSON``,
       ``QPDF::createFromJSON``, ``QPDF::updateFromJSON``
 
+    - New C API calls: ``qpdf_create_from_json_file``,
+      ``qpdf_create_from_json_data``, ``qpdf_update_from_json_file``,
+      ``qpdf_update_from_json_data``, and ``qpdf_write_json``.
+
     - Complete documentation can be found at :ref:`json`. A
       comprehensive list of changes from version 1 to version 2 can be
       found at :ref:`json-v2-changes`.

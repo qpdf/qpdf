@@ -2,8 +2,10 @@
 
 #include <qpdf/QPDF.hh>
 
+#include <qpdf/BufferInputSource.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Discard.hh>
+#include <qpdf/Pl_Function.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
@@ -2028,4 +2030,90 @@ qpdf_remove_page(qpdf_data qpdf, qpdf_oh page)
     QTC::TC("qpdf", "qpdf-c called qpdf_remove_page");
     auto p = qpdf_oh_item_internal(qpdf, page);
     return trap_errors(qpdf, [&p](qpdf_data q) { q->qpdf->removePage(p); });
+}
+
+QPDF_ERROR_CODE
+qpdf_create_from_json_file(qpdf_data qpdf, char const* filename)
+{
+    QPDF_ERROR_CODE status = QPDF_SUCCESS;
+    qpdf->filename = filename;
+    status = trap_errors(
+        qpdf, [](qpdf_data q) { q->qpdf->createFromJSON(q->filename); });
+    return status;
+}
+
+QPDF_ERROR_CODE
+qpdf_create_from_json_data(
+    qpdf_data qpdf, char const* buffer, unsigned long long size)
+{
+    QPDF_ERROR_CODE status = QPDF_SUCCESS;
+    qpdf->filename = "json buffer";
+    qpdf->buffer = buffer;
+    qpdf->size = size;
+    auto b =
+        new Buffer(QUtil::unsigned_char_pointer(buffer), QIntC::to_size(size));
+    auto is = std::make_shared<BufferInputSource>(qpdf->filename, b, true);
+    status =
+        trap_errors(qpdf, [&is](qpdf_data q) { q->qpdf->createFromJSON(is); });
+    return status;
+}
+
+QPDF_ERROR_CODE
+qpdf_update_from_json_file(qpdf_data qpdf, char const* filename)
+{
+    QPDF_ERROR_CODE status = QPDF_SUCCESS;
+    status = trap_errors(
+        qpdf, [filename](qpdf_data q) { q->qpdf->updateFromJSON(filename); });
+    return status;
+}
+
+QPDF_ERROR_CODE
+qpdf_update_from_json_data(
+    qpdf_data qpdf, char const* buffer, unsigned long long size)
+{
+    QPDF_ERROR_CODE status = QPDF_SUCCESS;
+    auto b =
+        new Buffer(QUtil::unsigned_char_pointer(buffer), QIntC::to_size(size));
+    auto is = std::make_shared<BufferInputSource>(qpdf->filename, b, true);
+    status =
+        trap_errors(qpdf, [&is](qpdf_data q) { q->qpdf->updateFromJSON(is); });
+    return status;
+}
+
+QPDF_ERROR_CODE
+qpdf_write_json(
+    qpdf_data qpdf,
+    int version,
+    qpdf_write_fn_t fn,
+    void* udata,
+    enum qpdf_stream_decode_level_e decode_level,
+    enum qpdf_json_stream_data_e json_stream_data,
+    char const* file_prefix,
+    char const* const* wanted_objects)
+{
+    QPDF_ERROR_CODE status = QPDF_SUCCESS;
+    auto p = std::make_shared<Pl_Function>("write_json", nullptr, fn, udata);
+    std::set<std::string> wanted_objects_set;
+    if (wanted_objects) {
+        for (auto i = wanted_objects; *i; ++i) {
+            wanted_objects_set.insert(*i);
+        }
+    }
+    status = trap_errors(
+        qpdf,
+        [version,
+         p,
+         decode_level,
+         json_stream_data,
+         file_prefix,
+         &wanted_objects_set](qpdf_data q) {
+            q->qpdf->writeJSON(
+                version,
+                p.get(),
+                decode_level,
+                json_stream_data,
+                file_prefix,
+                wanted_objects_set);
+        });
+    return status;
 }

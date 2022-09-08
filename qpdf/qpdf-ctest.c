@@ -133,6 +133,13 @@ count_progress(int percent, void* data)
     ++(*(int*)data);
 }
 
+static int
+write_to_file(char const* data, size_t size, void* udata)
+{
+    FILE* f = (FILE*)udata;
+    return fwrite(data, 1, size, f) != size;
+}
+
 static void
 test01(
     char const* infile,
@@ -1458,11 +1465,115 @@ test41(
     char const* outfile,
     char const* xarg)
 {
-    /* Empty PDF -- infile is ignored*/
+    /* Empty PDF -- infile is ignored */
     assert(qpdf_empty_pdf(qpdf) == 0);
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
     qpdf_write(qpdf);
+    report_errors();
+}
+
+static void
+test42(
+    char const* infile,
+    char const* password,
+    char const* outfile,
+    char const* xarg)
+{
+    assert(qpdf_create_from_json_file(qpdf, infile) == QPDF_SUCCESS);
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
+static void
+test43(
+    char const* infile,
+    char const* password,
+    char const* outfile,
+    char const* xarg)
+{
+    char* buf = NULL;
+    unsigned long size = 0;
+    read_file_into_memory(infile, &buf, &size);
+    assert(qpdf_create_from_json_data(qpdf, buf, size) == QPDF_SUCCESS);
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+    free(buf);
+}
+
+static void
+test44(
+    char const* infile,
+    char const* password,
+    char const* outfile,
+    char const* xarg)
+{
+    assert(qpdf_read(qpdf, infile, password) == 0);
+    assert(qpdf_update_from_json_file(qpdf, xarg) == QPDF_SUCCESS);
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
+static void
+test45(
+    char const* infile,
+    char const* password,
+    char const* outfile,
+    char const* xarg)
+{
+    char* buf = NULL;
+    unsigned long size = 0;
+    read_file_into_memory(xarg, &buf, &size);
+    assert(qpdf_read(qpdf, infile, password) == 0);
+    assert(qpdf_update_from_json_data(qpdf, buf, size) == QPDF_SUCCESS);
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+    free(buf);
+}
+
+static void
+test46(
+    char const* infile,
+    char const* password,
+    char const* outfile,
+    char const* xarg)
+{
+    FILE* f = safe_fopen(outfile, "wb");
+    assert(qpdf_read(qpdf, infile, password) == 0);
+    qpdf_write_json(
+        qpdf, 2, write_to_file, f, qpdf_dl_none, qpdf_sj_inline, "", NULL);
+    fclose(f);
+    report_errors();
+}
+
+static void
+test47(
+    char const* infile,
+    char const* password,
+    char const* outfile,
+    char const* xarg)
+{
+    FILE* f = safe_fopen(outfile, "wb");
+    assert(qpdf_read(qpdf, infile, password) == 0);
+    char const* wanted_objects[] = {"obj:4 0 R", "trailer", NULL};
+    qpdf_write_json(
+        qpdf,
+        2,
+        write_to_file,
+        f,
+        qpdf_dl_specialized,
+        qpdf_sj_file,
+        xarg,
+        wanted_objects);
+    fclose(f);
     report_errors();
 }
 
@@ -1542,6 +1653,12 @@ main(int argc, char* argv[])
              : (n == 39) ? test39
              : (n == 40) ? test40
              : (n == 41) ? test41
+             : (n == 42) ? test42
+             : (n == 43) ? test43
+             : (n == 44) ? test44
+             : (n == 45) ? test45
+             : (n == 46) ? test46
+             : (n == 47) ? test47
                          : 0);
 
     if (fn == 0) {

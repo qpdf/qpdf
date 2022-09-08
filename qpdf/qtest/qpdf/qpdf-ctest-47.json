@@ -1,0 +1,25 @@
+{
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "1.3",
+      "pushedinheritedpageresources": false,
+      "calledgetallpages": false,
+      "maxobjectid": 6
+    },
+    {
+      "obj:4 0 R": {
+        "stream": {
+          "datafile": "auto-4",
+          "dict": {}
+        }
+      },
+      "trailer": {
+        "value": {
+          "/Root": "1 0 R",
+          "/Size": 7
+        }
+      }
+    }
+  ]
+}

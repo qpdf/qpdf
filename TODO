@@ -8,12 +8,6 @@ Always
 Next
 ====
 
-Before Release:
-
-* Support json v2 in the C API. At a minimum, write_json,
-  create_from_json, and update_from_json need to be there and should
-  take the same kinds of functions as the C API for logger.
-
 Pending changes:
 
 * Consider also exposing a way to set a new logger and to get the
