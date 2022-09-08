@@ -787,27 +787,40 @@ Rejected Ideas
 
 * Fix Multiple Direct Object Parent Issue
 
-  These are some ideas I had before m-holger's changes to split
-  QPDFValue from QPDFObject. These notes were written prior to the
-  split of QPDFObject into QPDFObject and QPDFValue and don't work
-  directly with the new implementation. I think they are still basic
-  valid after adjusting to the new structure, but I think they would
-  come at too high a performance cost to be worth doing.
+  This idea was rejected because it would be complicated to implement
+  and would likely have a high performance cost to fix what is not
+  really that big of a problem in practice.
+
+  It is possible for a QPDFObjectHandle for a direct object to be
+  contained inside of multiple QPDFObjectHandle objects or even
+  replicated across multiple QPDF objects. This creates a potentially
+  confusing and unintentional aliasing of direct objects. There are
+  known cases in the qpdf library where this happens including page
+  splitting and merging (particularly with page labels, and possibly
+  with other cases), and also with unsafeShallowCopy. Disallowing this
+  would incur a significant performance penalty and is probably not
+  worth doing. If we were to do it, here are some ideas.
 
   * Add std::weak_ptr<QPDFObject> parent to QPDFObject. When adding a
     direct object to an array or dictionary, set its parent. When
-    removing it, clear the parent pointer.
-  * When a direct object that already has a parent is added to
-    something, it is a warning and will become an error in qpdf 12.
-    There needs to be unsafe add methods used by unsafeShallowCopy.
-    These will add but not modify the parent pointer.
+    removing it, clear the parent pointer. The parent pointer would
+    always be null for indirect objects, so the parent pointer, which
+    would reside in QPDFObject, would have to be managed by
+    QPDFObjectHandle. This is because QPDFObject can't tell the
+    difference between a resolved indirect object and a direct object.
 
-  This allows an object to be moved from one object to another by
-  removing it, which returns the now orphaned object, and then inserting
-  it somewhere else. It also doesn't break the pattern of adding a
-  direct object to something and subsequently mutating it. It just
-  prevents the same object from being added to more than one thing.
+  * Phase 1: When a direct object that already has a parent is added
+    to a dictionary or array, issue a warning. There would need to be
+    unsafe add methods used by unsafeShallowCopy. These would add but
+    not modify the parent pointer.
 
-  Note that arrays and dictionaries still need to contain
-  QPDFObjectHandle because of indirect objects. This only pertains to
-  direct objects, which are always "resolved" in QPDFObjectHandle.
+  * Phase 2: In the next major release, make the multiple parent case
+    an error. Require people to create a copy. The unsafe operations
+    would still have to be permitted.
+
+  This approach would allow an object to be moved from one object to
+  another by removing it, which returns the now orphaned object, and
+  then inserting it somewhere else. It also doesn't break the pattern
+  of adding a direct object to something and subsequently mutating it.
+  It just prevents the same object from being added to more than one
+  thing.
