@@ -12,11 +12,11 @@
 // something with QPDFJob. See qpdfjob-c-save-attachment.c for an
 // implementation that uses the C API.
 
-static void
+static int
 save_to_file(char const* data, size_t len, void* udata)
 {
     FILE* f = (FILE*)udata;
-    fwrite(data, 1, len, f);
+    return fwrite(data, 1, len, f) != len;
 }
 
 static FILE*

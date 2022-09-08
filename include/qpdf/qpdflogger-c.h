@@ -59,7 +59,8 @@ extern "C" {
         qpdf_log_dest_custom = 4,
     };
 
-    typedef void (*qpdf_log_fn_t)(char const* data, size_t len, void* udata);
+    /* Function should return 0 on success. */
+    typedef int (*qpdf_log_fn_t)(char const* data, size_t len, void* udata);
 
     QPDF_DLL
     void qpdflogger_set_info(

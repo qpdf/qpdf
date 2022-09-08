@@ -8,11 +8,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void
+static int
 fn(char const* data, size_t len, void* udata)
 {
     FILE* f = (FILE*)udata;
-    fwrite(data, 1, len, f);
+    return fwrite(data, 1, len, f) != len;
 }
 
 static void

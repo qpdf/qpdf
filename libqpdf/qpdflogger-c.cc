@@ -56,12 +56,7 @@ set_log_dest(
         method(l->discard());
         break;
     case qpdf_log_dest_custom:
-        method(std::make_shared<Pl_Function>(
-            identifier,
-            nullptr,
-            [fn, udata](unsigned char const* data, size_t len) {
-                fn(reinterpret_cast<char const*>(data), len, udata);
-            }));
+        method(std::make_shared<Pl_Function>(identifier, nullptr, fn, udata));
         break;
     }
 }
