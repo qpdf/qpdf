@@ -240,7 +240,7 @@ the ``QPDFObjectHandle`` type to hold onto objects and to abstract
 away in most cases whether the object is direct or indirect.
 
 Internally, ``QPDFObjectHandle`` holds onto a shared pointer to the
-underlying object value. When direct object is created, the
+underlying object value. When a direct object is created, the
 ``QPDFObjectHandle`` that holds it is not associated with a ``QPDF``
 object. When an indirect object reference is created, it starts off in
 an *unresolved* state and must be associated with a ``QPDF`` object,
