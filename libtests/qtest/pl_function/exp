@@ -1,2 +1,11 @@
 p1: 6: potato
 p2: 5: salad
+got one(3)
+got two(3)
+got three(5)
+three threw c-function function returned code 1
+got four(4)
+signed got potato(6)
+signed got salad(5)
+salad threw c-function function returned code 2
+signed got quack(5)

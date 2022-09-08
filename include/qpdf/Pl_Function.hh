@@ -31,6 +31,9 @@
 //
 // It is okay to not call finish() on this pipeline if it has no
 // "next".
+//
+// It is okay to keep calling write() after a previous write throws an
+// exception as long as the delegated function allows it.
 
 #include <qpdf/Pipeline.hh>
 
@@ -41,8 +44,26 @@ class QPDF_DLL_CLASS Pl_Function: public Pipeline
   public:
     typedef std::function<void(unsigned char const*, size_t)> writer_t;
 
+    // The supplied function is called every time write is called.
     QPDF_DLL
     Pl_Function(char const* identifier, Pipeline* next, writer_t fn);
+
+    // The supplied C-style function is called every time write is
+    // called. The udata option is passed into the function with each
+    // call. If the function returns a non-zero value, a runtime error
+    // is thrown.
+    typedef int (*writer_c_t)(unsigned char const*, size_t, void*);
+    QPDF_DLL
+    Pl_Function(
+        char const* identifier, Pipeline* next, writer_c_t fn, void* udata);
+    typedef int (*writer_c_char_t)(char const*, size_t, void*);
+    QPDF_DLL
+    Pl_Function(
+        char const* identifier,
+        Pipeline* next,
+        writer_c_char_t fn,
+        void* udata);
+
     QPDF_DLL
     virtual ~Pl_Function();
 
