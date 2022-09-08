@@ -17,7 +17,7 @@ class QPDF_Dictionary: public QPDFValue
     virtual std::shared_ptr<QPDFValueProxy> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
-    virtual void reset();
+    virtual void disconnect();
 
     // hasKey() and getKeys() treat keys with null values as if they
     // aren't there.  getKey() returns null for the value of a

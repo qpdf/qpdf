@@ -27,7 +27,7 @@ class QPDF_Stream: public QPDFValue
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
     virtual void setDescription(QPDF*, std::string const&);
-    virtual void reset();
+    virtual void disconnect();
     QPDFObjectHandle getDict() const;
     bool isDataModified() const;
     void setFilterOnWrite(bool);

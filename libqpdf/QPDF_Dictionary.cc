@@ -22,10 +22,10 @@ QPDF_Dictionary::shallowCopy()
 }
 
 void
-QPDF_Dictionary::reset()
+QPDF_Dictionary::disconnect()
 {
     for (auto& iter: this->items) {
-        QPDFObjectHandle::Resetter::reset(iter.second);
+        QPDFObjectHandle::DisconnectAccess::disconnect(iter.second);
     }
 }
 

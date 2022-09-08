@@ -64,7 +64,7 @@ class QPDFValue
         return og;
     }
     virtual void
-    reset()
+    disconnect()
     {
     }
 

@@ -49,10 +49,10 @@ SparseOHArray::remove_last()
 }
 
 void
-SparseOHArray::reset()
+SparseOHArray::disconnect()
 {
     for (auto& iter: this->elements) {
-        QPDFObjectHandle::Resetter::reset(iter.second);
+        QPDFObjectHandle::DisconnectAccess::disconnect(iter.second);
     }
 }
 

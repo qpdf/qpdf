@@ -17,7 +17,7 @@ class QPDF_Array: public QPDFValue
     virtual std::shared_ptr<QPDFValueProxy> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
-    virtual void reset();
+    virtual void disconnect();
 
     int getNItems() const;
     QPDFObjectHandle getItem(int n) const;

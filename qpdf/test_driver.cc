@@ -3316,8 +3316,8 @@ test_92(QPDF& pdf, char const* arg2)
     check(contents);
     check(contents_dict);
     // Objects that were originally indirect should be destroyed.
-    // Otherwise, they should have retained their old values. See
-    // comments in QPDFValueProxy::reset for why this is the case.
+    // Otherwise, they should have retained their old values but just
+    // lost their connection to the owning QPDF.
     assert(root.isDestroyed());
     assert(page1.isDestroyed());
     assert(contents.isDestroyed());

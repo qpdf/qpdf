@@ -252,9 +252,11 @@ QPDF::~QPDF()
     // resolved indirect references by replacing them with an internal
     // object type representing that they have been destroyed. Note
     // that we can't break references like this at any time when the
-    // QPDF object is active. The call to reset also causes all
+    // QPDF object is active. The call to reset also causes all direct
     // QPDFObjectHandle objects that are reachable from this object to
-    // release their association with this QPDF.
+    // release their association with this QPDF. Direct objects are
+    // not destroyed since they can be moved to other QPDF objects
+    // safely.
 
     // At this point, obviously no one is still using the QPDF object,
     // but we'll explicitly clear the xref table anyway just to
@@ -262,9 +264,7 @@ QPDF::~QPDF()
     this->m->xref_table.clear();
     auto null_obj = QPDF_Null::create();
     for (auto const& iter: this->m->obj_cache) {
-        iter.second.object->reset();
-        // It would be better if reset() could call destroy(), but it
-        // can't -- see comments in QPDFValueProxy::reset().
+        iter.second.object->disconnect();
         iter.second.object->destroy();
     }
 }

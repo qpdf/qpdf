@@ -249,7 +249,7 @@ QPDFObjectHandle::operator!=(QPDFObjectHandle const& rhs) const
 }
 
 void
-QPDFObjectHandle::reset()
+QPDFObjectHandle::disconnect()
 {
     // Recursively remove association with any QPDF object. This
     // method may only be called during final destruction.
@@ -257,7 +257,7 @@ QPDFObjectHandle::reset()
     // pointer itself, so we don't do that here. Other objects call it
     // through this method.
     if (!isIndirect()) {
-        this->obj->reset();
+        this->obj->disconnect();
     }
 }
 

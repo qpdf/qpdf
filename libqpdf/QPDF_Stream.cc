@@ -168,10 +168,10 @@ QPDF_Stream::getFilterOnWrite() const
 }
 
 void
-QPDF_Stream::reset()
+QPDF_Stream::disconnect()
 {
     this->stream_provider = nullptr;
-    QPDFObjectHandle::Resetter::reset(this->stream_dict);
+    QPDFObjectHandle::DisconnectAccess::disconnect(this->stream_dict);
 }
 
 void

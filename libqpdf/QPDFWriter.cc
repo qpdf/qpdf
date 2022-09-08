@@ -1198,14 +1198,12 @@ void
 QPDFWriter::enqueueObject(QPDFObjectHandle object)
 {
     if (object.isIndirect()) {
-        // This owner check should really be done for all objects, not
-        // just indirect objects. As of the time of the release of
-        // qpdf 11, it is known that there are cases of direct objects
-        // from other files getting copied into multiple QPDF objects.
-        // This definitely happens in the page splitting code. If we
-        // were to implement strong checks to prevent objects from
-        // having multiple owners, once that was complete phased in,
-        // this check could be moved outside the if statement.
+        // This owner check can only be done for indirect objects. It
+        // is possible for a direct object to have an owning QPDF that
+        // is from another file if a direct QPDFObjectHandle from one
+        // file was insert into another file without copying. Doing
+        // that is safe even if the original QPDF gets destroyed,
+        // which just disconnects the QPDFObjectHandle from its owner.
         if (object.getOwningQPDF() != &(this->m->pdf)) {
             QTC::TC("qpdf", "QPDFWriter foreign object");
             throw std::logic_error(

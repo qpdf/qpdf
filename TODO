@@ -785,7 +785,7 @@ Rejected Ideas
   and too much toil for library users to be worth the small benefit of
   not having to call resetObjGen in QPDF's destructor.
 
-* Fix Multiple Direct Object Owner Issue
+* Fix Multiple Direct Object Parent Issue
 
   These are some ideas I had before m-holger's changes to split
   QPDFValue from QPDFObject. These notes were written prior to the
@@ -811,12 +811,3 @@ Rejected Ideas
   Note that arrays and dictionaries still need to contain
   QPDFObjectHandle because of indirect objects. This only pertains to
   direct objects, which are always "resolved" in QPDFObjectHandle.
-
-  If this is addressed, read comments in the following places:
-  * QPDFWriter.cc::enqueueObject near the call to getOwningQPDF
-  * QPDFValueProxy::reset and QPDFValueProxy::destroy
-  * QPDF::~QPDF()
-  * test 92 in test_driver.cc
-  * QPDFObjectHandle.hh near isDestroyed
-  All these references were from the release of qpdf 11 (in case they
-  have moved by such time as this might be resurrected).

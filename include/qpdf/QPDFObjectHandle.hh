@@ -392,7 +392,8 @@ class QPDFObjectHandle
     inline bool isIndirect() const;
 
     // This returns true for indirect objects from a QPDF that has
-    // been destroyed.
+    // been destroyed. Trying unparse such an object will throw a
+    // logic_error.
     QPDF_DLL
     bool isDestroyed();
 
@@ -1540,8 +1541,8 @@ class QPDFObjectHandle
     friend class ObjAccessor;
 
     // Provide access to specific classes for recursive
-    // reset().
-    class Resetter
+    // disconnected().
+    class DisconnectAccess
     {
         friend class QPDF_Dictionary;
         friend class QPDF_Stream;
@@ -1549,9 +1550,9 @@ class QPDFObjectHandle
 
       private:
         static void
-        reset(QPDFObjectHandle& o)
+        disconnect(QPDFObjectHandle& o)
         {
-            o.reset();
+            o.disconnect();
         }
     };
     friend class Resetter;
@@ -1653,7 +1654,7 @@ class QPDFObjectHandle
         bool first_level_only,
         bool stop_at_streams);
     void shallowCopyInternal(QPDFObjectHandle& oh, bool first_level_only);
-    void reset();
+    void disconnect();
     void setParsedOffset(qpdf_offset_t offset);
     void parseContentStream_internal(
         std::string const& description, ParserCallbacks* callbacks);

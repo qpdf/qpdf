@@ -13,6 +13,5 @@ QPDFValueProxy::doResolve()
 void
 QPDFValueProxy::destroy()
 {
-    // See comments in reset() for why this isn't part of reset.
     value = QPDF_Destroyed::getInstance();
 }

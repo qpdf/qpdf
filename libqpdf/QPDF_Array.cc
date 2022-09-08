@@ -35,9 +35,9 @@ QPDF_Array::shallowCopy()
 }
 
 void
-QPDF_Array::reset()
+QPDF_Array::disconnect()
 {
-    elements.reset();
+    elements.disconnect();
 }
 
 std::string
