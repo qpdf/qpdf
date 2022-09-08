@@ -19,14 +19,24 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef QPDFOBJECT_HH
-#define QPDFOBJECT_HH
+#ifndef QPDFOBJECT_OLD_HH
+#define QPDFOBJECT_OLD_HH
+
+// **********************************************************************
+//
+//   This file is for backward compatibility. The header file for the
+//   internal QPDFObject class (not part of the public API) is in
+//   QPDFObject_private.hh (not installed).
+//
+// **********************************************************************
 
 // ABI: in qpdf 12, leave this file in place and have it generate an
 // error. This is to prevent someone from being able to successfully
 // include this file and get a copy from a previous installation
 // thereby accidentally creating sources depend on having an older
-// version installed.
+// version installed. When enough time has passed, this file can be
+// removed, and libqpdf/qpdf/QPDFObject_private.hh can be renamed to
+// libqpdf/qpdf/QPDFObject.hh.
 
 #ifndef QPDF_OBJECT_NOWARN
 // ABI: remove this file in qpdf 12
@@ -66,4 +76,4 @@ class QPDFObject
     QPDFObject& operator=(QPDFObject const&) = delete;
 };
 
-#endif // QPDFOBJECT_HH
+#endif // QPDFOBJECT_OLD_HH

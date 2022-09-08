@@ -1,5 +1,9 @@
-#ifndef QPDFVALUEPROXY_HH
-#define QPDFVALUEPROXY_HH
+#ifndef QPDFOBJECT_HH
+#define QPDFOBJECT_HH
+
+// NOTE: This file is called QPDFObject_private.hh instead of
+// QPDFObject.hh because of include/qpdf/QPDFObject.hh. See comments
+// there for an explanation.
 
 #include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
@@ -149,4 +153,4 @@ class QPDFValueProxy
     std::shared_ptr<QPDFValue> value;
 };
 
-#endif // QPDFVALUEPROXY_HH
+#endif // QPDFOBJECT_HH

@@ -1,6 +1,6 @@
 #include <qpdf/QPDFValue.hh>
 
-#include <qpdf/QPDFValueProxy.hh>
+#include <qpdf/QPDFObject_private.hh>
 
 std::shared_ptr<QPDFValueProxy>
 QPDFValue::do_create(QPDFValue* object)

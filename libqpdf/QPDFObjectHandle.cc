@@ -7,9 +7,9 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFMatrix.hh>
+#include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFParser.hh>
-#include <qpdf/QPDFValueProxy.hh>
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Bool.hh>
 #include <qpdf/QPDF_Dictionary.hh>
