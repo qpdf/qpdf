@@ -22,6 +22,12 @@
 #ifndef QPDFOBJECT_HH
 #define QPDFOBJECT_HH
 
+// ABI: in qpdf 12, leave this file in place and have it generate an
+// error. This is to prevent someone from being able to successfully
+// include this file and get a copy from a previous installation
+// thereby accidentally creating sources depend on having an older
+// version installed.
+
 #ifndef QPDF_OBJECT_NOWARN
 // ABI: remove this file in qpdf 12
 # warning "QPDFObject.hh is deprecated see comments in QPDFObject.hh"
@@ -53,7 +59,6 @@ class QPDFObject
     static constexpr object_type_e ot_stream = ::ot_stream;
     static constexpr object_type_e ot_operator = ::ot_operator;
     static constexpr object_type_e ot_inlineimage = ::ot_inlineimage;
-    static constexpr object_type_e ot_unresolved = ::ot_unresolved;
 
   private:
     QPDFObject() = delete;

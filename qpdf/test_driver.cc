@@ -3440,7 +3440,7 @@ runtest(int n, char const* filename1, char const* arg2)
         assert(strcmp(uninitialized.getTypeName(), "uninitialized") == 0);
 
         // ABI: until QPDF 12, spot check deprecated constants
-        assert(QPDFObject::ot_unresolved == ::ot_unresolved);
+        assert(QPDFObject::ot_dictionary == ::ot_dictionary);
         assert(QPDFObject::ot_uninitialized == ::ot_uninitialized);
     }
 
