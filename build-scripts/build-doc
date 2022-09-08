@@ -10,7 +10,7 @@ pip3 install sphinx sphinx_rtd_theme
 cmake -S . -B build -DBUILD_DOC=1
 cmake --build build --target doc_dist
 zip -r doc.zip build/manual/doc-dist
-version=$(egrep '^release' manual/conf.py | cut -d"'" -f 2)
+version=$(grep -E '^release' manual/conf.py | cut -d"'" -f 2)
 mv build/manual/doc-dist qpdf-${version}-doc
 mkdir distribution
 zip -r distribution/qpdf-${version}-doc-ci.zip qpdf-${version}-doc
