@@ -1,6 +1,6 @@
 #!/bin/sh
-lines=$(expr 0 + $(diff "$1" "$2" | egrep '^[<>]' | \
-        egrep -v '/ID' | egrep -v '%PDF-' | wc -l))
+lines=$(expr 0 + $(diff "$1" "$2" | grep -E '^[<>]' | \
+        grep -E -v '/ID' | grep -E -v '%PDF-' | wc -l))
 if [ "$lines" = "0" ]; then
    echo okay
 else

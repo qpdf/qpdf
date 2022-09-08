@@ -8,7 +8,7 @@ sudo apt-get -y install build-essential cmake zlib1g-dev libjpeg-dev
 ./fuzz/oss-fuzz-build
 ls -l out/qpdf_fuzzer
 ls -l out/
-if ldd out/qpdf_fuzzer | egrep 'libjpeg|libz|libqpdf'; then
+if ldd out/qpdf_fuzzer | grep -E 'libjpeg|libz|libqpdf'; then
     echo 1>&2 "*** Fuzzers linked dynamically with some dependent libraries."
     ldd out/qpdf_fuzzer
     exit 2

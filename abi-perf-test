@@ -3,7 +3,7 @@ set -eo pipefail
 cd $(dirname $0)
 whoami=$(basename $0)
 
-if [[ $(git status -s | egrep -v abi-perf-test | wc -l) != 0 ]]; then
+if [[ $(git status -s | grep -E -v abi-perf-test | wc -l) != 0 ]]; then
     echo 1>&2 "${whoami}: git is not clean. (abi-perf-test changes ignored)"
     git status -s
     exit 2
