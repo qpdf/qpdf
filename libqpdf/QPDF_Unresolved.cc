@@ -7,13 +7,13 @@ QPDF_Unresolved::QPDF_Unresolved(QPDF* qpdf, QPDFObjGen const& og) :
 {
 }
 
-std::shared_ptr<QPDFValueProxy>
+std::shared_ptr<QPDFObject>
 QPDF_Unresolved::create(QPDF* qpdf, QPDFObjGen const& og)
 {
     return do_create(new QPDF_Unresolved(qpdf, og));
 }
 
-std::shared_ptr<QPDFValueProxy>
+std::shared_ptr<QPDFObject>
 QPDF_Unresolved::shallowCopy()
 {
     throw std::logic_error(

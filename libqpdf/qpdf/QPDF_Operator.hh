@@ -7,8 +7,8 @@ class QPDF_Operator: public QPDFValue
 {
   public:
     virtual ~QPDF_Operator() = default;
-    static std::shared_ptr<QPDFValueProxy> create(std::string const& val);
-    virtual std::shared_ptr<QPDFValueProxy> shallowCopy();
+    static std::shared_ptr<QPDFObject> create(std::string const& val);
+    virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
     std::string getVal() const;

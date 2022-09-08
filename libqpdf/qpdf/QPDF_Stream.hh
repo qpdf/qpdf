@@ -17,13 +17,13 @@ class QPDF_Stream: public QPDFValue
 {
   public:
     virtual ~QPDF_Stream() = default;
-    static std::shared_ptr<QPDFValueProxy> create(
+    static std::shared_ptr<QPDFObject> create(
         QPDF*,
         QPDFObjGen const& og,
         QPDFObjectHandle stream_dict,
         qpdf_offset_t offset,
         size_t length);
-    virtual std::shared_ptr<QPDFValueProxy> shallowCopy();
+    virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
     virtual void setDescription(QPDF*, std::string const&);

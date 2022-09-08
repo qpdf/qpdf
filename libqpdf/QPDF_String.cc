@@ -26,13 +26,13 @@ QPDF_String::QPDF_String(std::string const& val) :
 {
 }
 
-std::shared_ptr<QPDFValueProxy>
+std::shared_ptr<QPDFObject>
 QPDF_String::create(std::string const& val)
 {
     return do_create(new QPDF_String(val));
 }
 
-std::shared_ptr<QPDFValueProxy>
+std::shared_ptr<QPDFObject>
 QPDF_String::create_utf16(std::string const& utf8_val)
 {
     std::string result;
@@ -42,7 +42,7 @@ QPDF_String::create_utf16(std::string const& utf8_val)
     return do_create(new QPDF_String(result));
 }
 
-std::shared_ptr<QPDFValueProxy>
+std::shared_ptr<QPDFObject>
 QPDF_String::shallowCopy()
 {
     return create(val);

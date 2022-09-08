@@ -14,7 +14,7 @@ QPDF_Destroyed::getInstance()
     return instance;
 }
 
-std::shared_ptr<QPDFValueProxy>
+std::shared_ptr<QPDFObject>
 QPDF_Destroyed::shallowCopy()
 {
     throw std::logic_error(

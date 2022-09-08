@@ -4,14 +4,14 @@
 #include <qpdf/QPDF_Destroyed.hh>
 
 void
-QPDFValueProxy::doResolve()
+QPDFObject::doResolve()
 {
     auto og = value->og;
     QPDF::Resolver::resolve(value->qpdf, og);
 }
 
 void
-QPDFValueProxy::destroy()
+QPDFObject::destroy()
 {
     value = QPDF_Destroyed::getInstance();
 }

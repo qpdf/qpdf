@@ -349,18 +349,18 @@ Objects in qpdf 11 and Newer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The object cache in ``QPDF`` contains a shared pointer to
-``QPDFValueProxy``. Any ``QPDFObjectHandle`` resolved from an indirect
+``QPDFObject``. Any ``QPDFObjectHandle`` resolved from an indirect
 reference to that object has a copy of that shared pointer. Each
-``QPDFValueProxy`` object contains a shared pointer to an object of
-type ``QPDFValue``. The ``QPDFValue`` type is an abstract base class.
-There is an implementation for each of the basic object types (array,
+``QPDFObject`` object contains a shared pointer to an object of type
+``QPDFValue``. The ``QPDFValue`` type is an abstract base class. There
+is an implementation for each of the basic object types (array,
 dictionary, null, boolean, string, number, etc.) as well as a few
-special ones including ``uninitialized``, ``unresolved``, and
-``reserved``. When an object is first referenced, its underlying
-``QPDFValue`` has type ``unresolved``. When the object is first
-resolved, the ``QPDFValueProxy`` in the cache has its internal
+special ones including ``uninitialized``, ``unresolved``,
+``reserved``, and ``destroyed``. When an object is first referenced,
+its underlying ``QPDFValue`` has type ``unresolved``. When the object
+is first resolved, the ``QPDFObject`` in the cache has its internal
 ``QPDFValue`` replaced with the object as read from the file. Since it
-is the ``QPDFValueProxy`` object that is shared by all referencing
+is the ``QPDFObject`` object that is shared by all referencing
 ``QPDFObjectHandle`` objects as well as by the owning ``QPDF`` object,
 this ensures that any future changes to the object, including
 replacing the object with a completely different one, will be
@@ -368,22 +368,24 @@ reflected across all ``QPDFObjectHandle`` objects that reference it.
 
 A ``QPDFValue`` that originated from a PDF input source maintains a
 pointer to the ``QPDF`` object that read it (its *owner*). When that
-``QPDF`` object is destroyed, it replaces the value of each
-``QPDFValueProxy`` in its cache with a direct ``null`` object and
-clears the pointer to the owning ``QPDF``. This means that, if there
-are still any referencing ``QPDFObjectHandle`` objects floating
-around, requesting their owning ``QPDF`` will return a null pointer
-rather than a pointer to a ``QPDF`` object that is either invalid or
-points to something else. This operation also has the effect of
-breaking any circular references (which are common and, in some cases,
-required by the PDF specification), thus preventing memory leaks when
-``QPDF`` objects are destroyed.
+``QPDF`` object is destroyed, it disconnects all reachable from it by
+clearing their owner. For indirect objects (all objects in the object
+cache), it also replaces the object's value with an object of type
+``destroyed``. This means that, if there are still any referencing
+``QPDFObjectHandle`` objects floating around, requesting their owning
+``QPDF`` will return a null pointer rather than a pointer to a
+``QPDF`` object that is either invalid or points to something else,
+and any attempt to access an indirect object that is associated with a
+destroyed ``QPDF`` object will throw an exception. This operation also
+has the effect of breaking any circular references (which are common
+and, in some cases, required by the PDF specification), thus
+preventing memory leaks when ``QPDF`` objects are destroyed.
 
 Objects prior to qpdf 11
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Prior to qpdf 11, the functionality of the ``QPDFValue`` and
-``QPDFValueProxy`` classes were combined into a single ``QPDFObject``
+``QPDFObject`` classes were contained in a single ``QPDFObject``
 class, which served the dual purpose of being the cache entry for
 ``QPDF`` and being the abstract base class for all the different PDF
 object types. The behavior was nearly the same, but there were a few
@@ -415,7 +417,7 @@ problems:
   was still valid.
 
 All of these problems were effectively solved by splitting
-``QPDFObject`` into ``QPDFValueProxy`` and ``QPDFValue``.
+``QPDFObject`` into ``QPDFObject`` and ``QPDFValue``.
 
 .. _casting:
 

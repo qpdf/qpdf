@@ -2120,8 +2120,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 }
 
 QPDFObjectHandle
-QPDF::newIndirect(
-    QPDFObjGen const& og, std::shared_ptr<QPDFValueProxy> const& obj)
+QPDF::newIndirect(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& obj)
 {
     obj->setObjGen(this, og);
     if (!obj->hasDescription()) {
@@ -2133,7 +2132,7 @@ QPDF::newIndirect(
 void
 QPDF::updateCache(
     QPDFObjGen const& og,
-    std::shared_ptr<QPDFValueProxy> const& object,
+    std::shared_ptr<QPDFObject> const& object,
     qpdf_offset_t end_before_space,
     qpdf_offset_t end_after_space)
 {

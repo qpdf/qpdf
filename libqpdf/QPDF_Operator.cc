@@ -6,13 +6,13 @@ QPDF_Operator::QPDF_Operator(std::string const& val) :
 {
 }
 
-std::shared_ptr<QPDFValueProxy>
+std::shared_ptr<QPDFObject>
 QPDF_Operator::create(std::string const& val)
 {
     return do_create(new QPDF_Operator(val));
 }
 
-std::shared_ptr<QPDFValueProxy>
+std::shared_ptr<QPDFObject>
 QPDF_Operator::shallowCopy()
 {
     return create(val);

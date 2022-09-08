@@ -789,7 +789,7 @@ Rejected Ideas
 
   These are some ideas I had before m-holger's changes to split
   QPDFValue from QPDFObject. These notes were written prior to the
-  split of QPDFObject into QPDFValueProxy and QPDFValue and don't work
+  split of QPDFObject into QPDFObject and QPDFValue and don't work
   directly with the new implementation. I think they are still basic
   valid after adjusting to the new structure, but I think they would
   come at too high a performance cost to be worth doing.

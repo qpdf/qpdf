@@ -11,16 +11,16 @@
 
 class QPDF;
 class QPDFObjectHandle;
-class QPDFValueProxy;
+class QPDFObject;
 
 class QPDFValue
 {
-    friend class QPDFValueProxy;
+    friend class QPDFObject;
 
   public:
     virtual ~QPDFValue() = default;
 
-    virtual std::shared_ptr<QPDFValueProxy> shallowCopy() = 0;
+    virtual std::shared_ptr<QPDFObject> shallowCopy() = 0;
     virtual std::string unparse() = 0;
     virtual JSON getJSON(int json_version) = 0;
     virtual void
@@ -91,7 +91,7 @@ class QPDFValue
     {
     }
 
-    static std::shared_ptr<QPDFValueProxy> do_create(QPDFValue*);
+    static std::shared_ptr<QPDFObject> do_create(QPDFValue*);
 
   private:
     QPDFValue(QPDFValue const&) = delete;

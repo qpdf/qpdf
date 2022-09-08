@@ -7,9 +7,8 @@ class QPDF_Unresolved: public QPDFValue
 {
   public:
     virtual ~QPDF_Unresolved() = default;
-    static std::shared_ptr<QPDFValueProxy>
-    create(QPDF* qpdf, QPDFObjGen const& og);
-    virtual std::shared_ptr<QPDFValueProxy> shallowCopy();
+    static std::shared_ptr<QPDFObject> create(QPDF* qpdf, QPDFObjGen const& og);
+    virtual std::shared_ptr<QPDFObject> shallowCopy();
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
 
