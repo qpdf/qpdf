@@ -1,3 +1,4 @@
 logic error: QPDFObjectHandle from different QPDF found while writing.  Use QPDF::copyForeignObject to add objects from another file.
+logic error: attempted to unparse a QPDFObjectHandle from a destroyed QPDF
 logic error: Attempting to add an object from a different QPDF. Use QPDF::copyForeignObject to add objects from another file.
 test 29 done

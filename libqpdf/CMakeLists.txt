@@ -90,6 +90,7 @@ set(libqpdf_SOURCES
   QPDFXRefEntry.cc
   QPDF_Array.cc
   QPDF_Bool.cc
+  QPDF_Destroyed.cc
   QPDF_Dictionary.cc
   QPDF_InlineImage.cc
   QPDF_Integer.cc

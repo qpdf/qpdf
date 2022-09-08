@@ -202,11 +202,13 @@ For a detailed list of changes, please see the file
       ``replaceKeyAndGetOld``, a ``null`` object if the object was not
       previously there.
 
-    - The method ``QPDFObjectHandle::getOwningQPDF`` now returns a
-      null pointer (rather than an invalid pointer) if the owning
-      ``QPDF`` object has been destroyed. This situation should
-      generally not happen for correct code, but at least the
-      situation is detectible now.
+    - It is now possible to detect when a ``QPDFObjectHandle`` is an
+      indirect object that belongs to a ``QPDF`` that has been
+      destroyed. Any attempt to unparse this type of
+      ``QPDFObjectHandle`` will throw a logic error. You can detect
+      this by calling the new ``QPDFObjectHandle::isDestroyed``
+      method. Also the ``QPDFObjectHandle::getOwningQPDF`` method now
+      returns a null pointer rather than an invalid pointer.
 
     - The method ``QPDFObjectHandle::getQPDF`` returns a ``QPDF&``
       (rather than a ``QPDF*``) and is an alternative to

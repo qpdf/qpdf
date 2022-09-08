@@ -252,8 +252,10 @@ void
 QPDFObjectHandle::reset()
 {
     // Recursively remove association with any QPDF object. This
-    // method may only be called during final destruction. See
-    // comments in QPDF::~QPDF().
+    // method may only be called during final destruction.
+    // QPDF::~QPDF() calls it for indirect objects using the object
+    // pointer itself, so we don't do that here. Other objects call it
+    // through this method.
     if (!isIndirect()) {
         this->obj->reset();
     }
@@ -349,6 +351,12 @@ QPDF_String*
 QPDFObjectHandle::asString()
 {
     return dereference() ? obj->as<QPDF_String>() : nullptr;
+}
+
+bool
+QPDFObjectHandle::isDestroyed()
+{
+    return dereference() && (obj->getTypeCode() == ::ot_destroyed);
 }
 
 bool

@@ -1,3 +1,8 @@
+2022-09-08  Jay Berkenbilt  <ejb@ql.org>
+
+        * Add QPDFObjectHandle::isDestroyed() to test whether an indirect
+        object was from a QPDF that has been destroyed.
+
 2022-09-07  Jay Berkenbilt  <ejb@ql.org>
 
         * Add QPDFObjectHandle::getQPDF(), which returns a reference, as

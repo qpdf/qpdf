@@ -31,6 +31,6 @@ JSON
 QPDF_Reserved::getJSON(int json_version)
 {
     throw std::logic_error(
-        "QPDFObjectHandle: attempting to unparse a reserved object");
+        "QPDFObjectHandle: attempting to get JSON from a reserved object");
     return JSON::makeNull();
 }

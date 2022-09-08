@@ -17,7 +17,7 @@ std::shared_ptr<QPDFValueProxy>
 QPDF_Unresolved::shallowCopy()
 {
     throw std::logic_error(
-        "attempted to shallow copy unresolved QPDFObjectHandle");
+        "attempted to shallow copy an unresolved QPDFObjectHandle");
     return nullptr;
 }
 
@@ -32,5 +32,7 @@ QPDF_Unresolved::unparse()
 JSON
 QPDF_Unresolved::getJSON(int json_version)
 {
+    throw std::logic_error(
+        "attempted to get JSON from an unresolved QPDFObjectHandle");
     return JSON::makeNull();
 }

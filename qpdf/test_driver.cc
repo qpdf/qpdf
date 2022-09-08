@@ -1135,8 +1135,8 @@ test_29(QPDF& pdf, char const* arg2)
 {
     // Detect mixed objects in QPDFWriter
     assert(arg2 != 0);
-    QPDF other;
-    other.processFile(arg2);
+    auto other = QPDF::create();
+    other->processFile(arg2);
     // We need to create a QPDF with mixed ownership to exercise
     // QPDFWriter's ownership check. To do this, we have to sneak the
     // foreign object inside an ownerless direct object to avoid
@@ -1146,10 +1146,25 @@ test_29(QPDF& pdf, char const* arg2)
     // explicitly change the ownership to the wrong value.
     auto dict = QPDFObjectHandle::newDictionary();
     dict.replaceKey("/QTest", pdf.getTrailer().getKey("/QTest"));
-    other.getTrailer().replaceKey("/QTest", dict);
+    other->getTrailer().replaceKey("/QTest", dict);
 
     try {
-        QPDFWriter w(other, "a.pdf");
+        QPDFWriter w(*other, "a.pdf");
+        w.write();
+        std::cout << "oops -- didn't throw" << std::endl;
+    } catch (std::logic_error const& e) {
+        std::cout << "logic error: " << e.what() << std::endl;
+    }
+
+    // Make sure deleting the other source doesn't prevent detection.
+    auto other2 = QPDF::create();
+    other2->emptyPDF();
+    dict = QPDFObjectHandle::newDictionary();
+    dict.replaceKey("/QTest", other2->getRoot());
+    other->getTrailer().replaceKey("/QTest", dict);
+    other2 = nullptr;
+    try {
+        QPDFWriter w(*other, "a.pdf");
         w.write();
         std::cout << "oops -- didn't throw" << std::endl;
     } catch (std::logic_error const& e) {
@@ -1158,7 +1173,7 @@ test_29(QPDF& pdf, char const* arg2)
 
     // Detect adding a foreign object
     auto root1 = pdf.getRoot();
-    auto root2 = other.getRoot();
+    auto root2 = other->getRoot();
     try {
         root1.replaceKey("/Oops", root2);
     } catch (std::logic_error const& e) {
@@ -3300,14 +3315,20 @@ test_92(QPDF& pdf, char const* arg2)
     check(resources);
     check(contents);
     check(contents_dict);
-    // Objects that were originally indirect should be null.
+    // Objects that were originally indirect should be destroyed.
     // Otherwise, they should have retained their old values. See
     // comments in QPDFValueProxy::reset for why this is the case.
-    assert(root.isNull());
-    assert(page1.isNull());
-    assert(contents.isNull());
-    assert(!resources.isNull());
-    assert(!contents_dict.isNull());
+    assert(root.isDestroyed());
+    assert(page1.isDestroyed());
+    assert(contents.isDestroyed());
+    assert(resources.isDictionary());
+    assert(contents_dict.isDictionary());
+    try {
+        root.unparse();
+        assert(false);
+    } catch (std::logic_error&) {
+        // Expected
+    }
 }
 
 static void

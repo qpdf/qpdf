@@ -391,6 +391,11 @@ class QPDFObjectHandle
     QPDF_DLL
     inline bool isIndirect() const;
 
+    // This returns true for indirect objects from a QPDF that has
+    // been destroyed.
+    QPDF_DLL
+    bool isDestroyed();
+
     // True for everything except array, dictionary, stream, word, and
     // inline image.
     QPDF_DLL
