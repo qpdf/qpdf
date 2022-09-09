@@ -4,6 +4,8 @@ Always
 
 * Evaluate issues tagged with `next` and `bug`. Remember to check
   discussions and pull requests in addition to regular issues.
+* When close to release, make sure external-libs is building and
+  follow instructions in ../external-libs/README
 
 Next
 ====

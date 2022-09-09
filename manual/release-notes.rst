@@ -6,14 +6,9 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
-11.0.0
-  - Performance improvements
+.. x.y.z: not yet released
 
-    - Many performance enhancements have been added. In developer
-      performance benchmarks, gains on the order of 20% have been
-      observed. Most of that work, including major optimization of
-      qpdf's lexical and parsing layers, was done by M. Holger.
-
+11.0.0: not yet released
   - Replacement of ``PointerHolder`` with ``std::shared_ptr``
 
     - The qpdf-specific ``PointerHolder`` smart pointer implementation
@@ -50,8 +45,8 @@ For a detailed list of changes, please see the file
 
   - Build replaced with cmake
 
-    - The old autoconf-based build has been replaced with CMake. Version
-      3.16 or newer is required. For all the details, please read
+    - The old autoconf-based build has been replaced with CMake. CMake
+      version 3.16 or newer is required. For details, please read
       :ref:`installing` and, if you package qpdf for a distribution,
       :ref:`packaging`.
 
@@ -87,6 +82,13 @@ For a detailed list of changes, please see the file
 	``autopkgtest`` framework but can be used by others. See
 	:file:`pkg-test/README.md` for details.
 
+  - Performance improvements
+
+    - Many performance enhancements have been added. In developer
+      performance benchmarks, gains on the order of 20% have been
+      observed. Most of that work, including major optimization of
+      qpdf's lexical and parsing layers, was done by M. Holger.
+
   - CLI: breaking changes
 
     - The :qpdf:ref:`--show-encryption` flag now provides encryption
@@ -114,13 +116,13 @@ For a detailed list of changes, please see the file
       need your code to be backward compatible to qpdf versions prior
       to 10.5.0, you can check that the preprocessor symbol
       ``QPDF_MAJOR_VERSION`` is defined and ``>= 11``. As a stop-gap,
-      you can `#define QPDF_OBJECT_NOWARN` to suppress the warning.
+      you can ``#define QPDF_OBJECT_NOWARN`` to suppress the warning.
 
-    - Pipeline::write now takes ``unsigned char const*`` instead of
-      ``unsigned char*``. Callers don't need to change anything, but
-      you no longer have to pass writable pointers to pipelines. If
-      you've implemented your own pipeline classes, you will need to
-      update them.
+    - ``Pipeline::write`` now takes ``unsigned char const*`` instead
+      of ``unsigned char*``. Callers don't need to change anything,
+      but you no longer have to pass writable pointers to pipelines.
+      If you've implemented your own pipeline classes, you will need
+      to update them.
 
     - Remove deprecated
       ``QPDFAcroFormDocumentHelper::copyFieldsFromForeignPage``. This
@@ -132,8 +134,8 @@ For a detailed list of changes, please see the file
       ``QPDF&`` argument.
 
     - The function passed to and called by ``QPDFJob::doIfVerbose``
-      now takes a ``Pipeline&` argument instead of a ``std::ostream&``
-      argument.
+      now takes a ``Pipeline&`` argument instead of a
+      ``std::ostream&`` argument.
 
     - Intentionally break API to call attention to operations that
       write files with insecure encryption:
@@ -150,8 +152,9 @@ For a detailed list of changes, please see the file
 
     - ``QPDFObjectHandle::warnIfPossible`` no longer takes an optional
       argument to throw an exception if there is no description. If
-      there is no description, it writes to the default logger's error
-      stream.
+      there is no description, it writes to the default
+      ``QPDFLogger``'s error stream. (``QPDFLogger`` is new in qpdf
+      11---see below.)
 
     - ``QPDF`` objects can no longer be copied or assigned to. It has
       never been safe to do this because of assumptions made by
@@ -162,7 +165,7 @@ For a detailed list of changes, please see the file
 
   - CLI Enhancements
 
-    - ``qpdf --list-attachments --verbose`` include some additional
+    - ``qpdf --list-attachments --verbose`` includes some additional
       information about attachments. Additional information about
       attachments is also included in the ``attachments`` JSON key
       with ``--json``.
@@ -206,32 +209,43 @@ For a detailed list of changes, please see the file
       ``replaceKeyAndGetOld``, a ``null`` object if the object was not
       previously there.
 
-    - It is now possible to detect when a ``QPDFObjectHandle`` is an
-      indirect object that belongs to a ``QPDF`` that has been
-      destroyed. Any attempt to unparse this type of
-      ``QPDFObjectHandle`` will throw a logic error. You can detect
-      this by calling the new ``QPDFObjectHandle::isDestroyed``
-      method. Also the ``QPDFObjectHandle::getOwningQPDF`` method now
-      returns a null pointer rather than an invalid pointer.
+    - The ``QPDFObjectHandle::isDestroyed`` method can be used to
+      detect when an indirect object ``QPDFObjectHandle`` belongs to a
+      ``QPDF`` that has been destroyed. Any attempt to unparse this
+      type of ``QPDFObjectHandle`` will throw a logic error.
 
-    - The method ``QPDFObjectHandle::getQPDF`` returns a ``QPDF&``
-      (rather than a ``QPDF*``) and is an alternative to
-      ``QPDFObjectHandle::getOwningQPDF`` for when the object is known
-      to have an owning ``QPDF``.
+    - The ``QPDFObjectHandle::getOwningQPDF`` method now returns a
+      null pointer rather than an invalid pointer when the owning
+      ``QPDF`` object has been destroyed. Indirect objects whose
+      owning ``QPDF`` has been destroyed become invalid. Direct
+      objects just lose their owning ``QPDF`` but continue to be
+      valid.
+
+    - The method ``QPDFObjectHandle::getQPDF`` is an alternative to
+      ``QPDFObjectHandle::getOwningQPDF``. It returns a ``QPDF&``
+      rather than a ``QPDF*`` and can be used when the object is known
+      to have an owning ``QPDF``. It throws an exception if the object
+      does not have an owning ``QPDF``. Only indirect objects are
+      guaranteed to have an owning ``QPDF``. Direct objects may have
+      one if they were initially read from a PDF input source that is
+      still valid, but it's also possible to have direct objects that
+      don't have an owning ``QPDF``.
 
     - It is now possible to test ``QPDFObjectHandle`` equality with
       ``==`` and ``!=``. Two ``QPDFObjectHandle`` objects are equal if
       they point to the same underlying object, meaning changes to one
-      will be reflected in the other.
+      will be reflected in the other. Note that this method does not
+      compare the contents of the objects, so two distinct but
+      structurally identical objects will not be considered equal.
 
-    - Add new factory method ``QPDF::create()`` that returns a
+    - New factory method ``QPDF::create()`` returns a
       ``std::shared_ptr<QPDF>``.
 
-    - Add new ``Pipeline`` methods to reduce the amount of casting that is
-      needed:
+    - New ``Pipeline`` methods have been added to reduce the amount of
+      casting that is needed:
 
-      - ``write``: overloaded version that takes `char const*` in
-        addition to the one that takes `unsigned char const*`
+      - ``write``: overloaded version that takes ``char const*`` in
+        addition to the one that takes ``unsigned char const*``
 
       - ``writeCstr``: writes a null-terminated C string
 
@@ -240,20 +254,26 @@ For a detailed list of changes, please see the file
       - ``operator <<``: for null-terminated C strings, std::strings,
         and integer types
 
-    - Add new ``Pipeline`` type ``Pl_OStream`` to write to a
+    - New ``Pipeline`` type ``Pl_OStream`` writes to a
       ``std::ostream``.
 
-    - Add new ``Pipeline`` type ``Pl_String`` to append to a
+    - New ``Pipeline`` type ``Pl_String`` appends to a
       ``std::string``.
 
-    - Add methods to ``QUtil`` for converting PDF timestamps and
-      ``QPDFTime`` objects to ISO-8601 timestamps.
+    - New ``Pipeline`` type ``Pl_Function`` can be used to call an
+      arbitrary function on write. It supports ``std::function`` for
+      C++ code and can also accept C-style functions that indicate
+      success using a return value and take an extra parameter for
+      passing user data.
+
+    - Methods have been added to ``QUtil`` for converting PDF
+      timestamps and ``QPDFTime`` objects to ISO-8601 timestamps.
 
     - Enhance JSON class to better support incrementally reading and
       writing large amounts of data without having to keep everything
       in memory.
 
-    - Add new functions to the C API for qpdfjob that use a
+    - Add new functions to the C API for ``qpdfjob`` that use a
       ``qpdfjob_handle``. Like with the regular C API for qpdf, you
       have to call ``qpdfjob_init`` first, pass the handle to the
       functions, and call ``qpdfjob_cleanup`` at the end. This
@@ -308,11 +328,13 @@ For a detailed list of changes, please see the file
       `qpdf/performance-test-files github repository
       <https://github.com/qpdf/performance-test-files>`__. In addition
       to running time, memory usage is also included in performance
-      test results. The ``performance_check`` tool has only been
-      tested on Linux.
+      test results when available. The ``performance_check`` tool has
+      only been tested on Linux.
 
     - Lots of code cleanup and refactoring work was contributed in
-      multiple pull requests by M. Holger.
+      multiple pull requests by M. Holger. This includes the work
+      required to enable detection of ``QPDFObjectHandle`` objects
+      that belong to destroyed ``QPDF`` objects.
 
 10.6.3: March 8, 2022
   - Announcement of upcoming change:
