@@ -8,50 +8,53 @@ Design and Library Notes
 Introduction
 ------------
 
-This section was written prior to the implementation of the qpdf package
-and was subsequently modified to reflect the implementation. In some
-cases, for purposes of explanation, it may differ slightly from the
-actual implementation. As always, the source code and test suite are
-authoritative. Even if there are some errors, this document should serve
-as a road map to understanding how this code works.
+This section was written prior to the implementation of the qpdf
+library and was subsequently modified to reflect the implementation.
+In some cases, for purposes of explanation, it may differ slightly
+from the actual implementation. As always, the source code and test
+suite are authoritative. Even if there are some errors, this document
+should serve as a road map to understanding how this code works.
 
 In general, one should adhere strictly to a specification when writing
-but be liberal in reading. This way, the product of our software will be
-accepted by the widest range of other programs, and we will accept the
-widest range of input files. This library attempts to conform to that
-philosophy whenever possible but also aims to provide strict checking
-for people who want to validate PDF files. If you don't want to see
-warnings and are trying to write something that is tolerant, you can
-call ``setSuppressWarnings(true)``. If you want to fail on the first
-error, you can call ``setAttemptRecovery(false)``. The default behavior
-is to generating warnings for recoverable problems. Note that recovery
-will not always produce the desired results even if it is able to get
-through the file. Unlike most other PDF files that produce generic
-warnings such as "This file is damaged,", qpdf generally issues a
-detailed error message that would be most useful to a PDF developer.
+but be liberal in reading. This way, the product of our software will
+be accepted by the widest range of other programs, and we will accept
+the widest range of input files. This library attempts to conform to
+that philosophy whenever possible but also aims to provide strict
+checking for people who want to validate PDF files. If you don't want
+to see warnings and are trying to write something that is tolerant,
+you can call ``setSuppressWarnings(true)``. If you want to fail on the
+first error, you can call ``setAttemptRecovery(false)``. The default
+behavior is to generating warnings for recoverable problems. Note that
+recovery will not always produce the desired results even if it is
+able to get through the file. Unlike most other PDF files that produce
+generic warnings such as "This file is damaged," qpdf generally issues
+a detailed error message that would be most useful to a PDF developer.
 This is by design as there seems to be a shortage of PDF validation
-tools out there. This was, in fact, one of the major motivations behind
-the initial creation of qpdf.
+tools out there. This was, in fact, one of the major motivations
+behind the initial creation of qpdf. That said, qpdf is not a strict
+PDF checker. There are many ways in which a PDF file can be out of
+conformance to the spec that qpdf doesn't notice or report.
 
 .. _design-goals:
 
 Design Goals
 ------------
 
-The QPDF package includes support for reading and rewriting PDF files.
+The qpdf library includes support for reading and rewriting PDF files.
 It aims to hide from the user details involving object locations,
-modified (appended) PDF files, the directness/indirectness of objects,
-and stream filters including encryption. It does not aim to hide
-knowledge of the object hierarchy or content stream contents. Put
-another way, a user of the qpdf library is expected to have knowledge
-about how PDF files work, but is not expected to have to keep track of
-bookkeeping details such as file positions.
+modified (appended) PDF files, use of object streams, and stream
+filters including encryption. It does not aim to hide knowledge of the
+object hierarchy or content stream contents. Put another way, a user
+of the qpdf library is expected to have knowledge about how PDF files
+work, but is not expected to have to keep track of bookkeeping details
+such as file positions.
 
-A user of the library never has to care whether an object is direct or
-indirect, though it is possible to determine whether an object is direct
-or not if this information is needed. All access to objects deals with
-this transparently. All memory management details are also handled by
-the library.
+When accessing objects, a user of the library never has to care
+whether an object is direct or indirect as all access to objects deals
+with this transparently. All memory management details are also
+handled by the library. When modifying objects, it is possible to
+determine whether an object is indirect and to make copies of the
+object if needed.
 
 Memory is managed mostly with ``std::shared_ptr`` object to minimize
 explicit memory handling. This library also makes use of a technique
@@ -85,29 +88,32 @@ objects to indirect objects and vice versa.
 Instances of ``QPDFObjectHandle`` can be directly created and modified
 using static factory methods in the ``QPDFObjectHandle`` class. There
 are factory methods for each type of object as well as a convenience
-method ``QPDFObjectHandle::parse`` that creates an object from a string
-representation of the object. Existing instances of ``QPDFObjectHandle``
-can also be modified in several ways. See comments in
-:file:`QPDFObjectHandle.hh` for details.
+method ``QPDFObjectHandle::parse`` that creates an object from a
+string representation of the object. The ``_qpdf`` user-defined string
+literal is also available, making it possible to create instances of
+``QPDFObjectHandle`` with ``"(pdf-syntax)"_qpdf``. Existing instances
+of ``QPDFObjectHandle`` can also be modified in several ways. See
+comments in :file:`QPDFObjectHandle.hh` for details.
 
 An instance of ``QPDF`` is constructed by using the class's default
-constructor. If desired, the ``QPDF`` object may be configured with
-various methods that change its default behavior. Then the
-``QPDF::processFile()`` method is passed the name of a PDF file, which
-permanently associates the file with that QPDF object. A password may
-also be given for access to password-protected files. QPDF does not
-enforce encryption parameters and will treat user and owner passwords
-equivalently. Either password may be used to access an encrypted file.
-``QPDF`` will allow recovery of a user password given an owner password.
-The input PDF file must be seekable. (Output files written by
-``QPDFWriter`` need not be seekable, even when creating linearized
-files.) During construction, ``QPDF`` validates the PDF file's header,
-and then reads the cross reference tables and trailer dictionaries. The
-``QPDF`` class keeps only the first trailer dictionary though it does
-read all of them so it can check the ``/Prev`` key. ``QPDF`` class users
-may request the root object and the trailer dictionary specifically. The
-cross reference table is kept private. Objects may then be requested by
-number or by walking the object tree.
+constructor or with ``QPDF::create()``. If desired, the ``QPDF``
+object may be configured with various methods that change its default
+behavior. Then the ``QPDF::processFile`` method is passed the name of
+a PDF file, which permanently associates the file with that ``QPDF``
+object. A password may also be given for access to password-protected
+files. ``QPDF`` does not enforce encryption parameters and will treat
+user and owner passwords equivalently. Either password may be used to
+access an encrypted file. ``QPDF`` will allow recovery of a user
+password given an owner password. The input PDF file must be seekable.
+Output files written by ``QPDFWriter`` need not be seekable, even when
+creating linearized files. During construction, ``QPDF`` validates the
+PDF file's header, and then reads the cross reference tables and
+trailer dictionaries. The ``QPDF`` class keeps only the first trailer
+dictionary though it does read all of them so it can check the
+``/Prev`` key. ``QPDF`` class users may request the root object and
+the trailer dictionary specifically. The cross reference table is kept
+private. Objects may then be requested by number or by walking the
+object tree.
 
 When a PDF file has a cross-reference stream instead of a
 cross-reference table and trailer, requesting the document's trailer
@@ -240,13 +246,14 @@ the ``QPDFObjectHandle`` type to hold onto objects and to abstract
 away in most cases whether the object is direct or indirect.
 
 Internally, ``QPDFObjectHandle`` holds onto a shared pointer to the
-underlying object value. When a direct object is created, the
-``QPDFObjectHandle`` that holds it is not associated with a ``QPDF``
-object. When an indirect object reference is created, it starts off in
-an *unresolved* state and must be associated with a ``QPDF`` object,
-which is considered its *owner*. To access the actual value of the
-object, the object must be *resolved*. This happens automatically when
-the the object is accessed in any way.
+underlying object value. When a direct object is created
+programmatically by client code (rather than being read from the
+file), the ``QPDFObjectHandle`` that holds it is not associated with a
+``QPDF`` object. When an indirect object reference is created, it
+starts off in an *unresolved* state and must be associated with a
+``QPDF`` object, which is considered its *owner*. To access the actual
+value of the object, the object must be *resolved*. This happens
+automatically when the the object is accessed in any way.
 
 To resolve an object, qpdf checks its object cache. If not found in
 the cache, it attempts to read the object from the input source
@@ -286,18 +293,20 @@ file.
   it is looking before the last ``%%EOF``. After getting to ``trailer``
   keyword, it invokes the parser.
 
-- The parser sees ``<<``, so it calls itself recursively in
-  dictionary creation mode.
+- The parser sees ``<<``, so it changes state and starts accumulating
+  the keys and values of the dictionary.
 
 - In dictionary creation mode, the parser keeps accumulating objects
   until it encounters ``>>``. Each object that is read is pushed onto
   a stack. If ``R`` is read, the last two objects on the stack are
   inspected. If they are integers, they are popped off the stack and
-  their values are used to construct an indirect object handle which
-  is then pushed onto the stack. When ``>>`` is finally read, the
-  stack is converted into a ``QPDF_Dictionary`` (not directly
-  accessible through the API) which is placed in a
-  ``QPDFObjectHandle`` and returned.
+  their values are used to obtain an indirect object handle from the
+  ``QPDF`` class. The ``QPDF`` class consults its cache, and if
+  necessary, inserts a new unresolved object, and returns an object
+  handle pointing to the cache entry, which is then pushed onto the
+  stack. When ``>>`` is finally read, the stack is converted into a
+  ``QPDF_Dictionary`` (not directly accessible through the API) which
+  is placed in a ``QPDFObjectHandle`` and returned.
 
 - The resulting dictionary is saved as the trailer dictionary.
 
@@ -309,23 +318,21 @@ file.
 - If there is an encryption dictionary, the document's encryption
   parameters are initialized.
 
-- The client requests root object. The ``QPDF`` class gets the value of
-  root key from trailer dictionary and returns it. It is an unresolved
-  indirect ``QPDFObjectHandle``.
+- The client requests the root object by getting the value of the
+  ``/Root`` key from trailer dictionary and returns it. It is an
+  unresolved indirect ``QPDFObjectHandle``.
 
 - The client requests the ``/Pages`` key from root
-  ``QPDFObjectHandle``. The ``QPDFObjectHandle`` notices that it is
-  indirect so it asks ``QPDF`` to resolve it. ``QPDF`` looks in the
-  object cache for an object with the root dictionary's object ID and
-  generation number. Upon not seeing it, it checks the cross reference
-  table, gets the offset, and reads the object present at that offset.
-  It stores the result in the object cache. The cache entry's value is
-  replaced by the actual value, which causes any previously unresolved
-  ``QPDFObjectHandle`` objects that that pointed there to now have a
-  shared copy of the actual object. Modifications through any such
-  ``QPDFObjectHandle`` will be reflected in all of them. As the client
-  continues to request objects, the same process is followed for each
-  new requested object.
+  ``QPDFObjectHandle``. The ``QPDFObjectHandle`` notices that it is an
+  unresolved indirect object, so it asks ``QPDF`` to resolve it.
+  ``QPDF`` checks the cross reference table, gets the offset, and
+  reads the object present at that offset. The object cache entry's
+  ``unresolved`` value is replaced by the actual value, which causes
+  any previously unresolved ``QPDFObjectHandle`` objects that pointed
+  there to now have a shared copy of the actual object. Modifications
+  through any such ``QPDFObjectHandle`` will be reflected in all of
+  them. As the client continues to request objects, the same process
+  is followed for each new requested object.
 
 .. _object_internals:
 
@@ -339,11 +346,12 @@ Object Internals
 ~~~~~~~~~~~~~~~~
 
 The ``QPDF`` object has an object cache which contains a shared
-pointer to each object that was read from the file. Changes can be
-made to any of those objects through ``QPDFObjectHandle`` methods. Any
-such changes are visible to all ``QPDFObjectHandle`` instances that
-point to the same object. When a ``QPDF`` object is written by
-``QPDFWriter`` or serialized to JSON, any changes are reflected.
+pointer to each object that was read from the file or added as an
+indirect object. Changes can be made to any of those objects through
+``QPDFObjectHandle`` methods. Any such changes are visible to all
+``QPDFObjectHandle`` instances that point to the same object. When a
+``QPDF`` object is written by ``QPDFWriter`` or serialized to JSON,
+any changes are reflected.
 
 Objects in qpdf 11 and Newer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -356,30 +364,32 @@ reference to that object has a copy of that shared pointer. Each
 is an implementation for each of the basic object types (array,
 dictionary, null, boolean, string, number, etc.) as well as a few
 special ones including ``uninitialized``, ``unresolved``,
-``reserved``, and ``destroyed``. When an object is first referenced,
+``reserved``, and ``destroyed``. When an object is first created,
 its underlying ``QPDFValue`` has type ``unresolved``. When the object
-is first resolved, the ``QPDFObject`` in the cache has its internal
+is first accessed, the ``QPDFObject`` in the cache has its internal
 ``QPDFValue`` replaced with the object as read from the file. Since it
 is the ``QPDFObject`` object that is shared by all referencing
 ``QPDFObjectHandle`` objects as well as by the owning ``QPDF`` object,
 this ensures that any future changes to the object, including
-replacing the object with a completely different one, will be
+replacing the object with a completely different one by calling
+``QPDF::replaceObject`` or ``QPDF::swapObjects``, will be
 reflected across all ``QPDFObjectHandle`` objects that reference it.
 
 A ``QPDFValue`` that originated from a PDF input source maintains a
 pointer to the ``QPDF`` object that read it (its *owner*). When that
-``QPDF`` object is destroyed, it disconnects all reachable from it by
-clearing their owner. For indirect objects (all objects in the object
-cache), it also replaces the object's value with an object of type
-``destroyed``. This means that, if there are still any referencing
-``QPDFObjectHandle`` objects floating around, requesting their owning
-``QPDF`` will return a null pointer rather than a pointer to a
-``QPDF`` object that is either invalid or points to something else,
-and any attempt to access an indirect object that is associated with a
-destroyed ``QPDF`` object will throw an exception. This operation also
-has the effect of breaking any circular references (which are common
-and, in some cases, required by the PDF specification), thus
-preventing memory leaks when ``QPDF`` objects are destroyed.
+``QPDF`` object is destroyed, it disconnects all objects reachable
+from it by clearing their owner. For indirect objects (all objects in
+the object cache), it also replaces the object's value with an object
+of type ``destroyed``. This means that, if there are still any
+referencing ``QPDFObjectHandle`` objects floating around, requesting
+their owning ``QPDF`` will return a null pointer rather than a pointer
+to a ``QPDF`` object that is either invalid or points to something
+else, and any attempt to access an indirect object that is associated
+with a destroyed ``QPDF`` object will throw an exception. This
+operation also has the effect of breaking any circular references
+(which are common and, in some cases, required by the PDF
+specification), thus preventing memory leaks when ``QPDF`` objects are
+destroyed.
 
 Objects prior to qpdf 11
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -478,22 +488,6 @@ and 64-bit platforms, and the test suite is very thorough, so it is
 hard to make any of the potential errors here without being caught in
 build or test.
 
-Non-const ``unsigned char*`` is used in the ``Pipeline`` interface. The
-pipeline interface has a ``write`` call that uses ``unsigned char*``
-without a ``const`` qualifier. The main reason for this is
-to support pipelines that make calls to third-party libraries, such as
-zlib, that don't include ``const`` in their interfaces. Unfortunately,
-there are many places in the code where it is desirable to have
-``const char*`` with pipelines. None of the pipeline implementations
-in qpdf
-currently modify the data passed to write, and doing so would be counter
-to the intent of ``Pipeline``, but there is nothing in the code to
-prevent this from being done. There are places in the code where
-``const_cast`` is used to remove the const-ness of pointers going into
-``Pipeline``\ s. This could theoretically be unsafe, but there is
-adequate testing to assert that it is safe and will remain safe in
-qpdf's code.
-
 .. _encryption:
 
 Encryption
@@ -516,14 +510,14 @@ given an encryption key. This is used by ``QPDFWriter`` when it rewrites
 encrypted files.
 
 When copying encrypted files, unless otherwise directed, qpdf will
-preserve any encryption in force in the original file. qpdf can do this
-with either the user or the owner password. There is no difference in
-capability based on which password is used. When 40 or 128 bit
-encryption keys are used, the user password can be recovered with the
-owner password. With 256 keys, the user and owner passwords are used
-independently to encrypt the actual encryption key, so while either can
-be used, the owner password can no longer be used to recover the user
-password.
+preserve any encryption in effect in the original file. qpdf can do
+this with either the user or the owner password. There is no
+difference in capability based on which password is used. When 40 or
+128 bit encryption keys are used, the user password can be recovered
+with the owner password. With 256 keys, the user and owner passwords
+are used independently to encrypt the actual encryption key, so while
+either can be used, the owner password can no longer be used to
+recover the user password.
 
 Starting with version 4.0.0, qpdf can read files that are not encrypted
 but that contain encrypted attachments, but it cannot write such files.
@@ -538,33 +532,37 @@ format. The only exception to this is that clear-text metadata will be
 preserved as clear-text if it is that way in the original file.
 
 One point of confusion some people have about encrypted PDF files is
-that encryption is not the same as password protection. Password
-protected files are always encrypted, but it is also possible to create
-encrypted files that do not have passwords. Internally, such files use
-the empty string as a password, and most readers try the empty string
-first to see if it works and prompt for a password only if the empty
-string doesn't work. Normally such files have an empty user password and
-a non-empty owner password. In that way, if the file is opened by an
-ordinary reader without specification of password, the restrictions
-specified in the encryption dictionary can be enforced. Most users
-wouldn't even realize such a file was encrypted. Since qpdf always
-ignores the restrictions (except for the purpose of reporting what they
-are), qpdf doesn't care which password you use. QPDF will allow you to
-create PDF files with non-empty user passwords and empty owner
-passwords. Some readers will require a password when you open these
-files, and others will open the files without a password and not enforce
-restrictions. Having a non-empty user password and an empty owner
-password doesn't really make sense because it would mean that opening
-the file with the user password would be more restrictive than not
-supplying a password at all. QPDF also allows you to create PDF files
-with the same password as both the user and owner password. Some readers
-will not ever allow such files to be accessed without restrictions
-because they never try the password as the owner password if it works as
-the user password. Nonetheless, one of the powerful aspects of qpdf is
-that it allows you to finely specify the way encrypted files are
-created, even if the results are not useful to some readers. One use
-case for this would be for testing a PDF reader to ensure that it
-handles odd configurations of input files.
+that encryption is not the same as password protection.
+Password-protected files are always encrypted, but it is also possible
+to create encrypted files that do not have passwords. Internally, such
+files use the empty string as a password, and most readers try the
+empty string first to see if it works and prompt for a password only
+if the empty string doesn't work. Normally such files have an empty
+user password and a non-empty owner password. In that way, if the file
+is opened by an ordinary reader without specification of password, the
+restrictions specified in the encryption dictionary can be enforced.
+Most users wouldn't even realize such a file was encrypted. Since qpdf
+always ignores the restrictions (except for the purpose of reporting
+what they are), qpdf doesn't care which password you use. QPDF will
+allow you to create PDF files with non-empty user passwords and empty
+owner passwords. Some readers will require a password when you open
+these files, and others will open the files without a password and not
+enforce restrictions. Having a non-empty user password and an empty
+owner password doesn't really make sense because it would mean that
+opening the file with the user password would be more restrictive than
+not supplying a password at all. QPDF also allows you to create PDF
+files with the same password as both the user and owner password. Some
+readers will not ever allow such files to be accessed without
+restrictions because they never try the password as the owner password
+if it works as the user password. Nonetheless, one of the powerful
+aspects of qpdf is that it allows you to finely specify the way
+encrypted files are created, even if the results are not useful to
+some readers. One use case for this would be for testing a PDF reader
+to ensure that it handles odd configurations of input files. If you
+attempt to create an encrypted file that is not secure, qpdf will warn
+you and require you to explicitly state your intention to create an
+insecure file. So while qpdf can create insecure files, it won't let
+you do it by mistake.
 
 .. _random-numbers:
 
@@ -630,23 +628,21 @@ Copying Objects From Other PDF Files
 
 Version 3.0 of qpdf introduced the ability to copy objects into a
 ``QPDF`` object from a different ``QPDF`` object, which we refer to as
-*foreign objects*. This allows arbitrary
-merging of PDF files. The "from" ``QPDF`` object must remain valid after
-the copy as discussed in the note below. The
-:command:`qpdf` command-line tool provides limited
-support for basic page selection, including merging in pages from other
-files, but the library's API makes it possible to implement arbitrarily
-complex merging operations. The main method for copying foreign objects
-is ``QPDF::copyForeignObject``. This takes an indirect object from
+*foreign objects*. This allows arbitrary merging of PDF files. The
+:command:`qpdf` command-line tool provides limited support for basic
+page selection, including merging in pages from other files, but the
+library's API makes it possible to implement arbitrarily complex
+merging operations. The main method for copying foreign objects is
+``QPDF::copyForeignObject``. This takes an indirect object from
 another ``QPDF`` and copies it recursively into this object while
 preserving all object structure, including circular references. This
 means you can add a direct object that you create from scratch to a
 ``QPDF`` object with ``QPDF::makeIndirectObject``, and you can add an
-indirect object from another file with ``QPDF::copyForeignObject``. The
-fact that ``QPDF::makeIndirectObject`` does not automatically detect a
-foreign object and copy it is an explicit design decision. Copying a
-foreign object seems like a sufficiently significant thing to do that it
-should be done explicitly.
+indirect object from another file with ``QPDF::copyForeignObject``.
+The fact that ``QPDF::makeIndirectObject`` does not automatically
+detect a foreign object and copy it is an explicit design decision.
+Copying a foreign object seems like a sufficiently significant thing
+to do that it should be done explicitly.
 
 The other way to copy foreign objects is by passing a page from one
 ``QPDF`` to another by calling ``QPDF::addPage``. In contrast to
@@ -654,26 +650,30 @@ The other way to copy foreign objects is by passing a page from one
 between indirect objects in the current file, foreign objects, and
 direct objects.
 
-Please note: when you copy objects from one ``QPDF`` to another, the
-source ``QPDF`` object must remain valid until you have finished with
-the destination object. This is because the original object is still
-used to retrieve any referenced stream data from the copied object.
+When you copy objects from one ``QPDF`` to another, the input source
+of the original file remain valid until you have finished with the
+destination object. This is because the input source is still used
+to retrieve any referenced stream data from the copied object. If
+needed, there are methods to force the data to be copied. See comments
+near the declaration of ``copyForeignObject`` in
+:file:`include/qpdf/QPDF.hh` for details.
 
 .. _rewriting:
 
 Writing PDF Files
 -----------------
 
-The qpdf library supports file writing of ``QPDF`` objects to PDF files
-through the ``QPDFWriter`` class. The ``QPDFWriter`` class has two
-writing modes: one for non-linearized files, and one for linearized
-files. See :ref:`linearization` for a description of
+The qpdf library supports file writing of ``QPDF`` objects to PDF
+files through the ``QPDFWriter`` class. The ``QPDFWriter`` class has
+two writing modes: one for non-linearized files, and one for
+linearized files. See :ref:`linearization` for a description of
 linearization is implemented. This section describes how we write
-non-linearized files including the creation of QDF files (see :ref:`qdf`.
+non-linearized files including the creation of QDF files (see
+:ref:`qdf`).
 
 This outline was written prior to implementation and is not exactly
-accurate, but it provides a correct "notional" idea of how writing
-works. Look at the code in ``QPDFWriter`` for exact details.
+accurate, but it portrays the essence of how writing works. Look at
+the code in ``QPDFWriter`` for exact details.
 
 - Initialize state:
 
@@ -685,7 +685,7 @@ works. Look at the code in ``QPDFWriter`` for exact details.
 
   - xref table: new id -> offset = empty
 
-- Create a QPDF object from a file.
+- Create a ``QPDF`` object from a file.
 
 - Write header for new PDF file.
 
@@ -750,7 +750,7 @@ Filtered Streams
 ----------------
 
 Support for streams is implemented through the ``Pipeline`` interface
-which was designed for this package.
+which was designed for this library.
 
 When reading streams, create a series of ``Pipeline`` objects. The
 ``Pipeline`` abstract base requires implementation ``write()`` and
@@ -802,32 +802,20 @@ file might be, the presence of type warnings can save lots of developer
 time. They have also proven useful in exposing issues in qpdf itself
 that would have otherwise gone undetected.
 
-*Can there be a type-safe ``QPDFObjectHandle``?* It would be great if
-``QPDFObjectHandle`` could be more strongly typed so that you'd have to
-have check that something was of a particular type before calling
-type-specific accessor methods. However, implementing this at this stage
-of the library's history would be quite difficult, and it would make a
-the common pattern of drilling into an object no longer work. While it
-would be possible to have a parallel interface, it would create a lot of
-extra code. If qpdf were written in a language like rust, an interface
-like this would make a lot of sense, but, for a variety of reasons, the
-qpdf API is consistent with other APIs of its time, relying on exception
-handling to catch errors. The underlying PDF objects are inherently not
-type-safe. Forcing stronger type safety in ``QPDFObjectHandle`` would
-ultimately cause a lot more code to have to be written and would like
-make software that uses qpdf more brittle, and even so, checks would
-have to occur at runtime.
-
-*Why do type errors sometimes raise exceptions?* The way warnings work
-in qpdf requires a ``QPDF`` object to be associated with an object
-handle for a warning to be issued. It would be nice if this could be
-fixed, but it would require major changes to the API. Rather than
-throwing away these conditions, we convert them to exceptions. It's not
-that bad though. Since any object handle that was read from a file has
-an associated ``QPDF`` object, it would only be type errors on objects
-that were created explicitly that would cause exceptions, and in that
-case, type errors are much more likely to be the result of a coding
-error than invalid input.
+*Can there be a type-safe* ``QPDFObjectHandle``? At the time of the
+release of qpdf 11, there is active work being done toward the goal of
+creating a way to work with PDF objects that is more type-safe and
+closer in feel to the current C++ standard library. It is hoped that
+this work will make it easier to write bindings to qpdf in modern
+languages like `Rust <https://www.rust-lang.org/>`__. If this happens,
+it will likely be by providing an alternative to ``QPDFObjectHandle``
+that provides a separate path to the underlying object. Details are
+still being worked out. Fundamentally, PDF objects are not strongly
+typed. They are similar to ``JSON`` objects or to objects in dynamic
+languages like `Python <https://python.org/>`__: there are certain
+things you can only do to objects of a given type, but you can replace
+an object of one type with an object of another. Because of this,
+there will always be some checks that will happen at runtime.
 
 *Why does the behavior of a type exception differ between the C and C++
 API?* There is no way to throw and catch exceptions in C short of
