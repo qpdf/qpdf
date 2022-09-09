@@ -460,7 +460,7 @@ QPDFJob::setLogger(std::shared_ptr<QPDFLogger> l)
 void
 QPDFJob::setOutputStreams(std::ostream* out, std::ostream* err)
 {
-    setLogger(std::make_shared<QPDFLogger>());
+    setLogger(QPDFLogger::create());
     this->m->log->setOutputStreams(out, err);
 }
 

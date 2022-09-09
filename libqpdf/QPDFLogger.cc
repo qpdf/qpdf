@@ -65,9 +65,15 @@ QPDFLogger::QPDFLogger() :
 }
 
 std::shared_ptr<QPDFLogger>
+QPDFLogger::create()
+{
+    return std::shared_ptr<QPDFLogger>(new QPDFLogger);
+}
+
+std::shared_ptr<QPDFLogger>
 QPDFLogger::defaultLogger()
 {
-    static auto l = std::make_shared<QPDFLogger>();
+    static auto l = create();
     return l;
 }
 

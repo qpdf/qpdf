@@ -31,7 +31,7 @@ class QPDFLogger
 {
   public:
     QPDF_DLL
-    QPDFLogger();
+    static std::shared_ptr<QPDFLogger> create();
 
     // Return the default logger. In general, you should use the
     // default logger. You can also create your own loggers and use
@@ -152,6 +152,7 @@ class QPDFLogger
     void setOutputStreams(std::ostream* out_stream, std::ostream* err_stream);
 
   private:
+    QPDFLogger();
     std::shared_ptr<Pipeline>
     throwIfNull(std::shared_ptr<Pipeline>, bool null_okay);
 
