@@ -334,14 +334,13 @@ class QPDFObjectHandle
     QPDF_DLL
     inline bool isInitialized() const;
 
-    // Two QPDFObjectHandle objects are equal if they point to exactly
-    // the same underlying object, meaning that changes to one are
-    // reflected in the other, or "if you paint one, the other one
-    // changes color."
+    // This method returns true if the QPDFObjectHandle objects point
+    // to exactly the same underlying object, meaning that changes to
+    // one are reflected in the other, or "if you paint one, the other
+    // one changes color." This does not perform a structural
+    // comparison of the contents of the objects.
     QPDF_DLL
-    bool operator==(QPDFObjectHandle const&) const;
-    QPDF_DLL
-    bool operator!=(QPDFObjectHandle const&) const;
+    bool isSameObjectAs(QPDFObjectHandle const&) const;
 
     // Return type code and type name of underlying object.  These are
     // useful for doing rapid type tests (like switch statements) or

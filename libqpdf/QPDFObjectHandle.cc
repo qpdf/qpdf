@@ -237,15 +237,9 @@ LastChar::getLastChar()
 }
 
 bool
-QPDFObjectHandle::operator==(QPDFObjectHandle const& rhs) const
+QPDFObjectHandle::isSameObjectAs(QPDFObjectHandle const& rhs) const
 {
     return this->obj == rhs.obj;
-}
-
-bool
-QPDFObjectHandle::operator!=(QPDFObjectHandle const& rhs) const
-{
-    return this->obj != rhs.obj;
 }
 
 void

@@ -231,12 +231,12 @@ For a detailed list of changes, please see the file
       still valid, but it's also possible to have direct objects that
       don't have an owning ``QPDF``.
 
-    - It is now possible to test ``QPDFObjectHandle`` equality with
-      ``==`` and ``!=``. Two ``QPDFObjectHandle`` objects are equal if
-      they point to the same underlying object, meaning changes to one
-      will be reflected in the other. Note that this method does not
-      compare the contents of the objects, so two distinct but
-      structurally identical objects will not be considered equal.
+    - Add method ``QPDFObjectHandle::isSameObjectAs`` for testing
+      whether two ``QPDFObjectHandle`` objects point to the same
+      underlying object, meaning changes to one will be reflected in
+      the other. Note that this method does not compare the contents
+      of the objects, so two distinct but structurally identical
+      objects will not be considered the same object.
 
     - New factory method ``QPDF::create()`` returns a
       ``std::shared_ptr<QPDF>``.

@@ -3340,22 +3340,22 @@ test_93(QPDF& pdf, char const* arg2)
     auto trailer = pdf.getTrailer();
     auto root1 = trailer.getKey("/Root");
     auto root2 = pdf.getRoot();
-    assert(root1 == root2);
+    assert(root1.isSameObjectAs(root2));
     auto oh1 = "<< /One /Two >>"_qpdf;
     auto oh2 = oh1;
-    assert(oh1 == oh2);
+    assert(oh1.isSameObjectAs(oh2));
     auto oh3 = "<< /One /Two >>"_qpdf;
-    assert(oh1 != oh3);
+    assert(!oh1.isSameObjectAs(oh3));
     oh2.replaceKey("/One", "/Three"_qpdf);
-    assert(oh1 == oh2);
+    assert(oh1.isSameObjectAs(oh2));
     assert(oh2.unparse() == "<< /One /Three >>");
     assert(!oh1.isIndirect());
     auto oh4 = pdf.makeIndirectObject(oh1);
-    assert(oh1 == oh4);
+    assert(oh1.isSameObjectAs(oh4));
     assert(oh1.isIndirect());
     assert(oh4.isIndirect());
     trailer.replaceKey("/Potato", oh1);
-    assert(trailer.getKey("/Potato") == oh2);
+    assert(trailer.getKey("/Potato").isSameObjectAs(oh2));
 }
 
 static void
@@ -3385,76 +3385,76 @@ test_94(QPDF& pdf, char const* arg2)
 
     assert(p1.getObjectHandle().getKey("/MediaBox").isNull());
     // MediaBox not present, so get inherited one
-    assert(p1.getMediaBox(false) == root_media);
+    assert(p1.getMediaBox(false).isSameObjectAs(root_media));
     // Other boxesBox not present, so fall back to MediaBox
-    assert(p1.getCropBox(false, false) == root_media);
-    assert(p1.getBleedBox(false, false) == root_media);
-    assert(p1.getTrimBox(false, false) == root_media);
-    assert(p1.getArtBox(false, false) == root_media);
+    assert(p1.getCropBox(false, false).isSameObjectAs(root_media));
+    assert(p1.getBleedBox(false, false).isSameObjectAs(root_media));
+    assert(p1.getTrimBox(false, false).isSameObjectAs(root_media));
+    assert(p1.getArtBox(false, false).isSameObjectAs(root_media));
     // Make copy of artbox
     auto p1_new_art = p1.getArtBox(false, true);
     assert(p1_new_art.unparse() == root_media_unparse);
-    assert(p1_new_art != root_media);
+    assert(!p1_new_art.isSameObjectAs(root_media));
     // This also copied cropbox
     auto p1_new_crop = p1.getCropBox(false, false);
-    assert(p1_new_crop != root_media);
-    assert(p1_new_crop != p1_new_art);
+    assert(!p1_new_crop.isSameObjectAs(root_media));
+    assert(!p1_new_crop.isSameObjectAs(p1_new_art));
     assert(p1_new_crop.unparse() == root_media_unparse);
     // But it didn't copy Media
-    assert(p1.getMediaBox(false) == root_media);
+    assert(p1.getMediaBox(false).isSameObjectAs(root_media));
     // Now fall back to new crop
-    assert(p1.getTrimBox(false, false) == p1_new_crop);
+    assert(p1.getTrimBox(false, false).isSameObjectAs(p1_new_crop));
     // Request copy. The value returned has the same structure but is
     // a different object.
     auto p1_effective_media = p1.getMediaBox(true);
     assert(p1_effective_media.unparse() == root_media_unparse);
-    assert(p1_effective_media != root_media);
+    assert(!p1_effective_media.isSameObjectAs(root_media));
 
     // copy_on_fallback didn't have to copy media to crop
-    assert(p2.getMediaBox(false) == root_media);
+    assert(p2.getMediaBox(false).isSameObjectAs(root_media));
     auto p2_crop = p2.getCropBox(false, false);
     auto p2_new_trim = p2.getTrimBox(false, true);
     assert(p2_new_trim.unparse() == p2_crop.unparse());
-    assert(p2_new_trim != p2_crop);
-    assert(p2.getMediaBox(false) == root_media);
+    assert(!p2_new_trim.isSameObjectAs(p2_crop));
+    assert(p2.getMediaBox(false).isSameObjectAs(root_media));
 
     // We didn't need to copy anything
     auto p3_media = p3.getMediaBox(false);
     auto p3_crop = p3.getCropBox(false, false);
-    assert(p3.getMediaBox(true) == p3_media);
-    assert(p3.getCropBox(true, true) == p3_crop);
+    assert(p3.getMediaBox(true).isSameObjectAs(p3_media));
+    assert(p3.getCropBox(true, true).isSameObjectAs(p3_crop));
 
     // We didn't have to copy for bleed but we did for art
     auto p4_orig_crop = p4.getObjectHandle().getKey("/CropBox");
     auto p4_crop = p4.getCropBox(false, false);
-    assert(p4_orig_crop == p4_crop);
+    assert(p4_orig_crop.isSameObjectAs(p4_crop));
     auto p4_bleed1 = p4.getBleedBox(false, false);
     auto p4_bleed2 = p4.getBleedBox(false, true);
-    assert(p4_bleed1 != p4_crop);
-    assert(p4_bleed1 == p4_bleed2);
+    assert(!p4_bleed1.isSameObjectAs(p4_crop));
+    assert(p4_bleed1.isSameObjectAs(p4_bleed2));
     auto p4_art1 = p4.getArtBox(false, false);
-    assert(p4_art1 == p4_crop);
+    assert(p4_art1.isSameObjectAs(p4_crop));
     auto p4_art2 = p4.getArtBox(false, true);
-    assert(p4_art2 != p4_crop);
+    assert(!p4_art2.isSameObjectAs(p4_crop));
     auto p4_new_crop = p4.getCropBox(true, false);
-    assert(p4_new_crop != p4_orig_crop);
+    assert(!p4_new_crop.isSameObjectAs(p4_orig_crop));
     assert(p4_orig_crop.isIndirect());
     assert(!p4_new_crop.isIndirect());
     assert(p4_new_crop.unparse() == p4_orig_crop.unparseResolved());
 
     // Exercise copying for inheritance and fallback
-    assert(p5.getMediaBox(false) == root_media);
-    assert(p5.getCropBox(false, false) == root_media);
-    assert(p5.getBleedBox(false, false) == root_media);
+    assert(p5.getMediaBox(false).isSameObjectAs(root_media));
+    assert(p5.getCropBox(false, false).isSameObjectAs(root_media));
+    assert(p5.getBleedBox(false, false).isSameObjectAs(root_media));
     auto p5_new_bleed = p5.getBleedBox(true, true);
     auto p5_new_media = p5.getMediaBox(false);
     auto p5_new_crop = p5.getCropBox(false, false);
-    assert(p5_new_media != root_media);
-    assert(p5_new_crop != root_media);
-    assert(p5_new_crop != p5_new_media);
-    assert(p5_new_bleed != root_media);
-    assert(p5_new_bleed != p5_new_media);
-    assert(p5_new_bleed != p5_new_crop);
+    assert(!p5_new_media.isSameObjectAs(root_media));
+    assert(!p5_new_crop.isSameObjectAs(root_media));
+    assert(!p5_new_crop.isSameObjectAs(p5_new_media));
+    assert(!p5_new_bleed.isSameObjectAs(root_media));
+    assert(!p5_new_bleed.isSameObjectAs(p5_new_media));
+    assert(!p5_new_bleed.isSameObjectAs(p5_new_crop));
     assert(p5_new_media.unparse() == root_media_unparse);
     assert(p5_new_crop.unparse() == root_media_unparse);
     assert(p5_new_bleed.unparse() == root_media_unparse);
