@@ -4,6 +4,7 @@
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFUsage.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/qpdflogger-c_impl.hh>
 
 #include <cstdio>
 #include <cstring>
@@ -39,6 +40,18 @@ wrap_qpdfjob(qpdfjob_handle j, std::function<int(qpdfjob_handle j)> fn)
             << j->j.getMessagePrefix() << ": " << e.what() << "\n";
     }
     return QPDFJob::EXIT_ERROR;
+}
+
+void
+qpdfjob_set_logger(qpdfjob_handle j, qpdflogger_handle logger)
+{
+    j->j.setLogger(logger->l);
+}
+
+qpdflogger_handle
+qpdfjob_get_logger(qpdfjob_handle j)
+{
+    return new _qpdflogger_handle(j->j.getLogger());
 }
 
 int

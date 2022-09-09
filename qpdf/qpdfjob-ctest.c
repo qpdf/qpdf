@@ -26,6 +26,15 @@ custom_progress(int progress, void* data)
     printf("%s: write progress: %d%%\n", (char const*)data, progress);
 }
 
+static int
+custom_log(char const* data, size_t size, void* udata)
+{
+    fprintf(stderr, "|custom|");
+    fwrite(data, 1, size, stderr);
+    fflush(stderr);
+    return 0;
+}
+
 static void
 run_tests()
 {
@@ -55,6 +64,7 @@ run_tests()
   \"objectStreams\": \"generate\"\n\
 }") == 0);
     printf("json test passed\n");
+    fflush(stdout);
 
     assert(qpdfjob_run_from_json("{\n\
   \"inputFile\": \"xref-with-short-size.pdf\",\n\
@@ -64,10 +74,28 @@ run_tests()
   \"objectStreams\": \"generate\"\n\
 }") == 3);
     printf("json warn test passed\n");
+    fflush(stdout);
 
-    assert(qpdfjob_run_from_json("{\n\
+    /* Also exercise custom logger */
+    j = qpdfjob_init();
+    qpdflogger_handle l1 = qpdfjob_get_logger(j);
+    qpdflogger_handle l2 = qpdflogger_default_logger();
+    assert(qpdflogger_equal(l1, l2));
+    qpdflogger_cleanup(&l1);
+    qpdflogger_cleanup(&l2);
+    qpdflogger_handle l = qpdflogger_create();
+    qpdflogger_set_error(l, qpdf_log_dest_custom, custom_log, NULL);
+    qpdfjob_set_logger(j, l);
+    qpdflogger_handle l3 = qpdfjob_get_logger(j);
+    assert(qpdflogger_equal(l, l3));
+    qpdflogger_cleanup(&l);
+    qpdflogger_cleanup(&l3);
+
+    qpdfjob_initialize_from_json(j, "{\n\
   \"inputFile\": \"nothing-there.pdf\"\n\
-}") == 2);
+}");
+    assert(qpdfjob_run(j) == 2);
+    qpdfjob_cleanup(&j);
     printf("json error test passed\n");
 }
 

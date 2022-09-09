@@ -8,12 +8,7 @@ Always
 Next
 ====
 
-Pending changes:
-
-* Consider also exposing a way to set a new logger and to get the
-  logger from QPDF and QPDFJob in the C API.
-
-Soon: Break ground on "Document-level work"
+* Break ground on "Document-level work"
 
 Possible future JSON enhancements
 =================================

@@ -1,6 +1,6 @@
-WARNING: c-check-warn-in.pdf: file is damaged
-WARNING: c-check-warn-in.pdf (offset 1556): xref not found
-WARNING: c-check-warn-in.pdf: Attempting to reconstruct cross-reference table
+|custom|WARNING: |custom|c-check-warn-in.pdf: file is damaged|custom|
+|custom|WARNING: |custom|c-check-warn-in.pdf (offset 1556): xref not found|custom|
+|custom|WARNING: |custom|c-check-warn-in.pdf: Attempting to reconstruct cross-reference table|custom|
 status: 1
 warning: c-check-warn-in.pdf: file is damaged
   code: 5

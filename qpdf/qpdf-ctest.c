@@ -140,6 +140,15 @@ write_to_file(char const* data, size_t size, void* udata)
     return fwrite(data, 1, size, f) != size;
 }
 
+static int
+custom_log(char const* data, size_t size, void* udata)
+{
+    fprintf(stderr, "|custom|");
+    fwrite(data, 1, size, stderr);
+    fflush(stderr);
+    return 0;
+}
+
 static void
 test01(
     char const* infile,
@@ -583,6 +592,20 @@ test23(
     char const* outfile,
     char const* xarg)
 {
+    /* Test check and also exercise custom logger */
+    qpdflogger_handle l1 = qpdf_get_logger(qpdf);
+    qpdflogger_handle l2 = qpdflogger_default_logger();
+    assert(qpdflogger_equal(l1, l2));
+    qpdflogger_cleanup(&l1);
+    qpdflogger_cleanup(&l2);
+    qpdflogger_handle l = qpdflogger_create();
+    qpdflogger_set_warn(l, qpdf_log_dest_custom, custom_log, NULL);
+    qpdf_set_logger(qpdf, l);
+    qpdflogger_handle l3 = qpdf_get_logger(qpdf);
+    assert(qpdflogger_equal(l, l3));
+    qpdflogger_cleanup(&l);
+    qpdflogger_cleanup(&l3);
+
     QPDF_ERROR_CODE status = 0;
     qpdf_read(qpdf, infile, password);
     status = qpdf_check_pdf(qpdf);

@@ -12,6 +12,7 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/qpdflogger-c_impl.hh>
 
 #include <cstring>
 #include <functional>
@@ -277,6 +278,18 @@ qpdf_check_pdf(qpdf_data qpdf)
     QPDF_ERROR_CODE status = trap_errors(qpdf, &call_check);
     QTC::TC("qpdf", "qpdf-c called qpdf_check_pdf");
     return status;
+}
+
+void
+qpdf_set_logger(qpdf_data qpdf, qpdflogger_handle logger)
+{
+    qpdf->qpdf->setLogger(logger->l);
+}
+
+qpdflogger_handle
+qpdf_get_logger(qpdf_data qpdf)
+{
+    return new _qpdflogger_handle(qpdf->qpdf->getLogger());
 }
 
 void

@@ -140,6 +140,7 @@
 #include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
+#include <qpdf/qpdflogger-c.h>
 #include <string.h>
 
 #ifdef __cplusplus
@@ -248,6 +249,20 @@ extern "C" {
      */
     QPDF_DLL
     void qpdf_set_suppress_warnings(qpdf_data qpdf, QPDF_BOOL value);
+
+    /* LOG FUNCTIONS */
+
+    /* Set or get the current logger. You need to call
+     * qpdflogger_cleanup on the logger handles when you are done with
+     * the handles. The underlying logger is cleaned up automatically
+     * and persists if needed after the logger handle is destroyed.
+     * See comments in qpdflogger-c.h for details.
+     */
+
+    QPDF_DLL
+    void qpdf_set_logger(qpdf_data qpdf, qpdflogger_handle logger);
+    QPDF_DLL
+    qpdflogger_handle qpdf_get_logger(qpdf_data qpdf);
 
     /* CHECK FUNCTIONS */
 

@@ -6,5 +6,6 @@ json test passed
 WARNING: xref-with-short-size.pdf (xref stream, offset 16227): Cross-reference stream data has the wrong size; expected = 52; actual = 56
 qpdfjob json: operation succeeded with warnings; resulting file may have some problems
 json warn test passed
-qpdfjob json: an output file name is required; use - for standard output
+|custom|qpdfjob json|custom|: |custom|an output file name is required; use - for standard output|custom|
+|custom|qpdfjob json|custom|: |custom|an output file name is required; use - for standard output|custom|
 json error test passed

@@ -38,15 +38,27 @@ extern "C" {
 
     /* To operate on a logger, you need a handle to it. call
      * qpdflogger_default_logger to get a handle for the default
-     * logger. The qpdf and qpdfjob functions may offer ways to get
-     * other logger handles. When you're done with the logger handler,
-     * call qpdflogger_cleanup. This does not destroy the underlying
-     * log object. It just cleans up the handle to it.
+     * logger. There are functions in qpdf-c.h and qpdfjob-c.h that
+     * also take or return logger handles. When you're done with the
+     * logger handler, call qpdflogger_cleanup. This cleans up the
+     * handle but leaves the underlying log object intact. (It uses a
+     * shared pointer and will be cleaned up automatically when it is
+     * no longer in use.) That means you can create a logger with
+     * qpdflogger_create(), pass the logger handle to a function in
+     * qpdf-c.h or qpdfjob-c.h, and then clean it up, subject to
+     * constraints imposed by the other function.
      */
 
     typedef struct _qpdflogger_handle* qpdflogger_handle;
     QPDF_DLL
     qpdflogger_handle qpdflogger_default_logger();
+
+    /* Calling cleanup on the handle returned by qpdflogger_create
+     * destroys the handle but not the underlying logger. See comments
+     * above.
+     */
+    QPDF_DLL
+    qpdflogger_handle qpdflogger_create();
 
     QPDF_DLL
     void qpdflogger_cleanup(qpdflogger_handle* l);
@@ -94,6 +106,10 @@ extern "C" {
     QPDF_DLL
     void qpdflogger_save_to_standard_output(
         qpdflogger_handle l, int only_if_not_set);
+
+    /* For testing */
+    QPDF_DLL
+    int qpdflogger_equal(qpdflogger_handle l1, qpdflogger_handle l2);
 
 #ifdef __cplusplus
 }

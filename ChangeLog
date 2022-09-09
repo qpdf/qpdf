@@ -1,3 +1,8 @@
+2022-09-09  Jay Berkenbilt  <ejb@ql.org>
+
+        * Expose ability to create custom loggers and to get and set the
+        logger for QPDF and QPDFJob through the C API.
+
 2022-09-08  Jay Berkenbilt  <ejb@ql.org>
 
         * Added new functions to the C API to support qpdf JSON:

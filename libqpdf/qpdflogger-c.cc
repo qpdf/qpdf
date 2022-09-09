@@ -1,19 +1,13 @@
 #include <qpdf/qpdflogger-c.h>
 
+#include <qpdf/qpdflogger-c_impl.hh>
+
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Pl_Function.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFLogger.hh>
 #include <functional>
 #include <memory>
-
-struct _qpdflogger_handle
-{
-    _qpdflogger_handle(std::shared_ptr<QPDFLogger> l);
-    ~_qpdflogger_handle() = default;
-
-    std::shared_ptr<QPDFLogger> l;
-};
 
 _qpdflogger_handle::_qpdflogger_handle(std::shared_ptr<QPDFLogger> l) :
     l(l)
@@ -24,6 +18,12 @@ qpdflogger_handle
 qpdflogger_default_logger()
 {
     return new _qpdflogger_handle(QPDFLogger::defaultLogger());
+}
+
+qpdflogger_handle
+qpdflogger_create()
+{
+    return new _qpdflogger_handle(QPDFLogger::create());
 }
 
 void
@@ -124,4 +124,10 @@ qpdflogger_save_to_standard_output(qpdflogger_handle l, int only_if_not_set)
 {
     qpdflogger_set_save(
         l, qpdf_log_dest_stdout, nullptr, nullptr, only_if_not_set);
+}
+
+int
+qpdflogger_equal(qpdflogger_handle l1, qpdflogger_handle l2)
+{
+    return l1->l.get() == l2->l.get();
 }

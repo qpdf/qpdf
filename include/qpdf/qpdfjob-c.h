@@ -32,6 +32,7 @@
  */
 
 #include <qpdf/DLL.h>
+#include <qpdf/qpdflogger-c.h>
 #include <string.h>
 #ifndef QPDF_NO_WCHAR_T
 # include <wchar.h>
@@ -91,6 +92,18 @@ extern "C" {
 
     QPDF_DLL
     void qpdfjob_cleanup(qpdfjob_handle* j);
+
+    /* Set or get the current logger. You need to call
+     * qpdflogger_cleanup on the logger handles when you are done with
+     * the handles. The underlying logger is cleaned up automatically
+     * and persists if needed after the logger handle is destroyed.
+     * See comments in qpdflogger-c.h for details.
+     */
+
+    QPDF_DLL
+    void qpdfjob_set_logger(qpdfjob_handle j, qpdflogger_handle logger);
+    QPDF_DLL
+    qpdflogger_handle qpdfjob_get_logger(qpdfjob_handle j);
 
     /* This function wraps QPDFJob::initializeFromArgv. The return
      * value is the same as qpdfjob_run. If this returns an error, it
