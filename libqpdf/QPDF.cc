@@ -1942,7 +1942,7 @@ QPDF::readObjectAtOffset(
 void
 QPDF::resolve(QPDFObjGen const& og)
 {
-    if (isCached(og) && !isUnresolved(og)) {
+    if (!isUnresolved(og)) {
         // We only need to resolve unresolved objects
         return;
     }
@@ -2176,9 +2176,8 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
 QPDFObjectHandle
 QPDF::reserveObjectIfNotExists(QPDFObjGen const& og)
 {
-    if (!isCached(og) && !m->xref_table.count(og)) {
-        resolve(og);
-        m->obj_cache[og].object = QPDF_Reserved::create();
+    if (!isCached(og) && m->xref_table.count(og) == 0) {
+        updateCache(og, QPDF_Reserved::create(), -1, -1);
         return newIndirect(og, m->obj_cache[og].object);
     } else {
         return getObject(og);
@@ -2192,16 +2191,19 @@ QPDF::reserveStream(QPDFObjGen const& og)
         this, og, QPDFObjectHandle::newDictionary(), 0, 0);
 }
 
-QPDFObjectHandle
-QPDF::getObject(QPDFObjGen const& og)
+std::shared_ptr<QPDFObject>
+QPDF::getCachedObject(QPDFObjGen const& og)
 {
-    if (!og.isIndirect()) {
-        return QPDFObjectHandle::newNull();
-    }
     if (!isCached(og)) {
         m->obj_cache[og] = ObjCache(QPDF_Unresolved::create(this, og), -1, -1);
     }
-    return newIndirect(og, m->obj_cache[og].object);
+    return m->obj_cache[og].object;
+}
+
+QPDFObjectHandle
+QPDF::getObject(QPDFObjGen const& og)
+{
+    return og.isIndirect() ? newIndirect(og, getCachedObject(og)) : QPDFObjectHandle::newNull();
 }
 
 QPDFObjectHandle
@@ -2236,10 +2238,6 @@ QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
         throw std::logic_error(
             "QPDF::replaceObject called with indirect object handle");
     }
-    // Force new object to appear in the cache
-    resolve(og);
-
-    // Replace the object in the object cache
     updateCache(og, QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
 }
 
@@ -2558,10 +2556,10 @@ QPDF::swapObjects(int objid1, int generation1, int objid2, int generation2)
 void
 QPDF::swapObjects(QPDFObjGen const& og1, QPDFObjGen const& og2)
 {
-    // Force objects to be loaded into cache; then swap them in the
-    // cache.
-    resolve(og1);
-    resolve(og2);
+    // Force objects to be loaded into cache and resolved; then swap them in
+    // the cache.
+    resolve(getCachedObject(og1)->getObjGen());
+    resolve(getCachedObject(og2)->getObjGen());
     m->obj_cache[og1].object->swapWith(m->obj_cache[og2].object);
 }
 

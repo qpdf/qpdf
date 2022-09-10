@@ -1189,6 +1189,7 @@ class QPDF
     newIndirect(QPDFObjGen const&, std::shared_ptr<QPDFObject> const&);
     bool isCached(QPDFObjGen const& og);
     bool isUnresolved(QPDFObjGen const& og);
+    std::shared_ptr<QPDFObject> getCachedObject(QPDFObjGen const& og);
     void updateCache(
         QPDFObjGen const& og,
         std::shared_ptr<QPDFObject> const& object,
