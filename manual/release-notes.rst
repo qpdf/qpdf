@@ -8,7 +8,7 @@ For a detailed list of changes, please see the file
 
 .. x.y.z: not yet released
 
-11.0.0: not yet released
+11.0.0: September 10, 2022
   - Replacement of ``PointerHolder`` with ``std::shared_ptr``
 
     - The qpdf-specific ``PointerHolder`` smart pointer implementation
