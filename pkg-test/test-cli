@@ -11,7 +11,9 @@ if [ ! -d "$TMP" ]; then
     exit 2
 fi
 
-qpdf --version
+WANTED_VERSION=$(awk -F'"' '/#define QPDF_VERSION / {print $2}' include/qpdf/DLL.h)
+
+qpdf --version | grep -F $WANTED_VERSION
 qpdf --help
 qpdf --check qpdf/qtest/qpdf/minimal.pdf
 qpdf qpdf/qtest/qpdf/minimal.pdf --encrypt u o 256 -- $TMP/out.pdf

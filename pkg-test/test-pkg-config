@@ -13,11 +13,18 @@ if [ ! -d "$TMP" ]; then
     exit 2
 fi
 
+WANTED_VERSION=$(awk -F'"' '/#define QPDF_VERSION / {print $2}' include/qpdf/DLL.h)
+
 cp pkg-test/qpdf-version.cc $TMP
 cd $TMP
-pkg-config libqpdf --modversion
+if [ "$(pkg-config libqpdf --modversion)" != "$WANTED_VERSION" ]; then
+    echo 1>&2 "Failed to get correct qpdf version from pkg-config --modversion"
+fi
 pkg-config libqpdf --libs --static
 g++ qpdf-version.cc -o qpdf-version \
     $(pkg-config libqpdf --cflags) \
     $(pkg-config libqpdf --libs)
-./qpdf-version
+if [ "$(./qpdf-version)" != "$WANTED_VERSION" ]; then
+    echo 1>&2 "Failed to get correct qpdf version from pkg-config test"
+    exit 2
+fi
