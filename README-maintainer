@@ -340,11 +340,12 @@ RELEASE PREPARATION
     `make_dist` verifies this consistency.
 
 * Update release notes in manual. Look at diffs and ChangeLog.
-  Update release date in `manual/release-notes.rst`.
+  Update release date in `manual/release-notes.rst`. Change "not yet
+  released" to an actual date for the release.
 
 * Add a release entry to ChangeLog: "x.y.z: release"
 
-* Commit title: "Prepare x.y.z release"
+* Commit changes with title "Prepare x.y.z release"
 
 * Performance test is included with binary compatibility steps. Even
   if releasing a new major release and not doing binary compatibility
