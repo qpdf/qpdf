@@ -1,9 +1,8 @@
 #!/bin/sh
 #
 # Test that the installed qpdf development packages enable a qpdf
-# application to be build with cmake using qpdf's cmake package
-# information. Requires cmake as well as libqpdf development
-# dependencies.
+# application to be built with cmake. Requires cmake as well as
+# libqpdf development dependencies.
 #
 set -ex
 
