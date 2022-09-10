@@ -398,7 +398,7 @@ Prior to qpdf 11, the functionality of the ``QPDFValue`` and
 ``QPDFObject`` classes were contained in a single ``QPDFObject``
 class, which served the dual purpose of being the cache entry for
 ``QPDF`` and being the abstract base class for all the different PDF
-object types. The behavior was nearly the same, but there were a few
+object types. The behavior was nearly the same, but there were some
 problems:
 
 - While changes to a ``QPDFObjectHandle`` through mutation were
@@ -412,11 +412,6 @@ problems:
   replace its internal ``QPDFObject`` pointer. This added overhead to
   every indirect object access even if no objects were ever changed.
 
-- When a ``QPDF`` object was destroyed, it was necessary to
-  recursively traverse the structure of every object in the file to
-  break any circular references. For complex files, this significantly
-  increased the cost of destroying ``QPDF`` objects.
-
 - When a ``QPDF`` object was destroyed, any ``QPDFObjectHandle``
   objects that referenced it would maintain a potentially invalid
   pointer as the owning ``QPDF``. In practice, this wasn't usually a
@@ -426,8 +421,8 @@ problems:
   software to do its own bookkeeping to ensure that an object's owner
   was still valid.
 
-All of these problems were effectively solved by splitting
-``QPDFObject`` into ``QPDFObject`` and ``QPDFValue``.
+These problems were solved by splitting ``QPDFObject`` into
+``QPDFObject`` and ``QPDFValue``.
 
 .. _casting:
 
