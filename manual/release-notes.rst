@@ -8,7 +8,7 @@ For a detailed list of changes, please see the file
 
 .. x.y.z: not yet released
 
-11.0.1: not yet released
+11.1.0: not yet released
   - Build fixes
 
     - Remove ``LL_FMT`` tests, which were broken for cross
