@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <qpdf/qpdf-config.h> // for LL_FMT -- special case in build
-
 static char* whoami = 0;
 static qpdf_data qpdf = 0;
 
@@ -42,11 +40,10 @@ safe_fopen(char const* filename, char const* mode)
 static void
 print_error(char const* label, qpdf_data q, qpdf_error e)
 {
-#define POS_FMT "  pos : " LL_FMT "\n"
     printf("%s: %s\n", label, qpdf_get_error_full_text(q, e));
     printf("  code: %d\n", qpdf_get_error_code(q, e));
     printf("  file: %s\n", qpdf_get_error_filename(q, e));
-    printf(POS_FMT, qpdf_get_error_file_position(q, e));
+    printf("  pos: %lld\n", qpdf_get_error_file_position(q, e));
     printf("  text: %s\n", qpdf_get_error_message_detail(q, e));
 }
 

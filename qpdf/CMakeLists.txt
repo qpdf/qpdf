@@ -27,7 +27,6 @@ foreach(PROG ${MAIN_C_PROGRAMS})
   target_link_libraries(${PROG} libqpdf)
   set_property(TARGET ${PROG} PROPERTY LINKER_LANGUAGE CXX)
 endforeach()
-target_include_directories(qpdf-ctest PRIVATE ${CMAKE_BINARY_DIR}/libqpdf)
 target_include_directories(sizes PRIVATE ${JPEG_INCLUDE})
 
 set(needs_private_headers

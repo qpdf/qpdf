@@ -361,24 +361,6 @@ if(LFS_WITH_MACROS AND NOT LFS_WITHOUT_MACROS)
   set(_FILE_OFFSET_BITS 64)
 endif()
 
-function(qpdf_check_ll_fmt fmt var)
-  if(NOT DEFINED LL_FMT)
-    check_c_source_runs(
-      "#define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
-#include <string.h>
-int main(int argc, char* argv[]) {
-    long long int a = 123456789012345ll;
-    char s[30];
-    sprintf(s, \"${fmt}\", a);
-    return (strcmp(s, \"123456789012345\") == 0) ? 0 : 1;
-}" ${var})
-    if(${var})
-      set(LL_FMT "${fmt}" PARENT_SCOPE)
-    endif()
-  endif()
-endfunction()
-
 check_c_source_compiles(
 "#include <malloc.h>
 #include <stdio.h>
@@ -401,10 +383,6 @@ int main(int argc, char* argv[]) {
     return 0;
 }"
     HAVE_OPEN_MEMSTREAM)
-
-qpdf_check_ll_fmt("%lld" fmt_lld)
-qpdf_check_ll_fmt("%I64d" fmt_i64d)
-qpdf_check_ll_fmt("%I64lld" fmt_i64lld)
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/qpdf/qpdf-config.h.in"

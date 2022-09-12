@@ -1,3 +1,8 @@
+2022-09-12  Jay Berkenbilt  <ejb@ql.org>
+
+        * Remove compile-time test for LL_FMT. It's unlikely that any
+        compiler new enough to build qpdf still doesn't support %lld.
+
 2022-09-10  Jay Berkenbilt  <ejb@ql.org>
 
         * 11.0.0: release

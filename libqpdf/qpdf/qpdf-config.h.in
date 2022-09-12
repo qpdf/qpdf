@@ -24,9 +24,6 @@
 #cmakedefine HAVE_MALLOC_INFO 1
 #cmakedefine HAVE_OPEN_MEMSTREAM 1
 
-/* printf format for long long */
-#cmakedefine LL_FMT "${LL_FMT}"
-
 /* system random device (e.g. /dev/random) if any */
 #cmakedefine RANDOM_DEVICE "${RANDOM_DEVICE}"
 

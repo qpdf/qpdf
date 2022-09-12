@@ -8,6 +8,12 @@ For a detailed list of changes, please see the file
 
 .. x.y.z: not yet released
 
+11.0.1: not yet released
+  - Build fixes
+
+    - Remove ``LL_FMT`` tests, which were broken for cross
+      compilation. The code just uses ``%lld`` now.
+
 11.0.0: September 10, 2022
   - Replacement of ``PointerHolder`` with ``std::shared_ptr``
 

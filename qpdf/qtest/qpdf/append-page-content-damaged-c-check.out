@@ -7,16 +7,16 @@ encrypted: 0
 warning: append-page-content-damaged.pdf: file is damaged
   code: 5
   file: append-page-content-damaged.pdf
-  pos : 0
+  pos: 0
   text: file is damaged
 warning: append-page-content-damaged.pdf: can't find startxref
   code: 5
   file: append-page-content-damaged.pdf
-  pos : 0
+  pos: 0
   text: can't find startxref
 warning: append-page-content-damaged.pdf: Attempting to reconstruct cross-reference table
   code: 5
   file: append-page-content-damaged.pdf
-  pos : 0
+  pos: 0
   text: Attempting to reconstruct cross-reference table
 C test 1 done

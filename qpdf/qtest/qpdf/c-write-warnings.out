@@ -1,21 +1,21 @@
 warning: bad33.pdf: file is damaged
   code: 5
   file: bad33.pdf
-  pos : 0
+  pos: 0
   text: file is damaged
 warning: bad33.pdf (offset 1771): xref not found
   code: 5
   file: bad33.pdf
-  pos : 1771
+  pos: 1771
   text: xref not found
 warning: bad33.pdf: Attempting to reconstruct cross-reference table
   code: 5
   file: bad33.pdf
-  pos : 0
+  pos: 0
   text: Attempting to reconstruct cross-reference table
 warning: bad33.pdf (offset 629): stream filter type is not name or array
   code: 5
   file: bad33.pdf
-  pos : 629
+  pos: 629
   text: stream filter type is not name or array
 C test 2 done
