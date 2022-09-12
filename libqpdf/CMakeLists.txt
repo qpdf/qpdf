@@ -402,9 +402,16 @@ int main(int argc, char* argv[]) {
 }"
     HAVE_OPEN_MEMSTREAM)
 
-qpdf_check_ll_fmt("%lld" fmt_lld)
-qpdf_check_ll_fmt("%I64d" fmt_i64d)
-qpdf_check_ll_fmt("%I64lld" fmt_i64lld)
+if (NOT CMAKE_CROSSCOMPILING)
+  qpdf_check_ll_fmt("%lld" fmt_lld)
+  qpdf_check_ll_fmt("%I64d" fmt_i64d)
+  qpdf_check_ll_fmt("%I64lld" fmt_i64lld)
+else()
+  if (NOT DEFINED LL_FMT)
+    message(WARNING "Assuming LL_FMT is '%lld' as we are cross-compiling. This may be wrong. Please set LL_FMT if needed.")
+    set(LL_FMT "%lld")
+  endif()
+endif()
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/qpdf/qpdf-config.h.in"
