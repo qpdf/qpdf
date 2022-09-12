@@ -16,7 +16,7 @@ project = 'QPDF'
 copyright = '2005-2022, Jay Berkenbilt'
 author = 'Jay Berkenbilt'
 # make_dist and the CI build lexically find the release version from this file.
-release = '11.0.0'
+release = '11.0.1'
 version = release
 extensions = [
     'sphinx_rtd_theme',
