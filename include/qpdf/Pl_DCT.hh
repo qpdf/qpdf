@@ -41,7 +41,9 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
     class QPDF_DLL_CLASS CompressConfig
     {
       public:
+        QPDF_DLL
         CompressConfig() = default;
+        QPDF_DLL
         virtual ~CompressConfig() = default;
         virtual void apply(jpeg_compress_struct*) = 0;
     };

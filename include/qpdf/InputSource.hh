@@ -47,7 +47,9 @@ class QPDF_DLL_CLASS InputSource
     class QPDF_DLL_CLASS Finder
     {
       public:
+        QPDF_DLL
         Finder() = default;
+        QPDF_DLL
         virtual ~Finder() = default;
         virtual bool check() = 0;
     };

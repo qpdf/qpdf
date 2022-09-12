@@ -14,6 +14,9 @@ For a detailed list of changes, please see the file
     - Remove ``LL_FMT`` tests, which were broken for cross
       compilation. The code just uses ``%lld`` now.
 
+    - Some symbols were not properly exported for the Windows DLL
+      build.
+
 11.0.0: September 10, 2022
   - Replacement of ``PointerHolder`` with ``std::shared_ptr``
 

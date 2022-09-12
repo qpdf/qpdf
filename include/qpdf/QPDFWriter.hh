@@ -81,6 +81,7 @@ class QPDFWriter
     class QPDF_DLL_CLASS ProgressReporter
     {
       public:
+        QPDF_DLL
         virtual ~ProgressReporter();
 
         // This method is called with a value from 0 to 100 to
@@ -95,8 +96,11 @@ class QPDFWriter
     class QPDF_DLL_CLASS FunctionProgressReporter: public ProgressReporter
     {
       public:
+        QPDF_DLL
         FunctionProgressReporter(std::function<void(int)>);
+        QPDF_DLL
         virtual ~FunctionProgressReporter();
+        QPDF_DLL
         virtual void reportProgress(int) override;
 
       private:

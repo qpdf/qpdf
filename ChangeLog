@@ -1,5 +1,7 @@
 2022-09-12  Jay Berkenbilt  <ejb@ql.org>
 
+        * Add some missing DLL exports that only affect the Windows build.
+
         * Remove compile-time test for LL_FMT. It's unlikely that any
         compiler new enough to build qpdf still doesn't support %lld.
 
