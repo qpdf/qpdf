@@ -1942,8 +1942,7 @@ QPDF::readObjectAtOffset(
 void
 QPDF::resolve(QPDFObjGen const& og)
 {
-    if (isCached(og) && !isUnresolved(og)) {
-        // We only need to resolve unresolved objects
+    if (!isUnresolved(og)) {
         return;
     }
 
@@ -2173,9 +2172,8 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
 QPDFObjectHandle
 QPDF::reserveObjectIfNotExists(QPDFObjGen const& og)
 {
-    if (!isCached(og) && !m->xref_table.count(og)) {
-        resolve(og);
-        m->obj_cache[og].object = QPDF_Reserved::create();
+    if (!isCached(og) && m->xref_table.count(og) == 0) {
+        updateCache(og, QPDF_Reserved::create(), -1, -1);
         return newIndirect(og, m->obj_cache[og].object);
     } else {
         return getObject(og);
@@ -2233,10 +2231,6 @@ QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
         throw std::logic_error(
             "QPDF::replaceObject called with indirect object handle");
     }
-    // Force new object to appear in the cache
-    resolve(og);
-
-    // Replace the object in the object cache
     updateCache(og, QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
 }
 
