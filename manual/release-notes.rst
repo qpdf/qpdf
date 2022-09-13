@@ -17,6 +17,11 @@ For a detailed list of changes, please see the file
     - Some symbols were not properly exported for the Windows DLL
       build.
 
+  - Packaging note omitted from 11.0.0 release notes:
+
+    - On GitHub, the release tags are now `vX.Y.Z` instead of
+      `release-qpdf-X.Y.Z` to be more consistent with current practice.
+
 11.0.0: September 10, 2022
   - Replacement of ``PointerHolder`` with ``std::shared_ptr``
 
@@ -309,6 +314,9 @@ For a detailed list of changes, please see the file
     - Add a move constructor to the ``Buffer`` class.
 
   - Other changes
+
+    - On GitHub, the release tags are now `vX.Y.Z` instead of
+      `release-qpdf-X.Y.Z` to be more consistent with current practice.
 
     - In JSON v1 mode, the ``"objects"`` key now reflects the repaired
       pages tree if ``"pages"`` (or any other key that has the side
