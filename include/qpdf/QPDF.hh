@@ -875,8 +875,8 @@ class QPDF
     };
     friend class Resolver;
 
-    // ParseGuard class allows QPDFObjectHandle to detect re-entrant
-    // resolution
+    // The ParseGuard class allows QPDFObjectHandle to detect
+    // re-entrant parsing.
     class ParseGuard
     {
         friend class QPDFParser;

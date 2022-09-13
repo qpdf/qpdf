@@ -1947,9 +1947,6 @@ QPDF::resolve(QPDFObjGen const& og)
         return;
     }
 
-    // Check object cache before checking xref table.  This allows us
-    // to insert things into the object cache that don't actually
-    // exist in the file.
     if (this->m->resolving.count(og)) {
         // This can happen if an object references itself directly or
         // indirectly in some key that has to be resolved during
@@ -2558,8 +2555,8 @@ QPDF::swapObjects(int objid1, int generation1, int objid2, int generation2)
 void
 QPDF::swapObjects(QPDFObjGen const& og1, QPDFObjGen const& og2)
 {
-    // Force objects to be loaded into cache; then swap them in the
-    // cache.
+    // Force objects to be read from the input source if needed, then
+    // swap them in the cache.
     resolve(og1);
     resolve(og2);
     m->obj_cache[og1].object->swapWith(m->obj_cache[og2].object);
