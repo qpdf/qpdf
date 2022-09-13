@@ -1940,12 +1940,13 @@ QPDF::readObjectAtOffset(
 }
 
 void
-QPDF::resolve(QPDFObjGen const& og)
+QPDF::resolve(QPDFObject const& obj)
 {
-    if (!isUnresolved(og)) {
+    if (!obj.isUnresolved()) {
         // We only need to resolve unresolved objects
         return;
     }
+    auto og = obj.getObjGen();
 
     // Check object cache before checking xref table.  This allows us
     // to insert things into the object cache that don't actually
@@ -2558,8 +2559,8 @@ QPDF::swapObjects(QPDFObjGen const& og1, QPDFObjGen const& og2)
 {
     // Force objects to be loaded into cache and resolved; then swap them in
     // the cache.
-    resolve(getCachedObject(og1)->getObjGen());
-    resolve(getCachedObject(og2)->getObjGen());
+    resolve(*getCachedObject(og1));
+    resolve(*getCachedObject(og2));
     m->obj_cache[og1].object->swapWith(m->obj_cache[og2].object);
 }
 

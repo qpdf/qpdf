@@ -850,9 +850,9 @@ class QPDF
 
       private:
         static void
-        resolve(QPDF* qpdf, QPDFObjGen const& og)
+        resolve(QPDF* qpdf, QPDFObject const& obj)
         {
-            qpdf->resolve(og);
+            qpdf->resolve(obj);
         }
     };
     friend class Resolver;
@@ -1180,7 +1180,7 @@ class QPDF
         std::string const& description,
         QPDFObjGen const& exp_og,
         QPDFObjGen& og);
-    void resolve(QPDFObjGen const& og);
+    void resolve(QPDFObject const& obj);
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
     QPDFObjectHandle reserveObjectIfNotExists(QPDFObjGen const& og);
