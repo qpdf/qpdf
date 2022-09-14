@@ -330,11 +330,7 @@ class QPDFObjectHandle
     QPDF_DLL
     QPDFObjectHandle(QPDFObjectHandle const&) = default;
     QPDF_DLL
-    QPDFObjectHandle(QPDFObjectHandle&&) = default;
-    QPDF_DLL
     QPDFObjectHandle& operator=(QPDFObjectHandle const&) = default;
-    QPDF_DLL
-    QPDFObjectHandle& operator=(QPDFObjectHandle&&) = default;
     QPDF_DLL
     inline bool isInitialized() const;
 
