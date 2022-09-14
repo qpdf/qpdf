@@ -1,5 +1,10 @@
 2022-09-14  Jay Berkenbilt  <ejb@ql.org>
 
+        * 11.1.0: release
+
+        * Add notes to documentation clarifying that installing the dev
+        component usually requires the lib component to also be installed.
+
         * Set CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON in cmake to
         (hopefully) solve the problem of older installed qpdf headers
         interfering with building qpdf from source. Fixes #763.
