@@ -111,6 +111,7 @@ if(NOT (BUILD_STATIC_LIBS OR BUILD_SHARED_LIBS))
     FATAL_ERROR "At least one of static or shared libraries must be built")
 endif()
 
+set(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 add_compile_definitions($<$<COMPILE_LANGUAGE:CXX>:POINTERHOLDER_TRANSITION=4>)
 
 if(ENABLE_QTC)

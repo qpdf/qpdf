@@ -17,6 +17,10 @@ For a detailed list of changes, please see the file
     - Some symbols were not properly exported for the Windows DLL
       build.
 
+    - Force project-specific header files to precede all others in the
+      build so that a previous qpdf installation won't break building
+      qpdf from source.
+
   - Packaging note omitted from 11.0.0 release notes:
 
     - On GitHub, the release tags are now `vX.Y.Z` instead of
