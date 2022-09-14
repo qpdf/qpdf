@@ -1458,7 +1458,7 @@ QPDF::getObjectCount()
     // fixDanglingReferences is called, all objects in the xref table
     // will also be in obj_cache.
     fixDanglingReferences();
-    QPDFObjGen og(0, 0);
+    QPDFObjGen og;
     if (!this->m->obj_cache.empty()) {
         og = (*(this->m->obj_cache.rbegin())).first;
     }
