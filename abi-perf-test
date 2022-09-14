@@ -89,6 +89,7 @@ $source/check_abi compare --old-lib $work/old/libqpdf.so.*.* \
   --new-lib build/libqpdf/libqpdf.so \
   --old-sizes $work/old/sizes --new-sizes $work/new/sizes
 
+test_warn=0
 if [ "$SKIP_TESTS" != "1" ]; then
     # Switch back to the previous release and run tests. There may be
     # some failures based on functionality change. We are looking for
@@ -97,14 +98,7 @@ if [ "$SKIP_TESTS" != "1" ]; then
     set +e
     (cd build; ctest --verbose)
     if [ $? != 0 ]; then
-        cat <<EOF
-
-**********************************************************************
-There were some test failures; inspect to determine whether they are
-ABI-related.
-**********************************************************************
-
-EOF
+        test_warn=1
     fi
     set -e
 fi
@@ -120,4 +114,17 @@ if [ "$SKIP_PERF" != "1" ]; then
     cmake --build build -j$(nproc)
     $source/performance_check --dir $source/../performance-test-files | \
         tee -a $work/perf
+fi
+
+if [ $test_warn = 1 ]; then
+    cat <<EOF
+
+**********************************************************************
+There were some test failures; inspect to determine whether they are
+ABI-related.
+
+Check test results in $work/qpdf/build
+**********************************************************************
+
+EOF
 fi

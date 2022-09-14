@@ -353,7 +353,7 @@ RELEASE PREPARATION
 
 * Test for performance and binary compatibility:
 
-  ./abi-perf-test release-<old> @
+  ./abi-perf-test v<old> @
 
   Prefix with SKIP_PERF=1 to skip performance test.
   Prefix with SKIP_TESTS=1 to skip test suite run.
