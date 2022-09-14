@@ -190,6 +190,41 @@ There are several components that can be installed separately:
    - - examples
      - Example source files
 
+Note that the ``lib`` component installs only runtime libraries, not
+header files or other files/links needed to build against qpdf. For
+that, you need ``dev``. If you are using shared libraries, the ``dev``
+will install files or create symbolic links that depend on files
+installed by ``lib``, so you will need to install both. If you wanted
+to build software against the qpdf library and only wanted to install
+the files you needed for that purpose, here are some examples:
+
+- Install development files with static libraries only:
+
+  ::
+
+     cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF
+     cmake --build build --parallel --target libqpdf
+     cmake --install build --component dev
+
+- Install development files with shared libraries only:
+
+  ::
+
+     cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_STATIC_LIBS=OFF
+     cmake --build build --parallel --target libqpdf
+     cmake --install build --component lib
+     cmake --install build --component dev
+
+
+- Install development files with shared and static libraries:
+
+  ::
+
+     cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+     cmake --build build --parallel --target libqpdf libqpdf_static
+     cmake --install build --component lib
+     cmake --install build --component dev
+
 There are also separate options, discussed in :ref:`build-options`,
 that control how certain specific parts of the software are installed.
 
