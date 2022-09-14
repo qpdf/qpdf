@@ -23,8 +23,9 @@ For a detailed list of changes, please see the file
 
   - Packaging note omitted from 11.0.0 release notes:
 
-    - On GitHub, the release tags are now `vX.Y.Z` instead of
-      `release-qpdf-X.Y.Z` to be more consistent with current practice.
+    - On GitHub, the release tags are now ``vX.Y.Z`` instead of
+      ``release-qpdf-X.Y.Z`` to be more consistent with current
+      practice.
 
 11.0.0: September 10, 2022
   - Replacement of ``PointerHolder`` with ``std::shared_ptr``
