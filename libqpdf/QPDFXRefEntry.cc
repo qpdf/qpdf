@@ -17,8 +17,7 @@ QPDFXRefEntry::QPDFXRefEntry(int type, qpdf_offset_t field1, int field2) :
     field2(field2)
 {
     if ((type < 1) || (type > 2)) {
-        throw std::logic_error(
-            "invalid xref type " + QUtil::int_to_string(type));
+        throw std::logic_error("invalid xref type " + std::to_string(type));
     }
 }
 

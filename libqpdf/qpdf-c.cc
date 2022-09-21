@@ -994,7 +994,7 @@ do_with_oh(
             throw QPDFExc(
                 qpdf_e_internal,
                 q->qpdf->getFilename(),
-                std::string("C API object handle ") + QUtil::uint_to_string(oh),
+                std::string("C API object handle ") + std::to_string(oh),
                 0,
                 "attempted access to unknown object handle");
         }

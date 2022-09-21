@@ -869,8 +869,8 @@ QPDF::initializeEncryption()
             "encryption dictionary",
             this->m->file->getLastOffset(),
             "Unsupported /R or /V in encryption dictionary; R = " +
-                QUtil::int_to_string(R) +
-                " (max 6), V = " + QUtil::int_to_string(V) + " (max 5)");
+                std::to_string(R) + " (max 6), V = " + std::to_string(V) +
+                " (max 5)");
     }
 
     this->m->encp->encryption_V = V;

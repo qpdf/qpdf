@@ -104,7 +104,7 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(
                 std::string append;
                 while (!getFieldsWithQualifiedName(new_name).empty()) {
                     ++suffix;
-                    append = "+" + QUtil::int_to_string(suffix);
+                    append = "+" + std::to_string(suffix);
                     new_name = old_name + append;
                 }
                 renames[old_name] = append;

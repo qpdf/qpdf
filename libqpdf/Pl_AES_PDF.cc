@@ -53,7 +53,7 @@ Pl_AES_PDF::setIV(unsigned char const* iv, size_t bytes)
         throw std::logic_error(
             "Pl_AES_PDF: specified initialization vector"
             " size in bytes must be " +
-            QUtil::uint_to_string(bytes));
+            std::to_string(bytes));
     }
     this->use_specified_iv = true;
     memcpy(this->specified_iv, iv, bytes);

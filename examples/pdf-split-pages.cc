@@ -24,8 +24,7 @@ process(char const* whoami, char const* infile, std::string outprefix)
     inpdf.processFile(infile);
     std::vector<QPDFPageObjectHelper> pages =
         QPDFPageDocumentHelper(inpdf).getAllPages();
-    int pageno_len =
-        QIntC::to_int(QUtil::uint_to_string(pages.size()).length());
+    int pageno_len = QIntC::to_int(std::to_string(pages.size()).length());
     int pageno = 0;
     for (auto& page: pages) {
         std::string outfile =

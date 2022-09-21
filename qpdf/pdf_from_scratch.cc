@@ -78,7 +78,7 @@ runtest(int n)
         w.write();
     } else {
         throw std::runtime_error(
-            std::string("invalid test ") + QUtil::int_to_string(n));
+            std::string("invalid test ") + std::to_string(n));
     }
 
     std::cout << "test " << n << " done" << std::endl;

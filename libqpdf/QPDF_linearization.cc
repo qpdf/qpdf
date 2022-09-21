@@ -534,7 +534,7 @@ QPDF::checkLinearizationInternal()
         QPDFObjGen og(page.getObjGen());
         if (this->m->xref_table[og].getType() == 2) {
             errors.push_back(
-                "page dictionary for page " + QUtil::uint_to_string(i) +
+                "page dictionary for page " + std::to_string(i) +
                 " is compressed");
         }
     }
@@ -554,8 +554,8 @@ QPDF::checkLinearizationInternal()
         errors.push_back(
             "space before first xref item (/T) mismatch "
             "(computed = " +
-            QUtil::int_to_string(this->m->first_xref_item_offset) +
-            "; file = " + QUtil::int_to_string(this->m->file->tell()));
+            std::to_string(this->m->first_xref_item_offset) +
+            "; file = " + std::to_string(this->m->file->tell()));
     }
 
     // P: first page number -- Implementation note 124 says Acrobat
@@ -619,8 +619,8 @@ QPDF::checkLinearizationInternal()
         QTC::TC("qpdf", "QPDF warn /E mismatch");
         warnings.push_back(
             "end of first page section (/E) mismatch: /E = " +
-            QUtil::int_to_string(p.first_page_end) + "; computed = " +
-            QUtil::int_to_string(min_E) + ".." + QUtil::int_to_string(max_E));
+            std::to_string(p.first_page_end) + "; computed = " +
+            std::to_string(min_E) + ".." + std::to_string(max_E));
     }
 
     // Check hint tables
@@ -717,8 +717,8 @@ QPDF::lengthNextN(int first_object, int n, std::list<std::string>& errors)
         QPDFObjGen og(first_object + i, 0);
         if (this->m->xref_table.count(og) == 0) {
             errors.push_back(
-                "no xref table entry for " +
-                QUtil::int_to_string(first_object + i) + " 0");
+                "no xref table entry for " + std::to_string(first_object + i) +
+                " 0");
         } else {
             if (this->m->obj_cache.count(og) == 0) {
                 stopOnError("found unknown object while"
@@ -785,10 +785,9 @@ QPDF::checkHPageOffset(
         if (h_nobjects != ce.nobjects) {
             // This happens with pdlin when there are thumbnails.
             warnings.push_back(
-                "object count mismatch for page " +
-                QUtil::int_to_string(pageno) +
-                ": hint table = " + QUtil::int_to_string(h_nobjects) +
-                "; computed = " + QUtil::int_to_string(ce.nobjects));
+                "object count mismatch for page " + std::to_string(pageno) +
+                ": hint table = " + std::to_string(h_nobjects) +
+                "; computed = " + std::to_string(ce.nobjects));
         }
 
         // Use value for number of objects in hint table rather than
@@ -800,11 +799,10 @@ QPDF::checkHPageOffset(
             // This condition almost certainly indicates a bad hint
             // table or a bug in this code.
             errors.push_back(
-                "page length mismatch for page " +
-                QUtil::int_to_string(pageno) +
-                ": hint table = " + QUtil::int_to_string(h_length) +
-                "; computed length = " + QUtil::int_to_string(length) +
-                " (offset = " + QUtil::int_to_string(offset) + ")");
+                "page length mismatch for page " + std::to_string(pageno) +
+                ": hint table = " + std::to_string(h_length) +
+                "; computed length = " + std::to_string(length) +
+                " (offset = " + std::to_string(offset) + ")");
         }
 
         offset += h_length;
@@ -841,8 +839,8 @@ QPDF::checkHPageOffset(
             if (!computed_shared.count(iter)) {
                 // pdlin puts thumbnails here even though it shouldn't
                 warnings.push_back(
-                    "page " + QUtil::int_to_string(pageno) +
-                    ": shared object " + QUtil::int_to_string(iter) +
+                    "page " + std::to_string(pageno) + ": shared object " +
+                    std::to_string(iter) +
                     ": in hint table but not computed list");
             }
         }
@@ -853,8 +851,8 @@ QPDF::checkHPageOffset(
                 // built-in fonts and procsets here, at least in some
                 // cases.
                 warnings.push_back(
-                    "page " + QUtil::int_to_string(pageno) +
-                    ": shared object " + QUtil::int_to_string(iter) +
+                    "page " + std::to_string(pageno) + ": shared object " +
+                    std::to_string(iter) +
                     ": in computed list but not hint table");
             }
         }
@@ -906,8 +904,8 @@ QPDF::checkHSharedObject(
                         errors.push_back(
                             "first shared object number mismatch: "
                             "hint table = " +
-                            QUtil::int_to_string(so.first_shared_obj) +
-                            "; computed = " + QUtil::int_to_string(obj));
+                            std::to_string(so.first_shared_obj) +
+                            "; computed = " + std::to_string(obj));
                     }
                 }
 
@@ -923,8 +921,8 @@ QPDF::checkHSharedObject(
                 if (offset != h_offset) {
                     errors.push_back(
                         "first shared object offset mismatch: hint table = " +
-                        QUtil::int_to_string(h_offset) +
-                        "; computed = " + QUtil::int_to_string(offset));
+                        std::to_string(h_offset) +
+                        "; computed = " + std::to_string(offset));
                 }
             }
 
@@ -935,10 +933,10 @@ QPDF::checkHSharedObject(
             int h_length = so.min_group_length + se.delta_group_length;
             if (length != h_length) {
                 errors.push_back(
-                    "shared object " + QUtil::int_to_string(i) +
+                    "shared object " + std::to_string(i) +
                     " length mismatch: hint table = " +
-                    QUtil::int_to_string(h_length) +
-                    "; computed = " + QUtil::int_to_string(length));
+                    std::to_string(h_length) +
+                    "; computed = " + std::to_string(length));
             }
             cur_object += nobjects;
         }
@@ -985,15 +983,15 @@ QPDF::checkHOutlines(std::list<std::string>& warnings)
             if (offset != table_offset) {
                 warnings.push_back(
                     "incorrect offset in outlines table: hint table = " +
-                    QUtil::int_to_string(table_offset) +
-                    "; computed = " + QUtil::int_to_string(offset));
+                    std::to_string(table_offset) +
+                    "; computed = " + std::to_string(offset));
             }
             int table_length = this->m->outline_hints.group_length;
             if (length != table_length) {
                 warnings.push_back(
                     "incorrect length in outlines table: hint table = " +
-                    QUtil::int_to_string(table_length) +
-                    "; computed = " + QUtil::int_to_string(length));
+                    std::to_string(table_length) +
+                    "; computed = " + std::to_string(length));
             }
         } else {
             warnings.push_back("incorrect first object number in outline "
@@ -1443,7 +1441,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
             stopOnError(
                 "INTERNAL ERROR: "
                 "QPDF::calculateLinearizationData: page object for page " +
-                QUtil::uint_to_string(i) + " not in lc_other_page_private");
+                std::to_string(i) + " not in lc_other_page_private");
         }
         lc_other_page_private.erase(page_og);
         this->m->part7.push_back(pages.at(i));
@@ -1565,8 +1563,8 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         stopOnError(
             "INTERNAL ERROR: QPDF::calculateLinearizationData: wrong "
             "number of objects placed (num_placed = " +
-            QUtil::uint_to_string(num_placed) +
-            "; number of objects: " + QUtil::uint_to_string(num_wanted));
+            std::to_string(num_placed) +
+            "; number of objects: " + std::to_string(num_wanted));
     }
 
     // Calculate shared object hint table information including

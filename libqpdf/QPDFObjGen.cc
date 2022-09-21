@@ -12,6 +12,5 @@ operator<<(std::ostream& os, const QPDFObjGen& og)
 std::string
 QPDFObjGen::unparse(char separator) const
 {
-    return QUtil::int_to_string(this->obj) + separator +
-        QUtil::int_to_string(this->gen);
+    return std::to_string(this->obj) + separator + std::to_string(this->gen);
 }

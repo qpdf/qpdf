@@ -33,8 +33,8 @@ read_bits(
     if (bits_wanted > bits_available) {
         throw std::runtime_error(
             "overflow reading bit stream: wanted = " +
-            QUtil::uint_to_string(bits_wanted) +
-            "; available = " + QUtil::uint_to_string(bits_available));
+            std::to_string(bits_wanted) +
+            "; available = " + std::to_string(bits_available));
     }
     if (bits_wanted > 32) {
         throw std::out_of_range("read_bits: too many bits requested");

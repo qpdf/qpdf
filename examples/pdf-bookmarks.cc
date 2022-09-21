@@ -110,7 +110,7 @@ show_bookmark_details(QPDFOutlineObjectHelper outline, std::vector<int> numbers)
             QTC::TC("examples", "pdf-bookmarks dest");
             QPDFObjGen og = dest_page.getObjGen();
             if (page_map.count(og)) {
-                target = QUtil::int_to_string(page_map[og]);
+                target = std::to_string(page_map[og]);
             }
         }
         std::cout << "[ -> " << target << " ] ";

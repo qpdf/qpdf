@@ -86,7 +86,6 @@ class QPDF_DLL_CLASS Pipeline
     Pipeline& operator<<(char const* cstr);
     QPDF_DLL
     Pipeline& operator<<(std::string const&);
-    // Calls QUtil::int_to_string
     QPDF_DLL
     Pipeline& operator<<(short);
     QPDF_DLL
@@ -95,7 +94,6 @@ class QPDF_DLL_CLASS Pipeline
     Pipeline& operator<<(long);
     QPDF_DLL
     Pipeline& operator<<(long long);
-    // Calls QUtil::uint_to_string
     QPDF_DLL
     Pipeline& operator<<(unsigned short);
     QPDF_DLL

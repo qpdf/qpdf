@@ -144,8 +144,7 @@ main(int argc, char* argv[])
     auto iter2 = number_tree.begin();
     for (int i = 7; i <= 350; i += 7) {
         iter2.insertAfter(
-            i,
-            QPDFObjectHandle::newString("-" + QUtil::int_to_string(i) + "-"));
+            i, QPDFObjectHandle::newString("-" + std::to_string(i) + "-"));
     }
     std::cout << "Numbers:" << std::endl;
     int n = 1;

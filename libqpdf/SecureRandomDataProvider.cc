@@ -107,7 +107,7 @@ SecureRandomDataProvider::provideRandomData(unsigned char* data, size_t len)
     fclose(f);
     if (fr != len) {
         throw std::runtime_error(
-            "unable to read " + QUtil::uint_to_string(len) + " bytes from " +
+            "unable to read " + std::to_string(len) + " bytes from " +
             std::string(RANDOM_DEVICE));
     }
 

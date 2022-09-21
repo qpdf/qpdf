@@ -28,13 +28,12 @@ report(QPDF& q, QPDFObjectHandle oh, long long item, long long exp_item)
     auto mk_wanted = [](long long i) {
         return (
             (i == -1) ? "end"
-                      : (QUtil::int_to_string(i) + "/(-" +
-                         QUtil::int_to_string(i) + "-)"));
+                      : (std::to_string(i) + "/(-" + std::to_string(i) + "-)"));
     };
     std::string i1_wanted = mk_wanted(exp_item);
     std::string i2_wanted = mk_wanted(item == exp_item ? item : -1);
     auto mk_actual = [](bool found, long long v, QPDFObjectHandle& o) {
-        return (found ? QUtil::int_to_string(v) + "/" + o.unparse() : "end");
+        return (found ? std::to_string(v) + "/" + o.unparse() : "end");
     };
     std::string i1_actual = mk_actual(f1, item - offset, o1);
     std::string i2_actual = mk_actual(f2, item, o2);
@@ -63,8 +62,8 @@ test_bsearch()
         auto nums = QPDFObjectHandle::newArray();
         for (auto i: v) {
             nums.appendItem(QPDFObjectHandle::newInteger(i));
-            nums.appendItem(QPDFObjectHandle::newString(
-                "-" + QUtil::int_to_string(i) + "-"));
+            nums.appendItem(
+                QPDFObjectHandle::newString("-" + std::to_string(i) + "-"));
         }
         auto limits = QPDFObjectHandle::newArray();
         limits.appendItem(QPDFObjectHandle::newInteger(v.at(0)));

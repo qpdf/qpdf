@@ -23,7 +23,7 @@ QPDF_Integer::shallowCopy()
 std::string
 QPDF_Integer::unparse()
 {
-    return QUtil::int_to_string(this->val);
+    return std::to_string(this->val);
 }
 
 JSON

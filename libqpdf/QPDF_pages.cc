@@ -121,7 +121,7 @@ QPDF::getAllPagesInternal(
             if (!kid.isIndirect()) {
                 QTC::TC("qpdf", "QPDF handle direct page object");
                 cur_node.warnIfPossible(
-                    "kid " + QUtil::int_to_string(i) +
+                    "kid " + std::to_string(i) +
                     " (from 0) is direct; converting to indirect");
                 kid = makeIndirectObject(kid);
                 kids.setArrayItem(i, kid);
@@ -130,7 +130,7 @@ QPDF::getAllPagesInternal(
                 // shallowCopyPage in QPDFPageObjectHelper.
                 QTC::TC("qpdf", "QPDF resolve duplicated page object");
                 cur_node.warnIfPossible(
-                    "kid " + QUtil::int_to_string(i) +
+                    "kid " + std::to_string(i) +
                     " (from 0) appears more than once in the pages tree;"
                     " creating a new page object as a copy");
                 kid = makeIndirectObject(QPDFObjectHandle(kid).shallowCopy());
@@ -205,8 +205,7 @@ QPDF::insertPageobjToPage(
             // The library never calls insertPageobjToPage in a way
             // that causes this to happen.
             setLastObjectDescription(
-                "page " + QUtil::int_to_string(pos) + " (numbered from zero)",
-                og);
+                "page " + std::to_string(pos) + " (numbered from zero)", og);
             throw QPDFExc(
                 qpdf_e_pages,
                 this->m->file->getName(),

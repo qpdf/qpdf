@@ -135,7 +135,7 @@ QPDFCrypto_gnutls::SHA2_init(int bits)
     if (code < 0) {
         this->hash_ctx = nullptr;
         throw std::runtime_error(
-            std::string("gnutls: SHA") + QUtil::int_to_string(bits) +
+            std::string("gnutls: SHA") + std::to_string(bits) +
             " error: " + std::string(gnutls_strerror(code)));
     }
 }

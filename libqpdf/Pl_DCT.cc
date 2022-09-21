@@ -302,9 +302,8 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
         QIntC::to_size(cinfo->input_components);
     if (b->getSize() != expected_size) {
         throw std::runtime_error(
-            "Pl_DCT: image buffer size = " +
-            QUtil::uint_to_string(b->getSize()) +
-            "; expected size = " + QUtil::uint_to_string(expected_size));
+            "Pl_DCT: image buffer size = " + std::to_string(b->getSize()) +
+            "; expected size = " + std::to_string(expected_size));
     }
     JSAMPROW row_pointer[1];
     unsigned char* buffer = b->getBuffer();
