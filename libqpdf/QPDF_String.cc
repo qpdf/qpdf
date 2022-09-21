@@ -113,7 +113,14 @@ QPDF_String::unparse(bool force_binary)
     bool use_hexstring = force_binary || useHexString();
     std::string result;
     if (use_hexstring) {
-        result += "<" + QUtil::hex_encode(this->val) + ">";
+        static auto constexpr hexchars = "0123456789abcdef";
+        result.reserve(2 * this->val.length() + 2);
+        result += '<';
+        for (const char c: this->val) {
+            result += hexchars[static_cast<unsigned char>(c) >> 4];
+            result += hexchars[c & 0x0f];
+        }
+        result += '>';
     } else {
         result += "(";
         for (unsigned int i = 0; i < this->val.length(); ++i) {
