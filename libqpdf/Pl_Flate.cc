@@ -286,7 +286,7 @@ Pl_Flate::checkError(char const* prefix, int error_code)
 
             default:
                 msg += std::string("zlib unknown error (") +
-                    QUtil::int_to_string(error_code) + ")";
+                    std::to_string(error_code) + ")";
                 break;
             }
         }

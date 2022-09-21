@@ -105,8 +105,7 @@ FileInputSource::seek(qpdf_offset_t offset, int whence)
     if (QUtil::seek(this->file, offset, whence) == -1) {
         QUtil::throw_system_error(
             std::string("seek to ") + this->filename + ", offset " +
-            QUtil::int_to_string(offset) + " (" + QUtil::int_to_string(whence) +
-            ")");
+            std::to_string(offset) + " (" + std::to_string(whence) + ")");
     }
 }
 
@@ -128,8 +127,7 @@ FileInputSource::read(char* buffer, size_t length)
                 this->filename,
                 "",
                 this->last_offset,
-                (std::string("read ") + QUtil::uint_to_string(length) +
-                 " bytes"));
+                (std::string("read ") + std::to_string(length) + " bytes"));
         } else if (length > 0) {
             this->seek(0, SEEK_END);
             this->last_offset = this->tell();

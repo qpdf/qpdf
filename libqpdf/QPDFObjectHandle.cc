@@ -1257,7 +1257,7 @@ QPDFObjectHandle::getUniqueResourceName(
     std::set<std::string> names = (namesp ? *namesp : getResourceNames());
     int max_suffix = min_suffix + QIntC::to_int(names.size());
     while (min_suffix <= max_suffix) {
-        std::string candidate = prefix + QUtil::int_to_string(min_suffix);
+        std::string candidate = prefix + std::to_string(min_suffix);
         if (names.count(candidate) == 0) {
             return candidate;
         }
@@ -1554,8 +1554,8 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
                     QPDFExc(
                         qpdf_e_damaged_pdf,
                         "",
-                        description + ": item index " +
-                            QUtil::int_to_string(i) + " (from 0)",
+                        description + ": item index " + std::to_string(i) +
+                            " (from 0)",
                         0,
                         "ignoring non-stream in an array of streams"));
             }

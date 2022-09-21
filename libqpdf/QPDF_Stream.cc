@@ -618,9 +618,9 @@ QPDF_Stream::pipeStreamData(
                 // part of a library user, not by invalid input data.
                 throw std::runtime_error(
                     "stream data provider for " + og.unparse(' ') +
-                    " provided " + QUtil::int_to_string(actual_length) +
+                    " provided " + std::to_string(actual_length) +
                     " bytes instead of expected " +
-                    QUtil::int_to_string(desired_length) + " bytes");
+                    std::to_string(desired_length) + " bytes");
             }
         } else if (success) {
             QTC::TC("qpdf", "QPDF_Stream provider length not provided");

@@ -2472,7 +2472,7 @@ QPDFJob::handleTransformations(QPDF& pdf)
                 std::shared_ptr<QPDFObjectHandle::StreamDataProvider> sdp(io);
                 if (io->evaluate(
                         "image " + name + " on page " +
-                        QUtil::int_to_string(pageno))) {
+                        std::to_string(pageno))) {
                     QPDFObjectHandle new_image =
                         QPDFObjectHandle::newStream(&pdf);
                     new_image.replaceDict(image.getDict().shallowCopy());
@@ -3318,7 +3318,7 @@ QPDFJob::doSplitPages(QPDF& pdf, bool& warnings)
     QPDFPageLabelDocumentHelper pldh(pdf);
     QPDFAcroFormDocumentHelper afdh(pdf);
     std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
-    size_t pageno_len = QUtil::uint_to_string(pages.size()).length();
+    size_t pageno_len = std::to_string(pages.size()).length();
     size_t num_pages = pages.size();
     for (size_t i = 0; i < num_pages; i += QIntC::to_size(m->split_pages)) {
         size_t first = i + 1;

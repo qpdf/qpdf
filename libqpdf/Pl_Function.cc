@@ -25,7 +25,7 @@ Pl_Function::Pl_Function(
         if (code != 0) {
             throw std::runtime_error(
                 std::string(identifier) + " function returned code " +
-                QUtil::int_to_string(code));
+                std::to_string(code));
         }
     };
 }
@@ -40,7 +40,7 @@ Pl_Function::Pl_Function(
         if (code != 0) {
             throw std::runtime_error(
                 std::string(identifier) + " function returned code " +
-                QUtil::int_to_string(code));
+                std::to_string(code));
         }
     };
 }

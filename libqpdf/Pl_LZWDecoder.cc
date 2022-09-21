@@ -98,7 +98,7 @@ Pl_LZWDecoder::getFirstChar(unsigned int code)
     } else {
         throw std::runtime_error(
             "Pl_LZWDecoder::getFirstChar called with invalid code (" +
-            QUtil::int_to_string(code) + ")");
+            std::to_string(code) + ")");
     }
     return result;
 }
@@ -126,7 +126,7 @@ Pl_LZWDecoder::addToTable(unsigned char next)
     } else {
         throw std::runtime_error(
             "Pl_LZWDecoder::addToTable called with invalid code (" +
-            QUtil::int_to_string(this->last_code) + ")");
+            std::to_string(this->last_code) + ")");
     }
 
     Buffer entry(1 + last_size);

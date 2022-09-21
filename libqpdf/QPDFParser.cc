@@ -335,8 +335,8 @@ QPDFParser::parse(bool& empty, bool content_stream)
                         bool found_fake = false;
                         std::string candidate;
                         while (!found_fake) {
-                            candidate = "/QPDFFake" +
-                                QUtil::int_to_string(next_fake_key++);
+                            candidate =
+                                "/QPDFFake" + std::to_string(next_fake_key++);
                             found_fake = (names.count(candidate) == 0);
                             QTC::TC(
                                 "qpdf",
@@ -416,7 +416,7 @@ QPDFParser::setDescriptionFromInput(
     oh.setObjectDescription(
         context,
         (input->getName() + ", " + object_description + " at offset " +
-         QUtil::int_to_string(offset)));
+         std::to_string(offset)));
 }
 
 void

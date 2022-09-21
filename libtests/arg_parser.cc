@@ -141,7 +141,7 @@ ArgParser::getQuack(std::string const& p)
     ++this->quacks;
     if (this->ap.isCompleting() && (this->ap.argsLeft() == 0)) {
         this->ap.insertCompletion(
-            std::string("thing-") + QUtil::int_to_string(this->quacks));
+            std::string("thing-") + std::to_string(this->quacks));
         return;
     }
     output(std::string("got quack: ") + p);
@@ -150,13 +150,13 @@ ArgParser::getQuack(std::string const& p)
 void
 ArgParser::endQuack()
 {
-    output("total quacks so far: " + QUtil::int_to_string(this->quacks));
+    output("total quacks so far: " + std::to_string(this->quacks));
 }
 
 void
 ArgParser::finalChecks()
 {
-    output("total quacks: " + QUtil::int_to_string(this->quacks));
+    output("total quacks: " + std::to_string(this->quacks));
 }
 
 void

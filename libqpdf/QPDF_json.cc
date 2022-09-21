@@ -641,7 +641,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
         }
     } else {
         throw std::logic_error(
-            "QPDF_json: unknown state " + QUtil::int_to_string(state));
+            "QPDF_json: unknown state " + std::to_string(state));
     }
     return true;
 }
@@ -679,7 +679,7 @@ QPDF::JSONReactor::setObjectDescription(QPDFObjectHandle& oh, JSON const& value)
     if (!this->cur_object.empty()) {
         description += ", " + this->cur_object;
     }
-    description += " at offset " + QUtil::int_to_string(value.getStart());
+    description += " at offset " + std::to_string(value.getStart());
     oh.setObjectDescription(&this->pdf, description);
 }
 
@@ -790,7 +790,7 @@ QPDF::writeJSONStream(
     std::shared_ptr<Pl_StdioFile> f_pl;
     std::string filename;
     if (json_stream_data == qpdf_sj_file) {
-        filename = file_prefix + "-" + QUtil::int_to_string(obj.getObjectID());
+        filename = file_prefix + "-" + std::to_string(obj.getObjectID());
         f = QUtil::safe_fopen(filename.c_str(), "wb");
         f_pl = std::make_shared<Pl_StdioFile>("stream data", f);
         stream_p = f_pl.get();

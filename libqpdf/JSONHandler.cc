@@ -132,7 +132,7 @@ JSONHandler::handle(std::string const& path, JSON j)
         size_t i = 0;
         j.forEachArrayItem([&i, &path, this](JSON v) {
             this->m->h.array_item_handler->handle(
-                path + "[" + QUtil::uint_to_string(i) + "]", v);
+                path + "[" + std::to_string(i) + "]", v);
             ++i;
         });
         this->m->h.array_end_handler(path);

@@ -256,11 +256,10 @@ QdfFixer::processLines(std::list<std::string>& lines)
         } else if (state == st_in_length) {
             if (!matches(re_num)) {
                 fatal(
-                    filename + ":" + QUtil::uint_to_string(lineno) +
+                    filename + ":" + std::to_string(lineno) +
                     ": expected integer");
             }
-            std::string new_length =
-                QUtil::uint_to_string(stream_length) + "\n";
+            std::string new_length = std::to_string(stream_length) + "\n";
             offset -= QIntC::to_offset(line.length());
             offset += QIntC::to_offset(new_length.length());
             std::cout << new_length;
@@ -301,8 +300,8 @@ QdfFixer::checkObjId(std::string const& cur_obj_str)
     int cur_obj = QUtil::string_to_int(cur_obj_str.c_str());
     if (cur_obj != last_obj + 1) {
         fatal(
-            filename + ":" + QUtil::uint_to_string(lineno) +
-            ": expected object " + QUtil::int_to_string(last_obj + 1));
+            filename + ":" + std::to_string(lineno) + ": expected object " +
+            std::to_string(last_obj + 1));
     }
     last_obj = cur_obj;
     xref.push_back(QPDFXRefEntry(1, QIntC::to_offset(last_offset), 0));
@@ -325,16 +324,15 @@ QdfFixer::writeOstream()
     for (auto iter: ostream_offsets) {
         iter -= QIntC::to_offset(first);
         ++onum;
-        offsets += QUtil::int_to_string(onum) + " " +
-            QUtil::int_to_string(iter) + "\n";
+        offsets += std::to_string(onum) + " " + std::to_string(iter) + "\n";
     }
     auto offset_adjust = QIntC::to_offset(offsets.size());
     first += offset_adjust;
     stream_length += QIntC::to_size(offset_adjust);
     std::string dict_data = "";
-    dict_data += "  /Length " + QUtil::uint_to_string(stream_length) + "\n";
-    dict_data += "  /N " + QUtil::uint_to_string(n) + "\n";
-    dict_data += "  /First " + QUtil::int_to_string(first) + "\n";
+    dict_data += "  /Length " + std::to_string(stream_length) + "\n";
+    dict_data += "  /N " + std::to_string(n) + "\n";
+    dict_data += "  /First " + std::to_string(first) + "\n";
     if (!ostream_extends.empty()) {
         dict_data += "  /Extends " + ostream_extends + "\n";
     }

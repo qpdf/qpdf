@@ -10,7 +10,7 @@ get_description(QPDFObjectHandle& node)
 {
     std::string result("Name/Number tree node");
     if (node.isIndirect()) {
-        result += " (object " + QUtil::int_to_string(node.getObjectID()) + ")";
+        result += " (object " + std::to_string(node.getObjectID()) + ")";
     }
     return result;
 }
@@ -103,7 +103,7 @@ NNTreeIterator::getNextKid(PathElement& pe, bool backward)
                     impl.qpdf,
                     pe.node,
                     ("skipping over invalid kid at index " +
-                     QUtil::int_to_string(pe.kid_number)));
+                     std::to_string(pe.kid_number)));
             }
         } else {
             result = QPDFObjectHandle::newNull();
@@ -159,7 +159,7 @@ NNTreeIterator::increment(bool backward)
                 warn(
                     impl.qpdf,
                     this->node,
-                    ("item " + QUtil::int_to_string(this->item_number) +
+                    ("item " + std::to_string(this->item_number) +
                      " has the wrong type"));
             } else {
                 found_valid_key = true;
@@ -685,8 +685,7 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
                     warn(
                         impl.qpdf,
                         node,
-                        ("converting kid number " +
-                         QUtil::int_to_string(kid_number) +
+                        ("converting kid number " + std::to_string(kid_number) +
                          " to an indirect object"));
                     next = impl.qpdf.makeIndirectObject(next);
                     kids.setArrayItem(kid_number, next);
@@ -695,7 +694,7 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
                     warn(
                         impl.qpdf,
                         node,
-                        ("kid number " + QUtil::int_to_string(kid_number) +
+                        ("kid number " + std::to_string(kid_number) +
                          " is not an indirect object"));
                 }
             }
@@ -853,7 +852,7 @@ NNTreeImpl::compareKeyItem(
         error(
             qpdf,
             this->oh,
-            ("item at index " + QUtil::int_to_string(2 * idx) +
+            ("item at index " + std::to_string(2 * idx) +
              " is not the right type"));
     }
     return details.compareKeys(key, items.getArrayItem(2 * idx));
@@ -866,10 +865,7 @@ NNTreeImpl::compareKeyKid(
     if (!(kids.isArray() && (idx < kids.getArrayNItems()) &&
           kids.getArrayItem(idx).isDictionary())) {
         QTC::TC("qpdf", "NNTree kid is invalid");
-        error(
-            qpdf,
-            this->oh,
-            "invalid kid at index " + QUtil::int_to_string(idx));
+        error(qpdf, this->oh, "invalid kid at index " + std::to_string(idx));
     }
     return withinLimits(key, kids.getArrayItem(idx));
 }

@@ -39,7 +39,7 @@ QPDFExc::createWhat(
             }
         }
         if (offset > 0) {
-            result += "offset " + QUtil::int_to_string(offset);
+            result += "offset " + std::to_string(offset);
         }
         if (!filename.empty()) {
             result += ")";

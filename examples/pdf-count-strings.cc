@@ -59,7 +59,7 @@ StringCounter::handleEOF()
     // Write a comment at the end of the stream just to show how we
     // can enhance the output if we want.
     write("\n% strings found: ");
-    write(QUtil::int_to_string(this->count));
+    write(std::to_string(this->count));
 }
 
 int
