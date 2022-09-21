@@ -31,7 +31,6 @@ set(libqpdf_SOURCES
   NNTree.cc
   OffsetInputSource.cc
   PDFVersion.cc
-  Pipeline.cc
   Pl_AES_PDF.cc
   Pl_ASCII85Decoder.cc
   Pl_ASCIIHexDecoder.cc

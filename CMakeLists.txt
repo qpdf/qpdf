@@ -153,7 +153,7 @@ Please build with cmake in a subdirectory, e.g.
 Please remove CMakeCache.txt and the CMakeFiles directories.")
 endif()
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_VISIBILITY_PRESET hidden)

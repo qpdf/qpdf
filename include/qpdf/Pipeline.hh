@@ -47,8 +47,11 @@
 #include <qpdf/DLL.h>
 #include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
 
+#include <cstring>
 #include <memory>
+#include <stdexcept>
 #include <string>
+#include <string_view>
 
 // Remember to use QPDF_DLL_CLASS on anything derived from Pipeline so
 // it will work with dynamic_cast across the shared object boundary.
@@ -56,7 +59,11 @@ class QPDF_DLL_CLASS Pipeline
 {
   public:
     QPDF_DLL
-    Pipeline(char const* identifier, Pipeline* next);
+    Pipeline(char const* identifier, Pipeline* next) :
+        identifier(identifier),
+        next(next)
+    {
+    }
 
     QPDF_DLL
     virtual ~Pipeline() = default;
@@ -69,47 +76,47 @@ class QPDF_DLL_CLASS Pipeline
     QPDF_DLL
     virtual void finish() = 0;
     QPDF_DLL
-    std::string getIdentifier() const;
+    inline std::string getIdentifier() const;
 
     // These are convenience methods for making it easier to write
     // certain other types of data to pipelines without having to
     // cast. The methods that take char const* expect null-terminated
     // C strings and do not write the null terminators.
     QPDF_DLL
-    void writeCStr(char const* cstr);
+    inline void writeCStr(char const* cstr);
     QPDF_DLL
-    void writeString(std::string const&);
+    inline void writeString(std::string_view);
     // This allows *p << "x" << "y" but is not intended to be a
     // general purpose << compatible with ostream and does not have
     // local awareness or the ability to be "imbued" with properties.
     QPDF_DLL
-    Pipeline& operator<<(char const* cstr);
+    inline Pipeline& operator<<(char const* cstr);
     QPDF_DLL
-    Pipeline& operator<<(std::string const&);
+    inline Pipeline& operator<<(std::string_view);
     QPDF_DLL
-    Pipeline& operator<<(short);
+    inline Pipeline& operator<<(short);
     QPDF_DLL
-    Pipeline& operator<<(int);
+    inline Pipeline& operator<<(int);
     QPDF_DLL
-    Pipeline& operator<<(long);
+    inline Pipeline& operator<<(long);
     QPDF_DLL
-    Pipeline& operator<<(long long);
+    inline Pipeline& operator<<(long long);
     QPDF_DLL
-    Pipeline& operator<<(unsigned short);
+    inline Pipeline& operator<<(unsigned short);
     QPDF_DLL
-    Pipeline& operator<<(unsigned int);
+    inline Pipeline& operator<<(unsigned int);
     QPDF_DLL
-    Pipeline& operator<<(unsigned long);
+    inline Pipeline& operator<<(unsigned long);
     QPDF_DLL
-    Pipeline& operator<<(unsigned long long);
+    inline Pipeline& operator<<(unsigned long long);
 
     // Overloaded write to reduce casting
     QPDF_DLL
-    void write(char const* data, size_t len);
+    inline void write(char const* data, size_t len);
 
   protected:
     QPDF_DLL
-    Pipeline* getNext(bool allow_null = false);
+    inline Pipeline* getNext(bool allow_null = false);
     std::string identifier;
 
   private:
@@ -118,5 +125,110 @@ class QPDF_DLL_CLASS Pipeline
 
     Pipeline* next;
 };
+
+inline Pipeline*
+Pipeline::getNext(bool allow_null)
+{
+    if ((this->next == nullptr) && (!allow_null)) {
+        throw std::logic_error(
+            this->identifier +
+            ": Pipeline::getNext() called on pipeline with no next");
+    }
+    return this->next;
+}
+
+inline std::string
+Pipeline::getIdentifier() const
+{
+    return this->identifier;
+}
+
+inline void
+Pipeline::writeCStr(char const* cstr)
+{
+    this->write(cstr, strlen(cstr));
+}
+
+inline void
+Pipeline::writeString(std::string_view str)
+{
+    this->write(str.data(), str.length());
+}
+
+Pipeline&
+Pipeline::operator<<(char const* cstr)
+{
+    this->writeCStr(cstr);
+    return *this;
+}
+
+Pipeline&
+Pipeline::operator<<(std::string_view str)
+{
+    this->writeString(str);
+    return *this;
+}
+
+inline Pipeline&
+Pipeline::operator<<(short i)
+{
+    this->writeString(std::to_string(i));
+    return *this;
+}
+
+inline Pipeline&
+Pipeline::operator<<(int i)
+{
+    this->writeString(std::to_string(i));
+    return *this;
+}
+
+inline Pipeline&
+Pipeline::operator<<(long i)
+{
+    this->writeString(std::to_string(i));
+    return *this;
+}
+
+Pipeline&
+Pipeline::operator<<(long long i)
+{
+    this->writeString(std::to_string(i));
+    return *this;
+}
+
+inline Pipeline&
+Pipeline::operator<<(unsigned short i)
+{
+    this->writeString(std::to_string(i));
+    return *this;
+}
+
+inline Pipeline&
+Pipeline::operator<<(unsigned int i)
+{
+    this->writeString(std::to_string(i));
+    return *this;
+}
+
+inline Pipeline&
+Pipeline::operator<<(unsigned long i)
+{
+    this->writeString(std::to_string(i));
+    return *this;
+}
+
+inline Pipeline&
+Pipeline::operator<<(unsigned long long i)
+{
+    this->writeString(std::to_string(i));
+    return *this;
+}
+
+inline void
+Pipeline::write(char const* data, size_t len)
+{
+    this->write(reinterpret_cast<unsigned char const*>(data), len);
+}
 
 #endif // PIPELINE_HH
