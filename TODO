@@ -119,7 +119,7 @@ Document-level work
   into QPDFPageCopier as well as the doc helpers. Make sure it is
   called from --check.
 
-* See also issues tagged with "pages"
+* See also issues tagged with "pages". Include closed issues.
 
 * Add flags to CLI to select which document-level options to
   preserve or not preserve. We will probably need a pair of mutually
@@ -237,13 +237,16 @@ ABI Changes
 ===========
 
 This is a list of changes to make next time there is an ABI change.
-Comments appear in the code prefixed by "ABI". Always Search for ABI
-in source and header files to find items not listed here. Also search
-for "[[deprecated" to find deprecated APIs that can be removed.
+Comments appear in the code prefixed by "ABI".
 
-* As long as QPDF disallows copying, its Members could be a unique_ptr
-  instead of a shared_ptr. There may be other classes that could also
-  be converted.
+Always:
+* Search for ABI in source and header files
+* Search for "[[deprecated" to find deprecated APIs that can be removed
+* Search for issues, pull requests, and discussions with the "abi" label
+* Check discussion "qpdf X planning" where X is the next major
+  version. This should be tagged `abi`
+
+For qpdf 12, see https://github.com/qpdf/qpdf/discussions/785
 
 Page splitting/merging
 ======================
