@@ -769,10 +769,12 @@ QUtil::make_unique_cstr(std::string const& str)
 std::string
 QUtil::hex_encode(std::string const& input)
 {
+    static auto constexpr hexchars = "0123456789abcdef";
     std::string result;
-    for (unsigned int i = 0; i < input.length(); ++i) {
-        result += QUtil::int_to_string_base(
-            QIntC::to_int(static_cast<unsigned char>(input.at(i))), 16, 2);
+    result.reserve(2 * input.length());
+    for (const char c: input) {
+        result += hexchars[static_cast<unsigned char>(c) >> 4];
+        result += hexchars[c & 0x0f];
     }
     return result;
 }
