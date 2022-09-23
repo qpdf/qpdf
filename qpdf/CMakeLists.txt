@@ -3,6 +3,7 @@ set(MAIN_CXX_PROGRAMS
   fix-qdf
   pdf_from_scratch
   sizes
+  test_char_sign
   test_driver
   test_large_file
   test_many_nulls

@@ -15,4 +15,8 @@ env CFLAGS="-funsigned-char" \
     -DENABLE_QTC=1
 cmake --build build -j$(nproc) -- -k
 cd build
+# Make sure char is unsigned by default. ./build-linux verifies that
+# that build has char signed by default. That way we can be sure we
+# are testing both ways.
+./qpdf/test_char_sign | grep 'char is unsigned'
 ctest --verbose
