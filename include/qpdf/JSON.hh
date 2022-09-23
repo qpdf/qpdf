@@ -36,7 +36,7 @@
 // general-purpose JSON package.
 
 #include <qpdf/DLL.h>
-#include <qpdf/PointerHolder.hh>
+#include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
 #include <qpdf/Types.h>
 
 #include <functional>

@@ -25,7 +25,7 @@
 #include <qpdf/DLL.h>
 
 #include <qpdf/InputSource.hh>
-#include <qpdf/PointerHolder.hh>
+#include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
 
 #include <memory>
 #include <stdio.h>
