@@ -7,12 +7,6 @@
 // be used.
 #include <string.h>
 
-// See above about ctype.
-static bool
-is_ascii_printable(char ch)
-{
-    return ((ch >= 32) && (ch <= 126));
-}
 static bool
 is_iso_latin1_printable(char ch)
 {
@@ -92,19 +86,20 @@ QPDF_String::useHexString() const
     // there are any non-printable (in PDF Doc encoding) characters or
     // if too large of a proportion of the string consists of
     // non-ASCII characters.
-    bool nonprintable = false;
     unsigned int non_ascii = 0;
-    for (unsigned int i = 0; i < this->val.length(); ++i) {
-        char ch = this->val.at(i);
-        if ((ch == 0) ||
-            (!(is_ascii_printable(ch) || strchr("\n\r\t\b\f", ch)))) {
-            if ((ch >= 0) && (ch < 24)) {
-                nonprintable = true;
-            }
+    for (auto const ch: this->val) {
+        if (ch > 126) {
             ++non_ascii;
+        } else if (ch >= 32) {
+            continue;
+        } else if (ch < 0 || ch >= 24) {
+            ++non_ascii;
+        } else if (!(ch == '\n' || ch == '\r' || ch == '\t' || ch == '\b' ||
+                     ch == '\f')) {
+            return true;
         }
     }
-    return (nonprintable || (5 * non_ascii > val.length()));
+    return 5 * non_ascii > val.length();
 }
 
 std::string
