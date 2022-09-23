@@ -35,7 +35,6 @@
 
 #include <qpdf/Buffer.hh>
 #include <qpdf/Pipeline.hh>
-#include <qpdf/PointerHolder.hh>
 
 #include <memory>
 
@@ -80,12 +79,11 @@ class QPDF_DLL_CLASS Pl_Buffer: public Pipeline
         ~Members() = default;
 
       private:
-        Members();
+        Members() = default;
         Members(Members const&) = delete;
 
-        bool ready;
-        std::shared_ptr<Buffer> data;
-        size_t total_size;
+        bool ready{true};
+        std::basic_string<unsigned char> data;
     };
 
     std::shared_ptr<Members> m;
