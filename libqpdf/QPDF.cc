@@ -2155,7 +2155,7 @@ QPDF::isUnresolved(QPDFObjGen const& og)
 }
 
 QPDFObjectHandle
-QPDF::makeIndirectObject(QPDFObjectHandle oh)
+QPDF::makeIndirectObject(std::shared_ptr<QPDFObject> const& obj)
 {
     int max_objid = toI(getObjectCount());
     if (max_objid == std::numeric_limits<int>::max()) {
@@ -2163,9 +2163,14 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
             "max object id is too high to create new objects");
     }
     QPDFObjGen next(max_objid + 1, 0);
-    m->obj_cache[next] =
-        ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
+    m->obj_cache[next] = ObjCache(obj, -1, -1);
     return newIndirect(next, m->obj_cache[next].object);
+}
+
+QPDFObjectHandle
+QPDF::makeIndirectObject(QPDFObjectHandle oh)
+{
+    return makeIndirectObject(QPDFObjectHandle::ObjAccessor::getObject(oh));
 }
 
 QPDFObjectHandle
