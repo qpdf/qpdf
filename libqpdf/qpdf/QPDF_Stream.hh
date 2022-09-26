@@ -104,8 +104,6 @@ class QPDF_Stream: public QPDFValue
         std::string const& message);
     void setDictDescription();
 
-    QPDF* qpdf;
-    QPDFObjGen og;
     bool filter_on_write;
     QPDFObjectHandle stream_dict;
     qpdf_offset_t offset;
