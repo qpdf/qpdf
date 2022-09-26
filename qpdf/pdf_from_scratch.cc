@@ -22,8 +22,7 @@ usage()
 static QPDFObjectHandle
 createPageContents(QPDF& pdf, std::string const& text)
 {
-    std::string contents = "BT /F1 15 Tf 72 720 Td (" + text + ") Tj ET\n";
-    return QPDFObjectHandle::newStream(&pdf, contents);
+    return pdf.newStream("BT /F1 15 Tf 72 720 Td (" + text + ") Tj ET\n");
 }
 
 QPDFObjectHandle

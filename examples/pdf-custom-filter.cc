@@ -365,8 +365,7 @@ StreamReplacer::registerStream(
         // or create objects during write.
         char p[1] = {static_cast<char>(this->keys[og])};
         std::string p_str(p, 1);
-        QPDFObjectHandle dp_stream =
-            QPDFObjectHandle::newStream(this->pdf, p_str);
+        QPDFObjectHandle dp_stream = this->pdf->newStream(p_str);
         // Create /DecodeParms as expected by our fictitious
         // /XORDecode filter.
         QPDFObjectHandle decode_parms =

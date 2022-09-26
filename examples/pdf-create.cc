@@ -139,7 +139,7 @@ createPageContents(QPDF& pdf, std::string const& text)
     std::string contents = "BT /F1 24 Tf 72 320 Td (" + text +
         ") Tj ET\n"
         "q 244 0 0 144 184 100 cm /Im1 Do Q\n";
-    return QPDFObjectHandle::newStream(&pdf, contents);
+    return pdf.newStream(contents);
 }
 
 QPDFObjectHandle
@@ -172,7 +172,7 @@ add_page(
     std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider(p);
     size_t width = p->getWidth();
     size_t height = p->getHeight();
-    QPDFObjectHandle image = QPDFObjectHandle::newStream(&pdf);
+    QPDFObjectHandle image = pdf.newStream();
     auto image_dict =
         // line-break
         "<<"
