@@ -785,10 +785,10 @@ QPDFPageObjectHelper::getMatrixForTransformations(bool invert)
 QPDFObjectHandle
 QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
 {
-    QPDF& qpdf = this->oh.getQPDF(
-        "QPDFPageObjectHelper::getFormXObjectForPage called with a direct "
-        "object");
-    QPDFObjectHandle result = QPDFObjectHandle::newStream(&qpdf);
+    auto result = this->oh
+                      .getQPDF("QPDFPageObjectHelper::getFormXObjectForPage "
+                               "called with a direct object")
+                      .newStream();
     QPDFObjectHandle newdict = result.getDict();
     newdict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
     newdict.replaceKey("/Subtype", QPDFObjectHandle::newName("/Form"));
@@ -1062,8 +1062,7 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
     }
     std::string cm_str = std::string("q\n") + cm.unparse() + " cm\n";
     this->oh.addPageContents(QPDFObjectHandle::newStream(&qpdf, cm_str), true);
-    this->oh.addPageContents(
-        QPDFObjectHandle::newStream(&qpdf, "\nQ\n"), false);
+    this->oh.addPageContents(qpdf.newStream("\nQ\n"), false);
     this->oh.removeKey("/Rotate");
     QPDFObjectHandle rotate_obj = getAttribute("/Rotate", false);
     if (!rotate_obj.isNull()) {

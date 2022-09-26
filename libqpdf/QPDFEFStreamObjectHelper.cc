@@ -4,6 +4,7 @@
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/Pl_MD5.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QPDF.hh>
 #include <qpdf/QUtil.hh>
 
 QPDFEFStreamObjectHelper::QPDFEFStreamObjectHelper(QPDFObjectHandle oh) :
@@ -91,20 +92,20 @@ QPDFEFStreamObjectHelper
 QPDFEFStreamObjectHelper::createEFStream(
     QPDF& qpdf, std::shared_ptr<Buffer> data)
 {
-    return newFromStream(QPDFObjectHandle::newStream(&qpdf, data));
+    return newFromStream(qpdf.newStream(data));
 }
 
 QPDFEFStreamObjectHelper
 QPDFEFStreamObjectHelper::createEFStream(QPDF& qpdf, std::string const& data)
 {
-    return newFromStream(QPDFObjectHandle::newStream(&qpdf, data));
+    return newFromStream(qpdf.newStream(data));
 }
 
 QPDFEFStreamObjectHelper
 QPDFEFStreamObjectHelper::createEFStream(
     QPDF& qpdf, std::function<void(Pipeline*)> provider)
 {
-    auto stream = QPDFObjectHandle::newStream(&qpdf);
+    auto stream = qpdf.newStream();
     stream.replaceStreamData(
         provider, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
     return newFromStream(stream);

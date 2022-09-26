@@ -2402,7 +2402,7 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
             obj_copier.to_copy.push_back(foreign);
             QPDFObjectHandle reservation;
             if (foreign.isStream()) {
-                reservation = QPDFObjectHandle::newStream(this);
+                reservation = newStream();
             } else {
                 reservation = QPDFObjectHandle::newReserved(this);
             }

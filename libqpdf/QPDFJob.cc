@@ -2242,13 +2242,10 @@ QPDFJob::doUnderOverlayForPage(
     }
     if (!content.empty()) {
         if (before) {
-            dest_page.addPageContents(
-                QPDFObjectHandle::newStream(&pdf, content), true);
+            dest_page.addPageContents(pdf.newStream(content), true);
         } else {
-            dest_page.addPageContents(
-                QPDFObjectHandle::newStream(&pdf, "q\n"), true);
-            dest_page.addPageContents(
-                QPDFObjectHandle::newStream(&pdf, "\nQ\n" + content), false);
+            dest_page.addPageContents(pdf.newStream("q\n"), true);
+            dest_page.addPageContents(pdf.newStream("\nQ\n" + content), false);
         }
     }
 }
@@ -2473,8 +2470,7 @@ QPDFJob::handleTransformations(QPDF& pdf)
                 if (io->evaluate(
                         "image " + name + " on page " +
                         std::to_string(pageno))) {
-                    QPDFObjectHandle new_image =
-                        QPDFObjectHandle::newStream(&pdf);
+                    QPDFObjectHandle new_image = pdf.newStream();
                     new_image.replaceDict(image.getDict().shallowCopy());
                     new_image.replaceStreamData(
                         sdp,
