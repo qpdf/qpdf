@@ -1184,6 +1184,7 @@ class QPDF
     void stopOnError(std::string const& message);
     QPDFObjectHandle reserveObjectIfNotExists(QPDFObjGen const& og);
     QPDFObjectHandle reserveStream(QPDFObjGen const& og);
+    QPDFObjGen nextObjGen();
     QPDFObjectHandle
     newIndirect(QPDFObjGen const&, std::shared_ptr<QPDFObject> const&);
     QPDFObjectHandle makeIndirectObject(std::shared_ptr<QPDFObject> const& obj);
