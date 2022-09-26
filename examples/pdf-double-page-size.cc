@@ -75,8 +75,7 @@ main(int argc, char* argv[])
 
         for (auto& page: QPDFPageDocumentHelper(qpdf).getAllPages()) {
             // Prepend the buffer to the page's contents
-            page.addPageContents(
-                QPDFObjectHandle::newStream(&qpdf, content), true);
+            page.addPageContents(qpdf.newStream(content), true);
 
             // Double the size of each of the content boxes
             doubleBoxSize(page, "/MediaBox");

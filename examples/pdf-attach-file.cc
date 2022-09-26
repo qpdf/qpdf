@@ -89,15 +89,13 @@ process(
 
     // Create appearance stream for the attachment.
 
-    auto ap = QPDFObjectHandle::newStream(
-        &q,
-        "0 10 m\n"
-        "10 0 l\n"
-        "20 10 l\n"
-        "10 0 m\n"
-        "10 20 l\n"
-        "0 0 20 20 re\n"
-        "S\n");
+    auto ap = q.newStream("0 10 m\n"
+                          "10 0 l\n"
+                          "20 10 l\n"
+                          "10 0 m\n"
+                          "10 20 l\n"
+                          "0 0 20 20 re\n"
+                          "S\n");
     auto apdict = ap.getDict();
 
     // The following four lines demonstrate the use of the qpdf literal syntax
@@ -127,15 +125,13 @@ process(
          ">>")));
 
     // Generate contents for the page.
-    auto contents = QPDFObjectHandle::newStream(
-        &q,
-        ("q\n"
-         "BT\n"
-         "  102 700 Td\n"
-         "  /F1 16 Tf\n"
-         "  (Here is an attachment.) Tj\n"
-         "ET\n"
-         "Q\n"));
+    auto contents = q.newStream(("q\n"
+                                 "BT\n"
+                                 "  102 700 Td\n"
+                                 "  /F1 16 Tf\n"
+                                 "  (Here is an attachment.) Tj\n"
+                                 "ET\n"
+                                 "Q\n"));
 
     // Create the page object.
     auto page = QPDFObjectHandle::parse(

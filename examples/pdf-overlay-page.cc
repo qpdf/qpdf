@@ -57,10 +57,8 @@ stamp_page(char const* infile, char const* stampfile, char const* outfile)
             // page's original content.
             resources.mergeResources("<< /XObject << >> >>"_qpdf);
             resources.getKey("/XObject").replaceKey(name, stamp_fo);
-            ph.addPageContents(
-                QPDFObjectHandle::newStream(&inpdf, "q\n"), true);
-            ph.addPageContents(
-                QPDFObjectHandle::newStream(&inpdf, "\nQ\n" + content), false);
+            ph.addPageContents(inpdf.newStream("q\n"), true);
+            ph.addPageContents(inpdf.newStream("\nQ\n" + content), false);
         }
         // Copy the annotations and form fields from the original page
         // to the new page. For more efficiency when copying multiple
