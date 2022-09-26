@@ -163,8 +163,7 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
                 page_oh.replaceKey("/Annots", new_annots_oh);
             }
         }
-        page.addPageContents(QPDFObjectHandle::newStream(&qpdf, "q\n"), true);
-        page.addPageContents(
-            QPDFObjectHandle::newStream(&qpdf, "\nQ\n" + new_content), false);
+        page.addPageContents(qpdf.newStream("q\n"), true);
+        page.addPageContents(qpdf.newStream("\nQ\n" + new_content), false);
     }
 }

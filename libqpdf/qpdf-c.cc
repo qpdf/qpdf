@@ -1696,7 +1696,7 @@ qpdf_oh
 qpdf_oh_new_stream(qpdf_data qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_stream");
-    return new_object(qpdf, QPDFObjectHandle::newStream(qpdf->qpdf.get()));
+    return new_object(qpdf, qpdf->qpdf->newStream());
 }
 
 void
