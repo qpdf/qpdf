@@ -1187,6 +1187,7 @@ class QPDF
     QPDFObjectHandle reserveStream(QPDFObjGen const& og);
     QPDFObjectHandle
     newIndirect(QPDFObjGen const&, std::shared_ptr<QPDFObject> const&);
+    QPDFObjectHandle makeIndirectObject(std::shared_ptr<QPDFObject> const& obj);
     bool isCached(QPDFObjGen const& og);
     bool isUnresolved(QPDFObjGen const& og);
     void updateCache(
