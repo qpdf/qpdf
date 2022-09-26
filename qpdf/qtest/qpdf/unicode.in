@@ -5,3 +5,8 @@ If you think wwwwww is good, you should try ʬʬʬʬʬʬ.
 𝄞 𝄢 𝄪 𝅂
 This can be encoded in ASCII.
 This can be encoded in PDFDocEncoding (€).
+þÿ -- PDFDoc would look like UTF-16-BE
+ÿþ -- PDFDoc would look like UTF-16-LE
+ï»¿ -- PDFDoc would look like UTF-8
+ï»» -- PDFDoc okay
+þþ -- PDFDoc okay

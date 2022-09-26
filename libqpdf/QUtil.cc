@@ -1565,10 +1565,38 @@ transcode_utf8(
 {
     bool okay = true;
     result.clear();
-    if (encoding == e_utf16) {
-        result += "\xfe\xff";
-    }
     size_t len = utf8_val.length();
+    switch (encoding) {
+    case e_utf16:
+        result += "\xfe\xff";
+        break;
+    case e_pdfdoc:
+        // We need to avoid having the result start with something
+        // that will be interpreted as UTF-16 or UTF-8, meaning we
+        // can't end up with a string that starts with "fe ff",
+        // (UTF-16-BE) "ff fe" (UTF-16-LE, not officially part of the
+        // PDF spec, but recognized by most readers including qpdf),
+        // or "ef bb bf" (UTF-8). It's more efficient to check the
+        // input string to see if it will map to one of those
+        // sequences than to check the output string since all cases
+        // start with the same starting character.
+        if ((len >= 4) && (utf8_val[0] == '\xc3')) {
+            static std::string fe_ff("\xbe\xc3\xbf");
+            static std::string ff_fe("\xbf\xc3\xbe");
+            static std::string ef_bb_bf("\xaf\xc2\xbb\xc2\xbf");
+            // C++-20 has starts_with, but when this was written, qpdf
+            // had a minimum supported version of C++-17.
+            if ((utf8_val.compare(1, 3, fe_ff) == 0) ||
+                (utf8_val.compare(1, 3, ff_fe) == 0) ||
+                (utf8_val.compare(1, 5, ef_bb_bf) == 0)) {
+                result += unknown;
+                okay = false;
+            }
+        }
+        break;
+    default:
+        break;
+    }
     size_t pos = 0;
     while (pos < len) {
         bool error = false;

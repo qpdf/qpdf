@@ -436,6 +436,21 @@ transcoding_test()
     assert(!QUtil::utf8_to_pdf_doc(other_utf8, other_to_utf8));
     std::cout << other_to_utf8 << std::endl;
     std::cout << "done other characters" << std::endl;
+    // These valid UTF8 strings when converted to PDFDoc would end up
+    // with a byte sequence that would be recognized as UTF-8 or
+    // UTF-16 rather than PDFDoc. A special case is required to store
+    // them as UTF-16 rather than PDFDoc.
+    static std::string fe_ff("\xc3\xbe\xc3\xbf potato");
+    static std::string ff_fe("\xc3\xbf\xc3\xbe potato");
+    static std::string ef_bb_bf("\xc3\xaf\xc2\xbb\xc2\xbf potato");
+    assert(!QUtil::utf8_to_pdf_doc(fe_ff, pdfdoc));
+    assert(pdfdoc == "?\xfe\xff potato");
+    assert(!QUtil::utf8_to_pdf_doc(ff_fe, pdfdoc));
+    assert(pdfdoc == "?\xff\xfe potato");
+    assert(!QUtil::utf8_to_pdf_doc(ef_bb_bf, pdfdoc));
+    assert(pdfdoc == "?\xef\xbb\xbf potato");
+    assert(QUtil::utf8_to_pdf_doc("\xc3\xbe\xc3\xbe", pdfdoc));
+    assert(QUtil::utf8_to_pdf_doc("\xc3\xaf\xc2\xbb\xc2\xbe", pdfdoc));
 }
 
 void

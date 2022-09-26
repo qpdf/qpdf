@@ -1,3 +1,9 @@
+2022-09-26  Jay Berkenbilt  <ejb@ql.org>
+
+        * Bug fix: avoid using PDF Doc encoding for strings whose PDF Doc
+        encoding representation starts with UTF-16 or UTF-8 markers. Fixes
+        #778.
+
 2022-09-14  Jay Berkenbilt  <ejb@ql.org>
 
         * 11.1.0: release
