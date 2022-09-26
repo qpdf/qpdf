@@ -2180,6 +2180,31 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
 }
 
 QPDFObjectHandle
+QPDF::newStream()
+{
+    return makeIndirectObject(QPDF_Stream::create(
+        this, nextObjGen(), QPDFObjectHandle::newDictionary(), 0, 0));
+}
+
+QPDFObjectHandle
+QPDF::newStream(std::shared_ptr<Buffer> data)
+{
+    auto result = newStream();
+    result.replaceStreamData(
+        data, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+    return result;
+}
+
+QPDFObjectHandle
+QPDF::newStream(std::string const& data)
+{
+    auto result = newStream();
+    result.replaceStreamData(
+        data, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+    return result;
+}
+
+QPDFObjectHandle
 QPDF::reserveObjectIfNotExists(QPDFObjGen const& og)
 {
     if (!isCached(og) && m->xref_table.count(og) == 0) {

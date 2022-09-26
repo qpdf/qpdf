@@ -2165,30 +2165,29 @@ QPDFObjectHandle::newStream(QPDF* qpdf)
             "attempt to create stream in null qpdf object");
     }
     QTC::TC("qpdf", "QPDFObjectHandle newStream");
-    QPDFObjectHandle stream_dict = newDictionary();
-    QPDFObjectHandle result = qpdf->makeIndirectObject(QPDFObjectHandle(
-        QPDF_Stream::create(qpdf, QPDFObjGen(), stream_dict, 0, 0)));
-    auto stream = result.asStream();
-    stream->setObjGen(result.getObjGen());
-    return result;
+    return qpdf->newStream();
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newStream(QPDF* qpdf, std::shared_ptr<Buffer> data)
 {
+    if (qpdf == nullptr) {
+        throw std::runtime_error(
+            "attempt to create stream in null qpdf object");
+    }
     QTC::TC("qpdf", "QPDFObjectHandle newStream with data");
-    QPDFObjectHandle result = newStream(qpdf);
-    result.replaceStreamData(data, newNull(), newNull());
-    return result;
+    return qpdf->newStream(data);
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newStream(QPDF* qpdf, std::string const& data)
 {
+    if (qpdf == nullptr) {
+        throw std::runtime_error(
+            "attempt to create stream in null qpdf object");
+    }
     QTC::TC("qpdf", "QPDFObjectHandle newStream with string");
-    QPDFObjectHandle result = newStream(qpdf);
-    result.replaceStreamData(data, newNull(), newNull());
-    return result;
+    return qpdf->newStream(data);
 }
 
 QPDFObjectHandle

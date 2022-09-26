@@ -381,6 +381,36 @@ class QPDF
     QPDF_DLL
     std::map<QPDFObjGen, QPDFXRefEntry> getXRefTable();
 
+    // Public factory methods
+
+    // Create a new stream.  A subsequent call must be made to
+    // replaceStreamData() to provide data for the stream.  The stream's
+    // dictionary may be retrieved by calling getDict(), and the resulting
+    // dictionary may be modified.  Alternatively, you can create a new
+    // dictionary and call replaceDict to install it.
+    QPDF_DLL
+    QPDFObjectHandle newStream();
+
+    // Create a new stream.  Use the given buffer as the stream data.  The
+    // stream dictionary's /Length key will automatically be set to the size of
+    // the data buffer.  If additional keys are required, the stream's
+    // dictionary may be retrieved by calling getDict(), and the resulting
+    // dictionary may be modified.  This method is just a convenient wrapper
+    // around the newStream() and replaceStreamData().  It is a convenience
+    // methods for streams that require no parameters beyond the stream length.
+    // Note that you don't have to deal with compression yourself if you use
+    // QPDFWriter.  By default, QPDFWriter will automatically compress
+    // uncompressed stream data.  Example programs are provided that
+    // illustrate this.
+    QPDF_DLL
+    QPDFObjectHandle newStream(std::shared_ptr<Buffer> data);
+
+    // Create new stream with data from string.  This method will
+    // create a copy of the data rather than using the user-provided
+    // buffer as in the std::shared_ptr<Buffer> version of newStream.
+    QPDF_DLL
+    QPDFObjectHandle newStream(std::string const& data);
+
     // Install this object handle as an indirect object and return an
     // indirect reference to it.
     QPDF_DLL
