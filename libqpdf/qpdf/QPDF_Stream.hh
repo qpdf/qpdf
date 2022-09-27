@@ -34,7 +34,6 @@ class QPDF_Stream: public QPDFValue
     bool getFilterOnWrite() const;
 
     // Methods to help QPDF copy foreign streams
-    qpdf_offset_t getOffset() const;
     size_t getLength() const;
     std::shared_ptr<Buffer> getStreamDataBuffer() const;
     std::shared_ptr<QPDFObjectHandle::StreamDataProvider>
@@ -72,11 +71,6 @@ class QPDF_Stream: public QPDFValue
     static void registerStreamFilter(
         std::string const& filter_name,
         std::function<std::shared_ptr<QPDFStreamFilter>()> factory);
-
-    // Replace object ID and generation.  This may only be called if
-    // object ID and generation are 0.  It is used by QPDFObjectHandle
-    // when adding streams to files.
-    void setObjGen(QPDFObjGen const& og);
 
   private:
     QPDF_Stream(

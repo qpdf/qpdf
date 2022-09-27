@@ -2560,7 +2560,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
             foreign_stream_qpdf.m->encp,
             foreign_stream_qpdf.m->file,
             foreign.getObjGen(),
-            stream->getOffset(),
+            stream->getParsedOffset(),
             stream->getLength(),
             dict);
         this->m->copied_stream_data_provider->registerForeignStream(
