@@ -1534,8 +1534,10 @@ QPDF::readObject(
                     throw e;
                 }
             }
-            object = QPDFObjectHandle::Factory::newStream(
-                this, og, object, stream_offset, length);
+            auto stream =
+                QPDF_Stream::create(this, og, object, stream_offset, length);
+            stream->setParsedOffset(stream_offset);
+            object = newIndirect(og, stream);
         } else {
             input->seek(cur_offset, SEEK_SET);
         }
@@ -2040,8 +2042,8 @@ QPDF::reserveObjectIfNotExists(QPDFObjGen const& og)
 QPDFObjectHandle
 QPDF::reserveStream(QPDFObjGen const& og)
 {
-    return QPDFObjectHandle::Factory::newStream(
-        this, og, QPDFObjectHandle::newDictionary(), 0, 0);
+    return QPDFObjectHandle::Factory::newIndirect(
+        QPDF_Stream::create(this, og, QPDFObjectHandle::newDictionary(), 0, 0));
 }
 
 QPDFObjectHandle

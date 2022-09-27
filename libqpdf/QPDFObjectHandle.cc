@@ -2142,22 +2142,6 @@ QPDFObjectHandle::newDictionary(
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::newStream(
-    QPDF* qpdf,
-    QPDFObjGen const& og,
-    QPDFObjectHandle stream_dict,
-    qpdf_offset_t offset,
-    size_t length)
-{
-    QPDFObjectHandle result = QPDFObjectHandle(
-        QPDF_Stream::create(qpdf, og, stream_dict, offset, length));
-    if (offset) {
-        result.setParsedOffset(offset);
-    }
-    return result;
-}
-
-QPDFObjectHandle
 QPDFObjectHandle::newStream(QPDF* qpdf)
 {
     if (qpdf == nullptr) {
