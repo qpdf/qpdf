@@ -5,11 +5,11 @@
 # described in README-maintainer.
 #
 set -ex
-cd appimage
+pushd appimage
 docker build -t qpdfbuild .
 rm -rf build
 mkdir build
-cd ..
+popd
 git clone .git appimage/build/qpdf
 docker run --privileged --rm \
        -v $PWD/appimage/build:/tmp/build ${1+"$@"} qpdfbuild
@@ -19,20 +19,41 @@ cp -p appimage/build/qpdf/appimage/build/qpdf*AppImage* distribution
 for i in distribution/*; do
     mv $i $(echo $i | sed -e 's/\.AppImage/-ci.AppImage/')
 done
+version=$(basename distribution/qpdf*AppImage | cut -d- -f 2)
+
+# Smoke test the AppImage
+app_image=$(echo distribution/qpdf*AppImage)
+# Directly invoking the AppImage should behave like qpdf
+${app_image} --version | grep -E "^qpdf version $version"
+# Invoking the AppImage with a subcommand should behave like the subcommand
+${app_image} qpdf --version | grep -E "^qpdf version $version"
+${app_image} fix-qdf --version | grep -E "^fix-qdf from qpdf version $version"
+${app_image} zlib-flate --version | grep -E "^zlib-flate from qpdf version $version"
+# Symlinking a command to the AppImage should invoke as that command
+mkdir appimage/build/argv0-test
+pushd appimage/build/argv0-test
+for i in qpdf fix-qdf zlib-flate; do
+    ln -s ../../../${app_image} ./$i
+done
+./qpdf --version | grep -E "^qpdf version $version"
+./fix-qdf --version | grep -E "^fix-qdf from qpdf version $version"
+./zlib-flate --version | grep -E "^zlib-flate from qpdf version $version"
+popd
 
 # Extract a standalone copy of binaries and libraries from the
 # AppImage. This is suitable for use in AWS Lambda, docker, or other
-# self-contained environments.
-version=$(basename distribution/qpdf*AppImage | cut -d- -f 2)
-./distribution/qpdf*AppImage --appimage-extract
+# self-contained environments. We are relying on the AppImage build to
+# create an executable whose runpath is relative to the binary so that
+# the extract zip file is relocatable.
+${app_image} --appimage-extract
 D=$PWD/distribution
-if ! (readelf -d squashfs-root/usr/bin/qpdf | \
-          grep RUNPATH | grep -q -F ..); then
-    # We are relying on the AppImage build to create an executable
-    # whose runpath is relative to the binary so that the extract zip
-    # file is relocatable.
-    echo "Standalone linux binary lacks relative RUNPATH"
-fi
+for i in qpdf fix-qdf zlib-flate; do
+    if ! (readelf -d squashfs-root/usr/bin/$i | \
+              grep RUNPATH | grep -q -F ..); then
+        echo "Standalone linux binary $i lacks relative RUNPATH"
+        exit 2
+    fi
+done
 (cd squashfs-root/usr; \
  zip -9 --symlinks $D/qpdf-$version-bin-linux-x86_64-ci.zip \
      bin/{qpdf,fix-qdf,zlib-flate} lib/*)
