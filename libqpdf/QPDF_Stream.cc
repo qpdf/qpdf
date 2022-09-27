@@ -414,10 +414,7 @@ QPDF_Stream::filterable(
 
     if (!filters_okay) {
         QTC::TC("qpdf", "QPDF_Stream invalid filter");
-        warn(
-            qpdf_e_damaged_pdf,
-            this->offset,
-            "stream filter type is not name or array");
+        warn("stream filter type is not name or array");
         return false;
     }
 
@@ -465,11 +462,7 @@ QPDF_Stream::filterable(
     // one case of a file whose /DecodeParms was [ << >> ] when
     // /Filters was empty has been seen in the wild.
     if ((filters.size() != 0) && (decode_parms.size() != filters.size())) {
-        warn(
-            qpdf_e_damaged_pdf,
-            this->offset,
-            "stream /DecodeParms length is"
-            " inconsistent with filters");
+        warn("stream /DecodeParms length is inconsistent with filters");
         filterable = false;
     }
 
@@ -581,9 +574,8 @@ QPDF_Stream::pipeStreamData(
             }
             Pl_Flate* flate = dynamic_cast<Pl_Flate*>(pipeline);
             if (flate != nullptr) {
-                flate->setWarnCallback([this](char const* msg, int code) {
-                    warn(qpdf_e_damaged_pdf, this->offset, msg);
-                });
+                flate->setWarnCallback(
+                    [this](char const* msg, int code) { warn(msg); });
             }
         }
     }
@@ -646,28 +638,17 @@ QPDF_Stream::pipeStreamData(
 
     if (filter && (!suppress_warnings) && normalizer.get() &&
         normalizer->anyBadTokens()) {
-        warn(
-            qpdf_e_damaged_pdf,
-            this->offset,
-            "content normalization encountered bad tokens");
+        warn("content normalization encountered bad tokens");
         if (normalizer->lastTokenWasBad()) {
             QTC::TC("qpdf", "QPDF_Stream bad token at end during normalize");
-            warn(
-                qpdf_e_damaged_pdf,
-                this->offset,
-                "normalized content ended with a bad token;"
-                " you may be able to resolve this by"
-                " coalescing content streams in combination"
-                " with normalizing content. From the command"
-                " line, specify --coalesce-contents");
+            warn("normalized content ended with a bad token; you may be able "
+                 "to resolve this by coalescing content streams in combination "
+                 "with normalizing content. From the command line, specify "
+                 "--coalesce-contents");
         }
-        warn(
-            qpdf_e_damaged_pdf,
-            this->offset,
-            "Resulting stream data may be corrupted but is"
-            " may still useful for manual inspection."
-            " For more information on this warning, search"
-            " for content normalization in the manual.");
+        warn("Resulting stream data may be corrupted but is may still useful "
+             "for manual inspection. For more information on this warning, "
+             "search for content normalization in the manual.");
     }
 
     return success;
@@ -732,10 +713,7 @@ QPDF_Stream::replaceDict(QPDFObjectHandle const& new_dict)
 }
 
 void
-QPDF_Stream::warn(
-    qpdf_error_code_e error_code,
-    qpdf_offset_t offset,
-    std::string const& message)
+QPDF_Stream::warn(std::string const& message)
 {
-    this->qpdf->warn(error_code, "", offset, message);
+    this->qpdf->warn(qpdf_e_damaged_pdf, "", this->offset, message);
 }
