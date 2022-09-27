@@ -98,10 +98,7 @@ class QPDF_Stream: public QPDFValue
         std::vector<std::shared_ptr<QPDFStreamFilter>>& filters,
         bool& specialized_compression,
         bool& lossy_compression);
-    void warn(
-        qpdf_error_code_e error_code,
-        qpdf_offset_t offset,
-        std::string const& message);
+    void warn(std::string const& message);
     void setDictDescription();
 
     bool filter_on_write;
