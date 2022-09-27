@@ -117,7 +117,6 @@ QPDF_Stream::QPDF_Stream(
     QPDFValue(::ot_stream, "stream"),
     filter_on_write(true),
     stream_dict(stream_dict),
-    offset(offset),
     length(length)
 {
     if (!stream_dict.isDictionary()) {
@@ -126,6 +125,7 @@ QPDF_Stream::QPDF_Stream(
     }
     setDescription(
         qpdf, qpdf->getFilename() + ", stream object " + og.unparse(' '));
+    this->parsed_offset = offset;
 }
 
 std::shared_ptr<QPDFObject>
@@ -325,7 +325,7 @@ QPDF_Stream::isDataModified() const
 qpdf_offset_t
 QPDF_Stream::getOffset() const
 {
-    return this->offset;
+    return this->parsed_offset;
 }
 
 size_t
@@ -357,7 +357,7 @@ QPDF_Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
             qpdf_e_unsupported,
             qpdf->getFilename(),
             "",
-            this->offset,
+            this->parsed_offset,
             "getStreamData called on unfilterable stream");
     }
     QTC::TC("qpdf", "QPDF_Stream getStreamData");
@@ -373,7 +373,7 @@ QPDF_Stream::getRawStreamData()
             qpdf_e_unsupported,
             qpdf->getFilename(),
             "",
-            this->offset,
+            this->parsed_offset,
             "error getting raw stream data");
     }
     QTC::TC("qpdf", "QPDF_Stream getRawStreamData");
@@ -618,7 +618,7 @@ QPDF_Stream::pipeStreamData(
             this->stream_dict.replaceKey(
                 "/Length", QPDFObjectHandle::newInteger(actual_length));
         }
-    } else if (this->offset == 0) {
+    } else if (this->parsed_offset == 0) {
         QTC::TC("qpdf", "QPDF_Stream pipe no stream data");
         throw std::logic_error("pipeStreamData called for stream with no data");
     } else {
@@ -626,7 +626,7 @@ QPDF_Stream::pipeStreamData(
         if (!QPDF::Pipe::pipeStreamData(
                 this->qpdf,
                 og,
-                this->offset,
+                this->parsed_offset,
                 this->length,
                 this->stream_dict,
                 pipeline,
@@ -716,5 +716,5 @@ QPDF_Stream::replaceDict(QPDFObjectHandle const& new_dict)
 void
 QPDF_Stream::warn(std::string const& message)
 {
-    this->qpdf->warn(qpdf_e_damaged_pdf, "", this->offset, message);
+    this->qpdf->warn(qpdf_e_damaged_pdf, "", this->parsed_offset, message);
 }

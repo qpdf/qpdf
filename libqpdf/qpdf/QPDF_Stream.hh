@@ -103,7 +103,6 @@ class QPDF_Stream: public QPDFValue
 
     bool filter_on_write;
     QPDFObjectHandle stream_dict;
-    qpdf_offset_t offset;
     size_t length;
     std::shared_ptr<Buffer> stream_data;
     std::shared_ptr<QPDFObjectHandle::StreamDataProvider> stream_provider;
