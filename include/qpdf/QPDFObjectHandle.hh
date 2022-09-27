@@ -1496,17 +1496,6 @@ class QPDFObjectHandle
         {
             return QPDFObjectHandle(obj);
         }
-        static QPDFObjectHandle
-        newStream(
-            QPDF* qpdf,
-            QPDFObjGen const& og,
-            QPDFObjectHandle stream_dict,
-            qpdf_offset_t offset,
-            size_t length)
-        {
-            return QPDFObjectHandle::newStream(
-                qpdf, og, stream_dict, offset, length);
-        }
     };
     friend class Factory;
 
@@ -1620,14 +1609,6 @@ class QPDFObjectHandle
         obj(obj)
     {
     }
-
-    // Private object factory methods
-    static QPDFObjectHandle newStream(
-        QPDF* qpdf,
-        QPDFObjGen const& og,
-        QPDFObjectHandle stream_dict,
-        qpdf_offset_t offset,
-        size_t length);
 
     QPDF_Array* asArray();
     QPDF_Bool* asBool();
