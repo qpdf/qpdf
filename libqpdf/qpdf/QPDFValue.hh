@@ -69,11 +69,8 @@ class QPDFValue
     }
 
   protected:
-    QPDFValue() :
-        type_code(::ot_uninitialized),
-        type_name("uninitialized")
-    {
-    }
+    QPDFValue() = default;
+
     QPDFValue(qpdf_object_type_e type_code, char const* type_name) :
         type_code(type_code),
         type_name(type_name)
@@ -97,13 +94,14 @@ class QPDFValue
     QPDFValue(QPDFValue const&) = delete;
     QPDFValue& operator=(QPDFValue const&) = delete;
     std::string object_description;
-    qpdf_offset_t parsed_offset{-1};
-    const qpdf_object_type_e type_code;
-    char const* type_name;
+
+    const qpdf_object_type_e type_code{::ot_uninitialized};
+    char const* type_name{"uninitialized"};
 
   protected:
     QPDF* qpdf{nullptr};
-    QPDFObjGen og;
+    QPDFObjGen og{};
+    qpdf_offset_t parsed_offset{-1};
 };
 
 #endif // QPDFVALUE_HH

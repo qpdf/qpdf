@@ -1655,10 +1655,9 @@ QPDF::readObject(
                     throw e;
                 }
             }
-            auto stream =
-                QPDF_Stream::create(this, og, object, stream_offset, length);
-            stream->setParsedOffset(stream_offset);
-            object = newIndirect(og, stream);
+            object = newIndirect(
+                og,
+                QPDF_Stream::create(this, og, object, stream_offset, length));
         } else {
             input->seek(cur_offset, SEEK_SET);
         }
