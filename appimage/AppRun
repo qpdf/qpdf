@@ -381,7 +381,7 @@ fi
 if [ x"$1" == "xman"  -o  x"$1" == "x--man" ] ; then
     export MANPATH="$HERE/usr/share/man:$MANPATH"
     shift
-    exec man "$@" || man $(basename $1)
+    exec man "$@" || man $(basename -- $1)
 fi
 
 
@@ -452,9 +452,9 @@ fi
 ### Main stuff happens from here:
 if [ ! -z $APPIMAGE ] ; then
     # We run as an AppImage
-    BINARY_NAME=$(basename "$ARGV0")
+    BINARY_NAME=$(basename -- "$ARGV0")
     APPIMAGE=$APPIMAGE
-    CALLED_SUBCMD=$( basename $1 2>/dev/null )
+    CALLED_SUBCMD=$( basename -- $1 2>/dev/null )
     if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
         # We have the (hidden) env var for debugging stuff set
         echo BINARY_NAME=$BINARY_NAME       1>&2  # Don't leak strings into output of qpdf|fix-pdf|zlib-flate going to stdout!
@@ -470,7 +470,6 @@ if [ ! -z $APPIMAGE ] ; then
             echo APPIMAGE=$APPIMAGE             1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
             echo CALLED_SUBCMD=$CALLED_SUBCMD   1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
         fi
-        shift
         exec "$HERE/usr/bin/$BINARY_NAME" "$@"
 
     else
@@ -504,9 +503,9 @@ if [ ! -z $APPIMAGE ] ; then
 
 else
     # Most likely we run from an AppDir, not as an AppImage:
-    BINARY_NAME=$(basename "$ARGV0")
+    BINARY_NAME=$(basename -- "$ARGV0")
     APPIMAGE=$APPIMAGE
-    CALLED_SUBCMD=$( basename $1 2>/dev/null )
+    CALLED_SUBCMD=$( basename -- $1 2>/dev/null )
     if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
         # We have the (hidden) env var for debugging stuff set
         echo BINARY_NAME=$BINARY_NAME       1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
@@ -534,7 +533,6 @@ else
             echo APPIMAGE=$APPIMAGE             1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
             echo CALLED_SUBCMD=$CALLED_SUBCMD   1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
         fi
-        shift
         exec "$HERE/usr/bin/$BINARY_NAME" "$@"
 
     else
