@@ -172,17 +172,6 @@ QPDF_Stream::disconnect()
     QPDFObjectHandle::DisconnectAccess::disconnect(this->stream_dict);
 }
 
-void
-QPDF_Stream::setObjGen(QPDFObjGen const& og)
-{
-    if (this->og.isIndirect()) {
-        throw std::logic_error(
-            "attempt to set object ID and generation of a stream"
-            " that already has them");
-    }
-    this->og = og;
-}
-
 std::string
 QPDF_Stream::unparse()
 {
@@ -320,12 +309,6 @@ bool
 QPDF_Stream::isDataModified() const
 {
     return (!this->token_filters.empty());
-}
-
-qpdf_offset_t
-QPDF_Stream::getOffset() const
-{
-    return this->parsed_offset;
 }
 
 size_t
