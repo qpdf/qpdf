@@ -186,24 +186,16 @@ QPDF::readLinearizationData()
 
     if (!(H.isArray() && O.isInteger() && E.isInteger() && N.isInteger() &&
           T.isInteger() && (P.isInteger() || P.isNull()))) {
-        throw QPDFExc(
-            qpdf_e_damaged_pdf,
-            this->m->file->getName(),
+        throw damagedPDF(
             "linearization dictionary",
-            this->m->file->getLastOffset(),
-            "some keys in linearization dictionary are of "
-            "the wrong type");
+            "some keys in linearization dictionary are of the wrong type");
     }
 
     // Hint table array: offset length [ offset length ]
     size_t n_H_items = toS(H.getArrayNItems());
     if (!((n_H_items == 2) || (n_H_items == 4))) {
-        throw QPDFExc(
-            qpdf_e_damaged_pdf,
-            this->m->file->getName(),
-            "linearization dictionary",
-            this->m->file->getLastOffset(),
-            "H has the wrong number of items");
+        throw damagedPDF(
+            "linearization dictionary", "H has the wrong number of items");
     }
 
     std::vector<int> H_items;
@@ -212,11 +204,8 @@ QPDF::readLinearizationData()
         if (oh.isInteger()) {
             H_items.push_back(oh.getIntValueAsInt());
         } else {
-            throw QPDFExc(
-                qpdf_e_damaged_pdf,
-                this->m->file->getName(),
+            throw damagedPDF(
                 "linearization dictionary",
-                this->m->file->getLastOffset(),
                 "some H items are of the wrong type");
         }
     }
@@ -249,12 +238,8 @@ QPDF::readLinearizationData()
     // initialized from N, to pre-allocate memory, so make sure it's
     // accurate and bail right now if it's not.
     if (N.getIntValue() != static_cast<long long>(getAllPages().size())) {
-        throw QPDFExc(
-            qpdf_e_damaged_pdf,
-            this->m->file->getName(),
-            "linearization hint table",
-            this->m->file->getLastOffset(),
-            "/N does not match number of pages");
+        throw damagedPDF(
+            "linearization hint table", "/N does not match number of pages");
     }
 
     // file_size initialized by isLinearized()
@@ -297,11 +282,8 @@ QPDF::readLinearizationData()
 
     int HSi = HS.getIntValueAsInt();
     if ((HSi < 0) || (toS(HSi) >= h_size)) {
-        throw QPDFExc(
-            qpdf_e_damaged_pdf,
-            this->m->file->getName(),
+        throw damagedPDF(
             "linearization hint table",
-            this->m->file->getLastOffset(),
             "/S (shared object) offset is out of bounds");
     }
     readHSharedObject(BitStream(h_buf + HSi, h_size - toS(HSi)));
@@ -309,11 +291,8 @@ QPDF::readLinearizationData()
     if (HO.isInteger()) {
         int HOi = HO.getIntValueAsInt();
         if ((HOi < 0) || (toS(HOi) >= h_size)) {
-            throw QPDFExc(
-                qpdf_e_damaged_pdf,
-                this->m->file->getName(),
+            throw damagedPDF(
                 "linearization hint table",
-                this->m->file->getLastOffset(),
                 "/O (outline) offset is out of bounds");
         }
         readHGeneric(
@@ -331,12 +310,8 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
     qpdf_offset_t min_end_offset = oc.end_before_space;
     qpdf_offset_t max_end_offset = oc.end_after_space;
     if (!H.isStream()) {
-        throw QPDFExc(
-            qpdf_e_damaged_pdf,
-            this->m->file->getName(),
-            "linearization dictionary",
-            this->m->file->getLastOffset(),
-            "hint table is not a stream");
+        throw damagedPDF(
+            "linearization dictionary", "hint table is not a stream");
     }
 
     QPDFObjectHandle Hdict = H.getDict();
@@ -362,12 +337,8 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
         *this->m->log->getError()
             << "expected = " << computed_end << "; actual = " << min_end_offset
             << ".." << max_end_offset << "\n";
-        throw QPDFExc(
-            qpdf_e_damaged_pdf,
-            this->m->file->getName(),
-            "linearization dictionary",
-            this->m->file->getLastOffset(),
-            "hint table length mismatch");
+        throw damagedPDF(
+            "linearization dictionary", "hint table length mismatch");
     }
     H.pipeStreamData(&pl, 0, qpdf_dl_specialized);
     return Hdict;
