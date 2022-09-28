@@ -1194,6 +1194,22 @@ class QPDF
         std::shared_ptr<QPDFObject> const& object,
         qpdf_offset_t end_before_space,
         qpdf_offset_t end_after_space);
+    static QPDFExc damagedPDF(
+        std::shared_ptr<InputSource> const& input,
+        std::string const& object,
+        qpdf_offset_t offset,
+        std::string const& message);
+    QPDFExc damagedPDF(
+        std::shared_ptr<InputSource> const& input,
+        qpdf_offset_t offset,
+        std::string const& message);
+    QPDFExc damagedPDF(
+        std::string const& object,
+        qpdf_offset_t offset,
+        std::string const& message);
+    QPDFExc damagedPDF(std::string const& object, std::string const& message);
+    QPDFExc damagedPDF(qpdf_offset_t offset, std::string const& message);
+    QPDFExc damagedPDF(std::string const& message);
 
     // Calls finish() on the pipeline when done but does not delete it
     bool pipeStreamData(

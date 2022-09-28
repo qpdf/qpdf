@@ -804,21 +804,12 @@ QPDF::initializeEncryption()
         // Treating a missing ID as the empty string enables qpdf to
         // decrypt some invalid encrypted files with no /ID that
         // poppler can read but Adobe Reader can't.
-        warn(
-            qpdf_e_damaged_pdf,
-            "trailer",
-            this->m->file->getLastOffset(),
-            "invalid /ID in trailer dictionary");
+        warn(damagedPDF("trailer", "invalid /ID in trailer dictionary"));
     }
 
     QPDFObjectHandle encryption_dict = this->m->trailer.getKey("/Encrypt");
     if (!encryption_dict.isDictionary()) {
-        throw QPDFExc(
-            qpdf_e_damaged_pdf,
-            this->m->file->getName(),
-            this->m->last_object_description,
-            this->m->file->getLastOffset(),
-            "/Encrypt in trailer dictionary is not a dictionary");
+        throw damagedPDF("/Encrypt in trailer dictionary is not a dictionary");
     }
 
     if (!(encryption_dict.getKey("/Filter").isName() &&
@@ -835,8 +826,7 @@ QPDF::initializeEncryption()
             qpdf_e_unsupported,
             "encryption dictionary",
             this->m->file->getLastOffset(),
-            "file uses encryption SubFilters,"
-            " which qpdf does not support");
+            "file uses encryption SubFilters, which qpdf does not support");
     }
 
     if (!(encryption_dict.getKey("/V").isInteger() &&
@@ -844,13 +834,10 @@ QPDF::initializeEncryption()
           encryption_dict.getKey("/O").isString() &&
           encryption_dict.getKey("/U").isString() &&
           encryption_dict.getKey("/P").isInteger())) {
-        throw QPDFExc(
-            qpdf_e_damaged_pdf,
-            this->m->file->getName(),
+        throw damagedPDF(
             "encryption dictionary",
-            this->m->file->getLastOffset(),
-            "some encryption dictionary parameters are missing "
-            "or the wrong type");
+            "some encryption dictionary parameters are missing or the wrong "
+            "type");
     }
 
     int V = encryption_dict.getKey("/V").getIntValueAsInt();
@@ -886,25 +873,18 @@ QPDF::initializeEncryption()
         pad_short_parameter(O, key_bytes);
         pad_short_parameter(U, key_bytes);
         if (!((O.length() == key_bytes) && (U.length() == key_bytes))) {
-            throw QPDFExc(
-                qpdf_e_damaged_pdf,
-                this->m->file->getName(),
+            throw damagedPDF(
                 "encryption dictionary",
-                this->m->file->getLastOffset(),
-                "incorrect length for /O and/or /U in "
-                "encryption dictionary");
+                "incorrect length for /O and/or /U in encryption dictionary");
         }
     } else {
         if (!(encryption_dict.getKey("/OE").isString() &&
               encryption_dict.getKey("/UE").isString() &&
               encryption_dict.getKey("/Perms").isString())) {
-            throw QPDFExc(
-                qpdf_e_damaged_pdf,
-                this->m->file->getName(),
+            throw damagedPDF(
                 "encryption dictionary",
-                this->m->file->getLastOffset(),
-                "some V=5 encryption dictionary parameters are "
-                "missing or the wrong type");
+                "some V=5 encryption dictionary parameters are missing or the "
+                "wrong type");
         }
         OE = encryption_dict.getKey("/OE").getStringValue();
         UE = encryption_dict.getKey("/UE").getStringValue();
@@ -1062,12 +1042,10 @@ QPDF::initializeEncryption()
         this->m->encp->encryption_key = recover_encryption_key_with_password(
             this->m->encp->provided_password, data, perms_valid);
         if (!perms_valid) {
-            warn(
-                qpdf_e_damaged_pdf,
+            warn(damagedPDF(
                 "encryption dictionary",
-                this->m->file->getLastOffset(),
-                "/Perms field in encryption dictionary"
-                " doesn't match expected value");
+                "/Perms field in encryption dictionary doesn't match expected "
+                "value"));
         }
     }
 }
@@ -1121,13 +1099,9 @@ QPDF::decryptString(std::string& str, QPDFObjGen const& og)
             break;
 
         default:
-            warn(
-                qpdf_e_damaged_pdf,
-                this->m->last_object_description,
-                this->m->file->getLastOffset(),
-                "unknown encryption filter for strings"
-                " (check /StrF in /Encrypt dictionary);"
-                " strings may be decrypted improperly");
+            warn(damagedPDF(
+                "unknown encryption filter for strings (check /StrF in "
+                "/Encrypt dictionary); strings may be decrypted improperly"));
             // To avoid repeated warnings, reset cf_string.  Assume
             // we'd want to use AES if V == 4.
             this->m->encp->cf_string = e_aes;
@@ -1166,13 +1140,9 @@ QPDF::decryptString(std::string& str, QPDFObjGen const& og)
     } catch (QPDFExc&) {
         throw;
     } catch (std::runtime_error& e) {
-        throw QPDFExc(
-            qpdf_e_damaged_pdf,
-            this->m->file->getName(),
-            this->m->last_object_description,
-            this->m->file->getLastOffset(),
+        throw damagedPDF(
             "error decrypting string for object " + og.unparse() + ": " +
-                e.what());
+            e.what());
     }
 }
 
@@ -1265,11 +1235,8 @@ QPDF::decryptStream(
                 file->getName(),
                 "",
                 file->getLastOffset(),
-                "unknown encryption filter for streams"
-                " (check " +
-                    method_source +
-                    ");"
-                    " streams may be decrypted improperly"));
+                "unknown encryption filter for streams (check " +
+                    method_source + "); streams may be decrypted improperly"));
             // To avoid repeated warnings, reset cf_stream.  Assume
             // we'd want to use AES if V == 4.
             encp->cf_stream = e_aes;
