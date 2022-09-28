@@ -22,6 +22,7 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFObject_private.hh>
+#include <qpdf/QPDFParser.hh>
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QPDF_Null.hh>
@@ -530,7 +531,7 @@ void
 QPDF::inParse(bool v)
 {
     if (this->m->in_parse == v) {
-        // This happens of QPDFObjectHandle::parseInternal tries to
+        // This happens if QPDFParser::parse tries to
         // resolve an indirect object while it is parsing.
         throw std::logic_error(
             "QPDF: re-entrant parsing detected. This is a qpdf bug."
@@ -1413,13 +1414,10 @@ QPDF::readObject(
         decrypter_ph = std::make_shared<StringDecrypter>(this, og);
         decrypter = decrypter_ph.get();
     }
-    QPDFObjectHandle object = QPDFObjectHandle::parse(
-        input,
-        this->m->last_object_description,
-        this->m->tokenizer,
-        empty,
-        decrypter,
-        this);
+    auto object =
+        QPDFParser(
+            input, m->last_object_description, m->tokenizer, decrypter, this)
+            .parse(empty, false);
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but
         // they have been encountered in actual PDF files and Adobe
