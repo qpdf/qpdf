@@ -112,6 +112,16 @@ class QPDFTokenizer
         {
             return this->type == tt_integer;
         }
+        bool
+        isWord() const
+        {
+            return this->type == tt_word;
+        }
+        bool
+        isWord(std::string const& value) const
+        {
+            return this->type == tt_word && this->value == value;
+        }
 
       private:
         token_type_e type;

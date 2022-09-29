@@ -210,18 +210,16 @@ InlineImageTracker::handleToken(QPDFTokenizer::Token const& token)
                 writeToken(token);
                 state = st_top;
             }
-        } else if (
-            token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "ID")) {
+        } else if (token.isWord("ID")) {
             bi_str += token.getValue();
             dict_str += " >>";
-        } else if (
-            token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "EI")) {
+        } else if (token.isWord("EI")) {
             state = st_top;
         } else {
             bi_str += token.getRawValue();
             dict_str += token.getRawValue();
         }
-    } else if (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "BI")) {
+    } else if (token.isWord("BI")) {
         bi_str = token.getValue();
         dict_str = "<< ";
         state = st_bi;

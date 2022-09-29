@@ -139,8 +139,7 @@ ColorToGray::handleToken(QPDFTokenizer::Token const& token)
     QPDFTokenizer::token_type_e token_type = token.getType();
     if (!isIgnorable(token_type)) {
         this->stack.push_back(token);
-        if ((this->stack.size() == 4) &&
-            (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "rg")) &&
+        if ((this->stack.size() == 4) && token.isWord("rg") &&
             (isNumeric(this->stack.at(0).getType())) &&
             (isNumeric(this->stack.at(1).getType())) &&
             (isNumeric(this->stack.at(2).getType()))) {

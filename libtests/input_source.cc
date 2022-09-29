@@ -37,9 +37,9 @@ Finder::check()
 {
     QPDFTokenizer tokenizer;
     QPDFTokenizer::Token t = tokenizer.readToken(is, "finder", true);
-    if (t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "potato")) {
+    if (t.isWord("potato")) {
         t = tokenizer.readToken(is, "finder", true);
-        return (t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, after));
+        return t.isWord(after);
     }
     return false;
 }
