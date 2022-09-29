@@ -53,9 +53,7 @@ Pl_QPDFTokenizer::finish()
         this->m->filter->handleToken(token);
         if (token.getType() == QPDFTokenizer::tt_eof) {
             break;
-        } else if (
-            (token.getType() == QPDFTokenizer::tt_word) &&
-            (token.getValue() == "ID")) {
+        } else if (token.isWord("ID")) {
             // Read the space after the ID.
             char ch = ' ';
             input->read(&ch, 1);

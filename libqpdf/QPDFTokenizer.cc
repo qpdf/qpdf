@@ -892,7 +892,7 @@ QPDFTokenizer::findEI(std::shared_ptr<InputSource> input)
                 okay = true;
             } else if (type == tt_bad) {
                 found_bad = true;
-            } else if (type == tt_word) {
+            } else if (t.isWord()) {
                 // The qpdf tokenizer lumps alphabetic and otherwise
                 // uncategorized characters into "words". We recognize
                 // strings of alphabetic characters as potential valid

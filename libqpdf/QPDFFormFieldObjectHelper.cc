@@ -556,7 +556,7 @@ ValueSetter::handleToken(QPDFTokenizer::Token const& token)
     switch (state) {
     case st_top:
         writeToken(token);
-        if ((ttype == QPDFTokenizer::tt_word) && (value == "BMC")) {
+        if (token.isWord("BMC")) {
             state = st_bmc;
         }
         break;
@@ -571,7 +571,7 @@ ValueSetter::handleToken(QPDFTokenizer::Token const& token)
         // fall through to emc
 
     case st_emc:
-        if ((ttype == QPDFTokenizer::tt_word) && (value == "EMC")) {
+        if (token.isWord("EMC")) {
             do_replace = true;
             state = st_end;
         }
@@ -751,7 +751,7 @@ TfFinder::handleToken(QPDFTokenizer::Token const& token)
         break;
 
     case QPDFTokenizer::tt_word:
-        if (value == "Tf") {
+        if (token.isWord("Tf")) {
             if ((last_num > 1.0) && (last_num < 1000.0)) {
                 // These ranges are arbitrary but keep us from doing
                 // insane things or suffering from over/underflow
