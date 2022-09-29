@@ -107,6 +107,11 @@ class QPDFTokenizer
                 (this->type != tt_bad) && (this->type == rhs.type) &&
                 (this->value == rhs.value));
         }
+        bool
+        isInteger() const
+        {
+            return this->type == tt_integer;
+        }
 
       private:
         token_type_e type;
