@@ -461,8 +461,7 @@ QPDF::findStartxref()
 {
     QPDFTokenizer::Token t = readToken(this->m->file);
     if (t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "startxref")) {
-        t = readToken(this->m->file);
-        if (t.getType() == QPDFTokenizer::tt_integer) {
+        if (readToken(this->m->file).isInteger()) {
             // Position in front of offset token
             this->m->file->seek(this->m->file->getLastOffset(), SEEK_SET);
             return true;
@@ -612,10 +611,10 @@ QPDF::reconstruct_xref(QPDFExc& e)
         if (token_start >= next_line_start) {
             // don't process yet -- wait until we get to the line
             // containing this token
-        } else if (t1.getType() == QPDFTokenizer::tt_integer) {
+        } else if (t1.isInteger()) {
             QPDFTokenizer::Token t2 = readToken(this->m->file, MAX_LEN);
             QPDFTokenizer::Token t3 = readToken(this->m->file, MAX_LEN);
-            if ((t2.getType() == QPDFTokenizer::tt_integer) &&
+            if ((t2.isInteger()) &&
                 (t3 == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "obj"))) {
                 int obj = QUtil::string_to_int(t1.getValue().c_str());
                 int gen = QUtil::string_to_int(t2.getValue().c_str());
@@ -1682,8 +1681,8 @@ QPDF::readObjectAtOffset(
     QPDFTokenizer::Token tgen = readToken(this->m->file);
     QPDFTokenizer::Token tobj = readToken(this->m->file);
 
-    bool objidok = (tobjid.getType() == QPDFTokenizer::tt_integer);
-    int genok = (tgen.getType() == QPDFTokenizer::tt_integer);
+    bool objidok = tobjid.isInteger();
+    int genok = tgen.isInteger();
     int objok = (tobj == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "obj"));
 
     QTC::TC("qpdf", "QPDF check objid", objidok ? 1 : 0);
@@ -1945,10 +1944,10 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     for (int i = 0; i < n; ++i) {
         QPDFTokenizer::Token tnum = readToken(input);
         QPDFTokenizer::Token toffset = readToken(input);
-        if (!((tnum.getType() == QPDFTokenizer::tt_integer) &&
-              (toffset.getType() == QPDFTokenizer::tt_integer))) {
+        if (!(tnum.isInteger() && toffset.isInteger())) {
             throw damagedPDF(
                 input,
+                this->m->last_object_description,
                 input->getLastOffset(),
                 "expected integer in object stream header");
         }
