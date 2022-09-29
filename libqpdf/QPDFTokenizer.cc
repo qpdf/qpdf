@@ -974,11 +974,21 @@ QPDFTokenizer::readToken(
     bool allow_bad,
     size_t max_len)
 {
-    qpdf_offset_t offset = input->fastTell();
+    return readToken(*input, context, allow_bad, max_len);
+}
+
+QPDFTokenizer::Token
+QPDFTokenizer::readToken(
+    InputSource& input,
+    std::string const& context,
+    bool allow_bad,
+    size_t max_len)
+{
+    qpdf_offset_t offset = input.fastTell();
 
     while (this->state != st_token_ready) {
         char ch;
-        if (!input->fastRead(ch)) {
+        if (!input.fastRead(ch)) {
             presentEOF();
 
             if ((this->type == tt_eof) && (!this->allow_eof)) {
@@ -987,7 +997,7 @@ QPDFTokenizer::readToken(
                 // exercised.
                 this->type = tt_bad;
                 this->error_message = "unexpected EOF";
-                offset = input->getLastOffset();
+                offset = input.getLastOffset();
             }
         } else {
             handleCharacter(ch);
@@ -1013,10 +1023,10 @@ QPDFTokenizer::readToken(
     bool unread_char;
     char char_to_unread;
     getToken(token, unread_char, char_to_unread);
-    input->fastUnread(unread_char);
+    input.fastUnread(unread_char);
 
     if (token.getType() != tt_eof) {
-        input->setLastOffset(offset);
+        input.setLastOffset(offset);
     }
 
     if (token.getType() == tt_bad) {
@@ -1025,7 +1035,7 @@ QPDFTokenizer::readToken(
         } else {
             throw QPDFExc(
                 qpdf_e_damaged_pdf,
-                input->getName(),
+                input.getName(),
                 context,
                 offset,
                 token.getErrorMessage());

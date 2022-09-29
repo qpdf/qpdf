@@ -1758,7 +1758,7 @@ QPDFTokenizer::Token
 QPDF::readToken(std::shared_ptr<InputSource> input, size_t max_len)
 {
     return this->m->tokenizer.readToken(
-        input, this->m->last_object_description, true, max_len);
+        *input, this->m->last_object_description, true, max_len);
 }
 
 QPDFObjectHandle

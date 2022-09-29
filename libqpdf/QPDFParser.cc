@@ -66,7 +66,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
         set_offset = false;
 
         QPDFTokenizer::Token token =
-            tokenizer.readToken(input, object_description, true);
+            tokenizer.readToken(*input, object_description, true);
         std::string const& token_error_message = token.getErrorMessage();
         if (!token_error_message.empty()) {
             // Tokens other than tt_bad can still generate warnings.

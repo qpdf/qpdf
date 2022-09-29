@@ -1919,7 +1919,7 @@ QPDFObjectHandle::parseContentStream_data(
         // from this process is the beginning of the next
         // non-ignorable (space, comment) token. This way, the offset
         // and don't including ignorable content.
-        tokenizer.readToken(input, "content", true);
+        tokenizer.readToken(*input, "content", true);
         qpdf_offset_t offset = input->getLastOffset();
         input->seek(offset, SEEK_SET);
         auto obj = QPDFParser(input, "content", tokenizer, nullptr, context)
@@ -1938,7 +1938,7 @@ QPDFObjectHandle::parseContentStream_data(
             input->read(&ch, 1);
             tokenizer.expectInlineImage(input);
             QPDFTokenizer::Token t =
-                tokenizer.readToken(input, description, true);
+                tokenizer.readToken(*input, description, true);
             offset = input->getLastOffset();
             length = QIntC::to_size(input->tell() - offset);
             if (t.getType() == QPDFTokenizer::tt_bad) {

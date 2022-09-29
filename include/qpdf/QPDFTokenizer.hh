@@ -177,7 +177,12 @@ class QPDFTokenizer
         std::string const& context,
         bool allow_bad = false,
         size_t max_len = 0);
-
+    QPDF_DLL
+    Token readToken(
+        InputSource& input,
+        std::string const& context,
+        bool allow_bad = false,
+        size_t max_len = 0);
     // Calling this method puts the tokenizer in a state for reading
     // inline images. You should call this method after reading the
     // character following the ID operator. In that state, it will
