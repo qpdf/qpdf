@@ -120,10 +120,10 @@ QPDF::isLinearized()
             ++p;
         }
 
-        QPDFTokenizer::Token t1 = readToken(this->m->file);
-        QPDFTokenizer::Token t2 = readToken(this->m->file);
-        QPDFTokenizer::Token t3 = readToken(this->m->file);
-        QPDFTokenizer::Token t4 = readToken(this->m->file);
+        QPDFTokenizer::Token t1 = readToken(*m->file);
+        QPDFTokenizer::Token t2 = readToken(*m->file);
+        QPDFTokenizer::Token t3 = readToken(*m->file);
+        QPDFTokenizer::Token t4 = readToken(*m->file);
         if ((t1.getType() == QPDFTokenizer::tt_integer) &&
             (t2.getType() == QPDFTokenizer::tt_integer) &&
             (t3 == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "obj")) &&

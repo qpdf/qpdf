@@ -458,9 +458,9 @@ QPDF::findHeader()
 bool
 QPDF::findStartxref()
 {
-    QPDFTokenizer::Token t = readToken(this->m->file);
+    QPDFTokenizer::Token t = readToken(*m->file);
     if (t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "startxref")) {
-        t = readToken(this->m->file);
+        t = readToken(*m->file);
         if (t.getType() == QPDFTokenizer::tt_integer) {
             // Position in front of offset token
             this->m->file->seek(this->m->file->getLastOffset(), SEEK_SET);
@@ -497,7 +497,7 @@ QPDF::parse(char const* password)
     qpdf_offset_t xref_offset = 0;
     if (this->m->file->findLast("startxref", start_offset, 0, sf)) {
         xref_offset =
-            QUtil::string_to_ll(readToken(this->m->file).getValue().c_str());
+            QUtil::string_to_ll(readToken(*m->file).getValue().c_str());
     }
 
     try {
@@ -618,15 +618,15 @@ QPDF::reconstruct_xref(QPDFExc& e)
         this->m->file->findAndSkipNextEOL();
         qpdf_offset_t next_line_start = this->m->file->tell();
         this->m->file->seek(line_start, SEEK_SET);
-        QPDFTokenizer::Token t1 = readToken(this->m->file, MAX_LEN);
+        QPDFTokenizer::Token t1 = readToken(*m->file, MAX_LEN);
         qpdf_offset_t token_start =
             this->m->file->tell() - toO(t1.getValue().length());
         if (token_start >= next_line_start) {
             // don't process yet -- wait until we get to the line
             // containing this token
         } else if (t1.getType() == QPDFTokenizer::tt_integer) {
-            QPDFTokenizer::Token t2 = readToken(this->m->file, MAX_LEN);
-            QPDFTokenizer::Token t3 = readToken(this->m->file, MAX_LEN);
+            QPDFTokenizer::Token t2 = readToken(*m->file, MAX_LEN);
+            QPDFTokenizer::Token t3 = readToken(*m->file, MAX_LEN);
             if ((t2.getType() == QPDFTokenizer::tt_integer) &&
                 (t3 == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "obj"))) {
                 int obj = QUtil::string_to_int(t1.getValue().c_str());
@@ -965,7 +965,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
             }
         }
         qpdf_offset_t pos = this->m->file->tell();
-        QPDFTokenizer::Token t = readToken(this->m->file);
+        QPDFTokenizer::Token t = readToken(*m->file);
         if (t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "trailer")) {
             done = true;
         } else {
@@ -1531,7 +1531,7 @@ QPDF::readObject(
     } else if (object.isDictionary() && (!in_object_stream)) {
         // check for stream
         qpdf_offset_t cur_offset = input->tell();
-        if (readToken(input) ==
+        if (readToken(*input) ==
             QPDFTokenizer::Token(QPDFTokenizer::tt_word, "stream")) {
             // The PDF specification states that the word "stream"
             // should be followed by either a carriage return and
@@ -1636,7 +1636,7 @@ QPDF::readObject(
                 // Seek in two steps to avoid potential integer overflow
                 input->seek(stream_offset, SEEK_SET);
                 input->seek(toO(length), SEEK_CUR);
-                if (!(readToken(input) ==
+                if (!(readToken(*input) ==
                       QPDFTokenizer::Token(
                           QPDFTokenizer::tt_word, "endstream"))) {
                     QTC::TC("qpdf", "QPDF missing endstream");
@@ -1672,7 +1672,7 @@ bool
 QPDF::findEndstream()
 {
     // Find endstream or endobj. Position the input at that token.
-    QPDFTokenizer::Token t = readToken(this->m->file, 20);
+    QPDFTokenizer::Token t = readToken(*m->file, 20);
     if ((t.getType() == QPDFTokenizer::tt_word) &&
         ((t.getValue() == "endobj") || (t.getValue() == "endstream"))) {
         this->m->file->seek(this->m->file->getLastOffset(), SEEK_SET);
@@ -1701,7 +1701,7 @@ QPDF::recoverStreamLength(
     if (this->m->file->findFirst("end", stream_offset, 0, ef)) {
         length = toS(this->m->file->tell() - stream_offset);
         // Reread endstream but, if it was endobj, don't skip that.
-        QPDFTokenizer::Token t = readToken(this->m->file);
+        QPDFTokenizer::Token t = readToken(*m->file);
         if (t.getValue() == "endobj") {
             this->m->file->seek(this->m->file->getLastOffset(), SEEK_SET);
         }
@@ -1755,10 +1755,10 @@ QPDF::recoverStreamLength(
 }
 
 QPDFTokenizer::Token
-QPDF::readToken(std::shared_ptr<InputSource> input, size_t max_len)
+QPDF::readToken(InputSource& input, size_t max_len)
 {
     return this->m->tokenizer.readToken(
-        *input, this->m->last_object_description, true, max_len);
+        input, this->m->last_object_description, true, max_len);
 }
 
 QPDFObjectHandle
@@ -1805,9 +1805,9 @@ QPDF::readObjectAtOffset(
 
     this->m->file->seek(offset, SEEK_SET);
 
-    QPDFTokenizer::Token tobjid = readToken(this->m->file);
-    QPDFTokenizer::Token tgen = readToken(this->m->file);
-    QPDFTokenizer::Token tobj = readToken(this->m->file);
+    QPDFTokenizer::Token tobjid = readToken(*m->file);
+    QPDFTokenizer::Token tgen = readToken(*m->file);
+    QPDFTokenizer::Token tobj = readToken(*m->file);
 
     bool objidok = (tobjid.getType() == QPDFTokenizer::tt_integer);
     int genok = (tgen.getType() == QPDFTokenizer::tt_integer);
@@ -1887,7 +1887,7 @@ QPDF::readObjectAtOffset(
 
     QPDFObjectHandle oh = readObject(this->m->file, description, og, false);
 
-    if (!(readToken(this->m->file) ==
+    if (!(readToken(*m->file) ==
           QPDFTokenizer::Token(QPDFTokenizer::tt_word, "endobj"))) {
         QTC::TC("qpdf", "QPDF err expected endobj");
         warn(
@@ -2073,8 +2073,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             bp.get()));
 
     for (int i = 0; i < n; ++i) {
-        QPDFTokenizer::Token tnum = readToken(input);
-        QPDFTokenizer::Token toffset = readToken(input);
+        QPDFTokenizer::Token tnum = readToken(*input);
+        QPDFTokenizer::Token toffset = readToken(*input);
         if (!((tnum.getType() == QPDFTokenizer::tt_integer) &&
               (toffset.getType() == QPDFTokenizer::tt_integer))) {
             throw QPDFExc(

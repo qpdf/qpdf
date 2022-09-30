@@ -1,5 +1,6 @@
 #include <cstdio>
-int main()
+int
+main()
 {
     char ch = '\xf7';
     if (ch < 0) {
