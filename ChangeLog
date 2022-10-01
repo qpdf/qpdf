@@ -1,8 +1,24 @@
+2022-10-01  Jay Berkenbilt  <ejb@ql.org>
+
+        * 11.1.1: release
+
+2022-09-27  Jay Berkenbilt  <ejb@ql.org>
+
+        * Bug fix: avoid having the AppImage discard the first argument
+        when renamed to one of the embedded executables. Fixes #789.
+
+        * Add AppImage-specific tests to CI. These test different
+        invocation styles and loading of the proper shared library.
+
 2022-09-26  Jay Berkenbilt  <ejb@ql.org>
 
         * Bug fix: avoid using PDF Doc encoding for strings whose PDF Doc
         encoding representation starts with UTF-16 or UTF-8 markers. Fixes
         #778.
+
+2022-09-27  Jay Berkenbilt  <ejb@ql.org>
+
+        * Add tests to CI for char being unsigned by default.
 
 2022-09-14  Jay Berkenbilt  <ejb@ql.org>
 

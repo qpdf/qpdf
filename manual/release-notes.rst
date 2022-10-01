@@ -8,6 +8,31 @@ For a detailed list of changes, please see the file
 
 .. x.y.z: not yet released
 
+11.1.1: October 1, 2022
+  - Bug fixes
+
+    - Fix edge case with character encoding for strings whose initial
+      characters happen to coincide with Unicode markers.
+
+    - Fix issue with AppImage discarding the first command-line
+      argument when invoked as the name of one of the embedded
+      executables. Also, fix-qdf, for unknown reasons, had the wrong
+      runpath and would use a qpdf library that was installed on the
+      system.
+
+  - Test improvements
+
+    - Exercise the case of ``char`` being ``unsigned`` by default in
+      automated tests.
+
+    - Add AppImage-specific tests to CI to ensure that the AppImage
+      works in the various ways it is intended to be invoked.
+
+  - Other changes
+
+    - Include more code tidying and performance improvements from M.
+      Holger.
+
 11.1.0: September 14, 2022
   - Build fixes
 
