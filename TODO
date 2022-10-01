@@ -1,4 +1,3 @@
-
 Always
 ======
 
@@ -10,6 +9,10 @@ Always
 Next
 ====
 
+* As an experiment, 11.1.1 has the qpdf-11.1.1-msvc64.exe as the
+  default download for Windows. If this works out, change
+  README-what-to-download.md and README-maintainer to reflect the
+  change.
 * Break ground on "Document-level work"
 
 Possible future JSON enhancements
