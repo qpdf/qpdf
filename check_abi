@@ -88,7 +88,14 @@ class Main:
             m = re.match(r'^[0-9a-f]+ (.) (.+)@@LIBQPDF_\d+\s*$', line)
             if not m:
                 continue
-            symbols.add(m.group(2))
+            symbol = m.group(2)
+            if re.match(r'^((void|int|bool|(.*? for)) )?std::', symbol):
+                # Calling different methods of STL classes causes
+                # different template instantiations to appear.
+                # Standard library methods that sneak into the binary
+                # interface are not considered part of the qpdf ABI.
+                continue
+            symbols.add(symbol)
         return symbols
 
     def dump(self, options):
