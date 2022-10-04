@@ -204,6 +204,18 @@ class QPDFTokenizer
     QPDF_DLL
     void expectInlineImage(std::shared_ptr<InputSource> input);
 
+    // Read a token from an input source. Context describes the
+    // context in which the token is being read and is used in the
+    // exception thrown if there is an error. After a token is read,
+    // the position of the input source returned by input->tell()
+    // points to just after the token, and the input source's "last
+    // offset" as returned by input->getLastOffset() points to the
+    // beginning of the token. Returns false if the token is bad
+    // or if scanning produced an error message for any reason.
+    QPDF_DLL
+    bool nextToken(
+        InputSource& input, std::string const& context, size_t max_len = 0);
+
   private:
     QPDFTokenizer(QPDFTokenizer const&) = delete;
     QPDFTokenizer& operator=(QPDFTokenizer const&) = delete;
