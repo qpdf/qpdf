@@ -807,7 +807,9 @@ QPDFTokenizer::presentEOF()
 void
 QPDFTokenizer::expectInlineImage(std::shared_ptr<InputSource> input)
 {
-    if (this->state != st_before_token) {
+    if (this->state == st_token_ready) {
+        reset();
+    } else if (this->state != st_before_token) {
         throw std::logic_error("QPDFTokenizer::expectInlineImage called"
                                " when tokenizer is in improper state");
     }
@@ -943,11 +945,40 @@ QPDFTokenizer::readToken(
     bool allow_bad,
     size_t max_len)
 {
-    qpdf_offset_t offset = input->fastTell();
+    nextToken(*input, context, max_len);
+
+    Token token;
+    bool unread_char;
+    char char_to_unread;
+    getToken(token, unread_char, char_to_unread);
+
+    if (token.getType() == tt_bad) {
+        if (allow_bad) {
+            QTC::TC("qpdf", "QPDFTokenizer allowing bad token");
+        } else {
+            throw QPDFExc(
+                qpdf_e_damaged_pdf,
+                input->getName(),
+                context,
+                input->getLastOffset(),
+                token.getErrorMessage());
+        }
+    }
+    return token;
+}
+
+bool
+QPDFTokenizer::nextToken(
+    InputSource& input, std::string const& context, size_t max_len)
+{
+    if (this->state != st_inline_image) {
+        reset();
+    }
+    qpdf_offset_t offset = input.fastTell();
 
     while (this->state != st_token_ready) {
         char ch;
-        if (!input->fastRead(ch)) {
+        if (!input.fastRead(ch)) {
             presentEOF();
 
             if ((this->type == tt_eof) && (!this->allow_eof)) {
@@ -956,7 +987,7 @@ QPDFTokenizer::readToken(
                 // exercised.
                 this->type = tt_bad;
                 this->error_message = "unexpected EOF";
-                offset = input->getLastOffset();
+                offset = input.getLastOffset();
             }
         } else {
             handleCharacter(ch);
@@ -978,28 +1009,11 @@ QPDFTokenizer::readToken(
         }
     }
 
-    Token token;
-    bool unread_char;
-    char char_to_unread;
-    getToken(token, unread_char, char_to_unread);
-    input->fastUnread(unread_char);
+    input.fastUnread(!this->in_token && !this->before_token);
 
-    if (token.getType() != tt_eof) {
-        input->setLastOffset(offset);
+    if (this->type != tt_eof) {
+        input.setLastOffset(offset);
     }
 
-    if (token.getType() == tt_bad) {
-        if (allow_bad) {
-            QTC::TC("qpdf", "QPDFTokenizer allowing bad token");
-        } else {
-            throw QPDFExc(
-                qpdf_e_damaged_pdf,
-                input->getName(),
-                context,
-                offset,
-                token.getErrorMessage());
-        }
-    }
-
-    return token;
+    return this->error_message.empty();
 }
