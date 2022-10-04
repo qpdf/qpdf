@@ -1,13 +1,13 @@
 #include <qpdf/QPDF_InlineImage.hh>
 
-QPDF_InlineImage::QPDF_InlineImage(std::string const& val) :
+QPDF_InlineImage::QPDF_InlineImage(std::string_view val) :
     QPDFValue(::ot_inlineimage, "inline-image"),
     val(val)
 {
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_InlineImage::create(std::string const& val)
+QPDF_InlineImage::create(std::string_view val)
 {
     return do_create(new QPDF_InlineImage(val));
 }

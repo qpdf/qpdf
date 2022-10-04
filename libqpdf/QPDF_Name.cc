@@ -4,14 +4,14 @@
 #include <stdio.h>
 #include <string.h>
 
-QPDF_Name::QPDF_Name(std::string const& name) :
+QPDF_Name::QPDF_Name(std::string_view name) :
     QPDFValue(::ot_name, "name"),
     name(name)
 {
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Name::create(std::string const& name)
+QPDF_Name::create(std::string_view name)
 {
     return do_create(new QPDF_Name(name));
 }
@@ -23,10 +23,10 @@ QPDF_Name::copy(bool shallow)
 }
 
 std::string
-QPDF_Name::normalizeName(std::string const& name)
+QPDF_Name::normalizeName(std::string_view name)
 {
     if (name.empty()) {
-        return name;
+        return "";
     }
     std::string result;
     result += name.at(0);

@@ -8,6 +8,7 @@
 #include <qpdf/Types.h>
 
 #include <string>
+#include <string_view>
 
 class QPDF;
 class QPDFObjectHandle;
