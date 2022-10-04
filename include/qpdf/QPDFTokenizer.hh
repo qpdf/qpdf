@@ -219,7 +219,15 @@ class QPDFTokenizer
     bool nextToken(
         InputSource& input, std::string const& context, size_t max_len = 0);
 
-  private:
+    // The following methods are only valid after nextToken has been called
+    // and until another QPDFTokenizer method is called. They allow the results
+    // of calling nextToken to be accessed without creating a Token, thus
+    // avoiding copying information that may not be needed.
+    inline token_type_e getType() const noexcept;
+    inline std::string const& getValue() const noexcept;
+    inline std::string const& getRawValue() const noexcept;
+    inline std::string const& getErrorMessage() const noexcept;
+
     QPDFTokenizer(QPDFTokenizer const&) = delete;
     QPDFTokenizer& operator=(QPDFTokenizer const&) = delete;
 
@@ -300,5 +308,27 @@ class QPDFTokenizer
     char hex_char;
     int digit_count;
 };
+
+inline QPDFTokenizer::token_type_e
+QPDFTokenizer::getType() const noexcept
+{
+    return this->type;
+}
+inline std::string const&
+QPDFTokenizer::getValue() const noexcept
+{
+    return (this->type == tt_name || this->type == tt_string) ? this->val
+                                                              : this->raw_val;
+}
+inline std::string const&
+QPDFTokenizer::getRawValue() const noexcept
+{
+    return this->raw_val;
+}
+inline std::string const&
+QPDFTokenizer::getErrorMessage() const noexcept
+{
+    return this->error_message;
+}
 
 #endif // QPDFTOKENIZER_HH
