@@ -30,6 +30,7 @@
 #include <memory>
 #include <stdio.h>
 #include <string>
+#include <string_view>
 
 class QPDFTokenizer
 {
@@ -201,6 +202,21 @@ class QPDFTokenizer
     bool nextToken(
         InputSource& input, std::string const& context, size_t max_len = 0);
 
+    // The following methods are only valid after nextToken has been called
+    // and until another QPDFTokenizer method is called. They allow the results
+    // of calling nextToken to be accessed without creating a Token, thus
+    // avoiding copying information that may not be needed.
+    // NB Any string_views returned by these methods will be invalid after
+    // another QPDFTokenizer method is called.
+    QPDF_DLL
+    inline token_type_e getType() const noexcept;
+    QPDF_DLL
+    inline std::string_view getValue() const noexcept;
+    QPDF_DLL
+    inline std::string_view getRawValue() const noexcept;
+    QPDF_DLL
+    inline std::string const& getErrorMessage() const noexcept;
+
   private:
     QPDFTokenizer(QPDFTokenizer const&) = delete;
     QPDFTokenizer& operator=(QPDFTokenizer const&) = delete;
@@ -282,5 +298,27 @@ class QPDFTokenizer
     char hex_char;
     int digit_count;
 };
+
+inline QPDFTokenizer::token_type_e
+QPDFTokenizer::getType() const noexcept
+{
+    return this->type;
+}
+inline std::string_view
+QPDFTokenizer::getValue() const noexcept
+{
+    return (this->type == tt_name || this->type == tt_string) ? this->val
+                                                              : this->raw_val;
+}
+inline std::string_view
+QPDFTokenizer::getRawValue() const noexcept
+{
+    return this->raw_val;
+}
+inline std::string const&
+QPDFTokenizer::getErrorMessage() const noexcept
+{
+    return this->error_message;
+}
 
 #endif // QPDFTOKENIZER_HH
