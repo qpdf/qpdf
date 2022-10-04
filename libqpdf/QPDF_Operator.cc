@@ -1,13 +1,13 @@
 #include <qpdf/QPDF_Operator.hh>
 
-QPDF_Operator::QPDF_Operator(std::string const& val) :
+QPDF_Operator::QPDF_Operator(std::string_view val) :
     QPDFValue(::ot_operator, "operator"),
     val(val)
 {
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Operator::create(std::string const& val)
+QPDF_Operator::create(std::string_view val)
 {
     return do_create(new QPDF_Operator(val));
 }
