@@ -333,11 +333,23 @@ QPDFTokenizer::inTop(char ch)
     case '8':
     case '9':
         this->state = st_number;
+        this->int_val = ch - '0';
+        this->digit_count = max_digits;
+        this->negative = false;
         return;
 
     case '+':
+        this->state = st_sign;
+        this->int_val = 0;
+        this->digit_count = max_digits;
+        this->negative = false;
+        return;
+
     case '-':
         this->state = st_sign;
+        this->int_val = 0;
+        this->digit_count = max_digits;
+        this->negative = true;
         return;
 
     case '.':
@@ -510,6 +522,7 @@ QPDFTokenizer::inSign(char ch)
 {
     if (QUtil::is_digit(ch)) {
         this->state = st_number;
+        this->int_val = ch - '0';
     } else if (ch == '.') {
         this->state = st_decimal;
     } else {
@@ -533,10 +546,17 @@ void
 QPDFTokenizer::inNumber(char ch)
 {
     if (QUtil::is_digit(ch)) {
+        if (this->digit_count != 0) {
+            --this->digit_count;
+            this->int_val = 10 * this->int_val + ch - '0';
+        }
     } else if (ch == '.') {
         this->state = st_real;
     } else if (isDelimiter(ch)) {
         this->type = tt_integer;
+        if (this->negative) {
+            this->int_val *= -1;
+        }
         this->state = st_token_ready;
         this->in_token = false;
         this->char_to_unread = ch;
@@ -664,9 +684,15 @@ QPDFTokenizer::inLiteral(char ch)
         this->in_token = false;
         this->char_to_unread = ch;
         this->state = st_token_ready;
-        this->type = (this->raw_val == "true") || (this->raw_val == "false")
-            ? tt_bool
-            : (this->raw_val == "null" ? tt_null : tt_word);
+        if (this->raw_val == "true") {
+            this->type = tt_bool;
+            this->bool_val = true;
+        } else if (this->raw_val == "false") {
+            this->type = tt_bool;
+            this->bool_val = false;
+        } else {
+            this->type = this->raw_val == "null" ? tt_null : tt_word;
+        }
     }
 }
 

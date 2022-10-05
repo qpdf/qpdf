@@ -26,6 +26,7 @@
 
 #include <qpdf/InputSource.hh>
 #include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
+#include <qpdf/QUtil.hh>
 
 #include <memory>
 #include <stdio.h>
@@ -216,6 +217,12 @@ class QPDFTokenizer
     inline std::string_view getRawValue() const noexcept;
     QPDF_DLL
     inline std::string const& getErrorMessage() const noexcept;
+    // Only valid if token type is tt_integer.
+    QPDF_DLL
+    inline long long getIntValue() const;
+    // Only valid if token type is tt_bool.
+    QPDF_DLL
+    inline bool getBoolValue() const noexcept;
 
   private:
     QPDFTokenizer(QPDFTokenizer const&) = delete;
@@ -283,6 +290,7 @@ class QPDFTokenizer
 
     // Current token accumulation
     token_type_e type;
+    // Note val is only set for tt_name and tt_string
     std::string val;
     std::string raw_val;
     std::string error_message;
@@ -297,6 +305,11 @@ class QPDFTokenizer
     int char_code;
     char hex_char;
     int digit_count;
+    long long int_val;
+    bool negative;
+    bool bool_val;
+
+    static constexpr int max_digits = 2 * sizeof(long long);
 };
 
 inline QPDFTokenizer::token_type_e
@@ -320,5 +333,18 @@ QPDFTokenizer::getErrorMessage() const noexcept
 {
     return this->error_message;
 }
-
+inline long long
+QPDFTokenizer::getIntValue() const
+{
+    if (this->digit_count > 0) {
+        return this->int_val;
+    } else {
+        return QUtil::string_to_ll(this->raw_val.c_str());
+    }
+}
+inline bool
+QPDFTokenizer::getBoolValue() const noexcept
+{
+    return this->bool_val;
+}
 #endif // QPDFTOKENIZER_HH

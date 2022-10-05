@@ -146,7 +146,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             break;
 
         case QPDFTokenizer::tt_bool:
-            object = QPDF_Bool::create((tokenizer.getValue() == "true"));
+            object = QPDF_Bool::create(tokenizer.getBoolValue());
             break;
 
         case QPDFTokenizer::tt_null:
@@ -154,8 +154,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             break;
 
         case QPDFTokenizer::tt_integer:
-            object = QPDF_Integer::create(
-                QUtil::string_to_ll(std::string(tokenizer.getValue()).c_str()));
+            object = QPDF_Integer::create(tokenizer.getIntValue());
             break;
 
         case QPDFTokenizer::tt_real:
