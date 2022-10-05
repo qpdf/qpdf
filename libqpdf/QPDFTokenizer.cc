@@ -932,12 +932,6 @@ QPDFTokenizer::getToken(Token& token, bool& unread_char, char& ch)
     return ready;
 }
 
-bool
-QPDFTokenizer::betweenTokens()
-{
-    return this->before_token;
-}
-
 QPDFTokenizer::Token
 QPDFTokenizer::readToken(
     std::shared_ptr<InputSource> input,
@@ -945,25 +939,24 @@ QPDFTokenizer::readToken(
     bool allow_bad,
     size_t max_len)
 {
-    nextToken(*input, context, max_len);
-
-    Token token;
-    bool unread_char;
-    char char_to_unread;
-    getToken(token, unread_char, char_to_unread);
-
-    if (token.getType() == tt_bad) {
-        if (allow_bad) {
-            QTC::TC("qpdf", "QPDFTokenizer allowing bad token");
-        } else {
-            throw QPDFExc(
-                qpdf_e_damaged_pdf,
-                input->getName(),
-                context,
-                input->getLastOffset(),
-                token.getErrorMessage());
+    if (!nextToken(*input, context, max_len)) {
+        if (this->type == tt_bad) {
+            if (allow_bad) {
+                QTC::TC("qpdf", "QPDFTokenizer allowing bad token");
+            } else {
+                throw QPDFExc(
+                    qpdf_e_damaged_pdf,
+                    input->getName(),
+                    context,
+                    input->getLastOffset(),
+                    this->error_message);
+            }
         }
     }
+    auto token = (!(this->type == tt_name || this->type == tt_string))
+        ? Token(this->type, this->raw_val, this->raw_val, this->error_message)
+        : Token(this->type, this->val, this->raw_val, this->error_message);
+    reset();
     return token;
 }
 
