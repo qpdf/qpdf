@@ -81,15 +81,11 @@ QPDFParser::parse(bool& empty, bool content_stream)
         object = nullptr;
         set_offset = false;
 
-        QPDFTokenizer::Token token =
-            tokenizer.readToken(input, object_description, true);
-        std::string const& token_error_message = token.getErrorMessage();
-        if (!token_error_message.empty()) {
-            // Tokens other than tt_bad can still generate warnings.
-            warn(token_error_message);
+        if (!tokenizer.nextToken(*input, object_description)) {
+            warn(tokenizer.getErrorMessage());
         }
 
-        switch (token.getType()) {
+        switch (tokenizer.getType()) {
         case QPDFTokenizer::tt_eof:
             if (!content_stream) {
                 QTC::TC("qpdf", "QPDFParser eof in parse");
@@ -146,7 +142,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             } else {
                 state = st_start;
                 state_stack.push_back(
-                    (token.getType() == QPDFTokenizer::tt_array_open)
+                    (tokenizer.getType() == QPDFTokenizer::tt_array_open)
                         ? st_array
                         : st_dictionary);
                 b_contents = false;
@@ -155,7 +151,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             break;
 
         case QPDFTokenizer::tt_bool:
-            object = QPDF_Bool::create((token.getValue() == "true"));
+            object = QPDF_Bool::create((tokenizer.getValue() == "true"));
             break;
 
         case QPDFTokenizer::tt_null:
@@ -164,16 +160,16 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         case QPDFTokenizer::tt_integer:
             object = QPDF_Integer::create(
-                QUtil::string_to_ll(token.getValue().c_str()));
+                QUtil::string_to_ll(std::string(tokenizer.getValue()).c_str()));
             break;
 
         case QPDFTokenizer::tt_real:
-            object = QPDF_Real::create(token.getValue());
+            object = QPDF_Real::create(tokenizer.getValue());
             break;
 
         case QPDFTokenizer::tt_name:
             {
-                std::string name = token.getValue();
+                auto name = tokenizer.getValue();
                 object = QPDF_Name::create(name);
 
                 if (name == "/Contents") {
@@ -186,7 +182,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         case QPDFTokenizer::tt_word:
             {
-                std::string const& value = token.getValue();
+                auto value = tokenizer.getValue();
                 auto size = olist.size();
                 if (content_stream) {
                     object = QPDF_Operator::create(value);
@@ -240,16 +236,19 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         case QPDFTokenizer::tt_string:
             {
-                std::string val = token.getValue();
+                auto val = tokenizer.getValue();
                 if (decrypter) {
                     if (b_contents) {
                         frame.contents_string = val;
                         frame.contents_offset = input->getLastOffset();
                         b_contents = false;
                     }
-                    decrypter->decryptString(val);
+                    std::string s{val};
+                    decrypter->decryptString(s);
+                    object = QPDF_String::create(s);
+                } else {
+                    object = QPDF_String::create(val);
                 }
-                object = QPDF_String::create(val);
             }
 
             break;
