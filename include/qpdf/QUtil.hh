@@ -32,6 +32,7 @@
 #include <stdexcept>
 #include <stdio.h>
 #include <string>
+#include <string_view>
 #include <time.h>
 #include <vector>
 
@@ -535,6 +536,12 @@ namespace QUtil
     // purposes.
     QPDF_DLL
     size_t get_max_memory_usage();
+
+    // Temporary methods to be removed in qpdf 12.
+
+    bool utf8_view_to_pdf_doc(
+        std::string_view utf8, std::string& pdfdoc, char unknown_char = '?');
+    std::string utf8_view_to_utf16(std::string_view utf8);
 }; // namespace QUtil
 
 inline bool

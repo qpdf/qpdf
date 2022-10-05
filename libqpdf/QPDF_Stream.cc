@@ -213,8 +213,9 @@ QPDF_Stream::getStreamJSON(
     case qpdf_sj_none:
     case qpdf_sj_inline:
         if (p != nullptr) {
-            throw std::logic_error("QPDF_Stream::getStreamJSON: pipeline should "
-                                   "only be supplied when json_data is file");
+            throw std::logic_error(
+                "QPDF_Stream::getStreamJSON: pipeline should "
+                "only be supplied when json_data is file");
         }
         break;
     case qpdf_sj_file:

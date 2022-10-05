@@ -1516,9 +1516,9 @@ encode_pdfdoc(unsigned long codepoint)
     return '\0';
 }
 
-unsigned long
-QUtil::get_next_utf8_codepoint(
-    std::string const& utf8_val, size_t& pos, bool& error)
+static unsigned long
+get_next_utf8_codepoint_internal(
+    std::string_view utf8_val, size_t& pos, bool& error)
 {
     size_t len = utf8_val.length();
     unsigned char ch = static_cast<unsigned char>(utf8_val.at(pos++));
@@ -1556,9 +1556,16 @@ QUtil::get_next_utf8_codepoint(
     return codepoint;
 }
 
+unsigned long
+QUtil::get_next_utf8_codepoint(
+    std::string const& utf8_val, size_t& pos, bool& error)
+{
+    return get_next_utf8_codepoint_internal(utf8_val, pos, error);
+}
+
 static bool
 transcode_utf8(
-    std::string const& utf8_val,
+    std::string_view utf8_val,
     std::string& result,
     encoding_e encoding,
     char unknown)
@@ -1601,7 +1608,7 @@ transcode_utf8(
     while (pos < len) {
         bool error = false;
         unsigned long codepoint =
-            QUtil::get_next_utf8_codepoint(utf8_val, pos, error);
+            get_next_utf8_codepoint_internal(utf8_val, pos, error);
         if (error) {
             okay = false;
             if (encoding == e_utf16) {
@@ -1655,7 +1662,7 @@ transcode_utf8(
 }
 
 static std::string
-transcode_utf8(std::string const& utf8_val, encoding_e encoding, char unknown)
+transcode_utf8(std::string_view utf8_val, encoding_e encoding, char unknown)
 {
     std::string result;
     transcode_utf8(utf8_val, result, encoding, unknown);
@@ -1664,6 +1671,12 @@ transcode_utf8(std::string const& utf8_val, encoding_e encoding, char unknown)
 
 std::string
 QUtil::utf8_to_utf16(std::string const& utf8)
+{
+    return transcode_utf8(utf8, e_utf16, 0);
+}
+
+std::string
+QUtil::utf8_view_to_utf16(std::string_view utf8)
 {
     return transcode_utf8(utf8, e_utf16, 0);
 }
@@ -1716,6 +1729,13 @@ QUtil::utf8_to_mac_roman(
 bool
 QUtil::utf8_to_pdf_doc(
     std::string const& utf8, std::string& pdfdoc, char unknown_char)
+{
+    return transcode_utf8(utf8, pdfdoc, e_pdfdoc, unknown_char);
+}
+
+bool
+QUtil::utf8_view_to_pdf_doc(
+    std::string_view utf8, std::string& pdfdoc, char unknown_char)
 {
     return transcode_utf8(utf8, pdfdoc, e_pdfdoc, unknown_char);
 }
