@@ -8,6 +8,11 @@ For a detailed list of changes, please see the file
 
 .. x.y.z: not yet released
 
+11.2.0: not yet released
+  - Build changes
+
+    - A C++-17 compiler is now required.
+
 11.1.1: October 1, 2022
   - Bug fixes
 

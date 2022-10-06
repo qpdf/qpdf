@@ -1,3 +1,7 @@
+2022-10-06  Jay Berkenbilt  <ejb@ql.org>
+
+        * Change minimum required C++ version from C++-14 to C++-17.
+
 2022-10-01  Jay Berkenbilt  <ejb@ql.org>
 
         * 11.1.1: release

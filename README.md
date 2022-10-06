@@ -29,7 +29,7 @@ Versions of qpdf prior to version 7 were released under the terms of version 2.0
 
 # Prerequisites
 
-QPDF requires a C++ compiler that supports C++-14.
+QPDF requires a C++ compiler that supports C++-17.
 
 To compile and link something with qpdf, you can use `pkg-config` with package name `libqpdf` or `cmake` with package name `qpdf`. Here's an example of a `CMakeLists.txt` file that builds a program with the qpdf library:
 

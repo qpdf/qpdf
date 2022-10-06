@@ -16,7 +16,7 @@ need to build qpdf in various circumstances.
 Basic Dependencies
 ~~~~~~~~~~~~~~~~~~
 
-- A C++ compiler that supports C++-14
+- A C++ compiler that supports C++-17
 
 - `CMake <https://www.cmake.org>`__ version 3.16 or later
 
