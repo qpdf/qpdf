@@ -6,7 +6,7 @@ sudo apt-get -y install \
    libssl-dev libtiff-tools ghostscript
 cmake -S . -B build -DCI_MODE=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
       -DREQUIRE_CRYPTO_OPENSSL=1 -DREQUIRE_CRYPTO_GNUTLS=1
-cmake --build build -j$(nproc) -- -k
+cmake --build build --verbose -j$(nproc) -- -k
 cd build
 # Make sure char is signed by default -- see also test-unsigned-char
 ./qpdf/test_char_sign | grep 'char is signed'

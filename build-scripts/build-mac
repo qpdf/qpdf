@@ -9,5 +9,5 @@ make -k
 sudo make install
 cd ..
 cmake -S . -B build -DCI_MODE=1 -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j$(sysctl -n hw.ncpu) -- -k
+cmake --build build --verbose -j$(sysctl -n hw.ncpu) -- -k
 (cd build; ctest --verbose)

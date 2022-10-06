@@ -8,7 +8,7 @@ sudo apt-get -y install \
    python3-pip texlive-latex-extra latexmk
 pip3 install sphinx sphinx_rtd_theme
 cmake -S . -B build -DBUILD_DOC=1
-cmake --build build --target doc_dist
+cmake --build build --verbose --target doc_dist
 zip -r doc.zip build/manual/doc-dist
 version=$(grep -E '^release' manual/conf.py | cut -d"'" -f 2)
 mv build/manual/doc-dist qpdf-${version}-doc

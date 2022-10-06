@@ -10,5 +10,5 @@ CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32 \
       cmake -S . -B build -DCI_MODE=1 -DCMAKE_BUILD_TYPE=Release \
       -DUSE_IMPLICIT_CRYPTO=0 -DBUILD_STATIC_LIBS=0 \
       -DREQUIRE_CRYPTO_NATIVE=1
-cmake --build build -j$(nproc) -- -k
+cmake --build build --verbose -j$(nproc) -- -k
 (cd build; ctest --verbose)
