@@ -47,6 +47,24 @@ usage()
     exit(2);
 }
 
+// Derive from QPDFNumberTreeObjectHelper -- See test 61
+class ExtendNameTree: public QPDFNameTreeObjectHelper
+{
+  public:
+    ExtendNameTree(QPDFObjectHandle o, QPDF& q);
+    virtual ~ExtendNameTree();
+};
+
+ExtendNameTree::ExtendNameTree(QPDFObjectHandle o, QPDF& q) :
+    QPDFNameTreeObjectHelper(o, q)
+{
+}
+
+ExtendNameTree::~ExtendNameTree()
+{
+    std::cout << "~ExtendNameTree called" << std::endl;
+}
+
 class Provider: public QPDFObjectHandle::StreamDataProvider
 {
   public:
@@ -2281,6 +2299,13 @@ test_61(QPDF& pdf, char const* arg2)
     Pl_Discard pd;
     Pipeline* p = &pd;
     assert(dynamic_cast<Pl_Discard*>(p) != nullptr);
+
+    // For some reason, QPDFNameTreeObjectHelper's vtable seems to
+    // like to not make it into the shared library with mingw. Try to
+    // make sure this is really fixed.
+    QPDFNameTreeObjectHelper* n =
+        new ExtendNameTree(QPDFObjectHandle::newNull(), pdf);
+    delete n;
 }
 
 static void
