@@ -36,7 +36,7 @@
 // introduced to allow creation of higher level helper functions
 // without polluting the public interface of QPDF.
 
-class QPDFDocumentHelper
+class QPDF_DLL_CLASS QPDFDocumentHelper
 {
   public:
     QPDF_DLL
@@ -45,7 +45,7 @@ class QPDFDocumentHelper
     {
     }
     QPDF_DLL
-    virtual ~QPDFDocumentHelper() = default;
+    virtual ~QPDFDocumentHelper();
     QPDF_DLL
     QPDF&
     getQPDF()

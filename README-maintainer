@@ -179,9 +179,11 @@ CODING RULES
   the shared object boundary (or "shared library boundary" -- we may
   use either term in comments and documentation). In particular,
   anything new derived from Pipeline or InputSource should be marked
-  with QPDF_DLL_CLASS, but we don't need to do it for QPDFObjectHelper
+  with QPDF_DLL_CLASS. We shouldn't need to do it for QPDFObjectHelper
   or QPDFDocumentHelper subclasses since there's no reason to use
-  dynamic_cast with those.
+  dynamic_cast with those, but doing it anyway may help with some
+  strange cases for mingw or with some code generators that may
+  systematically do this for other reasons.
 
   IMPORTANT NOTE ABOUT QPDF_DLL_CLASS: On mingw, the vtable for a
   class with some virtual methods and no pure virtual methods seems

@@ -37,7 +37,7 @@
 // introduced to allow creation of higher level helper functions
 // without polluting the public interface of QPDFObjectHandle.
 
-class QPDFObjectHelper
+class QPDF_DLL_CLASS QPDFObjectHelper
 {
   public:
     QPDF_DLL
@@ -46,7 +46,7 @@ class QPDFObjectHelper
     {
     }
     QPDF_DLL
-    virtual ~QPDFObjectHelper() = default;
+    virtual ~QPDFObjectHelper();
     QPDF_DLL
     QPDFObjectHandle
     getObjectHandle()

@@ -42,14 +42,16 @@
 #  define QPDF_DLL
 # endif
 # define QPDF_DLL_PRIVATE
-# define QPDF_DLL_CLASS
 #elif defined __GNUC__
 # define QPDF_DLL __attribute__((visibility("default")))
 # define QPDF_DLL_PRIVATE __attribute__((visibility("hidden")))
-# define QPDF_DLL_CLASS QPDF_DLL
 #else
 # define QPDF_DLL
 # define QPDF_DLL_PRIVATE
+#endif
+#ifdef __GNUC__
+# define QPDF_DLL_CLASS QPDF_DLL
+#else
 # define QPDF_DLL_CLASS
 #endif
 
@@ -86,6 +88,9 @@ for a more in-depth discussion.
     not necessary, and doing it right is complex in our case of being
     multi-platform and building both static and shared libraries that
     use the same headers, so we don't bother.
+
+  * If we don't export base classes with mingw, the vtables don't end
+    up in the DLL.
 
 * On Linux (and other similar systems):
 

@@ -59,6 +59,7 @@ set(libqpdf_SOURCES
   QPDFAnnotationObjectHelper.cc
   QPDFArgParser.cc
   QPDFCryptoProvider.cc
+  QPDFDocumentHelper.cc
   QPDFEFStreamObjectHelper.cc
   QPDFEmbeddedFileDocumentHelper.cc
   QPDFExc.cc
@@ -74,6 +75,7 @@ set(libqpdf_SOURCES
   QPDFNumberTreeObjectHelper.cc
   QPDFObject.cc
   QPDFObjectHandle.cc
+  QPDFObjectHelper.cc
   QPDFObjGen.cc
   QPDFOutlineDocumentHelper.cc
   QPDFOutlineObjectHelper.cc
