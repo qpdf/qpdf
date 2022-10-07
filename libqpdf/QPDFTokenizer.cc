@@ -886,37 +886,44 @@ QPDFTokenizer::nextToken(
     }
     qpdf_offset_t offset = input.fastTell();
 
-    while (this->state != &QPDFTokenizer::inTokenReady) {
-        char ch;
-        if (!input.fastRead(ch)) {
-            presentEOF();
-
-            if ((this->type == tt_eof) && (!this->allow_eof)) {
-                // Nothing in the qpdf library calls readToken
-                // without allowEOF anymore, so this case is not
-                // exercised.
-                this->type = tt_bad;
-                this->error_message = "unexpected EOF";
-                offset = input.getLastOffset();
-            }
-        } else {
-            std::invoke(this->state, *this, ch);
-            if (this->before_token) {
-                ++offset;
-            }
-            if (this->in_token) {
-                this->raw_val += ch;
-            }
-            if (max_len && (this->raw_val.length() >= max_len) &&
-                (this->state != &QPDFTokenizer::inTokenReady)) {
-                // terminate this token now
-                QTC::TC("qpdf", "QPDFTokenizer block long token");
-                this->type = tt_bad;
-                this->state = &QPDFTokenizer::inTokenReady;
-                this->error_message =
-                    "exceeded allowable length while reading token";
-            }
+    for (char ch; input.fastRead(ch);) {
+        std::invoke(this->state, *this, ch);
+        if (this->before_token) {
+            ++offset;
         }
+        if (this->in_token) {
+            this->raw_val += ch;
+        }
+        if (max_len && (this->raw_val.length() >= max_len) &&
+            (this->state != &QPDFTokenizer::inTokenReady)) {
+            // terminate this token now
+            QTC::TC("qpdf", "QPDFTokenizer block long token");
+            this->type = tt_bad;
+            this->state = &QPDFTokenizer::inTokenReady;
+            this->error_message =
+                "exceeded allowable length while reading token";
+        }
+
+        if (this->state == &QPDFTokenizer::inTokenReady) {
+            input.fastUnread(!this->in_token && !this->before_token);
+
+            if (this->type != tt_eof) {
+                input.setLastOffset(offset);
+            }
+
+            return this->error_message.empty();
+        }
+    }
+    // Reached EOF
+    presentEOF();
+
+    if ((this->type == tt_eof) && (!this->allow_eof)) {
+        // Nothing in the qpdf library calls readToken
+        // without allowEOF anymore, so this case is not
+        // exercised.
+        this->type = tt_bad;
+        this->error_message = "unexpected EOF";
+        offset = input.getLastOffset();
     }
 
     input.fastUnread(!this->in_token && !this->before_token);
