@@ -232,32 +232,7 @@ class QPDFTokenizer
     bool isDelimiter(char);
     void findEI(std::shared_ptr<InputSource> input);
 
-    enum state_e {
-        st_top,
-        st_in_hexstring,
-        st_in_string,
-        st_in_hexstring_2nd,
-        st_name,
-        st_literal,
-        st_in_space,
-        st_in_comment,
-        st_string_escape,
-        st_char_code,
-        st_string_after_cr,
-        st_lt,
-        st_gt,
-        st_inline_image,
-        st_sign,
-        st_number,
-        st_real,
-        st_decimal,
-        st_name_hex1,
-        st_name_hex2,
-        st_before_token,
-        st_token_ready
-    };
-
-    void handleCharacter(char);
+    // Lexer states
     void inBeforeToken(char);
     void inTop(char);
     void inSpace(char);
@@ -283,7 +258,8 @@ class QPDFTokenizer
     void reset();
 
     // Lexer state
-    state_e state;
+    typedef void (QPDFTokenizer::*State)(char);
+    State state;
 
     bool allow_eof;
     bool include_ignorable;
