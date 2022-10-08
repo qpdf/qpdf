@@ -14,24 +14,24 @@ is_iso_latin1_printable(char ch)
         ((ch >= 32) && (ch <= 126)) || (static_cast<unsigned char>(ch) >= 160));
 }
 
-QPDF_String::QPDF_String(std::string const& val) :
+QPDF_String::QPDF_String(std::string_view val) :
     QPDFValue(::ot_string, "string"),
     val(val)
 {
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_String::create(std::string const& val)
+QPDF_String::create(std::string_view val)
 {
     return do_create(new QPDF_String(val));
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_String::create_utf16(std::string const& utf8_val)
+QPDF_String::create_utf16(std::string_view utf8_val)
 {
     std::string result;
-    if (!QUtil::utf8_to_pdf_doc(utf8_val, result, '?')) {
-        result = QUtil::utf8_to_utf16(utf8_val);
+    if (!QUtil::utf8_view_to_pdf_doc(utf8_val, result, '?')) {
+        result = QUtil::utf8_view_to_utf16(utf8_val);
     }
     return do_create(new QPDF_String(result));
 }

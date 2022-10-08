@@ -2,7 +2,7 @@
 
 #include <qpdf/QUtil.hh>
 
-QPDF_Real::QPDF_Real(std::string const& val) :
+QPDF_Real::QPDF_Real(std::string_view val) :
     QPDFValue(::ot_real, "real"),
     val(val)
 {
@@ -16,7 +16,7 @@ QPDF_Real::QPDF_Real(
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Real::create(std::string const& val)
+QPDF_Real::create(std::string_view val)
 {
     return do_create(new QPDF_Real(val));
 }

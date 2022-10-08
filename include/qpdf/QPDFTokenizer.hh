@@ -26,10 +26,12 @@
 
 #include <qpdf/InputSource.hh>
 #include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
+#include <qpdf/QUtil.hh>
 
 #include <memory>
 #include <stdio.h>
 #include <string>
+#include <string_view>
 
 class QPDFTokenizer
 {
@@ -189,6 +191,39 @@ class QPDFTokenizer
     QPDF_DLL
     void expectInlineImage(std::shared_ptr<InputSource> input);
 
+    // Read a token from an input source. Context describes the
+    // context in which the token is being read and is used in the
+    // exception thrown if there is an error. After a token is read,
+    // the position of the input source returned by input->tell()
+    // points to just after the token, and the input source's "last
+    // offset" as returned by input->getLastOffset() points to the
+    // beginning of the token. Returns false if the token is bad
+    // or if scanning produced an error message for any reason.
+    QPDF_DLL
+    bool nextToken(
+        InputSource& input, std::string const& context, size_t max_len = 0);
+
+    // The following methods are only valid after nextToken has been called
+    // and until another QPDFTokenizer method is called. They allow the results
+    // of calling nextToken to be accessed without creating a Token, thus
+    // avoiding copying information that may not be needed.
+    // NB Any string_views returned by these methods will be invalid after
+    // another QPDFTokenizer method is called.
+    QPDF_DLL
+    inline token_type_e getType() const noexcept;
+    QPDF_DLL
+    inline std::string_view getValue() const noexcept;
+    QPDF_DLL
+    inline std::string_view getRawValue() const noexcept;
+    QPDF_DLL
+    inline std::string const& getErrorMessage() const noexcept;
+    // Only valid if token type is tt_integer.
+    QPDF_DLL
+    inline long long getIntValue() const;
+    // Only valid if token type is tt_bool.
+    QPDF_DLL
+    inline bool getBoolValue() const noexcept;
+
   private:
     QPDFTokenizer(QPDFTokenizer const&) = delete;
     QPDFTokenizer& operator=(QPDFTokenizer const&) = delete;
@@ -197,32 +232,7 @@ class QPDFTokenizer
     bool isDelimiter(char);
     void findEI(std::shared_ptr<InputSource> input);
 
-    enum state_e {
-        st_top,
-        st_in_hexstring,
-        st_in_string,
-        st_in_hexstring_2nd,
-        st_name,
-        st_literal,
-        st_in_space,
-        st_in_comment,
-        st_string_escape,
-        st_char_code,
-        st_string_after_cr,
-        st_lt,
-        st_gt,
-        st_inline_image,
-        st_sign,
-        st_number,
-        st_real,
-        st_decimal,
-        st_name_hex1,
-        st_name_hex2,
-        st_before_token,
-        st_token_ready
-    };
-
-    void handleCharacter(char);
+    // Lexer states
     void inBeforeToken(char);
     void inTop(char);
     void inSpace(char);
@@ -248,13 +258,15 @@ class QPDFTokenizer
     void reset();
 
     // Lexer state
-    state_e state;
+    typedef void (QPDFTokenizer::*State)(char);
+    State state;
 
     bool allow_eof;
     bool include_ignorable;
 
     // Current token accumulation
     token_type_e type;
+    // Note val is only set for tt_name and tt_string
     std::string val;
     std::string raw_val;
     std::string error_message;
@@ -269,6 +281,46 @@ class QPDFTokenizer
     int char_code;
     char hex_char;
     int digit_count;
+    long long int_val;
+    bool negative;
+    bool bool_val;
+
+    static constexpr int max_digits = 2 * sizeof(long long);
 };
 
+inline QPDFTokenizer::token_type_e
+QPDFTokenizer::getType() const noexcept
+{
+    return this->type;
+}
+inline std::string_view
+QPDFTokenizer::getValue() const noexcept
+{
+    return (this->type == tt_name || this->type == tt_string) ? this->val
+                                                              : this->raw_val;
+}
+inline std::string_view
+QPDFTokenizer::getRawValue() const noexcept
+{
+    return this->raw_val;
+}
+inline std::string const&
+QPDFTokenizer::getErrorMessage() const noexcept
+{
+    return this->error_message;
+}
+inline long long
+QPDFTokenizer::getIntValue() const
+{
+    if (this->digit_count > 0) {
+        return this->int_val;
+    } else {
+        return QUtil::string_to_ll(this->raw_val.c_str());
+    }
+}
+inline bool
+QPDFTokenizer::getBoolValue() const noexcept
+{
+    return this->bool_val;
+}
 #endif // QPDFTOKENIZER_HH
