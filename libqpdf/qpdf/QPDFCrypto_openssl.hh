@@ -58,13 +58,6 @@ class QPDFCrypto_openssl: public QPDFCryptoImpl
     void rijndael_finalize() override;
 
   private:
-#ifdef QPDF_OPENSSL_1
-    EVP_CIPHER const* rc4;
-#else
-    OSSL_LIB_CTX* libctx;
-    OSSL_PROVIDER* legacy;
-    EVP_CIPHER* rc4;
-#endif
     EVP_MD_CTX* const md_ctx;
     EVP_CIPHER_CTX* const cipher_ctx;
     uint8_t md_out[EVP_MAX_MD_SIZE];

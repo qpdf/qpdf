@@ -13,6 +13,13 @@ For a detailed list of changes, please see the file
 
     - A C++-17 compiler is now required.
 
+  - Bug fixes
+
+    - Fix major performance bug with the OpenSSL crypto provider. This
+      bug was causing a 6x to 12x slowdown for encrypted files when
+      OpenSSL 3 was in use. This includes the default Windows builds
+      distributed with the qpdf release.
+
 11.1.1: October 1, 2022
   - Bug fixes
 

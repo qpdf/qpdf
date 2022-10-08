@@ -1,5 +1,10 @@
 2022-10-08  Jay Berkenbilt  <ejb@ql.org>
 
+        * Fix major performance bug with the openssl crypto provider when
+        using OpenSSL 3. The legacy loader and rc4 algorithm was being
+        loaded with every call to the crypto provider instead of once in
+        the life of the program. Fixes #798.
+
         * performance_check: add --test option to limit which tests are
         run.
 

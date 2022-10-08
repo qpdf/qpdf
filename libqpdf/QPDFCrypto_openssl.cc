@@ -1,6 +1,7 @@
 #include <qpdf/QPDFCrypto_openssl.hh>
 
 #include <cstring>
+#include <memory>
 #include <stdexcept>
 #include <string>
 
@@ -17,6 +18,60 @@
 #endif
 
 #include <qpdf/QIntC.hh>
+
+#ifndef QPDF_OPENSSL_1
+namespace
+{
+    class RC4Loader
+    {
+      public:
+        static EVP_CIPHER const* getRC4();
+        ~RC4Loader();
+
+      private:
+        RC4Loader();
+        OSSL_PROVIDER* legacy;
+        OSSL_LIB_CTX* libctx;
+        EVP_CIPHER* rc4;
+    };
+} // namespace
+
+EVP_CIPHER const*
+RC4Loader::getRC4()
+{
+    static auto loader = std::shared_ptr<RC4Loader>(new RC4Loader());
+    return loader->rc4;
+}
+
+RC4Loader::RC4Loader()
+{
+    libctx = OSSL_LIB_CTX_new();
+    if (libctx == nullptr) {
+        throw std::runtime_error("unable to create openssl library context");
+        return;
+    }
+    legacy = OSSL_PROVIDER_load(libctx, "legacy");
+    if (legacy == nullptr) {
+        OSSL_LIB_CTX_free(libctx);
+        throw std::runtime_error("unable to load openssl legacy provider");
+        return;
+    }
+    rc4 = EVP_CIPHER_fetch(libctx, "RC4", nullptr);
+    if (rc4 == nullptr) {
+        OSSL_PROVIDER_unload(legacy);
+        OSSL_LIB_CTX_free(libctx);
+        throw std::runtime_error("unable to load openssl rc4 algorithm");
+        return;
+    }
+}
+
+RC4Loader::~RC4Loader()
+{
+    EVP_CIPHER_free(rc4);
+    OSSL_PROVIDER_unload(legacy);
+    OSSL_LIB_CTX_free(libctx);
+}
+#endif // not QPDF_OPENSSL_1
 
 static void
 bad_bits(int bits)
@@ -41,32 +96,9 @@ check_openssl(int status)
 }
 
 QPDFCrypto_openssl::QPDFCrypto_openssl() :
-#ifdef QPDF_OPENSSL_1
-    rc4(EVP_rc4()),
-#endif
     md_ctx(EVP_MD_CTX_new()),
     cipher_ctx(EVP_CIPHER_CTX_new())
 {
-#ifndef QPDF_OPENSSL_1
-    libctx = OSSL_LIB_CTX_new();
-    if (libctx == nullptr) {
-        throw std::runtime_error("unable to create openssl library context");
-        return;
-    }
-    legacy = OSSL_PROVIDER_load(libctx, "legacy");
-    if (legacy == nullptr) {
-        OSSL_LIB_CTX_free(libctx);
-        throw std::runtime_error("unable to load openssl legacy provider");
-        return;
-    }
-    rc4 = EVP_CIPHER_fetch(libctx, "RC4", nullptr);
-    if (rc4 == nullptr) {
-        OSSL_PROVIDER_unload(legacy);
-        OSSL_LIB_CTX_free(libctx);
-        throw std::runtime_error("unable to load openssl rc4 algorithm");
-        return;
-    }
-#endif
     memset(md_out, 0, sizeof(md_out));
     EVP_MD_CTX_init(md_ctx);
     EVP_CIPHER_CTX_init(cipher_ctx);
@@ -77,11 +109,6 @@ QPDFCrypto_openssl::~QPDFCrypto_openssl()
     EVP_MD_CTX_reset(md_ctx);
     EVP_CIPHER_CTX_reset(cipher_ctx);
     EVP_CIPHER_CTX_free(cipher_ctx);
-#ifndef QPDF_OPENSSL_1
-    EVP_CIPHER_free(rc4);
-    OSSL_PROVIDER_unload(legacy);
-    OSSL_LIB_CTX_free(libctx);
-#endif
     EVP_MD_CTX_free(md_ctx);
 }
 
@@ -101,7 +128,7 @@ QPDFCrypto_openssl::MD5_init()
 void
 QPDFCrypto_openssl::SHA2_init(int bits)
 {
-    const EVP_MD* md = EVP_sha512();
+    static const EVP_MD* md = EVP_sha512();
     switch (bits) {
     case 256:
         md = EVP_sha256();
@@ -174,6 +201,11 @@ QPDFCrypto_openssl::SHA2_digest()
 void
 QPDFCrypto_openssl::RC4_init(unsigned char const* key_data, int key_len)
 {
+#ifdef QPDF_OPENSSL_1
+    static auto const rc4 = EVP_rc4();
+#else
+    static auto const rc4 = RC4Loader::getRC4();
+#endif
     check_openssl(EVP_CIPHER_CTX_reset(cipher_ctx));
     if (key_len == -1) {
         key_len =
