@@ -486,7 +486,7 @@ gcurl -XPOST $url -d'{"draft": false}'
 rsync -vrlcO ./ jay_berkenbilt,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/qpdf/qpdf/$version/
 
 * On sourceforge, make the source package the default for all but
-  Windows, and make the 32-bit mingw build the default for Windows.
+  Windows, and make the 64-bit msvc build the default for Windows.
 
 * Publish a news item manually on sourceforge.
 
