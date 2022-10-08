@@ -50,7 +50,7 @@ my $default_iterations = 20;
 
 sub usage
 {
-    die "
+    warn "
 Usage: $whoami [ args ]
   --dir dir           test on all files in dir (default: $default_test_dir)
   --file file         test only on the named file
@@ -58,15 +58,23 @@ Usage: $whoami [ args ]
   --workdir           where to write output pdfs (default: $default_workdir)
   --maxtime           maximum time for a test; 0 means unlimited (default: $default_maxtime)
   --iterations        number of iterations (default: $default_iterations)
+  --test regexp       run only tests that match specified pattern
 
 Populate $test_dir with files you want to use for performance
 benchmarking. PDF files and qpdf JSON files are allowed. The qpdf
 release process uses a clone of
 https://github.com/qpdf/performance-test-files for this purpose.
 
+Tests:
 ";
+    foreach my $t (@tests)
+    {
+        warn "  $t->[0]\n";
+    }
+    exit 2;
 }
 
+my $test_re = undef;
 while (@ARGV)
 {
     my $arg = shift(@ARGV);
@@ -101,6 +109,11 @@ while (@ARGV)
     {
         usage() unless @ARGV;
         $iterations = shift(@ARGV);
+    }
+    elsif ('--test' eq $arg)
+    {
+        usage() unless @ARGV;
+        $test_re = shift(@ARGV);
     }
     else
     {
@@ -233,6 +246,11 @@ sub run_tests
     foreach my $test (@tests)
     {
         my ($name, $args) = @$test;
+        if ((defined $test_re) && $name !~ m/$test_re/)
+        {
+            print " skipping test $name\n";
+            next;
+        }
         print " test: $name\n";
         $args = filter_args($args);
         if (! defined $args)

@@ -1,3 +1,8 @@
+2022-10-08  Jay Berkenbilt  <ejb@ql.org>
+
+        * performance_check: add --test option to limit which tests are
+        run.
+
 2022-10-06  Jay Berkenbilt  <ejb@ql.org>
 
         * Change minimum required C++ version from C++-14 to C++-17.
