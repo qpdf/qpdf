@@ -485,9 +485,10 @@ I find it useful to make reference to them in this list.
   an Adobe private key? Search for "Digital signatures" in the PDF
   spec, and look at ~/Q/pdf-collection/form-with-full-save.pdf, which
   came from Adobe's example site. See also
-  ../misc/digital-sign-from-trueroad/. If digital signatures are
-  implemented, update the docs on crypto providers, which mention
-  that this may happen in the future.
+  ../misc/digital-sign-from-trueroad/ and
+  ../misc/digital-signatures/digitally-signed-pdf-xfa.pdf. If digital
+  signatures are implemented, update the docs on crypto providers,
+  which mention that this may happen in the future.
 
 * Qpdf does not honor /EFF when adding new file attachments. When it
   encrypts, it never generates streams with explicit crypt filters.
