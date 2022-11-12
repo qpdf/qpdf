@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('invalid-objects');
 
-my $n_tests = 3;
+my $n_tests = 4;
 
 $td->runtest("closed input source",
              {$td->COMMAND => "test_driver 73 minimal.pdf"},
@@ -31,6 +31,11 @@ $td->runtest("empty object",
 $td->runtest("object with zero offset",
              {$td->COMMAND => "qpdf --check zero-offset.pdf"},
              {$td->FILE => "zero-offset.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("catalog with invalid type entry",
+             {$td->COMMAND => "qpdf --check catalgg.pdf"},
+             {$td->FILE => "catalgg.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();

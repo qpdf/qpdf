@@ -2461,6 +2461,13 @@ QPDF::getRoot()
     QPDFObjectHandle root = this->m->trailer.getKey("/Root");
     if (!root.isDictionary()) {
         throw damagedPDF("", 0, "unable to find /Root dictionary");
+    } else if (
+        // Check_mode is an interim solution to request #810 pending a more
+        // comprehensive review of the approach to more extensive checks and
+        // warning levels.
+        m->check_mode && !root.getKey("/Type").isNameAndEquals("/Catalog")) {
+        warn(damagedPDF("", 0, "catalog /Type entry missing or invalid"));
+        root.replaceKey("/Type", "/Catalog"_qpdf);
     }
     return root;
 }
