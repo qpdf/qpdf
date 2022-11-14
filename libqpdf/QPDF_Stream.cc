@@ -142,6 +142,7 @@ QPDF_Stream::create(
 std::shared_ptr<QPDFObject>
 QPDF_Stream::copy(bool shallow)
 {
+    QTC::TC("qpdf", "QPDF_Stream ERR shallow copy stream");
     throw std::runtime_error("stream objects cannot be cloned");
 }
 

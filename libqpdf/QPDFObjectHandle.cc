@@ -2211,8 +2211,7 @@ QPDFObjectHandle::shallowCopyInternal1(QPDFObjectHandle& new_obj)
     assertInitialized();
 
     if (isStream()) {
-        QTC::TC("qpdf", "QPDFObjectHandle ERR shallow copy stream");
-        throw std::runtime_error("attempt to make a shallow copy of a stream");
+        // Handled bt QPDF_Stream::copy()
     }
     new_obj = QPDFObjectHandle(obj->copy(true));
 
@@ -2225,9 +2224,10 @@ QPDFObjectHandle::copyObject1(std::set<QPDFObjGen>& visited)
 {
     assertInitialized();
 
+    std::shared_ptr<QPDFObject> new_obj;
+
     if (isStream()) {
-        throw std::runtime_error(
-            "attempt to make a stream into a direct object");
+        new_obj = obj->copy();
     }
 
     auto cur_og = getObjGen();
@@ -2241,36 +2241,17 @@ QPDFObjectHandle::copyObject1(std::set<QPDFObjGen>& visited)
     }
 
     if (isReserved()) {
-        throw std::logic_error("QPDFObjectHandle: attempting to make a"
-                               " reserved object handle direct");
+        new_obj = obj->copy();
     }
-
-    std::shared_ptr<QPDFObject> new_obj;
 
     if (isBool() || isInteger() || isName() || isNull() || isReal() ||
         isString()) {
-        new_obj = obj->copy(true);
+        // copy(true) and copy(false) are the same
+        new_obj = obj->copy();
     } else if (isArray()) {
-        std::vector<QPDFObjectHandle> items;
-        auto array = asArray();
-        int n = array->getNItems();
-        for (int i = 0; i < n; ++i) {
-            items.push_back(array->getItem(i));
-            if (!items.back().isIndirect()) {
-                items.back().copyObject1(visited);
-            }
-        }
-        new_obj = QPDF_Array::create(items);
+        new_obj = obj->copy();
     } else if (isDictionary()) {
-        std::map<std::string, QPDFObjectHandle> items;
-        auto dict = asDictionary();
-        for (auto const& key: getKeys()) {
-            items[key] = dict->getKey(key);
-            if (!items[key].isIndirect()) {
-                items[key].copyObject1(visited);
-            }
-        }
-        new_obj = QPDF_Dictionary::create(items);
+        new_obj = obj->copy();
     } else {
         throw std::logic_error("QPDFObjectHandle::makeDirectInternal: "
                                "unknown object type");
