@@ -16,7 +16,7 @@ QPDF_Dictionary::create(std::map<std::string, QPDFObjectHandle> const& items)
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Dictionary::shallowCopy()
+QPDF_Dictionary::copy(bool shallow)
 {
     return create(items);
 }

@@ -13,7 +13,7 @@ QPDF_InlineImage::create(std::string const& val)
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_InlineImage::shallowCopy()
+QPDF_InlineImage::copy(bool shallow)
 {
     return create(val);
 }

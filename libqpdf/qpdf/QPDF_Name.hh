@@ -8,7 +8,7 @@ class QPDF_Name: public QPDFValue
   public:
     virtual ~QPDF_Name() = default;
     static std::shared_ptr<QPDFObject> create(std::string const& name);
-    virtual std::shared_ptr<QPDFObject> shallowCopy();
+    virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
     std::string getName() const;

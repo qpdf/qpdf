@@ -29,7 +29,7 @@ QPDF_Array::create(SparseOHArray const& items)
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Array::shallowCopy()
+QPDF_Array::copy(bool shallow)
 {
     return create(elements);
 }

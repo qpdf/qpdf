@@ -13,7 +13,7 @@ QPDF_Bool::create(bool value)
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Bool::shallowCopy()
+QPDF_Bool::copy(bool shallow)
 {
     return create(val);
 }

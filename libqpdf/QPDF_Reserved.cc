@@ -14,7 +14,7 @@ QPDF_Reserved::create()
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Reserved::shallowCopy()
+QPDF_Reserved::copy(bool shallow)
 {
     return create();
 }

@@ -14,7 +14,7 @@ class QPDF_String: public QPDFValue
     static std::shared_ptr<QPDFObject> create(std::string const& val);
     static std::shared_ptr<QPDFObject>
     create_utf16(std::string const& utf8_val);
-    virtual std::shared_ptr<QPDFObject> shallowCopy();
+    virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
     virtual std::string unparse();
     std::string unparse(bool force_binary);
     virtual JSON getJSON(int json_version);

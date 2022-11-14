@@ -14,7 +14,7 @@ QPDF_Unresolved::create(QPDF* qpdf, QPDFObjGen const& og)
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Unresolved::shallowCopy()
+QPDF_Unresolved::copy(bool shallow)
 {
     throw std::logic_error(
         "attempted to shallow copy an unresolved QPDFObjectHandle");
