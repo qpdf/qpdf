@@ -378,12 +378,14 @@ do_regex()
     assert((*m3)[2].matched);
 }
 
-static long operator""_x(char const* v)
+static long
+operator""_x(char const* v)
 {
     return strtol(v, nullptr, 16);
 }
 
-static std::string operator""_y(char const* v, size_t len)
+static std::string
+operator""_y(char const* v, size_t len)
 {
     return "y" + std::string(v, len) + "y";
 }
