@@ -2813,7 +2813,8 @@ QPDFObjectHandle::setParsedOffset(qpdf_offset_t offset)
     }
 }
 
-QPDFObjectHandle operator""_qpdf(char const* v, size_t len)
+QPDFObjectHandle
+operator""_qpdf(char const* v, size_t len)
 {
     return QPDFObjectHandle::parse(
         std::string(v, len), "QPDFObjectHandle literal");
