@@ -110,6 +110,19 @@ SparseOHArray::insert(size_t idx, QPDFObjectHandle oh)
     }
 }
 
+SparseOHArray
+SparseOHArray::copy()
+{
+    SparseOHArray result;
+    result.n_elements = this->n_elements;
+    for (auto const& element: this->elements) {
+        auto value = element.second;
+        result.elements[element.first] =
+            value.isIndirect() ? value : value.shallowCopy();
+    }
+    return result;
+}
+
 SparseOHArray::const_iterator
 SparseOHArray::begin() const
 {

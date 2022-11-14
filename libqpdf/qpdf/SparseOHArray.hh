@@ -15,6 +15,7 @@ class SparseOHArray
     void setAt(size_t idx, QPDFObjectHandle oh);
     void erase(size_t idx);
     void insert(size_t idx, QPDFObjectHandle oh);
+    SparseOHArray copy();
     void disconnect();
 
     typedef std::unordered_map<size_t, QPDFObjectHandle>::const_iterator

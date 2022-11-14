@@ -18,7 +18,17 @@ QPDF_Dictionary::create(std::map<std::string, QPDFObjectHandle> const& items)
 std::shared_ptr<QPDFObject>
 QPDF_Dictionary::copy(bool shallow)
 {
-    return create(items);
+    if (shallow) {
+        return create(items);
+    } else {
+        std::map<std::string, QPDFObjectHandle> new_items;
+        for (auto const& item: this->items) {
+            auto value = item.second;
+            new_items[item.first] =
+                value.isIndirect() ? value : value.shallowCopy();
+        }
+        return create(new_items);
+    }
 }
 
 void
