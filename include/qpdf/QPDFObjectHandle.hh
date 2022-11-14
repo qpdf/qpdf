@@ -1628,8 +1628,6 @@ class QPDFObjectHandle
     void objectWarning(std::string const& warning);
     void assertType(char const* type_name, bool istype);
     bool dereference();
-    void copyObject1(std::set<QPDFObjGen>& visited);
-    void shallowCopyInternal1(QPDFObjectHandle& oh);
     void copyObject(
         std::set<QPDFObjGen>& visited,
         bool cross_indirect,

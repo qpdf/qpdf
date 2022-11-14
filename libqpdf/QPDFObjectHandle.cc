@@ -2200,68 +2200,11 @@ QPDFObjectHandle::hasObjectDescription()
 QPDFObjectHandle
 QPDFObjectHandle::shallowCopy()
 {
-    QPDFObjectHandle result;
-    shallowCopyInternal1(result);
-    return result;
-}
-
-void
-QPDFObjectHandle::shallowCopyInternal1(QPDFObjectHandle& new_obj)
-{
-    assertInitialized();
-
-    if (isStream()) {
-        // Handled bt QPDF_Stream::copy()
+    if (!dereference()) {
+        throw std::logic_error("operation attempted on uninitialized "
+                               "QPDFObjectHandle");
     }
-    new_obj = QPDFObjectHandle(obj->copy(true));
-
-    std::set<QPDFObjGen> visited;
-    new_obj.copyObject1(visited);
-}
-
-void
-QPDFObjectHandle::copyObject1(std::set<QPDFObjGen>& visited)
-{
-    assertInitialized();
-
-    std::shared_ptr<QPDFObject> new_obj;
-
-    if (isStream()) {
-        new_obj = obj->copy();
-    }
-
-    auto cur_og = getObjGen();
-    if (cur_og.getObj() != 0) {
-        if (visited.count(cur_og)) {
-            throw std::runtime_error(
-                "loop detected while converting object from "
-                "indirect to direct");
-        }
-        visited.insert(cur_og);
-    }
-
-    if (isReserved()) {
-        new_obj = obj->copy();
-    }
-
-    if (isBool() || isInteger() || isName() || isNull() || isReal() ||
-        isString()) {
-        // copy(true) and copy(false) are the same
-        new_obj = obj->copy();
-    } else if (isArray()) {
-        new_obj = obj->copy();
-    } else if (isDictionary()) {
-        new_obj = obj->copy();
-    } else {
-        throw std::logic_error("QPDFObjectHandle::makeDirectInternal: "
-                               "unknown object type");
-    }
-
-    this->obj = new_obj;
-
-    if (cur_og.getObj()) {
-        visited.erase(cur_og);
-    }
+    return QPDFObjectHandle(obj->copy());
 }
 
 QPDFObjectHandle
