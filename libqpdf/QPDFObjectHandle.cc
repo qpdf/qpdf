@@ -2315,20 +2315,11 @@ QPDFObjectHandle::copyObject1(
 QPDFObjectHandle
 QPDFObjectHandle::unsafeShallowCopy()
 {
-    QPDFObjectHandle result;
-    shallowCopyInternal2(result);
-    return result;
-}
-
-void
-QPDFObjectHandle::shallowCopyInternal2(QPDFObjectHandle& new_obj)
-{
-    assertInitialized();
-
-    if (isStream()) {
-        throw std::runtime_error("attempt to make a shallow copy of a stream");
+    if (!dereference()) {
+        throw std::logic_error("operation attempted on uninitialized "
+                               "QPDFObjectHandle");
     }
-    new_obj = QPDFObjectHandle(obj->copy(true));
+    return QPDFObjectHandle(obj->copy(true));
 }
 
 void
