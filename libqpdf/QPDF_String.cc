@@ -37,7 +37,7 @@ QPDF_String::create_utf16(std::string const& utf8_val)
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_String::shallowCopy()
+QPDF_String::copy(bool shallow)
 {
     return create(val);
 }

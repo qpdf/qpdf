@@ -14,7 +14,7 @@ class QPDF_Array: public QPDFValue
     static std::shared_ptr<QPDFObject>
     create(std::vector<QPDFObjectHandle> const& items);
     static std::shared_ptr<QPDFObject> create(SparseOHArray const& items);
-    virtual std::shared_ptr<QPDFObject> shallowCopy();
+    virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
     virtual void disconnect();

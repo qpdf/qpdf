@@ -20,7 +20,7 @@ class QPDFValue
   public:
     virtual ~QPDFValue() = default;
 
-    virtual std::shared_ptr<QPDFObject> shallowCopy() = 0;
+    virtual std::shared_ptr<QPDFObject> copy(bool shallow = false) = 0;
     virtual std::string unparse() = 0;
     virtual JSON getJSON(int json_version) = 0;
     virtual void

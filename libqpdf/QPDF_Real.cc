@@ -29,7 +29,7 @@ QPDF_Real::create(double value, int decimal_places, bool trim_trailing_zeroes)
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Real::shallowCopy()
+QPDF_Real::copy(bool shallow)
 {
     return create(val);
 }

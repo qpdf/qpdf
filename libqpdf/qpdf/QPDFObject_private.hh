@@ -24,9 +24,9 @@ class QPDFObject
     QPDFObject() = default;
 
     std::shared_ptr<QPDFObject>
-    shallowCopy()
+    copy(bool shallow = false)
     {
-        return value->shallowCopy();
+        return value->copy(shallow);
     }
     std::string
     unparse()

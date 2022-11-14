@@ -15,7 +15,7 @@ QPDF_Integer::create(long long value)
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Integer::shallowCopy()
+QPDF_Integer::copy(bool shallow)
 {
     return create(val);
 }

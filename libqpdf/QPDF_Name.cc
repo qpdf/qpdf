@@ -17,7 +17,7 @@ QPDF_Name::create(std::string const& name)
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Name::shallowCopy()
+QPDF_Name::copy(bool shallow)
 {
     return create(name);
 }

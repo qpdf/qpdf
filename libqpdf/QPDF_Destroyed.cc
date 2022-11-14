@@ -15,7 +15,7 @@ QPDF_Destroyed::getInstance()
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Destroyed::shallowCopy()
+QPDF_Destroyed::copy(bool shallow)
 {
     throw std::logic_error(
         "attempted to shallow copy QPDFObjectHandle from destroyed QPDF");

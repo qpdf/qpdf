@@ -13,7 +13,7 @@ QPDF_Operator::create(std::string const& val)
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Operator::shallowCopy()
+QPDF_Operator::copy(bool shallow)
 {
     return create(val);
 }
