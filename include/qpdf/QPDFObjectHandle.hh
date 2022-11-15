@@ -1628,7 +1628,7 @@ class QPDFObjectHandle
     void objectWarning(std::string const& warning);
     void assertType(char const* type_name, bool istype);
     bool dereference();
-    void copyObject(std::set<QPDFObjGen>& visited, bool stop_at_streams);
+    void makeDirect(std::set<QPDFObjGen>& visited, bool stop_at_streams);
     void disconnect();
     void setParsedOffset(qpdf_offset_t offset);
     void parseContentStream_internal(

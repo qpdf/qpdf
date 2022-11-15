@@ -2218,19 +2218,10 @@ QPDFObjectHandle::unsafeShallowCopy()
 }
 
 void
-QPDFObjectHandle::copyObject(
+QPDFObjectHandle::makeDirect(
     std::set<QPDFObjGen>& visited, bool stop_at_streams)
 {
     assertInitialized();
-    if (isStream()) {
-        QTC::TC(
-            "qpdf", "QPDFObjectHandle copy stream", stop_at_streams ? 0 : 1);
-        if (stop_at_streams) {
-            return;
-        }
-        throw std::runtime_error(
-            "attempt to make a stream into a direct object");
-    }
 
     auto cur_og = getObjGen();
     if (cur_og.getObj() != 0) {
@@ -2243,39 +2234,40 @@ QPDFObjectHandle::copyObject(
         visited.insert(cur_og);
     }
 
-    if (isReserved()) {
-        throw std::logic_error("QPDFObjectHandle: attempting to make a"
-                               " reserved object handle direct");
-    }
-
-    std::shared_ptr<QPDFObject> new_obj;
-
     if (isBool() || isInteger() || isName() || isNull() || isReal() ||
         isString()) {
-        new_obj = obj->copy(true);
+        this->obj = obj->copy(true);
     } else if (isArray()) {
         std::vector<QPDFObjectHandle> items;
         auto array = asArray();
         int n = array->getNItems();
         for (int i = 0; i < n; ++i) {
             items.push_back(array->getItem(i));
-            items.back().copyObject(visited, stop_at_streams);
+            items.back().makeDirect(visited, stop_at_streams);
         }
-        new_obj = QPDF_Array::create(items);
+        this->obj = QPDF_Array::create(items);
     } else if (isDictionary()) {
         std::map<std::string, QPDFObjectHandle> items;
         auto dict = asDictionary();
         for (auto const& key: getKeys()) {
             items[key] = dict->getKey(key);
-            items[key].copyObject(visited, stop_at_streams);
+            items[key].makeDirect(visited, stop_at_streams);
         }
-        new_obj = QPDF_Dictionary::create(items);
+        this->obj = QPDF_Dictionary::create(items);
+    } else if (isStream()) {
+        QTC::TC(
+            "qpdf", "QPDFObjectHandle copy stream", stop_at_streams ? 0 : 1);
+        if (!stop_at_streams) {
+            throw std::runtime_error(
+                "attempt to make a stream into a direct object");
+        }
+    } else if (isReserved()) {
+        throw std::logic_error("QPDFObjectHandle: attempting to make a"
+                               " reserved object handle direct");
     } else {
         throw std::logic_error("QPDFObjectHandle::makeDirectInternal: "
                                "unknown object type");
     }
-
-    this->obj = new_obj;
 
     if (cur_og.getObj()) {
         visited.erase(cur_og);
@@ -2304,7 +2296,7 @@ void
 QPDFObjectHandle::makeDirect(bool allow_streams)
 {
     std::set<QPDFObjGen> visited;
-    copyObject(visited, allow_streams);
+    makeDirect(visited, allow_streams);
 }
 
 void
