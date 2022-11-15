@@ -2219,7 +2219,7 @@ QPDFObjectHandle::unsafeShallowCopy()
 
 void
 QPDFObjectHandle::copyObject(
-    std::set<QPDFObjGen>& visited, bool cross_indirect, bool stop_at_streams)
+    std::set<QPDFObjGen>& visited, bool stop_at_streams)
 {
     assertInitialized();
     if (isStream()) {
@@ -2259,10 +2259,7 @@ QPDFObjectHandle::copyObject(
         int n = array->getNItems();
         for (int i = 0; i < n; ++i) {
             items.push_back(array->getItem(i));
-            if ((cross_indirect || (!items.back().isIndirect()))) {
-                items.back().copyObject(
-                    visited, cross_indirect, stop_at_streams);
-            }
+            items.back().copyObject(visited, stop_at_streams);
         }
         new_obj = QPDF_Array::create(items);
     } else if (isDictionary()) {
@@ -2270,9 +2267,7 @@ QPDFObjectHandle::copyObject(
         auto dict = asDictionary();
         for (auto const& key: getKeys()) {
             items[key] = dict->getKey(key);
-            if ((cross_indirect || (!items[key].isIndirect()))) {
-                items[key].copyObject(visited, cross_indirect, stop_at_streams);
-            }
+            items[key].copyObject(visited, stop_at_streams);
         }
         new_obj = QPDF_Dictionary::create(items);
     } else {
@@ -2309,7 +2304,7 @@ void
 QPDFObjectHandle::makeDirect(bool allow_streams)
 {
     std::set<QPDFObjGen> visited;
-    copyObject(visited, true, allow_streams);
+    copyObject(visited, allow_streams);
 }
 
 void
