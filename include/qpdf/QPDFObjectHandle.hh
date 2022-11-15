@@ -1650,7 +1650,6 @@ class QPDFObjectHandle
     void copyObject(
         std::set<QPDFObjGen>& visited,
         bool cross_indirect,
-        bool first_level_only,
         bool stop_at_streams);
     void disconnect();
     void setParsedOffset(qpdf_offset_t offset);
