@@ -11,6 +11,7 @@
 #include <qpdf/QPDFValue.hh>
 #include <qpdf/Types.h>
 
+#include <optional>
 #include <string>
 
 class QPDF;
@@ -49,7 +50,6 @@ class QPDFObject
     {
         return value->type_code;
     }
-
     // Return a string literal that describes the type, useful for
     // debugging and testing
     char const*
@@ -97,6 +97,11 @@ class QPDFObject
     getParsedOffset()
     {
         return value->getParsedOffset();
+    }
+    bool
+    isDirectNull() const
+    {
+        return value->type_code == ::ot_null && !value->og.isIndirect();
     }
     void
     assign(std::shared_ptr<QPDFObject> o)
@@ -158,6 +163,39 @@ class QPDFObject
     as()
     {
         return dynamic_cast<T*>(value.get());
+    }
+
+    // Array methods
+
+    int
+    size(bool type_warn = false, bool allow_null = false) const
+    {
+        return value->size();
+    }
+    QPDFObjectHandle
+    at(int n) const
+    {
+        return value->at(n);
+    }
+    bool
+    setAt(int n, QPDFObjectHandle const& oh)
+    {
+        return value->setAt(n, oh);
+    }
+    bool
+    erase(int at)
+    {
+        return value->erase(at);
+    }
+    bool
+    insert(int at, QPDFObjectHandle const& item)
+    {
+        return value->insert(at, item);
+    }
+    bool
+    push_back(QPDFObjectHandle const& item)
+    {
+        return value->push_back(item);
     }
 
   private:

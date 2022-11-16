@@ -26,5 +26,6 @@ QPDF_Null::unparse()
 JSON
 QPDF_Null::getJSON(int json_version)
 {
+    // If this is updated, QPDF_Array::getJSON must also be updated.
     return JSON::makeNull();
 }

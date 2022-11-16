@@ -1501,7 +1501,6 @@ class QPDFObjectHandle
     {
         friend class QPDF_Dictionary;
         friend class QPDF_Stream;
-        friend class SparseOHArray;
 
       private:
         static void
@@ -1612,6 +1611,7 @@ class QPDFObjectHandle
     void objectWarning(std::string const& warning);
     void assertType(char const* type_name, bool istype);
     inline bool dereference();
+    inline void resolve();
     void makeDirect(std::set<QPDFObjGen>& visited, bool stop_at_streams);
     void disconnect();
     void setParsedOffset(qpdf_offset_t offset);

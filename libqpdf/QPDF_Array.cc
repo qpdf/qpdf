@@ -2,8 +2,16 @@
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFObject_private.hh>
+#include <qpdf/QPDF_Null.hh>
+#include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+
 #include <stdexcept>
+
+QPDF_Array::QPDF_Array() :
+    QPDFValue(::ot_array, "array")
+{
+}
 
 QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v) :
     QPDFValue(::ot_array, "array")
@@ -17,9 +25,17 @@ QPDF_Array::QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& v) :
     setFromVector(std::move(v));
 }
 
-QPDF_Array::QPDF_Array(SparseOHArray const& items) :
+QPDF_Array::QPDF_Array(QPDF_Array const& other) :
     QPDFValue(::ot_array, "array"),
-    elements(items)
+    elements(other.elements),
+    n_elements(other.n_elements)
+{
+}
+
+QPDF_Array::QPDF_Array(QPDF_Array&& other) :
+    QPDFValue(::ot_array, "array"),
+    elements(std::move(other.elements)),
+    n_elements(other.n_elements)
 {
 }
 
@@ -36,31 +52,66 @@ QPDF_Array::create(std::vector<std::shared_ptr<QPDFObject>>&& items)
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Array::create(SparseOHArray const& items)
+QPDF_Array::create(QPDF_Array const& other)
 {
-    return do_create(new QPDF_Array(items));
+    return do_create(new QPDF_Array(other));
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_Array::create(QPDF_Array&& other)
+{
+    return do_create(new QPDF_Array(other));
 }
 
 std::shared_ptr<QPDFObject>
 QPDF_Array::copy(bool shallow)
 {
-    return create(shallow ? elements : elements.copy());
+    if (shallow) {
+        return create(*this);
+    } else {
+        auto* result = new QPDF_Array();
+        result->n_elements = n_elements;
+        for (auto const& element: elements) {
+            auto value = element.second;
+            if (auto* obj = value.getObjectPtr()) {
+                result->elements[element.first] =
+                    obj->getObjGen().isIndirect() ? value : obj->copy();
+            } else {
+                result->elements[element.first] = value;
+            }
+        }
+        return do_create(result);
+    }
 }
 
 void
 QPDF_Array::disconnect()
 {
-    elements.disconnect();
+    for (auto& item: elements) {
+        if (auto* obj = item.second.getObjectPtr()) {
+            if (!obj->getObjGen().isIndirect()) {
+                obj->disconnect();
+            }
+        }
+    }
 }
 
 std::string
 QPDF_Array::unparse()
 {
     std::string result = "[ ";
-    size_t size = this->elements.size();
-    for (size_t i = 0; i < size; ++i) {
-        result += this->elements.at(i).unparse();
+    int next = 0;
+    for (auto& item: elements) {
+        int key = item.first;
+        for (int j = next; j < key; ++j) {
+            result += "null ";
+        }
+        result += item.second.unparse();
         result += " ";
+        next = ++key;
+    }
+    for (int j = next; j < n_elements; ++j) {
+        result += "null ";
     }
     result += "]";
     return result;
@@ -69,96 +120,166 @@ QPDF_Array::unparse()
 JSON
 QPDF_Array::getJSON(int json_version)
 {
-    JSON j = JSON::makeArray();
-    size_t size = this->elements.size();
-    for (size_t i = 0; i < size; ++i) {
-        j.addArrayElement(this->elements.at(i).getJSON(json_version));
+    static JSON j_null = JSON::makeNull();
+    JSON j_array = JSON::makeArray();
+    int next = 0;
+    for (auto& item: elements) {
+        int key = item.first;
+        for (int j = next; j < key; ++j) {
+            j_array.addArrayElement(j_null);
+        }
+        j_array.addArrayElement(item.second.getJSON(json_version));
+        next = ++key;
     }
-    return j;
+    for (int j = next; j < n_elements; ++j) {
+        j_array.addArrayElement(j_null);
+    }
+    return j_array;
 }
 
 int
-QPDF_Array::getNItems() const
+QPDF_Array::size() const
 {
-    // This should really return a size_t, but changing it would break
-    // a lot of code.
-    return QIntC::to_int(this->elements.size());
+    return n_elements;
 }
 
 QPDFObjectHandle
-QPDF_Array::getItem(int n) const
+QPDF_Array::at(int n) const
 {
-    if ((n < 0) || (n >= QIntC::to_int(elements.size()))) {
-        throw std::logic_error(
-            "INTERNAL ERROR: bounds error accessing QPDF_Array element");
-    }
-    return this->elements.at(QIntC::to_size(n));
-}
-
-void
-QPDF_Array::getAsVector(std::vector<QPDFObjectHandle>& v) const
-{
-    size_t size = this->elements.size();
-    for (size_t i = 0; i < size; ++i) {
-        v.push_back(this->elements.at(i));
+    if ((0 <= n) && (n < n_elements)) {
+        if (auto result = unchecked_at(n)) {
+            return result;
+        } else {
+            return QPDF_Null::create();
+        }
+    } else {
+        return {};
     }
 }
 
-void
-QPDF_Array::setItem(int n, QPDFObjectHandle const& oh)
+std::vector<QPDFObjectHandle>
+QPDF_Array::getAsVector() const
 {
-    this->elements.setAt(QIntC::to_size(n), oh);
+    std::vector<QPDFObjectHandle> v;
+    for (int i = 0; i < n_elements; ++i) {
+        auto ptr = unchecked_at(i);
+        v.push_back(ptr ? ptr : QPDF_Null::create());
+    }
+    return v;
+}
+
+bool
+QPDF_Array::setAt(int n, QPDFObjectHandle const& oh)
+{
+    if (0 <= n && n < n_elements) {
+        if (auto ptr = oh.getObjectPtr()) {
+            if (ptr->isDirectNull()) {
+                elements.erase(n);
+            } else {
+                checkOwnership(ptr);
+                elements[n] = oh;
+            }
+        }
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void
 QPDF_Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
 {
-    this->elements = SparseOHArray();
+    clear();
     for (auto const& iter: v) {
-        this->elements.append(iter);
+        push_back(iter);
     }
 }
 
 void
 QPDF_Array::setFromVector(std::vector<std::shared_ptr<QPDFObject>>&& v)
 {
-    this->elements = SparseOHArray();
+    clear();
     for (auto&& item: v) {
         if (item) {
-            this->elements.append(item);
-        } else {
-            ++this->elements.n_elements;
+            // This method is only called from QPDFParser. No need to check for
+            // ownership or direct nulls.
+            elements[n_elements] = item;
         }
+        ++n_elements;
     }
 }
 
-void
-QPDF_Array::insertItem(int at, QPDFObjectHandle const& item)
+bool
+QPDF_Array::insert(int at, QPDFObjectHandle const& item)
 {
-    // As special case, also allow insert beyond the end
-    if ((at < 0) || (at > QIntC::to_int(this->elements.size()))) {
-        throw std::logic_error(
-            "INTERNAL ERROR: bounds error accessing QPDF_Array element");
+    if (at == n_elements) {
+        // As special case, also allow inserting to the last position.
+        push_back(item);
+        return true;
+    } else if (0 <= at && (at < n_elements)) {
+        checkOwnership(item.getObjectPtr());
+
+        if (auto iter = elements.lower_bound(at); iter != elements.end()) {
+            auto nh1 = elements.extract(iter++);
+            while (iter != elements.end()) {
+                // We need to extract the next element before we can insert the
+                // current element because the current elements new key may
+                // clash with the next elements existing key.
+                auto nh2 = elements.extract(iter++);
+                ++nh1.key();
+                elements.insert(std::move(nh1));
+                nh1 = std::move(nh2);
+            }
+            ++nh1.key();
+            elements.insert(std::move(nh1));
+        }
+        elements[at] = item;
+        ++n_elements;
+        return true;
+    } else {
+        return false;
     }
-    this->elements.insert(QIntC::to_size(at), item);
 }
 
-void
-QPDF_Array::appendItem(QPDFObjectHandle const& item)
+bool
+QPDF_Array::push_back(QPDFObjectHandle const& item)
 {
-    this->elements.append(item);
+    auto ptr = item.getObjectPtr();
+    if (ptr && !ptr->isDirectNull()) {
+        checkOwnership(ptr);
+        elements[n_elements] = item;
+    }
+    ++n_elements;
+    return true;
 }
 
-void
-QPDF_Array::eraseItem(int at)
+bool
+QPDF_Array::erase(int at)
 {
-    this->elements.erase(QIntC::to_size(at));
+    if (0 <= at && at < n_elements) {
+        if (auto iter = elements.lower_bound(at); iter != elements.end()) {
+            if (iter->first == at) {
+                iter++;
+                elements.erase(at);
+            }
+
+            while (iter != elements.end()) {
+                auto nh = elements.extract(iter++);
+                --nh.key();
+                elements.insert(std::move(nh));
+            }
+        }
+        --n_elements;
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void
 QPDF_Array::addExplicitElementsToList(std::list<QPDFObjectHandle>& l) const
 {
-    for (auto const& iter: this->elements) {
+    for (auto const& iter: elements) {
         l.push_back(iter.second);
     }
 }
