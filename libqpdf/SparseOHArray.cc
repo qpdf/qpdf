@@ -1,16 +1,8 @@
 #include <qpdf/SparseOHArray.hh>
 
-#include <qpdf/QPDFObjectHandle.hh>
-#include <qpdf/QPDFObject_private.hh>
-
 #include <stdexcept>
 
-SparseOHArray::SparseOHArray() :
-    n_elements(0)
-{
-}
-
-size_t
+int
 SparseOHArray::size() const
 {
     return this->n_elements;
@@ -20,7 +12,7 @@ void
 SparseOHArray::append(QPDFObjectHandle oh)
 {
     if (!oh.isDirectNull()) {
-        this->elements[this->n_elements] = oh;
+        this->elements[this->n_elements] = oh.getObj();
     }
     ++this->n_elements;
 }
@@ -35,9 +27,9 @@ SparseOHArray::append(std::shared_ptr<QPDFObject>&& obj)
 }
 
 QPDFObjectHandle
-SparseOHArray::at(size_t idx) const
+SparseOHArray::at(int idx) const
 {
-    if (idx >= this->n_elements) {
+    if (idx < 0 || idx >= this->n_elements) {
         throw std::logic_error(
             "INTERNAL ERROR: bounds error accessing SparseOHArray element");
     }
@@ -69,7 +61,7 @@ SparseOHArray::disconnect()
 }
 
 void
-SparseOHArray::setAt(size_t idx, QPDFObjectHandle oh)
+SparseOHArray::setAt(int idx, QPDFObjectHandle oh)
 {
     if (idx >= this->n_elements) {
         throw std::logic_error("bounds error setting item in SparseOHArray");
@@ -77,12 +69,12 @@ SparseOHArray::setAt(size_t idx, QPDFObjectHandle oh)
     if (oh.isDirectNull()) {
         this->elements.erase(idx);
     } else {
-        this->elements[idx] = oh;
+        this->elements[idx] = oh.getObj();
     }
 }
 
 void
-SparseOHArray::erase(size_t idx)
+SparseOHArray::erase(int idx)
 {
     if (idx >= this->n_elements) {
         throw std::logic_error("bounds error erasing item from SparseOHArray");
@@ -100,7 +92,7 @@ SparseOHArray::erase(size_t idx)
 }
 
 void
-SparseOHArray::insert(size_t idx, QPDFObjectHandle oh)
+SparseOHArray::insert(int idx, QPDFObjectHandle oh)
 {
     if (idx > this->n_elements) {
         throw std::logic_error("bounds error inserting item to SparseOHArray");
@@ -117,7 +109,7 @@ SparseOHArray::insert(size_t idx, QPDFObjectHandle oh)
             }
         }
         this->elements = dest;
-        this->elements[idx] = oh;
+        this->elements[idx] = oh.getObj();
         ++this->n_elements;
     }
 }
@@ -130,7 +122,7 @@ SparseOHArray::copy()
     for (auto const& element: this->elements) {
         auto value = element.second;
         result.elements[element.first] =
-            value.isIndirect() ? value : value.shallowCopy();
+            value->getObjGen().isIndirect() ? value : value->copy();
     }
     return result;
 }

@@ -103,8 +103,8 @@ QPDF_Array::unparse()
 {
     if (sparse) {
         std::string result = "[ ";
-        size_t size = sp_elements.size();
-        for (size_t i = 0; i < size; ++i) {
+        int size = sp_elements.size();
+        for (int i = 0; i < size; ++i) {
             result += sp_elements.at(i).unparse();
             result += " ";
         }
@@ -127,8 +127,8 @@ QPDF_Array::getJSON(int json_version)
 {
     if (sparse) {
         JSON j = JSON::makeArray();
-        size_t size = sp_elements.size();
-        for (size_t i = 0; i < size; ++i) {
+        int size = sp_elements.size();
+        for (int i = 0; i < size; ++i) {
             j.addArrayElement(sp_elements.at(i).getJSON(json_version));
         }
         return j;
@@ -162,7 +162,7 @@ QPDF_Array::getItem(int n) const
             throw std::logic_error(
                 "INTERNAL ERROR: bounds error accessing QPDF_Array element");
         }
-        return sp_elements.at(QIntC::to_size(n));
+        return sp_elements.at(n);
     } else {
         if ((n < 0) || (n >= QIntC::to_int(elements.size()))) {
             throw std::logic_error(
@@ -177,8 +177,8 @@ void
 QPDF_Array::getAsVector(std::vector<QPDFObjectHandle>& v) const
 {
     if (sparse) {
-        size_t size = sp_elements.size();
-        for (size_t i = 0; i < size; ++i) {
+        int size = sp_elements.size();
+        for (int i = 0; i < size; ++i) {
             v.push_back(sp_elements.at(i));
         }
     } else {
@@ -190,7 +190,7 @@ void
 QPDF_Array::setItem(int n, QPDFObjectHandle const& oh)
 {
     if (sparse) {
-        sp_elements.setAt(QIntC::to_size(n), oh);
+        sp_elements.setAt(n, oh);
     } else {
         size_t idx = size_t(n);
         if (n < 0 || idx >= elements.size()) {
@@ -239,11 +239,11 @@ QPDF_Array::insertItem(int at, QPDFObjectHandle const& item)
 {
     if (sparse) {
         // As special case, also allow insert beyond the end
-        if ((at < 0) || (at > QIntC::to_int(sp_elements.size()))) {
+        if ((at < 0) || (at > sp_elements.size())) {
             throw std::logic_error(
                 "INTERNAL ERROR: bounds error accessing QPDF_Array element");
         }
-        sp_elements.insert(QIntC::to_size(at), item);
+        sp_elements.insert(at, item);
     } else {
         // As special case, also allow insert beyond the end
         size_t idx = QIntC::to_size(at);
@@ -275,7 +275,7 @@ void
 QPDF_Array::eraseItem(int at)
 {
     if (sparse) {
-        sp_elements.erase(QIntC::to_size(at));
+        sp_elements.erase(at);
     } else {
         size_t idx = QIntC::to_size(at);
         if (idx >= elements.size()) {
