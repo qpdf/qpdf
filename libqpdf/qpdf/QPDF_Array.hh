@@ -42,6 +42,9 @@ class QPDF_Array: public QPDFValue
     QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& items, bool sparse);
     QPDF_Array(SparseOHArray const& items);
     QPDF_Array(std::vector<std::shared_ptr<QPDFObject>> const& items);
+
+    void checkOwnership(QPDFObjectHandle const& item) const;
+
     bool sparse{false};
     SparseOHArray sp_elements;
     std::vector<std::shared_ptr<QPDFObject>> elements;

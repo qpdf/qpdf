@@ -7,6 +7,26 @@
 
 static const QPDFObjectHandle null_oh = QPDFObjectHandle::newNull();
 
+inline void
+QPDF_Array::checkOwnership(QPDFObjectHandle const& item) const
+{
+    if (auto obj = item.getObjectPtr()) {
+        if (qpdf) {
+            if (auto item_qpdf = obj->getQPDF()) {
+                if (qpdf != item_qpdf) {
+                    throw std::logic_error(
+                        "Attempting to add an object from a different QPDF. "
+                        "Use QPDF::copyForeignObject to add objects from "
+                        "another file.");
+                }
+            }
+        }
+    } else {
+        throw std::logic_error(
+            "Attempting to add an uninitialized object to a QPDF_Array.");
+    }
+}
+
 QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v) :
     QPDFValue(::ot_array, "array")
 {
