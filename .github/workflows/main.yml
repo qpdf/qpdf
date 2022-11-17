@@ -24,32 +24,32 @@ jobs:
     # build on Linux. Also create the documentation distribution.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: 'Run pre-build steps'
         run: build-scripts/prebuild
       - name: 'Upload documentation for later build steps'
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: doc
           path: doc.zip
       - name: 'Upload external libs'
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: external-libs
           path: external-libs-dist
       - name: 'Upload doc distribution'
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: distribution
           path: distribution
   Linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: 'Generate, build, and test'
         run: build-scripts/build-linux
       - name: Upload distribution
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: distribution
           path: distribution
@@ -66,14 +66,14 @@ jobs:
       - name: 'Disable git autocrlf'
         shell: bash
         run: git config --global core.autocrlf input
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: 'Download documentation'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: doc
           path: .
       - name: 'Download external libs'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: external-libs
           path: .
@@ -81,7 +81,7 @@ jobs:
         shell: cmd
         run: build-scripts/build-windows.bat ${{ matrix.wordsize }} ${{ matrix.tool }}
       - name: 'Upload binary distributions'
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: distribution
           path: distribution
@@ -89,9 +89,9 @@ jobs:
     runs-on: macos-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: 'Download external libs'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: external-libs
           path: .
@@ -101,11 +101,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: 'Build AppImage'
         run: build-scripts/build-appimage
       - name: 'Upload AppImage'
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: distribution
           path: distribution
@@ -113,27 +113,27 @@ jobs:
     runs-on: ubuntu-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: 'Linux 32-bit'
         run: build-scripts/build-linux32
   Fuzzers:
     runs-on: ubuntu-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: 'Build Fuzzer'
         run: build-scripts/build-fuzzer
   Sanitizers:
     runs-on: ubuntu-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: 'Sanitizer Tests'
         run: build-scripts/test-sanitizers
   UnsignedChar:
     runs-on: ubuntu-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: 'Unsigned Char Tests'
         run: build-scripts/test-unsigned-char
