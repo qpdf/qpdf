@@ -267,84 +267,31 @@ QPDFObjectHandle::getTypeName()
     return dereference() ? this->obj->getTypeName() : "uninitialized";
 }
 
+template <class T>
+T*
+QPDFObjectHandle::as()
+{
+    return dereference() ? obj->as<T>() : nullptr;
+}
+
 QPDF_Array*
 QPDFObjectHandle::asArray()
 {
-    return dereference() ? obj->as<QPDF_Array>() : nullptr;
-}
-
-QPDF_Bool*
-QPDFObjectHandle::asBool()
-{
-    return dereference() ? obj->as<QPDF_Bool>() : nullptr;
-}
-
-QPDF_Dictionary*
-QPDFObjectHandle::asDictionary()
-{
-    return dereference() ? obj->as<QPDF_Dictionary>() : nullptr;
-}
-
-QPDF_InlineImage*
-QPDFObjectHandle::asInlineImage()
-{
-    return dereference() ? obj->as<QPDF_InlineImage>() : nullptr;
-}
-
-QPDF_Integer*
-QPDFObjectHandle::asInteger()
-{
-    return dereference() ? obj->as<QPDF_Integer>() : nullptr;
-}
-
-QPDF_Name*
-QPDFObjectHandle::asName()
-{
-    return dereference() ? obj->as<QPDF_Name>() : nullptr;
-}
-
-QPDF_Null*
-QPDFObjectHandle::asNull()
-{
-    return dereference() ? obj->as<QPDF_Null>() : nullptr;
-}
-
-QPDF_Operator*
-QPDFObjectHandle::asOperator()
-{
-    return dereference() ? obj->as<QPDF_Operator>() : nullptr;
-}
-
-QPDF_Real*
-QPDFObjectHandle::asReal()
-{
-    return dereference() ? obj->as<QPDF_Real>() : nullptr;
-}
-
-QPDF_Reserved*
-QPDFObjectHandle::asReserved()
-{
-    return dereference() ? obj->as<QPDF_Reserved>() : nullptr;
+    return as<QPDF_Array>();
 }
 
 QPDF_Stream*
 QPDFObjectHandle::asStream()
 {
-    return dereference() ? obj->as<QPDF_Stream>() : nullptr;
+    return as<QPDF_Stream>();
 }
 
 QPDF_Stream*
 QPDFObjectHandle::asStreamWithAssert()
 {
-    auto stream = asStream();
+    auto stream = as<QPDF_Stream>();
     assertType("stream", stream);
     return stream;
-}
-
-QPDF_String*
-QPDFObjectHandle::asString()
-{
-    return dereference() ? obj->as<QPDF_String>() : nullptr;
 }
 
 bool
@@ -501,8 +448,7 @@ QPDFObjectHandle::isStreamOfType(
 bool
 QPDFObjectHandle::getBoolValue()
 {
-    auto boolean = asBool();
-    if (boolean) {
+    if (auto boolean = as<QPDF_Bool>()) {
         return boolean->getVal();
     } else {
         typeWarning("boolean", "returning false");
@@ -514,12 +460,11 @@ QPDFObjectHandle::getBoolValue()
 bool
 QPDFObjectHandle::getValueAsBool(bool& value)
 {
-    auto boolean = asBool();
-    if (boolean == nullptr) {
-        return false;
+    if (auto boolean = as<QPDF_Bool>()) {
+        value = boolean->getVal();
+        return true;
     }
-    value = boolean->getVal();
-    return true;
+    return false;
 }
 
 // Integer accessors
@@ -527,8 +472,7 @@ QPDFObjectHandle::getValueAsBool(bool& value)
 long long
 QPDFObjectHandle::getIntValue()
 {
-    auto integer = asInteger();
-    if (integer) {
+    if (auto integer = as<QPDF_Integer>()) {
         return integer->getVal();
     } else {
         typeWarning("integer", "returning 0");
@@ -540,12 +484,11 @@ QPDFObjectHandle::getIntValue()
 bool
 QPDFObjectHandle::getValueAsInt(long long& value)
 {
-    auto integer = asInteger();
-    if (integer == nullptr) {
-        return false;
+    if (auto integer = as<QPDF_Integer>()) {
+        value = integer->getVal();
+        return true;
     }
-    value = integer->getVal();
-    return true;
+    return false;
 }
 
 int
@@ -640,8 +583,7 @@ QPDFObjectHandle::getValueAsUInt(unsigned int& value)
 std::string
 QPDFObjectHandle::getRealValue()
 {
-    auto real = asReal();
-    if (real) {
+    if (auto real = as<QPDF_Real>()) {
         return real->getVal();
     } else {
         typeWarning("real", "returning 0.0");
@@ -653,12 +595,11 @@ QPDFObjectHandle::getRealValue()
 bool
 QPDFObjectHandle::getValueAsReal(std::string& value)
 {
-    auto real = asReal();
-    if (real == nullptr) {
-        return false;
+    if (auto real = as<QPDF_Real>()) {
+        value = real->getVal();
+        return true;
     }
-    value = real->getVal();
-    return true;
+    return false;
 }
 
 // Name accessors
@@ -666,8 +607,7 @@ QPDFObjectHandle::getValueAsReal(std::string& value)
 std::string
 QPDFObjectHandle::getName()
 {
-    auto name = asName();
-    if (name) {
+    if (auto name = as<QPDF_Name>()) {
         return name->getName();
     } else {
         typeWarning("name", "returning dummy name");
@@ -679,12 +619,11 @@ QPDFObjectHandle::getName()
 bool
 QPDFObjectHandle::getValueAsName(std::string& value)
 {
-    auto name = asName();
-    if (name == nullptr) {
-        return false;
+    if (auto name = as<QPDF_Name>()) {
+        value = name->getName();
+        return true;
     }
-    value = name->getName();
-    return true;
+    return false;
 }
 
 // String accessors
@@ -692,8 +631,7 @@ QPDFObjectHandle::getValueAsName(std::string& value)
 std::string
 QPDFObjectHandle::getStringValue()
 {
-    auto str = asString();
-    if (str) {
+    if (auto str = as<QPDF_String>()) {
         return str->getVal();
     } else {
         typeWarning("string", "returning empty string");
@@ -705,19 +643,17 @@ QPDFObjectHandle::getStringValue()
 bool
 QPDFObjectHandle::getValueAsString(std::string& value)
 {
-    auto str = asString();
-    if (str == nullptr) {
-        return false;
+    if (auto str = as<QPDF_String>()) {
+        value = str->getVal();
+        return true;
     }
-    value = str->getVal();
-    return true;
+    return false;
 }
 
 std::string
 QPDFObjectHandle::getUTF8Value()
 {
-    auto str = asString();
-    if (str) {
+    if (auto str = as<QPDF_String>()) {
         return str->getUTF8Val();
     } else {
         typeWarning("string", "returning empty string");
@@ -729,12 +665,11 @@ QPDFObjectHandle::getUTF8Value()
 bool
 QPDFObjectHandle::getValueAsUTF8(std::string& value)
 {
-    auto str = asString();
-    if (str == nullptr) {
-        return false;
+    if (auto str = as<QPDF_String>()) {
+        value = str->getUTF8Val();
+        return true;
     }
-    value = str->getUTF8Val();
-    return true;
+    return false;
 }
 
 // Operator and Inline Image accessors
@@ -742,8 +677,7 @@ QPDFObjectHandle::getValueAsUTF8(std::string& value)
 std::string
 QPDFObjectHandle::getOperatorValue()
 {
-    auto op = asOperator();
-    if (op) {
+    if (auto op = as<QPDF_Operator>()) {
         return op->getVal();
     } else {
         typeWarning("operator", "returning fake value");
@@ -755,19 +689,17 @@ QPDFObjectHandle::getOperatorValue()
 bool
 QPDFObjectHandle::getValueAsOperator(std::string& value)
 {
-    auto op = asOperator();
-    if (op == nullptr) {
-        return false;
+    if (auto op = as<QPDF_Operator>()) {
+        value = op->getVal();
+        return true;
     }
-    value = op->getVal();
-    return true;
+    return false;
 }
 
 std::string
 QPDFObjectHandle::getInlineImageValue()
 {
-    auto image = asInlineImage();
-    if (image) {
+    if (auto image = as<QPDF_InlineImage>()) {
         return image->getVal();
     } else {
         typeWarning("inlineimage", "returning empty data");
@@ -779,12 +711,11 @@ QPDFObjectHandle::getInlineImageValue()
 bool
 QPDFObjectHandle::getValueAsInlineImage(std::string& value)
 {
-    auto image = asInlineImage();
-    if (image == nullptr) {
-        return false;
+    if (auto image = as<QPDF_InlineImage>()) {
+        value = image->getVal();
+        return true;
     }
-    value = image->getVal();
-    return true;
+    return false;
 }
 
 // Array accessors
@@ -798,8 +729,7 @@ QPDFObjectHandle::aitems()
 int
 QPDFObjectHandle::getArrayNItems()
 {
-    auto array = asArray();
-    if (array) {
+    if (auto array = as<QPDF_Array>()) {
         return array->getNItems();
     } else {
         typeWarning("array", "treating as empty");
@@ -811,12 +741,11 @@ QPDFObjectHandle::getArrayNItems()
 QPDFObjectHandle
 QPDFObjectHandle::getArrayItem(int n)
 {
-    QPDFObjectHandle result;
-    auto array = asArray();
+    auto array = as<QPDF_Array>();
     if (array && (n < array->getNItems()) && (n >= 0)) {
-        result = array->getItem(n);
+        return array->getItem(n);
     } else {
-        result = newNull();
+        auto result = newNull();
         if (array) {
             objectWarning("returning null for out of bounds array access");
             QTC::TC("qpdf", "QPDFObjectHandle array bounds");
@@ -831,14 +760,14 @@ QPDFObjectHandle::getArrayItem(int n)
                 context,
                 description + " -> null returned from invalid array access");
         }
+        return result;
     }
-    return result;
 }
 
 bool
 QPDFObjectHandle::isRectangle()
 {
-    auto array = asArray();
+    auto array = as<QPDF_Array>();
     if ((array == nullptr) || (array->getNItems() != 4)) {
         return false;
     }
@@ -853,7 +782,7 @@ QPDFObjectHandle::isRectangle()
 bool
 QPDFObjectHandle::isMatrix()
 {
-    auto array = asArray();
+    auto array = as<QPDF_Array>();
     if ((array == nullptr) || (array->getNItems() != 6)) {
         return false;
     }
@@ -870,7 +799,7 @@ QPDFObjectHandle::getArrayAsRectangle()
 {
     Rectangle result;
     if (isRectangle()) {
-        auto array = asArray();
+        auto array = as<QPDF_Array>();
         // Rectangle coordinates are always supposed to be llx, lly,
         // urx, ury, but files have been found in the wild where
         // llx > urx or lly > ury.
@@ -892,7 +821,7 @@ QPDFObjectHandle::getArrayAsMatrix()
 {
     Matrix result;
     if (isMatrix()) {
-        auto array = asArray();
+        auto array = as<QPDF_Array>();
         result = Matrix(
             array->getItem(0).getNumericValue(),
             array->getItem(1).getNumericValue(),
@@ -908,8 +837,7 @@ std::vector<QPDFObjectHandle>
 QPDFObjectHandle::getArrayAsVector()
 {
     std::vector<QPDFObjectHandle> result;
-    auto array = asArray();
-    if (array) {
+    if (auto array = as<QPDF_Array>()) {
         array->getAsVector(result);
     } else {
         typeWarning("array", "treating as empty");
@@ -923,8 +851,7 @@ QPDFObjectHandle::getArrayAsVector()
 void
 QPDFObjectHandle::setArrayItem(int n, QPDFObjectHandle const& item)
 {
-    auto array = asArray();
-    if (array) {
+    if (auto array = as<QPDF_Array>()) {
         checkOwnership(item);
         array->setItem(n, item);
     } else {
@@ -936,8 +863,7 @@ QPDFObjectHandle::setArrayItem(int n, QPDFObjectHandle const& item)
 void
 QPDFObjectHandle::setArrayFromVector(std::vector<QPDFObjectHandle> const& items)
 {
-    auto array = asArray();
-    if (array) {
+    if (auto array = as<QPDF_Array>()) {
         for (auto const& item: items) {
             checkOwnership(item);
         }
@@ -951,8 +877,7 @@ QPDFObjectHandle::setArrayFromVector(std::vector<QPDFObjectHandle> const& items)
 void
 QPDFObjectHandle::insertItem(int at, QPDFObjectHandle const& item)
 {
-    auto array = asArray();
-    if (array) {
+    if (auto array = as<QPDF_Array>()) {
         array->insertItem(at, item);
     } else {
         typeWarning("array", "ignoring attempt to insert item");
@@ -970,8 +895,7 @@ QPDFObjectHandle::insertItemAndGetNew(int at, QPDFObjectHandle const& item)
 void
 QPDFObjectHandle::appendItem(QPDFObjectHandle const& item)
 {
-    auto array = asArray();
-    if (array) {
+    if (auto array = as<QPDF_Array>()) {
         checkOwnership(item);
         array->appendItem(item);
     } else {
@@ -990,7 +914,7 @@ QPDFObjectHandle::appendItemAndGetNew(QPDFObjectHandle const& item)
 void
 QPDFObjectHandle::eraseItem(int at)
 {
-    auto array = asArray();
+    auto array = as<QPDF_Array>();
     if (array && (at < array->getNItems()) && (at >= 0)) {
         array->eraseItem(at);
     } else {
@@ -1008,7 +932,7 @@ QPDFObjectHandle
 QPDFObjectHandle::eraseItemAndGetOld(int at)
 {
     auto result = QPDFObjectHandle::newNull();
-    auto array = asArray();
+    auto array = as<QPDF_Array>();
     if (array && (at < array->getNItems()) && (at >= 0)) {
         result = array->getItem(at);
     }
@@ -1027,8 +951,7 @@ QPDFObjectHandle::ditems()
 bool
 QPDFObjectHandle::hasKey(std::string const& key)
 {
-    auto dict = asDictionary();
-    if (dict) {
+    if (auto dict = as<QPDF_Dictionary>()) {
         return dict->hasKey(key);
     } else {
         typeWarning(
@@ -1041,14 +964,12 @@ QPDFObjectHandle::hasKey(std::string const& key)
 QPDFObjectHandle
 QPDFObjectHandle::getKey(std::string const& key)
 {
-    QPDFObjectHandle result;
-    auto dict = asDictionary();
-    if (dict) {
-        result = dict->getKey(key);
+    if (auto dict = as<QPDF_Dictionary>()) {
+        return dict->getKey(key);
     } else {
         typeWarning("dictionary", "returning null for attempted key retrieval");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary null for getKey");
-        result = newNull();
+        auto result = newNull();
         QPDF* qpdf = nullptr;
         std::string description;
         if (obj->getDescription(qpdf, description)) {
@@ -1057,8 +978,9 @@ QPDFObjectHandle::getKey(std::string const& key)
                 (description + " -> null returned from getting key " + key +
                  " from non-Dictionary"));
         }
+
+        return result;
     }
-    return result;
 }
 
 QPDFObjectHandle
@@ -1070,29 +992,25 @@ QPDFObjectHandle::getKeyIfDict(std::string const& key)
 std::set<std::string>
 QPDFObjectHandle::getKeys()
 {
-    std::set<std::string> result;
-    auto dict = asDictionary();
-    if (dict) {
-        result = dict->getKeys();
+    if (auto dict = as<QPDF_Dictionary>()) {
+        return dict->getKeys();
     } else {
         typeWarning("dictionary", "treating as empty");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary empty set for getKeys");
+        return {};
     }
-    return result;
 }
 
 std::map<std::string, QPDFObjectHandle>
 QPDFObjectHandle::getDictAsMap()
 {
-    std::map<std::string, QPDFObjectHandle> result;
-    auto dict = asDictionary();
-    if (dict) {
-        result = dict->getAsMap();
+    if (auto dict = as<QPDF_Dictionary>()) {
+        return dict->getAsMap();
     } else {
         typeWarning("dictionary", "treating as empty");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary empty map for asMap");
+        return {};
     }
-    return result;
 }
 
 // Array and Name accessors
@@ -1278,8 +1196,7 @@ void
 QPDFObjectHandle::replaceKey(
     std::string const& key, QPDFObjectHandle const& value)
 {
-    auto dict = asDictionary();
-    if (dict) {
+    if (auto dict = as<QPDF_Dictionary>()) {
         checkOwnership(value);
         dict->replaceKey(key, value);
     } else {
@@ -1308,8 +1225,7 @@ QPDFObjectHandle::replaceKeyAndGetOld(
 void
 QPDFObjectHandle::removeKey(std::string const& key)
 {
-    auto dict = asDictionary();
-    if (dict) {
+    if (auto dict = as<QPDF_Dictionary>()) {
         dict->removeKey(key);
     } else {
         typeWarning("dictionary", "ignoring key removal request");
@@ -1320,13 +1236,12 @@ QPDFObjectHandle::removeKey(std::string const& key)
 QPDFObjectHandle
 QPDFObjectHandle::removeKeyAndGetOld(std::string const& key)
 {
-    auto result = QPDFObjectHandle::newNull();
-    auto dict = asDictionary();
-    if (dict) {
-        result = dict->getKey(key);
+    if (auto dict = as<QPDF_Dictionary>()) {
+        auto result = dict->getKey(key);
+        removeKey(key);
+        return result;
     }
-    removeKey(key);
-    return result;
+    return newNull();
 }
 
 void
@@ -1540,8 +1455,7 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
 {
     all_description = description;
     std::vector<QPDFObjectHandle> result;
-    auto array = asArray();
-    if (array) {
+    if (auto array = as<QPDF_Array>()) {
         int n_items = array->getNItems();
         for (int i = 0; i < n_items; ++i) {
             QPDFObjectHandle item = array->getItem(i);
@@ -1717,8 +1631,7 @@ QPDFObjectHandle::unparseResolved()
 std::string
 QPDFObjectHandle::unparseBinary()
 {
-    auto str = asString();
-    if (str) {
+    if (auto str = as<QPDF_String>()) {
         return str->unparse(true);
     } else {
         return unparse();
@@ -2168,7 +2081,7 @@ QPDFObjectHandle::newStream(QPDF* qpdf)
     QPDFObjectHandle stream_dict = newDictionary();
     QPDFObjectHandle result = qpdf->makeIndirectObject(QPDFObjectHandle(
         QPDF_Stream::create(qpdf, QPDFObjGen(), stream_dict, 0, 0)));
-    auto stream = result.asStream();
+    auto stream = result.as<QPDF_Stream>();
     stream->setObjGen(result.getObjGen());
     return result;
 }
@@ -2286,9 +2199,8 @@ QPDFObjectHandle::copyObject(
     if (isBool() || isInteger() || isName() || isNull() || isReal() ||
         isString()) {
         new_obj = obj->shallowCopy();
-    } else if (isArray()) {
+    } else if (auto array = as<QPDF_Array>()) {
         std::vector<QPDFObjectHandle> items;
-        auto array = asArray();
         int n = array->getNItems();
         for (int i = 0; i < n; ++i) {
             items.push_back(array->getItem(i));
@@ -2299,9 +2211,8 @@ QPDFObjectHandle::copyObject(
             }
         }
         new_obj = QPDF_Array::create(items);
-    } else if (isDictionary()) {
+    } else if (auto dict = as<QPDF_Dictionary>()) {
         std::map<std::string, QPDFObjectHandle> items;
-        auto dict = asDictionary();
         for (auto const& key: getKeys()) {
             items[key] = dict->getKey(key);
             if ((!first_level_only) &&
