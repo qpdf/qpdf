@@ -1209,7 +1209,8 @@ class QPDF
         qpdf_offset_t offset,
         std::string const& description,
         QPDFObjGen const& exp_og,
-        QPDFObjGen& og);
+        QPDFObjGen& og,
+        bool skip_cache_if_in_xref);
     void resolve(QPDFObjGen const& og);
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);

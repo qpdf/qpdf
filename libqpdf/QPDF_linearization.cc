@@ -303,7 +303,12 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
 {
     QPDFObjGen og;
     QPDFObjectHandle H = readObjectAtOffset(
-        false, offset, "linearization hint stream", QPDFObjGen(0, 0), og);
+        false,
+        offset,
+        "linearization hint stream",
+        QPDFObjGen(0, 0),
+        og,
+        false);
     ObjCache& oc = this->m->obj_cache[og];
     qpdf_offset_t min_end_offset = oc.end_before_space;
     qpdf_offset_t max_end_offset = oc.end_after_space;

@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('xref-streams');
 
-my $n_tests = 3;
+my $n_tests = 5;
 
 # Handle xref stream with more entries than reported (bug 2872265)
 $td->runtest("xref with short size",
@@ -30,6 +30,17 @@ $td->runtest("recover xref with short size",
 $td->runtest("show new xref stream",
              {$td->COMMAND => "qpdf --show-xref a.pdf"},
              {$td->FILE => "xref-with-short-size-new.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+# Handle appended file that reuses the xref stream object number
+$td->runtest("override xref stream - xref",
+             {$td->COMMAND => "qpdf --show-xref reuse-xref-stream.pdf"},
+             {$td->FILE => "reuse-xref-stream-xref.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("override xref stream - object",
+             {$td->COMMAND => "qpdf --show-object=9 reuse-xref-stream.pdf"},
+             {$td->FILE => "reuse-xref-stream-obj9.out",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
