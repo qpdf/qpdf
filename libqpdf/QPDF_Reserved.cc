@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 QPDF_Reserved::QPDF_Reserved() :
-    QPDFValue(::ot_reserved, NAME)
+    QPDFValue(CODE, NAME)
 {
 }
 

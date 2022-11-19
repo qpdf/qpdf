@@ -14,6 +14,7 @@ class QPDF_Integer: public QPDFValue
     long long getVal() const;
 
     static constexpr const char* NAME = "integer";
+    static constexpr qpdf_object_type_e CODE = ot_integer;
 
   private:
     QPDF_Integer(long long val);

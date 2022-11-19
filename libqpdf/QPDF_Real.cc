@@ -3,14 +3,14 @@
 #include <qpdf/QUtil.hh>
 
 QPDF_Real::QPDF_Real(std::string const& val) :
-    QPDFValue(::ot_real, NAME),
+    QPDFValue(CODE, NAME),
     val(val)
 {
 }
 
 QPDF_Real::QPDF_Real(
     double value, int decimal_places, bool trim_trailing_zeroes) :
-    QPDFValue(::ot_real, "real"),
+    QPDFValue(CODE, NAME),
     val(QUtil::double_to_string(value, decimal_places, trim_trailing_zeroes))
 {
 }

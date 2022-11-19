@@ -4,7 +4,7 @@
 
 QPDF_Dictionary::QPDF_Dictionary(
     std::map<std::string, QPDFObjectHandle> const& items) :
-    QPDFValue(::ot_dictionary, NAME),
+    QPDFValue(CODE, NAME),
     items(items)
 {
 }

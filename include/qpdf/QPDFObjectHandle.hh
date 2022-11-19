@@ -1637,6 +1637,8 @@ class QPDFObjectHandle
     T* as();
     template <class T>
     T* as(std::string const& type_warning);
+    template <class T>
+    bool is();
 
     void typeWarning(char const* expected_type, std::string const& warning);
     void objectWarning(std::string const& warning);

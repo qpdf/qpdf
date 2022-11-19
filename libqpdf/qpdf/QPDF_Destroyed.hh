@@ -13,6 +13,7 @@ class QPDF_Destroyed: public QPDFValue
     static std::shared_ptr<QPDFValue> getInstance();
 
     static constexpr const char* NAME = "destroyed";
+    static constexpr qpdf_object_type_e CODE = ot_destroyed;
 
   private:
     QPDF_Destroyed();

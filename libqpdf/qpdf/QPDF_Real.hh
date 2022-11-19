@@ -16,6 +16,7 @@ class QPDF_Real: public QPDFValue
     std::string getVal();
 
     static constexpr const char* NAME = "real";
+    static constexpr qpdf_object_type_e CODE = ot_real;
 
   private:
     QPDF_Real(std::string const& val);

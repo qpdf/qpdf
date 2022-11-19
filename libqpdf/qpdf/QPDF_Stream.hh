@@ -79,6 +79,7 @@ class QPDF_Stream: public QPDFValue
     void setObjGen(QPDFObjGen const& og);
 
     static constexpr const char* NAME = "stream";
+    static constexpr qpdf_object_type_e CODE = ot_stream;
 
   private:
     QPDF_Stream(

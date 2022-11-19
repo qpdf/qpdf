@@ -14,6 +14,7 @@ class QPDF_Operator: public QPDFValue
     std::string getVal() const;
 
     static constexpr const char* NAME = "operator";
+    static constexpr qpdf_object_type_e CODE = ot_operator;
 
   private:
     QPDF_Operator(std::string const& val);

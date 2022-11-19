@@ -14,6 +14,7 @@ class QPDF_InlineImage: public QPDFValue
     std::string getVal() const;
 
     static constexpr const char* NAME = "inline-image";
+    static constexpr qpdf_object_type_e CODE = ot_inlineimage;
 
   private:
     QPDF_InlineImage(std::string const& val);

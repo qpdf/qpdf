@@ -1,7 +1,7 @@
 #include <qpdf/QPDF_Operator.hh>
 
 QPDF_Operator::QPDF_Operator(std::string const& val) :
-    QPDFValue(::ot_operator, NAME),
+    QPDFValue(CODE, NAME),
     val(val)
 {
 }

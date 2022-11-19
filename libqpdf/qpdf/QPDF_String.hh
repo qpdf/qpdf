@@ -22,6 +22,7 @@ class QPDF_String: public QPDFValue
     std::string getUTF8Val() const;
 
     static constexpr const char* NAME = "string";
+    static constexpr qpdf_object_type_e CODE = ot_string;
 
   private:
     QPDF_String(std::string const& val);

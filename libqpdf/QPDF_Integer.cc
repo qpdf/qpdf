@@ -3,7 +3,7 @@
 #include <qpdf/QUtil.hh>
 
 QPDF_Integer::QPDF_Integer(long long val) :
-    QPDFValue(::ot_integer, NAME),
+    QPDFValue(CODE, NAME),
     val(val)
 {
 }

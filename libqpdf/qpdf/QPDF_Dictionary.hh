@@ -34,6 +34,7 @@ class QPDF_Dictionary: public QPDFValue
     void removeKey(std::string const& key);
 
     static constexpr const char* NAME = "dictionary";
+    static constexpr qpdf_object_type_e CODE = ot_dictionary;
 
   private:
     QPDF_Dictionary(std::map<std::string, QPDFObjectHandle> const& items);

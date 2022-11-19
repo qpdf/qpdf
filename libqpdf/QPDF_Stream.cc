@@ -114,7 +114,7 @@ QPDF_Stream::QPDF_Stream(
     QPDFObjectHandle stream_dict,
     qpdf_offset_t offset,
     size_t length) :
-    QPDFValue(::ot_stream, NAME),
+    QPDFValue(CODE, NAME),
     qpdf(qpdf),
     og(og),
     filter_on_write(true),
