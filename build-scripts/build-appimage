@@ -22,6 +22,7 @@ done
 version=$(basename distribution/qpdf*AppImage | cut -d- -f 2)
 
 # Smoke test the AppImage
+sudo apt-get install libfuse2
 app_image=$(echo distribution/qpdf*AppImage)
 # Directly invoking the AppImage should behave like qpdf
 ${app_image} --version | grep -E "^qpdf version $version"
