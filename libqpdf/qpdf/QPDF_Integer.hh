@@ -13,6 +13,8 @@ class QPDF_Integer: public QPDFValue
     virtual JSON getJSON(int json_version);
     long long getVal() const;
 
+    static constexpr const char* NAME = "integer";
+
   private:
     QPDF_Integer(long long val);
     long long val;

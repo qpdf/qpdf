@@ -274,6 +274,18 @@ QPDFObjectHandle::as()
     return dereference() ? obj->as<T>() : nullptr;
 }
 
+template <class T>
+T*
+QPDFObjectHandle::as(std::string const& type_warning)
+{
+    if (auto result = dereference() ? obj->as<T>() : nullptr) {
+        return result;
+    } else {
+        typeWarning(T::NAME, type_warning);
+        return nullptr;
+    }
+}
+
 QPDF_Array*
 QPDFObjectHandle::asArray()
 {
@@ -448,10 +460,9 @@ QPDFObjectHandle::isStreamOfType(
 bool
 QPDFObjectHandle::getBoolValue()
 {
-    if (auto boolean = as<QPDF_Bool>()) {
+    if (auto boolean = as<QPDF_Bool>("returning false")) {
         return boolean->getVal();
     } else {
-        typeWarning("boolean", "returning false");
         QTC::TC("qpdf", "QPDFObjectHandle boolean returning false");
         return false;
     }
@@ -472,10 +483,9 @@ QPDFObjectHandle::getValueAsBool(bool& value)
 long long
 QPDFObjectHandle::getIntValue()
 {
-    if (auto integer = as<QPDF_Integer>()) {
+    if (auto integer = as<QPDF_Integer>("returning 0")) {
         return integer->getVal();
     } else {
-        typeWarning("integer", "returning 0");
         QTC::TC("qpdf", "QPDFObjectHandle integer returning 0");
         return 0;
     }
@@ -583,10 +593,9 @@ QPDFObjectHandle::getValueAsUInt(unsigned int& value)
 std::string
 QPDFObjectHandle::getRealValue()
 {
-    if (auto real = as<QPDF_Real>()) {
+    if (auto real = as<QPDF_Real>("returning 0.0")) {
         return real->getVal();
     } else {
-        typeWarning("real", "returning 0.0");
         QTC::TC("qpdf", "QPDFObjectHandle real returning 0.0");
         return "0.0";
     }
@@ -607,10 +616,9 @@ QPDFObjectHandle::getValueAsReal(std::string& value)
 std::string
 QPDFObjectHandle::getName()
 {
-    if (auto name = as<QPDF_Name>()) {
+    if (auto name = as<QPDF_Name>("returning dummy name")) {
         return name->getName();
     } else {
-        typeWarning("name", "returning dummy name");
         QTC::TC("qpdf", "QPDFObjectHandle name returning dummy name");
         return "/QPDFFakeName";
     }
@@ -631,10 +639,9 @@ QPDFObjectHandle::getValueAsName(std::string& value)
 std::string
 QPDFObjectHandle::getStringValue()
 {
-    if (auto str = as<QPDF_String>()) {
+    if (auto str = as<QPDF_String>("returning empty string")) {
         return str->getVal();
     } else {
-        typeWarning("string", "returning empty string");
         QTC::TC("qpdf", "QPDFObjectHandle string returning empty string");
         return "";
     }
@@ -653,10 +660,9 @@ QPDFObjectHandle::getValueAsString(std::string& value)
 std::string
 QPDFObjectHandle::getUTF8Value()
 {
-    if (auto str = as<QPDF_String>()) {
+    if (auto str = as<QPDF_String>("returning empty string")) {
         return str->getUTF8Val();
     } else {
-        typeWarning("string", "returning empty string");
         QTC::TC("qpdf", "QPDFObjectHandle string returning empty utf8");
         return "";
     }
@@ -677,10 +683,9 @@ QPDFObjectHandle::getValueAsUTF8(std::string& value)
 std::string
 QPDFObjectHandle::getOperatorValue()
 {
-    if (auto op = as<QPDF_Operator>()) {
+    if (auto op = as<QPDF_Operator>("returning fake value")) {
         return op->getVal();
     } else {
-        typeWarning("operator", "returning fake value");
         QTC::TC("qpdf", "QPDFObjectHandle operator returning fake value");
         return "QPDFFAKE";
     }
@@ -699,10 +704,9 @@ QPDFObjectHandle::getValueAsOperator(std::string& value)
 std::string
 QPDFObjectHandle::getInlineImageValue()
 {
-    if (auto image = as<QPDF_InlineImage>()) {
+    if (auto image = as<QPDF_InlineImage>("returning empty data")) {
         return image->getVal();
     } else {
-        typeWarning("inlineimage", "returning empty data");
         QTC::TC("qpdf", "QPDFObjectHandle inlineimage returning empty data");
         return "";
     }
@@ -729,10 +733,9 @@ QPDFObjectHandle::aitems()
 int
 QPDFObjectHandle::getArrayNItems()
 {
-    if (auto array = as<QPDF_Array>()) {
+    if (auto array = as<QPDF_Array>("treating as empty")) {
         return array->getNItems();
     } else {
-        typeWarning("array", "treating as empty");
         QTC::TC("qpdf", "QPDFObjectHandle array treating as empty");
         return 0;
     }
@@ -741,7 +744,7 @@ QPDFObjectHandle::getArrayNItems()
 QPDFObjectHandle
 QPDFObjectHandle::getArrayItem(int n)
 {
-    auto array = as<QPDF_Array>();
+    auto array = as<QPDF_Array>("returning null");
     if (array && (n < array->getNItems()) && (n >= 0)) {
         return array->getItem(n);
     } else {
@@ -750,7 +753,6 @@ QPDFObjectHandle::getArrayItem(int n)
             objectWarning("returning null for out of bounds array access");
             QTC::TC("qpdf", "QPDFObjectHandle array bounds");
         } else {
-            typeWarning("array", "returning null");
             QTC::TC("qpdf", "QPDFObjectHandle array null for non-array");
         }
         QPDF* context = nullptr;
@@ -837,10 +839,9 @@ std::vector<QPDFObjectHandle>
 QPDFObjectHandle::getArrayAsVector()
 {
     std::vector<QPDFObjectHandle> result;
-    if (auto array = as<QPDF_Array>()) {
+    if (auto array = as<QPDF_Array>("treating as empty")) {
         array->getAsVector(result);
     } else {
-        typeWarning("array", "treating as empty");
         QTC::TC("qpdf", "QPDFObjectHandle array treating as empty vector");
     }
     return result;
@@ -851,11 +852,10 @@ QPDFObjectHandle::getArrayAsVector()
 void
 QPDFObjectHandle::setArrayItem(int n, QPDFObjectHandle const& item)
 {
-    if (auto array = as<QPDF_Array>()) {
+    if (auto array = as<QPDF_Array>("ignoring attempt to set item")) {
         checkOwnership(item);
         array->setItem(n, item);
     } else {
-        typeWarning("array", "ignoring attempt to set item");
         QTC::TC("qpdf", "QPDFObjectHandle array ignoring set item");
     }
 }
@@ -863,13 +863,12 @@ QPDFObjectHandle::setArrayItem(int n, QPDFObjectHandle const& item)
 void
 QPDFObjectHandle::setArrayFromVector(std::vector<QPDFObjectHandle> const& items)
 {
-    if (auto array = as<QPDF_Array>()) {
+    if (auto array = as<QPDF_Array>("ignoring attempt to replace items")) {
         for (auto const& item: items) {
             checkOwnership(item);
         }
         array->setFromVector(items);
     } else {
-        typeWarning("array", "ignoring attempt to replace items");
         QTC::TC("qpdf", "QPDFObjectHandle array ignoring replace items");
     }
 }
@@ -877,10 +876,9 @@ QPDFObjectHandle::setArrayFromVector(std::vector<QPDFObjectHandle> const& items)
 void
 QPDFObjectHandle::insertItem(int at, QPDFObjectHandle const& item)
 {
-    if (auto array = as<QPDF_Array>()) {
+    if (auto array = as<QPDF_Array>("ignoring attempt to insert item")) {
         array->insertItem(at, item);
     } else {
-        typeWarning("array", "ignoring attempt to insert item");
         QTC::TC("qpdf", "QPDFObjectHandle array ignoring insert item");
     }
 }
@@ -895,11 +893,10 @@ QPDFObjectHandle::insertItemAndGetNew(int at, QPDFObjectHandle const& item)
 void
 QPDFObjectHandle::appendItem(QPDFObjectHandle const& item)
 {
-    if (auto array = as<QPDF_Array>()) {
+    if (auto array = as<QPDF_Array>("ignoring attempt to append item")) {
         checkOwnership(item);
         array->appendItem(item);
     } else {
-        typeWarning("array", "ignoring attempt to append item");
         QTC::TC("qpdf", "QPDFObjectHandle array ignoring append item");
     }
 }
@@ -914,7 +911,7 @@ QPDFObjectHandle::appendItemAndGetNew(QPDFObjectHandle const& item)
 void
 QPDFObjectHandle::eraseItem(int at)
 {
-    auto array = as<QPDF_Array>();
+    auto array = as<QPDF_Array>("ignoring attempt to erase item");
     if (array && (at < array->getNItems()) && (at >= 0)) {
         array->eraseItem(at);
     } else {
@@ -922,7 +919,6 @@ QPDFObjectHandle::eraseItem(int at)
             objectWarning("ignoring attempt to erase out of bounds array item");
             QTC::TC("qpdf", "QPDFObjectHandle erase array bounds");
         } else {
-            typeWarning("array", "ignoring attempt to erase item");
             QTC::TC("qpdf", "QPDFObjectHandle array ignoring erase item");
         }
     }
@@ -931,13 +927,16 @@ QPDFObjectHandle::eraseItem(int at)
 QPDFObjectHandle
 QPDFObjectHandle::eraseItemAndGetOld(int at)
 {
-    auto result = QPDFObjectHandle::newNull();
-    auto array = as<QPDF_Array>();
+    auto array = as<QPDF_Array>("ignoring attempt to erase item");
     if (array && (at < array->getNItems()) && (at >= 0)) {
-        result = array->getItem(at);
+        auto result = array->getItem(at);
+        eraseItem(at);
+        return result;
+    } else {
+        objectWarning("ignoring attempt to erase out of bounds array item");
+        QTC::TC("qpdf", "QPDFObjectHandle erase array bounds fluent");
     }
-    eraseItem(at);
-    return result;
+    return newNull();
 }
 
 // Dictionary accessors
@@ -951,11 +950,10 @@ QPDFObjectHandle::ditems()
 bool
 QPDFObjectHandle::hasKey(std::string const& key)
 {
-    if (auto dict = as<QPDF_Dictionary>()) {
+    if (auto dict = as<QPDF_Dictionary>(
+            "returning false for a key containment request")) {
         return dict->hasKey(key);
     } else {
-        typeWarning(
-            "dictionary", "returning false for a key containment request");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary false for hasKey");
         return false;
     }
@@ -964,10 +962,10 @@ QPDFObjectHandle::hasKey(std::string const& key)
 QPDFObjectHandle
 QPDFObjectHandle::getKey(std::string const& key)
 {
-    if (auto dict = as<QPDF_Dictionary>()) {
+    if (auto dict =
+            as<QPDF_Dictionary>("returning null for attempted key retrieval")) {
         return dict->getKey(key);
     } else {
-        typeWarning("dictionary", "returning null for attempted key retrieval");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary null for getKey");
         auto result = newNull();
         QPDF* qpdf = nullptr;
@@ -992,10 +990,9 @@ QPDFObjectHandle::getKeyIfDict(std::string const& key)
 std::set<std::string>
 QPDFObjectHandle::getKeys()
 {
-    if (auto dict = as<QPDF_Dictionary>()) {
+    if (auto dict = as<QPDF_Dictionary>("treating as empty")) {
         return dict->getKeys();
     } else {
-        typeWarning("dictionary", "treating as empty");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary empty set for getKeys");
         return {};
     }
@@ -1004,10 +1001,9 @@ QPDFObjectHandle::getKeys()
 std::map<std::string, QPDFObjectHandle>
 QPDFObjectHandle::getDictAsMap()
 {
-    if (auto dict = as<QPDF_Dictionary>()) {
+    if (auto dict = as<QPDF_Dictionary>("treating as empty")) {
         return dict->getAsMap();
     } else {
-        typeWarning("dictionary", "treating as empty");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary empty map for asMap");
         return {};
     }
@@ -1196,11 +1192,10 @@ void
 QPDFObjectHandle::replaceKey(
     std::string const& key, QPDFObjectHandle const& value)
 {
-    if (auto dict = as<QPDF_Dictionary>()) {
+    if (auto dict = as<QPDF_Dictionary>("ignoring key replacement request")) {
         checkOwnership(value);
         dict->replaceKey(key, value);
     } else {
-        typeWarning("dictionary", "ignoring key replacement request");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary ignoring replaceKey");
     }
 }
@@ -1225,10 +1220,9 @@ QPDFObjectHandle::replaceKeyAndGetOld(
 void
 QPDFObjectHandle::removeKey(std::string const& key)
 {
-    if (auto dict = as<QPDF_Dictionary>()) {
+    if (auto dict = as<QPDF_Dictionary>("ignoring key removal request")) {
         dict->removeKey(key);
     } else {
-        typeWarning("dictionary", "ignoring key removal request");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary ignoring removeKey");
     }
 }
@@ -1236,7 +1230,7 @@ QPDFObjectHandle::removeKey(std::string const& key)
 QPDFObjectHandle
 QPDFObjectHandle::removeKeyAndGetOld(std::string const& key)
 {
-    if (auto dict = as<QPDF_Dictionary>()) {
+    if (auto dict = as<QPDF_Dictionary>("ignoring key removal request")) {
         auto result = dict->getKey(key);
         removeKey(key);
         return result;

@@ -3,7 +3,7 @@
 #include <qpdf/QUtil.hh>
 
 QPDF_Real::QPDF_Real(std::string const& val) :
-    QPDFValue(::ot_real, "real"),
+    QPDFValue(::ot_real, NAME),
     val(val)
 {
 }

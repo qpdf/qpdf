@@ -12,6 +12,8 @@ class QPDF_Unresolved: public QPDFValue
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
 
+    static constexpr const char* NAME = "unresolved";
+
   private:
     QPDF_Unresolved(QPDF* qpdf, QPDFObjGen const& og);
 };

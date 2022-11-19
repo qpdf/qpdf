@@ -13,6 +13,8 @@ class QPDF_InlineImage: public QPDFValue
     virtual JSON getJSON(int json_version);
     std::string getVal() const;
 
+    static constexpr const char* NAME = "inline-image";
+
   private:
     QPDF_InlineImage(std::string const& val);
     std::string val;

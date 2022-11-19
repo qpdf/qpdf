@@ -15,6 +15,8 @@ class QPDF_Real: public QPDFValue
     virtual JSON getJSON(int json_version);
     std::string getVal();
 
+    static constexpr const char* NAME = "real";
+
   private:
     QPDF_Real(std::string const& val);
     QPDF_Real(double value, int decimal_places, bool trim_trailing_zeroes);

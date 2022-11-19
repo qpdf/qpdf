@@ -13,6 +13,8 @@ class QPDF_Bool: public QPDFValue
     virtual JSON getJSON(int json_version);
     bool getVal() const;
 
+    static constexpr const char* NAME = "boolean";
+
   private:
     QPDF_Bool(bool val);
     bool val;

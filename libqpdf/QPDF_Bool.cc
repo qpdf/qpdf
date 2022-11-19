@@ -1,7 +1,7 @@
 #include <qpdf/QPDF_Bool.hh>
 
 QPDF_Bool::QPDF_Bool(bool val) :
-    QPDFValue(::ot_boolean, "boolean"),
+    QPDFValue(::ot_boolean, NAME),
     val(val)
 {
 }

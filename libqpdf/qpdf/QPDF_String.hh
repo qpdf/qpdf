@@ -21,6 +21,8 @@ class QPDF_String: public QPDFValue
     std::string getVal() const;
     std::string getUTF8Val() const;
 
+    static constexpr const char* NAME = "string";
+
   private:
     QPDF_String(std::string const& val);
     bool useHexString() const;

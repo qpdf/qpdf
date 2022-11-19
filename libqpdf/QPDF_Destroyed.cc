@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 QPDF_Destroyed::QPDF_Destroyed() :
-    QPDFValue(::ot_destroyed, "destroyed")
+    QPDFValue(::ot_destroyed, NAME)
 {
 }
 

@@ -33,6 +33,8 @@ class QPDF_Dictionary: public QPDFValue
     // Remove key, doing nothing if key does not exist
     void removeKey(std::string const& key);
 
+    static constexpr const char* NAME = "dictionary";
+
   private:
     QPDF_Dictionary(std::map<std::string, QPDFObjectHandle> const& items);
     std::map<std::string, QPDFObjectHandle> items;

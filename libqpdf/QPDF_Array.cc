@@ -5,13 +5,13 @@
 #include <stdexcept>
 
 QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v) :
-    QPDFValue(::ot_array, "array")
+    QPDFValue(::ot_array, NAME)
 {
     setFromVector(v);
 }
 
 QPDF_Array::QPDF_Array(SparseOHArray const& items) :
-    QPDFValue(::ot_array, "array"),
+    QPDFValue(::ot_array, NAME),
     elements(items)
 {
 }

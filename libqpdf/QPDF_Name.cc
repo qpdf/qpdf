@@ -5,7 +5,7 @@
 #include <string.h>
 
 QPDF_Name::QPDF_Name(std::string const& name) :
-    QPDFValue(::ot_name, "name"),
+    QPDFValue(::ot_name, NAME),
     name(name)
 {
 }

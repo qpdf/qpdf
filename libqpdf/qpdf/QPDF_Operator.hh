@@ -13,6 +13,8 @@ class QPDF_Operator: public QPDFValue
     virtual JSON getJSON(int json_version);
     std::string getVal() const;
 
+    static constexpr const char* NAME = "operator";
+
   private:
     QPDF_Operator(std::string const& val);
     std::string val;
