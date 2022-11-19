@@ -1630,18 +1630,15 @@ class QPDFObjectHandle
         size_t length);
 
     QPDF_Array* asArray();
-    QPDF_Bool* asBool();
-    QPDF_Dictionary* asDictionary();
-    QPDF_InlineImage* asInlineImage();
-    QPDF_Integer* asInteger();
-    QPDF_Name* asName();
-    QPDF_Null* asNull();
-    QPDF_Operator* asOperator();
-    QPDF_Real* asReal();
-    QPDF_Reserved* asReserved();
     QPDF_Stream* asStream();
     QPDF_Stream* asStreamWithAssert();
-    QPDF_String* asString();
+
+    template <class T>
+    T* as();
+    template <class T>
+    T* as(std::string const& type_warning);
+    template <class T>
+    bool is();
 
     void typeWarning(char const* expected_type, std::string const& warning);
     void objectWarning(std::string const& warning);

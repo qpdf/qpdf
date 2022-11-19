@@ -12,6 +12,9 @@ class QPDF_Null: public QPDFValue
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
 
+    static constexpr const char* NAME = "null";
+    static constexpr qpdf_object_type_e CODE = ot_null;
+
   private:
     QPDF_Null();
 };

@@ -12,6 +12,9 @@ class QPDF_Reserved: public QPDFValue
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
 
+    static constexpr const char* NAME = "reserved";
+    static constexpr qpdf_object_type_e CODE = ot_reserved;
+
   private:
     QPDF_Reserved();
 };

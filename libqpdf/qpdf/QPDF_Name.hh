@@ -16,6 +16,9 @@ class QPDF_Name: public QPDFValue
     // Put # into strings with characters unsuitable for name token
     static std::string normalizeName(std::string const& name);
 
+    static constexpr const char* NAME = "name";
+    static constexpr qpdf_object_type_e CODE = ot_name;
+
   private:
     QPDF_Name(std::string const& name);
     std::string name;

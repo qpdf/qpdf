@@ -146,6 +146,14 @@ class QPDFObject
     {
         return dynamic_cast<T*>(value.get());
     }
+    // Note: unlike the QPDFObjectHandle::is, for eg an unresolved QPDF_Array,
+    // is<QPDF_Array> returns false but is<QPDF_Unresolved>() returns true.
+    template <typename T>
+    bool
+    is()
+    {
+        return value->type_code == T::CODE;
+    }
 
   private:
     QPDFObject(QPDFObject const&) = delete;

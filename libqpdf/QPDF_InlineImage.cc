@@ -1,7 +1,7 @@
 #include <qpdf/QPDF_InlineImage.hh>
 
 QPDF_InlineImage::QPDF_InlineImage(std::string const& val) :
-    QPDFValue(::ot_inlineimage, "inline-image"),
+    QPDFValue(CODE, NAME),
     val(val)
 {
 }

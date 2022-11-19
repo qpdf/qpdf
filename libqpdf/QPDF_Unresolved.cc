@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 QPDF_Unresolved::QPDF_Unresolved(QPDF* qpdf, QPDFObjGen const& og) :
-    QPDFValue(::ot_unresolved, "unresolved", qpdf, og)
+    QPDFValue(CODE, NAME, qpdf, og)
 {
 }
 
