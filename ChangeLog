@@ -1,3 +1,9 @@
+2022-11-19  Jay Berkenbilt  <ejb@ql.org>
+
+        * Bug fix: handle special case of an earlier xref stream object's
+        object number being reused by an update made by appending the
+        file. Fixes #809.
+
 2022-10-08  Jay Berkenbilt  <ejb@ql.org>
 
         * Fix major performance bug with the openssl crypto provider when

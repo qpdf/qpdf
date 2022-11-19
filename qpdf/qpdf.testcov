@@ -678,3 +678,4 @@ QPDF_json bad calledgetallpages 0
 QPDF_json bad pushedinheritedpageresources 0
 QPDFPageObjectHelper copied fallback 0
 QPDFPageObjectHelper used fallback without copying 0
+QPDF skipping cache for known unchecked object 0
