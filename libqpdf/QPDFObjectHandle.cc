@@ -2201,13 +2201,12 @@ QPDFObjectHandle
 QPDFObjectHandle::shallowCopy()
 {
     QPDFObjectHandle result;
-    shallowCopyInternal1(result, false);
+    shallowCopyInternal1(result);
     return result;
 }
 
 void
-QPDFObjectHandle::shallowCopyInternal1(
-    QPDFObjectHandle& new_obj, bool first_level_only)
+QPDFObjectHandle::shallowCopyInternal1(QPDFObjectHandle& new_obj)
 {
     assertInitialized();
 
@@ -2218,12 +2217,11 @@ QPDFObjectHandle::shallowCopyInternal1(
     new_obj = QPDFObjectHandle(obj->copy(true));
 
     std::set<QPDFObjGen> visited;
-    new_obj.copyObject1(visited, first_level_only);
+    new_obj.copyObject1(visited);
 }
 
 void
-QPDFObjectHandle::copyObject1(
-    std::set<QPDFObjGen>& visited, bool first_level_only)
+QPDFObjectHandle::copyObject1(std::set<QPDFObjGen>& visited)
 {
     assertInitialized();
 
@@ -2258,8 +2256,8 @@ QPDFObjectHandle::copyObject1(
         int n = array->getNItems();
         for (int i = 0; i < n; ++i) {
             items.push_back(array->getItem(i));
-            if ((!first_level_only) && !items.back().isIndirect()) {
-                items.back().copyObject1(visited, first_level_only);
+            if (!items.back().isIndirect()) {
+                items.back().copyObject1(visited);
             }
         }
         new_obj = QPDF_Array::create(items);
@@ -2268,8 +2266,8 @@ QPDFObjectHandle::copyObject1(
         auto dict = asDictionary();
         for (auto const& key: getKeys()) {
             items[key] = dict->getKey(key);
-            if ((!first_level_only) && !items[key].isIndirect()) {
-                items[key].copyObject1(visited, first_level_only);
+            if (!items[key].isIndirect()) {
+                items[key].copyObject1(visited);
             }
         }
         new_obj = QPDF_Dictionary::create(items);
