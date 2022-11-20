@@ -2218,20 +2218,12 @@ QPDFObjectHandle
 QPDFObjectHandle::shallowCopy()
 {
     QPDFObjectHandle result;
-    shallowCopyInternal(result, false);
-    return result;
-}
-
-QPDFObjectHandle
-QPDFObjectHandle::unsafeShallowCopy()
-{
-    QPDFObjectHandle result;
-    shallowCopyInternal(result, true);
+    shallowCopyInternal1(result, false);
     return result;
 }
 
 void
-QPDFObjectHandle::shallowCopyInternal(
+QPDFObjectHandle::shallowCopyInternal1(
     QPDFObjectHandle& new_obj, bool first_level_only)
 {
     assertInitialized();
@@ -2243,7 +2235,178 @@ QPDFObjectHandle::shallowCopyInternal(
     new_obj = QPDFObjectHandle(obj->copy(true));
 
     std::set<QPDFObjGen> visited;
-    new_obj.copyObject(visited, false, first_level_only, false);
+    new_obj.copyObject1(visited, false, first_level_only, false);
+}
+
+void
+QPDFObjectHandle::copyObject1(
+    std::set<QPDFObjGen>& visited,
+    bool cross_indirect,
+    bool first_level_only,
+    bool stop_at_streams)
+{
+    assertInitialized();
+
+    if (isStream()) {
+        if (stop_at_streams) {
+            return;
+        }
+        throw std::runtime_error(
+            "attempt to make a stream into a direct object");
+    }
+
+    auto cur_og = getObjGen();
+    if (cur_og.getObj() != 0) {
+        if (visited.count(cur_og)) {
+            throw std::runtime_error(
+                "loop detected while converting object from "
+                "indirect to direct");
+        }
+        visited.insert(cur_og);
+    }
+
+    if (isReserved()) {
+        throw std::logic_error("QPDFObjectHandle: attempting to make a"
+                               " reserved object handle direct");
+    }
+
+    std::shared_ptr<QPDFObject> new_obj;
+
+    if (isBool() || isInteger() || isName() || isNull() || isReal() ||
+        isString()) {
+        new_obj = obj->copy(true);
+    } else if (isArray()) {
+        std::vector<QPDFObjectHandle> items;
+        auto array = asArray();
+        int n = array->getNItems();
+        for (int i = 0; i < n; ++i) {
+            items.push_back(array->getItem(i));
+            if ((!first_level_only) &&
+                (cross_indirect || (!items.back().isIndirect()))) {
+                items.back().copyObject1(
+                    visited, cross_indirect, first_level_only, stop_at_streams);
+            }
+        }
+        new_obj = QPDF_Array::create(items);
+    } else if (isDictionary()) {
+        std::map<std::string, QPDFObjectHandle> items;
+        auto dict = asDictionary();
+        for (auto const& key: getKeys()) {
+            items[key] = dict->getKey(key);
+            if ((!first_level_only) &&
+                (cross_indirect || (!items[key].isIndirect()))) {
+                items[key].copyObject1(
+                    visited, cross_indirect, first_level_only, stop_at_streams);
+            }
+        }
+        new_obj = QPDF_Dictionary::create(items);
+    } else {
+        throw std::logic_error("QPDFObjectHandle::makeDirectInternal: "
+                               "unknown object type");
+    }
+
+    this->obj = new_obj;
+
+    if (cur_og.getObj()) {
+        visited.erase(cur_og);
+    }
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::unsafeShallowCopy()
+{
+    QPDFObjectHandle result;
+    shallowCopyInternal2(result, true);
+    return result;
+}
+
+void
+QPDFObjectHandle::shallowCopyInternal2(
+    QPDFObjectHandle& new_obj, bool first_level_only)
+{
+    assertInitialized();
+
+    if (isStream()) {
+        throw std::runtime_error("attempt to make a shallow copy of a stream");
+    }
+    new_obj = QPDFObjectHandle(obj->copy(true));
+
+    std::set<QPDFObjGen> visited;
+    new_obj.copyObject2(visited, false, first_level_only, false);
+}
+
+void
+QPDFObjectHandle::copyObject2(
+    std::set<QPDFObjGen>& visited,
+    bool cross_indirect,
+    bool first_level_only,
+    bool stop_at_streams)
+{
+    assertInitialized();
+
+    if (isStream()) {
+        if (stop_at_streams) {
+            return;
+        }
+        throw std::runtime_error(
+            "attempt to make a stream into a direct object");
+    }
+
+    auto cur_og = getObjGen();
+    if (cur_og.getObj() != 0) {
+        if (visited.count(cur_og)) {
+            throw std::runtime_error(
+                "loop detected while converting object from "
+                "indirect to direct");
+        }
+        visited.insert(cur_og);
+    }
+
+    if (isReserved()) {
+        throw std::logic_error("QPDFObjectHandle: attempting to make a"
+                               " reserved object handle direct");
+    }
+
+    std::shared_ptr<QPDFObject> new_obj;
+
+    if (isBool() || isInteger() || isName() || isNull() || isReal() ||
+        isString()) {
+        new_obj = obj->copy(true);
+    } else if (isArray()) {
+        std::vector<QPDFObjectHandle> items;
+        auto array = asArray();
+        int n = array->getNItems();
+        for (int i = 0; i < n; ++i) {
+            items.push_back(array->getItem(i));
+            if ((!first_level_only) &&
+                (cross_indirect || (!items.back().isIndirect()))) {
+                items.back().copyObject2(
+                    visited, cross_indirect, first_level_only, stop_at_streams);
+            }
+        }
+        new_obj = QPDF_Array::create(items);
+    } else if (isDictionary()) {
+        std::map<std::string, QPDFObjectHandle> items;
+        auto dict = asDictionary();
+        for (auto const& key: getKeys()) {
+            items[key] = dict->getKey(key);
+            if ((!first_level_only) &&
+                (cross_indirect || (!items[key].isIndirect()))) {
+                items[key].copyObject2(
+                    visited, cross_indirect, first_level_only, stop_at_streams);
+            }
+        }
+        new_obj = QPDF_Dictionary::create(items);
+    } else {
+        throw std::logic_error("QPDFObjectHandle::makeDirectInternal: "
+                               "unknown object type");
+    }
+
+    this->obj = new_obj;
+
+    if (cur_og.getObj()) {
+        visited.erase(cur_og);
+    }
 }
 
 void
