@@ -2022,7 +2022,7 @@ QPDF::nextObjGen()
 }
 
 QPDFObjectHandle
-QPDF::makeIndirectObject(std::shared_ptr<QPDFObject> const& obj)
+QPDF::makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj)
 {
     QPDFObjGen next{nextObjGen()};
     m->obj_cache[next] = ObjCache(obj, -1, -1);
@@ -2032,13 +2032,14 @@ QPDF::makeIndirectObject(std::shared_ptr<QPDFObject> const& obj)
 QPDFObjectHandle
 QPDF::makeIndirectObject(QPDFObjectHandle oh)
 {
-    return makeIndirectObject(QPDFObjectHandle::ObjAccessor::getObject(oh));
+    return makeIndirectFromQPDFObject(
+        QPDFObjectHandle::ObjAccessor::getObject(oh));
 }
 
 QPDFObjectHandle
 QPDF::newStream()
 {
-    return makeIndirectObject(QPDF_Stream::create(
+    return makeIndirectFromQPDFObject(QPDF_Stream::create(
         this, nextObjGen(), QPDFObjectHandle::newDictionary(), 0, 0));
 }
 
