@@ -2316,13 +2316,12 @@ QPDFObjectHandle
 QPDFObjectHandle::unsafeShallowCopy()
 {
     QPDFObjectHandle result;
-    shallowCopyInternal2(result, true);
+    shallowCopyInternal2(result);
     return result;
 }
 
 void
-QPDFObjectHandle::shallowCopyInternal2(
-    QPDFObjectHandle& new_obj, bool first_level_only)
+QPDFObjectHandle::shallowCopyInternal2(QPDFObjectHandle& new_obj)
 {
     assertInitialized();
 
@@ -2332,16 +2331,16 @@ QPDFObjectHandle::shallowCopyInternal2(
     new_obj = QPDFObjectHandle(obj->copy(true));
 
     std::set<QPDFObjGen> visited;
-    new_obj.copyObject2(visited, first_level_only);
+    new_obj.copyObject2(visited);
 }
 
 void
-QPDFObjectHandle::copyObject2(
-    std::set<QPDFObjGen>& visited, bool first_level_only)
+QPDFObjectHandle::copyObject2(std::set<QPDFObjGen>& visited)
 {
     assertInitialized();
 
     if (isStream()) {
+        // same as obj->copy(true)
         throw std::runtime_error(
             "attempt to make a stream into a direct object");
     }
@@ -2357,6 +2356,7 @@ QPDFObjectHandle::copyObject2(
     }
 
     if (isReserved()) {
+        // same as obj->copy(true)
         throw std::logic_error("QPDFObjectHandle: attempting to make a"
                                " reserved object handle direct");
     }
@@ -2367,26 +2367,20 @@ QPDFObjectHandle::copyObject2(
         isString()) {
         new_obj = obj->copy(true);
     } else if (isArray()) {
+        // same as obj->copy(true)
         std::vector<QPDFObjectHandle> items;
         auto array = asArray();
         int n = array->getNItems();
         for (int i = 0; i < n; ++i) {
             items.push_back(array->getItem(i));
-            if ((!first_level_only) && !items.back().isIndirect())
-                {
-                    items.back().copyObject2(visited, first_level_only);
-                }
         }
         new_obj = QPDF_Array::create(items);
     } else if (isDictionary()) {
+        // same as obj->copy(true)
         std::map<std::string, QPDFObjectHandle> items;
         auto dict = asDictionary();
         for (auto const& key: getKeys()) {
             items[key] = dict->getKey(key);
-            if ((!first_level_only) && !items[key].isIndirect())
-                {
-                    items[key].copyObject2(visited, first_level_only);
-                }
         }
         new_obj = QPDF_Dictionary::create(items);
     } else {
