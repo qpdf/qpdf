@@ -616,34 +616,41 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newFromMatrix(QPDFMatrix const&);
 
+    // Note: new stream creation methods have were added to the QPDF
+    // class starting with version 11.2.0. The ones in this class are
+    // here for backward compatibility.
+
     // Create a new stream and associate it with the given qpdf
-    // object.  A subsequent call must be made to replaceStreamData()
-    // to provide data for the stream.  The stream's dictionary may be
+    // object. A subsequent call must be made to replaceStreamData()
+    // to provide data for the stream. The stream's dictionary may be
     // retrieved by calling getDict(), and the resulting dictionary
-    // may be modified.  Alternatively, you can create a new
-    // dictionary and call replaceDict to install it.
+    // may be modified. Alternatively, you can create a new dictionary
+    // and call replaceDict to install it. From QPDF 11.2, you can
+    // call QPDF::newStream() instead.
     QPDF_DLL
     static QPDFObjectHandle newStream(QPDF* qpdf);
 
     // Create a new stream and associate it with the given qpdf
-    // object.  Use the given buffer as the stream data.  The stream
+    // object. Use the given buffer as the stream data. The stream
     // dictionary's /Length key will automatically be set to the size
-    // of the data buffer.  If additional keys are required, the
+    // of the data buffer. If additional keys are required, the
     // stream's dictionary may be retrieved by calling getDict(), and
-    // the resulting dictionary may be modified.  This method is just
-    // a convenient wrapper around the newStream() and
-    // replaceStreamData().  It is a convenience methods for streams
-    // that require no parameters beyond the stream length.  Note that
+    // the resulting dictionary may be modified. This method is just a
+    // convenient wrapper around the newStream() and
+    // replaceStreamData(). It is a convenience methods for streams
+    // that require no parameters beyond the stream length. Note that
     // you don't have to deal with compression yourself if you use
-    // QPDFWriter.  By default, QPDFWriter will automatically compress
-    // uncompressed stream data.  Example programs are provided that
-    // illustrate this.
+    // QPDFWriter. By default, QPDFWriter will automatically compress
+    // uncompressed stream data. Example programs are provided that
+    // illustrate this. From QPDF 11.2, you can call QPDF::newStream()
+    // instead.
     QPDF_DLL
     static QPDFObjectHandle newStream(QPDF* qpdf, std::shared_ptr<Buffer> data);
 
-    // Create new stream with data from string.  This method will
+    // Create new stream with data from string. This method will
     // create a copy of the data rather than using the user-provided
     // buffer as in the std::shared_ptr<Buffer> version of newStream.
+    // From QPDF 11.2, you can call QPDF::newStream() instead.
     QPDF_DLL
     static QPDFObjectHandle newStream(QPDF* qpdf, std::string const& data);
 

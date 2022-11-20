@@ -8,17 +8,33 @@ For a detailed list of changes, please see the file
 
 .. x.y.z: not yet released
 
-11.2.0: not yet released
+11.2.0: November 20, 2022
   - Build changes
 
     - A C++-17 compiler is now required.
 
+  - Library enhancements
+
+    - Move stream creation functions in the ``QPDF`` object where they
+      belong. The ones in ``QPDFObjectHandle`` are not deprecated and
+      will stick around.
+
+    - Add some convenience methods to ``QPDFTokenizer::Token`` for
+      testing token types. This is part of qpdf's lexical layer and
+      will not be needed by most developers.
+
   - Bug fixes
+
+    - Fix issue with missing symbols in the mingw build.
 
     - Fix major performance bug with the OpenSSL crypto provider. This
       bug was causing a 6x to 12x slowdown for encrypted files when
       OpenSSL 3 was in use. This includes the default Windows builds
       distributed with the qpdf release.
+
+    - Fix obscure bug involving appended files that reuse an object
+      number that was used as a cross reference stream in an earlier
+      stage of the file.
 
 11.1.1: October 1, 2022
   - Bug fixes
