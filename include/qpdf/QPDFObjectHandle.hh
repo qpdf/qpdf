@@ -1628,12 +1628,23 @@ class QPDFObjectHandle
     void objectWarning(std::string const& warning);
     void assertType(char const* type_name, bool istype);
     bool dereference();
+    void copyObject1(
+        std::set<QPDFObjGen>& visited,
+        bool cross_indirect,
+        bool first_level_only,
+        bool stop_at_streams);
+    void shallowCopyInternal1(QPDFObjectHandle& oh, bool first_level_only);
+    void copyObject2(
+        std::set<QPDFObjGen>& visited,
+        bool cross_indirect,
+        bool first_level_only,
+        bool stop_at_streams);
+    void shallowCopyInternal2(QPDFObjectHandle& oh, bool first_level_only);
     void copyObject(
         std::set<QPDFObjGen>& visited,
         bool cross_indirect,
         bool first_level_only,
         bool stop_at_streams);
-    void shallowCopyInternal(QPDFObjectHandle& oh, bool first_level_only);
     void disconnect();
     void setParsedOffset(qpdf_offset_t offset);
     void parseContentStream_internal(
