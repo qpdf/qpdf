@@ -1653,7 +1653,6 @@ class QPDFObjectHandle
         bool first_level_only,
         bool stop_at_streams);
     void shallowCopyInternal1(QPDFObjectHandle& oh, bool first_level_only);
-    void copyObject2(std::set<QPDFObjGen>& visited);
     void shallowCopyInternal2(QPDFObjectHandle& oh);
     void copyObject(
         std::set<QPDFObjGen>& visited,
