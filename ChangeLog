@@ -1,5 +1,7 @@
 2022-11-20  Jay Berkenbilt  <ejb@ql.org>
 
+        * 11.2.0: release
+
         * Add a few convenience methods to QPDFTokenizer::Token for
         checking token types. thanks to M. Holger for the contribution.
 
