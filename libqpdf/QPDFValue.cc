@@ -27,7 +27,7 @@ QPDFValue::checkOwnership(QPDFObject* const item) const
 int
 QPDFValue::size() const
 {
-    return -1;
+    return 1;
 }
 
 QPDFObjectHandle

@@ -36,3 +36,9 @@ QPDF_Unresolved::getJSON(int json_version)
         "attempted to get JSON from an unresolved QPDFObjectHandle");
     return JSON::makeNull();
 }
+
+int
+QPDF_Unresolved::size() const
+{
+    return -1;
+}

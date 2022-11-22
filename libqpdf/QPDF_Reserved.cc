@@ -34,3 +34,9 @@ QPDF_Reserved::getJSON(int json_version)
         "QPDFObjectHandle: attempting to get JSON from a reserved object");
     return JSON::makeNull();
 }
+
+int
+QPDF_Reserved::size() const
+{
+    return -1;
+}

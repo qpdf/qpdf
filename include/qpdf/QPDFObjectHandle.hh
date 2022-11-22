@@ -835,6 +835,11 @@ class QPDFObjectHandle
     QPDF_DLL
     bool getValueAsInlineImage(std::string&);
 
+    // Generalized accessors
+
+    QPDF_DLL
+    int size();
+
     // Methods for array objects; see also name and array objects.
 
     // Return an object that enables iteration over members. You can

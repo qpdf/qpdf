@@ -773,6 +773,14 @@ QPDFObjectHandle::getValueAsInlineImage(std::string& value)
     return true;
 }
 
+// Generalized accessors
+
+int
+QPDFObjectHandle::size()
+{
+    return dereference() ? obj->size() : -1;
+}
+
 // Array accessors
 
 QPDFObjectHandle::QPDFArrayItems
@@ -785,7 +793,7 @@ int
 QPDFObjectHandle::getArrayNItems()
 {
     resolve();
-    if (auto result = obj->size(); result >= 0) {
+    if (auto result = obj->size(); result > 1 || isArray()) {
         return result;
     } else {
         typeWarning("array", "treating as empty");

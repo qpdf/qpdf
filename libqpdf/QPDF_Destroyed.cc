@@ -37,3 +37,9 @@ QPDF_Destroyed::getJSON(int json_version)
         "attempted to get JSON from a QPDFObjectHandle from a destroyed QPDF");
     return JSON::makeNull();
 }
+
+int
+QPDF_Destroyed::size() const
+{
+    return -1;
+}
