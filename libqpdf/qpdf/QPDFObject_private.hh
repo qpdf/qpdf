@@ -8,16 +8,17 @@
 #include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
 #include <qpdf/JSON.hh>
+#include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFValue.hh>
 #include <qpdf/Types.h>
 
+#include <memory>
 #include <optional>
 #include <string>
 
 class QPDF;
-class QPDFObjectHandle;
 
-class QPDFObject
+class QPDFObject: public std::enable_shared_from_this<QPDFObject>
 {
     friend class QPDFValue;
 
@@ -173,9 +174,24 @@ class QPDFObject
         return value->size();
     }
     QPDFObjectHandle
-    at(int n) const
+    at(int n)
     {
-        return value->at(n);
+        switch (value->type_code) {
+        case ::ot_array:
+            return value->at(n);
+        case ::ot_null:
+        case ::ot_uninitialized:
+        case ::ot_reserved:
+        case ::ot_unresolved:
+        case ::ot_destroyed:
+            return {};
+        default:
+            if (n == 0) {
+                return {shared_from_this()};
+            } else {
+                return {};
+            }
+        }
     }
     bool
     setAt(int n, QPDFObjectHandle const& oh)

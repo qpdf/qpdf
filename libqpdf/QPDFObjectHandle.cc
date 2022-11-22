@@ -778,13 +778,24 @@ QPDFObjectHandle::getValueAsInlineImage(std::string& value)
 int
 QPDFObjectHandle::size()
 {
-    return dereference() ? obj->size() : -1;
+    resolve();
+    return obj->size();
 }
 
 int
 QPDFObjectHandle::sizeIfArray()
 {
     return isArray() ? obj->size() : 0;
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::at(int index)
+{
+    resolve();
+    if (auto result = obj->at(index)) {
+        return result;
+    }
+    return newNull();
 }
 
 // Array accessors
@@ -812,7 +823,7 @@ QPDFObjectHandle
 QPDFObjectHandle::getArrayItem(int n)
 {
     resolve();
-    if (auto item = obj->at(n)) {
+    if (auto item = obj->at(n); item && (n > 1 || isArray())) {
         return item;
     }
     if (isArray()) {
@@ -997,7 +1008,7 @@ QPDFObjectHandle
 QPDFObjectHandle::eraseItemAndGetOld(int at)
 {
     resolve();
-    if (auto item = obj->at(at)) {
+    if (auto item = obj->at(at); item && (at > 1 || isArray())) {
         obj->erase(at);
         return item;
     } else {

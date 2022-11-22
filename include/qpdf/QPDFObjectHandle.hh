@@ -29,6 +29,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <optional>
 #include <set>
 #include <string>
 #include <vector>
@@ -841,7 +842,8 @@ class QPDFObjectHandle
     int size();
     QPDF_DLL
     int sizeIfArray();
-
+    QPDF_DLL
+    QPDFObjectHandle at(int index);
     // Methods for array objects; see also name and array objects.
 
     // Return an object that enables iteration over members. You can

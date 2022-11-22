@@ -13,6 +13,8 @@
 class QPDF;
 class QPDFObject;
 
+using ObjectPtr = std::shared_ptr<QPDFObject>;
+
 class QPDFValue
 {
     friend class QPDFObject;
