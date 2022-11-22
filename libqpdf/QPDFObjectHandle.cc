@@ -781,6 +781,12 @@ QPDFObjectHandle::size()
     return dereference() ? obj->size() : -1;
 }
 
+int
+QPDFObjectHandle::sizeIfArray()
+{
+    return isArray() ? obj->size() : 0;
+}
+
 // Array accessors
 
 QPDFObjectHandle::QPDFArrayItems

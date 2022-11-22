@@ -839,6 +839,8 @@ class QPDFObjectHandle
 
     QPDF_DLL
     int size();
+    QPDF_DLL
+    int sizeIfArray();
 
     // Methods for array objects; see also name and array objects.
 
