@@ -298,7 +298,7 @@ QPDFFormFieldObjectHelper::getChoices()
     }
     QPDFObjectHandle opt = getInheritableFieldValue("/Opt");
     if (opt.isArray()) {
-        int n = opt.getArrayNItems();
+        int n = opt.size();
         for (int i = 0; i < n; ++i) {
             QPDFObjectHandle item = opt.getArrayItem(i);
             if (item.isString()) {
@@ -411,7 +411,7 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
         return;
     }
     setFieldAttribute("/V", name);
-    int nkids = kids.getArrayNItems();
+    int nkids = kids.size();
     for (int i = 0; i < nkids; ++i) {
         QPDFObjectHandle kid = kids.getArrayItem(i);
         QPDFObjectHandle AP = kid.getKey("/AP");
@@ -421,7 +421,7 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
             // just find the first one.
             QPDFObjectHandle grandkids = kid.getKey("/Kids");
             if (grandkids.isArray()) {
-                int ngrandkids = grandkids.getArrayNItems();
+                int ngrandkids = grandkids.size();
                 for (int j = 0; j < ngrandkids; ++j) {
                     QPDFObjectHandle grandkid = grandkids.getArrayItem(j);
                     AP = grandkid.getKey("/AP");
@@ -467,7 +467,7 @@ QPDFFormFieldObjectHelper::setCheckBoxValue(bool value)
         // find the first one.
         QPDFObjectHandle kids = this->oh.getKey("/Kids");
         if (kids.isArray()) {
-            int nkids = kids.getArrayNItems();
+            int nkids = kids.size();
             for (int i = 0; i < nkids; ++i) {
                 QPDFObjectHandle kid = kids.getArrayItem(i);
                 AP = kid.getKey("/AP");

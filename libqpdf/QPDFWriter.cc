@@ -1258,7 +1258,7 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
         }
     } else if (object.isArray()) {
         if (!this->m->linearized) {
-            int n = object.getArrayNItems();
+            int n = object.size();
             for (int i = 0; i < n; ++i) {
                 enqueueObject(object.getArrayItem(i));
             }
@@ -1496,7 +1496,7 @@ QPDFWriter::unparseObject(
         // doesn't make the files that much bigger.
         writeString("[");
         writeStringQDF("\n");
-        int n = object.getArrayNItems();
+        int n = object.size();
         for (int i = 0; i < n; ++i) {
             writeStringQDF(indent);
             writeStringQDF("  ");
@@ -1621,7 +1621,7 @@ QPDFWriter::unparseObject(
 
             // If /DecodeParms is an empty list, remove it.
             if (object.getKey("/DecodeParms").isArray() &&
-                (0 == object.getKey("/DecodeParms").getArrayNItems())) {
+                (0 == object.getKey("/DecodeParms").size())) {
                 QTC::TC("qpdf", "QPDFWriter remove empty DecodeParms");
                 object.removeKey("/DecodeParms");
             }
@@ -1642,7 +1642,8 @@ QPDFWriter::unparseObject(
                         object.removeKey("/DecodeParms");
                     } else {
                         int idx = -1;
-                        for (int i = 0; i < filter.getArrayNItems(); ++i) {
+                        int n = filter.size();
+                        for (int i = 0; i < n; ++i) {
                             QPDFObjectHandle item = filter.getArrayItem(i);
                             if (item.isNameAndEquals("/Crypt")) {
                                 idx = i;
@@ -2133,7 +2134,7 @@ QPDFWriter::initializeSpecialStreams()
         QPDFObjectHandle contents = page.getKey("/Contents");
         std::vector<QPDFObjGen> contents_objects;
         if (contents.isArray()) {
-            int n = contents.getArrayNItems();
+            int n = contents.size();
             for (int i = 0; i < n; ++i) {
                 contents_objects.push_back(
                     contents.getArrayItem(i).getObjGen());

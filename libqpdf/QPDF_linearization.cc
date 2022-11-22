@@ -186,7 +186,7 @@ QPDF::readLinearizationData()
     }
 
     // Hint table array: offset length [ offset length ]
-    size_t n_H_items = toS(H.getArrayNItems());
+    size_t n_H_items = toS(H.size());
     if (!((n_H_items == 2) || (n_H_items == 4))) {
         throw damagedPDF(
             "linearization dictionary", "H has the wrong number of items");

@@ -1024,8 +1024,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
     QPDFObjectHandle dict = xref_obj.getDict();
     QPDFObjectHandle W_obj = dict.getKey("/W");
     QPDFObjectHandle Index_obj = dict.getKey("/Index");
-    if (!(W_obj.isArray() && (W_obj.getArrayNItems() >= 3) &&
-          W_obj.getArrayItem(0).isInteger() &&
+    if (!((W_obj.size() >= 3) && W_obj.getArrayItem(0).isInteger() &&
           W_obj.getArrayItem(1).isInteger() &&
           W_obj.getArrayItem(2).isInteger() &&
           dict.getKey("/Size").isInteger() &&
@@ -1060,7 +1059,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 
     std::vector<long long> indx;
     if (Index_obj.isArray()) {
-        int n_index = Index_obj.getArrayNItems();
+        int n_index = Index_obj.size();
         if ((n_index % 2) || (n_index < 2)) {
             throw damagedPDF(
                 "xref stream",
@@ -2234,7 +2233,7 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
 
     if (foreign.isArray()) {
         QTC::TC("qpdf", "QPDF reserve array");
-        int n = foreign.getArrayNItems();
+        int n = foreign.size();
         for (int i = 0; i < n; ++i) {
             reserveObjects(foreign.getArrayItem(i), obj_copier, false);
         }
@@ -2274,7 +2273,7 @@ QPDF::replaceForeignIndirectObjects(
     } else if (foreign.isArray()) {
         QTC::TC("qpdf", "QPDF replace array");
         result = QPDFObjectHandle::newArray();
-        int n = foreign.getArrayNItems();
+        int n = foreign.size();
         for (int i = 0; i < n; ++i) {
             result.appendItem(
                 // line-break
@@ -2567,7 +2566,7 @@ QPDF::getCompressibleObjGens()
                 queue.push_front(obj.getKey(*iter));
             }
         } else if (obj.isArray()) {
-            int n = obj.getArrayNItems();
+            int n = obj.size();
             for (int i = 1; i <= n; ++i) {
                 queue.push_front(obj.getArrayItem(n - i));
             }

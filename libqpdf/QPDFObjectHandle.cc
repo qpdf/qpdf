@@ -2696,7 +2696,7 @@ QPDFObjectHandle::QPDFArrayItems::iterator::iterator(
 void
 QPDFObjectHandle::QPDFArrayItems::iterator::updateIValue()
 {
-    this->m->is_end = (this->m->item_number >= this->m->oh.getArrayNItems());
+    this->m->is_end = (this->m->item_number >= this->m->oh.size());
     if (this->m->is_end) {
         this->ivalue = QPDFObjectHandle();
     } else {
@@ -2708,7 +2708,7 @@ QPDFObjectHandle::QPDFArrayItems::iterator::Members::Members(
     QPDFObjectHandle& oh, bool for_begin) :
     oh(oh)
 {
-    this->item_number = for_begin ? 0 : oh.getArrayNItems();
+    this->item_number = for_begin ? 0 : oh.size();
 }
 
 QPDFObjectHandle::QPDFArrayItems::iterator

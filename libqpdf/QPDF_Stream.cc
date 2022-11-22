@@ -382,7 +382,7 @@ QPDF_Stream::filterable(
         filter_names.push_back(filter_obj.getName());
     } else if (filter_obj.isArray()) {
         // Potentially multiple filters
-        int n = filter_obj.getArrayNItems();
+        int n = filter_obj.size();
         for (int i = 0; i < n; ++i) {
             QPDFObjectHandle item = filter_obj.getArrayItem(i);
             if (item.isName()) {
@@ -428,11 +428,11 @@ QPDF_Stream::filterable(
 
     QPDFObjectHandle decode_obj = this->stream_dict.getKey("/DecodeParms");
     std::vector<QPDFObjectHandle> decode_parms;
-    if (decode_obj.isArray() && (decode_obj.getArrayNItems() == 0)) {
+    if (decode_obj.isArray() && (decode_obj.size() == 0)) {
         decode_obj = QPDFObjectHandle::newNull();
     }
     if (decode_obj.isArray()) {
-        for (int i = 0; i < decode_obj.getArrayNItems(); ++i) {
+        for (int i = 0; i < decode_obj.size(); ++i) {
             decode_parms.push_back(decode_obj.getArrayItem(i));
         }
     } else {

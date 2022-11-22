@@ -58,7 +58,7 @@ NNTreeIterator::updateIValue(bool allow_invalid)
     bool okay = false;
     if ((item_number >= 0) && this->node.isDictionary()) {
         auto items = this->node.getKey(impl.details.itemsKey());
-        if (this->item_number + 1 < items.getArrayNItems()) {
+        if (this->item_number + 1 < items.size()) {
             okay = true;
             this->ivalue.first = items.getArrayItem(this->item_number);
             this->ivalue.second = items.getArrayItem(1 + this->item_number);
@@ -91,7 +91,7 @@ NNTreeIterator::getNextKid(PathElement& pe, bool backward)
     while (!found) {
         pe.kid_number += backward ? -1 : 1;
         auto kids = pe.node.getKey("/Kids");
-        if ((pe.kid_number >= 0) && (pe.kid_number < kids.getArrayNItems())) {
+        if ((pe.kid_number >= 0) && (pe.kid_number < kids.size())) {
             result = kids.getArrayItem(pe.kid_number);
             if (result.isDictionary() &&
                 (result.hasKey("/Kids") ||
@@ -131,8 +131,7 @@ NNTreeIterator::increment(bool backward)
     while (valid() && (!found_valid_key)) {
         this->item_number += backward ? -2 : 2;
         auto items = this->node.getKey(impl.details.itemsKey());
-        if ((this->item_number < 0) ||
-            (this->item_number >= items.getArrayNItems())) {
+        if ((this->item_number < 0) || (this->item_number >= items.size())) {
             bool found = false;
             setItemNumber(QPDFObjectHandle(), -1);
             while (!(found || this->path.empty())) {
@@ -147,7 +146,7 @@ NNTreeIterator::increment(bool backward)
         }
         if (this->item_number >= 0) {
             items = this->node.getKey(impl.details.itemsKey());
-            if (this->item_number + 1 >= items.getArrayNItems()) {
+            if (this->item_number + 1 >= items.size()) {
                 QTC::TC("qpdf", "NNTree skip item at end of short items");
                 warn(
                     impl.qpdf,
@@ -181,9 +180,9 @@ NNTreeIterator::resetLimits(
             break;
         }
         auto kids = node.getKey("/Kids");
-        int nkids = kids.isArray() ? kids.getArrayNItems() : 0;
+        int nkids = kids.isArray() ? kids.size() : 0;
         auto items = node.getKey(impl.details.itemsKey());
-        int nitems = items.isArray() ? items.getArrayNItems() : 0;
+        int nitems = items.isArray() ? items.size() : 0;
 
         bool changed = true;
         QPDFObjectHandle first;
@@ -197,10 +196,7 @@ NNTreeIterator::resetLimits(
             if (first_kid.isDictionary() && last_kid.isDictionary()) {
                 auto first_limits = first_kid.getKey("/Limits");
                 auto last_limits = last_kid.getKey("/Limits");
-                if (first_limits.isArray() &&
-                    (first_limits.getArrayNItems() >= 2) &&
-                    last_limits.isArray() &&
-                    (last_limits.getArrayNItems() >= 2)) {
+                if ((first_limits.size() >= 2) && (last_limits.size() >= 2)) {
                     first = first_limits.getArrayItem(0);
                     last = last_limits.getArrayItem(1);
                 }
@@ -211,7 +207,7 @@ NNTreeIterator::resetLimits(
             limits.appendItem(first);
             limits.appendItem(last);
             auto olimits = node.getKey("/Limits");
-            if (olimits.isArray() && (olimits.getArrayNItems() == 2)) {
+            if ((olimits.size() == 2)) {
                 auto ofirst = olimits.getArrayItem(0);
                 auto olast = olimits.getArrayItem(1);
                 if (impl.details.keyValid(ofirst) &&
@@ -279,9 +275,9 @@ NNTreeIterator::split(
     // Find the array we actually need to split, which is either this
     // node's kids or items.
     auto kids = to_split.getKey("/Kids");
-    int nkids = kids.isArray() ? kids.getArrayNItems() : 0;
+    int nkids = kids.isArray() ? kids.size() : 0;
     auto items = to_split.getKey(impl.details.itemsKey());
-    int nitems = items.isArray() ? items.getArrayNItems() : 0;
+    int nitems = items.isArray() ? items.size() : 0;
 
     QPDFObjectHandle first_half;
     int n = 0;
@@ -364,7 +360,7 @@ NNTreeIterator::split(
     // items into the second half array.
     QPDFObjectHandle second_half = QPDFObjectHandle::newArray();
     int start_idx = ((n / 2) & ~1);
-    while (first_half.getArrayNItems() > start_idx) {
+    while (first_half.size() > start_idx) {
         second_half.appendItem(first_half.getArrayItem(start_idx));
         first_half.eraseItem(start_idx);
     }
@@ -435,7 +431,7 @@ NNTreeIterator::insertAfter(QPDFObjectHandle key, QPDFObjectHandle value)
     if (!items.isArray()) {
         error(impl.qpdf, node, "node contains no items array");
     }
-    if (items.getArrayNItems() < this->item_number + 2) {
+    if (items.size() < this->item_number + 2) {
         error(impl.qpdf, node, "insert: items array is too short");
     }
     items.insertItem(this->item_number + 2, key);
@@ -455,7 +451,7 @@ NNTreeIterator::remove()
         throw std::logic_error("attempt made to remove an invalid iterator");
     }
     auto items = this->node.getKey(impl.details.itemsKey());
-    int nitems = items.getArrayNItems();
+    int nitems = items.size();
     if (this->item_number + 2 > nitems) {
         error(
             impl.qpdf,
@@ -517,7 +513,7 @@ NNTreeIterator::remove()
         --parent;
         auto kids = element->node.getKey("/Kids");
         kids.eraseItem(element->kid_number);
-        auto nkids = kids.getArrayNItems();
+        auto nkids = kids.size();
         if (nkids > 0) {
             // The logic here is similar to the items case.
             if ((element->kid_number == 0) || (element->kid_number == nkids)) {
@@ -669,9 +665,9 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
         }
 
         auto kids = node.getKey("/Kids");
-        int nkids = kids.isArray() ? kids.getArrayNItems() : 0;
+        int nkids = kids.isArray() ? kids.size() : 0;
         auto items = node.getKey(impl.details.itemsKey());
-        int nitems = items.isArray() ? items.getArrayNItems() : 0;
+        int nitems = items.isArray() ? items.size() : 0;
         if (nitems > 0) {
             setItemNumber(node, first ? 0 : nitems - 2);
             break;
@@ -767,8 +763,7 @@ NNTreeImpl::withinLimits(QPDFObjectHandle key, QPDFObjectHandle node)
 {
     int result = 0;
     auto limits = node.getKey("/Limits");
-    if (limits.isArray() && (limits.getArrayNItems() >= 2) &&
-        details.keyValid(limits.getArrayItem(0)) &&
+    if ((limits.size() >= 2) && details.keyValid(limits.getArrayItem(0)) &&
         details.keyValid(limits.getArrayItem(1))) {
         if (details.compareKeys(key, limits.getArrayItem(0)) < 0) {
             result = -1;
@@ -846,7 +841,7 @@ int
 NNTreeImpl::compareKeyItem(
     QPDFObjectHandle& key, QPDFObjectHandle& items, int idx)
 {
-    if (!((items.isArray() && (items.getArrayNItems() > (2 * idx)) &&
+    if (!(((items.size() > (2 * idx)) &&
            details.keyValid(items.getArrayItem(2 * idx))))) {
         QTC::TC("qpdf", "NNTree item is wrong type");
         error(
@@ -862,7 +857,7 @@ int
 NNTreeImpl::compareKeyKid(
     QPDFObjectHandle& key, QPDFObjectHandle& kids, int idx)
 {
-    if (!(kids.isArray() && (idx < kids.getArrayNItems()) &&
+    if (!(kids.isArray() && (idx < kids.size()) &&
           kids.getArrayItem(idx).isDictionary())) {
         QTC::TC("qpdf", "NNTree kid is invalid");
         error(qpdf, this->oh, "invalid kid at index " + std::to_string(idx));
@@ -941,9 +936,9 @@ NNTreeImpl::findInternal(QPDFObjectHandle key, bool return_prev_if_not_found)
         seen.insert(og);
 
         auto kids = node.getKey("/Kids");
-        int nkids = kids.isArray() ? kids.getArrayNItems() : 0;
+        int nkids = kids.isArray() ? kids.size() : 0;
         auto items = node.getKey(details.itemsKey());
-        int nitems = items.isArray() ? items.getArrayNItems() : 0;
+        int nitems = items.isArray() ? items.size() : 0;
         if (nitems > 0) {
             int idx = binarySearch(
                 key,

@@ -1264,7 +1264,8 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
                 dp_array = decode_parms;
             } else {
                 dp_array = QPDFObjectHandle::newArray();
-                for (int i = 0; i < filters.getArrayNItems(); ++i) {
+                int n = filters.size();
+                for (int i = 0; i < n; ++i) {
                     dp_array.appendItem(decode_parms);
                 }
             }
@@ -2574,7 +2575,7 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                 });
                 return true;
             }
-            int n = kids.getArrayNItems();
+            int n = kids.size();
             for (int i = 0; i < n; ++i) {
                 queue.push_back(kids.getArrayItem(i));
             }
@@ -2937,7 +2938,7 @@ QPDFJob::handlePageSpecs(
                     new_fields.appendItem(field);
                 }
             }
-            if (new_fields.getArrayNItems() > 0) {
+            if (new_fields.size() > 0) {
                 QTC::TC("qpdf", "QPDFJob keep some fields in pages");
                 acroform.replaceKey("/Fields", new_fields);
             } else {

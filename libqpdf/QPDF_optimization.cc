@@ -321,7 +321,7 @@ QPDF::updateObjectMapsInternal(
     }
 
     if (oh.isArray()) {
-        int n = oh.getArrayNItems();
+        int n = oh.size();
         for (int i = 0; i < n; ++i) {
             updateObjectMapsInternal(
                 ou,

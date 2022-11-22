@@ -795,8 +795,7 @@ QPDF::initializeEncryption()
 
     std::string id1;
     QPDFObjectHandle id_obj = this->m->trailer.getKey("/ID");
-    if ((id_obj.isArray() && (id_obj.getArrayNItems() == 2) &&
-         id_obj.getArrayItem(0).isString())) {
+    if ((id_obj.size() == 2) && id_obj.getArrayItem(0).isString()) {
         id1 = id_obj.getArrayItem(0).getStringValue();
     } else {
         // Treating a missing ID as the empty string enables qpdf to
@@ -1182,8 +1181,8 @@ QPDF::decryptStream(
                 stream_dict.getKey("/Filter").isArray()) {
                 QPDFObjectHandle filter = stream_dict.getKey("/Filter");
                 QPDFObjectHandle decode = stream_dict.getKey("/DecodeParms");
-                if (filter.getArrayNItems() == decode.getArrayNItems()) {
-                    for (int i = 0; i < filter.getArrayNItems(); ++i) {
+                if (filter.size() == decode.size()) {
+                    for (int i = 0; i < filter.size(); ++i) {
                         if (filter.getArrayItem(i).isNameAndEquals("/Crypt")) {
                             QPDFObjectHandle crypt_params =
                                 decode.getArrayItem(i);
