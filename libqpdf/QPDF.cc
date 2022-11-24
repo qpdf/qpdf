@@ -1292,48 +1292,36 @@ QPDF::showXRefTable()
     }
 }
 
+// Resolve all objects in the xref table. If this triggers a xref table
+// reconstruction abort and return false. Otherwise return true.
+bool
+QPDF::resolveXRefTable()
+{
+    bool may_change = !this->m->reconstructed_xref;
+    for (auto& iter: this->m->xref_table) {
+        if (isUnresolved(iter.first)) {
+            resolve(iter.first);
+            if (may_change && this->m->reconstructed_xref) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Ensure all objects in the pdf file, including those in indirect
+// references, appear in the object cache.
 void
 QPDF::fixDanglingReferences(bool force)
 {
-    // Ensure all objects in the pdf file, including those in indirect
-    // references, appear in the object cache.
-    if (this->m->fixed_dangling_refs && !force) {
+    if (this->m->fixed_dangling_refs) {
         return;
     }
-
-    // Make sure everything in the xref table appears in the object
-    // cache.
-    for (auto const& iter: this->m->xref_table) {
-        auto og = iter.first;
-        if (!isCached(og)) {
-            m->obj_cache[og] =
-                ObjCache(QPDF_Unresolved::create(this, og), -1, -1);
-        }
-    }
-
-    // Resolve all known objects. The parser inserts any indirect
-    // reference into the object cache, including dangling references.
-    bool orig_reconstructed_xref = this->m->reconstructed_xref;
-    bool triggered_xref_reconstruction = false;
-    for (auto const& iter: this->m->obj_cache) {
-        resolve(iter.first);
-        if (!orig_reconstructed_xref && this->m->reconstructed_xref) {
-            triggered_xref_reconstruction = true;
-            // We triggered xref reconstruction. We'll have to start
-            // over.
-            break;
-        }
-    }
-    if (triggered_xref_reconstruction) {
-        // Resolving objects triggered xref reconstruction. This may
-        // cause new objects to appear in the xref. Start over again.
-        // This recursive call can never go more than two deep since
-        // we never clear this->m->reconstructed_xref.
+    if (!resolveXRefTable()) {
         QTC::TC("qpdf", "QPDF fix dangling triggered xref reconstruction");
-        fixDanglingReferences(force);
-    } else {
-        this->m->fixed_dangling_refs = true;
+        resolveXRefTable();
     }
+    this->m->fixed_dangling_refs = true;
 }
 
 size_t
@@ -1356,7 +1344,7 @@ QPDF::getAllObjects()
 {
     // After fixDanglingReferences is called, all objects are in the
     // object cache.
-    fixDanglingReferences(true);
+    fixDanglingReferences();
     std::vector<QPDFObjectHandle> result;
     for (auto const& iter: this->m->obj_cache) {
         result.push_back(newIndirect(iter.first, iter.second.object));
@@ -1616,7 +1604,7 @@ QPDF::readObjectAtOffset(
     bool try_recovery,
     qpdf_offset_t offset,
     std::string const& description,
-    QPDFObjGen const& exp_og,
+    QPDFObjGen exp_og,
     QPDFObjGen& og,
     bool skip_cache_if_in_xref)
 {
@@ -1799,7 +1787,7 @@ QPDF::readObjectAtOffset(
 }
 
 void
-QPDF::resolve(QPDFObjGen const& og)
+QPDF::resolve(QPDFObjGen og)
 {
     if (!isUnresolved(og)) {
         return;
