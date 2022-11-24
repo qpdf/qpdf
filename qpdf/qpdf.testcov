@@ -381,7 +381,6 @@ QPDFFormFieldObjectHelper list not found 0
 QPDFFormFieldObjectHelper list found 0
 QPDFFormFieldObjectHelper list first too low 0
 QPDFFormFieldObjectHelper list last too high 0
-QPDF detected dangling ref 0
 QPDFJob image optimize no pipeline 0
 QPDFJob image optimize no shrink 0
 QPDFJob image optimize too small 0
