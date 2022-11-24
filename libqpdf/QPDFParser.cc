@@ -190,6 +190,11 @@ QPDFParser::parse(bool& empty, bool content_stream)
                         olist.at(size - 2).getIntValueAsInt(),
                         olist.back().getIntValueAsInt());
                     if (ref_og.isIndirect()) {
+                        // This action has the desirable side effect
+                        // of causing dangling references (references
+                        // to indirect objects that don't appear in
+                        // the PDF) in any parsed object to appear in
+                        // the object cache.
                         object = context->getObject(ref_og);
                         indirect_ref = true;
                     } else {

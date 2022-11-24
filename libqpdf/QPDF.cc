@@ -577,6 +577,8 @@ QPDF::reconstruct_xref(QPDFExc& e)
     }
 
     this->m->reconstructed_xref = true;
+    // We may find more objects, which may contain dangling references.
+    this->m->fixed_dangling_refs = false;
 
     warn(damagedPDF("", 0, "file is damaged"));
     warn(e);
@@ -1290,65 +1292,48 @@ QPDF::showXRefTable()
     }
 }
 
+// Ensure all objects in the pdf file, including those in indirect references,
+// appear in the object cache.
 void
 QPDF::fixDanglingReferences(bool force)
 {
-    if (this->m->fixed_dangling_refs && (!force)) {
+    if (this->m->fixed_dangling_refs && !force) {
         return;
     }
-    this->m->fixed_dangling_refs = true;
 
-    // Create a set of all known indirect objects including those
-    // we've previously resolved and those that we have created.
-    std::set<QPDFObjGen> to_process;
-    for (auto const& iter: this->m->obj_cache) {
-        to_process.insert(iter.first);
-    }
-    for (auto const& iter: this->m->xref_table) {
-        to_process.insert(iter.first);
-    }
-
-    // For each non-scalar item to process, put it in the queue.
-    std::list<QPDFObjectHandle> queue;
-    queue.push_back(this->m->trailer);
-    for (auto const& og: to_process) {
-        auto obj = getObject(og);
-        if (obj.isDictionary() || obj.isArray()) {
-            queue.push_back(obj);
-        } else if (obj.isStream()) {
-            queue.push_back(obj.getDict());
-        }
-    }
-
-    // Process the queue by recursively resolving all object
-    // references. We don't need to do loop detection because we don't
-    // traverse known indirect objects when processing the queue.
-    while (!queue.empty()) {
-        QPDFObjectHandle obj = queue.front();
-        queue.pop_front();
-        std::list<QPDFObjectHandle> to_check;
-        if (obj.isDictionary()) {
-            std::map<std::string, QPDFObjectHandle> members =
-                obj.getDictAsMap();
-            for (auto const& iter: members) {
-                to_check.push_back(iter.second);
-            }
-        } else if (obj.isArray()) {
-            auto arr = QPDFObjectHandle::ObjAccessor::asArray(obj);
-            arr->addExplicitElementsToList(to_check);
-        }
-        for (auto sub: to_check) {
-            if (sub.isIndirect()) {
-                if ((sub.getOwningQPDF() == this) &&
-                    isUnresolved(sub.getObjGen())) {
-                    QTC::TC("qpdf", "QPDF detected dangling ref");
-                    queue.push_back(sub);
+    if (!this->m->fixed_dangling_refs) {
+        // First pass is only run if the the xref table has not been
+        // reconstructed. It will be terminated as soon as reconstruction is
+        // triggered.
+        if (!this->m->reconstructed_xref) {
+            for (auto const& iter: this->m->xref_table) {
+                auto og = iter.first;
+                if (!isCached(og)) {
+                    m->obj_cache[og] =
+                        ObjCache(QPDF_Unresolved::create(this, og), -1, -1);
+                    if (this->m->reconstructed_xref) {
+                        break;
+                    }
                 }
-            } else {
-                queue.push_back(sub);
+            }
+        }
+        // Second pass is skipped if the first pass did not trigger
+        // reconstruction of the xref table.
+        if (this->m->reconstructed_xref) {
+            for (auto const& iter: this->m->xref_table) {
+                auto og = iter.first;
+                if (!isCached(og)) {
+                    m->obj_cache[og] =
+                        ObjCache(QPDF_Unresolved::create(this, og), -1, -1);
+                }
             }
         }
     }
+    // Final pass adds all indirect references to the object cache.
+    for (auto const& iter: this->m->obj_cache) {
+        resolve(iter.first);
+    }
+    this->m->fixed_dangling_refs = true;
 }
 
 size_t
@@ -2082,6 +2067,8 @@ QPDF::reserveStream(QPDFObjGen const& og)
 QPDFObjectHandle
 QPDF::getObject(QPDFObjGen const& og)
 {
+    // This method is called by the parser and therefore must not
+    // resolve any objects.
     if (!isCached(og)) {
         m->obj_cache[og] = ObjCache(QPDF_Unresolved::create(this, og), -1, -1);
     }
