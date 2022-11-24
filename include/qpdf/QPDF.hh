@@ -1173,6 +1173,7 @@ class QPDF
     void inParse(bool);
     void setTrailer(QPDFObjectHandle obj);
     void read_xref(qpdf_offset_t offset);
+    bool resolveXRefTable();
     void reconstruct_xref(QPDFExc& e);
     bool
     parse_xrefFirst(std::string const& line, int& obj, int& num, int& bytes);
@@ -1202,10 +1203,10 @@ class QPDF
         bool attempt_recovery,
         qpdf_offset_t offset,
         std::string const& description,
-        QPDFObjGen const& exp_og,
+        QPDFObjGen exp_og,
         QPDFObjGen& og,
         bool skip_cache_if_in_xref);
-    void resolve(QPDFObjGen const& og);
+    void resolve(QPDFObjGen og);
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
     QPDFObjectHandle reserveObjectIfNotExists(QPDFObjGen const& og);

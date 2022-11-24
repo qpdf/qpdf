@@ -2266,7 +2266,7 @@ QPDFWriter::prepareFileForWrite()
     // Make document extension level information direct as required by
     // the spec.
 
-    this->m->pdf.fixDanglingReferences(true);
+    this->m->pdf.fixDanglingReferences();
     QPDFObjectHandle root = this->m->pdf.getRoot();
     for (auto const& key: root.getKeys()) {
         QPDFObjectHandle oh = root.getKey(key);
