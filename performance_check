@@ -12,6 +12,8 @@ my $whoami = basename($0);
 $| = 1;
 
 # [ name, [ args ] ]
+# If <IN> appears, it is replaced with the input file name. Otherwise,
+# the input file name is added to the end of the arguments.
 my @tests = (
     ['no arguments', []],
     ['generate object streams', ['--object-streams=generate']],
@@ -20,6 +22,7 @@ my @tests = (
     ['shared resource check', ['--split-pages', '--remove-unreferenced-resources=auto']],
     ['linearize', ['--linearize']],
     ['encrypt', ['--encrypt', 'u', 'o', '256', '--']],
+    ['extract first page', ['--empty', '--pages', '<IN>', '1', '--']],
     ['json-output', ['--json-output']],
     ['json-input', ['--json-input']],
     );
@@ -214,7 +217,7 @@ sub filter_args
     {
         my $to_check = $arg;
         $to_check =~ s/=.*$//;
-        if (index($help, $to_check) == -1)
+        if (($to_check =~ m/^-/) && (index($help, $to_check) == -1))
         {
             my $new_arg = $arg_compat{$arg};
             if (! defined $new_arg)
@@ -287,15 +290,27 @@ sub run_test
     my ($file, $args) = @_;
 
     my $outfile = "out.pdf";
-    foreach my $arg (@$args)
+    my $found_in = 0;
+    my @cmd = ($executable, @$report_mem);
+    for (@$args)
     {
+        my $arg = $_;
         if ($arg eq '--json-output')
         {
             $outfile = "out.json";
-            last;
         }
+        elsif ($arg eq '<IN>')
+        {
+            $found_in = 1;
+            $arg = $file;
+        }
+        push(@cmd, $arg);
     }
-    my @cmd = ($executable, @$args, @$report_mem, $file, "$workdir/$outfile");
+    if (! $found_in)
+    {
+        push(@cmd, $file);
+    }
+    push(@cmd, "$workdir/$outfile");
     # Run once and discard to update caches
     system("sync");
     run_cmd(@cmd);
