@@ -2062,8 +2062,10 @@ test_53(QPDF& pdf, char const* arg2)
 {
     // Test get all objects and dangling ref handling
     QPDFObjectHandle root = pdf.getRoot();
-    root.replaceKey(
-        "/Q1", pdf.makeIndirectObject(QPDFObjectHandle::newString("potato")));
+    auto new_obj =
+        pdf.makeIndirectObject(QPDFObjectHandle::newString("potato"));
+    root.replaceKey("/Q1", new_obj);
+    std::cout << "new object: " << new_obj.unparse() << std::endl;
     std::cout << "all objects" << std::endl;
     for (auto& obj: pdf.getAllObjects()) {
         std::cout << obj.unparse() << std::endl;
