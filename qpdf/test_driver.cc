@@ -194,7 +194,7 @@ print_rect(std::ostream& out, QPDFObjectHandle::Rectangle const& r)
 }
 
 #define assert_compare_numbers(expected, expr) \
- compare_numbers(#expr, expected, expr)
+    compare_numbers(#expr, expected, expr)
 
 template <typename T1, typename T2>
 static void

@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #define try_convert(exp_pass, fn, i) \
- try_convert_real(#fn "(" #i ")", exp_pass, fn, i)
+    try_convert_real(#fn "(" #i ")", exp_pass, fn, i)
 
 template <typename From, typename To>
 static void
@@ -27,7 +27,7 @@ try_convert_real(
 }
 
 #define try_range_check(exp_pass, a, b) \
- try_range_check_real(#a " + " #b, exp_pass, a, b)
+    try_range_check_real(#a " + " #b, exp_pass, a, b)
 
 template <typename T>
 static void
@@ -47,7 +47,7 @@ try_range_check_real(
 }
 
 #define try_range_check_subtract(exp_pass, a, b) \
- try_range_check_subtract_real(#a " - " #b, exp_pass, a, b)
+    try_range_check_subtract_real(#a " - " #b, exp_pass, a, b)
 
 template <typename T>
 static void
