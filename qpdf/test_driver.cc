@@ -2073,6 +2073,7 @@ test_53(QPDF& pdf, char const* arg2)
 
     QPDFWriter w(pdf, "a.pdf");
     w.setStaticID(true);
+    w.setPreserveUnreferencedObjects(true);
     w.write();
 }
 
