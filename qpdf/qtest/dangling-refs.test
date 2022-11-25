@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('dangling-refs');
 
-my @dangling = (qw(minimal dangling-refs));
+my @dangling = (qw(minimal dangling-refs dangling-bad-xref));
 my $n_tests = 2 * scalar(@dangling);
 
 foreach my $f (@dangling)
