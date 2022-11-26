@@ -1292,48 +1292,48 @@ QPDF::showXRefTable()
     }
 }
 
-// Ensure all objects in the pdf file, including those in indirect references,
-// appear in the object cache.
 void
 QPDF::fixDanglingReferences(bool force)
 {
+    // Ensure all objects in the pdf file, including those in indirect
+    // references, appear in the object cache.
     if (this->m->fixed_dangling_refs && !force) {
         return;
     }
 
-    if (!this->m->fixed_dangling_refs) {
-        // First pass is only run if the the xref table has not been
-        // reconstructed. It will be terminated as soon as reconstruction is
-        // triggered.
-        if (!this->m->reconstructed_xref) {
-            for (auto const& iter: this->m->xref_table) {
-                auto og = iter.first;
-                if (!isCached(og)) {
-                    m->obj_cache[og] =
-                        ObjCache(QPDF_Unresolved::create(this, og), -1, -1);
-                    if (this->m->reconstructed_xref) {
-                        break;
-                    }
-                }
-            }
-        }
-        // Second pass is skipped if the first pass did not trigger
-        // reconstruction of the xref table.
-        if (this->m->reconstructed_xref) {
-            for (auto const& iter: this->m->xref_table) {
-                auto og = iter.first;
-                if (!isCached(og)) {
-                    m->obj_cache[og] =
-                        ObjCache(QPDF_Unresolved::create(this, og), -1, -1);
-                }
-            }
+    // Make sure everything in the xref table appears in the object
+    // cache.
+    for (auto const& iter: this->m->xref_table) {
+        auto og = iter.first;
+        if (!isCached(og)) {
+            m->obj_cache[og] =
+                ObjCache(QPDF_Unresolved::create(this, og), -1, -1);
         }
     }
-    // Final pass adds all indirect references to the object cache.
+
+    // Resolve all known objects. The parser inserts any indirect
+    // reference into the object cache, including dangling references.
+    bool orig_reconstructed_xref = this->m->reconstructed_xref;
+    bool triggered_xref_reconstruction = false;
     for (auto const& iter: this->m->obj_cache) {
         resolve(iter.first);
+        if (!orig_reconstructed_xref && this->m->reconstructed_xref) {
+            triggered_xref_reconstruction = true;
+            // We triggered xref reconstruction. We'll have to start
+            // over.
+            break;
+        }
     }
-    this->m->fixed_dangling_refs = true;
+    if (triggered_xref_reconstruction) {
+        // Resolving objects triggered xref reconstruction. This may
+        // cause new objects to appear in the xref. Start over again.
+        // This recursive call can never go more than two deep since
+        // we never clear this->m->reconstructed_xref.
+        QTC::TC("qpdf", "QPDF fix dangling triggered xref reconstruction");
+        fixDanglingReferences(force);
+    } else {
+        this->m->fixed_dangling_refs = true;
+    }
 }
 
 size_t

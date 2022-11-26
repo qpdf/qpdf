@@ -19,21 +19,13 @@ my $n_tests = 2 * scalar(@dangling);
 
 foreach my $f (@dangling)
 {
-    # TEMPORARY
-    my $xflags = 0;
-    if ($f eq 'dangling-bad-xref')
-    {
-        $xflags = $td->EXPECT_FAILURE;
-    }
-    # END TEMPORARY
     $td->runtest("dangling refs: $f",
                  {$td->COMMAND => "test_driver 53 $f.pdf"},
                  {$td->FILE => "$f-dangling.out", $td->EXIT_STATUS => 0},
-                 $td->NORMALIZE_NEWLINES | $xflags);
+                 $td->NORMALIZE_NEWLINES);
     $td->runtest("check output",
                  {$td->FILE => "a.pdf"},
-                 {$td->FILE => "$f-dangling-out.pdf"},
-                 $xflags);
+                 {$td->FILE => "$f-dangling-out.pdf"});
 }
 cleanup();
 $td->report($n_tests);
