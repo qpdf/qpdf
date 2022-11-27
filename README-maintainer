@@ -4,18 +4,21 @@ ROUTINE DEVELOPMENT
 
 Default:
 
-cmake -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 \
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
+   -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 \
    -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 
 Debugging:
 
-cmake -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 \
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
+   -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 \
    -DCMAKE_BUILD_TYPE=Debug ..
 
 Profiling:
 
 CFLAGS=-pg LDFLAGS=-pg \
-   cmake -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 \
+   cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
+   -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 \
    -DCMAKE_BUILD_TYPE=Debug ..
 
 Then run `gprof gmon.out`. Note that gmon.out is not cumulative.
@@ -26,7 +29,8 @@ CFLAGS="-fsanitize=address -fsanitize=undefined" \
    CXXFLAGS="-fsanitize=address -fsanitize=undefined" \
    LDFLAGS="-fsanitize=address -fsanitize=undefined" \
    CC=clang CXX=clang++ \
-   cmake -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 \
+   cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
+   -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 \
    -DCMAKE_BUILD_TYPE=Debug ..
 
 Windows:
