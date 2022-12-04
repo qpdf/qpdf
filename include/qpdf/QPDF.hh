@@ -886,7 +886,6 @@ class QPDF
             qpdf->resolve(og);
         }
     };
-    friend class Resolver;
 
     // StreamCopier class is restricted to QPDFObjectHandle so it can
     // copy stream data.
@@ -904,7 +903,6 @@ class QPDF
             qpdf->copyStreamData(dest, src);
         }
     };
-    friend class Resolver;
 
     // The ParseGuard class allows QPDFObjectHandle to detect
     // re-entrant parsing.
@@ -928,7 +926,6 @@ class QPDF
         }
         QPDF* qpdf;
     };
-    friend class ParseGuard;
 
     // Pipe class is restricted to QPDF_Stream
     class Pipe
@@ -957,7 +954,6 @@ class QPDF
                 will_retry);
         }
     };
-    friend class Pipe;
 
     // For testing only -- do not add to DLL
     static bool test_json_validators();
@@ -1106,7 +1102,6 @@ class QPDF
         QPDF* qpdf;
         std::set<QPDFObjGen>::const_iterator iter;
     };
-    friend class ResolveRecorder;
 
     class JSONReactor: public JSON::Reactor
     {
@@ -1173,7 +1168,6 @@ class QPDF
         std::vector<QPDFObjectHandle> object_stack;
         std::set<QPDFObjGen> reserved;
     };
-    friend class JSONReactor;
 
     void parse(char const* password);
     void inParse(bool);

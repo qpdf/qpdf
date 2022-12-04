@@ -76,7 +76,6 @@ class QPDFOutlineDocumentHelper: public QPDFDocumentHelper
             return dh.checkSeen(og);
         }
     };
-    friend class Accessor;
 
   private:
     bool checkSeen(QPDFObjGen const& og);
