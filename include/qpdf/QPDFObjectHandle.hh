@@ -1504,7 +1504,6 @@ class QPDFObjectHandle
             return QPDFObjectHandle(obj);
         }
     };
-    friend class Factory;
 
     // Accessor for raw underlying object -- only QPDF is allowed to
     // call this.
@@ -1533,7 +1532,6 @@ class QPDFObjectHandle
             return oh.asStream();
         }
     };
-    friend class ObjAccessor;
 
     // Provide access to specific classes for recursive
     // disconnected().
@@ -1550,7 +1548,6 @@ class QPDFObjectHandle
             o.disconnect();
         }
     };
-    friend class Resetter;
 
     // Convenience routine: Throws if the assumption is violated. Your
     // code will be better if you call one of the isType methods and

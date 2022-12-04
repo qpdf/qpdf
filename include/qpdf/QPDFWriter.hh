@@ -550,7 +550,6 @@ class QPDFWriter
         std::shared_ptr<Buffer>* bp;
         std::string stack_id;
     };
-    friend class PipelinePopper;
 
     unsigned int bytesNeeded(long long n);
     void writeBinary(unsigned long long val, unsigned int bytes);

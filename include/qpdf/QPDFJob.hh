@@ -382,7 +382,6 @@ class QPDFJob
         }
         QPDFJob& o;
     };
-    friend class Config;
 
     // Return a top-level configuration item. See CONFIGURATION above
     // for details. If an invalid configuration is created (such as

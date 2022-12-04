@@ -93,7 +93,6 @@ class QPDFOutlineObjectHelper: public QPDFObjectHelper
             return QPDFOutlineObjectHelper(oh, dh, depth);
         }
     };
-    friend class Accessor;
 
   private:
     QPDF_DLL
