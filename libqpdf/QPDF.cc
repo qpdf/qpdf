@@ -1616,7 +1616,7 @@ QPDF::readObjectAtOffset(
     bool try_recovery,
     qpdf_offset_t offset,
     std::string const& description,
-    QPDFObjGen const& exp_og,
+    QPDFObjGen exp_og,
     QPDFObjGen& og,
     bool skip_cache_if_in_xref)
 {
