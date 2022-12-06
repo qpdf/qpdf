@@ -1211,7 +1211,7 @@ class QPDF
         QPDFObjGen exp_og,
         QPDFObjGen& og,
         bool skip_cache_if_in_xref);
-    void resolve(QPDFObjGen const& og);
+    void resolve(QPDFObjGen og);
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
     QPDFObjectHandle reserveObjectIfNotExists(QPDFObjGen const& og);

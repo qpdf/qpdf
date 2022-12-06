@@ -1799,7 +1799,7 @@ QPDF::readObjectAtOffset(
 }
 
 void
-QPDF::resolve(QPDFObjGen const& og)
+QPDF::resolve(QPDFObjGen og)
 {
     if (!isUnresolved(og)) {
         return;
