@@ -713,15 +713,16 @@ class QPDF
     QPDF_DLL
     void showXRefTable();
 
-    // Detect all indirect references to objects that don't exist and
-    // resolve them by replacing them with null, which is how the PDF
-    // spec says to interpret such dangling references. This method is
-    // called automatically if you try to add any new objects, if you
-    // call getAllObjects, and before a file is written. The qpdf
-    // object caches whether it has run this to avoid running it
-    // multiple times. You can pass true to force it to run again if
-    // you have explicitly added new objects that may have additional
-    // dangling references.
+    // Starting from qpdf 11.0 user code should not need to call this method.
+    // Before 11.0 this method was used to detect all indirect references to
+    // objects that don't exist and resolve them by replacing them with null,
+    // which is how the PDF spec says to interpret such dangling references.
+    // This method is called automatically when you try to add any new objects,
+    // if you call getAllObjects, and before a file is written. The qpdf object
+    // caches whether it has run this to avoid running it multiple times.
+    // Before 11.2.1 you could pass true to force it to run again if you had
+    // explicitly added new objects that may have additional dangling
+    // references.
     QPDF_DLL
     void fixDanglingReferences(bool force = false);
 
