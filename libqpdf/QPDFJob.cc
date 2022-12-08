@@ -2577,7 +2577,7 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
             }
             int n = kids.size();
             for (int i = 0; i < n; ++i) {
-                queue.push_back(kids.getArrayItem(i));
+                queue.push_back(kids.at(i));
             }
         } else {
             // This is a leaf node or a form XObject.

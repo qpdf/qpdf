@@ -114,7 +114,7 @@ QPDF::getAllPagesInternal(
     auto kids = cur_node.getKey("/Kids");
     int n = kids.size();
     for (int i = 0; i < n; ++i) {
-        auto kid = kids.getArrayItem(i);
+        auto kid = kids.at(i);
         if (kid.hasKey("/Kids")) {
             getAllPagesInternal(kid, visited, seen);
         } else {

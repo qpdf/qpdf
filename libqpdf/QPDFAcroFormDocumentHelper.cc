@@ -158,7 +158,7 @@ QPDFAcroFormDocumentHelper::removeFormFields(
 
     int i = 0;
     while (i < fields.size()) {
-        auto field = fields.getArrayItem(i);
+        auto field = fields.at(i);
         if (to_remove.count(field.getObjGen())) {
             fields.eraseItem(i);
         } else {
@@ -282,7 +282,7 @@ QPDFAcroFormDocumentHelper::analyze()
     int nfields = fields.size();
     QPDFObjectHandle null(QPDFObjectHandle::newNull());
     for (int i = 0; i < nfields; ++i) {
-        traverseField(fields.getArrayItem(i), null, 0, visited);
+        traverseField(fields.at(i), null, 0, visited);
     }
 
     // All Widget annotations should have been encountered by
@@ -368,7 +368,7 @@ QPDFAcroFormDocumentHelper::traverseField(
         is_field = true;
         int nkids = kids.size();
         for (int k = 0; k < nkids; ++k) {
-            traverseField(kids.getArrayItem(k), field, 1 + depth, visited);
+            traverseField(kids.at(k), field, 1 + depth, visited);
         }
     } else {
         if (field.hasKey("/Parent")) {
@@ -998,9 +998,9 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                     }
                 }
                 auto kids = obj.getKey("/Kids");
-                if (kids.isArray()) {
-                    for (int i = 0; i < kids.size(); ++i) {
-                        auto kid = kids.getArrayItem(i);
+                if (int n = kids.sizeIfArray()) {
+                    for (int i = 0; i < n; ++i) {
+                        auto kid = kids.at(i);
                         if (maybe_copy_object(kid)) {
                             kids.setArrayItem(i, kid);
                             queue.push_back(kid);

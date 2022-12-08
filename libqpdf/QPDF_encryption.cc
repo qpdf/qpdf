@@ -795,8 +795,8 @@ QPDF::initializeEncryption()
 
     std::string id1;
     QPDFObjectHandle id_obj = this->m->trailer.getKey("/ID");
-    if ((id_obj.size() == 2) && id_obj.getArrayItem(0).isString()) {
-        id1 = id_obj.getArrayItem(0).getStringValue();
+    if ((id_obj.size() == 2) && id_obj.at(0).isString()) {
+        id1 = id_obj.at(0).getStringValue();
     } else {
         // Treating a missing ID as the empty string enables qpdf to
         // decrypt some invalid encrypted files with no /ID that
@@ -1176,23 +1176,22 @@ QPDF::decryptStream(
                     method = interpretCF(encp, decode_parms.getKey("/Name"));
                     method_source = "stream's Crypt decode parameters";
                 }
-            } else if (
-                stream_dict.getKey("/DecodeParms").isArray() &&
-                stream_dict.getKey("/Filter").isArray()) {
-                QPDFObjectHandle filter = stream_dict.getKey("/Filter");
-                QPDFObjectHandle decode = stream_dict.getKey("/DecodeParms");
-                if (filter.size() == decode.size()) {
-                    for (int i = 0; i < filter.size(); ++i) {
-                        if (filter.getArrayItem(i).isNameAndEquals("/Crypt")) {
-                            QPDFObjectHandle crypt_params =
-                                decode.getArrayItem(i);
-                            if (crypt_params.isDictionary() &&
-                                crypt_params.getKey("/Name").isName()) {
-                                QTC::TC("qpdf", "QPDF_encrypt crypt array");
-                                method = interpretCF(
-                                    encp, crypt_params.getKey("/Name"));
-                                method_source = "stream's Crypt "
-                                                "decode parameters (array)";
+            } else {
+                auto filter = stream_dict.getKey("/Filter");
+                if (int filter_size = filter.sizeIfArray()) {
+                    auto decode = stream_dict.getKey("/DecodeParms");
+                    if (decode.sizeIfArray() > 0) {
+                        for (int i = 0; i < filter_size; ++i) {
+                            if (filter.at(i).isNameAndEquals("/Crypt")) {
+                                QPDFObjectHandle crypt_params = decode.at(i);
+                                if (crypt_params.isDictionary() &&
+                                    crypt_params.getKey("/Name").isName()) {
+                                    QTC::TC("qpdf", "QPDF_encrypt crypt array");
+                                    method = interpretCF(
+                                        encp, crypt_params.getKey("/Name"));
+                                    method_source = "stream's Crypt "
+                                                    "decode parameters (array)";
+                                }
                             }
                         }
                     }

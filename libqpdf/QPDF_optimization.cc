@@ -325,7 +325,7 @@ QPDF::updateObjectMapsInternal(
         for (int i = 0; i < n; ++i) {
             updateObjectMapsInternal(
                 ou,
-                oh.getArrayItem(i),
+                oh.at(i),
                 skip_stream_parameters,
                 visited,
                 false,

@@ -732,7 +732,7 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
     QPDFObjectHandle trailer = qpdf.getTrailer();
     if (trailer.hasKey("/Encrypt")) {
         generateID();
-        this->m->id1 = trailer.getKey("/ID").getArrayItem(0).getStringValue();
+        this->m->id1 = trailer.getKey("/ID").at(0).getStringValue();
         QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
         int V = encrypt.getKey("/V").getIntValueAsInt();
         int key_len = 5;
@@ -1260,7 +1260,7 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
         if (!this->m->linearized) {
             int n = object.size();
             for (int i = 0; i < n; ++i) {
-                enqueueObject(object.getArrayItem(i));
+                enqueueObject(object.at(i));
             }
         }
     } else if (object.isDictionary()) {
@@ -1501,7 +1501,7 @@ QPDFWriter::unparseObject(
             writeStringQDF(indent);
             writeStringQDF("  ");
             writeStringNoQDF(" ");
-            unparseChild(object.getArrayItem(i), level + 1, child_flags);
+            unparseChild(object.at(i), level + 1, child_flags);
             writeStringQDF("\n");
         }
         writeStringQDF(indent);
@@ -1644,7 +1644,7 @@ QPDFWriter::unparseObject(
                         int idx = -1;
                         int n = filter.size();
                         for (int i = 0; i < n; ++i) {
-                            QPDFObjectHandle item = filter.getArrayItem(i);
+                            QPDFObjectHandle item = filter.at(i);
                             if (item.isNameAndEquals("/Crypt")) {
                                 idx = i;
                                 break;
@@ -2019,7 +2019,7 @@ QPDFWriter::getOriginalID1()
 {
     QPDFObjectHandle trailer = this->m->pdf.getTrailer();
     if (trailer.hasKey("/ID")) {
-        return trailer.getKey("/ID").getArrayItem(0).getStringValue();
+        return trailer.getKey("/ID").at(0).getStringValue();
     } else {
         return "";
     }
@@ -2136,8 +2136,7 @@ QPDFWriter::initializeSpecialStreams()
         if (contents.isArray()) {
             int n = contents.size();
             for (int i = 0; i < n; ++i) {
-                contents_objects.push_back(
-                    contents.getArrayItem(i).getObjGen());
+                contents_objects.push_back(contents.at(i).getObjGen());
             }
         } else if (contents.isStream()) {
             contents_objects.push_back(contents.getObjGen());

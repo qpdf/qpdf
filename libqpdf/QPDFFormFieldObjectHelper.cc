@@ -300,7 +300,7 @@ QPDFFormFieldObjectHelper::getChoices()
     if (opt.isArray()) {
         int n = opt.size();
         for (int i = 0; i < n; ++i) {
-            QPDFObjectHandle item = opt.getArrayItem(i);
+            QPDFObjectHandle item = opt.at(i);
             if (item.isString()) {
                 result.push_back(item.getUTF8Value());
             }
@@ -413,7 +413,7 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
     setFieldAttribute("/V", name);
     int nkids = kids.size();
     for (int i = 0; i < nkids; ++i) {
-        QPDFObjectHandle kid = kids.getArrayItem(i);
+        QPDFObjectHandle kid = kids.at(i);
         QPDFObjectHandle AP = kid.getKey("/AP");
         QPDFObjectHandle annot;
         if (AP.isNull()) {
@@ -423,7 +423,7 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
             if (grandkids.isArray()) {
                 int ngrandkids = grandkids.size();
                 for (int j = 0; j < ngrandkids; ++j) {
-                    QPDFObjectHandle grandkid = grandkids.getArrayItem(j);
+                    QPDFObjectHandle grandkid = grandkids.at(j);
                     AP = grandkid.getKey("/AP");
                     if (!AP.isNull()) {
                         QTC::TC(
@@ -469,7 +469,7 @@ QPDFFormFieldObjectHelper::setCheckBoxValue(bool value)
         if (kids.isArray()) {
             int nkids = kids.size();
             for (int i = 0; i < nkids; ++i) {
-                QPDFObjectHandle kid = kids.getArrayItem(i);
+                QPDFObjectHandle kid = kids.at(i);
                 AP = kid.getKey("/AP");
                 if (!AP.isNull()) {
                     QTC::TC(

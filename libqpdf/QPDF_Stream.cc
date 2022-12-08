@@ -384,7 +384,7 @@ QPDF_Stream::filterable(
         // Potentially multiple filters
         int n = filter_obj.size();
         for (int i = 0; i < n; ++i) {
-            QPDFObjectHandle item = filter_obj.getArrayItem(i);
+            QPDFObjectHandle item = filter_obj.at(i);
             if (item.isName()) {
                 filter_names.push_back(item.getName());
             } else {
@@ -432,8 +432,9 @@ QPDF_Stream::filterable(
         decode_obj = QPDFObjectHandle::newNull();
     }
     if (decode_obj.isArray()) {
-        for (int i = 0; i < decode_obj.size(); ++i) {
-            decode_parms.push_back(decode_obj.getArrayItem(i));
+        int n = decode_obj.size();
+        for (int i = 0; i < n; ++i) {
+            decode_parms.push_back(decode_obj.at(i));
         }
     } else {
         for (unsigned int i = 0; i < filter_names.size(); ++i) {
