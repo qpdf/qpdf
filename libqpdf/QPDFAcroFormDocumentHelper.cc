@@ -82,7 +82,7 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(
         seen.insert(og);
         auto kids = obj.getKey("/Kids");
         if (kids.isArray()) {
-            for (auto kid: kids.aitems()) {
+            for (auto const& kid: kids) {
                 queue.push_back(kid);
             }
         }
@@ -889,7 +889,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     // Now do the actual copies.
 
     std::set<QPDFObjGen> added_new_fields;
-    for (auto annot: old_annots.aitems()) {
+    for (auto&& annot: old_annots) {
         if (annot.isStream()) {
             annot.warnIfPossible("ignoring annotation that's a stream");
             continue;

@@ -1100,15 +1100,12 @@ QPDFObjectHandle::getDictAsMap()
 bool
 QPDFObjectHandle::isOrHasName(std::string const& value)
 {
-    if (isNameAndEquals(value)) {
-        return true;
-    } else if (isArray()) {
-        for (auto& item: aitems()) {
-            if (item.isNameAndEquals(value)) {
-                return true;
-            }
+    for (auto&& item: *this) {
+        if (item.isNameAndEquals(value)) {
+            return true;
         }
     }
+
     return false;
 }
 
@@ -1208,12 +1205,12 @@ QPDFObjectHandle::mergeResources(
                 }
             } else if (this_val.isArray() && other_val.isArray()) {
                 std::set<std::string> scalars;
-                for (auto this_item: this_val.aitems()) {
+                for (auto&& this_item: this_val) {
                     if (this_item.isScalar()) {
                         scalars.insert(this_item.unparse());
                     }
                 }
-                for (auto other_item: other_val.aitems()) {
+                for (auto&& other_item: other_val) {
                     if (other_item.isScalar()) {
                         if (scalars.count(other_item.unparse()) == 0) {
                             QTC::TC("qpdf", "QPDFObjectHandle merge array");

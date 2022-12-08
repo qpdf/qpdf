@@ -1580,6 +1580,13 @@ class QPDFObjectHandle
 
     // The following methods do not form part of the public API and are for
     // internal use only.
+    class iterator;
+
+    QPDF_DLL
+    inline iterator begin();
+
+    QPDF_DLL
+    inline iterator end();
 
     QPDFObjectHandle(std::shared_ptr<QPDFObject> const& obj) :
         obj(obj)
@@ -1886,6 +1893,99 @@ inline bool
 QPDFObjectHandle::isInitialized() const
 {
     return obj != nullptr;
+}
+
+class QPDFObjectHandle::iterator
+{
+    friend class QPDFObjectHandle;
+
+  public:
+    typedef QPDFObjectHandle T;
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = T;
+    using difference_type = long;
+    using pointer = T*;
+    using reference = T&;
+
+    QPDF_DLL
+    iterator(int index);
+    QPDF_DLL
+    virtual ~iterator() = default;
+    QPDF_DLL
+    iterator
+    operator++()
+    {
+        ++index;
+        return *this;
+    }
+    QPDF_DLL
+    iterator
+    operator++(int)
+    {
+        ++index;
+        return *this;
+    }
+    QPDF_DLL
+    iterator&
+    operator--()
+    {
+        --index;
+        return *this;
+    }
+    QPDF_DLL
+    iterator
+    operator--(int)
+    {
+        --index;
+        return *this;
+    }
+    QPDF_DLL
+    QPDFObjectHandle
+    operator*()
+    {
+        return oh.at(index);
+    }
+    QPDF_DLL
+    pointer
+    operator->()
+    {
+        value = oh.at(index);
+        return &value;
+    }
+    QPDF_DLL
+    bool
+    operator==(iterator const& other) const
+    {
+        return index == other.index;
+    }
+    QPDF_DLL
+    bool
+    operator!=(iterator const& other) const
+    {
+        return index != other.index;
+    }
+
+  private:
+    iterator(QPDFObjectHandle& oh, int index) :
+        oh(oh),
+        index(index),
+        value(oh)
+    {
+    }
+    QPDFObjectHandle& oh;
+    int index;
+    QPDFObjectHandle value;
+};
+
+inline QPDFObjectHandle::iterator
+QPDFObjectHandle::begin()
+{
+    return iterator(*this, 0);
+}
+inline QPDFObjectHandle::iterator
+QPDFObjectHandle::end()
+{
+    return iterator(*this, size());
 }
 
 #endif // QPDFOBJECTHANDLE_HH

@@ -2575,9 +2575,8 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                 });
                 return true;
             }
-            int n = kids.size();
-            for (int i = 0; i < n; ++i) {
-                queue.push_back(kids.at(i));
+            for (auto const& kid: kids) {
+                queue.push_back(kid);
             }
         } else {
             // This is a leaf node or a form XObject.
@@ -2933,7 +2932,7 @@ QPDFJob::handlePageSpecs(
             if (fields.isIndirect()) {
                 new_fields = pdf.makeIndirectObject(new_fields);
             }
-            for (auto const& field: fields.aitems()) {
+            for (auto const& field: fields) {
                 if (referenced_fields.count(field.getObjGen())) {
                     new_fields.appendItem(field);
                 }

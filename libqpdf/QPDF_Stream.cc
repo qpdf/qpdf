@@ -369,56 +369,24 @@ QPDF_Stream::filterable(
     bool& lossy_compression)
 {
     // Check filters
-
-    QPDFObjectHandle filter_obj = this->stream_dict.getKey("/Filter");
-    bool filters_okay = true;
-
-    std::vector<std::string> filter_names;
-
-    if (filter_obj.isNull()) {
-        // No filters
-    } else if (filter_obj.isName()) {
-        // One filter
-        filter_names.push_back(filter_obj.getName());
-    } else if (filter_obj.isArray()) {
-        // Potentially multiple filters
-        int n = filter_obj.size();
-        for (int i = 0; i < n; ++i) {
-            QPDFObjectHandle item = filter_obj.at(i);
-            if (item.isName()) {
-                filter_names.push_back(item.getName());
-            } else {
-                filters_okay = false;
+    for (auto&& item: this->stream_dict.getKey("/Filter")) {
+        if (item.isName()) {
+            auto filter_name = item.getName();
+            if (filter_abbreviations.count(filter_name)) {
+                QTC::TC("qpdf", "QPDF_Stream expand filter abbreviation");
+                filter_name = filter_abbreviations[filter_name];
             }
-        }
-    } else {
-        filters_okay = false;
-    }
-
-    if (!filters_okay) {
-        QTC::TC("qpdf", "QPDF_Stream invalid filter");
-        warn("stream filter type is not name or array");
-        return false;
-    }
-
-    bool filterable = true;
-
-    for (auto& filter_name: filter_names) {
-        if (filter_abbreviations.count(filter_name)) {
-            QTC::TC("qpdf", "QPDF_Stream expand filter abbreviation");
-            filter_name = filter_abbreviations[filter_name];
-        }
-
-        auto ff = filter_factories.find(filter_name);
-        if (ff == filter_factories.end()) {
-            filterable = false;
+            auto ff = filter_factories.find(filter_name);
+            if (ff == filter_factories.end()) {
+                return false;
+            } else {
+                filters.push_back((ff->second)());
+            }
         } else {
-            filters.push_back((ff->second)());
+            QTC::TC("qpdf", "QPDF_Stream invalid filter");
+            warn("stream filter type is not name or array");
+            return false;
         }
-    }
-
-    if (!filterable) {
-        return false;
     }
 
     // filters now contains a list of filters to be applied in order.
@@ -428,16 +396,12 @@ QPDF_Stream::filterable(
 
     QPDFObjectHandle decode_obj = this->stream_dict.getKey("/DecodeParms");
     std::vector<QPDFObjectHandle> decode_parms;
-    if (decode_obj.isArray() && (decode_obj.size() == 0)) {
-        decode_obj = QPDFObjectHandle::newNull();
-    }
-    if (decode_obj.isArray()) {
-        int n = decode_obj.size();
-        for (int i = 0; i < n; ++i) {
-            decode_parms.push_back(decode_obj.at(i));
+    if (decode_obj.sizeIfArray() > 0) {
+        for (auto const& item: decode_obj) {
+            decode_parms.push_back(item);
         }
     } else {
-        for (unsigned int i = 0; i < filter_names.size(); ++i) {
+        for (unsigned int i = 0; i < filters.size(); ++i) {
             decode_parms.push_back(decode_obj);
         }
     }
@@ -447,10 +411,6 @@ QPDF_Stream::filterable(
     // /Filters was empty has been seen in the wild.
     if ((filters.size() != 0) && (decode_parms.size() != filters.size())) {
         warn("stream /DecodeParms length is inconsistent with filters");
-        filterable = false;
-    }
-
-    if (!filterable) {
         return false;
     }
 
@@ -467,11 +427,11 @@ QPDF_Stream::filterable(
                 lossy_compression = true;
             }
         } else {
-            filterable = false;
+            return false;
         }
     }
 
-    return filterable;
+    return true;
 }
 
 bool

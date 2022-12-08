@@ -193,8 +193,7 @@ QPDF::readLinearizationData()
     }
 
     std::vector<int> H_items;
-    for (size_t i = 0; i < n_H_items; ++i) {
-        QPDFObjectHandle oh(H.at(toI(i)));
+    for (auto&& oh: H) {
         if (oh.isInteger()) {
             H_items.push_back(oh.getIntValueAsInt());
         } else {

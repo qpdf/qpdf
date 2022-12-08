@@ -2232,9 +2232,8 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
 
     if (foreign.isArray()) {
         QTC::TC("qpdf", "QPDF reserve array");
-        int n = foreign.size();
-        for (int i = 0; i < n; ++i) {
-            reserveObjects(foreign.at(i), obj_copier, false);
+        for (auto&& element: foreign) {
+            reserveObjects(element, obj_copier, false);
         }
     } else if (foreign.isDictionary()) {
         QTC::TC("qpdf", "QPDF reserve dictionary");
@@ -2272,12 +2271,10 @@ QPDF::replaceForeignIndirectObjects(
     } else if (foreign.isArray()) {
         QTC::TC("qpdf", "QPDF replace array");
         result = QPDFObjectHandle::newArray();
-        int n = foreign.size();
-        for (int i = 0; i < n; ++i) {
+        for (auto&& element: foreign) {
             result.appendItem(
                 // line-break
-                replaceForeignIndirectObjects(
-                    foreign.at(i), obj_copier, false));
+                replaceForeignIndirectObjects(element, obj_copier, false));
         }
     } else if (foreign.isDictionary()) {
         QTC::TC("qpdf", "QPDF replace dictionary");

@@ -240,7 +240,7 @@ QPDF::pushInheritedAttributesToPageInternal(
     // detection because all code paths that lead here follow a call
     // to getAllPages, which already throws an exception in the event
     // of a loop in the pages tree.
-    for (auto& kid: cur_pages.getKey("/Kids").aitems()) {
+    for (auto&& kid: cur_pages.getKey("/Kids")) {
         if (kid.isDictionaryOfType("/Pages")) {
             pushInheritedAttributesToPageInternal(
                 kid, key_ancestors, allow_changes, warn_skipped_keys);
@@ -321,15 +321,9 @@ QPDF::updateObjectMapsInternal(
     }
 
     if (oh.isArray()) {
-        int n = oh.size();
-        for (int i = 0; i < n; ++i) {
+        for (auto&& item: oh) {
             updateObjectMapsInternal(
-                ou,
-                oh.at(i),
-                skip_stream_parameters,
-                visited,
-                false,
-                1 + depth);
+                ou, item, skip_stream_parameters, visited, false, 1 + depth);
         }
     } else if (oh.isDictionary() || oh.isStream()) {
         QPDFObjectHandle dict = oh;
