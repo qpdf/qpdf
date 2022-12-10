@@ -264,10 +264,11 @@ QPDF_Array::insertItem(int at, QPDFObjectHandle const& item)
 }
 
 void
-QPDF_Array::appendItem(QPDFObjectHandle const& item)
+QPDF_Array::push_back(QPDFObjectHandle const& item)
 {
+    checkOwnership(item);
     if (sparse) {
-        sp_elements.append(item);
+        sp_elements.elements[sp_elements.n_elements++] = item.getObj();
     } else {
         elements.push_back(item.getObj());
     }

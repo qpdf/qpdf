@@ -16,8 +16,16 @@ class SparseOHArray
     {
         return n_elements;
     }
-    void append(QPDFObjectHandle oh);
-    void append(std::shared_ptr<QPDFObject>&& obj);
+    void
+    append(QPDFObjectHandle oh)
+    {
+        elements[n_elements++] = oh.getObj();
+    }
+    void
+    append(std::shared_ptr<QPDFObject>&& obj)
+    {
+        elements[n_elements++] = std::move(obj);
+    }
     QPDFObjectHandle at(int idx) const;
     void remove_last();
     void setAt(int idx, QPDFObjectHandle oh);

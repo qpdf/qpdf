@@ -951,10 +951,8 @@ QPDFObjectHandle::insertItemAndGetNew(int at, QPDFObjectHandle const& item)
 void
 QPDFObjectHandle::appendItem(QPDFObjectHandle const& item)
 {
-    auto array = asArray();
-    if (array) {
-        checkOwnership(item);
-        array->appendItem(item);
+    if (auto array = asArray()) {
+        array->push_back(item);
     } else {
         typeWarning("array", "ignoring attempt to append item");
         QTC::TC("qpdf", "QPDFObjectHandle array ignoring append item");
