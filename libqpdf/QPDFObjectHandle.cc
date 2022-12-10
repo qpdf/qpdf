@@ -932,9 +932,12 @@ QPDFObjectHandle::setArrayFromVector(std::vector<QPDFObjectHandle> const& items)
 void
 QPDFObjectHandle::insertItem(int at, QPDFObjectHandle const& item)
 {
-    auto array = asArray();
-    if (array) {
-        array->insertItem(at, item);
+    if (auto array = asArray()) {
+        if (!array->insert(at, item)) {
+            objectWarning(
+                "ignoring attempt to insert out of bounds array item");
+            QTC::TC("qpdf", "QPDFObjectHandle insert array bounds");
+        }
     } else {
         typeWarning("array", "ignoring attempt to insert item");
         QTC::TC("qpdf", "QPDFObjectHandle array ignoring insert item");

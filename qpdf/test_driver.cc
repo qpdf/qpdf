@@ -1506,6 +1506,7 @@ test_42(QPDF& pdf, char const* arg2)
     integer.appendItem(null);
     array.eraseItem(-1);
     array.eraseItem(16059);
+    array.insertItem(42, "/Dontpanic"_qpdf);
     integer.eraseItem(0);
     integer.insertItem(0, null);
     integer.setArrayFromVector(std::vector<QPDFObjectHandle>());

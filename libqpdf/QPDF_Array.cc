@@ -236,31 +236,24 @@ QPDF_Array::setFromVector(std::vector<std::shared_ptr<QPDFObject>>&& v)
     }
 }
 
-void
-QPDF_Array::insertItem(int at, QPDFObjectHandle const& item)
+bool
+QPDF_Array::insert(int at, QPDFObjectHandle const& item)
 {
-    if (sparse) {
+    int sz = size();
+    if (at < 0 || at > sz) {
         // As special case, also allow insert beyond the end
-        if ((at < 0) || (at > sp_elements.size())) {
-            throw std::logic_error(
-                "INTERNAL ERROR: bounds error accessing QPDF_Array element");
-        }
-        sp_elements.insert(at, item);
+        return false;
+    } else if (at == sz) {
+        push_back(item);
     } else {
-        // As special case, also allow insert beyond the end
-        size_t idx = QIntC::to_size(at);
-        if ((at < 0) || (at > QIntC::to_int(elements.size()))) {
-            throw std::logic_error(
-                "INTERNAL ERROR: bounds error accessing QPDF_Array element");
-        }
-        if (idx == elements.size()) {
-            // Allow inserting to the last position
-            elements.push_back(item.getObj());
+        checkOwnership(item);
+        if (sparse) {
+            sp_elements.insert(at, item);
         } else {
-            int n = int(idx);
-            elements.insert(elements.cbegin() + n, item.getObj());
+            elements.insert(elements.cbegin() + at, item.getObj());
         }
     }
+    return true;
 }
 
 void

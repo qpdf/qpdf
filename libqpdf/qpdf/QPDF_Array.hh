@@ -33,7 +33,7 @@ class QPDF_Array: public QPDFValue
     void setItem(int, QPDFObjectHandle const&);
     void setFromVector(std::vector<QPDFObjectHandle> const& items);
     void setFromVector(std::vector<std::shared_ptr<QPDFObject>>&& items);
-    void insertItem(int at, QPDFObjectHandle const& item);
+    bool insert(int at, QPDFObjectHandle const& item);
     void push_back(QPDFObjectHandle const& item);
     void eraseItem(int at);
 

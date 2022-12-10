@@ -64,23 +64,23 @@ SparseOHArray::erase(int idx)
 void
 SparseOHArray::insert(int idx, QPDFObjectHandle oh)
 {
-    if (idx > this->n_elements) {
-        throw std::logic_error("bounds error inserting item to SparseOHArray");
-    } else if (idx == this->n_elements) {
+    if (idx == n_elements) {
         // Allow inserting to the last position
         append(oh);
     } else {
-        decltype(this->elements) dest;
-        for (auto const& iter: this->elements) {
-            if (iter.first < idx) {
-                dest.insert(iter);
+        auto iter = elements.crbegin();
+        while (iter != elements.crend()) {
+            auto key = (iter++)->first;
+            if (key >= idx) {
+                auto nh = elements.extract(key);
+                ++nh.key();
+                elements.insert(std::move(nh));
             } else {
-                dest[iter.first + 1] = iter.second;
+                break;
             }
         }
-        this->elements = dest;
-        this->elements[idx] = oh.getObj();
-        ++this->n_elements;
+        elements[idx] = oh.getObj();
+        ++n_elements;
     }
 }
 
