@@ -8,9 +8,9 @@ if ! ./generate_auto_job --check; then
 
 An input or output file of generate_auto_job was modified without
 rerunning ./generate_auto_job. If you are seeing this in your pull
-request, you should pass --enable-maintainer-mode to ./configure if
-possible, or if not, run "./generate_auto_job --generate" and include
-any changed files in your commit.
+request, you should pass -DMAINTAINER_MODE=1 to cmake if possible, or
+if not, run "./generate_auto_job --generate" and include any changed
+files in your commit.
 
 ******************************
 
