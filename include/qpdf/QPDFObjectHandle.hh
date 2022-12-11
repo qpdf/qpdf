@@ -1494,10 +1494,8 @@ class QPDFObjectHandle
     // disconnected().
     class DisconnectAccess
     {
-        friend class QPDF_Array;
         friend class QPDF_Dictionary;
         friend class QPDF_Stream;
-        friend class SparseOHArray;
 
       private:
         static void

@@ -1,13 +1,5 @@
 #include <qpdf/SparseOHArray.hh>
 
-void
-SparseOHArray::disconnect()
-{
-    for (auto& iter: this->elements) {
-        QPDFObjectHandle::DisconnectAccess::disconnect(iter.second);
-    }
-}
-
 SparseOHArray
 SparseOHArray::copy()
 {

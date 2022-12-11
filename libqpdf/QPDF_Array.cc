@@ -116,11 +116,16 @@ void
 QPDF_Array::disconnect()
 {
     if (sparse) {
-        sp_elements.disconnect();
+        for (auto& item: sp_elements.elements) {
+            auto& obj = item.second;
+            if (!obj->getObjGen().isIndirect()) {
+                obj->disconnect();
+            }
+        }
     } else {
-        for (auto const& iter: elements) {
-            if (iter) {
-                QPDFObjectHandle::DisconnectAccess::disconnect(iter);
+        for (auto& obj: elements) {
+            if (!obj->getObjGen().isIndirect()) {
+                obj->disconnect();
             }
         }
     }
