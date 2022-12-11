@@ -16,7 +16,6 @@ class SparseOHArray
     {
         return n_elements;
     }
-    SparseOHArray copy();
 
   private:
     friend class QPDF_Array;

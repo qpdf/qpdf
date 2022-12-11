@@ -92,11 +92,22 @@ QPDF_Array::create(std::vector<std::shared_ptr<QPDFObject>> const& items)
 std::shared_ptr<QPDFObject>
 QPDF_Array::copy(bool shallow)
 {
-    if (sparse) {
-        return create(shallow ? sp_elements : sp_elements.copy());
-    } else {
-        if (shallow) {
+    if (shallow) {
+        if (sparse) {
+            return create(sp_elements);
+        } else {
             return create(elements);
+        }
+    } else {
+        if (sparse) {
+            SparseOHArray result;
+            result.n_elements = sp_elements.n_elements;
+            for (auto const& element: sp_elements.elements) {
+                auto const& obj = element.second;
+                result.elements[element.first] =
+                    obj->getObjGen().isIndirect() ? obj : obj->copy();
+            }
+            return create(std::move(result));
         } else {
             std::vector<std::shared_ptr<QPDFObject>> result;
             result.reserve(elements.size());
@@ -107,7 +118,7 @@ QPDF_Array::copy(bool shallow)
                                                              : element->copy())
                         : element);
             }
-            return create(result);
+            return create(std::move(result));
         }
     }
 }
