@@ -855,7 +855,7 @@ Related Options
    and gzip) unless those streams are compressed in some other way.
    This analysis is made after qpdf attempts to uncompress streams and
    is therefore closely related to :qpdf:ref:`--decode-level`. To
-   suppress this behavior and leave streams streams uncompressed, use
+   suppress this behavior and leave streams uncompressed, use
    :samp:`--compress-streams=n`. In QDF mode (see :ref:`qdf` and
    :qpdf:ref:`--qdf`), the default is to leave streams uncompressed.
 
