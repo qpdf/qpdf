@@ -1608,9 +1608,27 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isImage(bool exclude_imagemask = true);
 
+    // The following methods do not form part of the public API and are for
+    // internal use only.
+
     QPDFObjectHandle(std::shared_ptr<QPDFObject> const& obj) :
         obj(obj)
     {
+    }
+    std::shared_ptr<QPDFObject>
+    getObj()
+    {
+        return obj;
+    }
+    QPDFObject*
+    getObjectPtr()
+    {
+        return obj.get();
+    }
+    QPDFObject* const
+    getObjectPtr() const
+    {
+        return obj.get();
     }
 
   private:
