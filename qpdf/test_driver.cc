@@ -3283,6 +3283,7 @@ test_88(QPDF& pdf, char const* arg2)
     auto arr2 = pdf.getRoot().replaceKeyAndGetNew("/QTest", "[1 2]"_qpdf);
     arr2.setObjectDescription(&pdf, "test array");
     assert(arr2.eraseItemAndGetOld(50).isNull());
+    assert(pdf.getRoot().eraseItemAndGetOld(0).isNull());
 }
 
 static void

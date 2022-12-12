@@ -267,17 +267,16 @@ QPDF_Array::push_back(QPDFObjectHandle const& item)
     }
 }
 
-void
-QPDF_Array::eraseItem(int at)
+bool
+QPDF_Array::erase(int at)
 {
+    if (at < 0 || at >= size()) {
+        return false;
+    }
     if (sparse) {
         sp_elements.erase(at);
     } else {
-        size_t idx = QIntC::to_size(at);
-        if (idx >= elements.size()) {
-            throw std::logic_error("bounds error erasing item from OHArray");
-        }
-        int n = int(idx);
-        elements.erase(elements.cbegin() + n);
+        elements.erase(elements.cbegin() + at);
     }
+    return true;
 }

@@ -972,17 +972,14 @@ QPDFObjectHandle::appendItemAndGetNew(QPDFObjectHandle const& item)
 void
 QPDFObjectHandle::eraseItem(int at)
 {
-    auto array = asArray();
-    if (array && at < array->size() && at >= 0) {
-        array->eraseItem(at);
-    } else {
-        if (array) {
+    if (auto array = asArray()) {
+        if (!array->erase(at)) {
             objectWarning("ignoring attempt to erase out of bounds array item");
             QTC::TC("qpdf", "QPDFObjectHandle erase array bounds");
-        } else {
-            typeWarning("array", "ignoring attempt to erase item");
-            QTC::TC("qpdf", "QPDFObjectHandle array ignoring erase item");
         }
+    } else {
+        typeWarning("array", "ignoring attempt to erase item");
+        QTC::TC("qpdf", "QPDFObjectHandle array ignoring erase item");
     }
 }
 

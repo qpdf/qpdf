@@ -44,21 +44,22 @@ SparseOHArray::setAt(int idx, QPDFObjectHandle oh)
 }
 
 void
-SparseOHArray::erase(int idx)
+SparseOHArray::erase(int at)
 {
-    if (idx >= this->n_elements) {
-        throw std::logic_error("bounds error erasing item from SparseOHArray");
-    }
-    decltype(this->elements) dest;
-    for (auto const& iter: this->elements) {
-        if (iter.first < idx) {
-            dest.insert(iter);
-        } else if (iter.first > idx) {
-            dest[iter.first - 1] = iter.second;
+    auto end = elements.end();
+    if (auto iter = elements.lower_bound(at); iter != end) {
+        if (iter->first == at) {
+            iter++;
+            elements.erase(at);
+        }
+
+        while (iter != end) {
+            auto nh = elements.extract(iter++);
+            --nh.key();
+            elements.insert(std::move(nh));
         }
     }
-    this->elements = dest;
-    --this->n_elements;
+    --n_elements;
 }
 
 void
