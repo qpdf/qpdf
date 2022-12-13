@@ -2917,7 +2917,7 @@ Related Options
 
    .. code-block:: bash
 
-      if [ qpdf --requires-password file.pdf ]; then
+      if qpdf --requires-password file.pdf; then
           # prompt for password
       fi
 
