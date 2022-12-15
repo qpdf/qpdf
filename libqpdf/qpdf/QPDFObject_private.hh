@@ -66,9 +66,10 @@ class QPDFObject
     }
 
     void
-    setDescription(QPDF* qpdf, std::string const& description)
+    setDescription(
+        QPDF* qpdf, std::string const& description, qpdf_offset_t offset = -1)
     {
-        return value->setDescription(qpdf, description);
+        return value->setDescription(qpdf, description, offset);
     }
     bool
     getDescription(QPDF*& qpdf, std::string& description)

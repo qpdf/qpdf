@@ -40,9 +40,11 @@ class QPDFParser
     void warn(qpdf_offset_t offset, std::string const& msg) const;
     void warn(std::string const& msg) const;
     static void warn(QPDF*, QPDFExc const&);
-    void setParsedOffset(qpdf_offset_t offset);
-    void
-    setDescriptionFromInput(QPDFObjectHandle oh, qpdf_offset_t offset) const;
+
+    void setDescription(
+        QPDFObjectHandle oh,
+        qpdf_offset_t descr_offset,
+        qpdf_offset_t parsed_offset = -1) const;
     std::shared_ptr<InputSource> input;
     std::string const& object_description;
     QPDFTokenizer& tokenizer;

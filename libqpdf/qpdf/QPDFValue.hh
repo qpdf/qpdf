@@ -24,10 +24,12 @@ class QPDFValue
     virtual std::string unparse() = 0;
     virtual JSON getJSON(int json_version) = 0;
     virtual void
-    setDescription(QPDF* qpdf_p, std::string const& description)
+    setDescription(
+        QPDF* qpdf_p, std::string const& description, qpdf_offset_t offset)
     {
         qpdf = qpdf_p;
         object_description = description;
+        setParsedOffset(offset);
     }
     bool
     getDescription(QPDF*& qpdf_p, std::string& description)
