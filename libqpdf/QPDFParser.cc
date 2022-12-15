@@ -284,7 +284,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         case st_dictionary:
         case st_array:
-            if (!indirect_ref && !object.isDirectNull()) {
+            if (!indirect_ref && !is_null) {
                 // No need to set description for direct nulls - they will
                 // become implicit.
                 setDescriptionFromInput(object, input->getLastOffset());
