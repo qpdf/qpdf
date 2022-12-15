@@ -124,8 +124,9 @@ QPDF_Stream::QPDF_Stream(
                                "object for dictionary");
     }
     setDescription(
-        qpdf, qpdf->getFilename() + ", stream object " + og.unparse(' '));
-    this->parsed_offset = offset;
+        qpdf,
+        qpdf->getFilename() + ", stream object " + og.unparse(' '),
+        offset);
 }
 
 std::shared_ptr<QPDFObject>
@@ -282,9 +283,10 @@ QPDF_Stream::getStreamJSON(
 }
 
 void
-QPDF_Stream::setDescription(QPDF* qpdf, std::string const& description)
+QPDF_Stream::setDescription(
+    QPDF* qpdf, std::string const& description, qpdf_offset_t offset)
 {
-    this->QPDFValue::setDescription(qpdf, description);
+    this->QPDFValue::setDescription(qpdf, description, offset);
     setDictDescription();
 }
 

@@ -3,6 +3,7 @@
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
@@ -287,8 +288,8 @@ QPDFParser::parse(bool& empty, bool content_stream)
             if (!indirect_ref && !is_null) {
                 // No need to set description for direct nulls - they will
                 // become implicit.
-                setDescriptionFromInput(object, input->getLastOffset());
-                object.setParsedOffset(input->getLastOffset());
+                auto os = input->getLastOffset();
+                setDescription(object, os, os);
             }
             set_offset = true;
             olist.push_back(is_null ? null_oh : object);
@@ -311,13 +312,12 @@ QPDFParser::parse(bool& empty, bool content_stream)
             state_stack.pop_back();
             if (old_state == st_array) {
                 object = QPDFObjectHandle::newArray(olist);
-                setDescriptionFromInput(object, offset);
+                setDescription(object, offset, offset - 1);
                 // The `offset` points to the next of "[".  Set the rewind
                 // offset to point to the beginning of "[". This has been
                 // explicitly tested with whitespace surrounding the array start
                 // delimiter. getLastOffset points to the array end token and
                 // therefore can't be used here.
-                object.setParsedOffset(offset - 1);
                 set_offset = true;
             } else if (old_state == st_dictionary) {
                 // Convert list to map. Alternating elements are keys.  Attempt
@@ -362,7 +362,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                             "dictionary ended prematurely; "
                             "using null as value for last key");
                         val = QPDFObjectHandle::newNull();
-                        setDescriptionFromInput(val, offset);
+                        setDescription(val, offset);
                     } else {
                         val = olist.at(++i);
                     }
@@ -386,13 +386,12 @@ QPDFParser::parse(bool& empty, bool content_stream)
                     dict["/Contents"].setParsedOffset(frame.contents_offset);
                 }
                 object = QPDFObjectHandle::newDictionary(dict);
-                setDescriptionFromInput(object, offset);
+                setDescription(object, offset, offset - 2);
                 // The `offset` points to the next of "<<". Set the rewind
                 // offset to point to the beginning of "<<". This has been
                 // explicitly tested with whitespace surrounding the dictionary
                 // start delimiter. getLastOffset points to the dictionary end
                 // token and therefore can't be used here.
-                object.setParsedOffset(offset - 2);
                 set_offset = true;
             }
             stack.pop_back();
@@ -408,20 +407,24 @@ QPDFParser::parse(bool& empty, bool content_stream)
         object = QPDFObjectHandle::newNull();
     }
     if (!set_offset) {
-        setDescriptionFromInput(object, offset);
-        object.setParsedOffset(offset);
+        setDescription(object, offset, offset);
     }
     return object;
 }
 
 void
-QPDFParser::setDescriptionFromInput(
-    QPDFObjectHandle oh, qpdf_offset_t offset) const
+QPDFParser::setDescription(
+    QPDFObjectHandle oh,
+    qpdf_offset_t descr_offset,
+    qpdf_offset_t parsed_offset) const
 {
-    oh.setObjectDescription(
-        context,
-        (input->getName() + ", " + object_description + " at offset " +
-         std::to_string(offset)));
+    if (auto& obj = oh.obj) {
+        obj->setDescription(
+            context,
+            (input->getName() + ", " + object_description + " at offset " +
+             std::to_string(descr_offset)),
+            parsed_offset);
+    }
 }
 
 void
