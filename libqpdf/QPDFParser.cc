@@ -419,11 +419,10 @@ QPDFParser::setDescription(
     qpdf_offset_t parsed_offset) const
 {
     if (auto& obj = oh.obj) {
-        obj->setDescription(
-            context,
-            (input->getName() + ", " + object_description + " at offset " +
-             std::to_string(descr_offset)),
-            parsed_offset);
+        auto descr = std::make_shared<std::string>(
+            input->getName() + ", " + object_description + " at offset " +
+            std::to_string(descr_offset));
+        obj->setDescription(context, descr, parsed_offset);
     }
 }
 

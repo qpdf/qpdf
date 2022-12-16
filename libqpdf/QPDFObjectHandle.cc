@@ -2176,7 +2176,8 @@ QPDFObjectHandle::setObjectDescription(
     // This is called during parsing on newly created direct objects,
     // so we can't call dereference() here.
     if (isInitialized() && obj.get()) {
-        obj->setDescription(owning_qpdf, object_description);
+        auto descr = std::make_shared<std::string>(object_description);
+        obj->setDescription(owning_qpdf, descr);
     }
 }
 
