@@ -123,10 +123,9 @@ QPDF_Stream::QPDF_Stream(
         throw std::logic_error("stream object instantiated with non-dictionary "
                                "object for dictionary");
     }
-    setDescription(
-        qpdf,
-        qpdf->getFilename() + ", stream object " + og.unparse(' '),
-        offset);
+    auto descr = std::make_shared<std::string>(
+        qpdf->getFilename() + ", stream object " + og.unparse(' '));
+    setDescription(qpdf, descr, offset);
 }
 
 std::shared_ptr<QPDFObject>
@@ -284,7 +283,7 @@ QPDF_Stream::getStreamJSON(
 
 void
 QPDF_Stream::setDescription(
-    QPDF* qpdf, std::string const& description, qpdf_offset_t offset)
+    QPDF* qpdf, std::shared_ptr<std::string>& description, qpdf_offset_t offset)
 {
     this->QPDFValue::setDescription(qpdf, description, offset);
     setDictDescription();

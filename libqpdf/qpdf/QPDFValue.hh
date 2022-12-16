@@ -25,7 +25,9 @@ class QPDFValue
     virtual JSON getJSON(int json_version) = 0;
     virtual void
     setDescription(
-        QPDF* qpdf_p, std::string const& description, qpdf_offset_t offset)
+        QPDF* qpdf_p,
+        std::shared_ptr<std::string>& description,
+        qpdf_offset_t offset)
     {
         qpdf = qpdf_p;
         object_description = description;
@@ -34,8 +36,9 @@ class QPDFValue
     void
     setDefaultDescription(QPDF* a_qpdf, QPDFObjGen const& a_og)
     {
-        if (object_description.empty()) {
-            object_description = "object " + a_og.unparse(' ');
+        if (!object_description) {
+            object_description =
+                std::make_shared<std::string>("object " + a_og.unparse(' '));
         }
         qpdf = a_qpdf;
         og = a_og;
@@ -44,13 +47,14 @@ class QPDFValue
     getDescription(QPDF*& qpdf_p, std::string& description)
     {
         qpdf_p = qpdf;
-        description = object_description;
+        description = object_description ? *object_description : "";
         return qpdf != nullptr;
     }
     bool
     hasDescription()
     {
-        return qpdf != nullptr && !object_description.empty();
+        return qpdf != nullptr && object_description &&
+            !object_description->empty();
     }
     void
     setParsedOffset(qpdf_offset_t offset)
@@ -104,7 +108,7 @@ class QPDFValue
   private:
     QPDFValue(QPDFValue const&) = delete;
     QPDFValue& operator=(QPDFValue const&) = delete;
-    std::string object_description;
+    std::shared_ptr<std::string> object_description;
 
     const qpdf_object_type_e type_code{::ot_uninitialized};
     char const* type_name{"uninitialized"};
