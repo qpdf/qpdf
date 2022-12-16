@@ -31,6 +31,15 @@ class QPDFValue
         object_description = description;
         setParsedOffset(offset);
     }
+    void
+    setDefaultDescription(QPDF* a_qpdf, QPDFObjGen const& a_og)
+    {
+        if (object_description.empty()) {
+            object_description = "object " + a_og.unparse(' ');
+        }
+        qpdf = a_qpdf;
+        og = a_og;
+    }
     bool
     getDescription(QPDF*& qpdf_p, std::string& description)
     {

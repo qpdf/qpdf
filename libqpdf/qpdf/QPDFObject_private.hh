@@ -64,7 +64,6 @@ class QPDFObject
     {
         return value->og;
     }
-
     void
     setDescription(
         QPDF* qpdf, std::string const& description, qpdf_offset_t offset = -1)
@@ -108,9 +107,14 @@ class QPDFObject
     }
 
     void
-    setObjGen(QPDF* qpdf, QPDFObjGen const& og)
+    setDefaultDescription(QPDF* qpdf, QPDFObjGen const& og)
     {
         // Intended for use by the QPDF class
+        value->setDefaultDescription(qpdf, og);
+    }
+    void
+    setObjGen(QPDF* qpdf, QPDFObjGen const& og)
+    {
         value->qpdf = qpdf;
         value->og = og;
     }
