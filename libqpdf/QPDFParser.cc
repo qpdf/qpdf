@@ -288,8 +288,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             if (!indirect_ref && !is_null) {
                 // No need to set description for direct nulls - they will
                 // become implicit.
-                auto os = input->getLastOffset();
-                setDescription(object, os, os);
+                setDescription(object, input->getLastOffset());
             }
             set_offset = true;
             olist.push_back(is_null ? null_oh : object);
@@ -312,7 +311,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             state_stack.pop_back();
             if (old_state == st_array) {
                 object = QPDFObjectHandle::newArray(olist);
-                setDescription(object, offset, offset - 1);
+                setDescription(object, offset - 1);
                 // The `offset` points to the next of "[".  Set the rewind
                 // offset to point to the beginning of "[". This has been
                 // explicitly tested with whitespace surrounding the array start
@@ -386,7 +385,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                     dict["/Contents"].setParsedOffset(frame.contents_offset);
                 }
                 object = QPDFObjectHandle::newDictionary(dict);
-                setDescription(object, offset, offset - 2);
+                setDescription(object, offset - 2);
                 // The `offset` points to the next of "<<". Set the rewind
                 // offset to point to the beginning of "<<". This has been
                 // explicitly tested with whitespace surrounding the dictionary
@@ -407,22 +406,16 @@ QPDFParser::parse(bool& empty, bool content_stream)
         object = QPDFObjectHandle::newNull();
     }
     if (!set_offset) {
-        setDescription(object, offset, offset);
+        setDescription(object, offset);
     }
     return object;
 }
 
 void
-QPDFParser::setDescription(
-    QPDFObjectHandle oh,
-    qpdf_offset_t descr_offset,
-    qpdf_offset_t parsed_offset) const
+QPDFParser::setDescription(QPDFObjectHandle oh, qpdf_offset_t parsed_offset)
 {
     if (auto& obj = oh.obj) {
-        auto descr = std::make_shared<std::string>(
-            input->getName() + ", " + object_description + " at offset " +
-            std::to_string(descr_offset));
-        obj->setDescription(context, descr, parsed_offset);
+        obj->setDescription(context, description, parsed_offset);
     }
 }
 
