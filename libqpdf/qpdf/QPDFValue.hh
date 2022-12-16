@@ -36,9 +36,10 @@ class QPDFValue
     void
     setDefaultDescription(QPDF* a_qpdf, QPDFObjGen const& a_og)
     {
+        static auto default_description{
+            std::make_shared<std::string>("object $OG")};
         if (!object_description) {
-            object_description =
-                std::make_shared<std::string>("object " + a_og.unparse(' '));
+            object_description = default_description;
         }
         qpdf = a_qpdf;
         og = a_og;
@@ -48,6 +49,9 @@ class QPDFValue
     {
         qpdf_p = qpdf;
         description = object_description ? *object_description : "";
+        if (auto pos = description.find("$OG"); pos != std::string::npos) {
+            description.replace(pos, 3, og.unparse(' '));
+        }
         return qpdf != nullptr;
     }
     bool
