@@ -52,6 +52,13 @@ class QPDFValue
         if (auto pos = description.find("$OG"); pos != std::string::npos) {
             description.replace(pos, 3, og.unparse(' '));
         }
+        if (auto pos = description.find("$PO"); pos != std::string::npos) {
+            qpdf_offset_t shift = (type_code == ::ot_dictionary) ? 2
+                : (type_code == ::ot_array)                      ? 1
+                                                                 : 0;
+
+            description.replace(pos, 3, std::to_string(parsed_offset + shift));
+        }
         return qpdf != nullptr;
     }
     bool
