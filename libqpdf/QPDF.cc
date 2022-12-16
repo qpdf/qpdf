@@ -1848,9 +1848,7 @@ QPDF::resolve(QPDFObjGen og)
     }
 
     auto result(this->m->obj_cache[og].object);
-    if (!result->hasDescription()) {
-        result->setDescription(this, ("object " + og.unparse(' ')));
-    }
+    result->setDefaultDescription(this, og);
 }
 
 void
@@ -1946,10 +1944,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 QPDFObjectHandle
 QPDF::newIndirect(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& obj)
 {
-    obj->setObjGen(this, og);
-    if (!obj->hasDescription()) {
-        obj->setDescription(this, "object " + og.unparse(' '));
-    }
+    obj->setDefaultDescription(this, og);
     return QPDFObjectHandle::Factory::newIndirect(obj);
 }
 
