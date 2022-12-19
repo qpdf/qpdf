@@ -13,6 +13,8 @@ class QPDF_Array: public QPDFValue
     virtual ~QPDF_Array() = default;
     static std::shared_ptr<QPDFObject>
     create(std::vector<QPDFObjectHandle> const& items);
+    static std::shared_ptr<QPDFObject>
+    create(std::vector<std::shared_ptr<QPDFObject>>&& items);
     static std::shared_ptr<QPDFObject> create(SparseOHArray const& items);
     virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
     virtual std::string unparse();
@@ -25,6 +27,7 @@ class QPDF_Array: public QPDFValue
 
     void setItem(int, QPDFObjectHandle const&);
     void setFromVector(std::vector<QPDFObjectHandle> const& items);
+    void setFromVector(std::vector<std::shared_ptr<QPDFObject>>&& items);
     void insertItem(int at, QPDFObjectHandle const& item);
     void appendItem(QPDFObjectHandle const& item);
     void eraseItem(int at);
@@ -36,6 +39,7 @@ class QPDF_Array: public QPDFValue
 
   private:
     QPDF_Array(std::vector<QPDFObjectHandle> const& items);
+    QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& items);
     QPDF_Array(SparseOHArray const& items);
     SparseOHArray elements;
 };

@@ -1,5 +1,8 @@
 #include <qpdf/SparseOHArray.hh>
 
+#include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDFObject_private.hh>
+
 #include <stdexcept>
 
 SparseOHArray::SparseOHArray() :
@@ -18,6 +21,15 @@ SparseOHArray::append(QPDFObjectHandle oh)
 {
     if (!oh.isDirectNull()) {
         this->elements[this->n_elements] = oh;
+    }
+    ++this->n_elements;
+}
+
+void
+SparseOHArray::append(std::shared_ptr<QPDFObject>&& obj)
+{
+    if (obj->getTypeCode() != ::ot_null || !obj->getObjGen().isIndirect()) {
+        this->elements[this->n_elements] = std::move(obj);
     }
     ++this->n_elements;
 }

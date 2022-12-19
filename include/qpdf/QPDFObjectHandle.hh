@@ -1608,12 +1608,12 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isImage(bool exclude_imagemask = true);
 
-  private:
     QPDFObjectHandle(std::shared_ptr<QPDFObject> const& obj) :
         obj(obj)
     {
     }
 
+  private:
     QPDF_Array* asArray();
     QPDF_Bool* asBool();
     QPDF_Dictionary* asDictionary();
