@@ -441,14 +441,14 @@ QPDFParser::setDescription(
 }
 
 void
-QPDFParser::warn(QPDF* qpdf, QPDFExc const& e)
+QPDFParser::warn(QPDFExc const& e) const
 {
     // If parsing on behalf of a QPDF object and want to give a
     // warning, we can warn through the object. If parsing for some
     // other reason, such as an explicit creation of an object from a
     // string, then just throw the exception.
-    if (qpdf) {
-        qpdf->warn(e);
+    if (context) {
+        context->warn(e);
     } else {
         throw e;
     }
@@ -457,14 +457,8 @@ QPDFParser::warn(QPDF* qpdf, QPDFExc const& e)
 void
 QPDFParser::warn(qpdf_offset_t offset, std::string const& msg) const
 {
-    warn(
-        context,
-        QPDFExc(
-            qpdf_e_damaged_pdf,
-            input->getName(),
-            object_description,
-            offset,
-            msg));
+    warn(QPDFExc(
+        qpdf_e_damaged_pdf, input->getName(), object_description, offset, msg));
 }
 
 void
