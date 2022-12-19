@@ -404,7 +404,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                         QPDFObjectHandle::newString(frame.contents_string);
                     dict["/Contents"].setParsedOffset(frame.contents_offset);
                 }
-                object = QPDF_Dictionary::create(dict);
+                object = QPDF_Dictionary::create(std::move(dict));
                 setDescription(object, offset - 2);
                 // The `offset` points to the next of "<<". Set the rewind
                 // offset to point to the beginning of "<<". This has been
