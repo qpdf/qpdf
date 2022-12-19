@@ -33,7 +33,7 @@ namespace
         {
         }
 
-        std::vector<QPDFObjectHandle> olist;
+        std::vector<std::shared_ptr<QPDFObject>> olist;
         qpdf_offset_t offset;
         std::string contents_string;
         qpdf_offset_t contents_offset;
@@ -67,7 +67,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
     int good_count = 0;
     bool b_contents = false;
     bool is_null = false;
-    auto null_oh = QPDFObjectHandle::newNull();
+    auto null_oh = QPDF_Null::create();
 
     while (!done) {
         bool bad = false;
@@ -191,11 +191,13 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 if (content_stream) {
                     object = QPDF_Operator::create(value);
                 } else if (
-                    (value == "R") && (state != st_top) && (size >= 2) &&
-                    (!olist.back().isIndirect()) &&
-                    (olist.back().isInteger()) &&
-                    (!olist.at(size - 2).isIndirect()) &&
-                    (olist.at(size - 2).isInteger())) {
+                    value == "R" && state != st_top && size >= 2 &&
+                    olist.back() &&
+                    olist.back()->getTypeCode() == ::ot_integer &&
+                    !olist.back()->getObjGen().isIndirect() &&
+                    olist.at(size - 2) &&
+                    olist.at(size - 2)->getTypeCode() == ::ot_integer &&
+                    !olist.at(size - 2)->getObjGen().isIndirect()) {
                     if (context == nullptr) {
                         QTC::TC("qpdf", "QPDFParser indirect without context");
                         throw std::logic_error(
@@ -203,8 +205,8 @@ QPDFParser::parse(bool& empty, bool content_stream)
                             " on an object with indirect references");
                     }
                     auto ref_og = QPDFObjGen(
-                        olist.at(size - 2).getIntValueAsInt(),
-                        olist.back().getIntValueAsInt());
+                        QPDFObjectHandle(olist.at(size - 2)).getIntValueAsInt(),
+                        QPDFObjectHandle(olist.back()).getIntValueAsInt());
                     if (ref_og.isIndirect()) {
                         // This action has the desirable side effect
                         // of causing dangling references (references
@@ -306,7 +308,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 setDescription(object, input->getLastOffset());
             }
             set_offset = true;
-            olist.push_back(is_null ? null_oh : QPDFObjectHandle(object));
+            olist.push_back(is_null ? null_oh : object);
             break;
 
         case st_top:
@@ -325,7 +327,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             parser_state_e old_state = state_stack.back();
             state_stack.pop_back();
             if (old_state == st_array) {
-                object = QPDF_Array::create(olist);
+                object = QPDF_Array::create(std::move(olist));
                 setDescription(object, offset - 1);
                 // The `offset` points to the next of "[".  Set the rewind
                 // offset to point to the beginning of "[". This has been
@@ -412,8 +414,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             if (state_stack.back() == st_top) {
                 done = true;
             } else {
-                stack.back().olist.push_back(
-                    is_null ? null_oh : QPDFObjectHandle(object));
+                stack.back().olist.push_back(is_null ? null_oh : object);
             }
         }
     }

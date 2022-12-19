@@ -1,6 +1,7 @@
 #include <qpdf/QPDF_Array.hh>
 
 #include <qpdf/QIntC.hh>
+#include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QUtil.hh>
 #include <stdexcept>
 
@@ -8,6 +9,12 @@ QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v) :
     QPDFValue(::ot_array, "array")
 {
     setFromVector(v);
+}
+
+QPDF_Array::QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& v) :
+    QPDFValue(::ot_array, "array")
+{
+    setFromVector(std::move(v));
 }
 
 QPDF_Array::QPDF_Array(SparseOHArray const& items) :
@@ -20,6 +27,12 @@ std::shared_ptr<QPDFObject>
 QPDF_Array::create(std::vector<QPDFObjectHandle> const& items)
 {
     return do_create(new QPDF_Array(items));
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_Array::create(std::vector<std::shared_ptr<QPDFObject>>&& items)
+{
+    return do_create(new QPDF_Array(std::move(items)));
 }
 
 std::shared_ptr<QPDFObject>
@@ -102,6 +115,15 @@ QPDF_Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
 {
     this->elements = SparseOHArray();
     for (auto const& iter: v) {
+        this->elements.append(iter);
+    }
+}
+
+void
+QPDF_Array::setFromVector(std::vector<std::shared_ptr<QPDFObject>>&& v)
+{
+    this->elements = SparseOHArray();
+    for (auto&& iter: v) {
         this->elements.append(iter);
     }
 }
