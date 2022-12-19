@@ -381,7 +381,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                             "dictionary ended prematurely; "
                             "using null as value for last key");
                         val = QPDFObjectHandle::newNull();
-                        setDescription(val, offset);
+                        setDescription(val.obj, offset);
                     } else {
                         val = olist.at(++i);
                     }
@@ -432,9 +432,10 @@ QPDFParser::parse(bool& empty, bool content_stream)
 }
 
 void
-QPDFParser::setDescription(QPDFObjectHandle oh, qpdf_offset_t parsed_offset)
+QPDFParser::setDescription(
+    std::shared_ptr<QPDFObject>& obj, qpdf_offset_t parsed_offset)
 {
-    if (auto& obj = oh.obj) {
+    if (obj) {
         obj->setDescription(context, description, parsed_offset);
     }
 }
