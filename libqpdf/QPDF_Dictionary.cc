@@ -9,8 +9,21 @@ QPDF_Dictionary::QPDF_Dictionary(
 {
 }
 
+QPDF_Dictionary::QPDF_Dictionary(
+    std::map<std::string, QPDFObjectHandle>&& items) :
+    QPDFValue(::ot_dictionary, "dictionary"),
+    items(items)
+{
+}
+
 std::shared_ptr<QPDFObject>
 QPDF_Dictionary::create(std::map<std::string, QPDFObjectHandle> const& items)
+{
+    return do_create(new QPDF_Dictionary(items));
+}
+
+std::shared_ptr<QPDFObject>
+QPDF_Dictionary::create(std::map<std::string, QPDFObjectHandle>&& items)
 {
     return do_create(new QPDF_Dictionary(items));
 }
