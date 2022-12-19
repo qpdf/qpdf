@@ -123,8 +123,12 @@ void
 QPDF_Array::setFromVector(std::vector<std::shared_ptr<QPDFObject>>&& v)
 {
     this->elements = SparseOHArray();
-    for (auto&& iter: v) {
-        this->elements.append(iter);
+    for (auto&& item: v) {
+        if (item) {
+            this->elements.append(item);
+        } else {
+            ++this->elements.n_elements;
+        }
     }
 }
 

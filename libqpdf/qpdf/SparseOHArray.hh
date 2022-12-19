@@ -4,6 +4,8 @@
 #include <qpdf/QPDFObjectHandle.hh>
 #include <unordered_map>
 
+class QPDF_Array;
+
 class SparseOHArray
 {
   public:
@@ -25,6 +27,7 @@ class SparseOHArray
     const_iterator end() const;
 
   private:
+    friend class QPDF_Array;
     std::unordered_map<size_t, QPDFObjectHandle> elements;
     size_t n_elements;
 };
