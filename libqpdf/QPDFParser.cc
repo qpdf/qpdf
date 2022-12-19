@@ -308,7 +308,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 setDescription(object, input->getLastOffset());
             }
             set_offset = true;
-            olist.push_back(is_null ? null_oh : object);
+            olist.push_back(object);
             break;
 
         case st_top:
@@ -339,16 +339,19 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 // Convert list to map. Alternating elements are keys.  Attempt
                 // to recover more or less gracefully from invalid dictionaries.
                 std::set<std::string> names;
-                size_t n_elements = olist.size();
-                for (size_t i = 0; i < n_elements; ++i) {
-                    QPDFObjectHandle oh = olist.at(i);
-                    if ((!oh.isIndirect()) && oh.isName()) {
-                        names.insert(oh.getName());
+                for (auto& obj: olist) {
+                    if (obj) {
+                        if (obj->getTypeCode() == ::ot_name) {
+                            names.insert(obj->getStringValue());
+                        }
+                    } else {
+                        obj = null_oh;
                     }
                 }
 
                 std::map<std::string, QPDFObjectHandle> dict;
                 int next_fake_key = 1;
+                size_t n_elements = olist.size();
                 for (unsigned int i = 0; i < n_elements; ++i) {
                     QPDFObjectHandle key_obj = olist.at(i);
                     QPDFObjectHandle val;
@@ -414,7 +417,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             if (state_stack.back() == st_top) {
                 done = true;
             } else {
-                stack.back().olist.push_back(is_null ? null_oh : object);
+                stack.back().olist.push_back(object);
             }
         }
     }
