@@ -344,24 +344,21 @@ QPDFParser::parse(bool& empty, bool content_stream)
                         if (obj->getTypeCode() == ::ot_name) {
                             names.insert(obj->getStringValue());
                         }
-                    } else {
-                        obj = null_oh;
                     }
                 }
 
                 std::map<std::string, QPDFObjectHandle> dict;
                 int next_fake_key = 1;
-                size_t n_elements = olist.size();
-                for (unsigned int i = 0; i < n_elements; ++i) {
-                    QPDFObjectHandle key_obj = olist.at(i);
-                    QPDFObjectHandle val;
-                    if (key_obj.isIndirect() || (!key_obj.isName())) {
-                        bool found_fake = false;
-                        std::string candidate;
-                        while (!found_fake) {
-                            candidate =
-                                "/QPDFFake" + std::to_string(next_fake_key++);
-                            found_fake = (names.count(candidate) == 0);
+                for (auto iter = olist.begin(); iter != olist.end();) {
+                    // Calculate key.
+                    std::string key;
+                    if (*iter && (*iter)->getTypeCode() == ::ot_name) {
+                        key = (*iter)->getStringValue();
+                        ++iter;
+                    } else {
+                        for (bool found_fake = false; !found_fake;) {
+                            key = "/QPDFFake" + std::to_string(next_fake_key++);
+                            found_fake = (names.count(key) == 0);
                             QTC::TC(
                                 "qpdf",
                                 "QPDFParser found fake",
@@ -371,21 +368,8 @@ QPDFParser::parse(bool& empty, bool content_stream)
                             offset,
                             "expected dictionary key but found"
                             " non-name object; inserting key " +
-                                candidate);
-                        val = key_obj;
-                        key_obj = QPDFObjectHandle::newName(candidate);
-                    } else if (i + 1 >= olist.size()) {
-                        QTC::TC("qpdf", "QPDFParser no val for last key");
-                        warn(
-                            offset,
-                            "dictionary ended prematurely; "
-                            "using null as value for last key");
-                        val = QPDFObjectHandle::newNull();
-                        setDescription(val.obj, offset);
-                    } else {
-                        val = olist.at(++i);
+                                key);
                     }
-                    std::string key = key_obj.getName();
                     if (dict.count(key) > 0) {
                         QTC::TC("qpdf", "QPDFParser duplicate dict key");
                         warn(
@@ -394,7 +378,22 @@ QPDFParser::parse(bool& empty, bool content_stream)
                                 "; last occurrence overrides earlier "
                                 "ones");
                     }
-                    dict[key] = val;
+
+                    // Calculate value.
+                    std::shared_ptr<QPDFObject> val;
+                    if (iter != olist.end()) {
+                        val = *iter ? *iter : QPDF_Null::create();
+                        ++iter;
+                    } else {
+                        QTC::TC("qpdf", "QPDFParser no val for last key");
+                        warn(
+                            offset,
+                            "dictionary ended prematurely; "
+                            "using null as value for last key");
+                        val = QPDF_Null::create();
+                    }
+
+                    dict[std::move(key)] = std::move(val);
                 }
                 if (!frame.contents_string.empty() && dict.count("/Type") &&
                     dict["/Type"].isNameAndEquals("/Sig") &&
