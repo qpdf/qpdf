@@ -640,9 +640,8 @@ QPDFObjectHandle::getValueAsUInt(unsigned int& value)
 std::string
 QPDFObjectHandle::getRealValue()
 {
-    auto real = asReal();
-    if (real) {
-        return real->getVal();
+    if (isReal()) {
+        return obj->getStringValue();
     } else {
         typeWarning("real", "returning 0.0");
         QTC::TC("qpdf", "QPDFObjectHandle real returning 0.0");
@@ -653,11 +652,10 @@ QPDFObjectHandle::getRealValue()
 bool
 QPDFObjectHandle::getValueAsReal(std::string& value)
 {
-    auto real = asReal();
-    if (real == nullptr) {
+    if (!isReal()) {
         return false;
     }
-    value = real->getVal();
+    value = obj->getStringValue();
     return true;
 }
 
@@ -666,9 +664,8 @@ QPDFObjectHandle::getValueAsReal(std::string& value)
 std::string
 QPDFObjectHandle::getName()
 {
-    auto name = asName();
-    if (name) {
-        return name->getName();
+    if (isName()) {
+        return obj->getStringValue();
     } else {
         typeWarning("name", "returning dummy name");
         QTC::TC("qpdf", "QPDFObjectHandle name returning dummy name");
@@ -679,11 +676,10 @@ QPDFObjectHandle::getName()
 bool
 QPDFObjectHandle::getValueAsName(std::string& value)
 {
-    auto name = asName();
-    if (name == nullptr) {
+    if (!isName()) {
         return false;
     }
-    value = name->getName();
+    value = obj->getStringValue();
     return true;
 }
 
@@ -692,9 +688,8 @@ QPDFObjectHandle::getValueAsName(std::string& value)
 std::string
 QPDFObjectHandle::getStringValue()
 {
-    auto str = asString();
-    if (str) {
-        return str->getVal();
+    if (isString()) {
+        return obj->getStringValue();
     } else {
         typeWarning("string", "returning empty string");
         QTC::TC("qpdf", "QPDFObjectHandle string returning empty string");
@@ -705,11 +700,10 @@ QPDFObjectHandle::getStringValue()
 bool
 QPDFObjectHandle::getValueAsString(std::string& value)
 {
-    auto str = asString();
-    if (str == nullptr) {
+    if (!isString()) {
         return false;
     }
-    value = str->getVal();
+    value = obj->getStringValue();
     return true;
 }
 
@@ -742,9 +736,8 @@ QPDFObjectHandle::getValueAsUTF8(std::string& value)
 std::string
 QPDFObjectHandle::getOperatorValue()
 {
-    auto op = asOperator();
-    if (op) {
-        return op->getVal();
+    if (isOperator()) {
+        return obj->getStringValue();
     } else {
         typeWarning("operator", "returning fake value");
         QTC::TC("qpdf", "QPDFObjectHandle operator returning fake value");
@@ -755,20 +748,18 @@ QPDFObjectHandle::getOperatorValue()
 bool
 QPDFObjectHandle::getValueAsOperator(std::string& value)
 {
-    auto op = asOperator();
-    if (op == nullptr) {
+    if (!isOperator()) {
         return false;
     }
-    value = op->getVal();
+    value = obj->getStringValue();
     return true;
 }
 
 std::string
 QPDFObjectHandle::getInlineImageValue()
 {
-    auto image = asInlineImage();
-    if (image) {
-        return image->getVal();
+    if (isInlineImage()) {
+        return obj->getStringValue();
     } else {
         typeWarning("inlineimage", "returning empty data");
         QTC::TC("qpdf", "QPDFObjectHandle inlineimage returning empty data");
@@ -779,11 +770,10 @@ QPDFObjectHandle::getInlineImageValue()
 bool
 QPDFObjectHandle::getValueAsInlineImage(std::string& value)
 {
-    auto image = asInlineImage();
-    if (image == nullptr) {
+    if (!isInlineImage()) {
         return false;
     }
-    value = image->getVal();
+    value = obj->getStringValue();
     return true;
 }
 

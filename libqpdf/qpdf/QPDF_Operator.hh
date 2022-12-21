@@ -11,7 +11,11 @@ class QPDF_Operator: public QPDFValue
     virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
-    std::string getVal() const;
+    virtual std::string
+    getStringValue() const
+    {
+        return val;
+    }
 
   private:
     QPDF_Operator(std::string const& val);

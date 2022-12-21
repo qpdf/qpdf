@@ -29,9 +29,3 @@ QPDF_InlineImage::getJSON(int json_version)
 {
     return JSON::makeNull();
 }
-
-std::string
-QPDF_InlineImage::getVal() const
-{
-    return this->val;
-}

@@ -38,7 +38,11 @@ class QPDFObject
     {
         return value->getJSON(json_version);
     }
-
+    std::string
+    getStringValue() const
+    {
+        return value->getStringValue();
+    }
     // Return a unique type code for the object
     qpdf_object_type_e
     getTypeCode() const

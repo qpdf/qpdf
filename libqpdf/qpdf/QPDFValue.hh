@@ -67,6 +67,11 @@ class QPDFValue
     disconnect()
     {
     }
+    virtual std::string
+    getStringValue() const
+    {
+        return "";
+    }
 
   protected:
     QPDFValue() = default;
