@@ -26,6 +26,10 @@ $td->runtest("equality",
              {$td->COMMAND => "test_driver 93 minimal.pdf -"},
              {$td->STRING => "test 93 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+$td->runtest("isScalar checks",
+             {$td->COMMAND => "test_driver 95 - -"},
+             {$td->STRING => "test 95 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 cleanup();
-$td->report(3);
+$td->report(4);
