@@ -469,9 +469,8 @@ QPDFObjectHandle::isReserved()
 bool
 QPDFObjectHandle::isScalar()
 {
-    return (
-        !(isArray() || isDictionary() || isStream() || isOperator() ||
-          isInlineImage()));
+    return isBool() || isInteger() || isName() || isNull() || isReal() ||
+        isString();
 }
 
 bool
