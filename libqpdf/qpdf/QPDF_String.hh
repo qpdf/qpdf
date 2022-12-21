@@ -18,8 +18,12 @@ class QPDF_String: public QPDFValue
     virtual std::string unparse();
     std::string unparse(bool force_binary);
     virtual JSON getJSON(int json_version);
-    std::string getVal() const;
     std::string getUTF8Val() const;
+    virtual std::string
+    getStringValue() const
+    {
+        return val;
+    }
 
   private:
     QPDF_String(std::string const& val);

@@ -13,7 +13,11 @@ class QPDF_Real: public QPDFValue
     virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
-    std::string getVal();
+    virtual std::string
+    getStringValue() const
+    {
+        return val;
+    }
 
   private:
     QPDF_Real(std::string const& val);

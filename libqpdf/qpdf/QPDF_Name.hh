@@ -11,10 +11,14 @@ class QPDF_Name: public QPDFValue
     virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
-    std::string getName() const;
 
     // Put # into strings with characters unsuitable for name token
     static std::string normalizeName(std::string const& name);
+    virtual std::string
+    getStringValue() const
+    {
+        return name;
+    }
 
   private:
     QPDF_Name(std::string const& name);

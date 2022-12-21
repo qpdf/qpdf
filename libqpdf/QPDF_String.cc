@@ -174,12 +174,6 @@ QPDF_String::unparse(bool force_binary)
 }
 
 std::string
-QPDF_String::getVal() const
-{
-    return this->val;
-}
-
-std::string
 QPDF_String::getUTF8Val() const
 {
     if (QUtil::is_utf16(this->val)) {

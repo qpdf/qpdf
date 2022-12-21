@@ -61,9 +61,3 @@ QPDF_Real::getJSON(int json_version)
     }
     return JSON::makeNumber(result);
 }
-
-std::string
-QPDF_Real::getVal()
-{
-    return this->val;
-}

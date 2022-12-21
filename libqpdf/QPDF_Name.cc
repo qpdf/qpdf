@@ -61,9 +61,3 @@ QPDF_Name::getJSON(int json_version)
         return JSON::makeString(this->name);
     }
 }
-
-std::string
-QPDF_Name::getName() const
-{
-    return this->name;
-}

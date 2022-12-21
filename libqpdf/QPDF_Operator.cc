@@ -29,9 +29,3 @@ QPDF_Operator::getJSON(int json_version)
 {
     return JSON::makeNull();
 }
-
-std::string
-QPDF_Operator::getVal() const
-{
-    return this->val;
-}
