@@ -151,20 +151,33 @@ QPDF_Array::unparse()
 JSON
 QPDF_Array::getJSON(int json_version)
 {
+    static const JSON j_null = JSON::makeNull();
+    JSON j_array = JSON::makeArray();
     if (sparse) {
-        JSON j = JSON::makeArray();
-        for (int i = 0; i < sp_size; ++i) {
-            j.addArrayElement(at(i).getJSON(json_version));
+        int next = 0;
+        for (auto& item: sp_elements) {
+            int key = item.first;
+            for (int j = next; j < key; ++j) {
+                j_array.addArrayElement(j_null);
+            }
+            auto og = item.second->getObjGen();
+            j_array.addArrayElement(
+                og.isIndirect() ? JSON::makeString(og.unparse(' ') + " R")
+                                : item.second->getJSON(json_version));
+            next = ++key;
         }
-        return j;
+        for (int j = next; j < sp_size; ++j) {
+            j_array.addArrayElement(j_null);
+        }
     } else {
-        JSON j = JSON::makeArray();
-        size_t size = elements.size();
-        for (int i = 0; i < int(size); ++i) {
-            j.addArrayElement(at(i).getJSON(json_version));
+        for (auto const& item: elements) {
+            auto og = item->getObjGen();
+            j_array.addArrayElement(
+                og.isIndirect() ? JSON::makeString(og.unparse(' ') + " R")
+                                : item->getJSON(json_version));
         }
-        return j;
     }
+    return j_array;
 }
 
 QPDFObjectHandle
