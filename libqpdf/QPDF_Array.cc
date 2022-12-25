@@ -128,24 +128,33 @@ QPDF_Array::disconnect()
 std::string
 QPDF_Array::unparse()
 {
+    std::string result = "[ ";
     if (sparse) {
-        std::string result = "[ ";
-        for (int i = 0; i < sp_size; ++i) {
-            result += at(i).unparse();
-            result += " ";
+        int next = 0;
+        for (auto& item: sp_elements) {
+            int key = item.first;
+            for (int j = next; j < key; ++j) {
+                result += "null ";
+            }
+            item.second->resolve();
+            auto og = item.second->getObjGen();
+            result += og.isIndirect() ? og.unparse(' ') + " R "
+                                      : item.second->unparse() + " ";
+            next = ++key;
         }
-        result += "]";
-        return result;
+        for (int j = next; j < sp_size; ++j) {
+            result += "null ";
+        }
     } else {
-        std::string result = "[ ";
-        auto size = elements.size();
-        for (int i = 0; i < int(size); ++i) {
-            result += at(i).unparse();
-            result += " ";
+        for (auto const& item: elements) {
+            item->resolve();
+            auto og = item->getObjGen();
+            result += og.isIndirect() ? og.unparse(' ') + " R "
+                                      : item->unparse() + " ";
         }
-        result += "]";
-        return result;
     }
+    result += "]";
+    return result;
 }
 
 JSON
