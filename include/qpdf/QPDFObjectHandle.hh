@@ -1490,49 +1490,6 @@ class QPDFObjectHandle
     QPDF_DLL
     void warnIfPossible(std::string const& warning);
 
-    // Initializers for objects.  This Factory class gives the QPDF
-    // class specific permission to call factory methods without
-    // making it a friend of the whole QPDFObjectHandle class.
-    class Factory
-    {
-        friend class QPDF;
-
-      private:
-        static QPDFObjectHandle
-        newIndirect(std::shared_ptr<QPDFObject> const& obj)
-        {
-            return QPDFObjectHandle(obj);
-        }
-    };
-
-    // Accessor for raw underlying object -- only QPDF is allowed to
-    // call this.
-    class ObjAccessor
-    {
-        friend class QPDF;
-
-      private:
-        static std::shared_ptr<QPDFObject>
-        getObject(QPDFObjectHandle& o)
-        {
-            if (!o.dereference()) {
-                throw std::logic_error("attempted to dereference an"
-                                       " uninitialized QPDFObjectHandle");
-            };
-            return o.obj;
-        }
-        static QPDF_Array*
-        asArray(QPDFObjectHandle& oh)
-        {
-            return oh.asArray();
-        }
-        static QPDF_Stream*
-        asStream(QPDFObjectHandle& oh)
-        {
-            return oh.asStream();
-        }
-    };
-
     // Provide access to specific classes for recursive
     // disconnected().
     class DisconnectAccess
