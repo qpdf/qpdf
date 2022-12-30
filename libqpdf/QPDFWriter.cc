@@ -1257,15 +1257,15 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
             QTC::TC("qpdf", "QPDFWriter ignore self-referential object stream");
         }
     } else if (object.isArray()) {
-        int n = object.getArrayNItems();
-        for (int i = 0; i < n; ++i) {
-            if (!this->m->linearized) {
+        if (!this->m->linearized) {
+            int n = object.getArrayNItems();
+            for (int i = 0; i < n; ++i) {
                 enqueueObject(object.getArrayItem(i));
             }
         }
     } else if (object.isDictionary()) {
-        for (auto const& key: object.getKeys()) {
-            if (!this->m->linearized) {
+        if (!this->m->linearized) {
+            for (auto const& key: object.getKeys()) {
                 enqueueObject(object.getKey(key));
             }
         }
