@@ -33,6 +33,13 @@ os.makedirs(dir_name, exist_ok=True)
 r = requests.get(
     'https://api.github.com/repos/qpdf/external-libs/releases')
 releases = json.loads(r.text)
+
+# Help diagnose occasional failure where some releases don't have
+# 'prerelease'. I've never seen this in attempts to reproduce.
+print("---- github API output for external-libs releaes ----")
+print(json.dumps(releases, indent=2, separators=(',', ': ')))
+print("--------")
+
 by_tag = sorted(
     [(r['tag_name'], r) for r in releases
      if r['prerelease'] is False],
