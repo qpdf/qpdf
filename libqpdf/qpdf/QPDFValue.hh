@@ -44,11 +44,10 @@ class QPDFValue
         qpdf = a_qpdf;
         og = a_og;
     }
-    bool
-    getDescription(QPDF*& qpdf_p, std::string& description)
+    std::string
+    getDescription()
     {
-        qpdf_p = qpdf;
-        description = object_description ? *object_description : "";
+        auto description = object_description ? *object_description : "";
         if (auto pos = description.find("$OG"); pos != std::string::npos) {
             description.replace(pos, 3, og.unparse(' '));
         }
@@ -59,7 +58,7 @@ class QPDFValue
 
             description.replace(pos, 3, std::to_string(parsed_offset + shift));
         }
-        return qpdf != nullptr;
+        return description;
     }
     bool
     hasDescription()

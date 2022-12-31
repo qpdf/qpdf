@@ -292,12 +292,9 @@ QPDF_Stream::setDescription(
 void
 QPDF_Stream::setDictDescription()
 {
-    QPDF* qpdf = nullptr;
-    std::string description;
-    if ((!this->stream_dict.hasObjectDescription()) &&
-        getDescription(qpdf, description)) {
+    if (!this->stream_dict.hasObjectDescription()) {
         this->stream_dict.setObjectDescription(
-            qpdf, description + " -> stream dictionary");
+            qpdf, getDescription() + " -> stream dictionary");
     }
 }
 
