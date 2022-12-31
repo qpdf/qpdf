@@ -75,7 +75,9 @@ class QPDFObject
     bool
     getDescription(QPDF*& qpdf, std::string& description)
     {
-        return value->getDescription(qpdf, description);
+        qpdf = value->qpdf;
+        description = value->getDescription();
+        return qpdf != nullptr;
     }
     bool
     hasDescription()
