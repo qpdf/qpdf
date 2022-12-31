@@ -26,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: 'Run pre-build steps'
-        run: build-scripts/prebuild
+        run: build-scripts/prebuild ${{ secrets.GITHUB_TOKEN }}
       - name: 'Upload documentation for later build steps'
         uses: actions/upload-artifact@v3
         with:

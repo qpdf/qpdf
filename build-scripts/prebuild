@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 cd $(dirname $0)/..
+
+token=$1
+if [ "$token" = "" ]; then
+    echo 1>&2 "Usage: $0 github-token"
+    exit 2
+fi
+
 if ! ./generate_auto_job --check; then
    cat 1>&2 <<EOF
 
@@ -18,4 +25,4 @@ EOF
    exit 2
 fi
 build-scripts/build-doc
-build-scripts/download-external-libs
+build-scripts/download-external-libs $token

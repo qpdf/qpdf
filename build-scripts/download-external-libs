@@ -30,16 +30,23 @@ src_name = 'qpdf-external-libs-src.zip'
 dir_name = 'external-libs-dist'
 os.makedirs(dir_name, exist_ok=True)
 
+github_headers = {
+    'content-type': 'application/json',
+}
+try:
+    token = sys.argv[1]
+    github_headers['authorization'] = f'Bearer {token}'
+except IndexError:
+    print('WARNING: unauthenticated call to github API'
+          ' will be subject to more stringent rate limits.')
+
 r = requests.get(
-    'https://api.github.com/repos/qpdf/external-libs/releases')
+    'https://api.github.com/repos/qpdf/external-libs/releases',
+    headers=github_headers)
+if r.status_code >= 400:
+    exit(f'GitHub API call returned status {r.status_code}: {r.text}')
+
 releases = json.loads(r.text)
-
-# Help diagnose occasional failure where some releases don't have
-# 'prerelease'. I've never seen this in attempts to reproduce.
-print("---- github API output for external-libs releaes ----")
-print(json.dumps(releases, indent=2, separators=(',', ': ')))
-print("--------")
-
 by_tag = sorted(
     [(r['tag_name'], r) for r in releases
      if r['prerelease'] is False],
