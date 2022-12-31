@@ -1228,8 +1228,6 @@ test_30(QPDF& pdf, char const* arg2)
 static void
 test_31(QPDF& pdf, char const* arg2)
 {
-    // Test object parsing from a string.  The input file is not used.
-
     auto o1 = "[/name 16059 3.14159 false\n"
               " << /key true /other [ (string1) (string2) ] >> null]"_qpdf;
     std::cout << o1.unparse() << std::endl;
@@ -1246,6 +1244,14 @@ test_31(QPDF& pdf, char const* arg2)
         std::cout << "oops -- didn't throw" << std::endl;
     } catch (std::runtime_error const& e) {
         std::cout << "trailing data: " << e.what() << std::endl;
+    }
+    try {
+        assert(QPDFObjectHandle::parse(&pdf, "5 0 R").isInteger());
+        QPDFObjectHandle::parse(&pdf, "5 0 R 0 R");
+        std::cout << "oops -- didn't throw" << std::endl;
+    } catch (std::runtime_error const& e) {
+        std::cout << "broken indirect object reference: " << e.what()
+                  << std::endl;
     }
     assert(
         QPDFObjectHandle::parse(&pdf, "[1 0 R]", "indirect test").unparse() ==
