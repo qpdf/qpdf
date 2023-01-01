@@ -31,19 +31,6 @@ SparseOHArray::disconnect()
 }
 
 void
-SparseOHArray::setAt(int idx, QPDFObjectHandle oh)
-{
-    if (idx >= this->n_elements) {
-        throw std::logic_error("bounds error setting item in SparseOHArray");
-    }
-    if (oh.isDirectNull()) {
-        this->elements.erase(idx);
-    } else {
-        this->elements[idx] = oh.getObj();
-    }
-}
-
-void
 SparseOHArray::erase(int at)
 {
     auto end = elements.end();

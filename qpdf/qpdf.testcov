@@ -303,6 +303,7 @@ QPDFObjectHandle array treating as empty 0
 QPDFObjectHandle array null for non-array 0
 QPDFObjectHandle array treating as empty vector 0
 QPDFObjectHandle array ignoring set item 0
+QPDFObjectHandle set array bounds 0
 QPDFObjectHandle array ignoring replace items 0
 QPDFObjectHandle array ignoring insert item 0
 QPDFObjectHandle insert array bounds 0

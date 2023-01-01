@@ -1,9 +1,6 @@
 #include <qpdf/QPDF_Array.hh>
 
-#include <qpdf/QIntC.hh>
 #include <qpdf/QPDFObject_private.hh>
-#include <qpdf/QUtil.hh>
-#include <stdexcept>
 
 static const QPDFObjectHandle null_oh = QPDFObjectHandle::newNull();
 
@@ -188,18 +185,19 @@ QPDF_Array::getAsVector(std::vector<QPDFObjectHandle>& v) const
     }
 }
 
-void
-QPDF_Array::setItem(int n, QPDFObjectHandle const& oh)
+bool
+QPDF_Array::setAt(int at, QPDFObjectHandle const& oh)
 {
-    if (sparse) {
-        sp_elements.setAt(n, oh);
-    } else {
-        size_t idx = size_t(n);
-        if (n < 0 || idx >= elements.size()) {
-            throw std::logic_error("bounds error setting item in QPDF_Array");
-        }
-        elements[idx] = oh.getObj();
+    if (at < 0 || at >= size()) {
+        return false;
     }
+    checkOwnership(oh);
+    if (sparse) {
+        sp_elements.setAt(at, oh);
+    } else {
+        elements[size_t(at)] = oh.getObj();
+    }
+    return true;
 }
 
 void

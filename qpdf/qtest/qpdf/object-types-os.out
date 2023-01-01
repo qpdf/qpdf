@@ -6,6 +6,7 @@ WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operatio
 WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 384: ignoring attempt to erase out of bounds array item
 WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 384: ignoring attempt to erase out of bounds array item
 WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 384: ignoring attempt to insert out of bounds array item
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 384: ignoring attempt to set out of bounds array item
 WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for array attempted on object of type integer: ignoring attempt to erase item
 WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for array attempted on object of type integer: ignoring attempt to insert item
 WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for array attempted on object of type integer: ignoring attempt to replace items

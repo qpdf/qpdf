@@ -28,7 +28,11 @@ class SparseOHArray
     }
     QPDFObjectHandle at(int idx) const;
     void remove_last();
-    void setAt(int idx, QPDFObjectHandle oh);
+    void
+    setAt(int idx, QPDFObjectHandle oh)
+    {
+        elements[idx] = oh.getObj();
+    }
     void erase(int idx);
     void insert(int idx, QPDFObjectHandle oh);
     SparseOHArray copy();

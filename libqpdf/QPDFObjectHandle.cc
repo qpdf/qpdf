@@ -904,16 +904,16 @@ QPDFObjectHandle::getArrayAsVector()
 void
 QPDFObjectHandle::setArrayItem(int n, QPDFObjectHandle const& item)
 {
-    auto array = asArray();
-    if (array) {
-        checkOwnership(item);
-        array->setItem(n, item);
+    if (auto array = asArray()) {
+        if (!array->setAt(n, item)) {
+            objectWarning("ignoring attempt to set out of bounds array item");
+            QTC::TC("qpdf", "QPDFObjectHandle set array bounds");
+        }
     } else {
         typeWarning("array", "ignoring attempt to set item");
         QTC::TC("qpdf", "QPDFObjectHandle array ignoring set item");
     }
 }
-
 void
 QPDFObjectHandle::setArrayFromVector(std::vector<QPDFObjectHandle> const& items)
 {
