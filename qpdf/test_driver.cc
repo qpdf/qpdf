@@ -1245,14 +1245,13 @@ test_31(QPDF& pdf, char const* arg2)
     } catch (std::runtime_error const& e) {
         std::cout << "trailing data: " << e.what() << std::endl;
     }
-    try {
-        assert(QPDFObjectHandle::parse(&pdf, "5 0 R").isInteger());
-        QPDFObjectHandle::parse(&pdf, "5 0 R 0 R");
-        std::cout << "oops -- didn't throw" << std::endl;
-    } catch (std::runtime_error const& e) {
-        std::cout << "broken indirect object reference: " << e.what()
-                  << std::endl;
-    }
+    assert(
+        QPDFObjectHandle::parse(&pdf, "[5 0 R]").getArrayItem(0).isInteger());
+    // Make sure an indirect integer followed by "0 R" is not
+    // mistakenly parsed as an indirect object.
+    assert(
+        QPDFObjectHandle::parse(&pdf, "[5 0 R 0 R /X]").unparse() ==
+        "[ 5 0 R 0 (R) /X ]");
     assert(
         QPDFObjectHandle::parse(&pdf, "[1 0 R]", "indirect test").unparse() ==
         "[ 1 0 R ]");
