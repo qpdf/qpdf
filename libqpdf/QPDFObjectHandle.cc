@@ -2525,7 +2525,7 @@ QPDFObjectHandle::assertPageObject()
     }
 }
 
-bool
+inline bool
 QPDFObjectHandle::dereference()
 {
     if (!isInitialized()) {
