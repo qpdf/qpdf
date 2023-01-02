@@ -172,16 +172,20 @@ QPDF_Array::at(int n) const noexcept
     }
 }
 
-void
-QPDF_Array::getAsVector(std::vector<QPDFObjectHandle>& v) const
+std::vector<QPDFObjectHandle>
+QPDF_Array::getAsVector() const
 {
     if (sparse) {
-        int size = sp_elements.size();
-        for (int i = 0; i < size; ++i) {
-            v.push_back(at(i));
+        std::vector<QPDFObjectHandle> v;
+        v.reserve(size_t(size()));
+        for (auto const& item: sp_elements.elements) {
+            v.resize(size_t(item.first), null_oh);
+            v.push_back(item.second);
         }
+        v.resize(size_t(size()), null_oh);
+        return v;
     } else {
-        v = std::vector<QPDFObjectHandle>(elements.cbegin(), elements.cend());
+        return {elements.cbegin(), elements.cend()};
     }
 }
 

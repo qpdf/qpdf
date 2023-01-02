@@ -29,7 +29,7 @@ class QPDF_Array: public QPDFValue
     }
     QPDFObjectHandle at(int n) const noexcept;
     bool setAt(int n, QPDFObjectHandle const& oh);
-    void getAsVector(std::vector<QPDFObjectHandle>&) const;
+    std::vector<QPDFObjectHandle> getAsVector() const;
     void setFromVector(std::vector<QPDFObjectHandle> const& items);
     void setFromVector(std::vector<std::shared_ptr<QPDFObject>>&& items);
     bool insert(int at, QPDFObjectHandle const& item);

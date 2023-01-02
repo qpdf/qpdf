@@ -888,15 +888,14 @@ QPDFObjectHandle::getArrayAsMatrix()
 std::vector<QPDFObjectHandle>
 QPDFObjectHandle::getArrayAsVector()
 {
-    std::vector<QPDFObjectHandle> result;
     auto array = asArray();
     if (array) {
-        array->getAsVector(result);
+        return array->getAsVector();
     } else {
         typeWarning("array", "treating as empty");
         QTC::TC("qpdf", "QPDFObjectHandle array treating as empty vector");
     }
-    return result;
+    return {};
 }
 
 // Array mutators
