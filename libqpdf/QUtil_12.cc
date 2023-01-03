@@ -1519,7 +1519,7 @@ encode_pdfdoc(unsigned long codepoint)
 
 unsigned long
 QUtil_12::get_next_utf8_codepoint(
-    std::string const& utf8_val, size_t& pos, bool& error)
+    std::string_view utf8_val, size_t& pos, bool& error)
 {
     size_t len = utf8_val.length();
     unsigned char ch = static_cast<unsigned char>(utf8_val.at(pos++));
@@ -1559,7 +1559,7 @@ QUtil_12::get_next_utf8_codepoint(
 
 static bool
 transcode_utf8(
-    std::string const& utf8_val,
+    std::string_view utf8_val,
     std::string& result,
     encoding_e encoding,
     char unknown)
@@ -1656,7 +1656,7 @@ transcode_utf8(
 }
 
 static std::string
-transcode_utf8(std::string const& utf8_val, encoding_e encoding, char unknown)
+transcode_utf8(std::string_view utf8_val, encoding_e encoding, char unknown)
 {
     std::string result;
     transcode_utf8(utf8_val, result, encoding, unknown);
@@ -1664,65 +1664,65 @@ transcode_utf8(std::string const& utf8_val, encoding_e encoding, char unknown)
 }
 
 std::string
-QUtil_12::utf8_to_utf16(std::string const& utf8)
+QUtil_12::utf8_to_utf16(std::string_view utf8)
 {
     return transcode_utf8(utf8, e_utf16, 0);
 }
 
 std::string
-QUtil_12::utf8_to_ascii(std::string const& utf8, char unknown_char)
+QUtil_12::utf8_to_ascii(std::string_view utf8, char unknown_char)
 {
     return transcode_utf8(utf8, e_ascii, unknown_char);
 }
 
 std::string
-QUtil_12::utf8_to_win_ansi(std::string const& utf8, char unknown_char)
+QUtil_12::utf8_to_win_ansi(std::string_view utf8, char unknown_char)
 {
     return transcode_utf8(utf8, e_winansi, unknown_char);
 }
 
 std::string
-QUtil_12::utf8_to_mac_roman(std::string const& utf8, char unknown_char)
+QUtil_12::utf8_to_mac_roman(std::string_view utf8, char unknown_char)
 {
     return transcode_utf8(utf8, e_macroman, unknown_char);
 }
 
 std::string
-QUtil_12::utf8_to_pdf_doc(std::string const& utf8, char unknown_char)
+QUtil_12::utf8_to_pdf_doc(std::string_view utf8, char unknown_char)
 {
     return transcode_utf8(utf8, e_pdfdoc, unknown_char);
 }
 
 bool
 QUtil_12::utf8_to_ascii(
-    std::string const& utf8, std::string& ascii, char unknown_char)
+    std::string_view utf8, std::string& ascii, char unknown_char)
 {
     return transcode_utf8(utf8, ascii, e_ascii, unknown_char);
 }
 
 bool
 QUtil_12::utf8_to_win_ansi(
-    std::string const& utf8, std::string& win, char unknown_char)
+    std::string_view utf8, std::string& win, char unknown_char)
 {
     return transcode_utf8(utf8, win, e_winansi, unknown_char);
 }
 
 bool
 QUtil_12::utf8_to_mac_roman(
-    std::string const& utf8, std::string& mac, char unknown_char)
+    std::string_view utf8, std::string& mac, char unknown_char)
 {
     return transcode_utf8(utf8, mac, e_macroman, unknown_char);
 }
 
 bool
 QUtil_12::utf8_to_pdf_doc(
-    std::string const& utf8, std::string& pdfdoc, char unknown_char)
+    std::string_view utf8, std::string& pdfdoc, char unknown_char)
 {
     return transcode_utf8(utf8, pdfdoc, e_pdfdoc, unknown_char);
 }
 
 bool
-QUtil_12::is_utf16(std::string const& val)
+QUtil_12::is_utf16(std::string_view val)
 {
     return (
         (val.length() >= 2) &&
@@ -1731,7 +1731,7 @@ QUtil_12::is_utf16(std::string const& val)
 }
 
 bool
-QUtil_12::is_explicit_utf8(std::string const& val)
+QUtil_12::is_explicit_utf8(std::string_view val)
 {
     // QPDF_String.cc knows that this is a 3-byte sequence.
     return (
@@ -1740,7 +1740,7 @@ QUtil_12::is_explicit_utf8(std::string const& val)
 }
 
 std::string
-QUtil_12::utf16_to_utf8(std::string const& val)
+QUtil_12::utf16_to_utf8(std::string_view val)
 {
     std::string result;
     // This code uses unsigned long and unsigned short to hold
@@ -1790,7 +1790,7 @@ QUtil_12::utf16_to_utf8(std::string const& val)
 }
 
 std::string
-QUtil_12::win_ansi_to_utf8(std::string const& val)
+QUtil_12::win_ansi_to_utf8(std::string_view val)
 {
     std::string result;
     size_t len = val.length();
@@ -1806,7 +1806,7 @@ QUtil_12::win_ansi_to_utf8(std::string const& val)
 }
 
 std::string
-QUtil_12::mac_roman_to_utf8(std::string const& val)
+QUtil_12::mac_roman_to_utf8(std::string_view val)
 {
     std::string result;
     size_t len = val.length();
@@ -1822,7 +1822,7 @@ QUtil_12::mac_roman_to_utf8(std::string const& val)
 }
 
 std::string
-QUtil_12::pdf_doc_to_utf8(std::string const& val)
+QUtil_12::pdf_doc_to_utf8(std::string_view val)
 {
     std::string result;
     size_t len = val.length();

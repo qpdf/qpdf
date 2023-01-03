@@ -10,6 +10,7 @@
 #include <locale>
 #include <stdio.h>
 #include <string.h>
+#include <string_view>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -333,8 +334,8 @@ utf8_to_ascii_test()
 
 void
 transcoding_test(
-    std::string (*to_utf8)(std::string const&),
-    std::string (*from_utf8)(std::string const&, char),
+    std::string (*to_utf8)(std::string_view),
+    std::string (*from_utf8)(std::string_view, char),
     int first,
     int last,
     std::string unknown)
