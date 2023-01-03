@@ -19,6 +19,7 @@ set(TEST_PROGRAMS
   logger
   lzw
   main_from_wmain
+  main_from_wmain_12
   matrix
   md5
   nntree
@@ -29,6 +30,7 @@ set(TEST_PROGRAMS
   predictors
   qintc
   qutil
+  qutil_12
   random
   rc4
   runlength

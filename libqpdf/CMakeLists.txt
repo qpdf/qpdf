@@ -111,6 +111,7 @@ set(libqpdf_SOURCES
   QPDF_pages.cc
   QTC.cc
   QUtil.cc
+  QUtil_12.cc
   RC4.cc
   ResourceFinder.cc
   SecureRandomDataProvider.cc

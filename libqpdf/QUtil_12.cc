@@ -1,14 +1,13 @@
 // Include qpdf-config.h first so off_t is guaranteed to have the right size.
 #include <qpdf/qpdf-config.h>
 
-#include <qpdf/QUtil.hh>
+#include <qpdf/QUtil_12.hh>
 
 #include <qpdf/CryptoRandomDataProvider.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QTC.hh>
-#include <qpdf/QUtil_12.hh>
 
 #include <cmath>
 #include <ctype.h>
@@ -344,31 +343,31 @@ int_to_string_base_internal(T num, int base, int length)
 }
 
 std::string
-QUtil::int_to_string(long long num, int length)
+QUtil_12::int_to_string(long long num, int length)
 {
     return int_to_string_base(num, 10, length);
 }
 
 std::string
-QUtil::uint_to_string(unsigned long long num, int length)
+QUtil_12::uint_to_string(unsigned long long num, int length)
 {
     return uint_to_string_base(num, 10, length);
 }
 
 std::string
-QUtil::int_to_string_base(long long num, int base, int length)
+QUtil_12::int_to_string_base(long long num, int base, int length)
 {
     return int_to_string_base_internal(num, base, length);
 }
 
 std::string
-QUtil::uint_to_string_base(unsigned long long num, int base, int length)
+QUtil_12::uint_to_string_base(unsigned long long num, int base, int length)
 {
     return int_to_string_base_internal(num, base, length);
 }
 
 std::string
-QUtil::double_to_string(
+QUtil_12::double_to_string(
     double num, int decimal_places, bool trim_trailing_zeroes)
 {
     // Backward compatibility -- this code used to use sprintf and
@@ -394,7 +393,7 @@ QUtil::double_to_string(
 }
 
 long long
-QUtil::string_to_ll(char const* str)
+QUtil_12::string_to_ll(char const* str)
 {
     errno = 0;
 #ifdef _MSC_VER
@@ -411,14 +410,14 @@ QUtil::string_to_ll(char const* str)
 }
 
 int
-QUtil::string_to_int(char const* str)
+QUtil_12::string_to_int(char const* str)
 {
     // QIntC::to_int does range checking
     return QIntC::to_int(string_to_ll(str));
 }
 
 unsigned long long
-QUtil::string_to_ull(char const* str)
+QUtil_12::string_to_ull(char const* str)
 {
     char const* p = str;
     while (*p && is_space(*p)) {
@@ -445,14 +444,14 @@ QUtil::string_to_ull(char const* str)
 }
 
 unsigned int
-QUtil::string_to_uint(char const* str)
+QUtil_12::string_to_uint(char const* str)
 {
     // QIntC::to_uint does range checking
     return QIntC::to_uint(string_to_ull(str));
 }
 
 bool
-QUtil::is_long_long(char const* str)
+QUtil_12::is_long_long(char const* str)
 {
     try {
         auto i1 = string_to_ll(str);
@@ -465,25 +464,25 @@ QUtil::is_long_long(char const* str)
 }
 
 unsigned char*
-QUtil::unsigned_char_pointer(std::string const& str)
+QUtil_12::unsigned_char_pointer(std::string const& str)
 {
     return reinterpret_cast<unsigned char*>(const_cast<char*>(str.c_str()));
 }
 
 unsigned char*
-QUtil::unsigned_char_pointer(char const* str)
+QUtil_12::unsigned_char_pointer(char const* str)
 {
     return reinterpret_cast<unsigned char*>(const_cast<char*>(str));
 }
 
 void
-QUtil::throw_system_error(std::string const& description)
+QUtil_12::throw_system_error(std::string const& description)
 {
     throw QPDFSystemError(description, errno);
 }
 
 int
-QUtil::os_wrapper(std::string const& description, int status)
+QUtil_12::os_wrapper(std::string const& description, int status)
 {
     if (status == -1) {
         throw_system_error(description);
@@ -498,10 +497,10 @@ win_convert_filename(char const* filename)
     // Convert the utf-8 encoded filename argument to wchar_t*. First,
     // convert to utf16, then to wchar_t*. Note that u16 will start
     // with the UTF16 marker, which we skip.
-    std::string u16 = QUtil::utf8_to_utf16(filename);
+    std::string u16 = QUtil_12::utf8_to_utf16(filename);
     size_t len = u16.length();
     size_t wlen = (len / 2) - 1;
-    auto wfilenamep = QUtil::make_shared_array<wchar_t>(wlen + 1);
+    auto wfilenamep = QUtil_12::make_shared_array<wchar_t>(wlen + 1);
     wchar_t* wfilename = wfilenamep.get();
     wfilename[wlen] = 0;
     for (unsigned int i = 2; i < len; i += 2) {
@@ -514,13 +513,13 @@ win_convert_filename(char const* filename)
 #endif
 
 FILE*
-QUtil::safe_fopen(char const* filename, char const* mode)
+QUtil_12::safe_fopen(char const* filename, char const* mode)
 {
     FILE* f = nullptr;
 #ifdef _WIN32
     std::shared_ptr<wchar_t> wfilenamep = win_convert_filename(filename);
     wchar_t* wfilename = wfilenamep.get();
-    auto wmodep = QUtil::make_shared_array<wchar_t>(strlen(mode) + 1);
+    auto wmodep = QUtil_12::make_shared_array<wchar_t>(strlen(mode) + 1);
     wchar_t* wmode = wmodep.get();
     wmode[strlen(mode)] = 0;
     for (size_t i = 0; i < strlen(mode); ++i) {
@@ -545,7 +544,7 @@ QUtil::safe_fopen(char const* filename, char const* mode)
 }
 
 FILE*
-QUtil::fopen_wrapper(std::string const& description, FILE* f)
+QUtil_12::fopen_wrapper(std::string const& description, FILE* f)
 {
     if (f == nullptr) {
         throw_system_error(description);
@@ -554,7 +553,7 @@ QUtil::fopen_wrapper(std::string const& description, FILE* f)
 }
 
 bool
-QUtil::file_can_be_opened(char const* filename)
+QUtil_12::file_can_be_opened(char const* filename)
 {
     try {
         fclose(safe_fopen(filename, "rb"));
@@ -566,7 +565,7 @@ QUtil::file_can_be_opened(char const* filename)
 }
 
 int
-QUtil::seek(FILE* stream, qpdf_offset_t offset, int whence)
+QUtil_12::seek(FILE* stream, qpdf_offset_t offset, int whence)
 {
 #if HAVE_FSEEKO
     return fseeko(
@@ -585,7 +584,7 @@ QUtil::seek(FILE* stream, qpdf_offset_t offset, int whence)
 }
 
 qpdf_offset_t
-QUtil::tell(FILE* stream)
+QUtil_12::tell(FILE* stream)
 {
 #if HAVE_FSEEKO
     return QIntC::to_offset(ftello(stream));
@@ -601,7 +600,7 @@ QUtil::tell(FILE* stream)
 }
 
 bool
-QUtil::same_file(char const* name1, char const* name2)
+QUtil_12::same_file(char const* name1, char const* name2)
 {
     if ((name1 == nullptr) || (strlen(name1) == 0) || (name2 == nullptr) ||
         (strlen(name2) == 0)) {
@@ -656,7 +655,7 @@ QUtil::same_file(char const* name1, char const* name2)
 }
 
 void
-QUtil::remove_file(char const* path)
+QUtil_12::remove_file(char const* path)
 {
 #ifdef _WIN32
     std::shared_ptr<wchar_t> wpath = win_convert_filename(path);
@@ -667,7 +666,7 @@ QUtil::remove_file(char const* path)
 }
 
 void
-QUtil::rename_file(char const* oldname, char const* newname)
+QUtil_12::rename_file(char const* oldname, char const* newname)
 {
 #ifdef _WIN32
     try {
@@ -688,7 +687,7 @@ QUtil::rename_file(char const* oldname, char const* newname)
 }
 
 void
-QUtil::pipe_file(char const* filename, Pipeline* p)
+QUtil_12::pipe_file(char const* filename, Pipeline* p)
 {
     // Exercised in test suite by testing file_provider.
     FILE* f = safe_fopen(filename, "rb");
@@ -707,13 +706,13 @@ QUtil::pipe_file(char const* filename, Pipeline* p)
 }
 
 std::function<void(Pipeline*)>
-QUtil::file_provider(std::string const& filename)
+QUtil_12::file_provider(std::string const& filename)
 {
     return [filename](Pipeline* p) { pipe_file(filename.c_str(), p); };
 }
 
 std::string
-QUtil::path_basename(std::string const& filename)
+QUtil_12::path_basename(std::string const& filename)
 {
 #ifdef _WIN32
     char const* pathsep = "/\\";
@@ -738,7 +737,7 @@ QUtil::path_basename(std::string const& filename)
 }
 
 char*
-QUtil::copy_string(std::string const& str)
+QUtil_12::copy_string(std::string const& str)
 {
     char* result = new char[str.length() + 1];
     // Use memcpy in case string contains nulls
@@ -748,9 +747,9 @@ QUtil::copy_string(std::string const& str)
 }
 
 std::shared_ptr<char>
-QUtil::make_shared_cstr(std::string const& str)
+QUtil_12::make_shared_cstr(std::string const& str)
 {
-    auto result = QUtil::make_shared_array<char>(str.length() + 1);
+    auto result = QUtil_12::make_shared_array<char>(str.length() + 1);
     // Use memcpy in case string contains nulls
     result.get()[str.length()] = '\0';
     memcpy(result.get(), str.c_str(), str.length());
@@ -758,7 +757,7 @@ QUtil::make_shared_cstr(std::string const& str)
 }
 
 std::unique_ptr<char[]>
-QUtil::make_unique_cstr(std::string const& str)
+QUtil_12::make_unique_cstr(std::string const& str)
 {
     auto result = std::make_unique<char[]>(str.length() + 1);
     // Use memcpy in case string contains nulls
@@ -768,7 +767,7 @@ QUtil::make_unique_cstr(std::string const& str)
 }
 
 std::string
-QUtil::hex_encode(std::string const& input)
+QUtil_12::hex_encode(std::string const& input)
 {
     static auto constexpr hexchars = "0123456789abcdef";
     std::string result;
@@ -781,7 +780,7 @@ QUtil::hex_encode(std::string const& input)
 }
 
 std::string
-QUtil::hex_decode(std::string const& input)
+QUtil_12::hex_decode(std::string const& input)
 {
     std::string result;
     size_t pos = 0;
@@ -810,7 +809,7 @@ QUtil::hex_decode(std::string const& input)
 }
 
 void
-QUtil::binary_stdout()
+QUtil_12::binary_stdout()
 {
 #if defined(_WIN32) && defined(__BORLANDC__)
     setmode(_fileno(stdout), _O_BINARY);
@@ -820,7 +819,7 @@ QUtil::binary_stdout()
 }
 
 void
-QUtil::binary_stdin()
+QUtil_12::binary_stdin()
 {
 #if defined(_WIN32) && defined(__BORLANDC__)
     setmode(_fileno(stdin), _O_BINARY);
@@ -830,7 +829,7 @@ QUtil::binary_stdin()
 }
 
 void
-QUtil::setLineBuf(FILE* f)
+QUtil_12::setLineBuf(FILE* f)
 {
 #ifndef _WIN32
     setvbuf(f, reinterpret_cast<char*>(0), _IOLBF, 0);
@@ -838,7 +837,7 @@ QUtil::setLineBuf(FILE* f)
 }
 
 char*
-QUtil::getWhoami(char* argv0)
+QUtil_12::getWhoami(char* argv0)
 {
     char* whoami = nullptr;
     if (((whoami = strrchr(argv0, '/')) == NULL) &&
@@ -857,7 +856,7 @@ QUtil::getWhoami(char* argv0)
 }
 
 bool
-QUtil::get_env(std::string const& var, std::string* value)
+QUtil_12::get_env(std::string const& var, std::string* value)
 {
     // This was basically ripped out of wxWindows.
 #ifdef _WIN32
@@ -872,7 +871,7 @@ QUtil::get_env(std::string const& var, std::string* value)
     }
 
     if (value) {
-        auto t = QUtil::make_shared_array<char>(len + 1);
+        auto t = QUtil_12::make_shared_array<char>(len + 1);
         ::GetEnvironmentVariable(var.c_str(), t.get(), len);
         *value = t.get();
     }
@@ -893,7 +892,7 @@ QUtil::get_env(std::string const& var, std::string* value)
 }
 
 time_t
-QUtil::get_current_time()
+QUtil_12::get_current_time()
 {
 #ifdef _WIN32
     // The procedure to get local time at this resolution comes from
@@ -918,8 +917,8 @@ QUtil::get_current_time()
 #endif
 }
 
-QUtil::QPDFTime
-QUtil::get_current_qpdf_time()
+QUtil_12::QPDFTime
+QUtil_12::get_current_qpdf_time()
 {
 #ifdef _WIN32
     SYSTEMTIME ltime;
@@ -966,7 +965,7 @@ QUtil::get_current_qpdf_time()
 }
 
 std::string
-QUtil::qpdf_time_to_pdf_time(QPDFTime const& qtm)
+QUtil_12::qpdf_time_to_pdf_time(QPDFTime const& qtm)
 {
     std::string tz_offset;
     int t = qtm.tz_delta;
@@ -979,19 +978,20 @@ QUtil::qpdf_time_to_pdf_time(QPDFTime const& qtm)
         } else {
             tz_offset += "-";
         }
-        tz_offset += QUtil::int_to_string(t / 60, 2) + "'" +
-            QUtil::int_to_string(t % 60, 2) + "'";
+        tz_offset += QUtil_12::int_to_string(t / 60, 2) + "'" +
+            QUtil_12::int_to_string(t % 60, 2) + "'";
     }
     return (
-        "D:" + QUtil::int_to_string(qtm.year, 4) +
-        QUtil::int_to_string(qtm.month, 2) + QUtil::int_to_string(qtm.day, 2) +
-        QUtil::int_to_string(qtm.hour, 2) +
-        QUtil::int_to_string(qtm.minute, 2) +
-        QUtil::int_to_string(qtm.second, 2) + tz_offset);
+        "D:" + QUtil_12::int_to_string(qtm.year, 4) +
+        QUtil_12::int_to_string(qtm.month, 2) +
+        QUtil_12::int_to_string(qtm.day, 2) +
+        QUtil_12::int_to_string(qtm.hour, 2) +
+        QUtil_12::int_to_string(qtm.minute, 2) +
+        QUtil_12::int_to_string(qtm.second, 2) + tz_offset);
 }
 
 std::string
-QUtil::qpdf_time_to_iso8601(QPDFTime const& qtm)
+QUtil_12::qpdf_time_to_iso8601(QPDFTime const& qtm)
 {
     std::string tz_offset;
     int t = qtm.tz_delta;
@@ -1004,20 +1004,20 @@ QUtil::qpdf_time_to_iso8601(QPDFTime const& qtm)
         } else {
             tz_offset += "-";
         }
-        tz_offset += QUtil::int_to_string(t / 60, 2) + ":" +
-            QUtil::int_to_string(t % 60, 2);
+        tz_offset += QUtil_12::int_to_string(t / 60, 2) + ":" +
+            QUtil_12::int_to_string(t % 60, 2);
     }
     return (
-        QUtil::int_to_string(qtm.year, 4) + "-" +
-        QUtil::int_to_string(qtm.month, 2) + "-" +
-        QUtil::int_to_string(qtm.day, 2) + "T" +
-        QUtil::int_to_string(qtm.hour, 2) + ":" +
-        QUtil::int_to_string(qtm.minute, 2) + ":" +
-        QUtil::int_to_string(qtm.second, 2) + tz_offset);
+        QUtil_12::int_to_string(qtm.year, 4) + "-" +
+        QUtil_12::int_to_string(qtm.month, 2) + "-" +
+        QUtil_12::int_to_string(qtm.day, 2) + "T" +
+        QUtil_12::int_to_string(qtm.hour, 2) + ":" +
+        QUtil_12::int_to_string(qtm.minute, 2) + ":" +
+        QUtil_12::int_to_string(qtm.second, 2) + tz_offset);
 }
 
 bool
-QUtil::pdf_time_to_qpdf_time(std::string const& str, QPDFTime* qtm)
+QUtil_12::pdf_time_to_qpdf_time(std::string const& str, QPDFTime* qtm)
 {
     static std::regex pdf_date("^D:([0-9]{4})([0-9]{2})([0-9]{2})"
                                "([0-9]{2})([0-9]{2})([0-9]{2})"
@@ -1028,7 +1028,7 @@ QUtil::pdf_time_to_qpdf_time(std::string const& str, QPDFTime* qtm)
     }
     int tz_delta = 0;
     auto to_i = [](std::string const& s) {
-        return QUtil::string_to_int(s.c_str());
+        return QUtil_12::string_to_int(s.c_str());
     };
 
     if (m[8] != "") {
@@ -1051,7 +1051,7 @@ QUtil::pdf_time_to_qpdf_time(std::string const& str, QPDFTime* qtm)
 }
 
 bool
-QUtil::pdf_time_to_iso8601(std::string const& pdf_time, std::string& iso8601)
+QUtil_12::pdf_time_to_iso8601(std::string const& pdf_time, std::string& iso8601)
 {
     QPDFTime qtm;
     if (pdf_time_to_qpdf_time(pdf_time, &qtm)) {
@@ -1062,7 +1062,7 @@ QUtil::pdf_time_to_iso8601(std::string const& pdf_time, std::string& iso8601)
 }
 
 std::string
-QUtil::toUTF8(unsigned long uval)
+QUtil_12::toUTF8(unsigned long uval)
 {
     std::string result;
 
@@ -1077,7 +1077,7 @@ QUtil::toUTF8(unsigned long uval)
     // remaining bits.
 
     if (uval > 0x7fffffff) {
-        throw std::runtime_error("bounds error in QUtil::toUTF8");
+        throw std::runtime_error("bounds error in QUtil_12::toUTF8");
     } else if (uval < 128) {
         result += static_cast<char>(uval);
     } else {
@@ -1097,7 +1097,7 @@ QUtil::toUTF8(unsigned long uval)
             maxval = static_cast<unsigned char>(maxval >> 1);
             // Slide to the left one byte
             if (cur_byte <= bytes) {
-                throw std::logic_error("QUtil::toUTF8: overflow error");
+                throw std::logic_error("QUtil_12::toUTF8: overflow error");
             }
             --cur_byte;
         }
@@ -1113,7 +1113,7 @@ QUtil::toUTF8(unsigned long uval)
 }
 
 std::string
-QUtil::toUTF16(unsigned long uval)
+QUtil_12::toUTF16(unsigned long uval)
 {
     std::string result;
     if ((uval >= 0xd800) && (uval <= 0xdfff)) {
@@ -1187,25 +1187,25 @@ getRandomDataProviderProvider()
 }
 
 void
-QUtil::setRandomDataProvider(RandomDataProvider* p)
+QUtil_12::setRandomDataProvider(RandomDataProvider* p)
 {
     getRandomDataProviderProvider()->setProvider(p);
 }
 
 RandomDataProvider*
-QUtil::getRandomDataProvider()
+QUtil_12::getRandomDataProvider()
 {
     return getRandomDataProviderProvider()->getProvider();
 }
 
 void
-QUtil::initializeWithRandomBytes(unsigned char* data, size_t len)
+QUtil_12::initializeWithRandomBytes(unsigned char* data, size_t len)
 {
     getRandomDataProvider()->provideRandomData(data, len);
 }
 
 long
-QUtil::random()
+QUtil_12::random()
 {
     long result = 0L;
     initializeWithRandomBytes(
@@ -1214,15 +1214,15 @@ QUtil::random()
 }
 
 void
-QUtil::read_file_into_memory(
+QUtil_12::read_file_into_memory(
     char const* filename, std::shared_ptr<char>& file_buf, size_t& size)
 {
     FILE* f = safe_fopen(filename, "rb");
     FileCloser fc(f);
     fseek(f, 0, SEEK_END);
-    size = QIntC::to_size(QUtil::tell(f));
+    size = QIntC::to_size(QUtil_12::tell(f));
     fseek(f, 0, SEEK_SET);
-    file_buf = QUtil::make_shared_array<char>(size);
+    file_buf = QUtil_12::make_shared_array<char>(size);
     char* buf_p = file_buf.get();
     size_t bytes_read = 0;
     size_t len = 0;
@@ -1258,7 +1258,7 @@ read_char_from_FILE(char& ch, FILE* f)
 }
 
 std::list<std::string>
-QUtil::read_lines_from_file(char const* filename, bool preserve_eol)
+QUtil_12::read_lines_from_file(char const* filename, bool preserve_eol)
 {
     std::list<std::string> lines;
     FILE* f = safe_fopen(filename, "rb");
@@ -1269,7 +1269,7 @@ QUtil::read_lines_from_file(char const* filename, bool preserve_eol)
 }
 
 std::list<std::string>
-QUtil::read_lines_from_file(std::istream& in, bool preserve_eol)
+QUtil_12::read_lines_from_file(std::istream& in, bool preserve_eol)
 {
     std::list<std::string> lines;
     auto next_char = [&in](char& ch) { return (in.get(ch)) ? true : false; };
@@ -1278,7 +1278,7 @@ QUtil::read_lines_from_file(std::istream& in, bool preserve_eol)
 }
 
 std::list<std::string>
-QUtil::read_lines_from_file(FILE* f, bool preserve_eol)
+QUtil_12::read_lines_from_file(FILE* f, bool preserve_eol)
 {
     std::list<std::string> lines;
     auto next_char = [&f](char& ch) { return read_char_from_FILE(ch, f); };
@@ -1287,7 +1287,7 @@ QUtil::read_lines_from_file(FILE* f, bool preserve_eol)
 }
 
 void
-QUtil::read_lines_from_file(
+QUtil_12::read_lines_from_file(
     std::function<bool(char&)> next_char,
     std::list<std::string>& lines,
     bool preserve_eol)
@@ -1322,7 +1322,7 @@ QUtil::read_lines_from_file(
 }
 
 int
-QUtil::str_compare_nocase(char const* s1, char const* s2)
+QUtil_12::str_compare_nocase(char const* s1, char const* s2)
 {
 #if defined(_WIN32) && defined(__BORLANDC__)
     return stricmp(s1, s2);
@@ -1347,7 +1347,7 @@ maybe_from_end(int num, bool from_end, int max)
 }
 
 std::vector<int>
-QUtil::parse_numrange(char const* range, int max)
+QUtil_12::parse_numrange(char const* range, int max)
 {
     std::vector<int> result;
     char const* p = range;
@@ -1438,7 +1438,7 @@ QUtil::parse_numrange(char const* range, int max)
             // testing for valid syntax.
             if ((max > 0) && ((num < 1) || (num > max))) {
                 throw std::runtime_error(
-                    "number " + QUtil::int_to_string(num) + " out of range");
+                    "number " + QUtil_12::int_to_string(num) + " out of range");
             }
             if (i == 0) {
                 result.push_back(work.at(i));
@@ -1518,7 +1518,7 @@ encode_pdfdoc(unsigned long codepoint)
 }
 
 unsigned long
-QUtil::get_next_utf8_codepoint(
+QUtil_12::get_next_utf8_codepoint(
     std::string const& utf8_val, size_t& pos, bool& error)
 {
     size_t len = utf8_val.length();
@@ -1602,7 +1602,7 @@ transcode_utf8(
     while (pos < len) {
         bool error = false;
         unsigned long codepoint =
-            QUtil::get_next_utf8_codepoint(utf8_val, pos, error);
+            QUtil_12::get_next_utf8_codepoint(utf8_val, pos, error);
         if (error) {
             okay = false;
             if (encoding == e_utf16) {
@@ -1613,7 +1613,7 @@ transcode_utf8(
         } else if (codepoint < 128) {
             char ch = static_cast<char>(codepoint);
             if (encoding == e_utf16) {
-                result += QUtil::toUTF16(QIntC::to_ulong(ch));
+                result += QUtil_12::toUTF16(QIntC::to_ulong(ch));
             } else if (
                 (encoding == e_pdfdoc) &&
                 (((ch >= 0x18) && (ch <= 0x1f)) || (ch == 127))) {
@@ -1627,7 +1627,7 @@ transcode_utf8(
                 result.append(1, ch);
             }
         } else if (encoding == e_utf16) {
-            result += QUtil::toUTF16(codepoint);
+            result += QUtil_12::toUTF16(codepoint);
         } else if ((codepoint == 0xad) && (encoding == e_pdfdoc)) {
             // PDFDocEncoding omits 0x00ad (soft hyphen).
             okay = false;
@@ -1664,65 +1664,65 @@ transcode_utf8(std::string const& utf8_val, encoding_e encoding, char unknown)
 }
 
 std::string
-QUtil::utf8_to_utf16(std::string const& utf8)
+QUtil_12::utf8_to_utf16(std::string const& utf8)
 {
     return transcode_utf8(utf8, e_utf16, 0);
 }
 
 std::string
-QUtil::utf8_to_ascii(std::string const& utf8, char unknown_char)
+QUtil_12::utf8_to_ascii(std::string const& utf8, char unknown_char)
 {
     return transcode_utf8(utf8, e_ascii, unknown_char);
 }
 
 std::string
-QUtil::utf8_to_win_ansi(std::string const& utf8, char unknown_char)
+QUtil_12::utf8_to_win_ansi(std::string const& utf8, char unknown_char)
 {
     return transcode_utf8(utf8, e_winansi, unknown_char);
 }
 
 std::string
-QUtil::utf8_to_mac_roman(std::string const& utf8, char unknown_char)
+QUtil_12::utf8_to_mac_roman(std::string const& utf8, char unknown_char)
 {
     return transcode_utf8(utf8, e_macroman, unknown_char);
 }
 
 std::string
-QUtil::utf8_to_pdf_doc(std::string const& utf8, char unknown_char)
+QUtil_12::utf8_to_pdf_doc(std::string const& utf8, char unknown_char)
 {
     return transcode_utf8(utf8, e_pdfdoc, unknown_char);
 }
 
 bool
-QUtil::utf8_to_ascii(
+QUtil_12::utf8_to_ascii(
     std::string const& utf8, std::string& ascii, char unknown_char)
 {
     return transcode_utf8(utf8, ascii, e_ascii, unknown_char);
 }
 
 bool
-QUtil::utf8_to_win_ansi(
+QUtil_12::utf8_to_win_ansi(
     std::string const& utf8, std::string& win, char unknown_char)
 {
     return transcode_utf8(utf8, win, e_winansi, unknown_char);
 }
 
 bool
-QUtil::utf8_to_mac_roman(
+QUtil_12::utf8_to_mac_roman(
     std::string const& utf8, std::string& mac, char unknown_char)
 {
     return transcode_utf8(utf8, mac, e_macroman, unknown_char);
 }
 
 bool
-QUtil::utf8_to_pdf_doc(
+QUtil_12::utf8_to_pdf_doc(
     std::string const& utf8, std::string& pdfdoc, char unknown_char)
 {
     return transcode_utf8(utf8, pdfdoc, e_pdfdoc, unknown_char);
 }
 
 bool
-QUtil::is_utf16(std::string const& val)
+QUtil_12::is_utf16(std::string const& val)
 {
     return (
         (val.length() >= 2) &&
@@ -1731,7 +1731,7 @@ QUtil::is_utf16(std::string const& val)
 }
 
 bool
-QUtil::is_explicit_utf8(std::string const& val)
+QUtil_12::is_explicit_utf8(std::string const& val)
 {
     // QPDF_String.cc knows that this is a 3-byte sequence.
     return (
@@ -1740,13 +1740,57 @@ QUtil::is_explicit_utf8(std::string const& val)
 }
 
 std::string
-QUtil::utf16_to_utf8(std::string const& val)
+QUtil_12::utf16_to_utf8(std::string const& val)
 {
-    return QUtil_12::utf16_to_utf8(val);
+    std::string result;
+    // This code uses unsigned long and unsigned short to hold
+    // codepoint values. It requires unsigned long to be at least
+    // 32 bits and unsigned short to be at least 16 bits, but it
+    // will work fine if they are larger.
+    unsigned long codepoint = 0L;
+    size_t len = val.length();
+    size_t start = 0;
+    bool is_le = false;
+    if (is_utf16(val)) {
+        if (static_cast<unsigned char>(val.at(0)) == 0xff) {
+            is_le = true;
+        }
+        start += 2;
+    }
+    // If the string has an odd number of bytes, the last byte is
+    // ignored.
+    for (size_t i = start; i + 1 < len; i += 2) {
+        // Convert from UTF16-BE.  If we get a malformed
+        // codepoint, this code will generate incorrect output
+        // without giving a warning.  Specifically, a high
+        // codepoint not followed by a low codepoint will be
+        // discarded, and a low codepoint not preceded by a high
+        // codepoint will just get its low 10 bits output.
+        auto msb = is_le ? i + 1 : i;
+        auto lsb = is_le ? i : i + 1;
+        unsigned short bits = QIntC::to_ushort(
+            (static_cast<unsigned char>(val.at(msb)) << 8) +
+            static_cast<unsigned char>(val.at(lsb)));
+        if ((bits & 0xFC00) == 0xD800) {
+            codepoint = 0x10000U + ((bits & 0x3FFU) << 10U);
+            continue;
+        } else if ((bits & 0xFC00) == 0xDC00) {
+            if (codepoint != 0) {
+                QTC::TC("qpdf", "QUtil non-trivial UTF-16");
+            }
+            codepoint += bits & 0x3FF;
+        } else {
+            codepoint = bits;
+        }
+
+        result += QUtil_12::toUTF8(codepoint);
+        codepoint = 0;
+    }
+    return result;
 }
 
 std::string
-QUtil::win_ansi_to_utf8(std::string const& val)
+QUtil_12::win_ansi_to_utf8(std::string const& val)
 {
     std::string result;
     size_t len = val.length();
@@ -1756,13 +1800,13 @@ QUtil::win_ansi_to_utf8(std::string const& val)
         if ((ch >= 128) && (ch <= 160)) {
             ch_short = win_ansi_to_unicode[ch - 128];
         }
-        result += QUtil::toUTF8(ch_short);
+        result += QUtil_12::toUTF8(ch_short);
     }
     return result;
 }
 
 std::string
-QUtil::mac_roman_to_utf8(std::string const& val)
+QUtil_12::mac_roman_to_utf8(std::string const& val)
 {
     std::string result;
     size_t len = val.length();
@@ -1772,13 +1816,13 @@ QUtil::mac_roman_to_utf8(std::string const& val)
         if (ch >= 128) {
             ch_short = mac_roman_to_unicode[ch - 128];
         }
-        result += QUtil::toUTF8(ch_short);
+        result += QUtil_12::toUTF8(ch_short);
     }
     return result;
 }
 
 std::string
-QUtil::pdf_doc_to_utf8(std::string const& val)
+QUtil_12::pdf_doc_to_utf8(std::string const& val)
 {
     std::string result;
     size_t len = val.length();
@@ -1792,20 +1836,20 @@ QUtil::pdf_doc_to_utf8(std::string const& val)
         } else if (ch == 173) {
             ch_short = 0xfffd;
         }
-        result += QUtil::toUTF8(ch_short);
+        result += QUtil_12::toUTF8(ch_short);
     }
     return result;
 }
 
 void
-QUtil::analyze_encoding(
+QUtil_12::analyze_encoding(
     std::string const& val,
     bool& has_8bit_chars,
     bool& is_valid_utf8,
     bool& is_utf16)
 {
     has_8bit_chars = is_utf16 = is_valid_utf8 = false;
-    if (QUtil::is_utf16(val)) {
+    if (QUtil_12::is_utf16(val)) {
         has_8bit_chars = true;
         is_utf16 = true;
         return;
@@ -1829,7 +1873,7 @@ QUtil::analyze_encoding(
 }
 
 std::vector<std::string>
-QUtil::possible_repaired_encodings(std::string supplied)
+QUtil_12::possible_repaired_encodings(std::string supplied)
 {
     std::vector<std::string> result;
     // Always include the original string
@@ -1925,8 +1969,8 @@ call_main_from_wmain(
             utf16.append(
                 1, static_cast<char>(QIntC::to_uchar(codepoint & 0xff)));
         }
-        std::string utf8 = QUtil::utf16_to_utf8(utf16);
-        utf8_argv.push_back(QUtil::make_unique_cstr(utf8));
+        std::string utf8 = QUtil_12::utf16_to_utf8(utf16);
+        utf8_argv.push_back(QUtil_12::make_unique_cstr(utf8));
     }
     auto utf8_argv_sp = std::make_unique<char*[]>(1 + utf8_argv.size());
     char** new_argv = utf8_argv_sp.get();
@@ -1939,14 +1983,14 @@ call_main_from_wmain(
 }
 
 int
-QUtil::call_main_from_wmain(
+QUtil_12::call_main_from_wmain(
     int argc, wchar_t* argv[], std::function<int(int, char*[])> realmain)
 {
     return ::call_main_from_wmain(true, argc, argv, realmain);
 }
 
 int
-QUtil::call_main_from_wmain(
+QUtil_12::call_main_from_wmain(
     int argc,
     wchar_t const* const argv[],
     std::function<int(int, char const* const[])> realmain)
@@ -1960,7 +2004,7 @@ QUtil::call_main_from_wmain(
 #endif // QPDF_NO_WCHAR_T
 
 size_t
-QUtil::get_max_memory_usage()
+QUtil_12::get_max_memory_usage()
 {
 #if defined(HAVE_MALLOC_INFO) && defined(HAVE_OPEN_MEMSTREAM)
     static std::regex tag_re("<(/?\\w+)([^>]*?)>");
@@ -1974,7 +2018,7 @@ QUtil::get_max_memory_usage()
     }
     malloc_info(0, f);
     fclose(f);
-    if (QUtil::get_env("QPDF_DEBUG_MEM_USAGE")) {
+    if (QUtil_12::get_env("QPDF_DEBUG_MEM_USAGE")) {
         fprintf(stderr, "%s", buf);
     }
 
@@ -2011,11 +2055,11 @@ QUtil::get_max_memory_usage()
                 if (tag == "total") {
                     if (attrs.count("size") > 0) {
                         result += QIntC::to_size(
-                            QUtil::string_to_ull(attrs["size"].c_str()));
+                            QUtil_12::string_to_ull(attrs["size"].c_str()));
                     }
                 } else if (tag == "system" && attrs["type"] == "max") {
                     result += QIntC::to_size(
-                        QUtil::string_to_ull(attrs["size"].c_str()));
+                        QUtil_12::string_to_ull(attrs["size"].c_str()));
                 }
             }
         }

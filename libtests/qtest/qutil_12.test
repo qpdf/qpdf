@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("qutil") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('qutil_12');
+
+$td->runtest("QUtil",
+             {$td->COMMAND => "qutil"},
+             {$td->FILE => "qutil.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES | $td->RM_WS_ONLY_LINES);
+
+my $mfw = `main_from_wmain`;
+if ($mfw eq '')
+{
+    $td->runtest("skipping main_from_wmain",
+                 {$td->STRING => ""},
+                 {$td->STRING => ""})
+}
+else
+{
+    $td->runtest("main_from_wmain",
+                 {$td->COMMAND => "main_from_wmain_12"},
+                 {$td->FILE => "wmain.out",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES | $td->RM_WS_ONLY_LINES);
+}
+
+$td->report(2);
