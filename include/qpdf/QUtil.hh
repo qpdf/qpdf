@@ -210,6 +210,11 @@ namespace QUtil
     QPDF_DLL
     std::string hex_encode(std::string const&);
 
+    // Returns lower-case hex-encoded version of the char including a leading
+    // "#".
+    QPDF_DLL
+    inline std::string hex_encode_char(char);
+
     // Returns a string that is the result of decoding the input
     // string. The input string may consist of mixed case hexadecimal
     // digits. Any characters that are not hexadecimal digits will be
@@ -581,6 +586,14 @@ QUtil::is_number(char const* p)
         }
     }
     return found_digit;
+}
+
+inline std::string
+QUtil::hex_encode_char(char c)
+{
+    static auto constexpr hexchars = "0123456789abcdef";
+    return {
+        '#', hexchars[static_cast<unsigned char>(c) >> 4], hexchars[c & 0x0f]};
 }
 
 #endif // QUTIL_HH

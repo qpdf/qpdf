@@ -38,7 +38,7 @@ QPDF_Name::normalizeName(std::string const& name)
             // invalid #.
             result += "#";
         } else if (strchr("#()<>[]{}/%", ch) || (ch < 33) || (ch > 126)) {
-            result += "#" + QUtil::hex_encode(std::string(&ch, 1));
+            result += QUtil::hex_encode_char(ch);
         } else {
             result += ch;
         }
