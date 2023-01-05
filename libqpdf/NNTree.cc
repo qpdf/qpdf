@@ -638,26 +638,21 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
     auto opath = this->path;
     bool failed = false;
 
-    std::set<QPDFObjGen> seen;
+    QPDFObjGen::set seen;
     for (auto i: this->path) {
-        if (i.node.isIndirect()) {
-            seen.insert(i.node.getObjGen());
-        }
+        seen.add(i.node);
     }
     while (!failed) {
-        if (node.isIndirect()) {
-            auto og = node.getObjGen();
-            if (seen.count(og)) {
-                QTC::TC("qpdf", "NNTree deepen: loop");
-                warn(
-                    impl.qpdf,
-                    node,
-                    "loop detected while traversing name/number tree");
-                failed = true;
-                break;
-            }
-            seen.insert(og);
+        if (!seen.add(node)) {
+            QTC::TC("qpdf", "NNTree deepen: loop");
+            warn(
+                impl.qpdf,
+                node,
+                "loop detected while traversing name/number tree");
+            failed = true;
+            break;
         }
+
         if (!node.isDictionary()) {
             QTC::TC("qpdf", "NNTree node is not a dictionary");
             warn(
@@ -928,17 +923,15 @@ NNTreeImpl::findInternal(QPDFObjectHandle key, bool return_prev_if_not_found)
         }
     }
 
-    std::set<QPDFObjGen> seen;
+    QPDFObjGen::set seen;
     auto node = this->oh;
     iterator result(*this);
 
     while (true) {
-        auto og = node.getObjGen();
-        if (seen.count(og)) {
+        if (!seen.add(node)) {
             QTC::TC("qpdf", "NNTree loop in find");
             error(qpdf, node, "loop detected in find");
         }
-        seen.insert(og);
 
         auto kids = node.getKey("/Kids");
         int nkids = kids.isArray() ? kids.getArrayNItems() : 0;
