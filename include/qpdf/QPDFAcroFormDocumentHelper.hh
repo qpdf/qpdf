@@ -254,7 +254,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
         QPDFObjectHandle field,
         QPDFObjectHandle parent,
         int depth,
-        std::set<QPDFObjGen>& visited);
+        QPDFObjGen::set& visited);
     QPDFObjectHandle getOrCreateAcroForm();
     void adjustInheritedFields(
         QPDFObjectHandle obj,

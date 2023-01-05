@@ -57,7 +57,7 @@ QPDFAcroFormDocumentHelper::addFormField(QPDFFormFieldObjectHelper ff)
             "/Fields", QPDFObjectHandle::newArray());
     }
     fields.appendItem(ff.getObjectHandle());
-    std::set<QPDFObjGen> visited;
+    QPDFObjGen::set visited;
     traverseField(
         ff.getObjectHandle(), QPDFObjectHandle::newNull(), 0, visited);
 }
@@ -167,7 +167,7 @@ QPDFAcroFormDocumentHelper::setFormFieldName(
     QPDFFormFieldObjectHelper ff, std::string const& name)
 {
     ff.setFieldAttribute("/T", name);
-    std::set<QPDFObjGen> visited;
+    QPDFObjGen::set visited;
     auto ff_oh = ff.getObjectHandle();
     traverseField(ff_oh, ff_oh.getKey("/Parent"), 0, visited);
 }
@@ -273,7 +273,7 @@ QPDFAcroFormDocumentHelper::analyze()
     // Traverse /AcroForm to find annotations and map them
     // bidirectionally to fields.
 
-    std::set<QPDFObjGen> visited;
+    QPDFObjGen::set visited;
     int nfields = fields.getArrayNItems();
     QPDFObjectHandle null(QPDFObjectHandle::newNull());
     for (int i = 0; i < nfields; ++i) {
@@ -319,7 +319,7 @@ QPDFAcroFormDocumentHelper::traverseField(
     QPDFObjectHandle field,
     QPDFObjectHandle parent,
     int depth,
-    std::set<QPDFObjGen>& visited)
+    QPDFObjGen::set& visited)
 {
     if (depth > 100) {
         // Arbitrarily cut off recursion at a fixed depth to avoid
@@ -341,12 +341,11 @@ QPDFAcroFormDocumentHelper::traverseField(
         return;
     }
     QPDFObjGen og(field.getObjGen());
-    if (visited.count(og) != 0) {
+    if (!visited.add(og)) {
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper loop");
         field.warnIfPossible("loop detected while traversing /AcroForm");
         return;
     }
-    visited.insert(og);
 
     // A dictionary encountered while traversing the /AcroForm field
     // may be a form field, an annotation, or the merger of the two. A
