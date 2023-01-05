@@ -15,13 +15,8 @@ QPDFOutlineDocumentHelper::QPDFOutlineDocumentHelper(QPDF& qpdf) :
         return;
     }
     QPDFObjectHandle cur = outlines.getKey("/First");
-    std::set<QPDFObjGen> seen;
-    while (!cur.isNull()) {
-        auto og = cur.getObjGen();
-        if (seen.count(og)) {
-            break;
-        }
-        seen.insert(og);
+    QPDFObjGen::set seen;
+    while (!cur.isNull() && seen.add(cur)) {
         this->m->outlines.push_back(
             QPDFOutlineObjectHelper::Accessor::create(cur, *this, 1));
         cur = cur.getKey("/Next");
@@ -103,14 +98,4 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
         result = QPDFObjectHandle::newNull();
     }
     return result;
-}
-
-bool
-QPDFOutlineDocumentHelper::checkSeen(QPDFObjGen const& og)
-{
-    if (this->m->seen.count(og) > 0) {
-        return true;
-    }
-    this->m->seen.insert(og);
-    return false;
 }
