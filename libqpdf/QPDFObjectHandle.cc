@@ -1588,22 +1588,12 @@ QPDFObjectHandle::rotatePage(int angle, bool relative)
     int new_angle = angle;
     if (relative) {
         int old_angle = 0;
-        bool found_rotate = false;
         QPDFObjectHandle cur_obj = *this;
-        bool searched_parent = false;
-        std::set<QPDFObjGen> visited;
-        while (!found_rotate) {
-            if (visited.count(cur_obj.getObjGen())) {
-                // Don't get stuck in an infinite loop
+        QPDFObjGen::set visited;
+        while (visited.add(cur_obj)) {
+            // Don't get stuck in an infinite loop
+            if (cur_obj.getKey("/Rotate").getValueAsInt(old_angle)) {
                 break;
-            }
-            if (!visited.empty()) {
-                searched_parent = true;
-            }
-            visited.insert(cur_obj.getObjGen());
-            if (cur_obj.getKey("/Rotate").isInteger()) {
-                found_rotate = true;
-                old_angle = cur_obj.getKey("/Rotate").getIntValueAsInt();
             } else if (cur_obj.getKey("/Parent").isDictionary()) {
                 cur_obj = cur_obj.getKey("/Parent");
             } else {
@@ -1613,7 +1603,7 @@ QPDFObjectHandle::rotatePage(int angle, bool relative)
         QTC::TC(
             "qpdf",
             "QPDFObjectHandle found old angle",
-            searched_parent ? 0 : 1);
+            visited.size() > 1 ? 0 : 1);
         if ((old_angle % 90) != 0) {
             old_angle = 0;
         }
@@ -2181,20 +2171,15 @@ QPDFObjectHandle::unsafeShallowCopy()
 }
 
 void
-QPDFObjectHandle::makeDirect(
-    std::set<QPDFObjGen>& visited, bool stop_at_streams)
+QPDFObjectHandle::makeDirect(QPDFObjGen::set& visited, bool stop_at_streams)
 {
     assertInitialized();
 
     auto cur_og = getObjGen();
-    if (cur_og.getObj() != 0) {
-        if (visited.count(cur_og)) {
-            QTC::TC("qpdf", "QPDFObjectHandle makeDirect loop");
-            throw std::runtime_error(
-                "loop detected while converting object from "
-                "indirect to direct");
-        }
-        visited.insert(cur_og);
+    if (!visited.add(cur_og)) {
+        QTC::TC("qpdf", "QPDFObjectHandle makeDirect loop");
+        throw std::runtime_error("loop detected while converting object from "
+                                 "indirect to direct");
     }
 
     if (isBool() || isInteger() || isName() || isNull() || isReal() ||
@@ -2232,9 +2217,7 @@ QPDFObjectHandle::makeDirect(
                                "unknown object type");
     }
 
-    if (cur_og.getObj()) {
-        visited.erase(cur_og);
-    }
+    visited.erase(cur_og);
 }
 
 QPDFObjectHandle
@@ -2258,7 +2241,7 @@ QPDFObjectHandle::copyStream()
 void
 QPDFObjectHandle::makeDirect(bool allow_streams)
 {
-    std::set<QPDFObjGen> visited;
+    QPDFObjGen::set visited;
     makeDirect(visited, allow_streams);
 }
 
