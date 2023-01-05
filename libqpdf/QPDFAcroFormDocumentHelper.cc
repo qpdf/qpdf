@@ -188,12 +188,11 @@ QPDFAcroFormDocumentHelper::getFieldsWithQualifiedName(std::string const& name)
 {
     analyze();
     // Keep from creating an empty entry
-    std::set<QPDFObjGen> result;
     auto iter = this->m->name_to_fields.find(name);
     if (iter != this->m->name_to_fields.end()) {
-        result = iter->second;
+        return iter->second;
     }
-    return result;
+    return {};
 }
 
 std::vector<QPDFAnnotationObjectHelper>
