@@ -217,18 +217,12 @@ std::vector<QPDFFormFieldObjectHelper>
 QPDFAcroFormDocumentHelper::getFormFieldsForPage(QPDFPageObjectHelper ph)
 {
     analyze();
-    std::set<QPDFObjGen> added;
+    QPDFObjGen::set todo;
     std::vector<QPDFFormFieldObjectHelper> result;
-    auto widget_annotations = getWidgetAnnotationsForPage(ph);
-    for (auto annot: widget_annotations) {
-        auto field = getFieldForAnnotation(annot);
-        field = field.getTopLevelField();
-        auto og = field.getObjectHandle().getObjGen();
-        if (!added.count(og)) {
-            added.insert(og);
-            if (field.getObjectHandle().isDictionary()) {
-                result.push_back(field);
-            }
+    for (auto& annot: getWidgetAnnotationsForPage(ph)) {
+        auto field = getFieldForAnnotation(annot).getTopLevelField();
+        if (todo.add(field) && field.getObjectHandle().isDictionary()) {
+            result.push_back(field);
         }
     }
     return result;
