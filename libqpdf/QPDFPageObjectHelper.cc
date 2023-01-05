@@ -246,32 +246,23 @@ QPDFPageObjectHelper::getAttribute(
     std::function<QPDFObjectHandle()> get_fallback,
     bool copy_if_fallback)
 {
-    QPDFObjectHandle result;
-    QPDFObjectHandle dict;
-    bool is_form_xobject = this->oh.isFormXObject();
+    const bool is_form_xobject = this->oh.isFormXObject();
     bool inherited = false;
-    if (is_form_xobject) {
-        dict = this->oh.getDict();
-        result = dict.getKey(name);
-    } else {
-        dict = this->oh;
-        bool inheritable =
-            ((name == "/MediaBox") || (name == "/CropBox") ||
-             (name == "/Resources") || (name == "/Rotate"));
+    auto dict = is_form_xobject ? oh.getDict() : oh;
+    auto result = dict.getKey(name);
 
+    if (!is_form_xobject && result.isNull() &&
+        (name == "/MediaBox" || name == "/CropBox" || name == "/Resources" ||
+         name == "/Rotate")) {
         QPDFObjectHandle node = dict;
-        result = node.getKey(name);
-        std::set<QPDFObjGen> seen;
-        while (inheritable && result.isNull() && node.hasKey("/Parent")) {
-            seen.insert(node.getObjGen());
+        QPDFObjGen::set seen{};
+        while (seen.add(node) && node.hasKey("/Parent")) {
             node = node.getKey("/Parent");
-            if (seen.count(node.getObjGen())) {
-                break;
-            }
             result = node.getKey(name);
             if (!result.isNull()) {
                 QTC::TC("qpdf", "QPDFPageObjectHelper non-trivial inheritance");
                 inherited = true;
+                break;
             }
         }
     }
