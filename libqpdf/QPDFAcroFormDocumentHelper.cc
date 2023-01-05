@@ -68,53 +68,48 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(
 {
     analyze();
     std::map<std::string, std::string> renames;
-    std::list<QPDFObjectHandle> queue;
-    queue.insert(queue.begin(), fields.begin(), fields.end());
-    std::set<QPDFObjGen> seen;
-    while (!queue.empty()) {
-        QPDFObjectHandle obj = queue.front();
-        queue.pop_front();
-        auto og = obj.getObjGen();
-        if (seen.count(og)) {
-            // loop
-            continue;
-        }
-        seen.insert(og);
-        auto kids = obj.getKey("/Kids");
-        if (kids.isArray()) {
-            for (auto kid: kids.aitems()) {
-                queue.push_back(kid);
-            }
-        }
-
-        if (obj.hasKey("/T")) {
-            // Find something we can append to the partial name that
-            // makes the fully qualified name unique. When we find
-            // something, reuse the same suffix for all fields in this
-            // group with the same name. We can only change the name
-            // of fields that have /T, and this field's /T is always
-            // at the end of the fully qualified name, appending to /T
-            // has the effect of appending the same thing to the fully
-            // qualified name.
-            std::string old_name =
-                QPDFFormFieldObjectHelper(obj).getFullyQualifiedName();
-            if (renames.count(old_name) == 0) {
-                std::string new_name = old_name;
-                int suffix = 0;
-                std::string append;
-                while (!getFieldsWithQualifiedName(new_name).empty()) {
-                    ++suffix;
-                    append = "+" + std::to_string(suffix);
-                    new_name = old_name + append;
+    QPDFObjGen::set seen;
+    for (std::list<QPDFObjectHandle> queue{fields.begin(), fields.end()};
+         !queue.empty();
+         queue.pop_front()) {
+        auto& obj = queue.front();
+        if (seen.add(obj)) {
+            auto kids = obj.getKey("/Kids");
+            if (kids.isArray()) {
+                for (auto kid: kids.aitems()) {
+                    queue.push_back(kid);
                 }
-                renames[old_name] = append;
             }
-            std::string append = renames[old_name];
-            if (!append.empty()) {
-                obj.replaceKey(
-                    "/T",
-                    QPDFObjectHandle::newUnicodeString(
-                        obj.getKey("/T").getUTF8Value() + append));
+
+            if (obj.hasKey("/T")) {
+                // Find something we can append to the partial name that
+                // makes the fully qualified name unique. When we find
+                // something, reuse the same suffix for all fields in this
+                // group with the same name. We can only change the name
+                // of fields that have /T, and this field's /T is always
+                // at the end of the fully qualified name, appending to /T
+                // has the effect of appending the same thing to the fully
+                // qualified name.
+                std::string old_name =
+                    QPDFFormFieldObjectHelper(obj).getFullyQualifiedName();
+                if (renames.count(old_name) == 0) {
+                    std::string new_name = old_name;
+                    int suffix = 0;
+                    std::string append;
+                    while (!getFieldsWithQualifiedName(new_name).empty()) {
+                        ++suffix;
+                        append = "+" + std::to_string(suffix);
+                        new_name = old_name + append;
+                    }
+                    renames[old_name] = append;
+                }
+                std::string append = renames[old_name];
+                if (!append.empty()) {
+                    obj.replaceKey(
+                        "/T",
+                        QPDFObjectHandle::newUnicodeString(
+                            obj.getKey("/T").getUTF8Value() + append));
+                }
             }
         }
     }
