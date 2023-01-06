@@ -36,6 +36,7 @@
 #include <set>
 #include <stdio.h>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <qpdf/Constants.h>
@@ -553,10 +554,10 @@ class QPDFWriter
 
     unsigned int bytesNeeded(long long n);
     void writeBinary(unsigned long long val, unsigned int bytes);
-    void writeString(std::string const& str);
+    void writeString(std::string_view str);
     void writeBuffer(std::shared_ptr<Buffer>&);
-    void writeStringQDF(std::string const& str);
-    void writeStringNoQDF(std::string const& str);
+    void writeStringQDF(std::string_view str);
+    void writeStringNoQDF(std::string_view str);
     void writePad(int nspaces);
     void assignCompressedObjectNumbers(QPDFObjGen const& og);
     void enqueueObject(QPDFObjectHandle object);

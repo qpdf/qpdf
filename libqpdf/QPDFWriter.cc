@@ -981,9 +981,9 @@ QPDFWriter::writeBinary(unsigned long long val, unsigned int bytes)
 }
 
 void
-QPDFWriter::writeString(std::string const& str)
+QPDFWriter::writeString(std::string_view str)
 {
-    this->m->pipeline->writeString(str);
+    this->m->pipeline->writeStr(str);
 }
 
 void
@@ -993,18 +993,18 @@ QPDFWriter::writeBuffer(std::shared_ptr<Buffer>& b)
 }
 
 void
-QPDFWriter::writeStringQDF(std::string const& str)
+QPDFWriter::writeStringQDF(std::string_view str)
 {
     if (this->m->qdf_mode) {
-        writeString(str);
+        this->m->pipeline->writeStr(str);
     }
 }
 
 void
-QPDFWriter::writeStringNoQDF(std::string const& str)
+QPDFWriter::writeStringNoQDF(std::string_view str)
 {
     if (!this->m->qdf_mode) {
-        writeString(str);
+        this->m->pipeline->writeStr(str);
     }
 }
 

@@ -49,6 +49,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 // Remember to use QPDF_DLL_CLASS on anything derived from Pipeline so
 // it will work with dynamic_cast across the shared object boundary.
@@ -75,6 +76,8 @@ class QPDF_DLL_CLASS Pipeline
     // certain other types of data to pipelines without having to
     // cast. The methods that take char const* expect null-terminated
     // C strings and do not write the null terminators.
+    QPDF_DLL
+    inline void writeStr(std::string_view);
     QPDF_DLL
     void writeCStr(char const* cstr);
     QPDF_DLL
@@ -118,5 +121,11 @@ class QPDF_DLL_CLASS Pipeline
 
     Pipeline* next;
 };
+
+inline void
+Pipeline::writeStr(std::string_view str)
+{
+    write(str.data(), str.size());
+}
 
 #endif // PIPELINE_HH
