@@ -23,6 +23,7 @@
 #include <qpdf/RC4.hh>
 
 #include <algorithm>
+#include <stdexcept>
 #include <stdlib.h>
 
 QPDFWriter::ProgressReporter::~ProgressReporter()
@@ -1482,13 +1483,13 @@ QPDFWriter::unparseObject(
 {
     QPDFObjGen old_og = object.getObjGen();
     int child_flags = flags & ~f_stream;
-
-    std::string indent;
-    for (int i = 0; i < level; ++i) {
-        indent += "  ";
+    if (level < 0) {
+        throw std::logic_error("invalid level in QPDFWriter::unparseObject");
     }
 
-    if (object.isArray()) {
+    std::string const indent(static_cast<size_t>(2 * level), ' ');
+
+    if (auto const tc = object.getTypeCode(); tc == ::ot_array) {
         // Note: PDF spec 1.4 implementation note 121 states that
         // Acrobat requires a space after the [ in the /H key of the
         // linearization parameter dictionary.  We'll do this
@@ -1496,18 +1497,17 @@ QPDFWriter::unparseObject(
         // doesn't make the files that much bigger.
         writeString("[");
         writeStringQDF("\n");
-        int n = object.getArrayNItems();
-        for (int i = 0; i < n; ++i) {
+        for (auto const& item: object.getArrayAsVector()) {
             writeStringQDF(indent);
             writeStringQDF("  ");
             writeStringNoQDF(" ");
-            unparseChild(object.getArrayItem(i), level + 1, child_flags);
+            unparseChild(item, level + 1, child_flags);
             writeStringQDF("\n");
         }
         writeStringQDF(indent);
         writeStringNoQDF(" ");
         writeString("]");
-    } else if (object.isDictionary()) {
+    } else if (tc == ::ot_dictionary) {
         // Make a shallow copy of this object so we can modify it
         // safely without affecting the original. This code has logic
         // to skip certain keys in agreement with prepareFileForWrite
@@ -1668,23 +1668,26 @@ QPDFWriter::unparseObject(
         writeString("<<");
         writeStringQDF("\n");
 
-        for (auto const& key: object.getKeys()) {
-            writeStringQDF(indent);
-            writeStringQDF("  ");
-            writeStringNoQDF(" ");
-            writeString(QPDF_Name::normalizeName(key));
-            writeString(" ");
-            if (key == "/Contents" && object.isDictionaryOfType("/Sig") &&
-                object.hasKey("/ByteRange")) {
-                QTC::TC("qpdf", "QPDFWriter no encryption sig contents");
-                unparseChild(
-                    object.getKey(key),
-                    level + 1,
-                    child_flags | f_hex_string | f_no_encryption);
-            } else {
-                unparseChild(object.getKey(key), level + 1, child_flags);
+        for (auto& item: object.getDictAsMap()) {
+            if (!item.second.isNull()) {
+                auto const& key = item.first;
+                writeStringQDF(indent);
+                writeStringQDF("  ");
+                writeStringNoQDF(" ");
+                writeString(QPDF_Name::normalizeName(key));
+                writeString(" ");
+                if (key == "/Contents" && object.isDictionaryOfType("/Sig") &&
+                    object.hasKey("/ByteRange")) {
+                    QTC::TC("qpdf", "QPDFWriter no encryption sig contents");
+                    unparseChild(
+                        item.second,
+                        level + 1,
+                        child_flags | f_hex_string | f_no_encryption);
+                } else {
+                    unparseChild(item.second, level + 1, child_flags);
+                }
+                writeStringQDF("\n");
             }
-            writeStringQDF("\n");
         }
 
         if (flags & f_stream) {
@@ -1710,7 +1713,7 @@ QPDFWriter::unparseObject(
         writeStringQDF(indent);
         writeStringNoQDF(" ");
         writeString(">>");
-    } else if (object.isStream()) {
+    } else if (tc == ::ot_stream) {
         // Write stream data to a buffer.
         int new_id = this->m->obj_renumber[old_og];
         if (!this->m->direct_stream_lengths) {
@@ -1752,7 +1755,7 @@ QPDFWriter::unparseObject(
             this->m->added_newline = false;
         }
         writeString("endstream");
-    } else if (object.isString()) {
+    } else if (tc == ::ot_string) {
         std::string val;
         if (this->m->encrypted && (!(flags & f_in_ostream)) &&
             (!(flags & f_no_encryption)) && (!this->m->cur_data_key.empty())) {
