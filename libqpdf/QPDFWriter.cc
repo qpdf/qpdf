@@ -1257,17 +1257,17 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
             // indicates that an object stream is inside itself.
             QTC::TC("qpdf", "QPDFWriter ignore self-referential object stream");
         }
-    } else if (object.isArray()) {
-        if (!this->m->linearized) {
-            int n = object.getArrayNItems();
-            for (int i = 0; i < n; ++i) {
-                enqueueObject(object.getArrayItem(i));
+        return;
+    } else if (!this->m->linearized) {
+        if (object.isArray()) {
+            for (auto& item: object.getArrayAsVector()) {
+                enqueueObject(item);
             }
-        }
-    } else if (object.isDictionary()) {
-        if (!this->m->linearized) {
-            for (auto const& key: object.getKeys()) {
-                enqueueObject(object.getKey(key));
+        } else if (object.isDictionary()) {
+            for (auto& item: object.getDictAsMap()) {
+                if (!item.second.isNull()) {
+                    enqueueObject(item.second);
+                }
             }
         }
     } else {
