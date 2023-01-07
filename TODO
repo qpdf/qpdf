@@ -9,7 +9,20 @@ Always
 Next
 ====
 
-* Break ground on "Document-level work"
+* std::string_view transition -- work being done by m-holger
+* Break ground on "Document-level work" -- TODO-pages.md lives on a
+  separate branch.
+* Standard for CLI and Job JSON support for JSON-based command-line
+  arguments. Come up with a standard way of supporting command-line
+  arguments that take JSON specifications of things so that
+  * there is a predictable way to indicate whether an argument is a
+    file or a JSON blob
+  * with QPDFJob JSON, make sure it is possible to directly include
+    the JSON rather than having to stringify a JSON blob
+  * One option might be to prepend file:// to a filename or otherwise
+    to take a JSON blob. We could have that as a particular type of
+    argument that would behave properly for both job JSON and CLI.
+
 
 Possible future JSON enhancements
 =================================
