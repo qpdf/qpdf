@@ -1,6 +1,6 @@
 #include <qpdf/QPDF_String.hh>
 
-#include <qpdf/QUtil_12.hh>
+#include <qpdf/QUtil.hh>
 
 // DO NOT USE ctype -- it is locale dependent for some things, and
 // it's not worth the risk of including it in case it may accidentally
@@ -30,8 +30,8 @@ std::shared_ptr<QPDFObject>
 QPDF_String::create_utf16(std::string_view utf8_val)
 {
     std::string result;
-    if (!QUtil_12::utf8_to_pdf_doc(utf8_val, result, '?')) {
-        result = QUtil_12::utf8_to_utf16(utf8_val);
+    if (!QUtil::utf8_to_pdf_doc(utf8_val, result, '?')) {
+        result = QUtil::utf8_to_utf16(utf8_val);
     }
     return do_create(new QPDF_String(result));
 }
@@ -58,13 +58,13 @@ QPDF_String::getJSON(int json_version)
     bool is_unicode = false;
     std::string result;
     std::string candidate = getUTF8Val();
-    if (QUtil_12::is_utf16(this->val) ||
-        QUtil_12::is_explicit_utf8(this->val)) {
+    if (QUtil::is_utf16(this->val) ||
+        QUtil::is_explicit_utf8(this->val)) {
         is_unicode = true;
         result = candidate;
     } else if (!useHexString()) {
         std::string test;
-        if (QUtil_12::utf8_to_pdf_doc(candidate, test, '?') &&
+        if (QUtil::utf8_to_pdf_doc(candidate, test, '?') &&
             (test == this->val)) {
             // This is a PDF-doc string that can be losslessly encoded
             // as Unicode.
@@ -75,7 +75,7 @@ QPDF_String::getJSON(int json_version)
     if (is_unicode) {
         result = "u:" + result;
     } else {
-        result = "b:" + QUtil_12::hex_encode(this->val);
+        result = "b:" + QUtil::hex_encode(this->val);
     }
     return JSON::makeString(result);
 }
@@ -160,7 +160,7 @@ QPDF_String::unparse(bool force_binary)
                 } else {
                     result +=
                         "\\" +
-                        QUtil_12::int_to_string_base(
+                        QUtil::int_to_string_base(
                             static_cast<int>(static_cast<unsigned char>(ch)),
                             8,
                             3);
@@ -177,13 +177,13 @@ QPDF_String::unparse(bool force_binary)
 std::string
 QPDF_String::getUTF8Val() const
 {
-    if (QUtil_12::is_utf16(this->val)) {
-        return QUtil_12::utf16_to_utf8(this->val);
-    } else if (QUtil_12::is_explicit_utf8(this->val)) {
+    if (QUtil::is_utf16(this->val)) {
+        return QUtil::utf16_to_utf8(this->val);
+    } else if (QUtil::is_explicit_utf8(this->val)) {
         // PDF 2.0 allows UTF-8 strings when explicitly prefixed with
         // the three-byte representation of U+FEFF.
         return this->val.substr(3);
     } else {
-        return QUtil_12::pdf_doc_to_utf8(this->val);
+        return QUtil::pdf_doc_to_utf8(this->val);
     }
 }

@@ -32,6 +32,7 @@
 #include <stdexcept>
 #include <stdio.h>
 #include <string>
+#include <string_view>
 #include <time.h>
 #include <vector>
 
@@ -327,7 +328,7 @@ namespace QUtil
     // length of the string.
     QPDF_DLL
     unsigned long get_next_utf8_codepoint(
-        std::string const& utf8_val, size_t& pos, bool& error);
+        std::string_view utf8_val, size_t& pos, bool& error);
 
     // Test whether this is a UTF-16 string. This is indicated by
     // first two bytes being 0xFE 0xFF (big-endian) or 0xFF 0xFE
@@ -336,64 +337,63 @@ namespace QUtil
     // little-endian as well as big-endian. Even though the PDF spec
     // doesn't allow little-endian, most readers seem to accept it.
     QPDF_DLL
-    bool is_utf16(std::string const&);
+    bool is_utf16(std::string_view);
 
     // Test whether this is an explicit UTF-8 string as allowed by the
     // PDF 2.0 spec. This is indicated by first three bytes being 0xEF
     // 0xBB 0xBF, which is the UTF-8 encoding of U+FEFF.
     QPDF_DLL
-    bool is_explicit_utf8(std::string const&);
+    bool is_explicit_utf8(std::string_view);
 
     // Convert a UTF-8 encoded string to UTF-16 big-endian.
     // Unrepresentable code points are converted to U+FFFD.
     QPDF_DLL
-    std::string utf8_to_utf16(std::string const& utf8);
+    std::string utf8_to_utf16(std::string_view utf8);
 
     // Convert a UTF-8 encoded string to the specified single-byte
     // encoding system by replacing all unsupported characters with
     // the given unknown_char.
     QPDF_DLL
-    std::string utf8_to_ascii(std::string const& utf8, char unknown_char = '?');
+    std::string utf8_to_ascii(std::string_view utf8, char unknown_char = '?');
     QPDF_DLL
     std::string
-    utf8_to_win_ansi(std::string const& utf8, char unknown_char = '?');
+    utf8_to_win_ansi(std::string_view utf8, char unknown_char = '?');
     QPDF_DLL
     std::string
-    utf8_to_mac_roman(std::string const& utf8, char unknown_char = '?');
+    utf8_to_mac_roman(std::string_view utf8, char unknown_char = '?');
     QPDF_DLL
-    std::string
-    utf8_to_pdf_doc(std::string const& utf8, char unknown_char = '?');
+    std::string utf8_to_pdf_doc(std::string_view utf8, char unknown_char = '?');
 
     // These versions return true if the conversion was successful and
     // false if any unrepresentable characters were found and had to
     // be substituted with the unknown character.
     QPDF_DLL
     bool utf8_to_ascii(
-        std::string const& utf8, std::string& ascii, char unknown_char = '?');
+        std::string_view utf8, std::string& ascii, char unknown_char = '?');
     QPDF_DLL
     bool utf8_to_win_ansi(
-        std::string const& utf8, std::string& win, char unknown_char = '?');
+        std::string_view utf8, std::string& win, char unknown_char = '?');
     QPDF_DLL
     bool utf8_to_mac_roman(
-        std::string const& utf8, std::string& mac, char unknown_char = '?');
+        std::string_view utf8, std::string& mac, char unknown_char = '?');
     QPDF_DLL
     bool utf8_to_pdf_doc(
-        std::string const& utf8, std::string& pdfdoc, char unknown_char = '?');
+        std::string_view utf8, std::string& pdfdoc, char unknown_char = '?');
 
     // Convert a UTF-16 encoded string to UTF-8. Unrepresentable code
     // points are converted to U+FFFD.
     QPDF_DLL
-    std::string utf16_to_utf8(std::string const& utf16);
+    std::string utf16_to_utf8(std::string_view utf16);
 
     // Convert from the specified single-byte encoding system to
     // UTF-8. There is no ascii_to_utf8 because all ASCII strings are
     // already valid UTF-8.
     QPDF_DLL
-    std::string win_ansi_to_utf8(std::string const& win);
+    std::string win_ansi_to_utf8(std::string_view win);
     QPDF_DLL
-    std::string mac_roman_to_utf8(std::string const& mac);
+    std::string mac_roman_to_utf8(std::string_view mac);
     QPDF_DLL
-    std::string pdf_doc_to_utf8(std::string const& pdfdoc);
+    std::string pdf_doc_to_utf8(std::string_view pdfdoc);
 
     // Analyze a string for encoding. We can't tell the difference
     // between any single-byte encodings, and we can't tell for sure

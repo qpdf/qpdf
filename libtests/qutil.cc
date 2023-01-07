@@ -10,6 +10,7 @@
 #include <locale>
 #include <stdio.h>
 #include <string.h>
+#include <string_view>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -179,7 +180,8 @@ os_wrapper_test()
 {
     try {
         std::cout << "before remove" << std::endl;
-        QUtil::os_wrapper("remove file", remove("/this/file/does/not/exist"));
+        QUtil::os_wrapper(
+            "remove file", remove("/this/file/does/not/exist"));
         std::cout << "after remove" << std::endl;
     } catch (std::runtime_error& s) {
         std::cout << "exception: " << s.what() << std::endl;
@@ -320,19 +322,20 @@ utf8_to_ascii_test()
               << QUtil::utf8_to_ascii(input, '*') << std::endl;
     std::string a = QUtil::utf8_to_win_ansi(input, '*');
     std::string b = QUtil::utf8_to_mac_roman(input, '*');
-    std::cout
-        << "<"
-        << QUtil::int_to_string_base(static_cast<unsigned char>(a.at(0)), 16, 2)
-        << ">" << a.substr(1) << std::endl
-        << "<"
-        << QUtil::int_to_string_base(static_cast<unsigned char>(b.at(0)), 16, 2)
-        << ">" << b.substr(1) << std::endl;
+    std::cout << "<"
+              << QUtil::int_to_string_base(
+                     static_cast<unsigned char>(a.at(0)), 16, 2)
+              << ">" << a.substr(1) << std::endl
+              << "<"
+              << QUtil::int_to_string_base(
+                     static_cast<unsigned char>(b.at(0)), 16, 2)
+              << ">" << b.substr(1) << std::endl;
 }
 
 void
 transcoding_test(
-    std::string (*to_utf8)(std::string const&),
-    std::string (*from_utf8)(std::string const&, char),
+    std::string (*to_utf8)(std::string_view),
+    std::string (*from_utf8)(std::string_view, char),
     int first,
     int last,
     std::string unknown)
@@ -368,10 +371,12 @@ check_analyze(std::string const& str, bool has8bit, bool utf8, bool utf16)
 void
 print_alternatives(std::string const& str)
 {
-    std::vector<std::string> result = QUtil::possible_repaired_encodings(str);
+    std::vector<std::string> result =
+        QUtil::possible_repaired_encodings(str);
     size_t n = result.size();
     for (size_t i = 0; i < n; ++i) {
-        std::cout << i << ": " << QUtil::hex_encode(result.at(i)) << std::endl;
+        std::cout << i << ": " << QUtil::hex_encode(result.at(i))
+                  << std::endl;
     }
 }
 
@@ -379,16 +384,28 @@ void
 transcoding_test()
 {
     transcoding_test(
-        &QUtil::pdf_doc_to_utf8, &QUtil::utf8_to_pdf_doc, 127, 160, "\x9f");
+        &QUtil::pdf_doc_to_utf8,
+        &QUtil::utf8_to_pdf_doc,
+        127,
+        160,
+        "\x9f");
     std::cout << "bidirectional pdf doc done" << std::endl;
     transcoding_test(
         &QUtil::pdf_doc_to_utf8, &QUtil::utf8_to_pdf_doc, 24, 31, "?");
     std::cout << "bidirectional pdf doc low done" << std::endl;
     transcoding_test(
-        &QUtil::win_ansi_to_utf8, &QUtil::utf8_to_win_ansi, 128, 160, "?");
+        &QUtil::win_ansi_to_utf8,
+        &QUtil::utf8_to_win_ansi,
+        128,
+        160,
+        "?");
     std::cout << "bidirectional win ansi done" << std::endl;
     transcoding_test(
-        &QUtil::mac_roman_to_utf8, &QUtil::utf8_to_mac_roman, 128, 255, "?");
+        &QUtil::mac_roman_to_utf8,
+        &QUtil::utf8_to_mac_roman,
+        128,
+        255,
+        "?");
     std::cout << "bidirectional mac roman done" << std::endl;
     check_analyze("pi = \317\200", true, true, false);
     check_analyze("pi != \317", true, false, false);

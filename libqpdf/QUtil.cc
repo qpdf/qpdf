@@ -8,7 +8,6 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QTC.hh>
-#include <qpdf/QUtil_12.hh>
 
 #include <cmath>
 #include <ctype.h>
@@ -984,7 +983,8 @@ QUtil::qpdf_time_to_pdf_time(QPDFTime const& qtm)
     }
     return (
         "D:" + QUtil::int_to_string(qtm.year, 4) +
-        QUtil::int_to_string(qtm.month, 2) + QUtil::int_to_string(qtm.day, 2) +
+        QUtil::int_to_string(qtm.month, 2) +
+        QUtil::int_to_string(qtm.day, 2) +
         QUtil::int_to_string(qtm.hour, 2) +
         QUtil::int_to_string(qtm.minute, 2) +
         QUtil::int_to_string(qtm.second, 2) + tz_offset);
@@ -1519,7 +1519,7 @@ encode_pdfdoc(unsigned long codepoint)
 
 unsigned long
 QUtil::get_next_utf8_codepoint(
-    std::string const& utf8_val, size_t& pos, bool& error)
+    std::string_view utf8_val, size_t& pos, bool& error)
 {
     size_t len = utf8_val.length();
     unsigned char ch = static_cast<unsigned char>(utf8_val.at(pos++));
@@ -1559,7 +1559,7 @@ QUtil::get_next_utf8_codepoint(
 
 static bool
 transcode_utf8(
-    std::string const& utf8_val,
+    std::string_view utf8_val,
     std::string& result,
     encoding_e encoding,
     char unknown)
@@ -1656,7 +1656,7 @@ transcode_utf8(
 }
 
 static std::string
-transcode_utf8(std::string const& utf8_val, encoding_e encoding, char unknown)
+transcode_utf8(std::string_view utf8_val, encoding_e encoding, char unknown)
 {
     std::string result;
     transcode_utf8(utf8_val, result, encoding, unknown);
@@ -1664,65 +1664,65 @@ transcode_utf8(std::string const& utf8_val, encoding_e encoding, char unknown)
 }
 
 std::string
-QUtil::utf8_to_utf16(std::string const& utf8)
+QUtil::utf8_to_utf16(std::string_view utf8)
 {
     return transcode_utf8(utf8, e_utf16, 0);
 }
 
 std::string
-QUtil::utf8_to_ascii(std::string const& utf8, char unknown_char)
+QUtil::utf8_to_ascii(std::string_view utf8, char unknown_char)
 {
     return transcode_utf8(utf8, e_ascii, unknown_char);
 }
 
 std::string
-QUtil::utf8_to_win_ansi(std::string const& utf8, char unknown_char)
+QUtil::utf8_to_win_ansi(std::string_view utf8, char unknown_char)
 {
     return transcode_utf8(utf8, e_winansi, unknown_char);
 }
 
 std::string
-QUtil::utf8_to_mac_roman(std::string const& utf8, char unknown_char)
+QUtil::utf8_to_mac_roman(std::string_view utf8, char unknown_char)
 {
     return transcode_utf8(utf8, e_macroman, unknown_char);
 }
 
 std::string
-QUtil::utf8_to_pdf_doc(std::string const& utf8, char unknown_char)
+QUtil::utf8_to_pdf_doc(std::string_view utf8, char unknown_char)
 {
     return transcode_utf8(utf8, e_pdfdoc, unknown_char);
 }
 
 bool
 QUtil::utf8_to_ascii(
-    std::string const& utf8, std::string& ascii, char unknown_char)
+    std::string_view utf8, std::string& ascii, char unknown_char)
 {
     return transcode_utf8(utf8, ascii, e_ascii, unknown_char);
 }
 
 bool
 QUtil::utf8_to_win_ansi(
-    std::string const& utf8, std::string& win, char unknown_char)
+    std::string_view utf8, std::string& win, char unknown_char)
 {
     return transcode_utf8(utf8, win, e_winansi, unknown_char);
 }
 
 bool
 QUtil::utf8_to_mac_roman(
-    std::string const& utf8, std::string& mac, char unknown_char)
+    std::string_view utf8, std::string& mac, char unknown_char)
 {
     return transcode_utf8(utf8, mac, e_macroman, unknown_char);
 }
 
 bool
 QUtil::utf8_to_pdf_doc(
-    std::string const& utf8, std::string& pdfdoc, char unknown_char)
+    std::string_view utf8, std::string& pdfdoc, char unknown_char)
 {
     return transcode_utf8(utf8, pdfdoc, e_pdfdoc, unknown_char);
 }
 
 bool
-QUtil::is_utf16(std::string const& val)
+QUtil::is_utf16(std::string_view val)
 {
     return (
         (val.length() >= 2) &&
@@ -1731,7 +1731,7 @@ QUtil::is_utf16(std::string const& val)
 }
 
 bool
-QUtil::is_explicit_utf8(std::string const& val)
+QUtil::is_explicit_utf8(std::string_view val)
 {
     // QPDF_String.cc knows that this is a 3-byte sequence.
     return (
@@ -1740,13 +1740,57 @@ QUtil::is_explicit_utf8(std::string const& val)
 }
 
 std::string
-QUtil::utf16_to_utf8(std::string const& val)
+QUtil::utf16_to_utf8(std::string_view val)
 {
-    return QUtil_12::utf16_to_utf8(val);
+    std::string result;
+    // This code uses unsigned long and unsigned short to hold
+    // codepoint values. It requires unsigned long to be at least
+    // 32 bits and unsigned short to be at least 16 bits, but it
+    // will work fine if they are larger.
+    unsigned long codepoint = 0L;
+    size_t len = val.length();
+    size_t start = 0;
+    bool is_le = false;
+    if (is_utf16(val)) {
+        if (static_cast<unsigned char>(val.at(0)) == 0xff) {
+            is_le = true;
+        }
+        start += 2;
+    }
+    // If the string has an odd number of bytes, the last byte is
+    // ignored.
+    for (size_t i = start; i + 1 < len; i += 2) {
+        // Convert from UTF16-BE.  If we get a malformed
+        // codepoint, this code will generate incorrect output
+        // without giving a warning.  Specifically, a high
+        // codepoint not followed by a low codepoint will be
+        // discarded, and a low codepoint not preceded by a high
+        // codepoint will just get its low 10 bits output.
+        auto msb = is_le ? i + 1 : i;
+        auto lsb = is_le ? i : i + 1;
+        unsigned short bits = QIntC::to_ushort(
+            (static_cast<unsigned char>(val.at(msb)) << 8) +
+            static_cast<unsigned char>(val.at(lsb)));
+        if ((bits & 0xFC00) == 0xD800) {
+            codepoint = 0x10000U + ((bits & 0x3FFU) << 10U);
+            continue;
+        } else if ((bits & 0xFC00) == 0xDC00) {
+            if (codepoint != 0) {
+                QTC::TC("qpdf", "QUtil non-trivial UTF-16");
+            }
+            codepoint += bits & 0x3FF;
+        } else {
+            codepoint = bits;
+        }
+
+        result += QUtil::toUTF8(codepoint);
+        codepoint = 0;
+    }
+    return result;
 }
 
 std::string
-QUtil::win_ansi_to_utf8(std::string const& val)
+QUtil::win_ansi_to_utf8(std::string_view val)
 {
     std::string result;
     size_t len = val.length();
@@ -1762,7 +1806,7 @@ QUtil::win_ansi_to_utf8(std::string const& val)
 }
 
 std::string
-QUtil::mac_roman_to_utf8(std::string const& val)
+QUtil::mac_roman_to_utf8(std::string_view val)
 {
     std::string result;
     size_t len = val.length();
@@ -1778,7 +1822,7 @@ QUtil::mac_roman_to_utf8(std::string const& val)
 }
 
 std::string
-QUtil::pdf_doc_to_utf8(std::string const& val)
+QUtil::pdf_doc_to_utf8(std::string_view val)
 {
     std::string result;
     size_t len = val.length();

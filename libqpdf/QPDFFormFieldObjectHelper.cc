@@ -6,7 +6,9 @@
 #include <qpdf/QPDFAnnotationObjectHelper.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+
 #include <stdlib.h>
+#include <string_view>
 
 QPDFFormFieldObjectHelper::QPDFFormFieldObjectHelper(QPDFObjectHandle oh) :
     QPDFObjectHelper(oh),
@@ -864,7 +866,7 @@ QPDFFormFieldObjectHelper::generateTextAppearance(
     double tf = tff.getTf();
     DA = tff.getDA();
 
-    std::string (*encoder)(std::string const&, char) = &QUtil::utf8_to_ascii;
+    std::string (*encoder)(std::string_view, char) = &QUtil::utf8_to_ascii;
     std::string font_name = tff.getFontName();
     if (!font_name.empty()) {
         // See if the font is encoded with something we know about.
