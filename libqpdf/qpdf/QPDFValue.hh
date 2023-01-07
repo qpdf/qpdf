@@ -5,13 +5,15 @@
 #include <qpdf/DLL.h>
 #include <qpdf/JSON.hh>
 #include <qpdf/QPDFObjGen.hh>
+#include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/Types.h>
 
 #include <string>
 
 class QPDF;
-class QPDFObjectHandle;
 class QPDFObject;
+
+using ObjectPtr = std::shared_ptr<QPDFObject>;
 
 class QPDFValue
 {
@@ -98,6 +100,15 @@ class QPDFValue
         return "";
     }
 
+    // Array methods
+
+    virtual int size() const;
+    virtual QPDFObjectHandle at(int n) const;
+    virtual bool setAt(int n, QPDFObjectHandle const& oh);
+    virtual bool erase(int at);
+    virtual bool insert(int at, QPDFObjectHandle const& item);
+    virtual bool push_back(QPDFObjectHandle const& item);
+
   protected:
     QPDFValue() = default;
 
@@ -119,6 +130,7 @@ class QPDFValue
     }
 
     static std::shared_ptr<QPDFObject> do_create(QPDFValue*);
+    void checkOwnership(QPDFObject* const item) const;
 
   private:
     QPDFValue(QPDFValue const&) = delete;

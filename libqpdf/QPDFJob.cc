@@ -1264,7 +1264,8 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
                 dp_array = decode_parms;
             } else {
                 dp_array = QPDFObjectHandle::newArray();
-                for (int i = 0; i < filters.getArrayNItems(); ++i) {
+                int n = filters.size();
+                for (int i = 0; i < n; ++i) {
                     dp_array.appendItem(decode_parms);
                 }
             }
@@ -2574,9 +2575,8 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                 });
                 return true;
             }
-            int n = kids.getArrayNItems();
-            for (int i = 0; i < n; ++i) {
-                queue.push_back(kids.getArrayItem(i));
+            for (auto const& kid: kids) {
+                queue.push_back(kid);
             }
         } else {
             // This is a leaf node or a form XObject.
@@ -2932,12 +2932,12 @@ QPDFJob::handlePageSpecs(
             if (fields.isIndirect()) {
                 new_fields = pdf.makeIndirectObject(new_fields);
             }
-            for (auto const& field: fields.aitems()) {
+            for (auto const& field: fields) {
                 if (referenced_fields.count(field.getObjGen())) {
                     new_fields.appendItem(field);
                 }
             }
-            if (new_fields.getArrayNItems() > 0) {
+            if (new_fields.size() > 0) {
                 QTC::TC("qpdf", "QPDFJob keep some fields in pages");
                 acroform.replaceKey("/Fields", new_fields);
             } else {

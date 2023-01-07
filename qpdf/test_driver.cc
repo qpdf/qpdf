@@ -1506,6 +1506,8 @@ test_42(QPDF& pdf, char const* arg2)
     integer.appendItem(null);
     array.eraseItem(-1);
     array.eraseItem(16059);
+    array.insertItem(42, "/Dontpanic"_qpdf);
+    array.setArrayItem(42, "/Dontpanic"_qpdf);
     integer.eraseItem(0);
     integer.insertItem(0, null);
     integer.setArrayFromVector(std::vector<QPDFObjectHandle>());
@@ -3282,6 +3284,7 @@ test_88(QPDF& pdf, char const* arg2)
     auto arr2 = pdf.getRoot().replaceKeyAndGetNew("/QTest", "[1 2]"_qpdf);
     arr2.setObjectDescription(&pdf, "test array");
     assert(arr2.eraseItemAndGetOld(50).isNull());
+    assert(pdf.getRoot().eraseItemAndGetOld(0).isNull());
 }
 
 static void

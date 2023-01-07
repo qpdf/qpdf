@@ -8,15 +8,17 @@
 #include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
 #include <qpdf/JSON.hh>
+#include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFValue.hh>
 #include <qpdf/Types.h>
 
+#include <memory>
+#include <optional>
 #include <string>
 
 class QPDF;
-class QPDFObjectHandle;
 
-class QPDFObject
+class QPDFObject: public std::enable_shared_from_this<QPDFObject>
 {
     friend class QPDFValue;
 
@@ -49,7 +51,6 @@ class QPDFObject
     {
         return value->type_code;
     }
-
     // Return a string literal that describes the type, useful for
     // debugging and testing
     char const*
@@ -97,6 +98,11 @@ class QPDFObject
     getParsedOffset()
     {
         return value->getParsedOffset();
+    }
+    bool
+    isDirectNull() const
+    {
+        return value->type_code == ::ot_null && !value->og.isIndirect();
     }
     void
     assign(std::shared_ptr<QPDFObject> o)
@@ -158,6 +164,54 @@ class QPDFObject
     as()
     {
         return dynamic_cast<T*>(value.get());
+    }
+
+    // Array methods
+
+    int
+    size(bool type_warn = false, bool allow_null = false) const
+    {
+        return value->size();
+    }
+    QPDFObjectHandle
+    at(int n)
+    {
+        switch (value->type_code) {
+        case ::ot_array:
+            return value->at(n);
+        case ::ot_null:
+        case ::ot_uninitialized:
+        case ::ot_reserved:
+        case ::ot_unresolved:
+        case ::ot_destroyed:
+            return {};
+        default:
+            if (n == 0) {
+                return {shared_from_this()};
+            } else {
+                return {};
+            }
+        }
+    }
+    bool
+    setAt(int n, QPDFObjectHandle const& oh)
+    {
+        return value->setAt(n, oh);
+    }
+    bool
+    erase(int at)
+    {
+        return value->erase(at);
+    }
+    bool
+    insert(int at, QPDFObjectHandle const& item)
+    {
+        return value->insert(at, item);
+    }
+    bool
+    push_back(QPDFObjectHandle const& item)
+    {
+        return value->push_back(item);
     }
 
   private:

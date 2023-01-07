@@ -82,7 +82,7 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(
         seen.insert(og);
         auto kids = obj.getKey("/Kids");
         if (kids.isArray()) {
-            for (auto kid: kids.aitems()) {
+            for (auto const& kid: kids) {
                 queue.push_back(kid);
             }
         }
@@ -157,8 +157,8 @@ QPDFAcroFormDocumentHelper::removeFormFields(
     }
 
     int i = 0;
-    while (i < fields.getArrayNItems()) {
-        auto field = fields.getArrayItem(i);
+    while (i < fields.size()) {
+        auto field = fields.at(i);
         if (to_remove.count(field.getObjGen())) {
             fields.eraseItem(i);
         } else {
@@ -279,10 +279,10 @@ QPDFAcroFormDocumentHelper::analyze()
     // bidirectionally to fields.
 
     std::set<QPDFObjGen> visited;
-    int nfields = fields.getArrayNItems();
+    int nfields = fields.size();
     QPDFObjectHandle null(QPDFObjectHandle::newNull());
     for (int i = 0; i < nfields; ++i) {
-        traverseField(fields.getArrayItem(i), null, 0, visited);
+        traverseField(fields.at(i), null, 0, visited);
     }
 
     // All Widget annotations should have been encountered by
@@ -366,9 +366,9 @@ QPDFAcroFormDocumentHelper::traverseField(
     QPDFObjectHandle kids = field.getKey("/Kids");
     if (kids.isArray()) {
         is_field = true;
-        int nkids = kids.getArrayNItems();
+        int nkids = kids.size();
         for (int k = 0; k < nkids; ++k) {
-            traverseField(kids.getArrayItem(k), field, 1 + depth, visited);
+            traverseField(kids.at(k), field, 1 + depth, visited);
         }
     } else {
         if (field.hasKey("/Parent")) {
@@ -889,7 +889,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     // Now do the actual copies.
 
     std::set<QPDFObjGen> added_new_fields;
-    for (auto annot: old_annots.aitems()) {
+    for (auto&& annot: old_annots) {
         if (annot.isStream()) {
             annot.warnIfPossible("ignoring annotation that's a stream");
             continue;
@@ -998,9 +998,9 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                     }
                 }
                 auto kids = obj.getKey("/Kids");
-                if (kids.isArray()) {
-                    for (int i = 0; i < kids.getArrayNItems(); ++i) {
-                        auto kid = kids.getArrayItem(i);
+                if (int n = kids.sizeIfArray()) {
+                    for (int i = 0; i < n; ++i) {
+                        auto kid = kids.at(i);
                         if (maybe_copy_object(kid)) {
                             kids.setArrayItem(i, kid);
                             queue.push_back(kid);
@@ -1131,7 +1131,7 @@ QPDFAcroFormDocumentHelper::fixCopiedAnnotations(
     std::set<QPDFObjGen>* added_fields)
 {
     auto old_annots = from_page.getKey("/Annots");
-    if ((!old_annots.isArray()) || (old_annots.getArrayNItems() == 0)) {
+    if ((!old_annots.isArray()) || (old_annots.size() == 0)) {
         return;
     }
 

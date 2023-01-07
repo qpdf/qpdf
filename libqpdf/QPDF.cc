@@ -1024,10 +1024,8 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
     QPDFObjectHandle dict = xref_obj.getDict();
     QPDFObjectHandle W_obj = dict.getKey("/W");
     QPDFObjectHandle Index_obj = dict.getKey("/Index");
-    if (!(W_obj.isArray() && (W_obj.getArrayNItems() >= 3) &&
-          W_obj.getArrayItem(0).isInteger() &&
-          W_obj.getArrayItem(1).isInteger() &&
-          W_obj.getArrayItem(2).isInteger() &&
+    if (!((W_obj.size() >= 3) && W_obj.at(0).isInteger() &&
+          W_obj.at(1).isInteger() && W_obj.at(2).isInteger() &&
           dict.getKey("/Size").isInteger() &&
           (Index_obj.isArray() || Index_obj.isNull()))) {
         throw damagedPDF(
@@ -1040,7 +1038,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
     size_t entry_size = 0;
     int max_bytes = sizeof(qpdf_offset_t);
     for (int i = 0; i < 3; ++i) {
-        W[i] = W_obj.getArrayItem(i).getIntValueAsInt();
+        W[i] = W_obj.at(i).getIntValueAsInt();
         if (W[i] > max_bytes) {
             throw damagedPDF(
                 "xref stream",
@@ -1060,7 +1058,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 
     std::vector<long long> indx;
     if (Index_obj.isArray()) {
-        int n_index = Index_obj.getArrayNItems();
+        int n_index = Index_obj.size();
         if ((n_index % 2) || (n_index < 2)) {
             throw damagedPDF(
                 "xref stream",
@@ -1069,8 +1067,8 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
                 "values");
         }
         for (int i = 0; i < n_index; ++i) {
-            if (Index_obj.getArrayItem(i).isInteger()) {
-                indx.push_back(Index_obj.getArrayItem(i).getIntValue());
+            if (Index_obj.at(i).isInteger()) {
+                indx.push_back(Index_obj.at(i).getIntValue());
             } else {
                 throw damagedPDF(
                     "xref stream",
@@ -2234,9 +2232,8 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
 
     if (foreign.isArray()) {
         QTC::TC("qpdf", "QPDF reserve array");
-        int n = foreign.getArrayNItems();
-        for (int i = 0; i < n; ++i) {
-            reserveObjects(foreign.getArrayItem(i), obj_copier, false);
+        for (auto&& element: foreign) {
+            reserveObjects(element, obj_copier, false);
         }
     } else if (foreign.isDictionary()) {
         QTC::TC("qpdf", "QPDF reserve dictionary");
@@ -2274,12 +2271,10 @@ QPDF::replaceForeignIndirectObjects(
     } else if (foreign.isArray()) {
         QTC::TC("qpdf", "QPDF replace array");
         result = QPDFObjectHandle::newArray();
-        int n = foreign.getArrayNItems();
-        for (int i = 0; i < n; ++i) {
+        for (auto&& element: foreign) {
             result.appendItem(
                 // line-break
-                replaceForeignIndirectObjects(
-                    foreign.getArrayItem(i), obj_copier, false));
+                replaceForeignIndirectObjects(element, obj_copier, false));
         }
     } else if (foreign.isDictionary()) {
         QTC::TC("qpdf", "QPDF replace dictionary");
@@ -2567,9 +2562,9 @@ QPDF::getCompressibleObjGens()
                 queue.push_front(obj.getKey(*iter));
             }
         } else if (obj.isArray()) {
-            int n = obj.getArrayNItems();
+            int n = obj.size();
             for (int i = 1; i <= n; ++i) {
-                queue.push_front(obj.getArrayItem(n - i));
+                queue.push_front(obj.at(n - i));
             }
         }
     }

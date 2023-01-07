@@ -12,6 +12,8 @@ class QPDF_Destroyed: public QPDFValue
     virtual JSON getJSON(int json_version);
     static std::shared_ptr<QPDFValue> getInstance();
 
+    virtual int size() const;
+
   private:
     QPDF_Destroyed();
 };

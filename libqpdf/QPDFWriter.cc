@@ -732,7 +732,7 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
     QPDFObjectHandle trailer = qpdf.getTrailer();
     if (trailer.hasKey("/Encrypt")) {
         generateID();
-        this->m->id1 = trailer.getKey("/ID").getArrayItem(0).getStringValue();
+        this->m->id1 = trailer.getKey("/ID").at(0).getStringValue();
         QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
         int V = encrypt.getKey("/V").getIntValueAsInt();
         int key_len = 5;
@@ -1258,9 +1258,8 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
         }
     } else if (object.isArray()) {
         if (!this->m->linearized) {
-            int n = object.getArrayNItems();
-            for (int i = 0; i < n; ++i) {
-                enqueueObject(object.getArrayItem(i));
+            for (auto const& item: object) {
+                    enqueueObject(item);
             }
         }
     } else if (object.isDictionary()) {
@@ -1496,12 +1495,11 @@ QPDFWriter::unparseObject(
         // doesn't make the files that much bigger.
         writeString("[");
         writeStringQDF("\n");
-        int n = object.getArrayNItems();
-        for (int i = 0; i < n; ++i) {
+        for (auto&& item: object) {
             writeStringQDF(indent);
             writeStringQDF("  ");
             writeStringNoQDF(" ");
-            unparseChild(object.getArrayItem(i), level + 1, child_flags);
+            unparseChild(item, level + 1, child_flags);
             writeStringQDF("\n");
         }
         writeStringQDF(indent);
@@ -1621,7 +1619,7 @@ QPDFWriter::unparseObject(
 
             // If /DecodeParms is an empty list, remove it.
             if (object.getKey("/DecodeParms").isArray() &&
-                (0 == object.getKey("/DecodeParms").getArrayNItems())) {
+                (0 == object.getKey("/DecodeParms").size())) {
                 QTC::TC("qpdf", "QPDFWriter remove empty DecodeParms");
                 object.removeKey("/DecodeParms");
             }
@@ -1642,8 +1640,9 @@ QPDFWriter::unparseObject(
                         object.removeKey("/DecodeParms");
                     } else {
                         int idx = -1;
-                        for (int i = 0; i < filter.getArrayNItems(); ++i) {
-                            QPDFObjectHandle item = filter.getArrayItem(i);
+                        int n = filter.size();
+                        for (int i = 0; i < n; ++i) {
+                            QPDFObjectHandle item = filter.at(i);
                             if (item.isNameAndEquals("/Crypt")) {
                                 idx = i;
                                 break;
@@ -2018,7 +2017,7 @@ QPDFWriter::getOriginalID1()
 {
     QPDFObjectHandle trailer = this->m->pdf.getTrailer();
     if (trailer.hasKey("/ID")) {
-        return trailer.getKey("/ID").getArrayItem(0).getStringValue();
+        return trailer.getKey("/ID").at(0).getStringValue();
     } else {
         return "";
     }
@@ -2133,10 +2132,8 @@ QPDFWriter::initializeSpecialStreams()
         QPDFObjectHandle contents = page.getKey("/Contents");
         std::vector<QPDFObjGen> contents_objects;
         if (contents.isArray()) {
-            int n = contents.getArrayNItems();
-            for (int i = 0; i < n; ++i) {
-                contents_objects.push_back(
-                    contents.getArrayItem(i).getObjGen());
+            for (auto const& item: contents) {
+                contents_objects.push_back(item.getObjGen());
             }
         } else if (contents.isStream()) {
             contents_objects.push_back(contents.getObjGen());

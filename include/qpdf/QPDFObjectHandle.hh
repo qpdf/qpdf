@@ -29,6 +29,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <optional>
 #include <set>
 #include <string>
 #include <vector>
@@ -835,6 +836,14 @@ class QPDFObjectHandle
     QPDF_DLL
     bool getValueAsInlineImage(std::string&);
 
+    // Generalized accessors
+
+    QPDF_DLL
+    int size();
+    QPDF_DLL
+    int sizeIfArray();
+    QPDF_DLL
+    QPDFObjectHandle at(int index);
     // Methods for array objects; see also name and array objects.
 
     // Return an object that enables iteration over members. You can
@@ -1501,7 +1510,6 @@ class QPDFObjectHandle
     {
         friend class QPDF_Dictionary;
         friend class QPDF_Stream;
-        friend class SparseOHArray;
 
       private:
         static void
@@ -1572,6 +1580,13 @@ class QPDFObjectHandle
 
     // The following methods do not form part of the public API and are for
     // internal use only.
+    class iterator;
+
+    QPDF_DLL
+    inline iterator begin();
+
+    QPDF_DLL
+    inline iterator end();
 
     QPDFObjectHandle(std::shared_ptr<QPDFObject> const& obj) :
         obj(obj)
@@ -1612,6 +1627,7 @@ class QPDFObjectHandle
     void objectWarning(std::string const& warning);
     void assertType(char const* type_name, bool istype);
     inline bool dereference();
+    inline void resolve();
     void makeDirect(std::set<QPDFObjGen>& visited, bool stop_at_streams);
     void disconnect();
     void setParsedOffset(qpdf_offset_t offset);
@@ -1877,6 +1893,99 @@ inline bool
 QPDFObjectHandle::isInitialized() const
 {
     return obj != nullptr;
+}
+
+class QPDFObjectHandle::iterator
+{
+    friend class QPDFObjectHandle;
+
+  public:
+    typedef QPDFObjectHandle T;
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = T;
+    using difference_type = long;
+    using pointer = T*;
+    using reference = T&;
+
+    QPDF_DLL
+    iterator(int index);
+    QPDF_DLL
+    virtual ~iterator() = default;
+    QPDF_DLL
+    iterator
+    operator++()
+    {
+        ++index;
+        return *this;
+    }
+    QPDF_DLL
+    iterator
+    operator++(int)
+    {
+        ++index;
+        return *this;
+    }
+    QPDF_DLL
+    iterator&
+    operator--()
+    {
+        --index;
+        return *this;
+    }
+    QPDF_DLL
+    iterator
+    operator--(int)
+    {
+        --index;
+        return *this;
+    }
+    QPDF_DLL
+    QPDFObjectHandle
+    operator*()
+    {
+        return oh.at(index);
+    }
+    QPDF_DLL
+    pointer
+    operator->()
+    {
+        value = oh.at(index);
+        return &value;
+    }
+    QPDF_DLL
+    bool
+    operator==(iterator const& other) const
+    {
+        return index == other.index;
+    }
+    QPDF_DLL
+    bool
+    operator!=(iterator const& other) const
+    {
+        return index != other.index;
+    }
+
+  private:
+    iterator(QPDFObjectHandle& oh, int index) :
+        oh(oh),
+        index(index),
+        value(oh)
+    {
+    }
+    QPDFObjectHandle& oh;
+    int index;
+    QPDFObjectHandle value;
+};
+
+inline QPDFObjectHandle::iterator
+QPDFObjectHandle::begin()
+{
+    return iterator(*this, 0);
+}
+inline QPDFObjectHandle::iterator
+QPDFObjectHandle::end()
+{
+    return iterator(*this, size());
 }
 
 #endif // QPDFOBJECTHANDLE_HH
