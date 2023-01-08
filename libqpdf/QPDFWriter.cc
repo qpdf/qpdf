@@ -1010,11 +1010,9 @@ QPDFWriter::writeStringNoQDF(std::string const& str)
 }
 
 void
-QPDFWriter::writePad(int nspaces)
+QPDFWriter::writePad(size_t nspaces)
 {
-    for (int i = 0; i < nspaces; ++i) {
-        writeString(" ");
-    }
+    writeString(std::string(nspaces, ' '));
 }
 
 Pipeline*
@@ -1321,13 +1319,8 @@ QPDFWriter::writeTrailer(
                     writeString(" /Prev ");
                     qpdf_offset_t pos = this->m->pipeline->getCount();
                     writeString(std::to_string(prev));
-                    int nspaces =
-                        QIntC::to_int(pos - this->m->pipeline->getCount() + 21);
-                    if (nspaces < 0) {
-                        throw std::logic_error(
-                            "QPDFWriter: no padding required in trailer");
-                    }
-                    writePad(nspaces);
+                    writePad(QIntC::to_size(
+                        pos - this->m->pipeline->getCount() + 21));
                 }
             } else {
                 unparseChild(trailer.getKey(key), 1, 0);
@@ -2783,7 +2776,7 @@ QPDFWriter::writeXRefStream(
     return space_before_zero;
 }
 
-int
+size_t
 QPDFWriter::calculateXrefStreamPadding(qpdf_offset_t xref_bytes)
 {
     // This routine is called right after a linearization first pass
@@ -2794,7 +2787,7 @@ QPDFWriter::calculateXrefStreamPadding(qpdf_offset_t xref_bytes)
     // input by 6 bytes plus 5 bytes per 16K, and then we'll add 10
     // extra bytes for number length increases.
 
-    return QIntC::to_int(16 + (5 * ((xref_bytes + 16383) / 16384)));
+    return QIntC::to_size(16 + (5 * ((xref_bytes + 16383) / 16384)));
 }
 
 void
@@ -3029,9 +3022,7 @@ QPDFWriter::writeLinearized()
         writeString(" >>");
         closeObject(lindict_id);
         static int const pad = 200;
-        int spaces = QIntC::to_int(pos - this->m->pipeline->getCount() + pad);
-        qpdf_assert_debug(spaces >= 0);
-        writePad(spaces);
+        writePad(QIntC::to_size(pos - this->m->pipeline->getCount() + pad));
         writeString("\n");
 
         // If the user supplied any additional header text, write it
@@ -3082,7 +3073,7 @@ QPDFWriter::writeLinearized()
             } else {
                 // Pad so that the next object starts at the same
                 // place as in pass 1.
-                writePad(QIntC::to_int(first_xref_end - endpos));
+                writePad(QIntC::to_size(first_xref_end - endpos));
 
                 if (this->m->pipeline->getCount() != first_xref_end) {
                     throw std::logic_error(
@@ -3164,7 +3155,7 @@ QPDFWriter::writeLinearized()
                 second_xref_end = this->m->pipeline->getCount();
             } else {
                 // Make the file size the same.
-                writePad(QIntC::to_int(
+                writePad(QIntC::to_size(
                     second_xref_end + hint_length - 1 -
                     this->m->pipeline->getCount()));
                 writeString("\n");

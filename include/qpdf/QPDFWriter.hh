@@ -557,7 +557,7 @@ class QPDFWriter
     void writeBuffer(std::shared_ptr<Buffer>&);
     void writeStringQDF(std::string const& str);
     void writeStringNoQDF(std::string const& str);
-    void writePad(int nspaces);
+    void writePad(size_t nspaces);
     void assignCompressedObjectNumbers(QPDFObjGen const& og);
     void enqueueObject(QPDFObjectHandle object);
     void writeObjectStreamOffsets(
@@ -676,7 +676,7 @@ class QPDFWriter
         qpdf_offset_t hint_length,
         bool skip_compression,
         int linearization_pass);
-    int calculateXrefStreamPadding(qpdf_offset_t xref_bytes);
+    size_t calculateXrefStreamPadding(qpdf_offset_t xref_bytes);
 
     // When filtering subsections, push additional pipelines to the
     // stack. When ready to switch, activate the pipeline stack. When
