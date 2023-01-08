@@ -751,7 +751,8 @@ class QPDFWriter
         std::string cur_data_key;
         std::list<std::shared_ptr<Pipeline>> to_delete;
         Pl_Count* pipeline;
-        std::list<QPDFObjectHandle> object_queue;
+        std::vector<QPDFObjectHandle> object_queue;
+        size_t object_queue_front{0};
         std::map<QPDFObjGen, int> obj_renumber;
         std::map<int, QPDFXRefEntry> xref;
         std::map<int, qpdf_offset_t> lengths;
