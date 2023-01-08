@@ -3363,9 +3363,9 @@ QPDFWriter::writeStandard()
     }
 
     // Now start walking queue, outputting each object.
-    while (this->m->object_queue.size()) {
-        QPDFObjectHandle cur_object = this->m->object_queue.front();
-        this->m->object_queue.pop_front();
+    while (m->object_queue_front < m->object_queue.size()) {
+        QPDFObjectHandle cur_object = m->object_queue.at(m->object_queue_front);
+        ++m->object_queue_front;
         writeObject(cur_object);
     }
 
