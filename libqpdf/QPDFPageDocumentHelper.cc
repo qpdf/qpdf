@@ -67,9 +67,11 @@ QPDFPageDocumentHelper::flattenAnnotations(
     for (auto& ph: getAllPages()) {
         QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
         if (!resources.isDictionary()) {
-            // This should never happen and is not exercised in the
-            // test suite
-            resources = QPDFObjectHandle::newDictionary();
+            QTC::TC(
+                "qpdf",
+                "QPDFPageDocumentHelper flatten resources missing or invalid");
+            resources = ph.getObjectHandle().replaceKeyAndGetNew(
+                "/Resources", QPDFObjectHandle::newDictionary());
         }
         flattenAnnotationsForPage(
             ph, resources, afdh, required_flags, forbidden_flags);

@@ -55,6 +55,7 @@ my @annotation_files = (
     'sample-form',
     'need-appearances',
     'need-appearances-more',
+    'annotation-no-resources',
     );
 $n_tests += 2 * scalar(@annotation_files);
 

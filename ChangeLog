@@ -1,3 +1,8 @@
+2023-01-09  Jay Berkenbilt  <ejb@ql.org>
+
+        * Bug fix: flatten annotations should handle a page with no
+        /Resources key. Fixes #827.
+
 2022-11-20  Jay Berkenbilt  <ejb@ql.org>
 
         * 11.2.0: release
