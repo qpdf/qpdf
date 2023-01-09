@@ -3,3 +3,4 @@ build.*
 appimage/build
 external-libs
 distribution/
+.cache
