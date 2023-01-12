@@ -1262,10 +1262,8 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
                 enqueueObject(item);
             }
         } else if (object.isDictionary()) {
-            for (auto& item: object.getDictAsMap()) {
-                if (!item.second.isNull()) {
-                    enqueueObject(item.second);
-                }
+            for (auto item: object.dItems()) {
+                enqueueObject(item.second);
             }
         }
     } else {
@@ -1661,26 +1659,24 @@ QPDFWriter::unparseObject(
         writeString("<<");
         writeStringQDF("\n");
 
-        for (auto& item: object.getDictAsMap()) {
-            if (!item.second.isNull()) {
-                auto const& key = item.first;
-                writeStringQDF(indent);
-                writeStringQDF("  ");
-                writeStringNoQDF(" ");
-                writeString(QPDF_Name::normalizeName(key));
-                writeString(" ");
-                if (key == "/Contents" && object.isDictionaryOfType("/Sig") &&
-                    object.hasKey("/ByteRange")) {
-                    QTC::TC("qpdf", "QPDFWriter no encryption sig contents");
-                    unparseChild(
-                        item.second,
-                        level + 1,
-                        child_flags | f_hex_string | f_no_encryption);
-                } else {
-                    unparseChild(item.second, level + 1, child_flags);
-                }
-                writeStringQDF("\n");
+        for (auto item: object.dItems()) {
+            auto const& key = item.first;
+            writeStringQDF(indent);
+            writeStringQDF("  ");
+            writeStringNoQDF(" ");
+            writeString(QPDF_Name::normalizeName(key));
+            writeString(" ");
+            if (key == "/Contents" && object.isDictionaryOfType("/Sig") &&
+                object.hasKey("/ByteRange")) {
+                QTC::TC("qpdf", "QPDFWriter no encryption sig contents");
+                unparseChild(
+                    item.second,
+                    level + 1,
+                    child_flags | f_hex_string | f_no_encryption);
+            } else {
+                unparseChild(item.second, level + 1, child_flags);
             }
+            writeStringQDF("\n");
         }
 
         if (flags & f_stream) {
