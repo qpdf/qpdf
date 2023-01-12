@@ -11,6 +11,7 @@
 class QPDF_Dictionary: public QPDFValue
 {
     friend class QPDFObjectHandle::QPDFDictItems::iterator;
+    friend class QPDFObjectHandle::DictItems::iterator;
 
   public:
     virtual ~QPDF_Dictionary() = default;

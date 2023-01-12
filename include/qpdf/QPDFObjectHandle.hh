@@ -885,8 +885,13 @@ class QPDFObjectHandle
     //     // iter.second is the value
     // }
     class QPDFDictItems;
+    class DictItems;
+
     QPDF_DLL
     QPDFDictItems ditems();
+
+    QPDF_DLL
+    DictItems dItems();
 
     // Return true if key is present.  Keys with null values are treated as if
     // they are not present.  This is as per the PDF spec.
@@ -1739,6 +1744,76 @@ class QPDFObjectHandle::QPDFDictItems
         };
         std::shared_ptr<Members> m;
         value_type ivalue;
+    };
+
+    QPDF_DLL
+    iterator begin();
+    QPDF_DLL
+    iterator end();
+
+  private:
+    QPDFObjectHandle oh;
+};
+
+class QPDFObjectHandle::DictItems
+{
+    // This class allows C++-style iteration, including range-for
+    // iteration, around dictionaries. You can write
+
+    // for (auto iter: DictItems(dictionary_obj))
+    // {
+    //     // iter.first is a string
+    //     // iter.second is a QPDFObjectHandle
+    // }
+
+    // See examples/pdf-name-number-tree.cc for a demonstration of
+    // using this API.
+
+  public:
+    QPDF_DLL
+    DictItems(QPDFObjectHandle oh);
+
+    class iterator
+    {
+        friend class DictItems;
+
+      public:
+        typedef std::pair<std::string, QPDFObjectHandle> T;
+        using iterator_category = std::input_iterator_tag;
+        using value_type = T;
+        using difference_type = long;
+        using pointer = T*;
+        using reference = T&;
+
+        QPDF_DLL
+        virtual ~iterator() = default;
+        QPDF_DLL
+        iterator& operator++();
+        QPDF_DLL
+        iterator
+        operator++(int)
+        {
+            iterator t = *this;
+            ++(*this);
+            return t;
+        }
+        QPDF_DLL
+        value_type operator*();
+        QPDF_DLL
+        bool operator==(iterator const& other) const;
+        QPDF_DLL
+        bool
+        operator!=(iterator const& other) const
+        {
+            return !operator==(other);
+        }
+
+      private:
+        using diter = std::map<std::string, QPDFObjectHandle>::iterator;
+
+        iterator(std::pair<diter, diter> iter);
+
+        std::pair<diter, diter> iters;
     };
 
     QPDF_DLL

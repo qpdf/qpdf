@@ -266,7 +266,7 @@ test_0_1(QPDF& pdf, char const* arg2)
     } else if (qtest.isDictionary()) {
         QTC::TC("qpdf", "main QTest dictionary");
         std::cout << "/QTest is a dictionary" << std::endl;
-        for (auto& iter: qtest.ditems()) {
+        for (auto iter: qtest.ditems()) {
             QTC::TC(
                 "qpdf",
                 "main QTest dictionary indirect",
@@ -1507,9 +1507,21 @@ test_42(QPDF& pdf, char const* arg2)
         ++i;
         --i;
         assert(i->second.getName() == "/Value1");
-        // // Following test only works with dItems. Use i-- instead.
+        // // Following test does not work. Use i-- instead.
         --i;
         // // assert((--i)->second.getName() == "/Value1");
+        assert(i == di.end());
+    }
+    {
+        // Exercise iterators directly
+        auto di = dictionary.dItems();
+        auto i = di.begin();
+        assert((*i).first == "/Key1");
+        assert((*i).second.getName() == "/Value1");
+        assert((*i++).second.getName() == "/Value1");
+        ++i;
+        assert(i == di.end());
+        ++i;
         assert(i == di.end());
     }
     assert("" == qtest.getStringValue());
