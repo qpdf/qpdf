@@ -1719,7 +1719,6 @@ class QPDFObjectHandle::QPDFDictItems
 
       private:
         iterator(QPDFObjectHandle& oh, bool for_begin);
-        void updateIValue();
 
         class Members
         {
@@ -1730,14 +1729,13 @@ class QPDFObjectHandle::QPDFDictItems
             ~Members() = default;
 
           private:
-            Members(QPDFObjectHandle& oh, bool for_begin);
+            using diter = std::map<std::string, QPDFObjectHandle>::iterator;
+            Members(QPDF_Dictionary* dict, bool for_begin);
             Members() = delete;
             Members(Members const&) = delete;
 
-            QPDFObjectHandle& oh;
-            std::set<std::string> keys;
-            std::set<std::string>::iterator iter;
-            bool is_end;
+            std::pair<diter, diter> iters;
+            diter begin;
         };
         std::shared_ptr<Members> m;
         value_type ivalue;

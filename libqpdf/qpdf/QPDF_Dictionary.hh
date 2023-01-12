@@ -10,6 +10,8 @@
 
 class QPDF_Dictionary: public QPDFValue
 {
+    friend class QPDFObjectHandle::QPDFDictItems::iterator;
+
   public:
     virtual ~QPDF_Dictionary() = default;
     static std::shared_ptr<QPDFObject>

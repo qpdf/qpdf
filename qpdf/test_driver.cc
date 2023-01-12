@@ -1492,12 +1492,25 @@ test_42(QPDF& pdf, char const* arg2)
         auto di = dictionary.ditems();
         auto i = di.begin();
         assert(i->first == "/Key1");
-        auto& i_value = *i;
         assert(i->second.getName() == "/Value1");
-        ++i;
+        // Following test only works with dItems. Use i++ instead.
+        i++;
+        // assert((i++)->second.getName() == "/Value1");
         ++i;
         assert(i == di.end());
-        assert(!i_value.second.isInitialized());
+        ++i;
+        assert(i == di.end());
+        --i;
+        assert(i == di.end());
+
+        i = di.begin();
+        ++i;
+        --i;
+        assert(i->second.getName() == "/Value1");
+        // // Following test only works with dItems. Use i-- instead.
+        --i;
+        // // assert((--i)->second.getName() == "/Value1");
+        assert(i == di.end());
     }
     assert("" == qtest.getStringValue());
     array.getArrayItem(-1).assertNull();

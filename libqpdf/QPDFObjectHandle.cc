@@ -2557,72 +2557,69 @@ QPDFObjectHandle::QPDFDictItems::QPDFDictItems(QPDFObjectHandle const& oh) :
 QPDFObjectHandle::QPDFDictItems::iterator&
 QPDFObjectHandle::QPDFDictItems::iterator::operator++()
 {
-    ++this->m->iter;
-    updateIValue();
+    QPDF_Dictionary::increment(m->iters);
     return *this;
 }
 
 QPDFObjectHandle::QPDFDictItems::iterator&
 QPDFObjectHandle::QPDFDictItems::iterator::operator--()
 {
-    --this->m->iter;
-    updateIValue();
+    auto& current = m->iters.first;
+    auto& end = m->iters.second;
+
+    if (current != end) {
+        if (current != m->begin) {
+            --current;
+
+            while (current != m->begin) {
+                if (current->second.isNull()) {
+                    --current;
+                }
+            }
+            if (current->second.isNull()) {
+                current = end;
+            }
+        } else {
+            current = end;
+        }
+    }
     return *this;
 }
 
 QPDFObjectHandle::QPDFDictItems::iterator::reference
 QPDFObjectHandle::QPDFDictItems::iterator::operator*()
 {
-    updateIValue();
-    return this->ivalue;
+    ivalue = *m->iters.first;
+    return ivalue;
 }
 
 QPDFObjectHandle::QPDFDictItems::iterator::pointer
 QPDFObjectHandle::QPDFDictItems::iterator::operator->()
 {
-    updateIValue();
-    return &this->ivalue;
+    ivalue = *m->iters.first;
+    return &ivalue;
 }
 
 bool
 QPDFObjectHandle::QPDFDictItems::iterator::operator==(
     iterator const& other) const
 {
-    if (this->m->is_end && other.m->is_end) {
-        return true;
-    }
-    if (this->m->is_end || other.m->is_end) {
-        return false;
-    }
-    return (this->ivalue.first == other.ivalue.first);
+    return (m->iters.first == other.m->iters.first);
 }
 
 QPDFObjectHandle::QPDFDictItems::iterator::iterator(
     QPDFObjectHandle& oh, bool for_begin) :
-    m(new Members(oh, for_begin))
+    m(new Members(
+        oh.isDictionary() ? oh.asDictionary() : newDictionary().asDictionary(),
+        for_begin))
 {
-    updateIValue();
-}
-
-void
-QPDFObjectHandle::QPDFDictItems::iterator::updateIValue()
-{
-    this->m->is_end = (this->m->iter == this->m->keys.end());
-    if (this->m->is_end) {
-        this->ivalue.first = "";
-        this->ivalue.second = QPDFObjectHandle();
-    } else {
-        this->ivalue.first = *(this->m->iter);
-        this->ivalue.second = this->m->oh.getKey(this->ivalue.first);
-    }
 }
 
 QPDFObjectHandle::QPDFDictItems::iterator::Members::Members(
-    QPDFObjectHandle& oh, bool for_begin) :
-    oh(oh)
+    QPDF_Dictionary* dict, bool for_begin) :
+    iters(for_begin ? dict->getBegin() : dict->getEnd()),
+    begin(iters.first)
 {
-    this->keys = oh.getKeys();
-    this->iter = for_begin ? this->keys.begin() : this->keys.end();
 }
 
 QPDFObjectHandle::QPDFDictItems::iterator
