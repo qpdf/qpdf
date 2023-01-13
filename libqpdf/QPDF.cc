@@ -2240,8 +2240,8 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
         }
     } else if (foreign.isDictionary()) {
         QTC::TC("qpdf", "QPDF reserve dictionary");
-        for (auto const& key: foreign.getKeys()) {
-            reserveObjects(foreign.getKey(key), obj_copier, false);
+        for (auto item: foreign.dItems()) {
+            reserveObjects(item.second, obj_copier, false);
         }
     } else if (foreign.isStream()) {
         QTC::TC("qpdf", "QPDF reserve stream");
@@ -2284,12 +2284,11 @@ QPDF::replaceForeignIndirectObjects(
     } else if (foreign.isDictionary()) {
         QTC::TC("qpdf", "QPDF replace dictionary");
         result = QPDFObjectHandle::newDictionary();
-        std::set<std::string> keys = foreign.getKeys();
-        for (auto const& iter: keys) {
+        for (auto item: foreign.dItems()) {
             result.replaceKey(
-                iter,
+                item.first,
                 replaceForeignIndirectObjects(
-                    foreign.getKey(iter), obj_copier, false));
+                    item.second, obj_copier, false));
         }
     } else if (foreign.isStream()) {
         QTC::TC("qpdf", "QPDF replace stream");
@@ -2297,13 +2296,11 @@ QPDF::replaceForeignIndirectObjects(
         result = obj_copier.object_map[foreign_og];
         result.assertStream();
         QPDFObjectHandle dict = result.getDict();
-        QPDFObjectHandle old_dict = foreign.getDict();
-        std::set<std::string> keys = old_dict.getKeys();
-        for (auto const& iter: keys) {
+        for (auto item: foreign.getDict().dItems()) {
             dict.replaceKey(
-                iter,
+                item.first,
                 replaceForeignIndirectObjects(
-                    old_dict.getKey(iter), obj_copier, false));
+                    item.second, obj_copier, false));
         }
         copyStreamData(result, foreign);
     } else {
