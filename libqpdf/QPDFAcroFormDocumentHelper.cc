@@ -735,7 +735,7 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
     // the stream contents.
     resources.mergeResources(merge_with, &dr_map);
     // Remove empty subdictionaries
-    for (auto iter: resources.ditems()) {
+    for (auto iter: resources.dItems()) {
         if (iter.second.isDictionary() && (iter.second.getKeys().size() == 0)) {
             resources.removeKey(iter.first);
         }
@@ -1079,12 +1079,12 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             return dict.replaceKeyAndGetNew(key, old.copyStream());
         };
         if (apdict.isDictionary()) {
-            for (auto& ap: apdict.ditems()) {
+            for (auto ap: apdict.dItems()) {
                 if (ap.second.isStream()) {
                     streams.push_back(
                         replace_stream(apdict, ap.first, ap.second));
                 } else if (ap.second.isDictionary()) {
-                    for (auto& ap2: ap.second.ditems()) {
+                    for (auto ap2: ap.second.dItems()) {
                         if (ap2.second.isStream()) {
                             streams.push_back(
                                 // line-break

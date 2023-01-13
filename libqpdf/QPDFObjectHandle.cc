@@ -1112,12 +1112,12 @@ QPDFObjectHandle::makeResourcesIndirect(QPDF& owning_qpdf)
     if (!isDictionary()) {
         return;
     }
-    for (auto const& i1: ditems()) {
+    for (auto i1: dItems()) {
         QPDFObjectHandle sub = i1.second;
         if (!sub.isDictionary()) {
             continue;
         }
-        for (auto i2: sub.ditems()) {
+        for (auto i2: sub.dItems()) {
             std::string const& key = i2.first;
             QPDFObjectHandle val = i2.second;
             if (!val.isIndirect()) {
@@ -1139,7 +1139,7 @@ QPDFObjectHandle::mergeResources(
 
     auto make_og_to_name = [](QPDFObjectHandle& dict,
                               std::map<QPDFObjGen, std::string>& og_to_name) {
-        for (auto i: dict.ditems()) {
+        for (auto i: dict.dItems()) {
             if (i.second.isIndirect()) {
                 og_to_name[i.second.getObjGen()] = i.first;
             }
@@ -1148,7 +1148,7 @@ QPDFObjectHandle::mergeResources(
 
     // This algorithm is described in comments in QPDFObjectHandle.hh
     // above the declaration of mergeResources.
-    for (auto o_top: other.ditems()) {
+    for (auto o_top: other.dItems()) {
         std::string const& rtype = o_top.first;
         QPDFObjectHandle other_val = o_top.second;
         if (hasKey(rtype)) {
@@ -1168,7 +1168,7 @@ QPDFObjectHandle::mergeResources(
                 std::set<std::string> rnames;
                 int min_suffix = 1;
                 bool initialized_maps = false;
-                for (auto ov_iter: other_val.ditems()) {
+                for (auto ov_iter: other_val.dItems()) {
                     std::string const& key = ov_iter.first;
                     QPDFObjectHandle rval = ov_iter.second;
                     if (!this_val.hasKey(key)) {

@@ -31,7 +31,7 @@ dumpInfoDict(
 {
     QPDFObjectHandle trailer = pdf.getTrailer();
     if (trailer.hasKey("/Info")) {
-        for (auto& it: trailer.getKey("/Info").ditems()) {
+        for (auto it: trailer.getKey("/Info").dItems()) {
             std::string val;
             if (it.second.isString()) {
                 val = it.second.getStringValue();

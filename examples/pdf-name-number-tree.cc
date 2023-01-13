@@ -86,7 +86,7 @@ main(int argc, char* argv[])
     // look at it using dictionary and array iterators.
     std::cout << "Keys in name tree object:" << std::endl;
     QPDFObjectHandle names;
-    for (auto const& i: name_tree_oh.ditems()) {
+    for (auto i: name_tree_oh.dItems()) {
         std::cout << i.first << std::endl;
         if (i.first == "/Names") {
             names = i.second;
