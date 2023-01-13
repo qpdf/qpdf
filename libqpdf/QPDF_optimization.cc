@@ -90,18 +90,18 @@ QPDF::optimize(
     }
 
     // Traverse document-level items
-    for (auto const& key: this->m->trailer.getKeys()) {
-        if (key == "/Root") {
+    for (auto item: m->trailer.dItems()) {
+        if (item.first == "/Root") {
             // handled separately
         } else {
             updateObjectMaps(
-                ObjUser(ObjUser::ou_trailer_key, key),
-                this->m->trailer.getKey(key),
+                ObjUser(ObjUser::ou_trailer_key, item.first),
+                item.second,
                 skip_stream_parameters);
         }
     }
 
-    for (auto const& key: root.getKeys()) {
+    for (auto item: root.dItems()) {
         // Technically, /I keys from /Thread dictionaries are supposed
         // to be handled separately, but we are going to disregard
         // that specification for now.  There is loads of evidence
@@ -109,8 +109,8 @@ QPDF::optimize(
         // time to time, so this is almost certain not to cause any
         // problems.
         updateObjectMaps(
-            ObjUser(ObjUser::ou_root_key, key),
-            root.getKey(key),
+            ObjUser(ObjUser::ou_root_key, item.first),
+            item.second,
             skip_stream_parameters);
     }
 
@@ -176,7 +176,8 @@ QPDF::pushInheritedAttributesToPageInternal(
     // that have values for this attribute.
 
     std::set<std::string> inheritable_keys;
-    for (auto const& key: cur_pages.getKeys()) {
+    for (auto item: cur_pages.dItems()) {
+        auto const& key = item.first;
         if ((key == "/MediaBox") || (key == "/CropBox") ||
             (key == "/Resources") || (key == "/Rotate")) {
             if (!allow_changes) {
@@ -192,7 +193,7 @@ QPDF::pushInheritedAttributesToPageInternal(
 
             // This is an inheritable resource
             inheritable_keys.insert(key);
-            QPDFObjectHandle oh = cur_pages.getKey(key);
+            QPDFObjectHandle oh = item.second;
             QTC::TC(
                 "qpdf",
                 "QPDF opt direct pages resource",
@@ -202,8 +203,8 @@ QPDF::pushInheritedAttributesToPageInternal(
                     // Replace shared direct object non-scalar
                     // resources with indirect objects to avoid
                     // copying large structures around.
-                    cur_pages.replaceKey(key, makeIndirectObject(oh));
-                    oh = cur_pages.getKey(key);
+                    oh = makeIndirectObject(oh);
+                    cur_pages.replaceKey(key, oh);
                 } else {
                     // It's okay to copy scalars.
                     QTC::TC("qpdf", "QPDF opt inherited scalar");
@@ -342,13 +343,14 @@ QPDF::updateObjectMapsInternal(
             }
         }
 
-        for (auto const& key: dict.getKeys()) {
+        for (auto item: dict.dItems()) {
+            auto const& key = item.first;
             if (is_page_node && (key == "/Thumb")) {
                 // Traverse page thumbnail dictionaries as a special
                 // case.
                 updateObjectMapsInternal(
                     ObjUser(ObjUser::ou_thumb, ou.pageno),
-                    dict.getKey(key),
+                    item.second,
                     skip_stream_parameters,
                     visited,
                     false,
@@ -364,7 +366,7 @@ QPDF::updateObjectMapsInternal(
             } else {
                 updateObjectMapsInternal(
                     ou,
-                    dict.getKey(key),
+                    item.second,
                     skip_stream_parameters,
                     visited,
                     false,

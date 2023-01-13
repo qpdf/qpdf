@@ -2287,8 +2287,7 @@ QPDF::replaceForeignIndirectObjects(
         for (auto item: foreign.dItems()) {
             result.replaceKey(
                 item.first,
-                replaceForeignIndirectObjects(
-                    item.second, obj_copier, false));
+                replaceForeignIndirectObjects(item.second, obj_copier, false));
         }
     } else if (foreign.isStream()) {
         QTC::TC("qpdf", "QPDF replace stream");
@@ -2299,8 +2298,7 @@ QPDF::replaceForeignIndirectObjects(
         for (auto item: foreign.getDict().dItems()) {
             dict.replaceKey(
                 item.first,
-                replaceForeignIndirectObjects(
-                    item.second, obj_copier, false));
+                replaceForeignIndirectObjects(item.second, obj_copier, false));
         }
         copyStreamData(result, foreign);
     } else {
