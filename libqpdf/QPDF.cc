@@ -2538,28 +2538,19 @@ QPDF::getCompressibleObjGens()
             visited.insert(og);
         }
         if (obj.isStream()) {
-            QPDFObjectHandle dict = obj.getDict();
-            std::set<std::string> keys = dict.getKeys();
-            for (std::set<std::string>::reverse_iterator iter = keys.rbegin();
-                 iter != keys.rend();
-                 ++iter) {
-                std::string const& key = *iter;
-                QPDFObjectHandle value = dict.getKey(key);
-                if (key == "/Length") {
+            auto it = queue.begin();
+            for (auto item: obj.getDict().dItems()) {
+                if (item.first == "/Length") {
                     // omit stream lengths
-                    if (value.isIndirect()) {
-                        QTC::TC("qpdf", "QPDF exclude indirect length");
-                    }
+                    QTC::TC("qpdf", "QPDF exclude indirect length");
                 } else {
-                    queue.push_front(value);
+                    queue.insert(it, item.second);
                 }
             }
         } else if (obj.isDictionary()) {
-            std::set<std::string> keys = obj.getKeys();
-            for (std::set<std::string>::reverse_iterator iter = keys.rbegin();
-                 iter != keys.rend();
-                 ++iter) {
-                queue.push_front(obj.getKey(*iter));
+            auto it = queue.begin();
+            for (auto oh: obj.dValues()) {
+                queue.insert(it, oh);
             }
         } else if (obj.isArray()) {
             int n = obj.getArrayNItems();
