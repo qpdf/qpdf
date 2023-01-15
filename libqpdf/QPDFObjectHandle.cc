@@ -1245,11 +1245,10 @@ QPDFObjectHandle::getResourceNames()
     if (!isDictionary()) {
         return result;
     }
-    for (auto const& key: getKeys()) {
-        QPDFObjectHandle val = getKey(key);
+    for (auto val: dValues()) {
         if (val.isDictionary()) {
-            for (auto const& val_key: val.getKeys()) {
-                result.insert(val_key);
+            for (auto key: val.dKeys()) {
+                result.insert(std::move(key));
             }
         }
     }
@@ -2256,10 +2255,9 @@ QPDFObjectHandle::makeDirect(
         this->obj = QPDF_Array::create(items);
     } else if (isDictionary()) {
         std::map<std::string, QPDFObjectHandle> items;
-        auto dict = asDictionary();
-        for (auto const& key: getKeys()) {
-            items[key] = dict->getKey(key);
-            items[key].makeDirect(visited, stop_at_streams);
+        for (auto item: dItems()) {
+            item.second.makeDirect(visited, stop_at_streams);
+            items[std::move(item.first)] = item.second;
         }
         this->obj = QPDF_Dictionary::create(items);
     } else if (isStream()) {
