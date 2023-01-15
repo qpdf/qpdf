@@ -1019,6 +1019,12 @@ QPDFObjectHandle::dItems()
     return {*this};
 }
 
+QPDFObjectHandle::DictKeys
+QPDFObjectHandle::dKeys()
+{
+    return {*this};
+}
+
 QPDFObjectHandle::DictValues
 QPDFObjectHandle::dValues()
 {
@@ -2683,6 +2689,47 @@ QPDFObjectHandle::DictItems::iterator::operator*()
 
 bool
 QPDFObjectHandle::DictItems::iterator::operator==(iterator const& other) const
+{
+    return iters.first == other.iters.first;
+}
+
+QPDFObjectHandle::DictKeys::DictKeys(QPDFObjectHandle oh) :
+    oh(oh.isDictionary() ? oh : newDictionary())
+{
+}
+
+QPDFObjectHandle::DictKeys::iterator
+QPDFObjectHandle::DictKeys::begin()
+{
+    return iterator(oh.asDictionary()->getBegin());
+}
+
+QPDFObjectHandle::DictKeys::iterator
+QPDFObjectHandle::DictKeys::end()
+{
+    return iterator(oh.asDictionary()->getEnd());
+}
+
+QPDFObjectHandle::DictKeys::iterator::iterator(std::pair<diter, diter> iter) :
+    iters(iter)
+{
+}
+
+QPDFObjectHandle::DictKeys::iterator&
+QPDFObjectHandle::DictKeys::iterator::operator++()
+{
+    QPDF_Dictionary::increment(iters);
+    return *this;
+}
+
+QPDFObjectHandle::DictKeys::iterator::reference
+QPDFObjectHandle::DictKeys::iterator::operator*()
+{
+    return iters.first->first;
+}
+
+bool
+QPDFObjectHandle::DictKeys::iterator::operator==(iterator const& other) const
 {
     return iters.first == other.iters.first;
 }

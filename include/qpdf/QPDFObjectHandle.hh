@@ -886,6 +886,7 @@ class QPDFObjectHandle
     // }
     class QPDFDictItems;
     class DictItems;
+    class DictKeys;
     class DictValues;
 
     QPDF_DLL
@@ -893,6 +894,8 @@ class QPDFObjectHandle
 
     QPDF_DLL
     DictItems dItems();
+    QPDF_DLL
+    DictKeys dKeys();
     QPDF_DLL
     DictValues dValues();
 
@@ -1802,6 +1805,64 @@ class QPDFObjectHandle::DictItems
         }
         QPDF_DLL
         value_type operator*();
+        QPDF_DLL
+        bool operator==(iterator const& other) const;
+        QPDF_DLL
+        bool
+        operator!=(iterator const& other) const
+        {
+            return !operator==(other);
+        }
+
+      private:
+        using diter = std::map<std::string, QPDFObjectHandle>::iterator;
+
+        iterator(std::pair<diter, diter> iter);
+
+        std::pair<diter, diter> iters;
+    };
+
+    QPDF_DLL
+    iterator begin();
+    QPDF_DLL
+    iterator end();
+
+  private:
+    QPDFObjectHandle oh;
+};
+
+class QPDFObjectHandle::DictKeys
+{
+  public:
+    QPDF_DLL
+    DictKeys(QPDFObjectHandle oh);
+
+    class iterator
+    {
+        friend class DictKeys;
+
+      public:
+        typedef std::string T;
+        using iterator_category = std::input_iterator_tag;
+        using value_type = T;
+        using difference_type = long;
+        using pointer = T*;
+        using reference = T const&;
+
+        QPDF_DLL
+        virtual ~iterator() = default;
+        QPDF_DLL
+        iterator& operator++();
+        QPDF_DLL
+        iterator
+        operator++(int)
+        {
+            iterator t = *this;
+            ++(*this);
+            return t;
+        }
+        QPDF_DLL
+        reference operator*();
         QPDF_DLL
         bool operator==(iterator const& other) const;
         QPDF_DLL
