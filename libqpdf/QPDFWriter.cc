@@ -1262,8 +1262,8 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
                 enqueueObject(item);
             }
         } else if (object.isDictionary()) {
-            for (auto item: object.dItems()) {
-                enqueueObject(item.second);
+            for (auto oh: object.dValues()) {
+                enqueueObject(oh);
             }
         }
     } else {
@@ -1306,7 +1306,8 @@ QPDFWriter::writeTrailer(
         writeString(" /Size ");
         writeString(std::to_string(size));
     } else {
-        for (auto const& key: trailer.getKeys()) {
+        for (auto item: trailer.dItems()) {
+            auto const& key = item.first;
             writeStringQDF("  ");
             writeStringNoQDF(" ");
             writeString(QPDF_Name::normalizeName(key));
@@ -1321,7 +1322,7 @@ QPDFWriter::writeTrailer(
                         pos - this->m->pipeline->getCount() + 21));
                 }
             } else {
-                unparseChild(trailer.getKey(key), 1, 0);
+                unparseChild(item.second, 1, 0);
             }
             writeStringQDF("\n");
         }
@@ -1544,13 +1545,18 @@ QPDFWriter::unparseObject(
         }
 
         if (extensions.isInitialized()) {
-            std::set<std::string> keys = extensions.getKeys();
-            if (keys.count("/ADBE") > 0) {
-                have_extensions_adbe = true;
-                keys.erase("/ADBE");
-            }
-            if (keys.size() > 0) {
-                have_extensions_other = true;
+            for (auto const& key: extensions.dKeys()) {
+                if (key == "/ADBE") {
+                    have_extensions_adbe = true;
+                    if (have_extensions_other) {
+                        break;
+                    }
+                } else {
+                    have_extensions_other = true;
+                    if (have_extensions_adbe) {
+                        break;
+                    }
+                }
             }
         }
 
@@ -2083,9 +2089,7 @@ QPDFWriter::generateID()
         }
         seed += " QPDF ";
         if (trailer.hasKey("/Info")) {
-            QPDFObjectHandle info = trailer.getKey("/Info");
-            for (auto const& key: info.getKeys()) {
-                QPDFObjectHandle obj = info.getKey(key);
+            for (auto obj: trailer.getKey("/Info").dValues()) {
                 if (obj.isString()) {
                     seed += " ";
                     seed += obj.getStringValue();
@@ -2260,8 +2264,9 @@ QPDFWriter::prepareFileForWrite()
 
     this->m->pdf.fixDanglingReferences();
     QPDFObjectHandle root = this->m->pdf.getRoot();
-    for (auto const& key: root.getKeys()) {
-        QPDFObjectHandle oh = root.getKey(key);
+    for (auto item: root.dItems()) {
+        auto const& key = item.first;
+        auto oh = item.second;
         if ((key == "/Extensions") && (oh.isDictionary())) {
             bool extensions_indirect = false;
             if (oh.isIndirect()) {
@@ -3256,8 +3261,8 @@ QPDFWriter::enqueueObjectsStandard()
     // dictionary into the queue, handling direct objects recursively.
     // Root is already there, so enqueuing it a second time is a
     // no-op.
-    for (auto const& key: trailer.getKeys()) {
-        enqueueObject(trailer.getKey(key));
+    for (auto oh: trailer.dValues()) {
+        enqueueObject(oh);
     }
 }
 
@@ -3279,11 +3284,10 @@ QPDFWriter::enqueueObjectsPCLm()
         enqueueObject(page.getKey("/Contents"));
 
         // enqueue all the strips for each page
-        QPDFObjectHandle strips = page.getKey("/Resources").getKey("/XObject");
-        for (auto const& image: strips.getKeys()) {
-            enqueueObject(strips.getKey(image));
-            enqueueObject(QPDFObjectHandle::newStream(
-                &this->m->pdf, image_transform_content));
+        for (auto image:
+             page.getKey("/Resources").getKey("/XObject").dValues()) {
+            enqueueObject(image);
+            enqueueObject(m->pdf.newStream(image_transform_content));
         }
     }
 
