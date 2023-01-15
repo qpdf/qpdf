@@ -35,6 +35,40 @@ class QPDF_Dictionary: public QPDFValue
     // Remove key, doing nothing if key does not exist
     void removeKey(std::string const& key);
 
+    // Methods to support iteration over dictionaries, skipping null elements.
+    // These methods use pairs of map iterators, where the first element of the
+    // pair is an iterator pointing to the current (non-null) element, and the
+    // second element is the end iterator. The increment method increments the
+    // iterator pair to the next non-null map element.
+    using diter = std::map<std::string, QPDFObjectHandle>::iterator;
+
+    std::pair<diter, diter>
+    getBegin()
+    {
+        auto begin = items.begin();
+        auto end = items.end();
+        while (begin != end && begin->second.isNull()) {
+            ++begin;
+        }
+        return {begin, end};
+    }
+    std::pair<diter, diter>
+    getEnd()
+    {
+        auto end = items.end();
+        return {end, end};
+    }
+    static void
+    increment(std::pair<diter, diter>& iter)
+    {
+        if (iter.first != iter.second) {
+            ++iter.first;
+            while (iter.first != iter.second && iter.first->second.isNull()) {
+                ++iter.first;
+            }
+        }
+    }
+
   private:
     QPDF_Dictionary(std::map<std::string, QPDFObjectHandle> const& items);
     QPDF_Dictionary(std::map<std::string, QPDFObjectHandle>&& items);
