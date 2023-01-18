@@ -4,10 +4,7 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QUtil.hh>
 
-QPDFXRefEntry::QPDFXRefEntry() :
-    type(0),
-    field1(0),
-    field2(0)
+QPDFXRefEntry::QPDFXRefEntry()
 {
 }
 
