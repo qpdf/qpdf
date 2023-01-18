@@ -34,10 +34,26 @@ class QPDFXRefEntry
     // 1 = "uncompressed"; field 1 = offset
     // 2 = "compressed"; field 1 = object stream number, field 2 = index
 
+    // Create a type 0 "free" entry.
     QPDF_DLL
     QPDFXRefEntry();
     QPDF_DLL
     QPDFXRefEntry(int type, qpdf_offset_t field1, int field2);
+    // Create a type 1 "uncompressed" entry.
+    QPDF_DLL
+    QPDFXRefEntry(qpdf_offset_t offset) :
+        type(1),
+        field1(offset)
+    {
+    }
+    // Create a type 2 "compressed" entry.
+    QPDF_DLL
+    QPDFXRefEntry(int stream_number, int index) :
+        type(2),
+        field1(stream_number),
+        field2(index)
+    {
+    }
 
     QPDF_DLL
     int getType() const;
@@ -51,9 +67,9 @@ class QPDFXRefEntry
   private:
     // This class does not use the Members pattern to avoid a memory
     // allocation for every one of these. A lot of these get created.
-    int type;
-    qpdf_offset_t field1;
-    int field2;
+    int type{0};
+    qpdf_offset_t field1{0};
+    int field2{0};
 };
 
 #endif // QPDFXREFENTRY_HH

@@ -1249,11 +1249,11 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2, bool overwrite)
     case 1:
         // f2 is generation
         QTC::TC("qpdf", "QPDF xref gen > 0", ((f2 > 0) ? 1 : 0));
-        this->m->xref_table[QPDFObjGen(obj, f2)] = QPDFXRefEntry(f0, f1, f2);
+        this->m->xref_table[QPDFObjGen(obj, f2)] = QPDFXRefEntry(f1);
         break;
 
     case 2:
-        this->m->xref_table[QPDFObjGen(obj, 0)] = QPDFXRefEntry(f0, f1, f2);
+        this->m->xref_table[QPDFObjGen(obj, 0)] = QPDFXRefEntry(toI(f1), f2);
         break;
 
     default:
