@@ -650,6 +650,7 @@ namespace
             ls_number_minus,
             ls_number_leading_zero,
             ls_number_before_point,
+            ls_number_point,
             ls_alpha,
             ls_string,
             ls_backslash,
@@ -825,6 +826,11 @@ JSONParser::numberError()
         throw std::runtime_error(
             "JSON: offset " + std::to_string(offset) +
             ": numeric literal: unexpected sign");
+    } else if (QUtil::is_space(*p) || strchr("{}[]:,", *p)) {
+        QTC::TC("libtests", "JSON parse incomplete number");
+        throw std::runtime_error(
+            "JSON: offset " + std::to_string(offset) +
+            ": numeric literal: incomplete number");
     } else {
         QTC::TC("libtests", "JSON parse numeric bad character");
         throw std::runtime_error(
@@ -884,13 +890,6 @@ JSONParser::getToken()
                 number_after_e = 0;
                 number_saw_point = false;
                 number_saw_e = false;
-            } else if (*p == '.') {
-                lex_state = ls_number;
-                number_before_point = 0;
-                number_after_point = 0;
-                number_after_e = 0;
-                number_saw_point = true;
-                number_saw_e = false;
             } else if (strchr("{}[]:,", *p)) {
                 ready = true;
             } else {
@@ -918,7 +917,7 @@ JSONParser::getToken()
 
         case ls_number_leading_zero:
             if (*p == '.') {
-                lex_state = ls_number;
+                lex_state = ls_number_point;
             } else if (*p == 'e') {
                 lex_state = ls_number;
             } else if (QUtil::is_space(*p)) {
@@ -940,7 +939,7 @@ JSONParser::getToken()
                 ++number_before_point;
             } else if (*p == '.') {
                 number_saw_point = true;
-                lex_state = ls_number;
+                lex_state = ls_number_point;
             } else if (*p == 'e') {
                 number_saw_e = true;
                 lex_state = ls_number;
@@ -950,6 +949,15 @@ JSONParser::getToken()
             } else if (strchr("{}[]:,", *p)) {
                 action = reread;
                 ready = true;
+            } else {
+                numberError();
+            }
+            break;
+
+        case ls_number_point:
+            if ((*p >= '0') && (*p <= '9')) {
+                ++number_after_point;
+                lex_state = ls_number;
             } else {
                 numberError();
             }
@@ -1083,6 +1091,7 @@ JSONParser::getToken()
                 break;
 
             case ls_number_before_point:
+            case ls_number_point:
             case ls_number:
             case ls_number_minus:
             case ls_number_leading_zero:
@@ -1158,10 +1167,11 @@ JSONParser::handleToken()
         }
         break;
 
-    case ls_number_before_point:
     case ls_number:
     case ls_number_minus:
     case ls_number_leading_zero:
+    case ls_number_before_point:
+    case ls_number_point:
         if (number_saw_point && (number_after_point == 0)) {
             // QTC::TC("libtests", "JSON parse decimal with no digits");
             throw std::runtime_error(

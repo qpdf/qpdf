@@ -76,6 +76,7 @@ JSON parse duplicate e 0
 JSON parse unexpected sign 0
 JSON parse numeric bad character 0
 JSON parse number minus no digits 0
+JSON parse incomplete number 0
 JSON parse keyword bad character 0
 JSON parse backslash bad character 0
 JSON parse unterminated string 0
