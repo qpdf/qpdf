@@ -649,6 +649,7 @@ namespace
             ls_number,
             ls_number_minus,
             ls_number_leading_zero,
+            ls_number_before_point,
             ls_alpha,
             ls_string,
             ls_backslash,
@@ -820,7 +821,7 @@ JSONParser::numberError()
             "JSON: offset " + std::to_string(offset) +
             ": numeric literal: e already seen");
     } else if ((*p == '+') || (*p == '-')) {
-        // QTC::TC("libtests", "JSON parse unexpected sign");
+        QTC::TC("libtests", "JSON parse unexpected sign");
         throw std::runtime_error(
             "JSON: offset " + std::to_string(offset) +
             ": numeric literal: unexpected sign");
@@ -870,7 +871,7 @@ JSONParser::getToken()
                 number_saw_point = false;
                 number_saw_e = false;
             } else if ((*p >= '1') && (*p <= '9')) {
-                lex_state = ls_number;
+                lex_state = ls_number_before_point;
                 number_before_point = 1;
                 number_after_point = 0;
                 number_after_e = 0;
@@ -903,7 +904,7 @@ JSONParser::getToken()
         case ls_number_minus:
             if ((*p >= '1') && (*p <= '9')) {
                 ++number_before_point;
-                lex_state = ls_number;
+                lex_state = ls_number_before_point;
             } else if (*p == '0') {
                 ++number_before_point;
                 lex_state = ls_number_leading_zero;
@@ -931,6 +932,26 @@ JSONParser::getToken()
                 throw std::runtime_error(
                     "JSON: offset " + std::to_string(offset) +
                     ": number with leading zero");
+            }
+            break;
+
+        case ls_number_before_point:
+            if ((*p >= '0') && (*p <= '9')) {
+                ++number_before_point;
+            } else if (*p == '.') {
+                number_saw_point = true;
+                lex_state = ls_number;
+            } else if (*p == 'e') {
+                number_saw_e = true;
+                lex_state = ls_number;
+            } else if (QUtil::is_space(*p)) {
+                action = ignore;
+                ready = true;
+            } else if (strchr("{}[]:,", *p)) {
+                action = reread;
+                ready = true;
+            } else {
+                numberError();
             }
             break;
 
@@ -970,7 +991,6 @@ JSONParser::getToken()
                 if (number_saw_e && (number_after_e == 0)) {
                     // okay
                 } else {
-                    QTC::TC("libtests", "JSON parse unexpected sign");
                     throw std::runtime_error(
                         "JSON: offset " + std::to_string(offset) +
                         ": numeric literal: unexpected sign");
@@ -1062,6 +1082,7 @@ JSONParser::getToken()
                 throw std::logic_error("tok_start set in ls_top while parsing");
                 break;
 
+            case ls_number_before_point:
             case ls_number:
             case ls_number_minus:
             case ls_number_leading_zero:
@@ -1137,6 +1158,7 @@ JSONParser::handleToken()
         }
         break;
 
+    case ls_number_before_point:
     case ls_number:
     case ls_number_minus:
     case ls_number_leading_zero:
