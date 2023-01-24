@@ -647,6 +647,7 @@ namespace
         enum lex_state_e {
             ls_top,
             ls_number,
+            ls_number_minus,
             ls_alpha,
             ls_string,
             ls_backslash,
@@ -861,7 +862,7 @@ JSONParser::getToken()
             } else if ((*p >= 'a') && (*p <= 'z')) {
                 lex_state = ls_alpha;
             } else if (*p == '-') {
-                lex_state = ls_number;
+                lex_state = ls_number_minus;
                 number_before_point = 0;
                 number_after_point = 0;
                 number_after_e = 0;
@@ -888,6 +889,21 @@ JSONParser::getToken()
                 throw std::runtime_error(
                     "JSON: offset " + std::to_string(offset) +
                     ": unexpected character " + std::string(p, 1));
+            }
+            break;
+
+        case ls_number_minus:
+            if ((*p >= '1') && (*p <= '9')) {
+                ++number_before_point;
+                lex_state = ls_number;
+            } else if (*p == '0') {
+                ++number_before_point;
+                lex_state = ls_number;
+            } else {
+                QTC::TC("libtests", "JSON parse number minus no digits");
+                throw std::runtime_error(
+                    "JSON: offset " + std::to_string(offset) +
+                    ": numeric literal: no digit after minus sign");
             }
             break;
 
@@ -1020,6 +1036,7 @@ JSONParser::getToken()
                 break;
 
             case ls_number:
+            case ls_number_minus:
             case ls_alpha:
                 // okay
                 break;
@@ -1093,8 +1110,9 @@ JSONParser::handleToken()
         break;
 
     case ls_number:
+    case ls_number_minus:
         if (number_saw_point && (number_after_point == 0)) {
-            QTC::TC("libtests", "JSON parse decimal with no digits");
+            // QTC::TC("libtests", "JSON parse decimal with no digits");
             throw std::runtime_error(
                 "JSON: offset " + std::to_string(offset) +
                 ": decimal point with no digits");
@@ -1108,7 +1126,7 @@ JSONParser::handleToken()
                 ": number with leading zero");
         }
         if ((number_before_point == 0) && (number_after_point == 0)) {
-            QTC::TC("libtests", "JSON parse number no digits");
+            // QTC::TC("libtests", "JSON parse number no digits");
             throw std::runtime_error(
                 "JSON: offset " + std::to_string(offset) +
                 ": number with no digits");

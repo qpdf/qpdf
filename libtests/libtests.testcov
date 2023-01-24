@@ -58,7 +58,6 @@ QPDFArgParser bad option for help 0
 QPDFArgParser bad topic for help 0
 QPDFArgParser invalid choice handler to unknown 0
 JSON parse junk after object 0
-JSON parse decimal with no digits 0
 JSON parse invalid keyword 0
 JSON parse expected colon 0
 JSON parse expected , or } 0
@@ -76,11 +75,11 @@ JSON parse duplicate point 0
 JSON parse duplicate e 0
 JSON parse unexpected sign 0
 JSON parse numeric bad character 0
+JSON parse number minus no digits 0
 JSON parse keyword bad character 0
 JSON parse backslash bad character 0
 JSON parse unterminated string 0
 JSON parse leading zero 0
-JSON parse number no digits 0
 JSON parse premature end of u 0
 JSON parse bad hex after u 0
 JSONHandler unhandled value 0

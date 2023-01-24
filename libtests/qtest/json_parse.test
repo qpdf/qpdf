@@ -121,6 +121,8 @@ my @bad = (
     "high high surrogate",      # 38
     "dangling high surrogate",  # 39
     "duplicate dictionary key", # 40
+    "decimal point after minus",# 41
+    "e after minus",            # 42
     );
 
 my $i = 0;
