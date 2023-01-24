@@ -653,6 +653,7 @@ namespace
             ls_number_point,
             ls_number_after_point,
             ls_number_e,
+            ls_number_e_sign,
             ls_alpha,
             ls_string,
             ls_backslash,
@@ -988,6 +989,14 @@ JSONParser::getToken()
                 ++number_after_e;
                 lex_state = ls_number;
             } else if ((*p == '+') || (*p == '-')) {
+                lex_state = ls_number_e_sign;
+            } else {
+                numberError();
+            }
+            break;
+
+        case ls_number_e_sign:
+            if ((*p >= '0') && (*p <= '9')) {
                 lex_state = ls_number;
             } else {
                 numberError();
@@ -1120,13 +1129,14 @@ JSONParser::getToken()
                 throw std::logic_error("tok_start set in ls_top while parsing");
                 break;
 
+            case ls_number:
+            case ls_number_minus:
+            case ls_number_leading_zero:
             case ls_number_before_point:
             case ls_number_point:
             case ls_number_after_point:
             case ls_number_e:
-            case ls_number:
-            case ls_number_minus:
-            case ls_number_leading_zero:
+            case ls_number_e_sign:
             case ls_alpha:
                 // okay
                 break;
@@ -1206,6 +1216,7 @@ JSONParser::handleToken()
     case ls_number_point:
     case ls_number_after_point:
     case ls_number_e:
+    case ls_number_e_sign:
         if (number_saw_point && (number_after_point == 0)) {
             // QTC::TC("libtests", "JSON parse decimal with no digits");
             throw std::runtime_error(
