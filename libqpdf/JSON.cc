@@ -620,6 +620,7 @@ namespace
       private:
         void getToken();
         void handleToken();
+        void numberError();
         static std::string
         decode_string(std::string const& json, qpdf_offset_t offset);
         static void handle_u_code(
@@ -797,6 +798,39 @@ JSONParser::decode_string(std::string const& str, qpdf_offset_t offset)
 }
 
 void
+JSONParser::numberError()
+{
+    if (*p == '.') {
+        if (number_saw_e) {
+            // QTC::TC("libtests", "JSON parse point after e");
+            throw std::runtime_error(
+                "JSON: offset " + std::to_string(offset) +
+                ": numeric literal: decimal point after e");
+        } else {
+            // QTC::TC("libtests", "JSON parse duplicate point");
+            throw std::runtime_error(
+                "JSON: offset " + std::to_string(offset) +
+                ": numeric literal: decimal point already seen");
+        }
+    } else if (*p == 'e') {
+        // QTC::TC("libtests", "JSON parse duplicate e");
+        throw std::runtime_error(
+            "JSON: offset " + std::to_string(offset) +
+            ": numeric literal: e already seen");
+    } else if ((*p == '+') || (*p == '-')) {
+        // QTC::TC("libtests", "JSON parse unexpected sign");
+        throw std::runtime_error(
+            "JSON: offset " + std::to_string(offset) +
+            ": numeric literal: unexpected sign");
+    } else {
+        QTC::TC("libtests", "JSON parse numeric bad character");
+        throw std::runtime_error(
+            "JSON: offset " + std::to_string(offset) +
+            ": numeric literal: unexpected character " + std::string(p, 1));
+    }
+}
+
+void
 JSONParser::getToken()
 {
     enum { append, ignore, reread } action = append;
@@ -905,11 +939,7 @@ JSONParser::getToken()
                 action = reread;
                 ready = true;
             } else {
-                QTC::TC("libtests", "JSON parse numeric bad character");
-                throw std::runtime_error(
-                    "JSON: offset " + std::to_string(offset) +
-                    ": numeric literal: unexpected character " +
-                    std::string(p, 1));
+                numberError();
             }
             break;
 
