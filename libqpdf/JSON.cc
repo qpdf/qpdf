@@ -651,6 +651,7 @@ namespace
             ls_number_leading_zero,
             ls_number_before_point,
             ls_number_point,
+            ls_number_after_point,
             ls_alpha,
             ls_string,
             ls_backslash,
@@ -811,7 +812,7 @@ JSONParser::numberError()
                 "JSON: offset " + std::to_string(offset) +
                 ": numeric literal: decimal point after e");
         } else {
-            // QTC::TC("libtests", "JSON parse duplicate point");
+            QTC::TC("libtests", "JSON parse duplicate point");
             throw std::runtime_error(
                 "JSON: offset " + std::to_string(offset) +
                 ": numeric literal: decimal point already seen");
@@ -957,7 +958,24 @@ JSONParser::getToken()
         case ls_number_point:
             if ((*p >= '0') && (*p <= '9')) {
                 ++number_after_point;
+                lex_state = ls_number_after_point;
+            } else {
+                numberError();
+            }
+            break;
+
+        case ls_number_after_point:
+            if ((*p >= '0') && (*p <= '9')) {
+                ++number_after_point;
+            } else if (*p == 'e') {
+                number_saw_e = true;
                 lex_state = ls_number;
+            } else if (QUtil::is_space(*p)) {
+                action = ignore;
+                ready = true;
+            } else if (strchr("{}[]:,", *p)) {
+                action = reread;
+                ready = true;
             } else {
                 numberError();
             }
@@ -979,7 +997,6 @@ JSONParser::getToken()
                         "JSON: offset " + std::to_string(offset) +
                         ": numeric literal: decimal point after e");
                 } else if (number_saw_point) {
-                    QTC::TC("libtests", "JSON parse duplicate point");
                     throw std::runtime_error(
                         "JSON: offset " + std::to_string(offset) +
                         ": numeric literal: decimal point already seen");
@@ -1092,6 +1109,7 @@ JSONParser::getToken()
 
             case ls_number_before_point:
             case ls_number_point:
+            case ls_number_after_point:
             case ls_number:
             case ls_number_minus:
             case ls_number_leading_zero:
@@ -1172,6 +1190,7 @@ JSONParser::handleToken()
     case ls_number_leading_zero:
     case ls_number_before_point:
     case ls_number_point:
+    case ls_number_after_point:
         if (number_saw_point && (number_after_point == 0)) {
             // QTC::TC("libtests", "JSON parse decimal with no digits");
             throw std::runtime_error(
