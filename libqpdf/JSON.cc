@@ -652,6 +652,7 @@ namespace
             ls_number_before_point,
             ls_number_point,
             ls_number_after_point,
+            ls_number_e,
             ls_alpha,
             ls_string,
             ls_backslash,
@@ -817,7 +818,7 @@ JSONParser::numberError()
                 "JSON: offset " + std::to_string(offset) +
                 ": numeric literal: decimal point already seen");
         }
-    } else if (*p == 'e') {
+    } else if (*p == 'e' || *p == 'E') {
         // QTC::TC("libtests", "JSON parse duplicate e");
         throw std::runtime_error(
             "JSON: offset " + std::to_string(offset) +
@@ -919,14 +920,15 @@ JSONParser::getToken()
         case ls_number_leading_zero:
             if (*p == '.') {
                 lex_state = ls_number_point;
-            } else if (*p == 'e') {
-                lex_state = ls_number;
             } else if (QUtil::is_space(*p)) {
                 action = ignore;
                 ready = true;
             } else if (strchr("{}[]:,", *p)) {
                 action = reread;
                 ready = true;
+            } else if (*p == 'e' || *p == 'E') {
+                number_saw_e = true;
+                lex_state = ls_number_e;
             } else {
                 QTC::TC("libtests", "JSON parse leading zero");
                 throw std::runtime_error(
@@ -941,15 +943,15 @@ JSONParser::getToken()
             } else if (*p == '.') {
                 number_saw_point = true;
                 lex_state = ls_number_point;
-            } else if (*p == 'e') {
-                number_saw_e = true;
-                lex_state = ls_number;
             } else if (QUtil::is_space(*p)) {
                 action = ignore;
                 ready = true;
             } else if (strchr("{}[]:,", *p)) {
                 action = reread;
                 ready = true;
+            } else if (*p == 'e' || *p == 'E') {
+                number_saw_e = true;
+                lex_state = ls_number_e;
             } else {
                 numberError();
             }
@@ -967,15 +969,26 @@ JSONParser::getToken()
         case ls_number_after_point:
             if ((*p >= '0') && (*p <= '9')) {
                 ++number_after_point;
-            } else if (*p == 'e') {
-                number_saw_e = true;
-                lex_state = ls_number;
             } else if (QUtil::is_space(*p)) {
                 action = ignore;
                 ready = true;
             } else if (strchr("{}[]:,", *p)) {
                 action = reread;
                 ready = true;
+            } else if (*p == 'e' || *p == 'E') {
+                number_saw_e = true;
+                lex_state = ls_number_e;
+            } else {
+                numberError();
+            }
+            break;
+
+        case ls_number_e:
+            if ((*p >= '0') && (*p <= '9')) {
+                ++number_after_e;
+                lex_state = ls_number;
+            } else if ((*p == '+') || (*p == '-')) {
+                lex_state = ls_number;
             } else {
                 numberError();
             }
@@ -1003,7 +1016,7 @@ JSONParser::getToken()
                 } else {
                     number_saw_point = true;
                 }
-            } else if (*p == 'e') {
+            } else if (*p == 'e' || *p == 'E') {
                 if (number_saw_e) {
                     QTC::TC("libtests", "JSON parse duplicate e");
                     throw std::runtime_error(
@@ -1110,6 +1123,7 @@ JSONParser::getToken()
             case ls_number_before_point:
             case ls_number_point:
             case ls_number_after_point:
+            case ls_number_e:
             case ls_number:
             case ls_number_minus:
             case ls_number_leading_zero:
@@ -1191,6 +1205,7 @@ JSONParser::handleToken()
     case ls_number_before_point:
     case ls_number_point:
     case ls_number_after_point:
+    case ls_number_e:
         if (number_saw_point && (number_after_point == 0)) {
             // QTC::TC("libtests", "JSON parse decimal with no digits");
             throw std::runtime_error(
