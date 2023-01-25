@@ -809,7 +809,7 @@ JSONParser::numberError()
 {
     if (*p == '.') {
         if (number_saw_e) {
-            // QTC::TC("libtests", "JSON parse point after e");
+            QTC::TC("libtests", "JSON parse point after e");
             throw std::runtime_error(
                 "JSON: offset " + std::to_string(offset) +
                 ": numeric literal: decimal point after e");
@@ -820,7 +820,7 @@ JSONParser::numberError()
                 ": numeric literal: decimal point already seen");
         }
     } else if (*p == 'e' || *p == 'E') {
-        // QTC::TC("libtests", "JSON parse duplicate e");
+        QTC::TC("libtests", "JSON parse duplicate e");
         throw std::runtime_error(
             "JSON: offset " + std::to_string(offset) +
             ": numeric literal: e already seen");
@@ -922,9 +922,11 @@ JSONParser::getToken()
             if (*p == '.') {
                 lex_state = ls_number_point;
             } else if (QUtil::is_space(*p)) {
+                lex_state = ls_number;
                 action = ignore;
                 ready = true;
             } else if (strchr("{}[]:,", *p)) {
+                lex_state = ls_number;
                 action = reread;
                 ready = true;
             } else if (*p == 'e' || *p == 'E') {
@@ -945,9 +947,11 @@ JSONParser::getToken()
                 number_saw_point = true;
                 lex_state = ls_number_point;
             } else if (QUtil::is_space(*p)) {
+                lex_state = ls_number;
                 action = ignore;
                 ready = true;
             } else if (strchr("{}[]:,", *p)) {
+                lex_state = ls_number;
                 action = reread;
                 ready = true;
             } else if (*p == 'e' || *p == 'E') {
@@ -971,9 +975,11 @@ JSONParser::getToken()
             if ((*p >= '0') && (*p <= '9')) {
                 ++number_after_point;
             } else if (QUtil::is_space(*p)) {
+                lex_state = ls_number;
                 action = ignore;
                 ready = true;
             } else if (strchr("{}[]:,", *p)) {
+                lex_state = ls_number;
                 action = reread;
                 ready = true;
             } else if (*p == 'e' || *p == 'E') {
@@ -1004,44 +1010,9 @@ JSONParser::getToken()
             break;
 
         case ls_number:
+            // We only get here after we have seen an exponent.
             if ((*p >= '0') && (*p <= '9')) {
-                if (number_saw_e) {
                     ++number_after_e;
-                } else if (number_saw_point) {
-                    ++number_after_point;
-                } else {
-                    ++number_before_point;
-                }
-            } else if (*p == '.') {
-                if (number_saw_e) {
-                    QTC::TC("libtests", "JSON parse point after e");
-                    throw std::runtime_error(
-                        "JSON: offset " + std::to_string(offset) +
-                        ": numeric literal: decimal point after e");
-                } else if (number_saw_point) {
-                    throw std::runtime_error(
-                        "JSON: offset " + std::to_string(offset) +
-                        ": numeric literal: decimal point already seen");
-                } else {
-                    number_saw_point = true;
-                }
-            } else if (*p == 'e' || *p == 'E') {
-                if (number_saw_e) {
-                    QTC::TC("libtests", "JSON parse duplicate e");
-                    throw std::runtime_error(
-                        "JSON: offset " + std::to_string(offset) +
-                        ": numeric literal: e already seen");
-                } else {
-                    number_saw_e = true;
-                }
-            } else if ((*p == '+') || (*p == '-')) {
-                if (number_saw_e && (number_after_e == 0)) {
-                    // okay
-                } else {
-                    throw std::runtime_error(
-                        "JSON: offset " + std::to_string(offset) +
-                        ": numeric literal: unexpected sign");
-                }
             } else if (QUtil::is_space(*p)) {
                 action = ignore;
                 ready = true;
