@@ -600,11 +600,6 @@ namespace
             is(is),
             reactor(reactor),
             lex_state(ls_top),
-            number_before_point(0),
-            number_after_point(0),
-            number_after_e(0),
-            number_saw_point(false),
-            number_saw_e(false),
             bytes(0),
             p(buf),
             u_count(0),
@@ -663,11 +658,6 @@ namespace
         InputSource& is;
         JSON::Reactor* reactor;
         lex_state_e lex_state;
-        size_t number_before_point;
-        size_t number_after_point;
-        size_t number_after_e;
-        bool number_saw_point;
-        bool number_saw_e;
         char buf[16384];
         size_t bytes;
         char const* p;
@@ -808,7 +798,8 @@ void
 JSONParser::numberError()
 {
     if (*p == '.') {
-        if (number_saw_e) {
+        if (lex_state == ls_number || lex_state == ls_number_e ||
+            lex_state == ls_number_e_sign) {
             QTC::TC("libtests", "JSON parse point after e");
             throw std::runtime_error(
                 "JSON: offset " + std::to_string(offset) +
@@ -874,25 +865,10 @@ JSONParser::getToken()
                 lex_state = ls_alpha;
             } else if (*p == '-') {
                 lex_state = ls_number_minus;
-                number_before_point = 0;
-                number_after_point = 0;
-                number_after_e = 0;
-                number_saw_point = false;
-                number_saw_e = false;
             } else if ((*p >= '1') && (*p <= '9')) {
                 lex_state = ls_number_before_point;
-                number_before_point = 1;
-                number_after_point = 0;
-                number_after_e = 0;
-                number_saw_point = false;
-                number_saw_e = false;
             } else if (*p == '0') {
                 lex_state = ls_number_leading_zero;
-                number_before_point = 1;
-                number_after_point = 0;
-                number_after_e = 0;
-                number_saw_point = false;
-                number_saw_e = false;
             } else if (strchr("{}[]:,", *p)) {
                 ready = true;
             } else {
@@ -905,10 +881,8 @@ JSONParser::getToken()
 
         case ls_number_minus:
             if ((*p >= '1') && (*p <= '9')) {
-                ++number_before_point;
                 lex_state = ls_number_before_point;
             } else if (*p == '0') {
-                ++number_before_point;
                 lex_state = ls_number_leading_zero;
             } else {
                 QTC::TC("libtests", "JSON parse number minus no digits");
@@ -930,7 +904,6 @@ JSONParser::getToken()
                 action = reread;
                 ready = true;
             } else if (*p == 'e' || *p == 'E') {
-                number_saw_e = true;
                 lex_state = ls_number_e;
             } else {
                 QTC::TC("libtests", "JSON parse leading zero");
@@ -942,9 +915,8 @@ JSONParser::getToken()
 
         case ls_number_before_point:
             if ((*p >= '0') && (*p <= '9')) {
-                ++number_before_point;
+                // continue
             } else if (*p == '.') {
-                number_saw_point = true;
                 lex_state = ls_number_point;
             } else if (QUtil::is_space(*p)) {
                 lex_state = ls_number;
@@ -955,7 +927,6 @@ JSONParser::getToken()
                 action = reread;
                 ready = true;
             } else if (*p == 'e' || *p == 'E') {
-                number_saw_e = true;
                 lex_state = ls_number_e;
             } else {
                 numberError();
@@ -964,7 +935,6 @@ JSONParser::getToken()
 
         case ls_number_point:
             if ((*p >= '0') && (*p <= '9')) {
-                ++number_after_point;
                 lex_state = ls_number_after_point;
             } else {
                 numberError();
@@ -973,7 +943,7 @@ JSONParser::getToken()
 
         case ls_number_after_point:
             if ((*p >= '0') && (*p <= '9')) {
-                ++number_after_point;
+                // continue
             } else if (QUtil::is_space(*p)) {
                 lex_state = ls_number;
                 action = ignore;
@@ -983,7 +953,6 @@ JSONParser::getToken()
                 action = reread;
                 ready = true;
             } else if (*p == 'e' || *p == 'E') {
-                number_saw_e = true;
                 lex_state = ls_number_e;
             } else {
                 numberError();
@@ -992,7 +961,6 @@ JSONParser::getToken()
 
         case ls_number_e:
             if ((*p >= '0') && (*p <= '9')) {
-                ++number_after_e;
                 lex_state = ls_number;
             } else if ((*p == '+') || (*p == '-')) {
                 lex_state = ls_number_e_sign;
@@ -1012,7 +980,7 @@ JSONParser::getToken()
         case ls_number:
             // We only get here after we have seen an exponent.
             if ((*p >= '0') && (*p <= '9')) {
-                ++number_after_e;
+                // continue
             } else if (QUtil::is_space(*p)) {
                 action = ignore;
                 ready = true;
