@@ -871,21 +871,27 @@ JSONParser::getToken()
                 action = ignore;
             } else if (*p == ',') {
                 lex_state = ls_comma;
+                action = ignore;
                 ready = true;
             } else if (*p == ':') {
                 lex_state = ls_colon;
+                action = ignore;
                 ready = true;
             } else if (*p == '{') {
                 lex_state = ls_begin_dict;
+                action = ignore;
                 ready = true;
             } else if (*p == '}') {
                 lex_state = ls_end_dict;
+                action = ignore;
                 ready = true;
             } else if (*p == '[') {
                 lex_state = ls_begin_array;
+                action = ignore;
                 ready = true;
             } else if (*p == ']') {
                 lex_state = ls_end_array;
+                action = ignore;
                 ready = true;
             } else if ((*p >= 'a') && (*p <= 'z')) {
                 lex_state = ls_alpha;
