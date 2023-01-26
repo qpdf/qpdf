@@ -1150,10 +1150,44 @@ JSONParser::handleToken()
         break;
 
     case ls_colon:
+        if (parser_state != ps_dict_after_key) {
+            QTC::TC("libtests", "JSON parse unexpected :");
+            throw std::runtime_error(
+                "JSON: offset " + std::to_string(offset) +
+                ": unexpected colon");
+        }
+        break;
+
     case ls_comma:
+        if (!((parser_state == ps_dict_after_item) ||
+              (parser_state == ps_array_after_item))) {
+            QTC::TC("libtests", "JSON parse unexpected ,");
+            throw std::runtime_error(
+                "JSON: offset " + std::to_string(offset) +
+                ": unexpected comma");
+        }
+        break;
+
     case ls_end_array:
+        if (!((parser_state == ps_array_begin) ||
+              (parser_state == ps_array_after_item)))
+
+        {
+            QTC::TC("libtests", "JSON parse unexpected ]");
+            throw std::runtime_error(
+                "JSON: offset " + std::to_string(offset) +
+                ": unexpected array end delimiter");
+        }
+        break;
+
     case ls_end_dict:
-        // continue
+        if (!((parser_state == ps_dict_begin) ||
+              (parser_state == ps_dict_after_item))) {
+            QTC::TC("libtests", "JSON parse unexpected }");
+            throw std::runtime_error(
+                "JSON: offset " + std::to_string(offset) +
+                ": unexpected dictionary end delimiter");
+        }
         break;
 
     case ls_number:
@@ -1234,41 +1268,6 @@ JSONParser::handleToken()
         case ps_array_after_comma:
             break;
             // okay
-        }
-    } else if (lex_state == ls_end_dict) {
-        if (!((parser_state == ps_dict_begin) ||
-              (parser_state == ps_dict_after_item)))
-
-        {
-            QTC::TC("libtests", "JSON parse unexpected }");
-            throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": unexpected dictionary end delimiter");
-        }
-    } else if (lex_state == ls_end_array) {
-        if (!((parser_state == ps_array_begin) ||
-              (parser_state == ps_array_after_item)))
-
-        {
-            QTC::TC("libtests", "JSON parse unexpected ]");
-            throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": unexpected array end delimiter");
-        }
-    } else if (lex_state == ls_colon) {
-        if (parser_state != ps_dict_after_key) {
-            QTC::TC("libtests", "JSON parse unexpected :");
-            throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": unexpected colon");
-        }
-    } else if (lex_state == ls_comma) {
-        if (!((parser_state == ps_dict_after_item) ||
-              (parser_state == ps_array_after_item))) {
-            QTC::TC("libtests", "JSON parse unexpected ,");
-            throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": unexpected comma");
         }
     }
 
