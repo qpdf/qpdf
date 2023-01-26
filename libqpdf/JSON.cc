@@ -671,6 +671,7 @@ namespace
         qpdf_offset_t offset;
         bool done;
         std::string token;
+        qpdf_offset_t token_start{0};
         parser_state_e parser_state;
         std::vector<std::shared_ptr<JSON>> stack;
         std::vector<parser_state_e> ps_stack;
@@ -863,6 +864,7 @@ JSONParser::getToken()
         action = append;
         switch (lex_state) {
         case ls_top:
+            token_start = offset;
             if (*p == '"') {
                 lex_state = ls_string;
             } else if (QUtil::is_space(*p)) {
@@ -1134,7 +1136,7 @@ JSONParser::handleToken()
         if (token.length() < 2) {
             throw std::logic_error("JSON string length < 2");
         }
-        s_value = decode_string(token, offset - toO(token.length()));
+        s_value = decode_string(token, token_start);
     }
 
     std::shared_ptr<JSON> item;
@@ -1142,12 +1144,12 @@ JSONParser::handleToken()
     switch (lex_state) {
     case ls_begin_dict:
         item = std::make_shared<JSON>(JSON::makeDictionary());
-        item->setStart(offset - toO(token.length()));
+        item->setStart(token_start);
         break;
 
     case ls_begin_array:
         item = std::make_shared<JSON>(JSON::makeArray());
-        item->setStart(offset - toO(token.length()));
+        item->setStart(token_start);
         break;
 
     case ls_colon:
@@ -1296,7 +1298,7 @@ JSONParser::handleToken()
         }
     } else if (item.get()) {
         if (!(item->isArray() || item->isDictionary())) {
-            item->setStart(offset - toO(token.length()));
+            item->setStart(token_start);
             item->setEnd(offset);
         }
 
