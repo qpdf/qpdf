@@ -653,6 +653,12 @@ namespace
             ls_string,
             ls_backslash,
             ls_u4,
+            ls_begin_array,
+            ls_end_array,
+            ls_begin_dict,
+            ls_end_dict,
+            ls_colon,
+            ls_comma,
         };
 
         InputSource& is;
@@ -861,6 +867,24 @@ JSONParser::getToken()
                 lex_state = ls_string;
             } else if (QUtil::is_space(*p)) {
                 action = ignore;
+            } else if (*p == ',') {
+                lex_state = ls_comma;
+                ready = true;
+            } else if (*p == ':') {
+                lex_state = ls_colon;
+                ready = true;
+            } else if (*p == '{') {
+                lex_state = ls_begin_dict;
+                ready = true;
+            } else if (*p == '}') {
+                lex_state = ls_end_dict;
+                ready = true;
+            } else if (*p == '[') {
+                lex_state = ls_begin_array;
+                ready = true;
+            } else if (*p == ']') {
+                lex_state = ls_end_array;
+                ready = true;
             } else if ((*p >= 'a') && (*p <= 'z')) {
                 lex_state = ls_alpha;
             } else if (*p == '-') {
@@ -869,8 +893,6 @@ JSONParser::getToken()
                 lex_state = ls_number_before_point;
             } else if (*p == '0') {
                 lex_state = ls_number_leading_zero;
-            } else if (strchr("{}[]:,", *p)) {
-                ready = true;
             } else {
                 QTC::TC("libtests", "JSON parse bad character");
                 throw std::runtime_error(
@@ -1044,6 +1066,10 @@ JSONParser::getToken()
                 lex_state = ls_string;
             }
             break;
+
+        default:
+            throw std::logic_error(
+                "JSONParser::getToken : trying to handle delimiter state");
         }
         switch (action) {
         case reread:
@@ -1090,7 +1116,7 @@ JSONParser::getToken()
 void
 JSONParser::handleToken()
 {
-    if (token.empty()) {
+    if (lex_state == ls_top) {
         return;
     }
 
@@ -1110,31 +1136,25 @@ JSONParser::handleToken()
         }
         s_value = decode_string(token, offset - toO(token.length()));
     }
-    // Based on the lexical state and value, figure out whether we are
-    // looking at an item or a delimiter. It will always be exactly
-    // one of those two or an error condition.
 
     std::shared_ptr<JSON> item;
-    char delimiter = '\0';
-    // Already verified that token is not empty
-    char first_char = token.at(0);
+
     switch (lex_state) {
-    case ls_top:
-        switch (first_char) {
-        case '{':
-            item = std::make_shared<JSON>(JSON::makeDictionary());
-            item->setStart(offset - toO(token.length()));
-            break;
+    case ls_begin_dict:
+        item = std::make_shared<JSON>(JSON::makeDictionary());
+        item->setStart(offset - toO(token.length()));
+        break;
 
-        case '[':
-            item = std::make_shared<JSON>(JSON::makeArray());
-            item->setStart(offset - toO(token.length()));
-            break;
+    case ls_begin_array:
+        item = std::make_shared<JSON>(JSON::makeArray());
+        item->setStart(offset - toO(token.length()));
+        break;
 
-        default:
-            delimiter = first_char;
-            break;
-        }
+    case ls_colon:
+    case ls_comma:
+    case ls_end_array:
+    case ls_end_dict:
+        // continue
         break;
 
     case ls_number:
@@ -1164,12 +1184,6 @@ JSONParser::handleToken()
         throw std::logic_error(
             "JSONParser::handleToken : non-terminal lexer state encountered");
         break;
-    }
-
-    if ((item == nullptr) == (delimiter == '\0')) {
-        throw std::logic_error(
-            "JSONParser::handleToken: logic error: exactly one of item"
-            " or delimiter must be set");
     }
 
     // See whether what we have is allowed at this point.
@@ -1217,7 +1231,7 @@ JSONParser::handleToken()
             break;
             // okay
         }
-    } else if (delimiter == '}') {
+    } else if (lex_state == ls_end_dict) {
         if (!((parser_state == ps_dict_begin) ||
               (parser_state == ps_dict_after_item)))
 
@@ -1227,7 +1241,7 @@ JSONParser::handleToken()
                 "JSON: offset " + std::to_string(offset) +
                 ": unexpected dictionary end delimiter");
         }
-    } else if (delimiter == ']') {
+    } else if (lex_state == ls_end_array) {
         if (!((parser_state == ps_array_begin) ||
               (parser_state == ps_array_after_item)))
 
@@ -1237,14 +1251,14 @@ JSONParser::handleToken()
                 "JSON: offset " + std::to_string(offset) +
                 ": unexpected array end delimiter");
         }
-    } else if (delimiter == ':') {
+    } else if (lex_state == ls_colon) {
         if (parser_state != ps_dict_after_key) {
             QTC::TC("libtests", "JSON parse unexpected :");
             throw std::runtime_error(
                 "JSON: offset " + std::to_string(offset) +
                 ": unexpected colon");
         }
-    } else if (delimiter == ',') {
+    } else if (lex_state == ls_comma) {
         if (!((parser_state == ps_dict_after_item) ||
               (parser_state == ps_array_after_item))) {
             QTC::TC("libtests", "JSON parse unexpected ,");
@@ -1252,17 +1266,15 @@ JSONParser::handleToken()
                 "JSON: offset " + std::to_string(offset) +
                 ": unexpected comma");
         }
-    } else if (delimiter != '\0') {
-        throw std::logic_error("JSONParser::handleToken: bad delimiter");
     }
 
     // Now we know we have a delimiter or item that is allowed. Do
     // whatever we need to do with it.
 
     parser_state_e next_state = ps_top;
-    if (delimiter == ':') {
+    if (lex_state == ls_colon) {
         next_state = ps_dict_after_colon;
-    } else if (delimiter == ',') {
+    } else if (lex_state == ls_comma) {
         if (parser_state == ps_dict_after_item) {
             next_state = ps_dict_after_comma;
         } else if (parser_state == ps_array_after_item) {
@@ -1271,7 +1283,7 @@ JSONParser::handleToken()
             throw std::logic_error("JSONParser::handleToken: unexpected parser"
                                    " state for comma");
         }
-    } else if ((delimiter == '}') || (delimiter == ']')) {
+    } else if ((lex_state == ls_end_array) || (lex_state == ls_end_dict)) {
         next_state = ps_stack.back();
         ps_stack.pop_back();
         auto tos = stack.back();
@@ -1282,9 +1294,6 @@ JSONParser::handleToken()
         if (next_state != ps_done) {
             stack.pop_back();
         }
-    } else if (delimiter != '\0') {
-        throw std::logic_error(
-            "JSONParser::handleToken: unexpected delimiter in transition");
     } else if (item.get()) {
         if (!(item->isArray() || item->isDictionary())) {
             item->setStart(offset - toO(token.length()));
