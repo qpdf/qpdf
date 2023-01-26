@@ -1012,7 +1012,7 @@ JSONParser::getToken()
         case ls_number:
             // We only get here after we have seen an exponent.
             if ((*p >= '0') && (*p <= '9')) {
-                    ++number_after_e;
+                ++number_after_e;
             } else if (QUtil::is_space(*p)) {
                 action = ignore;
                 ready = true;
@@ -1093,38 +1093,27 @@ JSONParser::getToken()
         }
     }
     if (done) {
-        if ((!token.empty()) && (!ready)) {
+        if (!token.empty() && !ready) {
             switch (lex_state) {
             case ls_top:
                 // Can't happen
                 throw std::logic_error("tok_start set in ls_top while parsing");
                 break;
 
-            case ls_number:
-            case ls_number_minus:
             case ls_number_leading_zero:
             case ls_number_before_point:
-            case ls_number_point:
             case ls_number_after_point:
-            case ls_number_e:
-            case ls_number_e_sign:
+                lex_state = ls_number;
+                break;
+
+            case ls_number:
             case ls_alpha:
-                // okay
+                // terminal state
                 break;
 
-            case ls_u4:
-                QTC::TC("libtests", "JSON parse premature end of u");
-                throw std::runtime_error(
-                    "JSON: offset " + std::to_string(offset - u_count - 1) +
-                    ": \\u must be followed by four characters");
-
-            case ls_string:
-            case ls_backslash:
-                QTC::TC("libtests", "JSON parse unterminated string");
-                throw std::runtime_error(
-                    "JSON: offset " + std::to_string(offset) +
-                    ": unterminated string");
-                break;
+            default:
+                QTC::TC("libtests", "JSON parse ls premature end of input");
+                throw std::runtime_error("JSON: premature end of input");
             }
         }
     }
@@ -1181,32 +1170,6 @@ JSONParser::handleToken()
         break;
 
     case ls_number:
-    case ls_number_minus:
-    case ls_number_leading_zero:
-    case ls_number_before_point:
-    case ls_number_point:
-    case ls_number_after_point:
-    case ls_number_e:
-    case ls_number_e_sign:
-        if (number_saw_point && (number_after_point == 0)) {
-            // QTC::TC("libtests", "JSON parse decimal with no digits");
-            throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": decimal point with no digits");
-        }
-        if ((number_before_point > 1) &&
-            ((first_char == '0') ||
-             ((first_char == '-') && (token.at(1) == '0')))) {
-            throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": number with leading zero");
-        }
-        if ((number_before_point == 0) && (number_after_point == 0)) {
-            // QTC::TC("libtests", "JSON parse number no digits");
-            throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": number with no digits");
-        }
         item = std::make_shared<JSON>(JSON::makeNumber(token));
         break;
 
@@ -1229,10 +1192,9 @@ JSONParser::handleToken()
         item = std::make_shared<JSON>(JSON::makeString(s_value));
         break;
 
-    case ls_backslash:
-    case ls_u4:
+    default:
         throw std::logic_error(
-            "tok_end is set while state = ls_backslash or ls_u4");
+            "JSONParser::handleToken : non-terminal lexer state encountered");
         break;
     }
 

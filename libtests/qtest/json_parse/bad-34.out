@@ -1,1 +1,1 @@
-exception: bad-34.json: JSON: offset 3: \u must be followed by four characters
+exception: bad-34.json: JSON: premature end of input
