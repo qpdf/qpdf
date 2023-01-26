@@ -1135,16 +1135,7 @@ JSONParser::handleToken()
             ": material follows end of object: " + token);
     }
 
-    // Git string value
     std::string s_value;
-    if (lex_state == ls_string) {
-        // Token includes the quotation marks
-        if (token.length() < 2) {
-            throw std::logic_error("JSON string length < 2");
-        }
-        s_value = decode_string(token, token_start);
-    }
-
     std::shared_ptr<JSON> item;
 
     switch (lex_state) {
@@ -1185,6 +1176,11 @@ JSONParser::handleToken()
         break;
 
     case ls_string:
+        // Token includes the quotation marks
+        if (token.length() < 2) {
+            throw std::logic_error("JSON string length < 2");
+        }
+        s_value = decode_string(token, token_start);
         item = std::make_shared<JSON>(JSON::makeString(s_value));
         break;
 
