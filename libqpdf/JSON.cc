@@ -1138,8 +1138,10 @@ JSONParser::handleToken()
     std::string s_value;
     std::shared_ptr<JSON> item;
     auto tos = stack.empty() ? nullptr : stack.back();
+    auto ls = lex_state;
+    lex_state = ls_top;
 
-    switch (lex_state) {
+    switch (ls) {
     case ls_begin_dict:
         item = std::make_shared<JSON>(JSON::makeDictionary());
         break;
@@ -1156,7 +1158,6 @@ JSONParser::handleToken()
                 ": unexpected colon");
         }
         parser_state = ps_dict_after_colon;
-        lex_state = ls_top;
         return;
 
     case ls_comma:
@@ -1175,7 +1176,6 @@ JSONParser::handleToken()
             throw std::logic_error("JSONParser::handleToken: unexpected parser"
                                    " state for comma");
         }
-        lex_state = ls_top;
         return;
 
     case ls_end_array:
@@ -1195,7 +1195,6 @@ JSONParser::handleToken()
         if (parser_state != ps_done) {
             stack.pop_back();
         }
-        lex_state = ls_top;
         return;
 
     case ls_end_dict:
@@ -1215,7 +1214,6 @@ JSONParser::handleToken()
         if (parser_state != ps_done) {
             stack.pop_back();
         }
-        lex_state = ls_top;
         return;
 
     case ls_number:
@@ -1243,7 +1241,15 @@ JSONParser::handleToken()
             throw std::logic_error("JSON string length < 2");
         }
         s_value = decode_string(token, token_start);
-        item = std::make_shared<JSON>(JSON::makeString(s_value));
+        if (parser_state == ps_dict_begin ||
+            parser_state == ps_dict_after_comma) {
+            dict_key = s_value;
+            dict_key_offset = token_start;
+            parser_state = ps_dict_after_key;
+            return;
+        } else {
+            item = std::make_shared<JSON>(JSON::makeString(s_value));
+        }
         break;
 
     default:
@@ -1260,16 +1266,10 @@ JSONParser::handleToken()
     switch (parser_state) {
     case ps_dict_begin:
     case ps_dict_after_comma:
-        if (lex_state != ls_string) {
-            QTC::TC("libtests", "JSON parse string as dict key");
-            throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": expect string as dictionary key");
-        }
-        this->dict_key = s_value;
-        this->dict_key_offset = item->getStart();
-        item = nullptr;
-        next_state = ps_dict_after_key;
+        QTC::TC("libtests", "JSON parse string as dict key");
+        throw std::runtime_error(
+            "JSON: offset " + std::to_string(offset) +
+            ": expect string as dictionary key");
         break;
 
     case ps_dict_after_colon:
@@ -1320,7 +1320,7 @@ JSONParser::handleToken()
             "JSONParser::handleToken: unexpected parser state");
     }
 
-    if (reactor && item.get()) {
+    if (reactor) {
         // Calling container start method is postponed until after
         // adding the containers to their parent containers, if any.
         // This makes it much easier to keep track of the current
@@ -1333,26 +1333,25 @@ JSONParser::handleToken()
     }
 
     // Prepare for next token
-    if (item.get()) {
-        if (item->isDictionary()) {
-            stack.push_back(item);
-            ps_stack.push_back(next_state);
-            next_state = ps_dict_begin;
-        } else if (item->isArray()) {
-            stack.push_back(item);
-            ps_stack.push_back(next_state);
-            next_state = ps_array_begin;
-        } else if (parser_state == ps_top) {
-            stack.push_back(item);
-        }
+
+    if (item->isDictionary()) {
+        stack.push_back(item);
+        ps_stack.push_back(next_state);
+        next_state = ps_dict_begin;
+    } else if (item->isArray()) {
+        stack.push_back(item);
+        ps_stack.push_back(next_state);
+        next_state = ps_array_begin;
+    } else if (parser_state == ps_top) {
+        stack.push_back(item);
     }
+
     if (ps_stack.size() > 500) {
         throw std::runtime_error(
             "JSON: offset " + std::to_string(offset) +
             ": maximum object depth exceeded");
     }
     parser_state = next_state;
-    lex_state = ls_top;
 }
 
 std::shared_ptr<JSON>
