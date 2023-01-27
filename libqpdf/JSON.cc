@@ -790,7 +790,6 @@ JSONParser::decode_string(std::string const& str, qpdf_offset_t offset)
                 i += 4;
                 break;
             default:
-                throw std::logic_error("JSON parse: bad character after \\");
                 break;
             }
         } else {
@@ -1052,17 +1051,43 @@ JSONParser::getToken()
                 ready = true;
             } else if (*p == '\\') {
                 lex_state = ls_backslash;
+                action = ignore;
             }
             break;
 
         case ls_backslash:
-            /* cSpell: ignore bfnrt */
-            if (strchr("\\\"/bfnrt", *p)) {
-                lex_state = ls_string;
-            } else if (*p == 'u') {
+            action = ignore;
+            lex_state = ls_string;
+            switch (*p) {
+            case '\\':
+                token += "\\\\";
+            case '\"':
+            case '/':
+                // \/ is allowed in json input, but so is /, so we
+                // don't map / to \/ in output.
+                token += *p;
+                break;
+            case 'b':
+                token += '\b';
+                break;
+            case 'f':
+                token += '\f';
+                break;
+            case 'n':
+                token += '\n';
+                break;
+            case 'r':
+                token += '\r';
+                break;
+            case 't':
+                token += '\t';
+                break;
+            case 'u':
+                token += "\\u";
                 lex_state = ls_u4;
                 u_count = 0;
-            } else {
+                break;
+            default:
                 QTC::TC("libtests", "JSON parse backslash bad character");
                 throw std::runtime_error(
                     "JSON: offset " + std::to_string(offset) +
