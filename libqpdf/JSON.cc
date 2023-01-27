@@ -1142,12 +1142,10 @@ JSONParser::handleToken()
     switch (lex_state) {
     case ls_begin_dict:
         item = std::make_shared<JSON>(JSON::makeDictionary());
-        item->setStart(token_start);
         break;
 
     case ls_begin_array:
         item = std::make_shared<JSON>(JSON::makeArray());
-        item->setStart(token_start);
         break;
 
     case ls_colon:
@@ -1306,10 +1304,8 @@ JSONParser::handleToken()
 
     parser_state_e next_state = ps_top;
 
-    if (!(item->isArray() || item->isDictionary())) {
-        item->setStart(token_start);
-        item->setEnd(offset);
-    }
+    item->setStart(token_start);
+    item->setEnd(offset);
 
     switch (parser_state) {
     case ps_dict_begin:

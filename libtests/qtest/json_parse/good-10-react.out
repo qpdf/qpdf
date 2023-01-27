@@ -1,21 +1,21 @@
 dictionary start
-dictionary item: a -> [9, 0): []
+dictionary item: a -> [9, 10): []
 array start
 array item: [10, 11): 1
 array item: [13, 14): 2
-array item: [16, 0): {}
+array item: [16, 17): {}
 dictionary start
 dictionary item: x -> [22, 25): "y"
 container end: [16, 26): {}
 array item: [28, 29): 3
-array item: [31, 0): {}
+array item: [31, 32): {}
 dictionary start
 dictionary item: keep -> [40, 61): "not in final output"
 container end: [31, 62): {
   "keep": "not in final output"
 }
 container end: [9, 63): []
-dictionary item: keep -> [75, 0): []
+dictionary item: keep -> [75, 76): []
 array start
 array item: [76, 77): 1
 array item: [79, 83): null
@@ -23,7 +23,7 @@ array item: [85, 86): 2
 array item: [88, 93): false
 array item: [95, 101): "keep"
 array item: [103, 104): 3
-array item: [106, 0): []
+array item: [106, 107): []
 array start
 array item: [107, 113): "this"
 array item: [115, 121): "keep"

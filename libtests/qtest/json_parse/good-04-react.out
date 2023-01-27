@@ -1,15 +1,15 @@
 array start
-array item: [1, 0): []
+array item: [1, 2): []
 array start
-array item: [2, 0): []
+array item: [2, 3): []
 array start
-array item: [3, 0): {}
+array item: [3, 4): {}
 dictionary start
 container end: [3, 5): {}
 container end: [2, 6): []
-array item: [8, 0): {}
+array item: [8, 9): {}
 dictionary start
-dictionary item:  -> [13, 0): {}
+dictionary item:  -> [13, 14): {}
 dictionary start
 container end: [13, 15): {}
 container end: [8, 16): {}
