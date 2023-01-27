@@ -1258,8 +1258,6 @@ JSONParser::handleToken()
         break;
     }
 
-    parser_state_e next_state = ps_top;
-
     item->setStart(token_start);
     item->setEnd(offset);
 
@@ -1282,7 +1280,7 @@ JSONParser::handleToken()
         if (!reactor || !reactor->dictionaryItem(dict_key, *item)) {
             tos->addDictionaryMember(dict_key, *item);
         }
-        next_state = ps_dict_after_item;
+        parser_state = ps_dict_after_item;
         break;
 
     case ps_array_begin:
@@ -1290,12 +1288,16 @@ JSONParser::handleToken()
         if (!reactor || !reactor->arrayItem(*item)) {
             tos->addArrayElement(*item);
         }
-        next_state = ps_array_after_item;
+        parser_state = ps_array_after_item;
         break;
 
     case ps_top:
-        stack.push_back(item);
-        next_state = ps_done;
+        if (!(item->isDictionary() || item->isArray())) {
+            stack.push_back(item);
+            parser_state = ps_done;
+            return;
+        }
+        parser_state = ps_done;
         break;
 
     case ps_dict_after_key:
@@ -1323,7 +1325,7 @@ JSONParser::handleToken()
 
     if (item->isDictionary() || item->isArray()) {
         stack.push_back(item);
-        ps_stack.push_back(next_state);
+        ps_stack.push_back(parser_state);
         // Calling container start method is postponed until after
         // adding the containers to their parent containers, if any.
         // This makes it much easier to keep track of the current
@@ -1332,12 +1334,12 @@ JSONParser::handleToken()
             if (reactor) {
                 reactor->dictionaryStart();
             }
-            next_state = ps_dict_begin;
+            parser_state = ps_dict_begin;
         } else if (item->isArray()) {
             if (reactor) {
                 reactor->arrayStart();
             }
-            next_state = ps_array_begin;
+            parser_state = ps_array_begin;
         }
 
         if (ps_stack.size() > 500) {
@@ -1346,7 +1348,6 @@ JSONParser::handleToken()
                 ": maximum object depth exceeded");
         }
     }
-    parser_state = next_state;
 }
 
 std::shared_ptr<JSON>
