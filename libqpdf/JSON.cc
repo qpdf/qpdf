@@ -744,14 +744,8 @@ JSONParser::decode_string(std::string const& str, qpdf_offset_t offset)
     // is called, so errors are logic errors instead of runtime
     // errors.
     size_t len = str.length();
-    if ((len < 2) || (str.at(0) != '"') || (str.at(len - 1) != '"')) {
-        throw std::logic_error(
-            "JSON Parse: decode_string called with other than \"...\"");
-    }
     char const* s = str.c_str();
-    // Move inside the quotation marks
-    ++s;
-    len -= 2;
+
     // Keep track of UTF-16 surrogate pairs.
     unsigned long high_surrogate = 0;
     qpdf_offset_t high_offset = 0;
@@ -878,6 +872,7 @@ JSONParser::getToken()
             token_start = offset;
             if (*p == '"') {
                 lex_state = ls_string;
+                action = ignore;
             } else if (QUtil::is_space(*p)) {
                 action = ignore;
             } else if (*p == ',') {
@@ -1052,7 +1047,6 @@ JSONParser::getToken()
 
         case ls_string:
             if (*p == '"') {
-                token += '"';
                 token = decode_string(token, token_start);
                 action = ignore;
                 ready = true;
