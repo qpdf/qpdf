@@ -661,6 +661,18 @@ namespace
             ls_comma,
         };
 
+        struct StackFrame
+        {
+            StackFrame(parser_state_e state, std::shared_ptr<JSON>& item) :
+                state(state),
+                item(item)
+            {
+            }
+
+            parser_state_e state;
+            std::shared_ptr<JSON> item;
+        };
+
         InputSource& is;
         JSON::Reactor* reactor;
         lex_state_e lex_state;
@@ -673,8 +685,7 @@ namespace
         std::string token;
         qpdf_offset_t token_start{0};
         parser_state_e parser_state;
-        std::vector<std::shared_ptr<JSON>> stack;
-        std::vector<parser_state_e> ps_stack;
+        std::vector<StackFrame> stack;
         std::string dict_key;
         qpdf_offset_t dict_key_offset;
     };
@@ -1137,7 +1148,7 @@ JSONParser::handleToken()
 
     std::string s_value;
     std::shared_ptr<JSON> item;
-    auto tos = stack.empty() ? nullptr : stack.back();
+    auto tos = stack.empty() ? nullptr : stack.back().item;
     auto ls = lex_state;
     lex_state = ls_top;
 
@@ -1186,8 +1197,7 @@ JSONParser::handleToken()
                 "JSON: offset " + std::to_string(offset) +
                 ": unexpected array end delimiter");
         }
-        parser_state = ps_stack.back();
-        ps_stack.pop_back();
+        parser_state = stack.back().state;
         tos->setEnd(offset);
         if (reactor) {
             reactor->containerEnd(*tos);
@@ -1205,8 +1215,7 @@ JSONParser::handleToken()
                 "JSON: offset " + std::to_string(offset) +
                 ": unexpected dictionary end delimiter");
         }
-        parser_state = ps_stack.back();
-        ps_stack.pop_back();
+        parser_state = stack.back().state;
         tos->setEnd(offset);
         if (reactor) {
             reactor->containerEnd(*tos);
@@ -1293,7 +1302,7 @@ JSONParser::handleToken()
 
     case ps_top:
         if (!(item->isDictionary() || item->isArray())) {
-            stack.push_back(item);
+            stack.push_back({ps_done, item});
             parser_state = ps_done;
             return;
         }
@@ -1324,8 +1333,7 @@ JSONParser::handleToken()
     }
 
     if (item->isDictionary() || item->isArray()) {
-        stack.push_back(item);
-        ps_stack.push_back(parser_state);
+        stack.push_back({parser_state, item});
         // Calling container start method is postponed until after
         // adding the containers to their parent containers, if any.
         // This makes it much easier to keep track of the current
@@ -1342,7 +1350,7 @@ JSONParser::handleToken()
             parser_state = ps_array_begin;
         }
 
-        if (ps_stack.size() > 500) {
+        if (stack.size() > 500) {
             throw std::runtime_error(
                 "JSON: offset " + std::to_string(offset) +
                 ": maximum object depth exceeded");
@@ -1361,7 +1369,7 @@ JSONParser::parse()
         QTC::TC("libtests", "JSON parse premature EOF");
         throw std::runtime_error("JSON: premature end of input");
     }
-    auto const& tos = stack.back();
+    auto const& tos = stack.back().item;
     if (reactor && tos.get() && !(tos->isArray() || tos->isDictionary())) {
         reactor->topLevelScalar();
     }
