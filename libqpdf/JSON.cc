@@ -1156,7 +1156,9 @@ JSONParser::handleToken()
                 "JSON: offset " + std::to_string(offset) +
                 ": unexpected colon");
         }
-        break;
+        parser_state = ps_dict_after_colon;
+        lex_state = ls_top;
+        return;
 
     case ls_comma:
         if (!((parser_state == ps_dict_after_item) ||
@@ -1166,7 +1168,16 @@ JSONParser::handleToken()
                 "JSON: offset " + std::to_string(offset) +
                 ": unexpected comma");
         }
-        break;
+        if (parser_state == ps_dict_after_item) {
+            parser_state = ps_dict_after_comma;
+        } else if (parser_state == ps_array_after_item) {
+            parser_state = ps_array_after_comma;
+        } else {
+            throw std::logic_error("JSONParser::handleToken: unexpected parser"
+                                   " state for comma");
+        }
+        lex_state = ls_top;
+        return;
 
     case ls_end_array:
         if (!((parser_state == ps_array_begin) ||
@@ -1275,18 +1286,7 @@ JSONParser::handleToken()
     // whatever we need to do with it.
 
     parser_state_e next_state = ps_top;
-    if (lex_state == ls_colon) {
-        next_state = ps_dict_after_colon;
-    } else if (lex_state == ls_comma) {
-        if (parser_state == ps_dict_after_item) {
-            next_state = ps_dict_after_comma;
-        } else if (parser_state == ps_array_after_item) {
-            next_state = ps_array_after_comma;
-        } else {
-            throw std::logic_error("JSONParser::handleToken: unexpected parser"
-                                   " state for comma");
-        }
-    } else if ((lex_state == ls_end_array) || (lex_state == ls_end_dict)) {
+    if ((lex_state == ls_end_array) || (lex_state == ls_end_dict)) {
         next_state = ps_stack.back();
         ps_stack.pop_back();
         auto tos = stack.back();
@@ -1348,9 +1348,6 @@ JSONParser::handleToken()
             throw std::logic_error(
                 "JSONParser::handleToken: unexpected parser state");
         }
-    } else {
-        throw std::logic_error(
-            "JSONParser::handleToken: unexpected null item in transition");
     }
 
     if (reactor && item.get()) {
