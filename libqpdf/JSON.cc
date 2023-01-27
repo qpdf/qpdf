@@ -1294,6 +1294,7 @@ JSONParser::handleToken()
         break;
 
     case ps_top:
+        stack.push_back(item);
         next_state = ps_done;
         break;
 
@@ -1320,36 +1321,30 @@ JSONParser::handleToken()
             "JSONParser::handleToken: unexpected parser state");
     }
 
-    if (reactor) {
+    if (item->isDictionary() || item->isArray()) {
+        stack.push_back(item);
+        ps_stack.push_back(next_state);
         // Calling container start method is postponed until after
         // adding the containers to their parent containers, if any.
         // This makes it much easier to keep track of the current
         // nesting level.
         if (item->isDictionary()) {
-            reactor->dictionaryStart();
+            if (reactor) {
+                reactor->dictionaryStart();
+            }
+            next_state = ps_dict_begin;
         } else if (item->isArray()) {
-            reactor->arrayStart();
+            if (reactor) {
+                reactor->arrayStart();
+            }
+            next_state = ps_array_begin;
         }
-    }
 
-    // Prepare for next token
-
-    if (item->isDictionary()) {
-        stack.push_back(item);
-        ps_stack.push_back(next_state);
-        next_state = ps_dict_begin;
-    } else if (item->isArray()) {
-        stack.push_back(item);
-        ps_stack.push_back(next_state);
-        next_state = ps_array_begin;
-    } else if (parser_state == ps_top) {
-        stack.push_back(item);
-    }
-
-    if (ps_stack.size() > 500) {
-        throw std::runtime_error(
-            "JSON: offset " + std::to_string(offset) +
-            ": maximum object depth exceeded");
+        if (ps_stack.size() > 500) {
+            throw std::runtime_error(
+                "JSON: offset " + std::to_string(offset) +
+                ": maximum object depth exceeded");
+        }
     }
     parser_state = next_state;
 }
