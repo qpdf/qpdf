@@ -1252,56 +1252,6 @@ JSONParser::handleToken()
         break;
     }
 
-    // See whether what we have is allowed at this point.
-
-    if (item.get()) {
-        switch (parser_state) {
-        case ps_done:
-            throw std::logic_error("can't happen; ps_done already handled");
-            break;
-
-        case ps_dict_after_key:
-            QTC::TC("libtests", "JSON parse expected colon");
-            throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) + ": expected ':'");
-            break;
-
-        case ps_dict_after_item:
-            QTC::TC("libtests", "JSON parse expected , or }");
-            throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": expected ',' or '}'");
-            break;
-
-        case ps_array_after_item:
-            QTC::TC("libtests", "JSON parse expected, or ]");
-            throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": expected ',' or ']'");
-            break;
-
-        case ps_dict_begin:
-        case ps_dict_after_comma:
-            if (lex_state != ls_string) {
-                QTC::TC("libtests", "JSON parse string as dict key");
-                throw std::runtime_error(
-                    "JSON: offset " + std::to_string(offset) +
-                    ": expect string as dictionary key");
-            }
-            break;
-
-        case ps_top:
-        case ps_dict_after_colon:
-        case ps_array_begin:
-        case ps_array_after_comma:
-            break;
-            // okay
-        }
-    }
-
-    // Now we know we have a delimiter or item that is allowed. Do
-    // whatever we need to do with it.
-
     parser_state_e next_state = ps_top;
 
     item->setStart(token_start);
@@ -1310,6 +1260,12 @@ JSONParser::handleToken()
     switch (parser_state) {
     case ps_dict_begin:
     case ps_dict_after_comma:
+        if (lex_state != ls_string) {
+            QTC::TC("libtests", "JSON parse string as dict key");
+            throw std::runtime_error(
+                "JSON: offset " + std::to_string(offset) +
+                ": expect string as dictionary key");
+        }
         this->dict_key = s_value;
         this->dict_key_offset = item->getStart();
         item = nullptr;
@@ -1342,8 +1298,23 @@ JSONParser::handleToken()
         break;
 
     case ps_dict_after_key:
+        QTC::TC("libtests", "JSON parse expected colon");
+        throw std::runtime_error(
+            "JSON: offset " + std::to_string(offset) + ": expected ':'");
+        break;
+
     case ps_dict_after_item:
+        QTC::TC("libtests", "JSON parse expected , or }");
+        throw std::runtime_error(
+            "JSON: offset " + std::to_string(offset) + ": expected ',' or '}'");
+        break;
+
     case ps_array_after_item:
+        QTC::TC("libtests", "JSON parse expected, or ]");
+        throw std::runtime_error(
+            "JSON: offset " + std::to_string(offset) + ": expected ',' or ']'");
+        break;
+
     case ps_done:
         throw std::logic_error(
             "JSONParser::handleToken: unexpected parser state");
