@@ -1137,6 +1137,7 @@ JSONParser::handleToken()
 
     std::string s_value;
     std::shared_ptr<JSON> item;
+    auto tos = stack.empty() ? nullptr : stack.back();
 
     switch (lex_state) {
     case ls_begin_dict:
@@ -1180,16 +1181,24 @@ JSONParser::handleToken()
         return;
 
     case ls_end_array:
-        if (!((parser_state == ps_array_begin) ||
-              (parser_state == ps_array_after_item)))
-
-        {
+        if (!(parser_state == ps_array_begin ||
+              parser_state == ps_array_after_item)) {
             QTC::TC("libtests", "JSON parse unexpected ]");
             throw std::runtime_error(
                 "JSON: offset " + std::to_string(offset) +
                 ": unexpected array end delimiter");
         }
-        break;
+        parser_state = ps_stack.back();
+        ps_stack.pop_back();
+        tos->setEnd(offset);
+        if (reactor) {
+            reactor->containerEnd(*tos);
+        }
+        if (parser_state != ps_done) {
+            stack.pop_back();
+        }
+        lex_state = ls_top;
+        return;
 
     case ls_end_dict:
         if (!((parser_state == ps_dict_begin) ||
@@ -1199,7 +1208,17 @@ JSONParser::handleToken()
                 "JSON: offset " + std::to_string(offset) +
                 ": unexpected dictionary end delimiter");
         }
-        break;
+        parser_state = ps_stack.back();
+        ps_stack.pop_back();
+        tos->setEnd(offset);
+        if (reactor) {
+            reactor->containerEnd(*tos);
+        }
+        if (parser_state != ps_done) {
+            stack.pop_back();
+        }
+        lex_state = ls_top;
+        return;
 
     case ls_number:
         item = std::make_shared<JSON>(JSON::makeNumber(token));
@@ -1286,68 +1305,52 @@ JSONParser::handleToken()
     // whatever we need to do with it.
 
     parser_state_e next_state = ps_top;
-    if ((lex_state == ls_end_array) || (lex_state == ls_end_dict)) {
-        next_state = ps_stack.back();
-        ps_stack.pop_back();
-        auto tos = stack.back();
-        tos->setEnd(offset);
-        if (reactor) {
-            reactor->containerEnd(*tos);
-        }
-        if (next_state != ps_done) {
-            stack.pop_back();
-        }
-    } else if (item.get()) {
-        if (!(item->isArray() || item->isDictionary())) {
-            item->setStart(token_start);
-            item->setEnd(offset);
-        }
 
-        std::shared_ptr<JSON> tos;
-        if (!stack.empty()) {
-            tos = stack.back();
+    if (!(item->isArray() || item->isDictionary())) {
+        item->setStart(token_start);
+        item->setEnd(offset);
+    }
+
+    switch (parser_state) {
+    case ps_dict_begin:
+    case ps_dict_after_comma:
+        this->dict_key = s_value;
+        this->dict_key_offset = item->getStart();
+        item = nullptr;
+        next_state = ps_dict_after_key;
+        break;
+
+    case ps_dict_after_colon:
+        if (tos->checkDictionaryKeySeen(dict_key)) {
+            QTC::TC("libtests", "JSON parse duplicate key");
+            throw std::runtime_error(
+                "JSON: offset " + std::to_string(dict_key_offset) +
+                ": duplicated dictionary key");
         }
-        switch (parser_state) {
-        case ps_dict_begin:
-        case ps_dict_after_comma:
-            this->dict_key = s_value;
-            this->dict_key_offset = item->getStart();
-            item = nullptr;
-            next_state = ps_dict_after_key;
-            break;
-
-        case ps_dict_after_colon:
-            if (tos->checkDictionaryKeySeen(dict_key)) {
-                QTC::TC("libtests", "JSON parse duplicate key");
-                throw std::runtime_error(
-                    "JSON: offset " + std::to_string(dict_key_offset) +
-                    ": duplicated dictionary key");
-            }
-            if (!reactor || !reactor->dictionaryItem(dict_key, *item)) {
-                tos->addDictionaryMember(dict_key, *item);
-            }
-            next_state = ps_dict_after_item;
-            break;
-
-        case ps_array_begin:
-        case ps_array_after_comma:
-            if (!reactor || !reactor->arrayItem(*item)) {
-                tos->addArrayElement(*item);
-            }
-            next_state = ps_array_after_item;
-            break;
-
-        case ps_top:
-            next_state = ps_done;
-            break;
-
-        case ps_dict_after_key:
-        case ps_dict_after_item:
-        case ps_array_after_item:
-        case ps_done:
-            throw std::logic_error(
-                "JSONParser::handleToken: unexpected parser state");
+        if (!reactor || !reactor->dictionaryItem(dict_key, *item)) {
+            tos->addDictionaryMember(dict_key, *item);
         }
+        next_state = ps_dict_after_item;
+        break;
+
+    case ps_array_begin:
+    case ps_array_after_comma:
+        if (!reactor || !reactor->arrayItem(*item)) {
+            tos->addArrayElement(*item);
+        }
+        next_state = ps_array_after_item;
+        break;
+
+    case ps_top:
+        next_state = ps_done;
+        break;
+
+    case ps_dict_after_key:
+    case ps_dict_after_item:
+    case ps_array_after_item:
+    case ps_done:
+        throw std::logic_error(
+            "JSONParser::handleToken: unexpected parser state");
     }
 
     if (reactor && item.get()) {
