@@ -1052,6 +1052,9 @@ JSONParser::getToken()
 
         case ls_string:
             if (*p == '"') {
+                token += '"';
+                token = decode_string(token, token_start);
+                action = ignore;
                 ready = true;
             } else if (*p == '\\') {
                 lex_state = ls_backslash;
@@ -1146,7 +1149,6 @@ JSONParser::handleToken()
             ": material follows end of object: " + token);
     }
 
-    std::string s_value;
     std::shared_ptr<JSON> item;
     auto tos = stack.empty() ? nullptr : stack.back().item;
     auto ls = lex_state;
@@ -1245,19 +1247,14 @@ JSONParser::handleToken()
         break;
 
     case ls_string:
-        // Token includes the quotation marks
-        if (token.length() < 2) {
-            throw std::logic_error("JSON string length < 2");
-        }
-        s_value = decode_string(token, token_start);
         if (parser_state == ps_dict_begin ||
             parser_state == ps_dict_after_comma) {
-            dict_key = s_value;
+            dict_key = token;
             dict_key_offset = token_start;
             parser_state = ps_dict_after_key;
             return;
         } else {
-            item = std::make_shared<JSON>(JSON::makeString(s_value));
+            item = std::make_shared<JSON>(JSON::makeString(token));
         }
         break;
 
