@@ -19,6 +19,11 @@ For a detailed list of changes, please see the file
     - New method ``QPDF::removeSecurityRestrictions`` removes security
       restrictions from digitally signed files.
 
+  - Performance enhancements
+
+    - Include more code tidying and performance improvements from M.
+      Holger.
+
 11.2.0: November 20, 2022
   - Build changes
 
