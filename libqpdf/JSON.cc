@@ -141,7 +141,7 @@ JSON::JSON_string::JSON_string(std::string const& utf8) :
 void
 JSON::JSON_string::write(Pipeline* p, size_t) const
 {
-    *p << "\"" << encoded << "\"";
+    *p << std::string("\"") + encoded + "\"";
 }
 
 JSON::JSON_number::JSON_number(long long value) :
