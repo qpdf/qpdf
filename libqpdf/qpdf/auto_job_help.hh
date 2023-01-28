@@ -156,6 +156,11 @@ ap.addOptionHelp("--decrypt", "transformation", "remove encryption from input fi
 encrypted. Normally qpdf preserves whatever encryption was
 present on the input file. This option overrides that behavior.
 )");
+ap.addOptionHelp("--remove-restrictions", "transformation", "remove security restrictions from input file", R"(Remove restrictions associated with digitally signed PDF files.
+This may be combined with --decrypt to allow free editing of
+previously signed/encrypted files. This option invalidates the
+signature but leaves its visual appearance intact.
+)");
 ap.addOptionHelp("--copy-encryption", "transformation", "copy another file's encryption details", R"(--copy-encryption=file
 
 Copy encryption details from the specified file instead of
@@ -167,6 +172,9 @@ ap.addOptionHelp("--encryption-file-password", "transformation", "supply passwor
 If the file named in --copy-encryption requires a password, use
 this option to supply the password.
 )");
+}
+static void add_help_3(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--qdf", "transformation", "enable viewing PDF code in a text editor", R"(Create a PDF file suitable for viewing in a text editor and even
 editing. This is for editing the PDF code, not the page contents.
 All streams that can be uncompressed are uncompressed, and
@@ -175,9 +183,6 @@ companion tool "fix-qdf" can be used to repair hand-edited QDF
 files. QDF is a feature specific to the qpdf tool. Please see
 the "QDF Mode" chapter in the manual.
 )");
-}
-static void add_help_3(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--no-original-object-ids", "transformation", "omit original object IDs in qdf", R"(Omit comments in a QDF file indicating the object ID an object
 had in the original file.
 )");
@@ -292,12 +297,12 @@ resulting set of pages, where :odd starts with the first page and
 :even starts with the second page. These are odd and even pages
 from the resulting set, not based on the original page numbers.
 )");
-ap.addHelpTopic("modification", "change parts of the PDF", R"(Modification options make systematic changes to certain parts of
-the PDF, causing the PDF to render differently from the original.
-)");
 }
 static void add_help_4(QPDFArgParser& ap)
 {
+ap.addHelpTopic("modification", "change parts of the PDF", R"(Modification options make systematic changes to certain parts of
+the PDF, causing the PDF to render differently from the original.
+)");
 ap.addOptionHelp("--pages", "modification", "begin page selection", R"(--pages file [--password=password] [page-range] [...] --
 
 Run qpdf --help=page-selection for details.
@@ -460,14 +465,14 @@ and filling in form fields. For 128-bit and 256-bit encryption,
 this also enables editing, creating, and deleting form fields
 unless --modify-other=n or --modify=none is also specified.
 )");
+}
+static void add_help_5(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--assemble", "encryption", "restrict document assembly", R"(--assemble=[y|n]
 
 Enable/disable document assembly (rotation and reordering of
 pages). This option is not available with 40-bit encryption.
 )");
-}
-static void add_help_5(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--extract", "encryption", "restrict text/graphic extraction", R"(--extract=[y|n]
 
 Enable/disable text/graphic extraction for purposes other than
@@ -638,14 +643,14 @@ The --copy-attachments-from flag and its options may be repeated
 to copy attachments from multiple files. Run
 qpdf --help=copy-attachments for details.
 )");
+}
+static void add_help_6(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--remove-attachment", "attachments", "remove an embedded file", R"(--remove-attachment=key
 
 Remove an embedded file using its key. Get the key with
 --list-attachments.
 )");
-}
-static void add_help_6(QPDFArgParser& ap)
-{
 ap.addHelpTopic("pdf-dates", "PDF date format", R"(When a date is required, the date should conform to the PDF date
 format specification, which is "D:yyyymmddhhmmssz" where "z" is
 either literally upper case "Z" for UTC or a timezone offset in
@@ -750,11 +755,11 @@ underlying encryption key to be displayed.
 ap.addOptionHelp("--check-linearization", "inspection", "check linearization tables", R"(Check to see whether a file is linearized and, if so, whether
 the linearization hint tables are correct.
 )");
-ap.addOptionHelp("--show-linearization", "inspection", "show linearization hint tables", R"(Check and display all data in the linearization hint tables.
-)");
 }
 static void add_help_7(QPDFArgParser& ap)
 {
+ap.addOptionHelp("--show-linearization", "inspection", "show linearization hint tables", R"(Check and display all data in the linearization hint tables.
+)");
 ap.addOptionHelp("--show-xref", "inspection", "show cross reference data", R"(Show the contents of the cross-reference table or stream (object
 locations in the file) in a human-readable form. This is
 especially useful for files with cross-reference streams, which
@@ -853,15 +858,15 @@ ap.addOptionHelp("--json-input", "json", "input file is qpdf JSON", R"(Treat the
 "qpdf JSON Format" section of the manual for information about
 how to use this option.
 )");
+}
+static void add_help_8(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--update-from-json", "json", "update a PDF from qpdf JSON", R"(--update-from-json=qpdf-json-file
 
 Update a PDF file from a JSON file. Please see the "qpdf JSON"
 chapter of the manual for information about how to use this
 option.
 )");
-}
-static void add_help_8(QPDFArgParser& ap)
-{
 ap.addHelpTopic("testing", "options for testing or debugging", R"(The options below are useful when writing automated test code that
 includes files created by qpdf or when testing qpdf itself.
 )");

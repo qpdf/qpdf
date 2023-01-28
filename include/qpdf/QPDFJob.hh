@@ -604,6 +604,7 @@ class QPDFJob
         std::shared_ptr<char> password;
         bool linearize{false};
         bool decrypt{false};
+        bool remove_restrictions{false};
         int split_pages{0};
         bool progress{false};
         std::function<void(int)> progress_handler{nullptr};

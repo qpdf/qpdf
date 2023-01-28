@@ -109,6 +109,9 @@ popHandler(); // key: splitPages
 pushKey("jsonOutput");
 addChoices(json_output_choices, false, [this](std::string const& p) { c_main->jsonOutput(p); });
 popHandler(); // key: jsonOutput
+pushKey("removeRestrictions");
+addBare([this]() { c_main->removeRestrictions(); });
+popHandler(); // key: removeRestrictions
 pushKey("encrypt");
 beginDict(bindJSON(&Handlers::beginEncrypt), bindBare(&Handlers::endEncrypt)); // .encrypt
 pushKey("userPassword");

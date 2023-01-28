@@ -35,6 +35,7 @@ QPDF_DLL Config* recompressFlate();
 QPDF_DLL Config* removePageLabels();
 QPDF_DLL Config* reportMemoryUsage();
 QPDF_DLL Config* requiresPassword();
+QPDF_DLL Config* removeRestrictions();
 QPDF_DLL Config* showEncryption();
 QPDF_DLL Config* showEncryptionKey();
 QPDF_DLL Config* showLinearization();

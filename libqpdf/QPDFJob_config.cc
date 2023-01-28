@@ -518,6 +518,13 @@ QPDFJob::Config::requiresPassword()
 }
 
 QPDFJob::Config*
+QPDFJob::Config::removeRestrictions()
+{
+    o.m->remove_restrictions = true;
+    return this;
+}
+
+QPDFJob::Config*
 QPDFJob::Config::showAttachment(std::string const& parameter)
 {
     o.m->attachment_to_show = parameter;

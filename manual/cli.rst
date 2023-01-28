@@ -736,7 +736,22 @@ Related Options
    whatever encryption was present on the input file. This
    functionality is not intended to be used for bypassing copyright
    restrictions or other restrictions placed on files by their
-   producers. See also :qpdf:ref:`--copy-encryption`.
+   producers. See also :qpdf:ref:`--copy-encryption` and
+   :qpdf:ref:`--remove-restrictions`.
+
+.. qpdf:option:: --remove-restrictions
+
+   .. help: remove security restrictions from input file
+
+      Remove restrictions associated with digitally signed PDF files.
+      This may be combined with --decrypt to allow free editing of
+      previously signed/encrypted files. This option invalidates the
+      signature but leaves its visual appearance intact.
+
+   Remove security restrictions associated with digitally signed PDF
+   files. This may be combined with :qpdf:option:--decrypt: to allow
+   free editing of previously signed/encrypted files. This option
+   invalidates the signature but leaves its visual appearance intact.
 
 .. qpdf:option:: --copy-encryption=file
 

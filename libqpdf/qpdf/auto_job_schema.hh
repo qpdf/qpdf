@@ -29,6 +29,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "progress": "show progress when writing",
   "splitPages": "write pages to separate files",
   "jsonOutput": "apply defaults for JSON serialization",
+  "removeRestrictions": "remove security restrictions from input file",
   "encrypt": {
     "userPassword": "user password",
     "ownerPassword": "owner password",

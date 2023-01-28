@@ -129,6 +129,7 @@ options:
       - replace-input
       - report-memory-usage
       - requires-password
+      - remove-restrictions
       - show-encryption
       - show-encryption-key
       - show-linearization
@@ -313,6 +314,7 @@ json:
   progress:
   split-pages:
   json-output:
+  remove-restrictions:
   encrypt:
     _user-password: "user password"
     _owner-password: "owner password"

@@ -71,6 +71,7 @@ this->ap.addBare("remove-page-labels", [this](){c_main->removePageLabels();});
 this->ap.addBare("replace-input", b(&ArgParser::argReplaceInput));
 this->ap.addBare("report-memory-usage", [this](){c_main->reportMemoryUsage();});
 this->ap.addBare("requires-password", [this](){c_main->requiresPassword();});
+this->ap.addBare("remove-restrictions", [this](){c_main->removeRestrictions();});
 this->ap.addBare("show-encryption", [this](){c_main->showEncryption();});
 this->ap.addBare("show-encryption-key", [this](){c_main->showEncryptionKey();});
 this->ap.addBare("show-linearization", [this](){c_main->showLinearization();});
