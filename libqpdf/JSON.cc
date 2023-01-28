@@ -87,7 +87,7 @@ JSON::writeDictionaryKey(
     Pipeline* p, bool& first, std::string const& key, size_t depth)
 {
     writeNext(p, first, depth);
-    *p << "\"" << key << "\": ";
+    *p << std::string("\"") + key + "\": ";
 }
 
 void
