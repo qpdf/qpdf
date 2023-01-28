@@ -269,17 +269,13 @@ JSON::makeDictionary()
 JSON
 JSON::addDictionaryMember(std::string const& key, JSON const& val)
 {
-    JSON_dictionary* obj = dynamic_cast<JSON_dictionary*>(this->m->value.get());
-    if (nullptr == obj) {
+    if (auto* obj = dynamic_cast<JSON_dictionary*>(this->m->value.get())) {
+        return obj->members[encode_string(key)] =
+                   val.m->value ? val.m->value : std::make_shared<JSON_null>();
+    } else {
         throw std::runtime_error(
             "JSON::addDictionaryMember called on non-dictionary");
     }
-    if (val.m->value.get()) {
-        obj->members[encode_string(key)] = val.m->value;
-    } else {
-        obj->members[encode_string(key)] = std::make_shared<JSON_null>();
-    }
-    return obj->members[encode_string(key)];
 }
 
 bool
