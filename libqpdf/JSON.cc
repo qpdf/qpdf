@@ -4,18 +4,10 @@
 #include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_Concatenate.hh>
 #include <qpdf/Pl_String.hh>
-#include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <cstring>
 #include <stdexcept>
-
-template <typename T>
-static qpdf_offset_t
-toO(T const& i)
-{
-    return QIntC::to_offset(i);
-}
 
 JSON::Members::Members(std::shared_ptr<JSON_value> value) :
     value(value),
