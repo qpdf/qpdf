@@ -338,7 +338,6 @@ class JSON
     static std::string encode_string(std::string const& utf8);
     static void
     writeClose(Pipeline* p, bool first, size_t depth, char const* delimeter);
-    static void writeIndent(Pipeline* p, size_t depth);
 
     struct JSON_value
     {
