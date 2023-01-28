@@ -2777,3 +2777,14 @@ QPDF::everPushedInheritedAttributesToPages() const
 {
     return this->m->ever_pushed_inherited_attributes_to_pages;
 }
+
+void
+QPDF::removeSecurityRestrictions()
+{
+    auto root = getRoot();
+    root.removeKey("/Perms");
+    auto acroform = root.getKey("/AcroForm");
+    if (acroform.isDictionary() && acroform.hasKey("/SigFlags")) {
+        acroform.replaceKey("/SigFlags", QPDFObjectHandle::newInteger(0));
+    }
+}

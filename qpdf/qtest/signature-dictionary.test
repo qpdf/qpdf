@@ -128,5 +128,16 @@ foreach my $i (qw(40 128 256))
                       $td->EXIT_STATUS => 0});
 }
 
+$n_tests += 2;
+$td->runtest("remove security restrictions",
+             {$td->COMMAND =>
+                  "qpdf --qdf --no-original-object-ids --static-id" .
+                  " --remove-restrictions minimal-signed-restricted.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("checkout output (remove restrictions)",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "minimal-signed-restrictions-removed.pdf"});
+
 cleanup();
 $td->report($n_tests);

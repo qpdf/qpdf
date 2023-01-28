@@ -2333,6 +2333,9 @@ QPDFJob::handleTransformations(QPDF& pdf)
             afdh = std::make_shared<QPDFAcroFormDocumentHelper>(pdf);
         }
     };
+    if (m->remove_restrictions) {
+        pdf.removeSecurityRestrictions();
+    }
     if (m->externalize_inline_images ||
         (m->optimize_images && (!m->keep_inline_images))) {
         for (auto& ph: dh.getAllPages()) {

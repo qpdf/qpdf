@@ -8,6 +8,17 @@ For a detailed list of changes, please see the file
 
 .. x.y.z: not yet released
 
+11.3.0: not yet released
+  - CLI Enhancements
+
+    - New option :qpdf:ref:`--remove-restrictions` removes security
+      restrictions from digitally signed files.
+
+  - Library enhancements
+
+    - New method ``QPDF::removeSecurityRestrictions`` removes security
+      restrictions from digitally signed files.
+
 11.2.0: November 20, 2022
   - Build changes
 

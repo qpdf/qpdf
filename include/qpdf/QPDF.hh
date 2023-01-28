@@ -685,6 +685,10 @@ class QPDF
     // this file
     QPDF_DLL
     std::string getEncryptionKey() const;
+    // Remove security restrictions associated with digitally signed
+    // files.
+    QPDF_DLL
+    void removeSecurityRestrictions();
 
     // Linearization support
 

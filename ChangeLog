@@ -1,3 +1,8 @@
+2023-01-28  Jay Berkenbilt  <ejb@ql.org>
+
+        * New option --remove-restrictions removes security restrictions
+        from digitally signed files. Fixes #833.
+
 2023-01-09  Jay Berkenbilt  <ejb@ql.org>
 
         * Bug fix: flatten annotations should handle a page with no
