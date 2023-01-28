@@ -42,23 +42,18 @@ JSON::writeClose(Pipeline* p, bool first, size_t depth, char const* delimiter)
 }
 
 void
-JSON::writeIndent(Pipeline* p, size_t depth)
-{
-    for (size_t i = 0; i < depth; ++i) {
-        *p << "  ";
-    }
-}
-
-void
 JSON::writeNext(Pipeline* p, bool& first, size_t depth)
 {
     if (first) {
         first = false;
+        std::string s{"\n"};
+        s.append(2 * depth, ' ');
+        *p << s;
     } else {
-        *p << ",";
+        std::string s{",\n"};
+        s.append(2 * depth, ' ');
+        *p << s;
     }
-    *p << "\n";
-    writeIndent(p, depth);
 }
 
 void
