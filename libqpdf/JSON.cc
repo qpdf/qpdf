@@ -32,11 +32,13 @@ JSON::JSON(std::shared_ptr<JSON_value> value) :
 void
 JSON::writeClose(Pipeline* p, bool first, size_t depth, char const* delimiter)
 {
-    if (!first) {
-        *p << "\n";
-        writeIndent(p, depth);
+    if (first) {
+        *p << delimiter;
+    } else {
+        std::string s{"\n"};
+        s.append(2 * depth, ' ');
+        *p << s + delimiter;
     }
-    *p << delimiter;
 }
 
 void
