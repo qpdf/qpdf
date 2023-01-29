@@ -602,7 +602,7 @@ namespace
         {
         }
 
-        std::shared_ptr<JSON> parse();
+        JSON parse();
 
       private:
         enum parser_state_e {
@@ -642,14 +642,14 @@ namespace
 
         struct StackFrame
         {
-            StackFrame(parser_state_e state, std::shared_ptr<JSON>& item) :
+            StackFrame(parser_state_e state, JSON& item) :
                 state(state),
                 item(item)
             {
             }
 
             parser_state_e state;
-            std::shared_ptr<JSON> item;
+            JSON item;
         };
 
         void getToken();
@@ -860,6 +860,7 @@ JSONParser::getToken()
                 } else {
                     break;
                 }
+
             } else {
                 QTC::TC("libtests", "JSON parse null character");
                 throw std::runtime_error(
@@ -1169,18 +1170,19 @@ JSONParser::handleToken()
             ": material follows end of object: " + token);
     }
 
-    std::shared_ptr<JSON> item;
-    auto tos = stack.empty() ? nullptr : stack.back().item;
+    const static JSON null_item = JSON::makeNull();
+    JSON item;
+    auto tos = stack.empty() ? null_item : stack.back().item;
     auto ls = lex_state;
     lex_state = ls_top;
 
     switch (ls) {
     case ls_begin_dict:
-        item = std::make_shared<JSON>(JSON::makeDictionary());
+        item = JSON::makeDictionary();
         break;
 
     case ls_begin_array:
-        item = std::make_shared<JSON>(JSON::makeArray());
+        item = JSON::makeArray();
         break;
 
     case ls_colon:
@@ -1220,9 +1222,9 @@ JSONParser::handleToken()
                 ": unexpected array end delimiter");
         }
         parser_state = stack.back().state;
-        tos->setEnd(offset);
+        tos.setEnd(offset);
         if (reactor) {
-            reactor->containerEnd(*tos);
+            reactor->containerEnd(tos);
         }
         if (parser_state != ps_done) {
             stack.pop_back();
@@ -1238,9 +1240,9 @@ JSONParser::handleToken()
                 ": unexpected dictionary end delimiter");
         }
         parser_state = stack.back().state;
-        tos->setEnd(offset);
+        tos.setEnd(offset);
         if (reactor) {
-            reactor->containerEnd(*tos);
+            reactor->containerEnd(tos);
         }
         if (parser_state != ps_done) {
             stack.pop_back();
@@ -1248,16 +1250,16 @@ JSONParser::handleToken()
         return;
 
     case ls_number:
-        item = std::make_shared<JSON>(JSON::makeNumber(token));
+        item = JSON::makeNumber(token);
         break;
 
     case ls_alpha:
         if (token == "true") {
-            item = std::make_shared<JSON>(JSON::makeBool(true));
+            item = JSON::makeBool(true);
         } else if (token == "false") {
-            item = std::make_shared<JSON>(JSON::makeBool(false));
+            item = JSON::makeBool(false);
         } else if (token == "null") {
-            item = std::make_shared<JSON>(JSON::makeNull());
+            item = JSON::makeNull();
         } else {
             QTC::TC("libtests", "JSON parse invalid keyword");
             throw std::runtime_error(
@@ -1274,7 +1276,7 @@ JSONParser::handleToken()
             parser_state = ps_dict_after_key;
             return;
         } else {
-            item = std::make_shared<JSON>(JSON::makeString(token));
+            item = JSON::makeString(token);
         }
         break;
 
@@ -1284,8 +1286,8 @@ JSONParser::handleToken()
         break;
     }
 
-    item->setStart(token_start);
-    item->setEnd(offset);
+    item.setStart(token_start);
+    item.setEnd(offset);
 
     switch (parser_state) {
     case ps_dict_begin:
@@ -1297,28 +1299,28 @@ JSONParser::handleToken()
         break;
 
     case ps_dict_after_colon:
-        if (tos->checkDictionaryKeySeen(dict_key)) {
+        if (tos.checkDictionaryKeySeen(dict_key)) {
             QTC::TC("libtests", "JSON parse duplicate key");
             throw std::runtime_error(
                 "JSON: offset " + std::to_string(dict_key_offset) +
                 ": duplicated dictionary key");
         }
-        if (!reactor || !reactor->dictionaryItem(dict_key, *item)) {
-            tos->addDictionaryMember(dict_key, *item);
+        if (!reactor || !reactor->dictionaryItem(dict_key, item)) {
+            tos.addDictionaryMember(dict_key, item);
         }
         parser_state = ps_dict_after_item;
         break;
 
     case ps_array_begin:
     case ps_array_after_comma:
-        if (!reactor || !reactor->arrayItem(*item)) {
-            tos->addArrayElement(*item);
+        if (!reactor || !reactor->arrayItem(item)) {
+            tos.addArrayElement(item);
         }
         parser_state = ps_array_after_item;
         break;
 
     case ps_top:
-        if (!(item->isDictionary() || item->isArray())) {
+        if (!(item.isDictionary() || item.isArray())) {
             stack.push_back({ps_done, item});
             parser_state = ps_done;
             return;
@@ -1349,18 +1351,18 @@ JSONParser::handleToken()
             "JSONParser::handleToken: unexpected parser state");
     }
 
-    if (item->isDictionary() || item->isArray()) {
+    if (item.isDictionary() || item.isArray()) {
         stack.push_back({parser_state, item});
         // Calling container start method is postponed until after
         // adding the containers to their parent containers, if any.
         // This makes it much easier to keep track of the current
         // nesting level.
-        if (item->isDictionary()) {
+        if (item.isDictionary()) {
             if (reactor) {
                 reactor->dictionaryStart();
             }
             parser_state = ps_dict_begin;
-        } else if (item->isArray()) {
+        } else if (item.isArray()) {
             if (reactor) {
                 reactor->arrayStart();
             }
@@ -1375,7 +1377,7 @@ JSONParser::handleToken()
     }
 }
 
-std::shared_ptr<JSON>
+JSON
 JSONParser::parse()
 {
     while (!done) {
@@ -1387,7 +1389,7 @@ JSONParser::parse()
         throw std::runtime_error("JSON: premature end of input");
     }
     auto const& tos = stack.back().item;
-    if (reactor && tos.get() && !(tos->isArray() || tos->isDictionary())) {
+    if (reactor && !(tos.isArray() || tos.isDictionary())) {
         reactor->topLevelScalar();
     }
     return tos;
@@ -1397,7 +1399,7 @@ JSON
 JSON::parse(InputSource& is, Reactor* reactor)
 {
     JSONParser jp(is, reactor);
-    return *jp.parse();
+    return jp.parse();
 }
 
 JSON
@@ -1405,7 +1407,7 @@ JSON::parse(std::string const& s)
 {
     BufferInputSource bis("json input", s);
     JSONParser jp(bis, nullptr);
-    return *jp.parse();
+    return jp.parse();
 }
 
 void
