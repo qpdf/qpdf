@@ -780,10 +780,22 @@ JSONParser::getToken()
             }
         }
 
-        if (*p == 0) {
-            QTC::TC("libtests", "JSON parse null character");
-            throw std::runtime_error(
-                "JSON: null character at offset " + std::to_string(offset));
+        if ((*p < 32 && *p >= 0)) {
+            if (*p == '\t' || *p == '\n' || *p == '\r') {
+                // Legal white space not permitted in strings. This will always
+                // end the current token (unless we are still before the start
+                // of the token).
+                if (lex_state == ls_top) {
+                    // Continue with token
+                } else {
+                    // done
+                }
+            } else {
+                QTC::TC("libtests", "JSON parse null character");
+                throw std::runtime_error(
+                    "JSON: control or null character at offset " +
+                    std::to_string(offset));
+            }
         }
         action = append;
         switch (lex_state) {
