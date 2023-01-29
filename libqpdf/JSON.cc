@@ -607,7 +607,7 @@ namespace
       private:
         void getToken();
         void handleToken();
-        void numberError();
+        void tokenError();
         static void handle_u_code(
             unsigned long codepoint,
             qpdf_offset_t offset,
@@ -721,8 +721,29 @@ JSONParser::handle_u_code(
 }
 
 void
-JSONParser::numberError()
+JSONParser::tokenError()
 {
+    if (bytes == 0) {
+        QTC::TC("libtests", "JSON parse ls premature end of input");
+        throw std::runtime_error("JSON: premature end of input");
+    }
+    if (lex_state == ls_u4) {
+        QTC::TC("libtests", "JSON parse bad hex after u");
+        throw std::runtime_error(
+            "JSON: offset " + std::to_string(offset - u_count - 1) +
+            ": \\u must be followed by four hex digits");
+    } else if (lex_state == ls_alpha) {
+        QTC::TC("libtests", "JSON parse keyword bad character");
+        throw std::runtime_error(
+            "JSON: offset " + std::to_string(offset) +
+            ": keyword: unexpected character " + std::string(p, 1));
+    } else if (lex_state == ls_backslash) {
+        QTC::TC("libtests", "JSON parse backslash bad character");
+        throw std::runtime_error(
+            "JSON: offset " + std::to_string(offset) +
+            ": invalid character after backslash: " + std::string(p, 1));
+    }
+
     if (*p == '.') {
         if (lex_state == ls_number || lex_state == ls_number_e ||
             lex_state == ls_number_e_sign) {
@@ -751,6 +772,7 @@ JSONParser::numberError()
         throw std::runtime_error(
             "JSON: offset " + std::to_string(offset) +
             ": numeric literal: incomplete number");
+
     } else {
         QTC::TC("libtests", "JSON parse numeric bad character");
         throw std::runtime_error(
@@ -896,7 +918,7 @@ JSONParser::getToken()
             } else if (*p == 'e' || *p == 'E') {
                 lex_state = ls_number_e;
             } else {
-                numberError();
+                tokenError();
             }
             break;
 
@@ -904,7 +926,7 @@ JSONParser::getToken()
             if ((*p >= '0') && (*p <= '9')) {
                 lex_state = ls_number_after_point;
             } else {
-                numberError();
+                tokenError();
             }
             break;
 
@@ -922,7 +944,7 @@ JSONParser::getToken()
             } else if (*p == 'e' || *p == 'E') {
                 lex_state = ls_number_e;
             } else {
-                numberError();
+                tokenError();
             }
             break;
 
@@ -932,7 +954,7 @@ JSONParser::getToken()
             } else if ((*p == '+') || (*p == '-')) {
                 lex_state = ls_number_e_sign;
             } else {
-                numberError();
+                tokenError();
             }
             break;
 
@@ -940,7 +962,7 @@ JSONParser::getToken()
             if ((*p >= '0') && (*p <= '9')) {
                 lex_state = ls_number;
             } else {
-                numberError();
+                tokenError();
             }
             break;
 
@@ -955,7 +977,7 @@ JSONParser::getToken()
                 action = reread;
                 ready = true;
             } else {
-                numberError();
+                tokenError();
             }
             break;
 
@@ -969,10 +991,7 @@ JSONParser::getToken()
                 action = reread;
                 ready = true;
             } else {
-                QTC::TC("libtests", "JSON parse keyword bad character");
-                throw std::runtime_error(
-                    "JSON: offset " + std::to_string(offset) +
-                    ": keyword: unexpected character " + std::string(p, 1));
+                tokenError();
             }
             break;
 
@@ -1025,11 +1044,8 @@ JSONParser::getToken()
                 u_value = 0;
                 break;
             default:
-                QTC::TC("libtests", "JSON parse backslash bad character");
-                throw std::runtime_error(
-                    "JSON: offset " + std::to_string(offset) +
-                    ": invalid character after backslash: " +
-                    std::string(p, 1));
+                lex_state = ls_backslash;
+                tokenError();
             }
             break;
 
@@ -1043,10 +1059,7 @@ JSONParser::getToken()
             } else if ('A' <= *p && *p <= 'F') {
                 u_value = 16 * u_value + (10 + ui(*p) - ui('A'));
             } else {
-                QTC::TC("libtests", "JSON parse bad hex after u");
-                throw std::runtime_error(
-                    "JSON: offset " + std::to_string(offset - u_count - 1) +
-                    ": \\u must be followed by four hex digits");
+                tokenError();
             }
             if (++u_count == 4) {
                 handle_u_code(
@@ -1094,8 +1107,7 @@ JSONParser::getToken()
                 break;
 
             default:
-                QTC::TC("libtests", "JSON parse ls premature end of input");
-                throw std::runtime_error("JSON: premature end of input");
+                tokenError();
             }
         }
     }
