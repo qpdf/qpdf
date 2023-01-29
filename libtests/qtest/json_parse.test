@@ -125,10 +125,10 @@ my @bad = (
     "e after minus",            # 42
     "missing digit after e",    # 43
     "missing digit after e+/-", # 44
-    # "tab char in string",       # 45
-    # "cr char in string",        # 46
-    # "lf char in string",        # 47
-    # "bs char in string",        # 48
+    "tab char in string",       # 45
+    "cr char in string",        # 46
+    "lf char in string",        # 47
+    "bs char in string",        # 48
     );
 
 my $i = 0;

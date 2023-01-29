@@ -1,1 +1,1 @@
-"lf in str\ning"
+exception: bad-47.json: JSON: offset 10: control character in string (missing "?)

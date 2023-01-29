@@ -79,6 +79,7 @@ JSON parse number minus no digits 0
 JSON parse incomplete number 0
 JSON parse keyword bad character 0
 JSON parse backslash bad character 0
+JSON parse control char in string 0
 JSON parse leading zero 0
 JSON parse ls premature end of input 0
 JSON parse bad hex after u 0

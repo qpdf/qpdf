@@ -723,10 +723,11 @@ JSONParser::handle_u_code(
 void
 JSONParser::tokenError()
 {
-    if (bytes == 0) {
+    if (done) {
         QTC::TC("libtests", "JSON parse ls premature end of input");
         throw std::runtime_error("JSON: premature end of input");
     }
+
     if (lex_state == ls_u4) {
         QTC::TC("libtests", "JSON parse bad hex after u");
         throw std::runtime_error(
@@ -737,6 +738,11 @@ JSONParser::tokenError()
         throw std::runtime_error(
             "JSON: offset " + std::to_string(offset) +
             ": keyword: unexpected character " + std::string(p, 1));
+    } else if (lex_state == ls_string) {
+        QTC::TC("libtests", "JSON parse control char in string");
+        throw std::runtime_error(
+            "JSON: offset " + std::to_string(offset) +
+            ": control character in string (missing \"?)");
     } else if (lex_state == ls_backslash) {
         QTC::TC("libtests", "JSON parse backslash bad character");
         throw std::runtime_error(
@@ -779,6 +785,7 @@ JSONParser::tokenError()
             "JSON: offset " + std::to_string(offset) +
             ": numeric literal: unexpected character " + std::string(p, 1));
     }
+    throw std::logic_error("JSON::tokenError : unhandled error");
 }
 
 void
@@ -792,7 +799,7 @@ JSONParser::getToken()
     unsigned long high_surrogate = 0;
     qpdf_offset_t high_offset = 0;
 
-    while (!done) {
+    while (true) {
         if (p == (buf + bytes)) {
             p = buf;
             bytes = is.read(buf, sizeof(buf));
@@ -808,307 +815,320 @@ JSONParser::getToken()
                 // end the current token (unless we are still before the start
                 // of the token).
                 if (lex_state == ls_top) {
-                    // Continue with token
+                    ++p;
+                    ++offset;
                 } else {
-                    // done
+                    break;
                 }
+
             } else {
                 QTC::TC("libtests", "JSON parse null character");
                 throw std::runtime_error(
                     "JSON: control or null character at offset " +
                     std::to_string(offset));
             }
-        }
-        action = append;
-        switch (lex_state) {
-        case ls_top:
-            token_start = offset;
-            if (*p == '"') {
-                lex_state = ls_string;
-                action = ignore;
-            } else if (QUtil::is_space(*p)) {
-                action = ignore;
-            } else if (*p == ',') {
-                lex_state = ls_comma;
-                action = ignore;
-                ready = true;
-            } else if (*p == ':') {
-                lex_state = ls_colon;
-                action = ignore;
-                ready = true;
-            } else if (*p == '{') {
-                lex_state = ls_begin_dict;
-                action = ignore;
-                ready = true;
-            } else if (*p == '}') {
-                lex_state = ls_end_dict;
-                action = ignore;
-                ready = true;
-            } else if (*p == '[') {
-                lex_state = ls_begin_array;
-                action = ignore;
-                ready = true;
-            } else if (*p == ']') {
-                lex_state = ls_end_array;
-                action = ignore;
-                ready = true;
-            } else if ((*p >= 'a') && (*p <= 'z')) {
-                lex_state = ls_alpha;
-            } else if (*p == '-') {
-                lex_state = ls_number_minus;
-            } else if ((*p >= '1') && (*p <= '9')) {
-                lex_state = ls_number_before_point;
-            } else if (*p == '0') {
-                lex_state = ls_number_leading_zero;
-            } else {
-                QTC::TC("libtests", "JSON parse bad character");
-                throw std::runtime_error(
-                    "JSON: offset " + std::to_string(offset) +
-                    ": unexpected character " + std::string(p, 1));
-            }
-            break;
-
-        case ls_number_minus:
-            if ((*p >= '1') && (*p <= '9')) {
-                lex_state = ls_number_before_point;
-            } else if (*p == '0') {
-                lex_state = ls_number_leading_zero;
-            } else {
-                QTC::TC("libtests", "JSON parse number minus no digits");
-                throw std::runtime_error(
-                    "JSON: offset " + std::to_string(offset) +
-                    ": numeric literal: no digit after minus sign");
-            }
-            break;
-
-        case ls_number_leading_zero:
-            if (*p == '.') {
-                lex_state = ls_number_point;
-            } else if (QUtil::is_space(*p)) {
-                lex_state = ls_number;
-                action = ignore;
-                ready = true;
-            } else if (strchr("{}[]:,", *p)) {
-                lex_state = ls_number;
-                action = reread;
-                ready = true;
-            } else if (*p == 'e' || *p == 'E') {
-                lex_state = ls_number_e;
-            } else {
-                QTC::TC("libtests", "JSON parse leading zero");
-                throw std::runtime_error(
-                    "JSON: offset " + std::to_string(offset) +
-                    ": number with leading zero");
-            }
-            break;
-
-        case ls_number_before_point:
-            if ((*p >= '0') && (*p <= '9')) {
-                // continue
-            } else if (*p == '.') {
-                lex_state = ls_number_point;
-            } else if (QUtil::is_space(*p)) {
-                lex_state = ls_number;
-                action = ignore;
-                ready = true;
-            } else if (strchr("{}[]:,", *p)) {
-                lex_state = ls_number;
-                action = reread;
-                ready = true;
-            } else if (*p == 'e' || *p == 'E') {
-                lex_state = ls_number_e;
-            } else {
-                tokenError();
-            }
-            break;
-
-        case ls_number_point:
-            if ((*p >= '0') && (*p <= '9')) {
-                lex_state = ls_number_after_point;
-            } else {
-                tokenError();
-            }
-            break;
-
-        case ls_number_after_point:
-            if ((*p >= '0') && (*p <= '9')) {
-                // continue
-            } else if (QUtil::is_space(*p)) {
-                lex_state = ls_number;
-                action = ignore;
-                ready = true;
-            } else if (strchr("{}[]:,", *p)) {
-                lex_state = ls_number;
-                action = reread;
-                ready = true;
-            } else if (*p == 'e' || *p == 'E') {
-                lex_state = ls_number_e;
-            } else {
-                tokenError();
-            }
-            break;
-
-        case ls_number_e:
-            if ((*p >= '0') && (*p <= '9')) {
-                lex_state = ls_number;
-            } else if ((*p == '+') || (*p == '-')) {
-                lex_state = ls_number_e_sign;
-            } else {
-                tokenError();
-            }
-            break;
-
-        case ls_number_e_sign:
-            if ((*p >= '0') && (*p <= '9')) {
-                lex_state = ls_number;
-            } else {
-                tokenError();
-            }
-            break;
-
-        case ls_number:
-            // We only get here after we have seen an exponent.
-            if ((*p >= '0') && (*p <= '9')) {
-                // continue
-            } else if (QUtil::is_space(*p)) {
-                action = ignore;
-                ready = true;
-            } else if (strchr("{}[]:,", *p)) {
-                action = reread;
-                ready = true;
-            } else {
-                tokenError();
-            }
-            break;
-
-        case ls_alpha:
-            if ((*p >= 'a') && (*p <= 'z')) {
-                // okay
-            } else if (QUtil::is_space(*p)) {
-                action = ignore;
-                ready = true;
-            } else if (strchr("{}[]:,", *p)) {
-                action = reread;
-                ready = true;
-            } else {
-                tokenError();
-            }
-            break;
-
-        case ls_string:
-            if (*p == '"') {
-                if (high_offset) {
-                    QTC::TC("libtests", "JSON 16 dangling high");
-                    throw std::runtime_error(
-                        "JSON: offset " + std::to_string(high_offset) +
-                        ": UTF-16 high surrogate not followed by low "
-                        "surrogate");
-                }
-                action = ignore;
-                ready = true;
-            } else if (*p == '\\') {
-                lex_state = ls_backslash;
-                action = ignore;
-            }
-            break;
-
-        case ls_backslash:
-            action = ignore;
-            lex_state = ls_string;
-            switch (*p) {
-            case '\\':
-            case '\"':
-            case '/':
-                // \/ is allowed in json input, but so is /, so we
-                // don't map / to \/ in output.
-                token += *p;
-                break;
-            case 'b':
-                token += '\b';
-                break;
-            case 'f':
-                token += '\f';
-                break;
-            case 'n':
-                token += '\n';
-                break;
-            case 'r':
-                token += '\r';
-                break;
-            case 't':
-                token += '\t';
-                break;
-            case 'u':
-                lex_state = ls_u4;
-                u_count = 0;
-                u_value = 0;
-                break;
-            default:
-                lex_state = ls_backslash;
-                tokenError();
-            }
-            break;
-
-        case ls_u4:
-            using ui = unsigned int;
-            action = ignore;
-            if ('0' <= *p && *p <= '9') {
-                u_value = 16 * u_value + (ui(*p) - ui('0'));
-            } else if ('a' <= *p && *p <= 'f') {
-                u_value = 16 * u_value + (10 + ui(*p) - ui('a'));
-            } else if ('A' <= *p && *p <= 'F') {
-                u_value = 16 * u_value + (10 + ui(*p) - ui('A'));
-            } else {
-                tokenError();
-            }
-            if (++u_count == 4) {
-                handle_u_code(
-                    u_value, offset - 5, high_surrogate, high_offset, token);
-                lex_state = ls_string;
-            }
-            break;
-
-        default:
-            throw std::logic_error(
-                "JSONParser::getToken : trying to handle delimiter state");
-        }
-        switch (action) {
-        case reread:
-            break;
-        case append:
-            token.append(1, *p);
-            // fall through
-        case ignore:
-            ++p;
-            ++offset;
-            break;
-        }
-        if (ready) {
-            break;
-        }
-    }
-    if (done) {
-        if (!token.empty() && !ready) {
+        } else {
+            action = append;
             switch (lex_state) {
             case ls_top:
-                // Can't happen
-                throw std::logic_error("tok_start set in ls_top while parsing");
+                token_start = offset;
+                if (*p == '"') {
+                    lex_state = ls_string;
+                    action = ignore;
+                } else if (*p == ' ') {
+                    action = ignore;
+                } else if (*p == ',') {
+                    lex_state = ls_comma;
+                    action = ignore;
+                    ready = true;
+                } else if (*p == ',') {
+                    lex_state = ls_comma;
+                    action = ignore;
+                    ready = true;
+                } else if (*p == ':') {
+                    lex_state = ls_colon;
+                    action = ignore;
+                    ready = true;
+                } else if (*p == '{') {
+                    lex_state = ls_begin_dict;
+                    action = ignore;
+                    ready = true;
+                } else if (*p == '}') {
+                    lex_state = ls_end_dict;
+                    action = ignore;
+                    ready = true;
+                } else if (*p == '[') {
+                    lex_state = ls_begin_array;
+                    action = ignore;
+                    ready = true;
+                } else if (*p == ']') {
+                    lex_state = ls_end_array;
+                    action = ignore;
+                    ready = true;
+                } else if ((*p >= 'a') && (*p <= 'z')) {
+                    lex_state = ls_alpha;
+                } else if (*p == '-') {
+                    lex_state = ls_number_minus;
+                } else if ((*p >= '1') && (*p <= '9')) {
+                    lex_state = ls_number_before_point;
+                } else if (*p == '0') {
+                    lex_state = ls_number_leading_zero;
+                } else {
+                    QTC::TC("libtests", "JSON parse bad character");
+                    throw std::runtime_error(
+                        "JSON: offset " + std::to_string(offset) +
+                        ": unexpected character " + std::string(p, 1));
+                }
+                break;
+
+            case ls_number_minus:
+                if ((*p >= '1') && (*p <= '9')) {
+                    lex_state = ls_number_before_point;
+                } else if (*p == '0') {
+                    lex_state = ls_number_leading_zero;
+                } else {
+                    QTC::TC("libtests", "JSON parse number minus no digits");
+                    throw std::runtime_error(
+                        "JSON: offset " + std::to_string(offset) +
+                        ": numeric literal: no digit after minus sign");
+                }
                 break;
 
             case ls_number_leading_zero:
+                if (*p == '.') {
+                    lex_state = ls_number_point;
+                } else if (*p == ' ') {
+                    lex_state = ls_number;
+                    action = ignore;
+                    ready = true;
+                } else if (strchr("{}[]:,", *p)) {
+                    lex_state = ls_number;
+                    action = reread;
+                    ready = true;
+                } else if (*p == 'e' || *p == 'E') {
+                    lex_state = ls_number_e;
+                } else {
+                    QTC::TC("libtests", "JSON parse leading zero");
+                    throw std::runtime_error(
+                        "JSON: offset " + std::to_string(offset) +
+                        ": number with leading zero");
+                }
+                break;
+
             case ls_number_before_point:
+                if ((*p >= '0') && (*p <= '9')) {
+                    // continue
+                } else if (*p == '.') {
+                    lex_state = ls_number_point;
+                } else if (*p == ' ') {
+                    lex_state = ls_number;
+                    action = ignore;
+                    ready = true;
+                } else if (strchr("{}[]:,", *p)) {
+                    lex_state = ls_number;
+                    action = reread;
+                    ready = true;
+                } else if (*p == 'e' || *p == 'E') {
+                    lex_state = ls_number_e;
+                } else {
+                    tokenError();
+                }
+                break;
+
+            case ls_number_point:
+                if ((*p >= '0') && (*p <= '9')) {
+                    lex_state = ls_number_after_point;
+                } else {
+                    tokenError();
+                }
+                break;
+
             case ls_number_after_point:
-                lex_state = ls_number;
+                if ((*p >= '0') && (*p <= '9')) {
+                    // continue
+                } else if (*p == ' ') {
+                    lex_state = ls_number;
+                    action = ignore;
+                    ready = true;
+                } else if (strchr("{}[]:,", *p)) {
+                    lex_state = ls_number;
+                    action = reread;
+                    ready = true;
+                } else if (*p == 'e' || *p == 'E') {
+                    lex_state = ls_number_e;
+                } else {
+                    tokenError();
+                }
+                break;
+
+            case ls_number_e:
+                if ((*p >= '0') && (*p <= '9')) {
+                    lex_state = ls_number;
+                } else if ((*p == '+') || (*p == '-')) {
+                    lex_state = ls_number_e_sign;
+                } else {
+                    tokenError();
+                }
+                break;
+
+            case ls_number_e_sign:
+                if ((*p >= '0') && (*p <= '9')) {
+                    lex_state = ls_number;
+                } else {
+                    tokenError();
+                }
                 break;
 
             case ls_number:
+                // We only get here after we have seen an exponent.
+                if ((*p >= '0') && (*p <= '9')) {
+                    // continue
+                } else if (*p == ' ') {
+                    action = ignore;
+                    ready = true;
+                } else if (strchr("{}[]:,", *p)) {
+                    action = reread;
+                    ready = true;
+                } else {
+                    tokenError();
+                }
+                break;
+
             case ls_alpha:
-                // terminal state
+                if ((*p >= 'a') && (*p <= 'z')) {
+                    // okay
+                } else if (*p == ' ') {
+                    action = ignore;
+                    ready = true;
+                } else if (strchr("{}[]:,", *p)) {
+                    action = reread;
+                    ready = true;
+                } else {
+                    tokenError();
+                }
+                break;
+
+            case ls_string:
+                if (*p == '"') {
+                    if (high_offset) {
+                        QTC::TC("libtests", "JSON 16 dangling high");
+                        throw std::runtime_error(
+                            "JSON: offset " + std::to_string(high_offset) +
+                            ": UTF-16 high surrogate not followed by low "
+                            "surrogate");
+                    }
+                    action = ignore;
+                    ready = true;
+                } else if (*p == '\\') {
+                    lex_state = ls_backslash;
+                    action = ignore;
+                }
+                break;
+
+            case ls_backslash:
+                action = ignore;
+                lex_state = ls_string;
+                switch (*p) {
+                case '\\':
+                case '\"':
+                case '/':
+                    // \/ is allowed in json input, but so is /, so we
+                    // don't map / to \/ in output.
+                    token += *p;
+                    break;
+                case 'b':
+                    token += '\b';
+                    break;
+                case 'f':
+                    token += '\f';
+                    break;
+                case 'n':
+                    token += '\n';
+                    break;
+                case 'r':
+                    token += '\r';
+                    break;
+                case 't':
+                    token += '\t';
+                    break;
+                case 'u':
+                    lex_state = ls_u4;
+                    u_count = 0;
+                    u_value = 0;
+                    break;
+                default:
+                    lex_state = ls_backslash;
+                    tokenError();
+                }
+                break;
+
+            case ls_u4:
+                using ui = unsigned int;
+                action = ignore;
+                if ('0' <= *p && *p <= '9') {
+                    u_value = 16 * u_value + (ui(*p) - ui('0'));
+                } else if ('a' <= *p && *p <= 'f') {
+                    u_value = 16 * u_value + (10 + ui(*p) - ui('a'));
+                } else if ('A' <= *p && *p <= 'F') {
+                    u_value = 16 * u_value + (10 + ui(*p) - ui('A'));
+                } else {
+                    tokenError();
+                }
+                if (++u_count == 4) {
+                    handle_u_code(
+                        u_value,
+                        offset - 5,
+                        high_surrogate,
+                        high_offset,
+                        token);
+                    lex_state = ls_string;
+                }
                 break;
 
             default:
-                tokenError();
+                throw std::logic_error(
+                    "JSONParser::getToken : trying to handle delimiter state");
             }
+            switch (action) {
+            case reread:
+                break;
+            case append:
+                token.append(1, *p);
+                // fall through
+            case ignore:
+                ++p;
+                ++offset;
+                break;
+            }
+            if (ready) {
+                return;
+            }
+        }
+    }
+
+    // We only get here if on end of input or if the last character was a
+    // control character.
+
+    if (!token.empty()) {
+        switch (lex_state) {
+        case ls_top:
+            // Can't happen
+            throw std::logic_error("tok_start set in ls_top while parsing");
+            break;
+
+        case ls_number_leading_zero:
+        case ls_number_before_point:
+        case ls_number_after_point:
+            lex_state = ls_number;
+            break;
+
+        case ls_number:
+        case ls_alpha:
+            // terminal state
+            break;
+
+        default:
+            tokenError();
         }
     }
 }
