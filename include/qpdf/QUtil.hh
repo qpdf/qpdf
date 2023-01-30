@@ -545,13 +545,15 @@ namespace QUtil
 inline bool
 QUtil::is_hex_digit(char ch)
 {
-    return (ch && (strchr("0123456789abcdefABCDEF", ch) != nullptr));
+    return ('0' <= ch && ch <= '9') || ('a' <= ch && ch <= 'f') ||
+        ('A' <= ch && ch <= 'F');
 }
 
 inline bool
 QUtil::is_space(char ch)
 {
-    return (ch && (strchr(" \f\n\r\t\v", ch) != nullptr));
+    return ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t' || ch == '\f' ||
+        ch == '\v';
 }
 
 inline bool
