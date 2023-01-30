@@ -14,10 +14,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-static bool
+static inline bool
 is_delimiter(char ch)
 {
-    return (strchr(" \t\n\v\f\r()<>[]{}/%", ch) != nullptr);
+    return (
+        ch == ' ' || ch == '\n' || ch == '/' || ch == '(' || ch == ')' ||
+        ch == '{' || ch == '}' || ch == '<' || ch == '>' || ch == '[' ||
+        ch == ']' || ch == '%' || ch == '\t' || ch == '\r' || ch == '\v' ||
+        ch == '\f' || ch == 0);
 }
 
 namespace
