@@ -791,7 +791,7 @@ JSONParser::tokenError()
 void
 JSONParser::getToken()
 {
-    enum { append, ignore, reread } action = append;
+    enum { append, ignore } action = append;
     bool ready = false;
     token.clear();
 
@@ -820,12 +820,102 @@ JSONParser::getToken()
                 } else {
                     break;
                 }
-
             } else {
                 QTC::TC("libtests", "JSON parse null character");
                 throw std::runtime_error(
                     "JSON: control or null character at offset " +
                     std::to_string(offset));
+            }
+        } else if (*p == ',') {
+            if (lex_state == ls_top) {
+                ++p;
+                ++offset;
+                lex_state = ls_comma;
+                return;
+            } else if (lex_state == ls_string) {
+                token += *p;
+                ++p;
+                ++offset;
+            } else {
+                break;
+            }
+        } else if (*p == ':') {
+            if (lex_state == ls_top) {
+                ++p;
+                ++offset;
+                lex_state = ls_colon;
+                return;
+            } else if (lex_state == ls_string) {
+                token += *p;
+                ++p;
+                ++offset;
+            } else {
+                break;
+            }
+        } else if (*p == ' ') {
+            if (lex_state == ls_top) {
+                ++p;
+                ++offset;
+            } else if (lex_state == ls_string) {
+                token += *p;
+                ++p;
+                ++offset;
+            } else {
+                break;
+            }
+        } else if (*p == '{') {
+            if (lex_state == ls_top) {
+                token_start = offset;
+                ++p;
+                ++offset;
+                lex_state = ls_begin_dict;
+                return;
+            } else if (lex_state == ls_string) {
+                token += *p;
+                ++p;
+                ++offset;
+            } else {
+                break;
+            }
+        } else if (*p == '}') {
+            if (lex_state == ls_top) {
+                ++p;
+                ++offset;
+                lex_state = ls_end_dict;
+                return;
+            } else if (lex_state == ls_string) {
+                token += *p;
+                ++p;
+                ++offset;
+            } else {
+                break;
+            }
+        } else if (*p == '[') {
+            if (lex_state == ls_top) {
+                token_start = offset;
+                ++p;
+                ++offset;
+                lex_state = ls_begin_array;
+                return;
+            } else if (lex_state == ls_string) {
+                token += *p;
+                ++p;
+                ++offset;
+            } else {
+                break;
+            }
+        } else if (*p == ']') {
+            if (lex_state == ls_top) {
+                ++p;
+                ++offset;
+                lex_state = ls_end_array;
+                return;
+            } else if (lex_state == ls_string) {
+                token += *p;
+                ++p;
+                ++offset;
+            } else {
+                break;
             }
         } else {
             action = append;
@@ -835,36 +925,6 @@ JSONParser::getToken()
                 if (*p == '"') {
                     lex_state = ls_string;
                     action = ignore;
-                } else if (*p == ' ') {
-                    action = ignore;
-                } else if (*p == ',') {
-                    lex_state = ls_comma;
-                    action = ignore;
-                    ready = true;
-                } else if (*p == ',') {
-                    lex_state = ls_comma;
-                    action = ignore;
-                    ready = true;
-                } else if (*p == ':') {
-                    lex_state = ls_colon;
-                    action = ignore;
-                    ready = true;
-                } else if (*p == '{') {
-                    lex_state = ls_begin_dict;
-                    action = ignore;
-                    ready = true;
-                } else if (*p == '}') {
-                    lex_state = ls_end_dict;
-                    action = ignore;
-                    ready = true;
-                } else if (*p == '[') {
-                    lex_state = ls_begin_array;
-                    action = ignore;
-                    ready = true;
-                } else if (*p == ']') {
-                    lex_state = ls_end_array;
-                    action = ignore;
-                    ready = true;
                 } else if ((*p >= 'a') && (*p <= 'z')) {
                     lex_state = ls_alpha;
                 } else if (*p == '-') {
@@ -897,14 +957,6 @@ JSONParser::getToken()
             case ls_number_leading_zero:
                 if (*p == '.') {
                     lex_state = ls_number_point;
-                } else if (*p == ' ') {
-                    lex_state = ls_number;
-                    action = ignore;
-                    ready = true;
-                } else if (strchr("{}[]:,", *p)) {
-                    lex_state = ls_number;
-                    action = reread;
-                    ready = true;
                 } else if (*p == 'e' || *p == 'E') {
                     lex_state = ls_number_e;
                 } else {
@@ -920,14 +972,6 @@ JSONParser::getToken()
                     // continue
                 } else if (*p == '.') {
                     lex_state = ls_number_point;
-                } else if (*p == ' ') {
-                    lex_state = ls_number;
-                    action = ignore;
-                    ready = true;
-                } else if (strchr("{}[]:,", *p)) {
-                    lex_state = ls_number;
-                    action = reread;
-                    ready = true;
                 } else if (*p == 'e' || *p == 'E') {
                     lex_state = ls_number_e;
                 } else {
@@ -946,14 +990,6 @@ JSONParser::getToken()
             case ls_number_after_point:
                 if ((*p >= '0') && (*p <= '9')) {
                     // continue
-                } else if (*p == ' ') {
-                    lex_state = ls_number;
-                    action = ignore;
-                    ready = true;
-                } else if (strchr("{}[]:,", *p)) {
-                    lex_state = ls_number;
-                    action = reread;
-                    ready = true;
                 } else if (*p == 'e' || *p == 'E') {
                     lex_state = ls_number_e;
                 } else {
@@ -983,12 +1019,6 @@ JSONParser::getToken()
                 // We only get here after we have seen an exponent.
                 if ((*p >= '0') && (*p <= '9')) {
                     // continue
-                } else if (*p == ' ') {
-                    action = ignore;
-                    ready = true;
-                } else if (strchr("{}[]:,", *p)) {
-                    action = reread;
-                    ready = true;
                 } else {
                     tokenError();
                 }
@@ -997,12 +1027,6 @@ JSONParser::getToken()
             case ls_alpha:
                 if ((*p >= 'a') && (*p <= 'z')) {
                     // okay
-                } else if (*p == ' ') {
-                    action = ignore;
-                    ready = true;
-                } else if (strchr("{}[]:,", *p)) {
-                    action = reread;
-                    ready = true;
                 } else {
                     tokenError();
                 }
@@ -1090,8 +1114,6 @@ JSONParser::getToken()
                     "JSONParser::getToken : trying to handle delimiter state");
             }
             switch (action) {
-            case reread:
-                break;
             case append:
                 token.append(1, *p);
                 // fall through
@@ -1107,7 +1129,7 @@ JSONParser::getToken()
     }
 
     // We only get here if on end of input or if the last character was a
-    // control character.
+    // control character or other delimiter.
 
     if (!token.empty()) {
         switch (lex_state) {
