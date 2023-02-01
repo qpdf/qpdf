@@ -605,16 +605,6 @@ namespace
         std::shared_ptr<JSON> parse();
 
       private:
-        void getToken();
-        void handleToken();
-        void tokenError();
-        static void handle_u_code(
-            unsigned long codepoint,
-            qpdf_offset_t offset,
-            unsigned long& high_surrogate,
-            qpdf_offset_t& high_offset,
-            std::string& result);
-
         enum parser_state_e {
             ps_top,
             ps_dict_begin,
@@ -661,6 +651,20 @@ namespace
             parser_state_e state;
             std::shared_ptr<JSON> item;
         };
+
+        void getToken();
+        void handleToken();
+        void tokenError();
+        static void handle_u_code(
+            unsigned long codepoint,
+            qpdf_offset_t offset,
+            unsigned long& high_surrogate,
+            qpdf_offset_t& high_offset,
+            std::string& result);
+        inline void append();
+        inline void append(lex_state_e);
+        inline void ignore();
+        inline void ignore(lex_state_e);
 
         InputSource& is;
         JSON::Reactor* reactor;
@@ -788,11 +792,48 @@ JSONParser::tokenError()
     throw std::logic_error("JSON::tokenError : unhandled error");
 }
 
+// Append current character to token and advance to next input character.
+inline void
+JSONParser::append()
+{
+    token += *p;
+    ++p;
+    ++offset;
+}
+
+// Append current character to token, advance to next input character and
+// transition to 'next' lexer state.
+inline void
+JSONParser::append(lex_state_e next)
+{
+    lex_state = next;
+    token += *p;
+    ++p;
+    ++offset;
+}
+
+// Advance to next input character without appending the current character to
+// token.
+inline void
+JSONParser::ignore()
+{
+    ++p;
+    ++offset;
+}
+
+// Advance to next input character without appending the current character to
+// token and transition to 'next' lexer state.
+inline void
+JSONParser::ignore(lex_state_e next)
+{
+    lex_state = next;
+    ++p;
+    ++offset;
+}
+
 void
 JSONParser::getToken()
 {
-    enum { append, ignore } action = append;
-    bool ready = false;
     token.clear();
 
     // Keep track of UTF-16 surrogate pairs.
@@ -815,8 +856,7 @@ JSONParser::getToken()
                 // end the current token (unless we are still before the start
                 // of the token).
                 if (lex_state == ls_top) {
-                    ++p;
-                    ++offset;
+                    ignore();
                 } else {
                     break;
                 }
@@ -828,111 +868,82 @@ JSONParser::getToken()
             }
         } else if (*p == ',') {
             if (lex_state == ls_top) {
-                ++p;
-                ++offset;
-                lex_state = ls_comma;
+                ignore(ls_comma);
                 return;
             } else if (lex_state == ls_string) {
-                token += *p;
-                ++p;
-                ++offset;
+                append();
             } else {
                 break;
             }
         } else if (*p == ':') {
             if (lex_state == ls_top) {
-                ++p;
-                ++offset;
-                lex_state = ls_colon;
+                ignore(ls_colon);
                 return;
             } else if (lex_state == ls_string) {
-                token += *p;
-                ++p;
-                ++offset;
+                append();
             } else {
                 break;
             }
         } else if (*p == ' ') {
             if (lex_state == ls_top) {
-                ++p;
-                ++offset;
+                ignore();
             } else if (lex_state == ls_string) {
-                token += *p;
-                ++p;
-                ++offset;
+                append();
             } else {
                 break;
             }
         } else if (*p == '{') {
             if (lex_state == ls_top) {
                 token_start = offset;
-                ++p;
-                ++offset;
-                lex_state = ls_begin_dict;
+                ignore(ls_begin_dict);
                 return;
             } else if (lex_state == ls_string) {
-                token += *p;
-                ++p;
-                ++offset;
+                append();
             } else {
                 break;
             }
         } else if (*p == '}') {
             if (lex_state == ls_top) {
-                ++p;
-                ++offset;
-                lex_state = ls_end_dict;
+                ignore(ls_end_dict);
                 return;
             } else if (lex_state == ls_string) {
-                token += *p;
-                ++p;
-                ++offset;
+                append();
             } else {
                 break;
             }
         } else if (*p == '[') {
             if (lex_state == ls_top) {
                 token_start = offset;
-                ++p;
-                ++offset;
-                lex_state = ls_begin_array;
+                ignore(ls_begin_array);
                 return;
             } else if (lex_state == ls_string) {
-                token += *p;
-                ++p;
-                ++offset;
+                append();
             } else {
                 break;
             }
         } else if (*p == ']') {
             if (lex_state == ls_top) {
-                ++p;
-                ++offset;
-                lex_state = ls_end_array;
+                ignore(ls_end_array);
                 return;
             } else if (lex_state == ls_string) {
-                token += *p;
-                ++p;
-                ++offset;
+                append();
             } else {
                 break;
             }
         } else {
-            action = append;
             switch (lex_state) {
             case ls_top:
                 token_start = offset;
                 if (*p == '"') {
-                    lex_state = ls_string;
-                    action = ignore;
+                    ignore(ls_string);
                 } else if ((*p >= 'a') && (*p <= 'z')) {
-                    lex_state = ls_alpha;
+                    append(ls_alpha);
                 } else if (*p == '-') {
-                    lex_state = ls_number_minus;
+                    append(ls_number_minus);
                 } else if ((*p >= '1') && (*p <= '9')) {
-                    lex_state = ls_number_before_point;
+                    append(ls_number_before_point);
                 } else if (*p == '0') {
-                    lex_state = ls_number_leading_zero;
+                    append(ls_number_leading_zero);
                 } else {
                     QTC::TC("libtests", "JSON parse bad character");
                     throw std::runtime_error(
@@ -943,9 +954,9 @@ JSONParser::getToken()
 
             case ls_number_minus:
                 if ((*p >= '1') && (*p <= '9')) {
-                    lex_state = ls_number_before_point;
+                    append(ls_number_before_point);
                 } else if (*p == '0') {
-                    lex_state = ls_number_leading_zero;
+                    append(ls_number_leading_zero);
                 } else {
                     QTC::TC("libtests", "JSON parse number minus no digits");
                     throw std::runtime_error(
@@ -956,9 +967,9 @@ JSONParser::getToken()
 
             case ls_number_leading_zero:
                 if (*p == '.') {
-                    lex_state = ls_number_point;
+                    append(ls_number_point);
                 } else if (*p == 'e' || *p == 'E') {
-                    lex_state = ls_number_e;
+                    append(ls_number_e);
                 } else {
                     QTC::TC("libtests", "JSON parse leading zero");
                     throw std::runtime_error(
@@ -969,11 +980,11 @@ JSONParser::getToken()
 
             case ls_number_before_point:
                 if ((*p >= '0') && (*p <= '9')) {
-                    // continue
+                    append();
                 } else if (*p == '.') {
-                    lex_state = ls_number_point;
+                    append(ls_number_point);
                 } else if (*p == 'e' || *p == 'E') {
-                    lex_state = ls_number_e;
+                    append(ls_number_e);
                 } else {
                     tokenError();
                 }
@@ -981,7 +992,7 @@ JSONParser::getToken()
 
             case ls_number_point:
                 if ((*p >= '0') && (*p <= '9')) {
-                    lex_state = ls_number_after_point;
+                    append(ls_number_after_point);
                 } else {
                     tokenError();
                 }
@@ -989,9 +1000,9 @@ JSONParser::getToken()
 
             case ls_number_after_point:
                 if ((*p >= '0') && (*p <= '9')) {
-                    // continue
+                    append();
                 } else if (*p == 'e' || *p == 'E') {
-                    lex_state = ls_number_e;
+                    append(ls_number_e);
                 } else {
                     tokenError();
                 }
@@ -999,9 +1010,9 @@ JSONParser::getToken()
 
             case ls_number_e:
                 if ((*p >= '0') && (*p <= '9')) {
-                    lex_state = ls_number;
+                    append(ls_number);
                 } else if ((*p == '+') || (*p == '-')) {
-                    lex_state = ls_number_e_sign;
+                    append(ls_number_e_sign);
                 } else {
                     tokenError();
                 }
@@ -1009,7 +1020,7 @@ JSONParser::getToken()
 
             case ls_number_e_sign:
                 if ((*p >= '0') && (*p <= '9')) {
-                    lex_state = ls_number;
+                    append(ls_number);
                 } else {
                     tokenError();
                 }
@@ -1018,7 +1029,7 @@ JSONParser::getToken()
             case ls_number:
                 // We only get here after we have seen an exponent.
                 if ((*p >= '0') && (*p <= '9')) {
-                    // continue
+                    append();
                 } else {
                     tokenError();
                 }
@@ -1026,7 +1037,7 @@ JSONParser::getToken()
 
             case ls_alpha:
                 if ((*p >= 'a') && (*p <= 'z')) {
-                    // okay
+                    append();
                 } else {
                     tokenError();
                 }
@@ -1041,16 +1052,16 @@ JSONParser::getToken()
                             ": UTF-16 high surrogate not followed by low "
                             "surrogate");
                     }
-                    action = ignore;
-                    ready = true;
+                    ignore();
+                    return;
                 } else if (*p == '\\') {
-                    lex_state = ls_backslash;
-                    action = ignore;
+                    ignore(ls_backslash);
+                } else {
+                    append();
                 }
                 break;
 
             case ls_backslash:
-                action = ignore;
                 lex_state = ls_string;
                 switch (*p) {
                 case '\\':
@@ -1084,11 +1095,11 @@ JSONParser::getToken()
                     lex_state = ls_backslash;
                     tokenError();
                 }
+                ignore();
                 break;
 
             case ls_u4:
                 using ui = unsigned int;
-                action = ignore;
                 if ('0' <= *p && *p <= '9') {
                     u_value = 16 * u_value + (ui(*p) - ui('0'));
                 } else if ('a' <= *p && *p <= 'f') {
@@ -1107,23 +1118,12 @@ JSONParser::getToken()
                         token);
                     lex_state = ls_string;
                 }
+                ignore();
                 break;
 
             default:
                 throw std::logic_error(
                     "JSONParser::getToken : trying to handle delimiter state");
-            }
-            switch (action) {
-            case append:
-                token.append(1, *p);
-                // fall through
-            case ignore:
-                ++p;
-                ++offset;
-                break;
-            }
-            if (ready) {
-                return;
             }
         }
     }
