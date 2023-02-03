@@ -220,41 +220,61 @@ JSON::unparse() const
 std::string
 JSON::encode_string(std::string const& str)
 {
-    std::string result;
-    size_t len = str.length();
-    for (size_t i = 0; i < len; ++i) {
-        unsigned char ch = static_cast<unsigned char>(str.at(i));
-        switch (ch) {
-        case '\\':
-            result += "\\\\";
-            break;
-        case '\"':
-            result += "\\\"";
-            break;
-        case '\b':
-            result += "\\b";
-            break;
-        case '\f':
-            result += "\\f";
-            break;
-        case '\n':
-            result += "\\n";
-            break;
-        case '\r':
-            result += "\\r";
-            break;
-        case '\t':
-            result += "\\t";
-            break;
-        default:
-            if (ch < 32) {
-                result += "\\u" + QUtil::int_to_string_base(ch, 16, 4);
-            } else {
-                result.append(1, static_cast<char>(ch));
+    static auto constexpr hexchars = "0123456789abcdef";
+
+    auto begin = str.cbegin();
+    auto end = str.cend();
+    auto iter = begin;
+    while (iter != end) {
+        auto c = static_cast<unsigned char>(*iter);
+        if ((c > 34 && c != '\\') || c == ' ' || c == 33) {
+            // Optimistically check that no char in str requires escaping.
+            // Hopefully we can just return the input str.
+            ++iter;
+        } else {
+            // We found a char that requires escaping. Initialize result to the
+            // chars scanned so far, append/replace the rest of str one char at
+            // a time, and return the result.
+            std::string result{begin, iter};
+
+            for (; iter != end; ++iter) {
+                auto ch = static_cast<unsigned char>(*iter);
+                if ((ch > 34 && ch != '\\') || ch == ' ' || ch == 33) {
+                    // Check for most common case first.
+                    result += *iter;
+                } else {
+                    switch (ch) {
+                    case '\\':
+                        result += "\\\\";
+                        break;
+                    case '\"':
+                        result += "\\\"";
+                        break;
+                    case '\b':
+                        result += "\\b";
+                        break;
+                    case '\f':
+                        result += "\\f";
+                        break;
+                    case '\n':
+                        result += "\\n";
+                        break;
+                    case '\r':
+                        result += "\\r";
+                        break;
+                    case '\t':
+                        result += "\\t";
+                        break;
+                    default:
+                        result += ch < 16 ? "\\u000" : "\\u001";
+                        result += hexchars[ch % 16];
+                    }
+                }
             }
+            return result;
         }
     }
-    return result;
+    return str;
 }
 
 JSON
