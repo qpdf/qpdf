@@ -4,7 +4,7 @@ Linearization
 =============
 
 This chapter describes how ``QPDF`` and ``QPDFWriter`` implement
-creation and processing of linearized PDFS.
+creation and processing of linearized PDFs.
 
 .. _linearization-strategy:
 
