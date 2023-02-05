@@ -54,6 +54,8 @@ class JSON
 {
   public:
     static int constexpr LATEST = 2;
+
+    QPDF_DLL
     JSON() = default;
 
     QPDF_DLL
@@ -369,7 +371,7 @@ class JSON
         }
         virtual ~JSON_dictionary() = default;
         virtual void write(Pipeline*, size_t depth) const;
-        std::map<std::string, std::shared_ptr<JSON_value>> members;
+        std::map<std::string, JSON> members;
         std::set<std::string> parsed_keys;
     };
     struct JSON_array: public JSON_value
@@ -380,7 +382,7 @@ class JSON
         }
         virtual ~JSON_array() = default;
         virtual void write(Pipeline*, size_t depth) const;
-        std::vector<std::shared_ptr<JSON_value>> elements;
+        std::vector<JSON> elements;
     };
     struct JSON_string: public JSON_value
     {

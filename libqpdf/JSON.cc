@@ -322,9 +322,9 @@ JSON::addArrayElement(JSON const& val)
         throw std::runtime_error("JSON::addArrayElement called on non-array");
     }
     if (val.m->value.get()) {
-        arr->elements.push_back(val.m->value);
+        arr->elements.push_back(val);
     } else {
-        arr->elements.push_back(std::make_shared<JSON_null>());
+        arr->elements.push_back(makeNull());
     }
     return arr->elements.back();
 }
@@ -504,11 +504,11 @@ JSON::checkSchemaInternal(
     }
 
     if (sch_dict && (!pattern_key.empty())) {
-        auto pattern_schema = sch_dict->members[pattern_key].get();
+        auto pattern_schema = sch_dict->members[pattern_key].m->value.get();
         for (auto const& iter: this_dict->members) {
             std::string const& key = iter.first;
             checkSchemaInternal(
-                this_dict->members[key].get(),
+                this_dict->members[key].m->value.get(),
                 pattern_schema,
                 flags,
                 errors,
@@ -519,8 +519,8 @@ JSON::checkSchemaInternal(
             std::string const& key = iter.first;
             if (this_dict->members.count(key)) {
                 checkSchemaInternal(
-                    this_dict->members[key].get(),
-                    iter.second.get(),
+                    this_dict->members[key].m->value.get(),
+                    iter.second.m->value.get(),
                     flags,
                     errors,
                     prefix + "." + key);
@@ -557,8 +557,8 @@ JSON::checkSchemaInternal(
                 int i = 0;
                 for (auto const& element: this_arr->elements) {
                     checkSchemaInternal(
-                        element.get(),
-                        sch_arr->elements.at(0).get(),
+                        element.m->value.get(),
+                        sch_arr->elements.at(0).m->value.get(),
                         flags,
                         errors,
                         prefix + "." + std::to_string(i));
@@ -568,7 +568,7 @@ JSON::checkSchemaInternal(
                 QTC::TC("libtests", "JSON schema array for single item");
                 checkSchemaInternal(
                     this_v,
-                    sch_arr->elements.at(0).get(),
+                    sch_arr->elements.at(0).m->value.get(),
                     flags,
                     errors,
                     prefix);
@@ -587,8 +587,8 @@ JSON::checkSchemaInternal(
             size_t i = 0;
             for (auto const& element: this_arr->elements) {
                 checkSchemaInternal(
-                    element.get(),
-                    sch_arr->elements.at(i).get(),
+                    element.m->value.get(),
+                    sch_arr->elements.at(i).m->value.get(),
                     flags,
                     errors,
                     prefix + "." + std::to_string(i));
