@@ -425,7 +425,7 @@ class JSON
         std::function<void(Pipeline*)> fn;
     };
 
-    JSON(std::shared_ptr<JSON_value>);
+    JSON(std::unique_ptr<JSON_value>);
 
     static bool checkSchemaInternal(
         JSON_value* this_v,
@@ -443,13 +443,13 @@ class JSON
         ~Members() = default;
 
       private:
-        Members(std::shared_ptr<JSON_value>);
+        Members(std::unique_ptr<JSON_value>);
         Members(Members const&) = delete;
 
-        std::shared_ptr<JSON_value> value;
+        std::unique_ptr<JSON_value> value;
         // start and end are only populated for objects created by parse
-        qpdf_offset_t start;
-        qpdf_offset_t end;
+        qpdf_offset_t start{0};
+        qpdf_offset_t end{0};
     };
 
     std::shared_ptr<Members> m;

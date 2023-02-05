@@ -9,15 +9,13 @@
 #include <cstring>
 #include <stdexcept>
 
-JSON::Members::Members(std::shared_ptr<JSON_value> value) :
-    value(value),
-    start(0),
-    end(0)
+JSON::Members::Members(std::unique_ptr<JSON_value> value) :
+    value(std::move(value))
 {
 }
 
-JSON::JSON(std::shared_ptr<JSON_value> value) :
-    m(new Members(value))
+JSON::JSON(std::unique_ptr<JSON_value> value) :
+    m(new Members(std::move(value)))
 {
 }
 
@@ -278,7 +276,7 @@ JSON::encode_string(std::string const& str)
 JSON
 JSON::makeDictionary()
 {
-    return JSON(std::make_shared<JSON_dictionary>());
+    return JSON(std::make_unique<JSON_dictionary>());
 }
 
 JSON
@@ -286,7 +284,7 @@ JSON::addDictionaryMember(std::string const& key, JSON const& val)
 {
     if (auto* obj = dynamic_cast<JSON_dictionary*>(this->m->value.get())) {
         return obj->members[encode_string(key)] =
-                   val.m->value ? val.m->value : std::make_shared<JSON_null>();
+                   val.m->value ? val : makeNull();
     } else {
         throw std::runtime_error(
             "JSON::addDictionaryMember called on non-dictionary");
@@ -311,7 +309,7 @@ JSON::checkDictionaryKeySeen(std::string const& key)
 JSON
 JSON::makeArray()
 {
-    return JSON(std::make_shared<JSON_array>());
+    return JSON(std::make_unique<JSON_array>());
 }
 
 JSON
@@ -332,43 +330,43 @@ JSON::addArrayElement(JSON const& val)
 JSON
 JSON::makeString(std::string const& utf8)
 {
-    return JSON(std::make_shared<JSON_string>(utf8));
+    return JSON(std::make_unique<JSON_string>(utf8));
 }
 
 JSON
 JSON::makeInt(long long int value)
 {
-    return JSON(std::make_shared<JSON_number>(value));
+    return JSON(std::make_unique<JSON_number>(value));
 }
 
 JSON
 JSON::makeReal(double value)
 {
-    return JSON(std::make_shared<JSON_number>(value));
+    return JSON(std::make_unique<JSON_number>(value));
 }
 
 JSON
 JSON::makeNumber(std::string const& encoded)
 {
-    return JSON(std::make_shared<JSON_number>(encoded));
+    return JSON(std::make_unique<JSON_number>(encoded));
 }
 
 JSON
 JSON::makeBool(bool value)
 {
-    return JSON(std::make_shared<JSON_bool>(value));
+    return JSON(std::make_unique<JSON_bool>(value));
 }
 
 JSON
 JSON::makeNull()
 {
-    return JSON(std::make_shared<JSON_null>());
+    return JSON(std::make_unique<JSON_null>());
 }
 
 JSON
 JSON::makeBlob(std::function<void(Pipeline*)> fn)
 {
-    return JSON(std::make_shared<JSON_blob>(fn));
+    return JSON(std::make_unique<JSON_blob>(fn));
 }
 
 bool
