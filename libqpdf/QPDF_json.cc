@@ -85,10 +85,10 @@ is_obj_key(std::string_view v, int& obj, int& gen)
 }
 
 static bool
-is_unicode_string(std::string const& v, std::string& str)
+is_unicode_string(std::string& str)
 {
-    if (v.substr(0, 2) == "u:") {
-        str = v.substr(2);
+    if (str.substr(0, 2) == "u:") {
+        str.erase(0, 2);
         return true;
     }
     return false;
@@ -149,12 +149,17 @@ QPDF::test_json_validators()
     check(obj == 12);
     check(gen == 13);
     std::string str;
-    check(!is_unicode_string("", str));
-    check(!is_unicode_string("xyz", str));
-    check(!is_unicode_string("x:", str));
-    check(is_unicode_string("u:potato", str));
+    str = "";
+    check(!is_unicode_string(str));
+    str = "xyz";
+    check(!is_unicode_string(str));
+    str = "x:";
+    check(!is_unicode_string(str));
+    str = "u:potato";
+    check(is_unicode_string(str));
     check(str == "potato");
-    check(is_unicode_string("u:", str));
+    str = "u:";
+    check(is_unicode_string(str));
     check(str == "");
     check(!is_binary_string("", str));
     check(!is_binary_string("x:", str));
@@ -687,8 +692,8 @@ QPDF::JSONReactor::makeObject(JSON const& value)
         std::string str;
         if (is_indirect_object(str_v, obj, gen)) {
             result = reserveObject(obj, gen);
-        } else if (is_unicode_string(str_v, str)) {
-            result = QPDFObjectHandle::newUnicodeString(str);
+        } else if (is_unicode_string(str_v)) {
+            result = QPDFObjectHandle::newUnicodeString(str_v);
         } else if (is_binary_string(str_v, str)) {
             result = QPDFObjectHandle::newString(QUtil::hex_decode(str));
         } else if (is_name(str_v)) {
