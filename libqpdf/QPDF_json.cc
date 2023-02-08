@@ -8,6 +8,7 @@
 #include <qpdf/QUtil.hh>
 #include <algorithm>
 #include <cstring>
+#include <string_view>
 
 // This chart shows an example of the state transitions that would
 // occur in parsing a minimal file.
@@ -60,44 +61,15 @@ static char const* JSON_PDF = (
 
 // Validator methods -- these are much more performant than std::regex.
 static bool
-is_indirect_object(std::string const& v, int& obj, int& gen)
+is_indirect_object(std::string_view v, int& obj, int& gen)
 {
-    char const* p = v.c_str();
-    std::string o_str;
-    std::string g_str;
-    if (!QUtil::is_digit(*p)) {
-        return false;
-    }
-    while (QUtil::is_digit(*p)) {
-        o_str.append(1, *p++);
-    }
-    if (*p != ' ') {
-        return false;
-    }
-    while (*p == ' ') {
-        ++p;
-    }
-    if (!QUtil::is_digit(*p)) {
-        return false;
-    }
-    while (QUtil::is_digit(*p)) {
-        g_str.append(1, *p++);
-    }
-    if (*p != ' ') {
-        return false;
-    }
-    while (*p == ' ') {
-        ++p;
-    }
-    if (*p++ != 'R') {
-        return false;
-    }
-    if (*p) {
-        return false;
-    }
-    obj = QUtil::string_to_int(o_str.c_str());
-    gen = QUtil::string_to_int(g_str.c_str());
-    return true;
+    // Note that v must be null-terminated.
+    char const* p = v.data();
+
+    return (
+        QUtil::process_digits(p, obj) && QUtil::process_space_chars(p) &&
+        QUtil::process_digits(p, gen) && QUtil::process_space_chars(p) &&
+        *p++ == 'R' && !(*p));
 }
 
 static bool
