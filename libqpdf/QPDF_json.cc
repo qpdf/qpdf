@@ -73,9 +73,12 @@ is_indirect_object(std::string_view v, int& obj, int& gen)
 }
 
 static bool
-is_obj_key(std::string const& v, int& obj, int& gen)
+is_obj_key(std::string_view v, int& obj, int& gen)
 {
-    if (v.substr(0, 4) != "obj:") {
+    // Note that v must be null-terminated.
+    using namespace std::literals;
+
+    if (v.substr(0, 4) != "obj:"sv) {
         return false;
     }
     return is_indirect_object(v.substr(4), obj, gen);
