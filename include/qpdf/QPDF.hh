@@ -32,6 +32,7 @@
 #include <memory>
 #include <stdio.h>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include <qpdf/Buffer.hh>
@@ -50,6 +51,7 @@ class BitStream;
 class BitWriter;
 class QPDFLogger;
 class QPDFParser;
+struct JSON_Descr;
 
 class QPDF
 {
@@ -1152,6 +1154,7 @@ class QPDF
         QPDF& pdf;
         std::shared_ptr<InputSource> is;
         bool must_be_complete;
+        std::shared_ptr<std::variant<std::string, JSON_Descr>> descr;
         bool errors;
         bool parse_error;
         bool saw_qpdf;

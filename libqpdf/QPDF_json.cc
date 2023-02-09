@@ -4,6 +4,8 @@
 #include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QPDFObject_private.hh>
+#include <qpdf/QPDFValue.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <algorithm>
@@ -226,6 +228,8 @@ QPDF::JSONReactor::JSONReactor(
     pdf(pdf),
     is(is),
     must_be_complete(must_be_complete),
+    descr(std::make_shared<std::variant<std::string, JSON_Descr>>(
+        JSON_Descr(std::make_shared<std::string>(is->getName()), ""))),
     errors(false),
     parse_error(false),
     saw_qpdf(false),
@@ -675,12 +679,13 @@ QPDF::JSONReactor::arrayItem(JSON const& value)
 void
 QPDF::JSONReactor::setObjectDescription(QPDFObjectHandle& oh, JSON const& value)
 {
-    std::string description = this->is->getName();
-    if (!this->cur_object.empty()) {
-        description += ", " + this->cur_object;
+    auto j_descr = std::get<JSON_Descr>(*descr);
+    if (j_descr.object != cur_object) {
+        descr = std::make_shared<QPDFValue::Description>(
+            JSON_Descr(j_descr.input, cur_object));
     }
-    description += " at offset " + std::to_string(value.getStart());
-    oh.setObjectDescription(&this->pdf, description);
+
+    oh.getObjectPtr()->setDescription(&pdf, descr, value.getStart());
 }
 
 QPDFObjectHandle

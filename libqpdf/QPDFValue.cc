@@ -34,6 +34,14 @@ QPDFValue::getDescription()
                 }
                 return description;
             }
+        case 1:
+            {
+                auto j_descr = std::get<1>(*object_description);
+                return (
+                    *j_descr.input +
+                    (j_descr.object.empty() ? "" : ", " + j_descr.object) +
+                    " at offset " + std::to_string(parsed_offset));
+            }
         }
     } else if (og.isIndirect()) {
         return "object " + og.unparse(' ');
