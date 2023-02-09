@@ -14,18 +14,6 @@ class QPDF;
 class QPDFObjectHandle;
 class QPDFObject;
 
-struct JSON_Descr
-{
-    JSON_Descr(std::shared_ptr<std::string> input, std::string const& object) :
-        input(input),
-        object(object)
-    {
-    }
-
-    std::shared_ptr<std::string> input;
-    std::string object;
-};
-
 class QPDFValue
 {
     friend class QPDFObject;
@@ -36,6 +24,19 @@ class QPDFValue
     virtual std::shared_ptr<QPDFObject> copy(bool shallow = false) = 0;
     virtual std::string unparse() = 0;
     virtual JSON getJSON(int json_version) = 0;
+
+    struct JSON_Descr
+    {
+        JSON_Descr(
+            std::shared_ptr<std::string> input, std::string const& object) :
+            input(input),
+            object(object)
+        {
+        }
+
+        std::shared_ptr<std::string> input;
+        std::string object;
+    };
 
     using Description = std::variant<std::string, JSON_Descr>;
 
