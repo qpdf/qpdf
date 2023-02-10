@@ -510,6 +510,12 @@ namespace QUtil
     // The following routines are used by tokenizers to perform common tasks
     // without repeated testing or string copying.
 
+    // If 'p' points at a space character advance p to the next non-space and
+    // return true. Otherwise return false. NOTE that the 'p' must point at a
+    // null-terminated character sequence.
+    QPDF_DLL
+    inline bool process_space_chars(char const*& p);
+
     // 'process_digits' builds up an integer one character at a time. If 'p'
     // does not point to a digit set 'value' to 0 and return false. Otherwise
     // advance 'p' to point to the next non-digit, set 'value' to the numeric
@@ -577,6 +583,18 @@ inline bool
 QUtil::is_digit(char ch)
 {
     return ((ch >= '0') && (ch <= '9'));
+}
+
+inline bool
+QUtil::process_space_chars(char const*& p)
+{
+    if (*p != ' ') {
+        return false;
+    }
+    while (*p == ' ') {
+        ++p;
+    }
+    return true;
 }
 
 inline bool
