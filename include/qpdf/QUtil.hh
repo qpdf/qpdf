@@ -27,6 +27,7 @@
 #include <qpdf/Types.h>
 #include <cstring>
 #include <functional>
+#include <limits>
 #include <list>
 #include <memory>
 #include <stdexcept>
@@ -506,6 +507,22 @@ namespace QUtil
     QPDF_DLL
     inline bool is_number(char const*);
 
+    // The following routines are used by tokenizers to perform common tasks
+    // without repeated testing or string copying.
+
+    // 'process_digits' builds up an integer one character at a time. If 'p'
+    // does not point to a digit set 'value' to 0 and return false. Otherwise
+    // advance 'p' to point to the next non-digit, set 'value' to the numeric
+    // value and return true. If the integer is too large to handle, 'p' will
+    // point to the digit that would cause an overflow. NOTE that the 'p' must
+    // point at a null-terminated character sequence. 'process_digit' processes
+    // a single character and returns false if the character is not a digit or
+    // would cause an overflow.
+    QPDF_DLL
+    inline bool process_digits(char const*& p, int& value);
+    QPDF_DLL
+    inline bool process_digit(char ch, int& value);
+
     // This method parses the numeric range syntax used by the qpdf
     // command-line tool. May throw std::runtime_error.
     QPDF_DLL
@@ -560,6 +577,33 @@ inline bool
 QUtil::is_digit(char ch)
 {
     return ((ch >= '0') && (ch <= '9'));
+}
+
+inline bool
+QUtil::process_digits(char const*& p, int& value)
+{
+    value = 0;
+    if (!QUtil::process_digit(*p, value)) {
+        return false;
+    }
+    p++;
+    while (QUtil::process_digit(*p, value)) {
+        p++;
+    }
+    return true;
+}
+
+inline bool
+QUtil::process_digit(char ch, int& value)
+{
+    constexpr int max = std::numeric_limits<int>::max() / 10 - 9;
+    if ('0' <= ch && ch <= '9' && value <= max) {
+        value *= 10;
+        value += ch - '0';
+        return true;
+    } else {
+        return false;
+    }
 }
 
 inline bool
