@@ -339,13 +339,33 @@ class JSON
     static void
     writeClose(Pipeline* p, bool first, size_t depth, char const* delimeter);
 
+    enum value_type_e {
+        vt_none,
+        vt_dictionary,
+        vt_array,
+        vt_string,
+        vt_number,
+        vt_bool,
+        vt_null,
+        vt_blob,
+    };
+
     struct JSON_value
     {
+        JSON_value(value_type_e type_code) :
+            type_code(type_code)
+        {
+        }
         virtual ~JSON_value() = default;
         virtual void write(Pipeline*, size_t depth) const = 0;
+        const value_type_e type_code{vt_none};
     };
     struct JSON_dictionary: public JSON_value
     {
+        JSON_dictionary() :
+            JSON_value(vt_dictionary)
+        {
+        }
         virtual ~JSON_dictionary() = default;
         virtual void write(Pipeline*, size_t depth) const;
         std::map<std::string, std::shared_ptr<JSON_value>> members;
@@ -353,6 +373,10 @@ class JSON
     };
     struct JSON_array: public JSON_value
     {
+        JSON_array() :
+            JSON_value(vt_array)
+        {
+        }
         virtual ~JSON_array() = default;
         virtual void write(Pipeline*, size_t depth) const;
         std::vector<std::shared_ptr<JSON_value>> elements;
@@ -383,6 +407,10 @@ class JSON
     };
     struct JSON_null: public JSON_value
     {
+        JSON_null() :
+            JSON_value(vt_null)
+        {
+        }
         virtual ~JSON_null() = default;
         virtual void write(Pipeline*, size_t depth) const;
     };

@@ -133,6 +133,7 @@ JSON::JSON_array::write(Pipeline* p, size_t depth) const
 }
 
 JSON::JSON_string::JSON_string(std::string const& utf8) :
+    JSON_value(vt_string),
     utf8(utf8),
     encoded(encode_string(utf8))
 {
@@ -145,16 +146,19 @@ JSON::JSON_string::write(Pipeline* p, size_t) const
 }
 
 JSON::JSON_number::JSON_number(long long value) :
+    JSON_value(vt_number),
     encoded(std::to_string(value))
 {
 }
 
 JSON::JSON_number::JSON_number(double value) :
+    JSON_value(vt_number),
     encoded(QUtil::double_to_string(value, 6))
 {
 }
 
 JSON::JSON_number::JSON_number(std::string const& value) :
+    JSON_value(vt_number),
     encoded(value)
 {
 }
@@ -166,6 +170,7 @@ JSON::JSON_number::write(Pipeline* p, size_t) const
 }
 
 JSON::JSON_bool::JSON_bool(bool val) :
+    JSON_value(vt_bool),
     value(val)
 {
 }
@@ -183,6 +188,7 @@ JSON::JSON_null::write(Pipeline* p, size_t) const
 }
 
 JSON::JSON_blob::JSON_blob(std::function<void(Pipeline*)> fn) :
+    JSON_value(vt_blob),
     fn(fn)
 {
 }
@@ -376,56 +382,52 @@ JSON::makeBlob(std::function<void(Pipeline*)> fn)
 bool
 JSON::isArray() const
 {
-    return nullptr != dynamic_cast<JSON_array const*>(this->m->value.get());
+    return m->value->type_code == vt_array;
 }
 
 bool
 JSON::isDictionary() const
 {
-    return nullptr !=
-        dynamic_cast<JSON_dictionary const*>(this->m->value.get());
+    return m->value->type_code == vt_dictionary;
 }
 
 bool
 JSON::getString(std::string& utf8) const
 {
-    auto v = dynamic_cast<JSON_string const*>(this->m->value.get());
-    if (v == nullptr) {
-        return false;
+    if (m->value->type_code == vt_string) {
+        auto v = dynamic_cast<JSON_string const*>(this->m->value.get());
+        utf8 = v->utf8;
+        return true;
     }
-    utf8 = v->utf8;
-    return true;
+    return false;
 }
 
 bool
 JSON::getNumber(std::string& value) const
 {
-    auto v = dynamic_cast<JSON_number const*>(this->m->value.get());
-    if (v == nullptr) {
-        return false;
+    if (m->value->type_code == vt_number) {
+        auto v = dynamic_cast<JSON_number const*>(this->m->value.get());
+        value = v->encoded;
+        return true;
     }
-    value = v->encoded;
-    return true;
+    return false;
 }
 
 bool
 JSON::getBool(bool& value) const
 {
-    auto v = dynamic_cast<JSON_bool const*>(this->m->value.get());
-    if (v == nullptr) {
-        return false;
+    if (m->value->type_code == vt_bool) {
+        auto v = dynamic_cast<JSON_bool const*>(this->m->value.get());
+        value = v->value;
+        return true;
     }
-    value = v->value;
-    return true;
+    return false;
 }
 
 bool
 JSON::isNull() const
 {
-    if (dynamic_cast<JSON_null const*>(this->m->value.get())) {
-        return true;
-    }
-    return false;
+    return m->value->type_code == vt_null;
 }
 
 bool
