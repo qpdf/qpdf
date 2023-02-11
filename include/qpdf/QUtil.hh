@@ -33,6 +33,7 @@
 #include <stdexcept>
 #include <stdio.h>
 #include <string>
+#include <string_view>
 #include <time.h>
 #include <vector>
 
@@ -216,11 +217,16 @@ namespace QUtil
     QPDF_DLL
     inline std::string hex_encode_char(char);
 
-    // Returns a string that is the result of decoding the input
-    // string. The input string may consist of mixed case hexadecimal
-    // digits. Any characters that are not hexadecimal digits will be
-    // silently ignored. If there are an odd number of hexadecimal
-    // digits, a trailing 0 will be assumed.
+    // Returns a string that is the result of decoding the input string. The
+    // input string may consist of mixed case hexadecimal digits. If
+    // 'ignore_non_digits' is set to false, an empty string is returned if any
+    // characters that are not hexadecimal digits are encountered or if the
+    // input has an odd number of characters. Otherwise, extra characters are
+    // ignored and silently ignored and a trailing 0 will be assumed if
+    // necessary.
+    QPDF_DLL
+    std::string hex_decode(std::string_view input, bool ignore_non_digits);
+    // ABI: remove, default 'ignore_non_digits' above to true.
     QPDF_DLL
     std::string hex_decode(std::string const&);
 

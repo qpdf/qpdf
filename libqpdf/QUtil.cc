@@ -782,28 +782,42 @@ QUtil::hex_encode(std::string const& input)
 std::string
 QUtil::hex_decode(std::string const& input)
 {
+    return hex_decode(input, true);
+}
+
+std::string
+QUtil::hex_decode(std::string_view input, bool ignore_non_digits)
+{
     std::string result;
-    size_t pos = 0;
+    result.reserve(input.size() / 2 + 1);
+    bool first = true;
+    char c;
+
     for (auto ch: input) {
-        bool skip = false;
-        if ((ch >= 'A') && (ch <= 'F')) {
-            ch = QIntC::to_char(ch - 'A' + 10);
-        } else if ((ch >= 'a') && (ch <= 'f')) {
-            ch = QIntC::to_char(ch - 'a' + 10);
-        } else if ((ch >= '0') && (ch <= '9')) {
-            ch = QIntC::to_char(ch - '0');
+        if ('0' <= ch && ch <= '9') {
+            c = static_cast<char>(ch - '0');
+        } else if ('a' <= ch && ch <= 'f') {
+            c = static_cast<char>(ch - 'a' + 10);
+        } else if ('A' <= ch && ch <= 'F') {
+            c = static_cast<char>(ch - 'A' + 10);
         } else {
-            skip = true;
-        }
-        if (!skip) {
-            if (pos == 0) {
-                result.push_back(static_cast<char>(ch << 4));
-                pos = 1;
-            } else {
-                result[result.length() - 1] |= ch;
-                pos = 0;
+            if (!ignore_non_digits) {
+                result.clear();
+                return result;
             }
+            continue;
         }
+
+        if (first) {
+            result.push_back(static_cast<char>(c << 4));
+            first = false;
+        } else {
+            result.back() |= c;
+            first = true;
+        }
+    }
+    if (!ignore_non_digits && !first) {
+        result.clear();
     }
     return result;
 }
