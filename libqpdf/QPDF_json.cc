@@ -95,18 +95,16 @@ is_unicode_string(std::string& str)
 }
 
 static bool
-is_binary_string(std::string const& v, std::string& str)
+is_binary_string(std::string_view v, std::string& str)
 {
     if (v.substr(0, 2) == "b:") {
-        str = v.substr(2);
-        int count = 0;
-        for (char c: str) {
-            if (!QUtil::is_hex_digit(c)) {
-                return false;
-            }
-            ++count;
+        if (v.size() == 2) {
+            str.clear();
+            return true;
+        } else {
+            str = QUtil::hex_decode(v.substr(2), false);
+            return str.size() > 0;
         }
-        return (count % 2 == 0);
     }
     return false;
 }
@@ -695,7 +693,7 @@ QPDF::JSONReactor::makeObject(JSON const& value)
         } else if (is_unicode_string(str_v)) {
             result = QPDFObjectHandle::newUnicodeString(str_v);
         } else if (is_binary_string(str_v, str)) {
-            result = QPDFObjectHandle::newString(QUtil::hex_decode(str));
+            result = QPDFObjectHandle::newString(str);
         } else if (is_name(str_v)) {
             result = QPDFObjectHandle::newName(str_v);
         } else {
