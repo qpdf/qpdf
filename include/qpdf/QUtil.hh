@@ -27,11 +27,13 @@
 #include <qpdf/Types.h>
 #include <cstring>
 #include <functional>
+#include <limits>
 #include <list>
 #include <memory>
 #include <stdexcept>
 #include <stdio.h>
 #include <string>
+#include <string_view>
 #include <time.h>
 #include <vector>
 
@@ -215,11 +217,16 @@ namespace QUtil
     QPDF_DLL
     inline std::string hex_encode_char(char);
 
-    // Returns a string that is the result of decoding the input
-    // string. The input string may consist of mixed case hexadecimal
-    // digits. Any characters that are not hexadecimal digits will be
-    // silently ignored. If there are an odd number of hexadecimal
-    // digits, a trailing 0 will be assumed.
+    // Returns a string that is the result of decoding the input string. The
+    // input string may consist of mixed case hexadecimal digits. If
+    // 'ignore_non_digits' is set to false, an empty string is returned if any
+    // characters that are not hexadecimal digits are encountered or if the
+    // input has an odd number of characters. Otherwise, extra characters are
+    // ignored and silently ignored and a trailing 0 will be assumed if
+    // necessary.
+    QPDF_DLL
+    std::string hex_decode(std::string_view input, bool ignore_non_digits);
+    // ABI: remove, default 'ignore_non_digits' above to true.
     QPDF_DLL
     std::string hex_decode(std::string const&);
 
@@ -506,6 +513,28 @@ namespace QUtil
     QPDF_DLL
     inline bool is_number(char const*);
 
+    // The following routines are used by tokenizers to perform common tasks
+    // without repeated testing or string copying.
+
+    // If 'p' points at a space character advance p to the next non-space and
+    // return true. Otherwise return false. NOTE that the 'p' must point at a
+    // null-terminated character sequence.
+    QPDF_DLL
+    inline bool process_space_chars(char const*& p);
+
+    // 'process_digits' builds up an integer one character at a time. If 'p'
+    // does not point to a digit set 'value' to 0 and return false. Otherwise
+    // advance 'p' to point to the next non-digit, set 'value' to the numeric
+    // value and return true. If the integer is too large to handle, 'p' will
+    // point to the digit that would cause an overflow. NOTE that the 'p' must
+    // point at a null-terminated character sequence. 'process_digit' processes
+    // a single character and returns false if the character is not a digit or
+    // would cause an overflow.
+    QPDF_DLL
+    inline bool process_digits(char const*& p, int& value);
+    QPDF_DLL
+    inline bool process_digit(char ch, int& value);
+
     // This method parses the numeric range syntax used by the qpdf
     // command-line tool. May throw std::runtime_error.
     QPDF_DLL
@@ -560,6 +589,45 @@ inline bool
 QUtil::is_digit(char ch)
 {
     return ((ch >= '0') && (ch <= '9'));
+}
+
+inline bool
+QUtil::process_space_chars(char const*& p)
+{
+    if (*p != ' ') {
+        return false;
+    }
+    while (*p == ' ') {
+        ++p;
+    }
+    return true;
+}
+
+inline bool
+QUtil::process_digits(char const*& p, int& value)
+{
+    value = 0;
+    if (!QUtil::process_digit(*p, value)) {
+        return false;
+    }
+    p++;
+    while (QUtil::process_digit(*p, value)) {
+        p++;
+    }
+    return true;
+}
+
+inline bool
+QUtil::process_digit(char ch, int& value)
+{
+    constexpr int max = std::numeric_limits<int>::max() / 10 - 9;
+    if ('0' <= ch && ch <= '9' && value <= max) {
+        value *= 10;
+        value += ch - '0';
+        return true;
+    } else {
+        return false;
+    }
 }
 
 inline bool

@@ -8,6 +8,7 @@
 #include <qpdf/QUtil.hh>
 #include <algorithm>
 #include <cstring>
+#include <string_view>
 
 // This chart shows an example of the state transitions that would
 // occur in parsing a minimal file.
@@ -60,78 +61,50 @@ static char const* JSON_PDF = (
 
 // Validator methods -- these are much more performant than std::regex.
 static bool
-is_indirect_object(std::string const& v, int& obj, int& gen)
+is_indirect_object(std::string_view v, int& obj, int& gen)
 {
-    char const* p = v.c_str();
-    std::string o_str;
-    std::string g_str;
-    if (!QUtil::is_digit(*p)) {
-        return false;
-    }
-    while (QUtil::is_digit(*p)) {
-        o_str.append(1, *p++);
-    }
-    if (*p != ' ') {
-        return false;
-    }
-    while (*p == ' ') {
-        ++p;
-    }
-    if (!QUtil::is_digit(*p)) {
-        return false;
-    }
-    while (QUtil::is_digit(*p)) {
-        g_str.append(1, *p++);
-    }
-    if (*p != ' ') {
-        return false;
-    }
-    while (*p == ' ') {
-        ++p;
-    }
-    if (*p++ != 'R') {
-        return false;
-    }
-    if (*p) {
-        return false;
-    }
-    obj = QUtil::string_to_int(o_str.c_str());
-    gen = QUtil::string_to_int(g_str.c_str());
-    return true;
+    // Note that v must be null-terminated.
+    char const* p = v.data();
+
+    return (
+        QUtil::process_digits(p, obj) && QUtil::process_space_chars(p) &&
+        QUtil::process_digits(p, gen) && QUtil::process_space_chars(p) &&
+        *p++ == 'R' && !(*p));
 }
 
 static bool
-is_obj_key(std::string const& v, int& obj, int& gen)
+is_obj_key(std::string_view v, int& obj, int& gen)
 {
-    if (v.substr(0, 4) != "obj:") {
+    // Note that v must be null-terminated.
+    using namespace std::literals;
+
+    if (v.substr(0, 4) != "obj:"sv) {
         return false;
     }
     return is_indirect_object(v.substr(4), obj, gen);
 }
 
 static bool
-is_unicode_string(std::string const& v, std::string& str)
+is_unicode_string(std::string& str)
 {
-    if (v.substr(0, 2) == "u:") {
-        str = v.substr(2);
+    if (str.substr(0, 2) == "u:") {
+        str.erase(0, 2);
         return true;
     }
     return false;
 }
 
 static bool
-is_binary_string(std::string const& v, std::string& str)
+is_binary_string(std::string_view v, std::string& str)
 {
     if (v.substr(0, 2) == "b:") {
-        str = v.substr(2);
-        int count = 0;
-        for (char c: str) {
-            if (!QUtil::is_hex_digit(c)) {
-                return false;
-            }
-            ++count;
+        if (v.size() == 2) {
+            str.clear();
+            return true;
+        } else {
+            str = QUtil::hex_decode(v.substr(2), false);
+            return str.size() > 0;
         }
-        return (count % 2 == 0);
     }
     return false;
 }
@@ -174,12 +147,17 @@ QPDF::test_json_validators()
     check(obj == 12);
     check(gen == 13);
     std::string str;
-    check(!is_unicode_string("", str));
-    check(!is_unicode_string("xyz", str));
-    check(!is_unicode_string("x:", str));
-    check(is_unicode_string("u:potato", str));
+    str = "";
+    check(!is_unicode_string(str));
+    str = "xyz";
+    check(!is_unicode_string(str));
+    str = "x:";
+    check(!is_unicode_string(str));
+    str = "u:potato";
+    check(is_unicode_string(str));
     check(str == "potato");
-    check(is_unicode_string("u:", str));
+    str = "u:";
+    check(is_unicode_string(str));
     check(str == "");
     check(!is_binary_string("", str));
     check(!is_binary_string("x:", str));
@@ -712,10 +690,10 @@ QPDF::JSONReactor::makeObject(JSON const& value)
         std::string str;
         if (is_indirect_object(str_v, obj, gen)) {
             result = reserveObject(obj, gen);
-        } else if (is_unicode_string(str_v, str)) {
-            result = QPDFObjectHandle::newUnicodeString(str);
+        } else if (is_unicode_string(str_v)) {
+            result = QPDFObjectHandle::newUnicodeString(str_v);
         } else if (is_binary_string(str_v, str)) {
-            result = QPDFObjectHandle::newString(QUtil::hex_decode(str));
+            result = QPDFObjectHandle::newString(str);
         } else if (is_name(str_v)) {
             result = QPDFObjectHandle::newName(str_v);
         } else {
