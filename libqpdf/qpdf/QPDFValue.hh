@@ -8,6 +8,7 @@
 #include <qpdf/Types.h>
 
 #include <string>
+#include <variant>
 
 class QPDF;
 class QPDFObjectHandle;
@@ -23,10 +24,13 @@ class QPDFValue
     virtual std::shared_ptr<QPDFObject> copy(bool shallow = false) = 0;
     virtual std::string unparse() = 0;
     virtual JSON getJSON(int json_version) = 0;
+
+    using Description = std::variant<std::string>;
+
     virtual void
     setDescription(
         QPDF* qpdf_p,
-        std::shared_ptr<std::string>& description,
+        std::shared_ptr<Description>& description,
         qpdf_offset_t offset)
     {
         qpdf = qpdf_p;
@@ -37,7 +41,7 @@ class QPDFValue
     setDefaultDescription(QPDF* a_qpdf, QPDFObjGen const& a_og)
     {
         static auto default_description{
-            std::make_shared<std::string>("object $OG")};
+            std::make_shared<Description>("object $OG")};
         if (!object_description) {
             object_description = default_description;
         }
@@ -49,7 +53,7 @@ class QPDFValue
     hasDescription()
     {
         return qpdf != nullptr && object_description &&
-            !object_description->empty();
+            !getDescription().empty();
     }
     void
     setParsedOffset(qpdf_offset_t offset)
@@ -108,7 +112,7 @@ class QPDFValue
   private:
     QPDFValue(QPDFValue const&) = delete;
     QPDFValue& operator=(QPDFValue const&) = delete;
-    std::shared_ptr<std::string> object_description;
+    std::shared_ptr<Description> object_description;
 
     const qpdf_object_type_e type_code{::ot_uninitialized};
     char const* type_name{"uninitialized"};

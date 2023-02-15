@@ -71,7 +71,7 @@ class QPDFObject
     void
     setDescription(
         QPDF* qpdf,
-        std::shared_ptr<std::string>& description,
+        std::shared_ptr<QPDFValue::Description>& description,
         qpdf_offset_t offset = -1)
     {
         return value->setDescription(qpdf, description, offset);
