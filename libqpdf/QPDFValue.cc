@@ -35,6 +35,8 @@ QPDFValue::getDescription()
                 return description;
             }
         }
+    } else if (og.isIndirect()) {
+        return "object " + og.unparse(' ');
     }
     return {};
 }

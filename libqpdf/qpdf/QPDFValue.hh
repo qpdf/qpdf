@@ -40,11 +40,6 @@ class QPDFValue
     void
     setDefaultDescription(QPDF* a_qpdf, QPDFObjGen const& a_og)
     {
-        static auto default_description{
-            std::make_shared<Description>("object $OG")};
-        if (!object_description) {
-            object_description = default_description;
-        }
         qpdf = a_qpdf;
         og = a_og;
     }
@@ -52,7 +47,7 @@ class QPDFValue
     bool
     hasDescription()
     {
-        return object_description != nullptr;
+        return object_description || og.isIndirect();
     }
     void
     setParsedOffset(qpdf_offset_t offset)
