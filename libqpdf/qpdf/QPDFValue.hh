@@ -52,8 +52,7 @@ class QPDFValue
     bool
     hasDescription()
     {
-        return qpdf != nullptr && object_description &&
-            !getDescription().empty();
+        return object_description != nullptr;
     }
     void
     setParsedOffset(qpdf_offset_t offset)
