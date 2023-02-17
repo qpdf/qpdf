@@ -802,12 +802,10 @@ QPDFObjectHandle::getArrayNItems()
 QPDFObjectHandle
 QPDFObjectHandle::getArrayItem(int n)
 {
-    QPDFObjectHandle result;
     auto array = asArray();
     if (array && (n < array->getNItems()) && (n >= 0)) {
-        result = array->getItem(n);
+        return array->getItem(n);
     } else {
-        result = newNull();
         if (array) {
             objectWarning("returning null for out of bounds array access");
             QTC::TC("qpdf", "QPDFObjectHandle array bounds");
@@ -817,9 +815,8 @@ QPDFObjectHandle::getArrayItem(int n)
         }
         static auto constexpr msg =
             " -> null returned from invalid array access"sv;
-        result.obj->setChildDescription(obj, msg, "");
+        return QPDF_Null::create(obj, msg, "");
     }
-    return result;
 }
 
 bool
@@ -1028,19 +1025,15 @@ QPDFObjectHandle::hasKey(std::string const& key)
 QPDFObjectHandle
 QPDFObjectHandle::getKey(std::string const& key)
 {
-    QPDFObjectHandle result;
-    auto dict = asDictionary();
-    if (dict) {
-        result = dict->getKey(key);
+    if (auto dict = asDictionary()) {
+        return dict->getKey(key);
     } else {
         typeWarning("dictionary", "returning null for attempted key retrieval");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary null for getKey");
-        result = newNull();
         static auto constexpr msg =
             " -> null returned from getting key $VD from non-Dictionary"sv;
-        result.obj->setChildDescription(obj, msg, key);
+        return QPDF_Null::create(obj, msg, "");
     }
-    return result;
 }
 
 QPDFObjectHandle
