@@ -12,6 +12,7 @@
 #include <qpdf/Types.h>
 
 #include <string>
+#include <string_view>
 
 class QPDF;
 class QPDFObjectHandle;
@@ -75,6 +76,25 @@ class QPDFObject
         qpdf_offset_t offset = -1)
     {
         return value->setDescription(qpdf, description, offset);
+    }
+    void
+    setChildDescription(
+        std::shared_ptr<QPDFObject> parent,
+        std::string_view const& static_descr,
+        std::string var_descr)
+    {
+        auto qpdf = parent ? parent->value->qpdf : nullptr;
+        value->setChildDescription(
+            qpdf, parent->value, static_descr, var_descr);
+    }
+    void
+    setChildDescription(
+        std::shared_ptr<QPDFValue> parent,
+        std::string_view const& static_descr,
+        std::string var_descr)
+    {
+        auto qpdf = parent ? parent->qpdf : nullptr;
+        value->setChildDescription(qpdf, parent, static_descr, var_descr);
     }
     bool
     getDescription(QPDF*& qpdf, std::string& description)

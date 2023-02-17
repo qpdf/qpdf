@@ -8,13 +8,14 @@
 #include <qpdf/Types.h>
 
 #include <string>
+#include <string_view>
 #include <variant>
 
 class QPDF;
 class QPDFObjectHandle;
 class QPDFObject;
 
-class QPDFValue
+class QPDFValue: public std::enable_shared_from_this<QPDFValue>
 {
     friend class QPDFObject;
 
@@ -38,7 +39,24 @@ class QPDFValue
         std::string object;
     };
 
-    using Description = std::variant<std::string, JSON_Descr>;
+    struct ChildDescr
+    {
+        ChildDescr(
+            std::shared_ptr<QPDFValue> parent,
+            std::string_view const& static_descr,
+            std::string var_descr) :
+            parent(parent),
+            static_descr(static_descr),
+            var_descr(var_descr)
+        {
+        }
+
+        std::weak_ptr<QPDFValue> parent;
+        std::string_view const& static_descr;
+        std::string var_descr;
+    };
+
+    using Description = std::variant<std::string, JSON_Descr, ChildDescr>;
 
     virtual void
     setDescription(
@@ -55,6 +73,17 @@ class QPDFValue
     {
         qpdf = a_qpdf;
         og = a_og;
+    }
+    void
+    setChildDescription(
+        QPDF* a_qpdf,
+        std::shared_ptr<QPDFValue> parent,
+        std::string_view const& static_descr,
+        std::string var_descr)
+    {
+        object_description = std::make_shared<Description>(
+            ChildDescr(parent, static_descr, var_descr));
+        qpdf = a_qpdf;
     }
     std::string getDescription();
     bool

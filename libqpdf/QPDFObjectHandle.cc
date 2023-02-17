@@ -36,6 +36,8 @@
 #include <stdexcept>
 #include <stdlib.h>
 
+using namespace std::literals;
+
 namespace
 {
     class TerminateParsing
@@ -813,13 +815,9 @@ QPDFObjectHandle::getArrayItem(int n)
             typeWarning("array", "returning null");
             QTC::TC("qpdf", "QPDFObjectHandle array null for non-array");
         }
-        QPDF* context = nullptr;
-        std::string description;
-        if (obj->getDescription(context, description)) {
-            result.setObjectDescription(
-                context,
-                description + " -> null returned from invalid array access");
-        }
+        static auto constexpr msg =
+            " -> null returned from invalid array access"sv;
+        result.obj->setChildDescription(obj, msg, "");
     }
     return result;
 }
@@ -1038,14 +1036,9 @@ QPDFObjectHandle::getKey(std::string const& key)
         typeWarning("dictionary", "returning null for attempted key retrieval");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary null for getKey");
         result = newNull();
-        QPDF* qpdf = nullptr;
-        std::string description;
-        if (obj->getDescription(qpdf, description)) {
-            result.setObjectDescription(
-                qpdf,
-                (description + " -> null returned from getting key " + key +
-                 " from non-Dictionary"));
-        }
+        static auto constexpr msg =
+            " -> null returned from getting key $VD from non-Dictionary"sv;
+        result.obj->setChildDescription(obj, msg, key);
     }
     return result;
 }

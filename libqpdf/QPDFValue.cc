@@ -17,6 +17,7 @@ QPDFValue::getDescription()
         switch (object_description->index()) {
         case 0:
             {
+                // Simple template string
                 auto description = std::get<0>(*object_description);
 
                 if (auto pos = description.find("$OG");
@@ -36,11 +37,26 @@ QPDFValue::getDescription()
             }
         case 1:
             {
+                // QPDF::JSONReactor generated description
                 auto j_descr = std::get<1>(*object_description);
                 return (
                     *j_descr.input +
                     (j_descr.object.empty() ? "" : ", " + j_descr.object) +
                     " at offset " + std::to_string(parsed_offset));
+            }
+        case 2:
+            {
+                // Child object description
+                auto j_descr = std::get<2>(*object_description);
+                std::string result;
+                if (auto p = j_descr.parent.lock()) {
+                    result = p->getDescription();
+                }
+                result += j_descr.static_descr;
+                if (auto pos = result.find("$VD"); pos != std::string::npos) {
+                    result.replace(pos, 3, j_descr.var_descr);
+                }
+                return result;
             }
         }
     } else if (og.isIndirect()) {
