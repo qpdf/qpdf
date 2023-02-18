@@ -226,7 +226,15 @@ provide_data(
 class QPDF::JSONReactor: public JSON::Reactor
 {
   public:
-    JSONReactor(QPDF&, std::shared_ptr<InputSource> is, bool must_be_complete);
+    JSONReactor(
+        QPDF& pdf, std::shared_ptr<InputSource> is, bool must_be_complete) :
+        pdf(pdf),
+        is(is),
+        must_be_complete(must_be_complete),
+        descr(std::make_shared<QPDFValue::Description>(QPDFValue::JSON_Descr(
+            std::make_shared<std::string>(is->getName()), "")))
+    {
+    }
     virtual ~JSONReactor() = default;
     virtual void dictionaryStart() override;
     virtual void arrayStart() override;
@@ -265,56 +273,29 @@ class QPDF::JSONReactor: public JSON::Reactor
 
     QPDF& pdf;
     std::shared_ptr<InputSource> is;
-    bool must_be_complete;
+    bool must_be_complete{true};
     std::shared_ptr<QPDFValue::Description> descr;
-    bool errors;
-    bool parse_error;
-    bool saw_qpdf;
-    bool saw_qpdf_meta;
-    bool saw_objects;
-    bool saw_json_version;
-    bool saw_pdf_version;
-    bool saw_trailer;
-    state_e state;
-    state_e next_state;
+    bool errors{false};
+    bool parse_error{false};
+    bool saw_qpdf{false};
+    bool saw_qpdf_meta{false};
+    bool saw_objects{false};
+    bool saw_json_version{false};
+    bool saw_pdf_version{false};
+    bool saw_trailer{false};
+    state_e state{st_initial};
+    state_e next_state{st_top};
     std::string cur_object;
-    bool saw_value;
-    bool saw_stream;
-    bool saw_dict;
-    bool saw_data;
-    bool saw_datafile;
-    bool this_stream_needs_data;
-    std::vector<state_e> state_stack;
+    bool saw_value{false};
+    bool saw_stream{false};
+    bool saw_dict{false};
+    bool saw_data{false};
+    bool saw_datafile{false};
+    bool this_stream_needs_data{false};
+    std::vector<state_e> state_stack{st_initial};
     std::vector<QPDFObjectHandle> object_stack;
     std::set<QPDFObjGen> reserved;
 };
-
-QPDF::JSONReactor::JSONReactor(
-    QPDF& pdf, std::shared_ptr<InputSource> is, bool must_be_complete) :
-    pdf(pdf),
-    is(is),
-    must_be_complete(must_be_complete),
-    descr(std::make_shared<QPDFValue::Description>(QPDFValue::JSON_Descr(
-        std::make_shared<std::string>(is->getName()), ""))),
-    errors(false),
-    parse_error(false),
-    saw_qpdf(false),
-    saw_qpdf_meta(false),
-    saw_objects(false),
-    saw_json_version(false),
-    saw_pdf_version(false),
-    saw_trailer(false),
-    state(st_initial),
-    next_state(st_top),
-    saw_value(false),
-    saw_stream(false),
-    saw_dict(false),
-    saw_data(false),
-    saw_datafile(false),
-    this_stream_needs_data(false)
-{
-    state_stack.push_back(st_initial);
-}
 
 void
 QPDF::JSONReactor::error(qpdf_offset_t offset, std::string const& msg)
