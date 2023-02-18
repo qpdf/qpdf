@@ -54,6 +54,7 @@ class JSON
 {
   public:
     static int constexpr LATEST = 2;
+    JSON() = default;
 
     QPDF_DLL
     std::string unparse() const;

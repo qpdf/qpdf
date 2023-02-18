@@ -1,1 +1,1 @@
-exception: bad-04.json: JSON: offset 5: decimal point with no digits
+exception: bad-04.json: JSON: offset 4: unexpected character .

@@ -1,1 +1,1 @@
-exception: bad-03.json: JSON: offset 16: material follows end of object: junk
+exception: bad-03.json: JSON: offset 15: material follows end of object: junk

@@ -1,1 +1,1 @@
-exception: bad-18.json: JSON: null character at offset 5
+exception: bad-18.json: JSON: control or null character at offset 5

@@ -1,1 +1,1 @@
-exception: bad-27.json: JSON: offset 6: unterminated string
+exception: bad-27.json: JSON: offset 5: control character in string (missing "?)
