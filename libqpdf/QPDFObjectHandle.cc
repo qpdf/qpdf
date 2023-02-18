@@ -36,6 +36,8 @@
 #include <stdexcept>
 #include <stdlib.h>
 
+using namespace std::literals;
+
 namespace
 {
     class TerminateParsing
@@ -800,12 +802,10 @@ QPDFObjectHandle::getArrayNItems()
 QPDFObjectHandle
 QPDFObjectHandle::getArrayItem(int n)
 {
-    QPDFObjectHandle result;
     auto array = asArray();
     if (array && (n < array->getNItems()) && (n >= 0)) {
-        result = array->getItem(n);
+        return array->getItem(n);
     } else {
-        result = newNull();
         if (array) {
             objectWarning("returning null for out of bounds array access");
             QTC::TC("qpdf", "QPDFObjectHandle array bounds");
@@ -813,15 +813,10 @@ QPDFObjectHandle::getArrayItem(int n)
             typeWarning("array", "returning null");
             QTC::TC("qpdf", "QPDFObjectHandle array null for non-array");
         }
-        QPDF* context = nullptr;
-        std::string description;
-        if (obj->getDescription(context, description)) {
-            result.setObjectDescription(
-                context,
-                description + " -> null returned from invalid array access");
-        }
+        static auto constexpr msg =
+            " -> null returned from invalid array access"sv;
+        return QPDF_Null::create(obj, msg, "");
     }
-    return result;
 }
 
 bool
@@ -1030,24 +1025,15 @@ QPDFObjectHandle::hasKey(std::string const& key)
 QPDFObjectHandle
 QPDFObjectHandle::getKey(std::string const& key)
 {
-    QPDFObjectHandle result;
-    auto dict = asDictionary();
-    if (dict) {
-        result = dict->getKey(key);
+    if (auto dict = asDictionary()) {
+        return dict->getKey(key);
     } else {
         typeWarning("dictionary", "returning null for attempted key retrieval");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary null for getKey");
-        result = newNull();
-        QPDF* qpdf = nullptr;
-        std::string description;
-        if (obj->getDescription(qpdf, description)) {
-            result.setObjectDescription(
-                qpdf,
-                (description + " -> null returned from getting key " + key +
-                 " from non-Dictionary"));
-        }
+        static auto constexpr msg =
+            " -> null returned from getting key $VD from non-Dictionary"sv;
+        return QPDF_Null::create(obj, msg, "");
     }
-    return result;
 }
 
 QPDFObjectHandle
@@ -2176,7 +2162,8 @@ QPDFObjectHandle::setObjectDescription(
     // This is called during parsing on newly created direct objects,
     // so we can't call dereference() here.
     if (isInitialized() && obj.get()) {
-        auto descr = std::make_shared<std::string>(object_description);
+        auto descr =
+            std::make_shared<QPDFValue::Description>(object_description);
         obj->setDescription(owning_qpdf, descr);
     }
 }

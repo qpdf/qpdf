@@ -1,6 +1,10 @@
 #include <qpdf/QPDF_Dictionary.hh>
 
+#include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDF_Name.hh>
+#include <qpdf/QPDF_Null.hh>
+
+using namespace std::literals;
 
 QPDF_Dictionary::QPDF_Dictionary(
     std::map<std::string, QPDFObjectHandle> const& items) :
@@ -97,12 +101,8 @@ QPDF_Dictionary::getKey(std::string const& key)
         // May be a null object
         return item->second;
     } else {
-        auto null = QPDFObjectHandle::newNull();
-        if (qpdf != nullptr) {
-            null.setObjectDescription(
-                qpdf, getDescription() + " -> dictionary key " + key);
-        }
-        return null;
+        static auto constexpr msg = " -> dictionary key $VD"sv;
+        return QPDF_Null::create(shared_from_this(), msg, key);
     }
 }
 

@@ -4,6 +4,8 @@
 #include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QPDFObject_private.hh>
+#include <qpdf/QPDFValue.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <algorithm>
@@ -221,11 +223,79 @@ provide_data(
     };
 }
 
+class QPDF::JSONReactor: public JSON::Reactor
+{
+  public:
+    JSONReactor(QPDF&, std::shared_ptr<InputSource> is, bool must_be_complete);
+    virtual ~JSONReactor() = default;
+    virtual void dictionaryStart() override;
+    virtual void arrayStart() override;
+    virtual void containerEnd(JSON const& value) override;
+    virtual void topLevelScalar() override;
+    virtual bool
+    dictionaryItem(std::string const& key, JSON const& value) override;
+    virtual bool arrayItem(JSON const& value) override;
+
+    bool anyErrors() const;
+
+  private:
+    enum state_e {
+        st_initial,
+        st_top,
+        st_qpdf,
+        st_qpdf_meta,
+        st_objects,
+        st_trailer,
+        st_object_top,
+        st_stream,
+        st_object,
+        st_ignore,
+    };
+
+    void containerStart();
+    void nestedState(std::string const& key, JSON const& value, state_e);
+    void setObjectDescription(QPDFObjectHandle& oh, JSON const& value);
+    QPDFObjectHandle makeObject(JSON const& value);
+    void error(qpdf_offset_t offset, std::string const& message);
+    QPDFObjectHandle reserveObject(int obj, int gen);
+    void replaceObject(
+        QPDFObjectHandle to_replace,
+        QPDFObjectHandle replacement,
+        JSON const& value);
+
+    QPDF& pdf;
+    std::shared_ptr<InputSource> is;
+    bool must_be_complete;
+    std::shared_ptr<QPDFValue::Description> descr;
+    bool errors;
+    bool parse_error;
+    bool saw_qpdf;
+    bool saw_qpdf_meta;
+    bool saw_objects;
+    bool saw_json_version;
+    bool saw_pdf_version;
+    bool saw_trailer;
+    state_e state;
+    state_e next_state;
+    std::string cur_object;
+    bool saw_value;
+    bool saw_stream;
+    bool saw_dict;
+    bool saw_data;
+    bool saw_datafile;
+    bool this_stream_needs_data;
+    std::vector<state_e> state_stack;
+    std::vector<QPDFObjectHandle> object_stack;
+    std::set<QPDFObjGen> reserved;
+};
+
 QPDF::JSONReactor::JSONReactor(
     QPDF& pdf, std::shared_ptr<InputSource> is, bool must_be_complete) :
     pdf(pdf),
     is(is),
     must_be_complete(must_be_complete),
+    descr(std::make_shared<QPDFValue::Description>(QPDFValue::JSON_Descr(
+        std::make_shared<std::string>(is->getName()), ""))),
     errors(false),
     parse_error(false),
     saw_qpdf(false),
@@ -675,12 +745,13 @@ QPDF::JSONReactor::arrayItem(JSON const& value)
 void
 QPDF::JSONReactor::setObjectDescription(QPDFObjectHandle& oh, JSON const& value)
 {
-    std::string description = this->is->getName();
-    if (!this->cur_object.empty()) {
-        description += ", " + this->cur_object;
+    auto j_descr = std::get<QPDFValue::JSON_Descr>(*descr);
+    if (j_descr.object != cur_object) {
+        descr = std::make_shared<QPDFValue::Description>(
+            QPDFValue::JSON_Descr(j_descr.input, cur_object));
     }
-    description += " at offset " + std::to_string(value.getStart());
-    oh.setObjectDescription(&this->pdf, description);
+
+    oh.getObjectPtr()->setDescription(&pdf, descr, value.getStart());
 }
 
 QPDFObjectHandle
