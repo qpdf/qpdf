@@ -6,6 +6,16 @@ Always
 * When close to release, make sure external-libs is building and
   follow instructions in ../external-libs/README
 
+11.3
+====
+
+* Fix #874 -- make args in --encrypt to match the json and make
+  positional fill in the gaps
+* Fix #851 -- not suppressing linearization warnings
+* Maybe fix #553 -- use file times for attachments
+* Clarify idempotency section to emphasize --deterministic-id over
+  --static-id
+
 Next
 ====
 
