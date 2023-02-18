@@ -1,13 +1,6 @@
 #!/bin/bash
 set -ex
 cd $(dirname $0)/..
-unzip qpdf-external-libs-src.zip
-tar xzf external-libs-src/jpegsrc*
-cd jpeg-*
-./configure
-make -k
-sudo make install
-cd ..
 cmake -S . -B build -DCI_MODE=1 -DCMAKE_BUILD_TYPE=Release
 cmake --build build --verbose -j$(sysctl -n hw.ncpu) -- -k
 (cd build; ctest --verbose)
