@@ -6,6 +6,7 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFValue.hh>
+#include <qpdf/QPDF_Null.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <algorithm>
@@ -234,6 +235,11 @@ class QPDF::JSONReactor: public JSON::Reactor
         descr(std::make_shared<QPDFValue::Description>(QPDFValue::JSON_Descr(
             std::make_shared<std::string>(is->getName()), "")))
     {
+        for (auto& oc: pdf.m->obj_cache) {
+            if (oc.second.object->getTypeCode() == ::ot_reserved) {
+                reserved.insert(oc.first);
+            }
+        }
     }
     virtual ~JSONReactor() = default;
     virtual void dictionaryStart() override;
@@ -265,7 +271,6 @@ class QPDF::JSONReactor: public JSON::Reactor
     void setObjectDescription(QPDFObjectHandle& oh, JSON const& value);
     QPDFObjectHandle makeObject(JSON const& value);
     void error(qpdf_offset_t offset, std::string const& message);
-    QPDFObjectHandle reserveObject(int obj, int gen);
     void replaceObject(
         QPDFObjectHandle to_replace,
         QPDFObjectHandle replacement,
@@ -416,27 +421,17 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
             object_stack.pop_back();
         }
     } else if ((state == st_top) && (from_state == st_qpdf)) {
-        for (auto const& og: this->reserved) {
-            // Handle dangling indirect object references which the
-            // PDF spec says to treat as nulls. It's tempting to make
-            // this an error, but that would be wrong since valid
-            // input files may have these.
-            QTC::TC("qpdf", "QPDF_json non-trivial null reserved");
-            this->pdf.replaceObject(og, QPDFObjectHandle::newNull());
+        // Handle dangling indirect object references which the PDF spec says to
+        // treat as nulls. It's tempting to make this an error, but that would
+        // be wrong since valid input files may have these.
+        for (auto& oc: pdf.m->obj_cache) {
+            if (oc.second.object->getTypeCode() == ::ot_reserved &&
+                reserved.count(oc.first) == 0) {
+                QTC::TC("qpdf", "QPDF_json non-trivial null reserved");
+                pdf.updateCache(oc.first, QPDF_Null::create(), -1, -1);
+            }
         }
-        this->reserved.clear();
     }
-}
-
-QPDFObjectHandle
-QPDF::JSONReactor::reserveObject(int obj, int gen)
-{
-    QPDFObjGen og(obj, gen);
-    auto oh = pdf.reserveObjectIfNotExists(og);
-    if (oh.isReserved()) {
-        this->reserved.insert(og);
-    }
-    return oh;
 }
 
 void
@@ -446,7 +441,6 @@ QPDF::JSONReactor::replaceObject(
     JSON const& value)
 {
     auto og = to_replace.getObjGen();
-    this->reserved.erase(og);
     this->pdf.replaceObject(og, replacement);
     auto oh = pdf.getObject(og);
     setObjectDescription(oh, value);
@@ -564,7 +558,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             this->cur_object = "trailer";
         } else if (is_obj_key(key, obj, gen)) {
             this->cur_object = key;
-            auto oh = reserveObject(obj, gen);
+            auto oh = pdf.reserveObjectIfNotExists(QPDFObjGen(obj, gen));
             object_stack.push_back(oh);
             nestedState(key, value, st_object_top);
         } else {
@@ -763,7 +757,7 @@ QPDF::JSONReactor::makeObject(JSON const& value)
         int gen = 0;
         std::string str;
         if (is_indirect_object(str_v, obj, gen)) {
-            result = reserveObject(obj, gen);
+            result = pdf.reserveObjectIfNotExists(QPDFObjGen(obj, gen));
         } else if (is_unicode_string(str_v, str)) {
             result = QPDFObjectHandle::newUnicodeString(str);
         } else if (is_binary_string(str_v, str)) {

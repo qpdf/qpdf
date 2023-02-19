@@ -9,15 +9,13 @@
 #include <cstring>
 #include <stdexcept>
 
-JSON::Members::Members(std::shared_ptr<JSON_value> value) :
-    value(value),
-    start(0),
-    end(0)
+JSON::Members::Members(std::unique_ptr<JSON_value> value) :
+    value(std::move(value))
 {
 }
 
-JSON::JSON(std::shared_ptr<JSON_value> value) :
-    m(new Members(value))
+JSON::JSON(std::unique_ptr<JSON_value> value) :
+    m(new Members(std::move(value)))
 {
 }
 
@@ -278,7 +276,7 @@ JSON::encode_string(std::string const& str)
 JSON
 JSON::makeDictionary()
 {
-    return JSON(std::make_shared<JSON_dictionary>());
+    return JSON(std::make_unique<JSON_dictionary>());
 }
 
 JSON
@@ -286,7 +284,7 @@ JSON::addDictionaryMember(std::string const& key, JSON const& val)
 {
     if (auto* obj = dynamic_cast<JSON_dictionary*>(this->m->value.get())) {
         return obj->members[encode_string(key)] =
-                   val.m->value ? val.m->value : std::make_shared<JSON_null>();
+                   val.m->value ? val : makeNull();
     } else {
         throw std::runtime_error(
             "JSON::addDictionaryMember called on non-dictionary");
@@ -311,7 +309,7 @@ JSON::checkDictionaryKeySeen(std::string const& key)
 JSON
 JSON::makeArray()
 {
-    return JSON(std::make_shared<JSON_array>());
+    return JSON(std::make_unique<JSON_array>());
 }
 
 JSON
@@ -322,9 +320,9 @@ JSON::addArrayElement(JSON const& val)
         throw std::runtime_error("JSON::addArrayElement called on non-array");
     }
     if (val.m->value.get()) {
-        arr->elements.push_back(val.m->value);
+        arr->elements.push_back(val);
     } else {
-        arr->elements.push_back(std::make_shared<JSON_null>());
+        arr->elements.push_back(makeNull());
     }
     return arr->elements.back();
 }
@@ -332,43 +330,43 @@ JSON::addArrayElement(JSON const& val)
 JSON
 JSON::makeString(std::string const& utf8)
 {
-    return JSON(std::make_shared<JSON_string>(utf8));
+    return JSON(std::make_unique<JSON_string>(utf8));
 }
 
 JSON
 JSON::makeInt(long long int value)
 {
-    return JSON(std::make_shared<JSON_number>(value));
+    return JSON(std::make_unique<JSON_number>(value));
 }
 
 JSON
 JSON::makeReal(double value)
 {
-    return JSON(std::make_shared<JSON_number>(value));
+    return JSON(std::make_unique<JSON_number>(value));
 }
 
 JSON
 JSON::makeNumber(std::string const& encoded)
 {
-    return JSON(std::make_shared<JSON_number>(encoded));
+    return JSON(std::make_unique<JSON_number>(encoded));
 }
 
 JSON
 JSON::makeBool(bool value)
 {
-    return JSON(std::make_shared<JSON_bool>(value));
+    return JSON(std::make_unique<JSON_bool>(value));
 }
 
 JSON
 JSON::makeNull()
 {
-    return JSON(std::make_shared<JSON_null>());
+    return JSON(std::make_unique<JSON_null>());
 }
 
 JSON
 JSON::makeBlob(std::function<void(Pipeline*)> fn)
 {
-    return JSON(std::make_shared<JSON_blob>(fn));
+    return JSON(std::make_unique<JSON_blob>(fn));
 }
 
 bool
@@ -504,11 +502,11 @@ JSON::checkSchemaInternal(
     }
 
     if (sch_dict && (!pattern_key.empty())) {
-        auto pattern_schema = sch_dict->members[pattern_key].get();
+        auto pattern_schema = sch_dict->members[pattern_key].m->value.get();
         for (auto const& iter: this_dict->members) {
             std::string const& key = iter.first;
             checkSchemaInternal(
-                this_dict->members[key].get(),
+                this_dict->members[key].m->value.get(),
                 pattern_schema,
                 flags,
                 errors,
@@ -519,8 +517,8 @@ JSON::checkSchemaInternal(
             std::string const& key = iter.first;
             if (this_dict->members.count(key)) {
                 checkSchemaInternal(
-                    this_dict->members[key].get(),
-                    iter.second.get(),
+                    this_dict->members[key].m->value.get(),
+                    iter.second.m->value.get(),
                     flags,
                     errors,
                     prefix + "." + key);
@@ -557,8 +555,8 @@ JSON::checkSchemaInternal(
                 int i = 0;
                 for (auto const& element: this_arr->elements) {
                     checkSchemaInternal(
-                        element.get(),
-                        sch_arr->elements.at(0).get(),
+                        element.m->value.get(),
+                        sch_arr->elements.at(0).m->value.get(),
                         flags,
                         errors,
                         prefix + "." + std::to_string(i));
@@ -568,7 +566,7 @@ JSON::checkSchemaInternal(
                 QTC::TC("libtests", "JSON schema array for single item");
                 checkSchemaInternal(
                     this_v,
-                    sch_arr->elements.at(0).get(),
+                    sch_arr->elements.at(0).m->value.get(),
                     flags,
                     errors,
                     prefix);
@@ -587,8 +585,8 @@ JSON::checkSchemaInternal(
             size_t i = 0;
             for (auto const& element: this_arr->elements) {
                 checkSchemaInternal(
-                    element.get(),
-                    sch_arr->elements.at(i).get(),
+                    element.m->value.get(),
+                    sch_arr->elements.at(i).m->value.get(),
                     flags,
                     errors,
                     prefix + "." + std::to_string(i));

@@ -54,6 +54,8 @@ class JSON
 {
   public:
     static int constexpr LATEST = 2;
+
+    QPDF_DLL
     JSON() = default;
 
     QPDF_DLL
@@ -369,7 +371,7 @@ class JSON
         }
         virtual ~JSON_dictionary() = default;
         virtual void write(Pipeline*, size_t depth) const;
-        std::map<std::string, std::shared_ptr<JSON_value>> members;
+        std::map<std::string, JSON> members;
         std::set<std::string> parsed_keys;
     };
     struct JSON_array: public JSON_value
@@ -380,7 +382,7 @@ class JSON
         }
         virtual ~JSON_array() = default;
         virtual void write(Pipeline*, size_t depth) const;
-        std::vector<std::shared_ptr<JSON_value>> elements;
+        std::vector<JSON> elements;
     };
     struct JSON_string: public JSON_value
     {
@@ -423,7 +425,7 @@ class JSON
         std::function<void(Pipeline*)> fn;
     };
 
-    JSON(std::shared_ptr<JSON_value>);
+    JSON(std::unique_ptr<JSON_value>);
 
     static bool checkSchemaInternal(
         JSON_value* this_v,
@@ -441,13 +443,13 @@ class JSON
         ~Members() = default;
 
       private:
-        Members(std::shared_ptr<JSON_value>);
+        Members(std::unique_ptr<JSON_value>);
         Members(Members const&) = delete;
 
-        std::shared_ptr<JSON_value> value;
+        std::unique_ptr<JSON_value> value;
         // start and end are only populated for objects created by parse
-        qpdf_offset_t start;
-        qpdf_offset_t end;
+        qpdf_offset_t start{0};
+        qpdf_offset_t end{0};
     };
 
     std::shared_ptr<Members> m;
