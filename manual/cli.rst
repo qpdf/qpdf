@@ -3397,20 +3397,21 @@ random element, as well as the interaction of stream length encoding
 with dictionary key sorting.
 
 It is possible to get idempotent behavior by using the
-:qpdf:ref:`--static-id` or :qpdf:ref:`--deterministic-id` option with
-qpdf and running it *three* times so that you are processing the
-output of qpdf on its own previous output. For example, in this
-sequence of commands:
+:qpdf:ref:`--deterministic-id` (or, for testing only,
+:qpdf:ref:`--static-id`) option with qpdf and running it *three* times
+so that you are processing the output of qpdf on its own previous
+output. For example, in this sequence of commands:
 
 ::
 
    qpdf any-file.pdf 1.pdf
-   qpdf --static-id 1.pdf 2.pdf
-   qpdf --static-id 2.pdf 3.pdf
+   qpdf --deterministic-id 1.pdf 2.pdf
+   qpdf --deterministic-id 2.pdf 3.pdf
 
 the files :file:`2.pdf` and :file:`3.pdf` should be *byte-for-byte*
 identical. The qpdf test suite relies on this behavior. See also
-:qpdf:ref:`--static-aes-iv`.
+:qpdf:ref:`--static-aes-iv`, which should also be used only for
+testing.
 
 Related Options
 ~~~~~~~~~~~~~~~
