@@ -210,24 +210,8 @@ QPDF::EncryptionParameters::EncryptionParameters() :
 
 QPDF::Members::Members() :
     log(QPDFLogger::defaultLogger()),
-    unique_id(0),
     file(new InvalidInputSource()),
-    provided_password_is_hex_key(false),
-    ignore_xref_streams(false),
-    suppress_warnings(false),
-    attempt_recovery(true),
-    encp(new EncryptionParameters),
-    pushed_inherited_attributes_to_pages(false),
-    ever_pushed_inherited_attributes_to_pages(false),
-    ever_called_get_all_pages(false),
-    copied_stream_data_provider(nullptr),
-    reconstructed_xref(false),
-    fixed_dangling_refs(false),
-    immediate_copy_from(false),
-    in_parse(false),
-    parsed(false),
-    first_xref_item_offset(0),
-    uncompressed_after_compressed(false)
+    encp(new EncryptionParameters)
 {
 }
 

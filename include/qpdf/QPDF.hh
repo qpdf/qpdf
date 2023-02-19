@@ -1693,14 +1693,14 @@ class QPDF
         Members(Members const&) = delete;
 
         std::shared_ptr<QPDFLogger> log;
-        unsigned long long unique_id;
+        unsigned long long unique_id{0};
         QPDFTokenizer tokenizer;
         std::shared_ptr<InputSource> file;
         std::string last_object_description;
-        bool provided_password_is_hex_key;
-        bool ignore_xref_streams;
-        bool suppress_warnings;
-        bool attempt_recovery;
+        bool provided_password_is_hex_key{false};
+        bool ignore_xref_streams{false};
+        bool suppress_warnings{false};
+        bool attempt_recovery{true};
         std::shared_ptr<EncryptionParameters> encp;
         std::string pdf_version;
         std::map<QPDFObjGen, QPDFXRefEntry> xref_table;
@@ -1710,24 +1710,24 @@ class QPDF
         QPDFObjectHandle trailer;
         std::vector<QPDFObjectHandle> all_pages;
         std::map<QPDFObjGen, int> pageobj_to_pages_pos;
-        bool pushed_inherited_attributes_to_pages;
-        bool ever_pushed_inherited_attributes_to_pages;
-        bool ever_called_get_all_pages;
+        bool pushed_inherited_attributes_to_pages{false};
+        bool ever_pushed_inherited_attributes_to_pages{false};
+        bool ever_called_get_all_pages{false};
         std::vector<QPDFExc> warnings;
         std::map<unsigned long long, ObjCopier> object_copiers;
         std::shared_ptr<QPDFObjectHandle::StreamDataProvider> copied_streams;
         // copied_stream_data_provider is owned by copied_streams
-        CopiedStreamDataProvider* copied_stream_data_provider;
-        bool reconstructed_xref;
-        bool fixed_dangling_refs;
-        bool immediate_copy_from;
-        bool in_parse;
-        bool parsed;
+        CopiedStreamDataProvider* copied_stream_data_provider{nullptr};
+        bool reconstructed_xref{false};
+        bool fixed_dangling_refs{false};
+        bool immediate_copy_from{false};
+        bool in_parse{false};
+        bool parsed{false};
         std::set<int> resolved_object_streams;
 
         // Linearization data
-        qpdf_offset_t first_xref_item_offset; // actual value from file
-        bool uncompressed_after_compressed;
+        qpdf_offset_t first_xref_item_offset{0}; // actual value from file
+        bool uncompressed_after_compressed{false};
 
         // Linearization parameter dictionary and hint table data: may be
         // read from file or computed prior to writing a linearized file
