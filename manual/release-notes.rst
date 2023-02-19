@@ -19,6 +19,12 @@ For a detailed list of changes, please see the file
     - New method ``QPDF::removeSecurityRestrictions`` removes security
       restrictions from digitally signed files.
 
+  - Bug fixes
+
+    - Linearization warnings are now treated like normal warnings in
+      that they include the file name and are suppressed with the
+      :qpdf:ref:`--no-warn` option.
+
   - Performance enhancements
 
     - Include more code tidying and performance improvements from M.

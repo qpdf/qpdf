@@ -1,8 +1,8 @@
-WARNING: first page object (/O) mismatch
-WARNING: space before first xref item (/T) mismatch (computed = 11777; file = 11771
-WARNING: end of first page section (/E) mismatch: /E = 1827; computed = 3889..3891
-WARNING: page 0 has shared identifier entries
-WARNING: page 0: shared object 62: in hint table but not computed list
+WARNING: badlin1.pdf: first page object (/O) mismatch
+WARNING: badlin1.pdf: space before first xref item (/T) mismatch (computed = 11777; file = 11771
+WARNING: badlin1.pdf: end of first page section (/E) mismatch: /E = 1827; computed = 3889..3891
+WARNING: badlin1.pdf: page 0 has shared identifier entries
+WARNING: badlin1.pdf: page 0: shared object 62: in hint table but not computed list
 badlin1.pdf: linearization data:
 
 file_size: 13103
@@ -378,3 +378,4 @@ first_object: 66
 first_object_offset: 1827
 nobjects: 12
 group_length: 2064
+qpdf: operation succeeded with warnings

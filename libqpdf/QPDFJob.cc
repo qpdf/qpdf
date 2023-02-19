@@ -783,7 +783,6 @@ QPDFJob::doCheck(QPDF& pdf)
     // continue to perform additional checks after finding
     // errors.
     bool okay = true;
-    bool warnings = false;
     auto& cout = *this->m->log->getInfo();
     cout << "checking " << m->infilename.get() << "\n";
     try {
@@ -796,12 +795,7 @@ QPDFJob::doCheck(QPDF& pdf)
         showEncryption(pdf);
         if (pdf.isLinearized()) {
             cout << "File is linearized\n";
-            // any errors or warnings are reported by
-            // checkLinearization(). We treat all issues reported here
-            // as warnings.
-            if (!pdf.checkLinearization()) {
-                warnings = true;
-            }
+            pdf.checkLinearization();
         } else {
             cout << "File is not linearized\n";
         }
@@ -836,7 +830,7 @@ QPDFJob::doCheck(QPDF& pdf)
         throw std::runtime_error("errors detected");
     }
 
-    if ((!pdf.getWarnings().empty()) || warnings) {
+    if (!pdf.getWarnings().empty()) {
         this->m->warnings = true;
     } else {
         *this->m->log->getInfo() << "No syntax or stream encoding errors"

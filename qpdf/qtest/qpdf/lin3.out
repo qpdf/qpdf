@@ -1,64 +1,64 @@
-WARNING: end of first page section (/E) mismatch: /E = 3978; computed = 3785..3786
-WARNING: page 1: shared object 107: in computed list but not hint table
-WARNING: page 1: shared object 109: in computed list but not hint table
-WARNING: page 2: shared object 107: in computed list but not hint table
-WARNING: page 2: shared object 109: in computed list but not hint table
-WARNING: page 3: shared object 107: in computed list but not hint table
-WARNING: page 3: shared object 109: in computed list but not hint table
-WARNING: page 4: shared object 107: in computed list but not hint table
-WARNING: page 4: shared object 109: in computed list but not hint table
-WARNING: page 5: shared object 107: in computed list but not hint table
-WARNING: page 5: shared object 109: in computed list but not hint table
-WARNING: page 6: shared object 107: in computed list but not hint table
-WARNING: page 6: shared object 109: in computed list but not hint table
-WARNING: page 7: shared object 107: in computed list but not hint table
-WARNING: page 7: shared object 109: in computed list but not hint table
-WARNING: page 8: shared object 107: in computed list but not hint table
-WARNING: page 8: shared object 109: in computed list but not hint table
-WARNING: page 9: shared object 107: in computed list but not hint table
-WARNING: page 9: shared object 109: in computed list but not hint table
-WARNING: page 10: shared object 107: in computed list but not hint table
-WARNING: page 10: shared object 109: in computed list but not hint table
-WARNING: page 11: shared object 107: in computed list but not hint table
-WARNING: page 11: shared object 109: in computed list but not hint table
-WARNING: page 12: shared object 107: in computed list but not hint table
-WARNING: page 12: shared object 109: in computed list but not hint table
-WARNING: page 13: shared object 107: in computed list but not hint table
-WARNING: page 13: shared object 109: in computed list but not hint table
-WARNING: page 14: shared object 107: in computed list but not hint table
-WARNING: page 14: shared object 109: in computed list but not hint table
-WARNING: page 15: shared object 107: in computed list but not hint table
-WARNING: page 15: shared object 109: in computed list but not hint table
-WARNING: page 16: shared object 107: in computed list but not hint table
-WARNING: page 16: shared object 109: in computed list but not hint table
-WARNING: page 17: shared object 107: in computed list but not hint table
-WARNING: page 17: shared object 109: in computed list but not hint table
-WARNING: page 18: shared object 107: in computed list but not hint table
-WARNING: page 18: shared object 109: in computed list but not hint table
-WARNING: page 19: shared object 107: in computed list but not hint table
-WARNING: page 19: shared object 109: in computed list but not hint table
-WARNING: page 20: shared object 107: in computed list but not hint table
-WARNING: page 20: shared object 109: in computed list but not hint table
-WARNING: page 21: shared object 107: in computed list but not hint table
-WARNING: page 21: shared object 109: in computed list but not hint table
-WARNING: page 22: shared object 107: in computed list but not hint table
-WARNING: page 22: shared object 109: in computed list but not hint table
-WARNING: page 23: shared object 107: in computed list but not hint table
-WARNING: page 23: shared object 109: in computed list but not hint table
-WARNING: page 24: shared object 107: in computed list but not hint table
-WARNING: page 24: shared object 109: in computed list but not hint table
-WARNING: page 25: shared object 107: in computed list but not hint table
-WARNING: page 25: shared object 109: in computed list but not hint table
-WARNING: page 26: shared object 107: in computed list but not hint table
-WARNING: page 26: shared object 109: in computed list but not hint table
-WARNING: page 27: shared object 107: in computed list but not hint table
-WARNING: page 27: shared object 109: in computed list but not hint table
-WARNING: page 28: shared object 107: in computed list but not hint table
-WARNING: page 28: shared object 109: in computed list but not hint table
-WARNING: page 29: shared object 107: in computed list but not hint table
-WARNING: page 29: shared object 109: in computed list but not hint table
-WARNING: incorrect offset in outlines table: hint table = 1627; computed = 1547
-WARNING: incorrect length in outlines table: hint table = 1988; computed = 1936
+WARNING: lin3.pdf: end of first page section (/E) mismatch: /E = 3978; computed = 3785..3786
+WARNING: lin3.pdf: page 1: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 1: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 2: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 2: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 3: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 3: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 4: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 4: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 5: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 5: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 6: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 6: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 7: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 7: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 8: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 8: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 9: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 9: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 10: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 10: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 11: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 11: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 12: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 12: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 13: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 13: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 14: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 14: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 15: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 15: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 16: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 16: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 17: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 17: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 18: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 18: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 19: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 19: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 20: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 20: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 21: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 21: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 22: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 22: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 23: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 23: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 24: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 24: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 25: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 25: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 26: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 26: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 27: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 27: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 28: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 28: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: page 29: shared object 107: in computed list but not hint table
+WARNING: lin3.pdf: page 29: shared object 109: in computed list but not hint table
+WARNING: lin3.pdf: incorrect offset in outlines table: hint table = 1627; computed = 1547
+WARNING: lin3.pdf: incorrect length in outlines table: hint table = 1988; computed = 1936
 lin3.pdf: linearization data:
 
 file_size: 16937
@@ -316,3 +316,4 @@ first_object: 94
 first_object_offset: 1627
 nobjects: 12
 group_length: 1988
+qpdf: operation succeeded with warnings

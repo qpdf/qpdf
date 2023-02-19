@@ -1,5 +1,5 @@
-WARNING: page 0 has shared identifier entries
-WARNING: page 0: shared object 19: in hint table but not computed list
+WARNING: lin9.pdf: page 0 has shared identifier entries
+WARNING: lin9.pdf: page 0: shared object 19: in hint table but not computed list
 lin9.pdf: linearization data:
 
 file_size: 3316
@@ -102,3 +102,4 @@ Shared Object 5:
   group length: 67
 Shared Object 6:
   group length: 117
+qpdf: operation succeeded with warnings

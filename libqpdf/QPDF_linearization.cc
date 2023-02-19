@@ -65,6 +65,13 @@ load_vector_vector(
     bit_stream.skipToNextByte();
 }
 
+void
+QPDF::linearizationWarning(std::string_view msg)
+{
+    this->m->linearization_warnings = true;
+    warn(qpdf_e_linearization, "", 0, std::string(msg));
+}
+
 bool
 QPDF::checkLinearization()
 {
@@ -73,9 +80,9 @@ QPDF::checkLinearization()
         readLinearizationData();
         result = checkLinearizationInternal();
     } catch (std::runtime_error& e) {
-        *this->m->log->getError()
-            << "WARNING: error encountered while checking linearization data: "
-            << e.what() << "\n";
+        linearizationWarning(
+            "error encountered while checking linearization data: " +
+            std::string(e.what()));
     }
     return result;
 }
@@ -333,9 +340,10 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
     }
     qpdf_offset_t computed_end = offset + toO(length);
     if ((computed_end < min_end_offset) || (computed_end > max_end_offset)) {
-        *this->m->log->getError()
-            << "expected = " << computed_end << "; actual = " << min_end_offset
-            << ".." << max_end_offset << "\n";
+        linearizationWarning(
+            "expected = " + std::to_string(computed_end) +
+            "; actual = " + std::to_string(min_end_offset) + ".." +
+            std::to_string(max_end_offset));
         throw damagedPDF(
             "linearization dictionary", "hint table length mismatch");
     }
@@ -476,9 +484,6 @@ QPDF::checkLinearizationInternal()
     // All comments referring to the PDF spec refer to the spec for
     // version 1.4.
 
-    std::list<std::string> errors;
-    std::list<std::string> warnings;
-
     // Check all values in linearization parameter dictionary
 
     LinParameters& p = this->m->linp;
@@ -489,21 +494,21 @@ QPDF::checkLinearizationInternal()
     std::vector<QPDFObjectHandle> const& pages = getAllPages();
     if (p.first_page_object != pages.at(0).getObjectID()) {
         QTC::TC("qpdf", "QPDF err /O mismatch");
-        errors.push_back("first page object (/O) mismatch");
+        linearizationWarning("first page object (/O) mismatch");
     }
 
     // N: number of pages
     int npages = toI(pages.size());
     if (p.npages != npages) {
         // Not tested in the test suite
-        errors.push_back("page count (/N) mismatch");
+        linearizationWarning("page count (/N) mismatch");
     }
 
     for (size_t i = 0; i < toS(npages); ++i) {
         QPDFObjectHandle const& page = pages.at(i);
         QPDFObjGen og(page.getObjGen());
         if (this->m->xref_table[og].getType() == 2) {
-            errors.push_back(
+            linearizationWarning(
                 "page dictionary for page " + std::to_string(i) +
                 " is compressed");
         }
@@ -521,7 +526,7 @@ QPDF::checkLinearizationInternal()
     }
     if (this->m->file->tell() != this->m->first_xref_item_offset) {
         QTC::TC("qpdf", "QPDF err /T mismatch");
-        errors.push_back(
+        linearizationWarning(
             "space before first xref item (/T) mismatch "
             "(computed = " +
             std::to_string(this->m->first_xref_item_offset) +
@@ -537,8 +542,9 @@ QPDF::checkLinearizationInternal()
     // are in use.
 
     if (this->m->uncompressed_after_compressed) {
-        errors.push_back("linearized file contains an uncompressed object"
-                         " after a compressed one in a cross-reference stream");
+        linearizationWarning(
+            "linearized file contains an uncompressed object"
+            " after a compressed one in a cross-reference stream");
     }
 
     // Further checking requires optimization and order calculation.
@@ -587,7 +593,7 @@ QPDF::checkLinearizationInternal()
     }
     if ((p.first_page_end < min_E) || (p.first_page_end > max_E)) {
         QTC::TC("qpdf", "QPDF warn /E mismatch");
-        warnings.push_back(
+        linearizationWarning(
             "end of first page section (/E) mismatch: /E = " +
             std::to_string(p.first_page_end) + "; computed = " +
             std::to_string(min_E) + ".." + std::to_string(max_E));
@@ -596,34 +602,11 @@ QPDF::checkLinearizationInternal()
     // Check hint tables
 
     std::map<int, int> shared_idx_to_obj;
-    checkHSharedObject(errors, warnings, pages, shared_idx_to_obj);
-    checkHPageOffset(errors, warnings, pages, shared_idx_to_obj);
-    checkHOutlines(warnings);
+    checkHSharedObject(pages, shared_idx_to_obj);
+    checkHPageOffset(pages, shared_idx_to_obj);
+    checkHOutlines();
 
-    // Report errors
-
-    bool result = true;
-
-    // Treat all linearization errors as warnings. Many of them occur
-    // in otherwise working files, so it's really misleading to treat
-    // them as errors. We'll hang onto the distinction in the code for
-    // now in case we ever have a chance to clean up the linearization
-    // code.
-    if (!errors.empty()) {
-        result = false;
-        for (auto const& error: errors) {
-            *this->m->log->getError() << "WARNING: " << error << "\n";
-        }
-    }
-
-    if (!warnings.empty()) {
-        result = false;
-        for (auto const& warning: warnings) {
-            *this->m->log->getError() << "WARNING: " << warning << "\n";
-        }
-    }
-
-    return result;
+    return !this->m->linearization_warnings;
 }
 
 qpdf_offset_t
@@ -680,13 +663,13 @@ QPDF::getUncompressedObject(
 }
 
 int
-QPDF::lengthNextN(int first_object, int n, std::list<std::string>& errors)
+QPDF::lengthNextN(int first_object, int n)
 {
     int length = 0;
     for (int i = 0; i < n; ++i) {
         QPDFObjGen og(first_object + i, 0);
         if (this->m->xref_table.count(og) == 0) {
-            errors.push_back(
+            linearizationWarning(
                 "no xref table entry for " + std::to_string(first_object + i) +
                 " 0");
         } else {
@@ -704,8 +687,6 @@ QPDF::lengthNextN(int first_object, int n, std::list<std::string>& errors)
 
 void
 QPDF::checkHPageOffset(
-    std::list<std::string>& errors,
-    std::list<std::string>& warnings,
     std::vector<QPDFObjectHandle> const& pages,
     std::map<int, int>& shared_idx_to_obj)
 {
@@ -735,7 +716,7 @@ QPDF::checkHPageOffset(
     }
     qpdf_offset_t offset = getLinearizationOffset(first_page_og);
     if (table_offset != offset) {
-        warnings.push_back("first page object offset mismatch");
+        linearizationWarning("first page object offset mismatch");
     }
 
     for (int pageno = 0; pageno < npages; ++pageno) {
@@ -754,7 +735,7 @@ QPDF::checkHPageOffset(
             he.delta_nobjects + this->m->page_offset_hints.min_nobjects;
         if (h_nobjects != ce.nobjects) {
             // This happens with pdlin when there are thumbnails.
-            warnings.push_back(
+            linearizationWarning(
                 "object count mismatch for page " + std::to_string(pageno) +
                 ": hint table = " + std::to_string(h_nobjects) +
                 "; computed = " + std::to_string(ce.nobjects));
@@ -762,13 +743,13 @@ QPDF::checkHPageOffset(
 
         // Use value for number of objects in hint table rather than
         // computed value if there is a discrepancy.
-        int length = lengthNextN(first_object, h_nobjects, errors);
+        int length = lengthNextN(first_object, h_nobjects);
         int h_length = toI(
             he.delta_page_length + this->m->page_offset_hints.min_page_length);
         if (length != h_length) {
             // This condition almost certainly indicates a bad hint
             // table or a bug in this code.
-            errors.push_back(
+            linearizationWarning(
                 "page length mismatch for page " + std::to_string(pageno) +
                 ": hint table = " + std::to_string(h_length) +
                 "; computed length = " + std::to_string(length) +
@@ -784,7 +765,7 @@ QPDF::checkHPageOffset(
         if ((pageno == 0) && (he.nshared_objects > 0)) {
             // pdlin and Acrobat both do this even though the spec
             // states clearly and unambiguously that they should not.
-            warnings.push_back("page 0 has shared identifier entries");
+            linearizationWarning("page 0 has shared identifier entries");
         }
 
         for (size_t i = 0; i < toS(he.nshared_objects); ++i) {
@@ -808,7 +789,7 @@ QPDF::checkHPageOffset(
         for (int iter: hint_shared) {
             if (!computed_shared.count(iter)) {
                 // pdlin puts thumbnails here even though it shouldn't
-                warnings.push_back(
+                linearizationWarning(
                     "page " + std::to_string(pageno) + ": shared object " +
                     std::to_string(iter) +
                     ": in hint table but not computed list");
@@ -820,10 +801,10 @@ QPDF::checkHPageOffset(
                 // Acrobat does not put some things including at least
                 // built-in fonts and procsets here, at least in some
                 // cases.
-                warnings.push_back(
-                    "page " + std::to_string(pageno) + ": shared object " +
-                    std::to_string(iter) +
-                    ": in computed list but not hint table");
+                linearizationWarning(
+                    ("page " + std::to_string(pageno) + ": shared object " +
+                     std::to_string(iter) +
+                     ": in computed list but not hint table"));
             }
         }
     }
@@ -831,10 +812,7 @@ QPDF::checkHPageOffset(
 
 void
 QPDF::checkHSharedObject(
-    std::list<std::string>& errors,
-    std::list<std::string>& warnings,
-    std::vector<QPDFObjectHandle> const& pages,
-    std::map<int, int>& idx_to_obj)
+    std::vector<QPDFObjectHandle> const& pages, std::map<int, int>& idx_to_obj)
 {
     // Implementation note 125 says shared object groups always
     // contain only one object.  Implementation note 128 says that
@@ -856,7 +834,7 @@ QPDF::checkHSharedObject(
 
     HSharedObject& so = this->m->shared_object_hints;
     if (so.nshared_total < so.nshared_first_page) {
-        errors.push_back("shared object hint table: ntotal < nfirst_page");
+        linearizationWarning("shared object hint table: ntotal < nfirst_page");
     } else {
         // The first nshared_first_page objects are consecutive
         // objects starting with the first page object.  The rest are
@@ -866,12 +844,12 @@ QPDF::checkHSharedObject(
             if (i == so.nshared_first_page) {
                 QTC::TC("qpdf", "QPDF lin check shared past first page");
                 if (this->m->part8.empty()) {
-                    errors.push_back("part 8 is empty but nshared_total > "
-                                     "nshared_first_page");
+                    linearizationWarning("part 8 is empty but nshared_total > "
+                                         "nshared_first_page");
                 } else {
                     int obj = this->m->part8.at(0).getObjectID();
                     if (obj != so.first_shared_obj) {
-                        errors.push_back(
+                        linearizationWarning(
                             "first shared object number mismatch: "
                             "hint table = " +
                             std::to_string(so.first_shared_obj) +
@@ -889,7 +867,7 @@ QPDF::checkHSharedObject(
                 qpdf_offset_t h_offset =
                     adjusted_offset(so.first_shared_offset);
                 if (offset != h_offset) {
-                    errors.push_back(
+                    linearizationWarning(
                         "first shared object offset mismatch: hint table = " +
                         std::to_string(h_offset) +
                         "; computed = " + std::to_string(offset));
@@ -899,10 +877,10 @@ QPDF::checkHSharedObject(
             idx_to_obj[i] = cur_object;
             HSharedObjectEntry& se = so.entries.at(toS(i));
             int nobjects = se.nobjects_minus_one + 1;
-            int length = lengthNextN(cur_object, nobjects, errors);
+            int length = lengthNextN(cur_object, nobjects);
             int h_length = so.min_group_length + se.delta_group_length;
             if (length != h_length) {
-                errors.push_back(
+                linearizationWarning(
                     "shared object " + std::to_string(i) +
                     " length mismatch: hint table = " +
                     std::to_string(h_length) +
@@ -914,7 +892,7 @@ QPDF::checkHSharedObject(
 }
 
 void
-QPDF::checkHOutlines(std::list<std::string>& warnings)
+QPDF::checkHOutlines()
 {
     // Empirically, Acrobat generates the correct value for the object
     // number but incorrectly stores the next object number's offset
@@ -937,7 +915,7 @@ QPDF::checkHOutlines(std::list<std::string>& warnings)
                 // This case is not exercised in test suite since not
                 // permitted by the spec, but if this does occur, the
                 // code below would fail.
-                warnings.push_back(
+                linearizationWarning(
                     "/Outlines key of root dictionary is not indirect");
                 return;
             }
@@ -951,24 +929,24 @@ QPDF::checkHOutlines(std::list<std::string>& warnings)
             qpdf_offset_t table_offset =
                 adjusted_offset(this->m->outline_hints.first_object_offset);
             if (offset != table_offset) {
-                warnings.push_back(
+                linearizationWarning(
                     "incorrect offset in outlines table: hint table = " +
                     std::to_string(table_offset) +
                     "; computed = " + std::to_string(offset));
             }
             int table_length = this->m->outline_hints.group_length;
             if (length != table_length) {
-                warnings.push_back(
+                linearizationWarning(
                     "incorrect length in outlines table: hint table = " +
                     std::to_string(table_length) +
                     "; computed = " + std::to_string(length));
             }
         } else {
-            warnings.push_back("incorrect first object number in outline "
-                               "hints table.");
+            linearizationWarning("incorrect first object number in outline "
+                                 "hints table.");
         }
     } else {
-        warnings.push_back("incorrect object count in outline hint table");
+        linearizationWarning("incorrect object count in outline hint table");
     }
 }
 
@@ -980,7 +958,7 @@ QPDF::showLinearizationData()
         checkLinearizationInternal();
         dumpLinearizationDataInternal();
     } catch (QPDFExc& e) {
-        *this->m->log->getError() << e.what() << "\n";
+        linearizationWarning(e.what());
     }
 }
 

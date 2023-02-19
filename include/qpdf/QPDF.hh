@@ -32,6 +32,7 @@
 #include <memory>
 #include <stdio.h>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <qpdf/Buffer.hh>
@@ -1565,6 +1566,7 @@ class QPDF
     void readLinearizationData();
     bool checkLinearizationInternal();
     void dumpLinearizationDataInternal();
+    void linearizationWarning(std::string_view);
     QPDFObjectHandle
     readHintStream(Pipeline&, qpdf_offset_t offset, size_t length);
     void readHPageOffset(BitStream);
@@ -1574,18 +1576,14 @@ class QPDF
     qpdf_offset_t getLinearizationOffset(QPDFObjGen const&);
     QPDFObjectHandle getUncompressedObject(
         QPDFObjectHandle&, std::map<int, int> const& object_stream_data);
-    int lengthNextN(int first_object, int n, std::list<std::string>& errors);
+    int lengthNextN(int first_object, int n);
     void checkHPageOffset(
-        std::list<std::string>& errors,
-        std::list<std::string>& warnings,
         std::vector<QPDFObjectHandle> const& pages,
         std::map<int, int>& idx_to_obj);
     void checkHSharedObject(
-        std::list<std::string>& warnings,
-        std::list<std::string>& errors,
         std::vector<QPDFObjectHandle> const& pages,
         std::map<int, int>& idx_to_obj);
-    void checkHOutlines(std::list<std::string>& warnings);
+    void checkHOutlines();
     void dumpHPageOffset();
     void dumpHSharedObject();
     void dumpHGeneric(HGeneric&);
@@ -1728,6 +1726,7 @@ class QPDF
         // Linearization data
         qpdf_offset_t first_xref_item_offset{0}; // actual value from file
         bool uncompressed_after_compressed{false};
+        bool linearization_warnings{false};
 
         // Linearization parameter dictionary and hint table data: may be
         // read from file or computed prior to writing a linearized file

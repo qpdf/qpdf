@@ -127,6 +127,8 @@ CODING RULES
   "Code Formatting" section in manual/contributing.rst for details.
   See also "CODE FORMATTING" below.
 
+* Use std::to_string instead of QUtil::int_to_string et al
+
 * Use of assert:
 
   * Test code: #include <qpdf/assert_test.h> first.

@@ -1,94 +1,94 @@
-WARNING: end of first page section (/E) mismatch: /E = 2656; computed = 1768..1770
-WARNING: object count mismatch for page 0: hint table = 7; computed = 4
-WARNING: page 0 has shared identifier entries
-WARNING: page 0: shared object 105: in hint table but not computed list
-WARNING: object count mismatch for page 1: hint table = 3; computed = 2
-WARNING: page 1: shared object 110: in hint table but not computed list
-WARNING: page 1: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 2: hint table = 3; computed = 2
-WARNING: page 2: shared object 110: in hint table but not computed list
-WARNING: page 2: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 3: hint table = 3; computed = 2
-WARNING: page 3: shared object 110: in hint table but not computed list
-WARNING: page 3: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 4: hint table = 3; computed = 2
-WARNING: page 4: shared object 110: in hint table but not computed list
-WARNING: page 4: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 5: hint table = 3; computed = 2
-WARNING: page 5: shared object 110: in hint table but not computed list
-WARNING: page 5: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 6: hint table = 3; computed = 2
-WARNING: page 6: shared object 110: in hint table but not computed list
-WARNING: page 6: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 7: hint table = 3; computed = 2
-WARNING: page 7: shared object 110: in hint table but not computed list
-WARNING: page 7: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 8: hint table = 3; computed = 2
-WARNING: page 8: shared object 110: in hint table but not computed list
-WARNING: page 8: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 9: hint table = 3; computed = 2
-WARNING: page 9: shared object 110: in hint table but not computed list
-WARNING: page 9: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 10: hint table = 3; computed = 2
-WARNING: page 10: shared object 110: in hint table but not computed list
-WARNING: page 10: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 11: hint table = 3; computed = 2
-WARNING: page 11: shared object 110: in hint table but not computed list
-WARNING: page 11: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 12: hint table = 3; computed = 2
-WARNING: page 12: shared object 110: in hint table but not computed list
-WARNING: page 12: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 13: hint table = 3; computed = 2
-WARNING: page 13: shared object 110: in hint table but not computed list
-WARNING: page 13: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 14: hint table = 3; computed = 2
-WARNING: page 14: shared object 110: in hint table but not computed list
-WARNING: page 14: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 15: hint table = 3; computed = 2
-WARNING: page 15: shared object 110: in hint table but not computed list
-WARNING: page 15: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 16: hint table = 3; computed = 2
-WARNING: page 16: shared object 110: in hint table but not computed list
-WARNING: page 16: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 17: hint table = 3; computed = 2
-WARNING: page 17: shared object 110: in hint table but not computed list
-WARNING: page 17: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 18: hint table = 3; computed = 2
-WARNING: page 18: shared object 110: in hint table but not computed list
-WARNING: page 18: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 19: hint table = 3; computed = 2
-WARNING: page 19: shared object 110: in hint table but not computed list
-WARNING: page 19: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 20: hint table = 3; computed = 2
-WARNING: page 20: shared object 110: in hint table but not computed list
-WARNING: page 20: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 21: hint table = 3; computed = 2
-WARNING: page 21: shared object 110: in hint table but not computed list
-WARNING: page 21: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 22: hint table = 3; computed = 2
-WARNING: page 22: shared object 110: in hint table but not computed list
-WARNING: page 22: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 23: hint table = 3; computed = 2
-WARNING: page 23: shared object 110: in hint table but not computed list
-WARNING: page 23: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 24: hint table = 3; computed = 2
-WARNING: page 24: shared object 110: in hint table but not computed list
-WARNING: page 24: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 25: hint table = 3; computed = 2
-WARNING: page 25: shared object 110: in hint table but not computed list
-WARNING: page 25: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 26: hint table = 3; computed = 2
-WARNING: page 26: shared object 110: in hint table but not computed list
-WARNING: page 26: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 27: hint table = 3; computed = 2
-WARNING: page 27: shared object 110: in hint table but not computed list
-WARNING: page 27: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 28: hint table = 3; computed = 2
-WARNING: page 28: shared object 110: in hint table but not computed list
-WARNING: page 28: shared object 111: in hint table but not computed list
-WARNING: object count mismatch for page 29: hint table = 3; computed = 2
-WARNING: page 29: shared object 110: in hint table but not computed list
-WARNING: page 29: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: end of first page section (/E) mismatch: /E = 2656; computed = 1768..1770
+WARNING: lin8.pdf: object count mismatch for page 0: hint table = 7; computed = 4
+WARNING: lin8.pdf: page 0 has shared identifier entries
+WARNING: lin8.pdf: page 0: shared object 105: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 1: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 1: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 1: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 2: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 2: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 2: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 3: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 3: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 3: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 4: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 4: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 4: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 5: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 5: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 5: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 6: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 6: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 6: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 7: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 7: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 7: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 8: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 8: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 8: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 9: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 9: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 9: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 10: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 10: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 10: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 11: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 11: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 11: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 12: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 12: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 12: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 13: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 13: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 13: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 14: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 14: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 14: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 15: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 15: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 15: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 16: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 16: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 16: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 17: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 17: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 17: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 18: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 18: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 18: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 19: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 19: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 19: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 20: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 20: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 20: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 21: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 21: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 21: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 22: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 22: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 22: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 23: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 23: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 23: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 24: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 24: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 24: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 25: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 25: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 25: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 26: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 26: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 26: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 27: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 27: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 27: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 28: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 28: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 28: shared object 111: in hint table but not computed list
+WARNING: lin8.pdf: object count mismatch for page 29: hint table = 3; computed = 2
+WARNING: lin8.pdf: page 29: shared object 110: in hint table but not computed list
+WARNING: lin8.pdf: page 29: shared object 111: in hint table but not computed list
 lin8.pdf: linearization data:
 
 file_size: 24875
@@ -566,3 +566,4 @@ first_object: 89
 first_object_offset: 20067
 nobjects: 12
 group_length: 2069
+qpdf: operation succeeded with warnings

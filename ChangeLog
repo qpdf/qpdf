@@ -1,3 +1,10 @@
+2023-02-18  Jay Berkenbilt  <ejb@ql.org>
+
+        * Treat all linearization errors and warnings as warnings, and
+        issue them through the normal warning system using the new error
+        code qpdf_e_linearization. That means that --no-warn will suppress
+        them, and the file name is included in the warning. Fixes #851.
+
 2023-01-28  Jay Berkenbilt  <ejb@ql.org>
 
         * New option --remove-restrictions removes security restrictions
