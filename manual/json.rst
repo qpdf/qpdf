@@ -85,7 +85,7 @@ Notes about terminology:
 - Some languages that use JSON call an *object* a *dictionary*, a
   *map*, or a *hash*.
 
-- Sometimes, it's called on *object* if it has fixed keys and a
+- Sometimes, it's called an *object* if it has fixed keys and a
   *dictionary* if it has variable keys.
 
 This manual is not entirely consistent about its use of *dictionary*
@@ -516,7 +516,7 @@ Here are some important things to know about qpdf JSON input.
 
 - The values of ``"calledgetallpages"`` and
   ``"pushedinheritedpageresources"`` are ignored when creating a file.
-  When updating a file, they treated as ``false`` if omitted.
+  When updating a file, they are treated as ``false`` if omitted.
 
 - When qpdf reads a PDF file, the internal object numbers are always
   preserved. However, when qpdf writes a file using ``QPDFWriter``,
@@ -535,7 +535,7 @@ Here are some important things to know about qpdf JSON input.
     # edit pdf.json
     qpdf in.pdf out.pdf --update-from-json=pdf.json
 
-  The following will produce unpredictable and probably incorrect
+  By contrast, the following will produce unpredictable and probably incorrect
   results because ``out.pdf`` won't have the same object numbers as
   ``pdf.json`` and ``in.pdf``.
 
