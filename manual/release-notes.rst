@@ -14,6 +14,11 @@ For a detailed list of changes, please see the file
     - New option :qpdf:ref:`--remove-restrictions` removes security
       restrictions from digitally signed files.
 
+    - Improve overlay/underlay so that the content a page with
+      unbalanced graphics state operators (``q``/``Q``) doesn't affect
+      the way subsequent pages are displayed. This changes the output
+      of all overlay/underlay operations.
+
   - Library enhancements
 
     - New method ``QPDF::removeSecurityRestrictions`` removes security

@@ -2082,11 +2082,6 @@ QPDFJob::doUnderOverlayForPage(
     std::string content;
     int min_suffix = 1;
     QPDFObjectHandle resources = dest_page.getAttribute("/Resources", true);
-    if (!resources.isDictionary()) {
-        QTC::TC("qpdf", "QPDFJob overlay page with no resources");
-        resources = dest_page.getObjectHandle().replaceKeyAndGetNew(
-            "/Resources", QPDFObjectHandle::newDictionary());
-    }
     for (int from_pageno: pagenos[pageno]) {
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << "    " << uo.which << " " << from_pageno << "\n";
@@ -2179,7 +2174,24 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
               overlay_pagenos.count(pageno))) {
             continue;
         }
+        // This code converts the original page, any underlays, and
+        // any overlays to form XObjects. Then it concatenates display
+        // of all underlays, the original page, and all overlays.
+        // Prior to 11.3.0, the original page contents were wrapped in
+        // q/Q, but this didin't work if the original page had
+        // unbalanced q/Q operators. See github issue #904.
         auto& dest_page = main_pages.at(i);
+        auto dest_page_oh = dest_page.getObjectHandle();
+        auto this_page_fo = dest_page.getFormXObjectForPage();
+        // The resulting form xobject lazily reads the content from
+        // the original page, which we are going to replace. Therefore
+        // we have to explicitly copy it.
+        auto content_data = this_page_fo.getRawStreamData();
+        this_page_fo.replaceStreamData(
+            content_data, QPDFObjectHandle(), QPDFObjectHandle());
+        auto resources = dest_page_oh.replaceKeyAndGetNew(
+            "/Resources", "<< /XObject << >> >>"_qpdf);
+        resources.getKey("/XObject").replaceKeyAndGetNew("/Fx0", this_page_fo);
         auto content = doUnderOverlayForPage(
             pdf,
             m->underlay,
@@ -2188,15 +2200,16 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
             underlay_fo,
             upages,
             dest_page);
-        if (!content.empty()) {
-            dest_page.addPageContents(pdf.newStream(content), true);
-        }
-        content = doUnderOverlayForPage(
+        content += dest_page.placeFormXObject(
+            this_page_fo,
+            "/Fx0",
+            dest_page.getMediaBox().getArrayAsRectangle(),
+            true,
+            false,
+            false);
+        content += doUnderOverlayForPage(
             pdf, m->overlay, overlay_pagenos, i, overlay_fo, opages, dest_page);
-        if (!content.empty()) {
-            dest_page.addPageContents(pdf.newStream("q\n"), true);
-            dest_page.addPageContents(pdf.newStream("\nQ\n" + content), false);
-        }
+        dest_page_oh.replaceKey("/Contents", pdf.newStream(content));
     }
 }
 
