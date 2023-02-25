@@ -368,6 +368,7 @@ RELEASE PREPARATION
 
   See "ABI checks" for details about the process.
   End state:
+  * /tmp/check-abi/perf contains the performance comparison
   * /tmp/check-abi/old contains old sizes and library
   * /tmp/check-abi/new contains new sizes and library
   * run check_abi manually to compare
