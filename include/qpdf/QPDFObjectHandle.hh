@@ -334,11 +334,6 @@ class QPDFObjectHandle
     QPDF_DLL
     inline bool isInitialized() const;
 
-    // Return true if the QPDFObjectHandle is initialized. This allows object
-    // handles to be used in if statements with initializer.
-    QPDF_DLL
-    inline operator bool() const;
-
     // This method returns true if the QPDFObjectHandle objects point
     // to exactly the same underlying object, meaning that changes to
     // one are reflected in the other, or "if you paint one, the other
@@ -1866,11 +1861,6 @@ inline bool
 QPDFObjectHandle::isIndirect() const
 {
     return (obj != nullptr) && (getObjectID() != 0);
-}
-
-inline QPDFObjectHandle::operator bool() const
-{
-    return obj != nullptr;
 }
 
 inline bool
