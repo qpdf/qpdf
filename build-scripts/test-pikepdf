@@ -1,0 +1,18 @@
+#!/bin/bash
+set -ex
+sudo apt-get update
+sudo apt-get -y install \
+   build-essential cmake zlib1g-dev libjpeg-dev libgnutls28-dev
+cmake -S . -B build -DBUILD_STATIC_LIBS=0 -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build build --verbose -j$(nproc) --target libqpdf -- -k
+export QPDF_SOURCE_TREE=$PWD
+export QPDF_BUILD_LIBDIR=$QPDF_SOURCE_TREE/build/libqpdf
+export LD_LIBRARY_PATH=$QPDF_BUILD_LIBDIR
+git clone https://github.com/pikepdf/pikepdf
+python3 -m venv v
+source v/bin/activate
+cd pikepdf
+python3 -m pip install --upgrade pip
+python3 -m pip install '.[test]'
+python3 -m pip install .
+pytest -n auto
