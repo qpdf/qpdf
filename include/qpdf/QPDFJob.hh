@@ -526,15 +526,14 @@ class QPDFJob
     void
     getUOPagenos(UnderOverlay& uo, std::map<int, std::vector<int>>& pagenos);
     void handleUnderOverlay(QPDF& pdf);
-    void doUnderOverlayForPage(
+    std::string doUnderOverlayForPage(
         QPDF& pdf,
         UnderOverlay& uo,
         std::map<int, std::vector<int>>& pagenos,
         size_t page_idx,
         std::map<int, QPDFObjectHandle>& fo,
         std::vector<QPDFPageObjectHelper>& pages,
-        QPDFPageObjectHelper& dest_page,
-        bool before);
+        QPDFPageObjectHelper& dest_page);
     void validateUnderOverlay(QPDF& pdf, UnderOverlay* uo);
     void handleTransformations(QPDF& pdf);
     void addAttachments(QPDF& pdf);

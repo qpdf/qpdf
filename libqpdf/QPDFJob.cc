@@ -2056,7 +2056,7 @@ get_afdh_for_qpdf(
     return afdh_map[uid].get();
 }
 
-void
+std::string
 QPDFJob::doUnderOverlayForPage(
     QPDF& pdf,
     UnderOverlay& uo,
@@ -2064,12 +2064,11 @@ QPDFJob::doUnderOverlayForPage(
     size_t page_idx,
     std::map<int, QPDFObjectHandle>& fo,
     std::vector<QPDFPageObjectHelper>& pages,
-    QPDFPageObjectHelper& dest_page,
-    bool before)
+    QPDFPageObjectHelper& dest_page)
 {
     int pageno = 1 + QIntC::to_int(page_idx);
     if (!pagenos.count(pageno)) {
-        return;
+        return "";
     }
 
     std::map<unsigned long long, std::shared_ptr<QPDFAcroFormDocumentHelper>>
@@ -2121,14 +2120,7 @@ QPDFJob::doUnderOverlayForPage(
             content += new_content;
         }
     }
-    if (!content.empty()) {
-        if (before) {
-            dest_page.addPageContents(pdf.newStream(content), true);
-        } else {
-            dest_page.addPageContents(pdf.newStream("q\n"), true);
-            dest_page.addPageContents(pdf.newStream("\nQ\n" + content), false);
-        }
-    }
+    return content;
 }
 
 void
@@ -2182,24 +2174,29 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << "  page " << 1 + i << "\n";
         });
-        doUnderOverlayForPage(
+        auto pageno = QIntC::to_int(i) + 1;
+        if (!(underlay_pagenos.count(pageno) ||
+              overlay_pagenos.count(pageno))) {
+            continue;
+        }
+        auto& dest_page = main_pages.at(i);
+        auto content = doUnderOverlayForPage(
             pdf,
             m->underlay,
             underlay_pagenos,
             i,
             underlay_fo,
             upages,
-            main_pages.at(i),
-            true);
-        doUnderOverlayForPage(
-            pdf,
-            m->overlay,
-            overlay_pagenos,
-            i,
-            overlay_fo,
-            opages,
-            main_pages.at(i),
-            false);
+            dest_page);
+        if (!content.empty()) {
+            dest_page.addPageContents(pdf.newStream(content), true);
+        }
+        content = doUnderOverlayForPage(
+            pdf, m->overlay, overlay_pagenos, i, overlay_fo, opages, dest_page);
+        if (!content.empty()) {
+            dest_page.addPageContents(pdf.newStream("q\n"), true);
+            dest_page.addPageContents(pdf.newStream("\nQ\n" + content), false);
+        }
     }
 }
 
