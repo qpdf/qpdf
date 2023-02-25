@@ -1,5 +1,7 @@
 2023-02-25  Jay Berkenbilt  <ejb@ql.org>
 
+        * 11.3.0: release
+
         * When performing overlay or underlay operations, convert the
         original page to a form XObject instead of simply isolating its
         contents with q/Q operators. This prevents unbalanced q/Q

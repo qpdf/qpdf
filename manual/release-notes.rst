@@ -8,7 +8,7 @@ For a detailed list of changes, please see the file
 
 .. x.y.z: not yet released
 
-11.3.0: not yet released
+11.3.0: February 25, 2023
   - CLI Enhancements
 
     - New option :qpdf:ref:`--remove-restrictions` removes security
