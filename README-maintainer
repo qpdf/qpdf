@@ -390,6 +390,38 @@ rehash
 pip3 install .
 pytest -n auto
 
+If there are failures, use git bisect to figure out where the failure
+was introduced. For example, set up a work area like this:
+
+cd /tmp/z
+git clone file://$HOME/source/qpdf/qpdf/.git qpdf
+git clone git@github.com:pikepdf/pikepdf
+export QPDF_SOURCE_TREE=/tmp/z/qpdf
+export QPDF_BUILD_LIBDIR=$QPDF_SOURCE_TREE/build/libqpdf
+export LD_LIBRARY_PATH=$QPDF_BUILD_LIBDIR
+cd qpdf
+mkdir build
+cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
+   -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 \
+   -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cat <<'EOF'
+#!/bin/bash
+cd /tmp/z/pikepdf
+cmake --build /tmp/z/qpdf/build -j16 --target libqpdf -- -k
+git clean -dfx
+rm -rf ../v
+virtualenv ../v
+source ../v/bin/activate
+pip3 install --upgrade pip
+pip3 install '.[test]'
+pip3 install .
+pytest -n auto
+EOF
+chmod +x /tmp/check
+
+Then in /tmp/z/qpdf, run git bisect. Use /tmp/check at each stage to
+test whether it's a good or bad commit.
+
 * Run package tests:
 
 (Note: can't use DESTDIR because pkg-config won't know about it.)
