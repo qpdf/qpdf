@@ -1,7 +1,7 @@
 2023-02-25  Jay Berkenbilt  <ejb@ql.org>
 
         * When performing overlay or underlay operations, convert the
-        origianal page to a form XObject instead of simply isolating its
+        original page to a form XObject instead of simply isolating its
         contents with q/Q operators. This prevents unbalanced q/Q
         operators in any of the original pages from messing up the
         graphics state of anything that is overlaid on top of it. Fixes

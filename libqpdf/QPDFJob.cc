@@ -2178,7 +2178,7 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         // any overlays to form XObjects. Then it concatenates display
         // of all underlays, the original page, and all overlays.
         // Prior to 11.3.0, the original page contents were wrapped in
-        // q/Q, but this didin't work if the original page had
+        // q/Q, but this didn't work if the original page had
         // unbalanced q/Q operators. See github issue #904.
         auto& dest_page = main_pages.at(i);
         auto dest_page_oh = dest_page.getObjectHandle();
