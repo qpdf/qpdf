@@ -373,55 +373,6 @@ RELEASE PREPARATION
   * /tmp/check-abi/new contains new sizes and library
   * run check_abi manually to compare
 
-* Run pikepdf's test suite. Do this in a separate shell.
-
-cd ...qpdf-source-tree...
-export QPDF_SOURCE_TREE=$PWD
-export QPDF_BUILD_LIBDIR=$QPDF_SOURCE_TREE/build/libqpdf
-export LD_LIBRARY_PATH=$QPDF_BUILD_LIBDIR
-cd /tmp/z
-git clone git@github.com:pikepdf/pikepdf
-virtualenv v
-source v/bin/activate
-cd pikepdf
-pip3 install --upgrade pip
-pip3 install '.[test]'
-rehash
-pip3 install .
-pytest -n auto
-
-If there are failures, use git bisect to figure out where the failure
-was introduced. For example, set up a work area like this:
-
-cd /tmp/z
-git clone file://$HOME/source/qpdf/qpdf/.git qpdf
-git clone git@github.com:pikepdf/pikepdf
-export QPDF_SOURCE_TREE=/tmp/z/qpdf
-export QPDF_BUILD_LIBDIR=$QPDF_SOURCE_TREE/build/libqpdf
-export LD_LIBRARY_PATH=$QPDF_BUILD_LIBDIR
-cd qpdf
-mkdir build
-cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
-   -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 \
-   -DCMAKE_BUILD_TYPE=RelWithDebInfo
-cat <<'EOF'
-#!/bin/bash
-cd /tmp/z/pikepdf
-cmake --build /tmp/z/qpdf/build -j16 --target libqpdf -- -k
-git clean -dfx
-rm -rf ../v
-virtualenv ../v
-source ../v/bin/activate
-pip3 install --upgrade pip
-pip3 install '.[test]'
-pip3 install .
-pytest -n auto
-EOF
-chmod +x /tmp/check
-
-Then in /tmp/z/qpdf, run git bisect. Use /tmp/check at each stage to
-test whether it's a good or bad commit.
-
 * Run package tests:
 
 (Note: can't use DESTDIR because pkg-config won't know about it.)
@@ -532,6 +483,65 @@ rsync -vrlcO ./ jay_berkenbilt,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/q
 * Upload the debian package and Ubuntu ppa backports.
 
 * Email the qpdf-announce list.
+
+
+RUNNING pikepdf's TEST SUITE
+
+We run pikepdf's test suite from CI. These instructions show how to do
+it manually.
+
+Do this in a separate shell.
+
+cd ...qpdf-source-tree...
+export QPDF_SOURCE_TREE=$PWD
+export QPDF_BUILD_LIBDIR=$QPDF_SOURCE_TREE/build/libqpdf
+export LD_LIBRARY_PATH=$QPDF_BUILD_LIBDIR
+rm -rf /tmp/z
+mkdir /tmp/z
+cd /tmp/z
+git clone git@github.com:pikepdf/pikepdf
+python3 -m venv v
+source v/bin/activate
+cd pikepdf
+python3 -m pip install --upgrade pip
+python3 -m pip install '.[test]'
+rehash
+python3 -m pip install .
+pytest -n auto
+
+If there are failures, use git bisect to figure out where the failure
+was introduced. For example, set up a work area like this:
+
+rm -rf /tmp/z
+mkdir /tmp/z
+cd /tmp/z
+git clone file://$HOME/source/qpdf/qpdf/.git qpdf
+git clone git@github.com:pikepdf/pikepdf
+export QPDF_SOURCE_TREE=/tmp/z/qpdf
+export QPDF_BUILD_LIBDIR=$QPDF_SOURCE_TREE/build/libqpdf
+export LD_LIBRARY_PATH=$QPDF_BUILD_LIBDIR
+cd qpdf
+mkdir build
+cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
+   -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 \
+   -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cat <<'EOF'
+#!/bin/bash
+cd /tmp/z/pikepdf
+cmake --build /tmp/z/qpdf/build -j16 --target libqpdf -- -k
+git clean -dfx
+rm -rf ../v
+python3 -m venv ../v
+source ../v/bin/activate
+python3 -m pip install --upgrade pip
+python3 -m pip install '.[test]'
+python3 -m pip install .
+pytest -n auto
+EOF
+chmod +x /tmp/check
+
+Then in /tmp/z/qpdf, run git bisect. Use /tmp/check at each stage to
+test whether it's a good or bad commit.
 
 
 OTHER NOTES
