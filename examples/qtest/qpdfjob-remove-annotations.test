@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("qpdfjob-remove-annotations");
+
+require TestDriver;
+
+my $td = new TestDriver('qpdfjob-remove-annotations');
+
+cleanup();
+
+$td->runtest("remove-annotations",
+             {$td->COMMAND => "qpdfjob-remove-annotations --static-id annotations.pdf out.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("compare files",
+             {$td->FILE => "out.pdf"},
+             {$td->FILE => "annotations-out.pdf"});
+
+cleanup();
+
+$td->report(2);
+
+sub cleanup
+{
+    unlink("out.pdf");
+}
