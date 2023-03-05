@@ -517,10 +517,8 @@ class QPDFJob
 
     // Transformations
     void setQPDFOptions(QPDF& pdf);
-    void handlePageSpecs(
-        QPDF& pdf,
-        bool& warnings,
-        std::vector<std::shared_ptr<QPDF>>& page_heap);
+    void
+    handlePageSpecs(QPDF& pdf, std::vector<std::shared_ptr<QPDF>>& page_heap);
     bool shouldRemoveUnreferencedResources(QPDF& pdf);
     void handleRotations(QPDF& pdf);
     void
@@ -549,7 +547,7 @@ class QPDFJob
     void doShowAttachment(QPDF& pdf);
 
     // Output generation
-    void doSplitPages(QPDF& pdf, bool& warnings);
+    void doSplitPages(QPDF& pdf);
     void setWriterOptions(QPDF& pdf, QPDFWriter& w);
     void setEncryptionOptions(QPDF&, QPDFWriter&);
     void maybeFixWritePassword(int R, std::string& password);

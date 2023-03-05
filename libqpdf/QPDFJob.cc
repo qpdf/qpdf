@@ -486,10 +486,9 @@ QPDFJob::run()
         pdf.updateFromJSON(this->m->update_from_json);
     }
 
-    bool other_warnings = false;
     std::vector<std::shared_ptr<QPDF>> page_heap;
     if (!m->page_specs.empty()) {
-        handlePageSpecs(pdf, other_warnings, page_heap);
+        handlePageSpecs(pdf, page_heap);
     }
     if (!m->rotations.empty()) {
         handleRotations(pdf);
@@ -500,7 +499,7 @@ QPDFJob::run()
     if (!createsOutput()) {
         doInspection(pdf);
     } else if (m->split_pages) {
-        doSplitPages(pdf, other_warnings);
+        doSplitPages(pdf);
     } else {
         writeOutfile(pdf);
     }
@@ -2541,7 +2540,7 @@ added_page(QPDF& pdf, QPDFPageObjectHelper page)
 
 void
 QPDFJob::handlePageSpecs(
-    QPDF& pdf, bool& warnings, std::vector<std::shared_ptr<QPDF>>& page_heap)
+    QPDF& pdf, std::vector<std::shared_ptr<QPDF>>& page_heap)
 {
     // Parse all page specifications and translate them into lists of
     // actual pages.
@@ -2786,9 +2785,6 @@ QPDFJob::handlePageSpecs(
                          std::string("Exception: ") + e.what()));
                 }
             }
-        }
-        if (page_data.qpdf->anyWarnings()) {
-            warnings = true;
         }
         if (cis) {
             cis->stayOpen(false);
@@ -3176,7 +3172,7 @@ QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
 }
 
 void
-QPDFJob::doSplitPages(QPDF& pdf, bool& warnings)
+QPDFJob::doSplitPages(QPDF& pdf)
 {
     // Generate output file pattern
     std::string before;
@@ -3272,9 +3268,6 @@ QPDFJob::doSplitPages(QPDF& pdf, bool& warnings)
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << prefix << ": wrote file " << outfile << "\n";
         });
-        if (outpdf.anyWarnings()) {
-            warnings = true;
-        }
     }
 }
 
