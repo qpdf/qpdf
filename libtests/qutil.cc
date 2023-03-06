@@ -576,6 +576,12 @@ read_from_file_test()
     auto buf2 = b2.getBufferSharedPointer();
     assert(buf2->getSize() == size);
     assert(memcmp(buf2->getBuffer(), p, size) == 0);
+
+    auto s = QUtil::read_file_into_string("other-file");
+    std::cout << "read " << s.size() << " bytes" << std::endl;
+    assert(s.size() == 24652);
+    assert(s.substr(0, 36) == "This file is used for qutil testing.");
+    assert(s.substr(24641, 10) == "very long.");
 }
 
 void

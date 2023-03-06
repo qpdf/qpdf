@@ -485,6 +485,11 @@ namespace QUtil
     void read_file_into_memory(
         char const* filename, std::shared_ptr<char>& file_buf, size_t& size);
 
+    QPDF_DLL
+    std::string read_file_into_string(char const* filename);
+    QPDF_DLL
+    std::string read_file_into_string(FILE* f, std::string_view filename = "");
+
     // This used to be called strcasecmp, but that is a macro on some
     // platforms, so we have to give it a name that is not likely to
     // be a macro anywhere.
