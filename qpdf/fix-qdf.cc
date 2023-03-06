@@ -6,6 +6,7 @@
 #include <cstring>
 #include <iostream>
 #include <regex>
+#include <string_view>
 
 static char const* whoami = 0;
 
@@ -20,7 +21,7 @@ class QdfFixer
 {
   public:
     QdfFixer(std::string const& filename);
-    void processLines(std::list<std::string>& lines);
+    void processLines(std::string const& input);
 
   private:
     void fatal(std::string const&);
@@ -58,9 +59,9 @@ class QdfFixer
     size_t xref_f1_nbytes;
     size_t xref_f2_nbytes;
     size_t xref_size;
-    std::vector<std::string> ostream;
+    std::vector<std::string_view> ostream;
     std::vector<qpdf_offset_t> ostream_offsets;
-    std::vector<std::string> ostream_discarded;
+    std::vector<std::string_view> ostream_discarded;
     size_t ostream_idx;
     int ostream_id;
     std::string ostream_extends;
@@ -92,34 +93,60 @@ QdfFixer::fatal(std::string const& msg)
 }
 
 void
-QdfFixer::processLines(std::list<std::string>& lines)
+QdfFixer::processLines(std::string const& input)
 {
-    static std::regex re_n_0_obj("^(\\d+) 0 obj\n$");
-    static std::regex re_xref("^xref\n$");
-    static std::regex re_stream("^stream\n$");
-    static std::regex re_endobj("^endobj\n$");
-    static std::regex re_type_objstm("/Type /ObjStm");
-    static std::regex re_type_xref("/Type /XRef");
-    static std::regex re_extends("/Extends (\\d+ 0 R)");
-    static std::regex re_ostream_obj("^%% Object stream: object (\\d+)");
-    static std::regex re_endstream("^endstream\n$");
-    static std::regex re_length_or_w("/(Length|W) ");
-    static std::regex re_size("/Size ");
-    static std::regex re_ignore_newline("^%QDF: ignore_newline\n$");
-    static std::regex re_num("^\\d+\n$");
-    static std::regex re_trailer("^trailer <<");
-    static std::regex re_size_n("^  /Size \\d+\n$");
-    static std::regex re_dict_end("^>>\n$");
+    static const std::regex re_n_0_obj("^(\\d+) 0 obj\n$");
+    static const std::regex re_xref("^xref\n$");
+    static const std::regex re_stream("^stream\n$");
+    static const std::regex re_endobj("^endobj\n$");
+    static const std::regex re_type_objstm("/Type /ObjStm");
+    static const std::regex re_type_xref("/Type /XRef");
+    static const std::regex re_extends("/Extends (\\d+ 0 R)");
+    static const std::regex re_ostream_obj("^%% Object stream: object (\\d+)");
+    static const std::regex re_endstream("^endstream\n$");
+    static const std::regex re_length_or_w("/(Length|W) ");
+    static const std::regex re_size("/Size ");
+    static const std::regex re_ignore_newline("^%QDF: ignore_newline\n$");
+    static const std::regex re_num("^\\d+\n$");
+    static const std::regex re_trailer("^trailer <<");
+    static const std::regex re_size_n("^  /Size \\d+\n$");
+    static const std::regex re_dict_end("^>>\n$");
+
+    auto sv_diff = [](size_t i) {
+        return static_cast<std::string_view::difference_type>(i);
+    };
 
     lineno = 0;
-    for (auto const& line: lines) {
+    bool more = true;
+    auto len_line = sv_diff(0);
+
+    std::string_view line;
+    std::string_view input_view{input.data(), input.size()};
+    size_t offs = 0;
+
+    auto b_line = input.cbegin();
+    std::smatch m;
+    auto const matches = [&m, &b_line, &len_line](std::regex const& r) {
+        return std::regex_search(b_line, b_line + len_line, m, r);
+    };
+
+    while (more) {
         ++lineno;
         last_offset = offset;
-        offset += QIntC::to_offset(line.length());
-        std::smatch m;
-        auto matches = [&m, &line](std::regex& r) {
-            return std::regex_search(line, m, r);
-        };
+        b_line += len_line;
+
+        offs = input_view.find('\n');
+        if (offs == std::string::npos) {
+            more = false;
+            line = input_view;
+        } else {
+            offs++;
+            line = input_view.substr(0, offs);
+            input_view.remove_prefix(offs);
+        }
+        len_line = sv_diff(line.size());
+        offset += len_line;
+
         if (state == st_top) {
             if (matches(re_n_0_obj)) {
                 checkObjId(m[1].str());
@@ -392,17 +419,17 @@ realmain(int argc, char* argv[])
     } else if (argc == 2) {
         filename = argv[1];
     }
-    std::list<std::string> lines;
+    std::string input;
     if (filename == 0) {
         filename = "standard input";
         QUtil::binary_stdin();
-        lines = QUtil::read_lines_from_file(stdin, true);
+        input = QUtil::read_file_into_string(stdin);
     } else {
-        lines = QUtil::read_lines_from_file(filename, true);
+        input = QUtil::read_file_into_string(filename);
     }
     QUtil::binary_stdout();
     QdfFixer qf(filename);
-    qf.processLines(lines);
+    qf.processLines(input);
     return 0;
 }
 
