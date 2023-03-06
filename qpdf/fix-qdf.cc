@@ -363,14 +363,10 @@ QdfFixer::writeBinary(unsigned long long val, size_t bytes)
         throw std::logic_error(
             "fix-qdf::writeBinary called with too many bytes");
     }
-    std::string data;
-    data.reserve(bytes);
-    for (size_t i = 0; i < bytes; ++i) {
-        data.append(1, '\0');
-    }
-    for (size_t i = 0; i < bytes; ++i) {
-        data.at(bytes - i - 1) = static_cast<char>(QIntC::to_uchar(val & 0xff));
-        val >>= 8;
+    std::string data(bytes, '\0');
+    for (auto i = bytes; i > 0; --i) {
+        data[i - 1] = static_cast<char>(val & 0xff); // i.e. val % 256
+        val >>= 8;                                   // i.e. val = val / 256
     }
     std::cout << data;
 }
