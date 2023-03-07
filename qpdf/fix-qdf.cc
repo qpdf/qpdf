@@ -297,14 +297,12 @@ QdfFixer::processLines(std::list<std::string>& lines)
 void
 QdfFixer::checkObjId(std::string const& cur_obj_str)
 {
-    int cur_obj = QUtil::string_to_int(cur_obj_str.c_str());
-    if (cur_obj != last_obj + 1) {
+    if (std::stoi(cur_obj_str) != ++last_obj) {
         fatal(
             filename + ":" + std::to_string(lineno) + ": expected object " +
-            std::to_string(last_obj + 1));
+            std::to_string(last_obj));
     }
-    last_obj = cur_obj;
-    xref.push_back(QPDFXRefEntry(1, QIntC::to_offset(last_offset), 0));
+    xref.push_back(QPDFXRefEntry(1, last_offset, 0));
 }
 
 void
