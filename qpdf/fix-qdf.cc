@@ -308,8 +308,7 @@ QdfFixer::checkObjId(std::string const& cur_obj_str)
 void
 QdfFixer::adjustOstreamXref()
 {
-    xref.pop_back();
-    xref.push_back(QPDFXRefEntry(2, ostream_id, QIntC::to_int(ostream_idx++)));
+    xref.back() = QPDFXRefEntry(2, ostream_id, QIntC::to_int(ostream_idx++));
 }
 
 void
