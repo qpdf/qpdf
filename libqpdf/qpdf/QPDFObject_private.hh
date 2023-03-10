@@ -69,6 +69,15 @@ class QPDFObject
     {
         return value->og;
     }
+
+    void
+    forEach(
+        QPDFObjectHandle& caller,
+        std::function<void(int index, QPDFObjectHandle&)> fn)
+    {
+        value->forEach(caller, fn);
+    }
+
     void
     setDescription(
         QPDF* qpdf,

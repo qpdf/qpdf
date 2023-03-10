@@ -1109,6 +1109,11 @@ class QPDFObjectHandle
     QPDF_DLL
     QPDFObjectHandle eraseItemAndGetOld(int at);
 
+    QPDF_DLL
+    void forEach(std::function<void(QPDFObjectHandle&)> fn);
+    QPDF_DLL
+    void forEach(std::function<void(int index, QPDFObjectHandle&)> fn);
+
     // Mutator methods for dictionary objects
 
     // Replace value of key, adding it if it does not exist. If value

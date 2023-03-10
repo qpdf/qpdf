@@ -20,6 +20,13 @@ class QPDF_Null: public QPDFValue
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
 
+    void
+    forEach(
+        QPDFObjectHandle& caller,
+        std::function<void(int, QPDFObjectHandle&)> fn) final
+    {
+    }
+
   private:
     QPDF_Null();
 };

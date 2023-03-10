@@ -1000,6 +1000,22 @@ QPDFObjectHandle::eraseItemAndGetOld(int at)
     return result;
 }
 
+void
+QPDFObjectHandle::forEach(std::function<void(int, QPDFObjectHandle&)> fn)
+{
+    if (dereference()) {
+        obj->forEach(*this, fn);
+    }
+}
+
+void
+QPDFObjectHandle::forEach(std::function<void(QPDFObjectHandle&)> fn)
+{
+    if (dereference()) {
+        obj->forEach(*this, [fn](auto i, auto& oh) { fn(oh); });
+    }
+}
+
 // Dictionary accessors
 
 QPDFObjectHandle::QPDFDictItems

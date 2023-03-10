@@ -69,6 +69,21 @@ SparseOHArray::disconnect()
 }
 
 void
+SparseOHArray::forEach(std::function<void(int, QPDFObjectHandle&)> fn)
+{
+    static const auto null = QPDFObjectHandle::newNull();
+    auto end = elements.end();
+    for (size_t i = 0; i < n_elements; ++i) {
+        if (auto const& iter = elements.find(i); iter != end) {
+            fn(static_cast<int>(i), iter->second);
+        } else {
+            auto n = null;
+            fn(static_cast<int>(i), n);
+        }
+    }
+}
+
+void
 SparseOHArray::setAt(size_t idx, QPDFObjectHandle oh)
 {
     if (idx >= this->n_elements) {

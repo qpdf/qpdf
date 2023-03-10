@@ -21,6 +21,10 @@ class QPDF_Array: public QPDFValue
     virtual JSON getJSON(int json_version);
     virtual void disconnect();
 
+    void forEach(
+        QPDFObjectHandle& caller,
+        std::function<void(int, QPDFObjectHandle&)> fn) final;
+
     int getNItems() const;
     QPDFObjectHandle getItem(int n) const;
     void getAsVector(std::vector<QPDFObjectHandle>&) const;

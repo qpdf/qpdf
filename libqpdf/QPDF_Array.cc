@@ -77,6 +77,13 @@ QPDF_Array::getJSON(int json_version)
     return j;
 }
 
+void
+QPDF_Array::forEach(
+    QPDFObjectHandle& caller, std::function<void(int, QPDFObjectHandle&)> fn)
+{
+    elements.forEach(fn);
+}
+
 int
 QPDF_Array::getNItems() const
 {

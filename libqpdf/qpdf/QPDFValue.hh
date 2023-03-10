@@ -113,6 +113,15 @@ class QPDFValue: public std::enable_shared_from_this<QPDFValue>
     {
         return og;
     }
+
+    virtual void
+    forEach(
+        QPDFObjectHandle& caller,
+        std::function<void(int, QPDFObjectHandle&)> fn)
+    {
+        fn(0, caller);
+    }
+
     virtual void
     disconnect()
     {

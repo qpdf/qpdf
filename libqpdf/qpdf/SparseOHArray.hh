@@ -21,6 +21,8 @@ class SparseOHArray
     SparseOHArray copy();
     void disconnect();
 
+    void forEach(std::function<void(int, QPDFObjectHandle&)> fn);
+
     typedef std::unordered_map<size_t, QPDFObjectHandle>::const_iterator
         const_iterator;
     const_iterator begin() const;
