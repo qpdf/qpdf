@@ -428,19 +428,18 @@ QPDF_Stream::filterable(
 
     // See if we can support any decode parameters that are specified.
 
-    QPDFObjectHandle decode_obj = this->stream_dict.getKey("/DecodeParms");
-    std::vector<QPDFObjectHandle> decode_parms;
-    if (decode_obj.isArray() && (decode_obj.getArrayNItems() == 0)) {
+    auto decode_obj = this->stream_dict.getKey("/DecodeParms");
+    bool is_array = decode_obj.isArray();
+    if (is_array && (decode_obj.getArrayNItems() == 0)) {
         decode_obj = QPDFObjectHandle::newNull();
+        is_array = false;
     }
-    if (decode_obj.isArray()) {
-        for (int i = 0; i < decode_obj.getArrayNItems(); ++i) {
-            decode_parms.push_back(decode_obj.getArrayItem(i));
-        }
-    } else {
-        for (unsigned int i = 0; i < filter_names.size(); ++i) {
-            decode_parms.push_back(decode_obj);
-        }
+    auto decode_parms = is_array
+        ? std::vector<QPDFObjectHandle>()
+        : std::vector<QPDFObjectHandle>(filter_names.size(), decode_obj);
+    if (is_array) {
+        decode_obj.forEach(
+            [&decode_parms](auto& item) { decode_parms.push_back(item); });
     }
 
     // Ignore /DecodeParms entirely if /Filters is empty.  At least
