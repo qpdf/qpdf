@@ -321,16 +321,11 @@ QPDF::updateObjectMapsInternal(
     }
 
     if (oh.isArray()) {
-        int n = oh.getArrayNItems();
-        for (int i = 0; i < n; ++i) {
+        oh.forEach([this, &ou, skip_stream_parameters, &visited, depth](
+                       auto& item) {
             updateObjectMapsInternal(
-                ou,
-                oh.getArrayItem(i),
-                skip_stream_parameters,
-                visited,
-                false,
-                1 + depth);
-        }
+                ou, item, skip_stream_parameters, visited, false, 1 + depth);
+        });
     } else if (oh.isDictionary() || oh.isStream()) {
         QPDFObjectHandle dict = oh;
         bool is_stream = oh.isStream();
