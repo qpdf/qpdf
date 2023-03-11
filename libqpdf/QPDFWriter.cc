@@ -1261,9 +1261,7 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
         return;
     } else if (!this->m->linearized) {
         if (object.isArray()) {
-            for (auto& item: object.getArrayAsVector()) {
-                enqueueObject(item);
-            }
+            object.forEach([this](auto& item) { enqueueObject(item); });
         } else if (object.isDictionary()) {
             for (auto& item: object.getDictAsMap()) {
                 if (!item.second.isNull()) {
@@ -1493,13 +1491,13 @@ QPDFWriter::unparseObject(
         // doesn't make the files that much bigger.
         writeString("[");
         writeStringQDF("\n");
-        for (auto const& item: object.getArrayAsVector()) {
+        object.forEach([this, &indent, &level, child_flags](auto& item) {
             writeStringQDF(indent);
             writeStringQDF("  ");
             writeStringNoQDF(" ");
             unparseChild(item, level + 1, child_flags);
             writeStringQDF("\n");
-        }
+        });
         writeStringQDF(indent);
         writeStringNoQDF(" ");
         writeString("]");
@@ -2132,11 +2130,9 @@ QPDFWriter::initializeSpecialStreams()
         QPDFObjectHandle contents = page.getKey("/Contents");
         std::vector<QPDFObjGen> contents_objects;
         if (contents.isArray()) {
-            int n = contents.getArrayNItems();
-            for (int i = 0; i < n; ++i) {
-                contents_objects.push_back(
-                    contents.getArrayItem(i).getObjGen());
-            }
+            contents.forEach([&contents_objects](auto& item) {
+                contents_objects.push_back(item.getObjGen());
+            });
         } else if (contents.isStream()) {
             contents_objects.push_back(contents.getObjGen());
         }
