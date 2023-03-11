@@ -111,10 +111,9 @@ QPDF::getAllPagesInternal(
             "/Type key should be /Pages but is not; overriding");
         cur_node.replaceKey("/Type", "/Pages"_qpdf);
     }
-    auto kids = cur_node.getKey("/Kids");
-    int n = kids.getArrayNItems();
-    for (int i = 0; i < n; ++i) {
-        auto kid = kids.getArrayItem(i);
+
+    cur_node.getKey("/Kids").forEach([this, &visited, &seen, &cur_node](
+                                         int i, auto& kid) {
         if (kid.hasKey("/Kids")) {
             getAllPagesInternal(kid, visited, seen);
         } else {
@@ -124,7 +123,6 @@ QPDF::getAllPagesInternal(
                     "kid " + std::to_string(i) +
                     " (from 0) is direct; converting to indirect");
                 kid = makeIndirectObject(kid);
-                kids.setArrayItem(i, kid);
             } else if (seen.count(kid.getObjGen())) {
                 // Make a copy of the page. This does the same as
                 // shallowCopyPage in QPDFPageObjectHelper.
@@ -134,7 +132,6 @@ QPDF::getAllPagesInternal(
                     " (from 0) appears more than once in the pages tree;"
                     " creating a new page object as a copy");
                 kid = makeIndirectObject(QPDFObjectHandle(kid).shallowCopy());
-                kids.setArrayItem(i, kid);
             }
             if (!kid.isDictionaryOfType("/Page")) {
                 kid.warnIfPossible(
@@ -144,7 +141,7 @@ QPDF::getAllPagesInternal(
             seen.insert(kid.getObjGen());
             m->all_pages.push_back(kid);
         }
-    }
+    });
 }
 
 void
