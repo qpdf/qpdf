@@ -285,7 +285,7 @@ QPDF::updateObjectMaps(
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
     std::set<QPDFObjGen> visited;
-    updateObjectMapsInternal(ou, oh, skip_stream_parameters, visited, true, 0);
+    updateObjectMapsInternal(ou, oh, skip_stream_parameters, visited, true);
 }
 
 void
@@ -294,8 +294,7 @@ QPDF::updateObjectMapsInternal(
     QPDFObjectHandle oh,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters,
     std::set<QPDFObjGen>& visited,
-    bool top,
-    int depth)
+    bool top)
 {
     // Traverse the object tree from this point taking care to avoid
     // crossing page boundaries.
@@ -324,12 +323,7 @@ QPDF::updateObjectMapsInternal(
         int n = oh.getArrayNItems();
         for (int i = 0; i < n; ++i) {
             updateObjectMapsInternal(
-                ou,
-                oh.getArrayItem(i),
-                skip_stream_parameters,
-                visited,
-                false,
-                1 + depth);
+                ou, oh.getArrayItem(i), skip_stream_parameters, visited, false);
         }
     } else if (oh.isDictionary() || oh.isStream()) {
         QPDFObjectHandle dict = oh;
@@ -351,8 +345,7 @@ QPDF::updateObjectMapsInternal(
                     dict.getKey(key),
                     skip_stream_parameters,
                     visited,
-                    false,
-                    1 + depth);
+                    false);
             } else if (is_page_node && (key == "/Parent")) {
                 // Don't traverse back up the page tree
             } else if (
@@ -367,8 +360,7 @@ QPDF::updateObjectMapsInternal(
                     dict.getKey(key),
                     skip_stream_parameters,
                     visited,
-                    false,
-                    1 + depth);
+                    false);
             }
         }
     }

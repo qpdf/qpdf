@@ -1633,8 +1633,7 @@ class QPDF
         QPDFObjectHandle oh,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters,
         std::set<QPDFObjGen>& visited,
-        bool top,
-        int depth);
+        bool top);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
 
     // JSON import
