@@ -52,50 +52,9 @@ QPDFWriter::FunctionProgressReporter::reportProgress(int progress)
 
 QPDFWriter::Members::Members(QPDF& pdf) :
     pdf(pdf),
-    filename("unspecified"),
-    file(nullptr),
-    close_file(false),
-    buffer_pipeline(nullptr),
-    output_buffer(nullptr),
-    normalize_content_set(false),
-    normalize_content(false),
-    compress_streams(true),
-    compress_streams_set(false),
-    stream_decode_level(qpdf_dl_none),
-    stream_decode_level_set(false),
-    recompress_flate(false),
-    qdf_mode(false),
-    preserve_unreferenced_objects(false),
-    newline_before_endstream(false),
-    static_id(false),
-    suppress_original_object_ids(false),
-    direct_stream_lengths(true),
-    encrypted(false),
-    preserve_encryption(true),
-    linearized(false),
-    pclm(false),
-    object_stream_mode(qpdf_o_preserve),
-    encrypt_metadata(true),
-    encrypt_use_aes(false),
-    encryption_V(0),
-    encryption_R(0),
-    final_extension_level(0),
-    min_extension_level(0),
-    forced_extension_level(0),
-    encryption_dict_objid(0),
-    pipeline(nullptr),
-    next_objid(1),
-    cur_stream_length_id(0),
-    cur_stream_length(0),
-    added_newline(false),
-    max_ostream_index(0),
-    next_stack_id(0),
-    deterministic_id(false),
-    md5_pipeline(nullptr),
-    did_write_setup(false),
-    events_expected(0),
-    events_seen(0),
-    next_progress_report(0)
+    root_og(
+        pdf.getRoot().getObjGen().isIndirect() ? pdf.getRoot().getObjGen()
+                                               : QPDFObjGen(-1, 0))
 {
 }
 
@@ -1534,14 +1493,12 @@ QPDFWriter::unparseObject(
         // is direct through the ADBE dictionary, so we can modify in
         // place.
 
-        bool is_root = false;
+        const bool is_root = (old_og == m->root_og);
         bool have_extensions_other = false;
         bool have_extensions_adbe = false;
 
         QPDFObjectHandle extensions;
-        if ((old_og.getObj() != 0) &&
-            (old_og == this->m->pdf.getRoot().getObjGen())) {
-            is_root = true;
+        if (is_root) {
             if (object.hasKey("/Extensions") &&
                 object.getKey("/Extensions").isDictionary()) {
                 extensions = object.getKey("/Extensions");
@@ -2396,10 +2353,9 @@ QPDFWriter::doWriteSetup()
         // 8.0.0 has a bug that prevents it from being able to handle
         // encrypted files with compressed document catalogs, so we
         // disable them in that case as well.
-        QPDFObjGen og = this->m->pdf.getRoot().getObjGen();
-        if (this->m->object_to_object_stream.count(og)) {
+        if (m->object_to_object_stream.count(m->root_og)) {
             QTC::TC("qpdf", "QPDFWriter uncompressing root");
-            this->m->object_to_object_stream.erase(og);
+            this->m->object_to_object_stream.erase(m->root_og);
         }
     }
 
