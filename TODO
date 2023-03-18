@@ -263,6 +263,14 @@ Always:
 
 For qpdf 12, see https://github.com/qpdf/qpdf/discussions/785
 
+C++ Version Changes
+===================
+
+Use
+// C++NN: ...
+to mark places in the code that should be updated when we require at
+least that version of C++.
+
 Page splitting/merging
 ======================
 

@@ -1,3 +1,9 @@
+2023-03-18  Jay Berkenbilt  <ejb@ql.org>
+
+        * Enhance --optimize-images to support images nested inside of
+        form XObjects. Thanks to Connor Osborne (github user cdosborn) for
+        the contribution. Fixes #923.
+
 2023-02-25  Jay Berkenbilt  <ejb@ql.org>
 
         * 11.3.0: release

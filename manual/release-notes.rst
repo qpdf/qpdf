@@ -8,6 +8,12 @@ For a detailed list of changes, please see the file
 
 .. x.y.z: not yet released
 
+11.4.0: not yet released
+  - CLI Enhancements
+
+    - The :qpdf:ref:`--optimize-images` option now optimizes images
+      inside of form XObjects.
+
 11.3.0: February 25, 2023
   - CLI Enhancements
 
