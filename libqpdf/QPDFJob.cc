@@ -2363,31 +2363,30 @@ QPDFJob::handleTransformations(QPDF& pdf)
         int pageno = 0;
         for (auto& ph: dh.getAllPages()) {
             ++pageno;
-            QPDFObjectHandle page = ph.getObjectHandle();
-            for (auto& iter2: ph.getImages()) {
-                std::string name = iter2.first;
-                QPDFObjectHandle& image = iter2.second;
-                ImageOptimizer* io = new ImageOptimizer(
-                    *this,
-                    m->oi_min_width,
-                    m->oi_min_height,
-                    m->oi_min_area,
-                    image);
-                std::shared_ptr<QPDFObjectHandle::StreamDataProvider> sdp(io);
-                if (io->evaluate(
-                        "image " + name + " on page " +
-                        std::to_string(pageno))) {
-                    QPDFObjectHandle new_image = pdf.newStream();
-                    new_image.replaceDict(image.getDict().shallowCopy());
-                    new_image.replaceStreamData(
-                        sdp,
-                        QPDFObjectHandle::newName("/DCTDecode"),
-                        QPDFObjectHandle::newNull());
-                    ph.getAttribute("/Resources", true)
-                        .getKey("/XObject")
-                        .replaceKey(name, new_image);
-                }
-            }
+            ph.forEachImage(
+                true,
+                [this, pageno, &pdf](
+                    QPDFObjectHandle& obj,
+                    QPDFObjectHandle& xobj_dict,
+                    std::string const& key) {
+                    auto io = std::make_unique<ImageOptimizer>(
+                        *this,
+                        m->oi_min_width,
+                        m->oi_min_height,
+                        m->oi_min_area,
+                        obj);
+                    if (io->evaluate(
+                            "image " + key + " on page " +
+                            std::to_string(pageno))) {
+                        QPDFObjectHandle new_image = pdf.newStream();
+                        new_image.replaceDict(obj.getDict().shallowCopy());
+                        new_image.replaceStreamData(
+                            std::move(io),
+                            QPDFObjectHandle::newName("/DCTDecode"),
+                            QPDFObjectHandle::newNull());
+                        xobj_dict.replaceKey(key, new_image);
+                    }
+                });
         }
     }
     if (m->generate_appearances) {
