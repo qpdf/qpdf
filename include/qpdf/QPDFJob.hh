@@ -397,6 +397,21 @@ class QPDFJob
     QPDF_DLL
     void run();
 
+    // The following two methods allow a job to be run in two stages - creation
+    // of a QPDF object and writing of the QPDF object. This allows the QPDF
+    // object to be modified prior to writing it out. See
+    // examples/qpdfjob-remove-annotations for an illustration of its use.
+
+    // Run the first stage of the job. Return a nullptr if the configuration is
+    // not valid.
+    QPDF_DLL
+    std::unique_ptr<QPDF> createQPDF();
+
+    // Run the second stage of the job. Do nothing if a nullptr is passed as
+    // parameter.
+    QPDF_DLL
+    void writeQPDF(QPDF& qpdf);
+
     // CHECK STATUS -- these methods provide information known after
     // run() is called.
 
@@ -474,7 +489,7 @@ class QPDFJob
         std::string to_nr;
         std::string from_nr;
         std::string repeat_nr;
-        std::shared_ptr<QPDF> pdf;
+        std::unique_ptr<QPDF> pdf;
         std::vector<int> to_pagenos;
         std::vector<int> from_pagenos;
         std::vector<int> repeat_pagenos;
@@ -490,25 +505,25 @@ class QPDFJob
 
     // Basic file processing
     void processFile(
-        std::shared_ptr<QPDF>&,
+        std::unique_ptr<QPDF>&,
         char const* filename,
         char const* password,
         bool used_for_input,
         bool main_input);
     void processInputSource(
-        std::shared_ptr<QPDF>&,
+        std::unique_ptr<QPDF>&,
         std::shared_ptr<InputSource> is,
         char const* password,
         bool used_for_input);
     void doProcess(
-        std::shared_ptr<QPDF>&,
+        std::unique_ptr<QPDF>&,
         std::function<void(QPDF*, char const*)> fn,
         char const* password,
         bool empty,
         bool used_for_input,
         bool main_input);
     void doProcessOnce(
-        std::shared_ptr<QPDF>&,
+        std::unique_ptr<QPDF>&,
         std::function<void(QPDF*, char const*)> fn,
         char const* password,
         bool empty,
@@ -518,7 +533,7 @@ class QPDFJob
     // Transformations
     void setQPDFOptions(QPDF& pdf);
     void
-    handlePageSpecs(QPDF& pdf, std::vector<std::shared_ptr<QPDF>>& page_heap);
+    handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_heap);
     bool shouldRemoveUnreferencedResources(QPDF& pdf);
     void handleRotations(QPDF& pdf);
     void

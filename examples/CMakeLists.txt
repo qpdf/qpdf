@@ -15,6 +15,7 @@ set(EXAMPLE_CXX_PROGRAMS
   pdf-set-form-values
   pdf-split-pages
   qpdf-job
+  qpdfjob-remove-annotations
   qpdfjob-save-attachment)
 set(EXAMPLE_C_PROGRAMS
   pdf-c-objects
