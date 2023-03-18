@@ -316,21 +316,18 @@ QdfFixer::processLines(std::string const& input)
 void
 QdfFixer::checkObjId(std::string const& cur_obj_str)
 {
-    int cur_obj = QUtil::string_to_int(cur_obj_str.c_str());
-    if (cur_obj != last_obj + 1) {
+    if (std::stoi(cur_obj_str) != ++last_obj) {
         fatal(
             filename + ":" + std::to_string(lineno) + ": expected object " +
-            std::to_string(last_obj + 1));
+            std::to_string(last_obj));
     }
-    last_obj = cur_obj;
-    xref.push_back(QPDFXRefEntry(1, QIntC::to_offset(last_offset), 0));
+    xref.push_back(QPDFXRefEntry(1, last_offset, 0));
 }
 
 void
 QdfFixer::adjustOstreamXref()
 {
-    xref.pop_back();
-    xref.push_back(QPDFXRefEntry(2, ostream_id, QIntC::to_int(ostream_idx++)));
+    xref.back() = QPDFXRefEntry(2, ostream_id, QIntC::to_int(ostream_idx++));
 }
 
 void
@@ -382,14 +379,10 @@ QdfFixer::writeBinary(unsigned long long val, size_t bytes)
         throw std::logic_error(
             "fix-qdf::writeBinary called with too many bytes");
     }
-    std::string data;
-    data.reserve(bytes);
-    for (size_t i = 0; i < bytes; ++i) {
-        data.append(1, '\0');
-    }
-    for (size_t i = 0; i < bytes; ++i) {
-        data.at(bytes - i - 1) = static_cast<char>(QIntC::to_uchar(val & 0xff));
-        val >>= 8;
+    std::string data(bytes, '\0');
+    for (auto i = bytes; i > 0; --i) {
+        data[i - 1] = static_cast<char>(val & 0xff); // i.e. val % 256
+        val >>= 8;                                   // i.e. val = val / 256
     }
     std::cout << data;
 }
