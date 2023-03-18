@@ -760,11 +760,9 @@ QPDFJob::Config::showObject(std::string const& parameter)
 QPDFJob::Config*
 QPDFJob::Config::jobJsonFile(std::string const& parameter)
 {
-    std::shared_ptr<char> file_buf;
-    size_t size;
-    QUtil::read_file_into_memory(parameter.c_str(), file_buf, size);
     try {
-        o.initializeFromJson(std::string(file_buf.get(), size), true);
+        o.initializeFromJson(
+            QUtil::read_file_into_string(parameter.c_str()), true);
     } catch (std::exception& e) {
         throw std::runtime_error(
             "error with job-json file " + std::string(parameter) + ": " +

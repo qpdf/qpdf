@@ -1243,6 +1243,37 @@ QUtil::read_file_into_memory(
     }
 }
 
+std::string
+QUtil::read_file_into_string(char const* filename)
+{
+    FILE* f = safe_fopen(filename, "rb");
+    FileCloser fc(f);
+    return read_file_into_string(f, filename);
+}
+
+std::string
+QUtil::read_file_into_string(FILE* f, std::string_view filename)
+{
+    fseek(f, 0, SEEK_END);
+    auto size = QIntC::to_size(QUtil::tell(f));
+    fseek(f, 0, SEEK_SET);
+    std::string result(size, '\0');
+    if (auto read = fread(result.data(), 1, size, f); read != size) {
+        if (ferror(f)) {
+            throw std::runtime_error(
+                std::string("failure reading file ") + std::string(filename) +
+                " into memory: read " + uint_to_string(read) + "; wanted " +
+                uint_to_string(size));
+        } else {
+            throw std::runtime_error(
+                std::string("premature eof reading file ") +
+                std::string(filename) + " into memory: read " +
+                uint_to_string(read) + "; wanted " + uint_to_string(size));
+        }
+    }
+    return result;
+}
+
 static bool
 read_char_from_FILE(char& ch, FILE* f)
 {
