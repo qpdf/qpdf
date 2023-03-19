@@ -899,7 +899,7 @@ NNTreeImpl::find(QPDFObjectHandle key, bool return_prev_if_not_found)
             repair();
             return findInternal(key, return_prev_if_not_found);
         } else {
-            throw e;
+            throw;
         }
     }
 }

@@ -469,7 +469,7 @@ QPDFJob::createQPDF()
                 return nullptr;
             }
         }
-        throw e;
+        throw;
     }
     QPDF& pdf = *pdf_sp;
     if (pdf.isEncrypted()) {
@@ -1968,11 +1968,11 @@ QPDFJob::doProcess(
         try {
             doProcessOnce(pdf, fn, *iter, empty, used_for_input, main_input);
             return;
-        } catch (QPDFExc& e) {
+        } catch (QPDFExc&) {
             auto next = iter;
             ++next;
             if (next == passwords.end()) {
-                throw e;
+                throw;
             }
         }
         if (!warned) {
