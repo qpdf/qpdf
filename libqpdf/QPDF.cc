@@ -542,12 +542,21 @@ QPDF::warn(
 }
 
 void
-QPDF::setTrailer(QPDFObjectHandle obj)
+QPDF::setTrailer(QPDFObjectHandle oh)
 {
-    if (this->m->trailer.isInitialized()) {
+    if (m->trailer) {
         return;
     }
-    this->m->trailer = obj;
+    updateTrailer(oh);
+}
+
+void
+QPDF::updateTrailer(QPDFObjectHandle oh)
+{
+    if (oh.isDictionary()) {
+        m->trailer_oh = oh;
+        m->trailer = oh.getObj()->as<QPDF_Dictionary>();
+    }
 }
 
 void
@@ -603,7 +612,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
                 int gen = QUtil::string_to_int(t2.getValue().c_str());
                 insertXrefEntry(obj, 1, token_start, gen, true);
             }
-        } else if (!this->m->trailer.isInitialized() && t1.isWord("trailer")) {
+        } else if (!m->trailer && t1.isWord("trailer")) {
             QPDFObjectHandle t =
                 readObject(this->m->file, "trailer", QPDFObjGen(), false);
             if (!t.isDictionary()) {
@@ -616,7 +625,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
         line_start = next_line_start;
     }
 
-    if (!this->m->trailer.isInitialized()) {
+    if (!m->trailer) {
         // We could check the last encountered object to see if it was
         // an xref stream.  If so, we could try to get the trailer
         // from there.  This may make it possible to recover files
@@ -707,10 +716,10 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
         }
     }
 
-    if (!this->m->trailer.isInitialized()) {
+    if (!m->trailer) {
         throw damagedPDF("", 0, "unable to find trailer while reading xref");
     }
-    int size = this->m->trailer.getKey("/Size").getIntValueAsInt();
+    int size = m->trailer->getKey("/Size").getIntValueAsInt();
     int max_obj = 0;
     if (!this->m->xref_table.empty()) {
         max_obj = (*(this->m->xref_table.rbegin())).first.getObj();
@@ -918,14 +927,14 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
         throw damagedPDF("", "expected trailer dictionary");
     }
 
-    if (!this->m->trailer.isInitialized()) {
+    if (!m->trailer) {
         setTrailer(cur_trailer);
 
-        if (!this->m->trailer.hasKey("/Size")) {
+        if (!m->trailer->hasKey("/Size")) {
             QTC::TC("qpdf", "QPDF trailer lacks size");
             throw damagedPDF("trailer", "trailer dictionary lacks /Size key");
         }
-        if (!this->m->trailer.getKey("/Size").isInteger()) {
+        if (!m->trailer->getKey("/Size").isInteger()) {
             QTC::TC("qpdf", "QPDF trailer size not integer");
             throw damagedPDF(
                 "trailer", "/Size key in trailer dictionary is not an integer");
@@ -1174,7 +1183,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         insertXrefEntry(obj, toI(fields[0]), fields[1], toI(fields[2]));
     }
 
-    if (!this->m->trailer.isInitialized()) {
+    if (!m->trailer) {
         setTrailer(dict);
     }
 
@@ -2452,13 +2461,14 @@ QPDF::getExtensionLevel()
 QPDFObjectHandle
 QPDF::getTrailer()
 {
-    return this->m->trailer;
+    return m->trailer_oh;
 }
 
 QPDFObjectHandle
 QPDF::getRoot()
 {
-    QPDFObjectHandle root = this->m->trailer.getKey("/Root");
+    auto root = m->trailer ? m->trailer->getKey("/Root")
+                           : QPDFObjectHandle().getKey("/Root");
     if (!root.isDictionary()) {
         throw damagedPDF("", 0, "unable to find /Root dictionary");
     } else if (
@@ -2507,12 +2517,12 @@ QPDF::getCompressibleObjGens()
     // orphaned items.
 
     // Exclude encryption dictionary, if any
-    QPDFObjectHandle encryption_dict = this->m->trailer.getKey("/Encrypt");
+    QPDFObjectHandle encryption_dict = m->trailer->getKey("/Encrypt");
     QPDFObjGen encryption_dict_og = encryption_dict.getObjGen();
 
     std::set<QPDFObjGen> visited;
     std::list<QPDFObjectHandle> queue;
-    queue.push_front(this->m->trailer);
+    queue.push_front(m->trailer_oh);
     std::vector<QPDFObjGen> result;
     while (!queue.empty()) {
         QPDFObjectHandle obj = queue.front();

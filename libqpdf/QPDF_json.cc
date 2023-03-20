@@ -606,8 +606,8 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             this->saw_value = true;
             // The trailer must be a dictionary, so we can use nestedState.
             nestedState("trailer.value", value, st_object);
-            this->pdf.m->trailer = makeObject(value);
-            setObjectDescription(this->pdf.m->trailer, value);
+            pdf.updateTrailer(makeObject(value));
+            setObjectDescription(pdf.m->trailer_oh, value);
         } else if (key == "stream") {
             // Don't need to set saw_stream here since there's already
             // an error.

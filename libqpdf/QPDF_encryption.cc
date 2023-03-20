@@ -12,6 +12,7 @@
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_RC4.hh>
 #include <qpdf/Pl_SHA2.hh>
+#include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/RC4.hh>
@@ -784,7 +785,7 @@ QPDF::initializeEncryption()
     // things could go wrong if someone mutates the encryption
     // dictionary.
 
-    if (!this->m->trailer.hasKey("/Encrypt")) {
+    if (!m->trailer->hasKey("/Encrypt")) {
         return;
     }
 
@@ -794,7 +795,7 @@ QPDF::initializeEncryption()
     this->m->encp->encrypted = true;
 
     std::string id1;
-    QPDFObjectHandle id_obj = this->m->trailer.getKey("/ID");
+    QPDFObjectHandle id_obj = m->trailer->getKey("/ID");
     if ((id_obj.isArray() && (id_obj.getArrayNItems() == 2) &&
          id_obj.getArrayItem(0).isString())) {
         id1 = id_obj.getArrayItem(0).getStringValue();
@@ -805,7 +806,7 @@ QPDF::initializeEncryption()
         warn(damagedPDF("trailer", "invalid /ID in trailer dictionary"));
     }
 
-    QPDFObjectHandle encryption_dict = this->m->trailer.getKey("/Encrypt");
+    QPDFObjectHandle encryption_dict = m->trailer->getKey("/Encrypt");
     if (!encryption_dict.isDictionary()) {
         throw damagedPDF("/Encrypt in trailer dictionary is not a dictionary");
     }

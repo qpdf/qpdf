@@ -1126,7 +1126,8 @@ class QPDF
 
     void parse(char const* password);
     void inParse(bool);
-    void setTrailer(QPDFObjectHandle obj);
+    void setTrailer(QPDFObjectHandle oh);
+    void updateTrailer(QPDFObjectHandle oh);
     void read_xref(qpdf_offset_t offset);
     bool resolveXRefTable();
     void reconstruct_xref(QPDFExc& e);
@@ -1718,7 +1719,8 @@ class QPDF
         std::set<int> deleted_objects;
         std::map<QPDFObjGen, ObjCache> obj_cache;
         std::set<QPDFObjGen> resolving;
-        QPDFObjectHandle trailer;
+        QPDFObjectHandle trailer_oh{};
+        QPDF_Dictionary* trailer{nullptr};
         std::vector<QPDFObjectHandle> all_pages;
         std::map<QPDFObjGen, int> pageobj_to_pages_pos;
         bool pushed_inherited_attributes_to_pages{false};
