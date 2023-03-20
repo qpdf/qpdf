@@ -910,8 +910,7 @@ class QPDF
         }
     };
 
-    // The ParseGuard class allows QPDFObjectHandle to detect
-    // re-entrant parsing.
+    // The ParseGuard class allows QPDFParser to detect re-entrant parsing.
     class ParseGuard
     {
         friend class QPDFParser;
@@ -933,7 +932,7 @@ class QPDF
         QPDF* qpdf;
     };
 
-    // Pipe class is restricted to QPDF_Stream
+    // Pipe class is restricted to QPDF_Stream.
     class Pipe
     {
         friend class QPDF_Stream;
@@ -958,6 +957,20 @@ class QPDF
                 pipeline,
                 suppress_warnings,
                 will_retry);
+        }
+    };
+
+    // JobSetter class is restricted to QPDFJob.
+    class JobSetter
+    {
+        friend class QPDFJob;
+
+      private:
+        // Enable enhanced warnings for pdf file checking.
+        static void
+        setCheckMode(QPDF& qpdf, bool val)
+        {
+            qpdf.m->check_mode = val;
         }
     };
 
@@ -1698,6 +1711,7 @@ class QPDF
         bool ignore_xref_streams{false};
         bool suppress_warnings{false};
         bool attempt_recovery{true};
+        bool check_mode{false};
         std::shared_ptr<EncryptionParameters> encp;
         std::string pdf_version;
         std::map<QPDFObjGen, QPDFXRefEntry> xref_table;

@@ -798,6 +798,7 @@ QPDFJob::doCheck(QPDF& pdf)
     bool okay = true;
     auto& cout = *this->m->log->getInfo();
     cout << "checking " << m->infilename.get() << "\n";
+    QPDF::JobSetter::setCheckMode(pdf, true);
     try {
         int extension_level = pdf.getExtensionLevel();
         cout << "PDF Version: " << pdf.getPDFVersion();
