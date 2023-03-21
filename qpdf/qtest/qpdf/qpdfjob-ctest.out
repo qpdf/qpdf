@@ -9,3 +9,8 @@ json warn test passed
 |custom|qpdfjob json|custom|: |custom|an output file name is required; use - for standard output|custom|
 |custom|qpdfjob json|custom|: |custom|an output file name is required; use - for standard output|custom|
 json error test passed
+qpdfjob: d.pdf: write progress: 0%
+....other write progress....
+qpdfjob: d.pdf: write progress: 100%
+qpdfjob: open m.pdf: No such file or directory
+qpdfjob_create_qpdf and qpdfjob_write_qpdf test passed

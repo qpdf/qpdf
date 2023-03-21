@@ -32,6 +32,7 @@
  */
 
 #include <qpdf/DLL.h>
+#include <qpdf/qpdf-c.h>
 #include <qpdf/qpdflogger-c.h>
 #include <string.h>
 #ifndef QPDF_NO_WCHAR_T
@@ -137,6 +138,28 @@ extern "C" {
      */
     QPDF_DLL
     int qpdfjob_run(qpdfjob_handle j);
+
+    /* The following two functions allow a job to be run in two stages -
+     * creation of a qpdf_data object and writing of the qpdf_data object. This
+     * allows the qpdf_data object to be modified prior to writing it out. See
+     * examples/qpdfjob-remove-annotations for a C++ illustration of its use.
+     *
+     * This function wraps QPDFJob::createQPDF. It runs the first stage of the
+     * job. A nullptr is returned if the job did not produce any pdf file to be
+     * written.
+     */
+    QPDF_DLL
+    qpdf_data qpdfjob_create_qpdf(qpdfjob_handle j);
+
+    /* This function wraps QPDFJob::writeQPDF. It returns the error code that
+     * qpdf would return with the equivalent command-line invocation. Exit code
+     * values are defined in Constants.h in the qpdf_exit_code_e type. NOTE it
+     * is the callers responsibility to clean up the resources associated
+     * qpdf_data object by calling qpdf_cleanup after the call to
+     * qpdfjob_write_qpdf.
+     */
+    QPDF_DLL
+    int qpdfjob_write_qpdf(qpdfjob_handle j, qpdf_data qpdf);
 
     /* Allow specification of a custom progress reporter. The progress
      * reporter is only used if progress is otherwise requested (with
