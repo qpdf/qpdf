@@ -27,7 +27,7 @@ struct _qpdf_error
 
 struct _qpdf_data
 {
-    _qpdf_data();
+    _qpdf_data() = default;
     ~_qpdf_data() = default;
 
     std::shared_ptr<QPDF> qpdf;
@@ -39,30 +39,22 @@ struct _qpdf_data
     std::string tmp_string;
 
     // Parameters for functions we call
-    char const* filename; // or description
-    char const* buffer;
-    unsigned long long size;
-    char const* password;
-    bool write_memory;
+    char const* filename{nullptr}; // or description
+    char const* buffer{nullptr};
+    unsigned long long size{0};
+    char const* password{nullptr};
+    bool write_memory{false};
     std::shared_ptr<Buffer> output_buffer;
 
     // QPDFObjectHandle support
-    bool silence_errors;
-    bool oh_error_occurred;
+    bool silence_errors{false};
+    bool oh_error_occurred{false};
     std::map<qpdf_oh, std::shared_ptr<QPDFObjectHandle>> oh_cache;
-    qpdf_oh next_oh;
+    qpdf_oh next_oh{0};
     std::set<std::string> cur_iter_dict_keys;
     std::set<std::string>::const_iterator dict_iter;
     std::string cur_dict_key;
 };
-
-_qpdf_data::_qpdf_data() :
-    write_memory(false),
-    silence_errors(false),
-    oh_error_occurred(false),
-    next_oh(0)
-{
-}
 
 // must set qpdf->filename and qpdf->password
 static void
