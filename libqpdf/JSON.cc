@@ -1121,12 +1121,8 @@ JSONParser::getToken()
 
             case ls_u4:
                 using ui = unsigned int;
-                if ('0' <= *p && *p <= '9') {
-                    u_value = 16 * u_value + (ui(*p) - ui('0'));
-                } else if ('a' <= *p && *p <= 'f') {
-                    u_value = 16 * u_value + (10 + ui(*p) - ui('a'));
-                } else if ('A' <= *p && *p <= 'F') {
-                    u_value = 16 * u_value + (10 + ui(*p) - ui('A'));
+                if (ui val = ui(QUtil::hex_decode_char(*p)); val < 16) {
+                    u_value = 16 * u_value + val;
                 } else {
                     tokenError();
                 }

@@ -449,18 +449,9 @@ QPDFTokenizer::inNameHex1(char ch)
 {
     this->hex_char = ch;
 
-    if ('0' <= ch && ch <= '9') {
-        this->char_code = 16 * (int(ch) - int('0'));
+    if (char hval = QUtil::hex_decode_char(ch); hval < '\20') {
+        this->char_code = int(hval) << 4;
         this->state = st_name_hex2;
-
-    } else if ('A' <= ch && ch <= 'F') {
-        this->char_code = 16 * (10 + int(ch) - int('A'));
-        this->state = st_name_hex2;
-
-    } else if ('a' <= ch && ch <= 'f') {
-        this->char_code = 16 * (10 + int(ch) - int('a'));
-        this->state = st_name_hex2;
-
     } else {
         QTC::TC("qpdf", "QPDFTokenizer bad name 1");
         this->error_message = "name with stray # will not work with PDF >= 1.2";
@@ -475,15 +466,8 @@ QPDFTokenizer::inNameHex1(char ch)
 void
 QPDFTokenizer::inNameHex2(char ch)
 {
-    if ('0' <= ch && ch <= '9') {
-        this->char_code += int(ch) - int('0');
-
-    } else if ('A' <= ch && ch <= 'F') {
-        this->char_code += 10 + int(ch) - int('A');
-
-    } else if ('a' <= ch && ch <= 'f') {
-        this->char_code += 10 + int(ch) - int('a');
-
+    if (char hval = QUtil::hex_decode_char(ch); hval < '\20') {
+        this->char_code |= int(hval);
     } else {
         QTC::TC("qpdf", "QPDFTokenizer bad name 2");
         this->error_message = "name with stray # will not work with PDF >= 1.2";
@@ -675,16 +659,8 @@ QPDFTokenizer::inLiteral(char ch)
 void
 QPDFTokenizer::inHexstring(char ch)
 {
-    if ('0' <= ch && ch <= '9') {
-        this->char_code = 16 * (int(ch) - int('0'));
-        this->state = st_in_hexstring_2nd;
-
-    } else if ('A' <= ch && ch <= 'F') {
-        this->char_code = 16 * (10 + int(ch) - int('A'));
-        this->state = st_in_hexstring_2nd;
-
-    } else if ('a' <= ch && ch <= 'f') {
-        this->char_code = 16 * (10 + int(ch) - int('a'));
+    if (char hval = QUtil::hex_decode_char(ch); hval < '\20') {
+        this->char_code = int(hval) << 4;
         this->state = st_in_hexstring_2nd;
 
     } else if (ch == '>') {
@@ -706,16 +682,8 @@ QPDFTokenizer::inHexstring(char ch)
 void
 QPDFTokenizer::inHexstring2nd(char ch)
 {
-    if ('0' <= ch && ch <= '9') {
-        this->val += char(this->char_code + int(ch) - int('0'));
-        this->state = st_in_hexstring;
-
-    } else if ('A' <= ch && ch <= 'F') {
-        this->val += char(this->char_code + 10 + int(ch) - int('A'));
-        this->state = st_in_hexstring;
-
-    } else if ('a' <= ch && ch <= 'f') {
-        this->val += char(this->char_code + 10 + int(ch) - int('a'));
+    if (char hval = QUtil::hex_decode_char(ch); hval < '\20') {
+        this->val += char(this->char_code) | hval;
         this->state = st_in_hexstring;
 
     } else if (ch == '>') {
