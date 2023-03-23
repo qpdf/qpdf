@@ -783,27 +783,24 @@ std::string
 QUtil::hex_decode(std::string const& input)
 {
     std::string result;
-    size_t pos = 0;
+    // We know result.size() <= 0.5 * input.size() + 1. However, reserving
+    // string space for this upper bound has a negative impact.
+    bool first = true;
+    char decoded;
     for (auto ch: input) {
-        bool skip = false;
-        if ((ch >= 'A') && (ch <= 'F')) {
-            ch = QIntC::to_char(ch - 'A' + 10);
-        } else if ((ch >= 'a') && (ch <= 'f')) {
-            ch = QIntC::to_char(ch - 'a' + 10);
-        } else if ((ch >= '0') && (ch <= '9')) {
-            ch = QIntC::to_char(ch - '0');
-        } else {
-            skip = true;
-        }
-        if (!skip) {
-            if (pos == 0) {
-                result.push_back(static_cast<char>(ch << 4));
-                pos = 1;
+        ch = hex_decode_char(ch);
+        if (ch < '\20') {
+            if (first) {
+                decoded = static_cast<char>(ch << 4);
+                first = false;
             } else {
-                result[result.length() - 1] |= ch;
-                pos = 0;
+                result.push_back(decoded | ch);
+                first = true;
             }
         }
+    }
+    if (!first) {
+        result.push_back(decoded);
     }
     return result;
 }
