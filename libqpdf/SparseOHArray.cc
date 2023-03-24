@@ -2,12 +2,6 @@
 
 #include <stdexcept>
 
-int
-SparseOHArray::size() const
-{
-    return this->n_elements;
-}
-
 void
 SparseOHArray::append(QPDFObjectHandle oh)
 {

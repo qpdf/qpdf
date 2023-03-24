@@ -789,9 +789,8 @@ QPDFObjectHandle::aitems()
 int
 QPDFObjectHandle::getArrayNItems()
 {
-    auto array = asArray();
-    if (array) {
-        return array->getNItems();
+    if (auto array = asArray()) {
+        return array->size();
     } else {
         typeWarning("array", "treating as empty");
         QTC::TC("qpdf", "QPDFObjectHandle array treating as empty");
@@ -803,7 +802,7 @@ QPDFObjectHandle
 QPDFObjectHandle::getArrayItem(int n)
 {
     auto array = asArray();
-    if (array && (n < array->getNItems()) && (n >= 0)) {
+    if (array && n < array->size() && n >= 0) {
         return array->getItem(n);
     } else {
         if (array) {
@@ -823,7 +822,7 @@ bool
 QPDFObjectHandle::isRectangle()
 {
     auto array = asArray();
-    if ((array == nullptr) || (array->getNItems() != 4)) {
+    if (array == nullptr || array->size() != 4) {
         return false;
     }
     for (int i = 0; i < 4; ++i) {
@@ -838,7 +837,7 @@ bool
 QPDFObjectHandle::isMatrix()
 {
     auto array = asArray();
-    if ((array == nullptr) || (array->getNItems() != 6)) {
+    if (array == nullptr || array->size() != 6) {
         return false;
     }
     for (int i = 0; i < 6; ++i) {
@@ -975,7 +974,7 @@ void
 QPDFObjectHandle::eraseItem(int at)
 {
     auto array = asArray();
-    if (array && (at < array->getNItems()) && (at >= 0)) {
+    if (array && at < array->size() && at >= 0) {
         array->eraseItem(at);
     } else {
         if (array) {
@@ -991,11 +990,9 @@ QPDFObjectHandle::eraseItem(int at)
 QPDFObjectHandle
 QPDFObjectHandle::eraseItemAndGetOld(int at)
 {
-    auto result = QPDFObjectHandle::newNull();
     auto array = asArray();
-    if (array && (at < array->getNItems()) && (at >= 0)) {
-        result = array->getItem(at);
-    }
+    auto result = (array && at < array->size() && at >= 0) ? array->getItem(at)
+                                                           : newNull();
     eraseItem(at);
     return result;
 }
@@ -1515,9 +1512,8 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
 {
     all_description = description;
     std::vector<QPDFObjectHandle> result;
-    auto array = asArray();
-    if (array) {
-        int n_items = array->getNItems();
+    if (auto array = asArray()) {
+        int n_items = array->size();
         for (int i = 0; i < n_items; ++i) {
             QPDFObjectHandle item = array->getItem(i);
             if (item.isStream()) {
@@ -2217,7 +2213,7 @@ QPDFObjectHandle::makeDirect(
     } else if (isArray()) {
         std::vector<QPDFObjectHandle> items;
         auto array = asArray();
-        int n = array->getNItems();
+        int n = array->size();
         for (int i = 0; i < n; ++i) {
             items.push_back(array->getItem(i));
             items.back().makeDirect(visited, stop_at_streams);

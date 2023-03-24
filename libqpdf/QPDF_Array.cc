@@ -142,18 +142,6 @@ QPDF_Array::getJSON(int json_version)
     }
 }
 
-int
-QPDF_Array::getNItems() const
-{
-    if (sparse) {
-        // This should really return a size_t, but changing it would break
-        // a lot of code.
-        return QIntC::to_int(sp_elements.size());
-    } else {
-        return QIntC::to_int(elements.size());
-    }
-}
-
 QPDFObjectHandle
 QPDF_Array::getItem(int n) const
 {

@@ -11,7 +11,11 @@ class SparseOHArray
 {
   public:
     SparseOHArray() = default;
-    int size() const;
+    int
+    size() const
+    {
+        return n_elements;
+    }
     void append(QPDFObjectHandle oh);
     void append(std::shared_ptr<QPDFObject>&& obj);
     QPDFObjectHandle at(int idx) const;

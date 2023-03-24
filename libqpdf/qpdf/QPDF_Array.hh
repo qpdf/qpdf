@@ -22,7 +22,11 @@ class QPDF_Array: public QPDFValue
     virtual JSON getJSON(int json_version);
     virtual void disconnect();
 
-    int getNItems() const;
+    int
+    size() const noexcept
+    {
+        return sparse ? sp_elements.size() : int(elements.size());
+    }
     QPDFObjectHandle getItem(int n) const;
     void getAsVector(std::vector<QPDFObjectHandle>&) const;
 
