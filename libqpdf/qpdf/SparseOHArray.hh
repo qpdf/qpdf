@@ -12,7 +12,7 @@ class SparseOHArray
   public:
     SparseOHArray() = default;
     int
-    size() const
+    size() const noexcept
     {
         return n_elements;
     }

@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 
+static const QPDFObjectHandle null_oh = QPDFObjectHandle::newNull();
+
 void
 SparseOHArray::append(QPDFObjectHandle oh)
 {
@@ -23,16 +25,8 @@ SparseOHArray::append(std::shared_ptr<QPDFObject>&& obj)
 QPDFObjectHandle
 SparseOHArray::at(int idx) const
 {
-    if (idx < 0 || idx >= this->n_elements) {
-        throw std::logic_error(
-            "INTERNAL ERROR: bounds error accessing SparseOHArray element");
-    }
-    auto const& iter = this->elements.find(idx);
-    if (iter == this->elements.end()) {
-        return QPDFObjectHandle::newNull();
-    } else {
-        return (*iter).second;
-    }
+    auto const& iter = elements.find(idx);
+    return iter == elements.end() ? null_oh : (*iter).second;
 }
 
 void

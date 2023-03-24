@@ -801,90 +801,88 @@ QPDFObjectHandle::getArrayNItems()
 QPDFObjectHandle
 QPDFObjectHandle::getArrayItem(int n)
 {
-    auto array = asArray();
-    if (array && n < array->size() && n >= 0) {
-        return array->getItem(n);
-    } else {
-        if (array) {
+    if (auto array = asArray()) {
+        if (auto result = array->at(n); result.obj != nullptr) {
+            return result;
+        } else {
             objectWarning("returning null for out of bounds array access");
             QTC::TC("qpdf", "QPDFObjectHandle array bounds");
-        } else {
-            typeWarning("array", "returning null");
-            QTC::TC("qpdf", "QPDFObjectHandle array null for non-array");
         }
-        static auto constexpr msg =
-            " -> null returned from invalid array access"sv;
-        return QPDF_Null::create(obj, msg, "");
+    } else {
+        typeWarning("array", "returning null");
+        QTC::TC("qpdf", "QPDFObjectHandle array null for non-array");
     }
+    static auto constexpr msg = " -> null returned from invalid array access"sv;
+    return QPDF_Null::create(obj, msg, "");
 }
 
 bool
 QPDFObjectHandle::isRectangle()
 {
-    auto array = asArray();
-    if (array == nullptr || array->size() != 4) {
-        return false;
-    }
-    for (int i = 0; i < 4; ++i) {
-        if (!array->getItem(i).isNumber()) {
-            return false;
+    if (auto array = asArray()) {
+        for (int i = 0; i < 4; ++i) {
+            if (auto item = array->at(i); !(item.obj && item.isNumber())) {
+                return false;
+            }
         }
+        return array->size() == 4;
     }
-    return true;
+    return false;
 }
 
 bool
 QPDFObjectHandle::isMatrix()
 {
-    auto array = asArray();
-    if (array == nullptr || array->size() != 6) {
-        return false;
-    }
-    for (int i = 0; i < 6; ++i) {
-        if (!array->getItem(i).isNumber()) {
-            return false;
+    if (auto array = asArray()) {
+        for (int i = 0; i < 6; ++i) {
+            if (auto item = array->at(i); !(item.obj && item.isNumber())) {
+                return false;
+            }
         }
+        return array->size() == 6;
     }
-    return true;
+    return false;
 }
 
 QPDFObjectHandle::Rectangle
 QPDFObjectHandle::getArrayAsRectangle()
 {
-    Rectangle result;
-    if (isRectangle()) {
-        auto array = asArray();
-        // Rectangle coordinates are always supposed to be llx, lly,
-        // urx, ury, but files have been found in the wild where
-        // llx > urx or lly > ury.
-        double i0 = array->getItem(0).getNumericValue();
-        double i1 = array->getItem(1).getNumericValue();
-        double i2 = array->getItem(2).getNumericValue();
-        double i3 = array->getItem(3).getNumericValue();
-        result = Rectangle(
-            std::min(i0, i2),
-            std::min(i1, i3),
-            std::max(i0, i2),
-            std::max(i1, i3));
+    if (auto array = asArray()) {
+        if (array->size() != 4) {
+            return {};
+        }
+        double items[4];
+        for (int i = 0; i < 4; ++i) {
+            if (!array->at(i).getValueAsNumber(items[i])) {
+                return {};
+            }
+        }
+        return Rectangle(
+            std::min(items[0], items[2]),
+            std::min(items[1], items[3]),
+            std::max(items[0], items[2]),
+            std::max(items[1], items[3]));
     }
-    return result;
+    return {};
 }
 
 QPDFObjectHandle::Matrix
 QPDFObjectHandle::getArrayAsMatrix()
 {
-    Matrix result;
-    if (isMatrix()) {
-        auto array = asArray();
-        result = Matrix(
-            array->getItem(0).getNumericValue(),
-            array->getItem(1).getNumericValue(),
-            array->getItem(2).getNumericValue(),
-            array->getItem(3).getNumericValue(),
-            array->getItem(4).getNumericValue(),
-            array->getItem(5).getNumericValue());
+    if (auto array = asArray()) {
+        if (array->size() != 6) {
+            return {};
+        }
+        double items[6];
+        for (int i = 0; i < 6; ++i) {
+            if (!array->at(i).getValueAsNumber(items[i])) {
+                return {};
+            }
+        }
+        return Matrix(
+            items[0], items[1], items[2], items[3], items[4], items[5]);
     }
-    return result;
+    return {};
 }
 
 std::vector<QPDFObjectHandle>
@@ -991,8 +989,8 @@ QPDFObjectHandle
 QPDFObjectHandle::eraseItemAndGetOld(int at)
 {
     auto array = asArray();
-    auto result = (array && at < array->size() && at >= 0) ? array->getItem(at)
-                                                           : newNull();
+    auto result =
+        (array && at < array->size() && at >= 0) ? array->at(at) : newNull();
     eraseItem(at);
     return result;
 }
@@ -1515,7 +1513,7 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
     if (auto array = asArray()) {
         int n_items = array->size();
         for (int i = 0; i < n_items; ++i) {
-            QPDFObjectHandle item = array->getItem(i);
+            QPDFObjectHandle item = array->at(i);
             if (item.isStream()) {
                 result.push_back(item);
             } else {
@@ -2215,7 +2213,7 @@ QPDFObjectHandle::makeDirect(
         auto array = asArray();
         int n = array->size();
         for (int i = 0; i < n; ++i) {
-            items.push_back(array->getItem(i));
+            items.push_back(array->at(i));
             items.back().makeDirect(visited, stop_at_streams);
         }
         this->obj = QPDF_Array::create(items);

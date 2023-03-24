@@ -105,7 +105,7 @@ QPDF_Array::unparse()
         std::string result = "[ ";
         int size = sp_elements.size();
         for (int i = 0; i < size; ++i) {
-            result += sp_elements.at(i).unparse();
+            result += at(i).unparse();
             result += " ";
         }
         result += "]";
@@ -114,7 +114,7 @@ QPDF_Array::unparse()
         std::string result = "[ ";
         auto size = elements.size();
         for (int i = 0; i < int(size); ++i) {
-            result += getItem(i).unparse();
+            result += at(i).unparse();
             result += " ";
         }
         result += "]";
@@ -129,35 +129,29 @@ QPDF_Array::getJSON(int json_version)
         JSON j = JSON::makeArray();
         int size = sp_elements.size();
         for (int i = 0; i < size; ++i) {
-            j.addArrayElement(sp_elements.at(i).getJSON(json_version));
+            j.addArrayElement(at(i).getJSON(json_version));
         }
         return j;
     } else {
         JSON j = JSON::makeArray();
         size_t size = elements.size();
         for (int i = 0; i < int(size); ++i) {
-            j.addArrayElement(getItem(i).getJSON(json_version));
+            j.addArrayElement(at(i).getJSON(json_version));
         }
         return j;
     }
 }
 
 QPDFObjectHandle
-QPDF_Array::getItem(int n) const
+QPDF_Array::at(int n) const noexcept
 {
-    if (sparse) {
-        if ((n < 0) || (n >= QIntC::to_int(sp_elements.size()))) {
-            throw std::logic_error(
-                "INTERNAL ERROR: bounds error accessing QPDF_Array element");
-        }
-        return sp_elements.at(n);
+    if (n < 0 || n >= size()) {
+        return {};
+    } else if (sparse) {
+        auto const& iter = sp_elements.elements.find(n);
+        return iter == sp_elements.elements.end() ? null_oh : (*iter).second;
     } else {
-        if ((n < 0) || (n >= QIntC::to_int(elements.size()))) {
-            throw std::logic_error(
-                "INTERNAL ERROR: bounds error accessing QPDF_Array element");
-        }
-        auto const& obj = elements.at(size_t(n));
-        return obj ? obj : null_oh;
+        return elements[size_t(n)];
     }
 }
 
@@ -167,7 +161,7 @@ QPDF_Array::getAsVector(std::vector<QPDFObjectHandle>& v) const
     if (sparse) {
         int size = sp_elements.size();
         for (int i = 0; i < size; ++i) {
-            v.push_back(sp_elements.at(i));
+            v.push_back(at(i));
         }
     } else {
         v = std::vector<QPDFObjectHandle>(elements.cbegin(), elements.cend());

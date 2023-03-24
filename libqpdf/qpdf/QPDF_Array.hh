@@ -27,7 +27,7 @@ class QPDF_Array: public QPDFValue
     {
         return sparse ? sp_elements.size() : int(elements.size());
     }
-    QPDFObjectHandle getItem(int n) const;
+    QPDFObjectHandle at(int n) const noexcept;
     void getAsVector(std::vector<QPDFObjectHandle>&) const;
 
     void setItem(int, QPDFObjectHandle const&);
