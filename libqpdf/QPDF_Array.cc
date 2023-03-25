@@ -205,11 +205,7 @@ QPDF_Array::setFromVector(std::vector<std::shared_ptr<QPDFObject>>&& v)
     } else {
         elements = OHArray();
         for (auto&& item: v) {
-            if (item) {
-                elements.append(item);
-            } else {
-                ++elements.n_elements;
-            }
+            elements.append(std::move(item));
         }
     }
 }
