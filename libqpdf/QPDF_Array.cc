@@ -5,6 +5,8 @@
 #include <qpdf/QUtil.hh>
 #include <stdexcept>
 
+static const QPDFObjectHandle null_oh = QPDFObjectHandle::newNull();
+
 QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v) :
     QPDFValue(::ot_array, "array")
 {
@@ -93,9 +95,9 @@ QPDF_Array::unparse()
         return result;
     } else {
         std::string result = "[ ";
-        size_t size = elements.elements.size();
-        for (size_t i = 0; i < size; ++i) {
-            result += elements.at(i).unparse();
+        auto size = elements.elements.size();
+        for (int i = 0; i < int(size); ++i) {
+            result += getItem(i).unparse();
             result += " ";
         }
         result += "]";
@@ -116,8 +118,8 @@ QPDF_Array::getJSON(int json_version)
     } else {
         JSON j = JSON::makeArray();
         size_t size = elements.elements.size();
-        for (size_t i = 0; i < size; ++i) {
-            j.addArrayElement(elements.at(i).getJSON(json_version));
+        for (int i = 0; i < int(size); ++i) {
+            j.addArrayElement(getItem(i).getJSON(json_version));
         }
         return j;
     }
@@ -149,7 +151,8 @@ QPDF_Array::getItem(int n) const
             throw std::logic_error(
                 "INTERNAL ERROR: bounds error accessing QPDF_Array element");
         }
-        return elements.at(QIntC::to_size(n));
+        auto const& obj = elements.elements.at(size_t(n));
+        return obj ? obj : null_oh;
     }
 }
 
@@ -162,10 +165,8 @@ QPDF_Array::getAsVector(std::vector<QPDFObjectHandle>& v) const
             v.push_back(sp_elements.at(i));
         }
     } else {
-        size_t size = elements.elements.size();
-        for (size_t i = 0; i < size; ++i) {
-            v.push_back(elements.at(i));
-        }
+        v = std::vector<QPDFObjectHandle>(
+            elements.elements.cbegin(), elements.elements.cend());
     }
 }
 

@@ -12,7 +12,6 @@ class OHArray
 {
   public:
     OHArray();
-    QPDFObjectHandle at(size_t idx) const;
     void setAt(size_t idx, QPDFObjectHandle oh);
     void erase(size_t idx);
     void insert(size_t idx, QPDFObjectHandle oh);

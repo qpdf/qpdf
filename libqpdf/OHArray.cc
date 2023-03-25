@@ -11,17 +11,6 @@ OHArray::OHArray()
 {
 }
 
-QPDFObjectHandle
-OHArray::at(size_t idx) const
-{
-    if (idx >= elements.size()) {
-        throw std::logic_error(
-            "INTERNAL ERROR: bounds error accessing OHArray element");
-    }
-    auto const& obj = elements.at(idx);
-    return obj ? obj : null_oh;
-}
-
 void
 OHArray::disconnect()
 {
