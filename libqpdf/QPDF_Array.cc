@@ -77,7 +77,11 @@ QPDF_Array::disconnect()
     if (sparse) {
         sp_elements.disconnect();
     } else {
-        elements.disconnect();
+        for (auto const& iter: elements.elements) {
+            if (iter) {
+                QPDFObjectHandle::DisconnectAccess::disconnect(iter);
+            }
+        }
     }
 }
 
@@ -176,7 +180,11 @@ QPDF_Array::setItem(int n, QPDFObjectHandle const& oh)
     if (sparse) {
         sp_elements.setAt(QIntC::to_size(n), oh);
     } else {
-        elements.setAt(QIntC::to_size(n), oh);
+        size_t idx = size_t(n);
+        if (n < 0 || idx >= elements.elements.size()) {
+            throw std::logic_error("bounds error setting item in QPDF_Array");
+        }
+        elements.elements[idx] = oh.getObj();
     }
 }
 

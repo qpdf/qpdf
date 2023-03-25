@@ -12,26 +12,6 @@ OHArray::OHArray()
 }
 
 void
-OHArray::disconnect()
-{
-    for (auto const& iter: elements) {
-        if (iter) {
-            QPDFObjectHandle oh = iter;
-            QPDFObjectHandle::DisconnectAccess::disconnect(oh);
-        }
-    }
-}
-
-void
-OHArray::setAt(size_t idx, QPDFObjectHandle oh)
-{
-    if (idx >= elements.size()) {
-        throw std::logic_error("bounds error setting item in OHArray");
-    }
-    elements[idx] = oh.getObj();
-}
-
-void
 OHArray::erase(size_t idx)
 {
     if (idx >= elements.size()) {
