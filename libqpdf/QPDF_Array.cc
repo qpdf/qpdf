@@ -93,7 +93,7 @@ QPDF_Array::unparse()
         return result;
     } else {
         std::string result = "[ ";
-        size_t size = elements.size();
+        size_t size = elements.elements.size();
         for (size_t i = 0; i < size; ++i) {
             result += elements.at(i).unparse();
             result += " ";
@@ -115,7 +115,7 @@ QPDF_Array::getJSON(int json_version)
         return j;
     } else {
         JSON j = JSON::makeArray();
-        size_t size = elements.size();
+        size_t size = elements.elements.size();
         for (size_t i = 0; i < size; ++i) {
             j.addArrayElement(elements.at(i).getJSON(json_version));
         }
@@ -131,7 +131,7 @@ QPDF_Array::getNItems() const
         // a lot of code.
         return QIntC::to_int(sp_elements.size());
     } else {
-        return QIntC::to_int(elements.size());
+        return QIntC::to_int(elements.elements.size());
     }
 }
 
@@ -145,7 +145,7 @@ QPDF_Array::getItem(int n) const
         }
         return sp_elements.at(QIntC::to_size(n));
     } else {
-        if ((n < 0) || (n >= QIntC::to_int(elements.size()))) {
+        if ((n < 0) || (n >= QIntC::to_int(elements.elements.size()))) {
             throw std::logic_error(
                 "INTERNAL ERROR: bounds error accessing QPDF_Array element");
         }
@@ -162,7 +162,7 @@ QPDF_Array::getAsVector(std::vector<QPDFObjectHandle>& v) const
             v.push_back(sp_elements.at(i));
         }
     } else {
-        size_t size = elements.size();
+        size_t size = elements.elements.size();
         for (size_t i = 0; i < size; ++i) {
             v.push_back(elements.at(i));
         }
@@ -190,7 +190,7 @@ QPDF_Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
     } else {
         elements = OHArray();
         for (auto const& iter: v) {
-            elements.append(iter);
+            elements.elements.push_back(iter.getObj());
         }
     }
 }
@@ -211,7 +211,7 @@ QPDF_Array::setFromVector(std::vector<std::shared_ptr<QPDFObject>>&& v)
     } else {
         elements = OHArray();
         for (auto&& item: v) {
-            elements.append(std::move(item));
+            elements.elements.push_back(std::move(item));
         }
     }
 }
@@ -228,7 +228,7 @@ QPDF_Array::insertItem(int at, QPDFObjectHandle const& item)
         sp_elements.insert(QIntC::to_size(at), item);
     } else {
         // As special case, also allow insert beyond the end
-        if ((at < 0) || (at > QIntC::to_int(elements.size()))) {
+        if ((at < 0) || (at > QIntC::to_int(elements.elements.size()))) {
             throw std::logic_error(
                 "INTERNAL ERROR: bounds error accessing QPDF_Array element");
         }
@@ -242,7 +242,7 @@ QPDF_Array::appendItem(QPDFObjectHandle const& item)
     if (sparse) {
         sp_elements.append(item);
     } else {
-        elements.append(item);
+        elements.elements.push_back(item.getObj());
     }
 }
 

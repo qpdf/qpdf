@@ -11,24 +11,6 @@ OHArray::OHArray()
 {
 }
 
-size_t
-OHArray::size() const
-{
-    return elements.size();
-}
-
-void
-OHArray::append(QPDFObjectHandle oh)
-{
-    elements.push_back(oh.getObj());
-}
-
-void
-OHArray::append(std::shared_ptr<QPDFObject>&& obj)
-{
-    elements.push_back(std::move(obj));
-}
-
 QPDFObjectHandle
 OHArray::at(size_t idx) const
 {
@@ -77,7 +59,7 @@ OHArray::insert(size_t idx, QPDFObjectHandle oh)
         throw std::logic_error("bounds error inserting item to OHArray");
     } else if (idx == elements.size()) {
         // Allow inserting to the last position
-        append(oh.getObj());
+        elements.push_back(oh.getObj());
     } else {
         int n = int(idx);
         elements.insert(elements.cbegin() + n, oh.getObj());

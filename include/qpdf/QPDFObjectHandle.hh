@@ -1578,6 +1578,11 @@ class QPDFObjectHandle
     {
         return obj;
     }
+    std::shared_ptr<QPDFObject>
+    getObj() const
+    {
+        return obj;
+    }
     QPDFObject*
     getObjectPtr()
     {

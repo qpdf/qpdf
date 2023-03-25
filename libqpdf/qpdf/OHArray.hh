@@ -12,9 +12,6 @@ class OHArray
 {
   public:
     OHArray();
-    size_t size() const;
-    void append(QPDFObjectHandle oh);
-    void append(std::shared_ptr<QPDFObject>&& obj);
     QPDFObjectHandle at(size_t idx) const;
     void setAt(size_t idx, QPDFObjectHandle oh);
     void erase(size_t idx);
