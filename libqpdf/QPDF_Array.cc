@@ -154,11 +154,3 @@ QPDF_Array::eraseItem(int at)
 {
     this->elements.erase(QIntC::to_size(at));
 }
-
-void
-QPDF_Array::addExplicitElementsToList(std::list<QPDFObjectHandle>& l) const
-{
-    for (auto const& iter: this->elements) {
-        l.push_back(iter.second);
-    }
-}

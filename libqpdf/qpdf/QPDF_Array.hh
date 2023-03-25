@@ -32,11 +32,6 @@ class QPDF_Array: public QPDFValue
     void appendItem(QPDFObjectHandle const& item);
     void eraseItem(int at);
 
-    // Helper methods for QPDF and QPDFObjectHandle -- these are
-    // public methods since the whole class is not part of the public
-    // API. Otherwise, these would be wrapped in accessor classes.
-    void addExplicitElementsToList(std::list<QPDFObjectHandle>&) const;
-
   private:
     QPDF_Array(std::vector<QPDFObjectHandle> const& items);
     QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& items);
