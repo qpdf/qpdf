@@ -12,9 +12,6 @@ class OHArray
 {
   public:
     OHArray();
-    void erase(size_t idx);
-    void insert(size_t idx, QPDFObjectHandle oh);
-    OHArray copy();
 
   private:
     friend class QPDF_Array;

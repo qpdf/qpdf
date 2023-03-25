@@ -67,7 +67,20 @@ QPDF_Array::copy(bool shallow)
     if (sparse) {
         return create(shallow ? sp_elements : sp_elements.copy());
     } else {
-        return create(shallow ? elements : elements.copy());
+        if (shallow) {
+            return create(elements);
+        } else {
+            OHArray result;
+            result.elements.reserve(elements.elements.size());
+            for (auto const& element: elements.elements) {
+                result.elements.push_back(
+                    element
+                        ? (element->getObjGen().isIndirect() ? element
+                                                             : element->copy())
+                        : element);
+            }
+            return create(result);
+        }
     }
 }
 
@@ -237,11 +250,19 @@ QPDF_Array::insertItem(int at, QPDFObjectHandle const& item)
         sp_elements.insert(QIntC::to_size(at), item);
     } else {
         // As special case, also allow insert beyond the end
+        size_t idx = QIntC::to_size(at);
         if ((at < 0) || (at > QIntC::to_int(elements.elements.size()))) {
             throw std::logic_error(
                 "INTERNAL ERROR: bounds error accessing QPDF_Array element");
         }
-        elements.insert(QIntC::to_size(at), item);
+        if (idx == elements.elements.size()) {
+            // Allow inserting to the last position
+            elements.elements.push_back(item.getObj());
+        } else {
+            int n = int(idx);
+            elements.elements.insert(
+                elements.elements.cbegin() + n, item.getObj());
+        }
     }
 }
 
@@ -261,6 +282,11 @@ QPDF_Array::eraseItem(int at)
     if (sparse) {
         sp_elements.erase(QIntC::to_size(at));
     } else {
-        elements.erase(QIntC::to_size(at));
+        size_t idx = QIntC::to_size(at);
+        if (idx >= elements.elements.size()) {
+            throw std::logic_error("bounds error erasing item from OHArray");
+        }
+        int n = int(idx);
+        elements.elements.erase(elements.elements.cbegin() + n);
     }
 }
