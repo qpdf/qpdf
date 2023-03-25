@@ -1497,6 +1497,7 @@ class QPDFObjectHandle
         friend class QPDF_Dictionary;
         friend class QPDF_Stream;
         friend class SparseOHArray;
+        friend class OHArray;
 
       private:
         static void

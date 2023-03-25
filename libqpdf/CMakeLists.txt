@@ -116,6 +116,7 @@ set(libqpdf_SOURCES
   SecureRandomDataProvider.cc
   SF_FlateLzwDecode.cc
   SparseOHArray.cc
+  OHArray.cc
   qpdf-c.cc
   qpdfjob-c.cc
   qpdflogger-c.cc)

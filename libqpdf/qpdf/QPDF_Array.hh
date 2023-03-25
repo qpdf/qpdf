@@ -3,6 +3,7 @@
 
 #include <qpdf/QPDFValue.hh>
 
+#include <qpdf/OHArray.hh>
 #include <qpdf/SparseOHArray.hh>
 #include <list>
 #include <vector>
@@ -16,6 +17,7 @@ class QPDF_Array: public QPDFValue
     static std::shared_ptr<QPDFObject>
     create(std::vector<std::shared_ptr<QPDFObject>>&& items);
     static std::shared_ptr<QPDFObject> create(SparseOHArray const& items);
+    static std::shared_ptr<QPDFObject> create(OHArray const& items);
     virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
@@ -36,7 +38,10 @@ class QPDF_Array: public QPDFValue
     QPDF_Array(std::vector<QPDFObjectHandle> const& items);
     QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& items);
     QPDF_Array(SparseOHArray const& items);
-    SparseOHArray elements;
+    QPDF_Array(OHArray const& items);
+    bool sparse{false};
+    SparseOHArray sp_elements;
+    OHArray elements;
 };
 
 #endif // QPDF_ARRAY_HH
