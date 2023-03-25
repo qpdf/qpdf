@@ -29,7 +29,7 @@ QPDF_Array::QPDF_Array(SparseOHArray const& items) :
 {
 }
 
-QPDF_Array::QPDF_Array(OHArray const& items) :
+QPDF_Array::QPDF_Array(std::vector<std::shared_ptr<QPDFObject>> const& items) :
     QPDFValue(::ot_array, "array"),
     sparse(false),
     elements(items)
@@ -56,7 +56,7 @@ QPDF_Array::create(SparseOHArray const& items)
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Array::create(OHArray const& items)
+QPDF_Array::create(std::vector<std::shared_ptr<QPDFObject>> const& items)
 {
     return do_create(new QPDF_Array(items));
 }
@@ -70,10 +70,10 @@ QPDF_Array::copy(bool shallow)
         if (shallow) {
             return create(elements);
         } else {
-            OHArray result;
-            result.elements.reserve(elements.elements.size());
-            for (auto const& element: elements.elements) {
-                result.elements.push_back(
+            std::vector<std::shared_ptr<QPDFObject>> result;
+            result.reserve(elements.size());
+            for (auto const& element: elements) {
+                result.push_back(
                     element
                         ? (element->getObjGen().isIndirect() ? element
                                                              : element->copy())
@@ -90,7 +90,7 @@ QPDF_Array::disconnect()
     if (sparse) {
         sp_elements.disconnect();
     } else {
-        for (auto const& iter: elements.elements) {
+        for (auto const& iter: elements) {
             if (iter) {
                 QPDFObjectHandle::DisconnectAccess::disconnect(iter);
             }
@@ -112,7 +112,7 @@ QPDF_Array::unparse()
         return result;
     } else {
         std::string result = "[ ";
-        auto size = elements.elements.size();
+        auto size = elements.size();
         for (int i = 0; i < int(size); ++i) {
             result += getItem(i).unparse();
             result += " ";
@@ -134,7 +134,7 @@ QPDF_Array::getJSON(int json_version)
         return j;
     } else {
         JSON j = JSON::makeArray();
-        size_t size = elements.elements.size();
+        size_t size = elements.size();
         for (int i = 0; i < int(size); ++i) {
             j.addArrayElement(getItem(i).getJSON(json_version));
         }
@@ -150,7 +150,7 @@ QPDF_Array::getNItems() const
         // a lot of code.
         return QIntC::to_int(sp_elements.size());
     } else {
-        return QIntC::to_int(elements.elements.size());
+        return QIntC::to_int(elements.size());
     }
 }
 
@@ -164,11 +164,11 @@ QPDF_Array::getItem(int n) const
         }
         return sp_elements.at(QIntC::to_size(n));
     } else {
-        if ((n < 0) || (n >= QIntC::to_int(elements.elements.size()))) {
+        if ((n < 0) || (n >= QIntC::to_int(elements.size()))) {
             throw std::logic_error(
                 "INTERNAL ERROR: bounds error accessing QPDF_Array element");
         }
-        auto const& obj = elements.elements.at(size_t(n));
+        auto const& obj = elements.at(size_t(n));
         return obj ? obj : null_oh;
     }
 }
@@ -182,8 +182,7 @@ QPDF_Array::getAsVector(std::vector<QPDFObjectHandle>& v) const
             v.push_back(sp_elements.at(i));
         }
     } else {
-        v = std::vector<QPDFObjectHandle>(
-            elements.elements.cbegin(), elements.elements.cend());
+        v = std::vector<QPDFObjectHandle>(elements.cbegin(), elements.cend());
     }
 }
 
@@ -194,10 +193,10 @@ QPDF_Array::setItem(int n, QPDFObjectHandle const& oh)
         sp_elements.setAt(QIntC::to_size(n), oh);
     } else {
         size_t idx = size_t(n);
-        if (n < 0 || idx >= elements.elements.size()) {
+        if (n < 0 || idx >= elements.size()) {
             throw std::logic_error("bounds error setting item in QPDF_Array");
         }
-        elements.elements[idx] = oh.getObj();
+        elements[idx] = oh.getObj();
     }
 }
 
@@ -210,9 +209,9 @@ QPDF_Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
             sp_elements.append(iter);
         }
     } else {
-        elements = OHArray();
+        elements.resize(0);
         for (auto const& iter: v) {
-            elements.elements.push_back(iter.getObj());
+            elements.push_back(iter.getObj());
         }
     }
 }
@@ -231,10 +230,7 @@ QPDF_Array::setFromVector(std::vector<std::shared_ptr<QPDFObject>>&& v)
             }
         }
     } else {
-        elements = OHArray();
-        for (auto&& item: v) {
-            elements.elements.push_back(std::move(item));
-        }
+        elements = std::move(v);
     }
 }
 
@@ -251,17 +247,16 @@ QPDF_Array::insertItem(int at, QPDFObjectHandle const& item)
     } else {
         // As special case, also allow insert beyond the end
         size_t idx = QIntC::to_size(at);
-        if ((at < 0) || (at > QIntC::to_int(elements.elements.size()))) {
+        if ((at < 0) || (at > QIntC::to_int(elements.size()))) {
             throw std::logic_error(
                 "INTERNAL ERROR: bounds error accessing QPDF_Array element");
         }
-        if (idx == elements.elements.size()) {
+        if (idx == elements.size()) {
             // Allow inserting to the last position
-            elements.elements.push_back(item.getObj());
+            elements.push_back(item.getObj());
         } else {
             int n = int(idx);
-            elements.elements.insert(
-                elements.elements.cbegin() + n, item.getObj());
+            elements.insert(elements.cbegin() + n, item.getObj());
         }
     }
 }
@@ -272,7 +267,7 @@ QPDF_Array::appendItem(QPDFObjectHandle const& item)
     if (sparse) {
         sp_elements.append(item);
     } else {
-        elements.elements.push_back(item.getObj());
+        elements.push_back(item.getObj());
     }
 }
 
@@ -283,10 +278,10 @@ QPDF_Array::eraseItem(int at)
         sp_elements.erase(QIntC::to_size(at));
     } else {
         size_t idx = QIntC::to_size(at);
-        if (idx >= elements.elements.size()) {
+        if (idx >= elements.size()) {
             throw std::logic_error("bounds error erasing item from OHArray");
         }
         int n = int(idx);
-        elements.elements.erase(elements.elements.cbegin() + n);
+        elements.erase(elements.cbegin() + n);
     }
 }
