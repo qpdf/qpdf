@@ -11,15 +11,19 @@ QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v) :
     setFromVector(v);
 }
 
-QPDF_Array::QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& v) :
-    QPDFValue(::ot_array, "array")
+QPDF_Array::QPDF_Array(
+    std::vector<std::shared_ptr<QPDFObject>>&& v, bool sparse) :
+    QPDFValue(::ot_array, "array"),
+    sparse(sparse)
 {
     setFromVector(std::move(v));
 }
 
 QPDF_Array::QPDF_Array(SparseOHArray const& items) :
     QPDFValue(::ot_array, "array"),
+    sparse(true),
     sp_elements(items)
+
 {
 }
 
@@ -37,9 +41,10 @@ QPDF_Array::create(std::vector<QPDFObjectHandle> const& items)
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Array::create(std::vector<std::shared_ptr<QPDFObject>>&& items)
+QPDF_Array::create(
+    std::vector<std::shared_ptr<QPDFObject>>&& items, bool sparse)
 {
-    return do_create(new QPDF_Array(std::move(items)));
+    return do_create(new QPDF_Array(std::move(items), sparse));
 }
 
 std::shared_ptr<QPDFObject>
@@ -196,8 +201,9 @@ QPDF_Array::setFromVector(std::vector<std::shared_ptr<QPDFObject>>&& v)
     if (sparse) {
         sp_elements = SparseOHArray();
         for (auto&& item: v) {
-            if (item) {
-                sp_elements.append(item);
+            if (item->getTypeCode() != ::ot_null ||
+                item->getObjGen().isIndirect()) {
+                sp_elements.append(std::move(item));
             } else {
                 ++sp_elements.n_elements;
             }
