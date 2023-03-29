@@ -193,7 +193,7 @@ QPDF_Array::setAt(int at, QPDFObjectHandle const& oh)
     }
     checkOwnership(oh);
     if (sparse) {
-        sp_elements.setAt(at, oh);
+        sp_elements.elements[at] = oh.getObj();
     } else {
         elements[size_t(at)] = oh.getObj();
     }
@@ -206,7 +206,7 @@ QPDF_Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
     if (sparse) {
         sp_elements = SparseOHArray();
         for (auto const& iter: v) {
-            sp_elements.append(iter);
+            sp_elements.elements[sp_elements.n_elements++] = iter.getObj();
         }
     } else {
         elements.resize(0);
@@ -224,10 +224,9 @@ QPDF_Array::setFromVector(std::vector<std::shared_ptr<QPDFObject>>&& v)
         for (auto&& item: v) {
             if (item->getTypeCode() != ::ot_null ||
                 item->getObjGen().isIndirect()) {
-                sp_elements.append(std::move(item));
-            } else {
-                ++sp_elements.n_elements;
+                sp_elements.elements[sp_elements.n_elements] = std::move(item);
             }
+            ++sp_elements.n_elements;
         }
     } else {
         elements = std::move(v);
