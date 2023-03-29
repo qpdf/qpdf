@@ -49,29 +49,6 @@ SparseOHArray::erase(int at)
     --n_elements;
 }
 
-void
-SparseOHArray::insert(int idx, QPDFObjectHandle oh)
-{
-    if (idx == n_elements) {
-        // Allow inserting to the last position
-        append(oh);
-    } else {
-        auto iter = elements.crbegin();
-        while (iter != elements.crend()) {
-            auto key = (iter++)->first;
-            if (key >= idx) {
-                auto nh = elements.extract(key);
-                ++nh.key();
-                elements.insert(std::move(nh));
-            } else {
-                break;
-            }
-        }
-        elements[idx] = oh.getObj();
-        ++n_elements;
-    }
-}
-
 SparseOHArray
 SparseOHArray::copy()
 {

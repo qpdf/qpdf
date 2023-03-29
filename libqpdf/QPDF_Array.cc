@@ -246,7 +246,19 @@ QPDF_Array::insert(int at, QPDFObjectHandle const& item)
     } else {
         checkOwnership(item);
         if (sparse) {
-            sp_elements.insert(at, item);
+            auto iter = sp_elements.elements.crbegin();
+            while (iter != sp_elements.elements.crend()) {
+                auto key = (iter++)->first;
+                if (key >= at) {
+                    auto nh = sp_elements.elements.extract(key);
+                    ++nh.key();
+                    sp_elements.elements.insert(std::move(nh));
+                } else {
+                    break;
+                }
+            }
+            sp_elements.elements[at] = item.getObj();
+            ++sp_elements.n_elements;
         } else {
             elements.insert(elements.cbegin() + at, item.getObj());
         }

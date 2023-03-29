@@ -34,7 +34,6 @@ class SparseOHArray
         elements[idx] = oh.getObj();
     }
     void erase(int idx);
-    void insert(int idx, QPDFObjectHandle oh);
     SparseOHArray copy();
     void disconnect();
 
