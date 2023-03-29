@@ -3,7 +3,7 @@
 
 #include <qpdf/QPDFValue.hh>
 
-#include <qpdf/SparseOHArray.hh>
+#include <map>
 #include <vector>
 
 class QPDF_Array: public QPDFValue
@@ -14,9 +14,6 @@ class QPDF_Array: public QPDFValue
     create(std::vector<QPDFObjectHandle> const& items);
     static std::shared_ptr<QPDFObject>
     create(std::vector<std::shared_ptr<QPDFObject>>&& items, bool sparse);
-    static std::shared_ptr<QPDFObject> create(SparseOHArray const& items);
-    static std::shared_ptr<QPDFObject>
-    create(std::vector<std::shared_ptr<QPDFObject>> const& items);
     virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
@@ -25,7 +22,7 @@ class QPDF_Array: public QPDFValue
     int
     size() const noexcept
     {
-        return sparse ? sp_elements.size() : int(elements.size());
+        return sparse ? sp_size : int(elements.size());
     }
     QPDFObjectHandle at(int n) const noexcept;
     bool setAt(int n, QPDFObjectHandle const& oh);
@@ -36,15 +33,16 @@ class QPDF_Array: public QPDFValue
     bool erase(int at);
 
   private:
+    QPDF_Array();
+    QPDF_Array(QPDF_Array const&);
     QPDF_Array(std::vector<QPDFObjectHandle> const& items);
     QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& items, bool sparse);
-    QPDF_Array(SparseOHArray const& items);
-    QPDF_Array(std::vector<std::shared_ptr<QPDFObject>> const& items);
 
     void checkOwnership(QPDFObjectHandle const& item) const;
 
     bool sparse{false};
-    SparseOHArray sp_elements;
+    int sp_size{0};
+    std::map<int, std::shared_ptr<QPDFObject>> sp_elements;
     std::vector<std::shared_ptr<QPDFObject>> elements;
 };
 

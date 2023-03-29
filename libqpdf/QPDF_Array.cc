@@ -1,5 +1,6 @@
 #include <qpdf/QPDF_Array.hh>
 
+#include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFObject_private.hh>
 
 static const QPDFObjectHandle null_oh = QPDFObjectHandle::newNull();
@@ -24,6 +25,20 @@ QPDF_Array::checkOwnership(QPDFObjectHandle const& item) const
     }
 }
 
+QPDF_Array::QPDF_Array() :
+    QPDFValue(::ot_array, "array")
+{
+}
+
+QPDF_Array::QPDF_Array(QPDF_Array const& other) :
+    QPDFValue(::ot_array, "array"),
+    sparse(other.sparse),
+    sp_size(other.sp_size),
+    sp_elements(other.sp_elements),
+    elements(other.elements)
+{
+}
+
 QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v) :
     QPDFValue(::ot_array, "array")
 {
@@ -36,32 +51,16 @@ QPDF_Array::QPDF_Array(
     sparse(sparse)
 {
     if (sparse) {
-        sp_elements = SparseOHArray();
         for (auto&& item: v) {
             if (item->getTypeCode() != ::ot_null ||
                 item->getObjGen().isIndirect()) {
-                sp_elements.elements[sp_elements.n_elements] = std::move(item);
+                sp_elements[sp_size] = std::move(item);
             }
-            ++sp_elements.n_elements;
+            ++sp_size;
         }
     } else {
         elements = std::move(v);
     }
-}
-
-QPDF_Array::QPDF_Array(SparseOHArray const& items) :
-    QPDFValue(::ot_array, "array"),
-    sparse(true),
-    sp_elements(items)
-
-{
-}
-
-QPDF_Array::QPDF_Array(std::vector<std::shared_ptr<QPDFObject>> const& items) :
-    QPDFValue(::ot_array, "array"),
-    sparse(false),
-    elements(items)
-{
 }
 
 std::shared_ptr<QPDFObject>
@@ -78,36 +77,20 @@ QPDF_Array::create(
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Array::create(SparseOHArray const& items)
-{
-    return do_create(new QPDF_Array(items));
-}
-
-std::shared_ptr<QPDFObject>
-QPDF_Array::create(std::vector<std::shared_ptr<QPDFObject>> const& items)
-{
-    return do_create(new QPDF_Array(items));
-}
-
-std::shared_ptr<QPDFObject>
 QPDF_Array::copy(bool shallow)
 {
     if (shallow) {
-        if (sparse) {
-            return create(sp_elements);
-        } else {
-            return create(elements);
-        }
+        return do_create(new QPDF_Array(*this));
     } else {
         if (sparse) {
-            SparseOHArray result;
-            result.n_elements = sp_elements.n_elements;
-            for (auto const& element: sp_elements.elements) {
+            QPDF_Array* result = new QPDF_Array();
+            result->sp_size = sp_size;
+            for (auto const& element: sp_elements) {
                 auto const& obj = element.second;
-                result.elements[element.first] =
+                result->sp_elements[element.first] =
                     obj->getObjGen().isIndirect() ? obj : obj->copy();
             }
-            return create(std::move(result));
+            return do_create(result);
         } else {
             std::vector<std::shared_ptr<QPDFObject>> result;
             result.reserve(elements.size());
@@ -118,7 +101,7 @@ QPDF_Array::copy(bool shallow)
                                                              : element->copy())
                         : element);
             }
-            return create(std::move(result));
+            return create(std::move(result), false);
         }
     }
 }
@@ -127,7 +110,7 @@ void
 QPDF_Array::disconnect()
 {
     if (sparse) {
-        for (auto& item: sp_elements.elements) {
+        for (auto& item: sp_elements) {
             auto& obj = item.second;
             if (!obj->getObjGen().isIndirect()) {
                 obj->disconnect();
@@ -147,8 +130,7 @@ QPDF_Array::unparse()
 {
     if (sparse) {
         std::string result = "[ ";
-        int size = sp_elements.size();
-        for (int i = 0; i < size; ++i) {
+        for (int i = 0; i < sp_size; ++i) {
             result += at(i).unparse();
             result += " ";
         }
@@ -171,8 +153,7 @@ QPDF_Array::getJSON(int json_version)
 {
     if (sparse) {
         JSON j = JSON::makeArray();
-        int size = sp_elements.size();
-        for (int i = 0; i < size; ++i) {
+        for (int i = 0; i < sp_size; ++i) {
             j.addArrayElement(at(i).getJSON(json_version));
         }
         return j;
@@ -192,8 +173,8 @@ QPDF_Array::at(int n) const noexcept
     if (n < 0 || n >= size()) {
         return {};
     } else if (sparse) {
-        auto const& iter = sp_elements.elements.find(n);
-        return iter == sp_elements.elements.end() ? null_oh : (*iter).second;
+        auto const& iter = sp_elements.find(n);
+        return iter == sp_elements.end() ? null_oh : (*iter).second;
     } else {
         return elements[size_t(n)];
     }
@@ -205,7 +186,7 @@ QPDF_Array::getAsVector() const
     if (sparse) {
         std::vector<QPDFObjectHandle> v;
         v.reserve(size_t(size()));
-        for (auto const& item: sp_elements.elements) {
+        for (auto const& item: sp_elements) {
             v.resize(size_t(item.first), null_oh);
             v.push_back(item.second);
         }
@@ -224,7 +205,7 @@ QPDF_Array::setAt(int at, QPDFObjectHandle const& oh)
     }
     checkOwnership(oh);
     if (sparse) {
-        sp_elements.elements[at] = oh.getObj();
+        sp_elements[at] = oh.getObj();
     } else {
         elements[size_t(at)] = oh.getObj();
     }
@@ -254,19 +235,19 @@ QPDF_Array::insert(int at, QPDFObjectHandle const& item)
     } else {
         checkOwnership(item);
         if (sparse) {
-            auto iter = sp_elements.elements.crbegin();
-            while (iter != sp_elements.elements.crend()) {
+            auto iter = sp_elements.crbegin();
+            while (iter != sp_elements.crend()) {
                 auto key = (iter++)->first;
                 if (key >= at) {
-                    auto nh = sp_elements.elements.extract(key);
+                    auto nh = sp_elements.extract(key);
                     ++nh.key();
-                    sp_elements.elements.insert(std::move(nh));
+                    sp_elements.insert(std::move(nh));
                 } else {
                     break;
                 }
             }
-            sp_elements.elements[at] = item.getObj();
-            ++sp_elements.n_elements;
+            sp_elements[at] = item.getObj();
+            ++sp_size;
         } else {
             elements.insert(elements.cbegin() + at, item.getObj());
         }
@@ -279,7 +260,7 @@ QPDF_Array::push_back(QPDFObjectHandle const& item)
 {
     checkOwnership(item);
     if (sparse) {
-        sp_elements.elements[sp_elements.n_elements++] = item.getObj();
+        sp_elements[sp_size++] = item.getObj();
     } else {
         elements.push_back(item.getObj());
     }
@@ -292,20 +273,20 @@ QPDF_Array::erase(int at)
         return false;
     }
     if (sparse) {
-        auto end = sp_elements.elements.end();
-        if (auto iter = sp_elements.elements.lower_bound(at); iter != end) {
+        auto end = sp_elements.end();
+        if (auto iter = sp_elements.lower_bound(at); iter != end) {
             if (iter->first == at) {
                 iter++;
-                sp_elements.elements.erase(at);
+                sp_elements.erase(at);
             }
 
             while (iter != end) {
-                auto nh = sp_elements.elements.extract(iter++);
+                auto nh = sp_elements.extract(iter++);
                 --nh.key();
-                sp_elements.elements.insert(std::move(nh));
+                sp_elements.insert(std::move(nh));
             }
         }
-        --sp_elements.n_elements;
+        --sp_size;
     } else {
         elements.erase(elements.cbegin() + at);
     }

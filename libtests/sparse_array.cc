@@ -1,6 +1,7 @@
 #include <qpdf/assert_test.h>
 
 #include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDF_Array.hh>
 #include <iostream>
 
