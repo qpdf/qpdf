@@ -284,7 +284,20 @@ QPDF_Array::erase(int at)
         return false;
     }
     if (sparse) {
-        sp_elements.erase(at);
+        auto end = sp_elements.elements.end();
+        if (auto iter = sp_elements.elements.lower_bound(at); iter != end) {
+            if (iter->first == at) {
+                iter++;
+                sp_elements.elements.erase(at);
+            }
+
+            while (iter != end) {
+                auto nh = sp_elements.elements.extract(iter++);
+                --nh.key();
+                sp_elements.elements.insert(std::move(nh));
+            }
+        }
+        --sp_elements.n_elements;
     } else {
         elements.erase(elements.cbegin() + at);
     }

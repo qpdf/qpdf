@@ -33,7 +33,6 @@ class SparseOHArray
     {
         elements[idx] = oh.getObj();
     }
-    void erase(int idx);
     SparseOHArray copy();
     void disconnect();
 

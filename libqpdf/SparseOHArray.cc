@@ -30,25 +30,6 @@ SparseOHArray::disconnect()
     }
 }
 
-void
-SparseOHArray::erase(int at)
-{
-    auto end = elements.end();
-    if (auto iter = elements.lower_bound(at); iter != end) {
-        if (iter->first == at) {
-            iter++;
-            elements.erase(at);
-        }
-
-        while (iter != end) {
-            auto nh = elements.extract(iter++);
-            --nh.key();
-            elements.insert(std::move(nh));
-        }
-    }
-    --n_elements;
-}
-
 SparseOHArray
 SparseOHArray::copy()
 {
