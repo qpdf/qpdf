@@ -916,11 +916,7 @@ QPDFObjectHandle::setArrayItem(int n, QPDFObjectHandle const& item)
 void
 QPDFObjectHandle::setArrayFromVector(std::vector<QPDFObjectHandle> const& items)
 {
-    auto array = asArray();
-    if (array) {
-        for (auto const& item: items) {
-            checkOwnership(item);
-        }
+    if (auto array = asArray()) {
         array->setFromVector(items);
     } else {
         typeWarning("array", "ignoring attempt to replace items");

@@ -35,7 +35,18 @@ QPDF_Array::QPDF_Array(
     QPDFValue(::ot_array, "array"),
     sparse(sparse)
 {
-    setFromVector(std::move(v));
+    if (sparse) {
+        sp_elements = SparseOHArray();
+        for (auto&& item: v) {
+            if (item->getTypeCode() != ::ot_null ||
+                item->getObjGen().isIndirect()) {
+                sp_elements.elements[sp_elements.n_elements] = std::move(item);
+            }
+            ++sp_elements.n_elements;
+        }
+    } else {
+        elements = std::move(v);
+    }
 }
 
 QPDF_Array::QPDF_Array(SparseOHArray const& items) :
@@ -207,33 +218,11 @@ QPDF_Array::setAt(int at, QPDFObjectHandle const& oh)
 void
 QPDF_Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
 {
-    if (sparse) {
-        sp_elements = SparseOHArray();
-        for (auto const& iter: v) {
-            sp_elements.elements[sp_elements.n_elements++] = iter.getObj();
-        }
-    } else {
-        elements.resize(0);
-        for (auto const& iter: v) {
-            elements.push_back(iter.getObj());
-        }
-    }
-}
-
-void
-QPDF_Array::setFromVector(std::vector<std::shared_ptr<QPDFObject>>&& v)
-{
-    if (sparse) {
-        sp_elements = SparseOHArray();
-        for (auto&& item: v) {
-            if (item->getTypeCode() != ::ot_null ||
-                item->getObjGen().isIndirect()) {
-                sp_elements.elements[sp_elements.n_elements] = std::move(item);
-            }
-            ++sp_elements.n_elements;
-        }
-    } else {
-        elements = std::move(v);
+    elements.resize(0);
+    elements.reserve(v.size());
+    for (auto const& item: v) {
+        checkOwnership(item);
+        elements.push_back(item.getObj());
     }
 }
 
