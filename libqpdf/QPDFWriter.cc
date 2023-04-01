@@ -1441,8 +1441,13 @@ QPDFWriter::unparseObject(
     if (level < 0) {
         throw std::logic_error("invalid level in QPDFWriter::unparseObject");
     }
-
-    std::string const indent(static_cast<size_t>(2 * level), ' ');
+    // For non-qdf, "indent" is a single space between tokens.
+    // For qdf, indent includes the preceding newline.
+    std::string indent = " ";
+    if (m->qdf_mode) {
+        indent.append(static_cast<size_t>(2 * level), ' ');
+        indent[0] = '\n';
+    }
 
     if (auto const tc = object.getTypeCode(); tc == ::ot_array) {
         // Note: PDF spec 1.4 implementation note 121 states that
@@ -1451,16 +1456,12 @@ QPDFWriter::unparseObject(
         // unconditionally for all arrays because it looks nicer and
         // doesn't make the files that much bigger.
         writeString("[");
-        writeStringQDF("\n");
         for (auto const& item: object.getArrayAsVector()) {
-            writeStringQDF(indent);
+            writeString(indent);
             writeStringQDF("  ");
-            writeStringNoQDF(" ");
             unparseChild(item, level + 1, child_flags);
-            writeStringQDF("\n");
         }
-        writeStringQDF(indent);
-        writeStringNoQDF(" ");
+        writeString(indent);
         writeString("]");
     } else if (tc == ::ot_dictionary) {
         // Make a shallow copy of this object so we can modify it
@@ -1619,14 +1620,12 @@ QPDFWriter::unparseObject(
         }
 
         writeString("<<");
-        writeStringQDF("\n");
 
         for (auto& item: object.getDictAsMap()) {
             if (!item.second.isNull()) {
                 auto const& key = item.first;
-                writeStringQDF(indent);
+                writeString(indent);
                 writeStringQDF("  ");
-                writeStringNoQDF(" ");
                 writeString(QPDF_Name::normalizeName(key));
                 writeString(" ");
                 if (key == "/Contents" && object.isDictionaryOfType("/Sig") &&
@@ -1639,14 +1638,13 @@ QPDFWriter::unparseObject(
                 } else {
                     unparseChild(item.second, level + 1, child_flags);
                 }
-                writeStringQDF("\n");
             }
         }
 
         if (flags & f_stream) {
-            writeStringQDF(indent);
-            writeStringQDF(" ");
-            writeString(" /Length ");
+            writeString(indent);
+            writeStringQDF("  ");
+            writeString("/Length ");
 
             if (this->m->direct_stream_lengths) {
                 writeString(std::to_string(stream_length));
@@ -1654,17 +1652,14 @@ QPDFWriter::unparseObject(
                 writeString(std::to_string(this->m->cur_stream_length_id));
                 writeString(" 0 R");
             }
-            writeStringQDF("\n");
             if (compress && (flags & f_filtered)) {
-                writeStringQDF(indent);
-                writeStringQDF(" ");
-                writeString(" /Filter /FlateDecode");
-                writeStringQDF("\n");
+                writeString(indent);
+                writeStringQDF("  ");
+                writeString("/Filter /FlateDecode");
             }
         }
 
-        writeStringQDF(indent);
-        writeStringNoQDF(" ");
+        writeString(indent);
         writeString(">>");
     } else if (tc == ::ot_stream) {
         // Write stream data to a buffer.
