@@ -500,7 +500,7 @@ QPDF::parse(char const* password)
             reconstruct_xref(e);
             QTC::TC("qpdf", "QPDF reconstructed xref table");
         } else {
-            throw e;
+            throw;
         }
     }
 
@@ -1483,7 +1483,7 @@ QPDF::readObject(
                     warn(e);
                     length = recoverStreamLength(input, og, stream_offset);
                 } else {
-                    throw e;
+                    throw;
                 }
             }
             object = newIndirect(
@@ -1684,7 +1684,7 @@ QPDF::readObjectAtOffset(
                 return QPDFObjectHandle::newNull();
             }
         } else {
-            throw e;
+            throw;
         }
     }
 
