@@ -27,16 +27,15 @@ namespace
     struct StackFrame
     {
         StackFrame(std::shared_ptr<InputSource> input) :
-            offset(input->tell()),
-            contents_string(""),
-            contents_offset(-1)
+            offset(input->tell())
         {
         }
 
         std::vector<std::shared_ptr<QPDFObject>> olist;
         qpdf_offset_t offset;
-        std::string contents_string;
-        qpdf_offset_t contents_offset;
+        std::string contents_string{""};
+        qpdf_offset_t contents_offset{-1};
+        int null_count{0};
     };
 } // namespace
 
@@ -50,6 +49,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
     // this, it will cause a logic error to be thrown from
     // QPDF::inParse().
 
+    const static std::shared_ptr<QPDFObject> null_oh = QPDF_Null::create();
     QPDF::ParseGuard pg(context);
 
     empty = false;
@@ -67,7 +67,6 @@ QPDFParser::parse(bool& empty, bool content_stream)
     int good_count = 0;
     bool b_contents = false;
     bool is_null = false;
-    auto null_oh = QPDF_Null::create();
 
     while (!done) {
         bool bad = false;
@@ -156,6 +155,8 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         case QPDFTokenizer::tt_null:
             is_null = true;
+            ++frame.null_count;
+
             break;
 
         case QPDFTokenizer::tt_integer:
@@ -301,9 +302,11 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         case st_dictionary:
         case st_array:
-            if (!indirect_ref && !is_null) {
-                // No need to set description for direct nulls - they will
-                // become implicit.
+            if (is_null) {
+                object = null_oh;
+                // No need to set description for direct nulls - they probably
+                // will become implicit.
+            } else if (!indirect_ref) {
                 setDescription(object, input->getLastOffset());
             }
             set_offset = true;
@@ -326,7 +329,8 @@ QPDFParser::parse(bool& empty, bool content_stream)
             parser_state_e old_state = state_stack.back();
             state_stack.pop_back();
             if (old_state == st_array) {
-                object = QPDF_Array::create(std::move(olist));
+                object = QPDF_Array::create(
+                    std::move(olist), frame.null_count > 100);
                 setDescription(object, offset - 1);
                 // The `offset` points to the next of "[".  Set the rewind
                 // offset to point to the beginning of "[". This has been
@@ -381,7 +385,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                     // Calculate value.
                     std::shared_ptr<QPDFObject> val;
                     if (iter != olist.end()) {
-                        val = *iter ? *iter : QPDF_Null::create();
+                        val = *iter;
                         ++iter;
                     } else {
                         QTC::TC("qpdf", "QPDFParser no val for last key");

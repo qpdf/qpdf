@@ -5,6 +5,8 @@ WARNING: object-types.pdf, object 8 0 at offset 669: operation for array attempt
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for array attempted on object of type integer: ignoring attempt to append item
 WARNING: object-types.pdf, object 8 0 at offset 717: ignoring attempt to erase out of bounds array item
 WARNING: object-types.pdf, object 8 0 at offset 717: ignoring attempt to erase out of bounds array item
+WARNING: object-types.pdf, object 8 0 at offset 717: ignoring attempt to insert out of bounds array item
+WARNING: object-types.pdf, object 8 0 at offset 717: ignoring attempt to set out of bounds array item
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for array attempted on object of type integer: ignoring attempt to erase item
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for array attempted on object of type integer: ignoring attempt to insert item
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for array attempted on object of type integer: ignoring attempt to replace items

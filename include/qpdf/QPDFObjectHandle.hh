@@ -1496,11 +1496,10 @@ class QPDFObjectHandle
     {
         friend class QPDF_Dictionary;
         friend class QPDF_Stream;
-        friend class SparseOHArray;
 
       private:
         static void
-        disconnect(QPDFObjectHandle& o)
+        disconnect(QPDFObjectHandle o)
         {
             o.disconnect();
         }
@@ -1574,6 +1573,11 @@ class QPDFObjectHandle
     }
     std::shared_ptr<QPDFObject>
     getObj()
+    {
+        return obj;
+    }
+    std::shared_ptr<QPDFObject>
+    getObj() const
     {
         return obj;
     }

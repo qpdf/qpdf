@@ -1,19 +1,23 @@
 #include <qpdf/assert_test.h>
 
-#include <qpdf/SparseOHArray.hh>
+#include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDFObject_private.hh>
+#include <qpdf/QPDF_Array.hh>
 #include <iostream>
 
 int
 main()
 {
-    SparseOHArray a;
+    auto obj = QPDF_Array::create({}, true);
+    QPDF_Array& a = *obj->as<QPDF_Array>();
+
     assert(a.size() == 0);
 
-    a.append(QPDFObjectHandle::parse("1"));
-    a.append(QPDFObjectHandle::parse("(potato)"));
-    a.append(QPDFObjectHandle::parse("null"));
-    a.append(QPDFObjectHandle::parse("null"));
-    a.append(QPDFObjectHandle::parse("/Quack"));
+    a.push_back(QPDFObjectHandle::parse("1"));
+    a.push_back(QPDFObjectHandle::parse("(potato)"));
+    a.push_back(QPDFObjectHandle::parse("null"));
+    a.push_back(QPDFObjectHandle::parse("null"));
+    a.push_back(QPDFObjectHandle::parse("/Quack"));
     assert(a.size() == 5);
     assert(a.at(0).isInteger() && (a.at(0).getIntValue() == 1));
     assert(a.at(1).isString() && (a.at(1).getStringValue() == "potato"));
@@ -60,20 +64,20 @@ main()
     a.setAt(4, QPDFObjectHandle::newNull());
     assert(a.at(4).isNull());
 
-    a.remove_last();
+    a.erase(a.size() - 1);
     assert(a.size() == 5);
     assert(a.at(0).isName() && (a.at(0).getName() == "/First"));
     assert(a.at(1).isInteger() && (a.at(1).getIntValue() == 1));
     assert(a.at(3).isName() && (a.at(3).getName() == "/Third"));
     assert(a.at(4).isNull());
 
-    a.remove_last();
+    a.erase(a.size() - 1);
     assert(a.size() == 4);
     assert(a.at(0).isName() && (a.at(0).getName() == "/First"));
     assert(a.at(1).isInteger() && (a.at(1).getIntValue() == 1));
     assert(a.at(3).isName() && (a.at(3).getName() == "/Third"));
 
-    a.remove_last();
+    a.erase(a.size() - 1);
     assert(a.size() == 3);
     assert(a.at(0).isName() && (a.at(0).getName() == "/First"));
     assert(a.at(1).isInteger() && (a.at(1).getIntValue() == 1));

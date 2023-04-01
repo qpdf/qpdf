@@ -1,2 +1,3 @@
 WARNING: test array: ignoring attempt to erase out of bounds array item
+WARNING: minimal.pdf, object 1 0 at offset 19: operation for array attempted on object of type dictionary: ignoring attempt to erase item
 test 88 done
