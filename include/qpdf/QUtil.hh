@@ -223,6 +223,11 @@ namespace QUtil
     QPDF_DLL
     std::string hex_decode(std::string const&);
 
+    // Decode a single hex digit into a char in the range 0 <= char < 16. Return
+    // a char >= 16 if digit is not a valid hex digit.
+    QPDF_DLL
+    inline constexpr char hex_decode_char(char digit) noexcept;
+
     // Set stdin, stdout to binary mode
     QPDF_DLL
     void binary_stdout();
@@ -550,8 +555,7 @@ namespace QUtil
 inline bool
 QUtil::is_hex_digit(char ch)
 {
-    return ('0' <= ch && ch <= '9') || ('a' <= ch && ch <= 'f') ||
-        ('A' <= ch && ch <= 'F');
+    return hex_decode_char(ch) < '\20';
 }
 
 inline bool
@@ -601,6 +605,15 @@ QUtil::hex_encode_char(char c)
     static auto constexpr hexchars = "0123456789abcdef";
     return {
         '#', hexchars[static_cast<unsigned char>(c) >> 4], hexchars[c & 0x0f]};
+}
+
+inline constexpr char
+QUtil::hex_decode_char(char digit) noexcept
+{
+    return digit <= '9' && digit >= '0'
+        ? char(digit - '0')
+        : (digit >= 'a' ? char(digit - 'a' + 10)
+                        : (digit >= 'A' ? char(digit - 'A' + 10) : '\20'));
 }
 
 #endif // QUTIL_HH
