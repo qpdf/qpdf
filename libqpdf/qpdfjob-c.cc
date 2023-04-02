@@ -4,6 +4,7 @@
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFUsage.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/qpdf-c_impl.hh>
 #include <qpdf/qpdflogger-c_impl.hh>
 
 #include <cstdio>
@@ -94,6 +95,30 @@ qpdfjob_run(qpdfjob_handle j)
     QUtil::setLineBuf(stdout);
     return wrap_qpdfjob(j, [](qpdfjob_handle jh) {
         jh->j.run();
+        return jh->j.getExitCode();
+    });
+}
+
+qpdf_data
+qpdfjob_create_qpdf(qpdfjob_handle j)
+{
+    QUtil::setLineBuf(stdout);
+    try {
+        auto qpdf = j->j.createQPDF();
+        return qpdf ? new _qpdf_data(std::move(qpdf)) : nullptr;
+    } catch (std::exception& e) {
+        *j->j.getLogger()->getError()
+            << j->j.getMessagePrefix() << ": " << e.what() << "\n";
+    }
+    return nullptr;
+}
+
+int
+qpdfjob_write_qpdf(qpdfjob_handle j, qpdf_data qpdf)
+{
+    QUtil::setLineBuf(stdout);
+    return wrap_qpdfjob(j, [qpdf](qpdfjob_handle jh) {
+        jh->j.writeQPDF(*(qpdf->qpdf));
         return jh->j.getExitCode();
     });
 }

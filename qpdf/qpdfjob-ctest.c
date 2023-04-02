@@ -97,6 +97,33 @@ run_tests()
     assert(qpdfjob_run(j) == 2);
     qpdfjob_cleanup(&j);
     printf("json error test passed\n");
+
+    /* qpdfjob_create_qpdf and qpdfjob_write_qpdf test */
+    argv[0] = "qpdfjob";
+    argv[1] = "minimal.pdf";
+    argv[2] = "d.pdf";
+    argv[3] = "--deterministic-id";
+    argv[4] = "--progress";
+    argv[5] = NULL;
+    j = qpdfjob_init();
+    assert(qpdfjob_initialize_from_argv(j, argv) == 0);
+    qpdf_data qpdf = qpdfjob_create_qpdf(j);
+    assert(qpdfjob_write_qpdf(j, qpdf) == 0);
+    qpdf_cleanup(&qpdf);
+    qpdfjob_cleanup(&j);
+
+    /* Try to open a missing file to test case of QPDFJob::createQPDF returning
+     * nullptr.
+     */
+    argv[0] = "qpdfjob";
+    argv[1] = "m.pdf";
+    argv[2] = "--check";
+    argv[3] = NULL;
+    j = qpdfjob_init();
+    assert(qpdfjob_initialize_from_argv(j, argv) == 0);
+    assert(qpdfjob_create_qpdf(j) == NULL);
+    qpdfjob_cleanup(&j);
+    printf("qpdfjob_create_qpdf and qpdfjob_write_qpdf test passed\n");
 }
 
 int
