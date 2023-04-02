@@ -2511,7 +2511,7 @@ QPDF::getCompressibleObjGens()
     QPDFObjectHandle encryption_dict = this->m->trailer.getKey("/Encrypt");
     QPDFObjGen encryption_dict_og = encryption_dict.getObjGen();
 
-    std::set<QPDFObjGen> visited;
+    QPDFObjGen::set visited;
     std::list<QPDFObjectHandle> queue;
     queue.push_front(this->m->trailer);
     std::vector<QPDFObjGen> result;
@@ -2520,7 +2520,7 @@ QPDF::getCompressibleObjGens()
         queue.pop_front();
         if (obj.isIndirect()) {
             QPDFObjGen og = obj.getObjGen();
-            if (visited.count(og)) {
+            if (!visited.add(og)) {
                 QTC::TC("qpdf", "QPDF loop detected traversing objects");
                 continue;
             }
@@ -2532,7 +2532,6 @@ QPDF::getCompressibleObjGens()
                           obj.hasKey("/Contents")))) {
                 result.push_back(og);
             }
-            visited.insert(og);
         }
         if (obj.isStream()) {
             QPDFObjectHandle dict = obj.getDict();
