@@ -2451,8 +2451,8 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
 
     // Return true as soon as we find any shared resources.
 
-    std::set<QPDFObjGen> resources_seen; // shared resources detection
-    std::set<QPDFObjGen> nodes_seen;     // loop detection
+    QPDFObjGen::set resources_seen; // shared resources detection
+    QPDFObjGen::set nodes_seen;     // loop detection
 
     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
         v << prefix << ": " << pdf.getFilename()
@@ -2465,10 +2465,9 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
         QPDFObjectHandle node = *queue.begin();
         queue.pop_front();
         QPDFObjGen og = node.getObjGen();
-        if (nodes_seen.count(og)) {
+        if (!nodes_seen.add(og)) {
             continue;
         }
-        nodes_seen.insert(og);
         QPDFObjectHandle dict = node.isStream() ? node.getDict() : node;
         QPDFObjectHandle kids = dict.getKey("/Kids");
         if (kids.isArray()) {
@@ -2489,33 +2488,29 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
             // This is a leaf node or a form XObject.
             QPDFObjectHandle resources = dict.getKey("/Resources");
             if (resources.isIndirect()) {
-                QPDFObjGen resources_og = resources.getObjGen();
-                if (resources_seen.count(resources_og)) {
+                if (!resources_seen.add(resources)) {
                     QTC::TC("qpdf", "QPDFJob found shared resources in leaf");
                     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                         v << "  found shared resources in leaf node "
                           << og.unparse(' ') << ": "
-                          << resources_og.unparse(' ') << "\n";
+                          << resources.getObjGen().unparse(' ') << "\n";
                     });
                     return true;
                 }
-                resources_seen.insert(resources_og);
             }
             QPDFObjectHandle xobject =
                 (resources.isDictionary() ? resources.getKey("/XObject")
                                           : QPDFObjectHandle::newNull());
             if (xobject.isIndirect()) {
-                QPDFObjGen xobject_og = xobject.getObjGen();
-                if (resources_seen.count(xobject_og)) {
+                if (!resources_seen.add(xobject)) {
                     QTC::TC("qpdf", "QPDFJob found shared xobject in leaf");
                     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                         v << "  found shared xobject in leaf node "
-                          << og.unparse(' ') << ": " << xobject_og.unparse(' ')
-                          << "\n";
+                          << og.unparse(' ') << ": "
+                          << xobject.getObjGen().unparse(' ') << "\n";
                     });
                     return true;
                 }
-                resources_seen.insert(xobject_og);
             }
             if (xobject.isDictionary()) {
                 for (auto const& k: xobject.getKeys()) {
