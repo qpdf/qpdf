@@ -374,16 +374,7 @@ class JSON
         std::map<std::string, JSON> members;
         std::set<std::string> parsed_keys;
     };
-    struct JSON_array: public JSON_value
-    {
-        JSON_array() :
-            JSON_value(vt_array)
-        {
-        }
-        virtual ~JSON_array() = default;
-        virtual void write(Pipeline*, size_t depth) const;
-        std::vector<JSON> elements;
-    };
+    struct JSON_array;
     struct JSON_string: public JSON_value
     {
         JSON_string(std::string const& utf8);
@@ -453,6 +444,17 @@ class JSON
     };
 
     std::shared_ptr<Members> m;
+};
+
+struct JSON::JSON_array: public JSON_value
+{
+    JSON_array() :
+        JSON_value(vt_array)
+    {
+    }
+    virtual ~JSON_array() = default;
+    virtual void write(Pipeline*, size_t depth) const;
+    std::vector<JSON> elements;
 };
 
 #endif // JSON_HH
