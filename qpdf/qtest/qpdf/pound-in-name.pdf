@@ -81,6 +81,7 @@ trailer <<
     /a#b [ 4 /##00## /Som#ething ]
     /Som#ething (else)
   >>
+  /#20#23#2f#28#29#7b#7d#3c#3e#5b#5d#25#21#7e#7f 42
 >>
 
 startxref
