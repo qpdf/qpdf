@@ -247,10 +247,11 @@ QPDF::~QPDF()
     // but we'll explicitly clear the xref table anyway just to
     // prevent any possibility of resolve() succeeding.
     this->m->xref_table.clear();
-    auto null_obj = QPDF_Null::create();
     for (auto const& iter: this->m->obj_cache) {
         iter.second.object->disconnect();
-        iter.second.object->destroy();
+        if (iter.second.object->getTypeCode() != ::ot_null) {
+            iter.second.object->destroy();
+        }
     }
 }
 
