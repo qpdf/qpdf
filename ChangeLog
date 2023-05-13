@@ -5,6 +5,15 @@
         reserved object fits better in the QPDF API. The old call just
         delegates to the new one.
 
+2023-05-13  Jay Berkenbilt  <ejb@ql.org>
+
+        * When an annotation dictionary's appearance dictionary (`/AP`)
+        has a key that is a stream, disregard `/AS` (which is supposed to
+        point to a subkey). This enables qpdf to not ignore annotations
+        that have incorrect values for `/AS` when the appearance stream is
+        directly in the `/AP` dictionary instead of in a subkey. Fixes
+        #949.
+
 2023-04-02  Jay Berkenbilt  <ejb@ql.org>
         * Allow QPDFJob's workflow to be split into a reading phase and a
         writing phase to allow the caller to operate on the QPDF object

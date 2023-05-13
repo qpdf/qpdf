@@ -54,7 +54,14 @@ QPDFAnnotationObjectHelper::getAppearanceStream(
     std::string desired_state = state.empty() ? getAppearanceState() : state;
     if (ap.isDictionary()) {
         QPDFObjectHandle ap_sub = ap.getKey(which);
-        if (ap_sub.isStream() && desired_state.empty()) {
+        if (ap_sub.isStream()) {
+            // According to the spec, Appearance State is supposed to
+            // refer to a subkey of the appearance stream when /AP is
+            // a dictionary, but files have been seen in the wild
+            // where Appearance State is `/N` and `/AP` is a stream.
+            // Therefore, if `which` points to a stream, disregard
+            // state and just use the stream. See qpdf issue #949 for
+            // details.
             QTC::TC("qpdf", "QPDFAnnotationObjectHelper AP stream");
             return ap_sub;
         }

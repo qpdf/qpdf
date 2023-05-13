@@ -26,6 +26,14 @@ For a detailed list of changes, please see the file
     - Add ``QPDF::newReserved`` as a better alternative to
       ``QPDFObjectHandle::newReserved``.
 
+  - Bug fixes
+
+    - Ignore an annotation's appearance state when the annotation only
+      has one appearance. This prevents qpdf's annotation flattening
+      logic from throwing away appearances of annotations whose
+      annotation state is set incorrectly, as has been seen in some
+      PDF files.
+
 11.3.0: February 25, 2023
   - CLI Enhancements
 

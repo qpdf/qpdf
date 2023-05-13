@@ -178,7 +178,7 @@ Page: 11 0 R
     Subtype: /Widget
     Rect: [123.4, 692.1, 260.9, 706.7]
     Appearance stream (/N): 14 0 R
-    Appearance stream (/N, /3): null
+    Appearance stream (/N, /3): 14 0 R
   Annotation: 16 0 R
     Field: 16 0 R
     Subtype: /Widget
@@ -249,5 +249,5 @@ Page: 35 0 R
     Subtype: /Widget
     Rect: [113.6, 378.5, 351.3, 396.3]
     Appearance stream (/N): 36 0 R
-    Appearance stream (/N, /3): null
+    Appearance stream (/N, /3): 36 0 R
 test 43 done
