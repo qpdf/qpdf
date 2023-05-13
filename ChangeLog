@@ -1,3 +1,11 @@
+2023-04-02  Jay Berkenbilt  <ejb@ql.org>
+        * Allow QPDFJob's workflow to be split into a reading phase and a
+        writing phase to allow the caller to operate on the QPDF object
+        before it is written. This adds methods QPDFJob::createQPDF and
+        QPDFJob::writeQPDF and corresponding C API functions
+        qpdfjob_create_qpdf and qpdfjob_write_qpdf. Thanks to M. Holger
+        for the contrbution.
+
 2023-03-18  Jay Berkenbilt  <ejb@ql.org>
 
         * Enhance --optimize-images to support images nested inside of

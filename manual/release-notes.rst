@@ -14,6 +14,15 @@ For a detailed list of changes, please see the file
     - The :qpdf:ref:`--optimize-images` option now optimizes images
       inside of form XObjects.
 
+  - Library Enhancements
+
+    - Allow QPDFJob's workflow to be split into a reading phase and a
+      writing phase to allow the caller to operate on the ``QPDF``
+      object before it is written. This adds methods
+      ``QPDFJob::createQPDF`` and ``QPDFJob::writeQPDF`` and
+      corresponding C API functions ``qpdfjob_create_qpdf`` and
+      ``qpdfjob_write_qpdf``.
+
 11.3.0: February 25, 2023
   - CLI Enhancements
 
