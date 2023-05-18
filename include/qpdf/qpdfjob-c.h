@@ -81,6 +81,13 @@ extern "C" {
     QPDF_DLL
     int qpdfjob_run_from_json(char const* json);
 
+    /* A method that outputs out and err as a string instead of writing it
+    * to the console so that it can be captured and used from another
+    * language like C#
+    */
+    QPDF_DLL
+    int qpdfjob_run_from_json_with_result(char const* json, char const** cout_result, char const** cerr_result);
+
     /* FULL INTERFACE -- new in qpdf11. Similar to the qpdf-c.h API,
      * you must call qpdfjob_init to get a qpdfjob_handle and, when
      * done, call qpdfjob_cleanup to free resources. Remaining methods

@@ -161,6 +161,27 @@ qpdfjob_run_from_json(char const* json)
     });
 }
 
+int
+qpdfjob_run_from_json_with_result(char const* json, char const** cout_result, char const** cerr_result)
+{
+    int result = 0;
+    std::ostringstream cout;
+    std::ostringstream cerr;
+    QPDFJob j;
+    j.setOutputStreams(&cout, &cerr);
+    try {
+        j.initializeFromJson(json);
+        j.run();
+        result = j.getExitCode();
+    } catch (std::exception& e) {
+        std::cerr << "qpdfjob json: " << e.what() << std::endl;
+        result = QPDFJob::EXIT_ERROR;
+    }
+    *cout_result = QUtil::copy_string(cout.str());
+    *cerr_result = QUtil::copy_string(cerr.str());
+    return result;
+}
+
 void
 qpdfjob_register_progress_reporter(
     qpdfjob_handle j,
