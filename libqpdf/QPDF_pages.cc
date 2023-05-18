@@ -55,13 +55,13 @@ QPDF::getAllPages()
     // initialize this->m->all_pages.
     if (this->m->all_pages.empty()) {
         this->m->ever_called_get_all_pages = true;
-        std::set<QPDFObjGen> visited;
-        std::set<QPDFObjGen> seen;
+        QPDFObjGen::set visited;
+        QPDFObjGen::set seen;
         QPDFObjectHandle pages = getRoot().getKey("/Pages");
         bool warned = false;
         bool changed_pages = false;
         while (pages.isDictionary() && pages.hasKey("/Parent")) {
-            if (seen.count(pages.getObjGen())) {
+            if (!seen.add(pages)) {
                 // loop -- will be detected again and reported later
                 break;
             }
@@ -74,7 +74,6 @@ QPDF::getAllPages()
                     " to the root of the page tree; attempting to correct");
                 warned = true;
             }
-            seen.insert(pages.getObjGen());
             changed_pages = true;
             pages = pages.getKey("/Parent");
         }
@@ -92,12 +91,9 @@ QPDF::getAllPages()
 
 void
 QPDF::getAllPagesInternal(
-    QPDFObjectHandle cur_node,
-    std::set<QPDFObjGen>& visited,
-    std::set<QPDFObjGen>& seen)
+    QPDFObjectHandle cur_node, QPDFObjGen::set& visited, QPDFObjGen::set& seen)
 {
-    QPDFObjGen cur_node_og = cur_node.getObjGen();
-    if (visited.count(cur_node_og) > 0) {
+    if (!visited.add(cur_node)) {
         throw QPDFExc(
             qpdf_e_pages,
             this->m->file->getName(),
@@ -105,7 +101,6 @@ QPDF::getAllPagesInternal(
             0,
             "Loop detected in /Pages structure (getAllPages)");
     }
-    visited.insert(cur_node_og);
     if (!cur_node.isDictionaryOfType("/Pages")) {
         cur_node.warnIfPossible(
             "/Type key should be /Pages but is not; overriding");
@@ -125,7 +120,7 @@ QPDF::getAllPagesInternal(
                     " (from 0) is direct; converting to indirect");
                 kid = makeIndirectObject(kid);
                 kids.setArrayItem(i, kid);
-            } else if (seen.count(kid.getObjGen())) {
+            } else if (!seen.add(kid)) {
                 // Make a copy of the page. This does the same as
                 // shallowCopyPage in QPDFPageObjectHelper.
                 QTC::TC("qpdf", "QPDF resolve duplicated page object");
@@ -134,6 +129,7 @@ QPDF::getAllPagesInternal(
                     " (from 0) appears more than once in the pages tree;"
                     " creating a new page object as a copy");
                 kid = makeIndirectObject(QPDFObjectHandle(kid).shallowCopy());
+                seen.add(kid);
                 kids.setArrayItem(i, kid);
             }
             if (!kid.isDictionaryOfType("/Page")) {
@@ -141,7 +137,6 @@ QPDF::getAllPagesInternal(
                     "/Type key should be /Page but is not; overriding");
                 kid.replaceKey("/Type", "/Page"_qpdf);
             }
-            seen.insert(kid.getObjGen());
             m->all_pages.push_back(kid);
         }
     }

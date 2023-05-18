@@ -1252,8 +1252,8 @@ class QPDF
 
     void getAllPagesInternal(
         QPDFObjectHandle cur_pages,
-        std::set<QPDFObjGen>& visited,
-        std::set<QPDFObjGen>& seen);
+        QPDFObjGen::set& visited,
+        QPDFObjGen::set& seen);
     void insertPage(QPDFObjectHandle newpage, int pos);
     void flattenPagesTree();
     void insertPageobjToPage(
