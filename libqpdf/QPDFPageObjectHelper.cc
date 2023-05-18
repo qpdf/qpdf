@@ -352,30 +352,27 @@ QPDFPageObjectHelper::forEachXObject(
         "QPDFPageObjectHelper::forEachXObject",
         recursive ? (this->oh.isFormXObject() ? 0 : 1)
                   : (this->oh.isFormXObject() ? 2 : 3));
-    std::set<QPDFObjGen> seen;
+    QPDFObjGen::set seen;
     std::list<QPDFPageObjectHelper> queue;
     queue.push_back(*this);
     while (!queue.empty()) {
-        QPDFPageObjectHelper ph = queue.front();
-        queue.pop_front();
-        QPDFObjGen og = ph.oh.getObjGen();
-        if (seen.count(og)) {
-            continue;
-        }
-        seen.insert(og);
-        QPDFObjectHandle resources = ph.getAttribute("/Resources", false);
-        if (resources.isDictionary() && resources.hasKey("/XObject")) {
-            QPDFObjectHandle xobj_dict = resources.getKey("/XObject");
-            for (auto const& key: xobj_dict.getKeys()) {
-                QPDFObjectHandle obj = xobj_dict.getKey(key);
-                if ((!selector) || selector(obj)) {
-                    action(obj, xobj_dict, key);
-                }
-                if (recursive && obj.isFormXObject()) {
-                    queue.push_back(QPDFPageObjectHelper(obj));
+        auto& ph = queue.front();
+        if (seen.add(ph)) {
+            auto xobj_dict =
+                ph.getAttribute("/Resources", false).getKeyIfDict("/XObject");
+            if (xobj_dict.isDictionary()) {
+                for (auto const& key: xobj_dict.getKeys()) {
+                    QPDFObjectHandle obj = xobj_dict.getKey(key);
+                    if ((!selector) || selector(obj)) {
+                        action(obj, xobj_dict, key);
+                    }
+                    if (recursive && obj.isFormXObject()) {
+                        queue.emplace_back(obj);
+                    }
                 }
             }
         }
+        queue.pop_front();
     }
 }
 
