@@ -284,7 +284,7 @@ QPDF::updateObjectMaps(
     QPDFObjectHandle oh,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
-    std::set<QPDFObjGen> visited;
+    QPDFObjGen::set visited;
     updateObjectMapsInternal(ou, oh, skip_stream_parameters, visited, true);
 }
 
@@ -293,7 +293,7 @@ QPDF::updateObjectMapsInternal(
     ObjUser const& ou,
     QPDFObjectHandle oh,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters,
-    std::set<QPDFObjGen>& visited,
+    QPDFObjGen::set& visited,
     bool top)
 {
     // Traverse the object tree from this point taking care to avoid
@@ -310,13 +310,12 @@ QPDF::updateObjectMapsInternal(
 
     if (oh.isIndirect()) {
         QPDFObjGen og(oh.getObjGen());
-        if (visited.count(og)) {
+        if (!visited.add(og)) {
             QTC::TC("qpdf", "QPDF opt loop detected");
             return;
         }
         this->m->obj_user_to_objects[ou].insert(og);
         this->m->object_to_obj_users[og].insert(ou);
-        visited.insert(og);
     }
 
     if (oh.isArray()) {

@@ -1645,7 +1645,7 @@ class QPDF
         ObjUser const& ou,
         QPDFObjectHandle oh,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters,
-        std::set<QPDFObjGen>& visited,
+        QPDFObjGen::set& visited,
         bool top);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
 
