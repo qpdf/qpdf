@@ -1001,18 +1001,16 @@ QPDFJob::parse_object_id(
     }
 }
 
-std::set<QPDFObjGen>
+QPDFObjGen::set
 QPDFJob::getWantedJSONObjects()
 {
-    std::set<QPDFObjGen> wanted_og;
+    QPDFObjGen::set wanted_og;
     for (auto const& iter: m->json_objects) {
         bool trailer;
         int obj = 0;
         int gen = 0;
         parse_object_id(iter, trailer, obj, gen);
-        if (obj) {
-            wanted_og.insert(QPDFObjGen(obj, gen));
-        }
+        wanted_og.add(QPDFObjGen(obj, gen));
     }
     return wanted_og;
 }
