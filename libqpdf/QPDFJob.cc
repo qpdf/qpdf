@@ -1043,7 +1043,7 @@ QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
         bool first_object = true;
         JSON::writeDictionaryOpen(p, first_object, 1);
         bool all_objects = m->json_objects.empty();
-        std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
+        auto wanted_og = getWantedJSONObjects();
         for (auto& obj: pdf.getAllObjects()) {
             std::string key = obj.unparse();
             if (this->m->json_version > 1) {
@@ -1063,11 +1063,8 @@ QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
         if (this->m->json_objects.count("trailer")) {
             json_objects.insert("trailer");
         }
-        auto wanted = getWantedJSONObjects();
-        for (auto const& og: wanted) {
-            std::ostringstream s;
-            s << "obj:" << og.unparse(' ') << " R";
-            json_objects.insert(s.str());
+        for (auto og: getWantedJSONObjects()) {
+            json_objects.emplace("obj:" + og.unparse(' ') + " R");
         }
         pdf.writeJSON(
             this->m->json_version,
@@ -1088,7 +1085,7 @@ QPDFJob::doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf)
     bool first_object = true;
     JSON::writeDictionaryOpen(p, first_object, 1);
     bool all_objects = m->json_objects.empty();
-    std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
+    auto wanted_og = getWantedJSONObjects();
     for (auto& obj: pdf.getAllObjects()) {
         if (all_objects || wanted_og.count(obj.getObjGen())) {
             auto j_details = JSON::makeDictionary();
