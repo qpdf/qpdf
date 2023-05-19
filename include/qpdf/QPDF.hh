@@ -1017,7 +1017,7 @@ class QPDF
       public:
         std::map<QPDFObjGen, QPDFObjectHandle> object_map;
         std::vector<QPDFObjectHandle> to_copy;
-        std::set<QPDFObjGen> visiting;
+        QPDFObjGen::set visiting;
     };
 
     class EncryptionParameters

@@ -2176,7 +2176,8 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
 void
 QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
 {
-    if (foreign.isReserved()) {
+    auto foreign_tc = foreign.getTypeCode();
+    if (foreign_tc == ::ot_reserved) {
         throw std::logic_error(
             "QPDF: attempting to copy a foreign reserved object");
     }
@@ -2193,70 +2194,62 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
 
     if (foreign.isIndirect()) {
         QPDFObjGen foreign_og(foreign.getObjGen());
-        if (obj_copier.visiting.find(foreign_og) != obj_copier.visiting.end()) {
-            QTC::TC("qpdf", "QPDF loop reserving objects");
+        if (obj_copier.object_map.count(foreign_og) > 0) {
+            QTC::TC("qpdf", "QPDF already reserved object");
+            if (obj_copier.visiting.count(foreign_og)) {
+                QTC::TC("qpdf", "QPDF loop reserving objects");
+            }
             return;
         }
-        if (obj_copier.object_map.find(foreign_og) !=
-            obj_copier.object_map.end()) {
-            QTC::TC("qpdf", "QPDF already reserved object");
+        if (!obj_copier.visiting.add(foreign_og)) {
             return;
         }
         QTC::TC("qpdf", "QPDF copy indirect");
-        obj_copier.visiting.insert(foreign_og);
-        auto mapping = obj_copier.object_map.find(foreign_og);
-        if (mapping == obj_copier.object_map.end()) {
+        if (obj_copier.object_map.count(foreign_og) == 0) {
             obj_copier.to_copy.push_back(foreign);
-            QPDFObjectHandle reservation;
-            if (foreign.isStream()) {
-                reservation = newStream();
-            } else {
-                reservation = QPDFObjectHandle::newReserved(this);
-            }
-            obj_copier.object_map[foreign_og] = reservation;
+            obj_copier.object_map[foreign_og] = foreign.isStream()
+                ? newStream()
+                : QPDFObjectHandle::newReserved(this);
         }
     }
 
-    if (foreign.isArray()) {
+    if (foreign_tc == ::ot_array) {
         QTC::TC("qpdf", "QPDF reserve array");
         int n = foreign.getArrayNItems();
         for (int i = 0; i < n; ++i) {
             reserveObjects(foreign.getArrayItem(i), obj_copier, false);
         }
-    } else if (foreign.isDictionary()) {
+    } else if (foreign_tc == ::ot_dictionary) {
         QTC::TC("qpdf", "QPDF reserve dictionary");
         for (auto const& key: foreign.getKeys()) {
             reserveObjects(foreign.getKey(key), obj_copier, false);
         }
-    } else if (foreign.isStream()) {
+    } else if (foreign_tc == ::ot_stream) {
         QTC::TC("qpdf", "QPDF reserve stream");
         reserveObjects(foreign.getDict(), obj_copier, false);
     }
 
-    if (foreign.isIndirect()) {
-        QPDFObjGen foreign_og(foreign.getObjGen());
-        obj_copier.visiting.erase(foreign_og);
-    }
+    obj_copier.visiting.erase(foreign);
 }
 
 QPDFObjectHandle
 QPDF::replaceForeignIndirectObjects(
     QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
 {
+    auto foreign_tc = foreign.getTypeCode();
     QPDFObjectHandle result;
     if ((!top) && foreign.isIndirect()) {
         QTC::TC("qpdf", "QPDF replace indirect");
-        QPDFObjGen foreign_og(foreign.getObjGen());
-        auto mapping = obj_copier.object_map.find(foreign_og);
+        auto mapping = obj_copier.object_map.find(foreign.getObjGen());
         if (mapping == obj_copier.object_map.end()) {
             // This case would occur if this is a reference to a Page
             // or Pages object that we didn't traverse into.
             QTC::TC("qpdf", "QPDF replace foreign indirect with null");
             result = QPDFObjectHandle::newNull();
         } else {
-            result = obj_copier.object_map[foreign_og];
+            result = mapping->second;
         }
-    } else if (foreign.isArray()) {
+    } else if (foreign_tc == ::ot_array) {
         QTC::TC("qpdf", "QPDF replace array");
         result = QPDFObjectHandle::newArray();
         int n = foreign.getArrayNItems();
@@ -2266,7 +2259,7 @@ QPDF::replaceForeignIndirectObjects(
                 replaceForeignIndirectObjects(
                     foreign.getArrayItem(i), obj_copier, false));
         }
-    } else if (foreign.isDictionary()) {
+    } else if (foreign_tc == ::ot_dictionary) {
         QTC::TC("qpdf", "QPDF replace dictionary");
         result = QPDFObjectHandle::newDictionary();
         std::set<std::string> keys = foreign.getKeys();
@@ -2276,10 +2269,9 @@ QPDF::replaceForeignIndirectObjects(
                 replaceForeignIndirectObjects(
                     foreign.getKey(iter), obj_copier, false));
         }
-    } else if (foreign.isStream()) {
+    } else if (foreign_tc == ::ot_stream) {
         QTC::TC("qpdf", "QPDF replace stream");
-        QPDFObjGen foreign_og(foreign.getObjGen());
-        result = obj_copier.object_map[foreign_og];
+        result = obj_copier.object_map[foreign.getObjGen()];
         result.assertStream();
         QPDFObjectHandle dict = result.getDict();
         QPDFObjectHandle old_dict = foreign.getDict();
