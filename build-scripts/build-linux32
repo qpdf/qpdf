@@ -4,8 +4,8 @@ set -ex
 sudo dpkg --add-architecture i386
 sudo apt-get update
 sudo apt-get -y install \
-     build-essential cmake zlib1g-dev:i386 libjpeg-dev:i386 \
-     libssl-dev:i386 g++-multilib
+     build-essential cmake libc6-i386 libgcc-s1:i386 \
+     zlib1g-dev:i386 libjpeg-dev:i386 libssl-dev:i386 g++-multilib
 CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32 \
       cmake -S . -B build -DCI_MODE=1 -DCMAKE_BUILD_TYPE=Release \
       -DUSE_IMPLICIT_CRYPTO=0 -DBUILD_STATIC_LIBS=0 \
