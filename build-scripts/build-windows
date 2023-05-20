@@ -6,6 +6,7 @@ tool=$2
 
 declare -a cmake_xargs
 declare -a ctest_xargs
+config=Release
 if [[ $tool == mingw ]]; then
     pacman -Sy --noconfirm make base-devel tar zip unzip
     if [ ! -x /c/msys64/mingw$wordsize/bin/g++.exe ]; then
@@ -16,12 +17,10 @@ if [[ $tool == mingw ]]; then
         fi
     fi
     PATH="/c/msys64/mingw$wordsize/bin:$PATH"
-    config=RelWithDebInfo
     cmake_xargs=(-- -k)
     g++ -v
 elif [[ $tool == msvc ]]; then
     cl
-    config=Release
     cmake_xargs=(--config $config)
     ctest_xargs=(-C $config)
 fi
