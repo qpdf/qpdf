@@ -27,7 +27,7 @@
 #include <qpdf/Types.h>
 
 #include <memory>
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 
 // Remember to use QPDF_DLL_CLASS on anything derived from InputSource

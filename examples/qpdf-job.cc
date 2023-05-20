@@ -1,8 +1,6 @@
-#include <qpdf/QIntC.hh>
 #include <qpdf/QPDFJob.hh>
 #include <qpdf/QUtil.hh>
 
-#include <cstring>
 #include <iostream>
 
 // This program is a simple demonstration of different ways to use the

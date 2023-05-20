@@ -1,6 +1,5 @@
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDF.hh>
@@ -23,10 +22,10 @@ usage()
 class ParserCallbacks: public QPDFObjectHandle::ParserCallbacks
 {
   public:
-    virtual ~ParserCallbacks() = default;
-    virtual void contentSize(size_t);
-    virtual void handleObject(QPDFObjectHandle, size_t offset, size_t length);
-    virtual void handleEOF();
+    ~ParserCallbacks() override = default;
+    void contentSize(size_t) override;
+    void handleObject(QPDFObjectHandle, size_t offset, size_t length) override;
+    void handleEOF() override;
 };
 
 void

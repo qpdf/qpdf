@@ -3,7 +3,7 @@
 #include <qpdf/Pl_StdioFile.hh>
 
 #include <qpdf/QUtil.hh>
-#include <errno.h>
+#include <cerrno>
 #include <stdexcept>
 
 Pl_StdioFile::Members::Members(FILE* f) :

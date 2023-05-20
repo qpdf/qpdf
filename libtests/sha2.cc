@@ -1,8 +1,7 @@
 #include <qpdf/Pl_SHA2.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <cstring>
 
 static void
 test(

@@ -2,7 +2,6 @@
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QUtil.hh>
-#include <algorithm>
 #include <cstring>
 #include <stdexcept>
 

@@ -1,7 +1,5 @@
 #include <qpdf/Pl_Function.hh>
 
-#include <qpdf/QUtil.hh>
-#include <errno.h>
 #include <stdexcept>
 
 Pl_Function::Members::Members(writer_t fn) :

@@ -3,7 +3,6 @@
 #include <qpdf/QPDFNumberTreeObjectHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
-#include <cstring>
 #include <iostream>
 
 static char const* whoami = nullptr;

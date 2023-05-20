@@ -30,10 +30,10 @@
 
 #include <algorithm>
 #include <cstring>
-#include <ctype.h>
-#include <limits.h>
+#include <cctype>
+#include <climits>
 #include <stdexcept>
-#include <stdlib.h>
+#include <cstdlib>
 
 using namespace std::literals;
 
@@ -111,8 +111,8 @@ namespace
             old_contents(old_contents)
         {
         }
-        virtual ~CoalesceProvider() = default;
-        virtual void provideStreamData(QPDFObjGen const&, Pipeline* pipeline);
+        ~CoalesceProvider() override = default;
+        void provideStreamData(QPDFObjGen const&, Pipeline* pipeline) override;
 
       private:
         QPDFObjectHandle containing_page;
@@ -200,9 +200,9 @@ namespace
     {
       public:
         LastChar(Pipeline* next);
-        virtual ~LastChar() = default;
-        virtual void write(unsigned char const* data, size_t len);
-        virtual void finish();
+        ~LastChar() override = default;
+        void write(unsigned char const* data, size_t len) override;
+        void finish() override;
         unsigned char getLastChar();
 
       private:
@@ -1446,13 +1446,13 @@ namespace
         {
         }
 
-        virtual void
+        void
         provideStreamData(QPDFObjGen const&, Pipeline* pipeline) override
         {
             p1(pipeline);
         }
 
-        virtual bool
+        bool
         provideStreamData(
             QPDFObjGen const&,
             Pipeline* pipeline,

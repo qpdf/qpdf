@@ -7,18 +7,18 @@ namespace
     class NameTreeDetails: public NNTreeDetails
     {
       public:
-        virtual std::string const&
+        std::string const&
         itemsKey() const override
         {
             static std::string k("/Names");
             return k;
         }
-        virtual bool
+        bool
         keyValid(QPDFObjectHandle oh) const override
         {
             return oh.isString();
         }
-        virtual int
+        int
         compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const override
         {
             if (!(keyValid(a) && keyValid(b))) {

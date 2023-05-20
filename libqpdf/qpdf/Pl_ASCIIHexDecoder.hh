@@ -7,9 +7,9 @@ class Pl_ASCIIHexDecoder: public Pipeline
 {
   public:
     Pl_ASCIIHexDecoder(char const* identifier, Pipeline* next);
-    virtual ~Pl_ASCIIHexDecoder() = default;
-    virtual void write(unsigned char const* buf, size_t len);
-    virtual void finish();
+    ~Pl_ASCIIHexDecoder() override = default;
+    void write(unsigned char const* buf, size_t len) override;
+    void finish() override;
 
   private:
     void flush();

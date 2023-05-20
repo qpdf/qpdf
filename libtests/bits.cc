@@ -4,8 +4,7 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 // See comments in bits_functions.hh
 #define BITS_TESTING 1
@@ -142,7 +141,7 @@ test()
 
     unsigned char ch = 0;
     bit_offset = 7;
-    Pl_Buffer* bp = new Pl_Buffer("buffer");
+    auto* bp = new Pl_Buffer("buffer");
 
     test_write_bits(ch, bit_offset, 30UL, 5, bp);
     test_write_bits(ch, bit_offset, 10UL, 4, bp);

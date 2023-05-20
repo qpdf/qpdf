@@ -2,10 +2,8 @@
 
 #include <qpdf/QIntC.hh>
 #include <algorithm>
-#include <limits>
 #include <sstream>
-#include <stdexcept>
-#include <string.h>
+#include <cstring>
 
 BufferInputSource::BufferInputSource(
     std::string const& description, Buffer* buf, bool own_memory) :

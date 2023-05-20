@@ -6,7 +6,7 @@
 #include <qpdf/QPDFAnnotationObjectHelper.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
-#include <stdlib.h>
+#include <cstdlib>
 
 QPDFFormFieldObjectHelper::QPDFFormFieldObjectHelper(QPDFObjectHandle oh) :
     QPDFObjectHelper(oh),
@@ -515,9 +515,9 @@ namespace
             std::vector<std::string> const& opt,
             double tf,
             QPDFObjectHandle::Rectangle const& bbox);
-        virtual ~ValueSetter() = default;
-        virtual void handleToken(QPDFTokenizer::Token const&);
-        virtual void handleEOF();
+        ~ValueSetter() override = default;
+        void handleToken(QPDFTokenizer::Token const&) override;
+        void handleEOF() override;
         void writeAppearance();
 
       private:
@@ -611,7 +611,7 @@ ValueSetter::writeAppearance()
     // Write one or more lines, centered vertically, possibly with
     // one row highlighted.
 
-    size_t max_rows = static_cast<size_t>((bbox.ury - bbox.lly) / tfh);
+    auto max_rows = static_cast<size_t>((bbox.ury - bbox.lly) / tfh);
     bool highlight = false;
     size_t highlight_idx = 0;
 
@@ -706,10 +706,10 @@ namespace
     {
       public:
         TfFinder();
-        virtual ~TfFinder()
+        ~TfFinder() override
         {
         }
-        virtual void handleToken(QPDFTokenizer::Token const&);
+        void handleToken(QPDFTokenizer::Token const&) override;
         double getTf();
         std::string getFontName();
         std::string getDA();

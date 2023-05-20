@@ -51,7 +51,7 @@ class QPDF_DLL_CLASS Pl_QPDFTokenizer: public Pipeline
     Pl_QPDFTokenizer(
         char const* identifier,
         QPDFObjectHandle::TokenFilter* filter,
-        Pipeline* next = 0);
+        Pipeline* next = nullptr);
     QPDF_DLL
     virtual ~Pl_QPDFTokenizer();
     QPDF_DLL

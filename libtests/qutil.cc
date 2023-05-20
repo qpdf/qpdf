@@ -3,15 +3,11 @@
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QUtil.hh>
-#include <fcntl.h>
 #include <fstream>
 #include <iostream>
-#include <limits.h>
-#include <locale>
-#include <stdio.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
+#include <climits>
+#include <cstdio>
+#include <cstring>
 
 #ifdef _WIN32
 # include <io.h>
@@ -493,7 +489,7 @@ same_file_test()
     assert_same_file("qutil.out", "qutil.out", true);
     assert_same_file("qutil.out", "other-file", false);
     assert_same_file("qutil.out", "", false);
-    assert_same_file("qutil.out", 0, false);
+    assert_same_file("qutil.out", nullptr, false);
     assert_same_file("", "qutil.out", false);
 }
 

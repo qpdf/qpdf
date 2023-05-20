@@ -27,10 +27,10 @@ namespace
     {
       public:
         SF_Crypt() = default;
-        virtual ~SF_Crypt() = default;
+        ~SF_Crypt() override = default;
 
-        virtual bool
-        setDecodeParms(QPDFObjectHandle decode_parms)
+        bool
+        setDecodeParms(QPDFObjectHandle decode_parms) override
         {
             if (decode_parms.isNull()) {
                 return true;
@@ -49,8 +49,8 @@ namespace
             return filterable;
         }
 
-        virtual Pipeline*
-        getDecodePipeline(Pipeline*)
+        Pipeline*
+        getDecodePipeline(Pipeline*) override
         {
             // Not used -- handled by pipeStreamData
             return nullptr;
@@ -557,7 +557,7 @@ QPDF_Stream::pipeStreamData(
             if (decode_pipeline) {
                 pipeline = decode_pipeline;
             }
-            Pl_Flate* flate = dynamic_cast<Pl_Flate*>(pipeline);
+            auto* flate = dynamic_cast<Pl_Flate*>(pipeline);
             if (flate != nullptr) {
                 flate->setWarnCallback(
                     [this](char const* msg, int code) { warn(msg); });

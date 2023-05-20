@@ -30,7 +30,7 @@
 #include <list>
 #include <map>
 #include <memory>
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -83,7 +83,7 @@ class QPDF
     // interpreted as a raw encryption key. See comments on
     // setPasswordIsHexKey for more information.
     QPDF_DLL
-    void processFile(char const* filename, char const* password = 0);
+    void processFile(char const* filename, char const* password = nullptr);
 
     // Parse a PDF from a stdio FILE*.  The FILE must be open in
     // binary mode and must be seekable.  It may be open read only.
@@ -96,7 +96,7 @@ class QPDF
         char const* description,
         FILE* file,
         bool close_file,
-        char const* password = 0);
+        char const* password = nullptr);
 
     // Parse a PDF file loaded into a memory buffer.  This works
     // exactly like processFile except that the PDF file is in memory
@@ -107,14 +107,14 @@ class QPDF
         char const* description,
         char const* buf,
         size_t length,
-        char const* password = 0);
+        char const* password = nullptr);
 
     // Parse a PDF file loaded from a custom InputSource.  If you have
     // your own method of retrieving a PDF file, you can subclass
     // InputSource and use this method.
     QPDF_DLL
     void
-    processInputSource(std::shared_ptr<InputSource>, char const* password = 0);
+    processInputSource(std::shared_ptr<InputSource>, char const* password = nullptr);
 
     // Create a PDF from an input source that contains JSON as written
     // by writeJSON (or qpdf --json-output, version 2 or higher). The

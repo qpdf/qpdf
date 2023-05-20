@@ -42,7 +42,7 @@ class QPDFOutlineObjectHelper: public QPDFObjectHelper
     {
         // This must be cleared explicitly to avoid circular references
         // that prevent cleanup of pointer holders.
-        this->m->parent = 0;
+        this->m->parent = nullptr;
     }
 
     // All constructors are private. You can only create one of these

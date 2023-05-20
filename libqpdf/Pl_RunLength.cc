@@ -127,11 +127,11 @@ Pl_RunLength::flush_encode()
             throw std::logic_error(
                 "Pl_RunLength: invalid length in flush_encode for run");
         }
-        unsigned char ch = static_cast<unsigned char>(257 - this->m->length);
+        auto ch = static_cast<unsigned char>(257 - this->m->length);
         this->getNext()->write(&ch, 1);
         this->getNext()->write(&this->m->buf[0], 1);
     } else if (this->m->length > 0) {
-        unsigned char ch = static_cast<unsigned char>(this->m->length - 1);
+        auto ch = static_cast<unsigned char>(this->m->length - 1);
         this->getNext()->write(&ch, 1);
         this->getNext()->write(this->m->buf, this->m->length);
     }

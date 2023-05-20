@@ -2,7 +2,7 @@
 
 #include <qpdf/QUtil.hh>
 #include <qpdf/qpdf-config.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 InsecureRandomDataProvider::InsecureRandomDataProvider() :
     seeded_random(false)
@@ -24,7 +24,7 @@ InsecureRandomDataProvider::random()
         // Seed the random number generator with something simple, but
         // just to be interesting, don't use the unmodified current
         // time.  It would be better if this were a more secure seed.
-        unsigned int seed =
+        auto seed =
             static_cast<unsigned int>(QUtil::get_current_time() ^ 0xcccc);
 #ifdef HAVE_RANDOM
         ::srandom(seed);

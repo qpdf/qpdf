@@ -1,7 +1,7 @@
 #include <qpdf/assert_test.h>
 
 #include <qpdf/QIntC.hh>
-#include <stdint.h>
+#include <cstdint>
 
 #define try_convert(exp_pass, fn, i) \
     try_convert_real(#fn "(" #i ")", exp_pass, fn, i)
@@ -74,7 +74,7 @@ main()
     uint64_t ul1 = 1099511627776LL; // Too big for 32-bit
     uint64_t ul2 = 12345;           // Fits into 32-bit
     int32_t i2 = 81;                // Fits in char and uchar
-    signed char c1 = static_cast<signed char>('\xf7'); // Signed value when char
+    auto c1 = static_cast<signed char>('\xf7'); // Signed value when char
     char c2 = 'W'; // char; may be signed or unsigned
 
     // Verify i1 and u1 have same bit pattern

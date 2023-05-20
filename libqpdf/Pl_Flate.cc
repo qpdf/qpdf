@@ -1,7 +1,7 @@
 #include <qpdf/Pl_Flate.hh>
 
-#include <limits.h>
-#include <string.h>
+#include <climits>
+#include <cstring>
 #include <zlib.h>
 
 #include <qpdf/QIntC.hh>

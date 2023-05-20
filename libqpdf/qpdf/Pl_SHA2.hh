@@ -20,10 +20,10 @@
 class Pl_SHA2: public Pipeline
 {
   public:
-    Pl_SHA2(int bits = 0, Pipeline* next = 0);
-    virtual ~Pl_SHA2() = default;
-    virtual void write(unsigned char const*, size_t);
-    virtual void finish();
+    Pl_SHA2(int bits = 0, Pipeline* next = nullptr);
+    ~Pl_SHA2() override = default;
+    void write(unsigned char const*, size_t) override;
+    void finish() override;
     void resetBits(int bits);
     std::string getHexDigest();
     std::string getRawDigest();

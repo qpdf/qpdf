@@ -6,8 +6,8 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 static char const* whoami = nullptr;
 
@@ -33,8 +33,8 @@ usage()
 class ImageInverter: public QPDFObjectHandle::StreamDataProvider
 {
   public:
-    virtual ~ImageInverter() = default;
-    virtual void
+    ~ImageInverter() override = default;
+    void
     provideStreamData(QPDFObjGen const& og, Pipeline* pipeline) override;
 
     void registerImage(
@@ -124,7 +124,7 @@ main(int argc, char* argv[])
         QPDF qpdf;
         qpdf.processFile(infilename, password);
 
-        ImageInverter* inv = new ImageInverter;
+        auto* inv = new ImageInverter;
         auto p = std::shared_ptr<QPDFObjectHandle::StreamDataProvider>(inv);
 
         // For each page...

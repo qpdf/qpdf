@@ -9,9 +9,8 @@
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QTC.hh>
 
-#include <cmath>
-#include <ctype.h>
-#include <errno.h>
+#include <cctype>
+#include <cerrno>
 #include <fcntl.h>
 #include <fstream>
 #include <iomanip>
@@ -22,9 +21,9 @@
 #include <set>
 #include <sstream>
 #include <stdexcept>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #ifndef QPDF_NO_WCHAR_T
 # include <cwchar>
 #endif
@@ -837,8 +836,8 @@ char*
 QUtil::getWhoami(char* argv0)
 {
     char* whoami = nullptr;
-    if (((whoami = strrchr(argv0, '/')) == NULL) &&
-        ((whoami = strrchr(argv0, '\\')) == NULL)) {
+    if (((whoami = strrchr(argv0, '/')) == nullptr) &&
+        ((whoami = strrchr(argv0, '\\')) == nullptr)) {
         whoami = argv0;
     } else {
         ++whoami;

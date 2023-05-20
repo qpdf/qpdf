@@ -2,7 +2,6 @@
 
 #include <qpdf/QPDFArgParser.hh>
 #include <qpdf/QPDFUsage.hh>
-#include <qpdf/QUtil.hh>
 #include <cstring>
 #include <iostream>
 
@@ -52,7 +51,7 @@ ArgParser::initOptions()
     ap.addBare("potato", b(&ArgParser::handlePotato));
     ap.addRequiredParameter("salad", p(&ArgParser::handleSalad), "tossed");
     ap.addOptionalParameter("moo", p(&ArgParser::handleMoo));
-    char const* choices[] = {"pig", "boar", "sow", 0};
+    char const* choices[] = {"pig", "boar", "sow", nullptr};
     ap.addChoices("oink", p(&ArgParser::handleOink), true, choices);
     ap.selectHelpOptionTable();
     ap.addBare("version", [this]() { output("3.14159"); });

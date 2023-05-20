@@ -8,13 +8,11 @@
 #include <algorithm>
 #include <deque>
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
 
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
-#include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
 
@@ -35,8 +33,8 @@ usage()
 class StringReverser: public QPDFObjectHandle::TokenFilter
 {
   public:
-    virtual ~StringReverser() = default;
-    virtual void handleToken(QPDFTokenizer::Token const&);
+    ~StringReverser() override = default;
+    void handleToken(QPDFTokenizer::Token const&) override;
 };
 
 void
@@ -68,9 +66,9 @@ StringReverser::handleToken(QPDFTokenizer::Token const& token)
 class ColorToGray: public QPDFObjectHandle::TokenFilter
 {
   public:
-    virtual ~ColorToGray() = default;
-    virtual void handleToken(QPDFTokenizer::Token const&);
-    virtual void handleEOF();
+    ~ColorToGray() override = default;
+    void handleToken(QPDFTokenizer::Token const&) override;
+    void handleEOF() override;
 
   private:
     bool isNumeric(QPDFTokenizer::token_type_e);

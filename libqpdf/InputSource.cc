@@ -3,7 +3,7 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 #include <stdexcept>
-#include <string.h>
+#include <cstring>
 
 void
 InputSource::setLastOffset(qpdf_offset_t offset)

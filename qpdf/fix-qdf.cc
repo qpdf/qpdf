@@ -8,7 +8,7 @@
 #include <regex>
 #include <string_view>
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 static void
 usage()
@@ -392,7 +392,7 @@ realmain(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
     QUtil::setLineBuf(stdout);
-    char const* filename = 0;
+    char const* filename = nullptr;
     if (argc > 2) {
         usage();
     } else if ((argc > 1) && (strcmp(argv[1], "--version") == 0)) {
@@ -405,7 +405,7 @@ realmain(int argc, char* argv[])
         filename = argv[1];
     }
     std::string input;
-    if (filename == 0) {
+    if (filename == nullptr) {
         filename = "standard input";
         QUtil::binary_stdin();
         input = QUtil::read_file_into_string(stdin);

@@ -5,8 +5,8 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 // This program demonstrates extraction of bookmarks using the qpdf
 // outlines API. Note that all the information shown by this program

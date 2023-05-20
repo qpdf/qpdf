@@ -2,9 +2,7 @@
 
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/QTC.hh>
-#include <qpdf/QUtil.hh>
 #include <stdexcept>
-#include <string.h>
 
 Pl_QPDFTokenizer::Members::Members() :
     filter(nullptr),

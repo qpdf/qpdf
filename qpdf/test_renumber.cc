@@ -1,4 +1,3 @@
-#include <qpdf/Buffer.hh>
 #include <qpdf/Constants.h>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjGen.hh>
@@ -6,7 +5,6 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QPDFXRefEntry.hh>
 
-#include <algorithm>
 #include <cstdlib>
 #include <iostream>
 #include <set>

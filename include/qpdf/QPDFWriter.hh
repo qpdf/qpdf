@@ -34,7 +34,7 @@
 #include <map>
 #include <memory>
 #include <set>
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -102,7 +102,7 @@ class QPDFWriter
         QPDF_DLL
         virtual ~FunctionProgressReporter();
         QPDF_DLL
-        virtual void reportProgress(int) override;
+        void reportProgress(int) override;
 
       private:
         std::function<void(int)> handler;
@@ -539,7 +539,7 @@ class QPDFWriter
         friend class QPDFWriter;
 
       public:
-        PipelinePopper(QPDFWriter* qw, std::shared_ptr<Buffer>* bp = 0) :
+        PipelinePopper(QPDFWriter* qw, std::shared_ptr<Buffer>* bp = nullptr) :
             qw(qw),
             bp(bp)
         {

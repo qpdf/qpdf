@@ -3,7 +3,7 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QUtil.hh>
 #include <algorithm>
-#include <string.h>
+#include <cstring>
 
 FileInputSource::FileInputSource() :
     close_file(false),

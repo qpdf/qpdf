@@ -11,7 +11,7 @@ class SF_ASCII85Decode: public QPDFStreamFilter
     SF_ASCII85Decode() = default;
     virtual ~SF_ASCII85Decode() = default;
 
-    virtual Pipeline*
+    Pipeline*
     getDecodePipeline(Pipeline* next) override
     {
         this->pipeline =

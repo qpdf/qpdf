@@ -11,15 +11,15 @@ class OffsetInputSource: public InputSource
   public:
     OffsetInputSource(
         std::shared_ptr<InputSource>, qpdf_offset_t global_offset);
-    virtual ~OffsetInputSource() = default;
+    ~OffsetInputSource() override = default;
 
-    virtual qpdf_offset_t findAndSkipNextEOL();
-    virtual std::string const& getName() const;
-    virtual qpdf_offset_t tell();
-    virtual void seek(qpdf_offset_t offset, int whence);
-    virtual void rewind();
-    virtual size_t read(char* buffer, size_t length);
-    virtual void unreadCh(char ch);
+    qpdf_offset_t findAndSkipNextEOL() override;
+    std::string const& getName() const override;
+    qpdf_offset_t tell() override;
+    void seek(qpdf_offset_t offset, int whence) override;
+    void rewind() override;
+    size_t read(char* buffer, size_t length) override;
+    void unreadCh(char ch) override;
 
   private:
     std::shared_ptr<InputSource> proxied;

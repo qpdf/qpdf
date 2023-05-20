@@ -2,7 +2,6 @@
 
 #include <qpdf/QPDFCryptoProvider.hh>
 
-#include <string.h>
 
 RC4::RC4(unsigned char const* key_data, int key_len) :
     crypto(QPDFCryptoProvider::getImpl())

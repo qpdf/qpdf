@@ -1,7 +1,6 @@
 #include <qpdf/InsecureRandomDataProvider.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/SecureRandomDataProvider.hh>
-#include <qpdf/qpdf-config.h>
 #include <iostream>
 
 class BogusRandomDataProvider: public RandomDataProvider
@@ -57,7 +56,7 @@ main()
     if (!((buf[0] == 0) && (buf[1] == 1) && (buf[2] == 2) && (buf[3] == 3))) {
         std::cout << "fail: bogus random didn't provide correct bytes\n";
     }
-    QUtil::setRandomDataProvider(0);
+    QUtil::setRandomDataProvider(nullptr);
     if (QUtil::getRandomDataProvider() != orig_rdp) {
         std::cout << "fail: passing null to setRandomDataProvider "
                      "didn't reset the random data provider\n";

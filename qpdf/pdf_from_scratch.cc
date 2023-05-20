@@ -3,14 +3,13 @@
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFWriter.hh>
-#include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 void
 usage()
@@ -87,7 +86,7 @@ int
 main(int argc, char* argv[])
 {
     QUtil::setLineBuf(stdout);
-    if ((whoami = strrchr(argv[0], '/')) == NULL) {
+    if ((whoami = strrchr(argv[0], '/')) == nullptr) {
         whoami = argv[0];
     } else {
         ++whoami;

@@ -4,10 +4,9 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
 #include <iostream>
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 static void
 usageExit(std::string const& msg)

@@ -5,7 +5,6 @@
 // DO NOT USE ctype -- it is locale dependent for some things, and
 // it's not worth the risk of including it in case it may accidentally
 // be used.
-#include <string.h>
 
 static bool
 is_iso_latin1_printable(char ch)

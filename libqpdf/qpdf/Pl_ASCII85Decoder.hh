@@ -7,9 +7,9 @@ class Pl_ASCII85Decoder: public Pipeline
 {
   public:
     Pl_ASCII85Decoder(char const* identifier, Pipeline* next);
-    virtual ~Pl_ASCII85Decoder() = default;
-    virtual void write(unsigned char const* buf, size_t len);
-    virtual void finish();
+    ~Pl_ASCII85Decoder() override = default;
+    void write(unsigned char const* buf, size_t len) override;
+    void finish() override;
 
   private:
     void flush();

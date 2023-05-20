@@ -3,9 +3,8 @@
 #include <qpdf/QUtil.hh>
 
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
 
 int
 main(int argc, char* argv[])

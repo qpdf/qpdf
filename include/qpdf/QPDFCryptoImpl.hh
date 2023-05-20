@@ -80,7 +80,7 @@ class QPDF_DLL_CLASS QPDFCryptoImpl
     virtual void RC4_process(
         unsigned char const* in_data,
         size_t len,
-        unsigned char* out_data = 0) = 0;
+        unsigned char* out_data = nullptr) = 0;
     QPDF_DLL
     virtual void RC4_finalize() = 0;
 

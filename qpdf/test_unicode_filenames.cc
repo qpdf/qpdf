@@ -6,13 +6,13 @@
 #endif
 
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 static void
 do_copy(FILE* in, FILE* out)
 {
-    if ((in == 0) || (out == 0)) {
+    if ((in == nullptr) || (out == nullptr)) {
         std::cerr << "errors opening files" << std::endl;
         exit(2);
     }

@@ -26,19 +26,18 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
-#include <algorithm>
 #include <iostream>
-#include <limits.h>
+#include <climits>
 #include <map>
 #include <sstream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #define QPDF_OBJECT_NOWARN
 #include <qpdf/QPDFObject.hh>
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 void
 usage()
@@ -287,7 +286,7 @@ test_0_1(QPDF& pdf, char const* arg2)
         qtest.pipeStreamData(out.get(), 0, qpdf_dl_none);
 
         std::cout << std::endl << "Uncompressed stream data:" << std::endl;
-        if (qtest.pipeStreamData(0, 0, qpdf_dl_all)) {
+        if (qtest.pipeStreamData(nullptr, 0, qpdf_dl_all)) {
             std::cout.flush();
             QUtil::binary_stdout();
             out = std::make_shared<Pl_StdioFile>("filtered", stdout);
@@ -388,7 +387,7 @@ test_4(QPDF& pdf, char const* arg2)
     }
 
     trailer.replaceKey("/Info", pdf.makeIndirectObject(qtest));
-    QPDFWriter w(pdf, 0);
+    QPDFWriter w(pdf, nullptr);
     w.setQDFMode(true);
     w.setStaticID(true);
     w.write();
@@ -500,7 +499,7 @@ test_8(QPDF& pdf, char const* arg2)
     auto b = p1.getBufferSharedPointer();
     // This is a bogus way to use StreamDataProvider, but it does
     // adequately test its functionality.
-    Provider* provider = new Provider(b);
+    auto* provider = new Provider(b);
     auto p = std::shared_ptr<QPDFObjectHandle::StreamDataProvider>(provider);
     qstream.replaceStreamData(
         p,
@@ -600,7 +599,7 @@ test_12(QPDF& pdf, char const* arg2)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-    pdf.setOutputStreams(0, 0);
+    pdf.setOutputStreams(nullptr, nullptr);
 #if (defined(__GNUC__) || defined(__clang__))
 # pragma GCC diagnostic pop
 #endif
@@ -1010,7 +1009,7 @@ test_25(QPDF& pdf, char const* arg2)
     // Copy qtest without crossing page boundaries.  Should get O1
     // and O2 and their streams but not O3 or any other pages.
 
-    assert(arg2 != 0);
+    assert(arg2 != nullptr);
     {
         // Make sure original PDF is out of scope when we write.
         QPDF oldpdf;
@@ -1036,7 +1035,7 @@ test_26(QPDF& pdf, char const* arg2)
 
     {
         // Make sure original PDF is out of scope when we write.
-        assert(arg2 != 0);
+        assert(arg2 != nullptr);
         QPDF oldpdf;
         oldpdf.processFile(arg2);
         QPDFObjectHandle qtest = oldpdf.getTrailer().getKey("/QTest");
@@ -1069,7 +1068,7 @@ test_27(QPDF& pdf, char const* arg2)
         pl.writeCStr("new data for stream\n");
         pl.finish();
         auto b = pl.getBufferSharedPointer();
-        Provider* provider = new Provider(b);
+        auto* provider = new Provider(b);
         p1 = decltype(p1)(provider);
     }
     // Create a stream that uses a provider in empty1 and copy it
@@ -1096,7 +1095,7 @@ test_27(QPDF& pdf, char const* arg2)
             pl.writeCStr("more data for stream\n");
             pl.finish();
             auto b = pl.getBufferSharedPointer();
-            Provider* provider = new Provider(b);
+            auto* provider = new Provider(b);
             p2 = decltype(p2)(provider);
         }
         QPDF empty3;
@@ -1105,7 +1104,7 @@ test_27(QPDF& pdf, char const* arg2)
         QPDFObjectHandle s3 = QPDFObjectHandle::newStream(&empty3);
         s3.replaceStreamData(
             p2, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
-        assert(arg2 != 0);
+        assert(arg2 != nullptr);
         QPDF oldpdf;
         oldpdf.processFile(arg2);
         QPDFObjectHandle qtest = oldpdf.getTrailer().getKey("/QTest");
@@ -1152,7 +1151,7 @@ static void
 test_29(QPDF& pdf, char const* arg2)
 {
     // Detect mixed objects in QPDFWriter
-    assert(arg2 != 0);
+    assert(arg2 != nullptr);
     auto other = QPDF::create();
     other->processFile(arg2);
     // We need to create a QPDF with mixed ownership to exercise
@@ -1202,7 +1201,7 @@ test_29(QPDF& pdf, char const* arg2)
 static void
 test_30(QPDF& pdf, char const* arg2)
 {
-    assert(arg2 != 0);
+    assert(arg2 != nullptr);
     QPDF encrypted;
     encrypted.processFile(arg2, "user");
     QPDFWriter w(pdf, "b.pdf");
@@ -1434,7 +1433,7 @@ test_40(QPDF& pdf, char const* arg2)
     // feature was implemented by Sahil Arora
     // <sahilarora.535@gmail.com> as part of a Google Summer of
     // Code project in 2017.
-    assert(arg2 != 0);
+    assert(arg2 != nullptr);
     QPDFWriter w(pdf, arg2);
     w.setPCLm(true);
     w.setStaticID(true);
@@ -3559,11 +3558,11 @@ runtest(int n, char const* filename1, char const* arg2)
 
     QPDF pdf;
     std::shared_ptr<char> file_buf;
-    FILE* filep = 0;
+    FILE* filep = nullptr;
     if (n == 0) {
         pdf.setAttemptRecovery(false);
     }
-    if (((n == 35) || (n == 36)) && (arg2 != 0)) {
+    if (((n == 35) || (n == 36)) && (arg2 != nullptr)) {
         // arg2 is password
         pdf.processFile(filename1, arg2);
     } else if (n == 45) {
@@ -3653,7 +3652,7 @@ int
 main(int argc, char* argv[])
 {
     QUtil::setLineBuf(stdout);
-    if ((whoami = strrchr(argv[0], '/')) == NULL) {
+    if ((whoami = strrchr(argv[0], '/')) == nullptr) {
         whoami = argv[0];
     } else {
         ++whoami;

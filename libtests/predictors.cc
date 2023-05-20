@@ -6,10 +6,9 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QUtil.hh>
 
-#include <errno.h>
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 void
 run(char const* filename,
@@ -22,7 +21,7 @@ run(char const* filename,
     FILE* in = QUtil::safe_fopen(filename, "rb");
     FILE* o1 = QUtil::safe_fopen("out", "wb");
     Pipeline* out = new Pl_StdioFile("out", o1);
-    Pipeline* pl = 0;
+    Pipeline* pl = nullptr;
     if (strcmp(filter, "png") == 0) {
         pl = new Pl_PNGFilter(
             "png",

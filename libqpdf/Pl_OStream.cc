@@ -1,7 +1,5 @@
 #include <qpdf/Pl_OStream.hh>
 
-#include <qpdf/QUtil.hh>
-#include <errno.h>
 #include <stdexcept>
 
 Pl_OStream::Members::Members(std::ostream& os) :

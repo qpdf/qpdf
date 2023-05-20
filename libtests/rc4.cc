@@ -6,9 +6,9 @@
 #include <qpdf/QUtil.hh>
 
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 static void
 other_tests()
@@ -41,7 +41,7 @@ main(int argc, char* argv[])
     char* outfilename = argv[3];
     unsigned int hexkeylen = QIntC::to_uint(strlen(hexkey));
     unsigned int keylen = hexkeylen / 2;
-    unsigned char* key = new unsigned char[keylen + 1];
+    auto* key = new unsigned char[keylen + 1];
     key[keylen] = '\0';
 
     FILE* infile = QUtil::safe_fopen(infilename, "rb");
@@ -51,14 +51,14 @@ main(int argc, char* argv[])
         t[1] = hexkey[i + 1];
         t[2] = '\0';
 
-        long val = strtol(t, 0, 16);
+        long val = strtol(t, nullptr, 16);
         key[i / 2] = static_cast<unsigned char>(val);
     }
 
     FILE* outfile = QUtil::safe_fopen(outfilename, "wb");
-    Pl_StdioFile* out = new Pl_StdioFile("stdout", outfile);
+    auto* out = new Pl_StdioFile("stdout", outfile);
     // Use a small buffer size (64) for testing
-    Pl_RC4* rc4 = new Pl_RC4("rc4", out, key, QIntC::to_int(keylen), 64U);
+    auto* rc4 = new Pl_RC4("rc4", out, key, QIntC::to_int(keylen), 64U);
     delete[] key;
 
     // 64 < buffer size < 512, buffer_size is not a power of 2 for testing

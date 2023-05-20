@@ -4,7 +4,7 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <stdexcept>
-#include <string.h>
+#include <cstring>
 
 Pl_LZWDecoder::Pl_LZWDecoder(
     char const* identifier, Pipeline* next, bool early_code_change) :
@@ -189,7 +189,7 @@ Pl_LZWDecoder::handleCode(unsigned int code)
         }
 
         if (code < 256) {
-            unsigned char ch = static_cast<unsigned char>(code);
+            auto ch = static_cast<unsigned char>(code);
             getNext()->write(&ch, 1);
         } else {
             unsigned int idx = code - 258;

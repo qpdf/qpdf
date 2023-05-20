@@ -369,8 +369,8 @@ class JSON
             JSON_value(vt_dictionary)
         {
         }
-        virtual ~JSON_dictionary() = default;
-        virtual void write(Pipeline*, size_t depth) const;
+        ~JSON_dictionary() override = default;
+        void write(Pipeline*, size_t depth) const override;
         std::map<std::string, JSON> members;
         std::set<std::string> parsed_keys;
     };
@@ -380,15 +380,15 @@ class JSON
             JSON_value(vt_array)
         {
         }
-        virtual ~JSON_array() = default;
-        virtual void write(Pipeline*, size_t depth) const;
+        ~JSON_array() override = default;
+        void write(Pipeline*, size_t depth) const override;
         std::vector<JSON> elements;
     };
     struct JSON_string: public JSON_value
     {
         JSON_string(std::string const& utf8);
-        virtual ~JSON_string() = default;
-        virtual void write(Pipeline*, size_t depth) const;
+        ~JSON_string() override = default;
+        void write(Pipeline*, size_t depth) const override;
         std::string utf8;
         std::string encoded;
     };
@@ -397,15 +397,15 @@ class JSON
         JSON_number(long long val);
         JSON_number(double val);
         JSON_number(std::string const& val);
-        virtual ~JSON_number() = default;
-        virtual void write(Pipeline*, size_t depth) const;
+        ~JSON_number() override = default;
+        void write(Pipeline*, size_t depth) const override;
         std::string encoded;
     };
     struct JSON_bool: public JSON_value
     {
         JSON_bool(bool val);
-        virtual ~JSON_bool() = default;
-        virtual void write(Pipeline*, size_t depth) const;
+        ~JSON_bool() override = default;
+        void write(Pipeline*, size_t depth) const override;
         bool value;
     };
     struct JSON_null: public JSON_value
@@ -414,14 +414,14 @@ class JSON
             JSON_value(vt_null)
         {
         }
-        virtual ~JSON_null() = default;
-        virtual void write(Pipeline*, size_t depth) const;
+        ~JSON_null() override = default;
+        void write(Pipeline*, size_t depth) const override;
     };
     struct JSON_blob: public JSON_value
     {
         JSON_blob(std::function<void(Pipeline*)> fn);
-        virtual ~JSON_blob() = default;
-        virtual void write(Pipeline*, size_t depth) const;
+        ~JSON_blob() override = default;
+        void write(Pipeline*, size_t depth) const override;
         std::function<void(Pipeline*)> fn;
     };
 

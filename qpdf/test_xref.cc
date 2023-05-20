@@ -1,11 +1,8 @@
 #include <qpdf/QPDF.hh>
-#include <qpdf/QPDFObjGen.hh>
-#include <qpdf/QPDFXRefEntry.hh>
 
 #include <cstdlib>
 #include <iostream>
 #include <map>
-#include <string>
 
 int
 main(int argc, char* argv[])

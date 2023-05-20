@@ -2,12 +2,9 @@
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
-#include <qpdf/QUtil.hh>
 
-#include <cstring>
-#include <setjmp.h>
+#include <csetjmp>
 #include <stdexcept>
-#include <stdlib.h>
 #include <string>
 
 #if BITS_IN_JSAMPLE != 8
@@ -27,7 +24,7 @@ namespace
 static void
 error_handler(j_common_ptr cinfo)
 {
-    qpdf_jpeg_error_mgr* jerr =
+    auto* jerr =
         reinterpret_cast<qpdf_jpeg_error_mgr*>(cinfo->err);
     char buf[JMSG_LENGTH_MAX];
     (*cinfo->err->format_message)(cinfo, buf);
@@ -170,7 +167,7 @@ static boolean
 empty_pipeline_output_buffer(j_compress_ptr cinfo)
 {
     QTC::TC("libtests", "Pl_DCT empty_pipeline_output_buffer");
-    dct_pipeline_dest* dest = reinterpret_cast<dct_pipeline_dest*>(cinfo->dest);
+    auto* dest = reinterpret_cast<dct_pipeline_dest*>(cinfo->dest);
     dest->next->write(dest->buffer, dest->size);
     dest->pub.next_output_byte = dest->buffer;
     dest->pub.free_in_buffer = dest->size;
@@ -181,7 +178,7 @@ static void
 term_pipeline_destination(j_compress_ptr cinfo)
 {
     QTC::TC("libtests", "Pl_DCT term_pipeline_destination");
-    dct_pipeline_dest* dest = reinterpret_cast<dct_pipeline_dest*>(cinfo->dest);
+    auto* dest = reinterpret_cast<dct_pipeline_dest*>(cinfo->dest);
     dest->next->write(dest->buffer, dest->size - dest->pub.free_in_buffer);
 }
 
@@ -195,7 +192,7 @@ jpeg_pipeline_dest(
             reinterpret_cast<j_common_ptr>(cinfo),
             JPOOL_PERMANENT,
             sizeof(dct_pipeline_dest)));
-    dct_pipeline_dest* dest = reinterpret_cast<dct_pipeline_dest*>(cinfo->dest);
+    auto* dest = reinterpret_cast<dct_pipeline_dest*>(cinfo->dest);
     dest->pub.init_destination = init_pipeline_destination;
     dest->pub.empty_output_buffer = empty_pipeline_output_buffer;
     dest->pub.term_destination = term_pipeline_destination;
@@ -264,7 +261,7 @@ jpeg_buffer_src(j_decompress_ptr cinfo, Buffer* buffer)
 void
 Pl_DCT::compress(void* cinfo_p, Buffer* b)
 {
-    struct jpeg_compress_struct* cinfo =
+    auto* cinfo =
         reinterpret_cast<jpeg_compress_struct*>(cinfo_p);
 
 #if ( \
@@ -319,7 +316,7 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
 void
 Pl_DCT::decompress(void* cinfo_p, Buffer* b)
 {
-    struct jpeg_decompress_struct* cinfo =
+    auto* cinfo =
         reinterpret_cast<jpeg_decompress_struct*>(cinfo_p);
 
 #if ( \

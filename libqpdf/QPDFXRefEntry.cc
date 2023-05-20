@@ -2,7 +2,6 @@
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFExc.hh>
-#include <qpdf/QUtil.hh>
 
 QPDFXRefEntry::QPDFXRefEntry()
 {

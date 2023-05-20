@@ -2,7 +2,7 @@
 
 #include <qpdf/Pl_StdioFile.hh>
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
 int
 main()

@@ -3,9 +3,9 @@
 #include <qpdf/QUtil.hh>
 
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 static void
 usage()
@@ -22,8 +22,8 @@ class Callback: public Pl_DCT::CompressConfig
         called(false)
     {
     }
-    virtual ~Callback() = default;
-    virtual void apply(jpeg_compress_struct*);
+    ~Callback() override = default;
+    void apply(jpeg_compress_struct*) override;
     bool called;
 };
 

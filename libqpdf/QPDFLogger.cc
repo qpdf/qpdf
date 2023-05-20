@@ -17,14 +17,14 @@ namespace
         {
         }
 
-        virtual void
+        void
         write(unsigned char const* data, size_t len) override
         {
             this->used = true;
             getNext()->write(data, len);
         }
 
-        virtual void
+        void
         finish() override
         {
             getNext()->finish();

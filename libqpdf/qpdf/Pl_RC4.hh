@@ -17,10 +17,10 @@ class Pl_RC4: public Pipeline
         unsigned char const* key_data,
         int key_len = -1,
         size_t out_bufsize = def_bufsize);
-    virtual ~Pl_RC4() = default;
+    ~Pl_RC4() override = default;
 
-    virtual void write(unsigned char const* data, size_t len);
-    virtual void finish();
+    void write(unsigned char const* data, size_t len) override;
+    void finish() override;
 
   private:
     std::shared_ptr<unsigned char> outbuf;

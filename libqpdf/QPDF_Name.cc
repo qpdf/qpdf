@@ -1,8 +1,6 @@
 #include <qpdf/QPDF_Name.hh>
 
 #include <qpdf/QUtil.hh>
-#include <stdio.h>
-#include <string.h>
 
 QPDF_Name::QPDF_Name(std::string const& name) :
     QPDFValue(::ot_name, "name"),

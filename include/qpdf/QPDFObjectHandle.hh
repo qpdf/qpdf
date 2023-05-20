@@ -526,7 +526,7 @@ class QPDFObjectHandle
     QPDF_DLL
     void parsePageContents(ParserCallbacks* callbacks);
     QPDF_DLL
-    void filterPageContents(TokenFilter* filter, Pipeline* next = 0);
+    void filterPageContents(TokenFilter* filter, Pipeline* next = nullptr);
     // See comments for QPDFPageObjectHelper::pipeContents.
     QPDF_DLL
     void pipePageContents(Pipeline* p);
@@ -538,7 +538,7 @@ class QPDFObjectHandle
     // contents. This can be used to apply a TokenFilter to a form
     // XObject, whose data is in the same format as a content stream.
     QPDF_DLL
-    void filterAsContents(TokenFilter* filter, Pipeline* next = 0);
+    void filterAsContents(TokenFilter* filter, Pipeline* next = nullptr);
     // Called on a stream to parse the stream as page contents. This
     // can be used to parse a form XObject.
     QPDF_DLL

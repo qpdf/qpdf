@@ -1,7 +1,6 @@
 #include <qpdf/QPDFSystemError.hh>
 
-#include <qpdf/QUtil.hh>
-#include <string.h>
+#include <cstring>
 
 QPDFSystemError::QPDFSystemError(
     std::string const& description, int system_errno) :

@@ -48,9 +48,9 @@ class Pl_XOR: public Pipeline
 
   public:
     Pl_XOR(char const* identifier, Pipeline* next, unsigned char key);
-    virtual ~Pl_XOR() = default;
-    virtual void write(unsigned char const* data, size_t len) override;
-    virtual void finish() override;
+    ~Pl_XOR() override = default;
+    void write(unsigned char const* data, size_t len) override;
+    void finish() override;
 
   private:
     unsigned char key;
@@ -91,10 +91,10 @@ class SF_XORDecode: public QPDFStreamFilter
     // filter, which just means QPDF assumes that it should not
     // "uncompress" the stream by default.
   public:
-    virtual ~SF_XORDecode() = default;
-    virtual bool setDecodeParms(QPDFObjectHandle decode_parms) override;
-    virtual Pipeline* getDecodePipeline(Pipeline* next) override;
-    virtual bool isSpecializedCompression() override;
+    ~SF_XORDecode() override = default;
+    bool setDecodeParms(QPDFObjectHandle decode_parms) override;
+    Pipeline* getDecodePipeline(Pipeline* next) override;
+    bool isSpecializedCompression() override;
 
   private:
     unsigned char key;
@@ -199,8 +199,8 @@ class StreamReplacer: public QPDFObjectHandle::StreamDataProvider
 
   public:
     StreamReplacer(QPDF* pdf);
-    virtual ~StreamReplacer() = default;
-    virtual void
+    ~StreamReplacer() override = default;
+    void
     provideStreamData(QPDFObjGen const& og, Pipeline* pipeline) override;
 
     void registerStream(
@@ -409,7 +409,7 @@ process(
     // Create a single StreamReplacer instance. The interface requires
     // a std::shared_ptr in various places, so allocate a StreamReplacer
     // and stash it in a std::shared_ptr.
-    StreamReplacer* replacer = new StreamReplacer(&qpdf);
+    auto* replacer = new StreamReplacer(&qpdf);
     std::shared_ptr<QPDFObjectHandle::StreamDataProvider> p(replacer);
 
     for (auto& o: qpdf.getAllObjects()) {

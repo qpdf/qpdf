@@ -4,7 +4,6 @@
 
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Pl_Function.hh>
-#include <qpdf/QIntC.hh>
 #include <qpdf/QPDFLogger.hh>
 #include <functional>
 #include <memory>

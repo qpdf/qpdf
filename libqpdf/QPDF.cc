@@ -9,8 +9,8 @@
 #include <memory.h>
 #include <regex>
 #include <sstream>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include <vector>
 
 #include <qpdf/BufferInputSource.hh>
@@ -60,42 +60,42 @@ namespace
     class InvalidInputSource: public InputSource
     {
       public:
-        virtual ~InvalidInputSource() = default;
-        virtual qpdf_offset_t
+        ~InvalidInputSource() override = default;
+        qpdf_offset_t
         findAndSkipNextEOL() override
         {
             throwException();
             return 0;
         }
-        virtual std::string const&
+        std::string const&
         getName() const override
         {
             static std::string name("closed input source");
             return name;
         }
-        virtual qpdf_offset_t
+        qpdf_offset_t
         tell() override
         {
             throwException();
             return 0;
         }
-        virtual void
+        void
         seek(qpdf_offset_t offset, int whence) override
         {
             throwException();
         }
-        virtual void
+        void
         rewind() override
         {
             throwException();
         }
-        virtual size_t
+        size_t
         read(char* buffer, size_t length) override
         {
             throwException();
             return 0;
         }
-        virtual void
+        void
         unreadCh(char ch) override
         {
             throwException();
@@ -264,7 +264,7 @@ QPDF::create()
 void
 QPDF::processFile(char const* filename, char const* password)
 {
-    FileInputSource* fi = new FileInputSource(filename);
+    auto* fi = new FileInputSource(filename);
     processInputSource(std::shared_ptr<InputSource>(fi), password);
 }
 
@@ -272,7 +272,7 @@ void
 QPDF::processFile(
     char const* description, FILE* filep, bool close_file, char const* password)
 {
-    FileInputSource* fi = new FileInputSource(description, filep, close_file);
+    auto* fi = new FileInputSource(description, filep, close_file);
     processInputSource(std::shared_ptr<InputSource>(fi), password);
 }
 
@@ -2537,7 +2537,7 @@ QPDF::getCompressibleObjGens()
         if (obj.isStream()) {
             QPDFObjectHandle dict = obj.getDict();
             std::set<std::string> keys = dict.getKeys();
-            for (std::set<std::string>::reverse_iterator iter = keys.rbegin();
+            for (auto iter = keys.rbegin();
                  iter != keys.rend();
                  ++iter) {
                 std::string const& key = *iter;
@@ -2553,7 +2553,7 @@ QPDF::getCompressibleObjGens()
             }
         } else if (obj.isDictionary()) {
             std::set<std::string> keys = obj.getKeys();
-            for (std::set<std::string>::reverse_iterator iter = keys.rbegin();
+            for (auto iter = keys.rbegin();
                  iter != keys.rend();
                  ++iter) {
                 queue.push_front(obj.getKey(*iter));

@@ -8,18 +8,18 @@ namespace
     class NumberTreeDetails: public NNTreeDetails
     {
       public:
-        virtual std::string const&
+        std::string const&
         itemsKey() const override
         {
             static std::string k("/Nums");
             return k;
         }
-        virtual bool
+        bool
         keyValid(QPDFObjectHandle oh) const override
         {
             return oh.isInteger();
         }
-        virtual int
+        int
         compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const override
         {
             if (!(keyValid(a) && keyValid(b))) {

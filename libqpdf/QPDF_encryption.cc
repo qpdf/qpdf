@@ -17,7 +17,7 @@
 #include <qpdf/RC4.hh>
 
 #include <algorithm>
-#include <string.h>
+#include <cstring>
 
 static unsigned char const padding_string[] = {
     0x28, 0xbf, 0x4e, 0x5e, 0x4e, 0x75, 0x8a, 0x41, 0x64, 0x00, 0x4e,

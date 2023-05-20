@@ -83,7 +83,7 @@ QPDF_Array::copy(bool shallow)
         return do_create(new QPDF_Array(*this));
     } else {
         if (sparse) {
-            QPDF_Array* result = new QPDF_Array();
+            auto* result = new QPDF_Array();
             result->sp_size = sp_size;
             for (auto const& element: sp_elements) {
                 auto const& obj = element.second;

@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <ctype.h>
+#include <cctype>
 #include <fcntl.h>
 #include <iostream>
 #include <memory>
@@ -48,8 +48,8 @@ namespace
             size_t oi_min_height,
             size_t oi_min_area,
             QPDFObjectHandle& image);
-        virtual ~ImageOptimizer() = default;
-        virtual void provideStreamData(QPDFObjGen const&, Pipeline* pipeline);
+        ~ImageOptimizer() override = default;
+        void provideStreamData(QPDFObjGen const&, Pipeline* pipeline) override;
         std::shared_ptr<Pipeline>
         makePipeline(std::string const& description, Pipeline* next);
         bool evaluate(std::string const& description);
@@ -65,13 +65,13 @@ namespace
     class DiscardContents: public QPDFObjectHandle::ParserCallbacks
     {
       public:
-        virtual ~DiscardContents() = default;
-        virtual void
-        handleObject(QPDFObjectHandle)
+        ~DiscardContents() override = default;
+        void
+        handleObject(QPDFObjectHandle) override
         {
         }
-        virtual void
-        handleEOF()
+        void
+        handleEOF() override
         {
         }
     };
@@ -98,8 +98,8 @@ namespace
             filename(filename)
         {
         }
-        virtual ~ProgressReporter() = default;
-        virtual void reportProgress(int);
+        ~ProgressReporter() override = default;
+        void reportProgress(int) override;
 
       private:
         Pipeline& p;
