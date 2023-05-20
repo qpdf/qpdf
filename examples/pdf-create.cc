@@ -166,7 +166,7 @@ add_page(
     // mode. Since we are not specifying, QPDFWriter will compress
     // with /FlateDecode if we don't provide any other form of
     // compression.
-    ImageProvider* p = new ImageProvider(color_space, filter);
+    auto* p = new ImageProvider(color_space, filter);
     std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider(p);
     size_t width = p->getWidth();
     size_t height = p->getHeight();
@@ -286,7 +286,7 @@ check(
         if (!this_errors) {
             // Check image data
             auto actual_data = image.getStreamData(qpdf_dl_all);
-            ImageProvider* p = new ImageProvider(desired_color_space, "null");
+            auto* p = new ImageProvider(desired_color_space, "null");
             std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider(p);
             Pl_Buffer b_p("get image data");
             provider->provideStreamData(QPDFObjGen(), &b_p);

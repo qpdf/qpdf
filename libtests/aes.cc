@@ -74,7 +74,7 @@ main(int argc, char* argv[])
 
     FILE* infile = QUtil::safe_fopen(infilename, "rb");
     FILE* outfile = QUtil::safe_fopen(outfilename, "wb");
-    unsigned char* key = new unsigned char[keylen];
+    auto* key = new unsigned char[keylen];
     for (unsigned int i = 0; i < strlen(hexkey); i += 2) {
         char t[3];
         t[0] = hexkey[i];
@@ -85,8 +85,8 @@ main(int argc, char* argv[])
         key[i / 2] = static_cast<unsigned char>(val);
     }
 
-    Pl_StdioFile* out = new Pl_StdioFile("stdout", outfile);
-    Pl_AES_PDF* aes = new Pl_AES_PDF("aes_128_cbc", out, encrypt, key, keylen);
+    auto* out = new Pl_StdioFile("stdout", outfile);
+    auto* aes = new Pl_AES_PDF("aes_128_cbc", out, encrypt, key, keylen);
     delete[] key;
     key = nullptr;
     if (!cbc_mode) {

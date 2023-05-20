@@ -124,7 +124,7 @@ main(int argc, char* argv[])
         QPDF qpdf;
         qpdf.processFile(infilename, password);
 
-        ImageInverter* inv = new ImageInverter;
+        auto* inv = new ImageInverter;
         auto p = std::shared_ptr<QPDFObjectHandle::StreamDataProvider>(inv);
 
         // For each page...

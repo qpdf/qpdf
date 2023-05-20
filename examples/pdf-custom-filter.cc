@@ -409,7 +409,7 @@ process(
     // Create a single StreamReplacer instance. The interface requires
     // a std::shared_ptr in various places, so allocate a StreamReplacer
     // and stash it in a std::shared_ptr.
-    StreamReplacer* replacer = new StreamReplacer(&qpdf);
+    auto* replacer = new StreamReplacer(&qpdf);
     std::shared_ptr<QPDFObjectHandle::StreamDataProvider> p(replacer);
 
     for (auto& o: qpdf.getAllObjects()) {

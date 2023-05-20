@@ -72,7 +72,7 @@ test_ph()
     ObjectHolder oh0;
     {
         std::cout << "hello" << std::endl;
-        Object* o1 = new Object;
+        auto* o1 = new Object;
         ObjectHolder oh1(o1);
         std::cout << "oh1 refcount = " << oh1.getRefcount() << std::endl;
         ObjectHolder oh2(oh1);
@@ -95,7 +95,7 @@ test_ph()
         }
         ol1.push_back(oh3);
         ol1.push_back(oh3);
-        Object* o3 = new Object;
+        auto* o3 = new Object;
         oh0 = o3;
         PointerHolder<Object const> oh6(new Object());
         oh6->hello();

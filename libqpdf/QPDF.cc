@@ -264,7 +264,7 @@ QPDF::create()
 void
 QPDF::processFile(char const* filename, char const* password)
 {
-    FileInputSource* fi = new FileInputSource(filename);
+    auto* fi = new FileInputSource(filename);
     processInputSource(std::shared_ptr<InputSource>(fi), password);
 }
 
@@ -272,7 +272,7 @@ void
 QPDF::processFile(
     char const* description, FILE* filep, bool close_file, char const* password)
 {
-    FileInputSource* fi = new FileInputSource(description, filep, close_file);
+    auto* fi = new FileInputSource(description, filep, close_file);
     processInputSource(std::shared_ptr<InputSource>(fi), password);
 }
 

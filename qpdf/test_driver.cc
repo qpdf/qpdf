@@ -499,7 +499,7 @@ test_8(QPDF& pdf, char const* arg2)
     auto b = p1.getBufferSharedPointer();
     // This is a bogus way to use StreamDataProvider, but it does
     // adequately test its functionality.
-    Provider* provider = new Provider(b);
+    auto* provider = new Provider(b);
     auto p = std::shared_ptr<QPDFObjectHandle::StreamDataProvider>(provider);
     qstream.replaceStreamData(
         p,
@@ -1068,7 +1068,7 @@ test_27(QPDF& pdf, char const* arg2)
         pl.writeCStr("new data for stream\n");
         pl.finish();
         auto b = pl.getBufferSharedPointer();
-        Provider* provider = new Provider(b);
+        auto* provider = new Provider(b);
         p1 = decltype(p1)(provider);
     }
     // Create a stream that uses a provider in empty1 and copy it
@@ -1095,7 +1095,7 @@ test_27(QPDF& pdf, char const* arg2)
             pl.writeCStr("more data for stream\n");
             pl.finish();
             auto b = pl.getBufferSharedPointer();
-            Provider* provider = new Provider(b);
+            auto* provider = new Provider(b);
             p2 = decltype(p2)(provider);
         }
         QPDF empty3;

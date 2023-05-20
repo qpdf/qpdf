@@ -28,7 +28,7 @@ run(char const* filename)
     Pipeline* inf2 = new Pl_Flate("inf2", out2, Pl_Flate::a_inflate);
 
     // Count bytes written to o3
-    Pl_Count* count3 = new Pl_Count("count3", out3);
+    auto* count3 = new Pl_Count("count3", out3);
 
     // Do both simultaneously
     Pipeline* inf3 = new Pl_Flate("inf3", count3, Pl_Flate::a_inflate);

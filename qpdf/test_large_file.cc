@@ -218,7 +218,7 @@ create_pdf(char const* filename)
         image_dict.replaceKey("/BitsPerComponent", newInteger(8));
         image_dict.replaceKey("/Width", newInteger(width));
         image_dict.replaceKey("/Height", newInteger(height));
-        ImageProvider* p = new ImageProvider(pageno);
+        auto* p = new ImageProvider(pageno);
         std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider(p);
         image.replaceStreamData(
             provider, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());

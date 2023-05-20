@@ -190,7 +190,7 @@ process(char const* filename, bool include_ignorable, size_t max_len)
     std::shared_ptr<InputSource> is;
 
     // Tokenize file, skipping streams
-    FileInputSource* fis = new FileInputSource(filename);
+    auto* fis = new FileInputSource(filename);
     is = std::shared_ptr<InputSource>(fis);
     dump_tokens(is, "FILE", max_len, include_ignorable, true, false);
 
@@ -203,7 +203,7 @@ process(char const* filename, bool include_ignorable, size_t max_len)
         Pl_Buffer plb("buffer");
         page.pipeContents(&plb);
         auto content_data = plb.getBufferSharedPointer();
-        BufferInputSource* bis =
+        auto* bis =
             new BufferInputSource("content data", content_data.get());
         is = std::shared_ptr<InputSource>(bis);
         dump_tokens(
@@ -220,7 +220,7 @@ process(char const* filename, bool include_ignorable, size_t max_len)
         if (obj.isStream() && obj.getDict().getKey("/Type").isName() &&
             obj.getDict().getKey("/Type").getName() == "/ObjStm") {
             std::shared_ptr<Buffer> b = obj.getStreamData(qpdf_dl_specialized);
-            BufferInputSource* bis =
+            auto* bis =
                 new BufferInputSource("object stream data", b.get());
             is = std::shared_ptr<InputSource>(bis);
             dump_tokens(

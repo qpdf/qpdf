@@ -106,7 +106,7 @@ qpdf_data
 qpdf_init()
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_init");
-    qpdf_data qpdf = new _qpdf_data();
+    auto qpdf = new _qpdf_data();
     qpdf->qpdf = QPDF::create();
     return qpdf;
 }

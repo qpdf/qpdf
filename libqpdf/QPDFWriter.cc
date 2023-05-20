@@ -997,7 +997,7 @@ void
 QPDFWriter::activatePipelineStack(PipelinePopper& pp)
 {
     std::string stack_id("stack " + std::to_string(this->m->next_stack_id));
-    Pl_Count* c =
+    auto* c =
         new Pl_Count(stack_id.c_str(), this->m->pipeline_stack.back());
     ++this->m->next_stack_id;
     this->m->pipeline_stack.push_back(c);
@@ -1030,7 +1030,7 @@ QPDFWriter::PipelinePopper::~PipelinePopper()
             qw->m->md5_pipeline = nullptr;
         }
         qw->m->pipeline_stack.pop_back();
-        Pl_Buffer* buf = dynamic_cast<Pl_Buffer*>(p);
+        auto* buf = dynamic_cast<Pl_Buffer*>(p);
         if (bp && buf) {
             *bp = buf->getBufferSharedPointer();
         }

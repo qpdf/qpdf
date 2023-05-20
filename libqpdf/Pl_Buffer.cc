@@ -45,7 +45,7 @@ Pl_Buffer::getBuffer()
     }
 
     auto size = this->m->data.length();
-    Buffer* b = new Buffer(size);
+    auto* b = new Buffer(size);
     if (size > 0) {
         unsigned char* p = b->getBuffer();
         memcpy(p, this->m->data.data(), size);
