@@ -204,6 +204,7 @@ main(int argc, char* argv[])
 
         QPDFWriter w(pdf, outfilename);
         w.setStaticID(true); // for testing only
+        w.setQDFMode(true);
         w.write();
     } catch (std::exception& e) {
         std::cerr << whoami << ": " << e.what() << std::endl;
