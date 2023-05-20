@@ -3,7 +3,7 @@
 #ifndef BITSTREAM_HH
 #define BITSTREAM_HH
 
-#include <stddef.h>
+#include <cstddef>
 
 class BitStream
 {

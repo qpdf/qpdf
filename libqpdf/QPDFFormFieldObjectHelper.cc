@@ -6,7 +6,7 @@
 #include <qpdf/QPDFAnnotationObjectHelper.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
-#include <stdlib.h>
+#include <cstdlib>
 
 QPDFFormFieldObjectHelper::QPDFFormFieldObjectHelper(QPDFObjectHandle oh) :
     QPDFObjectHelper(oh),

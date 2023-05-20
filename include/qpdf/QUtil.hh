@@ -30,9 +30,9 @@
 #include <list>
 #include <memory>
 #include <stdexcept>
-#include <stdio.h>
+#include <cstdio>
 #include <string>
-#include <time.h>
+#include <ctime>
 #include <vector>
 
 class RandomDataProvider;

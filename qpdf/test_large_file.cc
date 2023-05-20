@@ -13,8 +13,8 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 // Run "test_large_file write small a.pdf" to get a PDF file that you
 // can look at in a reader.

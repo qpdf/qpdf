@@ -34,7 +34,7 @@
 #include <map>
 #include <memory>
 #include <set>
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include <string_view>
 #include <vector>

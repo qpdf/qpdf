@@ -6,9 +6,9 @@
 #include <qpdf/QUtil.hh>
 
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 static void
 other_tests()

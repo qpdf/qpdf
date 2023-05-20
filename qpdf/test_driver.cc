@@ -27,12 +27,12 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
-#include <limits.h>
+#include <climits>
 #include <map>
 #include <sstream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #define QPDF_OBJECT_NOWARN
 #include <qpdf/QPDFObject.hh>

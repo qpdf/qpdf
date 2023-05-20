@@ -7,7 +7,7 @@
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
-#include <stdlib.h>
+#include <cstdlib>
 
 static unsigned char*
 uc(char const* s)

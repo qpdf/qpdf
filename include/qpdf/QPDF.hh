@@ -30,7 +30,7 @@
 #include <list>
 #include <map>
 #include <memory>
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include <string_view>
 #include <vector>

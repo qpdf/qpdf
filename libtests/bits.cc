@@ -4,7 +4,7 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
 // See comments in bits_functions.hh
 #define BITS_TESTING 1

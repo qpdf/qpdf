@@ -3,7 +3,7 @@
 #include <qpdf/QIntC.hh>
 #include <algorithm>
 #include <sstream>
-#include <string.h>
+#include <cstring>
 
 BufferInputSource::BufferInputSource(
     std::string const& description, Buffer* buf, bool own_memory) :

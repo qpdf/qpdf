@@ -5,7 +5,7 @@
 #include <qpdf/QUtil.hh>
 
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
 void
 run(char const* filename)

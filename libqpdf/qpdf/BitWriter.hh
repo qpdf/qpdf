@@ -3,7 +3,7 @@
 #ifndef BITWRITER_HH
 #define BITWRITER_HH
 
-#include <stddef.h>
+#include <cstddef>
 
 class Pipeline;
 

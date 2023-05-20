@@ -3,7 +3,7 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 
-#include <setjmp.h>
+#include <csetjmp>
 #include <stdexcept>
 #include <string>
 

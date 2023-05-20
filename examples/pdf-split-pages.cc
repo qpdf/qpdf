@@ -12,7 +12,7 @@
 
 #include <cstring>
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 
 static bool static_id = false;

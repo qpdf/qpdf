@@ -9,8 +9,8 @@
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QTC.hh>
 
-#include <ctype.h>
-#include <errno.h>
+#include <cctype>
+#include <cerrno>
 #include <fcntl.h>
 #include <fstream>
 #include <iomanip>
@@ -21,9 +21,9 @@
 #include <set>
 #include <sstream>
 #include <stdexcept>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #ifndef QPDF_NO_WCHAR_T
 # include <cwchar>
 #endif

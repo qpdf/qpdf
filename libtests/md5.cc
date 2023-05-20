@@ -3,7 +3,7 @@
 #include <qpdf/Pl_MD5.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
 
 static void
 test_string(char const* str)

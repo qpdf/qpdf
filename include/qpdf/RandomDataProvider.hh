@@ -23,7 +23,7 @@
 #define RANDOMDATAPROVIDER_HH
 
 #include <qpdf/DLL.h>
-#include <string.h> // for size_t
+#include <cstring> // for size_t
 
 class QPDF_DLL_CLASS RandomDataProvider
 {

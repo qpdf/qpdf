@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <ctype.h>
+#include <cctype>
 #include <fcntl.h>
 #include <iostream>
 #include <memory>

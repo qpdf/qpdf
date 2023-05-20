@@ -1,7 +1,7 @@
 #include <qpdf/assert_test.h>
 
 #include <qpdf/QIntC.hh>
-#include <stdint.h>
+#include <cstdint>
 
 #define try_convert(exp_pass, fn, i) \
     try_convert_real(#fn "(" #i ")", exp_pass, fn, i)

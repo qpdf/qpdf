@@ -1,7 +1,7 @@
 #include <qpdf/Pl_ASCIIHexDecoder.hh>
 
 #include <qpdf/QTC.hh>
-#include <ctype.h>
+#include <cctype>
 #include <stdexcept>
 
 Pl_ASCIIHexDecoder::Pl_ASCIIHexDecoder(char const* identifier, Pipeline* next) :

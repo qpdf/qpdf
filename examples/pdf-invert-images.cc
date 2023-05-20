@@ -6,8 +6,8 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 static char const* whoami = nullptr;
 

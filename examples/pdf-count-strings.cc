@@ -5,7 +5,7 @@
 //
 
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QPDF.hh>

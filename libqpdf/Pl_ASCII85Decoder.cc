@@ -2,7 +2,7 @@
 
 #include <qpdf/QTC.hh>
 #include <stdexcept>
-#include <string.h>
+#include <cstring>
 
 Pl_ASCII85Decoder::Pl_ASCII85Decoder(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),

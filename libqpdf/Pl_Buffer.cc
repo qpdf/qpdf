@@ -2,8 +2,8 @@
 
 #include <algorithm>
 #include <stdexcept>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 Pl_Buffer::Pl_Buffer(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),

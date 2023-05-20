@@ -5,9 +5,9 @@
 #include <qpdf/QUtil.hh>
 #include <fstream>
 #include <iostream>
-#include <limits.h>
-#include <stdio.h>
-#include <string.h>
+#include <climits>
+#include <cstdio>
+#include <cstring>
 
 #ifdef _WIN32
 # include <io.h>

@@ -4,7 +4,7 @@
 #include <qpdf/QPDFCryptoProvider.hh>
 #include <qpdf/QUtil.hh>
 
-#include <string.h>
+#include <cstring>
 
 MD5::MD5()
 {

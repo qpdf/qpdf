@@ -4,7 +4,7 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <stdexcept>
-#include <string.h>
+#include <cstring>
 
 Pl_LZWDecoder::Pl_LZWDecoder(
     char const* identifier, Pipeline* next, bool early_code_change) :

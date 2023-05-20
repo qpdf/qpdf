@@ -9,8 +9,8 @@
 #include <memory.h>
 #include <regex>
 #include <sstream>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include <vector>
 
 #include <qpdf/BufferInputSource.hh>

@@ -13,8 +13,8 @@
 #include <qpdf/QUtil.hh>
 
 #include <algorithm>
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring>
 
 template <class T, class int_type>
 static void

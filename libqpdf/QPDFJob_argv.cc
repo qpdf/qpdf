@@ -3,12 +3,12 @@
 // See "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-maintainer.
 
 #include <cstdio>
-#include <ctype.h>
+#include <cctype>
 #include <iostream>
 #include <memory>
 #include <sstream>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFArgParser.hh>

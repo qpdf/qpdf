@@ -1,5 +1,5 @@
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDF.hh>

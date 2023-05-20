@@ -16,7 +16,7 @@
 #include <qpdf/QUtil.hh>
 #include <iostream>
 #include <memory>
-#include <stdlib.h>
+#include <cstdlib>
 
 static char const* whoami = nullptr;
 

@@ -28,7 +28,7 @@
 #include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
 
 #include <memory>
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 
 class QPDFTokenizer

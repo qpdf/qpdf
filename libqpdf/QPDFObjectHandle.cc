@@ -30,10 +30,10 @@
 
 #include <algorithm>
 #include <cstring>
-#include <ctype.h>
-#include <limits.h>
+#include <cctype>
+#include <climits>
 #include <stdexcept>
-#include <stdlib.h>
+#include <cstdlib>
 
 using namespace std::literals;
 

@@ -6,8 +6,8 @@
 #endif
 
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 static void
 do_copy(FILE* in, FILE* out)

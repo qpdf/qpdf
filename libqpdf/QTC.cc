@@ -3,7 +3,7 @@
 #include <qpdf/QUtil.hh>
 #include <map>
 #include <set>
-#include <stdio.h>
+#include <cstdio>
 
 static bool
 tc_active(char const* const scope)

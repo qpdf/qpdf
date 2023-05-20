@@ -26,7 +26,7 @@
 
 #include <qpdf/Pipeline.hh>
 
-#include <stdio.h>
+#include <cstdio>
 
 //
 // This pipeline is reusable.

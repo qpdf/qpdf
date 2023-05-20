@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <deque>
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjectHandle.hh>

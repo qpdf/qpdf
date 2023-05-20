@@ -2,7 +2,7 @@
 
 #include <qpdf/QUtil.hh>
 #include <qpdf/qpdf-config.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 InsecureRandomDataProvider::InsecureRandomDataProvider() :
     seeded_random(false)

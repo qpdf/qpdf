@@ -2,7 +2,7 @@
 #include <qpdf/FileInputSource.hh>
 
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
 
 void
 check(std::string const& what, bool result)

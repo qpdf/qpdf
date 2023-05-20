@@ -1,6 +1,6 @@
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 #include <qpdf/QPDF.hh>
 #include <qpdf/QUtil.hh>

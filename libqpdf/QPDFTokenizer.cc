@@ -11,8 +11,8 @@
 #include <qpdf/QUtil.hh>
 
 #include <stdexcept>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 static inline bool
 is_delimiter(char ch)

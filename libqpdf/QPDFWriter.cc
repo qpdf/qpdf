@@ -24,7 +24,7 @@
 
 #include <algorithm>
 #include <stdexcept>
-#include <stdlib.h>
+#include <cstdlib>
 
 QPDFWriter::ProgressReporter::~ProgressReporter()
 {
