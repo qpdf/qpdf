@@ -1,6 +1,8 @@
-build
-build.*
+/build
+/build.*
+/cmake-build-*
 appimage/build
-external-libs
-distribution/
+/external-libs
+/distribution/
 .cache
+/.idea
