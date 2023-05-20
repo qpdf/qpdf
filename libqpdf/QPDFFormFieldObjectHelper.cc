@@ -515,9 +515,9 @@ namespace
             std::vector<std::string> const& opt,
             double tf,
             QPDFObjectHandle::Rectangle const& bbox);
-        virtual ~ValueSetter() = default;
-        virtual void handleToken(QPDFTokenizer::Token const&);
-        virtual void handleEOF();
+        ~ValueSetter() override = default;
+        void handleToken(QPDFTokenizer::Token const&) override;
+        void handleEOF() override;
         void writeAppearance();
 
       private:
@@ -706,10 +706,10 @@ namespace
     {
       public:
         TfFinder();
-        virtual ~TfFinder()
+        ~TfFinder() override
         {
         }
-        virtual void handleToken(QPDFTokenizer::Token const&);
+        void handleToken(QPDFTokenizer::Token const&) override;
         double getTf();
         std::string getFontName();
         std::string getDA();

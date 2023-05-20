@@ -111,8 +111,8 @@ namespace
             old_contents(old_contents)
         {
         }
-        virtual ~CoalesceProvider() = default;
-        virtual void provideStreamData(QPDFObjGen const&, Pipeline* pipeline);
+        ~CoalesceProvider() override = default;
+        void provideStreamData(QPDFObjGen const&, Pipeline* pipeline) override;
 
       private:
         QPDFObjectHandle containing_page;
@@ -200,9 +200,9 @@ namespace
     {
       public:
         LastChar(Pipeline* next);
-        virtual ~LastChar() = default;
-        virtual void write(unsigned char const* data, size_t len);
-        virtual void finish();
+        ~LastChar() override = default;
+        void write(unsigned char const* data, size_t len) override;
+        void finish() override;
         unsigned char getLastChar();
 
       private:

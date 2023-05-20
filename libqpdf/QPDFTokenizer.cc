@@ -35,8 +35,8 @@ namespace
             str(str)
         {
         }
-        virtual ~QPDFWordTokenFinder() = default;
-        virtual bool check();
+        ~QPDFWordTokenFinder() override = default;
+        bool check() override;
 
       private:
         std::shared_ptr<InputSource> is;

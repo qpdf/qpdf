@@ -27,10 +27,10 @@ namespace
     {
       public:
         SF_Crypt() = default;
-        virtual ~SF_Crypt() = default;
+        ~SF_Crypt() override = default;
 
-        virtual bool
-        setDecodeParms(QPDFObjectHandle decode_parms)
+        bool
+        setDecodeParms(QPDFObjectHandle decode_parms) override
         {
             if (decode_parms.isNull()) {
                 return true;
@@ -49,8 +49,8 @@ namespace
             return filterable;
         }
 
-        virtual Pipeline*
-        getDecodePipeline(Pipeline*)
+        Pipeline*
+        getDecodePipeline(Pipeline*) override
         {
             // Not used -- handled by pipeStreamData
             return nullptr;

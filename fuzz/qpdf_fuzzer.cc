@@ -14,13 +14,13 @@
 class DiscardContents: public QPDFObjectHandle::ParserCallbacks
 {
   public:
-    virtual ~DiscardContents() = default;
-    virtual void
-    handleObject(QPDFObjectHandle)
+    ~DiscardContents() override = default;
+    void
+    handleObject(QPDFObjectHandle) override
     {
     }
-    virtual void
-    handleEOF()
+    void
+    handleEOF() override
     {
     }
 };

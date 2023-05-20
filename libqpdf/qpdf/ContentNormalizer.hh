@@ -7,8 +7,8 @@ class ContentNormalizer: public QPDFObjectHandle::TokenFilter
 {
   public:
     ContentNormalizer();
-    virtual ~ContentNormalizer() = default;
-    virtual void handleToken(QPDFTokenizer::Token const&);
+    ~ContentNormalizer() override = default;
+    void handleToken(QPDFTokenizer::Token const&) override;
 
     bool anyBadTokens() const;
     bool lastTokenWasBad() const;

@@ -18,10 +18,10 @@ class Pl_AES_PDF: public Pipeline
         bool encrypt,
         unsigned char const* key,
         size_t key_bytes);
-    virtual ~Pl_AES_PDF() = default;
+    ~Pl_AES_PDF() override = default;
 
-    virtual void write(unsigned char const* data, size_t len);
-    virtual void finish();
+    void write(unsigned char const* data, size_t len) override;
+    void finish() override;
 
     // Use zero initialization vector; needed for AESV3
     void useZeroIV();

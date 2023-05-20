@@ -18,10 +18,10 @@ class Pl_TIFFPredictor: public Pipeline
         unsigned int columns,
         unsigned int samples_per_pixel = 1,
         unsigned int bits_per_sample = 8);
-    virtual ~Pl_TIFFPredictor() = default;
+    ~Pl_TIFFPredictor() override = default;
 
-    virtual void write(unsigned char const* data, size_t len);
-    virtual void finish();
+    void write(unsigned char const* data, size_t len) override;
+    void finish() override;
 
   private:
     void processRow();

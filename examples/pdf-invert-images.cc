@@ -33,7 +33,7 @@ usage()
 class ImageInverter: public QPDFObjectHandle::StreamDataProvider
 {
   public:
-    virtual ~ImageInverter() = default;
+    ~ImageInverter() override = default;
     void
     provideStreamData(QPDFObjGen const& og, Pipeline* pipeline) override;
 

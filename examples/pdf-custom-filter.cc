@@ -48,7 +48,7 @@ class Pl_XOR: public Pipeline
 
   public:
     Pl_XOR(char const* identifier, Pipeline* next, unsigned char key);
-    virtual ~Pl_XOR() = default;
+    ~Pl_XOR() override = default;
     void write(unsigned char const* data, size_t len) override;
     void finish() override;
 
@@ -91,7 +91,7 @@ class SF_XORDecode: public QPDFStreamFilter
     // filter, which just means QPDF assumes that it should not
     // "uncompress" the stream by default.
   public:
-    virtual ~SF_XORDecode() = default;
+    ~SF_XORDecode() override = default;
     bool setDecodeParms(QPDFObjectHandle decode_parms) override;
     Pipeline* getDecodePipeline(Pipeline* next) override;
     bool isSpecializedCompression() override;
@@ -199,7 +199,7 @@ class StreamReplacer: public QPDFObjectHandle::StreamDataProvider
 
   public:
     StreamReplacer(QPDF* pdf);
-    virtual ~StreamReplacer() = default;
+    ~StreamReplacer() override = default;
     void
     provideStreamData(QPDFObjGen const& og, Pipeline* pipeline) override;
 

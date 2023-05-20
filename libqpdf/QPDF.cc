@@ -60,7 +60,7 @@ namespace
     class InvalidInputSource: public InputSource
     {
       public:
-        virtual ~InvalidInputSource() = default;
+        ~InvalidInputSource() override = default;
         qpdf_offset_t
         findAndSkipNextEOL() override
         {

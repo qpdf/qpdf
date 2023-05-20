@@ -26,8 +26,8 @@ class ImageProvider: public QPDFObjectHandle::StreamDataProvider
 {
   public:
     ImageProvider(std::string const& color_space, std::string const& filter);
-    virtual ~ImageProvider() = default;
-    virtual void provideStreamData(QPDFObjGen const&, Pipeline* pipeline);
+    ~ImageProvider() override = default;
+    void provideStreamData(QPDFObjGen const&, Pipeline* pipeline) override;
     size_t getWidth() const;
     size_t getHeight() const;
 
