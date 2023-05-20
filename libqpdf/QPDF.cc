@@ -2537,7 +2537,7 @@ QPDF::getCompressibleObjGens()
         if (obj.isStream()) {
             QPDFObjectHandle dict = obj.getDict();
             std::set<std::string> keys = dict.getKeys();
-            for (std::set<std::string>::reverse_iterator iter = keys.rbegin();
+            for (auto iter = keys.rbegin();
                  iter != keys.rend();
                  ++iter) {
                 std::string const& key = *iter;
@@ -2553,7 +2553,7 @@ QPDF::getCompressibleObjGens()
             }
         } else if (obj.isDictionary()) {
             std::set<std::string> keys = obj.getKeys();
-            for (std::set<std::string>::reverse_iterator iter = keys.rbegin();
+            for (auto iter = keys.rbegin();
                  iter != keys.rend();
                  ++iter) {
                 queue.push_front(obj.getKey(*iter));
