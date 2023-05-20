@@ -4,7 +4,7 @@
 static void
 test_numrange(char const* range)
 {
-    if (range == 0) {
+    if (range == nullptr) {
         std::cout << "null" << std::endl;
     } else {
         std::vector<int> result = QUtil::parse_numrange(range, 15);

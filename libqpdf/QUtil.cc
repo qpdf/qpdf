@@ -836,8 +836,8 @@ char*
 QUtil::getWhoami(char* argv0)
 {
     char* whoami = nullptr;
-    if (((whoami = strrchr(argv0, '/')) == NULL) &&
-        ((whoami = strrchr(argv0, '\\')) == NULL)) {
+    if (((whoami = strrchr(argv0, '/')) == nullptr) &&
+        ((whoami = strrchr(argv0, '\\')) == nullptr)) {
         whoami = argv0;
     } else {
         ++whoami;

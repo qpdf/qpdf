@@ -489,7 +489,7 @@ same_file_test()
     assert_same_file("qutil.out", "qutil.out", true);
     assert_same_file("qutil.out", "other-file", false);
     assert_same_file("qutil.out", "", false);
-    assert_same_file("qutil.out", 0, false);
+    assert_same_file("qutil.out", nullptr, false);
     assert_same_file("", "qutil.out", false);
 }
 

@@ -35,7 +35,7 @@
 // reading the large file then allows us to verify large file support
 // with confidence.
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 // Height should be a multiple of 10
 static size_t const nstripes = 10;
@@ -47,7 +47,7 @@ static size_t const npages = 200;
 size_t stripesize = 0;
 size_t width = 0;
 size_t height = 0;
-static unsigned char* buf = 0;
+static unsigned char* buf = nullptr;
 
 static inline unsigned char
 get_pixel_color(size_t n, size_t row)
@@ -73,7 +73,7 @@ class ImageChecker: public Pipeline
 };
 
 ImageChecker::ImageChecker(size_t n) :
-    Pipeline("image checker", 0),
+    Pipeline("image checker", nullptr),
     n(n),
     offset(0),
     okay(true)
@@ -122,7 +122,7 @@ ImageProvider::ImageProvider(size_t n) :
 void
 ImageProvider::provideStreamData(int objid, int generation, Pipeline* pipeline)
 {
-    if (buf == 0) {
+    if (buf == nullptr) {
         buf = new unsigned char[width * stripesize];
     }
     std::cout << "page " << n << " of " << npages << std::endl;

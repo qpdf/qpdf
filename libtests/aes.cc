@@ -29,9 +29,9 @@ main(int argc, char* argv[])
 {
     bool encrypt = true;
     bool cbc_mode = true;
-    char* hexkey = 0;
-    char* infilename = 0;
-    char* outfilename = 0;
+    char* hexkey = nullptr;
+    char* infilename = nullptr;
+    char* outfilename = nullptr;
     bool zero_iv = false;
     bool static_iv = false;
     bool disable_padding = false;
@@ -65,7 +65,7 @@ main(int argc, char* argv[])
             usage();
         }
     }
-    if (outfilename == 0) {
+    if (outfilename == nullptr) {
         usage();
     }
 
@@ -81,14 +81,14 @@ main(int argc, char* argv[])
         t[1] = hexkey[i + 1];
         t[2] = '\0';
 
-        long val = strtol(t, 0, 16);
+        long val = strtol(t, nullptr, 16);
         key[i / 2] = static_cast<unsigned char>(val);
     }
 
     Pl_StdioFile* out = new Pl_StdioFile("stdout", outfile);
     Pl_AES_PDF* aes = new Pl_AES_PDF("aes_128_cbc", out, encrypt, key, keylen);
     delete[] key;
-    key = 0;
+    key = nullptr;
     if (!cbc_mode) {
         aes->disableCBC();
     }

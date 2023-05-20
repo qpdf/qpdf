@@ -57,7 +57,7 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
         JDIMENSION image_height,
         int components,
         J_COLOR_SPACE color_space,
-        CompressConfig* config_callback = 0);
+        CompressConfig* config_callback = nullptr);
 
     QPDF_DLL
     virtual ~Pl_DCT();
@@ -91,7 +91,7 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
             JDIMENSION image_height = 0,
             int components = 1,
             J_COLOR_SPACE color_space = JCS_GRAYSCALE,
-            CompressConfig* config_callback = 0);
+            CompressConfig* config_callback = nullptr);
         Members(Members const&) = delete;
 
         action_e action;

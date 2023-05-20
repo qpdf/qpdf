@@ -539,7 +539,7 @@ class QPDFWriter
         friend class QPDFWriter;
 
       public:
-        PipelinePopper(QPDFWriter* qw, std::shared_ptr<Buffer>* bp = 0) :
+        PipelinePopper(QPDFWriter* qw, std::shared_ptr<Buffer>* bp = nullptr) :
             qw(qw),
             bp(bp)
         {

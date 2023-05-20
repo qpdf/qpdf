@@ -11,7 +11,7 @@
 // The example is a full copy of the qpdf program modified to allways remove all
 // annotations from the final output.
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 static void
 usageExit(std::string const& msg)

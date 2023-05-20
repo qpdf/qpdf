@@ -177,9 +177,9 @@ class QPDFArgParser
     {
         OptionEntry() :
             parameter_needed(false),
-            bare_arg_handler(0),
-            param_arg_handler(0),
-            invalid_choice_handler(0)
+            bare_arg_handler(nullptr),
+            param_arg_handler(nullptr),
+            invalid_choice_handler(nullptr)
         {
         }
         bool parameter_needed;

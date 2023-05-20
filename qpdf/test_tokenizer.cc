@@ -11,7 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 
-static char const* whoami = 0;
+static char const* whoami = nullptr;
 
 void
 usage()
@@ -91,7 +91,7 @@ tokenTypeName(QPDFTokenizer::token_type_e ttype)
     case QPDFTokenizer::tt_inline_image:
         return "inline-image";
     }
-    return 0;
+    return nullptr;
 }
 
 static std::string
@@ -238,13 +238,13 @@ int
 main(int argc, char* argv[])
 {
     QUtil::setLineBuf(stdout);
-    if ((whoami = strrchr(argv[0], '/')) == NULL) {
+    if ((whoami = strrchr(argv[0], '/')) == nullptr) {
         whoami = argv[0];
     } else {
         ++whoami;
     }
 
-    char const* filename = 0;
+    char const* filename = nullptr;
     size_t max_len = 0;
     bool include_ignorable = true;
     for (int i = 1; i < argc; ++i) {
@@ -265,7 +265,7 @@ main(int argc, char* argv[])
             filename = argv[i];
         }
     }
-    if (filename == 0) {
+    if (filename == nullptr) {
         usage();
     }
 

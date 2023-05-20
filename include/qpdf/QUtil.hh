@@ -245,7 +245,7 @@ namespace QUtil
     // Returns true iff the variable is defined.  If `value' is
     // non-null, initializes it with the value of the variable.
     QPDF_DLL
-    bool get_env(std::string const& var, std::string* value = 0);
+    bool get_env(std::string const& var, std::string* value = nullptr);
 
     QPDF_DLL
     time_t get_current_time();

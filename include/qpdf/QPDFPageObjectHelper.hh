@@ -320,12 +320,12 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // examples/pdf-count-strings.cc for an example.
     QPDF_DLL
     void
-    filterContents(QPDFObjectHandle::TokenFilter* filter, Pipeline* next = 0);
+    filterContents(QPDFObjectHandle::TokenFilter* filter, Pipeline* next = nullptr);
 
     // Old name -- calls filterContents()
     QPDF_DLL
     void filterPageContents(
-        QPDFObjectHandle::TokenFilter* filter, Pipeline* next = 0);
+        QPDFObjectHandle::TokenFilter* filter, Pipeline* next = nullptr);
 
     // Pipe a page's contents through the given pipeline. This method
     // works whether the contents are a single stream or an array of

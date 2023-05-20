@@ -51,7 +51,7 @@ main(int argc, char* argv[])
         t[1] = hexkey[i + 1];
         t[2] = '\0';
 
-        long val = strtol(t, 0, 16);
+        long val = strtol(t, nullptr, 16);
         key[i / 2] = static_cast<unsigned char>(val);
     }
 
