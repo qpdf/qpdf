@@ -472,6 +472,8 @@ if(BUILD_SHARED_LIBS)
       # Reference: Platform/Windows-GNU.cmake in the cmake installation
       set(CMAKE_SHARED_LIBRARY_PREFIX "")    # libqpdf$v.dll -> qpdf$v.dll
       set(CMAKE_IMPORT_LIBRARY_SUFFIX ".a")  # libqpdf.dll.a -> libqpdf.a
+      # Ensure the DLLs are striped in Release mode.
+      set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
     endif()
     if(MSVC)
       # Avoid linker warning from mixing libraries built with /MT and /MD.
