@@ -5,7 +5,6 @@
 #include <qpdf/QUtil.hh>
 #include <cstring>
 #include <stdexcept>
-#include <stdlib.h>
 #include <string>
 
 bool Pl_AES_PDF::use_static_iv = false;

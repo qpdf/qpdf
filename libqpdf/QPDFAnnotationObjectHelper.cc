@@ -2,7 +2,6 @@
 
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFMatrix.hh>
-#include <qpdf/QPDFNameTreeObjectHelper.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 

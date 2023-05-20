@@ -4,7 +4,6 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
 #include <iostream>
 
 // This example demonstrates how we can use the QPDFJob createQPDF and writeQPDF

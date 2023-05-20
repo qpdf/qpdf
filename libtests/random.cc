@@ -1,7 +1,6 @@
 #include <qpdf/InsecureRandomDataProvider.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/SecureRandomDataProvider.hh>
-#include <qpdf/qpdf-config.h>
 #include <iostream>
 
 class BogusRandomDataProvider: public RandomDataProvider

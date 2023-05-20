@@ -3,8 +3,6 @@
 
 #include <iostream>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 void
 check(std::string const& what, bool result)

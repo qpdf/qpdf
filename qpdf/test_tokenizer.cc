@@ -4,7 +4,6 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
-#include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFTokenizer.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>

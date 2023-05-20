@@ -1,7 +1,5 @@
 #include <qpdf/Pipeline.hh>
 
-#include <qpdf/QUtil.hh>
-
 #include <cstring>
 #include <stdexcept>
 

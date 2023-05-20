@@ -2,9 +2,7 @@
 
 #include <qpdf/QIntC.hh>
 #include <algorithm>
-#include <limits>
 #include <sstream>
-#include <stdexcept>
 #include <string.h>
 
 BufferInputSource::BufferInputSource(

@@ -2,7 +2,6 @@
 
 #include <qpdf/QPDFArgParser.hh>
 #include <qpdf/QPDFUsage.hh>
-#include <qpdf/QUtil.hh>
 #include <cstring>
 #include <iostream>
 

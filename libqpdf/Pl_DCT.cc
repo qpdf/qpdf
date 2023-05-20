@@ -2,12 +2,9 @@
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
-#include <qpdf/QUtil.hh>
 
-#include <cstring>
 #include <setjmp.h>
 #include <stdexcept>
-#include <stdlib.h>
 #include <string>
 
 #if BITS_IN_JSAMPLE != 8

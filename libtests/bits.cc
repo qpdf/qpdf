@@ -4,7 +4,6 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
-#include <stdio.h>
 #include <stdlib.h>
 
 // See comments in bits_functions.hh

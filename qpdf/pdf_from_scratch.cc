@@ -3,7 +3,6 @@
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFWriter.hh>
-#include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
 #include <stdio.h>

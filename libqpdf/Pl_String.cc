@@ -1,7 +1,5 @@
 #include <qpdf/Pl_String.hh>
 
-#include <qpdf/QUtil.hh>
-#include <errno.h>
 #include <stdexcept>
 
 Pl_String::Members::Members(std::string& s) :

@@ -3,7 +3,6 @@
 #include <qpdf/QTC.hh>
 #include <ctype.h>
 #include <stdexcept>
-#include <string.h>
 
 Pl_ASCIIHexDecoder::Pl_ASCIIHexDecoder(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),

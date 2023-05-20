@@ -13,7 +13,6 @@
 #include <qpdf/QUtil.hh>
 
 #include <algorithm>
-#include <iostream>
 #include <math.h>
 #include <string.h>
 

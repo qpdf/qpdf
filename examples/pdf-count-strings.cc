@@ -6,13 +6,11 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include <string.h>
 
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
-#include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QUtil.hh>
 
 static char const* whoami = nullptr;

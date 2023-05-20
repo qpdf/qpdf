@@ -2,7 +2,6 @@
 
 #include <qpdf/qpdflogger-c.h>
 
-#include <qpdf/Constants.h>
 #include <qpdf/qpdfjob-c.h>
 
 #include <stdio.h>

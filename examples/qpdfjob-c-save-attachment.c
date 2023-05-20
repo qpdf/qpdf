@@ -1,4 +1,3 @@
-#include <qpdf/Constants.h>
 #include <qpdf/qpdfjob-c.h>
 #include <qpdf/qpdflogger-c.h>
 

@@ -26,7 +26,6 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
-#include <algorithm>
 #include <iostream>
 #include <limits.h>
 #include <map>

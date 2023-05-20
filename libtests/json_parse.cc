@@ -1,6 +1,5 @@
 #include <qpdf/FileInputSource.hh>
 #include <qpdf/JSON.hh>
-#include <qpdf/QUtil.hh>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>

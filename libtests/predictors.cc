@@ -6,7 +6,6 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QUtil.hh>
 
-#include <errno.h>
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>

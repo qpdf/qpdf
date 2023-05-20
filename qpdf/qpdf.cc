@@ -4,7 +4,6 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
 #include <iostream>
 
 static char const* whoami = 0;

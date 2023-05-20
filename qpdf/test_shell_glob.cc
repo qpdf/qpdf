@@ -1,5 +1,4 @@
 #include <qpdf/QUtil.hh>
-#include <cstring>
 #include <iostream>
 
 int

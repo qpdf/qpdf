@@ -15,7 +15,6 @@
 #include <qpdf/qpdf-c_impl.hh>
 #include <qpdf/qpdflogger-c_impl.hh>
 
-#include <cstring>
 #include <functional>
 #include <list>
 #include <stdexcept>

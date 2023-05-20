@@ -9,7 +9,6 @@
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QTC.hh>
 
-#include <cmath>
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>

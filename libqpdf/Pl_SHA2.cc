@@ -2,7 +2,6 @@
 
 #include <qpdf/QPDFCryptoProvider.hh>
 #include <qpdf/QUtil.hh>
-#include <cstdio>
 #include <stdexcept>
 
 Pl_SHA2::Pl_SHA2(int bits, Pipeline* next) :

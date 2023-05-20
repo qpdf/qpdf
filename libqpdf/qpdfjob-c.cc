@@ -1,14 +1,12 @@
 #include <qpdf/qpdfjob-c.h>
 
 #include <qpdf/QPDFJob.hh>
-#include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFUsage.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/qpdf-c_impl.hh>
 #include <qpdf/qpdflogger-c_impl.hh>
 
 #include <cstdio>
-#include <cstring>
 
 struct _qpdfjob_handle
 {
