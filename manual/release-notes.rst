@@ -23,6 +23,9 @@ For a detailed list of changes, please see the file
       corresponding C API functions ``qpdfjob_create_qpdf`` and
       ``qpdfjob_write_qpdf``.
 
+    - Add ``QPDF::newReserved`` as a better alternative to
+      ``QPDFObjectHandle::newReserved``.
+
 11.3.0: February 25, 2023
   - CLI Enhancements
 
