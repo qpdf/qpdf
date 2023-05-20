@@ -26,8 +26,8 @@
 #include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
 #include <qpdf/Types.h>
 
-#include <memory>
 #include <cstdio>
+#include <memory>
 #include <string>
 
 // Remember to use QPDF_DLL_CLASS on anything derived from InputSource

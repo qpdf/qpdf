@@ -4,8 +4,8 @@
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QUtil.hh>
 
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 
 void
 run(char const* filename)

@@ -1,9 +1,9 @@
 #include <qpdf/Pl_Buffer.hh>
 
 #include <algorithm>
-#include <stdexcept>
 #include <cstdlib>
 #include <cstring>
+#include <stdexcept>
 
 Pl_Buffer::Pl_Buffer(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),

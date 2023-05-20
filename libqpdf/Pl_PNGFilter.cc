@@ -4,8 +4,8 @@
 #include <qpdf/QUtil.hh>
 
 #include <climits>
-#include <stdexcept>
 #include <cstring>
+#include <stdexcept>
 
 static int
 abs_diff(int a, int b)

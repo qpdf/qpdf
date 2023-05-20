@@ -5,9 +5,9 @@
 # include <windows.h>
 #endif
 
-#include <iostream>
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
 
 static void
 do_copy(FILE* in, FILE* out)

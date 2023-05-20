@@ -29,12 +29,12 @@
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
 
+#include <cstdio>
 #include <functional>
 #include <list>
 #include <map>
 #include <memory>
 #include <set>
-#include <cstdio>
 #include <string>
 #include <string_view>
 #include <vector>

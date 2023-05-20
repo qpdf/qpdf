@@ -2,9 +2,9 @@
 
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QUtil.hh>
-#include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 int
 main(int argc, char* argv[])

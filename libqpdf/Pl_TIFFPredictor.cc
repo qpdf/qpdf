@@ -6,8 +6,8 @@
 #include <qpdf/QUtil.hh>
 
 #include <climits>
-#include <stdexcept>
 #include <cstring>
+#include <stdexcept>
 #include <vector>
 
 Pl_TIFFPredictor::Pl_TIFFPredictor(

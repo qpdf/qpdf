@@ -10,9 +10,9 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
 
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <cstdlib>
 #include <string>
 
 static bool static_id = false;

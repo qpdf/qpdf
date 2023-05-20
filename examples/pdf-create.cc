@@ -14,9 +14,9 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
+#include <cstdlib>
 #include <iostream>
 #include <memory>
-#include <cstdlib>
 
 static char const* whoami = nullptr;
 

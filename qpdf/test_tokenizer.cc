@@ -6,10 +6,10 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFTokenizer.hh>
 #include <qpdf/QUtil.hh>
-#include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 static char const* whoami = nullptr;
 
@@ -203,8 +203,7 @@ process(char const* filename, bool include_ignorable, size_t max_len)
         Pl_Buffer plb("buffer");
         page.pipeContents(&plb);
         auto content_data = plb.getBufferSharedPointer();
-        auto* bis =
-            new BufferInputSource("content data", content_data.get());
+        auto* bis = new BufferInputSource("content data", content_data.get());
         is = std::shared_ptr<InputSource>(bis);
         dump_tokens(
             is,
@@ -220,8 +219,7 @@ process(char const* filename, bool include_ignorable, size_t max_len)
         if (obj.isStream() && obj.getDict().getKey("/Type").isName() &&
             obj.getDict().getKey("/Type").getName() == "/ObjStm") {
             std::shared_ptr<Buffer> b = obj.getStreamData(qpdf_dl_specialized);
-            auto* bis =
-                new BufferInputSource("object stream data", b.get());
+            auto* bis = new BufferInputSource("object stream data", b.get());
             is = std::shared_ptr<InputSource>(bis);
             dump_tokens(
                 is,

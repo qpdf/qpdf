@@ -25,12 +25,12 @@
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
 
+#include <cstdio>
 #include <functional>
 #include <iostream>
 #include <list>
 #include <map>
 #include <memory>
-#include <cstdio>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -113,8 +113,8 @@ class QPDF
     // your own method of retrieving a PDF file, you can subclass
     // InputSource and use this method.
     QPDF_DLL
-    void
-    processInputSource(std::shared_ptr<InputSource>, char const* password = nullptr);
+    void processInputSource(
+        std::shared_ptr<InputSource>, char const* password = nullptr);
 
     // Create a PDF from an input source that contains JSON as written
     // by writeJSON (or qpdf --json-output, version 2 or higher). The

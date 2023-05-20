@@ -10,9 +10,9 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
-#include <stdexcept>
 #include <cstdlib>
 #include <cstring>
+#include <stdexcept>
 
 static inline bool
 is_delimiter(char ch)

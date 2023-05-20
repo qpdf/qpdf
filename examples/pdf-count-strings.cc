@@ -4,8 +4,8 @@
 // that uses QPDFObjectHandle::TokenFilter with addContentTokenFilter.
 //
 
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QPDF.hh>

@@ -24,8 +24,7 @@ namespace
 static void
 error_handler(j_common_ptr cinfo)
 {
-    auto* jerr =
-        reinterpret_cast<qpdf_jpeg_error_mgr*>(cinfo->err);
+    auto* jerr = reinterpret_cast<qpdf_jpeg_error_mgr*>(cinfo->err);
     char buf[JMSG_LENGTH_MAX];
     (*cinfo->err->format_message)(cinfo, buf);
     jerr->msg = buf;
@@ -261,8 +260,7 @@ jpeg_buffer_src(j_decompress_ptr cinfo, Buffer* buffer)
 void
 Pl_DCT::compress(void* cinfo_p, Buffer* b)
 {
-    auto* cinfo =
-        reinterpret_cast<jpeg_compress_struct*>(cinfo_p);
+    auto* cinfo = reinterpret_cast<jpeg_compress_struct*>(cinfo_p);
 
 #if ( \
     (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
@@ -316,8 +314,7 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
 void
 Pl_DCT::decompress(void* cinfo_p, Buffer* b)
 {
-    auto* cinfo =
-        reinterpret_cast<jpeg_decompress_struct*>(cinfo_p);
+    auto* cinfo = reinterpret_cast<jpeg_decompress_struct*>(cinfo_p);
 
 #if ( \
     (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \

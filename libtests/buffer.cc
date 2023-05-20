@@ -4,10 +4,10 @@
 #include <qpdf/Pl_Count.hh>
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/QUtil.hh>
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
-#include <cstdlib>
 
 static unsigned char*
 uc(char const* s)

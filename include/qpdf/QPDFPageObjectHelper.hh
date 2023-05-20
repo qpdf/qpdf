@@ -319,8 +319,8 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // contents, as happens with addContentTokenFilter. See
     // examples/pdf-count-strings.cc for an example.
     QPDF_DLL
-    void
-    filterContents(QPDFObjectHandle::TokenFilter* filter, Pipeline* next = nullptr);
+    void filterContents(
+        QPDFObjectHandle::TokenFilter* filter, Pipeline* next = nullptr);
 
     // Old name -- calls filterContents()
     QPDF_DLL

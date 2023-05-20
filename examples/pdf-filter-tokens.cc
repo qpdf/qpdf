@@ -6,9 +6,9 @@
 //
 
 #include <algorithm>
+#include <cstdlib>
 #include <deque>
 #include <iostream>
-#include <cstdlib>
 
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjectHandle.hh>

@@ -69,11 +69,11 @@ try_range_check_subtract_real(
 int
 main()
 {
-    uint32_t u1 = 3141592653U;      // Too big for signed type
-    int32_t i1 = -1153374643;       // Same bit pattern as u1
-    uint64_t ul1 = 1099511627776LL; // Too big for 32-bit
-    uint64_t ul2 = 12345;           // Fits into 32-bit
-    int32_t i2 = 81;                // Fits in char and uchar
+    uint32_t u1 = 3141592653U;                  // Too big for signed type
+    int32_t i1 = -1153374643;                   // Same bit pattern as u1
+    uint64_t ul1 = 1099511627776LL;             // Too big for 32-bit
+    uint64_t ul2 = 12345;                       // Fits into 32-bit
+    int32_t i2 = 81;                            // Fits in char and uchar
     auto c1 = static_cast<signed char>('\xf7'); // Signed value when char
     char c2 = 'W'; // char; may be signed or unsigned
 

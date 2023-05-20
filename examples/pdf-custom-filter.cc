@@ -200,8 +200,7 @@ class StreamReplacer: public QPDFObjectHandle::StreamDataProvider
   public:
     StreamReplacer(QPDF* pdf);
     ~StreamReplacer() override = default;
-    void
-    provideStreamData(QPDFObjGen const& og, Pipeline* pipeline) override;
+    void provideStreamData(QPDFObjGen const& og, Pipeline* pipeline) override;
 
     void registerStream(
         QPDFObjectHandle stream,

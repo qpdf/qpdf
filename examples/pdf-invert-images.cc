@@ -5,9 +5,9 @@
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
-#include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 static char const* whoami = nullptr;
 
@@ -34,8 +34,7 @@ class ImageInverter: public QPDFObjectHandle::StreamDataProvider
 {
   public:
     ~ImageInverter() override = default;
-    void
-    provideStreamData(QPDFObjGen const& og, Pipeline* pipeline) override;
+    void provideStreamData(QPDFObjGen const& og, Pipeline* pipeline) override;
 
     void registerImage(
         QPDFObjectHandle image,

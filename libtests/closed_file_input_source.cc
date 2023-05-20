@@ -1,8 +1,8 @@
 #include <qpdf/ClosedFileInputSource.hh>
 #include <qpdf/FileInputSource.hh>
 
-#include <iostream>
 #include <cstdio>
+#include <iostream>
 
 void
 check(std::string const& what, bool result)

@@ -1,9 +1,9 @@
 #include <qpdf/QPDFJob.hh>
 
+#include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cctype>
 #include <fcntl.h>
 #include <iostream>
 #include <memory>

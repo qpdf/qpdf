@@ -3,8 +3,8 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 
 static char const* whoami = nullptr;
 

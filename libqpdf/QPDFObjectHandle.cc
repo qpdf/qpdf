@@ -29,11 +29,11 @@
 #include <qpdf/QUtil.hh>
 
 #include <algorithm>
-#include <cstring>
 #include <cctype>
 #include <climits>
-#include <stdexcept>
 #include <cstdlib>
+#include <cstring>
+#include <stdexcept>
 
 using namespace std::literals;
 

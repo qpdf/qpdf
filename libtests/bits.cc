@@ -3,8 +3,8 @@
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QUtil.hh>
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 
 // See comments in bits_functions.hh
 #define BITS_TESTING 1

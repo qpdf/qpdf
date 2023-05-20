@@ -2,8 +2,8 @@
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/Pl_MD5.hh>
 #include <qpdf/QUtil.hh>
-#include <iostream>
 #include <cstdio>
+#include <iostream>
 
 static void
 test_string(char const* str)

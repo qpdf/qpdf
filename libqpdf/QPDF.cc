@@ -4,13 +4,13 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cstdlib>
+#include <cstring>
 #include <limits>
 #include <map>
 #include <memory.h>
 #include <regex>
 #include <sstream>
-#include <cstdlib>
-#include <cstring>
 #include <vector>
 
 #include <qpdf/BufferInputSource.hh>
@@ -2528,9 +2528,7 @@ QPDF::getCompressibleObjGens()
         if (obj.isStream()) {
             QPDFObjectHandle dict = obj.getDict();
             std::set<std::string> keys = dict.getKeys();
-            for (auto iter = keys.rbegin();
-                 iter != keys.rend();
-                 ++iter) {
+            for (auto iter = keys.rbegin(); iter != keys.rend(); ++iter) {
                 std::string const& key = *iter;
                 QPDFObjectHandle value = dict.getKey(key);
                 if (key == "/Length") {
@@ -2544,9 +2542,7 @@ QPDF::getCompressibleObjGens()
             }
         } else if (obj.isDictionary()) {
             std::set<std::string> keys = obj.getKeys();
-            for (auto iter = keys.rbegin();
-                 iter != keys.rend();
-                 ++iter) {
+            for (auto iter = keys.rbegin(); iter != keys.rend(); ++iter) {
                 queue.push_front(obj.getKey(*iter));
             }
         } else if (obj.isArray()) {

@@ -23,8 +23,8 @@
 #include <qpdf/RC4.hh>
 
 #include <algorithm>
-#include <stdexcept>
 #include <cstdlib>
+#include <stdexcept>
 
 QPDFWriter::ProgressReporter::~ProgressReporter()
 {
@@ -997,8 +997,7 @@ void
 QPDFWriter::activatePipelineStack(PipelinePopper& pp)
 {
     std::string stack_id("stack " + std::to_string(this->m->next_stack_id));
-    auto* c =
-        new Pl_Count(stack_id.c_str(), this->m->pipeline_stack.back());
+    auto* c = new Pl_Count(stack_id.c_str(), this->m->pipeline_stack.back());
     ++this->m->next_stack_id;
     this->m->pipeline_stack.push_back(c);
     this->m->pipeline = c;

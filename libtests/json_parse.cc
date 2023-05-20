@@ -15,8 +15,7 @@ namespace
         void arrayStart() override;
         void containerEnd(JSON const& value) override;
         void topLevelScalar() override;
-        bool
-        dictionaryItem(std::string const& key, JSON const& value) override;
+        bool dictionaryItem(std::string const& key, JSON const& value) override;
         bool arrayItem(JSON const& value) override;
 
       private:

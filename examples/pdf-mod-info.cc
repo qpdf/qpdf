@@ -5,10 +5,10 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
-#include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 static char const* version = "1.1";
 static char const* whoami = nullptr;

@@ -25,14 +25,14 @@
 #include <qpdf/DLL.h>
 #include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
 #include <qpdf/Types.h>
+#include <cstdio>
 #include <cstring>
+#include <ctime>
 #include <functional>
 #include <list>
 #include <memory>
 #include <stdexcept>
-#include <cstdio>
 #include <string>
-#include <ctime>
 #include <vector>
 
 class RandomDataProvider;

@@ -1,8 +1,8 @@
 #include <qpdf/Pl_ASCII85Decoder.hh>
 
 #include <qpdf/QTC.hh>
-#include <stdexcept>
 #include <cstring>
+#include <stdexcept>
 
 Pl_ASCII85Decoder::Pl_ASCII85Decoder(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),

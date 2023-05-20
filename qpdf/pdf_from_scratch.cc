@@ -4,10 +4,10 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
-#include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 static char const* whoami = nullptr;
 

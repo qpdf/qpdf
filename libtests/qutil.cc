@@ -3,11 +3,11 @@
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QUtil.hh>
-#include <fstream>
-#include <iostream>
 #include <climits>
 #include <cstdio>
 #include <cstring>
+#include <fstream>
+#include <iostream>
 
 #ifdef _WIN32
 # include <io.h>

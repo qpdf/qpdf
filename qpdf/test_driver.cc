@@ -26,13 +26,13 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
-#include <iostream>
 #include <climits>
-#include <map>
-#include <sstream>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
+#include <map>
+#include <sstream>
 
 #define QPDF_OBJECT_NOWARN
 #include <qpdf/QPDFObject.hh>

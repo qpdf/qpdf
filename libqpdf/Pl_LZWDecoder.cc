@@ -3,8 +3,8 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
-#include <stdexcept>
 #include <cstring>
+#include <stdexcept>
 
 Pl_LZWDecoder::Pl_LZWDecoder(
     char const* identifier, Pipeline* next, bool early_code_change) :

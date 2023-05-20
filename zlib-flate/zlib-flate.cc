@@ -3,11 +3,11 @@
 #include <qpdf/QPDF.hh>
 #include <qpdf/QUtil.hh>
 
-#include <fcntl.h>
-#include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <fcntl.h>
+#include <iostream>
 
 static char const* whoami = nullptr;
 
