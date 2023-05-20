@@ -4,13 +4,13 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cstdlib>
+#include <cstring>
 #include <limits>
 #include <map>
 #include <memory.h>
 #include <regex>
 #include <sstream>
-#include <cstdlib>
-#include <cstring>
 #include <vector>
 
 #include <qpdf/BufferInputSource.hh>
@@ -1985,6 +1985,12 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
 }
 
 QPDFObjectHandle
+QPDF::newReserved()
+{
+    return makeIndirectFromQPDFObject(QPDF_Reserved::create());
+}
+
+QPDFObjectHandle
 QPDF::newStream()
 {
     return makeIndirectFromQPDFObject(QPDF_Stream::create(
@@ -2207,9 +2213,8 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
         QTC::TC("qpdf", "QPDF copy indirect");
         if (obj_copier.object_map.count(foreign_og) == 0) {
             obj_copier.to_copy.push_back(foreign);
-            obj_copier.object_map[foreign_og] = foreign.isStream()
-                ? newStream()
-                : QPDFObjectHandle::newReserved(this);
+            obj_copier.object_map[foreign_og] =
+                foreign.isStream() ? newStream() : newReserved();
         }
     }
 
@@ -2528,9 +2533,7 @@ QPDF::getCompressibleObjGens()
         if (obj.isStream()) {
             QPDFObjectHandle dict = obj.getDict();
             std::set<std::string> keys = dict.getKeys();
-            for (auto iter = keys.rbegin();
-                 iter != keys.rend();
-                 ++iter) {
+            for (auto iter = keys.rbegin(); iter != keys.rend(); ++iter) {
                 std::string const& key = *iter;
                 QPDFObjectHandle value = dict.getKey(key);
                 if (key == "/Length") {
@@ -2544,9 +2547,7 @@ QPDF::getCompressibleObjGens()
             }
         } else if (obj.isDictionary()) {
             std::set<std::string> keys = obj.getKeys();
-            for (auto iter = keys.rbegin();
-                 iter != keys.rend();
-                 ++iter) {
+            for (auto iter = keys.rbegin(); iter != keys.rend(); ++iter) {
                 queue.push_front(obj.getKey(*iter));
             }
         } else if (obj.isArray()) {

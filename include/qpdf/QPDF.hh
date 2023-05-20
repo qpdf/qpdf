@@ -413,6 +413,24 @@ class QPDF
     QPDF_DLL
     QPDFObjectHandle newStream(std::string const& data);
 
+    // A reserved object is a special sentinel used for qpdf to
+    // reserve a spot for an object that is going to be added to the
+    // QPDF object.  Normally you don't have to use this type since
+    // you can just call QPDF::makeIndirectObject.  However, in some
+    // cases, if you have to create objects with circular references,
+    // you may need to create a reserved object so that you can have a
+    // reference to it and then replace the object later.  Reserved
+    // objects have the special property that they can't be resolved
+    // to direct objects.  This makes it possible to replace a
+    // reserved object with a new object while preserving existing
+    // references to them.  When you are ready to replace a reserved
+    // object with its replacement, use QPDF::replaceReserved for this
+    // purpose rather than the more general QPDF::replaceObject.  It
+    // is an error to try to write a QPDF with QPDFWriter if it has
+    // any reserved objects in it.
+    QPDF_DLL
+    QPDFObjectHandle newReserved();
+
     // Install this object handle as an indirect object and return an
     // indirect reference to it.
     QPDF_DLL

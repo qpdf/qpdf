@@ -2128,7 +2128,11 @@ QPDFObjectHandle::newStream(QPDF* qpdf, std::string const& data)
 QPDFObjectHandle
 QPDFObjectHandle::newReserved(QPDF* qpdf)
 {
-    return qpdf->makeIndirectObject(QPDFObjectHandle(QPDF_Reserved::create()));
+    if (qpdf == nullptr) {
+        throw std::runtime_error(
+            "attempt to create reserved object in null qpdf object");
+    }
+    return qpdf->newReserved();
 }
 
 void
