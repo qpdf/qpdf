@@ -24,6 +24,10 @@
 
 #include <qpdf/DLL.h>
 #include <iostream>
+#include <set>
+
+class QPDFObjectHandle;
+class QPDFObjectHelper;
 
 // This class represents an object ID and generation pair.  It is
 // suitable to use as a key in a map or set.
@@ -31,6 +35,7 @@
 class QPDFObjGen
 {
   public:
+    // ABI: change to default.
     QPDF_DLL
     QPDFObjGen() :
         obj(0),
@@ -84,12 +89,72 @@ class QPDFObjGen
     QPDF_DLL
     friend std::ostream& operator<<(std::ostream& os, const QPDFObjGen& og);
 
+    // Convenience class for loop detection when processing objects.
+    //
+    // The class adds 'add' methods to a std::set<QPDFObjGen> which allows
+    // to test whether an QPDFObjGen is present in the set and to insert it in
+    // a single operation. The 'add' method is overloaded to take a QPDFObjGen,
+    // QPDFObjectHandle or an QPDFObjectHelper as parameter.
+    //
+    // The erase method is modified to ignore requests to erase
+    // QPDFObjGen(0, 0).
+    //
+    // Usage example:
+    //
+    // void process_object(QPDFObjectHandle oh, QPDFObjGen::Tracker& seen)
+    // {
+    //     if (seen.add(oh)) {
+    //         // handle first encounter of oh
+    //     } else {
+    //         // handle loop / subsequent encounter of oh
+    //     }
+    // }
+    class QPDF_DLL_CLASS set: public std::set<QPDFObjGen>
+    {
+      public:
+        // Add 'og' to the set. Return false if 'og' is already present in
+        // the set. Attempts to insert QPDFObjGen(0, 0) are ignored.
+        QPDF_DLL
+        bool
+        add(QPDFObjGen og)
+        {
+            if (og.isIndirect()) {
+                if (count(og) > 0) {
+                    return false;
+                }
+                emplace(og);
+            }
+            return true;
+        }
+
+        QPDF_DLL
+        bool add(QPDFObjectHandle const& oh);
+
+        QPDF_DLL
+        bool add(QPDFObjectHelper const& oh);
+
+        QPDF_DLL
+        void
+        erase(QPDFObjGen og)
+        {
+            if (og.isIndirect()) {
+                std::set<QPDFObjGen>::erase(og);
+            }
+        }
+
+        QPDF_DLL
+        void erase(QPDFObjectHandle const& oh);
+
+        QPDF_DLL
+        void erase(QPDFObjectHelper const& oh);
+    };
+
   private:
     // This class does not use the Members pattern to avoid a memory
     // allocation for every one of these. A lot of these get created
     // and destroyed.
-    int obj;
-    int gen;
+    int obj{0};
+    int gen{0};
 };
 
 #endif // QPDFOBJGEN_HH

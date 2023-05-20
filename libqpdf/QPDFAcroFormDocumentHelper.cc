@@ -57,7 +57,7 @@ QPDFAcroFormDocumentHelper::addFormField(QPDFFormFieldObjectHelper ff)
             "/Fields", QPDFObjectHandle::newArray());
     }
     fields.appendItem(ff.getObjectHandle());
-    std::set<QPDFObjGen> visited;
+    QPDFObjGen::set visited;
     traverseField(
         ff.getObjectHandle(), QPDFObjectHandle::newNull(), 0, visited);
 }
@@ -68,53 +68,48 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(
 {
     analyze();
     std::map<std::string, std::string> renames;
-    std::list<QPDFObjectHandle> queue;
-    queue.insert(queue.begin(), fields.begin(), fields.end());
-    std::set<QPDFObjGen> seen;
-    while (!queue.empty()) {
-        QPDFObjectHandle obj = queue.front();
-        queue.pop_front();
-        auto og = obj.getObjGen();
-        if (seen.count(og)) {
-            // loop
-            continue;
-        }
-        seen.insert(og);
-        auto kids = obj.getKey("/Kids");
-        if (kids.isArray()) {
-            for (auto kid: kids.aitems()) {
-                queue.push_back(kid);
-            }
-        }
-
-        if (obj.hasKey("/T")) {
-            // Find something we can append to the partial name that
-            // makes the fully qualified name unique. When we find
-            // something, reuse the same suffix for all fields in this
-            // group with the same name. We can only change the name
-            // of fields that have /T, and this field's /T is always
-            // at the end of the fully qualified name, appending to /T
-            // has the effect of appending the same thing to the fully
-            // qualified name.
-            std::string old_name =
-                QPDFFormFieldObjectHelper(obj).getFullyQualifiedName();
-            if (renames.count(old_name) == 0) {
-                std::string new_name = old_name;
-                int suffix = 0;
-                std::string append;
-                while (!getFieldsWithQualifiedName(new_name).empty()) {
-                    ++suffix;
-                    append = "+" + std::to_string(suffix);
-                    new_name = old_name + append;
+    QPDFObjGen::set seen;
+    for (std::list<QPDFObjectHandle> queue{fields.begin(), fields.end()};
+         !queue.empty();
+         queue.pop_front()) {
+        auto& obj = queue.front();
+        if (seen.add(obj)) {
+            auto kids = obj.getKey("/Kids");
+            if (kids.isArray()) {
+                for (auto kid: kids.aitems()) {
+                    queue.push_back(kid);
                 }
-                renames[old_name] = append;
             }
-            std::string append = renames[old_name];
-            if (!append.empty()) {
-                obj.replaceKey(
-                    "/T",
-                    QPDFObjectHandle::newUnicodeString(
-                        obj.getKey("/T").getUTF8Value() + append));
+
+            if (obj.hasKey("/T")) {
+                // Find something we can append to the partial name that
+                // makes the fully qualified name unique. When we find
+                // something, reuse the same suffix for all fields in this
+                // group with the same name. We can only change the name
+                // of fields that have /T, and this field's /T is always
+                // at the end of the fully qualified name, appending to /T
+                // has the effect of appending the same thing to the fully
+                // qualified name.
+                std::string old_name =
+                    QPDFFormFieldObjectHelper(obj).getFullyQualifiedName();
+                if (renames.count(old_name) == 0) {
+                    std::string new_name = old_name;
+                    int suffix = 0;
+                    std::string append;
+                    while (!getFieldsWithQualifiedName(new_name).empty()) {
+                        ++suffix;
+                        append = "+" + std::to_string(suffix);
+                        new_name = old_name + append;
+                    }
+                    renames[old_name] = append;
+                }
+                std::string append = renames[old_name];
+                if (!append.empty()) {
+                    obj.replaceKey(
+                        "/T",
+                        QPDFObjectHandle::newUnicodeString(
+                            obj.getKey("/T").getUTF8Value() + append));
+                }
             }
         }
     }
@@ -172,7 +167,7 @@ QPDFAcroFormDocumentHelper::setFormFieldName(
     QPDFFormFieldObjectHelper ff, std::string const& name)
 {
     ff.setFieldAttribute("/T", name);
-    std::set<QPDFObjGen> visited;
+    QPDFObjGen::set visited;
     auto ff_oh = ff.getObjectHandle();
     traverseField(ff_oh, ff_oh.getKey("/Parent"), 0, visited);
 }
@@ -193,12 +188,11 @@ QPDFAcroFormDocumentHelper::getFieldsWithQualifiedName(std::string const& name)
 {
     analyze();
     // Keep from creating an empty entry
-    std::set<QPDFObjGen> result;
     auto iter = this->m->name_to_fields.find(name);
     if (iter != this->m->name_to_fields.end()) {
-        result = iter->second;
+        return iter->second;
     }
-    return result;
+    return {};
 }
 
 std::vector<QPDFAnnotationObjectHelper>
@@ -223,18 +217,12 @@ std::vector<QPDFFormFieldObjectHelper>
 QPDFAcroFormDocumentHelper::getFormFieldsForPage(QPDFPageObjectHelper ph)
 {
     analyze();
-    std::set<QPDFObjGen> added;
+    QPDFObjGen::set todo;
     std::vector<QPDFFormFieldObjectHelper> result;
-    auto widget_annotations = getWidgetAnnotationsForPage(ph);
-    for (auto annot: widget_annotations) {
-        auto field = getFieldForAnnotation(annot);
-        field = field.getTopLevelField();
-        auto og = field.getObjectHandle().getObjGen();
-        if (!added.count(og)) {
-            added.insert(og);
-            if (field.getObjectHandle().isDictionary()) {
-                result.push_back(field);
-            }
+    for (auto& annot: getWidgetAnnotationsForPage(ph)) {
+        auto field = getFieldForAnnotation(annot).getTopLevelField();
+        if (todo.add(field) && field.getObjectHandle().isDictionary()) {
+            result.push_back(field);
         }
     }
     return result;
@@ -278,7 +266,7 @@ QPDFAcroFormDocumentHelper::analyze()
     // Traverse /AcroForm to find annotations and map them
     // bidirectionally to fields.
 
-    std::set<QPDFObjGen> visited;
+    QPDFObjGen::set visited;
     int nfields = fields.getArrayNItems();
     QPDFObjectHandle null(QPDFObjectHandle::newNull());
     for (int i = 0; i < nfields; ++i) {
@@ -324,7 +312,7 @@ QPDFAcroFormDocumentHelper::traverseField(
     QPDFObjectHandle field,
     QPDFObjectHandle parent,
     int depth,
-    std::set<QPDFObjGen>& visited)
+    QPDFObjGen::set& visited)
 {
     if (depth > 100) {
         // Arbitrarily cut off recursion at a fixed depth to avoid
@@ -346,12 +334,11 @@ QPDFAcroFormDocumentHelper::traverseField(
         return;
     }
     QPDFObjGen og(field.getObjGen());
-    if (visited.count(og) != 0) {
+    if (!visited.add(og)) {
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper loop");
         field.warnIfPossible("loop detected while traversing /AcroForm");
         return;
     }
-    visited.insert(og);
 
     // A dictionary encountered while traversing the /AcroForm field
     // may be a form field, an annotation, or the merger of the two. A
@@ -888,7 +875,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
 
     // Now do the actual copies.
 
-    std::set<QPDFObjGen> added_new_fields;
+    QPDFObjGen::set added_new_fields;
     for (auto annot: old_annots.aitems()) {
         if (annot.isStream()) {
             annot.warnIfPossible("ignoring annotation that's a stream");
@@ -970,73 +957,68 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             // Traverse the field, copying kids, and preserving
             // integrity.
             std::list<QPDFObjectHandle> queue;
+            QPDFObjGen::set seen;
             if (maybe_copy_object(top_field)) {
                 queue.push_back(top_field);
             }
-            std::set<QPDFObjGen> seen;
-            while (!queue.empty()) {
-                QPDFObjectHandle obj = queue.front();
-                queue.pop_front();
-                auto orig_og = obj.getObjGen();
-                if (seen.count(orig_og)) {
-                    // loop
-                    break;
-                }
-                seen.insert(orig_og);
-                auto parent = obj.getKey("/Parent");
-                if (parent.isIndirect()) {
-                    auto parent_og = parent.getObjGen();
-                    if (orig_to_copy.count(parent_og)) {
-                        obj.replaceKey("/Parent", orig_to_copy[parent_og]);
-                    } else {
-                        parent.warnIfPossible(
-                            "while traversing field " +
-                            obj.getObjGen().unparse(',') + ", found parent (" +
-                            parent_og.unparse(',') +
-                            ") that had not been seen, indicating likely"
-                            " invalid field structure");
-                    }
-                }
-                auto kids = obj.getKey("/Kids");
-                if (kids.isArray()) {
-                    for (int i = 0; i < kids.getArrayNItems(); ++i) {
-                        auto kid = kids.getArrayItem(i);
-                        if (maybe_copy_object(kid)) {
-                            kids.setArrayItem(i, kid);
-                            queue.push_back(kid);
+            for (; !queue.empty(); queue.pop_front()) {
+                auto& obj = queue.front();
+                if (seen.add(obj)) {
+                    auto parent = obj.getKey("/Parent");
+                    if (parent.isIndirect()) {
+                        auto parent_og = parent.getObjGen();
+                        if (orig_to_copy.count(parent_og)) {
+                            obj.replaceKey("/Parent", orig_to_copy[parent_og]);
+                        } else {
+                            parent.warnIfPossible(
+                                "while traversing field " +
+                                obj.getObjGen().unparse(',') +
+                                ", found parent (" + parent_og.unparse(',') +
+                                ") that had not been seen, indicating likely"
+                                " invalid field structure");
                         }
                     }
-                }
-
-                if (override_da || override_q) {
-                    adjustInheritedFields(
-                        obj,
-                        override_da,
-                        from_default_da,
-                        override_q,
-                        from_default_q);
-                }
-                if (foreign) {
-                    // Lazily initialize our /DR and the conflict map.
-                    init_dr_map();
-                    // The spec doesn't say anything about /DR on the
-                    // field, but lots of writers put one there, and
-                    // it is frequently the same as the document-level
-                    // /DR. To avoid having the field's /DR point to
-                    // information that we are not maintaining, just
-                    // reset it to that if it exists. Empirical
-                    // evidence suggests that many readers, including
-                    // Acrobat, Adobe Acrobat Reader, chrome, firefox,
-                    // the mac Preview application, and several of the
-                    // free readers on Linux all ignore /DR at the
-                    // field level.
-                    if (obj.hasKey("/DR")) {
-                        obj.replaceKey("/DR", dr);
+                    auto kids = obj.getKey("/Kids");
+                    if (kids.isArray()) {
+                        for (int i = 0; i < kids.getArrayNItems(); ++i) {
+                            auto kid = kids.getArrayItem(i);
+                            if (maybe_copy_object(kid)) {
+                                kids.setArrayItem(i, kid);
+                                queue.push_back(kid);
+                            }
+                        }
                     }
-                }
-                if (foreign && obj.getKey("/DA").isString() &&
-                    (!dr_map.empty())) {
-                    adjustDefaultAppearances(obj, dr_map);
+
+                    if (override_da || override_q) {
+                        adjustInheritedFields(
+                            obj,
+                            override_da,
+                            from_default_da,
+                            override_q,
+                            from_default_q);
+                    }
+                    if (foreign) {
+                        // Lazily initialize our /DR and the conflict map.
+                        init_dr_map();
+                        // The spec doesn't say anything about /DR on the
+                        // field, but lots of writers put one there, and
+                        // it is frequently the same as the document-level
+                        // /DR. To avoid having the field's /DR point to
+                        // information that we are not maintaining, just
+                        // reset it to that if it exists. Empirical
+                        // evidence suggests that many readers, including
+                        // Acrobat, Adobe Acrobat Reader, chrome, firefox,
+                        // the mac Preview application, and several of the
+                        // free readers on Linux all ignore /DR at the
+                        // field level.
+                        if (obj.hasKey("/DR")) {
+                            obj.replaceKey("/DR", dr);
+                        }
+                    }
+                    if (foreign && obj.getKey("/DA").isString() &&
+                        (!dr_map.empty())) {
+                        adjustDefaultAppearances(obj, dr_map);
+                    }
                 }
             }
 
@@ -1064,9 +1046,8 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         maybe_copy_object(annot);
 
         // Now we have copies, so we can safely mutate.
-        if (have_field && !added_new_fields.count(top_field.getObjGen())) {
+        if (have_field && added_new_fields.add(top_field)) {
             new_fields.push_back(top_field);
-            added_new_fields.insert(top_field.getObjGen());
         }
         new_annots.push_back(annot);
 

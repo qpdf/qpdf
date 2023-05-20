@@ -22,13 +22,13 @@
 #ifndef QPDFOUTLINEDOCUMENTHELPER_HH
 #define QPDFOUTLINEDOCUMENTHELPER_HH
 
+#include <qpdf/QPDF.hh>
 #include <qpdf/QPDFDocumentHelper.hh>
 #include <qpdf/QPDFNameTreeObjectHelper.hh>
+#include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFOutlineObjectHelper.hh>
 
-#include <qpdf/QPDF.hh>
 #include <map>
-#include <set>
 #include <vector>
 
 #include <qpdf/DLL.h>
@@ -69,16 +69,16 @@ class QPDFOutlineDocumentHelper: public QPDFDocumentHelper
     {
         friend class QPDFOutlineObjectHelper;
 
+        // ABI: remove  QPDF_DLL and pass og by value.
         QPDF_DLL
         static bool
         checkSeen(QPDFOutlineDocumentHelper& dh, QPDFObjGen const& og)
         {
-            return dh.checkSeen(og);
+            return !dh.m->seen.add(og);
         }
     };
 
   private:
-    bool checkSeen(QPDFObjGen const& og);
     void initializeByPage();
 
     class Members
@@ -94,7 +94,7 @@ class QPDFOutlineDocumentHelper: public QPDFDocumentHelper
         Members(Members const&) = delete;
 
         std::vector<QPDFOutlineObjectHelper> outlines;
-        std::set<QPDFObjGen> seen;
+        QPDFObjGen::set seen;
         QPDFObjectHandle dest_dict;
         std::shared_ptr<QPDFNameTreeObjectHelper> names_dest;
         std::map<QPDFObjGen, std::vector<QPDFOutlineObjectHelper>> by_page;

@@ -1017,7 +1017,7 @@ class QPDF
       public:
         std::map<QPDFObjGen, QPDFObjectHandle> object_map;
         std::vector<QPDFObjectHandle> to_copy;
-        std::set<QPDFObjGen> visiting;
+        QPDFObjGen::set visiting;
     };
 
     class EncryptionParameters
@@ -1252,8 +1252,8 @@ class QPDF
 
     void getAllPagesInternal(
         QPDFObjectHandle cur_pages,
-        std::set<QPDFObjGen>& visited,
-        std::set<QPDFObjGen>& seen);
+        QPDFObjGen::set& visited,
+        QPDFObjGen::set& seen);
     void insertPage(QPDFObjectHandle newpage, int pos);
     void flattenPagesTree();
     void insertPageobjToPage(
@@ -1645,7 +1645,7 @@ class QPDF
         ObjUser const& ou,
         QPDFObjectHandle oh,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters,
-        std::set<QPDFObjGen>& visited,
+        QPDFObjGen::set& visited,
         bool top);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
 

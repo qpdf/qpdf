@@ -36,20 +36,14 @@ QPDFFormFieldObjectHelper
 QPDFFormFieldObjectHelper::getTopLevelField(bool* is_different)
 {
     auto top_field = this->oh;
-    std::set<QPDFObjGen> seen;
-    while (top_field.isDictionary() &&
-           (!top_field.getKey("/Parent").isNull())) {
+    QPDFObjGen::set seen;
+    while (seen.add(top_field) && !top_field.getKeyIfDict("/Parent").isNull()) {
         top_field = top_field.getKey("/Parent");
         if (is_different) {
             *is_different = true;
         }
-        auto og = top_field.getObjGen();
-        if (seen.count(og)) {
-            break;
-        }
-        seen.insert(og);
     }
-    return QPDFFormFieldObjectHelper(top_field);
+    return {top_field};
 }
 
 QPDFObjectHandle
@@ -76,17 +70,17 @@ QPDFFormFieldObjectHelper::getInheritableFieldValue(std::string const& name)
         return QPDFObjectHandle::newNull();
     }
     QPDFObjectHandle result(node.getKey(name));
-    std::set<QPDFObjGen> seen;
-    while (result.isNull() && node.hasKey("/Parent")) {
-        seen.insert(node.getObjGen());
-        node = node.getKey("/Parent");
-        if (seen.count(node.getObjGen())) {
-            break;
-        }
-        result = node.getKey(name);
-        if (!result.isNull()) {
-            QTC::TC(
-                "qpdf", "QPDFFormFieldObjectHelper non-trivial inheritance");
+    if (result.isNull()) {
+        QPDFObjGen::set seen;
+        while (seen.add(node) && node.hasKey("/Parent")) {
+            node = node.getKey("/Parent");
+            result = node.getKey(name);
+            if (!result.isNull()) {
+                QTC::TC(
+                    "qpdf",
+                    "QPDFFormFieldObjectHelper non-trivial inheritance");
+                return result;
+            }
         }
     }
     return result;
@@ -127,8 +121,8 @@ QPDFFormFieldObjectHelper::getFullyQualifiedName()
 {
     std::string result;
     QPDFObjectHandle node = this->oh;
-    std::set<QPDFObjGen> seen;
-    while ((!node.isNull()) && (seen.count(node.getObjGen()) == 0)) {
+    QPDFObjGen::set seen;
+    while (!node.isNull() && seen.add(node)) {
         if (node.getKey("/T").isString()) {
             if (!result.empty()) {
                 QTC::TC(
@@ -138,7 +132,6 @@ QPDFFormFieldObjectHelper::getFullyQualifiedName()
             }
             result = node.getKey("/T").getUTF8Value() + result;
         }
-        seen.insert(node.getObjGen());
         node = node.getKey("/Parent");
     }
     return result;

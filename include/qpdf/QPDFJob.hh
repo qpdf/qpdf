@@ -571,7 +571,7 @@ class QPDFJob
 
     // JSON
     void doJSON(QPDF& pdf, Pipeline*);
-    std::set<QPDFObjGen> getWantedJSONObjects();
+    QPDFObjGen::set getWantedJSONObjects();
     void doJSONObject(
         Pipeline* p, bool& first, std::string const& key, QPDFObjectHandle&);
     void doJSONObjects(Pipeline* p, bool& first, QPDF& pdf);

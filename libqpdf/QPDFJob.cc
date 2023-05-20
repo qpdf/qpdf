@@ -1001,18 +1001,16 @@ QPDFJob::parse_object_id(
     }
 }
 
-std::set<QPDFObjGen>
+QPDFObjGen::set
 QPDFJob::getWantedJSONObjects()
 {
-    std::set<QPDFObjGen> wanted_og;
+    QPDFObjGen::set wanted_og;
     for (auto const& iter: m->json_objects) {
         bool trailer;
         int obj = 0;
         int gen = 0;
         parse_object_id(iter, trailer, obj, gen);
-        if (obj) {
-            wanted_og.insert(QPDFObjGen(obj, gen));
-        }
+        wanted_og.add(QPDFObjGen(obj, gen));
     }
     return wanted_og;
 }
@@ -1045,7 +1043,7 @@ QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
         bool first_object = true;
         JSON::writeDictionaryOpen(p, first_object, 1);
         bool all_objects = m->json_objects.empty();
-        std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
+        auto wanted_og = getWantedJSONObjects();
         for (auto& obj: pdf.getAllObjects()) {
             std::string key = obj.unparse();
             if (this->m->json_version > 1) {
@@ -1065,11 +1063,8 @@ QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
         if (this->m->json_objects.count("trailer")) {
             json_objects.insert("trailer");
         }
-        auto wanted = getWantedJSONObjects();
-        for (auto const& og: wanted) {
-            std::ostringstream s;
-            s << "obj:" << og.unparse(' ') << " R";
-            json_objects.insert(s.str());
+        for (auto og: getWantedJSONObjects()) {
+            json_objects.emplace("obj:" + og.unparse(' ') + " R");
         }
         pdf.writeJSON(
             this->m->json_version,
@@ -1090,7 +1085,7 @@ QPDFJob::doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf)
     bool first_object = true;
     JSON::writeDictionaryOpen(p, first_object, 1);
     bool all_objects = m->json_objects.empty();
-    std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
+    auto wanted_og = getWantedJSONObjects();
     for (auto& obj: pdf.getAllObjects()) {
         if (all_objects || wanted_og.count(obj.getObjGen())) {
             auto j_details = JSON::makeDictionary();
@@ -2451,8 +2446,8 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
 
     // Return true as soon as we find any shared resources.
 
-    std::set<QPDFObjGen> resources_seen; // shared resources detection
-    std::set<QPDFObjGen> nodes_seen;     // loop detection
+    QPDFObjGen::set resources_seen; // shared resources detection
+    QPDFObjGen::set nodes_seen;     // loop detection
 
     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
         v << prefix << ": " << pdf.getFilename()
@@ -2465,10 +2460,9 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
         QPDFObjectHandle node = *queue.begin();
         queue.pop_front();
         QPDFObjGen og = node.getObjGen();
-        if (nodes_seen.count(og)) {
+        if (!nodes_seen.add(og)) {
             continue;
         }
-        nodes_seen.insert(og);
         QPDFObjectHandle dict = node.isStream() ? node.getDict() : node;
         QPDFObjectHandle kids = dict.getKey("/Kids");
         if (kids.isArray()) {
@@ -2489,33 +2483,29 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
             // This is a leaf node or a form XObject.
             QPDFObjectHandle resources = dict.getKey("/Resources");
             if (resources.isIndirect()) {
-                QPDFObjGen resources_og = resources.getObjGen();
-                if (resources_seen.count(resources_og)) {
+                if (!resources_seen.add(resources)) {
                     QTC::TC("qpdf", "QPDFJob found shared resources in leaf");
                     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                         v << "  found shared resources in leaf node "
                           << og.unparse(' ') << ": "
-                          << resources_og.unparse(' ') << "\n";
+                          << resources.getObjGen().unparse(' ') << "\n";
                     });
                     return true;
                 }
-                resources_seen.insert(resources_og);
             }
             QPDFObjectHandle xobject =
                 (resources.isDictionary() ? resources.getKey("/XObject")
                                           : QPDFObjectHandle::newNull());
             if (xobject.isIndirect()) {
-                QPDFObjGen xobject_og = xobject.getObjGen();
-                if (resources_seen.count(xobject_og)) {
+                if (!resources_seen.add(xobject)) {
                     QTC::TC("qpdf", "QPDFJob found shared xobject in leaf");
                     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                         v << "  found shared xobject in leaf node "
-                          << og.unparse(' ') << ": " << xobject_og.unparse(' ')
-                          << "\n";
+                          << og.unparse(' ') << ": "
+                          << xobject.getObjGen().unparse(' ') << "\n";
                     });
                     return true;
                 }
-                resources_seen.insert(xobject_og);
             }
             if (xobject.isDictionary()) {
                 for (auto const& k: xobject.getKeys()) {
