@@ -557,7 +557,7 @@ QPDF_Stream::pipeStreamData(
             if (decode_pipeline) {
                 pipeline = decode_pipeline;
             }
-            Pl_Flate* flate = dynamic_cast<Pl_Flate*>(pipeline);
+            auto* flate = dynamic_cast<Pl_Flate*>(pipeline);
             if (flate != nullptr) {
                 flate->setWarnCallback(
                     [this](char const* msg, int code) { warn(msg); });

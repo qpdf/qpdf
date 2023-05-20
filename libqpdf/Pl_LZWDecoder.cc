@@ -189,7 +189,7 @@ Pl_LZWDecoder::handleCode(unsigned int code)
         }
 
         if (code < 256) {
-            unsigned char ch = static_cast<unsigned char>(code);
+            auto ch = static_cast<unsigned char>(code);
             getNext()->write(&ch, 1);
         } else {
             unsigned int idx = code - 258;

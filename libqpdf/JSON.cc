@@ -294,7 +294,7 @@ JSON::addDictionaryMember(std::string const& key, JSON const& val)
 bool
 JSON::checkDictionaryKeySeen(std::string const& key)
 {
-    JSON_dictionary* obj = dynamic_cast<JSON_dictionary*>(this->m->value.get());
+    auto* obj = dynamic_cast<JSON_dictionary*>(this->m->value.get());
     if (nullptr == obj) {
         throw std::logic_error(
             "JSON::checkDictionaryKey called on non-dictionary");
@@ -315,7 +315,7 @@ JSON::makeArray()
 JSON
 JSON::addArrayElement(JSON const& val)
 {
-    JSON_array* arr = dynamic_cast<JSON_array*>(this->m->value.get());
+    auto* arr = dynamic_cast<JSON_array*>(this->m->value.get());
     if (nullptr == arr) {
         throw std::runtime_error("JSON::addArrayElement called on non-array");
     }
@@ -470,13 +470,13 @@ JSON::checkSchemaInternal(
     std::list<std::string>& errors,
     std::string prefix)
 {
-    JSON_array* this_arr = dynamic_cast<JSON_array*>(this_v);
-    JSON_dictionary* this_dict = dynamic_cast<JSON_dictionary*>(this_v);
+    auto* this_arr = dynamic_cast<JSON_array*>(this_v);
+    auto* this_dict = dynamic_cast<JSON_dictionary*>(this_v);
 
-    JSON_array* sch_arr = dynamic_cast<JSON_array*>(sch_v);
-    JSON_dictionary* sch_dict = dynamic_cast<JSON_dictionary*>(sch_v);
+    auto* sch_arr = dynamic_cast<JSON_array*>(sch_v);
+    auto* sch_dict = dynamic_cast<JSON_dictionary*>(sch_v);
 
-    JSON_string* sch_str = dynamic_cast<JSON_string*>(sch_v);
+    auto* sch_str = dynamic_cast<JSON_string*>(sch_v);
 
     std::string err_prefix;
     if (prefix.empty()) {

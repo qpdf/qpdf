@@ -115,7 +115,7 @@ QPDF::optimize(
     }
 
     ObjUser root_ou = ObjUser(ObjUser::ou_root);
-    QPDFObjGen root_og = QPDFObjGen(root.getObjGen());
+    auto root_og = QPDFObjGen(root.getObjGen());
     this->m->obj_user_to_objects[root_ou].insert(root_og);
     this->m->object_to_obj_users[root_og].insert(root_ou);
 

@@ -611,7 +611,7 @@ ValueSetter::writeAppearance()
     // Write one or more lines, centered vertically, possibly with
     // one row highlighted.
 
-    size_t max_rows = static_cast<size_t>((bbox.ury - bbox.lly) / tfh);
+    auto max_rows = static_cast<size_t>((bbox.ury - bbox.lly) / tfh);
     bool highlight = false;
     size_t highlight_idx = 0;
 
