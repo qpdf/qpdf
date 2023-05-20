@@ -102,7 +102,7 @@ class QPDFWriter
         QPDF_DLL
         virtual ~FunctionProgressReporter();
         QPDF_DLL
-        virtual void reportProgress(int) override;
+        void reportProgress(int) override;
 
       private:
         std::function<void(int)> handler;

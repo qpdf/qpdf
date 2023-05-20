@@ -61,41 +61,41 @@ namespace
     {
       public:
         virtual ~InvalidInputSource() = default;
-        virtual qpdf_offset_t
+        qpdf_offset_t
         findAndSkipNextEOL() override
         {
             throwException();
             return 0;
         }
-        virtual std::string const&
+        std::string const&
         getName() const override
         {
             static std::string name("closed input source");
             return name;
         }
-        virtual qpdf_offset_t
+        qpdf_offset_t
         tell() override
         {
             throwException();
             return 0;
         }
-        virtual void
+        void
         seek(qpdf_offset_t offset, int whence) override
         {
             throwException();
         }
-        virtual void
+        void
         rewind() override
         {
             throwException();
         }
-        virtual size_t
+        size_t
         read(char* buffer, size_t length) override
         {
             throwException();
             return 0;
         }
-        virtual void
+        void
         unreadCh(char ch) override
         {
             throwException();

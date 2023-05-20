@@ -242,13 +242,13 @@ class QPDF::JSONReactor: public JSON::Reactor
         }
     }
     virtual ~JSONReactor() = default;
-    virtual void dictionaryStart() override;
-    virtual void arrayStart() override;
-    virtual void containerEnd(JSON const& value) override;
-    virtual void topLevelScalar() override;
-    virtual bool
+    void dictionaryStart() override;
+    void arrayStart() override;
+    void containerEnd(JSON const& value) override;
+    void topLevelScalar() override;
+    bool
     dictionaryItem(std::string const& key, JSON const& value) override;
-    virtual bool arrayItem(JSON const& value) override;
+    bool arrayItem(JSON const& value) override;
 
     bool anyErrors() const;
 

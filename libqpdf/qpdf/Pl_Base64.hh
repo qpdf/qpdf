@@ -9,8 +9,8 @@ class Pl_Base64: public Pipeline
     enum action_e { a_encode, a_decode };
     Pl_Base64(char const* identifier, Pipeline* next, action_e);
     virtual ~Pl_Base64() = default;
-    virtual void write(unsigned char const* buf, size_t len) override;
-    virtual void finish() override;
+    void write(unsigned char const* buf, size_t len) override;
+    void finish() override;
 
   private:
     void decode(unsigned char const* buf, size_t len);

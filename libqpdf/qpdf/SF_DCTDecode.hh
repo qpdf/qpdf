@@ -11,7 +11,7 @@ class SF_DCTDecode: public QPDFStreamFilter
     SF_DCTDecode() = default;
     virtual ~SF_DCTDecode() = default;
 
-    virtual Pipeline*
+    Pipeline*
     getDecodePipeline(Pipeline* next) override
     {
         this->pipeline = std::make_shared<Pl_DCT>("DCT decode", next);
@@ -24,13 +24,13 @@ class SF_DCTDecode: public QPDFStreamFilter
         return std::make_shared<SF_DCTDecode>();
     }
 
-    virtual bool
+    bool
     isSpecializedCompression() override
     {
         return true;
     }
 
-    virtual bool
+    bool
     isLossyCompression() override
     {
         return true;

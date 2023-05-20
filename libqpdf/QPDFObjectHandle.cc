@@ -1446,13 +1446,13 @@ namespace
         {
         }
 
-        virtual void
+        void
         provideStreamData(QPDFObjGen const&, Pipeline* pipeline) override
         {
             p1(pipeline);
         }
 
-        virtual bool
+        bool
         provideStreamData(
             QPDFObjGen const&,
             Pipeline* pipeline,
