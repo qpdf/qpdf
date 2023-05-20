@@ -668,7 +668,8 @@ class QPDFObjectHandle
     // object with its replacement, use QPDF::replaceReserved for this
     // purpose rather than the more general QPDF::replaceObject.  It
     // is an error to try to write a QPDF with QPDFWriter if it has
-    // any reserved objects in it.
+    // any reserved objects in it. From QPDF 11.4, you can
+    // call QPDF::newReserved() instead.
     QPDF_DLL
     static QPDFObjectHandle newReserved(QPDF* qpdf);
 

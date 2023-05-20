@@ -1985,6 +1985,12 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
 }
 
 QPDFObjectHandle
+QPDF::newReserved()
+{
+    return makeIndirectFromQPDFObject(QPDF_Reserved::create());
+}
+
+QPDFObjectHandle
 QPDF::newStream()
 {
     return makeIndirectFromQPDFObject(QPDF_Stream::create(
@@ -2207,9 +2213,8 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
         QTC::TC("qpdf", "QPDF copy indirect");
         if (obj_copier.object_map.count(foreign_og) == 0) {
             obj_copier.to_copy.push_back(foreign);
-            obj_copier.object_map[foreign_og] = foreign.isStream()
-                ? newStream()
-                : QPDFObjectHandle::newReserved(this);
+            obj_copier.object_map[foreign_og] =
+                foreign.isStream() ? newStream() : newReserved();
         }
     }
 
