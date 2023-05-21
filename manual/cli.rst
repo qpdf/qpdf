@@ -1736,7 +1736,7 @@ Encryption
 
    Either or both of user-password and owner-password may be empty
    strings, though setting either to the empty string enables the file
-   to be opened and decrpyted without a password. key-length may be
+   to be opened and decrypted without a password. key-length may be
    40, 128, or 256. Encryption options are terminated by "--" by
    itself.
 
@@ -1805,7 +1805,7 @@ To create an encrypted file, use
 
 Either or both of :samp:`{user-password}` and :samp:`{owner-password}`
 may be empty strings, though setting either to the empty string
-enables the file to be opened and decrpyted without a password..
+enables the file to be opened and decrypted without a password..
 :samp:`{key-length}` may be ``40``, ``128``, or ``256``. Encryption
 options are terminated by ``--`` by itself.
 

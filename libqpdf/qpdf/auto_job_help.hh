@@ -398,7 +398,7 @@ ap.addHelpTopic("encryption", "create encrypted files", R"(Create encrypted file
 
 Either or both of user-password and owner-password may be empty
 strings, though setting either to the empty string enables the file
-to be opened and decrpyted without a password. key-length may be
+to be opened and decrypted without a password. key-length may be
 40, 128, or 256. Encryption options are terminated by "--" by
 itself.
 

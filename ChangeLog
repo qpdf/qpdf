@@ -20,7 +20,7 @@
         before it is written. This adds methods QPDFJob::createQPDF and
         QPDFJob::writeQPDF and corresponding C API functions
         qpdfjob_create_qpdf and qpdfjob_write_qpdf. Thanks to M. Holger
-        for the contrbution.
+        for the contribution.
 
 2023-03-18  Jay Berkenbilt  <ejb@ql.org>
 
