@@ -25,23 +25,17 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(
     pos(0)
 {
     if (samples_per_pixel < 1) {
-        throw std::runtime_error(
-            "TIFFPredictor created with invalid samples_per_pixel");
+        throw std::runtime_error("TIFFPredictor created with invalid samples_per_pixel");
     }
-    if ((bits_per_sample < 1) ||
-        (bits_per_sample > (8 * (sizeof(unsigned long long))))) {
-        throw std::runtime_error(
-            "TIFFPredictor created with invalid bits_per_sample");
+    if ((bits_per_sample < 1) || (bits_per_sample > (8 * (sizeof(unsigned long long))))) {
+        throw std::runtime_error("TIFFPredictor created with invalid bits_per_sample");
     }
-    unsigned long long bpr =
-        ((columns * bits_per_sample * samples_per_pixel) + 7) / 8;
+    unsigned long long bpr = ((columns * bits_per_sample * samples_per_pixel) + 7) / 8;
     if ((bpr == 0) || (bpr > (UINT_MAX - 1))) {
-        throw std::runtime_error(
-            "TIFFPredictor created with invalid columns value");
+        throw std::runtime_error("TIFFPredictor created with invalid columns value");
     }
     this->bytes_per_row = bpr & UINT_MAX;
-    this->cur_row =
-        QUtil::make_shared_array<unsigned char>(this->bytes_per_row);
+    this->cur_row = QUtil::make_shared_array<unsigned char>(this->bytes_per_row);
     memset(this->cur_row.get(), 0, this->bytes_per_row);
 }
 
@@ -72,10 +66,7 @@ Pl_TIFFPredictor::write(unsigned char const* data, size_t len)
 void
 Pl_TIFFPredictor::processRow()
 {
-    QTC::TC(
-        "libtests",
-        "Pl_TIFFPredictor processRow",
-        (action == a_decode ? 0 : 1));
+    QTC::TC("libtests", "Pl_TIFFPredictor processRow", (action == a_decode ? 0 : 1));
     BitWriter bw(this->getNext());
     BitStream in(this->cur_row.get(), this->bytes_per_row);
     std::vector<long long> prev;

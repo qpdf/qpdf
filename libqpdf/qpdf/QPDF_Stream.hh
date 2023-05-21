@@ -27,9 +27,7 @@ class QPDF_Stream: public QPDFValue
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);
     virtual void setDescription(
-        QPDF*,
-        std::shared_ptr<QPDFValue::Description>& description,
-        qpdf_offset_t offset);
+        QPDF*, std::shared_ptr<QPDFValue::Description>& description, qpdf_offset_t offset);
     virtual void disconnect();
     QPDFObjectHandle getDict() const;
     bool isDataModified() const;
@@ -39,8 +37,7 @@ class QPDF_Stream: public QPDFValue
     // Methods to help QPDF copy foreign streams
     size_t getLength() const;
     std::shared_ptr<Buffer> getStreamDataBuffer() const;
-    std::shared_ptr<QPDFObjectHandle::StreamDataProvider>
-    getStreamDataProvider() const;
+    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> getStreamDataProvider() const;
 
     // See comments in QPDFObjectHandle.hh for these methods.
     bool pipeStreamData(
@@ -60,8 +57,7 @@ class QPDF_Stream: public QPDFValue
         std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider,
         QPDFObjectHandle const& filter,
         QPDFObjectHandle const& decode_parms);
-    void
-    addTokenFilter(std::shared_ptr<QPDFObjectHandle::TokenFilter> token_filter);
+    void addTokenFilter(std::shared_ptr<QPDFObjectHandle::TokenFilter> token_filter);
     JSON getStreamJSON(
         int json_version,
         qpdf_json_stream_data_e json_data,
@@ -72,8 +68,7 @@ class QPDF_Stream: public QPDFValue
     void replaceDict(QPDFObjectHandle const& new_dict);
 
     static void registerStreamFilter(
-        std::string const& filter_name,
-        std::function<std::shared_ptr<QPDFStreamFilter>()> factory);
+        std::string const& filter_name, std::function<std::shared_ptr<QPDFStreamFilter>()> factory);
 
   private:
     QPDF_Stream(
@@ -83,14 +78,11 @@ class QPDF_Stream: public QPDFValue
         qpdf_offset_t offset,
         size_t length);
     static std::map<std::string, std::string> filter_abbreviations;
-    static std::
-        map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>>
-            filter_factories;
+    static std::map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>>
+        filter_factories;
 
     void replaceFilterData(
-        QPDFObjectHandle const& filter,
-        QPDFObjectHandle const& decode_parms,
-        size_t length);
+        QPDFObjectHandle const& filter, QPDFObjectHandle const& decode_parms, size_t length);
     bool filterable(
         std::vector<std::shared_ptr<QPDFStreamFilter>>& filters,
         bool& specialized_compression,

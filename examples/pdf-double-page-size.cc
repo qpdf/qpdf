@@ -13,8 +13,7 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " infile.pdf outfile.pdf [in-password]"
-              << std::endl
+    std::cerr << "Usage: " << whoami << " infile.pdf outfile.pdf [in-password]" << std::endl
               << "Double size of all pages in infile.pdf;"
               << " write output to outfile.pdf" << std::endl;
     exit(2);
@@ -33,16 +32,13 @@ doubleBoxSize(QPDFPageObjectHelper& page, char const* box_name)
     }
     if (!box.isRectangle()) {
         throw std::runtime_error(
-            std::string("box ") + box_name +
-            " is not an array of four elements");
+            std::string("box ") + box_name + " is not an array of four elements");
     }
     std::vector<QPDFObjectHandle> doubled;
     for (auto& item: box.aitems()) {
-        doubled.push_back(
-            QPDFObjectHandle::newReal(item.getNumericValue() * 2.0, 2));
+        doubled.push_back(QPDFObjectHandle::newReal(item.getNumericValue() * 2.0, 2));
     }
-    page.getObjectHandle().replaceKey(
-        box_name, QPDFObjectHandle::newArray(doubled));
+    page.getObjectHandle().replaceKey(box_name, QPDFObjectHandle::newArray(doubled));
 }
 
 int
@@ -93,11 +89,9 @@ main(int argc, char* argv[])
             w.setStreamDataMode(qpdf_s_uncompress);
         }
         w.write();
-        std::cout << whoami << ": new file written to " << outfilename
-                  << std::endl;
+        std::cout << whoami << ": new file written to " << outfilename << std::endl;
     } catch (std::exception& e) {
-        std::cerr << whoami << " processing file " << infilename << ": "
-                  << e.what() << std::endl;
+        std::cerr << whoami << " processing file " << infilename << ": " << e.what() << std::endl;
         exit(2);
     }
 

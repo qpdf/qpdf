@@ -10,8 +10,7 @@ class QPDF_Array: public QPDFValue
 {
   public:
     virtual ~QPDF_Array() = default;
-    static std::shared_ptr<QPDFObject>
-    create(std::vector<QPDFObjectHandle> const& items);
+    static std::shared_ptr<QPDFObject> create(std::vector<QPDFObjectHandle> const& items);
     static std::shared_ptr<QPDFObject>
     create(std::vector<std::shared_ptr<QPDFObject>>&& items, bool sparse);
     virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);

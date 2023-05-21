@@ -10,11 +10,9 @@ OffsetInputSource::OffsetInputSource(
     global_offset(global_offset)
 {
     if (global_offset < 0) {
-        throw std::logic_error(
-            "OffsetInputSource constructed with negative offset");
+        throw std::logic_error("OffsetInputSource constructed with negative offset");
     }
-    this->max_safe_offset =
-        std::numeric_limits<qpdf_offset_t>::max() - global_offset;
+    this->max_safe_offset = std::numeric_limits<qpdf_offset_t>::max() - global_offset;
 }
 
 qpdf_offset_t
@@ -51,8 +49,7 @@ OffsetInputSource::seek(qpdf_offset_t offset, int whence)
         this->proxied->seek(offset, whence);
     }
     if (tell() < 0) {
-        throw std::runtime_error(
-            "offset input source: seek before beginning of file");
+        throw std::runtime_error("offset input source: seek before beginning of file");
     }
 }
 

@@ -17,8 +17,7 @@
 
 template <class int_T>
 void
-test_to_number(
-    char const* str, int_T wanted, bool error, int_T (*fn)(char const*))
+test_to_number(char const* str, int_T wanted, bool error, int_T (*fn)(char const*))
 {
     bool threw = false;
     bool worked = false;
@@ -33,11 +32,9 @@ test_to_number(
     }
     if (threw) {
         if (error) {
-            std::cout << str << " to int threw (" << msg << "): PASSED"
-                      << std::endl;
+            std::cout << str << " to int threw (" << msg << "): PASSED" << std::endl;
         } else {
-            std::cout << str << " to int threw but wanted " << wanted
-                      << std::endl;
+            std::cout << str << " to int threw but wanted " << wanted << std::endl;
         }
     } else {
         if (worked) {
@@ -203,11 +200,10 @@ void
 getenv_test()
 {
     std::string val;
-    std::cout << "IN_TESTSUITE: " << QUtil::get_env("IN_TESTSUITE", &val)
-              << ": " << val << std::endl;
-    // Hopefully this environment variable is not defined.
-    std::cout << "HAGOOGAMAGOOGLE: " << QUtil::get_env("HAGOOGAMAGOOGLE")
+    std::cout << "IN_TESTSUITE: " << QUtil::get_env("IN_TESTSUITE", &val) << ": " << val
               << std::endl;
+    // Hopefully this environment variable is not defined.
+    std::cout << "HAGOOGAMAGOOGLE: " << QUtil::get_env("HAGOOGAMAGOOGLE") << std::endl;
 }
 
 static void
@@ -224,9 +220,7 @@ print_utf8(unsigned long val)
         for (auto const& ch: result) {
             std::cout << " "
                       << QUtil::int_to_string_base(
-                             static_cast<int>(static_cast<unsigned char>(ch)),
-                             16,
-                             2);
+                             static_cast<int>(static_cast<unsigned char>(ch)), 16, 2);
         }
     }
     std::cout << std::endl;
@@ -282,9 +276,7 @@ print_utf16(unsigned long val)
     for (auto const& ch: result) {
         std::cout << " "
                   << QUtil::int_to_string_base(
-                         static_cast<int>(static_cast<unsigned char>(ch)),
-                         16,
-                         2);
+                         static_cast<int>(static_cast<unsigned char>(ch)), 16, 2);
     }
     std::cout << std::endl;
 }
@@ -303,8 +295,7 @@ to_utf16_test()
     std::string s(QUtil::utf8_to_utf16("\xcf\x80"));
     std::cout << QUtil::utf16_to_utf8(s) << std::endl;
     std::cout << QUtil::utf16_to_utf8(s + ".") << std::endl;
-    std::cout << "LE: " << QUtil::utf16_to_utf8("\xff\xfe\xc0\x03")
-              << std::endl;
+    std::cout << "LE: " << QUtil::utf16_to_utf8("\xff\xfe\xc0\x03") << std::endl;
 }
 
 void
@@ -316,13 +307,10 @@ utf8_to_ascii_test()
               << QUtil::utf8_to_ascii(input, '*') << std::endl;
     std::string a = QUtil::utf8_to_win_ansi(input, '*');
     std::string b = QUtil::utf8_to_mac_roman(input, '*');
-    std::cout
-        << "<"
-        << QUtil::int_to_string_base(static_cast<unsigned char>(a.at(0)), 16, 2)
-        << ">" << a.substr(1) << std::endl
-        << "<"
-        << QUtil::int_to_string_base(static_cast<unsigned char>(b.at(0)), 16, 2)
-        << ">" << b.substr(1) << std::endl;
+    std::cout << "<" << QUtil::int_to_string_base(static_cast<unsigned char>(a.at(0)), 16, 2) << ">"
+              << a.substr(1) << std::endl
+              << "<" << QUtil::int_to_string_base(static_cast<unsigned char>(b.at(0)), 16, 2) << ">"
+              << b.substr(1) << std::endl;
 }
 
 void
@@ -342,8 +330,8 @@ transcoding_test(
         std::string wanted = (out == "\xef\xbf\xbd") ? unknown : in;
         back = (*from_utf8)(out, '?');
         if (back != wanted) {
-            std::cout << i << ": " << in << " -> " << out << " -> " << back
-                      << " (wanted " << wanted << ")" << std::endl;
+            std::cout << i << ": " << in << " -> " << out << " -> " << back << " (wanted " << wanted
+                      << ")" << std::endl;
         }
     }
 }
@@ -355,8 +343,7 @@ check_analyze(std::string const& str, bool has8bit, bool utf8, bool utf16)
     bool is_valid_utf8 = false;
     bool is_utf16 = false;
     QUtil::analyze_encoding(str, has_8bit_chars, is_valid_utf8, is_utf16);
-    if (!((has_8bit_chars == has8bit) && (is_valid_utf8 == utf8) &&
-          (is_utf16 == utf16))) {
+    if (!((has_8bit_chars == has8bit) && (is_valid_utf8 == utf8) && (is_utf16 == utf16))) {
         std::cout << "analysis failed: " << str << std::endl;
     }
 }
@@ -374,17 +361,13 @@ print_alternatives(std::string const& str)
 void
 transcoding_test()
 {
-    transcoding_test(
-        &QUtil::pdf_doc_to_utf8, &QUtil::utf8_to_pdf_doc, 127, 160, "\x9f");
+    transcoding_test(&QUtil::pdf_doc_to_utf8, &QUtil::utf8_to_pdf_doc, 127, 160, "\x9f");
     std::cout << "bidirectional pdf doc done" << std::endl;
-    transcoding_test(
-        &QUtil::pdf_doc_to_utf8, &QUtil::utf8_to_pdf_doc, 24, 31, "?");
+    transcoding_test(&QUtil::pdf_doc_to_utf8, &QUtil::utf8_to_pdf_doc, 24, 31, "?");
     std::cout << "bidirectional pdf doc low done" << std::endl;
-    transcoding_test(
-        &QUtil::win_ansi_to_utf8, &QUtil::utf8_to_win_ansi, 128, 160, "?");
+    transcoding_test(&QUtil::win_ansi_to_utf8, &QUtil::utf8_to_win_ansi, 128, 160, "?");
     std::cout << "bidirectional win ansi done" << std::endl;
-    transcoding_test(
-        &QUtil::mac_roman_to_utf8, &QUtil::utf8_to_mac_roman, 128, 255, "?");
+    transcoding_test(&QUtil::mac_roman_to_utf8, &QUtil::utf8_to_mac_roman, 128, 255, "?");
     std::cout << "bidirectional mac roman done" << std::endl;
     check_analyze("pi = \317\200", true, true, false);
     check_analyze("pi != \317", true, false, false);
@@ -426,8 +409,7 @@ transcoding_test()
     // cSpell: ignore xadw
     std::string other_doc = other + "\x9fw\xadw";
     std::cout << QUtil::pdf_doc_to_utf8(other_doc) << std::endl;
-    std::string other_utf8 =
-        other + QUtil::toUTF8(0x9f) + "w" + QUtil::toUTF8(0xad) + "w";
+    std::string other_utf8 = other + QUtil::toUTF8(0x9f) + "w" + QUtil::toUTF8(0xad) + "w";
     std::string other_to_utf8;
     assert(!QUtil::utf8_to_pdf_doc(other_utf8, other_to_utf8));
     std::cout << other_to_utf8 << std::endl;
@@ -533,8 +515,7 @@ read_from_file_test()
     }
 
     // Test with EOL preservation
-    std::list<std::string> lines2 =
-        QUtil::read_lines_from_file("other-file", true);
+    std::list<std::string> lines2 = QUtil::read_lines_from_file("other-file", true);
     auto line = lines2.begin();
     assert(37 == (*line).length());
     assert('.' == (*line).at(35));
@@ -693,8 +674,8 @@ timestamp_test()
     // Round trip on the current time without actually printing it.
     // Manual testing was done to ensure that we are actually getting
     // back the current time in various time zones.
-    assert(QUtil::pdf_time_to_qpdf_time(
-        QUtil::qpdf_time_to_pdf_time(QUtil::get_current_qpdf_time())));
+    assert(
+        QUtil::pdf_time_to_qpdf_time(QUtil::qpdf_time_to_pdf_time(QUtil::get_current_qpdf_time())));
 }
 
 void

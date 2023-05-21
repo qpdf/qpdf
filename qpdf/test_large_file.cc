@@ -53,9 +53,8 @@ static inline unsigned char
 get_pixel_color(size_t n, size_t row)
 {
     return (
-        (n & (1LLU << (nstripes - 1LLU - row)))
-            ? static_cast<unsigned char>('\xc0')
-            : static_cast<unsigned char>('\x40'));
+        (n & (1LLU << (nstripes - 1LLU - row))) ? static_cast<unsigned char>('\xc0')
+                                                : static_cast<unsigned char>('\x40'));
 }
 
 class ImageChecker: public Pipeline
@@ -97,8 +96,7 @@ void
 ImageChecker::finish()
 {
     if (!okay) {
-        std::cout << "errors found checking image data for page " << n
-                  << std::endl;
+        std::cout << "errors found checking image data for page " << n << std::endl;
     }
 }
 
@@ -107,8 +105,7 @@ class ImageProvider: public QPDFObjectHandle::StreamDataProvider
   public:
     ImageProvider(size_t n);
     virtual ~ImageProvider() = default;
-    virtual void
-    provideStreamData(int objid, int generation, Pipeline* pipeline);
+    virtual void provideStreamData(int objid, int generation, Pipeline* pipeline);
 
   private:
     size_t n;
@@ -137,8 +134,7 @@ ImageProvider::provideStreamData(int objid, int generation, Pipeline* pipeline)
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " {read|write} {large|small} outfile"
-              << std::endl;
+    std::cerr << "Usage: " << whoami << " {read|write} {large|small} outfile" << std::endl;
     exit(2);
 }
 
@@ -153,8 +149,7 @@ set_parameters(bool large)
 std::string
 generate_page_contents(size_t pageno)
 {
-    std::string contents = "BT /F1 24 Tf 72 720 Td (page " +
-        QUtil::uint_to_string(pageno) +
+    std::string contents = "BT /F1 24 Tf 72 720 Td (page " + QUtil::uint_to_string(pageno) +
         ") Tj ET\n"
         "q 468 0 0 468 72 72 cm /Im1 Do Q\n";
     return contents;
@@ -185,16 +180,14 @@ create_pdf(char const* filename)
 
     pdf.emptyPDF();
 
-    QPDFObjectHandle font =
-        pdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
+    QPDFObjectHandle font = pdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
     font.replaceKey("/Type", newName("/Font"));
     font.replaceKey("/Subtype", newName("/Type1"));
     font.replaceKey("/Name", newName("/F1"));
     font.replaceKey("/BaseFont", newName("/Helvetica"));
     font.replaceKey("/Encoding", newName("/WinAnsiEncoding"));
 
-    QPDFObjectHandle procset =
-        pdf.makeIndirectObject(QPDFObjectHandle::newArray());
+    QPDFObjectHandle procset = pdf.makeIndirectObject(QPDFObjectHandle::newArray());
     procset.appendItem(newName("/PDF"));
     procset.appendItem(newName("/Text"));
     procset.appendItem(newName("/ImageC"));
@@ -220,8 +213,7 @@ create_pdf(char const* filename)
         image_dict.replaceKey("/Height", newInteger(height));
         auto* p = new ImageProvider(pageno);
         std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider(p);
-        image.replaceStreamData(
-            provider, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+        image.replaceStreamData(provider, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
 
         QPDFObjectHandle xobject = QPDFObjectHandle::newDictionary();
         xobject.replaceKey("/Im1", image);
@@ -233,8 +225,7 @@ create_pdf(char const* filename)
 
         QPDFObjectHandle contents = create_page_contents(pdf, pageno);
 
-        QPDFObjectHandle page =
-            pdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
+        QPDFObjectHandle page = pdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
         page.replaceKey("/Type", newName("/Page"));
         page.replaceKey("/MediaBox", mediabox);
         page.replaceKey("/Contents", contents);
@@ -259,16 +250,14 @@ check_page_contents(size_t pageno, QPDFObjectHandle page)
     std::string expected_contents = generate_page_contents(pageno);
     if (expected_contents != actual_contents) {
         std::cout << "page contents wrong for page " << pageno << std::endl
-                  << "ACTUAL: " << actual_contents
-                  << "EXPECTED: " << expected_contents << "----\n";
+                  << "ACTUAL: " << actual_contents << "EXPECTED: " << expected_contents << "----\n";
     }
 }
 
 static void
 check_image(size_t pageno, QPDFObjectHandle page)
 {
-    QPDFObjectHandle image =
-        page.getKey("/Resources").getKey("/XObject").getKey("/Im1");
+    QPDFObjectHandle image = page.getKey("/Resources").getKey("/XObject").getKey("/Im1");
     ImageChecker ic(pageno);
     image.pipeStreamData(&ic, 0, qpdf_dl_specialized);
 }

@@ -51,8 +51,7 @@ void
 Pl_SHA2::resetBits(int bits)
 {
     if (this->in_progress) {
-        throw std::logic_error(
-            "bit reset requested for in-progress SHA2 Pipeline");
+        throw std::logic_error("bit reset requested for in-progress SHA2 Pipeline");
     }
     this->crypto = QPDFCryptoProvider::getImpl();
     this->crypto->SHA2_init(bits);
@@ -62,8 +61,7 @@ std::string
 Pl_SHA2::getRawDigest()
 {
     if (this->in_progress) {
-        throw std::logic_error(
-            "digest requested for in-progress SHA2 Pipeline");
+        throw std::logic_error("digest requested for in-progress SHA2 Pipeline");
     }
     return this->crypto->SHA2_digest();
 }
@@ -72,8 +70,7 @@ std::string
 Pl_SHA2::getHexDigest()
 {
     if (this->in_progress) {
-        throw std::logic_error(
-            "digest requested for in-progress SHA2 Pipeline");
+        throw std::logic_error("digest requested for in-progress SHA2 Pipeline");
     }
     return QUtil::hex_encode(getRawDigest());
 }

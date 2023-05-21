@@ -35,11 +35,9 @@ ParserCallbacks::contentSize(size_t size)
 }
 
 void
-ParserCallbacks::handleObject(
-    QPDFObjectHandle obj, size_t offset, size_t length)
+ParserCallbacks::handleObject(QPDFObjectHandle obj, size_t offset, size_t length)
 {
-    std::cout << obj.getTypeName() << ", offset=" << offset
-              << ", length=" << length << ": ";
+    std::cout << obj.getTypeName() << ", offset=" << offset << ", length=" << length << ": ";
     if (obj.isInlineImage()) {
         std::cout << QUtil::hex_encode(obj.getInlineImageValue()) << std::endl;
     } else {
@@ -67,8 +65,7 @@ main(int argc, char* argv[])
     try {
         QPDF pdf;
         pdf.processFile(filename);
-        std::vector<QPDFPageObjectHelper> pages =
-            QPDFPageDocumentHelper(pdf).getAllPages();
+        std::vector<QPDFPageObjectHelper> pages = QPDFPageDocumentHelper(pdf).getAllPages();
         if ((pageno < 1) || (QIntC::to_size(pageno) > pages.size())) {
             usage();
         }

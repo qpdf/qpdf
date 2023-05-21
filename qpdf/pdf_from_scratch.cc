@@ -38,17 +38,16 @@ runtest(int n)
     if (n == 0) {
         // Create a minimal PDF from scratch.
 
-        QPDFObjectHandle font = pdf.makeIndirectObject(
-            QPDFObjectHandle::parse("<<"
-                                    " /Type /Font"
-                                    " /Subtype /Type1"
-                                    " /Name /F1"
-                                    " /BaseFont /Helvetica"
-                                    " /Encoding /WinAnsiEncoding"
-                                    ">>"));
+        QPDFObjectHandle font =
+            pdf.makeIndirectObject(QPDFObjectHandle::parse("<<"
+                                                           " /Type /Font"
+                                                           " /Subtype /Type1"
+                                                           " /Name /F1"
+                                                           " /BaseFont /Helvetica"
+                                                           " /Encoding /WinAnsiEncoding"
+                                                           ">>"));
 
-        QPDFObjectHandle procset =
-            pdf.makeIndirectObject(QPDFObjectHandle::parse("[/PDF /Text]"));
+        QPDFObjectHandle procset = pdf.makeIndirectObject(QPDFObjectHandle::parse("[/PDF /Text]"));
 
         QPDFObjectHandle contents = createPageContents(pdf, "First Page");
 
@@ -61,8 +60,7 @@ runtest(int n)
         resources.replaceKey("/ProcSet", procset);
         resources.replaceKey("/Font", rfont);
 
-        QPDFObjectHandle page =
-            pdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
+        QPDFObjectHandle page = pdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
         page.replaceKey("/Type", newName("/Page"));
         page.replaceKey("/MediaBox", mediabox);
         page.replaceKey("/Contents", contents);
@@ -75,8 +73,7 @@ runtest(int n)
         w.setStreamDataMode(qpdf_s_preserve);
         w.write();
     } else {
-        throw std::runtime_error(
-            std::string("invalid test ") + std::to_string(n));
+        throw std::runtime_error(std::string("invalid test ") + std::to_string(n));
     }
 
     std::cout << "test " << n << " done" << std::endl;

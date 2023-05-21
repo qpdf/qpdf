@@ -6,15 +6,13 @@
 
 using namespace std::literals;
 
-QPDF_Dictionary::QPDF_Dictionary(
-    std::map<std::string, QPDFObjectHandle> const& items) :
+QPDF_Dictionary::QPDF_Dictionary(std::map<std::string, QPDFObjectHandle> const& items) :
     QPDFValue(::ot_dictionary, "dictionary"),
     items(items)
 {
 }
 
-QPDF_Dictionary::QPDF_Dictionary(
-    std::map<std::string, QPDFObjectHandle>&& items) :
+QPDF_Dictionary::QPDF_Dictionary(std::map<std::string, QPDFObjectHandle>&& items) :
     QPDFValue(::ot_dictionary, "dictionary"),
     items(items)
 {
@@ -41,8 +39,7 @@ QPDF_Dictionary::copy(bool shallow)
         std::map<std::string, QPDFObjectHandle> new_items;
         for (auto const& item: this->items) {
             auto value = item.second;
-            new_items[item.first] =
-                value.isIndirect() ? value : value.shallowCopy();
+            new_items[item.first] = value.isIndirect() ? value : value.shallowCopy();
         }
         return create(new_items);
     }
@@ -62,8 +59,7 @@ QPDF_Dictionary::unparse()
     std::string result = "<< ";
     for (auto& iter: this->items) {
         if (!iter.second.isNull()) {
-            result += QPDF_Name::normalizeName(iter.first) + " " +
-                iter.second.unparse() + " ";
+            result += QPDF_Name::normalizeName(iter.first) + " " + iter.second.unparse() + " ";
         }
     }
     result += ">>";
@@ -77,8 +73,7 @@ QPDF_Dictionary::getJSON(int json_version)
     for (auto& iter: this->items) {
         if (!iter.second.isNull()) {
             std::string key =
-                (json_version == 1 ? QPDF_Name::normalizeName(iter.first)
-                                   : iter.first);
+                (json_version == 1 ? QPDF_Name::normalizeName(iter.first) : iter.first);
             j.addDictionaryMember(key, iter.second.getJSON(json_version));
         }
     }

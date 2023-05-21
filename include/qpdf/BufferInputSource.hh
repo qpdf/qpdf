@@ -31,11 +31,9 @@ class QPDF_DLL_CLASS BufferInputSource: public InputSource
     // If own_memory is true, BufferInputSource will delete the buffer
     // when finished with it. Otherwise, the caller owns the memory.
     QPDF_DLL
-    BufferInputSource(
-        std::string const& description, Buffer* buf, bool own_memory = false);
+    BufferInputSource(std::string const& description, Buffer* buf, bool own_memory = false);
     QPDF_DLL
-    BufferInputSource(
-        std::string const& description, std::string const& contents);
+    BufferInputSource(std::string const& description, std::string const& contents);
     QPDF_DLL
     virtual ~BufferInputSource();
     QPDF_DLL

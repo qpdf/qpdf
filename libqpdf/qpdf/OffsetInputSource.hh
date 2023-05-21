@@ -9,8 +9,7 @@
 class OffsetInputSource: public InputSource
 {
   public:
-    OffsetInputSource(
-        std::shared_ptr<InputSource>, qpdf_offset_t global_offset);
+    OffsetInputSource(std::shared_ptr<InputSource>, qpdf_offset_t global_offset);
     ~OffsetInputSource() override = default;
 
     qpdf_offset_t findAndSkipNextEOL() override;

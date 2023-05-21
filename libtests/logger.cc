@@ -25,8 +25,7 @@ test1()
         logger->saveToStandardOutput(true);
         assert(false);
     } catch (std::logic_error& e) {
-        *(logger->getInfo())
-            << "saveToStandardOutput exception: " << e.what() << "\n";
+        *(logger->getInfo()) << "saveToStandardOutput exception: " << e.what() << "\n";
     }
     logger->setWarn(logger->discard());
     logger->warn("warning not seen\n");

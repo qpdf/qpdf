@@ -24,13 +24,12 @@ QPDFEFStreamObjectHelper::getParam(std::string const& pkey)
 }
 
 void
-QPDFEFStreamObjectHelper::setParam(
-    std::string const& pkey, QPDFObjectHandle const& pval)
+QPDFEFStreamObjectHelper::setParam(std::string const& pkey, QPDFObjectHandle const& pval)
 {
     auto params = this->oh.getDict().getKey("/Params");
     if (!params.isDictionary()) {
-        params = this->oh.getDict().replaceKeyAndGetNew(
-            "/Params", QPDFObjectHandle::newDictionary());
+        params =
+            this->oh.getDict().replaceKeyAndGetNew("/Params", QPDFObjectHandle::newDictionary());
     }
     params.replaceKey(pkey, pval);
 }
@@ -89,8 +88,7 @@ QPDFEFStreamObjectHelper::getChecksum()
 }
 
 QPDFEFStreamObjectHelper
-QPDFEFStreamObjectHelper::createEFStream(
-    QPDF& qpdf, std::shared_ptr<Buffer> data)
+QPDFEFStreamObjectHelper::createEFStream(QPDF& qpdf, std::shared_ptr<Buffer> data)
 {
     return newFromStream(qpdf.newStream(data));
 }
@@ -102,12 +100,10 @@ QPDFEFStreamObjectHelper::createEFStream(QPDF& qpdf, std::string const& data)
 }
 
 QPDFEFStreamObjectHelper
-QPDFEFStreamObjectHelper::createEFStream(
-    QPDF& qpdf, std::function<void(Pipeline*)> provider)
+QPDFEFStreamObjectHelper::createEFStream(QPDF& qpdf, std::function<void(Pipeline*)> provider)
 {
     auto stream = qpdf.newStream();
-    stream.replaceStreamData(
-        provider, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+    stream.replaceStreamData(provider, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
     return newFromStream(stream);
 }
 
@@ -128,8 +124,7 @@ QPDFEFStreamObjectHelper::setModDate(std::string const& date)
 QPDFEFStreamObjectHelper&
 QPDFEFStreamObjectHelper::setSubtype(std::string const& subtype)
 {
-    this->oh.getDict().replaceKey(
-        "/Subtype", QPDFObjectHandle::newName("/" + subtype));
+    this->oh.getDict().replaceKey("/Subtype", QPDFObjectHandle::newName("/" + subtype));
     return *this;
 }
 
@@ -137,22 +132,18 @@ QPDFEFStreamObjectHelper
 QPDFEFStreamObjectHelper::newFromStream(QPDFObjectHandle stream)
 {
     QPDFEFStreamObjectHelper result(stream);
-    stream.getDict().replaceKey(
-        "/Type", QPDFObjectHandle::newName("/EmbeddedFile"));
+    stream.getDict().replaceKey("/Type", QPDFObjectHandle::newName("/EmbeddedFile"));
     Pl_Discard discard;
     // The PDF spec specifies use of MD5 here and notes that it is not
     // to be used for security. MD5 is known to be insecure.
     Pl_MD5 md5("EF md5", &discard);
     Pl_Count count("EF size", &md5);
     if (!stream.pipeStreamData(&count, nullptr, 0, qpdf_dl_all)) {
-        stream.warnIfPossible(
-            "unable to get stream data for new embedded file stream");
+        stream.warnIfPossible("unable to get stream data for new embedded file stream");
     } else {
+        result.setParam("/Size", QPDFObjectHandle::newInteger(count.getCount()));
         result.setParam(
-            "/Size", QPDFObjectHandle::newInteger(count.getCount()));
-        result.setParam(
-            "/CheckSum",
-            QPDFObjectHandle::newString(QUtil::hex_decode(md5.getHexDigest())));
+            "/CheckSum", QPDFObjectHandle::newString(QUtil::hex_decode(md5.getHexDigest())));
     }
     return result;
 }

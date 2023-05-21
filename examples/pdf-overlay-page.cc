@@ -31,8 +31,7 @@ stamp_page(char const* infile, char const* stampfile, char const* outfile)
     stamppdf.processFile(stampfile);
 
     // Get first page from other file
-    QPDFPageObjectHelper stamp_page_1 =
-        QPDFPageDocumentHelper(stamppdf).getAllPages().at(0);
+    QPDFPageObjectHelper stamp_page_1 = QPDFPageDocumentHelper(stamppdf).getAllPages().at(0);
     // Convert page to a form XObject
     QPDFObjectHandle foreign_fo = stamp_page_1.getFormXObjectForPage();
     // Copy form XObject to the input file
@@ -48,8 +47,8 @@ stamp_page(char const* infile, char const* stampfile, char const* outfile)
         // Generate content to place the form XObject centered within
         // destination page's trim box.
         QPDFMatrix m;
-        std::string content = ph.placeFormXObject(
-            stamp_fo, name, ph.getTrimBox().getArrayAsRectangle(), m);
+        std::string content =
+            ph.placeFormXObject(stamp_fo, name, ph.getTrimBox().getArrayAsRectangle(), m);
         if (!content.empty()) {
             // Append the content to the page's content. Surround the
             // original content with q...Q to the new content from the

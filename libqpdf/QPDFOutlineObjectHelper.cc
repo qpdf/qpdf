@@ -18,8 +18,7 @@ QPDFOutlineObjectHelper::QPDFOutlineObjectHelper(
         // temporarily changing max depth to 1.
         return;
     }
-    if (QPDFOutlineDocumentHelper::Accessor::checkSeen(
-            m->dh, this->oh.getObjGen())) {
+    if (QPDFOutlineDocumentHelper::Accessor::checkSeen(m->dh, this->oh.getObjGen())) {
         QTC::TC("qpdf", "QPDFOutlineObjectHelper loop");
         return;
     }

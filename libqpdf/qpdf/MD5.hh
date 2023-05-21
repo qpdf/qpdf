@@ -38,14 +38,10 @@ class MD5
 
     // Convenience functions
     static std::string getDataChecksum(char const* buf, size_t len);
-    static std::string
-    getFileChecksum(char const* filename, qpdf_offset_t up_to_offset = -1);
-    static bool
-    checkDataChecksum(char const* const checksum, char const* buf, size_t len);
+    static std::string getFileChecksum(char const* filename, qpdf_offset_t up_to_offset = -1);
+    static bool checkDataChecksum(char const* const checksum, char const* buf, size_t len);
     static bool checkFileChecksum(
-        char const* const checksum,
-        char const* filename,
-        qpdf_offset_t up_to_offset = -1);
+        char const* const checksum, char const* filename, qpdf_offset_t up_to_offset = -1);
 
   private:
     void init();

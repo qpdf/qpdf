@@ -15,8 +15,7 @@ main(int argc, char* argv[])
     }
 
     if (argc < 3) {
-        std::cerr << "Usage: lzw infile outfile [ --no-early-code-change ]"
-                  << std::endl;
+        std::cerr << "Usage: lzw infile outfile [ --no-early-code-change ]" << std::endl;
         exit(2);
     }
 

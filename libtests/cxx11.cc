@@ -33,8 +33,7 @@ do_functional()
     x = 7; // change not seen by lambda
     assert(by_value(1) == 6);
     // Also >> at end of template
-    assert((std::is_convertible<decltype(by_value), std::function<int(int)>>::
-                value));
+    assert((std::is_convertible<decltype(by_value), std::function<int(int)>>::value));
 
     // Capture by reference
     auto by_reference = [&x](int a) { return a + x; };

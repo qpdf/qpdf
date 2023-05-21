@@ -111,8 +111,7 @@ extern "C" {
      * is invalid to call any other functions this job handle.
      */
     QPDF_DLL
-    int
-    qpdfjob_initialize_from_argv(qpdfjob_handle j, char const* const argv[]);
+    int qpdfjob_initialize_from_argv(qpdfjob_handle j, char const* const argv[]);
 
 #ifndef QPDF_NO_WCHAR_T
     /* This function is the same as qpdfjob_initialize_from_argv
@@ -120,8 +119,7 @@ extern "C" {
      * suitable for calling from a Windows wmain function.
      */
     QPDF_DLL
-    int qpdfjob_initialize_from_wide_argv(
-        qpdfjob_handle j, wchar_t const* const argv[]);
+    int qpdfjob_initialize_from_wide_argv(qpdfjob_handle j, wchar_t const* const argv[]);
 #endif /* QPDF_NO_WCHAR_T */
 
     /* This function wraps QPDFJob::initializeFromJson. The return
@@ -167,9 +165,7 @@ extern "C" {
      */
     QPDF_DLL
     void qpdfjob_register_progress_reporter(
-        qpdfjob_handle j,
-        void (*report_progress)(int percent, void* data),
-        void* data);
+        qpdfjob_handle j, void (*report_progress)(int percent, void* data), void* data);
 
 #ifdef __cplusplus
 }

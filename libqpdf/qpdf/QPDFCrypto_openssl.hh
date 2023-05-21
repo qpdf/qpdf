@@ -37,9 +37,7 @@ class QPDFCrypto_openssl: public QPDFCryptoImpl
 
     void RC4_init(unsigned char const* key_data, int key_len = -1) override;
     void RC4_process(
-        unsigned char const* in_data,
-        size_t len,
-        unsigned char* out_data = nullptr) override;
+        unsigned char const* in_data, size_t len, unsigned char* out_data = nullptr) override;
     void RC4_finalize() override;
 
     void SHA2_init(int bits) override;
@@ -53,8 +51,7 @@ class QPDFCrypto_openssl: public QPDFCryptoImpl
         size_t key_len,
         bool cbc_mode,
         unsigned char* cbc_block) override;
-    void
-    rijndael_process(unsigned char* in_data, unsigned char* out_data) override;
+    void rijndael_process(unsigned char* in_data, unsigned char* out_data) override;
     void rijndael_finalize() override;
 
   private:

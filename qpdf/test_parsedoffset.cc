@@ -20,12 +20,10 @@ std::string
 make_objdesc(qpdf_offset_t offset, QPDFObjectHandle obj)
 {
     std::stringstream ss;
-    ss << "offset = " << offset << " (0x" << std::hex << offset << std::dec
-       << "), ";
+    ss << "offset = " << offset << " (0x" << std::hex << offset << std::dec << "), ";
 
     if (obj.isIndirect()) {
-        ss << "indirect " << obj.getObjectID() << "/" << obj.getGeneration()
-           << ", ";
+        ss << "indirect " << obj.getObjectID() << "/" << obj.getGeneration() << ", ";
     } else {
         ss << "direct, ";
     }
@@ -42,8 +40,7 @@ walk(
     std::vector<std::vector<std::pair<qpdf_offset_t, std::string>>>& result)
 {
     qpdf_offset_t offset = obj.getParsedOffset();
-    std::pair<qpdf_offset_t, std::string> p =
-        std::make_pair(offset, make_objdesc(offset, obj));
+    std::pair<qpdf_offset_t, std::string> p = std::make_pair(offset, make_objdesc(offset, obj));
 
     if (result.size() < stream_number + 1) {
         result.resize(stream_number + 1);
@@ -73,9 +70,7 @@ walk(
 }
 
 void
-process(
-    std::string fn,
-    std::vector<std::vector<std::pair<qpdf_offset_t, std::string>>>& result)
+process(std::string fn, std::vector<std::vector<std::pair<qpdf_offset_t, std::string>>>& result)
 {
     QPDF qpdf;
     qpdf.processFile(fn.c_str());
@@ -93,8 +88,8 @@ process(
 
         switch (xref.getType()) {
         case 0:
-            std::cerr << oh.getObjectID() << "/" << oh.getGeneration()
-                      << " xref entry is free" << std::endl;
+            std::cerr << oh.getObjectID() << "/" << oh.getGeneration() << " xref entry is free"
+                      << std::endl;
             std::exit(2);
         case 1:
             stream_number = 0;
@@ -133,8 +128,7 @@ main(int argc, char* argv[])
             if (i == 0) {
                 std::cout << "--- objects not in streams ---" << std::endl;
             } else {
-                std::cout << "--- objects in stream " << i << " ---"
-                          << std::endl;
+                std::cout << "--- objects in stream " << i << " ---" << std::endl;
             }
 
             for (auto const& iter: table[i]) {

@@ -28,25 +28,19 @@ test_read_bits(
     size_t& bits_available,
     size_t bits_wanted)
 {
-    unsigned long result =
-        QIntC::to_ulong(read_bits(p, bit_offset, bits_available, bits_wanted));
+    unsigned long result = QIntC::to_ulong(read_bits(p, bit_offset, bits_available, bits_wanted));
 
-    std::cout << "bits read: " << bits_wanted << ", result = " << result
-              << std::endl;
+    std::cout << "bits read: " << bits_wanted << ", result = " << result << std::endl;
     print_values(p - buf, bit_offset, bits_available);
 }
 
 static void
 test_write_bits(
-    unsigned char& ch,
-    size_t& bit_offset,
-    unsigned long val,
-    size_t bits,
-    Pl_Buffer* bp)
+    unsigned char& ch, size_t& bit_offset, unsigned long val, size_t bits, Pl_Buffer* bp)
 {
     write_bits(ch, bit_offset, val, bits, bp);
-    std::cout << "ch = " << QUtil::uint_to_string_base(ch, 16, 2)
-              << ", bit_offset = " << bit_offset << std::endl;
+    std::cout << "ch = " << QUtil::uint_to_string_base(ch, 16, 2) << ", bit_offset = " << bit_offset
+              << std::endl;
 }
 
 static void
@@ -57,8 +51,7 @@ print_buffer(Pl_Buffer* bp)
     unsigned char const* p = b->getBuffer();
     size_t l = b->getSize();
     for (unsigned long i = 0; i < l; ++i) {
-        std::cout << QUtil::uint_to_string_base(p[i], 16, 2)
-                  << ((i == l - 1) ? "\n" : " ");
+        std::cout << QUtil::uint_to_string_base(p[i], 16, 2) << ((i == l - 1) ? "\n" : " ");
     }
     std::cout << std::endl;
     delete b;
@@ -72,8 +65,7 @@ test()
 
     // Read tests
 
-    static unsigned char const buf[] = {
-        0xF5, 0x15, 0x65, 0x79, 0x12, 0x89, 0x75, 0x4B};
+    static unsigned char const buf[] = {0xF5, 0x15, 0x65, 0x79, 0x12, 0x89, 0x75, 0x4B};
 
     unsigned char const* p = buf;
     size_t bit_offset = 7;

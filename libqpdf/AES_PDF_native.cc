@@ -27,11 +27,9 @@ AES_PDF_native::AES_PDF_native(
     std::memcpy(this->key.get(), key, key_bytes);
     std::memset(this->rk.get(), 0, rk_bytes);
     if (encrypt) {
-        this->nrounds =
-            rijndaelSetupEncrypt(this->rk.get(), this->key.get(), keybits);
+        this->nrounds = rijndaelSetupEncrypt(this->rk.get(), this->key.get(), keybits);
     } else {
-        this->nrounds =
-            rijndaelSetupDecrypt(this->rk.get(), this->key.get(), keybits);
+        this->nrounds = rijndaelSetupDecrypt(this->rk.get(), this->key.get(), keybits);
     }
 }
 
@@ -46,8 +44,7 @@ AES_PDF_native::update(unsigned char* in_data, unsigned char* out_data)
         }
         rijndaelEncrypt(this->rk.get(), this->nrounds, in_data, out_data);
         if (this->cbc_mode) {
-            memcpy(
-                this->cbc_block, out_data, QPDFCryptoImpl::rijndael_buf_size);
+            memcpy(this->cbc_block, out_data, QPDFCryptoImpl::rijndael_buf_size);
         }
     } else {
         rijndaelDecrypt(this->rk.get(), this->nrounds, in_data, out_data);

@@ -32,17 +32,11 @@ main(int, char*[])
     b.encodeFile("md5.in", 100);
     std::cout << b.unparse() << std::endl;
 
-    std::cout
-        << MD5::checkDataChecksum("900150983cd24fb0d6963f7d28e17f72", "abc", 3)
-        << std::endl
-        << MD5::checkFileChecksum("5f4b4321873433daae578f85c72f9e74", "md5.in")
-        << std::endl
-        << MD5::checkFileChecksum("6f4b4321873433daae578f85c72f9e74", "md5.in")
-        << std::endl
-        << MD5::checkDataChecksum("000150983cd24fb0d6963f7d28e17f72", "abc", 3)
-        << std::endl
-        << MD5::checkFileChecksum("6f4b4321873433daae578f85c72f9e74", "glerbl")
-        << std::endl;
+    std::cout << MD5::checkDataChecksum("900150983cd24fb0d6963f7d28e17f72", "abc", 3) << std::endl
+              << MD5::checkFileChecksum("5f4b4321873433daae578f85c72f9e74", "md5.in") << std::endl
+              << MD5::checkFileChecksum("6f4b4321873433daae578f85c72f9e74", "md5.in") << std::endl
+              << MD5::checkDataChecksum("000150983cd24fb0d6963f7d28e17f72", "abc", 3) << std::endl
+              << MD5::checkFileChecksum("6f4b4321873433daae578f85c72f9e74", "glerbl") << std::endl;
 
     Pl_Discard d;
     Pl_MD5 p("MD5", &d);

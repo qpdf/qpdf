@@ -170,26 +170,22 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // Return the effective CropBox. If not defined, fall back to
     // MediaBox
     QPDF_DLL
-    QPDFObjectHandle
-    getCropBox(bool copy_if_shared = false, bool copy_if_fallback = false);
+    QPDFObjectHandle getCropBox(bool copy_if_shared = false, bool copy_if_fallback = false);
 
     // Return the effective BleedBox. If not defined, fall back to
     // CropBox.
     QPDF_DLL
-    QPDFObjectHandle
-    getBleedBox(bool copy_if_shared = false, bool copy_if_fallback = false);
+    QPDFObjectHandle getBleedBox(bool copy_if_shared = false, bool copy_if_fallback = false);
 
     // Return the effective TrimBox. If not defined, fall back to
     // CropBox.
     QPDF_DLL
-    QPDFObjectHandle
-    getTrimBox(bool copy_if_shared = false, bool copy_if_fallback = false);
+    QPDFObjectHandle getTrimBox(bool copy_if_shared = false, bool copy_if_fallback = false);
 
     // Return the effective ArtBox. If not defined, fall back to
     // CropBox.
     QPDF_DLL
-    QPDFObjectHandle
-    getArtBox(bool copy_if_shared = false, bool copy_if_fallback = false);
+    QPDFObjectHandle getArtBox(bool copy_if_shared = false, bool copy_if_fallback = false);
 
     // Iterate through XObjects, possibly recursing into form
     // XObjects. This works with pages or form XObjects. Call action
@@ -203,26 +199,20 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     void forEachXObject(
         bool recursive,
         std::function<void(
-            QPDFObjectHandle& obj,
-            QPDFObjectHandle& xobj_dict,
-            std::string const& key)> action,
+            QPDFObjectHandle& obj, QPDFObjectHandle& xobj_dict, std::string const& key)> action,
         std::function<bool(QPDFObjectHandle)> selector = nullptr);
     // Only call action for images
     QPDF_DLL
     void forEachImage(
         bool recursive,
         std::function<void(
-            QPDFObjectHandle& obj,
-            QPDFObjectHandle& xobj_dict,
-            std::string const& key)> action);
+            QPDFObjectHandle& obj, QPDFObjectHandle& xobj_dict, std::string const& key)> action);
     // Only call action for form XObjects
     QPDF_DLL
     void forEachFormXObject(
         bool recursive,
         std::function<void(
-            QPDFObjectHandle& obj,
-            QPDFObjectHandle& xobj_dict,
-            std::string const& key)> action);
+            QPDFObjectHandle& obj, QPDFObjectHandle& xobj_dict, std::string const& key)> action);
 
     // Returns an empty map if there are no images or no resources.
     // Prior to qpdf 8.4.0, this function did not support inherited
@@ -258,8 +248,7 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // only_subtype is non-empty, only include annotations of the
     // given subtype.
     QPDF_DLL
-    std::vector<QPDFAnnotationObjectHelper>
-    getAnnotations(std::string const& only_subtype = "");
+    std::vector<QPDFAnnotationObjectHelper> getAnnotations(std::string const& only_subtype = "");
 
     // Returns a vector of stream objects representing the content
     // streams for the given page.  This routine allows the caller to
@@ -319,13 +308,11 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // contents, as happens with addContentTokenFilter. See
     // examples/pdf-count-strings.cc for an example.
     QPDF_DLL
-    void filterContents(
-        QPDFObjectHandle::TokenFilter* filter, Pipeline* next = nullptr);
+    void filterContents(QPDFObjectHandle::TokenFilter* filter, Pipeline* next = nullptr);
 
     // Old name -- calls filterContents()
     QPDF_DLL
-    void filterPageContents(
-        QPDFObjectHandle::TokenFilter* filter, Pipeline* next = nullptr);
+    void filterPageContents(QPDFObjectHandle::TokenFilter* filter, Pipeline* next = nullptr);
 
     // Pipe a page's contents through the given pipeline. This method
     // works whether the contents are a single stream or an array of
@@ -341,8 +328,7 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // The token filter is applied to the page's contents as a single
     // stream. Also works on form XObjects.
     QPDF_DLL
-    void addContentTokenFilter(
-        std::shared_ptr<QPDFObjectHandle::TokenFilter> token_filter);
+    void addContentTokenFilter(std::shared_ptr<QPDFObjectHandle::TokenFilter> token_filter);
 
     // A page's resources dictionary maps names to objects elsewhere
     // in the file. This method walks through a page's contents and
@@ -500,8 +486,8 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
         bool copy_if_shared,
         std::function<QPDFObjectHandle()> get_fallback,
         bool copy_if_fallback);
-    static bool removeUnreferencedResourcesHelper(
-        QPDFPageObjectHelper ph, std::set<std::string>& unresolved);
+    static bool
+    removeUnreferencedResourcesHelper(QPDFPageObjectHelper ph, std::set<std::string>& unresolved);
 
     class Members
     {

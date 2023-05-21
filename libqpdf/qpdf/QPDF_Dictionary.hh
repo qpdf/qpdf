@@ -12,10 +12,8 @@ class QPDF_Dictionary: public QPDFValue
 {
   public:
     virtual ~QPDF_Dictionary() = default;
-    static std::shared_ptr<QPDFObject>
-    create(std::map<std::string, QPDFObjectHandle> const& items);
-    static std::shared_ptr<QPDFObject>
-    create(std::map<std::string, QPDFObjectHandle>&& items);
+    static std::shared_ptr<QPDFObject> create(std::map<std::string, QPDFObjectHandle> const& items);
+    static std::shared_ptr<QPDFObject> create(std::map<std::string, QPDFObjectHandle>&& items);
     virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
     virtual std::string unparse();
     virtual JSON getJSON(int json_version);

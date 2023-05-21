@@ -6,8 +6,7 @@
 #include <cstring>
 #include <stdexcept>
 
-Pl_LZWDecoder::Pl_LZWDecoder(
-    char const* identifier, Pipeline* next, bool early_code_change) :
+Pl_LZWDecoder::Pl_LZWDecoder(char const* identifier, Pipeline* next, bool early_code_change) :
     Pipeline(identifier, next),
     code_size(9),
     next(0),
@@ -90,15 +89,13 @@ Pl_LZWDecoder::getFirstChar(unsigned int code)
     } else if (code > 257) {
         unsigned int idx = code - 258;
         if (idx >= table.size()) {
-            throw std::runtime_error(
-                "Pl_LZWDecoder::getFirstChar: table overflow");
+            throw std::runtime_error("Pl_LZWDecoder::getFirstChar: table overflow");
         }
         Buffer& b = table.at(idx);
         result = b.getBuffer()[0];
     } else {
         throw std::runtime_error(
-            "Pl_LZWDecoder::getFirstChar called with invalid code (" +
-            std::to_string(code) + ")");
+            "Pl_LZWDecoder::getFirstChar called with invalid code (" + std::to_string(code) + ")");
     }
     return result;
 }
@@ -117,8 +114,7 @@ Pl_LZWDecoder::addToTable(unsigned char next)
     } else if (this->last_code > 257) {
         unsigned int idx = this->last_code - 258;
         if (idx >= table.size()) {
-            throw std::runtime_error(
-                "Pl_LZWDecoder::addToTable: table overflow");
+            throw std::runtime_error("Pl_LZWDecoder::addToTable: table overflow");
         }
         Buffer& b = table.at(idx);
         last_data = b.getBuffer();
@@ -182,8 +178,7 @@ Pl_LZWDecoder::handleCode(unsigned int code)
             }
             addToTable(next);
             unsigned int change_idx = new_idx + code_change_delta;
-            if ((change_idx == 511) || (change_idx == 1023) ||
-                (change_idx == 2047)) {
+            if ((change_idx == 511) || (change_idx == 1023) || (change_idx == 2047)) {
                 ++this->code_size;
             }
         }
@@ -194,8 +189,7 @@ Pl_LZWDecoder::handleCode(unsigned int code)
         } else {
             unsigned int idx = code - 258;
             if (idx >= table.size()) {
-                throw std::runtime_error(
-                    "Pl_LZWDecoder::handleCode: table overflow");
+                throw std::runtime_error("Pl_LZWDecoder::handleCode: table overflow");
             }
             Buffer& b = table.at(idx);
             getNext()->write(b.getBuffer(), b.getSize());

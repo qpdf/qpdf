@@ -19,8 +19,7 @@ QPDFFileSpecObjectHelper::QPDFFileSpecObjectHelper(QPDFObjectHandle oh) :
     }
 }
 
-static std::vector<std::string> name_keys = {
-    "/UF", "/F", "/Unix", "/DOS", "/Mac"};
+static std::vector<std::string> name_keys = {"/UF", "/F", "/Unix", "/DOS", "/Mac"};
 
 std::string
 QPDFFileSpecObjectHelper::getDescription()
@@ -90,8 +89,7 @@ QPDFFileSpecObjectHelper::createFileSpec(
     return createFileSpec(
         qpdf,
         filename,
-        QPDFEFStreamObjectHelper::createEFStream(
-            qpdf, QUtil::file_provider(fullpath)));
+        QPDFEFStreamObjectHelper::createEFStream(qpdf, QUtil::file_provider(fullpath)));
 }
 
 QPDFFileSpecObjectHelper

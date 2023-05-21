@@ -16,8 +16,7 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami
-              << " --in in_file [--out out_file] [--key key [--val val]?]+\n"
+    std::cerr << "Usage: " << whoami << " --in in_file [--out out_file] [--key key [--val val]?]+\n"
               << "Modifies/Adds/Removes PDF /Info entries in the in_file\n"
               << "and stores the result in out_file\n"
               << "Special mode: " << whoami << " --dump file\n"
@@ -26,8 +25,7 @@ usage()
 }
 
 void
-dumpInfoDict(
-    QPDF& pdf, std::ostream& os = std::cout, std::string const& sep = ":\t")
+dumpInfoDict(QPDF& pdf, std::ostream& os = std::cout, std::string const& sep = ":\t")
 {
     QPDFObjectHandle trailer = pdf.getTrailer();
     if (trailer.hasKey("/Info")) {
@@ -164,8 +162,7 @@ main(int argc, char* argv[])
     try {
         (void)remove(fl_out);
         QUtil::os_wrapper(
-            "rename " + fl_tmp + " " + std::string(fl_out),
-            rename(fl_tmp.c_str(), fl_out));
+            "rename " + fl_tmp + " " + std::string(fl_out), rename(fl_tmp.c_str(), fl_out));
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
         exit(2);

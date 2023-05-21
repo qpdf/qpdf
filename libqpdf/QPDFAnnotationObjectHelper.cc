@@ -47,8 +47,7 @@ QPDFAnnotationObjectHelper::getFlags()
 }
 
 QPDFObjectHandle
-QPDFAnnotationObjectHelper::getAppearanceStream(
-    std::string const& which, std::string const& state)
+QPDFAnnotationObjectHelper::getAppearanceStream(std::string const& which, std::string const& state)
 {
     QPDFObjectHandle ap = getAppearanceDictionary();
     std::string desired_state = state.empty() ? getAppearanceState() : state;
@@ -80,10 +79,7 @@ QPDFAnnotationObjectHelper::getAppearanceStream(
 
 std::string
 QPDFAnnotationObjectHelper::getPageContentForAppearance(
-    std::string const& name,
-    int rotate,
-    int required_flags,
-    int forbidden_flags)
+    std::string const& name, int rotate, int required_flags, int forbidden_flags)
 {
     if (!getAppearanceStream("/N").isStream()) {
         return "";
@@ -242,9 +238,7 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
     // Compute a matrix to transform the appearance box to the rectangle
     QPDFMatrix AA;
     AA.translate(rect.llx, rect.lly);
-    AA.scale(
-        (rect.urx - rect.llx) / (T.urx - T.llx),
-        (rect.ury - rect.lly) / (T.ury - T.lly));
+    AA.scale((rect.urx - rect.llx) / (T.urx - T.llx), (rect.ury - rect.lly) / (T.ury - T.lly));
     AA.translate(-T.llx, -T.lly);
     if (do_rotate) {
         AA.rotatex90(rotate);

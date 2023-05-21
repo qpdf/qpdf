@@ -68,8 +68,7 @@ QPDFCrypto_native::RC4_init(unsigned char const* key_data, int key_len)
 }
 
 void
-QPDFCrypto_native::RC4_process(
-    unsigned char const* in_data, size_t len, unsigned char* out_data)
+QPDFCrypto_native::RC4_process(unsigned char const* in_data, size_t len, unsigned char* out_data)
 {
     this->rc4->process(in_data, len, out_data);
 }
@@ -112,13 +111,12 @@ QPDFCrypto_native::rijndael_init(
     unsigned char* cbc_block)
 
 {
-    this->aes_pdf = std::make_shared<AES_PDF_native>(
-        encrypt, key_data, key_len, cbc_mode, cbc_block);
+    this->aes_pdf =
+        std::make_shared<AES_PDF_native>(encrypt, key_data, key_len, cbc_mode, cbc_block);
 }
 
 void
-QPDFCrypto_native::rijndael_process(
-    unsigned char* in_data, unsigned char* out_data)
+QPDFCrypto_native::rijndael_process(unsigned char* in_data, unsigned char* out_data)
 {
     this->aes_pdf->update(in_data, out_data);
 }

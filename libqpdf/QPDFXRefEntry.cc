@@ -36,8 +36,7 @@ int
 QPDFXRefEntry::getObjStreamNumber() const
 {
     if (this->type != 2) {
-        throw std::logic_error(
-            "getObjStreamNumber called for xref entry of type != 2");
+        throw std::logic_error("getObjStreamNumber called for xref entry of type != 2");
     }
     return QIntC::to_int(this->field1);
 }
@@ -46,8 +45,7 @@ int
 QPDFXRefEntry::getObjStreamIndex() const
 {
     if (this->type != 2) {
-        throw std::logic_error(
-            "getObjStreamIndex called for xref entry of type != 2");
+        throw std::logic_error("getObjStreamIndex called for xref entry of type != 2");
     }
     return this->field2;
 }

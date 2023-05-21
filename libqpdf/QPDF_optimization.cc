@@ -109,9 +109,7 @@ QPDF::optimize(
         // time to time, so this is almost certain not to cause any
         // problems.
         updateObjectMaps(
-            ObjUser(ObjUser::ou_root_key, key),
-            root.getKey(key),
-            skip_stream_parameters);
+            ObjUser(ObjUser::ou_root_key, key), root.getKey(key), skip_stream_parameters);
     }
 
     ObjUser root_ou = ObjUser(ObjUser::ou_root);
@@ -177,8 +175,8 @@ QPDF::pushInheritedAttributesToPageInternal(
 
     std::set<std::string> inheritable_keys;
     for (auto const& key: cur_pages.getKeys()) {
-        if ((key == "/MediaBox") || (key == "/CropBox") ||
-            (key == "/Resources") || (key == "/Rotate")) {
+        if ((key == "/MediaBox") || (key == "/CropBox") || (key == "/Resources") ||
+            (key == "/Rotate")) {
             if (!allow_changes) {
                 throw QPDFExc(
                     qpdf_e_internal,
@@ -193,10 +191,7 @@ QPDF::pushInheritedAttributesToPageInternal(
             // This is an inheritable resource
             inheritable_keys.insert(key);
             QPDFObjectHandle oh = cur_pages.getKey(key);
-            QTC::TC(
-                "qpdf",
-                "QPDF opt direct pages resource",
-                oh.isIndirect() ? 0 : 1);
+            QTC::TC("qpdf", "QPDF opt direct pages resource", oh.isIndirect() ? 0 : 1);
             if (!oh.isIndirect()) {
                 if (!oh.isScalar()) {
                     // Replace shared direct object non-scalar
@@ -216,8 +211,8 @@ QPDF::pushInheritedAttributesToPageInternal(
             // Remove this resource from this node.  It will be
             // reattached at the page level.
             cur_pages.removeKey(key);
-        } else if (!((key == "/Type") || (key == "/Parent") ||
-                     (key == "/Kids") || (key == "/Count"))) {
+        } else if (!((key == "/Type") || (key == "/Parent") || (key == "/Kids") ||
+                     (key == "/Count"))) {
             // Warn when flattening, but not if the key is at the top
             // level (i.e. "/Parent" not set), as we don't change these;
             // but flattening removes intermediate /Pages nodes.
@@ -349,17 +344,12 @@ QPDF::updateObjectMapsInternal(
                 // Don't traverse back up the page tree
             } else if (
                 ((ssp >= 1) && (key == "/Length")) ||
-                ((ssp >= 2) &&
-                 ((key == "/Filter") || (key == "/DecodeParms")))) {
+                ((ssp >= 2) && ((key == "/Filter") || (key == "/DecodeParms")))) {
                 // Don't traverse into stream parameters that we are
                 // not going to write.
             } else {
                 updateObjectMapsInternal(
-                    ou,
-                    dict.getKey(key),
-                    skip_stream_parameters,
-                    visited,
-                    false);
+                    ou, dict.getKey(key), skip_stream_parameters, visited, false);
             }
         }
     }

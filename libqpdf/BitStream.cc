@@ -33,8 +33,7 @@ BitStream::getBits(size_t nbits)
 long long
 BitStream::getBitsSigned(size_t nbits)
 {
-    unsigned long long bits =
-        read_bits(this->p, this->bit_offset, this->bits_available, nbits);
+    unsigned long long bits = read_bits(this->p, this->bit_offset, this->bits_available, nbits);
     long long result = 0;
     if (static_cast<long long>(bits) > 1LL << (nbits - 1)) {
         result = static_cast<long long>(bits - (1ULL << nbits));
@@ -49,8 +48,7 @@ BitStream::getBitsInt(size_t nbits)
 {
     return static_cast<int>(
         // line-break
-        QIntC::to_uint(
-            read_bits(this->p, this->bit_offset, this->bits_available, nbits)));
+        QIntC::to_uint(read_bits(this->p, this->bit_offset, this->bits_available, nbits)));
 }
 
 void
@@ -59,8 +57,7 @@ BitStream::skipToNextByte()
     if (bit_offset != 7) {
         size_t bits_to_skip = bit_offset + 1;
         if (bits_available < bits_to_skip) {
-            throw std::logic_error(
-                "INTERNAL ERROR: overflow skipping to next byte in bitstream");
+            throw std::logic_error("INTERNAL ERROR: overflow skipping to next byte in bitstream");
         }
         bit_offset = 7;
         ++p;

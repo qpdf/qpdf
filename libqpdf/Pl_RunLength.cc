@@ -10,8 +10,7 @@ Pl_RunLength::Members::Members(action_e action) :
 {
 }
 
-Pl_RunLength::Pl_RunLength(
-    char const* identifier, Pipeline* next, action_e action) :
+Pl_RunLength::Pl_RunLength(char const* identifier, Pipeline* next, action_e action) :
     Pipeline(identifier, next),
     m(new Members(action))
 {
@@ -38,17 +37,12 @@ Pl_RunLength::encode(unsigned char const* data, size_t len)
 {
     for (size_t i = 0; i < len; ++i) {
         if ((m->state == st_top) != (m->length <= 1)) {
-            throw std::logic_error(
-                "Pl_RunLength::encode: state/length inconsistency");
+            throw std::logic_error("Pl_RunLength::encode: state/length inconsistency");
         }
         unsigned char ch = data[i];
-        if ((m->length > 0) &&
-            ((m->state == st_copying) || (m->length < 128)) &&
+        if ((m->length > 0) && ((m->state == st_copying) || (m->length < 128)) &&
             (ch == m->buf[m->length - 1])) {
-            QTC::TC(
-                "libtests",
-                "Pl_RunLength: switch to run",
-                (m->length == 128) ? 0 : 1);
+            QTC::TC("libtests", "Pl_RunLength: switch to run", (m->length == 128) ? 0 : 1);
             if (m->state == st_copying) {
                 --m->length;
                 flush_encode();
@@ -124,8 +118,7 @@ Pl_RunLength::flush_encode()
     }
     if (m->state == st_run) {
         if ((m->length < 2) || (m->length > 128)) {
-            throw std::logic_error(
-                "Pl_RunLength: invalid length in flush_encode for run");
+            throw std::logic_error("Pl_RunLength: invalid length in flush_encode for run");
         }
         auto ch = static_cast<unsigned char>(257 - m->length);
         this->getNext()->write(&ch, 1);

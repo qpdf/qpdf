@@ -18,8 +18,7 @@ class ResourceFinder: public QPDFObjectHandle::ParserCallbacks
     std::string last_name;
     size_t last_name_offset;
     std::set<std::string> names;
-    std::map<std::string, std::map<std::string, std::set<size_t>>>
-        names_by_resource_type;
+    std::map<std::string, std::map<std::string, std::set<size_t>>> names_by_resource_type;
 };
 
 #endif // RESOURCEFINDER_HH

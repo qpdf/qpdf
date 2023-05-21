@@ -27,14 +27,10 @@ class JSONHandler
     // called. There is no "final" handler -- if the top-level is a
     // dictionary or array, just use its end handler.
 
-    typedef std::function<void(std::string const& path, JSON value)>
-        json_handler_t;
+    typedef std::function<void(std::string const& path, JSON value)> json_handler_t;
     typedef std::function<void(std::string const& path)> void_handler_t;
-    typedef std::function<void(
-        std::string const& path, std::string const& value)>
-        string_handler_t;
-    typedef std::function<void(std::string const& path, bool value)>
-        bool_handler_t;
+    typedef std::function<void(std::string const& path, std::string const& value)> string_handler_t;
+    typedef std::function<void(std::string const& path, bool value)> bool_handler_t;
 
     // If an any handler is added, it will be called for any value
     // including null, and no other handler will be called.
@@ -48,14 +44,11 @@ class JSONHandler
     void addBoolHandler(bool_handler_t fn);
 
     void addDictHandlers(json_handler_t start_fn, void_handler_t end_fn);
-    void
-    addDictKeyHandler(std::string const& key, std::shared_ptr<JSONHandler>);
+    void addDictKeyHandler(std::string const& key, std::shared_ptr<JSONHandler>);
     void addFallbackDictHandler(std::shared_ptr<JSONHandler>);
 
     void addArrayHandlers(
-        json_handler_t start_fn,
-        void_handler_t end_fn,
-        std::shared_ptr<JSONHandler> item_handlers);
+        json_handler_t start_fn, void_handler_t end_fn, std::shared_ptr<JSONHandler> item_handlers);
 
     // Apply handlers recursively to a JSON object.
     void handle(std::string const& path, JSON j);

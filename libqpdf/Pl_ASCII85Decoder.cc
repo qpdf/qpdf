@@ -26,8 +26,7 @@ Pl_ASCII85Decoder::write(unsigned char const* buf, size_t len)
                 flush();
                 eod = 2;
             } else {
-                throw std::runtime_error(
-                    "broken end-of-data sequence in base 85 data");
+                throw std::runtime_error("broken end-of-data sequence in base 85 data");
             }
         } else {
             switch (buf[i]) {
@@ -47,8 +46,7 @@ Pl_ASCII85Decoder::write(unsigned char const* buf, size_t len)
 
             case 'z':
                 if (pos != 0) {
-                    throw std::runtime_error(
-                        "unexpected z during base 85 decode");
+                    throw std::runtime_error("unexpected z during base 85 decode");
                 } else {
                     QTC::TC("libtests", "Pl_ASCII85Decoder read z");
                     unsigned char zeroes[4];
@@ -59,8 +57,7 @@ Pl_ASCII85Decoder::write(unsigned char const* buf, size_t len)
 
             default:
                 if ((buf[i] < 33) || (buf[i] > 117)) {
-                    throw std::runtime_error(
-                        "character out of range during base 85 decode");
+                    throw std::runtime_error("character out of range during base 85 decode");
                 } else {
                     this->inbuf[this->pos++] = buf[i];
                     if (pos == 5) {
@@ -93,10 +90,7 @@ Pl_ASCII85Decoder::flush()
         lval >>= 8;
     }
 
-    QTC::TC(
-        "libtests",
-        "Pl_ASCII85Decoder partial flush",
-        (this->pos == 5) ? 0 : 1);
+    QTC::TC("libtests", "Pl_ASCII85Decoder partial flush", (this->pos == 5) ? 0 : 1);
     // Reset before calling getNext()->write in case that throws an
     // exception.
     auto t = this->pos - 1;

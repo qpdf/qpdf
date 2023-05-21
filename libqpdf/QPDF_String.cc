@@ -9,8 +9,7 @@
 static bool
 is_iso_latin1_printable(char ch)
 {
-    return (
-        ((ch >= 32) && (ch <= 126)) || (static_cast<unsigned char>(ch) >= 160));
+    return (((ch >= 32) && (ch <= 126)) || (static_cast<unsigned char>(ch) >= 160));
 }
 
 QPDF_String::QPDF_String(std::string const& val) :
@@ -62,8 +61,7 @@ QPDF_String::getJSON(int json_version)
         result = candidate;
     } else if (!useHexString()) {
         std::string test;
-        if (QUtil::utf8_to_pdf_doc(candidate, test, '?') &&
-            (test == this->val)) {
+        if (QUtil::utf8_to_pdf_doc(candidate, test, '?') && (test == this->val)) {
             // This is a PDF-doc string that can be losslessly encoded
             // as Unicode.
             is_unicode = true;
@@ -93,8 +91,7 @@ QPDF_String::useHexString() const
             continue;
         } else if (ch < 0 || ch >= 24) {
             ++non_ascii;
-        } else if (!(ch == '\n' || ch == '\r' || ch == '\t' || ch == '\b' ||
-                     ch == '\f')) {
+        } else if (!(ch == '\n' || ch == '\r' || ch == '\t' || ch == '\b' || ch == '\f')) {
             return true;
         }
     }
@@ -156,12 +153,9 @@ QPDF_String::unparse(bool force_binary)
                 if (is_iso_latin1_printable(ch)) {
                     result += this->val.at(i);
                 } else {
-                    result +=
-                        "\\" +
+                    result += "\\" +
                         QUtil::int_to_string_base(
-                            static_cast<int>(static_cast<unsigned char>(ch)),
-                            8,
-                            3);
+                                  static_cast<int>(static_cast<unsigned char>(ch)), 8, 3);
                 }
                 break;
             }

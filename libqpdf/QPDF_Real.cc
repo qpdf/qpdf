@@ -8,8 +8,7 @@ QPDF_Real::QPDF_Real(std::string const& val) :
 {
 }
 
-QPDF_Real::QPDF_Real(
-    double value, int decimal_places, bool trim_trailing_zeroes) :
+QPDF_Real::QPDF_Real(double value, int decimal_places, bool trim_trailing_zeroes) :
     QPDFValue(::ot_real, "real"),
     val(QUtil::double_to_string(value, decimal_places, trim_trailing_zeroes))
 {
@@ -24,8 +23,7 @@ QPDF_Real::create(std::string const& val)
 std::shared_ptr<QPDFObject>
 QPDF_Real::create(double value, int decimal_places, bool trim_trailing_zeroes)
 {
-    return do_create(
-        new QPDF_Real(value, decimal_places, trim_trailing_zeroes));
+    return do_create(new QPDF_Real(value, decimal_places, trim_trailing_zeroes));
 }
 
 std::shared_ptr<QPDFObject>
@@ -52,9 +50,7 @@ QPDF_Real::getJSON(int json_version)
         result = "0";
     } else if (this->val.at(0) == '.') {
         result = "0" + this->val;
-    } else if (
-        (this->val.length() >= 2) && (this->val.at(0) == '-') &&
-        (this->val.at(1) == '.')) {
+    } else if ((this->val.length() >= 2) && (this->val.at(0) == '-') && (this->val.at(1) == '.')) {
         result = "-0." + this->val.substr(2);
     } else {
         result = this->val;

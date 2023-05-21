@@ -78,8 +78,7 @@ class QPDFCryptoProvider
 
     static QPDFCryptoProvider& getInstance();
 
-    std::shared_ptr<QPDFCryptoImpl>
-    getImpl_internal(std::string const& name) const;
+    std::shared_ptr<QPDFCryptoImpl> getImpl_internal(std::string const& name) const;
     template <typename T>
     void registerImpl_internal(std::string const& name);
     void setDefaultProvider_internal(std::string const& name);

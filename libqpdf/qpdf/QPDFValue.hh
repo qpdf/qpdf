@@ -28,8 +28,7 @@ class QPDFValue: public std::enable_shared_from_this<QPDFValue>
 
     struct JSON_Descr
     {
-        JSON_Descr(
-            std::shared_ptr<std::string> input, std::string const& object) :
+        JSON_Descr(std::shared_ptr<std::string> input, std::string const& object) :
             input(input),
             object(object)
         {
@@ -59,10 +58,7 @@ class QPDFValue: public std::enable_shared_from_this<QPDFValue>
     using Description = std::variant<std::string, JSON_Descr, ChildDescr>;
 
     virtual void
-    setDescription(
-        QPDF* qpdf_p,
-        std::shared_ptr<Description>& description,
-        qpdf_offset_t offset)
+    setDescription(QPDF* qpdf_p, std::shared_ptr<Description>& description, qpdf_offset_t offset)
     {
         qpdf = qpdf_p;
         object_description = description;
@@ -81,8 +77,8 @@ class QPDFValue: public std::enable_shared_from_this<QPDFValue>
         std::string_view const& static_descr,
         std::string var_descr)
     {
-        object_description = std::make_shared<Description>(
-            ChildDescr(parent, static_descr, var_descr));
+        object_description =
+            std::make_shared<Description>(ChildDescr(parent, static_descr, var_descr));
         qpdf = a_qpdf;
     }
     std::string getDescription();
@@ -132,10 +128,7 @@ class QPDFValue: public std::enable_shared_from_this<QPDFValue>
     {
     }
     QPDFValue(
-        qpdf_object_type_e type_code,
-        char const* type_name,
-        QPDF* qpdf,
-        QPDFObjGen const& og) :
+        qpdf_object_type_e type_code, char const* type_name, QPDF* qpdf, QPDFObjGen const& og) :
         type_code(type_code),
         type_name(type_name),
         qpdf(qpdf),

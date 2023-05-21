@@ -20,18 +20,15 @@ QPDFValue::getDescription()
                 // Simple template string
                 auto description = std::get<0>(*object_description);
 
-                if (auto pos = description.find("$OG");
-                    pos != std::string::npos) {
+                if (auto pos = description.find("$OG"); pos != std::string::npos) {
                     description.replace(pos, 3, og.unparse(' '));
                 }
-                if (auto pos = description.find("$PO");
-                    pos != std::string::npos) {
+                if (auto pos = description.find("$PO"); pos != std::string::npos) {
                     qpdf_offset_t shift = (type_code == ::ot_dictionary) ? 2
                         : (type_code == ::ot_array)                      ? 1
                                                                          : 0;
 
-                    description.replace(
-                        pos, 3, std::to_string(parsed_offset + shift));
+                    description.replace(pos, 3, std::to_string(parsed_offset + shift));
                 }
                 return description;
             }
@@ -40,8 +37,7 @@ QPDFValue::getDescription()
                 // QPDF::JSONReactor generated description
                 auto j_descr = std::get<1>(*object_description);
                 return (
-                    *j_descr.input +
-                    (j_descr.object.empty() ? "" : ", " + j_descr.object) +
+                    *j_descr.input + (j_descr.object.empty() ? "" : ", " + j_descr.object) +
                     " at offset " + std::to_string(parsed_offset));
             }
         case 2:

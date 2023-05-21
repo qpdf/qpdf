@@ -17,8 +17,7 @@ QPDFOutlineDocumentHelper::QPDFOutlineDocumentHelper(QPDF& qpdf) :
     QPDFObjectHandle cur = outlines.getKey("/First");
     QPDFObjGen::set seen;
     while (!cur.isNull() && seen.add(cur)) {
-        m->outlines.push_back(
-            QPDFOutlineObjectHelper::Accessor::create(cur, *this, 1));
+        m->outlines.push_back(QPDFOutlineObjectHelper::Accessor::create(cur, *this, 1));
         cur = cur.getKey("/Next");
     }
 }
@@ -81,8 +80,7 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
             if (names.isDictionary()) {
                 QPDFObjectHandle dests = names.getKey("/Dests");
                 if (dests.isDictionary()) {
-                    m->names_dest = std::make_shared<QPDFNameTreeObjectHelper>(
-                        dests, this->qpdf);
+                    m->names_dest = std::make_shared<QPDFNameTreeObjectHelper>(dests, this->qpdf);
                 }
             }
         }

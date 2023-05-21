@@ -41,8 +41,7 @@ class ImageProvider: public QPDFObjectHandle::StreamDataProvider
     J_COLOR_SPACE j_color_space;
 };
 
-ImageProvider::ImageProvider(
-    std::string const& color_space, std::string const& filter) :
+ImageProvider::ImageProvider(std::string const& color_space, std::string const& filter) :
     width(400),
     stripe_height(80),
     color_space(color_space),
@@ -107,8 +106,7 @@ ImageProvider::provideStreamData(QPDFObjGen const&, Pipeline* pipeline)
         to_delete.push_back(p_new);
         p = p_new.get();
     } else if (filter == "/RunLengthDecode") {
-        p_new = std::make_shared<Pl_RunLength>(
-            "image encoder", pipeline, Pl_RunLength::a_encode);
+        p_new = std::make_shared<Pl_RunLength>("image encoder", pipeline, Pl_RunLength::a_encode);
         to_delete.push_back(p_new);
         p = p_new.get();
     }
@@ -184,8 +182,7 @@ add_page(
     image.replaceDict(image_dict);
 
     // Provide the stream data.
-    image.replaceStreamData(
-        provider, QPDFObjectHandle::parse(filter), QPDFObjectHandle::newNull());
+    image.replaceStreamData(provider, QPDFObjectHandle::parse(filter), QPDFObjectHandle::newNull());
 
     // Create direct objects as needed by the page dictionary.
     QPDFObjectHandle procset = "[/PDF /Text /ImageC]"_qpdf;
@@ -202,8 +199,7 @@ add_page(
     resources.replaceKey("/XObject", xobject);
 
     // Create the page content stream
-    QPDFObjectHandle contents =
-        createPageContents(pdf, color_space + " with filter " + filter);
+    QPDFObjectHandle contents = createPageContents(pdf, color_space + " with filter " + filter);
 
     // Create the page dictionary
     QPDFObjectHandle page = pdf.makeIndirectObject("<<"
@@ -256,8 +252,7 @@ check(
         }
 
         // Check filter and color space.
-        std::string desired_color_space =
-            color_spaces[(pageno - 1) / n_color_spaces];
+        std::string desired_color_space = color_spaces[(pageno - 1) / n_color_spaces];
         std::string desired_filter = filters[(pageno - 1) % n_filters];
         // In the default mode, QPDFWriter will compress with
         // /FlateDecode if no filters are provided.
@@ -271,16 +266,13 @@ check(
         bool this_errors = false;
         if (!filter.isNameAndEquals(desired_filter)) {
             this_errors = errors = true;
-            std::cout << "page " << pageno << ": expected filter "
-                      << desired_filter
+            std::cout << "page " << pageno << ": expected filter " << desired_filter
                       << "; actual filter = " << filter.unparse() << std::endl;
         }
         if (!color_space.isNameAndEquals(desired_color_space)) {
             this_errors = errors = true;
-            std::cout << "page " << pageno << ": expected color space "
-                      << desired_color_space
-                      << "; actual color space = " << color_space.unparse()
-                      << std::endl;
+            std::cout << "page " << pageno << ": expected color space " << desired_color_space
+                      << "; actual color space = " << color_space.unparse() << std::endl;
         }
 
         if (!this_errors) {
@@ -293,8 +285,7 @@ check(
             std::shared_ptr<Buffer> desired_data(b_p.getBuffer());
 
             if (desired_data->getSize() != actual_data->getSize()) {
-                std::cout << "page " << pageno << ": image data length mismatch"
-                          << std::endl;
+                std::cout << "page " << pageno << ": image data length mismatch" << std::endl;
                 this_errors = errors = true;
             } else {
                 // Compare bytes. For JPEG, allow a certain number of
@@ -308,8 +299,7 @@ check(
                 size_t len = actual_data->getSize();
                 unsigned int mismatches = 0;
                 int tolerance = (desired_filter == "/DCTDecode" ? 10 : 0);
-                size_t threshold =
-                    (desired_filter == "/DCTDecode" ? len / 40U : 0);
+                size_t threshold = (desired_filter == "/DCTDecode" ? len / 40U : 0);
                 for (size_t i = 0; i < len; ++i) {
                     int delta = actual_bytes[i] - desired_bytes[i];
                     if ((delta > tolerance) || (delta < -tolerance)) {
@@ -317,9 +307,8 @@ check(
                     }
                 }
                 if (mismatches > threshold) {
-                    std::cout << "page " << pageno << ": "
-                              << desired_color_space << ", " << desired_filter
-                              << ": mismatches: " << mismatches << " of " << len
+                    std::cout << "page " << pageno << ": " << desired_color_space << ", "
+                              << desired_filter << ": mismatches: " << mismatches << " of " << len
                               << std::endl;
                     this_errors = errors = true;
                 }

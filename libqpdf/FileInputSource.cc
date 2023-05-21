@@ -18,8 +18,7 @@ FileInputSource::FileInputSource(char const* filename) :
 {
 }
 
-FileInputSource::FileInputSource(
-    char const* description, FILE* filep, bool close_file) :
+FileInputSource::FileInputSource(char const* description, FILE* filep, bool close_file) :
     close_file(close_file),
     filename(description),
     file(filep)
@@ -104,8 +103,8 @@ FileInputSource::seek(qpdf_offset_t offset, int whence)
 {
     if (QUtil::seek(this->file, offset, whence) == -1) {
         QUtil::throw_system_error(
-            std::string("seek to ") + this->filename + ", offset " +
-            std::to_string(offset) + " (" + std::to_string(whence) + ")");
+            std::string("seek to ") + this->filename + ", offset " + std::to_string(offset) + " (" +
+            std::to_string(whence) + ")");
     }
 }
 

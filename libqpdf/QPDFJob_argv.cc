@@ -46,8 +46,7 @@ namespace
     };
 } // namespace
 
-ArgParser::ArgParser(
-    QPDFArgParser& ap, std::shared_ptr<QPDFJob::Config> c_main) :
+ArgParser::ArgParser(QPDFArgParser& ap, std::shared_ptr<QPDFJob::Config> c_main) :
     ap(ap),
     c_main(c_main),
     pages_password(nullptr),
@@ -107,8 +106,7 @@ ArgParser::argVersion()
     auto whoami = this->ap.getProgname();
     *QPDFLogger::defaultLogger()->getInfo()
         << whoami << " version " << QPDF::QPDFVersion() << "\n"
-        << "Run " << whoami
-        << " --copyright to see copyright and license information.\n";
+        << "Run " << whoami << " --copyright to see copyright and license information.\n";
 }
 
 void
@@ -152,8 +150,7 @@ ArgParser::argJsonHelp(std::string const& parameter)
     if ((version < 1) || (version > JSON::LATEST)) {
         usage(std::string("unsupported json version ") + parameter);
     }
-    *QPDFLogger::defaultLogger()->getInfo()
-        << QPDFJob::json_out_schema(version) << "\n";
+    *QPDFLogger::defaultLogger()->getInfo() << QPDFJob::json_out_schema(version) << "\n";
 }
 
 void
@@ -263,10 +260,7 @@ ArgParser::argPagesPositional(std::string const& arg)
     if (range_p == nullptr) {
         if (arg.empty()) {
             // The filename or password was the last argument
-            QTC::TC(
-                "qpdf",
-                "QPDFJob pages range omitted at end",
-                this->pages_password ? 0 : 1);
+            QTC::TC("qpdf", "QPDFJob pages range omitted at end", this->pages_password ? 0 : 1);
         } else {
             // We need to accumulate some more arguments
             return;

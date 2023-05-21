@@ -19,8 +19,7 @@ QPDFCryptoProvider::getImpl()
 {
     QPDFCryptoProvider& p = getInstance();
     if (p.m->default_provider.empty()) {
-        throw std::logic_error(
-            "QPDFCryptoProvider::getImpl called with no default provider.");
+        throw std::logic_error("QPDFCryptoProvider::getImpl called with no default provider.");
     }
     return p.getImpl_internal(p.m->default_provider);
 }
@@ -76,8 +75,7 @@ QPDFCryptoProvider::getImpl_internal(std::string const& name) const
     auto iter = m->providers.find(name);
     if (iter == m->providers.end()) {
         throw std::logic_error(
-            "QPDFCryptoProvider requested unknown implementation \"" + name +
-            "\"");
+            "QPDFCryptoProvider requested unknown implementation \"" + name + "\"");
     }
     return m->providers[name]();
 }

@@ -79,8 +79,7 @@ class QPDFMatrix
     // bounds the polygon resulting from transforming the four
     // corners.
     QPDF_DLL
-    QPDFObjectHandle::Rectangle
-    transformRectangle(QPDFObjectHandle::Rectangle r) const;
+    QPDFObjectHandle::Rectangle transformRectangle(QPDFObjectHandle::Rectangle r) const;
 
     // operator== tests for exact equality, not considering deltas for
     // floating point.

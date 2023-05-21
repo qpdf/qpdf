@@ -16,31 +16,21 @@ check(QPDFMatrix const& m, std::string const& exp)
 static void
 check_xy(double x, double y, std::string const& exp)
 {
-    std::string u =
-        (QUtil::double_to_string(x, 2) + " " + QUtil::double_to_string(y, 2));
+    std::string u = (QUtil::double_to_string(x, 2) + " " + QUtil::double_to_string(y, 2));
     if (u != exp) {
         std::cout << "got " << u << ", wanted " << exp << std::endl;
     }
 }
 
 static void
-check_rect(
-    QPDFObjectHandle::Rectangle const& r,
-    double llx,
-    double lly,
-    double urx,
-    double ury)
+check_rect(QPDFObjectHandle::Rectangle const& r, double llx, double lly, double urx, double ury)
 {
     std::string actual =
-        (QUtil::double_to_string(r.llx, 2) + " " +
-         QUtil::double_to_string(r.lly, 2) + " " +
-         QUtil::double_to_string(r.urx, 2) + " " +
-         QUtil::double_to_string(r.ury, 2));
+        (QUtil::double_to_string(r.llx, 2) + " " + QUtil::double_to_string(r.lly, 2) + " " +
+         QUtil::double_to_string(r.urx, 2) + " " + QUtil::double_to_string(r.ury, 2));
     std::string wanted =
-        (QUtil::double_to_string(llx, 2) + " " +
-         QUtil::double_to_string(lly, 2) + " " +
-         QUtil::double_to_string(urx, 2) + " " +
-         QUtil::double_to_string(ury, 2));
+        (QUtil::double_to_string(llx, 2) + " " + QUtil::double_to_string(lly, 2) + " " +
+         QUtil::double_to_string(urx, 2) + " " + QUtil::double_to_string(ury, 2));
     if (actual != wanted) {
         std::cout << "got " << actual << ", wanted " << wanted << std::endl;
     }
@@ -80,19 +70,13 @@ main()
     check_xy(xp, yp, "2582.5 4912");
 
     check(
-        QPDFMatrix(
-            QPDFObjectHandle::parse("[3 1 4 1 5 9.26535]").getArrayAsMatrix()),
+        QPDFMatrix(QPDFObjectHandle::parse("[3 1 4 1 5 9.26535]").getArrayAsMatrix()),
         "3 1 4 1 5 9.26535");
 
     m = QPDFMatrix();
     m.rotatex90(90);
     m.translate(200, -100);
-    check_rect(
-        m.transformRectangle(QPDFObjectHandle::Rectangle(10, 20, 30, 50)),
-        50,
-        210,
-        80,
-        230);
+    check_rect(m.transformRectangle(QPDFObjectHandle::Rectangle(10, 20, 30, 50)), 50, 210, 80, 230);
 
     std::cout << "matrix tests done" << std::endl;
     return 0;

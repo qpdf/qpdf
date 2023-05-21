@@ -78,9 +78,8 @@ namespace QIntC // QIntC = qpdf Integer Conversion
         {
             std::ostringstream msg;
             msg.imbue(std::locale::classic());
-            msg << "integer out of range converting " << i << " from a "
-                << sizeof(From) << "-byte unsigned type to a " << sizeof(To)
-                << "-byte unsigned type";
+            msg << "integer out of range converting " << i << " from a " << sizeof(From)
+                << "-byte unsigned type to a " << sizeof(To) << "-byte unsigned type";
             throw std::range_error(msg.str());
         }
     };
@@ -93,8 +92,7 @@ namespace QIntC // QIntC = qpdf Integer Conversion
         convert(From const& i)
         {
             // From and To are both signed.
-            if ((i < std::numeric_limits<To>::min()) ||
-                (i > std::numeric_limits<To>::max())) {
+            if ((i < std::numeric_limits<To>::min()) || (i > std::numeric_limits<To>::max())) {
                 error(i);
             }
             return static_cast<To>(i);
@@ -105,9 +103,8 @@ namespace QIntC // QIntC = qpdf Integer Conversion
         {
             std::ostringstream msg;
             msg.imbue(std::locale::classic());
-            msg << "integer out of range converting " << i << " from a "
-                << sizeof(From) << "-byte signed type to a " << sizeof(To)
-                << "-byte signed type";
+            msg << "integer out of range converting " << i << " from a " << sizeof(From)
+                << "-byte signed type to a " << sizeof(To) << "-byte signed type";
             throw std::range_error(msg.str());
         }
     };
@@ -134,9 +131,8 @@ namespace QIntC // QIntC = qpdf Integer Conversion
         {
             std::ostringstream msg;
             msg.imbue(std::locale::classic());
-            msg << "integer out of range converting " << i << " from a "
-                << sizeof(From) << "-byte signed type to a " << sizeof(To)
-                << "-byte unsigned type";
+            msg << "integer out of range converting " << i << " from a " << sizeof(From)
+                << "-byte signed type to a " << sizeof(To) << "-byte unsigned type";
             throw std::range_error(msg.str());
         }
     };
@@ -150,8 +146,7 @@ namespace QIntC // QIntC = qpdf Integer Conversion
         {
             // From is unsigned, and to is signed. Convert To's max to the
             // unsigned version of To and compare i against that.
-            auto maxval = static_cast<typename to_u<To>::type>(
-                std::numeric_limits<To>::max());
+            auto maxval = static_cast<typename to_u<To>::type>(std::numeric_limits<To>::max());
             if (i > maxval) {
                 error(i);
             }
@@ -163,9 +158,8 @@ namespace QIntC // QIntC = qpdf Integer Conversion
         {
             std::ostringstream msg;
             msg.imbue(std::locale::classic());
-            msg << "integer out of range converting " << i << " from a "
-                << sizeof(From) << "-byte unsigned type to a " << sizeof(To)
-                << "-byte signed type";
+            msg << "integer out of range converting " << i << " from a " << sizeof(From)
+                << "-byte unsigned type to a " << sizeof(To) << "-byte signed type";
             throw std::range_error(msg.str());
         }
     };
@@ -263,15 +257,12 @@ namespace QIntC // QIntC = qpdf Integer Conversion
         if ((delta > 0) && ((std::numeric_limits<T>::max() - cur) < delta)) {
             std::ostringstream msg;
             msg.imbue(std::locale::classic());
-            msg << "adding " << delta << " to " << cur
-                << " would cause an integer overflow";
+            msg << "adding " << delta << " to " << cur << " would cause an integer overflow";
             throw std::range_error(msg.str());
-        } else if (
-            (delta < 0) && ((std::numeric_limits<T>::min() - cur) > delta)) {
+        } else if ((delta < 0) && ((std::numeric_limits<T>::min() - cur) > delta)) {
             std::ostringstream msg;
             msg.imbue(std::locale::classic());
-            msg << "adding " << delta << " to " << cur
-                << " would cause an integer underflow";
+            msg << "adding " << delta << " to " << cur << " would cause an integer underflow";
             throw std::range_error(msg.str());
         }
     }
@@ -296,12 +287,10 @@ namespace QIntC // QIntC = qpdf Integer Conversion
             msg << "subtracting " << delta << " from " << cur
                 << " would cause an integer underflow";
             throw std::range_error(msg.str());
-        } else if (
-            (delta < 0) && ((std::numeric_limits<T>::max() + delta) < cur)) {
+        } else if ((delta < 0) && ((std::numeric_limits<T>::max() + delta) < cur)) {
             std::ostringstream msg;
             msg.imbue(std::locale::classic());
-            msg << "subtracting " << delta << " from " << cur
-                << " would cause an integer overflow";
+            msg << "subtracting " << delta << " from " << cur << " would cause an integer overflow";
             throw std::range_error(msg.str());
         }
     }

@@ -14,8 +14,8 @@ class SF_RunLengthDecode: public QPDFStreamFilter
     Pipeline*
     getDecodePipeline(Pipeline* next) override
     {
-        this->pipeline = std::make_shared<Pl_RunLength>(
-            "runlength decode", next, Pl_RunLength::a_decode);
+        this->pipeline =
+            std::make_shared<Pl_RunLength>("runlength decode", next, Pl_RunLength::a_decode);
         return this->pipeline.get();
     }
 

@@ -13,8 +13,7 @@ QPDFMatrix::QPDFMatrix() :
 {
 }
 
-QPDFMatrix::QPDFMatrix(
-    double a, double b, double c, double d, double e, double f) :
+QPDFMatrix::QPDFMatrix(double a, double b, double c, double d, double e, double f) :
     a(a),
     b(b),
     c(c),
@@ -136,6 +135,6 @@ bool
 QPDFMatrix::operator==(QPDFMatrix const& rhs) const
 {
     return (
-        (this->a == rhs.a) && (this->b == rhs.b) && (this->c == rhs.c) &&
-        (this->d == rhs.d) && (this->e == rhs.e) && (this->f == rhs.f));
+        (this->a == rhs.a) && (this->b == rhs.b) && (this->c == rhs.c) && (this->d == rhs.d) &&
+        (this->e == rhs.e) && (this->f == rhs.f));
 }

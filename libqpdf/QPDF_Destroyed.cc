@@ -17,23 +17,20 @@ QPDF_Destroyed::getInstance()
 std::shared_ptr<QPDFObject>
 QPDF_Destroyed::copy(bool shallow)
 {
-    throw std::logic_error(
-        "attempted to shallow copy QPDFObjectHandle from destroyed QPDF");
+    throw std::logic_error("attempted to shallow copy QPDFObjectHandle from destroyed QPDF");
     return nullptr;
 }
 
 std::string
 QPDF_Destroyed::unparse()
 {
-    throw std::logic_error(
-        "attempted to unparse a QPDFObjectHandle from a destroyed QPDF");
+    throw std::logic_error("attempted to unparse a QPDFObjectHandle from a destroyed QPDF");
     return "";
 }
 
 JSON
 QPDF_Destroyed::getJSON(int json_version)
 {
-    throw std::logic_error(
-        "attempted to get JSON from a QPDFObjectHandle from a destroyed QPDF");
+    throw std::logic_error("attempted to get JSON from a QPDFObjectHandle from a destroyed QPDF");
     return JSON::makeNull();
 }

@@ -132,8 +132,7 @@ SF_XORDecode::setDecodeParms(QPDFObjectHandle decode_parms)
         this->key = buf->getBuffer()[0];
         return true;
     } catch (std::exception& e) {
-        std::cerr << "Error extracting key for /XORDecode: " << e.what()
-                  << std::endl;
+        std::cerr << "Error extracting key for /XORDecode: " << e.what() << std::endl;
     }
     return false;
 }
@@ -203,8 +202,7 @@ class StreamReplacer: public QPDFObjectHandle::StreamDataProvider
     void provideStreamData(QPDFObjGen const& og, Pipeline* pipeline) override;
 
     void registerStream(
-        QPDFObjectHandle stream,
-        std::shared_ptr<QPDFObjectHandle::StreamDataProvider> self);
+        QPDFObjectHandle stream, std::shared_ptr<QPDFObjectHandle::StreamDataProvider> self);
 
   private:
     bool maybeReplace(
@@ -300,12 +298,10 @@ StreamReplacer::maybeReplace(
         // changes. For example, an image resampler might change the
         // dimensions or other properties of the image.
         dict_updates->replaceKey(
-            "/OrigLength",
-            QPDFObjectHandle::newInteger(QIntC::to_longlong(out->getSize())));
+            "/OrigLength", QPDFObjectHandle::newInteger(QIntC::to_longlong(out->getSize())));
         // We are also storing the "key" that we will access when
         // writing the data.
-        this->keys[og] = QIntC::to_uchar(
-            (og.getObj() * QIntC::to_int(out->getSize())) & 0xff);
+        this->keys[og] = QIntC::to_uchar((og.getObj() * QIntC::to_int(out->getSize())) & 0xff);
     }
 
     if (pipeline) {
@@ -319,8 +315,7 @@ StreamReplacer::maybeReplace(
 
 void
 StreamReplacer::registerStream(
-    QPDFObjectHandle stream,
-    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> self)
+    QPDFObjectHandle stream, std::shared_ptr<QPDFObjectHandle::StreamDataProvider> self)
 {
     QPDFObjGen og(stream.getObjGen());
 
@@ -344,8 +339,7 @@ StreamReplacer::registerStream(
     try {
         should_replace = maybeReplace(og, stream, nullptr, &dict_updates);
     } catch (std::exception& e) {
-        stream.warnIfPossible(
-            std::string("exception while attempting to replace: ") + e.what());
+        stream.warnIfPossible(std::string("exception while attempting to replace: ") + e.what());
     }
 
     if (should_replace) {
@@ -369,8 +363,7 @@ StreamReplacer::registerStream(
         // /XORDecode filter.
         QPDFObjectHandle decode_parms =
             QPDFObjectHandle::newDictionary({{"/KeyStream", dp_stream}});
-        stream.replaceStreamData(
-            self, QPDFObjectHandle::newName("/XORDecode"), decode_parms);
+        stream.replaceStreamData(self, QPDFObjectHandle::newName("/XORDecode"), decode_parms);
         // Further, if /ProtectXOR = true, we disable filtering on write
         // so that QPDFWriter will not decode the stream even though we
         // have registered a stream filter for /XORDecode.
@@ -393,14 +386,12 @@ StreamReplacer::provideStreamData(QPDFObjGen const& og, Pipeline* pipeline)
         // Since this only gets called for streams we already
         // determined we are replacing, a false return would indicate
         // a logic error.
-        throw std::logic_error(
-            "should_replace return false in provideStreamData");
+        throw std::logic_error("should_replace return false in provideStreamData");
     }
 }
 
 static void
-process(
-    char const* infilename, char const* outfilename, bool decode_specialized)
+process(char const* infilename, char const* outfilename, bool decode_specialized)
 {
     QPDF qpdf;
     qpdf.processFile(infilename);
@@ -434,8 +425,7 @@ static void
 usage()
 {
     std::cerr << "\n"
-              << "Usage: " << whoami
-              << " [--decode-specialized] infile outfile\n"
+              << "Usage: " << whoami << " [--decode-specialized] infile outfile\n"
               << std::endl;
     exit(2);
 }
@@ -468,8 +458,7 @@ main(int argc, char* argv[])
         // decode our streams. This is not a real filter, so no real
         // PDF reading application would be able to interpret it. This
         // is just for illustrative purposes.
-        QPDF::registerStreamFilter(
-            "/XORDecode", [] { return std::make_shared<SF_XORDecode>(); });
+        QPDF::registerStreamFilter("/XORDecode", [] { return std::make_shared<SF_XORDecode>(); });
         // Do the actual processing.
         process(infilename, outfilename, decode_specialized);
     } catch (std::exception& e) {

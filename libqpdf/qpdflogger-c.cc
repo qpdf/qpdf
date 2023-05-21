@@ -70,59 +70,40 @@ set_log_dest(
     void* udata)
 {
     set_log_dest(
-        l,
-        std::bind(std::mem_fn(method), l, std::placeholders::_1),
-        dest,
-        identifier,
-        fn,
-        udata);
+        l, std::bind(std::mem_fn(method), l, std::placeholders::_1), dest, identifier, fn, udata);
 }
 
 void
-qpdflogger_set_info(
-    qpdflogger_handle l, qpdf_log_dest_e dest, qpdf_log_fn_t fn, void* udata)
+qpdflogger_set_info(qpdflogger_handle l, qpdf_log_dest_e dest, qpdf_log_fn_t fn, void* udata)
 {
-    set_log_dest(
-        l->l.get(), &QPDFLogger::setInfo, dest, "info logger", fn, udata);
+    set_log_dest(l->l.get(), &QPDFLogger::setInfo, dest, "info logger", fn, udata);
 }
 
 void
-qpdflogger_set_warn(
-    qpdflogger_handle l, qpdf_log_dest_e dest, qpdf_log_fn_t fn, void* udata)
+qpdflogger_set_warn(qpdflogger_handle l, qpdf_log_dest_e dest, qpdf_log_fn_t fn, void* udata)
 {
-    set_log_dest(
-        l->l.get(), &QPDFLogger::setWarn, dest, "warn logger", fn, udata);
+    set_log_dest(l->l.get(), &QPDFLogger::setWarn, dest, "warn logger", fn, udata);
 }
 
 void
-qpdflogger_set_error(
-    qpdflogger_handle l, qpdf_log_dest_e dest, qpdf_log_fn_t fn, void* udata)
+qpdflogger_set_error(qpdflogger_handle l, qpdf_log_dest_e dest, qpdf_log_fn_t fn, void* udata)
 {
-    set_log_dest(
-        l->l.get(), &QPDFLogger::setError, dest, "error logger", fn, udata);
+    set_log_dest(l->l.get(), &QPDFLogger::setError, dest, "error logger", fn, udata);
 }
 
 void
 qpdflogger_set_save(
-    qpdflogger_handle l,
-    qpdf_log_dest_e dest,
-    qpdf_log_fn_t fn,
-    void* udata,
-    int only_if_not_set)
+    qpdflogger_handle l, qpdf_log_dest_e dest, qpdf_log_fn_t fn, void* udata, int only_if_not_set)
 {
     auto method = std::bind(
-        std::mem_fn(&QPDFLogger::setSave),
-        l->l.get(),
-        std::placeholders::_1,
-        only_if_not_set);
+        std::mem_fn(&QPDFLogger::setSave), l->l.get(), std::placeholders::_1, only_if_not_set);
     set_log_dest(l->l.get(), method, dest, "save logger", fn, udata);
 }
 
 void
 qpdflogger_save_to_standard_output(qpdflogger_handle l, int only_if_not_set)
 {
-    qpdflogger_set_save(
-        l, qpdf_log_dest_stdout, nullptr, nullptr, only_if_not_set);
+    qpdflogger_set_save(l, qpdf_log_dest_stdout, nullptr, nullptr, only_if_not_set);
 }
 
 int

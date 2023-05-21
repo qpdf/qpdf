@@ -47,8 +47,7 @@ QPDFCrypto_gnutls::MD5_init()
     if (code < 0) {
         this->hash_ctx = nullptr;
         throw std::runtime_error(
-            std::string("gnutls: MD5 error: ") +
-            std::string(gnutls_strerror(code)));
+            std::string("gnutls: MD5 error: ") + std::string(gnutls_strerror(code)));
     }
 }
 
@@ -78,26 +77,22 @@ QPDFCrypto_gnutls::RC4_init(unsigned char const* key_data, int key_len)
 {
     RC4_finalize();
     if (key_len == -1) {
-        key_len =
-            QIntC::to_int(strlen(reinterpret_cast<char const*>(key_data)));
+        key_len = QIntC::to_int(strlen(reinterpret_cast<char const*>(key_data)));
     }
     gnutls_datum_t key;
     key.data = const_cast<unsigned char*>(key_data);
     key.size = QIntC::to_uint(key_len);
 
-    int code = gnutls_cipher_init(
-        &this->cipher_ctx, GNUTLS_CIPHER_ARCFOUR_128, &key, nullptr);
+    int code = gnutls_cipher_init(&this->cipher_ctx, GNUTLS_CIPHER_ARCFOUR_128, &key, nullptr);
     if (code < 0) {
         this->cipher_ctx = nullptr;
         throw std::runtime_error(
-            std::string("gnutls: RC4 error: ") +
-            std::string(gnutls_strerror(code)));
+            std::string("gnutls: RC4 error: ") + std::string(gnutls_strerror(code)));
     }
 }
 
 void
-QPDFCrypto_gnutls::RC4_process(
-    unsigned char const* in_data, size_t len, unsigned char* out_data)
+QPDFCrypto_gnutls::RC4_process(unsigned char const* in_data, size_t len, unsigned char* out_data)
 {
     gnutls_cipher_encrypt2(this->cipher_ctx, in_data, len, out_data, len);
 }
@@ -223,29 +218,19 @@ QPDFCrypto_gnutls::rijndael_init(
     if (code < 0) {
         this->cipher_ctx = nullptr;
         throw std::runtime_error(
-            std::string("gnutls: AES error: ") +
-            std::string(gnutls_strerror(code)));
+            std::string("gnutls: AES error: ") + std::string(gnutls_strerror(code)));
     }
 }
 
 void
-QPDFCrypto_gnutls::rijndael_process(
-    unsigned char* in_data, unsigned char* out_data)
+QPDFCrypto_gnutls::rijndael_process(unsigned char* in_data, unsigned char* out_data)
 {
     if (this->encrypt) {
         gnutls_cipher_encrypt2(
-            this->cipher_ctx,
-            in_data,
-            rijndael_buf_size,
-            out_data,
-            rijndael_buf_size);
+            this->cipher_ctx, in_data, rijndael_buf_size, out_data, rijndael_buf_size);
     } else {
         gnutls_cipher_decrypt2(
-            this->cipher_ctx,
-            in_data,
-            rijndael_buf_size,
-            out_data,
-            rijndael_buf_size);
+            this->cipher_ctx, in_data, rijndael_buf_size, out_data, rijndael_buf_size);
     }
 
     // Gnutls doesn't support AES in ECB (non-CBC) mode, but the
@@ -253,14 +238,8 @@ QPDFCrypto_gnutls::rijndael_process(
     // zeroes each time. We jump through a few hoops here to make this
     // work.
     if (!this->cbc_mode) {
-        static unsigned char zeroes[16] = {
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        rijndael_init(
-            this->encrypt,
-            this->aes_key_data,
-            this->aes_key_len,
-            false,
-            zeroes);
+        static unsigned char zeroes[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        rijndael_init(this->encrypt, this->aes_key_data, this->aes_key_len, false, zeroes);
     }
 }
 

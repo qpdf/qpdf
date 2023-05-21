@@ -658,8 +658,7 @@ QPDFJob::Config::passwordFile(std::string const& parameter)
 
         if (lines.size() > 1) {
             *QPDFLogger::defaultLogger()->getError()
-                << this->o.m->message_prefix
-                << ": WARNING: all but the first line of"
+                << this->o.m->message_prefix << ": WARNING: all but the first line of"
                 << " the password file are ignored\n";
         }
     }
@@ -751,8 +750,7 @@ QPDFJob::Config::removeUnreferencedResources(std::string const& parameter)
 QPDFJob::Config*
 QPDFJob::Config::showObject(std::string const& parameter)
 {
-    QPDFJob::parse_object_id(
-        parameter, o.m->show_trailer, o.m->show_obj, o.m->show_gen);
+    QPDFJob::parse_object_id(parameter, o.m->show_trailer, o.m->show_obj, o.m->show_gen);
     o.m->require_outfile = false;
     return this;
 }
@@ -761,13 +759,11 @@ QPDFJob::Config*
 QPDFJob::Config::jobJsonFile(std::string const& parameter)
 {
     try {
-        o.initializeFromJson(
-            QUtil::read_file_into_string(parameter.c_str()), true);
+        o.initializeFromJson(QUtil::read_file_into_string(parameter.c_str()), true);
     } catch (std::exception& e) {
         throw std::runtime_error(
-            "error with job-json file " + std::string(parameter) + ": " +
-            e.what() + "\nRun " + this->o.m->message_prefix +
-            " --job-json-help for information on the file format.");
+            "error with job-json file " + std::string(parameter) + ": " + e.what() + "\nRun " +
+            this->o.m->message_prefix + " --job-json-help for information on the file format.");
     }
     return this;
 }
@@ -900,8 +896,7 @@ QPDFJob::AttConfig::replace()
 QPDFJob::Config*
 QPDFJob::AttConfig::endAddAttachment()
 {
-    static std::string now =
-        QUtil::qpdf_time_to_pdf_time(QUtil::get_current_qpdf_time());
+    static std::string now = QUtil::qpdf_time_to_pdf_time(QUtil::get_current_qpdf_time());
     if (this->att.path.empty()) {
         usage("add attachment: no file specified");
     }
@@ -953,8 +948,7 @@ QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::pageSpec(
     std::string const& filename, std::string const& range, char const* password)
 {
-    this->config->o.m->page_specs.push_back(
-        QPDFJob::PageSpec(filename, password, range));
+    this->config->o.m->page_specs.push_back(QPDFJob::PageSpec(filename, password, range));
     return this;
 }
 
@@ -1035,9 +1029,7 @@ QPDFJob::UOConfig::password(std::string const& parameter)
 
 std::shared_ptr<QPDFJob::EncConfig>
 QPDFJob::Config::encrypt(
-    int keylen,
-    std::string const& user_password,
-    std::string const& owner_password)
+    int keylen, std::string const& user_password, std::string const& owner_password)
 {
     o.m->keylen = keylen;
     if (keylen == 256) {

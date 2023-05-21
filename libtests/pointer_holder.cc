@@ -185,8 +185,7 @@ ph_sp_compat()
     PointerHolder<Object> arr1_ph;
     {
         std::cout << "initialize ph array from shared_ptr" << std::endl;
-        std::shared_ptr<Object> arr1(
-            new Object[2], std::default_delete<Object[]>());
+        std::shared_ptr<Object> arr1(new Object[2], std::default_delete<Object[]>());
         arr1_ph = arr1;
     }
     std::cout << "delete ph array" << std::endl;

@@ -103,9 +103,7 @@ QdfFixer::processLines(std::string const& input)
     static const std::regex re_num("^\\d+\n$");
     static const std::regex re_size_n("^  /Size \\d+\n$");
 
-    auto sv_diff = [](size_t i) {
-        return static_cast<std::string_view::difference_type>(i);
-    };
+    auto sv_diff = [](size_t i) { return static_cast<std::string_view::difference_type>(i); };
 
     lineno = 0;
     bool more = true;
@@ -170,8 +168,7 @@ QdfFixer::processLines(std::string const& input)
                 // there are no object streams.
                 int max_objects = 1;
                 for (auto const& e: xref) {
-                    if ((e.getType() == 2) &&
-                        (e.getObjStreamIndex() > max_objects)) {
+                    if ((e.getType() == 2) && (e.getObjStreamIndex() > max_objects)) {
                         max_objects = e.getObjStreamIndex();
                     }
                 }
@@ -183,8 +180,7 @@ QdfFixer::processLines(std::string const& input)
                 xref_size = 1 + xref.size();
                 auto length = xref_size * esize;
                 std::cout << "  /Length " << length << "\n"
-                          << "  /W [ 1 " << xref_f1_nbytes << " "
-                          << xref_f2_nbytes << " ]"
+                          << "  /W [ 1 " << xref_f1_nbytes << " " << xref_f2_nbytes << " ]"
                           << "\n";
                 state = st_in_xref_stream_dict;
             }
@@ -224,8 +220,7 @@ QdfFixer::processLines(std::string const& input)
                 state = st_in_obj;
             }
         } else if (state == st_in_xref_stream_dict) {
-            if ((line.find("/Length"sv) != line.npos) ||
-                (line.find("/W"sv) != line.npos)) {
+            if ((line.find("/Length"sv) != line.npos) || (line.find("/W"sv) != line.npos)) {
                 // already printed
             } else if (line.find("/Size"sv) != line.npos) {
                 auto xref_size = 1 + xref.size();
@@ -274,9 +269,7 @@ QdfFixer::processLines(std::string const& input)
             std::cout << line;
         } else if (state == st_in_length) {
             if (!matches(re_num)) {
-                fatal(
-                    filename + ":" + std::to_string(lineno) +
-                    ": expected integer");
+                fatal(filename + ":" + std::to_string(lineno) + ": expected integer");
             }
             std::string new_length = std::to_string(stream_length) + "\n";
             offset -= QIntC::to_offset(line.length());
@@ -287,8 +280,7 @@ QdfFixer::processLines(std::string const& input)
             auto n = xref.size();
             std::cout << "0 " << 1 + n << "\n0000000000 65535 f \n";
             for (auto const& e: xref) {
-                std::cout << QUtil::int_to_string(e.getOffset(), 10)
-                          << " 00000 n \n";
+                std::cout << QUtil::int_to_string(e.getOffset(), 10) << " 00000 n \n";
             }
             state = st_before_trailer;
         } else if (state == st_before_trailer) {
@@ -376,8 +368,7 @@ void
 QdfFixer::writeBinary(unsigned long long val, size_t bytes)
 {
     if (bytes > sizeof(unsigned long long)) {
-        throw std::logic_error(
-            "fix-qdf::writeBinary called with too many bytes");
+        throw std::logic_error("fix-qdf::writeBinary called with too many bytes");
     }
     std::string data(bytes, '\0');
     for (auto i = bytes; i > 0; --i) {
@@ -396,8 +387,7 @@ realmain(int argc, char* argv[])
     if (argc > 2) {
         usage();
     } else if ((argc > 1) && (strcmp(argv[1], "--version") == 0)) {
-        std::cout << whoami << " from qpdf version " << QPDF::QPDFVersion()
-                  << std::endl;
+        std::cout << whoami << " from qpdf version " << QPDF::QPDFVersion() << std::endl;
         return 0;
     } else if ((argc > 1) && (strcmp(argv[1], "--help") == 0)) {
         usage();

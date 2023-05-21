@@ -33,8 +33,7 @@ modify_file(qpdf_data qpdf)
     qpdf_oh_remove_key(qpdf, root, "/OpenAction");
     /* 0 is never a valid qpdf_oh */
     qpdf_oh pagemode = 0;
-    if (qpdf_oh_is_dictionary(
-            qpdf, qpdf_oh_get_key(qpdf, root, "/PageLabels"))) {
+    if (qpdf_oh_is_dictionary(qpdf, qpdf_oh_get_key(qpdf, root, "/PageLabels"))) {
         pagemode = qpdf_oh_new_name(qpdf, "/UseOutlines");
     } else {
         pagemode = qpdf_oh_new_null(qpdf);
@@ -71,8 +70,7 @@ main(int argc, char* argv[])
     password = argv[2];
     outfile = argv[3];
 
-    if (((qpdf_read(qpdf, infile, password) & QPDF_ERRORS) == 0) &&
-        modify_file(qpdf) &&
+    if (((qpdf_read(qpdf, infile, password) & QPDF_ERRORS) == 0) && modify_file(qpdf) &&
         ((qpdf_init_write(qpdf, outfile) & QPDF_ERRORS) == 0)) {
         /* Use static ID for testing only. For production, a
          * non-static ID is used. See also
@@ -82,15 +80,11 @@ main(int argc, char* argv[])
     }
     while (qpdf_more_warnings(qpdf)) {
         warnings = 1;
-        printf(
-            "warning: %s\n",
-            qpdf_get_error_full_text(qpdf, qpdf_next_warning(qpdf)));
+        printf("warning: %s\n", qpdf_get_error_full_text(qpdf, qpdf_next_warning(qpdf)));
     }
     if (qpdf_has_error(qpdf)) {
         errors = 1;
-        printf(
-            "error: %s\n",
-            qpdf_get_error_full_text(qpdf, qpdf_get_error(qpdf)));
+        printf("error: %s\n", qpdf_get_error_full_text(qpdf, qpdf_get_error(qpdf)));
     }
     qpdf_cleanup(&qpdf);
     if (errors) {

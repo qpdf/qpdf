@@ -69,9 +69,8 @@ QPDF::getAllPages()
             // catalog points to the first page. Try to work around
             // this and similar cases with this heuristic.
             if (!warned) {
-                getRoot().warnIfPossible(
-                    "document page tree root (root -> /Pages) doesn't point"
-                    " to the root of the page tree; attempting to correct");
+                getRoot().warnIfPossible("document page tree root (root -> /Pages) doesn't point"
+                                         " to the root of the page tree; attempting to correct");
                 warned = true;
             }
             changed_pages = true;
@@ -102,8 +101,7 @@ QPDF::getAllPagesInternal(
             "Loop detected in /Pages structure (getAllPages)");
     }
     if (!cur_node.isDictionaryOfType("/Pages")) {
-        cur_node.warnIfPossible(
-            "/Type key should be /Pages but is not; overriding");
+        cur_node.warnIfPossible("/Type key should be /Pages but is not; overriding");
         cur_node.replaceKey("/Type", "/Pages"_qpdf);
     }
     auto kids = cur_node.getKey("/Kids");
@@ -116,8 +114,7 @@ QPDF::getAllPagesInternal(
             if (!kid.isIndirect()) {
                 QTC::TC("qpdf", "QPDF handle direct page object");
                 cur_node.warnIfPossible(
-                    "kid " + std::to_string(i) +
-                    " (from 0) is direct; converting to indirect");
+                    "kid " + std::to_string(i) + " (from 0) is direct; converting to indirect");
                 kid = makeIndirectObject(kid);
                 kids.setArrayItem(i, kid);
             } else if (!seen.add(kid)) {
@@ -133,8 +130,7 @@ QPDF::getAllPagesInternal(
                 kids.setArrayItem(i, kid);
             }
             if (!kid.isDictionaryOfType("/Page")) {
-                kid.warnIfPossible(
-                    "/Type key should be /Page but is not; overriding");
+                kid.warnIfPossible("/Type key should be /Page but is not; overriding");
                 kid.replaceKey("/Type", "/Page"_qpdf);
             }
             m->all_pages.push_back(kid);
@@ -190,16 +186,14 @@ QPDF::flattenPagesTree()
 }
 
 void
-QPDF::insertPageobjToPage(
-    QPDFObjectHandle const& obj, int pos, bool check_duplicate)
+QPDF::insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_duplicate)
 {
     QPDFObjGen og(obj.getObjGen());
     if (check_duplicate) {
         if (!m->pageobj_to_pages_pos.insert(std::make_pair(og, pos)).second) {
             // The library never calls insertPageobjToPage in a way
             // that causes this to happen.
-            setLastObjectDescription(
-                "page " + std::to_string(pos) + " (numbered from zero)", og);
+            setLastObjectDescription("page " + std::to_string(pos) + " (numbered from zero)", og);
             throw QPDFExc(
                 qpdf_e_pages,
                 m->file->getName(),
@@ -233,8 +227,7 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
     }
 
     if ((pos < 0) || (toS(pos) > m->all_pages.size())) {
-        throw std::runtime_error(
-            "QPDF::insertPage called with pos out of range");
+        throw std::runtime_error("QPDF::insertPage called with pos out of range");
     }
 
     QTC::TC(
@@ -306,9 +299,7 @@ QPDF::addPage(QPDFObjectHandle newpage, bool first)
     if (first) {
         insertPage(newpage, 0);
     } else {
-        insertPage(
-            newpage,
-            getRoot().getKey("/Pages").getKey("/Count").getIntValueAsInt());
+        insertPage(newpage, getRoot().getKey("/Pages").getKey("/Count").getIntValueAsInt());
     }
 }
 

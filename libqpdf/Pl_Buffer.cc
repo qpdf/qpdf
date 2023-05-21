@@ -64,8 +64,7 @@ void
 Pl_Buffer::getMallocBuffer(unsigned char** buf, size_t* len)
 {
     if (!m->ready) {
-        throw std::logic_error(
-            "Pl_Buffer::getMallocBuffer() called when not ready");
+        throw std::logic_error("Pl_Buffer::getMallocBuffer() called when not ready");
     }
     auto size = m->data.length();
     *len = size;

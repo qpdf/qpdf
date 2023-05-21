@@ -22,8 +22,7 @@ void
 usage()
 {
     std::cerr << "Usage: " << whoami << " infile outfile" << std::endl
-              << "Applies token filters to infile and writes outfile"
-              << std::endl;
+              << "Applies token filters to infile and writes outfile" << std::endl;
     exit(2);
 }
 
@@ -82,17 +81,13 @@ class ColorToGray: public QPDFObjectHandle::TokenFilter
 bool
 ColorToGray::isNumeric(QPDFTokenizer::token_type_e token_type)
 {
-    return (
-        (token_type == QPDFTokenizer::tt_integer) ||
-        (token_type == QPDFTokenizer::tt_real));
+    return ((token_type == QPDFTokenizer::tt_integer) || (token_type == QPDFTokenizer::tt_real));
 }
 
 bool
 ColorToGray::isIgnorable(QPDFTokenizer::token_type_e token_type)
 {
-    return (
-        (token_type == QPDFTokenizer::tt_space) ||
-        (token_type == QPDFTokenizer::tt_comment));
+    return ((token_type == QPDFTokenizer::tt_space) || (token_type == QPDFTokenizer::tt_comment));
 }
 
 double
@@ -128,8 +123,7 @@ ColorToGray::handleToken(QPDFTokenizer::Token const& token)
     // kinds of operands, replace the command. Flush any additional
     // accumulated tokens to keep the stack only four tokens deep.
 
-    while ((!this->all_stack.empty()) &&
-           isIgnorable(this->all_stack.at(0).getType())) {
+    while ((!this->all_stack.empty()) && isIgnorable(this->all_stack.at(0).getType())) {
         writeToken(this->all_stack.at(0));
         this->all_stack.pop_front();
     }
@@ -138,8 +132,7 @@ ColorToGray::handleToken(QPDFTokenizer::Token const& token)
     if (!isIgnorable(token_type)) {
         this->stack.push_back(token);
         if ((this->stack.size() == 4) && token.isWord("rg") &&
-            (isNumeric(this->stack.at(0).getType())) &&
-            (isNumeric(this->stack.at(1).getType())) &&
+            (isNumeric(this->stack.at(0).getType())) && (isNumeric(this->stack.at(1).getType())) &&
             (isNumeric(this->stack.at(2).getType()))) {
             double r = numericValue(this->stack.at(0));
             double g = numericValue(this->stack.at(1));
@@ -195,11 +188,9 @@ main(int argc, char* argv[])
             // applied. See comments on the filters for additional
             // details.
             page.addContentTokenFilter(
-                std::shared_ptr<QPDFObjectHandle::TokenFilter>(
-                    new StringReverser));
+                std::shared_ptr<QPDFObjectHandle::TokenFilter>(new StringReverser));
             page.addContentTokenFilter(
-                std::shared_ptr<QPDFObjectHandle::TokenFilter>(
-                    new ColorToGray));
+                std::shared_ptr<QPDFObjectHandle::TokenFilter>(new ColorToGray));
         }
 
         QPDFWriter w(pdf, outfilename);

@@ -30,8 +30,7 @@ Pl_StdioFile::write(unsigned char const* buf, size_t len)
     while (len > 0) {
         so_far = fwrite(buf, 1, len, m->file);
         if (so_far == 0) {
-            QUtil::throw_system_error(
-                this->identifier + ": Pl_StdioFile::write");
+            QUtil::throw_system_error(this->identifier + ": Pl_StdioFile::write");
         } else {
             buf += so_far;
             len -= so_far;
@@ -43,7 +42,6 @@ void
 Pl_StdioFile::finish()
 {
     if ((fflush(m->file) == -1) && (errno == EBADF)) {
-        throw std::logic_error(
-            this->identifier + ": Pl_StdioFile::finish: stream already closed");
+        throw std::logic_error(this->identifier + ": Pl_StdioFile::finish: stream already closed");
     }
 }

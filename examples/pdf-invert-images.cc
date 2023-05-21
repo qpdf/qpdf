@@ -14,8 +14,7 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " infile.pdf outfile.pdf [in-password]"
-              << std::endl
+    std::cerr << "Usage: " << whoami << " infile.pdf outfile.pdf [in-password]" << std::endl
               << "Invert some images in infile.pdf;"
               << " write output to outfile.pdf" << std::endl;
     exit(2);
@@ -37,8 +36,7 @@ class ImageInverter: public QPDFObjectHandle::StreamDataProvider
     void provideStreamData(QPDFObjGen const& og, Pipeline* pipeline) override;
 
     void registerImage(
-        QPDFObjectHandle image,
-        std::shared_ptr<QPDFObjectHandle::StreamDataProvider> self);
+        QPDFObjectHandle image, std::shared_ptr<QPDFObjectHandle::StreamDataProvider> self);
 
   private:
     std::map<QPDFObjGen, QPDFObjectHandle> copied_images;
@@ -46,8 +44,7 @@ class ImageInverter: public QPDFObjectHandle::StreamDataProvider
 
 void
 ImageInverter::registerImage(
-    QPDFObjectHandle image,
-    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> self)
+    QPDFObjectHandle image, std::shared_ptr<QPDFObjectHandle::StreamDataProvider> self)
 {
     // replaceStreamData requires a pointer holder to the stream data
     // provider, but there's no way for us to generate one ourselves,
@@ -76,8 +73,7 @@ ImageInverter::registerImage(
     // filterable in the input QPDF object, so we don't have to deal
     // with it explicitly here. We could explicitly use /DCTDecode and
     // write through a DCT filter if we wanted.
-    image.replaceStreamData(
-        self, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+    image.replaceStreamData(self, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
 }
 
 void
@@ -86,8 +82,7 @@ ImageInverter::provideStreamData(QPDFObjGen const& og, Pipeline* pipeline)
     // Use the object and generation number supplied to look up the
     // image data.  Then invert the image data and write the inverted
     // data to the pipeline.
-    std::shared_ptr<Buffer> data =
-        this->copied_images[og].getStreamData(qpdf_dl_all);
+    std::shared_ptr<Buffer> data = this->copied_images[og].getStreamData(qpdf_dl_all);
     size_t size = data->getSize();
     unsigned char* buf = data->getBuffer();
     unsigned char ch;
@@ -133,18 +128,15 @@ main(int argc, char* argv[])
                 QPDFObjectHandle& image = iter.second;
                 QPDFObjectHandle image_dict = image.getDict();
                 QPDFObjectHandle color_space = image_dict.getKey("/ColorSpace");
-                QPDFObjectHandle bits_per_component =
-                    image_dict.getKey("/BitsPerComponent");
+                QPDFObjectHandle bits_per_component = image_dict.getKey("/BitsPerComponent");
 
                 // For our example, we can only work with images 8-bit
                 // grayscale images that we can fully decode.  Use
                 // pipeStreamData with a null pipeline to determine
                 // whether the image is filterable.  Directly inspect
                 // keys to determine the image type.
-                if (image.pipeStreamData(
-                        nullptr, qpdf_ef_compress, qpdf_dl_all) &&
-                    color_space.isNameAndEquals("/DeviceGray") &&
-                    bits_per_component.isInteger() &&
+                if (image.pipeStreamData(nullptr, qpdf_ef_compress, qpdf_dl_all) &&
+                    color_space.isNameAndEquals("/DeviceGray") && bits_per_component.isInteger() &&
                     (bits_per_component.getIntValue() == 8)) {
                     inv->registerImage(image, p);
                 }
@@ -159,11 +151,9 @@ main(int argc, char* argv[])
             w.setStaticID(true); // for testing only
         }
         w.write();
-        std::cout << whoami << ": new file written to " << outfilename
-                  << std::endl;
+        std::cout << whoami << ": new file written to " << outfilename << std::endl;
     } catch (std::exception& e) {
-        std::cerr << whoami << " processing file " << infilename << ": "
-                  << e.what() << std::endl;
+        std::cerr << whoami << " processing file " << infilename << ": " << e.what() << std::endl;
         exit(2);
     }
 

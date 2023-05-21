@@ -41,14 +41,12 @@ QPDFNameTreeObjectHelper::~QPDFNameTreeObjectHelper()
     // #745.
 }
 
-QPDFNameTreeObjectHelper::Members::Members(
-    QPDFObjectHandle& oh, QPDF& q, bool auto_repair) :
+QPDFNameTreeObjectHelper::Members::Members(QPDFObjectHandle& oh, QPDF& q, bool auto_repair) :
     impl(std::make_shared<NNTreeImpl>(name_tree_details, q, oh, auto_repair))
 {
 }
 
-QPDFNameTreeObjectHelper::QPDFNameTreeObjectHelper(
-    QPDFObjectHandle oh, QPDF& q, bool auto_repair) :
+QPDFNameTreeObjectHelper::QPDFNameTreeObjectHelper(QPDFObjectHandle oh, QPDF& q, bool auto_repair) :
     QPDFObjectHelper(oh),
     m(new Members(oh, q, auto_repair))
 {
@@ -61,8 +59,7 @@ QPDFNameTreeObjectHelper::newEmpty(QPDF& qpdf, bool auto_repair)
         qpdf.makeIndirectObject("<< /Names [] >>"_qpdf), qpdf, auto_repair);
 }
 
-QPDFNameTreeObjectHelper::iterator::iterator(
-    std::shared_ptr<NNTreeIterator> const& i) :
+QPDFNameTreeObjectHelper::iterator::iterator(std::shared_ptr<NNTreeIterator> const& i) :
     impl(i)
 {
 }
@@ -123,8 +120,7 @@ QPDFNameTreeObjectHelper::iterator::operator==(iterator const& other) const
 }
 
 void
-QPDFNameTreeObjectHelper::iterator::insertAfter(
-    std::string const& key, QPDFObjectHandle value)
+QPDFNameTreeObjectHelper::iterator::insertAfter(std::string const& key, QPDFObjectHandle value)
 {
     impl->insertAfter(QPDFObjectHandle::newUnicodeString(key), value);
     updateIValue();
@@ -156,11 +152,9 @@ QPDFNameTreeObjectHelper::last() const
 }
 
 QPDFNameTreeObjectHelper::iterator
-QPDFNameTreeObjectHelper::find(
-    std::string const& key, bool return_prev_if_not_found)
+QPDFNameTreeObjectHelper::find(std::string const& key, bool return_prev_if_not_found)
 {
-    auto i = m->impl->find(
-        QPDFObjectHandle::newUnicodeString(key), return_prev_if_not_found);
+    auto i = m->impl->find(QPDFObjectHandle::newUnicodeString(key), return_prev_if_not_found);
     return iterator(std::make_shared<NNTreeIterator>(i));
 }
 
@@ -172,8 +166,7 @@ QPDFNameTreeObjectHelper::insert(std::string const& key, QPDFObjectHandle value)
 }
 
 bool
-QPDFNameTreeObjectHelper::remove(
-    std::string const& key, QPDFObjectHandle* value)
+QPDFNameTreeObjectHelper::remove(std::string const& key, QPDFObjectHandle* value)
 {
     return m->impl->remove(QPDFObjectHandle::newUnicodeString(key), value);
 }
@@ -186,8 +179,7 @@ QPDFNameTreeObjectHelper::hasName(std::string const& name)
 }
 
 bool
-QPDFNameTreeObjectHelper::findObject(
-    std::string const& name, QPDFObjectHandle& oh)
+QPDFNameTreeObjectHelper::findObject(std::string const& name, QPDFObjectHandle& oh)
 {
     auto i = find(name);
     if (i == end()) {

@@ -117,8 +117,7 @@ Pl_AES_PDF::finish()
                 throw std::logic_error("buffer overflow in AES encryption"
                                        " pipeline");
             }
-            std::memset(
-                this->inbuf + this->offset, 0, this->buf_size - this->offset);
+            std::memset(this->inbuf + this->offset, 0, this->buf_size - this->offset);
             this->offset = this->buf_size;
         }
         flush(!this->disable_padding);
@@ -149,8 +148,7 @@ void
 Pl_AES_PDF::flush(bool strip_padding)
 {
     if (this->offset != this->buf_size) {
-        throw std::logic_error(
-            "AES pipeline: flush called when buffer was not full");
+        throw std::logic_error("AES pipeline: flush called when buffer was not full");
     }
 
     if (first) {
@@ -177,11 +175,7 @@ Pl_AES_PDF::flush(bool strip_padding)
             }
         }
         this->crypto->rijndael_init(
-            encrypt,
-            this->key.get(),
-            key_bytes,
-            this->cbc_mode,
-            this->cbc_block);
+            encrypt, this->key.get(), key_bytes, this->cbc_mode, this->cbc_block);
         if (return_after_init) {
             return;
         }

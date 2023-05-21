@@ -45,8 +45,7 @@ class QPDF_DLL_CLASS QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     // The qpdf object is required so that this class can issue
     // warnings, attempt repairs, and add indirect objects.
     QPDF_DLL
-    QPDFNumberTreeObjectHelper(
-        QPDFObjectHandle, QPDF&, bool auto_repair = true);
+    QPDFNumberTreeObjectHelper(QPDFObjectHandle, QPDF&, bool auto_repair = true);
 
     QPDF_DLL
     virtual ~QPDFNumberTreeObjectHelper();
@@ -82,8 +81,7 @@ class QPDF_DLL_CLASS QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     // oh to the value with index 3, and set offset to 2 (5 - 3). See
     // also find().
     QPDF_DLL
-    bool findObjectAtOrBelow(
-        numtree_number idx, QPDFObjectHandle& oh, numtree_number& offset);
+    bool findObjectAtOrBelow(numtree_number idx, QPDFObjectHandle& oh, numtree_number& offset);
 
     class QPDF_DLL_PRIVATE iterator
     {

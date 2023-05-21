@@ -76,22 +76,13 @@ extern "C" {
 
     QPDF_DLL
     void qpdflogger_set_info(
-        qpdflogger_handle l,
-        enum qpdf_log_dest_e dest,
-        qpdf_log_fn_t fn,
-        void* udata);
+        qpdflogger_handle l, enum qpdf_log_dest_e dest, qpdf_log_fn_t fn, void* udata);
     QPDF_DLL
     void qpdflogger_set_warn(
-        qpdflogger_handle l,
-        enum qpdf_log_dest_e dest,
-        qpdf_log_fn_t fn,
-        void* udata);
+        qpdflogger_handle l, enum qpdf_log_dest_e dest, qpdf_log_fn_t fn, void* udata);
     QPDF_DLL
     void qpdflogger_set_error(
-        qpdflogger_handle l,
-        enum qpdf_log_dest_e dest,
-        qpdf_log_fn_t fn,
-        void* udata);
+        qpdflogger_handle l, enum qpdf_log_dest_e dest, qpdf_log_fn_t fn, void* udata);
 
     /* A non-zero value for only_if_not_set means that the save
      * pipeline will only be changed if it is not already set.
@@ -104,8 +95,7 @@ extern "C" {
         void* udata,
         int only_if_not_set);
     QPDF_DLL
-    void qpdflogger_save_to_standard_output(
-        qpdflogger_handle l, int only_if_not_set);
+    void qpdflogger_save_to_standard_output(qpdflogger_handle l, int only_if_not_set);
 
     /* For testing */
     QPDF_DLL

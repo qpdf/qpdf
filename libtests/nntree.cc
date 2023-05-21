@@ -20,15 +20,12 @@ report(QPDF& q, QPDFObjectHandle oh, long long item, long long exp_item)
     auto show = [&failed, &oh, &item]() {
         if (!failed) {
             failed = true;
-            std::cout << "key = " << item << ", oh = " << oh.unparseResolved()
-                      << std::endl;
+            std::cout << "key = " << item << ", oh = " << oh.unparseResolved() << std::endl;
         }
     };
 
     auto mk_wanted = [](long long i) {
-        return (
-            (i == -1) ? "end"
-                      : (std::to_string(i) + "/(-" + std::to_string(i) + "-)"));
+        return ((i == -1) ? "end" : (std::to_string(i) + "/(-" + std::to_string(i) + "-)"));
     };
     std::string i1_wanted = mk_wanted(exp_item);
     std::string i2_wanted = mk_wanted(item == exp_item ? item : -1);
@@ -40,13 +37,11 @@ report(QPDF& q, QPDFObjectHandle oh, long long item, long long exp_item)
 
     if (i1_wanted != i1_actual) {
         show();
-        std::cout << "i1: wanted " << i1_wanted << ", got " << i1_actual
-                  << std::endl;
+        std::cout << "i1: wanted " << i1_wanted << ", got " << i1_actual << std::endl;
     }
     if (i2_wanted != i2_actual) {
         show();
-        std::cout << "i2: wanted " << i2_wanted << ", got " << i2_actual
-                  << std::endl;
+        std::cout << "i2: wanted " << i2_wanted << ", got " << i2_actual << std::endl;
     }
 
     return failed;
@@ -62,8 +57,7 @@ test_bsearch()
         auto nums = QPDFObjectHandle::newArray();
         for (auto i: v) {
             nums.appendItem(QPDFObjectHandle::newInteger(i));
-            nums.appendItem(
-                QPDFObjectHandle::newString("-" + std::to_string(i) + "-"));
+            nums.appendItem(QPDFObjectHandle::newString("-" + std::to_string(i) + "-"));
         }
         auto limits = QPDFObjectHandle::newArray();
         limits.appendItem(QPDFObjectHandle::newInteger(v.at(0)));
@@ -125,10 +119,7 @@ new_node(QPDF& q, std::string const& key)
 }
 
 static void
-check_find(
-    QPDFNameTreeObjectHelper& nh,
-    std::string const& key,
-    bool prev_if_not_found)
+check_find(QPDFNameTreeObjectHelper& nh, std::string const& key, bool prev_if_not_found)
 {
     auto i = nh.find(key, prev_if_not_found);
     std::cout << "find " << key << " (" << prev_if_not_found << "): ";
@@ -165,8 +156,7 @@ test_depth()
                 std::string first;
                 std::string last;
                 for (int i4 = 0; i4 < NITEMS; ++i4) {
-                    int val =
-                        (((((i1 * NITEMS) + i2) * NITEMS) + i3) * NITEMS) + i4;
+                    int val = (((((i1 * NITEMS) + i2) * NITEMS) + i3) * NITEMS) + i4;
                     std::string str = QUtil::int_to_string(10 * val, 6);
                     items.appendItem(QPDFObjectHandle::newString(str));
                     items.appendItem(QPDFObjectHandle::newString("val " + str));
@@ -183,16 +173,13 @@ test_depth()
             }
             auto limits = QPDFObjectHandle::newArray();
             n2.replaceKey("/Limits", limits);
-            limits.appendItem(
-                k2.getArrayItem(0).getKey("/Limits").getArrayItem(0));
-            limits.appendItem(
-                k2.getArrayItem(NITEMS - 1).getKey("/Limits").getArrayItem(1));
+            limits.appendItem(k2.getArrayItem(0).getKey("/Limits").getArrayItem(0));
+            limits.appendItem(k2.getArrayItem(NITEMS - 1).getKey("/Limits").getArrayItem(1));
         }
         auto limits = QPDFObjectHandle::newArray();
         n1.replaceKey("/Limits", limits);
         limits.appendItem(k1.getArrayItem(0).getKey("/Limits").getArrayItem(0));
-        limits.appendItem(
-            k1.getArrayItem(NITEMS - 1).getKey("/Limits").getArrayItem(1));
+        limits.appendItem(k1.getArrayItem(NITEMS - 1).getKey("/Limits").getArrayItem(1));
     }
 
     QPDFNameTreeObjectHelper nh(n0, q);

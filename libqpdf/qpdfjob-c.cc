@@ -35,8 +35,7 @@ wrap_qpdfjob(qpdfjob_handle j, std::function<int(qpdfjob_handle j)> fn)
     try {
         return fn(j);
     } catch (std::exception& e) {
-        *j->j.getLogger()->getError()
-            << j->j.getMessagePrefix() << ": " << e.what() << "\n";
+        *j->j.getLogger()->getError() << j->j.getMessagePrefix() << ": " << e.what() << "\n";
     }
     return QPDFJob::EXIT_ERROR;
 }
@@ -70,10 +69,9 @@ qpdfjob_initialize_from_wide_argv(qpdfjob_handle j, wchar_t const* const argv[])
     for (auto k = argv; *k; ++k) {
         ++argc;
     }
-    return QUtil::call_main_from_wmain(
-        argc, argv, [j](int, char const* const new_argv[]) {
-            return qpdfjob_initialize_from_argv(j, new_argv);
-        });
+    return QUtil::call_main_from_wmain(argc, argv, [j](int, char const* const new_argv[]) {
+        return qpdfjob_initialize_from_argv(j, new_argv);
+    });
 }
 #endif // QPDF_NO_WCHAR_T
 
@@ -105,8 +103,7 @@ qpdfjob_create_qpdf(qpdfjob_handle j)
         auto qpdf = j->j.createQPDF();
         return qpdf ? new _qpdf_data(std::move(qpdf)) : nullptr;
     } catch (std::exception& e) {
-        *j->j.getLogger()->getError()
-            << j->j.getMessagePrefix() << ": " << e.what() << "\n";
+        *j->j.getLogger()->getError() << j->j.getMessagePrefix() << ": " << e.what() << "\n";
     }
     return nullptr;
 }
@@ -136,35 +133,29 @@ run_with_handle(std::function<int(qpdfjob_handle)> fn)
 int
 qpdfjob_run_from_argv(char const* const argv[])
 {
-    return run_with_handle([argv](qpdfjob_handle j) {
-        return qpdfjob_initialize_from_argv(j, argv);
-    });
+    return run_with_handle(
+        [argv](qpdfjob_handle j) { return qpdfjob_initialize_from_argv(j, argv); });
 }
 
 #ifndef QPDF_NO_WCHAR_T
 int
 qpdfjob_run_from_wide_argv(wchar_t const* const argv[])
 {
-    return run_with_handle([argv](qpdfjob_handle j) {
-        return qpdfjob_initialize_from_wide_argv(j, argv);
-    });
+    return run_with_handle(
+        [argv](qpdfjob_handle j) { return qpdfjob_initialize_from_wide_argv(j, argv); });
 }
 #endif /* QPDF_NO_WCHAR_T */
 
 int
 qpdfjob_run_from_json(char const* json)
 {
-    return run_with_handle([json](qpdfjob_handle j) {
-        return qpdfjob_initialize_from_json(j, json);
-    });
+    return run_with_handle(
+        [json](qpdfjob_handle j) { return qpdfjob_initialize_from_json(j, json); });
 }
 
 void
 qpdfjob_register_progress_reporter(
-    qpdfjob_handle j,
-    void (*report_progress)(int percent, void* data),
-    void* data)
+    qpdfjob_handle j, void (*report_progress)(int percent, void* data), void* data)
 {
-    j->j.registerProgressReporter(
-        std::bind(report_progress, std::placeholders::_1, data));
+    j->j.registerProgressReporter(std::bind(report_progress, std::placeholders::_1, data));
 }

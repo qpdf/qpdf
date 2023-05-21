@@ -43,8 +43,7 @@ void
 QPDFPageDocumentHelper::addPageAt(
     QPDFPageObjectHelper newpage, bool before, QPDFPageObjectHelper refpage)
 {
-    this->qpdf.addPageAt(
-        newpage.getObjectHandle(), before, refpage.getObjectHandle());
+    this->qpdf.addPageAt(newpage.getObjectHandle(), before, refpage.getObjectHandle());
 }
 
 void
@@ -54,8 +53,7 @@ QPDFPageDocumentHelper::removePage(QPDFPageObjectHelper page)
 }
 
 void
-QPDFPageDocumentHelper::flattenAnnotations(
-    int required_flags, int forbidden_flags)
+QPDFPageDocumentHelper::flattenAnnotations(int required_flags, int forbidden_flags)
 {
     QPDFAcroFormDocumentHelper afdh(this->qpdf);
     if (afdh.getNeedAppearances()) {
@@ -67,14 +65,11 @@ QPDFPageDocumentHelper::flattenAnnotations(
     for (auto& ph: getAllPages()) {
         QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
         if (!resources.isDictionary()) {
-            QTC::TC(
-                "qpdf",
-                "QPDFPageDocumentHelper flatten resources missing or invalid");
+            QTC::TC("qpdf", "QPDFPageDocumentHelper flatten resources missing or invalid");
             resources = ph.getObjectHandle().replaceKeyAndGetNew(
                 "/Resources", QPDFObjectHandle::newDictionary());
         }
-        flattenAnnotationsForPage(
-            ph, resources, afdh, required_flags, forbidden_flags);
+        flattenAnnotationsForPage(ph, resources, afdh, required_flags, forbidden_flags);
     }
     if (!afdh.getNeedAppearances()) {
         this->qpdf.getRoot().removeKey("/AcroForm");
@@ -104,21 +99,17 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
         bool is_widget = (aoh.getSubtype() == "/Widget");
         bool process = true;
         if (need_appearances && is_widget) {
-            QTC::TC(
-                "qpdf", "QPDFPageDocumentHelper skip widget need appearances");
+            QTC::TC("qpdf", "QPDFPageDocumentHelper skip widget need appearances");
             process = false;
         }
         if (process && as.isStream()) {
             if (is_widget) {
                 QTC::TC("qpdf", "QPDFPageDocumentHelper merge DR");
                 QPDFFormFieldObjectHelper ff = afdh.getFieldForAnnotation(aoh);
-                QPDFObjectHandle as_resources =
-                    as.getDict().getKey("/Resources");
+                QPDFObjectHandle as_resources = as.getDict().getKey("/Resources");
                 if (as_resources.isIndirect()) {
-                    QTC::TC(
-                        "qpdf", "QPDFPageDocumentHelper indirect as resources");
-                    as.getDict().replaceKey(
-                        "/Resources", as_resources.shallowCopy());
+                    QTC::TC("qpdf", "QPDFPageDocumentHelper indirect as resources");
+                    as.getDict().replaceKey("/Resources", as_resources.shallowCopy());
                     as_resources = as.getDict().getKey("/Resources");
                 }
                 as_resources.mergeResources(ff.getDefaultResources());
@@ -126,8 +117,8 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
                 QTC::TC("qpdf", "QPDFPageDocumentHelper non-widget annotation");
             }
             std::string name = resources.getUniqueResourceName("/Fxo", next_fx);
-            std::string content = aoh.getPageContentForAppearance(
-                name, rotate, required_flags, forbidden_flags);
+            std::string content =
+                aoh.getPageContentForAppearance(name, rotate, required_flags, forbidden_flags);
             if (!content.empty()) {
                 resources.mergeResources("<< /XObject << >> >>"_qpdf);
                 resources.getKey("/XObject").replaceKey(name, as);
@@ -140,9 +131,7 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
             // unchecked checkboxes and radio buttons, popup windows
             // associated with comments that aren't visible, and other
             // types of annotations that aren't visible.
-            QTC::TC(
-                "qpdf",
-                "QPDFPageDocumentHelper ignore annotation with no appearance");
+            QTC::TC("qpdf", "QPDFPageDocumentHelper ignore annotation with no appearance");
         } else {
             new_annots.push_back(aoh.getObjectHandle());
         }
@@ -154,11 +143,9 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
             page_oh.removeKey("/Annots");
         } else {
             QPDFObjectHandle old_annots = page_oh.getKey("/Annots");
-            QPDFObjectHandle new_annots_oh =
-                QPDFObjectHandle::newArray(new_annots);
+            QPDFObjectHandle new_annots_oh = QPDFObjectHandle::newArray(new_annots);
             if (old_annots.isIndirect()) {
-                QTC::TC(
-                    "qpdf", "QPDFPageDocumentHelper replace indirect annots");
+                QTC::TC("qpdf", "QPDFPageDocumentHelper replace indirect annots");
                 this->qpdf.replaceObject(old_annots.getObjGen(), new_annots_oh);
             } else {
                 QTC::TC("qpdf", "QPDFPageDocumentHelper replace direct annots");

@@ -22,8 +22,7 @@ Pl_OStream::~Pl_OStream()
 void
 Pl_OStream::write(unsigned char const* buf, size_t len)
 {
-    m->os.write(
-        reinterpret_cast<char const*>(buf), static_cast<std::streamsize>(len));
+    m->os.write(reinterpret_cast<char const*>(buf), static_cast<std::streamsize>(len));
 }
 
 void

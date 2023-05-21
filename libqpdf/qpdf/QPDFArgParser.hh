@@ -53,23 +53,17 @@ class QPDFArgParser
     void selectOptionTable(std::string const& name);
 
     // Register a new options table. This also selects the option table.
-    void registerOptionTable(
-        std::string const& name, bare_arg_handler_t end_handler);
+    void registerOptionTable(std::string const& name, bare_arg_handler_t end_handler);
 
     // Add handlers for options in the current table
 
     void addPositional(param_arg_handler_t);
     void addBare(std::string const& arg, bare_arg_handler_t);
-    void addRequiredParameter(
-        std::string const& arg,
-        param_arg_handler_t,
-        char const* parameter_name);
+    void
+    addRequiredParameter(std::string const& arg, param_arg_handler_t, char const* parameter_name);
     void addOptionalParameter(std::string const& arg, param_arg_handler_t);
-    void addChoices(
-        std::string const& arg,
-        param_arg_handler_t,
-        bool required,
-        char const** choices);
+    void
+    addChoices(std::string const& arg, param_arg_handler_t, bool required, char const** choices);
 
     // The default behavior when an invalid choice is specified with
     // an option that takes choices is to list all the choices. This
@@ -123,9 +117,7 @@ class QPDFArgParser
 
     // Add a help topic along with the text for that topic
     void addHelpTopic(
-        std::string const& topic,
-        std::string const& short_text,
-        std::string const& long_text);
+        std::string const& topic, std::string const& short_text, std::string const& long_text);
 
     // Add help for an option, and associate it with a topic.
     void addOptionHelp(
@@ -220,16 +212,13 @@ class QPDFArgParser
     void readArgsFromFile(std::string const& filename);
     void doFinalChecks();
     void addOptionsToCompletions(option_table_t&);
-    void addChoicesToCompletions(
-        option_table_t&, std::string const&, std::string const&);
-    void
-    insertCompletions(option_table_t&, std::string const&, std::string const&);
+    void addChoicesToCompletions(option_table_t&, std::string const&, std::string const&);
+    void insertCompletions(option_table_t&, std::string const&, std::string const&);
     void handleCompletion();
 
     void getTopHelp(std::ostringstream&);
     void getAllHelp(std::ostringstream&);
-    void getTopicHelp(
-        std::string const& name, HelpTopic const&, std::ostringstream&);
+    void getTopicHelp(std::string const& name, HelpTopic const&, std::ostringstream&);
 
     class Members
     {

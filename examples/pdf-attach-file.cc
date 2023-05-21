@@ -71,8 +71,7 @@ process(
 
     // Create a file spec.
     std::string key = QUtil::path_basename(attachment);
-    std::cout << whoami << ": attaching " << attachment << " as " << key
-              << std::endl;
+    std::cout << whoami << ": attaching " << attachment << " as " << key << std::endl;
     auto fs = QPDFFileSpecObjectHelper::createFileSpec(q, key, attachment);
 
     if (mimetype) {

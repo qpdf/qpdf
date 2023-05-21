@@ -71,9 +71,7 @@ class QPDFObject
     }
     void
     setDescription(
-        QPDF* qpdf,
-        std::shared_ptr<QPDFValue::Description>& description,
-        qpdf_offset_t offset = -1)
+        QPDF* qpdf, std::shared_ptr<QPDFValue::Description>& description, qpdf_offset_t offset = -1)
     {
         return value->setDescription(qpdf, description, offset);
     }
@@ -84,8 +82,7 @@ class QPDFObject
         std::string var_descr)
     {
         auto qpdf = parent ? parent->value->qpdf : nullptr;
-        value->setChildDescription(
-            qpdf, parent->value, static_descr, var_descr);
+        value->setChildDescription(qpdf, parent->value, static_descr, var_descr);
     }
     void
     setChildDescription(

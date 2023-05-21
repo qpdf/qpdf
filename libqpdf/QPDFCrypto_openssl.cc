@@ -76,8 +76,7 @@ RC4Loader::~RC4Loader()
 static void
 bad_bits(int bits)
 {
-    throw std::logic_error(
-        std::string("unsupported key length: ") + std::to_string(bits));
+    throw std::logic_error(std::string("unsupported key length: ") + std::to_string(bits));
 }
 
 static void
@@ -208,14 +207,11 @@ QPDFCrypto_openssl::RC4_init(unsigned char const* key_data, int key_len)
 #endif
     check_openssl(EVP_CIPHER_CTX_reset(cipher_ctx));
     if (key_len == -1) {
-        key_len =
-            QIntC::to_int(strlen(reinterpret_cast<const char*>(key_data)));
+        key_len = QIntC::to_int(strlen(reinterpret_cast<const char*>(key_data)));
     }
-    check_openssl(
-        EVP_EncryptInit_ex(cipher_ctx, rc4, nullptr, nullptr, nullptr));
+    check_openssl(EVP_EncryptInit_ex(cipher_ctx, rc4, nullptr, nullptr, nullptr));
     check_openssl(EVP_CIPHER_CTX_set_key_length(cipher_ctx, key_len));
-    check_openssl(
-        EVP_EncryptInit_ex(cipher_ctx, nullptr, nullptr, key_data, nullptr));
+    check_openssl(EVP_EncryptInit_ex(cipher_ctx, nullptr, nullptr, key_data, nullptr));
 }
 
 void
@@ -242,23 +238,19 @@ QPDFCrypto_openssl::rijndael_init(
     check_openssl(EVP_CIPHER_CTX_reset(cipher_ctx));
     check_openssl(
         // line-break
-        EVP_CipherInit_ex(
-            cipher_ctx, cipher, nullptr, key_data, cbc_block, encrypt));
+        EVP_CipherInit_ex(cipher_ctx, cipher, nullptr, key_data, cbc_block, encrypt));
     check_openssl(EVP_CIPHER_CTX_set_padding(cipher_ctx, 0));
 }
 
 void
-QPDFCrypto_openssl::RC4_process(
-    unsigned char const* in_data, size_t len, unsigned char* out_data)
+QPDFCrypto_openssl::RC4_process(unsigned char const* in_data, size_t len, unsigned char* out_data)
 {
     int out_len = static_cast<int>(len);
-    check_openssl(
-        EVP_EncryptUpdate(cipher_ctx, out_data, &out_len, in_data, out_len));
+    check_openssl(EVP_EncryptUpdate(cipher_ctx, out_data, &out_len, in_data, out_len));
 }
 
 void
-QPDFCrypto_openssl::rijndael_process(
-    unsigned char* in_data, unsigned char* out_data)
+QPDFCrypto_openssl::rijndael_process(unsigned char* in_data, unsigned char* out_data)
 {
     int len = QPDFCryptoImpl::rijndael_buf_size;
     check_openssl(EVP_CipherUpdate(cipher_ctx, out_data, &len, in_data, len));

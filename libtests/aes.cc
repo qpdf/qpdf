@@ -17,8 +17,7 @@ usage()
               << "  -encrypt     -- encrypt" << std::endl
               << "  -decrypt     -- decrypt CBC mode" << std::endl
               << "  -zero-iv     -- use zero initialization vector" << std::endl
-              << "  -static-iv   -- use static initialization vector"
-              << std::endl
+              << "  -static-iv   -- use static initialization vector" << std::endl
               << "  -no-padding  -- disable padding" << std::endl
               << "Options must precede key and file names." << std::endl;
     exit(2);

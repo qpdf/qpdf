@@ -83,8 +83,7 @@ class QPDFJob
     // about converting arguments to UTF-8. This method will mutate
     // arguments that are passed to it.
     QPDF_DLL
-    void initializeFromArgv(
-        char const* const argv[], char const* progname_env = nullptr);
+    void initializeFromArgv(char const* const argv[], char const* progname_env = nullptr);
 
     // Initialize a QPDFJob from json. Passing partial = true prevents
     // this method from doing the final checks (calling
@@ -132,8 +131,7 @@ class QPDFJob
     // configures a private logger, separating this object from the
     // default logger, and calls setOutputStreams on that logger. See
     // QPDFLogger.hh for additional details.
-    [[deprecated(
-        "configure logger from getLogger() or call setLogger()")]] QPDF_DLL void
+    [[deprecated("configure logger from getLogger() or call setLogger()")]] QPDF_DLL void
     setOutputStreams(std::ostream* out_stream, std::ostream* err_stream);
 
     // You can register a custom progress reporter to be called by
@@ -187,10 +185,7 @@ class QPDFJob
 
     struct PageSpec
     {
-        PageSpec(
-            std::string const& filename,
-            char const* password,
-            std::string const& range);
+        PageSpec(std::string const& filename, char const* password, std::string const& range);
 
         std::string filename;
         std::shared_ptr<char> password;
@@ -284,9 +279,7 @@ class QPDFJob
         Config* endPages();
         QPDF_DLL
         PagesConfig* pageSpec(
-            std::string const& filename,
-            std::string const& range,
-            char const* password = nullptr);
+            std::string const& filename, std::string const& range, char const* password = nullptr);
 
 #include <qpdf/auto_job_c_pages.hh>
 
@@ -366,10 +359,8 @@ class QPDFJob
         QPDF_DLL
         std::shared_ptr<UOConfig> underlay();
         QPDF_DLL
-        std::shared_ptr<EncConfig> encrypt(
-            int keylen,
-            std::string const& user_password,
-            std::string const& owner_password);
+        std::shared_ptr<EncConfig>
+        encrypt(int keylen, std::string const& user_password, std::string const& owner_password);
 
 #include <qpdf/auto_job_c_main.hh>
 
@@ -438,8 +429,7 @@ class QPDFJob
     // If in verbose mode, call the given function, passing in the
     // output stream and message prefix.
     QPDF_DLL
-    void
-    doIfVerbose(std::function<void(Pipeline&, std::string const& prefix)> fn);
+    void doIfVerbose(std::function<void(Pipeline&, std::string const& prefix)> fn);
 
     // Provide a string that is the help information ("schema" for the
     // qpdf-specific JSON object) for the specified version of JSON
@@ -447,16 +437,14 @@ class QPDFJob
     QPDF_DLL
     static std::string json_out_schema(int version);
 
-    [[deprecated("use json_out_schema(version)")]] static std::string QPDF_DLL
-    json_out_schema_v1();
+    [[deprecated("use json_out_schema(version)")]] static std::string QPDF_DLL json_out_schema_v1();
 
     // Provide a string that is the help information for specified
     // version of JSON format for QPDFJob.
     QPDF_DLL
     static std::string job_json_schema(int version);
 
-    [[deprecated("use job_json_schema(version)")]] static std::string QPDF_DLL
-    job_json_schema_v1();
+    [[deprecated("use job_json_schema(version)")]] static std::string QPDF_DLL job_json_schema_v1();
 
   private:
     struct RotationSpec
@@ -497,10 +485,8 @@ class QPDFJob
 
     // Helper functions
     static void usage(std::string const& msg);
-    static JSON
-    json_schema(int json_version, std::set<std::string>* keys = nullptr);
-    static void parse_object_id(
-        std::string const& objspec, bool& trailer, int& obj, int& gen);
+    static JSON json_schema(int json_version, std::set<std::string>* keys = nullptr);
+    static void parse_object_id(std::string const& objspec, bool& trailer, int& obj, int& gen);
     void parseRotationParameter(std::string const&);
     std::vector<int> parseNumrange(char const* range, int max);
 
@@ -533,12 +519,10 @@ class QPDFJob
 
     // Transformations
     void setQPDFOptions(QPDF& pdf);
-    void
-    handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_heap);
+    void handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_heap);
     bool shouldRemoveUnreferencedResources(QPDF& pdf);
     void handleRotations(QPDF& pdf);
-    void
-    getUOPagenos(UnderOverlay& uo, std::map<int, std::vector<int>>& pagenos);
+    void getUOPagenos(UnderOverlay& uo, std::map<int, std::vector<int>>& pagenos);
     void handleUnderOverlay(QPDF& pdf);
     std::string doUnderOverlayForPage(
         QPDF& pdf,
@@ -573,8 +557,7 @@ class QPDFJob
     // JSON
     void doJSON(QPDF& pdf, Pipeline*);
     QPDFObjGen::set getWantedJSONObjects();
-    void doJSONObject(
-        Pipeline* p, bool& first, std::string const& key, QPDFObjectHandle&);
+    void doJSONObject(Pipeline* p, bool& first, std::string const& key, QPDFObjectHandle&);
     void doJSONObjects(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf);
     void doJSONPages(Pipeline* p, bool& first, QPDF& pdf);

@@ -17,8 +17,7 @@ swap_byte(unsigned char& a, unsigned char& b)
 RC4_native::RC4_native(unsigned char const* key_data, int key_len)
 {
     if (key_len == -1) {
-        key_len =
-            QIntC::to_int(strlen(reinterpret_cast<char const*>(key_data)));
+        key_len = QIntC::to_int(strlen(reinterpret_cast<char const*>(key_data)));
     }
 
     for (int i = 0; i < 256; ++i) {
@@ -37,8 +36,7 @@ RC4_native::RC4_native(unsigned char const* key_data, int key_len)
 }
 
 void
-RC4_native::process(
-    unsigned char const* in_data, size_t len, unsigned char* out_data)
+RC4_native::process(unsigned char const* in_data, size_t len, unsigned char* out_data)
 {
     for (size_t i = 0; i < len; ++i) {
         key.x = static_cast<unsigned char>((key.x + 1) % 256);

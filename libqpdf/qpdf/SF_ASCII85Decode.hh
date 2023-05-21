@@ -14,8 +14,7 @@ class SF_ASCII85Decode: public QPDFStreamFilter
     Pipeline*
     getDecodePipeline(Pipeline* next) override
     {
-        this->pipeline =
-            std::make_shared<Pl_ASCII85Decoder>("ascii85 decode", next);
+        this->pipeline = std::make_shared<Pl_ASCII85Decoder>("ascii85 decode", next);
         return this->pipeline.get();
     }
 

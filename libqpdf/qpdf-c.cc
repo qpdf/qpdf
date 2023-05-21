@@ -32,18 +32,14 @@ static void
 call_read_memory(qpdf_data qpdf)
 {
     qpdf->qpdf->processMemoryFile(
-        qpdf->filename,
-        qpdf->buffer,
-        QIntC::to_size(qpdf->size),
-        qpdf->password);
+        qpdf->filename, qpdf->buffer, QIntC::to_size(qpdf->size), qpdf->password);
 }
 
 // must set qpdf->filename
 static void
 call_init_write(qpdf_data qpdf)
 {
-    qpdf->qpdf_writer =
-        std::make_shared<QPDFWriter>(*(qpdf->qpdf), qpdf->filename);
+    qpdf->qpdf_writer = std::make_shared<QPDFWriter>(*(qpdf->qpdf), qpdf->filename);
 }
 
 static void
@@ -79,12 +75,10 @@ trap_errors(qpdf_data qpdf, std::function<void(qpdf_data)> fn)
         qpdf->error = std::make_shared<QPDFExc>(e);
         status |= QPDF_ERRORS;
     } catch (std::runtime_error& e) {
-        qpdf->error =
-            std::make_shared<QPDFExc>(qpdf_e_system, "", "", 0, e.what());
+        qpdf->error = std::make_shared<QPDFExc>(qpdf_e_system, "", "", 0, e.what());
         status |= QPDF_ERRORS;
     } catch (std::exception& e) {
-        qpdf->error =
-            std::make_shared<QPDFExc>(qpdf_e_internal, "", "", 0, e.what());
+        qpdf->error = std::make_shared<QPDFExc>(qpdf_e_internal, "", "", 0, e.what());
         status |= QPDF_ERRORS;
     }
 
@@ -119,8 +113,7 @@ qpdf_cleanup(qpdf_data* qpdf)
     if ((*qpdf)->error.get()) {
         QTC::TC("qpdf", "qpdf-c cleanup warned about unhandled error");
         *QPDFLogger::defaultLogger()->getWarn()
-            << "WARNING: application did not handle error: "
-            << (*qpdf)->error->what() << "\n";
+            << "WARNING: application did not handle error: " << (*qpdf)->error->what() << "\n";
     }
     delete *qpdf;
     *qpdf = nullptr;
@@ -377,8 +370,7 @@ qpdf_set_info_key(qpdf_data qpdf, char const* key, char const* value)
     if (!trailer.hasKey("/Info")) {
         QTC::TC("qpdf", "qpdf-c add info to trailer");
         trailer.replaceKey(
-            "/Info",
-            qpdf->qpdf->makeIndirectObject(QPDFObjectHandle::newDictionary()));
+            "/Info", qpdf->qpdf->makeIndirectObject(QPDFObjectHandle::newDictionary()));
     } else {
         QTC::TC("qpdf", "qpdf-c set-info-key use existing info");
     }
@@ -765,8 +757,7 @@ qpdf_set_minimum_pdf_version(qpdf_data qpdf, char const* version)
 }
 
 void
-qpdf_set_minimum_pdf_version_and_extension(
-    qpdf_data qpdf, char const* version, int extension_level)
+qpdf_set_minimum_pdf_version_and_extension(qpdf_data qpdf, char const* version, int extension_level)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_minimum_pdf_version");
     qpdf->qpdf_writer->setMinimumPDFVersion(version, extension_level);
@@ -779,8 +770,7 @@ qpdf_force_pdf_version(qpdf_data qpdf, char const* version)
 }
 
 void
-qpdf_force_pdf_version_and_extension(
-    qpdf_data qpdf, char const* version, int extension_level)
+qpdf_force_pdf_version_and_extension(qpdf_data qpdf, char const* version, int extension_level)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_force_pdf_version");
     qpdf->qpdf_writer->forcePDFVersion(version, extension_level);
@@ -788,15 +778,12 @@ qpdf_force_pdf_version_and_extension(
 
 void
 qpdf_register_progress_reporter(
-    qpdf_data qpdf,
-    void (*report_progress)(int percent, void* data),
-    void* data)
+    qpdf_data qpdf, void (*report_progress)(int percent, void* data), void* data)
 {
     QTC::TC("qpdf", "qpdf-c registered progress reporter");
     qpdf->qpdf_writer->registerProgressReporter(
-        std::shared_ptr<QPDFWriter::ProgressReporter>(
-            new QPDFWriter::FunctionProgressReporter(
-                std::bind(report_progress, std::placeholders::_1, data))));
+        std::shared_ptr<QPDFWriter::ProgressReporter>(new QPDFWriter::FunctionProgressReporter(
+            std::bind(report_progress, std::placeholders::_1, data))));
 }
 
 QPDF_ERROR_CODE
@@ -817,23 +804,16 @@ qpdf_silence_errors(qpdf_data qpdf)
 
 template <class RET>
 static RET
-trap_oh_errors(
-    qpdf_data qpdf,
-    std::function<RET()> fallback,
-    std::function<RET(qpdf_data)> fn)
+trap_oh_errors(qpdf_data qpdf, std::function<RET()> fallback, std::function<RET(qpdf_data)> fn)
 {
     // Note: fallback is a function so we don't have to evaluate it
     // unless needed. This is important because sometimes the fallback
     // creates an object.
     RET ret;
-    QPDF_ERROR_CODE status =
-        trap_errors(qpdf, [&ret, fn](qpdf_data q) { ret = fn(q); });
+    QPDF_ERROR_CODE status = trap_errors(qpdf, [&ret, fn](qpdf_data q) { ret = fn(q); });
     if (status & QPDF_ERRORS) {
         if (!qpdf->silence_errors) {
-            QTC::TC(
-                "qpdf",
-                "qpdf-c warn about oh error",
-                qpdf->oh_error_occurred ? 0 : 1);
+            QTC::TC("qpdf", "qpdf-c warn about oh error", qpdf->oh_error_occurred ? 0 : 1);
             if (!qpdf->oh_error_occurred) {
                 qpdf->warnings.push_back(QPDFExc(
                     qpdf_e_internal,
@@ -845,8 +825,7 @@ trap_oh_errors(
                     " to ERROR HANDLING in qpdf-c.h"));
                 qpdf->oh_error_occurred = true;
             }
-            *QPDFLogger::defaultLogger()->getError()
-                << qpdf->error->what() << "\n";
+            *QPDFLogger::defaultLogger()->getError() << qpdf->error->what() << "\n";
         }
         return fallback();
     }
@@ -911,20 +890,18 @@ qpdf_oh
 qpdf_get_trailer(qpdf_data qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_get_trailer");
-    return trap_oh_errors<qpdf_oh>(
-        qpdf, return_uninitialized(qpdf), [](qpdf_data q) {
-            return new_object(q, q->qpdf->getTrailer());
-        });
+    return trap_oh_errors<qpdf_oh>(qpdf, return_uninitialized(qpdf), [](qpdf_data q) {
+        return new_object(q, q->qpdf->getTrailer());
+    });
 }
 
 qpdf_oh
 qpdf_get_root(qpdf_data qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_get_root");
-    return trap_oh_errors<qpdf_oh>(
-        qpdf, return_uninitialized(qpdf), [](qpdf_data q) {
-            return new_object(q, q->qpdf->getRoot());
-        });
+    return trap_oh_errors<qpdf_oh>(qpdf, return_uninitialized(qpdf), [](qpdf_data q) {
+        return new_object(q, q->qpdf->getRoot());
+    });
 }
 
 qpdf_oh
@@ -959,14 +936,12 @@ do_with_oh(
 }
 
 static void
-do_with_oh_void(
-    qpdf_data qpdf, qpdf_oh oh, std::function<void(QPDFObjectHandle&)> fn)
+do_with_oh_void(qpdf_data qpdf, qpdf_oh oh, std::function<void(QPDFObjectHandle&)> fn)
 {
-    do_with_oh<bool>(
-        qpdf, oh, return_T<bool>(false), [fn](QPDFObjectHandle& o) {
-            fn(o);
-            return true; // unused
-        });
+    do_with_oh<bool>(qpdf, oh, return_T<bool>(false), [fn](QPDFObjectHandle& o) {
+        fn(o);
+        return true; // unused
+    });
 }
 
 void
@@ -983,9 +958,7 @@ qpdf_oh_is_initialized(qpdf_data qpdf, qpdf_oh oh)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_initialized");
     return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [](QPDFObjectHandle& o) {
-            return o.isInitialized();
-        });
+        qpdf, oh, return_false, [](QPDFObjectHandle& o) { return o.isInitialized(); });
 }
 
 QPDF_BOOL
@@ -1009,9 +982,7 @@ qpdf_oh_is_integer(qpdf_data qpdf, qpdf_oh oh)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_integer");
     return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [](QPDFObjectHandle& o) {
-            return o.isInteger();
-        });
+        qpdf, oh, return_false, [](QPDFObjectHandle& o) { return o.isInteger(); });
 }
 
 QPDF_BOOL
@@ -1035,9 +1006,7 @@ qpdf_oh_is_string(qpdf_data qpdf, qpdf_oh oh)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_string");
     return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [](QPDFObjectHandle& o) {
-            return o.isString();
-        });
+        qpdf, oh, return_false, [](QPDFObjectHandle& o) { return o.isString(); });
 }
 
 QPDF_BOOL
@@ -1045,9 +1014,7 @@ qpdf_oh_is_operator(qpdf_data qpdf, qpdf_oh oh)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_operator");
     return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [](QPDFObjectHandle& o) {
-            return o.isOperator();
-        });
+        qpdf, oh, return_false, [](QPDFObjectHandle& o) { return o.isOperator(); });
 }
 
 QPDF_BOOL
@@ -1055,9 +1022,7 @@ qpdf_oh_is_inline_image(qpdf_data qpdf, qpdf_oh oh)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_inline_image");
     return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [](QPDFObjectHandle& o) {
-            return o.isInlineImage();
-        });
+        qpdf, oh, return_false, [](QPDFObjectHandle& o) { return o.isInlineImage(); });
 }
 
 QPDF_BOOL
@@ -1065,9 +1030,7 @@ qpdf_oh_is_array(qpdf_data qpdf, qpdf_oh oh)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_array");
     return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [](QPDFObjectHandle& o) {
-            return o.isArray();
-        });
+        qpdf, oh, return_false, [](QPDFObjectHandle& o) { return o.isArray(); });
 }
 
 QPDF_BOOL
@@ -1075,9 +1038,7 @@ qpdf_oh_is_dictionary(qpdf_data qpdf, qpdf_oh oh)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_dictionary");
     return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [](QPDFObjectHandle& o) {
-            return o.isDictionary();
-        });
+        qpdf, oh, return_false, [](QPDFObjectHandle& o) { return o.isDictionary(); });
 }
 
 QPDF_BOOL
@@ -1085,9 +1046,7 @@ qpdf_oh_is_stream(qpdf_data qpdf, qpdf_oh oh)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_stream");
     return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [](QPDFObjectHandle& o) {
-            return o.isStream();
-        });
+        qpdf, oh, return_false, [](QPDFObjectHandle& o) { return o.isStream(); });
 }
 
 QPDF_BOOL
@@ -1095,9 +1054,7 @@ qpdf_oh_is_indirect(qpdf_data qpdf, qpdf_oh oh)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_indirect");
     return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [](QPDFObjectHandle& o) {
-            return o.isIndirect();
-        });
+        qpdf, oh, return_false, [](QPDFObjectHandle& o) { return o.isIndirect(); });
 }
 
 QPDF_BOOL
@@ -1105,51 +1062,42 @@ qpdf_oh_is_scalar(qpdf_data qpdf, qpdf_oh oh)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_scalar");
     return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [](QPDFObjectHandle& o) {
-            return o.isScalar();
-        });
+        qpdf, oh, return_false, [](QPDFObjectHandle& o) { return o.isScalar(); });
 }
 
 QPDF_BOOL
 qpdf_oh_is_number(qpdf_data qpdf, qpdf_oh oh)
 {
-    return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_number");
-            return o.isNumber();
-        });
+    return do_with_oh<QPDF_BOOL>(qpdf, oh, return_false, [](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_number");
+        return o.isNumber();
+    });
 }
 
 QPDF_BOOL
 qpdf_oh_is_name_and_equals(qpdf_data qpdf, qpdf_oh oh, char const* name)
 {
-    return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [name](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_name_and_equals");
-            return o.isNameAndEquals(name);
-        });
+    return do_with_oh<QPDF_BOOL>(qpdf, oh, return_false, [name](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_name_and_equals");
+        return o.isNameAndEquals(name);
+    });
 }
 
 QPDF_BOOL
-qpdf_oh_is_dictionary_of_type(
-    qpdf_data qpdf, qpdf_oh oh, char const* type, char const* subtype)
+qpdf_oh_is_dictionary_of_type(qpdf_data qpdf, qpdf_oh oh, char const* type, char const* subtype)
 {
     auto stype = (subtype == nullptr) ? "" : subtype;
-    return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [type, stype](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_dictionary_of_type");
-            return o.isDictionaryOfType(type, stype);
-        });
+    return do_with_oh<QPDF_BOOL>(qpdf, oh, return_false, [type, stype](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_dictionary_of_type");
+        return o.isDictionaryOfType(type, stype);
+    });
 }
 
 qpdf_object_type_e
 qpdf_oh_get_type_code(qpdf_data qpdf, qpdf_oh oh)
 {
     return do_with_oh<qpdf_object_type_e>(
-        qpdf,
-        oh,
-        return_T<qpdf_object_type_e>(ot_uninitialized),
-        [](QPDFObjectHandle& o) {
+        qpdf, oh, return_T<qpdf_object_type_e>(ot_uninitialized), [](QPDFObjectHandle& o) {
             QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_type_code");
             return o.getTypeCode();
         });
@@ -1180,9 +1128,7 @@ qpdf_oh_wrap_in_array(qpdf_data qpdf, qpdf_oh oh)
             } else {
                 QTC::TC("qpdf", "qpdf-c non-array to wrap_in_array");
                 return new_object(
-                    qpdf,
-                    QPDFObjectHandle::newArray(
-                        std::vector<QPDFObjectHandle>{qoh}));
+                    qpdf, QPDFObjectHandle::newArray(std::vector<QPDFObjectHandle>{qoh}));
             }
         });
 }
@@ -1191,55 +1137,50 @@ qpdf_oh
 qpdf_oh_parse(qpdf_data qpdf, char const* object_str)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_parse");
-    return trap_oh_errors<qpdf_oh>(
-        qpdf, return_uninitialized(qpdf), [object_str](qpdf_data q) {
-            return new_object(q, QPDFObjectHandle::parse(object_str));
-        });
+    return trap_oh_errors<qpdf_oh>(qpdf, return_uninitialized(qpdf), [object_str](qpdf_data q) {
+        return new_object(q, QPDFObjectHandle::parse(object_str));
+    });
 }
 
 QPDF_BOOL
 qpdf_oh_get_bool_value(qpdf_data qpdf, qpdf_oh oh)
 {
-    return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_bool_value");
-            return o.getBoolValue();
-        });
+    return do_with_oh<QPDF_BOOL>(qpdf, oh, return_false, [](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_bool_value");
+        return o.getBoolValue();
+    });
 }
 
 QPDF_BOOL
 qpdf_oh_get_value_as_bool(qpdf_data qpdf, qpdf_oh oh, QPDF_BOOL* value)
 {
-    return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_bool");
-            bool v = *value;
-            QPDF_BOOL result = o.getValueAsBool(v);
-            if (result) {
-                *value = v;
-            }
-            return result;
-        });
+    return do_with_oh<QPDF_BOOL>(qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_bool");
+        bool v = *value;
+        QPDF_BOOL result = o.getValueAsBool(v);
+        if (result) {
+            *value = v;
+        }
+        return result;
+    });
 }
 
 long long
 qpdf_oh_get_int_value(qpdf_data qpdf, qpdf_oh oh)
 {
-    return do_with_oh<long long>(
-        qpdf, oh, return_T<long long>(0LL), [](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_int_value");
-            return o.getIntValue();
-        });
+    return do_with_oh<long long>(qpdf, oh, return_T<long long>(0LL), [](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_int_value");
+        return o.getIntValue();
+    });
 }
 
 QPDF_BOOL
 qpdf_oh_get_value_as_longlong(qpdf_data qpdf, qpdf_oh oh, long long* value)
 {
-    return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_longlong");
-            return o.getValueAsInt(*value);
-        });
+    return do_with_oh<QPDF_BOOL>(qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_longlong");
+        return o.getValueAsInt(*value);
+    });
 }
 
 int
@@ -1254,11 +1195,10 @@ qpdf_oh_get_int_value_as_int(qpdf_data qpdf, qpdf_oh oh)
 QPDF_BOOL
 qpdf_oh_get_value_as_int(qpdf_data qpdf, qpdf_oh oh, int* value)
 {
-    return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_int");
-            return o.getValueAsInt(*value);
-        });
+    return do_with_oh<QPDF_BOOL>(qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_int");
+        return o.getValueAsInt(*value);
+    });
 }
 
 unsigned long long
@@ -1272,34 +1212,30 @@ qpdf_oh_get_uint_value(qpdf_data qpdf, qpdf_oh oh)
 }
 
 QPDF_BOOL
-qpdf_oh_get_value_as_ulonglong(
-    qpdf_data qpdf, qpdf_oh oh, unsigned long long* value)
+qpdf_oh_get_value_as_ulonglong(qpdf_data qpdf, qpdf_oh oh, unsigned long long* value)
 {
-    return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_ulonglong");
-            return o.getValueAsUInt(*value);
-        });
+    return do_with_oh<QPDF_BOOL>(qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_ulonglong");
+        return o.getValueAsUInt(*value);
+    });
 }
 
 unsigned int
 qpdf_oh_get_uint_value_as_uint(qpdf_data qpdf, qpdf_oh oh)
 {
-    return do_with_oh<unsigned int>(
-        qpdf, oh, return_T<unsigned int>(0U), [](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_uint_value_as_uint");
-            return o.getUIntValueAsUInt();
-        });
+    return do_with_oh<unsigned int>(qpdf, oh, return_T<unsigned int>(0U), [](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_uint_value_as_uint");
+        return o.getUIntValueAsUInt();
+    });
 }
 
 QPDF_BOOL
 qpdf_oh_get_value_as_uint(qpdf_data qpdf, qpdf_oh oh, unsigned int* value)
 {
-    return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_uint");
-            return o.getValueAsUInt(*value);
-        });
+    return do_with_oh<QPDF_BOOL>(qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_uint");
+        return o.getValueAsUInt(*value);
+    });
 }
 
 char const*
@@ -1314,8 +1250,7 @@ qpdf_oh_get_real_value(qpdf_data qpdf, qpdf_oh oh)
 }
 
 QPDF_BOOL
-qpdf_oh_get_value_as_real(
-    qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length)
+qpdf_oh_get_value_as_real(qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length)
 {
     return do_with_oh<QPDF_BOOL>(
         qpdf, oh, return_false, [qpdf, value, length](QPDFObjectHandle& o) {
@@ -1332,21 +1267,19 @@ qpdf_oh_get_value_as_real(
 double
 qpdf_oh_get_numeric_value(qpdf_data qpdf, qpdf_oh oh)
 {
-    return do_with_oh<double>(
-        qpdf, oh, return_T<double>(0.0), [](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_numeric_value");
-            return o.getNumericValue();
-        });
+    return do_with_oh<double>(qpdf, oh, return_T<double>(0.0), [](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_numeric_value");
+        return o.getNumericValue();
+    });
 }
 
 QPDF_BOOL
 qpdf_oh_get_value_as_number(qpdf_data qpdf, qpdf_oh oh, double* value)
 {
-    return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_number");
-            return o.getValueAsNumber(*value);
-        });
+    return do_with_oh<QPDF_BOOL>(qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_number");
+        return o.getValueAsNumber(*value);
+    });
 }
 
 char const*
@@ -1361,8 +1294,7 @@ qpdf_oh_get_name(qpdf_data qpdf, qpdf_oh oh)
 }
 
 QPDF_BOOL
-qpdf_oh_get_value_as_name(
-    qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length)
+qpdf_oh_get_value_as_name(qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length)
 {
     return do_with_oh<QPDF_BOOL>(
         qpdf, oh, return_false, [qpdf, value, length](QPDFObjectHandle& o) {
@@ -1388,8 +1320,7 @@ qpdf_oh_get_string_value(qpdf_data qpdf, qpdf_oh oh)
 }
 
 QPDF_BOOL
-qpdf_oh_get_value_as_string(
-    qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length)
+qpdf_oh_get_value_as_string(qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length)
 {
     return do_with_oh<QPDF_BOOL>(
         qpdf, oh, return_false, [qpdf, value, length](QPDFObjectHandle& o) {
@@ -1415,8 +1346,7 @@ qpdf_oh_get_utf8_value(qpdf_data qpdf, qpdf_oh oh)
 }
 
 QPDF_BOOL
-qpdf_oh_get_value_as_utf8(
-    qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length)
+qpdf_oh_get_value_as_utf8(qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length)
 {
     return do_with_oh<QPDF_BOOL>(
         qpdf, oh, return_false, [qpdf, value, length](QPDFObjectHandle& o) {
@@ -1434,10 +1364,7 @@ char const*
 qpdf_oh_get_binary_string_value(qpdf_data qpdf, qpdf_oh oh, size_t* length)
 {
     return do_with_oh<char const*>(
-        qpdf,
-        oh,
-        return_T<char const*>(""),
-        [qpdf, length](QPDFObjectHandle& o) {
+        qpdf, oh, return_T<char const*>(""), [qpdf, length](QPDFObjectHandle& o) {
             QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_binary_string_value");
             qpdf->tmp_string = o.getStringValue();
             *length = qpdf->tmp_string.length();
@@ -1449,10 +1376,7 @@ char const*
 qpdf_oh_get_binary_utf8_value(qpdf_data qpdf, qpdf_oh oh, size_t* length)
 {
     return do_with_oh<char const*>(
-        qpdf,
-        oh,
-        return_T<char const*>(""),
-        [qpdf, length](QPDFObjectHandle& o) {
+        qpdf, oh, return_T<char const*>(""), [qpdf, length](QPDFObjectHandle& o) {
             QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_binary_utf8_value");
             qpdf->tmp_string = o.getUTF8Value();
             *length = qpdf->tmp_string.length();
@@ -1472,11 +1396,10 @@ qpdf_oh_get_array_n_items(qpdf_data qpdf, qpdf_oh oh)
 qpdf_oh
 qpdf_oh_get_array_item(qpdf_data qpdf, qpdf_oh oh, int n)
 {
-    return do_with_oh<qpdf_oh>(
-        qpdf, oh, return_null(qpdf), [qpdf, n](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_array_item");
-            return new_object(qpdf, o.getArrayItem(n));
-        });
+    return do_with_oh<qpdf_oh>(qpdf, oh, return_null(qpdf), [qpdf, n](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_array_item");
+        return new_object(qpdf, o.getArrayItem(n));
+    });
 }
 
 void
@@ -1516,41 +1439,37 @@ qpdf_oh_dict_next_key(qpdf_data qpdf)
 QPDF_BOOL
 qpdf_oh_has_key(qpdf_data qpdf, qpdf_oh oh, char const* key)
 {
-    return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [key](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_has_key");
-            return o.hasKey(key);
-        });
+    return do_with_oh<QPDF_BOOL>(qpdf, oh, return_false, [key](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_has_key");
+        return o.hasKey(key);
+    });
 }
 
 qpdf_oh
 qpdf_oh_get_key(qpdf_data qpdf, qpdf_oh oh, char const* key)
 {
-    return do_with_oh<qpdf_oh>(
-        qpdf, oh, return_null(qpdf), [qpdf, key](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_key");
-            return new_object(qpdf, o.getKey(key));
-        });
+    return do_with_oh<qpdf_oh>(qpdf, oh, return_null(qpdf), [qpdf, key](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_key");
+        return new_object(qpdf, o.getKey(key));
+    });
 }
 
 qpdf_oh
 qpdf_oh_get_key_if_dict(qpdf_data qpdf, qpdf_oh oh, char const* key)
 {
-    return do_with_oh<qpdf_oh>(
-        qpdf, oh, return_null(qpdf), [qpdf, key](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_key_if_dict");
-            return new_object(qpdf, o.getKeyIfDict(key));
-        });
+    return do_with_oh<qpdf_oh>(qpdf, oh, return_null(qpdf), [qpdf, key](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_key_if_dict");
+        return new_object(qpdf, o.getKeyIfDict(key));
+    });
 }
 
 QPDF_BOOL
 qpdf_oh_is_or_has_name(qpdf_data qpdf, qpdf_oh oh, char const* key)
 {
-    return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [key](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_or_has_name");
-            return o.isOrHasName(key);
-        });
+    return do_with_oh<QPDF_BOOL>(qpdf, oh, return_false, [key](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_or_has_name");
+        return o.isOrHasName(key);
+    });
 }
 
 qpdf_oh
@@ -1620,18 +1539,14 @@ qpdf_oh
 qpdf_oh_new_binary_string(qpdf_data qpdf, char const* str, size_t length)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_binary_string");
-    return new_object(
-        qpdf, QPDFObjectHandle::newString(std::string(str, length)));
+    return new_object(qpdf, QPDFObjectHandle::newString(std::string(str, length)));
 }
 
 qpdf_oh
-qpdf_oh_new_binary_unicode_string(
-    qpdf_data qpdf, char const* utf8_str, size_t length)
+qpdf_oh_new_binary_unicode_string(qpdf_data qpdf, char const* utf8_str, size_t length)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_binary_unicode_string");
-    return new_object(
-        qpdf,
-        QPDFObjectHandle::newUnicodeString(std::string(utf8_str, length)));
+    return new_object(qpdf, QPDFObjectHandle::newUnicodeString(std::string(utf8_str, length)));
 }
 
 qpdf_oh
@@ -1667,10 +1582,9 @@ qpdf_oh_make_direct(qpdf_data qpdf, qpdf_oh oh)
 qpdf_oh
 qpdf_make_indirect_object(qpdf_data qpdf, qpdf_oh oh)
 {
-    return do_with_oh<qpdf_oh>(
-        qpdf, oh, return_uninitialized(qpdf), [qpdf](QPDFObjectHandle& o) {
-            return new_object(qpdf, qpdf->qpdf->makeIndirectObject(o));
-        });
+    return do_with_oh<qpdf_oh>(qpdf, oh, return_uninitialized(qpdf), [qpdf](QPDFObjectHandle& o) {
+        return new_object(qpdf, qpdf->qpdf->makeIndirectObject(o));
+    });
 }
 
 static QPDFObjectHandle
@@ -1738,8 +1652,7 @@ qpdf_oh_remove_key(qpdf_data qpdf, qpdf_oh oh, char const* key)
 }
 
 void
-qpdf_oh_replace_or_remove_key(
-    qpdf_data qpdf, qpdf_oh oh, char const* key, qpdf_oh item)
+qpdf_oh_replace_or_remove_key(qpdf_data qpdf, qpdf_oh oh, char const* key, qpdf_oh item)
 {
     do_with_oh_void(qpdf, oh, [qpdf, key, item](QPDFObjectHandle& o) {
         QTC::TC("qpdf", "qpdf-c called qpdf_oh_replace_or_remove_key");
@@ -1750,11 +1663,10 @@ qpdf_oh_replace_or_remove_key(
 qpdf_oh
 qpdf_oh_get_dict(qpdf_data qpdf, qpdf_oh oh)
 {
-    return do_with_oh<qpdf_oh>(
-        qpdf, oh, return_null(qpdf), [qpdf](QPDFObjectHandle& o) {
-            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_dict");
-            return new_object(qpdf, o.getDict());
-        });
+    return do_with_oh<qpdf_oh>(qpdf, oh, return_null(qpdf), [qpdf](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_dict");
+        return new_object(qpdf, o.getDict());
+    });
 }
 
 int
@@ -1809,14 +1721,10 @@ qpdf_oh_unparse_binary(qpdf_data qpdf, qpdf_oh oh)
 }
 
 qpdf_oh
-qpdf_oh_copy_foreign_object(
-    qpdf_data qpdf, qpdf_data other_qpdf, qpdf_oh foreign_oh)
+qpdf_oh_copy_foreign_object(qpdf_data qpdf, qpdf_data other_qpdf, qpdf_oh foreign_oh)
 {
     return do_with_oh<qpdf_oh>(
-        other_qpdf,
-        foreign_oh,
-        return_uninitialized(qpdf),
-        [qpdf](QPDFObjectHandle& o) {
+        other_qpdf, foreign_oh, return_uninitialized(qpdf), [qpdf](QPDFObjectHandle& o) {
             QTC::TC("qpdf", "qpdf-c called qpdf_oh_copy_foreign_object");
             return new_object(qpdf, qpdf->qpdf->copyForeignObject(o));
         });
@@ -1831,39 +1739,31 @@ qpdf_oh_get_stream_data(
     unsigned char** bufp,
     size_t* len)
 {
-    return trap_errors(
-        qpdf, [stream_oh, decode_level, filtered, bufp, len](qpdf_data q) {
-            auto stream = qpdf_oh_item_internal(q, stream_oh);
-            Pipeline* p = nullptr;
-            Pl_Buffer buf("stream data");
-            if (bufp) {
-                p = &buf;
+    return trap_errors(qpdf, [stream_oh, decode_level, filtered, bufp, len](qpdf_data q) {
+        auto stream = qpdf_oh_item_internal(q, stream_oh);
+        Pipeline* p = nullptr;
+        Pl_Buffer buf("stream data");
+        if (bufp) {
+            p = &buf;
+        }
+        bool was_filtered = false;
+        if (stream.pipeStreamData(p, &was_filtered, 0, decode_level, false, false)) {
+            QTC::TC("qpdf", "qpdf-c stream data buf set", bufp ? 0 : 1);
+            if (p && bufp && len) {
+                buf.getMallocBuffer(bufp, len);
             }
-            bool was_filtered = false;
-            if (stream.pipeStreamData(
-                    p, &was_filtered, 0, decode_level, false, false)) {
-                QTC::TC("qpdf", "qpdf-c stream data buf set", bufp ? 0 : 1);
-                if (p && bufp && len) {
-                    buf.getMallocBuffer(bufp, len);
-                }
-                QTC::TC(
-                    "qpdf",
-                    "qpdf-c stream data filtered set",
-                    filtered ? 0 : 1);
-                if (filtered) {
-                    *filtered = was_filtered ? QPDF_TRUE : QPDF_FALSE;
-                }
-            } else {
-                throw std::runtime_error(
-                    "unable to access stream data for stream " +
-                    stream.unparse());
+            QTC::TC("qpdf", "qpdf-c stream data filtered set", filtered ? 0 : 1);
+            if (filtered) {
+                *filtered = was_filtered ? QPDF_TRUE : QPDF_FALSE;
             }
-        });
+        } else {
+            throw std::runtime_error("unable to access stream data for stream " + stream.unparse());
+        }
+    });
 }
 
 QPDF_ERROR_CODE
-qpdf_oh_get_page_content_data(
-    qpdf_data qpdf, qpdf_oh page_oh, unsigned char** bufp, size_t* len)
+qpdf_oh_get_page_content_data(qpdf_data qpdf, qpdf_oh page_oh, unsigned char** bufp, size_t* len)
 {
     return trap_errors(qpdf, [page_oh, bufp, len](qpdf_data q) {
         QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_page_content_data");
@@ -1884,17 +1784,13 @@ qpdf_oh_replace_stream_data(
     qpdf_oh decode_parms_oh)
 {
     do_with_oh_void(
-        qpdf,
-        stream_oh,
-        [qpdf, buf, len, filter_oh, decode_parms_oh](QPDFObjectHandle& o) {
+        qpdf, stream_oh, [qpdf, buf, len, filter_oh, decode_parms_oh](QPDFObjectHandle& o) {
             QTC::TC("qpdf", "qpdf-c called qpdf_oh_replace_stream_data");
             auto filter = qpdf_oh_item_internal(qpdf, filter_oh);
             auto decode_parms = qpdf_oh_item_internal(qpdf, decode_parms_oh);
             // XXX test with binary data with null
             o.replaceStreamData(
-                std::string(reinterpret_cast<char const*>(buf), len),
-                filter,
-                decode_parms);
+                std::string(reinterpret_cast<char const*>(buf), len), filter, decode_parms);
         });
 }
 
@@ -1903,9 +1799,8 @@ qpdf_get_num_pages(qpdf_data qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_num_pages");
     int n = -1;
-    QPDF_ERROR_CODE code = trap_errors(qpdf, [&n](qpdf_data q) {
-        n = QIntC::to_int(q->qpdf->getAllPages().size());
-    });
+    QPDF_ERROR_CODE code =
+        trap_errors(qpdf, [&n](qpdf_data q) { n = QIntC::to_int(q->qpdf->getAllPages().size()); });
     if (code & QPDF_ERRORS) {
         return -1;
     }
@@ -1917,9 +1812,8 @@ qpdf_get_page_n(qpdf_data qpdf, size_t i)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_get_page_n");
     qpdf_oh result = 0;
-    QPDF_ERROR_CODE code = trap_errors(qpdf, [&result, i](qpdf_data q) {
-        result = new_object(q, q->qpdf->getAllPages().at(i));
-    });
+    QPDF_ERROR_CODE code = trap_errors(
+        qpdf, [&result, i](qpdf_data q) { result = new_object(q, q->qpdf->getAllPages().at(i)); });
     if ((code & QPDF_ERRORS) || (result == 0)) {
         return qpdf_oh_new_uninitialized(qpdf);
     }
@@ -1930,8 +1824,7 @@ QPDF_ERROR_CODE
 qpdf_update_all_pages_cache(qpdf_data qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_update_all_pages_cache");
-    return trap_errors(
-        qpdf, [](qpdf_data q) { q->qpdf->updateAllPagesCache(); });
+    return trap_errors(qpdf, [](qpdf_data q) { q->qpdf->updateAllPagesCache(); });
 }
 
 int
@@ -1940,9 +1833,8 @@ qpdf_find_page_by_id(qpdf_data qpdf, int objid, int generation)
     QTC::TC("qpdf", "qpdf-c called qpdf_find_page_by_id");
     int n = -1;
     QPDFObjGen og(objid, generation);
-    QPDF_ERROR_CODE code = trap_errors(qpdf, [&n, &og](qpdf_data q) {
-        n = QIntC::to_int(q->qpdf->findPage(og));
-    });
+    QPDF_ERROR_CODE code =
+        trap_errors(qpdf, [&n, &og](qpdf_data q) { n = QIntC::to_int(q->qpdf->findPage(og)); });
     if (code & QPDF_ERRORS) {
         return -1;
     }
@@ -1953,44 +1845,35 @@ int
 qpdf_find_page_by_oh(qpdf_data qpdf, qpdf_oh oh)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_find_page_by_oh");
-    return do_with_oh<int>(
-        qpdf, oh, return_T<int>(-1), [qpdf](QPDFObjectHandle& o) {
-            return qpdf->qpdf->findPage(o);
-        });
+    return do_with_oh<int>(qpdf, oh, return_T<int>(-1), [qpdf](QPDFObjectHandle& o) {
+        return qpdf->qpdf->findPage(o);
+    });
 }
 
 QPDF_ERROR_CODE
 qpdf_push_inherited_attributes_to_page(qpdf_data qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_push_inherited_attributes_to_page");
-    return trap_errors(
-        qpdf, [](qpdf_data q) { q->qpdf->pushInheritedAttributesToPage(); });
+    return trap_errors(qpdf, [](qpdf_data q) { q->qpdf->pushInheritedAttributesToPage(); });
 }
 
 QPDF_ERROR_CODE
-qpdf_add_page(
-    qpdf_data qpdf, qpdf_data newpage_qpdf, qpdf_oh newpage, QPDF_BOOL first)
+qpdf_add_page(qpdf_data qpdf, qpdf_data newpage_qpdf, qpdf_oh newpage, QPDF_BOOL first)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_add_page");
     auto page = qpdf_oh_item_internal(newpage_qpdf, newpage);
-    return trap_errors(
-        qpdf, [&page, first](qpdf_data q) { q->qpdf->addPage(page, first); });
+    return trap_errors(qpdf, [&page, first](qpdf_data q) { q->qpdf->addPage(page, first); });
 }
 
 QPDF_ERROR_CODE
 qpdf_add_page_at(
-    qpdf_data qpdf,
-    qpdf_data newpage_qpdf,
-    qpdf_oh newpage,
-    QPDF_BOOL before,
-    qpdf_oh refpage)
+    qpdf_data qpdf, qpdf_data newpage_qpdf, qpdf_oh newpage, QPDF_BOOL before, qpdf_oh refpage)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_add_page_at");
     auto page = qpdf_oh_item_internal(newpage_qpdf, newpage);
     auto ref = qpdf_oh_item_internal(qpdf, refpage);
-    return trap_errors(qpdf, [&page, before, &ref](qpdf_data q) {
-        q->qpdf->addPageAt(page, before, ref);
-    });
+    return trap_errors(
+        qpdf, [&page, before, &ref](qpdf_data q) { q->qpdf->addPageAt(page, before, ref); });
 }
 
 QPDF_ERROR_CODE
@@ -2006,24 +1889,20 @@ qpdf_create_from_json_file(qpdf_data qpdf, char const* filename)
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
     qpdf->filename = filename;
-    status = trap_errors(
-        qpdf, [](qpdf_data q) { q->qpdf->createFromJSON(q->filename); });
+    status = trap_errors(qpdf, [](qpdf_data q) { q->qpdf->createFromJSON(q->filename); });
     return status;
 }
 
 QPDF_ERROR_CODE
-qpdf_create_from_json_data(
-    qpdf_data qpdf, char const* buffer, unsigned long long size)
+qpdf_create_from_json_data(qpdf_data qpdf, char const* buffer, unsigned long long size)
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
     qpdf->filename = "json buffer";
     qpdf->buffer = buffer;
     qpdf->size = size;
-    auto b =
-        new Buffer(QUtil::unsigned_char_pointer(buffer), QIntC::to_size(size));
+    auto b = new Buffer(QUtil::unsigned_char_pointer(buffer), QIntC::to_size(size));
     auto is = std::make_shared<BufferInputSource>(qpdf->filename, b, true);
-    status =
-        trap_errors(qpdf, [&is](qpdf_data q) { q->qpdf->createFromJSON(is); });
+    status = trap_errors(qpdf, [&is](qpdf_data q) { q->qpdf->createFromJSON(is); });
     return status;
 }
 
@@ -2031,21 +1910,17 @@ QPDF_ERROR_CODE
 qpdf_update_from_json_file(qpdf_data qpdf, char const* filename)
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
-    status = trap_errors(
-        qpdf, [filename](qpdf_data q) { q->qpdf->updateFromJSON(filename); });
+    status = trap_errors(qpdf, [filename](qpdf_data q) { q->qpdf->updateFromJSON(filename); });
     return status;
 }
 
 QPDF_ERROR_CODE
-qpdf_update_from_json_data(
-    qpdf_data qpdf, char const* buffer, unsigned long long size)
+qpdf_update_from_json_data(qpdf_data qpdf, char const* buffer, unsigned long long size)
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
-    auto b =
-        new Buffer(QUtil::unsigned_char_pointer(buffer), QIntC::to_size(size));
+    auto b = new Buffer(QUtil::unsigned_char_pointer(buffer), QIntC::to_size(size));
     auto is = std::make_shared<BufferInputSource>(qpdf->filename, b, true);
-    status =
-        trap_errors(qpdf, [&is](qpdf_data q) { q->qpdf->updateFromJSON(is); });
+    status = trap_errors(qpdf, [&is](qpdf_data q) { q->qpdf->updateFromJSON(is); });
     return status;
 }
 
@@ -2070,19 +1945,10 @@ qpdf_write_json(
     }
     status = trap_errors(
         qpdf,
-        [version,
-         p,
-         decode_level,
-         json_stream_data,
-         file_prefix,
-         &wanted_objects_set](qpdf_data q) {
+        [version, p, decode_level, json_stream_data, file_prefix, &wanted_objects_set](
+            qpdf_data q) {
             q->qpdf->writeJSON(
-                version,
-                p.get(),
-                decode_level,
-                json_stream_data,
-                file_prefix,
-                wanted_objects_set);
+                version, p.get(), decode_level, json_stream_data, file_prefix, wanted_objects_set);
         });
     return status;
 }

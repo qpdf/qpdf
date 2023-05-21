@@ -54,15 +54,10 @@ class QPDF_DLL_CLASS Pl_Function: public Pipeline
     // is thrown.
     typedef int (*writer_c_t)(unsigned char const*, size_t, void*);
     QPDF_DLL
-    Pl_Function(
-        char const* identifier, Pipeline* next, writer_c_t fn, void* udata);
+    Pl_Function(char const* identifier, Pipeline* next, writer_c_t fn, void* udata);
     typedef int (*writer_c_char_t)(char const*, size_t, void*);
     QPDF_DLL
-    Pl_Function(
-        char const* identifier,
-        Pipeline* next,
-        writer_c_char_t fn,
-        void* udata);
+    Pl_Function(char const* identifier, Pipeline* next, writer_c_char_t fn, void* udata);
 
     QPDF_DLL
     virtual ~Pl_Function();

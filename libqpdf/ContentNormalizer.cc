@@ -44,13 +44,11 @@ ContentNormalizer::handleToken(QPDFTokenizer::Token const& token)
         // Replacing string and name tokens in this way normalizes
         // their representation as this will automatically handle
         // quoting of unprintable characters, etc.
-        writeToken(
-            QPDFTokenizer::Token(QPDFTokenizer::tt_string, token.getValue()));
+        writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_string, token.getValue()));
         break;
 
     case QPDFTokenizer::tt_name:
-        writeToken(
-            QPDFTokenizer::Token(QPDFTokenizer::tt_name, token.getValue()));
+        writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_name, token.getValue()));
         break;
 
     default:
@@ -59,10 +57,8 @@ ContentNormalizer::handleToken(QPDFTokenizer::Token const& token)
     }
 
     value = token.getRawValue();
-    if (((token_type == QPDFTokenizer::tt_string) ||
-         (token_type == QPDFTokenizer::tt_name)) &&
-        ((value.find('\r') != std::string::npos) ||
-         (value.find('\n') != std::string::npos))) {
+    if (((token_type == QPDFTokenizer::tt_string) || (token_type == QPDFTokenizer::tt_name)) &&
+        ((value.find('\r') != std::string::npos) || (value.find('\n') != std::string::npos))) {
         write("\n");
     }
 }

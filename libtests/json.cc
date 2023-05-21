@@ -17,8 +17,7 @@ check(JSON const& j, std::string const& exp)
 static void
 test_main()
 {
-    JSON jstr = JSON::makeString(
-        "<1>\xcf\x80<2>\xf0\x9f\xa5\x94\\\"<3>\x03\t\b\r\n<4>");
+    JSON jstr = JSON::makeString("<1>\xcf\x80<2>\xf0\x9f\xa5\x94\\\"<3>\x03\t\b\r\n<4>");
     check(
         jstr,
         "\"<1>\xcf\x80<2>\xf0\x9f\xa5\x94\\\\\\\"<3>"
@@ -60,8 +59,7 @@ test_main()
         "  2.1e5\n"
         "]");
     std::vector<std::string> avalue;
-    assert(jarr.forEachArrayItem(
-        [&avalue](JSON j) { avalue.push_back(j.unparse()); }));
+    assert(jarr.forEachArrayItem([&avalue](JSON j) { avalue.push_back(j.unparse()); }));
     std::vector<std::string> xavalue = {
         "\"a\\tb\"",
         "null",
@@ -79,8 +77,7 @@ test_main()
     jmap.addDictionaryMember("no", JSON::makeBool(true));
     jmap.addDictionaryMember("empty_dict", JSON::makeDictionary());
     jmap.addDictionaryMember("empty_list", JSON::makeArray());
-    jmap.addDictionaryMember("single", JSON::makeArray())
-        .addArrayElement(JSON::makeInt(12));
+    jmap.addDictionaryMember("single", JSON::makeArray()).addArrayElement(JSON::makeInt(12));
     check(
         jmap,
         "{\n"
@@ -117,9 +114,7 @@ test_main()
         {"c", "[\n  true\n]"},
     };
     assert(dvalue == xdvalue);
-    auto blob_data = [](Pipeline* p) {
-        *p << "\x01\x02\x03\x04\x05\xff\xfe\xfd\xfc\xfb";
-    };
+    auto blob_data = [](Pipeline* p) { *p << "\x01\x02\x03\x04\x05\xff\xfe\xfd\xfc\xfb"; };
     JSON jblob = JSON::makeDictionary();
     jblob.addDictionaryMember("normal", JSON::parse(R"("string")"));
     jblob.addDictionaryMember("blob", JSON::makeBlob(blob_data));
@@ -133,12 +128,7 @@ test_main()
 }
 
 static void
-check_schema(
-    JSON& obj,
-    JSON& schema,
-    unsigned long flags,
-    bool exp,
-    std::string const& description)
+check_schema(JSON& obj, JSON& schema, unsigned long flags, bool exp, std::string const& description)
 {
     std::list<std::string> errors;
     std::cout << "--- " << description << std::endl;

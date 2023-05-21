@@ -14,8 +14,7 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " { -uncompress | -compress[=n] }"
-              << std::endl
+    std::cerr << "Usage: " << whoami << " { -uncompress | -compress[=n] }" << std::endl
               << "If n is specified with -compress, it is a"
               << " zlib compression level from" << std::endl
               << "1 to 9 where lower numbers are faster and"
@@ -34,8 +33,7 @@ main(int argc, char* argv[])
     }
 
     if ((argc == 2) && (strcmp(argv[1], "--version") == 0)) {
-        std::cout << whoami << " from qpdf version " << QPDF::QPDFVersion()
-                  << std::endl;
+        std::cout << whoami << " from qpdf version " << QPDF::QPDFVersion() << std::endl;
         exit(0);
     }
 
@@ -64,8 +62,7 @@ main(int argc, char* argv[])
     bool warn = false;
     flate->setWarnCallback([&warn](char const* msg, int code) {
         warn = true;
-        std::cerr << whoami << ": WARNING: zlib code " << code
-                  << ", msg = " << msg << std::endl;
+        std::cerr << whoami << ": WARNING: zlib code " << code << ", msg = " << msg << std::endl;
     });
 
     try {

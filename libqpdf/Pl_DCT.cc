@@ -182,15 +182,12 @@ term_pipeline_destination(j_compress_ptr cinfo)
 }
 
 static void
-jpeg_pipeline_dest(
-    j_compress_ptr cinfo, unsigned char* outbuffer, size_t size, Pipeline* next)
+jpeg_pipeline_dest(j_compress_ptr cinfo, unsigned char* outbuffer, size_t size, Pipeline* next)
 {
     cinfo->dest = static_cast<struct jpeg_destination_mgr*>(
         // line-break
         (*cinfo->mem->alloc_small)(
-            reinterpret_cast<j_common_ptr>(cinfo),
-            JPOOL_PERMANENT,
-            sizeof(dct_pipeline_dest)));
+            reinterpret_cast<j_common_ptr>(cinfo), JPOOL_PERMANENT, sizeof(dct_pipeline_dest)));
     auto* dest = reinterpret_cast<dct_pipeline_dest*>(cinfo->dest);
     dest->pub.init_destination = init_pipeline_destination;
     dest->pub.empty_output_buffer = empty_pipeline_output_buffer;
@@ -243,9 +240,7 @@ jpeg_buffer_src(j_decompress_ptr cinfo, Buffer* buffer)
     cinfo->src = reinterpret_cast<jpeg_source_mgr*>(
         // line-break
         (*cinfo->mem->alloc_small)(
-            reinterpret_cast<j_common_ptr>(cinfo),
-            JPOOL_PERMANENT,
-            sizeof(jpeg_source_mgr)));
+            reinterpret_cast<j_common_ptr>(cinfo), JPOOL_PERMANENT, sizeof(jpeg_source_mgr)));
 
     jpeg_source_mgr* src = cinfo->src;
     src->init_source = init_buffer_source;
@@ -262,16 +257,12 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
 {
     auto* cinfo = reinterpret_cast<jpeg_compress_struct*>(cinfo_p);
 
-#if ( \
-    (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
-    defined(__clang__))
+#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || defined(__clang__))
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
     jpeg_create_compress(cinfo);
-#if ( \
-    (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
-    defined(__clang__))
+#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || defined(__clang__))
 # pragma GCC diagnostic pop
 #endif
     static int const BUF_SIZE = 65536;
@@ -290,11 +281,9 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
 
     jpeg_start_compress(cinfo, TRUE);
 
-    unsigned int width =
-        cinfo->image_width * QIntC::to_uint(cinfo->input_components);
+    unsigned int width = cinfo->image_width * QIntC::to_uint(cinfo->input_components);
     size_t expected_size = QIntC::to_size(cinfo->image_height) *
-        QIntC::to_size(cinfo->image_width) *
-        QIntC::to_size(cinfo->input_components);
+        QIntC::to_size(cinfo->image_width) * QIntC::to_size(cinfo->input_components);
     if (b->getSize() != expected_size) {
         throw std::runtime_error(
             "Pl_DCT: image buffer size = " + std::to_string(b->getSize()) +
@@ -316,16 +305,12 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
 {
     auto* cinfo = reinterpret_cast<jpeg_decompress_struct*>(cinfo_p);
 
-#if ( \
-    (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
-    defined(__clang__))
+#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || defined(__clang__))
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
     jpeg_create_decompress(cinfo);
-#if ( \
-    (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
-    defined(__clang__))
+#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || defined(__clang__))
 # pragma GCC diagnostic pop
 #endif
     jpeg_buffer_src(cinfo, b);
@@ -333,10 +318,9 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
     (void)jpeg_read_header(cinfo, TRUE);
     (void)jpeg_calc_output_dimensions(cinfo);
 
-    unsigned int width =
-        cinfo->output_width * QIntC::to_uint(cinfo->output_components);
-    JSAMPARRAY buffer = (*cinfo->mem->alloc_sarray)(
-        reinterpret_cast<j_common_ptr>(cinfo), JPOOL_IMAGE, width, 1);
+    unsigned int width = cinfo->output_width * QIntC::to_uint(cinfo->output_components);
+    JSAMPARRAY buffer =
+        (*cinfo->mem->alloc_sarray)(reinterpret_cast<j_common_ptr>(cinfo), JPOOL_IMAGE, width, 1);
 
     (void)jpeg_start_decompress(cinfo);
     while (cinfo->output_scanline < cinfo->output_height) {

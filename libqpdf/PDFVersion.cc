@@ -7,8 +7,7 @@ PDFVersion::PDFVersion() :
 {
 }
 
-PDFVersion::PDFVersion(
-    int major_version, int minor_version, int extension_level) :
+PDFVersion::PDFVersion(int major_version, int minor_version, int extension_level) :
     major_version(major_version),
     minor_version(minor_version),
     extension_level(extension_level)
@@ -31,8 +30,7 @@ bool
 PDFVersion::operator==(PDFVersion const& rhs) const
 {
     return (
-        (this->major_version == rhs.major_version) &&
-        (this->minor_version == rhs.minor_version) &&
+        (this->major_version == rhs.major_version) && (this->minor_version == rhs.minor_version) &&
         (this->extension_level == rhs.extension_level));
 }
 
@@ -48,8 +46,7 @@ void
 PDFVersion::getVersion(std::string& version, int& extension_level) const
 {
     extension_level = this->extension_level;
-    version = std::to_string(this->major_version) + "." +
-        std::to_string(this->minor_version);
+    version = std::to_string(this->major_version) + "." + std::to_string(this->minor_version);
 }
 
 int

@@ -156,8 +156,7 @@ class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
     // Find the entry with the given key. If return_prev_if_not_found
     // is true and the item is not found, return the next lower item.
     QPDF_DLL
-    iterator
-    find(std::string const& key, bool return_prev_if_not_found = false);
+    iterator find(std::string const& key, bool return_prev_if_not_found = false);
 
     // Insert a new item. If the key already exists, it is replaced.
     QPDF_DLL

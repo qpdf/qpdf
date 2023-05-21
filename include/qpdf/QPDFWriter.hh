@@ -561,16 +561,11 @@ class QPDFWriter
     void writePad(size_t nspaces);
     void assignCompressedObjectNumbers(QPDFObjGen const& og);
     void enqueueObject(QPDFObjectHandle object);
-    void writeObjectStreamOffsets(
-        std::vector<qpdf_offset_t>& offsets, int first_obj);
+    void writeObjectStreamOffsets(std::vector<qpdf_offset_t>& offsets, int first_obj);
     void writeObjectStream(QPDFObjectHandle object);
     void writeObject(QPDFObjectHandle object, int object_stream_index = -1);
     void writeTrailer(
-        trailer_e which,
-        int size,
-        bool xref_stream,
-        qpdf_offset_t prev,
-        int linearization_pass);
+        trailer_e which, int size, bool xref_stream, qpdf_offset_t prev, int linearization_pass);
     bool willFilterStream(
         QPDFObjectHandle stream,
         bool& compress_stream,
@@ -601,8 +596,7 @@ class QPDFWriter
         bool allow_modify_other,
         qpdf_r3_print_e print,
         qpdf_r3_modify_e modify);
-    void
-    disableIncompatibleEncryption(int major, int minor, int extension_level);
+    void disableIncompatibleEncryption(int major, int minor, int extension_level);
     void parseVersion(std::string const& version, int& major, int& minor) const;
     int compareVersions(int major1, int minor1, int major2, int minor2) const;
     void setEncryptionParameters(
@@ -640,8 +634,7 @@ class QPDFWriter
     void doWriteSetup();
     void writeHeader();
     void writeHintStream(int hint_id);
-    qpdf_offset_t
-    writeXRefTable(trailer_e which, int first, int last, int size);
+    qpdf_offset_t writeXRefTable(trailer_e which, int first, int last, int size);
     qpdf_offset_t writeXRefTable(
         trailer_e which,
         int first,
@@ -693,8 +686,7 @@ class QPDFWriter
     void pushMD5Pipeline(PipelinePopper&);
     void computeDeterministicIDData();
 
-    void discardGeneration(
-        std::map<QPDFObjGen, int> const& in, std::map<int, int>& out);
+    void discardGeneration(std::map<QPDFObjGen, int> const& in, std::map<int, int>& out);
 
     class Members
     {

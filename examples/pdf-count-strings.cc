@@ -97,8 +97,7 @@ main(int argc, char* argv[])
                 page.filterContents(&counter, &out);
                 std::cout << "\n% end " << pageno << std::endl;
             }
-            std::cout << "Page " << pageno
-                      << ": strings = " << counter.getCount() << std::endl;
+            std::cout << "Page " << pageno << ": strings = " << counter.getCount() << std::endl;
         }
     } catch (std::exception& e) {
         std::cerr << whoami << ": " << e.what() << std::endl;

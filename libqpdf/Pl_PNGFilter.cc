@@ -29,36 +29,28 @@ Pl_PNGFilter::Pl_PNGFilter(
     pos(0)
 {
     if (samples_per_pixel < 1) {
-        throw std::runtime_error(
-            "PNGFilter created with invalid samples_per_pixel");
+        throw std::runtime_error("PNGFilter created with invalid samples_per_pixel");
     }
-    if (!((bits_per_sample == 1) || (bits_per_sample == 2) ||
-          (bits_per_sample == 4) || (bits_per_sample == 8) ||
-          (bits_per_sample == 16))) {
-        throw std::runtime_error(
-            "PNGFilter created with invalid bits_per_sample not"
-            " 1, 2, 4, 8, or 16");
+    if (!((bits_per_sample == 1) || (bits_per_sample == 2) || (bits_per_sample == 4) ||
+          (bits_per_sample == 8) || (bits_per_sample == 16))) {
+        throw std::runtime_error("PNGFilter created with invalid bits_per_sample not"
+                                 " 1, 2, 4, 8, or 16");
     }
     this->bytes_per_pixel = ((bits_per_sample * samples_per_pixel) + 7) / 8;
-    unsigned long long bpr =
-        ((columns * bits_per_sample * samples_per_pixel) + 7) / 8;
+    unsigned long long bpr = ((columns * bits_per_sample * samples_per_pixel) + 7) / 8;
     if ((bpr == 0) || (bpr > (UINT_MAX - 1))) {
-        throw std::runtime_error(
-            "PNGFilter created with invalid columns value");
+        throw std::runtime_error("PNGFilter created with invalid columns value");
     }
     this->bytes_per_row = bpr & UINT_MAX;
-    this->buf1 =
-        QUtil::make_shared_array<unsigned char>(this->bytes_per_row + 1);
-    this->buf2 =
-        QUtil::make_shared_array<unsigned char>(this->bytes_per_row + 1);
+    this->buf1 = QUtil::make_shared_array<unsigned char>(this->bytes_per_row + 1);
+    this->buf2 = QUtil::make_shared_array<unsigned char>(this->bytes_per_row + 1);
     memset(this->buf1.get(), 0, this->bytes_per_row + 1);
     memset(this->buf2.get(), 0, this->bytes_per_row + 1);
     this->cur_row = this->buf1.get();
     this->prev_row = this->buf2.get();
 
     // number of bytes per incoming row
-    this->incoming =
-        (action == a_encode ? this->bytes_per_row : this->bytes_per_row + 1);
+    this->incoming = (action == a_encode ? this->bytes_per_row : this->bytes_per_row + 1);
 }
 
 void
@@ -197,8 +189,8 @@ Pl_PNGFilter::decodePaeth()
             upper_left = above_buffer[i - bpp];
         }
 
-        buffer[i] = static_cast<unsigned char>(
-            buffer[i] + this->PaethPredictor(left, up, upper_left));
+        buffer[i] =
+            static_cast<unsigned char>(buffer[i] + this->PaethPredictor(left, up, upper_left));
     }
 }
 
@@ -227,8 +219,7 @@ Pl_PNGFilter::encodeRow()
     getNext()->write(&ch, 1);
     if (this->prev_row) {
         for (unsigned int i = 0; i < this->bytes_per_row; ++i) {
-            ch = static_cast<unsigned char>(
-                this->cur_row[i] - this->prev_row[i]);
+            ch = static_cast<unsigned char>(this->cur_row[i] - this->prev_row[i]);
             getNext()->write(&ch, 1);
         }
     } else {

@@ -91,8 +91,7 @@ void
 Pl_Base64::flush_decode()
 {
     if (this->end_of_data) {
-        throw std::runtime_error(
-            getIdentifier() + ": base64 decode: data follows pad characters");
+        throw std::runtime_error(getIdentifier() + ": base64 decode: data follows pad characters");
     }
     int pad = 0;
     int shift = 18;
@@ -110,14 +109,12 @@ Pl_Base64::flush_decode()
             v = 62;
         } else if ((ch == '/') || (ch == '_')) {
             v = 63;
-        } else if (
-            (ch == '=') && ((i == 3) || ((i == 2) && (this->buf[3] == '=')))) {
+        } else if ((ch == '=') && ((i == 3) || ((i == 2) && (this->buf[3] == '=')))) {
             ++pad;
             this->end_of_data = true;
             v = 0;
         } else {
-            throw std::runtime_error(
-                getIdentifier() + ": base64 decode: invalid input");
+            throw std::runtime_error(getIdentifier() + ": base64 decode: invalid input");
         }
         outval |= v << shift;
         shift -= 6;

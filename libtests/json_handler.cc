@@ -38,9 +38,7 @@ print_json(std::string const& path, JSON value)
 static JSONHandler::void_handler_t
 make_print_message(std::string msg)
 {
-    return [msg](std::string const& path) {
-        std::cout << path << ": json: " << msg << std::endl;
-    };
+    return [msg](std::string const& path) { std::cout << path << ": json: " << msg << std::endl; };
 }
 
 static void

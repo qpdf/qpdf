@@ -230,9 +230,6 @@ enum pdf_annotation_flag_e {
 };
 
 /* Encryption/password status for QPDFJob */
-enum qpdf_encryption_status_e {
-    qpdf_es_encrypted = 1 << 0,
-    qpdf_es_password_incorrect = 1 << 1
-};
+enum qpdf_encryption_status_e { qpdf_es_encrypted = 1 << 0, qpdf_es_password_incorrect = 1 << 1 };
 
 #endif /* QPDFCONSTANTS_H */

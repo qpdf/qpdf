@@ -14,8 +14,7 @@ main(int argc, char* argv[])
     auto whoami = QUtil::getWhoami(argv[0]);
 
     if (argc != 4) {
-        std::cerr << "Usage: " << whoami << " file attachment-key outfile"
-                  << std::endl;
+        std::cerr << "Usage: " << whoami << " file attachment-key outfile" << std::endl;
         exit(2);
     }
 

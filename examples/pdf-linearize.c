@@ -61,15 +61,11 @@ main(int argc, char* argv[])
     }
     while (qpdf_more_warnings(qpdf)) {
         warnings = 1;
-        printf(
-            "warning: %s\n",
-            qpdf_get_error_full_text(qpdf, qpdf_next_warning(qpdf)));
+        printf("warning: %s\n", qpdf_get_error_full_text(qpdf, qpdf_next_warning(qpdf)));
     }
     if (qpdf_has_error(qpdf)) {
         errors = 1;
-        printf(
-            "error: %s\n",
-            qpdf_get_error_full_text(qpdf, qpdf_get_error(qpdf)));
+        printf("error: %s\n", qpdf_get_error_full_text(qpdf, qpdf_get_error(qpdf)));
     }
     qpdf_cleanup(&qpdf);
     if (errors) {

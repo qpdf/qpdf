@@ -22,13 +22,11 @@ process(char const* whoami, char const* infile, std::string outprefix)
 {
     QPDF inpdf;
     inpdf.processFile(infile);
-    std::vector<QPDFPageObjectHelper> pages =
-        QPDFPageDocumentHelper(inpdf).getAllPages();
+    std::vector<QPDFPageObjectHelper> pages = QPDFPageDocumentHelper(inpdf).getAllPages();
     int pageno_len = QIntC::to_int(std::to_string(pages.size()).length());
     int pageno = 0;
     for (auto& page: pages) {
-        std::string outfile =
-            outprefix + QUtil::int_to_string(++pageno, pageno_len) + ".pdf";
+        std::string outfile = outprefix + QUtil::int_to_string(++pageno, pageno_len) + ".pdf";
         QPDF outpdf;
         outpdf.emptyPDF();
         QPDFPageDocumentHelper(outpdf).addPage(page, false);

@@ -117,9 +117,7 @@ compare(QPDFObjectHandle a, QPDFObjectHandle b)
 }
 
 bool
-compare_xref_table(
-    std::map<QPDFObjGen, QPDFXRefEntry> a,
-    std::map<QPDFObjGen, QPDFXRefEntry> b)
+compare_xref_table(std::map<QPDFObjGen, QPDFXRefEntry> a, std::map<QPDFObjGen, QPDFXRefEntry> b)
 {
     if (a.size() != b.size()) {
         std::cerr << "different size" << std::endl;
@@ -127,8 +125,8 @@ compare_xref_table(
     }
 
     for (auto const& iter: a) {
-        std::cout << "xref entry for " << iter.first.getObj() << "/"
-                  << iter.first.getGen() << std::endl;
+        std::cout << "xref entry for " << iter.first.getObj() << "/" << iter.first.getGen()
+                  << std::endl;
 
         if (b.count(iter.first) == 0) {
             std::cerr << "not found" << std::endl;
@@ -222,20 +220,16 @@ main(int argc, char* argv[])
 
         QPDF qpdf_ren;
         qpdf_ren.processMemoryFile(
-            "renumbered",
-            reinterpret_cast<char*>(buf->getBuffer()),
-            buf->getSize());
+            "renumbered", reinterpret_cast<char*>(buf->getBuffer()), buf->getSize());
         std::map<QPDFObjGen, QPDFXRefEntry> xrefs_ren = qpdf_ren.getXRefTable();
 
-        std::cout << "--- compare between input and renumbered objects ---"
-                  << std::endl;
+        std::cout << "--- compare between input and renumbered objects ---" << std::endl;
         for (auto const& iter: objs_in) {
             QPDFObjGen og_in = iter.getObjGen();
             QPDFObjGen og_ren = w.getRenumberedObjGen(og_in);
 
-            std::cout << "input " << og_in.getObj() << "/" << og_in.getGen()
-                      << " -> renumbered " << og_ren.getObj() << "/"
-                      << og_ren.getGen() << std::endl;
+            std::cout << "input " << og_in.getObj() << "/" << og_in.getGen() << " -> renumbered "
+                      << og_ren.getObj() << "/" << og_ren.getGen() << std::endl;
 
             if (og_ren.getObj() == 0) {
                 std::cout << "deleted" << std::endl;
@@ -249,8 +243,7 @@ main(int argc, char* argv[])
         }
         std::cout << "complete" << std::endl;
 
-        std::cout << "--- compare between written and reloaded xref tables ---"
-                  << std::endl;
+        std::cout << "--- compare between written and reloaded xref tables ---" << std::endl;
         if (!compare_xref_table(xrefs_w, xrefs_ren)) {
             std::cerr << "different" << std::endl;
             std::exit(2);

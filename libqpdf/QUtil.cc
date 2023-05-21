@@ -255,56 +255,41 @@ static unsigned short mac_roman_to_unicode[] = {
 };
 
 static std::map<unsigned long, unsigned char> unicode_to_win_ansi = {
-    {0x20ac, 0x80}, {0x201a, 0x82}, {0x192, 0x83},  {0x201e, 0x84},
-    {0x2026, 0x85}, {0x2020, 0x86}, {0x2021, 0x87}, {0x2c6, 0x88},
-    {0x2030, 0x89}, {0x160, 0x8a},  {0x2039, 0x8b}, {0x152, 0x8c},
-    {0x17d, 0x8e},  {0x2018, 0x91}, {0x2019, 0x92}, {0x201c, 0x93},
-    {0x201d, 0x94}, {0x2022, 0x95}, {0x2013, 0x96}, {0x2014, 0x97},
-    {0x303, 0x98},  {0x2122, 0x99}, {0x161, 0x9a},  {0x203a, 0x9b},
+    {0x20ac, 0x80}, {0x201a, 0x82}, {0x192, 0x83},  {0x201e, 0x84}, {0x2026, 0x85}, {0x2020, 0x86},
+    {0x2021, 0x87}, {0x2c6, 0x88},  {0x2030, 0x89}, {0x160, 0x8a},  {0x2039, 0x8b}, {0x152, 0x8c},
+    {0x17d, 0x8e},  {0x2018, 0x91}, {0x2019, 0x92}, {0x201c, 0x93}, {0x201d, 0x94}, {0x2022, 0x95},
+    {0x2013, 0x96}, {0x2014, 0x97}, {0x303, 0x98},  {0x2122, 0x99}, {0x161, 0x9a},  {0x203a, 0x9b},
     {0x153, 0x9c},  {0x17e, 0x9e},  {0x178, 0x9f},  {0xa0, 0xa0},
 };
 static std::map<unsigned long, unsigned char> unicode_to_mac_roman = {
-    {0xc4, 0x80},   {0xc5, 0x81},   {0xc7, 0x82},   {0xc9, 0x83},
-    {0xd1, 0x84},   {0xd6, 0x85},   {0xdc, 0x86},   {0xe1, 0x87},
-    {0xe0, 0x88},   {0xe2, 0x89},   {0xe4, 0x8a},   {0xe3, 0x8b},
-    {0xe5, 0x8c},   {0xe7, 0x8d},   {0xe9, 0x8e},   {0xe8, 0x8f},
-    {0xea, 0x90},   {0xeb, 0x91},   {0xed, 0x92},   {0xec, 0x93},
-    {0xee, 0x94},   {0xef, 0x95},   {0xf1, 0x96},   {0xf3, 0x97},
-    {0xf2, 0x98},   {0xf4, 0x99},   {0xf6, 0x9a},   {0xf5, 0x9b},
-    {0xfa, 0x9c},   {0xf9, 0x9d},   {0xfb, 0x9e},   {0xfc, 0x9f},
-    {0x2020, 0xa0}, {0xb0, 0xa1},   {0xa2, 0xa2},   {0xa3, 0xa3},
-    {0xa7, 0xa4},   {0x2022, 0xa5}, {0xb6, 0xa6},   {0xdf, 0xa7},
-    {0xae, 0xa8},   {0xa9, 0xa9},   {0x2122, 0xaa}, {0x301, 0xab},
-    {0x308, 0xac},  {0xc6, 0xae},   {0xd8, 0xaf},   {0xb1, 0xb1},
-    {0xa5, 0xb4},   {0x3bc, 0xb5},  {0x1d43, 0xbb}, {0x1d52, 0xbc},
-    {0xe6, 0xbe},   {0xf8, 0xbf},   {0xbf, 0xc0},   {0xa1, 0xc1},
-    {0xac, 0xc2},   {0x192, 0xc4},  {0xab, 0xc7},   {0xbb, 0xc8},
-    {0x2026, 0xc9}, {0xc0, 0xcb},   {0xc3, 0xcc},   {0xd5, 0xcd},
-    {0x152, 0xce},  {0x153, 0xcf},  {0x2013, 0xd0}, {0x2014, 0xd1},
-    {0x201c, 0xd2}, {0x201d, 0xd3}, {0x2018, 0xd4}, {0x2019, 0xd5},
-    {0xf7, 0xd6},   {0xff, 0xd8},   {0x178, 0xd9},  {0x2044, 0xda},
-    {0xa4, 0xdb},   {0x2039, 0xdc}, {0x203a, 0xdd}, {0xfb01, 0xde},
-    {0xfb02, 0xdf}, {0x2021, 0xe0}, {0xb7, 0xe1},   {0x201a, 0xe2},
-    {0x201e, 0xe3}, {0x2030, 0xe4}, {0xc2, 0xe5},   {0xca, 0xe6},
-    {0xc1, 0xe7},   {0xcb, 0xe8},   {0xc8, 0xe9},   {0xcd, 0xea},
-    {0xce, 0xeb},   {0xcf, 0xec},   {0xcc, 0xed},   {0xd3, 0xee},
-    {0xd4, 0xef},   {0xd2, 0xf1},   {0xda, 0xf2},   {0xdb, 0xf3},
-    {0xd9, 0xf4},   {0x131, 0xf5},  {0x2c6, 0xf6},  {0x303, 0xf7},
-    {0x304, 0xf8},  {0x306, 0xf9},  {0x307, 0xfa},  {0x30a, 0xfb},
+    {0xc4, 0x80},   {0xc5, 0x81},   {0xc7, 0x82},   {0xc9, 0x83},   {0xd1, 0x84},   {0xd6, 0x85},
+    {0xdc, 0x86},   {0xe1, 0x87},   {0xe0, 0x88},   {0xe2, 0x89},   {0xe4, 0x8a},   {0xe3, 0x8b},
+    {0xe5, 0x8c},   {0xe7, 0x8d},   {0xe9, 0x8e},   {0xe8, 0x8f},   {0xea, 0x90},   {0xeb, 0x91},
+    {0xed, 0x92},   {0xec, 0x93},   {0xee, 0x94},   {0xef, 0x95},   {0xf1, 0x96},   {0xf3, 0x97},
+    {0xf2, 0x98},   {0xf4, 0x99},   {0xf6, 0x9a},   {0xf5, 0x9b},   {0xfa, 0x9c},   {0xf9, 0x9d},
+    {0xfb, 0x9e},   {0xfc, 0x9f},   {0x2020, 0xa0}, {0xb0, 0xa1},   {0xa2, 0xa2},   {0xa3, 0xa3},
+    {0xa7, 0xa4},   {0x2022, 0xa5}, {0xb6, 0xa6},   {0xdf, 0xa7},   {0xae, 0xa8},   {0xa9, 0xa9},
+    {0x2122, 0xaa}, {0x301, 0xab},  {0x308, 0xac},  {0xc6, 0xae},   {0xd8, 0xaf},   {0xb1, 0xb1},
+    {0xa5, 0xb4},   {0x3bc, 0xb5},  {0x1d43, 0xbb}, {0x1d52, 0xbc}, {0xe6, 0xbe},   {0xf8, 0xbf},
+    {0xbf, 0xc0},   {0xa1, 0xc1},   {0xac, 0xc2},   {0x192, 0xc4},  {0xab, 0xc7},   {0xbb, 0xc8},
+    {0x2026, 0xc9}, {0xc0, 0xcb},   {0xc3, 0xcc},   {0xd5, 0xcd},   {0x152, 0xce},  {0x153, 0xcf},
+    {0x2013, 0xd0}, {0x2014, 0xd1}, {0x201c, 0xd2}, {0x201d, 0xd3}, {0x2018, 0xd4}, {0x2019, 0xd5},
+    {0xf7, 0xd6},   {0xff, 0xd8},   {0x178, 0xd9},  {0x2044, 0xda}, {0xa4, 0xdb},   {0x2039, 0xdc},
+    {0x203a, 0xdd}, {0xfb01, 0xde}, {0xfb02, 0xdf}, {0x2021, 0xe0}, {0xb7, 0xe1},   {0x201a, 0xe2},
+    {0x201e, 0xe3}, {0x2030, 0xe4}, {0xc2, 0xe5},   {0xca, 0xe6},   {0xc1, 0xe7},   {0xcb, 0xe8},
+    {0xc8, 0xe9},   {0xcd, 0xea},   {0xce, 0xeb},   {0xcf, 0xec},   {0xcc, 0xed},   {0xd3, 0xee},
+    {0xd4, 0xef},   {0xd2, 0xf1},   {0xda, 0xf2},   {0xdb, 0xf3},   {0xd9, 0xf4},   {0x131, 0xf5},
+    {0x2c6, 0xf6},  {0x303, 0xf7},  {0x304, 0xf8},  {0x306, 0xf9},  {0x307, 0xfa},  {0x30a, 0xfb},
     {0x327, 0xfc},  {0x30b, 0xfd},  {0x328, 0xfe},  {0x2c7, 0xff},
 };
 static std::map<unsigned long, unsigned char> unicode_to_pdf_doc = {
-    {0x02d8, 0x18}, {0x02c7, 0x19}, {0x02c6, 0x1a}, {0x02d9, 0x1b},
-    {0x02dd, 0x1c}, {0x02db, 0x1d}, {0x02da, 0x1e}, {0x02dc, 0x1f},
-    {0x2022, 0x80}, {0x2020, 0x81}, {0x2021, 0x82}, {0x2026, 0x83},
-    {0x2014, 0x84}, {0x2013, 0x85}, {0x0192, 0x86}, {0x2044, 0x87},
-    {0x2039, 0x88}, {0x203a, 0x89}, {0x2212, 0x8a}, {0x2030, 0x8b},
-    {0x201e, 0x8c}, {0x201c, 0x8d}, {0x201d, 0x8e}, {0x2018, 0x8f},
-    {0x2019, 0x90}, {0x201a, 0x91}, {0x2122, 0x92}, {0xfb01, 0x93},
-    {0xfb02, 0x94}, {0x0141, 0x95}, {0x0152, 0x96}, {0x0160, 0x97},
-    {0x0178, 0x98}, {0x017d, 0x99}, {0x0131, 0x9a}, {0x0142, 0x9b},
-    {0x0153, 0x9c}, {0x0161, 0x9d}, {0x017e, 0x9e}, {0xfffd, 0x9f},
-    {0x20ac, 0xa0},
+    {0x02d8, 0x18}, {0x02c7, 0x19}, {0x02c6, 0x1a}, {0x02d9, 0x1b}, {0x02dd, 0x1c}, {0x02db, 0x1d},
+    {0x02da, 0x1e}, {0x02dc, 0x1f}, {0x2022, 0x80}, {0x2020, 0x81}, {0x2021, 0x82}, {0x2026, 0x83},
+    {0x2014, 0x84}, {0x2013, 0x85}, {0x0192, 0x86}, {0x2044, 0x87}, {0x2039, 0x88}, {0x203a, 0x89},
+    {0x2212, 0x8a}, {0x2030, 0x8b}, {0x201e, 0x8c}, {0x201c, 0x8d}, {0x201d, 0x8e}, {0x2018, 0x8f},
+    {0x2019, 0x90}, {0x201a, 0x91}, {0x2122, 0x92}, {0xfb01, 0x93}, {0xfb02, 0x94}, {0x0141, 0x95},
+    {0x0152, 0x96}, {0x0160, 0x97}, {0x0178, 0x98}, {0x017d, 0x99}, {0x0131, 0x9a}, {0x0142, 0x9b},
+    {0x0153, 0x9c}, {0x0161, 0x9d}, {0x017e, 0x9e}, {0xfffd, 0x9f}, {0x20ac, 0xa0},
 };
 
 template <typename T>
@@ -316,8 +301,7 @@ int_to_string_base_internal(T num, int base, int length)
     // such that a negative value appends spaces and a positive value
     // prepends zeroes.
     if (!((base == 8) || (base == 10) || (base == 16))) {
-        throw std::logic_error(
-            "int_to_string_base called with unsupported base");
+        throw std::logic_error("int_to_string_base called with unsupported base");
     }
     std::string cvt;
     if (base == 10) {
@@ -366,8 +350,7 @@ QUtil::uint_to_string_base(unsigned long long num, int base, int length)
 }
 
 std::string
-QUtil::double_to_string(
-    double num, int decimal_places, bool trim_trailing_zeroes)
+QUtil::double_to_string(double num, int decimal_places, bool trim_trailing_zeroes)
 {
     // Backward compatibility -- this code used to use sprintf and
     // treated decimal_places <= 0 to mean to use the default, which
@@ -402,8 +385,7 @@ QUtil::string_to_ll(char const* str)
 #endif
     if (errno == ERANGE) {
         throw std::range_error(
-            std::string("overflow/underflow converting ") + str +
-            " to 64-bit integer");
+            std::string("overflow/underflow converting ") + str + " to 64-bit integer");
     }
     return result;
 }
@@ -424,8 +406,7 @@ QUtil::string_to_ull(char const* str)
     }
     if (*p == '-') {
         throw std::runtime_error(
-            std::string("underflow converting ") + str +
-            " to 64-bit unsigned integer");
+            std::string("underflow converting ") + str + " to 64-bit unsigned integer");
     }
 
     errno = 0;
@@ -436,8 +417,7 @@ QUtil::string_to_ull(char const* str)
 #endif
     if (errno == ERANGE) {
         throw std::runtime_error(
-            std::string("overflow converting ") + str +
-            " to 64-bit unsigned integer");
+            std::string("overflow converting ") + str + " to 64-bit unsigned integer");
     }
     return result;
 }
@@ -567,10 +547,7 @@ int
 QUtil::seek(FILE* stream, qpdf_offset_t offset, int whence)
 {
 #if HAVE_FSEEKO
-    return fseeko(
-        stream,
-        QIntC::IntConverter<qpdf_offset_t, off_t>::convert(offset),
-        whence);
+    return fseeko(stream, QIntC::IntConverter<qpdf_offset_t, off_t>::convert(offset), whence);
 #elif HAVE_FSEEKO64
     return fseeko64(stream, offset, whence);
 #else
@@ -601,37 +578,22 @@ QUtil::tell(FILE* stream)
 bool
 QUtil::same_file(char const* name1, char const* name2)
 {
-    if ((name1 == nullptr) || (strlen(name1) == 0) || (name2 == nullptr) ||
-        (strlen(name2) == 0)) {
+    if ((name1 == nullptr) || (strlen(name1) == 0) || (name2 == nullptr) || (strlen(name2) == 0)) {
         return false;
     }
 #ifdef _WIN32
     bool same = false;
 # ifndef AVOID_WINDOWS_HANDLE
     HANDLE fh1 = CreateFile(
-        name1,
-        GENERIC_READ,
-        FILE_SHARE_READ,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL);
+        name1, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     HANDLE fh2 = CreateFile(
-        name2,
-        GENERIC_READ,
-        FILE_SHARE_READ,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL);
+        name2, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     BY_HANDLE_FILE_INFORMATION fi1;
     BY_HANDLE_FILE_INFORMATION fi2;
     if ((fh1 != INVALID_HANDLE_VALUE) && (fh2 != INVALID_HANDLE_VALUE) &&
-        GetFileInformationByHandle(fh1, &fi1) &&
-        GetFileInformationByHandle(fh2, &fi2) &&
+        GetFileInformationByHandle(fh1, &fi1) && GetFileInformationByHandle(fh2, &fi2) &&
         (fi1.dwVolumeSerialNumber == fi2.dwVolumeSerialNumber) &&
-        (fi1.nFileIndexLow == fi2.nFileIndexLow) &&
-        (fi1.nFileIndexHigh == fi2.nFileIndexHigh)) {
+        (fi1.nFileIndexLow == fi2.nFileIndexLow) && (fi1.nFileIndexHigh == fi2.nFileIndexHigh)) {
         same = true;
     }
     if (fh1 != INVALID_HANDLE_VALUE) {
@@ -645,8 +607,8 @@ QUtil::same_file(char const* name1, char const* name2)
 #else
     struct stat st1;
     struct stat st2;
-    if ((stat(name1, &st1) == 0) && (stat(name2, &st2) == 0) &&
-        (st1.st_ino == st2.st_ino) && (st1.st_dev == st2.st_dev)) {
+    if ((stat(name1, &st1) == 0) && (stat(name2, &st2) == 0) && (st1.st_ino == st2.st_ino) &&
+        (st1.st_dev == st2.st_dev)) {
         return true;
     }
 #endif
@@ -675,13 +637,9 @@ QUtil::rename_file(char const* oldname, char const* newname)
     }
     std::shared_ptr<wchar_t> wold = win_convert_filename(oldname);
     std::shared_ptr<wchar_t> wnew = win_convert_filename(newname);
-    os_wrapper(
-        std::string("rename ") + oldname + " " + newname,
-        _wrename(wold.get(), wnew.get()));
+    os_wrapper(std::string("rename ") + oldname + " " + newname, _wrename(wold.get(), wnew.get()));
 #else
-    os_wrapper(
-        std::string("rename ") + oldname + " " + newname,
-        rename(oldname, newname));
+    os_wrapper(std::string("rename ") + oldname + " " + newname, rename(oldname, newname));
 #endif
 }
 
@@ -699,8 +657,7 @@ QUtil::pipe_file(char const* filename, Pipeline* p)
     }
     p->finish();
     if (ferror(f)) {
-        throw std::runtime_error(
-            std::string("failure reading file ") + filename);
+        throw std::runtime_error(std::string("failure reading file ") + filename);
     }
 }
 
@@ -843,8 +800,7 @@ QUtil::getWhoami(char* argv0)
         ++whoami;
     }
 
-    if ((strlen(whoami) > 4) &&
-        (strcmp(whoami + strlen(whoami) - 4, ".exe") == 0)) {
+    if ((strlen(whoami) > 4) && (strcmp(whoami + strlen(whoami) - 4, ".exe") == 0)) {
         whoami[strlen(whoami) - 4] = '\0';
     }
 
@@ -974,15 +930,12 @@ QUtil::qpdf_time_to_pdf_time(QPDFTime const& qtm)
         } else {
             tz_offset += "-";
         }
-        tz_offset += QUtil::int_to_string(t / 60, 2) + "'" +
-            QUtil::int_to_string(t % 60, 2) + "'";
+        tz_offset += QUtil::int_to_string(t / 60, 2) + "'" + QUtil::int_to_string(t % 60, 2) + "'";
     }
     return (
-        "D:" + QUtil::int_to_string(qtm.year, 4) +
-        QUtil::int_to_string(qtm.month, 2) + QUtil::int_to_string(qtm.day, 2) +
-        QUtil::int_to_string(qtm.hour, 2) +
-        QUtil::int_to_string(qtm.minute, 2) +
-        QUtil::int_to_string(qtm.second, 2) + tz_offset);
+        "D:" + QUtil::int_to_string(qtm.year, 4) + QUtil::int_to_string(qtm.month, 2) +
+        QUtil::int_to_string(qtm.day, 2) + QUtil::int_to_string(qtm.hour, 2) +
+        QUtil::int_to_string(qtm.minute, 2) + QUtil::int_to_string(qtm.second, 2) + tz_offset);
 }
 
 std::string
@@ -999,16 +952,13 @@ QUtil::qpdf_time_to_iso8601(QPDFTime const& qtm)
         } else {
             tz_offset += "-";
         }
-        tz_offset += QUtil::int_to_string(t / 60, 2) + ":" +
-            QUtil::int_to_string(t % 60, 2);
+        tz_offset += QUtil::int_to_string(t / 60, 2) + ":" + QUtil::int_to_string(t % 60, 2);
     }
     return (
-        QUtil::int_to_string(qtm.year, 4) + "-" +
-        QUtil::int_to_string(qtm.month, 2) + "-" +
-        QUtil::int_to_string(qtm.day, 2) + "T" +
-        QUtil::int_to_string(qtm.hour, 2) + ":" +
-        QUtil::int_to_string(qtm.minute, 2) + ":" +
-        QUtil::int_to_string(qtm.second, 2) + tz_offset);
+        QUtil::int_to_string(qtm.year, 4) + "-" + QUtil::int_to_string(qtm.month, 2) + "-" +
+        QUtil::int_to_string(qtm.day, 2) + "T" + QUtil::int_to_string(qtm.hour, 2) + ":" +
+        QUtil::int_to_string(qtm.minute, 2) + ":" + QUtil::int_to_string(qtm.second, 2) +
+        tz_offset);
 }
 
 bool
@@ -1022,9 +972,7 @@ QUtil::pdf_time_to_qpdf_time(std::string const& str, QPDFTime* qtm)
         return false;
     }
     int tz_delta = 0;
-    auto to_i = [](std::string const& s) {
-        return QUtil::string_to_int(s.c_str());
-    };
+    auto to_i = [](std::string const& s) { return QUtil::string_to_int(s.c_str()); };
 
     if (m[8] != "") {
         tz_delta = ((to_i(m[9]) * 60) + to_i(m[10]));
@@ -1034,13 +982,7 @@ QUtil::pdf_time_to_qpdf_time(std::string const& str, QPDFTime* qtm)
     }
     if (qtm) {
         *qtm = QPDFTime(
-            to_i(m[1]),
-            to_i(m[2]),
-            to_i(m[3]),
-            to_i(m[4]),
-            to_i(m[5]),
-            to_i(m[6]),
-            tz_delta);
+            to_i(m[1]), to_i(m[2]), to_i(m[3]), to_i(m[4]), to_i(m[5]), to_i(m[6]), tz_delta);
     }
     return true;
 }
@@ -1098,8 +1040,7 @@ QUtil::toUTF8(unsigned long uval)
         }
         // If maxval is k bits long, the high (7 - k) bits of the
         // resulting byte must be high.
-        *cur_byte = static_cast<unsigned char>(
-            QIntC::to_ulong(0xff - (1 + (maxval << 1))) + uval);
+        *cur_byte = static_cast<unsigned char>(QIntC::to_ulong(0xff - (1 + (maxval << 1))) + uval);
 
         result += reinterpret_cast<char*>(cur_byte);
     }
@@ -1121,10 +1062,8 @@ QUtil::toUTF16(unsigned long uval)
     } else if (uval <= 0x10ffff) {
         char out[4];
         uval -= 0x10000;
-        unsigned short high =
-            static_cast<unsigned short>(((uval & 0xffc00) >> 10) + 0xd800);
-        unsigned short low =
-            static_cast<unsigned short>((uval & 0x3ff) + 0xdc00);
+        unsigned short high = static_cast<unsigned short>(((uval & 0xffc00) >> 10) + 0xd800);
+        unsigned short low = static_cast<unsigned short>((uval & 0x3ff) + 0xdc00);
         out[0] = static_cast<char>((high & 0xff00) >> 8);
         out[1] = static_cast<char>(high & 0xff);
         out[2] = static_cast<char>((low & 0xff00) >> 8);
@@ -1203,14 +1142,12 @@ long
 QUtil::random()
 {
     long result = 0L;
-    initializeWithRandomBytes(
-        reinterpret_cast<unsigned char*>(&result), sizeof(result));
+    initializeWithRandomBytes(reinterpret_cast<unsigned char*>(&result), sizeof(result));
     return result;
 }
 
 void
-QUtil::read_file_into_memory(
-    char const* filename, std::shared_ptr<char>& file_buf, size_t& size)
+QUtil::read_file_into_memory(char const* filename, std::shared_ptr<char>& file_buf, size_t& size)
 {
     FILE* f = safe_fopen(filename, "rb");
     FileCloser fc(f);
@@ -1227,14 +1164,12 @@ QUtil::read_file_into_memory(
     if (bytes_read != size) {
         if (ferror(f)) {
             throw std::runtime_error(
-                std::string("failure reading file ") + filename +
-                " into memory: read " + uint_to_string(bytes_read) +
-                "; wanted " + uint_to_string(size));
+                std::string("failure reading file ") + filename + " into memory: read " +
+                uint_to_string(bytes_read) + "; wanted " + uint_to_string(size));
         } else {
             throw std::runtime_error(
-                std::string("premature eof reading file ") + filename +
-                " into memory: read " + uint_to_string(bytes_read) +
-                "; wanted " + uint_to_string(size));
+                std::string("premature eof reading file ") + filename + " into memory: read " +
+                uint_to_string(bytes_read) + "; wanted " + uint_to_string(size));
         }
     }
 }
@@ -1258,13 +1193,11 @@ QUtil::read_file_into_string(FILE* f, std::string_view filename)
         if (ferror(f)) {
             throw std::runtime_error(
                 std::string("failure reading file ") + std::string(filename) +
-                " into memory: read " + uint_to_string(read) + "; wanted " +
-                uint_to_string(size));
+                " into memory: read " + uint_to_string(read) + "; wanted " + uint_to_string(size));
         } else {
             throw std::runtime_error(
-                std::string("premature eof reading file ") +
-                std::string(filename) + " into memory: read " +
-                uint_to_string(read) + "; wanted " + uint_to_string(size));
+                std::string("premature eof reading file ") + std::string(filename) +
+                " into memory: read " + uint_to_string(read) + "; wanted " + uint_to_string(size));
         }
     }
     return result;
@@ -1314,9 +1247,7 @@ QUtil::read_lines_from_file(FILE* f, bool preserve_eol)
 
 void
 QUtil::read_lines_from_file(
-    std::function<bool(char&)> next_char,
-    std::list<std::string>& lines,
-    bool preserve_eol)
+    std::function<bool(char&)> next_char, std::list<std::string>& lines, bool preserve_eol)
 {
     std::string* buf = nullptr;
     char c;
@@ -1463,8 +1394,7 @@ QUtil::parse_numrange(char const* range, int max)
             // max == 0 means we don't know the max and are just
             // testing for valid syntax.
             if ((max > 0) && ((num < 1) || (num > max))) {
-                throw std::runtime_error(
-                    "number " + QUtil::int_to_string(num) + " out of range");
+                throw std::runtime_error("number " + QUtil::int_to_string(num) + " out of range");
             }
             if (i == 0) {
                 result.push_back(work.at(i));
@@ -1484,8 +1414,7 @@ QUtil::parse_numrange(char const* range, int max)
                         }
                     }
                 } else {
-                    throw std::logic_error(
-                        "INTERNAL ERROR parsing numeric range");
+                    throw std::logic_error("INTERNAL ERROR parsing numeric range");
                 }
             }
         }
@@ -1500,11 +1429,9 @@ QUtil::parse_numrange(char const* range, int max)
         std::string message;
         if (p) {
             message = "error at * in numeric range " +
-                std::string(range, QIntC::to_size(p - range)) + "*" + p + ": " +
-                e.what();
+                std::string(range, QIntC::to_size(p - range)) + "*" + p + ": " + e.what();
         } else {
-            message = "error in numeric range " + std::string(range) + ": " +
-                e.what();
+            message = "error in numeric range " + std::string(range) + ": " + e.what();
         }
         throw std::runtime_error(message);
     }
@@ -1544,8 +1471,7 @@ encode_pdfdoc(unsigned long codepoint)
 }
 
 unsigned long
-QUtil::get_next_utf8_codepoint(
-    std::string const& utf8_val, size_t& pos, bool& error)
+QUtil::get_next_utf8_codepoint(std::string const& utf8_val, size_t& pos, bool& error)
 {
     size_t len = utf8_val.length();
     unsigned char ch = static_cast<unsigned char>(utf8_val.at(pos++));
@@ -1562,8 +1488,7 @@ QUtil::get_next_utf8_codepoint(
         to_clear = static_cast<unsigned char>(to_clear | bit_check);
         bit_check >>= 1;
     }
-    if (((bytes_needed > 5) || (bytes_needed < 1)) ||
-        ((pos + bytes_needed) > len)) {
+    if (((bytes_needed > 5) || (bytes_needed < 1)) || ((pos + bytes_needed) > len)) {
         error = true;
         return 0xfffd;
     }
@@ -1584,11 +1509,7 @@ QUtil::get_next_utf8_codepoint(
 }
 
 static bool
-transcode_utf8(
-    std::string const& utf8_val,
-    std::string& result,
-    encoding_e encoding,
-    char unknown)
+transcode_utf8(std::string const& utf8_val, std::string& result, encoding_e encoding, char unknown)
 {
     bool okay = true;
     result.clear();
@@ -1613,8 +1534,7 @@ transcode_utf8(
             static std::string ef_bb_bf("\xaf\xc2\xbb\xc2\xbf");
             // C++-20 has starts_with, but when this was written, qpdf
             // had a minimum supported version of C++-17.
-            if ((utf8_val.compare(1, 3, fe_ff) == 0) ||
-                (utf8_val.compare(1, 3, ff_fe) == 0) ||
+            if ((utf8_val.compare(1, 3, fe_ff) == 0) || (utf8_val.compare(1, 3, ff_fe) == 0) ||
                 (utf8_val.compare(1, 5, ef_bb_bf) == 0)) {
                 result += unknown;
                 okay = false;
@@ -1627,8 +1547,7 @@ transcode_utf8(
     size_t pos = 0;
     while (pos < len) {
         bool error = false;
-        unsigned long codepoint =
-            QUtil::get_next_utf8_codepoint(utf8_val, pos, error);
+        unsigned long codepoint = QUtil::get_next_utf8_codepoint(utf8_val, pos, error);
         if (error) {
             okay = false;
             if (encoding == e_utf16) {
@@ -1640,9 +1559,7 @@ transcode_utf8(
             char ch = static_cast<char>(codepoint);
             if (encoding == e_utf16) {
                 result += QUtil::toUTF16(QIntC::to_ulong(ch));
-            } else if (
-                (encoding == e_pdfdoc) &&
-                (((ch >= 0x18) && (ch <= 0x1f)) || (ch == 127))) {
+            } else if ((encoding == e_pdfdoc) && (((ch >= 0x18) && (ch <= 0x1f)) || (ch == 127))) {
                 // PDFDocEncoding maps some low characters to Unicode,
                 // so if we encounter those invalid UTF-8 code points,
                 // map them to unknown so reversing the mapping
@@ -1720,29 +1637,25 @@ QUtil::utf8_to_pdf_doc(std::string const& utf8, char unknown_char)
 }
 
 bool
-QUtil::utf8_to_ascii(
-    std::string const& utf8, std::string& ascii, char unknown_char)
+QUtil::utf8_to_ascii(std::string const& utf8, std::string& ascii, char unknown_char)
 {
     return transcode_utf8(utf8, ascii, e_ascii, unknown_char);
 }
 
 bool
-QUtil::utf8_to_win_ansi(
-    std::string const& utf8, std::string& win, char unknown_char)
+QUtil::utf8_to_win_ansi(std::string const& utf8, std::string& win, char unknown_char)
 {
     return transcode_utf8(utf8, win, e_winansi, unknown_char);
 }
 
 bool
-QUtil::utf8_to_mac_roman(
-    std::string const& utf8, std::string& mac, char unknown_char)
+QUtil::utf8_to_mac_roman(std::string const& utf8, std::string& mac, char unknown_char)
 {
     return transcode_utf8(utf8, mac, e_macroman, unknown_char);
 }
 
 bool
-QUtil::utf8_to_pdf_doc(
-    std::string const& utf8, std::string& pdfdoc, char unknown_char)
+QUtil::utf8_to_pdf_doc(std::string const& utf8, std::string& pdfdoc, char unknown_char)
 {
     return transcode_utf8(utf8, pdfdoc, e_pdfdoc, unknown_char);
 }
@@ -1869,10 +1782,7 @@ QUtil::pdf_doc_to_utf8(std::string const& val)
 
 void
 QUtil::analyze_encoding(
-    std::string const& val,
-    bool& has_8bit_chars,
-    bool& is_valid_utf8,
-    bool& is_utf16)
+    std::string const& val, bool& has_8bit_chars, bool& is_valid_utf8, bool& is_utf16)
 {
     has_8bit_chars = is_utf16 = is_valid_utf8 = false;
     if (QUtil::is_utf16(val)) {
@@ -1976,10 +1886,7 @@ QUtil::possible_repaired_encodings(std::string supplied)
 #ifndef QPDF_NO_WCHAR_T
 static int
 call_main_from_wmain(
-    bool,
-    int argc,
-    wchar_t const* const argv[],
-    std::function<int(int, char*[])> realmain)
+    bool, int argc, wchar_t const* const argv[], std::function<int(int, char*[])> realmain)
 {
     // argv contains UTF-16-encoded strings with a 16-bit wchar_t.
     // Convert this to UTF-8-encoded strings for compatibility with
@@ -1992,8 +1899,7 @@ call_main_from_wmain(
         for (size_t j = 0; j < std::wcslen(argv[i]); ++j) {
             unsigned short codepoint = static_cast<unsigned short>(argv[i][j]);
             utf16.append(1, static_cast<char>(QIntC::to_uchar(codepoint >> 8)));
-            utf16.append(
-                1, static_cast<char>(QIntC::to_uchar(codepoint & 0xff)));
+            utf16.append(1, static_cast<char>(QIntC::to_uchar(codepoint & 0xff)));
         }
         std::string utf8 = QUtil::utf16_to_utf8(utf16);
         utf8_argv.push_back(QUtil::make_unique_cstr(utf8));
@@ -2009,22 +1915,18 @@ call_main_from_wmain(
 }
 
 int
-QUtil::call_main_from_wmain(
-    int argc, wchar_t* argv[], std::function<int(int, char*[])> realmain)
+QUtil::call_main_from_wmain(int argc, wchar_t* argv[], std::function<int(int, char*[])> realmain)
 {
     return ::call_main_from_wmain(true, argc, argv, realmain);
 }
 
 int
 QUtil::call_main_from_wmain(
-    int argc,
-    wchar_t const* const argv[],
-    std::function<int(int, char const* const[])> realmain)
+    int argc, wchar_t const* const argv[], std::function<int(int, char const* const[])> realmain)
 {
-    return ::call_main_from_wmain(
-        true, argc, argv, [realmain](int new_argc, char* new_argv[]) {
-            return realmain(new_argc, new_argv);
-        });
+    return ::call_main_from_wmain(true, argc, argv, [realmain](int new_argc, char* new_argv[]) {
+        return realmain(new_argc, new_argv);
+    });
 }
 
 #endif // QPDF_NO_WCHAR_T
@@ -2080,12 +1982,10 @@ QUtil::get_max_memory_usage()
                 }
                 if (tag == "total") {
                     if (attrs.count("size") > 0) {
-                        result += QIntC::to_size(
-                            QUtil::string_to_ull(attrs["size"].c_str()));
+                        result += QIntC::to_size(QUtil::string_to_ull(attrs["size"].c_str()));
                     }
                 } else if (tag == "system" && attrs["type"] == "max") {
-                    result += QIntC::to_size(
-                        QUtil::string_to_ull(attrs["size"].c_str()));
+                    result += QIntC::to_size(QUtil::string_to_ull(attrs["size"].c_str()));
                 }
             }
         }

@@ -23,16 +23,12 @@ static std::map<QPDFObjGen, int> page_map;
 void
 usage()
 {
-    std::cerr
-        << "Usage: " << whoami << " [options] file.pdf [password]" << std::endl
-        << "Options:" << std::endl
-        << "  --numbers        give bookmarks outline-style numbers"
-        << std::endl
-        << "  --lines          draw lines to show bookmark hierarchy"
-        << std::endl
-        << "  --show-open      indicate whether a bookmark is initially open"
-        << std::endl
-        << "  --show-targets   show target if possible" << std::endl;
+    std::cerr << "Usage: " << whoami << " [options] file.pdf [password]" << std::endl
+              << "Options:" << std::endl
+              << "  --numbers        give bookmarks outline-style numbers" << std::endl
+              << "  --lines          draw lines to show bookmark hierarchy" << std::endl
+              << "  --show-open      indicate whether a bookmark is initially open" << std::endl
+              << "  --show-targets   show target if possible" << std::endl;
     exit(2);
 }
 
@@ -120,16 +116,14 @@ show_bookmark_details(QPDFOutlineObjectHelper outline, std::vector<int> numbers)
 }
 
 void
-extract_bookmarks(
-    std::vector<QPDFOutlineObjectHelper> outlines, std::vector<int>& numbers)
+extract_bookmarks(std::vector<QPDFOutlineObjectHelper> outlines, std::vector<int>& numbers)
 {
     // For style == st_numbers, numbers.at(n) contains the numerical
     // label for the outline, so we count up from 1.
     // For style == st_lines, numbers.at(n) == 0 indicates the last
     // outline at level n, and we don't otherwise care what the value
     // is, so we count up to zero.
-    numbers.push_back(
-        (style == st_lines) ? -QIntC::to_int(outlines.size()) : 0);
+    numbers.push_back((style == st_lines) ? -QIntC::to_int(outlines.size()) : 0);
     for (auto& outline: outlines) {
         ++(numbers.back());
         show_bookmark_details(outline, numbers);
@@ -196,8 +190,7 @@ main(int argc, char* argv[])
             std::cout << filename << " has no bookmarks" << std::endl;
         }
     } catch (std::exception& e) {
-        std::cerr << whoami << " processing file " << filename << ": "
-                  << e.what() << std::endl;
+        std::cerr << whoami << " processing file " << filename << ": " << e.what() << std::endl;
         exit(2);
     }
 

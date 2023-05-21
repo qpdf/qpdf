@@ -49,9 +49,7 @@ class QPDF_DLL_CLASS Pl_QPDFTokenizer: public Pipeline
     // provided, any output written by the filter will be discarded.
     QPDF_DLL
     Pl_QPDFTokenizer(
-        char const* identifier,
-        QPDFObjectHandle::TokenFilter* filter,
-        Pipeline* next = nullptr);
+        char const* identifier, QPDFObjectHandle::TokenFilter* filter, Pipeline* next = nullptr);
     QPDF_DLL
     virtual ~Pl_QPDFTokenizer();
     QPDF_DLL

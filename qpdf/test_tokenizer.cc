@@ -16,8 +16,7 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami
-              << " [-maxlen len | -no-ignorable] filename" << std::endl;
+    std::cerr << "Usage: " << whoami << " [-maxlen len | -no-ignorable] filename" << std::endl;
     exit(2);
 }
 
@@ -102,9 +101,7 @@ sanitize(std::string const& value)
         if ((iter >= 32) && (iter <= 126)) {
             result.append(1, iter);
         } else {
-            result += "\\x" +
-                QUtil::int_to_string_base(
-                          static_cast<unsigned char>(iter), 16, 2);
+            result += "\\x" + QUtil::int_to_string_base(static_cast<unsigned char>(iter), 16, 2);
         }
     }
     return result;
@@ -145,8 +142,8 @@ dump_tokens(
     }
     qpdf_offset_t inline_image_offset = 0;
     while (!done) {
-        QPDFTokenizer::Token token = tokenizer.readToken(
-            is, "test", true, inline_image_offset ? 0 : max_len);
+        QPDFTokenizer::Token token =
+            tokenizer.readToken(is, "test", true, inline_image_offset ? 0 : max_len);
         if (inline_image_offset && (token.getType() == QPDFTokenizer::tt_bad)) {
             std::cout << "EI not found; resuming normal scanning" << std::endl;
             is->seek(inline_image_offset, SEEK_SET);
@@ -167,12 +164,10 @@ dump_tokens(
             std::cout << " (" << token.getErrorMessage() << ")";
         }
         std::cout << std::endl;
-        if (skip_streams &&
-            (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "stream"))) {
+        if (skip_streams && (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "stream"))) {
             try_skipping(tokenizer, is, max_len, "endstream", f1);
         } else if (
-            skip_inline_images &&
-            (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "ID"))) {
+            skip_inline_images && (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "ID"))) {
             char ch;
             is->read(&ch, 1);
             tokenizer.expectInlineImage(is);
@@ -206,12 +201,7 @@ process(char const* filename, bool include_ignorable, size_t max_len)
         auto* bis = new BufferInputSource("content data", content_data.get());
         is = std::shared_ptr<InputSource>(bis);
         dump_tokens(
-            is,
-            "PAGE " + QUtil::int_to_string(pageno),
-            max_len,
-            include_ignorable,
-            false,
-            true);
+            is, "PAGE " + QUtil::int_to_string(pageno), max_len, include_ignorable, false, true);
     }
 
     // Tokenize object streams

@@ -48,8 +48,7 @@ class QPDF_DLL_CLASS QPDFSystemError: public std::runtime_error
 
   private:
     QPDF_DLL_PRIVATE
-    static std::string
-    createWhat(std::string const& description, int system_errno);
+    static std::string createWhat(std::string const& description, int system_errno);
 
     // This class does not use the Members pattern to avoid needless
     // memory allocations during exception handling.

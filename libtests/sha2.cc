@@ -4,12 +4,7 @@
 #include <iostream>
 
 static void
-test(
-    Pl_SHA2& sha2,
-    char const* description,
-    int bits,
-    char const* input,
-    std::string const& output)
+test(Pl_SHA2& sha2, char const* description, int bits, char const* input, std::string const& output)
 {
     sha2.resetBits(bits);
     sha2.write(QUtil::unsigned_char_pointer(input), strlen(input));

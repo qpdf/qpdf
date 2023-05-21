@@ -10,10 +10,8 @@
 #endif
 #include <stddef.h>
 
-unsigned int
-rijndaelSetupEncrypt(uint32_t* rk, const unsigned char* key, size_t keybits);
-unsigned int
-rijndaelSetupDecrypt(uint32_t* rk, const unsigned char* key, size_t keybits);
+unsigned int rijndaelSetupEncrypt(uint32_t* rk, const unsigned char* key, size_t keybits);
+unsigned int rijndaelSetupDecrypt(uint32_t* rk, const unsigned char* key, size_t keybits);
 void rijndaelEncrypt(
     const uint32_t* rk,
     unsigned int nrounds,

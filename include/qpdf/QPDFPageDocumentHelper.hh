@@ -104,10 +104,7 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     // Add new page before or after refpage. See comments for addPage
     // for details about what newpage should be.
     QPDF_DLL
-    void addPageAt(
-        QPDFPageObjectHelper newpage,
-        bool before,
-        QPDFPageObjectHelper refpage);
+    void addPageAt(QPDFPageObjectHelper newpage, bool before, QPDFPageObjectHelper refpage);
 
     // Remove page from the pdf.
     QPDF_DLL
@@ -125,8 +122,7 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     // comments there in QPDFAnnotationObjectHelper.hh for meanings of
     // those flags.
     QPDF_DLL
-    void flattenAnnotations(
-        int required_flags = 0, int forbidden_flags = an_invisible | an_hidden);
+    void flattenAnnotations(int required_flags = 0, int forbidden_flags = an_invisible | an_hidden);
 
   private:
     void flattenAnnotationsForPage(

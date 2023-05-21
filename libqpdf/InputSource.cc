@@ -43,8 +43,7 @@ InputSource::readLine(size_t max_line_length)
 }
 
 bool
-InputSource::findFirst(
-    char const* start_chars, qpdf_offset_t offset, size_t len, Finder& finder)
+InputSource::findFirst(char const* start_chars, qpdf_offset_t offset, size_t len, Finder& finder)
 {
     // Basic approach: search for the first character of start_chars
     // starting from offset but not going past len (if len != 0). Once
@@ -64,9 +63,8 @@ InputSource::findFirst(
     // so that buf[size] is valid memory.
     size_t size = sizeof(buf) - 1;
     if ((strlen(start_chars) < 1) || (strlen(start_chars) > size)) {
-        throw std::logic_error(
-            "InputSource::findSource called with"
-            " too small or too large of a character sequence");
+        throw std::logic_error("InputSource::findSource called with"
+                               " too small or too large of a character sequence");
     }
 
     char* p = nullptr;
@@ -86,13 +84,10 @@ InputSource::findFirst(
         // If p points to buf[size], since strlen(start_chars) is
         // always >= 1, this overflow test will be correct for that
         // case regardless of start_chars.
-        if ((p == nullptr) ||
-            ((p + strlen(start_chars)) > (buf + bytes_read))) {
+        if ((p == nullptr) || ((p + strlen(start_chars)) > (buf + bytes_read))) {
             if (p) {
                 QTC::TC(
-                    "libtests",
-                    "InputSource read next block",
-                    ((p == buf + bytes_read) ? 0 : 1));
+                    "libtests", "InputSource read next block", ((p == buf + bytes_read) ? 0 : 1));
                 buf_offset += (p - buf);
             }
             this->seek(buf_offset, SEEK_SET);
@@ -102,10 +97,7 @@ InputSource::findFirst(
             // protection against overrun when using string functions.
             bytes_read = this->read(buf, size);
             if (bytes_read < strlen(start_chars)) {
-                QTC::TC(
-                    "libtests",
-                    "InputSource find EOF",
-                    bytes_read == 0 ? 0 : 1);
+                QTC::TC("libtests", "InputSource find EOF", bytes_read == 0 ? 0 : 1);
                 return false;
             }
             memset(buf + bytes_read, '\0', 1 + (size - bytes_read));
@@ -115,18 +107,14 @@ InputSource::findFirst(
         // Search for the first character.
         if ((p = static_cast<char*>(
                  // line-break
-                 memchr(
-                     p,
-                     start_chars[0],
-                     bytes_read - QIntC::to_size(p - buf)))) != nullptr) {
+                 memchr(p, start_chars[0], bytes_read - QIntC::to_size(p - buf)))) != nullptr) {
             if (p == buf) {
                 QTC::TC("libtests", "InputSource found match at buf[0]");
             }
             // Found first letter.
             if (len != 0) {
                 // Make sure it's in range.
-                size_t p_relative_offset =
-                    QIntC::to_size((p - buf) + (buf_offset - offset));
+                size_t p_relative_offset = QIntC::to_size((p - buf) + (buf_offset - offset));
                 if (p_relative_offset >= len) {
                     // out of range
                     QTC::TC("libtests", "InputSource out of range");
@@ -151,14 +139,10 @@ InputSource::findFirst(
                 if (finder.check()) {
                     return true;
                 } else {
-                    QTC::TC(
-                        "libtests",
-                        "InputSource start_chars matched but not check");
+                    QTC::TC("libtests", "InputSource start_chars matched but not check");
                 }
             } else {
-                QTC::TC(
-                    "libtests",
-                    "InputSource first char matched but not string");
+                QTC::TC("libtests", "InputSource first char matched but not string");
             }
             // This occurrence of the first character wasn't a match.
             // Skip over it and keep searching.
@@ -172,8 +156,7 @@ InputSource::findFirst(
 }
 
 bool
-InputSource::findLast(
-    char const* start_chars, qpdf_offset_t offset, size_t len, Finder& finder)
+InputSource::findLast(char const* start_chars, qpdf_offset_t offset, size_t len, Finder& finder)
 {
     bool found = false;
     qpdf_offset_t after_found_offset = 0;

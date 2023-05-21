@@ -73,8 +73,7 @@ JSON::writeArrayClose(Pipeline* p, bool first, size_t depth)
 }
 
 void
-JSON::writeDictionaryKey(
-    Pipeline* p, bool& first, std::string const& key, size_t depth)
+JSON::writeDictionaryKey(Pipeline* p, bool& first, std::string const& key, size_t depth)
 {
     writeNext(p, first, depth);
     *p << std::string("\"") + key + "\": ";
@@ -82,19 +81,14 @@ JSON::writeDictionaryKey(
 
 void
 JSON::writeDictionaryItem(
-    Pipeline* p,
-    bool& first,
-    std::string const& key,
-    JSON const& value,
-    size_t depth)
+    Pipeline* p, bool& first, std::string const& key, JSON const& value, size_t depth)
 {
     writeDictionaryKey(p, first, key, depth);
     value.write(p, depth);
 }
 
 void
-JSON::writeArrayItem(
-    Pipeline* p, bool& first, JSON const& element, size_t depth)
+JSON::writeArrayItem(Pipeline* p, bool& first, JSON const& element, size_t depth)
 {
     writeNext(p, first, depth);
     element.write(p, depth);
@@ -283,11 +277,9 @@ JSON
 JSON::addDictionaryMember(std::string const& key, JSON const& val)
 {
     if (auto* obj = dynamic_cast<JSON_dictionary*>(m->value.get())) {
-        return obj->members[encode_string(key)] =
-                   val.m->value ? val : makeNull();
+        return obj->members[encode_string(key)] = val.m->value ? val : makeNull();
     } else {
-        throw std::runtime_error(
-            "JSON::addDictionaryMember called on non-dictionary");
+        throw std::runtime_error("JSON::addDictionaryMember called on non-dictionary");
     }
 }
 
@@ -296,8 +288,7 @@ JSON::checkDictionaryKeySeen(std::string const& key)
 {
     auto* obj = dynamic_cast<JSON_dictionary*>(m->value.get());
     if (nullptr == obj) {
-        throw std::logic_error(
-            "JSON::checkDictionaryKey called on non-dictionary");
+        throw std::logic_error("JSON::checkDictionaryKey called on non-dictionary");
     }
     if (obj->parsed_keys.count(key)) {
         return true;
@@ -421,8 +412,7 @@ JSON::isNull() const
 }
 
 bool
-JSON::forEachDictItem(
-    std::function<void(std::string const& key, JSON value)> fn) const
+JSON::forEachDictItem(std::function<void(std::string const& key, JSON value)> fn) const
 {
     auto v = dynamic_cast<JSON_dictionary const*>(m->value.get());
     if (v == nullptr) {
@@ -450,16 +440,13 @@ JSON::forEachArrayItem(std::function<void(JSON value)> fn) const
 bool
 JSON::checkSchema(JSON schema, std::list<std::string>& errors)
 {
-    return checkSchemaInternal(
-        m->value.get(), schema.m->value.get(), 0, errors, "");
+    return checkSchemaInternal(m->value.get(), schema.m->value.get(), 0, errors, "");
 }
 
 bool
-JSON::checkSchema(
-    JSON schema, unsigned long flags, std::list<std::string>& errors)
+JSON::checkSchema(JSON schema, unsigned long flags, std::list<std::string>& errors)
 {
-    return checkSchemaInternal(
-        m->value.get(), schema.m->value.get(), flags, errors, "");
+    return checkSchemaInternal(m->value.get(), schema.m->value.get(), flags, errors, "");
 }
 
 bool
@@ -495,8 +482,8 @@ JSON::checkSchemaInternal(
         auto members = sch_dict->members;
         std::string key;
         if ((members.size() == 1) &&
-            ((key = members.begin()->first, key.length() > 2) &&
-             (key.at(0) == '<') && (key.at(key.length() - 1) == '>'))) {
+            ((key = members.begin()->first, key.length() > 2) && (key.at(0) == '<') &&
+             (key.at(key.length() - 1) == '>'))) {
             pattern_key = key;
         }
     }
@@ -565,17 +552,12 @@ JSON::checkSchemaInternal(
             } else {
                 QTC::TC("libtests", "JSON schema array for single item");
                 checkSchemaInternal(
-                    this_v,
-                    sch_arr->elements.at(0).m->value.get(),
-                    flags,
-                    errors,
-                    prefix);
+                    this_v, sch_arr->elements.at(0).m->value.get(), flags, errors, prefix);
             }
         } else if (!this_arr || (this_arr->elements.size() != n_elements)) {
             QTC::TC("libtests", "JSON schema array length mismatch");
             errors.push_back(
-                err_prefix + " is supposed to be an array of length " +
-                std::to_string(n_elements));
+                err_prefix + " is supposed to be an array of length " + std::to_string(n_elements));
             return false;
         } else {
             // A multi-element array in the schema must correspond to
@@ -595,8 +577,7 @@ JSON::checkSchemaInternal(
         }
     } else if (!sch_str) {
         QTC::TC("libtests", "JSON schema other type");
-        errors.push_back(
-            err_prefix + " schema value is not dictionary, array, or string");
+        errors.push_back(err_prefix + " schema value is not dictionary, array, or string");
         return false;
     }
 
@@ -736,8 +717,7 @@ JSONParser::handle_u_code(
                 " surrogate");
         }
         high_offset = 0;
-        codepoint =
-            0x10000U + ((high_surrogate & 0x3FFU) << 10U) + (codepoint & 0x3FF);
+        codepoint = 0x10000U + ((high_surrogate & 0x3FFU) << 10U) + (codepoint & 0x3FF);
         result += QUtil::toUTF8(codepoint);
     } else {
         result += QUtil::toUTF8(codepoint);
@@ -760,8 +740,8 @@ JSONParser::tokenError()
     } else if (lex_state == ls_alpha) {
         QTC::TC("libtests", "JSON parse keyword bad character");
         throw std::runtime_error(
-            "JSON: offset " + std::to_string(offset) +
-            ": keyword: unexpected character " + std::string(p, 1));
+            "JSON: offset " + std::to_string(offset) + ": keyword: unexpected character " +
+            std::string(p, 1));
     } else if (lex_state == ls_string) {
         QTC::TC("libtests", "JSON parse control char in string");
         throw std::runtime_error(
@@ -775,8 +755,7 @@ JSONParser::tokenError()
     }
 
     if (*p == '.') {
-        if (lex_state == ls_number || lex_state == ls_number_e ||
-            lex_state == ls_number_e_sign) {
+        if (lex_state == ls_number || lex_state == ls_number_e || lex_state == ls_number_e_sign) {
             QTC::TC("libtests", "JSON parse point after e");
             throw std::runtime_error(
                 "JSON: offset " + std::to_string(offset) +
@@ -790,24 +769,21 @@ JSONParser::tokenError()
     } else if (*p == 'e' || *p == 'E') {
         QTC::TC("libtests", "JSON parse duplicate e");
         throw std::runtime_error(
-            "JSON: offset " + std::to_string(offset) +
-            ": numeric literal: e already seen");
+            "JSON: offset " + std::to_string(offset) + ": numeric literal: e already seen");
     } else if ((*p == '+') || (*p == '-')) {
         QTC::TC("libtests", "JSON parse unexpected sign");
         throw std::runtime_error(
-            "JSON: offset " + std::to_string(offset) +
-            ": numeric literal: unexpected sign");
+            "JSON: offset " + std::to_string(offset) + ": numeric literal: unexpected sign");
     } else if (QUtil::is_space(*p) || strchr("{}[]:,", *p)) {
         QTC::TC("libtests", "JSON parse incomplete number");
         throw std::runtime_error(
-            "JSON: offset " + std::to_string(offset) +
-            ": numeric literal: incomplete number");
+            "JSON: offset " + std::to_string(offset) + ": numeric literal: incomplete number");
 
     } else {
         QTC::TC("libtests", "JSON parse numeric bad character");
         throw std::runtime_error(
-            "JSON: offset " + std::to_string(offset) +
-            ": numeric literal: unexpected character " + std::string(p, 1));
+            "JSON: offset " + std::to_string(offset) + ": numeric literal: unexpected character " +
+            std::string(p, 1));
     }
     throw std::logic_error("JSON::tokenError : unhandled error");
 }
@@ -884,8 +860,7 @@ JSONParser::getToken()
             } else {
                 QTC::TC("libtests", "JSON parse null character");
                 throw std::runtime_error(
-                    "JSON: control or null character at offset " +
-                    std::to_string(offset));
+                    "JSON: control or null character at offset " + std::to_string(offset));
             }
         } else if (*p == ',') {
             if (lex_state == ls_top) {
@@ -968,8 +943,8 @@ JSONParser::getToken()
                 } else {
                     QTC::TC("libtests", "JSON parse bad character");
                     throw std::runtime_error(
-                        "JSON: offset " + std::to_string(offset) +
-                        ": unexpected character " + std::string(p, 1));
+                        "JSON: offset " + std::to_string(offset) + ": unexpected character " +
+                        std::string(p, 1));
                 }
                 break;
 
@@ -994,8 +969,7 @@ JSONParser::getToken()
                 } else {
                     QTC::TC("libtests", "JSON parse leading zero");
                     throw std::runtime_error(
-                        "JSON: offset " + std::to_string(offset) +
-                        ": number with leading zero");
+                        "JSON: offset " + std::to_string(offset) + ": number with leading zero");
                 }
                 break;
 
@@ -1127,20 +1101,14 @@ JSONParser::getToken()
                     tokenError();
                 }
                 if (++u_count == 4) {
-                    handle_u_code(
-                        u_value,
-                        offset - 5,
-                        high_surrogate,
-                        high_offset,
-                        token);
+                    handle_u_code(u_value, offset - 5, high_surrogate, high_offset, token);
                     lex_state = ls_string;
                 }
                 ignore();
                 break;
 
             default:
-                throw std::logic_error(
-                    "JSONParser::getToken : trying to handle delimiter state");
+                throw std::logic_error("JSONParser::getToken : trying to handle delimiter state");
             }
         }
     }
@@ -1205,19 +1173,16 @@ JSONParser::handleToken()
         if (parser_state != ps_dict_after_key) {
             QTC::TC("libtests", "JSON parse unexpected :");
             throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": unexpected colon");
+                "JSON: offset " + std::to_string(offset) + ": unexpected colon");
         }
         parser_state = ps_dict_after_colon;
         return;
 
     case ls_comma:
-        if (!((parser_state == ps_dict_after_item) ||
-              (parser_state == ps_array_after_item))) {
+        if (!((parser_state == ps_dict_after_item) || (parser_state == ps_array_after_item))) {
             QTC::TC("libtests", "JSON parse unexpected ,");
             throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": unexpected comma");
+                "JSON: offset " + std::to_string(offset) + ": unexpected comma");
         }
         if (parser_state == ps_dict_after_item) {
             parser_state = ps_dict_after_comma;
@@ -1230,12 +1195,10 @@ JSONParser::handleToken()
         return;
 
     case ls_end_array:
-        if (!(parser_state == ps_array_begin ||
-              parser_state == ps_array_after_item)) {
+        if (!(parser_state == ps_array_begin || parser_state == ps_array_after_item)) {
             QTC::TC("libtests", "JSON parse unexpected ]");
             throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": unexpected array end delimiter");
+                "JSON: offset " + std::to_string(offset) + ": unexpected array end delimiter");
         }
         parser_state = stack.back().state;
         tos.setEnd(offset);
@@ -1248,12 +1211,10 @@ JSONParser::handleToken()
         return;
 
     case ls_end_dict:
-        if (!((parser_state == ps_dict_begin) ||
-              (parser_state == ps_dict_after_item))) {
+        if (!((parser_state == ps_dict_begin) || (parser_state == ps_dict_after_item))) {
             QTC::TC("libtests", "JSON parse unexpected }");
             throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": unexpected dictionary end delimiter");
+                "JSON: offset " + std::to_string(offset) + ": unexpected dictionary end delimiter");
         }
         parser_state = stack.back().state;
         tos.setEnd(offset);
@@ -1279,14 +1240,12 @@ JSONParser::handleToken()
         } else {
             QTC::TC("libtests", "JSON parse invalid keyword");
             throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": invalid keyword " + token);
+                "JSON: offset " + std::to_string(offset) + ": invalid keyword " + token);
         }
         break;
 
     case ls_string:
-        if (parser_state == ps_dict_begin ||
-            parser_state == ps_dict_after_comma) {
+        if (parser_state == ps_dict_begin || parser_state == ps_dict_after_comma) {
             dict_key = token;
             dict_key_offset = token_start;
             parser_state = ps_dict_after_key;
@@ -1297,8 +1256,7 @@ JSONParser::handleToken()
         break;
 
     default:
-        throw std::logic_error(
-            "JSONParser::handleToken : non-terminal lexer state encountered");
+        throw std::logic_error("JSONParser::handleToken : non-terminal lexer state encountered");
         break;
     }
 
@@ -1310,16 +1268,14 @@ JSONParser::handleToken()
     case ps_dict_after_comma:
         QTC::TC("libtests", "JSON parse string as dict key");
         throw std::runtime_error(
-            "JSON: offset " + std::to_string(offset) +
-            ": expect string as dictionary key");
+            "JSON: offset " + std::to_string(offset) + ": expect string as dictionary key");
         break;
 
     case ps_dict_after_colon:
         if (tos.checkDictionaryKeySeen(dict_key)) {
             QTC::TC("libtests", "JSON parse duplicate key");
             throw std::runtime_error(
-                "JSON: offset " + std::to_string(dict_key_offset) +
-                ": duplicated dictionary key");
+                "JSON: offset " + std::to_string(dict_key_offset) + ": duplicated dictionary key");
         }
         if (!reactor || !reactor->dictionaryItem(dict_key, item)) {
             tos.addDictionaryMember(dict_key, item);
@@ -1346,8 +1302,7 @@ JSONParser::handleToken()
 
     case ps_dict_after_key:
         QTC::TC("libtests", "JSON parse expected colon");
-        throw std::runtime_error(
-            "JSON: offset " + std::to_string(offset) + ": expected ':'");
+        throw std::runtime_error("JSON: offset " + std::to_string(offset) + ": expected ':'");
         break;
 
     case ps_dict_after_item:
@@ -1363,8 +1318,7 @@ JSONParser::handleToken()
         break;
 
     case ps_done:
-        throw std::logic_error(
-            "JSONParser::handleToken: unexpected parser state");
+        throw std::logic_error("JSONParser::handleToken: unexpected parser state");
     }
 
     if (item.isDictionary() || item.isArray()) {
@@ -1387,8 +1341,7 @@ JSONParser::handleToken()
 
         if (stack.size() > 500) {
             throw std::runtime_error(
-                "JSON: offset " + std::to_string(offset) +
-                ": maximum object depth exceeded");
+                "JSON: offset " + std::to_string(offset) + ": maximum object depth exceeded");
         }
     }
 }

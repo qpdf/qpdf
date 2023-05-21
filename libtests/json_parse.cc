@@ -74,8 +74,7 @@ Reactor::arrayItem(JSON const& value)
 void
 Reactor::printItem(JSON const& j)
 {
-    std::cout << "[" << j.getStart() << ", " << j.getEnd()
-              << "): " << j.unparse() << std::endl;
+    std::cout << "[" << j.getStart() << ", " << j.getEnd() << "): " << j.unparse() << std::endl;
 }
 
 static void

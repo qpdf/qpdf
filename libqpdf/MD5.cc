@@ -81,8 +81,7 @@ MD5::encodeFile(char const* filename, qpdf_offset_t up_to_offset)
         // Assume, perhaps incorrectly, that errno was set by the
         // underlying call to read....
         (void)fclose(file);
-        QUtil::throw_system_error(
-            std::string("MD5: read error on ") + filename);
+        QUtil::throw_system_error(std::string("MD5: read error on ") + filename);
     }
     (void)fclose(file);
 
@@ -115,8 +114,7 @@ MD5::unparse()
     this->crypto->MD5_finalize();
     Digest digest_val;
     digest(digest_val);
-    return QUtil::hex_encode(
-        std::string(reinterpret_cast<char*>(digest_val), 16));
+    return QUtil::hex_encode(std::string(reinterpret_cast<char*>(digest_val), 16));
 }
 
 std::string
@@ -143,10 +141,7 @@ MD5::checkDataChecksum(char const* const checksum, char const* buf, size_t len)
 }
 
 bool
-MD5::checkFileChecksum(
-    char const* const checksum,
-    char const* filename,
-    qpdf_offset_t up_to_offset)
+MD5::checkFileChecksum(char const* const checksum, char const* filename, qpdf_offset_t up_to_offset)
 {
     bool result = false;
     try {

@@ -12,16 +12,14 @@ QPDF_Array::checkOwnership(QPDFObjectHandle const& item) const
         if (qpdf) {
             if (auto item_qpdf = obj->getQPDF()) {
                 if (qpdf != item_qpdf) {
-                    throw std::logic_error(
-                        "Attempting to add an object from a different QPDF. "
-                        "Use QPDF::copyForeignObject to add objects from "
-                        "another file.");
+                    throw std::logic_error("Attempting to add an object from a different QPDF. "
+                                           "Use QPDF::copyForeignObject to add objects from "
+                                           "another file.");
                 }
             }
         }
     } else {
-        throw std::logic_error(
-            "Attempting to add an uninitialized object to a QPDF_Array.");
+        throw std::logic_error("Attempting to add an uninitialized object to a QPDF_Array.");
     }
 }
 
@@ -45,15 +43,13 @@ QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v) :
     setFromVector(v);
 }
 
-QPDF_Array::QPDF_Array(
-    std::vector<std::shared_ptr<QPDFObject>>&& v, bool sparse) :
+QPDF_Array::QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& v, bool sparse) :
     QPDFValue(::ot_array, "array"),
     sparse(sparse)
 {
     if (sparse) {
         for (auto&& item: v) {
-            if (item->getTypeCode() != ::ot_null ||
-                item->getObjGen().isIndirect()) {
+            if (item->getTypeCode() != ::ot_null || item->getObjGen().isIndirect()) {
                 sp_elements[sp_size] = std::move(item);
             }
             ++sp_size;
@@ -70,8 +66,7 @@ QPDF_Array::create(std::vector<QPDFObjectHandle> const& items)
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Array::create(
-    std::vector<std::shared_ptr<QPDFObject>>&& items, bool sparse)
+QPDF_Array::create(std::vector<std::shared_ptr<QPDFObject>>&& items, bool sparse)
 {
     return do_create(new QPDF_Array(std::move(items), sparse));
 }
@@ -96,10 +91,8 @@ QPDF_Array::copy(bool shallow)
             result.reserve(elements.size());
             for (auto const& element: elements) {
                 result.push_back(
-                    element
-                        ? (element->getObjGen().isIndirect() ? element
-                                                             : element->copy())
-                        : element);
+                    element ? (element->getObjGen().isIndirect() ? element : element->copy())
+                            : element);
             }
             return create(std::move(result), false);
         }
@@ -138,8 +131,7 @@ QPDF_Array::unparse()
             }
             item.second->resolve();
             auto og = item.second->getObjGen();
-            result += og.isIndirect() ? og.unparse(' ') + " R "
-                                      : item.second->unparse() + " ";
+            result += og.isIndirect() ? og.unparse(' ') + " R " : item.second->unparse() + " ";
             next = ++key;
         }
         for (int j = next; j < sp_size; ++j) {
@@ -149,8 +141,7 @@ QPDF_Array::unparse()
         for (auto const& item: elements) {
             item->resolve();
             auto og = item->getObjGen();
-            result += og.isIndirect() ? og.unparse(' ') + " R "
-                                      : item->unparse() + " ";
+            result += og.isIndirect() ? og.unparse(' ') + " R " : item->unparse() + " ";
         }
     }
     result += "]";

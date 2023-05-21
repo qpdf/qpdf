@@ -326,8 +326,7 @@ extern "C" {
      */
     QPDF_DLL
     QPDF_ERROR_CODE
-    qpdf_create_from_json_data(
-        qpdf_data qpdf, char const* buffer, unsigned long long size);
+    qpdf_create_from_json_data(qpdf_data qpdf, char const* buffer, unsigned long long size);
 
     /* JSON UPDATE FUNCTIONS */
 
@@ -341,8 +340,7 @@ extern "C" {
     qpdf_update_from_json_file(qpdf_data qpdf, char const* filename);
     QPDF_DLL
     QPDF_ERROR_CODE
-    qpdf_update_from_json_data(
-        qpdf_data qpdf, char const* buffer, unsigned long long size);
+    qpdf_update_from_json_data(qpdf_data qpdf, char const* buffer, unsigned long long size);
 
     /* READ FUNCTIONS */
 
@@ -492,23 +490,19 @@ extern "C" {
     unsigned char const* qpdf_get_buffer(qpdf_data qpdf);
 
     QPDF_DLL
-    void
-    qpdf_set_object_stream_mode(qpdf_data qpdf, enum qpdf_object_stream_e mode);
+    void qpdf_set_object_stream_mode(qpdf_data qpdf, enum qpdf_object_stream_e mode);
 
     QPDF_DLL
-    void
-    qpdf_set_stream_data_mode(qpdf_data qpdf, enum qpdf_stream_data_e mode);
+    void qpdf_set_stream_data_mode(qpdf_data qpdf, enum qpdf_stream_data_e mode);
 
     QPDF_DLL
     void qpdf_set_compress_streams(qpdf_data qpdf, QPDF_BOOL value);
 
     QPDF_DLL
-    void qpdf_set_decode_level(
-        qpdf_data qpdf, enum qpdf_stream_decode_level_e level);
+    void qpdf_set_decode_level(qpdf_data qpdf, enum qpdf_stream_decode_level_e level);
 
     QPDF_DLL
-    void
-    qpdf_set_preserve_unreferenced_objects(qpdf_data qpdf, QPDF_BOOL value);
+    void qpdf_set_preserve_unreferenced_objects(qpdf_data qpdf, QPDF_BOOL value);
 
     QPDF_DLL
     void qpdf_set_newline_before_endstream(qpdf_data qpdf, QPDF_BOOL value);
@@ -625,8 +619,8 @@ extern "C" {
     void qpdf_force_pdf_version(qpdf_data qpdf, char const* version);
 
     QPDF_DLL
-    void qpdf_force_pdf_version_and_extension(
-        qpdf_data qpdf, char const* version, int extension_level);
+    void
+    qpdf_force_pdf_version_and_extension(qpdf_data qpdf, char const* version, int extension_level);
 
     /* During write, your report_progress function will be called with
      * a value between 0 and 100 representing the approximate write
@@ -640,9 +634,7 @@ extern "C" {
      */
     QPDF_DLL
     void qpdf_register_progress_reporter(
-        qpdf_data qpdf,
-        void (*report_progress)(int percent, void* data),
-        void* data);
+        qpdf_data qpdf, void (*report_progress)(int percent, void* data), void* data);
 
     /* Do actual write operation. */
     QPDF_DLL
@@ -733,8 +725,7 @@ extern "C" {
     QPDF_DLL
     qpdf_oh qpdf_make_indirect_object(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    void
-    qpdf_replace_object(qpdf_data qpdf, int objid, int generation, qpdf_oh oh);
+    void qpdf_replace_object(qpdf_data qpdf, int objid, int generation, qpdf_oh oh);
 
     /* Wrappers around QPDFObjectHandle methods. Be sure to read
      * corresponding comments in QPDFObjectHandle.hh to understand
@@ -811,8 +802,7 @@ extern "C" {
     QPDF_DLL
     unsigned long long qpdf_oh_get_uint_value(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_get_value_as_ulonglong(
-        qpdf_data qpdf, qpdf_oh oh, unsigned long long* value);
+    QPDF_BOOL qpdf_oh_get_value_as_ulonglong(qpdf_data qpdf, qpdf_oh oh, unsigned long long* value);
     QPDF_DLL
     unsigned int qpdf_oh_get_uint_value_as_uint(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
@@ -822,8 +812,8 @@ extern "C" {
     QPDF_DLL
     char const* qpdf_oh_get_real_value(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_get_value_as_real(
-        qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length);
+    QPDF_BOOL
+    qpdf_oh_get_value_as_real(qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length);
 
     QPDF_DLL
     QPDF_BOOL qpdf_oh_is_number(qpdf_data qpdf, qpdf_oh oh);
@@ -836,8 +826,8 @@ extern "C" {
     QPDF_DLL
     char const* qpdf_oh_get_name(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_get_value_as_name(
-        qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length);
+    QPDF_BOOL
+    qpdf_oh_get_value_as_name(qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length);
 
     /* Return the length of the last string returned. This enables you
      * to retrieve the entire string for cases in which a char*
@@ -858,19 +848,17 @@ extern "C" {
     QPDF_DLL
     char const* qpdf_oh_get_string_value(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_get_value_as_string(
-        qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length);
+    QPDF_BOOL
+    qpdf_oh_get_value_as_string(qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length);
     QPDF_DLL
     char const* qpdf_oh_get_utf8_value(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_get_value_as_utf8(
-        qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length);
+    QPDF_BOOL
+    qpdf_oh_get_value_as_utf8(qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length);
     QPDF_DLL
-    char const*
-    qpdf_oh_get_binary_string_value(qpdf_data qpdf, qpdf_oh oh, size_t* length);
+    char const* qpdf_oh_get_binary_string_value(qpdf_data qpdf, qpdf_oh oh, size_t* length);
     QPDF_DLL
-    char const*
-    qpdf_oh_get_binary_utf8_value(qpdf_data qpdf, qpdf_oh oh, size_t* length);
+    char const* qpdf_oh_get_binary_utf8_value(qpdf_data qpdf, qpdf_oh oh, size_t* length);
 
     QPDF_DLL
     int qpdf_oh_get_array_n_items(qpdf_data qpdf, qpdf_oh oh);
@@ -906,8 +894,7 @@ extern "C" {
     QPDF_DLL
     qpdf_oh qpdf_oh_get_key(qpdf_data qpdf, qpdf_oh oh, char const* key);
     QPDF_DLL
-    qpdf_oh
-    qpdf_oh_get_key_if_dict(qpdf_data qpdf, qpdf_oh oh, char const* key);
+    qpdf_oh qpdf_oh_get_key_if_dict(qpdf_data qpdf, qpdf_oh oh, char const* key);
 
     QPDF_DLL
     QPDF_BOOL
@@ -924,8 +911,7 @@ extern "C" {
     QPDF_DLL
     qpdf_oh qpdf_oh_new_real_from_string(qpdf_data qpdf, char const* value);
     QPDF_DLL
-    qpdf_oh qpdf_oh_new_real_from_double(
-        qpdf_data qpdf, double value, int decimal_places);
+    qpdf_oh qpdf_oh_new_real_from_double(qpdf_data qpdf, double value, int decimal_places);
     QPDF_DLL
     qpdf_oh qpdf_oh_new_name(qpdf_data qpdf, char const* name);
     QPDF_DLL
@@ -936,11 +922,9 @@ extern "C" {
      * contain atrbitary binary data including embedded null characters.
      */
     QPDF_DLL
-    qpdf_oh
-    qpdf_oh_new_binary_string(qpdf_data qpdf, char const* str, size_t length);
+    qpdf_oh qpdf_oh_new_binary_string(qpdf_data qpdf, char const* str, size_t length);
     QPDF_DLL
-    qpdf_oh qpdf_oh_new_binary_unicode_string(
-        qpdf_data qpdf, char const* str, size_t length);
+    qpdf_oh qpdf_oh_new_binary_unicode_string(qpdf_data qpdf, char const* str, size_t length);
     QPDF_DLL
     qpdf_oh qpdf_oh_new_array(qpdf_data qpdf);
     QPDF_DLL
@@ -959,8 +943,7 @@ extern "C" {
     void qpdf_oh_make_direct(qpdf_data qpdf, qpdf_oh oh);
 
     QPDF_DLL
-    void
-    qpdf_oh_set_array_item(qpdf_data qpdf, qpdf_oh oh, int at, qpdf_oh item);
+    void qpdf_oh_set_array_item(qpdf_data qpdf, qpdf_oh oh, int at, qpdf_oh item);
     QPDF_DLL
     void qpdf_oh_insert_item(qpdf_data qpdf, qpdf_oh oh, int at, qpdf_oh item);
     QPDF_DLL
@@ -969,13 +952,11 @@ extern "C" {
     void qpdf_oh_erase_item(qpdf_data qpdf, qpdf_oh oh, int at);
 
     QPDF_DLL
-    void qpdf_oh_replace_key(
-        qpdf_data qpdf, qpdf_oh oh, char const* key, qpdf_oh item);
+    void qpdf_oh_replace_key(qpdf_data qpdf, qpdf_oh oh, char const* key, qpdf_oh item);
     QPDF_DLL
     void qpdf_oh_remove_key(qpdf_data qpdf, qpdf_oh oh, char const* key);
     QPDF_DLL
-    void qpdf_oh_replace_or_remove_key(
-        qpdf_data qpdf, qpdf_oh oh, char const* key, qpdf_oh item);
+    void qpdf_oh_replace_or_remove_key(qpdf_data qpdf, qpdf_oh oh, char const* key, qpdf_oh item);
 
     QPDF_DLL
     qpdf_oh qpdf_oh_get_dict(qpdf_data qpdf, qpdf_oh oh);
@@ -1005,8 +986,7 @@ extern "C" {
      * while `foreign_oh` belongs to `other_qpdf`.
      */
     QPDF_DLL
-    qpdf_oh qpdf_oh_copy_foreign_object(
-        qpdf_data qpdf, qpdf_data other_qpdf, qpdf_oh foreign_oh);
+    qpdf_oh qpdf_oh_copy_foreign_object(qpdf_data qpdf, qpdf_data other_qpdf, qpdf_oh foreign_oh);
 
     /* STREAM FUNCTIONS */
 
@@ -1105,19 +1085,12 @@ extern "C" {
 
     /* addPage() */
     QPDF_DLL
-    QPDF_ERROR_CODE qpdf_add_page(
-        qpdf_data qpdf,
-        qpdf_data newpage_qpdf,
-        qpdf_oh newpage,
-        QPDF_BOOL first);
+    QPDF_ERROR_CODE
+    qpdf_add_page(qpdf_data qpdf, qpdf_data newpage_qpdf, qpdf_oh newpage, QPDF_BOOL first);
     /* addPageAt() */
     QPDF_DLL
     QPDF_ERROR_CODE qpdf_add_page_at(
-        qpdf_data qpdf,
-        qpdf_data newpage_qpdf,
-        qpdf_oh newpage,
-        QPDF_BOOL before,
-        qpdf_oh refpage);
+        qpdf_data qpdf, qpdf_data newpage_qpdf, qpdf_oh newpage, QPDF_BOOL before, qpdf_oh refpage);
     /* removePage() */
     QPDF_DLL
     QPDF_ERROR_CODE qpdf_remove_page(qpdf_data qpdf, qpdf_oh page);

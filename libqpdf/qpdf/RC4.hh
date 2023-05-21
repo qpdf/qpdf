@@ -13,8 +13,7 @@ class RC4
 
     // It is safe to pass the same pointer to in_data and out_data to
     // encrypt/decrypt in place
-    void
-    process(unsigned char const* in_data, size_t len, unsigned char* out_data);
+    void process(unsigned char const* in_data, size_t len, unsigned char* out_data);
 
   private:
     std::shared_ptr<QPDFCryptoImpl> crypto;

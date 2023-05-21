@@ -153,8 +153,7 @@ class QPDFLogger
 
   private:
     QPDFLogger();
-    std::shared_ptr<Pipeline>
-    throwIfNull(std::shared_ptr<Pipeline>, bool null_okay);
+    std::shared_ptr<Pipeline> throwIfNull(std::shared_ptr<Pipeline>, bool null_okay);
 
     class Members
     {

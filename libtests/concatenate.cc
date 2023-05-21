@@ -29,8 +29,7 @@ main(int argc, char* argv[])
     inflate.write(b1_buf->getBuffer(), b1_buf->getSize());
     inflate.finish();
     auto b2_buf = b2.getBufferSharedPointer();
-    std::string result(
-        reinterpret_cast<char*>(b2_buf->getBuffer()), b2_buf->getSize());
+    std::string result(reinterpret_cast<char*>(b2_buf->getBuffer()), b2_buf->getSize());
     if (result == "-one--two-") {
         std::cout << "concatenate test passed" << std::endl;
     } else {

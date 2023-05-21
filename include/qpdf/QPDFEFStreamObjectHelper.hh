@@ -75,11 +75,9 @@ class QPDFEFStreamObjectHelper: public QPDFObjectHelper
     // checksum and size are computed automatically and stored. Other
     // parameters may be supplied using setters defined below.
     QPDF_DLL
-    static QPDFEFStreamObjectHelper
-    createEFStream(QPDF& qpdf, std::shared_ptr<Buffer> data);
+    static QPDFEFStreamObjectHelper createEFStream(QPDF& qpdf, std::shared_ptr<Buffer> data);
     QPDF_DLL
-    static QPDFEFStreamObjectHelper
-    createEFStream(QPDF& qpdf, std::string const& data);
+    static QPDFEFStreamObjectHelper createEFStream(QPDF& qpdf, std::string const& data);
     // The provider function must write the data to the given
     // pipeline. The function may be called multiple times by the qpdf
     // library. You can pass QUtil::file_provider(filename) as the

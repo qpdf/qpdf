@@ -17,11 +17,7 @@
 
 #ifdef BITS_READ
 static unsigned long long
-read_bits(
-    unsigned char const*& p,
-    size_t& bit_offset,
-    size_t& bits_available,
-    size_t bits_wanted)
+read_bits(unsigned char const*& p, size_t& bit_offset, size_t& bits_available, size_t bits_wanted)
 {
     // View p as a stream of bits:
 
@@ -32,8 +28,7 @@ read_bits(
 
     if (bits_wanted > bits_available) {
         throw std::runtime_error(
-            "overflow reading bit stream: wanted = " +
-            std::to_string(bits_wanted) +
+            "overflow reading bit stream: wanted = " + std::to_string(bits_wanted) +
             "; available = " + std::to_string(bits_available));
     }
     if (bits_wanted > 32) {
@@ -49,20 +44,14 @@ read_bits(
     while (bits_wanted > 0) {
         // Grab bits from the first byte clearing anything before
         // bit_offset.
-        unsigned char byte =
-            static_cast<unsigned char>(*p & ((1U << (bit_offset + 1U)) - 1U));
+        unsigned char byte = static_cast<unsigned char>(*p & ((1U << (bit_offset + 1U)) - 1U));
 
         // There are bit_offset + 1 bits available in the first byte.
         size_t to_copy = std::min(bits_wanted, bit_offset + 1);
         size_t leftover = (bit_offset + 1) - to_copy;
 
 # ifdef BITS_TESTING
-        QTC::TC(
-            "libtests",
-            "bits bit_offset",
-            ((bit_offset == 0)       ? 0
-                 : (bit_offset == 7) ? 1
-                                     : 2));
+        QTC::TC("libtests", "bits bit_offset", ((bit_offset == 0) ? 0 : (bit_offset == 7) ? 1 : 2));
         QTC::TC("libtests", "bits leftover", (leftover > 0) ? 1 : 0);
 # endif
 
@@ -84,12 +73,7 @@ read_bits(
         bits_available -= to_copy;
 
 # ifdef BITS_TESTING
-        QTC::TC(
-            "libtests",
-            "bits iterations",
-            ((bits_wanted > 8)       ? 0
-                 : (bits_wanted > 0) ? 1
-                                     : 2));
+        QTC::TC("libtests", "bits iterations", ((bits_wanted > 8) ? 0 : (bits_wanted > 0) ? 1 : 2));
 # endif
     }
 
@@ -100,11 +84,7 @@ read_bits(
 #ifdef BITS_WRITE
 static void
 write_bits(
-    unsigned char& ch,
-    size_t& bit_offset,
-    unsigned long long val,
-    size_t bits,
-    Pipeline* pipeline)
+    unsigned char& ch, size_t& bit_offset, unsigned long long val, size_t bits, Pipeline* pipeline)
 {
     if (bits > 32) {
         throw std::out_of_range("write_bits: too many bits requested");
@@ -138,12 +118,7 @@ write_bits(
         }
         bits -= bits_to_write;
 # ifdef BITS_TESTING
-        QTC::TC(
-            "libtests",
-            "bits write iterations",
-            ((bits > 8)       ? 0
-                 : (bits > 0) ? 1
-                              : 2));
+        QTC::TC("libtests", "bits write iterations", ((bits > 8) ? 0 : (bits > 0) ? 1 : 2));
 # endif
     }
 }

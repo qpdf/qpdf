@@ -48,19 +48,16 @@ class QPDFEmbeddedFileDocumentHelper: public QPDFDocumentHelper
     bool hasEmbeddedFiles() const;
 
     QPDF_DLL
-    std::map<std::string, std::shared_ptr<QPDFFileSpecObjectHelper>>
-    getEmbeddedFiles();
+    std::map<std::string, std::shared_ptr<QPDFFileSpecObjectHelper>> getEmbeddedFiles();
 
     // If an embedded file with the given name exists, return a
     // (shared) pointer to it. Otherwise, return nullptr.
     QPDF_DLL
-    std::shared_ptr<QPDFFileSpecObjectHelper>
-    getEmbeddedFile(std::string const& name);
+    std::shared_ptr<QPDFFileSpecObjectHelper> getEmbeddedFile(std::string const& name);
 
     // Add or replace an attachment
     QPDF_DLL
-    void replaceEmbeddedFile(
-        std::string const& name, QPDFFileSpecObjectHelper const&);
+    void replaceEmbeddedFile(std::string const& name, QPDFFileSpecObjectHelper const&);
 
     // Remove an embedded file if present. Return value is true if the
     // file was present and was removed. This method not only removes

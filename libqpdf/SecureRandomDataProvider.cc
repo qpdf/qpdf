@@ -39,13 +39,8 @@ namespace
         WindowsCryptProvider()
         {
             if (!CryptAcquireContextW(
-                    &crypt_prov,
-                    NULL,
-                    NULL,
-                    PROV_RSA_FULL,
-                    CRYPT_VERIFYCONTEXT)) {
-                throw std::runtime_error(
-                    "unable to acquire crypt context: " + getErrorMessage());
+                    &crypt_prov, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
+                throw std::runtime_error("unable to acquire crypt context: " + getErrorMessage());
             }
         }
         ~WindowsCryptProvider()
@@ -74,8 +69,7 @@ namespace
             std::string message(messageBuffer, size);
             LocalFree(messageBuffer);
             return (
-                "error number " +
-                QUtil::int_to_string_base(errorMessageID, 16) + ": " + message);
+                "error number " + QUtil::int_to_string_base(errorMessageID, 16) + ": " + message);
         }
     };
 } // namespace
@@ -89,10 +83,7 @@ SecureRandomDataProvider::provideRandomData(unsigned char* data, size_t len)
     // Optimization: make the WindowsCryptProvider static as long as
     // it can be done in a thread-safe fashion.
     WindowsCryptProvider c;
-    if (!CryptGenRandom(
-            c.crypt_prov,
-            static_cast<DWORD>(len),
-            reinterpret_cast<BYTE*>(data))) {
+    if (!CryptGenRandom(c.crypt_prov, static_cast<DWORD>(len), reinterpret_cast<BYTE*>(data))) {
         throw std::runtime_error("unable to generate secure random data");
     }
 
@@ -107,8 +98,7 @@ SecureRandomDataProvider::provideRandomData(unsigned char* data, size_t len)
     fclose(f);
     if (fr != len) {
         throw std::runtime_error(
-            "unable to read " + std::to_string(len) + " bytes from " +
-            std::string(RANDOM_DEVICE));
+            "unable to read " + std::to_string(len) + " bytes from " + std::string(RANDOM_DEVICE));
     }
 
 # else

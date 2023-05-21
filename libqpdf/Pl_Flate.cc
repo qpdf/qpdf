@@ -54,10 +54,7 @@ Pl_Flate::Members::~Members()
 }
 
 Pl_Flate::Pl_Flate(
-    char const* identifier,
-    Pipeline* next,
-    action_e action,
-    unsigned int out_bufsize_int) :
+    char const* identifier, Pipeline* next, action_e action, unsigned int out_bufsize_int) :
     Pipeline(identifier, next),
     m(new Members(QIntC::to_size(out_bufsize_int), action))
 {
@@ -88,8 +85,7 @@ Pl_Flate::write(unsigned char const* data, size_t len)
 {
     if (m->outbuf == nullptr) {
         throw std::logic_error(
-            this->identifier +
-            ": Pl_Flate: write() called after finish() called");
+            this->identifier + ": Pl_Flate: write() called after finish() called");
     }
 
     // Write in chunks in case len is too big to fit in an int.
@@ -99,8 +95,7 @@ Pl_Flate::write(unsigned char const* data, size_t len)
     unsigned char const* buf = data;
     while (bytes_left > 0) {
         size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
-        handleData(
-            buf, bytes, (m->action == a_inflate ? Z_SYNC_FLUSH : Z_NO_FLUSH));
+        handleData(buf, bytes, (m->action == a_inflate ? Z_SYNC_FLUSH : Z_NO_FLUSH));
         bytes_left -= bytes;
         buf += bytes;
     }
@@ -124,9 +119,7 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
 
         // deflateInit and inflateInit are macros that use old-style
         // casts.
-#if ( \
-    (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
-    defined(__clang__))
+#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || defined(__clang__))
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
@@ -135,9 +128,7 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
         } else {
             err = inflateInit(&zstream);
         }
-#if ( \
-    (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
-    defined(__clang__))
+#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || defined(__clang__))
 # pragma GCC diagnostic pop
 #endif
 
@@ -171,8 +162,7 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
             // least one in qpdf's test suite). In some cases, we want
             // to know about this, because it indicates incorrect
             // compression, so call a callback if provided.
-            this->warn(
-                "input stream is complete but output may still be valid", err);
+            this->warn("input stream is complete but output may still be valid", err);
             done = true;
             break;
 
@@ -188,8 +178,7 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
                     // needed, so we're done for now.
                     done = true;
                 }
-                uLong ready =
-                    QIntC::to_ulong(m->out_bufsize - zstream.avail_out);
+                uLong ready = QIntC::to_ulong(m->out_bufsize - zstream.avail_out);
                 if (ready > 0) {
                     this->getNext()->write(m->outbuf.get(), ready);
                     zstream.next_out = m->outbuf.get();
@@ -249,10 +238,8 @@ Pl_Flate::checkError(char const* prefix, int error_code)
 {
     z_stream& zstream = *(static_cast<z_stream*>(m->zdata));
     if (error_code != Z_OK) {
-        char const* action_str =
-            (m->action == a_deflate ? "deflate" : "inflate");
-        std::string msg =
-            this->identifier + ": " + action_str + ": " + prefix + ": ";
+        char const* action_str = (m->action == a_deflate ? "deflate" : "inflate");
+        std::string msg = this->identifier + ": " + action_str + ": " + prefix + ": ";
 
         if (zstream.msg) {
             msg += zstream.msg;
@@ -283,8 +270,7 @@ Pl_Flate::checkError(char const* prefix, int error_code)
                 break;
 
             default:
-                msg += std::string("zlib unknown error (") +
-                    std::to_string(error_code) + ")";
+                msg += std::string("zlib unknown error (") + std::to_string(error_code) + ")";
                 break;
             }
         }

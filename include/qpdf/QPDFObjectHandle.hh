@@ -128,22 +128,13 @@ class QPDFObjectHandle
         // version of the method, which should also return a boolean
         // indicating whether it ran without errors.
         QPDF_DLL
-        virtual void
-        provideStreamData(QPDFObjGen const& og, Pipeline* pipeline);
+        virtual void provideStreamData(QPDFObjGen const& og, Pipeline* pipeline);
         QPDF_DLL
         virtual bool provideStreamData(
-            QPDFObjGen const& og,
-            Pipeline* pipeline,
-            bool suppress_warnings,
-            bool will_retry);
-        QPDF_DLL virtual void
-        provideStreamData(int objid, int generation, Pipeline* pipeline);
+            QPDFObjGen const& og, Pipeline* pipeline, bool suppress_warnings, bool will_retry);
+        QPDF_DLL virtual void provideStreamData(int objid, int generation, Pipeline* pipeline);
         QPDF_DLL virtual bool provideStreamData(
-            int objid,
-            int generation,
-            Pipeline* pipeline,
-            bool suppress_warnings,
-            bool will_retry);
+            int objid, int generation, Pipeline* pipeline, bool suppress_warnings, bool will_retry);
         QPDF_DLL
         bool supportsRetry();
 
@@ -246,8 +237,7 @@ class QPDFObjectHandle
         QPDF_DLL
         virtual void handleObject(QPDFObjectHandle);
         QPDF_DLL
-        virtual void
-        handleObject(QPDFObjectHandle, size_t offset, size_t length);
+        virtual void handleObject(QPDFObjectHandle, size_t offset, size_t length);
 
         virtual void handleEOF() = 0;
 
@@ -408,14 +398,12 @@ class QPDFObjectHandle
     // True if the object is a dictionary of the specified type and
     // subtype, if any.
     QPDF_DLL
-    bool isDictionaryOfType(
-        std::string const& type, std::string const& subtype = "");
+    bool isDictionaryOfType(std::string const& type, std::string const& subtype = "");
 
     // True if the object is a stream of the specified type and
     // subtype, if any.
     QPDF_DLL
-    bool
-    isStreamOfType(std::string const& type, std::string const& subtype = "");
+    bool isStreamOfType(std::string const& type, std::string const& subtype = "");
 
     // Public factory methods
 
@@ -433,9 +421,8 @@ class QPDFObjectHandle
     // in the message of any QPDFExc exception thrown for invalid
     // syntax. See also the global `operator ""_qpdf` defined below.
     QPDF_DLL
-    static QPDFObjectHandle parse(
-        std::string const& object_str,
-        std::string const& object_description = "");
+    static QPDFObjectHandle
+    parse(std::string const& object_str, std::string const& object_description = "");
 
     // Construct an object of any type from a string representation of
     // the object. Indirect object syntax (obj gen R) is allowed and
@@ -447,10 +434,8 @@ class QPDFObjectHandle
     // object, which will just be the first number and will report
     // that there is trailing data at the end of the string.
     QPDF_DLL
-    static QPDFObjectHandle parse(
-        QPDF* context,
-        std::string const& object_str,
-        std::string const& object_description = "");
+    static QPDFObjectHandle
+    parse(QPDF* context, std::string const& object_str, std::string const& object_description = "");
 
     // Construct an object as above by reading from the given
     // InputSource at its current position and using the tokenizer you
@@ -480,8 +465,7 @@ class QPDFObjectHandle
     // error messages will also be more useful because the page object
     // information will be known.
     QPDF_DLL
-    static void parseContentStream(
-        QPDFObjectHandle stream_or_array, ParserCallbacks* callbacks);
+    static void parseContentStream(QPDFObjectHandle stream_or_array, ParserCallbacks* callbacks);
 
     // When called on a stream or stream array that is some page's
     // content streams, do the same as pipePageContents. This method
@@ -500,10 +484,8 @@ class QPDFObjectHandle
     // Pl_Concatenate and then call manualFinish() on the
     // Pl_Concatenate pipeline at the end.
     QPDF_DLL
-    void pipeContentStreams(
-        Pipeline* p,
-        std::string const& description,
-        std::string& all_description);
+    void
+    pipeContentStreams(Pipeline* p, std::string const& description, std::string& all_description);
 
     // As of qpdf 8, it is possible to add custom token filters to a
     // stream. The tokenized stream data is passed through the token
@@ -554,8 +536,8 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newReal(std::string const& value);
     QPDF_DLL
-    static QPDFObjectHandle newReal(
-        double value, int decimal_places = 0, bool trim_trailing_zeroes = true);
+    static QPDFObjectHandle
+    newReal(double value, int decimal_places = 0, bool trim_trailing_zeroes = true);
     // Note about name objects: qpdf's internal representation of a
     // PDF name is a sequence of bytes, excluding the NUL character,
     // and starting with a slash. Name objects as represented in the
@@ -591,8 +573,7 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newArray();
     QPDF_DLL
-    static QPDFObjectHandle
-    newArray(std::vector<QPDFObjectHandle> const& items);
+    static QPDFObjectHandle newArray(std::vector<QPDFObjectHandle> const& items);
     QPDF_DLL
     static QPDFObjectHandle newArray(Rectangle const&);
     QPDF_DLL
@@ -602,8 +583,7 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newDictionary();
     QPDF_DLL
-    static QPDFObjectHandle
-    newDictionary(std::map<std::string, QPDFObjectHandle> const& items);
+    static QPDFObjectHandle newDictionary(std::map<std::string, QPDFObjectHandle> const& items);
 
     // Create an array from a rectangle. Equivalent to the rectangle
     // form of newArray.
@@ -686,8 +666,7 @@ class QPDFObjectHandle
     // else. To add objects from another qpdf, use copyForeignObject
     // instead.
     QPDF_DLL
-    void setObjectDescription(
-        QPDF* owning_qpdf, std::string const& object_description);
+    void setObjectDescription(QPDF* owning_qpdf, std::string const& object_description);
     QPDF_DLL
     bool hasObjectDescription();
 
@@ -964,8 +943,7 @@ class QPDFObjectHandle
     QPDF_DLL
     void mergeResources(
         QPDFObjectHandle other,
-        std::map<std::string, std::map<std::string, std::string>>* conflicts =
-            nullptr);
+        std::map<std::string, std::map<std::string, std::string>>* conflicts = nullptr);
 
     // Get all resource names from a resource dictionary. If this
     // object is a dictionary, this method returns a set of all the
@@ -1118,13 +1096,11 @@ class QPDFObjectHandle
     void replaceKey(std::string const& key, QPDFObjectHandle const& value);
     // Replace value of key and return the value.
     QPDF_DLL
-    QPDFObjectHandle
-    replaceKeyAndGetNew(std::string const& key, QPDFObjectHandle const& value);
+    QPDFObjectHandle replaceKeyAndGetNew(std::string const& key, QPDFObjectHandle const& value);
     // Replace value of key and return the old value, or null if the
     // key was previously not present.
     QPDF_DLL
-    QPDFObjectHandle
-    replaceKeyAndGetOld(std::string const& key, QPDFObjectHandle const& value);
+    QPDFObjectHandle replaceKeyAndGetOld(std::string const& key, QPDFObjectHandle const& value);
     // Remove key, doing nothing if key does not exist.
     QPDF_DLL
     void removeKey(std::string const& key);
@@ -1167,8 +1143,7 @@ class QPDFObjectHandle
     // Returns filtered (uncompressed) stream data.  Throws an
     // exception if the stream is filtered and we can't decode it.
     QPDF_DLL
-    std::shared_ptr<Buffer>
-    getStreamData(qpdf_stream_decode_level_e level = qpdf_dl_generalized);
+    std::shared_ptr<Buffer> getStreamData(qpdf_stream_decode_level_e level = qpdf_dl_generalized);
 
     // Returns unfiltered (raw) stream data.
     QPDF_DLL
@@ -1347,8 +1322,7 @@ class QPDFObjectHandle
     // returning true if it succeeded without errors.
     QPDF_DLL
     void replaceStreamData(
-        std::function<bool(Pipeline*, bool suppress_warnings, bool will_retry)>
-            provider,
+        std::function<bool(Pipeline*, bool suppress_warnings, bool will_retry)> provider,
         QPDFObjectHandle const& filter,
         QPDFObjectHandle const& decode_parms);
 
@@ -1615,15 +1589,14 @@ class QPDFObjectHandle
     void makeDirect(QPDFObjGen::set& visited, bool stop_at_streams);
     void disconnect();
     void setParsedOffset(qpdf_offset_t offset);
-    void parseContentStream_internal(
-        std::string const& description, ParserCallbacks* callbacks);
+    void parseContentStream_internal(std::string const& description, ParserCallbacks* callbacks);
     static void parseContentStream_data(
         std::shared_ptr<Buffer>,
         std::string const& description,
         ParserCallbacks* callbacks,
         QPDF* context);
-    std::vector<QPDFObjectHandle> arrayOrStreamToStreamArray(
-        std::string const& description, std::string& all_description);
+    std::vector<QPDFObjectHandle>
+    arrayOrStreamToStreamArray(std::string const& description, std::string& all_description);
     static void warn(QPDF*, QPDFExc const&);
     void checkOwnership(QPDFObjectHandle const&) const;
 

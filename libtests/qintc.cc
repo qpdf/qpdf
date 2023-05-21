@@ -3,16 +3,11 @@
 #include <qpdf/QIntC.hh>
 #include <cstdint>
 
-#define try_convert(exp_pass, fn, i) \
-    try_convert_real(#fn "(" #i ")", exp_pass, fn, i)
+#define try_convert(exp_pass, fn, i) try_convert_real(#fn "(" #i ")", exp_pass, fn, i)
 
 template <typename From, typename To>
 static void
-try_convert_real(
-    char const* description,
-    bool exp_pass,
-    To (*fn)(From const&),
-    From const& i)
+try_convert_real(char const* description, bool exp_pass, To (*fn)(From const&), From const& i)
 {
     bool passed = false;
     try {
@@ -26,13 +21,11 @@ try_convert_real(
     std::cout << ((passed == exp_pass) ? " PASSED" : " FAILED") << std::endl;
 }
 
-#define try_range_check(exp_pass, a, b) \
-    try_range_check_real(#a " + " #b, exp_pass, a, b)
+#define try_range_check(exp_pass, a, b) try_range_check_real(#a " + " #b, exp_pass, a, b)
 
 template <typename T>
 static void
-try_range_check_real(
-    char const* description, bool exp_pass, T const& a, T const& b)
+try_range_check_real(char const* description, bool exp_pass, T const& a, T const& b)
 {
     bool passed = false;
     try {
@@ -51,8 +44,7 @@ try_range_check_real(
 
 template <typename T>
 static void
-try_range_check_subtract_real(
-    char const* description, bool exp_pass, T const& a, T const& b)
+try_range_check_subtract_real(char const* description, bool exp_pass, T const& a, T const& b)
 {
     bool passed = false;
     try {
@@ -75,7 +67,7 @@ main()
     uint64_t ul2 = 12345;                       // Fits into 32-bit
     int32_t i2 = 81;                            // Fits in char and uchar
     auto c1 = static_cast<signed char>('\xf7'); // Signed value when char
-    char c2 = 'W'; // char; may be signed or unsigned
+    char c2 = 'W';                              // char; may be signed or unsigned
 
     // Verify i1 and u1 have same bit pattern
     assert(static_cast<uint32_t>(i1) == u1);

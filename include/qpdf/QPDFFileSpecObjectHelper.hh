@@ -77,16 +77,16 @@ class QPDFFileSpecObjectHelper: public QPDFObjectHelper
     // filename, and attach the contents of the specified file as data
     // in an embedded file stream.
     QPDF_DLL
-    static QPDFFileSpecObjectHelper createFileSpec(
-        QPDF& qpdf, std::string const& filename, std::string const& fullpath);
+    static QPDFFileSpecObjectHelper
+    createFileSpec(QPDF& qpdf, std::string const& filename, std::string const& fullpath);
 
     // Create a new filespec as an indirect object with the given
     // unicode filename and embedded file stream. The file name will
     // be used as both /UF and /F. If you need to override, call
     // setFilename.
     QPDF_DLL
-    static QPDFFileSpecObjectHelper createFileSpec(
-        QPDF& qpdf, std::string const& filename, QPDFEFStreamObjectHelper);
+    static QPDFFileSpecObjectHelper
+    createFileSpec(QPDF& qpdf, std::string const& filename, QPDFEFStreamObjectHelper);
 
     QPDF_DLL
     QPDFFileSpecObjectHelper& setDescription(std::string const&);
@@ -96,8 +96,8 @@ class QPDFFileSpecObjectHelper: public QPDFObjectHelper
     // QPDFObjectHandle literally, preserving whatever encoding it
     // might happen to have.
     QPDF_DLL
-    QPDFFileSpecObjectHelper& setFilename(
-        std::string const& unicode_name, std::string const& compat_name = "");
+    QPDFFileSpecObjectHelper&
+    setFilename(std::string const& unicode_name, std::string const& compat_name = "");
 
   private:
     class Members

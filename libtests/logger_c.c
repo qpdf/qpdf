@@ -54,15 +54,9 @@ main()
     qpdflogger_set_error(l, qpdf_log_dest_custom, fn, (void*)error);
     qpdflogger_set_save(l, qpdf_log_dest_custom, fn, (void*)save, 0);
 
-    do_run(
-        "{\"inputFile\": \"normal.pdf\", \"showNpages\": \"\"}",
-        qpdf_exit_success);
-    do_run(
-        "{\"inputFile\": \"warning.pdf\", \"showNpages\": \"\"}",
-        qpdf_exit_warning);
-    do_run(
-        "{\"inputFile\": \"missing.pdf\", \"showNpages\": \"\"}",
-        qpdf_exit_error);
+    do_run("{\"inputFile\": \"normal.pdf\", \"showNpages\": \"\"}", qpdf_exit_success);
+    do_run("{\"inputFile\": \"warning.pdf\", \"showNpages\": \"\"}", qpdf_exit_warning);
+    do_run("{\"inputFile\": \"missing.pdf\", \"showNpages\": \"\"}", qpdf_exit_error);
     do_run(
         "{\"inputFile\": \"normal.pdf\","
         " \"staticId\": \"\","
@@ -79,16 +73,11 @@ main()
     qpdflogger_set_error(l, qpdf_log_dest_default, NULL, NULL);
     qpdflogger_set_save(l, qpdf_log_dest_custom, fn, (void*)save2, 0);
 
-    do_run(
-        "{\"inputFile\": \"2pages.pdf\", \"showNpages\": \"\"}",
-        qpdf_exit_success);
-    do_run(
-        "{\"inputFile\": \"warning.pdf\", \"showNpages\": \"\"}",
-        qpdf_exit_warning);
+    do_run("{\"inputFile\": \"2pages.pdf\", \"showNpages\": \"\"}", qpdf_exit_success);
+    do_run("{\"inputFile\": \"warning.pdf\", \"showNpages\": \"\"}", qpdf_exit_warning);
     do_run(
 
-        "{\"inputFile\": \"missing.pdf\", \"showNpages\": \"\"}",
-        qpdf_exit_error);
+        "{\"inputFile\": \"missing.pdf\", \"showNpages\": \"\"}", qpdf_exit_error);
     do_run(
         "{\"inputFile\": \"attach.pdf\","
         " \"showAttachment\": \"a\"}",

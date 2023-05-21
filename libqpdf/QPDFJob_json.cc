@@ -125,32 +125,28 @@ Handlers::initHandlers()
 void
 Handlers::addBare(bare_handler_t fn)
 {
-    jh->addStringHandler(
-        [this, fn](std::string const& path, std::string const& parameter) {
-            if (!parameter.empty()) {
-                QTC::TC("qpdf", "QPDFJob json bare not empty");
-                usage(path + ": value must be the empty string");
-            } else {
-                fn();
-            }
-        });
+    jh->addStringHandler([this, fn](std::string const& path, std::string const& parameter) {
+        if (!parameter.empty()) {
+            QTC::TC("qpdf", "QPDFJob json bare not empty");
+            usage(path + ": value must be the empty string");
+        } else {
+            fn();
+        }
+    });
 }
 
 void
 Handlers::addParameter(param_handler_t fn)
 {
     jh->addStringHandler(
-        [fn](std::string const& path, std::string const& parameter) {
-            fn(parameter.c_str());
-        });
+        [fn](std::string const& path, std::string const& parameter) { fn(parameter.c_str()); });
 }
 
 void
 Handlers::addChoices(char const** choices, bool required, param_handler_t fn)
 {
     jh->addStringHandler(
-        [fn, choices, required, this](
-            std::string const& path, std::string const& parameter) {
+        [fn, choices, required, this](std::string const& path, std::string const& parameter) {
             char const* p = parameter.c_str();
             bool matches = false;
             if ((!required) && (parameter.empty())) {
@@ -494,8 +490,7 @@ Handlers::beginPages(JSON j)
         QTC::TC("qpdf", "QPDFJob json pages no file");
         usage("file is required in page specification");
     }
-    this->c_pages->pageSpec(
-        file, range, password_seen ? password.c_str() : nullptr);
+    this->c_pages->pageSpec(file, range, password_seen ? password.c_str() : nullptr);
 }
 
 void

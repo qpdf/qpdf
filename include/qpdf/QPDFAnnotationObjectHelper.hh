@@ -76,8 +76,7 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
     // which appearance stream is desired. If not specified, the
     // appearance state in "/AS" will used.
     QPDF_DLL
-    QPDFObjectHandle getAppearanceStream(
-        std::string const& which, std::string const& state = "");
+    QPDFObjectHandle getAppearanceStream(std::string const& which, std::string const& state = "");
 
     // Generate text suitable for addition to the containing page's
     // content stream that draws this annotation's appearance stream

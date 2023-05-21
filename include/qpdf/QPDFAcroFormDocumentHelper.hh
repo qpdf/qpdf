@@ -148,18 +148,15 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     // underlying object will typically be the same as the underlying
     // object for the field.
     QPDF_DLL
-    std::vector<QPDFAnnotationObjectHelper>
-        getAnnotationsForField(QPDFFormFieldObjectHelper);
+    std::vector<QPDFAnnotationObjectHelper> getAnnotationsForField(QPDFFormFieldObjectHelper);
 
     // Return annotations of subtype /Widget for a page.
     QPDF_DLL
-    std::vector<QPDFAnnotationObjectHelper>
-        getWidgetAnnotationsForPage(QPDFPageObjectHelper);
+    std::vector<QPDFAnnotationObjectHelper> getWidgetAnnotationsForPage(QPDFPageObjectHelper);
 
     // Return top-level form fields for a page.
     QPDF_DLL
-    std::vector<QPDFFormFieldObjectHelper>
-        getFormFieldsForPage(QPDFPageObjectHelper);
+    std::vector<QPDFFormFieldObjectHelper> getFormFieldsForPage(QPDFPageObjectHelper);
 
     // Return the terminal field that is associated with this
     // annotation. If the annotation dictionary is merged with the
@@ -251,10 +248,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
   private:
     void analyze();
     void traverseField(
-        QPDFObjectHandle field,
-        QPDFObjectHandle parent,
-        int depth,
-        QPDFObjGen::set& visited);
+        QPDFObjectHandle field, QPDFObjectHandle parent, int depth, QPDFObjGen::set& visited);
     QPDFObjectHandle getOrCreateAcroForm();
     void adjustInheritedFields(
         QPDFObjectHandle obj,
@@ -264,11 +258,9 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
         int from_default_q);
     void adjustDefaultAppearances(
         QPDFObjectHandle obj,
-        std::map<std::string, std::map<std::string, std::string>> const&
-            dr_map);
+        std::map<std::string, std::map<std::string, std::string>> const& dr_map);
     void adjustAppearanceStream(
-        QPDFObjectHandle stream,
-        std::map<std::string, std::map<std::string, std::string>> dr_map);
+        QPDFObjectHandle stream, std::map<std::string, std::map<std::string, std::string>> dr_map);
 
     class Members
     {
@@ -283,8 +275,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
         Members(Members const&) = delete;
 
         bool cache_valid;
-        std::map<QPDFObjGen, std::vector<QPDFAnnotationObjectHelper>>
-            field_to_annotations;
+        std::map<QPDFObjGen, std::vector<QPDFAnnotationObjectHelper>> field_to_annotations;
         std::map<QPDFObjGen, QPDFFormFieldObjectHelper> annotation_to_field;
         std::map<QPDFObjGen, std::string> field_to_name;
         std::map<std::string, std::set<QPDFObjGen>> name_to_fields;

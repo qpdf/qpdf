@@ -69,17 +69,9 @@ class QPDF_DLL_CLASS InputSource
     // methods return true and leave the input source positioned
     // wherever check() left it at the end of the matching pattern.
     QPDF_DLL
-    bool findFirst(
-        char const* start_chars,
-        qpdf_offset_t offset,
-        size_t len,
-        Finder& finder);
+    bool findFirst(char const* start_chars, qpdf_offset_t offset, size_t len, Finder& finder);
     QPDF_DLL
-    bool findLast(
-        char const* start_chars,
-        qpdf_offset_t offset,
-        size_t len,
-        Finder& finder);
+    bool findLast(char const* start_chars, qpdf_offset_t offset, size_t len, Finder& finder);
 
     virtual qpdf_offset_t findAndSkipNextEOL() = 0;
     virtual std::string const& getName() const = 0;
@@ -144,8 +136,7 @@ InputSource::fastTell()
         loadBuffer();
     } else {
         auto curr = tell();
-        if (curr < this->buf_start ||
-            curr >= (this->buf_start + this->buf_len)) {
+        if (curr < this->buf_start || curr >= (this->buf_start + this->buf_len)) {
             loadBuffer();
         } else {
             this->last_offset = curr;
