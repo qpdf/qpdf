@@ -101,7 +101,7 @@ class QPDFObjGen
     //
     // Usage example:
     //
-    // void process_object(QPDFObjectHandle oh, QPDFObjGen::Tracker& seen)
+    // void process_object(QPDFObjectHandle oh, QPDFObjGen::set& seen)
     // {
     //     if (seen.add(oh)) {
     //         // handle first encounter of oh
