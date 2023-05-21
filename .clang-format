@@ -20,6 +20,7 @@ BraceWrapping:
   AfterUnion:      true
 BreakBeforeBraces: Custom
 BreakConstructorInitializers: AfterColon
+ColumnLimit: 100
 DeriveLineEnding: false
 PackConstructorInitializers: Never
 IncludeCategories:

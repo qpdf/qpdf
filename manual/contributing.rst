@@ -44,7 +44,7 @@ partial summary of the formatting rules:
 
 - Use spaces, not tabs.
 
-- Keep lines to 80 columns when possible.
+- Keep lines to 100 columns when possible.
 
 - Braces are on their own lines after classes and functions (and
   similar top-level constructs) and are compact otherwise.
