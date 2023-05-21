@@ -397,8 +397,10 @@ ap.addHelpTopic("encryption", "create encrypted files", R"(Create encrypted file
 --encrypt user-password owner-password key-length [options] --
 
 Either or both of user-password and owner-password may be empty
-strings. key-length may be 40, 128, or 256. Encryption options are
-terminated by "--" by itself.
+strings, though setting either to the empty string enables the file
+to be opened and decrpyted without a password. key-length may be
+40, 128, or 256. Encryption options are terminated by "--" by
+itself.
 
 40-bit encryption is insecure, as is 128-bit encryption without
 AES. Use 256-bit encryption unless you have a specific reason to
