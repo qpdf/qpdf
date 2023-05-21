@@ -3,6 +3,7 @@ set -e
 whoami=$(basename $0)
 tool=$1
 mode=$2
+config=${3-RelWithDebInfo}
 
 dir=$(realpath --relative-to . $(dirname $0))
 if [ "$dir" = "." ]; then
@@ -12,13 +13,13 @@ fi
 declare -a args
 case $tool in
     msvc)
-        args=(-DCMAKE_BUILD_TYPE=RelWithDebInfo)
+        args=(-DCMAKE_BUILD_TYPE=$config)
         if cl 2>&1 | grep -q 'for x86'; then
             args=("${args[@]}" -A win32)
         fi
         ;;
     mingw)
-        args=(-G 'MSYS Makefiles' -DCMAKE_BUILD_TYPE=RelWithDebInfo)
+        args=(-G 'MSYS Makefiles' -DCMAKE_BUILD_TYPE=$config)
         ;;
     *)
         echo 1>&2 "Usage: $whoami {msvc|mingw}"
@@ -36,9 +37,9 @@ cmake "${args[@]}" $dir
 set +x
 if [ "$tool" = "msvc" ]; then
     echo ""
-    echo "*****************************************************************"
-    echo "*** Remember to pass --config RelWithDebInfo to cmake --build ***"
-    echo "***  and -C RelWithDebInfo to ctest                           ***"
-    echo "*****************************************************************"
+    echo "***"
+    echo "*** Remember to pass --config $config to cmake --build"
+    echo "***  and -C $config to ctest"
+    echo "***"
     echo ""
 fi

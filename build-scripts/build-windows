@@ -30,7 +30,7 @@ unzip doc.zip
 unzip qpdf-external-libs-bin.zip
 
 cd build
-../cmake-win $tool ci
+../cmake-win $tool ci $config
 cmake --build . --verbose -j$(nproc) "${cmake_xargs[@]}"
 ctest --verbose "${ctest_xargs[@]}"
 cpack -G NSIS -C $config
