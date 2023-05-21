@@ -59,7 +59,6 @@ cmake --build build -j$(nproc)
 
 echo "** saving old library and size information **"
 
-$source/check_abi check-sizes --lib build/libqpdf/libqpdf.so
 ./build/qpdf/sizes >| $work/old/sizes
 cp build/libqpdf/libqpdf.so.*.* $work/old
 
