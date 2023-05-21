@@ -56,7 +56,7 @@ Buffer::Buffer(Buffer&& rhs) noexcept :
 Buffer&
 Buffer::operator=(Buffer&& rhs) noexcept
 {
-    std::swap(this->m, rhs.m);
+    std::swap(m, rhs.m);
     return *this;
 }
 
@@ -64,8 +64,7 @@ void
 Buffer::copy(Buffer const& rhs)
 {
     if (this != &rhs) {
-        this->m =
-            std::unique_ptr<Members>(new Members(rhs.m->size, nullptr, true));
+        m = std::unique_ptr<Members>(new Members(rhs.m->size, nullptr, true));
         if (m->size) {
             memcpy(m->buf, rhs.m->buf, m->size);
         }

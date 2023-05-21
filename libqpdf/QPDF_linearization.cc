@@ -1462,8 +1462,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
                 // lc_thumbnail_private.
             }
             std::set<QPDFObjGen>& ogs =
-                this->m
-                    ->obj_user_to_objects[ObjUser(ObjUser::ou_thumb, toI(i))];
+                m->obj_user_to_objects[ObjUser(ObjUser::ou_thumb, toI(i))];
             for (auto const& og: ogs) {
                 if (lc_thumbnail_private.count(og)) {
                     lc_thumbnail_private.erase(og);

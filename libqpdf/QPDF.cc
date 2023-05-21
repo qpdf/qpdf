@@ -2407,10 +2407,10 @@ QPDF::getVersionAsPDFVersion()
     int extension_level = getExtensionLevel();
 
     std::regex v("^[[:space:]]*([0-9]+)\\.([0-9]+)");
-    std::smatch m;
-    if (std::regex_search(this->m->pdf_version, m, v)) {
-        major = QUtil::string_to_int(m[1].str().c_str());
-        minor = QUtil::string_to_int(m[2].str().c_str());
+    std::smatch match;
+    if (std::regex_search(m->pdf_version, match, v)) {
+        major = QUtil::string_to_int(match[1].str().c_str());
+        minor = QUtil::string_to_int(match[2].str().c_str());
     }
 
     return PDFVersion(major, minor, extension_level);
