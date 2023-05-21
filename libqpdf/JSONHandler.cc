@@ -18,51 +18,51 @@ JSONHandler::usage(std::string const& msg)
 void
 JSONHandler::addAnyHandler(json_handler_t fn)
 {
-    this->m->h.any_handler = fn;
+    m->h.any_handler = fn;
 }
 
 void
 JSONHandler::addNullHandler(void_handler_t fn)
 {
-    this->m->h.null_handler = fn;
+    m->h.null_handler = fn;
 }
 
 void
 JSONHandler::addStringHandler(string_handler_t fn)
 {
-    this->m->h.string_handler = fn;
+    m->h.string_handler = fn;
 }
 
 void
 JSONHandler::addNumberHandler(string_handler_t fn)
 {
-    this->m->h.number_handler = fn;
+    m->h.number_handler = fn;
 }
 
 void
 JSONHandler::addBoolHandler(bool_handler_t fn)
 {
-    this->m->h.bool_handler = fn;
+    m->h.bool_handler = fn;
 }
 
 void
 JSONHandler::addDictHandlers(json_handler_t start_fn, void_handler_t end_fn)
 {
-    this->m->h.dict_start_handler = start_fn;
-    this->m->h.dict_end_handler = end_fn;
+    m->h.dict_start_handler = start_fn;
+    m->h.dict_end_handler = end_fn;
 }
 
 void
 JSONHandler::addDictKeyHandler(
     std::string const& key, std::shared_ptr<JSONHandler> dkh)
 {
-    this->m->h.dict_handlers[key] = dkh;
+    m->h.dict_handlers[key] = dkh;
 }
 
 void
 JSONHandler::addFallbackDictHandler(std::shared_ptr<JSONHandler> fdh)
 {
-    this->m->h.fallback_dict_handler = fdh;
+    m->h.fallback_dict_handler = fdh;
 }
 
 void
@@ -71,71 +71,71 @@ JSONHandler::addArrayHandlers(
     void_handler_t end_fn,
     std::shared_ptr<JSONHandler> ah)
 {
-    this->m->h.array_start_handler = start_fn;
-    this->m->h.array_end_handler = end_fn;
-    this->m->h.array_item_handler = ah;
+    m->h.array_start_handler = start_fn;
+    m->h.array_end_handler = end_fn;
+    m->h.array_item_handler = ah;
 }
 
 void
 JSONHandler::handle(std::string const& path, JSON j)
 {
-    if (this->m->h.any_handler) {
-        this->m->h.any_handler(path, j);
+    if (m->h.any_handler) {
+        m->h.any_handler(path, j);
         return;
     }
     bool handled = false;
     bool bvalue = false;
     std::string s_value;
-    if (this->m->h.null_handler && j.isNull()) {
-        this->m->h.null_handler(path);
+    if (m->h.null_handler && j.isNull()) {
+        m->h.null_handler(path);
         handled = true;
     }
-    if (this->m->h.string_handler && j.getString(s_value)) {
-        this->m->h.string_handler(path, s_value);
+    if (m->h.string_handler && j.getString(s_value)) {
+        m->h.string_handler(path, s_value);
         handled = true;
     }
-    if (this->m->h.number_handler && j.getNumber(s_value)) {
-        this->m->h.number_handler(path, s_value);
+    if (m->h.number_handler && j.getNumber(s_value)) {
+        m->h.number_handler(path, s_value);
         handled = true;
     }
-    if (this->m->h.bool_handler && j.getBool(bvalue)) {
-        this->m->h.bool_handler(path, bvalue);
+    if (m->h.bool_handler && j.getBool(bvalue)) {
+        m->h.bool_handler(path, bvalue);
         handled = true;
     }
-    if (this->m->h.dict_start_handler && j.isDictionary()) {
-        this->m->h.dict_start_handler(path, j);
+    if (m->h.dict_start_handler && j.isDictionary()) {
+        m->h.dict_start_handler(path, j);
         std::string path_base = path;
         if (path_base != ".") {
             path_base += ".";
         }
-        j.forEachDictItem([&path, &path_base, this](
-                              std::string const& k, JSON v) {
-            auto i = this->m->h.dict_handlers.find(k);
-            if (i == this->m->h.dict_handlers.end()) {
-                if (this->m->h.fallback_dict_handler.get()) {
-                    this->m->h.fallback_dict_handler->handle(path_base + k, v);
+        j.forEachDictItem(
+            [&path, &path_base, this](std::string const& k, JSON v) {
+                auto i = m->h.dict_handlers.find(k);
+                if (i == m->h.dict_handlers.end()) {
+                    if (m->h.fallback_dict_handler.get()) {
+                        m->h.fallback_dict_handler->handle(path_base + k, v);
+                    } else {
+                        QTC::TC("libtests", "JSONHandler unexpected key");
+                        usage(
+                            "JSON handler found unexpected key " + k +
+                            " in object at " + path);
+                    }
                 } else {
-                    QTC::TC("libtests", "JSONHandler unexpected key");
-                    usage(
-                        "JSON handler found unexpected key " + k +
-                        " in object at " + path);
+                    i->second->handle(path_base + k, v);
                 }
-            } else {
-                i->second->handle(path_base + k, v);
-            }
-        });
-        this->m->h.dict_end_handler(path);
+            });
+        m->h.dict_end_handler(path);
         handled = true;
     }
-    if (this->m->h.array_start_handler && j.isArray()) {
-        this->m->h.array_start_handler(path, j);
+    if (m->h.array_start_handler && j.isArray()) {
+        m->h.array_start_handler(path, j);
         size_t i = 0;
         j.forEachArrayItem([&i, &path, this](JSON v) {
-            this->m->h.array_item_handler->handle(
+            m->h.array_item_handler->handle(
                 path + "[" + std::to_string(i) + "]", v);
             ++i;
         });
-        this->m->h.array_end_handler(path);
+        m->h.array_end_handler(path);
         handled = true;
     }
 

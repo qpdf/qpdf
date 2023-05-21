@@ -52,9 +52,9 @@ std::vector<QPDFObjectHandle> const&
 QPDF::getAllPages()
 {
     // Note that pushInheritedAttributesToPage may also be used to
-    // initialize this->m->all_pages.
-    if (this->m->all_pages.empty()) {
-        this->m->ever_called_get_all_pages = true;
+    // initialize m->all_pages.
+    if (m->all_pages.empty()) {
+        m->ever_called_get_all_pages = true;
         QPDFObjGen::set visited;
         QPDFObjGen::set seen;
         QPDFObjectHandle pages = getRoot().getKey("/Pages");
@@ -86,7 +86,7 @@ QPDF::getAllPages()
             getAllPagesInternal(pages, visited, seen);
         }
     }
-    return this->m->all_pages;
+    return m->all_pages;
 }
 
 void
@@ -96,8 +96,8 @@ QPDF::getAllPagesInternal(
     if (!visited.add(cur_node)) {
         throw QPDFExc(
             qpdf_e_pages,
-            this->m->file->getName(),
-            this->m->last_object_description,
+            m->file->getName(),
+            m->last_object_description,
             0,
             "Loop detected in /Pages structure (getAllPages)");
     }
@@ -150,9 +150,9 @@ QPDF::updateAllPagesCache()
     // it that they got from calls to getAllPages().  We can defer
     // recalculation of pageobj_to_pages_pos until needed.
     QTC::TC("qpdf", "QPDF updateAllPagesCache");
-    this->m->all_pages.clear();
-    this->m->pageobj_to_pages_pos.clear();
-    this->m->pushed_inherited_attributes_to_pages = false;
+    m->all_pages.clear();
+    m->pageobj_to_pages_pos.clear();
+    m->pushed_inherited_attributes_to_pages = false;
     getAllPages();
 }
 
@@ -162,27 +162,27 @@ QPDF::flattenPagesTree()
     // If not already done, flatten the /Pages structure and
     // initialize pageobj_to_pages_pos.
 
-    if (!this->m->pageobj_to_pages_pos.empty()) {
+    if (!m->pageobj_to_pages_pos.empty()) {
         return;
     }
 
     // Push inherited objects down to the /Page level.  As a side
-    // effect this->m->all_pages will also be generated.
+    // effect m->all_pages will also be generated.
     pushInheritedAttributesToPage(true, true);
 
     QPDFObjectHandle pages = getRoot().getKey("/Pages");
 
-    size_t const len = this->m->all_pages.size();
+    size_t const len = m->all_pages.size();
     for (size_t pos = 0; pos < len; ++pos) {
         // Populate pageobj_to_pages_pos and fix parent pointer. There
         // should be no duplicates at this point because
         // pushInheritedAttributesToPage calls getAllPages which
         // resolves duplicates.
-        insertPageobjToPage(this->m->all_pages.at(pos), toI(pos), true);
-        this->m->all_pages.at(pos).replaceKey("/Parent", pages);
+        insertPageobjToPage(m->all_pages.at(pos), toI(pos), true);
+        m->all_pages.at(pos).replaceKey("/Parent", pages);
     }
 
-    pages.replaceKey("/Kids", QPDFObjectHandle::newArray(this->m->all_pages));
+    pages.replaceKey("/Kids", QPDFObjectHandle::newArray(m->all_pages));
     // /Count has not changed
     if (pages.getKey("/Count").getUIntValue() != len) {
         throw std::runtime_error("/Count is wrong after flattening pages tree");
@@ -195,22 +195,21 @@ QPDF::insertPageobjToPage(
 {
     QPDFObjGen og(obj.getObjGen());
     if (check_duplicate) {
-        if (!this->m->pageobj_to_pages_pos.insert(std::make_pair(og, pos))
-                 .second) {
+        if (!m->pageobj_to_pages_pos.insert(std::make_pair(og, pos)).second) {
             // The library never calls insertPageobjToPage in a way
             // that causes this to happen.
             setLastObjectDescription(
                 "page " + std::to_string(pos) + " (numbered from zero)", og);
             throw QPDFExc(
                 qpdf_e_pages,
-                this->m->file->getName(),
-                this->m->last_object_description,
+                m->file->getName(),
+                m->last_object_description,
                 0,
                 "duplicate page reference found;"
                 " this would cause loss of data");
         }
     } else {
-        this->m->pageobj_to_pages_pos[og] = pos;
+        m->pageobj_to_pages_pos[og] = pos;
     }
 }
 
@@ -247,7 +246,7 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
             2);                                 // insert in middle
 
     auto og = newpage.getObjGen();
-    if (this->m->pageobj_to_pages_pos.count(og)) {
+    if (m->pageobj_to_pages_pos.count(og)) {
         QTC::TC("qpdf", "QPDF resolve duplicated page in insert");
         newpage = makeIndirectObject(QPDFObjectHandle(newpage).shallowCopy());
     }
@@ -259,9 +258,9 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
     kids.insertItem(pos, newpage);
     int npages = kids.getArrayNItems();
     pages.replaceKey("/Count", QPDFObjectHandle::newInteger(npages));
-    this->m->all_pages.insert(this->m->all_pages.begin() + pos, newpage);
+    m->all_pages.insert(m->all_pages.begin() + pos, newpage);
     for (int i = pos + 1; i < npages; ++i) {
-        insertPageobjToPage(this->m->all_pages.at(toS(i)), i, false);
+        insertPageobjToPage(m->all_pages.at(toS(i)), i, false);
     }
     insertPageobjToPage(newpage, pos, true);
 }
@@ -284,10 +283,10 @@ QPDF::removePage(QPDFObjectHandle page)
     kids.eraseItem(pos);
     int npages = kids.getArrayNItems();
     pages.replaceKey("/Count", QPDFObjectHandle::newInteger(npages));
-    this->m->all_pages.erase(this->m->all_pages.begin() + pos);
-    this->m->pageobj_to_pages_pos.erase(page.getObjGen());
+    m->all_pages.erase(m->all_pages.begin() + pos);
+    m->pageobj_to_pages_pos.erase(page.getObjGen());
     for (int i = pos; i < npages; ++i) {
-        insertPageobjToPage(this->m->all_pages.at(toS(i)), i, false);
+        insertPageobjToPage(m->all_pages.at(toS(i)), i, false);
     }
 }
 
@@ -323,14 +322,14 @@ int
 QPDF::findPage(QPDFObjGen const& og)
 {
     flattenPagesTree();
-    auto it = this->m->pageobj_to_pages_pos.find(og);
-    if (it == this->m->pageobj_to_pages_pos.end()) {
+    auto it = m->pageobj_to_pages_pos.find(og);
+    if (it == m->pageobj_to_pages_pos.end()) {
         QTC::TC("qpdf", "QPDF_pages findPage not found");
         setLastObjectDescription("page object", og);
         throw QPDFExc(
             qpdf_e_pages,
-            this->m->file->getName(),
-            this->m->last_object_description,
+            m->file->getName(),
+            m->last_object_description,
             0,
             "page object not referenced in /Pages tree");
     }

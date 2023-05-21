@@ -84,18 +84,18 @@ Pl_DCT::~Pl_DCT()
 void
 Pl_DCT::write(unsigned char const* data, size_t len)
 {
-    this->m->buf.write(data, len);
+    m->buf.write(data, len);
 }
 
 void
 Pl_DCT::finish()
 {
-    this->m->buf.finish();
+    m->buf.finish();
 
     // Using a std::shared_ptr<Buffer> here and passing it into compress
     // and decompress causes a memory leak with setjmp/longjmp. Just
     // use a pointer and delete it.
-    Buffer* b = this->m->buf.getBuffer();
+    Buffer* b = m->buf.getBuffer();
     if (b->getSize() == 0) {
         // Special case: empty data will never succeed and probably
         // means we're calling finish a second time from an exception
@@ -118,7 +118,7 @@ Pl_DCT::finish()
     // for exception handling.
     if (setjmp(jerr.jmpbuf) == 0) {
         try {
-            if (this->m->action == a_compress) {
+            if (m->action == a_compress) {
                 compress(reinterpret_cast<void*>(&cinfo_compress), b);
             } else {
                 decompress(reinterpret_cast<void*>(&cinfo_decompress), b);
@@ -135,10 +135,10 @@ Pl_DCT::finish()
     }
     delete b;
 
-    if (this->m->action == a_compress) {
+    if (m->action == a_compress) {
         jpeg_destroy_compress(&cinfo_compress);
     }
-    if (this->m->action == a_decompress) {
+    if (m->action == a_decompress) {
         jpeg_destroy_decompress(&cinfo_decompress);
     }
     if (error) {
@@ -279,13 +279,13 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
     unsigned char* outbuffer = outbuffer_ph.get();
     jpeg_pipeline_dest(cinfo, outbuffer, BUF_SIZE, this->getNext());
 
-    cinfo->image_width = this->m->image_width;
-    cinfo->image_height = this->m->image_height;
-    cinfo->input_components = this->m->components;
-    cinfo->in_color_space = this->m->color_space;
+    cinfo->image_width = m->image_width;
+    cinfo->image_height = m->image_height;
+    cinfo->input_components = m->components;
+    cinfo->in_color_space = m->color_space;
     jpeg_set_defaults(cinfo);
-    if (this->m->config_callback) {
-        this->m->config_callback->apply(cinfo);
+    if (m->config_callback) {
+        m->config_callback->apply(cinfo);
     }
 
     jpeg_start_compress(cinfo, TRUE);

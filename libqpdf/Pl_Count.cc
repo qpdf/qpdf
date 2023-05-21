@@ -24,8 +24,8 @@ void
 Pl_Count::write(unsigned char const* buf, size_t len)
 {
     if (len) {
-        this->m->count += QIntC::to_offset(len);
-        this->m->last_char = buf[len - 1];
+        m->count += QIntC::to_offset(len);
+        m->last_char = buf[len - 1];
         getNext()->write(buf, len);
     }
 }
@@ -39,11 +39,11 @@ Pl_Count::finish()
 qpdf_offset_t
 Pl_Count::getCount() const
 {
-    return this->m->count;
+    return m->count;
 }
 
 unsigned char
 Pl_Count::getLastChar() const
 {
-    return this->m->last_char;
+    return m->last_char;
 }

@@ -24,9 +24,9 @@ QPDFAcroFormDocumentHelper::QPDFAcroFormDocumentHelper(QPDF& qpdf) :
 void
 QPDFAcroFormDocumentHelper::invalidateCache()
 {
-    this->m->cache_valid = false;
-    this->m->field_to_annotations.clear();
-    this->m->annotation_to_field.clear();
+    m->cache_valid = false;
+    m->field_to_annotations.clear();
+    m->annotation_to_field.clear();
 }
 
 bool
@@ -133,21 +133,20 @@ QPDFAcroFormDocumentHelper::removeFormFields(
     }
 
     for (auto const& og: to_remove) {
-        auto annotations = this->m->field_to_annotations.find(og);
-        if (annotations != this->m->field_to_annotations.end()) {
+        auto annotations = m->field_to_annotations.find(og);
+        if (annotations != m->field_to_annotations.end()) {
             for (auto aoh: annotations->second) {
-                this->m->annotation_to_field.erase(
-                    aoh.getObjectHandle().getObjGen());
+                m->annotation_to_field.erase(aoh.getObjectHandle().getObjGen());
             }
-            this->m->field_to_annotations.erase(og);
+            m->field_to_annotations.erase(og);
         }
-        auto name = this->m->field_to_name.find(og);
-        if (name != this->m->field_to_name.end()) {
-            this->m->name_to_fields[name->second].erase(og);
-            if (this->m->name_to_fields[name->second].empty()) {
-                this->m->name_to_fields.erase(name->second);
+        auto name = m->field_to_name.find(og);
+        if (name != m->field_to_name.end()) {
+            m->name_to_fields[name->second].erase(og);
+            if (m->name_to_fields[name->second].empty()) {
+                m->name_to_fields.erase(name->second);
             }
-            this->m->field_to_name.erase(og);
+            m->field_to_name.erase(og);
         }
     }
 
@@ -177,7 +176,7 @@ QPDFAcroFormDocumentHelper::getFormFields()
 {
     analyze();
     std::vector<QPDFFormFieldObjectHelper> result;
-    for (auto const& iter: this->m->field_to_annotations) {
+    for (auto const& iter: m->field_to_annotations) {
         result.push_back(this->qpdf.getObject(iter.first));
     }
     return result;
@@ -188,8 +187,8 @@ QPDFAcroFormDocumentHelper::getFieldsWithQualifiedName(std::string const& name)
 {
     analyze();
     // Keep from creating an empty entry
-    auto iter = this->m->name_to_fields.find(name);
-    if (iter != this->m->name_to_fields.end()) {
+    auto iter = m->name_to_fields.find(name);
+    if (iter != m->name_to_fields.end()) {
         return iter->second;
     }
     return {};
@@ -201,8 +200,8 @@ QPDFAcroFormDocumentHelper::getAnnotationsForField(QPDFFormFieldObjectHelper h)
     analyze();
     std::vector<QPDFAnnotationObjectHelper> result;
     QPDFObjGen og(h.getObjectHandle().getObjGen());
-    if (this->m->field_to_annotations.count(og)) {
-        result = this->m->field_to_annotations[og];
+    if (m->field_to_annotations.count(og)) {
+        result = m->field_to_annotations[og];
     }
     return result;
 }
@@ -238,8 +237,8 @@ QPDFAcroFormDocumentHelper::getFieldForAnnotation(QPDFAnnotationObjectHelper h)
     }
     analyze();
     QPDFObjGen og(oh.getObjGen());
-    if (this->m->annotation_to_field.count(og)) {
-        result = this->m->annotation_to_field[og];
+    if (m->annotation_to_field.count(og)) {
+        result = m->annotation_to_field[og];
     }
     return result;
 }
@@ -247,10 +246,10 @@ QPDFAcroFormDocumentHelper::getFieldForAnnotation(QPDFAnnotationObjectHelper h)
 void
 QPDFAcroFormDocumentHelper::analyze()
 {
-    if (this->m->cache_valid) {
+    if (m->cache_valid) {
         return;
     }
-    this->m->cache_valid = true;
+    m->cache_valid = true;
     QPDFObjectHandle acroform = this->qpdf.getRoot().getKey("/AcroForm");
     if (!(acroform.isDictionary() && acroform.hasKey("/Fields"))) {
         return;
@@ -286,7 +285,7 @@ QPDFAcroFormDocumentHelper::analyze()
         for (auto const& iter: getWidgetAnnotationsForPage(ph)) {
             QPDFObjectHandle annot(iter.getObjectHandle());
             QPDFObjGen og(annot.getObjGen());
-            if (this->m->annotation_to_field.count(og) == 0) {
+            if (m->annotation_to_field.count(og) == 0) {
                 QTC::TC("qpdf", "QPDFAcroFormDocumentHelper orphaned widget");
                 // This is not supposed to happen, but it's easy
                 // enough for us to handle this case. Treat the
@@ -298,9 +297,8 @@ QPDFAcroFormDocumentHelper::analyze()
                 annot.warnIfPossible(
                     "this widget annotation is not"
                     " reachable from /AcroForm in the document catalog");
-                this->m->annotation_to_field[og] =
-                    QPDFFormFieldObjectHelper(annot);
-                this->m->field_to_annotations[og].push_back(
+                m->annotation_to_field[og] = QPDFFormFieldObjectHelper(annot);
+                m->field_to_annotations[og].push_back(
                     QPDFAnnotationObjectHelper(annot));
             }
         }
@@ -376,24 +374,24 @@ QPDFAcroFormDocumentHelper::traverseField(
 
     if (is_annotation) {
         QPDFObjectHandle our_field = (is_field ? field : parent);
-        this->m->field_to_annotations[our_field.getObjGen()].push_back(
+        m->field_to_annotations[our_field.getObjGen()].push_back(
             QPDFAnnotationObjectHelper(field));
-        this->m->annotation_to_field[og] = QPDFFormFieldObjectHelper(our_field);
+        m->annotation_to_field[og] = QPDFFormFieldObjectHelper(our_field);
     }
 
     if (is_field && (field.hasKey("/T"))) {
         QPDFFormFieldObjectHelper foh(field);
         auto f_og = field.getObjGen();
         std::string name = foh.getFullyQualifiedName();
-        auto old = this->m->field_to_name.find(f_og);
-        if (old != this->m->field_to_name.end()) {
+        auto old = m->field_to_name.find(f_og);
+        if (old != m->field_to_name.end()) {
             // We might be updating after a name change, so remove any
             // old information
             std::string old_name = old->second;
-            this->m->name_to_fields[old_name].erase(f_og);
+            m->name_to_fields[old_name].erase(f_og);
         }
-        this->m->field_to_name[f_og] = name;
-        this->m->name_to_fields[name].insert(f_og);
+        m->field_to_name[f_og] = name;
+        m->name_to_fields[name].insert(f_og);
     }
 }
 

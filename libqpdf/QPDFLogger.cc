@@ -92,7 +92,7 @@ QPDFLogger::info(std::string const& s)
 std::shared_ptr<Pipeline>
 QPDFLogger::getInfo(bool null_okay)
 {
-    return throwIfNull(this->m->p_info, null_okay);
+    return throwIfNull(m->p_info, null_okay);
 }
 
 void
@@ -110,8 +110,8 @@ QPDFLogger::warn(std::string const& s)
 std::shared_ptr<Pipeline>
 QPDFLogger::getWarn(bool null_okay)
 {
-    if (this->m->p_warn) {
-        return this->m->p_warn;
+    if (m->p_warn) {
+        return m->p_warn;
     }
     return getError(null_okay);
 }
@@ -131,83 +131,83 @@ QPDFLogger::error(std::string const& s)
 std::shared_ptr<Pipeline>
 QPDFLogger::getError(bool null_okay)
 {
-    return throwIfNull(this->m->p_error, null_okay);
+    return throwIfNull(m->p_error, null_okay);
 }
 
 std::shared_ptr<Pipeline>
 QPDFLogger::getSave(bool null_okay)
 {
-    return throwIfNull(this->m->p_save, null_okay);
+    return throwIfNull(m->p_save, null_okay);
 }
 
 std::shared_ptr<Pipeline>
 QPDFLogger::standardOutput()
 {
-    return this->m->p_stdout;
+    return m->p_stdout;
 }
 
 std::shared_ptr<Pipeline>
 QPDFLogger::standardError()
 {
-    return this->m->p_stderr;
+    return m->p_stderr;
 }
 
 std::shared_ptr<Pipeline>
 QPDFLogger::discard()
 {
-    return this->m->p_discard;
+    return m->p_discard;
 }
 
 void
 QPDFLogger::setInfo(std::shared_ptr<Pipeline> p)
 {
     if (p == nullptr) {
-        if (this->m->p_save == this->m->p_stdout) {
-            p = this->m->p_stderr;
+        if (m->p_save == m->p_stdout) {
+            p = m->p_stderr;
         } else {
-            p = this->m->p_stdout;
+            p = m->p_stdout;
         }
     }
-    this->m->p_info = p;
+    m->p_info = p;
 }
 
 void
 QPDFLogger::setWarn(std::shared_ptr<Pipeline> p)
 {
-    this->m->p_warn = p;
+    m->p_warn = p;
 }
 
 void
 QPDFLogger::setError(std::shared_ptr<Pipeline> p)
 {
     if (p == nullptr) {
-        p = this->m->p_stderr;
+        p = m->p_stderr;
     }
-    this->m->p_error = p;
+    m->p_error = p;
 }
 
 void
 QPDFLogger::setSave(std::shared_ptr<Pipeline> p, bool only_if_not_set)
 {
-    if (only_if_not_set && (this->m->p_save != nullptr)) {
+    if (only_if_not_set && (m->p_save != nullptr)) {
         return;
     }
-    if (this->m->p_save == p) {
+    if (m->p_save == p) {
         return;
     }
-    if (p == this->m->p_stdout) {
+    if (p == m->p_stdout) {
         auto pt = dynamic_cast<Pl_Track*>(p.get());
         if (pt->getUsed()) {
             throw std::logic_error(
                 "QPDFLogger: called setSave on standard output after standard"
                 " output has already been used");
         }
-        if (this->m->p_info == this->m->p_stdout) {
-            this->m->p_info = this->m->p_stderr;
+        if (m->p_info == m->p_stdout) {
+            m->p_info = m->p_stderr;
         }
         QUtil::binary_stdout();
     }
-    this->m->p_save = p;
+    m->p_save = p;
 }
 
 void
@@ -229,22 +229,22 @@ QPDFLogger::setOutputStreams(std::ostream* out_stream, std::ostream* err_stream)
     std::shared_ptr<Pipeline> new_err;
 
     if (out_stream == nullptr) {
-        if (this->m->p_save == this->m->p_stdout) {
-            new_out = this->m->p_stderr;
+        if (m->p_save == m->p_stdout) {
+            new_out = m->p_stderr;
         } else {
-            new_out = this->m->p_stdout;
+            new_out = m->p_stdout;
         }
     } else {
         new_out = std::make_shared<Pl_OStream>("output", *out_stream);
     }
     if (err_stream == nullptr) {
-        new_err = this->m->p_stderr;
+        new_err = m->p_stderr;
     } else {
         new_err = std::make_shared<Pl_OStream>("error output", *err_stream);
     }
-    this->m->p_info = new_out;
-    this->m->p_warn = nullptr;
-    this->m->p_error = new_err;
+    m->p_info = new_out;
+    m->p_warn = nullptr;
+    m->p_error = new_err;
 }
 
 std::shared_ptr<Pipeline>

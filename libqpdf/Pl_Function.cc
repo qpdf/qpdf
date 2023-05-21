@@ -52,7 +52,7 @@ Pl_Function::~Pl_Function()
 void
 Pl_Function::write(unsigned char const* buf, size_t len)
 {
-    this->m->fn(buf, len);
+    m->fn(buf, len);
     if (getNext(true)) {
         getNext()->write(buf, len);
     }

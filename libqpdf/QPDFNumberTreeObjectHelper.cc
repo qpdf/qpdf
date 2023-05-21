@@ -141,26 +141,26 @@ QPDFNumberTreeObjectHelper::iterator::remove()
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::begin() const
 {
-    return iterator(std::make_shared<NNTreeIterator>(this->m->impl->begin()));
+    return iterator(std::make_shared<NNTreeIterator>(m->impl->begin()));
 }
 
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::end() const
 {
-    return iterator(std::make_shared<NNTreeIterator>(this->m->impl->end()));
+    return iterator(std::make_shared<NNTreeIterator>(m->impl->end()));
 }
 
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::last() const
 {
-    return iterator(std::make_shared<NNTreeIterator>(this->m->impl->last()));
+    return iterator(std::make_shared<NNTreeIterator>(m->impl->last()));
 }
 
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::find(
     numtree_number key, bool return_prev_if_not_found)
 {
-    auto i = this->m->impl->find(
+    auto i = m->impl->find(
         QPDFObjectHandle::newInteger(key), return_prev_if_not_found);
     return iterator(std::make_shared<NNTreeIterator>(i));
 }
@@ -168,14 +168,14 @@ QPDFNumberTreeObjectHelper::find(
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::insert(numtree_number key, QPDFObjectHandle value)
 {
-    auto i = this->m->impl->insert(QPDFObjectHandle::newInteger(key), value);
+    auto i = m->impl->insert(QPDFObjectHandle::newInteger(key), value);
     return iterator(std::make_shared<NNTreeIterator>(i));
 }
 
 bool
 QPDFNumberTreeObjectHelper::remove(numtree_number key, QPDFObjectHandle* value)
 {
-    return this->m->impl->remove(QPDFObjectHandle::newInteger(key), value);
+    return m->impl->remove(QPDFObjectHandle::newInteger(key), value);
 }
 
 QPDFNumberTreeObjectHelper::numtree_number
@@ -233,7 +233,7 @@ QPDFNumberTreeObjectHelper::findObjectAtOrBelow(
 void
 QPDFNumberTreeObjectHelper::setSplitThreshold(int t)
 {
-    this->m->impl->setSplitThreshold(t);
+    m->impl->setSplitThreshold(t);
 }
 
 std::map<QPDFNumberTreeObjectHelper::numtree_number, QPDFObjectHandle>

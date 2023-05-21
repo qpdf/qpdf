@@ -2517,7 +2517,7 @@ QPDFObjectHandle::QPDFDictItems::QPDFDictItems(QPDFObjectHandle const& oh) :
 QPDFObjectHandle::QPDFDictItems::iterator&
 QPDFObjectHandle::QPDFDictItems::iterator::operator++()
 {
-    ++this->m->iter;
+    ++m->iter;
     updateIValue();
     return *this;
 }
@@ -2525,7 +2525,7 @@ QPDFObjectHandle::QPDFDictItems::iterator::operator++()
 QPDFObjectHandle::QPDFDictItems::iterator&
 QPDFObjectHandle::QPDFDictItems::iterator::operator--()
 {
-    --this->m->iter;
+    --m->iter;
     updateIValue();
     return *this;
 }
@@ -2548,10 +2548,10 @@ bool
 QPDFObjectHandle::QPDFDictItems::iterator::operator==(
     iterator const& other) const
 {
-    if (this->m->is_end && other.m->is_end) {
+    if (m->is_end && other.m->is_end) {
         return true;
     }
-    if (this->m->is_end || other.m->is_end) {
+    if (m->is_end || other.m->is_end) {
         return false;
     }
     return (this->ivalue.first == other.ivalue.first);
@@ -2567,13 +2567,13 @@ QPDFObjectHandle::QPDFDictItems::iterator::iterator(
 void
 QPDFObjectHandle::QPDFDictItems::iterator::updateIValue()
 {
-    this->m->is_end = (this->m->iter == this->m->keys.end());
-    if (this->m->is_end) {
+    m->is_end = (m->iter == m->keys.end());
+    if (m->is_end) {
         this->ivalue.first = "";
         this->ivalue.second = QPDFObjectHandle();
     } else {
-        this->ivalue.first = *(this->m->iter);
-        this->ivalue.second = this->m->oh.getKey(this->ivalue.first);
+        this->ivalue.first = *(m->iter);
+        this->ivalue.second = m->oh.getKey(this->ivalue.first);
     }
 }
 
@@ -2605,8 +2605,8 @@ QPDFObjectHandle::QPDFArrayItems::QPDFArrayItems(QPDFObjectHandle const& oh) :
 QPDFObjectHandle::QPDFArrayItems::iterator&
 QPDFObjectHandle::QPDFArrayItems::iterator::operator++()
 {
-    if (!this->m->is_end) {
-        ++this->m->item_number;
+    if (!m->is_end) {
+        ++m->item_number;
         updateIValue();
     }
     return *this;
@@ -2615,8 +2615,8 @@ QPDFObjectHandle::QPDFArrayItems::iterator::operator++()
 QPDFObjectHandle::QPDFArrayItems::iterator&
 QPDFObjectHandle::QPDFArrayItems::iterator::operator--()
 {
-    if (this->m->item_number > 0) {
-        --this->m->item_number;
+    if (m->item_number > 0) {
+        --m->item_number;
         updateIValue();
     }
     return *this;
@@ -2640,7 +2640,7 @@ bool
 QPDFObjectHandle::QPDFArrayItems::iterator::operator==(
     iterator const& other) const
 {
-    return (this->m->item_number == other.m->item_number);
+    return (m->item_number == other.m->item_number);
 }
 
 QPDFObjectHandle::QPDFArrayItems::iterator::iterator(
@@ -2653,11 +2653,11 @@ QPDFObjectHandle::QPDFArrayItems::iterator::iterator(
 void
 QPDFObjectHandle::QPDFArrayItems::iterator::updateIValue()
 {
-    this->m->is_end = (this->m->item_number >= this->m->oh.getArrayNItems());
-    if (this->m->is_end) {
+    m->is_end = (m->item_number >= m->oh.getArrayNItems());
+    if (m->is_end) {
         this->ivalue = QPDFObjectHandle();
     } else {
-        this->ivalue = this->m->oh.getArrayItem(this->m->item_number);
+        this->ivalue = m->oh.getArrayItem(m->item_number);
     }
 }
 

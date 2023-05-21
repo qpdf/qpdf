@@ -20,8 +20,8 @@ Pl_Buffer::~Pl_Buffer()
 void
 Pl_Buffer::write(unsigned char const* buf, size_t len)
 {
-    this->m->data.append(buf, len);
-    this->m->ready = false;
+    m->data.append(buf, len);
+    m->ready = false;
 
     if (getNext(true)) {
         getNext()->write(buf, len);
@@ -31,7 +31,7 @@ Pl_Buffer::write(unsigned char const* buf, size_t len)
 void
 Pl_Buffer::finish()
 {
-    this->m->ready = true;
+    m->ready = true;
     if (getNext(true)) {
         getNext()->finish();
     }
@@ -40,17 +40,17 @@ Pl_Buffer::finish()
 Buffer*
 Pl_Buffer::getBuffer()
 {
-    if (!this->m->ready) {
+    if (!m->ready) {
         throw std::logic_error("Pl_Buffer::getBuffer() called when not ready");
     }
 
-    auto size = this->m->data.length();
+    auto size = m->data.length();
     auto* b = new Buffer(size);
     if (size > 0) {
         unsigned char* p = b->getBuffer();
-        memcpy(p, this->m->data.data(), size);
+        memcpy(p, m->data.data(), size);
     }
-    this->m->data.clear();
+    m->data.clear();
     return b;
 }
 
@@ -63,17 +63,17 @@ Pl_Buffer::getBufferSharedPointer()
 void
 Pl_Buffer::getMallocBuffer(unsigned char** buf, size_t* len)
 {
-    if (!this->m->ready) {
+    if (!m->ready) {
         throw std::logic_error(
             "Pl_Buffer::getMallocBuffer() called when not ready");
     }
-    auto size = this->m->data.length();
+    auto size = m->data.length();
     *len = size;
     if (size > 0) {
         *buf = reinterpret_cast<unsigned char*>(malloc(size));
-        memcpy(*buf, this->m->data.data(), size);
+        memcpy(*buf, m->data.data(), size);
     } else {
         *buf = nullptr;
     }
-    this->m->data.clear();
+    m->data.clear();
 }
