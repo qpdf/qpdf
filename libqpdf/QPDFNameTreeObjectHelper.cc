@@ -140,26 +140,26 @@ QPDFNameTreeObjectHelper::iterator::remove()
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::begin() const
 {
-    return iterator(std::make_shared<NNTreeIterator>(this->m->impl->begin()));
+    return iterator(std::make_shared<NNTreeIterator>(m->impl->begin()));
 }
 
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::end() const
 {
-    return iterator(std::make_shared<NNTreeIterator>(this->m->impl->end()));
+    return iterator(std::make_shared<NNTreeIterator>(m->impl->end()));
 }
 
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::last() const
 {
-    return iterator(std::make_shared<NNTreeIterator>(this->m->impl->last()));
+    return iterator(std::make_shared<NNTreeIterator>(m->impl->last()));
 }
 
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::find(
     std::string const& key, bool return_prev_if_not_found)
 {
-    auto i = this->m->impl->find(
+    auto i = m->impl->find(
         QPDFObjectHandle::newUnicodeString(key), return_prev_if_not_found);
     return iterator(std::make_shared<NNTreeIterator>(i));
 }
@@ -167,8 +167,7 @@ QPDFNameTreeObjectHelper::find(
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::insert(std::string const& key, QPDFObjectHandle value)
 {
-    auto i =
-        this->m->impl->insert(QPDFObjectHandle::newUnicodeString(key), value);
+    auto i = m->impl->insert(QPDFObjectHandle::newUnicodeString(key), value);
     return iterator(std::make_shared<NNTreeIterator>(i));
 }
 
@@ -176,8 +175,7 @@ bool
 QPDFNameTreeObjectHelper::remove(
     std::string const& key, QPDFObjectHandle* value)
 {
-    return this->m->impl->remove(
-        QPDFObjectHandle::newUnicodeString(key), value);
+    return m->impl->remove(QPDFObjectHandle::newUnicodeString(key), value);
 }
 
 bool
@@ -202,7 +200,7 @@ QPDFNameTreeObjectHelper::findObject(
 void
 QPDFNameTreeObjectHelper::setSplitThreshold(int t)
 {
-    this->m->impl->setSplitThreshold(t);
+    m->impl->setSplitThreshold(t);
 }
 
 std::map<std::string, QPDFObjectHandle>

@@ -19,7 +19,7 @@ QPDFOutlineObjectHelper::QPDFOutlineObjectHelper(
         return;
     }
     if (QPDFOutlineDocumentHelper::Accessor::checkSeen(
-            this->m->dh, this->oh.getObjGen())) {
+            m->dh, this->oh.getObjGen())) {
         QTC::TC("qpdf", "QPDFOutlineObjectHelper loop");
         return;
     }
@@ -28,7 +28,7 @@ QPDFOutlineObjectHelper::QPDFOutlineObjectHelper(
     while (!cur.isNull()) {
         QPDFOutlineObjectHelper new_ooh(cur, dh, 1 + depth);
         new_ooh.m->parent = std::make_shared<QPDFOutlineObjectHelper>(*this);
-        this->m->kids.push_back(new_ooh);
+        m->kids.push_back(new_ooh);
         cur = cur.getKey("/Next");
     }
 }
@@ -36,13 +36,13 @@ QPDFOutlineObjectHelper::QPDFOutlineObjectHelper(
 std::shared_ptr<QPDFOutlineObjectHelper>
 QPDFOutlineObjectHelper::getParent()
 {
-    return this->m->parent;
+    return m->parent;
 }
 
 std::vector<QPDFOutlineObjectHelper>
 QPDFOutlineObjectHelper::getKids()
 {
-    return this->m->kids;
+    return m->kids;
 }
 
 QPDFObjectHandle
@@ -65,7 +65,7 @@ QPDFOutlineObjectHelper::getDest()
 
     if (dest.isName() || dest.isString()) {
         QTC::TC("qpdf", "QPDFOutlineObjectHelper named dest");
-        dest = this->m->dh.resolveNamedDest(dest);
+        dest = m->dh.resolveNamedDest(dest);
     }
 
     return dest;
