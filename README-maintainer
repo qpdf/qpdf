@@ -345,7 +345,9 @@ RELEASE PREPARATION
     * CMakeLists.txt
     * include/qpdf/DLL.h
     * manual/conf.py
-    `make_dist` verifies this consistency.
+
+  `make_dist` verifies this consistency, and CI fails if they are
+  inconsistent.
 
 * Update release notes in manual. Look at diffs and ChangeLog.
   Update release date in `manual/release-notes.rst`. Change "not yet

@@ -1,3 +1,7 @@
+2023-05-21  Jay Berkenbilt  <ejb@ql.org>
+
+        * 11.4.0: release
+
 2023-05-20  Jay Berkenbilt  <ejb@ql.org>
 
         * From M. Holger: add QPDF::newReserved as a better alternative to
@@ -21,6 +25,10 @@
         QPDFJob::writeQPDF and corresponding C API functions
         qpdfjob_create_qpdf and qpdfjob_write_qpdf. Thanks to M. Holger
         for the contribution.
+
+2023-04-01  Jay Berkenbilt  <ejb@ql.org>
+        * From M. Holger: throw a logic error if an uninitialized or
+        foreign QPDFObjectHandle is added to an array.
 
 2023-03-18  Jay Berkenbilt  <ejb@ql.org>
 

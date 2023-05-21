@@ -25,7 +25,7 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
-11.4.0: not yet released
+11.4.0: May 21, 2023
   - CLI Enhancements
 
     - The :qpdf:ref:`--optimize-images` option now optimizes images
