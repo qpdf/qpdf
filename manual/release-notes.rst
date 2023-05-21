@@ -6,6 +6,23 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
+Planned changes for future 12.x (subject to change):
+  - ``QPDFObjectHandle`` will support move construction/assignment.
+    This change will be invisible to most developers but may break
+    your code if you rely on specific behavior around how many
+    references to a QPDFObjectHandle's underlying object exist. You
+    would have to write code specifically to do that, so if you're not
+    sure, then you shouldn't have to worry.
+
+  - ``QPDFObjectHandle`` will be implicitly convertible to ``bool``
+    with undefined objects evaluating to ``false``. This can simplify
+    error handling and will facilitate use of ``QPDFObjectHandle``
+    with some newer standard library constructs. This change won't
+    affect any existing code unless you have written your own
+    conversion methods to/from ``QPDFObjectHandle``. In that case,
+    it's possible that the new qpdf-provided conversion may override
+    your conversion.
+
 .. x.y.z: not yet released
 
 11.4.0: not yet released
@@ -25,6 +42,10 @@ For a detailed list of changes, please see the file
 
     - Add ``QPDF::newReserved`` as a better alternative to
       ``QPDFObjectHandle::newReserved``.
+
+    - If you add an uninitialized ``QPDFObjectHandle`` to an array,
+      qpdf will throw a ``logic_error``. It has always been invalid to
+      do this, but before, it wouldn't have been caught until later.
 
   - Bug fixes
 
