@@ -97,13 +97,12 @@ namespace
         }
 
       private:
-        void
+        static void
         throwException()
         {
             throw std::logic_error("QPDF operation attempted on a QPDF object with no input "
-                                   "source."
-                                   " QPDF operations are invalid before processFile (or another"
-                                   " process method) or after closeInputSource");
+                                   "source. QPDF operations are invalid before processFile (or "
+                                   "another process method) or after closeInputSource");
         }
     };
 } // namespace
