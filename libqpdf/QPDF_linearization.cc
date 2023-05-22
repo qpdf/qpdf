@@ -110,16 +110,15 @@ QPDF::isLinearized()
         if (p - buf == tbuf_size) {
             break;
         }
-        // Seek to the digit. Then skip over digits for a potential
-        // next iteration.
+        // Seek to the digit. Then skip over digits for a potential next iteration.
         m->file->seek(p - buf, SEEK_SET);
         while (((p - buf) < tbuf_size) && QUtil::is_digit(*p)) {
             ++p;
         }
 
-        QPDFTokenizer::Token t1 = readToken(m->file);
-        if (t1.isInteger() && readToken(m->file).isInteger() && readToken(m->file).isWord("obj") &&
-            (readToken(m->file).getType() == QPDFTokenizer::tt_dict_open)) {
+        QPDFTokenizer::Token t1 = readToken();
+        if (t1.isInteger() && readToken().isInteger() && readToken().isWord("obj") &&
+            (readToken().getType() == QPDFTokenizer::tt_dict_open)) {
             lindict_obj = toI(QUtil::string_to_ll(t1.getValue().c_str()));
         }
     }
@@ -128,7 +127,7 @@ QPDF::isLinearized()
         return false;
     }
 
-    auto candidate = getObjectByID(lindict_obj, 0);
+    auto candidate = getObject(lindict_obj, 0);
     if (!candidate.isDictionary()) {
         return false;
     }
