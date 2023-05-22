@@ -1402,7 +1402,7 @@ class QPDF
     QPDFObjectHandle readHintStream(Pipeline&, qpdf_offset_t offset, size_t length);
     void readHPageOffset(BitStream);
     void readHSharedObject(BitStream);
-    void readHGeneric(BitStream, HGeneric&);
+    static void readHGeneric(BitStream, HGeneric&);
     qpdf_offset_t maxEnd(ObjUser const& ou);
     qpdf_offset_t getLinearizationOffset(QPDFObjGen const&);
     QPDFObjectHandle
@@ -1441,7 +1441,7 @@ class QPDF
         std::map<int, int> const& obj_renumber);
     void writeHPageOffset(BitWriter&);
     void writeHSharedObject(BitWriter&);
-    void writeHGeneric(BitWriter&, HGeneric&);
+    static void writeHGeneric(BitWriter&, HGeneric&);
 
     // Methods to support optimization
 
