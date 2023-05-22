@@ -552,7 +552,7 @@ QPDF::maxEnd(ObjUser const& ou)
 }
 
 qpdf_offset_t
-QPDF::getLinearizationOffset(QPDFObjGen const& og)
+QPDF::getLinearizationOffset(QPDFObjGen const& og) // NOLINT(misc-no-recursion)
 {
     QPDFXRefEntry entry = m->xref_table[og];
     qpdf_offset_t result = 0;
@@ -1450,7 +1450,12 @@ QPDF::getLinearizedParts(
 static inline int
 nbits(int val)
 {
-    return (val == 0 ? 0 : (1 + nbits(val >> 1)));
+    int result = 0;
+    while (val != 0) {
+        val >>= 1;
+        result++;
+    }
+    return result;
 }
 
 int
