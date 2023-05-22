@@ -1350,10 +1350,7 @@ QPDF::readObject(
                 if (!length_obj.isInteger()) {
                     QTC::TC("qpdf", "QPDF stream length not integer");
                     throw damagedPDF(
-                        *input,
-                        offset,
-                        "/Length key in stream dictionary is not "
-                        "an integer");
+                        *input, offset, "/Length key in stream dictionary is not an integer");
                 }
 
                 length = toS(length_obj.getUIntValue());
@@ -1367,7 +1364,7 @@ QPDF::readObject(
             } catch (QPDFExc& e) {
                 if (m->attempt_recovery) {
                     warn(e);
-                    length = recoverStreamLength(input, og, stream_offset);
+                    length = recoverStreamLength(*input, og, stream_offset);
                 } else {
                     throw;
                 }
@@ -1396,11 +1393,10 @@ QPDF::findEndstream()
 }
 
 size_t
-QPDF::recoverStreamLength(
-    std::shared_ptr<InputSource> input, QPDFObjGen const& og, qpdf_offset_t stream_offset)
+QPDF::recoverStreamLength(InputSource& input, QPDFObjGen og, qpdf_offset_t stream_offset)
 {
     // Try to reconstruct stream length by looking for endstream or endobj
-    warn(damagedPDF(*input, stream_offset, "attempting to recover stream length"));
+    warn(damagedPDF(input, stream_offset, "attempting to recover stream length"));
 
     PatternFinder ef(*this, &QPDF::findEndstream);
     size_t length = 0;
@@ -1439,10 +1435,10 @@ QPDF::recoverStreamLength(
 
     if (length == 0) {
         warn(damagedPDF(
-            *input, stream_offset, "unable to recover stream data; treating stream as empty"));
+            input, stream_offset, "unable to recover stream data; treating stream as empty"));
     } else {
-        warn(damagedPDF(
-            *input, stream_offset, "recovered stream length: " + std::to_string(length)));
+        warn(
+            damagedPDF(input, stream_offset, "recovered stream length: " + std::to_string(length)));
     }
 
     QTC::TC("qpdf", "QPDF recovered stream length");
