@@ -926,7 +926,7 @@ class QPDF
             QPDFObjGen const& foreign_og,
             qpdf_offset_t offset,
             size_t length,
-            QPDFObjectHandle local_dict);
+            QPDFObjectHandle const& local_dict);
 
       private:
         std::shared_ptr<EncryptionParameters> encp;

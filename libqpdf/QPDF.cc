@@ -114,7 +114,7 @@ QPDF::ForeignStreamData::ForeignStreamData(
     QPDFObjGen const& foreign_og,
     qpdf_offset_t offset,
     size_t length,
-    QPDFObjectHandle local_dict) :
+    QPDFObjectHandle const& local_dict) :
     encp(std::move(encp)),
     file(std::move(file)),
     foreign_og(foreign_og),
