@@ -133,11 +133,10 @@ bool
 QPDF::CopiedStreamDataProvider::provideStreamData(
     QPDFObjGen const& og, Pipeline* pipeline, bool suppress_warnings, bool will_retry)
 {
-    std::shared_ptr<ForeignStreamData> foreign_data = foreign_stream_data[og];
     bool result = false;
-    if (foreign_data.get()) {
+    if (foreign_stream_data.count(og) > 0) {
         result = destination_qpdf.pipeForeignStreamData(
-            *foreign_data, pipeline, suppress_warnings, will_retry);
+            foreign_stream_data.find(og)->second, pipeline, suppress_warnings, will_retry);
         QTC::TC("qpdf", "QPDF copy foreign with data", result ? 0 : 1);
     } else {
         auto foreign_stream = foreign_streams[og];
@@ -150,16 +149,16 @@ QPDF::CopiedStreamDataProvider::provideStreamData(
 
 void
 QPDF::CopiedStreamDataProvider::registerForeignStream(
-    QPDFObjGen const& local_og, QPDFObjectHandle foreign_stream)
+    QPDFObjGen local_og, QPDFObjectHandle const& foreign_stream)
 {
     this->foreign_streams[local_og] = foreign_stream;
 }
 
 void
 QPDF::CopiedStreamDataProvider::registerForeignStream(
-    QPDFObjGen const& local_og, std::shared_ptr<ForeignStreamData> foreign_stream)
+    QPDFObjGen local_og, ForeignStreamData&& foreign_stream)
 {
-    this->foreign_stream_data[local_og] = std::move(foreign_stream);
+    this->foreign_stream_data.insert({local_og, std::move(foreign_stream)});
 }
 
 QPDF::StringDecrypter::StringDecrypter(QPDF* qpdf, QPDFObjGen const& og) :
@@ -2160,14 +2159,14 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
         result.replaceStreamData(
             m->copied_streams, dict.getKey("/Filter"), dict.getKey("/DecodeParms"));
     } else {
-        auto foreign_stream_data = std::make_shared<ForeignStreamData>(
-            foreign_stream_qpdf.m->encp,
-            foreign_stream_qpdf.m->file,
-            foreign.getObjGen(),
-            stream->getParsedOffset(),
-            stream->getLength(),
-            dict);
-        m->copied_stream_data_provider->registerForeignStream(local_og, foreign_stream_data);
+        m->copied_stream_data_provider->registerForeignStream(
+            local_og,
+            {foreign_stream_qpdf.m->encp,
+             foreign_stream_qpdf.m->file,
+             foreign.getObjGen(),
+             stream->getParsedOffset(),
+             stream->getLength(),
+             dict});
         result.replaceStreamData(
             m->copied_streams, dict.getKey("/Filter"), dict.getKey("/DecodeParms"));
     }

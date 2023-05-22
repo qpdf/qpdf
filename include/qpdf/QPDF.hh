@@ -932,9 +932,9 @@ class QPDF
         std::shared_ptr<EncryptionParameters> encp;
         std::shared_ptr<InputSource> file;
         QPDFObjGen foreign_og;
-        qpdf_offset_t offset;
-        size_t length;
-        QPDFObjectHandle local_dict;
+        qpdf_offset_t offset{0};
+        size_t length{0};
+        QPDFObjectHandle local_dict{};
     };
 
     class CopiedStreamDataProvider: public QPDFObjectHandle::StreamDataProvider
@@ -947,13 +947,13 @@ class QPDF
             Pipeline* pipeline,
             bool suppress_warnings,
             bool will_retry) override;
-        void registerForeignStream(QPDFObjGen const& local_og, QPDFObjectHandle foreign_stream);
-        void registerForeignStream(QPDFObjGen const& local_og, std::shared_ptr<ForeignStreamData>);
+        void registerForeignStream(QPDFObjGen local_og, QPDFObjectHandle const& foreign_stream);
+        void registerForeignStream(QPDFObjGen local_og, ForeignStreamData&&);
 
       private:
         QPDF& destination_qpdf;
         std::map<QPDFObjGen, QPDFObjectHandle> foreign_streams;
-        std::map<QPDFObjGen, std::shared_ptr<ForeignStreamData>> foreign_stream_data;
+        std::map<QPDFObjGen, ForeignStreamData> foreign_stream_data;
     };
 
     class StringDecrypter: public QPDFObjectHandle::StringDecrypter
