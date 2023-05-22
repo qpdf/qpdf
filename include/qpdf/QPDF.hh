@@ -362,8 +362,7 @@ class QPDF
     QPDFObjectHandle getObject(QPDFObjGen const&);
     QPDF_DLL
     QPDFObjectHandle getObject(int objid, int generation);
-    // These are older methods, but there is no intention to deprecate
-    // them.
+    // These are older methods, but there is no intention to deprecate them.
     QPDF_DLL
     QPDFObjectHandle getObjectByObjGen(QPDFObjGen const&);
     QPDF_DLL
@@ -427,7 +426,7 @@ class QPDF
     // will not be recopied.  Therefore, you should do all mutation on the original file that you
     // are going to do before you start copying its objects to a new file.
     QPDF_DLL
-    QPDFObjectHandle copyForeignObject(QPDFObjectHandle foreign);
+    QPDFObjectHandle copyForeignObject(QPDFObjectHandle const& foreign);
 
     // Encryption support
 

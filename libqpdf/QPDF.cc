@@ -1914,7 +1914,7 @@ QPDF::replaceReserved(QPDFObjectHandle reserved, QPDFObjectHandle replacement)
 }
 
 QPDFObjectHandle
-QPDF::copyForeignObject(QPDFObjectHandle foreign)
+QPDF::copyForeignObject(QPDFObjectHandle const& foreign)
 {
     // Here's an explanation of what's going on here.
     //
