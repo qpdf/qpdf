@@ -62,7 +62,7 @@ namespace
             throwException();
             return 0;
         }
-        std::string const&
+        [[nodiscard]] std::string const&
         getName() const override
         {
             static std::string name("closed input source");
