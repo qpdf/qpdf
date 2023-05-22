@@ -115,8 +115,8 @@ QPDF::ForeignStreamData::ForeignStreamData(
     qpdf_offset_t offset,
     size_t length,
     QPDFObjectHandle local_dict) :
-    encp(encp),
-    file(file),
+    encp(std::move(encp)),
+    file(std::move(file)),
     foreign_og(foreign_og),
     offset(offset),
     length(length),
@@ -160,7 +160,7 @@ void
 QPDF::CopiedStreamDataProvider::registerForeignStream(
     QPDFObjGen const& local_og, std::shared_ptr<ForeignStreamData> foreign_stream)
 {
-    this->foreign_stream_data[local_og] = foreign_stream;
+    this->foreign_stream_data[local_og] = std::move(foreign_stream);
 }
 
 QPDF::StringDecrypter::StringDecrypter(QPDF* qpdf, QPDFObjGen const& og) :
@@ -271,7 +271,7 @@ QPDF::processMemoryFile(
 void
 QPDF::processInputSource(std::shared_ptr<InputSource> source, char const* password)
 {
-    m->file = source;
+    m->file = std::move(source);
     parse(password);
 }
 
@@ -297,7 +297,7 @@ void
 QPDF::registerStreamFilter(
     std::string const& filter_name, std::function<std::shared_ptr<QPDFStreamFilter>()> factory)
 {
-    QPDF_Stream::registerStreamFilter(filter_name, factory);
+    QPDF_Stream::registerStreamFilter(filter_name, std::move(factory));
 }
 
 void
@@ -315,7 +315,7 @@ QPDF::getLogger()
 void
 QPDF::setLogger(std::shared_ptr<QPDFLogger> l)
 {
-    m->log = l;
+    m->log = std::move(l);
 }
 
 void
@@ -1830,7 +1830,7 @@ QPDFObjectHandle
 QPDF::newStream(std::shared_ptr<Buffer> data)
 {
     auto result = newStream();
-    result.replaceStreamData(data, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+    result.replaceStreamData(std::move(data), QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
     return result;
 }
 
