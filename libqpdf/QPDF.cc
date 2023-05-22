@@ -1188,16 +1188,24 @@ QPDF::showXRefTable()
 bool
 QPDF::resolveXRefTable()
 {
-    bool may_change = !m->reconstructed_xref;
-    for (auto& iter: m->xref_table) {
-        if (isUnresolved(iter.first)) {
-            resolve(iter.first);
-            if (may_change && m->reconstructed_xref) {
-                return false;
+    if (m->reconstructed_xref) {
+        return std::all_of(m->xref_table.cbegin(), m->xref_table.cend(), [this](auto const& iter) {
+            if (isUnresolved(iter.first)) {
+                resolve(iter.first);
             }
-        }
+            return true;
+        });
+    } else {
+        // xref table may change
+        return std::all_of(m->xref_table.cbegin(), m->xref_table.cend(), [this](auto const& iter) {
+            if (isUnresolved(iter.first)) {
+                resolve(iter.first);
+                return !m->reconstructed_xref;
+            } else {
+                return true;
+            }
+        });
     }
-    return true;
 }
 
 // Ensure all objects in the pdf file, including those in indirect references, appear in the object
