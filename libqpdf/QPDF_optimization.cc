@@ -306,7 +306,7 @@ QPDF::updateObjectMapsInternal( // NOLINT(misc-no-recursion)
         }
     } else if (tc == ::ot_dictionary || tc == ::ot_stream) {
         auto dict = tc == ::ot_stream ? oh.getDict() : oh;
-        int ssp = tc == ::ot_stream && skip_stream_parameters ? skip_stream_parameters(oh) : 0  ;
+        int ssp = tc == ::ot_stream && skip_stream_parameters ? skip_stream_parameters(oh) : 0;
 
         for (auto const& key: dict.getKeys()) {
             if (is_page_node && (key == "/Thumb")) {
