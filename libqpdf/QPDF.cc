@@ -503,7 +503,7 @@ QPDF::warn(
 }
 
 void
-QPDF::setTrailer(QPDFObjectHandle obj)
+QPDF::setTrailer(QPDFObjectHandle obj) // NOLINT (readability-make-member-function-const) ABI
 {
     if (m->trailer.isInitialized()) {
         return;
@@ -1018,7 +1018,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
             ("Cross-reference stream data has the wrong size; expected = " +
              std::to_string(expected_size) + "; actual = " + std::to_string(actual_size)));
         if (expected_size > actual_size) {
-            throw x;
+            throw x; // NOLINT
         } else {
             warn(x);
         }
@@ -1460,7 +1460,7 @@ QPDF::readToken(InputSource& input, size_t max_len)
 }
 
 QPDFObjectHandle
-QPDF::readObjectAtOffset(
+QPDF::readObjectAtOffset( // NOLINT(misc-no-recursion)
     bool try_recovery,
     qpdf_offset_t offset,
     std::string const& description,
@@ -1525,7 +1525,7 @@ QPDF::readObjectAtOffset(
             QPDFExc e = damagedPDF(offset, "expected " + exp_og.unparse(' ') + " obj");
             if (try_recovery) {
                 // Will be retried below
-                throw e;
+                throw e; // NOLINT (cert-err09-cpp)
             } else {
                 // We can try reading the object anyway even if the ID doesn't match.
                 warn(e);
@@ -1895,7 +1895,10 @@ QPDF::getObjectByID(int objid, int generation)
 }
 
 void
-QPDF::replaceObject(int objid, int generation, QPDFObjectHandle oh)
+QPDF::replaceObject(
+    int objid,
+    int generation,
+    QPDFObjectHandle oh) // NOLINT (performance-unnecessary-value-param) ABI
 {
     replaceObject(QPDFObjGen(objid, generation), oh);
 }
@@ -1911,7 +1914,9 @@ QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
 }
 
 void
-QPDF::replaceReserved(QPDFObjectHandle reserved, QPDFObjectHandle replacement)
+QPDF::replaceReserved(
+    QPDFObjectHandle reserved,
+    QPDFObjectHandle replacement) // NOLINT (performance-unnecessary-value-param) ABI
 {
     QTC::TC("qpdf", "QPDF replaceReserved");
     reserved.assertReserved();
@@ -1996,7 +2001,10 @@ QPDF::copyForeignObject(QPDFObjectHandle const& foreign)
 }
 
 void
-QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
+QPDF::reserveObjects( // NOLINT(misc-no-recursion)
+    QPDFObjectHandle foreign,
+    ObjCopier& obj_copier,
+    bool top)
 {
     auto foreign_tc = foreign.getTypeCode();
     if (foreign_tc == ::ot_reserved) {
@@ -2052,7 +2060,10 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
 }
 
 QPDFObjectHandle
-QPDF::replaceForeignIndirectObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
+QPDF::replaceForeignIndirectObjects( // NOLINT(misc-no-recursion)
+    QPDFObjectHandle foreign,
+    ObjCopier& obj_copier,
+    bool top)
 {
     auto foreign_tc = foreign.getTypeCode();
     QPDFObjectHandle result;
