@@ -29,7 +29,7 @@ QPDF::ObjUser::ObjUser(user_e type, int pageno) :
     qpdf_assert_debug((type == ou_page) || (type == ou_thumb));
 }
 
-QPDF::ObjUser::ObjUser(user_e type, std::string const& key) :
+QPDF::ObjUser::ObjUser(user_e type, std::string_view key) :
     ou_type(type),
     pageno(0),
     key(key)
@@ -57,7 +57,8 @@ void
 QPDF::optimize(
     std::map<int, int> const& object_stream_data,
     bool allow_changes,
-    std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
+    std::function<int(QPDFObjectHandle&)>
+        skip_stream_parameters) // NOLINT (performance-unnecessary-value-param) ABI
 {
     if (!m->obj_user_to_objects.empty()) {
         // already optimized
@@ -156,7 +157,7 @@ QPDF::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
 }
 
 void
-QPDF::pushInheritedAttributesToPageInternal(
+QPDF::pushInheritedAttributesToPageInternal( // NOLINT(misc-no-recursion)
     QPDFObjectHandle cur_pages,
     std::map<std::string, std::vector<QPDFObjectHandle>>& key_ancestors,
     bool allow_changes,
@@ -260,18 +261,18 @@ QPDF::pushInheritedAttributesToPageInternal(
 void
 QPDF::updateObjectMaps(
     ObjUser const& ou,
-    QPDFObjectHandle oh,
-    std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
+    QPDFObjectHandle const& oh,
+    std::function<int(QPDFObjectHandle&)> const& skip_stream_parameters)
 {
     QPDFObjGen::set visited;
     updateObjectMapsInternal(ou, oh, skip_stream_parameters, visited, true);
 }
 
 void
-QPDF::updateObjectMapsInternal(
+QPDF::updateObjectMapsInternal( // NOLINT(misc-no-recursion)
     ObjUser const& ou,
     QPDFObjectHandle oh,
-    std::function<int(QPDFObjectHandle&)> skip_stream_parameters,
+    std::function<int(QPDFObjectHandle&)> const& skip_stream_parameters,
     QPDFObjGen::set& visited,
     bool top)
 {
@@ -322,9 +323,9 @@ QPDF::updateObjectMapsInternal(
                     skip_stream_parameters,
                     visited,
                     false);
-            } else if (is_page_node && (key == "/Parent")) {
+            } else if (is_page_node && (key == "/Parent")) { // NOLINT (bugprone-branch-clone)
                 // Don't traverse back up the page tree
-            } else if (
+            } else if ( // NOLINT(misc-no-recursion)
                 ((ssp >= 1) && (key == "/Length")) ||
                 ((ssp >= 2) && ((key == "/Filter") || (key == "/DecodeParms")))) {
                 // Don't traverse into stream parameters that we are not going to write.

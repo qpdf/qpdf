@@ -1359,7 +1359,7 @@ class QPDF
         ObjUser(user_e type, int pageno);
 
         // type must be one of ou_trailer_key or ou_root_key
-        ObjUser(user_e type, std::string const& key);
+        ObjUser(user_e type, std::string_view key);
 
         bool operator<(ObjUser const&) const;
 
@@ -1453,12 +1453,12 @@ class QPDF
         bool warn_skipped_keys);
     void updateObjectMaps(
         ObjUser const& ou,
-        QPDFObjectHandle oh,
-        std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
+        QPDFObjectHandle const& oh,
+        std::function<int(QPDFObjectHandle&)> const& skip_stream_parameters);
     void updateObjectMapsInternal(
         ObjUser const& ou,
         QPDFObjectHandle oh,
-        std::function<int(QPDFObjectHandle&)> skip_stream_parameters,
+        std::function<int(QPDFObjectHandle&)> const& skip_stream_parameters,
         QPDFObjGen::set& visited,
         bool top);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
