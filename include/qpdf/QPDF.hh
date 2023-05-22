@@ -819,7 +819,7 @@ class QPDF
         static bool
         pipeStreamData(
             QPDF* qpdf,
-            QPDFObjGen const& og,
+            QPDFObjGen og,
             qpdf_offset_t offset,
             size_t length,
             QPDFObjectHandle dict,
@@ -1036,14 +1036,11 @@ class QPDF
         qpdf_offset_t end_before_space,
         qpdf_offset_t end_after_space);
     static QPDFExc damagedPDF(
-        std::shared_ptr<InputSource> const& input,
+        InputSource const& input,
         std::string const& object,
         qpdf_offset_t offset,
         std::string const& message);
-    QPDFExc damagedPDF(
-        std::shared_ptr<InputSource> const& input,
-        qpdf_offset_t offset,
-        std::string const& message);
+    QPDFExc damagedPDF(InputSource const& input, qpdf_offset_t offset, std::string const& message);
     QPDFExc damagedPDF(std::string const& object, qpdf_offset_t offset, std::string const& message);
     QPDFExc damagedPDF(std::string const& object, std::string const& message);
     QPDFExc damagedPDF(qpdf_offset_t offset, std::string const& message);
@@ -1051,23 +1048,23 @@ class QPDF
 
     // Calls finish() on the pipeline when done but does not delete it
     bool pipeStreamData(
-        QPDFObjGen const& og,
+        QPDFObjGen og,
         qpdf_offset_t offset,
         size_t length,
-        QPDFObjectHandle dict,
+        QPDFObjectHandle& dict,
         Pipeline* pipeline,
         bool suppress_warnings,
         bool will_retry);
-    bool pipeForeignStreamData(
-        std::shared_ptr<ForeignStreamData>, Pipeline*, bool suppress_warnings, bool will_retry);
+    bool
+    pipeForeignStreamData(ForeignStreamData&, Pipeline*, bool suppress_warnings, bool will_retry);
     static bool pipeStreamData(
-        std::shared_ptr<QPDF::EncryptionParameters> encp,
-        std::shared_ptr<InputSource> file,
+        EncryptionParameters& encp,
+        InputSource& file,
         QPDF& qpdf_for_warning,
-        QPDFObjGen const& og,
+        QPDFObjGen og,
         qpdf_offset_t offset,
         size_t length,
-        QPDFObjectHandle dict,
+        QPDFObjectHandle& dict,
         Pipeline* pipeline,
         bool suppress_warnings,
         bool will_retry);
@@ -1107,11 +1104,9 @@ class QPDF
     void insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_duplicate);
 
     // methods to support encryption -- implemented in QPDF_encryption.cc
-    static encryption_method_e
-    interpretCF(std::shared_ptr<EncryptionParameters> encp, QPDFObjectHandle);
+    static encryption_method_e interpretCF(EncryptionParameters& encp, QPDFObjectHandle cf);
     void initializeEncryption();
-    static std::string
-    getKeyForObject(std::shared_ptr<EncryptionParameters> encp, QPDFObjGen const& og, bool use_aes);
+    static std::string getKeyForObject(EncryptionParameters& encp, QPDFObjGen og, bool use_aes);
     void decryptString(std::string&, QPDFObjGen const& og);
     static std::string
     compute_encryption_key_from_password(std::string const& password, EncryptionData const& data);
@@ -1120,11 +1115,11 @@ class QPDF
     static std::string recover_encryption_key_with_password(
         std::string const& password, EncryptionData const& data, bool& perms_valid);
     static void decryptStream(
-        std::shared_ptr<EncryptionParameters> encp,
-        std::shared_ptr<InputSource> file,
+        EncryptionParameters& encp,
+        InputSource const& file,
         QPDF& qpdf_for_warning,
         Pipeline*& pipeline,
-        QPDFObjGen const& og,
+        QPDFObjGen og,
         QPDFObjectHandle& stream_dict,
         std::vector<std::shared_ptr<Pipeline>>& heap);
 
