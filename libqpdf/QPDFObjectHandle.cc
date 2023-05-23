@@ -754,7 +754,7 @@ QPDFObjectHandle::getValueAsInlineImage(std::string& value)
 QPDFObjectHandle::QPDFArrayItems
 QPDFObjectHandle::aitems()
 {
-    return QPDFArrayItems(*this);
+    return *this;
 }
 
 int
@@ -828,11 +828,11 @@ QPDFObjectHandle::getArrayAsRectangle()
                 return {};
             }
         }
-        return Rectangle(
+        return {
             std::min(items[0], items[2]),
             std::min(items[1], items[3]),
             std::max(items[0], items[2]),
-            std::max(items[1], items[3]));
+            std::max(items[1], items[3])};
     }
     return {};
 }
@@ -850,7 +850,7 @@ QPDFObjectHandle::getArrayAsMatrix()
                 return {};
             }
         }
-        return Matrix(items[0], items[1], items[2], items[3], items[4], items[5]);
+        return {items[0], items[1], items[2], items[3], items[4], items[5]};
     }
     return {};
 }
@@ -961,7 +961,7 @@ QPDFObjectHandle::eraseItemAndGetOld(int at)
 QPDFObjectHandle::QPDFDictItems
 QPDFObjectHandle::ditems()
 {
-    return QPDFDictItems(*this);
+    return {*this};
 }
 
 bool
@@ -1866,61 +1866,61 @@ QPDFObjectHandle::getParsedOffset()
 QPDFObjectHandle
 QPDFObjectHandle::newBool(bool value)
 {
-    return QPDFObjectHandle(QPDF_Bool::create(value));
+    return {QPDF_Bool::create(value)};
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newNull()
 {
-    return QPDFObjectHandle(QPDF_Null::create());
+    return {QPDF_Null::create()};
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newInteger(long long value)
 {
-    return QPDFObjectHandle(QPDF_Integer::create(value));
+    return {QPDF_Integer::create(value)};
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newReal(std::string const& value)
 {
-    return QPDFObjectHandle(QPDF_Real::create(value));
+    return {QPDF_Real::create(value)};
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newReal(double value, int decimal_places, bool trim_trailing_zeroes)
 {
-    return QPDFObjectHandle(QPDF_Real::create(value, decimal_places, trim_trailing_zeroes));
+    return {QPDF_Real::create(value, decimal_places, trim_trailing_zeroes)};
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newName(std::string const& name)
 {
-    return QPDFObjectHandle(QPDF_Name::create(name));
+    return {QPDF_Name::create(name)};
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newString(std::string const& str)
 {
-    return QPDFObjectHandle(QPDF_String::create(str));
+    return {QPDF_String::create(str)};
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newUnicodeString(std::string const& utf8_str)
 {
-    return QPDFObjectHandle(QPDF_String::create_utf16(utf8_str));
+    return {QPDF_String::create_utf16(utf8_str)};
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newOperator(std::string const& value)
 {
-    return QPDFObjectHandle(QPDF_Operator::create(value));
+    return {QPDF_Operator::create(value)};
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newInlineImage(std::string const& value)
 {
-    return QPDFObjectHandle(QPDF_InlineImage::create(value));
+    return {QPDF_InlineImage::create(value)};
 }
 
 QPDFObjectHandle
@@ -1932,44 +1932,37 @@ QPDFObjectHandle::newArray()
 QPDFObjectHandle
 QPDFObjectHandle::newArray(std::vector<QPDFObjectHandle> const& items)
 {
-    return QPDFObjectHandle(QPDF_Array::create(items));
+    return {QPDF_Array::create(items)};
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newArray(Rectangle const& rect)
 {
-    std::vector<QPDFObjectHandle> items;
-    items.push_back(newReal(rect.llx));
-    items.push_back(newReal(rect.lly));
-    items.push_back(newReal(rect.urx));
-    items.push_back(newReal(rect.ury));
-    return newArray(items);
+    return newArray({newReal(rect.llx), newReal(rect.lly), newReal(rect.urx), newReal(rect.ury)});
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newArray(Matrix const& matrix)
 {
-    std::vector<QPDFObjectHandle> items;
-    items.push_back(newReal(matrix.a));
-    items.push_back(newReal(matrix.b));
-    items.push_back(newReal(matrix.c));
-    items.push_back(newReal(matrix.d));
-    items.push_back(newReal(matrix.e));
-    items.push_back(newReal(matrix.f));
-    return newArray(items);
+    return newArray(
+        {newReal(matrix.a),
+         newReal(matrix.b),
+         newReal(matrix.c),
+         newReal(matrix.d),
+         newReal(matrix.e),
+         newReal(matrix.f)});
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newArray(QPDFMatrix const& matrix)
 {
-    std::vector<QPDFObjectHandle> items;
-    items.push_back(newReal(matrix.a));
-    items.push_back(newReal(matrix.b));
-    items.push_back(newReal(matrix.c));
-    items.push_back(newReal(matrix.d));
-    items.push_back(newReal(matrix.e));
-    items.push_back(newReal(matrix.f));
-    return newArray(items);
+    return newArray(
+        {newReal(matrix.a),
+         newReal(matrix.b),
+         newReal(matrix.c),
+         newReal(matrix.d),
+         newReal(matrix.e),
+         newReal(matrix.f)});
 }
 
 QPDFObjectHandle
@@ -1999,7 +1992,7 @@ QPDFObjectHandle::newDictionary()
 QPDFObjectHandle
 QPDFObjectHandle::newDictionary(std::map<std::string, QPDFObjectHandle> const& items)
 {
-    return QPDFObjectHandle(QPDF_Dictionary::create(items));
+    return {QPDF_Dictionary::create(items)};
 }
 
 QPDFObjectHandle
@@ -2064,7 +2057,7 @@ QPDFObjectHandle::shallowCopy()
     if (!dereference()) {
         throw std::logic_error("operation attempted on uninitialized QPDFObjectHandle");
     }
-    return QPDFObjectHandle(obj->copy());
+    return {obj->copy()};
 }
 
 QPDFObjectHandle
@@ -2073,7 +2066,7 @@ QPDFObjectHandle::unsafeShallowCopy()
     if (!dereference()) {
         throw std::logic_error("operation attempted on uninitialized QPDFObjectHandle");
     }
-    return QPDFObjectHandle(obj->copy(true));
+    return {obj->copy(true)};
 }
 
 void
@@ -2475,13 +2468,13 @@ QPDFObjectHandle::QPDFDictItems::iterator::Members::Members(QPDFObjectHandle& oh
 QPDFObjectHandle::QPDFDictItems::iterator
 QPDFObjectHandle::QPDFDictItems::begin()
 {
-    return iterator(oh, true);
+    return {oh, true};
 }
 
 QPDFObjectHandle::QPDFDictItems::iterator
 QPDFObjectHandle::QPDFDictItems::end()
 {
-    return iterator(oh, false);
+    return {oh, false};
 }
 
 QPDFObjectHandle::QPDFArrayItems::QPDFArrayItems(QPDFObjectHandle const& oh) :
@@ -2555,13 +2548,13 @@ QPDFObjectHandle::QPDFArrayItems::iterator::Members::Members(QPDFObjectHandle& o
 QPDFObjectHandle::QPDFArrayItems::iterator
 QPDFObjectHandle::QPDFArrayItems::begin()
 {
-    return iterator(oh, true);
+    return {oh, true};
 }
 
 QPDFObjectHandle::QPDFArrayItems::iterator
 QPDFObjectHandle::QPDFArrayItems::end()
 {
-    return iterator(oh, false);
+    return {oh, false};
 }
 
 QPDFObjGen
