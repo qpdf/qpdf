@@ -287,8 +287,8 @@ QPDF::updateObjectMapsInternal( // NOLINT(misc-no-recursion)
         }
     }
 
-    if (oh.isIndirect()) {
-        QPDFObjGen og(oh.getObjGen());
+    auto og = oh.getObjGen();
+    if (og.isIndirect()) {
         if (!visited.add(og)) {
             QTC::TC("qpdf", "QPDF opt loop detected");
             return;
@@ -297,22 +297,16 @@ QPDF::updateObjectMapsInternal( // NOLINT(misc-no-recursion)
         m->object_to_obj_users[og].insert(ou);
     }
 
-    if (oh.isArray()) {
+    auto tc = oh.getTypeCode();
+    if (tc == ::ot_array) {
         int n = oh.getArrayNItems();
         for (int i = 0; i < n; ++i) {
             updateObjectMapsInternal(
                 ou, oh.getArrayItem(i), skip_stream_parameters, visited, false);
         }
-    } else if (oh.isDictionary() || oh.isStream()) {
-        QPDFObjectHandle dict = oh;
-        bool is_stream = oh.isStream();
-        int ssp = 0;
-        if (is_stream) {
-            dict = oh.getDict();
-            if (skip_stream_parameters) {
-                ssp = skip_stream_parameters(oh);
-            }
-        }
+    } else if (tc == ::ot_dictionary || tc == ::ot_stream) {
+        auto dict = tc == ::ot_stream ? oh.getDict() : oh;
+        int ssp = tc == ::ot_stream && skip_stream_parameters ? skip_stream_parameters(oh) : 0  ;
 
         for (auto const& key: dict.getKeys()) {
             if (is_page_node && (key == "/Thumb")) {
