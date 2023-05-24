@@ -182,7 +182,7 @@ QPDF::test_json_validators()
     check(is_unicode_string("u:potato", str));
     check(str == "potato");
     check(is_unicode_string("u:", str));
-    check(str == "");
+    check(str.empty());
     check(!is_binary_string("", str));
     check(!is_binary_string("x:", str));
     check(!is_binary_string("b:1", str));
@@ -202,7 +202,7 @@ QPDF::test_json_validators()
 }
 
 static std::function<void(Pipeline*)>
-provide_data(std::shared_ptr<InputSource> is, qpdf_offset_t start, qpdf_offset_t end)
+provide_data(std::shared_ptr<InputSource> const& is, qpdf_offset_t start, qpdf_offset_t end)
 {
     return [is, start, end](Pipeline* p) {
         Pl_Base64 decode("base64-decode", p, Pl_Base64::a_decode);
@@ -225,7 +225,7 @@ provide_data(std::shared_ptr<InputSource> is, qpdf_offset_t start, qpdf_offset_t
 class QPDF::JSONReactor: public JSON::Reactor
 {
   public:
-    JSONReactor(QPDF& pdf, std::shared_ptr<InputSource> is, bool must_be_complete) :
+    JSONReactor(QPDF& pdf, std::shared_ptr<InputSource> const& is, bool must_be_complete) :
         pdf(pdf),
         is(is),
         must_be_complete(must_be_complete),
@@ -238,7 +238,7 @@ class QPDF::JSONReactor: public JSON::Reactor
             }
         }
     }
-    virtual ~JSONReactor() = default;
+    ~JSONReactor() override = default;
     void dictionaryStart() override;
     void arrayStart() override;
     void containerEnd(JSON const& value) override;
@@ -246,7 +246,7 @@ class QPDF::JSONReactor: public JSON::Reactor
     bool dictionaryItem(std::string const& key, JSON const& value) override;
     bool arrayItem(JSON const& value) override;
 
-    bool anyErrors() const;
+    [[nodiscard]] bool anyErrors() const;
 
   private:
     enum state_e {
@@ -267,8 +267,8 @@ class QPDF::JSONReactor: public JSON::Reactor
     void setObjectDescription(QPDFObjectHandle& oh, JSON const& value);
     QPDFObjectHandle makeObject(JSON const& value);
     void error(qpdf_offset_t offset, std::string const& message);
-    void
-    replaceObject(QPDFObjectHandle to_replace, QPDFObjectHandle replacement, JSON const& value);
+    void replaceObject(
+        QPDFObjectHandle const& to_replace, QPDFObjectHandle const& replacement, JSON const& value);
 
     QPDF& pdf;
     std::shared_ptr<InputSource> is;
@@ -297,14 +297,14 @@ class QPDF::JSONReactor: public JSON::Reactor
 };
 
 void
-QPDF::JSONReactor::error(qpdf_offset_t offset, std::string const& msg)
+QPDF::JSONReactor::error(qpdf_offset_t offset, std::string const& message)
 {
     this->errors = true;
     std::string object = this->cur_object;
     if (is->getName() != pdf.getFilename()) {
         object += " from " + is->getName();
     }
-    this->pdf.warn(qpdf_e_json, object, offset, msg);
+    this->pdf.warn(qpdf_e_json, object, offset, message);
 }
 
 bool
@@ -371,11 +371,11 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
         } else if (cur_object == "trailer") {
             if (!saw_value) {
                 QTC::TC("qpdf", "QPDF_json trailer no value");
-                error(value.getStart(), "\"trailer\" is missing \"value\"");
+                error(value.getStart(), R"("trailer" is missing "value")");
             }
         } else if (saw_value == saw_stream) {
             QTC::TC("qpdf", "QPDF_json value stream both or neither");
-            error(value.getStart(), "object must have exactly one of \"value\" or \"stream\"");
+            error(value.getStart(), R"(object must have exactly one of "value" or "stream")");
         }
         object_stack.clear();
         this->cur_object = "";
@@ -388,7 +388,7 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
         if (saw_stream) {
             if (!saw_dict) {
                 QTC::TC("qpdf", "QPDF_json stream no dict");
-                error(value.getStart(), "\"stream\" is missing \"dict\"");
+                error(value.getStart(), R"("stream" is missing "dict")");
             }
             if (saw_data == saw_datafile) {
                 if (this_stream_needs_data) {
@@ -427,7 +427,7 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
 
 void
 QPDF::JSONReactor::replaceObject(
-    QPDFObjectHandle to_replace, QPDFObjectHandle replacement, JSON const& value)
+    QPDFObjectHandle const& to_replace, QPDFObjectHandle const& replacement, JSON const& value)
 {
     auto og = to_replace.getObjGen();
     this->pdf.replaceObject(og, replacement);
@@ -548,12 +548,12 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             nestedState(key, value, st_object_top);
         } else {
             QTC::TC("qpdf", "QPDF_json bad object key");
-            error(value.getStart(), "object key should be \"trailer\" or \"obj:n n R\"");
+            error(value.getStart(), R"(object key should be "trailer" or "obj:n n R")");
             next_state = st_ignore;
             parse_error = true;
         }
     } else if (state == st_object_top) {
-        if (object_stack.size() == 0) {
+        if (object_stack.empty()) {
             throw std::logic_error("no object on stack in st_object_top");
         }
         auto tos = object_stack.back();
@@ -603,7 +603,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             next_state = st_ignore;
         }
     } else if (state == st_stream) {
-        if (object_stack.size() == 0) {
+        if (object_stack.empty()) {
             throw std::logic_error("no object on stack in st_stream");
         }
         auto tos = object_stack.back();
@@ -763,7 +763,8 @@ QPDF::createFromJSON(std::string const& json_file)
 }
 
 void
-QPDF::createFromJSON(std::shared_ptr<InputSource> is)
+QPDF::createFromJSON(
+    std::shared_ptr<InputSource> is) // NOLINT (performance-unnecessary-value-param) ABI
 {
     processMemoryFile(is->getName().c_str(), JSON_PDF, strlen(JSON_PDF));
     importJSON(is, true);
@@ -776,13 +777,14 @@ QPDF::updateFromJSON(std::string const& json_file)
 }
 
 void
-QPDF::updateFromJSON(std::shared_ptr<InputSource> is)
+QPDF::updateFromJSON(
+    std::shared_ptr<InputSource> is) // NOLINT (performance-unnecessary-value-param) ABI
 {
     importJSON(is, false);
 }
 
 void
-QPDF::importJSON(std::shared_ptr<InputSource> is, bool must_be_complete)
+QPDF::importJSON(std::shared_ptr<InputSource> const& is, bool must_be_complete)
 {
     JSONReactor reactor(*this, is, must_be_complete);
     try {
@@ -844,10 +846,18 @@ QPDF::writeJSON(
     qpdf_stream_decode_level_e decode_level,
     qpdf_json_stream_data_e json_stream_data,
     std::string const& file_prefix,
-    std::set<std::string> wanted_objects)
+    std::set<std::string> wanted_objects) // NOLINT (performance-unnecessary-value-param) ABI
 {
     bool first = true;
-    writeJSON(version, p, true, first, decode_level, json_stream_data, file_prefix, wanted_objects);
+    writeJSON(
+        version,
+        p,
+        true,
+        first,
+        decode_level,
+        json_stream_data,
+        file_prefix,
+        std::move(wanted_objects));
 }
 
 void

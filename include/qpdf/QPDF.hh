@@ -1464,10 +1464,10 @@ class QPDF
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
 
     // JSON import
-    void importJSON(std::shared_ptr<InputSource>, bool must_be_complete);
+    void importJSON(std::shared_ptr<InputSource> const&, bool must_be_complete);
 
     // JSON write
-    void writeJSONStream(
+    static void writeJSONStream(
         int version,
         Pipeline* p,
         bool& first,
@@ -1476,7 +1476,7 @@ class QPDF
         qpdf_stream_decode_level_e,
         qpdf_json_stream_data_e,
         std::string const& file_prefix);
-    void writeJSONObject(
+    static void writeJSONObject(
         int version, Pipeline* p, bool& first, std::string const& key, QPDFObjectHandle&);
 
     // Type conversion helper methods
