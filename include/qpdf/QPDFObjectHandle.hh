@@ -397,6 +397,14 @@ class QPDFObjectHandle
     // object's input stream.
     QPDF_DLL
     static QPDFObjectHandle parse(
+        InputSource& input,
+        std::string const& object_description,
+        QPDFTokenizer&,
+        bool& empty,
+        StringDecrypter* decrypter,
+        QPDF* context);
+    QPDF_DLL
+    static QPDFObjectHandle parse(
         std::shared_ptr<InputSource> input,
         std::string const& object_description,
         QPDFTokenizer&,
@@ -1369,10 +1377,7 @@ class QPDFObjectHandle
     void setParsedOffset(qpdf_offset_t offset);
     void parseContentStream_internal(std::string const& description, ParserCallbacks* callbacks);
     static void parseContentStream_data(
-        std::shared_ptr<Buffer>,
-        std::string const& description,
-        ParserCallbacks* callbacks,
-        QPDF* context);
+        Buffer&, std::string const& description, ParserCallbacks* callbacks, QPDF* context);
     std::vector<QPDFObjectHandle>
     arrayOrStreamToStreamArray(std::string const& description, std::string& all_description);
     static void warn(QPDF*, QPDFExc const&);
@@ -1485,7 +1490,7 @@ class QPDFObjectHandle::QPDFDictItems
             QPDFObjectHandle& oh;
             std::set<std::string> keys;
             std::set<std::string>::iterator iter;
-            bool is_end;
+            bool is_end{false};
         };
         std::shared_ptr<Members> m;
         value_type ivalue;
@@ -1581,8 +1586,8 @@ class QPDFObjectHandle::QPDFArrayItems
             Members(Members const&) = delete;
 
             QPDFObjectHandle& oh;
-            int item_number;
-            bool is_end;
+            int item_number{0};
+            bool is_end{false};
         };
         std::shared_ptr<Members> m;
         value_type ivalue;

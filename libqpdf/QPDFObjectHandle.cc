@@ -93,7 +93,8 @@ namespace
     class CoalesceProvider: public QPDFObjectHandle::StreamDataProvider
     {
       public:
-        CoalesceProvider(QPDFObjectHandle containing_page, QPDFObjectHandle old_contents) :
+        CoalesceProvider(
+            QPDFObjectHandle const& containing_page, QPDFObjectHandle const& old_contents) :
             containing_page(containing_page),
             old_contents(old_contents)
         {
@@ -147,18 +148,20 @@ QPDFObjectHandle::TokenFilter::write(std::string const& str)
 void
 QPDFObjectHandle::TokenFilter::writeToken(QPDFTokenizer::Token const& token)
 {
-    std::string value = token.getRawValue();
+    std::string const& value = token.getRawValue();
     write(value.c_str(), value.length());
 }
 
 void
-QPDFObjectHandle::ParserCallbacks::handleObject(QPDFObjectHandle)
+QPDFObjectHandle::ParserCallbacks::handleObject(
+    QPDFObjectHandle) // NOLINT (performance-unnecessary-value-param)
 {
     throw std::logic_error("You must override one of the handleObject methods in ParserCallbacks");
 }
 
 void
-QPDFObjectHandle::ParserCallbacks::handleObject(QPDFObjectHandle oh, size_t, size_t)
+QPDFObjectHandle::ParserCallbacks::handleObject(
+    QPDFObjectHandle oh, size_t, size_t) // NOLINT (performance-unnecessary-value-param)
 {
     // This version of handleObject was added in qpdf 9. If the developer did not override it, fall
     // back to the older interface.
@@ -189,13 +192,12 @@ namespace
         unsigned char getLastChar();
 
       private:
-        unsigned char last_char;
+        unsigned char last_char{0};
     };
 } // namespace
 
 LastChar::LastChar(Pipeline* next) :
-    Pipeline("lastchar", next),
-    last_char(0)
+    Pipeline("lastchar", next)
 {
 }
 
@@ -1290,13 +1292,13 @@ QPDFObjectHandle::replaceDict(QPDFObjectHandle const& new_dict)
 std::shared_ptr<Buffer>
 QPDFObjectHandle::getStreamData(qpdf_stream_decode_level_e level)
 {
-    return asStreamWithAssert()->getStreamData(level);
+    return asStreamWithAssert()->getStreamData(level).getBufferSharedPointer();
 }
 
 std::shared_ptr<Buffer>
 QPDFObjectHandle::getRawStreamData()
 {
-    return asStreamWithAssert()->getRawStreamData();
+    return asStreamWithAssert()->getRawStreamData().getBufferSharedPointer();
 }
 
 bool
@@ -1349,7 +1351,7 @@ QPDFObjectHandle::replaceStreamData(
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
 {
-    asStreamWithAssert()->replaceStreamData(data, filter, decode_parms);
+    asStreamWithAssert()->replaceStreamData(std::move(data), filter, decode_parms);
 }
 
 void
@@ -1361,7 +1363,7 @@ QPDFObjectHandle::replaceStreamData(
     if (bp) {
         memcpy(bp, data.c_str(), data.length());
     }
-    asStreamWithAssert()->replaceStreamData(b, filter, decode_parms);
+    asStreamWithAssert()->replaceStreamData(std::move(b), filter, decode_parms);
 }
 
 void
@@ -1370,7 +1372,7 @@ QPDFObjectHandle::replaceStreamData(
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
 {
-    asStreamWithAssert()->replaceStreamData(provider, filter, decode_parms);
+    asStreamWithAssert()->replaceStreamData(std::move(provider), filter, decode_parms);
 }
 
 namespace
@@ -1378,13 +1380,13 @@ namespace
     class FunctionProvider: public QPDFObjectHandle::StreamDataProvider
     {
       public:
-        FunctionProvider(std::function<void(Pipeline*)> provider) :
+        FunctionProvider(std::function<void(Pipeline*)> const& provider) :
             StreamDataProvider(false),
             p1(provider),
             p2(nullptr)
         {
         }
-        FunctionProvider(std::function<bool(Pipeline*, bool, bool)> provider) :
+        FunctionProvider(std::function<bool(Pipeline*, bool, bool)> const& provider) :
             StreamDataProvider(true),
             p1(nullptr),
             p2(provider)
@@ -1412,22 +1414,23 @@ namespace
 
 void
 QPDFObjectHandle::replaceStreamData(
-    std::function<void(Pipeline*)> provider,
+    std::function<void(Pipeline*)> provider, // NOLINT (performance-unnecessary-value-param) ABI
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
 {
     auto sdp = std::shared_ptr<StreamDataProvider>(new FunctionProvider(provider));
-    asStreamWithAssert()->replaceStreamData(sdp, filter, decode_parms);
+    asStreamWithAssert()->replaceStreamData(std::move(sdp), filter, decode_parms);
 }
 
 void
 QPDFObjectHandle::replaceStreamData(
-    std::function<bool(Pipeline*, bool, bool)> provider,
+    std::function<bool(Pipeline*, bool, bool)>
+        provider, // NOLINT (performance-unnecessary-value-param) ABI
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
 {
     auto sdp = std::shared_ptr<StreamDataProvider>(new FunctionProvider(provider));
-    asStreamWithAssert()->replaceStreamData(sdp, filter, decode_parms);
+    asStreamWithAssert()->replaceStreamData(std::move(sdp), filter, decode_parms);
 }
 
 std::map<std::string, QPDFObjectHandle>
@@ -1657,19 +1660,19 @@ QPDFObjectHandle
 QPDFObjectHandle::parse(
     QPDF* context, std::string const& object_str, std::string const& object_description)
 {
-    auto input = std::shared_ptr<InputSource>(new BufferInputSource("parsed object", object_str));
+    auto input = BufferInputSource("parsed object", object_str);
     QPDFTokenizer tokenizer;
     bool empty = false;
     QPDFObjectHandle result = parse(input, object_description, tokenizer, empty, nullptr, context);
-    size_t offset = QIntC::to_size(input->tell());
+    size_t offset = QIntC::to_size(input.tell());
     while (offset < object_str.length()) {
         if (!isspace(object_str.at(offset))) {
             QTC::TC("qpdf", "QPDFObjectHandle trailing data in parse");
             throw QPDFExc(
                 qpdf_e_damaged_pdf,
-                input->getName(),
+                input.getName(),
                 object_description,
-                input->getLastOffset(),
+                input.getLastOffset(),
                 "trailing data found parsing object from string");
         }
         ++offset;
@@ -1762,7 +1765,7 @@ QPDFObjectHandle::parseContentStream_internal(
     auto stream_data = buf.getBufferSharedPointer();
     callbacks->contentSize(stream_data->getSize());
     try {
-        parseContentStream_data(stream_data, all_description, callbacks, getOwningQPDF());
+        parseContentStream_data(*stream_data, all_description, callbacks, getOwningQPDF());
     } catch (TerminateParsing&) {
         return;
     }
@@ -1771,57 +1774,53 @@ QPDFObjectHandle::parseContentStream_internal(
 
 void
 QPDFObjectHandle::parseContentStream_data(
-    std::shared_ptr<Buffer> stream_data,
-    std::string const& description,
-    ParserCallbacks* callbacks,
-    QPDF* context)
+    Buffer& stream_data, std::string const& description, ParserCallbacks* callbacks, QPDF* context)
 {
-    size_t stream_length = stream_data->getSize();
-    auto input =
-        std::shared_ptr<InputSource>(new BufferInputSource(description, stream_data.get()));
+    size_t stream_length = stream_data.getSize();
+    auto input = BufferInputSource(description, &stream_data);
+    //        std::unique_ptr<InputSource>(new BufferInputSource(description, &stream_data));
     QPDFTokenizer tokenizer;
     tokenizer.allowEOF();
     bool empty = false;
-    while (QIntC::to_size(input->tell()) < stream_length) {
+    while (QIntC::to_size(input.tell()) < stream_length) {
         // Read a token and seek to the beginning. The offset we get
         // from this process is the beginning of the next
         // non-ignorable (space, comment) token. This way, the offset
         // and don't including ignorable content.
         tokenizer.readToken(input, "content", true);
-        qpdf_offset_t offset = input->getLastOffset();
-        input->seek(offset, SEEK_SET);
-        auto obj = QPDFParser(*input, "content", tokenizer, nullptr, context).parse(empty, true);
+        qpdf_offset_t offset = input.getLastOffset();
+        input.seek(offset, SEEK_SET);
+        auto obj = QPDFParser(input, "content", tokenizer, nullptr, context).parse(empty, true);
         if (!obj.isInitialized()) {
             // EOF
             break;
         }
-        size_t length = QIntC::to_size(input->tell() - offset);
+        size_t length = QIntC::to_size(input.tell() - offset);
 
         callbacks->handleObject(obj, QIntC::to_size(offset), length);
         if (obj.isOperator() && (obj.getOperatorValue() == "ID")) {
             // Discard next character; it is the space after ID that terminated the token.  Read
             // until end of inline image.
             char ch;
-            input->read(&ch, 1);
+            input.read(&ch, 1);
             tokenizer.expectInlineImage(input);
             QPDFTokenizer::Token t = tokenizer.readToken(input, description, true);
-            offset = input->getLastOffset();
-            length = QIntC::to_size(input->tell() - offset);
+            offset = input.getLastOffset();
+            length = QIntC::to_size(input.tell() - offset);
             if (t.getType() == QPDFTokenizer::tt_bad) {
                 QTC::TC("qpdf", "QPDFObjectHandle EOF in inline image");
                 warn(
                     context,
                     QPDFExc(
                         qpdf_e_damaged_pdf,
-                        input->getName(),
+                        input.getName(),
                         "stream data",
-                        input->tell(),
+                        input.tell(),
                         "EOF found while reading inline image"));
             } else {
-                std::string inline_image = t.getValue();
                 QTC::TC("qpdf", "QPDFObjectHandle inline image token");
                 callbacks->handleObject(
-                    QPDFObjectHandle::newInlineImage(inline_image), QIntC::to_size(offset), length);
+                    newInlineImage(t.getValue()), QIntC::to_size(offset), length);
             }
         }
     }
@@ -1831,18 +1830,30 @@ void
 QPDFObjectHandle::addContentTokenFilter(std::shared_ptr<TokenFilter> filter)
 {
     coalesceContentStreams();
-    this->getKey("/Contents").addTokenFilter(filter);
+    getKey("/Contents").addTokenFilter(std::move(filter));
 }
 
 void
 QPDFObjectHandle::addTokenFilter(std::shared_ptr<TokenFilter> filter)
 {
-    return asStreamWithAssert()->addTokenFilter(filter);
+    return asStreamWithAssert()->addTokenFilter(std::move(filter));
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::parse(
-    std::shared_ptr<InputSource> input,
+    InputSource& input,
+    std::string const& object_description,
+    QPDFTokenizer& tokenizer,
+    bool& empty,
+    StringDecrypter* decrypter,
+    QPDF* context)
+{
+    return QPDFParser(input, object_description, tokenizer, decrypter, context).parse(empty, false);
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::parse(
+    std::shared_ptr<InputSource> input, // NOLINT (performance-unnecessary-value-param)
     std::string const& object_description,
     QPDFTokenizer& tokenizer,
     bool& empty,
@@ -2012,7 +2023,7 @@ QPDFObjectHandle::newStream(QPDF* qpdf, std::shared_ptr<Buffer> data)
         throw std::runtime_error("attempt to create stream in null qpdf object");
     }
     QTC::TC("qpdf", "QPDFObjectHandle newStream with data");
-    return qpdf->newStream(data);
+    return qpdf->newStream(std::move(data));
 }
 
 QPDFObjectHandle
