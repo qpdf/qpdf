@@ -15,6 +15,16 @@ QPDFExc::QPDFExc(
 {
 }
 
+QPDFExc::QPDFExc(QPDFExc const& other) noexcept :
+    std::runtime_error(other),
+    error_code(other.error_code),
+    filename(other.filename),
+    object(other.object),
+    offset(other.offset),
+    message(other.message)
+{
+}
+
 std::string
 QPDFExc::createWhat(
     std::string const& filename,
