@@ -39,7 +39,7 @@ using namespace std::literals;
 
 namespace
 {
-    class TerminateParsing
+    class TerminateParsing: std::exception
     {
     };
 } // namespace
@@ -49,7 +49,7 @@ QPDFObjectHandle::StreamDataProvider::StreamDataProvider(bool supports_retry) :
 {
 }
 
-QPDFObjectHandle::StreamDataProvider::~StreamDataProvider()
+QPDFObjectHandle::StreamDataProvider::~StreamDataProvider() // NOLINT (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
 }
@@ -83,7 +83,8 @@ QPDFObjectHandle::StreamDataProvider::provideStreamData(
 }
 
 bool
-QPDFObjectHandle::StreamDataProvider::supportsRetry()
+QPDFObjectHandle::StreamDataProvider::
+    supportsRetry() // NOLINT (readability-make-member-function-const) ABI
 {
     return this->supports_retry;
 }
@@ -175,7 +176,8 @@ QPDFObjectHandle::ParserCallbacks::contentSize(size_t)
 }
 
 void
-QPDFObjectHandle::ParserCallbacks::terminateParsing()
+QPDFObjectHandle::ParserCallbacks::
+    terminateParsing() // NOLINT (readability-convert-member-functions-to-static) ABI
 {
     throw TerminateParsing();
 }
@@ -185,11 +187,11 @@ namespace
     class LastChar: public Pipeline
     {
       public:
-        LastChar(Pipeline* next);
+        explicit LastChar(Pipeline* next);
         ~LastChar() override = default;
         void write(unsigned char const* data, size_t len) override;
         void finish() override;
-        unsigned char getLastChar();
+        [[nodiscard]] unsigned char getLastChar() const;
 
       private:
         unsigned char last_char{0};
@@ -217,7 +219,7 @@ LastChar::finish()
 }
 
 unsigned char
-LastChar::getLastChar()
+LastChar::getLastChar() const
 {
     return this->last_char;
 }
@@ -384,7 +386,8 @@ QPDFObjectHandle::getNumericValue()
     if (isInteger()) {
         result = static_cast<double>(getIntValue());
     } else if (isReal()) {
-        result = atof(getRealValue().c_str());
+        char* end{};
+        result = strtod(getRealValue().c_str(), &end);
     } else {
         typeWarning("number", "returning 0");
         QTC::TC("qpdf", "QPDFObjectHandle numeric non-numeric");
@@ -1380,13 +1383,13 @@ namespace
     class FunctionProvider: public QPDFObjectHandle::StreamDataProvider
     {
       public:
-        FunctionProvider(std::function<void(Pipeline*)> const& provider) :
+        explicit FunctionProvider(std::function<void(Pipeline*)> const& provider) :
             StreamDataProvider(false),
             p1(provider),
             p2(nullptr)
         {
         }
-        FunctionProvider(std::function<bool(Pipeline*, bool, bool)> const& provider) :
+        explicit FunctionProvider(std::function<bool(Pipeline*, bool, bool)> const& provider) :
             StreamDataProvider(true),
             p1(nullptr),
             p2(provider)
@@ -1532,7 +1535,8 @@ QPDFObjectHandle::rotatePage(int angle, bool relative)
         QPDFObjGen::set visited;
         while (visited.add(cur_obj)) {
             // Don't get stuck in an infinite loop
-            if (cur_obj.getKey("/Rotate").getValueAsInt(old_angle)) {
+            if (cur_obj.getKey("/Rotate").getValueAsInt(
+                    old_angle)) { // NOLINT (bugprone-branch-clone)
                 break;
             } else if (cur_obj.getKey("/Parent").isDictionary()) {
                 cur_obj = cur_obj.getKey("/Parent");
@@ -2081,7 +2085,9 @@ QPDFObjectHandle::unsafeShallowCopy()
 }
 
 void
-QPDFObjectHandle::makeDirect(QPDFObjGen::set& visited, bool stop_at_streams)
+QPDFObjectHandle::makeDirect( // NOLINT(misc-no-recursion)
+    QPDFObjGen::set& visited,
+    bool stop_at_streams)
 {
     assertInitialized();
 
@@ -2287,7 +2293,7 @@ QPDFObjectHandle::assertReserved()
 }
 
 void
-QPDFObjectHandle::assertIndirect()
+QPDFObjectHandle::assertIndirect() // NOLINT (readability-make-member-function-const) ABI
 {
     if (!isIndirect()) {
         throw std::logic_error("operation for indirect object attempted on direct object");
@@ -2315,19 +2321,14 @@ QPDFObjectHandle::isPageObject()
     }
     // getAllPages repairs /Type when traversing the page tree.
     getOwningQPDF()->getAllPages();
-    if (!this->isDictionary()) {
+    if (!isDictionary()) {
         return false;
     }
-    if (this->hasKey("/Type")) {
-        QPDFObjectHandle type = this->getKey("/Type");
-        if (type.isNameAndEquals("/Page")) {
+    if (hasKey("/Type")) {
+        auto type = getKey("/Type");
+        if (type.isNameAndEquals("/Page") || (type.isString() && type.getStringValue() == "Page")) {
+            // Files have been seen in the wild that have /Type (Page)
             return true;
-        }
-        // Files have been seen in the wild that have /Type (Page)
-        else if (type.isString() && (type.getStringValue() == "Page")) {
-            return true;
-        } else {
-            return false;
         }
     }
     return false;

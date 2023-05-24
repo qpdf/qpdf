@@ -121,7 +121,6 @@ class QPDFObjectHandle
             int objid, int generation, Pipeline* pipeline, bool suppress_warnings, bool will_retry);
         QPDF_DLL
         bool supportsRetry();
-
       private:
         bool supports_retry;
     };
