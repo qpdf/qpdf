@@ -12,8 +12,7 @@
 #include <algorithm>
 #include <cstring>
 
-// This chart shows an example of the state transitions that would
-// occur in parsing a minimal file.
+// This chart shows an example of the state transitions that would occur in parsing a minimal file.
 
 //                                | st_initial
 // {                              |   -> st_top
@@ -414,9 +413,9 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
             object_stack.pop_back();
         }
     } else if ((state == st_top) && (from_state == st_qpdf)) {
-        // Handle dangling indirect object references which the PDF spec says to
-        // treat as nulls. It's tempting to make this an error, but that would
-        // be wrong since valid input files may have these.
+        // Handle dangling indirect object references which the PDF spec says to treat as nulls.
+        // It's tempting to make this an error, but that would be wrong since valid input files may
+        // have these.
         for (auto& oc: pdf.m->obj_cache) {
             if (oc.second.object->getTypeCode() == ::ot_reserved && reserved.count(oc.first) == 0) {
                 QTC::TC("qpdf", "QPDF_json non-trivial null reserved");
@@ -446,8 +445,7 @@ QPDF::JSONReactor::topLevelScalar()
 void
 QPDF::JSONReactor::nestedState(std::string const& key, JSON const& value, state_e next)
 {
-    // Use this method when the next state is for processing a nested
-    // dictionary.
+    // Use this method when the next state is for processing a nested dictionary.
     if (value.isDictionary()) {
         this->next_state = next;
     } else {
@@ -531,8 +529,8 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                 error(value.getStart(), "calledgetallpages must be a boolean");
             }
         } else {
-            // ignore unknown keys for forward compatibility and to
-            // skip keys we don't care about like "maxobjectid".
+            // ignore unknown keys for forward compatibility and to skip keys we don't care about
+            // like "maxobjectid".
             QTC::TC("qpdf", "QPDF_json ignore second-level key");
             next_state = st_ignore;
         }
@@ -594,8 +592,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             this->pdf.m->trailer = makeObject(value);
             setObjectDescription(this->pdf.m->trailer, value);
         } else if (key == "stream") {
-            // Don't need to set saw_stream here since there's already
-            // an error.
+            // Don't need to set saw_stream here since there's already an error.
             QTC::TC("qpdf", "QPDF_json trailer stream");
             error(value.getStart(), "the trailer may not be a stream");
             next_state = st_ignore;
@@ -616,8 +613,8 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
         auto uninitialized = QPDFObjectHandle();
         if (key == "dict") {
             this->saw_dict = true;
-            // Since a stream dictionary must be a dictionary, we can
-            // use nestedState to transition to st_value.
+            // Since a stream dictionary must be a dictionary, we can use nestedState to transition
+            // to st_value.
             nestedState("stream.dict", value, st_object);
             auto dict = makeObject(value);
             if (dict.isDictionary()) {

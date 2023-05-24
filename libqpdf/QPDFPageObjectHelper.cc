@@ -110,10 +110,8 @@ InlineImageTracker::convertIIDict(QPDFObjectHandle odict)
                 } else if (name == "/I") {
                     name = "/Indexed";
                 } else {
-                    // This is a key in the page's /Resources ->
-                    // /ColorSpace dictionary. We need to look it up
-                    // and use its value as the color space for the
-                    // image.
+                    // This is a key in the page's /Resources -> /ColorSpace dictionary. We need to
+                    // look it up and use its value as the color space for the image.
                     QPDFObjectHandle colorspace = resources.getKey("/ColorSpace");
                     if (colorspace.isDictionary() && colorspace.hasKey(name)) {
                         QTC::TC("qpdf", "QPDFPageObjectHelper colorspace lookup");
@@ -407,8 +405,8 @@ QPDFPageObjectHelper::externalizeInlineImages(size_t min_size, bool shallow)
 {
     if (shallow) {
         QPDFObjectHandle resources = getAttribute("/Resources", true);
-        // Calling mergeResources also ensures that /XObject becomes
-        // direct and is not shared with other pages.
+        // Calling mergeResources also ensures that /XObject becomes direct and is not shared with
+        // other pages.
         resources.mergeResources("<< /XObject << >> >>"_qpdf);
         InlineImageTracker iit(this->oh.getOwningQPDF(), min_size, resources);
         Pl_Buffer b("new page content");
@@ -573,11 +571,10 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
         return false;
     }
 
-    // We will walk through /Font and /XObject dictionaries, removing
-    // any resources that are not referenced. We must make copies of
-    // resource dictionaries down into the dictionaries are mutating
-    // to prevent mutating one dictionary from having the side effect
-    // of mutating the one it was copied from.
+    // We will walk through /Font and /XObject dictionaries, removing any resources that are not
+    // referenced. We must make copies of resource dictionaries down into the dictionaries are
+    // mutating to prevent mutating one dictionary from having the side effect of mutating the one
+    // it was copied from.
     QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
     std::vector<QPDFObjectHandle> rdicts;
     std::set<std::string> known_names;
@@ -605,33 +602,25 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
             }
         }
     }
-    // Older versions of the PDF spec allowed form XObjects to omit
-    // their resources dictionaries, in which case names were resolved
-    // from the containing page. This behavior seems to be widely
-    // supported by viewers. If a form XObjects has a resources
-    // dictionary and has some unresolved names, some viewers fail to
-    // resolve them, and others allow them to be inherited from the
-    // page or from another form XObjects that contains them. Since
-    // this behavior is inconsistent across viewers, we consider an
-    // unresolved name when a resources dictionary is present to be
-    // reason not to remove unreferenced resources. An unresolved name
-    // in the absence of a resource dictionary is not considered a
-    // problem. For form XObjects, we just accumulate a list of
-    // unresolved names, and for page objects, we avoid removing any
-    // such names found in nested form XObjects.
+    // Older versions of the PDF spec allowed form XObjects to omit their resources dictionaries, in
+    // which case names were resolved from the containing page. This behavior seems to be widely
+    // supported by viewers. If a form XObjects has a resources dictionary and has some unresolved
+    // names, some viewers fail to resolve them, and others allow them to be inherited from the page
+    // or from another form XObjects that contains them. Since this behavior is inconsistent across
+    // viewers, we consider an unresolved name when a resources dictionary is present to be reason
+    // not to remove unreferenced resources. An unresolved name in the absence of a resource
+    // dictionary is not considered a problem. For form XObjects, we just accumulate a list of
+    // unresolved names, and for page objects, we avoid removing any such names found in nested form
+    // XObjects.
 
     if ((!local_unresolved.empty()) && resources.isDictionary()) {
-        // It's not worth issuing a warning for this case. From qpdf
-        // 10.3, we are hopefully only looking at names that are
-        // referencing fonts and XObjects, but until we're certain
-        // that we know the meaning of every name in a content stream,
-        // we don't want to give warnings that might be false
-        // positives. Also, this can happen in legitimate cases with
-        // older PDFs, and there's nothing to be done about it, so
-        // there's no good reason to issue a warning. The only sad
-        // thing is that it was a false positive that alerted me to a
-        // logic error in the code, and any future such errors would
-        // now be hidden.
+        // It's not worth issuing a warning for this case. From qpdf 10.3, we are hopefully only
+        // looking at names that are referencing fonts and XObjects, but until we're certain that we
+        // know the meaning of every name in a content stream, we don't want to give warnings that
+        // might be false positives. Also, this can happen in legitimate cases with older PDFs, and
+        // there's nothing to be done about it, so there's no good reason to issue a warning. The
+        // only sad thing is that it was a false positive that alerted me to a logic error in the
+        // code, and any future such errors would now be hidden.
         QTC::TC("qpdf", "QPDFPageObjectHelper unresolved names");
         return false;
     }
@@ -639,8 +628,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     for (auto& dict: rdicts) {
         for (auto const& key: dict.getKeys()) {
             if (is_page && unresolved.count(key)) {
-                // This name is referenced by some nested form
-                // xobject, so don't remove it.
+                // This name is referenced by some nested form xobject, so don't remove it.
                 QTC::TC("qpdf", "QPDFPageObjectHelper resolving unresolved");
             } else if (!rf.getNames().count(key)) {
                 dict.removeKey(key);
@@ -653,8 +641,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
 void
 QPDFPageObjectHelper::removeUnreferencedResources()
 {
-    // Accumulate a list of unresolved names across all nested form
-    // XObjects.
+    // Accumulate a list of unresolved names across all nested form XObjects.
     std::set<std::string> unresolved;
     bool any_failures = false;
     forEachFormXObject(
@@ -724,10 +711,9 @@ QPDFPageObjectHelper::getMatrixForTransformations(bool invert)
 QPDFObjectHandle
 QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
 {
-    auto result = this->oh
-                      .getQPDF("QPDFPageObjectHelper::getFormXObjectForPage "
-                               "called with a direct object")
-                      .newStream();
+    auto result =
+        this->oh.getQPDF("QPDFPageObjectHelper::getFormXObjectForPage called with a direct object")
+            .newStream();
     QPDFObjectHandle newdict = result.getDict();
     newdict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
     newdict.replaceKey("/Subtype", QPDFObjectHandle::newName("/Form"));
@@ -759,18 +745,15 @@ QPDFPageObjectHelper::getMatrixForFormXObjectPlacement(
     bool allow_shrink,
     bool allow_expand)
 {
-    // Calculate the transformation matrix that will place the given
-    // form XObject fully inside the given rectangle, center and
-    // shrinking or expanding as needed if requested.
+    // Calculate the transformation matrix that will place the given form XObject fully inside the
+    // given rectangle, center and shrinking or expanding as needed if requested.
 
-    // When rendering a form XObject, the transformation in the
-    // graphics state (cm) is applied first (of course -- when it is
-    // applied, the PDF interpreter doesn't even know we're going to
-    // be drawing a form XObject yet), and then the object's matrix
-    // (M) is applied. The resulting matrix, when applied to the form
-    // XObject's bounding box, will generate a new rectangle. We want
-    // to create a transformation matrix that make the form XObject's
-    // bounding box land in exactly the right spot.
+    // When rendering a form XObject, the transformation in the graphics state (cm) is applied first
+    // (of course -- when it is applied, the PDF interpreter doesn't even know we're going to be
+    // drawing a form XObject yet), and then the object's matrix (M) is applied. The resulting
+    // matrix, when applied to the form XObject's bounding box, will generate a new rectangle. We
+    // want to create a transformation matrix that make the form XObject's bounding box land in
+    // exactly the right spot.
 
     QPDFObjectHandle fdict = fo.getDict();
     QPDFObjectHandle bbox_obj = fdict.getKey("/BBox");
@@ -782,37 +765,32 @@ QPDFPageObjectHelper::getMatrixForFormXObjectPlacement(
     QPDFMatrix tmatrix; // "to" matrix
     QPDFMatrix fmatrix; // "from" matrix
     if (invert_transformations) {
-        // tmatrix inverts scaling and rotation of the destination
-        // page. Applying this matrix allows the overlaid form
-        // XObject's to be absolute rather than relative to properties
-        // of the destination page. tmatrix is part of the computed
-        // transformation matrix.
+        // tmatrix inverts scaling and rotation of the destination page. Applying this matrix allows
+        // the overlaid form XObject's to be absolute rather than relative to properties of the
+        // destination page. tmatrix is part of the computed transformation matrix.
         tmatrix = QPDFMatrix(getMatrixForTransformations(true));
         wmatrix.concat(tmatrix);
     }
     if (fdict.getKey("/Matrix").isMatrix()) {
-        // fmatrix is the transformation matrix that is applied to the
-        // form XObject itself. We need this for calculations, but we
-        // don't explicitly use it in the final result because the PDF
+        // fmatrix is the transformation matrix that is applied to the form XObject itself. We need
+        // this for calculations, but we don't explicitly use it in the final result because the PDF
         // rendering system automatically applies this last before
         // drawing the form XObject.
         fmatrix = QPDFMatrix(fdict.getKey("/Matrix").getArrayAsMatrix());
         wmatrix.concat(fmatrix);
     }
 
-    // The current wmatrix handles transformation from the form
-    // xobject and, if requested, the destination page. Next, we have
-    // to adjust this for scale and position.
+    // The current wmatrix handles transformation from the form xobject and, if requested, the
+    // destination page. Next, we have to adjust this for scale and position.
 
-    // Step 1: figure out what scale factor we need to make the form
-    // XObject's bounding box fit within the destination rectangle.
+    // Step 1: figure out what scale factor we need to make the form XObject's bounding box fit
+    // within the destination rectangle.
 
     // Transform bounding box
     QPDFObjectHandle::Rectangle bbox = bbox_obj.getArrayAsRectangle();
     QPDFObjectHandle::Rectangle T = wmatrix.transformRectangle(bbox);
 
-    // Calculate a scale factor, if needed. Shrink or expand if needed
-    // and allowed.
+    // Calculate a scale factor, if needed. Shrink or expand if needed and allowed.
     if ((T.urx == T.llx) || (T.ury == T.lly)) {
         // avoid division by zero
         return QPDFMatrix();
@@ -834,8 +812,8 @@ QPDFPageObjectHelper::getMatrixForFormXObjectPlacement(
         }
     }
 
-    // Step 2: figure out what translation is required to get the
-    // rectangle to the right spot: centered within the destination.
+    // Step 2: figure out what translation is required to get the rectangle to the right spot:
+    // centered within the destination.
     wmatrix = QPDFMatrix();
     wmatrix.scale(scale, scale);
     wmatrix.concat(tmatrix);
@@ -849,9 +827,8 @@ QPDFPageObjectHelper::getMatrixForFormXObjectPlacement(
     double tx = r_cx - t_cx;
     double ty = r_cy - t_cy;
 
-    // Now we can calculate the final matrix. The final matrix does
-    // not include fmatrix because that is applied automatically by
-    // the PDF interpreter.
+    // Now we can calculate the final matrix. The final matrix does not include fmatrix because that
+    // is applied automatically by the PDF interpreter.
     QPDFMatrix cm;
     cm.translate(tx, ty);
     cm.scale(scale, scale);
@@ -921,18 +898,15 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
         auto rect = box.getArrayAsRectangle();
         decltype(rect) new_rect;
 
-        // How far are the edges of our rectangle from the edges
-        // of the media box?
+        // How far are the edges of our rectangle from the edges of the media box?
         auto left_x = rect.llx - media_rect.llx;
         auto right_x = media_rect.urx - rect.urx;
         auto bottom_y = rect.lly - media_rect.lly;
         auto top_y = media_rect.ury - rect.ury;
 
-        // Rotating the page 180 degrees does not change
-        // /MediaBox. Rotating 90 or 270 degrees reverses llx and
-        // lly and also reverse urx and ury. For all the other
-        // boxes, we want the corners to be the correct distance
-        // away from the corners of the mediabox.
+        // Rotating the page 180 degrees does not change /MediaBox. Rotating 90 or 270 degrees
+        // reverses llx and lly and also reverse urx and ury. For all the other boxes, we want the
+        // corners to be the correct distance away from the corners of the mediabox.
         switch (rotate) {
         case 90:
             new_rect.llx = media_rect.lly + bottom_y;
@@ -963,9 +937,8 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
         this->oh.replaceKey(boxkey, QPDFObjectHandle::newFromRectangle(new_rect));
     }
 
-    // When we rotate the page, pivot about the point 0, 0 and then
-    // translate so the page is visible with the origin point being
-    // the same offset from the lower left corner of the media box.
+    // When we rotate the page, pivot about the point 0, 0 and then translate so the page is visible
+    // with the origin point being the same offset from the lower left corner of the media box.
     // These calculations have been verified empirically with various
     // PDF readers.
     QPDFMatrix cm(0, 0, 0, 0, 0, 0);

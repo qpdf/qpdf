@@ -51,8 +51,7 @@ QPDFObjectHandle::StreamDataProvider::StreamDataProvider(bool supports_retry) :
 
 QPDFObjectHandle::StreamDataProvider::~StreamDataProvider()
 {
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
-    // README-maintainer
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
 }
 
 void
@@ -155,16 +154,14 @@ QPDFObjectHandle::TokenFilter::writeToken(QPDFTokenizer::Token const& token)
 void
 QPDFObjectHandle::ParserCallbacks::handleObject(QPDFObjectHandle)
 {
-    throw std::logic_error("You must override one of the"
-                           " handleObject methods in ParserCallbacks");
+    throw std::logic_error("You must override one of the handleObject methods in ParserCallbacks");
 }
 
 void
 QPDFObjectHandle::ParserCallbacks::handleObject(QPDFObjectHandle oh, size_t, size_t)
 {
-    // This version of handleObject was added in qpdf 9. If the
-    // developer did not override it, fall back to the older
-    // interface.
+    // This version of handleObject was added in qpdf 9. If the developer did not override it, fall
+    // back to the older interface.
     handleObject(oh);
 }
 
@@ -592,8 +589,7 @@ QPDFObjectHandle::getUIntValueAsUInt()
         result = 0;
     } else if (v > UINT_MAX) {
         QTC::TC("qpdf", "QPDFObjectHandle uint returning UINT_MAX");
-        warnIfPossible("requested value of unsigned integer is too big;"
-                       " returning UINT_MAX");
+        warnIfPossible("requested value of unsigned integer is too big; returning UINT_MAX");
         result = UINT_MAX;
     } else {
         result = static_cast<unsigned int>(v);
@@ -1092,11 +1088,9 @@ QPDFObjectHandle::mergeResources(
             QPDFObjectHandle this_val = getKey(rtype);
             if (this_val.isDictionary() && other_val.isDictionary()) {
                 if (this_val.isIndirect()) {
-                    // Do this even if there are no keys. Various
-                    // places in the code call mergeResources with
-                    // resource dictionaries that contain empty
-                    // subdictionaries just to get this shallow copy
-                    // functionality.
+                    // Do this even if there are no keys. Various places in the code call
+                    // mergeResources with resource dictionaries that contain empty subdictionaries
+                    // just to get this shallow copy functionality.
                     QTC::TC("qpdf", "QPDFObjectHandle replace with copy");
                     this_val = replaceKeyAndGetNew(rtype, this_val.shallowCopy());
                 }
@@ -1476,8 +1470,7 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
                 "",
                 description,
                 0,
-                " object is supposed to be a stream or an"
-                " array of streams but is neither"));
+                " object is supposed to be a stream or an array of streams but is neither"));
     }
 
     bool first = true;
@@ -1526,8 +1519,8 @@ void
 QPDFObjectHandle::rotatePage(int angle, bool relative)
 {
     if ((angle % 90) != 0) {
-        throw std::runtime_error("QPDF::rotatePage called with an"
-                                 " angle that is not a multiple of 90");
+        throw std::runtime_error(
+            "QPDF::rotatePage called with an angle that is not a multiple of 90");
     }
     int new_angle = angle;
     if (relative) {
@@ -1551,8 +1544,7 @@ QPDFObjectHandle::rotatePage(int angle, bool relative)
         new_angle += old_angle;
     }
     new_angle = (new_angle + 360) % 360;
-    // Make this explicit even with new_angle == 0 since /Rotate can
-    // be inherited.
+    // Make this explicit even with new_angle == 0 since /Rotate can be inherited.
     replaceKey("/Rotate", QPDFObjectHandle::newInteger(new_angle));
 }
 
@@ -1564,15 +1556,14 @@ QPDFObjectHandle::coalesceContentStreams()
         QTC::TC("qpdf", "QPDFObjectHandle coalesce called on stream");
         return;
     } else if (!contents.isArray()) {
-        // /Contents is optional for pages, and some very damaged
-        // files may have pages that are invalid in other ways.
+        // /Contents is optional for pages, and some very damaged files may have pages that are
+        // invalid in other ways.
         return;
     }
-    // Should not be possible for a page object to not have an
-    // owning PDF unless it was manually constructed in some
-    // incorrect way. However, it can happen in a PDF file whose
-    // page structure is direct, which is against spec but still
-    // possible to hand construct, as in fuzz issue 27393.
+    // Should not be possible for a page object to not have an owning PDF unless it was manually
+    // constructed in some incorrect way. However, it can happen in a PDF file whose page structure
+    // is direct, which is against spec but still possible to hand construct, as in fuzz issue
+    // 27393.
     QPDF& qpdf = getQPDF("coalesceContentStreams called on object  with no associated PDF file");
 
     QPDFObjectHandle new_contents = newStream(&qpdf);
@@ -1808,8 +1799,8 @@ QPDFObjectHandle::parseContentStream_data(
 
         callbacks->handleObject(obj, QIntC::to_size(offset), length);
         if (obj.isOperator() && (obj.getOperatorValue() == "ID")) {
-            // Discard next character; it is the space after ID that
-            // terminated the token.  Read until end of inline image.
+            // Discard next character; it is the space after ID that terminated the token.  Read
+            // until end of inline image.
             char ch;
             input->read(&ch, 1);
             tokenizer.expectInlineImage(input);
@@ -2052,8 +2043,8 @@ QPDFObjectHandle::newReserved(QPDF* qpdf)
 void
 QPDFObjectHandle::setObjectDescription(QPDF* owning_qpdf, std::string const& object_description)
 {
-    // This is called during parsing on newly created direct objects,
-    // so we can't call dereference() here.
+    // This is called during parsing on newly created direct objects, so we can't call dereference()
+    // here.
     if (isInitialized() && obj.get()) {
         auto descr = std::make_shared<QPDFValue::Description>(object_description);
         obj->setDescription(owning_qpdf, descr);
@@ -2070,8 +2061,7 @@ QPDFObjectHandle
 QPDFObjectHandle::shallowCopy()
 {
     if (!dereference()) {
-        throw std::logic_error("operation attempted on uninitialized "
-                               "QPDFObjectHandle");
+        throw std::logic_error("operation attempted on uninitialized QPDFObjectHandle");
     }
     return QPDFObjectHandle(obj->copy());
 }
@@ -2080,8 +2070,7 @@ QPDFObjectHandle
 QPDFObjectHandle::unsafeShallowCopy()
 {
     if (!dereference()) {
-        throw std::logic_error("operation attempted on uninitialized "
-                               "QPDFObjectHandle");
+        throw std::logic_error("operation attempted on uninitialized QPDFObjectHandle");
     }
     return QPDFObjectHandle(obj->copy(true));
 }
@@ -2094,8 +2083,7 @@ QPDFObjectHandle::makeDirect(QPDFObjGen::set& visited, bool stop_at_streams)
     auto cur_og = getObjGen();
     if (!visited.add(cur_og)) {
         QTC::TC("qpdf", "QPDFObjectHandle makeDirect loop");
-        throw std::runtime_error("loop detected while converting object from "
-                                 "indirect to direct");
+        throw std::runtime_error("loop detected while converting object from indirect to direct");
     }
 
     if (isBool() || isInteger() || isName() || isNull() || isReal() || isString()) {
@@ -2123,11 +2111,10 @@ QPDFObjectHandle::makeDirect(QPDFObjGen::set& visited, bool stop_at_streams)
             throw std::runtime_error("attempt to make a stream into a direct object");
         }
     } else if (isReserved()) {
-        throw std::logic_error("QPDFObjectHandle: attempting to make a"
-                               " reserved object handle direct");
+        throw std::logic_error(
+            "QPDFObjectHandle: attempting to make a reserved object handle direct");
     } else {
-        throw std::logic_error("QPDFObjectHandle::makeDirectInternal: "
-                               "unknown object type");
+        throw std::logic_error("QPDFObjectHandle::makeDirectInternal: unknown object type");
     }
 
     visited.erase(cur_og);
@@ -2162,8 +2149,7 @@ void
 QPDFObjectHandle::assertInitialized() const
 {
     if (!isInitialized()) {
-        throw std::logic_error("operation attempted on uninitialized "
-                               "QPDFObjectHandle");
+        throw std::logic_error("operation attempted on uninitialized QPDFObjectHandle");
     }
 }
 
@@ -2172,8 +2158,8 @@ QPDFObjectHandle::typeWarning(char const* expected_type, std::string const& warn
 {
     QPDF* context = nullptr;
     std::string description;
-    // Type checks above guarantee that the object has been dereferenced.
-    // Nevertheless, dereference throws exceptions in the test suite
+    // Type checks above guarantee that the object has been dereferenced. Nevertheless, dereference
+    // throws exceptions in the test suite
     if (!dereference()) {
         throw std::logic_error("attempted to dereference an uninitialized QPDFObjectHandle");
     }
@@ -2376,8 +2362,8 @@ QPDFObjectHandle::checkOwnership(QPDFObjectHandle const& item) const
     auto item_qpdf = item.getOwningQPDF();
     if ((qpdf != nullptr) && (item_qpdf != nullptr) && (qpdf != item_qpdf)) {
         QTC::TC("qpdf", "QPDFObjectHandle check ownership");
-        throw std::logic_error("Attempting to add an object from a different QPDF."
-                               " Use QPDF::copyForeignObject to add objects from another file.");
+        throw std::logic_error("Attempting to add an object from a different QPDF. Use "
+                               "QPDF::copyForeignObject to add objects from another file.");
     }
 }
 
@@ -2402,9 +2388,8 @@ QPDFObjectHandle::dereference()
 void
 QPDFObjectHandle::warn(QPDF* qpdf, QPDFExc const& e)
 {
-    // If parsing on behalf of a QPDF object and want to give a
-    // warning, we can warn through the object. If parsing for some
-    // other reason, such as an explicit creation of an object from a
+    // If parsing on behalf of a QPDF object and want to give a warning, we can warn through the
+    // object. If parsing for some other reason, such as an explicit creation of an object from a
     // string, then just throw the exception.
     if (qpdf) {
         qpdf->warn(e);
@@ -2596,7 +2581,8 @@ QPDFObjectHandle::getQPDF(std::string const& error_msg) const
 {
     auto result = isInitialized() ? this->obj->getQPDF() : nullptr;
     if (result == nullptr) {
-        throw std::runtime_error(error_msg == "" ? "attempt to use a null qpdf object" : error_msg);
+        throw std::runtime_error(
+            error_msg.empty() ? "attempt to use a null qpdf object" : error_msg);
     }
     return *result;
 }

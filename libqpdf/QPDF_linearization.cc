@@ -22,8 +22,8 @@ load_vector_int(
     BitStream& bit_stream, int nitems, std::vector<T>& vec, int bits_wanted, int_type T::*field)
 {
     bool append = vec.empty();
-    // nitems times, read bits_wanted from the given bit stream,
-    // storing results in the ith vector entry.
+    // nitems times, read bits_wanted from the given bit stream, storing results in the ith vector
+    // entry.
 
     for (size_t i = 0; i < QIntC::to_size(nitems); ++i) {
         if (append) {
@@ -34,8 +34,8 @@ load_vector_int(
     if (QIntC::to_int(vec.size()) != nitems) {
         throw std::logic_error("vector has wrong size in load_vector_int");
     }
-    // The PDF spec says that each hint table starts at a byte
-    // boundary.  Each "row" actually must start on a byte boundary.
+    // The PDF spec says that each hint table starts at a byte boundary.  Each "row" actually must
+    // start on a byte boundary.
     bit_stream.skipToNextByte();
 }
 
@@ -49,8 +49,8 @@ load_vector_vector(
     int bits_wanted,
     std::vector<int> T::*vec2)
 {
-    // nitems1 times, read nitems2 (from the ith element of vec1) items
-    // into the vec2 vector field of the ith item of vec1.
+    // nitems1 times, read nitems2 (from the ith element of vec1) items into the vec2 vector field
+    // of the ith item of vec1.
     for (size_t i1 = 0; i1 < QIntC::to_size(nitems1); ++i1) {
         for (int i2 = 0; i2 < vec1.at(i1).*nitems2; ++i2) {
             (vec1.at(i1).*vec2).push_back(bit_stream.getBitsInt(QIntC::to_size(bits_wanted)));
@@ -83,18 +83,15 @@ QPDF::checkLinearization()
 bool
 QPDF::isLinearized()
 {
-    // If the first object in the file is a dictionary with a suitable
-    // /Linearized key and has an /L key that accurately indicates the
-    // file size, initialize m->lindict and return true.
+    // If the first object in the file is a dictionary with a suitable /Linearized key and has an /L
+    // key that accurately indicates the file size, initialize m->lindict and return true.
 
-    // A linearized PDF spec's first object will be contained within
-    // the first 1024 bytes of the file and will be a dictionary with
-    // a valid /Linearized key.  This routine looks for that and does
-    // no additional validation.
+    // A linearized PDF spec's first object will be contained within the first 1024 bytes of the
+    // file and will be a dictionary with a valid /Linearized key.  This routine looks for that and
+    // does no additional validation.
 
-    // The PDF spec says the linearization dictionary must be
-    // completely contained within the first 1024 bytes of the file.
-    // Add a byte for a null terminator.
+    // The PDF spec says the linearization dictionary must be completely contained within the first
+    // 1024 bytes of the file. Add a byte for a null terminator.
     static int const tbuf_size = 1025;
 
     auto b = std::make_unique<char[]>(tbuf_size);
@@ -161,8 +158,8 @@ QPDF::isLinearized()
 void
 QPDF::readLinearizationData()
 {
-    // This function throws an exception (which is trapped by
-    // checkLinearization()) for any errors that prevent loading.
+    // This function throws an exception (which is trapped by checkLinearization()) for any errors
+    // that prevent loading.
 
     if (!isLinearized()) {
         throw std::logic_error("called readLinearizationData for file"
@@ -206,8 +203,8 @@ QPDF::readLinearizationData()
     int H1_offset = 0;
     int H1_length = 0;
     if (H_items.size() == 4) {
-        // Acrobat doesn't read or write these (as PDF 1.4), so we
-        // don't have a way to generate a test case.
+        // Acrobat doesn't read or write these (as PDF 1.4), so we don't have a way to generate a
+        // test case.
         // QTC::TC("qpdf", "QPDF overflow hint table");
         H1_offset = H_items.at(2);
         H1_length = H_items.at(3);
@@ -224,9 +221,8 @@ QPDF::readLinearizationData()
 
     // Store linearization parameter data
 
-    // Various places in the code use linp.npages, which is
-    // initialized from N, to pre-allocate memory, so make sure it's
-    // accurate and bail right now if it's not.
+    // Various places in the code use linp.npages, which is initialized from N, to pre-allocate
+    // memory, so make sure it's accurate and bail right now if it's not.
     if (N.getIntValue() != static_cast<long long>(getAllPages().size())) {
         throw damagedPDF("linearization hint table", "/N does not match number of pages");
     }
@@ -299,11 +295,10 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
 
     QPDFObjectHandle Hdict = H.getDict();
 
-    // Some versions of Acrobat make /Length indirect and place it
-    // immediately after the stream, increasing length to cover it,
-    // even though the specification says all objects in the
-    // linearization parameter dictionary must be direct.  We have to
-    // get the file position of the end of length in this case.
+    // Some versions of Acrobat make /Length indirect and place it immediately after the stream,
+    // increasing length to cover it, even though the specification says all objects in the
+    // linearization parameter dictionary must be direct.  We have to get the file position of the
+    // end of length in this case.
     QPDFObjectHandle length_obj = Hdict.getKey("/Length");
     if (length_obj.isIndirect()) {
         QTC::TC("qpdf", "QPDF hint table length indirect");
@@ -329,8 +324,7 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
 void
 QPDF::readHPageOffset(BitStream h)
 {
-    // All comments referring to the PDF spec refer to the spec for
-    // version 1.4.
+    // All comments referring to the PDF spec refer to the spec for version 1.4.
 
     HPageOffset& t = m->page_offset_hints;
 
@@ -402,9 +396,8 @@ QPDF::readHSharedObject(BitStream h)
     load_vector_int(h, nitems, entries, 1, &HSharedObjectEntry::signature_present);
     for (size_t i = 0; i < toS(nitems); ++i) {
         if (entries.at(i).signature_present) {
-            // Skip 128-bit MD5 hash.  These are not supported by
-            // acrobat, so they should probably never be there.  We
-            // have no test case for this.
+            // Skip 128-bit MD5 hash.  These are not supported by acrobat, so they should probably
+            // never be there.  We have no test case for this.
             for (int j = 0; j < 4; ++j) {
                 (void)h.getBits(32);
             }
@@ -425,8 +418,7 @@ QPDF::readHGeneric(BitStream h, HGeneric& t)
 bool
 QPDF::checkLinearizationInternal()
 {
-    // All comments referring to the PDF spec refer to the spec for
-    // version 1.4.
+    // All comments referring to the PDF spec refer to the spec for version 1.4.
 
     // Check all values in linearization parameter dictionary
 
@@ -476,24 +468,21 @@ QPDF::checkLinearizationInternal()
             "; file = " + std::to_string(m->file->tell()));
     }
 
-    // P: first page number -- Implementation note 124 says Acrobat
-    // ignores this value, so we will too.
+    // P: first page number -- Implementation note 124 says Acrobat ignores this value, so we will
+    // too.
 
-    // Check numbering of compressed objects in each xref section.
-    // For linearized files, all compressed objects are supposed to be
-    // at the end of the containing xref section if any object streams
-    // are in use.
+    // Check numbering of compressed objects in each xref section. For linearized files, all
+    // compressed objects are supposed to be at the end of the containing xref section if any object
+    // streams are in use.
 
     if (m->uncompressed_after_compressed) {
-        linearizationWarning("linearized file contains an uncompressed object"
-                             " after a compressed one in a cross-reference stream");
+        linearizationWarning("linearized file contains an uncompressed object after a compressed "
+                             "one in a cross-reference stream");
     }
 
-    // Further checking requires optimization and order calculation.
-    // Don't allow optimization to make changes.  If it has to, then
-    // the file is not properly linearized.  We use the xref table to
-    // figure out which objects are compressed and which are
-    // uncompressed.
+    // Further checking requires optimization and order calculation. Don't allow optimization to
+    // make changes.  If it has to, then the file is not properly linearized.  We use the xref table
+    // to figure out which objects are compressed and which are uncompressed.
     { // local scope
         std::map<int, int> object_stream_data;
         for (auto const& iter: m->xref_table) {
@@ -507,16 +496,13 @@ QPDF::checkLinearizationInternal()
         calculateLinearizationData(object_stream_data);
     }
 
-    // E: offset of end of first page -- Implementation note 123 says
-    // Acrobat includes on extra object here by mistake.  pdlin fails
-    // to place thumbnail images in section 9, so when thumbnails are
-    // present, it also gets the wrong value for /E.  It also doesn't
-    // count outlines here when it should even though it places them
-    // in part 6.  This code fails to put thread information
-    // dictionaries in part 9, so it actually gets the wrong value for
-    // E when threads are present.  In that case, it would probably
-    // agree with pdlin.  As of this writing, the test suite doesn't
-    // contain any files with threads.
+    // E: offset of end of first page -- Implementation note 123 says Acrobat includes on extra
+    // object here by mistake.  pdlin fails to place thumbnail images in section 9, so when
+    // thumbnails are present, it also gets the wrong value for /E.  It also doesn't count outlines
+    // here when it should even though it places them in part 6.  This code fails to put thread
+    // information dictionaries in part 9, so it actually gets the wrong value for E when threads
+    // are present.  In that case, it would probably agree with pdlin.  As of this writing, the test
+    // suite doesn't contain any files with threads.
 
     if (m->part6.empty()) {
         stopOnError("linearization part 6 unexpectedly empty");
@@ -577,8 +563,7 @@ QPDF::getLinearizationOffset(QPDFObjGen const& og)
         break;
 
     case 2:
-        // For compressed objects, return the offset of the object
-        // stream that contains them.
+        // For compressed objects, return the offset of the object stream that contains them.
         result = getLinearizationOffset(QPDFObjGen(entry.getObjStreamNumber(), 0));
         break;
 
@@ -611,8 +596,7 @@ QPDF::lengthNextN(int first_object, int n)
                 "no xref table entry for " + std::to_string(first_object + i) + " 0");
         } else {
             if (m->obj_cache.count(og) == 0) {
-                stopOnError("found unknown object while"
-                            " calculating length for linearization data");
+                stopOnError("found unknown object while calculating length for linearization data");
             }
             length += toI(m->obj_cache[og].end_after_space - getLinearizationOffset(og));
         }
@@ -624,22 +608,17 @@ void
 QPDF::checkHPageOffset(
     std::vector<QPDFObjectHandle> const& pages, std::map<int, int>& shared_idx_to_obj)
 {
-    // Implementation note 126 says Acrobat always sets
-    // delta_content_offset and delta_content_length in the page
-    // offset header dictionary to 0.  It also states that
-    // min_content_offset in the per-page information is always 0,
-    // which is an incorrect value.
+    // Implementation note 126 says Acrobat always sets delta_content_offset and
+    // delta_content_length in the page offset header dictionary to 0.  It also states that
+    // min_content_offset in the per-page information is always 0, which is an incorrect value.
 
-    // Implementation note 127 explains that Acrobat always sets item
-    // 8 (min_content_length) to zero, item 9
-    // (nbits_delta_content_length) to the value of item 5
-    // (nbits_delta_page_length), and item 7 of each per-page hint
-    // table (delta_content_length) to item 2 (delta_page_length) of
-    // that entry.  Acrobat ignores these values when reading files.
+    // Implementation note 127 explains that Acrobat always sets item 8 (min_content_length) to
+    // zero, item 9 (nbits_delta_content_length) to the value of item 5 (nbits_delta_page_length),
+    // and item 7 of each per-page hint table (delta_content_length) to item 2 (delta_page_length)
+    // of that entry.  Acrobat ignores these values when reading files.
 
-    // Empirically, it also seems that Acrobat sometimes puts items
-    // under a page's /Resources dictionary in with shared objects
-    // even when they are private.
+    // Empirically, it also seems that Acrobat sometimes puts items under a page's /Resources
+    // dictionary in with shared objects even when they are private.
 
     int npages = toI(pages.size());
     qpdf_offset_t table_offset = adjusted_offset(m->page_offset_hints.first_page_offset);
@@ -670,13 +649,12 @@ QPDF::checkHPageOffset(
                 std::to_string(h_nobjects) + "; computed = " + std::to_string(ce.nobjects));
         }
 
-        // Use value for number of objects in hint table rather than
-        // computed value if there is a discrepancy.
+        // Use value for number of objects in hint table rather than computed value if there is a
+        // discrepancy.
         int length = lengthNextN(first_object, h_nobjects);
         int h_length = toI(he.delta_page_length + m->page_offset_hints.min_page_length);
         if (length != h_length) {
-            // This condition almost certainly indicates a bad hint
-            // table or a bug in this code.
+            // This condition almost certainly indicates a bad hint table or a bug in this code.
             linearizationWarning(
                 "page length mismatch for page " + std::to_string(pageno) + ": hint table = " +
                 std::to_string(h_length) + "; computed length = " + std::to_string(length) +
@@ -690,8 +668,8 @@ QPDF::checkHPageOffset(
         std::set<int> computed_shared;
 
         if ((pageno == 0) && (he.nshared_objects > 0)) {
-            // pdlin and Acrobat both do this even though the spec
-            // states clearly and unambiguously that they should not.
+            // pdlin and Acrobat both do this even though the spec states clearly and unambiguously
+            // that they should not.
             linearizationWarning("page 0 has shared identifier entries");
         }
 
@@ -724,9 +702,8 @@ QPDF::checkHPageOffset(
 
         for (int iter: computed_shared) {
             if (!hint_shared.count(iter)) {
-                // Acrobat does not put some things including at least
-                // built-in fonts and procsets here, at least in some
-                // cases.
+                // Acrobat does not put some things including at least built-in fonts and procsets
+                // here, at least in some cases.
                 linearizationWarning(
                     ("page " + std::to_string(pageno) + ": shared object " + std::to_string(iter) +
                      ": in computed list but not hint table"));
@@ -738,31 +715,26 @@ QPDF::checkHPageOffset(
 void
 QPDF::checkHSharedObject(std::vector<QPDFObjectHandle> const& pages, std::map<int, int>& idx_to_obj)
 {
-    // Implementation note 125 says shared object groups always
-    // contain only one object.  Implementation note 128 says that
-    // Acrobat always nbits_nobjects to zero.  Implementation note 130
-    // says that Acrobat does not support more than one shared object
-    // per group.  These are all consistent.
+    // Implementation note 125 says shared object groups always contain only one object.
+    // Implementation note 128 says that Acrobat always nbits_nobjects to zero.  Implementation note
+    // 130 says that Acrobat does not support more than one shared object per group.  These are all
+    // consistent.
 
-    // Implementation note 129 states that MD5 signatures are not
-    // implemented in Acrobat, so signature_present must always be
-    // zero.
+    // Implementation note 129 states that MD5 signatures are not implemented in Acrobat, so
+    // signature_present must always be zero.
 
-    // Implementation note 131 states that first_shared_obj and
-    // first_shared_offset have meaningless values for single-page
-    // files.
+    // Implementation note 131 states that first_shared_obj and first_shared_offset have meaningless
+    // values for single-page files.
 
-    // Empirically, Acrobat and pdlin generate incorrect values for
-    // these whenever there are no shared objects not referenced by
-    // the first page (i.e., nshared_total == nshared_first_page).
+    // Empirically, Acrobat and pdlin generate incorrect values for these whenever there are no
+    // shared objects not referenced by the first page (i.e., nshared_total == nshared_first_page).
 
     HSharedObject& so = m->shared_object_hints;
     if (so.nshared_total < so.nshared_first_page) {
         linearizationWarning("shared object hint table: ntotal < nfirst_page");
     } else {
-        // The first nshared_first_page objects are consecutive
-        // objects starting with the first page object.  The rest are
-        // consecutive starting from the first_shared_obj object.
+        // The first nshared_first_page objects are consecutive objects starting with the first page
+        // object.  The rest are consecutive starting from the first_shared_obj object.
         int cur_object = pages.at(0).getObjectID();
         for (int i = 0; i < so.nshared_total; ++i) {
             if (i == so.nshared_first_page) {
@@ -814,12 +786,10 @@ QPDF::checkHSharedObject(std::vector<QPDFObjectHandle> const& pages, std::map<in
 void
 QPDF::checkHOutlines()
 {
-    // Empirically, Acrobat generates the correct value for the object
-    // number but incorrectly stores the next object number's offset
-    // as the offset, at least when outlines appear in part 6.  It
-    // also generates an incorrect value for length (specifically, the
-    // length that would cover the correct number of objects from the
-    // wrong starting place).  pdlin appears to generate correct
+    // Empirically, Acrobat generates the correct value for the object number but incorrectly stores
+    // the next object number's offset as the offset, at least when outlines appear in part 6.  It
+    // also generates an incorrect value for length (specifically, the length that would cover the
+    // correct number of objects from the wrong starting place).  pdlin appears to generate correct
     // values in those cases.
 
     if (m->c_outline_data.nobjects == m->outline_hints.nobjects) {
@@ -831,9 +801,8 @@ QPDF::checkHOutlines()
             // Check length and offset.  Acrobat gets these wrong.
             QPDFObjectHandle outlines = getRoot().getKey("/Outlines");
             if (!outlines.isIndirect()) {
-                // This case is not exercised in test suite since not
-                // permitted by the spec, but if this does occur, the
-                // code below would fail.
+                // This case is not exercised in test suite since not permitted by the spec, but if
+                // this does occur, the code below would fail.
                 linearizationWarning("/Outlines key of root dictionary is not indirect");
                 return;
             }
@@ -906,9 +875,8 @@ QPDF::dumpLinearizationDataInternal()
 qpdf_offset_t
 QPDF::adjusted_offset(qpdf_offset_t offset)
 {
-    // All offsets >= H_offset have to be increased by H_length
-    // since all hint table location values disregard the hint table
-    // itself.
+    // All offsets >= H_offset have to be increased by H_length since all hint table location values
+    // disregard the hint table itself.
     if (offset >= m->linp.H_offset) {
         return offset + m->linp.H_length;
     }
@@ -971,8 +939,8 @@ QPDF::dumpHSharedObject()
         *m->log->getInfo() << "Shared Object " << i << ":\n"
                            << "  group length: " << se.delta_group_length + t.min_group_length
                            << "\n";
-        // PDF spec says signature present nobjects_minus_one are
-        // always 0, so print them only if they have a non-zero value.
+        // PDF spec says signature present nobjects_minus_one are always 0, so print them only if
+        // they have a non-zero value.
         if (se.signature_present) {
             *m->log->getInfo() << "  signature present\n";
         }
@@ -994,44 +962,38 @@ QPDF::dumpHGeneric(HGeneric& t)
 void
 QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 {
-    // This function calculates the ordering of objects, divides them
-    // into the appropriate parts, and computes some values for the
-    // linearization parameter dictionary and hint tables.  The file
-    // must be optimized (via calling optimize()) prior to calling
-    // this function.  Note that actual offsets and lengths are not
-    // computed here, but anything related to object ordering is.
+    // This function calculates the ordering of objects, divides them into the appropriate parts,
+    // and computes some values for the linearization parameter dictionary and hint tables.  The
+    // file must be optimized (via calling optimize()) prior to calling this function.  Note that
+    // actual offsets and lengths are not computed here, but anything related to object ordering is.
 
     if (m->object_to_obj_users.empty()) {
-        // Note that we can't call optimize here because we don't know
-        // whether it should be called with or without allow changes.
-        throw std::logic_error("INTERNAL ERROR: QPDF::calculateLinearizationData "
-                               "called before optimize()");
+        // Note that we can't call optimize here because we don't know whether it should be called
+        // with or without allow changes.
+        throw std::logic_error(
+            "INTERNAL ERROR: QPDF::calculateLinearizationData called before optimize()");
     }
 
-    // Separate objects into the categories sufficient for us to
-    // determine which part of the linearized file should contain the
-    // object.  This categorization is useful for other purposes as
-    // well.  Part numbers refer to version 1.4 of the PDF spec.
+    // Separate objects into the categories sufficient for us to determine which part of the
+    // linearized file should contain the object.  This categorization is useful for other purposes
+    // as well.  Part numbers refer to version 1.4 of the PDF spec.
 
-    // Parts 1, 3, 5, 10, and 11 don't contain any objects from the
-    // original file (except the trailer dictionary in part 11).
+    // Parts 1, 3, 5, 10, and 11 don't contain any objects from the original file (except the
+    // trailer dictionary in part 11).
 
-    // Part 4 is the document catalog (root) and the following root
-    // keys: /ViewerPreferences, /PageMode, /Threads, /OpenAction,
-    // /AcroForm, /Encrypt.  Note that Thread information dictionaries
-    // are supposed to appear in part 9, but we are disregarding that
-    // recommendation for now.
+    // Part 4 is the document catalog (root) and the following root keys: /ViewerPreferences,
+    // /PageMode, /Threads, /OpenAction, /AcroForm, /Encrypt.  Note that Thread information
+    // dictionaries are supposed to appear in part 9, but we are disregarding that recommendation
+    // for now.
 
-    // Part 6 is the first page section.  It includes all remaining
-    // objects referenced by the first page including shared objects
-    // but not including thumbnails.  Additionally, if /PageMode is
+    // Part 6 is the first page section.  It includes all remaining objects referenced by the first
+    // page including shared objects but not including thumbnails.  Additionally, if /PageMode is
     // /Outlines, then information from /Outlines also appears here.
 
-    // Part 7 contains remaining objects private to pages other than
-    // the first page.
+    // Part 7 contains remaining objects private to pages other than the first page.
 
-    // Part 8 contains all remaining shared objects except those that
-    // are shared only within thumbnails.
+    // Part 8 contains all remaining shared objects except those that are shared only within
+    // thumbnails.
 
     // Part 9 contains all remaining objects.
 
@@ -1176,42 +1138,35 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         }
     }
 
-    // Generate ordering for objects in the output file.  Sometimes we
-    // just dump right from a set into a vector.  Rather than
-    // optimizing this by going straight into the vector, we'll leave
-    // these phases separate for now.  That way, this section can be
-    // concerned only with ordering, and the above section can be
-    // considered only with categorization.  Note that sets of
-    // QPDFObjGens are sorted by QPDFObjGen.  In a linearized file,
-    // objects appear in sequence with the possible exception of hints
-    // tables which we won't see here anyway.  That means that running
-    // calculateLinearizationData() on a linearized file should give
-    // results identical to the original file ordering.
+    // Generate ordering for objects in the output file.  Sometimes we just dump right from a set
+    // into a vector.  Rather than optimizing this by going straight into the vector, we'll leave
+    // these phases separate for now.  That way, this section can be concerned only with ordering,
+    // and the above section can be considered only with categorization.  Note that sets of
+    // QPDFObjGens are sorted by QPDFObjGen.  In a linearized file, objects appear in sequence with
+    // the possible exception of hints tables which we won't see here anyway.  That means that
+    // running calculateLinearizationData() on a linearized file should give results identical to
+    // the original file ordering.
 
-    // We seem to traverse the page tree a lot in this code, but we
-    // can address this for a future code optimization if necessary.
-    // Premature optimization is the root of all evil.
+    // We seem to traverse the page tree a lot in this code, but we can address this for a future
+    // code optimization if necessary. Premature optimization is the root of all evil.
     std::vector<QPDFObjectHandle> pages;
     { // local scope
-        // Map all page objects to the containing object stream.  This
-        // should be a no-op in a properly linearized file.
+        // Map all page objects to the containing object stream.  This should be a no-op in a
+        // properly linearized file.
         for (auto oh: getAllPages()) {
             pages.push_back(getUncompressedObject(oh, object_stream_data));
         }
     }
     int npages = toI(pages.size());
 
-    // We will be initializing some values of the computed hint
-    // tables.  Specifically, we can initialize any items that deal
-    // with object numbers or counts but not any items that deal with
-    // lengths or offsets.  The code that writes linearized files will
-    // have to fill in these values during the first pass.  The
-    // validation code can compute them relatively easily given the
-    // rest of the information.
+    // We will be initializing some values of the computed hint tables.  Specifically, we can
+    // initialize any items that deal with object numbers or counts but not any items that deal with
+    // lengths or offsets.  The code that writes linearized files will have to fill in these values
+    // during the first pass.  The validation code can compute them relatively easily given the rest
+    // of the information.
 
-    // npages is the size of the existing pages vector, which has been
-    // created by traversing the pages tree, and as such is a
-    // reasonable size.
+    // npages is the size of the existing pages vector, which has been created by traversing the
+    // pages tree, and as such is a reasonable size.
     m->c_linp.npages = npages;
     m->c_page_offset_data.entries = std::vector<CHPageOffsetEntry>(toS(npages));
 
@@ -1226,11 +1181,9 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         m->part4.push_back(getObject(og));
     }
 
-    // Part 6: first page objects.  Note: implementation note 124
-    // states that Acrobat always treats page 0 as the first page for
-    // linearization regardless of /OpenAction.  pdlin doesn't provide
-    // any option to set this and also disregards /OpenAction.  We
-    // will do the same.
+    // Part 6: first page objects.  Note: implementation note 124 states that Acrobat always treats
+    // page 0 as the first page for linearization regardless of /OpenAction.  pdlin doesn't provide
+    // any option to set this and also disregards /OpenAction.  We will do the same.
 
     // First, place the actual first page object itself.
     if (pages.empty()) {
@@ -1245,10 +1198,9 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     m->c_linp.first_page_object = pages.at(0).getObjectID();
     m->part6.push_back(pages.at(0));
 
-    // The PDF spec "recommends" an order for the rest of the objects,
-    // but we are going to disregard it except to the extent that it
-    // groups private and shared objects contiguously for the sake of
-    // hint tables.
+    // The PDF spec "recommends" an order for the rest of the objects, but we are going to disregard
+    // it except to the extent that it groups private and shared objects contiguously for the sake
+    // of hint tables.
 
     for (auto const& og: lc_first_page_private) {
         m->part6.push_back(getObject(og));
@@ -1263,11 +1215,9 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         pushOutlinesToPart(m->part6, lc_outlines, object_stream_data);
     }
 
-    // Fill in page offset hint table information for the first page.
-    // The PDF spec says that nshared_objects should be zero for the
-    // first page.  pdlin does not appear to obey this, but it fills
-    // in garbage values for all the shared object identifiers on the
-    // first page.
+    // Fill in page offset hint table information for the first page. The PDF spec says that
+    // nshared_objects should be zero for the first page.  pdlin does not appear to obey this, but
+    // it fills in garbage values for all the shared object identifiers on the first page.
 
     m->c_page_offset_data.entries.at(0).nobjects = toI(m->part6.size());
 
@@ -1287,8 +1237,8 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         lc_other_page_private.erase(page_og);
         m->part7.push_back(pages.at(i));
 
-        // Place all non-shared objects referenced by this page,
-        // updating the page object count for the hint table.
+        // Place all non-shared objects referenced by this page, updating the page object count for
+        // the hint table.
 
         m->c_page_offset_data.entries.at(i).nobjects = 1;
 
@@ -1321,12 +1271,10 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     // Part 9: other objects
 
-    // The PDF specification makes recommendations on ordering here.
-    // We follow them only to a limited extent.  Specifically, we put
-    // the pages tree first, then private thumbnail objects in page
-    // order, then shared thumbnail objects, and then outlines (unless
-    // in part 6).  After that, we throw all remaining objects in
-    // arbitrary order.
+    // The PDF specification makes recommendations on ordering here. We follow them only to a
+    // limited extent.  Specifically, we put the pages tree first, then private thumbnail objects in
+    // page order, then shared thumbnail objects, and then outlines (unless in part 6).  After that,
+    // we throw all remaining objects in arbitrary order.
 
     // Place the pages tree.
     std::set<QPDFObjGen> pages_ogs =
@@ -1342,9 +1290,8 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         }
     }
 
-    // Place private thumbnail images in page order.  Slightly more
-    // information would be required if we were going to bother with
-    // thumbnail hint tables.
+    // Place private thumbnail images in page order.  Slightly more information would be required if
+    // we were going to bother with thumbnail hint tables.
     for (size_t i = 0; i < toS(npages); ++i) {
         QPDFObjectHandle thumb = pages.at(i).getKey("/Thumb");
         thumb = getUncompressedObject(thumb, object_stream_data);
@@ -1355,11 +1302,9 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
                 lc_thumbnail_private.erase(thumb_og);
                 m->part9.push_back(thumb);
             } else {
-                // No internal error this time...there's nothing to
-                // stop this object from having been referred to
-                // somewhere else outside of a page's /Thumb, and if
-                // it had been, there's nothing to prevent it from
-                // having been in some set other than
+                // No internal error this time...there's nothing to stop this object from having
+                // been referred to somewhere else outside of a page's /Thumb, and if it had been,
+                // there's nothing to prevent it from having been in some set other than
                 // lc_thumbnail_private.
             }
             std::set<QPDFObjGen>& ogs = m->obj_user_to_objects[ObjUser(ObjUser::ou_thumb, toI(i))];
@@ -1372,9 +1317,8 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         }
     }
     if (!lc_thumbnail_private.empty()) {
-        stopOnError("INTERNAL ERROR: "
-                    "QPDF::calculateLinearizationData: lc_thumbnail_private "
-                    "not empty after placing thumbnails");
+        stopOnError("INTERNAL ERROR: QPDF::calculateLinearizationData: lc_thumbnail_private not "
+                    "empty after placing thumbnails");
     }
 
     // Place shared thumbnail objects
@@ -1404,17 +1348,15 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
             std::to_string(num_placed) + "; number of objects: " + std::to_string(num_wanted));
     }
 
-    // Calculate shared object hint table information including
-    // references to shared objects from page offset hint data.
+    // Calculate shared object hint table information including references to shared objects from
+    // page offset hint data.
 
-    // The shared object hint table consists of all part 6 (whether
-    // shared or not) in order followed by all part 8 objects in
-    // order.  Add the objects to shared object data keeping a map of
-    // object number to index.  Then populate the shared object
-    // information for the pages.
+    // The shared object hint table consists of all part 6 (whether shared or not) in order followed
+    // by all part 8 objects in order.  Add the objects to shared object data keeping a map of
+    // object number to index.  Then populate the shared object information for the pages.
 
-    // Note that two objects never have the same object number, so we
-    // can map from object number only without regards to generation.
+    // Note that two objects never have the same object number, so we can map from object number
+    // only without regards to generation.
     std::map<int, int> obj_to_index;
 
     m->c_shared_object_data.nshared_first_page = toI(m->part6.size());
@@ -1441,8 +1383,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         stopOnError("shared object hint table has wrong number of entries");
     }
 
-    // Now compute the list of shared objects for each page after the
-    // first page.
+    // Now compute the list of shared objects for each page after the first page.
 
     for (size_t i = 1; i < toS(npages); ++i) {
         CHPageOffsetEntry& pe = m->c_page_offset_data.entries.at(i);
@@ -1520,20 +1461,17 @@ QPDF::outputLengthNextN(
     std::map<int, qpdf_offset_t> const& lengths,
     std::map<int, int> const& obj_renumber)
 {
-    // Figure out the length of a series of n consecutive objects in
-    // the output file starting with whatever object in_object from
-    // the input file mapped to.
+    // Figure out the length of a series of n consecutive objects in the output file starting with
+    // whatever object in_object from the input file mapped to.
 
     if (obj_renumber.count(in_object) == 0) {
-        stopOnError("found object that is not renumbered while"
-                    " writing linearization data");
+        stopOnError("found object that is not renumbered while writing linearization data");
     }
     int first = (*(obj_renumber.find(in_object))).second;
     int length = 0;
     for (int i = 0; i < n; ++i) {
         if (lengths.count(first + i) == 0) {
-            stopOnError("found item with unknown length"
-                        " while writing linearization data");
+            stopOnError("found item with unknown length while writing linearization data");
         }
         length += toI((*(lengths.find(first + toI(i)))).second);
     }
@@ -1548,16 +1486,14 @@ QPDF::calculateHPageOffset(
 {
     // Page Offset Hint Table
 
-    // We are purposely leaving some values set to their initial zero
-    // values.
+    // We are purposely leaving some values set to their initial zero values.
 
     std::vector<QPDFObjectHandle> const& pages = getAllPages();
     size_t npages = pages.size();
     CHPageOffset& cph = m->c_page_offset_data;
     std::vector<CHPageOffsetEntry>& cphe = cph.entries;
 
-    // Calculate minimum and maximum values for number of objects per
-    // page and page length.
+    // Calculate minimum and maximum values for number of objects per page and page length.
 
     int min_nobjects = cphe.at(0).nobjects;
     int max_nobjects = min_nobjects;
@@ -1572,11 +1508,11 @@ QPDF::calculateHPageOffset(
     phe = std::vector<HPageOffsetEntry>(npages);
 
     for (unsigned int i = 0; i < npages; ++i) {
-        // Calculate values for each page, assigning full values to
-        // the delta items.  They will be adjusted later.
+        // Calculate values for each page, assigning full values to the delta items.  They will be
+        // adjusted later.
 
-        // Repeat calculations for page 0 so we can assign to phe[i]
-        // without duplicating those assignments.
+        // Repeat calculations for page 0 so we can assign to phe[i] without duplicating those
+        // assignments.
 
         int nobjects = cphe.at(i).nobjects;
         int length = outputLengthNextN(pages.at(i).getObjectID(), nobjects, lengths, obj_renumber);
@@ -1604,11 +1540,10 @@ QPDF::calculateHPageOffset(
     ph.nbits_shared_identifier = nbits(m->c_shared_object_data.nshared_total);
     ph.shared_denominator = 4; // doesn't matter
 
-    // It isn't clear how to compute content offset and content
-    // length.  Since we are not interleaving page objects with the
-    // content stream, we'll use the same values for content length as
-    // page length.  We will use 0 as content offset because this is
-    // what Adobe does (implementation note 127) and pdlin as well.
+    // It isn't clear how to compute content offset and content length.  Since we are not
+    // interleaving page objects with the content stream, we'll use the same values for content
+    // length as page length.  We will use 0 as content offset because this is what Adobe does
+    // (implementation note 127) and pdlin as well.
     ph.nbits_delta_content_length = ph.nbits_delta_page_length;
     ph.min_content_length = ph.min_page_length;
 
@@ -1616,8 +1551,8 @@ QPDF::calculateHPageOffset(
         // Adjust delta entries
         if ((phe.at(i).delta_nobjects < min_nobjects) ||
             (phe.at(i).delta_page_length < min_length)) {
-            stopOnError("found too small delta nobjects or delta page length"
-                        " while writing linearization data");
+            stopOnError("found too small delta nobjects or delta page length while writing "
+                        "linearization data");
         }
         phe.at(i).delta_nobjects -= min_nobjects;
         phe.at(i).delta_page_length -= min_length;
@@ -1669,8 +1604,7 @@ QPDF::calculateHSharedObject(
     for (size_t i = 0; i < toS(cso.nshared_total); ++i) {
         // Adjust deltas
         if (soe.at(i).delta_group_length < min_length) {
-            stopOnError("found too small group length while"
-                        " writing linearization data");
+            stopOnError("found too small group length while writing linearization data");
         }
         soe.at(i).delta_group_length -= min_length;
     }
@@ -1700,14 +1634,13 @@ template <class T, class int_type>
 static void
 write_vector_int(BitWriter& w, int nitems, std::vector<T>& vec, int bits, int_type T::*field)
 {
-    // nitems times, write bits bits from the given field of the ith
-    // vector to the given bit writer.
+    // nitems times, write bits bits from the given field of the ith vector to the given bit writer.
 
     for (size_t i = 0; i < QIntC::to_size(nitems); ++i) {
         w.writeBits(QIntC::to_ulonglong(vec.at(i).*field), QIntC::to_size(bits));
     }
-    // The PDF spec says that each hint table starts at a byte
-    // boundary.  Each "row" actually must start on a byte boundary.
+    // The PDF spec says that each hint table starts at a byte boundary.  Each "row" actually must
+    // start on a byte boundary.
     w.flush();
 }
 
@@ -1721,8 +1654,8 @@ write_vector_vector(
     int bits,
     std::vector<int> T::*vec2)
 {
-    // nitems1 times, write nitems2 (from the ith element of vec1) items
-    // from the vec2 vector field of the ith item of vec1.
+    // nitems1 times, write nitems2 (from the ith element of vec1) items from the vec2 vector field
+    // of the ith item of vec1.
     for (size_t i1 = 0; i1 < QIntC::to_size(nitems1); ++i1) {
         for (size_t i2 = 0; i2 < QIntC::to_size(vec1.at(i1).*nitems2); ++i2) {
             w.writeBits(QIntC::to_ulonglong((vec1.at(i1).*vec2).at(i2)), QIntC::to_size(bits));
@@ -1835,8 +1768,8 @@ QPDF::generateHintStream(
     calculateHSharedObject(xref, lengths, obj_renumber);
     calculateHOutline(xref, lengths, obj_renumber);
 
-    // Write the hint stream itself into a compressed memory buffer.
-    // Write through a counter so we can get offsets.
+    // Write the hint stream itself into a compressed memory buffer. Write through a counter so we
+    // can get offsets.
     Pl_Buffer hint_stream("hint stream");
     Pl_Flate f("compress hint stream", &hint_stream, Pl_Flate::a_deflate);
     Pl_Count c("count", &f);

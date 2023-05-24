@@ -15,9 +15,8 @@ QPDFAcroFormDocumentHelper::QPDFAcroFormDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
     m(new Members())
 {
-    // We have to analyze up front. Otherwise, when we are adding
-    // annotations and fields, we are in a temporarily unstable
-    // configuration where some widget annotations are not reachable.
+    // We have to analyze up front. Otherwise, when we are adding annotations and fields, we are in
+    // a temporarily unstable configuration where some widget annotations are not reachable.
     analyze();
 }
 
@@ -77,14 +76,11 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(std::vector<QPDFObjectHandle>
             }
 
             if (obj.hasKey("/T")) {
-                // Find something we can append to the partial name that
-                // makes the fully qualified name unique. When we find
-                // something, reuse the same suffix for all fields in this
-                // group with the same name. We can only change the name
-                // of fields that have /T, and this field's /T is always
-                // at the end of the fully qualified name, appending to /T
-                // has the effect of appending the same thing to the fully
-                // qualified name.
+                // Find something we can append to the partial name that makes the fully qualified
+                // name unique. When we find something, reuse the same suffix for all fields in this
+                // group with the same name. We can only change the name of fields that have /T, and
+                // this field's /T is always at the end of the fully qualified name, appending to /T
+                // has the effect of appending the same thing to the fully qualified name.
                 std::string old_name = QPDFFormFieldObjectHelper(obj).getFullyQualifiedName();
                 if (renames.count(old_name) == 0) {
                     std::string new_name = old_name;
@@ -253,8 +249,7 @@ QPDFAcroFormDocumentHelper::analyze()
         fields = QPDFObjectHandle::newArray();
     }
 
-    // Traverse /AcroForm to find annotations and map them
-    // bidirectionally to fields.
+    // Traverse /AcroForm to find annotations and map them bidirectionally to fields.
 
     QPDFObjGen::set visited;
     int nfields = fields.getArrayNItems();
@@ -263,12 +258,10 @@ QPDFAcroFormDocumentHelper::analyze()
         traverseField(fields.getArrayItem(i), null, 0, visited);
     }
 
-    // All Widget annotations should have been encountered by
-    // traversing /AcroForm, but in case any weren't, find them by
-    // walking through pages, and treat any widget annotation that is
-    // not associated with a field as its own field. This just ensures
-    // that requesting the field for any annotation we find through a
-    // page's /Annots list will have some associated field. Note that
+    // All Widget annotations should have been encountered by traversing /AcroForm, but in case any
+    // weren't, find them by walking through pages, and treat any widget annotation that is not
+    // associated with a field as its own field. This just ensures that requesting the field for any
+    // annotation we find through a page's /Annots list will have some associated field. Note that
     // a file that contains this kind of error will probably not
     // actually work with most viewers.
 
@@ -278,13 +271,11 @@ QPDFAcroFormDocumentHelper::analyze()
             QPDFObjGen og(annot.getObjGen());
             if (m->annotation_to_field.count(og) == 0) {
                 QTC::TC("qpdf", "QPDFAcroFormDocumentHelper orphaned widget");
-                // This is not supposed to happen, but it's easy
-                // enough for us to handle this case. Treat the
-                // annotation as its own field. This could allow qpdf
-                // to sensibly handle a case such as a PDF creator
-                // adding a self-contained annotation (merged with the
-                // field dictionary) to the page's /Annots array and
-                // forgetting to also put it in /AcroForm.
+                // This is not supposed to happen, but it's easy enough for us to handle this case.
+                // Treat the annotation as its own field. This could allow qpdf to sensibly handle a
+                // case such as a PDF creator adding a self-contained annotation (merged with the
+                // field dictionary) to the page's /Annots array and forgetting to also put it in
+                // /AcroForm.
                 annot.warnIfPossible("this widget annotation is not"
                                      " reachable from /AcroForm in the document catalog");
                 m->annotation_to_field[og] = QPDFFormFieldObjectHelper(annot);
@@ -299,14 +290,14 @@ QPDFAcroFormDocumentHelper::traverseField(
     QPDFObjectHandle field, QPDFObjectHandle parent, int depth, QPDFObjGen::set& visited)
 {
     if (depth > 100) {
-        // Arbitrarily cut off recursion at a fixed depth to avoid
-        // specially crafted files that could cause stack overflow.
+        // Arbitrarily cut off recursion at a fixed depth to avoid specially crafted files that
+        // could cause stack overflow.
         return;
     }
     if (!field.isIndirect()) {
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper direct field");
-        field.warnIfPossible("encountered a direct object as a field or annotation while"
-                             " traversing /AcroForm; ignoring field or annotation");
+        field.warnIfPossible("encountered a direct object as a field or annotation while "
+                             "traversing /AcroForm; ignoring field or annotation");
         return;
     }
     if (!field.isDictionary()) {
@@ -322,13 +313,11 @@ QPDFAcroFormDocumentHelper::traverseField(
         return;
     }
 
-    // A dictionary encountered while traversing the /AcroForm field
-    // may be a form field, an annotation, or the merger of the two. A
-    // field that has no fields below it is a terminal. If a terminal
-    // field looks like an annotation, it is an annotation because
-    // annotation dictionary fields can be merged with terminal field
-    // dictionaries. Otherwise, the annotation fields might be there
-    // to be inherited by annotations below it.
+    // A dictionary encountered while traversing the /AcroForm field may be a form field, an
+    // annotation, or the merger of the two. A field that has no fields below it is a terminal. If a
+    // terminal field looks like an annotation, it is an annotation because annotation dictionary
+    // fields can be merged with terminal field dictionaries. Otherwise, the annotation fields might
+    // be there to be inherited by annotations below it.
 
     bool is_annotation = false;
     bool is_field = (0 == depth);
@@ -363,8 +352,7 @@ QPDFAcroFormDocumentHelper::traverseField(
         std::string name = foh.getFullyQualifiedName();
         auto old = m->field_to_name.find(f_og);
         if (old != m->field_to_name.end()) {
-            // We might be updating after a name change, so remove any
-            // old information
+            // We might be updating after a name change, so remove any old information
             std::string old_name = old->second;
             m->name_to_fields[old_name].erase(f_og);
         }
@@ -412,11 +400,9 @@ QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded()
         for (auto& aoh: getWidgetAnnotationsForPage(page)) {
             QPDFFormFieldObjectHelper ffh = getFieldForAnnotation(aoh);
             if (ffh.getFieldType() == "/Btn") {
-                // Rather than generating appearances for button
-                // fields, rely on what's already there. Just make
-                // sure /AS is consistent with /V, which we can do by
-                // resetting the value of the field back to itself.
-                // This code is referenced in a comment in
+                // Rather than generating appearances for button fields, rely on what's already
+                // there. Just make sure /AS is consistent with /V, which we can do by resetting the
+                // value of the field back to itself. This code is referenced in a comment in
                 // QPDFFormFieldObjectHelper::generateAppearance.
                 if (ffh.isRadioButton() || ffh.isCheckbox()) {
                     ffh.setV(ffh.getValue());
@@ -437,16 +423,13 @@ QPDFAcroFormDocumentHelper::adjustInheritedFields(
     bool override_q,
     int from_default_q)
 {
-    // Override /Q or /DA if needed. If this object has a field type,
-    // directly or inherited, it is a field and not just an
-    // annotation. In that case, we need to override if we are getting
-    // a value from the document that is different from the value we
-    // would have gotten from the old document. We must take care not
-    // to override an explicit value. It's possible that /FT may be
-    // inherited by lower fields that may explicitly set /DA or /Q or
-    // that this is a field whose type does not require /DA or /Q and
-    // we may be put a value on the field that is unused. This is
-    // harmless, so it's not worth trying to work around.
+    // Override /Q or /DA if needed. If this object has a field type, directly or inherited, it is a
+    // field and not just an annotation. In that case, we need to override if we are getting a value
+    // from the document that is different from the value we would have gotten from the old
+    // document. We must take care not to override an explicit value. It's possible that /FT may be
+    // inherited by lower fields that may explicitly set /DA or /Q or that this is a field whose
+    // type does not require /DA or /Q and we may be put a value on the field that is unused. This
+    // is harmless, so it's not worth trying to work around.
 
     auto has_explicit = [](QPDFFormFieldObjectHelper& field, std::string const& key) {
         if (field.getObjectHandle().hasKey(key)) {
@@ -550,45 +533,36 @@ void
 QPDFAcroFormDocumentHelper::adjustDefaultAppearances(
     QPDFObjectHandle obj, std::map<std::string, std::map<std::string, std::string>> const& dr_map)
 {
-    // This method is called on a field that has been copied from
-    // another file but whose /DA still refers to resources in the
-    // original file's /DR.
+    // This method is called on a field that has been copied from another file but whose /DA still
+    // refers to resources in the original file's /DR.
 
-    // When appearance streams are generated for variable text fields
-    // (see ISO 32000 PDF spec section 12.7.3.3), the field's /DA is
-    // used to generate content of the appearance stream. /DA contains
-    // references to resources that may be resolved in the document's
-    // /DR dictionary, which appears in the document's /AcroForm
-    // dictionary. For fields that we copied from other documents, we
-    // need to ensure that resources are mapped correctly in the case
-    // of conflicting names. For example, if a.pdf's /DR has /F1
-    // pointing to one font and b.pdf's /DR also has /F1 but it points
-    // elsewhere, we need to make sure appearance streams of fields
-    // copied from b.pdf into a.pdf use whatever font /F1 meant in
-    // b.pdf, not whatever it means in a.pdf. This method takes care
-    // of that. It is only called on fields copied from foreign files.
+    // When appearance streams are generated for variable text fields (see ISO 32000 PDF spec
+    // section 12.7.3.3), the field's /DA is used to generate content of the appearance stream. /DA
+    // contains references to resources that may be resolved in the document's /DR dictionary, which
+    // appears in the document's /AcroForm dictionary. For fields that we copied from other
+    // documents, we need to ensure that resources are mapped correctly in the case of conflicting
+    // names. For example, if a.pdf's /DR has /F1 pointing to one font and b.pdf's /DR also has /F1
+    // but it points elsewhere, we need to make sure appearance streams of fields copied from b.pdf
+    // into a.pdf use whatever font /F1 meant in b.pdf, not whatever it means in a.pdf. This method
+    // takes care of that. It is only called on fields copied from foreign files.
 
     // A few notes:
     //
-    // * If the from document's /DR and the current document's /DR
-    //   have conflicting keys, we have already resolved the conflicts
-    //   before calling this method. The dr_map parameter contains the
-    //   mapping from old keys to new keys.
+    // * If the from document's /DR and the current document's /DR have conflicting keys, we have
+    //   already resolved the conflicts before calling this method. The dr_map parameter contains
+    //   the mapping from old keys to new keys.
     //
-    // * /DA may be inherited from the document's /AcroForm
-    //   dictionary. By the time this method has been called, we have
-    //   already copied any document-level values into the fields to
-    //   avoid having them inherit from the new document. This was
-    //   done in adjustInheritedFields.
+    // * /DA may be inherited from the document's /AcroForm dictionary. By the time this method has
+    //   been called, we have already copied any document-level values into the fields to avoid
+    //   having them inherit from the new document. This was done in adjustInheritedFields.
 
     auto DA = obj.getKey("/DA");
     if (!DA.isString()) {
         return;
     }
 
-    // Find names in /DA. /DA is a string that contains content
-    // stream-like code, so we create a stream out of the string and
-    // then filter it. We don't attach the stream to anything, so it
+    // Find names in /DA. /DA is a string that contains content stream-like code, so we create a
+    // stream out of the string and then filter it. We don't attach the stream to anything, so it
     // will get discarded.
     ResourceFinder rf;
     auto da_stream = QPDFObjectHandle::newStream(&this->qpdf, DA.getUTF8Value());
@@ -599,8 +573,8 @@ QPDFAcroFormDocumentHelper::adjustDefaultAppearances(
             QTC::TC("qpdf", "QPDFAcroFormDocumentHelper /DA parse error");
         }
     } catch (std::exception& e) {
-        // No way to reproduce in test suite right now since error
-        // conditions are converted to warnings.
+        // No way to reproduce in test suite right now since error conditions are converted to
+        // warnings.
         obj.warnIfPossible(
             std::string("Unable to parse /DA: ") + e.what() +
             "; this form field may not update properly");
@@ -620,15 +594,12 @@ void
 QPDFAcroFormDocumentHelper::adjustAppearanceStream(
     QPDFObjectHandle stream, std::map<std::string, std::map<std::string, std::string>> dr_map)
 {
-    // We don't have to modify appearance streams or their resource
-    // dictionaries for them to display properly, but we need to do so
-    // to make them save to regenerate. Suppose an appearance stream
-    // as a font /F1 that is different from /F1 in /DR, and that when
-    // we copy the field, /F1 is remapped to /F1_1. When the field is
-    // regenerated, /F1_1 won't appear in the stream's resource
-    // dictionary, so the regenerated appearance stream will revert to
-    // the /F1_1 in /DR. If we adjust existing appearance streams, we
-    // are protected from this problem.
+    // We don't have to modify appearance streams or their resource dictionaries for them to display
+    // properly, but we need to do so to make them save to regenerate. Suppose an appearance stream
+    // as a font /F1 that is different from /F1 in /DR, and that when we copy the field, /F1 is
+    // remapped to /F1_1. When the field is regenerated, /F1_1 won't appear in the stream's resource
+    // dictionary, so the regenerated appearance stream will revert to the /F1_1 in /DR. If we
+    // adjust existing appearance streams, we are protected from this problem.
 
     auto dict = stream.getDict();
     auto resources = dict.getKey("/Resources");
@@ -640,17 +611,15 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
         resources = this->qpdf.makeIndirectObject(resources);
     }
     dict.replaceKey("/Resources", resources);
-    // Create a dictionary with top-level keys so we can use
-    // mergeResources to force them to be unshared. We will also use
-    // this to resolve conflicts that may already be in the resource
+    // Create a dictionary with top-level keys so we can use mergeResources to force them to be
+    // unshared. We will also use this to resolve conflicts that may already be in the resource
     // dictionary.
     auto merge_with = QPDFObjectHandle::newDictionary();
     for (auto const& top_key: dr_map) {
         merge_with.replaceKey(top_key.first, QPDFObjectHandle::newDictionary());
     }
     resources.mergeResources(merge_with);
-    // Rename any keys in the resource dictionary that we
-    // remapped.
+    // Rename any keys in the resource dictionary that we remapped.
     for (auto const& i1: dr_map) {
         std::string const& top_key = i1.first;
         auto subdict = resources.getKey(top_key);
@@ -662,12 +631,10 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
             std::string const& new_key = i2.second;
             auto existing_new = subdict.getKey(new_key);
             if (!existing_new.isNull()) {
-                // The resource dictionary already has a key in it
-                // matching what we remapped an old key to, so we'll
-                // have to move it out of the way. Stick it in
-                // merge_with, which we will re-merge with the
-                // dictionary when we're done. We know merge_with
-                // already has dictionaries for all the top keys.
+                // The resource dictionary already has a key in it matching what we remapped an old
+                // key to, so we'll have to move it out of the way. Stick it in merge_with, which we
+                // will re-merge with the dictionary when we're done. We know merge_with already has
+                // dictionaries for all the top keys.
                 QTC::TC("qpdf", "QPDFAcroFormDocumentHelper ap conflict");
                 merge_with.getKey(top_key).replaceKey(new_key, existing_new);
             }
@@ -679,9 +646,8 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
             }
         }
     }
-    // Deal with any any conflicts by re-merging with merge_with and
-    // updating our local copy of dr_map, which we will use to modify
-    // the stream contents.
+    // Deal with any any conflicts by re-merging with merge_with and updating our local copy of
+    // dr_map, which we will use to modify the stream contents.
     resources.mergeResources(merge_with, &dr_map);
     // Remove empty subdictionaries
     for (auto iter: resources.ditems()) {
@@ -702,8 +668,8 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
         auto tf = std::shared_ptr<QPDFObjectHandle::TokenFilter>(rr);
         stream.addTokenFilter(tf);
     } catch (std::exception& e) {
-        // No way to reproduce in test suite right now since error
-        // conditions are converted to warnings.
+        // No way to reproduce in test suite right now since error conditions are converted to
+        // warnings.
         stream.warnIfPossible(std::string("Unable to parse appearance stream: ") + e.what());
     }
 }
@@ -729,24 +695,22 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     }
     bool foreign = (from_qpdf != &this->qpdf);
 
-    // It's possible that we will transform annotations that don't
-    // include any form fields. This code takes care not to muck
-    // around with /AcroForm unless we have to.
+    // It's possible that we will transform annotations that don't include any form fields. This
+    // code takes care not to muck around with /AcroForm unless we have to.
 
     QPDFObjectHandle acroform = this->qpdf.getRoot().getKey("/AcroForm");
     QPDFObjectHandle from_acroform = from_qpdf->getRoot().getKey("/AcroForm");
 
-    // /DA and /Q may be inherited from the document-level /AcroForm
-    // dictionary. If we are copying a foreign stream and the stream
-    // is getting one of these values from its document's /AcroForm,
-    // we will need to copy the value explicitly so that it doesn't
-    // start getting its default from the destination document.
+    // /DA and /Q may be inherited from the document-level /AcroForm dictionary. If we are copying a
+    // foreign stream and the stream is getting one of these values from its document's /AcroForm,
+    // we will need to copy the value explicitly so that it doesn't start getting its default from
+    // the destination document.
     bool override_da = false;
     bool override_q = false;
     std::string from_default_da;
     int from_default_q = 0;
-    // If we copy any form fields, we will need to merge the source
-    // document's /DR into this document's /DR.
+    // If we copy any form fields, we will need to merge the source document's /DR into this
+    // document's /DR.
     QPDFObjectHandle from_dr = QPDFObjectHandle::newNull();
     if (foreign) {
         std::string default_da;
@@ -782,9 +746,8 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         }
     }
 
-    // If we have to merge /DR, we will need a mapping of conflicting
-    // keys for rewriting /DA. Set this up for lazy initialization in
-    // case we encounter any form fields.
+    // If we have to merge /DR, we will need a mapping of conflicting keys for rewriting /DA. Set
+    // this up for lazy initialization in case we encounter any form fields.
     std::map<std::string, std::map<std::string, std::string>> dr_map;
     bool initialized_dr_map = false;
     QPDFObjectHandle dr = QPDFObjectHandle::newNull();
@@ -804,11 +767,9 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             if (!dr.isIndirect()) {
                 dr = acroform.replaceKeyAndGetNew("/DR", this->qpdf.makeIndirectObject(dr));
             }
-            // Merge the other document's /DR, creating a conflict
-            // map. mergeResources checks to make sure both objects
-            // are dictionaries. By this point, if this is foreign,
-            // from_dr has been copied, so we use the target qpdf as
-            // the owning qpdf.
+            // Merge the other document's /DR, creating a conflict map. mergeResources checks to
+            // make sure both objects are dictionaries. By this point, if this is foreign, from_dr
+            // has been copied, so we use the target qpdf as the owning qpdf.
             from_dr.makeResourcesIndirect(this->qpdf);
             dr.mergeResources(from_dr, &dr_map);
 
@@ -818,8 +779,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         }
     };
 
-    // This helper prevents us from copying the same object
-    // multiple times.
+    // This helper prevents us from copying the same object multiple times.
     std::map<QPDFObjGen, QPDFObjectHandle> orig_to_copy;
     auto maybe_copy_object = [&](QPDFObjectHandle& to_copy) {
         auto og = to_copy.getObjGen();
@@ -842,39 +802,28 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             continue;
         }
 
-        // Make copies of annotations and fields down to the
-        // appearance streams, preserving all internal referential
-        // integrity. When the incoming annotations are from a
-        // different file, we first copy them locally. Then, whether
-        // local or foreign, we copy them again so that if we bring
-        // the same annotation in multiple times (e.g. overlaying a
-        // foreign page onto multiple local pages or a local page onto
-        // multiple other local pages), we don't create annotations
-        // that are referenced in more than one place. If we did that,
-        // the effect of applying transformations would be cumulative,
-        // which is definitely not what we want. Besides, annotations
-        // and fields are not intended to be referenced in multiple
-        // places.
+        // Make copies of annotations and fields down to the appearance streams, preserving all
+        // internal referential integrity. When the incoming annotations are from a different file,
+        // we first copy them locally. Then, whether local or foreign, we copy them again so that if
+        // we bring the same annotation in multiple times (e.g. overlaying a foreign page onto
+        // multiple local pages or a local page onto multiple other local pages), we don't create
+        // annotations that are referenced in more than one place. If we did that, the effect of
+        // applying transformations would be cumulative, which is definitely not what we want.
+        // Besides, annotations and fields are not intended to be referenced in multiple places.
 
-        // Determine if this annotation is attached to a form field.
-        // If so, the annotation may be the same object as the form
-        // field, or the form field may have the annotation as a kid.
-        // In either case, we have to walk up the field structure to
-        // find the top-level field. Within one iteration through a
-        // set of annotations, we don't want to copy the same item
-        // more than once. For example, suppose we have field A with
-        // kids B, C, and D, each of which has annotations BA, CA, and
-        // DA. When we get to BA, we will find that BA is a kid of B
-        // which is under A. When we do a copyForeignObject of A, it
-        // will also copy everything else because of the indirect
-        // references. When we clone BA, we will want to clone A and
-        // then update A's clone's kid to point B's clone and B's
-        // clone's parent to point to A's clone. The same thing holds
-        // for annotations. Next, when we get to CA, we will again
-        // discover that A is the top, but we don't want to re-copy A.
-        // We want CA's clone to be linked to the same clone as BA's.
-        // Failure to do this will break up things like radio button
-        // groups, which all have to kids of the same parent.
+        // Determine if this annotation is attached to a form field. If so, the annotation may be
+        // the same object as the form field, or the form field may have the annotation as a kid. In
+        // either case, we have to walk up the field structure to find the top-level field. Within
+        // one iteration through a set of annotations, we don't want to copy the same item more than
+        // once. For example, suppose we have field A with kids B, C, and D, each of which has
+        // annotations BA, CA, and DA. When we get to BA, we will find that BA is a kid of B which
+        // is under A. When we do a copyForeignObject of A, it will also copy everything else
+        // because of the indirect references. When we clone BA, we will want to clone A and then
+        // update A's clone's kid to point B's clone and B's clone's parent to point to A's clone.
+        // The same thing holds for annotations. Next, when we get to CA, we will again discover
+        // that A is the top, but we don't want to re-copy A. We want CA's clone to be linked to the
+        // same clone as BA's. Failure to do this will break up things like radio button groups,
+        // which all have to kids of the same parent.
 
         auto ffield = from_afdh->getFieldForAnnotation(annot);
         auto ffield_oh = ffield.getObjectHandle();
@@ -886,36 +835,29 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         } else if ((!ffield_oh.isNull()) && (!ffield_oh.isIndirect())) {
             ffield_oh.warnIfPossible("ignoring form field not indirect");
         } else if (!ffield_oh.isNull()) {
-            // A field and its associated annotation can be the same
-            // object. This matters because we don't want to clone the
-            // annotation and field separately in this case.
+            // A field and its associated annotation can be the same object. This matters because we
+            // don't want to clone the annotation and field separately in this case.
             have_field = true;
             // Find the top-level field. It may be the field itself.
             top_field = ffield.getTopLevelField(&have_parent).getObjectHandle();
             if (foreign) {
-                // copyForeignObject returns the same value if called
-                // multiple times with the same field. Create/retrieve
-                // the local copy of the original field. This pulls
-                // over everything the field references including
-                // annotations and appearance streams, but it's
-                // harmless to call copyForeignObject on them too.
-                // They will already be copied, so we'll get the right
-                // object back.
+                // copyForeignObject returns the same value if called multiple times with the same
+                // field. Create/retrieve the local copy of the original field. This pulls over
+                // everything the field references including annotations and appearance streams, but
+                // it's harmless to call copyForeignObject on them too. They will already be copied,
+                // so we'll get the right object back.
 
                 // top_field and ffield_oh are known to be indirect.
                 top_field = this->qpdf.copyForeignObject(top_field);
                 ffield_oh = this->qpdf.copyForeignObject(ffield_oh);
             } else {
-                // We don't need to add top_field to old_fields if
-                // it's foreign because the new copy of the foreign
-                // field won't be referenced anywhere. It's just the
-                // starting point for us to make an additional local
-                // copy of.
+                // We don't need to add top_field to old_fields if it's foreign because the new copy
+                // of the foreign field won't be referenced anywhere. It's just the starting point
+                // for us to make an additional local copy of.
                 old_fields.insert(top_field.getObjGen());
             }
 
-            // Traverse the field, copying kids, and preserving
-            // integrity.
+            // Traverse the field, copying kids, and preserving integrity.
             std::list<QPDFObjectHandle> queue;
             QPDFObjGen::set seen;
             if (maybe_copy_object(top_field)) {
@@ -933,8 +875,8 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                             parent.warnIfPossible(
                                 "while traversing field " + obj.getObjGen().unparse(',') +
                                 ", found parent (" + parent_og.unparse(',') +
-                                ") that had not been seen, indicating likely"
-                                " invalid field structure");
+                                ") that had not been seen, indicating likely invalid field "
+                                "structure");
                         }
                     }
                     auto kids = obj.getKey("/Kids");
@@ -955,17 +897,13 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                     if (foreign) {
                         // Lazily initialize our /DR and the conflict map.
                         init_dr_map();
-                        // The spec doesn't say anything about /DR on the
-                        // field, but lots of writers put one there, and
-                        // it is frequently the same as the document-level
-                        // /DR. To avoid having the field's /DR point to
-                        // information that we are not maintaining, just
-                        // reset it to that if it exists. Empirical
-                        // evidence suggests that many readers, including
-                        // Acrobat, Adobe Acrobat Reader, chrome, firefox,
-                        // the mac Preview application, and several of the
-                        // free readers on Linux all ignore /DR at the
-                        // field level.
+                        // The spec doesn't say anything about /DR on the field, but lots of writers
+                        // put one there, and it is frequently the same as the document-level /DR.
+                        // To avoid having the field's /DR point to information that we are not
+                        // maintaining, just reset it to that if it exists. Empirical evidence
+                        // suggests that many readers, including Acrobat, Adobe Acrobat Reader,
+                        // chrome, firefox, the mac Preview application, and several of the free
+                        // readers on Linux all ignore /DR at the field level.
                         if (obj.hasKey("/DR")) {
                             obj.replaceKey("/DR", dr);
                         }
@@ -1029,8 +967,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             }
         }
 
-        // Now we can safely mutate the annotation and its appearance
-        // streams.
+        // Now we can safely mutate the annotation and its appearance streams.
         for (auto& stream: streams) {
             auto dict = stream.getDict();
             auto omatrix = dict.getKey("/Matrix");
