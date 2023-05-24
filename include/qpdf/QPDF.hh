@@ -476,11 +476,11 @@ class QPDF
         void setO(std::string const&);
         void setU(std::string const&);
         void setV5EncryptionParameters(
-            std::string const& O,
-            std::string const& OE,
-            std::string const& U,
-            std::string const& UE,
-            std::string const& Perms);
+            std::string const& a_O,
+            std::string const& a_OE,
+            std::string const& a_U,
+            std::string const& a_UE,
+            std::string const& a_Perms);
 
       private:
         EncryptionData(EncryptionData const&) = delete;
