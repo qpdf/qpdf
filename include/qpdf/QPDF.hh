@@ -30,6 +30,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <qpdf/Buffer.hh>
@@ -48,6 +49,8 @@ class BitStream;
 class BitWriter;
 class QPDFLogger;
 class QPDFParser;
+
+// NOLINTBEGIN (modernize-use-nodiscard) ABI
 
 class QPDF
 {
@@ -715,6 +718,8 @@ class QPDF
     void removePage(QPDFObjectHandle page);
     // End legacy page helpers
 
+    // NOLINTEND (modernize-use-nodiscard)
+
     // Writer class is restricted to QPDFWriter so that only it can call certain methods.
     class Writer
     {
@@ -793,7 +798,7 @@ class QPDF
         friend class QPDFParser;
 
       private:
-        ParseGuard(QPDF* qpdf) :
+        explicit ParseGuard(QPDF* qpdf) :
             qpdf(qpdf)
         {
             if (qpdf) {
@@ -853,8 +858,9 @@ class QPDF
     // there are no copies of a QPDF object. Copying QPDF objects was not prevented by the API until
     // qpdf 11. If you have been copying QPDF objects, use std::shared_ptr<QPDF> instead. From qpdf
     // 11, you can use QPDF::create to create them.
-    QPDF(QPDF const&) = delete;
-    QPDF& operator=(QPDF const&) = delete;
+    QPDF(QPDF const&) = delete; // NOLINT (cppcoreguidelines-special-member-functions) ABI
+    QPDF&
+    operator=(QPDF const&) = delete; // NOLINT (cppcoreguidelines-special-member-functions) ABI
 
     static std::string const qpdf_version;
 
@@ -870,7 +876,7 @@ class QPDF
             std::shared_ptr<QPDFObject> object,
             qpdf_offset_t end_before_space,
             qpdf_offset_t end_after_space) :
-            object(object),
+            object(std::move(object)),
             end_before_space(end_before_space),
             end_after_space(end_after_space)
         {
@@ -940,9 +946,9 @@ class QPDF
     class CopiedStreamDataProvider: public QPDFObjectHandle::StreamDataProvider
     {
       public:
-        CopiedStreamDataProvider(QPDF& destination_qpdf);
-        virtual ~CopiedStreamDataProvider() = default;
-        virtual bool provideStreamData(
+        explicit CopiedStreamDataProvider(QPDF& destination_qpdf);
+        ~CopiedStreamDataProvider() override = default;
+        bool provideStreamData(
             QPDFObjGen const& og,
             Pipeline* pipeline,
             bool suppress_warnings,
@@ -962,8 +968,8 @@ class QPDF
 
       public:
         StringDecrypter(QPDF* qpdf, QPDFObjGen const& og);
-        virtual ~StringDecrypter() = default;
-        virtual void decryptString(std::string& val);
+        ~StringDecrypter() override = default;
+        void decryptString(std::string& val) override;
 
       private:
         QPDF* qpdf;
@@ -1315,7 +1321,7 @@ class QPDF
 
     struct CHSharedObjectEntry
     {
-        CHSharedObjectEntry(int object) :
+        explicit CHSharedObjectEntry(int object) :
             object(object)
         {
         }
@@ -1353,7 +1359,7 @@ class QPDF
         ObjUser();
 
         // type must be ou_root
-        ObjUser(user_e type);
+        explicit ObjUser(user_e type);
 
         // type must be one of ou_page or ou_thumb
         ObjUser(user_e type, int pageno);
@@ -1376,9 +1382,9 @@ class QPDF
             checker(checker)
         {
         }
-        virtual ~PatternFinder() = default;
-        virtual bool
-        check()
+        ~PatternFinder() override = default;
+        bool
+        check() override
         {
             return (this->qpdf.*checker)();
         }
@@ -1502,15 +1508,17 @@ class QPDF
     class Members
     {
         friend class QPDF;
-        friend class ResolveRecorder;
 
       public:
+        Members(Members const&) = delete;
+        Members(Members&&) = delete;
+        Members& operator=(Members const&) = delete;
+        Members& operator=(Members&&) = delete;
         QPDF_DLL
         ~Members() = default;
 
       private:
-        Members();
-        Members(Members const&) = delete;
+        Members(); // NOLINT (cppcoreguidelines-special-member-functions)
 
         std::shared_ptr<QPDFLogger> log;
         unsigned long long unique_id{0};
