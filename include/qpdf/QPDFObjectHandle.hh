@@ -61,6 +61,8 @@ class Pl_QPDFTokenizer;
 class QPDFMatrix;
 class QPDFParser;
 
+// NOLINTBEGIN (modernize-use-nodiscard)
+
 class QPDFObjectHandle
 {
     friend class QPDFParser;
@@ -121,6 +123,7 @@ class QPDFObjectHandle
             int objid, int generation, Pipeline* pipeline, bool suppress_warnings, bool will_retry);
         QPDF_DLL
         bool supportsRetry();
+
       private:
         bool supports_retry;
     };
@@ -1325,9 +1328,12 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isImage(bool exclude_imagemask = true);
 
+    // NOLINTEND (modernize-use-nodiscard)
+
     // The following methods do not form part of the public API and are for internal use only.
 
-    QPDFObjectHandle(std::shared_ptr<QPDFObject> const& obj) :
+    QPDFObjectHandle(
+        std::shared_ptr<QPDFObject> const& obj) : // NOLINT((google-explicit-constructor) )
         obj(obj)
     {
     }
@@ -1336,7 +1342,7 @@ class QPDFObjectHandle
     {
         return obj;
     }
-    std::shared_ptr<QPDFObject>
+    [[nodiscard]] std::shared_ptr<QPDFObject>
     getObj() const
     {
         return obj;
@@ -1346,7 +1352,7 @@ class QPDFObjectHandle
     {
         return obj.get();
     }
-    QPDFObject* const
+    [[nodiscard]] QPDFObject*
     getObjectPtr() const
     {
         return obj.get();
@@ -1420,9 +1426,9 @@ class QPDFObjectHandle::QPDFDictItems
 
   public:
     QPDF_DLL
-    QPDFDictItems(QPDFObjectHandle const& oh);
+    QPDFDictItems(QPDFObjectHandle const& oh); // NOLINT (google-explicit-constructor) ABI
 
-    class iterator
+        class iterator
     {
         friend class QPDFDictItems;
 
@@ -1478,13 +1484,13 @@ class QPDFObjectHandle::QPDFDictItems
             friend class QPDFDictItems::iterator;
 
           public:
+            Members() = delete;
+            Members(Members const&) = delete;
             QPDF_DLL
             ~Members() = default;
 
           private:
             Members(QPDFObjectHandle& oh, bool for_begin);
-            Members() = delete;
-            Members(Members const&) = delete;
 
             QPDFObjectHandle& oh;
             std::set<std::string> keys;
@@ -1518,7 +1524,7 @@ class QPDFObjectHandle::QPDFArrayItems
 
   public:
     QPDF_DLL
-    QPDFArrayItems(QPDFObjectHandle const& oh);
+    QPDFArrayItems(QPDFObjectHandle const& oh); // NOLINT (google-explicit-constructor) ABI
 
     class iterator
     {
@@ -1576,13 +1582,13 @@ class QPDFObjectHandle::QPDFArrayItems
             friend class QPDFArrayItems::iterator;
 
           public:
+            Members() = delete;
+            Members(Members const&) = delete;
             QPDF_DLL
             ~Members() = default;
 
           private:
             Members(QPDFObjectHandle& oh, bool for_begin);
-            Members() = delete;
-            Members(Members const&) = delete;
 
             QPDFObjectHandle& oh;
             int item_number{0};
