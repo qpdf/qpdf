@@ -15,7 +15,7 @@ QPDFExc::QPDFExc(
 {
 }
 
-QPDFExc::QPDFExc(QPDFExc const& other) noexcept :
+QPDFExc::QPDFExc(QPDFExc const& other) noexcept : // NOLINT (modernize-use-equals-default)
     std::runtime_error(other),
     error_code(other.error_code),
     filename(other.filename),

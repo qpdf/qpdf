@@ -26,6 +26,8 @@
 #include <stdexcept>
 #include <string>
 
+// NOLINTBEGIN (modernize-use-nodiscard)
+
 class QPDF_DLL_CLASS QPDFExc: public std::runtime_error
 {
   public:
@@ -39,7 +41,7 @@ class QPDF_DLL_CLASS QPDFExc: public std::runtime_error
     QPDF_DLL
     QPDFExc(QPDFExc const& other) noexcept;
     QPDF_DLL
-    virtual ~QPDFExc() noexcept = default;
+    ~QPDFExc() noexcept override = default;
 
     // To get a complete error string, call what(), provided by std::exception.  The accessors below
     // return the original values used to create the exception.  Only the error code and message are
@@ -59,6 +61,8 @@ class QPDF_DLL_CLASS QPDFExc: public std::runtime_error
     qpdf_offset_t getFilePosition() const;
     QPDF_DLL
     std::string const& getMessageDetail() const;
+
+    // NOLINTEND (modernize-use-nodiscard)
 
   private:
     QPDF_DLL_PRIVATE
