@@ -727,6 +727,6 @@ formatting results" that shows several examples of changing code so
 that clang-format produces several results. (In git this is commit
 77e889495f7c513ba8677df5fe662f08053709eb.)
 
-The commit that has the bulk of the automatic reformatting is
-12f1eb15ca3fed6310402847559a7c99d3c77847. This could go in a
-blame.ignoreRevsFile file for `git blame` if needed.
+The commits that have the bulk of automatic or mechanical reformatting are
+listed in .git-blame-ignore-revs. Any new bulk updates should be added there.
+
