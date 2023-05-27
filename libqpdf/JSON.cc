@@ -1282,7 +1282,7 @@ JSONParser::handleToken()
 
     case ps_top:
         if (!(item.isDictionary() || item.isArray())) {
-            stack.push_back({ps_done, item});
+            stack.emplace_back(ps_done, item);
             parser_state = ps_done;
             return;
         }
@@ -1311,7 +1311,7 @@ JSONParser::handleToken()
     }
 
     if (item.isDictionary() || item.isArray()) {
-        stack.push_back({parser_state, item});
+        stack.emplace_back(parser_state, item);
         // Calling container start method is postponed until after adding the containers to their
         // parent containers, if any. This makes it much easier to keep track of the current nesting
         // level.

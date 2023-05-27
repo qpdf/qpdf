@@ -1246,7 +1246,7 @@ QUtil::read_lines_from_file(
     char c;
     while (next_char(c)) {
         if (buf == nullptr) {
-            lines.push_back("");
+            lines.emplace_back("");
             buf = &(lines.back());
             buf->reserve(80);
         }

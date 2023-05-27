@@ -942,7 +942,7 @@ QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::pageSpec(
     std::string const& filename, std::string const& range, char const* password)
 {
-    this->config->o.m->page_specs.push_back(QPDFJob::PageSpec(filename, password, range));
+    this->config->o.m->page_specs.emplace_back(filename, password, range);
     return this;
 }
 

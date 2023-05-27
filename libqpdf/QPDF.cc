@@ -840,7 +840,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
             }
             if (type == 'f') {
                 // Save deleted items until after we've checked the XRefStm, if any.
-                deleted_items.push_back(QPDFObjGen(toI(i), f2));
+                deleted_items.emplace_back(toI(i), f2);
             } else {
                 insertXrefEntry(toI(i), 1, f1, f2);
             }

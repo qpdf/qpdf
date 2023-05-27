@@ -2376,9 +2376,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
 
         // Read original pages from the PDF, and parse the page range associated with this
         // occurrence of the file.
-        parsed_specs.push_back(
-            // line-break
-            QPDFPageData(page_spec.filename, page_spec_qpdfs[page_spec.filename], page_spec.range));
+        parsed_specs.emplace_back(
+            page_spec.filename, page_spec_qpdfs[page_spec.filename], page_spec.range);
     }
 
     std::map<unsigned long long, bool> remove_unreferenced;
@@ -2427,9 +2426,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
                 for (size_t j = 0; j < m->collate; ++j) {
                     if (cur_page + j < page_data.selected_pages.size()) {
                         got_pages = true;
-                        new_parsed_specs.push_back(
-                            // line-break
-                            QPDFPageData(page_data, page_data.selected_pages.at(cur_page + j)));
+                        new_parsed_specs.emplace_back(
+                            page_data, page_data.selected_pages.at(cur_page + j));
                     }
                 }
             }

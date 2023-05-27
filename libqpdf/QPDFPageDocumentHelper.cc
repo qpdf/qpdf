@@ -14,7 +14,7 @@ QPDFPageDocumentHelper::getAllPages()
 {
     std::vector<QPDFPageObjectHelper> pages;
     for (auto const& iter: this->qpdf.getAllPages()) {
-        pages.push_back(QPDFPageObjectHelper(iter));
+        pages.emplace_back(iter);
     }
     return pages;
 }

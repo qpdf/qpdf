@@ -165,7 +165,7 @@ QPDFAcroFormDocumentHelper::getFormFields()
     analyze();
     std::vector<QPDFFormFieldObjectHelper> result;
     for (auto const& iter: m->field_to_annotations) {
-        result.push_back(this->qpdf.getObject(iter.first));
+        result.emplace_back(this->qpdf.getObject(iter.first));
     }
     return result;
 }
@@ -279,7 +279,7 @@ QPDFAcroFormDocumentHelper::analyze()
                 annot.warnIfPossible("this widget annotation is not"
                                      " reachable from /AcroForm in the document catalog");
                 m->annotation_to_field[og] = QPDFFormFieldObjectHelper(annot);
-                m->field_to_annotations[og].push_back(QPDFAnnotationObjectHelper(annot));
+                m->field_to_annotations[og].emplace_back(annot);
             }
         }
     }
@@ -342,7 +342,7 @@ QPDFAcroFormDocumentHelper::traverseField(
 
     if (is_annotation) {
         QPDFObjectHandle our_field = (is_field ? field : parent);
-        m->field_to_annotations[our_field.getObjGen()].push_back(QPDFAnnotationObjectHelper(field));
+        m->field_to_annotations[our_field.getObjGen()].emplace_back(field);
         m->annotation_to_field[og] = QPDFFormFieldObjectHelper(our_field);
     }
 
