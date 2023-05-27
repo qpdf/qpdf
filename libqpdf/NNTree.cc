@@ -689,7 +689,7 @@ NNTreeImpl::begin()
 NNTreeImpl::iterator
 NNTreeImpl::end()
 {
-    return iterator(*this);
+    return {*this};
 }
 
 NNTreeImpl::iterator

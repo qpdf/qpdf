@@ -662,7 +662,7 @@ QPDFPageObjectHelper::shallowCopyPage()
     QPDF& qpdf =
         this->oh.getQPDF("QPDFPageObjectHelper::shallowCopyPage called with a direct object");
     QPDFObjectHandle new_page = this->oh.shallowCopy();
-    return QPDFPageObjectHelper(qpdf.makeIndirectObject(new_page));
+    return {qpdf.makeIndirectObject(new_page)};
 }
 
 QPDFObjectHandle::Matrix
@@ -758,7 +758,7 @@ QPDFPageObjectHelper::getMatrixForFormXObjectPlacement(
     QPDFObjectHandle fdict = fo.getDict();
     QPDFObjectHandle bbox_obj = fdict.getKey("/BBox");
     if (!bbox_obj.isRectangle()) {
-        return QPDFMatrix();
+        return {};
     }
 
     QPDFMatrix wmatrix; // work matrix
@@ -793,7 +793,7 @@ QPDFPageObjectHelper::getMatrixForFormXObjectPlacement(
     // Calculate a scale factor, if needed. Shrink or expand if needed and allowed.
     if ((T.urx == T.llx) || (T.ury == T.lly)) {
         // avoid division by zero
-        return QPDFMatrix();
+        return {};
     }
     double rect_w = rect.urx - rect.llx;
     double rect_h = rect.ury - rect.lly;

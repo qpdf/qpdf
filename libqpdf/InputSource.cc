@@ -37,7 +37,7 @@ InputSource::readLine(size_t max_line_length)
     if (line_length < max_line_length) {
         buf[line_length] = '\0';
     }
-    return std::string(buf);
+    return {buf};
 }
 
 bool

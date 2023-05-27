@@ -428,7 +428,7 @@ QPDFJob::parseNumrange(char const* range, int max)
     } catch (std::runtime_error& e) {
         usage(e.what());
     }
-    return std::vector<int>();
+    return {};
 }
 
 std::unique_ptr<QPDF>

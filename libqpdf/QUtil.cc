@@ -903,14 +903,14 @@ QUtil::get_current_qpdf_time()
     // Don't know how to get timezone on this platform
     int tzoff = 0;
 # endif
-    return QPDFTime(
+    return {
         static_cast<int>(ltime.tm_year + 1900),
         static_cast<int>(ltime.tm_mon + 1),
         static_cast<int>(ltime.tm_mday),
         static_cast<int>(ltime.tm_hour),
         static_cast<int>(ltime.tm_min),
         static_cast<int>(ltime.tm_sec),
-        tzoff);
+        tzoff};
 #endif
 }
 

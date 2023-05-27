@@ -164,7 +164,7 @@ pad_or_truncate_password_V4(std::string const& password)
 {
     char k1[key_bytes];
     pad_or_truncate_password_V4(password, k1);
-    return std::string(k1, key_bytes);
+    return {k1, key_bytes};
 }
 
 static std::string
@@ -235,7 +235,7 @@ process_with_aes(
     } else {
         outlength = std::min(outlength, bufp->getSize());
     }
-    return std::string(reinterpret_cast<char*>(bufp->getBuffer()), outlength);
+    return {reinterpret_cast<char*>(bufp->getBuffer()), outlength};
 }
 
 static std::string
@@ -355,7 +355,7 @@ QPDF::compute_data_key(
     md5.encodeDataIncrementally(result.c_str(), result.length());
     MD5::Digest digest;
     md5.digest(digest);
-    return std::string(reinterpret_cast<char*>(digest), std::min(result.length(), toS(16)));
+    return {reinterpret_cast<char*>(digest), std::min(result.length(), toS(16))};
 }
 
 std::string
@@ -401,7 +401,7 @@ QPDF::compute_encryption_key_from_password(std::string const& password, Encrypti
     MD5::Digest digest;
     int key_len = std::min(toI(sizeof(digest)), data.getLengthBytes());
     iterate_md5_digest(md5, digest, ((data.getR() >= 3) ? 50 : 0), key_len);
-    return std::string(reinterpret_cast<char*>(digest), toS(key_len));
+    return {reinterpret_cast<char*>(digest), toS(key_len)};
 }
 
 static void
@@ -448,7 +448,7 @@ compute_O_value(
         data.getLengthBytes(),
         (data.getR() >= 3) ? 20 : 1,
         false);
-    return std::string(upass, key_bytes);
+    return {upass, key_bytes};
 }
 
 static std::string
@@ -467,7 +467,7 @@ compute_U_value_R2(std::string const& user_password, QPDF::EncryptionData const&
         data.getLengthBytes(),
         1,
         false);
-    return std::string(udata, key_bytes);
+    return {udata, key_bytes};
 }
 
 static std::string
@@ -496,7 +496,7 @@ compute_U_value_R3(std::string const& user_password, QPDF::EncryptionData const&
     for (unsigned int i = sizeof(MD5::Digest); i < key_bytes; ++i) {
         result[i] = static_cast<char>((i * i) % 0xff);
     }
-    return std::string(result, key_bytes);
+    return {result, key_bytes};
 }
 
 static std::string

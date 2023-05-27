@@ -2212,7 +2212,7 @@ QPDF::getVersionAsPDFVersion()
         minor = QUtil::string_to_int(match[2].str().c_str());
     }
 
-    return PDFVersion(major, minor, extension_level);
+    return {major, minor, extension_level};
 }
 
 std::string
@@ -2483,7 +2483,7 @@ QPDF::damagedPDF(
     qpdf_offset_t offset,
     std::string const& message)
 {
-    return QPDFExc(qpdf_e_damaged_pdf, input->getName(), object, offset, message);
+    return {qpdf_e_damaged_pdf, input->getName(), object, offset, message};
 }
 
 // Return an exception of type qpdf_e_damaged_pdf.  The object is taken from
@@ -2499,7 +2499,7 @@ QPDF::damagedPDF(
 QPDFExc
 QPDF::damagedPDF(std::string const& object, qpdf_offset_t offset, std::string const& message)
 {
-    return QPDFExc(qpdf_e_damaged_pdf, m->file->getName(), object, offset, message);
+    return {qpdf_e_damaged_pdf, m->file->getName(), object, offset, message};
 }
 
 // Return an exception of type qpdf_e_damaged_pdf.  The filename is taken from m->file and the

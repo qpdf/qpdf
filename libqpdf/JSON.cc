@@ -269,7 +269,7 @@ JSON::encode_string(std::string const& str)
 JSON
 JSON::makeDictionary()
 {
-    return JSON(std::make_unique<JSON_dictionary>());
+    return {std::make_unique<JSON_dictionary>()};
 }
 
 JSON
@@ -299,7 +299,7 @@ JSON::checkDictionaryKeySeen(std::string const& key)
 JSON
 JSON::makeArray()
 {
-    return JSON(std::make_unique<JSON_array>());
+    return {std::make_unique<JSON_array>()};
 }
 
 JSON
@@ -320,43 +320,43 @@ JSON::addArrayElement(JSON const& val)
 JSON
 JSON::makeString(std::string const& utf8)
 {
-    return JSON(std::make_unique<JSON_string>(utf8));
+    return {std::make_unique<JSON_string>(utf8)};
 }
 
 JSON
 JSON::makeInt(long long int value)
 {
-    return JSON(std::make_unique<JSON_number>(value));
+    return {std::make_unique<JSON_number>(value)};
 }
 
 JSON
 JSON::makeReal(double value)
 {
-    return JSON(std::make_unique<JSON_number>(value));
+    return {std::make_unique<JSON_number>(value)};
 }
 
 JSON
 JSON::makeNumber(std::string const& encoded)
 {
-    return JSON(std::make_unique<JSON_number>(encoded));
+    return {std::make_unique<JSON_number>(encoded)};
 }
 
 JSON
 JSON::makeBool(bool value)
 {
-    return JSON(std::make_unique<JSON_bool>(value));
+    return {std::make_unique<JSON_bool>(value)};
 }
 
 JSON
 JSON::makeNull()
 {
-    return JSON(std::make_unique<JSON_null>());
+    return {std::make_unique<JSON_null>()};
 }
 
 JSON
 JSON::makeBlob(std::function<void(Pipeline*)> fn)
 {
-    return JSON(std::make_unique<JSON_blob>(fn));
+    return {std::make_unique<JSON_blob>(fn)};
 }
 
 bool

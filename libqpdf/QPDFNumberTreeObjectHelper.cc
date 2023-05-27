@@ -56,8 +56,7 @@ QPDFNumberTreeObjectHelper::QPDFNumberTreeObjectHelper(
 QPDFNumberTreeObjectHelper
 QPDFNumberTreeObjectHelper::newEmpty(QPDF& qpdf, bool auto_repair)
 {
-    return QPDFNumberTreeObjectHelper(
-        qpdf.makeIndirectObject("<< /Nums [] >>"_qpdf), qpdf, auto_repair);
+    return {qpdf.makeIndirectObject("<< /Nums [] >>"_qpdf), qpdf, auto_repair};
 }
 
 QPDFNumberTreeObjectHelper::iterator::iterator(std::shared_ptr<NNTreeIterator> const& i) :
@@ -137,33 +136,33 @@ QPDFNumberTreeObjectHelper::iterator::remove()
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::begin() const
 {
-    return iterator(std::make_shared<NNTreeIterator>(m->impl->begin()));
+    return {std::make_shared<NNTreeIterator>(m->impl->begin())};
 }
 
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::end() const
 {
-    return iterator(std::make_shared<NNTreeIterator>(m->impl->end()));
+    return {std::make_shared<NNTreeIterator>(m->impl->end())};
 }
 
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::last() const
 {
-    return iterator(std::make_shared<NNTreeIterator>(m->impl->last()));
+    return {std::make_shared<NNTreeIterator>(m->impl->last())};
 }
 
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::find(numtree_number key, bool return_prev_if_not_found)
 {
     auto i = m->impl->find(QPDFObjectHandle::newInteger(key), return_prev_if_not_found);
-    return iterator(std::make_shared<NNTreeIterator>(i));
+    return {std::make_shared<NNTreeIterator>(i)};
 }
 
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::insert(numtree_number key, QPDFObjectHandle value)
 {
     auto i = m->impl->insert(QPDFObjectHandle::newInteger(key), value);
-    return iterator(std::make_shared<NNTreeIterator>(i));
+    return {std::make_shared<NNTreeIterator>(i)};
 }
 
 bool

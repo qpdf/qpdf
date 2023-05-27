@@ -54,8 +54,7 @@ QPDFNameTreeObjectHelper::QPDFNameTreeObjectHelper(QPDFObjectHandle oh, QPDF& q,
 QPDFNameTreeObjectHelper
 QPDFNameTreeObjectHelper::newEmpty(QPDF& qpdf, bool auto_repair)
 {
-    return QPDFNameTreeObjectHelper(
-        qpdf.makeIndirectObject("<< /Names [] >>"_qpdf), qpdf, auto_repair);
+    return {qpdf.makeIndirectObject("<< /Names [] >>"_qpdf), qpdf, auto_repair};
 }
 
 QPDFNameTreeObjectHelper::iterator::iterator(std::shared_ptr<NNTreeIterator> const& i) :
@@ -135,33 +134,33 @@ QPDFNameTreeObjectHelper::iterator::remove()
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::begin() const
 {
-    return iterator(std::make_shared<NNTreeIterator>(m->impl->begin()));
+    return {std::make_shared<NNTreeIterator>(m->impl->begin())};
 }
 
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::end() const
 {
-    return iterator(std::make_shared<NNTreeIterator>(m->impl->end()));
+    return {std::make_shared<NNTreeIterator>(m->impl->end())};
 }
 
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::last() const
 {
-    return iterator(std::make_shared<NNTreeIterator>(m->impl->last()));
+    return {std::make_shared<NNTreeIterator>(m->impl->last())};
 }
 
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::find(std::string const& key, bool return_prev_if_not_found)
 {
     auto i = m->impl->find(QPDFObjectHandle::newUnicodeString(key), return_prev_if_not_found);
-    return iterator(std::make_shared<NNTreeIterator>(i));
+    return {std::make_shared<NNTreeIterator>(i)};
 }
 
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::insert(std::string const& key, QPDFObjectHandle value)
 {
     auto i = m->impl->insert(QPDFObjectHandle::newUnicodeString(key), value);
-    return iterator(std::make_shared<NNTreeIterator>(i));
+    return {std::make_shared<NNTreeIterator>(i)};
 }
 
 bool

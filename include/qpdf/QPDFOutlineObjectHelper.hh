@@ -81,7 +81,7 @@ class QPDFOutlineObjectHelper: public QPDFObjectHelper
         static QPDFOutlineObjectHelper
         create(QPDFObjectHandle oh, QPDFOutlineDocumentHelper& dh, int depth)
         {
-            return QPDFOutlineObjectHelper(oh, dh, depth);
+            return {oh, dh, depth};
         }
     };
 

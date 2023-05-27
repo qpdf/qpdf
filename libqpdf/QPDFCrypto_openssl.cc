@@ -194,7 +194,7 @@ QPDFCrypto_openssl::MD5_digest(MD5_Digest d)
 std::string
 QPDFCrypto_openssl::SHA2_digest()
 {
-    return std::string(reinterpret_cast<char*>(md_out), sha2_bits / 8);
+    return {reinterpret_cast<char*>(md_out), sha2_bits / 8};
 }
 
 void
