@@ -43,7 +43,7 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
 
     // PAGE ATTRIBUTES
 
-    // The getAttribute method works with pages and form XObjects. It return the value of the
+    // The getAttribute method works with pages and form XObjects. It returns the value of the
     // requested attribute from the page/form XObject's dictionary, taking inheritance from the
     // pages tree into consideration. For pages, the attributes /MediaBox, /CropBox, /Resources, and
     // /Rotate are inheritable, meaning that if they are not present directly on the page node, they
@@ -81,7 +81,7 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // As noted above (PAGE ATTRIBUTES), /MediaBox and /CropBox can be inherited from parent nodes
     // in the pages tree. The other boxes can't be inherited.
     //
-    // When the comments below refer to the "effective value" of an box, this takes into
+    // When the comments below refer to the "effective value" of a box, this takes into
     // consideration both inheritance through the pages tree (in the case of /MediaBox and /CropBox)
     // and fallback values for missing attributes (for all except /MediaBox).
     //

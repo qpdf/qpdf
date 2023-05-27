@@ -725,7 +725,7 @@ QPDF::initializeEncryption()
     }
     m->encp->encryption_initialized = true;
 
-    // After we initialize encryption parameters, we must used stored key information and never look
+    // After we initialize encryption parameters, we must use stored key information and never look
     // at /Encrypt again.  Otherwise, things could go wrong if someone mutates the encryption
     // dictionary.
 
