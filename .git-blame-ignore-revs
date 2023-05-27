@@ -1,0 +1,16 @@
+# .git-blame-ignore-revs
+#
+# Programmatically apply new formatting to code
+12f1eb15ca3fed6310402847559a7c99d3c77847
+# Formatting: remove space in range-style for loops
+7f023701dd843749cf878baabeb3d33917fda62f
+# Rerun format_code (after merging clang-tidy PR)
+d740c6ccced02147f84a39d5e5f0984d12bac6cb
+# Globally replace 'this->m->' with 'm->'
+85d784952f8a7c4d8c9e614663ebc5b1eb747384
+49e6365f63f3ad09f04093d421caee04bc042c0d
+# Switch line length from 80 to 100 columns
+6b077332d38c093de2618d5e1481b42222106065
+60965d5f4d608bdccc2ffd4e8753e12cbbbd71d2
+# Reflow comments and strings to 100 columns
+698a70e6a84cf7c0db667e9d9e021b4c34c85a3e
