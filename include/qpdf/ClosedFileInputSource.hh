@@ -2,31 +2,27 @@
 //
 // This file is part of qpdf.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+// in compliance with the License. You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Unless required by applicable law or agreed to in writing, software distributed under the License
+// is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+// or implied. See the License for the specific language governing permissions and limitations under
+// the License.
 //
-// Versions of qpdf prior to version 7 were released under the terms
-// of version 2.0 of the Artistic License. At your option, you may
-// continue to consider qpdf to be licensed under those terms. Please
-// see the manual for additional information.
+// Versions of qpdf prior to version 7 were released under the terms of version 2.0 of the Artistic
+// License. At your option, you may continue to consider qpdf to be licensed under those terms.
+// Please see the manual for additional information.
 
 #ifndef QPDF_CLOSEDFILEINPUTSOURCE_HH
 #define QPDF_CLOSEDFILEINPUTSOURCE_HH
 
-// This is an input source that reads from files, like
-// FileInputSource, except that it opens and close the file
-// surrounding every operation. This decreases efficiency, but it allows
-// many more of these to exist at once than the maximum number of open
-// file descriptors. This is used for merging large numbers of files.
+// This is an input source that reads from files, like FileInputSource, except that it opens and
+// close the file surrounding every operation. This decreases efficiency, but it allows many more of
+// these to exist at once than the maximum number of open file descriptors. This is used for merging
+// large numbers of files.
 
 #include <qpdf/InputSource.hh>
 #include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
@@ -57,10 +53,9 @@ class QPDF_DLL_CLASS ClosedFileInputSource: public InputSource
     QPDF_DLL
     virtual void unreadCh(char ch);
 
-    // The file stays open between calls to stayOpen(true) and
-    // stayOpen(false). You can use this to surround multiple
-    // operations on a single ClosedFileInputSource to reduce the
-    // overhead of a separate open/close on each call.
+    // The file stays open between calls to stayOpen(true) and stayOpen(false). You can use this to
+    // surround multiple operations on a single ClosedFileInputSource to reduce the overhead of a
+    // separate open/close on each call.
     QPDF_DLL
     void stayOpen(bool);
 

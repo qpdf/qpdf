@@ -134,8 +134,8 @@ QPDFEFStreamObjectHelper::newFromStream(QPDFObjectHandle stream)
     QPDFEFStreamObjectHelper result(stream);
     stream.getDict().replaceKey("/Type", QPDFObjectHandle::newName("/EmbeddedFile"));
     Pl_Discard discard;
-    // The PDF spec specifies use of MD5 here and notes that it is not
-    // to be used for security. MD5 is known to be insecure.
+    // The PDF spec specifies use of MD5 here and notes that it is not to be used for security. MD5
+    // is known to be insecure.
     Pl_MD5 md5("EF md5", &discard);
     Pl_Count count("EF size", &md5);
     if (!stream.pipeStreamData(&count, nullptr, 0, qpdf_dl_all)) {

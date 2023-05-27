@@ -1,8 +1,8 @@
 #ifndef PL_TIFFPREDICTOR_HH
 #define PL_TIFFPREDICTOR_HH
 
-// This pipeline reverses the application of a TIFF predictor as
-// described in the TIFF specification.
+// This pipeline reverses the application of a TIFF predictor as described in the TIFF
+// specification.
 
 #include <qpdf/Pipeline.hh>
 

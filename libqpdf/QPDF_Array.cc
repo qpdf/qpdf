@@ -12,9 +12,9 @@ QPDF_Array::checkOwnership(QPDFObjectHandle const& item) const
         if (qpdf) {
             if (auto item_qpdf = obj->getQPDF()) {
                 if (qpdf != item_qpdf) {
-                    throw std::logic_error("Attempting to add an object from a different QPDF. "
-                                           "Use QPDF::copyForeignObject to add objects from "
-                                           "another file.");
+                    throw std::logic_error(
+                        "Attempting to add an object from a different QPDF. Use "
+                        "QPDF::copyForeignObject to add objects from another file.");
                 }
             }
         }

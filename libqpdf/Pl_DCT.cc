@@ -77,8 +77,7 @@ Pl_DCT::Pl_DCT(
 
 Pl_DCT::~Pl_DCT()
 {
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
-    // README-maintainer
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
 }
 
 void
@@ -92,14 +91,12 @@ Pl_DCT::finish()
 {
     m->buf.finish();
 
-    // Using a std::shared_ptr<Buffer> here and passing it into compress
-    // and decompress causes a memory leak with setjmp/longjmp. Just
-    // use a pointer and delete it.
+    // Using a std::shared_ptr<Buffer> here and passing it into compress and decompress causes a
+    // memory leak with setjmp/longjmp. Just use a pointer and delete it.
     Buffer* b = m->buf.getBuffer();
     if (b->getSize() == 0) {
-        // Special case: empty data will never succeed and probably
-        // means we're calling finish a second time from an exception
-        // handler.
+        // Special case: empty data will never succeed and probably means we're calling finish a
+        // second time from an exception handler.
         delete b;
         this->getNext()->finish();
         return;
@@ -114,8 +111,7 @@ Pl_DCT::finish()
     jerr.pub.error_exit = error_handler;
 
     bool error = false;
-    // The jpeg library is a "C" library, so we use setjmp and longjmp
-    // for exception handling.
+    // The jpeg library is a "C" library, so we use setjmp and longjmp for exception handling.
     if (setjmp(jerr.jmpbuf) == 0) {
         try {
             if (m->action == a_compress) {
@@ -124,9 +120,8 @@ Pl_DCT::finish()
                 decompress(reinterpret_cast<void*>(&cinfo_decompress), b);
             }
         } catch (std::exception& e) {
-            // Convert an exception back to a longjmp so we can ensure
-            // that the right cleanup happens. This will get converted
-            // back to an exception.
+            // Convert an exception back to a longjmp so we can ensure that the right cleanup
+            // happens. This will get converted back to an exception.
             jerr.msg = e.what();
             longjmp(jerr.jmpbuf, 1);
         }
@@ -205,9 +200,8 @@ init_buffer_source(j_decompress_ptr)
 static boolean
 fill_buffer_input_buffer(j_decompress_ptr)
 {
-    // The whole JPEG data is expected to reside in the supplied memory
-    // buffer, so any request for more data beyond the given buffer size
-    // is treated as an error.
+    // The whole JPEG data is expected to reside in the supplied memory buffer, so any request for
+    // more data beyond the given buffer size is treated as an error.
     throw std::runtime_error("invalid jpeg data reading from buffer");
     return TRUE;
 }
@@ -216,8 +210,8 @@ static void
 skip_buffer_input_data(j_decompress_ptr cinfo, long num_bytes)
 {
     if (num_bytes < 0) {
-        throw std::runtime_error("reading jpeg: jpeg library requested"
-                                 " skipping a negative number of bytes");
+        throw std::runtime_error(
+            "reading jpeg: jpeg library requested skipping a negative number of bytes");
     }
     size_t to_skip = QIntC::to_size(num_bytes);
     if ((to_skip > 0) && (to_skip <= cinfo->src->bytes_in_buffer)) {

@@ -36,23 +36,18 @@ NNTreeIterator::NNTreeIterator(NNTreeImpl& impl) :
 void
 NNTreeIterator::updateIValue(bool allow_invalid)
 {
-    // ivalue should never be used inside the class since we return a
-    // pointer/reference to it. Every bit of code that ever changes
-    // what object the iterator points to should take care to call
-    // updateIValue. Failure to do this means that any old references
-    // to *iter will point to incorrect objects, though the next
-    // dereference of the iterator will fix it. This isn't necessarily
-    // catastrophic, but it would be confusing. The test suite
-    // attempts to exercise various cases to ensure we don't introduce
-    // that bug in the future, but sadly it's tricky to verify by
-    // reasoning about the code that this constraint is always
-    // satisfied. Whenever we update what the iterator points to, we
-    // should call setItemNumber, which calls this. If we change what
-    // the iterator in some other way, such as replacing a value or
-    // removing an item and making the iterator point at a different
-    // item in potentially the same position, we must call
-    // updateIValue as well. These cases are handled, and for good
-    // measure, we also call updateIValue in operator* and operator->.
+    // ivalue should never be used inside the class since we return a pointer/reference to it. Every
+    // bit of code that ever changes what object the iterator points to should take care to call
+    // updateIValue. Failure to do this means that any old references to *iter will point to
+    // incorrect objects, though the next dereference of the iterator will fix it. This isn't
+    // necessarily catastrophic, but it would be confusing. The test suite attempts to exercise
+    // various cases to ensure we don't introduce that bug in the future, but sadly it's tricky to
+    // verify by reasoning about the code that this constraint is always satisfied. Whenever we
+    // update what the iterator points to, we should call setItemNumber, which calls this. If we
+    // change what the iterator in some other way, such as replacing a value or removing an item and
+    // making the iterator point at a different item in potentially the same position, we must call
+    // updateIValue as well. These cases are handled, and for good measure, we also call
+    // updateIValue in operator* and operator->.
 
     bool okay = false;
     if ((item_number >= 0) && this->node.isDictionary()) {
@@ -228,12 +223,11 @@ NNTreeIterator::resetLimits(QPDFObjectHandle node, std::list<PathElement>::itera
 void
 NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterator parent)
 {
-    // Split some node along the path to the item pointed to by this
-    // iterator, and adjust the iterator so it points to the same
-    // item.
+    // Split some node along the path to the item pointed to by this iterator, and adjust the
+    // iterator so it points to the same item.
 
-    // In examples, for simplicity, /Nums is show to just contain
-    // numbers instead of pairs. Imagine this tree:
+    // In examples, for simplicity, /Nums is show to just contain numbers instead of pairs. Imagine
+    // this tree:
     //
     // root: << /Kids [ A B C D ] >>
     // A: << /Nums [ 1 2 3 4 ] >>
@@ -260,8 +254,7 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
         throw std::logic_error("NNTreeIterator::split called an invalid iterator");
     }
 
-    // Find the array we actually need to split, which is either this
-    // node's kids or items.
+    // Find the array we actually need to split, which is either this node's kids or items.
     auto kids = to_split.getKey("/Kids");
     int nkids = kids.isArray() ? kids.getArrayNItems() : 0;
     auto items = to_split.getKey(impl.details.itemsKey());
@@ -294,30 +287,22 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
     bool is_root = (parent == this->path.end());
     bool is_leaf = (nitems > 0);
 
-    // CURRENT STATE: tree is in original state; iterator is valid and
-    // unchanged.
+    // CURRENT STATE: tree is in original state; iterator is valid and unchanged.
 
     if (is_root) {
-        // What we want to do is to create a new node for the second
-        // half of the items and put it in the parent's /Kids array
-        // right after the element that points to the current to_split
-        // node, but if we're splitting root, there is no parent, so
-        // handle that first.
+        // What we want to do is to create a new node for the second half of the items and put it in
+        // the parent's /Kids array right after the element that points to the current to_split
+        // node, but if we're splitting root, there is no parent, so handle that first.
 
-        // In the non-root case, parent points to the path element
-        // whose /Kids contains the first half node, and the first
-        // half node is to_split. If we are splitting the root, we
-        // need to push everything down a level, but we want to keep
-        // the actual root object the same so that indirect references
-        // to it remain intact (and also in case it might be a direct
-        // object, which it shouldn't be but that case probably exists
-        // in the wild). To achieve this, we create a new node for the
-        // first half and then replace /Kids in the root to contain
-        // it. Then we adjust the path so that the first element is
-        // root and the second element, if any, is the new first half.
-        // In this way, we make the root case identical to the
-        // non-root case so remaining logic can handle them in the
-        // same way.
+        // In the non-root case, parent points to the path element whose /Kids contains the first
+        // half node, and the first half node is to_split. If we are splitting the root, we need to
+        // push everything down a level, but we want to keep the actual root object the same so that
+        // indirect references to it remain intact (and also in case it might be a direct object,
+        // which it shouldn't be but that case probably exists in the wild). To achieve this, we
+        // create a new node for the first half and then replace /Kids in the root to contain it.
+        // Then we adjust the path so that the first element is root and the second element, if any,
+        // is the new first half. In this way, we make the root case identical to the non-root case
+        // so remaining logic can handle them in the same way.
 
         auto first_node = impl.qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
         first_node.replaceKey(key, first_half);
@@ -339,12 +324,11 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
         to_split = first_node;
     }
 
-    // CURRENT STATE: parent is guaranteed to be defined, and we have
-    // the invariants that parent[/Kids][kid_number] == to_split and
-    // (++parent).node == to_split.
+    // CURRENT STATE: parent is guaranteed to be defined, and we have the invariants that
+    // parent[/Kids][kid_number] == to_split and (++parent).node == to_split.
 
-    // Create a second half array, and transfer the second half of the
-    // items into the second half array.
+    // Create a second half array, and transfer the second half of the items into the second half
+    // array.
     QPDFObjectHandle second_half = QPDFObjectHandle::newArray();
     int start_idx = ((n / 2) & ~1);
     while (first_half.getArrayNItems() > start_idx) {
@@ -358,15 +342,13 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
     second_node.replaceKey(key, second_half);
     resetLimits(second_node, parent);
 
-    // CURRENT STATE: half the items from the kids or items array in
-    // the node being split have been moved into a new node. The new
-    // node is not yet attached to the tree. The iterator may have a
+    // CURRENT STATE: half the items from the kids or items array in the node being split have been
+    // moved into a new node. The new node is not yet attached to the tree. The iterator may have a
     // path element or leaf node that is out of bounds.
 
-    // We need to adjust the parent to add the second node to /Kids
-    // and, if needed, update kid_number to traverse through it. We
-    // need to update to_split's path element, or the node if this is
-    // a leaf, so that the kid/item number points to the right place.
+    // We need to adjust the parent to add the second node to /Kids and, if needed, update
+    // kid_number to traverse through it. We need to update to_split's path element, or the node if
+    // this is a leaf, so that the kid/item number points to the right place.
 
     auto parent_kids = parent->node.getKey("/Kids");
     parent_kids.insertItem(parent->kid_number + 1, second_node);
@@ -430,8 +412,7 @@ NNTreeIterator::insertAfter(QPDFObjectHandle key, QPDFObjectHandle value)
 void
 NNTreeIterator::remove()
 {
-    // Remove this item, leaving the tree valid and this iterator
-    // pointing to the next item.
+    // Remove this item, leaving the tree valid and this iterator pointing to the next item.
 
     if (!valid()) {
         throw std::logic_error("attempt made to remove an invalid iterator");
@@ -450,34 +431,32 @@ NNTreeIterator::remove()
         // There are still items left
 
         if ((this->item_number == 0) || (this->item_number == nitems)) {
-            // We removed either the first or last item of an items array
-            // that remains non-empty, so we have to adjust limits.
+            // We removed either the first or last item of an items array that remains non-empty, so
+            // we have to adjust limits.
             QTC::TC("qpdf", "NNTree remove reset limits");
             resetLimits(this->node, lastPathElement());
         }
 
         if (this->item_number == nitems) {
-            // We removed the last item of a non-empty items array, so
-            // advance to the successor of the previous item.
+            // We removed the last item of a non-empty items array, so advance to the successor of
+            // the previous item.
             QTC::TC("qpdf", "NNTree erased last item");
             this->item_number -= 2;
             increment(false);
         } else if (this->item_number < nitems) {
-            // We don't have to do anything since the removed item's
-            // successor now occupies its former location.
+            // We don't have to do anything since the removed item's successor now occupies its
+            // former location.
             QTC::TC("qpdf", "NNTree erased non-last item");
             updateIValue();
         } else {
-            // We already checked to ensure this condition would not
-            // happen.
+            // We already checked to ensure this condition would not happen.
             throw std::logic_error("NNTreeIterator::remove: item_number > nitems after erase");
         }
         return;
     }
 
     if (this->path.empty()) {
-        // Special case: if this is the root node, we can leave it
-        // empty.
+        // Special case: if this is the root node, we can leave it empty.
         QTC::TC("qpdf", "NNTree erased all items on leaf/root");
         setItemNumber(impl.oh, -1);
         return;
@@ -485,9 +464,8 @@ NNTreeIterator::remove()
 
     QTC::TC("qpdf", "NNTree items is empty after remove");
 
-    // We removed the last item from this items array, so we need to
-    // remove this node from the parent on up the tree. Then we need
-    // to position ourselves at the removed item's successor.
+    // We removed the last item from this items array, so we need to remove this node from the
+    // parent on up the tree. Then we need to position ourselves at the removed item's successor.
     bool done = false;
     while (!done) {
         auto element = lastPathElement();
@@ -503,8 +481,7 @@ NNTreeIterator::remove()
                 resetLimits(element->node, parent);
             }
             if (element->kid_number == nkids) {
-                // Move to the successor of the last child of the
-                // previous kid.
+                // Move to the successor of the last child of the previous kid.
                 setItemNumber(QPDFObjectHandle(), -1);
                 --element->kid_number;
                 deepen(kids.getArrayItem(element->kid_number), false, true);
@@ -523,8 +500,7 @@ NNTreeIterator::remove()
             }
             done = true;
         } else if (parent == this->path.end()) {
-            // We erased the very last item. Convert the root to an
-            // empty items array.
+            // We erased the very last item. Convert the root to an empty items array.
             QTC::TC("qpdf", "NNTree non-flat tree is empty after remove");
             element->node.removeKey("/Kids");
             element->node.replaceKey(impl.details.itemsKey(), QPDFObjectHandle::newArray());
@@ -608,9 +584,8 @@ NNTreeIterator::addPathElement(QPDFObjectHandle const& node, int kid_number)
 bool
 NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
 {
-    // Starting at this node, descend through the first or last kid
-    // until we reach a node with items. If we succeed, return true;
-    // otherwise return false and leave path alone.
+    // Starting at this node, descend through the first or last kid until we reach a node with
+    // items. If we succeed, return true; otherwise return false and leave path alone.
 
     auto opath = this->path;
     bool failed = false;

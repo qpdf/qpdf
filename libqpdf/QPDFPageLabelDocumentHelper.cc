@@ -57,19 +57,17 @@ QPDFPageLabelDocumentHelper::getLabelsForPageRange(
     long long new_start_idx,
     std::vector<QPDFObjectHandle>& new_labels)
 {
-    // Start off with a suitable label for the first page. For every
-    // remaining page, if that page has an explicit entry, copy it.
-    // Otherwise, let the subsequent page just sequence from the prior
-    // entry. If there is no entry for the first page, fabricate one
-    // that would match how the page would look in a new file in which
-    // it also didn't have an explicit label.
+    // Start off with a suitable label for the first page. For every remaining page, if that page
+    // has an explicit entry, copy it. Otherwise, let the subsequent page just sequence from the
+    // prior entry. If there is no entry for the first page, fabricate one that would match how the
+    // page would look in a new file in which it also didn't have an explicit label.
     QPDFObjectHandle label = getLabelForPage(start_idx);
     if (label.isNull()) {
         label = QPDFObjectHandle::newDictionary();
         label.replaceKey("/St", QPDFObjectHandle::newInteger(1 + new_start_idx));
     }
-    // See if the new label is redundant based on the previous entry
-    // in the vector. If so, don't add it.
+    // See if the new label is redundant based on the previous entry in the vector. If so, don't add
+    // it.
     size_t size = new_labels.size();
     bool skip_first = false;
     if (size >= 2) {

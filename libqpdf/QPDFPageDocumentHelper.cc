@@ -59,8 +59,8 @@ QPDFPageDocumentHelper::flattenAnnotations(int required_flags, int forbidden_fla
     if (afdh.getNeedAppearances()) {
         this->qpdf.getRoot()
             .getKey("/AcroForm")
-            .warnIfPossible("document does not have updated appearance streams,"
-                            " so form fields will not be flattened");
+            .warnIfPossible("document does not have updated appearance streams, so form fields "
+                            "will not be flattened");
     }
     for (auto& ph: getAllPages()) {
         QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
@@ -126,11 +126,10 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
             }
             new_content += content;
         } else if (process) {
-            // If an annotation has no appearance stream, just drop
-            // the annotation when flattening. This can happen for
-            // unchecked checkboxes and radio buttons, popup windows
-            // associated with comments that aren't visible, and other
-            // types of annotations that aren't visible.
+            // If an annotation has no appearance stream, just drop the annotation when flattening.
+            // This can happen for unchecked checkboxes and radio buttons, popup windows associated
+            // with comments that aren't visible, and other types of annotations that aren't
+            // visible.
             QTC::TC("qpdf", "QPDFPageDocumentHelper ignore annotation with no appearance");
         } else {
             new_annots.push_back(aoh.getObjectHandle());

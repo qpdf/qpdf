@@ -1,10 +1,9 @@
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
 
-// File attachments are stored in the /EmbeddedFiles (name tree) key
-// of the /Names dictionary from the document catalog. Each entry
-// points to a /FileSpec, which in turn points to one more Embedded
-// File Streams. Note that file specs can appear in other places as
-// well, such as file attachment annotations, among others.
+// File attachments are stored in the /EmbeddedFiles (name tree) key of the /Names dictionary from
+// the document catalog. Each entry points to a /FileSpec, which in turn points to one more Embedded
+// File Streams. Note that file specs can appear in other places as well, such as file attachment
+// annotations, among others.
 //
 // root -> /Names -> /EmbeddedFiles = name tree
 // filename -> filespec

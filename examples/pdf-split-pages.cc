@@ -1,7 +1,6 @@
 //
-// This is a stand-alone example of splitting a PDF into individual
-// pages. It does essentially the same thing that qpdf --split-pages
-// does.
+// This is a stand-alone example of splitting a PDF into individual pages. It does essentially the
+// same thing that qpdf --split-pages does.
 //
 
 #include <qpdf/QIntC.hh>
@@ -32,8 +31,7 @@ process(char const* whoami, char const* infile, std::string outprefix)
         QPDFPageDocumentHelper(outpdf).addPage(page, false);
         QPDFWriter outpdfw(outpdf, outfile.c_str());
         if (static_id) {
-            // For the test suite, uncompress streams and use static
-            // IDs.
+            // For the test suite, uncompress streams and use static IDs.
             outpdfw.setStaticID(true); // for testing only
             outpdfw.setStreamDataMode(qpdf_s_uncompress);
         }

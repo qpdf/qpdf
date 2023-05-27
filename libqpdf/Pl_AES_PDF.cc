@@ -98,9 +98,8 @@ Pl_AES_PDF::finish()
             flush(false);
         }
         if (!this->disable_padding) {
-            // Pad as described in section 3.5.1 of version 1.7 of the PDF
-            // specification, including providing an entire block of padding
-            // if the input was a multiple of 16 bytes.
+            // Pad as described in section 3.5.1 of version 1.7 of the PDF specification, including
+            // providing an entire block of padding if the input was a multiple of 16 bytes.
             unsigned char pad = QIntC::to_uchar(this->buf_size - this->offset);
             memset(this->inbuf + this->offset, pad, pad);
             this->offset = this->buf_size;
@@ -108,11 +107,9 @@ Pl_AES_PDF::finish()
         }
     } else {
         if (this->offset != this->buf_size) {
-            // This is never supposed to happen as the output is
-            // always supposed to be padded.  However, we have
-            // encountered files for which the output is not a
-            // multiple of the block size.  In this case, pad with
-            // zeroes and hope for the best.
+            // This is never supposed to happen as the output is always supposed to be padded.
+            // However, we have encountered files for which the output is not a multiple of the
+            // block size.  In this case, pad with zeroes and hope for the best.
             if (this->offset >= this->buf_size) {
                 throw std::logic_error("buffer overflow in AES encryption"
                                        " pipeline");
@@ -156,19 +153,19 @@ Pl_AES_PDF::flush(bool strip_padding)
         bool return_after_init = false;
         if (this->cbc_mode) {
             if (encrypt) {
-                // Set cbc_block to the initialization vector, and if
-                // not zero, write it to the output stream.
+                // Set cbc_block to the initialization vector, and if not zero, write it to the
+                // output stream.
                 initializeVector();
                 if (!(this->use_zero_iv || this->use_specified_iv)) {
                     getNext()->write(this->cbc_block, this->buf_size);
                 }
             } else if (this->use_zero_iv || this->use_specified_iv) {
-                // Initialize vector with zeroes; zero vector was not
-                // written to the beginning of the input file.
+                // Initialize vector with zeroes; zero vector was not written to the beginning of
+                // the input file.
                 initializeVector();
             } else {
-                // Take the first block of input as the initialization
-                // vector.  There's nothing to write at this time.
+                // Take the first block of input as the initialization vector.  There's nothing to
+                // write at this time.
                 memcpy(this->cbc_block, this->inbuf, this->buf_size);
                 this->offset = 0;
                 return_after_init = true;

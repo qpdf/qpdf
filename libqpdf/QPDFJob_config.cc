@@ -25,18 +25,14 @@ QPDFJob::Config*
 QPDFJob::Config::emptyInput()
 {
     if (o.m->infilename == nullptr) {
-        // Various places in QPDFJob.cc know that the empty string for
-        // infile means empty. We set it to something other than a
-        // null pointer as an indication that some input source has
-        // been specified. This approach means that passing "" as
-        // the argument to inputFile in job JSON, or equivalently
-        // using "" as a positional command-line argument would be the
-        // same as --empty. This probably isn't worth blocking or
-        // coding around.
+        // Various places in QPDFJob.cc know that the empty string for infile means empty. We set it
+        // to something other than a null pointer as an indication that some input source has been
+        // specified. This approach means that passing "" as the argument to inputFile in job JSON,
+        // or equivalently using "" as a positional command-line argument would be the same as
+        // --empty. This probably isn't worth blocking or coding around.
         o.m->infilename = QUtil::make_shared_cstr("");
     } else {
-        usage("empty input can't be used"
-              " since input file has already been given");
+        usage("empty input can't be used since input file has already been given");
     }
     return this;
 }
@@ -58,8 +54,7 @@ QPDFJob::Config::replaceInput()
     if ((o.m->outfilename == nullptr) && (!o.m->replace_input)) {
         o.m->replace_input = true;
     } else {
-        usage("replace-input can't be used"
-              " since output file has already been given");
+        usage("replace-input can't be used since output file has already been given");
     }
     return this;
 }
@@ -298,8 +293,7 @@ QPDFJob::Config::jsonOutput(std::string const& parameter)
     o.m->json_output = true;
     json(parameter);
     if (!o.m->json_stream_data_set) {
-        // No need to set json_stream_data_set -- that indicates
-        // explicit use of --json-stream-data.
+        // No need to set json_stream_data_set -- that indicates explicit use of --json-stream-data.
         o.m->json_stream_data = qpdf_sj_inline;
     }
     if (!o.m->decode_level_set) {

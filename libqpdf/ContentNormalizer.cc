@@ -41,9 +41,8 @@ ContentNormalizer::handleToken(QPDFTokenizer::Token const& token)
         break;
 
     case QPDFTokenizer::tt_string:
-        // Replacing string and name tokens in this way normalizes
-        // their representation as this will automatically handle
-        // quoting of unprintable characters, etc.
+        // Replacing string and name tokens in this way normalizes their representation as this will
+        // automatically handle quoting of unprintable characters, etc.
         writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_string, token.getValue()));
         break;
 

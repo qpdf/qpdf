@@ -6,10 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-// This example demonstrates how we can redirect where saved output
-// goes by calling the default logger's setSave method before running
-// something with QPDFJob. See qpdfjob-c-save-attachment.c for an
-// implementation that uses the C API.
+// This example demonstrates how we can redirect where saved output goes by calling the default
+// logger's setSave method before running something with QPDFJob. See qpdfjob-c-save-attachment.c
+// for an implementation that uses the C API.
 
 static int
 save_to_file(char const* data, size_t len, void* udata)
@@ -79,9 +78,8 @@ main(int argc, char* argv[])
     };
     outfile = do_fopen(outfilename);
 
-    /* Use qpdflogger_set_save with a callback function to redirect
-     * saved data. You can use other qpdf logger functions to capture
-     * informational output, warnings, and errors.
+    /* Use qpdflogger_set_save with a callback function to redirect saved data. You can use other
+     * qpdf logger functions to capture informational output, warnings, and errors.
      */
     qpdflogger_set_save(l, qpdf_log_dest_custom, save_to_file, (void*)outfile, 0);
     qpdflogger_cleanup(&l);

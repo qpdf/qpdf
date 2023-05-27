@@ -68,7 +68,7 @@ class QPDF
     // read until they are needed.  A QPDF object may be associated with only one file in its
     // lifetime.  This method must be called before any methods that potentially ask for information
     // about the PDF file are called. Prior to calling this, the only methods that are allowed are
-    // those that set parameters.  If the input file is not encrypted,either a null password or an
+    // those that set parameters.  If the input file is not encrypted, either a null password or an
     // empty password can be used.  If the file is encrypted, either the user password or the owner
     // password may be supplied. The method setPasswordIsHexKey may be called prior to calling this
     // method or any of the other process methods to force the password to be interpreted as a raw

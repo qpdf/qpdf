@@ -32,8 +32,7 @@ QPDF_Name::normalizeName(std::string const& name)
         char ch = name.at(i);
         // Don't use locale/ctype here; follow PDF spec guidelines.
         if (ch == '\0') {
-            // QPDFTokenizer embeds a null character to encode an
-            // invalid #.
+            // QPDFTokenizer embeds a null character to encode an invalid #.
             result += "#";
         } else if (
             ch < 33 || ch == '#' || ch == '/' || ch == '(' || ch == ')' || ch == '{' || ch == '}' ||

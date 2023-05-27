@@ -1,7 +1,4 @@
-/*
- * This is an example program to demonstrate use of object handle
- * functions in the C API.
- */
+/* This is an example program to demonstrate use of object handle functions in the C API. */
 
 #include <qpdf/qpdf-c.h>
 #include <stdio.h>
@@ -20,8 +17,7 @@ usage()
 QPDF_BOOL
 modify_file(qpdf_data qpdf)
 {
-    /* This small example performs the following operation on the
-     * document catalog (a.k.a. root):
+    /* This small example performs the following operation on the document catalog (a.k.a. root):
      * - Remove PageLayout
      * - Remove OpenAction
      * - If there are outlines, set PageMode to UseOutlines; otherwise,
@@ -72,8 +68,7 @@ main(int argc, char* argv[])
 
     if (((qpdf_read(qpdf, infile, password) & QPDF_ERRORS) == 0) && modify_file(qpdf) &&
         ((qpdf_init_write(qpdf, outfile) & QPDF_ERRORS) == 0)) {
-        /* Use static ID for testing only. For production, a
-         * non-static ID is used. See also
+        /* Use static ID for testing only. For production, a non-static ID is used. See also
          * qpdf_set_deterministic_ID. */
         qpdf_set_static_ID(qpdf, QPDF_TRUE); /* for testing only */
         qpdf_write(qpdf);

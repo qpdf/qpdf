@@ -27,8 +27,7 @@ FileInputSource::FileInputSource(char const* description, FILE* filep, bool clos
 
 FileInputSource::~FileInputSource()
 {
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
-    // README-maintainer
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
     if (this->file && this->close_file) {
         fclose(this->file);
     }
@@ -68,8 +67,7 @@ FileInputSource::findAndSkipNextEOL()
             char* p = (p1 && p2) ? std::min(p1, p2) : p1 ? p1 : p2;
             if (p) {
                 result = cur_offset + (p - buf);
-                // We found \r or \n.  Keep reading until we get past
-                // \r and \n characters.
+                // We found \r or \n.  Keep reading until we get past \r and \n characters.
                 this->seek(result + 1, SEEK_SET);
                 char ch;
                 while (!done) {

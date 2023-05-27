@@ -139,8 +139,8 @@ QPDFArgParser::addInvalidChoiceHandler(std::string const& arg, param_arg_handler
     auto i = m->option_table->find(arg);
     if (i == m->option_table->end()) {
         QTC::TC("libtests", "QPDFArgParser invalid choice handler to unknown");
-        throw std::logic_error("QPDFArgParser: attempt to add invalid choice handler"
-                               " to unknown argument");
+        throw std::logic_error(
+            "QPDFArgParser: attempt to add invalid choice handler to unknown argument");
     }
     auto& oe = i->second;
     oe.invalid_choice_handler = handler;
@@ -231,9 +231,9 @@ QPDFArgParser::invalidHelpArg(std::string const& p)
 void
 QPDFArgParser::handleArgFileArguments()
 {
-    // Support reading arguments from files. Create a new argv. Ensure
-    // that argv itself as well as all its contents are automatically
-    // deleted by using shared pointers to back the pointers in argv.
+    // Support reading arguments from files. Create a new argv. Ensure that argv itself as well as
+    // all its contents are automatically deleted by using shared pointers to back the pointers in
+    // argv.
     m->new_argv.push_back(QUtil::make_shared_cstr(m->argv[0]));
     for (int i = 1; i < m->argc; ++i) {
         char const* argfile = nullptr;
@@ -264,12 +264,10 @@ QPDFArgParser::handleArgFileArguments()
 void
 QPDFArgParser::handleBashArguments()
 {
-    // Do a minimal job of parsing bash_line into arguments. This
-    // doesn't do everything the shell does (e.g. $(...), variable
-    // expansion, arithmetic, globs, etc.), but it should be good
-    // enough for purposes of handling completion. As we build up the
-    // new argv, we can't use m->new_argv because this code has to
-    // interoperate with @file arguments, so memory for both ways of
+    // Do a minimal job of parsing bash_line into arguments. This doesn't do everything the shell
+    // does (e.g. $(...), variable expansion, arithmetic, globs, etc.), but it should be good enough
+    // for purposes of handling completion. As we build up the new argv, we can't use m->new_argv
+    // because this code has to interoperate with @file arguments, so memory for both ways of
     // fabricating argv has to be protected.
 
     bool last_was_backslash = false;
@@ -321,12 +319,11 @@ QPDFArgParser::handleBashArguments()
         }
     }
     if (m->bash_argv.empty()) {
-        // This can't happen if properly invoked by bash, but ensure
-        // we have a valid argv[0] regardless.
+        // This can't happen if properly invoked by bash, but ensure we have a valid argv[0]
+        // regardless.
         m->bash_argv.push_back(QUtil::make_shared_cstr(m->argv[0]));
     }
-    // Explicitly discard any non-space-terminated word. The "current
-    // word" is handled specially.
+    // Explicitly discard any non-space-terminated word. The "current word" is handled specially.
     m->bash_argv_ph = QUtil::make_shared_array<char const*>(1 + m->bash_argv.size());
     for (size_t i = 0; i < m->bash_argv.size(); ++i) {
         m->bash_argv_ph.get()[i] = m->bash_argv.at(i).get();
@@ -367,12 +364,10 @@ QPDFArgParser::checkCompletion()
 {
     // See if we're being invoked from bash completion.
     std::string bash_point_env;
-    // On Windows with mingw, there have been times when there appears
-    // to be no way to distinguish between an empty environment
-    // variable and an unset variable. There are also conditions under
-    // which bash doesn't set COMP_LINE. Therefore, enter this logic
-    // if either COMP_LINE or COMP_POINT are set. They will both be
-    // set together under ordinary circumstances.
+    // On Windows with mingw, there have been times when there appears to be no way to distinguish
+    // between an empty environment variable and an unset variable. There are also conditions under
+    // which bash doesn't set COMP_LINE. Therefore, enter this logic if either COMP_LINE or
+    // COMP_POINT are set. They will both be set together under ordinary circumstances.
     bool got_line = QUtil::get_env("COMP_LINE", &m->bash_line);
     bool got_point = QUtil::get_env("COMP_POINT", &bash_point_env);
     if (got_line || got_point) {
@@ -385,15 +380,12 @@ QPDFArgParser::checkCompletion()
         if (p > m->bash_line.length()) {
             p = m->bash_line.length();
         }
-        // Set bash_cur and bash_prev based on bash_line rather than
-        // relying on argv. This enables us to use bashcompinit to get
-        // completion in zsh too since bashcompinit sets COMP_LINE and
-        // COMP_POINT but doesn't invoke the command with options like
-        // bash does.
+        // Set bash_cur and bash_prev based on bash_line rather than relying on argv. This enables
+        // us to use bashcompinit to get completion in zsh too since bashcompinit sets COMP_LINE and
+        // COMP_POINT but doesn't invoke the command with options like bash does.
 
-        // p is equal to length of the string. Walk backwards looking
-        // for the first separator. bash_cur is everything after the
-        // last separator, possibly empty.
+        // p is equal to length of the string. Walk backwards looking for the first separator.
+        // bash_cur is everything after the last separator, possibly empty.
         char sep(0);
         while (p > 0) {
             --p;
@@ -407,10 +399,9 @@ QPDFArgParser::checkCompletion()
             m->bash_cur = m->bash_line.substr(1 + p, std::string::npos);
         }
         if ((sep == ':') || (sep == '=')) {
-            // Bash sets prev to the non-space separator if any.
-            // Actually, if there are multiple separators in a row,
-            // they are all included in prev, but that detail is not
-            // important to us and not worth coding.
+            // Bash sets prev to the non-space separator if any. Actually, if there are multiple
+            // separators in a row, they are all included in prev, but that detail is not important
+            // to us and not worth coding.
             m->bash_prev = m->bash_line.substr(p, 1);
         } else {
             // Go back to the last separator and set prev based on
@@ -429,8 +420,8 @@ QPDFArgParser::checkCompletion()
             m->bash_prev = m->bash_line.substr(0, p);
         }
         if (m->argc == 1) {
-            // This is probably zsh using bashcompinit. There are a
-            // few differences in the expected output.
+            // This is probably zsh using bashcompinit. There are a few differences in the expected
+            // output.
             m->zsh_completion = true;
         }
         handleBashArguments();
@@ -454,8 +445,7 @@ QPDFArgParser::parseArgs()
         std::string o_arg(arg);
         std::string arg_s(arg);
         if (strcmp(arg, "--") == 0) {
-            // Special case for -- option, which is used to break out
-            // of subparsers.
+            // Special case for -- option, which is used to break out of subparsers.
             oep = m->option_table->find("--");
             end_option = true;
             if (oep == m->option_table->end()) {
@@ -471,11 +461,9 @@ QPDFArgParser::parseArgs()
                 QTC::TC("libtests", "QPDFArgParser single dash");
             }
 
-            // Prevent --=something from being treated as an empty arg
-            // by searching for = from after the first character. We
-            // do this since the empty string in the option table is
-            // for positional arguments. Besides, it doesn't make
-            // sense to have an empty option.
+            // Prevent --=something from being treated as an empty arg by searching for = from after
+            // the first character. We do this since the empty string in the option table is for
+            // positional arguments. Besides, it doesn't make sense to have an empty option.
             arg_s = arg;
             size_t equal_pos = std::string::npos;
             if (arg_s.length() > 0) {
@@ -489,8 +477,7 @@ QPDFArgParser::parseArgs()
 
             if ((!m->bash_completion) && (m->argc == 2) && (m->cur_arg == 1) &&
                 m->help_option_table.count(arg_s)) {
-                // Handle help option, which is only valid as the sole
-                // option.
+                // Handle help option, which is only valid as the sole option.
                 QTC::TC("libtests", "QPDFArgParser help option");
                 oep = m->help_option_table.find(arg_s);
                 help_option = true;
@@ -500,8 +487,7 @@ QPDFArgParser::parseArgs()
                 oep = m->option_table->find(arg_s);
             }
         } else {
-            // The empty string maps to the positional argument
-            // handler.
+            // The empty string maps to the positional argument handler.
             QTC::TC("libtests", "QPDFArgParser positional");
             oep = m->option_table->find("");
             parameter = arg;
@@ -522,8 +508,7 @@ QPDFArgParser::parseArgs()
             std::string message = "--" + arg_s + " must be given as --" + arg_s + "=";
             if (oe.invalid_choice_handler) {
                 oe.invalid_choice_handler(parameter);
-                // Method should call usage() or exit. Just in case it
-                // doesn't...
+                // Method should call usage() or exit. Just in case it doesn't...
                 message += "option";
             } else if (!oe.choices.empty()) {
                 QTC::TC("libtests", "QPDFArgParser required choices");
@@ -609,8 +594,8 @@ QPDFArgParser::addOptionsToCompletions(option_table_t& option_table)
         std::string base = "--" + arg;
         if (oe.param_arg_handler) {
             if (m->zsh_completion) {
-                // zsh doesn't treat = as a word separator, so add all
-                // the options so we don't get a space after the =.
+                // zsh doesn't treat = as a word separator, so add all the options so we don't get a
+                // space after the =.
                 addChoicesToCompletions(option_table, arg, base + "=");
             }
             m->completions.insert(base + "=");

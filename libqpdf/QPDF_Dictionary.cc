@@ -89,8 +89,7 @@ QPDF_Dictionary::hasKey(std::string const& key)
 QPDFObjectHandle
 QPDF_Dictionary::getKey(std::string const& key)
 {
-    // PDF spec says fetching a non-existent key from a dictionary
-    // returns the null object.
+    // PDF spec says fetching a non-existent key from a dictionary returns the null object.
     auto item = this->items.find(key);
     if (item != this->items.end()) {
         // May be a null object
@@ -123,8 +122,7 @@ void
 QPDF_Dictionary::replaceKey(std::string const& key, QPDFObjectHandle value)
 {
     if (value.isNull()) {
-        // The PDF spec doesn't distinguish between keys with null
-        // values and missing keys.
+        // The PDF spec doesn't distinguish between keys with null values and missing keys.
         removeKey(key);
     } else {
         // add or replace value

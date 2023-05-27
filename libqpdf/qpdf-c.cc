@@ -269,9 +269,8 @@ qpdf_read(qpdf_data qpdf, char const* filename, char const* password)
     qpdf->filename = filename;
     qpdf->password = password;
     status = trap_errors(qpdf, &call_read);
-    // We no longer have a good way to exercise a file with both
-    // warnings and errors because qpdf is getting much better at
-    // recovering.
+    // We no longer have a good way to exercise a file with both warnings and errors because qpdf is
+    // getting much better at recovering.
     QTC::TC(
         "qpdf",
         "qpdf-c called qpdf_read",
@@ -806,9 +805,8 @@ template <class RET>
 static RET
 trap_oh_errors(qpdf_data qpdf, std::function<RET()> fallback, std::function<RET(qpdf_data)> fn)
 {
-    // Note: fallback is a function so we don't have to evaluate it
-    // unless needed. This is important because sometimes the fallback
-    // creates an object.
+    // Note: fallback is a function so we don't have to evaluate it unless needed. This is important
+    // because sometimes the fallback creates an object.
     RET ret;
     QPDF_ERROR_CODE status = trap_errors(qpdf, [&ret, fn](qpdf_data q) { ret = fn(q); });
     if (status & QPDF_ERRORS) {
@@ -820,9 +818,8 @@ trap_oh_errors(qpdf_data qpdf, std::function<RET()> fallback, std::function<RET(
                     qpdf->qpdf->getFilename(),
                     "",
                     0,
-                    "C API function caught an exception that it isn't"
-                    " returning; please point the application developer"
-                    " to ERROR HANDLING in qpdf-c.h"));
+                    "C API function caught an exception that it isn't returning; please point the "
+                    "application developer to ERROR HANDLING in qpdf-c.h"));
                 qpdf->oh_error_occurred = true;
             }
             *QPDFLogger::defaultLogger()->getError() << qpdf->error->what() << "\n";

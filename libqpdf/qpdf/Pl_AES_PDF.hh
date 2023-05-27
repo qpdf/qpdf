@@ -5,8 +5,8 @@
 #include <qpdf/QPDFCryptoImpl.hh>
 #include <memory>
 
-// This pipeline implements AES-128 and AES-256 with CBC and block
-// padding as specified in the PDF specification.
+// This pipeline implements AES-128 and AES-256 with CBC and block padding as specified in the PDF
+// specification.
 
 class Pl_AES_PDF: public Pipeline
 {

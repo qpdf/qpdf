@@ -4,8 +4,8 @@
 #include <qpdf/QPDFCryptoImpl.hh>
 #include <memory>
 
-// gnutls headers must be last to prevent them from interfering with
-// other headers. gnutls.h has to be included first.
+// gnutls headers must be last to prevent them from interfering with other headers. gnutls.h has to
+// be included first.
 #include <gnutls/gnutls.h>
 // This comment prevents clang-format from putting crypto.h before gnutls.h
 #include <gnutls/crypto.h>

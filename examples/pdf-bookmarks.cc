@@ -8,9 +8,9 @@
 #include <cstring>
 #include <iostream>
 
-// This program demonstrates extraction of bookmarks using the qpdf
-// outlines API. Note that all the information shown by this program
-// can also be obtained from a PDF file using qpdf's --json option.
+// This program demonstrates extraction of bookmarks using the qpdf outlines API. Note that all the
+// information shown by this program can also be obtained from a PDF file using qpdf's --json
+// option.
 //
 // Ignore calls to QTC::TC - they are for qpdf CI testing only.
 
@@ -118,11 +118,10 @@ show_bookmark_details(QPDFOutlineObjectHelper outline, std::vector<int> numbers)
 void
 extract_bookmarks(std::vector<QPDFOutlineObjectHelper> outlines, std::vector<int>& numbers)
 {
-    // For style == st_numbers, numbers.at(n) contains the numerical
-    // label for the outline, so we count up from 1.
-    // For style == st_lines, numbers.at(n) == 0 indicates the last
-    // outline at level n, and we don't otherwise care what the value
-    // is, so we count up to zero.
+    // For style == st_numbers, numbers.at(n) contains the numerical label for the outline, so we
+    // count up from 1.
+    // For style == st_lines, numbers.at(n) == 0 indicates the last outline at level n, and we don't
+    // otherwise care what the value is, so we count up to zero.
     numbers.push_back((style == st_lines) ? -QIntC::to_int(outlines.size()) : 0);
     for (auto& outline: outlines) {
         ++(numbers.back());

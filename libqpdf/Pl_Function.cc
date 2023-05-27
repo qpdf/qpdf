@@ -41,8 +41,7 @@ Pl_Function::Pl_Function(char const* identifier, Pipeline* next, writer_c_char_t
 
 Pl_Function::~Pl_Function()
 {
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
-    // README-maintainer
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
 }
 
 void

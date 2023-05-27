@@ -29,24 +29,19 @@ main(int argc, char* argv[])
     QPDF qpdf;
     qpdf.emptyPDF();
 
-    // This example doesn't do anything particularly useful other than
-    // just illustrate how to use the APIs for name and number trees.
-    // It also demonstrates use of the iterators for dictionaries and
-    // arrays introduced at the same time with qpdf 10.2.
+    // This example doesn't do anything particularly useful other than just illustrate how to use
+    // the APIs for name and number trees. It also demonstrates use of the iterators for
+    // dictionaries and arrays introduced at the same time with qpdf 10.2.
 
-    // To use this example, compile it and run it. Study the output
-    // and compare it to what you expect. When done, look at the
-    // generated output file in a text editor to inspect the structure
-    // of the trees as left in the file.
+    // To use this example, compile it and run it. Study the output and compare it to what you
+    // expect. When done, look at the generated output file in a text editor to inspect the
+    // structure of the trees as left in the file.
 
-    // We're just going to create some name and number trees, hang
-    // them off the document catalog (root), and write an empty PDF to
-    // a file. The PDF will have no pages and won't be viewable, but
-    // you can look at it in a text editor to see the resulting
-    // structure of the PDF.
+    // We're just going to create some name and number trees, hang them off the document catalog
+    // (root), and write an empty PDF to a file. The PDF will have no pages and won't be viewable,
+    // but you can look at it in a text editor to see the resulting structure of the PDF.
 
-    // Create a dictionary off the root where we will hang our name
-    // and number tree.
+    // Create a dictionary off the root where we will hang our name and number tree.
     auto root = qpdf.getRoot();
     auto example = QPDFObjectHandle::newDictionary();
     root.replaceKey("/Example", example);
@@ -75,8 +70,8 @@ main(int argc, char* argv[])
         std::cout << "  " << i.first << " -> " << i.second.unparse() << std::endl;
     }
 
-    // This is a small tree, so everything will be at the root. We can
-    // look at it using dictionary and array iterators.
+    // This is a small tree, so everything will be at the root. We can look at it using dictionary
+    // and array iterators.
     std::cout << "Keys in name tree object:" << std::endl;
     QPDFObjectHandle names;
     for (auto const& i: name_tree_oh.ditems()) {
@@ -121,15 +116,12 @@ main(int argc, char* argv[])
               << std::endl;
     std::cout << "Has K?: " << name_tree.hasName("K") << std::endl;
 
-    // Illustrate some more advanced usage using number trees. These
-    // calls work for name trees too.
+    // Illustrate some more advanced usage using number trees. These calls work for name trees too.
 
-    // The safe way to populate a tree is to call insert repeatedly as
-    // above, but if you know you are definitely inserting items in
-    // order, it is more efficient to insert them using insertAfter,
-    // which avoids doing a binary search through the tree for each
-    // insertion. Note that if you don't insert items in order using
-    // this method, you will create an invalid tree.
+    // The safe way to populate a tree is to call insert repeatedly as above, but if you know you
+    // are definitely inserting items in order, it is more efficient to insert them using
+    // insertAfter, which avoids doing a binary search through the tree for each insertion. Note
+    // that if you don't insert items in order using this method, you will create an invalid tree.
     auto number_tree = QPDFNumberTreeObjectHelper::newEmpty(qpdf);
     auto number_tree_oh = number_tree.getObjectHandle();
     example.replaceKey("/NumberTree", number_tree_oh);
@@ -149,9 +141,8 @@ main(int argc, char* argv[])
         ++n;
     }
 
-    // When you remove an item with an iterator, the iterator
-    // advances. This makes it possible to filter while iterating.
-    // Remove all items that are multiples of 5.
+    // When you remove an item with an iterator, the iterator advances. This makes it possible to
+    // filter while iterating. Remove all items that are multiples of 5.
     iter2 = number_tree.begin();
     while (iter2 != number_tree.end()) {
         if (iter2->first % 5 == 0) {

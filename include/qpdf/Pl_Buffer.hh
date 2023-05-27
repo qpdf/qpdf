@@ -47,8 +47,8 @@ class QPDF_DLL_CLASS Pl_Buffer: public Pipeline
     void finish() override;
 
     // Each call to getBuffer() resets this object -- see notes above.
-    // The caller is responsible for deleting the returned Buffer
-    // object. See also getBufferSharedPointer() and getMallocBuffer().
+    // The caller is responsible for deleting the returned Buffer object. See also
+    // getBufferSharedPointer() and getMallocBuffer().
     QPDF_DLL
     Buffer* getBuffer();
 
