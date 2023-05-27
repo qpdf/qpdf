@@ -4,55 +4,42 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
-// In support of page manipulation APIs, these methods internally
-// maintain state about pages in a pair of data structures: all_pages,
-// which is a vector of page objects, and pageobj_to_pages_pos, which
-// maps a page object to its position in the all_pages array.
-// Unfortunately, the getAllPages() method returns a const reference
-// to all_pages and has been in the public API long before the
-// introduction of mutation APIs, so we're pretty much stuck with it.
-// Anyway, there are lots of calls to it in the library, so the
-// efficiency of having it cached is probably worth keeping it. At one
-// point, I had partially implemented a helper class specifically for
-// the pages tree, but once you work in all the logic that handles
-// repairing the /Type keys of page tree nodes (both /Pages and /Page)
-// and deal with duplicate pages, it's just as complex and less
-// efficient than what's here. So, in spite of the fact that a const
-// reference is returned, the current code is fine and does not need
-// to be replaced. A partial implementation of QPDFPagesTree is in
-// github in attic in case there is ever a reason to resurrect it.
-// There are additional notes in README-maintainer, which also refers
-// to this comment.
+// In support of page manipulation APIs, these methods internally maintain state about pages in a
+// pair of data structures: all_pages, which is a vector of page objects, and pageobj_to_pages_pos,
+// which maps a page object to its position in the all_pages array. Unfortunately, the getAllPages()
+// method returns a const reference to all_pages and has been in the public API long before the
+// introduction of mutation APIs, so we're pretty much stuck with it. Anyway, there are lots of
+// calls to it in the library, so the efficiency of having it cached is probably worth keeping it.
+// At one point, I had partially implemented a helper class specifically for the pages tree, but
+// once you work in all the logic that handles repairing the /Type keys of page tree nodes (both
+// /Pages and /Page) and deal with duplicate pages, it's just as complex and less efficient than
+// what's here. So, in spite of the fact that a const reference is returned, the current code is
+// fine and does not need to be replaced. A partial implementation of QPDFPagesTree is in github in
+// attic in case there is ever a reason to resurrect it. There are additional notes in
+// README-maintainer, which also refers to this comment.
 
-// The goal of this code is to ensure that the all_pages vector, which
-// users may have a reference to, and the pageobj_to_pages_pos map,
-// which users will not have access to, remain consistent outside of
-// any call to the library.  As long as users only touch the /Pages
-// structure through page-specific API calls, they never have to worry
-// about anything, and this will also stay consistent.  If a user
-// touches anything about the /Pages structure outside of these calls
-// (such as by directly looking up and manipulating the underlying
-// objects), they can call updatePagesCache() to bring things back in
-// sync.
+// The goal of this code is to ensure that the all_pages vector, which users may have a reference
+// to, and the pageobj_to_pages_pos map, which users will not have access to, remain consistent
+// outside of any call to the library.  As long as users only touch the /Pages structure through
+// page-specific API calls, they never have to worry about anything, and this will also stay
+// consistent.  If a user touches anything about the /Pages structure outside of these calls (such
+// as by directly looking up and manipulating the underlying objects), they can call
+// updatePagesCache() to bring things back in sync.
 
-// If the user doesn't ever use the page manipulation APIs, then qpdf
-// leaves the /Pages structure alone.  If the user does use the APIs,
-// then we push all inheritable objects down and flatten the /Pages
-// tree.  This makes it easier for us to keep /Pages, all_pages, and
-// pageobj_to_pages_pos internally consistent at all times.
+// If the user doesn't ever use the page manipulation APIs, then qpdf leaves the /Pages structure
+// alone.  If the user does use the APIs, then we push all inheritable objects down and flatten the
+// /Pages tree.  This makes it easier for us to keep /Pages, all_pages, and pageobj_to_pages_pos
+// internally consistent at all times.
 
-// Responsibility for keeping all_pages, pageobj_to_pages_pos, and the
-// Pages structure consistent should remain in as few places as
-// possible.  As of initial writing, only flattenPagesTree,
-// insertPage, and removePage, along with methods they call, are
-// concerned with it.  Everything else goes through one of those
-// methods.
+// Responsibility for keeping all_pages, pageobj_to_pages_pos, and the Pages structure consistent
+// should remain in as few places as possible.  As of initial writing, only flattenPagesTree,
+// insertPage, and removePage, along with methods they call, are concerned with it.  Everything else
+// goes through one of those methods.
 
 std::vector<QPDFObjectHandle> const&
 QPDF::getAllPages()
 {
-    // Note that pushInheritedAttributesToPage may also be used to
-    // initialize m->all_pages.
+    // Note that pushInheritedAttributesToPage may also be used to initialize m->all_pages.
     if (m->all_pages.empty()) {
         m->ever_called_get_all_pages = true;
         QPDFObjGen::set visited;
@@ -65,9 +52,8 @@ QPDF::getAllPages()
                 // loop -- will be detected again and reported later
                 break;
             }
-            // Files have been found in the wild where /Pages in the
-            // catalog points to the first page. Try to work around
-            // this and similar cases with this heuristic.
+            // Files have been found in the wild where /Pages in the catalog points to the first
+            // page. Try to work around this and similar cases with this heuristic.
             if (!warned) {
                 getRoot().warnIfPossible("document page tree root (root -> /Pages) doesn't point"
                                          " to the root of the page tree; attempting to correct");
@@ -118,8 +104,8 @@ QPDF::getAllPagesInternal(
                 kid = makeIndirectObject(kid);
                 kids.setArrayItem(i, kid);
             } else if (!seen.add(kid)) {
-                // Make a copy of the page. This does the same as
-                // shallowCopyPage in QPDFPageObjectHelper.
+                // Make a copy of the page. This does the same as shallowCopyPage in
+                // QPDFPageObjectHelper.
                 QTC::TC("qpdf", "QPDF resolve duplicated page object");
                 cur_node.warnIfPossible(
                     "kid " + std::to_string(i) +
@@ -141,9 +127,8 @@ QPDF::getAllPagesInternal(
 void
 QPDF::updateAllPagesCache()
 {
-    // Force regeneration of the pages cache.  We force immediate
-    // recalculation of all_pages since users may have references to
-    // it that they got from calls to getAllPages().  We can defer
+    // Force regeneration of the pages cache.  We force immediate recalculation of all_pages since
+    // users may have references to it that they got from calls to getAllPages().  We can defer
     // recalculation of pageobj_to_pages_pos until needed.
     QTC::TC("qpdf", "QPDF updateAllPagesCache");
     m->all_pages.clear();
@@ -155,25 +140,23 @@ QPDF::updateAllPagesCache()
 void
 QPDF::flattenPagesTree()
 {
-    // If not already done, flatten the /Pages structure and
-    // initialize pageobj_to_pages_pos.
+    // If not already done, flatten the /Pages structure and initialize pageobj_to_pages_pos.
 
     if (!m->pageobj_to_pages_pos.empty()) {
         return;
     }
 
-    // Push inherited objects down to the /Page level.  As a side
-    // effect m->all_pages will also be generated.
+    // Push inherited objects down to the /Page level.  As a side effect m->all_pages will also be
+    // generated.
     pushInheritedAttributesToPage(true, true);
 
     QPDFObjectHandle pages = getRoot().getKey("/Pages");
 
     size_t const len = m->all_pages.size();
     for (size_t pos = 0; pos < len; ++pos) {
-        // Populate pageobj_to_pages_pos and fix parent pointer. There
-        // should be no duplicates at this point because
-        // pushInheritedAttributesToPage calls getAllPages which
-        // resolves duplicates.
+        // Populate pageobj_to_pages_pos and fix parent pointer. There should be no duplicates at
+        // this point because pushInheritedAttributesToPage calls getAllPages which resolves
+        // duplicates.
         insertPageobjToPage(m->all_pages.at(pos), toI(pos), true);
         m->all_pages.at(pos).replaceKey("/Parent", pages);
     }
@@ -191,16 +174,14 @@ QPDF::insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_dupli
     QPDFObjGen og(obj.getObjGen());
     if (check_duplicate) {
         if (!m->pageobj_to_pages_pos.insert(std::make_pair(og, pos)).second) {
-            // The library never calls insertPageobjToPage in a way
-            // that causes this to happen.
+            // The library never calls insertPageobjToPage in a way that causes this to happen.
             setLastObjectDescription("page " + std::to_string(pos) + " (numbered from zero)", og);
             throw QPDFExc(
                 qpdf_e_pages,
                 m->file->getName(),
                 m->last_object_description,
                 0,
-                "duplicate page reference found;"
-                " this would cause loss of data");
+                "duplicate page reference found; this would cause loss of data");
         }
     } else {
         m->pageobj_to_pages_pos[og] = pos;
@@ -210,8 +191,7 @@ QPDF::insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_dupli
 void
 QPDF::insertPage(QPDFObjectHandle newpage, int pos)
 {
-    // pos is numbered from 0, so pos = 0 inserts at the beginning and
-    // pos = npages adds to the end.
+    // pos is numbered from 0, so pos = 0 inserts at the beginning and pos = npages adds to the end.
 
     flattenPagesTree();
 
@@ -233,10 +213,9 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
     QTC::TC(
         "qpdf",
         "QPDF insert page",
-        (pos == 0) ? 0 : // insert at beginning
-            (pos == toI(m->all_pages.size())) ? 1
-                                              : // at end
-            2);                                 // insert in middle
+        (pos == 0) ? 0 :                            // insert at beginning
+            (pos == toI(m->all_pages.size())) ? 1   // at end
+                                              : 2); // insert in middle
 
     auto og = newpage.getObjGen();
     if (m->pageobj_to_pages_pos.count(og)) {
@@ -265,10 +244,9 @@ QPDF::removePage(QPDFObjectHandle page)
     QTC::TC(
         "qpdf",
         "QPDF remove page",
-        (pos == 0) ? 0 : // remove at beginning
-            (pos == toI(m->all_pages.size() - 1)) ? 1
-                                                  : // end
-            2);                                     // remove in middle
+        (pos == 0) ? 0 :                                // remove at beginning
+            (pos == toI(m->all_pages.size() - 1)) ? 1   // end
+                                                  : 2); // remove in middle
 
     QPDFObjectHandle pages = getRoot().getKey("/Pages");
     QPDFObjectHandle kids = pages.getKey("/Kids");

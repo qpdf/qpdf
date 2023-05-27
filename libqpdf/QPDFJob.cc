@@ -130,8 +130,8 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
     if (!(w_obj.isNumber() && h_obj.isNumber())) {
         if (!description.empty()) {
             o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-                v << prefix << ": " << description << ": not optimizing because image dictionary"
-                  << " is missing required keys\n";
+                v << prefix << ": " << description
+                  << ": not optimizing because image dictionary is missing required keys\n";
             });
         }
         return result;
@@ -142,14 +142,13 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         if (!description.empty()) {
             o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                 v << prefix << ": " << description
-                  << ": not optimizing because image has other than"
-                  << " 8 bits per component\n";
+                  << ": not optimizing because image has other than 8 bits per component\n";
             });
         }
         return result;
     }
-    // Files have been seen in the wild whose width and height are
-    // floating point, which is goofy, but we can deal with it.
+    // Files have been seen in the wild whose width and height are floating point, which is goofy,
+    // but we can deal with it.
     JDIMENSION w = 0;
     if (w_obj.isInteger()) {
         w = w_obj.getUIntValueAsUInt();
@@ -178,8 +177,8 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         QTC::TC("qpdf", "QPDFJob image optimize colorspace");
         if (!description.empty()) {
             o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-                v << prefix << ": " << description << ": not optimizing because qpdf can't optimize"
-                  << " images with this colorspace\n";
+                v << prefix << ": " << description
+                  << ": not optimizing because qpdf can't optimize images with this colorspace\n";
             });
         }
         return result;
@@ -190,8 +189,9 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         QTC::TC("qpdf", "QPDFJob image optimize too small");
         if (!description.empty()) {
             o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-                v << prefix << ": " << description << ": not optimizing because image"
-                  << " is smaller than requested minimum dimensions\n";
+                v << prefix << ": " << description
+                  << ": not optimizing because image is smaller than requested minimum "
+                     "dimensions\n";
             });
         }
         return result;
@@ -207,8 +207,8 @@ ImageOptimizer::evaluate(std::string const& description)
     if (!image.pipeStreamData(nullptr, 0, qpdf_dl_specialized, true)) {
         QTC::TC("qpdf", "QPDFJob image optimize no pipeline");
         o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-            v << prefix << ": " << description << ": not optimizing because unable to decode data"
-              << " or data already uses DCT\n";
+            v << prefix << ": " << description
+              << ": not optimizing because unable to decode data or data already uses DCT\n";
         });
         return false;
     }
@@ -227,8 +227,7 @@ ImageOptimizer::evaluate(std::string const& description)
         QTC::TC("qpdf", "QPDFJob image optimize no shrink");
         o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << prefix << ": " << description
-              << ": not optimizing because DCT compression does not"
-              << " reduce image size\n";
+              << ": not optimizing because DCT compression does not reduce image size\n";
         });
         return false;
     }
@@ -245,8 +244,8 @@ ImageOptimizer::provideStreamData(QPDFObjGen const&, Pipeline* pipeline)
     std::shared_ptr<Pipeline> p = makePipeline("", pipeline);
     if (p == nullptr) {
         // Should not be possible
-        image.warnIfPossible("unable to create pipeline after previous"
-                             " success; image data will be lost");
+        image.warnIfPossible(
+            "unable to create pipeline after previous success; image data will be lost");
         pipeline->finish();
         return;
     }
@@ -441,8 +440,7 @@ QPDFJob::createQPDF()
         processFile(pdf_sp, m->infilename.get(), m->password.get(), true, true);
     } catch (QPDFExc& e) {
         if (e.getErrorCode() == qpdf_e_password) {
-            // Allow certain operations to work when an incorrect
-            // password is supplied.
+            // Allow certain operations to work when an incorrect password is supplied.
             if (m->check_is_encrypted || m->check_requires_password) {
                 m->encryption_status = qpdf_es_encrypted | qpdf_es_password_incorrect;
                 return nullptr;
@@ -464,8 +462,8 @@ QPDFJob::createQPDF()
         return nullptr;
     }
 
-    // If we are updating from JSON, this has to be done first before
-    // other options may cause transformations to the input.
+    // If we are updating from JSON, this has to be done first before other options may cause
+    // transformations to the input.
     if (!m->update_from_json.empty()) {
         pdf.updateFromJSON(m->update_from_json);
     }
@@ -497,16 +495,16 @@ QPDFJob::writeQPDF(QPDF& pdf)
     }
     if (m->warnings && (!m->suppress_warnings)) {
         if (createsOutput()) {
-            *m->log->getWarn() << m->message_prefix << ": operation succeeded with warnings;"
-                               << " resulting file may have some problems\n";
+            *m->log->getWarn()
+                << m->message_prefix
+                << ": operation succeeded with warnings; resulting file may have some problems\n";
         } else {
             *m->log->getWarn() << m->message_prefix << ": operation succeeded with warnings\n";
         }
     }
     if (m->report_mem_usage) {
-        // Call get_max_memory_usage before generating output. When
-        // debugging, it's easier if print statements from
-        // get_max_memory_usage are not interleaved with the output.
+        // Call get_max_memory_usage before generating output. When debugging, it's easier if print
+        // statements from get_max_memory_usage are not interleaved with the output.
         auto mem_usage = QUtil::get_max_memory_usage();
         *m->log->getWarn() << "qpdf-max-memory-usage " << mem_usage << "\n";
     }
@@ -568,16 +566,13 @@ QPDFJob::getExitCode() const
 void
 QPDFJob::checkConfiguration()
 {
-    // Do final checks for command-line consistency. (I always think
-    // this is called doFinalChecks, so I'm putting that in a
-    // comment.)
+    // Do final checks for command-line consistency. (I always think this is called doFinalChecks,
+    // so I'm putting that in a comment.)
 
     if (m->replace_input) {
-        // Check for --empty appears later after we have checked
-        // m->infilename.
+        // Check for --empty appears later after we have checked m->infilename.
         if (m->outfilename) {
-            usage("--replace-input may not be used when"
-                  " an output file is specified");
+            usage("--replace-input may not be used when an output file is specified");
         } else if (m->split_pages) {
             usage("--split-pages may not be used with --replace-input");
         } else if (m->json_version) {
@@ -585,8 +580,8 @@ QPDFJob::checkConfiguration()
         }
     }
     if (m->json_version && (m->outfilename == nullptr)) {
-        // The output file is optional with --json for backward
-        // compatibility and defaults to standard output.
+        // The output file is optional with --json for backward compatibility and defaults to
+        // standard output.
         m->outfilename = QUtil::make_shared_cstr("-");
     }
     if (m->infilename == nullptr) {
@@ -605,24 +600,21 @@ QPDFJob::checkConfiguration()
 
     if (m->encrypt && (!m->allow_insecure) &&
         (m->owner_password.empty() && (!m->user_password.empty()) && (m->keylen == 256))) {
-        // Note that empty owner passwords for R < 5 are copied from
-        // the user password, so this lack of security is not an issue
-        // for those files. Also we are consider only the ability to
-        // open the file without a password to be insecure. We are not
-        // concerned about whether the viewer enforces security
-        // settings when the user and owner password match.
-        usage("A PDF with a non-empty user password and an empty owner"
-              " password encrypted with a 256-bit key is insecure as it"
-              " can be opened without a password. If you really want to"
-              " do this, you must also give the --allow-insecure option"
-              " before the -- that follows --encrypt.");
+        // Note that empty owner passwords for R < 5 are copied from the user password, so this lack
+        // of security is not an issue for those files. Also we are consider only the ability to
+        // open the file without a password to be insecure. We are not concerned about whether the
+        // viewer enforces security settings when the user and owner password match.
+        usage(
+            "A PDF with a non-empty user password and an empty owner password encrypted with a "
+            "256-bit key is insecure as it can be opened without a password. If you really want to"
+            " do this, you must also give the --allow-insecure option before the -- that follows "
+            "--encrypt.");
     }
 
     bool save_to_stdout = false;
     if (m->require_outfile && m->outfilename && (strcmp(m->outfilename.get(), "-") == 0)) {
         if (m->split_pages) {
-            usage("--split-pages may not be used when"
-                  " writing to standard output");
+            usage("--split-pages may not be used when writing to standard output");
         }
         save_to_stdout = true;
     }
@@ -634,9 +626,8 @@ QPDFJob::checkConfiguration()
     }
     if ((!m->split_pages) && QUtil::same_file(m->infilename.get(), m->outfilename.get())) {
         QTC::TC("qpdf", "QPDFJob same file error");
-        usage("input file and output file are the same;"
-              " use --replace-input to intentionally"
-              " overwrite the input file");
+        usage("input file and output file are the same; use --replace-input to intentionally "
+              "overwrite the input file");
     }
 
     if (m->json_version == 1) {
@@ -645,8 +636,7 @@ QPDFJob::checkConfiguration()
         }
     } else {
         if (m->json_keys.count("objectinfo") || m->json_keys.count("objects")) {
-            usage("json keys \"objects\" and \"objectinfo\" are only valid for"
-                  " json version 1");
+            usage("json keys \"objects\" and \"objectinfo\" are only valid for json version 1");
         }
     }
 }
@@ -754,10 +744,8 @@ QPDFJob::showEncryption(QPDF& pdf)
 void
 QPDFJob::doCheck(QPDF& pdf)
 {
-    // Code below may set okay to false but not to true.
-    // We assume okay until we prove otherwise but may
-    // continue to perform additional checks after finding
-    // errors.
+    // Code below may set okay to false but not to true. We assume okay until we prove otherwise but
+    // may continue to perform additional checks after finding errors.
     bool okay = true;
     auto& cout = *m->log->getInfo();
     cout << "checking " << m->infilename.get() << "\n";
@@ -777,8 +765,7 @@ QPDFJob::doCheck(QPDF& pdf)
             cout << "File is not linearized\n";
         }
 
-        // Write the file to nowhere, uncompressing
-        // streams.  This causes full file traversal and
+        // Write the file to nowhere, uncompressing streams.  This causes full file traversal and
         // decoding of all streams we can decode.
         QPDFWriter w(pdf);
         Pl_Discard discard;
@@ -809,9 +796,9 @@ QPDFJob::doCheck(QPDF& pdf)
     if (!pdf.getWarnings().empty()) {
         m->warnings = true;
     } else {
-        *m->log->getInfo() << "No syntax or stream encoding errors"
-                           << " found; the file may still contain\n"
-                           << "errors that qpdf cannot detect\n";
+        *m->log->getInfo()
+            << "No syntax or stream encoding errors found; the file may still contain\n"
+            << "errors that qpdf cannot detect\n";
     }
 }
 
@@ -833,8 +820,7 @@ QPDFJob::doShowObj(QPDF& pdf)
                 obj.warnIfPossible("unable to filter stream data");
                 error = true;
             } else {
-                // If anything has been written to standard output,
-                // this will fail.
+                // If anything has been written to standard output, this will fail.
                 m->log->saveToStandardOutput(true);
                 obj.pipeStreamData(
                     m->log->getSave().get(),
@@ -933,8 +919,8 @@ QPDFJob::doShowAttachment(QPDF& pdf)
         throw std::runtime_error("attachment " + m->attachment_to_show + " not found");
     }
     auto efs = fs->getEmbeddedFileStream();
-    // saveToStandardOutput has already been called, but it's harmless
-    // to call it again, so do as defensive coding.
+    // saveToStandardOutput has already been called, but it's harmless to call it again, so do as
+    // defensive coding.
     m->log->saveToStandardOutput(true);
     efs.pipeStreamData(m->log->getSave().get(), 0, qpdf_dl_all);
 }
@@ -1132,9 +1118,8 @@ QPDFJob::doJSONPageLabels(Pipeline* p, bool& first, QPDF& pdf)
         pldh.getLabelsForPageRange(0, npages - 1, 0, labels);
         for (auto iter = labels.begin(); iter != labels.end(); ++iter) {
             if ((iter + 1) == labels.end()) {
-                // This can't happen, so ignore it. This could only
-                // happen if getLabelsForPageRange somehow returned an
-                // odd number of items.
+                // This can't happen, so ignore it. This could only happen if getLabelsForPageRange
+                // somehow returned an odd number of items.
                 break;
             }
             JSON j_label = j_labels.addArrayElement(JSON::makeDictionary());
@@ -1362,22 +1347,17 @@ QPDFJob::doJSONAttachments(Pipeline* p, bool& first, QPDF& pdf)
 JSON
 QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
 {
-    // Style: use all lower-case keys with no dashes or underscores.
-    // Choose array or dictionary based on indexing. For example, we
-    // use a dictionary for objects because we want to index by object
-    // ID and an array for pages because we want to index by position.
-    // The pages in the pages array contain references back to the
-    // original object, which can be resolved in the objects
-    // dictionary. When a PDF construct that maps back to an original
-    // object is represented separately, use "object" as the key that
-    // references the original object.
+    // Style: use all lower-case keys with no dashes or underscores. Choose array or dictionary
+    // based on indexing. For example, we use a dictionary for objects because we want to index by
+    // object ID and an array for pages because we want to index by position. The pages in the pages
+    // array contain references back to the original object, which can be resolved in the objects
+    // dictionary. When a PDF construct that maps back to an original object is represented
+    // separately, use "object" as the key that references the original object.
 
-    // This JSON object doubles as a schema and as documentation for
-    // our JSON output. Any schema mismatch is a bug in qpdf. This
-    // helps to enforce our policy of consistently providing a known
-    // structure where every documented key will always be present,
-    // which makes it easier to consume our JSON. This is discussed in
-    // more depth in the manual.
+    // This JSON object doubles as a schema and as documentation for our JSON output. Any schema
+    // mismatch is a bug in qpdf. This helps to enforce our policy of consistently providing a known
+    // structure where every documented key will always be present, which makes it easier to consume
+    // our JSON. This is discussed in more depth in the manual.
     JSON schema = JSON::makeDictionary();
     schema.addDictionaryMember(
         "version",
@@ -1388,9 +1368,8 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
 
     bool all_keys = ((keys == nullptr) || keys->empty());
 
-    // The list of selectable top-level keys id duplicated in the
-    // following places: job.yml, QPDFJob::json_schema, and
-    // QPDFJob::doJSON.
+    // The list of selectable top-level keys id duplicated in the following places: job.yml,
+    // QPDFJob::json_schema, and QPDFJob::doJSON.
     if (json_version == 1) {
         if (all_keys || keys->count("objects")) {
             schema.addDictionaryMember("objects", JSON::parse(R"({
@@ -1581,8 +1560,8 @@ QPDFJob::json_out_schema_v1()
 void
 QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
 {
-    // qpdf guarantees that no new top-level keys whose names start
-    // with "x-" will be added. These are reserved for users.
+    // qpdf guarantees that no new top-level keys whose names start with "x-" will be added. These
+    // are reserved for users.
 
     std::string captured_json;
     std::shared_ptr<Pl_String> pl_str;
@@ -1595,14 +1574,12 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
     JSON::writeDictionaryOpen(p, first, 0);
 
     if (m->json_output) {
-        // Exclude version and parameters to keep the output file
-        // minimal. The JSON version is inside the "qpdf" key for
-        // version 2.
+        // Exclude version and parameters to keep the output file minimal. The JSON version is
+        // inside the "qpdf" key for version 2.
     } else {
-        // This version is updated every time a non-backward-compatible
-        // change is made to the JSON format. Clients of the JSON are to
-        // ignore unrecognized keys, so we only update the version of a
-        // key disappears or if its value changes meaning.
+        // This version is updated every time a non-backward-compatible change is made to the JSON
+        // format. Clients of the JSON are to ignore unrecognized keys, so we only update the
+        // version of a key disappears or if its value changes meaning.
         JSON::writeDictionaryItem(p, first, "version", JSON::makeInt(m->json_version), 1);
         JSON j_params = JSON::makeDictionary();
         std::string decode_level_str;
@@ -1624,13 +1601,11 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
         JSON::writeDictionaryItem(p, first, "parameters", j_params, 1);
     }
     bool all_keys = m->json_keys.empty();
-    // The list of selectable top-level keys id duplicated in the
-    // following places: job.yml, QPDFJob::json_schema, and
-    // QPDFJob::doJSON.
+    // The list of selectable top-level keys id duplicated in the following places: job.yml,
+    // QPDFJob::json_schema, and QPDFJob::doJSON.
 
-    // We do pages and pagelabels first since they have the side
-    // effect of repairing the pages tree, which could potentially
-    // impact object references in remaining items.
+    // We do pages and pagelabels first since they have the side effect of repairing the pages tree,
+    // which could potentially impact object references in remaining items.
     if (all_keys || m->json_keys.count("pages")) {
         doJSONPages(p, first, pdf);
     }
@@ -1638,8 +1613,7 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
         doJSONPageLabels(p, first, pdf);
     }
 
-    // The non-special keys are output in alphabetical order, but the
-    // order doesn't actually matter.
+    // The non-special keys are output in alphabetical order, but the order doesn't actually matter.
     if (all_keys || m->json_keys.count("acroform")) {
         doJSONAcroform(p, first, pdf);
     }
@@ -1653,16 +1627,15 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
         doJSONOutlines(p, first, pdf);
     }
 
-    // We do objects last so their information is consistent with
-    // repairing the page tree. To see the original file with any page
-    // tree problems and the page tree not flattened, select
+    // We do objects last so their information is consistent with repairing the page tree. To see
+    // the original file with any page tree problems and the page tree not flattened, select
     // qpdf/objects/objectinfo without other keys.
     if (all_keys || m->json_keys.count("objects") || m->json_keys.count("qpdf")) {
         doJSONObjects(p, first, pdf);
     }
     if (m->json_version == 1) {
-        // "objectinfo" is not needed for version >1 since you can
-        // tell streams from other objects in "objects".
+        // "objectinfo" is not needed for version >1 since you can tell streams from other objects
+        // in "objects".
         if (all_keys || m->json_keys.count("objectinfo")) {
             doJSONObjectinfo(p, first, pdf);
         }
@@ -1677,8 +1650,7 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
         std::list<std::string> errors;
         JSON captured = JSON::parse(captured_json);
         if (!captured.checkSchema(schema, errors)) {
-            m->log->error("QPDFJob didn't create JSON that complies with "
-                          "its own rules.\n");
+            m->log->error("QPDFJob didn't create JSON that complies with its own rules.\n");
             for (auto const& error: errors) {
                 *m->log->getError() << error << "\n";
             }
@@ -1768,53 +1740,46 @@ QPDFJob::doProcess(
     bool used_for_input,
     bool main_input)
 {
-    // If a password has been specified but doesn't work, try other
-    // passwords that are equivalent in different character encodings.
-    // This makes it possible to open PDF files that were encrypted
-    // using incorrect string encodings. For example, if someone used
-    // a password encoded in PDF Doc encoding or Windows code page
-    // 1252 for an AES-encrypted file or a UTF-8-encoded password on
-    // an RC4-encrypted file, or if the password was properly encoded
-    // but the password given here was incorrectly encoded, there's a
-    // good chance we'd succeed here.
+    // If a password has been specified but doesn't work, try other passwords that are equivalent in
+    // different character encodings. This makes it possible to open PDF files that were encrypted
+    // using incorrect string encodings. For example, if someone used a password encoded in PDF Doc
+    // encoding or Windows code page 1252 for an AES-encrypted file or a UTF-8-encoded password on
+    // an RC4-encrypted file, or if the password was properly encoded but the password given here
+    // was incorrectly encoded, there's a good chance we'd succeed here.
 
     std::string ptemp;
     if (password && (!m->password_is_hex_key)) {
         if (m->password_mode == QPDFJob::pm_hex_bytes) {
-            // Special case: handle --password-mode=hex-bytes for input
-            // password as well as output password
+            // Special case: handle --password-mode=hex-bytes for input password as well as output
+            // password
             QTC::TC("qpdf", "QPDFJob input password hex-bytes");
             ptemp = QUtil::hex_decode(password);
             password = ptemp.c_str();
         }
     }
     if ((password == nullptr) || empty || m->password_is_hex_key || m->suppress_password_recovery) {
-        // There is no password, or we're not doing recovery, so just
-        // do the normal processing with the supplied password.
+        // There is no password, or we're not doing recovery, so just do the normal processing with
+        // the supplied password.
         doProcessOnce(pdf, fn, password, empty, used_for_input, main_input);
         return;
     }
 
-    // Get a list of otherwise encoded strings. Keep in scope for this
-    // method.
+    // Get a list of otherwise encoded strings. Keep in scope for this method.
     std::vector<std::string> passwords_str = QUtil::possible_repaired_encodings(password);
     // Represent to char const*, as required by the QPDF class.
     std::vector<char const*> passwords;
     for (auto const& iter: passwords_str) {
         passwords.push_back(iter.c_str());
     }
-    // We always try the supplied password first because it is the
-    // first string returned by possible_repaired_encodings. If there
-    // is more than one option, go ahead and put the supplied password
-    // at the end so that it's that decoding attempt whose exception
-    // is thrown.
+    // We always try the supplied password first because it is the first string returned by
+    // possible_repaired_encodings. If there is more than one option, go ahead and put the supplied
+    // password at the end so that it's that decoding attempt whose exception is thrown.
     if (passwords.size() > 1) {
         passwords.push_back(password);
     }
 
-    // Try each password. If one works, return the resulting object.
-    // If they all fail, throw the exception thrown by the final
-    // attempt, which, like the first attempt, will be with the
+    // Try each password. If one works, return the resulting object. If they all fail, throw the
+    // exception thrown by the final attempt, which, like the first attempt, will be with the
     // supplied password.
     bool warned = false;
     for (auto iter = passwords.begin(); iter != passwords.end(); ++iter) {
@@ -1831,9 +1796,9 @@ QPDFJob::doProcess(
         if (!warned) {
             warned = true;
             doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-                v << prefix << ": supplied password didn't work;"
-                  << " trying other passwords based on interpreting"
-                  << " password with different string encodings\n";
+                v << prefix
+                  << ": supplied password didn't work; trying other passwords based on "
+                     "interpreting password with different string encodings\n";
             });
         }
     }
@@ -1943,10 +1908,8 @@ QPDFJob::doUnderOverlayForPage(
             fo[from_pageno] = pdf.copyForeignObject(from_page.getFormXObjectForPage());
         }
 
-        // If the same page is overlaid or underlaid multiple times,
-        // we'll generate multiple names for it, but that's harmless
-        // and also a pretty goofy case that's not worth coding
-        // around.
+        // If the same page is overlaid or underlaid multiple times, we'll generate multiple names
+        // for it, but that's harmless and also a pretty goofy case that's not worth coding around.
         std::string name = resources.getUniqueResourceName("/Fx", min_suffix);
         QPDFMatrix cm;
         std::string new_content = dest_page.placeFormXObject(
@@ -2017,18 +1980,15 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         if (!(underlay_pagenos.count(pageno) || overlay_pagenos.count(pageno))) {
             continue;
         }
-        // This code converts the original page, any underlays, and
-        // any overlays to form XObjects. Then it concatenates display
-        // of all underlays, the original page, and all overlays.
-        // Prior to 11.3.0, the original page contents were wrapped in
-        // q/Q, but this didn't work if the original page had
-        // unbalanced q/Q operators. See github issue #904.
+        // This code converts the original page, any underlays, and any overlays to form XObjects.
+        // Then it concatenates display of all underlays, the original page, and all overlays. Prior
+        // to 11.3.0, the original page contents were wrapped in q/Q, but this didn't work if the
+        // original page had unbalanced q/Q operators. See github issue #904.
         auto& dest_page = main_pages.at(i);
         auto dest_page_oh = dest_page.getObjectHandle();
         auto this_page_fo = dest_page.getFormXObjectForPage();
-        // The resulting form xobject lazily reads the content from
-        // the original page, which we are going to replace. Therefore
-        // we have to explicitly copy it.
+        // The resulting form xobject lazily reads the content from the original page, which we are
+        // going to replace. Therefore we have to explicitly copy it.
         auto content_data = this_page_fo.getRawStreamData();
         this_page_fo.replaceStreamData(content_data, QPDFObjectHandle(), QPDFObjectHandle());
         auto resources =
@@ -2097,8 +2057,7 @@ QPDFJob::addAttachments(QPDF& pdf)
         }
         message = pdf.getFilename() +
             " already has attachments with the following keys: " + message +
-            "; use --replace to replace or --key to specify a different "
-            "key";
+            "; use --replace to replace or --key to specify a different key";
         throw std::runtime_error(message);
     }
 }
@@ -2144,11 +2103,9 @@ QPDFJob::copyAttachments(QPDF& pdf)
             message += i;
         }
         message = pdf.getFilename() +
-            " already has attachments with keys that conflict with"
-            " attachments from other files: " +
+            " already has attachments with keys that conflict with attachments from other files: " +
             message +
-            ". Use --prefix with --copy-attachments-from"
-            " or manually copy individual attachments.";
+            ". Use --prefix with --copy-attachments-from or manually copy individual attachments.";
         throw std::runtime_error(message);
     }
 }
@@ -2243,13 +2200,11 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
         return true;
     }
 
-    // Unreferenced resources are common in files where resources
-    // dictionaries are shared across pages. As a heuristic, we look
-    // in the file for shared resources dictionaries or shared XObject
-    // subkeys of resources dictionaries either on pages or on form
-    // XObjects in pages. If we find any, then there is a higher
-    // likelihood that the expensive process of finding unreferenced
-    // resources is worth it.
+    // Unreferenced resources are common in files where resources dictionaries are shared across
+    // pages. As a heuristic, we look in the file for shared resources dictionaries or shared
+    // XObject subkeys of resources dictionaries either on pages or on form XObjects in pages. If we
+    // find any, then there is a higher likelihood that the expensive process of finding
+    // unreferenced resources is worth it.
 
     // Return true as soon as we find any shared resources.
 
@@ -2332,8 +2287,8 @@ added_page(QPDF& pdf, QPDFObjectHandle page)
 {
     QPDFObjectHandle result = page;
     if (&page.getQPDF() != &pdf) {
-        // Calling copyForeignObject on an object we already copied
-        // will give us the already existing copy.
+        // Calling copyForeignObject on an object we already copied will give us the already
+        // existing copy.
         result = pdf.copyForeignObject(page);
     }
     return result;
@@ -2348,8 +2303,7 @@ added_page(QPDF& pdf, QPDFPageObjectHelper page)
 void
 QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_heap)
 {
-    // Parse all page specifications and translate them into lists of
-    // actual pages.
+    // Parse all page specifications and translate them into lists of actual pages.
 
     // Handle "." as a shortcut for the input file
     for (auto& page_spec: m->page_specs) {
@@ -2359,9 +2313,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
     }
 
     if (!m->keep_files_open_set) {
-        // Count the number of distinct files to determine whether we
-        // should keep files open or not. Rather than trying to code
-        // some portable heuristic based on OS limits, just hard-code
+        // Count the number of distinct files to determine whether we should keep files open or not.
+        // Rather than trying to code some portable heuristic based on OS limits, just hard-code
         // this at a given number and allow users to override.
         std::set<std::string> filenames;
         for (auto& page_spec: m->page_specs) {
@@ -2383,16 +2336,13 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
     std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
     for (auto& page_spec: m->page_specs) {
         if (page_spec_qpdfs.count(page_spec.filename) == 0) {
-            // Open the PDF file and store the QPDF object. Throw a
-            // std::shared_ptr to the qpdf into a heap so that it
-            // survives through copying to the output but gets cleaned up
-            // automatically at the end. Do not canonicalize the file
-            // name. Using two different paths to refer to the same
-            // file is a documented workaround for duplicating a page.
-            // If you are using this an example of how to do this with
-            // the API, you can just create two different QPDF objects
-            // to the same underlying file with the same path to
-            // achieve the same affect.
+            // Open the PDF file and store the QPDF object. Throw a std::shared_ptr to the qpdf into
+            // a heap so that it survives through copying to the output but gets cleaned up
+            // automatically at the end. Do not canonicalize the file name. Using two different
+            // paths to refer to the same file is a documented workaround for duplicating a page. If
+            // you are using this an example of how to do this with the API, you can just create two
+            // different QPDF objects to the same underlying file with the same path to achieve the
+            // same affect.
             char const* password = page_spec.password.get();
             if ((!m->encryption_file.empty()) && (password == nullptr) &&
                 (page_spec.filename == m->encryption_file)) {
@@ -2424,8 +2374,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             }
         }
 
-        // Read original pages from the PDF, and parse the page range
-        // associated with this occurrence of the file.
+        // Read original pages from the PDF, and parse the page range associated with this
+        // occurrence of the file.
         parsed_specs.push_back(
             // line-break
             QPDFPageData(page_spec.filename, page_spec_qpdfs[page_spec.filename], page_spec.range));
@@ -2451,11 +2401,9 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
         }
     }
 
-    // Clear all pages out of the primary QPDF's pages tree but leave
-    // the objects in place in the file so they can be re-added
-    // without changing their object numbers. This enables other
-    // things in the original file, such as outlines, to continue to
-    // work.
+    // Clear all pages out of the primary QPDF's pages tree but leave the objects in place in the
+    // file so they can be re-added without changing their object numbers. This enables other things
+    // in the original file, such as outlines, to continue to work.
     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
         v << prefix << ": removing unreferenced pages from primary input\n";
     });
@@ -2466,9 +2414,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
     }
 
     if (m->collate && (parsed_specs.size() > 1)) {
-        // Collate the pages by selecting one page from each spec in
-        // order. When a spec runs out of pages, stop selecting from
-        // it.
+        // Collate the pages by selecting one page from each spec in order. When a spec runs out of
+        // pages, stop selecting from it.
         std::vector<QPDFPageData> new_parsed_specs;
         size_t nspecs = parsed_specs.size();
         size_t cur_page = 0;
@@ -2491,9 +2438,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
         parsed_specs = new_parsed_specs;
     }
 
-    // Add all the pages from all the files in the order specified.
-    // Keep track of any pages from the original file that we are
-    // selecting.
+    // Add all the pages from all the files in the order specified. Keep track of any pages from the
+    // original file that we are selecting.
     std::set<int> selected_from_orig;
     std::vector<QPDFObjectHandle> new_labels;
     bool any_page_labels = false;
@@ -2516,8 +2462,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             v << prefix << ": adding pages from " << page_data.filename << "\n";
         });
         for (auto pageno_iter: page_data.selected_pages) {
-            // Pages are specified from 1 but numbered from 0 in the
-            // vector
+            // Pages are specified from 1 but numbered from 0 in the vector
             int pageno = pageno_iter - 1;
             pldh.getLabelsForPageRange(pageno, pageno, out_pageno++, new_labels);
             QPDFPageObjectHelper to_copy = page_data.orig_pages.at(QIntC::to_size(pageno));
@@ -2539,22 +2484,18 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             bool first_copy_from_orig = false;
             bool this_file = (page_data.qpdf == &pdf);
             if (this_file) {
-                // This is a page from the original file. Keep track
-                // of the fact that we are using it.
+                // This is a page from the original file. Keep track of the fact that we are using
+                // it.
                 first_copy_from_orig = (selected_from_orig.count(pageno) == 0);
                 selected_from_orig.insert(pageno);
             }
             auto new_page = added_page(pdf, to_copy);
-            // Try to avoid gratuitously renaming fields. In the case
-            // of where we're just extracting a bunch of pages from
-            // the original file and not copying any page more than
-            // once, there's no reason to do anything with the fields.
-            // Since we don't remove fields from the original file
-            // until all copy operations are completed, any foreign
-            // pages that conflict with original pages will be
-            // adjusted. If we copy any page from the original file
-            // more than once, that page would be in conflict with the
-            // previous copy of itself.
+            // Try to avoid gratuitously renaming fields. In the case of where we're just extracting
+            // a bunch of pages from the original file and not copying any page more than once,
+            // there's no reason to do anything with the fields. Since we don't remove fields from
+            // the original file until all copy operations are completed, any foreign pages that
+            // conflict with original pages will be adjusted. If we copy any page from the original
+            // file more than once, that page would be in conflict with the previous copy of itself.
             if (other_afdh->hasAcroForm() && ((!this_file) || (!first_copy_from_orig))) {
                 if (!this_file) {
                     QTC::TC("qpdf", "QPDFJob copy fields not this file");
@@ -2569,8 +2510,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
                         qpdf_e_damaged_pdf,
                         "",
                         0,
-                        ("Exception caught while fixing copied"
-                         " annotations. This may be a qpdf bug. " +
+                        ("Exception caught while fixing copied annotations. This may be a qpdf "
+                         "bug. " +
                          std::string("Exception: ") + e.what()));
                 }
             }
@@ -2585,10 +2526,9 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
         pdf.getRoot().replaceKey("/PageLabels", page_labels);
     }
 
-    // Delete page objects for unused page in primary. This prevents
-    // those objects from being preserved by being referred to from
-    // other places, such as the outlines dictionary. Also make sure
-    // we keep form fields from pages we preserved.
+    // Delete page objects for unused page in primary. This prevents those objects from being
+    // preserved by being referred to from other places, such as the outlines dictionary. Also make
+    // sure we keep form fields from pages we preserved.
     for (size_t pageno = 0; pageno < orig_pages.size(); ++pageno) {
         auto page = orig_pages.at(pageno);
         if (selected_from_orig.count(QIntC::to_int(pageno))) {
@@ -2676,8 +2616,8 @@ QPDFJob::maybeFixWritePassword(int R, std::string& password)
                     std::string encoded;
                     if (!QUtil::utf8_to_pdf_doc(password, encoded)) {
                         QTC::TC("qpdf", "QPDFJob password not encodable");
-                        throw std::runtime_error("supplied password cannot be encoded for"
-                                                 " 40-bit or 128-bit encryption formats");
+                        throw std::runtime_error("supplied password cannot be encoded for 40-bit "
+                                                 "or 128-bit encryption formats");
                     }
                     password = encoded;
                 }
@@ -2687,31 +2627,27 @@ QPDFJob::maybeFixWritePassword(int R, std::string& password)
                     if (QUtil::utf8_to_pdf_doc(password, encoded)) {
                         QTC::TC("qpdf", "QPDFJob auto-encode password");
                         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-                            v << prefix << ": automatically converting Unicode"
-                              << " password to single-byte encoding as"
-                              << " required for 40-bit or 128-bit"
-                              << " encryption\n";
+                            v << prefix
+                              << ": automatically converting Unicode password to single-byte "
+                                 "encoding as required for 40-bit or 128-bit encryption\n";
                         });
                         password = encoded;
                     } else {
                         QTC::TC("qpdf", "QPDFJob bytes fallback warning");
-                        *m->log->getError() << m->message_prefix << ": WARNING: "
-                                            << "supplied password looks like a Unicode"
-                                            << " password with characters not allowed in"
-                                            << " passwords for 40-bit and 128-bit "
-                                               "encryption;"
-                                            << " most readers will not be able to open this"
-                                            << " file with the supplied password."
-                                            << " (Use --password-mode=bytes to suppress "
-                                               "this"
-                                            << " warning and use the password anyway.)\n";
+                        *m->log->getError()
+                            << m->message_prefix
+                            << ": WARNING: supplied password looks like a Unicode password with "
+                               "characters not allowed in passwords for 40-bit and 128-bit "
+                               "encryption; most readers will not be able to open this file with "
+                               "the supplied password. (Use --password-mode=bytes to suppress this "
+                               "warning and use the password anyway.)\n";
                     }
                 } else if ((R >= 5) && (!is_valid_utf8)) {
                     QTC::TC("qpdf", "QPDFJob invalid utf-8 in auto");
-                    throw std::runtime_error("supplied password is not a valid Unicode password,"
-                                             " which is required for 256-bit encryption; to"
-                                             " really use this password, rerun with the"
-                                             " --password-mode=bytes option");
+                    throw std::runtime_error(
+                        "supplied password is not a valid Unicode password, which is required for "
+                        "256-bit encryption; to really use this password, rerun with the "
+                        "--password-mode=bytes option");
                 }
             }
         }
@@ -2749,16 +2685,12 @@ QPDFJob::setEncryptionOptions(QPDF& pdf, QPDFWriter& w)
     if ((R < 4) || ((R == 4) && (!m->use_aes))) {
         if (!m->allow_weak_crypto) {
             QTC::TC("qpdf", "QPDFJob weak crypto error");
-            *m->log->getError() << m->message_prefix
-                                << ": refusing to write a file with RC4, a weak "
-                                   "cryptographic "
-                                   "algorithm\n"
-                                << "Please use 256-bit keys for better security.\n"
-                                << "Pass --allow-weak-crypto to enable writing insecure "
-                                   "files.\n"
-                                << "See also "
-                                   "https://qpdf.readthedocs.io/en/stable/"
-                                   "weak-crypto.html\n";
+            *m->log->getError()
+                << m->message_prefix
+                << ": refusing to write a file with RC4, a weak cryptographic algorithm\n"
+                   "Please use 256-bit keys for better security.\n"
+                   "Pass --allow-weak-crypto to enable writing insecure files.\n"
+                   "See also https://qpdf.readthedocs.io/en/stable/weak-crypto.html\n";
             throw std::runtime_error("refusing to write a file with weak crypto");
         }
     }
@@ -2996,8 +2928,8 @@ QPDFJob::doSplitPages(QPDF& pdf)
                         qpdf_e_damaged_pdf,
                         "",
                         0,
-                        ("Exception caught while fixing copied"
-                         " annotations. This may be a qpdf bug." +
+                        ("Exception caught while fixing copied annotations. This may be a qpdf "
+                         "bug." +
                          std::string("Exception: ") + e.what()));
                 }
             }
@@ -3032,12 +2964,10 @@ QPDFJob::writeOutfile(QPDF& pdf)
 {
     std::shared_ptr<char> temp_out;
     if (m->replace_input) {
-        // Append but don't prepend to the path to generate a
-        // temporary name. This saves us from having to split the path
-        // by directory and non-directory.
+        // Append but don't prepend to the path to generate a temporary name. This saves us from
+        // having to split the path by directory and non-directory.
         temp_out = QUtil::make_shared_cstr(std::string(m->infilename.get()) + ".~qpdf-temp#");
-        // m->outfilename will be restored to 0 before temp_out
-        // goes out of scope.
+        // m->outfilename will be restored to 0 before temp_out goes out of scope.
         m->outfilename = temp_out;
     } else if (strcmp(m->outfilename.get(), "-") == 0) {
         m->outfilename = nullptr;
@@ -3045,14 +2975,14 @@ QPDFJob::writeOutfile(QPDF& pdf)
     if (m->json_version) {
         writeJSON(pdf);
     } else {
-        // QPDFWriter must have block scope so the output file will be
-        // closed after write() finishes.
+        // QPDFWriter must have block scope so the output file will be closed after write()
+        // finishes.
         QPDFWriter w(pdf);
         if (m->outfilename) {
             w.setOutputFilename(m->outfilename.get());
         } else {
-            // saveToStandardOutput has already been called, but
-            // calling it again is defensive and harmless.
+            // saveToStandardOutput has already been called, but calling it again is defensive and
+            // harmless.
             m->log->saveToStandardOutput(true);
             w.setOutputPipeline(m->log->getSave().get());
         }
@@ -3096,8 +3026,7 @@ QPDFJob::writeOutfile(QPDF& pdf)
 void
 QPDFJob::writeJSON(QPDF& pdf)
 {
-    // File pipeline must have block scope so it will be closed
-    // after write.
+    // File pipeline must have block scope so it will be closed after write.
     std::shared_ptr<QUtil::FileCloser> fc;
     std::shared_ptr<Pipeline> fp;
     if (m->outfilename.get()) {

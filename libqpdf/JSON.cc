@@ -218,13 +218,12 @@ JSON::encode_string(std::string const& str)
     while (iter != end) {
         auto c = static_cast<unsigned char>(*iter);
         if ((c > 34 && c != '\\') || c == ' ' || c == 33) {
-            // Optimistically check that no char in str requires escaping.
-            // Hopefully we can just return the input str.
+            // Optimistically check that no char in str requires escaping. Hopefully we can just
+            // return the input str.
             ++iter;
         } else {
-            // We found a char that requires escaping. Initialize result to the
-            // chars scanned so far, append/replace the rest of str one char at
-            // a time, and return the result.
+            // We found a char that requires escaping. Initialize result to the chars scanned so
+            // far, append/replace the rest of str one char at a time, and return the result.
             std::string result{begin, iter};
 
             for (; iter != end; ++iter) {
@@ -532,12 +531,10 @@ JSON::checkSchemaInternal(
     } else if (sch_arr) {
         auto n_elements = sch_arr->elements.size();
         if (n_elements == 1) {
-            // A single-element array in the schema allows a single
-            // element in the object or a variable-length array, each
-            // of whose items must conform to the single element of
-            // the schema array. This doesn't apply to arrays of
-            // arrays -- we fall back to the behavior of allowing a
-            // single item only when the object is not an array.
+            // A single-element array in the schema allows a single element in the object or a
+            // variable-length array, each of whose items must conform to the single element of the
+            // schema array. This doesn't apply to arrays of arrays -- we fall back to the behavior
+            // of allowing a single item only when the object is not an array.
             if (this_arr) {
                 int i = 0;
                 for (auto const& element: this_arr->elements) {
@@ -560,10 +557,9 @@ JSON::checkSchemaInternal(
                 err_prefix + " is supposed to be an array of length " + std::to_string(n_elements));
             return false;
         } else {
-            // A multi-element array in the schema must correspond to
-            // an element of the same length in the object. Each
-            // element in the object is validated against the
-            // corresponding element in the schema.
+            // A multi-element array in the schema must correspond to an element of the same length
+            // in the object. Each element in the object is validated against the corresponding
+            // element in the schema.
             size_t i = 0;
             for (auto const& element: this_arr->elements) {
                 checkSchemaInternal(
@@ -701,8 +697,7 @@ JSONParser::handle_u_code(
             QTC::TC("libtests", "JSON 16 high high");
             throw std::runtime_error(
                 "JSON: offset " + std::to_string(new_high_offset) +
-                ": UTF-16 high surrogate found after previous high surrogate"
-                " at offset " +
+                ": UTF-16 high surrogate found after previous high surrogate at offset " +
                 std::to_string(high_offset));
         }
         high_offset = new_high_offset;
@@ -713,8 +708,7 @@ JSONParser::handle_u_code(
             QTC::TC("libtests", "JSON 16 low not after high");
             throw std::runtime_error(
                 "JSON: offset " + std::to_string(offset) +
-                ": UTF-16 low surrogate found not immediately after high"
-                " surrogate");
+                ": UTF-16 low surrogate found not immediately after high surrogate");
         }
         high_offset = 0;
         codepoint = 0x10000U + ((high_surrogate & 0x3FFU) << 10U) + (codepoint & 0x3FF);
@@ -797,8 +791,8 @@ JSONParser::append()
     ++offset;
 }
 
-// Append current character to token, advance to next input character and
-// transition to 'next' lexer state.
+// Append current character to token, advance to next input character and transition to 'next' lexer
+// state.
 inline void
 JSONParser::append(lex_state_e next)
 {
@@ -808,8 +802,7 @@ JSONParser::append(lex_state_e next)
     ++offset;
 }
 
-// Advance to next input character without appending the current character to
-// token.
+// Advance to next input character without appending the current character to token.
 inline void
 JSONParser::ignore()
 {
@@ -817,8 +810,8 @@ JSONParser::ignore()
     ++offset;
 }
 
-// Advance to next input character without appending the current character to
-// token and transition to 'next' lexer state.
+// Advance to next input character without appending the current character to token and transition
+// to 'next' lexer state.
 inline void
 JSONParser::ignore(lex_state_e next)
 {
@@ -848,9 +841,8 @@ JSONParser::getToken()
 
         if ((*p < 32 && *p >= 0)) {
             if (*p == '\t' || *p == '\n' || *p == '\r') {
-                // Legal white space not permitted in strings. This will always
-                // end the current token (unless we are still before the start
-                // of the token).
+                // Legal white space not permitted in strings. This will always end the current
+                // token (unless we are still before the start of the token).
                 if (lex_state == ls_top) {
                     ignore();
                 } else {
@@ -1044,8 +1036,7 @@ JSONParser::getToken()
                         QTC::TC("libtests", "JSON 16 dangling high");
                         throw std::runtime_error(
                             "JSON: offset " + std::to_string(high_offset) +
-                            ": UTF-16 high surrogate not followed by low "
-                            "surrogate");
+                            ": UTF-16 high surrogate not followed by low surrogate");
                     }
                     ignore();
                     return;
@@ -1062,8 +1053,7 @@ JSONParser::getToken()
                 case '\\':
                 case '\"':
                 case '/':
-                    // \/ is allowed in json input, but so is /, so we
-                    // don't map / to \/ in output.
+                    // \/ is allowed in json input, but so is /, so we don't map / to \/ in output.
                     token += *p;
                     break;
                 case 'b':
@@ -1113,8 +1103,8 @@ JSONParser::getToken()
         }
     }
 
-    // We only get here if on end of input or if the last character was a
-    // control character or other delimiter.
+    // We only get here if on end of input or if the last character was a control character or other
+    // delimiter.
 
     if (!token.empty()) {
         switch (lex_state) {
@@ -1189,8 +1179,7 @@ JSONParser::handleToken()
         } else if (parser_state == ps_array_after_item) {
             parser_state = ps_array_after_comma;
         } else {
-            throw std::logic_error("JSONParser::handleToken: unexpected parser"
-                                   " state for comma");
+            throw std::logic_error("JSONParser::handleToken: unexpected parser state for comma");
         }
         return;
 
@@ -1323,10 +1312,9 @@ JSONParser::handleToken()
 
     if (item.isDictionary() || item.isArray()) {
         stack.push_back({parser_state, item});
-        // Calling container start method is postponed until after
-        // adding the containers to their parent containers, if any.
-        // This makes it much easier to keep track of the current
-        // nesting level.
+        // Calling container start method is postponed until after adding the containers to their
+        // parent containers, if any. This makes it much easier to keep track of the current nesting
+        // level.
         if (item.isDictionary()) {
             if (reactor) {
                 reactor->dictionaryStart();

@@ -137,9 +137,8 @@ pad_or_truncate_password_V4(std::string const& password, char k1[key_bytes])
 void
 QPDF::trim_user_password(std::string& user_password)
 {
-    // Although unnecessary, this routine trims the padding string
-    // from the end of a user password.  Its only purpose is for
-    // recovery of user passwords which is done in the test suite.
+    // Although unnecessary, this routine trims the padding string from the end of a user password.
+    // Its only purpose is for recovery of user passwords which is done in the test suite.
     char const* cstr = user_password.c_str();
     size_t len = user_password.length();
     if (len < key_bytes) {
@@ -262,22 +261,17 @@ hash_V5(
         int round_number = 0;
         bool done = false;
         while (!done) {
-            // The hash algorithm has us setting K initially to the R5
-            // value and then repeating a series of steps 64 times
-            // before starting with the termination case testing.  The
-            // wording of the specification is very unclear as to the
-            // exact number of times it should be run since the
-            // wording about whether the initial setup counts as round
-            // 0 or not is ambiguous.  This code counts the initial
-            // setup (R5) value as round 0, which appears to be
-            // correct.  This was determined to be correct by
-            // increasing or decreasing the number of rounds by 1 or 2
-            // from this value and generating 20 test files.  In this
-            // interpretation, all the test files worked with Adobe
-            // Reader X.  In the other configurations, many of the
-            // files did not work, and we were accurately able to
-            // predict which files didn't work by looking at the
-            // conditions under which we terminated repetition.
+            // The hash algorithm has us setting K initially to the R5 value and then repeating a
+            // series of steps 64 times before starting with the termination case testing.  The
+            // wording of the specification is very unclear as to the exact number of times it
+            // should be run since the wording about whether the initial setup counts as round 0 or
+            // not is ambiguous.  This code counts the initial setup (R5) value as round 0, which
+            // appears to be correct.  This was determined to be correct by increasing or decreasing
+            // the number of rounds by 1 or 2 from this value and generating 20 test files.  In this
+            // interpretation, all the test files worked with Adobe Reader X.  In the other
+            // configurations, many of the files did not work, and we were accurately able to
+            // predict which files didn't work by looking at the conditions under which we
+            // terminated repetition.
 
             ++round_number;
             std::string K1 = password + K + udata;
@@ -291,11 +285,10 @@ hash_V5(
                 QUtil::unsigned_char_pointer(K.substr(16, 16)),
                 16);
 
-            // E_mod_3 is supposed to be mod 3 of the first 16 bytes
-            // of E taken as as a (128-bit) big-endian number.  Since
-            // (xy mod n) is equal to ((x mod n) + (y mod n)) mod n
-            // and since 256 mod n is 1, we can just take the sums of
-            // the the mod 3s of each byte to get the same result.
+            // E_mod_3 is supposed to be mod 3 of the first 16 bytes of E taken as as a (128-bit)
+            // big-endian number.  Since (xy mod n) is equal to ((x mod n) + (y mod n)) mod n and
+            // since 256 mod n is 1, we can just take the sums of the the mod 3s of each byte to get
+            // the same result.
             int E_mod_3 = 0;
             for (unsigned int i = 0; i < 16; ++i) {
                 E_mod_3 += static_cast<unsigned char>(E.at(i));
@@ -344,8 +337,7 @@ QPDF::compute_data_key(
     std::string result = encryption_key;
 
     if (encryption_V >= 5) {
-        // Algorithm 3.1a (PDF 1.7 extension level 3): just use
-        // encryption key straight.
+        // Algorithm 3.1a (PDF 1.7 extension level 3): just use encryption key straight.
         return result;
     }
 
@@ -370,9 +362,8 @@ std::string
 QPDF::compute_encryption_key(std::string const& password, EncryptionData const& data)
 {
     if (data.getV() >= 5) {
-        // For V >= 5, the encryption key is generated and stored in
-        // the file, encrypted separately with both user and owner
-        // passwords.
+        // For V >= 5, the encryption key is generated and stored in the file, encrypted separately
+        // with both user and owner passwords.
         return recover_encryption_key_with_password(password, data);
     } else {
         // For V < 5, the encryption key is derived from the user
@@ -386,12 +377,10 @@ QPDF::compute_encryption_key_from_password(std::string const& password, Encrypti
 {
     // Algorithm 3.2 from the PDF 1.7 Reference Manual
 
-    // This code does not properly handle Unicode passwords.
-    // Passwords are supposed to be converted from OS codepage
-    // characters to PDFDocEncoding.  Unicode passwords are supposed
-    // to be converted to OS codepage before converting to
-    // PDFDocEncoding.  We instead require the password to be
-    // presented in its final form.
+    // This code does not properly handle Unicode passwords. Passwords are supposed to be converted
+    // from OS codepage characters to PDFDocEncoding.  Unicode passwords are supposed to be
+    // converted to OS codepage before converting to PDFDocEncoding.  We instead require the
+    // password to be presented in its final form.
 
     MD5 md5;
     md5.encodeDataIncrementally(pad_or_truncate_password_V4(password).c_str(), key_bytes);
@@ -681,11 +670,9 @@ QPDF::recover_encryption_key_with_password(
 {
     // Algorithm 3.2a from the PDF 1.7 extension level 3
 
-    // This code does not handle Unicode passwords correctly.
-    // Empirical evidence suggests that most viewers don't.  We are
-    // supposed to process the input string with the SASLprep (RFC
-    // 4013) profile of stringprep (RFC 3454) and then convert the
-    // result to UTF-8.
+    // This code does not handle Unicode passwords correctly. Empirical evidence suggests that most
+    // viewers don't.  We are supposed to process the input string with the SASLprep (RFC 4013)
+    // profile of stringprep (RFC 3454) and then convert the result to UTF-8.
 
     perms_valid = false;
     std::string key_password = truncate_password_V5(password);
@@ -738,18 +725,16 @@ QPDF::initializeEncryption()
     }
     m->encp->encryption_initialized = true;
 
-    // After we initialize encryption parameters, we must used stored
-    // key information and never look at /Encrypt again.  Otherwise,
-    // things could go wrong if someone mutates the encryption
+    // After we initialize encryption parameters, we must use stored key information and never look
+    // at /Encrypt again.  Otherwise, things could go wrong if someone mutates the encryption
     // dictionary.
 
     if (!m->trailer.hasKey("/Encrypt")) {
         return;
     }
 
-    // Go ahead and set m->encrypted here.  That way, isEncrypted
-    // will return true even if there were errors reading the
-    // encryption dictionary.
+    // Go ahead and set m->encrypted here.  That way, isEncrypted will return true even if there
+    // were errors reading the encryption dictionary.
     m->encp->encrypted = true;
 
     std::string id1;
@@ -757,9 +742,8 @@ QPDF::initializeEncryption()
     if ((id_obj.isArray() && (id_obj.getArrayNItems() == 2) && id_obj.getArrayItem(0).isString())) {
         id1 = id_obj.getArrayItem(0).getStringValue();
     } else {
-        // Treating a missing ID as the empty string enables qpdf to
-        // decrypt some invalid encrypted files with no /ID that
-        // poppler can read but Adobe Reader can't.
+        // Treating a missing ID as the empty string enables qpdf to decrypt some invalid encrypted
+        // files with no /ID that poppler can read but Adobe Reader can't.
         warn(damagedPDF("trailer", "invalid /ID in trailer dictionary"));
     }
 
@@ -800,8 +784,8 @@ QPDF::initializeEncryption()
     std::string U = encryption_dict.getKey("/U").getStringValue();
     int P = static_cast<int>(encryption_dict.getKey("/P").getIntValue());
 
-    // If supporting new encryption R/V values, remember to update
-    // error message inside this if statement.
+    // If supporting new encryption R/V values, remember to update error message inside this if
+    // statement.
     if (!(((R >= 2) && (R <= 6)) && ((V == 1) || (V == 2) || (V == 4) || (V == 5)))) {
         throw QPDFExc(
             qpdf_e_unsupported,
@@ -893,8 +877,7 @@ QPDF::initializeEncryption()
                         QTC::TC("qpdf", "QPDF_encryption CFM AESV3");
                         method = e_aesv3;
                     } else {
-                        // Don't complain now -- maybe we won't need
-                        // to reference this type.
+                        // Don't complain now -- maybe we won't need to reference this type.
                         method = e_unknown;
                     }
                 }
@@ -908,20 +891,15 @@ QPDF::initializeEncryption()
         m->encp->cf_stream = interpretCF(m->encp, StmF);
         m->encp->cf_string = interpretCF(m->encp, StrF);
         if (EFF.isName()) {
-            // qpdf does not use this for anything other than
-            // informational purposes. This is intended to instruct
-            // conforming writers on which crypt filter should be used
-            // when new file attachments are added to a PDF file, but
-            // qpdf never generates encrypted files with non-default
-            // crypt filters. Prior to 10.2, I was under the mistaken
-            // impression that this was supposed to be used for
-            // decrypting attachments, but the code was wrong in a way
-            // that turns out not to have mattered because no writers
-            // were generating files the way I was imagining. Still,
-            // providing this information could be useful when looking
-            // at a file generated by something else, such as Acrobat
-            // when specifying that only attachments should be
-            // encrypted.
+            // qpdf does not use this for anything other than informational purposes. This is
+            // intended to instruct conforming writers on which crypt filter should be used when new
+            // file attachments are added to a PDF file, but qpdf never generates encrypted files
+            // with non-default crypt filters. Prior to 10.2, I was under the mistaken impression
+            // that this was supposed to be used for decrypting attachments, but the code was wrong
+            // in a way that turns out not to have mattered because no writers were generating files
+            // the way I was imagining. Still, providing this information could be useful when
+            // looking at a file generated by something else, such as Acrobat when specifying that
+            // only attachments should be encrypted.
             m->encp->cf_file = interpretCF(m->encp, EFF);
         } else {
             m->encp->cf_file = m->encp->cf_stream;
@@ -935,8 +913,7 @@ QPDF::initializeEncryption()
         m->encp->owner_password_matched =
             check_owner_password(m->encp->user_password, m->encp->provided_password, data);
         if (m->encp->owner_password_matched && (V < 5)) {
-            // password supplied was owner password; user_password has
-            // been initialized for V < 5
+            // password supplied was owner password; user_password has been initialized for V < 5
             if (getTrimmedUserPassword() == m->encp->provided_password) {
                 m->encp->user_password_matched = true;
                 QTC::TC("qpdf", "QPDF_encryption user matches owner V < 5");
@@ -958,14 +935,12 @@ QPDF::initializeEncryption()
     if (m->provided_password_is_hex_key) {
         m->encp->encryption_key = QUtil::hex_decode(m->encp->provided_password);
     } else if (V < 5) {
-        // For V < 5, the user password is encrypted with the owner
-        // password, and the user password is always used for
-        // computing the encryption key.
+        // For V < 5, the user password is encrypted with the owner password, and the user password
+        // is always used for computing the encryption key.
         m->encp->encryption_key = compute_encryption_key(m->encp->user_password, data);
     } else {
-        // For V >= 5, either password can be used independently to
-        // compute the encryption key, and neither password can be
-        // used to recover the other.
+        // For V >= 5, either password can be used independently to compute the encryption key, and
+        // neither password can be used to recover the other.
         bool perms_valid;
         m->encp->encryption_key =
             recover_encryption_key_with_password(m->encp->provided_password, data, perms_valid);
@@ -1026,8 +1001,7 @@ QPDF::decryptString(std::string& str, QPDFObjGen const& og)
         default:
             warn(damagedPDF("unknown encryption filter for strings (check /StrF in "
                             "/Encrypt dictionary); strings may be decrypted improperly"));
-            // To avoid repeated warnings, reset cf_string.  Assume
-            // we'd want to use AES if V == 4.
+            // To avoid repeated warnings, reset cf_string.  Assume we'd want to use AES if V == 4.
             m->encp->cf_string = e_aes;
             use_aes = true;
             break;
@@ -1052,8 +1026,8 @@ QPDF::decryptString(std::string& str, QPDFObjGen const& og)
         } else {
             QTC::TC("qpdf", "QPDF_encryption rc4 decode string");
             size_t vlen = str.length();
-            // Using std::shared_ptr guarantees that tmp will
-            // be freed even if rc4.process throws an exception.
+            // Using std::shared_ptr guarantees that tmp will be freed even if rc4.process throws an
+            // exception.
             auto tmp = QUtil::make_unique_cstr(str);
             RC4 rc4(QUtil::unsigned_char_pointer(key), toI(key.length()));
             auto data = QUtil::unsigned_char_pointer(tmp.get());
@@ -1154,8 +1128,7 @@ QPDF::decryptStream(
                 file->getLastOffset(),
                 "unknown encryption filter for streams (check " + method_source +
                     "); streams may be decrypted improperly"));
-            // To avoid repeated warnings, reset cf_stream.  Assume
-            // we'd want to use AES if V == 4.
+            // To avoid repeated warnings, reset cf_stream.  Assume we'd want to use AES if V == 4.
             encp->cf_stream = e_aes;
             use_aes = true;
             break;

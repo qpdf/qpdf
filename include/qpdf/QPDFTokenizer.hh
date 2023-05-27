@@ -2,22 +2,19 @@
 //
 // This file is part of qpdf.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+// in compliance with the License. You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Unless required by applicable law or agreed to in writing, software distributed under the License
+// is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+// or implied. See the License for the specific language governing permissions and limitations under
+// the License.
 //
-// Versions of qpdf prior to version 7 were released under the terms
-// of version 2.0 of the Artistic License. At your option, you may
-// continue to consider qpdf to be licensed under those terms. Please
-// see the manual for additional information.
+// Versions of qpdf prior to version 7 were released under the terms of version 2.0 of the Artistic
+// License. At your option, you may continue to consider qpdf to be licensed under those terms.
+// Please see the manual for additional information.
 
 #ifndef QPDFTOKENIZER_HH
 #define QPDFTOKENIZER_HH
@@ -34,9 +31,8 @@
 class QPDFTokenizer
 {
   public:
-    // Token type tt_eof is only returned of allowEOF() is called on
-    // the tokenizer. tt_eof was introduced in QPDF version 4.1.
-    // tt_space, tt_comment, and tt_inline_image were added in QPDF
+    // Token type tt_eof is only returned of allowEOF() is called on the tokenizer. tt_eof was
+    // introduced in QPDF version 4.1. tt_space, tt_comment, and tt_inline_image were added in QPDF
     // version 8.
     enum token_type_e {
         tt_bad,
@@ -132,59 +128,54 @@ class QPDFTokenizer
     QPDF_DLL
     QPDFTokenizer();
 
-    // If called, treat EOF as a separate token type instead of an
-    // error.  This was introduced in QPDF 4.1 to facilitate
-    // tokenizing content streams.
+    // If called, treat EOF as a separate token type instead of an error.  This was introduced in
+    // QPDF 4.1 to facilitate tokenizing content streams.
     QPDF_DLL
     void allowEOF();
 
-    // If called, readToken will return "ignorable" tokens for space
-    // and comments. This was added in QPDF 8.
+    // If called, readToken will return "ignorable" tokens for space and comments. This was added in
+    // QPDF 8.
     QPDF_DLL
     void includeIgnorable();
 
-    // There are two modes of operation: push and pull. The pull
-    // method is easier but requires an input source. The push method
-    // is more complicated but can be used to tokenize a stream of
+    // There are two modes of operation: push and pull. The pull method is easier but requires an
+    // input source. The push method is more complicated but can be used to tokenize a stream of
     // incoming characters in a pipeline.
 
     // Push mode:
 
-    // Keep presenting characters with presentCharacter() and
-    // presentEOF() and calling getToken() until getToken() returns
-    // true. When it does, be sure to check unread_ch and to unread ch
-    // if it is true.
+    // Keep presenting characters with presentCharacter() and presentEOF() and calling getToken()
+    // until getToken() returns true. When it does, be sure to check unread_ch and to unread ch if
+    // it is true.
 
-    // It these are called when a token is available, an exception
-    // will be thrown.
+    // It these are called when a token is available, an exception will be thrown.
     QPDF_DLL
     void presentCharacter(char ch);
     QPDF_DLL
     void presentEOF();
 
-    // If a token is available, return true and initialize token with
-    // the token, unread_char with whether or not we have to unread
-    // the last character, and if unread_char, ch with the character
-    // to unread.
+    // If a token is available, return true and initialize token with the token, unread_char with
+    // whether or not we have to unread the last character, and if unread_char, ch with the
+    // character to unread.
     QPDF_DLL
     bool getToken(Token& token, bool& unread_char, char& ch);
 
-    // This function returns true of the current character is between
-    // tokens (i.e., white space that is not part of a string) or is
-    // part of a comment.  A tokenizing filter can call this to
+    // This function returns true of the current character is between tokens (i.e., white space that
+    // is not part of a string) or is part of a comment.  A tokenizing filter can call this to
     // determine whether to output the character.
     QPDF_DLL
     bool betweenTokens();
 
     // Pull mode:
 
-    // Read a token from an input source. Context describes the
-    // context in which the token is being read and is used in the
-    // exception thrown if there is an error. After a token is read,
-    // the position of the input source returned by input->tell()
-    // points to just after the token, and the input source's "last
-    // offset" as returned by input->getLastOffset() points to the
+    // Read a token from an input source. Context describes the context in which the token is being
+    // read and is used in the exception thrown if there is an error. After a token is read, the
+    // position of the input source returned by input->tell() points to just after the token, and
+    // the input source's "last offset" as returned by input->getLastOffset() points to the
     // beginning of the token.
+    QPDF_DLL
+    Token readToken(
+        InputSource& input, std::string const& context, bool allow_bad = false, size_t max_len = 0);
     QPDF_DLL
     Token readToken(
         std::shared_ptr<InputSource> input,
@@ -192,12 +183,10 @@ class QPDFTokenizer
         bool allow_bad = false,
         size_t max_len = 0);
 
-    // Calling this method puts the tokenizer in a state for reading
-    // inline images. You should call this method after reading the
-    // character following the ID operator. In that state, it will
-    // return all data up to BUT NOT INCLUDING the next EI token.
-    // After you call this method, the next call to readToken (or the
-    // token created next time getToken returns true) will either be
+    // Calling this method puts the tokenizer in a state for reading inline images. You should call
+    // this method after reading the character following the ID operator. In that state, it will
+    // return all data up to BUT NOT INCLUDING the next EI token. After you call this method, the
+    // next call to readToken (or the token created next time getToken returns true) will either be
     // tt_inline_image or tt_bad. This is the only way readToken
     // returns a tt_inline_image token.
     QPDF_DLL
@@ -206,21 +195,18 @@ class QPDFTokenizer
   private:
     friend class QPDFParser;
 
-    // Read a token from an input source. Context describes the
-    // context in which the token is being read and is used in the
-    // exception thrown if there is an error. After a token is read,
-    // the position of the input source returned by input->tell()
-    // points to just after the token, and the input source's "last
-    // offset" as returned by input->getLastOffset() points to the
-    // beginning of the token. Returns false if the token is bad
-    // or if scanning produced an error message for any reason.
+    // Read a token from an input source. Context describes the context in which the token is being
+    // read and is used in the exception thrown if there is an error. After a token is read, the
+    // position of the input source returned by input->tell() points to just after the token, and
+    // the input source's "last offset" as returned by input->getLastOffset() points to the
+    // beginning of the token. Returns false if the token is bad or if scanning produced an error
+    // message for any reason.
 
     bool nextToken(InputSource& input, std::string const& context, size_t max_len = 0);
 
-    // The following methods are only valid after nextToken has been called
-    // and until another QPDFTokenizer method is called. They allow the results
-    // of calling nextToken to be accessed without creating a Token, thus
-    // avoiding copying information that may not be needed.
+    // The following methods are only valid after nextToken has been called and until another
+    // QPDFTokenizer method is called. They allow the results of calling nextToken to be accessed
+    // without creating a Token, thus avoiding copying information that may not be needed.
     inline token_type_e getType() const noexcept;
     inline std::string const& getValue() const noexcept;
     inline std::string const& getRawValue() const noexcept;

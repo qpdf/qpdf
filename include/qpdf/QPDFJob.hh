@@ -2,22 +2,19 @@
 //
 // This file is part of qpdf.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+// in compliance with the License. You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Unless required by applicable law or agreed to in writing, software distributed under the License
+// is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+// or implied. See the License for the specific language governing permissions and limitations under
+// the License.
 //
-// Versions of qpdf prior to version 7 were released under the terms
-// of version 2.0 of the Artistic License. At your option, you may
-// continue to consider qpdf to be licensed under those terms. Please
-// see the manual for additional information.
+// Versions of qpdf prior to version 7 were released under the terms of version 2.0 of the Artistic
+// License. At your option, you may continue to consider qpdf to be licensed under those terms.
+// Please see the manual for additional information.
 
 #ifndef QPDFJOB_HH
 #define QPDFJOB_HH
@@ -55,99 +52,80 @@ class QPDFJob
     static int constexpr EXIT_IS_NOT_ENCRYPTED = qpdf_exit_is_not_encrypted;
     static int constexpr EXIT_CORRECT_PASSWORD = qpdf_exit_correct_password;
 
-    // QPDFUsage is thrown if there are any usage-like errors when
-    // calling Config methods.
+    // QPDFUsage is thrown if there are any usage-like errors when calling Config methods.
     QPDF_DLL
     QPDFJob();
 
     // SETUP FUNCTIONS
 
-    // Initialize a QPDFJob object from argv, which must be a
-    // null-terminated array of null-terminated UTF-8-encoded C
-    // strings. The progname_env argument is the name of an
-    // environment variable which, if set, overrides the name of the
-    // executable for purposes of generating the --completion options.
-    // See QPDFArgParser for details. If a null pointer is passed in,
-    // the default value of "QPDF_EXECUTABLE" is used. This is used by
-    // the QPDF cli, which just initializes a QPDFJob from argv, calls
-    // run(), and handles errors and exit status issues. You can
-    // perform much of the cli functionality programmatically in this
-    // way rather than using the regular API. This is exposed in the C
-    // API, which makes it easier to get certain high-level qpdf
-    // functionality from other languages. If there are any
-    // command-line errors, this method will throw QPDFUsage which is
-    // derived from std::runtime_error. Other exceptions may be thrown
-    // in some cases. Note that argc, and argv should be UTF-8
-    // encoded. If you are calling this from a Windows Unicode-aware
-    // main (wmain), see QUtil::call_main_from_wmain for information
-    // about converting arguments to UTF-8. This method will mutate
-    // arguments that are passed to it.
+    // Initialize a QPDFJob object from argv, which must be a null-terminated array of
+    // null-terminated UTF-8-encoded C strings. The progname_env argument is the name of an
+    // environment variable which, if set, overrides the name of the executable for purposes of
+    // generating the --completion options. See QPDFArgParser for details. If a null pointer is
+    // passed in, the default value of "QPDF_EXECUTABLE" is used. This is used by the QPDF cli,
+    // which just initializes a QPDFJob from argv, calls run(), and handles errors and exit status
+    // issues. You can perform much of the cli functionality programmatically in this way rather
+    // than using the regular API. This is exposed in the C API, which makes it easier to get
+    // certain high-level qpdf functionality from other languages. If there are any command-line
+    // errors, this method will throw QPDFUsage which is derived from std::runtime_error. Other
+    // exceptions may be thrown in some cases. Note that argc, and argv should be UTF-8 encoded. If
+    // you are calling this from a Windows Unicode-aware main (wmain), see
+    // QUtil::call_main_from_wmain for information about converting arguments to UTF-8. This method
+    // will mutate arguments that are passed to it.
     QPDF_DLL
     void initializeFromArgv(char const* const argv[], char const* progname_env = nullptr);
 
-    // Initialize a QPDFJob from json. Passing partial = true prevents
-    // this method from doing the final checks (calling
-    // checkConfiguration) after processing the json file. This makes
-    // it possible to initialize QPDFJob in stages using multiple json
-    // files or to have a json file that can be processed from the CLI
-    // with --job-json-file and be combined with other arguments. For
-    // example, you might include only encryption parameters, leaving
-    // it up to the rest of the command-line arguments to provide
-    // input and output files. initializeFromJson is called with
-    // partial = true when invoked from the command line. To make sure
-    // that the json file is fully valid on its own, just don't
-    // specify any other command-line flags. If there are any
-    // configuration errors, QPDFUsage is thrown. Some error messages
-    // may be CLI-centric. If an an exception tells you to use the
-    // "--some-option" option, set the "someOption" key in the JSON
+    // Initialize a QPDFJob from json. Passing partial = true prevents this method from doing the
+    // final checks (calling checkConfiguration) after processing the json file. This makes it
+    // possible to initialize QPDFJob in stages using multiple json files or to have a json file
+    // that can be processed from the CLI with --job-json-file and be combined with other arguments.
+    // For example, you might include only encryption parameters, leaving it up to the rest of the
+    // command-line arguments to provide input and output files. initializeFromJson is called with
+    // partial = true when invoked from the command line. To make sure that the json file is fully
+    // valid on its own, just don't specify any other command-line flags. If there are any
+    // configuration errors, QPDFUsage is thrown. Some error messages may be CLI-centric. If an
+    // exception tells you to use the "--some-option" option, set the "someOption" key in the JSON
     // object instead.
     QPDF_DLL
     void initializeFromJson(std::string const& json, bool partial = false);
 
-    // Set name that is used to prefix verbose messages, progress
-    // messages, and other things that the library writes to output
-    // and error streams on the caller's behalf. Defaults to "qpdf".
+    // Set name that is used to prefix verbose messages, progress messages, and other things that
+    // the library writes to output and error streams on the caller's behalf. Defaults to "qpdf".
     QPDF_DLL
     void setMessagePrefix(std::string const&);
     QPDF_DLL
     std::string getMessagePrefix() const;
 
-    // To capture or redirect output, configure the logger returned by
-    // getLogger(). By default, all QPDF and QPDFJob objects share the
-    // global logger. If you need a private logger for some reason,
-    // pass a new one to setLogger(). See comments in QPDFLogger.hh
-    // for details on configuring the logger.
+    // To capture or redirect output, configure the logger returned by getLogger(). By default, all
+    // QPDF and QPDFJob objects share the global logger. If you need a private logger for some
+    // reason, pass a new one to setLogger(). See comments in QPDFLogger.hh for details on
+    // configuring the logger.
     //
-    // If you set a custom logger here, the logger will be passed to
-    // all subsequent QPDF objects created by this QPDFJob object.
+    // If you set a custom logger here, the logger will be passed to all subsequent QPDF objects
+    // created by this QPDFJob object.
     QPDF_DLL
     std::shared_ptr<QPDFLogger> getLogger();
     QPDF_DLL
     void setLogger(std::shared_ptr<QPDFLogger>);
 
-    // This deprecated method is the old way to capture output, but it
-    // didn't capture all output. See comments above for getLogger and
-    // setLogger. This will be removed in QPDF 12. For now, it
-    // configures a private logger, separating this object from the
-    // default logger, and calls setOutputStreams on that logger. See
-    // QPDFLogger.hh for additional details.
+    // This deprecated method is the old way to capture output, but it didn't capture all output.
+    // See comments above for getLogger and setLogger. This will be removed in QPDF 12. For now, it
+    // configures a private logger, separating this object from the default logger, and calls
+    // setOutputStreams on that logger. See QPDFLogger.hh for additional details.
     [[deprecated("configure logger from getLogger() or call setLogger()")]] QPDF_DLL void
     setOutputStreams(std::ostream* out_stream, std::ostream* err_stream);
 
-    // You can register a custom progress reporter to be called by
-    // QPDFWriter (see QPDFWriter::registerProgressReporter). This is
-    // only called if you also request progress reporting through
-    // normal configuration methods (e.g., pass --progress, call
+    // You can register a custom progress reporter to be called by QPDFWriter (see
+    // QPDFWriter::registerProgressReporter). This is only called if you also request progress
+    // reporting through normal configuration methods (e.g., pass --progress, call
     // config()->progress, etc.)
     QPDF_DLL
     void registerProgressReporter(std::function<void(int)>);
 
-    // Check to make sure no contradictory options have been
-    // specified. This is called automatically after initializing from
-    // argv or json and is also called by run, but you can call it
-    // manually as well. It throws a QPDFUsage exception if there are
-    // any errors. This Config object (see CONFIGURATION) also has a
-    // checkConfiguration method which calls this one.
+    // Check to make sure no contradictory options have been specified. This is called automatically
+    // after initializing from argv or json and is also called by run, but you can call it manually
+    // as well. It throws a QPDFUsage exception if there are any errors. This Config object (see
+    // CONFIGURATION) also has a checkConfiguration method which calls this one.
     QPDF_DLL
     void checkConfiguration();
 
@@ -157,8 +135,7 @@ class QPDFJob
 
     // SEE BELOW FOR MORE PUBLIC METHODS AND CLASSES
   private:
-    // These structures are private but we need to define them before
-    // the public Config classes.
+    // These structures are private but we need to define them before the public Config classes.
     struct CopyAttachmentFrom
     {
         std::string path;
@@ -197,33 +174,27 @@ class QPDFJob
 
     // Configuration classes are implemented in QPDFJob_config.cc.
 
-    // The config() method returns a shared pointer to a Config
-    // object. The Config object contains methods that correspond with
-    // qpdf command-line arguments. You can use a fluent interface to
-    // configure a QPDFJob object that would do exactly the same thing
-    // as a specific qpdf command. The example qpdf-job.cc contains an
-    // example of this usage. You can also use initializeFromJson or
-    // initializeFromArgv to initialize a QPDFJob object.
+    // The config() method returns a shared pointer to a Config object. The Config object contains
+    // methods that correspond with qpdf command-line arguments. You can use a fluent interface to
+    // configure a QPDFJob object that would do exactly the same thing as a specific qpdf command.
+    // The example qpdf-job.cc contains an example of this usage. You can also use
+    // initializeFromJson or initializeFromArgv to initialize a QPDFJob object.
 
     // Notes about the Config methods:
     //
-    // * Most of the method declarations are automatically generated
-    //   in header files that are included within the class
-    //   definitions. They correspond in predictable ways to the
-    //   command-line arguments and are generated from the same code
-    //   that generates the command-line argument parsing code.
+    // * Most of the method declarations are automatically generated   in header files that are
+    //   included within the class definitions. They correspond in predictable ways to the
+    //   command-line arguments and are generated from the same code that generates the command-line
+    //   argument parsing code.
     //
-    // * Methods return pointers, rather than references, to
-    //   configuration objects. References might feel more familiar to
-    //   users of fluent interfaces, so why do we use pointers? The
-    //   main methods that create them return smart pointers so that
-    //   users can initialize them when needed, which you can't do
-    //   with references. Returning pointers instead of references
-    //   makes for a more uniform interface.
+    // * Methods return pointers, rather than references, to   configuration objects. References
+    //   might feel more familiar to users of fluent interfaces, so why do we use pointers? The
+    //   main methods that create them return smart pointers so that users can initialize them when
+    //   needed, which you can't do with references. Returning pointers instead of references makes
+    //   for a more uniform interface.
 
-    // Maintainer documentation: see the section in README-maintainer
-    // called "HOW TO ADD A COMMAND-LINE ARGUMENT", which contains
-    // references to additional places in the documentation.
+    // Maintainer documentation: see the section in README-maintainer called "HOW TO ADD A
+    // COMMAND-LINE ARGUMENT", which contains references to additional places in the documentation.
 
     class Config;
 
@@ -374,13 +345,11 @@ class QPDFJob
         QPDFJob& o;
     };
 
-    // Return a top-level configuration item. See CONFIGURATION above
-    // for details. If an invalid configuration is created (such as
-    // supplying contradictory options, omitting an input file, etc.),
-    // QPDFUsage is thrown. Note that error messages are CLI-centric,
-    // but you can map them into config calls. For example, if an
-    // exception tells you to use the --some-option flag, you should
-    // call config()->someOption() instead.
+    // Return a top-level configuration item. See CONFIGURATION above for details. If an invalid
+    // configuration is created (such as supplying contradictory options, omitting an input file,
+    // etc.), QPDFUsage is thrown. Note that error messages are CLI-centric, but you can map them
+    // into config calls. For example, if an exception tells you to use the --some-option flag, you
+    // should call config()->someOption() instead.
     QPDF_DLL
     std::shared_ptr<Config> config();
 
@@ -388,33 +357,27 @@ class QPDFJob
     QPDF_DLL
     void run();
 
-    // The following two methods allow a job to be run in two stages - creation
-    // of a QPDF object and writing of the QPDF object. This allows the QPDF
-    // object to be modified prior to writing it out. See
-    // examples/qpdfjob-remove-annotations for an illustration of its use.
+    // The following two methods allow a job to be run in two stages - creation of a QPDF object and
+    // writing of the QPDF object. This allows the QPDF object to be modified prior to writing it
+    // out. See examples/qpdfjob-remove-annotations for an illustration of its use.
 
-    // Run the first stage of the job. Return a nullptr if the configuration is
-    // not valid.
+    // Run the first stage of the job. Return a nullptr if the configuration is not valid.
     QPDF_DLL
     std::unique_ptr<QPDF> createQPDF();
 
-    // Run the second stage of the job. Do nothing if a nullptr is passed as
-    // parameter.
+    // Run the second stage of the job. Do nothing if a nullptr is passed as parameter.
     QPDF_DLL
     void writeQPDF(QPDF& qpdf);
 
-    // CHECK STATUS -- these methods provide information known after
-    // run() is called.
+    // CHECK STATUS -- these methods provide information known after run() is called.
 
     QPDF_DLL
     bool hasWarnings() const;
 
-    // Return one of the EXIT_* constants defined at the top of the
-    // class declaration. This may be called after run() when run()
-    // did not throw an exception. Takes into consideration whether
-    // isEncrypted or requiresPassword was called. Note that this
-    // function does not know whether run() threw an exception, so
-    // code that uses this to determine how to exit should explicitly
+    // Return one of the EXIT_* constants defined at the top of the class declaration. This may be
+    // called after run() when run() did not throw an exception. Takes into consideration whether
+    // isEncrypted or requiresPassword was called. Note that this function does not know whether
+    // run() threw an exception, so code that uses this to determine how to exit should explicitly
     // use EXIT_ERROR if run() threw an exception.
     QPDF_DLL
     int getExitCode() const;
@@ -423,24 +386,22 @@ class QPDFJob
     QPDF_DLL
     unsigned long getEncryptionStatus();
 
-    // HELPER FUNCTIONS -- methods useful for calling in handlers that
-    // interact with QPDFJob during run or initialization.
+    // HELPER FUNCTIONS -- methods useful for calling in handlers that interact with QPDFJob during
+    // run or initialization.
 
-    // If in verbose mode, call the given function, passing in the
-    // output stream and message prefix.
+    // If in verbose mode, call the given function, passing in the output stream and message prefix.
     QPDF_DLL
     void doIfVerbose(std::function<void(Pipeline&, std::string const& prefix)> fn);
 
-    // Provide a string that is the help information ("schema" for the
-    // qpdf-specific JSON object) for the specified version of JSON
-    // output.
+    // Provide a string that is the help information ("schema" for the qpdf-specific JSON object)
+    // for the specified version of JSON output.
     QPDF_DLL
     static std::string json_out_schema(int version);
 
     [[deprecated("use json_out_schema(version)")]] static std::string QPDF_DLL json_out_schema_v1();
 
-    // Provide a string that is the help information for specified
-    // version of JSON format for QPDFJob.
+    // Provide a string that is the help information for specified version of JSON format for
+    // QPDFJob.
     QPDF_DLL
     static std::string job_json_schema(int version);
 

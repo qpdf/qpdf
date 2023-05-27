@@ -69,10 +69,9 @@ namespace
 } // namespace
 
 std::map<std::string, std::string> QPDF_Stream::filter_abbreviations = {
-    // The PDF specification provides these filter abbreviations for
-    // use in inline images, but according to table H.1 in the pre-ISO
-    // versions of the PDF specification, Adobe Reader also accepts
-    // them for stream filters.
+    // The PDF specification provides these filter abbreviations for use in inline images, but
+    // according to table H.1 in the pre-ISO versions of the PDF specification, Adobe Reader also
+    // accepts them for stream filters.
     {"/AHx", "/ASCIIHexDecode"},
     {"/A85", "/ASCII85Decode"},
     {"/LZW", "/LZWDecode"},
@@ -118,8 +117,8 @@ QPDF_Stream::QPDF_Stream(
     length(length)
 {
     if (!stream_dict.isDictionary()) {
-        throw std::logic_error("stream object instantiated with non-dictionary "
-                               "object for dictionary");
+        throw std::logic_error(
+            "stream object instantiated with non-dictionary object for dictionary");
     }
     auto descr = std::make_shared<QPDFValue::Description>(
         qpdf->getFilename() + ", stream object " + og.unparse(' '));
@@ -198,18 +197,18 @@ QPDF_Stream::getStreamJSON(
     case qpdf_sj_none:
     case qpdf_sj_inline:
         if (p != nullptr) {
-            throw std::logic_error("QPDF_Stream::getStreamJSON: pipeline should "
-                                   "only be supplied when json_data is file");
+            throw std::logic_error("QPDF_Stream::getStreamJSON: pipeline should only be supplied "
+                                   "when json_data is file");
         }
         break;
     case qpdf_sj_file:
         if (p == nullptr) {
-            throw std::logic_error("QPDF_Stream::getStreamJSON: pipeline must "
-                                   "be supplied when json_data is file");
+            throw std::logic_error(
+                "QPDF_Stream::getStreamJSON: pipeline must be supplied when json_data is file");
         }
         if (data_filename.empty()) {
-            throw std::logic_error("QPDF_Stream::getStreamJSON: data_filename "
-                                   "must be supplied when json_data is file");
+            throw std::logic_error("QPDF_Stream::getStreamJSON: data_filename must be supplied "
+                                   "when json_data is file");
         }
         break;
     }
@@ -244,8 +243,7 @@ QPDF_Stream::getStreamJSON(
                 break;
             }
         }
-        // We can use unsafeShallowCopy because we are only
-        // touching top-level keys.
+        // We can use unsafeShallowCopy because we are only touching top-level keys.
         dict = this->stream_dict.unsafeShallowCopy();
         dict.removeKey("/Length");
         if (filter && filtered) {
@@ -408,8 +406,7 @@ QPDF_Stream::filterable(
         return false;
     }
 
-    // filters now contains a list of filters to be applied in order.
-    // See which ones we can support.
+    // filters now contains a list of filters to be applied in order. See which ones we can support.
 
     // See if we can support any decode parameters that are specified.
 
@@ -428,9 +425,8 @@ QPDF_Stream::filterable(
         }
     }
 
-    // Ignore /DecodeParms entirely if /Filters is empty.  At least
-    // one case of a file whose /DecodeParms was [ << >> ] when
-    // /Filters was empty has been seen in the wild.
+    // Ignore /DecodeParms entirely if /Filters is empty.  At least one case of a file whose
+    // /DecodeParms was [ << >> ] when /Filters was empty has been seen in the wild.
     if ((filters.size() != 0) && (decode_parms.size() != filters.size())) {
         warn("stream /DecodeParms length is inconsistent with filters");
         filterable = false;
@@ -502,9 +498,8 @@ QPDF_Stream::pipeStreamData(
         return filter;
     }
 
-    // Construct the pipeline in reverse order. Force pipelines we
-    // create to be deleted when this function finishes. Pipelines
-    // created by QPDFStreamFilter objects will be deleted by those
+    // Construct the pipeline in reverse order. Force pipelines we create to be deleted when this
+    // function finishes. Pipelines created by QPDFStreamFilter objects will be deleted by those
     // objects.
     std::vector<std::shared_ptr<Pipeline>> to_delete;
 
@@ -568,8 +563,8 @@ QPDF_Stream::pipeStreamData(
                 QTC::TC("qpdf", "QPDF_Stream pipe use stream provider");
             } else {
                 QTC::TC("qpdf", "QPDF_Stream provider length mismatch");
-                // This would be caused by programmer error on the
-                // part of a library user, not by invalid input data.
+                // This would be caused by programmer error on the part of a library user, not by
+                // invalid input data.
                 throw std::runtime_error(
                     "stream data provider for " + og.unparse(' ') + " provided " +
                     std::to_string(actual_length) + " bytes instead of expected " +
@@ -602,14 +597,13 @@ QPDF_Stream::pipeStreamData(
         warn("content normalization encountered bad tokens");
         if (normalizer->lastTokenWasBad()) {
             QTC::TC("qpdf", "QPDF_Stream bad token at end during normalize");
-            warn("normalized content ended with a bad token; you may be able "
-                 "to resolve this by coalescing content streams in combination "
-                 "with normalizing content. From the command line, specify "
-                 "--coalesce-contents");
+            warn("normalized content ended with a bad token; you may be able to resolve this by "
+                 "coalescing content streams in combination with normalizing content. From the "
+                 "command line, specify --coalesce-contents");
         }
-        warn("Resulting stream data may be corrupted but is may still useful "
-             "for manual inspection. For more information on this warning, "
-             "search for content normalization in the manual.");
+        warn("Resulting stream data may be corrupted but is may still useful for manual "
+             "inspection. For more information on this warning, search for content normalization "
+             "in the manual.");
     }
 
     return success;

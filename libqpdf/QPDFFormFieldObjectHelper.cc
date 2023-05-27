@@ -310,15 +310,15 @@ QPDFFormFieldObjectHelper::setV(QPDFObjectHandle value, bool need_appearances)
                 }
             }
             if (!okay) {
-                this->oh.warnIfPossible("ignoring attempt to set a checkbox field to a"
-                                        " value of other than /Yes or /Off");
+                this->oh.warnIfPossible("ignoring attempt to set a checkbox field to a value of "
+                                        "other than /Yes or /Off");
             }
         } else if (isRadioButton()) {
             if (value.isName()) {
                 setRadioButtonValue(value);
             } else {
-                this->oh.warnIfPossible("ignoring attempt to set a radio button field to"
-                                        " an object that is not a name");
+                this->oh.warnIfPossible(
+                    "ignoring attempt to set a radio button field to an object that is not a name");
             }
         } else if (isPushbutton()) {
             this->oh.warnIfPossible("ignoring attempt set the value of a pushbutton field");
@@ -347,24 +347,19 @@ QPDFFormFieldObjectHelper::setV(std::string const& utf8_value, bool need_appeara
 void
 QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
 {
-    // Set the value of a radio button field. This has the following
-    // specific behavior:
-    // * If this is a radio button field that has a parent that is
-    //   also a radio button field and has no explicit /V, call itself
-    //   on the parent
-    // * If this is a radio button field with children, set /V to the
-    //   given value. Then, for each child, if the child has the
-    //   specified value as one of its keys in the /N subdictionary of
-    //   its /AP (i.e. its normal appearance stream dictionary), set
-    //   /AS to name; otherwise, if /Off is a member, set /AS to /Off.
-    // Note that we never turn on /NeedAppearances when setting a
-    // radio button field.
+    // Set the value of a radio button field. This has the following specific behavior:
+    // * If this is a radio button field that has a parent that is also a radio button field and has
+    //   no explicit /V, call itself on the parent
+    // * If this is a radio button field with children, set /V to the given value. Then, for each
+    //   child, if the child has the specified value as one of its keys in the /N subdictionary of
+    //   its /AP (i.e. its normal appearance stream dictionary), set /AS to name; otherwise, if /Off
+    //   is a member, set /AS to /Off.
+    // Note that we never turn on /NeedAppearances when setting a radio button field.
     QPDFObjectHandle parent = this->oh.getKey("/Parent");
     if (parent.isDictionary() && parent.getKey("/Parent").isNull()) {
         QPDFFormFieldObjectHelper ph(parent);
         if (ph.isRadioButton()) {
-            // This is most likely one of the individual buttons. Try
-            // calling on the parent.
+            // This is most likely one of the individual buttons. Try calling on the parent.
             QTC::TC("qpdf", "QPDFFormFieldObjectHelper set parent radio button");
             ph.setRadioButtonValue(name);
             return;
@@ -384,8 +379,7 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
         QPDFObjectHandle AP = kid.getKey("/AP");
         QPDFObjectHandle annot;
         if (AP.isNull()) {
-            // The widget may be below. If there is more than one,
-            // just find the first one.
+            // The widget may be below. If there is more than one, just find the first one.
             QPDFObjectHandle grandkids = kid.getKey("/Kids");
             if (grandkids.isArray()) {
                 int ngrandkids = grandkids.getArrayNItems();
@@ -458,9 +452,8 @@ void
 QPDFFormFieldObjectHelper::generateAppearance(QPDFAnnotationObjectHelper& aoh)
 {
     std::string ft = getFieldType();
-    // Ignore field types we don't know how to generate appearances
-    // for. Button fields don't really need them -- see code in
-    // QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded.
+    // Ignore field types we don't know how to generate appearances for. Button fields don't really
+    // need them -- see code in QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded.
     if ((ft == "/Tx") || (ft == "/Ch")) {
         generateTextAppearance(aoh);
     }
@@ -562,15 +555,13 @@ ValueSetter::writeAppearance()
 {
     this->replaced = true;
 
-    // This code does not take quadding into consideration because
-    // doing so requires font metric information, which we don't
-    // have in many cases.
+    // This code does not take quadding into consideration because doing so requires font metric
+    // information, which we don't have in many cases.
 
     double tfh = 1.2 * tf;
     int dx = 1;
 
-    // Write one or more lines, centered vertically, possibly with
-    // one row highlighted.
+    // Write one or more lines, centered vertically, possibly with one row highlighted.
 
     auto max_rows = static_cast<size_t>((bbox.ury - bbox.lly) / tfh);
     bool highlight = false;
@@ -591,8 +582,7 @@ ValueSetter::writeAppearance()
             }
         }
         if (found) {
-            // Try to make the found item the second one, but
-            // adjust for under/overflow.
+            // Try to make the found item the second one, but adjust for under/overflow.
             int wanted_first = QIntC::to_int(found_idx) - 1;
             int wanted_last = QIntC::to_int(found_idx + max_rows) - 2;
             QTC::TC("qpdf", "QPDFFormFieldObjectHelper list found");
@@ -639,9 +629,8 @@ ValueSetter::writeAppearance()
     dy -= tf;
     write("q\nBT\n" + DA + "\n");
     for (size_t i = 0; i < nlines; ++i) {
-        // We could adjust Tm to translate to the beginning the first
-        // line, set TL to tfh, and use T* for each subsequent line,
-        // but doing this would require extracting any Tm from DA,
+        // We could adjust Tm to translate to the beginning the first line, set TL to tfh, and use
+        // T* for each subsequent line, but doing this would require extracting any Tm from DA,
         // which doesn't seem really worth the effort.
         if (i == 0) {
             write(
@@ -708,8 +697,8 @@ TfFinder::handleToken(QPDFTokenizer::Token const& token)
     case QPDFTokenizer::tt_word:
         if (token.isWord("Tf")) {
             if ((last_num > 1.0) && (last_num < 1000.0)) {
-                // These ranges are arbitrary but keep us from doing
-                // insane things or suffering from over/underflow
+                // These ranges are arbitrary but keep us from doing insane things or suffering from
+                // over/underflow
                 tf = last_num;
             }
             tf_idx = last_num_idx;
@@ -738,8 +727,7 @@ TfFinder::getDA()
         if (QIntC::to_int(i) == tf_idx) {
             double delta = strtod(cur.c_str(), nullptr) - this->tf;
             if ((delta > 0.001) || (delta < -0.001)) {
-                // tf doesn't match the font size passed to Tf, so
-                // substitute.
+                // tf doesn't match the font size passed to Tf, so substitute.
                 QTC::TC("qpdf", "QPDFFormFieldObjectHelper fallback Tf");
                 cur = QUtil::double_to_string(tf);
             }
@@ -852,6 +840,5 @@ QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& ao
     }
 
     AS.addTokenFilter(
-        // line-break
         std::shared_ptr<QPDFObjectHandle::TokenFilter>(new ValueSetter(DA, V, opt, tf, bbox)));
 }
