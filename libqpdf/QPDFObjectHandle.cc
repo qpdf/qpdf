@@ -1934,38 +1934,31 @@ QPDFObjectHandle::newArray(std::vector<QPDFObjectHandle> const& items)
 QPDFObjectHandle
 QPDFObjectHandle::newArray(Rectangle const& rect)
 {
-    std::vector<QPDFObjectHandle> items;
-    items.push_back(newReal(rect.llx));
-    items.push_back(newReal(rect.lly));
-    items.push_back(newReal(rect.urx));
-    items.push_back(newReal(rect.ury));
-    return newArray(items);
+    return newArray({newReal(rect.llx), newReal(rect.lly), newReal(rect.urx), newReal(rect.ury)});
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newArray(Matrix const& matrix)
 {
-    std::vector<QPDFObjectHandle> items;
-    items.push_back(newReal(matrix.a));
-    items.push_back(newReal(matrix.b));
-    items.push_back(newReal(matrix.c));
-    items.push_back(newReal(matrix.d));
-    items.push_back(newReal(matrix.e));
-    items.push_back(newReal(matrix.f));
-    return newArray(items);
+    return newArray(
+        {newReal(matrix.a),
+         newReal(matrix.b),
+         newReal(matrix.c),
+         newReal(matrix.d),
+         newReal(matrix.e),
+         newReal(matrix.f)});
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::newArray(QPDFMatrix const& matrix)
 {
-    std::vector<QPDFObjectHandle> items;
-    items.push_back(newReal(matrix.a));
-    items.push_back(newReal(matrix.b));
-    items.push_back(newReal(matrix.c));
-    items.push_back(newReal(matrix.d));
-    items.push_back(newReal(matrix.e));
-    items.push_back(newReal(matrix.f));
-    return newArray(items);
+    return newArray(
+        {newReal(matrix.a),
+         newReal(matrix.b),
+         newReal(matrix.c),
+         newReal(matrix.d),
+         newReal(matrix.e),
+         newReal(matrix.f)});
 }
 
 QPDFObjectHandle
