@@ -4,8 +4,26 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
+class JSONHandler::Members
+{
+    friend class JSONHandler;
+
+  public:
+    ~Members() = default;
+
+  private:
+    Members() = default;
+    Members(Members const&) = delete;
+
+    Handlers h;
+};
+
 JSONHandler::JSONHandler() :
     m(new Members())
+{
+}
+
+JSONHandler::~JSONHandler()
 {
 }
 
