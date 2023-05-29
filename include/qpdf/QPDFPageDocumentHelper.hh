@@ -56,7 +56,7 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     void removeUnreferencedResources();
 
-    // Add new page at the beginning or the end of the current pdf. The newpage parameter may be
+    // Add a new page at the beginning or the end of the current pdf. The newpage parameter may be
     // either a direct object, an indirect object from this QPDF, or an indirect object from another
     // QPDF. If it is a direct object, it will be made indirect. If it is an indirect object from
     // another QPDF, this method will call pushInheritedAttributesToPage on the other file and then
@@ -76,7 +76,7 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     // This method does not have any specific awareness of annotations or form fields, so if you
     // just add a page without thinking about it, you might end up with two pages that share form
     // fields or annotations. While the page may look fine, it will probably not function properly
-    // with regard to interactive features. To work around this, you should called
+    // with regard to interactive features. To work around this, you should call
     // QPDFAcroFormDocumentHelper::fixCopiedAnnotations. A future version of qpdf will likely
     // provide a higher-level interface for copying pages around that will handle document-level
     // constructs in a less error-prone fashion.

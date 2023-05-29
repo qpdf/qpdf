@@ -69,7 +69,7 @@ class JSON
     // to pass that `first` through to all the methods that are called to add top-level items to the
     // container as well as to close the container. This lets the JSON object use it to keep track
     // of when it's writing a first object and when it's not. If incrementally writing multiple
-    // levels of depth, a new `first` should used for each new container that is opened.
+    // levels of depth, a new `first` should be used for each new container that is opened.
     //
     // "depth" -- Indicate the level of depth. This is used for consistent indentation. When writing
     // incrementally, whenever you call a method to add an item to a container, the value of `depth`
@@ -208,7 +208,7 @@ class JSON
     QPDF_DLL
     bool checkSchema(JSON schema, std::list<std::string>& errors);
 
-    // An pointer to a Reactor class can be passed to parse, which will enable the caller to react
+    // A pointer to a Reactor class can be passed to parse, which will enable the caller to react
     // to incremental events in the construction of the JSON object. This makes it possible to
     // implement SAX-like handling of very large JSON objects.
     class QPDF_DLL_CLASS Reactor

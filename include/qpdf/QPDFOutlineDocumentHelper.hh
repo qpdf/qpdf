@@ -55,7 +55,7 @@ class QPDFOutlineDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     QPDFObjectHandle resolveNamedDest(QPDFObjectHandle name);
 
-    // Return a list outlines that are known to target the specified page
+    // Return a list outlines that are known to target the specified page.
     QPDF_DLL
     std::vector<QPDFOutlineObjectHelper> getOutlinesForPage(QPDFObjGen const&);
 

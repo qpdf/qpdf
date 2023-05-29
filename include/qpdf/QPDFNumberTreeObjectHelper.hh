@@ -145,7 +145,7 @@ class QPDF_DLL_CLASS QPDFNumberTreeObjectHelper: public QPDFObjectHelper
         value_type ivalue;
     };
 
-    // The iterator looks like map iterator, so i.first is a string and i.second is a
+    // The iterator looks like map iterator, so i.first is a numtree_number and i.second is a
     // QPDFObjectHandle. Incrementing end() brings you to the first item. Decrementing end() brings
     // you to the last item.
     QPDF_DLL
@@ -166,7 +166,7 @@ class QPDF_DLL_CLASS QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     iterator insert(numtree_number key, QPDFObjectHandle value);
 
     // Remove an item. Return true if the item was found and removed; otherwise return false. If
-    // value is not null, initialize it to the value that was removed.
+    // value is not nullptr, initialize it to the value that was removed.
     QPDF_DLL
     bool remove(numtree_number key, QPDFObjectHandle* value = nullptr);
 

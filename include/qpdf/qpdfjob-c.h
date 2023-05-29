@@ -109,7 +109,7 @@ extern "C" {
 #endif /* QPDF_NO_WCHAR_T */
 
     /* This function wraps QPDFJob::initializeFromJson. The return value is the same as qpdfjob_run.
-     * If this returns an error, it is invalid to call any other functions this job handle.
+     * If this returns an error, it is invalid to call any other functions using this job handle.
      */
     QPDF_DLL
     int qpdfjob_initialize_from_json(qpdfjob_handle j, char const* json);
@@ -135,7 +135,8 @@ extern "C" {
     /* This function wraps QPDFJob::writeQPDF. It returns the error code that qpdf would return with
      * the equivalent command-line invocation. Exit code values are defined in Constants.h in the
      * qpdf_exit_code_e type. NOTE it is the callers responsibility to clean up the resources
-     * associated qpdf_data object by calling qpdf_cleanup after the call to qpdfjob_write_qpdf.
+     * associated with the qpdf_data object by calling qpdf_cleanup after the call to
+     * qpdfjob_write_qpdf.
      */
     QPDF_DLL
     int qpdfjob_write_qpdf(qpdfjob_handle j, qpdf_data qpdf);

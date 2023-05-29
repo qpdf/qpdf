@@ -20,9 +20,9 @@
 #define QPDF_CLOSEDFILEINPUTSOURCE_HH
 
 // This is an input source that reads from files, like FileInputSource, except that it opens and
-// close the file surrounding every operation. This decreases efficiency, but it allows many more of
-// these to exist at once than the maximum number of open file descriptors. This is used for merging
-// large numbers of files.
+// closes the file surrounding every operation. This decreases efficiency, but it allows many more
+// of these to exist at once than the maximum number of open file descriptors. This is used for
+// merging large numbers of files.
 
 #include <qpdf/InputSource.hh>
 #include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)

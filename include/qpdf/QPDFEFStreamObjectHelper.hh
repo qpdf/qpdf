@@ -55,7 +55,7 @@ class QPDFEFStreamObjectHelper: public QPDFObjectHelper
     // Return the checksum as stored in the object as a binary string. This does not check
     // consistency with the data. If not present, return an empty string. The PDF spec specifies
     // this as an MD5 checksum and notes that it is not to be used for security purposes since MD5
-    // is known not to be secure.
+    // is known to be insecure.
     QPDF_DLL
     std::string getChecksum();
 

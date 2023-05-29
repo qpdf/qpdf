@@ -232,7 +232,7 @@ void
 QPDFArgParser::handleArgFileArguments()
 {
     // Support reading arguments from files. Create a new argv. Ensure that argv itself as well as
-    // all its contents are automatically deleted by using shared pointers to back the pointers in
+    // all its contents are automatically deleted by using shared pointers back to the pointers in
     // argv.
     m->new_argv.push_back(QUtil::make_shared_cstr(m->argv[0]));
     for (int i = 1; i < m->argc; ++i) {

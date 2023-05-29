@@ -37,7 +37,7 @@ class QPDFOutlineObjectHelper: public QPDFObjectHelper
     virtual ~QPDFOutlineObjectHelper()
     {
         // This must be cleared explicitly to avoid circular references that prevent cleanup of
-        // pointer holders.
+        // shared pointers.
         m->parent = nullptr;
     }
 
@@ -66,11 +66,11 @@ class QPDFOutlineObjectHelper: public QPDFObjectHelper
 
     // Returns the value of /Count as present in the object, or 0 if not present. If count is
     // positive, the outline is open. If negative, it is closed. Either way, the absolute value is
-    // the number descendant items that would be visible if this were open.
+    // the number of descendant items that would be visible if this were open.
     QPDF_DLL
     int getCount();
 
-    // Returns the title as a UTF-8 string. Returns the empty string if there is no title.
+    // Returns the title as a UTF-8 string. Returns an empty string if there is no title.
     QPDF_DLL
     std::string getTitle();
 

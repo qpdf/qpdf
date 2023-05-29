@@ -120,9 +120,9 @@ main(int argc, char* argv[])
                 QPDFObjectHandle color_space = image_dict.getKey("/ColorSpace");
                 QPDFObjectHandle bits_per_component = image_dict.getKey("/BitsPerComponent");
 
-                // For our example, we can only work with images 8-bit grayscale images that we can
-                // fully decode.  Use pipeStreamData with a null pipeline to determine whether the
-                // image is filterable.  Directly inspect keys to determine the image type.
+                // For our example, we can only work with 8-bit grayscale images that we can fully
+                // decode.  Use pipeStreamData with a null pipeline to determine whether the image
+                // is filterable.  Directly inspect keys to determine the image type.
                 if (image.pipeStreamData(nullptr, qpdf_ef_compress, qpdf_dl_all) &&
                     color_space.isNameAndEquals("/DeviceGray") && bits_per_component.isInteger() &&
                     (bits_per_component.getIntValue() == 8)) {

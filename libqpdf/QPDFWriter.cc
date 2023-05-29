@@ -1346,8 +1346,8 @@ QPDFWriter::unparseObject(
         // Make a shallow copy of this object so we can modify it safely without affecting the
         // original. This code has logic to skip certain keys in agreement with prepareFileForWrite
         // and with skip_stream_parameters so that replacing them doesn't leave unreferenced objects
-        // in the output. We can use unsafeShallowCopy here because we are all we are doing is
-        // removing or replacing top-level keys.
+        // in the output. We can use unsafeShallowCopy here because all we are doing is removing or
+        // replacing top-level keys.
         object = object.unsafeShallowCopy();
 
         // Handle special cases for specific dictionaries.
@@ -1701,7 +1701,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
             }
             QPDFObjectHandle obj_to_write = m->pdf.getObject(obj);
             if (obj_to_write.isStream()) {
-                // This condition occurred in a fuzz input. Ideally we should block it at at parse
+                // This condition occurred in a fuzz input. Ideally we should block it at parse
                 // time, but it's not clear to me how to construct a case for this.
                 QTC::TC("qpdf", "QPDFWriter stream in ostream");
                 obj_to_write.warnIfPossible("stream found inside object stream; treating as null");

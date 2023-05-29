@@ -19,7 +19,7 @@
 #ifndef PL_CONCATENATE_HH
 #define PL_CONCATENATE_HH
 
-// This pipeline will drop all regular finished calls rather than passing them onto next.  To finish
+// This pipeline will drop all regular finish calls rather than passing them onto next.  To finish
 // downstream streams, call manualFinish.  This makes it possible to pipe multiple streams (e.g.
 // with QPDFObjectHandle::pipeStreamData) to a downstream like Pl_Flate that can't handle multiple
 // calls to finish().

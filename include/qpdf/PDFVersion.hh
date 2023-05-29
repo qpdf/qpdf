@@ -16,9 +16,6 @@
 // License. At your option, you may continue to consider qpdf to be licensed under those terms.
 // Please see the manual for additional information.
 
-// This class implements a simple writer for saving QPDF objects to new PDF files.  See comments
-// through the header file for additional details.
-
 #ifndef PDFVERSION_HH
 #define PDFVERSION_HH
 

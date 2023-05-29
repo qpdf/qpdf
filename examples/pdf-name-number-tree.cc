@@ -41,7 +41,7 @@ main(int argc, char* argv[])
     // (root), and write an empty PDF to a file. The PDF will have no pages and won't be viewable,
     // but you can look at it in a text editor to see the resulting structure of the PDF.
 
-    // Create a dictionary off the root where we will hang our name and number tree.
+    // Create a dictionary off the root where we will hang our name and number trees.
     auto root = qpdf.getRoot();
     auto example = QPDFObjectHandle::newDictionary();
     root.replaceKey("/Example", example);

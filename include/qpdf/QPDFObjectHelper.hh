@@ -26,7 +26,7 @@
 // This is a base class for QPDF Object Helper classes. Object helpers are classes that provide a
 // convenient, higher-level API for working with specific types of QPDF objects. Object helpers are
 // always initialized with a QPDFObjectHandle, and the underlying object handle can always be
-// retrieved. The intention is that you may freely intermix use of document helpers with the
+// retrieved. The intention is that you may freely intermix use of object helpers with the
 // underlying QPDF objects unless there is a specific comment in a specific helper method that says
 // otherwise. The pattern of using helper objects was introduced to allow creation of higher level
 // helper functions without polluting the public interface of QPDFObjectHandle.

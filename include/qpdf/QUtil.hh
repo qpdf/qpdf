@@ -224,7 +224,7 @@ namespace QUtil
     QPDF_DLL
     time_t get_current_time();
 
-    // Portable structure representing a point in time with second granularity and time zone offset
+    // Portable structure representing a point in time with second granularity and time zone offset.
     struct QPDFTime
     {
         QPDFTime() = default;

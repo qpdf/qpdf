@@ -44,10 +44,10 @@ NNTreeIterator::updateIValue(bool allow_invalid)
     // various cases to ensure we don't introduce that bug in the future, but sadly it's tricky to
     // verify by reasoning about the code that this constraint is always satisfied. Whenever we
     // update what the iterator points to, we should call setItemNumber, which calls this. If we
-    // change what the iterator in some other way, such as replacing a value or removing an item and
-    // making the iterator point at a different item in potentially the same position, we must call
-    // updateIValue as well. These cases are handled, and for good measure, we also call
-    // updateIValue in operator* and operator->.
+    // change what the iterator points to in some other way, such as replacing a value or removing
+    // an item and making the iterator point at a different item in potentially the same position,
+    // we must call updateIValue as well. These cases are handled, and for good measure, we also
+    // call updateIValue in operator* and operator->.
 
     bool okay = false;
     if ((item_number >= 0) && this->node.isDictionary()) {
@@ -226,7 +226,7 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
     // Split some node along the path to the item pointed to by this iterator, and adjust the
     // iterator so it points to the same item.
 
-    // In examples, for simplicity, /Nums is show to just contain numbers instead of pairs. Imagine
+    // In examples, for simplicity, /Nums is shown to just contain numbers instead of pairs. Imagine
     // this tree:
     //
     // root: << /Kids [ A B C D ] >>

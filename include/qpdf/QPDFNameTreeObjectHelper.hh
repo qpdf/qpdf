@@ -52,7 +52,7 @@ class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     virtual ~QPDFNameTreeObjectHelper();
 
-    // Return whether the number tree has an explicit entry for this number.
+    // Return whether the name tree has an explicit entry for this name.
     QPDF_DLL
     bool hasName(std::string const& utf8);
 
@@ -151,7 +151,7 @@ class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
     iterator insert(std::string const& key, QPDFObjectHandle value);
 
     // Remove an item. Return true if the item was found and removed; otherwise return false. If
-    // value is not null, initialize it to the value that was removed.
+    // value is not nullptr, initialize it to the value that was removed.
     QPDF_DLL
     bool remove(std::string const& key, QPDFObjectHandle* value = nullptr);
 

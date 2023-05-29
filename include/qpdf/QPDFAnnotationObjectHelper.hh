@@ -40,7 +40,7 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
     // besides widget annotations, but they are implemented with form fields so that they can
     // properly handle form fields when needed.
 
-    // Return the subtype of the annotation as a string (e.g. "/Widget"). Returns the empty string
+    // Return the subtype of the annotation as a string (e.g. "/Widget"). Returns an empty string
     // if the subtype (which is required by the spec) is missing.
     QPDF_DLL
     std::string getSubtype();
@@ -51,7 +51,7 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     QPDFObjectHandle getAppearanceDictionary();
 
-    // Return the appearance state as given in "/AS", or the empty string if none is given.
+    // Return the appearance state as given in "/AS", or an empty string if none is given.
     QPDF_DLL
     std::string getAppearanceState();
 

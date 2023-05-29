@@ -103,11 +103,11 @@ class QPDFWriter
     // Setting Output.  Output may be set only one time.  If you don't use the filename version of
     // the QPDFWriter constructor, you must call exactly one of these methods.
 
-    // Passing null as filename means write to stdout.  QPDFWriter will create a zero-length output
-    // file upon construction.  If write fails, the empty or partially written file will not be
-    // deleted.  This is by design: sometimes the partial file may be useful for tracking down
+    // Passing nullptr as filename means write to stdout.  QPDFWriter will create a zero-length
+    // output file upon construction.  If write fails, the empty or partially written file will not
+    // be deleted.  This is by design: sometimes the partial file may be useful for tracking down
     // problems.  If your application doesn't want the partially written file to be left behind, you
-    // should delete it the eventual call to write fails.
+    // should delete it if the eventual call to write fails.
     QPDF_DLL
     void setOutputFilename(char const* filename);
 
@@ -184,8 +184,8 @@ class QPDFWriter
     //
     // qpdf_dl_generalized: This is the default. QPDFWriter will apply LZWDecode, ASCII85Decode,
     // ASCIIHexDecode, and FlateDecode filters on the input. When combined with
-    // setCompressStreams(true), which the default, the effect of this is that streams filtered with
-    // these older and less efficient filters will be recompressed with the Flate filter. By
+    // setCompressStreams(true), which is the default, the effect of this is that streams filtered
+    // with these older and less efficient filters will be recompressed with the Flate filter. By
     // default, as a special case, if a stream is already compressed with FlateDecode and
     // setCompressStreams is enabled, the original compressed data will be preserved. This behavior
     // can be overridden by calling setRecompressFlate(true).

@@ -23,12 +23,12 @@
 #include <qpdf/QPDF.hh>
 
 // This is a base class for QPDF Document Helper classes. Document helpers are classes that provide
-// a convenient, higher-level API for accessing document-level structures with a PDF file. Document
-// helpers are always initialized with a reference to a QPDF object, and the object can always be
-// retrieved. The intention is that you may freely intermix use of document helpers with the
-// underlying QPDF object unless there is a specific comment in a specific helper method that says
-// otherwise. The pattern of using helper objects was introduced to allow creation of higher level
-// helper functions without polluting the public interface of QPDF.
+// a convenient, higher-level API for accessing document-level structures within a PDF file.
+// Document helpers are always initialized with a reference to a QPDF object, and the object can
+// always be retrieved. The intention is that you may freely intermix use of document helpers with
+// the underlying QPDF object unless there is a specific comment in a specific helper method that
+// says otherwise. The pattern of using helper objects was introduced to allow creation of higher
+// level helper functions without polluting the public interface of QPDF.
 
 class QPDF_DLL_CLASS QPDFDocumentHelper
 {
