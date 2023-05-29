@@ -1487,7 +1487,8 @@ QPDF::readObjectAtOffset(
 
     // Special case: if offset is 0, just return null.  Some PDF writers, in particular
     // "Mac OS X 10.7.5 Quartz PDFContext", may store deleted objects in the xref table as
-    // "0000000000 00000 n", which is not correct, but it won't hurt anything for to ignore these.
+    // "0000000000 00000 n", which is not correct, but it won't hurt anything for us to ignore
+    // these.
     if (offset == 0) {
         QTC::TC("qpdf", "QPDF bogus 0 offset", 0);
         warn(damagedPDF(0, "object has offset 0"));
