@@ -3,7 +3,7 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFExc.hh>
 
-QPDFXRefEntry::QPDFXRefEntry()
+QPDFXRefEntry::QPDFXRefEntry() // NOLINT (modernize-use-equals-default)
 {
 }
 

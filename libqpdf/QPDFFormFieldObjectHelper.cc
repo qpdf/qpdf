@@ -647,10 +647,8 @@ namespace
     class TfFinder: public QPDFObjectHandle::TokenFilter
     {
       public:
-        TfFinder();
-        ~TfFinder() override
-        {
-        }
+        TfFinder() = default;
+        ~TfFinder() override = default;
         void handleToken(QPDFTokenizer::Token const&) override;
         double getTf();
         std::string getFontName();
@@ -666,10 +664,6 @@ namespace
         std::vector<std::string> DA;
     };
 } // namespace
-
-TfFinder::TfFinder()
-{
-}
 
 void
 TfFinder::handleToken(QPDFTokenizer::Token const& token)

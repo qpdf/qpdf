@@ -17,9 +17,7 @@ usage()
 class Callback: public Pl_DCT::CompressConfig
 {
   public:
-    Callback()
-    {
-    }
+    Callback() = default;
     ~Callback() override = default;
     void apply(jpeg_compress_struct*) override;
     bool called{false};

@@ -145,9 +145,6 @@ class QPDFArgParser
   private:
     struct OptionEntry
     {
-        OptionEntry()
-        {
-        }
         bool parameter_needed{false};
         std::string parameter_name;
         std::set<std::string> choices;

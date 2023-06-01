@@ -145,10 +145,6 @@ class QPDFJob
 
     struct AddAttachment
     {
-        AddAttachment()
-        {
-        }
-
         std::string path;
         std::string key;
         std::string filename;

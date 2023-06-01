@@ -21,7 +21,7 @@ Pl_QPDFTokenizer::Pl_QPDFTokenizer(
     m->tokenizer.includeIgnorable();
 }
 
-Pl_QPDFTokenizer::~Pl_QPDFTokenizer()
+Pl_QPDFTokenizer::~Pl_QPDFTokenizer() // NOLINT (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
 }

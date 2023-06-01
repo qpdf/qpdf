@@ -16,7 +16,7 @@ Pl_RunLength::Pl_RunLength(char const* identifier, Pipeline* next, action_e acti
 {
 }
 
-Pl_RunLength::~Pl_RunLength()
+Pl_RunLength::~Pl_RunLength() // NOLINT (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
 }

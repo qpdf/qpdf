@@ -1150,10 +1150,6 @@ class QPDF
     // PDF 1.4: Table F.4
     struct HPageOffsetEntry
     {
-        HPageOffsetEntry()
-        {
-        }
-
         int delta_nobjects{0};              // 1
         qpdf_offset_t delta_page_length{0}; // 2
         // vectors' sizes = nshared_objects
@@ -1167,10 +1163,6 @@ class QPDF
     // PDF 1.4: Table F.3
     struct HPageOffset
     {
-        HPageOffset()
-        {
-        }
-
         int min_nobjects{0};                // 1
         qpdf_offset_t first_page_offset{0}; // 2
         int nbits_delta_nobjects{0};        // 3
@@ -1191,10 +1183,6 @@ class QPDF
     // PDF 1.4: Table F.6
     struct HSharedObjectEntry
     {
-        HSharedObjectEntry()
-        {
-        }
-
         // Item 3 is a 128-bit signature (unsupported by Acrobat)
         int delta_group_length{0}; // 1
         int signature_present{0};  // 2 -- always 0
@@ -1204,10 +1192,6 @@ class QPDF
     // PDF 1.4: Table F.5
     struct HSharedObject
     {
-        HSharedObject()
-        {
-        }
-
         int first_shared_obj{0};              // 1
         qpdf_offset_t first_shared_offset{0}; // 2
         int nshared_first_page{0};            // 3
@@ -1222,10 +1206,6 @@ class QPDF
     // PDF 1.4: Table F.9
     struct HGeneric
     {
-        HGeneric()
-        {
-        }
-
         int first_object{0};                  // 1
         qpdf_offset_t first_object_offset{0}; // 2
         int nobjects{0};                      // 3
@@ -1237,10 +1217,6 @@ class QPDF
     // Initialized from Linearization Parameter dictionary
     struct LinParameters
     {
-        LinParameters()
-        {
-        }
-
         qpdf_offset_t file_size{0};        // /L
         int first_page_object{0};          // /O
         qpdf_offset_t first_page_end{0};   // /E
@@ -1264,10 +1240,6 @@ class QPDF
 
     struct CHPageOffsetEntry
     {
-        CHPageOffsetEntry()
-        {
-        }
-
         int nobjects{0};
         int nshared_objects{0};
         // vectors' sizes = nshared_objects
@@ -1293,10 +1265,6 @@ class QPDF
     // PDF 1.4: Table F.5
     struct CHSharedObject
     {
-        CHSharedObject()
-        {
-        }
-
         int first_shared_obj{0};
         int nshared_first_page{0};
         int nshared_total{0};

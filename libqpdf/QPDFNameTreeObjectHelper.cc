@@ -34,7 +34,7 @@ namespace
 
 static NameTreeDetails name_tree_details;
 
-QPDFNameTreeObjectHelper::~QPDFNameTreeObjectHelper()
+QPDFNameTreeObjectHelper::~QPDFNameTreeObjectHelper() // NOLINT (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer. For this specific
     // class, see github issue #745.

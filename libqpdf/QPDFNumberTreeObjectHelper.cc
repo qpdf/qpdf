@@ -35,7 +35,7 @@ namespace
 
 static NumberTreeDetails number_tree_details;
 
-QPDFNumberTreeObjectHelper::~QPDFNumberTreeObjectHelper()
+QPDFNumberTreeObjectHelper::~QPDFNumberTreeObjectHelper() // NOLINT (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer. For this specific
     // class, see github issue #745.
