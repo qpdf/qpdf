@@ -894,7 +894,7 @@ QPDFJob::doListAttachments(QPDF& pdf)
                     v << "    " << i2.first << " -> " << i2.second << "\n";
                 }
                 v << "  all data streams:\n";
-                for (auto i2: efoh->getEmbeddedFileStreams().ditems()) {
+                for (auto const& i2: efoh->getEmbeddedFileStreams().ditems()) {
                     auto efs = QPDFEFStreamObjectHelper(i2.second);
                     v << "    " << i2.first << " -> "
                       << efs.getObjectHandle().getObjGen().unparse(',') << "\n";
@@ -1329,7 +1329,7 @@ QPDFJob::doJSONAttachments(Pipeline* p, bool& first, QPDF& pdf)
             j_names.addDictionaryMember(i2.first, JSON::makeString(i2.second));
         }
         auto j_streams = j_details.addDictionaryMember("streams", JSON::makeDictionary());
-        for (auto i2: fsoh->getEmbeddedFileStreams().ditems()) {
+        for (auto const& i2: fsoh->getEmbeddedFileStreams().ditems()) {
             auto efs = QPDFEFStreamObjectHelper(i2.second);
             auto j_stream = j_streams.addDictionaryMember(i2.first, JSON::makeDictionary());
             j_stream.addDictionaryMember(

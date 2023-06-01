@@ -70,7 +70,7 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(std::vector<QPDFObjectHandle>
         if (seen.add(obj)) {
             auto kids = obj.getKey("/Kids");
             if (kids.isArray()) {
-                for (auto kid: kids.aitems()) {
+                for (auto const& kid: kids.aitems()) {
                     queue.push_back(kid);
                 }
             }
@@ -104,7 +104,7 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(std::vector<QPDFObjectHandle>
         }
     }
 
-    for (auto i: fields) {
+    for (auto const& i: fields) {
         addFormField(i);
     }
 }
@@ -1018,7 +1018,7 @@ QPDFAcroFormDocumentHelper::fixCopiedAnnotations(
     to_page.replaceKey("/Annots", QPDFObjectHandle::newArray(new_annots));
     addAndRenameFormFields(new_fields);
     if (added_fields) {
-        for (auto f: new_fields) {
+        for (auto const& f: new_fields) {
             added_fields->insert(f.getObjGen());
         }
     }

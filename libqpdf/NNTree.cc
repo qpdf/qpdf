@@ -591,7 +591,7 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
     bool failed = false;
 
     QPDFObjGen::set seen;
-    for (auto i: this->path) {
+    for (auto const& i: this->path) {
         seen.add(i.node);
     }
     while (!failed) {

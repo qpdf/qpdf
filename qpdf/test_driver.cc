@@ -2576,7 +2576,7 @@ test_76(QPDF& pdf, char const* arg2)
     assert(efs2.getSubtype() == "text/plain");
     assert(QUtil::hex_encode(efs2.getChecksum()) == "2fce9c8228e360ba9b04a1bd1bf63d6b");
 
-    for (auto iter: efdh.getEmbeddedFiles()) {
+    for (auto const& iter: efdh.getEmbeddedFiles()) {
         std::cout << iter.first << " -> " << iter.second->getFilename() << std::endl;
     }
     assert(efdh.getEmbeddedFile("att1")->getFilename() == "att1.txt");
