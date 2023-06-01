@@ -7,7 +7,7 @@ class ResourceFinder: public QPDFObjectHandle::ParserCallbacks
 {
   public:
     ResourceFinder();
-    virtual ~ResourceFinder() = default;
+    ~ResourceFinder() override = default;
     void handleObject(QPDFObjectHandle, size_t, size_t) override;
     void handleEOF() override;
     std::set<std::string> const& getNames() const;

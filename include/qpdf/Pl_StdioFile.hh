@@ -36,12 +36,12 @@ class QPDF_DLL_CLASS Pl_StdioFile: public Pipeline
     QPDF_DLL
     Pl_StdioFile(char const* identifier, FILE* f);
     QPDF_DLL
-    virtual ~Pl_StdioFile();
+    ~Pl_StdioFile() override;
 
     QPDF_DLL
-    virtual void write(unsigned char const* buf, size_t len);
+    void write(unsigned char const* buf, size_t len) override;
     QPDF_DLL
-    virtual void finish();
+    void finish() override;
 
   private:
     class QPDF_DLL_PRIVATE Members

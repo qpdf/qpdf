@@ -44,7 +44,7 @@ class QPDFPageLabelDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     QPDFPageLabelDocumentHelper(QPDF&);
     QPDF_DLL
-    virtual ~QPDFPageLabelDocumentHelper() = default;
+    ~QPDFPageLabelDocumentHelper() override = default;
 
     QPDF_DLL
     bool hasPageLabels();

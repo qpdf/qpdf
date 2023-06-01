@@ -36,12 +36,12 @@ class QPDF_DLL_CLASS Pl_OStream: public Pipeline
     QPDF_DLL
     Pl_OStream(char const* identifier, std::ostream& os);
     QPDF_DLL
-    virtual ~Pl_OStream();
+    ~Pl_OStream() override;
 
     QPDF_DLL
-    virtual void write(unsigned char const* buf, size_t len);
+    void write(unsigned char const* buf, size_t len) override;
     QPDF_DLL
-    virtual void finish();
+    void finish() override;
 
   private:
     class QPDF_DLL_PRIVATE Members

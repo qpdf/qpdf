@@ -10,7 +10,7 @@ namespace
     class Reactor: public JSON::Reactor
     {
       public:
-        virtual ~Reactor() = default;
+        ~Reactor() override = default;
         void dictionaryStart() override;
         void arrayStart() override;
         void containerEnd(JSON const& value) override;

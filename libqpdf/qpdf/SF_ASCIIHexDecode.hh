@@ -9,7 +9,7 @@ class SF_ASCIIHexDecode: public QPDFStreamFilter
 {
   public:
     SF_ASCIIHexDecode() = default;
-    virtual ~SF_ASCIIHexDecode() = default;
+    ~SF_ASCIIHexDecode() override = default;
 
     Pipeline*
     getDecodePipeline(Pipeline* next) override

@@ -6,16 +6,16 @@
 class QPDF_Name: public QPDFValue
 {
   public:
-    virtual ~QPDF_Name() = default;
+    ~QPDF_Name() override = default;
     static std::shared_ptr<QPDFObject> create(std::string const& name);
-    virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
-    virtual std::string unparse();
-    virtual JSON getJSON(int json_version);
+    std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
+    std::string unparse() override;
+    JSON getJSON(int json_version) override;
 
     // Put # into strings with characters unsuitable for name token
     static std::string normalizeName(std::string const& name);
-    virtual std::string
-    getStringValue() const
+    std::string
+    getStringValue() const override
     {
         return name;
     }

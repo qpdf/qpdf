@@ -469,8 +469,8 @@ namespace
         ResourceReplacer(
             std::map<std::string, std::map<std::string, std::string>> const& dr_map,
             std::map<std::string, std::map<std::string, std::set<size_t>>> const& rnames);
-        virtual ~ResourceReplacer() = default;
-        virtual void handleToken(QPDFTokenizer::Token const&) override;
+        ~ResourceReplacer() override = default;
+        void handleToken(QPDFTokenizer::Token const&) override;
 
       private:
         size_t offset{0};

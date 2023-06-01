@@ -41,7 +41,7 @@ class QPDFOutlineDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     QPDFOutlineDocumentHelper(QPDF&);
     QPDF_DLL
-    virtual ~QPDFOutlineDocumentHelper() = default;
+    ~QPDFOutlineDocumentHelper() override = default;
 
     QPDF_DLL
     bool hasOutlines();

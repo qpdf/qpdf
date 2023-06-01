@@ -6,10 +6,10 @@
 class QPDF_Destroyed: public QPDFValue
 {
   public:
-    virtual ~QPDF_Destroyed() = default;
-    virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
-    virtual std::string unparse();
-    virtual JSON getJSON(int json_version);
+    ~QPDF_Destroyed() override = default;
+    std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
+    std::string unparse() override;
+    JSON getJSON(int json_version) override;
     static std::shared_ptr<QPDFValue> getInstance();
 
   private:

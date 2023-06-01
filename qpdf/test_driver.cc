@@ -51,7 +51,7 @@ class ExtendNameTree: public QPDFNameTreeObjectHelper
 {
   public:
     ExtendNameTree(QPDFObjectHandle o, QPDF& q);
-    virtual ~ExtendNameTree();
+    ~ExtendNameTree() override;
 };
 
 ExtendNameTree::ExtendNameTree(QPDFObjectHandle o, QPDF& q) :
@@ -71,9 +71,9 @@ class Provider: public QPDFObjectHandle::StreamDataProvider
         b(b)
     {
     }
-    virtual ~Provider() = default;
-    virtual void
-    provideStreamData(int objid, int generation, Pipeline* p)
+    ~Provider() override = default;
+    void
+    provideStreamData(int objid, int generation, Pipeline* p) override
     {
         // Don't change signature to use QPDFObjGen const& to detect problems forwarding to legacy
         // implementations.
@@ -98,10 +98,10 @@ class Provider: public QPDFObjectHandle::StreamDataProvider
 class ParserCallbacks: public QPDFObjectHandle::ParserCallbacks
 {
   public:
-    virtual ~ParserCallbacks() = default;
-    virtual void contentSize(size_t size);
-    virtual void handleObject(QPDFObjectHandle, size_t, size_t);
-    virtual void handleEOF();
+    ~ParserCallbacks() override = default;
+    void contentSize(size_t size) override;
+    void handleObject(QPDFObjectHandle, size_t, size_t) override;
+    void handleEOF() override;
 };
 
 void
@@ -137,9 +137,9 @@ class TokenFilter: public QPDFObjectHandle::TokenFilter
 {
   public:
     TokenFilter() = default;
-    virtual ~TokenFilter() = default;
-    virtual void
-    handleToken(QPDFTokenizer::Token const& t)
+    ~TokenFilter() override = default;
+    void
+    handleToken(QPDFTokenizer::Token const& t) override
     {
         if (t == QPDFTokenizer::Token(QPDFTokenizer::tt_string, "Potato")) {
             // Exercise unparsing of strings by token constructor
@@ -148,8 +148,8 @@ class TokenFilter: public QPDFObjectHandle::TokenFilter
             writeToken(t);
         }
     }
-    virtual void
-    handleEOF()
+    void
+    handleEOF() override
     {
         writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_name, "/bye"));
         write("\n");

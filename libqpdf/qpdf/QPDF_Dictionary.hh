@@ -11,13 +11,13 @@
 class QPDF_Dictionary: public QPDFValue
 {
   public:
-    virtual ~QPDF_Dictionary() = default;
+    ~QPDF_Dictionary() override = default;
     static std::shared_ptr<QPDFObject> create(std::map<std::string, QPDFObjectHandle> const& items);
     static std::shared_ptr<QPDFObject> create(std::map<std::string, QPDFObjectHandle>&& items);
-    virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
-    virtual std::string unparse();
-    virtual JSON getJSON(int json_version);
-    virtual void disconnect();
+    std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
+    std::string unparse() override;
+    JSON getJSON(int json_version) override;
+    void disconnect() override;
 
     // hasKey() and getKeys() treat keys with null values as if they aren't there.  getKey() returns
     // null for the value of a non-existent key.  This is as per the PDF spec.

@@ -41,12 +41,12 @@ class QPDF_DLL_CLASS Pl_String: public Pipeline
     QPDF_DLL
     Pl_String(char const* identifier, Pipeline* next, std::string& s);
     QPDF_DLL
-    virtual ~Pl_String();
+    ~Pl_String() override;
 
     QPDF_DLL
-    virtual void write(unsigned char const* buf, size_t len);
+    void write(unsigned char const* buf, size_t len) override;
     QPDF_DLL
-    virtual void finish();
+    void finish() override;
 
   private:
     class QPDF_DLL_PRIVATE Members

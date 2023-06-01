@@ -6,11 +6,11 @@
 class QPDF_Bool: public QPDFValue
 {
   public:
-    virtual ~QPDF_Bool() = default;
+    ~QPDF_Bool() override = default;
     static std::shared_ptr<QPDFObject> create(bool val);
-    virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
-    virtual std::string unparse();
-    virtual JSON getJSON(int json_version);
+    std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
+    std::string unparse() override;
+    JSON getJSON(int json_version) override;
     bool getVal() const;
 
   private:

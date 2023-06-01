@@ -32,21 +32,21 @@ class QPDF_DLL_CLASS BufferInputSource: public InputSource
     QPDF_DLL
     BufferInputSource(std::string const& description, std::string const& contents);
     QPDF_DLL
-    virtual ~BufferInputSource();
+    ~BufferInputSource() override;
     QPDF_DLL
-    virtual qpdf_offset_t findAndSkipNextEOL();
+    qpdf_offset_t findAndSkipNextEOL() override;
     QPDF_DLL
-    virtual std::string const& getName() const;
+    std::string const& getName() const override;
     QPDF_DLL
-    virtual qpdf_offset_t tell();
+    qpdf_offset_t tell() override;
     QPDF_DLL
-    virtual void seek(qpdf_offset_t offset, int whence);
+    void seek(qpdf_offset_t offset, int whence) override;
     QPDF_DLL
-    virtual void rewind();
+    void rewind() override;
     QPDF_DLL
-    virtual size_t read(char* buffer, size_t length);
+    size_t read(char* buffer, size_t length) override;
     QPDF_DLL
-    virtual void unreadCh(char ch);
+    void unreadCh(char ch) override;
 
   private:
     bool own_memory;

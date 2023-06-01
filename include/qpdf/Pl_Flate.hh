@@ -40,12 +40,12 @@ class QPDF_DLL_CLASS Pl_Flate: public Pipeline
         action_e action,
         unsigned int out_bufsize = def_bufsize);
     QPDF_DLL
-    virtual ~Pl_Flate();
+    ~Pl_Flate() override;
 
     QPDF_DLL
-    virtual void write(unsigned char const* data, size_t len);
+    void write(unsigned char const* data, size_t len) override;
     QPDF_DLL
-    virtual void finish();
+    void finish() override;
 
     // Globally set compression level from 1 (fastest, least
     // compression) to 9 (slowest, most compression). Use -1 to set

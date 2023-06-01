@@ -37,7 +37,7 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     QPDFFormFieldObjectHelper(QPDFObjectHandle);
     QPDF_DLL
-    virtual ~QPDFFormFieldObjectHelper() = default;
+    ~QPDFFormFieldObjectHelper() override = default;
 
     QPDF_DLL
     bool isNull();

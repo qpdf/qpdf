@@ -6,7 +6,7 @@
 class QPDF_Null: public QPDFValue
 {
   public:
-    virtual ~QPDF_Null() = default;
+    ~QPDF_Null() override = default;
     static std::shared_ptr<QPDFObject> create();
     static std::shared_ptr<QPDFObject> create(
         std::shared_ptr<QPDFObject> parent,
@@ -16,9 +16,9 @@ class QPDF_Null: public QPDFValue
         std::shared_ptr<QPDFValue> parent,
         std::string_view const& static_descr,
         std::string var_descr);
-    virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
-    virtual std::string unparse();
-    virtual JSON getJSON(int json_version);
+    std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
+    std::string unparse() override;
+    JSON getJSON(int json_version) override;
 
   private:
     QPDF_Null();

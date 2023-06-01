@@ -35,7 +35,7 @@ class QPDFEFStreamObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     QPDFEFStreamObjectHelper(QPDFObjectHandle);
     QPDF_DLL
-    virtual ~QPDFEFStreamObjectHelper() = default;
+    ~QPDFEFStreamObjectHelper() override = default;
 
     // Date parameters are strings that conform to the PDF spec for date/time strings, which is
     // "D:yyyymmddhhmmss<z>" where <z> is either "Z" for UTC or "-hh'mm'" or "+hh'mm'" for timezone

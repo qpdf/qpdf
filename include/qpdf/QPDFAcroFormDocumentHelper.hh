@@ -71,7 +71,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     QPDFAcroFormDocumentHelper(QPDF&);
     QPDF_DLL
-    virtual ~QPDFAcroFormDocumentHelper() = default;
+    ~QPDFAcroFormDocumentHelper() override = default;
 
     // This class lazily creates an internal cache of the mapping among form fields, annotations,
     // and pages. Methods within this class preserve the validity of this cache. However, if you

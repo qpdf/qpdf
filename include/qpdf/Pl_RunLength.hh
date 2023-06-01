@@ -29,12 +29,12 @@ class QPDF_DLL_CLASS Pl_RunLength: public Pipeline
     QPDF_DLL
     Pl_RunLength(char const* identifier, Pipeline* next, action_e action);
     QPDF_DLL
-    virtual ~Pl_RunLength();
+    ~Pl_RunLength() override;
 
     QPDF_DLL
-    virtual void write(unsigned char const* data, size_t len);
+    void write(unsigned char const* data, size_t len) override;
     QPDF_DLL
-    virtual void finish();
+    void finish() override;
 
   private:
     QPDF_DLL_PRIVATE

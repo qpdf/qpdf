@@ -56,12 +56,12 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
         CompressConfig* config_callback = nullptr);
 
     QPDF_DLL
-    virtual ~Pl_DCT();
+    ~Pl_DCT() override;
 
     QPDF_DLL
-    virtual void write(unsigned char const* data, size_t len);
+    void write(unsigned char const* data, size_t len) override;
     QPDF_DLL
-    virtual void finish();
+    void finish() override;
 
   private:
     QPDF_DLL_PRIVATE

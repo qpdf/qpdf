@@ -31,11 +31,11 @@ class QPDF_DLL_CLASS Pl_Discard: public Pipeline
     QPDF_DLL
     Pl_Discard();
     QPDF_DLL
-    virtual ~Pl_Discard();
+    ~Pl_Discard() override;
     QPDF_DLL
-    virtual void write(unsigned char const*, size_t);
+    void write(unsigned char const*, size_t) override;
     QPDF_DLL
-    virtual void finish();
+    void finish() override;
 
   private:
     class QPDF_DLL_PRIVATE Members

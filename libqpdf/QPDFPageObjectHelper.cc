@@ -20,8 +20,8 @@ namespace
             from_page(from_page)
         {
         }
-        virtual ~ContentProvider() = default;
-        virtual void provideStreamData(QPDFObjGen const&, Pipeline* pipeline);
+        ~ContentProvider() override = default;
+        void provideStreamData(QPDFObjGen const&, Pipeline* pipeline) override;
 
       private:
         QPDFObjectHandle from_page;
@@ -44,8 +44,8 @@ namespace
     {
       public:
         InlineImageTracker(QPDF*, size_t min_size, QPDFObjectHandle resources);
-        virtual ~InlineImageTracker() = default;
-        virtual void handleToken(QPDFTokenizer::Token const&);
+        ~InlineImageTracker() override = default;
+        void handleToken(QPDFTokenizer::Token const&) override;
         QPDFObjectHandle convertIIDict(QPDFObjectHandle odict);
 
         QPDF* qpdf;

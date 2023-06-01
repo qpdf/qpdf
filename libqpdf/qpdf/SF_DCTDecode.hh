@@ -9,7 +9,7 @@ class SF_DCTDecode: public QPDFStreamFilter
 {
   public:
     SF_DCTDecode() = default;
-    virtual ~SF_DCTDecode() = default;
+    ~SF_DCTDecode() override = default;
 
     Pipeline*
     getDecodePipeline(Pipeline* next) override

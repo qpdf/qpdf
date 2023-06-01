@@ -942,8 +942,8 @@ class QPDF
     {
       public:
         CopiedStreamDataProvider(QPDF& destination_qpdf);
-        virtual ~CopiedStreamDataProvider() = default;
-        virtual bool provideStreamData(
+        ~CopiedStreamDataProvider() override = default;
+        bool provideStreamData(
             QPDFObjGen const& og,
             Pipeline* pipeline,
             bool suppress_warnings,
@@ -963,8 +963,8 @@ class QPDF
 
       public:
         StringDecrypter(QPDF* qpdf, QPDFObjGen const& og);
-        virtual ~StringDecrypter() = default;
-        virtual void decryptString(std::string& val);
+        ~StringDecrypter() override = default;
+        void decryptString(std::string& val) override;
 
       private:
         QPDF* qpdf;
@@ -1308,9 +1308,9 @@ class QPDF
             checker(checker)
         {
         }
-        virtual ~PatternFinder() = default;
-        virtual bool
-        check()
+        ~PatternFinder() override = default;
+        bool
+        check() override
         {
             return (this->qpdf.*checker)();
         }
