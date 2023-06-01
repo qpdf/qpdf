@@ -67,15 +67,13 @@ class ImageChecker: public Pipeline
 
   private:
     size_t n;
-    size_t offset;
-    bool okay;
+    size_t offset{0};
+    bool okay{true};
 };
 
 ImageChecker::ImageChecker(size_t n) :
     Pipeline("image checker", nullptr),
-    n(n),
-    offset(0),
-    okay(true)
+    n(n)
 {
 }
 

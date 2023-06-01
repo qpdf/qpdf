@@ -12,8 +12,7 @@ namespace
     {
       public:
         Pl_Track(char const* identifier, Pipeline* next) :
-            Pipeline(identifier, next),
-            used(false)
+            Pipeline(identifier, next)
         {
         }
 
@@ -37,7 +36,7 @@ namespace
         }
 
       private:
-        bool used;
+        bool used{false};
     };
 }; // namespace
 

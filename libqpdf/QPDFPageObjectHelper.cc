@@ -53,19 +53,16 @@ namespace
         QPDFObjectHandle resources;
         std::string dict_str;
         std::string bi_str;
-        int min_suffix;
-        bool any_images;
-        enum { st_top, st_bi } state;
+        int min_suffix{1};
+        bool any_images{false};
+        enum { st_top, st_bi } state{st_top};
     };
 } // namespace
 
 InlineImageTracker::InlineImageTracker(QPDF* qpdf, size_t min_size, QPDFObjectHandle resources) :
     qpdf(qpdf),
     min_size(min_size),
-    resources(resources),
-    min_suffix(1),
-    any_images(false),
-    state(st_top)
+    resources(resources)
 {
 }
 

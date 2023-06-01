@@ -34,9 +34,7 @@ class QPDFObjGen
   public:
     // ABI: change to default.
     QPDF_DLL
-    QPDFObjGen() :
-        obj(0),
-        gen(0)
+    QPDFObjGen()
     {
     }
     QPDF_DLL

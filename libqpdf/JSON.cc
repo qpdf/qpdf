@@ -588,14 +588,7 @@ namespace
         JSONParser(InputSource& is, JSON::Reactor* reactor) :
             is(is),
             reactor(reactor),
-            lex_state(ls_top),
-            bytes(0),
-            p(buf),
-            u_count(0),
-            offset(0),
-            done(false),
-            parser_state(ps_top),
-            dict_key_offset(0)
+            p(buf)
         {
         }
 
@@ -665,20 +658,20 @@ namespace
 
         InputSource& is;
         JSON::Reactor* reactor;
-        lex_state_e lex_state;
+        lex_state_e lex_state{ls_top};
         char buf[16384];
-        size_t bytes;
+        size_t bytes{0};
         char const* p;
-        qpdf_offset_t u_count;
+        qpdf_offset_t u_count{0};
         unsigned long u_value{0};
-        qpdf_offset_t offset;
-        bool done;
+        qpdf_offset_t offset{0};
+        bool done{false};
         std::string token;
         qpdf_offset_t token_start{0};
-        parser_state_e parser_state;
+        parser_state_e parser_state{ps_top};
         std::vector<StackFrame> stack;
         std::string dict_key;
-        qpdf_offset_t dict_key_offset;
+        qpdf_offset_t dict_key_offset{0};
     };
 } // namespace
 

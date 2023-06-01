@@ -28,12 +28,11 @@ class ArgParser
     void output(std::string const&);
 
     QPDFArgParser ap;
-    int quacks;
+    int quacks{0};
 };
 
 ArgParser::ArgParser(int argc, char* argv[]) :
-    ap(QPDFArgParser(argc, argv, "TEST_ARG_PARSER")),
-    quacks(0)
+    ap(QPDFArgParser(argc, argv, "TEST_ARG_PARSER"))
 {
     initOptions();
 }

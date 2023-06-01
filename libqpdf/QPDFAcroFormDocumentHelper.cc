@@ -473,15 +473,14 @@ namespace
         virtual void handleToken(QPDFTokenizer::Token const&) override;
 
       private:
-        size_t offset;
+        size_t offset{0};
         std::map<std::string, std::map<size_t, std::string>> to_replace;
     };
 } // namespace
 
 ResourceReplacer::ResourceReplacer(
     std::map<std::string, std::map<std::string, std::string>> const& dr_map,
-    std::map<std::string, std::map<std::string, std::set<size_t>>> const& rnames) :
-    offset(0)
+    std::map<std::string, std::map<std::string, std::set<size_t>>> const& rnames)
 {
     // We have:
     // * dr_map[resource_type][key] == new_key

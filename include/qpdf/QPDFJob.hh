@@ -145,8 +145,7 @@ class QPDFJob
 
     struct AddAttachment
     {
-        AddAttachment() :
-            replace(false)
+        AddAttachment()
         {
         }
 
@@ -157,7 +156,7 @@ class QPDFJob
         std::string moddate;
         std::string mimetype;
         std::string description;
-        bool replace;
+        bool replace{false};
     };
 
     struct PageSpec

@@ -189,13 +189,12 @@ namespace
         unsigned char getLastChar();
 
       private:
-        unsigned char last_char;
+        unsigned char last_char{0};
     };
 } // namespace
 
 LastChar::LastChar(Pipeline* next) :
-    Pipeline("lastchar", next),
-    last_char(0)
+    Pipeline("lastchar", next)
 {
 }
 

@@ -33,8 +33,7 @@ class QPDF_DLL_CLASS InputSource
 {
   public:
     QPDF_DLL
-    InputSource() :
-        last_offset(0)
+    InputSource()
     {
     }
     QPDF_DLL
@@ -86,7 +85,7 @@ class QPDF_DLL_CLASS InputSource
     inline void loadBuffer();
 
   protected:
-    qpdf_offset_t last_offset;
+    qpdf_offset_t last_offset{0};
 
   private:
     class QPDF_DLL_PRIVATE Members

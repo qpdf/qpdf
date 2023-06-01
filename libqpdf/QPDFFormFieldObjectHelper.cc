@@ -481,8 +481,8 @@ namespace
         std::vector<std::string> opt;
         double tf;
         QPDFObjectHandle::Rectangle bbox;
-        enum { st_top, st_bmc, st_emc, st_end } state;
-        bool replaced;
+        enum { st_top, st_bmc, st_emc, st_end } state{st_top};
+        bool replaced{false};
     };
 } // namespace
 
@@ -496,9 +496,7 @@ ValueSetter::ValueSetter(
     V(V),
     opt(opt),
     tf(tf),
-    bbox(bbox),
-    state(st_top),
-    replaced(false)
+    bbox(bbox)
 {
 }
 
@@ -659,21 +657,17 @@ namespace
         std::string getDA();
 
       private:
-        double tf;
-        int tf_idx;
+        double tf{11.0};
+        int tf_idx{-1};
         std::string font_name;
-        double last_num;
-        int last_num_idx;
+        double last_num{0.0};
+        int last_num_idx{-1};
         std::string last_name;
         std::vector<std::string> DA;
     };
 } // namespace
 
-TfFinder::TfFinder() :
-    tf(11.0),
-    tf_idx(-1),
-    last_num(0.0),
-    last_num_idx(-1)
+TfFinder::TfFinder()
 {
 }
 

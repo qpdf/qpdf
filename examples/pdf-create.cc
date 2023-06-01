@@ -31,22 +31,18 @@ class ImageProvider: public QPDFObjectHandle::StreamDataProvider
     size_t getHeight() const;
 
   private:
-    size_t width;
-    size_t stripe_height;
+    size_t width{400};
+    size_t stripe_height{80};
     std::string color_space;
     std::string filter;
-    size_t n_stripes;
+    size_t n_stripes{6};
     std::vector<std::string> stripes;
-    J_COLOR_SPACE j_color_space;
+    J_COLOR_SPACE j_color_space{JCS_UNKNOWN};
 };
 
 ImageProvider::ImageProvider(std::string const& color_space, std::string const& filter) :
-    width(400),
-    stripe_height(80),
     color_space(color_space),
-    filter(filter),
-    n_stripes(6),
-    j_color_space(JCS_UNKNOWN)
+    filter(filter)
 {
     if (color_space == "/DeviceCMYK") {
         j_color_space = JCS_CMYK;

@@ -10,21 +10,19 @@
 static void
 usage()
 {
-    std::cerr << "Usage: dct_compress infile outfile width height"
-              << " {rgb|cmyk|gray}" << std::endl;
+    std::cerr << "Usage: dct_compress infile outfile width height {rgb|cmyk|gray}" << std::endl;
     exit(2);
 }
 
 class Callback: public Pl_DCT::CompressConfig
 {
   public:
-    Callback() :
-        called(false)
+    Callback()
     {
     }
     ~Callback() override = default;
     void apply(jpeg_compress_struct*) override;
-    bool called;
+    bool called{false};
 };
 
 void

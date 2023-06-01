@@ -68,16 +68,15 @@ class Provider: public QPDFObjectHandle::StreamDataProvider
 {
   public:
     Provider(std::shared_ptr<Buffer> b) :
-        b(b),
-        bad_length(false)
+        b(b)
     {
     }
     virtual ~Provider() = default;
     virtual void
     provideStreamData(int objid, int generation, Pipeline* p)
     {
-        // Don't change signature to use QPDFObjGen const& to detect
-        // problems forwarding to legacy implementations.
+        // Don't change signature to use QPDFObjGen const& to detect problems forwarding to legacy
+        // implementations.
         p->write(b->getBuffer(), b->getSize());
         if (this->bad_length) {
             unsigned char ch = ' ';
@@ -93,7 +92,7 @@ class Provider: public QPDFObjectHandle::StreamDataProvider
 
   private:
     std::shared_ptr<Buffer> b;
-    bool bad_length;
+    bool bad_length{false};
 };
 
 class ParserCallbacks: public QPDFObjectHandle::ParserCallbacks

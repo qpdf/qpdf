@@ -1082,13 +1082,12 @@ namespace
 
       private:
         RandomDataProvider* default_provider;
-        RandomDataProvider* current_provider;
+        RandomDataProvider* current_provider{nullptr};
     };
 } // namespace
 
 RandomDataProviderProvider::RandomDataProviderProvider() :
-    default_provider(CryptoRandomDataProvider::getInstance()),
-    current_provider(nullptr)
+    default_provider(CryptoRandomDataProvider::getInstance())
 {
     this->current_provider = default_provider;
 }

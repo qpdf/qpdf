@@ -1150,58 +1150,40 @@ class QPDF
     // PDF 1.4: Table F.4
     struct HPageOffsetEntry
     {
-        HPageOffsetEntry() :
-            delta_nobjects(0),
-            delta_page_length(0),
-            nshared_objects(0),
-            delta_content_offset(0),
-            delta_content_length(0)
+        HPageOffsetEntry()
         {
         }
 
-        int delta_nobjects;              // 1
-        qpdf_offset_t delta_page_length; // 2
-        int nshared_objects;             // 3
+        int delta_nobjects{0};              // 1
+        qpdf_offset_t delta_page_length{0}; // 2
         // vectors' sizes = nshared_objects
-        std::vector<int> shared_identifiers; // 4
-        std::vector<int> shared_numerators;  // 5
-        qpdf_offset_t delta_content_offset;  // 6
-        qpdf_offset_t delta_content_length;  // 7
+        int nshared_objects{0};                // 3
+        std::vector<int> shared_identifiers;   // 4
+        std::vector<int> shared_numerators;    // 5
+        qpdf_offset_t delta_content_offset{0}; // 6
+        qpdf_offset_t delta_content_length{0}; // 7
     };
 
     // PDF 1.4: Table F.3
     struct HPageOffset
     {
-        HPageOffset() :
-            min_nobjects(0),
-            first_page_offset(0),
-            nbits_delta_nobjects(0),
-            min_page_length(0),
-            nbits_delta_page_length(0),
-            min_content_offset(0),
-            nbits_delta_content_offset(0),
-            min_content_length(0),
-            nbits_delta_content_length(0),
-            nbits_nshared_objects(0),
-            nbits_shared_identifier(0),
-            nbits_shared_numerator(0),
-            shared_denominator(0)
+        HPageOffset()
         {
         }
 
-        int min_nobjects;                // 1
-        qpdf_offset_t first_page_offset; // 2
-        int nbits_delta_nobjects;        // 3
-        int min_page_length;             // 4
-        int nbits_delta_page_length;     // 5
-        int min_content_offset;          // 6
-        int nbits_delta_content_offset;  // 7
-        int min_content_length;          // 8
-        int nbits_delta_content_length;  // 9
-        int nbits_nshared_objects;       // 10
-        int nbits_shared_identifier;     // 11
-        int nbits_shared_numerator;      // 12
-        int shared_denominator;          // 13
+        int min_nobjects{0};                // 1
+        qpdf_offset_t first_page_offset{0}; // 2
+        int nbits_delta_nobjects{0};        // 3
+        int min_page_length{0};             // 4
+        int nbits_delta_page_length{0};     // 5
+        int min_content_offset{0};          // 6
+        int nbits_delta_content_offset{0};  // 7
+        int min_content_length{0};          // 8
+        int nbits_delta_content_length{0};  // 9
+        int nbits_nshared_objects{0};       // 10
+        int nbits_shared_identifier{0};     // 11
+        int nbits_shared_numerator{0};      // 12
+        int shared_denominator{0};          // 13
         // vector size is npages
         std::vector<HPageOffsetEntry> entries;
     };
@@ -1209,40 +1191,30 @@ class QPDF
     // PDF 1.4: Table F.6
     struct HSharedObjectEntry
     {
-        HSharedObjectEntry() :
-            delta_group_length(0),
-            signature_present(0),
-            nobjects_minus_one(0)
+        HSharedObjectEntry()
         {
         }
 
         // Item 3 is a 128-bit signature (unsupported by Acrobat)
-        int delta_group_length; // 1
-        int signature_present;  // 2 -- always 0
-        int nobjects_minus_one; // 4 -- always 0
+        int delta_group_length{0}; // 1
+        int signature_present{0};  // 2 -- always 0
+        int nobjects_minus_one{0}; // 4 -- always 0
     };
 
     // PDF 1.4: Table F.5
     struct HSharedObject
     {
-        HSharedObject() :
-            first_shared_obj(0),
-            first_shared_offset(0),
-            nshared_first_page(0),
-            nshared_total(0),
-            nbits_nobjects(0),
-            min_group_length(0),
-            nbits_delta_group_length(0)
+        HSharedObject()
         {
         }
 
-        int first_shared_obj;              // 1
-        qpdf_offset_t first_shared_offset; // 2
-        int nshared_first_page;            // 3
-        int nshared_total;                 // 4
-        int nbits_nobjects;                // 5
-        int min_group_length;              // 6
-        int nbits_delta_group_length;      // 7
+        int first_shared_obj{0};              // 1
+        qpdf_offset_t first_shared_offset{0}; // 2
+        int nshared_first_page{0};            // 3
+        int nshared_total{0};                 // 4
+        int nbits_nobjects{0};                // 5
+        int min_group_length{0};              // 6
+        int nbits_delta_group_length{0};      // 7
         // vector size is nshared_total
         std::vector<HSharedObjectEntry> entries;
     };
@@ -1250,18 +1222,14 @@ class QPDF
     // PDF 1.4: Table F.9
     struct HGeneric
     {
-        HGeneric() :
-            first_object(0),
-            first_object_offset(0),
-            nobjects(0),
-            group_length(0)
+        HGeneric()
         {
         }
 
-        int first_object;                  // 1
-        qpdf_offset_t first_object_offset; // 2
-        int nobjects;                      // 3
-        int group_length;                  // 4
+        int first_object{0};                  // 1
+        qpdf_offset_t first_object_offset{0}; // 2
+        int nobjects{0};                      // 3
+        int group_length{0};                  // 4
     };
 
     // Other linearization data structures
@@ -1269,26 +1237,18 @@ class QPDF
     // Initialized from Linearization Parameter dictionary
     struct LinParameters
     {
-        LinParameters() :
-            file_size(0),
-            first_page_object(0),
-            first_page_end(0),
-            npages(0),
-            xref_zero_offset(0),
-            first_page(0),
-            H_offset(0),
-            H_length(0)
+        LinParameters()
         {
         }
 
-        qpdf_offset_t file_size;        // /L
-        int first_page_object;          // /O
-        qpdf_offset_t first_page_end;   // /E
-        int npages;                     // /N
-        qpdf_offset_t xref_zero_offset; // /T
-        int first_page;                 // /P
-        qpdf_offset_t H_offset;         // offset of primary hint stream
-        qpdf_offset_t H_length;         // length of primary hint stream
+        qpdf_offset_t file_size{0};        // /L
+        int first_page_object{0};          // /O
+        qpdf_offset_t first_page_end{0};   // /E
+        int npages{0};                     // /N
+        qpdf_offset_t xref_zero_offset{0}; // /T
+        int first_page{0};                 // /P
+        qpdf_offset_t H_offset{0};         // offset of primary hint stream
+        qpdf_offset_t H_length{0};         // length of primary hint stream
     };
 
     // Computed hint table value data structures.  These tables contain the computed values on which
@@ -1304,14 +1264,12 @@ class QPDF
 
     struct CHPageOffsetEntry
     {
-        CHPageOffsetEntry() :
-            nobjects(0),
-            nshared_objects(0)
+        CHPageOffsetEntry()
         {
         }
 
-        int nobjects;
-        int nshared_objects;
+        int nobjects{0};
+        int nshared_objects{0};
         // vectors' sizes = nshared_objects
         std::vector<int> shared_identifiers;
     };
@@ -1335,16 +1293,13 @@ class QPDF
     // PDF 1.4: Table F.5
     struct CHSharedObject
     {
-        CHSharedObject() :
-            first_shared_obj(0),
-            nshared_first_page(0),
-            nshared_total(0)
+        CHSharedObject()
         {
         }
 
-        int first_shared_obj;
-        int nshared_first_page;
-        int nshared_total;
+        int first_shared_obj{0};
+        int nshared_first_page{0};
+        int nshared_total{0};
         // vector size is nshared_total
         std::vector<CHSharedObjectEntry> entries;
     };
