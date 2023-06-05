@@ -5,7 +5,7 @@ WARNING: issue-51.pdf (object 7 0, offset 553): expected endobj
 WARNING: issue-51.pdf (object 1 0, offset 236): dictionary has duplicated key /00000000; last occurrence overrides earlier ones
 WARNING: issue-51.pdf (object 1 0, offset 359): expected endobj
 WARNING: issue-51.pdf (offset 70): loop detected resolving object 2 0
-WARNING: issue-51.pdf (object 2 0, offset 26): /Length key in stream dictionary is not an integer
+WARNING: issue-51.pdf (object 2 0, offset 26): stream dictionary lacks /Length key
 WARNING: issue-51.pdf (object 2 0, offset 71): attempting to recover stream length
 WARNING: issue-51.pdf (object 2 0, offset 71): unable to recover stream data; treating stream as empty
 WARNING: issue-51.pdf (object 2 0, offset 977): expected endobj
