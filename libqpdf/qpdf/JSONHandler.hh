@@ -53,24 +53,6 @@ class JSONHandler
 
     static void usage(std::string const& msg);
 
-    struct Handlers
-    {
-        Handlers() = default;
-
-        json_handler_t any_handler{nullptr};
-        void_handler_t null_handler{nullptr};
-        string_handler_t string_handler{nullptr};
-        string_handler_t number_handler{nullptr};
-        bool_handler_t bool_handler{nullptr};
-        json_handler_t dict_start_handler{nullptr};
-        void_handler_t dict_end_handler{nullptr};
-        json_handler_t array_start_handler{nullptr};
-        void_handler_t array_end_handler{nullptr};
-        void_handler_t final_handler{nullptr};
-        std::map<std::string, std::shared_ptr<JSONHandler>> dict_handlers;
-        std::shared_ptr<JSONHandler> fallback_dict_handler;
-        std::shared_ptr<JSONHandler> array_item_handler;
-    };
 
     class Members;
 

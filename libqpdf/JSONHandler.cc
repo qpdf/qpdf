@@ -4,6 +4,25 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
+struct Handlers
+{
+    Handlers() = default;
+
+    JSONHandler::json_handler_t any_handler{nullptr};
+    JSONHandler::void_handler_t null_handler{nullptr};
+    JSONHandler::string_handler_t string_handler{nullptr};
+    JSONHandler::string_handler_t number_handler{nullptr};
+    JSONHandler::bool_handler_t bool_handler{nullptr};
+    JSONHandler::json_handler_t dict_start_handler{nullptr};
+    JSONHandler::void_handler_t dict_end_handler{nullptr};
+    JSONHandler::json_handler_t array_start_handler{nullptr};
+    JSONHandler::void_handler_t array_end_handler{nullptr};
+    JSONHandler::void_handler_t final_handler{nullptr};
+    std::map<std::string, std::shared_ptr<JSONHandler>> dict_handlers;
+    std::shared_ptr<JSONHandler> fallback_dict_handler;
+    std::shared_ptr<JSONHandler> array_item_handler;
+};
+
 class JSONHandler::Members
 {
     friend class JSONHandler;
