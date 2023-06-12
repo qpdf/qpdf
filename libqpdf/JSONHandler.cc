@@ -117,24 +117,24 @@ JSONHandler::handle(std::string const& path, JSON j)
         m->h.any_handler(path, j);
         return;
     }
-    bool handled = false;
+
     bool bvalue = false;
     std::string s_value;
     if (m->h.null_handler && j.isNull()) {
         m->h.null_handler(path);
-        handled = true;
+        return;
     }
     if (m->h.string_handler && j.getString(s_value)) {
         m->h.string_handler(path, s_value);
-        handled = true;
+        return;
     }
     if (m->h.number_handler && j.getNumber(s_value)) {
         m->h.number_handler(path, s_value);
-        handled = true;
+        return;
     }
     if (m->h.bool_handler && j.getBool(bvalue)) {
         m->h.bool_handler(path, bvalue);
-        handled = true;
+        return;
     }
     if (m->h.dict_start_handler && j.isDictionary()) {
         m->h.dict_start_handler(path, j);
@@ -156,7 +156,7 @@ JSONHandler::handle(std::string const& path, JSON j)
             }
         });
         m->h.dict_end_handler(path);
-        handled = true;
+        return;
     }
     if (m->h.array_start_handler && j.isArray()) {
         m->h.array_start_handler(path, j);
@@ -166,15 +166,13 @@ JSONHandler::handle(std::string const& path, JSON j)
             ++i;
         });
         m->h.array_end_handler(path);
-        handled = true;
+        return;
     }
 
-    if (!handled) {
-        // It would be nice to include information about what type the object was and what types
-        // were allowed, but we're relying on schema validation to make sure input is properly
-        // structured before calling the handlers. It would be different if this code were trying to
-        // be part of a general-purpose JSON package.
-        QTC::TC("libtests", "JSONHandler unhandled value");
-        usage("JSON handler: value at " + path + " is not of expected type");
-    }
+    // It would be nice to include information about what type the object was and what types were
+    // allowed, but we're relying on schema validation to make sure input is properly structured
+    // before calling the handlers. It would be different if this code were trying to be part of a
+    // general-purpose JSON package.
+    QTC::TC("libtests", "JSONHandler unhandled value");
+    usage("JSON handler: value at " + path + " is not of expected type");
 }
