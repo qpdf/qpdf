@@ -235,16 +235,26 @@ Building docs from pull requests is also enabled.
     // README-maintainer
     ```
 
-* Put private member variables in std::shared_ptr<Members> for all
-  public classes. Remember to use QPDF_DLL on ~Members(). Exception:
-  indirection through std::shared_ptr<Members> is expensive, so don't
-  do it for classes that are copied a lot, like QPDFObjectHandle and
-  QPDFObject. It may be possible to declare
-  std::shared_ptr<Members> m_ph;
-  Member* m;
-  with m = m_ph.get(), and then indirect through m in
-  performance-critical settings, though in 2022, std::shared_ptr is
-  sufficiently performant that this may not be worth it.
+* Put private member variables in std::unique_ptr<Members> for all
+  public classes. Forward declare Members in the header file and define
+  Members in the implementation file. One of the major benefits of
+  defining Members in the implementation file is that it makes it easier
+  to use private classes as data members and simplifies the include order.
+  Remember that Members must be fully defined before the destructor of the
+  main class. For an example of this pattern see class JSONHandler.
+
+  Exception: indirection through std::unique_ptr<Members> incurs an overhead,
+  so don't do it for:
+  * (especially private) classes that are copied a lot, like QPDFObjectHandle
+    and QPDFObject.
+  * classes that are a shared pointer to another class, such as QPDFObjectHandle
+    or JSON.
+
+  For exported classes that do not use the member pattern for performance
+  reasons it is worth considering adding a std::unique_ptr to an empty Members
+  class initialized to nullptr to give the flexibility to add data members
+  without breaking the ABI.
+
 
 * Traversal of objects is expensive. It's worth adding some complexity
   to avoid needless traversals of objects.
