@@ -1,3 +1,25 @@
+# Maintainer Notes
+
+## Contents
+
+* [ROUTINE DEVELOPMENT](#routine-development)
+* [VERSIONS](#versions)
+* [CHECKING DOCS ON readthedocs](#checking-docs-on-readthedocs)
+* [GOOGLE OSS-FUZZ](#google-oss-fuzz)
+* [CODING RULES](#coding-rules)
+* [HOW TO ADD A COMMAND-LINE ARGUMENT](#how-to-add-a-command-line-argument)
+* [RELEASE PREPARATION](#release-preparation)
+* [CREATING A RELEASE](#creating-a-release)
+* [RUNNING pikepdf's TEST SUITE](#running-pikepdfs-test-suite)
+* [OTHER NOTES](#other-notes)
+* [DEPRECATION](#deprecation)
+* [LOCAL WINDOWS TESTING PROCEDURE](#local-windows-testing-procedure)
+* [DOCS ON readthedocs.org](#docs-on-readthedocsorg)
+* [CMAKE notes](#cmake-notes)
+* [ABI checks](#abi-checks)
+* [CODE FORMATTING](#code-formatting)
+
+
 ## ROUTINE DEVELOPMENT
 
 **Remember to check pull requests as well as issues in github.**
@@ -631,7 +653,7 @@ This is what I do for routine testing on Windows.
 
 * Test with mingw:  `ctest --verbose -C RelWithDebInfo`
 
-### DOCS ON readthedocs.org
+## DOCS ON readthedocs.org
 
 * Registered for an account at readthedocs.org with my github account
 * Project page: https://readthedocs.org/projects/qpdf/
