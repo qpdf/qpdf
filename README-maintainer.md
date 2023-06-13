@@ -123,7 +123,7 @@ GOOGLE OSS-FUZZ
 
 CODING RULES
 
-* Code is formatted with clang-format >= 15. See .clang-format and the
+* Code is formatted with clang-format-16. See .clang-format and the
   "Code Formatting" section in manual/contributing.rst for details.
   See also "CODE FORMATTING" below.
 
