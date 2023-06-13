@@ -20,11 +20,10 @@ https://github.com/qpdf/qpdf/discussions.
 Code Formatting
 ---------------
 
-The qpdf source code is formatting using clang-format ≥ version 15
+The qpdf source code is formatting using clang-format version 16
 with a :file:`.clang-format` file at the top of the source tree. The
 :file:`format-code` script reformats all the source code in the
-repository. You must have ``clang-format`` in your path, and it must be
-at least version 15.
+repository. You must have ``clang-format-16`` in your path.
 
 For emacs users, the :file:`.dir-locals.el` file configures emacs
 ``cc-mode`` for an indentation style that is similar to but not

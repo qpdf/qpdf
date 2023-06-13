@@ -23,7 +23,7 @@ cd $(dirname $0)
 for i in $(find . -name 'build*' -prune -o '(' \
 		-name '*.hh' -o -name '*.h' -o -name '*.cc' -o -name '*.c' \
 		')' -print); do
-    if clang-format < $i >| $i.new; then
+    if clang-format-16 < $i >| $i.new; then
 	if diff -q $i $i.new >/dev/null 2>/dev/null; then
 	    echo "okay:    $i"
 	    rm $i.new
