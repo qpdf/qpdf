@@ -277,6 +277,11 @@ BUILD_SHARED_LIBS, BUILD_STATIC_LIBS
   compiled executables can find the DLL. Updating your path is not
   necessary if you build with static libraries only.
 
+FUTURE
+  This option enables changes planned for the next major release to be
+  included. These changes are ABI breaking and are subject to change. They
+  are NOT part of the stable API.
+
 QTEST_COLOR
   Turn this on or off to control whether qtest uses color in its
   output.
