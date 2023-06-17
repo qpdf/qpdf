@@ -110,16 +110,15 @@ QPDF::isLinearized()
         if (p - buf == tbuf_size) {
             break;
         }
-        // Seek to the digit. Then skip over digits for a potential
-        // next iteration.
+        // Seek to the digit. Then skip over digits for a potential next iteration.
         m->file->seek(p - buf, SEEK_SET);
         while (((p - buf) < tbuf_size) && QUtil::is_digit(*p)) {
             ++p;
         }
 
-        QPDFTokenizer::Token t1 = readToken(m->file);
-        if (t1.isInteger() && readToken(m->file).isInteger() && readToken(m->file).isWord("obj") &&
-            (readToken(m->file).getType() == QPDFTokenizer::tt_dict_open)) {
+        QPDFTokenizer::Token t1 = readToken();
+        if (t1.isInteger() && readToken().isInteger() && readToken().isWord("obj") &&
+            (readToken().getType() == QPDFTokenizer::tt_dict_open)) {
             lindict_obj = toI(QUtil::string_to_ll(t1.getValue().c_str()));
         }
     }
@@ -128,7 +127,7 @@ QPDF::isLinearized()
         return false;
     }
 
-    auto candidate = getObjectByID(lindict_obj, 0);
+    auto candidate = getObject(lindict_obj, 0);
     if (!candidate.isDictionary()) {
         return false;
     }
@@ -553,7 +552,7 @@ QPDF::maxEnd(ObjUser const& ou)
 }
 
 qpdf_offset_t
-QPDF::getLinearizationOffset(QPDFObjGen const& og)
+QPDF::getLinearizationOffset(QPDFObjGen const& og) // NOLINT(misc-no-recursion)
 {
     QPDFXRefEntry entry = m->xref_table[og];
     qpdf_offset_t result = 0;
@@ -1367,7 +1366,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     for (auto& oh: m->part6) {
         int obj = oh.getObjectID();
         obj_to_index[obj] = toI(shared.size());
-        shared.push_back(CHSharedObjectEntry(obj));
+        shared.emplace_back(obj);
     }
     QTC::TC("qpdf", "QPDF lin part 8 empty", m->part8.empty() ? 1 : 0);
     if (!m->part8.empty()) {
@@ -1375,7 +1374,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         for (auto& oh: m->part8) {
             int obj = oh.getObjectID();
             obj_to_index[obj] = toI(shared.size());
-            shared.push_back(CHSharedObjectEntry(obj));
+            shared.emplace_back(obj);
         }
     }
     if (static_cast<size_t>(m->c_shared_object_data.nshared_total) !=
@@ -1451,7 +1450,12 @@ QPDF::getLinearizedParts(
 static inline int
 nbits(int val)
 {
-    return (val == 0 ? 0 : (1 + nbits(val >> 1)));
+    int result = 0;
+    while (val != 0) {
+        val >>= 1;
+        result++;
+    }
+    return result;
 }
 
 int
@@ -1585,7 +1589,7 @@ QPDF::calculateHSharedObject(
         int length = outputLengthNextN(csoe.at(i).object, 1, lengths, obj_renumber);
         min_length = std::min(min_length, length);
         max_length = std::max(max_length, length);
-        soe.push_back(HSharedObjectEntry());
+        soe.emplace_back();
         soe.at(i).delta_group_length = length;
     }
     if (soe.size() != toS(cso.nshared_total)) {

@@ -25,8 +25,8 @@ namespace
 {
     struct StackFrame
     {
-        StackFrame(std::shared_ptr<InputSource> input) :
-            offset(input->tell())
+        StackFrame(InputSource& input) :
+            offset(input.tell())
         {
         }
 
@@ -77,7 +77,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
         object = nullptr;
         set_offset = false;
 
-        if (!tokenizer.nextToken(*input, object_description)) {
+        if (!tokenizer.nextToken(input, object_description)) {
             warn(tokenizer.getErrorMessage());
         }
 
@@ -213,7 +213,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                     // We just saw endobj without having read anything.  Treat this as a null and do
                     // not move the input source's offset.
                     is_null = true;
-                    input->seek(input->getLastOffset(), SEEK_SET);
+                    input.seek(input.getLastOffset(), SEEK_SET);
                     empty = true;
                 } else {
                     QTC::TC("qpdf", "QPDFParser treat word as string");
@@ -230,7 +230,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 if (decrypter) {
                     if (b_contents) {
                         frame.contents_string = val;
-                        frame.contents_offset = input->getLastOffset();
+                        frame.contents_offset = input.getLastOffset();
                         b_contents = false;
                     }
                     std::string s{val};
@@ -291,7 +291,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 object = null_oh;
                 // No need to set description for direct nulls - they probably will become implicit.
             } else if (!indirect_ref) {
-                setDescription(object, input->getLastOffset());
+                setDescription(object, input.getLastOffset());
             }
             set_offset = true;
             olist.push_back(object);
@@ -429,11 +429,11 @@ QPDFParser::warn(QPDFExc const& e) const
 void
 QPDFParser::warn(qpdf_offset_t offset, std::string const& msg) const
 {
-    warn(QPDFExc(qpdf_e_damaged_pdf, input->getName(), object_description, offset, msg));
+    warn(QPDFExc(qpdf_e_damaged_pdf, input.getName(), object_description, offset, msg));
 }
 
 void
 QPDFParser::warn(std::string const& msg) const
 {
-    warn(input->getLastOffset(), msg);
+    warn(input.getLastOffset(), msg);
 }

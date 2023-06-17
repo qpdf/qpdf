@@ -51,6 +51,12 @@ class QPDF_DLL_CLASS Pipeline
     Pipeline(char const* identifier, Pipeline* next);
 
     QPDF_DLL
+    Pipeline(Pipeline&&) noexcept = default;
+
+    QPDF_DLL
+    Pipeline& operator=(Pipeline&&) noexcept = default;
+
+    QPDF_DLL
     virtual ~Pipeline() = default;
 
     // Subclasses should implement write and finish to do their jobs and then, if they are not

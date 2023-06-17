@@ -11,6 +11,7 @@
 #include <memory>
 
 class Pipeline;
+class Pl_Buffer;
 class QPDF;
 
 class QPDF_Stream: public QPDFValue
@@ -47,14 +48,14 @@ class QPDF_Stream: public QPDFValue
         qpdf_stream_decode_level_e decode_level,
         bool suppress_warnings,
         bool will_retry);
-    std::shared_ptr<Buffer> getStreamData(qpdf_stream_decode_level_e);
-    std::shared_ptr<Buffer> getRawStreamData();
+    Pl_Buffer getStreamData(qpdf_stream_decode_level_e);
+    Pl_Buffer getRawStreamData();
     void replaceStreamData(
-        std::shared_ptr<Buffer> data,
+        std::shared_ptr<Buffer>&& data,
         QPDFObjectHandle const& filter,
         QPDFObjectHandle const& decode_parms);
     void replaceStreamData(
-        std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider,
+        std::shared_ptr<QPDFObjectHandle::StreamDataProvider>&& provider,
         QPDFObjectHandle const& filter,
         QPDFObjectHandle const& decode_parms);
     void addTokenFilter(std::shared_ptr<QPDFObjectHandle::TokenFilter> token_filter);

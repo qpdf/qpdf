@@ -39,6 +39,11 @@ class QPDF_DLL_CLASS Pl_Buffer: public Pipeline
   public:
     QPDF_DLL
     Pl_Buffer(char const* identifier, Pipeline* next = nullptr);
+
+    QPDF_DLL
+    Pl_Buffer(Pl_Buffer&&) noexcept = default;
+    QPDF_DLL
+    Pl_Buffer& operator=(Pl_Buffer&&) noexcept = default;
     QPDF_DLL
     ~Pl_Buffer() override;
     QPDF_DLL

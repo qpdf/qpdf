@@ -75,8 +75,10 @@ QPDF::getAllPages()
 }
 
 void
-QPDF::getAllPagesInternal(
-    QPDFObjectHandle cur_node, QPDFObjGen::set& visited, QPDFObjGen::set& seen)
+QPDF::getAllPagesInternal( // NOLINT(misc-no-recursion)
+    QPDFObjectHandle cur_node,
+    QPDFObjGen::set& visited,
+    QPDFObjGen::set& seen)
 {
     if (!visited.add(cur_node)) {
         throw QPDFExc(
@@ -262,7 +264,10 @@ QPDF::removePage(QPDFObjectHandle page)
 }
 
 void
-QPDF::addPageAt(QPDFObjectHandle newpage, bool before, QPDFObjectHandle refpage)
+QPDF::addPageAt(
+    QPDFObjectHandle newpage, // NOLINT (performance-unnecessary-value-param) ABI
+    bool before,
+    QPDFObjectHandle refpage)
 {
     int refpos = findPage(refpage);
     if (!before) {
@@ -272,7 +277,8 @@ QPDF::addPageAt(QPDFObjectHandle newpage, bool before, QPDFObjectHandle refpage)
 }
 
 void
-QPDF::addPage(QPDFObjectHandle newpage, bool first)
+QPDF::addPage(
+    QPDFObjectHandle newpage, bool first) // NOLINT (performance-unnecessary-value-param) ABI
 {
     if (first) {
         insertPage(newpage, 0);

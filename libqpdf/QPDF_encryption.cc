@@ -99,30 +99,30 @@ QPDF::EncryptionData::getEncryptMetadata() const
 }
 
 void
-QPDF::EncryptionData::setO(std::string const& O)
+QPDF::EncryptionData::setO(std::string const& a_O)
 {
-    this->O = O;
+    this->O = a_O;
 }
 
 void
-QPDF::EncryptionData::setU(std::string const& U)
+QPDF::EncryptionData::setU(std::string const& a_U)
 {
-    this->U = U;
+    this->U = a_U;
 }
 
 void
 QPDF::EncryptionData::setV5EncryptionParameters(
-    std::string const& O,
-    std::string const& OE,
-    std::string const& U,
-    std::string const& UE,
-    std::string const& Perms)
+    std::string const& a_O,
+    std::string const& a_OE,
+    std::string const& a_U,
+    std::string const& a_UE,
+    std::string const& a_Perms)
 {
-    this->O = O;
-    this->OE = OE;
-    this->U = U;
-    this->UE = UE;
-    this->Perms = Perms;
+    this->O = a_O;
+    this->OE = a_OE;
+    this->U = a_U;
+    this->UE = a_UE;
+    this->Perms = a_Perms;
 }
 
 static void
@@ -164,7 +164,7 @@ pad_or_truncate_password_V4(std::string const& password)
 {
     char k1[key_bytes];
     pad_or_truncate_password_V4(password, k1);
-    return std::string(k1, key_bytes);
+    return {k1, key_bytes};
 }
 
 static std::string
@@ -189,7 +189,7 @@ static void
 iterate_rc4(
     unsigned char* data,
     size_t data_len,
-    unsigned char* okey,
+    const unsigned char* okey,
     int key_len,
     int iterations,
     bool reverse)
@@ -235,7 +235,7 @@ process_with_aes(
     } else {
         outlength = std::min(outlength, bufp->getSize());
     }
-    return std::string(reinterpret_cast<char*>(bufp->getBuffer()), outlength);
+    return {reinterpret_cast<char*>(bufp->getBuffer()), outlength};
 }
 
 static std::string
@@ -274,7 +274,8 @@ hash_V5(
             // terminated repetition.
 
             ++round_number;
-            std::string K1 = password + K + udata;
+            std::string K1 = password;
+            K1 += K + udata;
             qpdf_assert_debug(K.length() >= 32);
             std::string E = process_with_aes(
                 K.substr(0, 16),
@@ -355,7 +356,7 @@ QPDF::compute_data_key(
     md5.encodeDataIncrementally(result.c_str(), result.length());
     MD5::Digest digest;
     md5.digest(digest);
-    return std::string(reinterpret_cast<char*>(digest), std::min(result.length(), toS(16)));
+    return {reinterpret_cast<char*>(digest), std::min(result.length(), toS(16))};
 }
 
 std::string
@@ -401,7 +402,7 @@ QPDF::compute_encryption_key_from_password(std::string const& password, Encrypti
     MD5::Digest digest;
     int key_len = std::min(toI(sizeof(digest)), data.getLengthBytes());
     iterate_md5_digest(md5, digest, ((data.getR() >= 3) ? 50 : 0), key_len);
-    return std::string(reinterpret_cast<char*>(digest), toS(key_len));
+    return {reinterpret_cast<char*>(digest), toS(key_len)};
 }
 
 static void
@@ -448,7 +449,7 @@ compute_O_value(
         data.getLengthBytes(),
         (data.getR() >= 3) ? 20 : 1,
         false);
-    return std::string(upass, key_bytes);
+    return {upass, key_bytes};
 }
 
 static std::string
@@ -467,7 +468,7 @@ compute_U_value_R2(std::string const& user_password, QPDF::EncryptionData const&
         data.getLengthBytes(),
         1,
         false);
-    return std::string(udata, key_bytes);
+    return {udata, key_bytes};
 }
 
 static std::string
@@ -496,7 +497,7 @@ compute_U_value_R3(std::string const& user_password, QPDF::EncryptionData const&
     for (unsigned int i = sizeof(MD5::Digest); i < key_bytes; ++i) {
         result[i] = static_cast<char>((i * i) % 0xff);
     }
-    return std::string(result, key_bytes);
+    return {result, key_bytes};
 }
 
 static std::string
@@ -700,12 +701,12 @@ QPDF::recover_encryption_key_with_password(
 }
 
 QPDF::encryption_method_e
-QPDF::interpretCF(std::shared_ptr<EncryptionParameters> encp, QPDFObjectHandle cf)
+QPDF::interpretCF(EncryptionParameters& encp, QPDFObjectHandle cf)
 {
     if (cf.isName()) {
         std::string filter = cf.getName();
-        if (encp->crypt_filters.count(filter) != 0) {
-            return encp->crypt_filters[filter];
+        if (encp.crypt_filters.count(filter) != 0) {
+            return encp.crypt_filters[filter];
         } else if (filter == "/Identity") {
             return e_none;
         } else {
@@ -885,11 +886,9 @@ QPDF::initializeEncryption()
             }
         }
 
-        QPDFObjectHandle StmF = encryption_dict.getKey("/StmF");
-        QPDFObjectHandle StrF = encryption_dict.getKey("/StrF");
         QPDFObjectHandle EFF = encryption_dict.getKey("/EFF");
-        m->encp->cf_stream = interpretCF(m->encp, StmF);
-        m->encp->cf_string = interpretCF(m->encp, StrF);
+        m->encp->cf_stream = interpretCF(*m->encp, encryption_dict.getKey("/StmF"));
+        m->encp->cf_string = interpretCF(*m->encp, encryption_dict.getKey("/StrF"));
         if (EFF.isName()) {
             // qpdf does not use this for anything other than informational purposes. This is
             // intended to instruct conforming writers on which crypt filter should be used when new
@@ -900,7 +899,7 @@ QPDF::initializeEncryption()
             // the way I was imagining. Still, providing this information could be useful when
             // looking at a file generated by something else, such as Acrobat when specifying that
             // only attachments should be encrypted.
-            m->encp->cf_file = interpretCF(m->encp, EFF);
+            m->encp->cf_file = interpretCF(*m->encp, EFF);
         } else {
             m->encp->cf_file = m->encp->cf_stream;
         }
@@ -954,25 +953,24 @@ QPDF::initializeEncryption()
 }
 
 std::string
-QPDF::getKeyForObject(
-    std::shared_ptr<EncryptionParameters> encp, QPDFObjGen const& og, bool use_aes)
+QPDF::getKeyForObject(EncryptionParameters& encp, QPDFObjGen og, bool use_aes)
 {
-    if (!encp->encrypted) {
+    if (!encp.encrypted) {
         throw std::logic_error("request for encryption key in non-encrypted PDF");
     }
 
-    if (og != encp->cached_key_og) {
-        encp->cached_object_encryption_key = compute_data_key(
-            encp->encryption_key,
+    if (og != encp.cached_key_og) {
+        encp.cached_object_encryption_key = compute_data_key(
+            encp.encryption_key,
             og.getObj(),
             og.getGen(),
             use_aes,
-            encp->encryption_V,
-            encp->encryption_R);
-        encp->cached_key_og = og;
+            encp.encryption_V,
+            encp.encryption_R);
+        encp.cached_key_og = og;
     }
 
-    return encp->cached_object_encryption_key;
+    return encp.cached_object_encryption_key;
 }
 
 void
@@ -988,9 +986,6 @@ QPDF::decryptString(std::string& str, QPDFObjGen const& og)
             return;
 
         case e_aes:
-            use_aes = true;
-            break;
-
         case e_aesv3:
             use_aes = true;
             break;
@@ -1008,7 +1003,7 @@ QPDF::decryptString(std::string& str, QPDFObjGen const& og)
         }
     }
 
-    std::string key = getKeyForObject(m->encp, og, use_aes);
+    std::string key = getKeyForObject(*m->encp, og, use_aes);
     try {
         if (use_aes) {
             QTC::TC("qpdf", "QPDF_encryption aes decode string");
@@ -1043,24 +1038,22 @@ QPDF::decryptString(std::string& str, QPDFObjGen const& og)
 
 void
 QPDF::decryptStream(
-    std::shared_ptr<EncryptionParameters> encp,
-    std::shared_ptr<InputSource> file,
+    EncryptionParameters& encp,
+    InputSource const& file,
     QPDF& qpdf_for_warning,
     Pipeline*& pipeline,
-    QPDFObjGen const& og,
+    QPDFObjGen og,
     QPDFObjectHandle& stream_dict,
     std::vector<std::shared_ptr<Pipeline>>& heap)
 {
     std::string type;
-    if (stream_dict.getKey("/Type").isName()) {
-        type = stream_dict.getKey("/Type").getName();
-    }
+    stream_dict.getKey("/Type").getValueAsName(type);
     if (type == "/XRef") {
         QTC::TC("qpdf", "QPDF_encryption xref stream from encrypted file");
         return;
     }
     bool use_aes = false;
-    if (encp->encryption_V >= 4) {
+    if (encp.encryption_V >= 4) {
         encryption_method_e method = e_unknown;
         std::string method_source = "/StmF from /Encrypt dictionary";
 
@@ -1095,11 +1088,11 @@ QPDF::decryptStream(
         }
 
         if (method == e_unknown) {
-            if ((!encp->encrypt_metadata) && (type == "/Metadata")) {
+            if ((!encp.encrypt_metadata) && (type == "/Metadata")) {
                 QTC::TC("qpdf", "QPDF_encryption cleartext metadata");
                 method = e_none;
             } else {
-                method = encp->cf_stream;
+                method = encp.cf_stream;
             }
         }
         use_aes = false;
@@ -1109,9 +1102,6 @@ QPDF::decryptStream(
             break;
 
         case e_aes:
-            use_aes = true;
-            break;
-
         case e_aesv3:
             use_aes = true;
             break;
@@ -1123,13 +1113,13 @@ QPDF::decryptStream(
             // filter local to this stream.
             qpdf_for_warning.warn(QPDFExc(
                 qpdf_e_damaged_pdf,
-                file->getName(),
+                file.getName(),
                 "",
-                file->getLastOffset(),
+                file.getLastOffset(),
                 "unknown encryption filter for streams (check " + method_source +
                     "); streams may be decrypted improperly"));
             // To avoid repeated warnings, reset cf_stream.  Assume we'd want to use AES if V == 4.
-            encp->cf_stream = e_aes;
+            encp.cf_stream = e_aes;
             use_aes = true;
             break;
         }

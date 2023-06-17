@@ -313,7 +313,7 @@ QPDF_Stream::getStreamDataProvider() const
     return this->stream_provider;
 }
 
-std::shared_ptr<Buffer>
+Pl_Buffer
 QPDF_Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
 {
     Pl_Buffer buf("stream data buffer");
@@ -328,10 +328,10 @@ QPDF_Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
             "getStreamData called on unfilterable stream");
     }
     QTC::TC("qpdf", "QPDF_Stream getStreamData");
-    return buf.getBufferSharedPointer();
+    return buf;
 }
 
-std::shared_ptr<Buffer>
+Pl_Buffer
 QPDF_Stream::getRawStreamData()
 {
     Pl_Buffer buf("stream data buffer");
@@ -344,7 +344,7 @@ QPDF_Stream::getRawStreamData()
             "error getting raw stream data");
     }
     QTC::TC("qpdf", "QPDF_Stream getRawStreamData");
-    return buf.getBufferSharedPointer();
+    return buf;
 }
 
 bool
@@ -611,22 +611,22 @@ QPDF_Stream::pipeStreamData(
 
 void
 QPDF_Stream::replaceStreamData(
-    std::shared_ptr<Buffer> data,
+    std::shared_ptr<Buffer>&& data,
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
 {
-    this->stream_data = data;
+    this->stream_data = std::move(data);
     this->stream_provider = nullptr;
-    replaceFilterData(filter, decode_parms, data->getSize());
+    replaceFilterData(filter, decode_parms, stream_data->getSize());
 }
 
 void
 QPDF_Stream::replaceStreamData(
-    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider,
+    std::shared_ptr<QPDFObjectHandle::StreamDataProvider>&& provider,
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
 {
-    this->stream_provider = provider;
+    this->stream_provider = std::move(provider);
     this->stream_data = nullptr;
     replaceFilterData(filter, decode_parms, 0);
 }

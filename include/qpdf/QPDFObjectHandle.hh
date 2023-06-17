@@ -61,6 +61,8 @@ class Pl_QPDFTokenizer;
 class QPDFMatrix;
 class QPDFParser;
 
+// NOLINTBEGIN (modernize-use-nodiscard)
+
 class QPDFObjectHandle
 {
     friend class QPDFParser;
@@ -395,6 +397,14 @@ class QPDFObjectHandle
     // and using the tokenizer you supply.  Indirect objects and encrypted strings are permitted.
     // This method was intended to be called by QPDF for parsing objects that are ready from the
     // object's input stream.
+    QPDF_DLL
+    static QPDFObjectHandle parse(
+        InputSource& input,
+        std::string const& object_description,
+        QPDFTokenizer&,
+        bool& empty,
+        StringDecrypter* decrypter,
+        QPDF* context);
     QPDF_DLL
     static QPDFObjectHandle parse(
         std::shared_ptr<InputSource> input,
@@ -1318,9 +1328,12 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isImage(bool exclude_imagemask = true);
 
+    // NOLINTEND (modernize-use-nodiscard)
+
     // The following methods do not form part of the public API and are for internal use only.
 
-    QPDFObjectHandle(std::shared_ptr<QPDFObject> const& obj) :
+    QPDFObjectHandle(
+        std::shared_ptr<QPDFObject> const& obj) : // NOLINT((google-explicit-constructor) )
         obj(obj)
     {
     }
@@ -1329,7 +1342,7 @@ class QPDFObjectHandle
     {
         return obj;
     }
-    std::shared_ptr<QPDFObject>
+    [[nodiscard]] std::shared_ptr<QPDFObject>
     getObj() const
     {
         return obj;
@@ -1339,7 +1352,7 @@ class QPDFObjectHandle
     {
         return obj.get();
     }
-    QPDFObject* const
+    [[nodiscard]] QPDFObject*
     getObjectPtr() const
     {
         return obj.get();
@@ -1369,10 +1382,7 @@ class QPDFObjectHandle
     void setParsedOffset(qpdf_offset_t offset);
     void parseContentStream_internal(std::string const& description, ParserCallbacks* callbacks);
     static void parseContentStream_data(
-        std::shared_ptr<Buffer>,
-        std::string const& description,
-        ParserCallbacks* callbacks,
-        QPDF* context);
+        Buffer&, std::string const& description, ParserCallbacks* callbacks, QPDF* context);
     std::vector<QPDFObjectHandle>
     arrayOrStreamToStreamArray(std::string const& description, std::string& all_description);
     static void warn(QPDF*, QPDFExc const&);
@@ -1416,9 +1426,9 @@ class QPDFObjectHandle::QPDFDictItems
 
   public:
     QPDF_DLL
-    QPDFDictItems(QPDFObjectHandle const& oh);
+    QPDFDictItems(QPDFObjectHandle const& oh); // NOLINT (google-explicit-constructor) ABI
 
-    class iterator
+        class iterator
     {
         friend class QPDFDictItems;
 
@@ -1474,18 +1484,18 @@ class QPDFObjectHandle::QPDFDictItems
             friend class QPDFDictItems::iterator;
 
           public:
+            Members() = delete;
+            Members(Members const&) = delete;
             QPDF_DLL
             ~Members() = default;
 
           private:
             Members(QPDFObjectHandle& oh, bool for_begin);
-            Members() = delete;
-            Members(Members const&) = delete;
 
             QPDFObjectHandle& oh;
             std::set<std::string> keys;
             std::set<std::string>::iterator iter;
-            bool is_end;
+            bool is_end{false};
         };
         std::shared_ptr<Members> m;
         value_type ivalue;
@@ -1514,7 +1524,7 @@ class QPDFObjectHandle::QPDFArrayItems
 
   public:
     QPDF_DLL
-    QPDFArrayItems(QPDFObjectHandle const& oh);
+    QPDFArrayItems(QPDFObjectHandle const& oh); // NOLINT (google-explicit-constructor) ABI
 
     class iterator
     {
@@ -1572,17 +1582,17 @@ class QPDFObjectHandle::QPDFArrayItems
             friend class QPDFArrayItems::iterator;
 
           public:
+            Members() = delete;
+            Members(Members const&) = delete;
             QPDF_DLL
             ~Members() = default;
 
           private:
             Members(QPDFObjectHandle& oh, bool for_begin);
-            Members() = delete;
-            Members(Members const&) = delete;
 
             QPDFObjectHandle& oh;
-            int item_number;
-            bool is_end;
+            int item_number{0};
+            bool is_end{false};
         };
         std::shared_ptr<Members> m;
         value_type ivalue;
