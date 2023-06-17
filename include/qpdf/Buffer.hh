@@ -41,10 +41,10 @@ class Buffer
     QPDF_DLL
     Buffer(unsigned char* buf, size_t size);
 
-    QPDF_DLL
-    Buffer(Buffer const&);
-    QPDF_DLL
-    Buffer& operator=(Buffer const&);
+    [[deprecated("Move Buffer or use Buffer::copy instead")]] QPDF_DLL Buffer(Buffer const&);
+    [[deprecated("Move Buffer or use Buffer::copy instead")]] QPDF_DLL Buffer&
+    operator=(Buffer const&);
+
     QPDF_DLL
     Buffer(Buffer&&) noexcept;
     QPDF_DLL
@@ -55,6 +55,14 @@ class Buffer
     unsigned char const* getBuffer() const;
     QPDF_DLL
     unsigned char* getBuffer();
+
+    // Create a new copy of the Buffer. The new Buffer owns an independent copy of the data.
+    QPDF_DLL
+    Buffer copy() const;
+
+    // Only used during CI testing.
+    // ABI: remove when removing copy constructor / assignment operator
+    static void setTestMode() noexcept;
 
   private:
     class Members

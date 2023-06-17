@@ -129,7 +129,7 @@ Pl_LZWDecoder::addToTable(unsigned char next)
     unsigned char* new_data = entry.getBuffer();
     memcpy(new_data, last_data, last_size);
     new_data[last_size] = next;
-    this->table.push_back(entry);
+    this->table.push_back(std::move(entry));
 }
 
 void

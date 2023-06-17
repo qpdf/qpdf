@@ -19,7 +19,34 @@ int
 main()
 {
     {
-        // Test that buffers can be copied by value.
+        // Test that buffers can be copied by value using Buffer::copy.
+        Buffer bc1(2);
+        unsigned char* bc1p = bc1.getBuffer();
+        bc1p[0] = 'Q';
+        bc1p[1] = 'W';
+        Buffer bc2(bc1.copy());
+        bc1p[0] = 'R';
+        unsigned char* bc2p = bc2.getBuffer();
+        assert(bc2p != bc1p);
+        assert(bc2p[0] == 'Q');
+        assert(bc2p[1] == 'W');
+        bc2 = bc1.copy();
+        bc2p = bc2.getBuffer();
+        assert(bc2p != bc1p);
+        assert(bc2p[0] == 'R');
+        assert(bc2p[1] == 'W');
+    }
+
+#ifdef _MSC_VER
+# pragma warning(disable : 4996)
+#endif
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+    {
+        // Test that buffers can be copied by value using copy construction / assignment.
+        Buffer::setTestMode();
         Buffer bc1(2);
         unsigned char* bc1p = bc1.getBuffer();
         bc1p[0] = 'Q';
@@ -36,6 +63,9 @@ main()
         assert(bc2p[0] == 'R');
         assert(bc2p[1] == 'W');
     }
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic pop
+#endif
 
     {
         // Test that buffers can be moved.

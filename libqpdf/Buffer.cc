@@ -1,6 +1,19 @@
+#include <qpdf/assert_test.h>
+
 #include <qpdf/Buffer.hh>
 
 #include <cstring>
+
+bool test_mode = false;
+
+// During CI the Buffer copy constructor and copy assignment operator throw an assertion error to
+// detect their accidental use. Call setTestMode to surpress the assertion errors for testing of
+// copy construction and assignment.
+void
+Buffer::setTestMode() noexcept
+{
+    test_mode = true;
+}
 
 Buffer::Members::Members(size_t size, unsigned char* buf, bool own_memory) :
     own_memory(own_memory),
@@ -38,12 +51,14 @@ Buffer::Buffer(unsigned char* buf, size_t size) :
 
 Buffer::Buffer(Buffer const& rhs)
 {
+    assert(test_mode);
     copy(rhs);
 }
 
 Buffer&
 Buffer::operator=(Buffer const& rhs)
 {
+    assert(test_mode);
     copy(rhs);
     return *this;
 }
@@ -87,4 +102,14 @@ unsigned char*
 Buffer::getBuffer()
 {
     return m->buf;
+}
+
+Buffer
+Buffer::copy() const
+{
+    auto result = Buffer(m->size);
+    if (m->size) {
+        memcpy(result.m->buf, m->buf, m->size);
+    }
+    return result;
 }
