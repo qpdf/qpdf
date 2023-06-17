@@ -145,19 +145,12 @@ class QPDFArgParser
   private:
     struct OptionEntry
     {
-        OptionEntry() :
-            parameter_needed(false),
-            bare_arg_handler(nullptr),
-            param_arg_handler(nullptr),
-            invalid_choice_handler(nullptr)
-        {
-        }
-        bool parameter_needed;
+        bool parameter_needed{false};
         std::string parameter_name;
         std::set<std::string> choices;
-        bare_arg_handler_t bare_arg_handler;
-        param_arg_handler_t param_arg_handler;
-        param_arg_handler_t invalid_choice_handler;
+        bare_arg_handler_t bare_arg_handler{nullptr};
+        param_arg_handler_t param_arg_handler{nullptr};
+        param_arg_handler_t invalid_choice_handler{nullptr};
     };
     typedef std::map<std::string, OptionEntry> option_table_t;
 

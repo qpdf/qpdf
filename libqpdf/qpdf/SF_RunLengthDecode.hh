@@ -9,7 +9,7 @@ class SF_RunLengthDecode: public QPDFStreamFilter
 {
   public:
     SF_RunLengthDecode() = default;
-    virtual ~SF_RunLengthDecode() = default;
+    ~SF_RunLengthDecode() override = default;
 
     Pipeline*
     getDecodePipeline(Pipeline* next) override

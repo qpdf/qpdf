@@ -7,8 +7,8 @@ class SecureRandomDataProvider: public RandomDataProvider
 {
   public:
     SecureRandomDataProvider() = default;
-    virtual ~SecureRandomDataProvider() = default;
-    virtual void provideRandomData(unsigned char* data, size_t len);
+    ~SecureRandomDataProvider() override = default;
+    void provideRandomData(unsigned char* data, size_t len) override;
     static RandomDataProvider* getInstance();
 };
 

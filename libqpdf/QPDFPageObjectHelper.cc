@@ -20,8 +20,8 @@ namespace
             from_page(from_page)
         {
         }
-        virtual ~ContentProvider() = default;
-        virtual void provideStreamData(QPDFObjGen const&, Pipeline* pipeline);
+        ~ContentProvider() override = default;
+        void provideStreamData(QPDFObjGen const&, Pipeline* pipeline) override;
 
       private:
         QPDFObjectHandle from_page;
@@ -44,8 +44,8 @@ namespace
     {
       public:
         InlineImageTracker(QPDF*, size_t min_size, QPDFObjectHandle resources);
-        virtual ~InlineImageTracker() = default;
-        virtual void handleToken(QPDFTokenizer::Token const&);
+        ~InlineImageTracker() override = default;
+        void handleToken(QPDFTokenizer::Token const&) override;
         QPDFObjectHandle convertIIDict(QPDFObjectHandle odict);
 
         QPDF* qpdf;
@@ -53,19 +53,16 @@ namespace
         QPDFObjectHandle resources;
         std::string dict_str;
         std::string bi_str;
-        int min_suffix;
-        bool any_images;
-        enum { st_top, st_bi } state;
+        int min_suffix{1};
+        bool any_images{false};
+        enum { st_top, st_bi } state{st_top};
     };
 } // namespace
 
 InlineImageTracker::InlineImageTracker(QPDF* qpdf, size_t min_size, QPDFObjectHandle resources) :
     qpdf(qpdf),
     min_size(min_size),
-    resources(resources),
-    min_suffix(1),
-    any_images(false),
-    state(st_top)
+    resources(resources)
 {
 }
 
@@ -451,7 +448,7 @@ QPDFPageObjectHelper::getAnnotations(std::string const& only_subtype)
         for (int i = 0; i < nannots; ++i) {
             QPDFObjectHandle annot = annots.getArrayItem(i);
             if (annot.isDictionaryOfType("", only_subtype)) {
-                result.push_back(QPDFAnnotationObjectHelper(annot));
+                result.emplace_back(annot);
             }
         }
     }
@@ -662,7 +659,7 @@ QPDFPageObjectHelper::shallowCopyPage()
     QPDF& qpdf =
         this->oh.getQPDF("QPDFPageObjectHelper::shallowCopyPage called with a direct object");
     QPDFObjectHandle new_page = this->oh.shallowCopy();
-    return QPDFPageObjectHelper(qpdf.makeIndirectObject(new_page));
+    return {qpdf.makeIndirectObject(new_page)};
 }
 
 QPDFObjectHandle::Matrix
@@ -758,7 +755,7 @@ QPDFPageObjectHelper::getMatrixForFormXObjectPlacement(
     QPDFObjectHandle fdict = fo.getDict();
     QPDFObjectHandle bbox_obj = fdict.getKey("/BBox");
     if (!bbox_obj.isRectangle()) {
-        return QPDFMatrix();
+        return {};
     }
 
     QPDFMatrix wmatrix; // work matrix
@@ -793,7 +790,7 @@ QPDFPageObjectHelper::getMatrixForFormXObjectPlacement(
     // Calculate a scale factor, if needed. Shrink or expand if needed and allowed.
     if ((T.urx == T.llx) || (T.ury == T.lly)) {
         // avoid division by zero
-        return QPDFMatrix();
+        return {};
     }
     double rect_w = rect.urx - rect.llx;
     double rect_h = rect.ury - rect.lly;

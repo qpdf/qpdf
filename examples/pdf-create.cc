@@ -31,47 +31,43 @@ class ImageProvider: public QPDFObjectHandle::StreamDataProvider
     size_t getHeight() const;
 
   private:
-    size_t width;
-    size_t stripe_height;
+    size_t width{400};
+    size_t stripe_height{80};
     std::string color_space;
     std::string filter;
-    size_t n_stripes;
+    size_t n_stripes{6};
     std::vector<std::string> stripes;
-    J_COLOR_SPACE j_color_space;
+    J_COLOR_SPACE j_color_space{JCS_UNKNOWN};
 };
 
 ImageProvider::ImageProvider(std::string const& color_space, std::string const& filter) :
-    width(400),
-    stripe_height(80),
     color_space(color_space),
-    filter(filter),
-    n_stripes(6),
-    j_color_space(JCS_UNKNOWN)
+    filter(filter)
 {
     if (color_space == "/DeviceCMYK") {
         j_color_space = JCS_CMYK;
-        stripes.push_back(std::string("\xff\x00\x00\x00", 4));
-        stripes.push_back(std::string("\x00\xff\x00\x00", 4));
-        stripes.push_back(std::string("\x00\x00\xff\x00", 4));
-        stripes.push_back(std::string("\xff\x00\xff\x00", 4));
-        stripes.push_back(std::string("\xff\xff\x00\x00", 4));
-        stripes.push_back(std::string("\x00\x00\x00\xff", 4));
+        stripes.emplace_back("\xff\x00\x00\x00", 4);
+        stripes.emplace_back("\x00\xff\x00\x00", 4);
+        stripes.emplace_back("\x00\x00\xff\x00", 4);
+        stripes.emplace_back("\xff\x00\xff\x00", 4);
+        stripes.emplace_back("\xff\xff\x00\x00", 4);
+        stripes.emplace_back("\x00\x00\x00\xff", 4);
     } else if (color_space == "/DeviceRGB") {
         j_color_space = JCS_RGB;
-        stripes.push_back(std::string("\xff\x00\x00", 3));
-        stripes.push_back(std::string("\x00\xff\x00", 3));
-        stripes.push_back(std::string("\x00\x00\xff", 3));
-        stripes.push_back(std::string("\xff\x00\xff", 3));
-        stripes.push_back(std::string("\xff\xff\x00", 3));
-        stripes.push_back(std::string("\x00\x00\x00", 3));
+        stripes.emplace_back("\xff\x00\x00", 3);
+        stripes.emplace_back("\x00\xff\x00", 3);
+        stripes.emplace_back("\x00\x00\xff", 3);
+        stripes.emplace_back("\xff\x00\xff", 3);
+        stripes.emplace_back("\xff\xff\x00", 3);
+        stripes.emplace_back("\x00\x00\x00", 3);
     } else if (color_space == "/DeviceGray") {
         j_color_space = JCS_GRAYSCALE;
-        stripes.push_back(std::string("\xee", 1));
-        stripes.push_back(std::string("\xcc", 1));
-        stripes.push_back(std::string("\x99", 1));
-        stripes.push_back(std::string("\x66", 1));
-        stripes.push_back(std::string("\x33", 1));
-        stripes.push_back(std::string("\x00", 1));
+        stripes.emplace_back("\xee", 1);
+        stripes.emplace_back("\xcc", 1);
+        stripes.emplace_back("\x99", 1);
+        stripes.emplace_back("\x66", 1);
+        stripes.emplace_back("\x33", 1);
+        stripes.emplace_back("\x00", 1);
     }
 }
 
@@ -335,13 +331,13 @@ create_pdf(char const* filename)
         ">>"_qpdf);
 
     std::vector<std::string> color_spaces;
-    color_spaces.push_back("/DeviceCMYK");
-    color_spaces.push_back("/DeviceRGB");
-    color_spaces.push_back("/DeviceGray");
+    color_spaces.emplace_back("/DeviceCMYK");
+    color_spaces.emplace_back("/DeviceRGB");
+    color_spaces.emplace_back("/DeviceGray");
     std::vector<std::string> filters;
-    filters.push_back("null");
-    filters.push_back("/DCTDecode");
-    filters.push_back("/RunLengthDecode");
+    filters.emplace_back("null");
+    filters.emplace_back("/DCTDecode");
+    filters.emplace_back("/RunLengthDecode");
     QPDFPageDocumentHelper dh(pdf);
     for (auto const& color_space: color_spaces) {
         for (auto const& filter: filters) {

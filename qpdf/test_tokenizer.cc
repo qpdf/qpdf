@@ -28,8 +28,8 @@ class Finder: public InputSource::Finder
         str(str)
     {
     }
-    virtual ~Finder() = default;
-    virtual bool check();
+    ~Finder() override = default;
+    bool check() override;
 
   private:
     std::shared_ptr<InputSource> is;

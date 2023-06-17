@@ -319,7 +319,7 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
             auto next = this->path.begin();
             next->node = first_node;
         }
-        this->path.push_front(PathElement(to_split, 0));
+        this->path.emplace_front(to_split, 0);
         parent = this->path.begin();
         to_split = first_node;
     }
@@ -578,7 +578,7 @@ NNTreeIterator::setItemNumber(QPDFObjectHandle const& node, int n)
 void
 NNTreeIterator::addPathElement(QPDFObjectHandle const& node, int kid_number)
 {
-    this->path.push_back(PathElement(node, kid_number));
+    this->path.emplace_back(node, kid_number);
 }
 
 bool
@@ -591,7 +591,7 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
     bool failed = false;
 
     QPDFObjGen::set seen;
-    for (auto i: this->path) {
+    for (auto const& i: this->path) {
         seen.add(i.node);
     }
     while (!failed) {
@@ -689,7 +689,7 @@ NNTreeImpl::begin()
 NNTreeImpl::iterator
 NNTreeImpl::end()
 {
-    return iterator(*this);
+    return {*this};
 }
 
 NNTreeImpl::iterator

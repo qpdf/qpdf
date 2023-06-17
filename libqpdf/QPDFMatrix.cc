@@ -57,7 +57,7 @@ QPDFMatrix::unparse() const
 QPDFObjectHandle::Matrix
 QPDFMatrix::getAsMatrix() const
 {
-    return QPDFObjectHandle::Matrix(a, b, c, d, e, f);
+    return {a, b, c, d, e, f};
 }
 
 void
@@ -124,11 +124,11 @@ QPDFMatrix::transformRectangle(QPDFObjectHandle::Rectangle r) const
     transform(r.llx, r.ury, tx.at(1), ty.at(1));
     transform(r.urx, r.lly, tx.at(2), ty.at(2));
     transform(r.urx, r.ury, tx.at(3), ty.at(3));
-    return QPDFObjectHandle::Rectangle(
+    return {
         *std::min_element(tx.begin(), tx.end()),
         *std::min_element(ty.begin(), ty.end()),
         *std::max_element(tx.begin(), tx.end()),
-        *std::max_element(ty.begin(), ty.end()));
+        *std::max_element(ty.begin(), ty.end())};
 }
 
 bool

@@ -35,7 +35,7 @@ class QPDFFileSpecObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     QPDFFileSpecObjectHelper(QPDFObjectHandle);
     QPDF_DLL
-    virtual ~QPDFFileSpecObjectHelper() = default;
+    ~QPDFFileSpecObjectHelper() override = default;
 
     QPDF_DLL
     std::string getDescription();

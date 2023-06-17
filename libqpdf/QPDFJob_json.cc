@@ -59,7 +59,7 @@ namespace
 
         std::list<std::shared_ptr<JSONHandler>> json_handlers;
         bool partial;
-        JSONHandler* jh; // points to last of json_handlers
+        JSONHandler* jh{nullptr}; // points to last of json_handlers
         std::shared_ptr<QPDFJob::Config> c_main;
         std::shared_ptr<QPDFJob::CopyAttConfig> c_copy_att;
         std::shared_ptr<QPDFJob::AttConfig> c_att;
@@ -71,7 +71,6 @@ namespace
 
 Handlers::Handlers(bool partial, std::shared_ptr<QPDFJob::Config> c_main) :
     partial(partial),
-    jh(nullptr),
     c_main(c_main)
 {
     initHandlers();

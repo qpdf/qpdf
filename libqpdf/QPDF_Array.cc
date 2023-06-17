@@ -201,7 +201,7 @@ QPDF_Array::getAsVector() const
         v.reserve(size_t(size()));
         for (auto const& item: sp_elements) {
             v.resize(size_t(item.first), null_oh);
-            v.push_back(item.second);
+            v.emplace_back(item.second);
         }
         v.resize(size_t(size()), null_oh);
         return v;

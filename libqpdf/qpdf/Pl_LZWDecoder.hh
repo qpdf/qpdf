@@ -10,9 +10,9 @@ class Pl_LZWDecoder: public Pipeline
 {
   public:
     Pl_LZWDecoder(char const* identifier, Pipeline* next, bool early_code_change);
-    virtual ~Pl_LZWDecoder() = default;
-    virtual void write(unsigned char const* buf, size_t len);
-    virtual void finish();
+    ~Pl_LZWDecoder() override = default;
+    void write(unsigned char const* buf, size_t len) override;
+    void finish() override;
 
   private:
     void sendNextCode();

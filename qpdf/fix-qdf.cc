@@ -46,42 +46,29 @@ class QdfFixer
         st_before_trailer,
         st_in_trailer,
         st_done,
-    } state;
+    } state{st_top};
 
-    size_t lineno;
-    qpdf_offset_t offset;
-    qpdf_offset_t last_offset;
-    int last_obj;
+    size_t lineno{0};
+    qpdf_offset_t offset{0};
+    qpdf_offset_t last_offset{0};
+    int last_obj{0};
     std::vector<QPDFXRefEntry> xref;
-    qpdf_offset_t stream_start;
-    size_t stream_length;
-    qpdf_offset_t xref_offset;
-    size_t xref_f1_nbytes;
-    size_t xref_f2_nbytes;
-    size_t xref_size;
+    qpdf_offset_t stream_start{0};
+    size_t stream_length{0};
+    qpdf_offset_t xref_offset{0};
+    size_t xref_f1_nbytes{0};
+    size_t xref_f2_nbytes{0};
+    size_t xref_size{0};
     std::vector<std::string_view> ostream;
     std::vector<qpdf_offset_t> ostream_offsets;
     std::vector<std::string_view> ostream_discarded;
-    size_t ostream_idx;
-    int ostream_id;
+    size_t ostream_idx{0};
+    int ostream_id{0};
     std::string ostream_extends;
 };
 
 QdfFixer::QdfFixer(std::string const& filename) :
-    filename(filename),
-    state(st_top),
-    lineno(0),
-    offset(0),
-    last_offset(0),
-    last_obj(0),
-    stream_start(0),
-    stream_length(0),
-    xref_offset(0),
-    xref_f1_nbytes(0),
-    xref_f2_nbytes(0),
-    xref_size(0),
-    ostream_idx(0),
-    ostream_id(0)
+    filename(filename)
 {
 }
 

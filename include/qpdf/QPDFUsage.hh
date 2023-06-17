@@ -30,7 +30,7 @@ class QPDF_DLL_CLASS QPDFUsage: public std::runtime_error
     QPDF_DLL
     QPDFUsage(std::string const& msg);
     QPDF_DLL
-    virtual ~QPDFUsage() noexcept = default;
+    ~QPDFUsage() noexcept override = default;
 };
 
 #endif // QPDFUSAGE_HH

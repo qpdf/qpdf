@@ -40,18 +40,15 @@ namespace
         std::shared_ptr<QPDFJob::UOConfig> c_uo;
         std::shared_ptr<QPDFJob::EncConfig> c_enc;
         std::vector<std::string> accumulated_args;
-        std::shared_ptr<char> pages_password;
-        bool gave_input;
-        bool gave_output;
+        std::shared_ptr<char> pages_password{nullptr};
+        bool gave_input{false};
+        bool gave_output{false};
     };
 } // namespace
 
 ArgParser::ArgParser(QPDFArgParser& ap, std::shared_ptr<QPDFJob::Config> c_main) :
     ap(ap),
-    c_main(c_main),
-    pages_password(nullptr),
-    gave_input(false),
-    gave_output(false)
+    c_main(c_main)
 {
     initOptionTables();
 }

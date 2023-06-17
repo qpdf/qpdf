@@ -44,7 +44,7 @@ class QPDF_DLL_CLASS QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     QPDFNumberTreeObjectHelper(QPDFObjectHandle, QPDF&, bool auto_repair = true);
 
     QPDF_DLL
-    virtual ~QPDFNumberTreeObjectHelper();
+    ~QPDFNumberTreeObjectHelper() override;
 
     // Create an empty number tree
     QPDF_DLL

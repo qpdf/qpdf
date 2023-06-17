@@ -30,11 +30,11 @@ class QPDF_DLL_CLASS Pl_Count: public Pipeline
     QPDF_DLL
     Pl_Count(char const* identifier, Pipeline* next);
     QPDF_DLL
-    virtual ~Pl_Count();
+    ~Pl_Count() override;
     QPDF_DLL
-    virtual void write(unsigned char const*, size_t);
+    void write(unsigned char const*, size_t) override;
     QPDF_DLL
-    virtual void finish();
+    void finish() override;
     // Returns the number of bytes written
     QPDF_DLL
     qpdf_offset_t getCount() const;

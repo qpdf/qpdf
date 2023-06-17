@@ -238,7 +238,7 @@ class QPDF::JSONReactor: public JSON::Reactor
             }
         }
     }
-    virtual ~JSONReactor() = default;
+    ~JSONReactor() override = default;
     void dictionaryStart() override;
     void arrayStart() override;
     void containerEnd(JSON const& value) override;

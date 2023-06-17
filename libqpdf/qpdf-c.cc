@@ -813,13 +813,13 @@ trap_oh_errors(qpdf_data qpdf, std::function<RET()> fallback, std::function<RET(
         if (!qpdf->silence_errors) {
             QTC::TC("qpdf", "qpdf-c warn about oh error", qpdf->oh_error_occurred ? 0 : 1);
             if (!qpdf->oh_error_occurred) {
-                qpdf->warnings.push_back(QPDFExc(
+                qpdf->warnings.emplace_back(
                     qpdf_e_internal,
                     qpdf->qpdf->getFilename(),
                     "",
                     0,
                     "C API function caught an exception that it isn't returning; please point the "
-                    "application developer to ERROR HANDLING in qpdf-c.h"));
+                    "application developer to ERROR HANDLING in qpdf-c.h");
                 qpdf->oh_error_occurred = true;
             }
             *QPDFLogger::defaultLogger()->getError() << qpdf->error->what() << "\n";

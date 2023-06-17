@@ -13,7 +13,7 @@ Pl_String::Pl_String(char const* identifier, Pipeline* next, std::string& s) :
 {
 }
 
-Pl_String::~Pl_String()
+Pl_String::~Pl_String() // NOLINT (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
 }

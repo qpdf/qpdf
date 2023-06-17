@@ -50,7 +50,7 @@ class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
     static QPDFNameTreeObjectHelper newEmpty(QPDF&, bool auto_repair = true);
 
     QPDF_DLL
-    virtual ~QPDFNameTreeObjectHelper();
+    ~QPDFNameTreeObjectHelper() override;
 
     // Return whether the name tree has an explicit entry for this name.
     QPDF_DLL

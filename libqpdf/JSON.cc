@@ -269,7 +269,7 @@ JSON::encode_string(std::string const& str)
 JSON
 JSON::makeDictionary()
 {
-    return JSON(std::make_unique<JSON_dictionary>());
+    return {std::make_unique<JSON_dictionary>()};
 }
 
 JSON
@@ -299,7 +299,7 @@ JSON::checkDictionaryKeySeen(std::string const& key)
 JSON
 JSON::makeArray()
 {
-    return JSON(std::make_unique<JSON_array>());
+    return {std::make_unique<JSON_array>()};
 }
 
 JSON
@@ -320,43 +320,43 @@ JSON::addArrayElement(JSON const& val)
 JSON
 JSON::makeString(std::string const& utf8)
 {
-    return JSON(std::make_unique<JSON_string>(utf8));
+    return {std::make_unique<JSON_string>(utf8)};
 }
 
 JSON
 JSON::makeInt(long long int value)
 {
-    return JSON(std::make_unique<JSON_number>(value));
+    return {std::make_unique<JSON_number>(value)};
 }
 
 JSON
 JSON::makeReal(double value)
 {
-    return JSON(std::make_unique<JSON_number>(value));
+    return {std::make_unique<JSON_number>(value)};
 }
 
 JSON
 JSON::makeNumber(std::string const& encoded)
 {
-    return JSON(std::make_unique<JSON_number>(encoded));
+    return {std::make_unique<JSON_number>(encoded)};
 }
 
 JSON
 JSON::makeBool(bool value)
 {
-    return JSON(std::make_unique<JSON_bool>(value));
+    return {std::make_unique<JSON_bool>(value)};
 }
 
 JSON
 JSON::makeNull()
 {
-    return JSON(std::make_unique<JSON_null>());
+    return {std::make_unique<JSON_null>()};
 }
 
 JSON
 JSON::makeBlob(std::function<void(Pipeline*)> fn)
 {
-    return JSON(std::make_unique<JSON_blob>(fn));
+    return {std::make_unique<JSON_blob>(fn)};
 }
 
 bool
@@ -588,14 +588,7 @@ namespace
         JSONParser(InputSource& is, JSON::Reactor* reactor) :
             is(is),
             reactor(reactor),
-            lex_state(ls_top),
-            bytes(0),
-            p(buf),
-            u_count(0),
-            offset(0),
-            done(false),
-            parser_state(ps_top),
-            dict_key_offset(0)
+            p(buf)
         {
         }
 
@@ -665,20 +658,20 @@ namespace
 
         InputSource& is;
         JSON::Reactor* reactor;
-        lex_state_e lex_state;
+        lex_state_e lex_state{ls_top};
         char buf[16384];
-        size_t bytes;
+        size_t bytes{0};
         char const* p;
-        qpdf_offset_t u_count;
+        qpdf_offset_t u_count{0};
         unsigned long u_value{0};
-        qpdf_offset_t offset;
-        bool done;
+        qpdf_offset_t offset{0};
+        bool done{false};
         std::string token;
         qpdf_offset_t token_start{0};
-        parser_state_e parser_state;
+        parser_state_e parser_state{ps_top};
         std::vector<StackFrame> stack;
         std::string dict_key;
-        qpdf_offset_t dict_key_offset;
+        qpdf_offset_t dict_key_offset{0};
     };
 } // namespace
 
@@ -1282,7 +1275,7 @@ JSONParser::handleToken()
 
     case ps_top:
         if (!(item.isDictionary() || item.isArray())) {
-            stack.push_back({ps_done, item});
+            stack.emplace_back(ps_done, item);
             parser_state = ps_done;
             return;
         }
@@ -1311,7 +1304,7 @@ JSONParser::handleToken()
     }
 
     if (item.isDictionary() || item.isArray()) {
-        stack.push_back({parser_state, item});
+        stack.emplace_back(parser_state, item);
         // Calling container start method is postponed until after adding the containers to their
         // parent containers, if any. This makes it much easier to keep track of the current nesting
         // level.

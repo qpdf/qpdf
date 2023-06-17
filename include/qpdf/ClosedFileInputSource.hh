@@ -37,21 +37,21 @@ class QPDF_DLL_CLASS ClosedFileInputSource: public InputSource
     QPDF_DLL
     ClosedFileInputSource(char const* filename);
     QPDF_DLL
-    virtual ~ClosedFileInputSource();
+    ~ClosedFileInputSource() override;
     QPDF_DLL
-    virtual qpdf_offset_t findAndSkipNextEOL();
+    qpdf_offset_t findAndSkipNextEOL() override;
     QPDF_DLL
-    virtual std::string const& getName() const;
+    std::string const& getName() const override;
     QPDF_DLL
-    virtual qpdf_offset_t tell();
+    qpdf_offset_t tell() override;
     QPDF_DLL
-    virtual void seek(qpdf_offset_t offset, int whence);
+    void seek(qpdf_offset_t offset, int whence) override;
     QPDF_DLL
-    virtual void rewind();
+    void rewind() override;
     QPDF_DLL
-    virtual size_t read(char* buffer, size_t length);
+    size_t read(char* buffer, size_t length) override;
     QPDF_DLL
-    virtual void unreadCh(char ch);
+    void unreadCh(char ch) override;
 
     // The file stays open between calls to stayOpen(true) and stayOpen(false). You can use this to
     // surround multiple operations on a single ClosedFileInputSource to reduce the overhead of a

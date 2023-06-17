@@ -32,13 +32,13 @@ class QPDF_DLL_CLASS Pl_Concatenate: public Pipeline
     QPDF_DLL
     Pl_Concatenate(char const* identifier, Pipeline* next);
     QPDF_DLL
-    virtual ~Pl_Concatenate();
+    ~Pl_Concatenate() override;
 
     QPDF_DLL
-    virtual void write(unsigned char const* data, size_t len);
+    void write(unsigned char const* data, size_t len) override;
 
     QPDF_DLL
-    virtual void finish();
+    void finish() override;
 
     // At the very end, call manualFinish to actually finish the rest of the pipeline.
     QPDF_DLL

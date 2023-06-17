@@ -70,7 +70,7 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(std::vector<QPDFObjectHandle>
         if (seen.add(obj)) {
             auto kids = obj.getKey("/Kids");
             if (kids.isArray()) {
-                for (auto kid: kids.aitems()) {
+                for (auto const& kid: kids.aitems()) {
                     queue.push_back(kid);
                 }
             }
@@ -104,7 +104,7 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(std::vector<QPDFObjectHandle>
         }
     }
 
-    for (auto i: fields) {
+    for (auto const& i: fields) {
         addFormField(i);
     }
 }
@@ -165,7 +165,7 @@ QPDFAcroFormDocumentHelper::getFormFields()
     analyze();
     std::vector<QPDFFormFieldObjectHelper> result;
     for (auto const& iter: m->field_to_annotations) {
-        result.push_back(this->qpdf.getObject(iter.first));
+        result.emplace_back(this->qpdf.getObject(iter.first));
     }
     return result;
 }
@@ -279,7 +279,7 @@ QPDFAcroFormDocumentHelper::analyze()
                 annot.warnIfPossible("this widget annotation is not"
                                      " reachable from /AcroForm in the document catalog");
                 m->annotation_to_field[og] = QPDFFormFieldObjectHelper(annot);
-                m->field_to_annotations[og].push_back(QPDFAnnotationObjectHelper(annot));
+                m->field_to_annotations[og].emplace_back(annot);
             }
         }
     }
@@ -342,7 +342,7 @@ QPDFAcroFormDocumentHelper::traverseField(
 
     if (is_annotation) {
         QPDFObjectHandle our_field = (is_field ? field : parent);
-        m->field_to_annotations[our_field.getObjGen()].push_back(QPDFAnnotationObjectHelper(field));
+        m->field_to_annotations[our_field.getObjGen()].emplace_back(field);
         m->annotation_to_field[og] = QPDFFormFieldObjectHelper(our_field);
     }
 
@@ -469,19 +469,18 @@ namespace
         ResourceReplacer(
             std::map<std::string, std::map<std::string, std::string>> const& dr_map,
             std::map<std::string, std::map<std::string, std::set<size_t>>> const& rnames);
-        virtual ~ResourceReplacer() = default;
-        virtual void handleToken(QPDFTokenizer::Token const&) override;
+        ~ResourceReplacer() override = default;
+        void handleToken(QPDFTokenizer::Token const&) override;
 
       private:
-        size_t offset;
+        size_t offset{0};
         std::map<std::string, std::map<size_t, std::string>> to_replace;
     };
 } // namespace
 
 ResourceReplacer::ResourceReplacer(
     std::map<std::string, std::map<std::string, std::string>> const& dr_map,
-    std::map<std::string, std::map<std::string, std::set<size_t>>> const& rnames) :
-    offset(0)
+    std::map<std::string, std::map<std::string, std::set<size_t>>> const& rnames)
 {
     // We have:
     // * dr_map[resource_type][key] == new_key
@@ -1019,7 +1018,7 @@ QPDFAcroFormDocumentHelper::fixCopiedAnnotations(
     to_page.replaceKey("/Annots", QPDFObjectHandle::newArray(new_annots));
     addAndRenameFormFields(new_fields);
     if (added_fields) {
-        for (auto f: new_fields) {
+        for (auto const& f: new_fields) {
             added_fields->insert(f.getObjGen());
         }
     }

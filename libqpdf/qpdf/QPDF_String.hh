@@ -10,16 +10,16 @@ class QPDF_String: public QPDFValue
     friend class QPDFWriter;
 
   public:
-    virtual ~QPDF_String() = default;
+    ~QPDF_String() override = default;
     static std::shared_ptr<QPDFObject> create(std::string const& val);
     static std::shared_ptr<QPDFObject> create_utf16(std::string const& utf8_val);
-    virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
-    virtual std::string unparse();
+    std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
+    std::string unparse() override;
     std::string unparse(bool force_binary);
-    virtual JSON getJSON(int json_version);
+    JSON getJSON(int json_version) override;
     std::string getUTF8Val() const;
-    virtual std::string
-    getStringValue() const
+    std::string
+    getStringValue() const override
     {
         return val;
     }

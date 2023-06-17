@@ -6,11 +6,11 @@
 class QPDF_Integer: public QPDFValue
 {
   public:
-    virtual ~QPDF_Integer() = default;
+    ~QPDF_Integer() override = default;
     static std::shared_ptr<QPDFObject> create(long long value);
-    virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
-    virtual std::string unparse();
-    virtual JSON getJSON(int json_version);
+    std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
+    std::string unparse() override;
+    JSON getJSON(int json_version) override;
     long long getVal() const;
 
   private:

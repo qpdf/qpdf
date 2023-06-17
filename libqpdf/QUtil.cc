@@ -903,14 +903,14 @@ QUtil::get_current_qpdf_time()
     // Don't know how to get timezone on this platform
     int tzoff = 0;
 # endif
-    return QPDFTime(
+    return {
         static_cast<int>(ltime.tm_year + 1900),
         static_cast<int>(ltime.tm_mon + 1),
         static_cast<int>(ltime.tm_mday),
         static_cast<int>(ltime.tm_hour),
         static_cast<int>(ltime.tm_min),
         static_cast<int>(ltime.tm_sec),
-        tzoff);
+        tzoff};
 #endif
 }
 
@@ -1082,13 +1082,12 @@ namespace
 
       private:
         RandomDataProvider* default_provider;
-        RandomDataProvider* current_provider;
+        RandomDataProvider* current_provider{nullptr};
     };
 } // namespace
 
 RandomDataProviderProvider::RandomDataProviderProvider() :
-    default_provider(CryptoRandomDataProvider::getInstance()),
-    current_provider(nullptr)
+    default_provider(CryptoRandomDataProvider::getInstance())
 {
     this->current_provider = default_provider;
 }
@@ -1246,7 +1245,7 @@ QUtil::read_lines_from_file(
     char c;
     while (next_char(c)) {
         if (buf == nullptr) {
-            lines.push_back("");
+            lines.emplace_back("");
             buf = &(lines.back());
             buf->reserve(80);
         }

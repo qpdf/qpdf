@@ -6,13 +6,13 @@
 class QPDF_InlineImage: public QPDFValue
 {
   public:
-    virtual ~QPDF_InlineImage() = default;
+    ~QPDF_InlineImage() override = default;
     static std::shared_ptr<QPDFObject> create(std::string const& val);
-    virtual std::shared_ptr<QPDFObject> copy(bool shallow = false);
-    virtual std::string unparse();
-    virtual JSON getJSON(int json_version);
-    virtual std::string
-    getStringValue() const
+    std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
+    std::string unparse() override;
+    JSON getJSON(int json_version) override;
+    std::string
+    getStringValue() const override
     {
         return val;
     }

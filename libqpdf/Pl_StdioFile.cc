@@ -17,7 +17,7 @@ Pl_StdioFile::Pl_StdioFile(char const* identifier, FILE* f) :
 {
 }
 
-Pl_StdioFile::~Pl_StdioFile()
+Pl_StdioFile::~Pl_StdioFile() // NOLINT (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
 }

@@ -6,10 +6,10 @@
 class BogusRandomDataProvider: public RandomDataProvider
 {
   public:
-    virtual ~BogusRandomDataProvider() = default;
+    ~BogusRandomDataProvider() override = default;
     BogusRandomDataProvider() = default;
-    virtual void
-    provideRandomData(unsigned char* data, size_t len)
+    void
+    provideRandomData(unsigned char* data, size_t len) override
     {
         for (size_t i = 0; i < len; ++i) {
             data[i] = static_cast<unsigned char>(i & 0xff);

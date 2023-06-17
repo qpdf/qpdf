@@ -54,12 +54,12 @@ class QPDF_DLL_CLASS Pl_Function: public Pipeline
     Pl_Function(char const* identifier, Pipeline* next, writer_c_char_t fn, void* udata);
 
     QPDF_DLL
-    virtual ~Pl_Function();
+    ~Pl_Function() override;
 
     QPDF_DLL
-    virtual void write(unsigned char const* buf, size_t len);
+    void write(unsigned char const* buf, size_t len) override;
     QPDF_DLL
-    virtual void finish();
+    void finish() override;
 
   private:
     class QPDF_DLL_PRIVATE Members

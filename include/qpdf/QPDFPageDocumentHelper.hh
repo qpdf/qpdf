@@ -37,7 +37,7 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     QPDFPageDocumentHelper(QPDF&);
     QPDF_DLL
-    virtual ~QPDFPageDocumentHelper() = default;
+    ~QPDFPageDocumentHelper() override = default;
 
     // Traverse page tree, and return all /Page objects wrapped in QPDFPageObjectHelper objects.
     // Unlike with QPDF::getAllPages, the vector of pages returned by this call is not affected by

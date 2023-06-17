@@ -26,7 +26,7 @@
 #include <cstdlib>
 #include <stdexcept>
 
-QPDFWriter::ProgressReporter::~ProgressReporter()
+QPDFWriter::ProgressReporter::~ProgressReporter() // NOLINT (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
 }
@@ -36,7 +36,8 @@ QPDFWriter::FunctionProgressReporter::FunctionProgressReporter(std::function<voi
 {
 }
 
-QPDFWriter::FunctionProgressReporter::~FunctionProgressReporter()
+QPDFWriter::FunctionProgressReporter::~FunctionProgressReporter() // NOLINT
+                                                                  // (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
 }

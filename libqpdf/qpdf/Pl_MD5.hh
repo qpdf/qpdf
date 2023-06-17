@@ -14,9 +14,9 @@ class Pl_MD5: public Pipeline
 {
   public:
     Pl_MD5(char const* identifier, Pipeline* next);
-    virtual ~Pl_MD5() = default;
-    virtual void write(unsigned char const*, size_t);
-    virtual void finish();
+    ~Pl_MD5() override = default;
+    void write(unsigned char const*, size_t) override;
+    void finish() override;
     std::string getHexDigest();
     // Enable/disable. Disabling the pipeline causes it to become a pass-through. This makes it
     // possible to stick an MD5 pipeline in a pipeline when it may or may not be required. Disabling

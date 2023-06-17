@@ -45,11 +45,11 @@ class QPDF_DLL_CLASS Pl_QPDFTokenizer: public Pipeline
     Pl_QPDFTokenizer(
         char const* identifier, QPDFObjectHandle::TokenFilter* filter, Pipeline* next = nullptr);
     QPDF_DLL
-    virtual ~Pl_QPDFTokenizer();
+    ~Pl_QPDFTokenizer() override;
     QPDF_DLL
-    virtual void write(unsigned char const* buf, size_t len);
+    void write(unsigned char const* buf, size_t len) override;
     QPDF_DLL
-    virtual void finish();
+    void finish() override;
 
   private:
     class QPDF_DLL_PRIVATE Members

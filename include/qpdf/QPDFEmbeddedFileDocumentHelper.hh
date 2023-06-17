@@ -39,7 +39,7 @@ class QPDFEmbeddedFileDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     QPDFEmbeddedFileDocumentHelper(QPDF&);
     QPDF_DLL
-    virtual ~QPDFEmbeddedFileDocumentHelper() = default;
+    ~QPDFEmbeddedFileDocumentHelper() override = default;
 
     QPDF_DLL
     bool hasEmbeddedFiles() const;

@@ -840,7 +840,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
             }
             if (type == 'f') {
                 // Save deleted items until after we've checked the XRefStm, if any.
-                deleted_items.push_back(QPDFObjGen(toI(i), f2));
+                deleted_items.emplace_back(toI(i), f2);
             } else {
                 insertXrefEntry(toI(i), 1, f1, f2);
             }
@@ -2207,7 +2207,7 @@ QPDF::getVersionAsPDFVersion()
         minor = QUtil::string_to_int(match[2].str().c_str());
     }
 
-    return PDFVersion(major, minor, extension_level);
+    return {major, minor, extension_level};
 }
 
 std::string
@@ -2478,7 +2478,7 @@ QPDF::damagedPDF(
     qpdf_offset_t offset,
     std::string const& message)
 {
-    return QPDFExc(qpdf_e_damaged_pdf, input->getName(), object, offset, message);
+    return {qpdf_e_damaged_pdf, input->getName(), object, offset, message};
 }
 
 // Return an exception of type qpdf_e_damaged_pdf.  The object is taken from
@@ -2494,7 +2494,7 @@ QPDF::damagedPDF(
 QPDFExc
 QPDF::damagedPDF(std::string const& object, qpdf_offset_t offset, std::string const& message)
 {
-    return QPDFExc(qpdf_e_damaged_pdf, m->file->getName(), object, offset, message);
+    return {qpdf_e_damaged_pdf, m->file->getName(), object, offset, message};
 }
 
 // Return an exception of type qpdf_e_damaged_pdf.  The filename is taken from m->file and the

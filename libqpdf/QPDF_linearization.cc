@@ -1367,7 +1367,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     for (auto& oh: m->part6) {
         int obj = oh.getObjectID();
         obj_to_index[obj] = toI(shared.size());
-        shared.push_back(CHSharedObjectEntry(obj));
+        shared.emplace_back(obj);
     }
     QTC::TC("qpdf", "QPDF lin part 8 empty", m->part8.empty() ? 1 : 0);
     if (!m->part8.empty()) {
@@ -1375,7 +1375,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         for (auto& oh: m->part8) {
             int obj = oh.getObjectID();
             obj_to_index[obj] = toI(shared.size());
-            shared.push_back(CHSharedObjectEntry(obj));
+            shared.emplace_back(obj);
         }
     }
     if (static_cast<size_t>(m->c_shared_object_data.nshared_total) !=
@@ -1585,7 +1585,7 @@ QPDF::calculateHSharedObject(
         int length = outputLengthNextN(csoe.at(i).object, 1, lengths, obj_renumber);
         min_length = std::min(min_length, length);
         max_length = std::max(max_length, length);
-        soe.push_back(HSharedObjectEntry());
+        soe.emplace_back();
         soe.at(i).delta_group_length = length;
     }
     if (soe.size() != toS(cso.nshared_total)) {

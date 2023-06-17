@@ -26,17 +26,14 @@ usage()
 class StringCounter: public QPDFObjectHandle::TokenFilter
 {
   public:
-    StringCounter() :
-        count(0)
-    {
-    }
+    StringCounter() = default;
     ~StringCounter() override = default;
     void handleToken(QPDFTokenizer::Token const&) override;
     void handleEOF() override;
     int getCount() const;
 
   private:
-    int count;
+    int count{0};
 };
 
 void

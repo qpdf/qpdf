@@ -55,7 +55,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
     bool set_offset = false;
 
     std::vector<StackFrame> stack;
-    stack.push_back(StackFrame(input));
+    stack.emplace_back(input);
     std::vector<parser_state_e> state_stack;
     state_stack.push_back(st_top);
     qpdf_offset_t offset;
@@ -141,7 +141,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                     (tokenizer.getType() == QPDFTokenizer::tt_array_open) ? st_array
                                                                           : st_dictionary);
                 b_contents = false;
-                stack.push_back(StackFrame(input));
+                stack.emplace_back(input);
             }
             break;
 
