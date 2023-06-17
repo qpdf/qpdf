@@ -9,41 +9,33 @@
 #include <string>
 #include <vector>
 
-// This is not a general-purpose argument parser. It is tightly
-// crafted to work with qpdf. qpdf's command-line syntax is very
-// complex because of its long history, and it doesn't really follow
-// any kind of normal standard for arguments, but it's important for
-// backward compatibility to ensure we don't break what constitutes a
-// valid command. This class handles the quirks of qpdf's argument
-// parsing, bash/zsh completion, and support for @argfile to read
-// arguments from a file. For the qpdf CLI, setup of QPDFArgParser is
-// done mostly by automatically-generated code (one-off code for
-// qpdf), though the handlers themselves are hand-coded. See
-// generate_auto_job at the top of the source tree for details.
+// This is not a general-purpose argument parser. It is tightly crafted to work with qpdf. qpdf's
+// command-line syntax is very complex because of its long history, and it doesn't really follow any
+// kind of normal standard for arguments, but it's important for backward compatibility to ensure we
+// don't break what constitutes a valid command. This class handles the quirks of qpdf's argument
+// parsing, bash/zsh completion, and support for @argfile to read arguments from a file. For the
+// qpdf CLI, setup of QPDFArgParser is done mostly by automatically-generated code (one-off code for
+// qpdf), though the handlers themselves are hand-coded. See generate_auto_job at the top of the
+// source tree for details.
 class QPDFArgParser
 {
   public:
-    // progname_env is used to override argv[0] when figuring out the
-    // name of the executable for setting up completion. This may be
-    // needed if the program is invoked by a wrapper.
+    // progname_env is used to override argv[0] when figuring out the name of the executable for
+    // setting up completion. This may be needed if the program is invoked by a wrapper.
     QPDFArgParser(int argc, char const* const argv[], char const* progname_env);
 
-    // Calls exit(0) if a help option is given or if in completion
-    // mode. If there are argument parsing errors, QPDFUsage is
-    // thrown.
+    // Calls exit(0) if a help option is given or if in completion mode. If there are argument
+    // parsing errors, QPDFUsage is thrown.
     void parseArgs();
 
-    // Return the program name as the last path element of the program
-    // executable.
+    // Return the program name as the last path element of the program executable.
     std::string getProgname();
 
-    // Methods for registering arguments. QPDFArgParser starts off
-    // with the main option table selected. You can add handlers for
-    // arguments in the current option table, and you can select which
-    // option table is current. The help option table is special and
-    // contains arguments that are only valid as the first and only
-    // option. Named option tables are for subparsers and always start
-    // a series of options that end with `--`.
+    // Methods for registering arguments. QPDFArgParser starts off with the main option table
+    // selected. You can add handlers for arguments in the current option table, and you can select
+    // which option table is current. The help option table is special and contains arguments that
+    // are only valid as the first and only option. Named option tables are for subparsers and
+    // always start a series of options that end with `--`.
 
     typedef std::function<void()> bare_arg_handler_t;
     typedef std::function<void(std::string const&)> param_arg_handler_t;
@@ -65,9 +57,8 @@ class QPDFArgParser
     void
     addChoices(std::string const& arg, param_arg_handler_t, bool required, char const** choices);
 
-    // The default behavior when an invalid choice is specified with
-    // an option that takes choices is to list all the choices. This
-    // may not be good if there are too many choices, so you can
+    // The default behavior when an invalid choice is specified with an option that takes choices is
+    // to list all the choices. This may not be good if there are too many choices, so you can
     // provide your own handler in this case.
     void addInvalidChoiceHandler(std::string const& arg, param_arg_handler_t);
 
@@ -77,42 +68,33 @@ class QPDFArgParser
 
     // Help generation methods
 
-    // Help is available on topics and options. Options may be
-    // associated with topics. Users can run --help, --help=topic, or
-    // --help=--arg to get help. The top-level help tells the user how
-    // to run help and lists available topics. Help for a topic prints
-    // a short synopsis about the topic and lists any options that may
-    // be associated with the topic. Help for an option provides a
-    // short synopsis for that option. All help output is appended
-    // with a blurb (if supplied) directing the user to the full
-    // documentation. Help is not shown for options for which help has
-    // not been added. This makes it possible to have undocumented
-    // options for testing, backward-compatibility, etc. Also, it
-    // could be quite confusing to handle appropriate help for some
-    // inner options that may be repeated with different semantics
-    // inside different option tables. There is also no checking for
-    // whether an option that has help actually exists. In other
-    // words, it's up to the caller to ensure that help actually
-    // corresponds to the program's actual options. Rather than this
-    // being an intentional design decision, it is because this class
-    // is specifically for qpdf, qpdf generates its help and has other
-    // means to ensure consistency.
+    // Help is available on topics and options. Options may be associated with topics. Users can run
+    // --help, --help=topic, or --help=--arg to get help. The top-level help tells the user how
+    // to run help and lists available topics. Help for a topic prints a short synopsis about the
+    // topic and lists any options that may be associated with the topic. Help for an option
+    // provides a short synopsis for that option. All help output is appended with a blurb (if
+    // supplied) directing the user to the full documentation. Help is not shown for options for
+    // which help has not been added. This makes it possible to have undocumented options for
+    // testing, backward-compatibility, etc. Also, it could be quite confusing to handle appropriate
+    // help for some inner options that may be repeated with different semantics inside different
+    // option tables. There is also no checking for whether an option that has help actually exists.
+    // In other words, it's up to the caller to ensure that help actually corresponds to the
+    // program's actual options. Rather than this being an intentional design decision, it is
+    // because this class is specifically for qpdf, qpdf generates its help and has other means to
+    // ensure consistency.
 
     // Note about newlines:
     //
-    // short_text should fit easily after the topic/option on the same
-    // line and should not end with a newline. Keep it to around 40 to
-    // 60 characters.
+    // short_text should fit easily after the topic/option on the same line and should not end with
+    // a newline. Keep it to around 40 to 60 characters.
     //
-    // long_text and footer should end with a single newline. They can
-    // have embedded newlines. Keep lines to under 80 columns.
+    // long_text and footer should end with a single newline. They can have embedded newlines. Keep
+    // lines to under 80 columns.
     //
-    // QPDFArgParser does reformat the text, but it may add blank
-    // lines in some situations. Following the above conventions will
-    // keep the help looking uniform.
+    // QPDFArgParser does reformat the text, but it may add blank lines in some situations.
+    // Following the above conventions will keep the help looking uniform.
 
-    // If provided, this footer is appended to all help, separated by
-    // a blank line.
+    // If provided, this footer is appended to all help, separated by a blank line.
     void addHelpFooter(std::string const&);
 
     // Add a help topic along with the text for that topic
@@ -126,14 +108,12 @@ class QPDFArgParser
         std::string const& short_text,
         std::string const& long_text);
 
-    // Return the help text for a topic or option. Passing a null
-    // pointer returns the top-level help information. Passing an
-    // unknown value returns a string directing the user to run the
+    // Return the help text for a topic or option. Passing a null pointer returns the top-level help
+    // information. Passing an unknown value returns a string directing the user to run the
     // top-level --help option.
     std::string getHelp(std::string const& topic_or_option);
 
-    // Convenience methods for adding member functions of a class as
-    // handlers.
+    // Convenience methods for adding member functions of a class as handlers.
     template <class T>
     static bare_arg_handler_t
     bindBare(void (T::*f)(), T* o)
@@ -147,21 +127,19 @@ class QPDFArgParser
         return std::bind(std::mem_fn(f), o, std::placeholders::_1);
     }
 
-    // When processing arguments, indicate how many arguments remain
-    // after the one whose handler is being called.
+    // When processing arguments, indicate how many arguments remain after the one whose handler is
+    // being called.
     int argsLeft() const;
 
     // Indicate whether we are in completion mode.
     bool isCompleting() const;
 
-    // Insert a completion during argument parsing; useful for
-    // customizing completion in the position argument handler. Should
-    // only be used in completion mode.
+    // Insert a completion during argument parsing; useful for customizing completion in the
+    // position argument handler. Should only be used in completion mode.
     void insertCompletion(std::string const&);
 
-    // Throw a Usage exception with the given message. In completion
-    // mode, this just exits to prevent errors from partial commands
-    // or other error messages from messing up completion.
+    // Throw a Usage exception with the given message. In completion mode, this just exits to
+    // prevent errors from partial commands or other error messages from messing up completion.
     void usage(std::string const& message);
 
   private:

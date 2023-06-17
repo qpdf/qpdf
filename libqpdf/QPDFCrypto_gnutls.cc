@@ -233,9 +233,8 @@ QPDFCrypto_gnutls::rijndael_process(unsigned char* in_data, unsigned char* out_d
             this->cipher_ctx, in_data, rijndael_buf_size, out_data, rijndael_buf_size);
     }
 
-    // Gnutls doesn't support AES in ECB (non-CBC) mode, but the
-    // result is the same as if you just reset the cbc block to all
-    // zeroes each time. We jump through a few hoops here to make this
+    // Gnutls doesn't support AES in ECB (non-CBC) mode, but the result is the same as if you just
+    // reset the cbc block to all zeroes each time. We jump through a few hoops here to make this
     // work.
     if (!this->cbc_mode) {
         static unsigned char zeroes[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};

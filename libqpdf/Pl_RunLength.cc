@@ -18,8 +18,7 @@ Pl_RunLength::Pl_RunLength(char const* identifier, Pipeline* next, action_e acti
 
 Pl_RunLength::~Pl_RunLength()
 {
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
-    // README-maintainer
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
 }
 
 void
@@ -135,10 +134,9 @@ Pl_RunLength::flush_encode()
 void
 Pl_RunLength::finish()
 {
-    // When decoding, we might have read a length byte not followed by
-    // data, which means the stream was terminated early, but we will
-    // just ignore this case since this is the only sensible thing to
-    // do.
+    // When decoding, we might have read a length byte not followed by data, which means the stream
+    // was terminated early, but we will just ignore this case since this is the only sensible thing
+    // to do.
     if (m->action == a_encode) {
         flush_encode();
         unsigned char ch = 128;

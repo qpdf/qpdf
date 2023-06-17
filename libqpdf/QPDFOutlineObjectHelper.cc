@@ -14,8 +14,8 @@ QPDFOutlineObjectHelper::QPDFOutlineObjectHelper(
     m(new Members(dh))
 {
     if (depth > 50) {
-        // Not exercised in test suite, but was tested manually by
-        // temporarily changing max depth to 1.
+        // Not exercised in test suite, but was tested manually by temporarily changing max depth
+        // to 1.
         return;
     }
     if (QPDFOutlineDocumentHelper::Accessor::checkSeen(m->dh, this->oh.getObjGen())) {

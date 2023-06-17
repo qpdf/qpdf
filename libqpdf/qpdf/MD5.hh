@@ -29,8 +29,7 @@ class MD5
     // computes a raw digest
     void digest(Digest);
 
-    // prints the digest to stdout terminated with \r\n (primarily for
-    // testing)
+    // prints the digest to stdout terminated with \r\n (primarily for testing)
     void print();
 
     // returns the digest as a hexadecimal string

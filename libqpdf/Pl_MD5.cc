@@ -19,8 +19,7 @@ Pl_MD5::write(unsigned char const* buf, size_t len)
             this->in_progress = true;
         }
 
-        // Write in chunks in case len is too big to fit in an int.
-        // Assume int is at least 32 bits.
+        // Write in chunks in case len is too big to fit in an int. Assume int is at least 32 bits.
         static size_t const max_bytes = 1 << 30;
         size_t bytes_left = len;
         unsigned char const* data = buf;

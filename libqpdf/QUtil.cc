@@ -296,9 +296,8 @@ template <typename T>
 static std::string
 int_to_string_base_internal(T num, int base, int length)
 {
-    // Backward compatibility -- int_to_string, which calls this
-    // function, used to use sprintf with %0*d, so we interpret length
-    // such that a negative value appends spaces and a positive value
+    // Backward compatibility -- int_to_string, which calls this function, used to use sprintf with
+    // %0*d, so we interpret length such that a negative value appends spaces and a positive value
     // prepends zeroes.
     if (!((base == 8) || (base == 10) || (base == 16))) {
         throw std::logic_error("int_to_string_base called with unsupported base");
@@ -352,9 +351,8 @@ QUtil::uint_to_string_base(unsigned long long num, int base, int length)
 std::string
 QUtil::double_to_string(double num, int decimal_places, bool trim_trailing_zeroes)
 {
-    // Backward compatibility -- this code used to use sprintf and
-    // treated decimal_places <= 0 to mean to use the default, which
-    // was six decimal places. Starting in 10.2, we trim trailing
+    // Backward compatibility -- this code used to use sprintf and treated decimal_places <= 0 to
+    // mean to use the default, which was six decimal places. Starting in 10.2, we trim trailing
     // zeroes by default.
     if (decimal_places <= 0) {
         decimal_places = 6;
@@ -739,8 +737,8 @@ std::string
 QUtil::hex_decode(std::string const& input)
 {
     std::string result;
-    // We know result.size() <= 0.5 * input.size() + 1. However, reserving
-    // string space for this upper bound has a negative impact.
+    // We know result.size() <= 0.5 * input.size() + 1. However, reserving string space for this
+    // upper bound has a negative impact.
     bool first = true;
     char decoded;
     for (auto ch: input) {
@@ -1003,15 +1001,12 @@ QUtil::toUTF8(unsigned long uval)
 {
     std::string result;
 
-    // A UTF-8 encoding of a Unicode value is a single byte for
-    // Unicode values <= 127.  For larger values, the first byte of
-    // the UTF-8 encoding has '1' as each of its n highest bits and
-    // '0' for its (n+1)th highest bit where n is the total number of
-    // bytes required.  Subsequent bytes start with '10' and have the
-    // remaining 6 bits free for encoding.  For example, an 11-bit
-    // Unicode value can be stored in two bytes where the first is
-    // 110zzzzz, the second is 10zzzzzz, and the z's represent the
-    // remaining bits.
+    // A UTF-8 encoding of a Unicode value is a single byte for Unicode values <= 127.  For larger
+    // values, the first byte of the UTF-8 encoding has '1' as each of its n highest bits and '0'
+    // for its (n+1)th highest bit where n is the total number of bytes required.  Subsequent bytes
+    // start with '10' and have the remaining 6 bits free for encoding.  For example, an 11-bit
+    // Unicode value can be stored in two bytes where the first is 110zzzzz, the second is 10zzzzzz,
+    // and the z's represent the remaining bits.
 
     if (uval > 0x7fffffff) {
         throw std::runtime_error("bounds error in QUtil::toUTF8");
@@ -1026,8 +1021,7 @@ QUtil::toUTF8(unsigned long uval)
         unsigned char maxval = 0x3f; // six bits
 
         while (uval > QIntC::to_ulong(maxval)) {
-            // Assign low six bits plus 10000000 to lowest unused
-            // byte position, then shift
+            // Assign low six bits plus 10000000 to lowest unused byte position, then shift
             *cur_byte = static_cast<unsigned char>(0x80 + (uval & 0x3f));
             uval >>= 6;
             // Maximum that will fit in high byte now shrinks by one bit
@@ -1038,8 +1032,7 @@ QUtil::toUTF8(unsigned long uval)
             }
             --cur_byte;
         }
-        // If maxval is k bits long, the high (7 - k) bits of the
-        // resulting byte must be high.
+        // If maxval is k bits long, the high (7 - k) bits of the resulting byte must be high.
         *cur_byte = static_cast<unsigned char>(QIntC::to_ulong(0xff - (1 + (maxval << 1))) + uval);
 
         result += reinterpret_cast<char*>(cur_byte);
@@ -1265,8 +1258,7 @@ QUtil::read_lines_from_file(
             if (preserve_eol) {
                 buf->append(1, c);
             } else {
-                // Remove any carriage return that preceded the
-                // newline and discard the newline
+                // Remove any carriage return that preceded the newline and discard the newline
                 if ((!buf->empty()) && ((*(buf->rbegin())) == '\r')) {
                     buf->erase(buf->length() - 1);
                 }
@@ -1391,8 +1383,7 @@ QUtil::parse_numrange(char const* range, int max)
         p = nullptr;
         for (size_t i = 0; i < work.size(); i += 2) {
             int num = work.at(i);
-            // max == 0 means we don't know the max and are just
-            // testing for valid syntax.
+            // max == 0 means we don't know the max and are just testing for valid syntax.
             if ((max > 0) && ((num < 1) || (num > max))) {
                 throw std::runtime_error("number " + QUtil::int_to_string(num) + " out of range");
             }
@@ -1519,21 +1510,18 @@ transcode_utf8(std::string const& utf8_val, std::string& result, encoding_e enco
         result += "\xfe\xff";
         break;
     case e_pdfdoc:
-        // We need to avoid having the result start with something
-        // that will be interpreted as UTF-16 or UTF-8, meaning we
-        // can't end up with a string that starts with "fe ff",
-        // (UTF-16-BE) "ff fe" (UTF-16-LE, not officially part of the
-        // PDF spec, but recognized by most readers including qpdf),
-        // or "ef bb bf" (UTF-8). It's more efficient to check the
-        // input string to see if it will map to one of those
-        // sequences than to check the output string since all cases
-        // start with the same starting character.
+        // We need to avoid having the result start with something that will be interpreted as
+        // UTF-16 or UTF-8, meaning we can't end up with a string that starts with "fe ff",
+        // (UTF-16-BE) "ff fe" (UTF-16-LE, not officially part of the PDF spec, but recognized by
+        // most readers including qpdf), or "ef bb bf" (UTF-8). It's more efficient to check the
+        // input string to see if it will map to one of those sequences than to check the output
+        // string since all cases start with the same starting character.
         if ((len >= 4) && (utf8_val[0] == '\xc3')) {
             static std::string fe_ff("\xbe\xc3\xbf");
             static std::string ff_fe("\xbf\xc3\xbe");
             static std::string ef_bb_bf("\xaf\xc2\xbb\xc2\xbf");
-            // C++-20 has starts_with, but when this was written, qpdf
-            // had a minimum supported version of C++-17.
+            // C++-20 has starts_with, but when this was written, qpdf had a minimum supported
+            // version of C++-17.
             if ((utf8_val.compare(1, 3, fe_ff) == 0) || (utf8_val.compare(1, 3, ff_fe) == 0) ||
                 (utf8_val.compare(1, 5, ef_bb_bf) == 0)) {
                 result += unknown;
@@ -1560,10 +1548,9 @@ transcode_utf8(std::string const& utf8_val, std::string& result, encoding_e enco
             if (encoding == e_utf16) {
                 result += QUtil::toUTF16(QIntC::to_ulong(ch));
             } else if ((encoding == e_pdfdoc) && (((ch >= 0x18) && (ch <= 0x1f)) || (ch == 127))) {
-                // PDFDocEncoding maps some low characters to Unicode,
-                // so if we encounter those invalid UTF-8 code points,
-                // map them to unknown so reversing the mapping
-                // doesn't change them into other characters.
+                // PDFDocEncoding maps some low characters to Unicode, so if we encounter those
+                // invalid UTF-8 code points, map them to unknown so reversing the mapping doesn't
+                // change them into other characters.
                 okay = false;
                 result.append(1, unknown);
             } else {
@@ -1682,10 +1669,9 @@ std::string
 QUtil::utf16_to_utf8(std::string const& val)
 {
     std::string result;
-    // This code uses unsigned long and unsigned short to hold
-    // codepoint values. It requires unsigned long to be at least
-    // 32 bits and unsigned short to be at least 16 bits, but it
-    // will work fine if they are larger.
+    // This code uses unsigned long and unsigned short to hold codepoint values. It requires
+    // unsigned long to be at least 32 bits and unsigned short to be at least 16 bits, but it will
+    // work fine if they are larger.
     unsigned long codepoint = 0L;
     size_t len = val.length();
     size_t start = 0;
@@ -1696,14 +1682,11 @@ QUtil::utf16_to_utf8(std::string const& val)
         }
         start += 2;
     }
-    // If the string has an odd number of bytes, the last byte is
-    // ignored.
+    // If the string has an odd number of bytes, the last byte is ignored.
     for (size_t i = start; i + 1 < len; i += 2) {
-        // Convert from UTF16-BE.  If we get a malformed
-        // codepoint, this code will generate incorrect output
-        // without giving a warning.  Specifically, a high
-        // codepoint not followed by a low codepoint will be
-        // discarded, and a low codepoint not preceded by a high
+        // Convert from UTF16-BE.  If we get a malformed codepoint, this code will generate
+        // incorrect output without giving a warning.  Specifically, a high codepoint not followed
+        // by a low codepoint will be discarded, and a low codepoint not preceded by a high
         // codepoint will just get its low 10 bits output.
         auto msb = is_le ? i + 1 : i;
         auto lsb = is_le ? i : i + 1;
@@ -1829,8 +1812,7 @@ QUtil::possible_repaired_encodings(std::string supplied)
     }
     std::string output;
     if (is_valid_utf8) {
-        // Maybe we were given UTF-8 but wanted one of the single-byte
-        // encodings.
+        // Maybe we were given UTF-8 but wanted one of the single-byte encodings.
         if (utf8_to_pdf_doc(supplied, output)) {
             result.push_back(output);
         }
@@ -1841,8 +1823,7 @@ QUtil::possible_repaired_encodings(std::string supplied)
             result.push_back(output);
         }
     } else {
-        // Maybe we were given one of the single-byte encodings but
-        // wanted UTF-8.
+        // Maybe we were given one of the single-byte encodings but wanted UTF-8.
         std::string from_pdf_doc(pdf_doc_to_utf8(supplied));
         result.push_back(from_pdf_doc);
         std::string from_win_ansi(win_ansi_to_utf8(supplied));
@@ -1850,8 +1831,8 @@ QUtil::possible_repaired_encodings(std::string supplied)
         std::string from_mac_roman(mac_roman_to_utf8(supplied));
         result.push_back(from_mac_roman);
 
-        // Maybe we were given one of the other single-byte encodings
-        // but wanted one of the other ones.
+        // Maybe we were given one of the other single-byte encodings but wanted one of the other
+        // ones.
         if (utf8_to_win_ansi(from_pdf_doc, output)) {
             result.push_back(output);
         }
@@ -1888,9 +1869,8 @@ static int
 call_main_from_wmain(
     bool, int argc, wchar_t const* const argv[], std::function<int(int, char*[])> realmain)
 {
-    // argv contains UTF-16-encoded strings with a 16-bit wchar_t.
-    // Convert this to UTF-8-encoded strings for compatibility with
-    // other systems. That way the rest of qpdf.cc can just act like
+    // argv contains UTF-16-encoded strings with a 16-bit wchar_t. Convert this to UTF-8-encoded
+    // strings for compatibility with other systems. That way the rest of qpdf.cc can just act like
     // arguments are UTF-8.
 
     std::vector<std::unique_ptr<char[]>> utf8_argv;
@@ -1950,16 +1930,13 @@ QUtil::get_max_memory_usage()
         fprintf(stderr, "%s", buf);
     }
 
-    // Warning: this code uses regular expression to extract data from
-    // an XML string. This is generally a bad idea, but we're going to
-    // do it anyway because QUtil.hh warns against using this function
-    // for other than development/testing, and if this function fails
-    // to generate reasonable output during performance testing, it
-    // will be noticed.
+    // Warning: this code uses regular expression to extract data from an XML string. This is
+    // generally a bad idea, but we're going to do it anyway because QUtil.hh warns against using
+    // this function for other than development/testing, and if this function fails to generate
+    // reasonable output during performance testing, it will be noticed.
 
-    // This is my best guess at how to interpret malloc_info. Anyway
-    // it seems to provide useful information for detecting code
-    // changes that drastically change memory usage.
+    // This is my best guess at how to interpret malloc_info. Anyway it seems to provide useful
+    // information for detecting code changes that drastically change memory usage.
     size_t result = 0;
     try {
         std::cregex_iterator m_begin(buf, buf + size, tag_re);

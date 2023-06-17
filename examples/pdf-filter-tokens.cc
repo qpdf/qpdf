@@ -1,7 +1,6 @@
 //
-// This example illustrates the use of QPDFObjectHandle::TokenFilter
-// with addContentTokenFilter. Please see comments inline for details.
-// See also pdf-count-strings.cc for a use of
+// This example illustrates the use of QPDFObjectHandle::TokenFilter with addContentTokenFilter.
+// Please see comments inline for details. See also pdf-count-strings.cc for a use of
 // QPDFObjectHandle::TokenFilter with filterContents.
 //
 
@@ -26,9 +25,8 @@ usage()
     exit(2);
 }
 
-// The StringReverser class is a trivial example of using a token
-// filter. This class only overrides the pure virtual handleToken
-// function and preserves the default handleEOF function.
+// The StringReverser class is a trivial example of using a token filter. This class only overrides
+// the pure virtual handleToken function and preserves the default handleEOF function.
 class StringReverser: public QPDFObjectHandle::TokenFilter
 {
   public:
@@ -39,15 +37,12 @@ class StringReverser: public QPDFObjectHandle::TokenFilter
 void
 StringReverser::handleToken(QPDFTokenizer::Token const& token)
 {
-    // For string tokens, reverse the characters. For other tokens,
-    // just pass them through. Notice that we construct a new string
-    // token and write that, thus allowing the library to handle any
-    // subtleties about properly encoding unprintable characters. This
-    // function doesn't handle multibyte characters at all. It's not
-    // intended to be an example of the correct way to reverse
-    // strings. It's just intended to give a simple example of a
-    // pretty minimal filter and to show an example of writing a
-    // constructed token.
+    // For string tokens, reverse the characters. For other tokens, just pass them through. Notice
+    // that we construct a new string token and write that, thus allowing the library to handle any
+    // subtleties about properly encoding unprintable characters. This function doesn't handle
+    // multibyte characters at all. It's not intended to be an example of the correct way to reverse
+    // strings. It's just intended to give a simple example of a pretty minimal filter and to show
+    // an example of writing a constructed token.
     if (token.getType() == QPDFTokenizer::tt_string) {
         std::string value = token.getValue();
         std::reverse(value.begin(), value.end());
@@ -57,9 +52,8 @@ StringReverser::handleToken(QPDFTokenizer::Token const& token)
     }
 }
 
-// The ColorToGray filter finds all "rg" operators in the content
-// stream and replaces them with "g" operators, thus mapping color to
-// grayscale. Note that it only applies to content streams, not
+// The ColorToGray filter finds all "rg" operators in the content stream and replaces them with "g"
+// operators, thus mapping color to grayscale. Note that it only applies to content streams, not
 // images, so this will not replace color images with grayscale
 // images.
 class ColorToGray: public QPDFObjectHandle::TokenFilter
@@ -99,29 +93,23 @@ ColorToGray::numericValue(QPDFTokenizer::Token const& token)
 void
 ColorToGray::handleToken(QPDFTokenizer::Token const& token)
 {
-    // Track the number of non-ignorable tokens we've seen. If we see
-    // an "rg" following three numbers, convert it to a grayscale
-    // value. Keep writing tokens to the output as we can.
+    // Track the number of non-ignorable tokens we've seen. If we see an "rg" following three
+    // numbers, convert it to a grayscale value. Keep writing tokens to the output as we can.
 
-    // There are several things to notice here. We keep two stacks:
-    // one of "meaningful" tokens, and one of all tokens. This way we
-    // can preserve whitespace or comments that we encounter in the
-    // stream and there preserve layout. As we receive tokens, we keep
-    // the last four meaningful tokens. If we see three numbers
-    // followed by rg, we use the three numbers to calculate a gray
-    // value that is perceptually similar to the color value and then
-    // write the "g" operator to the output, discarding any spaces or
-    // comments encountered embedded in the "rg" operator.
+    // There are several things to notice here. We keep two stacks: one of "meaningful" tokens, and
+    // one of all tokens. This way we can preserve whitespace or comments that we encounter in the
+    // stream and there preserve layout. As we receive tokens, we keep the last four meaningful
+    // tokens. If we see three numbers followed by rg, we use the three numbers to calculate a gray
+    // value that is perceptually similar to the color value and then write the "g" operator to the
+    // output, discarding any spaces or comments encountered embedded in the "rg" operator.
 
-    // The stack and all_stack members are updated in such a way that
-    // they always contain exactly the same non-ignorable tokens. The
-    // stack member contains the tokens that would be left if you
+    // The stack and all_stack members are updated in such a way that they always contain exactly
+    // the same non-ignorable tokens. The stack member contains the tokens that would be left if you
     // removed all space and comment tokens from all_stack.
 
-    // On each new token, flush out any space or comment tokens. Store
-    // the incoming token. If we just got an rg preceded by the right
-    // kinds of operands, replace the command. Flush any additional
-    // accumulated tokens to keep the stack only four tokens deep.
+    // On each new token, flush out any space or comment tokens. Store the incoming token. If we
+    // just got an rg preceded by the right kinds of operands, replace the command. Flush any
+    // additional accumulated tokens to keep the stack only four tokens deep.
 
     while ((!this->all_stack.empty()) && isIgnorable(this->all_stack.at(0).getType())) {
         writeToken(this->all_stack.at(0));
@@ -182,11 +170,9 @@ main(int argc, char* argv[])
         QPDF pdf;
         pdf.processFile(infilename);
         for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
-            // Attach two token filters to each page of this file.
-            // When the file is written, or when the pages' contents
-            // are retrieved in any other way, the filters will be
-            // applied. See comments on the filters for additional
-            // details.
+            // Attach two token filters to each page of this file. When the file is written, or when
+            // the pages' contents are retrieved in any other way, the filters will be applied. See
+            // comments on the filters for additional details.
             page.addContentTokenFilter(
                 std::shared_ptr<QPDFObjectHandle::TokenFilter>(new StringReverser));
             page.addContentTokenFilter(

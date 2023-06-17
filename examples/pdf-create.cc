@@ -1,7 +1,6 @@
 //
-// This is an example of creating a PDF file from scratch. It
-// illustrates use of several QPDF operations for creating objects and
-// streams. It also serves as an illustration of how to use
+// This is an example of creating a PDF file from scratch. It illustrates use of several QPDF
+// operations for creating objects and streams. It also serves as an illustration of how to use
 // StreamDataProvider with different types of filters.
 //
 
@@ -20,8 +19,8 @@
 
 static char const* whoami = nullptr;
 
-// This is a simple StreamDataProvider that writes image data for an
-// orange square of the given width and height.
+// This is a simple StreamDataProvider that writes image data for an orange square of the given
+// width and height.
 class ImageProvider: public QPDFObjectHandle::StreamDataProvider
 {
   public:
@@ -130,8 +129,7 @@ usage()
 static QPDFObjectHandle
 createPageContents(QPDF& pdf, std::string const& text)
 {
-    // Create a stream that displays our image and the given text in
-    // our font.
+    // Create a stream that displays our image and the given text in our font.
     std::string contents = "BT /F1 24 Tf 72 320 Td (" + text +
         ") Tj ET\n"
         "q 244 0 0 144 184 100 cm /Im1 Do Q\n";
@@ -159,11 +157,9 @@ add_page(
 {
     QPDF& pdf(dh.getQPDF());
 
-    // Create a stream to encode our image. QPDFWriter will fill in
-    // the length and will respect our filters based on stream data
-    // mode. Since we are not specifying, QPDFWriter will compress
-    // with /FlateDecode if we don't provide any other form of
-    // compression.
+    // Create a stream to encode our image. QPDFWriter will fill in the length and will respect our
+    // filters based on stream data mode. Since we are not specifying, QPDFWriter will compress with
+    // /FlateDecode if we don't provide any other form of compression.
     auto* p = new ImageProvider(color_space, filter);
     std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider(p);
     size_t width = p->getWidth();
@@ -219,20 +215,17 @@ check(
     std::vector<std::string> const& color_spaces,
     std::vector<std::string> const& filters)
 {
-    // Each stream is compressed the way it is supposed to be. We will
-    // add additional tests in qpdf.test to exercise QPDFWriter more
-    // fully. In this case, we want to make sure that we actually have
-    // RunLengthDecode and DCTDecode where we are supposed to and
-    // FlateDecode where we provided no filters.
+    // Each stream is compressed the way it is supposed to be. We will add additional tests in
+    // qpdf.test to exercise QPDFWriter more fully. In this case, we want to make sure that we
+    // actually have RunLengthDecode and DCTDecode where we are supposed to and FlateDecode where we
+    // provided no filters.
 
-    // Each image is correct. For non-lossy image compression, the
-    // uncompressed image data should exactly match what ImageProvider
-    // provided. For the DCTDecode data, allow for some fuzz to handle
-    // jpeg compression as well as its variance on different systems.
+    // Each image is correct. For non-lossy image compression, the uncompressed image data should
+    // exactly match what ImageProvider provided. For the DCTDecode data, allow for some fuzz to
+    // handle jpeg compression as well as its variance on different systems.
 
-    // These tests should use QPDFObjectHandle's stream data retrieval
-    // methods, but don't try to fully exercise them here. That is
-    // done elsewhere.
+    // These tests should use QPDFObjectHandle's stream data retrieval methods, but don't try to
+    // fully exercise them here. That is done elsewhere.
 
     size_t n_color_spaces = color_spaces.size();
     size_t n_filters = filters.size();
@@ -254,8 +247,8 @@ check(
         // Check filter and color space.
         std::string desired_color_space = color_spaces[(pageno - 1) / n_color_spaces];
         std::string desired_filter = filters[(pageno - 1) % n_filters];
-        // In the default mode, QPDFWriter will compress with
-        // /FlateDecode if no filters are provided.
+        // In the default mode, QPDFWriter will compress with /FlateDecode if no filters are
+        // provided.
         if (desired_filter == "null") {
             desired_filter = "/FlateDecode";
         }
@@ -288,11 +281,9 @@ check(
                 std::cout << "page " << pageno << ": image data length mismatch" << std::endl;
                 this_errors = errors = true;
             } else {
-                // Compare bytes. For JPEG, allow a certain number of
-                // the bytes to be off desired by more than a given
-                // tolerance. Any of the samples may be a little off
-                // because of lossy compression, and around sharp
-                // edges, things can be quite off. For non-lossy
+                // Compare bytes. For JPEG, allow a certain number of the bytes to be off desired by
+                // more than a given tolerance. Any of the samples may be a little off because of
+                // lossy compression, and around sharp edges, things can be quite off. For non-lossy
                 // compression, do not allow any tolerance.
                 unsigned char const* actual_bytes = actual_data->getBuffer();
                 unsigned char const* desired_bytes = desired_data->getBuffer();
@@ -332,8 +323,7 @@ create_pdf(char const* filename)
     // Start with an empty PDF that has no pages or non-required objects.
     pdf.emptyPDF();
 
-    // Add an indirect object to contain a font descriptor for the
-    // built-in Helvetica font.
+    // Add an indirect object to contain a font descriptor for the built-in Helvetica font.
     QPDFObjectHandle font = pdf.makeIndirectObject(
         // line-break
         "<<"
@@ -362,8 +352,7 @@ create_pdf(char const* filename)
     QPDFWriter w(pdf, filename);
     w.write();
 
-    // For test suite, verify that everything is the way it is
-    // supposed to be.
+    // For test suite, verify that everything is the way it is supposed to be.
     check(filename, color_spaces, filters);
 }
 

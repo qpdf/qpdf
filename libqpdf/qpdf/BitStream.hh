@@ -12,8 +12,7 @@ class BitStream
     void reset();
     unsigned long long getBits(size_t nbits);
     long long getBitsSigned(size_t nbits);
-    // Only call getBitsInt when requesting a number of bits that will
-    // definitely fit in an int.
+    // Only call getBitsInt when requesting a number of bits that definitely fit in an int.
     int getBitsInt(size_t nbits);
     void skipToNextByte();
 

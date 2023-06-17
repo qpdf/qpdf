@@ -3,10 +3,9 @@
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QUtil.hh>
 
-// This example demonstrates how we can redirect where saved output
-// goes by calling the default logger's setSave method before running
-// something with QPDFJob. See qpdfjob-c-save-attachment.c for an
-// implementation that uses the C API.
+// This example demonstrates how we can redirect where saved output goes by calling the default
+// logger's setSave method before running something with QPDFJob. See qpdfjob-c-save-attachment.c
+// for an implementation that uses the C API.
 
 int
 main(int argc, char* argv[])

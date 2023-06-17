@@ -1,7 +1,4 @@
-/*
- * This is an example program to linearize a PDF file using the C
- * QPDFJob API.
- */
+/* This is an example program to linearize a PDF file using the C QPDFJob API. */
 
 #include <qpdf/qpdfjob-c.h>
 #include <stdio.h>
@@ -48,14 +45,12 @@ main(int argc, char* argv[])
     new_argv[4] = "--static-id"; /* for testing only */
     new_argv[5] = NULL;
 
-    /* See qpdf-job.cc for a C++ example of using the json interface.
-     * To use that from C just like the argv one, call
-     * qpdfjob_run_from_json instead and pass the json string as a
-     * single char const* argument.
+    /* See qpdf-job.cc for a C++ example of using the json interface. To use that from C just like
+     * the argv one, call qpdfjob_run_from_json instead and pass the json string as a single char
+     * const* argument.
      *
-     * See qpdfjob-c-save-attachment.c for an example of using the
-     * full form of the qpdfjob interface with init and cleanup
-     * functions.
+     * See qpdfjob-c-save-attachment.c for an example of using the full form of the qpdfjob
+     * interface with init and cleanup functions.
      */
     r = qpdfjob_run_from_argv(new_argv);
     return r;

@@ -54,13 +54,10 @@ QPDFAnnotationObjectHelper::getAppearanceStream(std::string const& which, std::s
     if (ap.isDictionary()) {
         QPDFObjectHandle ap_sub = ap.getKey(which);
         if (ap_sub.isStream()) {
-            // According to the spec, Appearance State is supposed to
-            // refer to a subkey of the appearance stream when /AP is
-            // a dictionary, but files have been seen in the wild
-            // where Appearance State is `/N` and `/AP` is a stream.
-            // Therefore, if `which` points to a stream, disregard
-            // state and just use the stream. See qpdf issue #949 for
-            // details.
+            // According to the spec, Appearance State is supposed to refer to a subkey of the
+            // appearance stream when /AP is a dictionary, but files have been seen in the wild
+            // where Appearance State is `/N` and `/AP` is a stream. Therefore, if `which` points to
+            // a stream, disregard state and just use the stream. See qpdf issue #949 for details.
             QTC::TC("qpdf", "QPDFAnnotationObjectHelper AP stream");
             return ap_sub;
         }
@@ -85,84 +82,66 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
         return "";
     }
 
-    // The appearance matrix computed by this method is the
-    // transformation matrix that needs to be in effect when drawing
-    // this annotation's appearance stream on the page. The algorithm
-    // for computing the appearance matrix described in section 12.5.5
-    // of the ISO-32000 PDF spec is similar but not identical to what
-    // we are doing here.
+    // The appearance matrix computed by this method is the transformation matrix that needs to be
+    // in effect when drawing this annotation's appearance stream on the page. The algorithm for
+    // computing the appearance matrix described in section 12.5.5 of the ISO-32000 PDF spec is
+    // similar but not identical to what we are doing here.
 
-    // When rendering an appearance stream associated with an
-    // annotation, there are four relevant components:
+    // When rendering an appearance stream associated with an annotation, there are four relevant
+    // components:
     //
     // * The appearance stream's bounding box (/BBox)
     // * The appearance stream's matrix (/Matrix)
     // * The annotation's rectangle (/Rect)
-    // * In the case of form fields with the NoRotate flag, the
-    //   page's rotation
+    // * In the case of form fields with the NoRotate flag, the page's rotation
 
-    // When rendering a form xobject in isolation, just drawn with a
-    // /Do operator, there is no form field, so page rotation is not
-    // relevant, and there is no annotation, so /Rect is not relevant,
-    // so only /BBox and /Matrix are relevant. The effect of these are
-    // as follows:
+    // When rendering a form xobject in isolation, just drawn with a /Do operator, there is no form
+    // field, so page rotation is not relevant, and there is no annotation, so /Rect is not
+    // relevant, so only /BBox and /Matrix are relevant. The effect of these are as follows:
 
     // * /BBox is treated as a clipping region
-    // * /Matrix is applied as a transformation prior to rendering the
-    //   appearance stream.
+    // * /Matrix is applied as a transformation prior to rendering the appearance stream.
 
-    // There is no relationship between /BBox and /Matrix in this
-    // case.
+    // There is no relationship between /BBox and /Matrix in this case.
 
-    // When rendering a form xobject in the context of an annotation,
-    // things are a little different. In particular, a matrix is
-    // established such that /BBox, when transformed by /Matrix, would
-    // fit completely inside of /Rect. /BBox is no longer a clipping
-    // region. To illustrate the difference, consider a /Matrix of
-    // [2 0 0 2 0 0], which is scaling by a factor of two along both
-    // axes. If the appearance stream drew a rectangle equal to /BBox,
-    // in the case of the form xobject in isolation, this matrix would
-    // cause only the lower-left quadrant of the rectangle to be
-    // visible since the scaling would cause the rest of it to fall
-    // outside of the clipping region. In the case of the form xobject
-    // displayed in the context of an annotation, such a matrix would
-    // have no effect at all because it would be applied to the
-    // bounding box first, and then when the resulting enclosing
-    // quadrilateral was transformed to fit into /Rect, the effect of
-    // the scaling would be undone.
+    // When rendering a form xobject in the context of an annotation, things are a little different.
+    // In particular, a matrix is established such that /BBox, when transformed by /Matrix, would
+    // fit completely inside of /Rect. /BBox is no longer a clipping region. To illustrate the
+    // difference, consider a /Matrix of [2 0 0 2 0 0], which is scaling by a factor of two along
+    // both axes. If the appearance stream drew a rectangle equal to /BBox, in the case of the form
+    // xobject in isolation, this matrix would cause only the lower-left quadrant of the rectangle
+    // to be visible since the scaling would cause the rest of it to fall outside of the clipping
+    // region. In the case of the form xobject displayed in the context of an annotation, such a
+    // matrix would have no effect at all because it would be applied to the bounding box first, and
+    // then when the resulting enclosing quadrilateral was transformed to fit into /Rect, the effect
+    // of the scaling would be undone.
 
-    // Our job is to create a transformation matrix that compensates
-    // for these differences so that the appearance stream of an
-    // annotation can be drawn as a regular form xobject.
+    // Our job is to create a transformation matrix that compensates for these differences so that
+    // the appearance stream of an annotation can be drawn as a regular form xobject.
 
-    // To do this, we perform the following steps, which overlap
-    // significantly with the algorithm in 12.5.5:
+    // To do this, we perform the following steps, which overlap significantly with the algorithm
+    // in 12.5.5:
 
-    // 1. Transform the four corners of /BBox by applying /Matrix to
-    //    them, creating an arbitrarily transformed quadrilateral.
+    // 1. Transform the four corners of /BBox by applying /Matrix to them, creating an arbitrarily
+    //    transformed quadrilateral.
 
-    // 2. Find the minimum upright rectangle that encompasses the
-    //    resulting quadrilateral. This is the "transformed appearance
-    //    box", T.
+    // 2. Find the minimum upright rectangle that encompasses the resulting quadrilateral. This is
+    //    the "transformed appearance box", T.
 
-    // 3. Compute matrix A that maps the lower left and upper right
-    //    corners of T to the annotation's /Rect. This can be done by
-    //    scaling so that the sizes match and translating so that the
+    // 3. Compute matrix A that maps the lower left and upper right corners of T to the annotation's
+    //    /Rect. This can be done by scaling so that the sizes match and translating so that the
     //    scaled T exactly overlaps /Rect.
 
-    // If the annotation's /F flag has bit 4 set, this means that
-    // annotation is to be rotated about its upper left corner to
-    // counteract any rotation of the page so it remains upright. To
+    // If the annotation's /F flag has bit 4 set, this means that annotation is to be rotated about
+    // its upper left corner to counteract any rotation of the page so it remains upright. To
     // achieve this effect, we do the following extra steps:
 
-    // 1. Perform the rotation on /BBox box prior to transforming it
-    //    with /Matrix (by replacing matrix with concatenation of
-    //    matrix onto the rotation)
+    // 1. Perform the rotation on /BBox box prior to transforming it with /Matrix (by replacing
+    //    matrix with concatenation of matrix onto the rotation)
 
     // 2. Rotate the destination rectangle by the specified amount
 
-    // 3. Apply the rotation to A as computed above to get the final
-    //    appearance matrix.
+    // 3. Apply the rotation to A as computed above to get the final appearance matrix.
 
     QPDFObjectHandle rect_obj = this->oh.getKey("/Rect");
     QPDFObjectHandle as = getAppearanceStream("/N").getDict();
@@ -192,14 +171,12 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
     QPDFObjectHandle::Rectangle rect = rect_obj.getArrayAsRectangle();
     bool do_rotate = (rotate && (flags & an_no_rotate));
     if (do_rotate) {
-        // If the the annotation flags include the NoRotate bit and
-        // the page is rotated, we have to rotate the annotation about
-        // its upper left corner by the same amount in the opposite
-        // direction so that it will remain upright in absolute
-        // coordinates. Since the semantics of /Rotate for a page are
-        // to rotate the page, while the effect of rotating using a
-        // transformation matrix is to rotate the coordinate system,
-        // the opposite directionality is explicit in the code.
+        // If the the annotation flags include the NoRotate bit and the page is rotated, we have to
+        // rotate the annotation about its upper left corner by the same amount in the opposite
+        // direction so that it will remain upright in absolute coordinates. Since the semantics of
+        // /Rotate for a page are to rotate the page, while the effect of rotating using a
+        // transformation matrix is to rotate the coordinate system, the opposite directionality is
+        // explicit in the code.
         QPDFMatrix mr;
         mr.rotatex90(rotate);
         mr.concat(matrix);

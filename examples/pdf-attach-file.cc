@@ -8,11 +8,10 @@
 #include <iostream>
 
 //
-// This example attaches a file to an input file, adds a page to the
-// beginning of the file that includes a file attachment annotation,
-// and writes the result to an output file. It also illustrates a
-// number of new API calls that were added in qpdf 10.2 as well as
-// the use of the qpdf literal syntax introduced in qpdf 10.6.
+// This example attaches a file to an input file, adds a page to the beginning of the file that
+// includes a file attachment annotation, and writes the result to an output file. It also
+// illustrates a number of new API calls that were added in qpdf 10.2 as well as the use of the qpdf
+// literal syntax introduced in qpdf 10.6.
 //
 
 static char const* whoami = nullptr;
@@ -43,8 +42,8 @@ process(
     QPDF q;
     q.processFile(infilename, password);
 
-    // Create an indirect object for the built-in Helvetica font. This
-    // uses the qpdf literal syntax introduced in qpdf 10.6.
+    // Create an indirect object for the built-in Helvetica font. This uses the qpdf literal syntax
+    // introduced in qpdf 10.6.
     auto f1 = q.makeIndirectObject(
         // force line-break
         "<<"
@@ -55,9 +54,8 @@ process(
         "  /Encoding /WinAnsiEncoding"
         ">>"_qpdf);
 
-    // Create a resources dictionary with fonts. This uses the new
-    // parse introduced in qpdf 10.2 that takes a QPDF* and allows
-    // indirect object references.
+    // Create a resources dictionary with fonts. This uses the new parse introduced in qpdf 10.2
+    // that takes a QPDF* and allows indirect object references.
     auto resources = q.makeIndirectObject(
         // line-break
         QPDFObjectHandle::parse(
@@ -97,8 +95,8 @@ process(
                           "S\n");
     auto apdict = ap.getDict();
 
-    // The following four lines demonstrate the use of the qpdf literal syntax
-    // introduced in qpdf 10.6. They could have been written as:
+    // The following four lines demonstrate the use of the qpdf literal syntax introduced in
+    // qpdf 10.6. They could have been written as:
     // apdict.replaceKey("/Resources", QPDFObjectHandle::newDictionary());
     // apdict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
     // apdict.replaceKey("/Subtype", QPDFObjectHandle::newName("/Form"));

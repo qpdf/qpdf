@@ -89,10 +89,9 @@ SecureRandomDataProvider::provideRandomData(unsigned char* data, size_t len)
 
 # elif defined(RANDOM_DEVICE)
 
-    // Optimization: wrap the file open and close in a class so that
-    // the file is closed in a destructor, then make this static to
-    // keep the file handle open.  Only do this if it can be done in a
-    // thread-safe fashion.
+    // Optimization: wrap the file open and close in a class so that the file is closed in a
+    // destructor, then make this static to keep the file handle open.  Only do this if it can be
+    // done in a thread-safe fashion.
     FILE* f = QUtil::safe_fopen(RANDOM_DEVICE, "rb");
     size_t fr = fread(data, 1, len, f);
     fclose(f);

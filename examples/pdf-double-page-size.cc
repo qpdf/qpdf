@@ -14,18 +14,16 @@ void
 usage()
 {
     std::cerr << "Usage: " << whoami << " infile.pdf outfile.pdf [in-password]" << std::endl
-              << "Double size of all pages in infile.pdf;"
-              << " write output to outfile.pdf" << std::endl;
+              << "Double size of all pages in infile.pdf; write output to outfile.pdf" << std::endl;
     exit(2);
 }
 
-// If there is a box of name box_name, replace it with a new box whose
-// elements are double the values of the original box.
+// If there is a box of name box_name, replace it with a new box whose elements are double the
+// values of the original box.
 static void
 doubleBoxSize(QPDFPageObjectHelper& page, char const* box_name)
 {
-    // We need to use getAttribute rather than getKey as some boxes could
-    // be inherited.
+    // We need to use getAttribute rather than getKey as some boxes could be inherited.
     auto box = page.getAttribute(box_name, true);
     if (box.isNull()) {
         return;

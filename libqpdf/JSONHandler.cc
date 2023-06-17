@@ -133,12 +133,10 @@ JSONHandler::handle(std::string const& path, JSON j)
     }
 
     if (!handled) {
-        // It would be nice to include information about what type the
-        // object was and what types were allowed, but we're relying
-        // on schema validation to make sure input is properly
-        // structured before calling the handlers. It would be
-        // different if this code were trying to be part of a
-        // general-purpose JSON package.
+        // It would be nice to include information about what type the object was and what types
+        // were allowed, but we're relying on schema validation to make sure input is properly
+        // structured before calling the handlers. It would be different if this code were trying to
+        // be part of a general-purpose JSON package.
         QTC::TC("libtests", "JSONHandler unhandled value");
         usage("JSON handler: value at " + path + " is not of expected type");
     }

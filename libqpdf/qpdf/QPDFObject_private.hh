@@ -1,9 +1,8 @@
 #ifndef QPDFOBJECT_HH
 #define QPDFOBJECT_HH
 
-// NOTE: This file is called QPDFObject_private.hh instead of
-// QPDFObject.hh because of include/qpdf/QPDFObject.hh. See comments
-// there for an explanation.
+// NOTE: This file is called QPDFObject_private.hh instead of QPDFObject.hh because of
+// include/qpdf/QPDFObject.hh. See comments there for an explanation.
 
 #include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
@@ -51,8 +50,7 @@ class QPDFObject
         return value->type_code;
     }
 
-    // Return a string literal that describes the type, useful for
-    // debugging and testing
+    // Return a string literal that describes the type, useful for debugging and testing
     char const*
     getTypeName() const
     {
@@ -146,14 +144,12 @@ class QPDFObject
     void
     disconnect()
     {
-        // Disconnect an object from its owning QPDF. This is called
-        // by QPDF's destructor.
+        // Disconnect an object from its owning QPDF. This is called by QPDF's destructor.
         value->disconnect();
         value->qpdf = nullptr;
         value->og = QPDFObjGen();
     }
-    // Mark an object as destroyed. Used by QPDF's destructor for its
-    // indirect objects.
+    // Mark an object as destroyed. Used by QPDF's destructor for its indirect objects.
     void destroy();
 
     bool

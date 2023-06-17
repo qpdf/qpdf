@@ -13,8 +13,8 @@ void
 usage()
 {
     std::cerr << "Usage: " << whoami << " filename page-number" << std::endl
-              << "Prints a dump of the objects in the content streams"
-              << " of the given page." << std::endl
+              << "Prints a dump of the objects in the content streams of the given page."
+              << std::endl
               << "Pages are numbered from 1." << std::endl;
     exit(2);
 }

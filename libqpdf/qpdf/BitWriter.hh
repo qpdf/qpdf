@@ -10,8 +10,8 @@ class Pipeline;
 class BitWriter
 {
   public:
-    // Write bits to the pipeline.  It is the caller's responsibility
-    // to eventually call finish on the pipeline.
+    // Write bits to the pipeline.  It is the caller's responsibility to eventually call finish on
+    // the pipeline.
     BitWriter(Pipeline* pl);
     void writeBits(unsigned long long val, size_t bits);
     void writeBitsSigned(long long val, size_t bits);

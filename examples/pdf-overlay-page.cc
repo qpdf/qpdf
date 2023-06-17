@@ -6,10 +6,9 @@
 #include <cstdlib>
 #include <iostream>
 
-// This program demonstrates use of form XObjects to overlay a page
-// from one file onto all pages of another file. The qpdf program's
-// --overlay and --underlay options provide a more general version of
-// this capability.
+// This program demonstrates use of form XObjects to overlay a page from one file onto all pages of
+// another file. The qpdf program's --overlay and --underlay options provide a more general version
+// of this capability.
 
 static char const* whoami = nullptr;
 
@@ -44,24 +43,21 @@ stamp_page(char const* infile, char const* stampfile, char const* outfile)
         int min_suffix = 1;
         std::string name = resources.getUniqueResourceName("/Fx", min_suffix);
 
-        // Generate content to place the form XObject centered within
-        // destination page's trim box.
+        // Generate content to place the form XObject centered within destination page's trim box.
         QPDFMatrix m;
         std::string content =
             ph.placeFormXObject(stamp_fo, name, ph.getTrimBox().getArrayAsRectangle(), m);
         if (!content.empty()) {
-            // Append the content to the page's content. Surround the
-            // original content with q...Q to the new content from the
-            // page's original content.
+            // Append the content to the page's content. Surround the original content with q...Q to
+            // the new content from the page's original content.
             resources.mergeResources("<< /XObject << >> >>"_qpdf);
             resources.getKey("/XObject").replaceKey(name, stamp_fo);
             ph.addPageContents(inpdf.newStream("q\n"), true);
             ph.addPageContents(inpdf.newStream("\nQ\n" + content), false);
         }
-        // Copy the annotations and form fields from the original page
-        // to the new page. For more efficiency when copying multiple
-        // pages, we can create a QPDFAcroFormDocumentHelper and pass
-        // it in. See comments in QPDFPageObjectHelper.hh for details.
+        // Copy the annotations and form fields from the original page to the new page. For more
+        // efficiency when copying multiple pages, we can create a QPDFAcroFormDocumentHelper and
+        // pass it in. See comments in QPDFPageObjectHelper.hh for details.
         ph.copyAnnotations(stamp_page_1, m);
     }
 

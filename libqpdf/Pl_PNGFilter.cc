@@ -33,8 +33,8 @@ Pl_PNGFilter::Pl_PNGFilter(
     }
     if (!((bits_per_sample == 1) || (bits_per_sample == 2) || (bits_per_sample == 4) ||
           (bits_per_sample == 8) || (bits_per_sample == 16))) {
-        throw std::runtime_error("PNGFilter created with invalid bits_per_sample not"
-                                 " 1, 2, 4, 8, or 16");
+        throw std::runtime_error(
+            "PNGFilter created with invalid bits_per_sample not 1, 2, 4, 8, or 16");
     }
     this->bytes_per_pixel = ((bits_per_sample * samples_per_pixel) + 7) / 8;
     unsigned long long bpr = ((columns * bits_per_sample * samples_per_pixel) + 7) / 8;

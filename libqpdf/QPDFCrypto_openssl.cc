@@ -83,8 +83,8 @@ static void
 check_openssl(int status)
 {
     if (status != 1) {
-        // OpenSSL creates a "queue" of errors; copy the first (innermost)
-        // error to the exception message.
+        // OpenSSL creates a "queue" of errors; copy the first (innermost) error to the exception
+        // message.
         char buf[256] = "";
         ERR_error_string_n(ERR_get_error(), buf, sizeof(buf));
         std::string what = "OpenSSL error: ";

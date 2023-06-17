@@ -78,8 +78,7 @@ MD5::encodeFile(char const* filename, qpdf_offset_t up_to_offset)
         }
     } while (len > 0);
     if (ferror(file)) {
-        // Assume, perhaps incorrectly, that errno was set by the
-        // underlying call to read....
+        // Assume, perhaps incorrectly, that errno was set by the underlying call to read....
         (void)fclose(file);
         QUtil::throw_system_error(std::string("MD5: read error on ") + filename);
     }

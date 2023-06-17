@@ -16,16 +16,14 @@ Pl_Flate::Members::Members(size_t out_bufsize, action_e action) :
     zdata(nullptr)
 {
     this->outbuf = QUtil::make_shared_array<unsigned char>(out_bufsize);
-    // Indirect through zdata to reach the z_stream so we don't have
-    // to include zlib.h in Pl_Flate.hh.  This means people using
-    // shared library versions of qpdf don't have to have zlib
-    // development files available, which particularly helps in a
-    // Windows environment.
+    // Indirect through zdata to reach the z_stream so we don't have to include zlib.h in
+    // Pl_Flate.hh.  This means people using shared library versions of qpdf don't have to have zlib
+    // development files available, which particularly helps in a Windows environment.
     this->zdata = new z_stream;
 
     if (out_bufsize > UINT_MAX) {
-        throw std::runtime_error("Pl_Flate: zlib doesn't support buffer"
-                                 " sizes larger than unsigned int");
+        throw std::runtime_error(
+            "Pl_Flate: zlib doesn't support buffer sizes larger than unsigned int");
     }
 
     z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
@@ -62,8 +60,7 @@ Pl_Flate::Pl_Flate(
 
 Pl_Flate::~Pl_Flate()
 {
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
-    // README-maintainer
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
 }
 
 void
@@ -88,8 +85,7 @@ Pl_Flate::write(unsigned char const* data, size_t len)
             this->identifier + ": Pl_Flate: write() called after finish() called");
     }
 
-    // Write in chunks in case len is too big to fit in an int.
-    // Assume int is at least 32 bits.
+    // Write in chunks in case len is too big to fit in an int. Assume int is at least 32 bits.
     static size_t const max_bytes = 1 << 30;
     size_t bytes_left = len;
     unsigned char const* buf = data;
@@ -105,20 +101,18 @@ void
 Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
 {
     if (len > UINT_MAX) {
-        throw std::runtime_error("Pl_Flate: zlib doesn't support data"
-                                 " blocks larger than int");
+        throw std::runtime_error("Pl_Flate: zlib doesn't support data blocks larger than int");
     }
     z_stream& zstream = *(static_cast<z_stream*>(m->zdata));
-    // zlib is known not to modify the data pointed to by next_in but
-    // doesn't declare the field value const unless compiled to do so.
+    // zlib is known not to modify the data pointed to by next_in but doesn't declare the field
+    // value const unless compiled to do so.
     zstream.next_in = const_cast<unsigned char*>(data);
     zstream.avail_in = QIntC::to_uint(len);
 
     if (!m->initialized) {
         int err = Z_OK;
 
-        // deflateInit and inflateInit are macros that use old-style
-        // casts.
+        // deflateInit and inflateInit are macros that use old-style casts.
 #if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || defined(__clang__))
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -147,21 +141,18 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
         }
         if ((m->action == a_inflate) && (err != Z_OK) && zstream.msg &&
             (strcmp(zstream.msg, "incorrect data check") == 0)) {
-            // Other PDF readers ignore this specific error. Combining
-            // this with Z_SYNC_FLUSH enables qpdf to handle some
-            // broken zlib streams without losing data.
+            // Other PDF readers ignore this specific error. Combining this with Z_SYNC_FLUSH
+            // enables qpdf to handle some broken zlib streams without losing data.
             err = Z_STREAM_END;
         }
         switch (err) {
         case Z_BUF_ERROR:
-            // Probably shouldn't be able to happen, but possible as a
-            // boundary condition: if the last call to inflate exactly
-            // filled the output buffer, it's possible that the next
-            // call to inflate could have nothing to do. There are PDF
-            // files in the wild that have this error (including at
-            // least one in qpdf's test suite). In some cases, we want
-            // to know about this, because it indicates incorrect
-            // compression, so call a callback if provided.
+            // Probably shouldn't be able to happen, but possible as a boundary condition: if the
+            // last call to inflate exactly filled the output buffer, it's possible that the next
+            // call to inflate could have nothing to do. There are PDF files in the wild that have
+            // this error (including at least one in qpdf's test suite). In some cases, we want to
+            // know about this, because it indicates incorrect compression, so call a callback if
+            // provided.
             this->warn("input stream is complete but output may still be valid", err);
             done = true;
             break;
@@ -173,9 +164,8 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
         case Z_OK:
             {
                 if ((zstream.avail_in == 0) && (zstream.avail_out > 0)) {
-                    // There is nothing left to read, and there was
-                    // sufficient buffer space to write everything we
-                    // needed, so we're done for now.
+                    // There is nothing left to read, and there was sufficient buffer space to write
+                    // everything we needed, so we're done for now.
                     done = true;
                 }
                 uLong ready = QIntC::to_ulong(m->out_bufsize - zstream.avail_out);

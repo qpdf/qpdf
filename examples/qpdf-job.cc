@@ -3,8 +3,7 @@
 
 #include <iostream>
 
-// This program is a simple demonstration of different ways to use the
-// QPDFJob API.
+// This program is a simple demonstration of different ways to use the QPDFJob API.
 
 static char const* whoami = nullptr;
 
@@ -28,10 +27,9 @@ main(int argc, char* argv[])
         usage();
     }
 
-    // The examples below all catch std::exception. Note that
-    // QPDFUsage can be caught separately to report on errors in using
-    // the API itself. For CLI, this is command-line usage. For JSON
-    // or the API, it would be errors from the equivalent invocation.
+    // The examples below all catch std::exception. Note that QPDFUsage can be caught separately to
+    // report on errors in using the API itself. For CLI, this is command-line usage. For JSON or
+    // the API, it would be errors from the equivalent invocation.
 
     // Note that staticId is used for testing only.
 

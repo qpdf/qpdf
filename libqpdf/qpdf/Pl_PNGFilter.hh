@@ -1,11 +1,11 @@
 #ifndef PL_PNGFILTER_HH
 #define PL_PNGFILTER_HH
 
-// This pipeline applies or reverses the application of a PNG filter
-// as described in the PNG specification.
+// This pipeline applies or reverses the application of a PNG filter as described in the PNG
+// specification.
 
-// NOTE: In its current implementation, this filter always encodes
-// using the "up" filter, but it decodes all the filters.
+// NOTE: In its current implementation, this filter always encodes using the "up" filter, but it
+// decodes all the filters.
 
 #include <qpdf/Pipeline.hh>
 

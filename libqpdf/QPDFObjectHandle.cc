@@ -229,11 +229,9 @@ QPDFObjectHandle::isSameObjectAs(QPDFObjectHandle const& rhs) const
 void
 QPDFObjectHandle::disconnect()
 {
-    // Recursively remove association with any QPDF object. This
-    // method may only be called during final destruction.
-    // QPDF::~QPDF() calls it for indirect objects using the object
-    // pointer itself, so we don't do that here. Other objects call it
-    // through this method.
+    // Recursively remove association with any QPDF object. This method may only be called during
+    // final destruction. QPDF::~QPDF() calls it for indirect objects using the object pointer
+    // itself, so we don't do that here. Other objects call it through this method.
     if (!isIndirect()) {
         this->obj->disconnect();
     }
@@ -1783,10 +1781,9 @@ QPDFObjectHandle::parseContentStream_data(
     tokenizer.allowEOF();
     bool empty = false;
     while (QIntC::to_size(input->tell()) < stream_length) {
-        // Read a token and seek to the beginning. The offset we get
-        // from this process is the beginning of the next
-        // non-ignorable (space, comment) token. This way, the offset
-        // and don't including ignorable content.
+        // Read a token and seek to the beginning. The offset we get from this process is the
+        // beginning of the next non-ignorable (space, comment) token. This way, the offset and
+        // don't including ignorable content.
         tokenizer.readToken(input, "content", true);
         qpdf_offset_t offset = input->getLastOffset();
         input->seek(offset, SEEK_SET);

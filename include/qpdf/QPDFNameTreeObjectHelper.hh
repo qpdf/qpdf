@@ -2,22 +2,19 @@
 //
 // This file is part of qpdf.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+// in compliance with the License. You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Unless required by applicable law or agreed to in writing, software distributed under the License
+// is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+// or implied. See the License for the specific language governing permissions and limitations under
+// the License.
 //
-// Versions of qpdf prior to version 7 were released under the terms
-// of version 2.0 of the Artistic License. At your option, you may
-// continue to consider qpdf to be licensed under those terms. Please
-// see the manual for additional information.
+// Versions of qpdf prior to version 7 were released under the terms of version 2.0 of the Artistic
+// License. At your option, you may continue to consider qpdf to be licensed under those terms.
+// Please see the manual for additional information.
 
 #ifndef QPDFNAMETREEOBJECTHELPER_HH
 #define QPDFNAMETREEOBJECTHELPER_HH
@@ -30,13 +27,11 @@
 
 #include <qpdf/DLL.h>
 
-// This is an object helper for name trees. See section 7.9.6 in the
-// PDF spec (ISO 32000) for a description of name trees. When looking
-// up items in the name tree, use UTF-8 strings. All names are
-// normalized for lookup purposes.
+// This is an object helper for name trees. See section 7.9.6 in the PDF spec (ISO 32000) for a
+// description of name trees. When looking up items in the name tree, use UTF-8 strings. All names
+// are normalized for lookup purposes.
 
-// See examples/pdf-name-number-tree.cc for a demonstration of using
-// QPDFNameTreeObjectHelper.
+// See examples/pdf-name-number-tree.cc for a demonstration of using QPDFNameTreeObjectHelper.
 
 class NNTreeImpl;
 class NNTreeIterator;
@@ -45,8 +40,8 @@ class NNTreeDetails;
 class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
 {
   public:
-    // The qpdf object is required so that this class can issue
-    // warnings, attempt repairs, and add indirect objects.
+    // The qpdf object is required so that this class can issue warnings, attempt repairs, and add
+    // indirect objects.
     QPDF_DLL
     QPDFNameTreeObjectHelper(QPDFObjectHandle, QPDF&, bool auto_repair = true);
 
@@ -57,13 +52,11 @@ class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     virtual ~QPDFNameTreeObjectHelper();
 
-    // Return whether the number tree has an explicit entry for this
-    // number.
+    // Return whether the name tree has an explicit entry for this name.
     QPDF_DLL
     bool hasName(std::string const& utf8);
 
-    // Find an object by name. If found, returns true and initializes
-    // oh. See also find().
+    // Find an object by name. If found, returns true and initializes oh. See also find().
     QPDF_DLL
     bool findObject(std::string const& utf8, QPDFObjectHandle& oh);
 
@@ -115,21 +108,17 @@ class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
             return !operator==(other);
         }
 
-        // DANGER: this method can create inconsistent trees if not
-        // used properly! Insert a new item immediately after the
-        // current iterator and increment so that it points to the new
-        // item. If the current iterator is end(), insert at the
-        // beginning. This method does not check for proper ordering,
-        // so if you use it, you must ensure that the item you are
-        // inserting belongs where you are putting it. The reason for
-        // this method is that it is more efficient than insert() and
-        // can be used safely when you are creating a new tree and
-        // inserting items in sorted order.
+        // DANGER: this method can create inconsistent trees if not used properly! Insert a new item
+        // immediately after the current iterator and increment so that it points to the new item.
+        // If the current iterator is end(), insert at the beginning. This method does not check for
+        // proper ordering, so if you use it, you must ensure that the item you are inserting
+        // belongs where you are putting it. The reason for this method is that it is more efficient
+        // than insert() and can be used safely when you are creating a new tree and inserting items
+        // in sorted order.
         QPDF_DLL
         void insertAfter(std::string const& key, QPDFObjectHandle value);
 
-        // Remove the current item and advance the iterator to the
-        // next item.
+        // Remove the current item and advance the iterator to the next item.
         QPDF_DLL
         void remove();
 
@@ -141,10 +130,9 @@ class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
         value_type ivalue;
     };
 
-    // The iterator looks like map iterator, so i.first is a string
-    // and i.second is a QPDFObjectHandle. Incrementing end() brings
-    // you to the first item. Decrementing end() brings you to the
-    // last item.
+    // The iterator looks like map iterator, so i.first is a string and i.second is a
+    // QPDFObjectHandle. Incrementing end() brings you to the first item. Decrementing end() brings
+    // you to the last item.
     QPDF_DLL
     iterator begin() const;
     QPDF_DLL
@@ -153,8 +141,8 @@ class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     iterator last() const;
 
-    // Find the entry with the given key. If return_prev_if_not_found
-    // is true and the item is not found, return the next lower item.
+    // Find the entry with the given key. If return_prev_if_not_found is true and the item is not
+    // found, return the next lower item.
     QPDF_DLL
     iterator find(std::string const& key, bool return_prev_if_not_found = false);
 
@@ -162,20 +150,18 @@ class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     iterator insert(std::string const& key, QPDFObjectHandle value);
 
-    // Remove an item. Return true if the item was found and removed;
-    // otherwise return false. If value is not null, initialize it to
-    // the value that was removed.
+    // Remove an item. Return true if the item was found and removed; otherwise return false. If
+    // value is not nullptr, initialize it to the value that was removed.
     QPDF_DLL
     bool remove(std::string const& key, QPDFObjectHandle* value = nullptr);
 
-    // Return the contents of the name tree as a map. Note that name
-    // trees may be very large, so this may use a lot of RAM. It is
-    // more efficient to use QPDFNameTreeObjectHelper's iterator.
+    // Return the contents of the name tree as a map. Note that name trees may be very large, so
+    // this may use a lot of RAM. It is more efficient to use QPDFNameTreeObjectHelper's iterator.
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getAsMap() const;
 
-    // Split a node if the number of items exceeds this value. There's
-    // no real reason to ever set this except for testing.
+    // Split a node if the number of items exceeds this value. There's no real reason to ever set
+    // this except for testing.
     QPDF_DLL
     void setSplitThreshold(int);
 

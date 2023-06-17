@@ -26,8 +26,7 @@
 //
 // The client is required to call finish() before destroying a Pipeline in order to avoid loss of
 // data.  A Pipeline class should not throw an exception in the destructor if this hasn't been done
-// though since doing so causes too much trouble when deleting
-// pipelines during error conditions.
+// though since doing so causes too much trouble when deleting pipelines during error conditions.
 //
 // Some pipelines are reusable (i.e., you can call write() after calling finish() and can call
 // finish() multiple times) while others are not.  It is up to the caller to use a pipeline
