@@ -2034,29 +2034,25 @@ QPDFWriter::getTrimmedTrailer()
     return trailer;
 }
 
+// Make document extension level information direct as required by the spec.
 void
 QPDFWriter::prepareFileForWrite()
 {
-    // Make document extension level information direct as required by the spec.
-
     m->pdf.fixDanglingReferences();
-    QPDFObjectHandle root = m->pdf.getRoot();
-    for (auto const& key: root.getKeys()) {
-        QPDFObjectHandle oh = root.getKey(key);
-        if ((key == "/Extensions") && (oh.isDictionary())) {
-            bool extensions_indirect = false;
-            if (oh.isIndirect()) {
-                QTC::TC("qpdf", "QPDFWriter make Extensions direct");
-                extensions_indirect = true;
-                oh = root.replaceKeyAndGetNew(key, oh.shallowCopy());
-            }
-            if (oh.hasKey("/ADBE")) {
-                QPDFObjectHandle adbe = oh.getKey("/ADBE");
-                if (adbe.isIndirect()) {
-                    QTC::TC("qpdf", "QPDFWriter make ADBE direct", extensions_indirect ? 0 : 1);
-                    adbe.makeDirect();
-                    oh.replaceKey("/ADBE", adbe);
-                }
+    auto root = m->pdf.getRoot();
+    auto oh = root.getKey("/Extensions");
+    if (oh.isDictionary()) {
+        const bool extensions_indirect = oh.isIndirect();
+        if (extensions_indirect) {
+            QTC::TC("qpdf", "QPDFWriter make Extensions direct");
+            oh = root.replaceKeyAndGetNew("/Extensions", oh.shallowCopy());
+        }
+        if (oh.hasKey("/ADBE")) {
+            auto adbe = oh.getKey("/ADBE");
+            if (adbe.isIndirect()) {
+                QTC::TC("qpdf", "QPDFWriter make ADBE direct", extensions_indirect ? 0 : 1);
+                adbe.makeDirect();
+                oh.replaceKey("/ADBE", adbe);
             }
         }
     }
