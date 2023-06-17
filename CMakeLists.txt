@@ -104,6 +104,8 @@ option(INSTALL_PKGCONFIG "Install pkgconfig file" ON)
 option(INSTALL_CMAKE_PACKAGE "Install cmake package files" ON)
 option(INSTALL_EXAMPLES "Install example files" ON)
 
+option(FUTURE "Include ABI-breaking changes CONSIDERED for the next major release" OFF)
+
 # *** END OPTIONS ***
 
 if(NOT (BUILD_STATIC_LIBS OR BUILD_SHARED_LIBS))
@@ -119,6 +121,10 @@ if(ENABLE_QTC)
 else()
   add_compile_definitions(QPDF_DISABLE_QTC=1)
   set(ENABLE_QTC_ARG --disable-tc)
+endif()
+
+if(FUTURE)
+  add_compile_definitions(QPDF_FUTURE=1)
 endif()
 
 enable_testing()
@@ -347,6 +353,7 @@ message(STATUS "  build static libraries: ${BUILD_STATIC_LIBS}")
 message(STATUS "  build manual: ${BUILD_DOC}")
 message(STATUS "  compiler warnings are errors: ${WERROR}")
 message(STATUS "  QTC test coverage: ${ENABLE_QTC}")
+message(STATUS "  include future changes: ${FUTURE}")
 message(STATUS "  system: ${CPACK_SYSTEM_NAME}")
 message(STATUS "")
 message(STATUS "*** Options Summary ***")

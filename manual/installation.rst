@@ -277,6 +277,16 @@ BUILD_SHARED_LIBS, BUILD_STATIC_LIBS
   compiled executables can find the DLL. Updating your path is not
   necessary if you build with static libraries only.
 
+FUTURE
+  This option enables changes planned for the next major release to be
+  included. They are NOT part of the stable API. These changes are ABI
+  breaking and are subject to change, which means code linked against
+  a qpdf built with this option may not be binary compatible with
+  installed qpdf libraries. Set this if you want to test your code
+  with proposed QPDF API changes and provide feedback prior to the
+  inclusion of those changes in a release. Packagers should never
+  distribute backages built with this option.
+
 QTEST_COLOR
   Turn this on or off to control whether qtest uses color in its
   output.
