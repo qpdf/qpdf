@@ -77,7 +77,7 @@ configurations.
 * The version number on the main branch is whatever the version would
   be if the top of the branch were released. If the most recent
   release is version a.b.c, then
-  
+
   * If there are any ABI-breaking changes since the last release,
     main's version is a+1.0.0
   * Else if there is any new public API, main's version is a.b+1.0
@@ -116,9 +116,9 @@ Building docs from pull requests is also enabled.
 
 * To test locally, see https://github.com/google/oss-fuzz/tree/master/docs/,
   especially new_project_guide.md. Summary:
-  
+
   Clone the oss-fuzz project. From the root directory of the repository:
-  
+
   ```
   python3 infra/helper.py build_image --pull qpdf
   python3 infra/helper.py build_fuzzers [ --sanitizer memory|undefined|address ] qpdf [path-to-qpdf-source]
@@ -126,18 +126,18 @@ Building docs from pull requests is also enabled.
   python3 infra/helper.py build_fuzzers --sanitizer coverage qpdf
   python3 infra/helper.py coverage qpdf
   ```
-  
+
   To reproduce a test case, build with the correct sanitizer, then run
-  
+
   python3 infra/helper.py reproduce qpdf <specific-fuzzer> testcase
-  
+
   where fuzzer is the fuzzer used in the crash.
-  
+
   The fuzzer is in build/out/qpdf. It can be run with a directory as
   an argument to run against files in a directory. You can use
-  
+
   qpdf_fuzzer -merge=1 cur new >& /dev/null&
-  
+
   to add any files from new into cur if they increase coverage. You
   need to do this with the coverage build (the one with
   --sanitizer coverage)
@@ -160,18 +160,18 @@ Building docs from pull requests is also enabled.
 * Use std::to_string instead of QUtil::int_to_string et al
 
 * Use of assert:
-  
+
   * Test code: #include <qpdf/assert_test.h> first.
   * Debug code: #include <qpdf/assert_debug.h> first and use
     qpdf_assert_debug instead of assert.
-  
+
   These rules are enforced by the check-assert test. This practices
   serves to
-  
+
   * remind us that assert in release code disappears and so should only
     be used for debugging; when doing so use a Debug build
     configuration
-  
+
   * protect us from using assert in test code without explicitly
     removing the NDEBUG definition, since that would cause the assert
     not to actually be testing anything in non-Debug build
@@ -220,7 +220,7 @@ Building docs from pull requests is also enabled.
   dynamic_cast with those, but doing it anyway may help with some
   strange cases for mingw or with some code generators that may
   systematically do this for other reasons.
-  
+
   IMPORTANT NOTE ABOUT QPDF_DLL_CLASS: On mingw, the vtable for a
   class with some virtual methods and no pure virtual methods seems
   often (always?) not to be generated if the destructor is inline or
@@ -229,7 +229,7 @@ Building docs from pull requests is also enabled.
   methods, you must declare the destructor in the header without
   `= default` and provide a non-inline implementation in the source
   file. Add this comment to the implementation:
-  
+
     ```cpp
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in
     // README-maintainer
@@ -255,6 +255,16 @@ Building docs from pull requests is also enabled.
   class initialized to nullptr to give the flexibility to add data members
   without breaking the ABI.
 
+  Note that, as of qpdf 11, many public classes use `std::shared_ptr`
+  instead. Changing this to `std::unique_ptr` is ABI-breaking. If the
+  class doesn't allow copying, we can switch it to std::unique_ptr and
+  let that be the thing that prevents copying. If the intention is to
+  allow the object to be copied by value and treated as if it were
+  copied by reference, then `std::shared_ptr<Members>` should be used.
+  The `JSON` class is an example of this. As a rule, we should avoid
+  this design pattern. It's better to make things non-copiable and to
+  require explicit use of shared pointers, so going forward,
+  `std::unique_ptr` should be preferred.
 
 * Traversal of objects is expensive. It's worth adding some complexity
   to avoid needless traversals of objects.
@@ -323,13 +333,13 @@ When done, the following should happen:
 
 * Each year, update copyright notices. This will find all relevant
   places (assuming current copyright is from last year):
-  
+
   git --no-pager grep -i -n -P "copyright.*$(expr $(date +%Y) - 1).*berkenbilt"
-  
+
   Also update the copyright in these places:
   * debian package -- search for copyright.*berkenbilt in debian/copyright
   * qtest-driver, TestDriver.pm in qtest source
-  
+
   Copyright last updated: 2023.
 
 * Take a look at "External Libraries" in TODO to see if we need to
@@ -351,24 +361,24 @@ When done, the following should happen:
 * Check work `qpdf` project for private issues
 
 * Make sure the code is formatted.
-  
+
   ./format-code
 
 * Run a spelling checker over the source code to catch errors in
   variable names, strings, and comments.
-  
+
   ./spell-check
-  
+
   This uses cspell. Install with `npm install -g cspell`. The output
   of cspell is suitable for use with `M-x grep` in emacs. Add
   exceptions to cSpell.json.
 
 * If needed, run large file and image comparison tests by setting
   these environment variables:
-  
+
   QPDF_LARGE_FILE_TEST_PATH=/full/path
   QPDF_TEST_COMPARE_IMAGES=1
-  
+
   For Windows, use a Windows style path, not an MSYS path for large files.
 
 * If any interfaces were added or changed, check C API to see whether
@@ -380,12 +390,12 @@ When done, the following should happen:
 
 * Double check versions and shared library details. They should
   already be up to date in the code.
-  
+
   * Make sure version numbers are consistent in the following locations:
     * CMakeLists.txt
     * include/qpdf/DLL.h
     * manual/conf.py
-  
+
   `make_dist` verifies this consistency, and CI fails if they are
   inconsistent.
 
@@ -402,12 +412,12 @@ When done, the following should happen:
   testing, do performance testing.
 
 * Test for performance and binary compatibility:
-  
+
   ./abi-perf-test v<old> @
-  
+
   Prefix with SKIP_PERF=1 to skip performance test.
   Prefix with SKIP_TESTS=1 to skip test suite run.
-  
+
   See "ABI checks" for details about the process.
   End state:
   * /tmp/check-abi/perf contains the performance comparison
@@ -754,16 +764,16 @@ on.
   that builds the concatenated string.
 
 * With
-  
+
   ```cpp
   long_function(long_function(
       args)
 
   ```
-  
+
   clang-format anchors relative to the first function, and emacs
   anchors relative to the second function. Use
-  
+
   ```cpp
   long_function(
       // line-break
@@ -780,4 +790,3 @@ that clang-format produces several results. (In git this is commit
 
 The commits that have the bulk of automatic or mechanical reformatting are
 listed in .git-blame-ignore-revs. Any new bulk updates should be added there.
-
