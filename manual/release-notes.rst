@@ -6,6 +6,10 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
+If you are a developer and want to test your code against future API
+changes that are under consideration, you can build qpdf locally and
+enable the ``FUTURE`` build option (see :ref:`build-options`).
+
 Planned changes for future 12.x (subject to change):
   - ``QPDFObjectHandle`` will support move construction/assignment.
     This change will be invisible to most developers but may break

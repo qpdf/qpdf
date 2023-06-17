@@ -26,6 +26,12 @@ particularly useful to packagers.
   combined with either ``ctest --verbose`` or ``ctest
   --output-on-failure``.
 
+- Packagers should never define the ``FUTURE`` build option. API
+  changes enabled by ``FUTURE`` are not stable and may be
+  API/ABI-breaking. That option is intended only for people who are
+  testing their code with a local build of qpdf to provide early
+  feedback or prepare for possible future changes to the API.
+
 - qpdf's install targets do not install completion files by default
   since there is no standard location for them. As a packager, it's
   good if you install them wherever your distribution expects such
