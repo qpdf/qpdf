@@ -1,30 +1,59 @@
-ROUTINE DEVELOPMENT
+# Maintainer Notes
+
+## Contents
+
+* [ROUTINE DEVELOPMENT](#routine-development)
+* [VERSIONS](#versions)
+* [CHECKING DOCS ON readthedocs](#checking-docs-on-readthedocs)
+* [GOOGLE OSS-FUZZ](#google-oss-fuzz)
+* [CODING RULES](#coding-rules)
+* [HOW TO ADD A COMMAND-LINE ARGUMENT](#how-to-add-a-command-line-argument)
+* [RELEASE PREPARATION](#release-preparation)
+* [CREATING A RELEASE](#creating-a-release)
+* [RUNNING pikepdf's TEST SUITE](#running-pikepdfs-test-suite)
+* [OTHER NOTES](#other-notes)
+* [DEPRECATION](#deprecation)
+* [LOCAL WINDOWS TESTING PROCEDURE](#local-windows-testing-procedure)
+* [DOCS ON readthedocs.org](#docs-on-readthedocsorg)
+* [CMAKE notes](#cmake-notes)
+* [ABI checks](#abi-checks)
+* [CODE FORMATTING](#code-formatting)
+
+
+## ROUTINE DEVELOPMENT
 
 **Remember to check pull requests as well as issues in github.**
 
 Default:
 
+```
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
    -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 \
    -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+```
 
 Debugging:
 
+```
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
    -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 \
    -DCMAKE_BUILD_TYPE=Debug ..
+```
 
 Profiling:
 
+```
 CFLAGS=-pg LDFLAGS=-pg \
    cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
    -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 \
    -DCMAKE_BUILD_TYPE=Debug ..
+```
 
 Then run `gprof gmon.out`. Note that gmon.out is not cumulative.
 
 Memory checks:
 
+```
 CFLAGS="-fsanitize=address -fsanitize=undefined" \
    CXXFLAGS="-fsanitize=address -fsanitize=undefined" \
    LDFLAGS="-fsanitize=address -fsanitize=undefined" \
@@ -32,21 +61,23 @@ CFLAGS="-fsanitize=address -fsanitize=undefined" \
    cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
    -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 \
    -DCMAKE_BUILD_TYPE=Debug ..
+```
 
 Windows:
 
+```
 ../cmake-win {mingw|msvc} maint
+```
 
 See ./build-scripts for other ways to run the build for different
 configurations.
 
-
-VERSIONS
+## VERSIONS
 
 * The version number on the main branch is whatever the version would
   be if the top of the branch were released. If the most recent
   release is version a.b.c, then
-
+  
   * If there are any ABI-breaking changes since the last release,
     main's version is a+1.0.0
   * Else if there is any new public API, main's version is a.b+1.0
@@ -65,15 +96,13 @@ VERSIONS
   there or the changes can be merged back, depending on the amount of
   drift.
 
-
-CHECKING DOCS ON readthedocs
+## CHECKING DOCS ON readthedocs
 
 To check docs on readthedocs.io without running all of CI, push to the
 doc-check branch. Then visit https://qpdf.readthedocs.io/en/doc-check/
 Building docs from pull requests is also enabled.
 
-
-GOOGLE OSS-FUZZ
+## GOOGLE OSS-FUZZ
 
 * See ../misc/fuzz (not in repo) for unfixed, downloaded fuzz test cases
 
@@ -87,26 +116,28 @@ GOOGLE OSS-FUZZ
 
 * To test locally, see https://github.com/google/oss-fuzz/tree/master/docs/,
   especially new_project_guide.md. Summary:
-
+  
   Clone the oss-fuzz project. From the root directory of the repository:
-
+  
+  ```
   python3 infra/helper.py build_image --pull qpdf
   python3 infra/helper.py build_fuzzers [ --sanitizer memory|undefined|address ] qpdf [path-to-qpdf-source]
   python3 infra/helper.py check_build qpdf
   python3 infra/helper.py build_fuzzers --sanitizer coverage qpdf
   python3 infra/helper.py coverage qpdf
-
+  ```
+  
   To reproduce a test case, build with the correct sanitizer, then run
-
+  
   python3 infra/helper.py reproduce qpdf <specific-fuzzer> testcase
-
+  
   where fuzzer is the fuzzer used in the crash.
-
+  
   The fuzzer is in build/out/qpdf. It can be run with a directory as
   an argument to run against files in a directory. You can use
-
+  
   qpdf_fuzzer -merge=1 cur new >& /dev/null&
-
+  
   to add any files from new into cur if they increase coverage. You
   need to do this with the coverage build (the one with
   --sanitizer coverage)
@@ -120,28 +151,27 @@ GOOGLE OSS-FUZZ
 * Latest corpus:
   gs://qpdf-backup.clusterfuzz-external.appspot.com/corpus/libFuzzer/qpdf_fuzzer/latest.zip
 
+## CODING RULES
 
-CODING RULES
-
-* Code is formatted with clang-format >= 15. See .clang-format and the
+* Code is formatted with clang-format-16. See .clang-format and the
   "Code Formatting" section in manual/contributing.rst for details.
   See also "CODE FORMATTING" below.
 
 * Use std::to_string instead of QUtil::int_to_string et al
 
 * Use of assert:
-
+  
   * Test code: #include <qpdf/assert_test.h> first.
   * Debug code: #include <qpdf/assert_debug.h> first and use
     qpdf_assert_debug instead of assert.
-
+  
   These rules are enforced by the check-assert test. This practices
   serves to
-
+  
   * remind us that assert in release code disappears and so should only
     be used for debugging; when doing so use a Debug build
     configuration
-
+  
   * protect us from using assert in test code without explicitly
     removing the NDEBUG definition, since that would cause the assert
     not to actually be testing anything in non-Debug build
@@ -190,7 +220,7 @@ CODING RULES
   dynamic_cast with those, but doing it anyway may help with some
   strange cases for mingw or with some code generators that may
   systematically do this for other reasons.
-
+  
   IMPORTANT NOTE ABOUT QPDF_DLL_CLASS: On mingw, the vtable for a
   class with some virtual methods and no pure virtual methods seems
   often (always?) not to be generated if the destructor is inline or
@@ -199,9 +229,11 @@ CODING RULES
   methods, you must declare the destructor in the header without
   `= default` and provide a non-inline implementation in the source
   file. Add this comment to the implementation:
-
+  
+    ```cpp
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in
     // README-maintainer
+    ```
 
 * Put private member variables in std::shared_ptr<Members> for all
   public classes. Remember to use QPDF_DLL on ~Members(). Exception:
@@ -220,8 +252,7 @@ CODING RULES
 * Avoid attaching too much metadata to objects and object handles
   since those have to get copied around a lot.
 
-
-HOW TO ADD A COMMAND-LINE ARGUMENT
+## HOW TO ADD A COMMAND-LINE ARGUMENT
 
 Quick reminder:
 
@@ -278,18 +309,17 @@ When done, the following should happen:
 * The job JSON file should have a new key in the schema corresponding
   to the new option
 
-
-RELEASE PREPARATION
+## RELEASE PREPARATION
 
 * Each year, update copyright notices. This will find all relevant
   places (assuming current copyright is from last year):
-
+  
   git --no-pager grep -i -n -P "copyright.*$(expr $(date +%Y) - 1).*berkenbilt"
-
+  
   Also update the copyright in these places:
   * debian package -- search for copyright.*berkenbilt in debian/copyright
   * qtest-driver, TestDriver.pm in qtest source
-
+  
   Copyright last updated: 2023.
 
 * Take a look at "External Libraries" in TODO to see if we need to
@@ -311,24 +341,24 @@ RELEASE PREPARATION
 * Check work `qpdf` project for private issues
 
 * Make sure the code is formatted.
-
+  
   ./format-code
 
 * Run a spelling checker over the source code to catch errors in
   variable names, strings, and comments.
-
+  
   ./spell-check
-
+  
   This uses cspell. Install with `npm install -g cspell`. The output
   of cspell is suitable for use with `M-x grep` in emacs. Add
   exceptions to cSpell.json.
 
 * If needed, run large file and image comparison tests by setting
   these environment variables:
-
+  
   QPDF_LARGE_FILE_TEST_PATH=/full/path
   QPDF_TEST_COMPARE_IMAGES=1
-
+  
   For Windows, use a Windows style path, not an MSYS path for large files.
 
 * If any interfaces were added or changed, check C API to see whether
@@ -340,12 +370,12 @@ RELEASE PREPARATION
 
 * Double check versions and shared library details. They should
   already be up to date in the code.
-
+  
   * Make sure version numbers are consistent in the following locations:
     * CMakeLists.txt
     * include/qpdf/DLL.h
     * manual/conf.py
-
+  
   `make_dist` verifies this consistency, and CI fails if they are
   inconsistent.
 
@@ -362,12 +392,12 @@ RELEASE PREPARATION
   testing, do performance testing.
 
 * Test for performance and binary compatibility:
-
+  
   ./abi-perf-test v<old> @
-
+  
   Prefix with SKIP_PERF=1 to skip performance test.
   Prefix with SKIP_TESTS=1 to skip test suite run.
-
+  
   See "ABI checks" for details about the process.
   End state:
   * /tmp/check-abi/perf contains the performance comparison
@@ -389,8 +419,7 @@ env PKG_CONFIG_PATH=/tmp/inst/lib/pkgconfig \
     CMAKE_PREFIX_PATH=/tmp/inst \
    ./pkg-test/run-all
 
-
-CREATING A RELEASE
+## CREATING A RELEASE
 
 * Push to main. This will create an artifact called distribution
   which will contain all the distribution files. Download these,
@@ -442,7 +471,9 @@ git push qpdf @:stable
 * Create a github release after pushing the tag. `gcurl` is an alias
   that includes the auth token.
 
+```
 # Create release
+
 GITHUB_TOKEN=$(qdata-show cred github-token)
 function gcurl() { curl -H "Authorization: token $GITHUB_TOKEN" ${1+"$@"}; }
 
@@ -458,6 +489,7 @@ for i in *; do
   mime=$(file -b --mime-type $i)
   gcurl -H "Content-Type: $mime" --data-binary @$i "$upload_url?name=$i"
 done
+```
 
 If needed, go onto github and make any manual updates such as
 indicating a pre-release, adding release notes, etc.
@@ -470,8 +502,10 @@ This is qpdf version x.y.z. (Brief description)
 For a full list of changes from previous releases, please see the [release notes](https://qpdf.readthedocs.io/en/stable/release-notes.html). See also [README-what-to-download](./README-what-to-download.md) for details about the available source and binary distributions.
 ```
 
+```
 # Publish release
 gcurl -XPOST $url -d'{"draft": false}'
+```
 
 * Upload files to sourceforge.
 
@@ -486,14 +520,14 @@ rsync -vrlcO ./ jay_berkenbilt,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/q
 
 * Email the qpdf-announce list.
 
-
-RUNNING pikepdf's TEST SUITE
+## RUNNING pikepdf's TEST SUITE
 
 We run pikepdf's test suite from CI. These instructions show how to do
 it manually.
 
 Do this in a separate shell.
 
+```
 cd ...qpdf-source-tree...
 export QPDF_SOURCE_TREE=$PWD
 export QPDF_BUILD_LIBDIR=$QPDF_SOURCE_TREE/build/libqpdf
@@ -510,10 +544,12 @@ python3 -m pip install '.[test]'
 rehash
 python3 -m pip install .
 pytest -n auto
+```
 
 If there are failures, use git bisect to figure out where the failure
 was introduced. For example, set up a work area like this:
 
+```
 rm -rf /tmp/z
 mkdir /tmp/z
 cd /tmp/z
@@ -541,12 +577,12 @@ python3 -m pip install .
 pytest -n auto
 EOF
 chmod +x /tmp/check
+```
 
 Then in /tmp/z/qpdf, run git bisect. Use /tmp/check at each stage to
 test whether it's a good or bad commit.
 
-
-OTHER NOTES
+## OTHER NOTES
 
 For local iteration on the AppImage generation, it works to just
 ./build-scripts/build-appimage and get the resulting AppImage from the
@@ -558,9 +594,11 @@ Use -ti -e RUN_SHELL=1 to run a shell instead of the build script.
 
 To iterate on the scripts directly in the source tree, you can run
 
+```
 docker build -t qpdfbuild appimage
 docker run --privileged --rm -ti -e SKIP_TESTS=1 -e RUN_SHELL=1 \
        -v $PWD/..:/tmp/build ${1+"$@"} qpdfbuild
+```
 
 This will put you at a shell prompt inside the container with your
 current directory set to the top of the source tree and your uid equal
@@ -569,12 +607,13 @@ to the owner of the parent directory source tree.
 Note: this will leave some extra files (like .bash_history) in the
 parent directory of the source tree. You will want to clean those up.
 
-DEPRECATION
+## DEPRECATION
 
 This is a reminder of how to use and test deprecation.
 
 To temporarily disable deprecation warnings for testing:
 
+```cpp
 #ifdef _MSC_VER
 # pragma warning(disable : 4996)
 #endif
@@ -586,13 +625,15 @@ To temporarily disable deprecation warnings for testing:
 #if (defined(__GNUC__) || defined(__clang__))
 # pragma GCC diagnostic pop
 #endif
+```
 
 To declare something as deprecated:
 
+```cpp
 [[deprecated("explanation")]]
+```
 
-
-LOCAL WINDOWS TESTING PROCEDURE
+## LOCAL WINDOWS TESTING PROCEDURE
 
 This is what I do for routine testing on Windows.
 
@@ -612,8 +653,7 @@ This is what I do for routine testing on Windows.
 
 * Test with mingw:  `ctest --verbose -C RelWithDebInfo`
 
-
-DOCS ON readthedocs.org
+## DOCS ON readthedocs.org
 
 * Registered for an account at readthedocs.org with my github account
 * Project page: https://readthedocs.org/projects/qpdf/
@@ -640,8 +680,7 @@ following branching strategy to support docs:
 The release process includes updating the approach branches and
 activating versions.
 
-
-CMAKE notes
+## CMAKE notes
 
 To verify the various cmake options and their interactions, several
 manual tests were done:
@@ -662,8 +701,7 @@ We are using RelWithDebInfo for mingw and other non-Windows builds but
 Release for MSVC. There are linker warnings if MSVC is built with
 RelWithDebInfo when using external-libs.
 
-
-ABI checks
+## ABI checks
 
 Until the conversion of the build to cmake, we relied on running the
 test suite with old executables and a new library. When QPDFJob was
@@ -698,8 +736,7 @@ steps. See comments in check_abi for additional notes. Running
 "check_abi check-sizes" is run by ctest on Linux when CHECK_SIZES is
 on.
 
-
-CODE FORMATTING
+## CODE FORMATTING
 
 * Emacs doesn't indent breaking strings concatenated with + over
   lines but clang-format does. It's clearer with clang-format. To
@@ -707,18 +744,22 @@ CODE FORMATTING
   that builds the concatenated string.
 
 * With
-
+  
+  ```cpp
   long_function(long_function(
       args)
 
+  ```
+  
   clang-format anchors relative to the first function, and emacs
   anchors relative to the second function. Use
-
+  
+  ```cpp
   long_function(
       // line-break
       long_function(
 	  args)
-
+  ```
   to resolve.
 
 In the revision control history, there is a commit around April 3,
