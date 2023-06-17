@@ -16,7 +16,7 @@ class JSONHandler
   public:
     // A QPDFUsage exception is thrown if there are any errors validating the JSON object.
     JSONHandler();
-    ~JSONHandler() = default;
+    ~JSONHandler();
 
     // Based on the type of handler, expect the object to be of a certain type. QPDFUsage is thrown
     // otherwise. Multiple handlers may be registered, which allows the object to be of various
@@ -53,51 +53,10 @@ class JSONHandler
 
     static void usage(std::string const& msg);
 
-    struct Handlers
-    {
-        Handlers() :
-            any_handler(nullptr),
-            null_handler(nullptr),
-            string_handler(nullptr),
-            number_handler(nullptr),
-            bool_handler(nullptr),
-            dict_start_handler(nullptr),
-            dict_end_handler(nullptr),
-            array_start_handler(nullptr),
-            array_end_handler(nullptr),
-            final_handler(nullptr)
-        {
-        }
 
-        json_handler_t any_handler;
-        void_handler_t null_handler;
-        string_handler_t string_handler;
-        string_handler_t number_handler;
-        bool_handler_t bool_handler;
-        json_handler_t dict_start_handler;
-        void_handler_t dict_end_handler;
-        json_handler_t array_start_handler;
-        void_handler_t array_end_handler;
-        void_handler_t final_handler;
-        std::map<std::string, std::shared_ptr<JSONHandler>> dict_handlers;
-        std::shared_ptr<JSONHandler> fallback_dict_handler;
-        std::shared_ptr<JSONHandler> array_item_handler;
-    };
+    class Members;
 
-    class Members
-    {
-        friend class JSONHandler;
-
-      public:
-        ~Members() = default;
-
-      private:
-        Members() = default;
-        Members(Members const&) = delete;
-
-        Handlers h;
-    };
-    std::shared_ptr<Members> m;
+    std::unique_ptr<Members> m;
 };
 
 #endif // JSONHANDLER_HH

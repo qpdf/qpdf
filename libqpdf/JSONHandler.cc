@@ -4,8 +4,45 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
+struct Handlers
+{
+    Handlers() = default;
+
+    JSONHandler::json_handler_t any_handler{nullptr};
+    JSONHandler::void_handler_t null_handler{nullptr};
+    JSONHandler::string_handler_t string_handler{nullptr};
+    JSONHandler::string_handler_t number_handler{nullptr};
+    JSONHandler::bool_handler_t bool_handler{nullptr};
+    JSONHandler::json_handler_t dict_start_handler{nullptr};
+    JSONHandler::void_handler_t dict_end_handler{nullptr};
+    JSONHandler::json_handler_t array_start_handler{nullptr};
+    JSONHandler::void_handler_t array_end_handler{nullptr};
+    JSONHandler::void_handler_t final_handler{nullptr};
+    std::map<std::string, std::shared_ptr<JSONHandler>> dict_handlers;
+    std::shared_ptr<JSONHandler> fallback_dict_handler;
+    std::shared_ptr<JSONHandler> array_item_handler;
+};
+
+class JSONHandler::Members
+{
+    friend class JSONHandler;
+
+  public:
+    ~Members() = default;
+
+  private:
+    Members() = default;
+    Members(Members const&) = delete;
+
+    Handlers h;
+};
+
 JSONHandler::JSONHandler() :
     m(new Members())
+{
+}
+
+JSONHandler::~JSONHandler()
 {
 }
 
@@ -80,24 +117,24 @@ JSONHandler::handle(std::string const& path, JSON j)
         m->h.any_handler(path, j);
         return;
     }
-    bool handled = false;
+
     bool bvalue = false;
     std::string s_value;
     if (m->h.null_handler && j.isNull()) {
         m->h.null_handler(path);
-        handled = true;
+        return;
     }
     if (m->h.string_handler && j.getString(s_value)) {
         m->h.string_handler(path, s_value);
-        handled = true;
+        return;
     }
     if (m->h.number_handler && j.getNumber(s_value)) {
         m->h.number_handler(path, s_value);
-        handled = true;
+        return;
     }
     if (m->h.bool_handler && j.getBool(bvalue)) {
         m->h.bool_handler(path, bvalue);
-        handled = true;
+        return;
     }
     if (m->h.dict_start_handler && j.isDictionary()) {
         m->h.dict_start_handler(path, j);
@@ -119,7 +156,7 @@ JSONHandler::handle(std::string const& path, JSON j)
             }
         });
         m->h.dict_end_handler(path);
-        handled = true;
+        return;
     }
     if (m->h.array_start_handler && j.isArray()) {
         m->h.array_start_handler(path, j);
@@ -129,15 +166,13 @@ JSONHandler::handle(std::string const& path, JSON j)
             ++i;
         });
         m->h.array_end_handler(path);
-        handled = true;
+        return;
     }
 
-    if (!handled) {
-        // It would be nice to include information about what type the object was and what types
-        // were allowed, but we're relying on schema validation to make sure input is properly
-        // structured before calling the handlers. It would be different if this code were trying to
-        // be part of a general-purpose JSON package.
-        QTC::TC("libtests", "JSONHandler unhandled value");
-        usage("JSON handler: value at " + path + " is not of expected type");
-    }
+    // It would be nice to include information about what type the object was and what types were
+    // allowed, but we're relying on schema validation to make sure input is properly structured
+    // before calling the handlers. It would be different if this code were trying to be part of a
+    // general-purpose JSON package.
+    QTC::TC("libtests", "JSONHandler unhandled value");
+    usage("JSON handler: value at " + path + " is not of expected type");
 }
