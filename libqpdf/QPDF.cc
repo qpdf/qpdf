@@ -1343,21 +1343,16 @@ QPDF::readObject(
             size_t length = 0;
 
             try {
-                std::map<std::string, QPDFObjectHandle> dict = object.getDictAsMap();
+                auto length_obj = object.getKey("/Length");
 
-                if (dict.count("/Length") == 0) {
-                    QTC::TC("qpdf", "QPDF stream without length");
-                    throw damagedPDF(input, offset, "stream dictionary lacks /Length key");
-                }
-
-                QPDFObjectHandle length_obj = dict["/Length"];
                 if (!length_obj.isInteger()) {
+                    if (length_obj.isNull()) {
+                        QTC::TC("qpdf", "QPDF stream without length");
+                        throw damagedPDF(input, offset, "stream dictionary lacks /Length key");
+                    }
                     QTC::TC("qpdf", "QPDF stream length not integer");
                     throw damagedPDF(
-                        input,
-                        offset,
-                        "/Length key in stream dictionary is not "
-                        "an integer");
+                        input, offset, "/Length key in stream dictionary is not an integer");
                 }
 
                 length = toS(length_obj.getUIntValue());
