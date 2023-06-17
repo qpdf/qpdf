@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('copy-annotations');
 
-my $n_tests = 39;
+my $n_tests = 43;
 
 $td->runtest("complex copy annotations",
              {$td->COMMAND =>
@@ -41,6 +41,30 @@ foreach my $page (1, 2, 5, 6)
                  {$td->FILE => "a.pdf"},
                  {$td->FILE => "overlay-copy-annotations-p$page.pdf"});
 }
+
+$td->runtest("copy annotations no acroform from foreign file",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id --no-original-object-ids" .
+                   " annotations-no-acroform.pdf --pages . 1,1 -- a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "annotations-same-file.out.pdf"});
+
+$td->runtest("copy annotations no acroform from foreign file",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id --no-original-object-ids minimal.pdf" .
+                   " --pages annotations-no-acroform.pdf 1,1 -- a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "annotations-foreign-file.out.pdf"});
+
+
 
 foreach my $d ([1, "appearances-1.pdf"],
                [2, "appearances-1-rotated.pdf"])

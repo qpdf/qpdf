@@ -2494,7 +2494,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             // the original file until all copy operations are completed, any foreign pages that
             // conflict with original pages will be adjusted. If we copy any page from the original
             // file more than once, that page would be in conflict with the previous copy of itself.
-            if (other_afdh->hasAcroForm() && ((!this_file) || (!first_copy_from_orig))) {
+            if ((!this_file && other_afdh->hasAcroForm()) || !first_copy_from_orig) {
                 if (!this_file) {
                     QTC::TC("qpdf", "QPDFJob copy fields not this file");
                 } else if (!first_copy_from_orig) {
