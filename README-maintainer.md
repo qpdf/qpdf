@@ -790,3 +790,5 @@ that clang-format produces several results. (In git this is commit
 
 The commits that have the bulk of automatic or mechanical reformatting are
 listed in .git-blame-ignore-revs. Any new bulk updates should be added there.
+
+[//]: # (cSpell:ignore pikepdfs readthedocsorg .)

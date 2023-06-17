@@ -300,6 +300,7 @@
     "nobjects",
     "nocase",
     "nodefaultlib",
+    "nolint",
     "noout",
     "notfound",
     "nowarn",
