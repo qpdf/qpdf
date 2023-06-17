@@ -1,5 +1,6 @@
 # -*- yaml -*-
-# This configuration works with clang-format-15.
+# This configuration requires at least clang-format 15.
+# See ./format-code for comments about the minimum version.
 # See https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 ---
 Language: Cpp
