@@ -811,7 +811,7 @@ QPDF::checkHOutlines()
                 stopOnError("unknown object in outlines hint table");
             }
             qpdf_offset_t offset = getLinearizationOffset(og);
-            ObjUser ou(ObjUser::ou_root_key, "/Outlines");
+            auto ou = ObjUser::root("/Outlines");
             int length = toI(maxEnd(ou) - offset);
             qpdf_offset_t table_offset = adjusted_offset(m->outline_hints.first_object_offset);
             if (offset != table_offset) {
@@ -1217,7 +1217,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
         m->c_page_offset_data.entries.at(i).nobjects = 1;
 
-        ObjUser ou(ObjUser::ou_page, toI(i));
+        auto ou = ObjUser::page(toI(i));
         if (m->obj_user_to_objects.count(ou) == 0) {
             stopOnError("found unreferenced page while"
                         " calculating linearization data");
@@ -1252,8 +1252,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     // we throw all remaining objects in arbitrary order.
 
     // Place the pages tree.
-    std::set<QPDFObjGen> pages_ogs =
-        m->obj_user_to_objects[ObjUser(ObjUser::ou_root_key, "/Pages")];
+    std::set<QPDFObjGen> pages_ogs = m->obj_user_to_objects[ObjUser::root("/Pages")];
     if (pages_ogs.empty()) {
         stopOnError("found empty pages tree while"
                     " calculating linearization data");
@@ -1282,7 +1281,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
                 // there's nothing to prevent it from having been in some set other than
                 // lc_thumbnail_private.
             }
-            std::set<QPDFObjGen>& ogs = m->obj_user_to_objects[ObjUser(ObjUser::ou_thumb, toI(i))];
+            std::set<QPDFObjGen>& ogs = m->obj_user_to_objects[ObjUser::thumb(toI(i))];
             for (auto const& og: ogs) {
                 if (lc_thumbnail_private.count(og)) {
                     lc_thumbnail_private.erase(og);
@@ -1362,7 +1361,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     for (size_t i = 1; i < toS(npages); ++i) {
         CHPageOffsetEntry& pe = m->c_page_offset_data.entries.at(i);
-        ObjUser ou(ObjUser::ou_page, toI(i));
+        auto ou = ObjUser::page(toI(i));
         if (m->obj_user_to_objects.count(ou) == 0) {
             stopOnError("found unreferenced page while"
                         " calculating linearization data");
