@@ -1045,13 +1045,6 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         QTC::TC("qpdf", "QPDF categorize pagemode outlines", outlines_in_first_page ? 1 : 0);
     }
 
-    std::set<std::string> open_document_keys;
-    open_document_keys.insert("/ViewerPreferences");
-    open_document_keys.insert("/PageMode");
-    open_document_keys.insert("/Threads");
-    open_document_keys.insert("/OpenAction");
-    open_document_keys.insert("/AcroForm");
-
     std::set<QPDFObjGen> lc_open_document;
     std::set<QPDFObjGen> lc_first_page_private;
     std::set<QPDFObjGen> lc_first_page_shared;
@@ -1075,34 +1068,28 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
         for (auto const& ou: ous) {
             switch (ou.ou_type) {
-            case ObjUser::ou_trailer_key:
-                if (ou.key == "/Encrypt") {
-                    in_open_document = true;
-                } else {
-                    ++others;
-                }
+            case ObjUser::ou_other:
+                ++others;
                 break;
 
             case ObjUser::ou_thumb:
                 ++thumbs;
                 break;
 
-            case ObjUser::ou_root_key:
-                if (open_document_keys.count(ou.key) > 0) {
-                    in_open_document = true;
-                } else if (ou.key == "/Outlines") {
-                    in_outlines = true;
-                } else {
-                    ++others;
-                }
+            case ObjUser::ou_open_doc:
+                in_open_document = true;
+                break;
+
+            case ObjUser::ou_outlines:
+                in_outlines = true;
+                break;
+
+            case ObjUser::ou_first_page:
+                in_first_page = true;
                 break;
 
             case ObjUser::ou_page:
-                if (ou.pageno == 0) {
-                    in_first_page = true;
-                } else {
-                    ++other_pages;
-                }
+                ++other_pages;
                 break;
 
             case ObjUser::ou_bad:

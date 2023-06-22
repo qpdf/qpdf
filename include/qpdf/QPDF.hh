@@ -1279,7 +1279,17 @@ class QPDF
     class ObjUser
     {
       public:
-        enum user_e { ou_bad, ou_page, ou_thumb, ou_trailer_key, ou_root_key };
+        // The order and membership of user_e is fixed to allow an object to be clasified based on
+        // the first element and size of its ObjUser set.
+        enum user_e {
+            ou_bad,
+            ou_outlines,
+            ou_open_doc,
+            ou_first_page,
+            ou_page,
+            ou_thumb,
+            ou_other
+        };
 
         static ObjUser page(int pageno);
         static ObjUser thumb(int pageno);

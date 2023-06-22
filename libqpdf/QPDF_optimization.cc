@@ -24,6 +24,9 @@ QPDF::ObjUser::ObjUser(user_e type, std::string const& key) :
 QPDF::ObjUser
 QPDF::ObjUser::page(int pageno)
 {
+    if (pageno == 0) {
+        return {ou_first_page, 0};
+    }
     return {ou_page, pageno};
 }
 
@@ -36,13 +39,24 @@ QPDF::ObjUser::thumb(int pageno)
 QPDF::ObjUser
 QPDF::ObjUser::root(std::string const& key)
 {
-    return {ou_root_key, key};
+    static const std::set<std::string> open_document_keys{
+        "/ViewerPreferences", "/PageMode", "/Threads", "/OpenAction", "/AcroForm"};
+    if (key == "/Outlines") {
+        return {ou_outlines, key};
+    }
+    if (open_document_keys.count(key) > 0) {
+        return {ou_open_doc, key};
+    }
+    return {ou_other, key};
 }
 
 QPDF::ObjUser
 QPDF::ObjUser::trailer(std::string const& key)
 {
-    return {ou_trailer_key, key};
+    if (key == "/Encrypt") {
+        return {ou_open_doc, key};
+    }
+    return {ou_other, key};
 }
 
 bool
