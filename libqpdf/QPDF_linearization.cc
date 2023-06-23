@@ -1052,13 +1052,19 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     std::set<QPDFObjGen> lc_other_page_shared;
     std::set<QPDFObjGen> lc_thumbnail_private;
     std::set<QPDFObjGen> lc_thumbnail_shared;
+    std::set<QPDFObjGen> lc_pagetree;
     std::set<QPDFObjGen> lc_other;
     std::set<QPDFObjGen> lc_outlines;
 
     for (auto& [og, ous]: m->object_to_obj_users) {
-        switch (ous.cbegin()->ou_type) {
+        auto first = ous.cbegin();
+        switch (first->ou_type) {
         case ObjUser::ou_other:
-            lc_other.insert(og);
+            if (first->pageno == 0) {
+                lc_pagetree.insert(og);
+            } else {
+                lc_other.insert(og);
+            }
             break;
 
         case ObjUser::ou_thumb:
@@ -1228,11 +1234,8 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         stopOnError("found empty pages tree while"
                     " calculating linearization data");
     }
-    for (auto const& og: pages_ogs) {
-        if (lc_other.count(og)) {
-            lc_other.erase(og);
-            m->part9.push_back(getObject(og));
-        }
+    for (auto const& og: lc_pagetree) {
+        m->part9.push_back(getObject(og));
     }
 
     // Place private thumbnail images in page order.  Slightly more information would be required if
