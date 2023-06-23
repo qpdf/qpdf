@@ -970,9 +970,6 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     if (m->object_to_obj_users.empty()) {
         // Note that we can't call optimize here because we don't know whether it should be called
         // with or without allow changes.
-        if (getRoot().getKeyIfDict("/Pages").isNull()) {
-            stopOnError("no /Pages found while calculating linearization data");
-        }
         throw std::logic_error(
             "INTERNAL ERROR: QPDF::calculateLinearizationData called before optimize()");
     }

@@ -113,6 +113,11 @@ QPDF::optimize(
     }
 
     filterCompressedObjects(object_stream_data);
+
+    if (m->obj_user_to_objects.empty()) {
+        stopOnError("no objects found while trying to optimize");
+
+    }
 }
 
 void
@@ -376,6 +381,6 @@ QPDF::filterCompressedObjects(std::map<int, int> const& object_stream_data)
         }
     }
 
-    m->obj_user_to_objects = t_obj_user_to_objects;
-    m->object_to_obj_users = t_object_to_obj_users;
+    m->obj_user_to_objects.swap(t_obj_user_to_objects);
+    m->object_to_obj_users.swap(t_object_to_obj_users);
 }
