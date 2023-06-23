@@ -1279,17 +1279,13 @@ class QPDF
     class ObjUser
     {
       public:
-        enum user_e { ou_bad, ou_page, ou_thumb, ou_trailer_key, ou_root_key, ou_root };
+        enum user_e { ou_bad, ou_page, ou_thumb, ou_trailer_key, ou_root_key };
 
         // type is set to ou_bad
         ObjUser();
 
-        // type must be ou_root
-        ObjUser(user_e type);
-
         // type must be one of ou_page or ou_thumb
         ObjUser(user_e type, int pageno);
-
         // type must be one of ou_trailer_key or ou_root_key
         ObjUser(user_e type, std::string const& key);
 

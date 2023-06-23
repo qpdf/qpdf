@@ -15,13 +15,6 @@ QPDF::ObjUser::ObjUser() :
 {
 }
 
-QPDF::ObjUser::ObjUser(user_e type) :
-    ou_type(type),
-    pageno(0)
-{
-    qpdf_assert_debug(type == ou_root);
-}
-
 QPDF::ObjUser::ObjUser(user_e type, int pageno) :
     ou_type(type),
     pageno(pageno)
@@ -108,11 +101,6 @@ QPDF::optimize(
         updateObjectMaps(
             ObjUser(ObjUser::ou_root_key, key), root.getKey(key), skip_stream_parameters);
     }
-
-    ObjUser root_ou = ObjUser(ObjUser::ou_root);
-    auto root_og = QPDFObjGen(root.getObjGen());
-    m->obj_user_to_objects[root_ou].insert(root_og);
-    m->object_to_obj_users[root_og].insert(root_ou);
 
     filterCompressedObjects(object_stream_data);
 }

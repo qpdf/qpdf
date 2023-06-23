@@ -970,6 +970,9 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     if (m->object_to_obj_users.empty()) {
         // Note that we can't call optimize here because we don't know whether it should be called
         // with or without allow changes.
+        if (getRoot().getKeyIfDict("/Pages").isNull()) {
+            stopOnError("no /Pages found while calculating linearization data");
+        }
         throw std::logic_error(
             "INTERNAL ERROR: QPDF::calculateLinearizationData called before optimize()");
     }
@@ -1058,7 +1061,6 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     std::set<QPDFObjGen> lc_thumbnail_shared;
     std::set<QPDFObjGen> lc_other;
     std::set<QPDFObjGen> lc_outlines;
-    std::set<QPDFObjGen> lc_root;
 
     for (auto& oiter: m->object_to_obj_users) {
         QPDFObjGen const& og = oiter.first;
@@ -1070,7 +1072,6 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         int thumbs = 0;
         int others = 0;
         bool in_outlines = false;
-        bool is_root = false;
 
         for (auto const& ou: ous) {
             switch (ou.ou_type) {
@@ -1104,10 +1105,6 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
                 }
                 break;
 
-            case ObjUser::ou_root:
-                is_root = true;
-                break;
-
             case ObjUser::ou_bad:
                 stopOnError("INTERNAL ERROR: QPDF::calculateLinearizationData: "
                             "invalid user type");
@@ -1115,9 +1112,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
             }
         }
 
-        if (is_root) {
-            lc_root.insert(og);
-        } else if (in_outlines) {
+        if (in_outlines) {
             lc_outlines.insert(og);
         } else if (in_open_document) {
             lc_open_document.insert(og);
@@ -1172,15 +1167,10 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     // Part 4: open document objects.  We don't care about the order.
 
-    if (lc_root.size() != 1) {
-        stopOnError("found other than one root while"
-                    " calculating linearization data");
-    }
-    m->part4.push_back(getObject(*(lc_root.begin())));
+    m->part4.push_back(root);
     for (auto const& og: lc_open_document) {
         m->part4.push_back(getObject(og));
     }
-
     // Part 6: first page objects.  Note: implementation note 124 states that Acrobat always treats
     // page 0 as the first page for linearization regardless of /OpenAction.  pdlin doesn't provide
     // any option to set this and also disregards /OpenAction.  We will do the same.
@@ -1325,7 +1315,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     size_t num_placed =
         m->part4.size() + m->part6.size() + m->part7.size() + m->part8.size() + m->part9.size();
-    size_t num_wanted = m->object_to_obj_users.size() + pages.size();
+    size_t num_wanted = m->object_to_obj_users.size() + pages.size() + 1; // 1 is the root object.
     if (num_placed != num_wanted) {
         stopOnError(
             "INTERNAL ERROR: QPDF::calculateLinearizationData: wrong "
