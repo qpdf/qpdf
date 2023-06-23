@@ -1189,12 +1189,6 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     if (pages.empty()) {
         stopOnError("no pages found while calculating linearization data");
     }
-    QPDFObjGen first_page_og(pages.at(0).getObjGen());
-    if (!lc_first_page_private.count(first_page_og)) {
-        stopOnError("INTERNAL ERROR: QPDF::calculateLinearizationData: first page "
-                    "object not in lc_first_page_private");
-    }
-    lc_first_page_private.erase(first_page_og);
     m->c_linp.first_page_object = pages.at(0).getObjectID();
     m->part6.push_back(pages.at(0));
 
@@ -1226,15 +1220,6 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     // For each page in order:
     for (size_t i = 1; i < toS(npages); ++i) {
         // Place this page's page object
-
-        QPDFObjGen page_og(pages.at(i).getObjGen());
-        if (!lc_other_page_private.count(page_og)) {
-            stopOnError(
-                "INTERNAL ERROR: "
-                "QPDF::calculateLinearizationData: page object for page " +
-                std::to_string(i) + " not in lc_other_page_private");
-        }
-        lc_other_page_private.erase(page_og);
         m->part7.push_back(pages.at(i));
 
         // Place all non-shared objects referenced by this page, updating the page object count for
@@ -1340,7 +1325,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     size_t num_placed =
         m->part4.size() + m->part6.size() + m->part7.size() + m->part8.size() + m->part9.size();
-    size_t num_wanted = m->object_to_obj_users.size();
+    size_t num_wanted = m->object_to_obj_users.size() + pages.size();
     if (num_placed != num_wanted) {
         stopOnError(
             "INTERNAL ERROR: QPDF::calculateLinearizationData: wrong "

@@ -292,8 +292,10 @@ QPDF::updateObjectMapsInternal(
             QTC::TC("qpdf", "QPDF opt loop detected");
             return;
         }
-        m->obj_user_to_objects[ou].insert(og);
-        m->object_to_obj_users[og].insert(ou);
+        if (!is_page_node) {
+            m->obj_user_to_objects[ou].insert(og);
+            m->object_to_obj_users[og].insert(ou);
+        }
     }
 
     if (oh.isArray()) {

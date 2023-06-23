@@ -53,7 +53,6 @@ class JSONHandler
 
     static void usage(std::string const& msg);
 
-
     class Members;
 
     std::unique_ptr<Members> m;
