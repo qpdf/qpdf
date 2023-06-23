@@ -1055,68 +1055,52 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     std::set<QPDFObjGen> lc_other;
     std::set<QPDFObjGen> lc_outlines;
 
-    for (auto& oiter: m->object_to_obj_users) {
-        QPDFObjGen const& og = oiter.first;
-        std::set<ObjUser>& ous = oiter.second;
-
-        bool in_open_document = false;
-        bool in_first_page = false;
-        int other_pages = 0;
-        int thumbs = 0;
-        int others = 0;
-        bool in_outlines = false;
-
-        for (auto const& ou: ous) {
-            switch (ou.ou_type) {
-            case ObjUser::ou_other:
-                ++others;
-                break;
-
-            case ObjUser::ou_thumb:
-                ++thumbs;
-                break;
-
-            case ObjUser::ou_open_doc:
-                in_open_document = true;
-                break;
-
-            case ObjUser::ou_outlines:
-                in_outlines = true;
-                break;
-
-            case ObjUser::ou_first_page:
-                in_first_page = true;
-                break;
-
-            case ObjUser::ou_page:
-                ++other_pages;
-                break;
-
-            case ObjUser::ou_bad:
-                stopOnError("INTERNAL ERROR: QPDF::calculateLinearizationData: "
-                            "invalid user type");
-                break;
-            }
-        }
-
-        if (in_outlines) {
-            lc_outlines.insert(og);
-        } else if (in_open_document) {
-            lc_open_document.insert(og);
-        } else if ((in_first_page) && (others == 0) && (other_pages == 0) && (thumbs == 0)) {
-            lc_first_page_private.insert(og);
-        } else if (in_first_page) {
-            lc_first_page_shared.insert(og);
-        } else if ((other_pages == 1) && (others == 0) && (thumbs == 0)) {
-            lc_other_page_private.insert(og);
-        } else if (other_pages > 1) {
-            lc_other_page_shared.insert(og);
-        } else if ((thumbs == 1) && (others == 0)) {
-            lc_thumbnail_private.insert(og);
-        } else if (thumbs > 1) {
-            lc_thumbnail_shared.insert(og);
-        } else {
+    for (auto& [og, ous]: m->object_to_obj_users) {
+        switch (ous.cbegin()->ou_type) {
+        case ObjUser::ou_other:
             lc_other.insert(og);
+            break;
+
+        case ObjUser::ou_thumb:
+            if (ous.size() == 1) {
+                lc_thumbnail_private.insert(og);
+            } else {
+                lc_thumbnail_shared.insert(og);
+            }
+            break;
+
+        case ObjUser::ou_open_doc:
+            lc_open_document.insert(og);
+            break;
+
+        case ObjUser::ou_outlines:
+            lc_outlines.insert(og);
+            break;
+
+        case ObjUser::ou_first_page:
+            if (ous.size() == 1) {
+                lc_first_page_private.insert(og);
+            } else {
+                lc_first_page_shared.insert(og);
+            }
+            break;
+
+        case ObjUser::ou_page:
+            if (ous.size() == 1) {
+                lc_other_page_private.insert(og);
+            } else {
+                auto i = ++ous.cbegin();
+                if (i->ou_type == ObjUser::ou_page) {
+                    lc_other_page_shared.insert(og);
+                } else {
+                    lc_other.insert(og);
+                }
+            }
+            break;
+
+        case ObjUser::ou_bad:
+            stopOnError("INTERNAL ERROR: QPDF::calculateLinearizationData: invalid user type");
+            break;
         }
     }
 
