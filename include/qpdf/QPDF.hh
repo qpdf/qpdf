@@ -1299,12 +1299,10 @@ class QPDF
         bool operator<(ObjUser const& rhs) const;
 
         const user_e ou_type{ou_bad};
-        const int pageno{0};     // if ou_page or ou_thumb;
-        const std::string key{}; // if ou_trailer_key or ou_root_key
+        const int pageno{0};
 
       private:
         ObjUser(user_e type, int pageno);
-        ObjUser(user_e type, std::string const& key);
     };
 
     class PatternFinder: public InputSource::Finder

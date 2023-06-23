@@ -15,12 +15,6 @@ QPDF::ObjUser::ObjUser(user_e type, int pageno) :
 {
 }
 
-QPDF::ObjUser::ObjUser(user_e type, std::string const& key) :
-    ou_type(type),
-    key(key)
-{
-}
-
 QPDF::ObjUser
 QPDF::ObjUser::page(int pageno)
 {
@@ -42,37 +36,30 @@ QPDF::ObjUser::root(std::string const& key)
     static const std::set<std::string> open_document_keys{
         "/ViewerPreferences", "/PageMode", "/Threads", "/OpenAction", "/AcroForm"};
     if (key == "/Outlines") {
-        return {ou_outlines, key};
+        return {ou_outlines, 0};
     }
     if (open_document_keys.count(key) > 0) {
-        return {ou_open_doc, key};
+        return {ou_open_doc, 0};
     }
-    return {ou_other, key};
+    if (key == "/Pages") {
+        return {ou_other, 0};
+    }
+    return {ou_other, 1};
 }
 
 QPDF::ObjUser
 QPDF::ObjUser::trailer(std::string const& key)
 {
     if (key == "/Encrypt") {
-        return {ou_open_doc, key};
+        return {ou_open_doc, 0};
     }
-    return {ou_other, key};
+    return {ou_other, 2};
 }
 
 bool
 QPDF::ObjUser::operator<(ObjUser const& rhs) const
 {
-    if (this->ou_type < rhs.ou_type) {
-        return true;
-    } else if (this->ou_type == rhs.ou_type) {
-        if (this->pageno < rhs.pageno) {
-            return true;
-        } else if (this->pageno == rhs.pageno) {
-            return (this->key < rhs.key);
-        }
-    }
-
-    return false;
+    return ou_type < rhs.ou_type || (ou_type == rhs.ou_type && pageno < rhs.pageno);
 }
 
 void
