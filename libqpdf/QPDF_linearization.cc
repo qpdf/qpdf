@@ -1068,7 +1068,6 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         bool in_first_page = false;
         int other_pages = 0;
         int thumbs = 0;
-        int others = 0;
         bool in_outlines = false;
         bool is_root = false;
 
@@ -1077,8 +1076,6 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
             case ObjUser::ou_trailer_key:
                 if (ou.key == "/Encrypt") {
                     in_open_document = true;
-                } else {
-                    ++others;
                 }
                 break;
 
@@ -1091,8 +1088,6 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
                     in_open_document = true;
                 } else if (ou.key == "/Outlines") {
                     in_outlines = true;
-                } else {
-                    ++others;
                 }
                 break;
 
@@ -1121,15 +1116,15 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
             lc_outlines.insert(og);
         } else if (in_open_document) {
             lc_open_document.insert(og);
-        } else if ((in_first_page) && (others == 0) && (other_pages == 0) && (thumbs == 0)) {
+        } else if (in_first_page && other_pages == 0) {
             lc_first_page_private.insert(og);
         } else if (in_first_page) {
             lc_first_page_shared.insert(og);
-        } else if ((other_pages == 1) && (others == 0) && (thumbs == 0)) {
+        } else if (other_pages == 1) {
             lc_other_page_private.insert(og);
         } else if (other_pages > 1) {
             lc_other_page_shared.insert(og);
-        } else if ((thumbs == 1) && (others == 0)) {
+        } else if (thumbs == 1) {
             lc_thumbnail_private.insert(og);
         } else if (thumbs > 1) {
             lc_thumbnail_shared.insert(og);

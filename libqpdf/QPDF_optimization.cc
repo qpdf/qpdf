@@ -316,11 +316,16 @@ QPDF::updateObjectMapsInternal(
         for (auto const& key: dict.getKeys()) {
             if (is_page_node && (key == "/Thumb")) {
                 // Traverse page thumbnail dictionaries as a special case.
+                // Don't revisit objects already visited since the page object has higher priority
+                // and therefore the object and its children will not end up in part 9. Use a new
+                // QPDFObjGen::set to allow objects reached from here to be later rediscovered and
+                // to be included in one of parts 6 to 8.
+                QPDFObjGen::set visited_by_thumb{visited};
                 updateObjectMapsInternal(
                     ObjUser(ObjUser::ou_thumb, ou.pageno),
                     dict.getKey(key),
                     skip_stream_parameters,
-                    visited,
+                    visited_by_thumb,
                     false);
             } else if (is_page_node && (key == "/Parent")) {
                 // Don't traverse back up the page tree
