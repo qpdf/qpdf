@@ -1,3 +1,23 @@
+Contents
+========
+
+- [Always](#always)
+- [Next](#always)
+- [Possible future JSON enhancements](#possible-future-json-enhancements)
+- [QPDFJob](#qpdfjob)
+- [Documentation](#documentation)
+- [Document-level work](#document-level-work)
+- [Text Appearance Streams](#text-appearance-streams)
+- [Fuzz Errors](#fuzz-errors)
+- [External Libraries](#external-libraries)
+- [ABI Changes](#abi-changes)
+- [C++ Version Changes](#c-version-changes)
+- [Page splitting/merging](#page-splittingmerging)
+- [Analytics](#analytics)
+- [General](#general)
+
+- [HISTORICAL NOTES](#historical-notes)
+
 Always
 ======
 
@@ -559,7 +579,11 @@ I find it useful to make reference to them in this list.
 
 ----------------------------------------------------------------------
 
-HISTORICAL NOTES
+### HISTORICAL NOTES
+
+* [Performance](#performance)
+* [QPDFPagesTree](#qpdfpagestree)
+* [Rejected Ideas](#rejected-ideas)
 
 Performance
 ===========
