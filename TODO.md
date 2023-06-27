@@ -46,14 +46,14 @@ Possible future JSON enhancements
 
 * Consider not including unreferenced objects and trimming the trailer in the same way that
   QPDFWriter does (except don't remove `/ID`). This means excluding the linearization dictionary and
-  hint stream, the encryption dictionary, all keys from trailer that are removed by QPDFWriter::
-  getTrimmedTrailer except `/ID`, any object streams, and the xref stream as long as all those
-  objects are unreferenced. (They always should be, but there could be some bizarre case of someone
-  creating a PDF file that has an indirect reference to one of those, in which case we need to
-  preserve it.) If this is done, make
-  `--preserve-unreferenced` preserve unreference objects and also those extra keys. Search for "
-  linear" and "trailer" in json.rst to update the various places in the documentation that discuss
-  this. Also update the help for --json and --preserve-unreferenced.
+  hint stream, the encryption dictionary, all keys from trailer that are removed by
+  QPDFWriter::getTrimmedTrailer except `/ID`, any object streams, and the xref stream as long as all
+  those objects are unreferenced. (They always should be, but there could be some bizarre case of
+  someone creating a PDF file that has an indirect reference to one of those, in which case we need
+  to preserve it.) If this is done, make `--preserve-unreferenced` preserve unreference objects and
+  also those extra keys. Search for "linear" and "trailer" in json.rst to update the various places
+  in the documentation that discuss this. Also update the help for --json and
+  --preserve-unreferenced.
 
 * Add to JSON output the information available from a few additional informational options:
 
@@ -78,9 +78,8 @@ good -- just things to consider.
 
 * How do we chain jobs? The idea would be that the input and/or output of a QPDFJob could be a QPDF
   object rather than a file. For input, it's pretty easy. For output, none of the output-specific
-  options
-  (encrypt, compress-streams, objects-streams, etc.) would have any affect, so we would have to
-  treat this like inspect for error checking. The QPDF object in the state where it's ready to be
+  options (encrypt, compress-streams, objects-streams, etc.) would have any affect, so we would have
+  to treat this like inspect for error checking. The QPDF object in the state where it's ready to be
   sent off to QPDFWriter would be used as the input to the next QPDFJob. For the job json, I think
   we can have the output be an identifier that can be used as the input for another QPDFJob. For a
   json file, we could the top level detect if it's an array with the convention that exactly one has
@@ -152,10 +151,10 @@ This is a list of known issues with text appearance streams and things we might 
   then remove anything that's unreferenced. We have all the code required for that in ResourceFinder
   except TfFinder also gets the font size, which ResourceFinder doesn't do.
 
-* There are things we are missing because we don't look at font metrics. The code from TextBuilder (
-  work) has almost everything in it that is required. Once we have knowledge of character widths, we
-  can support quadding and multiline text fields (/Ff 4096), and we can potentially squeeze text to
-  fit into a field. For multiline, first squeeze vertically down to the font height, then squeeze
+* There are things we are missing because we don't look at font metrics. The code from TextBuilder
+  (work) has almost everything in it that is required. Once we have knowledge of character widths,
+  we can support quadding and multiline text fields (/Ff 4096), and we can potentially squeeze text
+  to fit into a field. For multiline, first squeeze vertically down to the font height, then squeeze
   horizontally with Tz. For single line, squeeze horizontally with Tz. If we use Tz, issue a
   warning.
 
@@ -164,9 +163,8 @@ This is a list of known issues with text appearance streams and things we might 
   to unicode to the width. See misc/character-encoding/ (not on github)
   and font metric information for the 14 standard fonts in my local pdf-spec directory.
 
-* Once we know about character widths, we can correctly support auto-sized variable text fields (0
-  Tf). If this is fixed, search for
-  "auto-sized" in cli.rst.
+* Once we know about character widths, we can correctly support auto-sized variable text fields
+  (0 Tf). If this is fixed, search for "auto-sized" in cli.rst.
 
 Fuzz Errors
 ===========
@@ -240,8 +238,11 @@ For qpdf 12, see https://github.com/qpdf/qpdf/discussions/785
 C++ Version Changes
 ===================
 
-Use // C++NN: ... to mark places in the code that should be updated when we require at least that
-version of C++.
+Use
+```
+// C++NN: ...
+```
+to mark places in the code that should be updated when we require at least that version of C++.
 
 Page splitting/merging
 ======================
@@ -653,9 +654,9 @@ Rejected Ideas
 
   QPDF_POINTER_TRANSITION = 0 -- no warnings around calling the QPDF constructor
   QPDF_POINTER_TRANSITION = 1 -- calls to QPDF() are deprecated, but QPDF is still available so code
-  can be backward compatible and use std::make_shared<QPDF>
-  QPDF_POINTER_TRANSITION = 2 -- the QPDF constructor is private; all calls to std::
-  make_shared<QPDF> have to be replaced with QPDF::create
+                                 can be backward compatible and use std::make_shared<QPDF>
+  QPDF_POINTER_TRANSITION = 2 -- the QPDF constructor is private; all calls to
+                                 std::make_shared<QPDF> have to be replaced with QPDF::create
 
   If we were to do this, we'd have to look at each use of QPDF* in the interface and decide whether
   to use a std::shared_ptr or a std::weak_ptr. The answer would almost always be to use a std::
