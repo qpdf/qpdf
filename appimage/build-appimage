@@ -137,7 +137,7 @@ for i in appdir/usr/share/doc/qpdf; do
     cp $top/LICENSE.txt $i
     cp $top/Artistic-2.0 $i/Artistic-LICENSE.txt
     cp $top/ChangeLog $i/README-ChangeLog
-    cp $top/TODO $i/README-todo
+    cp $top/TODO.md $i/README-todo.md
 done
 
 # The following lines are experimental (for debugging; and to test
