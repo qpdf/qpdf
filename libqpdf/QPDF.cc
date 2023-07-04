@@ -890,7 +890,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 
     // Handle any deleted items now that we've read the /XRefStm.
     for (auto const& og: deleted_items) {
-        insertXrefEntry(og.getObj(), 0, 0, og.getGen());
+        insertFreeXrefEntry(og);
     }
 
     if (cur_trailer.hasKey("/Prev")) {
@@ -1088,9 +1088,10 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         if (fields[0] == 0) {
             // Ignore fields[2], which we don't care about in this case. This works around the issue
             // of some PDF files that put invalid values, like -1, here for deleted objects.
-            fields[2] = 0;
+            insertFreeXrefEntry(QPDFObjGen(obj, 0));
+        } else {
+            insertXrefEntry(obj, toI(fields[0]), fields[1], toI(fields[2]));
         }
-        insertXrefEntry(obj, toI(fields[0]), fields[1], toI(fields[2]));
     }
 
     if (!m->trailer.isInitialized()) {
@@ -1121,34 +1122,39 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2)
     // If there is already an entry for this object and generation in the table, it means that a
     // later xref table has registered this object.  Disregard this one.
 
-    QPDFObjGen og(obj, (f0 == 2 ? 0 : f2));
-    if (m->xref_table.count(og)) {
-        QTC::TC("qpdf", "QPDF xref reused object");
-        return;
-    }
     if (m->deleted_objects.count(obj)) {
         QTC::TC("qpdf", "QPDF xref deleted object");
         return;
     }
 
-    switch (f0) {
-    case 0:
-        m->deleted_objects.insert(obj);
-        break;
+    auto [iter, created] = m->xref_table.try_emplace(QPDFObjGen(obj, (f0 == 2 ? 0 : f2)));
+    if (!created) {
+        QTC::TC("qpdf", "QPDF xref reused object");
+        return;
+    }
 
+    switch (f0) {
     case 1:
         // f2 is generation
         QTC::TC("qpdf", "QPDF xref gen > 0", ((f2 > 0) ? 1 : 0));
-        m->xref_table[og] = QPDFXRefEntry(f1);
+        iter->second = QPDFXRefEntry(f1);
         break;
 
     case 2:
-        m->xref_table[og] = QPDFXRefEntry(toI(f1), f2);
+        iter->second = QPDFXRefEntry(toI(f1), f2);
         break;
 
     default:
         throw damagedPDF("xref stream", "unknown xref stream entry type " + std::to_string(f0));
         break;
+    }
+}
+
+void
+QPDF::insertFreeXrefEntry(QPDFObjGen og)
+{
+    if (!m->xref_table.count(og)) {
+        m->deleted_objects.insert(og.getObj());
     }
 }
 
