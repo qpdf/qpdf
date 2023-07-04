@@ -564,7 +564,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
             if ((t2.isInteger()) && (readToken(m->file, MAX_LEN).isWord("obj"))) {
                 int obj = QUtil::string_to_int(t1.getValue().c_str());
                 int gen = QUtil::string_to_int(t2.getValue().c_str());
-                insertXrefEntry(obj, 1, token_start, gen, true);
+                insertReconstructedXrefEntry(obj, token_start, gen);
             }
         } else if (!m->trailer.isInitialized() && t1.isWord("trailer")) {
             QPDFObjectHandle t = readObject(m->file, "trailer", QPDFObjGen(), false);
@@ -577,6 +577,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
         m->file->seek(next_line_start, SEEK_SET);
         line_start = next_line_start;
     }
+    m->deleted_objects.clear();
 
     if (!m->trailer.isInitialized()) {
         // We could check the last encountered object to see if it was an xref stream.  If so, we
@@ -1126,7 +1127,6 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2, bool overwrite)
         QPDFObjGen og(obj, gen);
         if (m->xref_table.count(og)) {
             if (overwrite) {
-                QTC::TC("qpdf", "QPDF xref overwrite object");
                 m->xref_table.erase(og);
             } else {
                 QTC::TC("qpdf", "QPDF xref reused object");
@@ -1157,6 +1157,20 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2, bool overwrite)
     default:
         throw damagedPDF("xref stream", "unknown xref stream entry type " + std::to_string(f0));
         break;
+    }
+}
+
+// Replace uncompressed object. This is used in xref recovery mode, which reads the file from
+// beginning to end.
+void
+QPDF::insertReconstructedXrefEntry(int obj, qpdf_offset_t f1, int f2)
+{
+    QPDFObjGen og(obj, f2);
+    if (!m->deleted_objects.count(obj)) {
+        // deleted_objects stores the uncompressed objects removed from the xref table at the start
+        // of recovery.
+        QTC::TC("qpdf", "QPDF xref overwrite object");
+        m->xref_table[QPDFObjGen(obj, f2)] = QPDFXRefEntry(f1);
     }
 }
 
