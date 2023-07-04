@@ -1112,31 +1112,23 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 }
 
 void
-QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2, bool overwrite)
+QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2)
 {
     // Populate the xref table in such a way that the first reference to an object that we see,
     // which is the one in the latest xref table in which it appears, is the one that gets stored.
-    // This works because we are reading more recent appends before older ones.  Exception: if
-    // overwrite is true, then replace any existing object.  This is used in xref recovery mode,
-    // which reads the file from beginning to end.
+    // This works because we are reading more recent appends before older ones.
 
     // If there is already an entry for this object and generation in the table, it means that a
     // later xref table has registered this object.  Disregard this one.
-    { // private scope
-        int gen = (f0 == 2 ? 0 : f2);
-        QPDFObjGen og(obj, gen);
-        if (m->xref_table.count(og)) {
-            if (overwrite) {
-                m->xref_table.erase(og);
-            } else {
-                QTC::TC("qpdf", "QPDF xref reused object");
-                return;
-            }
-        }
-        if (m->deleted_objects.count(obj)) {
-            QTC::TC("qpdf", "QPDF xref deleted object");
-            return;
-        }
+
+    QPDFObjGen og(obj, (f0 == 2 ? 0 : f2));
+    if (m->xref_table.count(og)) {
+        QTC::TC("qpdf", "QPDF xref reused object");
+        return;
+    }
+    if (m->deleted_objects.count(obj)) {
+        QTC::TC("qpdf", "QPDF xref deleted object");
+        return;
     }
 
     switch (f0) {
@@ -1147,11 +1139,11 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2, bool overwrite)
     case 1:
         // f2 is generation
         QTC::TC("qpdf", "QPDF xref gen > 0", ((f2 > 0) ? 1 : 0));
-        m->xref_table[QPDFObjGen(obj, f2)] = QPDFXRefEntry(f1);
+        m->xref_table[og] = QPDFXRefEntry(f1);
         break;
 
     case 2:
-        m->xref_table[QPDFObjGen(obj, 0)] = QPDFXRefEntry(toI(f1), f2);
+        m->xref_table[og] = QPDFXRefEntry(toI(f1), f2);
         break;
 
     default:
