@@ -910,7 +910,6 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 qpdf_offset_t
 QPDF::read_xrefStream(qpdf_offset_t xref_offset)
 {
-    bool found = false;
     if (!m->ignore_xref_streams) {
         QPDFObjGen x_og;
         QPDFObjectHandle xref_obj;
@@ -922,17 +921,13 @@ QPDF::read_xrefStream(qpdf_offset_t xref_offset)
         }
         if (xref_obj.isStreamOfType("/XRef")) {
             QTC::TC("qpdf", "QPDF found xref stream");
-            found = true;
-            xref_offset = processXRefStream(xref_offset, xref_obj);
+            return processXRefStream(xref_offset, xref_obj);
         }
     }
 
-    if (!found) {
-        QTC::TC("qpdf", "QPDF can't find xref");
-        throw damagedPDF("", xref_offset, "xref not found");
-    }
-
-    return xref_offset;
+    QTC::TC("qpdf", "QPDF can't find xref");
+    throw damagedPDF("", xref_offset, "xref not found");
+    return 0; // unreachable
 }
 
 qpdf_offset_t
