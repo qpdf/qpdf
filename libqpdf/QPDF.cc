@@ -567,7 +567,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
                 insertReconstructedXrefEntry(obj, token_start, gen);
             }
         } else if (!m->trailer.isInitialized() && t1.isWord("trailer")) {
-            QPDFObjectHandle t = readObject("trailer", QPDFObjGen());
+            QPDFObjectHandle t = readTrailer();
             if (!t.isDictionary()) {
                 // Oh well.  It was worth a try.
             } else {
@@ -855,7 +855,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
     }
 
     // Set offset to previous xref table if any
-    QPDFObjectHandle cur_trailer = readObject("trailer", QPDFObjGen());
+    QPDFObjectHandle cur_trailer = readTrailer();
     if (!cur_trailer.isDictionary()) {
         QTC::TC("qpdf", "QPDF missing trailer");
         throw damagedPDF("", "expected trailer dictionary");
@@ -1266,6 +1266,25 @@ QPDF::setLastObjectDescription(std::string const& description, QPDFObjGen const&
         m->last_object_description += "object " + og.unparse(' ');
     }
 }
+
+QPDFObjectHandle
+QPDF::readTrailer()
+{
+    qpdf_offset_t offset = m->file->tell();
+    bool empty = false;
+    auto object = QPDFParser(m->file, "trailer", m->tokenizer, nullptr, this).parse(empty, false);
+    if (empty) {
+        // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
+        // actual PDF files and Adobe Reader appears to ignore them.
+        warn(damagedPDF("trailer", "empty object treated as null"));
+    } else if (object.isDictionary() && readToken(m->file).isWord("stream")) {
+        warn(damagedPDF("trailer", m->file->tell(), "stream keyword found in trailer"));
+    }
+    // Override last_offset so that it points to the beginning of the object we just read
+    m->file->setLastOffset(offset);
+    return object;
+}
+
 
 QPDFObjectHandle
 QPDF::readObject(std::string const& description, QPDFObjGen og)
