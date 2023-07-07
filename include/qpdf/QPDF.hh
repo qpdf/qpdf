@@ -1011,6 +1011,7 @@ class QPDF
         std::string const& description,
         QPDFObjGen const& og,
         bool in_object_stream);
+    QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>, QPDFObjGen og);
     size_t recoverStreamLength(
         std::shared_ptr<InputSource> input, QPDFObjGen const& og, qpdf_offset_t stream_offset);
     QPDFTokenizer::Token readToken(std::shared_ptr<InputSource>, size_t max_len = 0);

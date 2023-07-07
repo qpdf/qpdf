@@ -1389,6 +1389,26 @@ QPDF::readObject(
     return object;
 }
 
+QPDFObjectHandle
+QPDF::readObjectInStream(std::shared_ptr<InputSource> input, QPDFObjGen og)
+{
+    setLastObjectDescription("", og);
+    qpdf_offset_t offset = input->tell();
+
+    bool empty = false;
+    auto object = QPDFParser(input, m->last_object_description, m->tokenizer, nullptr, this)
+                      .parse(empty, false);
+    if (empty) {
+        // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
+        // actual PDF files and Adobe Reader appears to ignore them.
+        warn(damagedPDF(input, input->getLastOffset(), "empty object treated as null"));
+    }
+
+    // Override last_offset so that it points to the beginning of the object we just read
+    input->setLastOffset(offset);
+    return object;
+}
+
 bool
 QPDF::findEndstream()
 {
@@ -1750,7 +1770,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
         if ((entry.getType() == 2) && (entry.getObjStreamNumber() == obj_stream_number)) {
             int offset = iter.second;
             input->seek(offset, SEEK_SET);
-            QPDFObjectHandle oh = readObject(input, "", og, true);
+            QPDFObjectHandle oh = readObjectInStream(input, og);
             updateCache(og, oh.getObj(), end_before_space, end_after_space);
         } else {
             QTC::TC("qpdf", "QPDF not caching overridden objstm object");
