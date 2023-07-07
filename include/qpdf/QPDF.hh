@@ -1006,11 +1006,7 @@ class QPDF
     void insertFreeXrefEntry(QPDFObjGen);
     void insertReconstructedXrefEntry(int obj, qpdf_offset_t f1, int f2);
     void setLastObjectDescription(std::string const& description, QPDFObjGen const& og);
-    QPDFObjectHandle readObject(
-        std::shared_ptr<InputSource>,
-        std::string const& description,
-        QPDFObjGen const& og,
-        bool in_object_stream);
+    QPDFObjectHandle readObject(std::string const& description, QPDFObjGen og);
     QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>, QPDFObjGen og);
     size_t recoverStreamLength(
         std::shared_ptr<InputSource> input, QPDFObjGen const& og, qpdf_offset_t stream_offset);

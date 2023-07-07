@@ -567,7 +567,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
                 insertReconstructedXrefEntry(obj, token_start, gen);
             }
         } else if (!m->trailer.isInitialized() && t1.isWord("trailer")) {
-            QPDFObjectHandle t = readObject(m->file, "trailer", QPDFObjGen(), false);
+            QPDFObjectHandle t = readObject("trailer", QPDFObjGen());
             if (!t.isDictionary()) {
                 // Oh well.  It was worth a try.
             } else {
@@ -855,7 +855,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
     }
 
     // Set offset to previous xref table if any
-    QPDFObjectHandle cur_trailer = readObject(m->file, "trailer", QPDFObjGen(), false);
+    QPDFObjectHandle cur_trailer = readObject("trailer", QPDFObjGen());
     if (!cur_trailer.isDictionary()) {
         QTC::TC("qpdf", "QPDF missing trailer");
         throw damagedPDF("", "expected trailer dictionary");
@@ -1268,32 +1268,28 @@ QPDF::setLastObjectDescription(std::string const& description, QPDFObjGen const&
 }
 
 QPDFObjectHandle
-QPDF::readObject(
-    std::shared_ptr<InputSource> input,
-    std::string const& description,
-    QPDFObjGen const& og,
-    bool in_object_stream)
+QPDF::readObject(std::string const& description, QPDFObjGen og)
 {
     setLastObjectDescription(description, og);
-    qpdf_offset_t offset = input->tell();
+    qpdf_offset_t offset = m->file->tell();
 
     bool empty = false;
     std::shared_ptr<StringDecrypter> decrypter_ph;
     StringDecrypter* decrypter = nullptr;
-    if (m->encp->encrypted && (!in_object_stream)) {
+    if (m->encp->encrypted) {
         decrypter_ph = std::make_shared<StringDecrypter>(this, og);
         decrypter = decrypter_ph.get();
     }
-    auto object = QPDFParser(input, m->last_object_description, m->tokenizer, decrypter, this)
+    auto object = QPDFParser(m->file, m->last_object_description, m->tokenizer, decrypter, this)
                       .parse(empty, false);
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.
-        warn(damagedPDF(input, input->getLastOffset(), "empty object treated as null"));
-    } else if (object.isDictionary() && (!in_object_stream)) {
+        warn(damagedPDF(m->file, m->file->getLastOffset(), "empty object treated as null"));
+    } else if (object.isDictionary()) {
         // check for stream
-        qpdf_offset_t cur_offset = input->tell();
-        if (readToken(input).isWord("stream")) {
+        qpdf_offset_t cur_offset = m->file->tell();
+        if (readToken(m->file).isWord("stream")) {
             // The PDF specification states that the word "stream" should be followed by either a
             // carriage return and a newline or by a newline alone.  It specifically disallowed
             // following it by a carriage return alone since, in that case, there would be no way to
@@ -1305,7 +1301,7 @@ QPDF::readObject(
             while (!done) {
                 done = true;
                 char ch;
-                if (input->read(&ch, 1) == 0) {
+                if (m->file->read(&ch, 1) == 0) {
                     // A premature EOF here will result in some other problem that will get reported
                     // at another time.
                 } else if (ch == '\n') {
@@ -1313,7 +1309,7 @@ QPDF::readObject(
                     QTC::TC("qpdf", "QPDF stream with NL only");
                 } else if (ch == '\r') {
                     // Read another character
-                    if (input->read(&ch, 1) != 0) {
+                    if (m->file->read(&ch, 1) != 0) {
                         if (ch == '\n') {
                             // Ready to read stream data
                             QTC::TC("qpdf", "QPDF stream with CRNL");
@@ -1321,32 +1317,27 @@ QPDF::readObject(
                             // Treat the \r by itself as the whitespace after endstream and start
                             // reading stream data in spite of not having seen a newline.
                             QTC::TC("qpdf", "QPDF stream with CR only");
-                            input->unreadCh(ch);
+                            m->file->unreadCh(ch);
                             warn(damagedPDF(
-                                input,
-                                input->tell(),
-                                "stream keyword followed by carriage return "
-                                "only"));
+                                m->file->tell(),
+                                "stream keyword followed by carriage return only"));
                         }
                     }
                 } else if (QUtil::is_space(ch)) {
                     warn(damagedPDF(
-                        input, input->tell(), "stream keyword followed by extraneous whitespace"));
+                        m->file->tell(), "stream keyword followed by extraneous whitespace"));
                     done = false;
                 } else {
                     QTC::TC("qpdf", "QPDF stream without newline");
-                    input->unreadCh(ch);
+                    m->file->unreadCh(ch);
                     warn(damagedPDF(
-                        input,
-                        input->tell(),
-                        "stream keyword not followed by proper line "
-                        "terminator"));
+                        m->file->tell(), "stream keyword not followed by proper line terminator"));
                 }
             }
 
             // Must get offset before accessing any additional objects since resolving a previously
             // unresolved indirect object will change file position.
-            qpdf_offset_t stream_offset = input->tell();
+            qpdf_offset_t stream_offset = m->file->tell();
             size_t length = 0;
 
             try {
@@ -1355,37 +1346,36 @@ QPDF::readObject(
                 if (!length_obj.isInteger()) {
                     if (length_obj.isNull()) {
                         QTC::TC("qpdf", "QPDF stream without length");
-                        throw damagedPDF(input, offset, "stream dictionary lacks /Length key");
+                        throw damagedPDF(offset, "stream dictionary lacks /Length key");
                     }
                     QTC::TC("qpdf", "QPDF stream length not integer");
-                    throw damagedPDF(
-                        input, offset, "/Length key in stream dictionary is not an integer");
+                    throw damagedPDF(offset, "/Length key in stream dictionary is not an integer");
                 }
 
                 length = toS(length_obj.getUIntValue());
                 // Seek in two steps to avoid potential integer overflow
-                input->seek(stream_offset, SEEK_SET);
-                input->seek(toO(length), SEEK_CUR);
-                if (!readToken(input).isWord("endstream")) {
+                m->file->seek(stream_offset, SEEK_SET);
+                m->file->seek(toO(length), SEEK_CUR);
+                if (!readToken(m->file).isWord("endstream")) {
                     QTC::TC("qpdf", "QPDF missing endstream");
-                    throw damagedPDF(input, input->getLastOffset(), "expected endstream");
+                    throw damagedPDF("expected endstream");
                 }
             } catch (QPDFExc& e) {
                 if (m->attempt_recovery) {
                     warn(e);
-                    length = recoverStreamLength(input, og, stream_offset);
+                    length = recoverStreamLength(m->file, og, stream_offset);
                 } else {
                     throw;
                 }
             }
             object = newIndirect(og, QPDF_Stream::create(this, og, object, stream_offset, length));
         } else {
-            input->seek(cur_offset, SEEK_SET);
+            m->file->seek(cur_offset, SEEK_SET);
         }
     }
 
     // Override last_offset so that it points to the beginning of the object we just read
-    input->setLastOffset(offset);
+    m->file->setLastOffset(offset);
     return object;
 }
 
@@ -1579,7 +1569,7 @@ QPDF::readObjectAtOffset(
         }
     }
 
-    QPDFObjectHandle oh = readObject(m->file, description, og, false);
+    QPDFObjectHandle oh = readObject(description, og);
 
     if (!readToken(m->file).isWord("endobj")) {
         QTC::TC("qpdf", "QPDF err expected endobj");
