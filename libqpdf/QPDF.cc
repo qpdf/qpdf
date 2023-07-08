@@ -1324,51 +1324,7 @@ QPDF::readObject(std::string const& description, QPDFObjGen og)
 void
 QPDF::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
 {
-    // The PDF specification states that the word "stream" should be followed by either a carriage
-    // return and a newline or by a newline alone.  It specifically disallowed following it by a
-    // carriage return alone since, in that case, there would be no way to tell whether the NL in a
-    // CR NL sequence was part of the stream data.  However, some readers, including Adobe reader,
-    // accept a carriage return by itself when followed by a non-newline character, so that's what
-    // we do here. We have also seen files that have extraneous whitespace between the stream
-    // keyword and the newline.
-    while (true) {
-        char ch;
-        if (m->file->read(&ch, 1) == 0) {
-            // A premature EOF here will result in some other problem that will get reported at
-            // another time.
-            break;
-        }
-        if (ch == '\n') {
-            // ready to read stream data
-            QTC::TC("qpdf", "QPDF stream with NL only");
-            break;
-        }
-        if (ch == '\r') {
-            // Read another character
-            if (m->file->read(&ch, 1) != 0) {
-                if (ch == '\n') {
-                    // Ready to read stream data
-                    QTC::TC("qpdf", "QPDF stream with CRNL");
-                } else {
-                    // Treat the \r by itself as the whitespace after endstream and start reading
-                    // stream data in spite of not having seen a newline.
-                    QTC::TC("qpdf", "QPDF stream with CR only");
-                    m->file->unreadCh(ch);
-                    warn(damagedPDF(
-                        m->file->tell(), "stream keyword followed by carriage return only"));
-                }
-            }
-            break;
-        }
-        if (!QUtil::is_space(ch)) {
-            QTC::TC("qpdf", "QPDF stream without newline");
-            m->file->unreadCh(ch);
-            warn(damagedPDF(
-                m->file->tell(), "stream keyword not followed by proper line terminator"));
-            break;
-        }
-        warn(damagedPDF(m->file->tell(), "stream keyword followed by extraneous whitespace"));
-    }
+    validateStreamLineEnd(object, og, offset);
 
     // Must get offset before accessing any additional objects since resolving a previously
     // unresolved indirect object will change file position.
@@ -1404,6 +1360,56 @@ QPDF::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
         }
     }
     object = newIndirect(og, QPDF_Stream::create(this, og, object, stream_offset, length));
+}
+
+void
+QPDF::validateStreamLineEnd(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
+{
+    // The PDF specification states that the word "stream" should be followed by either a carriage
+    // return and a newline or by a newline alone.  It specifically disallowed following it by a
+    // carriage return alone since, in that case, there would be no way to tell whether the NL in a
+    // CR NL sequence was part of the stream data.  However, some readers, including Adobe reader,
+    // accept a carriage return by itself when followed by a non-newline character, so that's what
+    // we do here. We have also seen files that have extraneous whitespace between the stream
+    // keyword and the newline.
+    while (true) {
+        char ch;
+        if (m->file->read(&ch, 1) == 0) {
+            // A premature EOF here will result in some other problem that will get reported at
+            // another time.
+            return;
+        }
+        if (ch == '\n') {
+            // ready to read stream data
+            QTC::TC("qpdf", "QPDF stream with NL only");
+            return;
+        }
+        if (ch == '\r') {
+            // Read another character
+            if (m->file->read(&ch, 1) != 0) {
+                if (ch == '\n') {
+                    // Ready to read stream data
+                    QTC::TC("qpdf", "QPDF stream with CRNL");
+                } else {
+                    // Treat the \r by itself as the whitespace after endstream and start reading
+                    // stream data in spite of not having seen a newline.
+                    QTC::TC("qpdf", "QPDF stream with CR only");
+                    m->file->unreadCh(ch);
+                    warn(damagedPDF(
+                        m->file->tell(), "stream keyword followed by carriage return only"));
+                }
+            }
+            return;
+        }
+        if (!QUtil::is_space(ch)) {
+            QTC::TC("qpdf", "QPDF stream without newline");
+            m->file->unreadCh(ch);
+            warn(damagedPDF(
+                m->file->tell(), "stream keyword not followed by proper line terminator"));
+            return;
+        }
+        warn(damagedPDF(m->file->tell(), "stream keyword followed by extraneous whitespace"));
+    }
 }
 
 QPDFObjectHandle
