@@ -6,3 +6,5 @@ appimage/build
 /distribution/
 .cache
 /.idea
+/html
+Doxyfile
