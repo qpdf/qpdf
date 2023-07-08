@@ -1002,7 +1002,9 @@ class QPDF
     qpdf_offset_t read_xrefTable(qpdf_offset_t offset);
     qpdf_offset_t read_xrefStream(qpdf_offset_t offset);
     qpdf_offset_t processXRefStream(qpdf_offset_t offset, QPDFObjectHandle& xref_stream);
-    void insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2, bool overwrite = false);
+    void insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2);
+    void insertFreeXrefEntry(QPDFObjGen);
+    void insertReconstructedXrefEntry(int obj, qpdf_offset_t f1, int f2);
     void setLastObjectDescription(std::string const& description, QPDFObjGen const& og);
     QPDFObjectHandle readObject(
         std::shared_ptr<InputSource>,

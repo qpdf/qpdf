@@ -564,7 +564,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
             if ((t2.isInteger()) && (readToken(m->file, MAX_LEN).isWord("obj"))) {
                 int obj = QUtil::string_to_int(t1.getValue().c_str());
                 int gen = QUtil::string_to_int(t2.getValue().c_str());
-                insertXrefEntry(obj, 1, token_start, gen, true);
+                insertReconstructedXrefEntry(obj, token_start, gen);
             }
         } else if (!m->trailer.isInitialized() && t1.isWord("trailer")) {
             QPDFObjectHandle t = readObject(m->file, "trailer", QPDFObjGen(), false);
@@ -577,6 +577,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
         m->file->seek(next_line_start, SEEK_SET);
         line_start = next_line_start;
     }
+    m->deleted_objects.clear();
 
     if (!m->trailer.isInitialized()) {
         // We could check the last encountered object to see if it was an xref stream.  If so, we
@@ -889,7 +890,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 
     // Handle any deleted items now that we've read the /XRefStm.
     for (auto const& og: deleted_items) {
-        insertXrefEntry(og.getObj(), 0, 0, og.getGen());
+        insertFreeXrefEntry(og);
     }
 
     if (cur_trailer.hasKey("/Prev")) {
@@ -909,7 +910,6 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 qpdf_offset_t
 QPDF::read_xrefStream(qpdf_offset_t xref_offset)
 {
-    bool found = false;
     if (!m->ignore_xref_streams) {
         QPDFObjGen x_og;
         QPDFObjectHandle xref_obj;
@@ -921,17 +921,13 @@ QPDF::read_xrefStream(qpdf_offset_t xref_offset)
         }
         if (xref_obj.isStreamOfType("/XRef")) {
             QTC::TC("qpdf", "QPDF found xref stream");
-            found = true;
-            xref_offset = processXRefStream(xref_offset, xref_obj);
+            return processXRefStream(xref_offset, xref_obj);
         }
     }
 
-    if (!found) {
-        QTC::TC("qpdf", "QPDF can't find xref");
-        throw damagedPDF("", xref_offset, "xref not found");
-    }
-
-    return xref_offset;
+    QTC::TC("qpdf", "QPDF can't find xref");
+    throw damagedPDF("", xref_offset, "xref not found");
+    return 0; // unreachable
 }
 
 qpdf_offset_t
@@ -1087,9 +1083,10 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         if (fields[0] == 0) {
             // Ignore fields[2], which we don't care about in this case. This works around the issue
             // of some PDF files that put invalid values, like -1, here for deleted objects.
-            fields[2] = 0;
+            insertFreeXrefEntry(QPDFObjGen(obj, 0));
+        } else {
+            insertXrefEntry(obj, toI(fields[0]), fields[1], toI(fields[2]));
         }
-        insertXrefEntry(obj, toI(fields[0]), fields[1], toI(fields[2]));
     }
 
     if (!m->trailer.isInitialized()) {
@@ -1111,52 +1108,62 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 }
 
 void
-QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2, bool overwrite)
+QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2)
 {
     // Populate the xref table in such a way that the first reference to an object that we see,
     // which is the one in the latest xref table in which it appears, is the one that gets stored.
-    // This works because we are reading more recent appends before older ones.  Exception: if
-    // overwrite is true, then replace any existing object.  This is used in xref recovery mode,
-    // which reads the file from beginning to end.
+    // This works because we are reading more recent appends before older ones.
 
     // If there is already an entry for this object and generation in the table, it means that a
     // later xref table has registered this object.  Disregard this one.
-    { // private scope
-        int gen = (f0 == 2 ? 0 : f2);
-        QPDFObjGen og(obj, gen);
-        if (m->xref_table.count(og)) {
-            if (overwrite) {
-                QTC::TC("qpdf", "QPDF xref overwrite object");
-                m->xref_table.erase(og);
-            } else {
-                QTC::TC("qpdf", "QPDF xref reused object");
-                return;
-            }
-        }
-        if (m->deleted_objects.count(obj)) {
-            QTC::TC("qpdf", "QPDF xref deleted object");
-            return;
-        }
+
+    if (m->deleted_objects.count(obj)) {
+        QTC::TC("qpdf", "QPDF xref deleted object");
+        return;
+    }
+
+    auto [iter, created] = m->xref_table.try_emplace(QPDFObjGen(obj, (f0 == 2 ? 0 : f2)));
+    if (!created) {
+        QTC::TC("qpdf", "QPDF xref reused object");
+        return;
     }
 
     switch (f0) {
-    case 0:
-        m->deleted_objects.insert(obj);
-        break;
-
     case 1:
         // f2 is generation
         QTC::TC("qpdf", "QPDF xref gen > 0", ((f2 > 0) ? 1 : 0));
-        m->xref_table[QPDFObjGen(obj, f2)] = QPDFXRefEntry(f1);
+        iter->second = QPDFXRefEntry(f1);
         break;
 
     case 2:
-        m->xref_table[QPDFObjGen(obj, 0)] = QPDFXRefEntry(toI(f1), f2);
+        iter->second = QPDFXRefEntry(toI(f1), f2);
         break;
 
     default:
         throw damagedPDF("xref stream", "unknown xref stream entry type " + std::to_string(f0));
         break;
+    }
+}
+
+void
+QPDF::insertFreeXrefEntry(QPDFObjGen og)
+{
+    if (!m->xref_table.count(og)) {
+        m->deleted_objects.insert(og.getObj());
+    }
+}
+
+// Replace uncompressed object. This is used in xref recovery mode, which reads the file from
+// beginning to end.
+void
+QPDF::insertReconstructedXrefEntry(int obj, qpdf_offset_t f1, int f2)
+{
+    QPDFObjGen og(obj, f2);
+    if (!m->deleted_objects.count(obj)) {
+        // deleted_objects stores the uncompressed objects removed from the xref table at the start
+        // of recovery.
+        QTC::TC("qpdf", "QPDF xref overwrite object");
+        m->xref_table[QPDFObjGen(obj, f2)] = QPDFXRefEntry(f1);
     }
 }
 
