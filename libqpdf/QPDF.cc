@@ -1291,32 +1291,27 @@ QPDF::readObject(std::string const& description, QPDFObjGen og)
 {
     setLastObjectDescription(description, og);
     qpdf_offset_t offset = m->file->tell();
-
     bool empty = false;
-    std::shared_ptr<StringDecrypter> decrypter_ph;
-    StringDecrypter* decrypter = nullptr;
-    if (m->encp->encrypted) {
-        decrypter_ph = std::make_unique<StringDecrypter>(this, og);
-        decrypter = decrypter_ph.get();
-    }
-    auto object = QPDFParser(m->file, m->last_object_description, m->tokenizer, decrypter, this)
+
+    StringDecrypter decrypter{this, og};
+    StringDecrypter* decrypter_ptr = m->encp->encrypted ? &decrypter : nullptr;
+    auto object = QPDFParser(m->file, m->last_object_description, m->tokenizer, decrypter_ptr, this)
                       .parse(empty, false);
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.
         warn(damagedPDF(m->file, m->file->getLastOffset(), "empty object treated as null"));
-    } else if (object.isDictionary()) {
-        // check for stream
-        qpdf_offset_t cur_offset = m->file->tell();
-        if (readToken(m->file).isWord("stream")) {
-            readStream(object, og, offset);
-        } else {
-            m->file->seek(cur_offset, SEEK_SET);
-        }
+        return object;
     }
-
-    // Override last_offset so that it points to the beginning of the object we just read
-    m->file->setLastOffset(offset);
+    auto token = readToken(m->file);
+    if (object.isDictionary() && token.isWord("stream")) {
+        readStream(object, og, offset);
+        token = readToken(m->file);
+    }
+    if (!token.isWord("endobj")) {
+        QTC::TC("qpdf", "QPDF err expected endobj");
+        warn(damagedPDF("expected endobj"));
+    }
     return object;
 }
 
@@ -1601,11 +1596,6 @@ QPDF::readObjectAtOffset(
     }
 
     QPDFObjectHandle oh = readObject(description, og);
-
-    if (!readToken(m->file).isWord("endobj")) {
-        QTC::TC("qpdf", "QPDF err expected endobj");
-        warn(damagedPDF("expected endobj"));
-    }
 
     if (isUnresolved(og)) {
         // Store the object in the cache here so it gets cached whether we first know the offset or
