@@ -1008,6 +1008,7 @@ class QPDF
     void setLastObjectDescription(std::string const& description, QPDFObjGen const& og);
     QPDFObjectHandle readTrailer();
     QPDFObjectHandle readObject(std::string const& description, QPDFObjGen og);
+    void readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset);
     QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>, QPDFObjGen og);
     size_t recoverStreamLength(
         std::shared_ptr<InputSource> input, QPDFObjGen const& og, qpdf_offset_t stream_offset);
