@@ -1331,17 +1331,19 @@ QPDF::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
     // accept a carriage return by itself when followed by a non-newline character, so that's what
     // we do here. We have also seen files that have extraneous whitespace between the stream
     // keyword and the newline.
-    bool done = false;
-    while (!done) {
-        done = true;
+    while (true) {
         char ch;
         if (m->file->read(&ch, 1) == 0) {
             // A premature EOF here will result in some other problem that will get reported at
             // another time.
-        } else if (ch == '\n') {
+            break;
+        }
+        if (ch == '\n') {
             // ready to read stream data
             QTC::TC("qpdf", "QPDF stream with NL only");
-        } else if (ch == '\r') {
+            break;
+        }
+        if (ch == '\r') {
             // Read another character
             if (m->file->read(&ch, 1) != 0) {
                 if (ch == '\n') {
@@ -1356,15 +1358,16 @@ QPDF::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
                         m->file->tell(), "stream keyword followed by carriage return only"));
                 }
             }
-        } else if (QUtil::is_space(ch)) {
-            warn(damagedPDF(m->file->tell(), "stream keyword followed by extraneous whitespace"));
-            done = false;
-        } else {
+            break;
+        }
+        if (!QUtil::is_space(ch)) {
             QTC::TC("qpdf", "QPDF stream without newline");
             m->file->unreadCh(ch);
             warn(damagedPDF(
                 m->file->tell(), "stream keyword not followed by proper line terminator"));
+            break;
         }
+        warn(damagedPDF(m->file->tell(), "stream keyword followed by extraneous whitespace"));
     }
 
     // Must get offset before accessing any additional objects since resolving a previously
