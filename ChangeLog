@@ -1,3 +1,42 @@
+2023-07-09  Jay Berkenbilt  <ejb@ql.org>
+
+        * This release consists entirely of changes made by M. Holger.
+        Mostly this is changes to the private API, performance
+        enhancements, code cleanup, and reformatting to 100 columns
+        instead of 80. For qpdf development, we are starting to use
+        JetBrains CLion, so a lot of the changes are moving us toward a
+        cleaner development experience in that environment.
+
+2023-06-15  Jay Berkenbilt  <ejb@ql.org>
+
+        * Bug fix: when a the same page is copied multiple times, copy
+        the annotations rather than having multiple pages share an
+        annotation object. Thanks to M. Holger for the fix. Fixes #600.
+
+2023-06-14  Jay Berkenbilt  <ejb@ql.org>
+
+        * Add "FUTURE" build option for enabling experimental APIs. Do not
+        package qpdf built with the FUTURE option as there are no binary
+        compatibility or even source compatibility guarantees. The option
+        is intended for developers who want to ensure that future
+        potentially breaking changes are compatible with their code or
+        provide feedback on upcoming changes. At present, the only feature
+        enabled by FUTURE is a move constructor for QPDFObjectHandle.
+        While this shouldn't break any code, it would change details about
+        how many copies of a specific QPDFObjectHandle were in existence,
+        so it could potentially break code that was relying on internal
+        shared pointer reference counts. Thanks to M. Holger for the idea
+        and contribution.
+
+2023-05-25  Jay Berkenbilt  <ejb@ql.org>
+
+        * Add new method Buffer::copy and deprecate Buffer copy
+        constructor and assignment operator. Buffer copy operations are
+        expensive as they always involve copying the buffer content. Use
+        "buffer2 = buffer1.copy();" or "Buffer buffer2{buffer1.copy()};"
+        to make it explicit that copying is intended. This change was
+        contributed by M. Holger.
+
 2023-05-21  Jay Berkenbilt  <ejb@ql.org>
 
         * 11.4.0: release

@@ -285,7 +285,7 @@ FUTURE
   installed qpdf libraries. Set this if you want to test your code
   with proposed QPDF API changes and provide feedback prior to the
   inclusion of those changes in a release. Packagers should never
-  distribute backages built with this option.
+  distribute packages built with this option.
 
 QTEST_COLOR
   Turn this on or off to control whether qtest uses color in its
