@@ -1285,7 +1285,6 @@ QPDF::readTrailer()
     return object;
 }
 
-
 QPDFObjectHandle
 QPDF::readObject(std::string const& description, QPDFObjGen og)
 {
