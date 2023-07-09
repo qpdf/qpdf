@@ -1,5 +1,7 @@
 2023-07-09  Jay Berkenbilt  <ejb@ql.org>
 
+        * 11.5.0: release
+
         * This release consists entirely of changes made by M. Holger.
         Mostly this is changes to the private API, performance
         enhancements, code cleanup, and reformatting to 100 columns
