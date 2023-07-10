@@ -27,7 +27,12 @@
 #define QPDF_MAJOR_VERSION 11
 #define QPDF_MINOR_VERSION 6
 #define QPDF_PATCH_VERSION 3
-#define QPDF_VERSION "11.6.3"
+
+#ifdef QPDF_FUTURE
+# define QPDF_VERSION "11.6.3(Future)"
+#else
+# define QPDF_VERSION "11.6.3"
+#endif // QPDF_FUTURE
 
 /*
  * This file defines symbols that control the which functions,

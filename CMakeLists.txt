@@ -147,10 +147,16 @@ endif()
 # increment SOVERSION every time we increment the project major
 # version. This works because qpdf uses semantic versioning. qpdf 10.x
 # was libqpdf28, so start from there.
-math(EXPR qpdf_SOVERSION "${PROJECT_VERSION_MAJOR} + 18")
-set(qpdf_LIBVERSION ${qpdf_SOVERSION}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 
-if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+if (FUTURE)
+  math(EXPR qpdf_SOVERSION 0)
+  set(qpdf_LIBVERSION 0)
+else ()
+  math(EXPR qpdf_SOVERSION "${PROJECT_VERSION_MAJOR} + 18")
+  set(qpdf_LIBVERSION ${qpdf_SOVERSION}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
+endif ()
+
+if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR "
 Please build with cmake in a subdirectory, e.g.
  mkdir build
