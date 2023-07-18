@@ -70,7 +70,8 @@ Python
    qpdf's capabilities with other functionality provided by Python's
    rich standard library and available modules.
 
-Other Languages Starting with version 11.0.0, the :command:`qpdf`
+Other Languages
+   Starting with version 11.0.0, the :command:`qpdf`
    command-line tool can produce an unambiguous JSON representation of
    a PDF file and can also create or update PDF files using this JSON
    representation. qpdf versions from 8.3.0 through 10.6.3 had a more
