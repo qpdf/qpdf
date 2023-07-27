@@ -1178,21 +1178,43 @@ std::string
 QUtil::read_file_into_string(FILE* f, std::string_view filename)
 {
     fseek(f, 0, SEEK_END);
-    auto size = QIntC::to_size(QUtil::tell(f));
-    fseek(f, 0, SEEK_SET);
-    std::string result(size, '\0');
-    if (auto read = fread(result.data(), 1, size, f); read != size) {
+    auto o_size = QUtil::tell(f);
+    if (o_size >= 0) {
+        // Seekable file
+        auto size = QIntC::to_size(o_size);
+        fseek(f, 0, SEEK_SET);
+        std::string result(size, '\0');
+        if (auto n_read = fread(result.data(), 1, size, f); n_read != size) {
+            if (ferror(f)) {
+                throw std::runtime_error(
+                    std::string("failure reading file ") + std::string(filename) +
+                    " into memory: read " + uint_to_string(n_read) + "; wanted " +
+                    uint_to_string(size));
+            } else {
+                throw std::runtime_error(
+                    std::string("premature eof reading file ") + std::string(filename) +
+                    " into memory: read " + uint_to_string(n_read) + "; wanted " +
+                    uint_to_string(size));
+            }
+        }
+        return result;
+    } else {
+        // Pipe or other non-seekable file
+        size_t buf_size = 8192;
+        auto n_read = buf_size;
+        std::string buffer(buf_size, '\0');
+        std::string result;
+        while (n_read == buf_size) {
+            n_read = fread(buffer.data(), 1, buf_size, f);
+            buffer.erase(n_read);
+            result.append(buffer);
+        }
         if (ferror(f)) {
             throw std::runtime_error(
-                std::string("failure reading file ") + std::string(filename) +
-                " into memory: read " + uint_to_string(read) + "; wanted " + uint_to_string(size));
-        } else {
-            throw std::runtime_error(
-                std::string("premature eof reading file ") + std::string(filename) +
-                " into memory: read " + uint_to_string(read) + "; wanted " + uint_to_string(size));
+                std::string("failure reading file ") + std::string(filename) + " into memory");
         }
+        return result;
     }
-    return result;
 }
 
 static bool
