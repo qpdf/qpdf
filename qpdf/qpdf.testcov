@@ -411,6 +411,8 @@ QPDFPageObjectHelper copy shared attribute 1
 QPDFJob from_nr from repeat_nr 0
 QPDF resolve duplicated page object 0
 QPDF handle direct page object 0
+QPDF missing mediabox 0
+QPDF inherit mediabox 1
 QPDFTokenizer finder found wrong word 0
 QPDFTokenizer found EI by byte count 0
 QPDFTokenizer found EI after more than one try 0

@@ -1,0 +1,3 @@
+WARNING: issue-449.pdf, object 3 0 at offset 139: kid 0 (from 0) MediaBox is undefined; setting to letter / ANSI A
+WARNING: issue-449.pdf, object 4 0 at offset 211: kid 1 (from 0) MediaBox is undefined; setting to letter / ANSI A
+test 69 done
