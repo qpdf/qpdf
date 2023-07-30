@@ -646,7 +646,7 @@ between indirect objects in the current file, foreign objects, and
 direct objects.
 
 When you copy objects from one ``QPDF`` to another, the input source
-of the original file remain valid until you have finished with the
+of the original file must remain valid until you have finished with the
 destination object. This is because the input source is still used
 to retrieve any referenced stream data from the copied object. If
 needed, there are methods to force the data to be copied. See comments
