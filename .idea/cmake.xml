@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeSharedSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Maintainer" ENABLED="true" CONFIG_NAME="RelWithDebInfo" GENERATION_OPTIONS="-DMAINTAINER_MODE=ON -DBUILD_STATIC_LIBS=OFF" />
+    </configurations>
+  </component>
+</project>
