@@ -5,6 +5,5 @@ appimage/build
 /external-libs
 /distribution/
 .cache
-/.idea
 /html
 Doxyfile
