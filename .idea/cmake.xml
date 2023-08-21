@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CMakeSharedSettings">
     <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
       <configuration PROFILE_NAME="Maintainer" ENABLED="true" CONFIG_NAME="RelWithDebInfo" GENERATION_OPTIONS="-DMAINTAINER_MODE=ON -DBUILD_STATIC_LIBS=OFF" />
     </configurations>
   </component>
