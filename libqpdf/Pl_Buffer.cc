@@ -19,7 +19,7 @@ Pl_Buffer::~Pl_Buffer() // NOLINT (modernize-use-equals-default)
 void
 Pl_Buffer::write(unsigned char const* buf, size_t len)
 {
-    m->data.append(buf, len);
+    m->data.insert(m->data.end(), buf, buf + len);
     m->ready = false;
 
     if (getNext(true)) {
@@ -43,7 +43,7 @@ Pl_Buffer::getBuffer()
         throw std::logic_error("Pl_Buffer::getBuffer() called when not ready");
     }
 
-    auto size = m->data.length();
+    auto size = m->data.size();
     auto* b = new Buffer(size);
     if (size > 0) {
         unsigned char* p = b->getBuffer();
@@ -65,7 +65,7 @@ Pl_Buffer::getMallocBuffer(unsigned char** buf, size_t* len)
     if (!m->ready) {
         throw std::logic_error("Pl_Buffer::getMallocBuffer() called when not ready");
     }
-    auto size = m->data.length();
+    auto size = m->data.size();
     *len = size;
     if (size > 0) {
         *buf = reinterpret_cast<unsigned char*>(malloc(size));
