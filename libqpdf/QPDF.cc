@@ -2056,11 +2056,6 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
         return;
     }
 
-    if ((!top) && foreign.isPageObject()) {
-        QTC::TC("qpdf", "QPDF not crossing page boundary");
-        return;
-    }
-
     if (foreign.isIndirect()) {
         QPDFObjGen foreign_og(foreign.getObjGen());
         if (obj_copier.object_map.count(foreign_og) > 0) {
@@ -2075,9 +2070,14 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
         }
         QTC::TC("qpdf", "QPDF copy indirect");
         if (obj_copier.object_map.count(foreign_og) == 0) {
-            obj_copier.to_copy.push_back(foreign);
             obj_copier.object_map[foreign_og] =
                 foreign.isStream() ? newStream() : newIndirectNull();
+            if ((!top) && foreign.isPageObject()) {
+                QTC::TC("qpdf", "QPDF not crossing page boundary");
+                obj_copier.visiting.erase(foreign);
+                return;
+            }
+            obj_copier.to_copy.push_back(foreign);
         }
     }
 
@@ -2109,7 +2109,7 @@ QPDF::replaceForeignIndirectObjects(QPDFObjectHandle foreign, ObjCopier& obj_cop
         QTC::TC("qpdf", "QPDF replace indirect");
         auto mapping = obj_copier.object_map.find(foreign.getObjGen());
         if (mapping == obj_copier.object_map.end()) {
-            // This case would occur if this is a reference to a Page or Pages object that we didn't
+            // This case would occur if this is a reference to a Pages object that we didn't
             // traverse into.
             QTC::TC("qpdf", "QPDF replace foreign indirect with null");
             result = QPDFObjectHandle::newNull();
