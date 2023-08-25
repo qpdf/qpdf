@@ -391,8 +391,8 @@ class QPDF
     void swapObjects(int objid1, int generation1, int objid2, int generation2);
 
     // Replace a reserved object.  This is a wrapper around replaceObject but it guarantees that the
-    // underlying object is a reserved object.  After this call, reserved will be a reference to
-    // replacement.
+    // underlying object is a reserved object or a null object.  After this call, reserved will
+    // be a reference to replacement.
     QPDF_DLL
     void replaceReserved(QPDFObjectHandle reserved, QPDFObjectHandle replacement);
 
