@@ -1861,6 +1861,12 @@ QPDF::newReserved()
 }
 
 QPDFObjectHandle
+QPDF::newIndirectNull()
+{
+    return makeIndirectFromQPDFObject(QPDF_Null::create());
+}
+
+QPDFObjectHandle
 QPDF::newStream()
 {
     return makeIndirectFromQPDFObject(
@@ -2015,8 +2021,7 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
     reserveObjects(foreign, obj_copier, true);
 
     if (!obj_copier.visiting.empty()) {
-        throw std::logic_error("obj_copier.visiting is not empty"
-                               " after reserving objects");
+        throw std::logic_error("obj_copier.visiting is not empty after reserving objects");
     }
 
     // Copy any new objects and replace the reservations.
@@ -2071,7 +2076,8 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
         QTC::TC("qpdf", "QPDF copy indirect");
         if (obj_copier.object_map.count(foreign_og) == 0) {
             obj_copier.to_copy.push_back(foreign);
-            obj_copier.object_map[foreign_og] = foreign.isStream() ? newStream() : newReserved();
+            obj_copier.object_map[foreign_og] =
+                foreign.isStream() ? newStream() : newIndirectNull();
         }
     }
 

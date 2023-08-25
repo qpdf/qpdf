@@ -351,6 +351,8 @@ class QPDF
     // QPDF with QPDFWriter if it has any reserved objects in it.
     QPDF_DLL
     QPDFObjectHandle newReserved();
+    QPDF_DLL
+    QPDFObjectHandle newIndirectNull();
 
     // Install this object handle as an indirect object and return an indirect reference to it.
     QPDF_DLL
