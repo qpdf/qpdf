@@ -121,7 +121,7 @@ QPDF_Dictionary::getAsMap() const
 void
 QPDF_Dictionary::replaceKey(std::string const& key, QPDFObjectHandle value)
 {
-    if (value.isNull()) {
+    if (value.isNull() && !value.isIndirect()) {
         // The PDF spec doesn't distinguish between keys with null values and missing keys.
         removeKey(key);
     } else {
