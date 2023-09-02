@@ -14,12 +14,26 @@ cleanup();
 
 my $td = new TestDriver('page-errors');
 
-my $n_tests = 5;
+my $n_tests = 9;
 
 $td->runtest("handle page no with contents",
              {$td->COMMAND => "qpdf --show-pages page-no-content.pdf"},
-             {$td->FILE => "page-no-content.out", $td->EXIT_STATUS => 0},
+             {$td->FILE => "page-no-content.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
+$td->runtest("handle page with missing MediaBox",
+             {$td->COMMAND => "qpdf --static-id --empty --pages page-no-content.pdf -- out.pdf"},
+             {$td->FILE => "page-missing-mediabox.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "out.pdf"},
+             {$td->FILE => "page-missing-mediabox-out.pdf"});
+$td->runtest("handle page with inherited MediaBox",
+             {$td->COMMAND => "qpdf --static-id --empty --pages page-inherit-mediabox.pdf -- out.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "out.pdf"},
+             {$td->FILE => "page-inherit-mediabox-out.pdf"});
 $td->runtest("check no type key for page nodes",
              {$td->COMMAND => "qpdf --check no-pages-types.pdf"},
              {$td->FILE => "no-pages-types.out", $td->EXIT_STATUS => 3},

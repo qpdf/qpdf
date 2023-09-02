@@ -1105,7 +1105,10 @@ class QPDF
     // methods to support page handling
 
     void getAllPagesInternal(
-        QPDFObjectHandle cur_pages, QPDFObjGen::set& visited, QPDFObjGen::set& seen);
+        QPDFObjectHandle cur_pages,
+        QPDFObjGen::set& visited,
+        QPDFObjGen::set& seen,
+        bool media_box);
     void insertPage(QPDFObjectHandle newpage, int pos);
     void flattenPagesTree();
     void insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_duplicate);

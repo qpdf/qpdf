@@ -68,7 +68,7 @@ QPDF::getAllPages()
         seen.clear();
         if (pages.hasKey("/Kids")) {
             // Ensure we actually found a /Pages object.
-            getAllPagesInternal(pages, visited, seen);
+            getAllPagesInternal(pages, visited, seen, false);
         }
     }
     return m->all_pages;
@@ -76,7 +76,7 @@ QPDF::getAllPages()
 
 void
 QPDF::getAllPagesInternal(
-    QPDFObjectHandle cur_node, QPDFObjGen::set& visited, QPDFObjGen::set& seen)
+    QPDFObjectHandle cur_node, QPDFObjGen::set& visited, QPDFObjGen::set& seen, bool media_box)
 {
     if (!visited.add(cur_node)) {
         throw QPDFExc(
@@ -90,13 +90,26 @@ QPDF::getAllPagesInternal(
         cur_node.warnIfPossible("/Type key should be /Pages but is not; overriding");
         cur_node.replaceKey("/Type", "/Pages"_qpdf);
     }
+    if (!media_box) {
+        media_box = cur_node.getKey("/MediaBox").isRectangle();
+        QTC::TC("qpdf", "QPDF inherit mediabox", media_box ? 0 : 1);
+    }
     auto kids = cur_node.getKey("/Kids");
     int n = kids.getArrayNItems();
     for (int i = 0; i < n; ++i) {
         auto kid = kids.getArrayItem(i);
         if (kid.hasKey("/Kids")) {
-            getAllPagesInternal(kid, visited, seen);
+            getAllPagesInternal(kid, visited, seen, media_box);
         } else {
+            if (!media_box && !kid.getKey("/MediaBox").isRectangle()) {
+                QTC::TC("qpdf", "QPDF missing mediabox");
+                kid.warnIfPossible(
+                    "kid " + std::to_string(i) +
+                    " (from 0) MediaBox is undefined; setting to letter / ANSI A");
+                kid.replaceKey(
+                    "/MediaBox",
+                    QPDFObjectHandle::newArray(QPDFObjectHandle::Rectangle(0, 0, 612, 792)));
+            }
             if (!kid.isIndirect()) {
                 QTC::TC("qpdf", "QPDF handle direct page object");
                 cur_node.warnIfPossible(

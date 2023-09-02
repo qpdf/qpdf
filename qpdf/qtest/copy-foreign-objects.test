@@ -56,7 +56,7 @@ foreach my $i (0, 1)
 }
 $td->runtest("issue 449",
              {$td->COMMAND => "test_driver 69 issue-449.pdf"},
-             {$td->STRING => "test 69 done\n", $td->EXIT_STATUS => 0},
+             {$td->FILE => "issue-449.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();
