@@ -121,8 +121,10 @@ QPDF_Dictionary::getAsMap() const
 void
 QPDF_Dictionary::replaceKey(std::string const& key, QPDFObjectHandle value)
 {
-    if (value.isNull()) {
-        // The PDF spec doesn't distinguish between keys with null values and missing keys.
+    if (value.isNull() && !value.isIndirect()) {
+        // The PDF spec doesn't distinguish between keys with null values and missing keys. Allow
+        // indirect nulls which are equivalent to a dangling reference, which is permitted by the
+        // spec.
         removeKey(key);
     } else {
         // add or replace value
