@@ -28,6 +28,27 @@ for (my $n = 1; $n <= 2; ++$n)
                  {$td->FILE => "fix$n.qdf.out",
                   $td->EXIT_STATUS => 0});
 }
+if (! (($^O eq 'MSWin32') || ($^O eq 'Win32') || ($^O eq 'msys')))
+{
+    # The pipe tests are unstable on Windows. It has not been
+    # determined whether this is because the code doesn't work or the
+    # tests don't work, but as of September 2023, I think it works
+    # with MSVC and not with mingw. Fixing fix-qdf to read from pipes
+    # on Windows is not a high priority, but patches are welcome.
+    $n_tests += 4;
+    for (my $n = 1; $n <= 2; ++$n)
+    {
+        $td->runtest("fix-qdf $n from pipe",
+                     {$td->COMMAND => "cat fix$n.qdf | fix-qdf "},
+                     {$td->FILE => "fix$n.qdf.out",
+                          $td->EXIT_STATUS => 0});
+
+        $td->runtest("identity fix-qdf $n",
+                     {$td->COMMAND => "fix-qdf fix$n.qdf.out"},
+                     {$td->FILE => "fix$n.qdf.out",
+                          $td->EXIT_STATUS => 0});
+}
+    }
 $td->runtest("fix-qdf with big object stream", # > 255 objects in a stream
              {$td->COMMAND => "fix-qdf big-ostream.pdf"},
              {$td->FILE => "big-ostream.pdf",

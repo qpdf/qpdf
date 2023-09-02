@@ -1,3 +1,15 @@
+2023-09-02  Jay Berkenbilt  <ejb@ql.org>
+
+        * Bug fix from M. Holger: allow fix-qdf to read from pipe. Fixes #1010.
+
+        * Bug fix: maintain links to foreign pages when copying foreign
+        objects. This corrects a possible crash.
+
+        * Add /MediaBox to a page if absent. Thanks M. Holger.
+
+        * Use std::vector internally for Pl_Buffer to
+        avoid incompatibility with C++20. Thanks to Zoe Clifford. Fixes #1024.
+
 2023-07-09  Jay Berkenbilt  <ejb@ql.org>
 
         * 11.5.0: release
