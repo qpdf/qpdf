@@ -954,6 +954,8 @@ test_25(QPDF& pdf, char const* arg2)
     // Copy qtest without crossing page boundaries.  Should get O1
     // and O2 and their streams but not O3 or any other pages.
 
+    // Also verify that attempts to copy /Pages objects return null.
+
     assert(arg2 != nullptr);
     {
         // Make sure original PDF is out of scope when we write.
@@ -961,6 +963,8 @@ test_25(QPDF& pdf, char const* arg2)
         oldpdf.processFile(arg2);
         QPDFObjectHandle qtest = oldpdf.getTrailer().getKey("/QTest");
         pdf.getTrailer().replaceKey("/QTest", pdf.copyForeignObject(qtest));
+
+        assert(pdf.copyForeignObject(oldpdf.getRoot().getKey("/Pages")).isNull());
     }
 
     QPDFWriter w(pdf, "a.pdf");
