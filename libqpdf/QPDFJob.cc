@@ -1269,9 +1269,9 @@ QPDFJob::doJSONEncrypt(Pipeline* p, bool& first, QPDF& pdf)
     }
     j_parameters.addDictionaryMember("bits", JSON::makeInt(bits));
     j_parameters.addDictionaryMember("key", key);
-    auto fix_method = [is_encrypted](QPDF::encryption_method_e& m) {
-        if (is_encrypted && m == QPDF::e_none) {
-            m = QPDF::e_rc4;
+    auto fix_method = [is_encrypted](QPDF::encryption_method_e& method) {
+        if (is_encrypted && method == QPDF::e_none) {
+            method = QPDF::e_rc4;
         }
     };
     fix_method(stream_method);
@@ -2342,7 +2342,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             // paths to refer to the same file is a documented workaround for duplicating a page. If
             // you are using this an example of how to do this with the API, you can just create two
             // different QPDF objects to the same underlying file with the same path to achieve the
-            // same affect.
+            // same effect.
             char const* password = page_spec.password.get();
             if ((!m->encryption_file.empty()) && (password == nullptr) &&
                 (page_spec.filename == m->encryption_file)) {
