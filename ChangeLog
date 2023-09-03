@@ -1,5 +1,8 @@
 2023-09-03  Jay Berkenbilt  <ejb@ql.org>
 
+        * ascii85 parser: ignore spaces everywhere including between ~
+        and >. Fixes #973.
+
         * Bug fix: with --pages, if one of the external files had warnings
         but the main file did not, the warning was previously not taken
         into consideration when determining the exit status.

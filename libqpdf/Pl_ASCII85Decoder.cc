@@ -19,6 +19,17 @@ Pl_ASCII85Decoder::write(unsigned char const* buf, size_t len)
         return;
     }
     for (size_t i = 0; i < len; ++i) {
+        switch (buf[i]) {
+        case ' ':
+        case '\f':
+        case '\v':
+        case '\t':
+        case '\r':
+        case '\n':
+            QTC::TC("libtests", "Pl_ASCII85Decoder ignore space");
+            // ignore whitespace
+            continue;
+        }
         if (eod > 1) {
             break;
         } else if (eod == 1) {
@@ -30,16 +41,6 @@ Pl_ASCII85Decoder::write(unsigned char const* buf, size_t len)
             }
         } else {
             switch (buf[i]) {
-            case ' ':
-            case '\f':
-            case '\v':
-            case '\t':
-            case '\r':
-            case '\n':
-                QTC::TC("libtests", "Pl_ASCII85Decoder ignore space");
-                // ignore whitespace
-                break;
-
             case '~':
                 eod = 1;
                 break;

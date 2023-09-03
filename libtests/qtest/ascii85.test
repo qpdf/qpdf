@@ -20,4 +20,10 @@ $td->runtest("partial decode",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
-$td->report(2);
+$td->runtest("newline between ~ and >",
+             {$td->COMMAND => "echo '\@<5skEHbu7\$3~\n>' | ascii85"},
+             {$td->STRING => "asdfqwer\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->report(3);
