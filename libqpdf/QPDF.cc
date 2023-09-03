@@ -1956,7 +1956,7 @@ QPDF::replaceReserved(QPDFObjectHandle reserved, QPDFObjectHandle replacement)
     QTC::TC("qpdf", "QPDF replaceReserved");
     auto tc = reserved.getTypeCode();
     if (!(tc == ::ot_reserved || tc == ::ot_null)) {
-        throw std::logic_error("replaceReserved called with non-reserverd object");
+        throw std::logic_error("replaceReserved called with non-reserved object");
     }
     replaceObject(reserved.getObjGen(), replacement);
 }
