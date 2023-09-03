@@ -193,7 +193,7 @@ QPDFArgParser::completionCommon(bool zsh)
     if (!zsh) {
         std::cout << " -o nospace";
     }
-    std::cout << " -C " << progname << " " << m->whoami << std::endl;
+    std::cout << " -C \"" << progname << "\" " << m->whoami << std::endl;
     // Put output before error so calling from zsh works properly
     std::string path = progname;
     size_t slash = path.find('/');

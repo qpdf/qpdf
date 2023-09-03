@@ -1,5 +1,12 @@
 2023-09-03  Jay Berkenbilt  <ejb@ql.org>
 
+        * Put quotation marks around the command in completion output to
+        better handle spaces in paths. It is not a perfect fix (ideally,
+        full shell-compatible quoting should be used), but it handles more
+        cases than the old code and should handle all reasonable cases of
+        qpdf being in a directory with a space in its name, which is
+        common in Windows. Fixes #1021.
+
         * Move check for random number device to runtime instead of
         compile time. Since, by default, the crypto provider provides
         random numbers, runtime determinination of a random number device
