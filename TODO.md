@@ -29,6 +29,8 @@ Always
 Next
 ====
 
+* Spell check: Have the spell-check script synchronize cSpell.json with .idea/dictionaries/qpdf.xml,
+  which should be set to the union of all the validated user dictionaries.
 * Fix #874 -- make args in --encrypt to match the json and make positional fill in the gaps
 * Maybe fix #553 -- use file times for attachments
 * std::string_view transition -- work being done by m-holger
