@@ -1,9 +1,3 @@
-2023-09-03  Jay Berkenbilt  <ejb@ql.org>
-
-        * Bug fix: with --pages, if one of the external files had warnings
-        but the main file did not, the warning was previously not taken
-        into consideration when determining the exit status.
-
 2023-09-02  Jay Berkenbilt  <ejb@ql.org>
 
         * Bug fix from M. Holger: allow fix-qdf to read from pipe. Fixes #1010.
