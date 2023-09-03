@@ -14,10 +14,15 @@
 
 2023-09-02  Jay Berkenbilt  <ejb@ql.org>
 
-        * Bug fix from M. Holger: allow fix-qdf to read from pipe. Fixes #1010.
+        * Maintain links to foreign pages when copying foreign objects.
+        This allows hyperlinks in imported files to work. Fixes #1003.
 
-        * Bug fix: maintain links to foreign pages when copying foreign
-        objects. This corrects a possible crash.
+        * Bug fix: Return a null object if an attempt is made to to copy a
+        foreign /Pages object with copyForeignObject. This corrects a
+        possible crash. Fixes #1010.
+
+        * Bug fix: Return a null object if an attempt is made to to copy a
+        foreign /Pages object with copyForeignObject. Fixes #1003.
 
         * Add /MediaBox to a page if absent. Thanks M. Holger.
 
