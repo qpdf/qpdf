@@ -1,5 +1,9 @@
 2023-09-03  Jay Berkenbilt  <ejb@ql.org>
 
+        * Bug fix: with --pages, if one of the external files had warnings
+        but the main file did not, the warning was previously not taken
+        into consideration when determining the exit status.
+
         * Put quotation marks around the command in completion output to
         better handle spaces in paths. It is not a perfect fix (ideally,
         full shell-compatible quoting should be used), but it handles more
