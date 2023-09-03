@@ -2034,13 +2034,13 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
     }
     obj_copier.to_copy.clear();
 
-    auto& result = obj_copier.object_map[foreign.getObjGen()];
-    if (!result.isInitialized()) {
-        result = QPDFObjectHandle::newNull();
-        warn(damagedPDF("Unexpected reference to /Pages object while copying foreign object. "
-                        "Replacing with Null object."));
+    auto og = foreign.getObjGen();
+    if (!obj_copier.object_map.count(og)) {
+        warn(damagedPDF("unexpected reference to /Pages object while copying foreign object; "
+                        "replacing with null"));
+        return QPDFObjectHandle::newNull();
     }
-    return result;
+    return obj_copier.object_map[foreign.getObjGen()];
 }
 
 void
