@@ -35,6 +35,23 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
+11.6.0: September 3, 2023
+  - Bug fixes:
+
+    - Fix corner case in the ASCII85 decoder.
+
+    - Properly report warnings when ``--pages`` is used and the
+      warnings appear in other than the primary file.
+
+    - Improve ``--bash-completion`` and ``--zsh-completion`` to better
+      support paths with spaces in them.
+
+    - Move detection of random number device from compile-time to
+      runtime to improve cross compilation.
+
+    - Fix bugs around attempting to copy ``/Pages`` objects with
+      ``copyForeignObject`` (which explicitly doesn't allow this).
+
 11.5.0: July 9, 2023
   - Bug Fixes
 

@@ -1,5 +1,7 @@
 2023-09-03  Jay Berkenbilt  <ejb@ql.org>
 
+        * 11.6.0: release
+
         * ascii85 parser: ignore spaces everywhere including between ~
         and >. Fixes #973.
 
