@@ -334,7 +334,9 @@ When done, the following should happen:
 * Each year, update copyright notices. This will find all relevant
   places (assuming current copyright is from last year):
 
+  ```
   git --no-pager grep -i -n -P "copyright.*$(expr $(date +%Y) - 1).*berkenbilt"
+  ```
 
   Also update the copyright in these places:
   * debian package -- search for copyright.*berkenbilt in debian/copyright
@@ -350,7 +352,7 @@ When done, the following should happen:
 * Check for open fuzz crashes at https://oss-fuzz.com
 
 * Check all open issues and pull requests in github and the
-  sourceforge trackers. See ~/scripts/github-issues. Don't forget pull
+  sourceforge trackers. Don't forget pull
   requests. Note: If the location for reporting issues changes, do a
   careful check of documentation and code to make sure any comments
   that include the issue creation URL are updated.
@@ -362,12 +364,16 @@ When done, the following should happen:
 
 * Make sure the code is formatted.
 
+  ```
   ./format-code
+  ```
 
 * Run a spelling checker over the source code to catch errors in
   variable names, strings, and comments.
 
+  ```
   ./spell-check
+  ```
 
   This uses cspell. Install with `npm install -g cspell`. The output
   of cspell is suitable for use with `M-x grep` in emacs. Add
@@ -376,8 +382,10 @@ When done, the following should happen:
 * If needed, run large file and image comparison tests by setting
   these environment variables:
 
+  ```
   QPDF_LARGE_FILE_TEST_PATH=/full/path
   QPDF_TEST_COMPARE_IMAGES=1
+  ```
 
   For Windows, use a Windows style path, not an MSYS path for large files.
 
@@ -413,10 +421,12 @@ When done, the following should happen:
 
 * Test for performance and binary compatibility:
 
+  ```
   ./abi-perf-test v<old> @
+  ```
 
-  Prefix with SKIP_PERF=1 to skip performance test.
-  Prefix with SKIP_TESTS=1 to skip test suite run.
+  * Prefix with `SKIP_PERF=1` to skip performance test.
+  * Prefix with `SKIP_TESTS=1` to skip test suite run.
 
   See "ABI checks" for details about the process.
   End state:
@@ -427,8 +437,9 @@ When done, the following should happen:
 
 * Run package tests:
 
-(Note: can't use DESTDIR because pkg-config won't know about it.)
+  (Note: can't use DESTDIR because pkg-config won't know about it.)
 
+```
 \rm -rf /tmp/inst build.tmp
 cmake -S . -B build.tmp \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/tmp/inst
@@ -438,6 +449,7 @@ env PKG_CONFIG_PATH=/tmp/inst/lib/pkgconfig \
     LD_LIBRARY_PATH=/tmp/inst/lib \
     CMAKE_PREFIX_PATH=/tmp/inst \
    ./pkg-test/run-all
+```
 
 ## CREATING A RELEASE
 
@@ -448,8 +460,10 @@ env PKG_CONFIG_PATH=/tmp/inst/lib/pkgconfig \
 
 * Sign the source distribution:
 
+```
 version=x.y.z
 gpg --detach-sign --armor qpdf-$version.tar.gz
+```
 
 * Build and test the debian package. This includes running autopkgtest.
 
@@ -458,6 +472,7 @@ gpg --detach-sign --armor qpdf-$version.tar.gz
 
 * From the release archive area, sign the releases.
 
+```
 \rm -f *.sha256
 files=(*)
 sha256sum ${files[*]} >| qpdf-$version.sha256
@@ -465,6 +480,7 @@ gpg --clearsign --armor qpdf-$version.sha256
 mv qpdf-$version.sha256.asc qpdf-$version.sha256
 chmod 444 *
 chmod 555 *.AppImage
+```
 
 * When creating releases on github and sourceforge, remember to copy
   `README-what-to-download.md` separately onto the download area if
@@ -475,14 +491,18 @@ chmod 555 *.AppImage
   arguments. Create and push a signed tag. This should be run with
   HEAD pointing to the tip of main.
 
+```
 git rev-parse qpdf/main @
 git tag -s v$version @ -m"qpdf $version"
 git push qpdf v$version
+```
 
 * Update documentation branches
 
+```
 git push qpdf @:$(echo $version | sed -E 's/\.[^\.]+$//')
 git push qpdf @:stable
+```
 
 * If this is an x.y.0 release, visit
   https://readthedocs.org/projects/qpdf/versions/ (log in with
@@ -519,7 +539,8 @@ Template for release notes:
 ```
 This is qpdf version x.y.z. (Brief description)
 
-For a full list of changes from previous releases, please see the [release notes](https://qpdf.readthedocs.io/en/stable/release-notes.html). See also [README-what-to-download](./README-what-to-download.md) for details about the available source and binary distributions.
+For a full list of changes from previous releases, please see the [release notes](https://qpdf.readthedocs.io/en/stable/release-notes.html). See also [README-what-to-download](./README-what-to-download.md) for details about
+the available source and binary distributions.
 ```
 
 ```
@@ -529,7 +550,9 @@ gcurl -XPOST $url -d'{"draft": false}'
 
 * Upload files to sourceforge.
 
+```
 rsync -vrlcO ./ jay_berkenbilt,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/qpdf/qpdf/$version/
+```
 
 * On sourceforge, make the source package the default for all but
   Windows, and make the 64-bit msvc build the default for Windows.
