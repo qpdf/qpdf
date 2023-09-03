@@ -24,8 +24,5 @@
 #cmakedefine HAVE_MALLOC_INFO 1
 #cmakedefine HAVE_OPEN_MEMSTREAM 1
 
-/* system random device (e.g. /dev/random) if any */
-#cmakedefine RANDOM_DEVICE "${RANDOM_DEVICE}"
-
 /* bytes in the size_t type */
 #cmakedefine SIZEOF_SIZE_T ${SIZEOF_SIZE_T}

@@ -87,23 +87,26 @@ SecureRandomDataProvider::provideRandomData(unsigned char* data, size_t len)
         throw std::runtime_error("unable to generate secure random data");
     }
 
-# elif defined(RANDOM_DEVICE)
+# else
+    static std::unique_ptr<QUtil::FileCloser> random_device = []() {
+        FILE* f = fopen("/dev/urandom", "rb");
+        if (f == nullptr) {
+            f = fopen("/dev/arandom", "rb");
+        }
+        if (f == nullptr) {
+            f = fopen("/dev/random", "rb");
+        }
+        if (f == nullptr) {
+            throw std::runtime_error("unable to find device in /dev for generating random numbers");
+        }
+        return std::make_unique<QUtil::FileCloser>(f);
+    }();
 
-    // Optimization: wrap the file open and close in a class so that the file is closed in a
-    // destructor, then make this static to keep the file handle open.  Only do this if it can be
-    // done in a thread-safe fashion.
-    FILE* f = QUtil::safe_fopen(RANDOM_DEVICE, "rb");
-    size_t fr = fread(data, 1, len, f);
-    fclose(f);
+    size_t fr = fread(data, 1, len, random_device->f);
     if (fr != len) {
         throw std::runtime_error(
-            "unable to read " + std::to_string(len) + " bytes from " + std::string(RANDOM_DEVICE));
+            "unable to read " + std::to_string(len) + " bytes from random number device");
     }
-
-# else
-
-#  error \
-      "Don't know how to generate secure random numbers on this platform.  See random number generation in the top-level README.md"
 
 # endif
 }

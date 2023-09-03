@@ -320,8 +320,6 @@ check_symbol_exists(fseeko "stdio.h" HAVE_FSEEKO)
 check_symbol_exists(fseeko64 "stdio.h" HAVE_FSEEKO64)
 check_symbol_exists(localtime_r "time.h" HAVE_LOCALTIME_R)
 check_symbol_exists(random "stdlib.h" HAVE_RANDOM)
-find_file(RANDOM_DEVICE
-  "urandom" "arandom" "arandom" PATHS "/dev" NO_DEFAULT_PATH)
 
 check_c_source_compiles(
 "#include <time.h>

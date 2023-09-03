@@ -1,3 +1,10 @@
+2023-09-03  Jay Berkenbilt  <ejb@ql.org>
+
+        * Move check for random number device to runtime instead of
+        compile time. Since, by default, the crypto provider provides
+        random numbers, runtime determinination of a random number device
+        is usually not needed. Fixes #1022.
+
 2023-09-02  Jay Berkenbilt  <ejb@ql.org>
 
         * Bug fix from M. Holger: allow fix-qdf to read from pipe. Fixes #1010.
