@@ -2561,6 +2561,11 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             }
         }
     }
+    for (auto const& p: page_spec_qpdfs) {
+        if (!p.second->getWarnings().empty()) {
+            m->warnings = true;
+        }
+    }
 }
 
 void
