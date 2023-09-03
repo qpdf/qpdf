@@ -22,7 +22,7 @@ $td->runtest("handle page no with contents",
              $td->NORMALIZE_NEWLINES);
 $td->runtest("handle page with missing MediaBox",
              {$td->COMMAND => "qpdf --static-id --empty --pages page-no-content.pdf -- out.pdf"},
-             {$td->FILE => "page-missing-mediabox.out", $td->EXIT_STATUS => 0},
+             {$td->FILE => "page-missing-mediabox.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
              {$td->FILE => "out.pdf"},

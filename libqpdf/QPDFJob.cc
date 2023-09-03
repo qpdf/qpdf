@@ -477,6 +477,12 @@ QPDFJob::createQPDF()
     }
     handleUnderOverlay(pdf);
     handleTransformations(pdf);
+
+    for (auto& foreign: page_heap) {
+        if (foreign->anyWarnings()) {
+            m->warnings = true;
+        }
+    }
     return pdf_sp;
 }
 
