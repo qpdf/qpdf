@@ -2058,27 +2058,27 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
 
     if (foreign.isIndirect()) {
         QPDFObjGen foreign_og(foreign.getObjGen());
+        if (!obj_copier.visiting.add(foreign_og)) {
+            QTC::TC("qpdf", "QPDF loop reserving objects");
+            return;
+        }
         if (obj_copier.object_map.count(foreign_og) > 0) {
             QTC::TC("qpdf", "QPDF already reserved object");
-            if (obj_copier.visiting.count(foreign_og)) {
-                QTC::TC("qpdf", "QPDF loop reserving objects");
+            if (!(top && foreign.isPageObject() && obj_copier.object_map[foreign_og].isNull())) {
+                obj_copier.visiting.erase(foreign);
+                return;
             }
-            return;
-        }
-        if (!obj_copier.visiting.add(foreign_og)) {
-            return;
-        }
-        QTC::TC("qpdf", "QPDF copy indirect");
-        if (obj_copier.object_map.count(foreign_og) == 0) {
+        } else {
+            QTC::TC("qpdf", "QPDF copy indirect");
             obj_copier.object_map[foreign_og] =
                 foreign.isStream() ? newStream() : newIndirectNull();
             if ((!top) && foreign.isPageObject()) {
                 QTC::TC("qpdf", "QPDF not crossing page boundary");
-                obj_copier.visiting.erase(foreign);
+                obj_copier.visiting.erase(foreign_og);
                 return;
             }
-            obj_copier.to_copy.push_back(foreign);
         }
+        obj_copier.to_copy.push_back(foreign);
     }
 
     if (foreign_tc == ::ot_array) {

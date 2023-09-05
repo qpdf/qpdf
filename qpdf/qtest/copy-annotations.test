@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('copy-annotations');
 
-my $n_tests = 43;
+my $n_tests = 45;
 
 $td->runtest("complex copy annotations",
              {$td->COMMAND =>
@@ -205,6 +205,15 @@ $td->runtest("Direct DR and annotations",
 $td->runtest("check output",
              {$td->FILE => "split-out-1.pdf"},
              {$td->FILE => "direct-dr-out.pdf"});
+
+$td->runtest("Foreign link annotations",
+             {$td->COMMAND =>
+                  "qpdf --empty  --pages  link-annots.pdf -- --qdf --static-id --no-original-object-ids a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "link-annots.pdf"},
+             {$td->FILE => "a.pdf"});
 
 cleanup();
 $td->report($n_tests);
