@@ -1,3 +1,11 @@
+2023-09-05  Jay Berkenbilt  <ejb@ql.org>
+
+        * 11.6.1: release
+
+        * Fix a logic error introduced in 11.6.0 in the fix to
+        copyForeignObject. The bug could result in some pages not being
+        copied.
+
 2023-09-03  Jay Berkenbilt  <ejb@ql.org>
 
         * 11.6.0: release

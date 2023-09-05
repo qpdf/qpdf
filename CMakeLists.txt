@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.16)
 # the project line. When updating the version, check make_dist for all
 # the places it has to be updated.
 project(qpdf
-  VERSION 11.6.0
+  VERSION 11.6.1
   LANGUAGES C CXX)
 
 # Enable correct rpath handling for MacOSX

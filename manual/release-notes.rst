@@ -35,6 +35,13 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
+11.6.1: September 5, 2023
+  - Bug fixes:
+
+    - Fix a logic error introduced in 11.6.0 in the fix to
+      ``copyForeignObject``. The bug could result in some pages not
+      being copied.
+
 11.6.0: September 3, 2023
   - Bug fixes:
 
