@@ -2,9 +2,137 @@
 
 This file contains plans and notes regarding implementing of the "pages epic." The pages epic consists of the following features:
 * Proper handling of document-level features when splitting and merging documents
-* More flexible aways of selecting pages from one or more documents
-* More flexible ways of organizing pages, such as n-up, booklet generation ("signatures", as in what `psbook` does), scaling, and more control over overlay and underlay regarding scale and position
 * Insertion of blank pages
+* More flexible aways of
+  * selecting pages from one or more documents
+  * composing pages out of other pages
+    * underlay and overlay with control over position, transformation, and bounding box selection
+  * organizing pages
+    * n-up
+    * booklet generation ("signatures", as in what `psbook` does)
+* Possibly others pending analysis of open issues and public discussion
+
+# Architectural Thoughts
+
+I want to encapsulate various aspects of the logic into interfaces that can be implemented by developers to add their own logic. It should be easy to contribute these. Here are some rough ideas.
+
+A page group is just a group of pages.
+
+* PageSelector -- creates page groups from other page groups
+* PageTransformer -- selects a part of a page and possibly transforms it; applies to all pages of a group. Based on the page dictionary; does not look at the content stream
+* PageFilter -- apply arbitrary code to a page; may access the content stream
+* PageAssembler -- combines pages from groups into new groups whose pages are each assembled from corresponding pages of the input groups
+
+These should be able to be composed in arbitrary ways. There should be a natural API for doing this, and it there should be some specification, probably based on JSON, that can be provided on the command line or embedded in the job JSON format. I have been considering whether a lisp-like S-expression syntax may be less cumbersome to work with. I'll have to decide whether to support this or some other syntax in addition to a JSON representation.
+
+There also needs to be something to represent how document-level structures relate to this. I'm not sure exactly how this should work, but we need things like
+* what to do with page labels, especially when assembling pages from other pages
+* whether to preserve destinations (outlines, links, etc.), particularly when pages are duplicated
+  * If A refers to B and there is more than one copy of B, how do you decide which copies of A link to which copies of B?
+* what to do with pages that belong to more than one group, e.g., what happens if you used document structure or outlines to form page groups and a group boundary lies in the middle of the page
+
+Maybe pages groups can have arbitrary, user-defined tags so we can specify that links should only point to other pages with the same value of some tag. We can probably many-to-one links if the source is duplicated.
+
+We probably need to hold onto the concept of the primary input file. If there is a primary input file, there may need to be a way to specify what gets preserved it. The behavior of qpdf prior to all of this is to preserve all document-level constructs from the primary input file and to try to preserve page labels from other input files when combining pages.
+
+Here are some examples.
+
+* PageSelector
+  * all pages from an input file
+  * pages from a group using a NumericRange
+  * concatenate groups
+  * pages from a group in reverse order
+  * a group repeated as often as necessary until a specified number of pages is reached
+  * a group padded with blank pages to create a multiple of n pages
+  * odd or even pages from a group
+  * every nth page from a group
+  * pages interleaved from multiple groups
+  * the left-front (left-back, right-front, right-back) pages of a booklet with signatures of n pages
+  * all pages reachable from a section of the outline hierarchy or something based on threads or other structure
+  * selection based on page labels
+* PageTransformer
+  * clip to media box (trim box, crop box, etc.)
+  * clip to specific absolute or relative size
+  * scale
+  * translate
+  * rotate
+  * apply transformation matrix
+* PageFilter
+  * optimize images
+  * flatten annotations
+* PageAssembler
+  * Overlay/underlay all pages from one group onto corresponding pages from another group
+    * Control placement based on properties of all the groups, so higher order than a stand-alone transformer
+    * Examples
+      * Scale the smaller page up to the size of the larger page
+      * Center the smaller page horizontally and bottom-align the trim boxes
+  * Generalized overlay/underlay allowing n pages in a given order with transformations.
+  * n-up -- application of generalized overlay/underlay
+
+It should be possible to represent all of the existing qpdf operations using the above framework. It would be good to re-implement all of them in terms of this framework to exercise it. We will have to look through all the command-line arguments and make sure. Of course also make sure suggestions from issues can be implemented or at least supported by adding new selectors.
+
+Here are a few bits of scratch work. The top-level call is a selector. This doesn't capture everything. Implementing this would be tedious and challenging. It could be done using JSON arrays, but it would be clunky. This feels over-designed and possibly in conflict with QPDFJob.
+
+```
+(concat
+ (primary-input)
+ (file "file2.pdf")
+ (page-range (file "file3.pdf") "1-4,5-8")
+)
+
+(with
+ ("a"
+  (concat
+   (primary-input)
+   (file "file2.pdf")
+   (page-range (file "file3.pdf") "1-4,5-8")
+  )
+ )
+ (concat
+  (even-pages (from "a"))
+  (reverse (odd-pages (from "a")))
+ )
+)
+
+(with
+ ("a"
+  (concat
+   (primary-input)
+   (file "file2.pdf")
+   (page-range (file "file3.pdf") "1-4,5-8")
+  )
+  "b-even"
+  (even-pages (from "a"))
+  "b-odd"
+  (reverse (odd-pages (from "a")))
+ )
+ (stack
+  (repeat-range (from "a") "z")
+  (pad-end (from "b"))
+ )
+)
+```
+
+Easier to parse but yuck:
+```json
+["with",
+ ["a",
+  ["concat",
+   ["primary-input"],
+   ["file", "file2.pdf"],
+   ["page-range", ["file", "file3.pdf"], "1-4,5-8"]
+  ],
+  "b-even",
+  ["even-pages", ["from", "a"]],
+  "b-odd",
+  ["reverse", ["odd-pages", ["from", "a"]]]
+ ],
+ ["stack",
+  ["repeat-range", ["from", "a"], "z"],
+  ["pad-end", ["from", "b"]]
+ ]
+]
+```
 
 # To-do list
 
