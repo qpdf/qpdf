@@ -43,7 +43,7 @@ target_link_libraries(some-application qpdf::libqpdf)
 
 QPDF depends on the external libraries [zlib](https://www.zlib.net/) and [jpeg](https://www.ijg.org/files/). The [libjpeg-turbo](https://libjpeg-turbo.org/) library is also known to work since it is compatible with the regular jpeg library, and QPDF doesn't use any interfaces that aren't present in the straight jpeg8 API. These are part of every Linux distribution and are readily available. Download information appears in the documentation. For Windows, you can download pre-built binary versions of these libraries for some compilers; see [README-windows.md](README-windows.md) for additional details.
 
-Depending on which crypto providers are enabled, then [GnuTLS](https://www.gnutls.org/) and [OpenSSL](https://openssl.org) may also be required. This is discussed more in `Crypto providers` below.
+Depending on which crypto providers are enabled, then [GnuTLS](https://www.gnutls.org/) and [OpenSSL](https://openssl.org) may also be required. This is discussed more in [Crypto providers](#crypto-providers) below.
 
 Detailed information appears in the [manual](https://qpdf.readthedocs.io/en/latest/installation.html).
 
