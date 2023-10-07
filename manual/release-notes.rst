@@ -38,7 +38,7 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
-11.6.2: not yet released
+11.6.2: October 7, 2023
   - Bug fixes:
 
     - Fix a very old bug that could cause qpdf to call an internal
