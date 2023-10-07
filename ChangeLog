@@ -4,6 +4,9 @@
         if the failure was caused by a previous call to finish. Fixes
         #1042.
 
+        * Push .idea directory with the beginning of a sharable JetBrains
+        CLion configuration.
+
 2023-09-05  Jay Berkenbilt  <ejb@ql.org>
 
         * 11.6.1: release
