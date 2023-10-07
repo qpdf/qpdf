@@ -35,6 +35,21 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
+11.6.2: not yet released
+  - Bug fixes:
+
+    - Fix a very old bug that could cause qpdf to call an internal
+      ``finish`` function twice on certain stream decoding errors.
+      With certain incorrect input files, this could cause qpdf to
+      call gnutls or openssl 1 in a way that could cause them to
+      crash.
+
+  - Development changes:
+
+    - Control some ``.idea`` files for JetBrains CLion. We will be
+      iterating on making it easier to work with qpdf in CLion in
+      coming releases.
+
 11.6.1: September 5, 2023
   - Bug fixes:
 
