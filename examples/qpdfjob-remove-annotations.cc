@@ -8,7 +8,7 @@
 
 // This example demonstrates how we can use the QPDFJob createQPDF and writeQPDF methods to add
 // custom transformations to the output produced by QPDFJob runs. The example is a full copy of the
-// qpdf program modified to allways remove all annotations from the final output.
+// qpdf program modified to always remove all annotations from the final output.
 
 static char const* whoami = nullptr;
 

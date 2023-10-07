@@ -33,6 +33,9 @@ Planned changes for future 12.x (subject to change):
     buffer1.copy();`` or ``Buffer buffer2{buffer1.copy()};`` to make
     it explicit that copying is intended.
 
+  - ``QIntC.hh`` contains the type ``substract``, which will be fixed
+    to ``subtract``. (Not enabled with ``FUTURE`` option.)
+
 .. x.y.z: not yet released
 
 11.6.2: not yet released

@@ -1177,7 +1177,7 @@ class QPDFObjectHandle
     //     mappings are not reversible. There is no way to tell the difference between a string that
     //     looks like a name or indirect object from an actual name or indirect object.
     //   * JSON v2:
-    //     * Unicode strings and strings encoded with PDF Doc encoding that can be bidrectionally
+    //     * Unicode strings and strings encoded with PDF Doc encoding that can be bidirectionally
     //       mapped two Unicode (which is all strings without undefined characters) are represented
     //       as "u:" followed by the UTF-8 encoded string. Example:
     //       "u:potato".

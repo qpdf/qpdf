@@ -608,7 +608,7 @@ extern "C" {
      * not destroy the object. All QPDFObjectHandle objects are deleted when they are no longer
      * referenced. Releasing an object handle simply invalidates it. For example, if you create an
      * object, add it to an existing dictionary or array, and then release its handle, the object is
-     * safely part of the dictionary or array. Similarly, any other object handle refering to the
+     * safely part of the dictionary or array. Similarly, any other object handle referring to the
      * object remains valid. Explicitly releasing an object handle is essentially the same as
      * letting a QPDFObjectHandle go out of scope in the C++ API.
      *
@@ -826,7 +826,7 @@ extern "C" {
     qpdf_oh qpdf_oh_new_string(qpdf_data qpdf, char const* str);
     QPDF_DLL
     qpdf_oh qpdf_oh_new_unicode_string(qpdf_data qpdf, char const* utf8_str);
-    /* Use qpdf_oh_new_binary_string for creating a string that may contain atrbitary binary data
+    /* Use qpdf_oh_new_binary_string for creating a string that may contain arbitrary binary data
      * including embedded null characters.
      */
     QPDF_DLL

@@ -293,7 +293,7 @@ class QPDFWriter
     QPDF_DLL
     void setSuppressOriginalObjectIDs(bool);
 
-    // Preserve encryption.  The default is true unless prefilering, content normalization, or qdf
+    // Preserve encryption.  The default is true unless prefiltering, content normalization, or qdf
     // mode has been selected in which case encryption is never preserved.  Encryption is also not
     // preserved if we explicitly set encryption parameters.
     QPDF_DLL
