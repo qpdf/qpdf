@@ -2418,6 +2418,7 @@ QPDF::pipeStreamData(
         decryptStream(encp, file, qpdf_for_warning, pipeline, og, stream_dict, to_delete);
     }
 
+    bool attempted_finish = false;
     bool success = false;
     try {
         file->seek(offset, SEEK_SET);
@@ -2432,6 +2433,7 @@ QPDF::pipeStreamData(
             length -= len;
             pipeline->write(buf, len);
         }
+        attempted_finish = true;
         pipeline->finish();
         success = true;
     } catch (QPDFExc& e) {
@@ -2461,7 +2463,7 @@ QPDF::pipeStreamData(
             }
         }
     }
-    if (!success) {
+    if (!attempted_finish) {
         try {
             pipeline->finish();
         } catch (std::exception&) {
