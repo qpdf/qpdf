@@ -1670,11 +1670,11 @@ QPDF::writeHPageOffset(BitWriter& w)
     HPageOffset& t = m->page_offset_hints;
 
     w.writeBitsInt(t.min_nobjects, 32);               // 1
-    w.writeBitsInt(toI(t.first_page_offset), 32);     // 2
+    w.writeBits(toULL(t.first_page_offset), 32);      // 2
     w.writeBitsInt(t.nbits_delta_nobjects, 16);       // 3
     w.writeBitsInt(t.min_page_length, 32);            // 4
     w.writeBitsInt(t.nbits_delta_page_length, 16);    // 5
-    w.writeBitsInt(t.min_content_offset, 32);         // 6
+    w.writeBits(toULL(t.min_content_offset), 32);     // 6
     w.writeBitsInt(t.nbits_delta_content_offset, 16); // 7
     w.writeBitsInt(t.min_content_length, 32);         // 8
     w.writeBitsInt(t.nbits_delta_content_length, 16); // 9
@@ -1717,7 +1717,7 @@ QPDF::writeHSharedObject(BitWriter& w)
     HSharedObject& t = m->shared_object_hints;
 
     w.writeBitsInt(t.first_shared_obj, 32);         // 1
-    w.writeBitsInt(toI(t.first_shared_offset), 32); // 2
+    w.writeBits(toULL(t.first_shared_offset), 32);  // 2
     w.writeBitsInt(t.nshared_first_page, 32);       // 3
     w.writeBitsInt(t.nshared_total, 32);            // 4
     w.writeBitsInt(t.nbits_nobjects, 16);           // 5
@@ -1749,7 +1749,7 @@ void
 QPDF::writeHGeneric(BitWriter& w, HGeneric& t)
 {
     w.writeBitsInt(t.first_object, 32);             // 1
-    w.writeBitsInt(toI(t.first_object_offset), 32); // 2
+    w.writeBits(toULL(t.first_object_offset), 32);  // 2
     w.writeBitsInt(t.nobjects, 32);                 // 3
     w.writeBitsInt(t.group_length, 32);             // 4
 }

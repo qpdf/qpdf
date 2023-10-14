@@ -1437,6 +1437,12 @@ class QPDF
     {
         return QIntC::to_int(i);
     }
+    template <typename T>
+    static unsigned long long
+    toULL(T const& i)
+    {
+        return QIntC::to_ulonglong(i);
+    }
 
     class Members
     {
