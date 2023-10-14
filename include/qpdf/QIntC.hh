@@ -277,7 +277,7 @@ namespace QIntC // QIntC = qpdf Integer Conversion
         QIntC::range_check_error<T>(cur, delta);
     }
 
-    // ABI: fix spelling error in function name
+    // ABI: fix spelling error in function name. Also remove "substract" from spelling dictionary.
     template <typename T>
     void
     range_check_substract_error(T const& cur, T const& delta)
