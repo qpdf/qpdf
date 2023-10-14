@@ -1,5 +1,7 @@
 # Pages
 
+THIS IS A WORK IN PROGRESS. THE ACTUAL IMPLEMENTATION MAY NOT LOOK ANYTHING LIKE THIS. When this gets to the stage where it is starting to congeal into an actual plan, I will remove this disclaimer and open a discussion ticket in GitHub to work out details.
+
 This file contains plans and notes regarding implementing of the "pages epic." The pages epic consists of the following features:
 * Proper handling of document-level features when splitting and merging documents
 * Insertion of blank pages
