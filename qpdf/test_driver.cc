@@ -3344,12 +3344,16 @@ test_95(QPDF& pdf, char const* arg2)
 static void
 test_96(QPDF& pdf, char const* arg2)
 {
-    // Test edge cases with quoted characters
+    // Test edge cases with quoted characters and string parsing.
 
     auto s = R"((\48\418\121\4))"_qpdf;
     assert(s.unparseBinary() == "<043821385104>");
     s = R"((\48\418\121\41))"_qpdf;
     assert(s.unparseBinary() == "<043821385121>");
+    s = R"(<a>)"_qpdf;
+    assert(s.unparseBinary() == "<a0>");
+    s = R"(<abc>)"_qpdf;
+    assert(s.unparseBinary() == "<abc0>");
 }
 
 void
