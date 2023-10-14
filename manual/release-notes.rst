@@ -38,6 +38,20 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
+11.6.3: October 15, 2023
+  - Bug fixes:
+
+    - Fix a bug in which qpdf could potentially discard a character in
+      a binary string if that character was preceded by an octal
+      escaped string with fewer than three digits. This bug was
+      introduced in the 11.0.0 release. The bug would not apply to
+      content streams with default settings.
+
+    - The linearization specification precludes linearized files that
+      require offets past the 4 GB mark. A bug in qpdf was preventing
+      it from working when offsets had to pass the 2 GB mark. This has
+      been corrected.
+
 11.6.2: October 7, 2023
   - Bug fixes:
 

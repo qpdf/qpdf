@@ -1,13 +1,19 @@
+2023-10-15  Jay Berkenbilt  <ejb@ql.org>
+
+        * 11.6.3: release
+
 2023-10-14  Jay Berkenbilt  <ejb@ql.org>
 
         * Tweak linearization code to better handle files between 2 GB and
         4 GB in size. Fixes #1023.
 
-        * Fix serious bug: qpdf could discard a the character after an
-        escaped octal string. For content, this would only happen with QDF
-        or when normalizing content, but it could have happened in a
-        binary string. This bug was introduced between 10.6.3 and 11.0.0.
-        Fixes #1050.
+        * Fix data loss bug: qpdf could discard a the character after an
+        escaped octal string consisting of less than three digits. For
+        content, this would only happen with QDF or when normalizing
+        content. Outside of content, it could have happened in any binary
+        string, such as /ID, if the encoding software used octal escape
+        strings with less than three digits. This bug was introduced
+        between 10.6.3 and 11.0.0. Fixes #1050.
 
 2023-10-07  Jay Berkenbilt  <ejb@ql.org>
 
