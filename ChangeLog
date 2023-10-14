@@ -1,3 +1,11 @@
+2023-10-14  Jay Berkenbilt  <ejb@ql.org>
+
+        * Fix serious bug: qpdf could discard a the character after an
+        escaped octal string. For content, this would only happen with QDF
+        or when normalizing content, but it could have happened in a
+        binary string. This bug was introduced between 10.6.3 and 11.0.0.
+        Fixes #1050.
+
 2023-10-07  Jay Berkenbilt  <ejb@ql.org>
 
         * 11.6.2: release

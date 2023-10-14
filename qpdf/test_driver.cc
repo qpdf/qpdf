@@ -3341,6 +3341,17 @@ test_95(QPDF& pdf, char const* arg2)
     assert(!oh_d.isScalar());
 }
 
+static void
+test_96(QPDF& pdf, char const* arg2)
+{
+    // Test edge cases with quoted characters
+
+    auto s = R"((\48\418\121\4))"_qpdf;
+    assert(s.unparseBinary() == "<043821385104>");
+    s = R"((\48\418\121\41))"_qpdf;
+    assert(s.unparseBinary() == "<043821385121>");
+}
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -3348,7 +3359,7 @@ runtest(int n, char const* filename1, char const* arg2)
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
 
-    std::set<int> ignore_filename = {61, 81, 83, 84, 85, 86, 87, 92, 95};
+    std::set<int> ignore_filename = {61, 81, 83, 84, 85, 86, 87, 92, 95, 96};
 
     if (n == 0) {
         // Throw in some random test cases that don't fit anywhere
@@ -3441,7 +3452,8 @@ runtest(int n, char const* filename1, char const* arg2)
         {72, test_72}, {73, test_73}, {74, test_74}, {75, test_75}, {76, test_76}, {77, test_77},
         {78, test_78}, {79, test_79}, {80, test_80}, {81, test_81}, {82, test_82}, {83, test_83},
         {84, test_84}, {85, test_85}, {86, test_86}, {87, test_87}, {88, test_88}, {89, test_89},
-        {90, test_90}, {91, test_91}, {92, test_92}, {93, test_93}, {94, test_94}, {95, test_95}};
+        {90, test_90}, {91, test_91}, {92, test_92}, {93, test_93}, {94, test_94}, {95, test_95},
+        {96, test_96}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {

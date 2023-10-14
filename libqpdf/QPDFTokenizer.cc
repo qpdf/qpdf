@@ -145,9 +145,8 @@ QPDFTokenizer::presentCharacter(char ch)
 void
 QPDFTokenizer::handleCharacter(char ch)
 {
-    // State machine is implemented such that the final character may not be handled.  This happens
-    // whenever you have to use a character from the next token to detect the end of the current
-    // token.
+    // In some cases, functions called below may call a second handler. This happens whenever you
+    // have to use a character from the next token to detect the end of the current token.
 
     switch (this->state) {
     case st_top:
@@ -692,16 +691,21 @@ QPDFTokenizer::inHexstring2nd(char ch)
 void
 QPDFTokenizer::inCharCode(char ch)
 {
+    bool handled = false;
     if (('0' <= ch) && (ch <= '7')) {
         this->char_code = 8 * this->char_code + (int(ch) - int('0'));
         if (++(this->digit_count) < 3) {
             return;
         }
-        // We've accumulated \ddd.  PDF Spec says to ignore high-order overflow.
+        handled = true;
     }
+    // We've accumulated \ddd or we have \d or \dd followed by other than an octal digit. The PDF
+    // Spec says to ignore high-order overflow.
     this->val += char(this->char_code % 256);
     this->state = st_in_string;
-    return;
+    if (!handled) {
+        inString(ch);
+    }
 }
 
 void

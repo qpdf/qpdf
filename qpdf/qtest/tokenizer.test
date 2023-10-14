@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('tokenizer');
 
-my $n_tests = 4;
+my $n_tests = 5;
 
 $td->runtest("tokenizer with no ignorable",
              {$td->COMMAND => "test_tokenizer -no-ignorable tokens.pdf"},
@@ -35,6 +35,12 @@ $td->runtest("ignore bad token",
              {$td->COMMAND =>
                   "qpdf --show-xref bad-token-startxref.pdf"},
              {$td->FILE => "bad-token-startxref.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("quoted char edge cases",
+             {$td->COMMAND => "test_driver 96 -"},
+             {$td->STRING => "test 96 done\n",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
