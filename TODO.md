@@ -42,6 +42,11 @@ Next
     stringify a JSON blob
   * One option might be to prepend file:// to a filename or otherwise to take a JSON blob. We could
     have that as a particular type of argument that would behave properly for both job JSON and CLI.
+* Support digital signatures. This probably requires support for incremental updates. See
+  "incremental updates" in rejected ideas. That description is out of date but would need to be
+  cleaned up. See also issue #22.
+  * Make it possible to see incremental updates in qdf mode.
+  * Make it possible to add incremental updates.
 
 Possible future JSON enhancements
 =================================
@@ -561,9 +566,10 @@ Rejected Ideas
 
 * Investigate whether there is a way to automate the memory checker tests for Windows.
 
-* Provide support in QPDFWriter for writing incremental updates. Provide support in qpdf for
-  preserving incremental updates. The goal should be that QDF mode should be fully functional for
-  files with incremental updates including fix_qdf.
+* (This idea may be revised with alterations. Some of this is out of date.) Provide support in
+  QPDFWriter for writing incremental updates. Provide support in qpdf for preserving incremental
+  updates. The goal should be that QDF mode should be fully functional for files with incremental
+  updates including fix_qdf.
 
   Note that there's nothing that says an indirect object in one update can't refer to an object that
   doesn't appear until a later update. This means that QPDF has to treat indirect null objects
