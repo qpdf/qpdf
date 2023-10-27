@@ -31,7 +31,24 @@ class QPDFParser
     QPDFObjectHandle parse(bool& empty, bool content_stream);
 
   private:
+    struct StackFrame;
     enum parser_state_e { st_top, st_dictionary, st_array };
+
+    struct StackFrame
+    {
+        StackFrame(std::shared_ptr<InputSource> const& input, parser_state_e state) :
+            state(state),
+            offset(input->tell())
+        {
+        }
+
+        std::vector<std::shared_ptr<QPDFObject>> olist;
+        parser_state_e state;
+        qpdf_offset_t offset;
+        std::string contents_string{""};
+        qpdf_offset_t contents_offset{-1};
+        int null_count{0};
+    };
 
     bool tooManyBadTokens();
     void warn(qpdf_offset_t offset, std::string const& msg) const;
