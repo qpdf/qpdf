@@ -33,6 +33,7 @@ class QPDFParser
   private:
     enum parser_state_e { st_top, st_start, st_stop, st_eof, st_dictionary, st_array };
 
+    bool tooManyBadTokens();
     void warn(qpdf_offset_t offset, std::string const& msg) const;
     void warn(std::string const& msg) const;
     void warn(QPDFExc const&) const;
@@ -43,6 +44,10 @@ class QPDFParser
     QPDFObjectHandle::StringDecrypter* decrypter;
     QPDF* context;
     std::shared_ptr<QPDFValue::Description> description;
+    // Number of recent bad tokens.
+    int bad_count = 0;
+    // Number of good tokens since last bad token. Irrelevant if bad_count == 0.
+    int good_count = 0;
 };
 
 #endif // QPDFPARSER_HH

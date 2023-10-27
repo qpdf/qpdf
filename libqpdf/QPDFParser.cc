@@ -60,13 +60,10 @@ QPDFParser::parse(bool& empty, bool content_stream)
     state_stack.push_back(st_top);
     qpdf_offset_t offset;
     bool done = false;
-    int bad_count = 0;
-    int good_count = 0;
     bool b_contents = false;
     bool is_null = false;
 
     while (!done) {
-        bool bad = false;
         bool indirect_ref = false;
         is_null = false;
         auto& frame = stack.back();
@@ -80,6 +77,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
         if (!tokenizer.nextToken(*input, object_description)) {
             warn(tokenizer.getErrorMessage());
         }
+        ++good_count; // optimistically
 
         switch (tokenizer.getType()) {
         case QPDFTokenizer::tt_eof:
@@ -87,13 +85,14 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 QTC::TC("qpdf", "QPDFParser eof in parse");
                 warn("unexpected EOF");
             }
-            bad = true;
             state = st_eof;
             break;
 
         case QPDFTokenizer::tt_bad:
             QTC::TC("qpdf", "QPDFParser bad token in parse");
-            bad = true;
+            if (tooManyBadTokens()) {
+                return {QPDF_Null::create()};
+            }
             is_null = true;
             break;
 
@@ -101,7 +100,9 @@ QPDFParser::parse(bool& empty, bool content_stream)
         case QPDFTokenizer::tt_brace_close:
             QTC::TC("qpdf", "QPDFParser bad brace");
             warn("treating unexpected brace token as null");
-            bad = true;
+            if (tooManyBadTokens()) {
+                return {QPDF_Null::create()};
+            }
             is_null = true;
             break;
 
@@ -111,7 +112,9 @@ QPDFParser::parse(bool& empty, bool content_stream)
             } else {
                 QTC::TC("qpdf", "QPDFParser bad array close");
                 warn("treating unexpected array close token as null");
-                bad = true;
+                if (tooManyBadTokens()) {
+                    return {QPDF_Null::create()};
+                }
                 is_null = true;
             }
             break;
@@ -122,7 +125,9 @@ QPDFParser::parse(bool& empty, bool content_stream)
             } else {
                 QTC::TC("qpdf", "QPDFParser bad dictionary close");
                 warn("unexpected dictionary close token");
-                bad = true;
+                if (tooManyBadTokens()) {
+                    return {QPDF_Null::create()};
+                }
                 is_null = true;
             }
             break;
@@ -132,7 +137,9 @@ QPDFParser::parse(bool& empty, bool content_stream)
             if (stack.size() > 500) {
                 QTC::TC("qpdf", "QPDFParser too deep");
                 warn("ignoring excessively deeply nested data structure");
-                bad = true;
+                if (tooManyBadTokens()) {
+                    return {QPDF_Null::create()};
+                }
                 is_null = true;
                 state = st_top;
             } else {
@@ -217,7 +224,9 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 } else {
                     QTC::TC("qpdf", "QPDFParser treat word as string");
                     warn("unknown token while reading object; treating as string");
-                    bad = true;
+                    if (tooManyBadTokens()) {
+                        return {QPDF_Null::create()};
+                    }
                     object = QPDF_String::create(value);
                 }
             }
@@ -239,12 +248,13 @@ QPDFParser::parse(bool& empty, bool content_stream)
                     object = QPDF_String::create(val);
                 }
             }
-
             break;
 
         default:
             warn("treating unknown token type as null while reading object");
-            bad = true;
+            if (tooManyBadTokens()) {
+                return {QPDF_Null::create()};
+            }
             is_null = true;
             break;
         }
@@ -252,23 +262,6 @@ QPDFParser::parse(bool& empty, bool content_stream)
         if (object == nullptr && !is_null &&
             (!((state == st_start) || (state == st_stop) || (state == st_eof)))) {
             throw std::logic_error("QPDFParser:parseInternal: unexpected uninitialized object");
-            is_null = true;
-        }
-
-        if (bad) {
-            ++bad_count;
-            good_count = 0;
-        } else {
-            ++good_count;
-            if (good_count > 3) {
-                bad_count = 0;
-            }
-        }
-        if (bad_count > 5) {
-            // We had too many consecutive errors without enough intervening successful objects.
-            // Give up.
-            warn("too many errors; giving up on reading object");
-            state = st_top;
             is_null = true;
         }
 
@@ -410,6 +403,21 @@ QPDFParser::setDescription(std::shared_ptr<QPDFObject>& obj, qpdf_offset_t parse
     if (obj) {
         obj->setDescription(context, description, parsed_offset);
     }
+}
+
+bool
+QPDFParser::tooManyBadTokens()
+{
+    if (good_count <= 4) {
+        if (++bad_count > 5) {
+            warn("too many errors; giving up on reading object");
+            return true;
+        }
+    } else {
+        bad_count = 1;
+    }
+    good_count = 0;
+    return false;
 }
 
 void
