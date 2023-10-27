@@ -112,7 +112,20 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         case QPDFTokenizer::tt_array_close:
             if (state == st_array) {
-                state = st_stop;
+                if ((state_stack.size() < 2) || (stack.size() < 2)) {
+                    throw std::logic_error("QPDFParser::parseInternal: st_stop encountered with "
+                                           "insufficient elements in stack");
+                }
+                object = QPDF_Array::create(std::move(olist), frame.null_count > 100);
+                setDescription(object, offset - 1);
+                // The `offset` points to the next of "[".  Set the rewind offset to point to the
+                // beginning of "[". This has been explicitly tested with whitespace surrounding the
+                // array start delimiter. getLastOffset points to the array end token and therefore
+                // can't be used here.
+                set_offset = true;
+                state_stack.pop_back();
+                state = state_stack.back();
+                stack.pop_back();
             } else {
                 QTC::TC("qpdf", "QPDFParser bad array close");
                 warn("treating unexpected array close token as null");
@@ -273,11 +286,11 @@ QPDFParser::parse(bool& empty, bool content_stream)
             if (is_null) {
                 object = null_oh;
                 // No need to set description for direct nulls - they probably will become implicit.
-            } else if (!indirect_ref) {
+            } else if (!indirect_ref && !set_offset) {
                 setDescription(object, input->getLastOffset());
             }
             set_offset = true;
-            olist.push_back(object);
+            stack.back().olist.push_back(object);
             break;
 
         case st_top:
@@ -294,15 +307,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             }
             parser_state_e old_state = state_stack.back();
             state_stack.pop_back();
-            if (old_state == st_array) {
-                object = QPDF_Array::create(std::move(olist), frame.null_count > 100);
-                setDescription(object, offset - 1);
-                // The `offset` points to the next of "[".  Set the rewind offset to point to the
-                // beginning of "[". This has been explicitly tested with whitespace surrounding the
-                // array start delimiter. getLastOffset points to the array end token and therefore
-                // can't be used here.
-                set_offset = true;
-            } else if (old_state == st_dictionary) {
+            if (old_state == st_dictionary) {
                 // Convert list to map. Alternating elements are keys.  Attempt to recover more or
                 // less gracefully from invalid dictionaries.
                 std::set<std::string> names;
