@@ -31,7 +31,7 @@ class QPDFParser
     QPDFObjectHandle parse(bool& empty, bool content_stream);
 
   private:
-    enum parser_state_e { st_top, st_start, st_stop, st_eof, st_dictionary, st_array };
+    enum parser_state_e { st_top, st_start, st_stop, st_dictionary, st_array };
 
     bool tooManyBadTokens();
     void warn(qpdf_offset_t offset, std::string const& msg) const;

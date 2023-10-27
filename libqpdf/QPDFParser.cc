@@ -81,12 +81,16 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         switch (tokenizer.getType()) {
         case QPDFTokenizer::tt_eof:
-            if (!content_stream) {
-                QTC::TC("qpdf", "QPDFParser eof in parse");
-                warn("unexpected EOF");
+            if (state_stack.size() > 1) {
+                warn("parse error while reading object");
             }
-            state = st_eof;
-            break;
+            if (content_stream) {
+                // In content stream mode, leave object uninitialized to indicate EOF
+                return {};
+            }
+            QTC::TC("qpdf", "QPDFParser eof in parse");
+            warn("unexpected EOF");
+            return {QPDF_Null::create()};
 
         case QPDFTokenizer::tt_bad:
             QTC::TC("qpdf", "QPDFParser bad token in parse");
@@ -259,24 +263,11 @@ QPDFParser::parse(bool& empty, bool content_stream)
             break;
         }
 
-        if (object == nullptr && !is_null &&
-            (!((state == st_start) || (state == st_stop) || (state == st_eof)))) {
+        if (object == nullptr && !is_null && (!(state == st_start || state == st_stop))) {
             throw std::logic_error("QPDFParser:parseInternal: unexpected uninitialized object");
-            is_null = true;
         }
 
         switch (state) {
-        case st_eof:
-            if (state_stack.size() > 1) {
-                warn("parse error while reading object");
-            }
-            done = true;
-            // In content stream mode, leave object uninitialized to indicate EOF
-            if (!content_stream) {
-                is_null = true;
-            }
-            break;
-
         case st_dictionary:
         case st_array:
             if (is_null) {
