@@ -138,7 +138,80 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         case QPDFTokenizer::tt_dict_close:
             if (state == st_dictionary) {
-                state = st_stop;
+                if ((state_stack.size() < 2) || (stack.size() < 2)) {
+                    throw std::logic_error("QPDFParser::parseInternal: st_stop encountered with "
+                                           "insufficient elements in stack");
+                }
+
+                // Convert list to map. Alternating elements are keys.  Attempt to recover more or
+                // less gracefully from invalid dictionaries.
+                std::set<std::string> names;
+                for (auto& obj: olist) {
+                    if (obj) {
+                        if (obj->getTypeCode() == ::ot_name) {
+                            names.insert(obj->getStringValue());
+                        }
+                    }
+                }
+
+                std::map<std::string, QPDFObjectHandle> dict;
+                int next_fake_key = 1;
+                for (auto iter = olist.begin(); iter != olist.end();) {
+                    // Calculate key.
+                    std::string key;
+                    if (*iter && (*iter)->getTypeCode() == ::ot_name) {
+                        key = (*iter)->getStringValue();
+                        ++iter;
+                    } else {
+                        for (bool found_fake = false; !found_fake;) {
+                            key = "/QPDFFake" + std::to_string(next_fake_key++);
+                            found_fake = (names.count(key) == 0);
+                            QTC::TC("qpdf", "QPDFParser found fake", (found_fake ? 0 : 1));
+                        }
+                        warn(
+                            offset,
+                            "expected dictionary key but found non-name object; inserting key " +
+                                key);
+                    }
+                    if (dict.count(key) > 0) {
+                        QTC::TC("qpdf", "QPDFParser duplicate dict key");
+                        warn(
+                            offset,
+                            "dictionary has duplicated key " + key +
+                                "; last occurrence overrides earlier ones");
+                    }
+
+                    // Calculate value.
+                    std::shared_ptr<QPDFObject> val;
+                    if (iter != olist.end()) {
+                        val = *iter;
+                        ++iter;
+                    } else {
+                        QTC::TC("qpdf", "QPDFParser no val for last key");
+                        warn(
+                            offset,
+                            "dictionary ended prematurely; using null as value for last key");
+                        val = QPDF_Null::create();
+                    }
+
+                    dict[std::move(key)] = std::move(val);
+                }
+                if (!frame.contents_string.empty() && dict.count("/Type") &&
+                    dict["/Type"].isNameAndEquals("/Sig") && dict.count("/ByteRange") &&
+                    dict.count("/Contents") && dict["/Contents"].isString()) {
+                    dict["/Contents"] = QPDFObjectHandle::newString(frame.contents_string);
+                    dict["/Contents"].setParsedOffset(frame.contents_offset);
+                }
+                object = QPDF_Dictionary::create(std::move(dict));
+                setDescription(object, offset - 2);
+                // The `offset` points to the next of "<<". Set the rewind offset to point to the
+                // beginning of "<<". This has been explicitly tested with whitespace surrounding
+                // the dictionary start delimiter. getLastOffset points to the dictionary end token
+                // and therefore can't be used here.
+                set_offset = true;
+                state_stack.pop_back();
+                state = state_stack.back();
+                stack.pop_back();
             } else {
                 QTC::TC("qpdf", "QPDFParser bad dictionary close");
                 warn("unexpected dictionary close token");
@@ -276,7 +349,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             break;
         }
 
-        if (object == nullptr && !is_null && (!(state == st_start || state == st_stop))) {
+        if (object == nullptr && !is_null && state != st_start) {
             throw std::logic_error("QPDFParser:parseInternal: unexpected uninitialized object");
         }
 
@@ -299,88 +372,6 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         case st_start:
             break;
-
-        case st_stop:
-            if ((state_stack.size() < 2) || (stack.size() < 2)) {
-                throw std::logic_error("QPDFParser::parseInternal: st_stop encountered with "
-                                       "insufficient elements in stack");
-            }
-            parser_state_e old_state = state_stack.back();
-            state_stack.pop_back();
-            if (old_state == st_dictionary) {
-                // Convert list to map. Alternating elements are keys.  Attempt to recover more or
-                // less gracefully from invalid dictionaries.
-                std::set<std::string> names;
-                for (auto& obj: olist) {
-                    if (obj) {
-                        if (obj->getTypeCode() == ::ot_name) {
-                            names.insert(obj->getStringValue());
-                        }
-                    }
-                }
-
-                std::map<std::string, QPDFObjectHandle> dict;
-                int next_fake_key = 1;
-                for (auto iter = olist.begin(); iter != olist.end();) {
-                    // Calculate key.
-                    std::string key;
-                    if (*iter && (*iter)->getTypeCode() == ::ot_name) {
-                        key = (*iter)->getStringValue();
-                        ++iter;
-                    } else {
-                        for (bool found_fake = false; !found_fake;) {
-                            key = "/QPDFFake" + std::to_string(next_fake_key++);
-                            found_fake = (names.count(key) == 0);
-                            QTC::TC("qpdf", "QPDFParser found fake", (found_fake ? 0 : 1));
-                        }
-                        warn(
-                            offset,
-                            "expected dictionary key but found non-name object; inserting key " +
-                                key);
-                    }
-                    if (dict.count(key) > 0) {
-                        QTC::TC("qpdf", "QPDFParser duplicate dict key");
-                        warn(
-                            offset,
-                            "dictionary has duplicated key " + key +
-                                "; last occurrence overrides earlier ones");
-                    }
-
-                    // Calculate value.
-                    std::shared_ptr<QPDFObject> val;
-                    if (iter != olist.end()) {
-                        val = *iter;
-                        ++iter;
-                    } else {
-                        QTC::TC("qpdf", "QPDFParser no val for last key");
-                        warn(
-                            offset,
-                            "dictionary ended prematurely; using null as value for last key");
-                        val = QPDF_Null::create();
-                    }
-
-                    dict[std::move(key)] = std::move(val);
-                }
-                if (!frame.contents_string.empty() && dict.count("/Type") &&
-                    dict["/Type"].isNameAndEquals("/Sig") && dict.count("/ByteRange") &&
-                    dict.count("/Contents") && dict["/Contents"].isString()) {
-                    dict["/Contents"] = QPDFObjectHandle::newString(frame.contents_string);
-                    dict["/Contents"].setParsedOffset(frame.contents_offset);
-                }
-                object = QPDF_Dictionary::create(std::move(dict));
-                setDescription(object, offset - 2);
-                // The `offset` points to the next of "<<". Set the rewind offset to point to the
-                // beginning of "<<". This has been explicitly tested with whitespace surrounding
-                // the dictionary start delimiter. getLastOffset points to the dictionary end token
-                // and therefore can't be used here.
-                set_offset = true;
-            }
-            stack.pop_back();
-            if (state_stack.back() == st_top) {
-                done = true;
-            } else {
-                stack.back().olist.push_back(object);
-            }
         }
     }
 
