@@ -227,20 +227,15 @@ QPDFParser::parse(bool& empty, bool content_stream)
             if (stack.size() > 500) {
                 QTC::TC("qpdf", "QPDFParser too deep");
                 warn("ignoring excessively deeply nested data structure");
-                if (tooManyBadTokens()) {
-                    return {QPDF_Null::create()};
-                }
-                is_null = true;
-                state = st_top;
+                return {QPDF_Null::create()};
             } else {
-                state = st_start;
                 state_stack.push_back(
                     (tokenizer.getType() == QPDFTokenizer::tt_array_open) ? st_array
                                                                           : st_dictionary);
                 b_contents = false;
                 stack.emplace_back(input);
+                continue;
             }
-            break;
 
         case QPDFTokenizer::tt_bool:
             object = QPDF_Bool::create((tokenizer.getValue() == "true"));
@@ -349,7 +344,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
             break;
         }
 
-        if (object == nullptr && !is_null && state != st_start) {
+        if (object == nullptr && !is_null) {
             throw std::logic_error("QPDFParser:parseInternal: unexpected uninitialized object");
         }
 
@@ -368,9 +363,6 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
         case st_top:
             done = true;
-            break;
-
-        case st_start:
             break;
         }
     }
