@@ -32,7 +32,7 @@ class QPDFParser
 
   private:
     struct StackFrame;
-    enum parser_state_e { st_top, st_dictionary, st_array };
+    enum parser_state_e { st_dictionary, st_array };
 
     struct StackFrame
     {

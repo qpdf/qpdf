@@ -33,10 +33,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
     empty = false;
 
     std::shared_ptr<QPDFObject> object;
-    stack.clear();
-    stack.emplace_back(input, st_top);
-    frame = &stack.back();
-    object = nullptr;
+    auto offset = input->tell();
 
     if (!tokenizer.nextToken(*input, object_description)) {
         warn(tokenizer.getErrorMessage());
@@ -74,9 +71,11 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
     case QPDFTokenizer::tt_array_open:
     case QPDFTokenizer::tt_dict_open:
+        stack.clear();
         stack.emplace_back(
             input,
             (tokenizer.getType() == QPDFTokenizer::tt_array_open) ? st_array : st_dictionary);
+        frame = &stack.back();
         return parseRemainder(content_stream);
 
     case QPDFTokenizer::tt_bool:
@@ -132,7 +131,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
         return {QPDF_Null::create()};
     }
 
-    setDescription(object, frame->offset);
+    setDescription(object, offset);
     return object;
 }
 
@@ -148,14 +147,11 @@ QPDFParser::parseRemainder(bool content_stream)
 
     std::shared_ptr<QPDFObject> object;
     bool set_offset = false;
-
-    bool done = false;
     bool b_contents = false;
     bool is_null = false;
-    frame = &stack.back(); // CHANGED
     bad_count = 0;
 
-    while (!done) {
+    while (true) {
         bool indirect_ref = false;
         is_null = false;
         object = nullptr;
@@ -197,10 +193,6 @@ QPDFParser::parseRemainder(bool content_stream)
 
         case QPDFTokenizer::tt_array_close:
             if (frame->state == st_array) {
-                if (stack.size() < 2) {
-                    throw std::logic_error("QPDFParser::parseInternal: st_stop encountered with "
-                                           "insufficient elements in stack");
-                }
                 object = QPDF_Array::create(std::move(frame->olist), frame->null_count > 100);
                 setDescription(object, frame->offset - 1);
                 // The `offset` points to the next of "[".  Set the rewind offset to point to the
@@ -208,6 +200,9 @@ QPDFParser::parseRemainder(bool content_stream)
                 // array start delimiter. getLastOffset points to the array end token and therefore
                 // can't be used here.
                 set_offset = true;
+                if (stack.size() <= 1) {
+                    return object;
+                }
                 stack.pop_back();
                 frame = &stack.back();
             } else {
@@ -222,11 +217,6 @@ QPDFParser::parseRemainder(bool content_stream)
 
         case QPDFTokenizer::tt_dict_close:
             if (frame->state == st_dictionary) {
-                if (stack.size() < 2) {
-                    throw std::logic_error("QPDFParser::parseInternal: st_stop encountered with "
-                                           "insufficient elements in stack");
-                }
-
                 // Convert list to map. Alternating elements are keys.  Attempt to recover more or
                 // less gracefully from invalid dictionaries.
                 std::set<std::string> names;
@@ -278,7 +268,7 @@ QPDFParser::parseRemainder(bool content_stream)
                         val = QPDF_Null::create();
                     }
 
-                    dict[std::move(key)] = std::move(val);
+                    dict[std::move(key)] = val;
                 }
                 if (!frame->contents_string.empty() && dict.count("/Type") &&
                     dict["/Type"].isNameAndEquals("/Sig") && dict.count("/ByteRange") &&
@@ -292,6 +282,9 @@ QPDFParser::parseRemainder(bool content_stream)
                 // beginning of "<<". This has been explicitly tested with whitespace surrounding
                 // the dictionary start delimiter. getLastOffset points to the dictionary end token
                 // and therefore can't be used here.
+                if (stack.size() <= 1) {
+                    return object;
+                }
                 set_offset = true;
                 stack.pop_back();
                 frame = &stack.back();
@@ -307,7 +300,7 @@ QPDFParser::parseRemainder(bool content_stream)
 
         case QPDFTokenizer::tt_array_open:
         case QPDFTokenizer::tt_dict_open:
-            if (stack.size() > 500) {
+            if (stack.size() > 499) {
                 QTC::TC("qpdf", "QPDFParser too deep");
                 warn("ignoring excessively deeply nested data structure");
                 return {QPDF_Null::create()};
@@ -328,7 +321,6 @@ QPDFParser::parseRemainder(bool content_stream)
         case QPDFTokenizer::tt_null:
             is_null = true;
             ++frame->null_count;
-
             break;
 
         case QPDFTokenizer::tt_integer:
@@ -426,32 +418,15 @@ QPDFParser::parseRemainder(bool content_stream)
             throw std::logic_error("QPDFParser:parseInternal: unexpected uninitialized object");
         }
 
-        switch (frame->state) {
-        case st_dictionary:
-        case st_array:
-            if (is_null) {
-                object = null_oh;
-                // No need to set description for direct nulls - they probably will become implicit.
-            } else if (!indirect_ref && !set_offset) {
-                setDescription(object, input->getLastOffset());
-            }
-            set_offset = true;
-            frame->olist.push_back(object);
-            break;
-
-        case st_top:
-            done = true;
-            break;
+        if (is_null) {
+            object = null_oh;
+            // No need to set description for direct nulls - they probably will become implicit.
+        } else if (!indirect_ref && !set_offset) {
+            setDescription(object, input->getLastOffset());
         }
+        frame->olist.push_back(object);
     }
-
-    if (is_null) {
-        object = QPDF_Null::create();
-    }
-    if (!set_offset) {
-        setDescription(object, frame->offset);
-    }
-    return object;
+    return {}; // unreachable
 }
 
 void
