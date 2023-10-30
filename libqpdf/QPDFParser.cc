@@ -38,11 +38,343 @@ QPDFParser::parse(bool& empty, bool content_stream)
     std::shared_ptr<QPDFObject> object;
     bool set_offset = false;
 
-    std::vector<StackFrame> stack{{input, st_top}};
+//    std::vector<StackFrame> stack{{input, st_top}};
+    stack.clear(); // NEW
+    stack.emplace_back(input, st_top); // NEW
     bool done = false;
     bool b_contents = false;
     bool is_null = false;
-    auto* frame = &stack.back();
+    frame = &stack.back(); // CHANGED
+
+    while (!done) {
+        bool indirect_ref = false;
+        is_null = false;
+        object = nullptr;
+        set_offset = false;
+
+        if (!tokenizer.nextToken(*input, object_description)) {
+            warn(tokenizer.getErrorMessage());
+        }
+        ++good_count; // optimistically
+
+        switch (tokenizer.getType()) {
+        case QPDFTokenizer::tt_eof:
+            if (stack.size() > 1) {
+                warn("parse error while reading object");
+            }
+            if (content_stream) {
+                // In content stream mode, leave object uninitialized to indicate EOF
+                return {};
+            }
+//            QTC::TC("qpdf", "QPDFParser eof in parse");
+            warn("unexpected EOF");
+            return {QPDF_Null::create()};
+
+        case QPDFTokenizer::tt_bad:
+//            QTC::TC("qpdf", "QPDFParser bad token in parse");
+            if (tooManyBadTokens()) {
+                return {QPDF_Null::create()};
+            }
+            is_null = true;
+            break;
+
+        case QPDFTokenizer::tt_brace_open:
+        case QPDFTokenizer::tt_brace_close:
+//            QTC::TC("qpdf", "QPDFParser bad brace");
+            warn("treating unexpected brace token as null");
+            if (tooManyBadTokens()) {
+                return {QPDF_Null::create()};
+            }
+            is_null = true;
+            break;
+
+        case QPDFTokenizer::tt_array_close:
+            if (frame->state == st_array) {
+                if (stack.size() < 2) {
+                    throw std::logic_error("QPDFParser::parseInternal: st_stop encountered with "
+                                           "insufficient elements in stack");
+                }
+                object = QPDF_Array::create(std::move(frame->olist), frame->null_count > 100);
+                setDescription(object, frame->offset - 1);
+                // The `offset` points to the next of "[".  Set the rewind offset to point to the
+                // beginning of "[". This has been explicitly tested with whitespace surrounding the
+                // array start delimiter. getLastOffset points to the array end token and therefore
+                // can't be used here.
+                set_offset = true;
+                stack.pop_back();
+                frame = &stack.back();
+            } else {
+//                QTC::TC("qpdf", "QPDFParser bad array close");
+                warn("treating unexpected array close token as null");
+                if (tooManyBadTokens()) {
+                    return {QPDF_Null::create()};
+                }
+                is_null = true;
+            }
+            break;
+
+        case QPDFTokenizer::tt_dict_close:
+            if (frame->state == st_dictionary) {
+                if (stack.size() < 2) {
+                    throw std::logic_error("QPDFParser::parseInternal: st_stop encountered with "
+                                           "insufficient elements in stack");
+                }
+
+                // Convert list to map. Alternating elements are keys.  Attempt to recover more or
+                // less gracefully from invalid dictionaries.
+                std::set<std::string> names;
+                for (auto& obj: frame->olist) {
+                    if (obj) {
+                        if (obj->getTypeCode() == ::ot_name) {
+                            names.insert(obj->getStringValue());
+                        }
+                    }
+                }
+
+                std::map<std::string, QPDFObjectHandle> dict;
+                int next_fake_key = 1;
+                for (auto iter = frame->olist.begin(); iter != frame->olist.end();) {
+                    // Calculate key.
+                    std::string key;
+                    if (*iter && (*iter)->getTypeCode() == ::ot_name) {
+                        key = (*iter)->getStringValue();
+                        ++iter;
+                    } else {
+                        for (bool found_fake = false; !found_fake;) {
+                            key = "/QPDFFake" + std::to_string(next_fake_key++);
+                            found_fake = (names.count(key) == 0);
+//                            QTC::TC("qpdf", "QPDFParser found fake", (found_fake ? 0 : 1));
+                        }
+                        warn(
+                            frame->offset,
+                            "expected dictionary key but found non-name object; inserting key " +
+                                key);
+                    }
+                    if (dict.count(key) > 0) {
+//                        QTC::TC("qpdf", "QPDFParser duplicate dict key");
+                        warn(
+                            frame->offset,
+                            "dictionary has duplicated key " + key +
+                                "; last occurrence overrides earlier ones");
+                    }
+
+                    // Calculate value.
+                    std::shared_ptr<QPDFObject> val;
+                    if (iter != frame->olist.end()) {
+                        val = *iter;
+                        ++iter;
+                    } else {
+//                        QTC::TC("qpdf", "QPDFParser no val for last key");
+                        warn(
+                            frame->offset,
+                            "dictionary ended prematurely; using null as value for last key");
+                        val = QPDF_Null::create();
+                    }
+
+                    dict[std::move(key)] = std::move(val);
+                }
+                if (!frame->contents_string.empty() && dict.count("/Type") &&
+                    dict["/Type"].isNameAndEquals("/Sig") && dict.count("/ByteRange") &&
+                    dict.count("/Contents") && dict["/Contents"].isString()) {
+                    dict["/Contents"] = QPDFObjectHandle::newString(frame->contents_string);
+                    dict["/Contents"].setParsedOffset(frame->contents_offset);
+                }
+                object = QPDF_Dictionary::create(std::move(dict));
+                setDescription(object, frame->offset - 2);
+                // The `offset` points to the next of "<<". Set the rewind offset to point to the
+                // beginning of "<<". This has been explicitly tested with whitespace surrounding
+                // the dictionary start delimiter. getLastOffset points to the dictionary end token
+                // and therefore can't be used here.
+                set_offset = true;
+                stack.pop_back();
+                frame = &stack.back();
+            } else {
+//                QTC::TC("qpdf", "QPDFParser bad dictionary close");
+                warn("unexpected dictionary close token");
+                if (tooManyBadTokens()) {
+                    return {QPDF_Null::create()};
+                }
+                is_null = true;
+            }
+            break;
+
+        case QPDFTokenizer::tt_array_open:
+        case QPDFTokenizer::tt_dict_open:
+            if (stack.size() > 500) {
+//                QTC::TC("qpdf", "QPDFParser too deep");
+                warn("ignoring excessively deeply nested data structure");
+                return {QPDF_Null::create()};
+            } else {
+                b_contents = false;
+                stack.emplace_back(
+                    input,
+                    (tokenizer.getType() == QPDFTokenizer::tt_array_open) ? st_array
+                                                                          : st_dictionary);
+                frame = &stack.back();
+                return parseRemainder(content_stream); // NEW
+                continue;
+            }
+
+        case QPDFTokenizer::tt_bool:
+            object = QPDF_Bool::create((tokenizer.getValue() == "true"));
+            break;
+
+        case QPDFTokenizer::tt_null:
+            is_null = true;
+            ++frame->null_count;
+
+            break;
+
+        case QPDFTokenizer::tt_integer:
+            object = QPDF_Integer::create(QUtil::string_to_ll(tokenizer.getValue().c_str()));
+            break;
+
+        case QPDFTokenizer::tt_real:
+            object = QPDF_Real::create(tokenizer.getValue());
+            break;
+
+        case QPDFTokenizer::tt_name:
+            {
+                auto const& name = tokenizer.getValue();
+                object = QPDF_Name::create(name);
+
+                if (name == "/Contents") {
+                    b_contents = true;
+                } else {
+                    b_contents = false;
+                }
+            }
+            break;
+
+        case QPDFTokenizer::tt_word:
+            {
+                auto const& value = tokenizer.getValue();
+                auto size = frame->olist.size();
+                if (content_stream) {
+                    object = QPDF_Operator::create(value);
+                } else if (
+                    value == "R" && frame->state != st_top && size >= 2 && frame->olist.back() &&
+                    frame->olist.back()->getTypeCode() == ::ot_integer &&
+                    !frame->olist.back()->getObjGen().isIndirect() && frame->olist.at(size - 2) &&
+                    frame->olist.at(size - 2)->getTypeCode() == ::ot_integer &&
+                    !frame->olist.at(size - 2)->getObjGen().isIndirect()) {
+                    if (context == nullptr) {
+//                        QTC::TC("qpdf", "QPDFParser indirect without context");
+                        throw std::logic_error("QPDFObjectHandle::parse called without context on "
+                                               "an object with indirect references");
+                    }
+                    auto ref_og = QPDFObjGen(
+                        QPDFObjectHandle(frame->olist.at(size - 2)).getIntValueAsInt(),
+                        QPDFObjectHandle(frame->olist.back()).getIntValueAsInt());
+                    if (ref_og.isIndirect()) {
+                        // This action has the desirable side effect of causing dangling references
+                        // (references to indirect objects that don't appear in the PDF) in any
+                        // parsed object to appear in the object cache.
+                        object = context->getObject(ref_og).obj;
+                        indirect_ref = true;
+                    } else {
+//                        QTC::TC("qpdf", "QPDFParser indirect with 0 objid");
+                        is_null = true;
+                    }
+                    frame->olist.pop_back();
+                    frame->olist.pop_back();
+                } else if ((value == "endobj") && (frame->state == st_top)) {
+                    // We just saw endobj without having read anything.  Treat this as a null and do
+                    // not move the input source's offset.
+                    is_null = true;
+                    input->seek(input->getLastOffset(), SEEK_SET);
+                    empty = true;
+                } else {
+//                    QTC::TC("qpdf", "QPDFParser treat word as string");
+                    warn("unknown token while reading object; treating as string");
+                    if (tooManyBadTokens()) {
+                        return {QPDF_Null::create()};
+                    }
+                    object = QPDF_String::create(value);
+                }
+            }
+            break;
+
+        case QPDFTokenizer::tt_string:
+            {
+                auto const& val = tokenizer.getValue();
+                if (decrypter) {
+                    if (b_contents) {
+                        frame->contents_string = val;
+                        frame->contents_offset = input->getLastOffset();
+                        b_contents = false;
+                    }
+                    std::string s{val};
+                    decrypter->decryptString(s);
+                    object = QPDF_String::create(s);
+                } else {
+                    object = QPDF_String::create(val);
+                }
+            }
+            break;
+
+        default:
+            warn("treating unknown token type as null while reading object");
+            if (tooManyBadTokens()) {
+                return {QPDF_Null::create()};
+            }
+            is_null = true;
+            break;
+        }
+
+        if (object == nullptr && !is_null) {
+            throw std::logic_error("QPDFParser:parseInternal: unexpected uninitialized object");
+        }
+
+        switch (frame->state) {
+        case st_dictionary:
+        case st_array:
+            if (is_null) {
+                object = null_oh;
+                // No need to set description for direct nulls - they probably will become implicit.
+            } else if (!indirect_ref && !set_offset) {
+                setDescription(object, input->getLastOffset());
+            }
+            set_offset = true;
+            frame->olist.push_back(object);
+            break;
+
+        case st_top:
+            done = true;
+            break;
+        }
+    }
+
+    if (is_null) {
+        object = QPDF_Null::create();
+    }
+    if (!set_offset) {
+        setDescription(object, frame->offset);
+    }
+    return object;
+}
+
+QPDFObjectHandle
+QPDFParser::parseRemainder(bool content_stream)
+{
+    // This method must take care not to resolve any objects. Don't check the type of any object
+    // without first ensuring that it is a direct object. Otherwise, doing so may have the side
+    // effect of reading the object and changing the file pointer. If you do this, it will cause a
+    // logic error to be thrown from QPDF::inParse().
+
+    const static std::shared_ptr<QPDFObject> null_oh = QPDF_Null::create();
+//    QPDF::ParseGuard pg(context);
+
+//    empty = false;
+
+    std::shared_ptr<QPDFObject> object;
+    bool set_offset = false;
+
+//    std::vector<StackFrame> stack{{input, st_top},};
+    bool done = false;
+    bool b_contents = false;
+    bool is_null = false;
+    frame = &stack.back(); // CHANGED
 
     while (!done) {
         bool indirect_ref = false;
@@ -280,7 +612,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                     // not move the input source's offset.
                     is_null = true;
                     input->seek(input->getLastOffset(), SEEK_SET);
-                    empty = true;
+//                    empty = true;
                 } else {
                     QTC::TC("qpdf", "QPDFParser treat word as string");
                     warn("unknown token while reading object; treating as string");
