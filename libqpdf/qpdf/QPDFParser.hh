@@ -45,18 +45,20 @@ class QPDFParser
         std::vector<std::shared_ptr<QPDFObject>> olist;
         parser_state_e state;
         qpdf_offset_t offset;
-        std::string contents_string{""};
+        std::string contents_string;
         qpdf_offset_t contents_offset{-1};
         int null_count{0};
     };
 
-
-    QPDFObjectHandle
-    parseRemainder(bool content_stream);
+    QPDFObjectHandle parseRemainder(bool content_stream);
     bool tooManyBadTokens();
     void warn(qpdf_offset_t offset, std::string const& msg) const;
     void warn(std::string const& msg) const;
     void warn(QPDFExc const&) const;
+    template <typename T, typename... Args>
+    // Create a new scalar object complete with parsed offset and description.
+    // NB the offset includes any leading whitespace.
+    QPDFObjectHandle withDescription(Args&&... args);
     void setDescription(std::shared_ptr<QPDFObject>& obj, qpdf_offset_t parsed_offset);
     std::shared_ptr<InputSource> input;
     std::string const& object_description;
@@ -65,11 +67,14 @@ class QPDFParser
     QPDF* context;
     std::shared_ptr<QPDFValue::Description> description;
     std::vector<StackFrame> stack;
-    StackFrame*  frame;
+    StackFrame* frame;
     // Number of recent bad tokens.
     int bad_count = 0;
     // Number of good tokens since last bad token. Irrelevant if bad_count == 0.
     int good_count = 0;
+    // Start offset including any leading whitespace.
+    qpdf_offset_t start;
+
 };
 
 #endif // QPDFPARSER_HH

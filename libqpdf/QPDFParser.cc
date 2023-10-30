@@ -21,6 +21,8 @@
 
 #include <memory>
 
+using ObjectPtr = std::shared_ptr<QPDFObject>;
+
 QPDFObjectHandle
 QPDFParser::parse(bool& empty, bool content_stream)
 {
@@ -31,9 +33,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
     QPDF::ParseGuard pg(context);
     empty = false;
-
-    std::shared_ptr<QPDFObject> object;
-    auto offset = input->tell();
+    start = input->tell();
 
     if (!tokenizer.nextToken(*input, object_description)) {
         warn(tokenizer.getErrorMessage());
@@ -79,29 +79,25 @@ QPDFParser::parse(bool& empty, bool content_stream)
         return parseRemainder(content_stream);
 
     case QPDFTokenizer::tt_bool:
-        object = QPDF_Bool::create((tokenizer.getValue() == "true"));
-        break;
+        return withDescription<QPDF_Bool>(tokenizer.getValue() == "true");
 
     case QPDFTokenizer::tt_null:
         return {QPDF_Null::create()};
 
     case QPDFTokenizer::tt_integer:
-        object = QPDF_Integer::create(QUtil::string_to_ll(tokenizer.getValue().c_str()));
-        break;
+        return withDescription<QPDF_Integer>(QUtil::string_to_ll(tokenizer.getValue().c_str()));
 
     case QPDFTokenizer::tt_real:
-        object = QPDF_Real::create(tokenizer.getValue());
-        break;
+        return withDescription<QPDF_Real>(tokenizer.getValue());
 
     case QPDFTokenizer::tt_name:
-        object = QPDF_Name::create(tokenizer.getValue());
-        break;
+        return withDescription<QPDF_Name>(tokenizer.getValue());
 
     case QPDFTokenizer::tt_word:
         {
             auto const& value = tokenizer.getValue();
             if (content_stream) {
-                object = QPDF_Operator::create(value);
+                return withDescription<QPDF_Operator>(value);
             } else if (value == "endobj") {
                 // We just saw endobj without having read anything.  Treat this as a null and do
                 // not move the input source's offset.
@@ -111,28 +107,23 @@ QPDFParser::parse(bool& empty, bool content_stream)
             } else {
                 QTC::TC("qpdf", "QPDFParser treat word as string");
                 warn("unknown token while reading object; treating as string");
-                object = QPDF_String::create(value);
+                return withDescription<QPDF_String>(value);
             }
         }
-        break;
 
     case QPDFTokenizer::tt_string:
         if (decrypter) {
-            std::string s{tokenizer.getValue()};
-            decrypter->decryptString(s);
-            object = QPDF_String::create(s);
+                std::string s{tokenizer.getValue()};
+                decrypter->decryptString(s);
+                return withDescription<QPDF_String>(s);
         } else {
-            object = QPDF_String::create(tokenizer.getValue());
+                return withDescription<QPDF_String>(tokenizer.getValue());
         }
-        break;
 
     default:
         warn("treating unknown token type as null while reading object");
         return {QPDF_Null::create()};
     }
-
-    setDescription(object, offset);
-    return object;
 }
 
 QPDFObjectHandle
@@ -143,9 +134,9 @@ QPDFParser::parseRemainder(bool content_stream)
     // effect of reading the object and changing the file pointer. If you do this, it will cause a
     // logic error to be thrown from QPDF::inParse().
 
-    const static std::shared_ptr<QPDFObject> null_oh = QPDF_Null::create();
+    const static ObjectPtr null_oh = QPDF_Null::create();
 
-    std::shared_ptr<QPDFObject> object;
+    ObjectPtr object;
     bool set_offset = false;
     bool b_contents = false;
     bool is_null = false;
@@ -256,7 +247,7 @@ QPDFParser::parseRemainder(bool content_stream)
                     }
 
                     // Calculate value.
-                    std::shared_ptr<QPDFObject> val;
+                    ObjectPtr val;
                     if (iter != frame->olist.end()) {
                         val = *iter;
                         ++iter;
@@ -429,8 +420,17 @@ QPDFParser::parseRemainder(bool content_stream)
     return {}; // unreachable
 }
 
+template <typename T, typename... Args>
+QPDFObjectHandle
+QPDFParser::withDescription(Args&&... args)
+{
+    auto obj = T::create(args...);
+    obj->setDescription(context, description, start);
+    return {obj};
+}
+
 void
-QPDFParser::setDescription(std::shared_ptr<QPDFObject>& obj, qpdf_offset_t parsed_offset)
+QPDFParser::setDescription(ObjectPtr& obj, qpdf_offset_t parsed_offset)
 {
     if (obj) {
         obj->setDescription(context, description, parsed_offset);
