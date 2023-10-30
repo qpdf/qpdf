@@ -57,11 +57,14 @@ QPDF trailer lacks size 0
 QPDF trailer size not integer 0
 QPDF trailer prev not integer 0
 QPDFParser bad brace 0
+QPDFParser bad brace in parseRemainder 0
 QPDFParser bad array close 0
+QPDFParser bad array close in parseRemainder 0
 QPDF stream without length 0
 QPDF stream length not integer 0
 QPDF missing endstream 0
 QPDFParser bad dictionary close 0
+QPDFParser bad dictionary close in parseRemainder 0
 QPDF can't find xref 0
 QPDFTokenizer bad ) 0
 QPDFTokenizer bad > 0
@@ -258,6 +261,7 @@ QPDFParser indirect with 0 objid 0
 QPDF object id 0 0
 QPDF recursion loop in resolve 0
 QPDFParser treat word as string 0
+QPDFParser treat word as string in parseRemainder 0
 QPDFParser found fake 1
 QPDFParser no val for last key 0
 QPDF resolve failure to null 0
@@ -289,7 +293,9 @@ QPDFObjectHandle coalesce called on stream 0
 QPDFObjectHandle coalesce provide stream data 0
 QPDF_Stream bad token at end during normalize 0
 QPDFParser bad token in parse 0
+QPDFParser bad token in parseRemainder 0
 QPDFParser eof in parse 0
+QPDFParser eof in parseRemainder 0
 QPDFObjectHandle array bounds 0
 QPDFObjectHandle boolean returning false 0
 QPDFObjectHandle integer returning 0 0
