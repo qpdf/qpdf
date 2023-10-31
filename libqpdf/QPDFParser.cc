@@ -143,6 +143,51 @@ QPDFParser::parseRemainder(bool content_stream)
         }
         ++good_count; // optimistically
 
+        if (int_count != 0) {
+            // Special handling of indirect references. Treat integer tokens as part of an indirect
+            // reference until proven otherwise.
+            if (tokenizer.getType() == QPDFTokenizer::tt_integer) {
+                if (++int_count > 2) {
+                    // Process the oldest buffered integer.
+                    addInt(int_count);
+                }
+                last_offset_buffer[int_count % 2] = input->getLastOffset();
+                int_buffer[int_count % 2] = QUtil::string_to_ll(tokenizer.getValue().c_str());
+                continue;
+
+            } else if (
+                int_count >= 2 && tokenizer.getType() == QPDFTokenizer::tt_word &&
+                tokenizer.getValue() == "R") {
+                if (context == nullptr) {
+                    QTC::TC("qpdf", "QPDFParser indirect without context");
+                    throw std::logic_error("QPDFParser::parse called without context on an object "
+                                           "with indirect references");
+                }
+                auto ref_og = QPDFObjGen(
+                    QIntC::to_int(int_buffer[(int_count - 1) % 2]),
+                    QIntC::to_int(int_buffer[(int_count) % 2]));
+                if (ref_og.isIndirect()) {
+                    // This action has the desirable side effect of causing dangling references
+                    // (references to indirect objects that don't appear in the PDF) in any parsed
+                    // object to appear in the object cache.
+                    add(std::move(context->getObject(ref_og).obj));
+                } else {
+                    QTC::TC("qpdf", "QPDFParser indirect with 0 objid");
+                    addNull();
+                }
+                int_count = 0;
+                continue;
+
+            } else if (int_count > 0) {
+                // Process the buffered integers before processing the current token.
+                if (int_count > 1) {
+                    addInt(int_count - 1);
+                }
+                addInt(int_count);
+                int_count = 0;
+            }
+        }
+
         switch (tokenizer.getType()) {
         case QPDFTokenizer::tt_eof:
             warn("parse error while reading object");
@@ -304,7 +349,14 @@ QPDFParser::parseRemainder(bool content_stream)
             continue;
 
         case QPDFTokenizer::tt_integer:
-            addScalar<QPDF_Integer>(QUtil::string_to_ll(tokenizer.getValue().c_str()));
+            if (!content_stream) {
+                // Buffer token in case it is part of an indirect reference.
+                last_offset_buffer[1] = input->getLastOffset();
+                int_buffer[1] = QUtil::string_to_ll(tokenizer.getValue().c_str());
+                int_count = 1;
+            } else {
+                addScalar<QPDF_Integer>(QUtil::string_to_ll(tokenizer.getValue().c_str()));
+            }
             continue;
 
         case QPDFTokenizer::tt_real:
@@ -325,46 +377,15 @@ QPDFParser::parseRemainder(bool content_stream)
             continue;
 
         case QPDFTokenizer::tt_word:
-            {
-                auto const& value = tokenizer.getValue();
-                auto size = frame->olist.size();
-                if (content_stream) {
-                    addScalar<QPDF_Operator>(value);
-                } else if (
-                    value == "R" && size >= 2 && frame->olist.back() &&
-                    frame->olist.back()->getTypeCode() == ::ot_integer &&
-                    !frame->olist.back()->getObjGen().isIndirect() && frame->olist.at(size - 2) &&
-                    frame->olist.at(size - 2)->getTypeCode() == ::ot_integer &&
-                    !frame->olist.at(size - 2)->getObjGen().isIndirect()) {
-                    if (context == nullptr) {
-                        QTC::TC("qpdf", "QPDFParser indirect without context");
-                        throw std::logic_error("QPDFObjectHandle::parse called without context on "
-                                               "an object with indirect references");
-                    }
-                    auto ref_og = QPDFObjGen(
-                        QPDFObjectHandle(frame->olist.at(size - 2)).getIntValueAsInt(),
-                        QPDFObjectHandle(frame->olist.back()).getIntValueAsInt());
-                    if (ref_og.isIndirect()) {
-                        // This action has the desirable side effect of causing dangling references
-                        // (references to indirect objects that don't appear in the PDF) in any
-                        // parsed object to appear in the object cache.
-                        frame->olist.pop_back();
-                        frame->olist.pop_back();
-                        add(std::move(context->getObject(ref_og).obj));
-                    } else {
-                        QTC::TC("qpdf", "QPDFParser indirect with 0 objid");
-                        frame->olist.pop_back();
-                        frame->olist.pop_back();
-                        addNull();
-                    }
-                } else {
-                    QTC::TC("qpdf", "QPDFParser treat word as string in parseRemainder");
-                    warn("unknown token while reading object; treating as string");
-                    if (tooManyBadTokens()) {
-                        return {QPDF_Null::create()};
-                    }
-                    addScalar<QPDF_String>(value);
+            if (content_stream) {
+                addScalar<QPDF_Operator>(tokenizer.getValue());
+            } else {
+                QTC::TC("qpdf", "QPDFParser treat word as string in parseRemainder");
+                warn("unknown token while reading object; treating as string");
+                if (tooManyBadTokens()) {
+                    return {QPDF_Null::create()};
                 }
+                addScalar<QPDF_String>(tokenizer.getValue());
             }
             continue;
 
@@ -410,6 +431,14 @@ QPDFParser::addNull()
 
     frame->olist.emplace_back(null_obj);
     ++frame->null_count;
+}
+
+void
+QPDFParser::addInt(int count)
+{
+    auto obj = QPDF_Integer::create(int_buffer[count % 2]);
+    obj->setDescription(context, description, last_offset_buffer[count % 2]);
+    add(std::move(obj));
 }
 
 template <typename T, typename... Args>

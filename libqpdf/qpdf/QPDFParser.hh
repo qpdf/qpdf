@@ -53,6 +53,7 @@ class QPDFParser
     QPDFObjectHandle parseRemainder(bool content_stream);
     void add(std::shared_ptr<QPDFObject>&& obj);
     void addNull();
+    void addInt(int count);
     template <typename T, typename... Args>
     void addScalar(Args&&... args);
     bool tooManyBadTokens();
@@ -78,6 +79,10 @@ class QPDFParser
     int good_count = 0;
     // Start offset including any leading whitespace.
     qpdf_offset_t start;
+    // Number of successive integer tokens.
+    int int_count = 0;
+    long long int_buffer[2]{0, 0};
+    qpdf_offset_t last_offset_buffer[2]{0, 0};
 
 };
 
