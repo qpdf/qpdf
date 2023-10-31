@@ -51,6 +51,10 @@ class QPDFParser
     };
 
     QPDFObjectHandle parseRemainder(bool content_stream);
+    void add(std::shared_ptr<QPDFObject>&& obj);
+    void addNull();
+    template <typename T, typename... Args>
+    void addScalar(Args&&... args);
     bool tooManyBadTokens();
     void warn(qpdf_offset_t offset, std::string const& msg) const;
     void warn(std::string const& msg) const;

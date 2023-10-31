@@ -113,11 +113,11 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
     case QPDFTokenizer::tt_string:
         if (decrypter) {
-                std::string s{tokenizer.getValue()};
-                decrypter->decryptString(s);
-                return withDescription<QPDF_String>(s);
+            std::string s{tokenizer.getValue()};
+            decrypter->decryptString(s);
+            return withDescription<QPDF_String>(s);
         } else {
-                return withDescription<QPDF_String>(tokenizer.getValue());
+            return withDescription<QPDF_String>(tokenizer.getValue());
         }
 
     default:
@@ -134,20 +134,10 @@ QPDFParser::parseRemainder(bool content_stream)
     // effect of reading the object and changing the file pointer. If you do this, it will cause a
     // logic error to be thrown from QPDF::inParse().
 
-    const static ObjectPtr null_oh = QPDF_Null::create();
-
-    ObjectPtr object;
-    bool set_offset = false;
-    bool b_contents = false;
-    bool is_null = false;
     bad_count = 0;
+    bool b_contents = false;
 
     while (true) {
-        bool indirect_ref = false;
-        is_null = false;
-        object = nullptr;
-        set_offset = false;
-
         if (!tokenizer.nextToken(*input, object_description)) {
             warn(tokenizer.getErrorMessage());
         }
@@ -169,8 +159,8 @@ QPDFParser::parseRemainder(bool content_stream)
             if (tooManyBadTokens()) {
                 return {QPDF_Null::create()};
             }
-            is_null = true;
-            break;
+            addNull();
+            continue;
 
         case QPDFTokenizer::tt_brace_open:
         case QPDFTokenizer::tt_brace_close:
@@ -179,32 +169,32 @@ QPDFParser::parseRemainder(bool content_stream)
             if (tooManyBadTokens()) {
                 return {QPDF_Null::create()};
             }
-            is_null = true;
-            break;
+            addNull();
+            continue;
 
         case QPDFTokenizer::tt_array_close:
             if (frame->state == st_array) {
-                object = QPDF_Array::create(std::move(frame->olist), frame->null_count > 100);
+                auto object = QPDF_Array::create(std::move(frame->olist), frame->null_count > 100);
                 setDescription(object, frame->offset - 1);
                 // The `offset` points to the next of "[".  Set the rewind offset to point to the
                 // beginning of "[". This has been explicitly tested with whitespace surrounding the
                 // array start delimiter. getLastOffset points to the array end token and therefore
                 // can't be used here.
-                set_offset = true;
                 if (stack.size() <= 1) {
                     return object;
                 }
                 stack.pop_back();
                 frame = &stack.back();
+                add(std::move(object));
             } else {
                 QTC::TC("qpdf", "QPDFParser bad array close in parseRemainder");
                 warn("treating unexpected array close token as null");
                 if (tooManyBadTokens()) {
                     return {QPDF_Null::create()};
                 }
-                is_null = true;
+                addNull();
             }
-            break;
+            continue;
 
         case QPDFTokenizer::tt_dict_close:
             if (frame->state == st_dictionary) {
@@ -267,7 +257,7 @@ QPDFParser::parseRemainder(bool content_stream)
                     dict["/Contents"] = QPDFObjectHandle::newString(frame->contents_string);
                     dict["/Contents"].setParsedOffset(frame->contents_offset);
                 }
-                object = QPDF_Dictionary::create(std::move(dict));
+                auto object = QPDF_Dictionary::create(std::move(dict));
                 setDescription(object, frame->offset - 2);
                 // The `offset` points to the next of "<<". Set the rewind offset to point to the
                 // beginning of "<<". This has been explicitly tested with whitespace surrounding
@@ -276,18 +266,18 @@ QPDFParser::parseRemainder(bool content_stream)
                 if (stack.size() <= 1) {
                     return object;
                 }
-                set_offset = true;
                 stack.pop_back();
                 frame = &stack.back();
+                add(std::move(object));
             } else {
                 QTC::TC("qpdf", "QPDFParser bad dictionary close in parseRemainder");
                 warn("unexpected dictionary close token");
                 if (tooManyBadTokens()) {
                     return {QPDF_Null::create()};
                 }
-                is_null = true;
+                addNull();
             }
-            break;
+            continue;
 
         case QPDFTokenizer::tt_array_open:
         case QPDFTokenizer::tt_dict_open:
@@ -306,26 +296,25 @@ QPDFParser::parseRemainder(bool content_stream)
             }
 
         case QPDFTokenizer::tt_bool:
-            object = QPDF_Bool::create((tokenizer.getValue() == "true"));
-            break;
+            addScalar<QPDF_Bool>(tokenizer.getValue() == "true");
+            continue;
 
         case QPDFTokenizer::tt_null:
-            is_null = true;
-            ++frame->null_count;
-            break;
+            addNull();
+            continue;
 
         case QPDFTokenizer::tt_integer:
-            object = QPDF_Integer::create(QUtil::string_to_ll(tokenizer.getValue().c_str()));
-            break;
+            addScalar<QPDF_Integer>(QUtil::string_to_ll(tokenizer.getValue().c_str()));
+            continue;
 
         case QPDFTokenizer::tt_real:
-            object = QPDF_Real::create(tokenizer.getValue());
-            break;
+            addScalar<QPDF_Real>(tokenizer.getValue());
+            continue;
 
         case QPDFTokenizer::tt_name:
             {
                 auto const& name = tokenizer.getValue();
-                object = QPDF_Name::create(name);
+                addScalar<QPDF_Name>(name);
 
                 if (name == "/Contents") {
                     b_contents = true;
@@ -333,14 +322,14 @@ QPDFParser::parseRemainder(bool content_stream)
                     b_contents = false;
                 }
             }
-            break;
+            continue;
 
         case QPDFTokenizer::tt_word:
             {
                 auto const& value = tokenizer.getValue();
                 auto size = frame->olist.size();
                 if (content_stream) {
-                    object = QPDF_Operator::create(value);
+                    addScalar<QPDF_Operator>(value);
                 } else if (
                     value == "R" && size >= 2 && frame->olist.back() &&
                     frame->olist.back()->getTypeCode() == ::ot_integer &&
@@ -359,24 +348,25 @@ QPDFParser::parseRemainder(bool content_stream)
                         // This action has the desirable side effect of causing dangling references
                         // (references to indirect objects that don't appear in the PDF) in any
                         // parsed object to appear in the object cache.
-                        object = context->getObject(ref_og).obj;
-                        indirect_ref = true;
+                        frame->olist.pop_back();
+                        frame->olist.pop_back();
+                        add(std::move(context->getObject(ref_og).obj));
                     } else {
                         QTC::TC("qpdf", "QPDFParser indirect with 0 objid");
-                        is_null = true;
+                        frame->olist.pop_back();
+                        frame->olist.pop_back();
+                        addNull();
                     }
-                    frame->olist.pop_back();
-                    frame->olist.pop_back();
                 } else {
                     QTC::TC("qpdf", "QPDFParser treat word as string in parseRemainder");
                     warn("unknown token while reading object; treating as string");
                     if (tooManyBadTokens()) {
                         return {QPDF_Null::create()};
                     }
-                    object = QPDF_String::create(value);
+                    addScalar<QPDF_String>(value);
                 }
             }
-            break;
+            continue;
 
         case QPDFTokenizer::tt_string:
             {
@@ -389,35 +379,46 @@ QPDFParser::parseRemainder(bool content_stream)
                     }
                     std::string s{val};
                     decrypter->decryptString(s);
-                    object = QPDF_String::create(s);
+                    addScalar<QPDF_String>(s);
                 } else {
-                    object = QPDF_String::create(val);
+                    addScalar<QPDF_String>(val);
                 }
             }
-            break;
+            continue;
 
         default:
             warn("treating unknown token type as null while reading object");
             if (tooManyBadTokens()) {
                 return {QPDF_Null::create()};
             }
-            is_null = true;
-            break;
+            addNull();
         }
-
-        if (object == nullptr && !is_null) {
-            throw std::logic_error("QPDFParser:parseInternal: unexpected uninitialized object");
-        }
-
-        if (is_null) {
-            object = null_oh;
-            // No need to set description for direct nulls - they probably will become implicit.
-        } else if (!indirect_ref && !set_offset) {
-            setDescription(object, input->getLastOffset());
-        }
-        frame->olist.push_back(object);
     }
     return {}; // unreachable
+}
+
+void
+QPDFParser::add(std::shared_ptr<QPDFObject>&& obj)
+{
+    frame->olist.emplace_back(std::move(obj));
+}
+
+void
+QPDFParser::addNull()
+{
+    const static ObjectPtr null_obj = QPDF_Null::create();
+
+    frame->olist.emplace_back(null_obj);
+    ++frame->null_count;
+}
+
+template <typename T, typename... Args>
+void
+QPDFParser::addScalar(Args&&... args)
+{
+    auto obj = T::create(args...);
+    obj->setDescription(context, description, input->getLastOffset());
+    add(std::move(obj));
 }
 
 template <typename T, typename... Args>
