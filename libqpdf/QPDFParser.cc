@@ -74,7 +74,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
         stack.clear();
         stack.emplace_back(
             input,
-            (tokenizer.getType() == QPDFTokenizer::tt_array_open) ? st_array : st_dictionary);
+            (tokenizer.getType() == QPDFTokenizer::tt_array_open) ? st_array : st_dictionary_key);
         frame = &stack.back();
         return parseRemainder(content_stream);
 
@@ -242,60 +242,44 @@ QPDFParser::parseRemainder(bool content_stream)
             continue;
 
         case QPDFTokenizer::tt_dict_close:
-            if (frame->state == st_dictionary) {
-                // Convert list to map. Alternating elements are keys.  Attempt to recover more or
-                // less gracefully from invalid dictionaries.
-                std::set<std::string> names;
-                for (auto& obj: frame->olist) {
-                    if (obj) {
+            if (frame->state <= st_dictionary_value) {
+                // Attempt to recover more or less gracefully from invalid dictionaries.
+
+                auto& dict = frame->dict;
+                if (frame->state == st_dictionary_value) {
+                    QTC::TC("qpdf", "QPDFParser no val for last key");
+                    warn(
+                        frame->offset,
+                        "dictionary ended prematurely; using null as value for last key");
+                    dict[frame->key] = QPDF_Null::create();
+                }
+
+                if (!frame->olist.empty()) {
+                    std::set<std::string> names;
+                    for (auto& obj: frame->olist) {
                         if (obj->getTypeCode() == ::ot_name) {
                             names.insert(obj->getStringValue());
                         }
                     }
-                }
-
-                std::map<std::string, QPDFObjectHandle> dict;
-                int next_fake_key = 1;
-                for (auto iter = frame->olist.begin(); iter != frame->olist.end();) {
-                    // Calculate key.
-                    std::string key;
-                    if (*iter && (*iter)->getTypeCode() == ::ot_name) {
-                        key = (*iter)->getStringValue();
-                        ++iter;
-                    } else {
-                        for (bool found_fake = false; !found_fake;) {
-                            key = "/QPDFFake" + std::to_string(next_fake_key++);
-                            found_fake = (names.count(key) == 0);
+                    int next_fake_key = 1;
+                    for (auto const& item: frame->olist) {
+                        while (true) {
+                            const std::string key = "/QPDFFake" + std::to_string(next_fake_key++);
+                            const bool found_fake = (dict.count(key) == 0 && names.count(key) == 0);
                             QTC::TC("qpdf", "QPDFParser found fake", (found_fake ? 0 : 1));
+                            if (found_fake) {
+                                warn(
+                                    frame->offset,
+                                    "expected dictionary key but found non-name object; inserting "
+                                    "key " +
+                                        key);
+                                dict[key] = item;
+                                break;
+                            }
                         }
-                        warn(
-                            frame->offset,
-                            "expected dictionary key but found non-name object; inserting key " +
-                                key);
                     }
-                    if (dict.count(key) > 0) {
-                        QTC::TC("qpdf", "QPDFParser duplicate dict key");
-                        warn(
-                            frame->offset,
-                            "dictionary has duplicated key " + key +
-                                "; last occurrence overrides earlier ones");
-                    }
-
-                    // Calculate value.
-                    ObjectPtr val;
-                    if (iter != frame->olist.end()) {
-                        val = *iter;
-                        ++iter;
-                    } else {
-                        QTC::TC("qpdf", "QPDFParser no val for last key");
-                        warn(
-                            frame->offset,
-                            "dictionary ended prematurely; using null as value for last key");
-                        val = QPDF_Null::create();
-                    }
-
-                    dict[std::move(key)] = val;
                 }
+
                 if (!frame->contents_string.empty() && dict.count("/Type") &&
                     dict["/Type"].isNameAndEquals("/Sig") && dict.count("/ByteRange") &&
                     dict.count("/Contents") && dict["/Contents"].isString()) {
@@ -335,7 +319,7 @@ QPDFParser::parseRemainder(bool content_stream)
                 stack.emplace_back(
                     input,
                     (tokenizer.getType() == QPDFTokenizer::tt_array_open) ? st_array
-                                                                          : st_dictionary);
+                                                                          : st_dictionary_key);
                 frame = &stack.back();
                 continue;
             }
@@ -364,15 +348,13 @@ QPDFParser::parseRemainder(bool content_stream)
             continue;
 
         case QPDFTokenizer::tt_name:
-            {
-                auto const& name = tokenizer.getValue();
-                addScalar<QPDF_Name>(name);
-
-                if (name == "/Contents") {
-                    b_contents = true;
-                } else {
-                    b_contents = false;
-                }
+            if (frame->state == st_dictionary_key) {
+                frame->key = tokenizer.getValue();
+                frame->state = st_dictionary_value;
+                b_contents = decrypter && frame->key == "/Contents";
+                continue;
+            } else {
+                addScalar<QPDF_Name>(tokenizer.getValue());
             }
             continue;
 
@@ -415,13 +397,21 @@ QPDFParser::parseRemainder(bool content_stream)
             addNull();
         }
     }
-    return {}; // unreachable
 }
 
 void
 QPDFParser::add(std::shared_ptr<QPDFObject>&& obj)
 {
-    frame->olist.emplace_back(std::move(obj));
+    if (frame->state != st_dictionary_value) {
+        // If state is st_dictionary_key then there is a missing key. Push onto olist for
+        // processing once the tt_dict_close token has been found.
+        frame->olist.emplace_back(std::move(obj));
+    } else {
+        if (auto res = frame->dict.insert_or_assign(frame->key, std::move(obj)); !res.second) {
+            warnDuplicateKey();
+        }
+        frame->state = st_dictionary_key;
+    }
 }
 
 void
@@ -429,7 +419,16 @@ QPDFParser::addNull()
 {
     const static ObjectPtr null_obj = QPDF_Null::create();
 
-    frame->olist.emplace_back(null_obj);
+    if (frame->state != st_dictionary_value) {
+        // If state is st_dictionary_key then there is a missing key. Push onto olist for
+        // processing once the tt_dict_close token has been found.
+        frame->olist.emplace_back(null_obj);
+    } else {
+        if (auto res = frame->dict.insert_or_assign(frame->key, null_obj); !res.second) {
+            warnDuplicateKey();
+        }
+        frame->state = st_dictionary_key;
+    }
     ++frame->null_count;
 }
 
@@ -493,6 +492,15 @@ QPDFParser::warn(QPDFExc const& e) const
     } else {
         throw e;
     }
+}
+
+void
+QPDFParser::warnDuplicateKey()
+{
+    QTC::TC("qpdf", "QPDFParser duplicate dict key");
+    warn(
+        frame->offset,
+        "dictionary has duplicated key " + frame->key + "; last occurrence overrides earlier ones");
 }
 
 void

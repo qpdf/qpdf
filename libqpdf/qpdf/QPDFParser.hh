@@ -31,8 +31,9 @@ class QPDFParser
     QPDFObjectHandle parse(bool& empty, bool content_stream);
 
   private:
-    struct StackFrame;
-    enum parser_state_e { st_dictionary, st_array };
+    // Parser state.  Note:
+    // state < st_dictionary_value == (state = st_dictionary_key || state = st_dictionary_value)
+    enum parser_state_e { st_dictionary_key, st_dictionary_value, st_array };
 
     struct StackFrame
     {
@@ -43,7 +44,9 @@ class QPDFParser
         }
 
         std::vector<std::shared_ptr<QPDFObject>> olist;
+        std::map<std::string, QPDFObjectHandle> dict;
         parser_state_e state;
+        std::string key;
         qpdf_offset_t offset;
         std::string contents_string;
         qpdf_offset_t contents_offset{-1};
@@ -57,6 +60,7 @@ class QPDFParser
     template <typename T, typename... Args>
     void addScalar(Args&&... args);
     bool tooManyBadTokens();
+    void warnDuplicateKey();
     void warn(qpdf_offset_t offset, std::string const& msg) const;
     void warn(std::string const& msg) const;
     void warn(QPDFExc const&) const;
@@ -83,7 +87,6 @@ class QPDFParser
     int int_count = 0;
     long long int_buffer[2]{0, 0};
     qpdf_offset_t last_offset_buffer[2]{0, 0};
-
 };
 
 #endif // QPDFPARSER_HH
