@@ -244,8 +244,8 @@ QPDFParser::parseRemainder(bool content_stream)
         case QPDFTokenizer::tt_dict_close:
             if (frame->state <= st_dictionary_value) {
                 // Attempt to recover more or less gracefully from invalid dictionaries.
-
                 auto& dict = frame->dict;
+
                 if (frame->state == st_dictionary_value) {
                     QTC::TC("qpdf", "QPDFParser no val for last key");
                     warn(
@@ -254,31 +254,8 @@ QPDFParser::parseRemainder(bool content_stream)
                     dict[frame->key] = QPDF_Null::create();
                 }
 
-                if (!frame->olist.empty()) {
-                    std::set<std::string> names;
-                    for (auto& obj: frame->olist) {
-                        if (obj->getTypeCode() == ::ot_name) {
-                            names.insert(obj->getStringValue());
-                        }
-                    }
-                    int next_fake_key = 1;
-                    for (auto const& item: frame->olist) {
-                        while (true) {
-                            const std::string key = "/QPDFFake" + std::to_string(next_fake_key++);
-                            const bool found_fake = (dict.count(key) == 0 && names.count(key) == 0);
-                            QTC::TC("qpdf", "QPDFParser found fake", (found_fake ? 0 : 1));
-                            if (found_fake) {
-                                warn(
-                                    frame->offset,
-                                    "expected dictionary key but found non-name object; inserting "
-                                    "key " +
-                                        key);
-                                dict[key] = item;
-                                break;
-                            }
-                        }
-                    }
-                }
+                if (!frame->olist.empty())
+                    fixMissingKeys();
 
                 if (!frame->contents_string.empty() && dict.count("/Type") &&
                     dict["/Type"].isNameAndEquals("/Sig") && dict.count("/ByteRange") &&
@@ -463,6 +440,32 @@ QPDFParser::setDescription(ObjectPtr& obj, qpdf_offset_t parsed_offset)
 {
     if (obj) {
         obj->setDescription(context, description, parsed_offset);
+    }
+}
+
+void
+QPDFParser::fixMissingKeys()
+{
+    std::set<std::string> names;
+    for (auto& obj: frame->olist) {
+        if (obj->getTypeCode() == ::ot_name) {
+            names.insert(obj->getStringValue());
+        }
+    }
+    int next_fake_key = 1;
+    for (auto const& item: frame->olist) {
+        while (true) {
+            const std::string key = "/QPDFFake" + std::to_string(next_fake_key++);
+            const bool found_fake = frame->dict.count(key) == 0 && names.count(key) == 0;
+            QTC::TC("qpdf", "QPDFParser found fake", (found_fake ? 0 : 1));
+            if (found_fake) {
+                warn(
+                    frame->offset,
+                    "expected dictionary key but found non-name object; inserting key " + key);
+                frame->dict[key] = item;
+                break;
+            }
+        }
     }
 }
 

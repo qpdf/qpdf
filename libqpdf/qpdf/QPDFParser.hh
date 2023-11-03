@@ -61,6 +61,7 @@ class QPDFParser
     void addScalar(Args&&... args);
     bool tooManyBadTokens();
     void warnDuplicateKey();
+    void fixMissingKeys();
     void warn(qpdf_offset_t offset, std::string const& msg) const;
     void warn(std::string const& msg) const;
     void warn(QPDFExc const&) const;
