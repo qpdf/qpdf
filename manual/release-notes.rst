@@ -11,6 +11,14 @@ changes that are under consideration, you can build qpdf locally and
 enable the ``FUTURE`` build option (see :ref:`build-options`).
 
 Planned changes for future 12.x (subject to change):
+  - It will become illegal to create ``QPDF`` objects that do not comply
+    with the PDF specification, unless it is intentional. See the entry
+    for ``QPDFObjectHandle::force()`` below for further detail. The result
+    of creating an invalid ``QPDF`` object, unless documented, will be
+    undefined and may change over time. For example, an error may be
+    ignored, be quietly fixed, or generate a warning or error. There
+    will be a build option to disable this behaviour.
+
   - ``QPDFObjectHandle`` will support move construction/assignment.
     This change will be invisible to most developers but may break
     your code if you rely on specific behavior around how many
@@ -37,6 +45,13 @@ Planned changes for future 12.x (subject to change):
     to ``subtract``. (Not enabled with ``FUTURE`` option.)
 
 .. x.y.z: not yet released
+
+  - Library Enhancements
+
+    - Add new method ``QPDFObjectHandle::force`` to indicate that the
+      object handle is about to be used in a way that does not comply
+      with the PDF specification. The method currently does nothing
+      and is provided to help with transition to future qpdf 12.x.
 
 11.6.3: October 15, 2023
   - Bug fixes:

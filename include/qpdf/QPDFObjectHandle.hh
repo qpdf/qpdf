@@ -308,6 +308,17 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isSameObjectAs(QPDFObjectHandle const&) const;
 
+    // Indicate that the object handle is about to be used in a way that violates the PDF
+    // specification. For example, use:
+    //   qpdf.getRoot().replaceKey("/Pages", "<< /Type /Pages /Kids [] /Count 0>>\n"_qpdf.force());
+    // to indicate that you are deliberately using a direct object where the specification requires
+    // an indirect object. For future compatibility with qpdf 12.x.
+    QPDFObjectHandle
+    force() const noexcept
+    {
+        return *this;
+    }
+
     // Return type code and type name of underlying object.  These are useful for doing rapid type
     // tests (like switch statements) or for testing and debugging.
     QPDF_DLL
