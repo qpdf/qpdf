@@ -2176,7 +2176,7 @@ Related Options
    created in this way are insecure since they can be opened without a
    password, and restrictions will not be enforced. Users would
    ordinarily never want to create such files. If you are using qpdf
-   to intentionally created strange files for testing (a valid use of
+   to intentionally create strange files for testing (a valid use of
    qpdf!), this option allows you to create such insecure files. This
    option is only available with 256-bit encryption.
 
