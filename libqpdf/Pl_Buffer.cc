@@ -53,6 +53,17 @@ Pl_Buffer::getBuffer()
     return b;
 }
 
+std::string
+Pl_Buffer::getString()
+{
+    if (!m->ready) {
+        throw std::logic_error("Pl_Buffer::getString() called when not ready");
+    }
+    auto s = std::move(m->data);
+    m->data.clear();
+    return s;
+}
+
 std::shared_ptr<Buffer>
 Pl_Buffer::getBufferSharedPointer()
 {

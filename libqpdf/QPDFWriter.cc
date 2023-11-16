@@ -1579,10 +1579,7 @@ QPDFWriter::unparseObject(
                     m->cur_data_key.length());
                 pl.writeString(val);
                 pl.finish();
-                auto buf = bufpl.getBufferSharedPointer();
-                val = QPDF_String(
-                          std::string(reinterpret_cast<char*>(buf->getBuffer()), buf->getSize()))
-                          .unparse(true);
+                val = QPDF_String(bufpl.getString()).unparse(true);
             } else {
                 auto tmp_ph = QUtil::make_unique_cstr(val);
                 char* tmp = tmp_ph.get();

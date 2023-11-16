@@ -229,13 +229,11 @@ process_with_aes(
         aes.writeString(data);
     }
     aes.finish();
-    auto bufp = buffer.getBufferSharedPointer();
     if (outlength == 0) {
-        outlength = bufp->getSize();
+        return buffer.getString();
     } else {
-        outlength = std::min(outlength, bufp->getSize());
+        return buffer.getString().substr(0, outlength);
     }
-    return {reinterpret_cast<char*>(bufp->getBuffer()), outlength};
 }
 
 static std::string
@@ -1021,8 +1019,7 @@ QPDF::decryptString(std::string& str, QPDFObjGen const& og)
                 key.length());
             pl.writeString(str);
             pl.finish();
-            auto buf = bufpl.getBufferSharedPointer();
-            str = std::string(reinterpret_cast<char*>(buf->getBuffer()), buf->getSize());
+            str = bufpl.getString();
         } else {
             QTC::TC("qpdf", "QPDF_encryption rc4 decode string");
             size_t vlen = str.length();

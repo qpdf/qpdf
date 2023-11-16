@@ -64,6 +64,10 @@ class QPDF_DLL_CLASS Pl_Buffer: public Pipeline
     QPDF_DLL
     void getMallocBuffer(unsigned char** buf, size_t* len);
 
+    // Same as getBuffer but returns the result as a string.
+    QPDF_DLL
+    std::string getString();
+
   private:
     class QPDF_DLL_PRIVATE Members
     {
