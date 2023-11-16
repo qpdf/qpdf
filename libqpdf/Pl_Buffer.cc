@@ -19,7 +19,7 @@ Pl_Buffer::~Pl_Buffer() // NOLINT (modernize-use-equals-default)
 void
 Pl_Buffer::write(unsigned char const* buf, size_t len)
 {
-    m->data.insert(m->data.end(), buf, buf + len);
+    m->data.append(reinterpret_cast<char const*>(buf), len);
     m->ready = false;
 
     if (getNext(true)) {

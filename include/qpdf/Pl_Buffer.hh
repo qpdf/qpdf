@@ -33,7 +33,7 @@
 #include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
 
 #include <memory>
-#include <vector>
+#include <string>
 
 class QPDF_DLL_CLASS Pl_Buffer: public Pipeline
 {
@@ -78,7 +78,7 @@ class QPDF_DLL_CLASS Pl_Buffer: public Pipeline
         Members(Members const&) = delete;
 
         bool ready{true};
-        std::vector<unsigned char> data;
+        std::string data;
     };
 
     std::shared_ptr<Members> m;
