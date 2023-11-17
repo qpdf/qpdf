@@ -216,29 +216,28 @@ QPDF_Stream::getStreamJSON(
     auto dict = this->stream_dict;
     JSON result = JSON::makeDictionary();
     if (json_data != qpdf_sj_none) {
-        std::shared_ptr<Buffer> buf;
+        Pl_Discard discard;
+        Pl_Buffer buf_pl{"stream data"};
+        // buf_pl contains valid data and is ready for retrieval of the data.
+        bool buf_pl_ready = false;
         bool filtered = false;
         bool filter = (decode_level != qpdf_dl_none);
         for (int attempt = 1; attempt <= 2; ++attempt) {
-            Pl_Discard discard;
-            std::shared_ptr<Pl_Buffer> buf_pl;
-            Pipeline* data_pipeline = nullptr;
+            Pipeline* data_pipeline = &discard;
             if (json_data == qpdf_sj_file) {
                 // We need to capture the data to write
-                buf_pl = std::make_shared<Pl_Buffer>("stream data");
-                data_pipeline = buf_pl.get();
-            } else {
-                data_pipeline = &discard;
+                data_pipeline = &buf_pl;
             }
             bool succeeded =
                 pipeStreamData(data_pipeline, &filtered, 0, decode_level, false, (attempt == 1));
-            if ((!succeeded) || (filter && (!filtered))) {
+            if (!succeeded || (filter && !filtered)) {
                 // Try again
                 filter = false;
                 decode_level = qpdf_dl_none;
+                buf_pl.getString(); // reset buf_pl
             } else {
-                if (buf_pl.get()) {
-                    buf = buf_pl->getBufferSharedPointer();
+                if (json_data == qpdf_sj_file) {
+                    buf_pl_ready = true;
                 }
                 break;
             }
@@ -252,10 +251,10 @@ QPDF_Stream::getStreamJSON(
         }
         if (json_data == qpdf_sj_file) {
             result.addDictionaryMember("datafile", JSON::makeString(data_filename));
-            if (!buf.get()) {
+            if (!buf_pl_ready) {
                 throw std::logic_error("QPDF_Stream: failed to get stream data in json file mode");
             }
-            p->write(buf->getBuffer(), buf->getSize());
+            p->writeString(buf_pl.getString());
         } else if (json_data == qpdf_sj_inline) {
             result.addDictionaryMember(
                 "data", JSON::makeBlob(StreamBlobProvider(this, decode_level)));
