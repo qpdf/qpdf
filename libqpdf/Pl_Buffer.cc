@@ -42,13 +42,7 @@ Pl_Buffer::getBuffer()
     if (!m->ready) {
         throw std::logic_error("Pl_Buffer::getBuffer() called when not ready");
     }
-
-    auto size = m->data.size();
-    auto* b = new Buffer(size);
-    if (size > 0) {
-        unsigned char* p = b->getBuffer();
-        memcpy(p, m->data.data(), size);
-    }
+    auto* b = new Buffer(std::move(m->data));
     m->data.clear();
     return b;
 }

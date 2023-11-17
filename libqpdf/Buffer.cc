@@ -27,6 +27,14 @@ Buffer::Members::Members(size_t size, unsigned char* buf, bool own_memory) :
     }
 }
 
+Buffer::Members::Members(std::string&& content) :
+    str(std::move(content)),
+    own_memory(false),
+    size(str.size()),
+    buf(reinterpret_cast<unsigned char*>(str.data()))
+{
+}
+
 Buffer::Members::~Members()
 {
     if (this->own_memory) {
@@ -44,8 +52,18 @@ Buffer::Buffer(size_t size) :
 {
 }
 
+Buffer::Buffer(std::string&& content) :
+    m(new Members(std::move(content)))
+{
+}
+
 Buffer::Buffer(unsigned char* buf, size_t size) :
     m(new Members(size, buf, false))
+{
+}
+
+Buffer::Buffer(std::string& content) :
+    m(new Members(content.size(), reinterpret_cast<unsigned char*>(content.data()), false))
 {
 }
 

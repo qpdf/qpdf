@@ -24,6 +24,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <string>
 
 class Buffer
 {
@@ -35,11 +36,15 @@ class Buffer
     // object is destroyed.
     QPDF_DLL
     Buffer(size_t size);
+    QPDF_DLL
+    Buffer(std::string&& content);
 
     // Create a Buffer object whose memory is owned by the caller and will not be freed when the
     // Buffer is destroyed.
     QPDF_DLL
     Buffer(unsigned char* buf, size_t size);
+    QPDF_DLL
+    Buffer(std::string& content);
 
     [[deprecated("Move Buffer or use Buffer::copy instead")]] QPDF_DLL Buffer(Buffer const&);
     [[deprecated("Move Buffer or use Buffer::copy instead")]] QPDF_DLL Buffer&
@@ -75,8 +80,10 @@ class Buffer
 
       private:
         Members(size_t size, unsigned char* buf, bool own_memory);
+        Members(std::string&& content);
         Members(Members const&) = delete;
 
+        std::string str;
         bool own_memory;
         size_t size;
         unsigned char* buf;
