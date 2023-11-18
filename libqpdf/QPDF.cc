@@ -2413,7 +2413,7 @@ QPDF::pipeStreamData(
     bool suppress_warnings,
     bool will_retry)
 {
-    std::vector<std::shared_ptr<Pipeline>> to_delete;
+    std::unique_ptr<Pipeline> to_delete;
     if (encp->encrypted) {
         decryptStream(encp, file, qpdf_for_warning, pipeline, og, stream_dict, to_delete);
     }

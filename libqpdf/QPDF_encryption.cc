@@ -1038,6 +1038,9 @@ QPDF::decryptString(std::string& str, QPDFObjGen const& og)
     }
 }
 
+// Prepend a decryption pipeline to 'pipeline'. The decryption pipeline (returned as
+// 'decrypt_pipeline' must be owned by the caller to ensure that it stays alive while the pipeline
+// is in use.
 void
 QPDF::decryptStream(
     std::shared_ptr<EncryptionParameters> encp,
@@ -1046,7 +1049,7 @@ QPDF::decryptStream(
     Pipeline*& pipeline,
     QPDFObjGen const& og,
     QPDFObjectHandle& stream_dict,
-    std::vector<std::shared_ptr<Pipeline>>& heap)
+    std::unique_ptr<Pipeline>& decrypt_pipeline)
 {
     std::string type;
     if (stream_dict.getKey("/Type").isName()) {
@@ -1082,8 +1085,7 @@ QPDF::decryptStream(
                                 crypt_params.getKey("/Name").isName()) {
                                 QTC::TC("qpdf", "QPDF_encrypt crypt array");
                                 method = interpretCF(encp, crypt_params.getKey("/Name"));
-                                method_source = "stream's Crypt "
-                                                "decode parameters (array)";
+                                method_source = "stream's Crypt decode parameters (array)";
                             }
                         }
                     }
@@ -1132,10 +1134,9 @@ QPDF::decryptStream(
         }
     }
     std::string key = getKeyForObject(encp, og, use_aes);
-    std::shared_ptr<Pipeline> new_pipeline;
     if (use_aes) {
         QTC::TC("qpdf", "QPDF_encryption aes decode stream");
-        new_pipeline = std::make_shared<Pl_AES_PDF>(
+        decrypt_pipeline = std::make_unique<Pl_AES_PDF>(
             "AES stream decryption",
             pipeline,
             false,
@@ -1143,14 +1144,13 @@ QPDF::decryptStream(
             key.length());
     } else {
         QTC::TC("qpdf", "QPDF_encryption rc4 decode stream");
-        new_pipeline = std::make_shared<Pl_RC4>(
+        decrypt_pipeline = std::make_unique<Pl_RC4>(
             "RC4 stream decryption",
             pipeline,
             QUtil::unsigned_char_pointer(key),
             toI(key.length()));
     }
-    pipeline = new_pipeline.get();
-    heap.push_back(new_pipeline);
+    pipeline = decrypt_pipeline.get();
 }
 
 void

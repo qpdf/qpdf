@@ -1133,7 +1133,7 @@ class QPDF
         Pipeline*& pipeline,
         QPDFObjGen const& og,
         QPDFObjectHandle& stream_dict,
-        std::vector<std::shared_ptr<Pipeline>>& heap);
+        std::unique_ptr<Pipeline>& heap);
 
     // Methods to support object copying
     void reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top);
