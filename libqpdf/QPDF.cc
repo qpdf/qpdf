@@ -2419,23 +2419,17 @@ QPDF::pipeStreamData(
     }
 
     bool attempted_finish = false;
-    bool success = false;
     try {
         file->seek(offset, SEEK_SET);
-        char buf[10240];
-        while (length > 0) {
-            size_t to_read = (sizeof(buf) < length ? sizeof(buf) : length);
-            size_t len = file->read(buf, to_read);
-            if (len == 0) {
-                throw damagedPDF(
-                    file, "", file->getLastOffset(), "unexpected EOF reading stream data");
-            }
-            length -= len;
-            pipeline->write(buf, len);
+        auto buf = std::make_unique<char[]>(length);
+        if (auto read = file->read(buf.get(), length); read != length) {
+            throw damagedPDF(
+                file, "", offset + toO(read), "unexpected EOF reading stream data");
         }
+        pipeline->write(buf.get(), length);
         attempted_finish = true;
         pipeline->finish();
-        success = true;
+        return true;
     } catch (QPDFExc& e) {
         if (!suppress_warnings) {
             qpdf_for_warning.warn(e);
@@ -2458,8 +2452,7 @@ QPDF::pipeStreamData(
                         file,
                         "",
                         file->getLastOffset(),
-                        "stream will be re-processed without"
-                        " filtering to avoid data loss"));
+                        "stream will be re-processed without filtering to avoid data loss"));
             }
         }
     }
@@ -2470,7 +2463,7 @@ QPDF::pipeStreamData(
             // ignore
         }
     }
-    return success;
+    return false ;
 }
 
 bool
