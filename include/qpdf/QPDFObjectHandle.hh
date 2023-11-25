@@ -1178,13 +1178,13 @@ class QPDFObjectHandle
     //     looks like a name or indirect object from an actual name or indirect object.
     //   * JSON v2:
     //     * Unicode strings and strings encoded with PDF Doc encoding that can be bidirectionally
-    //       mapped two Unicode (which is all strings without undefined characters) are represented
+    //       mapped to Unicode (which is all strings without undefined characters) are represented
     //       as "u:" followed by the UTF-8 encoded string. Example:
     //       "u:potato".
     //     * All other strings are represented as "b:" followed by a hexadecimal encoding of the
     //       string. Example: "b:0102cacb"
     // * Streams
-    //   * JSON v1: Only the stream's dictionary is encoded. There is no way tell a stream from a
+    //   * JSON v1: Only the stream's dictionary is encoded. There is no way to tell a stream from a
     //     dictionary other than context.
     //   * JSON v2: A stream is encoded as {"dict": {...}} with the value being the encoding of the
     //     stream's dictionary. Since "dict" does not otherwise represent anything, this is
