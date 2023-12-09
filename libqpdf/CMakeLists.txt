@@ -590,10 +590,12 @@ if(INSTALL_CMAKE_PACKAGE)
   install(EXPORT libqpdfTargets
     NAMESPACE qpdf::
     FILE libqpdfTargets.cmake
+    COMPONENT ${COMPONENT_DEV}
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/qpdf)
   install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/qpdfConfigVersion.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/qpdfConfig.cmake
+    COMPONENT ${COMPONENT_DEV}
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/qpdf)
 endif()
 

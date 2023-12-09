@@ -1,3 +1,7 @@
+2023-12-09  Jay Berkenbilt  <ejb@ql.org>
+
+	* Install fix: include cmake files with the dev component.
+
 2023-11-20  Jay Berkenbilt  <ejb@ql.org>
 
 	* Build AppImage with an older Linux distribution to support AWS
