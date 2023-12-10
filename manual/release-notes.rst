@@ -38,6 +38,16 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
+11.6.4: December 10, 2023
+  - Bug fixes:
+
+    - When running ``cmake --install --component dev``, install cmake
+      files, which were previously omitted from the ``dev`` component
+
+    - Fix the Linux binary build to use older libraries so it
+      continues to work in AWS Lambda and other older execution
+      environments.
+
 11.6.3: October 15, 2023
   - Bug fixes:
 
@@ -48,7 +58,7 @@ Planned changes for future 12.x (subject to change):
       content streams with default settings.
 
     - The linearization specification precludes linearized files that
-      require offets past the 4 GB mark. A bug in qpdf was preventing
+      require offsets past the 4 GB mark. A bug in qpdf was preventing
       it from working when offsets had to pass the 2 GB mark. This has
       been corrected.
 

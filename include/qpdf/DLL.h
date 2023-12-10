@@ -26,8 +26,8 @@
 /* The first version of qpdf to include the version constants is 10.6.0. */
 #define QPDF_MAJOR_VERSION 11
 #define QPDF_MINOR_VERSION 6
-#define QPDF_PATCH_VERSION 3
-#define QPDF_VERSION "11.6.3"
+#define QPDF_PATCH_VERSION 4
+#define QPDF_VERSION "11.6.4"
 
 /*
  * This file defines symbols that control the which functions,
