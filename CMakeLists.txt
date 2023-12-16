@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.16)
 
 # make_dist expects the version line to be on a line by itself after
 # the project line. When updating the version, check make_dist for all
-# the places it has to be updated.
+# the places it has to be updated. The doc configuration and CI build
+# also find the version number here.
 project(qpdf
   VERSION 11.7.0
   LANGUAGES C CXX)
