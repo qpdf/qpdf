@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.16)
 
 # make_dist expects the version line to be on a line by itself after
 # the project line. When updating the version, check make_dist for all
-# the places it has to be updated.
+# the places it has to be updated. The doc configuration and CI build
+# also find the version number here.
 project(qpdf
   VERSION 11.7.0
   LANGUAGES C CXX)
@@ -105,6 +106,7 @@ option(INSTALL_CMAKE_PACKAGE "Install cmake package files" ON)
 option(INSTALL_EXAMPLES "Install example files" ON)
 
 option(FUTURE "Include ABI-breaking changes CONSIDERED for the next major release" OFF)
+option(CXX_NEXT "Build with next C++ standard version" OFF)
 
 # *** END OPTIONS ***
 
@@ -147,8 +149,14 @@ endif()
 # increment SOVERSION every time we increment the project major
 # version. This works because qpdf uses semantic versioning. qpdf 10.x
 # was libqpdf28, so start from there.
-math(EXPR qpdf_SOVERSION "${PROJECT_VERSION_MAJOR} + 18")
-set(qpdf_LIBVERSION ${qpdf_SOVERSION}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
+
+if(FUTURE)
+  math(EXPR qpdf_SOVERSION 0)
+  set(qpdf_LIBVERSION 0)
+else()
+  math(EXPR qpdf_SOVERSION "${PROJECT_VERSION_MAJOR} + 18")
+  set(qpdf_LIBVERSION ${qpdf_SOVERSION}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
+endif()
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR "
@@ -159,7 +167,11 @@ Please build with cmake in a subdirectory, e.g.
 Please remove CMakeCache.txt and the CMakeFiles directories.")
 endif()
 
-set(CMAKE_CXX_STANDARD 17)
+if(CXX_NEXT)
+  set(CMAKE_CXX_STANDARD 20)
+else()
+  set(CMAKE_CXX_STANDARD 17)
+endif()
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_VISIBILITY_PRESET hidden)
