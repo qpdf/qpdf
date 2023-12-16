@@ -1,10 +1,20 @@
 #!/bin/bash
 set -ex
+cmake_extra=
+future=0
+if [ "$1" = "future" ]; then
+    future=1
+    cmake_extra=-DFUTURE=ON
+fi
 sudo apt-get update
 sudo apt-get -y install \
    build-essential cmake zlib1g-dev libjpeg-dev libgnutls28-dev
-cmake -S . -B build -DBUILD_STATIC_LIBS=0 -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake -S . -B build -DBUILD_STATIC_LIBS=0 -DCMAKE_BUILD_TYPE=RelWithDebInfo $cmake_extra
 cmake --build build --verbose -j$(nproc) --target libqpdf -- -k
+if [ "$future" = "1" ]; then
+    # Run qpdf's test suite in FUTURE mode as well
+    ctest --verbose
+fi
 export QPDF_SOURCE_TREE=$PWD
 export QPDF_BUILD_LIBDIR=$QPDF_SOURCE_TREE/build/libqpdf
 export LD_LIBRARY_PATH=$QPDF_BUILD_LIBDIR
