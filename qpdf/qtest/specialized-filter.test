@@ -16,7 +16,7 @@ cleanup();
 
 my $td = new TestDriver('specialized-filter');
 
-my $n_tests = 3;
+my $n_tests = 5;
 my $n_compare_pdfs = 1;
 
 # The PDF file was submitted on bug #83 on github. All the PNG filters
@@ -39,6 +39,18 @@ $td->runtest("stream with tiff predictor",
              {$td->FILE => "tiff-predictor.out",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
-
+# TC:SF_FlateLzwDecode PNG filter
+# PDF:Table 8:Columns
+# The test file is invalid as it does not actually use one column (as is implied by the missing
+# key). However png-filters-1-column.pdf is the same file with /Columns explicitely set to 1,
+# and displays the same as png-filters-no-columns.pdf and png-filters-no-columns-decoded.pdf.
+$td->runtest("decode flate no /Columns",
+             {$td->COMMAND => "qpdf --static-id --compress-streams=n --decode-level=all" .
+                  " png-filters-no-columns.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "png-filters-no-columns-decoded.pdf"});
 cleanup();
 $td->report(calc_ntests($n_tests, $n_compare_pdfs));

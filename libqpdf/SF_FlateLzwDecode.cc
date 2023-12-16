@@ -11,7 +11,7 @@ SF_FlateLzwDecode::SF_FlateLzwDecode(bool lzw) :
     lzw(lzw),
     // Initialize values to their defaults as per the PDF spec
     predictor(1),
-    columns(0),
+    columns(1),
     colors(1),
     bits_per_component(8),
     early_code_change(true)
