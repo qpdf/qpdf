@@ -1708,8 +1708,7 @@ QPDFObjectHandle::pipeContentStreams(
         need_newline = (lc.getLastChar() != static_cast<unsigned char>('\n'));
         QTC::TC("qpdf", "QPDFObjectHandle need_newline", need_newline ? 0 : 1);
     }
-    std::unique_ptr<Buffer> b(buf.getBuffer());
-    p->write(b->getBuffer(), b->getSize());
+    p->writeString(buf.getString());
     p->finish();
 }
 

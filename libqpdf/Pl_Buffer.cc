@@ -19,7 +19,7 @@ Pl_Buffer::~Pl_Buffer() // NOLINT (modernize-use-equals-default)
 void
 Pl_Buffer::write(unsigned char const* buf, size_t len)
 {
-    m->data.insert(m->data.end(), buf, buf + len);
+    m->data.append(reinterpret_cast<char const*>(buf), len);
     m->ready = false;
 
     if (getNext(true)) {
@@ -42,15 +42,20 @@ Pl_Buffer::getBuffer()
     if (!m->ready) {
         throw std::logic_error("Pl_Buffer::getBuffer() called when not ready");
     }
-
-    auto size = m->data.size();
-    auto* b = new Buffer(size);
-    if (size > 0) {
-        unsigned char* p = b->getBuffer();
-        memcpy(p, m->data.data(), size);
-    }
+    auto* b = new Buffer(std::move(m->data));
     m->data.clear();
     return b;
+}
+
+std::string
+Pl_Buffer::getString()
+{
+    if (!m->ready) {
+        throw std::logic_error("Pl_Buffer::getString() called when not ready");
+    }
+    auto s = std::move(m->data);
+    m->data.clear();
+    return s;
 }
 
 std::shared_ptr<Buffer>

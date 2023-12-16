@@ -33,7 +33,7 @@
 #include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
 
 #include <memory>
-#include <vector>
+#include <string>
 
 class QPDF_DLL_CLASS Pl_Buffer: public Pipeline
 {
@@ -64,6 +64,10 @@ class QPDF_DLL_CLASS Pl_Buffer: public Pipeline
     QPDF_DLL
     void getMallocBuffer(unsigned char** buf, size_t* len);
 
+    // Same as getBuffer but returns the result as a string.
+    QPDF_DLL
+    std::string getString();
+
   private:
     class QPDF_DLL_PRIVATE Members
     {
@@ -78,7 +82,7 @@ class QPDF_DLL_CLASS Pl_Buffer: public Pipeline
         Members(Members const&) = delete;
 
         bool ready{true};
-        std::vector<unsigned char> data;
+        std::string data;
     };
 
     std::shared_ptr<Members> m;

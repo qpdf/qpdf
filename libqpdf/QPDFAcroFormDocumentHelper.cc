@@ -584,8 +584,7 @@ QPDFAcroFormDocumentHelper::adjustDefaultAppearances(
     ResourceReplacer rr(dr_map, rf.getNamesByResourceType());
     Pl_Buffer buf_pl("filtered DA");
     da_stream.filterAsContents(&rr, &buf_pl);
-    auto buf = buf_pl.getBufferSharedPointer();
-    std::string new_da(reinterpret_cast<char*>(buf->getBuffer()), buf->getSize());
+    std::string new_da = buf_pl.getString();
     obj.replaceKey("/DA", QPDFObjectHandle::newString(new_da));
 }
 
