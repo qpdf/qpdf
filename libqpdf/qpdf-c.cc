@@ -1949,3 +1949,15 @@ qpdf_write_json(
         });
     return status;
 }
+
+std::shared_ptr<QPDF>
+qpdf_c_get_qpdf(qpdf_data qpdf)
+{
+    return qpdf->qpdf;
+}
+
+QPDF_ERROR_CODE
+qpdf_c_wrap(qpdf_data qpdf, std::function<void()> fn)
+{
+    return trap_errors(qpdf, [&fn](qpdf_data) { fn(); });
+}

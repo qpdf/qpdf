@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("extend-c-api") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('extend-c-api');
+
+$td->runtest("extend C API (good)",
+             {$td->COMMAND => "extend-c-api good.pdf"},
+             {$td->FILE => "good.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("extend C API (bad)",
+             {$td->COMMAND => "extend-c-api bad.pdf"},
+             {$td->FILE => "bad.out", $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+
+$td->report(2);
+
+sub cleanup
+{
+    unlink "a.pdf";
+}

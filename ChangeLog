@@ -1,3 +1,10 @@
+2023-12-16  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new C++ functions "qpdf_c_get_qpdf" and "qpdf_c_wrap" to
+	qpdf-c.h that make it possible to write your own extern "C"
+	functions in C++ that interoperate with the C API. See
+	examples/extend-c-api for more information.
+
 2023-12-10  Jay Berkenbilt  <ejb@ql.org>
 
 	* 11.6.4: release

@@ -38,6 +38,13 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
+11.7.0: not yet released
+  - Library Enhancements:
+
+    - Add C++ functions ``qpdf_c_wrap`` and ``qpdf_c_get_qpdf`` to the
+      C API to enable custom C++ code to interoperate more easily with
+      the the C API. See ``examples/extend-c-api``.
+
 11.6.4: December 10, 2023
   - Bug fixes:
 

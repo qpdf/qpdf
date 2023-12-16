@@ -1,0 +1,5 @@
+WARNING: bad.pdf: can't find PDF header
+WARNING: bad.pdf: file is damaged
+WARNING: bad.pdf: can't find startxref
+WARNING: bad.pdf: Attempting to reconstruct cross-reference table
+error: bad.pdf: unable to find trailer dictionary while recovering damaged file

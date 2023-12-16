@@ -34,6 +34,11 @@ foreach(PROG ${EXAMPLE_C_PROGRAMS})
 endforeach()
 target_include_directories(pdf-create PRIVATE ${JPEG_INCLUDE})
 
+# extend-c-api contains a mixture of C and C++ files.
+add_executable(extend-c-api extend-c-api-impl.cc extend-c-api.c)
+set_property(TARGET extend-c-api PROPERTY LINKER_LANGUAGE CXX)
+target_link_libraries(extend-c-api libqpdf)
+
 add_test(
   NAME examples
   COMMAND ${RUN_QTEST}
@@ -47,7 +52,7 @@ add_test(
   --tc "${qpdf_SOURCE_DIR}/examples/*.cc"
   --tc "${qpdf_SOURCE_DIR}/examples/*.c")
 
-file(GLOB EXAMPLES_SRC "*.c" "*.cc")
+file(GLOB EXAMPLES_SRC "*.c" "*.cc" "*.h")
 if(INSTALL_EXAMPLES)
   install(FILES ${EXAMPLES_SRC}
     DESTINATION ${CMAKE_INSTALL_DOCDIR}/examples
