@@ -106,6 +106,7 @@ option(INSTALL_CMAKE_PACKAGE "Install cmake package files" ON)
 option(INSTALL_EXAMPLES "Install example files" ON)
 
 option(FUTURE "Include ABI-breaking changes CONSIDERED for the next major release" OFF)
+option(CXX_NEXT "Build with next C++ standard version" OFF)
 
 # *** END OPTIONS ***
 
@@ -166,7 +167,11 @@ Please build with cmake in a subdirectory, e.g.
 Please remove CMakeCache.txt and the CMakeFiles directories.")
 endif()
 
-set(CMAKE_CXX_STANDARD 17)
+if(CXX_NEXT)
+  set(CMAKE_CXX_STANDARD 20)
+else()
+  set(CMAKE_CXX_STANDARD 17)
+endif()
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_VISIBILITY_PRESET hidden)

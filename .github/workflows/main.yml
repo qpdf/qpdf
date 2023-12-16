@@ -147,3 +147,11 @@ jobs:
       - uses: actions/checkout@v3
       - name: 'Unsigned Char Tests'
         run: build-scripts/test-unsigned-char
+  CxxNext:
+    runs-on: ubuntu-latest
+    # Build after Fuzzers to save concurrent runners
+    needs: Fuzzers
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Build with Next C++ standard'
+        run: build-scripts/test-c++-next
