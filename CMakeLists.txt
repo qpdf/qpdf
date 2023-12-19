@@ -341,6 +341,7 @@ add_test(
 # add_subdirectory order affects test order
 add_subdirectory(include)
 add_subdirectory(libqpdf)
+add_subdirectory(compare-for-test)
 add_subdirectory(qpdf)
 add_subdirectory(libtests)
 add_subdirectory(examples)

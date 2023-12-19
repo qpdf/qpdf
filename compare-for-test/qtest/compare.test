@@ -1,0 +1,93 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("compare") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('compare');
+
+# The comparison tool is designed so that you can write tests that run
+# `compare actual expected` and compare the result to expected. This
+# allows you to just replace the actual file in a comparison with the
+# comparison command. If the files match, the output is the expected
+# file, which means that if the actual file is the expected file with
+# different zlib compression, the test will pass. If the files differ,
+# the actual output shown will be the real actual output. If it is
+# determined to be correct and used to replace the expected output,
+# the test will pass next time regardless of whether the same zlib
+# implementation is used.
+
+# These files are the same file compressed with a different
+# compression level and/or a different zlib implementation.
+my @same = qw(zlib.pdf zlib-9.pdf zlib-ng.pdf);
+my $comparisons = (scalar(@same) * (scalar(@same) + 1))/2;
+my $n_tests = 2 * $comparisons;
+
+for (my $i = 0; $i < scalar(@same); $i++)
+{
+    for (my $j = $i; $j < scalar(@same); $j++)
+    {
+        # Make sure the files are byte-wise different (unless they are the same file).
+        $td->runtest("byte-wise compare $i and $j",
+                     {$td->COMMAND => "cmp $same[$i] $same[$j]"},
+                     {$td->REGEXP => ".*", $td->EXIT_STATUS => $i == $j ? 0 : "!0"});
+        # Make sure they match. This is how compare should be used:
+        # the expected output is the same file as the second argument
+        # to the command.
+        $td->runtest("compare $i and $j",
+                     {$td->COMMAND => "qpdf-test-compare $same[$i] $same[$j]"},
+                     {$td->FILE => $same[$j], $td->EXIT_STATUS => 0});
+    }
+}
+
+my @diff = (
+    ["diff-num-objects.pdf", "trailer: object contents differ"],
+    ["diff-non-stream.pdf", "3,0: object contents differ"],
+    ["diff-data-size.pdf", "4,0: stream data size differs"],
+    ["diff-data.pdf", "4,0: stream data differs"],
+    ["diff-data-size-unc.pdf", "5,0: stream data size differs"],
+    ["diff-data-unc.pdf", "5,0: stream data differs"],
+    ["diff-stream-dict.pdf", "4,0: stream dictionaries differ"],
+    ["diff-object-type.pdf", "6,0: different types"],
+    );
+$n_tests += 2 * scalar(@diff);
+
+foreach my $f (@diff)
+{
+    # In a real test, the expected output would be the expected file
+    # as above. Here, we are actually testing the comparison tool to
+    # verify that it returns a non-zero status and the actual file
+    # when there is mismatch. Don't copy this test.
+    $td->runtest("$f->[0] is different",
+                 {$td->COMMAND => "qpdf-test-compare $f->[0] zlib.pdf"},
+                 {$td->FILE => $f->[0], $td->EXIT_STATUS => 2});
+    $td->runtest("$f->[0] is different (why)",
+                 {$td->COMMAND => "env QPDF_COMPARE_WHY=1" .
+                      " qpdf-test-compare $f->[0] zlib.pdf"},
+                 {$td->STRING => "$f->[1]\n", $td->EXIT_STATUS => 2},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+# Repeat for encrypted files.
+$n_tests += 3;
+$td->runtest("byte-wise compare encrypted files",
+             {$td->COMMAND => "cmp enc1.pdf enc2.pdf"},
+             {$td->REGEXP => ".*", $td->EXIT_STATUS => "!0"});
+$td->runtest("compare encrypted files (same)",
+             {$td->COMMAND => "env QPDF_COMPARE_WHY=1 qpdf-test-compare enc1.pdf enc2.pdf"},
+             {$td->FILE => "enc2.pdf", $td->EXIT_STATUS => 0});
+$td->runtest("compare encrypted files (different)",
+             {$td->COMMAND => "env QPDF_COMPARE_WHY=1 qpdf-test-compare enc1.pdf diff-data-enc.pdf"},
+             {$td->STRING => "4,0: stream data differs\n", $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+# Object streams
+$n_tests += 1;
+$td->runtest("compare object stream files (same)",
+             {$td->COMMAND => "env QPDF_COMPARE_WHY=1 qpdf-test-compare ostream1.pdf ostream2.pdf"},
+             {$td->FILE => "ostream2.pdf", $td->EXIT_STATUS => 0});
+
+$td->report($n_tests);
