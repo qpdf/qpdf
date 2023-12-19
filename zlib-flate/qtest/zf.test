@@ -7,21 +7,39 @@ require TestDriver;
 
 my $td = new TestDriver('zlib-flate');
 
+cleanup();
+
+open(F, "<1.uncompressed") or die;
+undef $/;
+my $unc = <F>;
+close(F);
+
+open(F, ">a.uncompressed") or die;
+for (my $i = 0; $i < 100; $i++)
+{
+    print F $unc;
+}
+close(F);
+
 foreach my $level ('', '=1', '=9')
 {
     my $f = $level;
     $f =~ s/=/-/;
     $td->runtest("compress",
                  {$td->COMMAND =>
-                      "zlib-flate -compress$level < 1.uncompressed"},
-                 {$td->FILE => "1.compressed$f",
-                      $td->EXIT_STATUS => 0});
+                      "zlib-flate -compress$level < a.uncompressed > a.$level"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
 
     $td->runtest("uncompress",
-                 {$td->COMMAND => "zlib-flate -uncompress < 1.compressed"},
-                 {$td->FILE => "1.uncompressed",
-                      $td->EXIT_STATUS => 0});
+                 {$td->COMMAND => "zlib-flate -uncompress < a.$level"},
+                 {$td->FILE => "a.uncompressed", $td->EXIT_STATUS => 0});
 }
+
+my $size1 = (stat("a.=1"))[7];
+my $size9 = (stat("a.=9"))[7];
+$td->runtest("higher compression is smaller",
+             {$td->STRING => ($size9 < $size1 ? "YES\n" : "$size9 $size1\n")},
+             {$td->STRING => "YES\n"});
 
 $td->runtest("error",
              {$td->COMMAND => "zlib-flate -uncompress < 1.uncompressed"},
@@ -36,4 +54,11 @@ $td->runtest("corrupted input",
                   $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 
-$td->report(8);
+$td->report(9);
+
+cleanup();
+
+sub cleanup
+{
+    system("rm -f a.*");
+}
