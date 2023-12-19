@@ -7,6 +7,7 @@
 * [CHECKING DOCS ON readthedocs](#checking-docs-on-readthedocs)
 * [GOOGLE OSS-FUZZ](#google-oss-fuzz)
 * [CODING RULES](#coding-rules)
+* [ZLIB COMPATIBILITY](#zlib-compatibility)
 * [HOW TO ADD A COMMAND-LINE ARGUMENT](#how-to-add-a-command-line-argument)
 * [RELEASE PREPARATION](#release-preparation)
 * [CREATING A RELEASE](#creating-a-release)
@@ -271,6 +272,10 @@ Building docs from pull requests is also enabled.
 
 * Avoid attaching too much metadata to objects and object handles
   since those have to get copied around a lot.
+
+## ZLIB COMPATIBILITY
+
+XXX Write this
 
 ## HOW TO ADD A COMMAND-LINE ARGUMENT
 

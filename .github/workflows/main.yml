@@ -133,6 +133,7 @@ jobs:
         script:
           - build-fuzzer
           - build-linux32
+          - test-alt-zlib
           - test-unsigned-char
           - test-c++-next
     steps:

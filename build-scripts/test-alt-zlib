@@ -1,0 +1,39 @@
+#!/bin/bash
+set -eo pipefail
+sudo apt-get update
+sudo apt-get -y install \
+   build-essential cmake \
+   zlib1g-dev libjpeg-dev libgnutls28-dev libssl-dev
+
+# Build and install zlib-ng
+rm -rf /tmp/zlib-ng
+pushd /tmp
+git clone https://github.com/zlib-ng/zlib-ng
+cd zlib-ng
+cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/tmp/inst -DZLIB_COMPAT=ON
+cmake --build build -j$(nproc)
+(cd build; ctest --verbose)
+cmake --install build
+popd
+
+cmake -S . -B build \
+    -DCI_MODE=1 -DBUILD_STATIC_LIBS=0 -DCMAKE_BUILD_TYPE=Release \
+    -DREQUIRE_CRYPTO_OPENSSL=1 -DREQUIRE_CRYPTO_GNUTLS=1 \
+    -DENABLE_QTC=1
+cmake --build build --verbose -j$(nproc) -- -k
+
+# Make sure we can use zlib-ng
+sum1="$(./build/zlib-flate/zlib-flate -compress < README-maintainer.md | sha256sum -)"
+export LD_PRELOAD=/tmp/inst/lib/libz.so.1
+sum2="$(./build/zlib-flate/zlib-flate -compress < README-maintainer.md | sha256sum -)"
+if [ "$sum1" = "$sum2" ]; then
+    # If this happens, see if zlib-ng has become the default. If
+    # that's the case, rework this test to use some other alternaive
+    # zlib, such as the old one or any other API-compatible
+    # implementation.
+    echo "Using zlib-ng didn't change compression output"
+    exit 2
+fi
+
+# If this fails, please see ZLIB COMPATIBILITY in README-maintainer.md.
+(cd build; ctest --verbose)
