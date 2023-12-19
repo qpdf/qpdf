@@ -60,6 +60,7 @@ main()
     do_run(
         "{\"inputFile\": \"normal.pdf\","
         " \"staticId\": \"\","
+        " \"streamData\": \"uncompress\","
         " \"outputFile\": \"-\"}",
         qpdf_exit_success);
 
@@ -75,9 +76,7 @@ main()
 
     do_run("{\"inputFile\": \"2pages.pdf\", \"showNpages\": \"\"}", qpdf_exit_success);
     do_run("{\"inputFile\": \"warning.pdf\", \"showNpages\": \"\"}", qpdf_exit_warning);
-    do_run(
-
-        "{\"inputFile\": \"missing.pdf\", \"showNpages\": \"\"}", qpdf_exit_error);
+    do_run("{\"inputFile\": \"missing.pdf\", \"showNpages\": \"\"}", qpdf_exit_error);
     do_run(
         "{\"inputFile\": \"attach.pdf\","
         " \"showAttachment\": \"a\"}",
