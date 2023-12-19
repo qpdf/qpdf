@@ -76,8 +76,8 @@ foreach my $i (@good_json)
     else
     {
         $td->runtest("check good json $i output",
-                     {$td->FILE => "a.pdf"},
-                     {$td->FILE => "job-json-$i.pdf"});
+                     {$td->COMMAND => "qpdf-test-compare a.pdf job-json-$i.pdf"},
+                     {$td->FILE => "job-json-$i.pdf", $td->EXIT_STATUS => 0});
     }
 }
 
@@ -107,8 +107,8 @@ $td->runtest("C job API",
 foreach my $i (['a.pdf', 1], ['b.pdf', 2], ['c.pdf', 3], ['d.pdf', 4])
 {
     $td->runtest("check output",
-                 {$td->FILE => $i->[0]},
-                 {$td->FILE => "qpdfjob-ctest$i->[1].pdf"});
+                 {$td->COMMAND => "qpdf-test-compare $i->[0] qpdfjob-ctest$i->[1].pdf"},
+                 {$td->FILE => "qpdfjob-ctest$i->[1].pdf", $td->EXIT_STATUS => 0});
 }
 my $wide_out = `qpdfjob-ctest wide`;
 $td->runtest("qpdfjob-ctest wide",
@@ -124,8 +124,8 @@ if ($wide_out =~ m/skipped/)
 else
 {
     $td->runtest("check output",
-                 {$td->FILE => "a.pdf"},
-                 {$td->FILE => "qpdfjob-ctest-wide.pdf"});
+                 {$td->COMMAND => "qpdf-test-compare a.pdf qpdfjob-ctest-wide.pdf"},
+                 {$td->FILE => "qpdfjob-ctest-wide.pdf", $td->EXIT_STATUS => 0});
 }
 
 cleanup();

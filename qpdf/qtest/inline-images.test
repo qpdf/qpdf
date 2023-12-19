@@ -68,8 +68,8 @@ $td->runtest("named colorspace",
              {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "inline-image-colorspace-lookup-out.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf inline-image-colorspace-lookup-out.pdf"},
+             {$td->FILE => "inline-image-colorspace-lookup-out.pdf", $td->EXIT_STATUS => 0});
 
 
 my @eii_tests = (

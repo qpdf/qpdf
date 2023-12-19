@@ -36,8 +36,8 @@ foreach my $d (
                  {$td->STRING => "", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("check output ($description)",
-                 {$td->FILE => "a.pdf"},
-                 {$td->FILE => "newline-before-endstream-$suffix.pdf"});
+                 {$td->COMMAND => "qpdf-test-compare a.pdf newline-before-endstream-$suffix.pdf"},
+                 {$td->FILE => "newline-before-endstream-$suffix.pdf", $td->EXIT_STATUS => 0});
     if ($flags =~ /qdf/)
     {
         $td->runtest("fix-qdf",
@@ -52,8 +52,8 @@ $td->runtest("newline before endstream (C)",
              {$td->STRING => "C test 22 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "newline-before-endstream-nl.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf newline-before-endstream-nl.pdf"},
+             {$td->FILE => "newline-before-endstream-nl.pdf", $td->EXIT_STATUS => 0});
 
 cleanup();
 $td->report($n_tests);

@@ -110,8 +110,8 @@ $td->runtest("keeping some fields",
              {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "kept-some-fields.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf kept-some-fields.pdf"},
+             {$td->FILE => "kept-some-fields.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("not keeping any fields",
              {$td->COMMAND =>
                   "qpdf --static-id kept-some-fields.pdf" .

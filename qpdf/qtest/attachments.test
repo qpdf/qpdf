@@ -207,8 +207,8 @@ $td->runtest("remove multiple attachments",
                   $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "remove-multiple-attachments.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf remove-multiple-attachments.pdf"},
+             {$td->FILE => "remove-multiple-attachments.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("remove multiple attachments (json)",
              {$td->COMMAND =>
                   "qpdf --job-json-file=remove-multiple-attachments.json"},
@@ -216,8 +216,8 @@ $td->runtest("remove multiple attachments (json)",
                   $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "b.pdf"},
-             {$td->FILE => "remove-multiple-attachments.pdf"});
+             {$td->COMMAND => "qpdf-test-compare b.pdf remove-multiple-attachments.pdf"},
+             {$td->FILE => "remove-multiple-attachments.pdf", $td->EXIT_STATUS => 0});
 
 cleanup();
 $td->report($n_tests);

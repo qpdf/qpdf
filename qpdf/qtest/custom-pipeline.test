@@ -21,8 +21,8 @@ $td->runtest("output to custom pipeline",
              {$td->STRING => "test 33 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "custom-pipeline.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf custom-pipeline.pdf"},
+             {$td->FILE => "custom-pipeline.pdf", $td->EXIT_STATUS => 0});
 
 cleanup();
 $td->report($n_tests);

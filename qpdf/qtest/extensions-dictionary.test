@@ -46,16 +46,16 @@ foreach my $input (@ext_inputs)
                 # Look at the actual file for a few cases to make sure
                 # qdf and non-qdf output are okay
                 $td->runtest("check file",
-                             {$td->FILE => "a.pdf"},
-                             {$td->FILE => "$base-$op-$version.pdf"});
+                             {$td->COMMAND => "qpdf-test-compare a.pdf $base-$op-$version.pdf"},
+                             {$td->FILE => "$base-$op-$version.pdf", $td->EXIT_STATUS => 0});
                 $td->runtest("$input: $op version to $version",
                              {$td->COMMAND =>
                                   "qpdf --qdf --static-id" .
                                   " --$op-version=$version $input a.qdf"},
                              {$td->STRING => "", $td->EXIT_STATUS => 0});
                 $td->runtest("check file",
-                             {$td->FILE => "a.qdf"},
-                             {$td->FILE => "$base-$op-$version.qdf"});
+                             {$td->COMMAND => "qpdf-test-compare a.qdf $base-$op-$version.qdf"},
+                             {$td->FILE => "$base-$op-$version.qdf", $td->EXIT_STATUS => 0});
             }
         }
     }

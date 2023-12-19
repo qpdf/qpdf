@@ -29,24 +29,24 @@ $td->runtest("page rotation",
                   " --rotate=-90:3,15,17,18"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "rotated.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf rotated.pdf"},
+             {$td->FILE => "rotated.pdf", $td->EXIT_STATUS => 0});
 
 $td->runtest("remove rotation",
              {$td->COMMAND => "qpdf --static-id rotated.pdf a.pdf" .
                   " --qdf --no-original-object-ids --rotate=0"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "unrotated.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf unrotated.pdf"},
+             {$td->FILE => "unrotated.pdf", $td->EXIT_STATUS => 0});
 
 $td->runtest("rotate all pages",
              {$td->COMMAND =>
                   "qpdf --static-id --rotate=180 minimal.pdf a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "minimal-rotated.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf minimal-rotated.pdf"},
+             {$td->FILE => "minimal-rotated.pdf", $td->EXIT_STATUS => 0});
 
 $td->runtest("flatten with inherited rotate",
              {$td->COMMAND =>
@@ -54,8 +54,8 @@ $td->runtest("flatten with inherited rotate",
                   " inherited-rotate.pdf a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "inherited-flattened.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf inherited-flattened.pdf"},
+             {$td->FILE => "inherited-flattened.pdf", $td->EXIT_STATUS => 0});
 
 foreach my $angle (qw(90 180 270))
 {

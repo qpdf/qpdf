@@ -24,8 +24,8 @@ $td->runtest("custom filter, decode generalized",
                   $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "generalized.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf generalized.pdf"},
+             {$td->FILE => "generalized.pdf", $td->EXIT_STATUS => 0});
 
 $td->runtest("custom filter, decode specialized",
              {$td->COMMAND =>
@@ -34,8 +34,8 @@ $td->runtest("custom filter, decode specialized",
                   $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "specialized.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf specialized.pdf"},
+             {$td->FILE => "specialized.pdf", $td->EXIT_STATUS => 0});
 
 cleanup();
 

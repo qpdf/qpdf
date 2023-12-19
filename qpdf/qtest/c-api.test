@@ -36,8 +36,8 @@ foreach my $d (@capi)
                  {$td->STRING => "C test $n done\n", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("check $description",
-                 {$td->FILE => "a.pdf"},
-                 {$td->FILE => $outfile});
+                 {$td->COMMAND => "qpdf-test-compare a.pdf $outfile"},
+                 {$td->FILE => $outfile, $td->EXIT_STATUS => 0});
 }
 $td->runtest("write to bad file name",
              {$td->COMMAND => "qpdf-ctest 2 hybrid-xref.pdf '' /:a:/:b:"},

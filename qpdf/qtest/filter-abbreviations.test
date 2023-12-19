@@ -23,8 +23,8 @@ $td->runtest("stream filter abbreviations",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "filter-abbreviation.out"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf filter-abbreviation.out"},
+             {$td->FILE => "filter-abbreviation.out", $td->EXIT_STATUS => 0});
 
 cleanup();
 $td->report($n_tests);

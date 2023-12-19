@@ -17,8 +17,8 @@ foreach my $i (qw(1 2))
                  {$td->COMMAND => "pdf-c-objects $i.pdf '' a.pdf"},
                  {$td->STRING => "", $td->EXIT_STATUS => 0});
     $td->runtest("check output",
-                 {$td->FILE => "a.pdf"},
-                 {$td->FILE => "$i-out.pdf"});
+                 {$td->COMMAND => "qpdf-test-compare a.pdf $i-out.pdf"},
+                 {$td->FILE => "$i-out.pdf", $td->EXIT_STATUS => 0});
 }
 
 cleanup();

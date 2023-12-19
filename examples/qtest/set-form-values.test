@@ -15,8 +15,8 @@ $td->runtest("set form values",
              {$td->COMMAND => "pdf-set-form-values form-in.pdf a.pdf soup"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("compare files",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "form-out.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf form-out.pdf"},
+             {$td->FILE => "form-out.pdf", $td->EXIT_STATUS => 0});
 
 cleanup();
 

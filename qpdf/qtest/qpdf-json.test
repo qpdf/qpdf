@@ -294,31 +294,31 @@ $td->runtest("C API create from json file",
              {$td->STRING => "C test 42 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check C API create from file",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "qpdf-ctest-42-43.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf qpdf-ctest-42-43.pdf"},
+             {$td->FILE => "qpdf-ctest-42-43.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("C API create from json buffer",
              {$td->COMMAND => "qpdf-ctest 43 minimal.json '' a.pdf"},
              {$td->STRING => "C test 43 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check C API create from buffer",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "qpdf-ctest-42-43.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf qpdf-ctest-42-43.pdf"},
+             {$td->FILE => "qpdf-ctest-42-43.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("C API update from json file",
              {$td->COMMAND =>
                   "qpdf-ctest 44 minimal.pdf '' a.pdf minimal-update.json"},
              {$td->STRING => "C test 44 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check C API update from file",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "qpdf-ctest-44-45.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf qpdf-ctest-44-45.pdf"},
+             {$td->FILE => "qpdf-ctest-44-45.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("C API update from json buffer",
              {$td->COMMAND =>
                   "qpdf-ctest 45 minimal.pdf '' a.pdf minimal-update.json"},
              {$td->STRING => "C test 45 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check C API update from buffer",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "qpdf-ctest-44-45.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf qpdf-ctest-44-45.pdf"},
+             {$td->FILE => "qpdf-ctest-44-45.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("C API write to JSON 1",
              {$td->COMMAND =>
                   "qpdf-ctest 46 minimal.pdf '' a.json"},

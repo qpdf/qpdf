@@ -33,15 +33,15 @@ $td->runtest("compress objstm and xref",
              {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "compress-objstm-xref.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf compress-objstm-xref.pdf"},
+             {$td->FILE => "compress-objstm-xref.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("qdf + preserved-unreferenced + xref streams",
              {$td->COMMAND => "qpdf --qdf --preserve-unreferenced" .
                   " --static-id compress-objstm-xref.pdf a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "compress-objstm-xref-qdf.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf compress-objstm-xref-qdf.pdf"},
+             {$td->FILE => "compress-objstm-xref-qdf.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("check fix-qdf idempotency",
              {$td->COMMAND => "fix-qdf a.pdf"},
              {$td->FILE => "a.pdf", $td->EXIT_STATUS => 0});

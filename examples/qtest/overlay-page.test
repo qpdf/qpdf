@@ -15,15 +15,15 @@ $td->runtest("overlay-page",
              {$td->COMMAND => "pdf-overlay-page in.pdf stamp.pdf a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("compare files",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "out.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf out.pdf"},
+             {$td->FILE => "out.pdf", $td->EXIT_STATUS => 0});
 
 $td->runtest("overlay-page with fields/ annotations",
              {$td->COMMAND => "pdf-overlay-page in.pdf annotations.pdf a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("compare files",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "annotations-out.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf annotations-out.pdf"},
+             {$td->FILE => "annotations-out.pdf", $td->EXIT_STATUS => 0});
 
 cleanup();
 

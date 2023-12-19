@@ -46,8 +46,8 @@ sub check_pdf
                  {$td->STRING => "",
                   $td->EXIT_STATUS => $status});
     $td->runtest("check output",
-                 {$td->FILE => "a.pdf"},
-                 {$td->FILE => $output});
+                 {$td->COMMAND => "qpdf-test-compare a.pdf $output"},
+                 {$td->FILE => $output, $td->EXIT_STATUS => 0});
 }
 
 sub flush_tiff_cache

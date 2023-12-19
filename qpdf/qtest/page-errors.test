@@ -32,8 +32,8 @@ $td->runtest("handle page with inherited MediaBox",
              {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "page-inherit-mediabox-out.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf page-inherit-mediabox-out.pdf"},
+             {$td->FILE => "page-inherit-mediabox-out.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("check no type key for page nodes",
              {$td->COMMAND => "qpdf --check no-pages-types.pdf"},
              {$td->FILE => "no-pages-types.out", $td->EXIT_STATUS => 3},
@@ -43,8 +43,8 @@ $td->runtest("no type key for page nodes",
              {$td->FILE => "no-pages-types-fix.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a-split-out-1.pdf"},
-             {$td->FILE => "no-pages-types-fixed.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a-split-out-1.pdf no-pages-types-fixed.pdf"},
+             {$td->FILE => "no-pages-types-fixed.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("detect loops in pages structure",
              {$td->COMMAND => "qpdf --check pages-loop.pdf"},
              {$td->FILE => "pages-loop.out", $td->EXIT_STATUS => 2},

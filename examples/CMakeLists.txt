@@ -45,6 +45,7 @@ add_test(
   --top ${qpdf_SOURCE_DIR}
   --bin $<TARGET_FILE_DIR:pdf-create>
   --bin $<TARGET_FILE_DIR:qpdf>
+  --bin $<TARGET_FILE_DIR:qpdf-test-compare>
   --bin $<TARGET_FILE_DIR:libqpdf>  # for Windows to find DLL
   --code ${qpdf_SOURCE_DIR}/examples
   --color ${QTEST_COLOR}

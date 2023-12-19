@@ -15,8 +15,8 @@ $td->runtest("remove-annotations",
              {$td->COMMAND => "qpdfjob-remove-annotations --static-id annotations.pdf out.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("compare files",
-             {$td->FILE => "out.pdf"},
-             {$td->FILE => "annotations-out.pdf"});
+             {$td->COMMAND => "qpdf-test-compare out.pdf annotations-out.pdf"},
+             {$td->FILE => "annotations-out.pdf", $td->EXIT_STATUS => 0});
 
 cleanup();
 

@@ -21,8 +21,8 @@ $td->runtest("replace stream data",
              {$td->STRING => "test 7 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "replaced-stream-data.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf replaced-stream-data.pdf"},
+             {$td->FILE => "replaced-stream-data.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("replace stream data compressed",
              {$td->COMMAND => "test_driver 8 qstream.pdf"},
              {$td->FILE => "test8.out", $td->EXIT_STATUS => 0},

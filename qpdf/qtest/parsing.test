@@ -33,14 +33,14 @@ $td->runtest("extra header text",
              {$td->FILE => "test-32.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "extra-header-no-newline.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf extra-header-no-newline.pdf"},
+             {$td->FILE => "extra-header-no-newline.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
              {$td->FILE => "b.pdf"},
              {$td->FILE => "extra-header-lin-no-newline.pdf"});
 $td->runtest("check output",
-             {$td->FILE => "c.pdf"},
-             {$td->FILE => "extra-header-newline.pdf"});
+             {$td->COMMAND => "qpdf-test-compare c.pdf extra-header-newline.pdf"},
+             {$td->FILE => "extra-header-newline.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
              {$td->FILE => "d.pdf"},
              {$td->FILE => "extra-header-lin-newline.pdf"});

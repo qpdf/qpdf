@@ -20,8 +20,8 @@ $td->runtest("invert images",
              $td->NORMALIZE_NEWLINES);
 
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "out.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf out.pdf"},
+             {$td->FILE => "out.pdf", $td->EXIT_STATUS => 0});
 
 cleanup();
 

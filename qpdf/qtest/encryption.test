@@ -404,8 +404,8 @@ foreach my $d (@cenc)
     if (-f $pdf_outfile)
     {
         $td->runtest("check $description content",
-                     {$td->FILE => "a.pdf"},
-                     {$td->FILE => $pdf_outfile});
+                     {$td->COMMAND => "qpdf-test-compare a.pdf $pdf_outfile"},
+                     {$td->FILE => $pdf_outfile, $td->EXIT_STATUS => 0});
     }
     else
     {
@@ -491,8 +491,8 @@ $td->runtest("convert encrypted to qdf",
                   " --qdf a.pdf b.qdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("compare files",
-             {$td->FILE => 'a.qdf'},
-             {$td->FILE => 'b.qdf'});
+             {$td->COMMAND => "qpdf-test-compare a.qdf b.qdf"},
+             {$td->FILE => 'b.qdf', $td->EXIT_STATUS => 0});
 $td->runtest("linearize with AES and object streams",
              {$td->COMMAND => "qpdf --encrypt '' o 128 --use-aes=y --" .
                   " --linearize --object-streams=generate enc-base.pdf a.pdf"},
@@ -564,8 +564,8 @@ foreach my $d (['--force-V4', 'V4'],
                       " enc-base.pdf a.pdf"},
                  {$td->STRING => "", $td->EXIT_STATUS => 0});
     $td->runtest("check output",
-                 {$td->FILE => "a.pdf"},
-                 {$td->FILE => "$out.pdf"});
+                 {$td->COMMAND => "qpdf-test-compare a.pdf $out.pdf"},
+                 {$td->FILE => "$out.pdf", $td->EXIT_STATUS => 0});
     $td->runtest("show encryption",
                  {$td->COMMAND => "qpdf --show-encryption a.pdf"},
                  {$td->FILE => "$out-encryption.out", $td->EXIT_STATUS => 0},

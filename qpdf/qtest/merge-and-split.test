@@ -39,8 +39,8 @@ $td->runtest("merge three files",
 # as well as 20-pages have text on page n (from 1) that shows its page
 # position from 0, so page 1 says it's page 0.
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "merge-three-files-1.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf merge-three-files-1.pdf"},
+             {$td->FILE => "merge-three-files-1.pdf", $td->EXIT_STATUS => 0});
 # Select the same pages but add them to an empty file
 $td->runtest("merge three files",
              {$td->COMMAND => "qpdf --empty a.pdf" .
@@ -49,8 +49,8 @@ $td->runtest("merge three files",
 # Manually verified about this file: it has the same pages but does
 # not contain outlines or other things from the original file.
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "merge-three-files-2.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf merge-three-files-2.pdf"},
+             {$td->FILE => "merge-three-files-2.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("avoid respecification of password",
              {$td->COMMAND =>
                   "qpdf --empty a.pdf --copy-encryption=20-pages.pdf" .
@@ -69,16 +69,16 @@ $td->runtest("merge with implicit ranges",
                   " --static-id"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "merge-implicit-ranges.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf merge-implicit-ranges.pdf"},
+             {$td->FILE => "merge-implicit-ranges.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("merge with . and implicit ranges",
              {$td->COMMAND =>
                   "qpdf minimal.pdf a.pdf --pages minimal.pdf . 1 --" .
                   " --static-id"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "merge-dot-implicit-ranges.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf merge-dot-implicit-ranges.pdf"},
+             {$td->FILE => "merge-dot-implicit-ranges.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("merge with multiple labels",
              {$td->COMMAND =>
                   "qpdf --empty a.pdf" .
@@ -88,8 +88,8 @@ $td->runtest("merge with multiple labels",
                   " --static-id"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "merge-multiple-labels.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf merge-multiple-labels.pdf"},
+             {$td->FILE => "merge-multiple-labels.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("remove labels",
              {$td->COMMAND =>
                   "qpdf --empty a.pdf" .
@@ -100,8 +100,8 @@ $td->runtest("remove labels",
                   " --static-id"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "remove-labels.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf remove-labels.pdf"},
+             {$td->FILE => "remove-labels.pdf", $td->EXIT_STATUS => 0});
 
 $td->runtest("split with shared resources",
              {$td->COMMAND =>
@@ -178,8 +178,8 @@ $td->runtest("force full page duplication",
              {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "deep-duplicate-pages.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf deep-duplicate-pages.pdf"},
+             {$td->FILE => "deep-duplicate-pages.pdf", $td->EXIT_STATUS => 0});
 
 
 cleanup();

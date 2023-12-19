@@ -46,8 +46,8 @@ $td->runtest("coalesce contents without qdf",
                   " --coalesce-contents coalesce.pdf a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "coalesce-out.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf coalesce-out.pdf"},
+             {$td->FILE => "coalesce-out.pdf", $td->EXIT_STATUS => 0});
 
 cleanup();
 $td->report($n_tests);

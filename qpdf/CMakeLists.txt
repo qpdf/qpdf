@@ -55,6 +55,7 @@ add_test(
   --top ${qpdf_SOURCE_DIR}
   --bin $<TARGET_FILE_DIR:qpdf>
   --bin $<TARGET_FILE_DIR:libqpdf>  # for Windows to find DLL
+  --bin $<TARGET_FILE_DIR:qpdf-test-compare>
   --code ${qpdf_SOURCE_DIR}/qpdf
   --color ${QTEST_COLOR}
   --show-on-failure ${SHOW_FAILED_TEST_OUTPUT}
