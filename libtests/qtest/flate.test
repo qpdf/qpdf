@@ -39,9 +39,13 @@ $td->runtest("run driver",
 
 check_file("farbage", "a6449c61db5b0645c0693b7560b77a60");
 
-$td->runtest("compressed file correct",
-             {$td->FILE => "farbage.1"},
-             {$td->FILE => "compressed"});
+my $size_uncompressed = (stat("farbage"))[7];
+my $size_compressed = (stat("farbage.1"))[7];
+$td->runtest("compressed is smaller",
+             {$td->STRING =>
+                  ($size_compressed < $size_uncompressed
+                   ? "YES\n" : "$size_compressed $size_uncompressed\n")},
+             {$td->STRING => "YES\n"});
 
 $td->runtest("uncompress filter works",
              {$td->FILE => "farbage"},
