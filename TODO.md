@@ -18,27 +18,6 @@ Contents
 
 - [HISTORICAL NOTES](#historical-notes)
 
-zlib-ng
-=======
-
-* Write ZLIB COMPATIBILITY section of README-maintainer.md.
-* Note: deterministic IDs are affected by choice of zlib
-
-```
-cd /tmp
-git clone https://github.com/zlib-ng/zlib-ng
-cd zlib-ng
-cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/tmp/inst -DZLIB_COMPAT=ON
-cmake --build build -j $(nproc)
-(cd build; ctest --verbose)
-cmake --install build
-```
-
-Then run qpdf's test suite with
-```
-LD_PRELOAD=/tmp/inst/lib/libz.so.1 ctest --verbose
-```
-
 Always
 ======
 

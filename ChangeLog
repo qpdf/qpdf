@@ -1,5 +1,12 @@
 2023-12-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Update code and tests so that qpdf's test suite no longer
+	depends on the output of any specific zlib implementation. This
+	makes it possible to get a fully passing test suite with any
+	API-compatible zlib library. CI tests with the default zlib as
+	well as zlib-ng (including verifying that zlib-ng is not the
+	default), but any zlib implementation should work. Fixes #774.
+
 	* Bug fix: with --compress-streams=n, don't compress object, XRef,
 	or linearization hint streams.
 

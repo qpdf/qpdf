@@ -275,7 +275,99 @@ Building docs from pull requests is also enabled.
 
 ## ZLIB COMPATIBILITY
 
-XXX Write this
+The qpdf test suite is designed to be independent of the output of any
+particular version of zlib. There are several strategies to make this
+work:
+
+* `build-scripts/test-alt-zlib` runs in CI and runs the test suite
+  with a non-default zlib. Please refer to that code for an example of
+  how to do this in case you want to test locally.
+
+* The test suite is full of cases that compare output PDF files with
+  expected PDF files in the test suite. If the file contains data that
+  was compressed by QPDFWriter, then the output file will depend on
+  the behavior of zlib. As such, using a simple comparison won't work.
+  There are several strategies used by the test suite.
+
+  * A new program called `qpdf-test-compare`, in most cases, is a drop
+    in replacement for a simple file comparison. This code make sure
+    the two files have exactly the same number of objects with the
+    same object and generation numbers, and that corresponding objects
+    are identical with the following allowances (consult its source
+    code for all the details details):
+    * The `/Length` key is not compared in stream dictionaries.
+    * The second element of `/ID` is not compared.
+    * If the first and second element of `/ID` are the same, then the
+      first element if `/ID` is also not compared.
+    * If a stream is compressed with `/FlateDecode`, the
+      _uncompressed_ stream data is compared. Otherwise, the raw
+      stream data is compared.
+    * Generated fields in the `/Encrypt` dictionary are not compared,
+      though password-protected files must have the same password.
+    * Differences in the contents of `/XRef` streams are ignored.
+
+    To use this, run `qpdf-test-compare actual.pdf expected.pdf`, and
+    expect the output to match `expected.pdf`. For example, if a test
+    used to be written like this;
+    ```perl
+    $td->runtest("check output",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "out.pdf"});
+    ```
+    then write it like this instead:
+    ```perl
+    $td->runtest("check output",
+                 {$td->COMMAND => "qpdf-test-compare a.pdf out.pdf"},
+                 {$td->FILE => "out.pdf", $td->EXIT_STATUS => 0});
+    ```
+    You can look at `compare-for-test/qtest/compare.test` for
+    additional examples.
+
+    Here's what's going on:
+    * If the files "match" according to the rules of
+      `qpdf-test-compare`, the output of the program is the expected
+      file.
+    * If the files do not match, the output is the actual file. The
+      reason is that, if a change is made that results in an expected
+      change to the expected file, the output of the comparison can be
+      used to replace the expected file (as long as it is definitely
+      known to be correct—no shortcuts here!). That way, it doesn't
+      matter which zlib you use to generate test files.
+    * As a special debugging tool, you can set the `QPDF_COMPARE_WHY`
+      environment variable to any value. In this case, if the files
+      don't match, the output is a description of the first thing in
+      the file that doesn't match. This is mostly useful for debugging
+      `qpdf-test-compare` itself, but it can also be helpful as a
+      sanity check that the differences are expected. If you are
+      trying to find out the _real_ differences, a suggestion is to
+      convert both files to qdf and compare them lexically.
+
+  * There are some cases where `qpdf-test-compare` can't be used. For
+    example, if you need to actually test one of the things that
+    `qpdf-test-compare` ignores, you'll need some other mechanism.
+    There are tests for deterministic ID creation and xref streams
+    that have to implement other mechanisms. Also, linearization hint
+    streams and the linearization dictionary in a linearized file
+    contain file offsets. Rather than ignoring those, it can be
+    helpful to create linearized files using `--compress-streams=n`.
+    In that case, `QPDFWriter` won't compress any data, so the PDF
+    will be independent of the output of any particular zlib
+    implementation.
+
+You can find many examples of how tests were rewritten by looking at
+the commits preceding the one that added this section of this README
+file.
+
+Note about `/ID`: many test cases use `--static-id` to have a
+predictable `/ID` for testing. Many other test cases use
+`--deterministic-id`. While `--static-id` is unaffected by file
+contents, `--deterministic-id` is based on file contents and so is
+dependent on zlib output if there is any newly compressed data. By
+using `qpdf-test-compare`, it's actually not necessary to use either
+`--static-id` or `--deterministic-id`. It may still be necessary to
+use `--static-aes-iv` if comparing encrypted files, but since
+`qpdf-test-compare` ignores `/Perms`, a wider range of encrypted files
+can be compared using `qpdf-test-compare`.
 
 ## HOW TO ADD A COMMAND-LINE ARGUMENT
 

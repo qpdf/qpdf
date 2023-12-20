@@ -39,6 +39,21 @@ Planned changes for future 12.x (subject to change):
 .. x.y.z: not yet released
 
 11.7.0: not yet released
+  - Bug fixes:
+
+    - With ``--compress-streams=n``, qpdf was still compressing cross
+      reference streams, linearization hint streams, and object
+      streams. This has been fixed.
+
+  - Build Enhancements:
+
+    - The qpdf test suite now passes when qpdf is linked with an
+      alternative ``zlib`` implementation. There are no dependencies
+      anywhere in the qpdf test suite on any particular ``zlib``
+      output. Consult the ``ZLIB COMPATIBILITY`` section of
+      ``README-maintainer.md`` for a detailed explanation of how to
+      maintain this.
+
   - Library Enhancements:
 
     - Add C++ functions ``qpdf_c_wrap`` and ``qpdf_c_get_qpdf`` to the
