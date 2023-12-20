@@ -52,6 +52,7 @@ my @diff = (
     ["diff-data-unc.pdf", "5,0: stream data differs"],
     ["diff-stream-dict.pdf", "4,0: stream dictionaries differ"],
     ["diff-object-type.pdf", "6,0: different types"],
+    ["diff-id.pdf", "trailer: object contents differ"],
     );
 $n_tests += 2 * scalar(@diff);
 
@@ -89,5 +90,13 @@ $n_tests += 1;
 $td->runtest("compare object stream files (same)",
              {$td->COMMAND => "env QPDF_COMPARE_WHY=1 qpdf-test-compare ostream1.pdf ostream2.pdf"},
              {$td->FILE => "ostream2.pdf", $td->EXIT_STATUS => 0});
+
+$n_tests += 2;
+$td->runtest("files identical except /ID[1]",
+             {$td->COMMAND => "env QPDF_COMPARE_WHY=1 qpdf-test-compare zlib.pdf zlib-new-id.pdf"},
+             {$td->FILE => "zlib-new-id.pdf", $td->EXIT_STATUS => 0});
+$td->runtest("/ID[0] = /ID[1]",
+             {$td->COMMAND => "env QPDF_COMPARE_WHY=1 qpdf-test-compare zlib-new-id1.pdf zlib-new-id2.pdf"},
+             {$td->FILE => "zlib-new-id2.pdf", $td->EXIT_STATUS => 0});
 
 $td->report($n_tests);

@@ -24,7 +24,7 @@ usage()
               << std::endl
               << "If the files match, the output is the expected file. Otherwise, it is"
               << std::endl
-              << "the actual file. Read comments in the test suite for rationale." << std::endl;
+              << "the actual file. Read comments in the code for rationale." << std::endl;
     exit(2);
 }
 
@@ -50,6 +50,8 @@ compareObjects(std::string const& label, QPDFObjectHandle act, QPDFObjectHandle 
         return label + ": different types";
     }
     if (act.isStream()) {
+        // Disregard stream lengths. The length of stream data is compared later, and we don't care
+        // about the length of compressed data as long as the uncompressed data matches.
         auto act_dict = act.getDict();
         auto exp_dict = exp.getDict();
         act_dict.removeKey("/Length");
@@ -59,6 +61,8 @@ compareObjects(std::string const& label, QPDFObjectHandle act, QPDFObjectHandle 
             return label + ": stream dictionaries differ";
         }
         if (act_dict.getKey("/Type").isNameAndEquals("/XRef")) {
+            // Cross-reference streams will generally not match, but we have numerous tests that
+            // meaningfully ensure that xref streams are correct.
             QTC::TC("compare", "ignore data for xref stream");
             return "";
         }
@@ -103,6 +107,27 @@ compareObjects(std::string const& label, QPDFObjectHandle act, QPDFObjectHandle 
     return "";
 }
 
+void
+cleanTrailer(QPDFObjectHandle& trailer)
+{
+    // If the trailer is an object stream, it will have /Length.
+    trailer.removeKey("/Length");
+    // Disregard the second half of /ID. This doesn't have anything directly to do with zlib, but
+    // lots of tests use --deterministic-id, and that is affected. The deterministic ID tests
+    // meaningfully exercise that deterministic IDs behave as expected, so for the rest of the
+    // tests, it's okay to ignore /ID[1]. If the two halves of /ID are the same, ignore both since
+    // this means qpdf completely generated the /ID rather than preserving the first half.
+    auto id = trailer.getKey("/ID");
+    if (id.isArray() && id.getArrayNItems() == 2) {
+        auto id0 = id.getArrayItem(0).unparse();
+        auto id1 = id.getArrayItem(1).unparse();
+        id.setArrayItem(1, "()"_qpdf);
+        if (id0 == id1) {
+            id.setArrayItem(0, "()"_qpdf);
+        }
+    }
+}
+
 std::string
 compare(char const* actual_filename, char const* expected_filename)
 {
@@ -118,8 +143,8 @@ compare(char const* actual_filename, char const* expected_filename)
 
     auto act_trailer = actual.getTrailer();
     auto exp_trailer = expected.getTrailer();
-    act_trailer.removeKey("/Length");
-    exp_trailer.removeKey("/Length");
+    cleanTrailer(act_trailer);
+    cleanTrailer(exp_trailer);
     auto trailer_diff = compareObjects("trailer", act_trailer, exp_trailer);
     if (!trailer_diff.empty()) {
         QTC::TC("compare", "different trailer");
