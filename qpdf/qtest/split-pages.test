@@ -70,8 +70,8 @@ $td->runtest("split page with labels",
 foreach my $i (qw(01-06 07-11))
 {
     $td->runtest("check output ($i)",
-                 {$td->FILE => "split-out-labels-$i.pdf"},
-                 {$td->FILE => "labels-split-$i.pdf"});
+                 {$td->COMMAND => "qpdf-test-compare split-out-labels-$i.pdf labels-split-$i.pdf"},
+                 {$td->FILE => "labels-split-$i.pdf", $td->EXIT_STATUS => 0});
 }
 
 # See comments in TODO about these expected failures. Search for
@@ -121,8 +121,8 @@ foreach my $d (@sp_cases)
         my $expected = $actual;
         $expected =~ s/split-out/split-exp/;
         $td->runtest("check output page $i ($description)",
-                     {$td->FILE => $actual},
-                     {$td->FILE => $expected});
+                     {$td->COMMAND => "qpdf-test-compare $actual $expected u"},
+                     {$td->FILE => $expected, $td->EXIT_STATUS => 0});
     }
 }
 
@@ -201,8 +201,8 @@ foreach my $d (@fo_resources)
                  {$td->STRING => "", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("check output ($f)",
-                 {$td->FILE => "a.pdf"},
-                 {$td->FILE => "$f-out.pdf"});
+                 {$td->COMMAND => "qpdf-test-compare a.pdf $f-out.pdf"},
+                 {$td->FILE => "$f-out.pdf", $td->EXIT_STATUS => 0});
     if ($compare)
     {
         compare_pdfs($td, "$f.pdf", "a.pdf");

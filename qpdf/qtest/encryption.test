@@ -373,9 +373,9 @@ $td->runtest("show-encryption works invalid password",
              $td->NORMALIZE_NEWLINES);
 
 my @cenc = (
-    [11, 'hybrid-xref.pdf', "''", 'r2', "", ""],
-    [12, 'hybrid-xref.pdf', "''", 'r3', "", ""],
-    [15, 'hybrid-xref.pdf', "''", 'r4', "", ""],
+    [11, 'hybrid-xref.pdf', "''", 'r2', "", "user1"],
+    [12, 'hybrid-xref.pdf', "''", 'r3', "", "user2"],
+    [15, 'hybrid-xref.pdf', "''", 'r4', "", "user2"],
     [17, 'hybrid-xref.pdf', "''", 'r5', "", "owner3"],
     [18, 'hybrid-xref.pdf', "''", 'r6', "", "user4"],
     [13, 'c-r2.pdf', 'user1', 'decrypt with user',
@@ -404,7 +404,7 @@ foreach my $d (@cenc)
     if (-f $pdf_outfile)
     {
         $td->runtest("check $description content",
-                     {$td->COMMAND => "qpdf-test-compare a.pdf $pdf_outfile"},
+                     {$td->COMMAND => "qpdf-test-compare a.pdf $pdf_outfile $checkpass"},
                      {$td->FILE => $pdf_outfile, $td->EXIT_STATUS => 0});
     }
     else
@@ -413,7 +413,8 @@ foreach my $d (@cenc)
         # /Perms static, so we have no way to predictably create a
         # /V=5 encrypted file.  It's not worth adding this...the test
         # suite is adequate without having a statically predictable
-        # file.
+        # file. (qpdf-test-compare ignores /Perms, but it's not worth
+        # adding output files for these cases.)
         $td->runtest("check $description",
                      {$td->COMMAND =>
                           "qpdf --check a.pdf --password=$checkpass"},

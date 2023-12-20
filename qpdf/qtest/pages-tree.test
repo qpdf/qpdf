@@ -24,7 +24,7 @@ $td->runtest("linearize duplicated pages",
                   $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("compare files",
-             {$td->COMMAND => "qpdf-test-compare a.pdf"},
+             {$td->COMMAND => "qpdf-test-compare a.pdf linearize-duplicate-page.pdf"},
              {$td->FILE => "linearize-duplicate-page.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("extract duplicated pages",
              {$td->COMMAND =>

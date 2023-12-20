@@ -30,18 +30,18 @@ my @bad_json = (
     "json-error"
     );
 my @good_json = (
-    "choice-match",
-    "input-file-password",
-    "empty-input",
-    "replace-input",
-    "encrypt-40",
-    "encrypt-128",
-    "encrypt-256-with-restrictions",
-    "add-attachments",
-    "copy-attachments",
-    "underlay-overlay",
-    "underlay-overlay-password",
-    "misc-options",
+    ["choice-match", ""],
+    ["input-file-password", "user"],
+    ["empty-input", ""],
+    ["replace-input", ""],
+    ["encrypt-40", "u"],
+    ["encrypt-128", "u"],
+    ["encrypt-256-with-restrictions", "u"],
+    ["add-attachments", ""],
+    ["copy-attachments", ""],
+    ["underlay-overlay", ""],
+    ["underlay-overlay-password", ""],
+    ["misc-options", ""],
     );
 my $n_tests = 11 + scalar(@bad_json) + (2 * scalar(@good_json));
 
@@ -56,28 +56,29 @@ foreach my $i (@bad_json)
 
 foreach my $i (@good_json)
 {
-    if ($i eq 'replace-input')
+    my ($base, $pass) = @$i;
+    if ($base eq 'replace-input')
     {
         copy("minimal.pdf", 'a.pdf');
     }
-    $td->runtest("QPDFJob good json: $i",
-                 {$td->COMMAND => "qpdf --job-json-file=job-json-$i.json"},
+    $td->runtest("QPDFJob good json: $base",
+                 {$td->COMMAND => "qpdf --job-json-file=job-json-$base.json"},
                  {$td->STRING => "", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
-    if ($i =~ m/encrypt-256/)
+    if ($base =~ m/encrypt-256/)
     {
-        $td->runtest("check encryption $i",
+        $td->runtest("check encryption $base",
                      {$td->COMMAND =>
                           "qpdf a.pdf --password=u" .
                           " --job-json-file=job-show-encryption.json"},
-                     {$td->FILE => "job-json-$i.out", $td->EXIT_STATUS => 0},
+                     {$td->FILE => "job-json-$base.out", $td->EXIT_STATUS => 0},
                      $td->NORMALIZE_NEWLINES);
     }
     else
     {
-        $td->runtest("check good json $i output",
-                     {$td->COMMAND => "qpdf-test-compare a.pdf job-json-$i.pdf"},
-                     {$td->FILE => "job-json-$i.pdf", $td->EXIT_STATUS => 0});
+        $td->runtest("check good json $base output",
+                     {$td->COMMAND => "qpdf-test-compare a.pdf job-json-$base.pdf $pass"},
+                     {$td->FILE => "job-json-$base.pdf", $td->EXIT_STATUS => 0});
     }
 }
 
