@@ -1748,10 +1748,10 @@ QPDF::writeHSharedObject(BitWriter& w)
 void
 QPDF::writeHGeneric(BitWriter& w, HGeneric& t)
 {
-    w.writeBitsInt(t.first_object, 32);             // 1
-    w.writeBits(toULL(t.first_object_offset), 32);  // 2
-    w.writeBitsInt(t.nobjects, 32);                 // 3
-    w.writeBitsInt(t.group_length, 32);             // 4
+    w.writeBitsInt(t.first_object, 32);            // 1
+    w.writeBits(toULL(t.first_object_offset), 32); // 2
+    w.writeBitsInt(t.nobjects, 32);                // 3
+    w.writeBitsInt(t.group_length, 32);            // 4
 }
 
 void
@@ -1761,7 +1761,8 @@ QPDF::generateHintStream(
     std::map<int, int> const& obj_renumber,
     std::shared_ptr<Buffer>& hint_buffer,
     int& S,
-    int& O)
+    int& O,
+    bool compressed)
 {
     // Populate actual hint table values
     calculateHPageOffset(xref, lengths, obj_renumber);
@@ -1771,8 +1772,14 @@ QPDF::generateHintStream(
     // Write the hint stream itself into a compressed memory buffer. Write through a counter so we
     // can get offsets.
     Pl_Buffer hint_stream("hint stream");
-    Pl_Flate f("compress hint stream", &hint_stream, Pl_Flate::a_deflate);
-    Pl_Count c("count", &f);
+    Pipeline* next = &hint_stream;
+    std::shared_ptr<Pipeline> flate;
+    if (compressed) {
+        flate =
+            std::make_shared<Pl_Flate>("compress hint stream", &hint_stream, Pl_Flate::a_deflate);
+        next = flate.get();
+    }
+    Pl_Count c("count", next);
     BitWriter w(&c);
 
     writeHPageOffset(w);

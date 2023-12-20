@@ -745,9 +745,10 @@ class QPDF
             std::map<int, int> const& obj_renumber,
             std::shared_ptr<Buffer>& hint_stream,
             int& S,
-            int& O)
+            int& O,
+            bool compressed)
         {
-            return qpdf.generateHintStream(xref, lengths, obj_renumber, hint_stream, S, O);
+            return qpdf.generateHintStream(xref, lengths, obj_renumber, hint_stream, S, O, compressed);
         }
 
         static void
@@ -1094,7 +1095,8 @@ class QPDF
         std::map<int, int> const& obj_renumber,
         std::shared_ptr<Buffer>& hint_stream,
         int& S,
-        int& O);
+        int& O,
+        bool compressed);
 
     // Map object to object stream that contains it
     void getObjectStreamData(std::map<int, int>&);

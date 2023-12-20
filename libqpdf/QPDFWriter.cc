@@ -2289,15 +2289,20 @@ QPDFWriter::writeHintStream(int hint_id)
     std::shared_ptr<Buffer> hint_buffer;
     int S = 0;
     int O = 0;
+    bool compressed = (m->compress_streams && !m->qdf_mode);
     QPDF::Writer::generateHintStream(
-        m->pdf, m->xref, m->lengths, m->obj_renumber_no_gen, hint_buffer, S, O);
+        m->pdf, m->xref, m->lengths, m->obj_renumber_no_gen, hint_buffer, S, O, compressed);
 
     openObject(hint_id);
     setDataKey(hint_id);
 
     size_t hlen = hint_buffer->getSize();
 
-    writeString("<< /Filter /FlateDecode /S ");
+    writeString("<< ");
+    if (compressed) {
+        writeString("/Filter /FlateDecode ");
+    }
+    writeString("/S ");
     writeString(std::to_string(S));
     if (O) {
         writeString(" /O ");
