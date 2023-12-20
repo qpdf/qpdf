@@ -44,6 +44,7 @@ main(int argc, char* argv[])
             ->endPages()
             ->linearize()
             ->staticId() // for testing only
+            ->compressStreams("n") // avoid dependency on zlib output
             ->checkConfiguration();
         j.run();
         std::cout << "out1 status: " << j.getExitCode() << std::endl;
@@ -63,6 +64,7 @@ main(int argc, char* argv[])
             "1",
             "--",
             "--static-id",
+            "--compress-streams=n", // avoid dependency on zlib output
             nullptr};
         QPDFJob j;
         j.initializeFromArgv(new_argv);
@@ -81,6 +83,7 @@ main(int argc, char* argv[])
   "outputFile": "out3.pdf",
   "staticId": "",
   "linearize": "",
+  "compressStreams": "n",
   "pages": [
     {
       "file": ".",

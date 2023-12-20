@@ -1211,6 +1211,9 @@ test_32(QPDF& pdf, char const* arg2)
                   << "linearized: " << (linearized ? "yes" : "no") << std::endl
                   << "newline: " << (newline ? "yes" : "no") << std::endl;
         w.setLinearization(linearized);
+        if (linearized) {
+            w.setCompressStreams(false); // avoid dependency on zlib's output
+        }
         w.setExtraHeaderText(newline ? "%% Comment with newline\n" : "%% Comment\n% No newline");
         w.write();
     }

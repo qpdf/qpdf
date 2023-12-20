@@ -19,7 +19,7 @@ main(int argc, char* argv[])
 {
     char* infile = NULL;
     char* outfile = NULL;
-    char const* new_argv[6];
+    char const* new_argv[7];
     int r = 0;
     char* p = 0;
 
@@ -43,7 +43,8 @@ main(int argc, char* argv[])
     new_argv[2] = outfile;
     new_argv[3] = "--linearize";
     new_argv[4] = "--static-id"; /* for testing only */
-    new_argv[5] = NULL;
+    new_argv[5] = "--compress-streams=n"; /* avoid dependency on zlib output */
+    new_argv[6] = NULL;
 
     /* See qpdf-job.cc for a C++ example of using the json interface. To use that from C just like
      * the argv one, call qpdfjob_run_from_json instead and pass the json string as a single char

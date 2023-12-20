@@ -18,7 +18,7 @@ my $n_tests = 17;
 
 $td->runtest("linearize duplicated pages",
              {$td->COMMAND =>
-                  "qpdf --static-id --linearize" .
+                  "qpdf --static-id --linearize --compress-streams=n" .
                   " page_api_2.pdf a.pdf"},
              {$td->FILE => "duplicate-page-warning.out",
                   $td->EXIT_STATUS => 3},

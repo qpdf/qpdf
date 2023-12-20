@@ -37,7 +37,8 @@ foreach my $file (qw(short-id long-id))
 
     $td->runtest("linearize $file.pdf",
                  {$td->COMMAND =>
-                      "qpdf --deterministic-id --linearize $file.pdf a.pdf"},
+                      "qpdf --deterministic-id --compress-streams=n" .
+                      " --linearize $file.pdf a.pdf"},
                  {$td->STRING => "",
                   $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);

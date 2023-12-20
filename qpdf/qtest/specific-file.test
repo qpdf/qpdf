@@ -47,7 +47,8 @@ $td->runtest("check fix-qdf idempotency",
              {$td->FILE => "a.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("pages points to page",
              {$td->COMMAND =>
-                  "qpdf --static-id --linearize pages-is-page.pdf a.pdf"},
+                  "qpdf --static-id --linearize --compress-streams=n" .
+                  " pages-is-page.pdf a.pdf"},
              {$td->FILE => "pages-is-page.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",

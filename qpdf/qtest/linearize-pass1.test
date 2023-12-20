@@ -18,6 +18,7 @@ my $n_tests = 3;
 
 $td->runtest("linearize pass 1 file",
              {$td->COMMAND => "qpdf --linearize --static-id" .
+                  " --compress-streams=n" .
                   " --linearize-pass1=b.pdf minimal.pdf a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
