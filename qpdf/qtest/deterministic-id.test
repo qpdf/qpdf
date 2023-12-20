@@ -2,6 +2,7 @@
 require 5.008;
 use warnings;
 use strict;
+use File::Copy;
 
 unshift(@INC, '.');
 require qpdf_test_helpers;
@@ -14,23 +15,41 @@ cleanup();
 
 my $td = new TestDriver('deterministic-id');
 
-my $n_tests = 11;
+my $n_tests = 19;
+
+# Do not use qpdf-test-compare in this test suite since it ignores
+# /ID[1].
 
 foreach my $d ('nn', 'ny', 'yn', 'yy')
 {
     my $linearize = ($d =~ m/^y/);
     my $ostream = ($d =~ m/y$/);
-    $td->runtest("deterministic ID: linearize/ostream=$d",
-                 {$td->COMMAND =>
-                      "qpdf -deterministic-id" .
-                      ($linearize ? " -linearize" : "") .
-                      " -object-streams=" . ($ostream ? "generate" : "disable") .
-                      " deterministic-id-in.pdf a.pdf"},
-                 {$td->STRING => "",
-                  $td->EXIT_STATUS => 0});
+    # The deterministic ID is a function of all the data in the file.
+    # As such, it is affected by which zlib implementation is in use.
+    # The important thing is that the ID is the same if a file is
+    # generated the same way more than once, so rather than comparing
+    # the output file to a known output, compare subsequent outputs
+    # with each other.
+    foreach my $out ('a.pdf', 'b.pdf')
+    {
+        $td->runtest("deterministic ID: linearize/ostream=$d",
+                     {$td->COMMAND =>
+                          "qpdf -deterministic-id" .
+                          ($linearize ? " -linearize" : "") .
+                          " -object-streams=" . ($ostream ? "generate" : "disable") .
+                          " deterministic-id-in.pdf $out"},
+                     {$td->STRING => "",
+                          $td->EXIT_STATUS => 0});
+    }
     $td->runtest("compare files",
                  {$td->FILE => "a.pdf"},
-                 {$td->FILE => "deterministic-id-$d.pdf"});
+                 {$td->FILE => "b.pdf"});
+    check_id('a.pdf');
+    if ($d eq 'nn')
+    {
+        # Save for the C API test
+        copy("a.pdf", 'c.pdf');
+    }
 }
 
 $td->runtest("deterministic ID with encryption",
@@ -49,7 +68,27 @@ $td->runtest("deterministic ID (C API)",
              $td->NORMALIZE_NEWLINES);
 $td->runtest("compare files",
              {$td->FILE => "a.pdf"},
-             {$td->FILE => "deterministic-id-nn.pdf"});
+             {$td->FILE => "c.pdf"});
 
 cleanup();
 $td->report($n_tests);
+
+sub check_id
+{
+    my $f = shift;
+    chomp(my $id = `qpdf --show-object=trailer $f`);
+    if ($id =~ m,.*/ID \[ <(9b1c69409fc9a5f50e44b9588e3e60f8)> <(.{32})>,)
+    {
+        my $id0 = $1;
+        my $id1 = $2;
+        $td->runtest("ID fields differ",
+                     {$td->STRING => $id0 ne $id1 ? "YES\n" : "$id0 $id1\n"},
+                     {$td->STRING => "YES\n"});
+    }
+    else
+    {
+        $td->runtest("checked ID",
+                     {$td->STRING => "YES\n"},
+                     {$td->STRING => "$id\n"});
+    }
+}
