@@ -129,12 +129,12 @@ cleanTrailer(QPDFObjectHandle& trailer)
 }
 
 std::string
-compare(char const* actual_filename, char const* expected_filename)
+compare(char const* actual_filename, char const* expected_filename, char const* password)
 {
     QPDF actual;
-    actual.processFile(actual_filename);
+    actual.processFile(actual_filename, password);
     QPDF expected;
-    expected.processFile(expected_filename);
+    expected.processFile(expected_filename, password);
     // The motivation behind this program is to compare files in a way that allows for
     // differences in the exact bytes of zlib compression. If all zlib implementations produced
     // exactly the same output, we would just be able to use straight comparison, but since they
@@ -191,16 +191,20 @@ main(int argc, char* argv[])
         exit(0);
     }
 
-    if (argc != 3) {
+    if (argc < 3 || argc > 4) {
         usage();
     }
 
     bool show_why = QUtil::get_env("QPDF_COMPARE_WHY");
     try {
         char const* to_output;
-        auto actual = argv[1];
-        auto expected = argv[2];
-        auto difference = compare(actual, expected);
+        char const* actual = argv[1];
+        char const* expected = argv[2];
+        char const* password{nullptr};
+        if (argc == 4) {
+            password = argv[3];
+        }
+        auto difference = compare(actual, expected, password);
         if (difference.empty()) {
             // The files are identical; write the expected file. This way, tests can be written
             // that compare the output of this program to the expected file.

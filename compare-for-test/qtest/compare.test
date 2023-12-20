@@ -73,7 +73,7 @@ foreach my $f (@diff)
 }
 
 # Repeat for encrypted files.
-$n_tests += 3;
+$n_tests += 5;
 $td->runtest("byte-wise compare encrypted files",
              {$td->COMMAND => "cmp enc1.pdf enc2.pdf"},
              {$td->REGEXP => ".*", $td->EXIT_STATUS => "!0"});
@@ -82,6 +82,13 @@ $td->runtest("compare encrypted files (same)",
              {$td->FILE => "enc2.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("compare encrypted files (different)",
              {$td->COMMAND => "env QPDF_COMPARE_WHY=1 qpdf-test-compare enc1.pdf diff-data-enc.pdf"},
+             {$td->STRING => "4,0: stream data differs\n", $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("with password (same)",
+             {$td->COMMAND => "env QPDF_COMPARE_WHY=1 qpdf-test-compare enc1.pdf enc2.pdf o"},
+             {$td->FILE => "enc2.pdf", $td->EXIT_STATUS => 0});
+$td->runtest("with password (different)",
+             {$td->COMMAND => "env QPDF_COMPARE_WHY=1 qpdf-test-compare enc1.pdf diff-data-enc.pdf o"},
              {$td->STRING => "4,0: stream data differs\n", $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 
