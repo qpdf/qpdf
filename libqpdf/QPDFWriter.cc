@@ -1658,8 +1658,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
 
             // Set up a stream to write the stream data into a buffer.
             Pipeline* next = pushPipeline(new Pl_Buffer("object stream"));
-            if ((m->compress_streams || (m->stream_decode_level == qpdf_dl_none)) &&
-                (!m->qdf_mode)) {
+            if (m->compress_streams && !m->qdf_mode) {
                 compressed = true;
                 next =
                     pushPipeline(new Pl_Flate("compress object stream", next, Pl_Flate::a_deflate));
@@ -2417,7 +2416,7 @@ QPDFWriter::writeXRefStream(
 
     Pipeline* p = pushPipeline(new Pl_Buffer("xref stream"));
     bool compressed = false;
-    if ((m->compress_streams || (m->stream_decode_level == qpdf_dl_none)) && (!m->qdf_mode)) {
+    if (m->compress_streams && !m->qdf_mode) {
         compressed = true;
         if (!skip_compression) {
             // Write the stream dictionary for compression but don't actually compress.  This helps

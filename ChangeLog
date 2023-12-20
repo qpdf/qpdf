@@ -1,3 +1,8 @@
+2023-12-20  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: with --compress-streams=n, don't compress object or
+	XRef streams.
+
 2023-12-16  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add new C++ functions "qpdf_c_get_qpdf" and "qpdf_c_wrap" to
