@@ -28,7 +28,8 @@ $td->runtest("recover xref with short size",
               $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("show new xref stream",
-             {$td->COMMAND => "qpdf --show-xref a.pdf"},
+             {$td->COMMAND => "qpdf --show-xref a.pdf",
+                  $td->FILTER => "perl filter-xref-offsets.pl"},
              {$td->FILE => "xref-with-short-size-new.out",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
