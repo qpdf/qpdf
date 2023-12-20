@@ -94,8 +94,8 @@ $td->runtest("overlay on page with no resources",
              {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check overlay with no resources output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "overlay-no-resources.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf overlay-no-resources.pdf"},
+             {$td->FILE => "overlay-no-resources.pdf", $td->EXIT_STATUS => 0});
 
 cleanup();
 $td->report($n_tests);

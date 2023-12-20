@@ -194,8 +194,8 @@ $td->runtest("xref loop with append",
               $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "append-xref-loop-fixed.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf append-xref-loop-fixed.pdf"},
+             {$td->FILE => "append-xref-loop-fixed.pdf", $td->EXIT_STATUS => 0});
 
 $td->runtest("endobj not at newline",
              {$td->COMMAND =>
@@ -204,8 +204,8 @@ $td->runtest("endobj not at newline",
               $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "endobj-at-eol-fixed.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf endobj-at-eol-fixed.pdf"},
+             {$td->FILE => "endobj-at-eol-fixed.pdf", $td->EXIT_STATUS => 0});
 
 cleanup();
 $td->report($n_tests);

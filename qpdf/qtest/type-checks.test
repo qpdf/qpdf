@@ -27,8 +27,8 @@ $td->runtest("ensure object-types-os is up-to-date",
                   " object-types.pdf a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check file",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "object-types-os.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf object-types-os.pdf"},
+             {$td->FILE => "object-types-os.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("type checks",
              {$td->COMMAND => "test_driver 42 object-types.pdf"},
              {$td->FILE => "object-types.out",

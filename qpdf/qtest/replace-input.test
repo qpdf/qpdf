@@ -32,10 +32,12 @@ foreach my $d (['auto-ü', 1], ['auto-öπ', 2])
                       " --object-streams=generate --replace-input ./$u.pdf"},
                  {$td->STRING => "", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
+    # qpdf handles Unicode filenames on Windows, but qpdf-test-compare
+    # doesn't.
+    rename("$u.pdf", "u.pdf") or die;
     $td->runtest("check output ($u)",
-                 {$td->FILE => "$u.pdf"},
-                 {$td->FILE => "replace-input.pdf"},
-                 $td->NORMALIZE_NEWLINES);
+                 {$td->COMMAND => "qpdf-test-compare u.pdf replace-input.pdf"},
+                 {$td->FILE => "replace-input.pdf", $td->EXIT_STATUS => 0});
 }
 
 system("cp xref-with-short-size.pdf auto-warn.pdf") == 0 or die;
@@ -46,8 +48,8 @@ $td->runtest("replace input with warnings",
              $td->NORMALIZE_NEWLINES);
 
 $td->runtest("check output",
-             {$td->FILE => "auto-warn.pdf"},
-             {$td->FILE => "warn-replace.pdf"});
+             {$td->COMMAND => "qpdf-test-compare auto-warn.pdf warn-replace.pdf"},
+             {$td->FILE => "warn-replace.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("check orig output",
              {$td->FILE => "auto-warn.pdf.~qpdf-orig"},
              {$td->FILE => "xref-with-short-size.pdf"});

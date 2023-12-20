@@ -23,9 +23,8 @@ $td->runtest("create file with many nulls",
              {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("compare output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "many-nulls.pdf"},
-             $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "qpdf-test-compare a.pdf many-nulls.pdf"},
+             {$td->FILE => "many-nulls.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("run check file",
              {$td->COMMAND => "qpdf --check a.pdf"},
              {$td->FILE => "many-nulls.out", $td->EXIT_STATUS => 0},
