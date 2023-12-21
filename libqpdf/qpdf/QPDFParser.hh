@@ -32,7 +32,7 @@ class QPDFParser
 
   private:
     // Parser state.  Note:
-    // state < st_dictionary_value == (state = st_dictionary_key || state = st_dictionary_value)
+    // state <= st_dictionary_value == (state = st_dictionary_key || state = st_dictionary_value)
     enum parser_state_e { st_dictionary_key, st_dictionary_value, st_array };
 
     struct StackFrame

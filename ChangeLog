@@ -1,3 +1,8 @@
+2023-12-21  Jay Berkenbilt  <ejb@ql.org>
+
+	* From M. Holger: Refactor QPDFParser for performance. See #1059
+	for a discussion.
+
 2023-12-20  Jay Berkenbilt  <ejb@ql.org>
 
 	* Update code and tests so that qpdf's test suite no longer
