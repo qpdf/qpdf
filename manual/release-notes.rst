@@ -60,6 +60,9 @@ Planned changes for future 12.x (subject to change):
       C API to enable custom C++ code to interoperate more easily with
       the the C API. See ``examples/extend-c-api``.
 
+    - Add methods to ``Buffer`` to work more easily and efficiently
+      with ``std::string``.
+
 11.6.4: December 10, 2023
   - Bug fixes:
 

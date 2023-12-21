@@ -17,6 +17,12 @@
 	functions in C++ that interoperate with the C API. See
 	examples/extend-c-api for more information.
 
+	* Bug fix from M. Holger: the default for /Columns in PNG filter
+	is 1, but libqpdf was acting like it was 0.
+
+	* Enhancement from M. Holger: add methods to Buffer to work more
+	easily with std::string.
+
 2023-12-10  Jay Berkenbilt  <ejb@ql.org>
 
 	* 11.6.4: release
