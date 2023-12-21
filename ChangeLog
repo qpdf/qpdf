@@ -1,5 +1,9 @@
 2023-12-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Fix to QPDF JSON: a floating point number that appears in
+	scientific notation will be converted to fixed-point notation,
+	rounded to six digits after the decimal point. Fixes #1079.
+
 	* Fix to QPDF JSON: the syntax "n:/pdf-syntax" is now accepted as
 	an alternative way to represent names. This can be used for any
 	name (e.g. "n:/text#2fplain"), but it is necessary when the name

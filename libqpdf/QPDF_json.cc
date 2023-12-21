@@ -732,6 +732,15 @@ QPDF::JSONReactor::makeObject(JSON const& value)
         if (QUtil::is_long_long(str_v.c_str())) {
             result = QPDFObjectHandle::newInteger(QUtil::string_to_ll(str_v.c_str()));
         } else {
+            // JSON allows scientific notation, but PDF does not.
+            if (str_v.find('e') != std::string::npos || str_v.find('E') != std::string::npos) {
+                try {
+                    auto v = std::stod(str_v);
+                    str_v = QUtil::double_to_string(v);
+                } catch (std::exception&) {
+                    // Keep it as it was
+                }
+            }
             result = QPDFObjectHandle::newReal(str_v);
         }
     } else if (value.getString(str_v)) {

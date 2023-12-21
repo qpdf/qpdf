@@ -52,6 +52,10 @@ Planned changes for future 12.x (subject to change):
       must be represented as ``"n:/one#a0two"`` since the single byte
       ``a0`` is not valid in JSON.
 
+    - QPDF JSON will convert floating numbers that appear in the JSON
+      in scientific notation to fixed-point notation since PDF doesn't
+      accept scientific notation.
+
   - Build Enhancements:
 
     - The qpdf test suite now passes when qpdf is linked with an
