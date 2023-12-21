@@ -61,6 +61,7 @@ my @goodfiles = (
     'form-fields-and-annotations.pdf',
     'need-appearances.pdf',
     'fxo-blue.pdf',
+    'weird-tokens.pdf',
     );
 $n_tests += 6 * scalar(@goodfiles);
 
@@ -340,6 +341,22 @@ $td->runtest("check C API write to JSON 2",
 $td->runtest("check C API write to JSON stream",
              {$td->FILE => "auto-4"},
              {$td->FILE => "qpdf-ctest-47-4"});
+
+# Bugs #1072 and #1079 illustrate cases that qpdf-json got wrong. In
+# #1072, it was noticed that name tokens containing binary characters
+# (using #xx) would generate invalid JSON, even though qpdf's own JSON
+# parser would accept it. Also, the JSON spec allows real numbers in
+# scientific notation, but the PDF spec does not.
+$n_tests += 2;
+$td->runtest("handle binary names",
+             {$td->COMMAND =>
+                  "qpdf --json-output weird-tokens.pdf a.json"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+# Round-trip is tested above.
+$td->runtest("check json",
+             {$td->FILE => "a.json"},
+             {$td->FILE => "weird-tokens.json"},
+             $td->NORMALIZE_NEWLINES);
 
 cleanup();
 $td->report($n_tests);

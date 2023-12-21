@@ -144,6 +144,12 @@ is_name(std::string const& v)
     return ((v.length() > 1) && (v.at(0) == '/'));
 }
 
+static bool
+is_pdf_name(std::string const& v)
+{
+    return ((v.length() > 3) && (v.substr(0, 3) == "n:/"));
+}
+
 bool
 QPDF::test_json_validators()
 {
@@ -740,6 +746,8 @@ QPDF::JSONReactor::makeObject(JSON const& value)
             result = QPDFObjectHandle::newString(QUtil::hex_decode(str));
         } else if (is_name(str_v)) {
             result = QPDFObjectHandle::newName(str_v);
+        } else if (is_pdf_name(str_v)) {
+            result = QPDFObjectHandle::parse(str_v.substr(2));
         } else {
             QTC::TC("qpdf", "QPDF_json unrecognized string value");
             error(value.getStart(), "unrecognized string value");

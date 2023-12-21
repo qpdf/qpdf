@@ -45,6 +45,13 @@ Planned changes for future 12.x (subject to change):
       reference streams, linearization hint streams, and object
       streams. This has been fixed.
 
+    - Fix to QPDF JSON: the syntax ``"n:/pdf-syntax"`` is now accepted
+      as an alternative way to represent names. This can be used for
+      any name (e.g. ``"n:/text#2fplain"``), but it is necessary when
+      the name contains binary characters. For example, ``/one#a0two``
+      must be represented as ``"n:/one#a0two"`` since the single byte
+      ``a0`` is not valid in JSON.
+
   - Build Enhancements:
 
     - The qpdf test suite now passes when qpdf is linked with an

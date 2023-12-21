@@ -57,6 +57,14 @@ QPDF_Name::getJSON(int json_version)
     if (json_version == 1) {
         return JSON::makeString(normalizeName(this->name));
     } else {
-        return JSON::makeString(this->name);
+        bool has_8bit_chars;
+        bool is_valid_utf8;
+        bool is_utf16;
+        QUtil::analyze_encoding(this->name, has_8bit_chars, is_valid_utf8, is_utf16);
+        if (!has_8bit_chars || is_valid_utf8) {
+            return JSON::makeString(this->name);
+        } else {
+            return JSON::makeString("n:" + normalizeName(this->name));
+        }
     }
 }

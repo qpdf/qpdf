@@ -258,6 +258,12 @@ Object Values
     syntax resolved. For example, the name whose canonical form (per
     the PDF specification) is ``text/plain`` would be represented in
     JSON as ``"/text/plain"`` and in PDF as ``"/text#2fplain"``.
+    Starting with qpdf 11.7.0, the syntax ``"n:/pdf-syntax"`` is
+    accepted as an alternative. This can be used for any name (e.g.
+    ``"n:/text#2fplain"``), but it is necessary when the name contains
+    binary characters. For example, ``/one#a0two`` must be represented
+    as ``"n:/one#a0two"`` since the single byte ``a0`` is not valid in
+    JSON.
 
   - Indirect object references are represented as JSON strings that
     look like a PDF indirect object reference and have the form
@@ -824,7 +830,8 @@ version 2.
   - Names are shown in qpdf's canonical form rather than in PDF
     syntax. (Example: the PDF-syntax name ``/text#2fplain`` appeared
     as ``"/text#2fplain"`` in v1 but appears as ``"/text/plain"`` in
-    v2.
+    v2. In qpdf 11.7.0, a fix was made to accept ``"n:/pdf-syntax"``
+    for names containing binary characters.
 
   - The top-level representation of an object in ``"objects"`` is a
     dictionary containing either a ``"value"`` key or a ``"stream"``
