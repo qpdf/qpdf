@@ -51,6 +51,7 @@ WARNING: issue-335a.pdf (trailer, offset 563): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 596): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 597): name with stray # will not work with PDF >= 1.2
 WARNING: issue-335a.pdf (trailer, offset 600): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 134): dictionary has duplicated key /L
 WARNING: issue-335a.pdf (trailer, offset 601): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 648): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 649): name with stray # will not work with PDF >= 1.2
@@ -74,6 +75,7 @@ WARNING: issue-335a.pdf (trailer, offset 563): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 596): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 597): name with stray # will not work with PDF >= 1.2
 WARNING: issue-335a.pdf (trailer, offset 600): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 164): dictionary has duplicated key /L
 WARNING: issue-335a.pdf (trailer, offset 601): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 648): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 649): name with stray # will not work with PDF >= 1.2
@@ -97,6 +99,7 @@ WARNING: issue-335a.pdf (trailer, offset 563): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 596): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 597): name with stray # will not work with PDF >= 1.2
 WARNING: issue-335a.pdf (trailer, offset 600): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 231): dictionary has duplicated key /L
 WARNING: issue-335a.pdf (trailer, offset 601): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 648): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 649): name with stray # will not work with PDF >= 1.2
@@ -448,6 +451,7 @@ WARNING: issue-335a.pdf (trailer, offset 1168): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 1328): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 1329): name with stray # will not work with PDF >= 1.2
 WARNING: issue-335a.pdf (trailer, offset 1332): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 1033): dictionary has duplicated key /L
 WARNING: issue-335a.pdf (trailer, offset 1333): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 1344): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 1428): unexpected )

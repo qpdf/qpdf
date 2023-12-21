@@ -1195,6 +1195,13 @@ test_31(QPDF& pdf, char const* arg2)
     // mistakenly parsed as an indirect object.
     assert(QPDFObjectHandle::parse(&pdf, "[5 0 R 0 R /X]").unparse() == "[ 5 0 R 0 (R) /X ]");
     assert(QPDFObjectHandle::parse(&pdf, "[1 0 R]", "indirect test").unparse() == "[ 1 0 R ]");
+    // TC:QPDFParser bad brace
+    assert(QPDFObjectHandle::parse(&pdf, "}").unparse() == "null");
+    assert(QPDFObjectHandle::parse(&pdf, "{").unparse() == "null");
+    // TC:QPDFParser bad dictionary close
+    assert(QPDFObjectHandle::parse(&pdf, ">>").unparse() == "null");
+    // TC:QPDFParser eof in parse
+    assert(QPDFObjectHandle::parse(&pdf, "[7 0 R]").getArrayItem(0).isNull());
 }
 
 static void
