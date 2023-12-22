@@ -1,3 +1,9 @@
+2023-12-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* When setting a check box value, allow any value other than /Off
+	to mean checked. This is permitted by the spec. Previously, any
+	value other than /Yes or /Off was rejected. Fixes #1056.
+
 2023-12-21  Jay Berkenbilt  <ejb@ql.org>
 
 	* Fix to QPDF JSON: a floating point number that appears in

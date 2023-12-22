@@ -304,10 +304,10 @@ QPDFFormFieldObjectHelper::setV(QPDFObjectHandle value, bool need_appearances)
             bool okay = false;
             if (value.isName()) {
                 std::string name = value.getName();
-                if ((name == "/Yes") || (name == "/Off")) {
-                    okay = true;
-                    setCheckBoxValue((name == "/Yes"));
-                }
+                okay = true;
+                // Accept any value other than /Off to mean checked. Files have been seen that use
+                // /1 or other values.
+                setCheckBoxValue((name != "/Off"));
             }
             if (!okay) {
                 this->oh.warnIfPossible("ignoring attempt to set a checkbox field to a value of "

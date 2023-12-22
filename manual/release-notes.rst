@@ -56,6 +56,11 @@ Planned changes for future 12.x (subject to change):
       in scientific notation to fixed-point notation since PDF doesn't
       accept scientific notation.
 
+    - When setting a check box value, allow any value other than
+      ``/Off`` to mean checked. This is permitted by the spec.
+      Previously, any value other than ``/Yes`` or ``/Off`` was
+      rejected.
+
   - Build Enhancements:
 
     - The qpdf test suite now passes when qpdf is linked with an
