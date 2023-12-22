@@ -135,7 +135,7 @@ $td->runtest("empty owner password",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("allow insecure",
-             {$td->COMMAND => "qpdf --encrypt u '' 256 --allow-insecure --" .
+             {$td->COMMAND => "qpdf --encrypt --user-password=u --bits=256 --allow-insecure --" .
                   " minimal.pdf a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
@@ -561,7 +561,7 @@ foreach my $d (['--force-V4', 'V4'],
     my ($args, $out) = @$d;
     $td->runtest("encrypt $args",
                  {$td->COMMAND => "qpdf --static-aes-iv --static-id" .
-                      " --allow-weak-crypto --encrypt '' '' 128 $args --" .
+                      " --allow-weak-crypto --encrypt --bits=128 $args --" .
                       " enc-base.pdf a.pdf"},
                  {$td->STRING => "", $td->EXIT_STATUS => 0});
     $td->runtest("check output",

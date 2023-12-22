@@ -17,21 +17,21 @@ my $td = new TestDriver('weak-cryptography-cryptography');
 my $n_tests = 4;
 
 $td->runtest("256-bit: no warning",
-             {$td->COMMAND => 'qpdf --encrypt "" "" 256 -- minimal.pdf a.pdf'},
+             {$td->COMMAND => 'qpdf --encrypt --bits=256 -- minimal.pdf a.pdf'},
              {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("128-bit with AES: no warning",
-             {$td->COMMAND => 'qpdf --encrypt "" "" 128 --use-aes=y --' .
+             {$td->COMMAND => 'qpdf --encrypt --bits=128 --use-aes=y --' .
                   ' minimal.pdf a.pdf'},
              {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("128-bit without AES: error",
-             {$td->COMMAND => 'qpdf --encrypt "" "" 128 -- minimal.pdf a.pdf'},
+             {$td->COMMAND => 'qpdf --encrypt --bits=128 -- minimal.pdf a.pdf'},
              {$td->REGEXP => "Pass --allow-weak-crypto to enable",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("40-bit: error",
-             {$td->COMMAND => 'qpdf --encrypt "" "" 40 -- minimal.pdf a.pdf'},
+             {$td->COMMAND => 'qpdf --encrypt --bits=40 -- minimal.pdf a.pdf'},
              {$td->REGEXP => "Pass --allow-weak-crypto to enable",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);

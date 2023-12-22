@@ -71,7 +71,7 @@ foreach my $i (qw(40 128 256))
     }
     $td->runtest("encrypt $i",
                  {$td->COMMAND =>
-                      "qpdf $x --encrypt '' o $i --" .
+                      "qpdf $x --encrypt --owner-password=o --bits=$i --" .
                       " digitally-signed.pdf a.pdf"},
                  {$td->STRING => "",
                       $td->EXIT_STATUS => 0});
@@ -102,7 +102,7 @@ foreach my $i (qw(40 128 256))
     }
     $td->runtest("non sig dict encrypt $i",
                  {$td->COMMAND =>
-                      "qpdf $x --encrypt '' o $i --" .
+                      "qpdf $x --encrypt --owner-password=o --bits=$i --" .
                       " comment-annotation.pdf a.pdf"},
                  {$td->STRING => "",
                       $td->EXIT_STATUS => 0});

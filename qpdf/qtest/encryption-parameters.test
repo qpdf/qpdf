@@ -24,7 +24,7 @@ foreach my $file (qw(short-id long-id))
     $td->runtest("encrypt $file.pdf",
                  {$td->COMMAND =>
                       "qpdf --allow-weak-crypto".
-                      " --encrypt '' pass 40 -- $file.pdf a.pdf"},
+                      " --encrypt --owner-password=pass --bits=40 -- $file.pdf a.pdf"},
                  {$td->STRING => "",
                   $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
