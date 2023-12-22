@@ -23,6 +23,7 @@ static char const* json_key_choices[] = {"acroform", "attachments", "encrypt", "
 static char const* json_output_choices[] = {"2", "latest", 0};
 static char const* json_stream_data_choices[] = {"none", "inline", "file", 0};
 static char const* json_version_choices[] = {"1", "2", "latest", 0};
+static char const* enc_bits_choices[] = {"40", "128", "256", 0};
 static char const* print128_choices[] = {"full", "low", "none", 0};
 static char const* modify128_choices[] = {"all", "annotate", "form", "assembly", "none", 0};
 
@@ -128,6 +129,9 @@ this->ap.addPositional(p(&ArgParser::argPagesPositional));
 this->ap.addRequiredParameter("password", p(&ArgParser::argPagesPassword), "password");
 this->ap.registerOptionTable("encryption", b(&ArgParser::argEndEncryption));
 this->ap.addPositional(p(&ArgParser::argEncPositional));
+this->ap.addRequiredParameter("user-password", p(&ArgParser::argEncUserPassword), "user_password");
+this->ap.addRequiredParameter("owner-password", p(&ArgParser::argEncOwnerPassword), "owner_password");
+this->ap.addChoices("bits", p(&ArgParser::argEncBits), true, enc_bits_choices);
 this->ap.registerOptionTable("40-bit encryption", b(&ArgParser::argEnd40BitEncryption));
 this->ap.addChoices("extract", [this](std::string const& x){c_enc->extract(x);}, true, yn_choices);
 this->ap.addChoices("annotate", [this](std::string const& x){c_enc->annotate(x);}, true, yn_choices);

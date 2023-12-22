@@ -31,8 +31,9 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "jsonOutput": "apply defaults for JSON serialization",
   "removeRestrictions": "remove security restrictions from input file",
   "encrypt": {
-    "userPassword": "user password",
-    "ownerPassword": "owner password",
+    "userPassword": "specify user password",
+    "ownerPassword": "specify owner password",
+    "Bits": null,
     "40bit": {
       "annotate": "restrict document annotation",
       "extract": "restrict text/graphic extraction",

@@ -152,10 +152,25 @@ ap.addOptionHelp("--encrypt", "transformation", "start encryption options", R"(-
 
 Run qpdf --help=encryption for details.
 )");
+ap.addOptionHelp("--user-password", "transformation", "specify user password", R"(--user-password=user-password
+
+Set the user password.
+)");
+ap.addOptionHelp("--owner-password", "transformation", "specify owner password", R"(--owner-password=owner-password
+
+Set the owner password.
+)");
+ap.addOptionHelp("--bits", "transformation", "specify encryption bit depth", R"(--bits={48|128|256}
+
+Set the encrypt bit depth. Use 256.
+)");
 ap.addOptionHelp("--decrypt", "transformation", "remove encryption from input file", R"(Create an unencrypted output file even if the input file was
 encrypted. Normally qpdf preserves whatever encryption was
 present on the input file. This option overrides that behavior.
 )");
+}
+static void add_help_3(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--remove-restrictions", "transformation", "remove security restrictions from input file", R"(Remove restrictions associated with digitally signed PDF files.
 This may be combined with --decrypt to allow free editing of
 previously signed/encrypted files. This option invalidates the
@@ -172,9 +187,6 @@ ap.addOptionHelp("--encryption-file-password", "transformation", "supply passwor
 If the file named in --copy-encryption requires a password, use
 this option to supply the password.
 )");
-}
-static void add_help_3(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--qdf", "transformation", "enable viewing PDF code in a text editor", R"(Create a PDF file suitable for viewing in a text editor and even
 editing. This is for editing the PDF code, not the page contents.
 All streams that can be uncompressed are uncompressed, and
@@ -270,6 +282,9 @@ ap.addOptionHelp("--ii-min-bytes", "transformation", "set minimum size for --ext
 Don't externalize inline images smaller than this size. The
 default is 1,024. Use 0 for no minimum.
 )");
+}
+static void add_help_4(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--min-version", "transformation", "set minimum PDF version", R"(--min-version=version
 
 Force the PDF version of the output to be at least the specified
@@ -297,9 +312,6 @@ resulting set of pages, where :odd starts with the first page and
 :even starts with the second page. These are odd and even pages
 from the resulting set, not based on the original page numbers.
 )");
-}
-static void add_help_4(QPDFArgParser& ap)
-{
 ap.addHelpTopic("modification", "change parts of the PDF", R"(Modification options make systematic changes to certain parts of
 the PDF, causing the PDF to render differently from the original.
 )");
@@ -392,6 +404,9 @@ ap.addOptionHelp("--keep-inline-images", "modification", "exclude inline images 
 )");
 ap.addOptionHelp("--remove-page-labels", "modification", "remove explicit page numbers", R"(Exclude page labels (explicit page numbers) from the output file.
 )");
+}
+static void add_help_5(QPDFArgParser& ap)
+{
 ap.addHelpTopic("encryption", "create encrypted files", R"(Create encrypted files. Usage:
 
 --encrypt user-password owner-password key-length [options] --
@@ -467,9 +482,6 @@ and filling in form fields. For 128-bit and 256-bit encryption,
 this also enables editing, creating, and deleting form fields
 unless --modify-other=n or --modify=none is also specified.
 )");
-}
-static void add_help_5(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--assemble", "encryption", "restrict document assembly", R"(--assemble=[y|n]
 
 Enable/disable document assembly (rotation and reordering of
@@ -628,6 +640,9 @@ Specify pages from the overlay/underlay that are repeated after
 "from" pages have been exhausted. See qpdf --help=page-ranges
 for help with the page range syntax.
 )");
+}
+static void add_help_6(QPDFArgParser& ap)
+{
 ap.addHelpTopic("attachments", "work with embedded files", R"(It is possible to list, add, or delete embedded files (also known
 as attachments) and to copy attachments from other files. See help
 on individual options for details. Run qpdf --help=add-attachment
@@ -645,9 +660,6 @@ The --copy-attachments-from flag and its options may be repeated
 to copy attachments from multiple files. Run
 qpdf --help=copy-attachments for details.
 )");
-}
-static void add_help_6(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--remove-attachment", "attachments", "remove an embedded file", R"(--remove-attachment=key
 
 Remove an embedded file using its key. Get the key with
@@ -746,6 +758,9 @@ of the actual PDF page content or semantic correctness of the
 PDF file. It merely checks that the PDF file is syntactically
 valid. See also qpdf --help=exit-status.
 )");
+}
+static void add_help_7(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--show-encryption", "inspection", "information about encrypted files", R"(Show document encryption parameters. Also show the document's
 user password if the owner password is given and the file was
 encrypted using older encryption formats that allow user
@@ -757,9 +772,6 @@ underlying encryption key to be displayed.
 ap.addOptionHelp("--check-linearization", "inspection", "check linearization tables", R"(Check to see whether a file is linearized and, if so, whether
 the linearization hint tables are correct.
 )");
-}
-static void add_help_7(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--show-linearization", "inspection", "show linearization hint tables", R"(Check and display all data in the linearization hint tables.
 )");
 ap.addOptionHelp("--show-xref", "inspection", "show cross reference data", R"(Show the contents of the cross-reference table or stream (object
@@ -840,6 +852,9 @@ object number. The prefix can be overridden with
 when --json-output is specified, in which case the default is
 "inline".
 )");
+}
+static void add_help_8(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--json-stream-prefix", "json", "prefix for json stream data files", R"(--json-stream-prefix=file-prefix
 
 When used with --json-stream-data=file, --json-stream-data=file-prefix
@@ -860,9 +875,6 @@ ap.addOptionHelp("--json-input", "json", "input file is qpdf JSON", R"(Treat the
 "qpdf JSON Format" section of the manual for information about
 how to use this option.
 )");
-}
-static void add_help_8(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--update-from-json", "json", "update a PDF from qpdf JSON", R"(--update-from-json=qpdf-json-file
 
 Update a PDF file from a JSON file. Please see the "qpdf JSON"

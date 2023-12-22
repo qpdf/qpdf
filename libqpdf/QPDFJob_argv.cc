@@ -204,6 +204,24 @@ ArgParser::argEncPositional(std::string const& arg)
 }
 
 void
+ArgParser::argEncUserPassword(std::string const& arg)
+{
+    // QXXXQ
+}
+
+void
+ArgParser::argEncOwnerPassword(std::string const& arg)
+{
+    // QXXXQ
+}
+
+void
+ArgParser::argEncBits(std::string const& arg)
+{
+    // QXXXQ
+}
+
+void
 ArgParser::argPages()
 {
     this->accumulated_args.clear();

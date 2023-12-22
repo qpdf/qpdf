@@ -109,6 +109,10 @@ Handlers::initHandlers()
 
 #include <qpdf/auto_job_json_init.hh>
 
+    // We have `bits` in the CLI but not in the JSON. Reference this variable so it doesn't generate
+    // a warning.
+    [](char const**) {}(enc_bits_choices);
+
     if (this->json_handlers.size() != 1) {
         throw std::logic_error("QPDFJob_json: json_handlers size != 1 at end");
     }

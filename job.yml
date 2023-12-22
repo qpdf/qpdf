@@ -60,6 +60,10 @@ choices:
     - 1
     - 2
     - latest
+  enc_bits:
+    - 40
+    - 128
+    - 256
   print128:
     - full
     - low
@@ -194,8 +198,18 @@ options:
     required_parameter:
       password: password
   - table: encryption
+    config: c_main
     prefix: Enc
     positional: true
+    manual:
+      - user-password
+      - owner-password
+      - bits
+    required_parameter:
+      user-password: user_password
+      owner-password: owner_password
+    required_choices:
+      bits: enc_bits
   - table: 40-bit encryption
     config: c_enc
     config_prefix: Enc
@@ -276,10 +290,14 @@ json:
   # match a command-line option, and its properties and help come from
   # other information known by generate_auto_job. This information is
   # used to construct a "schema" (as in JSON.hh) for the json input to
-  # QPDFJob. The leading underscore is removed. *NOTE*: all keys are
-  # converted to camelCase for the schema and must appear that way
-  # in the user-supplied json. This makes it more convenient to
-  # populate JSON objects in some languages.
+  # QPDFJob. The leading underscore is removed. If a key starts with a
+  # double underscore, it corresponds to a command-line argument that
+  # does not have a counterpart in the JSON. This signals that the
+  # command-line argument was not forgotten, but it is otherwise
+  # ignored by the JSON. *NOTE*: all keys are converted to camelCase
+  # for the schema and must appear that way in the user-supplied json.
+  # This makes it more convenient to populate JSON objects in some
+  # languages.
 
   # input
   _inputFile: "input filename"
@@ -316,8 +334,9 @@ json:
   json-output:
   remove-restrictions:
   encrypt:
-    _user-password: "user password"
-    _owner-password: "owner password"
+    user-password:
+    owner-password:
+    __bits:
     _40bit:
       Enc40.annotate:
       Enc40.extract:

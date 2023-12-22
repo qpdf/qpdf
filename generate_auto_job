@@ -738,6 +738,11 @@ class Main:
 
         if flag in expected:
             options_seen.add(flag)
+        elif flag.startswith('__'):
+            # This marks a flag that has no JSON equivalent because it
+            # is handled in some other fashion.
+            options_seen.add(flag[2:])
+            return
         elif isinstance(j, str):
             if not flag.startswith('_'):
                 raise Exception(f'json: {flag} has a description'

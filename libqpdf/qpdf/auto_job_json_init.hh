@@ -16,6 +16,7 @@ static char const* json_key_choices[] = {"acroform", "attachments", "encrypt", "
 static char const* json_output_choices[] = {"2", "latest", 0};
 static char const* json_stream_data_choices[] = {"none", "inline", "file", 0};
 static char const* json_version_choices[] = {"1", "2", "latest", 0};
+static char const* enc_bits_choices[] = {"40", "128", "256", 0};
 static char const* print128_choices[] = {"full", "low", "none", 0};
 static char const* modify128_choices[] = {"all", "annotate", "form", "assembly", "none", 0};
 
@@ -120,6 +121,8 @@ popHandler(); // key: userPassword
 pushKey("ownerPassword");
 setupEncryptOwnerPassword();
 popHandler(); // key: ownerPassword
+pushKey("Bits");
+popHandler(); // key: Bits
 pushKey("40bit");
 beginDict(bindJSON(&Handlers::beginEncrypt40bit), bindBare(&Handlers::endEncrypt40bit)); // .encrypt.40bit
 pushKey("annotate");

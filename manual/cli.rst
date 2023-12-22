@@ -723,6 +723,32 @@ Related Options
    This flag starts encryption options, used to create encrypted
    files. Please see :ref:`encryption-options` for details.
 
+.. qpdf:option:: --user-password=user-password
+
+   .. help: specify user password
+
+      Set the user password.
+
+   Set the user password for the encrypted file.
+
+.. qpdf:option:: --owner-password=owner-password
+
+   .. help: specify owner password
+
+      Set the owner password.
+
+   Set the owner password for the encrypted file.
+
+.. qpdf:option:: --bits={48|128|256}
+
+   .. help: specify encryption bit depth
+
+      Set the encrypt bit depth. Use 256.
+
+   Set the bit depth for encrypted files. You should always use
+   ``--bits=256`` unless you have a strong reason to create a file
+   with weaker encryption.
+
 .. qpdf:option:: --decrypt
 
    .. help: remove encryption from input file
