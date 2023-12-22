@@ -2,18 +2,12 @@
 
 // See "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-maintainer.
 
-#include <cctype>
-#include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <memory>
-#include <sstream>
 
-#include <qpdf/QIntC.hh>
 #include <qpdf/QPDFArgParser.hh>
 #include <qpdf/QPDFCryptoProvider.hh>
-#include <qpdf/QPDFJob.hh>
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
