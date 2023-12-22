@@ -714,7 +714,7 @@ Related Options
    important cross-reference information typically appears at the end
    of the file.
 
-.. qpdf:option:: --encrypt user-password owner-password key-length [options] --
+.. qpdf:option:: --encrypt [options] --
 
    .. help: start encryption options
 
@@ -722,32 +722,6 @@ Related Options
 
    This flag starts encryption options, used to create encrypted
    files. Please see :ref:`encryption-options` for details.
-
-.. qpdf:option:: --user-password=user-password
-
-   .. help: specify user password
-
-      Set the user password.
-
-   Set the user password for the encrypted file.
-
-.. qpdf:option:: --owner-password=owner-password
-
-   .. help: specify owner password
-
-      Set the owner password.
-
-   Set the owner password for the encrypted file.
-
-.. qpdf:option:: --bits={48|128|256}
-
-   .. help: specify encryption bit depth
-
-      Set the encrypt bit depth. Use 256.
-
-   Set the bit depth for encrypted files. You should always use
-   ``--bits=256`` unless you have a strong reason to create a file
-   with weaker encryption.
 
 .. qpdf:option:: --decrypt
 
@@ -1758,13 +1732,31 @@ Encryption
 
    Create encrypted files. Usage:
 
+   --encrypt \
+     [--user-password=user-password] \
+     [--owner-password=owner-password] \
+     --bits=key-length [options] --
+
+   OR
+
    --encrypt user-password owner-password key-length [options] --
 
-   Either or both of user-password and owner-password may be empty
-   strings, though setting either to the empty string enables the file
-   to be opened and decrypted without a password. key-length may be
-   40, 128, or 256. Encryption options are terminated by "--" by
-   itself.
+   The first form, with flags for the passwords and bit length, was
+   introduced in qpdf 11.7.0. Only the --bits option is is mandatory.
+   This form allows you to use any text as the password. If passwords
+   are specified, they must be given before the --bits option.
+
+   The second form has been in qpdf since the beginning and wil
+   continue to be supported. Either or both of user-password and
+   owner-password may be empty strings.
+
+   The key-length parameter must be either 40, 128, or 256. The user
+   and/or owner password may be omitted. Omitting either pasword
+   enables the PDF file to be opened without a password. Specifying
+   the same value for the user and owner password and specifying an
+   empty owner password are both considered insecure.
+
+   Encryption options are terminated by "--" by itself.
 
    40-bit encryption is insecure, as is 128-bit encryption without
    AES. Use 256-bit encryption unless you have a specific reason to
@@ -1823,17 +1815,38 @@ and :qpdf:ref:`--copy-encryption`. For a more in-depth technical
 discussion of how PDF encryption works internally, see
 :ref:`pdf-encryption`.
 
-To create an encrypted file, use
+To create an encrypted file, use one of
+
+::
+
+   --encrypt \
+     [--user-password=user-password] \
+     [--owner-password=owner-password] \
+     --bits=key-length [options] --
+
+OR
 
 ::
 
    --encrypt user-password owner-password key-length [options] --
 
-Either or both of :samp:`{user-password}` and :samp:`{owner-password}`
-may be empty strings, though setting either to the empty string
-enables the file to be opened and decrypted without a password..
-:samp:`{key-length}` may be ``40``, ``128``, or ``256``. Encryption
-options are terminated by ``--`` by itself.
+The first form, with flags for the passwords and bit length, was
+introduced in qpdf 11.7.0. Only the :qpdf:ref:`--bits` option is is
+mandatory. This form allows you to use any text as the password. If
+passwords are specified, they must be given before the
+:qpdf:ref:`--bits` option.
+
+The second form has been in qpdf since the beginning and wil
+continue to be supported. Either or both of user-password and
+owner-password may be empty strings.
+
+The ``key-length`` parameter must be either ``40``, ``128``, or
+``256``. The user and/or owner password may be omitted. Omitting
+either pasword enables the PDF file to be opened without a password.
+Specifying the same value for the user and owner password and
+specifying an empty owner password are both considered insecure.
+
+Encryption options are terminated by ``--`` by itself.
 
 40-bit encryption is insecure, as is 128-bit encryption without AES.
 Use 256-bit encryption unless you have a specific reason to use an
@@ -1970,6 +1983,36 @@ help for each option.
 
 Related Options
 ~~~~~~~~~~~~~~~
+
+.. qpdf:option:: --user-password=user-password
+
+   .. help: specify user password
+
+      Set the user password of the encrypted file.
+
+   Set the user passwrod of the encrypted file. Conforming readers
+   apply security restrictions to files opened with the user password.
+
+.. qpdf:option:: --owner-password=owner-password
+
+   .. help: specify owner password
+
+      Set the owner password of the encrypted file.
+
+   Set the owner passwrod of the encrypted file. Conforming readers
+   apply allow security restrictions to be changed or overridden when
+   files are opened with the owner password.
+
+.. qpdf:option:: --bits={48|128|256}
+
+   .. help: specify encryption key length
+
+      Specify the encryption key length. For best security, always use
+      a key length of 256.
+
+   Set the key length for encrypted files. You should always use
+   ``--bits=256`` unless you have a strong reason to create a file
+   with weaker encryption.
 
 .. qpdf:option:: --accessibility=[y|n]
 

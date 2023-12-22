@@ -15,7 +15,7 @@ cleanup();
 
 my $td = new TestDriver('arg-parsing');
 
-my $n_tests = 17;
+my $n_tests = 21;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -107,6 +107,22 @@ $td->runtest("empty and replace-input",
              {$td->REGEXP => ".*--replace-input may not be used with --empty.*",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
+
+# Disallow mixing positional and flag-style encryption arguments.
+my @bad_enc = (
+    "u --owner-password=x",
+    "u o --bits=128",
+    "--user-password=u o",
+    "--user-password=u --owner-password=o 256",
+    );
+foreach my $arg (@bad_enc)
+{
+    $td->runtest("mixed encryption args ($arg)",
+                 {$td->COMMAND => "qpdf --encrypt $arg"},
+                 {$td->REGEXP => ".*positional and dashed encryption arguments may not be mixed",
+                      $td->EXIT_STATUS => 2},
+                 $td->NORMALIZE_NEWLINES);
+}
 
 cleanup();
 $td->report($n_tests);

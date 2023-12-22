@@ -61,6 +61,16 @@ Planned changes for future 12.x (subject to change):
       Previously, any value other than ``/Yes`` or ``/Off`` was
       rejected.
 
+  - CLI Enhancements:
+
+    - Allow the syntax ``--encrypt --user-password=user-password
+      --owner-password=owner-password --bits={40,128,256}`` when
+      encrypting PDF files. This is an alternative to the syntax
+      ``--encrypt user-password owner-password {40,128,256}``, which
+      will continue to be supported. The new syntax works better with
+      shell completion and allows creation of passwords that start
+      with ``-``.
+
   - Build Enhancements:
 
     - The qpdf test suite now passes when qpdf is linked with an

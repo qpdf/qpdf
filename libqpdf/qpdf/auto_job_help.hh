@@ -148,29 +148,14 @@ the structure without changing the content.
 )");
 ap.addOptionHelp("--linearize", "transformation", "linearize (web-optimize) output", R"(Create linearized (web-optimized) output files.
 )");
-ap.addOptionHelp("--encrypt", "transformation", "start encryption options", R"(--encrypt user-password owner-password key-length [options] --
+ap.addOptionHelp("--encrypt", "transformation", "start encryption options", R"(--encrypt [options] --
 
 Run qpdf --help=encryption for details.
-)");
-ap.addOptionHelp("--user-password", "transformation", "specify user password", R"(--user-password=user-password
-
-Set the user password.
-)");
-ap.addOptionHelp("--owner-password", "transformation", "specify owner password", R"(--owner-password=owner-password
-
-Set the owner password.
-)");
-ap.addOptionHelp("--bits", "transformation", "specify encryption bit depth", R"(--bits={48|128|256}
-
-Set the encrypt bit depth. Use 256.
 )");
 ap.addOptionHelp("--decrypt", "transformation", "remove encryption from input file", R"(Create an unencrypted output file even if the input file was
 encrypted. Normally qpdf preserves whatever encryption was
 present on the input file. This option overrides that behavior.
 )");
-}
-static void add_help_3(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--remove-restrictions", "transformation", "remove security restrictions from input file", R"(Remove restrictions associated with digitally signed PDF files.
 This may be combined with --decrypt to allow free editing of
 previously signed/encrypted files. This option invalidates the
@@ -187,6 +172,9 @@ ap.addOptionHelp("--encryption-file-password", "transformation", "supply passwor
 If the file named in --copy-encryption requires a password, use
 this option to supply the password.
 )");
+}
+static void add_help_3(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--qdf", "transformation", "enable viewing PDF code in a text editor", R"(Create a PDF file suitable for viewing in a text editor and even
 editing. This is for editing the PDF code, not the page contents.
 All streams that can be uncompressed are uncompressed, and
@@ -282,9 +270,6 @@ ap.addOptionHelp("--ii-min-bytes", "transformation", "set minimum size for --ext
 Don't externalize inline images smaller than this size. The
 default is 1,024. Use 0 for no minimum.
 )");
-}
-static void add_help_4(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--min-version", "transformation", "set minimum PDF version", R"(--min-version=version
 
 Force the PDF version of the output to be at least the specified
@@ -312,6 +297,9 @@ resulting set of pages, where :odd starts with the first page and
 :even starts with the second page. These are odd and even pages
 from the resulting set, not based on the original page numbers.
 )");
+}
+static void add_help_4(QPDFArgParser& ap)
+{
 ap.addHelpTopic("modification", "change parts of the PDF", R"(Modification options make systematic changes to certain parts of
 the PDF, causing the PDF to render differently from the original.
 )");
@@ -404,18 +392,33 @@ ap.addOptionHelp("--keep-inline-images", "modification", "exclude inline images 
 )");
 ap.addOptionHelp("--remove-page-labels", "modification", "remove explicit page numbers", R"(Exclude page labels (explicit page numbers) from the output file.
 )");
-}
-static void add_help_5(QPDFArgParser& ap)
-{
 ap.addHelpTopic("encryption", "create encrypted files", R"(Create encrypted files. Usage:
+
+--encrypt \
+  [--user-password=user-password] \
+  [--owner-password=owner-password] \
+  --bits=key-length [options] --
+
+OR
 
 --encrypt user-password owner-password key-length [options] --
 
-Either or both of user-password and owner-password may be empty
-strings, though setting either to the empty string enables the file
-to be opened and decrypted without a password. key-length may be
-40, 128, or 256. Encryption options are terminated by "--" by
-itself.
+The first form, with flags for the passwords and bit length, was
+introduced in qpdf 11.7.0. Only the --bits option is is mandatory.
+This form allows you to use any text as the password. If passwords
+are specified, they must be given before the --bits option.
+
+The second form has been in qpdf since the beginning and wil
+continue to be supported. Either or both of user-password and
+owner-password may be empty strings.
+
+The key-length parameter must be either 40, 128, or 256. The user
+and/or owner password may be omitted. Omitting either pasword
+enables the PDF file to be opened without a password. Specifying
+the same value for the user and owner password and specifying an
+empty owner password are both considered insecure.
+
+Encryption options are terminated by "--" by itself.
 
 40-bit encryption is insecure, as is 128-bit encryption without
 AES. Use 256-bit encryption unless you have a specific reason to
@@ -467,6 +470,22 @@ Values for modify-opt:
   form                     assembly + filling in form fields and signing
   annotate                 form + commenting and modifying forms
   all                      allow full document modification
+)");
+ap.addOptionHelp("--user-password", "encryption", "specify user password", R"(--user-password=user-password
+
+Set the user password of the encrypted file.
+)");
+ap.addOptionHelp("--owner-password", "encryption", "specify owner password", R"(--owner-password=owner-password
+
+Set the owner password of the encrypted file.
+)");
+}
+static void add_help_5(QPDFArgParser& ap)
+{
+ap.addOptionHelp("--bits", "encryption", "specify encryption key length", R"(--bits={48|128|256}
+
+Specify the encryption key length. For best security, always use
+a key length of 256.
 )");
 ap.addOptionHelp("--accessibility", "encryption", "restrict document accessibility", R"(--accessibility=[y|n]
 

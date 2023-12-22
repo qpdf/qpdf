@@ -35,6 +35,9 @@ namespace
         std::shared_ptr<QPDFJob::EncConfig> c_enc;
         std::vector<std::string> accumulated_args;
         std::shared_ptr<char> pages_password{nullptr};
+        std::string user_password;
+        std::string owner_password;
+        bool used_enc_password_args{false};
         bool gave_input{false};
         bool gave_output{false};
     };
@@ -161,64 +164,67 @@ void
 ArgParser::argEncrypt()
 {
     this->accumulated_args.clear();
-    if (this->ap.isCompleting() && this->ap.argsLeft() == 0) {
-        this->ap.insertCompletion("user-password");
-    }
     this->ap.selectOptionTable(O_ENCRYPTION);
 }
 
 void
 ArgParser::argEncPositional(std::string const& arg)
 {
+    if (used_enc_password_args) {
+        usage("positional and dashed encryption arguments may not be mixed");
+    }
+
     this->accumulated_args.push_back(arg);
-    size_t n_args = this->accumulated_args.size();
-    if (n_args < 3) {
-        if (this->ap.isCompleting() && (this->ap.argsLeft() == 0)) {
-            if (n_args == 1) {
-                this->ap.insertCompletion("owner-password");
-            } else if (n_args == 2) {
-                this->ap.insertCompletion("40");
-                this->ap.insertCompletion("128");
-                this->ap.insertCompletion("256");
-            }
-        }
+    if (this->accumulated_args.size() < 3) {
         return;
     }
-    std::string user_password = this->accumulated_args.at(0);
-    std::string owner_password = this->accumulated_args.at(1);
-    std::string len_str = this->accumulated_args.at(2);
+    user_password = this->accumulated_args.at(0);
+    owner_password = this->accumulated_args.at(1);
+    auto len_str = this->accumulated_args.at(2);
+    this->accumulated_args.clear();
+    argEncBits(len_str);
+}
+
+void
+ArgParser::argEncUserPassword(std::string const& arg)
+{
+    if (!accumulated_args.empty()) {
+        usage("positional and dashed encryption arguments may not be mixed");
+    }
+    this->used_enc_password_args = true;
+    this->user_password = arg;
+}
+
+void
+ArgParser::argEncOwnerPassword(std::string const& arg)
+{
+    if (!accumulated_args.empty()) {
+        usage("positional and dashed encryption arguments may not be mixed");
+    }
+    this->used_enc_password_args = true;
+    this->owner_password = arg;
+}
+
+void
+ArgParser::argEncBits(std::string const& arg)
+{
+    if (!accumulated_args.empty()) {
+        usage("positional and dashed encryption arguments may not be mixed");
+    }
     int keylen = 0;
-    if (len_str == "40") {
+    if (arg == "40") {
         keylen = 40;
         this->ap.selectOptionTable(O_40_BIT_ENCRYPTION);
-    } else if (len_str == "128") {
+    } else if (arg == "128") {
         keylen = 128;
         this->ap.selectOptionTable(O_128_BIT_ENCRYPTION);
-    } else if (len_str == "256") {
+    } else if (arg == "256") {
         keylen = 256;
         this->ap.selectOptionTable(O_256_BIT_ENCRYPTION);
     } else {
         usage("encryption key length must be 40, 128, or 256");
     }
     this->c_enc = c_main->encrypt(keylen, user_password, owner_password);
-}
-
-void
-ArgParser::argEncUserPassword(std::string const& arg)
-{
-    // QXXXQ
-}
-
-void
-ArgParser::argEncOwnerPassword(std::string const& arg)
-{
-    // QXXXQ
-}
-
-void
-ArgParser::argEncBits(std::string const& arg)
-{
-    // QXXXQ
 }
 
 void
