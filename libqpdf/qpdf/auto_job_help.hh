@@ -419,7 +419,7 @@ continue to be supported. Either or both of user-password and
 owner-password may be empty strings.
 
 The key-length parameter must be either 40, 128, or 256. The user
-and/or owner password may be omitted. Omitting either pasword
+and/or owner password may be omitted. Omitting either password
 enables the PDF file to be opened without a password. Specifying
 the same value for the user and owner password and specifying an
 empty owner password are both considered insecure.

@@ -1769,7 +1769,7 @@ Encryption
    owner-password may be empty strings.
 
    The key-length parameter must be either 40, 128, or 256. The user
-   and/or owner password may be omitted. Omitting either pasword
+   and/or owner password may be omitted. Omitting either password
    enables the PDF file to be opened without a password. Specifying
    the same value for the user and owner password and specifying an
    empty owner password are both considered insecure.
@@ -1860,7 +1860,7 @@ owner-password may be empty strings.
 
 The ``key-length`` parameter must be either ``40``, ``128``, or
 ``256``. The user and/or owner password may be omitted. Omitting
-either pasword enables the PDF file to be opened without a password.
+either password enables the PDF file to be opened without a password.
 Specifying the same value for the user and owner password and
 specifying an empty owner password are both considered insecure.
 
@@ -2008,7 +2008,7 @@ Related Options
 
       Set the user password of the encrypted file.
 
-   Set the user passwrod of the encrypted file. Conforming readers
+   Set the user password of the encrypted file. Conforming readers
    apply security restrictions to files opened with the user password.
 
 .. qpdf:option:: --owner-password=owner-password
@@ -2017,7 +2017,7 @@ Related Options
 
       Set the owner password of the encrypted file.
 
-   Set the owner passwrod of the encrypted file. Conforming readers
+   Set the owner password of the encrypted file. Conforming readers
    apply allow security restrictions to be changed or overridden when
    files are opened with the owner password.
 
