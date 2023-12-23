@@ -22,7 +22,7 @@ if(BUILD_DOC)
 endif()
 
 set(MANUAL_SRC ${qpdf_SOURCE_DIR}/manual)
-foreach(F qpdf.1 fix-qdf.1 zlib-flate.1)
+foreach(F fix-qdf.1 zlib-flate.1)
   configure_file(
     ${MANUAL_SRC}/${F}.in
     ${CMAKE_CURRENT_BINARY_DIR}/${F}
@@ -129,7 +129,7 @@ if(NOT WIN32)
   # environment, especially when all they do is refer people to the
   # manual.
   install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/qpdf.1
+    ${qpdf_SOURCE_DIR}/manual/qpdf.1
     ${CMAKE_CURRENT_BINARY_DIR}/fix-qdf.1
     ${CMAKE_CURRENT_BINARY_DIR}/zlib-flate.1
     DESTINATION ${CMAKE_INSTALL_MANDIR}/man1

@@ -4,7 +4,8 @@ cmake_minimum_required(VERSION 3.16)
 # make_dist expects the version line to be on a line by itself after
 # the project line. When updating the version, check make_dist for all
 # the places it has to be updated. The doc configuration and CI build
-# also find the version number here.
+# also find the version number here. generate_auto_job also reads the
+# version from here.
 project(qpdf
   VERSION 11.7.0
   LANGUAGES C CXX)
@@ -312,9 +313,12 @@ endif()
 set(auto_job_inputs
   # Keep in sync with SOURCES in generate_auto_job
   generate_auto_job
+  CMakeLists.txt
   manual/_ext/qpdf.py
   job.yml
-  manual/cli.rst)
+  manual/cli.rst
+  manual/qpdf.1.in
+)
 
 set(auto_job_outputs
   # Keep in sync with DESTS in generate_auto_job
@@ -323,7 +327,9 @@ set(auto_job_outputs
   libqpdf/qpdf/auto_job_help.hh
   libqpdf/qpdf/auto_job_schema.hh
   libqpdf/qpdf/auto_job_json_decl.hh
-  libqpdf/qpdf/auto_job_json_init.hh)
+  libqpdf/qpdf/auto_job_json_init.hh
+  manual/qpdf.1
+)
 
 if(GENERATE_AUTO_JOB)
   add_custom_command(

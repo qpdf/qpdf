@@ -184,10 +184,10 @@ Exit Status
 
    Meaning of exit codes:
 
-   0: no errors or warnings
-   1: not used by qpdf but may be used by the shell if unable to invoke qpdf
-   2: errors detected
-   3: warnings detected, unless --warning-exit-0 is given
+   - 0: no errors or warnings
+   - 1: not used by qpdf but may be used by the shell if unable to invoke qpdf
+   - 2: errors detected
+   - 3: warnings detected, unless --warning-exit-0 is given
 
 The exit status of :command:`qpdf` may be interpreted as follows:
 

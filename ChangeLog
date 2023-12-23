@@ -1,5 +1,8 @@
 2023-12-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* Generate a more complete qpdf "man page" from the same source as
+	qpdf --help. Fixes #874.
+
 	* Allow the syntax "--encrypt --user-password=user-password
 	--owner-password=owner-password --bits={40,128,256}" when
 	encrypting PDF files. This is an alternative to the syntax

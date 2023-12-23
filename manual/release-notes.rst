@@ -80,6 +80,11 @@ Planned changes for future 12.x (subject to change):
       ``README-maintainer.md`` for a detailed explanation of how to
       maintain this.
 
+  - Package Enhancements:
+
+    - A UNIX man page is now automatically generated from the
+      documentation. It contains the same text as ``qpdf --help=all``.
+
   - Library Enhancements:
 
     - Add C++ functions ``qpdf_c_wrap`` and ``qpdf_c_get_qpdf`` to the
