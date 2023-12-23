@@ -85,6 +85,9 @@ Planned changes for future 12.x (subject to change):
       ``README-maintainer.md`` for a detailed explanation of how to
       maintain this.
 
+    - The official Windows installers now offers to modify ``PATH``
+      when installing qpdf.
+
   - Package Enhancements:
 
     - A UNIX man page is now automatically generated from the

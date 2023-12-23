@@ -1,5 +1,9 @@
 2023-12-23  Jay Berkenbilt  <ejb@ql.org>
 
+	* Define CPACK_NSIS_MODIFY_PATH for the Windows builds so the
+	official installers will offer to modify PATH when installing
+	qpdf. Fixes #1054.
+
 	* Add QPDFAcroFormDocumentHelper::disableDigitalSignatures and the
 	--disable-signatures command-line argument. This disables any
 	digital signature fields, leaving their visual representations

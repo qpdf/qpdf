@@ -31,6 +31,7 @@ if [ "$mode" = "maint" ]; then
 elif [ "$mode" = "ci" ]; then
     args=("${args[@]}" -DCI_MODE=1 -DINSTALL_MANUAL=1)
 fi
+args=("${args[@]}" -DCPACK_NSIS_MODIFY_PATH=ON)
 
 set -x
 cmake "${args[@]}" $dir
