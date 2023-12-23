@@ -532,22 +532,6 @@ When done, the following should happen:
   * /tmp/check-abi/new contains new sizes and library
   * run check_abi manually to compare
 
-* Run package tests:
-
-  (Note: can't use DESTDIR because pkg-config won't know about it.)
-
-```
-\rm -rf /tmp/inst build.tmp
-cmake -S . -B build.tmp \
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/tmp/inst
-cmake --build build.tmp -j$(nproc)
-cmake --install build.tmp
-env PKG_CONFIG_PATH=/tmp/inst/lib/pkgconfig \
-    LD_LIBRARY_PATH=/tmp/inst/lib \
-    CMAKE_PREFIX_PATH=/tmp/inst \
-   ./pkg-test/run-all
-```
-
 ## CREATING A RELEASE
 
 * Push to main. This will create an artifact called distribution

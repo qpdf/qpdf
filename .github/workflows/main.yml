@@ -132,6 +132,7 @@ jobs:
       matrix:
         script:
           - build-fuzzer
+          - pkg-test
           - build-linux32
           - test-alt-zlib
           - test-unsigned-char

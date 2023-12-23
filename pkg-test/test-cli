@@ -11,7 +11,7 @@ if [ ! -d "$TMP" ]; then
     exit 2
 fi
 
-WANTED_VERSION=$(awk -F'"' '/#define QPDF_VERSION / {print $2}' include/qpdf/DLL.h)
+WANTED_VERSION=$(awk -F'"' '/# *define QPDF_VERSION / {print $2}' include/qpdf/DLL.h | tail -n 1)
 
 qpdf --version | grep -F $WANTED_VERSION
 qpdf --help
