@@ -71,6 +71,9 @@ popHandler(); // key: decrypt
 pushKey("deterministicId");
 addBare([this]() { c_main->deterministicId(); });
 popHandler(); // key: deterministicId
+pushKey("disableSignatures");
+addBare([this]() { c_main->disableSignatures(); });
+popHandler(); // key: disableSignatures
 pushKey("staticAesIv");
 addBare([this]() { c_main->staticAesIv(); });
 popHandler(); // key: staticAesIv

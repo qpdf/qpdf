@@ -43,6 +43,7 @@ this->ap.addBare("coalesce-contents", [this](){c_main->coalesceContents();});
 this->ap.addBare("copy-attachments-from", b(&ArgParser::argCopyAttachmentsFrom));
 this->ap.addBare("decrypt", [this](){c_main->decrypt();});
 this->ap.addBare("deterministic-id", [this](){c_main->deterministicId();});
+this->ap.addBare("disable-signatures", [this](){c_main->disableSignatures();});
 this->ap.addBare("empty", b(&ArgParser::argEmpty));
 this->ap.addBare("encrypt", b(&ArgParser::argEncrypt));
 this->ap.addBare("externalize-inline-images", [this](){c_main->externalizeInlineImages();});

@@ -16,6 +16,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "decodeLevel": "control which streams to uncompress",
   "decrypt": "remove encryption from input file",
   "deterministicId": "generate ID deterministically",
+  "disableSignatures": "disable digital signature fields",
   "staticAesIv": "use a fixed AES vector",
   "staticId": "use a fixed document ID",
   "noOriginalObjectIds": "omit original object IDs in qdf",

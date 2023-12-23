@@ -71,6 +71,11 @@ Planned changes for future 12.x (subject to change):
       shell completion and allows creation of passwords that start
       with ``-``.
 
+    - Add ``QPDFAcroFormDocumentHelper::disableDigitalSignatures`` and
+      the :qpdf:ref:`--disable-signatures` command-line argument. This
+      disables any digital signature fields, leaving their visual
+      representations intact.
+
   - Build Enhancements:
 
     - The qpdf test suite now passes when qpdf is linked with an

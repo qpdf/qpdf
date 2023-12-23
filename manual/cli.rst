@@ -736,22 +736,40 @@ Related Options
    whatever encryption was present on the input file. This
    functionality is not intended to be used for bypassing copyright
    restrictions or other restrictions placed on files by their
-   producers. See also :qpdf:ref:`--copy-encryption` and
-   :qpdf:ref:`--remove-restrictions`.
+   producers. See also :qpdf:ref:`--copy-encryption`,
+   :qpdf:ref:`--remove-restrictions`, and
+   :qpdf:ref:`--disable-signatures`.
 
 .. qpdf:option:: --remove-restrictions
 
    .. help: remove security restrictions from input file
 
       Remove restrictions associated with digitally signed PDF files.
-      This may be combined with --decrypt to allow free editing of
-      previously signed/encrypted files. This option invalidates the
-      signature but leaves its visual appearance intact.
+      This may be combined with --decrypt and --disable-signatures to
+      allow free editing of previously signed/encrypted files. This
+      option invalidates the signature but leaves its visual
+      appearance intact. See also --disable-signatures.
 
    Remove security restrictions associated with digitally signed PDF
-   files. This may be combined with :qpdf:ref:--decrypt: to allow
-   free editing of previously signed/encrypted files. This option
-   invalidates the signature but leaves its visual appearance intact.
+   files. This may be combined with :qpdf:ref:`--decrypt` and
+   :qpdf:ref:`--disable-signatures` to allow free editing of
+   previously signed/encrypted files. This option invalidates the
+   signature but leaves its visual appearance intact. See also
+   :qpdf:ref:`--disable-signatures`.
+
+.. qpdf:option:: --disable-signatures
+
+   .. help: disable digital signature fields
+
+      Remove all digital signature fields from a file. The appearance
+      of the digital signature, if any, will remain on the page, but
+      it will no longer be a signature field. See also
+      --remove-restrictions.
+
+   Remove all digital signature fields from a file. The appearance
+   of the digital signature, if any, will remain on the page, but
+   it will no longer be a signature field. See also
+   :qpdf:ref:`--remove-restrictions`.
 
 .. qpdf:option:: --copy-encryption=file
 

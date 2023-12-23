@@ -2129,6 +2129,10 @@ QPDFJob::handleTransformations(QPDF& pdf)
     if (m->remove_restrictions) {
         pdf.removeSecurityRestrictions();
     }
+    if (m->disable_signatures) {
+        make_afdh();
+        afdh->disableDigitalSignatures();
+    }
     if (m->externalize_inline_images || (m->optimize_images && (!m->keep_inline_images))) {
         for (auto& ph: dh.getAllPages()) {
             ph.externalizeInlineImages(m->ii_min_bytes);
