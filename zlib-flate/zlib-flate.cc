@@ -15,10 +15,9 @@ void
 usage()
 {
     std::cerr << "Usage: " << whoami << " { -uncompress | -compress[=n] }" << std::endl
-              << "If n is specified with -compress, it is a"
-              << " zlib compression level from" << std::endl
-              << "1 to 9 where lower numbers are faster and"
-              << " less compressed and higher" << std::endl
+              << "If n is specified with -compress, it is a zlib compression level from"
+              << std::endl
+              << "1 to 9 where lower numbers are faster and less compressed and higher" << std::endl
               << "numbers are slower and more compressed" << std::endl;
     exit(2);
 }

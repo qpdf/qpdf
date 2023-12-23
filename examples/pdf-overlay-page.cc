@@ -16,8 +16,8 @@ void
 usage()
 {
     std::cerr << "Usage: " << whoami << " infile pagefile outfile" << std::endl
-              << "Stamp page 1 of pagefile on every page of infile,"
-              << " writing to outfile" << std::endl;
+              << "Stamp page 1 of pagefile on every page of infile, writing to outfile"
+              << std::endl;
     exit(2);
 }
 

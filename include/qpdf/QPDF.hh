@@ -748,7 +748,8 @@ class QPDF
             int& O,
             bool compressed)
         {
-            return qpdf.generateHintStream(xref, lengths, obj_renumber, hint_stream, S, O, compressed);
+            return qpdf.generateHintStream(
+                xref, lengths, obj_renumber, hint_stream, S, O, compressed);
         }
 
         static void

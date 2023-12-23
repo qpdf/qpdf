@@ -15,8 +15,7 @@ void
 usage()
 {
     std::cerr << "Usage: " << whoami << " infile.pdf outfile.pdf [in-password]" << std::endl
-              << "Invert some images in infile.pdf;"
-              << " write output to outfile.pdf" << std::endl;
+              << "Invert some images in infile.pdf; write output to outfile.pdf" << std::endl;
     exit(2);
 }
 

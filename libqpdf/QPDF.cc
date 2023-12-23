@@ -2423,8 +2423,7 @@ QPDF::pipeStreamData(
         file->seek(offset, SEEK_SET);
         auto buf = std::make_unique<char[]>(length);
         if (auto read = file->read(buf.get(), length); read != length) {
-            throw damagedPDF(
-                file, "", offset + toO(read), "unexpected EOF reading stream data");
+            throw damagedPDF(file, "", offset + toO(read), "unexpected EOF reading stream data");
         }
         pipeline->write(buf.get(), length);
         attempted_finish = true;
@@ -2463,7 +2462,7 @@ QPDF::pipeStreamData(
             // ignore
         }
     }
-    return false ;
+    return false;
 }
 
 bool

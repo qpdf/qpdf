@@ -178,8 +178,8 @@ InlineImageTracker::handleToken(QPDFTokenizer::Token const& token)
                 QPDFObjectHandle dict = convertIIDict(QPDFObjectHandle::parse(dict_str));
                 dict.replaceKey("/Length", QPDFObjectHandle::newInteger(QIntC::to_longlong(len)));
                 std::string name = resources.getUniqueResourceName("/IIm", this->min_suffix);
-                QPDFObjectHandle image =
-                    QPDFObjectHandle::newStream(this->qpdf, std::make_shared<Buffer>(std::move(image_data)));
+                QPDFObjectHandle image = QPDFObjectHandle::newStream(
+                    this->qpdf, std::make_shared<Buffer>(std::move(image_data)));
                 image.replaceDict(dict);
                 resources.getKey("/XObject").replaceKey(name, image);
                 write(name);

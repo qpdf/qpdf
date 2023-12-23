@@ -167,8 +167,7 @@ QdfFixer::processLines(std::string const& input)
                 xref_size = 1 + xref.size();
                 auto length = xref_size * esize;
                 std::cout << "  /Length " << length << "\n"
-                          << "  /W [ 1 " << xref_f1_nbytes << " " << xref_f2_nbytes << " ]"
-                          << "\n";
+                          << "  /W [ 1 " << xref_f1_nbytes << " " << xref_f2_nbytes << " ]\n";
                 state = st_in_xref_stream_dict;
             }
         } else if (state == st_in_ostream_dict) {

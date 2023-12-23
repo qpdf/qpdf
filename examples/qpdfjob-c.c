@@ -42,7 +42,7 @@ main(int argc, char* argv[])
     new_argv[1] = infile;
     new_argv[2] = outfile;
     new_argv[3] = "--linearize";
-    new_argv[4] = "--static-id"; /* for testing only */
+    new_argv[4] = "--static-id";          /* for testing only */
     new_argv[5] = "--compress-streams=n"; /* avoid dependency on zlib output */
     new_argv[6] = NULL;
 

@@ -11,10 +11,10 @@ static void
 usage()
 {
     std::cerr << "Usage: " << whoami << std::endl
-              << "This program linearizes the first page of in.pdf to out1.pdf,"
-              << " out2.pdf, and" << std::endl
-              << " out3.pdf, each demonstrating a different way to use the"
-              << " QPDFJob API" << std::endl;
+              << "This program linearizes the first page of in.pdf to out1.pdf, out2.pdf, and"
+              << std::endl
+              << " out3.pdf, each demonstrating a different way to use the QPDFJob API"
+              << std::endl;
     exit(2);
 }
 
@@ -43,7 +43,7 @@ main(int argc, char* argv[])
             ->pageSpec(".", "1")
             ->endPages()
             ->linearize()
-            ->staticId() // for testing only
+            ->staticId()           // for testing only
             ->compressStreams("n") // avoid dependency on zlib output
             ->checkConfiguration();
         j.run();

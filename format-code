@@ -23,7 +23,7 @@
 # are improvements, bump the minimum required version of clang-format
 # here, and update manual/contributing.rst. There's a comment there
 # that refers to this comment. See also .clang-format.
-min_version=16
+min_version=18
 
 clang_version=$(clang-format --version | \
     awk '{for (i=1; i<=NF; i++) if ($i == "version") {print int($(i+1)); exit}}')

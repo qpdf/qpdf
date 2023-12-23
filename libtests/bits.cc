@@ -15,8 +15,7 @@
 static void
 print_values(long long byte_offset, size_t bit_offset, size_t bits_available)
 {
-    std::cout << "byte offset = " << byte_offset << ", "
-              << "bit offset = " << bit_offset << ", "
+    std::cout << "byte offset = " << byte_offset << ", " << "bit offset = " << bit_offset << ", "
               << "bits available = " << bits_available << std::endl;
 }
 
