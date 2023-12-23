@@ -1042,6 +1042,9 @@ QPDFJob::EncConfig::EncConfig(Config* c) :
 QPDFJob::Config*
 QPDFJob::EncConfig::endEncrypt()
 {
+    if (config->o.m->keylen == 0) {
+        usage("encryption key length is required");
+    }
     config->o.m->encrypt = true;
     config->o.m->decrypt = false;
     config->o.m->copy_encryption = false;

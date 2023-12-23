@@ -15,7 +15,7 @@ cleanup();
 
 my $td = new TestDriver('arg-parsing');
 
-my $n_tests = 21;
+my $n_tests = 22;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -105,6 +105,11 @@ $td->runtest("ignore -- at top level",
 $td->runtest("empty and replace-input",
              {$td->COMMAND => "qpdf --empty --replace-input"},
              {$td->REGEXP => ".*--replace-input may not be used with --empty.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("missing key length",
+             {$td->COMMAND => "qpdf --encrypt --"},
+             {$td->REGEXP => ".*encryption key length is required",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 

@@ -163,6 +163,7 @@ ArgParser::argShowCrypto()
 void
 ArgParser::argEncrypt()
 {
+    this->c_enc = c_main->encrypt(0, "", "");
     this->accumulated_args.clear();
     this->ap.selectOptionTable(O_ENCRYPTION);
 }
