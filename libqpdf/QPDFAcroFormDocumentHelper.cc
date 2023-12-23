@@ -416,6 +416,28 @@ QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded()
 }
 
 void
+QPDFAcroFormDocumentHelper::disableDigitalSignatures()
+{
+    std::set<QPDFObjGen> to_remove;
+    auto fields = getFormFields();
+    for (auto& f: fields) {
+        auto ft = f.getFieldType();
+        if (ft == "/Sig") {
+            auto oh = f.getObjectHandle();
+            to_remove.insert(oh.getObjGen());
+            // Make this no longer a form field. If it's also an annotation, the annotation will
+            // survive. If it's only a field and is no longer referenced, it will disappear.
+            oh.removeKey("/FT");
+            // Remove fields that are specific to signature fields.
+            oh.removeKey("/V");
+            oh.removeKey("/SV");
+            oh.removeKey("/Lock");
+        }
+    }
+    removeFormFields(to_remove);
+}
+
+void
 QPDFAcroFormDocumentHelper::adjustInheritedFields(
     QPDFObjectHandle obj,
     bool override_da,

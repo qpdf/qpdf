@@ -163,6 +163,11 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     void generateAppearancesIfNeeded();
 
+    // Disable Digital Signature Fields. Remove all digital signature fields from the document,
+    // leaving any annotation showing the content of the field intact.
+    QPDF_DLL
+    void disableDigitalSignatures();
+
     // Note: this method works on all annotations, not just ones with associated fields. For each
     // annotation in old_annots, apply the given transformation matrix to create a new annotation.
     // New annotations are appended to new_annots. If the annotation is associated with a form
