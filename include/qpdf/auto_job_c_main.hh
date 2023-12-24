@@ -11,7 +11,6 @@ QPDF_DLL Config* checkLinearization();
 QPDF_DLL Config* coalesceContents();
 QPDF_DLL Config* decrypt();
 QPDF_DLL Config* deterministicId();
-QPDF_DLL Config* disableSignatures();
 QPDF_DLL Config* externalizeInlineImages();
 QPDF_DLL Config* filteredStreamData();
 QPDF_DLL Config* flattenRotation();

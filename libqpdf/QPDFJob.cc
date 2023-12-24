@@ -2127,9 +2127,6 @@ QPDFJob::handleTransformations(QPDF& pdf)
         }
     };
     if (m->remove_restrictions) {
-        pdf.removeSecurityRestrictions();
-    }
-    if (m->disable_signatures) {
         make_afdh();
         afdh->disableDigitalSignatures();
     }

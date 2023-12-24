@@ -145,13 +145,6 @@ QPDFJob::Config::deterministicId()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::disableSignatures()
-{
-    o.m->disable_signatures = true;
-    return this;
-}
-
-QPDFJob::Config*
 QPDFJob::Config::encryptionFilePassword(std::string const& parameter)
 {
     o.m->encryption_file_password = QUtil::make_shared_cstr(parameter);

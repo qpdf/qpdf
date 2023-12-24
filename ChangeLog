@@ -4,10 +4,10 @@
 	official installers will offer to modify PATH when installing
 	qpdf. Fixes #1054.
 
-	* Add QPDFAcroFormDocumentHelper::disableDigitalSignatures and the
-	--disable-signatures command-line argument. This disables any
-	digital signature fields, leaving their visual representations
-	intact.
+	* Add QPDFAcroFormDocumentHelper::disableDigitalSignatures, which
+	disables any digital signature fields, leaving their visual
+	representations intact. The --remove-restrictions command-line
+	argument now calls this. Fixes #1015.
 
 2023-12-22  Jay Berkenbilt  <ejb@ql.org>
 

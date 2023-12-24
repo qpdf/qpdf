@@ -71,10 +71,8 @@ Planned changes for future 12.x (subject to change):
       shell completion and allows creation of passwords that start
       with ``-``.
 
-    - Add ``QPDFAcroFormDocumentHelper::disableDigitalSignatures`` and
-      the :qpdf:ref:`--disable-signatures` command-line argument. This
-      disables any digital signature fields, leaving their visual
-      representations intact.
+    - :qpdf:ref:`--remove-restrictions` flag now also disables
+      digital signatures in the file.
 
   - Build Enhancements:
 
@@ -101,6 +99,10 @@ Planned changes for future 12.x (subject to change):
 
     - Add methods to ``Buffer`` to work more easily and efficiently
       with ``std::string``.
+
+    - Add ``QPDFAcroFormDocumentHelper::disableDigitalSignatures``,
+      which disables any digital signature fields, leaving their
+      visual representations intact.
 
 11.6.4: December 10, 2023
   - Bug fixes:

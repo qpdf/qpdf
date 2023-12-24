@@ -557,7 +557,6 @@ class QPDFJob
         bool linearize{false};
         bool decrypt{false};
         bool remove_restrictions{false};
-        bool disable_signatures{false};
         int split_pages{0};
         bool progress{false};
         std::function<void(int)> progress_handler{nullptr};

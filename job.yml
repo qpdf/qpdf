@@ -104,7 +104,6 @@ options:
       - copy-attachments-from
       - decrypt
       - deterministic-id
-      - disable-signatures
       - empty
       - encrypt
       - externalize-inline-images
@@ -320,7 +319,6 @@ json:
   decode-level:
   decrypt:
   deterministic-id:
-  disable-signatures:
   static-aes-iv:
   static-id:
   no-original-object-ids:

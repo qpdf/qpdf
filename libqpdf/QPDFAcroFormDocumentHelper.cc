@@ -418,6 +418,7 @@ QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded()
 void
 QPDFAcroFormDocumentHelper::disableDigitalSignatures()
 {
+    qpdf.removeSecurityRestrictions();
     std::set<QPDFObjGen> to_remove;
     auto fields = getFormFields();
     for (auto& f: fields) {

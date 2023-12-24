@@ -600,7 +600,9 @@ class QPDF
     // Return the previously computed or retrieved encryption key for this file
     QPDF_DLL
     std::string getEncryptionKey() const;
-    // Remove security restrictions associated with digitally signed files.
+    // Remove security restrictions associated with digitally signed files. From qpdf 11.7.0, this
+    // is called by QPDFAcroFormDocumentHelper::disableDigitalSignatures and is more useful when
+    // called from there than when just called by itself.
     QPDF_DLL
     void removeSecurityRestrictions();
 
