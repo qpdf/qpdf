@@ -1,3 +1,7 @@
+2023-12-24  Jay Berkenbilt  <ejb@ql.org>
+
+	* 11.7.0: release
+
 2023-12-23  Jay Berkenbilt  <ejb@ql.org>
 
 	* Define CPACK_NSIS_MODIFY_PATH for the Windows builds so the

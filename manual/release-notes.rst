@@ -38,7 +38,7 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
-11.7.0: not yet released
+11.7.0: December 24, 2023
   - Bug fixes:
 
     - With ``--compress-streams=n``, qpdf was still compressing cross
