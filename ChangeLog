@@ -1,3 +1,8 @@
+2023-12-25  Jay Berkenbilt  <ejb@ql.org>
+
+	* Detect overlong UTF-8 in the UTF-8 decoder, and fix detection of
+	8-bit characters in erroneous UTF-8 strings.
+
 2023-12-24  Jay Berkenbilt  <ejb@ql.org>
 
 	* 11.7.0: release

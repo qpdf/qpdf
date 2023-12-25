@@ -266,6 +266,23 @@ to_utf8_test()
     } catch (std::runtime_error& e) {
         std::cout << "0x80000000: " << e.what() << std::endl;
     }
+
+    // Overlong characters: characters represented by more bytes than necessary.
+    size_t pos = 0;
+    std::string utf8 = "\xC0\x80"                  // 1 << 7
+                       "\xE0\x80\x80"              // 1 << 11
+                       "\xF0\x80\x80\x80"          // 1 << 16
+                       "\xF8\x80\x80\x80\x80"      // 1 << 21
+                       "\xFC\x80\x80\x80\x80\x80"; // 1 << 26
+    auto check = [&pos, &utf8](unsigned long wanted_pos) {
+        bool error = false;
+        assert(QUtil::get_next_utf8_codepoint(utf8, pos, error) == 0 && error && pos == wanted_pos);
+    };
+    check(2);
+    check(5);
+    check(9);
+    check(14);
+    check(20);
 }
 
 static void

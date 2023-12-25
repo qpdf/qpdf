@@ -1485,6 +1485,7 @@ encode_pdfdoc(unsigned long codepoint)
 unsigned long
 QUtil::get_next_utf8_codepoint(std::string const& utf8_val, size_t& pos, bool& error)
 {
+    auto o_pos = pos;
     size_t len = utf8_val.length();
     unsigned char ch = static_cast<unsigned char>(utf8_val.at(pos++));
     error = false;
@@ -1505,7 +1506,7 @@ QUtil::get_next_utf8_codepoint(std::string const& utf8_val, size_t& pos, bool& e
         return 0xfffd;
     }
 
-    unsigned long codepoint = static_cast<unsigned long>(ch & ~to_clear);
+    auto codepoint = static_cast<unsigned long>(ch & ~to_clear);
     while (bytes_needed > 0) {
         --bytes_needed;
         ch = static_cast<unsigned char>(utf8_val.at(pos++));
@@ -1516,6 +1517,31 @@ QUtil::get_next_utf8_codepoint(std::string const& utf8_val, size_t& pos, bool& e
         }
         codepoint <<= 6;
         codepoint += (ch & 0x3f);
+    }
+    unsigned long lower_bound = 0;
+    switch (pos - o_pos) {
+    case 2:
+        lower_bound = 1 << 7;
+        break;
+    case 3:
+        lower_bound = 1 << 11;
+        break;
+    case 4:
+        lower_bound = 1 << 16;
+        break;
+    case 5:
+        lower_bound = 1 << 12;
+        break;
+    case 6:
+        lower_bound = 1 << 26;
+        break;
+    default:
+        lower_bound = 0;
+    }
+
+    if (lower_bound > 0 && codepoint < lower_bound) {
+        // Too many bytes were used, but return whatever character was encoded.
+        error = true;
     }
     return codepoint;
 }
@@ -1799,11 +1825,16 @@ QUtil::analyze_encoding(
     bool any_errors = false;
     while (pos < len) {
         bool error = false;
+        auto old_pos = pos;
         unsigned long codepoint = get_next_utf8_codepoint(val, pos, error);
         if (error) {
             any_errors = true;
-        }
-        if (codepoint >= 128) {
+            for (auto p = old_pos; p < pos; p++) {
+                if (static_cast<unsigned char>(val.at(p)) >= 128) {
+                    has_8bit_chars = true;
+                }
+            }
+        } else if (codepoint >= 128) {
             has_8bit_chars = true;
         }
     }
