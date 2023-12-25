@@ -13,6 +13,9 @@
           "/Extra": [
             "u:Names with binary data",
             "n:/ABCDEF+#ba#da#cc#e5",
+            "n:/OVERLONG+#c0#81",
+            "n:/OVERLONG+#e0#81#82",
+            "n:/OVERLONG+#f0#81#82#83",
             "/ABCEDEF+π",
             "n:/one+#a0two",
             "/text/plain",
