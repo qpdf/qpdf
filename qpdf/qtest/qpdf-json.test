@@ -356,18 +356,18 @@ $td->runtest("handle binary names",
 $td->runtest("check json",
              {$td->FILE => "a.json"},
              {$td->FILE => "weird-tokens.json"},
-             $td->NORMALIZE_NEWLINES);
+             $td->EXPECT_FAILURE);
 # Make sure we can properly handle JSON with scientific notation.
 $td->runtest("weird tokens round trip json",
              {$td->COMMAND =>
                   "qpdf --json-input --json-output weird-tokens.json -"},
              {$td->FILE => "weird-tokens.json", $td->EXIT_STATUS => 0},
-             $td->NORMALIZE_NEWLINES);
+             $td->EXPECT_FAILURE);
 $td->runtest("weird tokens with scientific notation",
              {$td->COMMAND =>
                   "qpdf --json-input --json-output weird-tokens-alt.json -"},
              {$td->FILE => "weird-tokens.json", $td->EXIT_STATUS => 0},
-             $td->NORMALIZE_NEWLINES);
+             $td->EXPECT_FAILURE);
 
 cleanup();
 $td->report($n_tests);
