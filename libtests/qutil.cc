@@ -269,20 +269,21 @@ to_utf8_test()
 
     // Overlong characters: characters represented by more bytes than necessary.
     size_t pos = 0;
-    std::string utf8 = "\xC0\x80"                  // 1 << 7
-                       "\xE0\x80\x80"              // 1 << 11
-                       "\xF0\x80\x80\x80"          // 1 << 16
-                       "\xF8\x80\x80\x80\x80"      // 1 << 21
-                       "\xFC\x80\x80\x80\x80\x80"; // 1 << 26
-    auto check = [&pos, &utf8](unsigned long wanted_pos) {
+    std::string utf8 = "\xC0\x81"                  // 1 << 7
+                       "\xE0\x80\x82"              // 1 << 11
+                       "\xF0\x80\x80\x83"          // 1 << 16
+                       "\xF8\x80\x80\x80\x84"      // 1 << 21
+                       "\xFC\x80\x80\x80\x80\x85"; // 1 << 26
+    auto check = [&pos, &utf8](unsigned long val, unsigned long wanted_pos) {
         bool error = false;
-        assert(QUtil::get_next_utf8_codepoint(utf8, pos, error) == 0 && error && pos == wanted_pos);
+        assert(
+            QUtil::get_next_utf8_codepoint(utf8, pos, error) == val && error && pos == wanted_pos);
     };
-    check(2);
-    check(5);
-    check(9);
-    check(14);
-    check(20);
+    check(1, 2);
+    check(2, 5);
+    check(3, 9);
+    check(4, 14);
+    check(5, 20);
 }
 
 static void
@@ -361,7 +362,8 @@ check_analyze(std::string const& str, bool has8bit, bool utf8, bool utf16)
     bool is_utf16 = false;
     QUtil::analyze_encoding(str, has_8bit_chars, is_valid_utf8, is_utf16);
     if (!((has_8bit_chars == has8bit) && (is_valid_utf8 == utf8) && (is_utf16 == utf16))) {
-        std::cout << "analysis failed: " << str << std::endl;
+        std::cout << "analysis failed: " << str << ": 8bit: " << has_8bit_chars
+                  << ", utf8: " << is_valid_utf8 << ", utf16: " << is_utf16 << std::endl;
     }
 }
 
@@ -389,6 +391,7 @@ transcoding_test()
     check_analyze("pi = \317\200", true, true, false);
     check_analyze("pi != \317", true, false, false);
     check_analyze("pi != 22/7", false, false, false);
+    check_analyze("\xE0\x80\x82", true, false, false);
     check_analyze(std::string("\xfe\xff\x00\x51", 4), true, false, true);
     check_analyze(std::string("\xff\xfe\x51\x00", 4), true, false, true);
     std::cout << "analysis done" << std::endl;

@@ -16,6 +16,8 @@
             "n:/OVERLONG+#c0#81",
             "n:/OVERLONG+#e0#81#82",
             "n:/OVERLONG+#f0#81#82#83",
+            "/range+\u0001",
+            "/low+\u0018",
             "/ABCEDEF+π",
             "n:/one+#a0two",
             "/text/plain",

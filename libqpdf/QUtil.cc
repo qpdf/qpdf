@@ -1825,16 +1825,12 @@ QUtil::analyze_encoding(
     bool any_errors = false;
     while (pos < len) {
         bool error = false;
-        auto old_pos = pos;
-        unsigned long codepoint = get_next_utf8_codepoint(val, pos, error);
+        auto o_pos = pos;
+        get_next_utf8_codepoint(val, pos, error);
         if (error) {
             any_errors = true;
-            for (auto p = old_pos; p < pos; p++) {
-                if (static_cast<unsigned char>(val.at(p)) >= 128) {
-                    has_8bit_chars = true;
-                }
-            }
-        } else if (codepoint >= 128) {
+        }
+        if (pos - o_pos > 1 || val[o_pos] & 0x80) {
             has_8bit_chars = true;
         }
     }
