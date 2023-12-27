@@ -25,18 +25,23 @@
 # that refers to this comment. See also .clang-format.
 min_version=18
 
-clang_version=$(clang-format --version | \
-    awk '{for (i=1; i<=NF; i++) if ($i == "version") {print int($(i+1)); exit}}')
-if [ "$clang_version" -lt "$min_version" ]; then
-    echo "clang-format version >= $min_version is required"
-    exit 2
+clang_format=clang-format
+if clang-format-$min_version --version >/dev/null 2>&1; then
+    clang_format=clang-format-$min_version
+else
+    clang_version=$(clang-format --version | \
+        awk '{for (i=1; i<=NF; i++) if ($i == "version") {print int($(i+1)); exit}}')
+    if [ "$clang_version" -lt "$min_version" ]; then
+        echo "clang-format version >= $min_version is required"
+        exit 2
+    fi
 fi
 
 cd $(dirname $0)
 for i in $(find . -name 'build*' -prune -o '(' \
 		-name '*.hh' -o -name '*.h' -o -name '*.cc' -o -name '*.c' \
 		')' -print); do
-    if clang-format < $i >| $i.new; then
+    if $clang_format < $i >| $i.new; then
 	if diff -q $i $i.new >/dev/null 2>/dev/null; then
 	    echo "okay:    $i"
 	    rm $i.new
