@@ -24,8 +24,7 @@ class QPDF_Dictionary: public QPDFValue
     bool hasKey(std::string const&);
     QPDFObjectHandle getKey(std::string const&);
     std::set<std::string> getKeys();
-    std::map<std::string, QPDFObjectHandle> const& getAsMap() const;
-
+    std::map<std::string, QPDFObjectHandle>& getAsMap();
     // If value is null, remove key; otherwise, replace the value of key, adding it if it does not
     // exist.
     void replaceKey(std::string const& key, QPDFObjectHandle value);

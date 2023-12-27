@@ -961,6 +961,19 @@ QPDFObjectHandle::ditems()
     return {*this};
 }
 
+QPDFObjectHandle::DictItems
+QPDFObjectHandle::dItems()
+{
+    static std::map<std::string, QPDFObjectHandle> empty;
+    if (auto dict = asDictionary()) {
+        return {*this, dict->getAsMap()};
+    } else {
+        typeWarning("dictionary", "treating as empty");
+        //        QTC::TC("qpdf", "QPDFObjectHandle dictionary empty map for dItems");
+        return {*this, empty};
+    }
+}
+
 bool
 QPDFObjectHandle::hasKey(std::string const& key)
 {

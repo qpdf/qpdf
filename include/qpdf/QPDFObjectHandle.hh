@@ -759,6 +759,10 @@ class QPDFObjectHandle
     QPDF_DLL
     QPDFDictItems ditems();
 
+    class DictItems;
+    QPDF_DLL
+    DictItems dItems();
+
     // Return true if key is present.  Keys with null values are treated as if they are not present.
     // This is as per the PDF spec.
     QPDF_DLL
@@ -1408,6 +1412,41 @@ QPDFObjectHandle operator ""_qpdf(char const* v, size_t len);
 /* clang-format on */
 
 #endif // QPDF_NO_QPDF_STRING
+
+class QPDFObjectHandle::DictItems
+{
+    friend class QPDFObjectHandle;
+
+  public:
+    class iterator: public std::map<std::string, QPDFObjectHandle>::iterator
+    {
+      public:
+        iterator(std::map<std::string, QPDFObjectHandle>::iterator it) :
+            std::map<std::string, QPDFObjectHandle>::iterator(it)
+        {
+        }
+    };
+
+    iterator begin()
+    {
+        return dict.begin();
+    }
+
+    iterator end()
+    {
+        return dict.end();
+    }
+
+  private:
+    DictItems(QPDFObjectHandle& oh, std::map<std::string, QPDFObjectHandle>& dict) :
+        oh(oh),
+        dict(dict)
+    {
+    }
+
+    QPDFObjectHandle oh;
+    std::map<std::string, QPDFObjectHandle>& dict;
+};
 
 class QPDFObjectHandle::QPDFDictItems
 {
