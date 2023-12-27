@@ -171,7 +171,7 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
     QPDFObjectHandle::Rectangle rect = rect_obj.getArrayAsRectangle();
     bool do_rotate = (rotate && (flags & an_no_rotate));
     if (do_rotate) {
-        // If the the annotation flags include the NoRotate bit and the page is rotated, we have to
+        // If the annotation flags include the NoRotate bit and the page is rotated, we have to
         // rotate the annotation about its upper left corner by the same amount in the opposite
         // direction so that it will remain upright in absolute coordinates. Since the semantics of
         // /Rotate for a page are to rotate the page, while the effect of rotating using a

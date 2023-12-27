@@ -70,6 +70,7 @@ Here are some examples.
       * Center the smaller page horizontally and bottom-align the trim boxes
   * Generalized overlay/underlay allowing n pages in a given order with transformations.
   * n-up -- application of generalized overlay/underlay
+  * make one long page with an arbitrary number of pages one after the other (#546)
 
 It should be possible to represent all of the existing qpdf operations using the above framework. It would be good to re-implement all of them in terms of this framework to exercise it. We will have to look through all the command-line arguments and make sure. Of course also make sure suggestions from issues can be implemented or at least supported by adding new selectors.
 
@@ -139,6 +140,7 @@ Easier to parse but yuck:
 # To-do list
 
 * Go through all issues marked with the `pages` label and ensure that any ideas are represented here. Keep a list with mappings back to the issue number.
+  * gh search issues label:pages --repo qpdf/qpdf --limit 200 --state=open
 * When ready, open a discussion ticket.
 * Flesh out an implementation plan.
 

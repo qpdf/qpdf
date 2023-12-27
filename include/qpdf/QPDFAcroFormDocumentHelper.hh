@@ -22,16 +22,16 @@
 // This document helper is intended to help with operations on interactive forms. Here are the key
 // things to know:
 
-// * The PDF specification talks about interactive forms and also   about form XObjects. While form
+// * The PDF specification talks about interactive forms and also about form XObjects. While form
 //   XObjects appear in parts of interactive forms, this class is concerned about interactive forms,
 //   not form XObjects.
 //
-// * Interactive forms are discussed in the PDF Specification (ISO PDF   32000-1:2008) section 12.7.
-//   Also relevant is the section about Widget annotations. Annotations are discussed in
-//   section 12.5 with annotation dictionaries discussed in 12.5.1. Widget annotations are discussed
+// * Interactive forms are discussed in the PDF Specification (ISO PDF 32000-1:2008) section 12.7.
+//   Also relevant is the section about Widget annotations. Annotations are discussed in section
+//   12.5 with annotation dictionaries discussed in 12.5.1. Widget annotations are discussed
 //   specifically in section 12.5.6.19.
 //
-// * What you need to know about the structure of interactive forms in   PDF files:
+// * What you need to know about the structure of interactive forms in PDF files:
 //
 //   - The document catalog contains the key "/AcroForm" which contains a list of fields. Fields are
 //     represented as a tree structure much like pages. Nodes in the fields tree may contain other
@@ -49,7 +49,7 @@
 //     traversing through the "/AcroForm" dictionary from the document catalog. In the simplest case
 //     (and also a very common case), a form field's widget annotation will be merged with the field
 //     object, and the object will appear directly both under "/Annots" in the page dictionary and
-//     under "/Fields" in the "/AcroForm" dictionary. In a more complex  case, you may have to trace
+//     under "/Fields" in the "/AcroForm" dictionary. In a more complex case, you may have to trace
 //     through various "/Kids" elements in the "/AcroForm" field entry until you find the annotation
 //     dictionary.
 
@@ -85,7 +85,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     bool hasAcroForm();
 
-    // Add a form field, initializing the document's AcroForm  dictionary if needed, updating the
+    // Add a form field, initializing the document's AcroForm dictionary if needed, updating the
     // cache if necessary. Note that you are adding fields that are copies of other fields, this
     // method may result in multiple fields existing with the same qualified name, which can have
     // unexpected side effects. In that case, you should use addAndRenameFormFields() instead.
@@ -182,7 +182,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     // to the document or pages. You have to do that yourself after calling transformAnnotations. If
     // this operation will leave orphaned fields behind, such as if you are replacing the old
     // annotations with the new ones on the same page and the fields and annotations are not shared,
-    // you will also need to remove the old fields to prevent them from hanging round unreferenced.
+    // you will also need to remove the old fields to prevent them from hanging around unreferenced.
     QPDF_DLL
     void transformAnnotations(
         QPDFObjectHandle old_annots,

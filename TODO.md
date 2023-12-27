@@ -47,6 +47,7 @@ Next
   cleaned up. See also issue #22.
   * Make it possible to see incremental updates in qdf mode.
   * Make it possible to add incremental updates.
+  * We may want a writing mode that preserves object IDs. See #339.
 
 Possible future JSON enhancements
 =================================
