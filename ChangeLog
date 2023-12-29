@@ -1,3 +1,9 @@
+2023-12-29  Jay Berkenbilt  <ejb@ql.org>
+
+	* When flattening annotations, preserve annotations without any
+	appearance information at all, such as types /Link, /Popup, and
+	/Projection. Fixes #1039.
+
 2023-12-25  Jay Berkenbilt  <ejb@ql.org>
 
 	* Detect overlong UTF-8 in the UTF-8 decoder, and fix detection of

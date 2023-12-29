@@ -38,6 +38,12 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
+11.7.1: not yet released
+  - Bug fixes:
+
+    - When flattening annotations, preserve hyperlinks and other
+      annotations that inherently have no appearance information.
+
 11.7.0: December 24, 2023
   - Bug fixes:
 

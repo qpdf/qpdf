@@ -125,11 +125,12 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
                 ++next_fx;
             }
             new_content += content;
-        } else if (process) {
-            // If an annotation has no appearance stream, just drop the annotation when flattening.
-            // This can happen for unchecked checkboxes and radio buttons, popup windows associated
-            // with comments that aren't visible, and other types of annotations that aren't
-            // visible.
+        } else if (process && !aoh.getAppearanceDictionary().isNull()) {
+            // If an annotation has no selected appearance stream, just drop the annotation when
+            // flattening. This can happen for unchecked checkboxes and radio buttons, popup windows
+            // associated with comments that aren't visible, and other types of annotations that
+            // aren't visible. Annotations that have no appearance streams at all, such as Link,
+            // Popup, and Projection, should be preserved.
             QTC::TC("qpdf", "QPDFPageDocumentHelper ignore annotation with no appearance");
         } else {
             new_annots.push_back(aoh.getObjectHandle());
