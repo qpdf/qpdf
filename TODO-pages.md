@@ -14,6 +14,93 @@ This file contains plans and notes regarding implementing of the "pages epic." T
     * booklet generation ("signatures", as in what `psbook` does)
 * Possibly others pending analysis of open issues and public discussion
 
+# Feature to Issue Mapping
+
+Last checked: 2023-12-29
+
+* Questions/ideas
+  * I have often wondered whether we need to be able to attach arbitrary metadata to a QPDFObjectHandle (or object or value) and to control whether it should be included in copies. For example, one could attach to a page which qpdf id and page number it came from, then carry that around as the page was converted to a form xobject, inserted into a foreign file, etc. It feels like something like that will be needed to support some of these features.
+* Generate a mapping from source to destination for all destinations
+  * Issues: #1077
+  * Notes:
+    * Source can be an outline or link, either directly or via action. If link, it should include the page.
+    * Destination can be a structure destination, which should map to a regular destination.
+    * source: page X -> link -> action -> dest: page Y
+    * source: page X -> link -> action -> dest: structure -> page Y
+    * Consider something in json that dumps this.
+    * We will need to associate this with a QPDF. It would be great if remote or embedded go-to actions could be handled, but that's ambitious.
+    * It will be necessary to keep some global map that includes all QPDF objects that are part of the final file.
+    * An interesting use case to consider would be to create a QPDF object from an embedded file and append the embedded file and make the embedded actions work. This would probably require some way to tell qpdf that a particular external file came from an embedded file.
+
+* Control size of page and position/transformation of overlay/underlay
+  * Issues: #1031, #811, #740, #559
+  * Notes:
+    * It should be possible to define a destination page from scratch or in terms of other pages and then place page contents onto it with arbitrary transformations applied.
+    * It should be possible to compute the size of the destination page in terms of the source pages, e.g., to create one long or wide page from other pages.
+    * Also allow specification of which page box to use
+* Preserve hyperlinks when doing any page operations
+  * See also "Generate a mapping from source to destination for all destinations"
+  * Issues: #1003, #797, #94
+  * Notes:
+    * A link annotation that points to a destination rather than an external URL should continue to work when files are split or merged.
+* Awareness of structured and tagged PDF (14.7, 14.8)
+  * Issues: #957, #953, #490
+  * Notes:
+    * This looks complicated. It may be not be possible to do this fully in the first increment, but we have to keep it in mind and warn if we can't and we see /SD in an action.
+    * #490 has some good analysis
+* Assign page labels
+  * Issues: #939
+  * Notes:
+    * #939 has a good proposal
+    * This could be applied to page groups, and we could have an option to keep the labels as they are in a given group, which is what qpdf does now.
+* Interleave pages with ordering
+  * Issues: #921
+  * Notes:
+    * From 921: interleave odd pages and reversed even pages. This might require different handling for even/odd numbers of pages. Make sure it's natural for the cases of len(odd) == len(even) or len(odd) == 1+len(even)
+* Preserve all attachments when merging files
+  * Issues: #856
+  * Notes:
+    * If all pages of a file are selected, keep all attachments
+    * If some pages of a file are selected
+      * Keep all attachments if there are any embedded file annotations
+      * Otherwise, what? Do we have a keep-attachments flag of some sort? Or do we just make the user copy attachments from one file to another?
+* Create page group by excluding pages
+  * Issues: #790, #564
+  * Notes:
+    * Handle cases in `PageSelector` below
+* Apply clipping to a page
+  * Issues: #771
+  * Notes:
+    * Create a form xobject from a page, then apply a specific clipping region expressed in coordinates or as a percentage
+* Ability to create a blank page
+  * Issues: #753
+  * Notes:
+    * Create a blank page of a specific size or of the same size as another page
+* Split groups with explicit boundaries
+  * Issues: #741, #616
+  * Notes:
+    * Example: --split-after a,b,c
+* Handle Optional Content (8.11)
+  * Issues: #672, #9
+* Scale a page up or down to fit to a size
+  * Issues: #611
+* Place contents of pages adjacent horizontally or vertically on one page
+  * Issues: #1040, #546
+* nup, booklet
+  * Issues: #493, #461, #152
+  * Notes:
+    * #461 may want the inverse of booklet and discusses reader and printer spreads
+* Flexible multiplexing
+  * Issues: #505
+* Split pages based on outlines
+  * Issues: #477
+* Keep relevant parts of outline hierarchy
+  * Issues: #457, #356, #343, #323
+  * Notes:
+    * There is some helpful discussion in #343 including
+      * Prserving open/closed status
+      * Preserving javascript actions
+
 # Architectural Thoughts
 
 I want to encapsulate various aspects of the logic into interfaces that can be implemented by developers to add their own logic. It should be easy to contribute these. Here are some rough ideas.
@@ -52,6 +139,7 @@ Here are some examples.
   * the left-front (left-back, right-front, right-back) pages of a booklet with signatures of n pages
   * all pages reachable from a section of the outline hierarchy or something based on threads or other structure
   * selection based on page labels
+  * pages in a group except pages in another group
 * PageTransformer
   * clip to media box (trim box, crop box, etc.)
   * clip to specific absolute or relative size
@@ -188,7 +276,7 @@ Document-level structures:
 * AcroForm
 * StructTreeRoot
   * Page: StructParents
-* MarkInfo
+* MarkInfo (see 14.7 - Logical Structure, 14.8 Tagged PDF)
 * SpiderInfo
   * Page: ID
 * OutputIntents
