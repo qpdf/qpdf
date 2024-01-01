@@ -1403,18 +1403,21 @@ Related Options
    See also :qpdf:ref:`--split-pages`, :qpdf:ref:`--collate`,
    :ref:`page-ranges`.
 
-.. qpdf:option:: --collate[=n]
+.. qpdf:option:: --collate[=n[,m,...]]
 
    .. help: collate with --pages
 
       Collate rather than concatenate pages specified with --pages.
       With a numeric parameter, collate in groups of n. The default
-      is 1. Run qpdf --help=page-selection for additional details.
+      is 1. With comma-separated numeric parameters, take n from the
+      first file, m from the second, etc. Run
+      qpdf --help=page-selection for additional details.
 
    This option causes :command:`qpdf` to collate rather than
    concatenate pages specified with :qpdf:ref:`--pages`. With a
    numeric parameter, collate in groups of :samp:`{n}`. The default
-   is 1.
+   is 1. With comma-separated numeric parameters, take :samp:`{n}`
+   from the first file, :samp:`{m}` from the second, etc.
 
    Please see :ref:`page-selection` for additional details.
 
@@ -2335,6 +2338,8 @@ Page Selection
 
    Use --collate=n to cause pages to be collated in groups of n pages
    (default 1) instead of concatenating the input.
+   Use --collate=i,j,k,... to take i from the first, then j from the
+   second, then k from the third, then i from the first, etc.
 
    Examples:
 
@@ -2383,9 +2388,13 @@ Notes:
 See :ref:`page-ranges` for help on specifying a page range.
 
 Use :samp:`--collate={n}` to cause pages to be collated in groups of
-:samp:`{n}` pages (default 1) instead of concatenating the input. Note
-that the :qpdf:ref:`--collate` appears outside of ``--pages ... --``
-(before ``--pages`` or after ``--``). Pages are pulled from each
+:samp:`{n}` pages (default 1) instead of concatenating the input. Use
+:samp:`--collate={i},{j},{k},...` to take :samp:`{i}` from the first,
+then :samp:`{j}` from the second, then :samp:`{k}` from the third,
+then :samp:`{i}` from the first, etc.
+
+Note that the :qpdf:ref:`--collate` appears outside of ``--pages ...
+--`` (before ``--pages`` or after ``--``). Pages are pulled from each
 document in turn. When a document is out of pages, it is skipped. See
 examples below.
 
@@ -2480,6 +2489,34 @@ Examples
   - b.pdf page 4
 
   - a.pdf page 5
+
+- You can specify a multiple numeric parameters to :qpdf:ref:`--collate`. With
+  :samp:`--collate={i,j,k}`, pull groups of :samp:`{i}` pages from the
+  first file, then :samp:`{j}` from the second, thenm :samp:`{k}` from
+  the third, repeating. The number of parameters must equal the number
+  of groups. For example, if you ran
+
+  ::
+
+     qpdf --collate=2,1,3 --empty --pages a.pdf 1-5 b.pdf 6-4 c.pdf r1-r4 -- out.pdf
+
+  you would get the following pages in this order:
+
+  - a.pdf pages 1 and 2
+
+  - b.pdf page 6
+
+  - c.pdf last three pages in reverse order
+
+  - a.pdf pages 3 and 4
+
+  - b.pdf page 5
+
+  - c.pdf fourth to last page
+
+  - a.pdf page 5
+
+  - b.pdf page 4
 
 - Take pages 1 through 5 from :file:`file1.pdf` and pages 11 through
   15 in reverse from :file:`file2.pdf`, taking document-level metadata

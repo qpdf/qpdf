@@ -15,7 +15,7 @@ cleanup();
 
 my $td = new TestDriver('arg-parsing');
 
-my $n_tests = 22;
+my $n_tests = 23;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -94,6 +94,14 @@ $td->runtest("v2-only qpdf json-key",
              {$td->REGEXP => ".*\"qpdf\" is only valid for json version > 1.*",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
+$td->runtest("wrong number of collate args",
+             {$td->COMMAND =>
+                  "qpdf --collate=2,3 collate-odd.pdf" .
+                  " --pages . minimal.pdf collate-even.pdf -- a.pdf"},
+             {$td->REGEXP => ".*--collate has more than one value.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
 # Ignoring -- at the top level was never intended but turned out to
 # have been there for a long time so that people relied on it. It is
 # intentionally not documented.

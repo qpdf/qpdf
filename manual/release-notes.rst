@@ -50,6 +50,10 @@ Planned changes for future 12.x (subject to change):
       of pages within a page range. See :ref:`page-ranges` for
       details.
 
+    - Support comma-separated numeric values with
+      :qpdf:ref:`--collate` to select different numbers of pages from
+      different groups.
+
 11.7.0: December 24, 2023
   - Bug fixes:
 

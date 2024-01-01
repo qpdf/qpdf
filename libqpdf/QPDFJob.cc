@@ -1,10 +1,6 @@
 #include <qpdf/QPDFJob.hh>
 
-#include <cctype>
-#include <cstdio>
-#include <cstdlib>
 #include <cstring>
-#include <fcntl.h>
 #include <iostream>
 #include <memory>
 
@@ -14,13 +10,11 @@
 #include <qpdf/Pl_DCT.hh>
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/Pl_Flate.hh>
-#include <qpdf/Pl_OStream.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/Pl_String.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
-#include <qpdf/QPDFArgParser.hh>
 #include <qpdf/QPDFCryptoProvider.hh>
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
 #include <qpdf/QPDFExc.hh>
@@ -2419,26 +2413,32 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
         dh.removePage(page);
     }
 
-    if (m->collate && (parsed_specs.size() > 1)) {
+    auto n_collate = m->collate.size();
+    auto n_specs = parsed_specs.size();
+    if (n_collate > 0 && n_specs > 1) {
         // Collate the pages by selecting one page from each spec in order. When a spec runs out of
         // pages, stop selecting from it.
         std::vector<QPDFPageData> new_parsed_specs;
-        size_t nspecs = parsed_specs.size();
-        size_t cur_page = 0;
+        // Make sure we have a collate value for each spec. We have already checked that a non-empty
+        // collate has either one value or one value per spec.
+        for (auto i = n_collate; i < n_specs; ++i) {
+            m->collate.push_back(m->collate.at(0));
+        }
+        std::vector<size_t> cur_page(n_specs, 0);
         bool got_pages = true;
         while (got_pages) {
             got_pages = false;
-            for (size_t i = 0; i < nspecs; ++i) {
+            for (size_t i = 0; i < n_specs; ++i) {
                 QPDFPageData& page_data = parsed_specs.at(i);
-                for (size_t j = 0; j < m->collate; ++j) {
-                    if (cur_page + j < page_data.selected_pages.size()) {
+                for (size_t j = 0; j < m->collate.at(i); ++j) {
+                    if (cur_page.at(i) + j < page_data.selected_pages.size()) {
                         got_pages = true;
                         new_parsed_specs.emplace_back(
-                            page_data, page_data.selected_pages.at(cur_page + j));
+                            page_data, page_data.selected_pages.at(cur_page.at(i) + j));
                     }
                 }
+                cur_page.at(i) += m->collate.at(i);
             }
-            cur_page += m->collate;
         }
         parsed_specs = new_parsed_specs;
     }
@@ -3019,9 +3019,10 @@ QPDFJob::writeOutfile(QPDF& pdf)
             try {
                 QUtil::remove_file(backup.c_str());
             } catch (QPDFSystemError& e) {
-                *m->log->getError() << m->message_prefix << ": unable to delete original file ("
-                                    << e.what() << ");" << " original file left in " << backup
-                                    << ", but the input was successfully replaced\n";
+                *m->log->getError()
+                    << m->message_prefix << ": unable to delete original file (" << e.what() << ");"
+                    << " original file left in " << backup
+                    << ", but the input was successfully replaced\n";
             }
         }
     }

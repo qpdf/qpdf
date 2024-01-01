@@ -637,7 +637,7 @@ class QPDFJob
         bool show_filtered_stream_data{false};
         bool show_pages{false};
         bool show_page_images{false};
-        size_t collate{0};
+        std::vector<size_t> collate;
         bool flatten_rotation{false};
         bool list_attachments{false};
         std::string attachment_to_show;

@@ -315,11 +315,13 @@ ap.addOptionHelp("--pages", "modification", "begin page selection", R"(--pages f
 
 Run qpdf --help=page-selection for details.
 )");
-ap.addOptionHelp("--collate", "modification", "collate with --pages", R"(--collate[=n]
+ap.addOptionHelp("--collate", "modification", "collate with --pages", R"(--collate[=n[,m,...]]
 
 Collate rather than concatenate pages specified with --pages.
 With a numeric parameter, collate in groups of n. The default
-is 1. Run qpdf --help=page-selection for additional details.
+is 1. With comma-separated numeric parameters, take n from the
+first file, m from the second, etc. Run
+qpdf --help=page-selection for additional details.
 )");
 ap.addOptionHelp("--split-pages", "modification", "write pages to separate files", R"(--split-pages[=n]
 
@@ -607,6 +609,8 @@ Run qpdf --help=page-ranges for help with page ranges.
 
 Use --collate=n to cause pages to be collated in groups of n pages
 (default 1) instead of concatenating the input.
+Use --collate=i,j,k,... to take i from the first, then j from the
+second, then k from the third, then i from the first, etc.
 
 Examples:
 

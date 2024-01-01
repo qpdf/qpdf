@@ -1,7 +1,11 @@
 2024-01-01  Jay Berkenbilt  <ejb@ql.org>
 
+	* Support comma-separated numeric values with --collate to select
+	different group sizes from different files. Fixes #505.
+
 	* Support "x" before a group in a numeric range to exclude a group
-	from the previous group. Details are in the manual.
+	from the previous group. Details are in the manual. Fixes #564,
+	#790.
 
 2023-12-29  Jay Berkenbilt  <ejb@ql.org>
 

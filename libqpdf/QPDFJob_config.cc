@@ -98,8 +98,27 @@ QPDFJob::Config::collate()
 QPDFJob::Config*
 QPDFJob::Config::collate(std::string const& parameter)
 {
-    auto n = (parameter.empty() ? 1 : QUtil::string_to_uint(parameter.c_str()));
-    o.m->collate = QIntC::to_size(n);
+    if (parameter.empty()) {
+        o.m->collate.push_back(1);
+        return this;
+    }
+    size_t pos = 0;
+    // Parse a,b,c
+    while (true) {
+        auto end = parameter.find(',', pos);
+        auto n = parameter.substr(pos, end);
+        if (n.empty()) {
+            usage("--collate: trailing comma");
+        }
+        o.m->collate.push_back(QIntC::to_size(QUtil::string_to_uint(n.c_str())));
+        if (end == std::string::npos) {
+            break;
+        }
+        pos = end + 1;
+    }
+    if (o.m->collate.empty()) {
+        o.m->collate.push_back(1);
+    }
     return this;
 }
 
@@ -932,8 +951,14 @@ QPDFJob::Config::pages()
 QPDFJob::Config*
 QPDFJob::PagesConfig::endPages()
 {
-    if (this->config->o.m->page_specs.empty()) {
+    auto n_specs = config->o.m->page_specs.size();
+    if (n_specs == 0) {
         usage("--pages: no page specifications given");
+    }
+    auto n_collate = config->o.m->collate.size();
+    if (!(n_collate == 0 || n_collate == 1 || n_collate == n_specs)) {
+        usage("--pages: if --collate has more than one value, it must have one value per page "
+              "specification");
     }
     return this->config;
 }
