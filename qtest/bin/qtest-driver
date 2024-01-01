@@ -2,7 +2,7 @@
 #
 # This file is part of qtest.
 #
-# Copyright 1993-2023, Jay Berkenbilt
+# Copyright 1993-2024, Jay Berkenbilt
 #
 # QTest is distributed under the terms of version 2.0 of the Artistic
 # license which may be found in the source distribution.

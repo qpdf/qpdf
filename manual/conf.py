@@ -13,7 +13,7 @@ import sys
 sys.path.append(os.path.abspath("./_ext"))
 
 project = 'QPDF'
-copyright = '2005-2023, Jay Berkenbilt'
+copyright = '2005-2024, Jay Berkenbilt'
 author = 'Jay Berkenbilt'
 here = os.path.dirname(os.path.realpath(__file__))
 with open(f'{here}/../CMakeLists.txt') as f:

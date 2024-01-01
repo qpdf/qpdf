@@ -1,4 +1,4 @@
-/* Copyright (c) 2005-2023 Jay Berkenbilt
+/* Copyright (c) 2005-2024 Jay Berkenbilt
  *
  * This file is part of qpdf.
  *
