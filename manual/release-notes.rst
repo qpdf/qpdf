@@ -44,6 +44,12 @@ Planned changes for future 12.x (subject to change):
     - When flattening annotations, preserve hyperlinks and other
       annotations that inherently have no appearance information.
 
+  - CLI Enhancements
+
+    - Introduce ``x`` in the numeric range syntax to allow exclusion
+      of pages within a page range. See :ref:`page-ranges` for
+      details.
+
 11.7.0: December 24, 2023
   - Bug fixes:
 

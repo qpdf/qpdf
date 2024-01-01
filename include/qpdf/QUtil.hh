@@ -442,7 +442,24 @@ namespace QUtil
     inline bool is_number(char const*);
 
     // This method parses the numeric range syntax used by the qpdf command-line tool. May throw
-    // std::runtime_error.
+    // std::runtime_error. A numeric range is as comma-separated list of groups. A group may be a
+    // number specification or a range of number specifications separated by a dash. A number
+    // specification may be one of the following (where <n> is a number):
+    // * <n> -- the numeric value of n
+    // * z -- the value of the `max` parameter
+    // * r<n> -- represents max + 1 - <n> (<n> from the end)
+    //
+    // If the group is two number specifications separated by a dash, it represents the range of
+    // numbers from the first to the second, inclusive. If the first is greater than the second, the
+    // numbers are descending.
+    //
+    // From qpdf 11.7.1: if a group starts with `x`, its members are excluded from the previous
+    // group that didn't start with `x1.
+    //
+    // Example: with max of 15, the range "4-10,x7-9,12-8,xr5" is 4, 5, 6, 10, 12, 10, 9, 8. This is
+    // 4 through 10 inclusive without 7 through 9 inclusive followed by 12 to 8 inclusiuve
+    // (descending) without 11 (the fifth value counting backwards from 15). For more information
+    // and additional examples, see the "Page Ranges" section in the manual.
     QPDF_DLL
     std::vector<int> parse_numrange(char const* range, int max);
 

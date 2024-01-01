@@ -67,6 +67,12 @@ my @nrange_tests = (
     ["1-6,8-12:even",
      "numeric range 1-6,8-12:even -> 2 4 6 9 11",
      0],
+    ["x1",
+     "error at * in numeric range *x1: first range group may not be an exclusion",
+     2],
+    ["4-10,x7-9,12-8,xr5",
+     "numeric range 4-10,x7-9,12-8,xr5 -> 4 5 6 10 12 10 9 8",
+     0],
     );
 foreach my $d (@nrange_tests)
 {

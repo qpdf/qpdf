@@ -1274,12 +1274,19 @@ Page Ranges
 .. help-topic page-ranges: page range syntax
 
    A full description of the page range syntax, with examples, can be
-   found in the manual. Summary:
+   found in the manual. In summary, a range is a comma-separated list
+   of groups. A group is a number or a range of numbers separated by a
+   dash. A group may be prepended by x to exclude its members from the
+   previous group. A number may be one of
 
-   - a,b,c    pages a, b, and c
-   - a-b      pages a through b inclusive; if a > b, this counts down
-   - r<n>     where <n> represents a number is the <n>th page from the end
-   - z        the last page, same as r1
+   - <n>        where <n> represents a number is the <n>th page
+   - r<n>       is the <n>th page from the end
+   - z          the last page, same as r1
+
+   - a,b,c      pages a, b, and c
+   - a-b        pages a through b inclusive; if a > b, this counts down
+   - a-b,xc     pages a through b except page c
+   - a-b,xc-d   pages a through b except pages c through d
 
    You can append :even or :odd to select every other page from the
    resulting set of pages, where :odd starts with the first page and
@@ -1302,6 +1309,10 @@ section describes the syntax of a page range.
 - Two page numbers separated by dashes represents the inclusive range
   of pages from the first to the second. If the first number is higher
   than the second number, it is the range of pages in reverse.
+
+- A number or dash-separated range of numbers may be prepended with
+  ``x`` (from qpdf 11.7.1). This means to exclude the pages in that
+  range from the previous range that didn't start with ``x``.
 
 - The range may be appended with ``:odd`` or ``:even`` to select only
   pages from the resulting range in odd or even positions. In this
@@ -1349,6 +1360,16 @@ section describes the syntax of a page range.
    - - ``5,7-9,12:even``
      - pages 7 and 9, which are the pages in even positions from the
        original set of 5, 7, 8, 9, 12
+
+   - - ``1-10,x3-4``
+     - pages 1 through 10 except pages 3 and 4 (1, 2, and 5
+       through 10)
+
+   - - ``4-10,x7-9,12-8,xr5``
+     - In a 15-page file, this is 4, 5, 6, 10, 12, 10, 9, and 8 in
+       that order. That is pages 4 through 10 except 7 through 9
+       followed by 12 through 8 descending except 11 (the fifth page
+       from the end)
 
 .. _modification-options:
 

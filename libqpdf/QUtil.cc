@@ -1303,6 +1303,10 @@ QUtil::str_compare_nocase(char const* s1, char const* s2)
 std::vector<int>
 QUtil::parse_numrange(char const* range, int max)
 {
+    // Performance note: this implementation aims to be straightforward, not efficient. Numeric
+    // range parsing is used only during argument processing. It is not used during processing of
+    // PDF files.
+
     static std::regex group_re(R"((x)?(z|r?\d+)(?:-(z|r?\d+))?)");
     auto parse_num = [&max](std::string const& s) -> int {
         if (s == "z") {
@@ -1375,12 +1379,22 @@ QUtil::parse_numrange(char const* range, int max)
             first = false;
             auto first_num = parse_num(m[2].str());
             auto is_span = m[3].matched;
-            int last_num;
+            int last_num{0};
             if (is_span) {
                 last_num = parse_num(m[3].str());
             }
             if (is_exclude) {
-                // XXX
+                std::vector<int> work;
+                populate(work, first_num, is_span, last_num);
+                std::set<int> exclusions;
+                exclusions.insert(work.begin(), work.end());
+                work = last_group;
+                last_group.clear();
+                for (auto n: work) {
+                    if (exclusions.count(n) == 0) {
+                        last_group.emplace_back(n);
+                    }
+                }
             } else {
                 result.insert(result.end(), last_group.begin(), last_group.end());
                 populate(last_group, first_num, is_span, last_num);

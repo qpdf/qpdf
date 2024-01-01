@@ -1,3 +1,8 @@
+2024-01-01  Jay Berkenbilt  <ejb@ql.org>
+
+	* Support "x" before a group in a numeric range to exclude a group
+	from the previous group. Details are in the manual.
+
 2023-12-29  Jay Berkenbilt  <ejb@ql.org>
 
 	* When flattening annotations, preserve annotations without any

@@ -286,12 +286,19 @@ value, even if the file uses features that may not be available
 in that version.
 )");
 ap.addHelpTopic("page-ranges", "page range syntax", R"(A full description of the page range syntax, with examples, can be
-found in the manual. Summary:
+found in the manual. In summary, a range is a comma-separated list
+of groups. A group is a number or a range of numbers separated by a
+dash. A group may be prepended by x to exclude its members from the
+previous group. A number may be one of
 
-- a,b,c    pages a, b, and c
-- a-b      pages a through b inclusive; if a > b, this counts down
-- r<n>     where <n> represents a number is the <n>th page from the end
-- z        the last page, same as r1
+- <n>        where <n> represents a number is the <n>th page
+- r<n>       is the <n>th page from the end
+- z          the last page, same as r1
+
+- a,b,c      pages a, b, and c
+- a-b        pages a through b inclusive; if a > b, this counts down
+- a-b,xc     pages a through b except page c
+- a-b,xc-d   pages a through b except pages c through d
 
 You can append :even or :odd to select every other page from the
 resulting set of pages, where :odd starts with the first page and
