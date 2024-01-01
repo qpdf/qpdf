@@ -9,15 +9,12 @@
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QTC.hh>
 
-#include <cctype>
 #include <cerrno>
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
 #include <fstream>
 #include <iomanip>
-#include <locale>
 #include <map>
 #include <memory>
 #include <regex>
@@ -1303,93 +1300,52 @@ QUtil::str_compare_nocase(char const* s1, char const* s2)
 #endif
 }
 
-static int
-maybe_from_end(int num, bool from_end, int max)
-{
-    if (from_end) {
-        if (num > max) {
-            num = 0;
-        } else {
-            num = max + 1 - num;
-        }
-    }
-    return num;
-}
-
 std::vector<int>
 QUtil::parse_numrange(char const* range, int max)
 {
-    std::vector<int> result;
-    char const* p = range;
+    static std::regex group_re(R"((x)?(z|r?\d+)(?:-(z|r?\d+))?)");
+    auto parse_num = [&max](std::string const& s) -> int {
+        if (s == "z") {
+            return max;
+        }
+        int num;
+        if (s.at(0) == 'r') {
+            num = max + 1 - string_to_int(s.substr(1).c_str());
+        } else {
+            num = string_to_int(s.c_str());
+        }
+        // max == 0 means we don't know the max and are just testing for valid syntax.
+        if ((max > 0) && ((num < 1) || (num > max))) {
+            throw std::runtime_error("number " + std::to_string(num) + " out of range");
+        }
+        return num;
+    };
+
+    auto populate = [](std::vector<int>& group, int first_num, bool is_span, int last_num) {
+        group.clear();
+        group.emplace_back(first_num);
+        if (is_span) {
+            if (first_num > last_num) {
+                for (auto i = first_num - 1; i >= last_num; --i) {
+                    group.push_back(i);
+                }
+            } else {
+                for (auto i = first_num + 1; i <= last_num; ++i) {
+                    group.push_back(i);
+                }
+            }
+        }
+    };
+
+    char const* p;
     try {
-        std::vector<int> work;
-        static int const comma = -1;
-        static int const dash = -2;
+        char const* range_end = range + strlen(range);
+        std::vector<int> result;
+        std::vector<int> last_group;
+        // See if range ends with :even or :odd.
         size_t start_idx = 0;
         size_t skip = 1;
-
-        enum { st_top, st_in_number, st_after_number } state = st_top;
-        bool last_separator_was_dash = false;
-        int cur_number = 0;
-        bool from_end = false;
-        while (*p) {
-            char ch = *p;
-            if (isdigit(ch)) {
-                if (!((state == st_top) || (state == st_in_number))) {
-                    throw std::runtime_error("digit not expected");
-                }
-                state = st_in_number;
-                cur_number *= 10;
-                cur_number += (ch - '0');
-            } else if (ch == 'z') {
-                // z represents max
-                if (!(state == st_top)) {
-                    throw std::runtime_error("z not expected");
-                }
-                state = st_after_number;
-                cur_number = max;
-            } else if (ch == 'r') {
-                if (!(state == st_top)) {
-                    throw std::runtime_error("r not expected");
-                }
-                state = st_in_number;
-                from_end = true;
-            } else if ((ch == ',') || (ch == '-')) {
-                if (!((state == st_in_number) || (state == st_after_number))) {
-                    throw std::runtime_error("unexpected separator");
-                }
-                cur_number = maybe_from_end(cur_number, from_end, max);
-                work.push_back(cur_number);
-                cur_number = 0;
-                from_end = false;
-                if (ch == ',') {
-                    state = st_top;
-                    last_separator_was_dash = false;
-                    work.push_back(comma);
-                } else if (ch == '-') {
-                    if (last_separator_was_dash) {
-                        throw std::runtime_error("unexpected dash");
-                    }
-                    state = st_top;
-                    last_separator_was_dash = true;
-                    work.push_back(dash);
-                }
-            } else if (ch == ':') {
-                if (!((state == st_in_number) || (state == st_after_number))) {
-                    throw std::runtime_error("unexpected colon");
-                }
-                break;
-            } else {
-                throw std::runtime_error("unexpected character");
-            }
-            ++p;
-        }
-        if ((state == st_in_number) || (state == st_after_number)) {
-            cur_number = maybe_from_end(cur_number, from_end, max);
-            work.push_back(cur_number);
-        } else {
-            throw std::runtime_error("number expected");
-        }
+        p = std::find(range, range_end, ':');
         if (*p == ':') {
             if (strcmp(p, ":odd") == 0) {
                 skip = 2;
@@ -1397,46 +1353,55 @@ QUtil::parse_numrange(char const* range, int max)
                 skip = 2;
                 start_idx = 1;
             } else {
-                throw std::runtime_error("unexpected even/odd modifier");
+                throw std::runtime_error("expected :even or :odd");
             }
+            range_end = p;
         }
 
-        p = nullptr;
-        for (size_t i = 0; i < work.size(); i += 2) {
-            int num = work.at(i);
-            // max == 0 means we don't know the max and are just testing for valid syntax.
-            if ((max > 0) && ((num < 1) || (num > max))) {
-                throw std::runtime_error("number " + QUtil::int_to_string(num) + " out of range");
+        // Divide the range into groups
+        p = range;
+        char const* group_end;
+        bool first = true;
+        while (p != range_end) {
+            group_end = std::find(p, range_end, ',');
+            std::cmatch m;
+            if (!std::regex_match(p, group_end, m, group_re)) {
+                throw std::runtime_error("invalid range syntax");
             }
-            if (i == 0) {
-                result.push_back(work.at(i));
+            auto is_exclude = m[1].matched;
+            if (first && is_exclude) {
+                throw std::runtime_error("first range group may not be an exclusion");
+            }
+            first = false;
+            auto first_num = parse_num(m[2].str());
+            auto is_span = m[3].matched;
+            int last_num;
+            if (is_span) {
+                last_num = parse_num(m[3].str());
+            }
+            if (is_exclude) {
+                // XXX
             } else {
-                int separator = work.at(i - 1);
-                if (separator == comma) {
-                    result.push_back(num);
-                } else if (separator == dash) {
-                    int lastnum = result.back();
-                    if (num > lastnum) {
-                        for (int j = lastnum + 1; j <= num; ++j) {
-                            result.push_back(j);
-                        }
-                    } else {
-                        for (int j = lastnum - 1; j >= num; --j) {
-                            result.push_back(j);
-                        }
-                    }
-                } else {
-                    throw std::logic_error("INTERNAL ERROR parsing numeric range");
+                result.insert(result.end(), last_group.begin(), last_group.end());
+                populate(last_group, first_num, is_span, last_num);
+            }
+            p = group_end;
+            if (*p == ',') {
+                ++p;
+                if (p == range_end) {
+                    throw std::runtime_error("trailing comma");
                 }
             }
         }
-        if ((start_idx > 0) || (skip != 1)) {
-            auto t = result;
-            result.clear();
-            for (size_t i = start_idx; i < t.size(); i += skip) {
-                result.push_back(t.at(i));
-            }
+        result.insert(result.end(), last_group.begin(), last_group.end());
+        if (skip == 1) {
+            return result;
         }
+        std::vector<int> filtered;
+        for (auto i = start_idx; i < result.size(); i += skip) {
+            filtered.emplace_back(result.at(i));
+        }
+        return filtered;
     } catch (std::runtime_error const& e) {
         std::string message;
         if (p) {
@@ -1447,7 +1412,6 @@ QUtil::parse_numrange(char const* range, int max)
         }
         throw std::runtime_error(message);
     }
-    return result;
 }
 
 enum encoding_e { e_utf16, e_ascii, e_winansi, e_macroman, e_pdfdoc };
