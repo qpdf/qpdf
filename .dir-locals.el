@@ -1,4 +1,5 @@
 ((nil . ((indent-tabs-mode . nil)
+         (fill-column 100)
          (qpdf-cc-style
           .
           ("qpdf"
@@ -35,5 +36,10 @@
                       (c-set-style "qpdf")
                     )
             ))
+ )
+ (gfm-mode . ((eval . (progn
+                        (setq fill-column 100)
+                        )
+                    ))
  )
 )
