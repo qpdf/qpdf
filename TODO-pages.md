@@ -73,6 +73,46 @@ Here are some examples of things that will become possible:
 The rest of this document describes the details of what how these features will work and what needs
 to be done to make them possible to build.
 
+# QPDFJob Summary
+
+`QPDFJob` goes through the following stages:
+
+* create QPDF
+  * update from JSON
+  * page specs (`--pages`)
+    * Create a QPDF for each input source
+    * Figure out whether to keep files open
+    * Remove unreferenced resources if needed
+    * Remove pages from the pages tree
+    * Handle collation
+    * Copy or revive all final pages
+      * When copying foreign pages, possibly remove unreferenced resources
+      * Handle the same page copied more than once by doing a shallow copy
+      * Preserve form fields and page labels
+    * Delete pages from the primary input that were not used in the output
+    * Delete unreferenced form fields
+  * rotation
+  * underlay/overlay
+  * transformations
+    * disable signatures
+    * externalize images
+    * optimize images
+    * generate appearances
+    * flatten annotations
+    * coalesce contents
+    * flatten rotation
+    * remove page labels
+    * remove attachments
+    * add attachments
+    * copy attachments
+* write QPDF
+  * One of:
+    * Do inspections
+    * Write single file
+    * Split pages
+      * Remove unreference resources if needed
+      * Preserve form fields and page labels
+
 # Architectural Thoughts
 
 Create a new top-level class called `QPDFAssembler` that will be used to perform page-level
@@ -198,7 +238,7 @@ Here is a list of cases that need to be expressible.
     * front: 4,9, back: 10,3
     * front: 2,11, back: 12,1
 
-    This is the same as dupex 2-up with pages in order 6, 7, 8, 5, 4, 9, 10, 3, 2, 11, 12, 1
+    This is the same as duplex 2-up with pages in order 6, 7, 8, 5, 4, 9, 10, 3, 2, 11, 12, 1
 * n-up:
   * For 2-up, calculate new w and h such that w/h maintains a fixed ratio and w and h are the
     largest values that can fit within 1/2 the page with specified margins.
@@ -206,7 +246,6 @@ Here is a list of cases that need to be expressible.
     change getFormXObjectForPage to handle other boxes than trim box.
   * Maybe define n-up a scale and rotate followed by fitting the result into a specified rectangle.
     I might already have this logic in QPDFAnnotationObjectHelper::getPageContentForAppearance.
-
 
 # Feature to Issue Mapping
 
@@ -494,62 +533,47 @@ PDF document structure
 The trailer contains the catalog and the Info dictionary. We probably need to do something
 intelligent with the info dictionary.
 
-
 7.7.2 contains the list of all keys in the document catalog.
 
-Document-level structures:
+Document-level structures to merge:
 * Extensions
   * Must be combination of Extensions from all input files
 * PageLabels
   * Ensure each page has its original label
   * Allow post-processing
 * Names -- see below
-  * Combined and disambiguated
+  * Combine per tree
+  * May require disambiguation
   * Page: TemplateInstantiated
-ombine from all files
 * Dests
   * Keep referenced destinations across all files
   * May need to disambiguate or "flatten" or convert to named dests with the names tree
 * Outlines
 * Threads (easy)
   * Page: B
-* AA (Additional Actions)
-  * Merge from different files if possible
-  * If duplicate, first contributor wins
 * AcroForm
-  * Merge
 * StructTreeRoot
-  * Combine
   * Page: StructParents
 * MarkInfo (see 14.7 - Logical Structure, 14.8 Tagged PDF)
-  * Combine
 * SpiderInfo
-  * Combine
   * Page: ID
 * OutputIntents
-  * Combine
   * Page: OutputIntents
 * PieceInfo
-  * Combine
   * Page: PieceInfo
 * OCProperties
-  * Combine across documents
 * Requirements
-  * Combine
 * AF (file specification dictionaries)
-  * Combine
   * Page: AF
 * DPartRoot
-  * Combine
   * Page: DPart
-
-Things qpdf probably needs to drop
 * Version
-* Perms
-* Legal
-* DSS
+  * Maximum
 
 Things that stay with the first document that has one and/or will not be supported
+* AA (Additional Actions)
+  * Would be possible to combine and let the first contributor win, but it probably wouldn't usually
+    be what we want.
 * Info (not part of document catalog)
 * ViewerPreferences
 * PageLayout
@@ -560,10 +584,13 @@ Things that stay with the first document that has one and/or will not be support
 * Lang
 * NeedsRendering
 * Collection
+* Perms
+* Legal
+* DSS
 
 Name dictionary (7.7.4)
 * Dests
-* AP (appearance strams)
+* AP (appearance streams)
 * JavaScript
 * Pages (named pages)
 * Templates
