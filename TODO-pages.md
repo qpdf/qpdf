@@ -115,6 +115,43 @@ to be done to make them possible to build.
 
 # Architectural Thoughts
 
+XXX WORK IN: Dump `QPDFAssembler`. Instead, these are enhancements to `QPDFJob`. Don't try to
+generalize this too much. There are actually only a few things we need to add to `QPDFJob`. Go
+through and flesh out the list, but roughly:
+
+* From the C++ API, make it possible to use an arbitrary QPDF as an input rather than having to
+  start with a file. That makes it possible to do arbitrary work on the PDF prior to submitting it.
+* Allow specification of n blank pages of a given size, e.g. `--blank=5@612x792`. Maybe we can
+  support standard paper sizes, inches, centimeters, or sizes relative to other pages.
+* Generalize underlay/overlay
+  * Maybe we can do it by adding flags and allowing them to be repeated
+  * Maybe we need a new syntax, like pstops, but with the ability to specify anchors and proportions
+    based on varoius boxes
+  * Maybe we need something like `--stack`
+  * It needs to be possible to stack arbitrary pages with arbitrary transformations and to have the
+    transformations be a function of the source or destination page; the rectangle mapping idea
+    discussed elsewhere may be a good basis
+* Have a page composition phase after the overlay/underlay stage
+  * Allow n-up, left-to-right (can reverse page order to get rtl), top-to-bottom, or modular
+    composition like pstops
+  * Possible hook for page composition to allow custom compositions
+* A few additional split options
+
+Then, we need to make the existing logic handle other document-level structures, preferably in a way
+that requires less duplication between split and merge. Maybe we can add a flag to disregard
+document-level structures for speed, but I think being able to turn them on and off individually is
+overkill, especially since people who are that sophisticated can tweak with JSON or just do it in
+code.
+
+The challenge will be able to come up with command-line syntax to do most things from the CLI and to
+make the C++ API flexible enough for users to insert their own bits in key places, just as we can
+now grab the QPDF before the write phase. This approach eliminates all the function stuff. We just
+have to make sure we can support all these features and have a relatively easy way to add new ones
+or to let developers extend. The documentation will have to explain the flow of QPDFJob so people
+can know where to apply hooks.
+
+----------
+
 Create a new top-level class called `QPDFAssembler` that will be used to perform page-level
 operations. Its implementation will use existing APIs, and it will add many new APIs. It should be
 possible to perform all existing page splitting and merging operations using `QPDFAssembler` without
