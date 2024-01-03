@@ -2689,9 +2689,6 @@ they are exhausted, after which any pages specified with
 :qpdf:ref:`--repeat` option, you can use ``--from=`` to provide an
 empty set of "from" pages.
 
-This Can be left empty by omitting
-:samp:`{page-range}` 
-
 .. qpdf:option:: --repeat=page-range
 
    .. help: overlay/underlay pages to repeat
