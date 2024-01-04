@@ -2377,12 +2377,13 @@ QPDF::getCompressibleObjGens()
     QPDFObjGen encryption_dict_og = encryption_dict.getObjGen();
 
     QPDFObjGen::set visited;
-    std::list<QPDFObjectHandle> queue;
-    queue.push_front(m->trailer);
+    std::vector<QPDFObjectHandle> queue;
+    queue.reserve(512);
+    queue.push_back(m->trailer);
     std::vector<QPDFObjGen> result;
     while (!queue.empty()) {
-        QPDFObjectHandle obj = queue.front();
-        queue.pop_front();
+        QPDFObjectHandle obj = queue.back();
+        queue.pop_back();
         if (obj.isIndirect()) {
             QPDFObjGen og = obj.getObjGen();
             if (!visited.add(og)) {
@@ -2409,18 +2410,18 @@ QPDF::getCompressibleObjGens()
                         QTC::TC("qpdf", "QPDF exclude indirect length");
                     }
                 } else {
-                    queue.push_front(value);
+                    queue.push_back(value);
                 }
             }
         } else if (obj.isDictionary()) {
             std::set<std::string> keys = obj.getKeys();
             for (auto iter = keys.rbegin(); iter != keys.rend(); ++iter) {
-                queue.push_front(obj.getKey(*iter));
+                queue.push_back(obj.getKey(*iter));
             }
         } else if (obj.isArray()) {
             int n = obj.getArrayNItems();
             for (int i = 1; i <= n; ++i) {
-                queue.push_front(obj.getArrayItem(n - i));
+                queue.push_back(obj.getArrayItem(n - i));
             }
         }
     }
