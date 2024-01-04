@@ -1,13 +1,30 @@
 # Pages
 
-**This is a work in progress, but it's getting close. When this gets to the stage where it is
-starting to congeal into an actual plan, I will remove this disclaimer and open a discussion ticket
-in GitHub to work out details.**
-
 This document describes a project known as the _pages epic_. The goal of the pages epic is to enable
 qpdf to properly preserve all functionality associated with a page as pages are copied from one PDF
 to another (or back to the same PDF). A secondary goal is to add more flexiblity to the ways in
 which documents can be split and combined (flexible assembly).
+
+This is a work in progress. As implementation proceeds, details will become more solid. Comments are
+encouraged. Please make comments in the [QPDF pages epic
+discussion](https://github.com/qpdf/qpdf/discussions/1104). As ideas are refined, they will be
+updated in this document.
+
+# Tasks
+
+This a breakdown of work. It is near the top of the file for easy access but doesn't make sense
+without reading the rest of the file.
+
+* Issue #939 (`--set-page-labels`) is unblocked and can be done at any time.
+* Create `QPDFAssembler` and incrementally move functionality from `QPDFJob` into it.
+* Create `QPDFSplitter` to use `QPDFAssembler`. Write a section in the manual describing how they
+  work, but leave the detailed API documentation in the header files. Model after how `QPDFJob` is
+  documented.
+* Break down remaining work, to include coming up with a mechanism for tracking destinations and
+  creating helper classes for other document-level operations, then incrementally adding support for
+  each idea. Keep the manual updated as we go.
+
+# Design and Background
 
 Terminology:
 * _Page-level data_: information that is contained within objects reachable from the page dictionary
