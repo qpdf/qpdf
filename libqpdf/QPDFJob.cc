@@ -2661,7 +2661,7 @@ QPDFJob::maybeFixWritePassword(int R, std::string& password)
 }
 
 void
-QPDFJob::setEncryptionOptions(QPDF& pdf, QPDFWriter& w)
+QPDFJob::setEncryptionOptions(QPDFWriter& w)
 {
     int R = 0;
     if (m->keylen == 40) {
@@ -2782,7 +2782,7 @@ parse_version(std::string const& full_version_string, std::string& version, int&
 }
 
 void
-QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
+QPDFJob::setWriterOptions(QPDFWriter& w)
 {
     if (m->compression_level >= 0) {
         Pl_Flate::setCompressionLevel(m->compression_level);
@@ -2837,7 +2837,7 @@ QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
         w.copyEncryptionParameters(*encryption_pdf);
     }
     if (m->encrypt) {
-        setEncryptionOptions(pdf, w);
+        setEncryptionOptions(w);
     }
     if (m->linearize) {
         w.setLinearization(true);
@@ -2956,7 +2956,7 @@ QPDFJob::doSplitPages(QPDF& pdf)
             throw std::runtime_error("split pages would overwrite input file with " + outfile);
         }
         QPDFWriter w(outpdf, outfile.c_str());
-        setWriterOptions(outpdf, w);
+        setWriterOptions(w);
         w.write();
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << prefix << ": wrote file " << outfile << "\n";
@@ -2991,7 +2991,7 @@ QPDFJob::writeOutfile(QPDF& pdf)
             m->log->saveToStandardOutput(true);
             w.setOutputPipeline(m->log->getSave().get());
         }
-        setWriterOptions(pdf, w);
+        setWriterOptions(w);
         w.write();
     }
     if (m->outfilename) {
