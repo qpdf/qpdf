@@ -24,18 +24,15 @@ of the following properties, among others:
 * Contains information used by pages (named destinations)
 
 As long as qpdf has had the ability to copy pages from one PDF to another, it has had robust
-handling of page-level data. Prior to the implementation of the pages epic, with the exception of
-page labels and form fields, qpdf has ignored document-level data during page copy operations.
-Specifically, when qpdf creates a new PDF file from existing PDF files, it always starts with a
-specific PDF, known as the _primary input_. The primary input may be a file or the built-in _empty
-PDF_. With the exception of page labels and form fields, document-level constructs that appear in
-the primary input are preserved, and document-level constructs from the other PDF files are ignored.
-With page labels, qpdf always ensures that any given page has the same label in the final output as
-it had in whichever input file it originated from, which is usually (but not always) the desired
-behavior. With form fields, qpdf has awareness and ensures that all form fields remain operational.
-The goal is to extend this document-level-awareness to other document-level constructs.
-
-Here are several examples of problems in qpdf prior to the implementation of the pages epic:
+handling of page-level data. When qpdf creates a new PDF file from existing PDF files, it starts
+with a specific PDF, known as the _primary input_. The primary input may be a file or the built-in
+_empty PDF_. Prior to the implementation of the pages epic, qpdf has ignored document-level data
+(except for page labels and interactive form fields) when merging and splitting files. Any
+document-level data in the primary input was preserved, and any document-level data other than form
+fields and page labels was discarded from the other files. After this work is complete, qpdf will
+handle other document-level data in a manner that preserves the functionality of all pages in the
+final PDF. Here are several examples of problems in qpdf prior to the implementation of the pages
+epic:
 * If two files with optional content (layers) are merged, all layers in all but the primary input
   will be visible in the combined file.
 * If two files with file attachments are merged, attachments will be retained on the primary input
@@ -46,9 +43,10 @@ Here are several examples of problems in qpdf prior to the implementation of the
   entirety, including outlines that point to pages that are no longer there, and outlines will be
   lost from all files except the primary input.
 
-With the above limitations, qpdf allows combining pages from arbitrary numbers of input PDFs to
-create an output PDF, or in the case of page splitting, multiple output PDFs. The API allows
-arbitrary combinations of input and output files. The command-line allows only the following:
+Regarding page assembly, prior to the pages epic, qpdf allows combining pages from arbitrary numbers
+of input PDFs to create an output PDF, or in the case of page splitting, multiple output PDFs. The
+API allows arbitrary combinations of input and output files. The command-line allows only the
+following:
 * Merge: creation of a single output file from a primary input and any number of other inputs by
   selecting pages by index from the beginning or end of the file
 * Split: creation of multiple output files from a single input or the result of a merge into files
@@ -79,10 +77,13 @@ Here are some examples of things that will become possible:
 The rest of this document describes the details of what how these features will work and what needs
 to be done to make them possible to build.
 
-# Architectural Thoughts
+# Architecture
 
-Open question: if I do all the complex logic in `QPDFJob`, what are the implications for pikepdf or
-other wrappers? This will need to be discussed in the discussion ticket.
+Create a `QPDFAssembler` class to handle merging and a `QPDFSplitter` to handle splitting. The
+complex assembly logic can be handled by `QPDFAssembler`. `QPDFSplitter` can invoke `QPDFAssembler`
+with a previous `QPDFAssembler`'s output (or any `QPDF`) multiple times to create the split files.
+This will mostly involve moving code from `QPDFJob` to `QPDFAssembler` and `QPDFSplitter` and having
+`QPDFJob` invoke them.
 
 Prior to implementation of the pages epic, `QPDFJob` goes through the following stages:
 
@@ -123,8 +124,16 @@ Prior to implementation of the pages epic, `QPDFJob` goes through the following 
       * Preserve form fields and page labels
 
 Broadly, the above has to be modified in the following ways:
-* From the C++ API, make it possible to use an arbitrary QPDF as an input rather than having to
-  start with a file. That makes it possible to do arbitrary work on the PDF prior to submitting it.
+* The transformations step has to be pulled out as that wil stay in `QPDFJob`.
+* Most of write QPDF will stay in `QPDFJob`, but the split logic will move to `QPDFSplitter`.
+* The entire create QPDF logic will move into `QPDFAssembler`.
+* `QPDFAssembler`'s API will allow using an arbitrary QPDF as an input rather than having to start
+  with a file. That makes it possible to do arbitrary work on the PDF prior to passing it to
+  `QPDFAssembler`.
+* `QPDFAssembler` and `QPDFSplitter` may need a C API, or perhaps C users will have to work through
+  `QPDFJob`, which will expose nearly all of the functionality.
+
+Within `QPDFAssembler`, we will extend the create QPDF logic in the following ways:
 * Allow creation of blank pages as an additional input source
 * Generalize underlay/overlay
   * Enable controlling placement
@@ -132,16 +141,31 @@ Broadly, the above has to be modified in the following ways:
 * Add additional reordering options
   * We don't need to provide hooks for this. If someone is going to code a hook, they can just
     compute the page ordering directly.
-* Have a page composition phase after the overlay/underlay stage
+* Have a page composition stage after the overlay/underlay stage
   * Allow n-up, left-to-right (can reverse page order to get rtl), top-to-bottom, or modular
     composition like pstops
 * Add additional ways to select pages besides range (e.g. based on outlines)
-* Add additional ways to specify boundaries for splitting
 * Enhance existing logic to handle other document-level structures, preferably in a way that
   requires less duplication between split and merge.
   * We don't need to turn on and off most types of document constructs individually. People can
     preprocess using the API or qpdf JSON if they want fine-grained control.
   * For things like attachments and outlines, we can add additional flags.
+
+Within `QPDFSplitter`, we will add additional ways to specify boundaries for splitting.
+
+We must take care with the implementations and APIs for `QPDFSplitter`, `QPDFAssembler`, and
+`QPDFJob` to avoid excessive duplication. Perhaps `QPDFJob` can create and configure a
+`QPDFAssembler` and `QPDFSplitter` on the fly to avoid too much duplication of state.
+
+Much of the logic will actually reside in other helper classes. For example, `QPDFAssembler` will
+probably not operate with numeric ranges, leaving that to `QPDFJob` and `QUtil` but will instead
+have vectors of page numbers. The logic for creating page groups from outlines, threads, or
+structure will most likely live in the document helpers for those bits of functionality. This keeps
+needless clutter out of `QPDFAssembler` and also makes it possible for people to perform their own
+subset of functionality by calling lower-level interfaces. The main power of `QPDFAssembler` will be
+to manage sequencing and destination tracking as well as to provide a future-proof API that will
+allow developers to automatically benefit from additional document-level support as it is added to
+qpdf.
 
 ## Flexible Assembly
 
@@ -189,10 +213,10 @@ are handled, specify placement options, etc. Given the above framework, it would
 additional features incrementally, without breaking compatibility, such as selecting or splitting
 pages based on tags, article threads, or outlines.
 
-It's tempting to allow assemblies to be nested, but this gets very complicated. From the C++ API, we
-could modify QPDFJob to allow the use any QPDF as an input, but supporting this from the CLI is hard
-because of the way JSON/arg parsing is set up. If people need to do that, they can just create
-intermediate files.
+It's tempting to allow assemblies to be nested, but this gets very complicated. From the C++ API,
+there is no problem using the output of one `QPDFAssembler` as the input to another, but supporting
+this from the CLI is hard because of the way JSON/arg parsing is set up. If people need to do that,
+they can just create intermediate files.
 
 Proposed CLI enhancements:
 
@@ -424,7 +448,8 @@ Last checked: 2023-12-29
 gh search issues label:pages --repo qpdf/qpdf --limit 200 --state=open
 ```
 
-* Allow an existing `QPDF` to be an input to a merge operation when using the QPDFJob C++ API
+* Allow an existing `QPDF` to be an input to a merge or underly/overlay operation when using the
+  `QPDFAssembler` C++ API
   * Issues: none
 * Generate a mapping from source to destination for all destinations
   * Issues: #1077
