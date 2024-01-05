@@ -146,7 +146,9 @@ Broadly, the above has to be modified in the following ways:
 * The entire create QPDF logic will move into `QPDFAssembler`.
 * `QPDFAssembler`'s API will allow using an arbitrary QPDF as an input rather than having to start
   with a file. That makes it possible to do arbitrary work on the PDF prior to passing it to
-  `QPDFAssembler`.
+  `QPDFAssembler`. The API contract will state that, if an existing `QPDF` is used as the primary
+  input, the same `QPDF` will be returned. Effectively, `QPDFAssembler` will modify the `QPDF` in
+  place.
 * `QPDFAssembler` and `QPDFSplitter` may need a C API, or perhaps C users will have to work through
   `QPDFJob`, which will expose nearly all of the functionality.
 
@@ -183,6 +185,11 @@ subset of functionality by calling lower-level interfaces. The main power of `QP
 to manage sequencing and destination tracking as well as to provide a future-proof API that will
 allow developers to automatically benefit from additional document-level support as it is added to
 qpdf.
+
+Other notes:
+* Per jbarlow, raw pointers are hard to work with in pybind11. Use references or shared pointers
+  instead for fluent interfaces.
+
 
 ## Flexible Assembly
 
@@ -407,6 +414,7 @@ Document-level structures to merge:
 * AcroForm
 * StructTreeRoot
   * Page: StructParents
+  * See jbarlow's comments in #1104 for additional notes
 * MarkInfo (see 14.7 - Logical Structure, 14.8 Tagged PDF)
 * SpiderInfo
   * Page: ID
@@ -557,3 +565,13 @@ gh search issues label:pages --repo qpdf/qpdf --limit 200 --state=open
     * There is some helpful discussion in #343 including
       * Preserving open/closed status
       * Preserving javascript actions
+
+# Other use cases
+
+* Other ways to specify pages besides numeric range
+  * all pages reachable from a section of the outline hierarchy
+  * something based on threads or document structure
+  * selection based on page labels
+* Placement for composition, overlay, underlay
+  * Scale the smaller page up to the size of the larger page
+  * Center the smaller page horizontally and bottom-align the trim boxes
