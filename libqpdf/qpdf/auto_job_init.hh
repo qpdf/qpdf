@@ -73,6 +73,7 @@ this->ap.addBare("replace-input", b(&ArgParser::argReplaceInput));
 this->ap.addBare("report-memory-usage", [this](){c_main->reportMemoryUsage();});
 this->ap.addBare("requires-password", [this](){c_main->requiresPassword();});
 this->ap.addBare("remove-restrictions", [this](){c_main->removeRestrictions();});
+this->ap.addBare("set-page-labels", b(&ArgParser::argSetPageLabels));
 this->ap.addBare("show-encryption", [this](){c_main->showEncryption();});
 this->ap.addBare("show-encryption-key", [this](){c_main->showEncryptionKey();});
 this->ap.addBare("show-linearization", [this](){c_main->showLinearization();});
@@ -180,3 +181,5 @@ this->ap.registerOptionTable("copy attachment", b(&ArgParser::argEndCopyAttachme
 this->ap.addPositional(p(&ArgParser::argCopyAttPositional));
 this->ap.addRequiredParameter("prefix", [this](std::string const& x){c_copy_att->prefix(x);}, "prefix");
 this->ap.addRequiredParameter("password", [this](std::string const& x){c_copy_att->password(x);}, "password");
+this->ap.registerOptionTable("set page labels", b(&ArgParser::argEndSetPageLabels));
+this->ap.addPositional(p(&ArgParser::argPageLabelsPositional));

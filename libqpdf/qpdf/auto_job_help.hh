@@ -402,6 +402,41 @@ ap.addOptionHelp("--keep-inline-images", "modification", "exclude inline images 
 )");
 ap.addOptionHelp("--remove-page-labels", "modification", "remove explicit page numbers", R"(Exclude page labels (explicit page numbers) from the output file.
 )");
+ap.addOptionHelp("--set-page-labels", "modification", "number pages for the entire document", R"(--set-page-labels label-spec ... --
+
+Set page labels (explicit page numbers) for the entire file.
+Each label-spec has the form
+
+first-page:[type][/start[/prefix]]
+
+where
+
+- "first-page" represents a sequential page number using the
+  same format as page ranges: a number, a number preceded by "r"
+  to indicate counting from the end, or "z" indicating the last
+  page
+- "type" is one of
+  - D: Arabic numerals (digits)
+  - A: Upper-case alphabetic characters
+  - a: Lower-case alphabetic characters
+  - R: Upper-case Roman numerals
+  - r: Lower-case Roman numerals
+  - omitted: the page number does not appear, though the prefix,
+    if specified will still appear
+- "prefix"` may be any string and is prepended to each page
+  label
+
+A given page label spec causes pages to be numbered according to
+that scheme starting with first-page and continuing until the
+next label spec or the end of the document. If you want to omit
+numbering starting at a certain page, you can use first-page: as
+the spec.
+
+Example: "1:r 5:D" would number the first four pages i through
+iv, then the remaining pages with Arabic numerals starting with
+1 and continuing sequentially until the end of the document. For
+additional examples, please consult the manual.
+)");
 ap.addHelpTopic("encryption", "create encrypted files", R"(Create encrypted files. Usage:
 
 --encrypt \
@@ -485,13 +520,13 @@ ap.addOptionHelp("--user-password", "encryption", "specify user password", R"(--
 
 Set the user password of the encrypted file.
 )");
+}
+static void add_help_5(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--owner-password", "encryption", "specify owner password", R"(--owner-password=owner-password
 
 Set the owner password of the encrypted file.
 )");
-}
-static void add_help_5(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--bits", "encryption", "specify encryption key length", R"(--bits={48|128|256}
 
 Specify the encryption key length. For best security, always use
@@ -665,15 +700,15 @@ the destination pages. See qpdf --help=page-ranges for help
 with the page range syntax. The page range may be omitted
 if --repeat is used.
 )");
+}
+static void add_help_6(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--repeat", "overlay-underlay", "overlay/underlay pages to repeat", R"(--repeat=page-range
 
 Specify pages from the overlay/underlay that are repeated after
 "from" pages have been exhausted. See qpdf --help=page-ranges
 for help with the page range syntax.
 )");
-}
-static void add_help_6(QPDFArgParser& ap)
-{
 ap.addHelpTopic("attachments", "work with embedded files", R"(It is possible to list, add, or delete embedded files (also known
 as attachments) and to copy attachments from other files. See help
 on individual options for details. Run qpdf --help=add-attachment
@@ -782,6 +817,9 @@ ap.addOptionHelp("--requires-password", "inspection", "silently test a file's pa
 2: the file is not encrypted
 3: the file is encrypted, and correct password (if any) has been supplied
 )");
+}
+static void add_help_7(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--check", "inspection", "partially check whether PDF is valid", R"(Check the structure of the PDF file as well as a number of other
 aspects of the file, and write information about the file to
 standard output. Note that qpdf does not perform any validation
@@ -789,9 +827,6 @@ of the actual PDF page content or semantic correctness of the
 PDF file. It merely checks that the PDF file is syntactically
 valid. See also qpdf --help=exit-status.
 )");
-}
-static void add_help_7(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--show-encryption", "inspection", "information about encrypted files", R"(Show document encryption parameters. Also show the document's
 user password if the owner password is given and the file was
 encrypted using older encryption formats that allow user
@@ -872,6 +907,9 @@ This option is repeatable. If given, only specified objects will
 be shown in the "objects" key of the JSON output. Otherwise, all
 objects will be shown.
 )");
+}
+static void add_help_8(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--json-stream-data", "json", "how to handle streams in json output", R"(--json-stream-data={none|inline|file}
 
 When used with --json, this option controls whether streams in
@@ -883,9 +921,6 @@ object number. The prefix can be overridden with
 when --json-output is specified, in which case the default is
 "inline".
 )");
-}
-static void add_help_8(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--json-stream-prefix", "json", "prefix for json stream data files", R"(--json-stream-prefix=file-prefix
 
 When used with --json-stream-data=file, --json-stream-data=file-prefix

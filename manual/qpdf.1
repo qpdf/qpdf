@@ -516,6 +516,45 @@ Prevent inline images from being considered by --optimize-images.
 .TP
 .B --remove-page-labels \-\- remove explicit page numbers
 Exclude page labels (explicit page numbers) from the output file.
+.TP
+.B --set-page-labels \-\- number pages for the entire document
+--set-page-labels label-spec ... --
+
+Set page labels (explicit page numbers) for the entire file.
+Each label-spec has the form
+
+first-page:[type][/start[/prefix]]
+
+where
+
+.IP \[bu]
+"first-page" represents a sequential page number using the
+same format as page ranges: a number, a number preceded by "r"
+to indicate counting from the end, or "z" indicating the last
+page
+.IP \[bu]
+"type" is one of
+- D: Arabic numerals (digits)
+- A: Upper-case alphabetic characters
+- a: Lower-case alphabetic characters
+- R: Upper-case Roman numerals
+- r: Lower-case Roman numerals
+- omitted: the page number does not appear, though the prefix,
+  if specified will still appear
+.IP \[bu]
+"prefix"` may be any string and is prepended to each page
+label
+
+A given page label spec causes pages to be numbered according to
+that scheme starting with first-page and continuing until the
+next label spec or the end of the document. If you want to omit
+numbering starting at a certain page, you can use first-page: as
+the spec.
+
+Example: "1:r 5:D" would number the first four pages i through
+iv, then the remaining pages with Arabic numerals starting with
+1 and continuing sequentially until the end of the document. For
+additional examples, please consult the manual.
 .SH ENCRYPTION (create encrypted files)
 Create encrypted files. Usage:
 
