@@ -66,6 +66,7 @@ namespace
         std::shared_ptr<QPDFJob::PagesConfig> c_pages;
         std::shared_ptr<QPDFJob::UOConfig> c_uo;
         std::shared_ptr<QPDFJob::EncConfig> c_enc;
+        std::vector<std::string> accumulated_args;
     };
 } // namespace
 
@@ -562,6 +563,26 @@ void
 Handlers::setupUnderlayPassword()
 {
     addParameter([this](char const* p) { c_uo->password(p); });
+}
+
+void
+Handlers::setupSetPageLabels()
+{
+    accumulated_args.clear();
+    addParameter([this](char const* p) { accumulated_args.push_back(p); });
+}
+
+void
+Handlers::endSetPageLabelsArray()
+{
+    c_main->setPageLabels(accumulated_args);
+    accumulated_args.clear();
+}
+
+void
+Handlers::beginSetPageLabelsArray(JSON)
+{
+    // nothing needed
 }
 
 void

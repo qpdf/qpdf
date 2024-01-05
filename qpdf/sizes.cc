@@ -101,6 +101,7 @@ main()
     print_size(QPDFJob::EncConfig);
     print_size(QPDFJob::PagesConfig);
     print_size(QPDFJob::UOConfig);
+    print_size(QPDFJob::PageLabelsConfig);
     print_size(QPDFLogger);
     print_size(QPDFMatrix);
     print_size(QPDFNameTreeObjectHelper);

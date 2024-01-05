@@ -1748,6 +1748,116 @@ Related Options
       Exclude page labels (explicit page numbers) from the output file.
 
    Exclude page labels (explicit page numbers) from the output file.
+   See also :qpdf:ref:`--set-page-labels`.
+
+.. qpdf:option:: --set-page-labels label-spec ... --
+
+   .. help: number pages for the entire document
+
+      Set page labels (explicit page numbers) for the entire file.
+      Each label-spec has the form
+
+      first-page:[type][/start[/prefix]]
+
+      where
+
+      - "first-page" represents a sequential page number using the
+        same format as page ranges: a number, a number preceded by "r"
+        to indicate counting from the end, or "z" indicating the last
+        page
+      - "type" is one of
+        - D: Arabic numerals (digits)
+        - A: Upper-case alphabetic characters
+        - a: Lower-case alphabetic characters
+        - R: Upper-case Roman numerals
+        - r: Lower-case Roman numerals
+        - omitted: the page number does not appear, though the prefix,
+          if specified will still appear
+      - "prefix"` may be any string and is prepended to each page
+        label
+
+      A given page label spec causes pages to be numbered according to
+      that scheme starting with first-page and continuing until the
+      next label spec or the end of the document. If you want to omit
+      numbering starting at a certain page, you can use first-page: as
+      the spec.
+
+      Example: "1:r 5:D" would number the first four pages i through
+      iv, then the remaining pages with Arabic numerals starting with
+      1 and continuing sequentially until the end of the document. For
+      additional examples, please consult the manual.
+
+   Set page labels (explicit page numbers) for the entire file. A PDF
+   file's pages can be explicitly numbered using page labels. Page
+   labels in a PDF file have an optional type (Arabic numerals,
+   upper/lower-case alphabetic characters, upper/lower-case Roman
+   numerals), an optional prefix, and an optional starting value,
+   which defaults to 1. A qpdf page label spec has the form
+
+   :samp:`{first-page}:[{type}][/{start}[/{prefix}]]`
+
+   where
+
+   - :samp:`{first-page}` represents a sequential page number using
+     the same format as page ranges (see :ref:`page-ranges`): a
+     number, a number preceded by ``r`` to indicate counting from the
+     end, or ``z`` indicating the last page
+
+   - :samp:`{type}` may be one of
+
+     - ``D``: Arabic numerals (digits)
+
+     - ``A``: Upper-case alphabetic characters
+
+     - ``a``: Lower-case alphabetic characters
+
+     - ``R``: Upper-case Roman numerals
+
+     - ``r``: Lower-case Roman numerals
+
+     - omitted: the page number does not appear, though the prefix, if
+       specified will still appear
+
+   - :samp:`{prefix}` may be any string and is prepended to each page
+     label
+
+   A given page label spec causes pages to be numbered according to
+   that scheme starting with :samp:`{first-page}` and continuing until
+   the next label spec or the end of the document. If you want to omit
+   numbering starting at a certain page, you can use
+   :samp:`{first-page}:` as the spec.
+
+   Here are some example page labeling schemes. First these examples,
+   assume a 50-page document.
+
+   - ``1:a 5:D``
+
+     - The first four pages will be numbered ``a`` through ``d``, then
+       the remaining pages will numbered ``1`` through ``46``.
+
+   - ``1:r 5:D 12: 14:D/10 r5:D//A- z://"end note"``:
+
+     - The first four pages are numbered ``i`` through ``iv``
+
+     - The 5th page is numbered ``1``, and pages are numbered
+       sequentially through the 11th page, which will be numbered
+       ``7``
+
+     - The 12th and 13th pages will not have labels
+
+     - The 14th page is numbered ``10``. Pages will be numered
+       sequentially up through the 45th page, which will be numbered
+       ``41``
+
+     - Starting with the 46th page (the fifth to last page) and going
+       to the 49th page, pages will be labeled ``A-1`` through ``A-4``
+
+     - The 50th page (the last page) will be labeled ``end note``.
+
+   The limitations on the range of formats for page labels are as
+   specified in Section 12.4.2 of the PDF spec, ISO 32000.
+
+   See also :qpdf:ref:`--remove-page-labels`.
 
 .. _encryption-options:
 

@@ -1059,6 +1059,17 @@ QPDFJob::Config::encrypt(
     return std::shared_ptr<EncConfig>(new EncConfig(this));
 }
 
+QPDFJob::Config*
+QPDFJob::Config::setPageLabels(const std::vector<std::string>& specs)
+{
+    // XXX validate
+    for (auto const& xxx: specs) {
+        std::cout << "XXX config: spec: " << xxx << std::endl;
+    }
+    o.m->page_label_specs = specs;
+    return this;
+}
+
 QPDFJob::EncConfig::EncConfig(Config* c) :
     config(c)
 {
@@ -1212,4 +1223,15 @@ QPDFJob::EncConfig::forceR5()
 {
     config->o.m->force_R5 = true;
     return this;
+}
+
+QPDFJob::PageLabelsConfig::PageLabelsConfig(Config* c) :
+    config(c)
+{
+}
+
+QPDFJob::Config*
+QPDFJob::PageLabelsConfig::endSetPageLabels()
+{
+    return this->config;
 }

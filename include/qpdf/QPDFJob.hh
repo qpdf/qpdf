@@ -296,6 +296,23 @@ class QPDFJob
         Config* config;
     };
 
+    class PageLabelsConfig {
+        friend class QPDFJob;
+        friend class Config;
+
+      public:
+        QPDF_DLL
+        Config* endSetPageLabels();
+
+#include <qpdf/auto_job_c_set_page_labels.hh>
+
+      private:
+        PageLabelsConfig(Config*);
+        PageLabelsConfig(PagesConfig const&) = delete;
+
+        Config* config;
+    };
+
     class Config
     {
         friend class QPDFJob;
@@ -313,6 +330,8 @@ class QPDFJob
         Config* outputFile(std::string const& filename);
         QPDF_DLL
         Config* replaceInput();
+        QPDF_DLL
+        Config* setPageLabels(std::vector<std::string> const& specs);
 
         QPDF_DLL
         std::shared_ptr<CopyAttConfig> copyAttachmentsFrom();
@@ -675,6 +694,7 @@ class QPDFJob
         bool json_output{false};
         std::string update_from_json;
         bool report_mem_usage{false};
+        std::vector<std::string> page_label_specs;
     };
     std::shared_ptr<Members> m;
 };

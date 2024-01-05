@@ -94,6 +94,7 @@ options:
       - underlay
       - empty
       - replace-input
+      - set-page-labels
     positional: true
     bare:
       - add-attachment
@@ -134,6 +135,7 @@ options:
       - report-memory-usage
       - requires-password
       - remove-restrictions
+      - set-page-labels
       - show-encryption
       - show-encryption-key
       - show-linearization
@@ -282,6 +284,9 @@ options:
     required_parameter:
       prefix: prefix
       password: password
+  - table: set page labels
+    prefix: PageLabels
+    positional: true
 json:
   # The structure of this section defines what the json input to
   # QPDFJob looks like. If a key starts with underscore, it does not
@@ -437,6 +442,8 @@ json:
   remove-page-labels:
   report-memory-usage:
   rotate:
+  set-page-labels:
+    - null
   overlay:
     _file: "source file for overlay"
     UO.password:

@@ -409,6 +409,26 @@ ArgParser::argEndCopyAttachment()
 }
 
 void
+ArgParser::argSetPageLabels()
+{
+    this->ap.selectOptionTable(O_SET_PAGE_LABELS);
+    accumulated_args.clear();
+}
+
+void
+ArgParser::argPageLabelsPositional(std::string const& arg)
+{
+    accumulated_args.push_back(arg);
+}
+
+void
+ArgParser::argEndSetPageLabels()
+{
+    c_main->setPageLabels(accumulated_args);
+    accumulated_args.clear();
+}
+
+void
 ArgParser::argJobJsonHelp()
 {
     *QPDFLogger::defaultLogger()->getInfo()
