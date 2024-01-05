@@ -15,7 +15,6 @@ updated in this document.
 This a breakdown of work. It is near the top of the file for easy access but doesn't make sense
 without reading the rest of the file.
 
-* Issue #939 (`--set-page-labels`) is unblocked and can be done at any time.
 * Create `QPDFAssembler` and incrementally move functionality from `QPDFJob` into it.
 * Create `QPDFSplitter` to use `QPDFAssembler`. Write a section in the manual describing how they
   work, but leave the detailed API documentation in the header files. Model after how `QPDFJob` is
@@ -277,8 +276,6 @@ Proposed CLI enhancements:
 --split-pages=n  # existing
 --split-after=a,b,c  # split after each named page
 --...  # future options to split based on outlines, article threads, tags, etc.
-# post-processing (with transformations like optimize images)
---set-page-labels ... # See issue #939
 ```
 
 Notes:
@@ -297,8 +294,6 @@ Notes:
   external logic to compute the rectangles and then use absolute rectangles.
 * `--compose`: XXX
 * `--booklet`: XXX
-* The `--set-page-labels` option would be done at the very end and is actually not blocked by
-  anything else here. It can be done near removing page labels in `handleTransformations`.
 * I'm not sure what impact composition should have on page labels. Most likely, we should drop page
   labels on composition. If someone wants them, they can use `--set-page-labels`.
 
@@ -512,12 +507,6 @@ gh search issues label:pages --repo qpdf/qpdf --limit 200 --state=open
     * This looks complicated. It may be not be possible to do this fully in the first increment, but
       we have to keep it in mind and warn if we can't and we see /SD in an action.
     * #490 has some good analysis
-* Assign page labels (renumber pages)
-  * Issues: #939
-  * Notes:
-    * #939 has a good proposal
-    * This could be applied to page groups, and we could have an option to keep the labels as they
-      are in a given group, which is what qpdf does now.
 * Interleave pages with ordering
   * Issues: #921
   * Notes:
