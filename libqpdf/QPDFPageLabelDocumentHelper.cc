@@ -99,3 +99,36 @@ QPDFPageLabelDocumentHelper::getLabelsForPageRange(
         }
     }
 }
+
+QPDFObjectHandle
+QPDFPageLabelDocumentHelper::pageLabelDict(
+    qpdf_page_label_e label_type, int start_num, std::string_view prefix)
+{
+    auto num = "<< /Type /PageLabel >>"_qpdf;
+    switch (label_type) {
+    case pl_none:
+        break;
+    case pl_digits:
+        num.replaceKey("/S", "/D"_qpdf);
+        break;
+    case pl_alpha_lower:
+        num.replaceKey("/S", "/a"_qpdf);
+        break;
+    case pl_alpha_upper:
+        num.replaceKey("/S", "/A"_qpdf);
+        break;
+    case pl_roman_lower:
+        num.replaceKey("/S", "/r"_qpdf);
+        break;
+    case pl_roman_upper:
+        num.replaceKey("/S", "/R"_qpdf);
+        break;
+    }
+    if (!prefix.empty()) {
+        num.replaceKey("/P", QPDFObjectHandle::newUnicodeString(std::string(prefix)));
+    }
+    if (start_num != 1) {
+        num.replaceKey("/St", QPDFObjectHandle::newInteger(start_num));
+    }
+    return num;
+}

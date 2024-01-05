@@ -38,7 +38,7 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
-11.7.1: not yet released
+11.8.0: not yet released
   - Bug fixes:
 
     - When flattening annotations, preserve hyperlinks and other
@@ -53,6 +53,19 @@ Planned changes for future 12.x (subject to change):
     - Support comma-separated numeric values with
       :qpdf:ref:`--collate` to select different numbers of pages from
       different groups.
+
+    - Add :qpdf:ref:`--set-page-labels` option to completely override
+      page labels in the output.
+
+  - Library Enhancements
+
+    - Add API to support :qpdf:ref:`--set-page-labels`:
+
+      - ``QPDFJob::Config::setPageLabels``
+
+      - ``pdf_page_label_e`` enumerated type
+
+      - ``QPDFPageLabelDocumentHelper::pageLabelDict``
 
 11.7.0: December 24, 2023
   - Bug fixes:

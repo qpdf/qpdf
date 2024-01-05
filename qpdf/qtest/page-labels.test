@@ -29,5 +29,44 @@ $td->runtest("no page labels",
              {$td->FILE => "no-page-labels.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
+# --set-page-labels
+my @errors = (
+    ["quack", ".*page label spec must be.*"],
+    ["5:r 10:D", ".*the first page .*must start with page 1.*"],
+    ["1:r 10:D 31:A",
+     ".*page 31 is more than the total number of pages \\(30\\).*"],
+);
+$n_tests += scalar(@errors);
+
+foreach my $d (@errors)
+{
+    my ($specs, $err) = @$d;
+    $td->runtest("error ($specs)",
+                 {$td->COMMAND => "qpdf --set-page-labels $specs --" .
+                      " page-labels-num-tree.pdf a.pdf"},
+                 {$td->REGEXP => $err, $td->EXIT_STATUS => 2},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+$n_tests += 4;
+$td->runtest("set page labels",
+             {$td->COMMAND => "qpdf page-labels-num-tree.pdf a.pdf" .
+                  " --set-page-labels 1:a 3:R/2 6:r//Z- 8:A/17 r10:D/3 28: z://end --"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("after set page labels",
+             {$td->COMMAND => "test_driver 47 a.pdf"},
+             {$td->FILE => "set-page-labels.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("set page labels (json)",
+             {$td->COMMAND => "qpdf page-labels-num-tree.pdf b.pdf" .
+                  " --job-json-file=set-page-labels.json"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("after set page labels",
+             {$td->COMMAND => "test_driver 47 b.pdf"},
+             {$td->FILE => "set-page-labels.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
 cleanup();
 $td->report($n_tests);

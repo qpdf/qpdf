@@ -296,7 +296,8 @@ class QPDFJob
         Config* config;
     };
 
-    class PageLabelsConfig {
+    class PageLabelsConfig
+    {
         friend class QPDFJob;
         friend class Config;
 
@@ -456,6 +457,22 @@ class QPDFJob
         std::vector<int> to_pagenos;
         std::vector<int> from_pagenos;
         std::vector<int> repeat_pagenos;
+    };
+
+    struct PageLabelSpec
+    {
+        PageLabelSpec(
+            int first_page, qpdf_page_label_e label_type, int start_num, std::string_view prefix) :
+            first_page(first_page),
+            label_type(label_type),
+            start_num(start_num),
+            prefix(prefix)
+        {
+        }
+        int first_page;
+        qpdf_page_label_e label_type;
+        int start_num{1};
+        std::string prefix;
     };
 
     // Helper functions
@@ -694,7 +711,7 @@ class QPDFJob
         bool json_output{false};
         std::string update_from_json;
         bool report_mem_usage{false};
-        std::vector<std::string> page_label_specs;
+        std::vector<PageLabelSpec> page_label_specs;
     };
     std::shared_ptr<Members> m;
 };

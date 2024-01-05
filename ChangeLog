@@ -1,3 +1,11 @@
+2024-01-05  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add --set-page-labels command-line argument and supporting API.
+	Fixes #939.
+	  - QPDFJob::Config::setPageLabels
+	  - pdf_page_label_e enumerated type
+	  - QPDFPageLabelDocumentHelper::pageLabelDict
+
 2024-01-01  Jay Berkenbilt  <ejb@ql.org>
 
 	* Support comma-separated numeric values with --collate to select

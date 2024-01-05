@@ -1,5 +1,7 @@
 #include <qpdf/QPDFJob.hh>
 
+#include <regex>
+
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -1062,11 +1064,50 @@ QPDFJob::Config::encrypt(
 QPDFJob::Config*
 QPDFJob::Config::setPageLabels(const std::vector<std::string>& specs)
 {
-    // XXX validate
-    for (auto const& xxx: specs) {
-        std::cout << "XXX config: spec: " << xxx << std::endl;
+    static std::regex page_label_re(R"(^(z|r?\d+):([DaArR])?(?:/(\d+)?(?:/(.+)?)?)?$)");
+    o.m->page_label_specs.clear();
+    for (auto const& spec: specs) {
+        std::smatch match;
+        if (!std::regex_match(spec, match, page_label_re)) {
+            usage("page label spec must be n:[D|a|A|r|R][/start[/prefix]]");
+        }
+        auto first_page_str = match[1].str();
+        int first_page;
+        if (first_page_str == "z") {
+            first_page = -1;
+        } else if (first_page_str.at(0) == 'r') {
+            first_page = -QUtil::string_to_int(first_page_str.substr(1).c_str());
+        } else {
+            first_page = QUtil::string_to_int(first_page_str.c_str());
+        }
+        auto label_type_ch = match[2].matched ? match[2].str().at(0) : '\0';
+        qpdf_page_label_e label_type;
+        switch (label_type_ch) {
+        case 'D':
+            label_type = pl_digits;
+            break;
+        case 'a':
+            label_type = pl_alpha_lower;
+            break;
+        case 'A':
+            label_type = pl_alpha_upper;
+            break;
+        case 'r':
+            label_type = pl_roman_lower;
+            break;
+        case 'R':
+            label_type = pl_roman_upper;
+            break;
+        default:
+            label_type = pl_none;
+        }
+
+        auto start_num = match[3].matched ? QUtil::string_to_int(match[3].str().c_str()) : 1;
+        auto prefix = match[4].matched ? match[4].str() : "";
+        // We can't check ordering until we know how many pages there are, so that is delayed until
+        // near the end.
+        o.m->page_label_specs.emplace_back(first_page, label_type, start_num, prefix);
     }
-    o.m->page_label_specs = specs;
     return this;
 }
 

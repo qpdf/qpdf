@@ -232,4 +232,14 @@ enum pdf_annotation_flag_e {
 /* Encryption/password status for QPDFJob */
 enum qpdf_encryption_status_e { qpdf_es_encrypted = 1 << 0, qpdf_es_password_incorrect = 1 << 1 };
 
+/* Page label types */
+enum qpdf_page_label_e {
+    pl_none,
+    pl_digits,
+    pl_alpha_lower,
+    pl_alpha_upper,
+    pl_roman_lower,
+    pl_roman_upper,
+};
+
 #endif /* QPDFCONSTANTS_H */

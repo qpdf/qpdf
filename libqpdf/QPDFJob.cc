@@ -2172,6 +2172,37 @@ QPDFJob::handleTransformations(QPDF& pdf)
     if (m->remove_page_labels) {
         pdf.getRoot().removeKey("/PageLabels");
     }
+    if (!m->page_label_specs.empty()) {
+        auto nums = QPDFObjectHandle::newArray();
+        auto n_pages = QIntC::to_int(dh.getAllPages().size());
+        int last_page_seen{0};
+        for (auto& spec: m->page_label_specs) {
+            if (spec.first_page < 0) {
+                spec.first_page = n_pages + 1 + spec.first_page;
+            }
+            if (last_page_seen == 0) {
+                if (spec.first_page != 1) {
+                    throw std::runtime_error(
+                        "the first page label specification must start with page 1");
+                }
+            } else if (spec.first_page <= last_page_seen) {
+                throw std::runtime_error(
+                    "page label specifications must be in order by first page");
+            }
+            if (spec.first_page > n_pages) {
+                throw std::runtime_error(
+                    "page label spec: page " + std::to_string(spec.first_page) +
+                    " is more than the total number of pages (" + std::to_string(n_pages) + ")");
+            }
+            last_page_seen = spec.first_page;
+            nums.appendItem(QPDFObjectHandle::newInteger(spec.first_page - 1));
+            nums.appendItem(QPDFPageLabelDocumentHelper::pageLabelDict(
+                spec.label_type, spec.start_num, spec.prefix));
+        }
+        auto page_labels = QPDFObjectHandle::newDictionary();
+        page_labels.replaceKey("/Nums", nums);
+        pdf.getRoot().replaceKey("/PageLabels", page_labels);
+    }
     if (!m->attachments_to_remove.empty()) {
         QPDFEmbeddedFileDocumentHelper efdh(pdf);
         for (auto const& key: m->attachments_to_remove) {
@@ -3019,10 +3050,9 @@ QPDFJob::writeOutfile(QPDF& pdf)
             try {
                 QUtil::remove_file(backup.c_str());
             } catch (QPDFSystemError& e) {
-                *m->log->getError()
-                    << m->message_prefix << ": unable to delete original file (" << e.what() << ");"
-                    << " original file left in " << backup
-                    << ", but the input was successfully replaced\n";
+                *m->log->getError() << m->message_prefix << ": unable to delete original file ("
+                                    << e.what() << ");" << " original file left in " << backup
+                                    << ", but the input was successfully replaced\n";
             }
         }
     }

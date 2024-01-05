@@ -49,6 +49,11 @@ class QPDFPageLabelDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     bool hasPageLabels();
 
+    // Helper function to create a dictionary suitable for adding to the /PageLabels numbers tree.
+    QPDF_DLL
+    static QPDFObjectHandle
+    pageLabelDict(qpdf_page_label_e label_type, int start_num, std::string_view prefix);
+
     // Return a page label dictionary representing the page label for the given page. The page does
     // not need to appear explicitly in the page label dictionary. This method will adjust /St as
     // needed to produce a label that is suitable for the page.
