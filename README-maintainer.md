@@ -377,7 +377,8 @@ Quick reminder:
   argument
 * Add an entry to the bottom half of job.yml for the job JSON field
 * Add documentation for the new option to cli.rst
-* Implement the QPDFJob::Config method in QPDFJob_config.cc.
+* Implement the QPDFJob::Config method in QPDFJob_config.cc
+* Adding new options tables is harder -- see below
 
 QPDFJob is documented in three places:
 
@@ -405,6 +406,12 @@ the appropriate Config method, which you then have to implement. If
 you need a manual handler, you have to declare the option as manual in
 job.yml and implement the handler yourself, though the automatically
 generated code will declare it for you.
+
+Adding a new option table is a bit harder and is not well-documented.
+For a simple example, look at the code that added the
+--set-page-labels table. That change was divided into two commits (one
+for the manual changes, and one for the generated changes) to make it
+easier to use as an example.
 
 The build will fail until the new option is documented in
 manual/cli.rst. To do that, create documentation for the option by
