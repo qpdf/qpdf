@@ -2376,20 +2376,26 @@ QPDF::getCompressibleObjGens()
     QPDFObjectHandle encryption_dict = m->trailer.getKey("/Encrypt");
     QPDFObjGen encryption_dict_og = encryption_dict.getObjGen();
 
-    QPDFObjGen::set visited;
+    const size_t max_obj = getObjectCount();
+    std::vector<bool> visited(max_obj, false);
     std::vector<QPDFObjectHandle> queue;
     queue.reserve(512);
     queue.push_back(m->trailer);
     std::vector<QPDFObjGen> result;
     while (!queue.empty()) {
-        QPDFObjectHandle obj = queue.back();
+        auto obj = queue.back();
         queue.pop_back();
         if (obj.isIndirect()) {
             QPDFObjGen og = obj.getObjGen();
-            if (!visited.add(og)) {
+            const size_t id = toS(og.getObj() - 1);
+            if (id >= max_obj)
+                throw std::runtime_error(
+                    "unexpected object id encountered in getCompressibleObjGens");
+            if (visited[id]) {
                 QTC::TC("qpdf", "QPDF loop detected traversing objects");
                 continue;
             }
+            visited[id] = true;
             if (og == encryption_dict_og) {
                 QTC::TC("qpdf", "QPDF exclude encryption dictionary");
             } else if (!(obj.isStream() ||
