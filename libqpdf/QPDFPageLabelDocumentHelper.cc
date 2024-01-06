@@ -104,7 +104,7 @@ QPDFObjectHandle
 QPDFPageLabelDocumentHelper::pageLabelDict(
     qpdf_page_label_e label_type, int start_num, std::string_view prefix)
 {
-    auto num = "<< /Type /PageLabel >>"_qpdf;
+    auto num = QPDFObjectHandle::newDictionary();
     switch (label_type) {
     case pl_none:
         break;
