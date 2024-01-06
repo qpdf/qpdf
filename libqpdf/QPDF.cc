@@ -600,7 +600,8 @@ QPDF::reconstruct_xref(QPDFExc& e)
             try {
                 read_xref(max_offset);
             } catch (std::exception&) {
-                throw damagedPDF("", 0, "error decoding candidate xref stream while recovering damaged file");
+                throw damagedPDF(
+                    "", 0, "error decoding candidate xref stream while recovering damaged file");
             }
             QTC::TC("qpdf", "QPDF recover xref stream");
         }
