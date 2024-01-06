@@ -2,13 +2,10 @@
 
 #include <qpdf/QPDF.hh>
 
-#include <algorithm>
 #include <atomic>
-#include <cstdlib>
 #include <cstring>
 #include <limits>
 #include <map>
-#include <memory.h>
 #include <regex>
 #include <sstream>
 #include <vector>
@@ -17,8 +14,6 @@
 #include <qpdf/FileInputSource.hh>
 #include <qpdf/OffsetInputSource.hh>
 #include <qpdf/Pipeline.hh>
-#include <qpdf/Pl_Discard.hh>
-#include <qpdf/Pl_OStream.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFObject_private.hh>
