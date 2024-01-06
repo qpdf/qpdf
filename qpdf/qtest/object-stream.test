@@ -16,7 +16,7 @@ cleanup();
 
 my $td = new TestDriver('object-stream');
 
-my $n_tests = 3 + (36 * 4) + (12 * 2);
+my $n_tests = 5 + (36 * 4) + (12 * 2);
 my $n_compare_pdfs = 36;
 
 for (my $n = 16; $n <= 19; ++$n)
@@ -86,6 +86,16 @@ $td->runtest("check file",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "gen1.qdf"});
 
+
+# Recover a file with xref streams
+$td->runtest("recover file with xref stream",
+             {$td->COMMAND => "qpdf --static-id --compress-streams=n" .
+                  " recover-xref-stream.pdf a.pdf"},
+             {$td->FILE => "recover-xref-stream.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "recover-xref-stream-recovered.pdf"});
 
 cleanup();
 $td->report(calc_ntests($n_tests, $n_compare_pdfs));

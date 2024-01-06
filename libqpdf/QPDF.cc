@@ -580,6 +580,38 @@ QPDF::reconstruct_xref(QPDFExc& e)
     m->deleted_objects.clear();
 
     if (!m->trailer.isInitialized()) {
+        qpdf_offset_t max_offset{0};
+        // If there are any xref streams, take the last one to appear.
+        for (auto const& iter: m->xref_table) {
+            auto entry = iter.second;
+            if (entry.getType() != 1) {
+                continue;
+            }
+            auto oh = getObjectByObjGen(iter.first);
+            try {
+                if (!oh.isStreamOfType("/XRef")) {
+                    continue;
+                }
+            } catch (std::exception&) {
+                continue;
+            }
+            auto offset = entry.getOffset();
+            if (offset > max_offset) {
+                max_offset = offset;
+                setTrailer(oh.getDict());
+            }
+        }
+        if (max_offset > 0) {
+            try {
+                read_xref(max_offset);
+            } catch (std::exception&) {
+                throw damagedPDF("", 0, "error decoding candidate xref stream while recovering damaged file");
+            }
+            QTC::TC("qpdf", "QPDF recover xref stream");
+        }
+    }
+
+    if (!m->trailer.isInitialized()) {
         // We could check the last encountered object to see if it was an xref stream.  If so, we
         // could try to get the trailer from there.  This may make it possible to recover files with
         // bad startxref pointers even when they have object streams.

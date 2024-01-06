@@ -689,3 +689,4 @@ QPDFPageObjectHelper used fallback without copying 0
 QPDF skipping cache for known unchecked object 0
 QPDF fix dangling triggered xref reconstruction 0
 QPDFPageDocumentHelper flatten resources missing or invalid 0
+QPDF recover xref stream 0

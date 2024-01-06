@@ -67,6 +67,11 @@ Planned changes for future 12.x (subject to change):
 
       - ``QPDFPageLabelDocumentHelper::pageLabelDict``
 
+    - Improve file recovery logic to better handle files with
+      cross-reference streams. This should enable qpdf to recover some
+      files that it would previously have reported "unable to find
+      trailer dictionary."
+
 11.7.0: December 24, 2023
   - Bug fixes:
 

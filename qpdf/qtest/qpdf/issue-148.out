@@ -7,4 +7,9 @@ WARNING: issue-148.pdf (offset 73): error decoding stream data for object 8 0: s
 WARNING: issue-148.pdf: file is damaged
 WARNING: issue-148.pdf (offset 73): getStreamData called on unfilterable stream
 WARNING: issue-148.pdf: Attempting to reconstruct cross-reference table
-qpdf: issue-148.pdf: unable to find trailer dictionary while recovering damaged file
+WARNING: issue-148.pdf (xref stream: object 8 0, offset 26): stream dictionary lacks /Length key
+WARNING: issue-148.pdf (xref stream: object 8 0, offset 73): attempting to recover stream length
+WARNING: issue-148.pdf (xref stream: object 8 0, offset 73): recovered stream length: 2
+WARNING: issue-148.pdf (xref stream: object 8 0, offset 85): expected endobj
+WARNING: issue-148.pdf (offset 73): error decoding stream data for object 8 0: stream inflate: inflate: data: incorrect header check
+qpdf: issue-148.pdf: error decoding candidate xref stream while recovering damaged file

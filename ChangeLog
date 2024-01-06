@@ -1,3 +1,9 @@
+2024-01-06  Jay Berkenbilt  <ejb@ql.org>
+
+	* When recovering a file's xref table, attempt to find xref
+	streams if a traditional trailer dictionary is not found. Fixes
+	#1103.
+
 2024-01-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add --set-page-labels command-line argument and supporting API.
