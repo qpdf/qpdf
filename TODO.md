@@ -31,23 +31,18 @@ Next
 
 * Spell check: Have the spell-check script synchronize cSpell.json with .idea/dictionaries/qpdf.xml,
   which should be set to the union of all the validated user dictionaries.
-* Fix #874 -- make args in --encrypt to match the json and make positional fill in the gaps
-* Maybe fix #553 -- use file times for attachments
+* Maybe fix #553 -- use file times for attachments (trivial with C++-20)
 * std::string_view transition -- work being done by m-holger
-* Break ground on "Document-level work" -- TODO-pages.md lives on a separate branch.
-* Standard for CLI and Job JSON support for JSON-based command-line arguments. Come up with a
-  standard way of supporting command-line arguments that take JSON specifications of things so that
-  * there is a predictable way to indicate whether an argument is a file or a JSON blob
-  * with QPDFJob JSON, make sure it is possible to directly include the JSON rather than having to
-    stringify a JSON blob
-  * One option might be to prepend file:// to a filename or otherwise to take a JSON blob. We could
-    have that as a particular type of argument that would behave properly for both job JSON and CLI.
-* Support digital signatures. This probably requires support for incremental updates. See
-  "incremental updates" in rejected ideas. That description is out of date but would need to be
-  cleaned up. See also issue #22.
+* Support incremental updates. See "incremental updates" in [General](#general). See also issue #22.
   * Make it possible to see incremental updates in qdf mode.
   * Make it possible to add incremental updates.
   * We may want a writing mode that preserves object IDs. See #339.
+* Support digital signatures. This probably requires support for incremental updates. First, add
+  support for verifying digital signatures. Then we can consider adding support for signing
+  documents, though the ability to sign documents is less useful without an interactive process of
+  filling in a field. We may want to support only a subset of digital signature with invisible
+  signature fields or with existing fields.
+* Support public key security handler (Section 7.6.5.)
 
 Possible future JSON enhancements
 =================================
@@ -328,6 +323,36 @@ NOTE: Some items in this list refer to files in my personal home directory or th
 publicly accessible. This includes things sent to me by email that are specifically not public. Even
 so, I find it useful to make reference to them in this list.
 
+* Provide support in QPDFWriter for writing incremental updates. Provide support in qpdf for
+  preserving incremental updates. The goal should be that QDF mode should be fully functional for
+  files with incremental updates including fix_qdf. This will work best if original object IDs are
+  preserved when a file is written. We will also have to preserve generations, which are, I believe,
+  completely ignored by QPDFWriter. If an update adds an object with a higher generation, any
+  reference to the object with a lower generation resolves to the null object. Increasing the
+  generation represents reusing an object number, while keeping the generation the same is updating
+  an object. I think qpdf must handle generations correctly, but make sure to test this carefully.
+
+  Note that there's nothing that says an indirect object in one update can't refer to an object that
+  doesn't appear until a later update. This means that QPDF has to hang onto indirect nulls,
+  including when they appear as dictionary values. In this case, QPDF_Dictionary::getKeys() ignores
+  all keys with null values, and hasKey() returns false for keys that have null values. We would
+  probably want to make QPDF_Dictionary able to handle the special case of keys that are indirect
+  nulls and basically never have it drop any keys that are indirect objects. We also have to make
+  sure that the testing for this handles non-trivial cases of the targets of indirect nulls being
+  replaced by real objects in an update. Such indirect nulls should appear in tests as dictionary
+  values and as array values. In the distant past, qpdf used to replace indirect nulls with direct
+  nulls, but I think there are no longer any remnants of that behavior.
+
+  I'm not sure how this plays with linearization, if at all. For cases where incremental updates are
+  not being preserved as incremental updates and where the data is being folded in (as is always the
+  case with qpdf now), none of this should make any difference in the actual semantics of the files.
+
+  One thought about how to implement this would be to have a QPDF object that is an incremental
+  update to an underlying QPDF object. Objects would be resolved from the underlying QPDF if not
+  found in the main one. When you write this type of QPDF, it can either flatten or it can write as
+  incremental updates. Perhaps, in incremental mode, QPDF reads each increment as a separate QPDF
+  with this kind of layering.
+
 * Consider enabling code scanning on GitHub.
 
 * Add an option --ignore-encryption to ignore encryption information and treat encrypted files as if
@@ -566,31 +591,6 @@ Rejected Ideas
 ==============
 
 * Investigate whether there is a way to automate the memory checker tests for Windows.
-
-* (This idea may be revised with alterations. Some of this is out of date.) Provide support in
-  QPDFWriter for writing incremental updates. Provide support in qpdf for preserving incremental
-  updates. The goal should be that QDF mode should be fully functional for files with incremental
-  updates including fix_qdf.
-
-  Note that there's nothing that says an indirect object in one update can't refer to an object that
-  doesn't appear until a later update. This means that QPDF has to treat indirect null objects
-  differently from how it does now. QPDF drops indirect null objects that appear as members of
-  arrays or dictionaries. For arrays, it's handled in QPDFWriter where we make indirect nulls
-  direct. This is in a single if block, and nothing else in the code cares about it. We could just
-  remove that if block and not break anything except a few test cases that exercise the current
-  behavior. For dictionaries, it's more complicated. In this case, QPDF_Dictionary::getKeys()
-  ignores all keys with null values, and hasKey() returns false for keys that have null values. We
-  would probably want to make QPDF_Dictionary able to handle the special case of keys that are
-  indirect nulls and basically never have it drop any keys that are indirect objects.
-
-  If we make a change to have qpdf preserve indirect references to null objects, we have to note
-  this in ChangeLog and in the release notes since this will change output files. We did this before
-  when we stopped flattening scalar references, so this is probably not a big deal. We also have to
-  make sure that the testing for this handles non-trivial cases of the targets of indirect nulls
-  being replaced by real objects in an update. I'm not sure how this plays with linearization, if at
-  all. For cases where incremental updates are not being preserved as incremental updates and where
-  the data is being folded in (as is always the case with qpdf now), none of this should make any
-  difference in the actual semantics of the files.
 
 * The second xref stream for linearized files has to be padded only because we need file_size as
   computed in pass 1 to be accurate. If we were not allowing writing to a pipe, we could seek back
