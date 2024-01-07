@@ -457,7 +457,7 @@ namespace QUtil
     // group that didn't start with `x1.
     //
     // Example: with max of 15, the range "4-10,x7-9,12-8,xr5" is 4, 5, 6, 10, 12, 10, 9, 8. This is
-    // 4 through 10 inclusive without 7 through 9 inclusive followed by 12 to 8 inclusiuve
+    // 4 through 10 inclusive without 7 through 9 inclusive followed by 12 to 8 inclusive
     // (descending) without 11 (the fifth value counting backwards from 15). For more information
     // and additional examples, see the "Page Ranges" section in the manual.
     QPDF_DLL

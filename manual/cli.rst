@@ -1845,7 +1845,7 @@ Related Options
 
      - The 12th and 13th pages will not have labels
 
-     - The 14th page is numbered ``10``. Pages will be numered
+     - The 14th page is numbered ``10``. Pages will be numbered
        sequentially up through the 45th page, which will be numbered
        ``41``
 
@@ -2602,7 +2602,7 @@ Examples
 
 - You can specify a multiple numeric parameters to :qpdf:ref:`--collate`. With
   :samp:`--collate={i,j,k}`, pull groups of :samp:`{i}` pages from the
-  first file, then :samp:`{j}` from the second, thenm :samp:`{k}` from
+  first file, then :samp:`{j}` from the second, then :samp:`{k}` from
   the third, repeating. The number of parameters must equal the number
   of groups. For example, if you ran
 
