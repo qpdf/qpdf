@@ -10,7 +10,7 @@ on:
     paths-ignore:
       - 'ChangeLog'
       - 'README*'
-      - 'TODO'
+      - 'TODO*'
   pull_request:
   schedule:
     # Building regularly with cron makes it safe for us to use
