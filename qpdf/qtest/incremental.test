@@ -18,7 +18,8 @@ my $n_tests = 6;
 
 # Since the beginning but discovered at the time of releasing 11.8.0:
 # qpdf doesn't delete earlier generations of an object when they are
-# reused.
+# reused. See also EXPECT_FAILURE in object-stream.test and
+# linearization.test.
 $td->runtest("handle delete and reuse",
              {$td->COMMAND => "qpdf --qdf --static-id incremental-1.pdf a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0},

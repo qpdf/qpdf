@@ -39,7 +39,8 @@ my @to_linearize =
      'lin-delete-and-reuse',    # linearized, then delete and reuse
      'object-stream',           # contains object streams
      'hybrid-xref',             # contains both xref tables and streams
-     'gen1',                    # has objects with generation > 0
+     'gen1',                    # has objects with generation > 0 and dangling references
+     'gen1-no-dangling',        # has objects with generation > 0
      'direct-outlines',         # /Outlines is a direct object
      @linearized_files,         # we should be able to relinearize
      );
@@ -83,23 +84,29 @@ foreach my $base (@to_linearize)
 {
     foreach my $omode (qw(disable preserve generate))
     {
+        my $xflags = 0;
+        if ($base eq 'gen1')
+        {
+            $xflags = $td->EXPECT_FAILURE;
+        }
         my $oarg = "-object-streams=$omode";
         my $sdarg = "";
         if (($base eq 'lin-special') || ($base eq 'object-stream'))
         {
             $sdarg = "--stream-data=uncompress";
         }
+        unlink "a.pdf", "b.pdf", "c.pdf";
         $td->runtest("linearize $base ($omode)",
                      {$td->COMMAND =>
                           "qpdf -linearize $oarg $sdarg" .
                           " --static-id $base.pdf a.pdf"},
-                     {$td->STRING => "",
-                      $td->EXIT_STATUS => 0});
+                     {$td->STRING => "", $td->EXIT_STATUS => 0},
+                     $xflags);
         $td->runtest("check linearization",
                      {$td->COMMAND => "qpdf --check-linearization a.pdf"},
                      {$td->STRING => "a.pdf: no linearization errors\n",
                       $td->EXIT_STATUS => 0},
-                     $td->NORMALIZE_NEWLINES);
+                     $td->NORMALIZE_NEWLINES | $xflags);
         # Relinearizing twice should produce identical results.  We
         # have to do it twice because, if objects changed ordering
         # during the original linearization, the hint tables won't
@@ -110,16 +117,17 @@ foreach my $base (@to_linearize)
         $td->runtest("relinearize $base 1",
                      {$td->COMMAND =>
                           "qpdf -linearize $sdarg --static-id a.pdf b.pdf"},
-                     {$td->STRING => "",
-                      $td->EXIT_STATUS => 0});
+                     {$td->STRING => "", $td->EXIT_STATUS => 0},
+                     $xflags);
         $td->runtest("relinearize $base 2",
                      {$td->COMMAND =>
                           "qpdf -linearize $sdarg --static-id b.pdf c.pdf"},
-                     {$td->STRING => "",
-                      $td->EXIT_STATUS => 0});
+                     {$td->STRING => "", $td->EXIT_STATUS => 0},
+                     $xflags);
         $td->runtest("compare files ($omode)",
                      {$td->FILE => "b.pdf"},
-                     {$td->FILE => "c.pdf"});
+                     {$td->FILE => "c.pdf"},
+                     $xflags);
         if (($base eq 'lin-special') || ($base eq 'object-stream'))
         {
             $td->runtest("check $base ($omode)",
