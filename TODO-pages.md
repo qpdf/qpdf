@@ -113,7 +113,8 @@ Prior to implementation of the pages epic, `QPDFJob` goes through the following 
     * Handle collation
     * Copy or revive all final pages
       * When copying foreign pages, possibly remove unreferenced resources
-      * Handle the same page copied more than once by doing a shallow copy
+      * Handle the same page copied more than once by cloning the page dictionary while sharing any
+        indirect references
       * Preserve form fields and page labels
     * Delete pages from the primary input that were not used in the output
     * Delete unreferenced form fields
@@ -140,7 +141,7 @@ Prior to implementation of the pages epic, `QPDFJob` goes through the following 
       * Preserve form fields and page labels
 
 Broadly, the above has to be modified in the following ways:
-* The transformations step has to be pulled out as that wil stay in `QPDFJob`.
+* The transformations step has to be pulled out as that will stay in `QPDFJob`.
 * Most of write QPDF will stay in `QPDFJob`, but the split logic will move to `QPDFSplitter`.
 * The entire create QPDF logic will move into `QPDFAssembler`.
 * `QPDFAssembler`'s API will allow using an arbitrary QPDF as an input rather than having to start
