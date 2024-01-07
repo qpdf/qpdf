@@ -38,7 +38,7 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
-11.8.0: not yet released
+11.8.0: January 7, 2024
   - Bug fixes:
 
     - When flattening annotations, preserve hyperlinks and other
