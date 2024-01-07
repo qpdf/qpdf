@@ -506,7 +506,6 @@ When done, the following should happen:
   * Make sure version numbers are consistent in the following locations:
     * CMakeLists.txt
     * include/qpdf/DLL.h
-    * manual/conf.py
 
   `make_dist` verifies this consistency, and CI fails if they are
   inconsistent.
@@ -622,7 +621,7 @@ done
 If needed, go onto github and make any manual updates such as
 indicating a pre-release, adding release notes, etc.
 
-Template for release notes:
+Template for release notes.
 
 ```
 This is qpdf version x.y.z. (Brief description)
@@ -645,7 +644,8 @@ rsync -vrlcO ./ jay_berkenbilt,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/q
 * On sourceforge, make the source package the default for all but
   Windows, and make the 64-bit msvc build the default for Windows.
 
-* Publish a news item manually on sourceforge.
+* Publish a news item manually on sourceforge using the release notes text. Remove the relative link
+  to README-what-to-download.md (just reference the file by name)
 
 * Upload the debian package and Ubuntu ppa backports.
 
