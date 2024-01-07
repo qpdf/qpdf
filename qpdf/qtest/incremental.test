@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('incremental');
+
+my $n_tests = 6;
+
+# Since the beginning but discovered at the time of releasing 11.8.0:
+# qpdf doesn't delete earlier generations of an object when they are
+# reused.
+$td->runtest("handle delete and reuse",
+             {$td->COMMAND => "qpdf --qdf --static-id incremental-1.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "incremental-1-out.qdf"},
+             $td->NORMALIZE_NEWLINES | $td->EXPECT_FAILURE);
+$td->runtest("check xref",
+             {$td->COMMAND => "qpdf --show-xref incremental-1.pdf"},
+             {$td->FILE => "incremental-1-xref.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES | $td->EXPECT_FAILURE);
+$td->runtest("handle delete and reuse",
+             {$td->COMMAND => "qpdf --qdf --static-id incremental-2.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             # intentionally comparing incremental-2 with incremental-1-out
+             {$td->FILE => "incremental-1-out.qdf"},
+             $td->NORMALIZE_NEWLINES | $td->EXPECT_FAILURE);
+$td->runtest("check xref",
+             {$td->COMMAND => "qpdf --show-xref incremental-1.pdf"},
+             {$td->FILE => "incremental-2-xref.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES | $td->EXPECT_FAILURE);
+
+cleanup();
+$td->report($n_tests);
