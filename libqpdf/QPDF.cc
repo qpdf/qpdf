@@ -1987,15 +1987,15 @@ QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
 }
 
 void
-QPDF::removeObject(QPDFObjGen const& og)
+QPDF::removeObject(QPDFObjGen og)
 {
-    auto null = QPDFObjectHandle::newNull();
     m->xref_table.erase(og);
-    if (isCached(og)) {
+    if (auto cached = m->obj_cache.find(og); cached != m->obj_cache.end()) {
         // Take care of any object handles that may be floating around.
-        replaceObject(og, null);
+        cached->second.object->assign(QPDF_Null::create());
+        cached->second.object->setObjGen(nullptr, QPDFObjGen());
+        m->obj_cache.erase(cached);
     }
-    m->obj_cache.erase(og);
 }
 
 void
