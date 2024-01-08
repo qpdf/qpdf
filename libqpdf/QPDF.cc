@@ -706,6 +706,14 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
     // We no longer need the deleted_objects table, so go ahead and clear it out to make sure we
     // never depend on its being set.
     m->deleted_objects.clear();
+
+    // Make sure we keep only the highest generation for any object.
+    QPDFObjGen last_og{-1, 0};
+    for (auto const& [og, _xref]: m->xref_table) {
+        if (og.getObj() == last_og.getObj())
+            removeObject(last_og);
+        last_og = og;
+    }
 }
 
 bool
@@ -1976,6 +1984,18 @@ QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
         throw std::logic_error("QPDF::replaceObject called with indirect object handle");
     }
     updateCache(og, oh.getObj(), -1, -1);
+}
+
+void
+QPDF::removeObject(QPDFObjGen og)
+{
+    m->xref_table.erase(og);
+    if (auto cached = m->obj_cache.find(og); cached != m->obj_cache.end()) {
+        // Take care of any object handles that may be floating around.
+        cached->second.object->assign(QPDF_Null::create());
+        cached->second.object->setObjGen(nullptr, QPDFObjGen());
+        m->obj_cache.erase(cached);
+    }
 }
 
 void

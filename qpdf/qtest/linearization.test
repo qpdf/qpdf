@@ -84,11 +84,6 @@ foreach my $base (@to_linearize)
 {
     foreach my $omode (qw(disable preserve generate))
     {
-        my $xflags = 0;
-        if ($base eq 'gen1')
-        {
-            $xflags = $td->EXPECT_FAILURE;
-        }
         my $oarg = "-object-streams=$omode";
         my $sdarg = "";
         if (($base eq 'lin-special') || ($base eq 'object-stream'))
@@ -100,13 +95,12 @@ foreach my $base (@to_linearize)
                      {$td->COMMAND =>
                           "qpdf -linearize $oarg $sdarg" .
                           " --static-id $base.pdf a.pdf"},
-                     {$td->STRING => "", $td->EXIT_STATUS => 0},
-                     $xflags);
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
         $td->runtest("check linearization",
                      {$td->COMMAND => "qpdf --check-linearization a.pdf"},
                      {$td->STRING => "a.pdf: no linearization errors\n",
                       $td->EXIT_STATUS => 0},
-                     $td->NORMALIZE_NEWLINES | $xflags);
+                     $td->NORMALIZE_NEWLINES);
         # Relinearizing twice should produce identical results.  We
         # have to do it twice because, if objects changed ordering
         # during the original linearization, the hint tables won't
@@ -117,17 +111,14 @@ foreach my $base (@to_linearize)
         $td->runtest("relinearize $base 1",
                      {$td->COMMAND =>
                           "qpdf -linearize $sdarg --static-id a.pdf b.pdf"},
-                     {$td->STRING => "", $td->EXIT_STATUS => 0},
-                     $xflags);
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
         $td->runtest("relinearize $base 2",
                      {$td->COMMAND =>
                           "qpdf -linearize $sdarg --static-id b.pdf c.pdf"},
-                     {$td->STRING => "", $td->EXIT_STATUS => 0},
-                     $xflags);
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
         $td->runtest("compare files ($omode)",
                      {$td->FILE => "b.pdf"},
-                     {$td->FILE => "c.pdf"},
-                     $xflags);
+                     {$td->FILE => "c.pdf"});
         if (($base eq 'lin-special') || ($base eq 'object-stream'))
         {
             $td->runtest("check $base ($omode)",

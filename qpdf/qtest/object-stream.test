@@ -82,13 +82,9 @@ $td->runtest("generate object streams for gen > 0",
              {$td->COMMAND => "qpdf --qdf --static-id" .
                   " --object-streams=generate gen1.pdf a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
-# qpdf 11.8.0 -- it was discovered that qpdf was incorrectly handling
-# references to older generations of reused objects in incrementally
-# updated files.
 $td->runtest("check file",
              {$td->FILE => "a.pdf"},
-             {$td->FILE => "gen1.qdf"},
-             $td->EXPECT_FAILURE);
+             {$td->FILE => "gen1.qdf"});
 
 $td->runtest("generate object streams for gen > 0",
              {$td->COMMAND => "qpdf --qdf --static-id" .
