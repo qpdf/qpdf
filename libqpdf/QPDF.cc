@@ -709,10 +709,10 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
 
     // Make sure we keep only the highest generation for any object.
     QPDFObjGen last_og{-1, 0};
-    for (auto const& [og, _xref]: m->xref_table) {
-        if (og.getObj() == last_og.getObj())
+    for (auto const& og: m->xref_table) {
+        if (og.first.getObj() == last_og.getObj())
             removeObject(last_og);
-        last_og = og;
+        last_og = og.first;
     }
 }
 
