@@ -708,11 +708,16 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
     m->deleted_objects.clear();
 
     // Make sure we keep only the highest generation for any object.
-    QPDFObjGen last_og{-1, 0};
-    for (auto const& [og, _xref]: m->xref_table) {
-        if (og.getObj() == last_og.getObj())
-            removeObject(last_og);
-        last_og = og;
+    std::vector<QPDFObjGen> to_delete;
+    QPDFObjGen last_og;
+    for (auto const& og: m->xref_table) {
+        if (og.first.getObj() == last_og.getObj()) {
+            to_delete.emplace_back(last_og);
+        }
+        last_og = og.first;
+    }
+    for (auto const& og: to_delete) {
+        removeObject(og);
     }
 }
 
