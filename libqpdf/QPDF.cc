@@ -2398,7 +2398,6 @@ QPDF::getCompressibleObjGens()
 
     const size_t max_obj = getObjectCount();
     std::vector<bool> visited(max_obj, false);
-    QPDFObjGen::set visited_gen; // for objects with generation > 0
     std::vector<QPDFObjectHandle> queue;
     queue.reserve(512);
     queue.push_back(m->trailer);
@@ -2409,19 +2408,14 @@ QPDF::getCompressibleObjGens()
         if (obj.isIndirect()) {
             QPDFObjGen og = obj.getObjGen();
             const size_t id = toS(og.getObj() - 1);
-            const int gen = og.getGen();
             if (id >= max_obj)
                 throw std::logic_error(
                     "unexpected object id encountered in getCompressibleObjGens");
-            if ((gen == 0 && visited[id]) || visited_gen.count(og)) {
+            if (visited[id]) {
                 QTC::TC("qpdf", "QPDF loop detected traversing objects");
                 continue;
             }
-            if (gen == 0) {
-                visited[id] = true;
-            } else {
-                visited_gen.insert(og);
-            }
+            visited[id] = true;
             if (og == encryption_dict_og) {
                 QTC::TC("qpdf", "QPDF exclude encryption dictionary");
             } else if (!(obj.isStream() ||
