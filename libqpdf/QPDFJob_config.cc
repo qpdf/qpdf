@@ -957,11 +957,6 @@ QPDFJob::PagesConfig::endPages()
     if (n_specs == 0) {
         usage("--pages: no page specifications given");
     }
-    auto n_collate = config->o.m->collate.size();
-    if (!(n_collate == 0 || n_collate == 1 || n_collate == n_specs)) {
-        usage("--pages: if --collate has more than one value, it must have one value per page "
-              "specification");
-    }
     return this->config;
 }
 

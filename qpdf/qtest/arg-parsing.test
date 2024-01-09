@@ -15,7 +15,7 @@ cleanup();
 
 my $td = new TestDriver('arg-parsing');
 
-my $n_tests = 23;
+my $n_tests = 24;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -98,6 +98,13 @@ $td->runtest("wrong number of collate args",
              {$td->COMMAND =>
                   "qpdf --collate=2,3 collate-odd.pdf" .
                   " --pages . minimal.pdf collate-even.pdf -- a.pdf"},
+             {$td->REGEXP => ".*--collate has more than one value.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("wrong number of collate args",
+             {$td->COMMAND =>
+                  "qpdf collate-odd.pdf --pages . minimal.pdf collate-even.pdf --" .
+                  " --collate=2,3 a.pdf"},
              {$td->REGEXP => ".*--collate has more than one value.*",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);

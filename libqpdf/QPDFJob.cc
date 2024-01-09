@@ -2446,6 +2446,10 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
 
     auto n_collate = m->collate.size();
     auto n_specs = parsed_specs.size();
+    if (!(n_collate == 0 || n_collate == 1 || n_collate == n_specs)) {
+        usage("--pages: if --collate has more than one value, it must have one value per page "
+              "specification");
+    }
     if (n_collate > 0 && n_specs > 1) {
         // Collate the pages by selecting one page from each spec in order. When a spec runs out of
         // pages, stop selecting from it.
