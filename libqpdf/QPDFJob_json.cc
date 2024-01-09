@@ -467,25 +467,17 @@ Handlers::endPagesArray()
 void
 Handlers::beginPages(JSON j)
 {
-    std::string file;
-    std::string range("1-z");
-    std::string password;
     bool file_seen = false;
-    bool password_seen = false;
-    j.forEachDictItem([&](std::string const& key, JSON value) {
+    j.forEachDictItem([&](std::string const& key, JSON const& value) {
         if (key == "file") {
-            file_seen = value.getString(file);
-        } else if (key == "range") {
-            value.getString(range);
-        } else if (key == "password") {
-            password_seen = value.getString(password);
+            std::string v;
+            file_seen = value.getString(v);
         }
     });
     if (!file_seen) {
         QTC::TC("qpdf", "QPDFJob json pages no file");
         usage("file is required in page specification");
     }
-    this->c_pages->pageSpec(file, range, password_seen ? password.c_str() : nullptr);
 }
 
 void
@@ -495,24 +487,9 @@ Handlers::endPages()
 }
 
 void
-Handlers::setupPagesFile()
-{
-    // handled in beginPages
-    ignoreItem();
-}
-
-void
 Handlers::setupPagesPassword()
 {
-    // handled in beginPages
-    ignoreItem();
-}
-
-void
-Handlers::setupPagesRange()
-{
-    // handled in beginPages
-    ignoreItem();
+    addParameter([this](char const* p) { c_pages->password(p); });
 }
 
 void

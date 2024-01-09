@@ -5,3 +5,6 @@
 //
 // clang-format off
 //
+QPDF_DLL PagesConfig* file(std::string const& parameter);
+QPDF_DLL PagesConfig* range(std::string const& parameter);
+QPDF_DLL PagesConfig* password(std::string const& parameter);

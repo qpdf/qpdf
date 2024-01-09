@@ -1388,7 +1388,7 @@ PDF, causing the PDF to render differently from the original. See also
 Related Options
 ~~~~~~~~~~~~~~~
 
-.. qpdf:option:: --pages file [--password=password] [page-range] [...] --
+.. qpdf:option:: --pages [--file=]file [options] [...] --
 
    .. help: begin page selection
 
@@ -1402,6 +1402,38 @@ Related Options
 
    See also :qpdf:ref:`--split-pages`, :qpdf:ref:`--collate`,
    :ref:`page-ranges`.
+
+.. qpdf:option:: --file=file
+
+   .. help: source for pages
+
+      Specify the file for the current page operation. This is used
+      with --pages, --overlay, and --underlay and appears between the
+      option and the terminating --. Run qpdf --help=page-selection
+      for details.
+
+   Specify the file for the current page operation. This option is
+   used with :qpdf:ref:`--pages`, :qpdf:ref:`--overlay` and
+   :qpdf:ref:`--underlay` and appears between the option and the
+   terminating ``--``.
+
+   Please see :ref:`page-selection` for additional details.
+
+.. qpdf:option:: --range=numeric-range
+
+   .. help: page range
+
+      Specify the page range for the current page operation with
+      --pages. If omitted, all pages are selected. This is used
+      with --pages and appears between --pages and --. Run
+      qpdf --help=page-selection for details.
+
+   Specify the page range for the current page operation with
+   :qpdf:ref:`--pages`. If omitted, all pages are selected. This
+   option is used with :qpdf:ref:`--pages` and appears between
+   :qpdf:ref:`--pages` and ``--``.
+
+   Please see :ref:`page-selection` for additional details.
 
 .. qpdf:option:: --collate[=n[,m,...]]
 
@@ -2424,11 +2456,23 @@ Page Selection
 
    Use the --pages option to select pages from multiple files. Usage:
 
+   qpdf in.pdf --pages --file=input-file \
+       [--range=page-range] [--password=password] [...] -- out.pdf
+
+   OR
+
    qpdf in.pdf --pages input-file [--password=password] [page-range] \
        [...] -- out.pdf
 
    Between --pages and the -- that terminates pages option, repeat
    the following:
+
+   --file=filename [--range=page-range] [--password=password] [options]
+
+   For compatibility, the file and range can be specified
+   positionally. qpdf versions prior to 11.9.0
+   require --password=password to immediately follow the filename. In
+   the older syntax, repeat the following:
 
    filename [--password=password] [page-range]
 
@@ -2458,7 +2502,7 @@ Page Selection
      information from in.pdf is retained. Note the use of "." to refer
      to in.pdf.
 
-     qpdf in.pdf --pages . a.pdf b.pdf:even -- out.pdf
+     qpdf in.pdf --pages . a.pdf b.pdf 1-z:even -- out.pdf
 
    - Take all the pages from a.pdf, all the pages from b.pdf in
      reverse, and only pages 3 and 6 from c.pdf and write the result
@@ -2472,14 +2516,29 @@ Page Selection
 split and merge PDF files by selecting pages from one or more input
 files.
 
-Usage: :samp:`qpdf {in.pdf} --pages input-file [--password={password}] [{page-range}] [...] -- {out.pdf}`
+::
 
-Between ``--pages`` and the ``--`` that terminates pages option,
-repeat the following:
+    qpdf primary-input.pdf \
+      --file=input.pdf \
+      [--range=page-range] \
+      [--password=password] \
+      [...] \
+      -- output.pdf
 
-:samp:`{filename} [--password={password}] [{page-range}]`
+OR
+
+::
+
+    qpdf primary-input.pdf \
+      input.pdf [--password=password] [page-range] \
+      [...] -- output.pdf
 
 Notes:
+  - The first form, with :qpdf:ref:`--file` and :qpdf:ref:`--range`,
+    was introduced in qpdf 11.9.0. In this form, the
+    :qpdf:ref:`--range` and :qpdf:ref:`--password` options apply to
+    the most recently specified :qpdf:ref:`--file` option.
+
   - The password option is needed only for password-protected files.
     If you specify the same file more than once, you only need to supply
     the password the first time.
@@ -2518,8 +2577,7 @@ Examples
 
   ::
 
-     qpdf in.pdf --pages . a.pdf b.pdf:even -- out.pdf
-
+     qpdf in.pdf --pages . a.pdf b.pdf 1-z:even -- out.pdf
 
 - Take all the pages from :file:`a.pdf`, all the pages from
   :file:`b.pdf` in reverse, and only pages 3 and 6 from :file:`c.pdf`
@@ -2529,7 +2587,9 @@ Examples
 
   ::
 
-     qpdf --empty --pages a.pdf b.pdf --password=x z-1 c.pdf 3,6
+     qpdf --empty --pages --file=a.pdf \
+       --file=b.pdf --password=x --range=z-1 \
+       --file=c.pdf --range=3,6 -- out.pdf
 
 - Scan a document with double-sided printing by scanning the fronts
   into :file:`odd.pdf` and the backs into :file:`even.pdf`. Collate
@@ -2542,6 +2602,8 @@ Examples
      qpdf --collate odd.pdf --pages . even.pdf -- all.pdf
        OR
      qpdf --collate --empty --pages odd.pdf even.pdf -- all.pdf
+       OR
+     qpdf --collate --empty --pages --file=odd.pdf --file=even.pdf -- all.pdf
 
 - When collating, any number of files and page ranges can be
   specified. If any file has fewer pages, that file is just skipped

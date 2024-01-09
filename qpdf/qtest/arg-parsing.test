@@ -15,7 +15,7 @@ cleanup();
 
 my $td = new TestDriver('arg-parsing');
 
-my $n_tests = 24;
+my $n_tests = 25;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -62,14 +62,20 @@ $td->runtest("bad file detected as unclosed --pages",
              {$td->REGEXP => ".*pages options must be terminated with --.*",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
-$td->runtest("misplaced pages password 1",
-             {$td->COMMAND => "qpdf --pages . 1 --password=z --"},
-             {$td->REGEXP => ".*password must immediately follow a file name.*",
+$td->runtest("misplaced pages range",
+             {$td->COMMAND => "qpdf --pages --range=1 . --password=z --"},
+             {$td->REGEXP => ".*range must follow a file name.*",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
-$td->runtest("misplaced pages password 2",
+$td->runtest("duplicate pages range",
+             {$td->COMMAND => "qpdf --pages --file=." .
+                  " --range=1 --range=2 . --password=z --"},
+             {$td->REGEXP => ".*range already specified.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("misplaced pages password",
              {$td->COMMAND => "qpdf --pages --password=z . 1 --"},
-             {$td->REGEXP => ".*password must immediately follow a file name.*",
+             {$td->REGEXP => ".*password must follow a file name.*",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("duplicated pages password",

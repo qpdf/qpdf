@@ -409,9 +409,25 @@ the PDF, causing the PDF to render differently from the original.
 Related Options:
 .TP
 .B --pages \-\- begin page selection
---pages file [--password=password] [page-range] [...] --
+--pages [--file=]file [options] [...] --
 
 Run qpdf --help=page-selection for details.
+.TP
+.B --file \-\- source for pages
+--file=file
+
+Specify the file for the current page operation. This is used
+with --pages, --overlay, and --underlay and appears between the
+option and the terminating --. Run qpdf --help=page-selection
+for details.
+.TP
+.B --range \-\- page range
+--range=numeric-range
+
+Specify the page range for the current page operation with
+--pages. If omitted, all pages are selected. This is used
+with --pages and appears between --pages and --. Run
+qpdf --help=page-selection for details.
 .TP
 .B --collate \-\- collate with --pages
 --collate[=n[,m,...]]
@@ -754,11 +770,23 @@ should not be used except for compatibility testing.
 .SH PAGE-SELECTION (select pages from one or more files)
 Use the --pages option to select pages from multiple files. Usage:
 
+qpdf in.pdf --pages --file=input-file \
+    [--range=page-range] [--password=password] [...] -- out.pdf
+
+OR
+
 qpdf in.pdf --pages input-file [--password=password] [page-range] \
     [...] -- out.pdf
 
 Between --pages and the -- that terminates pages option, repeat
 the following:
+
+--file=filename [--range=page-range] [--password=password] [options]
+
+For compatibility, the file and range can be specified
+positionally. qpdf versions prior to 11.9.0
+require --password=password to immediately follow the filename. In
+the older syntax, repeat the following:
 
 filename [--password=password] [page-range]
 
@@ -789,7 +817,7 @@ pages from b.pdf, and write the output to out.pdf. Document-level
 information from in.pdf is retained. Note the use of "." to refer
 to in.pdf.
 
-  qpdf in.pdf --pages . a.pdf b.pdf:even -- out.pdf
+  qpdf in.pdf --pages . a.pdf b.pdf 1-z:even -- out.pdf
 
 .IP \[bu]
 Take all the pages from a.pdf, all the pages from b.pdf in

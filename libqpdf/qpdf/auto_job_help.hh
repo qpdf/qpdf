@@ -311,9 +311,23 @@ static void add_help_4(QPDFArgParser& ap)
 ap.addHelpTopic("modification", "change parts of the PDF", R"(Modification options make systematic changes to certain parts of
 the PDF, causing the PDF to render differently from the original.
 )");
-ap.addOptionHelp("--pages", "modification", "begin page selection", R"(--pages file [--password=password] [page-range] [...] --
+ap.addOptionHelp("--pages", "modification", "begin page selection", R"(--pages [--file=]file [options] [...] --
 
 Run qpdf --help=page-selection for details.
+)");
+ap.addOptionHelp("--file", "modification", "source for pages", R"(--file=file
+
+Specify the file for the current page operation. This is used
+with --pages, --overlay, and --underlay and appears between the
+option and the terminating --. Run qpdf --help=page-selection
+for details.
+)");
+ap.addOptionHelp("--range", "modification", "page range", R"(--range=numeric-range
+
+Specify the page range for the current page operation with
+--pages. If omitted, all pages are selected. This is used
+with --pages and appears between --pages and --. Run
+qpdf --help=page-selection for details.
 )");
 ap.addOptionHelp("--collate", "modification", "collate with --pages", R"(--collate[=n[,m,...]]
 
@@ -437,6 +451,9 @@ iv, then the remaining pages with Arabic numerals starting with
 1 and continuing sequentially until the end of the document. For
 additional examples, please consult the manual.
 )");
+}
+static void add_help_5(QPDFArgParser& ap)
+{
 ap.addHelpTopic("encryption", "create encrypted files", R"(Create encrypted files. Usage:
 
 --encrypt \
@@ -520,9 +537,6 @@ ap.addOptionHelp("--user-password", "encryption", "specify user password", R"(--
 
 Set the user password of the encrypted file.
 )");
-}
-static void add_help_5(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--owner-password", "encryption", "specify owner password", R"(--owner-password=owner-password
 
 Set the owner password of the encrypted file.
@@ -620,11 +634,23 @@ should not be used except for compatibility testing.
 )");
 ap.addHelpTopic("page-selection", "select pages from one or more files", R"(Use the --pages option to select pages from multiple files. Usage:
 
+qpdf in.pdf --pages --file=input-file \
+    [--range=page-range] [--password=password] [...] -- out.pdf
+
+OR
+
 qpdf in.pdf --pages input-file [--password=password] [page-range] \
     [...] -- out.pdf
 
 Between --pages and the -- that terminates pages option, repeat
 the following:
+
+--file=filename [--range=page-range] [--password=password] [options]
+
+For compatibility, the file and range can be specified
+positionally. qpdf versions prior to 11.9.0
+require --password=password to immediately follow the filename. In
+the older syntax, repeat the following:
 
 filename [--password=password] [page-range]
 
@@ -654,7 +680,7 @@ Examples:
   information from in.pdf is retained. Note the use of "." to refer
   to in.pdf.
 
-  qpdf in.pdf --pages . a.pdf b.pdf:even -- out.pdf
+  qpdf in.pdf --pages . a.pdf b.pdf 1-z:even -- out.pdf
 
 - Take all the pages from a.pdf, all the pages from b.pdf in
   reverse, and only pages 3 and 6 from c.pdf and write the result
@@ -687,6 +713,9 @@ those pages to be repeated after the original pages are exhausted.
 
 Run qpdf --help=page-ranges for help with page ranges.
 )");
+}
+static void add_help_6(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--to", "overlay-underlay", "destination pages for underlay/overlay", R"(--to=page-range
 
 Specify the range of pages in the primary output to apply
@@ -700,9 +729,6 @@ the destination pages. See qpdf --help=page-ranges for help
 with the page range syntax. The page range may be omitted
 if --repeat is used.
 )");
-}
-static void add_help_6(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--repeat", "overlay-underlay", "overlay/underlay pages to repeat", R"(--repeat=page-range
 
 Specify pages from the overlay/underlay that are repeated after
@@ -801,6 +827,9 @@ ap.addHelpTopic("inspection", "inspect PDF files", R"(These options provide tool
 the options in this section are specified, no output file may be
 given.
 )");
+}
+static void add_help_7(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--is-encrypted", "inspection", "silently test whether a file is encrypted", R"(Silently exit with a code indicating the file's encryption status:
 
 0: the file is encrypted
@@ -817,9 +846,6 @@ ap.addOptionHelp("--requires-password", "inspection", "silently test a file's pa
 2: the file is not encrypted
 3: the file is encrypted, and correct password (if any) has been supplied
 )");
-}
-static void add_help_7(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--check", "inspection", "partially check whether PDF is valid", R"(Check the structure of the PDF file as well as a number of other
 aspects of the file, and write information about the file to
 standard output. Note that qpdf does not perform any validation
@@ -894,6 +920,9 @@ Describe the format of the JSON output by writing to standard
 output a JSON object with the same keys and with values
 containing descriptive text.
 )");
+}
+static void add_help_8(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--json-key", "json", "limit which keys are in JSON output", R"(--json-key=key
 
 This option is repeatable. If given, only the specified
@@ -907,9 +936,6 @@ This option is repeatable. If given, only specified objects will
 be shown in the "objects" key of the JSON output. Otherwise, all
 objects will be shown.
 )");
-}
-static void add_help_8(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--json-stream-data", "json", "how to handle streams in json output", R"(--json-stream-data={none|inline|file}
 
 When used with --json, this option controls whether streams in

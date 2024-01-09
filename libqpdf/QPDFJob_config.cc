@@ -968,6 +968,45 @@ QPDFJob::PagesConfig::pageSpec(
     return this;
 }
 
+QPDFJob::PagesConfig*
+QPDFJob::PagesConfig::file(std::string const& arg)
+{
+    this->config->o.m->page_specs.emplace_back(arg, nullptr, "");
+    return this;
+}
+
+QPDFJob::PagesConfig*
+QPDFJob::PagesConfig::range(std::string const& arg)
+{
+    if (config->o.m->page_specs.empty()) {
+        QTC::TC("qpdf", "QPDFJob misplaced page range");
+        usage("in --range must follow a file name");
+    }
+    auto& last = config->o.m->page_specs.back();
+    if (!last.range.empty()) {
+        QTC::TC("qpdf", "QPDFJob duplicated range");
+        usage("--range already specified for this file");
+    }
+    last.range = arg;
+    return this;
+}
+
+QPDFJob::PagesConfig*
+QPDFJob::PagesConfig::password(std::string const& arg)
+{
+    if (config->o.m->page_specs.empty()) {
+        QTC::TC("qpdf", "QPDFJob misplaced pages password");
+        usage("in --pages, --password must follow a file name");
+    }
+    auto& last = config->o.m->page_specs.back();
+    if (last.password) {
+        QTC::TC("qpdf", "QPDFJob duplicated pages password");
+        usage("--password already specified for this file");
+    }
+    last.password = QUtil::make_shared_cstr(arg);
+    return this;
+}
+
 std::shared_ptr<QPDFJob::UOConfig>
 QPDFJob::Config::overlay()
 {

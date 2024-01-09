@@ -249,7 +249,6 @@ QPDF not caching overridden objstm object 0
 QPDFWriter original obj non-zero gen 0
 QPDF_optimization indirect outlines 0
 QPDF xref space 2
-QPDFJob pages range omitted at end 1
 QPDFJob pages range omitted in middle 0
 QPDFJob npages 0
 QPDF already reserved object 0
@@ -690,3 +689,5 @@ QPDF skipping cache for known unchecked object 0
 QPDF fix dangling triggered xref reconstruction 0
 QPDFPageDocumentHelper flatten resources missing or invalid 0
 QPDF recover xref stream 0
+QPDFJob misplaced page range 0
+QPDFJob duplicated range 0

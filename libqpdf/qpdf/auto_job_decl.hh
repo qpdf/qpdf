@@ -31,7 +31,6 @@ void argReplaceInput();
 void argSetPageLabels();
 void argUnderlay();
 void argPagesPositional(std::string const&);
-void argPagesPassword(std::string const&);
 void argEndPages();
 void argEncPositional(std::string const&);
 void argEncUserPassword(std::string const&);

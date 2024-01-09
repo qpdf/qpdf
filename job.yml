@@ -195,9 +195,9 @@ options:
     config: c_pages
     prefix: Pages
     positional: true
-    manual:
-      - password
     required_parameter:
+      file: file
+      range: page-range
       password: password
   - table: encryption
     config: c_main
@@ -436,9 +436,9 @@ json:
   oi-min-width:
   optimize-images:
   pages:
-    - _file: "source for for pages"
+    - file:
       Pages.password:
-      _range: "page range"
+      range:
   remove-page-labels:
   report-memory-usage:
   rotate:

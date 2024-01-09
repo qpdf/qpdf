@@ -2342,6 +2342,9 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
         if (page_spec.filename == ".") {
             page_spec.filename = m->infilename.get();
         }
+        if (page_spec.range.empty()) {
+            page_spec.range = "1-z";
+        }
     }
 
     if (!m->keep_files_open_set) {

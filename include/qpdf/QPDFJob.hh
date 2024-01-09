@@ -243,6 +243,8 @@ class QPDFJob
       public:
         QPDF_DLL
         Config* endPages();
+        // From qpdf 11.9.0, you can call file(), range(), and password(). Each call to file()
+        // starts a new page spec.
         QPDF_DLL
         PagesConfig* pageSpec(
             std::string const& filename, std::string const& range, char const* password = nullptr);

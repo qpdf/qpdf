@@ -127,7 +127,9 @@ this->ap.addChoices("json", [this](std::string const& x){c_main->json(x);}, fals
 this->ap.addChoices("json-output", [this](std::string const& x){c_main->jsonOutput(x);}, false, json_output_choices);
 this->ap.registerOptionTable("pages", b(&ArgParser::argEndPages));
 this->ap.addPositional(p(&ArgParser::argPagesPositional));
-this->ap.addRequiredParameter("password", p(&ArgParser::argPagesPassword), "password");
+this->ap.addRequiredParameter("file", [this](std::string const& x){c_pages->file(x);}, "file");
+this->ap.addRequiredParameter("range", [this](std::string const& x){c_pages->range(x);}, "page-range");
+this->ap.addRequiredParameter("password", [this](std::string const& x){c_pages->password(x);}, "password");
 this->ap.registerOptionTable("encryption", b(&ArgParser::argEndEncryption));
 this->ap.addPositional(p(&ArgParser::argEncPositional));
 this->ap.addRequiredParameter("user-password", p(&ArgParser::argEncUserPassword), "user_password");

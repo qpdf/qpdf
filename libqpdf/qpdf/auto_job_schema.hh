@@ -140,7 +140,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "optimizeImages": "use efficient compression for images",
   "pages": [
     {
-      "file": "source for for pages",
+      "file": "source for pages",
       "password": "password for encrypted file",
       "range": "page range"
     }

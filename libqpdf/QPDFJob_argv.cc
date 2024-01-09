@@ -34,9 +34,10 @@ namespace
         std::shared_ptr<QPDFJob::UOConfig> c_uo;
         std::shared_ptr<QPDFJob::EncConfig> c_enc;
         std::vector<std::string> accumulated_args;
-        std::shared_ptr<char> pages_password{nullptr};
         std::string user_password;
         std::string owner_password;
+        bool called_pages_file{false};
+        bool called_pages_range{false};
         bool used_enc_password_args{false};
         bool gave_input{false};
         bool gave_output{false};
@@ -237,81 +238,43 @@ ArgParser::argPages()
 }
 
 void
-ArgParser::argPagesPassword(std::string const& parameter)
-{
-    if (this->pages_password) {
-        QTC::TC("qpdf", "QPDFJob duplicated pages password");
-        usage("--password already specified for this file");
-    }
-    if (this->accumulated_args.size() != 1) {
-        QTC::TC("qpdf", "QPDFJob misplaced pages password");
-        usage("in --pages, --password must immediately follow a file name");
-    }
-    this->pages_password = QUtil::make_shared_cstr(parameter);
-}
-
-void
 ArgParser::argPagesPositional(std::string const& arg)
 {
-    if (arg.empty()) {
-        if (this->accumulated_args.empty()) {
-            return;
-        }
-    } else {
-        this->accumulated_args.push_back(arg);
+    if (!called_pages_file) {
+        c_pages->file(arg);
+        called_pages_file = true;
+        return;
     }
-
-    std::string file = this->accumulated_args.at(0);
-    char const* range_p = nullptr;
-
-    size_t n_args = this->accumulated_args.size();
-    if (n_args >= 2) {
-        // will be copied before accumulated_args is cleared
-        range_p = this->accumulated_args.at(1).c_str();
+    if (called_pages_range) {
+        c_pages->file(arg);
+        called_pages_range = false;
+        return;
     }
-
-    // See if the user omitted the range entirely, in which case we assume "1-z".
-    std::string next_file;
-    if (range_p == nullptr) {
-        if (arg.empty()) {
-            // The filename or password was the last argument
-            QTC::TC("qpdf", "QPDFJob pages range omitted at end", this->pages_password ? 0 : 1);
+    // This could be a range or a file. Try parsing.
+    try {
+        QUtil::parse_numrange(arg.c_str(), 0);
+        c_pages->range(arg);
+        called_pages_range = true;
+    } catch (std::runtime_error& e1) {
+        // The range is invalid.  Let's see if it's a file.
+        if (arg == ".") {
+            // "." means the input file.
+            QTC::TC("qpdf", "QPDFJob pages range omitted with .");
+        } else if (QUtil::file_can_be_opened(arg.c_str())) {
+            QTC::TC("qpdf", "QPDFJob pages range omitted in middle");
+            // Yup, it's a file.
         } else {
-            // We need to accumulate some more arguments
-            return;
+            // Give the range error
+            usage(e1.what());
         }
-    } else {
-        try {
-            QUtil::parse_numrange(range_p, 0);
-        } catch (std::runtime_error& e1) {
-            // The range is invalid.  Let's see if it's a file.
-            if (strcmp(range_p, ".") == 0) {
-                // "." means the input file.
-                QTC::TC("qpdf", "QPDFJob pages range omitted with .");
-            } else if (QUtil::file_can_be_opened(range_p)) {
-                QTC::TC("qpdf", "QPDFJob pages range omitted in middle");
-                // Yup, it's a file.
-            } else {
-                // Give the range error
-                usage(e1.what());
-            }
-            next_file = range_p;
-            range_p = nullptr;
-        }
-    }
-    std::string range(range_p ? range_p : "1-z");
-    this->c_pages->pageSpec(file, range, this->pages_password.get());
-    this->accumulated_args.clear();
-    this->pages_password = nullptr;
-    if (!next_file.empty()) {
-        this->accumulated_args.push_back(next_file);
+        c_pages->file(arg);
+        called_pages_range = false;
     }
 }
 
 void
 ArgParser::argEndPages()
 {
-    argPagesPositional("");
     c_pages->endPages();
     c_pages = nullptr;
 }

@@ -21,9 +21,9 @@ my $n_tests = 28;
 # first time.  The file 20-pages.pdf is specified with two different
 # paths to duplicate a page.
 my $pages_options = "--pages page-labels-and-outlines.pdf 1,3,5-7,z" .
-    " 20-pages.pdf --password=user z-15" .
-    " page-labels-and-outlines.pdf 12" .
-    " 20-pages.pdf 10" .
+    " --file=20-pages.pdf --range=z-15 --password=user" .
+    " page-labels-and-outlines.pdf --range=12" .
+    " --file=20-pages.pdf 10" .
     " ./20-pages.pdf --password=owner 10" .
     " minimal.pdf 1 --";
 
