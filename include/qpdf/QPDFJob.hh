@@ -271,7 +271,7 @@ class QPDFJob
 
       private:
         UOConfig(Config*);
-        UOConfig(PagesConfig const&) = delete;
+        UOConfig(UOConfig const&) = delete;
 
         Config* config;
     };
@@ -291,7 +291,7 @@ class QPDFJob
 
       private:
         EncConfig(Config*);
-        EncConfig(PagesConfig const&) = delete;
+        EncConfig(EncConfig const&) = delete;
 
         Config* config;
     };
@@ -309,7 +309,7 @@ class QPDFJob
 
       private:
         PageLabelsConfig(Config*);
-        PageLabelsConfig(PagesConfig const&) = delete;
+        PageLabelsConfig(PageLabelsConfig const&) = delete;
 
         Config* config;
     };
