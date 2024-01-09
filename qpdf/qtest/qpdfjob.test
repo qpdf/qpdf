@@ -26,6 +26,7 @@ my @bad_json = (
     "encrypt-missing-password",
     "encrypt-no-key-length",
     "pages-no-file",
+    "overlay-no-file",
     "schema-error",
     "json-error"
     );

@@ -691,3 +691,4 @@ QPDFPageDocumentHelper flatten resources missing or invalid 0
 QPDF recover xref stream 0
 QPDFJob misplaced page range 0
 QPDFJob duplicated range 0
+QPDFJob json over/under no file 0

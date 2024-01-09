@@ -57,6 +57,8 @@ namespace
         bare_handler_t bindBare(void (Handlers::*f)());
         json_handler_t bindJSON(void (Handlers::*f)(JSON));
 
+        void beginUnderOverlay(JSON const& j);
+
         std::list<std::shared_ptr<JSONHandler>> json_handlers;
         bool partial;
         JSONHandler* jh{nullptr}; // points to last of json_handlers
@@ -223,6 +225,24 @@ void
 Handlers::handle(JSON& j)
 {
     this->json_handlers.back()->handle(".", j);
+}
+
+void
+Handlers::beginUnderOverlay(JSON const& j)
+{
+    // File has to be processed before items, so handle it here.
+    bool file_seen = false;
+    std::string file;
+    j.forEachDictItem([&](std::string const& key, JSON const& value) {
+        if (key == "file") {
+            file_seen = value.getString(file);
+        }
+    });
+    if (!file_seen) {
+        QTC::TC("qpdf", "QPDFJob json over/under no file");
+        usage("file is required in underlay/overlay specification");
+    }
+    c_uo->file(file);
 }
 
 void
@@ -468,16 +488,17 @@ void
 Handlers::beginPages(JSON j)
 {
     bool file_seen = false;
+    std::string file;
     j.forEachDictItem([&](std::string const& key, JSON const& value) {
         if (key == "file") {
-            std::string v;
-            file_seen = value.getString(v);
+            file_seen = value.getString(file);
         }
     });
     if (!file_seen) {
         QTC::TC("qpdf", "QPDFJob json pages no file");
         usage("file is required in page specification");
     }
+    c_pages->file(file);
 }
 
 void
@@ -489,7 +510,8 @@ Handlers::endPages()
 void
 Handlers::setupPagesFile()
 {
-    addParameter([this](char const* p) { c_pages->file(p); });
+    // This is handled in beginPages since file() has to be called first.
+    ignoreItem();
 }
 
 void
@@ -499,9 +521,10 @@ Handlers::setupPagesPassword()
 }
 
 void
-Handlers::beginOverlay(JSON)
+Handlers::beginOverlay(JSON j)
 {
     this->c_uo = c_main->overlay();
+    beginUnderOverlay(j);
 }
 
 void
@@ -514,7 +537,8 @@ Handlers::endOverlay()
 void
 Handlers::setupOverlayFile()
 {
-    addParameter([this](char const* p) { c_uo->file(p); });
+    // This is handled in beginOverlay since file() has to be called first.
+    ignoreItem();
 }
 
 void
@@ -524,9 +548,10 @@ Handlers::setupOverlayPassword()
 }
 
 void
-Handlers::beginUnderlay(JSON)
+Handlers::beginUnderlay(JSON j)
 {
     this->c_uo = c_main->underlay();
+    beginUnderOverlay(j);
 }
 
 void
@@ -539,7 +564,8 @@ Handlers::endUnderlay()
 void
 Handlers::setupUnderlayFile()
 {
-    addParameter([this](char const* p) { c_uo->file(p); });
+    // This is handled in beginUnderlay since file() has to be called first.
+    ignoreItem();
 }
 
 void
