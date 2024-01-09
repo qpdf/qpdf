@@ -194,10 +194,9 @@ Other notes:
 ## Flexible Assembly
 
 This section discusses modifications to the command-line syntax to make it easier to add flexibility
-going forward without breaking backward compatibility. The main thrust will be to create
-non-positional alternatives to some things that currently use positional arguments (`--pages`,
-`--overlay`, `--underlay`), as was done for `--encrypt` in 11.7.0, to make it possible to add
-additional flags.
+going forward without breaking backward compatibility. In qpdf 11.9.0, we added non-positional
+options to `--pages`, `--overlay`, `--underlay` and modifid configuration to make it easier to add
+new options.
 
 In several cases, we allow specification of transformations or placements. In this context:
 * The origin is always lower-left corner.
@@ -221,21 +220,6 @@ In several cases, we allow specification of transformations or placements. In th
     * `0,0,612,792` is a box whose size is that of a US Letter page.
   * A rectangle may also be just one of `M|C|B|T|A` to refer to a page's media, crop, bleed, trim,
     or art box.
-
-Tweak `--pages` similarly to `--encrypt`. As an alternative to `--pages file [--password=p] range
---`, support `--pages --file=x --password=y --range=z --`. This allows for a more flexible syntax.
-If `--file` appears, positional arguments are disallowed. The same applies to `--overlay` and
-`--underlay`.
-
-```
-OLD: qpdf 2.pdf --pages 1.pdf --password=x . 3.pdf 1-z -- out.pdf
-NEW: qpdf 2.pdf --pages --file=1.pdf --password=x --file=. --file 3.pdf --range=1-z -- out.pdf
-```
-
-This makes it possible to add additional flags to do things like control how document-level features
-are handled, specify placement options, etc. Given the above framework, it would be possible to add
-additional features incrementally, without breaking compatibility, such as selecting or splitting
-pages based on tags, article threads, or outlines.
 
 It's tempting to allow assemblies to be nested, but this gets very complicated. From the C++ API,
 there is no problem using the output of one `QPDFAssembler` as the input to another, but supporting
