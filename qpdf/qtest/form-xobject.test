@@ -51,9 +51,9 @@ foreach (my $i = 64; $i <= 67; ++$i)
 
 my @uo_cases = (
     '--underlay fxo-green.pdf --repeat=z --to=1-14 --' .
-    ' --overlay fxo-blue.pdf --', # 1
+    ' --overlay --file=fxo-blue.pdf --', # 1
     '--overlay fxo-green.pdf --from= --repeat=r2,r1 --' .
-    ' --underlay fxo-blue.pdf --from=z-1 --', # 2
+    ' --underlay --file=fxo-blue.pdf --from=z-1 --', # 2
     '--overlay fxo-green.pdf --from= --repeat=r2,r1 --' .
     ' --underlay fxo-blue.pdf --from=z-1 -- --coalesce-contents', # 3
     '--overlay fxo-green.pdf --', # 4

@@ -38,6 +38,21 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
+11.9.0: not yet released
+  - CLI Enhancements
+
+    - Add new command-line arguments :qpdf:ref:`--file` and
+      :qpdf:ref:`--range` which can be used within :qpdf:ref:`--pages`
+      in place of positional arguments. Allow :qpdf:ref:`--file` to be
+      used inside of :qpdf:ref:`--overlay` and :qpdf:ref:`--underlay`
+      as well. These new options can be freely intermixed with
+      positional arguments.
+
+  - Library Enhancements
+
+    - Add ``file()``, ``range()``, and ``password()`` to
+      ``QPDFJob::PagesConfig`` as an alternative to ``pageSpec``.
+
 11.8.0: January 8, 2024
   - Bug fixes:
 

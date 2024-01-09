@@ -402,7 +402,7 @@ pushKey("pages");
 beginArray(bindJSON(&Handlers::beginPagesArray), bindBare(&Handlers::endPagesArray)); // .pages[]
 beginDict(bindJSON(&Handlers::beginPages), bindBare(&Handlers::endPages)); // .pages
 pushKey("file");
-addParameter([this](std::string const& p) { c_pages->file(p); });
+setupPagesFile();
 popHandler(); // key: file
 pushKey("password");
 setupPagesPassword();

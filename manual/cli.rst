@@ -2789,7 +2789,7 @@ Overlay and Underlay
    the destination page and may obscure the page. Underlaid pages are
    drawn below the destination page. Usage:
 
-   {--overlay|--underlay} file
+   {--overlay|--underlay} [--file=]file
          [--password=password]
          [--to=page-range]
          [--from=[page-range]]
@@ -2813,7 +2813,7 @@ as follows:
 
 ::
 
-   {--overlay|--underlay} file [options] --
+   {--overlay|--underlay} [--file=]file [options] --
 
 Overlay and underlay options are processed late, so they can be
 combined with other options like merging and will apply to the final
@@ -2821,8 +2821,10 @@ output. The ``--overlay`` and ``--underlay`` options work the same
 way, except underlay pages are drawn underneath the page to which they
 are applied, possibly obscured by the original page, and overlay files
 are drawn on top of the page to which they are applied, possibly
-obscuring the page. You can combine overlay and underlay, but you can
-only specify each option at most one time.
+obscuring the page. The ability to specify the file using the
+:qpdf:ref:`--file` option was added in qpdf 11.9.0. You can combine
+overlay and underlay, but you can only specify each option at most one
+time.
 
 The default behavior of overlay and underlay is that pages are taken
 from the overlay/underlay file in sequence and applied to

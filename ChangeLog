@@ -1,3 +1,12 @@
+2024-01-09  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new command-line arguments --file and --range which can be
+	used within --pages in place of positional arguments. Allow --file
+	to be used inside of --overlay and --underlay as well. These new
+	options can be freely intermixed with positional arguments. Also
+	add file(), range(), and password() to QPDFJob::PagesConfig as an
+	alternative to pageSpec.
+
 2024-01-08  Jay Berkenbilt  <ejb@ql.org>
 
 	* 11.8.0: release

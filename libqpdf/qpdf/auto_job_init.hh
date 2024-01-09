@@ -166,6 +166,7 @@ this->ap.addChoices("modify-other", [this](std::string const& x){c_enc->modifyOt
 this->ap.addChoices("modify", [this](std::string const& x){c_enc->modify(x);}, true, modify128_choices);
 this->ap.registerOptionTable("underlay/overlay", b(&ArgParser::argEndUnderlayOverlay));
 this->ap.addPositional(p(&ArgParser::argUOPositional));
+this->ap.addRequiredParameter("file", [this](std::string const& x){c_uo->file(x);}, "file");
 this->ap.addRequiredParameter("to", [this](std::string const& x){c_uo->to(x);}, "page-range");
 this->ap.addRequiredParameter("from", [this](std::string const& x){c_uo->from(x);}, "page-range");
 this->ap.addRequiredParameter("repeat", [this](std::string const& x){c_uo->repeat(x);}, "page-range");

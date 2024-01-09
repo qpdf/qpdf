@@ -152,14 +152,14 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
     "number pages for the entire document"
   ],
   "overlay": {
-    "file": "source file for overlay",
+    "file": "source for pages",
     "password": "password for encrypted file",
     "from": "source pages for underlay/overlay",
     "repeat": "overlay/underlay pages to repeat",
     "to": "destination pages for underlay/overlay"
   },
   "underlay": {
-    "file": "source file for underlay",
+    "file": "source for pages",
     "password": "password for encrypted file",
     "from": "source pages for underlay/overlay",
     "repeat": "overlay/underlay pages to repeat",

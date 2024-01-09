@@ -695,7 +695,7 @@ underlaid on the primary output. Overlaid pages are drawn on top of
 the destination page and may obscure the page. Underlaid pages are
 drawn below the destination page. Usage:
 
-{--overlay|--underlay} file
+{--overlay|--underlay} [--file=]file
       [--password=password]
       [--to=page-range]
       [--from=[page-range]]

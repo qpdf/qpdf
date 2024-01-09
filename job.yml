@@ -260,6 +260,7 @@ options:
     prefix: UO
     positional: true
     required_parameter:
+      file: file
       to: page-range
       from: page-range
       repeat: page-range
@@ -436,7 +437,7 @@ json:
   oi-min-width:
   optimize-images:
   pages:
-    - file:
+    - Pages.file:
       Pages.password:
       range:
   remove-page-labels:
@@ -445,13 +446,13 @@ json:
   set-page-labels:
     - null
   overlay:
-    _file: "source file for overlay"
+    UO.file:
     UO.password:
     from:
     repeat:
     to:
   underlay:
-    _file: "source file for underlay"
+    UO.file:
     UO.password:
     from:
     repeat:

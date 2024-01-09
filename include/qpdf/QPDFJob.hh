@@ -266,8 +266,6 @@ class QPDFJob
       public:
         QPDF_DLL
         Config* endUnderlayOverlay();
-        QPDF_DLL
-        UOConfig* file(std::string const& parameter);
 
 #include <qpdf/auto_job_c_uo.hh>
 

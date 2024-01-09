@@ -487,6 +487,12 @@ Handlers::endPages()
 }
 
 void
+Handlers::setupPagesFile()
+{
+    addParameter([this](char const* p) { c_pages->file(p); });
+}
+
+void
 Handlers::setupPagesPassword()
 {
     addParameter([this](char const* p) { c_pages->password(p); });
