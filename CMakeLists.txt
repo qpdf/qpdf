@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.16)
 # also find the version number here. generate_auto_job also reads the
 # version from here.
 project(qpdf
-  VERSION 11.8.0
+  VERSION 11.9.0
   LANGUAGES C CXX)
 
 # Enable correct rpath handling for MacOSX
