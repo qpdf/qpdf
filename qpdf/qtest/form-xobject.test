@@ -61,6 +61,11 @@ my @uo_cases = (
     '--overlay fxo-blue.pdf --to=1,1,1,1 --from=1-4 --' .
     ' --pages . 1 --', #6
     '--overlay 20-pages.pdf --password=user --', #7
+    '--overlay fxo-blue.pdf --to=1-4 --from=1-4 --' .
+    ' --overlay fxo-green.pdf --to=1-4 --from=4-1 --' .
+    ' --underlay fxo-blue.pdf --to=4-1 --from=5-8 --' .
+    ' --underlay fxo-green.pdf --to=4-1 --from=8-5 --' .
+    ' --pages . 1-4 --', #8
     );
 $n_tests += 2 * scalar(@uo_cases);
 for (my $i = 1; $i <= scalar(@uo_cases); ++$i)
