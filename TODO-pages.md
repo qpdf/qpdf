@@ -156,7 +156,7 @@ Within `QPDFAssembler`, we will extend the create QPDF logic in the following wa
 * Allow creation of blank pages as an additional input source
 * Generalize underlay/overlay
   * Enable controlling placement
-  * Make repeatable
+  * Make repeatable (done)
 * Add additional reordering options
   * We don't need to provide hooks for this. If someone is going to code a hook, they can just
     compute the page ordering directly.
@@ -244,7 +244,7 @@ Proposed CLI enhancements:
 --flip={h|v}[:page-range]
 --transform=a,b,c,d,e,f[:page-range]
 --set-box={M|C|B|T|A}=rect[:page-range]  # change a bounding box
-# stacking -- make --underlay and --overlay repeatbale
+# stacking -- make --underlay and --overlay repeatable
 --{underlay|overlay} ... --
 --file=x [ --password=x ]
 --from, --to, --repeat  # same as current --overlay, --underlay
