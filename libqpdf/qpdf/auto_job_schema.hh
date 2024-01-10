@@ -151,20 +151,24 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "setPageLabels": [
     "number pages for the entire document"
   ],
-  "overlay": {
-    "file": "source for pages",
-    "password": "password for encrypted file",
-    "from": "source pages for underlay/overlay",
-    "repeat": "overlay/underlay pages to repeat",
-    "to": "destination pages for underlay/overlay"
-  },
-  "underlay": {
-    "file": "source for pages",
-    "password": "password for encrypted file",
-    "from": "source pages for underlay/overlay",
-    "repeat": "overlay/underlay pages to repeat",
-    "to": "destination pages for underlay/overlay"
-  },
+  "overlay": [
+    {
+      "file": "source for pages",
+      "password": "password for encrypted file",
+      "from": "source pages for underlay/overlay",
+      "repeat": "overlay/underlay pages to repeat",
+      "to": "destination pages for underlay/overlay"
+    }
+  ],
+  "underlay": [
+    {
+      "file": "source for pages",
+      "password": "password for encrypted file",
+      "from": "source pages for underlay/overlay",
+      "repeat": "overlay/underlay pages to repeat",
+      "to": "destination pages for underlay/overlay"
+    }
+  ],
   "warningExit0": "exit 0 even with warnings",
   "jobJsonFile": "job JSON file",
   "preserveUnreferencedResources": "use removeUnreferencedResources=no",

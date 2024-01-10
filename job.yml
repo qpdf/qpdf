@@ -446,17 +446,17 @@ json:
   set-page-labels:
     - null
   overlay:
-    UO.file:
-    UO.password:
-    from:
-    repeat:
-    to:
+    - UO.file:
+      UO.password:
+      from:
+      repeat:
+      to:
   underlay:
-    UO.file:
-    UO.password:
-    from:
-    repeat:
-    to:
+    - UO.file:
+      UO.password:
+      from:
+      repeat:
+      to:
   warning-exit-0:
   job-json-file:
   preserve-unreferenced-resources:

@@ -522,6 +522,18 @@ Handlers::setupPagesPassword()
 }
 
 void
+Handlers::beginOverlayArray(JSON)
+{
+    // nothing needed
+}
+
+void
+Handlers::endOverlayArray()
+{
+    // nothing needed
+}
+
+void
 Handlers::beginOverlay(JSON j)
 {
     this->c_uo = c_main->overlay();
@@ -546,6 +558,18 @@ void
 Handlers::setupOverlayPassword()
 {
     addParameter([this](char const* p) { c_uo->password(p); });
+}
+
+void
+Handlers::beginUnderlayArray(JSON)
+{
+    // nothing needed
+}
+
+void
+Handlers::endUnderlayArray()
+{
+    // nothing needed
 }
 
 void

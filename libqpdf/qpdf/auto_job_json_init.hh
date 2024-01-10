@@ -427,6 +427,7 @@ setupSetPageLabels();
 popHandler(); // array: .setPageLabels[]
 popHandler(); // key: setPageLabels
 pushKey("overlay");
+beginArray(bindJSON(&Handlers::beginOverlayArray), bindBare(&Handlers::endOverlayArray)); // .overlay[]
 beginDict(bindJSON(&Handlers::beginOverlay), bindBare(&Handlers::endOverlay)); // .overlay
 pushKey("file");
 setupOverlayFile();
@@ -443,8 +444,10 @@ popHandler(); // key: repeat
 pushKey("to");
 addParameter([this](std::string const& p) { c_uo->to(p); });
 popHandler(); // key: to
+popHandler(); // array: .overlay[]
 popHandler(); // key: overlay
 pushKey("underlay");
+beginArray(bindJSON(&Handlers::beginUnderlayArray), bindBare(&Handlers::endUnderlayArray)); // .underlay[]
 beginDict(bindJSON(&Handlers::beginUnderlay), bindBare(&Handlers::endUnderlay)); // .underlay
 pushKey("file");
 setupUnderlayFile();
@@ -461,6 +464,7 @@ popHandler(); // key: repeat
 pushKey("to");
 addParameter([this](std::string const& p) { c_uo->to(p); });
 popHandler(); // key: to
+popHandler(); // array: .underlay[]
 popHandler(); // key: underlay
 pushKey("warningExit0");
 addBare([this]() { c_main->warningExit0(); });
