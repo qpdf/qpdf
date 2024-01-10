@@ -1,6 +1,6 @@
 // See doc/linearization.
 
-#include <qpdf/QPDF.hh>
+#include <qpdf/QPDF_private.hh>
 
 #include <qpdf/BitStream.hh>
 #include <qpdf/BitWriter.hh>
@@ -286,7 +286,7 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
     QPDFObjGen og;
     QPDFObjectHandle H =
         readObjectAtOffset(false, offset, "linearization hint stream", QPDFObjGen(0, 0), og, false);
-    ObjCache& oc = m->obj_cache[og];
+    auto& oc = m->obj_cache.entries[og];
     qpdf_offset_t min_end_offset = oc.end_before_space;
     qpdf_offset_t max_end_offset = oc.end_after_space;
     if (!H.isStream()) {
@@ -304,7 +304,7 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
         QTC::TC("qpdf", "QPDF hint table length indirect");
         // Force resolution
         (void)length_obj.getIntValue();
-        ObjCache& oc2 = m->obj_cache[length_obj.getObjGen()];
+        auto& oc2 = m->obj_cache.entries[length_obj.getObjGen()];
         min_end_offset = oc2.end_before_space;
         max_end_offset = oc2.end_after_space;
     } else {
@@ -511,11 +511,11 @@ QPDF::checkLinearizationInternal()
     qpdf_offset_t max_E = -1;
     for (auto const& oh: m->part6) {
         QPDFObjGen og(oh.getObjGen());
-        if (m->obj_cache.count(og) == 0) {
+        if (!m->obj_cache.contains(og)) {
             // All objects have to have been dereferenced to be classified.
             throw std::logic_error("linearization part6 object not in cache");
         }
-        ObjCache const& oc = m->obj_cache[og];
+        auto const& oc = m->obj_cache.entries[og];
         min_E = std::max(min_E, oc.end_before_space);
         max_E = std::max(max_E, oc.end_after_space);
     }
@@ -544,10 +544,10 @@ QPDF::maxEnd(ObjUser const& ou)
     }
     qpdf_offset_t end = 0;
     for (auto const& og: m->obj_user_to_objects[ou]) {
-        if (m->obj_cache.count(og) == 0) {
+        if (!m->obj_cache.contains(og)) {
             stopOnError("unknown object referenced in object user table");
         }
-        end = std::max(end, m->obj_cache[og].end_after_space);
+        end = std::max(end, m->obj_cache.entries[og].end_after_space);
     }
     return end;
 }
@@ -595,10 +595,10 @@ QPDF::lengthNextN(int first_object, int n)
             linearizationWarning(
                 "no xref table entry for " + std::to_string(first_object + i) + " 0");
         } else {
-            if (m->obj_cache.count(og) == 0) {
+            if (!m->obj_cache.contains(og)) {
                 stopOnError("found unknown object while calculating length for linearization data");
             }
-            length += toI(m->obj_cache[og].end_after_space - getLinearizationOffset(og));
+            length += toI(m->obj_cache.entries[og].end_after_space - getLinearizationOffset(og));
         }
     }
     return length;

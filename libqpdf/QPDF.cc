@@ -1,6 +1,6 @@
 #include <qpdf/qpdf-config.h> // include first for large file support
 
-#include <qpdf/QPDF.hh>
+#include <qpdf/QPDF_private.hh>
 
 #include <atomic>
 #include <cstring>
@@ -195,15 +195,16 @@ QPDF::EncryptionParameters::EncryptionParameters() :
 {
 }
 
-QPDF::Members::Members() :
+QPDF::Members::Members(QPDF& qpdf) :
     log(QPDFLogger::defaultLogger()),
     file(new InvalidInputSource()),
-    encp(new EncryptionParameters)
+    encp(new EncryptionParameters),
+    obj_cache(qpdf)
 {
 }
 
 QPDF::QPDF() :
-    m(new Members())
+    m(new Members(*this))
 {
     m->tokenizer.allowEOF();
     // Generate a unique ID. It just has to be unique among all QPDF objects allocated throughout
@@ -1237,7 +1238,7 @@ QPDF::resolveXRefTable()
 {
     bool may_change = !m->reconstructed_xref;
     for (auto& iter: m->xref_table) {
-        if (isUnresolved(iter.first)) {
+        if (!m->obj_cache.containsResolved(iter.first)) {
             resolve(iter.first);
             if (may_change && m->reconstructed_xref) {
                 return false;
@@ -1271,7 +1272,7 @@ QPDF::getObjectCount()
     fixDanglingReferences();
     QPDFObjGen og;
     if (!m->obj_cache.empty()) {
-        og = (*(m->obj_cache.rbegin())).first;
+        og = (*(m->obj_cache.crbegin())).first;
     }
     return toS(og.getObj());
 }
@@ -1632,7 +1633,7 @@ QPDF::readObjectAtOffset(
 
     QPDFObjectHandle oh = readObject(description, og);
 
-    if (isUnresolved(og)) {
+    if (!m->obj_cache.containsResolved(og)) {
         // Store the object in the cache here so it gets cached whether we first know the offset or
         // whether we first know the object ID and generation (in which we case we would get here
         // through resolve).
@@ -1693,7 +1694,7 @@ QPDF::readObjectAtOffset(
 void
 QPDF::resolve(QPDFObjGen og)
 {
-    if (!isUnresolved(og)) {
+    if (m->obj_cache.containsResolved(og)) {
         return;
     }
 
@@ -1736,13 +1737,13 @@ QPDF::resolve(QPDFObjGen og)
         }
     }
 
-    if (isUnresolved(og)) {
+    if (!m->obj_cache.containsResolved(og)) {
         // PDF spec says unknown objects resolve to the null object.
         QTC::TC("qpdf", "QPDF resolve failure to null");
         updateCache(og, QPDF_Null::create(), -1, -1);
     }
 
-    auto result(m->obj_cache[og].object);
+    auto result(m->obj_cache.entries[og].object);
     result->setDefaultDescription(this, og);
 }
 
@@ -1763,8 +1764,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     // For linearization data in the object, use the data from the object stream for the objects in
     // the stream.
     QPDFObjGen stream_og(obj_stream_number, 0);
-    qpdf_offset_t end_before_space = m->obj_cache[stream_og].end_before_space;
-    qpdf_offset_t end_after_space = m->obj_cache[stream_og].end_after_space;
+    qpdf_offset_t end_before_space = m->obj_cache.entries[stream_og].end_before_space;
+    qpdf_offset_t end_after_space = m->obj_cache.entries[stream_og].end_after_space;
 
     QPDFObjectHandle dict = obj_stream.getDict();
     if (!dict.isDictionaryOfType("/ObjStm")) {
@@ -1841,26 +1842,14 @@ QPDF::updateCache(
     qpdf_offset_t end_after_space)
 {
     object->setObjGen(this, og);
-    if (isCached(og)) {
-        auto& cache = m->obj_cache[og];
+    if (m->obj_cache.contains(og)) {
+        auto& cache = m->obj_cache.entries[og];
         cache.object->assign(object);
         cache.end_before_space = end_before_space;
         cache.end_after_space = end_after_space;
     } else {
-        m->obj_cache[og] = ObjCache(object, end_before_space, end_after_space);
+        m->obj_cache.insert({og, {object, end_before_space, end_after_space}});
     }
-}
-
-bool
-QPDF::isCached(QPDFObjGen const& og)
-{
-    return m->obj_cache.count(og) != 0;
-}
-
-bool
-QPDF::isUnresolved(QPDFObjGen const& og)
-{
-    return !isCached(og) || m->obj_cache[og].object->isUnresolved();
 }
 
 QPDFObjGen
@@ -1877,8 +1866,8 @@ QPDFObjectHandle
 QPDF::makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj)
 {
     QPDFObjGen next{nextObjGen()};
-    m->obj_cache[next] = ObjCache(obj, -1, -1);
-    return newIndirect(next, m->obj_cache[next].object);
+    m->obj_cache.entries[next] = ObjTable::Entry(obj, -1, -1);
+    return newIndirect(next, m->obj_cache.entries[next].object);
 }
 
 QPDFObjectHandle
@@ -1928,9 +1917,9 @@ QPDF::newStream(std::string const& data)
 QPDFObjectHandle
 QPDF::reserveObjectIfNotExists(QPDFObjGen const& og)
 {
-    if (!isCached(og) && m->xref_table.count(og) == 0) {
+    if (!m->obj_cache.contains(og) && m->xref_table.count(og) == 0) {
         updateCache(og, QPDF_Reserved::create(), -1, -1);
-        return newIndirect(og, m->obj_cache[og].object);
+        return newIndirect(og, m->obj_cache.entries[og].object);
     } else {
         return getObject(og);
     }
@@ -1946,10 +1935,7 @@ QPDFObjectHandle
 QPDF::getObject(QPDFObjGen const& og)
 {
     // This method is called by the parser and therefore must not resolve any objects.
-    if (!isCached(og)) {
-        m->obj_cache[og] = ObjCache(QPDF_Unresolved::create(this, og), -1, -1);
-    }
-    return newIndirect(og, m->obj_cache[og].object);
+    return m->obj_cache.insert({og, {QPDF_Unresolved::create(this, og)}})->second.object;
 }
 
 QPDFObjectHandle
@@ -1990,12 +1976,7 @@ void
 QPDF::removeObject(QPDFObjGen og)
 {
     m->xref_table.erase(og);
-    if (auto cached = m->obj_cache.find(og); cached != m->obj_cache.end()) {
-        // Take care of any object handles that may be floating around.
-        cached->second.object->assign(QPDF_Null::create());
-        cached->second.object->setObjGen(nullptr, QPDFObjGen());
-        m->obj_cache.erase(cached);
-    }
+    m->obj_cache.erase(og);
 }
 
 void
@@ -2281,7 +2262,7 @@ QPDF::swapObjects(QPDFObjGen const& og1, QPDFObjGen const& og2)
     // Force objects to be read from the input source if needed, then swap them in the cache.
     resolve(og1);
     resolve(og2);
-    m->obj_cache[og1].object->swapWith(m->obj_cache[og2].object);
+    m->obj_cache.entries[og1].object->swapWith(m->obj_cache.entries[og2].object);
 }
 
 unsigned long long

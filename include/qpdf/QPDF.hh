@@ -839,18 +839,7 @@ class QPDF
     };
 
     // JobSetter class is restricted to QPDFJob.
-    class JobSetter
-    {
-        friend class QPDFJob;
-
-      private:
-        // Enable enhanced warnings for pdf file checking.
-        static void
-        setCheckMode(QPDF& qpdf, bool val)
-        {
-            qpdf.m->check_mode = val;
-        }
-    };
+    class JobSetter;
 
     // For testing only -- do not add to DLL
     static bool test_json_validators();
@@ -865,28 +854,7 @@ class QPDF
 
     static std::string const qpdf_version;
 
-    class ObjCache
-    {
-      public:
-        ObjCache() :
-            end_before_space(0),
-            end_after_space(0)
-        {
-        }
-        ObjCache(
-            std::shared_ptr<QPDFObject> object,
-            qpdf_offset_t end_before_space,
-            qpdf_offset_t end_after_space) :
-            object(object),
-            end_before_space(end_before_space),
-            end_after_space(end_after_space)
-        {
-        }
-
-        std::shared_ptr<QPDFObject> object;
-        qpdf_offset_t end_before_space;
-        qpdf_offset_t end_after_space;
-    };
+    class ObjTable;
 
     class ObjCopier
     {
@@ -977,24 +945,7 @@ class QPDF
         QPDFObjGen og;
     };
 
-    class ResolveRecorder
-    {
-      public:
-        ResolveRecorder(QPDF* qpdf, QPDFObjGen const& og) :
-            qpdf(qpdf),
-            iter(qpdf->m->resolving.insert(og).first)
-        {
-        }
-        virtual ~ResolveRecorder()
-        {
-            this->qpdf->m->resolving.erase(iter);
-        }
-
-      private:
-        QPDF* qpdf;
-        std::set<QPDFObjGen>::const_iterator iter;
-    };
-
+    class ResolveRecorder;
     class JSONReactor;
 
     void parse(char const* password);
@@ -1036,8 +987,6 @@ class QPDF
     QPDFObjGen nextObjGen();
     QPDFObjectHandle newIndirect(QPDFObjGen const&, std::shared_ptr<QPDFObject> const&);
     QPDFObjectHandle makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj);
-    bool isCached(QPDFObjGen const& og);
-    bool isUnresolved(QPDFObjGen const& og);
     void removeObject(QPDFObjGen og);
     void updateCache(
         QPDFObjGen const& og,
@@ -1450,85 +1399,7 @@ class QPDF
         return QIntC::to_ulonglong(i);
     }
 
-    class Members
-    {
-        friend class QPDF;
-        friend class ResolveRecorder;
-
-      public:
-        QPDF_DLL
-        ~Members() = default;
-
-      private:
-        Members();
-        Members(Members const&) = delete;
-
-        std::shared_ptr<QPDFLogger> log;
-        unsigned long long unique_id{0};
-        QPDFTokenizer tokenizer;
-        std::shared_ptr<InputSource> file;
-        std::string last_object_description;
-        bool provided_password_is_hex_key{false};
-        bool ignore_xref_streams{false};
-        bool suppress_warnings{false};
-        bool attempt_recovery{true};
-        bool check_mode{false};
-        std::shared_ptr<EncryptionParameters> encp;
-        std::string pdf_version;
-        std::map<QPDFObjGen, QPDFXRefEntry> xref_table;
-        std::set<int> deleted_objects;
-        std::map<QPDFObjGen, ObjCache> obj_cache;
-        std::set<QPDFObjGen> resolving;
-        QPDFObjectHandle trailer;
-        std::vector<QPDFObjectHandle> all_pages;
-        std::map<QPDFObjGen, int> pageobj_to_pages_pos;
-        bool pushed_inherited_attributes_to_pages{false};
-        bool ever_pushed_inherited_attributes_to_pages{false};
-        bool ever_called_get_all_pages{false};
-        std::vector<QPDFExc> warnings;
-        std::map<unsigned long long, ObjCopier> object_copiers;
-        std::shared_ptr<QPDFObjectHandle::StreamDataProvider> copied_streams;
-        // copied_stream_data_provider is owned by copied_streams
-        CopiedStreamDataProvider* copied_stream_data_provider{nullptr};
-        bool reconstructed_xref{false};
-        bool fixed_dangling_refs{false};
-        bool immediate_copy_from{false};
-        bool in_parse{false};
-        bool parsed{false};
-        std::set<int> resolved_object_streams;
-
-        // Linearization data
-        qpdf_offset_t first_xref_item_offset{0}; // actual value from file
-        bool uncompressed_after_compressed{false};
-        bool linearization_warnings{false};
-
-        // Linearization parameter dictionary and hint table data: may be read from file or computed
-        // prior to writing a linearized file
-        QPDFObjectHandle lindict;
-        LinParameters linp;
-        HPageOffset page_offset_hints;
-        HSharedObject shared_object_hints;
-        HGeneric outline_hints;
-
-        // Computed linearization data: used to populate above tables during writing and to compare
-        // with them during validation. c_ means computed.
-        LinParameters c_linp;
-        CHPageOffset c_page_offset_data;
-        CHSharedObject c_shared_object_data;
-        HGeneric c_outline_data;
-
-        // Object ordering data for linearized files: initialized by calculateLinearizationData().
-        // Part numbers refer to the PDF 1.4 specification.
-        std::vector<QPDFObjectHandle> part4;
-        std::vector<QPDFObjectHandle> part6;
-        std::vector<QPDFObjectHandle> part7;
-        std::vector<QPDFObjectHandle> part8;
-        std::vector<QPDFObjectHandle> part9;
-
-        // Optimization data
-        std::map<ObjUser, std::set<QPDFObjGen>> obj_user_to_objects;
-        std::map<QPDFObjGen, std::set<ObjUser>> object_to_obj_users;
-    };
+    class Members;
 
     // Keep all member variables inside the Members object, which we dynamically allocate. This
     // makes it possible to add new private members without breaking binary compatibility.

@@ -1,4 +1,4 @@
-#include <qpdf/QPDF.hh>
+#include <qpdf/QPDF_private.hh>
 
 #include <qpdf/FileInputSource.hh>
 #include <qpdf/Pl_Base64.hh>
