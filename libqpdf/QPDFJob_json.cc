@@ -204,6 +204,7 @@ Handlers::beginArray(json_handler_t start_fn, bare_handler_t end_fn)
         [start_fn](std::string const&, JSON j) { start_fn(j); },
         [end_fn](std::string const&) { end_fn(); },
         item_jh);
+    jh->addFallbackHandler(item_jh);
     this->json_handlers.push_back(item_jh);
     this->jh = item_jh.get();
 }
