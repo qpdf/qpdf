@@ -2805,6 +2805,9 @@ Overlay and Underlay
    ignored. You can also give a page range with --repeat to cause
    those pages to be repeated after the original pages are exhausted.
 
+   This options are repeatable. Pages will be stacked in order of
+   appearance: first underlays, then the original page, then overlays.
+
    Run qpdf --help=page-ranges for help with page ranges.
 
 You can use :command:`qpdf` to overlay or underlay pages from other
@@ -2823,8 +2826,10 @@ are applied, possibly obscured by the original page, and overlay files
 are drawn on top of the page to which they are applied, possibly
 obscuring the page. The ability to specify the file using the
 :qpdf:ref:`--file` option was added in qpdf 11.9.0. You can combine
-overlay and underlay, but you can only specify each option at most one
-time.
+overlay and underlay. Starting in qpdf 11.9.0, you can specify these
+options multiple times. The final page will be a stack containing the
+underlays in order of appearance, then the original page, then the
+overlays in order of appearance.
 
 The default behavior of overlay and underlay is that pages are taken
 from the overlay/underlay file in sequence and applied to

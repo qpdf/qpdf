@@ -48,6 +48,13 @@ Planned changes for future 12.x (subject to change):
       as well. These new options can be freely intermixed with
       positional arguments.
 
+    - Allow :qpdf:ref:`--overlay` and :qpdf:ref:`--underlay` to be
+      repeated. They may appear multiple times on the command-line and
+      will be stacked in the order in which they appear. In QPDFJob
+      JSON (see :ref:`qpdf-job`), the `overlay` and `underlay` keys
+      may contain arrays. For compatibility, they may also contain a
+      single dictionary.
+
   - Library Enhancements
 
     - Add ``file()``, ``range()``, and ``password()`` to

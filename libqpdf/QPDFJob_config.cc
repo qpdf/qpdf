@@ -1010,14 +1010,16 @@ QPDFJob::PagesConfig::password(std::string const& arg)
 std::shared_ptr<QPDFJob::UOConfig>
 QPDFJob::Config::overlay()
 {
-    o.m->under_overlay = &o.m->overlay;
+    o.m->overlay.emplace_back("overlay");
+    o.m->under_overlay = &o.m->overlay.back();
     return std::shared_ptr<UOConfig>(new UOConfig(this));
 }
 
 std::shared_ptr<QPDFJob::UOConfig>
 QPDFJob::Config::underlay()
 {
-    o.m->under_overlay = &o.m->underlay;
+    o.m->underlay.emplace_back("underlay");
+    o.m->under_overlay = &o.m->underlay.back();
     return std::shared_ptr<UOConfig>(new UOConfig(this));
 }
 

@@ -1834,9 +1834,6 @@ QPDFJob::processInputSource(
 void
 QPDFJob::validateUnderOverlay(QPDF& pdf, UnderOverlay* uo)
 {
-    if (uo->filename.empty()) {
-        return;
-    }
     QPDFPageDocumentHelper main_pdh(pdf);
     int main_npages = QIntC::to_int(main_pdh.getAllPages().size());
     processFile(uo->pdf, uo->filename.c_str(), uo->password.get(), true, false);
@@ -1878,14 +1875,15 @@ std::string
 QPDFJob::doUnderOverlayForPage(
     QPDF& pdf,
     UnderOverlay& uo,
-    std::map<int, std::vector<int>>& pagenos,
+    std::map<int, std::map<size_t, std::vector<int>>>& pagenos,
     size_t page_idx,
-    std::map<int, QPDFObjectHandle>& fo,
+    size_t uo_idx,
+    std::map<int, std::map<size_t, QPDFObjectHandle>>& fo,
     std::vector<QPDFPageObjectHelper>& pages,
     QPDFPageObjectHelper& dest_page)
 {
     int pageno = 1 + QIntC::to_int(page_idx);
-    if (!pagenos.count(pageno)) {
+    if (!(pagenos.count(pageno) && pagenos[pageno].count(uo_idx))) {
         return "";
     }
 
@@ -1899,13 +1897,13 @@ QPDFJob::doUnderOverlayForPage(
     std::string content;
     int min_suffix = 1;
     QPDFObjectHandle resources = dest_page.getAttribute("/Resources", true);
-    for (int from_pageno: pagenos[pageno]) {
+    for (int from_pageno: pagenos[pageno][uo_idx]) {
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << "    " << uo.which << " " << from_pageno << "\n";
         });
         auto from_page = pages.at(QIntC::to_size(from_pageno - 1));
-        if (0 == fo.count(from_pageno)) {
-            fo[from_pageno] = pdf.copyForeignObject(from_page.getFormXObjectForPage());
+        if (fo[from_pageno].count(uo_idx) == 0) {
+            fo[from_pageno][uo_idx] = pdf.copyForeignObject(from_page.getFormXObjectForPage());
         }
 
         // If the same page is overlaid or underlaid multiple times, we'll generate multiple names
@@ -1913,13 +1911,13 @@ QPDFJob::doUnderOverlayForPage(
         std::string name = resources.getUniqueResourceName("/Fx", min_suffix);
         QPDFMatrix cm;
         std::string new_content = dest_page.placeFormXObject(
-            fo[from_pageno], name, dest_page.getTrimBox().getArrayAsRectangle(), cm);
+            fo[from_pageno][uo_idx], name, dest_page.getTrimBox().getArrayAsRectangle(), cm);
         dest_page.copyAnnotations(from_page, cm, dest_afdh, make_afdh(from_page));
         if (!new_content.empty()) {
             resources.mergeResources("<< /XObject << >> >>"_qpdf);
             auto xobject = resources.getKey("/XObject");
             if (xobject.isDictionary()) {
-                xobject.replaceKey(name, fo[from_pageno]);
+                xobject.replaceKey(name, fo[from_pageno][uo_idx]);
             }
             ++min_suffix;
             content += new_content;
@@ -1929,73 +1927,104 @@ QPDFJob::doUnderOverlayForPage(
 }
 
 void
-QPDFJob::getUOPagenos(QPDFJob::UnderOverlay& uo, std::map<int, std::vector<int>>& pagenos)
+QPDFJob::getUOPagenos(
+    std::vector<QPDFJob::UnderOverlay>& uos,
+    std::map<int, std::map<size_t, std::vector<int>>>& pagenos)
 {
-    size_t idx = 0;
-    size_t from_size = uo.from_pagenos.size();
-    size_t repeat_size = uo.repeat_pagenos.size();
-    for (int to_pageno: uo.to_pagenos) {
-        if (idx < from_size) {
-            pagenos[to_pageno].push_back(uo.from_pagenos.at(idx));
-        } else if (repeat_size) {
-            pagenos[to_pageno].push_back(uo.repeat_pagenos.at((idx - from_size) % repeat_size));
+    size_t uo_idx = 0;
+    for (auto const& uo: uos) {
+        size_t page_idx = 0;
+        size_t from_size = uo.from_pagenos.size();
+        size_t repeat_size = uo.repeat_pagenos.size();
+        for (int to_pageno: uo.to_pagenos) {
+            if (page_idx < from_size) {
+                pagenos[to_pageno][uo_idx].push_back(uo.from_pagenos.at(page_idx));
+            } else if (repeat_size) {
+                pagenos[to_pageno][uo_idx].push_back(
+                    uo.repeat_pagenos.at((page_idx - from_size) % repeat_size));
+            }
+            ++page_idx;
         }
-        ++idx;
+        ++uo_idx;
     }
 }
 
 void
 QPDFJob::handleUnderOverlay(QPDF& pdf)
 {
-    validateUnderOverlay(pdf, &m->underlay);
-    validateUnderOverlay(pdf, &m->overlay);
-    if ((nullptr == m->underlay.pdf) && (nullptr == m->overlay.pdf)) {
+    if (m->underlay.empty() && m->overlay.empty()) {
         return;
     }
-    std::map<int, std::vector<int>> underlay_pagenos;
-    getUOPagenos(m->underlay, underlay_pagenos);
-    std::map<int, std::vector<int>> overlay_pagenos;
-    getUOPagenos(m->overlay, overlay_pagenos);
-    std::map<int, QPDFObjectHandle> underlay_fo;
-    std::map<int, QPDFObjectHandle> overlay_fo;
-    std::vector<QPDFPageObjectHelper> upages;
-    if (m->underlay.pdf.get()) {
-        upages = QPDFPageDocumentHelper(*(m->underlay.pdf)).getAllPages();
+    for (auto& uo: m->underlay) {
+        validateUnderOverlay(pdf, &uo);
     }
-    std::vector<QPDFPageObjectHelper> opages;
-    if (m->overlay.pdf.get()) {
-        opages = QPDFPageDocumentHelper(*(m->overlay.pdf)).getAllPages();
+    for (auto& uo: m->overlay) {
+        validateUnderOverlay(pdf, &uo);
     }
 
-    QPDFPageDocumentHelper main_pdh(pdf);
-    std::vector<QPDFPageObjectHelper> main_pages = main_pdh.getAllPages();
-    size_t main_npages = main_pages.size();
+    // First map key is 1-based page number. Second is index into the overlay/underlay vector. Watch
+    // out to not reverse the keys or be off by one.
+    std::map<int, std::map<size_t, std::vector<int>>> underlay_pagenos;
+    std::map<int, std::map<size_t, std::vector<int>>> overlay_pagenos;
+    getUOPagenos(m->underlay, underlay_pagenos);
+    getUOPagenos(m->overlay, overlay_pagenos);
     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
         v << prefix << ": processing underlay/overlay\n";
     });
-    for (size_t i = 0; i < main_npages; ++i) {
+
+    auto get_pages = [](std::vector<UnderOverlay>& v,
+                        std::vector<std::vector<QPDFPageObjectHelper>>& v_out) {
+        for (auto const& uo: v) {
+            if (uo.pdf) {
+                v_out.push_back(QPDFPageDocumentHelper(*(uo.pdf)).getAllPages());
+            }
+        }
+    };
+    std::vector<std::vector<QPDFPageObjectHelper>> upages;
+    get_pages(m->underlay, upages);
+    std::vector<std::vector<QPDFPageObjectHelper>> opages;
+    get_pages(m->overlay, opages);
+
+    std::map<int, std::map<size_t, QPDFObjectHandle>> underlay_fo;
+    std::map<int, std::map<size_t, QPDFObjectHandle>> overlay_fo;
+    QPDFPageDocumentHelper main_pdh(pdf);
+    auto main_pages = main_pdh.getAllPages();
+    size_t main_npages = main_pages.size();
+    for (size_t page_idx = 0; page_idx < main_npages; ++page_idx) {
+        auto pageno = QIntC::to_int(page_idx) + 1;
         doIfVerbose(
-            [&](Pipeline& v, std::string const& prefix) { v << "  page " << 1 + i << "\n"; });
-        auto pageno = QIntC::to_int(i) + 1;
-        if (!(underlay_pagenos.count(pageno) || overlay_pagenos.count(pageno))) {
+            [&](Pipeline& v, std::string const& prefix) { v << "  page " << pageno << "\n"; });
+        if (underlay_pagenos[pageno].empty() && overlay_pagenos[pageno].empty()) {
             continue;
         }
         // This code converts the original page, any underlays, and any overlays to form XObjects.
         // Then it concatenates display of all underlays, the original page, and all overlays. Prior
         // to 11.3.0, the original page contents were wrapped in q/Q, but this didn't work if the
-        // original page had unbalanced q/Q operators. See github issue #904.
-        auto& dest_page = main_pages.at(i);
+        // original page had unbalanced q/Q operators. See GitHub issue #904.
+        auto& dest_page = main_pages.at(page_idx);
         auto dest_page_oh = dest_page.getObjectHandle();
         auto this_page_fo = dest_page.getFormXObjectForPage();
         // The resulting form xobject lazily reads the content from the original page, which we are
-        // going to replace. Therefore we have to explicitly copy it.
+        // going to replace. Therefore, we have to explicitly copy it.
         auto content_data = this_page_fo.getRawStreamData();
         this_page_fo.replaceStreamData(content_data, QPDFObjectHandle(), QPDFObjectHandle());
         auto resources =
             dest_page_oh.replaceKeyAndGetNew("/Resources", "<< /XObject << >> >>"_qpdf);
         resources.getKey("/XObject").replaceKeyAndGetNew("/Fx0", this_page_fo);
-        auto content = doUnderOverlayForPage(
-            pdf, m->underlay, underlay_pagenos, i, underlay_fo, upages, dest_page);
+        size_t uo_idx{0};
+        std::string content;
+        for (auto& underlay: m->underlay) {
+            content += doUnderOverlayForPage(
+                pdf,
+                underlay,
+                underlay_pagenos,
+                page_idx,
+                uo_idx,
+                underlay_fo,
+                upages[uo_idx],
+                dest_page);
+            ++uo_idx;
+        }
         content += dest_page.placeFormXObject(
             this_page_fo,
             "/Fx0",
@@ -2003,8 +2032,19 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
             true,
             false,
             false);
-        content += doUnderOverlayForPage(
-            pdf, m->overlay, overlay_pagenos, i, overlay_fo, opages, dest_page);
+        uo_idx = 0;
+        for (auto& overlay: m->overlay) {
+            content += doUnderOverlayForPage(
+                pdf,
+                overlay,
+                overlay_pagenos,
+                page_idx,
+                uo_idx,
+                overlay_fo,
+                opages[uo_idx],
+                dest_page);
+            ++uo_idx;
+        }
         dest_page_oh.replaceKey("/Contents", pdf.newStream(content));
     }
 }
@@ -3057,9 +3097,10 @@ QPDFJob::writeOutfile(QPDF& pdf)
             try {
                 QUtil::remove_file(backup.c_str());
             } catch (QPDFSystemError& e) {
-                *m->log->getError() << m->message_prefix << ": unable to delete original file ("
-                                    << e.what() << ");" << " original file left in " << backup
-                                    << ", but the input was successfully replaced\n";
+                *m->log->getError()
+                    << m->message_prefix << ": unable to delete original file (" << e.what() << ");"
+                    << " original file left in " << backup
+                    << ", but the input was successfully replaced\n";
             }
         }
     }

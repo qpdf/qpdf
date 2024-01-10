@@ -711,6 +711,9 @@ of the primary output until it runs out of pages, and any extra pages are
 ignored. You can also give a page range with --repeat to cause
 those pages to be repeated after the original pages are exhausted.
 
+This options are repeatable. Pages will be stacked in order of
+appearance: first underlays, then the original page, then overlays.
+
 Run qpdf --help=page-ranges for help with page ranges.
 )");
 }
