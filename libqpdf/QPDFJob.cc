@@ -1899,7 +1899,7 @@ QPDFJob::doUnderOverlayForPage(
     QPDFObjectHandle resources = dest_page.getAttribute("/Resources", true);
     for (int from_pageno: pagenos[pageno][uo_idx]) {
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-            v << "    " << uo.which << " " << from_pageno << "\n";
+            v << "    " << uo.filename << " " << uo.which << " " << from_pageno << "\n";
         });
         auto from_page = pages.at(QIntC::to_size(from_pageno - 1));
         if (fo[from_pageno].count(uo_idx) == 0) {

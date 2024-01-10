@@ -5,8 +5,8 @@ qpdf: removing unreferenced pages from primary input
 qpdf: adding pages from fxo-red.pdf
 qpdf: processing underlay/overlay
   page 1
-    overlay 1
-    overlay 2
-    overlay 3
-    overlay 4
+    fxo-blue.pdf overlay 1
+    fxo-blue.pdf overlay 2
+    fxo-blue.pdf overlay 3
+    fxo-blue.pdf overlay 4
 qpdf: wrote file a.pdf
