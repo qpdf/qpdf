@@ -63,6 +63,12 @@
 .three: bool: true
 .two: number: 3.14
 .: json: dict end
+-- fallback --
+.: json: {
+  "five": "not-array"
+}
+.five: string: not-array
+.: json: dict end
 -- errors --
 bad type at top: JSON handler: value at . is not of expected type
 .: json: {

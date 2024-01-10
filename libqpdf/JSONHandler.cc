@@ -17,10 +17,10 @@ struct Handlers
     JSONHandler::void_handler_t dict_end_handler{nullptr};
     JSONHandler::json_handler_t array_start_handler{nullptr};
     JSONHandler::void_handler_t array_end_handler{nullptr};
-    JSONHandler::void_handler_t final_handler{nullptr};
     std::map<std::string, std::shared_ptr<JSONHandler>> dict_handlers;
     std::shared_ptr<JSONHandler> fallback_dict_handler;
     std::shared_ptr<JSONHandler> array_item_handler;
+    std::shared_ptr<JSONHandler> fallback_handler;
 };
 
 class JSONHandler::Members
@@ -111,6 +111,12 @@ JSONHandler::addArrayHandlers(
 }
 
 void
+JSONHandler::addFallbackHandler(std::shared_ptr<JSONHandler> h)
+{
+    m->h.fallback_handler = std::move(h);
+}
+
+void
 JSONHandler::handle(std::string const& path, JSON j)
 {
     if (m->h.any_handler) {
@@ -166,6 +172,11 @@ JSONHandler::handle(std::string const& path, JSON j)
             ++i;
         });
         m->h.array_end_handler(path);
+        return;
+    }
+
+    if (m->h.fallback_handler) {
+        m->h.fallback_handler->handle(path, j);
         return;
     }
 

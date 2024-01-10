@@ -45,6 +45,9 @@ class JSONHandler
     void addArrayHandlers(
         json_handler_t start_fn, void_handler_t end_fn, std::shared_ptr<JSONHandler> item_handlers);
 
+    // If no handlers is called, the fallback handler will be used to try to handle the item.
+    void addFallbackHandler(std::shared_ptr<JSONHandler>);
+
     // Apply handlers recursively to a JSON object.
     void handle(std::string const& path, JSON j);
 

@@ -77,6 +77,7 @@ make_all_handler()
     auto h5s = std::make_shared<JSONHandler>();
     h->addDictKeyHandler("five", h5s);
     h5s->addArrayHandlers(print_json, make_print_message("array end"), h5);
+    h5s->addFallbackHandler(h5);
     auto h6 = std::make_shared<JSONHandler>();
     h6->addDictHandlers(print_json, make_print_message("dict end"));
     auto h6a = std::make_shared<JSONHandler>();
@@ -107,6 +108,11 @@ test_all()
    "five": ["x", false, "y", null, true],
    "phour": null,
    "six": {"a": {"b": "quack", "Q": "baaa"}, "b": "moo"}
+})");
+    h->handle(".", j);
+    std::cerr << "-- fallback --" << std::endl;
+    j = JSON::parse(R"({
+   "five": "not-array"
 })");
     h->handle(".", j);
 }
