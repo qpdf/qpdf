@@ -447,7 +447,7 @@ Most of chapter 12 applies. See Document-level navigation (12.3).
 
 # Feature to Issue Mapping
 
-Last checked: 2023-12-29
+Last checked: 2024-01-11
 
 ```
 gh search issues label:pages --repo qpdf/qpdf --limit 200 --state=open
@@ -456,6 +456,13 @@ gh search issues label:pages --repo qpdf/qpdf --limit 200 --state=open
 * Allow an existing `QPDF` to be an input to a merge or underly/overlay operation when using the
   `QPDFAssembler` C++ API
   * Issues: none
+* Fixes to copying annotations
+  * Issues: #1116
+  * Notes:
+    * This is a PR that includes some failing test cases
+    * Fix `/P`
+    * Allow copying of annotations from a region of a page (not sure I want to add that)
+    * Allow selection of pages without annotations (not sure I want to do that)
 * Generate a mapping from source to destination for all destinations
   * Issues: #1077
   * Notes:
