@@ -286,13 +286,13 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
     QPDFObjGen og;
     QPDFObjectHandle H =
         readObjectAtOffset(false, offset, "linearization hint stream", QPDFObjGen(0, 0), og, false);
-    auto& oc = m->obj_cache.entries[og];
-    qpdf_offset_t min_end_offset = oc.end_before_space;
-    qpdf_offset_t max_end_offset = oc.end_after_space;
+
     if (!H.isStream()) {
         throw damagedPDF("linearization dictionary", "hint table is not a stream");
     }
-
+    auto it = m->obj_cache.find(og);
+    qpdf_offset_t min_end_offset = it->second.end_before_space;
+    qpdf_offset_t max_end_offset = it->second.end_after_space;
     QPDFObjectHandle Hdict = H.getDict();
 
     // Some versions of Acrobat make /Length indirect and place it immediately after the stream,
@@ -304,9 +304,9 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
         QTC::TC("qpdf", "QPDF hint table length indirect");
         // Force resolution
         (void)length_obj.getIntValue();
-        auto& oc2 = m->obj_cache.entries[length_obj.getObjGen()];
-        min_end_offset = oc2.end_before_space;
-        max_end_offset = oc2.end_after_space;
+        auto it2 = m->obj_cache.find(length_obj.getObjGen());
+        min_end_offset = it2->second.end_before_space;
+        max_end_offset = it2->second.end_after_space;
     } else {
         QTC::TC("qpdf", "QPDF hint table length direct");
     }
@@ -511,13 +511,13 @@ QPDF::checkLinearizationInternal()
     qpdf_offset_t max_E = -1;
     for (auto const& oh: m->part6) {
         QPDFObjGen og(oh.getObjGen());
-        if (!m->obj_cache.contains(og)) {
+        if (auto it = m->obj_cache.find(og); it == m->obj_cache.end()) {
             // All objects have to have been dereferenced to be classified.
             throw std::logic_error("linearization part6 object not in cache");
+        } else {
+            min_E = std::max(min_E, it->second.end_before_space);
+            max_E = std::max(max_E, it->second.end_after_space);
         }
-        auto const& oc = m->obj_cache.entries[og];
-        min_E = std::max(min_E, oc.end_before_space);
-        max_E = std::max(max_E, oc.end_after_space);
     }
     if ((p.first_page_end < min_E) || (p.first_page_end > max_E)) {
         QTC::TC("qpdf", "QPDF warn /E mismatch");
@@ -544,10 +544,11 @@ QPDF::maxEnd(ObjUser const& ou)
     }
     qpdf_offset_t end = 0;
     for (auto const& og: m->obj_user_to_objects[ou]) {
-        if (!m->obj_cache.contains(og)) {
+        if (auto it = m->obj_cache.find(og); it == m->obj_cache.end()) {
             stopOnError("unknown object referenced in object user table");
+        } else {
+            end = std::max(end, it->second.end_after_space);
         }
-        end = std::max(end, m->obj_cache.entries[og].end_after_space);
     }
     return end;
 }
@@ -595,10 +596,11 @@ QPDF::lengthNextN(int first_object, int n)
             linearizationWarning(
                 "no xref table entry for " + std::to_string(first_object + i) + " 0");
         } else {
-            if (!m->obj_cache.contains(og)) {
+            if (auto it = m->obj_cache.find(og); it == m->obj_cache.end()) {
                 stopOnError("found unknown object while calculating length for linearization data");
+            } else {
+                length += toI(it->second.end_after_space - getLinearizationOffset(og));
             }
-            length += toI(m->obj_cache.entries[og].end_after_space - getLinearizationOffset(og));
         }
     }
     return length;

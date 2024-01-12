@@ -1761,9 +1761,9 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 
     // For linearization data in the object, use the data from the object stream for the objects in
     // the stream.
-    QPDFObjGen stream_og(obj_stream_number, 0);
-    qpdf_offset_t end_before_space = m->obj_cache.entries[stream_og].end_before_space;
-    qpdf_offset_t end_after_space = m->obj_cache.entries[stream_og].end_after_space;
+    auto it = m->obj_cache.find(QPDFObjGen(obj_stream_number, 0));
+    qpdf_offset_t end_before_space = it->second.end_before_space;
+    qpdf_offset_t end_after_space = it->second.end_after_space;
 
     QPDFObjectHandle dict = obj_stream.getDict();
     if (!dict.isDictionaryOfType("/ObjStm")) {
@@ -2250,7 +2250,7 @@ QPDF::swapObjects(QPDFObjGen const& og1, QPDFObjGen const& og2)
     // Force objects to be read from the input source if needed, then swap them in the cache.
     resolve(og1);
     resolve(og2);
-    m->obj_cache.entries[og1].object->swapWith(m->obj_cache.entries[og2].object);
+    m->obj_cache.find(og1)->second.object->swapWith(m->obj_cache.find(og2)->second.object);
 }
 
 unsigned long long

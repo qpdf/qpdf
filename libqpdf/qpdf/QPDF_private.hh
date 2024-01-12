@@ -21,7 +21,7 @@ class QPDF::ObjTable
         Entry() = default;
 
         Entry(
-            std::shared_ptr<QPDFObject> const& object,
+            std::shared_ptr<QPDFObject>&& object,
             qpdf_offset_t end_before_space = -1,
             qpdf_offset_t end_after_space = -1) :
             object(object),
@@ -112,6 +112,7 @@ class QPDF::ObjTable
         return entries.upper_bound(og);
     }
 
+  private:
     std::map<QPDFObjGen, Entry> entries;
     QPDF& qpdf;
 };
