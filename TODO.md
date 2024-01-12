@@ -29,6 +29,8 @@ Always
 Next
 ====
 
+* Consider adding fuzzer code for JSON
+* Add some additional code coverage analysis to CI
 * Spell check: Have the spell-check script synchronize cSpell.json with .idea/dictionaries/qpdf.xml,
   which should be set to the union of all the validated user dictionaries.
 * Maybe fix #553 -- use file times for attachments (trivial with C++-20)
@@ -376,8 +378,6 @@ so, I find it useful to make reference to them in this list.
   safe if all intermediate page nodes have only /Kids, /Parent, /Type, and /Count.
 
 * Look at https://bestpractices.coreinfrastructure.org/en
-
-* Consider adding fuzzer code for JSON
 
 * Rework tests so that nothing is written into the source directory. Ideally then the entire build
   could be done with a read-only source tree.
