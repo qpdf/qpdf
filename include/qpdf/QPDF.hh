@@ -985,14 +985,8 @@ class QPDF
     QPDFObjectHandle reserveObjectIfNotExists(QPDFObjGen const& og);
     QPDFObjectHandle reserveStream(QPDFObjGen const& og);
     QPDFObjGen nextObjGen();
-    QPDFObjectHandle newIndirect(QPDFObjGen const&, std::shared_ptr<QPDFObject> const&);
-    QPDFObjectHandle makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj);
+    QPDFObjectHandle makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject>&& obj);
     void removeObject(QPDFObjGen og);
-    void updateCache(
-        QPDFObjGen const& og,
-        std::shared_ptr<QPDFObject> const& object,
-        qpdf_offset_t end_before_space,
-        qpdf_offset_t end_after_space);
     static QPDFExc damagedPDF(
         std::shared_ptr<InputSource> const& input,
         std::string const& object,

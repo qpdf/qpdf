@@ -425,7 +425,7 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
         for (auto& oc: pdf.m->obj_cache) {
             if (oc.second.object->getTypeCode() == ::ot_reserved && reserved.count(oc.first) == 0) {
                 QTC::TC("qpdf", "QPDF_json non-trivial null reserved");
-                pdf.updateCache(oc.first, QPDF_Null::create(), -1, -1);
+                pdf.m->obj_cache.insert_or_assign(oc.first, QPDF_Null::create());
             }
         }
     }

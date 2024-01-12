@@ -104,6 +104,8 @@ class QPDF::ObjTable
         return entries.insert(std::move(pair)).first;
     }
 
+    iterator insert_or_assign(QPDFObjGen oh, Entry&& obj);
+
     iterator
     upper_bound(QPDFObjGen og)
     {
