@@ -692,3 +692,4 @@ QPDF recover xref stream 0
 QPDFJob misplaced page range 0
 QPDFJob duplicated range 0
 QPDFJob json over/under no file 0
+QPDF_Array copy 1

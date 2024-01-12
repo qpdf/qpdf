@@ -3366,6 +3366,16 @@ test_96(QPDF& pdf, char const* arg2)
     assert(s.unparseBinary() == "<abc0>");
 }
 
+static void
+test_97(QPDF& pdf, char const* arg2)
+{
+    // Shallow array copy. This test uses many-nulls.pdf.
+    auto nulls = pdf.getTrailer().getKey("/Nulls").getArrayItem(0);
+    assert(nulls.isArray() && nulls.getArrayNItems() > 10000);
+    auto nulls2 = nulls.shallowCopy();
+    assert(nulls.unparse() == nulls2.unparse());
+}
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -3467,7 +3477,7 @@ runtest(int n, char const* filename1, char const* arg2)
         {78, test_78}, {79, test_79}, {80, test_80}, {81, test_81}, {82, test_82}, {83, test_83},
         {84, test_84}, {85, test_85}, {86, test_86}, {87, test_87}, {88, test_88}, {89, test_89},
         {90, test_90}, {91, test_91}, {92, test_92}, {93, test_93}, {94, test_94}, {95, test_95},
-        {96, test_96}};
+        {96, test_96}, {97, test_97}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {

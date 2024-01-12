@@ -1,5 +1,6 @@
 #include <qpdf/QPDF_Array.hh>
 
+#include <qpdf/QTC.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFObject_private.hh>
 
@@ -74,8 +75,10 @@ QPDF_Array::copy(bool shallow)
     if (shallow) {
         return do_create(new QPDF_Array(*this));
     } else {
+        QTC::TC("qpdf", "QPDF_Array copy", sp ? 0 : 1);
         if (sp) {
             auto* result = new QPDF_Array();
+            result->sp = std::make_unique<Sparse>();
             result->sp->size = sp->size;
             for (auto const& element: sp->elements) {
                 auto const& obj = element.second;
