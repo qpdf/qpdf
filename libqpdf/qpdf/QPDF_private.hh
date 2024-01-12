@@ -5,6 +5,7 @@
 
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDF_Null.hh>
+#include <qpdf/QPDF_Unresolved.hh>
 
 // The object table is a combination of the previous object cache and (, in future,) the xref_table
 // (, as well as possibly other existing structures). It is a hybrid of a map and a vector indexed
@@ -95,6 +96,23 @@ class QPDF::ObjTable
     find(QPDFObjGen og)
     {
         return entries.find(og);
+    }
+
+    std::shared_ptr<QPDFObject>
+    getObject(int id, int gen = 0)
+    {
+        // This method is called by the parser and therefore must not resolve any objects.
+        return getObject(QPDFObjGen(id, gen));
+    }
+
+    std::shared_ptr<QPDFObject>
+    getObject(QPDFObjGen og)
+    {
+        // This method is called by the parser and therefore must not resolve any objects.
+        if (auto it = entries.find(og); it != entries.end()) {
+            return it->second.object;
+        }
+        return entries.insert({og, {QPDF_Unresolved::create(&qpdf, og)}}).first->second.object;
     }
 
     iterator

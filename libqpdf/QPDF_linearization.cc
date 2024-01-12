@@ -582,7 +582,7 @@ QPDF::getUncompressedObject(QPDFObjectHandle& obj, std::map<int, int> const& obj
         return obj;
     } else {
         int repl = (*(object_stream_data.find(obj.getObjectID()))).second;
-        return getObject(repl, 0);
+        return m->obj_cache.getObject(repl, 0);
     }
 }
 
@@ -1178,9 +1178,9 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         stopOnError("found other than one root while"
                     " calculating linearization data");
     }
-    m->part4.push_back(getObject(*(lc_root.begin())));
+    m->part4.push_back(m->obj_cache.getObject(*(lc_root.begin())));
     for (auto const& og: lc_open_document) {
-        m->part4.push_back(getObject(og));
+        m->part4.push_back(m->obj_cache.getObject(og));
     }
 
     // Part 6: first page objects.  Note: implementation note 124 states that Acrobat always treats
@@ -1205,11 +1205,11 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     // of hint tables.
 
     for (auto const& og: lc_first_page_private) {
-        m->part6.push_back(getObject(og));
+        m->part6.push_back(m->obj_cache.getObject(og));
     }
 
     for (auto const& og: lc_first_page_shared) {
-        m->part6.push_back(getObject(og));
+        m->part6.push_back(m->obj_cache.getObject(og));
     }
 
     // Place the outline dictionary if it goes in the first page section.
@@ -1252,7 +1252,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         for (auto const& og: m->obj_user_to_objects[ou]) {
             if (lc_other_page_private.count(og)) {
                 lc_other_page_private.erase(og);
-                m->part7.push_back(getObject(og));
+                m->part7.push_back(m->obj_cache.getObject(og));
                 ++m->c_page_offset_data.entries.at(i).nobjects;
             }
         }
@@ -1268,7 +1268,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     // Order is unimportant.
     for (auto const& og: lc_other_page_shared) {
-        m->part8.push_back(getObject(og));
+        m->part8.push_back(m->obj_cache.getObject(og));
     }
 
     // Part 9: other objects
@@ -1288,7 +1288,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     for (auto const& og: pages_ogs) {
         if (lc_other.count(og)) {
             lc_other.erase(og);
-            m->part9.push_back(getObject(og));
+            m->part9.push_back(m->obj_cache.getObject(og));
         }
     }
 
@@ -1313,7 +1313,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
             for (auto const& og: ogs) {
                 if (lc_thumbnail_private.count(og)) {
                     lc_thumbnail_private.erase(og);
-                    m->part9.push_back(getObject(og));
+                    m->part9.push_back(m->obj_cache.getObject(og));
                 }
             }
         }
@@ -1325,7 +1325,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     // Place shared thumbnail objects
     for (auto const& og: lc_thumbnail_shared) {
-        m->part9.push_back(getObject(og));
+        m->part9.push_back(m->obj_cache.getObject(og));
     }
 
     // Place outlines unless in first page
@@ -1335,7 +1335,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     // Place all remaining objects
     for (auto const& og: lc_other) {
-        m->part9.push_back(getObject(og));
+        m->part9.push_back(m->obj_cache.getObject(og));
     }
 
     // Make sure we got everything exactly once.
@@ -1428,7 +1428,7 @@ QPDF::pushOutlinesToPart(
     lc_outlines.erase(outlines_og);
     part.push_back(outlines);
     for (auto const& og: lc_outlines) {
-        part.push_back(getObject(og));
+        part.push_back(m->obj_cache.getObject(og));
         ++m->c_outline_data.nobjects;
     }
 }

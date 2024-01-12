@@ -583,7 +583,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
             if (entry.getType() != 1) {
                 continue;
             }
-            auto oh = getObjectByObjGen(iter.first);
+            QPDFObjectHandle oh = m->obj_cache.getObject(iter.first);
             try {
                 if (!oh.isStreamOfType("/XRef")) {
                     continue;
@@ -1909,7 +1909,7 @@ QPDF::reserveObjectIfNotExists(QPDFObjGen const& og)
     if (m->xref_table.count(og) == 0) {
         return m->obj_cache.insert({og, QPDF_Reserved::create()})->second.object;
     } else {
-        return getObject(og);
+        return m->obj_cache.getObject(og);
     }
 }
 
@@ -1923,25 +1923,25 @@ QPDFObjectHandle
 QPDF::getObject(QPDFObjGen const& og)
 {
     // This method is called by the parser and therefore must not resolve any objects.
-    return m->obj_cache.insert({og, {QPDF_Unresolved::create(this, og)}})->second.object;
+    return {m->obj_cache.getObject(og.getObj(), og.getGen())};
 }
 
 QPDFObjectHandle
 QPDF::getObject(int objid, int generation)
 {
-    return getObject(QPDFObjGen(objid, generation));
+    return {m->obj_cache.getObject(objid, generation)};
 }
 
 QPDFObjectHandle
 QPDF::getObjectByObjGen(QPDFObjGen const& og)
 {
-    return getObject(og);
+    return {m->obj_cache.getObject(og.getObj(), og.getGen())};
 }
 
 QPDFObjectHandle
 QPDF::getObjectByID(int objid, int generation)
 {
-    return getObject(QPDFObjGen(objid, generation));
+    return {m->obj_cache.getObject(objid, generation)};
 }
 
 void
