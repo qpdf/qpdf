@@ -232,14 +232,8 @@ void
 Handlers::beginUnderOverlay(JSON const& j)
 {
     // File has to be processed before items, so handle it here.
-    bool file_seen = false;
     std::string file;
-    j.forEachDictItem([&](std::string const& key, JSON const& value) {
-        if (key == "file") {
-            file_seen = value.getString(file);
-        }
-    });
-    if (!file_seen) {
+    if (!j.getDictItem("file").getString(file)) {
         QTC::TC("qpdf", "QPDFJob json over/under no file");
         usage("file is required in underlay/overlay specification");
     }
@@ -488,14 +482,8 @@ Handlers::endPagesArray()
 void
 Handlers::beginPages(JSON j)
 {
-    bool file_seen = false;
     std::string file;
-    j.forEachDictItem([&](std::string const& key, JSON const& value) {
-        if (key == "file") {
-            file_seen = value.getString(file);
-        }
-    });
-    if (!file_seen) {
+    if (!j.getDictItem("file").getString(file)) {
         QTC::TC("qpdf", "QPDFJob json pages no file");
         usage("file is required in page specification");
     }
