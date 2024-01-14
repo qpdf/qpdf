@@ -2,8 +2,10 @@
 
 #include <qpdf/JSON.hh>
 #include <qpdf/Pipeline.hh>
+#include <qpdf/Pl_String.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjectHandle.hh>
+
 #include <iostream>
 
 static void
@@ -131,6 +133,51 @@ test_main()
         "  \"blob\": \"AQIDBAX//v38+w==\",\n"
         "  \"normal\": \"string\"\n"
         "}");
+
+    // Check default constructed JSON object (order as per JSON.hh).
+    JSON uninitialized;
+    std::string ws;
+    auto pl = Pl_String ("", nullptr, ws);
+    uninitialized.write(&pl);
+    assert(ws == "null");
+    assert(uninitialized.unparse() == "null");
+    try {
+        uninitialized.addDictionaryMember("key", jarr);
+        assert(false);
+    } catch (std::runtime_error&) {
+    }
+    assert(jmap.addDictionaryMember("42", uninitialized).isNull());
+    try {
+        uninitialized.addArrayElement(jarr);
+        assert(false);
+    } catch (std::runtime_error&) {
+    }
+    assert(jarr.addArrayElement(uninitialized).isNull());
+    assert(!uninitialized.isArray());
+    assert(!uninitialized.isDictionary());
+    try {
+        uninitialized.checkDictionaryKeySeen("key");
+        assert(false);
+    } catch (std::logic_error&) {
+    }
+    std::string st_out = "unchanged";
+    assert(!uninitialized.getString(st_out));
+    assert(!uninitialized.getNumber(st_out));
+    bool b_out = true;
+    assert(!uninitialized.getBool(b_out));
+    assert(b_out && st_out == "unchanged");
+    assert(!uninitialized.isNull());
+    assert(uninitialized.getDictItem("42").isNull());
+    assert(!uninitialized.forEachDictItem([](auto k, auto v) {}));
+    assert(!uninitialized.forEachArrayItem([](auto v) {}));
+    std::list<std::string> e;
+    assert(!uninitialized.checkSchema(JSON(), 0, e));
+    assert(!uninitialized.checkSchema(JSON(), e));
+    assert(e.empty());
+    uninitialized.setStart(0);
+    uninitialized.setEnd(0);
+    assert(uninitialized.getStart() == 0);
+    assert(uninitialized.getEnd() == 0);
 }
 
 static void
