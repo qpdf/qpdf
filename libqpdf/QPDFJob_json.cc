@@ -59,7 +59,7 @@ namespace
 
         void beginUnderOverlay(JSON const& j);
 
-        std::list<std::shared_ptr<JSONHandler>> json_handlers;
+        std::vector<std::shared_ptr<JSONHandler>> json_handlers;
         bool partial;
         JSONHandler* jh{nullptr}; // points to last of json_handlers
         std::shared_ptr<QPDFJob::Config> c_main;
@@ -100,7 +100,7 @@ Handlers::bindJSON(void (Handlers::*f)(JSON))
 void
 Handlers::initHandlers()
 {
-    this->json_handlers.push_back(std::make_shared<JSONHandler>());
+    this->json_handlers.emplace_back(std::make_shared<JSONHandler>());
     this->jh = this->json_handlers.back().get();
     jh->addDictHandlers(
         [](std::string const&, JSON) {},
@@ -184,8 +184,9 @@ Handlers::pushKey(std::string const& key)
 {
     auto new_jh = std::make_shared<JSONHandler>();
     this->jh->addDictKeyHandler(key, new_jh);
-    this->json_handlers.push_back(new_jh);
     this->jh = new_jh.get();
+    this->json_handlers.emplace_back(std::move(new_jh));
+
 }
 
 void
@@ -205,8 +206,9 @@ Handlers::beginArray(json_handler_t start_fn, bare_handler_t end_fn)
         [end_fn](std::string const&) { end_fn(); },
         item_jh);
     jh->addFallbackHandler(item_jh);
-    this->json_handlers.push_back(item_jh);
     this->jh = item_jh.get();
+    this->json_handlers.emplace_back(std::move(item_jh));
+
 }
 
 void
