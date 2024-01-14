@@ -162,6 +162,8 @@ class JSON
     QPDF_DLL
     bool isNull() const;
     QPDF_DLL
+    JSON getDictItem(std::string const& key) const;
+    QPDF_DLL
     bool forEachDictItem(std::function<void(std::string const& key, JSON value)> fn) const;
     QPDF_DLL
     bool forEachArrayItem(std::function<void(JSON value)> fn) const;

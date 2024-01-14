@@ -78,6 +78,12 @@ test_main()
     jmap.addDictionaryMember("empty_dict", JSON::makeDictionary());
     jmap.addDictionaryMember("empty_list", JSON::makeArray());
     jmap.addDictionaryMember("single", JSON::makeArray()).addArrayElement(JSON::makeInt(12));
+    std::string jm_str;
+    assert(jmap.getDictItem("b").getString(jm_str));
+    assert(!jmap.getDictItem("b2").getString(jm_str));
+    assert(!jstr2.getDictItem("b").getString(jm_str));
+    assert(jm_str == "a\tb");
+
     check(
         jmap,
         "{\n"

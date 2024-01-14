@@ -410,6 +410,17 @@ JSON::isNull() const
     return m->value->type_code == vt_null;
 }
 
+JSON
+JSON::getDictItem(std::string const& key) const
+{
+    if (auto v = dynamic_cast<JSON_dictionary const*>(m->value.get())) {
+        if (auto it = v->members.find(key); it != v->members.end()) {
+            return it->second;
+        }
+    }
+    return makeNull();
+}
+
 bool
 JSON::forEachDictItem(std::function<void(std::string const& key, JSON value)> fn) const
 {
