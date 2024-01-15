@@ -514,16 +514,15 @@ class QPDFJob
     void handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_heap);
     bool shouldRemoveUnreferencedResources(QPDF& pdf);
     void handleRotations(QPDF& pdf);
-    void getUOPagenos(
-        std::vector<UnderOverlay>& uo, std::map<int, std::map<size_t, std::vector<int>>>& pagenos);
+    std::map<std::pair<int, size_t>, std::vector<int>>
+    getUOPagenos(std::vector<UnderOverlay> const& uo);
     void handleUnderOverlay(QPDF& pdf);
     std::string doUnderOverlayForPage(
         QPDF& pdf,
         std::map<unsigned long long int, std::unique_ptr<QPDFAcroFormDocumentHelper>>& afdh,
         UnderOverlay& uo,
-        std::map<int, std::map<size_t, std::vector<int>>>& pagenos,
-        size_t page_idx,
-        size_t uo_idx,
+        std::map<std::pair<int, size_t>, std::vector<int>> const& pagenos,
+        std::pair<int, size_t> pageno_uo_idx,
         std::map<int, std::map<size_t, QPDFObjectHandle>>& fo,
         std::vector<QPDFPageObjectHelper>&& pages,
         QPDFPageObjectHelper& dest_page);
