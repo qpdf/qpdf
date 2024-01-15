@@ -1903,7 +1903,7 @@ QPDFJob::doUnderOverlayForPage(
     size_t page_idx,
     size_t uo_idx,
     std::map<int, std::map<size_t, QPDFObjectHandle>>& fo,
-    std::vector<QPDFPageObjectHelper>& pages,
+    std::vector<QPDFPageObjectHelper>&& pages,
     QPDFPageObjectHelper& dest_page)
 {
     int pageno = 1 + QIntC::to_int(page_idx);
@@ -1996,18 +1996,12 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         v << prefix << ": processing underlay/overlay\n";
     });
 
-    auto get_pages = [](std::vector<UnderOverlay>& v,
-                        std::vector<std::vector<QPDFPageObjectHelper>>& v_out) {
-        for (auto const& uo: v) {
-            if (uo.pdf) {
-                v_out.push_back(QPDFPageDocumentHelper(*(uo.pdf)).getAllPages());
-            }
+    auto get_pages = [](auto const& uo, auto idx) -> std::vector<QPDFPageObjectHelper> {
+        if (uo.pdf) {
+            return QPDFPageDocumentHelper(*uo.pdf).getAllPages();
         }
+        return {};
     };
-    std::vector<std::vector<QPDFPageObjectHelper>> upages;
-    get_pages(m->underlay, upages);
-    std::vector<std::vector<QPDFPageObjectHelper>> opages;
-    get_pages(m->overlay, opages);
 
     std::map<int, std::map<size_t, QPDFObjectHandle>> underlay_fo;
     std::map<int, std::map<size_t, QPDFObjectHandle>> overlay_fo;
@@ -2044,7 +2038,7 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
                 page.idx,
                 uo_idx,
                 underlay_fo,
-                upages[uo_idx],
+                get_pages(underlay, uo_idx),
                 dest_page);
             ++uo_idx;
         }
@@ -2064,7 +2058,7 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
                 page.idx,
                 uo_idx,
                 overlay_fo,
-                opages[uo_idx],
+                get_pages(overlay, uo_idx),
                 dest_page);
             ++uo_idx;
         }
