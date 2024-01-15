@@ -186,7 +186,6 @@ Handlers::pushKey(std::string const& key)
     this->jh->addDictKeyHandler(key, new_jh);
     this->jh = new_jh.get();
     this->json_handlers.emplace_back(std::move(new_jh));
-
 }
 
 void
@@ -208,7 +207,6 @@ Handlers::beginArray(json_handler_t start_fn, bare_handler_t end_fn)
     jh->addFallbackHandler(item_jh);
     this->jh = item_jh.get();
     this->json_handlers.emplace_back(std::move(item_jh));
-
 }
 
 void
