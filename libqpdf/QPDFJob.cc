@@ -1886,18 +1886,21 @@ QPDFJob::validateUnderOverlay(QPDF& pdf, UnderOverlay* uo)
 
 static QPDFAcroFormDocumentHelper*
 get_afdh_for_qpdf(
-    std::map<unsigned long long, std::shared_ptr<QPDFAcroFormDocumentHelper>>& afdh_map, QPDF* q)
+    std::map<unsigned long long, std::unique_ptr<QPDFAcroFormDocumentHelper>>& afdh_map, QPDF& q)
 {
-    auto uid = q->getUniqueId();
-    if (!afdh_map.count(uid)) {
-        afdh_map[uid] = std::make_shared<QPDFAcroFormDocumentHelper>(*q);
+    auto uid = q.getUniqueId();
+    if (auto it = afdh_map.find(uid); it != afdh_map.end()) {
+        return it->second.get();
+    } else {
+        return afdh_map.emplace(uid, std::make_unique<QPDFAcroFormDocumentHelper>(q))
+            .first->second.get();
     }
-    return afdh_map[uid].get();
 }
 
 std::string
 QPDFJob::doUnderOverlayForPage(
     QPDF& pdf,
+    std::map<unsigned long long int, std::unique_ptr<QPDFAcroFormDocumentHelper>>& afdh,
     UnderOverlay& uo,
     std::map<int, std::map<size_t, std::vector<int>>>& pagenos,
     size_t page_idx,
@@ -1911,10 +1914,8 @@ QPDFJob::doUnderOverlayForPage(
         return "";
     }
 
-    std::map<unsigned long long, std::shared_ptr<QPDFAcroFormDocumentHelper>> afdh;
     auto make_afdh = [&](QPDFPageObjectHelper& ph) {
-        QPDF& q = ph.getObjectHandle().getQPDF();
-        return get_afdh_for_qpdf(afdh, &q);
+        return get_afdh_for_qpdf(afdh, ph.getObjectHandle().getQPDF());
     };
     auto dest_afdh = make_afdh(dest_page);
 
@@ -2003,6 +2004,7 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         return {};
     };
 
+    std::map<unsigned long long int, std::unique_ptr<QPDFAcroFormDocumentHelper>> afdh;
     std::map<int, std::map<size_t, QPDFObjectHandle>> underlay_fo;
     std::map<int, std::map<size_t, QPDFObjectHandle>> overlay_fo;
     QPDFPageDocumentHelper main_pdh(pdf);
@@ -2033,6 +2035,7 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         for (auto& underlay: m->underlay) {
             content += doUnderOverlayForPage(
                 pdf,
+                afdh,
                 underlay,
                 underlay_pagenos,
                 page.idx,
@@ -2053,6 +2056,7 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         for (auto& overlay: m->overlay) {
             content += doUnderOverlayForPage(
                 pdf,
+                afdh,
                 overlay,
                 overlay_pagenos,
                 page.idx,
@@ -2171,10 +2175,10 @@ void
 QPDFJob::handleTransformations(QPDF& pdf)
 {
     QPDFPageDocumentHelper dh(pdf);
-    std::shared_ptr<QPDFAcroFormDocumentHelper> afdh;
+    std::unique_ptr<QPDFAcroFormDocumentHelper> afdh;
     auto make_afdh = [&]() {
-        if (!afdh.get()) {
-            afdh = std::make_shared<QPDFAcroFormDocumentHelper>(pdf);
+        if (!afdh) {
+            afdh = std::make_unique<QPDFAcroFormDocumentHelper>(pdf);
         }
     };
     if (m->remove_restrictions) {
@@ -2544,8 +2548,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
     std::vector<QPDFObjectHandle> new_labels;
     bool any_page_labels = false;
     int out_pageno = 0;
-    std::map<unsigned long long, std::shared_ptr<QPDFAcroFormDocumentHelper>> afdh_map;
-    auto this_afdh = get_afdh_for_qpdf(afdh_map, &pdf);
+    std::map<unsigned long long, std::unique_ptr<QPDFAcroFormDocumentHelper>> afdh_map;
+    auto this_afdh = get_afdh_for_qpdf(afdh_map, pdf);
     std::set<QPDFObjGen> referenced_fields;
     for (auto& page_data: parsed_specs) {
         ClosedFileInputSource* cis = nullptr;
@@ -2554,7 +2558,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             cis->stayOpen(true);
         }
         QPDFPageLabelDocumentHelper pldh(*page_data.qpdf);
-        auto other_afdh = get_afdh_for_qpdf(afdh_map, page_data.qpdf);
+        auto other_afdh = get_afdh_for_qpdf(afdh_map, *page_data.qpdf);
         if (pldh.hasPageLabels()) {
             any_page_labels = true;
         }
