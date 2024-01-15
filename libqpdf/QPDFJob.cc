@@ -33,6 +33,30 @@
 
 namespace
 {
+    // Page number (1 based) and index (0 based). Defaults to page number 1 / index 0.
+    struct Page
+    {
+        Page() = default;
+        Page(Page const&) = default;
+
+        Page(int no) :
+            idx{QIntC::to_size(no - 1)},
+            no{no}
+        {
+        }
+
+        Page&
+        operator++()
+        {
+            ++idx;
+            ++no;
+            return *this;
+        }
+
+        size_t idx{0};
+        int no{1};
+    };
+
     class ImageOptimizer: public QPDFObjectHandle::StreamDataProvider
     {
       public:
@@ -1897,13 +1921,13 @@ QPDFJob::doUnderOverlayForPage(
     std::string content;
     int min_suffix = 1;
     QPDFObjectHandle resources = dest_page.getAttribute("/Resources", true);
-    for (int from_pageno: pagenos[pageno][uo_idx]) {
+    for (Page from_page: pagenos[pageno][uo_idx]) {
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-            v << "    " << uo.filename << " " << uo.which << " " << from_pageno << "\n";
+            v << "    " << uo.filename << " " << uo.which << " " << from_page.no << "\n";
         });
-        auto from_page = pages.at(QIntC::to_size(from_pageno - 1));
-        if (fo[from_pageno].count(uo_idx) == 0) {
-            fo[from_pageno][uo_idx] = pdf.copyForeignObject(from_page.getFormXObjectForPage());
+        auto from_page_ph = pages.at(from_page.idx);
+        if (fo[from_page.no].count(uo_idx) == 0) {
+            fo[from_page.no][uo_idx] = pdf.copyForeignObject(from_page_ph.getFormXObjectForPage());
         }
 
         // If the same page is overlaid or underlaid multiple times, we'll generate multiple names
@@ -1911,13 +1935,13 @@ QPDFJob::doUnderOverlayForPage(
         std::string name = resources.getUniqueResourceName("/Fx", min_suffix);
         QPDFMatrix cm;
         std::string new_content = dest_page.placeFormXObject(
-            fo[from_pageno][uo_idx], name, dest_page.getTrimBox().getArrayAsRectangle(), cm);
-        dest_page.copyAnnotations(from_page, cm, dest_afdh, make_afdh(from_page));
+            fo[from_page.no][uo_idx], name, dest_page.getTrimBox().getArrayAsRectangle(), cm);
+        dest_page.copyAnnotations(from_page_ph, cm, dest_afdh, make_afdh(from_page_ph));
         if (!new_content.empty()) {
             resources.mergeResources("<< /XObject << >> >>"_qpdf);
             auto xobject = resources.getKey("/XObject");
             if (xobject.isDictionary()) {
-                xobject.replaceKey(name, fo[from_pageno][uo_idx]);
+                xobject.replaceKey(name, fo[from_page.no][uo_idx]);
             }
             ++min_suffix;
             content += new_content;
@@ -1990,18 +2014,17 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
     QPDFPageDocumentHelper main_pdh(pdf);
     auto main_pages = main_pdh.getAllPages();
     size_t main_npages = main_pages.size();
-    for (size_t page_idx = 0; page_idx < main_npages; ++page_idx) {
-        auto pageno = QIntC::to_int(page_idx) + 1;
+    for (Page page; page.idx < main_npages; ++page) {
         doIfVerbose(
-            [&](Pipeline& v, std::string const& prefix) { v << "  page " << pageno << "\n"; });
-        if (underlay_pagenos[pageno].empty() && overlay_pagenos[pageno].empty()) {
+            [&](Pipeline& v, std::string const& prefix) { v << "  page " << page.no << "\n"; });
+        if (underlay_pagenos[page.no].empty() && overlay_pagenos[page.no].empty()) {
             continue;
         }
         // This code converts the original page, any underlays, and any overlays to form XObjects.
         // Then it concatenates display of all underlays, the original page, and all overlays. Prior
         // to 11.3.0, the original page contents were wrapped in q/Q, but this didn't work if the
         // original page had unbalanced q/Q operators. See GitHub issue #904.
-        auto& dest_page = main_pages.at(page_idx);
+        auto& dest_page = main_pages.at(page.idx);
         auto dest_page_oh = dest_page.getObjectHandle();
         auto this_page_fo = dest_page.getFormXObjectForPage();
         // The resulting form xobject lazily reads the content from the original page, which we are
@@ -2018,7 +2041,7 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
                 pdf,
                 underlay,
                 underlay_pagenos,
-                page_idx,
+                page.idx,
                 uo_idx,
                 underlay_fo,
                 upages[uo_idx],
@@ -2038,7 +2061,7 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
                 pdf,
                 overlay,
                 overlay_pagenos,
-                page_idx,
+                page.idx,
                 uo_idx,
                 overlay_fo,
                 opages[uo_idx],
