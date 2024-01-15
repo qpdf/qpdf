@@ -519,6 +519,7 @@ class QPDFJob
     void handleUnderOverlay(QPDF& pdf);
     std::string doUnderOverlayForPage(
         QPDF& pdf,
+        std::map<unsigned long long int, std::unique_ptr<QPDFAcroFormDocumentHelper>>& afdh,
         UnderOverlay& uo,
         std::map<int, std::map<size_t, std::vector<int>>>& pagenos,
         size_t page_idx,
