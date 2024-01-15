@@ -1902,15 +1902,14 @@ QPDFJob::doUnderOverlayForPage(
     QPDF& pdf,
     std::map<unsigned long long int, std::unique_ptr<QPDFAcroFormDocumentHelper>>& afdh,
     UnderOverlay& uo,
-    std::map<int, std::map<size_t, std::vector<int>>>& pagenos,
-    size_t page_idx,
-    size_t uo_idx,
+    std::map<std::pair<int, size_t>, std::vector<int>> const& pagenos,
+    std::pair<int, size_t> pageno_uo_idx,
     std::map<int, std::map<size_t, QPDFObjectHandle>>& fo,
     std::vector<QPDFPageObjectHelper>&& pages,
     QPDFPageObjectHelper& dest_page)
 {
-    int pageno = 1 + QIntC::to_int(page_idx);
-    if (!(pagenos.count(pageno) && pagenos[pageno].count(uo_idx))) {
+    auto pagenos_it = pagenos.find(pageno_uo_idx);
+    if (pagenos_it == pagenos.end()) {
         return "";
     }
 
@@ -1922,13 +1921,14 @@ QPDFJob::doUnderOverlayForPage(
     std::string content;
     int min_suffix = 1;
     QPDFObjectHandle resources = dest_page.getAttribute("/Resources", true);
-    for (Page from_page: pagenos[pageno][uo_idx]) {
+    for (Page from_page: pagenos_it->second) {
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << "    " << uo.filename << " " << uo.which << " " << from_page.no << "\n";
         });
         auto from_page_ph = pages.at(from_page.idx);
-        if (fo[from_page.no].count(uo_idx) == 0) {
-            fo[from_page.no][uo_idx] = pdf.copyForeignObject(from_page_ph.getFormXObjectForPage());
+        if (fo[from_page.no].count(pageno_uo_idx.second) == 0) {
+            fo[from_page.no][pageno_uo_idx.second] =
+                pdf.copyForeignObject(from_page_ph.getFormXObjectForPage());
         }
 
         // If the same page is overlaid or underlaid multiple times, we'll generate multiple names
@@ -1936,13 +1936,16 @@ QPDFJob::doUnderOverlayForPage(
         std::string name = resources.getUniqueResourceName("/Fx", min_suffix);
         QPDFMatrix cm;
         std::string new_content = dest_page.placeFormXObject(
-            fo[from_page.no][uo_idx], name, dest_page.getTrimBox().getArrayAsRectangle(), cm);
+            fo[from_page.no][pageno_uo_idx.second],
+            name,
+            dest_page.getTrimBox().getArrayAsRectangle(),
+            cm);
         dest_page.copyAnnotations(from_page_ph, cm, dest_afdh, make_afdh(from_page_ph));
         if (!new_content.empty()) {
             resources.mergeResources("<< /XObject << >> >>"_qpdf);
             auto xobject = resources.getKey("/XObject");
             if (xobject.isDictionary()) {
-                xobject.replaceKey(name, fo[from_page.no][uo_idx]);
+                xobject.replaceKey(name, fo[from_page.no][pageno_uo_idx.second]);
             }
             ++min_suffix;
             content += new_content;
@@ -1951,27 +1954,29 @@ QPDFJob::doUnderOverlayForPage(
     return content;
 }
 
-void
-QPDFJob::getUOPagenos(
-    std::vector<QPDFJob::UnderOverlay>& uos,
-    std::map<int, std::map<size_t, std::vector<int>>>& pagenos)
+std::map<std::pair<int, size_t>, std::vector<int>>
+QPDFJob::getUOPagenos(std::vector<QPDFJob::UnderOverlay> const& uos)
 {
+    std::map<std::pair<int, size_t>, std::vector<int>> pagenos;
     size_t uo_idx = 0;
     for (auto const& uo: uos) {
         size_t page_idx = 0;
-        size_t from_size = uo.from_pagenos.size();
+        auto from_it = uo.from_pagenos.cbegin();
+        auto from_end = uo.from_pagenos.cend();
+        auto from_size = uo.from_pagenos.size();
         size_t repeat_size = uo.repeat_pagenos.size();
         for (int to_pageno: uo.to_pagenos) {
-            if (page_idx < from_size) {
-                pagenos[to_pageno][uo_idx].push_back(uo.from_pagenos.at(page_idx));
+            if (from_it != from_end) {
+                pagenos[{to_pageno, uo_idx}].emplace_back(*from_it++);
             } else if (repeat_size) {
-                pagenos[to_pageno][uo_idx].push_back(
+                pagenos[{to_pageno, uo_idx}].push_back(
                     uo.repeat_pagenos.at((page_idx - from_size) % repeat_size));
             }
             ++page_idx;
         }
         ++uo_idx;
     }
+    return pagenos;
 }
 
 void
@@ -1989,10 +1994,8 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
 
     // First map key is 1-based page number. Second is index into the overlay/underlay vector. Watch
     // out to not reverse the keys or be off by one.
-    std::map<int, std::map<size_t, std::vector<int>>> underlay_pagenos;
-    std::map<int, std::map<size_t, std::vector<int>>> overlay_pagenos;
-    getUOPagenos(m->underlay, underlay_pagenos);
-    getUOPagenos(m->overlay, overlay_pagenos);
+    auto underlay_pagenos = getUOPagenos(m->underlay);
+    auto overlay_pagenos = getUOPagenos(m->overlay);
     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
         v << prefix << ": processing underlay/overlay\n";
     });
@@ -2013,7 +2016,10 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
     for (Page page; page.idx < main_npages; ++page) {
         doIfVerbose(
             [&](Pipeline& v, std::string const& prefix) { v << "  page " << page.no << "\n"; });
-        if (underlay_pagenos[page.no].empty() && overlay_pagenos[page.no].empty()) {
+        if (underlay_pagenos.lower_bound({page.no, 0}) ==
+                underlay_pagenos.lower_bound({page.no + 1, 0}) &&
+            overlay_pagenos.lower_bound({page.no, 0}) ==
+                overlay_pagenos.lower_bound({page.no + 1, 0})) {
             continue;
         }
         // This code converts the original page, any underlays, and any overlays to form XObjects.
@@ -2038,8 +2044,7 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
                 afdh,
                 underlay,
                 underlay_pagenos,
-                page.idx,
-                uo_idx,
+                {page.no, uo_idx},
                 underlay_fo,
                 get_pages(underlay, uo_idx),
                 dest_page);
@@ -2059,8 +2064,7 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
                 afdh,
                 overlay,
                 overlay_pagenos,
-                page.idx,
-                uo_idx,
+                {page.no, uo_idx},
                 overlay_fo,
                 get_pages(overlay, uo_idx),
                 dest_page);
