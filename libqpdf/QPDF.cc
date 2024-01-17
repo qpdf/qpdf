@@ -709,10 +709,11 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
 
     // Make sure we keep only the highest generation for any object.
     QPDFObjGen last_og{-1, 0};
-    for (auto const& og: m->xref_table) {
-        if (og.first.getObj() == last_og.getObj())
+    for (auto const& item: m->xref_table) {
+        auto id = item.first.getObj();
+        if (id == last_og.getObj() && id > 0)
             removeObject(last_og);
-        last_og = og.first;
+        last_og = item.first;
     }
 }
 
@@ -2405,7 +2406,7 @@ QPDF::getCompressibleObjGens()
     while (!queue.empty()) {
         auto obj = queue.back();
         queue.pop_back();
-        if (obj.isIndirect()) {
+        if (obj.getObjectID() > 0) {
             QPDFObjGen og = obj.getObjGen();
             const size_t id = toS(og.getObj() - 1);
             if (id >= max_obj)
