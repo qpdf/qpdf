@@ -163,16 +163,15 @@ QPDFParser::parseRemainder(bool content_stream)
                     throw std::logic_error("QPDFParser::parse called without context on an object "
                                            "with indirect references");
                 }
-                auto ref_og = QPDFObjGen(
-                    QIntC::to_int(int_buffer[(int_count - 1) % 2]),
-                    QIntC::to_int(int_buffer[(int_count) % 2]));
-                if (ref_og.isIndirect()) {
+                auto id = QIntC::to_int(int_buffer[(int_count - 1) % 2]);
+                auto gen = QIntC::to_int(int_buffer[(int_count) % 2]);
+                if (!(id < 1 || gen < 0 || gen >= 65535)) {
                     // This action has the desirable side effect of causing dangling references
                     // (references to indirect objects that don't appear in the PDF) in any parsed
                     // object to appear in the object cache.
-                    add(std::move(context->getObject(ref_og).obj));
+                    add(std::move(context->getObject(id, gen).obj));
                 } else {
-                    QTC::TC("qpdf", "QPDFParser indirect with 0 objid");
+                    QTC::TC("qpdf", "QPDFParser invalid objgen");
                     addNull();
                 }
                 int_count = 0;

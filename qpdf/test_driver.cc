@@ -1202,6 +1202,10 @@ test_31(QPDF& pdf, char const* arg2)
     assert(QPDFObjectHandle::parse(&pdf, ">>").unparse() == "null");
     // TC:QPDFParser eof in parse
     assert(QPDFObjectHandle::parse(&pdf, "[7 0 R]").getArrayItem(0).isNull());
+    // TC:QPDFParser invalid objgen
+    assert(
+        QPDFObjectHandle::parse(&pdf, "[0 0 R -1 0 R 1 65535 R 1 100000 R 1 -1 R]").unparse() ==
+        "[ null null null null null ]");
 }
 
 static void
