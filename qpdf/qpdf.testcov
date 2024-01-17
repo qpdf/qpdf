@@ -105,6 +105,7 @@ QPDF_encryption xref stream from encrypted file 0
 QPDFJob unable to filter 0
 QUtil non-trivial UTF-16 0
 QPDF xref overwrite object 0
+QPDF xref overwrite invalid objgen 0
 QPDF decoding error warning 0
 qpdf-c called qpdf_init 0
 qpdf-c called qpdf_cleanup 0
