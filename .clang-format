@@ -41,6 +41,7 @@ IndentCaseBlocks: true
 IndentExternBlock: Indent
 IndentPPDirectives: AfterHash
 IndentWidth: 4
+InsertBraces: true
 InsertTrailingCommas: Wrapped
 KeepEmptyLinesAtTheStartOfBlocks: false
 NamespaceIndentation: All
