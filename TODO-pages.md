@@ -447,7 +447,7 @@ Most of chapter 12 applies. See Document-level navigation (12.3).
 
 # Feature to Issue Mapping
 
-Last checked: 2024-01-11
+Last checked: 2024-01-18
 
 ```
 gh search issues label:pages --repo qpdf/qpdf --limit 200 --state=open
@@ -546,6 +546,8 @@ gh search issues label:pages --repo qpdf/qpdf --limit 200 --state=open
     * There is some helpful discussion in #343 including
       * Preserving open/closed status
       * Preserving javascript actions
+* Split pages: write pages to memory
+  * Issues: #1130
 
 # Other use cases
 
