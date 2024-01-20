@@ -1195,6 +1195,10 @@ QPDF::insertFreeXrefEntry(QPDFObjGen og)
 void
 QPDF::insertReconstructedXrefEntry(int obj, qpdf_offset_t f1, int f2)
 {
+    if (!(obj > 0 && 0 <= f2 && f2 < 65535)) {
+        QTC::TC("qpdf", "QPDF xref overwrite invalid objgen");
+        return;
+    }
     QPDFObjGen og(obj, f2);
     if (!m->deleted_objects.count(obj)) {
         // deleted_objects stores the uncompressed objects removed from the xref table at the start
