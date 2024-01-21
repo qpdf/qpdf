@@ -19,7 +19,7 @@ my @fuzzers = (
     ['lzw' => 2],
     ['pngpredictor' => 1],
     ['runlength' => 6],
-    ['tiffpredictor' => 1],
+    ['tiffpredictor' => 2],
     ['qpdf' => 56],             # increment when adding new files
     );
 
