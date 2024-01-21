@@ -37,23 +37,21 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(
 void
 Pl_TIFFPredictor::write(unsigned char const* data, size_t len)
 {
-    size_t left = this->bytes_per_row - cur_row.size();
-    size_t offset = 0;
-    while (len >= left) {
+    auto end = data + len;
+    auto row_end = data + (bytes_per_row - cur_row.size());
+    while (row_end <= end) {
         // finish off current row
-        cur_row.insert(cur_row.end(), data + offset, data + offset + left);
-        offset += left;
-        len -= left;
+        cur_row.insert(cur_row.end(), data, row_end);
+        data = row_end;
+        row_end += bytes_per_row;
 
         processRow();
 
         // Prepare for next row
-        this->cur_row.clear();
-        left = this->bytes_per_row;
+        cur_row.clear();
     }
-    if (len) {
-        cur_row.insert(cur_row.end(), data + offset, data + offset + len);
-    }
+
+    cur_row.insert(cur_row.end(), data, end);
 }
 
 void
