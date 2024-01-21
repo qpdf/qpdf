@@ -6,6 +6,8 @@
 
 #include <qpdf/Pipeline.hh>
 
+#include<vector>
+
 class Pl_TIFFPredictor: public Pipeline
 {
   public:
@@ -31,7 +33,7 @@ class Pl_TIFFPredictor: public Pipeline
     unsigned int bytes_per_row;
     unsigned int samples_per_pixel;
     unsigned int bits_per_sample;
-    std::shared_ptr<unsigned char> cur_row;
+    std::vector<unsigned char> cur_row;
     size_t pos;
 };
 
