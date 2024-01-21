@@ -34,7 +34,6 @@ class Pl_TIFFPredictor: public Pipeline
     unsigned int samples_per_pixel;
     unsigned int bits_per_sample;
     std::vector<unsigned char> cur_row;
-    size_t pos;
 };
 
 #endif // PL_TIFFPREDICTOR_HH

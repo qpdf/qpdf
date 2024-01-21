@@ -3,10 +3,8 @@
 #include <qpdf/BitStream.hh>
 #include <qpdf/BitWriter.hh>
 #include <qpdf/QTC.hh>
-#include <qpdf/QUtil.hh>
 
 #include <climits>
-#include <cstring>
 #include <stdexcept>
 #include <vector>
 
@@ -21,8 +19,7 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(
     action(action),
     columns(columns),
     samples_per_pixel(samples_per_pixel),
-    bits_per_sample(bits_per_sample),
-    pos(0)
+    bits_per_sample(bits_per_sample)
 {
     if (samples_per_pixel < 1) {
         throw std::runtime_error("TIFFPredictor created with invalid samples_per_pixel");
@@ -35,31 +32,28 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(
         throw std::runtime_error("TIFFPredictor created with invalid columns value");
     }
     this->bytes_per_row = bpr & UINT_MAX;
-    this->cur_row.assign(this->bytes_per_row, 0);
 }
 
 void
 Pl_TIFFPredictor::write(unsigned char const* data, size_t len)
 {
-    size_t left = this->bytes_per_row - this->pos;
+    size_t left = this->bytes_per_row - cur_row.size();
     size_t offset = 0;
     while (len >= left) {
         // finish off current row
-        memcpy(this->cur_row.data() + this->pos, data + offset, left);
+        cur_row.insert(cur_row.end(), data + offset, data + offset + left);
         offset += left;
         len -= left;
 
         processRow();
 
         // Prepare for next row
-        this->cur_row.assign(this->bytes_per_row, 0);
+        this->cur_row.clear();
         left = this->bytes_per_row;
-        this->pos = 0;
     }
     if (len) {
-        memcpy(this->cur_row.data() + this->pos, data + offset, len);
+        cur_row.insert(cur_row.end(), data + offset, data + offset + len);
     }
-    this->pos += len;
 }
 
 void
@@ -94,11 +88,11 @@ Pl_TIFFPredictor::processRow()
 void
 Pl_TIFFPredictor::finish()
 {
-    if (this->pos) {
+    if (!cur_row.empty()) {
         // write partial row
+        cur_row.insert(cur_row.end(), bytes_per_row - cur_row.size(), 0);
         processRow();
     }
-    this->pos = 0;
-    this->cur_row.assign(this->bytes_per_row, 0);
+    cur_row.clear();
     getNext()->finish();
 }
