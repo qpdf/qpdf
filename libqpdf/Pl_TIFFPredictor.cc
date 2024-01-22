@@ -19,7 +19,8 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(
     action(action),
     columns(columns),
     samples_per_pixel(samples_per_pixel),
-    bits_per_sample(bits_per_sample)
+    bits_per_sample(bits_per_sample),
+    p_next(getNext())
 {
     if (samples_per_pixel < 1) {
         throw std::runtime_error("TIFFPredictor created with invalid samples_per_pixel");
@@ -58,7 +59,7 @@ void
 Pl_TIFFPredictor::processRow()
 {
     QTC::TC("libtests", "Pl_TIFFPredictor processRow", (action == a_decode ? 0 : 1));
-    BitWriter bw(this->getNext());
+    BitWriter bw(p_next);
     BitStream in(this->cur_row.data(), this->bytes_per_row);
     std::vector<long long> prev;
     for (unsigned int i = 0; i < this->samples_per_pixel; ++i) {
@@ -92,5 +93,5 @@ Pl_TIFFPredictor::finish()
         processRow();
     }
     cur_row.clear();
-    getNext()->finish();
+    p_next->finish();
 }
