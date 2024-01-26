@@ -58,24 +58,46 @@ void
 Pl_TIFFPredictor::processRow()
 {
     QTC::TC("libtests", "Pl_TIFFPredictor processRow", (action == a_decode ? 0 : 1));
-    BitWriter bw(p_next);
-    BitStream in(cur_row.data(), cur_row.size());
     previous.assign(samples_per_pixel, 0);
-    for (unsigned int col = 0; col < this->columns; ++col) {
-        for (auto& prev: previous) {
-            long long sample = in.getBitsSigned(this->bits_per_sample);
-            long long new_sample = sample;
-            if (action == a_encode) {
-                new_sample -= prev;
-                prev = sample;
-            } else {
-                new_sample += prev;
-                prev = new_sample;
+    if (bits_per_sample != 8) {
+        BitWriter bw(p_next);
+        BitStream in(cur_row.data(), cur_row.size());
+        for (unsigned int col = 0; col < this->columns; ++col) {
+            for (auto& prev: previous) {
+                long long sample = in.getBitsSigned(this->bits_per_sample);
+                long long new_sample = sample;
+                if (action == a_encode) {
+                    new_sample -= prev;
+                    prev = sample;
+                } else {
+                    new_sample += prev;
+                    prev = new_sample;
+                }
+                bw.writeBitsSigned(new_sample, this->bits_per_sample);
             }
-            bw.writeBitsSigned(new_sample, this->bits_per_sample);
+        }
+        bw.flush();
+    } else {
+        auto next = cur_row.begin();
+        auto cr_end = cur_row.end();
+        auto pr_end = previous.end();
+
+        while (next != cr_end) {
+            for (auto prev = previous.begin(); prev != pr_end && next != cr_end; ++prev, ++next) {
+                long long sample = *next;
+                long long new_sample = sample;
+                if (action == a_encode) {
+                    new_sample -= *prev;
+                    *prev = sample;
+                } else {
+                    new_sample += *prev;
+                    *prev = new_sample;
+                }
+                auto out = static_cast<unsigned char>(255U & new_sample);
+                p_next->write(&out, 1);
+            }
         }
     }
-    bw.flush();
 }
 
 void
