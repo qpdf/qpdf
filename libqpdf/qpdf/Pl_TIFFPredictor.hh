@@ -34,6 +34,7 @@ class Pl_TIFFPredictor: public Pipeline
     unsigned int samples_per_pixel;
     unsigned int bits_per_sample;
     std::vector<unsigned char> cur_row;
+    std::vector<long long> previous;
     Pipeline* p_next;
 };
 

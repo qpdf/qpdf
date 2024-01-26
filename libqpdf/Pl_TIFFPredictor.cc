@@ -7,6 +7,7 @@
 #include <climits>
 #include <stdexcept>
 #include <vector>
+#include <iostream>
 
 Pl_TIFFPredictor::Pl_TIFFPredictor(
     char const* identifier,
@@ -60,23 +61,23 @@ Pl_TIFFPredictor::processRow()
 {
     QTC::TC("libtests", "Pl_TIFFPredictor processRow", (action == a_decode ? 0 : 1));
     BitWriter bw(p_next);
-    BitStream in(this->cur_row.data(), this->bytes_per_row);
-    std::vector<long long> prev;
+    BitStream in(cur_row.data(), cur_row.size());
+    previous.clear();
     for (unsigned int i = 0; i < this->samples_per_pixel; ++i) {
         long long sample = in.getBitsSigned(this->bits_per_sample);
         bw.writeBitsSigned(sample, this->bits_per_sample);
-        prev.push_back(sample);
+        previous.push_back(sample);
     }
     for (unsigned int col = 1; col < this->columns; ++col) {
-        for (unsigned int i = 0; i < this->samples_per_pixel; ++i) {
+        for (auto& prev : previous) {
             long long sample = in.getBitsSigned(this->bits_per_sample);
             long long new_sample = sample;
             if (action == a_encode) {
-                new_sample -= prev[i];
-                prev[i] = sample;
+                new_sample -= prev;
+                prev = sample;
             } else {
-                new_sample += prev[i];
-                prev[i] = new_sample;
+                new_sample += prev;
+                prev = new_sample;
             }
             bw.writeBitsSigned(new_sample, this->bits_per_sample);
         }
