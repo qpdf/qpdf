@@ -78,6 +78,7 @@ Pl_TIFFPredictor::processRow()
         }
         bw.flush();
     } else {
+        out.clear();
         auto next = cur_row.begin();
         auto cr_end = cur_row.end();
         auto pr_end = previous.end();
@@ -93,10 +94,10 @@ Pl_TIFFPredictor::processRow()
                     new_sample += *prev;
                     *prev = new_sample;
                 }
-                auto out = static_cast<unsigned char>(255U & new_sample);
-                p_next->write(&out, 1);
+                out.push_back(static_cast<unsigned char>(255U & new_sample));
             }
         }
+        p_next->write(out.data(), out.size());
     }
 }
 
