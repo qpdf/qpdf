@@ -13,7 +13,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
-#include <fstream>
 #include <iomanip>
 #include <map>
 #include <memory>
@@ -465,8 +464,8 @@ QUtil::os_wrapper(std::string const& description, int status)
 }
 
 #ifdef _WIN32
-static std::shared_ptr<wchar_t>
-win_convert_filename(char const* filename)
+std::shared_ptr<wchar_t>
+QUtil::win_convert_filename(char const* filename)
 {
     // Convert the utf-8 encoded filename argument to wchar_t*. First,
     // convert to utf16, then to wchar_t*. Note that u16 will start

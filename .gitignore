@@ -7,3 +7,5 @@ appimage/build
 .cache
 /html
 Doxyfile
+compile_commands.json
+/.vscode/
