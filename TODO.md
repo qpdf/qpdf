@@ -337,9 +337,9 @@ so, I find it useful to make reference to them in this list.
   Note that there's nothing that says an indirect object in one update can't refer to an object that
   doesn't appear until a later update. This means that QPDF has to hang onto indirect nulls,
   including when they appear as dictionary values. In this case, QPDF_Dictionary::getKeys() ignores
-  all keys with null values, and hasKey() returns false for keys that have null values. We would
-  probably want to make QPDF_Dictionary able to handle the special case of keys that are indirect
-  nulls and basically never have it drop any keys that are indirect objects. We also have to make
+  all keys with null values, and hasKey() returns false for keys that have null values. QPDF_Dictionary
+  already handles the special case of keys that are indirect nulls, which is used to reserve foreign
+  objects, including foreign pages which may or may not be copied. We also have to make
   sure that the testing for this handles non-trivial cases of the targets of indirect nulls being
   replaced by real objects in an update. Such indirect nulls should appear in tests as dictionary
   values and as array values. In the distant past, qpdf used to replace indirect nulls with direct
