@@ -666,7 +666,9 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             if (dict.isStream()) {
                 dict = dict.getDict();
             }
-            dict.replaceKey(key, makeObject(value));
+            dict.replaceKey(
+                is_pdf_name(key) ? QPDFObjectHandle::parse(key.substr(2)).getName() : key,
+                makeObject(value));
         }
     } else {
         throw std::logic_error("QPDF_json: unknown state " + std::to_string(state));
