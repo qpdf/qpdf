@@ -3,6 +3,7 @@
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDF_Name.hh>
 #include <qpdf/QPDF_Null.hh>
+#include <qpdf/QUtil.hh>
 
 using namespace std::literals;
 
@@ -72,9 +73,19 @@ QPDF_Dictionary::getJSON(int json_version)
     JSON j = JSON::makeDictionary();
     for (auto& iter: this->items) {
         if (!iter.second.isNull()) {
-            std::string key =
-                (json_version == 1 ? QPDF_Name::normalizeName(iter.first) : iter.first);
-            j.addDictionaryMember(key, iter.second.getJSON(json_version));
+            if (json_version == 1) {
+                j.addDictionaryMember(
+                    QPDF_Name::normalizeName(iter.first), iter.second.getJSON(json_version));
+            } else {
+                bool has_8bit_chars;
+                bool is_valid_utf8;
+                bool is_utf16;
+                QUtil::analyze_encoding(iter.first, has_8bit_chars, is_valid_utf8, is_utf16);
+                std::string key = !has_8bit_chars || is_valid_utf8
+                    ? iter.first
+                    : "n:" + QPDF_Name::normalizeName(iter.first);
+                j.addDictionaryMember(key, iter.second.getJSON(json_version));
+            }
         }
     }
     return j;
