@@ -1,0 +1,2 @@
+WARNING: qjson-bad-data2.json (obj:4 0 R, offset 846): "stream.data" must be a string
+qpdf: qjson-bad-data2.json: errors found in JSON

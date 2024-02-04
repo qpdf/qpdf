@@ -1,2 +1,3 @@
 WARNING: qjson-trailer-stream.json (trailer, offset 1269): the trailer may not be a stream
+WARNING: qjson-trailer-stream.json (trailer, offset 1249): "trailer" is missing "value"
 qpdf: qjson-trailer-stream.json: errors found in JSON

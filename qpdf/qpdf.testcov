@@ -668,7 +668,6 @@ QPDF_json value stream both or neither 0
 QPDFJob need json-stream-prefix for stdout 0
 QPDFJob write json to stdout 0
 QPDFJob write json to file 0
-QPDF_json don't check object after parse error 0
 QPDF_json ignoring unknown top-level key 0
 QPDF_json ignore second-level key 0
 QPDF_json ignore unknown key in object_top 0
@@ -694,3 +693,6 @@ QPDFJob misplaced page range 0
 QPDFJob duplicated range 0
 QPDFJob json over/under no file 0
 QPDF_Array copy 1
+QPDF_json stream data not string 0
+QPDF_json stream datafile not string 0
+QPDF_json stream not a dictionary 0

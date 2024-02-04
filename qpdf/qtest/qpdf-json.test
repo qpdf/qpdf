@@ -37,6 +37,8 @@ my @badfiles = (
     'obj-key-errors',
     'bad-data',
     'bad-datafile',
+    'bad-data2',
+    'bad-datafile2',
     );
 
 $n_tests += scalar(@badfiles);
