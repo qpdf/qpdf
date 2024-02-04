@@ -1246,7 +1246,8 @@ JSONParser::handleToken()
         break;
 
     default:
-        throw std::logic_error("JSONParser::handleToken : non-terminal lexer state encountered");
+        throw std::runtime_error(
+            "JSON: offset " + std::to_string(offset) + ": premature end of input");
         break;
     }
 
