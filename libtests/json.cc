@@ -137,7 +137,7 @@ test_main()
     // Check default constructed JSON object (order as per JSON.hh).
     JSON uninitialized;
     std::string ws;
-    auto pl = Pl_String ("", nullptr, ws);
+    auto pl = Pl_String("", nullptr, ws);
     uninitialized.write(&pl);
     assert(ws == "null");
     assert(uninitialized.unparse() == "null");

@@ -253,8 +253,9 @@ QPDFParser::parseRemainder(bool content_stream)
                     dict[frame->key] = QPDF_Null::create();
                 }
 
-                if (!frame->olist.empty())
+                if (!frame->olist.empty()) {
                     fixMissingKeys();
+                }
 
                 if (!frame->contents_string.empty() && dict.count("/Type") &&
                     dict["/Type"].isNameAndEquals("/Sig") && dict.count("/ByteRange") &&

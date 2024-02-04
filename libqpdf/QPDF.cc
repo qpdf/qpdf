@@ -711,8 +711,9 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
     QPDFObjGen last_og{-1, 0};
     for (auto const& item: m->xref_table) {
         auto id = item.first.getObj();
-        if (id == last_og.getObj() && id > 0)
+        if (id == last_og.getObj() && id > 0) {
             removeObject(last_og);
+        }
         last_og = item.first;
     }
 }
@@ -2413,9 +2414,10 @@ QPDF::getCompressibleObjGens()
         if (obj.getObjectID() > 0) {
             QPDFObjGen og = obj.getObjGen();
             const size_t id = toS(og.getObj() - 1);
-            if (id >= max_obj)
+            if (id >= max_obj) {
                 throw std::logic_error(
                     "unexpected object id encountered in getCompressibleObjGens");
+            }
             if (visited[id]) {
                 QTC::TC("qpdf", "QPDF loop detected traversing objects");
                 continue;

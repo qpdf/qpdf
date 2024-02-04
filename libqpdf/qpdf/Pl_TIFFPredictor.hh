@@ -6,7 +6,7 @@
 
 #include <qpdf/Pipeline.hh>
 
-#include<vector>
+#include <vector>
 
 class Pl_TIFFPredictor: public Pipeline
 {

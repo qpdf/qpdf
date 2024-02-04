@@ -1,8 +1,8 @@
 #include <qpdf/QPDF_Array.hh>
 
-#include <qpdf/QTC.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFObject_private.hh>
+#include <qpdf/QTC.hh>
 
 static const QPDFObjectHandle null_oh = QPDFObjectHandle::newNull();
 
