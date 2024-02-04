@@ -29,7 +29,6 @@ Always
 Next
 ====
 
-* Consider adding fuzzer code for JSON
 * Add some additional code coverage analysis to CI
 * Spell check: Have the spell-check script synchronize cSpell.json with .idea/dictionaries/qpdf.xml,
   which should be set to the union of all the validated user dictionaries.

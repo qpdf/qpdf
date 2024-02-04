@@ -16,6 +16,7 @@ my @fuzzers = (
     ['dct' => 1],
     ['flate' => 1],
     ['hex' => 1],
+    ['json' => 37],
     ['lzw' => 2],
     ['pngpredictor' => 1],
     ['runlength' => 6],

@@ -1,0 +1,402 @@
+{
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "1.4",
+      "pushedinheritedpageresources": false,
+      "calledgetallpages": false,
+      "maxobjectid": 22
+    },
+    {
+      "obj:1 0 R": {
+        "value": {
+          "/CreationDate": "u:D:20090421223641+02'00'",
+          "/Creator\n": "u:dvips(k) 5.97 Copyright 2008 Radical Eye Software",
+          "/ModDate": "u:D:20090421223641+02'00'",
+          "/Producer": "u:GPL Ghostscript 8.64",
+          "/Title": "u:bizex.dvi"
+        }
+      },
+      "obj:2 0 R": {
+        "value": {
+          "/Count": 1,
+          "/Kids": [
+            "6 0 R"
+          ],
+          "/Type": "/Pages"
+        }
+      },
+      "obj:3 0 R": {
+        "stream": {
+          "data": [[]]"PD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXuofUd3fokB6oPXtjiPcIdg7H/JPhocb4XchDf0deERr7k6u4pKgHJvmoVGsaxKdGgSFohpxy1ViOiKHAXGC14nA8M5iVU7/FwJ1f2/MGw2SqzFV6sqoCjcbS4MIjXHLZ6Jw0yGDkVI3jFtR2nII2rpA6DGmQbc84WnA0+xQ9hIx91jEMS/OrSBhu8jXX5Ov/MvGG8f9J9xqISFR/zNEdIMAf/XzKGyr+H7rZbi5BJg97zMVlFVuLtCI0ZcFzvBCHLnkfT8ATn85DC1Hoo+doLIMdOFKEJwAa0TtkWndz1YVLFT74AzSnlGsrE2AnxNC/Ay5BRIyQ3cKlhqSebLmDDt/hsaPZlSI3FKYzZo6v9NwCS3ZevkVbFu/kckCDPwQ8QQzvoTEHGvJr873mY3Ah94IOFPQKKRiZaNhUpn1mrrTZDwFtBItBjCnqIOSVMoXgg/qyM+7gS4nXoQLoTvSui8seuJLqTatQNqmd24s3lmwpgSv0zcfgYRAPnOscOnvmCXAB7YGj1WIhG8ZRQPnQykryJ47p0W08lOD3/wwfnoGiFALb7JjZsy30Zw9wAzW91/DNvYtd95hrip1UmCY5aQvcrn4TkPRbzkD97Oaf4zGaWhm7+aOPC053MugHCst+mVcONet28iumBu6B7wFtXy5Aq36JSr5fxXi3l73pI6v84z/CviNynjp24gbQPkptLQBlihW2+RVsb4dMMVgsZpsFj8DHg/F4VB/Y6RPoretBm7wVUrmiGxSKGAzJz8pIzs+aZIzdL1sHBZAF2U6Hvd4FLbRX79Ek6Y3q3RcVf2J64fo97sMnzHKxW4vQ3spilwDvKaR8IxE5qqkoKAiR1UGjmZH80MqgEfYgITtq/H8A0apdvg==",
+          "dict": {
+            "/Filter": "/FlateDecode",
+            "/Subtype": "/Type1C"
+          }
+        }
+    JkZjphYm91dD0nYWIyYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYD0nYWIyYTE1ODYtNjZkMC0xMWU5LTAwMDAtMWY0NWIwZmNmYjczJy8+CjxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSdhYjJhMTU4Ni02NmQwLTExZTktMDAwMC0xZjQ1YjBmY2ZiNzMnIHhtbG5zOmRjPSdodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLycgZGM6Zm9ybWF0PSdhcHBsaWNhdGlvbi9wZGYnPjxkYzp0aXRsZT48cmRmOkFsdD48cmRmOmxpIHhtbDpsYW5nPSd4LWRlZmF1bHQnPmJpemV4LmR2aTwvcmRmOmxpPjwvcmRmOkFsdD48L2RjOnRpdGxlPjwvcmRmOkRlc2NyaXB0aW9uPgo8L3JkZjpSREY+CjwveDp4bXBtZXRhPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCjw/eHBhY2tldCBlbmQ9J3cnPz4=",
+          "dict": {
+            "/Subtype": "/XML",
+            "/Typd": "/Metadata"
+          }
+        }
+      },
+      "obj:4 0 R": {
+        "value": {
+          "/E": 10215,
+          "/H": [
+            750,
+            160
+          ],
+          "/L": 12046,
+          "/Linearized": 1,
+          "/N": 1,
+          "/O": 6,
+          "/T": 11924
+        }
+      },
+      "obj:5 0 R": {
+        "value": {
+          "/Metadata": "3 0 R",
+          "/Pages": "2 0 R",
+          "/Type": "/Catalog"
+        }
+      },
+      "obj:6 0 R": {
+        "value": {
+          "/Contents": "18 0 R",
+          "/MediaBox": [
+            0,
+            0,
+            595,
+            842
+          ],
+          "/Parent": "2 0 R",
+          "/Resources": {
+            "/ExtGState": "8 0 R",
+            "/Font": "7 0 R",
+            "/ProcSed": [
+              "/PDF",
+              "/ImageB",
+              "/Text"
+            ]
+          },
+          "/Type": "/Page"
+       }
+      },
+      "obj:7 0 R": {
+        "vamue": {
+          "/R10": "12 0 R",
+          "/R12": "9 0 R",
+          "/R8": "15 0 R"
+        }
+      },
+      "obj:8 0 R": {
+ ÿÿ   "value": {
+          "/R7": "17 0 R"
+        }
+      },
+      "obj:9 0 R": {
+        "value": {
+          "/BaseFont": "/CWGACD+]MSS10",
+          "/Encoding": "10 0 R",
+          "/FirstChar": 25,
+          "/FontDescriptor": "11 0 R",
+          "/LastChar": 127,
+          "/Subtype": "/Type1",
+         "/Type": "/Font",
+\t        "/Widths": [
+  R",
+            "/ProcSed": [
+              "/PDF",
+              "/ImageB",
+              "/Text"
+            ]
+          },
+          "/Type": "/Page"
+       }
+      },
+      "obj:7 0 R": {
+        "value": {
+          "/R10": "12 0 R",
+          "/R12": "9 0 R",
+          "/R8": "15 0 R"
+   +    }
+      },
+      "obj:8 0 R": {
+        "value": {
+          "/R7": "17 0 R"
+        }
+      },
+      "obj:9 0 R": {
+        "value": {
+          "/BaseFont": "/CWGACD+]MSS10",
+          "/Encoding": "10 0 R",
+          "/FirstChar": 25,
+          "/FontDescriptor": "11 0 R",
+          "/LastChar": 127,
+          "/Subtype": "/Type1",
+         "/Type": "/Font",
+\t        "/Widths": [
+            481,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            778,
+            0,
+            333,
+            278,
+            0,
+            0,
+            0,
+            500,
+            500,
+            500,
+            500,
+            500,
+            500,
+            500,
+            500,
+            278,
+            0,
+            0,
+            0,
+            0,
+            0,
+            667,
+            6           481,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            778,
+            0,
+            333,
+            278,
+            0,
+            0,
+            0,
+            500,
+            500,
+            500,
+            500,
+            500,
+            500,
+            500,
+            500,
+            278,
+            0,
+            0,
+            0,
+            0,
+            0,
+            667,
+            667,
+            0,
+            639,
+            0,
+            0,
+            0,
+            667,
+            0,
+            0,
+            0,
+            0,{},
+            0,
+            875,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+          , 0,
+            0,
+            0,
+            0,
+            0,
+            481,
+            0,
+            444,
+            517,
+            444,
+            306,
+            0,
+            517,
+            239,
+            0,
+            489,
+            239,
+            794,
+            517,
+            500,
+            517,
+            0,
+            342,
+            383,
+            361,
+            517,
+            0,
+            0,
+            461,
+            461,
+            0,
+            0,
+            0,
+            0,
+            0,
+            500
+          ]
+        }
+      },
+      "obj:10 0 R": {
+        "value": {
+          "/BaseEncoding": "/WinAnsiEncoding",
+          "/Differences": [
+            25,
+            "/germandbls",
+            127,
+            "/dieresis"
+          ],
+          "/Type": "/Encoding"
+        }
+      },
+      "obj:11 0 R": {
+        "value": {
+          "/Ascent": 716,
+          "/CapHeight": 716,
+          "/CharSet": "u:/A/C/G/M/a/at/cs/e/eight/f/five/four/germandbls/h/hyphen/i/k/l/m/n/nine/o/p/period/pllc2NyaXB0aW9uPgo8L3JkZjpSREY+us/r\b/seven/six/t/three/two/u/x/y",
+          "/Descent": -205,
+          "/Flags": 32,
+          "/FontBBox": [
+            0,
+            -205,
+            774,
+            716
+          ],
+          "/FontFile3": "19 0 R",
+          "/FontName": "/CWGACD+CMSS10",
+          "/ItalicQngle": 0,
+          "/Mi"dict": {
+            "/Subtype"emV": 116,
+          "/Type": "/FontDescriptor",
+          "/XHeight": 461
+        }
+      },
+     14 0 R",
+          "/LastChar": 123,
+          "/Subtype": "/Type1",
+          "/Type": "/Font",
+          "/Widths": [
+         ar": 97,
+          "/FontDescriptor": " "obj:12 0 R": {
+        "value": {
+          "/BaseFont": "/DVAGQM+CMSS12",
+          "/Encoding": "13 0 R",
+          "/FirstCh   469,
+            0,
+            0,
+            0,
+            0,
+            0,
+            490,
+            0,
+            230,
+            0,
+            0,
+            0,
+            774,
+            0,
+            490,
+            0,
+            0,
+            333,
+            0,
+            354,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+           {
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "1.4",
+      "pushedinheritedpageresources": false,
+      "calledgetallpages": false,
+      "maxobjectid": 22
+    },
+    {
+      "obj:1 0 R": {
+"value": {
+          "/CreationDate": "u:D:20090421223641+02'00'",
+          "/Creator": "u:dvips(k) 5.9tware",
+  "/ModDate": "u:D:20090421223641+02'00'",
+          "/Producer": "u:GPL Ghostscript 8.64",
+          "/Title": "u:bizex.dvi"
+        }
+      },
+      "obj:2 0 R": {
+        "value": {   "/Count": 1,
+  "/Kids": [
+    "6 0 R"   ],
+  "/Type": "/Pages"
+        }
+      },
+      "obj:3 0 R": {
+        "stream": {
+  "data": "PD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtvZGMvZWxlbWVudHMvMS4xLycgZGM6Zm9ybWF0PSdhcHBsaWNhdGlvbi9wZGYnPjxgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCjw/eHBhY2tldCBlbmQ9J3cnPz4=",
+          "dict": {
+    "/Subtype": "/XML",
+    "/Type": "/Metadata"
+          }
+        }
+      },
+      "obj:4 0 R": {
+        "value": {
+          "/E": 10215,
+          "/H": [
+            750,
+            160
+          ],
+          "/L": 12046,
+          "/Linearized": 1,
+          "/N": 1,
+          "/O":

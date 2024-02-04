@@ -1,0 +1,89 @@
+{
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "2.0",
+      "pushedinheritedpageresources": false,
+      "calledgetallpages": false,
+      "maxobjectid": 6
+    },
+    {
+      "obj:1 0 R": {
+        "value": {
+          "/Extra": [
+            "u:Names with binary data",
+            "n:/ABCDEF+#ba#da#cc#e5",
+            "n:/OVERLONG+#c0#81",
+            "n:/OVERLONG+#e0#81#82",
+            "n:/OVERLONG+#f0#81#82#83",
+            "/range+\u0001",
+            "/low+\u0018",
+            "/ABCEDEF+π",
+            "n:/one+#a0two",
+            "/text/plain",
+            "u:Very small/large reals",
+            0.00001,
+            1000000000000
+          ],
+          "/Pages": "2 0 R",
+          "/Type": "/Catalog",
+          "n:/WeirdKey+#ba#da#cc#e5": 42
+        }
+      },
+      "obj:2 0 R": {
+        "value": {
+          "/Count": 1,
+          "/Kids": [
+            "3 0 R"
+          ],
+          "/Type": "/Pages"
+        }
+      },
+      "obj:3 0 R": {
+        "value": {
+          "/Contents": "4 0 R",
+          "/MediaBox": [
+            0,
+            0,
+            612,
+            792
+          ],
+          "/Parent": "2 0 R",
+          "/Resources": {
+            "/Font": {
+              "/F1": "6 0 R"
+            }
+          },
+          "/Type": "/Page"
+        }
+      },
+      "obj:4 0 R": {
+        "stream": {
+          "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo=",
+          "dict": {}
+        }
+      },
+      "obj:5 0 R": {
+        "value": 44
+      },
+      "obj:6 0 R": {
+        "value": {
+          "/BaseFont": "/Helvetica",
+          "/Encoding": "/WinAnsiEncoding",
+          "/Subtype": "/Type1",
+          "/Type": "/Font"
+        }
+      },
+      "trailer": {
+        "value": {
+          "/ID": [
+            "b:42841c13bbf709d79a200fa1691836f8",
+            "b:728c020f464c3cf7e02c12605fa7d88b"
+          ],
+          "/Root": "1 0 R",
+          "/Size": 7
+        }
+      }
+    }
+  ]
+}

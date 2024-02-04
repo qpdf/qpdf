@@ -1,0 +1,62 @@
+{
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "1.3",
+      "maxobjectid": 6
+    },
+    {
+      "obj:1 0 R": {
+        "value": {
+          "/Pages": "2 0 R",
+          "/Type": "/Catalog"
+        }
+      },
+      "obj:2 0 R": {
+        "value": {
+          "/Count": 1,
+          "/Kids": [
+            "3 0 R"
+          ],
+          "/Type": "/Pages"
+        },
+        "stream": {
+          "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo=",
+          "dict": {}
+        }
+      },
+      "obj:3 0 R": {
+        "potato": {
+          "salad": "ignored-so-no-string-error",
+          "nested": [1, 2, {"x": "y"}]
+        }
+      },
+      "obj:4 0 R": {
+        "stream": {
+          "potato": "u:salad"
+        }
+      },
+      "obj:5 0 R": {
+        "stream": {
+          "dict": {"/A": "/B"},
+          "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo=",
+          "datafile": "abc"
+        }
+      },
+      "obj:6 0 R": {
+        "value": {
+          "/BaseFont": "/Helvetica",
+          "/Encoding": "/WinAnsiEncoding",
+          "/Subtype": "/Type1",
+          "/Type": "/Font"
+        }
+      },
+      "trailer": {
+        "potato": {
+          "/Root": "1 0 R",
+          "/Size": 7
+        }
+      }
+    }
+  ]
+}
