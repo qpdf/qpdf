@@ -441,6 +441,10 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
 void
 QPDF::JSONReactor::replaceObject(QPDFObjectHandle&& replacement, JSON const& value)
 {
+    if (replacement.isIndirect()) {
+        error(replacement.getParsedOffset(), "the value of an object may not be an indirect object reference");
+        return;
+    }
     auto& tos = stack.back();
     auto og = tos.object.getObjGen();
     this->pdf.replaceObject(og, replacement);

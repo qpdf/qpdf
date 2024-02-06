@@ -1,0 +1,2 @@
+WARNING: qjson-object-value-indirect.json (obj:1 0 R): the value of an object may not be an indirect object reference
+qpdf: qjson-object-value-indirect.json: errors found in JSON

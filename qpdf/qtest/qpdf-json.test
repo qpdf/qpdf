@@ -28,6 +28,7 @@ my @badfiles = (
     'objects-not-dict',
     'bad-object-key',
     'object-not-dict',
+    'object-value-indirect',
     'stream-not-dict',
     'stream-dict-not-dict',
     'trailer-not-dict',
