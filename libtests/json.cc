@@ -134,6 +134,12 @@ test_main()
         "  \"normal\": \"string\"\n"
         "}");
 
+    try {
+        JSON::parse("\"");
+        assert(false);
+    } catch (std::runtime_error&) {
+    }
+
     // Check default constructed JSON object (order as per JSON.hh).
     JSON uninitialized;
     std::string ws;

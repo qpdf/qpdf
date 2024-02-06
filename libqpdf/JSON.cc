@@ -628,6 +628,7 @@ namespace
             ls_number_e_sign,
             ls_alpha,
             ls_string,
+            ls_after_string,
             ls_backslash,
             ls_u4,
             ls_begin_array,
@@ -1039,7 +1040,7 @@ JSONParser::getToken()
                             "JSON: offset " + std::to_string(high_offset) +
                             ": UTF-16 high surrogate not followed by low surrogate");
                     }
-                    ignore();
+                    ignore(ls_after_string);
                     return;
                 } else if (*p == '\\') {
                     ignore(ls_backslash);
@@ -1234,7 +1235,7 @@ JSONParser::handleToken()
         }
         break;
 
-    case ls_string:
+    case ls_after_string:
         if (parser_state == ps_dict_begin || parser_state == ps_dict_after_comma) {
             dict_key = token;
             dict_key_offset = token_start;
