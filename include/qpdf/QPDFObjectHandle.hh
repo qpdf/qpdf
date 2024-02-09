@@ -1353,6 +1353,8 @@ class QPDFObjectHandle
         return obj.get();
     }
 
+    void writeJSON(int json_version, JSON::Writer& p, bool dereference_indirect = false);
+
   private:
     QPDF_Array* asArray();
     QPDF_Bool* asBool();

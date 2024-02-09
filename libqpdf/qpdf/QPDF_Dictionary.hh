@@ -17,6 +17,7 @@ class QPDF_Dictionary: public QPDFValue
     std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
     std::string unparse() override;
     JSON getJSON(int json_version) override;
+    void writeJSON(int json_version, JSON::Writer& p) override;
     void disconnect() override;
 
     // hasKey() and getKeys() treat keys with null values as if they aren't there.  getKey() returns

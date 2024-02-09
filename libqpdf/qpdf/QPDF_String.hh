@@ -17,6 +17,7 @@ class QPDF_String: public QPDFValue
     std::string unparse() override;
     std::string unparse(bool force_binary);
     JSON getJSON(int json_version) override;
+    void writeJSON(int json_version, JSON::Writer& p) override;
     std::string getUTF8Val() const;
     std::string
     getStringValue() const override

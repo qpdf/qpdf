@@ -1,5 +1,7 @@
 #include <qpdf/QPDF_Operator.hh>
 
+#include <qpdf/JSON_writer.hh>
+
 QPDF_Operator::QPDF_Operator(std::string const& val) :
     QPDFValue(::ot_operator, "operator"),
     val(val)
@@ -28,4 +30,10 @@ JSON
 QPDF_Operator::getJSON(int json_version)
 {
     return JSON::makeNull();
+}
+
+void
+QPDF_Operator::writeJSON(int json_version, JSON::Writer& p)
+{
+    p << "null";
 }

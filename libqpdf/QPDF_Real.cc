@@ -1,5 +1,6 @@
 #include <qpdf/QPDF_Real.hh>
 
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/QUtil.hh>
 
 QPDF_Real::QPDF_Real(std::string const& val) :
@@ -55,4 +56,19 @@ QPDF_Real::getJSON(int json_version)
         result = this->val;
     }
     return JSON::makeNumber(result);
+}
+
+void
+QPDF_Real::writeJSON(int json_version, JSON::Writer& p)
+{
+    if (this->val.length() == 0) {
+        // Can't really happen...
+        p << "0";
+    } else if (this->val.at(0) == '.') {
+        p << "0" << this->val;
+    } else if (this->val.length() >= 2 && this->val.at(0) == '-' && this->val.at(1) == '.') {
+        p << "-0." << this->val.substr(2);
+    } else {
+        p << this->val;
+    }
 }

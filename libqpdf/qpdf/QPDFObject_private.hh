@@ -38,6 +38,11 @@ class QPDFObject
     {
         return value->getJSON(json_version);
     }
+    void
+    writeJSON(int json_version, JSON::Writer& p)
+    {
+        return value->writeJSON(json_version, p);
+    }
     std::string
     getStringValue() const
     {

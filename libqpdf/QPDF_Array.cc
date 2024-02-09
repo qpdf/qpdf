@@ -1,5 +1,6 @@
 #include <qpdf/QPDF_Array.hh>
 
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QTC.hh>
@@ -178,6 +179,43 @@ QPDF_Array::getJSON(int json_version)
         }
     }
     return j_array;
+}
+
+void
+QPDF_Array::writeJSON(int json_version, JSON::Writer& p)
+{
+    p.writeStart('[');
+    if (sp) {
+        int next = 0;
+        for (auto& item: sp->elements) {
+            int key = item.first;
+            for (int j = next; j < key; ++j) {
+                p.writeNext() << "null";
+            }
+            p.writeNext();
+            auto og = item.second->getObjGen();
+            if (og.isIndirect()) {
+                p << "\"" << og.unparse(' ') << " R\"";
+            } else {
+                item.second->writeJSON(json_version, p);
+            }
+            next = ++key;
+        }
+        for (int j = next; j < sp->size; ++j) {
+            p.writeNext() << "null";
+        }
+    } else {
+        for (auto const& item: elements) {
+            p.writeNext();
+            auto og = item->getObjGen();
+            if (og.isIndirect()) {
+                p << "\"" << og.unparse(' ') << " R\"";
+            } else {
+                item->writeJSON(json_version, p);
+            }
+        }
+    }
+    p.writeEnd(']');
 }
 
 QPDFObjectHandle

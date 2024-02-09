@@ -1,6 +1,7 @@
 #include <qpdf/QPDF_Stream.hh>
 
 #include <qpdf/ContentNormalizer.hh>
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_Buffer.hh>
@@ -183,6 +184,12 @@ QPDF_Stream::getJSON(int json_version)
         return this->stream_dict.getJSON(json_version);
     }
     return getStreamJSON(json_version, qpdf_sj_none, qpdf_dl_none, nullptr, "");
+}
+
+void
+QPDF_Stream::writeJSON(int json_version, JSON::Writer& p)
+{
+    stream_dict.writeJSON(json_version, p);
 }
 
 JSON

@@ -34,3 +34,9 @@ QPDF_Destroyed::getJSON(int json_version)
     throw std::logic_error("attempted to get JSON from a QPDFObjectHandle from a destroyed QPDF");
     return JSON::makeNull();
 }
+
+void
+QPDF_Destroyed::writeJSON(int json_version, JSON::Writer& p)
+{
+    throw std::logic_error("attempted to get JSON from a QPDFObjectHandle from a destroyed QPDF");
+}

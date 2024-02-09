@@ -1,5 +1,7 @@
 #include <qpdf/QPDF_InlineImage.hh>
 
+#include <qpdf/JSON_writer.hh>
+
 QPDF_InlineImage::QPDF_InlineImage(std::string const& val) :
     QPDFValue(::ot_inlineimage, "inline-image"),
     val(val)
@@ -28,4 +30,10 @@ JSON
 QPDF_InlineImage::getJSON(int json_version)
 {
     return JSON::makeNull();
+}
+
+void
+QPDF_InlineImage::writeJSON(int json_version, JSON::Writer& p)
+{
+    p << "null";
 }

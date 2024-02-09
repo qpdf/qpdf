@@ -1,5 +1,6 @@
 #include <qpdf/QPDF_Name.hh>
 
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/QUtil.hh>
 
 QPDF_Name::QPDF_Name(std::string const& name) :
@@ -65,6 +66,24 @@ QPDF_Name::getJSON(int json_version)
             return JSON::makeString(this->name);
         } else {
             return JSON::makeString("n:" + normalizeName(this->name));
+        }
+    }
+}
+
+void
+QPDF_Name::writeJSON(int json_version, JSON::Writer& p)
+{
+    if (json_version == 1) {
+        p << "\"" << JSON::Writer::encode_string(normalizeName(name)) << "\"";
+    } else {
+        bool has_8bit_chars;
+        bool is_valid_utf8;
+        bool is_utf16;
+        QUtil::analyze_encoding(this->name, has_8bit_chars, is_valid_utf8, is_utf16);
+        if (!has_8bit_chars || is_valid_utf8) {
+            p << "\"" << JSON::Writer::encode_string(name) << "\"";
+        } else {
+            p << "\"n:" << JSON::Writer::encode_string(normalizeName(name)) << "\"";
         }
     }
 }

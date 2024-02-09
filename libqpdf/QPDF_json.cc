@@ -1,6 +1,7 @@
 #include <qpdf/QPDF.hh>
 
 #include <qpdf/FileInputSource.hh>
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QIntC.hh>
@@ -864,9 +865,15 @@ void
 QPDF::writeJSONObject(
     int version, Pipeline* p, bool& first, std::string const& key, QPDFObjectHandle& obj)
 {
-    auto j = JSON::makeDictionary();
-    j.addDictionaryMember("value", obj.getJSON(version, true));
-    JSON::writeDictionaryItem(p, first, key, j, 3);
+    if (first) {
+        *p << "\n      \"" << key << "\": {\n        \"value\": ";
+        first = false;
+    } else {
+        *p << ",\n      \"" << key << "\": {\n        \"value\": ";
+    }
+    auto w = JSON::Writer(p, 4);
+    obj.writeJSON(version, w, true);
+    *p << "\n      }";
 }
 
 void

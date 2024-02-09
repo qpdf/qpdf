@@ -11,6 +11,7 @@ class QPDF_Name: public QPDFValue
     std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
     std::string unparse() override;
     JSON getJSON(int json_version) override;
+    void writeJSON(int json_version, JSON::Writer& p) override;
 
     // Put # into strings with characters unsuitable for name token
     static std::string normalizeName(std::string const& name);

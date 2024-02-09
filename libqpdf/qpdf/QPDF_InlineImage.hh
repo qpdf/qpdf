@@ -11,6 +11,7 @@ class QPDF_InlineImage: public QPDFValue
     std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
     std::string unparse() override;
     JSON getJSON(int json_version) override;
+    void writeJSON(int json_version, JSON::Writer& p) override;
     std::string
     getStringValue() const override
     {

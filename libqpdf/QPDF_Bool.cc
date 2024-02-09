@@ -1,5 +1,7 @@
 #include <qpdf/QPDF_Bool.hh>
 
+#include <qpdf/JSON_writer.hh>
+
 QPDF_Bool::QPDF_Bool(bool val) :
     QPDFValue(::ot_boolean, "boolean"),
     val(val)
@@ -28,6 +30,12 @@ JSON
 QPDF_Bool::getJSON(int json_version)
 {
     return JSON::makeBool(this->val);
+}
+
+void
+QPDF_Bool::writeJSON(int json_version, JSON::Writer& p)
+{
+    p << val;
 }
 
 bool

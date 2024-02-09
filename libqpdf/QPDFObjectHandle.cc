@@ -3,6 +3,7 @@
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_QPDFTokenizer.hh>
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
@@ -1618,6 +1619,18 @@ QPDFObjectHandle::getJSON(int json_version, bool dereference_indirect)
         throw std::logic_error("attempted to dereference an uninitialized QPDFObjectHandle");
     } else {
         return obj->getJSON(json_version);
+    }
+}
+
+void
+QPDFObjectHandle::writeJSON(int json_version, JSON::Writer& p, bool dereference_indirect)
+{
+    if (!dereference_indirect && isIndirect()) {
+        p << "\"" << getObjGen().unparse(' ') << " R\"";
+    } else if (!dereference()) {
+        throw std::logic_error("attempted to dereference an uninitialized QPDFObjectHandle");
+    } else {
+        obj->writeJSON(json_version, p);
     }
 }
 

@@ -1,5 +1,6 @@
 #include <qpdf/QPDF_String.hh>
 
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/QUtil.hh>
 
 // DO NOT USE ctype -- it is locale dependent for some things, and it's not worth the risk of
@@ -72,6 +73,30 @@ QPDF_String::getJSON(int json_version)
         result = "b:" + QUtil::hex_encode(this->val);
     }
     return JSON::makeString(result);
+}
+
+void
+QPDF_String::writeJSON(int json_version, JSON::Writer& p)
+{
+    auto candidate = getUTF8Val();
+    if (json_version == 1) {
+
+        p << "\"" << JSON::Writer::encode_string(candidate) << "\"";
+    } else {
+        // See if we can unambiguously represent as Unicode.
+        if (QUtil::is_utf16(this->val) || QUtil::is_explicit_utf8(this->val)) {
+            p << "\"u:" << JSON::Writer::encode_string(candidate) <<"\"";
+            return;
+        } else if (!useHexString()) {
+            std::string test;
+            if (QUtil::utf8_to_pdf_doc(candidate, test, '?') && (test == this->val)) {
+                // This is a PDF-doc string that can be losslessly encoded as Unicode.
+                p << "\"u:" << JSON::Writer::encode_string(candidate) <<"\"";
+                return;
+            }
+        }
+        p << "\"b:" << QUtil::hex_encode(val) <<"\"";
+    }
 }
 
 bool

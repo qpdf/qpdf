@@ -25,6 +25,7 @@ class QPDFValue: public std::enable_shared_from_this<QPDFValue>
     virtual std::shared_ptr<QPDFObject> copy(bool shallow = false) = 0;
     virtual std::string unparse() = 0;
     virtual JSON getJSON(int json_version) = 0;
+    virtual void writeJSON(int json_version, JSON::Writer& p) = 0;
 
     struct JSON_Descr
     {

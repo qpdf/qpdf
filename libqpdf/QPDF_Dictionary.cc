@@ -1,5 +1,6 @@
 #include <qpdf/QPDF_Dictionary.hh>
 
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDF_Name.hh>
 #include <qpdf/QPDF_Null.hh>
@@ -89,6 +90,33 @@ QPDF_Dictionary::getJSON(int json_version)
         }
     }
     return j;
+}
+
+void
+QPDF_Dictionary::writeJSON(int json_version, JSON::Writer& p)
+{
+    p.writeStart('{');
+    for (auto& iter: this->items) {
+        if (!iter.second.isNull()) {
+            p.writeNext();
+            if (json_version == 1) {
+                p << "\"" << JSON::Writer::encode_string(QPDF_Name::normalizeName(iter.first)) << "\": ";
+            } else {
+                bool has_8bit_chars;
+                bool is_valid_utf8;
+                bool is_utf16;
+                QUtil::analyze_encoding(iter.first, has_8bit_chars, is_valid_utf8, is_utf16);
+                if (!has_8bit_chars || is_valid_utf8) {
+                    p << "\"" << JSON::Writer::encode_string(iter.first) << "\": ";
+                } else {
+                    p << "\"n:" << JSON::Writer::encode_string(QPDF_Name::normalizeName(iter.first))
+                      << "\": ";
+                }
+            }
+            iter.second.writeJSON(json_version, p);
+        }
+    }
+    p.writeEnd('}');
 }
 
 bool
