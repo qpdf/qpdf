@@ -77,15 +77,11 @@ QPDF_Dictionary::getJSON(int json_version)
             if (json_version == 1) {
                 j.addDictionaryMember(
                     QPDF_Name::normalizeName(iter.first), iter.second.getJSON(json_version));
+            } else if (auto res = QPDF_Name::analyzeJSONEncoding(iter.first); res.first) {
+                j.addDictionaryMember(iter.first, iter.second.getJSON(json_version));
             } else {
-                bool has_8bit_chars;
-                bool is_valid_utf8;
-                bool is_utf16;
-                QUtil::analyze_encoding(iter.first, has_8bit_chars, is_valid_utf8, is_utf16);
-                std::string key = !has_8bit_chars || is_valid_utf8
-                    ? iter.first
-                    : "n:" + QPDF_Name::normalizeName(iter.first);
-                j.addDictionaryMember(key, iter.second.getJSON(json_version));
+                j.addDictionaryMember(
+                    "n:" + QPDF_Name::normalizeName(iter.first), iter.second.getJSON(json_version));
             }
         }
     }
@@ -100,18 +96,17 @@ QPDF_Dictionary::writeJSON(int json_version, JSON::Writer& p)
         if (!iter.second.isNull()) {
             p.writeNext();
             if (json_version == 1) {
-                p << "\"" << JSON::Writer::encode_string(QPDF_Name::normalizeName(iter.first)) << "\": ";
-            } else {
-                bool has_8bit_chars;
-                bool is_valid_utf8;
-                bool is_utf16;
-                QUtil::analyze_encoding(iter.first, has_8bit_chars, is_valid_utf8, is_utf16);
-                if (!has_8bit_chars || is_valid_utf8) {
-                    p << "\"" << JSON::Writer::encode_string(iter.first) << "\": ";
+                p << "\"" << JSON::Writer::encode_string(QPDF_Name::normalizeName(iter.first))
+                  << "\": ";
+            } else if (auto res = QPDF_Name::analyzeJSONEncoding(iter.first); res.first) {
+                if (res.second) {
+                    p << "\"" << iter.first << "\": ";
                 } else {
-                    p << "\"n:" << JSON::Writer::encode_string(QPDF_Name::normalizeName(iter.first))
-                      << "\": ";
+                    p << "\"" << JSON::Writer::encode_string(iter.first) << "\": ";
                 }
+            } else {
+                p << "\"n:" << JSON::Writer::encode_string(QPDF_Name::normalizeName(iter.first))
+                  << "\": ";
             }
             iter.second.writeJSON(json_version, p);
         }

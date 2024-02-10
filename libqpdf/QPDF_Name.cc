@@ -3,6 +3,8 @@
 #include <qpdf/JSON_writer.hh>
 #include <qpdf/QUtil.hh>
 
+#include <string_view>
+
 QPDF_Name::QPDF_Name(std::string const& name) :
     QPDFValue(::ot_name, "name"),
     name(name)
@@ -52,20 +54,65 @@ QPDF_Name::unparse()
     return normalizeName(this->name);
 }
 
+std::pair<bool, bool>
+QPDF_Name::analyzeJSONEncoding(const std::string& name)
+{
+    std::basic_string_view<unsigned char> view{
+        reinterpret_cast<const unsigned char*>(name.data()), name.size()};
+
+    int tail = 0; // Number of continuation characters expected.
+    bool tail2 = false; // Potential overlong 3 octet utf-8.
+    bool tail3 = false; // potential overlong 4 octet
+    bool needs_escaping = false;
+    for (auto const& c: view) {
+        if (tail) {
+            if ((c & 0xc0) != 0x80) {
+                return {false, false};
+            }
+            if (tail2) {
+                if ((c & 0xe0) == 0x80) {
+                    return {false, false};
+                }
+                tail2 = false;
+            } else if (tail3) {
+                if ((c & 0xf0) == 0x80) {
+                    return {false, false};
+                }
+                tail3 = false;
+            }
+            tail--;
+        } else if (c < 0x80) {
+            if (!needs_escaping) {
+                needs_escaping = !((c > 34 && c != '\\') || c == ' ' || c == 33);
+            }
+        } else if ((c & 0xe0) == 0xc0) {
+            if ((c & 0xfe) == 0xc0) {
+                return {false, false};
+            }
+            tail = 1;
+        } else if ((c & 0xf0) == 0xe0) {
+            tail2 = (c == 0xe0);
+            tail = 2;
+        } else if ((c & 0xf8) == 0xf0) {
+            tail3 = (c == 0xf0);
+            tail = 3;
+        } else {
+            return {false, false};
+        }
+    }
+    return {tail == 0, !needs_escaping};
+}
+
 JSON
 QPDF_Name::getJSON(int json_version)
 {
     if (json_version == 1) {
         return JSON::makeString(normalizeName(this->name));
     } else {
-        bool has_8bit_chars;
-        bool is_valid_utf8;
-        bool is_utf16;
-        QUtil::analyze_encoding(this->name, has_8bit_chars, is_valid_utf8, is_utf16);
-        if (!has_8bit_chars || is_valid_utf8) {
-            return JSON::makeString(this->name);
+        if (auto res = analyzeJSONEncoding(name); res.first) {
+            return JSON::makeString(name);
         } else {
-            return JSON::makeString("n:" + normalizeName(this->name));
+            return JSON::makeString("n:" + normalizeName(name));
         }
     }
 }
@@ -76,12 +123,12 @@ QPDF_Name::writeJSON(int json_version, JSON::Writer& p)
     if (json_version == 1) {
         p << "\"" << JSON::Writer::encode_string(normalizeName(name)) << "\"";
     } else {
-        bool has_8bit_chars;
-        bool is_valid_utf8;
-        bool is_utf16;
-        QUtil::analyze_encoding(this->name, has_8bit_chars, is_valid_utf8, is_utf16);
-        if (!has_8bit_chars || is_valid_utf8) {
-            p << "\"" << JSON::Writer::encode_string(name) << "\"";
+        if (auto res = analyzeJSONEncoding(name); res.first) {
+            if (res.second) {
+                p << "\"" << name << "\"";
+            } else {
+                p << "\"" << JSON::Writer::encode_string(name) << "\"";
+            }
         } else {
             p << "\"n:" << JSON::Writer::encode_string(normalizeName(name)) << "\"";
         }
