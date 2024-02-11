@@ -122,7 +122,7 @@ endobj
   >>
   /P 15 0 R
   /T (checkbox1)
-  /V /Yes
+  /V /Yup
 >>
 endobj
 
@@ -589,10 +589,10 @@ endobj
   /AP <<
     /N <<
       /Off 64 0 R
-      /Yes 66 0 R
+      /Yup 66 0 R
     >>
   >>
-  /AS /Yes
+  /AS /Yup
   /F 4
   /Rect [
     118.649

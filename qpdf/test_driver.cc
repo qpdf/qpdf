@@ -1942,7 +1942,9 @@ test_51(QPDF& pdf, char const* arg2)
         } else if (Tval == "checkbox1") {
             std::cout << "turning checkbox1 on\n";
             QPDFFormFieldObjectHelper foh(field);
-            foh.setV(QPDFObjectHandle::newName("/Yes"));
+            // The value that eventually gets set is based on what's allowed in /N and may not match
+            // this value.
+            foh.setV(QPDFObjectHandle::newName("/Sure"));
         } else if (Tval == "checkbox2") {
             std::cout << "turning checkbox2 off\n";
             QPDFFormFieldObjectHelper foh(field);

@@ -166,7 +166,9 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     // either /Tx (text) or /Ch (choice), set /NeedAppearances to true. You can explicitly tell this
     // method not to set /NeedAppearances if you are going to generate an appearance stream
     // yourself. Starting with qpdf 8.3.0, this method handles fields of type /Btn (checkboxes,
-    // radio buttons, pushbuttons) specially.
+    // radio buttons, pushbuttons) specially. When setting a checkbox value, any value other than
+    // /Off will be treated as on, and the actual value set will be based on the appearance stream's
+    // /N dictionary, so the value that ends up in /V may not exactly match the value you pass in.
     QPDF_DLL
     void setV(QPDFObjectHandle value, bool need_appearances = true);
 

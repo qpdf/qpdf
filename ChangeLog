@@ -1,3 +1,11 @@
+2024-02-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* The previous fix to #1056 was incomplete. When setting a check
+	box value, the previous fix allowed any value other than /Off to
+	mean checked. Now we also set the actual value based on the
+	allowable non-/Off value in the normal appearance dictionary.
+	Fixes #1056.
+
 2024-02-03  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add fuzz testing for JSON.

@@ -310,8 +310,8 @@ QPDFFormFieldObjectHelper::setV(QPDFObjectHandle value, bool need_appearances)
                 setCheckBoxValue((name != "/Off"));
             }
             if (!okay) {
-                this->oh.warnIfPossible("ignoring attempt to set a checkbox field to a value of "
-                                        "other than /Yes or /Off");
+                this->oh.warnIfPossible(
+                    "ignoring attempt to set a checkbox field to a value whose type is not name");
             }
         } else if (isRadioButton()) {
             if (value.isName()) {
@@ -415,9 +415,6 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
 void
 QPDFFormFieldObjectHelper::setCheckBoxValue(bool value)
 {
-    // Set /AS to /Yes or /Off in addition to setting /V.
-    QPDFObjectHandle name = QPDFObjectHandle::newName(value ? "/Yes" : "/Off");
-    setFieldAttribute("/V", name);
     QPDFObjectHandle AP = this->oh.getKey("/AP");
     QPDFObjectHandle annot;
     if (AP.isNull()) {
@@ -439,6 +436,29 @@ QPDFFormFieldObjectHelper::setCheckBoxValue(bool value)
     } else {
         annot = this->oh;
     }
+    std::string on_value;
+    if (value) {
+        // Set the "on" value to the first value in the appearance stream's normal state dictionary
+        // that isn't /Off. If not found, fall back to /Yes.
+        if (AP.isDictionary()) {
+            auto N = AP.getKey("/N");
+            if (N.isDictionary()) {
+                for (auto const& iter: N.ditems()) {
+                    if (iter.first != "/Off") {
+                        on_value = iter.first;
+                        break;
+                    }
+                }
+            }
+        }
+        if (on_value.empty()) {
+            on_value = "/Yes";
+        }
+    }
+
+    // Set /AS to the on value or /Off in addition to setting /V.
+    QPDFObjectHandle name = QPDFObjectHandle::newName(value ? on_value : "/Off");
+    setFieldAttribute("/V", name);
     if (!annot.isInitialized()) {
         QTC::TC("qpdf", "QPDFObjectHandle broken checkbox");
         this->oh.warnIfPossible("unable to set the value of this checkbox");
