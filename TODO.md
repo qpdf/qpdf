@@ -38,6 +38,9 @@ Next
   * Make it possible to see incremental updates in qdf mode.
   * Make it possible to add incremental updates.
   * We may want a writing mode that preserves object IDs. See #339.
+  * Issue #1148 raises concerns about mixing xref tables and xref streams. We will have to consider
+    how qpdf should deal with this while making sure not to break hybrid-ref files, which are in the
+    test suite.
 * Support digital signatures. This probably requires support for incremental updates. First, add
   support for verifying digital signatures. Then we can consider adding support for signing
   documents, though the ability to sign documents is less useful without an interactive process of
