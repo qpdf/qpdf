@@ -27,13 +27,6 @@ QPDF_Unresolved::unparse()
     return "";
 }
 
-JSON
-QPDF_Unresolved::getJSON(int json_version)
-{
-    throw std::logic_error("attempted to get JSON from an unresolved QPDFObjectHandle");
-    return JSON::makeNull();
-}
-
 void
 QPDF_Unresolved::writeJSON(int json_version, JSON::Writer& p)
 {

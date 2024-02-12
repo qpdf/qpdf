@@ -149,38 +149,6 @@ QPDF_Array::unparse()
     return result;
 }
 
-JSON
-QPDF_Array::getJSON(int json_version)
-{
-    static const JSON j_null = JSON::makeNull();
-    JSON j_array = JSON::makeArray();
-    if (sp) {
-        int next = 0;
-        for (auto& item: sp->elements) {
-            int key = item.first;
-            for (int j = next; j < key; ++j) {
-                j_array.addArrayElement(j_null);
-            }
-            auto og = item.second->getObjGen();
-            j_array.addArrayElement(
-                og.isIndirect() ? JSON::makeString(og.unparse(' ') + " R")
-                                : item.second->getJSON(json_version));
-            next = ++key;
-        }
-        for (int j = next; j < sp->size; ++j) {
-            j_array.addArrayElement(j_null);
-        }
-    } else {
-        for (auto const& item: elements) {
-            auto og = item->getObjGen();
-            j_array.addArrayElement(
-                og.isIndirect() ? JSON::makeString(og.unparse(' ') + " R")
-                                : item->getJSON(json_version));
-        }
-    }
-    return j_array;
-}
-
 void
 QPDF_Array::writeJSON(int json_version, JSON::Writer& p)
 {

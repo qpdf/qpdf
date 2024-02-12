@@ -22,7 +22,6 @@ class QPDF_Array: public QPDFValue
     create(std::vector<std::shared_ptr<QPDFObject>>&& items, bool sparse);
     std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
     std::string unparse() override;
-    JSON getJSON(int json_version) override;
     void writeJSON(int json_version, JSON::Writer& p) override;
     void disconnect() override;
 

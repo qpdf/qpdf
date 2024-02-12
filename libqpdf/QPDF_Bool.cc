@@ -26,12 +26,6 @@ QPDF_Bool::unparse()
     return (val ? "true" : "false");
 }
 
-JSON
-QPDF_Bool::getJSON(int json_version)
-{
-    return JSON::makeBool(this->val);
-}
-
 void
 QPDF_Bool::writeJSON(int json_version, JSON::Writer& p)
 {

@@ -68,26 +68,6 @@ QPDF_Dictionary::unparse()
     return result;
 }
 
-JSON
-QPDF_Dictionary::getJSON(int json_version)
-{
-    JSON j = JSON::makeDictionary();
-    for (auto& iter: this->items) {
-        if (!iter.second.isNull()) {
-            if (json_version == 1) {
-                j.addDictionaryMember(
-                    QPDF_Name::normalizeName(iter.first), iter.second.getJSON(json_version));
-            } else if (auto res = QPDF_Name::analyzeJSONEncoding(iter.first); res.first) {
-                j.addDictionaryMember(iter.first, iter.second.getJSON(json_version));
-            } else {
-                j.addDictionaryMember(
-                    "n:" + QPDF_Name::normalizeName(iter.first), iter.second.getJSON(json_version));
-            }
-        }
-    }
-    return j;
-}
-
 void
 QPDF_Dictionary::writeJSON(int json_version, JSON::Writer& p)
 {

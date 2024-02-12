@@ -33,11 +33,6 @@ class QPDFObject
     {
         return value->unparse();
     }
-    JSON
-    getJSON(int json_version)
-    {
-        return value->getJSON(json_version);
-    }
     void
     writeJSON(int json_version, JSON::Writer& p)
     {

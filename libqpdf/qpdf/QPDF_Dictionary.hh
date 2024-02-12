@@ -16,7 +16,6 @@ class QPDF_Dictionary: public QPDFValue
     static std::shared_ptr<QPDFObject> create(std::map<std::string, QPDFObjectHandle>&& items);
     std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
     std::string unparse() override;
-    JSON getJSON(int json_version) override;
     void writeJSON(int json_version, JSON::Writer& p) override;
     void disconnect() override;
 

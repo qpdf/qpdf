@@ -27,12 +27,6 @@ QPDF_Integer::unparse()
     return std::to_string(this->val);
 }
 
-JSON
-QPDF_Integer::getJSON(int json_version)
-{
-    return JSON::makeInt(this->val);
-}
-
 void
 QPDF_Integer::writeJSON(int json_version, JSON::Writer& p)
 {

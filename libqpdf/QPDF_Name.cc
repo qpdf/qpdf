@@ -103,20 +103,6 @@ QPDF_Name::analyzeJSONEncoding(const std::string& name)
     return {tail == 0, !needs_escaping};
 }
 
-JSON
-QPDF_Name::getJSON(int json_version)
-{
-    if (json_version == 1) {
-        return JSON::makeString(normalizeName(this->name));
-    } else {
-        if (auto res = analyzeJSONEncoding(name); res.first) {
-            return JSON::makeString(name);
-        } else {
-            return JSON::makeString("n:" + normalizeName(name));
-        }
-    }
-}
-
 void
 QPDF_Name::writeJSON(int json_version, JSON::Writer& p)
 {

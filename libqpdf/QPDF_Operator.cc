@@ -26,12 +26,6 @@ QPDF_Operator::unparse()
     return val;
 }
 
-JSON
-QPDF_Operator::getJSON(int json_version)
-{
-    return JSON::makeNull();
-}
-
 void
 QPDF_Operator::writeJSON(int json_version, JSON::Writer& p)
 {

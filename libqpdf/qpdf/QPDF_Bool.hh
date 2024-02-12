@@ -10,7 +10,6 @@ class QPDF_Bool: public QPDFValue
     static std::shared_ptr<QPDFObject> create(bool val);
     std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
     std::string unparse() override;
-    JSON getJSON(int json_version) override;
     void writeJSON(int json_version, JSON::Writer& p) override;
 
     bool getVal() const;

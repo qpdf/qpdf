@@ -26,12 +26,6 @@ QPDF_InlineImage::unparse()
     return this->val;
 }
 
-JSON
-QPDF_InlineImage::getJSON(int json_version)
-{
-    return JSON::makeNull();
-}
-
 void
 QPDF_InlineImage::writeJSON(int json_version, JSON::Writer& p)
 {

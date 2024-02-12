@@ -177,15 +177,6 @@ QPDF_Stream::unparse()
     return og.unparse(' ') + " R";
 }
 
-JSON
-QPDF_Stream::getJSON(int json_version)
-{
-    if (json_version == 1) {
-        return this->stream_dict.getJSON(json_version);
-    }
-    return getStreamJSON(json_version, qpdf_sj_none, qpdf_dl_none, nullptr, "");
-}
-
 void
 QPDF_Stream::writeJSON(int json_version, JSON::Writer& p)
 {

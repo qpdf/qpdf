@@ -1618,7 +1618,11 @@ QPDFObjectHandle::getJSON(int json_version, bool dereference_indirect)
     } else if (!dereference()) {
         throw std::logic_error("attempted to dereference an uninitialized QPDFObjectHandle");
     } else {
-        return obj->getJSON(json_version);
+        Pl_Buffer p{"json"};
+        JSON::Writer jw{&p, 0};
+        writeJSON(json_version, jw, dereference_indirect);
+        p.finish();
+        return JSON::parse(p.getString());
     }
 }
 

@@ -46,35 +46,6 @@ QPDF_String::unparse()
     return unparse(false);
 }
 
-JSON
-QPDF_String::getJSON(int json_version)
-{
-    if (json_version == 1) {
-        return JSON::makeString(getUTF8Val());
-    }
-    // See if we can unambiguously represent as Unicode.
-    bool is_unicode = false;
-    std::string result;
-    std::string candidate = getUTF8Val();
-    if (QUtil::is_utf16(this->val) || QUtil::is_explicit_utf8(this->val)) {
-        is_unicode = true;
-        result = candidate;
-    } else if (!useHexString()) {
-        std::string test;
-        if (QUtil::utf8_to_pdf_doc(candidate, test, '?') && (test == this->val)) {
-            // This is a PDF-doc string that can be losslessly encoded as Unicode.
-            is_unicode = true;
-            result = candidate;
-        }
-    }
-    if (is_unicode) {
-        result = "u:" + result;
-    } else {
-        result = "b:" + QUtil::hex_encode(this->val);
-    }
-    return JSON::makeString(result);
-}
-
 void
 QPDF_String::writeJSON(int json_version, JSON::Writer& p)
 {

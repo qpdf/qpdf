@@ -26,13 +26,6 @@ QPDF_Reserved::unparse()
     return "";
 }
 
-JSON
-QPDF_Reserved::getJSON(int json_version)
-{
-    throw std::logic_error("QPDFObjectHandle: attempting to get JSON from a reserved object");
-    return JSON::makeNull();
-}
-
 void
 QPDF_Reserved::writeJSON(int json_version, JSON::Writer& p)
 {
