@@ -64,6 +64,14 @@ class QPDF_Stream: public QPDFValue
         qpdf_stream_decode_level_e decode_level,
         Pipeline* p,
         std::string const& data_filename);
+    qpdf_stream_decode_level_e writeStreamJSON(
+        int json_version,
+        JSON::Writer& jw,
+        qpdf_json_stream_data_e json_data,
+        qpdf_stream_decode_level_e decode_level,
+        Pipeline* p,
+        std::string const& data_filename,
+        bool no_data_key = false);
 
     void replaceDict(QPDFObjectHandle const& new_dict);
 
