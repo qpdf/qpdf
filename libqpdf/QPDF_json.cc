@@ -8,6 +8,7 @@
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFValue.hh>
 #include <qpdf/QPDF_Null.hh>
+#include <qpdf/QPDF_Stream.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <algorithm>
@@ -443,7 +444,9 @@ void
 QPDF::JSONReactor::replaceObject(QPDFObjectHandle&& replacement, JSON const& value)
 {
     if (replacement.isIndirect()) {
-        error(replacement.getParsedOffset(), "the value of an object may not be an indirect object reference");
+        error(
+            replacement.getParsedOffset(),
+            "the value of an object may not be an indirect object reference");
         return;
     }
     auto& tos = stack.back();
@@ -829,40 +832,51 @@ QPDF::importJSON(std::shared_ptr<InputSource> is, bool must_be_complete)
 }
 
 void
-QPDF::writeJSONStream(
+writeJSONStreamFile(
+    int version,
+    JSON::Writer& jw,
+    QPDF_Stream& stream,
+    int id,
+    qpdf_stream_decode_level_e decode_level,
+    std::string const& file_prefix)
+{
+    auto filename = file_prefix + "-" + std::to_string(id);
+    auto* f = QUtil::safe_fopen(filename.c_str(), "wb");
+    Pl_StdioFile f_pl{"stream data", f};
+    stream.writeStreamJSON(version, jw, qpdf_sj_file, decode_level, &f_pl, filename);
+    f_pl.finish();
+    fclose(f);
+}
+
+void
+writeJSONStream(
     int version,
     Pipeline* p,
     bool& first,
     std::string const& key,
-    QPDFObjectHandle& obj,
+    QPDF_Stream& stream,
+    int id,
     qpdf_stream_decode_level_e decode_level,
     qpdf_json_stream_data_e json_stream_data,
     std::string const& file_prefix)
 {
-    Pipeline* stream_p = nullptr;
-    FILE* f = nullptr;
-    std::shared_ptr<Pl_StdioFile> f_pl;
-    std::string filename;
+    if (first) {
+        *p << "\n      \"" << key << "\": {\n        \"stream\": ";
+        first = false;
+    } else {
+        *p << ",\n      \"" << key << "\": {\n        \"stream\": ";
+    }
+    JSON::Writer jw{p, 4};
     if (json_stream_data == qpdf_sj_file) {
-        filename = file_prefix + "-" + std::to_string(obj.getObjectID());
-        f = QUtil::safe_fopen(filename.c_str(), "wb");
-        f_pl = std::make_shared<Pl_StdioFile>("stream data", f);
-        stream_p = f_pl.get();
+        writeJSONStreamFile(version, jw, stream, id, decode_level, file_prefix);
+    } else {
+        stream.writeStreamJSON(version, jw, json_stream_data, decode_level, nullptr, "");
     }
-    auto j = JSON::makeDictionary();
-    j.addDictionaryMember(
-        "stream", obj.getStreamJSON(version, json_stream_data, decode_level, stream_p, filename));
-
-    JSON::writeDictionaryItem(p, first, key, j, 3);
-    if (f) {
-        f_pl->finish();
-        f_pl = nullptr;
-        fclose(f);
-    }
+    *p << "\n      }";
 }
 
 void
-QPDF::writeJSONObject(
+writeJSONObject(
     int version, Pipeline* p, bool& first, std::string const& key, QPDFObjectHandle& obj)
 {
     if (first) {
@@ -947,15 +961,17 @@ QPDF::writeJSON(
     JSON::writeDictionaryOpen(p, first_qpdf_inner, depth_qpdf);
     bool all_objects = wanted_objects.empty();
     for (auto& obj: getAllObjects()) {
-        std::string key = "obj:" + obj.unparse();
+        auto const og = obj.getObjGen();
+        std::string key = "obj:" + og.unparse(' ') + " R";
         if (all_objects || wanted_objects.count(key)) {
-            if (obj.isStream()) {
+            if (auto* stream = obj.getObjectPtr()->as<QPDF_Stream>()) {
                 writeJSONStream(
                     version,
                     p,
                     first_qpdf_inner,
                     key,
-                    obj,
+                    *stream,
+                    og.getObj(),
                     decode_level,
                     json_stream_data,
                     file_prefix);

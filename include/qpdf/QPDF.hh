@@ -1411,19 +1411,6 @@ class QPDF
     // JSON import
     void importJSON(std::shared_ptr<InputSource>, bool must_be_complete);
 
-    // JSON write
-    void writeJSONStream(
-        int version,
-        Pipeline* p,
-        bool& first,
-        std::string const& key,
-        QPDFObjectHandle&,
-        qpdf_stream_decode_level_e,
-        qpdf_json_stream_data_e,
-        std::string const& file_prefix);
-    void writeJSONObject(
-        int version, Pipeline* p, bool& first, std::string const& key, QPDFObjectHandle&);
-
     // Type conversion helper methods
     template <typename T>
     static qpdf_offset_t
