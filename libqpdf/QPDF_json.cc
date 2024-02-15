@@ -849,48 +849,6 @@ writeJSONStreamFile(
 }
 
 void
-writeJSONStream(
-    int version,
-    Pipeline* p,
-    bool& first,
-    std::string const& key,
-    QPDF_Stream& stream,
-    int id,
-    qpdf_stream_decode_level_e decode_level,
-    qpdf_json_stream_data_e json_stream_data,
-    std::string const& file_prefix)
-{
-    if (first) {
-        *p << "\n      \"" << key << "\": {\n        \"stream\": ";
-        first = false;
-    } else {
-        *p << ",\n      \"" << key << "\": {\n        \"stream\": ";
-    }
-    JSON::Writer jw{p, 4};
-    if (json_stream_data == qpdf_sj_file) {
-        writeJSONStreamFile(version, jw, stream, id, decode_level, file_prefix);
-    } else {
-        stream.writeStreamJSON(version, jw, json_stream_data, decode_level, nullptr, "");
-    }
-    *p << "\n      }";
-}
-
-void
-writeJSONObject(
-    int version, Pipeline* p, bool& first, std::string const& key, QPDFObjectHandle& obj)
-{
-    if (first) {
-        *p << "\n      \"" << key << "\": {\n        \"value\": ";
-        first = false;
-    } else {
-        *p << ",\n      \"" << key << "\": {\n        \"value\": ";
-    }
-    auto w = JSON::Writer(p, 4);
-    obj.writeJSON(version, w, true);
-    *p << "\n      }";
-}
-
-void
 QPDF::writeJSON(
     int version,
     Pipeline* p,
@@ -914,82 +872,75 @@ QPDF::writeJSON(
     std::string const& file_prefix,
     std::set<std::string> wanted_objects)
 {
-    int const depth_outer = 1;
-    int const depth_top = 1;
-    int const depth_qpdf = 2;
-    int const depth_qpdf_inner = 3;
-
     if (version != 2) {
         throw std::runtime_error("QPDF::writeJSON: only version 2 is supported");
     }
-    bool first = true;
+    JSON::Writer jw{p, 4};
     if (complete) {
-        JSON::writeDictionaryOpen(p, first, depth_outer);
-    } else {
-        first = first_key;
+        jw << "{";
+    } else if (!first_key) {
+        jw << ",";
     }
-    JSON::writeDictionaryKey(p, first, "qpdf", depth_top);
-    bool first_qpdf = true;
-    JSON::writeArrayOpen(p, first_qpdf, depth_top);
-    JSON::writeNext(p, first_qpdf, depth_qpdf);
-    bool first_qpdf_inner = true;
-    JSON::writeDictionaryOpen(p, first_qpdf_inner, depth_qpdf);
-    JSON::writeDictionaryItem(
-        p, first_qpdf_inner, "jsonversion", JSON::makeInt(version), depth_qpdf_inner);
-    JSON::writeDictionaryItem(
-        p, first_qpdf_inner, "pdfversion", JSON::makeString(getPDFVersion()), depth_qpdf_inner);
-    JSON::writeDictionaryItem(
-        p,
-        first_qpdf_inner,
-        "pushedinheritedpageresources",
-        JSON::makeBool(everPushedInheritedAttributesToPages()),
-        depth_qpdf_inner);
-    JSON::writeDictionaryItem(
-        p,
-        first_qpdf_inner,
-        "calledgetallpages",
-        JSON::makeBool(everCalledGetAllPages()),
-        depth_qpdf_inner);
-    JSON::writeDictionaryItem(
-        p,
-        first_qpdf_inner,
-        "maxobjectid",
-        JSON::makeInt(QIntC::to_longlong(getObjectCount())),
-        depth_qpdf_inner);
-    JSON::writeDictionaryClose(p, first_qpdf_inner, depth_qpdf);
-    JSON::writeNext(p, first_qpdf, depth_qpdf);
-    JSON::writeDictionaryOpen(p, first_qpdf_inner, depth_qpdf);
+    first_key = false;
+
+    /* clang-format off */
+    jw << "\n"
+          "  \"qpdf\": [\n"
+          "    {\n"
+          "      \"jsonversion\": " << std::to_string(version) << ",\n"
+          "      \"pdfversion\": \"" << getPDFVersion() << "\",\n"
+          "      \"pushedinheritedpageresources\": " <<  (everPushedInheritedAttributesToPages() ? "true" : "false") << ",\n"
+          "      \"calledgetallpages\": " <<  (everCalledGetAllPages() ? "true" : "false") << ",\n"
+          "      \"maxobjectid\": " <<  std::to_string(getObjectCount()) << "\n"
+          "    },\n"
+          "    {";
+    /* clang-format on */
+
     bool all_objects = wanted_objects.empty();
+    bool first = true;
     for (auto& obj: getAllObjects()) {
         auto const og = obj.getObjGen();
         std::string key = "obj:" + og.unparse(' ') + " R";
         if (all_objects || wanted_objects.count(key)) {
-            if (auto* stream = obj.getObjectPtr()->as<QPDF_Stream>()) {
-                writeJSONStream(
-                    version,
-                    p,
-                    first_qpdf_inner,
-                    key,
-                    *stream,
-                    og.getObj(),
-                    decode_level,
-                    json_stream_data,
-                    file_prefix);
+            if (first) {
+                jw << "\n      \"" << key;
+                first = false;
             } else {
-                writeJSONObject(version, p, first_qpdf_inner, key, obj);
+                jw << "\n      },\n      \"" << key;
+            }
+            if (auto* stream = obj.getObjectPtr()->as<QPDF_Stream>()) {
+                jw << "\": {\n        \"stream\": ";
+                if (json_stream_data == qpdf_sj_file) {
+                    writeJSONStreamFile(
+                        version, jw, *stream, og.getObj(), decode_level, file_prefix);
+                } else {
+                    stream->writeStreamJSON(
+                        version, jw, json_stream_data, decode_level, nullptr, "");
+                }
+            } else {
+                jw << "\": {\n        \"value\": ";
+                obj.writeJSON(version, jw, true);
             }
         }
     }
     if (all_objects || wanted_objects.count("trailer")) {
-        auto trailer = getTrailer();
-        writeJSONObject(version, p, first_qpdf_inner, "trailer", trailer);
+        if (!first) {
+            jw << "\n      },";
+        }
+        jw << "\n      \"trailer\": {\n        \"value\": ";
+        getTrailer().writeJSON(version, jw, true);
+        first = false;
     }
-    JSON::writeDictionaryClose(p, first_qpdf_inner, depth_qpdf);
-    JSON::writeArrayClose(p, first_qpdf, depth_top);
+    if (!first) {
+        jw << "\n      }";
+    }
+    /* clang-format off */
+    jw << "\n"
+          "    }\n"
+          "  ]";
+    /* clang-format on */
     if (complete) {
-        JSON::writeDictionaryClose(p, first, 0);
-        *p << "\n";
+        jw << "\n}\n";
         p->finish();
     }
-    first_key = false;
 }
