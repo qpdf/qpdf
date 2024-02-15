@@ -3,6 +3,8 @@
 
 #include <qpdf/JSON.hh>
 #include <qpdf/Pipeline.hh>
+#include <qpdf/Pl_Base64.hh>
+#include <qpdf/Pl_Concatenate.hh>
 
 #include <string_view>
 
@@ -24,6 +26,16 @@ class JSON::Writer
     write(char const* data, size_t len)
     {
         p->write(reinterpret_cast<unsigned char const*>(data), len);
+        return *this;
+    }
+
+    Writer&
+    writeBase64(std::string_view sv)
+    {
+        Pl_Concatenate cat{"writer concat", p};
+        Pl_Base64 base{"writer base64", &cat, Pl_Base64::a_encode};
+        base.write(reinterpret_cast<unsigned char const*>(sv.data()), sv.size());
+        base.finish();
         return *this;
     }
 

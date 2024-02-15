@@ -178,9 +178,9 @@ QPDF_Stream::unparse()
 }
 
 void
-QPDF_Stream::writeJSON(int json_version, JSON::Writer& p)
+QPDF_Stream::writeJSON(int json_version, JSON::Writer& jw)
 {
-    stream_dict.writeJSON(json_version, p);
+    stream_dict.writeJSON(json_version, jw);
 }
 
 JSON
@@ -233,58 +233,65 @@ QPDF_Stream::writeStreamJSON(
         break;
     }
 
-    auto dict = this->stream_dict;
-    JSON result = JSON::makeDictionary();
-    if (json_data != qpdf_sj_none) {
-        Pl_Discard discard;
-        Pl_Buffer buf_pl{"stream data"};
-        // buf_pl contains valid data and is ready for retrieval of the data.
-        bool buf_pl_ready = false;
-        bool filtered = false;
-        bool filter = (decode_level != qpdf_dl_none);
-        for (int attempt = 1; attempt <= 2; ++attempt) {
-            Pipeline* data_pipeline = &discard;
-            if (json_data == qpdf_sj_file) {
-                // We need to capture the data to write
-                data_pipeline = &buf_pl;
-            }
-            bool succeeded =
-                pipeStreamData(data_pipeline, &filtered, 0, decode_level, false, (attempt == 1));
-            if (!succeeded || (filter && !filtered)) {
-                // Try again
-                filter = false;
-                decode_level = qpdf_dl_none;
-                buf_pl.getString(); // reset buf_pl
-            } else {
-                buf_pl_ready = true;
-                break;
-            }
-        }
-        if (!buf_pl_ready) {
-            throw std::logic_error("QPDF_Stream: failed to get stream data");
-        }
-        // We can use unsafeShallowCopy because we are only touching top-level keys.
-        dict = this->stream_dict.unsafeShallowCopy();
-        dict.removeKey("/Length");
-        if (filter && filtered) {
-            dict.removeKey("/Filter");
-            dict.removeKey("/DecodeParms");
-        }
-        if (json_data == qpdf_sj_file) {
-            result.addDictionaryMember("datafile", JSON::makeString(data_filename));
+    jw.writeStart('{');
 
-            p->writeString(buf_pl.getString());
-        } else if (json_data == qpdf_sj_inline) {
-            if (!no_data_key) {
-                result.addDictionaryMember(
-                    "data", JSON::makeBlob(StreamBlobProvider(this, decode_level)));
-            }
+    if (json_data == qpdf_sj_none) {
+        jw.writeNext();
+        jw << R"("dict": )";
+        stream_dict.writeJSON(json_version, jw);
+        jw.writeEnd('}');
+        return decode_level;
+    }
+
+    Pl_Discard discard;
+    Pl_Buffer buf_pl{"stream data"};
+    Pipeline* data_pipeline = &buf_pl;
+    if (no_data_key && json_data == qpdf_sj_inline) {
+        data_pipeline = &discard;
+    }
+    // pipeStreamData produced valid data.
+    bool buf_pl_ready = false;
+    bool filtered = false;
+    bool filter = (decode_level != qpdf_dl_none);
+    for (int attempt = 1; attempt <= 2; ++attempt) {
+        bool succeeded =
+            pipeStreamData(data_pipeline, &filtered, 0, decode_level, false, (attempt == 1));
+        if (!succeeded || (filter && !filtered)) {
+            // Try again
+            filter = false;
+            decode_level = qpdf_dl_none;
+            buf_pl.getString(); // reset buf_pl
         } else {
-            throw std::logic_error("QPDF_Stream: unexpected value of json_data");
+            buf_pl_ready = true;
+            break;
         }
     }
-    result.addDictionaryMember("dict", dict.getJSON(json_version));
-    jw << std::move(result);
+    if (!buf_pl_ready) {
+        throw std::logic_error("QPDF_Stream: failed to get stream data");
+    }
+    // We can use unsafeShallowCopy because we are only touching top-level keys.
+    auto dict = stream_dict.unsafeShallowCopy();
+    dict.removeKey("/Length");
+    if (filter && filtered) {
+        dict.removeKey("/Filter");
+        dict.removeKey("/DecodeParms");
+    }
+    if (json_data == qpdf_sj_file) {
+        jw.writeNext() << R"("datafile": ")" << JSON::Writer::encode_string(data_filename) << "\"";
+        p->writeString(buf_pl.getString());
+    } else if (json_data == qpdf_sj_inline) {
+        if (!no_data_key) {
+            jw.writeNext() << R"("data": ")";
+            jw.writeBase64(buf_pl.getString()) << "\"";
+        }
+    } else {
+        throw std::logic_error("QPDF_Stream::writeStreamJSON : unexpected value of json_data");
+    }
+
+    jw.writeNext() << R"("dict": )";
+    dict.writeJSON(json_version, jw);
+    jw.writeEnd('}');
+
     return decode_level;
 }
 
