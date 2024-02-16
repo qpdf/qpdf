@@ -1638,6 +1638,13 @@ QPDFObjectHandle::writeJSON(int json_version, JSON::Writer& p, bool dereference_
     }
 }
 
+void
+QPDFObjectHandle::writeJSON(int json_version, Pipeline* p, bool dereference_indirect, size_t depth)
+{
+    JSON::Writer jw{p, depth};
+    writeJSON(json_version, jw, dereference_indirect);
+}
+
 JSON
 QPDFObjectHandle::getStreamJSON(
     int json_version,

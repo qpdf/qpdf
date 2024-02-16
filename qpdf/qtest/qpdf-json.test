@@ -350,7 +350,7 @@ $td->runtest("check C API write to JSON stream",
 # (using #xx) would generate invalid JSON, even though qpdf's own JSON
 # parser would accept it. Also, the JSON spec allows real numbers in
 # scientific notation, but the PDF spec does not.
-$n_tests += 6;
+$n_tests += 7;
 $td->runtest("handle binary names",
              {$td->COMMAND =>
                   "qpdf --json-output weird-tokens.pdf a.json"},
@@ -379,6 +379,9 @@ $td->runtest("check json",
              {$td->FILE => "a.json"},
              {$td->FILE => "weird-tokens-v1.json"},
              $td->NORMALIZE_NEWLINES);
-
+$td->runtest("write JSON to pipeline",
+             {$td->COMMAND => "test_driver 98 minimal.pdf ''"},
+             {$td->STRING => "test 98 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 cleanup();
 $td->report($n_tests);
