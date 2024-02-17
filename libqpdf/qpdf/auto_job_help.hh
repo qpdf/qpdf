@@ -437,8 +437,17 @@ where
   - r: Lower-case Roman numerals
   - omitted: the page number does not appear, though the prefix,
     if specified will still appear
+- "start" must be a number >= 1
 - "prefix"` may be any string and is prepended to each page
   label
+
+The first label spec must have a first-page value of 1,
+indicating the first page of the document. If multiple page
+label specs are specified, they must be given in increasing
+order.
+
+If multiple page label specs are specified, they must be given
+in increasing order.
 
 A given page label spec causes pages to be numbered according to
 that scheme starting with first-page and continuing until the

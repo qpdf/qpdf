@@ -1779,7 +1779,8 @@ Related Options
 
       Exclude page labels (explicit page numbers) from the output file.
 
-   Exclude page labels (explicit page numbers) from the output file.
+   Exclude page labels (explicit page numbers) from the output file by
+   omitting the ``/PageLabels`` dictionary in the document catalog.
    See also :qpdf:ref:`--set-page-labels`.
 
 .. qpdf:option:: --set-page-labels label-spec ... --
@@ -1805,8 +1806,17 @@ Related Options
         - r: Lower-case Roman numerals
         - omitted: the page number does not appear, though the prefix,
           if specified will still appear
+      - "start" must be a number >= 1
       - "prefix"` may be any string and is prepended to each page
         label
+
+      The first label spec must have a first-page value of 1,
+      indicating the first page of the document. If multiple page
+      label specs are specified, they must be given in increasing
+      order.
+
+      If multiple page label specs are specified, they must be given
+      in increasing order.
 
       A given page label spec causes pages to be numbered according to
       that scheme starting with first-page and continuing until the
@@ -1819,8 +1829,9 @@ Related Options
       1 and continuing sequentially until the end of the document. For
       additional examples, please consult the manual.
 
-   Set page labels (explicit page numbers) for the entire file. A PDF
-   file's pages can be explicitly numbered using page labels. Page
+   Set page labels (explicit page numbers) for the entire file. This
+   generates a ``/PageLabels`` dictionary in the document catalog. A
+   PDF file's pages can be explicitly numbered using page labels. Page
    labels in a PDF file have an optional type (Arabic numerals,
    upper/lower-case alphabetic characters, upper/lower-case Roman
    numerals), an optional prefix, and an optional starting value,
@@ -1850,8 +1861,14 @@ Related Options
      - omitted: the page number does not appear, though the prefix, if
        specified will still appear
 
+   - :samp:`{start}` must be a number ≥ 1
+
    - :samp:`{prefix}` may be any string and is prepended to each page
      label
+
+   The first label spec must have a :samp:`{first-page}` value of
+   ``1``, indicating the first page of the document. If multiple page
+   label specs are specified, they must be given in increasing order.
 
    A given page label spec causes pages to be numbered according to
    that scheme starting with :samp:`{first-page}` and continuing until
@@ -1859,7 +1876,7 @@ Related Options
    numbering starting at a certain page, you can use
    :samp:`{first-page}:` as the spec.
 
-   Here are some example page labeling schemes. First these examples,
+   Here are some example page labeling schemes. For these examples,
    assume a 50-page document.
 
    - ``1:a 5:D``
