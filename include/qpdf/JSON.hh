@@ -290,8 +290,11 @@ class JSON
     QPDF_DLL
     qpdf_offset_t getEnd() const;
 
+    // The following class does not form part of the public API and is for internal use only.
+
+    class Writer;
+
   private:
-    static std::string encode_string(std::string const& utf8);
     static void writeClose(Pipeline* p, bool first, size_t depth, char const* delimeter);
 
     enum value_type_e {

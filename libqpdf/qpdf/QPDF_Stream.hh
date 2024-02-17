@@ -25,7 +25,7 @@ class QPDF_Stream: public QPDFValue
         size_t length);
     std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
     std::string unparse() override;
-    JSON getJSON(int json_version) override;
+    void writeJSON(int json_version, JSON::Writer& p) override;
     void setDescription(
         QPDF*, std::shared_ptr<QPDFValue::Description>& description, qpdf_offset_t offset) override;
     void disconnect() override;
@@ -64,6 +64,14 @@ class QPDF_Stream: public QPDFValue
         qpdf_stream_decode_level_e decode_level,
         Pipeline* p,
         std::string const& data_filename);
+    qpdf_stream_decode_level_e writeStreamJSON(
+        int json_version,
+        JSON::Writer& jw,
+        qpdf_json_stream_data_e json_data,
+        qpdf_stream_decode_level_e decode_level,
+        Pipeline* p,
+        std::string const& data_filename,
+        bool no_data_key = false);
 
     void replaceDict(QPDFObjectHandle const& new_dict);
 

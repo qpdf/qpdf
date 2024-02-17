@@ -33,5 +33,22 @@ $td->runtest("copy sparse array",
              {$td->COMMAND => "test_driver 97 many-nulls.pdf"},
              {$td->STRING => "test 97 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+$td->runtest("copy file with many nulls",
+             {$td->COMMAND =>
+                    "qpdf minimal-nulls.pdf --qdf --static-id  --no-original-object-ids a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "minimal-nulls.pdf"});
+$td->runtest("file with many nulls to JSON v1",
+             {$td->COMMAND => "qpdf minimal-nulls.pdf --json=1 -"},
+             {$td->FILE => "minimal-nulls-1.json", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("file with many nulls to JSON v2",
+             {$td->COMMAND => "qpdf minimal-nulls.pdf --json=2 -"},
+             {$td->FILE => "minimal-nulls-2.json", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
 cleanup();
-$td->report(4);
+$td->report(8);

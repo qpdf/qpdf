@@ -1,5 +1,6 @@
 #include <qpdf/QPDF_Dictionary.hh>
 
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDF_Name.hh>
 #include <qpdf/QPDF_Null.hh>
@@ -67,28 +68,30 @@ QPDF_Dictionary::unparse()
     return result;
 }
 
-JSON
-QPDF_Dictionary::getJSON(int json_version)
+void
+QPDF_Dictionary::writeJSON(int json_version, JSON::Writer& p)
 {
-    JSON j = JSON::makeDictionary();
+    p.writeStart('{');
     for (auto& iter: this->items) {
         if (!iter.second.isNull()) {
+            p.writeNext();
             if (json_version == 1) {
-                j.addDictionaryMember(
-                    QPDF_Name::normalizeName(iter.first), iter.second.getJSON(json_version));
+                p << "\"" << JSON::Writer::encode_string(QPDF_Name::normalizeName(iter.first))
+                  << "\": ";
+            } else if (auto res = QPDF_Name::analyzeJSONEncoding(iter.first); res.first) {
+                if (res.second) {
+                    p << "\"" << iter.first << "\": ";
+                } else {
+                    p << "\"" << JSON::Writer::encode_string(iter.first) << "\": ";
+                }
             } else {
-                bool has_8bit_chars;
-                bool is_valid_utf8;
-                bool is_utf16;
-                QUtil::analyze_encoding(iter.first, has_8bit_chars, is_valid_utf8, is_utf16);
-                std::string key = !has_8bit_chars || is_valid_utf8
-                    ? iter.first
-                    : "n:" + QPDF_Name::normalizeName(iter.first);
-                j.addDictionaryMember(key, iter.second.getJSON(json_version));
+                p << "\"n:" << JSON::Writer::encode_string(QPDF_Name::normalizeName(iter.first))
+                  << "\": ";
             }
+            iter.second.writeJSON(json_version, p);
         }
     }
-    return j;
+    p.writeEnd('}');
 }
 
 bool

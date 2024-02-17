@@ -1,5 +1,6 @@
 #include <qpdf/QPDF_Null.hh>
 
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/QPDFObject_private.hh>
 
 QPDF_Null::QPDF_Null() :
@@ -43,9 +44,8 @@ QPDF_Null::unparse()
     return "null";
 }
 
-JSON
-QPDF_Null::getJSON(int json_version)
+void
+QPDF_Null::writeJSON(int json_version, JSON::Writer& p)
 {
-    // If this is updated, QPDF_Array::getJSON must also be updated.
-    return JSON::makeNull();
+    p << "null";
 }

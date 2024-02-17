@@ -12,7 +12,7 @@ class QPDF_Real: public QPDFValue
     create(double value, int decimal_places, bool trim_trailing_zeroes);
     std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
     std::string unparse() override;
-    JSON getJSON(int json_version) override;
+    void writeJSON(int json_version, JSON::Writer& p) override;
     std::string
     getStringValue() const override
     {

@@ -1,5 +1,6 @@
 #include <qpdf/QPDF_Integer.hh>
 
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/QUtil.hh>
 
 QPDF_Integer::QPDF_Integer(long long val) :
@@ -26,10 +27,10 @@ QPDF_Integer::unparse()
     return std::to_string(this->val);
 }
 
-JSON
-QPDF_Integer::getJSON(int json_version)
+void
+QPDF_Integer::writeJSON(int json_version, JSON::Writer& p)
 {
-    return JSON::makeInt(this->val);
+    p << std::to_string(this->val);
 }
 
 long long

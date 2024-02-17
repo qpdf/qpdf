@@ -1,5 +1,6 @@
 #include <qpdf/QPDF_Array.hh>
 
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QTC.hh>
@@ -148,36 +149,41 @@ QPDF_Array::unparse()
     return result;
 }
 
-JSON
-QPDF_Array::getJSON(int json_version)
+void
+QPDF_Array::writeJSON(int json_version, JSON::Writer& p)
 {
-    static const JSON j_null = JSON::makeNull();
-    JSON j_array = JSON::makeArray();
+    p.writeStart('[');
     if (sp) {
         int next = 0;
         for (auto& item: sp->elements) {
             int key = item.first;
             for (int j = next; j < key; ++j) {
-                j_array.addArrayElement(j_null);
+                p.writeNext() << "null";
             }
+            p.writeNext();
             auto og = item.second->getObjGen();
-            j_array.addArrayElement(
-                og.isIndirect() ? JSON::makeString(og.unparse(' ') + " R")
-                                : item.second->getJSON(json_version));
+            if (og.isIndirect()) {
+                p << "\"" << og.unparse(' ') << " R\"";
+            } else {
+                item.second->writeJSON(json_version, p);
+            }
             next = ++key;
         }
         for (int j = next; j < sp->size; ++j) {
-            j_array.addArrayElement(j_null);
+            p.writeNext() << "null";
         }
     } else {
         for (auto const& item: elements) {
+            p.writeNext();
             auto og = item->getObjGen();
-            j_array.addArrayElement(
-                og.isIndirect() ? JSON::makeString(og.unparse(' ') + " R")
-                                : item->getJSON(json_version));
+            if (og.isIndirect()) {
+                p << "\"" << og.unparse(' ') << " R\"";
+            } else {
+                item->writeJSON(json_version, p);
+            }
         }
     }
-    return j_array;
+    p.writeEnd(']');
 }
 
 QPDFObjectHandle

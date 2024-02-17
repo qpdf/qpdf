@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "parameters": {
+    "decodelevel": "generalized"
+  },
+  "pages": [
+    {
+      "contents": [
+        "4 0 R"
+      ],
+      "images": [],
+      "label": null,
+      "object": "3 0 R",
+      "outlines": [],
+      "pageposfrom1": 1
+    }
+  ],
+  "pagelabels": [],
+  "acroform": {
+    "fields": [],
+    "hasacroform": false,
+    "needappearances": false
+  },
+  "attachments": {},
+  "encrypt": {
+    "capabilities": {
+      "accessibility": true,
+      "extract": true,
+      "moddifyannotations": true,
+      "modify": true,
+      "modifyassembly": true,
+      "modifyforms": true,
+      "modifyother": true,
+      "printhigh": true,
+      "printlow": true
+    },
+    "encrypted": false,
+    "ownerpasswordmatched": false,
+    "parameters": {
+      "P": 0,
+      "R": 0,
+      "V": 0,
+      "bits": 0,
+      "filemethod": "none",
+      "key": null,
+      "method": "none",
+      "streammethod": "none",
+      "stringmethod": "none"
+    },
+    "recovereduserpassword": null,
+    "userpasswordmatched": false
+  },
+  "outlines": [],
+  "objects": {
+    "1 0 R": {
+      "/Escape\\Key": 42,
+      "/Extra": [
+        "Names with binary data",
+        "/ABCDEF+#ba#da#cc#e5",
+        "/OVERLONG+#c0#81",
+        "/OVERLONG+#c1#ff",
+        "/Ok+#c2#80",
+        "/OVERLONG+#e0#81#82",
+        "/OVERLONG+#e0#9f#ff",
+        "/Ok+#e0#a0#80",
+        "/OVERLONG+#f0#81#82#83",
+        "/OVERLONG+#f0#8f#ff#ff",
+        "/Ok+#f0#90#80#80",
+        "/range+#01",
+        "/low+#18",
+        "/ABCEDEF+#cf#80",
+        "/one+#a0two",
+        "/text#2fplain",
+        "Names requiring escaping in JSON",
+        "/Back\\shlash",
+        "/Low\"",
+        "/Low#1f",
+        "/ExceptSpace#20",
+        "/Except!",
+        "Very small/large reals",
+        0.00001,
+        1000000000000
+      ],
+      "/Nested": {
+        "/1": {
+          "/2": {
+            "/3": {
+              "/4": {
+                "/5": {
+                  "/6": {
+                    "/7": {
+                      "/8": {
+                        "/9": {
+                          "/10": {
+                            "/1": {
+                              "/2": {
+                                "/3": {
+                                  "/4": {
+                                    "/5": {
+                                      "/6": {
+                                        "/7": {
+                                          "/8": {
+                                            "/9": {
+                                              "/10": {
+                                                "/1": {
+                                                  "/2": {
+                                                    "/3": {
+                                                      "/4": {
+                                                        "/5": {
+                                                          "/6": {
+                                                            "/7": {
+                                                              "/8": {
+                                                                "/9": {
+                                                                  "/10": {
+                                                                    "/1": {
+                                                                      "/2": {
+                                                                        "/3": {
+                                                                          "/4": {
+                                                                            "/5": {
+                                                                              "/6": {
+                                                                                "/7": {
+                                                                                  "/8": {
+                                                                                    "/9": {
+                                                                                      "/10": {
+                                                                                        "/1": {
+                                                                                          "/2": {
+                                                                                            "/3": {
+                                                                                              "/4": {
+                                                                                                "/5": {
+                                                                                                  "/6": {
+                                                                                                    "/7": {
+                                                                                                      "/8": {
+                                                                                                        "/9": {
+                                                                                                          "/10": {
+                                                                                                            "/1": {
+                                                                                                              "/2": {
+                                                                                                                "/3": {
+                                                                                                                  "/4": {
+                                                                                                                    "/5": {
+                                                                                                                      "/6": {
+                                                                                                                        "/7": {
+                                                                                                                          "/8": {
+                                                                                                                            "/9": {
+                                                                                                                              "/10": 42
+                                                                                                                            }
+                                                                                                                          }
+                                                                                                                        }
+                                                                                                                      }
+                                                                                                                    }
+                                                                                                                  }
+                                                                                                                }
+                                                                                                              }
+                                                                                                            }
+                                                                                                          }
+                                                                                                        }
+                                                                                                      }
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/Pages": "2 0 R",
+      "/Type": "/Catalog",
+      "/WeirdKey+#ba#da#cc#e5": 42
+    },
+    "2 0 R": {
+      "/Count": 1,
+      "/Kids": [
+        "3 0 R"
+      ],
+      "/Type": "/Pages"
+    },
+    "3 0 R": {
+      "/Contents": "4 0 R",
+      "/MediaBox": [
+        0,
+        0,
+        612,
+        792
+      ],
+      "/Parent": "2 0 R",
+      "/Resources": {
+        "/Font": {
+          "/F1": "6 0 R"
+        }
+      },
+      "/Type": "/Page"
+    },
+    "4 0 R": {
+      "/Length": "5 0 R"
+    },
+    "5 0 R": 44,
+    "6 0 R": {
+      "/BaseFont": "/Helvetica",
+      "/Encoding": "/WinAnsiEncoding",
+      "/Subtype": "/Type1",
+      "/Type": "/Font"
+    },
+    "trailer": {
+      "/ID": [
+        "B—˝\u0013»÷\t×ı \u000f¡i˘6ø",
+        "1AY&SXŠﬁ#—bd3…'Ł"
+      ],
+      "/Root": "1 0 R",
+      "/Size": 7
+    }
+  },
+  "objectinfo": {
+    "1 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "2 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "3 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "4 0 R": {
+      "stream": {
+        "filter": null,
+        "is": true,
+        "length": 44
+      }
+    },
+    "5 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "6 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    }
+  }
+}

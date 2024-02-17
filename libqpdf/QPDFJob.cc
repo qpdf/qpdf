@@ -955,23 +955,6 @@ QPDFJob::getWantedJSONObjects()
 }
 
 void
-QPDFJob::doJSONObject(Pipeline* p, bool& first, std::string const& key, QPDFObjectHandle& obj)
-{
-    if (m->json_version == 1) {
-        JSON::writeDictionaryItem(p, first, key, obj.getJSON(1, true), 2);
-    } else {
-        auto j = JSON::makeDictionary();
-        if (obj.isStream()) {
-            j.addDictionaryMember("stream", JSON::makeDictionary())
-                .addDictionaryMember("dict", obj.getDict().getJSON(m->json_version, true));
-        } else {
-            j.addDictionaryMember("value", obj.getJSON(m->json_version, true));
-        }
-        JSON::writeDictionaryItem(p, first, key, j, 2);
-    }
-}
-
-void
 QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
 {
     if (m->json_version == 1) {
@@ -982,16 +965,17 @@ QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
         auto wanted_og = getWantedJSONObjects();
         for (auto& obj: pdf.getAllObjects()) {
             std::string key = obj.unparse();
-            if (m->json_version > 1) {
-                key = "obj:" + key;
-            }
+
             if (all_objects || wanted_og.count(obj.getObjGen())) {
-                doJSONObject(p, first_object, key, obj);
+                JSON::writeDictionaryKey(p, first_object, obj.unparse(), 2);
+                obj.writeJSON(1, p, true, 2);
+                first_object = false;
             }
         }
         if (all_objects || m->json_objects.count("trailer")) {
-            auto trailer = pdf.getTrailer();
-            doJSONObject(p, first_object, "trailer", trailer);
+            JSON::writeDictionaryKey(p, first_object, "trailer", 2);
+            pdf.getTrailer().writeJSON(1, p, true, 2);
+            first_object = false;
         }
         JSON::writeDictionaryClose(p, first_object, 1);
     } else {
@@ -3097,9 +3081,10 @@ QPDFJob::writeOutfile(QPDF& pdf)
             try {
                 QUtil::remove_file(backup.c_str());
             } catch (QPDFSystemError& e) {
-                *m->log->getError() << m->message_prefix << ": unable to delete original file ("
-                                    << e.what() << ");" << " original file left in " << backup
-                                    << ", but the input was successfully replaced\n";
+                *m->log->getError()
+                    << m->message_prefix << ": unable to delete original file (" << e.what() << ");"
+                    << " original file left in " << backup
+                    << ", but the input was successfully replaced\n";
             }
         }
     }

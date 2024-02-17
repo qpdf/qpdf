@@ -1,5 +1,6 @@
 #include <qpdf/QPDF_Real.hh>
 
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/QUtil.hh>
 
 QPDF_Real::QPDF_Real(std::string const& val) :
@@ -38,21 +39,17 @@ QPDF_Real::unparse()
     return this->val;
 }
 
-JSON
-QPDF_Real::getJSON(int json_version)
+void
+QPDF_Real::writeJSON(int json_version, JSON::Writer& p)
 {
-    // While PDF allows .x or -.x, JSON does not. Rather than converting from string to double and
-    // back, just handle this as a special case for JSON.
-    std::string result;
     if (this->val.length() == 0) {
         // Can't really happen...
-        result = "0";
+        p << "0";
     } else if (this->val.at(0) == '.') {
-        result = "0" + this->val;
-    } else if ((this->val.length() >= 2) && (this->val.at(0) == '-') && (this->val.at(1) == '.')) {
-        result = "-0." + this->val.substr(2);
+        p << "0" << this->val;
+    } else if (this->val.length() >= 2 && this->val.at(0) == '-' && this->val.at(1) == '.') {
+        p << "-0." << this->val.substr(2);
     } else {
-        result = this->val;
+        p << this->val;
     }
-    return JSON::makeNumber(result);
 }

@@ -1,12 +1,14 @@
 #include <qpdf/QPDF.hh>
 
 #include <qpdf/FileInputSource.hh>
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFValue.hh>
 #include <qpdf/QPDF_Null.hh>
+#include <qpdf/QPDF_Stream.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <algorithm>
@@ -442,7 +444,9 @@ void
 QPDF::JSONReactor::replaceObject(QPDFObjectHandle&& replacement, JSON const& value)
 {
     if (replacement.isIndirect()) {
-        error(replacement.getParsedOffset(), "the value of an object may not be an indirect object reference");
+        error(
+            replacement.getParsedOffset(),
+            "the value of an object may not be an indirect object reference");
         return;
     }
     auto& tos = stack.back();
@@ -828,45 +832,20 @@ QPDF::importJSON(std::shared_ptr<InputSource> is, bool must_be_complete)
 }
 
 void
-QPDF::writeJSONStream(
+writeJSONStreamFile(
     int version,
-    Pipeline* p,
-    bool& first,
-    std::string const& key,
-    QPDFObjectHandle& obj,
+    JSON::Writer& jw,
+    QPDF_Stream& stream,
+    int id,
     qpdf_stream_decode_level_e decode_level,
-    qpdf_json_stream_data_e json_stream_data,
     std::string const& file_prefix)
 {
-    Pipeline* stream_p = nullptr;
-    FILE* f = nullptr;
-    std::shared_ptr<Pl_StdioFile> f_pl;
-    std::string filename;
-    if (json_stream_data == qpdf_sj_file) {
-        filename = file_prefix + "-" + std::to_string(obj.getObjectID());
-        f = QUtil::safe_fopen(filename.c_str(), "wb");
-        f_pl = std::make_shared<Pl_StdioFile>("stream data", f);
-        stream_p = f_pl.get();
-    }
-    auto j = JSON::makeDictionary();
-    j.addDictionaryMember(
-        "stream", obj.getStreamJSON(version, json_stream_data, decode_level, stream_p, filename));
-
-    JSON::writeDictionaryItem(p, first, key, j, 3);
-    if (f) {
-        f_pl->finish();
-        f_pl = nullptr;
-        fclose(f);
-    }
-}
-
-void
-QPDF::writeJSONObject(
-    int version, Pipeline* p, bool& first, std::string const& key, QPDFObjectHandle& obj)
-{
-    auto j = JSON::makeDictionary();
-    j.addDictionaryMember("value", obj.getJSON(version, true));
-    JSON::writeDictionaryItem(p, first, key, j, 3);
+    auto filename = file_prefix + "-" + std::to_string(id);
+    auto* f = QUtil::safe_fopen(filename.c_str(), "wb");
+    Pl_StdioFile f_pl{"stream data", f};
+    stream.writeStreamJSON(version, jw, qpdf_sj_file, decode_level, &f_pl, filename);
+    f_pl.finish();
+    fclose(f);
 }
 
 void
@@ -893,80 +872,75 @@ QPDF::writeJSON(
     std::string const& file_prefix,
     std::set<std::string> wanted_objects)
 {
-    int const depth_outer = 1;
-    int const depth_top = 1;
-    int const depth_qpdf = 2;
-    int const depth_qpdf_inner = 3;
-
     if (version != 2) {
         throw std::runtime_error("QPDF::writeJSON: only version 2 is supported");
     }
-    bool first = true;
+    JSON::Writer jw{p, 4};
     if (complete) {
-        JSON::writeDictionaryOpen(p, first, depth_outer);
-    } else {
-        first = first_key;
+        jw << "{";
+    } else if (!first_key) {
+        jw << ",";
     }
-    JSON::writeDictionaryKey(p, first, "qpdf", depth_top);
-    bool first_qpdf = true;
-    JSON::writeArrayOpen(p, first_qpdf, depth_top);
-    JSON::writeNext(p, first_qpdf, depth_qpdf);
-    bool first_qpdf_inner = true;
-    JSON::writeDictionaryOpen(p, first_qpdf_inner, depth_qpdf);
-    JSON::writeDictionaryItem(
-        p, first_qpdf_inner, "jsonversion", JSON::makeInt(version), depth_qpdf_inner);
-    JSON::writeDictionaryItem(
-        p, first_qpdf_inner, "pdfversion", JSON::makeString(getPDFVersion()), depth_qpdf_inner);
-    JSON::writeDictionaryItem(
-        p,
-        first_qpdf_inner,
-        "pushedinheritedpageresources",
-        JSON::makeBool(everPushedInheritedAttributesToPages()),
-        depth_qpdf_inner);
-    JSON::writeDictionaryItem(
-        p,
-        first_qpdf_inner,
-        "calledgetallpages",
-        JSON::makeBool(everCalledGetAllPages()),
-        depth_qpdf_inner);
-    JSON::writeDictionaryItem(
-        p,
-        first_qpdf_inner,
-        "maxobjectid",
-        JSON::makeInt(QIntC::to_longlong(getObjectCount())),
-        depth_qpdf_inner);
-    JSON::writeDictionaryClose(p, first_qpdf_inner, depth_qpdf);
-    JSON::writeNext(p, first_qpdf, depth_qpdf);
-    JSON::writeDictionaryOpen(p, first_qpdf_inner, depth_qpdf);
+    first_key = false;
+
+    /* clang-format off */
+    jw << "\n"
+          "  \"qpdf\": [\n"
+          "    {\n"
+          "      \"jsonversion\": " << std::to_string(version) << ",\n"
+          "      \"pdfversion\": \"" << getPDFVersion() << "\",\n"
+          "      \"pushedinheritedpageresources\": " <<  (everPushedInheritedAttributesToPages() ? "true" : "false") << ",\n"
+          "      \"calledgetallpages\": " <<  (everCalledGetAllPages() ? "true" : "false") << ",\n"
+          "      \"maxobjectid\": " <<  std::to_string(getObjectCount()) << "\n"
+          "    },\n"
+          "    {";
+    /* clang-format on */
+
     bool all_objects = wanted_objects.empty();
+    bool first = true;
     for (auto& obj: getAllObjects()) {
-        std::string key = "obj:" + obj.unparse();
+        auto const og = obj.getObjGen();
+        std::string key = "obj:" + og.unparse(' ') + " R";
         if (all_objects || wanted_objects.count(key)) {
-            if (obj.isStream()) {
-                writeJSONStream(
-                    version,
-                    p,
-                    first_qpdf_inner,
-                    key,
-                    obj,
-                    decode_level,
-                    json_stream_data,
-                    file_prefix);
+            if (first) {
+                jw << "\n      \"" << key;
+                first = false;
             } else {
-                writeJSONObject(version, p, first_qpdf_inner, key, obj);
+                jw << "\n      },\n      \"" << key;
+            }
+            if (auto* stream = obj.getObjectPtr()->as<QPDF_Stream>()) {
+                jw << "\": {\n        \"stream\": ";
+                if (json_stream_data == qpdf_sj_file) {
+                    writeJSONStreamFile(
+                        version, jw, *stream, og.getObj(), decode_level, file_prefix);
+                } else {
+                    stream->writeStreamJSON(
+                        version, jw, json_stream_data, decode_level, nullptr, "");
+                }
+            } else {
+                jw << "\": {\n        \"value\": ";
+                obj.writeJSON(version, jw, true);
             }
         }
     }
     if (all_objects || wanted_objects.count("trailer")) {
-        auto trailer = getTrailer();
-        writeJSONObject(version, p, first_qpdf_inner, "trailer", trailer);
+        if (!first) {
+            jw << "\n      },";
+        }
+        jw << "\n      \"trailer\": {\n        \"value\": ";
+        getTrailer().writeJSON(version, jw, true);
+        first = false;
     }
-    JSON::writeDictionaryClose(p, first_qpdf_inner, depth_qpdf);
-    JSON::writeArrayClose(p, first_qpdf, depth_top);
+    if (!first) {
+        jw << "\n      }";
+    }
+    /* clang-format off */
+    jw << "\n"
+          "    }\n"
+          "  ]";
+    /* clang-format on */
     if (complete) {
-        JSON::writeDictionaryClose(p, first, 0);
-        *p << "\n";
+        jw << "\n}\n";
         p->finish();
     }
-    first_key = false;
 }

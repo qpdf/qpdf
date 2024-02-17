@@ -1,5 +1,7 @@
 #include <qpdf/JSON.hh>
 
+#include <qpdf/JSON_writer.hh>
+
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_Concatenate.hh>
@@ -119,7 +121,7 @@ JSON::JSON_array::write(Pipeline* p, size_t depth) const
 JSON::JSON_string::JSON_string(std::string const& utf8) :
     JSON_value(vt_string),
     utf8(utf8),
-    encoded(encode_string(utf8))
+    encoded(Writer::encode_string(utf8))
 {
 }
 
@@ -211,7 +213,7 @@ JSON::unparse() const
 }
 
 std::string
-JSON::encode_string(std::string const& str)
+JSON::Writer::encode_string(std::string const& str)
 {
     static auto constexpr hexchars = "0123456789abcdef";
 
@@ -279,7 +281,7 @@ JSON
 JSON::addDictionaryMember(std::string const& key, JSON const& val)
 {
     if (auto* obj = m ? dynamic_cast<JSON_dictionary*>(m->value.get()) : nullptr) {
-        return obj->members[encode_string(key)] = val.m ? val : makeNull();
+        return obj->members[Writer::encode_string(key)] = val.m ? val : makeNull();
     } else {
         throw std::runtime_error("JSON::addDictionaryMember called on non-dictionary");
     }

@@ -33,10 +33,10 @@ class QPDFObject
     {
         return value->unparse();
     }
-    JSON
-    getJSON(int json_version)
+    void
+    writeJSON(int json_version, JSON::Writer& p)
     {
-        return value->getJSON(json_version);
+        return value->writeJSON(json_version, p);
     }
     std::string
     getStringValue() const

@@ -1197,6 +1197,13 @@ class QPDFObjectHandle
     QPDF_DLL
     JSON getJSON(int json_version, bool dereference_indirect = false);
 
+    // Write the object encoded as JSON to a pipeline. This is equivalent to, but more efficient
+    // than, calling getJSON(json_version, dereference_indirect).write(p, depth). See the
+    // documentation for getJSON and JSON::write for further detail.
+    QPDF_DLL
+    void
+    writeJSON(int json_version, Pipeline* p, bool dereference_indirect = false, size_t depth = 0);
+
     // Deprecated version uses v1 for backward compatibility.
     // ABI: remove for qpdf 12
     [[deprecated("Use getJSON(int version)")]] QPDF_DLL JSON
@@ -1352,6 +1359,8 @@ class QPDFObjectHandle
     {
         return obj.get();
     }
+
+    void writeJSON(int json_version, JSON::Writer& p, bool dereference_indirect = false);
 
   private:
     QPDF_Array* asArray();
