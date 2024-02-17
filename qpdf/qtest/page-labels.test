@@ -33,8 +33,8 @@ $td->runtest("no page labels",
 my @errors = (
     ["quack", ".*page label spec must be.*"],
     ["5:r 10:D", ".*the first page .*must start with page 1.*"],
-    ["1:r 10:D 31:A",
-     ".*page 31 is more than the total number of pages \\(30\\).*"],
+    ["1:r 10:D 31:A", ".*page 31 is more than the total number of pages \\(30\\).*"],
+    ["1:r/0", ".*starting page number must be >= 1.*"],
 );
 $n_tests += scalar(@errors);
 

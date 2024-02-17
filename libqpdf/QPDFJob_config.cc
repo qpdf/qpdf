@@ -1139,6 +1139,9 @@ QPDFJob::Config::setPageLabels(const std::vector<std::string>& specs)
         }
 
         auto start_num = match[3].matched ? QUtil::string_to_int(match[3].str().c_str()) : 1;
+        if (start_num < 1) {
+            usage("starting page number must be >= 1");
+        }
         auto prefix = match[4].matched ? match[4].str() : "";
         // We can't check ordering until we know how many pages there are, so that is delayed until
         // near the end.
