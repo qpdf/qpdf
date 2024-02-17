@@ -60,7 +60,7 @@ QPDF_Name::analyzeJSONEncoding(const std::string& name)
     std::basic_string_view<unsigned char> view{
         reinterpret_cast<const unsigned char*>(name.data()), name.size()};
 
-    int tail = 0; // Number of continuation characters expected.
+    int tail = 0;       // Number of continuation characters expected.
     bool tail2 = false; // Potential overlong 3 octet utf-8.
     bool tail3 = false; // potential overlong 4 octet
     bool needs_escaping = false;
@@ -106,6 +106,8 @@ QPDF_Name::analyzeJSONEncoding(const std::string& name)
 void
 QPDF_Name::writeJSON(int json_version, JSON::Writer& p)
 {
+    // For performance reasons this code is duplicated in QPDF_Dictionary::writeJSON. When updating
+    // this method make sure QPDF_Dictionary is also update.
     if (json_version == 1) {
         p << "\"" << JSON::Writer::encode_string(normalizeName(name)) << "\"";
     } else {
