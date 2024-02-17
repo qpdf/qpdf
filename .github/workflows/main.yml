@@ -24,7 +24,7 @@ jobs:
     # build on Linux. Also create the documentation distribution.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'Run pre-build steps'
         run: build-scripts/prebuild ${{ secrets.GITHUB_TOKEN }}
       - name: 'Upload documentation for later build steps'
@@ -45,7 +45,7 @@ jobs:
   Linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'Generate, build, and test'
         run: build-scripts/build-linux
       - name: Upload distribution
@@ -66,7 +66,7 @@ jobs:
       - name: 'Disable git autocrlf'
         shell: bash
         run: git config --global core.autocrlf input
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'Download documentation'
         uses: actions/download-artifact@v3
         with:
@@ -89,14 +89,14 @@ jobs:
     runs-on: macos-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'Mac build and test'
         run: build-scripts/build-mac
   AppImage:
     runs-on: ubuntu-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'Build AppImage'
         run: build-scripts/build-appimage
       - name: 'Upload AppImage'
@@ -113,21 +113,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'pikepdf'
         run: build-scripts/test-pikepdf ${{ matrix.future }}
   Sanitizers:
     runs-on: ubuntu-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'Sanitizer Tests'
         run: build-scripts/test-sanitizers
   CodeCov:
     runs-on: ubuntu-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'Code Coverage'
         run: build-scripts/test-coverage
       - name: Upload coverage reports to Codecov
@@ -149,6 +149,6 @@ jobs:
           - test-unsigned-char
           - test-c++-next
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: ${{ matrix.script }}
         run: build-scripts/${{ matrix.script }}
