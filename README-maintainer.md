@@ -25,19 +25,19 @@
 
 **Remember to check pull requests as well as issues in github.**
 
+Include `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` with cmake if using emacs lsp mode.
+
 Default:
 
 ```
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-   -DMAINTAINER_MODE=ON -DBUILD_STATIC_LIBS=OFF \
+cmake -DMAINTAINER_MODE=ON -DBUILD_STATIC_LIBS=OFF \
    -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 ```
 
 Debugging:
 
 ```
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-   -DMAINTAINER_MODE=ON -DBUILD_SHARED_LIBS=OFF \
+cmake -DMAINTAINER_MODE=ON -DBUILD_SHARED_LIBS=OFF \
    -DCMAKE_BUILD_TYPE=Debug ..
 ```
 
@@ -45,12 +45,25 @@ Profiling:
 
 ```
 CFLAGS=-pg LDFLAGS=-pg \
-   cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-   -DMAINTAINER_MODE=ON -DBUILD_SHARED_LIBS=OFF \
+   cmake -DMAINTAINER_MODE=ON -DBUILD_SHARED_LIBS=OFF \
    -DCMAKE_BUILD_TYPE=Debug ..
 ```
 
 Then run `gprof gmon.out`. Note that gmon.out is not cumulative.
+
+Coverage:
+
+```
+cmake -DMAINTAINER_MODE=ON -DBUILD_SHARED_LIBS=OFF \
+   -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=ON..
+```
+
+Then, from the build directory, run the test suite (`ctest --verbose`) followed by
+```
+gcovr -r .. --html --html-details -o coverage-report.html
+```
+
+Note that, in early 2024, branch coverage information is not very accurate with C++.
 
 Memory checks:
 
@@ -59,8 +72,7 @@ CFLAGS="-fsanitize=address -fsanitize=undefined" \
    CXXFLAGS="-fsanitize=address -fsanitize=undefined" \
    LDFLAGS="-fsanitize=address -fsanitize=undefined" \
    CC=clang CXX=clang++ \
-   cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-   -DMAINTAINER_MODE=ON -DBUILD_SHARED_LIBS=OFF \
+   cmake -DMAINTAINER_MODE=ON -DBUILD_SHARED_LIBS=OFF \
    -DCMAKE_BUILD_TYPE=Debug ..
 ```
 
@@ -691,8 +703,7 @@ export QPDF_BUILD_LIBDIR=$QPDF_SOURCE_TREE/build/libqpdf
 export LD_LIBRARY_PATH=$QPDF_BUILD_LIBDIR
 cd qpdf
 mkdir build
-cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-   -DMAINTAINER_MODE=ON -DBUILD_STATIC_LIBS=OFF \
+cmake -B build -DMAINTAINER_MODE=ON -DBUILD_STATIC_LIBS=OFF \
    -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cat <<'EOF'
 #!/bin/bash

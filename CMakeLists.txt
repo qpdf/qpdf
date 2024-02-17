@@ -72,6 +72,7 @@ CMAKE_DEPENDENT_OPTION(
   BUILD_DOC_DIST "Create distribution of manual" ON
   "BUILD_DOC_PDF;BUILD_DOC_HTML" OFF)
 
+option(ENABLE_COVERAGE "Enable coverage reporting" OFF)
 option(BUILD_SHARED_LIBS "Build qpdf shared libraries" ON)
 option(BUILD_STATIC_LIBS "Build qpdf static libraries" ON)
 option(QTEST_COLOR "Whether qtest's output should be in color" ON)
@@ -295,6 +296,11 @@ endif()
 set(CPACK_RESOURCE_FILE_LICENSE "${qpdf_SOURCE_DIR}/LICENSE.txt")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://qpdf.sourceforge.io/")
 set(CPACK_NSIS_MUI_ICON "${qpdf_SOURCE_DIR}/logo/qpdf.ico")
+
+if(ENABLE_COVERAGE)
+  add_compile_options(--coverage -O0)
+  add_link_options(--coverage)
+endif()
 
 include(CPack)
 

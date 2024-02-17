@@ -1,3 +1,12 @@
+2024-02-17  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add ENABLE_COVERAGE cmake option to assist with generating
+	coverage reports.
+
+	* From M. Holger: add QPDFObjectHandle::writeJSON to directly
+	write a JSON representation to a pipeline. This is much faster
+	than writing the serialized result of getJSON.
+
 2024-02-11  Jay Berkenbilt  <ejb@ql.org>
 
 	* The previous fix to #1056 was incomplete. When setting a check

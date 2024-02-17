@@ -302,6 +302,10 @@ CHECK_SIZES
   that ensures an exact match between classes in ``sizes.cc`` and
   classes in the library's public API. This option requires Python 3.
 
+ENABLE_COVERAGE
+  Compile with ``--coverage``. See README-maintainer.md for
+  information about generating coverage reports.
+
 ENABLE_QTC
   This is off by default, except in maintainer mode. When off,
   ``QTC::TC`` calls are compiled out by having ``QTC::TC`` be an empty

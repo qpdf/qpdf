@@ -60,6 +60,10 @@ Planned changes for future 12.x (subject to change):
     - Add ``file()``, ``range()``, and ``password()`` to
       ``QPDFJob::PagesConfig`` as an alternative to ``pageSpec``.
 
+    - Add ``QPDFObjectHandle::writeJSON`` to write the JSON
+      representation of the object directly to a pipeline. This is
+      much faster than calling ``QPDFObjectHandle::getJSON``.
+
 11.8.0: January 8, 2024
   - Bug fixes:
 
