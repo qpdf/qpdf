@@ -765,6 +765,12 @@ class QPDF
         {
             return qpdf.getCompressibleObjGens();
         }
+
+        static size_t
+        tableSize(QPDF& qpdf)
+        {
+            return qpdf.tableSize();
+        }
     };
 
     // The Resolver class is restricted to QPDFObject so that only it can resolve indirect
@@ -1082,6 +1088,8 @@ class QPDF
         bool will_retry);
 
     // For QPDFWriter:
+
+    size_t tableSize();
 
     // Get lists of all objects in order according to the part of a linearized file that they belong
     // to.

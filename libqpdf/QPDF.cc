@@ -2377,6 +2377,19 @@ QPDF::getXRefTable()
     return m->xref_table;
 }
 
+size_t
+QPDF::tableSize()
+{
+    // If obj_cache is dense, accommodate all object in tables,else accommodate only original
+    // objects.
+    auto max_xref = m->xref_table.size() ? m->xref_table.crbegin()->first.getObj() : 0;
+    auto max_obj = m->obj_cache.size() ? m->obj_cache.crbegin()->first.getObj() : 0;
+    if (max_obj < 1.1 * std::max(toI(m->obj_cache.size()), max_xref)) {
+        return toS(++max_obj);
+    }
+    return toS(++max_xref);
+}
+
 void
 QPDF::getObjectStreamData(std::map<int, int>& omap)
 {

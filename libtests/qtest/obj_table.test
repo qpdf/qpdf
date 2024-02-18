@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("obj_table") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('object table');
+
+$td->runtest("obj_table",
+             {$td->COMMAND => "obj_table"},
+             {$td->FILE => "obj_table.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->report(1);
