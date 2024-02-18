@@ -64,6 +64,15 @@ Planned changes for future 12.x (subject to change):
       representation of the object directly to a pipeline. This is
       much faster than calling ``QPDFObjectHandle::getJSON``.
 
+  - Other Enhancements
+
+    - Code coverage reports are generated in CI and uploaded to
+      CodeCov.
+
+    - There have been non-user-visible improvements to the reliability
+      of the JSON parser. The JSON parser has been added to fuzz
+      testing with OSS-Fuzz.
+
 11.8.0: January 8, 2024
   - Bug fixes:
 
