@@ -2303,7 +2303,7 @@ QPDFWriter::writeHintStream(int hint_id)
     int O = 0;
     bool compressed = (m->compress_streams && !m->qdf_mode);
     QPDF::Writer::generateHintStream(
-        m->pdf, m->xref, m->lengths, m->obj_renumber_no_gen, hint_buffer, S, O, compressed);
+        m->pdf, m->xref, m->lengths, m->obj, hint_buffer, S, O, compressed);
 
     openObject(hint_id);
     setDataKey(hint_id);
@@ -2543,26 +2543,6 @@ QPDFWriter::discardGeneration(std::map<QPDFObjGen, int> const& in, std::map<int,
         }
         out[iter.first.getObj()] = iter.second;
     }
-}
-
-void
-QPDFWriter::discardGeneration(std::map<int, int>& out)
-{
-    // There are deep assumptions in the linearization code in QPDF that there is only one object
-    // with each object number; i.e., you can't have two objects with the same object number and
-    // different generations.  This is a pretty safe assumption because Adobe Reader and Acrobat
-    // can't actually handle this case.  There is not much if any code in QPDF outside linearization
-    // that assumes this, but the linearization code as currently implemented would do weird things
-    // if we found such a case.  In order to avoid breaking ABI changes in QPDF, we will first
-    // assert that this condition holds.  Then we can create new maps for QPDF that throw away
-    // generation numbers.
-
-    out.clear();
-    m->obj.forEach([&out](auto id, auto const& item) -> void {
-        if (item.renumber > 0) {
-            out[id] = item.renumber;
-        }
-    });
 }
 
 void
@@ -2886,8 +2866,6 @@ QPDFWriter::writeLinearized()
         writeString("startxref\n");
         writeString(std::to_string(first_xref_offset));
         writeString("\n%%EOF\n");
-
-        discardGeneration(m->obj_renumber_no_gen);
 
         if (pass == 1) {
             if (m->deterministic_id) {

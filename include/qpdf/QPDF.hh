@@ -41,6 +41,7 @@
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFStreamFilter.hh>
 #include <qpdf/QPDFTokenizer.hh>
+#include <qpdf/QPDFWriter.hh>
 #include <qpdf/QPDFXRefEntry.hh>
 
 class QPDF_Stream;
@@ -744,14 +745,13 @@ class QPDF
             QPDF& qpdf,
             std::map<int, QPDFXRefEntry> const& xref,
             std::map<int, qpdf_offset_t> const& lengths,
-            std::map<int, int> const& obj_renumber,
+            QPDFWriter::ObjTable const& obj,
             std::shared_ptr<Buffer>& hint_stream,
             int& S,
             int& O,
             bool compressed)
         {
-            return qpdf.generateHintStream(
-                xref, lengths, obj_renumber, hint_stream, S, O, compressed);
+            return qpdf.generateHintStream(xref, lengths, obj, hint_stream, S, O, compressed);
         }
 
         static void
@@ -1104,7 +1104,7 @@ class QPDF
     void generateHintStream(
         std::map<int, QPDFXRefEntry> const& xref,
         std::map<int, qpdf_offset_t> const& lengths,
-        std::map<int, int> const& obj_renumber,
+        QPDFWriter::ObjTable const& obj,
         std::shared_ptr<Buffer>& hint_stream,
         int& S,
         int& O,
@@ -1379,19 +1379,19 @@ class QPDF
         int in_object,
         int n,
         std::map<int, qpdf_offset_t> const& lengths,
-        std::map<int, int> const& obj_renumber);
+        QPDFWriter::ObjTable const& obj);
     void calculateHPageOffset(
         std::map<int, QPDFXRefEntry> const& xref,
         std::map<int, qpdf_offset_t> const& lengths,
-        std::map<int, int> const& obj_renumber);
+        QPDFWriter::ObjTable const& obj);
     void calculateHSharedObject(
         std::map<int, QPDFXRefEntry> const& xref,
         std::map<int, qpdf_offset_t> const& lengths,
-        std::map<int, int> const& obj_renumber);
+        QPDFWriter::ObjTable const& obj);
     void calculateHOutline(
         std::map<int, QPDFXRefEntry> const& xref,
         std::map<int, qpdf_offset_t> const& lengths,
-        std::map<int, int> const& obj_renumber);
+        QPDFWriter::ObjTable const& obj);
     void writeHPageOffset(BitWriter&);
     void writeHSharedObject(BitWriter&);
     void writeHGeneric(BitWriter&, HGeneric&);

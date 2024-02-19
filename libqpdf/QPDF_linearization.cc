@@ -9,6 +9,7 @@
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
+#include <qpdf/QPDFWriter_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
@@ -1459,15 +1460,15 @@ QPDF::outputLengthNextN(
     int in_object,
     int n,
     std::map<int, qpdf_offset_t> const& lengths,
-    std::map<int, int> const& obj_renumber)
+    QPDFWriter::ObjTable const& obj)
 {
     // Figure out the length of a series of n consecutive objects in the output file starting with
     // whatever object in_object from the input file mapped to.
 
-    if (obj_renumber.count(in_object) == 0) {
+    int first = obj[in_object].renumber;
+    if (first <= 0) {
         stopOnError("found object that is not renumbered while writing linearization data");
     }
-    int first = (*(obj_renumber.find(in_object))).second;
     int length = 0;
     for (int i = 0; i < n; ++i) {
         if (lengths.count(first + i) == 0) {
@@ -1482,7 +1483,7 @@ void
 QPDF::calculateHPageOffset(
     std::map<int, QPDFXRefEntry> const& xref,
     std::map<int, qpdf_offset_t> const& lengths,
-    std::map<int, int> const& obj_renumber)
+    QPDFWriter::ObjTable const& obj)
 {
     // Page Offset Hint Table
 
@@ -1497,8 +1498,7 @@ QPDF::calculateHPageOffset(
 
     int min_nobjects = cphe.at(0).nobjects;
     int max_nobjects = min_nobjects;
-    int min_length =
-        outputLengthNextN(pages.at(0).getObjectID(), min_nobjects, lengths, obj_renumber);
+    int min_length = outputLengthNextN(pages.at(0).getObjectID(), min_nobjects, lengths, obj);
     int max_length = min_length;
     int max_shared = cphe.at(0).nshared_objects;
 
@@ -1515,7 +1515,7 @@ QPDF::calculateHPageOffset(
         // assignments.
 
         int nobjects = cphe.at(i).nobjects;
-        int length = outputLengthNextN(pages.at(i).getObjectID(), nobjects, lengths, obj_renumber);
+        int length = outputLengthNextN(pages.at(i).getObjectID(), nobjects, lengths, obj);
         int nshared = cphe.at(i).nshared_objects;
 
         min_nobjects = std::min(min_nobjects, nobjects);
@@ -1530,8 +1530,7 @@ QPDF::calculateHPageOffset(
     }
 
     ph.min_nobjects = min_nobjects;
-    int in_page0_id = pages.at(0).getObjectID();
-    int out_page0_id = (*(obj_renumber.find(in_page0_id))).second;
+    int out_page0_id = obj[pages.at(0)].renumber;
     ph.first_page_offset = (*(xref.find(out_page0_id))).second.getOffset();
     ph.nbits_delta_nobjects = nbits(max_nobjects - min_nobjects);
     ph.min_page_length = min_length;
@@ -1569,7 +1568,7 @@ void
 QPDF::calculateHSharedObject(
     std::map<int, QPDFXRefEntry> const& xref,
     std::map<int, qpdf_offset_t> const& lengths,
-    std::map<int, int> const& obj_renumber)
+    QPDFWriter::ObjTable const& obj)
 {
     CHSharedObject& cso = m->c_shared_object_data;
     std::vector<CHSharedObjectEntry>& csoe = cso.entries;
@@ -1577,12 +1576,12 @@ QPDF::calculateHSharedObject(
     std::vector<HSharedObjectEntry>& soe = so.entries;
     soe.clear();
 
-    int min_length = outputLengthNextN(csoe.at(0).object, 1, lengths, obj_renumber);
+    int min_length = outputLengthNextN(csoe.at(0).object, 1, lengths, obj);
     int max_length = min_length;
 
     for (size_t i = 0; i < toS(cso.nshared_total); ++i) {
         // Assign absolute numbers to deltas; adjust later
-        int length = outputLengthNextN(csoe.at(i).object, 1, lengths, obj_renumber);
+        int length = outputLengthNextN(csoe.at(i).object, 1, lengths, obj);
         min_length = std::min(min_length, length);
         max_length = std::max(max_length, length);
         soe.emplace_back();
@@ -1595,7 +1594,7 @@ QPDF::calculateHSharedObject(
     so.nshared_total = cso.nshared_total;
     so.nshared_first_page = cso.nshared_first_page;
     if (so.nshared_total > so.nshared_first_page) {
-        so.first_shared_obj = (*(obj_renumber.find(cso.first_shared_obj))).second;
+        so.first_shared_obj = obj[cso.first_shared_obj].renumber;
         so.first_shared_offset = (*(xref.find(so.first_shared_obj))).second.getOffset();
     }
     so.min_group_length = min_length;
@@ -1614,7 +1613,7 @@ void
 QPDF::calculateHOutline(
     std::map<int, QPDFXRefEntry> const& xref,
     std::map<int, qpdf_offset_t> const& lengths,
-    std::map<int, int> const& obj_renumber)
+    QPDFWriter::ObjTable const& obj)
 {
     HGeneric& cho = m->c_outline_data;
 
@@ -1624,10 +1623,10 @@ QPDF::calculateHOutline(
 
     HGeneric& ho = m->outline_hints;
 
-    ho.first_object = (*(obj_renumber.find(cho.first_object))).second;
+    ho.first_object = obj[cho.first_object].renumber;
     ho.first_object_offset = (*(xref.find(ho.first_object))).second.getOffset();
     ho.nobjects = cho.nobjects;
-    ho.group_length = outputLengthNextN(cho.first_object, ho.nobjects, lengths, obj_renumber);
+    ho.group_length = outputLengthNextN(cho.first_object, ho.nobjects, lengths, obj);
 }
 
 template <class T, class int_type>
@@ -1758,16 +1757,16 @@ void
 QPDF::generateHintStream(
     std::map<int, QPDFXRefEntry> const& xref,
     std::map<int, qpdf_offset_t> const& lengths,
-    std::map<int, int> const& obj_renumber,
+    QPDFWriter::ObjTable const& obj,
     std::shared_ptr<Buffer>& hint_buffer,
     int& S,
     int& O,
     bool compressed)
 {
     // Populate actual hint table values
-    calculateHPageOffset(xref, lengths, obj_renumber);
-    calculateHSharedObject(xref, lengths, obj_renumber);
-    calculateHOutline(xref, lengths, obj_renumber);
+    calculateHPageOffset(xref, lengths, obj);
+    calculateHSharedObject(xref, lengths, obj);
+    calculateHOutline(xref, lengths, obj);
 
     // Write the hint stream itself into a compressed memory buffer. Write through a counter so we
     // can get offsets.
