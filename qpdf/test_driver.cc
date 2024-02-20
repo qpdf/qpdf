@@ -3385,7 +3385,10 @@ test_97(QPDF& pdf, char const* arg2)
 static void
 test_98(QPDF& pdf, char const* arg2)
 {
-    // Test QPDFObjectHandle::writeJSON. This test is built for minimal.pdf.
+    // Test methods no longer used by qpdf as a result of QPDFObjectHandle::writeJSON. This test is
+    // built for minimal.pdf.
+
+    // Test QPDFObjectHandle::getJSON.
     for (int i = 1; i < 7; ++i) {
         auto oh = pdf.getObject(i, 0);
         Pl_Buffer bf1{"write", nullptr};
@@ -3396,6 +3399,19 @@ test_98(QPDF& pdf, char const* arg2)
         bf2.finish();
         assert(bf1.getString() == bf2.getString());
     }
+
+    // Test QPDFObjectHandle::getStreamJSON.
+    pdf.getObject(4, 0).getDict().replaceKey("/Test", "42"_qpdf);
+    assert(
+        pdf.getObject(4, 0)
+            .getStreamJSON(JSON::LATEST, qpdf_sj_inline, qpdf_dl_generalized, nullptr, "")
+            .unparse() ==
+        "{\n"
+        "  \"data\": \"QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo=\",\n"
+        "  \"dict\": {\n"
+        "    \"/Test\": 42\n"
+        "  }\n"
+        "}");
 }
 
 void
