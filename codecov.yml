@@ -9,3 +9,11 @@ coverage:
     patch:
       default:
         informational: true
+
+ignore:
+  - compare-for-test/*
+  - libtests/*
+  - qpdf/test*
+  - qpdf/sizes.cc
+  - qpdf/qpdf-*
+  - qpdf/qpdfjob-*
