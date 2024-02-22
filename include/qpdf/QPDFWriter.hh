@@ -609,7 +609,7 @@ class QPDFWriter
     void pushMD5Pipeline(PipelinePopper&);
     void computeDeterministicIDData();
 
-    void discardGeneration(std::map<QPDFObjGen, int> const& in, std::map<int, int>& out);
+    void discardGeneration(std::map<int, int>& out);
 
     class Members;
 

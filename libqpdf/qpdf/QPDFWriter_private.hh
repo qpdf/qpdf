@@ -11,11 +11,24 @@
 struct QPDFWriter::Object
 {
     int renumber{0};
+    int gen{0};
+    int object_stream{0};
 };
 
 class QPDFWriter::ObjTable: public ::ObjTable<QPDFWriter::Object>
 {
     friend class QPDFWriter;
+
+  public:
+    bool
+    getStreamsEmpty() const noexcept
+    {
+        return streams_empty;
+    }
+
+  private:
+    // For performance, set by QPDFWriter rather than tracked by ObjTable.
+    bool streams_empty{false};
 };
 
 class QPDFWriter::Members
@@ -88,7 +101,6 @@ class QPDFWriter::Members
     std::set<QPDFObjGen> normalized_streams;
     std::map<QPDFObjGen, int> page_object_to_seq;
     std::map<QPDFObjGen, int> contents_to_page_seq;
-    std::map<QPDFObjGen, int> object_to_object_stream;
     std::map<int, std::set<QPDFObjGen>> object_stream_to_objects;
     std::list<Pipeline*> pipeline_stack;
     unsigned long long next_stack_id{0};
