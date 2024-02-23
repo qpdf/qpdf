@@ -2179,12 +2179,14 @@ QPDFWriter::doWriteSetup()
         // Generate reverse mapping from object stream to objects
         m->obj.forEach([this](auto id, auto const& item) -> void {
             if (item.object_stream > 0) {
-                m->object_stream_to_objects[item.object_stream].insert(QPDFObjGen(id, item.gen));
-                m->max_ostream_index = std::max(
-                    m->max_ostream_index,
-                    QIntC::to_int(m->object_stream_to_objects[item.object_stream].size()) - 1);
+                auto& vec = m->object_stream_to_objects[item.object_stream];
+                vec.emplace_back(id, item.gen);
+                if (m->max_ostream_index < vec.size()) {
+                    ++m->max_ostream_index;
+                }
             }
         });
+        --m->max_ostream_index;
 
         if (m->object_stream_to_objects.empty()) {
             m->obj.streams_empty = true;
@@ -2431,7 +2433,7 @@ QPDFWriter::writeXRefStream(
     unsigned int f1_size = std::max(bytesNeeded(max_offset + hint_length), bytesNeeded(max_id));
 
     // field 2 contains object stream indices
-    unsigned int f2_size = bytesNeeded(m->max_ostream_index);
+    unsigned int f2_size = bytesNeeded(QIntC::to_longlong(m->max_ostream_index));
 
     unsigned int esize = 1 + f1_size + f2_size;
 

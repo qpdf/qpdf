@@ -97,11 +97,11 @@ class QPDFWriter::Members
     int cur_stream_length_id{0};
     size_t cur_stream_length{0};
     bool added_newline{false};
-    int max_ostream_index{0};
+    size_t max_ostream_index{0};
     std::set<QPDFObjGen> normalized_streams;
     std::map<QPDFObjGen, int> page_object_to_seq;
     std::map<QPDFObjGen, int> contents_to_page_seq;
-    std::map<int, std::set<QPDFObjGen>> object_stream_to_objects;
+    std::map<int, std::vector<QPDFObjGen>> object_stream_to_objects;
     std::list<Pipeline*> pipeline_stack;
     unsigned long long next_stack_id{0};
     bool deterministic_id{false};
