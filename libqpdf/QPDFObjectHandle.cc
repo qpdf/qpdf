@@ -1,9 +1,9 @@
 #include <qpdf/QPDFObjectHandle.hh>
 
 #include <qpdf/BufferInputSource.hh>
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_QPDFTokenizer.hh>
-#include <qpdf/JSON_writer.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
