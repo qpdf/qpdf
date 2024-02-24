@@ -1191,6 +1191,7 @@ test_31(QPDF& pdf, char const* arg2)
         std::cout << "trailing data: " << e.what() << std::endl;
     }
     assert(QPDFObjectHandle::parse(&pdf, "[5 0 R]").getArrayItem(0).isInteger());
+    assert(!QPDFObjectHandle::parse(&pdf, "[5 0 R]").getArrayItem(0).isDirectNull());
     // Make sure an indirect integer followed by "0 R" is not
     // mistakenly parsed as an indirect object.
     assert(QPDFObjectHandle::parse(&pdf, "[5 0 R 0 R /X]").unparse() == "[ 5 0 R 0 (R) /X ]");
@@ -1202,6 +1203,8 @@ test_31(QPDF& pdf, char const* arg2)
     assert(QPDFObjectHandle::parse(&pdf, ">>").unparse() == "null");
     // TC:QPDFParser eof in parse
     assert(QPDFObjectHandle::parse(&pdf, "[7 0 R]").getArrayItem(0).isNull());
+    assert(!QPDFObjectHandle::parse(&pdf, "[7 0 R]").getArrayItem(0).isDirectNull());
+    assert(QPDFObjectHandle::parse(&pdf, "null").isDirectNull());
     // TC:QPDFParser invalid objgen
     assert(
         QPDFObjectHandle::parse(&pdf, "[0 0 R -1 0 R 1 65535 R 1 100000 R 1 -1 R]").unparse() ==
@@ -1493,7 +1496,7 @@ test_42(QPDF& pdf, char const* arg2)
     // Stream dictionary
     QPDFObjectHandle page = pdf.getAllPages().at(0);
     assert("/QPDFFakeName" == page.getKey("/Contents").getDict().getKey("/Potato").getName());
-    // Rectangles
+    // Rectangle
     QPDFObjectHandle::Rectangle r0 = integer.getArrayAsRectangle();
     assert((r0.llx == 0) && (r0.lly == 0) && (r0.urx == 0) && (r0.ury == 0));
     QPDFObjectHandle rect =
@@ -1502,6 +1505,42 @@ test_42(QPDF& pdf, char const* arg2)
     assert(
         (r1.llx > 1.19) && (r1.llx < 1.21) && (r1.lly > 3.39) && (r1.lly < 3.41) &&
         (r1.urx > 5.59) && (r1.urx < 5.61) && (r1.ury > 7.79) && (r1.ury < 7.81));
+    assert(!"[1 2 3 4 5]"_qpdf.isRectangle());
+    r1 = "[1 2 3 4 5]"_qpdf.getArrayAsRectangle();
+    assert(r0.llx == 0 && r0.lly == 0 && r0.urx == 0 && r0.ury == 0);
+    assert(!"[1 2 3]"_qpdf.isRectangle());
+    r1 = "[1 2 3]"_qpdf.getArrayAsRectangle();
+    assert(r0.llx == 0 && r0.lly == 0 && r0.urx == 0 && r0.ury == 0);
+    assert(!"[1 2 false 4]"_qpdf.isRectangle());
+    r1 = "[1 2 false 4]"_qpdf.getArrayAsRectangle();
+    assert(r0.llx == 0 && r0.lly == 0 && r0.urx == 0 && r0.ury == 0);
+    // Matrix
+    auto matrix =
+        QPDFObjectHandle::newFromMatrix(QPDFObjectHandle::Matrix{1.2, 3.4, 5.6, 7.8, 9.1, 2.3});
+    auto m1 = matrix.getArrayAsMatrix();
+    assert(
+        m1.a > 1.19 && m1.a < 1.21 && m1.b > 3.39 && m1.b < 3.41 && m1.c > 5.59 && m1.c < 5.61 &&
+        m1.d > 7.79 && m1.d < 7.81 && m1.e > 9.09 && m1.e < 9.11 && m1.f > 2.29 && m1.f < 2.31);
+    assert(matrix.isMatrix());
+    matrix = QPDFObjectHandle::newFromMatrix(QPDFMatrix{1.2, 3.4, 5.6, 7.8, 9.1, 2.3});
+    m1 = matrix.getArrayAsMatrix();
+    assert(
+        m1.a > 1.19 && m1.a < 1.21 && m1.b > 3.39 && m1.b < 3.41 && m1.c > 5.59 && m1.c < 5.61 &&
+        m1.d > 7.79 && m1.d < 7.81 && m1.e > 9.09 && m1.e < 9.11 && m1.f > 2.29 && m1.f < 2.31);
+    assert(matrix.isMatrix());
+    assert(!"[1 2 3 4 5]"_qpdf.isMatrix());
+    m1 = "[1 2 3 4 5]"_qpdf.getArrayAsMatrix();
+    assert(m1.a == 0 && m1.b == 0 && m1.c == 0 && m1.d == 0 && m1.e == 0 && m1.f == 0);
+    assert(!"[1 2 3 4 5 6 7]"_qpdf.isMatrix());
+    m1 = "[1 2 3 4 5 6 7]"_qpdf.getArrayAsMatrix();
+    assert(m1.a == 0 && m1.b == 0 && m1.c == 0 && m1.d == 0 && m1.e == 0 && m1.f == 0);
+    assert(!"[1 2 3 false 5 6 7]"_qpdf.isMatrix());
+    m1 = "[1 2 3 false 5 6 7]"_qpdf.getArrayAsMatrix();
+    assert(m1.a == 0 && m1.b == 0 && m1.c == 0 && m1.d == 0 && m1.e == 0 && m1.f == 0);
+    assert(!"42"_qpdf.isMatrix());
+    m1 = "42"_qpdf.getArrayAsMatrix();
+    assert(m1.a == 0 && m1.b == 0 && m1.c == 0 && m1.d == 0 && m1.e == 0 && m1.f == 0);
+    // Uninitialized
     QPDFObjectHandle uninitialized;
     assert(!uninitialized.isInitialized());
     assert(!uninitialized.isInteger());
