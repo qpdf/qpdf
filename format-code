@@ -38,7 +38,7 @@ else
 fi
 
 cd $(dirname $0)
-for i in $(find . -name 'build*' -prune -o '(' \
+for i in $(find . -name '*build*' -prune -o '(' \
 		-name '*.hh' -o -name '*.h' -o -name '*.cc' -o -name '*.c' \
 		')' -print); do
     if $clang_format < $i >| $i.new; then
