@@ -2,7 +2,7 @@
 
 This document describes a project known as the _pages epic_. The goal of the pages epic is to enable
 qpdf to properly preserve all functionality associated with a page as pages are copied from one PDF
-to another (or back to the same PDF). A secondary goal is to add more flexiblity to the ways in
+to another (or back to the same PDF). A secondary goal is to add more flexibility to the ways in
 which documents can be split and combined (flexible assembly).
 
 This is a work in progress. As implementation proceeds, details will become more solid. Comments are
@@ -195,7 +195,7 @@ Other notes:
 
 This section discusses modifications to the command-line syntax to make it easier to add flexibility
 going forward without breaking backward compatibility. In qpdf 11.9.0, we added non-positional
-options to `--pages`, `--overlay`, `--underlay` and modifid configuration to make it easier to add
+options to `--pages`, `--overlay`, `--underlay` and modified configuration to make it easier to add
 new options.
 
 In several cases, we allow specification of transformations or placements. In this context:
@@ -204,7 +204,7 @@ In several cases, we allow specification of transformations or placements. In th
   * An _absolute dimension_ is `{n}` (in points), `{n}in` (inches), `{n}cm` (centimeters),
   * A _relative dimension_ is expressed in terms of the corresponding dimension of one of a page's
     boxes. Which dimension is determined by context.
-    * `{n}{M|C|B|T|A}` is `{n}` times the corresopnding dimension of the media, crop, bleed, trim,
+    * `{n}{M|C|B|T|A}` is `{n}` times the corresponding dimension of the media, crop, bleed, trim,
       or art box. Example: `0.5M` would be half the width or height of the media box.
     * `{n}+{M|C|B|T|A}` is `{n}` plus the corresponding dimension. Example: `-0.5in+T` is half an
       inch (36 points) less than the width or height of the trim box.
@@ -453,7 +453,7 @@ Last checked: 2024-01-18
 gh search issues label:pages --repo qpdf/qpdf --limit 200 --state=open
 ```
 
-* Allow an existing `QPDF` to be an input to a merge or underly/overlay operation when using the
+* Allow an existing `QPDF` to be an input to a merge or underlay/overlay operation when using the
   `QPDFAssembler` C++ API
   * Issues: none
 * Fixes to copying annotations
