@@ -38,7 +38,7 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
-11.9.0: not yet released
+11.9.0: February 24, 2024
   - CLI Enhancements
 
     - Add new command-line arguments :qpdf:ref:`--file` and
@@ -65,9 +65,6 @@ Planned changes for future 12.x (subject to change):
       much faster than calling ``QPDFObjectHandle::getJSON``.
 
   - Other Enhancements
-
-    - Code coverage reports are generated in CI and uploaded to
-      CodeCov.
 
     - There have been non-user-visible improvements to the reliability
       of the JSON parser. The JSON parser has been added to fuzz
