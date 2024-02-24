@@ -3,7 +3,6 @@
 [![QPDF](logo/qpdf.svg)](https://qpdf.sourceforge.io)
 
 [![QPDF Build](https://github.com/qpdf/qpdf/workflows/QPDF%20Build/badge.svg)](https://github.com/qpdf/qpdf/actions)
-[![codecov](https://codecov.io/gh/qpdf/qpdf/graph/badge.svg?token=ODijhBtAoW)](https://codecov.io/gh/qpdf/qpdf)
 [![Documentation Status](https://readthedocs.org/projects/qpdf/badge/?version=latest)](https://qpdf.readthedocs.io/en/latest/?badge=latest)
 
 QPDF is a command-line tool and C++ library that performs content-preserving transformations on PDF files. It supports linearization, encryption, and numerous other features. It can also be used for splitting and merging files, creating PDF files (but you have to supply all the content yourself), and inspecting files for study or analysis. QPDF does not render PDFs or perform text extraction, and it does not contain higher-level interfaces for working with page contents. It is a low-level tool for working with the structure of PDF files and can be a valuable tool for anyone who wants to do programmatic or command-line-based manipulation of PDF files.
