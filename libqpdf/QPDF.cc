@@ -2397,6 +2397,19 @@ QPDF::tableSize()
 }
 
 std::vector<QPDFObjGen>
+QPDF::getCompressibleObjVector()
+{
+    return getCompressibleObjGens<QPDFObjGen>();
+}
+
+std::vector<bool>
+QPDF::getCompressibleObjSet()
+{
+    return getCompressibleObjGens<bool>();
+}
+
+template <typename T>
+std::vector<T>
 QPDF::getCompressibleObjGens()
 {
     // Return a list of objects that are allowed to be in object streams.  Walk through the objects
@@ -2414,7 +2427,14 @@ QPDF::getCompressibleObjGens()
     std::vector<QPDFObjectHandle> queue;
     queue.reserve(512);
     queue.push_back(m->trailer);
-    std::vector<QPDFObjGen> result;
+    std::vector<T> result;
+    if constexpr (std::is_same_v<T, QPDFObjGen>) {
+        result.reserve(m->obj_cache.size());
+    } else if constexpr (std::is_same_v<T, bool>) {
+        result.resize(max_obj + 1U, false);
+    } else {
+        throw std::logic_error("Unsupported type in QPDF::getCompressibleObjGens");
+    }
     while (!queue.empty()) {
         auto obj = queue.back();
         queue.pop_back();
@@ -2446,7 +2466,11 @@ QPDF::getCompressibleObjGens()
             } else if (!(obj.isStream() ||
                          (obj.isDictionaryOfType("/Sig") && obj.hasKey("/ByteRange") &&
                           obj.hasKey("/Contents")))) {
-                result.push_back(og);
+                if constexpr (std::is_same_v<T, QPDFObjGen>) {
+                    result.push_back(og);
+                } else if constexpr (std::is_same_v<T, bool>) {
+                    result[id + 1U] = true;
+                }
             }
         }
         if (obj.isStream()) {

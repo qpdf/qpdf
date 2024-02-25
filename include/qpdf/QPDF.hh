@@ -756,7 +756,13 @@ class QPDF
         static std::vector<QPDFObjGen>
         getCompressibleObjGens(QPDF& qpdf)
         {
-            return qpdf.getCompressibleObjGens();
+            return qpdf.getCompressibleObjVector();
+        }
+
+        static std::vector<bool>
+        getCompressibleObjSet(QPDF& qpdf)
+        {
+            return qpdf.getCompressibleObjSet();
         }
 
         static std::map<QPDFObjGen, QPDFXRefEntry> const&
@@ -1110,7 +1116,10 @@ class QPDF
         bool compressed);
 
     // Get a list of objects that would be permitted in an object stream.
-    std::vector<QPDFObjGen> getCompressibleObjGens();
+    template <typename T>
+    std::vector<T> getCompressibleObjGens();
+    std::vector<QPDFObjGen> getCompressibleObjVector();
+    std::vector<bool> getCompressibleObjSet();
 
     // methods to support page handling
 

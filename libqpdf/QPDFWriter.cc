@@ -1964,13 +1964,11 @@ QPDFWriter::preserveObjectStreams()
                     }
                 }
             } else {
-                std::set<QPDFObjGen> eligible;
-                std::vector<QPDFObjGen> eligible_v = QPDF::Writer::getCompressibleObjGens(m->pdf);
-                eligible = std::set<QPDFObjGen>(eligible_v.begin(), eligible_v.end());
+                auto eligible = QPDF::Writer::getCompressibleObjSet(m->pdf);
                 for (; iter != end; ++iter) {
                     if (iter->second.getType() == 2) {
-                        QPDFObjGen og(iter->first.getObj(), 0);
-                        if (eligible.count(og)) {
+                        auto id = static_cast<size_t>(iter->first.getObj());
+                        if (id < eligible.size() && eligible[id]) {
                             m->obj[iter->first].object_stream = iter->second.getObjStreamNumber();
                         } else {
                             QTC::TC("qpdf", "QPDFWriter exclude from object stream");
@@ -2009,22 +2007,18 @@ QPDFWriter::generateObjectStreams()
         ++n_per;
     }
     unsigned int n = 0;
-    int cur_ostream = 0;
-    for (auto const& iter: eligible) {
-        if ((n % n_per) == 0) {
-            if (n > 0) {
-                QTC::TC("qpdf", "QPDFWriter generate >1 ostream");
-            }
+    int cur_ostream = m->pdf.newIndirectNull().getObjectID();
+    for (auto const& item: eligible) {
+        if (n == n_per) {
+            QTC::TC("qpdf", "QPDFWriter generate >1 ostream");
             n = 0;
-        }
-        if (n == 0) {
             // Construct a new null object as the "original" object stream.  The rest of the code
             // knows that this means we're creating the object stream from scratch.
-            cur_ostream = m->pdf.makeIndirectObject(QPDFObjectHandle::newNull()).getObjectID();
+            cur_ostream = m->pdf.newIndirectNull().getObjectID();
         }
-        auto& obj = m->obj[iter];
+        auto& obj = m->obj[item];
         obj.object_stream = cur_ostream;
-        obj.gen = iter.getGen();
+        obj.gen = item.getGen();
         ++n;
     }
 }
