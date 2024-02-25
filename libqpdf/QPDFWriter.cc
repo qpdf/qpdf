@@ -1038,7 +1038,7 @@ QPDFWriter::openObject(int objid)
     if (objid == 0) {
         objid = m->next_objid++;
     }
-    m->xref[objid] = QPDFXRefEntry(m->pipeline->getCount());
+    m->new_obj[objid].xref = QPDFXRefEntry(m->pipeline->getCount());
     writeString(std::to_string(objid));
     writeString(" 0 obj\n");
     return objid;
@@ -1050,7 +1050,7 @@ QPDFWriter::closeObject(int objid)
     // Write a newline before endobj as it makes the file easier to repair.
     writeString("\nendobj\n");
     writeStringQDF("\n");
-    m->lengths[objid] = m->pipeline->getCount() - m->xref[objid].getOffset();
+    m->lengths[objid] = m->pipeline->getCount() - m->new_obj[objid].xref.getOffset();
 }
 
 void
@@ -1703,7 +1703,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
             }
             writeObject(obj_to_write, count);
 
-            m->xref[new_obj] = QPDFXRefEntry(new_stream_id, count);
+            m->new_obj[new_obj].xref = QPDFXRefEntry(new_stream_id, count);
         }
     }
 
@@ -1978,8 +1978,6 @@ QPDFWriter::generateObjectStreams()
     std::vector<QPDFObjGen> eligible = QPDF::Writer::getCompressibleObjGens(m->pdf);
     size_t n_object_streams = (eligible.size() + 99U) / 100U;
 
-    // Initialize object table for all existing objects plus some headroom for objects created
-    // during writing.
     initializeTables(2U * n_object_streams);
     if (n_object_streams == 0) {
         m->obj.streams_empty = true;
@@ -2065,6 +2063,7 @@ QPDFWriter::initializeTables(size_t extra)
 {
     auto size = QIntC::to_size(QPDF::Writer::tableSize(m->pdf) + 100) + extra;
     m->obj.initialize(size);
+    m->new_obj.initialize(size);
 }
 
 void
@@ -2136,8 +2135,6 @@ QPDFWriter::doWriteSetup()
 
     switch (m->object_stream_mode) {
     case qpdf_o_disable:
-        // Initialize object table for all existing objects plus some headroom for objects created
-        // during writing.
         initializeTables();
         m->obj.streams_empty = true;
         break;
@@ -2245,12 +2242,12 @@ QPDFWriter::getWrittenXRefTable()
 {
     std::map<QPDFObjGen, QPDFXRefEntry> result;
 
-    for (auto const& iter: m->xref) {
-        if (iter.first != 0 && iter.second.getType() != 0) {
-            result[QPDFObjGen(iter.first, 0)] = iter.second;
+    auto it = result.begin();
+    m->new_obj.forEach([&it, &result](auto id, auto const& item) -> void {
+        if (item.xref.getType() != 0) {
+            it = result.emplace_hint(it, QPDFObjGen(id, 0), item.xref);
         }
-    }
-
+    });
     return result;
 }
 
@@ -2313,7 +2310,7 @@ QPDFWriter::writeHintStream(int hint_id)
     int O = 0;
     bool compressed = (m->compress_streams && !m->qdf_mode);
     QPDF::Writer::generateHintStream(
-        m->pdf, m->xref, m->lengths, m->obj, hint_buffer, S, O, compressed);
+        m->pdf, m->new_obj, m->lengths, m->obj, hint_buffer, S, O, compressed);
 
     openObject(hint_id);
     setDataKey(hint_id);
@@ -2386,7 +2383,7 @@ QPDFWriter::writeXRefTable(
         } else {
             qpdf_offset_t offset = 0;
             if (!suppress_offsets) {
-                offset = m->xref[i].getOffset();
+                offset = m->new_obj[i].xref.getOffset();
                 if ((hint_id != 0) && (i != hint_id) && (offset >= hint_offset)) {
                     offset += hint_length;
                 }
@@ -2439,7 +2436,7 @@ QPDFWriter::writeXRefStream(
 
     // Must store in xref table in advance of writing the actual data rather than waiting for
     // openObject to do it.
-    m->xref[xref_id] = QPDFXRefEntry(m->pipeline->getCount());
+    m->new_obj[xref_id].xref = QPDFXRefEntry(m->pipeline->getCount());
 
     Pipeline* p = pushPipeline(new Pl_Buffer("xref stream"));
     bool compressed = false;
@@ -2457,7 +2454,7 @@ QPDFWriter::writeXRefStream(
         PipelinePopper pp_xref(this, &xref_data);
         activatePipelineStack(pp_xref);
         for (int i = first; i <= last; ++i) {
-            QPDFXRefEntry& e = m->xref[i];
+            QPDFXRefEntry& e = m->new_obj[i].xref;
             switch (e.getType()) {
             case 0:
                 writeBinary(0, 1);
@@ -2712,7 +2709,7 @@ QPDFWriter::writeLinearized()
             writeString(std::to_string(file_size + hint_length));
             // Implementation note 121 states that a space is mandatory after this open bracket.
             writeString(" /H [ ");
-            writeString(std::to_string(m->xref[hint_id].getOffset()));
+            writeString(std::to_string(m->new_obj[hint_id].xref.getOffset()));
             writeString(" ");
             writeString(std::to_string(hint_length));
             writeString(" ] /O ");
@@ -2739,7 +2736,7 @@ QPDFWriter::writeLinearized()
         qpdf_offset_t first_xref_offset = m->pipeline->getCount();
         qpdf_offset_t hint_offset = 0;
         if (pass == 2) {
-            hint_offset = m->xref[hint_id].getOffset();
+            hint_offset = m->new_obj[hint_id].xref.getOffset();
         }
         if (need_xref_stream) {
             // Must pad here too.
@@ -2810,7 +2807,7 @@ QPDFWriter::writeLinearized()
                     writeEncryptionDictionary();
                 }
                 if (pass == 1) {
-                    m->xref[hint_id] = QPDFXRefEntry(m->pipeline->getCount());
+                    m->new_obj[hint_id].xref = QPDFXRefEntry(m->pipeline->getCount());
                 } else {
                     // Part 5: hint stream
                     writeBuffer(hint_buffer);
@@ -2883,7 +2880,7 @@ QPDFWriter::writeLinearized()
             pp_pass1 = nullptr;
 
             // Save hint offset since it will be set to zero by calling openObject.
-            qpdf_offset_t hint_offset1 = m->xref[hint_id].getOffset();
+            qpdf_offset_t hint_offset1 = m->new_obj[hint_id].xref.getOffset();
 
             // Write hint stream to a buffer
             {
@@ -2895,7 +2892,7 @@ QPDFWriter::writeLinearized()
             hint_length = QIntC::to_offset(hint_buffer->getSize());
 
             // Restore hint offset
-            m->xref[hint_id] = QPDFXRefEntry(hint_offset1);
+            m->new_obj[hint_id].xref = QPDFXRefEntry(hint_offset1);
             if (lin_pass1_file) {
                 // Write some debugging information
                 fprintf(

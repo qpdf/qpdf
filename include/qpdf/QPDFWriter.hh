@@ -439,7 +439,9 @@ class QPDFWriter
 
     // The following structs / classes are not part of the public API.
     struct Object;
+    struct NewObject;
     class ObjTable;
+    class NewObjTable;
 
   private:
     // flags used by unparseObject

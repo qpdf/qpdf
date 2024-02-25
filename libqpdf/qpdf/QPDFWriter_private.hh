@@ -15,6 +15,11 @@ struct QPDFWriter::Object
     int object_stream{0};
 };
 
+struct QPDFWriter::NewObject
+{
+    QPDFXRefEntry xref;
+};
+
 class QPDFWriter::ObjTable: public ::ObjTable<QPDFWriter::Object>
 {
     friend class QPDFWriter;
@@ -29,6 +34,11 @@ class QPDFWriter::ObjTable: public ::ObjTable<QPDFWriter::Object>
   private:
     // For performance, set by QPDFWriter rather than tracked by ObjTable.
     bool streams_empty{false};
+};
+
+class QPDFWriter::NewObjTable: public ::ObjTable<QPDFWriter::NewObject>
+{
+    friend class QPDFWriter;
 };
 
 class QPDFWriter::Members
@@ -91,7 +101,7 @@ class QPDFWriter::Members
     std::vector<QPDFObjectHandle> object_queue;
     size_t object_queue_front{0};
     QPDFWriter::ObjTable obj;
-    std::map<int, QPDFXRefEntry> xref;
+    QPDFWriter::NewObjTable new_obj;
     std::map<int, qpdf_offset_t> lengths;
     int next_objid{1};
     int cur_stream_length_id{0};
