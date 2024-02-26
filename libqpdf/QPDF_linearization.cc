@@ -811,7 +811,7 @@ QPDF::checkHOutlines()
                 stopOnError("unknown object in outlines hint table");
             }
             qpdf_offset_t offset = getLinearizationOffset(og);
-            ObjUser ou(ObjUser::ou_root_key, "/Outlines");
+            auto ou = ObjUser::root("/Outlines");
             int length = toI(maxEnd(ou) - offset);
             qpdf_offset_t table_offset = adjusted_offset(m->outline_hints.first_object_offset);
             if (offset != table_offset) {
@@ -1042,13 +1042,6 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
         QTC::TC("qpdf", "QPDF categorize pagemode outlines", outlines_in_first_page ? 1 : 0);
     }
 
-    std::set<std::string> open_document_keys;
-    open_document_keys.insert("/ViewerPreferences");
-    open_document_keys.insert("/PageMode");
-    open_document_keys.insert("/Threads");
-    open_document_keys.insert("/OpenAction");
-    open_document_keys.insert("/AcroForm");
-
     std::set<QPDFObjGen> lc_open_document;
     std::set<QPDFObjGen> lc_first_page_private;
     std::set<QPDFObjGen> lc_first_page_shared;
@@ -1056,85 +1049,61 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     std::set<QPDFObjGen> lc_other_page_shared;
     std::set<QPDFObjGen> lc_thumbnail_private;
     std::set<QPDFObjGen> lc_thumbnail_shared;
+    std::set<QPDFObjGen> lc_pagetree;
     std::set<QPDFObjGen> lc_other;
     std::set<QPDFObjGen> lc_outlines;
-    std::set<QPDFObjGen> lc_root;
 
-    for (auto& oiter: m->object_to_obj_users) {
-        QPDFObjGen const& og = oiter.first;
-        std::set<ObjUser>& ous = oiter.second;
-
-        bool in_open_document = false;
-        bool in_first_page = false;
-        int other_pages = 0;
-        int thumbs = 0;
-        int others = 0;
-        bool in_outlines = false;
-        bool is_root = false;
-
-        for (auto const& ou: ous) {
-            switch (ou.ou_type) {
-            case ObjUser::ou_trailer_key:
-                if (ou.key == "/Encrypt") {
-                    in_open_document = true;
-                } else {
-                    ++others;
-                }
-                break;
-
-            case ObjUser::ou_thumb:
-                ++thumbs;
-                break;
-
-            case ObjUser::ou_root_key:
-                if (open_document_keys.count(ou.key) > 0) {
-                    in_open_document = true;
-                } else if (ou.key == "/Outlines") {
-                    in_outlines = true;
-                } else {
-                    ++others;
-                }
-                break;
-
-            case ObjUser::ou_page:
-                if (ou.pageno == 0) {
-                    in_first_page = true;
-                } else {
-                    ++other_pages;
-                }
-                break;
-
-            case ObjUser::ou_root:
-                is_root = true;
-                break;
-
-            case ObjUser::ou_bad:
-                stopOnError("INTERNAL ERROR: QPDF::calculateLinearizationData: "
-                            "invalid user type");
-                break;
+    for (auto& [og, ous]: m->object_to_obj_users) {
+        auto first = ous.cbegin();
+        switch (first->ou_type) {
+        case ObjUser::ou_other:
+            if (first->pageno == 0) {
+                lc_pagetree.insert(og);
+            } else {
+                lc_other.insert(og);
             }
-        }
+            break;
 
-        if (is_root) {
-            lc_root.insert(og);
-        } else if (in_outlines) {
-            lc_outlines.insert(og);
-        } else if (in_open_document) {
+        case ObjUser::ou_thumb:
+            if (ous.size() == 1) {
+                lc_thumbnail_private.insert(og);
+            } else {
+                lc_thumbnail_shared.insert(og);
+            }
+            break;
+
+        case ObjUser::ou_open_doc:
             lc_open_document.insert(og);
-        } else if ((in_first_page) && (others == 0) && (other_pages == 0) && (thumbs == 0)) {
-            lc_first_page_private.insert(og);
-        } else if (in_first_page) {
-            lc_first_page_shared.insert(og);
-        } else if ((other_pages == 1) && (others == 0) && (thumbs == 0)) {
-            lc_other_page_private.insert(og);
-        } else if (other_pages > 1) {
-            lc_other_page_shared.insert(og);
-        } else if ((thumbs == 1) && (others == 0)) {
-            lc_thumbnail_private.insert(og);
-        } else if (thumbs > 1) {
-            lc_thumbnail_shared.insert(og);
-        } else {
-            lc_other.insert(og);
+            break;
+
+        case ObjUser::ou_outlines:
+            lc_outlines.insert(og);
+            break;
+
+        case ObjUser::ou_first_page:
+            if (ous.size() == 1) {
+                lc_first_page_private.insert(og);
+            } else {
+                lc_first_page_shared.insert(og);
+            }
+            break;
+
+        case ObjUser::ou_page:
+            if (ous.size() == 1) {
+                lc_other_page_private.insert(og);
+            } else {
+                auto i = ++ous.cbegin();
+                if (i->ou_type == ObjUser::ou_page) {
+                    lc_other_page_shared.insert(og);
+                } else {
+                    lc_other.insert(og);
+                }
+            }
+            break;
+
+        case ObjUser::ou_bad:
+            stopOnError("INTERNAL ERROR: QPDF::calculateLinearizationData: invalid user type");
+            break;
         }
     }
 
@@ -1172,15 +1141,10 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     // Part 4: open document objects.  We don't care about the order.
 
-    if (lc_root.size() != 1) {
-        stopOnError("found other than one root while"
-                    " calculating linearization data");
-    }
-    m->part4.push_back(getObject(*(lc_root.begin())));
+    m->part4.push_back(root);
     for (auto const& og: lc_open_document) {
         m->part4.push_back(getObject(og));
     }
-
     // Part 6: first page objects.  Note: implementation note 124 states that Acrobat always treats
     // page 0 as the first page for linearization regardless of /OpenAction.  pdlin doesn't provide
     // any option to set this and also disregards /OpenAction.  We will do the same.
@@ -1189,12 +1153,6 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     if (pages.empty()) {
         stopOnError("no pages found while calculating linearization data");
     }
-    QPDFObjGen first_page_og(pages.at(0).getObjGen());
-    if (!lc_first_page_private.count(first_page_og)) {
-        stopOnError("INTERNAL ERROR: QPDF::calculateLinearizationData: first page "
-                    "object not in lc_first_page_private");
-    }
-    lc_first_page_private.erase(first_page_og);
     m->c_linp.first_page_object = pages.at(0).getObjectID();
     m->part6.push_back(pages.at(0));
 
@@ -1226,15 +1184,6 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     // For each page in order:
     for (size_t i = 1; i < toS(npages); ++i) {
         // Place this page's page object
-
-        QPDFObjGen page_og(pages.at(i).getObjGen());
-        if (!lc_other_page_private.count(page_og)) {
-            stopOnError(
-                "INTERNAL ERROR: "
-                "QPDF::calculateLinearizationData: page object for page " +
-                std::to_string(i) + " not in lc_other_page_private");
-        }
-        lc_other_page_private.erase(page_og);
         m->part7.push_back(pages.at(i));
 
         // Place all non-shared objects referenced by this page, updating the page object count for
@@ -1242,7 +1191,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
         m->c_page_offset_data.entries.at(i).nobjects = 1;
 
-        ObjUser ou(ObjUser::ou_page, toI(i));
+        auto ou = ObjUser::page(toI(i));
         if (m->obj_user_to_objects.count(ou) == 0) {
             stopOnError("found unreferenced page while"
                         " calculating linearization data");
@@ -1277,17 +1226,13 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     // we throw all remaining objects in arbitrary order.
 
     // Place the pages tree.
-    std::set<QPDFObjGen> pages_ogs =
-        m->obj_user_to_objects[ObjUser(ObjUser::ou_root_key, "/Pages")];
+    std::set<QPDFObjGen> pages_ogs = m->obj_user_to_objects[ObjUser::root("/Pages")];
     if (pages_ogs.empty()) {
         stopOnError("found empty pages tree while"
                     " calculating linearization data");
     }
-    for (auto const& og: pages_ogs) {
-        if (lc_other.count(og)) {
-            lc_other.erase(og);
-            m->part9.push_back(getObject(og));
-        }
+    for (auto const& og: lc_pagetree) {
+        m->part9.push_back(getObject(og));
     }
 
     // Place private thumbnail images in page order.  Slightly more information would be required if
@@ -1307,7 +1252,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
                 // there's nothing to prevent it from having been in some set other than
                 // lc_thumbnail_private.
             }
-            std::set<QPDFObjGen>& ogs = m->obj_user_to_objects[ObjUser(ObjUser::ou_thumb, toI(i))];
+            std::set<QPDFObjGen>& ogs = m->obj_user_to_objects[ObjUser::thumb(toI(i))];
             for (auto const& og: ogs) {
                 if (lc_thumbnail_private.count(og)) {
                     lc_thumbnail_private.erase(og);
@@ -1340,7 +1285,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     size_t num_placed =
         m->part4.size() + m->part6.size() + m->part7.size() + m->part8.size() + m->part9.size();
-    size_t num_wanted = m->object_to_obj_users.size();
+    size_t num_wanted = m->object_to_obj_users.size() + pages.size() + 1; // 1 is the root object.
     if (num_placed != num_wanted) {
         stopOnError(
             "INTERNAL ERROR: QPDF::calculateLinearizationData: wrong "
@@ -1387,7 +1332,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     for (size_t i = 1; i < toS(npages); ++i) {
         CHPageOffsetEntry& pe = m->c_page_offset_data.entries.at(i);
-        ObjUser ou(ObjUser::ou_page, toI(i));
+        auto ou = ObjUser::page(toI(i));
         if (m->obj_user_to_objects.count(ou) == 0) {
             stopOnError("found unreferenced page while"
                         " calculating linearization data");

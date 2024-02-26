@@ -1292,25 +1292,30 @@ class QPDF
     class ObjUser
     {
       public:
-        enum user_e { ou_bad, ou_page, ou_thumb, ou_trailer_key, ou_root_key, ou_root };
+        // The order and membership of user_e is fixed to allow an object to be clasified based on
+        // the first element and size of its ObjUser set.
+        enum user_e {
+            ou_bad,
+            ou_outlines,
+            ou_open_doc,
+            ou_first_page,
+            ou_page,
+            ou_thumb,
+            ou_other
+        };
 
-        // type is set to ou_bad
-        ObjUser();
+        static ObjUser page(int pageno);
+        static ObjUser thumb(int pageno);
+        static ObjUser root(std::string const& key);
+        static ObjUser trailer(std::string const& key);
 
-        // type must be ou_root
-        ObjUser(user_e type);
+        bool operator<(ObjUser const& rhs) const;
 
-        // type must be one of ou_page or ou_thumb
+        const user_e ou_type{ou_bad};
+        const int pageno{0};
+
+      private:
         ObjUser(user_e type, int pageno);
-
-        // type must be one of ou_trailer_key or ou_root_key
-        ObjUser(user_e type, std::string const& key);
-
-        bool operator<(ObjUser const&) const;
-
-        user_e ou_type;
-        int pageno;      // if ou_page;
-        std::string key; // if ou_trailer_key or ou_root_key
     };
 
     class PatternFinder: public InputSource::Finder

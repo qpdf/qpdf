@@ -9,48 +9,57 @@
 #include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QTC.hh>
 
-QPDF::ObjUser::ObjUser() :
-    ou_type(ou_bad),
-    pageno(0)
-{
-}
-
-QPDF::ObjUser::ObjUser(user_e type) :
-    ou_type(type),
-    pageno(0)
-{
-    qpdf_assert_debug(type == ou_root);
-}
-
 QPDF::ObjUser::ObjUser(user_e type, int pageno) :
     ou_type(type),
     pageno(pageno)
 {
-    qpdf_assert_debug((type == ou_page) || (type == ou_thumb));
 }
 
-QPDF::ObjUser::ObjUser(user_e type, std::string const& key) :
-    ou_type(type),
-    pageno(0),
-    key(key)
+QPDF::ObjUser
+QPDF::ObjUser::page(int pageno)
 {
-    qpdf_assert_debug((type == ou_trailer_key) || (type == ou_root_key));
+    if (pageno == 0) {
+        return {ou_first_page, 0};
+    }
+    return {ou_page, pageno};
+}
+
+QPDF::ObjUser
+QPDF::ObjUser::thumb(int pageno)
+{
+    return {ou_thumb, pageno};
+}
+
+QPDF::ObjUser
+QPDF::ObjUser::root(std::string const& key)
+{
+    static const std::set<std::string> open_document_keys{
+        "/ViewerPreferences", "/PageMode", "/Threads", "/OpenAction", "/AcroForm"};
+    if (key == "/Outlines") {
+        return {ou_outlines, 0};
+    }
+    if (open_document_keys.count(key) > 0) {
+        return {ou_open_doc, 0};
+    }
+    if (key == "/Pages") {
+        return {ou_other, 0};
+    }
+    return {ou_other, 1};
+}
+
+QPDF::ObjUser
+QPDF::ObjUser::trailer(std::string const& key)
+{
+    if (key == "/Encrypt") {
+        return {ou_open_doc, 0};
+    }
+    return {ou_other, 2};
 }
 
 bool
 QPDF::ObjUser::operator<(ObjUser const& rhs) const
 {
-    if (this->ou_type < rhs.ou_type) {
-        return true;
-    } else if (this->ou_type == rhs.ou_type) {
-        if (this->pageno < rhs.pageno) {
-            return true;
-        } else if (this->pageno == rhs.pageno) {
-            return (this->key < rhs.key);
-        }
-    }
-
-    return false;
+    return ou_type < rhs.ou_type || (ou_type == rhs.ou_type && pageno < rhs.pageno);
 }
 
 void
@@ -83,9 +92,7 @@ QPDF::optimize(
     int n = toI(m->all_pages.size());
     for (int pageno = 0; pageno < n; ++pageno) {
         updateObjectMaps(
-            ObjUser(ObjUser::ou_page, pageno),
-            m->all_pages.at(toS(pageno)),
-            skip_stream_parameters);
+            ObjUser::page(pageno), m->all_pages.at(toS(pageno)), skip_stream_parameters);
     }
 
     // Traverse document-level items
@@ -93,10 +100,7 @@ QPDF::optimize(
         if (key == "/Root") {
             // handled separately
         } else {
-            updateObjectMaps(
-                ObjUser(ObjUser::ou_trailer_key, key),
-                m->trailer.getKey(key),
-                skip_stream_parameters);
+            updateObjectMaps(ObjUser::trailer(key), m->trailer.getKey(key), skip_stream_parameters);
         }
     }
 
@@ -105,16 +109,15 @@ QPDF::optimize(
         // we are going to disregard that specification for now.  There is loads of evidence that
         // pdlin and Acrobat both disregard things like this from time to time, so this is almost
         // certain not to cause any problems.
-        updateObjectMaps(
-            ObjUser(ObjUser::ou_root_key, key), root.getKey(key), skip_stream_parameters);
+        updateObjectMaps(ObjUser::root(key), root.getKey(key), skip_stream_parameters);
     }
 
-    ObjUser root_ou = ObjUser(ObjUser::ou_root);
-    auto root_og = QPDFObjGen(root.getObjGen());
-    m->obj_user_to_objects[root_ou].insert(root_og);
-    m->object_to_obj_users[root_og].insert(root_ou);
-
     filterCompressedObjects(object_stream_data);
+
+    if (m->obj_user_to_objects.empty()) {
+        stopOnError("no objects found while trying to optimize");
+
+    }
 }
 
 void
@@ -292,8 +295,10 @@ QPDF::updateObjectMapsInternal(
             QTC::TC("qpdf", "QPDF opt loop detected");
             return;
         }
-        m->obj_user_to_objects[ou].insert(og);
-        m->object_to_obj_users[og].insert(ou);
+        if (!is_page_node) {
+            m->obj_user_to_objects[ou].insert(og);
+            m->object_to_obj_users[og].insert(ou);
+        }
     }
 
     if (oh.isArray()) {
@@ -317,7 +322,7 @@ QPDF::updateObjectMapsInternal(
             if (is_page_node && (key == "/Thumb")) {
                 // Traverse page thumbnail dictionaries as a special case.
                 updateObjectMapsInternal(
-                    ObjUser(ObjUser::ou_thumb, ou.pageno),
+                    ObjUser::thumb(ou.pageno),
                     dict.getKey(key),
                     skip_stream_parameters,
                     visited,
@@ -376,6 +381,6 @@ QPDF::filterCompressedObjects(std::map<int, int> const& object_stream_data)
         }
     }
 
-    m->obj_user_to_objects = t_obj_user_to_objects;
-    m->object_to_obj_users = t_object_to_obj_users;
+    m->obj_user_to_objects.swap(t_obj_user_to_objects);
+    m->object_to_obj_users.swap(t_object_to_obj_users);
 }
