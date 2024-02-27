@@ -18,6 +18,7 @@ struct QPDFWriter::Object
 struct QPDFWriter::NewObject
 {
     QPDFXRefEntry xref;
+    qpdf_offset_t length{0};
 };
 
 class QPDFWriter::ObjTable: public ::ObjTable<QPDFWriter::Object>
@@ -102,7 +103,6 @@ class QPDFWriter::Members
     size_t object_queue_front{0};
     QPDFWriter::ObjTable obj;
     QPDFWriter::NewObjTable new_obj;
-    std::map<int, qpdf_offset_t> lengths;
     int next_objid{1};
     int cur_stream_length_id{0};
     size_t cur_stream_length{0};

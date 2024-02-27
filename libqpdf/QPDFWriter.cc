@@ -1050,7 +1050,8 @@ QPDFWriter::closeObject(int objid)
     // Write a newline before endobj as it makes the file easier to repair.
     writeString("\nendobj\n");
     writeStringQDF("\n");
-    m->lengths[objid] = m->pipeline->getCount() - m->new_obj[objid].xref.getOffset();
+    auto& new_obj = m->new_obj[objid];
+    new_obj.length = m->pipeline->getCount() - new_obj.xref.getOffset();
 }
 
 void
@@ -2309,8 +2310,7 @@ QPDFWriter::writeHintStream(int hint_id)
     int S = 0;
     int O = 0;
     bool compressed = (m->compress_streams && !m->qdf_mode);
-    QPDF::Writer::generateHintStream(
-        m->pdf, m->new_obj, m->lengths, m->obj, hint_buffer, S, O, compressed);
+    QPDF::Writer::generateHintStream(m->pdf, m->new_obj, m->obj, hint_buffer, S, O, compressed);
 
     openObject(hint_id);
     setDataKey(hint_id);

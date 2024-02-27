@@ -744,14 +744,13 @@ class QPDF
         generateHintStream(
             QPDF& qpdf,
             QPDFWriter::NewObjTable const& new_obj,
-            std::map<int, qpdf_offset_t> const& lengths,
             QPDFWriter::ObjTable const& obj,
             std::shared_ptr<Buffer>& hint_stream,
             int& S,
             int& O,
             bool compressed)
         {
-            return qpdf.generateHintStream(new_obj, lengths, obj, hint_stream, S, O, compressed);
+            return qpdf.generateHintStream(new_obj, obj, hint_stream, S, O, compressed);
         }
 
         static void
@@ -1103,7 +1102,6 @@ class QPDF
 
     void generateHintStream(
         QPDFWriter::NewObjTable const& new_obj,
-        std::map<int, qpdf_offset_t> const& lengths,
         QPDFWriter::ObjTable const& obj,
         std::shared_ptr<Buffer>& hint_stream,
         int& S,
@@ -1378,20 +1376,13 @@ class QPDF
     int outputLengthNextN(
         int in_object,
         int n,
-        std::map<int, qpdf_offset_t> const& lengths,
-        QPDFWriter::ObjTable const& obj);
-    void calculateHPageOffset(
         QPDFWriter::NewObjTable const& new_obj,
-        std::map<int, qpdf_offset_t> const& lengths,
         QPDFWriter::ObjTable const& obj);
-    void calculateHSharedObject(
-        QPDFWriter::NewObjTable const& new_obj,
-        std::map<int, qpdf_offset_t> const& lengths,
-        QPDFWriter::ObjTable const& obj);
-    void calculateHOutline(
-        QPDFWriter::NewObjTable const& new_obj,
-        std::map<int, qpdf_offset_t> const& lengths,
-        QPDFWriter::ObjTable const& obj);
+    void
+    calculateHPageOffset(QPDFWriter::NewObjTable const& new_obj, QPDFWriter::ObjTable const& obj);
+    void
+    calculateHSharedObject(QPDFWriter::NewObjTable const& new_obj, QPDFWriter::ObjTable const& obj);
+    void calculateHOutline(QPDFWriter::NewObjTable const& new_obj, QPDFWriter::ObjTable const& obj);
     void writeHPageOffset(BitWriter&);
     void writeHSharedObject(BitWriter&);
     void writeHGeneric(BitWriter&, HGeneric&);
