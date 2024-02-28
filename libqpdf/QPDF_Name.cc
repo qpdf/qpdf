@@ -3,8 +3,6 @@
 #include <qpdf/JSON_writer.hh>
 #include <qpdf/QUtil.hh>
 
-#include <string_view>
-
 QPDF_Name::QPDF_Name(std::string const& name) :
     QPDFValue(::ot_name, "name"),
     name(name)
@@ -57,14 +55,12 @@ QPDF_Name::unparse()
 std::pair<bool, bool>
 QPDF_Name::analyzeJSONEncoding(const std::string& name)
 {
-    std::basic_string_view<unsigned char> view{
-        reinterpret_cast<const unsigned char*>(name.data()), name.size()};
-
     int tail = 0;       // Number of continuation characters expected.
     bool tail2 = false; // Potential overlong 3 octet utf-8.
     bool tail3 = false; // potential overlong 4 octet
     bool needs_escaping = false;
-    for (auto const& c: view) {
+    for (auto it = name.begin(); it != name.end(); ++it) {
+        unsigned char c = static_cast<unsigned char>(*it);
         if (tail) {
             if ((c & 0xc0) != 0x80) {
                 return {false, false};
