@@ -59,8 +59,8 @@ QPDF_Name::analyzeJSONEncoding(const std::string& name)
     bool tail2 = false; // Potential overlong 3 octet utf-8.
     bool tail3 = false; // potential overlong 4 octet
     bool needs_escaping = false;
-    for (auto it = name.begin(); it != name.end(); ++it) {
-        unsigned char c = static_cast<unsigned char>(*it);
+    for (auto const& it: name) {
+        auto c = static_cast<unsigned char>(it);
         if (tail) {
             if ((c & 0xc0) != 0x80) {
                 return {false, false};
