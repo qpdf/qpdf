@@ -3,7 +3,7 @@
 
 #include <qpdf/assert_debug.h>
 
-#include <qpdf/QPDF.hh>
+#include <qpdf/QPDF_private.hh>
 
 #include <qpdf/QPDFExc.hh>
 
