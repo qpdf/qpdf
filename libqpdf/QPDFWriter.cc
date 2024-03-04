@@ -2540,31 +2540,9 @@ QPDFWriter::calculateXrefStreamPadding(qpdf_offset_t xref_bytes)
 }
 
 void
-QPDFWriter::discardGeneration(std::map<int, int>& out)
-{
-    // There are deep assumptions in the linearization code in QPDF that there is only one object
-    // with each object number; i.e., you can't have two objects with the same object number and
-    // different generations.  This is a pretty safe assumption because Adobe Reader and Acrobat
-    // can't actually handle this case.  There is not much if any code in QPDF outside linearization
-    // that assumes this, but the linearization code as currently implemented would do weird things
-    // if we found such a case.  In order to avoid breaking ABI changes in QPDF, we will first
-    // assert that this condition holds.  Then we can create new maps for QPDF that throw away
-    // generation numbers.
-
-    out.clear();
-    m->obj.forEach([&out](auto id, auto const& item) -> void {
-        if (item.object_stream > 0) {
-            out[id] = item.object_stream;
-        }
-    });
-}
-
-void
 QPDFWriter::writeLinearized()
 {
     // Optimize file and enqueue objects in order
-
-    discardGeneration(m->object_to_object_stream_no_gen);
 
     auto skip_stream_parameters = [this](QPDFObjectHandle& stream) {
         bool compress_stream;
@@ -2583,8 +2561,7 @@ QPDFWriter::writeLinearized()
     std::vector<QPDFObjectHandle> part7;
     std::vector<QPDFObjectHandle> part8;
     std::vector<QPDFObjectHandle> part9;
-    QPDF::Writer::getLinearizedParts(
-        m->pdf, m->object_to_object_stream_no_gen, part4, part6, part7, part8, part9);
+    QPDF::Writer::getLinearizedParts(m->pdf, m->obj, part4, part6, part7, part8, part9);
 
     // Object number sequence:
     //

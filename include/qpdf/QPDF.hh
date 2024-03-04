@@ -739,14 +739,14 @@ class QPDF
         static void
         getLinearizedParts(
             QPDF& qpdf,
-            std::map<int, int> const& object_stream_data,
+            QPDFWriter::ObjTable const& obj,
             std::vector<QPDFObjectHandle>& part4,
             std::vector<QPDFObjectHandle>& part6,
             std::vector<QPDFObjectHandle>& part7,
             std::vector<QPDFObjectHandle>& part8,
             std::vector<QPDFObjectHandle>& part9)
         {
-            qpdf.getLinearizedParts(object_stream_data, part4, part6, part7, part8, part9);
+            qpdf.getLinearizedParts(obj, part4, part6, part7, part8, part9);
         }
 
         static void
@@ -1117,7 +1117,7 @@ class QPDF
     // Get lists of all objects in order according to the part of a linearized file that they belong
     // to.
     void getLinearizedParts(
-        std::map<int, int> const& object_stream_data,
+        QPDFWriter::ObjTable const& obj,
         std::vector<QPDFObjectHandle>& part4,
         std::vector<QPDFObjectHandle>& part6,
         std::vector<QPDFObjectHandle>& part7,
@@ -1382,6 +1382,7 @@ class QPDF
     qpdf_offset_t getLinearizationOffset(QPDFObjGen const&);
     QPDFObjectHandle
     getUncompressedObject(QPDFObjectHandle&, std::map<int, int> const& object_stream_data);
+    QPDFObjectHandle getUncompressedObject(QPDFObjectHandle&, QPDFWriter::ObjTable const& obj);
     int lengthNextN(int first_object, int n);
     void
     checkHPageOffset(std::vector<QPDFObjectHandle> const& pages, std::map<int, int>& idx_to_obj);
@@ -1392,11 +1393,13 @@ class QPDF
     void dumpHSharedObject();
     void dumpHGeneric(HGeneric&);
     qpdf_offset_t adjusted_offset(qpdf_offset_t offset);
-    void calculateLinearizationData(std::map<int, int> const& object_stream_data);
+    template <typename T>
+    void calculateLinearizationData(T const& object_stream_data);
+    template <typename T>
     void pushOutlinesToPart(
         std::vector<QPDFObjectHandle>& part,
         std::set<QPDFObjGen>& lc_outlines,
-        std::map<int, int> const& object_stream_data);
+        T const& object_stream_data);
     int outputLengthNextN(
         int in_object,
         int n,

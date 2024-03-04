@@ -586,6 +586,17 @@ QPDF::getUncompressedObject(QPDFObjectHandle& obj, std::map<int, int> const& obj
     }
 }
 
+QPDFObjectHandle
+QPDF::getUncompressedObject(QPDFObjectHandle& oh, QPDFWriter::ObjTable const& obj)
+{
+    if (obj.contains(oh)) {
+        if (auto id = obj[oh].object_stream; id > 0) {
+            return oh.isNull() ? oh : getObject(id, 0);
+        }
+    }
+    return oh;
+}
+
 int
 QPDF::lengthNextN(int first_object, int n)
 {
@@ -960,8 +971,9 @@ QPDF::dumpHGeneric(HGeneric& t)
                        << "group_length: " << t.group_length << "\n";
 }
 
+template <typename T>
 void
-QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
+QPDF::calculateLinearizationData(T const& object_stream_data)
 {
     // This function calculates the ordering of objects, divides them into the appropriate parts,
     // and computes some values for the linearization parameter dictionary and hint tables.  The
@@ -1403,11 +1415,12 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     }
 }
 
+template <typename T>
 void
 QPDF::pushOutlinesToPart(
     std::vector<QPDFObjectHandle>& part,
     std::set<QPDFObjGen>& lc_outlines,
-    std::map<int, int> const& object_stream_data)
+    T const& object_stream_data)
 {
     QPDFObjectHandle root = getRoot();
     QPDFObjectHandle outlines = root.getKey("/Outlines");
@@ -1434,14 +1447,14 @@ QPDF::pushOutlinesToPart(
 
 void
 QPDF::getLinearizedParts(
-    std::map<int, int> const& object_stream_data,
+    QPDFWriter::ObjTable const& obj,
     std::vector<QPDFObjectHandle>& part4,
     std::vector<QPDFObjectHandle>& part6,
     std::vector<QPDFObjectHandle>& part7,
     std::vector<QPDFObjectHandle>& part8,
     std::vector<QPDFObjectHandle>& part9)
 {
-    calculateLinearizationData(object_stream_data);
+    calculateLinearizationData(obj);
     part4 = m->part4;
     part6 = m->part6;
     part7 = m->part7;

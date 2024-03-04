@@ -611,8 +611,6 @@ class QPDFWriter
     void pushMD5Pipeline(PipelinePopper&);
     void computeDeterministicIDData();
 
-    void discardGeneration(std::map<int, int>& out);
-
     class Members;
 
     // Keep all member variables inside the Members object, which we dynamically allocate. This

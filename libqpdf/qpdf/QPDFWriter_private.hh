@@ -121,7 +121,6 @@ class QPDFWriter::Members
 
     // For linearization only
     std::string lin_pass1_filename;
-    std::map<int, int> object_to_object_stream_no_gen;
 
     // For progress reporting
     std::shared_ptr<QPDFWriter::ProgressReporter> progress_reporter;
