@@ -2370,6 +2370,12 @@ QPDF::getRoot()
 std::map<QPDFObjGen, QPDFXRefEntry>
 QPDF::getXRefTable()
 {
+    return getXRefTableInternal();
+}
+
+std::map<QPDFObjGen, QPDFXRefEntry> const&
+QPDF::getXRefTableInternal()
+{
     if (!m->parsed) {
         throw std::logic_error("QPDF::getXRefTable called before parsing.");
     }
@@ -2388,18 +2394,6 @@ QPDF::tableSize()
         return toS(++max_obj);
     }
     return toS(++max_xref);
-}
-
-void
-QPDF::getObjectStreamData(std::map<int, int>& omap)
-{
-    for (auto const& iter: m->xref_table) {
-        QPDFObjGen const& og = iter.first;
-        QPDFXRefEntry const& entry = iter.second;
-        if (entry.getType() == 2) {
-            omap[og.getObj()] = entry.getObjStreamNumber();
-        }
-    }
 }
 
 std::vector<QPDFObjGen>

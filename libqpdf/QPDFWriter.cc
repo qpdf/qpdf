@@ -1936,12 +1936,7 @@ QPDFWriter::initializeSpecialStreams()
 void
 QPDFWriter::preserveObjectStreams()
 {
-    std::map<int, int> omap;
-    QPDF::Writer::getObjectStreamData(m->pdf, omap);
-    if (omap.empty()) {
-        m->obj.streams_empty = true;
-        return;
-    }
+    auto const& xref = QPDF::Writer::getXRefTable(m->pdf);
     // Our object_to_object_stream map has to map ObjGen -> ObjGen since we may be generating object
     // streams out of old objects that have generation numbers greater than zero. However in an
     // existing PDF, all object stream objects and all objects in them must have generation 0
@@ -1949,20 +1944,45 @@ QPDFWriter::preserveObjectStreams()
     // that are not allowed to be in object streams. In addition to removing objects that were
     // erroneously included in object streams in the source PDF, it also prevents unreferenced
     // objects from being included.
-    std::set<QPDFObjGen> eligible;
-    if (!m->preserve_unreferenced_objects) {
-        std::vector<QPDFObjGen> eligible_v = QPDF::Writer::getCompressibleObjGens(m->pdf);
-        eligible = std::set<QPDFObjGen>(eligible_v.begin(), eligible_v.end());
-    }
-    QTC::TC("qpdf", "QPDFWriter preserve object streams", m->preserve_unreferenced_objects ? 0 : 1);
-    for (auto iter: omap) {
-        QPDFObjGen og(iter.first, 0);
-        if (eligible.count(og) || m->preserve_unreferenced_objects) {
-            m->obj[iter.first].object_stream = iter.second;
-        } else {
-            QTC::TC("qpdf", "QPDFWriter exclude from object stream");
+    auto iter = xref.cbegin();
+    auto end = xref.cend();
+
+    // Start by scanning for first compressed object in case we don't have any object streams to
+    // process.
+    for (; iter != end; ++iter) {
+        if (iter->second.getType() == 2) {
+            // Pdf contains object streams.
+            QTC::TC(
+                "qpdf",
+                "QPDFWriter preserve object streams",
+                m->preserve_unreferenced_objects ? 0 : 1);
+
+            if (m->preserve_unreferenced_objects) {
+                for (; iter != end; ++iter) {
+                    if (iter->second.getType() == 2) {
+                        m->obj[iter->first].object_stream = iter->second.getObjStreamNumber();
+                    }
+                }
+            } else {
+                std::set<QPDFObjGen> eligible;
+                std::vector<QPDFObjGen> eligible_v = QPDF::Writer::getCompressibleObjGens(m->pdf);
+                eligible = std::set<QPDFObjGen>(eligible_v.begin(), eligible_v.end());
+                for (; iter != end; ++iter) {
+                    if (iter->second.getType() == 2) {
+                        QPDFObjGen og(iter->first.getObj(), 0);
+                        if (eligible.count(og)) {
+                            m->obj[iter->first].object_stream = iter->second.getObjStreamNumber();
+                        } else {
+                            QTC::TC("qpdf", "QPDFWriter exclude from object stream");
+                        }
+                    }
+                }
+            }
+            return;
         }
     }
+    // No compressed objects found.
+    m->obj.streams_empty = true;
 }
 
 void

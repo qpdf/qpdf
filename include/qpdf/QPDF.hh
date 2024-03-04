@@ -753,16 +753,16 @@ class QPDF
             return qpdf.generateHintStream(new_obj, obj, hint_stream, S, O, compressed);
         }
 
-        static void
-        getObjectStreamData(QPDF& qpdf, std::map<int, int>& omap)
-        {
-            qpdf.getObjectStreamData(omap);
-        }
-
         static std::vector<QPDFObjGen>
         getCompressibleObjGens(QPDF& qpdf)
         {
             return qpdf.getCompressibleObjGens();
+        }
+
+        static std::map<QPDFObjGen, QPDFXRefEntry> const&
+        getXRefTable(QPDF& qpdf)
+        {
+            return qpdf.getXRefTableInternal();
         }
 
         static size_t
@@ -1088,6 +1088,7 @@ class QPDF
 
     // For QPDFWriter:
 
+    std::map<QPDFObjGen, QPDFXRefEntry> const& getXRefTableInternal();
     size_t tableSize();
 
     // Get lists of all objects in order according to the part of a linearized file that they belong
@@ -1107,9 +1108,6 @@ class QPDF
         int& S,
         int& O,
         bool compressed);
-
-    // Map object to object stream that contains it
-    void getObjectStreamData(std::map<int, int>&);
 
     // Get a list of objects that would be permitted in an object stream.
     std::vector<QPDFObjGen> getCompressibleObjGens();
