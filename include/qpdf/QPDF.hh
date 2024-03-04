@@ -728,6 +728,15 @@ class QPDF
 
       private:
         static void
+        optimize(
+            QPDF& qpdf,
+            QPDFWriter::ObjTable const& obj,
+            std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
+        {
+            return qpdf.optimize(obj, skip_stream_parameters);
+        }
+
+        static void
         getLinearizedParts(
             QPDF& qpdf,
             std::map<int, int> const& object_stream_data,
@@ -1095,6 +1104,14 @@ class QPDF
     // For QPDFWriter:
 
     std::map<QPDFObjGen, QPDFXRefEntry> const& getXRefTableInternal();
+    template <typename T>
+    void optimize_internal(
+        T const& object_stream_data,
+        bool allow_changes = true,
+        std::function<int(QPDFObjectHandle&)> skip_stream_parameters = nullptr);
+    void optimize(
+        QPDFWriter::ObjTable const& obj,
+        std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
     size_t tableSize();
 
     // Get lists of all objects in order according to the part of a linearized file that they belong
@@ -1413,6 +1430,7 @@ class QPDF
         QPDFObjGen::set& visited,
         bool top);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
+    void filterCompressedObjects(QPDFWriter::ObjTable const& object_stream_data);
 
     // JSON import
     void importJSON(std::shared_ptr<InputSource>, bool must_be_complete);

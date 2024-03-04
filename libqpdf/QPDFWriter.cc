@@ -2576,7 +2576,7 @@ QPDFWriter::writeLinearized()
         }
     };
 
-    m->pdf.optimize(m->object_to_object_stream_no_gen, true, skip_stream_parameters);
+    QPDF::Writer::optimize(m->pdf, m->obj, skip_stream_parameters);
 
     std::vector<QPDFObjectHandle> part4;
     std::vector<QPDFObjectHandle> part6;
