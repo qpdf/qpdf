@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('xref-errors');
 
-my $n_tests = 6;
+my $n_tests = 7;
 
 # Handle file with invalid xref table and object 0 as a regular object
 # (bug 3159950).
@@ -61,6 +61,11 @@ $td->runtest("out of range in deleted object",
              {$td->COMMAND => "qpdf --check xref-range.pdf"},
              {$td->FILE => "xref-range.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+
+$td->runtest("extra text in xref table",
+             {$td->COMMAND => "qpdf --check bad-xref.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 3},
+             $td->EXPECT_FAILURE);
 
 cleanup();
 $td->report($n_tests);
