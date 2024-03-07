@@ -1004,7 +1004,8 @@ class QPDF
     bool resolveXRefTable();
     void reconstruct_xref(QPDFExc& e);
     bool parse_xrefFirst(std::string const& line, int& obj, int& num, int& bytes);
-    bool parse_xrefEntry(std::string const& line, qpdf_offset_t& f1, int& f2, char& type);
+    bool read_xrefEntry(qpdf_offset_t& f1, int& f2, char& type);
+    bool read_bad_xrefEntry(qpdf_offset_t& f1, int& f2, char& type);
     qpdf_offset_t read_xrefTable(qpdf_offset_t offset);
     qpdf_offset_t read_xrefStream(qpdf_offset_t offset);
     qpdf_offset_t processXRefStream(qpdf_offset_t offset, QPDFObjectHandle& xref_stream);
