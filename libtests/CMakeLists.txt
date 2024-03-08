@@ -23,6 +23,7 @@ set(TEST_PROGRAMS
   md5
   nntree
   numrange
+  obj_table
   pdf_version
   pl_function
   pointer_holder

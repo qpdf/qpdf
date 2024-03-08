@@ -5,6 +5,7 @@
 #include <qpdf/QPDF.hh>
 
 #include <qpdf/QPDFExc.hh>
+#include <qpdf/QPDFWriter_private.hh>
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QTC.hh>
@@ -56,6 +57,23 @@ QPDF::ObjUser::operator<(ObjUser const& rhs) const
 void
 QPDF::optimize(
     std::map<int, int> const& object_stream_data,
+    bool allow_changes,
+    std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
+{
+    optimize_internal(object_stream_data, allow_changes, skip_stream_parameters);
+}
+
+void
+QPDF::optimize(
+    QPDFWriter::ObjTable const& obj, std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
+{
+    optimize_internal(obj, true, skip_stream_parameters);
+}
+
+template <typename T>
+void
+QPDF::optimize_internal(
+    T const& object_stream_data,
     bool allow_changes,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
@@ -372,6 +390,48 @@ QPDF::filterCompressedObjects(std::map<int, int> const& object_stream_data)
                 t_object_to_obj_users[og].insert(ou);
             } else {
                 t_object_to_obj_users[QPDFObjGen(i2->second, 0)].insert(ou);
+            }
+        }
+    }
+
+    m->obj_user_to_objects = t_obj_user_to_objects;
+    m->object_to_obj_users = t_object_to_obj_users;
+}
+
+void
+QPDF::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
+{
+    if (obj.getStreamsEmpty()) {
+        return;
+    }
+
+    // Transform object_to_obj_users and obj_user_to_objects so that they refer only to uncompressed
+    // objects.  If something is a user of a compressed object, then it is really a user of the
+    // object stream that contains it.
+
+    std::map<ObjUser, std::set<QPDFObjGen>> t_obj_user_to_objects;
+    std::map<QPDFObjGen, std::set<ObjUser>> t_object_to_obj_users;
+
+    for (auto const& i1: m->obj_user_to_objects) {
+        ObjUser const& ou = i1.first;
+        // Loop over objects.
+        for (auto const& og: i1.second) {
+            if (auto const& i2 = obj[og].object_stream; i2 <= 0) {
+                t_obj_user_to_objects[ou].insert(og);
+            } else {
+                t_obj_user_to_objects[ou].insert(QPDFObjGen(i2, 0));
+            }
+        }
+    }
+
+    for (auto const& i1: m->object_to_obj_users) {
+        QPDFObjGen const& og = i1.first;
+        // Loop over obj_users.
+        for (auto const& ou: i1.second) {
+            if (auto i2 = obj[og].object_stream; i2 <= 0) {
+                t_object_to_obj_users[og].insert(ou);
+            } else {
+                t_object_to_obj_users[QPDFObjGen(i2, 0)].insert(ou);
             }
         }
     }

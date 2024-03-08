@@ -41,6 +41,7 @@
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFStreamFilter.hh>
 #include <qpdf/QPDFTokenizer.hh>
+#include <qpdf/QPDFWriter.hh>
 #include <qpdf/QPDFXRefEntry.hh>
 
 class QPDF_Stream;
@@ -727,43 +728,62 @@ class QPDF
 
       private:
         static void
+        optimize(
+            QPDF& qpdf,
+            QPDFWriter::ObjTable const& obj,
+            std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
+        {
+            return qpdf.optimize(obj, skip_stream_parameters);
+        }
+
+        static void
         getLinearizedParts(
             QPDF& qpdf,
-            std::map<int, int> const& object_stream_data,
+            QPDFWriter::ObjTable const& obj,
             std::vector<QPDFObjectHandle>& part4,
             std::vector<QPDFObjectHandle>& part6,
             std::vector<QPDFObjectHandle>& part7,
             std::vector<QPDFObjectHandle>& part8,
             std::vector<QPDFObjectHandle>& part9)
         {
-            qpdf.getLinearizedParts(object_stream_data, part4, part6, part7, part8, part9);
+            qpdf.getLinearizedParts(obj, part4, part6, part7, part8, part9);
         }
 
         static void
         generateHintStream(
             QPDF& qpdf,
-            std::map<int, QPDFXRefEntry> const& xref,
-            std::map<int, qpdf_offset_t> const& lengths,
-            std::map<int, int> const& obj_renumber,
+            QPDFWriter::NewObjTable const& new_obj,
+            QPDFWriter::ObjTable const& obj,
             std::shared_ptr<Buffer>& hint_stream,
             int& S,
             int& O,
             bool compressed)
         {
-            return qpdf.generateHintStream(
-                xref, lengths, obj_renumber, hint_stream, S, O, compressed);
-        }
-
-        static void
-        getObjectStreamData(QPDF& qpdf, std::map<int, int>& omap)
-        {
-            qpdf.getObjectStreamData(omap);
+            return qpdf.generateHintStream(new_obj, obj, hint_stream, S, O, compressed);
         }
 
         static std::vector<QPDFObjGen>
         getCompressibleObjGens(QPDF& qpdf)
         {
-            return qpdf.getCompressibleObjGens();
+            return qpdf.getCompressibleObjVector();
+        }
+
+        static std::vector<bool>
+        getCompressibleObjSet(QPDF& qpdf)
+        {
+            return qpdf.getCompressibleObjSet();
+        }
+
+        static std::map<QPDFObjGen, QPDFXRefEntry> const&
+        getXRefTable(QPDF& qpdf)
+        {
+            return qpdf.getXRefTableInternal();
+        }
+
+        static size_t
+        tableSize(QPDF& qpdf)
+        {
+            return qpdf.tableSize();
         }
     };
 
@@ -1083,10 +1103,21 @@ class QPDF
 
     // For QPDFWriter:
 
+    std::map<QPDFObjGen, QPDFXRefEntry> const& getXRefTableInternal();
+    template <typename T>
+    void optimize_internal(
+        T const& object_stream_data,
+        bool allow_changes = true,
+        std::function<int(QPDFObjectHandle&)> skip_stream_parameters = nullptr);
+    void optimize(
+        QPDFWriter::ObjTable const& obj,
+        std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
+    size_t tableSize();
+
     // Get lists of all objects in order according to the part of a linearized file that they belong
     // to.
     void getLinearizedParts(
-        std::map<int, int> const& object_stream_data,
+        QPDFWriter::ObjTable const& obj,
         std::vector<QPDFObjectHandle>& part4,
         std::vector<QPDFObjectHandle>& part6,
         std::vector<QPDFObjectHandle>& part7,
@@ -1094,19 +1125,18 @@ class QPDF
         std::vector<QPDFObjectHandle>& part9);
 
     void generateHintStream(
-        std::map<int, QPDFXRefEntry> const& xref,
-        std::map<int, qpdf_offset_t> const& lengths,
-        std::map<int, int> const& obj_renumber,
+        QPDFWriter::NewObjTable const& new_obj,
+        QPDFWriter::ObjTable const& obj,
         std::shared_ptr<Buffer>& hint_stream,
         int& S,
         int& O,
         bool compressed);
 
-    // Map object to object stream that contains it
-    void getObjectStreamData(std::map<int, int>&);
-
     // Get a list of objects that would be permitted in an object stream.
-    std::vector<QPDFObjGen> getCompressibleObjGens();
+    template <typename T>
+    std::vector<T> getCompressibleObjGens();
+    std::vector<QPDFObjGen> getCompressibleObjVector();
+    std::vector<bool> getCompressibleObjSet();
 
     // methods to support page handling
 
@@ -1352,6 +1382,7 @@ class QPDF
     qpdf_offset_t getLinearizationOffset(QPDFObjGen const&);
     QPDFObjectHandle
     getUncompressedObject(QPDFObjectHandle&, std::map<int, int> const& object_stream_data);
+    QPDFObjectHandle getUncompressedObject(QPDFObjectHandle&, QPDFWriter::ObjTable const& obj);
     int lengthNextN(int first_object, int n);
     void
     checkHPageOffset(std::vector<QPDFObjectHandle> const& pages, std::map<int, int>& idx_to_obj);
@@ -1362,28 +1393,23 @@ class QPDF
     void dumpHSharedObject();
     void dumpHGeneric(HGeneric&);
     qpdf_offset_t adjusted_offset(qpdf_offset_t offset);
-    void calculateLinearizationData(std::map<int, int> const& object_stream_data);
+    template <typename T>
+    void calculateLinearizationData(T const& object_stream_data);
+    template <typename T>
     void pushOutlinesToPart(
         std::vector<QPDFObjectHandle>& part,
         std::set<QPDFObjGen>& lc_outlines,
-        std::map<int, int> const& object_stream_data);
+        T const& object_stream_data);
     int outputLengthNextN(
         int in_object,
         int n,
-        std::map<int, qpdf_offset_t> const& lengths,
-        std::map<int, int> const& obj_renumber);
-    void calculateHPageOffset(
-        std::map<int, QPDFXRefEntry> const& xref,
-        std::map<int, qpdf_offset_t> const& lengths,
-        std::map<int, int> const& obj_renumber);
-    void calculateHSharedObject(
-        std::map<int, QPDFXRefEntry> const& xref,
-        std::map<int, qpdf_offset_t> const& lengths,
-        std::map<int, int> const& obj_renumber);
-    void calculateHOutline(
-        std::map<int, QPDFXRefEntry> const& xref,
-        std::map<int, qpdf_offset_t> const& lengths,
-        std::map<int, int> const& obj_renumber);
+        QPDFWriter::NewObjTable const& new_obj,
+        QPDFWriter::ObjTable const& obj);
+    void
+    calculateHPageOffset(QPDFWriter::NewObjTable const& new_obj, QPDFWriter::ObjTable const& obj);
+    void
+    calculateHSharedObject(QPDFWriter::NewObjTable const& new_obj, QPDFWriter::ObjTable const& obj);
+    void calculateHOutline(QPDFWriter::NewObjTable const& new_obj, QPDFWriter::ObjTable const& obj);
     void writeHPageOffset(BitWriter&);
     void writeHSharedObject(BitWriter&);
     void writeHGeneric(BitWriter&, HGeneric&);
@@ -1407,6 +1433,7 @@ class QPDF
         QPDFObjGen::set& visited,
         bool top);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
+    void filterCompressedObjects(QPDFWriter::ObjTable const& object_stream_data);
 
     // JSON import
     void importJSON(std::shared_ptr<InputSource>, bool must_be_complete);
