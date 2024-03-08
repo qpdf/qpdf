@@ -169,7 +169,7 @@ QPDFParser::parseRemainder(bool content_stream)
                     // This action has the desirable side effect of causing dangling references
                     // (references to indirect objects that don't appear in the PDF) in any parsed
                     // object to appear in the object cache.
-                    add(std::move(context->getObject(id, gen).obj));
+                    add(QPDF::ParseGuard::getObject(context, id, gen));
                 } else {
                     QTC::TC("qpdf", "QPDFParser invalid objgen");
                     addNull();
