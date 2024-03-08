@@ -654,9 +654,11 @@ QPDF::reconstruct_xref(QPDFExc& e)
     }
     check_warnings();
     if (!m->parsed) {
+        m->parsed = true;
         getAllPages();
         check_warnings();
         if (m->all_pages.empty()) {
+            m->parsed = false;
             throw damagedPDF("", 0, "unable to find any pages while recovering damaged file");
         }
     }
@@ -2096,30 +2098,52 @@ QPDF::newStream(std::string const& data)
 }
 
 QPDFObjectHandle
-QPDF::reserveObjectIfNotExists(QPDFObjGen const& og)
-{
-    if (!isCached(og) && m->xref_table.count(og) == 0) {
-        updateCache(og, QPDF_Reserved::create(), -1, -1);
-        return newIndirect(og, m->obj_cache[og].object);
-    } else {
-        return getObject(og);
-    }
-}
-
-QPDFObjectHandle
 QPDF::reserveStream(QPDFObjGen const& og)
 {
     return {QPDF_Stream::create(this, og, QPDFObjectHandle::newDictionary(), 0, 0)};
 }
 
+std::shared_ptr<QPDFObject>
+QPDF::getObjectForParser(int id, int gen, bool parse_pdf)
+{
+    // This method is called by the parser and therefore must not resolve any objects.
+    auto og = QPDFObjGen(id, gen);
+    if (auto iter = m->obj_cache.find(og); iter != m->obj_cache.end()) {
+        return iter->second.object;
+    }
+    if (m->xref_table.count(og) || !m->parsed) {
+        return m->obj_cache.insert({og, QPDF_Unresolved::create(this, og)}).first->second.object;
+    }
+    if (parse_pdf) {
+        return QPDF_Null::create();
+    }
+    return m->obj_cache.insert({og, QPDF_Null::create(this, og)}).first->second.object;
+}
+
+std::shared_ptr<QPDFObject>
+QPDF::getObjectForJSON(int id, int gen)
+{
+    auto og = QPDFObjGen(id, gen);
+    auto [it, inserted] = m->obj_cache.try_emplace(og);
+    auto& obj = it->second.object;
+    if (inserted) {
+        obj = (m->parsed && !m->xref_table.count(og)) ? QPDF_Null::create(this, og)
+                                                      : QPDF_Unresolved::create(this, og);
+    }
+    return obj;
+}
+
 QPDFObjectHandle
 QPDF::getObject(QPDFObjGen const& og)
 {
-    // This method is called by the parser and therefore must not resolve any objects.
-    if (!isCached(og)) {
-        m->obj_cache[og] = ObjCache(QPDF_Unresolved::create(this, og), -1, -1);
+    if (auto it = m->obj_cache.find(og); it != m->obj_cache.end()) {
+        return {it->second.object};
+    } else if (m->parsed && !m->xref_table.count(og)) {
+        return QPDF_Null::create();
+    } else {
+        auto result = m->obj_cache.try_emplace(og, QPDF_Unresolved::create(this, og), -1, -1);
+        return {result.first->second.object};
     }
-    return newIndirect(og, m->obj_cache[og].object);
 }
 
 QPDFObjectHandle

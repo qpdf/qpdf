@@ -5,7 +5,7 @@
   item 2 is direct
   item 3 is indirect
   item 4 is direct
-  item 5 is indirect
+  item 5 is direct
 unparse: 9 0 R
-unparseResolved: [ /literal null /indirect 8 0 R /undefined 10 0 R ]
+unparseResolved: [ /literal null /indirect 8 0 R /undefined null ]
 test 1 done

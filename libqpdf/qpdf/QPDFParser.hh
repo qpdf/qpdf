@@ -24,7 +24,8 @@ class QPDFParser
         decrypter(decrypter),
         context(context),
         description(std::make_shared<QPDFValue::Description>(
-            std::string(input->getName() + ", " + object_description + " at offset $PO")))
+            std::string(input->getName() + ", " + object_description + " at offset $PO"))),
+        parse_pdf(parse_pdf)
     {
     }
     virtual ~QPDFParser() = default;
@@ -77,6 +78,8 @@ class QPDFParser
     QPDFObjectHandle::StringDecrypter* decrypter;
     QPDF* context;
     std::shared_ptr<QPDFValue::Description> description;
+    bool parse_pdf;
+
     std::vector<StackFrame> stack;
     StackFrame* frame;
     // Number of recent bad tokens.

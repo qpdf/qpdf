@@ -14,14 +14,14 @@ endobj
 2 0 obj
 <<
   /dangling-ref-for-json-test [
-    4 0 R
+    null
   ]
   /hex#20strings [
     (Potato)
     <01020300040560>
     (AB)
   ]
-  /indirect 5 0 R
+  /indirect 4 0 R
   /names [
     /nesting
     /hex#20strings
@@ -71,27 +71,22 @@ endobj
 <<
   /Count 1
   /Kids [
-    6 0 R
+    5 0 R
   ]
   /Type /Pages
 >>
 endobj
 
-%% Original object ID: 9 0
-4 0 obj
-null
-endobj
-
 %% Original object ID: 8 0
-5 0 obj
+4 0 obj
 (hello)
 endobj
 
 %% Page 1
 %% Original object ID: 3 0
-6 0 obj
+5 0 obj
 <<
-  /Contents 7 0 R
+  /Contents 6 0 R
   /MediaBox [
     0
     0
@@ -101,9 +96,9 @@ endobj
   /Parent 3 0 R
   /Resources <<
     /Font <<
-      /F1 9 0 R
+      /F1 8 0 R
     >>
-    /ProcSet 10 0 R
+    /ProcSet 9 0 R
   >>
   /Type /Page
 >>
@@ -111,10 +106,10 @@ endobj
 
 %% Contents for page 1
 %% Original object ID: 4 0
-7 0 obj
+6 0 obj
 <<
   /Potato (salad)
-  /Length 8 0 R
+  /Length 7 0 R
 >>
 stream
 BT
@@ -125,12 +120,12 @@ ET
 endstream
 endobj
 
-8 0 obj
+7 0 obj
 44
 endobj
 
 %% Original object ID: 6 0
-9 0 obj
+8 0 obj
 <<
   /BaseFont /Helvetica
   /Encoding /WinAnsiEncoding
@@ -141,7 +136,7 @@ endobj
 endobj
 
 %% Original object ID: 5 0
-10 0 obj
+9 0 obj
 [
   /PDF
   /Text
@@ -149,24 +144,23 @@ endobj
 endobj
 
 xref
-0 11
+0 10
 0000000000 65535 f 
 0000000052 00000 n 
 0000000133 00000 n 
-0000000756 00000 n 
-0000000855 00000 n 
-0000000903 00000 n 
-0000000964 00000 n 
-0000001207 00000 n 
-0000001324 00000 n 
-0000001370 00000 n 
-0000001515 00000 n 
+0000000755 00000 n 
+0000000854 00000 n 
+0000000915 00000 n 
+0000001157 00000 n 
+0000001274 00000 n 
+0000001320 00000 n 
+0000001465 00000 n 
 trailer <<
   /QTest 2 0 R
   /Root 1 0 R
-  /Size 11
+  /Size 10
   /ID [<31415926535897932384626433832795><31415926535897932384626433832795>]
 >>
 startxref
-1551
+1500
 %%EOF
