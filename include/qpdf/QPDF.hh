@@ -794,7 +794,8 @@ class QPDF
         }
     };
 
-    // The ParseGuard class allows QPDFParser to detect re-entrant parsing.
+    // The ParseGuard class allows QPDFParser to detect re-entrant parsing. It also provides
+    // special access to allow the parser to create unresolved objects and dangling references.
     class ParseGuard
     {
         friend class QPDFParser;
@@ -807,6 +808,13 @@ class QPDF
                 qpdf->inParse(true);
             }
         }
+
+        static std::shared_ptr<QPDFObject>
+        getObject(QPDF* qpdf, int id, int gen)
+        {
+            return qpdf->getObjectForParser(id, gen);
+        }
+
         ~ParseGuard()
         {
             if (qpdf) {
@@ -1031,13 +1039,15 @@ class QPDF
     void resolve(QPDFObjGen og);
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
-    QPDFObjectHandle reserveObjectIfNotExists(QPDFObjGen const& og);
     QPDFObjectHandle reserveStream(QPDFObjGen const& og);
     QPDFObjGen nextObjGen();
     QPDFObjectHandle newIndirect(QPDFObjGen const&, std::shared_ptr<QPDFObject> const&);
     QPDFObjectHandle makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj);
     bool isCached(QPDFObjGen const& og);
     bool isUnresolved(QPDFObjGen const& og);
+//    std::shared_ptr<QPDFObject> addUnresolvedIfNotExists(QPDFObjGen og);
+//    std::shared_ptr<QPDFObject> addNullIfNotExists(QPDFObjGen og);
+    std::shared_ptr<QPDFObject> getObjectForParser(int id, int gen);
     void removeObject(QPDFObjGen og);
     void updateCache(
         QPDFObjGen const& og,

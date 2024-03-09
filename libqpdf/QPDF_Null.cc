@@ -3,15 +3,15 @@
 #include <qpdf/JSON_writer.hh>
 #include <qpdf/QPDFObject_private.hh>
 
-QPDF_Null::QPDF_Null() :
-    QPDFValue(::ot_null, "null")
+QPDF_Null::QPDF_Null(QPDF* qpdf, QPDFObjGen og) :
+    QPDFValue(::ot_null, "null", qpdf, og)
 {
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Null::create()
+QPDF_Null::create(QPDF* qpdf, QPDFObjGen og)
 {
-    return do_create(new QPDF_Null());
+    return do_create(new QPDF_Null(qpdf, og));
 }
 
 std::shared_ptr<QPDFObject>
