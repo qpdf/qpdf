@@ -792,12 +792,13 @@ class QPDF
     class Resolver
     {
         friend class QPDFObject;
+        friend class QPDF_Unresolved;
 
       private:
-        static void
-        resolve(QPDF* qpdf, QPDFObjGen const& og)
+        static QPDFObject*
+        resolved(QPDF* qpdf, QPDFObjGen og)
         {
-            qpdf->resolve(og);
+            return qpdf->resolve(og);
         }
     };
 
@@ -1056,7 +1057,7 @@ class QPDF
         QPDFObjGen exp_og,
         QPDFObjGen& og,
         bool skip_cache_if_in_xref);
-    void resolve(QPDFObjGen og);
+    QPDFObject* resolve(QPDFObjGen og);
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
     QPDFObjectHandle reserveObjectIfNotExists(QPDFObjGen const& og);

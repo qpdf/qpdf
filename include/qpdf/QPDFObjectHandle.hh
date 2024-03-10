@@ -1363,24 +1363,23 @@ class QPDFObjectHandle
     void writeJSON(int json_version, JSON::Writer& p, bool dereference_indirect = false);
 
   private:
-    QPDF_Array* asArray();
-    QPDF_Bool* asBool();
-    QPDF_Dictionary* asDictionary();
-    QPDF_InlineImage* asInlineImage();
-    QPDF_Integer* asInteger();
-    QPDF_Name* asName();
-    QPDF_Null* asNull();
-    QPDF_Operator* asOperator();
-    QPDF_Real* asReal();
-    QPDF_Reserved* asReserved();
-    QPDF_Stream* asStream();
+    QPDF_Array* asArray() const;
+    QPDF_Bool* asBool() const;
+    QPDF_Dictionary* asDictionary() const;
+    QPDF_InlineImage* asInlineImage() const;
+    QPDF_Integer* asInteger() const;
+    QPDF_Name* asName() const;
+    QPDF_Null* asNull() const;
+    QPDF_Operator* asOperator() const;
+    QPDF_Real* asReal() const;
+    QPDF_Reserved* asReserved() const;
+    QPDF_Stream* asStream() const;
     QPDF_Stream* asStreamWithAssert();
-    QPDF_String* asString();
+    QPDF_String* asString() const;
 
     void typeWarning(char const* expected_type, std::string const& warning);
     void objectWarning(std::string const& warning);
     void assertType(char const* type_name, bool istype);
-    inline bool dereference();
     void makeDirect(QPDFObjGen::set& visited, bool stop_at_streams);
     void disconnect();
     void setParsedOffset(qpdf_offset_t offset);

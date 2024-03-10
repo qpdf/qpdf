@@ -11,6 +11,7 @@ class QPDF_Unresolved: public QPDFValue
     std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
     std::string unparse() override;
     void writeJSON(int json_version, JSON::Writer& p) override;
+    std::string getStringValue() const override;
 
   private:
     QPDF_Unresolved(QPDF* qpdf, QPDFObjGen const& og);
