@@ -1,1 +1,1 @@
-exception: bad-40.json: JSON: offset 28: duplicated dictionary key
+exception: bad-40.json: JSON: control or null character at offset 10

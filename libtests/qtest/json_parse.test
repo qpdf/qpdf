@@ -32,7 +32,7 @@ if ($^O ne 'msys')
 
 cleanup();
 
-my $good = 11;
+my $good = 12;
 
 for (my $i = 1; $i <= $good; ++$i)
 {
@@ -120,7 +120,7 @@ my @bad = (
     "stray low surrogate",      # 37
     "high high surrogate",      # 38
     "dangling high surrogate",  # 39
-    "duplicate dictionary key", # 40
+    "bs char in string",        # 40
     "decimal point after minus",# 41
     "e after minus",            # 42
     "missing digit after e",    # 43
@@ -128,7 +128,7 @@ my @bad = (
     "tab char in string",       # 45
     "cr char in string",        # 46
     "lf char in string",        # 47
-    "bs char in string",        # 48
+    #"bs char in string",       # 40
     );
 
 my $i = 0;
