@@ -30,7 +30,7 @@ class QPDF_Array: public QPDFValue
     {
         return sp ? sp->size : int(elements.size());
     }
-    QPDFObjectHandle at(int n) const noexcept;
+    std::pair<bool, QPDFObjectHandle> at(int n) const noexcept;
     bool setAt(int n, QPDFObjectHandle const& oh);
     std::vector<QPDFObjectHandle> getAsVector() const;
     void setFromVector(std::vector<QPDFObjectHandle> const& items);

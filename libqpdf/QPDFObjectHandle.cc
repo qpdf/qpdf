@@ -1004,8 +1004,9 @@ QPDFObjectHandle::getArrayItem(int n) const
 #endif
 {
     if (auto array = asArray()) {
-        if (auto result = array->at(n); result.obj != nullptr) {
-            return result;
+        auto result = array->at(n);
+        if (result.first) {
+            return result.second;
         } else {
             objectWarning("returning null for out of bounds array access");
             QTC::TC("qpdf", "QPDFObjectHandle array bounds");
@@ -1028,7 +1029,7 @@ QPDFObjectHandle::isRectangle() const
 {
     if (auto array = asArray()) {
         for (int i = 0; i < 4; ++i) {
-            if (auto item = array->at(i); !(item.obj && item.isNumber())) {
+            if (auto item = array->at(i).second; !item.isNumber()) {
                 return false;
             }
         }
@@ -1047,7 +1048,7 @@ QPDFObjectHandle::isMatrix() const
 {
     if (auto array = asArray()) {
         for (int i = 0; i < 6; ++i) {
-            if (auto item = array->at(i); !(item.obj && item.isNumber())) {
+            if (auto item = array->at(i).second; !item.isNumber()) {
                 return false;
             }
         }
@@ -1070,7 +1071,7 @@ QPDFObjectHandle::getArrayAsRectangle() const
         }
         double items[4];
         for (int i = 0; i < 4; ++i) {
-            if (!array->at(i).getValueAsNumber(items[i])) {
+            if (auto item = array->at(i).second; !item.getValueAsNumber(items[i])) {
                 return {};
             }
         }
@@ -1097,7 +1098,7 @@ QPDFObjectHandle::getArrayAsMatrix() const
         }
         double items[6];
         for (int i = 0; i < 6; ++i) {
-            if (!array->at(i).getValueAsNumber(items[i])) {
+            if (auto item = array->at(i).second; !item.getValueAsNumber(items[i])) {
                 return {};
             }
         }
@@ -1207,7 +1208,7 @@ QPDFObjectHandle
 QPDFObjectHandle::eraseItemAndGetOld(int at)
 {
     auto array = asArray();
-    auto result = (array && at < array->size() && at >= 0) ? array->at(at) : newNull();
+    auto result = (array && at < array->size() && at >= 0) ? array->at(at).second : newNull();
     eraseItem(at);
     return result;
 }
@@ -1747,7 +1748,7 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
     if (auto array = asArray()) {
         int n_items = array->size();
         for (int i = 0; i < n_items; ++i) {
-            QPDFObjectHandle item = array->at(i);
+            QPDFObjectHandle item = array->at(i).second;
             if (item.isStream()) {
                 result.push_back(item);
             } else {
@@ -2448,7 +2449,7 @@ QPDFObjectHandle::makeDirect(QPDFObjGen::set& visited, bool stop_at_streams)
         auto array = asArray();
         int n = array->size();
         for (int i = 0; i < n; ++i) {
-            items.push_back(array->at(i));
+            items.push_back(array->at(i).second);
             items.back().makeDirect(visited, stop_at_streams);
         }
         this->obj = QPDF_Array::create(items);
