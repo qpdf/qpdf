@@ -5,8 +5,11 @@
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QTC.hh>
 
+#ifndef QPDF_FUTURE
 static const QPDFObjectHandle null_oh = QPDFObjectHandle::newNull();
-
+#else
+static const QPDFObjectHandle null_oh;
+#endif
 inline void
 QPDF_Array::checkOwnership(QPDFObjectHandle const& item) const
 {
@@ -21,7 +24,9 @@ QPDF_Array::checkOwnership(QPDFObjectHandle const& item) const
             }
         }
     } else {
+#ifndef QPDF_FUTURE
         throw std::logic_error("Attempting to add an uninitialized object to a QPDF_Array.");
+#endif
     }
 }
 
@@ -48,7 +53,7 @@ QPDF_Array::QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& v, bool sparse
     if (sparse) {
         sp = std::make_unique<Sparse>();
         for (auto&& item: v) {
-            if (item->getTypeCode() != ::ot_null || item->getObjGen().isIndirect()) {
+            if (item && (item->getTypeCode() != ::ot_null || item->getObjGen().isIndirect())) {
                 sp->elements[sp->size] = std::move(item);
             }
             ++sp->size;
@@ -84,7 +89,7 @@ QPDF_Array::copy(bool shallow)
             for (auto const& element: sp->elements) {
                 auto const& obj = element.second;
                 result->sp->elements[element.first] =
-                    obj->getObjGen().isIndirect() ? obj : obj->copy();
+                    !obj || obj->getObjGen().isIndirect() ? obj : obj->copy();
             }
             return do_create(result);
         } else {
@@ -106,13 +111,13 @@ QPDF_Array::disconnect()
     if (sp) {
         for (auto& item: sp->elements) {
             auto& obj = item.second;
-            if (!obj->getObjGen().isIndirect()) {
+            if (obj && !obj->getObjGen().isIndirect()) {
                 obj->disconnect();
             }
         }
     } else {
         for (auto& obj: elements) {
-            if (!obj->getObjGen().isIndirect()) {
+            if (obj && !obj->getObjGen().isIndirect()) {
                 obj->disconnect();
             }
         }
@@ -130,9 +135,13 @@ QPDF_Array::unparse()
             for (int j = next; j < key; ++j) {
                 result += "null ";
             }
-            item.second->resolve();
-            auto og = item.second->getObjGen();
-            result += og.isIndirect() ? og.unparse(' ') + " R " : item.second->unparse() + " ";
+            if (item.second) {
+                item.second->resolve();
+                auto og = item.second->getObjGen();
+                result += og.isIndirect() ? og.unparse(' ') + " R " : item.second->unparse() + " ";
+            } else {
+                result += "null ";
+            }
             next = ++key;
         }
         for (int j = next; j < sp->size; ++j) {
@@ -140,9 +149,13 @@ QPDF_Array::unparse()
         }
     } else {
         for (auto const& item: elements) {
-            item->resolve();
-            auto og = item->getObjGen();
-            result += og.isIndirect() ? og.unparse(' ') + " R " : item->unparse() + " ";
+            if (item) {
+                item->resolve();
+                auto og = item->getObjGen();
+                result += og.isIndirect() ? og.unparse(' ') + " R " : item->unparse() + " ";
+            } else {
+                result += "null ";
+            }
         }
     }
     result += "]";
@@ -161,11 +174,15 @@ QPDF_Array::writeJSON(int json_version, JSON::Writer& p)
                 p.writeNext() << "null";
             }
             p.writeNext();
-            auto og = item.second->getObjGen();
-            if (og.isIndirect()) {
-                p << "\"" << og.unparse(' ') << " R\"";
+            if (item.second) {
+                auto og = item.second->getObjGen();
+                if (og.isIndirect()) {
+                    p << "\"" << og.unparse(' ') << " R\"";
+                } else {
+                    item.second->writeJSON(json_version, p);
+                }
             } else {
-                item.second->writeJSON(json_version, p);
+                p << "null";
             }
             next = ++key;
         }
@@ -175,11 +192,15 @@ QPDF_Array::writeJSON(int json_version, JSON::Writer& p)
     } else {
         for (auto const& item: elements) {
             p.writeNext();
-            auto og = item->getObjGen();
-            if (og.isIndirect()) {
-                p << "\"" << og.unparse(' ') << " R\"";
+            if (item) {
+                auto og = item->getObjGen();
+                if (og.isIndirect()) {
+                    p << "\"" << og.unparse(' ') << " R\"";
+                } else {
+                    item->writeJSON(json_version, p);
+                }
             } else {
-                item->writeJSON(json_version, p);
+                p << "null";
             }
         }
     }

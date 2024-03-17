@@ -90,8 +90,10 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
             }
         }
     }
+#ifndef QPDF_FUTURE
     if (!result.isInitialized()) {
         result = QPDFObjectHandle::newNull();
     }
+#endif
     return result;
 }

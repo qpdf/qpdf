@@ -1,0 +1,3 @@
+getRoot: operation for dictionary attempted on object of type null: returning null for attempted key retrieval
+WARNING: closed input source: object 1/0: error reading object: QPDF operation attempted on a QPDF object with no input source. QPDF operations are invalid before processFile (or another process method) or after closeInputSource
+closed input source: unable to find /Root dictionary
