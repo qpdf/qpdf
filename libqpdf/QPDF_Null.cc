@@ -35,7 +35,10 @@ QPDF_Null::create(
 std::shared_ptr<QPDFObject>
 QPDF_Null::copy(bool shallow)
 {
+#ifndef QPDF_FUTURE
     return create();
+#endif
+    return nullptr;
 }
 
 std::string

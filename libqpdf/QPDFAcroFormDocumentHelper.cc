@@ -55,7 +55,11 @@ QPDFAcroFormDocumentHelper::addFormField(QPDFFormFieldObjectHelper ff)
     }
     fields.appendItem(ff.getObjectHandle());
     QPDFObjGen::set visited;
+#ifndef QPDF_FUTURE
     traverseField(ff.getObjectHandle(), QPDFObjectHandle::newNull(), 0, visited);
+#else
+    traverseField(ff.getObjectHandle(), {}, 0, visited);
+#endif
 }
 
 void

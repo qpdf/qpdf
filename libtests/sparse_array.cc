@@ -102,11 +102,14 @@ main()
     assert(c->unparse() == "[ null null null null null 5 0 R null [ 0 1 42 3 ] null null ]");
     assert(d->unparse() == "[ null null null null null 5 0 R null [ 0 1 2 3 ] null null ]");
 
+#ifndef QPDF_FUTURE
+
     try {
         b.setAt(3, {});
         std::cout << "inserted uninitialized object\n";
     } catch (std::logic_error&) {
     }
+#endif
     QPDF pdf2;
     pdf2.emptyPDF();
     try {

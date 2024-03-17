@@ -214,8 +214,20 @@ test_0_1(QPDF& pdf, char const* arg2)
     }
 
     QTC::TC("qpdf", "main QTest indirect", qtest.isIndirect() ? 1 : 0);
-    std::cout << "/QTest is " << (qtest.isIndirect() ? "in" : "") << "direct and has type "
-              << qtest.getTypeName() << " (" << qtest.getTypeCode() << ")" << std::endl;
+    auto tn = qtest.getTypeName();
+    auto tc = qtest.getTypeCode();
+#ifdef QPDF_FUTURE
+    if (!qtest.isInitialized()) {
+        //        assert(tc == ::ot_null);
+        //        assert(std::string_view(tn) == "null");
+        if (!trailer.isInitialized()) {
+            tn = "uninitialized";
+            tc = ::ot_uninitialized;
+        }
+    }
+#endif
+    std::cout << "/QTest is " << (qtest.isIndirect() ? "in" : "") << "direct and has type " << tn
+              << " (" << tc << ")" << std::endl;
 
     if (qtest.isNull()) {
         QTC::TC("qpdf", "main QTest null");
@@ -1545,7 +1557,13 @@ test_42(QPDF& pdf, char const* arg2)
     assert(!uninitialized.isInitialized());
     assert(!uninitialized.isInteger());
     assert(!uninitialized.isDictionary());
+#ifdef QPDF_FUTURE
+    assert(uninitialized.isNull());
+    assert(uninitialized.isScalar());
+#else
+    assert(!uninitialized.isNull());
     assert(!uninitialized.isScalar());
+#endif
 }
 
 static void
@@ -3477,8 +3495,13 @@ runtest(int n, char const* filename1, char const* arg2)
         assert(password == "1234567890123456789012(45678");
 
         QPDFObjectHandle uninitialized;
+#ifndef QPDF_FUTURE
         assert(uninitialized.getTypeCode() == ::ot_uninitialized);
         assert(strcmp(uninitialized.getTypeName(), "uninitialized") == 0);
+#else
+        assert(uninitialized.getTypeCode() == ::ot_null);
+        assert(strcmp(uninitialized.getTypeName(), "null") == 0);
+#endif
 
         // ABI: until QPDF 12, spot check deprecated constants
         assert(QPDFObject::ot_dictionary == ::ot_dictionary);

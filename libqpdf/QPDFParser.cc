@@ -394,7 +394,11 @@ QPDFParser::add(std::shared_ptr<QPDFObject>&& obj)
 void
 QPDFParser::addNull()
 {
+#ifndef QPDF_FUTURE
     const static ObjectPtr null_obj = QPDF_Null::create();
+#else
+    const static ObjectPtr null_obj;
+#endif
 
     if (frame->state != st_dictionary_value) {
         // If state is st_dictionary_key then there is a missing key. Push onto olist for
@@ -448,7 +452,7 @@ QPDFParser::fixMissingKeys()
 {
     std::set<std::string> names;
     for (auto& obj: frame->olist) {
-        if (obj->getTypeCode() == ::ot_name) {
+        if (obj && obj->getTypeCode() == ::ot_name) {
             names.insert(obj->getStringValue());
         }
     }

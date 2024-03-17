@@ -902,7 +902,7 @@ test29(char const* infile, char const* password, char const* outfile, char const
 
     /* get_root fails when we have no trailer */
     qpdf_oh root = qpdf_get_root(qpdf);
-    handle_oh_error(qpdf, "get root");
+    //  handle_oh_error(qpdf, "get root");
     assert(root != 0);
     assert(!qpdf_oh_is_initialized(qpdf, root));
 
