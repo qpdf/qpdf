@@ -1129,7 +1129,7 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
                 enqueueObject(item);
             }
         } else if (object.isDictionary()) {
-            for (auto& item: object.getDictAsMap()) {
+            for (auto& item: object.dItems()) {
                 if (!item.second.isNull()) {
                     enqueueObject(item.second);
                 }
@@ -1487,7 +1487,7 @@ QPDFWriter::unparseObject(
 
         writeString("<<");
 
-        for (auto& item: object.getDictAsMap()) {
+        for (auto& item: object.dItems()) {
             if (!item.second.isNull()) {
                 auto const& key = item.first;
                 writeString(indent);
