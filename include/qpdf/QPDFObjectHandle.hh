@@ -23,6 +23,7 @@
 #define QPDFOBJECTHANDLE_HH
 
 #include <qpdf/QPDFObjectHandle_core.hh>
+#include <qpdf/QPDFObjectHandle_typed.hh>
 
 // See qpdf/QPDFObjectHandle_core.hh for the definition of QPDFObjectHandle.
 

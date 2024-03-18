@@ -66,6 +66,8 @@ class QPDFObjectHandle
     friend class QPDFParser;
 
   public:
+    class Typed;
+    class Integer;
     // This class is used by replaceStreamData.  It provides an alternative way of associating
     // stream data with a stream.  See comments on replaceStreamData and newStream for additional
     // details.
@@ -646,6 +648,8 @@ class QPDFObjectHandle
     // either direction) to fit in the requested return type, the maximum or minimum value for that
     // return type may be returned. For example, on a system with 32-bit int, a numeric object with
     // a value of 2^40 (or anything too big for 32 bits) will be returned as INT_MAX.
+    QPDF_DLL
+    QPDFObjectHandle::Integer asInteger(bool optional = false);
     QPDF_DLL
     long long getIntValue();
     QPDF_DLL
@@ -1367,7 +1371,6 @@ class QPDFObjectHandle
     QPDF_Bool* asBool();
     QPDF_Dictionary* asDictionary();
     QPDF_InlineImage* asInlineImage();
-    QPDF_Integer* asInteger();
     QPDF_Name* asName();
     QPDF_Null* asNull();
     QPDF_Operator* asOperator();
