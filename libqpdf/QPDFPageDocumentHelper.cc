@@ -88,11 +88,7 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
     std::vector<QPDFAnnotationObjectHelper> annots = page.getAnnotations();
     std::vector<QPDFObjectHandle> new_annots;
     std::string new_content;
-    int rotate = 0;
-    QPDFObjectHandle rotate_obj = page.getObjectHandle().getKey("/Rotate");
-    if (rotate_obj.isInteger() && rotate_obj.getIntValue()) {
-        rotate = rotate_obj.getIntValueAsInt();
-    }
+    int rotate = page.getObjectHandle().getKey("/Rotate").asInteger(true);
     int next_fx = 1;
     for (auto& aoh: annots) {
         QPDFObjectHandle as = aoh.getAppearanceStream("/N");

@@ -42,8 +42,8 @@ QPDFAnnotationObjectHelper::getAppearanceState()
 int
 QPDFAnnotationObjectHelper::getFlags()
 {
-    QPDFObjectHandle flags_obj = this->oh.getKey("/F");
-    return flags_obj.isInteger() ? flags_obj.getIntValueAsInt() : 0;
+    auto flags_obj = this->oh.getKey("/F").asInteger();
+    return flags_obj ? flags_obj : 0;
 }
 
 QPDFObjectHandle

@@ -130,8 +130,8 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         }
         return result;
     }
-    QPDFObjectHandle components_obj = dict.getKey("/BitsPerComponent");
-    if (!(components_obj.isInteger() && (components_obj.getIntValue() == 8))) {
+    auto components_obj = dict.getKey("/BitsPerComponent").asInteger();
+    if (!(components_obj && (components_obj.value() == 8))) {
         QTC::TC("qpdf", "QPDFJob image optimize bits per component");
         if (!description.empty()) {
             o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -144,14 +144,14 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
     // Files have been seen in the wild whose width and height are floating point, which is goofy,
     // but we can deal with it.
     JDIMENSION w = 0;
-    if (w_obj.isInteger()) {
-        w = w_obj.getUIntValueAsUInt();
+    if (auto w_int = w_obj.asInteger()) {
+        w = w_int;
     } else {
         w = static_cast<JDIMENSION>(w_obj.getNumericValue());
     }
     JDIMENSION h = 0;
-    if (h_obj.isInteger()) {
-        h = h_obj.getUIntValueAsUInt();
+    if (auto h_int = h_obj.asInteger()) {
+        h = h_int;
     } else {
         h = static_cast<JDIMENSION>(h_obj.getNumericValue());
     }
@@ -216,7 +216,7 @@ ImageOptimizer::evaluate(std::string const& description)
     if (!image.pipeStreamData(p.get(), 0, qpdf_dl_specialized)) {
         return false;
     }
-    long long orig_length = image.getDict().getKey("/Length").getIntValue();
+    long long orig_length = image.getDict().getKey("/Length").asInteger();
     if (c.getCount() >= orig_length) {
         QTC::TC("qpdf", "QPDFJob image optimize no shrink");
         o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -858,8 +858,8 @@ QPDFJob::doShowPages(QPDF& pdf)
                     std::string const& name = iter2.first;
                     QPDFObjectHandle image = iter2.second;
                     QPDFObjectHandle dict = image.getDict();
-                    int width = dict.getKey("/Width").getIntValueAsInt();
-                    int height = dict.getKey("/Height").getIntValueAsInt();
+                    int width = dict.getKey("/Width").asInteger();
+                    int height = dict.getKey("/Height").asInteger();
                     cout << "    " << name << ": " << image.unparse() << ", " << width << " x "
                          << height << "\n";
                 }
@@ -1651,7 +1651,7 @@ QPDFJob::doInspection(QPDF& pdf)
     }
     if (m->show_npages) {
         QTC::TC("qpdf", "QPDFJob npages");
-        cout << pdf.getRoot().getKey("/Pages").getKey("/Count").getIntValue() << "\n";
+        cout << pdf.getRoot().getKey("/Pages").getKey("/Count").asInteger().value() << "\n";
     }
     if (m->show_encryption) {
         showEncryption(pdf);
@@ -3081,10 +3081,9 @@ QPDFJob::writeOutfile(QPDF& pdf)
             try {
                 QUtil::remove_file(backup.c_str());
             } catch (QPDFSystemError& e) {
-                *m->log->getError()
-                    << m->message_prefix << ": unable to delete original file (" << e.what() << ");"
-                    << " original file left in " << backup
-                    << ", but the input was successfully replaced\n";
+                *m->log->getError() << m->message_prefix << ": unable to delete original file ("
+                                    << e.what() << ");" << " original file left in " << backup
+                                    << ", but the input was successfully replaced\n";
             }
         }
     }

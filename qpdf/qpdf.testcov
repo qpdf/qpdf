@@ -6,8 +6,7 @@ QPDF check generation 1
 QPDF check obj 1
 QPDF hint table length indirect 0
 QPDF hint table length direct 0
-QPDF P absent in lindict 0
-QPDF P present in lindict 0
+QPDF P present in lindict 1
 QPDF expected n n obj 0
 QPDF /L mismatch 0
 QPDF err /T mismatch 0
@@ -79,9 +78,8 @@ QPDFObjectHandle makeDirect loop 0
 QPDFObjectHandle copy stream 1
 QPDF default for xref stream field 0 0
 QPDF prev key in xref stream dictionary 0
-QPDF prev key in trailer dictionary 0
+QPDF prev key in trailer dictionary 1
 QPDF found xref stream 0
-QPDF ignoring XRefStm in trailer 0
 QPDF xref deleted object 0
 SF_FlateLzwDecode PNG filter 0
 QPDF xref /Index is null 0
@@ -332,7 +330,8 @@ QPDFFormFieldObjectHelper TU present 0
 QPDFFormFieldObjectHelper TM present 0
 QPDFFormFieldObjectHelper TU absent 0
 QPDFFormFieldObjectHelper TM absent 0
-QPDFFormFieldObjectHelper Q present 1
+QPDFFormFieldObjectHelper Q present 0
+QPDFFormFieldObjectHelper Q present looked 0
 QPDFFormFieldObjectHelper DA present 1
 QPDFAnnotationObjectHelper AS present 0
 QPDFAnnotationObjectHelper AS absent 0

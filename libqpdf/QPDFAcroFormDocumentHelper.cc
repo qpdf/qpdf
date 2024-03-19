@@ -740,9 +740,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             if (acroform.getKey("/DA").isString()) {
                 default_da = acroform.getKey("/DA").getUTF8Value();
             }
-            if (acroform.getKey("/Q").isInteger()) {
-                default_q = acroform.getKey("/Q").getIntValueAsInt();
-            }
+            acroform.getKey("/Q").asInteger().assign_to(default_q);
         }
         if (from_acroform.isDictionary()) {
             if (from_acroform.getKey("/DR").isDictionary()) {
@@ -755,9 +753,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             if (from_acroform.getKey("/DA").isString()) {
                 from_default_da = from_acroform.getKey("/DA").getUTF8Value();
             }
-            if (from_acroform.getKey("/Q").isInteger()) {
-                from_default_q = from_acroform.getKey("/Q").getIntValueAsInt();
-            }
+            from_acroform.getKey("/Q").asInteger().assign_to(from_default_q);
         }
         if (from_default_da != default_da) {
             override_da = true;

@@ -83,11 +83,7 @@ QPDFOutlineObjectHelper::getDestPage()
 int
 QPDFOutlineObjectHelper::getCount()
 {
-    int count = 0;
-    if (this->oh.hasKey("/Count")) {
-        count = this->oh.getKey("/Count").getIntValueAsInt();
-    }
-    return count;
+    return this->oh.getKey("/Count").asInteger(true);
 }
 
 std::string

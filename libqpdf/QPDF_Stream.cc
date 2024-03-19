@@ -586,7 +586,7 @@ QPDF_Stream::pipeStreamData(
         qpdf_offset_t actual_length = count.getCount();
         qpdf_offset_t desired_length = 0;
         if (success && this->stream_dict.hasKey("/Length")) {
-            desired_length = this->stream_dict.getKey("/Length").getIntValue();
+            desired_length = this->stream_dict.getKey("/Length").asInteger();
             if (actual_length == desired_length) {
                 QTC::TC("qpdf", "QPDF_Stream pipe use stream provider");
             } else {
