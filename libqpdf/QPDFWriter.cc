@@ -656,10 +656,11 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
         generateID();
         m->id1 = trailer.getKey("/ID").getArrayItem(0).getStringValue();
         QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
-        int V = encrypt.getKey("/V").getIntValueAsInt();
+        int V = encrypt.getKey("/V").asInteger();
         int key_len = 5;
         if (V > 1) {
-            key_len = encrypt.getKey("/Length").getIntValueAsInt() / 8;
+            key_len = encrypt.getKey("/Length").asInteger();
+            key_len /= 8;
         }
         if (encrypt.hasKey("/EncryptMetadata") && encrypt.getKey("/EncryptMetadata").isBool()) {
             m->encrypt_metadata = encrypt.getKey("/EncryptMetadata").getBoolValue();
@@ -687,9 +688,9 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
 
         setEncryptionParametersInternal(
             V,
-            encrypt.getKey("/R").getIntValueAsInt(),
+            encrypt.getKey("/R").asInteger(),
             key_len,
-            static_cast<int>(encrypt.getKey("/P").getIntValue()),
+            static_cast<int>(encrypt.getKey("/P").asInteger().value()),
             encrypt.getKey("/O").getStringValue(),
             encrypt.getKey("/U").getStringValue(),
             OE,
@@ -1416,10 +1417,10 @@ QPDFWriter::unparseObject(
         if (extensions.isInitialized()) {
             QTC::TC("qpdf", "QPDFWriter preserve Extensions");
             QPDFObjectHandle adbe = extensions.getKey("/ADBE");
+            auto ext_level = adbe.getKeyIfDict("/ExtensionLevel").asInteger();
             if (adbe.isDictionary() &&
                 adbe.getKey("/BaseVersion").isNameAndEquals("/" + m->final_pdf_version) &&
-                adbe.getKey("/ExtensionLevel").isInteger() &&
-                (adbe.getKey("/ExtensionLevel").getIntValue() == m->final_extension_level)) {
+                ext_level && (static_cast<int>(ext_level) == m->final_extension_level)) {
                 QTC::TC("qpdf", "QPDFWriter preserve ADBE");
             } else {
                 if (need_extensions_adbe) {

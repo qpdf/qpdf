@@ -766,21 +766,22 @@ QPDF::initializeEncryption()
             m->file->getLastOffset(),
             "file uses encryption SubFilters, which qpdf does not support");
     }
-
-    if (!(encryption_dict.getKey("/V").isInteger() && encryption_dict.getKey("/R").isInteger() &&
+    int V{0};
+    int R{0};
+    long long p_temp{0};
+    if (!(encryption_dict.getKey("/V").asInteger().assign_to(V) &&
+          encryption_dict.getKey("/R").asInteger().assign_to(R) &&
           encryption_dict.getKey("/O").isString() && encryption_dict.getKey("/U").isString() &&
-          encryption_dict.getKey("/P").isInteger())) {
+          encryption_dict.getKey("/P").asInteger().assign_to(p_temp))) {
         throw damagedPDF(
             "encryption dictionary",
             "some encryption dictionary parameters are missing or the wrong "
             "type");
     }
 
-    int V = encryption_dict.getKey("/V").getIntValueAsInt();
-    int R = encryption_dict.getKey("/R").getIntValueAsInt();
     std::string O = encryption_dict.getKey("/O").getStringValue();
     std::string U = encryption_dict.getKey("/U").getStringValue();
-    int P = static_cast<int>(encryption_dict.getKey("/P").getIntValue());
+    int P = static_cast<int>(p_temp);
 
     // If supporting new encryption R/V values, remember to update error message inside this if
     // statement.
@@ -840,8 +841,8 @@ QPDF::initializeEncryption()
     } else if (V == 5) {
         Length = 256;
     } else {
-        if (encryption_dict.getKey("/Length").isInteger()) {
-            Length = encryption_dict.getKey("/Length").getIntValueAsInt();
+        if (auto l = encryption_dict.getKey("/Length").asInteger()) {
+            Length = l;
             if ((Length % 8) || (Length < 40) || (Length > 128)) {
                 Length = 0;
             }
@@ -1249,12 +1250,9 @@ QPDF::isEncrypted(
     if (m->encp->encrypted) {
         QPDFObjectHandle trailer = getTrailer();
         QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
-        QPDFObjectHandle Pkey = encrypt.getKey("/P");
-        QPDFObjectHandle Rkey = encrypt.getKey("/R");
-        QPDFObjectHandle Vkey = encrypt.getKey("/V");
-        P = static_cast<int>(Pkey.getIntValue());
-        R = Rkey.getIntValueAsInt();
-        V = Vkey.getIntValueAsInt();
+        P = static_cast<int>(static_cast<long long>(encrypt.getKey("/P").asInteger()));
+        R = encrypt.getKey("/R").asInteger();
+        V = encrypt.getKey("/V").asInteger();
         stream_method = m->encp->cf_stream;
         string_method = m->encp->cf_string;
         file_method = m->encp->cf_file;

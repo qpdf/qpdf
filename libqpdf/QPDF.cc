@@ -686,7 +686,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
     if (!m->trailer.isInitialized()) {
         throw damagedPDF("", 0, "unable to find trailer while reading xref");
     }
-    int size = m->trailer.getKey("/Size").getIntValueAsInt();
+    int size = m->trailer.getKey("/Size").asInteger();
     int max_obj = 0;
     if (!m->xref_table.empty()) {
         max_obj = (*(m->xref_table.rbegin())).first.getObj();
@@ -912,17 +912,13 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
         }
     }
 
-    if (cur_trailer.hasKey("/XRefStm")) {
-        if (m->ignore_xref_streams) {
-            QTC::TC("qpdf", "QPDF ignoring XRefStm in trailer");
-        } else {
-            if (cur_trailer.getKey("/XRefStm").isInteger()) {
-                // Read the xref stream but disregard any return value -- we'll use our trailer's
-                // /Prev key instead of the xref stream's.
-                (void)read_xrefStream(cur_trailer.getKey("/XRefStm").getIntValue());
-            } else {
-                throw damagedPDF("xref stream", xref_offset, "invalid /XRefStm");
-            }
+    if (!m->ignore_xref_streams) {
+        if (auto offset = cur_trailer.getKey("/XRefStm").asInteger()) {
+            // Read the xref stream but disregard any return value -- we'll use our trailer's
+            // /Prev key instead of the xref stream's.
+            (void)read_xrefStream(offset);
+        } else if (!offset.null()) {
+            throw damagedPDF("xref stream", xref_offset, "invalid /XRefStm");
         }
     }
 
@@ -931,15 +927,12 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
         insertFreeXrefEntry(og);
     }
 
-    if (cur_trailer.hasKey("/Prev")) {
-        if (!cur_trailer.getKey("/Prev").isInteger()) {
-            QTC::TC("qpdf", "QPDF trailer prev not integer");
-            throw damagedPDF("trailer", "/Prev key in trailer dictionary is not an integer");
-        }
-        QTC::TC("qpdf", "QPDF prev key in trailer dictionary");
-        xref_offset = cur_trailer.getKey("/Prev").getIntValue();
+    if (auto prev = cur_trailer.getKey("/Prev").asInteger(true)) {
+        QTC::TC("qpdf", "QPDF prev key in trailer dictionary", prev.null() ? 0 : 1);
+        return prev;
     } else {
-        xref_offset = 0;
+        QTC::TC("qpdf", "QPDF trailer prev not integer");
+        throw damagedPDF("trailer", "/Prev key in trailer dictionary is not an integer");
     }
 
     return xref_offset;
@@ -987,7 +980,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
     size_t entry_size = 0;
     int max_bytes = sizeof(qpdf_offset_t);
     for (int i = 0; i < 3; ++i) {
-        W[i] = W_obj.getArrayItem(i).getIntValueAsInt();
+        W[i] = W_obj.getArrayItem(i).asInteger();
         if (W[i] > max_bytes) {
             throw damagedPDF(
                 "xref stream",
@@ -1013,8 +1006,8 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
                 "values");
         }
         for (int i = 0; i < n_index; ++i) {
-            if (Index_obj.getArrayItem(i).isInteger()) {
-                indx.push_back(Index_obj.getArrayItem(i).getIntValue());
+            if (auto index = Index_obj.getArrayItem(i).asInteger()) {
+                indx.emplace_back(index);
             } else {
                 throw damagedPDF(
                     "xref stream",
@@ -1026,9 +1019,8 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         QTC::TC("qpdf", "QPDF xref /Index is array", n_index == 2 ? 0 : 1);
     } else {
         QTC::TC("qpdf", "QPDF xref /Index is null");
-        long long size = dict.getKey("/Size").getIntValue();
-        indx.push_back(0);
-        indx.push_back(size);
+        indx.emplace_back(0);
+        indx.emplace_back(dict.getKey("/Size").asInteger());
     }
 
     size_t num_entries = 0;
@@ -1131,18 +1123,12 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         setTrailer(dict);
     }
 
-    if (dict.hasKey("/Prev")) {
-        if (!dict.getKey("/Prev").isInteger()) {
-            throw damagedPDF(
-                "xref stream", "/Prev key in xref stream dictionary is not an integer");
-        }
+    if (auto prev = dict.getKey("/Prev").asInteger(true)) {
         QTC::TC("qpdf", "QPDF prev key in xref stream dictionary");
-        xref_offset = dict.getKey("/Prev").getIntValue();
+        return prev;
     } else {
-        xref_offset = 0;
+        throw damagedPDF("xref stream", "/Prev key in xref stream dictionary is not an integer");
     }
-
-    return xref_offset;
 }
 
 void
@@ -1368,24 +1354,21 @@ QPDF::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
     size_t length = 0;
 
     try {
-        auto length_obj = object.getKey("/Length");
-
-        if (!length_obj.isInteger()) {
-            if (length_obj.isNull()) {
-                QTC::TC("qpdf", "QPDF stream without length");
-                throw damagedPDF(offset, "stream dictionary lacks /Length key");
+        if (auto length_obj = object.getKey("/Length").asInteger()) {
+            length = toS(length_obj.value());
+            // Seek in two steps to avoid potential integer overflow
+            m->file->seek(stream_offset, SEEK_SET);
+            m->file->seek(toO(length), SEEK_CUR);
+            if (!readToken(m->file).isWord("endstream")) {
+                QTC::TC("qpdf", "QPDF missing endstream");
+                throw damagedPDF("expected endstream");
             }
+        } else if (length_obj.null()) {
+            QTC::TC("qpdf", "QPDF stream without length");
+            throw damagedPDF(offset, "stream dictionary lacks /Length key");
+        } else {
             QTC::TC("qpdf", "QPDF stream length not integer");
             throw damagedPDF(offset, "/Length key in stream dictionary is not an integer");
-        }
-
-        length = toS(length_obj.getUIntValue());
-        // Seek in two steps to avoid potential integer overflow
-        m->file->seek(stream_offset, SEEK_SET);
-        m->file->seek(toO(length), SEEK_CUR);
-        if (!readToken(m->file).isWord("endstream")) {
-            QTC::TC("qpdf", "QPDF missing endstream");
-            throw damagedPDF("expected endstream");
         }
     } catch (QPDFExc& e) {
         if (m->attempt_recovery) {
@@ -1778,14 +1761,13 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
         warn(damagedPDF(
             "supposed object stream " + std::to_string(obj_stream_number) + " has wrong type"));
     }
-
-    if (!(dict.getKey("/N").isInteger() && dict.getKey("/First").isInteger())) {
+    int n{0};
+    long long first{0};
+    if (!(dict.getKey("/N").asInteger().assign_to(n) &&
+          dict.getKey("/First").asInteger().assign_to(first))) {
         throw damagedPDF(
             ("object stream " + std::to_string(obj_stream_number) + " has incorrect keys"));
     }
-
-    int n = dict.getKey("/N").getIntValueAsInt();
-    int first = dict.getKey("/First").getIntValueAsInt();
 
     std::map<int, int> offsets;
 
@@ -2328,21 +2310,11 @@ QPDF::getPDFVersion() const
 int
 QPDF::getExtensionLevel()
 {
-    int result = 0;
-    QPDFObjectHandle obj = getRoot();
-    if (obj.hasKey("/Extensions")) {
-        obj = obj.getKey("/Extensions");
-        if (obj.isDictionary() && obj.hasKey("/ADBE")) {
-            obj = obj.getKey("/ADBE");
-            if (obj.isDictionary() && obj.hasKey("/ExtensionLevel")) {
-                obj = obj.getKey("/ExtensionLevel");
-                if (obj.isInteger()) {
-                    result = obj.getIntValueAsInt();
-                }
-            }
-        }
-    }
-    return result;
+    return getRoot()
+        .getKey("/Extensions")
+        .getKeyIfDict("/ADBE")
+        .getKeyIfDict("/ExtensionLevel")
+        .asInteger(true);
 }
 
 QPDFObjectHandle

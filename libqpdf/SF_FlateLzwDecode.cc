@@ -28,10 +28,10 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
     bool filterable = true;
     std::set<std::string> keys = decode_parms.getKeys();
     for (auto const& key: keys) {
-        QPDFObjectHandle value = decode_parms.getKey(key);
+        auto value = decode_parms.getKey(key).asInteger();
         if (key == "/Predictor") {
-            if (value.isInteger()) {
-                this->predictor = value.getIntValueAsInt();
+            if (value) {
+                this->predictor = value;
                 if (!((this->predictor == 1) || (this->predictor == 2) ||
                       ((this->predictor >= 10) && (this->predictor <= 15)))) {
                     filterable = false;
@@ -40,23 +40,22 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
                 filterable = false;
             }
         } else if ((key == "/Columns") || (key == "/Colors") || (key == "/BitsPerComponent")) {
-            if (value.isInteger()) {
-                int val = value.getIntValueAsInt();
+            if (value) {
                 if (key == "/Columns") {
-                    this->columns = val;
+                    this->columns = value;
                 } else if (key == "/Colors") {
-                    this->colors = val;
+                    this->colors = value;
                 } else if (key == "/BitsPerComponent") {
-                    this->bits_per_component = val;
+                    this->bits_per_component = value;
                 }
             } else {
                 filterable = false;
             }
         } else if (lzw && (key == "/EarlyChange")) {
-            if (value.isInteger()) {
-                int earlychange = value.getIntValueAsInt();
+            if (value) {
+                int earlychange = value;
                 this->early_code_change = (earlychange == 1);
-                if (!((earlychange == 0) || (earlychange == 1))) {
+                if (!(earlychange == 0 || earlychange == 1)) {
                     filterable = false;
                 }
             } else {

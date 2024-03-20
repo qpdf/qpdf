@@ -57,11 +57,8 @@ QPDFEFStreamObjectHelper::getModDate()
 size_t
 QPDFEFStreamObjectHelper::getSize()
 {
-    auto val = getParam("/Size");
-    if (val.isInteger()) {
-        return QIntC::to_size(val.getUIntValueAsUInt());
-    }
-    return 0;
+    auto val = getParam("/Size").asInteger();
+    return val ? QIntC::to_size(val.value()) : 0;
 }
 
 std::string
