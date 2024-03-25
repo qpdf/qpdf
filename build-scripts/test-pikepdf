@@ -14,6 +14,7 @@ cmake --build build --verbose -j$(nproc) --target libqpdf -- -k
 if [ "$future" = "1" ]; then
     # Run qpdf's test suite in FUTURE mode as well
     ctest --verbose
+    export QPDF_FUTURE=True
 fi
 export QPDF_SOURCE_TREE=$PWD
 export QPDF_BUILD_LIBDIR=$QPDF_SOURCE_TREE/build/libqpdf
