@@ -84,9 +84,10 @@ nothing generally ever references it by number.
 
 It is not generally practical to remove objects from QDF files without
 messing up object numbering, but if you remove all references to an
-object, you can run qpdf on the file (after running
-:command:`fix-qdf`), and qpdf will omit the now-orphaned
-object.
+object without removing the object itself (by removing all indirect
+objects that point to it), this will leave the object unreferenced.
+Then you can run qpdf on the file (after running :command:`fix-qdf`),
+and qpdf will omit the now-orphaned object.
 
 When :command:`fix-qdf` is run, it goes through the file
 and recomputes the following parts of the file:
