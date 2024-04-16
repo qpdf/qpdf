@@ -606,7 +606,7 @@ QPDFJob::checkConfiguration()
     }
     if (m->infilename == nullptr) {
         usage("an input file name is required");
-    } else if (m->replace_input && (strlen(m->infilename.get()) == 0)) {
+    } else if (m->replace_input && m->empty_input) {
         usage("--replace-input may not be used with --empty");
     } else if (m->require_outfile && (m->outfilename == nullptr) && (!m->replace_input)) {
         usage("an output file name is required; use - for standard output");
