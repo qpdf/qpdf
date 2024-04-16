@@ -486,9 +486,10 @@ QPDFJob::createQPDF()
         pdf.updateFromJSON(m->update_from_json);
     }
 
-    std::vector<std::unique_ptr<QPDF>> page_heap;
     if (!m->page_specs.empty()) {
-        handlePageSpecs(pdf, page_heap);
+        if (!handlePageSpecs(pdf)) {
+            m->warnings = true;
+        }
     }
     if (!m->rotations.empty()) {
         handleRotations(pdf);
@@ -496,11 +497,6 @@ QPDFJob::createQPDF()
     handleUnderOverlay(pdf);
     handleTransformations(pdf);
 
-    for (auto& foreign: page_heap) {
-        if (foreign->anyWarnings()) {
-            m->warnings = true;
-        }
-    }
     return pdf_sp;
 }
 
@@ -2381,9 +2377,12 @@ added_page(QPDF& pdf, QPDFPageObjectHelper page)
     return added_page(pdf, page.getObjectHandle());
 }
 
-void
-QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_heap)
+// Handle all page specifications. Return true if it succeeded without warnings.
+bool
+QPDFJob::handlePageSpecs(QPDF& pdf)
 {
+    std::vector<std::unique_ptr<QPDF>> page_heap;
+
     // Parse all page specifications and translate them into lists of actual pages.
 
     // Handle "." as a shortcut for the input file
@@ -2655,6 +2654,12 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             }
         }
     }
+    for (auto& foreign: page_heap) {
+        if (foreign->anyWarnings()) {
+            return false;
+        }
+    }
+    return true;
 }
 
 void
