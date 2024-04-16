@@ -455,7 +455,7 @@ QPDFJob::createQPDF()
     checkConfiguration();
     std::unique_ptr<QPDF> pdf_sp;
     try {
-        processFile(pdf_sp, m->infilename.get(), m->password.get(), true, true);
+        processFile(pdf_sp, m->infilename.data(), m->password.get(), true, true);
     } catch (QPDFExc& e) {
         if (e.getErrorCode() == qpdf_e_password) {
             // Allow certain operations to work when an incorrect password is supplied.
@@ -604,7 +604,7 @@ QPDFJob::checkConfiguration()
         // standard output.
         m->outfilename = QUtil::make_shared_cstr("-");
     }
-    if (m->infilename == nullptr) {
+    if (m->infilename.empty() && !m->empty_input) {
         usage("an input file name is required");
     } else if (m->replace_input && m->empty_input) {
         usage("--replace-input may not be used with --empty");
@@ -644,7 +644,7 @@ QPDFJob::checkConfiguration()
     if (save_to_stdout) {
         m->log->saveToStandardOutput(true);
     }
-    if ((!m->split_pages) && QUtil::same_file(m->infilename.get(), m->outfilename.get())) {
+    if (!m->split_pages && QUtil::same_file(m->infilename.data(), m->outfilename.get())) {
         QTC::TC("qpdf", "QPDFJob same file error");
         usage("input file and output file are the same; use --replace-input to intentionally "
               "overwrite the input file");
@@ -768,7 +768,7 @@ QPDFJob::doCheck(QPDF& pdf)
     // may continue to perform additional checks after finding errors.
     bool okay = true;
     auto& cout = *m->log->getInfo();
-    cout << "checking " << m->infilename.get() << "\n";
+    cout << "checking " << m->infilename << "\n";
     QPDF::JobSetter::setCheckMode(pdf, true);
     try {
         int extension_level = pdf.getExtensionLevel();
@@ -926,7 +926,7 @@ QPDFJob::doListAttachments(QPDF& pdf)
             });
         }
     } else {
-        *m->log->getInfo() << m->infilename.get() << " has no embedded files\n";
+        *m->log->getInfo() << m->infilename << " has no embedded files\n";
     }
 }
 
@@ -1678,9 +1678,9 @@ QPDFJob::doInspection(QPDF& pdf)
     }
     if (m->check_linearization) {
         if (!pdf.isLinearized()) {
-            cout << m->infilename.get() << " is not linearized\n";
+            cout << m->infilename << " is not linearized\n";
         } else if (pdf.checkLinearization()) {
-            cout << m->infilename.get() << ": no linearization errors\n";
+            cout << m->infilename << ": no linearization errors\n";
         } else {
             m->warnings = true;
         }
@@ -1689,7 +1689,7 @@ QPDFJob::doInspection(QPDF& pdf)
         if (pdf.isLinearized()) {
             pdf.showLinearizationData();
         } else {
-            cout << m->infilename.get() << " is not linearized\n";
+            cout << m->infilename << " is not linearized\n";
         }
     }
     if (m->show_xref) {
@@ -1726,7 +1726,7 @@ QPDFJob::doProcessOnce(
     if (empty) {
         pdf->emptyPDF();
     } else if (main_input && m->json_input) {
-        pdf->createFromJSON(m->infilename.get());
+        pdf->createFromJSON(m->infilename);
     } else {
         fn(pdf.get(), password);
     }
@@ -2388,7 +2388,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     // Handle "." as a shortcut for the input file
     for (auto& page_spec: m->page_specs) {
         if (page_spec.filename == ".") {
-            page_spec.filename = m->infilename.get();
+            page_spec.filename = m->infilename;
         }
         if (page_spec.range.empty()) {
             page_spec.range = "1-z";
@@ -2414,7 +2414,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     // Create a QPDF object for each file that we may take pages from.
     std::map<std::string, QPDF*> page_spec_qpdfs;
     std::map<std::string, ClosedFileInputSource*> page_spec_cfis;
-    page_spec_qpdfs[m->infilename.get()] = &pdf;
+    page_spec_qpdfs[m->infilename] = &pdf;
     std::vector<QPDFPageData> parsed_specs;
     std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
     for (auto& page_spec: m->page_specs) {
@@ -3044,7 +3044,7 @@ QPDFJob::doSplitPages(QPDF& pdf)
             page_range += "-" + QUtil::uint_to_string(last, QIntC::to_int(pageno_len));
         }
         std::string outfile = before + page_range + after;
-        if (QUtil::same_file(m->infilename.get(), outfile.c_str())) {
+        if (QUtil::same_file(m->infilename.data(), outfile.c_str())) {
             throw std::runtime_error("split pages would overwrite input file with " + outfile);
         }
         QPDFWriter w(outpdf, outfile.c_str());
@@ -3063,7 +3063,7 @@ QPDFJob::writeOutfile(QPDF& pdf)
     if (m->replace_input) {
         // Append but don't prepend to the path to generate a temporary name. This saves us from
         // having to split the path by directory and non-directory.
-        temp_out = QUtil::make_shared_cstr(std::string(m->infilename.get()) + ".~qpdf-temp#");
+        temp_out = QUtil::make_shared_cstr(m->infilename + ".~qpdf-temp#");
         // m->outfilename will be restored to 0 before temp_out goes out of scope.
         m->outfilename = temp_out;
     } else if (strcmp(m->outfilename.get(), "-") == 0) {
@@ -3097,13 +3097,13 @@ QPDFJob::writeOutfile(QPDF& pdf)
     if (m->replace_input) {
         // We must close the input before we can rename files
         pdf.closeInputSource();
-        std::string backup = std::string(m->infilename.get()) + ".~qpdf-orig";
+        std::string backup = m->infilename + ".~qpdf-orig";
         bool warnings = pdf.anyWarnings();
         if (!warnings) {
             backup.append(1, '#');
         }
-        QUtil::rename_file(m->infilename.get(), backup.c_str());
-        QUtil::rename_file(temp_out.get(), m->infilename.get());
+        QUtil::rename_file(m->infilename.data(), backup.c_str());
+        QUtil::rename_file(temp_out.get(), m->infilename.data());
         if (warnings) {
             *m->log->getError() << m->message_prefix
                                 << ": there are warnings; original file kept in " << backup << "\n";
