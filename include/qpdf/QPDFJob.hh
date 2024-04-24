@@ -419,10 +419,14 @@ class QPDFJob
         friend class QPDFJob;
 
         Section(std::string const& filename, std::string const& password, std::string const& range);
+        Section(Section const& other, int page);
 
         std::string filename;
         std::string password;
         std::string range;
+        QPDF* qpdf;
+        std::vector<QPDFObjectHandle> orig_pages;
+        std::vector<int> selected_pages;
     };
 
     struct RotationSpec
