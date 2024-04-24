@@ -429,6 +429,24 @@ class QPDFJob
         std::vector<int> selected_pages;
     };
 
+    struct InputFile
+    {
+        InputFile() = default;
+        InputFile(QPDF* qpdf) :
+            qpdf(qpdf)
+        {
+        }
+
+        std::unique_ptr<QPDF> qpdf_p;
+        QPDF* qpdf;
+    };
+
+    class FileStore
+    {
+      public:
+        std::map<std::string, InputFile> files;
+    };
+
     struct RotationSpec
     {
         RotationSpec(int angle = 0, bool relative = false) :
@@ -708,6 +726,7 @@ class QPDFJob
         std::vector<UnderOverlay> overlay;
         UnderOverlay* under_overlay{nullptr};
         std::vector<Section> page_specs;
+        FileStore file_store;
         std::map<std::string, RotationSpec> rotations;
         bool require_outfile{true};
         bool replace_input{false};
