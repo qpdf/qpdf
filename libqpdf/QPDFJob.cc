@@ -455,7 +455,7 @@ QPDFJob::createQPDF()
     checkConfiguration();
     std::unique_ptr<QPDF> pdf_sp;
     try {
-        processFile(pdf_sp, m->infilename.data(), m->password.get(), true, true);
+        processFile(pdf_sp, m->infilename.data(), m->password.data(), true, true);
     } catch (QPDFExc& e) {
         if (e.getErrorCode() == qpdf_e_password) {
             // Allow certain operations to work when an incorrect password is supplied.

@@ -590,7 +590,7 @@ class QPDFJob
         bool warnings{false};
         unsigned long encryption_status{0};
         bool verbose{false};
-        std::shared_ptr<char> password;
+        std::string password;
         bool linearize{false};
         bool decrypt{false};
         bool remove_restrictions{false};
