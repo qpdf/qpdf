@@ -429,6 +429,8 @@ class QPDFJob
         std::vector<int> selected_pages;
     };
 
+    class FileStore;
+
     struct InputFile
     {
         InputFile() = default;
@@ -436,6 +438,8 @@ class QPDFJob
             qpdf(qpdf)
         {
         }
+
+        void initialize(FileStore& fs);
 
         std::string password;
         std::unique_ptr<QPDF> qpdf_p;
@@ -448,6 +452,7 @@ class QPDFJob
 
     class FileStore
     {
+        friend struct InputFile;
         // These default values are duplicated in help and docs.
         static int constexpr DEFAULT_KEEP_FILES_OPEN_THRESHOLD = 200;
 

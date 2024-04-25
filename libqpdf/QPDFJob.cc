@@ -2352,6 +2352,24 @@ added_page(QPDF& pdf, QPDFPageObjectHelper page)
     return added_page(pdf, page.getObjectHandle());
 }
 
+// Initialize all members that depend on the QPDF object. If both qpdf and  qpdf_p are null do
+// nothing.
+void
+QPDFJob::InputFile::initialize(FileStore& fs)
+{
+    if (qpdf_p) {
+        qpdf = qpdf_p.get();
+    }
+    if (qpdf) {
+        orig_pages = qpdf->getAllPages();
+        n_pages = QIntC::to_int(orig_pages.size());
+
+        if (fs.job.m->remove_unreferenced_page_resources != QPDFJob::re_no) {
+            remove_unreferenced = fs.job.shouldRemoveUnreferencedResources(*qpdf);
+        }
+    }
+}
+
 void
 QPDFJob::new_section(std::string const& filename, char const* password, std::string const& range)
 {
@@ -2389,13 +2407,7 @@ QPDFJob::FileStore::process_file(std::string const& filename, QPDFJob::InputFile
         is = std::shared_ptr<InputSource>(fis);
     }
     job.processInputSource(file_spec.qpdf_p, is, password.data(), true);
-    file_spec.qpdf = file_spec.qpdf_p.get();
-    file_spec.orig_pages = file_spec.qpdf->getAllPages();
-    file_spec.n_pages = QIntC::to_int(file_spec.orig_pages.size());
-
-    if (job.m->remove_unreferenced_page_resources != QPDFJob::re_no) {
-        file_spec.remove_unreferenced = job.shouldRemoveUnreferencedResources(*file_spec.qpdf);
-    }
+    file_spec.initialize(*this);
 
     if (cis) {
         cis->stayOpen(false);
@@ -2430,11 +2442,7 @@ bool
 QPDFJob::handlePageSpecs(QPDF& pdf)
 {
     auto res = m->file_store.files.insert({m->infilename, &pdf});
-    res.first->second.orig_pages = pdf.getAllPages();
-    res.first->second.n_pages = QIntC::to_int(res.first->second.orig_pages.size());
-    if (m->remove_unreferenced_page_resources != QPDFJob::re_no) {
-        res.first->second.remove_unreferenced = shouldRemoveUnreferencedResources(pdf);
-    }
+    res.first->second.initialize(m->file_store);
 
     // Parse all page specifications and translate them into lists of actual pages.
 
