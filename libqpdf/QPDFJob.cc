@@ -2391,7 +2391,6 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     }
 
     // Create a QPDF object for each file that we may take pages from.
-    std::map<std::string, ClosedFileInputSource*> page_spec_cfis;
     std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
     for (auto& page_spec: m->page_specs) {
         auto& spec = m->file_store.files[page_spec.filename];
@@ -2428,7 +2427,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             spec.qpdf = spec.qpdf_p.get();
             if (cis) {
                 cis->stayOpen(false);
-                page_spec_cfis[page_spec.filename] = cis;
+                spec.cfis = cis;
             }
         }
 
@@ -2448,18 +2447,16 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     std::map<unsigned long long, bool> remove_unreferenced;
     if (m->remove_unreferenced_page_resources != QPDFJob::re_no) {
         for (auto const& [filename, file_spec]: m->file_store.files) {
-            ClosedFileInputSource* cis = nullptr;
-            if (page_spec_cfis.count(filename)) {
-                cis = page_spec_cfis[filename];
-                cis->stayOpen(true);
+            if (file_spec.cfis) {
+                file_spec.cfis->stayOpen(true);
             }
             QPDF& other(*file_spec.qpdf);
             auto other_uuid = other.getUniqueId();
             if (remove_unreferenced.count(other_uuid) == 0) {
                 remove_unreferenced[other_uuid] = shouldRemoveUnreferencedResources(other);
             }
-            if (cis) {
-                cis->stayOpen(false);
+            if (file_spec.cfis) {
+                file_spec.cfis->stayOpen(false);
             }
         }
     }
@@ -2521,10 +2518,9 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     auto this_afdh = get_afdh_for_qpdf(afdh_map, pdf);
     std::set<QPDFObjGen> referenced_fields;
     for (auto& page_data: page_specs) {
-        ClosedFileInputSource* cis = nullptr;
-        if (page_spec_cfis.count(page_data.filename)) {
-            cis = page_spec_cfis[page_data.filename];
-            cis->stayOpen(true);
+        auto& file_spec = m->file_store.files[page_data.filename];
+        if (file_spec.cfis) {
+            file_spec.cfis->stayOpen(true);
         }
         QPDFPageLabelDocumentHelper pldh(*page_data.qpdf);
         auto other_afdh = get_afdh_for_qpdf(afdh_map, *page_data.qpdf);
@@ -2589,8 +2585,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
                 }
             }
         }
-        if (cis) {
-            cis->stayOpen(false);
+        if (file_spec.cfis) {
+            file_spec.cfis->stayOpen(false);
         }
     }
     if (any_page_labels) {
@@ -2636,10 +2632,13 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             }
         }
     }
-    for (auto& foreign: m->file_store.files)
-        if (foreign.second.qpdf_p) // exclude main input
-            if (foreign.second.qpdf->anyWarnings())
+    for (auto& foreign: m->file_store.files) {
+        if (foreign.second.qpdf_p) { // exclude main input
+            if (foreign.second.qpdf->anyWarnings()) {
                 return false;
+            }
+        }
+    }
     return true;
 }
 

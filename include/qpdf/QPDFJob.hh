@@ -19,6 +19,7 @@
 #ifndef QPDFJOB_HH
 #define QPDFJOB_HH
 
+#include <qpdf/ClosedFileInputSource.hh>
 #include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
 #include <qpdf/PDFVersion.hh>
@@ -438,7 +439,8 @@ class QPDFJob
         }
 
         std::unique_ptr<QPDF> qpdf_p;
-        QPDF* qpdf;
+        QPDF* qpdf{};
+        ClosedFileInputSource* cfis{};
     };
 
     class FileStore
