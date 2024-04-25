@@ -2392,6 +2392,11 @@ QPDFJob::FileStore::process_file(std::string const& filename, QPDFJob::InputFile
     file_spec.qpdf = file_spec.qpdf_p.get();
     file_spec.orig_pages = file_spec.qpdf->getAllPages();
     file_spec.n_pages = QIntC::to_int(file_spec.orig_pages.size());
+
+    if (job.m->remove_unreferenced_page_resources != QPDFJob::re_no) {
+        file_spec.remove_unreferenced = job.shouldRemoveUnreferencedResources(*file_spec.qpdf);
+    }
+
     if (cis) {
         cis->stayOpen(false);
         file_spec.cfis = cis;
@@ -2427,6 +2432,9 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     auto res = m->file_store.files.insert({m->infilename, &pdf});
     res.first->second.orig_pages = pdf.getAllPages();
     res.first->second.n_pages = QIntC::to_int(res.first->second.orig_pages.size());
+    if (m->remove_unreferenced_page_resources != QPDFJob::re_no) {
+        res.first->second.remove_unreferenced = shouldRemoveUnreferencedResources(pdf);
+    }
 
     // Parse all page specifications and translate them into lists of actual pages.
 
@@ -2456,23 +2464,6 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
         } catch (std::runtime_error& e) {
             throw std::runtime_error(
                 "parsing numeric range for " + page_spec.filename + ": " + e.what());
-        }
-    }
-
-    std::map<unsigned long long, bool> remove_unreferenced;
-    if (m->remove_unreferenced_page_resources != QPDFJob::re_no) {
-        for (auto const& [filename, file_spec]: m->file_store.files) {
-            if (file_spec.cfis) {
-                file_spec.cfis->stayOpen(true);
-            }
-            QPDF& other(*file_spec.qpdf);
-            auto other_uuid = other.getUniqueId();
-            if (remove_unreferenced.count(other_uuid) == 0) {
-                remove_unreferenced[other_uuid] = shouldRemoveUnreferencedResources(other);
-            }
-            if (file_spec.cfis) {
-                file_spec.cfis->stayOpen(false);
-            }
         }
     }
 
@@ -2560,7 +2551,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
                 to_copy = to_copy.shallowCopyPage();
             } else {
                 copied_pages[from_uuid].insert(to_copy_og);
-                if (remove_unreferenced[from_uuid]) {
+                if (file_spec.remove_unreferenced) {
                     to_copy.removeUnreferencedResources();
                 }
             }

@@ -443,6 +443,7 @@ class QPDFJob
         ClosedFileInputSource* cfis{};
         std::vector<QPDFObjectHandle> orig_pages;
         int n_pages;
+        bool remove_unreferenced{false};
     };
 
     class FileStore
