@@ -24,6 +24,7 @@
 #include <qpdf/DLL.h>
 #include <qpdf/PDFVersion.hh>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFOutlineObjectHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 
@@ -37,9 +38,9 @@
 #include <string>
 #include <vector>
 
-class QPDFWriter;
 class Pipeline;
 class QPDFLogger;
+class QPDFWriter;
 
 class QPDFJob
 {
@@ -448,6 +449,7 @@ class QPDFJob
         std::vector<QPDFObjectHandle> orig_pages;
         int n_pages;
         bool remove_unreferenced{false};
+        std::unique_ptr<QPDFAcroFormDocumentHelper> afdh{};
     };
 
     class FileStore

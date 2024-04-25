@@ -2367,6 +2367,7 @@ QPDFJob::InputFile::initialize(FileStore& fs)
         if (fs.job.m->remove_unreferenced_page_resources != QPDFJob::re_no) {
             remove_unreferenced = fs.job.shouldRemoveUnreferencedResources(*qpdf);
         }
+        afdh = std::make_unique<QPDFAcroFormDocumentHelper>(*qpdf);
     }
 }
 
@@ -2441,8 +2442,8 @@ QPDFJob::FileStore::process_files()
 bool
 QPDFJob::handlePageSpecs(QPDF& pdf)
 {
-    auto res = m->file_store.files.insert({m->infilename, &pdf});
-    res.first->second.initialize(m->file_store);
+    auto& this_spec = m->file_store.files.insert({m->infilename, &pdf}).first->second;
+    this_spec.initialize(m->file_store);
 
     // Parse all page specifications and translate them into lists of actual pages.
 
@@ -2528,8 +2529,6 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     std::vector<QPDFObjectHandle> new_labels;
     bool any_page_labels = false;
     int out_pageno = 0;
-    std::map<unsigned long long, std::unique_ptr<QPDFAcroFormDocumentHelper>> afdh_map;
-    auto this_afdh = get_afdh_for_qpdf(afdh_map, pdf);
     std::set<QPDFObjGen> referenced_fields;
     for (auto& page_data: page_specs) {
         auto& file_spec = m->file_store.files[page_data.filename];
@@ -2537,7 +2536,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             file_spec.cfis->stayOpen(true);
         }
         QPDFPageLabelDocumentHelper pldh(*file_spec.qpdf);
-        auto other_afdh = get_afdh_for_qpdf(afdh_map, *file_spec.qpdf);
+        auto& other_afdh = file_spec.afdh;
         if (pldh.hasPageLabels()) {
             any_page_labels = true;
         }
@@ -2586,7 +2585,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
                     QTC::TC("qpdf", "QPDFJob copy fields non-first from orig");
                 }
                 try {
-                    this_afdh->fixCopiedAnnotations(
+                    this_spec.afdh->fixCopiedAnnotations(
                         new_page, to_copy.getObjectHandle(), *other_afdh, &referenced_fields);
                 } catch (std::exception& e) {
                     pdf.warn(
@@ -2615,7 +2614,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     for (size_t pageno = 0; pageno < orig_pages.size(); ++pageno) {
         auto page = orig_pages.at(pageno);
         if (selected_from_orig.count(QIntC::to_int(pageno))) {
-            for (auto field: this_afdh->getFormFieldsForPage(page)) {
+            for (auto field: this_spec.afdh->getFormFieldsForPage(page)) {
                 QTC::TC("qpdf", "QPDFJob pages keeping field from original");
                 referenced_fields.insert(field.getObjectHandle().getObjGen());
             }
@@ -2624,7 +2623,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
         }
     }
     // Remove unreferenced form fields
-    if (this_afdh->hasAcroForm()) {
+    if (this_spec.afdh->hasAcroForm()) {
         auto acroform = pdf.getRoot().getKey("/AcroForm");
         auto fields = acroform.getKey("/Fields");
         if (fields.isArray()) {
