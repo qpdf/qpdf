@@ -1,5 +1,6 @@
 add_executable(zlib-flate zlib-flate.cc)
 target_link_libraries(zlib-flate libqpdf)
+set_target_properties(zlib-flate PROPERTIES INSTALL_RPATH "${Base_rpath}")
 
 add_test(
   NAME zlib-flate

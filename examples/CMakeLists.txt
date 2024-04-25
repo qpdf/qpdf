@@ -32,6 +32,7 @@ foreach(PROG ${EXAMPLE_C_PROGRAMS})
   target_link_libraries(${PROG} libqpdf)
   set_property(TARGET ${PROG} PROPERTY LINKER_LANGUAGE CXX)
 endforeach()
+set_target_properties(${EXAMPLE_CXX_PROGRAMS} ${EXAMPLE_C_PROGRAMS} PROPERTIES INSTALL_RPATH "${Base_rpath}")
 target_include_directories(pdf-create PRIVATE ${JPEG_INCLUDE})
 
 # extend-c-api contains a mixture of C and C++ files.
