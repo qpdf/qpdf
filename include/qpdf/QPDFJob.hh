@@ -447,8 +447,26 @@ class QPDFJob
 
     class FileStore
     {
+        // These default values are duplicated in help and docs.
+        static int constexpr DEFAULT_KEEP_FILES_OPEN_THRESHOLD = 200;
+
       public:
+        FileStore(QPDFJob& job) :
+            job(job)
+        {
+        }
+        void process_file(std::string const& filename, QPDFJob::InputFile& file_spec);
+        void process_files();
+        std::string encryption_file;
+        std::string encryption_file_password;
+        bool keep_files_open{true};
+        bool keep_files_open_set{false};
+        size_t keep_files_open_threshold{DEFAULT_KEEP_FILES_OPEN_THRESHOLD};
+
         std::map<std::string, InputFile> files;
+
+      private:
+        QPDFJob& job;
     };
 
     struct RotationSpec
@@ -611,7 +629,7 @@ class QPDFJob
         static int constexpr DEFAULT_OI_MIN_AREA = 16384;
         static int constexpr DEFAULT_II_MIN_BYTES = 1024;
 
-        Members();
+        Members(QPDFJob& job);
         Members(Members const&) = delete;
 
         std::shared_ptr<QPDFLogger> log;
@@ -629,8 +647,6 @@ class QPDFJob
         bool suppress_warnings{false};
         bool warnings_exit_zero{false};
         bool copy_encryption{false};
-        std::string encryption_file;
-        std::string encryption_file_password;
         bool encrypt{false};
         bool password_is_hex_key{false};
         bool suppress_password_recovery{false};
@@ -673,9 +689,6 @@ class QPDFJob
         bool qdf_mode{false};
         bool preserve_unreferenced_objects{false};
         remove_unref_e remove_unreferenced_page_resources{re_auto};
-        bool keep_files_open{true};
-        bool keep_files_open_set{false};
-        size_t keep_files_open_threshold{DEFAULT_KEEP_FILES_OPEN_THRESHOLD};
         bool newline_before_endstream{false};
         std::string linearize_pass1;
         bool coalesce_contents{false};

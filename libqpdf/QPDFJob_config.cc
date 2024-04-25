@@ -142,7 +142,7 @@ QPDFJob::Config::compressionLevel(std::string const& parameter)
 QPDFJob::Config*
 QPDFJob::Config::copyEncryption(std::string const& parameter)
 {
-    o.m->encryption_file = parameter;
+    o.m->file_store.encryption_file = parameter;
     o.m->copy_encryption = true;
     o.m->encrypt = false;
     o.m->decrypt = false;
@@ -168,7 +168,7 @@ QPDFJob::Config::deterministicId()
 QPDFJob::Config*
 QPDFJob::Config::encryptionFilePassword(std::string const& parameter)
 {
-    o.m->encryption_file_password = parameter;
+    o.m->file_store.encryption_file_password = parameter;
     return this;
 }
 
@@ -341,15 +341,15 @@ QPDFJob::Config::testJsonSchema()
 QPDFJob::Config*
 QPDFJob::Config::keepFilesOpen(std::string const& parameter)
 {
-    o.m->keep_files_open_set = true;
-    o.m->keep_files_open = (parameter == "y");
+    o.m->file_store.keep_files_open_set = true;
+    o.m->file_store.keep_files_open = (parameter == "y");
     return this;
 }
 
 QPDFJob::Config*
 QPDFJob::Config::keepFilesOpenThreshold(std::string const& parameter)
 {
-    o.m->keep_files_open_threshold = QUtil::string_to_uint(parameter.c_str());
+    o.m->file_store.keep_files_open_threshold = QUtil::string_to_uint(parameter.c_str());
     return this;
 }
 

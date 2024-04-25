@@ -281,13 +281,14 @@ ProgressReporter::reportProgress(int percentage)
     this->p << prefix << ": " << filename << ": write progress: " << percentage << "%\n";
 }
 
-QPDFJob::Members::Members() :
-    log(QPDFLogger::defaultLogger())
+QPDFJob::Members::Members(QPDFJob& job) :
+    log(QPDFLogger::defaultLogger()),
+    file_store(job)
 {
 }
 
 QPDFJob::QPDFJob() :
-    m(new Members())
+    m(new Members(*this))
 {
 }
 
@@ -2357,6 +2358,68 @@ QPDFJob::new_section(std::string const& filename, char const* password, std::str
     m->page_specs.push_back({filename, (password ? password : ""), range});
 }
 
+void
+QPDFJob::FileStore::process_file(std::string const& filename, QPDFJob::InputFile& file_spec)
+{
+    // Open the PDF file and store the QPDF object. Throw a std::shared_ptr to the qpdf into
+    // a heap so that it survives through copying to the output but gets cleaned up
+    // automatically at the end. Do not canonicalize the file name. Using two different
+    // paths to refer to the same file is a documented workaround for duplicating a page. If
+    // you are using this an example of how to do this with the API, you can just create two
+    // different QPDF objects to the same underlying file with the same path to achieve the
+    // same effect.
+    auto password = file_spec.password;
+    if (!encryption_file.empty() && password.empty() && filename == encryption_file) {
+        QTC::TC("qpdf", "QPDFJob pages encryption password");
+        password = encryption_file_password;
+    }
+    job.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
+        v << prefix << ": processing " << filename << "\n";
+    });
+    std::shared_ptr<InputSource> is;
+    ClosedFileInputSource* cis = nullptr;
+    if (!keep_files_open) {
+        QTC::TC("qpdf", "QPDFJob keep files open n");
+        cis = new ClosedFileInputSource(filename.c_str());
+        is = std::shared_ptr<InputSource>(cis);
+        cis->stayOpen(true);
+    } else {
+        QTC::TC("qpdf", "QPDFJob keep files open y");
+        FileInputSource* fis = new FileInputSource(filename.c_str());
+        is = std::shared_ptr<InputSource>(fis);
+    }
+    job.processInputSource(file_spec.qpdf_p, is, password.data(), true);
+    file_spec.qpdf = file_spec.qpdf_p.get();
+    file_spec.orig_pages = file_spec.qpdf->getAllPages();
+    file_spec.n_pages = QIntC::to_int(file_spec.orig_pages.size());
+    if (cis) {
+        cis->stayOpen(false);
+        file_spec.cfis = cis;
+    }
+}
+
+void
+QPDFJob::FileStore::process_files()
+{
+    if (!keep_files_open_set) {
+        // Count the number of distinct files to determine whether we should keep files open or not.
+        // Rather than trying to code some portable heuristic based on OS limits, just hard-code
+        // this at a given number and allow users to override.
+        keep_files_open = files.size() <= keep_files_open_threshold;
+        QTC::TC("qpdf", "QPDFJob automatically set keep files open", keep_files_open ? 0 : 1);
+        job.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
+            v << prefix << ": selecting --keep-open-files=" << (keep_files_open ? "y" : "n")
+              << "\n";
+        });
+    }
+
+    for (auto& [filename, file_spec]: files) {
+        if (!file_spec.qpdf) {
+            process_file(filename, file_spec);
+        }
+    }
+}
+
 // Handle all page specifications. Return true if it succeeded without warnings.
 bool
 QPDFJob::handlePageSpecs(QPDF& pdf)
@@ -2381,59 +2444,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
         }
     }
 
-    if (!m->keep_files_open_set) {
-        // Count the number of distinct files to determine whether we should keep files open or not.
-        // Rather than trying to code some portable heuristic based on OS limits, just hard-code
-        // this at a given number and allow users to override.
-        m->keep_files_open = m->file_store.files.size() <= m->keep_files_open_threshold;
-        QTC::TC("qpdf", "QPDFJob automatically set keep files open", m->keep_files_open ? 0 : 1);
-        doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-            v << prefix << ": selecting --keep-open-files=" << (m->keep_files_open ? "y" : "n")
-              << "\n";
-        });
-    }
-
-    // Create a QPDF object for each file that we may take pages from.
-    for (auto& [filename, file_spec]: m->file_store.files) {
-        if (!file_spec.qpdf) {
-            // Open the PDF file and store the QPDF object. Throw a std::shared_ptr to the qpdf into
-            // a heap so that it survives through copying to the output but gets cleaned up
-            // automatically at the end. Do not canonicalize the file name. Using two different
-            // paths to refer to the same file is a documented workaround for duplicating a page. If
-            // you are using this an example of how to do this with the API, you can just create two
-            // different QPDF objects to the same underlying file with the same path to achieve the
-            // same effect.
-            auto const& fn = filename;
-            auto password = file_spec.password;
-            if (!m->encryption_file.empty() && password.empty() && filename == m->encryption_file) {
-                QTC::TC("qpdf", "QPDFJob pages encryption password");
-                password = m->encryption_file_password;
-            }
-            doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-                v << prefix << ": processing " << fn << "\n";
-            });
-            std::shared_ptr<InputSource> is;
-            ClosedFileInputSource* cis = nullptr;
-            if (!m->keep_files_open) {
-                QTC::TC("qpdf", "QPDFJob keep files open n");
-                cis = new ClosedFileInputSource(filename.c_str());
-                is = std::shared_ptr<InputSource>(cis);
-                cis->stayOpen(true);
-            } else {
-                QTC::TC("qpdf", "QPDFJob keep files open y");
-                FileInputSource* fis = new FileInputSource(filename.c_str());
-                is = std::shared_ptr<InputSource>(fis);
-            }
-            processInputSource(file_spec.qpdf_p, is, password.data(), true);
-            file_spec.qpdf = file_spec.qpdf_p.get();
-            file_spec.orig_pages = file_spec.qpdf->getAllPages();
-            file_spec.n_pages = QIntC::to_int(file_spec.orig_pages.size());
-            if (cis) {
-                cis->stayOpen(false);
-                file_spec.cfis = cis;
-            }
-        }
-    }
+    m->file_store.process_files();
 
     std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
     for (auto& page_spec: m->page_specs) {
@@ -2906,8 +2917,8 @@ QPDFJob::setWriterOptions(QPDFWriter& w)
         std::unique_ptr<QPDF> encryption_pdf;
         processFile(
             encryption_pdf,
-            m->encryption_file.c_str(),
-            m->encryption_file_password.data(),
+            m->file_store.encryption_file.c_str(),
+            m->file_store.encryption_file_password.data(),
             false,
             false);
         w.copyEncryptionParameters(*encryption_pdf);
