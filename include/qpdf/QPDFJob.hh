@@ -426,7 +426,6 @@ class QPDFJob
         std::string password;
         std::string range;
         QPDF* qpdf;
-        std::vector<QPDFObjectHandle> orig_pages;
         std::vector<int> selected_pages;
     };
 
@@ -442,6 +441,8 @@ class QPDFJob
         std::unique_ptr<QPDF> qpdf_p;
         QPDF* qpdf{};
         ClosedFileInputSource* cfis{};
+        std::vector<QPDFObjectHandle> orig_pages;
+        int n_pages;
     };
 
     class FileStore

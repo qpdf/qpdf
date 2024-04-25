@@ -269,10 +269,8 @@ QPDFJob::Section::Section(
 
 QPDFJob::Section::Section(QPDFJob::Section const& other, int page) :
     filename(other.filename),
-    password(other.password),
-    // range is no longer required when this constructor is called.
-    qpdf(other.qpdf),
-    orig_pages(other.orig_pages)
+    password(other.password)
+// range is no longer required when this constructor is called.
 {
     selected_pages.push_back(page);
 }
@@ -2363,7 +2361,9 @@ QPDFJob::new_section(std::string const& filename, char const* password, std::str
 bool
 QPDFJob::handlePageSpecs(QPDF& pdf)
 {
-    m->file_store.files.insert({m->infilename, &pdf});
+    auto res = m->file_store.files.insert({m->infilename, &pdf});
+    res.first->second.orig_pages = pdf.getAllPages();
+    res.first->second.n_pages = QIntC::to_int(res.first->second.orig_pages.size());
 
     // Parse all page specifications and translate them into lists of actual pages.
 
@@ -2373,8 +2373,9 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             page_spec.filename = m->infilename;
         }
         auto result = m->file_store.files.insert({page_spec.filename, nullptr});
-        if (!page_spec.password.empty())
+        if (!page_spec.password.empty()) {
             result.first->second.password = page_spec.password;
+        }
         if (page_spec.range.empty()) {
             page_spec.range = "1-z";
         }
@@ -2425,6 +2426,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             }
             processInputSource(file_spec.qpdf_p, is, password.data(), true);
             file_spec.qpdf = file_spec.qpdf_p.get();
+            file_spec.orig_pages = file_spec.qpdf->getAllPages();
+            file_spec.n_pages = QIntC::to_int(file_spec.orig_pages.size());
             if (cis) {
                 cis->stayOpen(false);
                 file_spec.cfis = cis;
@@ -2436,11 +2439,9 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     for (auto& page_spec: m->page_specs) {
         // Read original pages from the PDF, and parse the page range associated with this
         // occurrence of the file.
-        page_spec.qpdf = m->file_store.files[page_spec.filename].qpdf;
-        page_spec.orig_pages = page_spec.qpdf->getAllPages();
         try {
             page_spec.selected_pages = QUtil::parse_numrange(
-                page_spec.range.c_str(), QIntC::to_int(page_spec.orig_pages.size()));
+                page_spec.range.c_str(), m->file_store.files[page_spec.filename].n_pages);
         } catch (std::runtime_error& e) {
             throw std::runtime_error(
                 "parsing numeric range for " + page_spec.filename + ": " + e.what());
@@ -2525,8 +2526,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
         if (file_spec.cfis) {
             file_spec.cfis->stayOpen(true);
         }
-        QPDFPageLabelDocumentHelper pldh(*page_data.qpdf);
-        auto other_afdh = get_afdh_for_qpdf(afdh_map, *page_data.qpdf);
+        QPDFPageLabelDocumentHelper pldh(*file_spec.qpdf);
+        auto other_afdh = get_afdh_for_qpdf(afdh_map, *file_spec.qpdf);
         if (pldh.hasPageLabels()) {
             any_page_labels = true;
         }
@@ -2537,14 +2538,14 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             // Pages are specified from 1 but numbered from 0 in the vector
             int pageno = pageno_iter - 1;
             pldh.getLabelsForPageRange(pageno, pageno, out_pageno++, new_labels);
-            QPDFPageObjectHelper to_copy = page_data.orig_pages.at(QIntC::to_size(pageno));
+            QPDFPageObjectHelper to_copy = file_spec.orig_pages.at(QIntC::to_size(pageno));
             QPDFObjGen to_copy_og = to_copy.getObjectHandle().getObjGen();
-            unsigned long long from_uuid = page_data.qpdf->getUniqueId();
+            unsigned long long from_uuid = file_spec.qpdf->getUniqueId();
             if (copied_pages[from_uuid].count(to_copy_og)) {
                 QTC::TC(
                     "qpdf",
                     "QPDFJob copy same page more than once",
-                    (page_data.qpdf == &pdf) ? 0 : 1);
+                    (file_spec.qpdf == &pdf) ? 0 : 1);
                 to_copy = to_copy.shallowCopyPage();
             } else {
                 copied_pages[from_uuid].insert(to_copy_og);
@@ -2554,7 +2555,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             }
             dh.addPage(to_copy, false);
             bool first_copy_from_orig = false;
-            bool this_file = (page_data.qpdf == &pdf);
+            bool this_file = (file_spec.qpdf == &pdf);
             if (this_file) {
                 // This is a page from the original file. Keep track of the fact that we are using
                 // it.
