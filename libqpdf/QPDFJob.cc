@@ -2367,12 +2367,14 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
 
     // Parse all page specifications and translate them into lists of actual pages.
 
-    // Handle "." as a shortcut for the input file
+    // Handle "." as a shortcut for the input file.
     for (auto& page_spec: m->page_specs) {
         if (page_spec.filename == ".") {
             page_spec.filename = m->infilename;
         }
-        m->file_store.files.insert({page_spec.filename, nullptr});
+        auto result = m->file_store.files.insert({page_spec.filename, nullptr});
+        if (!page_spec.password.empty())
+            result.first->second.password = page_spec.password;
         if (page_spec.range.empty()) {
             page_spec.range = "1-z";
         }
@@ -2391,10 +2393,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     }
 
     // Create a QPDF object for each file that we may take pages from.
-    std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
-    for (auto& page_spec: m->page_specs) {
-        auto& spec = m->file_store.files[page_spec.filename];
-        if (!spec.qpdf) {
+    for (auto& [filename, file_spec]: m->file_store.files) {
+        if (!file_spec.qpdf) {
             // Open the PDF file and store the QPDF object. Throw a std::shared_ptr to the qpdf into
             // a heap so that it survives through copying to the output but gets cleaned up
             // automatically at the end. Do not canonicalize the file name. Using two different
@@ -2402,35 +2402,38 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             // you are using this an example of how to do this with the API, you can just create two
             // different QPDF objects to the same underlying file with the same path to achieve the
             // same effect.
-            auto password = page_spec.password;
-            if (!m->encryption_file.empty() && password.empty() &&
-                page_spec.filename == m->encryption_file) {
+            auto const& fn = filename;
+            auto password = file_spec.password;
+            if (!m->encryption_file.empty() && password.empty() && filename == m->encryption_file) {
                 QTC::TC("qpdf", "QPDFJob pages encryption password");
                 password = m->encryption_file_password;
             }
             doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-                v << prefix << ": processing " << page_spec.filename << "\n";
+                v << prefix << ": processing " << fn << "\n";
             });
             std::shared_ptr<InputSource> is;
             ClosedFileInputSource* cis = nullptr;
             if (!m->keep_files_open) {
                 QTC::TC("qpdf", "QPDFJob keep files open n");
-                cis = new ClosedFileInputSource(page_spec.filename.c_str());
+                cis = new ClosedFileInputSource(filename.c_str());
                 is = std::shared_ptr<InputSource>(cis);
                 cis->stayOpen(true);
             } else {
                 QTC::TC("qpdf", "QPDFJob keep files open y");
-                FileInputSource* fis = new FileInputSource(page_spec.filename.c_str());
+                FileInputSource* fis = new FileInputSource(filename.c_str());
                 is = std::shared_ptr<InputSource>(fis);
             }
-            processInputSource(spec.qpdf_p, is, password.data(), true);
-            spec.qpdf = spec.qpdf_p.get();
+            processInputSource(file_spec.qpdf_p, is, password.data(), true);
+            file_spec.qpdf = file_spec.qpdf_p.get();
             if (cis) {
                 cis->stayOpen(false);
-                spec.cfis = cis;
+                file_spec.cfis = cis;
             }
         }
+    }
 
+    std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
+    for (auto& page_spec: m->page_specs) {
         // Read original pages from the PDF, and parse the page range associated with this
         // occurrence of the file.
         page_spec.qpdf = m->file_store.files[page_spec.filename].qpdf;

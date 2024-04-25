@@ -438,6 +438,7 @@ class QPDFJob
         {
         }
 
+        std::string password;
         std::unique_ptr<QPDF> qpdf_p;
         QPDF* qpdf{};
         ClosedFileInputSource* cfis{};
