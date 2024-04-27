@@ -2430,7 +2430,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             if ((!m->encryption_file.empty()) && (password == nullptr) &&
                 (page_spec.filename == m->encryption_file)) {
                 QTC::TC("qpdf", "QPDFJob pages encryption password");
-                password = m->encryption_file_password.get();
+                password = m->encryption_file_password.data();
             }
             doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                 v << prefix << ": processing " << page_spec.filename << "\n";
@@ -2923,7 +2923,7 @@ QPDFJob::setWriterOptions(QPDFWriter& w)
         processFile(
             encryption_pdf,
             m->encryption_file.c_str(),
-            m->encryption_file_password.get(),
+            m->encryption_file_password.data(),
             false,
             false);
         w.copyEncryptionParameters(*encryption_pdf);

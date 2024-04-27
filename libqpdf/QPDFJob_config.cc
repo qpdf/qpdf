@@ -168,7 +168,7 @@ QPDFJob::Config::deterministicId()
 QPDFJob::Config*
 QPDFJob::Config::encryptionFilePassword(std::string const& parameter)
 {
-    o.m->encryption_file_password = QUtil::make_shared_cstr(parameter);
+    o.m->encryption_file_password = parameter;
     return this;
 }
 
