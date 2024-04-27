@@ -155,15 +155,6 @@ class QPDFJob
         bool replace{false};
     };
 
-    struct PageSpec
-    {
-        PageSpec(std::string const& filename, char const* password, std::string const& range);
-
-        std::string filename;
-        std::shared_ptr<char> password;
-        std::string range;
-    };
-
   public:
     // CONFIGURATION
 
@@ -423,6 +414,17 @@ class QPDFJob
     [[deprecated("use job_json_schema(version)")]] static std::string QPDF_DLL job_json_schema_v1();
 
   private:
+    class Section
+    {
+        friend class QPDFJob;
+
+        Section(std::string const& filename, std::string const& password, std::string const& range);
+
+        std::string filename;
+        std::string password;
+        std::string range;
+    };
+
     struct RotationSpec
     {
         RotationSpec(int angle = 0, bool relative = false) :
@@ -513,6 +515,7 @@ class QPDFJob
     void setQPDFOptions(QPDF& pdf);
     bool handlePageSpecs(QPDF& pdf);
     bool shouldRemoveUnreferencedResources(QPDF& pdf);
+    void new_section(std::string const& filename, char const* password, std::string const& range);
     void handleRotations(QPDF& pdf);
     std::map<std::pair<int, size_t>, std::vector<int>>
     getUOPagenos(std::vector<UnderOverlay> const& uo);
@@ -700,7 +703,7 @@ class QPDFJob
         std::vector<UnderOverlay> underlay;
         std::vector<UnderOverlay> overlay;
         UnderOverlay* under_overlay{nullptr};
-        std::vector<PageSpec> page_specs;
+        std::vector<Section> page_specs;
         std::map<std::string, RotationSpec> rotations;
         bool require_outfile{true};
         bool replace_input{false};

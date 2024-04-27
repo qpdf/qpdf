@@ -270,14 +270,12 @@ ImageOptimizer::provideStreamData(QPDFObjGen const&, Pipeline* pipeline)
     image.pipeStreamData(p.get(), 0, qpdf_dl_specialized, false, false);
 }
 
-QPDFJob::PageSpec::PageSpec(
-    std::string const& filename, char const* password, std::string const& range) :
+QPDFJob::Section::Section(
+    std::string const& filename, std::string const& password, std::string const& range) :
     filename(filename),
+    password(password),
     range(range)
 {
-    if (password) {
-        this->password = QUtil::make_shared_cstr(password);
-    }
 }
 
 QPDFPageData::QPDFPageData(std::string const& filename, QPDF* qpdf, std::string const& range) :
@@ -2377,6 +2375,12 @@ added_page(QPDF& pdf, QPDFPageObjectHelper page)
     return added_page(pdf, page.getObjectHandle());
 }
 
+void
+QPDFJob::new_section(std::string const& filename, char const* password, std::string const& range)
+{
+    m->page_specs.push_back({filename, (password ? password : ""), range});
+}
+
 // Handle all page specifications. Return true if it succeeded without warnings.
 bool
 QPDFJob::handlePageSpecs(QPDF& pdf)
@@ -2426,11 +2430,11 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             // you are using this an example of how to do this with the API, you can just create two
             // different QPDF objects to the same underlying file with the same path to achieve the
             // same effect.
-            char const* password = page_spec.password.get();
-            if ((!m->encryption_file.empty()) && (password == nullptr) &&
-                (page_spec.filename == m->encryption_file)) {
+            auto password = page_spec.password;
+            if (!m->encryption_file.empty() && password.empty() &&
+                page_spec.filename == m->encryption_file) {
                 QTC::TC("qpdf", "QPDFJob pages encryption password");
-                password = m->encryption_file_password.data();
+                password = m->encryption_file_password;
             }
             doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                 v << prefix << ": processing " << page_spec.filename << "\n";
@@ -2448,7 +2452,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
                 is = std::shared_ptr<InputSource>(fis);
             }
             std::unique_ptr<QPDF> qpdf_sp;
-            processInputSource(qpdf_sp, is, password, true);
+            processInputSource(qpdf_sp, is, password.data(), true);
             page_spec_qpdfs[page_spec.filename] = qpdf_sp.get();
             page_heap.push_back(std::move(qpdf_sp));
             if (cis) {
@@ -2519,8 +2523,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
                 for (size_t j = 0; j < m->collate.at(i); ++j) {
                     if (cur_page.at(i) + j < page_data.selected_pages.size()) {
                         got_pages = true;
-                        new_parsed_specs.emplace_back(
-                            page_data, page_data.selected_pages.at(cur_page.at(i) + j));
+                        new_parsed_specs.push_back(
+                            {page_data, page_data.selected_pages.at(cur_page.at(i) + j)});
                     }
                 }
                 cur_page.at(i) += m->collate.at(i);

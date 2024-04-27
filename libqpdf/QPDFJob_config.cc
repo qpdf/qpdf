@@ -964,14 +964,14 @@ QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::pageSpec(
     std::string const& filename, std::string const& range, char const* password)
 {
-    this->config->o.m->page_specs.emplace_back(filename, password, range);
+    this->config->o.new_section(filename, password, range);
     return this;
 }
 
 QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::file(std::string const& arg)
 {
-    this->config->o.m->page_specs.emplace_back(arg, nullptr, "");
+    this->config->o.new_section(arg, nullptr, "");
     return this;
 }
 
@@ -999,11 +999,11 @@ QPDFJob::PagesConfig::password(std::string const& arg)
         usage("in --pages, --password must follow a file name");
     }
     auto& last = config->o.m->page_specs.back();
-    if (last.password) {
+    if (!last.password.empty()) {
         QTC::TC("qpdf", "QPDFJob duplicated pages password");
         usage("--password already specified for this file");
     }
-    last.password = QUtil::make_shared_cstr(arg);
+    last.password = arg;
     return this;
 }
 
