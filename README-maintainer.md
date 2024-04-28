@@ -166,7 +166,7 @@ Building docs from pull requests is also enabled.
 
 ## CODING RULES
 
-* Code is formatted with clang-format-16. See .clang-format and the
+* Code is formatted with clang-format. See .clang-format and the
   "Code Formatting" section in manual/contributing.rst for details.
   See also "CODE FORMATTING" below.
 

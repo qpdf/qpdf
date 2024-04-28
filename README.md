@@ -128,4 +128,4 @@ If the native crypto provider is in use, then, when `qpdf` detects either the Wi
 
 # Acknowledgments
 
-The qpdf project has a JetBrains license through their [Open Source Program](https://www.jetbrains.com/community/opensource/#support). We are grateful for this program and have been enjoying the befits of their high-quality products.
+The qpdf project has a JetBrains license through their [Open Source Program](https://www.jetbrains.com/community/opensource/#support). We are grateful for this program and have been enjoying the benefits of their high-quality products.
