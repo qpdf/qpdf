@@ -86,7 +86,7 @@ jobs:
           name: distribution-windows-${{ matrix.wordsize }}-${{ matrix.tool }}
           path: distribution
   macOS:
-    runs-on: macos-latest
+    runs-on: macos-14
     needs: Prebuild
     steps:
       - uses: actions/checkout@v4
