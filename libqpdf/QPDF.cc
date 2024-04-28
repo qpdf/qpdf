@@ -2370,6 +2370,12 @@ QPDF::getRoot()
 std::map<QPDFObjGen, QPDFXRefEntry>
 QPDF::getXRefTable()
 {
+    return getXRefTableInternal();
+}
+
+std::map<QPDFObjGen, QPDFXRefEntry> const&
+QPDF::getXRefTableInternal()
+{
     if (!m->parsed) {
         throw std::logic_error("QPDF::getXRefTable called before parsing.");
     }
@@ -2377,19 +2383,33 @@ QPDF::getXRefTable()
     return m->xref_table;
 }
 
-void
-QPDF::getObjectStreamData(std::map<int, int>& omap)
+size_t
+QPDF::tableSize()
 {
-    for (auto const& iter: m->xref_table) {
-        QPDFObjGen const& og = iter.first;
-        QPDFXRefEntry const& entry = iter.second;
-        if (entry.getType() == 2) {
-            omap[og.getObj()] = entry.getObjStreamNumber();
-        }
+    // If obj_cache is dense, accommodate all object in tables,else accommodate only original
+    // objects.
+    auto max_xref = m->xref_table.size() ? m->xref_table.crbegin()->first.getObj() : 0;
+    auto max_obj = m->obj_cache.size() ? m->obj_cache.crbegin()->first.getObj() : 0;
+    if (max_obj < 1.1 * std::max(toI(m->obj_cache.size()), max_xref)) {
+        return toS(++max_obj);
     }
+    return toS(++max_xref);
 }
 
 std::vector<QPDFObjGen>
+QPDF::getCompressibleObjVector()
+{
+    return getCompressibleObjGens<QPDFObjGen>();
+}
+
+std::vector<bool>
+QPDF::getCompressibleObjSet()
+{
+    return getCompressibleObjGens<bool>();
+}
+
+template <typename T>
+std::vector<T>
 QPDF::getCompressibleObjGens()
 {
     // Return a list of objects that are allowed to be in object streams.  Walk through the objects
@@ -2407,7 +2427,14 @@ QPDF::getCompressibleObjGens()
     std::vector<QPDFObjectHandle> queue;
     queue.reserve(512);
     queue.push_back(m->trailer);
-    std::vector<QPDFObjGen> result;
+    std::vector<T> result;
+    if constexpr (std::is_same_v<T, QPDFObjGen>) {
+        result.reserve(m->obj_cache.size());
+    } else if constexpr (std::is_same_v<T, bool>) {
+        result.resize(max_obj + 1U, false);
+    } else {
+        throw std::logic_error("Unsupported type in QPDF::getCompressibleObjGens");
+    }
     while (!queue.empty()) {
         auto obj = queue.back();
         queue.pop_back();
@@ -2439,7 +2466,11 @@ QPDF::getCompressibleObjGens()
             } else if (!(obj.isStream() ||
                          (obj.isDictionaryOfType("/Sig") && obj.hasKey("/ByteRange") &&
                           obj.hasKey("/Contents")))) {
-                result.push_back(og);
+                if constexpr (std::is_same_v<T, QPDFObjGen>) {
+                    result.push_back(og);
+                } else if constexpr (std::is_same_v<T, bool>) {
+                    result[id + 1U] = true;
+                }
             }
         }
         if (obj.isStream()) {
