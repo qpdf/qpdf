@@ -2536,6 +2536,7 @@ files.
 ::
 
     qpdf primary-input.pdf \
+      --pages \
       --file=input.pdf \
       [--range=page-range] \
       [--password=password] \
@@ -2547,6 +2548,7 @@ OR
 ::
 
     qpdf primary-input.pdf \
+      --pages \
       input.pdf [--password=password] [page-range] \
       [...] -- output.pdf
 
