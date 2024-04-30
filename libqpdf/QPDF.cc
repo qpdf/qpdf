@@ -1117,8 +1117,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         if (obj == 0) {
             // This is needed by checkLinearization()
             m->first_xref_item_offset = xref_offset;
-        }
-        if (fields[0] == 0) {
+        } else if (fields[0] == 0) {
             // Ignore fields[2], which we don't care about in this case. This works around the issue
             // of some PDF files that put invalid values, like -1, here for deleted objects.
             insertFreeXrefEntry(QPDFObjGen(obj, 0));
@@ -1196,7 +1195,9 @@ QPDF::insertFreeXrefEntry(QPDFObjGen og)
 void
 QPDF::insertReconstructedXrefEntry(int obj, qpdf_offset_t f1, int f2)
 {
-    if (!(obj > 0 && 0 <= f2 && f2 < 65535)) {
+    // Various tables are indexed by object id, with potential size id + 1
+    constexpr static int max_id = std::numeric_limits<int>::max() - 1;
+    if (!(obj > 0 && obj <= max_id && 0 <= f2 && f2 < 65535)) {
         QTC::TC("qpdf", "QPDF xref overwrite invalid objgen");
         return;
     }
