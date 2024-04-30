@@ -1117,8 +1117,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         if (obj == 0) {
             // This is needed by checkLinearization()
             m->first_xref_item_offset = xref_offset;
-        }
-        if (fields[0] == 0) {
+        } else if (fields[0] == 0) {
             // Ignore fields[2], which we don't care about in this case. This works around the issue
             // of some PDF files that put invalid values, like -1, here for deleted objects.
             insertFreeXrefEntry(QPDFObjGen(obj, 0));
