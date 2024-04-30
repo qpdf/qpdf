@@ -416,22 +416,26 @@ QPDF::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
         ObjUser const& ou = i1.first;
         // Loop over objects.
         for (auto const& og: i1.second) {
-            if (auto const& i2 = obj[og].object_stream; i2 <= 0) {
-                t_obj_user_to_objects[ou].insert(og);
-            } else {
-                t_obj_user_to_objects[ou].insert(QPDFObjGen(i2, 0));
+            if (obj.contains(og)) {
+                if (auto const& i2 = obj[og].object_stream; i2 <= 0) {
+                    t_obj_user_to_objects[ou].insert(og);
+                } else {
+                    t_obj_user_to_objects[ou].insert(QPDFObjGen(i2, 0));
+                }
             }
         }
     }
 
     for (auto const& i1: m->object_to_obj_users) {
         QPDFObjGen const& og = i1.first;
-        // Loop over obj_users.
-        for (auto const& ou: i1.second) {
-            if (auto i2 = obj[og].object_stream; i2 <= 0) {
-                t_object_to_obj_users[og].insert(ou);
-            } else {
-                t_object_to_obj_users[QPDFObjGen(i2, 0)].insert(ou);
+        if (obj.contains(og)) {
+            // Loop over obj_users.
+            for (auto const& ou: i1.second) {
+                if (auto i2 = obj[og].object_stream; i2 <= 0) {
+                    t_object_to_obj_users[og].insert(ou);
+                } else {
+                    t_object_to_obj_users[QPDFObjGen(i2, 0)].insert(ou);
+                }
             }
         }
     }

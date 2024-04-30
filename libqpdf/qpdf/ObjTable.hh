@@ -63,6 +63,12 @@ class ObjTable: public std::vector<T>
     }
 
     inline bool
+    contains(QPDFObjGen og) const
+    {
+        return contains(static_cast<size_t>(og.getObj()));
+    }
+
+    inline bool
     contains(QPDFObjectHandle oh) const
     {
         return contains(static_cast<size_t>(oh.getObjectID()));
