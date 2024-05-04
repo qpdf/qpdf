@@ -600,7 +600,8 @@ QPDFAcroFormDocumentHelper AP parse error 0
 QPDFJob copy fields not this file 0
 QPDFJob copy fields non-first from orig 0
 QPDF resolve duplicated page in insert 0
-QPDFWriter preserve object streams 1
+QPDFWriter preserve object streams 0
+QPDFWriter preserve object streams preserve unreferenced 0
 QPDFWriter exclude from object stream 0
 QPDF_pages findPage not found 0
 QPDFObjectHandle check ownership 0
