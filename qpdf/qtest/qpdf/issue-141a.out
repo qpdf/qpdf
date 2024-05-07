@@ -5,4 +5,5 @@ WARNING: issue-141a.pdf (xref stream: object 9 0, offset 47): unable to recover 
 WARNING: issue-141a.pdf: file is damaged
 WARNING: issue-141a.pdf (xref stream, offset 3): Cross-reference stream's /W indicates entry size of 0
 WARNING: issue-141a.pdf: Attempting to reconstruct cross-reference table
-qpdf: issue-141a.pdf: unable to find trailer dictionary while recovering damaged file
+WARNING: issue-141a.pdf: reported number of objects (0) is not one plus the highest object number (9)
+qpdf: issue-141a.pdf: unable to find /Root dictionary

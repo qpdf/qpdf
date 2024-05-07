@@ -521,6 +521,9 @@ QPDF::reconstruct_xref(QPDFExc& e)
         throw e;
     }
 
+    const bool recover_trailer = !m->trailer.isInitialized();
+    qpdf_offset_t max_offset{-1};
+
     m->reconstructed_xref = true;
     // We may find more objects, which may contain dangling references.
     m->fixed_dangling_refs = false;
@@ -561,12 +564,13 @@ QPDF::reconstruct_xref(QPDFExc& e)
                 int gen = QUtil::string_to_int(t2.getValue().c_str());
                 insertReconstructedXrefEntry(obj, token_start, gen);
             }
-        } else if (!m->trailer.isInitialized() && t1.isWord("trailer")) {
+        } else if (recover_trailer && t1.isWord("trailer")) {
             QPDFObjectHandle t = readTrailer();
             if (!t.isDictionary()) {
                 // Oh well.  It was worth a try.
             } else {
-                setTrailer(t);
+                max_offset = token_start;
+                m->trailer = t;
             }
         }
         m->file->seek(next_line_start, SEEK_SET);
@@ -574,15 +578,15 @@ QPDF::reconstruct_xref(QPDFExc& e)
     }
     m->deleted_objects.clear();
 
-    if (!m->trailer.isInitialized()) {
-        qpdf_offset_t max_offset{0};
-        // If there are any xref streams, take the last one to appear.
-        for (auto const& iter: m->xref_table) {
-            auto entry = iter.second;
-            if (entry.getType() != 1) {
+    if (recover_trailer) {
+        // If there are any xref streams, take the last one to appear, provided it appears after any
+        // recovered trailer..
+        bool found_xref_stream = false;
+        for (auto const& [og, entry]: m->xref_table) {
+            if (entry.getType() != 1 || entry.getOffset() <= max_offset) {
                 continue;
             }
-            auto oh = getObjectByObjGen(iter.first);
+            auto oh = getObject(og);
             try {
                 if (!oh.isStreamOfType("/XRef")) {
                     continue;
@@ -590,13 +594,14 @@ QPDF::reconstruct_xref(QPDFExc& e)
             } catch (std::exception&) {
                 continue;
             }
+            found_xref_stream = true;
             auto offset = entry.getOffset();
             if (offset > max_offset) {
                 max_offset = offset;
-                setTrailer(oh.getDict());
+                m->trailer = oh.getDict();
             }
         }
-        if (max_offset > 0) {
+        if (found_xref_stream) {
             try {
                 read_xref(max_offset);
             } catch (std::exception&) {
@@ -608,10 +613,6 @@ QPDF::reconstruct_xref(QPDFExc& e)
     }
 
     if (!m->trailer.isInitialized()) {
-        // We could check the last encountered object to see if it was an xref stream.  If so, we
-        // could try to get the trailer from there.  This may make it possible to recover files with
-        // bad startxref pointers even when they have object streams.
-
         throw damagedPDF("", 0, "unable to find trailer dictionary while recovering damaged file");
     }
 

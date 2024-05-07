@@ -2,4 +2,24 @@ WARNING: issue-101.pdf: file is damaged
 WARNING: issue-101.pdf (offset 3526): xref not found
 WARNING: issue-101.pdf: Attempting to reconstruct cross-reference table
 WARNING: issue-101.pdf (trailer, offset 1508): stream keyword found in trailer
+WARNING: issue-101.pdf (trailer, offset 1701): stream keyword found in trailer
+WARNING: issue-101.pdf (trailer, offset 2096): stream keyword found in trailer
+WARNING: issue-101.pdf (trailer, offset 2683): stream keyword found in trailer
+WARNING: issue-101.pdf (trailer, offset 2928): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (trailer, offset 2930): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (trailer, offset 2928): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-101.pdf (trailer, offset 2928): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-101.pdf (trailer, offset 2928): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-101.pdf (trailer, offset 2995): stream keyword found in trailer
+WARNING: issue-101.pdf (trailer, offset 3409): stream keyword found in trailer
+WARNING: issue-101.pdf (trailer, offset 3630): stream keyword found in trailer
+WARNING: issue-101.pdf (trailer, offset 4183): stream keyword found in trailer
+WARNING: issue-101.pdf (object 11 0, offset 591): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 625): treating unexpected brace token as null
+WARNING: issue-101.pdf (object 11 0, offset 626): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 637): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 639): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 644): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 644): too many errors; giving up on reading object
+WARNING: issue-101.pdf (object 11 0, offset 647): expected endobj
 qpdf: issue-101.pdf: unable to find /Root dictionary
