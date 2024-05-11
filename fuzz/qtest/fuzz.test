@@ -21,7 +21,7 @@ my @fuzzers = (
     ['pngpredictor' => 1],
     ['runlength' => 6],
     ['tiffpredictor' => 2],
-    ['qpdf' => 59],             # increment when adding new files
+    ['qpdf' => 60],             # increment when adding new files
     );
 
 my $n_tests = 0;
