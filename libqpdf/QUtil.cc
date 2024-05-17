@@ -1910,14 +1910,14 @@ call_main_from_wmain(
         }
         utf8_argv.emplace_back(QUtil::utf16_to_utf8(utf16));
     }
-    auto utf8_argv_sp = std::make_unique<char*[]>(1 + utf8_argv.size());
-    char** new_argv = utf8_argv_sp.get();
-    for (size_t i = 0; i < utf8_argv.size(); ++i) {
-        new_argv[i] = utf8_argv.at(i).data();
+    std::vector<char*> new_argv;
+    new_argv.reserve(utf8_argv.size() + 1U);
+    for (auto const& arg: utf8_argv) {
+        new_argv.emplace_back(const_cast<char*>(arg.data()));
     }
     argc = QIntC::to_int(utf8_argv.size());
-    new_argv[argc] = nullptr;
-    return realmain(argc, new_argv);
+    new_argv.emplace_back(nullptr);
+    return realmain(argc, new_argv.data());
 }
 
 int
