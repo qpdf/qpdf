@@ -1899,7 +1899,8 @@ call_main_from_wmain(
     // strings for compatibility with other systems. That way the rest of qpdf.cc can just act like
     // arguments are UTF-8.
 
-    std::vector<std::unique_ptr<char[]>> utf8_argv;
+    std::vector<std::string> utf8_argv;
+    utf8_argv.reserve(QIntC::to_size(argc));
     for (int i = 0; i < argc; ++i) {
         std::string utf16;
         for (size_t j = 0; j < std::wcslen(argv[i]); ++j) {
@@ -1907,17 +1908,16 @@ call_main_from_wmain(
             utf16.append(1, static_cast<char>(QIntC::to_uchar(codepoint >> 8)));
             utf16.append(1, static_cast<char>(QIntC::to_uchar(codepoint & 0xff)));
         }
-        std::string utf8 = QUtil::utf16_to_utf8(utf16);
-        utf8_argv.push_back(QUtil::make_unique_cstr(utf8));
+        utf8_argv.emplace_back(QUtil::utf16_to_utf8(utf16));
     }
-    auto utf8_argv_sp = std::make_unique<char*[]>(1 + utf8_argv.size());
-    char** new_argv = utf8_argv_sp.get();
-    for (size_t i = 0; i < utf8_argv.size(); ++i) {
-        new_argv[i] = utf8_argv.at(i).get();
+    std::vector<char*> new_argv;
+    new_argv.reserve(utf8_argv.size() + 1U);
+    for (auto const& arg: utf8_argv) {
+        new_argv.emplace_back(const_cast<char*>(arg.data()));
     }
     argc = QIntC::to_int(utf8_argv.size());
-    new_argv[argc] = nullptr;
-    return realmain(argc, new_argv);
+    new_argv.emplace_back(nullptr);
+    return realmain(argc, new_argv.data());
 }
 
 int
