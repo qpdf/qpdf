@@ -1002,6 +1002,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
     }
     unsigned long long max_num_entries = static_cast<unsigned long long>(-1) / entry_size;
 
+    // Process /Index entry
     std::vector<long long> indx;
     if (Index_obj.isArray()) {
         int n_index = Index_obj.getArrayNItems();
@@ -1025,6 +1026,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         }
         QTC::TC("qpdf", "QPDF xref /Index is array", n_index == 2 ? 0 : 1);
     } else {
+        // We have already validayed the /Index key.
         QTC::TC("qpdf", "QPDF xref /Index is null");
         long long size = dict.getKey("/Size").getIntValue();
         indx.push_back(0);
@@ -1033,6 +1035,11 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 
     size_t num_entries = 0;
     for (size_t i = 1; i < indx.size(); i += 2) {
+        // We are guarding against the possibility of num_entries * entry_size overflowing.
+        // We are not checking that entries are in ascending order as required by the spec, which
+        // probably should generate a warning. We are also not checking that for each subsection
+        // first object number + number of entries <= /Size. The spec requires us to ignore object
+        // number > /Size.
         if (indx.at(i) > QIntC::to_longlong(max_num_entries - num_entries)) {
             throw damagedPDF(
                 "xref stream",
@@ -1070,13 +1077,11 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
     bool saw_first_compressed_object = false;
 
     // Actual size vs. expected size check above ensures that we will not overflow any buffers here.
-    // We know that entry_size * num_entries is equal to the size of the buffer.
-    unsigned char const* data = bp->getBuffer();
+    // We know that entry_size * num_entries is less or equal to the size of the buffer.
+    auto p = bp->getBuffer();
     for (size_t i = 0; i < num_entries; ++i) {
         // Read this entry
-        unsigned char const* entry = data + (entry_size * i);
         qpdf_offset_t fields[3];
-        unsigned char const* p = entry;
         for (int j = 0; j < 3; ++j) {
             fields[j] = 0;
             if ((j == 0) && (W[0] == 0)) {
@@ -1085,7 +1090,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
             }
             for (int k = 0; k < W[j]; ++k) {
                 fields[j] <<= 8;
-                fields[j] += toI(*p++);
+                fields[j] |= *p++;
             }
         }
 
