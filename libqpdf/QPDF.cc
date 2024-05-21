@@ -1071,63 +1071,59 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         }
     }
 
-    size_t cur_chunk = 0;
-    int chunk_count = 0;
-
     bool saw_first_compressed_object = false;
 
     // Actual size vs. expected size check above ensures that we will not overflow any buffers here.
     // We know that entry_size * num_entries is less or equal to the size of the buffer.
     auto p = bp->getBuffer();
-    for (size_t i = 0; i < num_entries; ++i) {
-        // Read this entry
-        qpdf_offset_t fields[3];
-        for (int j = 0; j < 3; ++j) {
-            fields[j] = 0;
-            if ((j == 0) && (W[0] == 0)) {
-                QTC::TC("qpdf", "QPDF default for xref stream field 0");
-                fields[0] = 1;
+    for (auto iter = indx.cbegin(); iter < indx.cend(); ++iter) {
+        // Process a subsection.
+        // Get the object number. The object number is based on /Index.
+        int obj = toI(*iter++);
+        size_t sec_entries = toS(*iter);
+        for (size_t i = 0; i < sec_entries; ++i) {
+            if (obj < 0 || obj >= (std::numeric_limits<int>::max() - 1)) {
+                std::ostringstream msg;
+                msg.imbue(std::locale::classic());
+                msg << "adding 1 to " << obj
+                    << " while computing index in xref stream would cause an integer overflow";
+                throw std::range_error(msg.str());
             }
-            for (int k = 0; k < W[j]; ++k) {
-                fields[j] <<= 8;
-                fields[j] |= *p++;
+            // Read this entry
+            qpdf_offset_t fields[3];
+            for (int j = 0; j < 3; ++j) {
+                fields[j] = 0;
+                if ((j == 0) && (W[0] == 0)) {
+                    QTC::TC("qpdf", "QPDF default for xref stream field 0");
+                    fields[0] = 1;
+                }
+                for (int k = 0; k < W[j]; ++k) {
+                    fields[j] <<= 8;
+                    fields[j] |= *p++;
+                }
             }
-        }
 
-        // Get the object and generation number.  The object number is based on /Index.  The
-        // generation number is 0 unless this is an uncompressed object record, in which case the
-        // generation number appears as the third field.
-        int obj = toI(indx.at(cur_chunk));
-        if ((obj < 0) || ((std::numeric_limits<int>::max() - obj) < chunk_count)) {
-            std::ostringstream msg;
-            msg.imbue(std::locale::classic());
-            msg << "adding " << chunk_count << " to " << obj
-                << " while computing index in xref stream would cause an integer overflow";
-            throw std::range_error(msg.str());
-        }
-        obj += chunk_count;
-        ++chunk_count;
-        if (chunk_count >= indx.at(cur_chunk + 1)) {
-            cur_chunk += 2;
-            chunk_count = 0;
-        }
-
-        if (saw_first_compressed_object) {
-            if (fields[0] != 2) {
-                m->uncompressed_after_compressed = true;
+            // Get the generation number.  The generation number is 0 unless this is an uncompressed
+            // object record, in which case the generation number appears as the third field.
+            if (saw_first_compressed_object) {
+                if (fields[0] != 2) {
+                    m->uncompressed_after_compressed = true;
+                }
+            } else if (fields[0] == 2) {
+                saw_first_compressed_object = true;
             }
-        } else if (fields[0] == 2) {
-            saw_first_compressed_object = true;
-        }
-        if (obj == 0) {
-            // This is needed by checkLinearization()
-            m->first_xref_item_offset = xref_offset;
-        } else if (fields[0] == 0) {
-            // Ignore fields[2], which we don't care about in this case. This works around the issue
-            // of some PDF files that put invalid values, like -1, here for deleted objects.
-            insertFreeXrefEntry(QPDFObjGen(obj, 0));
-        } else {
-            insertXrefEntry(obj, toI(fields[0]), fields[1], toI(fields[2]));
+            if (obj == 0) {
+                // This is needed by checkLinearization()
+                m->first_xref_item_offset = xref_offset;
+            } else if (fields[0] == 0) {
+                // Ignore fields[2], which we don't care about in this case. This works around the
+                // issue of some PDF files that put invalid values, like -1, here for deleted
+                // objects.
+                insertFreeXrefEntry(QPDFObjGen(obj, 0));
+            } else {
+                insertXrefEntry(obj, toI(fields[0]), fields[1], toI(fields[2]));
+            }
+            ++obj;
         }
     }
 
