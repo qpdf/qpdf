@@ -1032,7 +1032,7 @@ class QPDF
     processXRefW(QPDFObjectHandle& dict, std::function<QPDFExc(std::string_view)> damaged);
     int processXRefSize(
         QPDFObjectHandle& dict, int entry_size, std::function<QPDFExc(std::string_view)> damaged);
-    std::pair<int, std::vector<long long>> processXRefIndex(
+    std::pair<int, std::vector<std::pair<int, int>>> processXRefIndex(
         QPDFObjectHandle& dict,
         int max_num_entries,
         std::function<QPDFExc(std::string_view)> damaged);
