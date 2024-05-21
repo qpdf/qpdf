@@ -968,38 +968,19 @@ QPDF::read_xrefStream(qpdf_offset_t xref_offset)
     return 0; // unreachable
 }
 
-qpdf_offset_t
-QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
+// Return the expected size of the xref stream and the processed Index array.
+std::pair<size_t, std::vector<long long>>
+QPDF::processXRefIndex(
+    QPDFObjectHandle& dict, size_t entry_size, std::function<QPDFExc(std::string_view)> damaged)
 {
-    auto damaged = [this, xref_offset](std::string_view msg) -> QPDFExc {
-        return damagedPDF("xref stream", xref_offset, msg.data());
-    };
+    auto max_num_entries = static_cast<unsigned long long>(-1) / entry_size;
 
-    auto dict = xref_obj.getDict();
-    auto W_obj = dict.getKey("/W");
+    auto Size_obj = dict.getKey("/Size");
     auto Index_obj = dict.getKey("/Index");
-    if (!(W_obj.isArray() && (W_obj.getArrayNItems() >= 3) && W_obj.getArrayItem(0).isInteger() &&
-          W_obj.getArrayItem(1).isInteger() && W_obj.getArrayItem(2).isInteger() &&
-          dict.getKey("/Size").isInteger() && (Index_obj.isArray() || Index_obj.isNull()))) {
-        throw damaged("Cross-reference stream does not have proper /W and /Index keys");
+    if (!(Index_obj.isArray() || Index_obj.isNull())) {
+        throw damaged("Cross-reference stream does not have a proper /Index key");
     }
 
-    int W[3];
-    size_t entry_size = 0;
-    int max_bytes = sizeof(qpdf_offset_t);
-    for (int i = 0; i < 3; ++i) {
-        W[i] = W_obj.getArrayItem(i).getIntValueAsInt();
-        if (W[i] > max_bytes) {
-            throw damaged("Cross-reference stream's /W contains impossibly large values");
-        }
-        entry_size += toS(W[i]);
-    }
-    if (entry_size == 0) {
-        throw damaged("Cross-reference stream's /W indicates entry size of 0");
-    }
-    unsigned long long max_num_entries = static_cast<unsigned long long>(-1) / entry_size;
-
-    // Process /Index entry
     std::vector<long long> indx;
     if (Index_obj.isArray()) {
         int n_index = Index_obj.getArrayNItems();
@@ -1017,9 +998,9 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         }
         QTC::TC("qpdf", "QPDF xref /Index is array", n_index == 2 ? 0 : 1);
     } else {
-        // We have already validayed the /Index key.
+        // We have already validated the /Index key.
         QTC::TC("qpdf", "QPDF xref /Index is null");
-        long long size = dict.getKey("/Size").getIntValue();
+        long long size = Size_obj.getIntValue();
         indx.push_back(0);
         indx.push_back(size);
     }
@@ -1039,20 +1020,50 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         }
         num_entries += toS(indx.at(i));
     }
-
     // entry_size and num_entries have both been validated to ensure that this multiplication does
     // not cause an overflow.
-    size_t expected_size = entry_size * num_entries;
+    return {entry_size * num_entries, indx};
+}
+
+qpdf_offset_t
+QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
+{
+    auto damaged = [this, xref_offset](std::string_view msg) -> QPDFExc {
+        return damagedPDF("xref stream", xref_offset, msg.data());
+    };
+
+    auto dict = xref_obj.getDict();
+    auto W_obj = dict.getKey("/W");
+    auto Size_obj = dict.getKey("/Size");
+    if (!(W_obj.isArray() && (W_obj.getArrayNItems() >= 3) && W_obj.getArrayItem(0).isInteger() &&
+          W_obj.getArrayItem(1).isInteger() && W_obj.getArrayItem(2).isInteger() &&
+          Size_obj.isInteger())) {
+        throw damaged("Cross-reference stream does not have a proper /W key");
+    }
+
+    int W[3];
+    size_t entry_size = 0;
+    int max_bytes = sizeof(qpdf_offset_t);
+    for (int i = 0; i < 3; ++i) {
+        W[i] = W_obj.getArrayItem(i).getIntValueAsInt();
+        if (W[i] > max_bytes) {
+            throw damaged("Cross-reference stream's /W contains impossibly large values");
+        }
+        entry_size += toS(W[i]);
+    }
+    if (entry_size == 0) {
+        throw damaged("Cross-reference stream's /W indicates entry size of 0");
+    }
+
+    auto [expected_size, indx] = processXRefIndex(dict, entry_size, damaged);
 
     std::shared_ptr<Buffer> bp = xref_obj.getStreamData(qpdf_dl_specialized);
     size_t actual_size = bp->getSize();
 
     if (expected_size != actual_size) {
-        QPDFExc x = damagedPDF(
-            "xref stream",
-            xref_offset,
-            ("Cross-reference stream data has the wrong size; expected = " +
-             std::to_string(expected_size) + "; actual = " + std::to_string(actual_size)));
+        QPDFExc x = damaged(
+            "Cross-reference stream data has the wrong size; expected = " +
+            std::to_string(expected_size) + "; actual = " + std::to_string(actual_size));
         if (expected_size > actual_size) {
             throw x;
         } else {
