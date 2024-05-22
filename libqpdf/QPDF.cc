@@ -971,16 +971,17 @@ QPDF::read_xrefStream(qpdf_offset_t xref_offset)
 qpdf_offset_t
 QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 {
-    QPDFObjectHandle dict = xref_obj.getDict();
-    QPDFObjectHandle W_obj = dict.getKey("/W");
-    QPDFObjectHandle Index_obj = dict.getKey("/Index");
+    auto damaged = [this, xref_offset](std::string_view msg) -> QPDFExc {
+        return damagedPDF("xref stream", xref_offset, msg.data());
+    };
+
+    auto dict = xref_obj.getDict();
+    auto W_obj = dict.getKey("/W");
+    auto Index_obj = dict.getKey("/Index");
     if (!(W_obj.isArray() && (W_obj.getArrayNItems() >= 3) && W_obj.getArrayItem(0).isInteger() &&
           W_obj.getArrayItem(1).isInteger() && W_obj.getArrayItem(2).isInteger() &&
           dict.getKey("/Size").isInteger() && (Index_obj.isArray() || Index_obj.isNull()))) {
-        throw damagedPDF(
-            "xref stream",
-            xref_offset,
-            "Cross-reference stream does not have proper /W and /Index keys");
+        throw damaged("Cross-reference stream does not have proper /W and /Index keys");
     }
 
     int W[3];
@@ -989,16 +990,12 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
     for (int i = 0; i < 3; ++i) {
         W[i] = W_obj.getArrayItem(i).getIntValueAsInt();
         if (W[i] > max_bytes) {
-            throw damagedPDF(
-                "xref stream",
-                xref_offset,
-                "Cross-reference stream's /W contains impossibly large values");
+            throw damaged("Cross-reference stream's /W contains impossibly large values");
         }
         entry_size += toS(W[i]);
     }
     if (entry_size == 0) {
-        throw damagedPDF(
-            "xref stream", xref_offset, "Cross-reference stream's /W indicates entry size of 0");
+        throw damaged("Cross-reference stream's /W indicates entry size of 0");
     }
     unsigned long long max_num_entries = static_cast<unsigned long long>(-1) / entry_size;
 
@@ -1007,21 +1004,15 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
     if (Index_obj.isArray()) {
         int n_index = Index_obj.getArrayNItems();
         if ((n_index % 2) || (n_index < 2)) {
-            throw damagedPDF(
-                "xref stream",
-                xref_offset,
-                "Cross-reference stream's /Index has an invalid number of "
-                "values");
+            throw damaged("Cross-reference stream's /Index has an invalid number of values");
         }
         for (int i = 0; i < n_index; ++i) {
             if (Index_obj.getArrayItem(i).isInteger()) {
                 indx.push_back(Index_obj.getArrayItem(i).getIntValue());
             } else {
-                throw damagedPDF(
-                    "xref stream",
-                    xref_offset,
-                    ("Cross-reference stream's /Index's item " + std::to_string(i) +
-                     " is not an integer"));
+                throw damaged(
+                    "Cross-reference stream's /Index's item " + std::to_string(i) +
+                    " is not an integer");
             }
         }
         QTC::TC("qpdf", "QPDF xref /Index is array", n_index == 2 ? 0 : 1);
@@ -1041,12 +1032,10 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         // first object number + number of entries <= /Size. The spec requires us to ignore object
         // number > /Size.
         if (indx.at(i) > QIntC::to_longlong(max_num_entries - num_entries)) {
-            throw damagedPDF(
-                "xref stream",
-                xref_offset,
-                ("Cross-reference stream claims to contain too many entries: " +
-                 std::to_string(indx.at(i)) + " " + std::to_string(max_num_entries) + " " +
-                 std::to_string(num_entries)));
+            throw damaged(
+                "Cross-reference stream claims to contain too many entries: " +
+                std::to_string(indx.at(i)) + " " + std::to_string(max_num_entries) + " " +
+                std::to_string(num_entries));
         }
         num_entries += toS(indx.at(i));
     }
