@@ -2391,6 +2391,13 @@ QPDF::tableSize()
     // objects.
     auto max_xref = m->xref_table.size() ? m->xref_table.crbegin()->first.getObj() : 0;
     auto max_obj = m->obj_cache.size() ? m->obj_cache.crbegin()->first.getObj() : 0;
+    auto max_id = std::numeric_limits<int>::max() - 1;
+    if (max_obj >= max_id || max_xref >= max_id) {
+        // Temporary fix. Long-term solution is
+        // - QPDFObjGen to enforce objgens are valid and sensible
+        // - xref table and obj cache to protect against insertion of impossibly large obj ids
+        stopOnError("Impossibly large object id encountered.");
+    }
     if (max_obj < 1.1 * std::max(toI(m->obj_cache.size()), max_xref)) {
         return toS(++max_obj);
     }
