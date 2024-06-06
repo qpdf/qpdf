@@ -1,6 +1,9 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
-    <SqlCodeStyleSettings version="6">
+    <RiderCodeStyleSettings>
+      <option name="/Default/CodeStyle/CodeFormatting/CppClangFormat/EnableClangFormatSupport/@EntryValue" value="true" type="bool" />
+    </RiderCodeStyleSettings>
+    <SqlCodeStyleSettings version="7">
       <option name="KEYWORD_CASE" value="2" />
     </SqlCodeStyleSettings>
     <clangFormatSettings>
