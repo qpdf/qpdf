@@ -1343,6 +1343,18 @@ class QPDF
         std::string key; // if ou_trailer_key or ou_root_key
     };
 
+    struct UpdateObjectMapsFrame
+    {
+        UpdateObjectMapsFrame(
+            ObjUser const& ou,
+            QPDFObjectHandle oh,
+            bool top);
+
+        ObjUser const& ou;
+        QPDFObjectHandle oh;
+        bool top;
+    };
+
     class PatternFinder: public InputSource::Finder
     {
       public:
@@ -1426,12 +1438,6 @@ class QPDF
         ObjUser const& ou,
         QPDFObjectHandle oh,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
-    void updateObjectMapsInternal(
-        ObjUser const& ou,
-        QPDFObjectHandle oh,
-        std::function<int(QPDFObjectHandle&)> skip_stream_parameters,
-        QPDFObjGen::set& visited,
-        bool top);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
     void filterCompressedObjects(QPDFWriter::ObjTable const& object_stream_data);
 

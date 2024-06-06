@@ -54,6 +54,14 @@ QPDF::ObjUser::operator<(ObjUser const& rhs) const
     return false;
 }
 
+QPDF::UpdateObjectMapsFrame::UpdateObjectMapsFrame(
+    QPDF::ObjUser const& ou, QPDFObjectHandle oh, bool top) :
+    ou(ou),
+    oh(oh),
+    top(top)
+{
+}
+
 void
 QPDF::optimize(
     std::map<int, int> const& object_stream_data,
@@ -277,78 +285,70 @@ QPDF::pushInheritedAttributesToPageInternal(
 
 void
 QPDF::updateObjectMaps(
-    ObjUser const& ou,
-    QPDFObjectHandle oh,
+    ObjUser const& first_ou,
+    QPDFObjectHandle first_oh,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
     QPDFObjGen::set visited;
-    updateObjectMapsInternal(ou, oh, skip_stream_parameters, visited, true);
-}
-
-void
-QPDF::updateObjectMapsInternal(
-    ObjUser const& ou,
-    QPDFObjectHandle oh,
-    std::function<int(QPDFObjectHandle&)> skip_stream_parameters,
-    QPDFObjGen::set& visited,
-    bool top)
-{
+    std::vector<UpdateObjectMapsFrame> pending;
+    pending.emplace_back(first_ou, first_oh, true);
     // Traverse the object tree from this point taking care to avoid crossing page boundaries.
+    std::unique_ptr<ObjUser> thumb_ou;
+    while (!pending.empty()) {
+        auto cur = pending.back();
+        pending.pop_back();
 
-    bool is_page_node = false;
+        bool is_page_node = false;
 
-    if (oh.isDictionaryOfType("/Page")) {
-        is_page_node = true;
-        if (!top) {
-            return;
-        }
-    }
-
-    if (oh.isIndirect()) {
-        QPDFObjGen og(oh.getObjGen());
-        if (!visited.add(og)) {
-            QTC::TC("qpdf", "QPDF opt loop detected");
-            return;
-        }
-        m->obj_user_to_objects[ou].insert(og);
-        m->object_to_obj_users[og].insert(ou);
-    }
-
-    if (oh.isArray()) {
-        int n = oh.getArrayNItems();
-        for (int i = 0; i < n; ++i) {
-            updateObjectMapsInternal(
-                ou, oh.getArrayItem(i), skip_stream_parameters, visited, false);
-        }
-    } else if (oh.isDictionary() || oh.isStream()) {
-        QPDFObjectHandle dict = oh;
-        bool is_stream = oh.isStream();
-        int ssp = 0;
-        if (is_stream) {
-            dict = oh.getDict();
-            if (skip_stream_parameters) {
-                ssp = skip_stream_parameters(oh);
+        if (cur.oh.isDictionaryOfType("/Page")) {
+            is_page_node = true;
+            if (!cur.top) {
+                continue;
             }
         }
 
-        for (auto const& key: dict.getKeys()) {
-            if (is_page_node && (key == "/Thumb")) {
-                // Traverse page thumbnail dictionaries as a special case.
-                updateObjectMapsInternal(
-                    ObjUser(ObjUser::ou_thumb, ou.pageno),
-                    dict.getKey(key),
-                    skip_stream_parameters,
-                    visited,
-                    false);
-            } else if (is_page_node && (key == "/Parent")) {
-                // Don't traverse back up the page tree
-            } else if (
-                ((ssp >= 1) && (key == "/Length")) ||
-                ((ssp >= 2) && ((key == "/Filter") || (key == "/DecodeParms")))) {
-                // Don't traverse into stream parameters that we are not going to write.
-            } else {
-                updateObjectMapsInternal(
-                    ou, dict.getKey(key), skip_stream_parameters, visited, false);
+        if (cur.oh.isIndirect()) {
+            QPDFObjGen og(cur.oh.getObjGen());
+            if (!visited.add(og)) {
+                QTC::TC("qpdf", "QPDF opt loop detected");
+                continue;
+            }
+            m->obj_user_to_objects[cur.ou].insert(og);
+            m->object_to_obj_users[og].insert(cur.ou);
+        }
+
+        if (cur.oh.isArray()) {
+            int n = cur.oh.getArrayNItems();
+            for (int i = 0; i < n; ++i) {
+                pending.emplace_back(cur.ou, cur.oh.getArrayItem(i), false);
+            }
+        } else if (cur.oh.isDictionary() || cur.oh.isStream()) {
+            QPDFObjectHandle dict = cur.oh;
+            bool is_stream = cur.oh.isStream();
+            int ssp = 0;
+            if (is_stream) {
+                dict = cur.oh.getDict();
+                if (skip_stream_parameters) {
+                    ssp = skip_stream_parameters(cur.oh);
+                }
+            }
+
+            for (auto const& key: dict.getKeys()) {
+                if (is_page_node && (key == "/Thumb")) {
+                    // Traverse page thumbnail dictionaries as a special case. There can only ever
+                    // be one /Thumb key on a page, and we see at most one page node per call.
+                    thumb_ou = std::make_unique<ObjUser>(ObjUser::ou_thumb, cur.ou.pageno);
+                    pending.emplace_back(*thumb_ou, dict.getKey(key), false);
+                } else if (is_page_node && (key == "/Parent")) {
+                    // Don't traverse back up the page tree
+                } else if (
+                    ((ssp >= 1) && (key == "/Length")) ||
+                    ((ssp >= 2) && ((key == "/Filter") || (key == "/DecodeParms")))) {
+                    // Don't traverse into stream parameters that we are not going to write.
+                } else {
+                    pending.emplace_back(
+                        cur.ou, dict.getKey(key), false);
+                }
             }
         }
     }
