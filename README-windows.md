@@ -3,7 +3,7 @@ Common Setup
 
 You may need to disable antivirus software to run qpdf's test suite. Running Windows Defender on Windows 10 does not interfere with building or running qpdf or its test suite.
 
-Starting with qpdf version 11, qpdf is built with cmake. You can build qpdf with Visual C++ in Release mode with the pre-built external-libraries distribution (described below) without having any additional tools installed. To run the test suite, you need MSYS2.
+Starting with qpdf version 11, qpdf is built with cmake. You can build qpdf with Visual C++ in Release mode with the pre-built external-libraries distribution (described below) without having any additional tools installed. You can also build with Visual C++ using JetBrains CLion with the external libraries distribution as long as you pass `-DBUILD_SHARED_LIBS=OFF`. It also works to use the build type `RelWithDebInfo`, in which case you can run qpdf in the debugger. To run the test suite, you need MSYS2.
 
 Here's what I did on my system:
 
@@ -17,7 +17,7 @@ Here's what I did on my system:
   * `pacman -S make base-devel git zip unzip`
   * `pacman -S mingw-w64-x86_64-toolchain mingw-w64-i686-toolchain`
 
-You need cmake. If you have Visual Studio installed, you can use the cmake that comes with it to build with both MSVC and mingw. You can also a install a native Windows cmake from cmake.org.
+You need cmake. If you have Visual Studio or JetBrains CLion installed, you can use the cmake that comes with those tools to build with both MSVC and mingw. You can also a install a native Windows cmake from cmake.org.
 
 To build qpdf with Visual Studio from msys2 so you can run its test suite, start the msys2 mingw32 or mingw64 shell from a command window started from one of the Visual Studio shell windows. You must have it inherit the path. For example:
 
