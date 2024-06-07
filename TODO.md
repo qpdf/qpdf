@@ -2,7 +2,7 @@ Contents
 ========
 
 - [Always](#always)
-- [Next](#always)
+- [Next](#next)
 - [Possible future JSON enhancements](#possible-future-json-enhancements)
 - [QPDFJob](#qpdfjob)
 - [Documentation](#documentation)
