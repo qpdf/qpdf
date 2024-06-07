@@ -1,7 +1,3 @@
-#ifndef POINTERHOLDER_TRANSITION
-# define POINTERHOLDER_TRANSITION 4
-#endif
-
 #include <qpdf/QPDF.hh>
 #include <iostream>
 
