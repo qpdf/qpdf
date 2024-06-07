@@ -38,6 +38,23 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
+11.9.1: June 7, 2024
+  - Bug Fixes
+
+    - Rework one piece of linearization to avoid potential stack
+      overflow on very complex files
+
+  - Build Improvements
+
+    - Add a CLion build configuration for building with static
+      libraries with Visual C++ on Windows. This configuration works
+      "out of the box" with CLion, Visual C++, and the external
+      libraries binary distribution without any additoinal external
+      tools.
+
+    - Tweak use of ``std::string_view`` to handle upcoming changes to
+      the C++ standard.
+
 11.9.0: February 24, 2024
   - CLI Enhancements
 

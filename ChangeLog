@@ -1,3 +1,17 @@
+2024-06-07  Jay Berkenbilt  <ejb@ql.org>
+
+	* 11.9.1: release
+
+2024-06-06  Jay Berkenbilt  <ejb@ql.org>
+
+	* Rewrite a recursive function to be iterative in linearization to
+	enable more complex files to be linearized, especially on Windows.
+
+2024-02-24  Jay Berkenbilt  <ejb@ql.org>
+
+	* Avoid non-standard use of `std::basic_string_view`. Contribution
+	from Zoe Clifford.
+
 2024-02-24  Jay Berkenbilt  <ejb@ql.org>
 
 	* 11.9.0: release
