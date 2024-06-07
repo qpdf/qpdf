@@ -29,6 +29,18 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
+12.0.0: not yet released
+  - Build Changes
+
+    - If ``POINTERHOLDER_TRANSITION`` is not defined, define it to
+      ``4``, which completely removes ``PointerHolder`` from the API.
+      Stop including it from any headers that used to include it. This
+      means code that hasn't completed its ``PointerHolder``
+      transition will get errors unless it defines
+      ``POINTERHOLDER_TRANSITION``, and any file that uses
+      ``PointerHolder`` will have to explicitly include it rather than
+      relying on other headers to bring it along.
+
 11.10.1: February 15, 2025
   - Build fixes
 
