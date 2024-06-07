@@ -346,8 +346,7 @@ QPDF::updateObjectMaps(
                     ((ssp >= 2) && ((key == "/Filter") || (key == "/DecodeParms")))) {
                     // Don't traverse into stream parameters that we are not going to write.
                 } else {
-                    pending.emplace_back(
-                        cur.ou, dict.getKey(key), false);
+                    pending.emplace_back(cur.ou, dict.getKey(key), false);
                 }
             }
         }

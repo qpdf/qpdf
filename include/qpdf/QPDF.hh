@@ -1345,10 +1345,7 @@ class QPDF
 
     struct UpdateObjectMapsFrame
     {
-        UpdateObjectMapsFrame(
-            ObjUser const& ou,
-            QPDFObjectHandle oh,
-            bool top);
+        UpdateObjectMapsFrame(ObjUser const& ou, QPDFObjectHandle oh, bool top);
 
         ObjUser const& ou;
         QPDFObjectHandle oh;
