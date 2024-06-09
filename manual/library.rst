@@ -1,11 +1,11 @@
 .. _using-library:
 
-Using the QPDF Library
+Using the qpdf Library
 ======================
 
 .. _using.from-cxx:
 
-Using QPDF from C++
+Using qpdf from C++
 -------------------
 
 The source tree for the qpdf package has an
@@ -39,14 +39,14 @@ single-file executable that links with qpdf:
 
 
 The qpdf library is safe to use in a multithreaded program, but no
-individual ``QPDF`` object instance (including ``QPDF``,
+individual ``qpdf`` object instance (including ``QPDF``,
 ``QPDFObjectHandle``, or ``QPDFWriter``) can be used in more than one
 thread at a time. Multiple threads may simultaneously work with
-different instances of these and all other QPDF objects.
+different instances of these and all other qpdf objects.
 
 .. _using.other-languages:
 
-Using QPDF from other languages
+Using qpdf from other languages
 -------------------------------
 
 The qpdf library is implemented in C++, which makes it hard to use

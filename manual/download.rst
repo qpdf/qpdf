@@ -1,9 +1,9 @@
 .. _download:
 
-Downloading QPDF
+Downloading qpdf
 ================
 
-QPDF is included in most Linux distributions. Native packages are
+qpdf is included in most Linux distributions. Native packages are
 available for many other operating systems as well.
 
 Other resources:
@@ -12,4 +12,4 @@ Other resources:
 
 - `GitHub project <https://github.com/qpdf/qpdf>`__
 
-- `QPDF project web site <https://qpdf.sourceforge.io>`__
+- `qpdf project web site <https://qpdf.sourceforge.io>`__

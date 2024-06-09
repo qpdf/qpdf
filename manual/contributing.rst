@@ -154,7 +154,7 @@ request as submitted.
 Personal Comments
 -----------------
 
-QPDF started as a work project in 2002. The first open source release
+qpdf started as a work project in 2002. The first open source release
 was in 2008. While there have been a handful of contributors, the vast
 majority of the code was written by one person over many years as a
 side project.

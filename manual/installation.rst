@@ -1,6 +1,6 @@
 .. _installing:
 
-Building and Installing QPDF
+Building and Installing qpdf
 ============================
 
 This chapter describes how to build and install qpdf.
@@ -283,7 +283,7 @@ FUTURE
   breaking and are subject to change, which means code linked against
   a qpdf built with this option may not be binary compatible with
   installed qpdf libraries. Set this if you want to test your code
-  with proposed QPDF API changes and provide feedback prior to the
+  with proposed qpdf API changes and provide feedback prior to the
   inclusion of those changes in a release. Packagers should never
   distribute packages built with this option.
 

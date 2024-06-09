@@ -1,4 +1,4 @@
-WHERE TO FIND THE QPDF DOCUMENTATION
+WHERE TO FIND THE qpdf DOCUMENTATION
 
 Complete documentation for qpdf can be found online here:
 https://qpdf.readthedocs.io

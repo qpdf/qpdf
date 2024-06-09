@@ -2,14 +2,14 @@
   Directives documentation:
   https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html
 
-QPDF version |release|
+qpdf version |release|
 ======================
 
 ..
   Include the actual text of the link to readthedocs so it shows up in
   the PDF when printed.
 
-Welcome to the QPDF documentation! For the latest version of this
+Welcome to the qpdf documentation! For the latest version of this
 documentation, please visit `https://qpdf.readthedocs.io
 <https://qpdf.readthedocs.io>`__.
 
