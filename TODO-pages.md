@@ -6,7 +6,7 @@ to another (or back to the same PDF). A secondary goal is to add more flexibilit
 which documents can be split and combined (flexible assembly).
 
 This is a work in progress. As implementation proceeds, details will become more solid. Comments are
-encouraged. Please make comments in the [QPDF pages epic
+encouraged. Please make comments in the [qpdf pages epic
 discussion](https://github.com/qpdf/qpdf/discussions/1104). As ideas are refined, they will be
 updated in this document.
 

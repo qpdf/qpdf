@@ -105,7 +105,7 @@ original encryption, *if any*. Also, one may have a template used for
 encryption that one may apply to a variety of output files, and it
 would be annoying to be warned about it for every output file.
 
-Uses of Weak Hashing In QPDF
+Uses of Weak Hashing In qpdf
 ----------------------------
 
 The PDF specification makes use the weak *MD5* hashing algorithm in

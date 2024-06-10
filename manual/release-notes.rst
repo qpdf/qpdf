@@ -128,14 +128,14 @@ Planned changes for future 12.x (subject to change):
       reference streams, linearization hint streams, and object
       streams. This has been fixed.
 
-    - Fix to QPDF JSON: the syntax ``"n:/pdf-syntax"`` is now accepted
+    - Fix to qpdf JSON: the syntax ``"n:/pdf-syntax"`` is now accepted
       as an alternative way to represent names. This can be used for
       any name (e.g. ``"n:/text#2fplain"``), but it is necessary when
       the name contains binary characters. For example, ``/one#a0two``
       must be represented as ``"n:/one#a0two"`` since the single byte
       ``a0`` is not valid in JSON.
 
-    - QPDF JSON will convert floating numbers that appear in the JSON
+    - qpdf JSON will convert floating numbers that appear in the JSON
       in scientific notation to fixed-point notation since PDF doesn't
       accept scientific notation.
 
@@ -1531,7 +1531,7 @@ Planned changes for future 12.x (subject to change):
       environment, such as a docker container. The zip file is also
       known to work as a layer in AWS Lambda.
 
-    - QPDF's automated build has been migrated from Azure Pipelines
+    - qpdf's automated build has been migrated from Azure Pipelines
       to GitHub Actions.
 
   - Windows-specific Changes
@@ -1916,7 +1916,7 @@ Planned changes for future 12.x (subject to change):
       tell ``QPDFWriter`` to uncompress and recompress streams
       already compressed with ``/FlateDecode``.
 
-    - The underlying implementation of QPDF arrays has been enhanced
+    - The underlying implementation of qpdf arrays has been enhanced
       to be much more memory efficient when dealing with arrays with
       lots of nulls. This enables qpdf to use drastically less memory
       for certain types of files.
@@ -1979,11 +1979,11 @@ Planned changes for future 12.x (subject to change):
       If you see this, please report a bug at
       https://github.com/qpdf/qpdf/issues/.
 
-    - QPDF is now compiled with integer conversion and sign
+    - qpdf is now compiled with integer conversion and sign
       conversion warnings enabled. Numerous changes were made to the
       library to make this safe.
 
-    - QPDF's :command:`make install` target explicitly
+    - qpdf's :command:`make install` target explicitly
       specifies the mode to use when installing files instead of
       relying the user's umask. It was previously doing this for some
       files but not others.
@@ -1995,7 +1995,7 @@ Planned changes for future 12.x (subject to change):
 
   - Other Notes
 
-    - QPDF has been fully integrated into `Google's OSS-Fuzz
+    - qpdf has been fully integrated into `Google's OSS-Fuzz
       project <https://github.com/google/oss-fuzz>`__. This project
       exercises code with randomly mutated inputs and is great for
       discovering hidden security crashes and security issues.
@@ -2179,7 +2179,7 @@ Planned changes for future 12.x (subject to change):
 
     - Add method ``QUtil::possible_repaired_encodings()`` to generate
       a list of strings that represent other ways the given string
-      could have been encoded. This is the method the QPDF CLI uses
+      could have been encoded. This is the method the qpdf CLI uses
       to generate the strings it tries when recovering incorrectly
       encoded Unicode passwords.
 
@@ -2344,7 +2344,7 @@ Planned changes for future 12.x (subject to change):
 
   - Bug Fixes and Enhancements
 
-    - QPDF now automatically detects and recovers from dangling
+    - qpdf now automatically detects and recovers from dangling
       references. If a PDF file contained an indirect reference to a
       non-existent object, which is valid, when adding a new object
       to the file, it was possible for the new object to take the
@@ -2662,7 +2662,7 @@ Planned changes for future 12.x (subject to change):
 8.0.0: February 25, 2018
   - Packaging and Distribution Changes
 
-    - QPDF is now distributed as an
+    - qpdf is now distributed as an
       `AppImage <https://appimage.org/>`__ in addition to all the
       other ways it is distributed. The AppImage can be found in the
       download area with the other packages. Thanks to Kurt Pfeifle
@@ -2752,14 +2752,14 @@ Planned changes for future 12.x (subject to change):
 7.0.0: September 15, 2017
   - Packaging and Distribution Changes
 
-    - QPDF's primary license is now `version 2.0 of the Apache
+    - qpdf's primary license is now `version 2.0 of the Apache
       License <http://www.apache.org/licenses/LICENSE-2.0>`__ rather
       than version 2.0 of the Artistic License. You may still, at
       your option, consider qpdf to be licensed with version 2.0 of
       the Artistic license.
 
-    - QPDF no longer has a dependency on the PCRE (Perl-Compatible
-      Regular Expression) library. QPDF now has an added dependency
+    - qpdf no longer has a dependency on the PCRE (Perl-Compatible
+      Regular Expression) library. qpdf now has an added dependency
       on the JPEG library.
 
   - Bug Fixes
@@ -2771,7 +2771,7 @@ Planned changes for future 12.x (subject to change):
 
   - New Features
 
-    - QPDF now supports reading and writing streams encoded with JPEG
+    - qpdf now supports reading and writing streams encoded with JPEG
       or RunLength encoding. Library API enhancements and
       command-line options have been added to control this behavior.
       See command-line options
@@ -2780,9 +2780,9 @@ Planned changes for future 12.x (subject to change):
       ``QPDFWriter::setCompressStreams`` and
       ``QPDFWriter::setDecodeLevel``.
 
-    - QPDF is much better at recovering from broken files. In most
+    - qpdf is much better at recovering from broken files. In most
       cases, qpdf will skip invalid objects and will preserve broken
-      stream data by not attempting to filter broken streams. QPDF is
+      stream data by not attempting to filter broken streams. qpdf is
       now able to recover or at least not crash on dozens of broken
       test files I have received over the past few years.
 
@@ -3390,7 +3390,7 @@ Planned changes for future 12.x (subject to change):
     and ``std::cerr`` with other streams for generation of diagnostic
     messages and error messages. This can be useful for GUIs or other
     applications that want to capture any output generated by the
-    library to present to the user in some other way. Note that QPDF
+    library to present to the user in some other way. Note that qpdf
     does not write to ``std::cout`` (or the specified output stream)
     except where explicitly mentioned in
     :file:`QPDF.hh`, and that the only use of the
@@ -3533,7 +3533,7 @@ Planned changes for future 12.x (subject to change):
 
   - *Non-compatible API changes:*
 
-    - QPDF's exception handling mechanism now uses
+    - qpdf's exception handling mechanism now uses
       ``std::logic_error`` for internal errors and
       ``std::runtime_error`` for runtime errors in favor of the now
       removed ``QEXC`` classes used in previous versions. The ``QEXC``

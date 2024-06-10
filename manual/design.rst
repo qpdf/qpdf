@@ -133,7 +133,7 @@ certain document constructions. These are discussed in :ref:`helper-classes`.
 Helper Classes
 --------------
 
-QPDF version 8.1 introduced the concept of helper classes. Helper
+qpdf version 8.1 introduced the concept of helper classes. Helper
 classes are intended to contain higher level APIs that allow developers
 to work with certain document constructs at an abstraction level above
 that of ``QPDFObjectHandle`` while staying true to qpdf's philosophy of
@@ -232,7 +232,7 @@ using helper classes.
 Implementation Notes
 --------------------
 
-This section contains a few notes about QPDF's internal implementation,
+This section contains a few notes about qpdf's internal implementation,
 particularly around what it does when it first processes a file. This
 section is a bit of a simplification of what it actually does, but it
 could serve as a starting point to someone trying to understand the
@@ -281,7 +281,7 @@ object stream contents is discarded. In this way, the first time an
 object in an object stream is requested, all objects in the stream are
 cached.
 
-The following example should clarify how ``QPDF`` processes a simple
+The following example should clarify how ``qpdf`` processes a simple
 file.
 
 - Client constructs ``QPDF`` ``pdf`` and calls
@@ -336,11 +336,11 @@ file.
 
 .. _object_internals:
 
-QPDF Object Internals
+qpdf Object Internals
 ---------------------
 
 The internals of ``QPDFObjectHandle`` and how qpdf stores objects were
-significantly rewritten for QPDF 11. Here are some additional details.
+significantly rewritten for qpdf 11. Here are some additional details.
 
 Object Internals
 ~~~~~~~~~~~~~~~~
@@ -456,7 +456,7 @@ move between different integer types because of incompatible integer
 types used in interoperable interfaces. Some are unavoidable, such as
 moving between sizes and offsets, and others are there because of old
 code that is too in entrenched to be fixable without breaking source
-compatibility and causing pain for users. QPDF is compiled with extra
+compatibility and causing pain for users. qpdf is compiled with extra
 warnings to detect conversions with potential data loss, and all such
 cases should be fixed by either using a function from ``QIntC`` or a
 ``static_cast``.
@@ -478,7 +478,7 @@ packed together in some integer type. Also note that ``size_t`` and
 so sometimes an explicit cast may not be needed to avoid warnings on one
 platform but may be needed on another. A conversion with ``QIntC``
 should always be used when the types are different even if the
-underlying size is the same. QPDF's automatic build builds on 32-bit
+underlying size is the same. qpdf's automatic build builds on 32-bit
 and 64-bit platforms, and the test suite is very thorough, so it is
 hard to make any of the potential errors here without being caught in
 build or test.
@@ -538,14 +538,14 @@ is opened by an ordinary reader without specification of password, the
 restrictions specified in the encryption dictionary can be enforced.
 Most users wouldn't even realize such a file was encrypted. Since qpdf
 always ignores the restrictions (except for the purpose of reporting
-what they are), qpdf doesn't care which password you use. QPDF will
+what they are), qpdf doesn't care which password you use. qpdf will
 allow you to create PDF files with non-empty user passwords and empty
 owner passwords. Some readers will require a password when you open
 these files, and others will open the files without a password and not
 enforce restrictions. Having a non-empty user password and an empty
 owner password doesn't really make sense because it would mean that
 opening the file with the user password would be more restrictive than
-not supplying a password at all. QPDF also allows you to create PDF
+not supplying a password at all. qpdf also allows you to create PDF
 files with the same password as both the user and owner password. Some
 readers will not ever allow such files to be accessed without
 restrictions because they never try the password as the owner password
@@ -564,7 +564,7 @@ you do it by mistake.
 Random Number Generation
 ------------------------
 
-QPDF generates random numbers to support generation of encrypted data.
+qpdf generates random numbers to support generation of encrypted data.
 Starting in qpdf 10.0.0, qpdf uses the crypto provider as its source of
 random numbers. Older versions used the OS-provided source of secure
 random numbers or, if allowed at build time, insecure random numbers
@@ -757,7 +757,7 @@ something like store its output to a file or a memory buffer ignoring a
 successor. For additional details, look at
 :file:`Pipeline.hh`.
 
-``QPDF`` can read raw or filtered streams. When reading a filtered
+``qpdf`` can read raw or filtered streams. When reading a filtered
 stream, the ``QPDF`` class creates a ``Pipeline`` object for one of each
 appropriate filter object and chains them together. The last filter
 should write to whatever type of output is required. The ``QPDF`` class

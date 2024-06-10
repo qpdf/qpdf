@@ -325,7 +325,7 @@ unreferenced objects, encryption, decryption, linearization, QDF
 mode, etc. See :ref:`rewriting` for a more in-depth discussion. This
 has a few noteworthy implications:
 
-- Decryption is handled transparently by qpdf. As there are no QPDF
+- Decryption is handled transparently by qpdf. As there are no qpdf
   APIs, even internal to the library, that allow retrieval of
   encrypted data in its raw, encrypted form, qpdf JSON always includes
   decrypted data. It is possible that a future version of qpdf may
@@ -653,7 +653,7 @@ JSON Compatibility Guarantees
 
 The qpdf JSON representation includes a JSON serialization of the raw
 objects in the PDF file as well as some computed information in a more
-easily extracted format. QPDF provides some guarantees about its JSON
+easily extracted format. qpdf provides some guarantees about its JSON
 format. These guarantees are designed to simplify the experience of a
 developer working with the JSON format.
 
