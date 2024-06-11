@@ -126,8 +126,8 @@ QPDF_Dictionary::getKeys()
     return result;
 }
 
-std::map<std::string, QPDFObjectHandle> const&
-QPDF_Dictionary::getAsMap() const
+std::map<std::string, QPDFObjectHandle>&
+QPDF_Dictionary::getAsMap()
 {
     return this->items;
 }
@@ -152,3 +152,5 @@ QPDF_Dictionary::removeKey(std::string const& key)
     // no-op if key does not exist
     this->items.erase(key);
 }
+
+
