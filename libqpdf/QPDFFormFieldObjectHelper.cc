@@ -213,25 +213,19 @@ QPDFFormFieldObjectHelper::getDefaultAppearance()
 int
 QPDFFormFieldObjectHelper::getQuadding()
 {
-    QPDFObjectHandle fv = getInheritableFieldValue("/Q");
-    bool looked_in_acroform = false;
-    if (!fv.isInteger()) {
-        fv = getFieldFromAcroForm("/Q");
-        looked_in_acroform = true;
+    if (auto fv = getInheritableFieldValue("/Q").asInteger()) {
+        QTC::TC("qpdf", "QPDFFormFieldObjectHelper Q present");
+        return fv;
+    } else {
+        QTC::TC("qpdf", "QPDFFormFieldObjectHelper Q present looked");
+        return getFieldFromAcroForm("/Q").asInteger(true);
     }
-    int result = 0;
-    if (fv.isInteger()) {
-        QTC::TC("qpdf", "QPDFFormFieldObjectHelper Q present", looked_in_acroform ? 0 : 1);
-        result = QIntC::to_int(fv.getIntValue());
-    }
-    return result;
 }
 
 int
 QPDFFormFieldObjectHelper::getFlags()
 {
-    QPDFObjectHandle f = getInheritableFieldValue("/Ff");
-    return f.isInteger() ? f.getIntValueAsInt() : 0;
+    return getInheritableFieldValue("/Ff").asInteger(true);
 }
 
 bool

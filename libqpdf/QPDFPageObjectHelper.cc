@@ -667,14 +667,14 @@ QPDFPageObjectHelper::getMatrixForTransformations(bool invert)
     if (!bbox.isRectangle()) {
         return matrix;
     }
-    QPDFObjectHandle rotate_obj = getAttribute("/Rotate", false);
+    auto rotate_obj = getAttribute("/Rotate", false).asInteger();
     QPDFObjectHandle scale_obj = getAttribute("/UserUnit", false);
-    if (!(rotate_obj.isNull() && scale_obj.isNull())) {
+    if (!(rotate_obj.null() && scale_obj.isNull())) {
         QPDFObjectHandle::Rectangle rect = bbox.getArrayAsRectangle();
         double width = rect.urx - rect.llx;
         double height = rect.ury - rect.lly;
         double scale = (scale_obj.isNumber() ? scale_obj.getNumericValue() : 1.0);
-        int rotate = (rotate_obj.isInteger() ? rotate_obj.getIntValueAsInt() : 0);
+        int rotate = rotate_obj ? rotate_obj : 0;
         if (invert) {
             if (scale == 0.0) {
                 return matrix;
@@ -863,12 +863,9 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
 {
     QPDF& qpdf =
         this->oh.getQPDF("QPDFPageObjectHelper::flattenRotation called with a direct object");
-    auto rotate_oh = this->oh.getKey("/Rotate");
-    int rotate = 0;
-    if (rotate_oh.isInteger()) {
-        rotate = rotate_oh.getIntValueAsInt();
-    }
-    if (!((rotate == 90) || (rotate == 180) || (rotate == 270))) {
+    auto rotate_key = this->oh.getKey("/Rotate").asInteger();
+    int rotate = rotate_key ? rotate_key : 0;
+    if (!(rotate == 90 || rotate == 180 || rotate == 270)) {
         return;
     }
     auto mediabox = this->oh.getKey("/MediaBox");

@@ -36,11 +36,8 @@ QPDFPageLabelDocumentHelper::getLabelForPage(long long page_idx)
     }
     QPDFObjectHandle S = label.getKey("/S");   // type (D, R, r, A, a)
     QPDFObjectHandle P = label.getKey("/P");   // prefix
-    QPDFObjectHandle St = label.getKey("/St"); // starting number
-    long long start = 1;
-    if (St.isInteger()) {
-        start = St.getIntValue();
-    }
+    auto St = label.getKey("/St").asInteger(); // starting number
+    long long start = St ? St : 1;
     QIntC::range_check(start, offset);
     start += offset;
     result = QPDFObjectHandle::newDictionary();
@@ -72,14 +69,14 @@ QPDFPageLabelDocumentHelper::getLabelsForPageRange(
     bool skip_first = false;
     if (size >= 2) {
         QPDFObjectHandle last = new_labels.at(size - 1);
-        QPDFObjectHandle last_idx = new_labels.at(size - 2);
-        if (last_idx.isInteger() && last.isDictionary() &&
+        auto last_idx = new_labels.at(size - 2).asInteger();
+        auto st = label.getKey("/St").asInteger();
+        auto last_st = last.getKey("/St").asInteger();
+        if (last_idx && last.isDictionary() &&
             (label.getKey("/S").unparse() == last.getKey("/S").unparse()) &&
-            (label.getKey("/P").unparse() == last.getKey("/P").unparse()) &&
-            label.getKey("/St").isInteger() && last.getKey("/St").isInteger()) {
-            long long int st_delta =
-                label.getKey("/St").getIntValue() - last.getKey("/St").getIntValue();
-            long long int idx_delta = new_start_idx - last_idx.getIntValue();
+            (label.getKey("/P").unparse() == last.getKey("/P").unparse()) && st && last_st) {
+            auto st_delta = st.value() - last_st.value();
+            auto idx_delta = new_start_idx - last_idx.value();
             if (st_delta == idx_delta) {
                 QTC::TC("qpdf", "QPDFPageLabelDocumentHelper skip first");
                 skip_first = true;

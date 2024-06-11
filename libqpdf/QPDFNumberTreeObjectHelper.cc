@@ -22,12 +22,14 @@ namespace
         int
         compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const override
         {
-            if (!(keyValid(a) && keyValid(b))) {
+            auto ai = a.asInteger();
+            auto bi = b.asInteger();
+            if (!(ai && bi)) {
                 // We don't call this without calling keyValid first
                 throw std::logic_error("comparing invalid keys");
             }
-            auto as = a.getIntValue();
-            auto bs = b.getIntValue();
+            auto as = ai.value();
+            auto bs = bi.value();
             return ((as < bs) ? -1 : (as > bs) ? 1 : 0);
         }
     };
@@ -91,7 +93,7 @@ QPDFNumberTreeObjectHelper::iterator::updateIValue()
 {
     if (impl->valid()) {
         auto p = *impl;
-        this->ivalue.first = p->first.getIntValue();
+        this->ivalue.first = p->first.asInteger();
         this->ivalue.second = p->second;
     } else {
         this->ivalue.first = 0;
