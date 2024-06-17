@@ -1371,12 +1371,12 @@ class QPDFObjectHandle
     QPDF_Real* asReal() const;
     QPDF_Reserved* asReserved() const;
     QPDF_Stream* asStream() const;
-    QPDF_Stream* asStreamWithAssert();
+    QPDF_Stream* asStreamWithAssert() const;
     QPDF_String* asString() const;
 
-    void typeWarning(char const* expected_type, std::string const& warning);
-    void objectWarning(std::string const& warning);
-    void assertType(char const* type_name, bool istype);
+    void typeWarning(char const* expected_type, std::string const& warning) const;
+    void objectWarning(std::string const& warning) const;
+    void assertType(char const* type_name, bool istype) const;
     void makeDirect(QPDFObjGen::set& visited, bool stop_at_streams);
     void disconnect();
     void setParsedOffset(qpdf_offset_t offset);
