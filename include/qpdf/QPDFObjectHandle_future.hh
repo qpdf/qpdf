@@ -19,30 +19,25 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef QPDFOBJECTHANDLE_HH
-#define QPDFOBJECTHANDLE_HH
+#ifndef QPDFOBJECTHANDLE_FUTURE_HH
+#define QPDFOBJECTHANDLE_FUTURE_HH
 
-#ifdef QPDF_FUTURE
-# include <qpdf/QPDFObjectHandle_future.hh>
-#else
+#include <qpdf/Constants.h>
+#include <qpdf/DLL.h>
+#include <qpdf/Types.h>
 
-# include <qpdf/Constants.h>
-# include <qpdf/DLL.h>
-# include <qpdf/Types.h>
+#include <functional>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <vector>
 
-# include <functional>
-# include <map>
-# include <memory>
-# include <set>
-# include <string>
-# include <vector>
-
-# include <qpdf/Buffer.hh>
-# include <qpdf/InputSource.hh>
-# include <qpdf/JSON.hh>
-# include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
-# include <qpdf/QPDFObjGen.hh>
-# include <qpdf/QPDFTokenizer.hh>
+#include <qpdf/Buffer.hh>
+#include <qpdf/InputSource.hh>
+#include <qpdf/JSON.hh>
+#include <qpdf/QPDFObjGen.hh>
+#include <qpdf/QPDFTokenizer.hh>
 
 class Pipeline;
 class QPDF;
@@ -294,6 +289,11 @@ class QPDFObjectHandle
     QPDFObjectHandle(QPDFObjectHandle const&) = default;
     QPDF_DLL
     QPDFObjectHandle& operator=(QPDFObjectHandle const&) = default;
+
+    QPDF_DLL
+    QPDFObjectHandle(QPDFObjectHandle&&) = default;
+    QPDF_DLL
+    QPDFObjectHandle& operator=(QPDFObjectHandle&&) = default;
 
     QPDF_DLL
     inline bool isInitialized() const;
@@ -1396,7 +1396,7 @@ class QPDFObjectHandle
     std::shared_ptr<QPDFObject> obj;
 };
 
-# ifndef QPDF_NO_QPDF_STRING
+#ifndef QPDF_NO_QPDF_STRING
 // This is short for QPDFObjectHandle::parse, so you can do
 
 // auto oh = "<< /Key (value) >>"_qpdf;
@@ -1412,7 +1412,7 @@ QPDF_DLL
 QPDFObjectHandle operator ""_qpdf(char const* v, size_t len);
 /* clang-format on */
 
-# endif // QPDF_NO_QPDF_STRING
+#endif // QPDF_NO_QPDF_STRING
 
 class QPDFObjectHandle::QPDFDictItems
 {
@@ -1634,5 +1634,4 @@ QPDFObjectHandle::isInitialized() const
     return obj != nullptr;
 }
 
-#endif // QPDF_FUTURE
-#endif // QPDFOBJECTHANDLE_HH
+#endif // QPDFOBJECTHANDLE_FUTURE_HH
