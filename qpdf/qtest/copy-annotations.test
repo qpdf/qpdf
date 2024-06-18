@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('copy-annotations');
 
-my $n_tests = 45;
+my $n_tests = 46;
 
 $td->runtest("complex copy annotations",
              {$td->COMMAND =>
@@ -48,6 +48,13 @@ $td->runtest("copy annotations no acroform from foreign file",
                   "qpdf --qdf --static-id --no-original-object-ids" .
                    " annotations-no-acroform.pdf --pages . 1,1 -- a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("get json no acroform",
+             {$td->COMMAND =>
+                  "qpdf --json annotations-no-acroform.pdf"},
+             {$td->FILE => "annotations-no-acroform.json",
+                  $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 $td->runtest("check output",

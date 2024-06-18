@@ -1168,6 +1168,9 @@ QPDFJob::doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf)
         ++pagepos1;
         for (auto& aoh: afdh.getWidgetAnnotationsForPage(page)) {
             QPDFFormFieldObjectHelper ffh = afdh.getFieldForAnnotation(aoh);
+            if (!ffh.getObjectHandle().isDictionary()) {
+                continue;
+            }
             JSON j_field = j_fields.addArrayElement(JSON::makeDictionary());
             j_field.addDictionaryMember("object", ffh.getObjectHandle().getJSON(m->json_version));
             j_field.addDictionaryMember(
