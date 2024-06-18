@@ -285,6 +285,16 @@ Building docs from pull requests is also enabled.
 * Avoid attaching too much metadata to objects and object handles
   since those have to get copied around a lot.
 
+* Prefer std::string_view to std::string const& and char const*.
+
+  * Where functions rely on strings being null-terminated, std::string_view may not be appropriate.
+
+  * For return values, consider whether returning a string_view is safe or whether it is more appropriate
+    to return a std::string or std::string const&, especially in the public API.
+
+  * NEVER replace a std::string const& return value with std::string_view in the public API.
+
+
 ## ZLIB COMPATIBILITY
 
 The qpdf test suite is designed to be independent of the output of any

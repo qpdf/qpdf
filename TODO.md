@@ -2,6 +2,7 @@ Contents
 ========
 
 - [Always](#always)
+- [In Progress](#in-progress)
 - [Next](#next)
 - [Possible future JSON enhancements](#possible-future-json-enhancements)
 - [QPDFJob](#qpdfjob)
@@ -25,6 +26,28 @@ Always
   addition to regular issues.
 * When close to release, make sure external-libs is building and follow instructions in
   ../external-libs/README
+
+In Progress
+===========
+
+Modernize qpdf
+--------------
+
+Update code to make use of the facilities provided by C++17. In particular, replace early qpdf C-style code
+with modern equivalent. Key updates are:
+
+* use the standard library where appropriate
+* replace C-strings with std::string or std::string_view
+* replace raw pointer with smart pointers or standard library containers
+* replace std::string const& with std::string_view where appropriate
+* replace std::shared_ptr with std::unique_ptr or references to the underlying object where appropriate
+
+Next steps are:
+
+* review function signatures in the public API
+* replace code that uses QUtil::make_shared_cstr etc
+
+Except for the above, prefer to make modernization changes as part of other updates.
 
 Next
 ====
