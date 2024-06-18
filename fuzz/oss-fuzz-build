@@ -21,9 +21,18 @@ if [[ $GITHUB_FORK != "" ]]; then
     fi
 fi
 
-env CMAKE_PREFIX_PATH=$WORK LDFLAGS="-L$WORK/lib -lpthread" \
-    cmake -S . -B build \
-    -DOSS_FUZZ=1 -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=Debug \
-    -DUSE_IMPLICIT_CRYPTO=0 -DREQUIRE_CRYPTO_NATIVE=1
-cmake --build build -j$(nproc) --target fuzzers
-cmake --install build --component fuzz
+for future in ON OFF; do
+    rm -rf build
+    env CMAKE_PREFIX_PATH=$WORK LDFLAGS="-L$WORK/lib -lpthread" \
+        cmake -S . -B build \
+        -DOSS_FUZZ=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Debug \
+        -DUSE_IMPLICIT_CRYPTO=OFF -DREQUIRE_CRYPTO_NATIVE=ON \
+        -DFUTURE=$future
+    cmake --build build -j$(nproc) --target fuzzers
+    cmake --install build --component fuzz
+    if [[ $future == ON ]]; then
+        pushd $OUT
+        for i in *; do mv $i future_$i; done
+        popd
+    fi
+done
