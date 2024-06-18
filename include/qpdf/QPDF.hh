@@ -1028,6 +1028,14 @@ class QPDF
     qpdf_offset_t read_xrefTable(qpdf_offset_t offset);
     qpdf_offset_t read_xrefStream(qpdf_offset_t offset);
     qpdf_offset_t processXRefStream(qpdf_offset_t offset, QPDFObjectHandle& xref_stream);
+    std::pair<int, std::array<int, 3>>
+    processXRefW(QPDFObjectHandle& dict, std::function<QPDFExc(std::string_view)> damaged);
+    int processXRefSize(
+        QPDFObjectHandle& dict, int entry_size, std::function<QPDFExc(std::string_view)> damaged);
+    std::pair<int, std::vector<std::pair<int, int>>> processXRefIndex(
+        QPDFObjectHandle& dict,
+        int max_num_entries,
+        std::function<QPDFExc(std::string_view)> damaged);
     void insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2);
     void insertFreeXrefEntry(QPDFObjGen);
     void insertReconstructedXrefEntry(int obj, qpdf_offset_t f1, int f2);
