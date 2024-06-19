@@ -1428,7 +1428,7 @@ test_42(QPDF& pdf, char const* arg2)
         assert(i == ai.end());
         ++i;
         assert(i == ai.end());
-        assert(!i_value.isInitialized());
+        assert(!i_value);
         --i;
         assert(i_value.getName() == "/Item2");
         assert(i->getName() == "/Item2");
@@ -1444,7 +1444,7 @@ test_42(QPDF& pdf, char const* arg2)
         ++i;
         ++i;
         assert(i == di.end());
-        assert(!i_value.second.isInitialized());
+        assert(!i_value.second);
     }
     assert("" == qtest.getStringValue());
     array.getArrayItem(-1).assertNull();
@@ -1542,7 +1542,7 @@ test_42(QPDF& pdf, char const* arg2)
     assert(m1.a == 0 && m1.b == 0 && m1.c == 0 && m1.d == 0 && m1.e == 0 && m1.f == 0);
     // Uninitialized
     QPDFObjectHandle uninitialized;
-    assert(!uninitialized.isInitialized());
+    assert(!uninitialized);
     assert(!uninitialized.isInteger());
     assert(!uninitialized.isDictionary());
     assert(!uninitialized.isScalar());
@@ -1692,7 +1692,7 @@ test_46(QPDF& pdf, char const* arg2)
     assert(iter1_val.first == 2);
     ++iter1;
     assert(iter1 == new1.end());
-    assert(!iter1_val.second.isInitialized());
+    assert(!iter1_val.second);
     ++iter1;
     assert(iter1->first == 1);
     --iter1;
@@ -1842,7 +1842,7 @@ test_48(QPDF& pdf, char const* arg2)
     assert(iter1_val.first == "2");
     ++iter1;
     assert(iter1 == new1.end());
-    assert(!iter1_val.second.isInitialized());
+    assert(!iter1_val.second);
     ++iter1;
     assert(iter1->first == "1");
     --iter1;

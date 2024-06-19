@@ -59,8 +59,8 @@ QPDFOutlineObjectHelper::getDest()
         QTC::TC("qpdf", "QPDFOutlineObjectHelper action dest");
         dest = A.getKey("/D");
     }
-    if (!dest.isInitialized()) {
-        dest = QPDFObjectHandle::newNull();
+    if (!dest) {
+        return QPDFObjectHandle::newNull();
     }
 
     if (dest.isName() || dest.isString()) {
