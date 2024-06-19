@@ -300,8 +300,7 @@ class QPDFObjectHandle
     QPDF_DLL
     explicit inline operator bool() const noexcept;
 
-    QPDF_DLL
-    inline bool isInitialized() const noexcept;
+    [[deprecated("use operator bool()")]] QPDF_DLL inline bool isInitialized() const noexcept;
 
     // This method returns true if the QPDFObjectHandle objects point to exactly the same underlying
     // object, meaning that changes to one are reflected in the other, or "if you paint one, the

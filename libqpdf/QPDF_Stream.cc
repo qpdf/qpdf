@@ -661,18 +661,17 @@ void
 QPDF_Stream::replaceFilterData(
     QPDFObjectHandle const& filter, QPDFObjectHandle const& decode_parms, size_t length)
 {
-    if (filter.isInitialized()) {
-        this->stream_dict.replaceKey("/Filter", filter);
+    if (filter) {
+        stream_dict.replaceKey("/Filter", filter);
     }
-    if (decode_parms.isInitialized()) {
-        this->stream_dict.replaceKey("/DecodeParms", decode_parms);
+    if (decode_parms) {
+        stream_dict.replaceKey("/DecodeParms", decode_parms);
     }
     if (length == 0) {
         QTC::TC("qpdf", "QPDF_Stream unknown stream length");
-        this->stream_dict.removeKey("/Length");
+        stream_dict.removeKey("/Length");
     } else {
-        this->stream_dict.replaceKey(
-            "/Length", QPDFObjectHandle::newInteger(QIntC::to_longlong(length)));
+        stream_dict.replaceKey("/Length", QPDFObjectHandle::newInteger(QIntC::to_longlong(length)));
     }
 }
 

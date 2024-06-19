@@ -396,7 +396,7 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
         } else {
             annot = kid;
         }
-        if (!annot.isInitialized()) {
+        if (!annot) {
             QTC::TC("qpdf", "QPDFObjectHandle broken radio button");
             this->oh.warnIfPossible("unable to set the value of this radio button");
             continue;
@@ -459,7 +459,7 @@ QPDFFormFieldObjectHelper::setCheckBoxValue(bool value)
     // Set /AS to the on value or /Off in addition to setting /V.
     QPDFObjectHandle name = QPDFObjectHandle::newName(value ? on_value : "/Off");
     setFieldAttribute("/V", name);
-    if (!annot.isInitialized()) {
+    if (!annot) {
         QTC::TC("qpdf", "QPDFObjectHandle broken checkbox");
         this->oh.warnIfPossible("unable to set the value of this checkbox");
         return;
@@ -815,7 +815,7 @@ QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& ao
         QPDFObjectHandle resources = AS.getDict().getKey("/Resources");
         QPDFObjectHandle font = getFontFromResource(resources, font_name);
         bool found_font_in_dr = false;
-        if (!font.isInitialized()) {
+        if (!font) {
             QPDFObjectHandle dr = getDefaultResources();
             font = getFontFromResource(dr, font_name);
             found_font_in_dr = font.isDictionary();

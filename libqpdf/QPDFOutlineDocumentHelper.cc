@@ -67,7 +67,7 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
 {
     QPDFObjectHandle result;
     if (name.isName()) {
-        if (!m->dest_dict.isInitialized()) {
+        if (!m->dest_dict) {
             m->dest_dict = qpdf.getRoot().getKey("/Dests");
         }
         QTC::TC("qpdf", "QPDFOutlineDocumentHelper name named dest");
@@ -85,7 +85,7 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
             }
         }
     }
-    if (!result.isInitialized()) {
+    if (!result) {
         return QPDFObjectHandle::newNull();
     }
     if (result.isDictionary()) {
