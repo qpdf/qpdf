@@ -768,11 +768,15 @@ QPDF::parse_xrefFirst(std::string const& line, int& obj, int& num, int& bytes)
 }
 
 bool
-QPDF::parse_xrefEntry(std::string const& line, qpdf_offset_t& f1, int& f2, char& type)
+QPDF::read_bad_xrefEntry(qpdf_offset_t& f1, int& f2, char& type)
 {
+    // Reposition after initial read attempt and reread.
+    m->file->seek(m->file->getLastOffset(), SEEK_SET);
+    auto line = m->file->readLine(30);
+
     // is_space and is_digit both return false on '\0', so this will not overrun the null-terminated
     // buffer.
-    char const* p = line.c_str();
+    char const* p = line.data();
 
     // Skip zero or more spaces. There aren't supposed to be any.
     bool invalid = false;
@@ -843,18 +847,73 @@ QPDF::parse_xrefEntry(std::string const& line, qpdf_offset_t& f1, int& f2, char&
     return true;
 }
 
+// Optimistically read and parse xref entry. If entry is bad, call read_bad_xrefEntry and return
+// result.
+bool
+QPDF::read_xrefEntry(qpdf_offset_t& f1, int& f2, char& type)
+{
+    std::array<char, 21> line;
+    if (m->file->read(line.data(), 20) != 20) {
+        // C++20: [[unlikely]]
+        return false;
+    }
+    line[20] = '\0';
+    char const* p = line.data();
+
+    int f1_len = 0;
+    int f2_len = 0;
+
+    // is_space and is_digit both return false on '\0', so this will not overrun the null-terminated
+    // buffer.
+
+    // Gather f1 digits. NB No risk of overflow as 9'999'999'999 < max long long.
+    while (*p == '0') {
+        ++f1_len;
+        ++p;
+    }
+    while (QUtil::is_digit(*p) && f1_len++ < 10) {
+        f1 *= 10;
+        f1 += *p++ - '0';
+    }
+    // Require space
+    if (!QUtil::is_space(*p++)) {
+        // Entry doesn't start with space or digit.
+        // C++20: [[unlikely]]
+        return false;
+    }
+    // Gather digits. NB No risk of overflow as 99'999 < max int.
+    while (*p == '0') {
+        ++f2_len;
+        ++p;
+    }
+    while (QUtil::is_digit(*p) && f2_len++ < 5) {
+        f2 *= 10;
+        f2 += static_cast<int>(*p++ - '0');
+    }
+    if (QUtil::is_space(*p++) && (*p == 'f' || *p == 'n')) {
+        // C++20: [[likely]]
+        type = *p;
+        ++p;
+        ++p; // No test for valid line[19].
+        if ((*p == '\n' || *p == '\r') && f1_len == 10 && f2_len == 5) {
+            // C++20: [[likely]]
+            return true;
+        }
+    }
+    return read_bad_xrefEntry(f1, f2, type);
+}
+
+// Read a single cross-reference table section and associated trailer.
 qpdf_offset_t
 QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 {
     std::vector<QPDFObjGen> deleted_items;
 
     m->file->seek(xref_offset, SEEK_SET);
-    bool done = false;
-    while (!done) {
-        char linebuf[51];
-        memset(linebuf, 0, sizeof(linebuf));
-        m->file->read(linebuf, sizeof(linebuf) - 1);
-        std::string line = linebuf;
+    std::string line;
+    while (true) {
+        line.assign(50, '\0');
+        m->file->read(line.data(), line.size());
         int obj = 0;
         int num = 0;
         int bytes = 0;
@@ -868,12 +927,11 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
                 // This is needed by checkLinearization()
                 m->first_xref_item_offset = m->file->tell();
             }
-            std::string xref_entry = m->file->readLine(30);
             // For xref_table, these will always be small enough to be ints
             qpdf_offset_t f1 = 0;
             int f2 = 0;
             char type = '\0';
-            if (!parse_xrefEntry(xref_entry, f1, f2, type)) {
+            if (!read_xrefEntry(f1, f2, type)) {
                 QTC::TC("qpdf", "QPDF invalid xref entry");
                 throw damagedPDF(
                     "xref table", "invalid xref entry (obj=" + std::to_string(i) + ")");
@@ -887,7 +945,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
         }
         qpdf_offset_t pos = m->file->tell();
         if (readToken(m->file).isWord("trailer")) {
-            done = true;
+            break;
         } else {
             m->file->seek(pos, SEEK_SET);
         }
@@ -946,6 +1004,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
     return xref_offset;
 }
 
+// Read a single cross-reference stream.
 qpdf_offset_t
 QPDF::read_xrefStream(qpdf_offset_t xref_offset)
 {
