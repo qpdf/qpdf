@@ -16,7 +16,8 @@ set(EXAMPLE_CXX_PROGRAMS
   pdf-split-pages
   qpdf-job
   qpdfjob-remove-annotations
-  qpdfjob-save-attachment)
+  qpdfjob-save-attachment
+  qpdfjob-remove-js-action)
 set(EXAMPLE_C_PROGRAMS
   pdf-c-objects
   pdf-linearize
