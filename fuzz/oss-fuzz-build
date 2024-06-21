@@ -32,7 +32,7 @@ for future in ON OFF; do
     cmake --install build --component fuzz
     if [[ $future == ON ]]; then
         pushd $OUT
-        for i in *; do mv $i future_$i; done
+        for i in *_fuzzer*; do mv $i future_$i; done
         popd
     fi
 done
