@@ -79,16 +79,14 @@ NNTreeIterator::PathElement::PathElement(QPDFObjectHandle const& node, int kid_n
 QPDFObjectHandle
 NNTreeIterator::getNextKid(PathElement& pe, bool backward)
 {
-    QPDFObjectHandle result;
-    bool found = false;
-    while (!found) {
+    while (true) {
         pe.kid_number += backward ? -1 : 1;
         auto kids = pe.node.getKey("/Kids");
         if ((pe.kid_number >= 0) && (pe.kid_number < kids.getArrayNItems())) {
-            result = kids.getArrayItem(pe.kid_number);
+            auto result = kids.getArrayItem(pe.kid_number);
             if (result.isDictionary() &&
                 (result.hasKey("/Kids") || result.hasKey(impl.details.itemsKey()))) {
-                found = true;
+                return result;
             } else {
                 QTC::TC("qpdf", "NNTree skip invalid kid");
                 warn(
@@ -97,11 +95,12 @@ NNTreeIterator::getNextKid(PathElement& pe, bool backward)
                     ("skipping over invalid kid at index " + std::to_string(pe.kid_number)));
             }
         } else {
-            result = QPDFObjectHandle::newNull();
-            found = true;
+#ifndef QPDF_FUTURE
+            return QPDFObjectHandle::newNull();
+#endif
+            return {};
         }
     }
-    return result;
 }
 
 bool

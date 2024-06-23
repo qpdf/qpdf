@@ -12,6 +12,8 @@ require TestDriver;
 
 cleanup();
 
+my $future = check_future();
+
 my $td = new TestDriver('c-api-object-handle');
 
 my $n_tests = 13;
@@ -54,10 +56,20 @@ $td->runtest("C wrap and clone objects",
              {$td->COMMAND => "qpdf-ctest 28 minimal.pdf '' ''"},
              {$td->STRING => "C test 28 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
-$td->runtest("C object handle errors",
-             {$td->COMMAND => "qpdf-ctest 29 minimal.pdf '' ''"},
-             {$td->FILE => "c-oh-errors.out", $td->EXIT_STATUS => 0},
-             $td->NORMALIZE_NEWLINES);
+if ($future)
+{
+    $td->runtest("C object handle errors",
+                 {$td->COMMAND => "qpdf-ctest 29 minimal.pdf '' ''"},
+                 {$td->FILE => "c-oh-errors-future.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+else
+{
+    $td->runtest("C object handle errors",
+                 {$td->COMMAND => "qpdf-ctest 29 minimal.pdf '' ''"},
+                 {$td->FILE => "c-oh-errors.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
 $td->runtest("C unhandled error warning",
              {$td->COMMAND => "qpdf-ctest 30 bad1.pdf '' ''"},
              {$td->FILE => "c-unhandled-error.out", $td->EXIT_STATUS => 0},

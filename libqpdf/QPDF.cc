@@ -229,9 +229,15 @@ QPDF::~QPDF()
     // the xref table anyway just to prevent any possibility of resolve() succeeding.
     m->xref_table.clear();
     for (auto const& iter: m->obj_cache) {
-        iter.second.object->disconnect();
-        if (iter.second.object->getTypeCode() != ::ot_null) {
+        if (iter.second.object) {
+            iter.second.object->disconnect();
+#ifndef QPDF_FUTURE
+            if (iter.second.object->getTypeCode() != ::ot_null) {
+                iter.second.object->destroy();
+            }
+#else
             iter.second.object->destroy();
+#endif
         }
     }
 }
@@ -1662,7 +1668,10 @@ QPDF::readObjectAtOffset(
     if (offset == 0) {
         QTC::TC("qpdf", "QPDF bogus 0 offset", 0);
         warn(damagedPDF(0, "object has offset 0"));
+#ifndef QPDF_FUTURE
         return QPDFObjectHandle::newNull();
+#endif
+        return {};
     }
 
     m->file->seek(offset, SEEK_SET);
@@ -1720,7 +1729,10 @@ QPDF::readObjectAtOffset(
                     ("object " + exp_og.unparse(' ') +
                      " not found in file after regenerating cross reference "
                      "table")));
+#ifndef QPDF_FUTURE
                 return QPDFObjectHandle::newNull();
+#endif
+                return {};
             }
         } else {
             throw;
@@ -1926,7 +1938,9 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 QPDFObjectHandle
 QPDF::newIndirect(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& obj)
 {
-    obj->setDefaultDescription(this, og);
+    if (obj) {
+        obj->setDefaultDescription(this, og);
+    }
     return {obj};
 }
 
@@ -1981,9 +1995,11 @@ QPDF::makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj)
 QPDFObjectHandle
 QPDF::makeIndirectObject(QPDFObjectHandle oh)
 {
+#ifndef QPDF_FUTURE
     if (!oh.isInitialized()) {
         throw std::logic_error("attempted to make an uninitialized QPDFObjectHandle indirect");
     }
+#endif
     return makeIndirectFromQPDFObject(oh.getObj());
 }
 
@@ -2076,11 +2092,19 @@ QPDF::replaceObject(int objid, int generation, QPDFObjectHandle oh)
 void
 QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
 {
+#ifndef QPDF_FUTURE
     if (oh.isIndirect() || !oh.isInitialized()) {
+#else
+    if (oh.isIndirect()) {
+#endif
         QTC::TC("qpdf", "QPDF replaceObject called with indirect object");
         throw std::logic_error("QPDF::replaceObject called with indirect object handle");
     }
-    updateCache(og, oh.getObj(), -1, -1);
+    auto obj = oh.getObj();
+    if (!obj) {
+        obj = QPDF_Null::create();
+    }
+    updateCache(og, obj, -1, -1);
 }
 
 void
@@ -2183,7 +2207,10 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
     if (!obj_copier.object_map.count(og)) {
         warn(damagedPDF("unexpected reference to /Pages object while copying foreign object; "
                         "replacing with null"));
+#ifndef QPDF_FUTURE
         return QPDFObjectHandle::newNull();
+#endif
+        return {};
     }
     return obj_copier.object_map[foreign.getObjGen()];
 }
@@ -2257,7 +2284,9 @@ QPDF::replaceForeignIndirectObjects(QPDFObjectHandle foreign, ObjCopier& obj_cop
             // This case would occur if this is a reference to a Pages object that we didn't
             // traverse into.
             QTC::TC("qpdf", "QPDF replace foreign indirect with null");
+#ifndef QPDF_FUTURE
             result = QPDFObjectHandle::newNull();
+#endif
         } else {
             result = mapping->second;
         }

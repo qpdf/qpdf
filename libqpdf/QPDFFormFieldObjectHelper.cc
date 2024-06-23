@@ -15,7 +15,9 @@ QPDFFormFieldObjectHelper::QPDFFormFieldObjectHelper(QPDFObjectHandle oh) :
 }
 
 QPDFFormFieldObjectHelper::QPDFFormFieldObjectHelper() :
+#ifndef QPDF_FUTURE
     QPDFObjectHelper(QPDFObjectHandle::newNull()),
+#endif
     m(new Members())
 {
 }
@@ -51,15 +53,13 @@ QPDFFormFieldObjectHelper::getFieldFromAcroForm(std::string const& name)
 {
     QPDFObjectHandle result = QPDFObjectHandle::newNull();
     // Fields are supposed to be indirect, so this should work.
-    QPDF* q = this->oh.getOwningQPDF();
-    if (!q) {
-        return result;
+    if (QPDF* q = this->oh.getOwningQPDF()) {
+        return q->getRoot().getKey("/AcroForm").getKeyIfDict(name);
     }
-    auto acroform = q->getRoot().getKey("/AcroForm");
-    if (!acroform.isDictionary()) {
-        return result;
-    }
-    return acroform.getKey(name);
+#ifndef QPDF_FUTURE
+    return QPDFObjectHandle::newNull();
+#endif
+    return {};
 }
 
 QPDFObjectHandle
@@ -67,9 +67,12 @@ QPDFFormFieldObjectHelper::getInheritableFieldValue(std::string const& name)
 {
     QPDFObjectHandle node = this->oh;
     if (!node.isDictionary()) {
+#ifndef QPDF_FUTURE
         return QPDFObjectHandle::newNull();
+#endif
+        return {};
     }
-    QPDFObjectHandle result(node.getKey(name));
+    auto result(node.getKey(name));
     if (result.isNull()) {
         QPDFObjGen::set seen;
         while (seen.add(node) && node.hasKey("/Parent")) {

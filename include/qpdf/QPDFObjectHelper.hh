@@ -55,6 +55,9 @@ class QPDF_DLL_CLASS QPDFObjectHelper
     }
 
   protected:
+#ifdef QPDF_FUTURE
+    QPDFObjectHelper() = default;
+#endif
     QPDFObjectHandle oh;
 };
 

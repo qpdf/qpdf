@@ -158,4 +158,15 @@ sub cleanup
     system("rm -rf *split-out* ???-kfo.pdf *.tmpout \@file.pdf auto-*");
 }
 
+sub check_future
+{
+    my $future = 0;
+    chomp($_ = `qpdf --version`);
+    if (m/future/)
+    {
+        $future = 1;
+    }
+    $future;
+}
+
 1;

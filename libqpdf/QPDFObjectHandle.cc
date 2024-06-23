@@ -240,13 +240,21 @@ QPDFObjectHandle::disconnect()
 qpdf_object_type_e
 QPDFObjectHandle::getTypeCode()
 {
+#ifndef QPDF_FUTURE
     return dereference() ? this->obj->getTypeCode() : ::ot_uninitialized;
+#else
+    return dereference() ? this->obj->getTypeCode() : ::ot_null;
+#endif
 }
 
 char const*
 QPDFObjectHandle::getTypeName()
 {
+#ifndef QPDF_FUTURE
     return dereference() ? this->obj->getTypeName() : "uninitialized";
+#else
+    return dereference() ? this->obj->getTypeName() : "null";
+#endif
 }
 
 QPDF_Array*
@@ -346,13 +354,21 @@ QPDFObjectHandle::isDirectNull() const
 {
     // Don't call dereference() -- this is a const method, and we know
     // objid == 0, so there's nothing to resolve.
-    return (isInitialized() && (getObjectID() == 0) && (obj->getTypeCode() == ::ot_null));
+#ifdef QPDF_FUTURE
+    return !obj || (getObjectID() == 0 && obj->getTypeCode() == ::ot_null);
+#else
+    return isInitialized() && getObjectID() == 0 && obj->getTypeCode() == ::ot_null;
+#endif
 }
 
 bool
 QPDFObjectHandle::isNull()
 {
-    return dereference() && (obj->getTypeCode() == ::ot_null);
+#ifdef QPDF_FUTURE
+    return !obj || (dereference() && obj->getTypeCode() == ::ot_null);
+#else
+    return dereference() && obj->getTypeCode() == ::ot_null;
+#endif
 }
 
 bool
@@ -771,8 +787,9 @@ QPDFObjectHandle
 QPDFObjectHandle::getArrayItem(int n)
 {
     if (auto array = asArray()) {
-        if (auto result = array->at(n); result.obj != nullptr) {
-            return result;
+        auto result = array->at(n);
+        if (result.first) {
+            return result.second;
         } else {
             objectWarning("returning null for out of bounds array access");
             QTC::TC("qpdf", "QPDFObjectHandle array bounds");
@@ -790,7 +807,7 @@ QPDFObjectHandle::isRectangle()
 {
     if (auto array = asArray()) {
         for (int i = 0; i < 4; ++i) {
-            if (auto item = array->at(i); !(item.obj && item.isNumber())) {
+            if (auto item = array->at(i).second; !item.isNumber()) {
                 return false;
             }
         }
@@ -804,7 +821,7 @@ QPDFObjectHandle::isMatrix()
 {
     if (auto array = asArray()) {
         for (int i = 0; i < 6; ++i) {
-            if (auto item = array->at(i); !(item.obj && item.isNumber())) {
+            if (auto item = array->at(i).second; !item.isNumber()) {
                 return false;
             }
         }
@@ -822,7 +839,7 @@ QPDFObjectHandle::getArrayAsRectangle()
         }
         double items[4];
         for (int i = 0; i < 4; ++i) {
-            if (!array->at(i).getValueAsNumber(items[i])) {
+            if (auto item = array->at(i).second; !item.getValueAsNumber(items[i])) {
                 return {};
             }
         }
@@ -844,7 +861,7 @@ QPDFObjectHandle::getArrayAsMatrix()
         }
         double items[6];
         for (int i = 0; i < 6; ++i) {
-            if (!array->at(i).getValueAsNumber(items[i])) {
+            if (auto item = array->at(i).second; !item.getValueAsNumber(items[i])) {
                 return {};
             }
         }
@@ -949,7 +966,7 @@ QPDFObjectHandle
 QPDFObjectHandle::eraseItemAndGetOld(int at)
 {
     auto array = asArray();
-    auto result = (array && at < array->size() && at >= 0) ? array->at(at) : newNull();
+    auto result = (array && at < array->size() && at >= 0) ? array->at(at).second : newNull();
     eraseItem(at);
     return result;
 }
@@ -991,21 +1008,22 @@ QPDFObjectHandle::getKey(std::string const& key)
 QPDFObjectHandle
 QPDFObjectHandle::getKeyIfDict(std::string const& key)
 {
+#ifndef QPDF_FUTURE
     return isNull() ? newNull() : getKey(key);
+#endif
+    return isNull() ? QPDFObjectHandle() : getKey(key);
 }
 
 std::set<std::string>
 QPDFObjectHandle::getKeys()
 {
-    std::set<std::string> result;
-    auto dict = asDictionary();
-    if (dict) {
-        result = dict->getKeys();
+    if (auto dict = asDictionary()) {
+        return dict->getKeys();
     } else {
         typeWarning("dictionary", "treating as empty");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary empty set for getKeys");
     }
-    return result;
+    return {};
 }
 
 std::map<std::string, QPDFObjectHandle>
@@ -1014,12 +1032,12 @@ QPDFObjectHandle::getDictAsMap()
     std::map<std::string, QPDFObjectHandle> result;
     auto dict = asDictionary();
     if (dict) {
-        result = dict->getAsMap();
+        return dict->getAsMap();
     } else {
         typeWarning("dictionary", "treating as empty");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary empty map for asMap");
     }
-    return result;
+    return {};
 }
 
 // Array and Name accessors
@@ -1239,13 +1257,15 @@ QPDFObjectHandle::removeKey(std::string const& key)
 QPDFObjectHandle
 QPDFObjectHandle::removeKeyAndGetOld(std::string const& key)
 {
-    auto result = QPDFObjectHandle::newNull();
-    auto dict = asDictionary();
-    if (dict) {
-        result = dict->getKey(key);
+    if (auto dict = asDictionary()) {
+        auto result = dict->getKey(key);
+        removeKey(key);
+        return result;
     }
-    removeKey(key);
-    return result;
+#ifndef QPDF_FUTURE
+    return QPDFObjectHandle::newNull();
+#endif
+    return {};
 }
 
 void
@@ -1443,7 +1463,7 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
     if (auto array = asArray()) {
         int n_items = array->size();
         for (int i = 0; i < n_items; ++i) {
-            QPDFObjectHandle item = array->at(i);
+            QPDFObjectHandle item = array->at(i).second;
             if (item.isStream()) {
                 result.push_back(item);
             } else {
@@ -1587,7 +1607,11 @@ std::string
 QPDFObjectHandle::unparseResolved()
 {
     if (!dereference()) {
+#ifndef QPDF_FUTURE
         throw std::logic_error("attempted to dereference an uninitialized QPDFObjectHandle");
+#else
+        return "null";
+#endif
     }
     return obj->unparse();
 }
@@ -1616,7 +1640,11 @@ QPDFObjectHandle::getJSON(int json_version, bool dereference_indirect)
     if ((!dereference_indirect) && isIndirect()) {
         return JSON::makeString(unparse());
     } else if (!dereference()) {
+#ifndef QPDF_FUTURE
         throw std::logic_error("attempted to dereference an uninitialized QPDFObjectHandle");
+#else
+        return JSON::makeNull();
+#endif
     } else {
         Pl_Buffer p{"json"};
         JSON::Writer jw{&p, 0};
@@ -1632,7 +1660,11 @@ QPDFObjectHandle::writeJSON(int json_version, JSON::Writer& p, bool dereference_
     if (!dereference_indirect && isIndirect()) {
         p << "\"" << getObjGen().unparse(' ') << " R\"";
     } else if (!dereference()) {
+#ifndef QPDF_FUTURE
         throw std::logic_error("attempted to dereference an uninitialized QPDFObjectHandle");
+#else
+        p << "null";
+#endif
     } else {
         obj->writeJSON(json_version, p);
     }
@@ -2073,7 +2105,11 @@ QPDFObjectHandle
 QPDFObjectHandle::shallowCopy()
 {
     if (!dereference()) {
+#ifndef QPDF_FUTURE
         throw std::logic_error("operation attempted on uninitialized QPDFObjectHandle");
+#else
+        return {};
+#endif
     }
     return {obj->copy()};
 }
@@ -2082,7 +2118,11 @@ QPDFObjectHandle
 QPDFObjectHandle::unsafeShallowCopy()
 {
     if (!dereference()) {
+#ifndef QPDF_FUTURE
         throw std::logic_error("operation attempted on uninitialized QPDFObjectHandle");
+#else
+        return {};
+#endif
     }
     return {obj->copy(true)};
 }
@@ -2091,6 +2131,9 @@ void
 QPDFObjectHandle::makeDirect(QPDFObjGen::set& visited, bool stop_at_streams)
 {
     assertInitialized();
+    if (!obj) {
+        return;
+    }
 
     auto cur_og = getObjGen();
     if (!visited.add(cur_og)) {
@@ -2105,7 +2148,7 @@ QPDFObjectHandle::makeDirect(QPDFObjGen::set& visited, bool stop_at_streams)
         auto array = asArray();
         int n = array->size();
         for (int i = 0; i < n; ++i) {
-            items.push_back(array->at(i));
+            items.push_back(array->at(i).second);
             items.back().makeDirect(visited, stop_at_streams);
         }
         this->obj = QPDF_Array::create(items);
@@ -2160,9 +2203,11 @@ QPDFObjectHandle::makeDirect(bool allow_streams)
 void
 QPDFObjectHandle::assertInitialized() const
 {
+#ifndef QPDF_FUTURE
     if (!isInitialized()) {
         throw std::logic_error("operation attempted on uninitialized QPDFObjectHandle");
     }
+#endif
 }
 
 void
@@ -2172,10 +2217,16 @@ QPDFObjectHandle::typeWarning(char const* expected_type, std::string const& warn
     std::string description;
     // Type checks above guarantee that the object has been dereferenced. Nevertheless, dereference
     // throws exceptions in the test suite
+#ifdef QPDF_FUTURE
+    if (dereference()) {
+        obj->getDescription(context, description);
+    }
+#else
     if (!dereference()) {
         throw std::logic_error("attempted to dereference an uninitialized QPDFObjectHandle");
     }
-    this->obj->getDescription(context, description);
+    obj->getDescription(context, description);
+#endif
     // Null context handled by warn
     warn(
         context,
