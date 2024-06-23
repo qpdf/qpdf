@@ -287,16 +287,6 @@ JSON::addDictionaryMember(std::string const& key, JSON const& val)
     }
 }
 
-bool
-JSON::checkDictionaryKeySeen(std::string const& key)
-{
-    if (auto* obj = m ? dynamic_cast<JSON_dictionary*>(m->value.get()) : nullptr) {
-        return !obj->parsed_keys.insert(key).second;
-    }
-    throw std::logic_error("JSON::checkDictionaryKey called on non-dictionary");
-    return false; // unreachable
-}
-
 JSON
 JSON::makeArray()
 {
@@ -1266,11 +1256,6 @@ JSONParser::handleToken()
         break;
 
     case ps_dict_after_colon:
-        if (tos.checkDictionaryKeySeen(dict_key)) {
-            QTC::TC("libtests", "JSON parse duplicate key");
-            throw std::runtime_error(
-                "JSON: offset " + std::to_string(dict_key_offset) + ": duplicated dictionary key");
-        }
         if (!reactor || !reactor->dictionaryItem(dict_key, item)) {
             tos.addDictionaryMember(dict_key, item);
         }
