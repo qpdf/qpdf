@@ -471,6 +471,10 @@ QPDF::parse(char const* password)
 
     initializeEncryption();
     m->parsed = true;
+    if (m->xref_table.size() > 0 && !getRoot().getKey("/Pages").isDictionary()) {
+        // QPDFs created from JSON have an empty xref table and no root object yet.
+            throw damagedPDF("", 0, "unable to find page tree");
+    }
 }
 
 void
