@@ -27,7 +27,7 @@ void
 FuzzHelper::doChecks()
 {
     Pl_Discard discard;
-    Pl_DCT p("decode", &discard);
+    Pl_DCT p("decode", &discard, 20'000'000);
     p.write(const_cast<unsigned char*>(data), size);
     p.finish();
 }

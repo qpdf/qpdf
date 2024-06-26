@@ -34,6 +34,11 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
     QPDF_DLL
     Pl_DCT(char const* identifier, Pipeline* next);
 
+    // Constructor for decompressing image data. If corrupt_data_limit is non-zero and the data is
+    // corrupt, only attempt to uncompress if the uncompressed size is less than corrupt_data_limit.
+    QPDF_DLL
+    Pl_DCT(char const* identifier, Pipeline* next, size_t corrupt_data_limit);
+
     class QPDF_DLL_CLASS CompressConfig
     {
       public:
@@ -80,26 +85,30 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
         ~Members() = default;
 
       private:
+        // For compression
         Members(
-            action_e action,
-            char const* buf_description,
-            JDIMENSION image_width = 0,
-            JDIMENSION image_height = 0,
-            int components = 1,
-            J_COLOR_SPACE color_space = JCS_GRAYSCALE,
-            CompressConfig* config_callback = nullptr);
+            JDIMENSION image_width,
+            JDIMENSION image_height,
+            int components,
+            J_COLOR_SPACE color_space,
+            CompressConfig* config_callback);
+        // For decompression
+        Members(size_t corrupt_data_limit);
         Members(Members const&) = delete;
 
         action_e action;
         Pl_Buffer buf;
 
-        // Used for compression
-        JDIMENSION image_width;
-        JDIMENSION image_height;
-        int components;
-        J_COLOR_SPACE color_space;
+        // Used for decompression
+        size_t corrupt_data_limit{0};
 
-        CompressConfig* config_callback;
+        // Used for compression
+        JDIMENSION image_width{0};
+        JDIMENSION image_height{0};
+        int components{1};
+        J_COLOR_SPACE color_space{JCS_GRAYSCALE};
+
+        CompressConfig* config_callback{nullptr};
     };
 
     std::shared_ptr<Members> m;

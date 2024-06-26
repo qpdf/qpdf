@@ -1,5 +1,6 @@
 #include <qpdf/Pl_DCT.hh>
 
+#include "qpdf/QPDFLogger.hh"
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 
@@ -31,16 +32,21 @@ error_handler(j_common_ptr cinfo)
     longjmp(jerr->jmpbuf, 1);
 }
 
+Pl_DCT::Members::Members(size_t corrupt_data_limit) :
+    action(a_decompress),
+    buf("DCT compressed image"),
+    corrupt_data_limit(corrupt_data_limit)
+{
+}
+
 Pl_DCT::Members::Members(
-    action_e action,
-    char const* buf_description,
     JDIMENSION image_width,
     JDIMENSION image_height,
     int components,
     J_COLOR_SPACE color_space,
     CompressConfig* config_callback) :
-    action(action),
-    buf(buf_description),
+    action(a_compress),
+    buf("DCT uncompressed image"),
     image_width(image_width),
     image_height(image_height),
     components(components),
@@ -50,8 +56,13 @@ Pl_DCT::Members::Members(
 }
 
 Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next) :
+    Pl_DCT(identifier, next, 0)
+{
+}
+
+Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next, size_t corrupt_data_limit) :
     Pipeline(identifier, next),
-    m(new Members(a_decompress, "DCT compressed image"))
+    m(new Members(corrupt_data_limit))
 {
 }
 
@@ -64,14 +75,7 @@ Pl_DCT::Pl_DCT(
     J_COLOR_SPACE color_space,
     CompressConfig* config_callback) :
     Pipeline(identifier, next),
-    m(new Members(
-        a_compress,
-        "DCT uncompressed image",
-        image_width,
-        image_height,
-        components,
-        color_space,
-        config_callback))
+    m(new Members(image_width, image_height, components, color_space, config_callback))
 {
 }
 
@@ -311,16 +315,22 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
 
     (void)jpeg_read_header(cinfo, TRUE);
     (void)jpeg_calc_output_dimensions(cinfo);
-
     unsigned int width = cinfo->output_width * QIntC::to_uint(cinfo->output_components);
-    JSAMPARRAY buffer =
-        (*cinfo->mem->alloc_sarray)(reinterpret_cast<j_common_ptr>(cinfo), JPOOL_IMAGE, width, 1);
+    if (cinfo->err->num_warnings == 0 || m->corrupt_data_limit == 0 ||
+        (width * QIntC::to_uint(cinfo->output_height)) < m->corrupt_data_limit) {
+        // err->num_warnings is the number of corrupt data warnings emitted.
+        // err->msg_code could also be the code of an informational message.
+        JSAMPARRAY buffer = (*cinfo->mem->alloc_sarray)(
+            reinterpret_cast<j_common_ptr>(cinfo), JPOOL_IMAGE, width, 1);
 
-    (void)jpeg_start_decompress(cinfo);
-    while (cinfo->output_scanline < cinfo->output_height) {
-        (void)jpeg_read_scanlines(cinfo, buffer, 1);
-        this->getNext()->write(buffer[0], width * sizeof(buffer[0][0]));
+        (void)jpeg_start_decompress(cinfo);
+        while (cinfo->output_scanline < cinfo->output_height) {
+            (void)jpeg_read_scanlines(cinfo, buffer, 1);
+            getNext()->write(buffer[0], width * sizeof(buffer[0][0]));
+        }
+        (void)jpeg_finish_decompress(cinfo);
+    } else {
+        *QPDFLogger::defaultLogger()->getError() << "corrupt JPEG data ignored" << "\n";
     }
-    (void)jpeg_finish_decompress(cinfo);
-    this->getNext()->finish();
+    getNext()->finish();
 }
