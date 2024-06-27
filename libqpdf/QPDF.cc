@@ -905,9 +905,8 @@ QPDF::read_xrefEntry(qpdf_offset_t& f1, int& f2, char& type)
     if (QUtil::is_space(*p++) && (*p == 'f' || *p == 'n')) {
         // C++20: [[likely]]
         type = *p;
-        ++p;
-        ++p; // No test for valid line[19].
-        if ((*p == '\n' || *p == '\r') && f1_len == 10 && f2_len == 5) {
+        // No test for valid line[19].
+        if (*(++p) && *(++p) && (*p == '\n' || *p == '\r') && f1_len == 10 && f2_len == 5) {
             // C++20: [[likely]]
             return true;
         }
