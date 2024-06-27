@@ -16,19 +16,19 @@ my $td = new TestDriver('specific-bugs');
 
 # The number is the github issue number in which the bug was reported.
 my @bug_tests = (
-    ["51", "resolve loop", 3],
+    ["51", "resolve loop", 2],
     ["99", "object 0", 2],
     ["99b", "object 0", 2],
     ["100", "xref reconstruction loop", 2],
     ["101", "resolve for exception text", 2],
     ["117", "other infinite loop", 3],
     ["118", "other infinite loop", 2],
-    ["119", "other infinite loop", 3],
-    ["120", "other infinite loop", 3],
+    ["119", "other infinite loop", 2],
+    ["120", "other infinite loop", 2],
     ["106", "zlib data error", 3],
     ["141a", "/W entry size 0", 2],
     ["141b", "/W entry size 0", 2],
-    ["143", "self-referential ostream", 3, "--preserve-unreferenced"],
+    ["143", "self-referential ostream", 2, "--preserve-unreferenced"],
     ["146", "very deeply nested array", 2],
     ["147", "previously caused memory error", 2],
     ["148", "free memory on bad flate", 2],

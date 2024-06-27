@@ -21,6 +21,7 @@ captured stderr
 WARNING: bad2.pdf: file is damaged
 WARNING: bad2.pdf: can't find startxref
 WARNING: bad2.pdf: Attempting to reconstruct cross-reference table
+WARNING: bad2.pdf (object 2 0, offset 128): expected endobj
 WARNING: bad2.pdf (object 4 0, offset 389): expected endobj
 qpdf: operation succeeded with warnings
 test 84 done

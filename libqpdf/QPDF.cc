@@ -471,6 +471,10 @@ QPDF::parse(char const* password)
 
     initializeEncryption();
     m->parsed = true;
+    if (m->xref_table.size() > 0 && !getRoot().getKey("/Pages").isDictionary()) {
+        // QPDFs created from JSON have an empty xref table and no root object yet.
+        throw damagedPDF("", 0, "unable to find page tree");
+    }
 }
 
 void
@@ -543,6 +547,9 @@ QPDF::reconstruct_xref(QPDFExc& e)
 
     m->file->seek(0, SEEK_END);
     qpdf_offset_t eof = m->file->tell();
+    // Sanity check on object ids. All objects must appear in xref table / stream. In all realistic
+    // scenarios at leat 3 bytes are required.
+    auto max_obj_id = eof / 3;
     m->file->seek(0, SEEK_SET);
     qpdf_offset_t line_start = 0;
     // Don't allow very long tokens here during recovery.
@@ -560,7 +567,12 @@ QPDF::reconstruct_xref(QPDFExc& e)
             if ((t2.isInteger()) && (readToken(m->file, MAX_LEN).isWord("obj"))) {
                 int obj = QUtil::string_to_int(t1.getValue().c_str());
                 int gen = QUtil::string_to_int(t2.getValue().c_str());
-                insertReconstructedXrefEntry(obj, token_start, gen);
+                if (obj <= max_obj_id) {
+                    insertReconstructedXrefEntry(obj, token_start, gen);
+                } else {
+                    warn(damagedPDF(
+                        "", 0, "ignoring object with impossibly large id " + std::to_string(obj)));
+                }
             }
         } else if (!m->trailer.isInitialized() && t1.isWord("trailer")) {
             QPDFObjectHandle t = readTrailer();

@@ -2496,7 +2496,7 @@ test_73(QPDF& pdf, char const* arg2)
     }
 
     pdf.closeInputSource();
-    pdf.getRoot().getKey("/Pages").unparseResolved();
+    pdf.getObject(4, 0).unparseResolved();
 }
 
 static void

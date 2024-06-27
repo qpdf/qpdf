@@ -1121,7 +1121,6 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
         } else if (obj.renumber == -1) {
             // This can happen if a specially constructed file indicates that an object stream is
             // inside itself.
-            QTC::TC("qpdf", "QPDFWriter ignore self-referential object stream");
         }
         return;
     } else if (!m->linearized) {
