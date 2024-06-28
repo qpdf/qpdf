@@ -311,6 +311,14 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
 #if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || defined(__clang__))
 # pragma GCC diagnostic pop
 #endif
+
+#ifdef QPDF_OSS_FUZZ
+    // Limit the memory used to decompress JPEG files during fuzzing. Excessive memory use during
+    // fuzzing is due to corrupt JPEG data which sometimes cannot be detected before
+    // jpeg_start_decompress is called. During normal use of qpdf very large JPEGs can occasionally
+    // occur legitimately and therefore must be allowed during normal operations.
+    cinfo->mem->max_memory_to_use = 1'000'000'000;
+#endif
     jpeg_buffer_src(cinfo, b);
 
     (void)jpeg_read_header(cinfo, TRUE);
