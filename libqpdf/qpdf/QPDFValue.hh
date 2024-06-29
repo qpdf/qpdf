@@ -65,12 +65,6 @@ class QPDFValue: public std::enable_shared_from_this<QPDFValue>
         setParsedOffset(offset);
     }
     void
-    setDefaultDescription(QPDF* a_qpdf, QPDFObjGen const& a_og)
-    {
-        qpdf = a_qpdf;
-        og = a_og;
-    }
-    void
     setChildDescription(
         QPDF* a_qpdf,
         std::shared_ptr<QPDFValue> parent,
