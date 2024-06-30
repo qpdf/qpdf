@@ -494,6 +494,13 @@ QPDF::warn(QPDFExc const& e)
 {
     m->warnings.push_back(e);
     if (!m->suppress_warnings) {
+#ifdef QPDF_OSS_FUZZ
+        if (m->warnings.size() > 20) {
+            *m->log->getWarn() << "WARNING: too many warnings - additional warnings surpressed\n";
+            m->suppress_warnings = true;
+            return;
+        }
+#endif
         *m->log->getWarn() << "WARNING: " << m->warnings.back().what() << "\n";
     }
 }
