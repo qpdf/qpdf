@@ -173,8 +173,11 @@ FuzzHelper::doChecks()
 {
     // Get as much coverage as possible in parts of the library that
     // might benefit from fuzzing.
+    std::cout << "starting testWrite\n";
     testWrite();
+    std::cout << "\nstarting testPages\n\n";
     testPages();
+    std::cout << "\nstarting testOutlines\n\n";
     testOutlines();
 }
 
