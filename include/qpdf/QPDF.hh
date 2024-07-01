@@ -1502,6 +1502,9 @@ class QPDF
         std::shared_ptr<EncryptionParameters> encp;
         std::string pdf_version;
         std::map<QPDFObjGen, QPDFXRefEntry> xref_table;
+        // Various tables are indexed by object id, with potential size id + 1
+        int xref_table_max_id{std::numeric_limits<int>::max() - 1};
+        qpdf_offset_t xref_table_max_offset{0};
         std::set<int> deleted_objects;
         std::map<QPDFObjGen, ObjCache> obj_cache;
         std::set<QPDFObjGen> resolving;
