@@ -1952,8 +1952,9 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     m->last_object_description += "object ";
     for (auto const& iter: offsets) {
         QPDFObjGen og(iter.first, 0);
-        QPDFXRefEntry const& entry = m->xref_table[og];
-        if ((entry.getType() == 2) && (entry.getObjStreamNumber() == obj_stream_number)) {
+        auto entry = m->xref_table.find(og);
+        if (entry != m->xref_table.end() && entry->second.getType() == 2 &&
+            entry->second.getObjStreamNumber() == obj_stream_number) {
             int offset = iter.second;
             input->seek(offset, SEEK_SET);
             QPDFObjectHandle oh = readObjectInStream(input, iter.first);
