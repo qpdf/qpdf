@@ -1,4 +1,3 @@
 WARNING: issue-118.pdf: can't find PDF header
-WARNING: issue-118.pdf (offset 732): loop detected resolving object 2 0
-WARNING: issue-118.pdf (xref stream: object 8 0, offset 732): supposed object stream 2 is not a stream
+WARNING: issue-118.pdf (xref stream, offset 732): self-referential object stream 2
 issue-118.pdf: unable to find /Root dictionary

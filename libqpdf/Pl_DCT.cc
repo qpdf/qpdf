@@ -320,7 +320,7 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
     cinfo->mem->max_memory_to_use = 1'000'000'000;
     // For some corrupt files the memory used internally by libjpeg stays within the above limits
     // even though the size written to the next pipeline is significantly larger.
-    m->corrupt_data_limit = 100'000'000;
+    m->corrupt_data_limit = 10'000'000;
 #endif
     jpeg_buffer_src(cinfo, b);
 

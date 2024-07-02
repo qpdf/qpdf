@@ -3,6 +3,7 @@ WARNING: issue-143.pdf (xref stream: object 3 0, offset 654): stream keyword not
 WARNING: issue-143.pdf (xref stream: object 3 0, offset 607): stream dictionary lacks /Length key
 WARNING: issue-143.pdf (xref stream: object 3 0, offset 654): attempting to recover stream length
 WARNING: issue-143.pdf (xref stream: object 3 0, offset 654): recovered stream length: 36
+WARNING: issue-143.pdf (xref stream, offset 654): self-referential object stream 3
 WARNING: issue-143.pdf: file is damaged
 WARNING: issue-143.pdf (object 1 0, offset 48): expected n n obj
 WARNING: issue-143.pdf: Attempting to reconstruct cross-reference table
