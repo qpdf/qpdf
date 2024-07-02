@@ -34,10 +34,23 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
     QPDF_DLL
     Pl_DCT(char const* identifier, Pipeline* next);
 
+    class QPDF_DLL_CLASS DecompressConfig
+    {
+      public:
+        QPDF_DLL
+        DecompressConfig() = default;
+        QPDF_DLL
+        virtual ~DecompressConfig() = default;
+        virtual void apply(jpeg_decompress_struct*) = 0;
+    };
+
     // Constructor for decompressing image data. If corrupt_data_limit is non-zero and the data is
     // corrupt, only attempt to uncompress if the uncompressed size is less than corrupt_data_limit.
+    // ABI: make config_callback an optional arg with default = nullptr
     QPDF_DLL
-    Pl_DCT(char const* identifier, Pipeline* next, size_t corrupt_data_limit);
+    Pl_DCT(char const* identifier, Pipeline* next, DecompressConfig* config_callback);
+    QPDF_DLL
+    void setCorruptDataLimit(size_t corrupt_data_limit);
 
     class QPDF_DLL_CLASS CompressConfig
     {
@@ -83,6 +96,7 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
       public:
         QPDF_DLL
         ~Members() = default;
+        Members(Members const&) = delete;
 
       private:
         // For compression
@@ -91,10 +105,9 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
             JDIMENSION image_height,
             int components,
             J_COLOR_SPACE color_space,
-            CompressConfig* config_callback);
+            CompressConfig* compress_config_callback);
         // For decompression
-        Members(size_t corrupt_data_limit);
-        Members(Members const&) = delete;
+        Members(DecompressConfig* decompress_config_callback);
 
         action_e action;
         Pl_Buffer buf;
@@ -108,7 +121,8 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
         int components{1};
         J_COLOR_SPACE color_space{JCS_GRAYSCALE};
 
-        CompressConfig* config_callback{nullptr};
+        CompressConfig* compress_config_callback{nullptr};
+        DecompressConfig* decompress_config_callback{nullptr};
     };
 
     std::shared_ptr<Members> m;

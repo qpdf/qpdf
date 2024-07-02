@@ -32,10 +32,10 @@ error_handler(j_common_ptr cinfo)
     longjmp(jerr->jmpbuf, 1);
 }
 
-Pl_DCT::Members::Members(size_t corrupt_data_limit) :
+Pl_DCT::Members::Members(DecompressConfig * decompress_config_callback) :
     action(a_decompress),
     buf("DCT compressed image"),
-    corrupt_data_limit(corrupt_data_limit)
+    decompress_config_callback(decompress_config_callback)
 {
 }
 
@@ -44,14 +44,14 @@ Pl_DCT::Members::Members(
     JDIMENSION image_height,
     int components,
     J_COLOR_SPACE color_space,
-    CompressConfig* config_callback) :
+    CompressConfig* compress_config_callback) :
     action(a_compress),
     buf("DCT uncompressed image"),
     image_width(image_width),
     image_height(image_height),
     components(components),
     color_space(color_space),
-    config_callback(config_callback)
+    compress_config_callback(compress_config_callback)
 {
 }
 
@@ -60,10 +60,16 @@ Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next) :
 {
 }
 
-Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next, size_t corrupt_data_limit) :
+Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next, DecompressConfig* config_callback) :
     Pipeline(identifier, next),
-    m(new Members(corrupt_data_limit))
+    m(new Members(config_callback))
 {
+}
+
+void
+Pl_DCT::setCorruptDataLimit(size_t corrupt_data_limit)
+{
+    m->corrupt_data_limit = corrupt_data_limit;
 }
 
 Pl_DCT::Pl_DCT(
@@ -273,8 +279,8 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
     cinfo->input_components = m->components;
     cinfo->in_color_space = m->color_space;
     jpeg_set_defaults(cinfo);
-    if (m->config_callback) {
-        m->config_callback->apply(cinfo);
+    if (m->compress_config_callback) {
+        m->compress_config_callback->apply(cinfo);
     }
 
     jpeg_start_compress(cinfo, TRUE);
@@ -312,16 +318,9 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
 # pragma GCC diagnostic pop
 #endif
 
-#ifdef QPDF_OSS_FUZZ
-    // Limit the memory used to decompress JPEG files during fuzzing. Excessive memory use during
-    // fuzzing is due to corrupt JPEG data which sometimes cannot be detected before
-    // jpeg_start_decompress is called. During normal use of qpdf very large JPEGs can occasionally
-    // occur legitimately and therefore must be allowed during normal operations.
-    cinfo->mem->max_memory_to_use = 1'000'000'000;
-    // For some corrupt files the memory used internally by libjpeg stays within the above limits
-    // even though the size written to the next pipeline is significantly larger.
-    m->corrupt_data_limit = 10'000'000;
-#endif
+    if (m->decompress_config_callback) {
+        m->decompress_config_callback->apply(cinfo);
+    }
     jpeg_buffer_src(cinfo, b);
 
     (void)jpeg_read_header(cinfo, TRUE);
