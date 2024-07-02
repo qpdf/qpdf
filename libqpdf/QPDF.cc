@@ -332,6 +332,12 @@ QPDF::setSuppressWarnings(bool val)
 }
 
 void
+QPDF::setMaxWarnings(int val)
+{
+    m->suppress_warnings = val;
+}
+
+void
 QPDF::setAttemptRecovery(bool val)
 {
     m->attempt_recovery = val;
@@ -500,14 +506,11 @@ QPDF::warn(QPDFExc const& e)
 {
     m->warnings.push_back(e);
     if (!m->suppress_warnings) {
-// QXXXQ
-#ifdef QPDF_OSS_FUZZ
-        if (m->warnings.size() > 20) {
-            *m->log->getWarn() << "WARNING: too many warnings - additional warnings surpressed\n";
+        if (m->max_warnings > 0 && m->warnings.size() > 20) {
+            *m->log->getWarn() << "WARNING: too many warnings - additional warnings suppressed\n";
             m->suppress_warnings = true;
             return;
         }
-#endif
         *m->log->getWarn() << "WARNING: " << m->warnings.back().what() << "\n";
     }
 }

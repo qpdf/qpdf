@@ -57,6 +57,7 @@ FuzzHelper::getQpdf()
     auto is =
         std::shared_ptr<InputSource>(new BufferInputSource("fuzz input", &this->input_buffer));
     auto qpdf = QPDF::create();
+    qpdf->setMaxWarnings(20);
     qpdf->processInputSource(is);
     return qpdf;
 }
