@@ -1,3 +1,14 @@
+2024-07-02  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QPDF::setMaxWarnings to set the maximum of warnings before
+	warning suppression.
+
+	* Add additional options to Pl_DCT construction to limit sizes and
+	memory usage of compression. These are generally exposed but are
+	primarily intended to support fuzz tests, which have explicit
+	memory limits that are smaller than what is commonly seen in the
+	wild with PDF files.
+
 2024-06-07  Jay Berkenbilt  <ejb@ql.org>
 
 	* 11.9.1: release

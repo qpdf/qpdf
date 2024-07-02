@@ -131,10 +131,6 @@ if(FUTURE)
   add_compile_definitions(QPDF_FUTURE=1)
 endif()
 
-if(OSS_FUZZ)
-  add_compile_definitions(QPDF_OSS_FUZZ=1)
-endif()
-
 enable_testing()
 set(RUN_QTEST perl ${qpdf_SOURCE_DIR}/run-qtest ${ENABLE_QTC_ARG})
 
