@@ -2,4 +2,6 @@ WARNING: issue-100.pdf: file is damaged
 WARNING: issue-100.pdf (offset 736): xref not found
 WARNING: issue-100.pdf: Attempting to reconstruct cross-reference table
 WARNING: issue-100.pdf (trailer, offset 488): stream keyword found in trailer
+WARNING: issue-100.pdf (trailer, offset 953): dictionary ended prematurely; using null as value for last key
+WARNING: issue-100.pdf (trailer, offset 953): expected dictionary key but found non-name object; inserting key /QPDFFake1
 qpdf: issue-100.pdf: unable to find /Root dictionary
