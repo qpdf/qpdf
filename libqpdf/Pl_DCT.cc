@@ -22,7 +22,7 @@ namespace
     };
 
     long memory_limit{0};
-    bool throw_on_corrupt_data{false};
+    bool throw_on_corrupt_data{true};
 } // namespace
 
 static void
