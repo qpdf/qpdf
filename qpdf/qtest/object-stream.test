@@ -16,7 +16,7 @@ cleanup();
 
 my $td = new TestDriver('object-stream');
 
-my $n_tests = 7 + (36 * 4) + (12 * 2);
+my $n_tests = 9 + (36 * 4) + (12 * 2);
 my $n_compare_pdfs = 36;
 
 for (my $n = 16; $n <= 19; ++$n)
@@ -106,6 +106,17 @@ $td->runtest("recover file with xref stream",
 $td->runtest("check file",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "recover-xref-stream-recovered.pdf"});
+
+# Self-referential object stream
+$td->runtest("self-referential object stream",
+             {$td->COMMAND => "qpdf --static-id --qdf" .
+                  " object-stream-self-ref.pdf a.pdf"},
+             {$td->FILE => "object-stream-self-ref.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "object-stream-self-ref.out.pdf"});
+
 
 cleanup();
 $td->report(calc_ntests($n_tests, $n_compare_pdfs));

@@ -17,6 +17,11 @@
 	* Add static option to Pl_DCT to control whether decompression of
 	corrupt JPEG data is attempted.
 
+2024-07-01  M Holger  <m.holger@qpdf.org>
+
+	* Bug fix: certain invalid object streams caused the insertion of
+	invalid entries into in the xref table.
+
 2024-06-29  M Holger  <m.holger@qpdf.org>
 
 	* Bug fix: in QPDFOutlineObjectHelper detect loops in the list of 

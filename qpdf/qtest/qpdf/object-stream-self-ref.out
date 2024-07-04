@@ -1,0 +1,2 @@
+WARNING: object-stream-self-ref.pdf object stream 1 (object 1 0, offset 2): object stream claims to contain itself
+qpdf: operation succeeded with warnings; resulting file may have some problems

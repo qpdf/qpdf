@@ -1938,6 +1938,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             continue;
         }
         if (num == obj_stream_number) {
+            QTC::TC("qpdf", "QPDF ignore self-referential object stream");
             warn(damagedPDF(
                 input,
                 m->last_object_description,
