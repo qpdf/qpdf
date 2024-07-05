@@ -1,6 +1,6 @@
 #include <qpdf/qpdf-config.h> // include first for large file support
 
-#include <qpdf/QPDF.hh>
+#include <qpdf/QPDF_private.hh>
 
 #include <array>
 #include <atomic>

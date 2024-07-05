@@ -13,7 +13,6 @@
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/Pl_String.hh>
 #include <qpdf/QIntC.hh>
-#include <qpdf/QPDF.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFCryptoProvider.hh>
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
@@ -26,6 +25,7 @@
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QPDFUsage.hh>
 #include <qpdf/QPDFWriter.hh>
+#include <qpdf/QPDF_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 

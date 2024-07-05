@@ -1,6 +1,6 @@
 // See doc/linearization.
 
-#include <qpdf/QPDF.hh>
+#include <qpdf/QPDF_private.hh>
 
 #include <qpdf/BitStream.hh>
 #include <qpdf/BitWriter.hh>

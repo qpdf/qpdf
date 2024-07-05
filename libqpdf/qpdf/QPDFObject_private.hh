@@ -6,14 +6,13 @@
 
 #include <qpdf/Constants.h>
 #include <qpdf/JSON.hh>
-#include <qpdf/QPDF.hh>
 #include <qpdf/QPDFValue.hh>
+#include <qpdf/QPDF_private.hh>
 #include <qpdf/Types.h>
 
 #include <string>
 #include <string_view>
 
-class QPDF;
 class QPDFObjectHandle;
 
 class QPDFObject
