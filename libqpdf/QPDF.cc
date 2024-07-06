@@ -1129,6 +1129,11 @@ QPDF::processXRefIndex(
             if (val.isInteger()) {
                 if (i % 2) {
                     auto count = val.getIntValue();
+                    if (count <= 0) {
+                        throw damaged(
+                            "Cross-reference stream section claims to contain " +
+                            std::to_string(count) + " entries");
+                    }
                     // We are guarding against the possibility of num_entries * entry_size
                     // overflowing. We are not checking that entries are in ascending order as
                     // required by the spec, which probably should generate a warning. We are also
