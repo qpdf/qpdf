@@ -228,6 +228,10 @@ class QPDF
     QPDF_DLL
     void setSuppressWarnings(bool);
 
+    // Set the maximum number of warnings to output. Subsequent warnings are suppressed.
+    QPDF_DLL
+    void setMaxWarnings(int);
+
     // By default, QPDF will try to recover if it finds certain types of errors in PDF files.  If
     // turned off, it will throw an exception on the first such problem it finds without attempting
     // recovery.
@@ -1497,6 +1501,7 @@ class QPDF
         bool provided_password_is_hex_key{false};
         bool ignore_xref_streams{false};
         bool suppress_warnings{false};
+        int max_warnings{0};
         bool attempt_recovery{true};
         bool check_mode{false};
         std::shared_ptr<EncryptionParameters> encp;

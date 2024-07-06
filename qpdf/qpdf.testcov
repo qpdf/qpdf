@@ -4,6 +4,7 @@ QPDF err wrong objid/generation 0
 QPDF check objid 1
 QPDF check generation 1
 QPDF check obj 1
+QPDF ignore self-referential object stream 0
 QPDF hint table length indirect 0
 QPDF hint table length direct 0
 QPDF P absent in lindict 0

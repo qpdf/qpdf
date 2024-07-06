@@ -20,6 +20,9 @@ namespace
         jmp_buf jmpbuf;
         std::string msg;
     };
+
+    long memory_limit{0};
+    bool throw_on_corrupt_data{true};
 } // namespace
 
 static void
@@ -32,38 +35,39 @@ error_handler(j_common_ptr cinfo)
     longjmp(jerr->jmpbuf, 1);
 }
 
-Pl_DCT::Members::Members(size_t corrupt_data_limit) :
+Pl_DCT::Members::Members() :
     action(a_decompress),
-    buf("DCT compressed image"),
-    corrupt_data_limit(corrupt_data_limit)
+    buf("DCT compressed image")
 {
 }
 
 Pl_DCT::Members::Members(
-    JDIMENSION image_width,
-    JDIMENSION image_height,
-    int components,
-    J_COLOR_SPACE color_space,
-    CompressConfig* config_callback) :
+    JDIMENSION image_width, JDIMENSION image_height, int components, J_COLOR_SPACE color_space) :
     action(a_compress),
     buf("DCT uncompressed image"),
     image_width(image_width),
     image_height(image_height),
     components(components),
-    color_space(color_space),
-    config_callback(config_callback)
+    color_space(color_space)
 {
 }
 
 Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next) :
-    Pl_DCT(identifier, next, 0)
+    Pipeline(identifier, next),
+    m(new Members())
 {
 }
 
-Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next, size_t corrupt_data_limit) :
-    Pipeline(identifier, next),
-    m(new Members(corrupt_data_limit))
+void
+Pl_DCT::setMemoryLimit(long limit)
 {
+    memory_limit = limit;
+}
+
+void
+Pl_DCT::setThrowOnCorruptData(bool treat_as_error)
+{
+    throw_on_corrupt_data = treat_as_error;
 }
 
 Pl_DCT::Pl_DCT(
@@ -72,10 +76,9 @@ Pl_DCT::Pl_DCT(
     JDIMENSION image_width,
     JDIMENSION image_height,
     int components,
-    J_COLOR_SPACE color_space,
-    CompressConfig* config_callback) :
+    J_COLOR_SPACE color_space) :
     Pipeline(identifier, next),
-    m(new Members(image_width, image_height, components, color_space, config_callback))
+    m(new Members(image_width, image_height, components, color_space))
 {
 }
 
@@ -273,9 +276,6 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
     cinfo->input_components = m->components;
     cinfo->in_color_space = m->color_space;
     jpeg_set_defaults(cinfo);
-    if (m->config_callback) {
-        m->config_callback->apply(cinfo);
-    }
 
     jpeg_start_compress(cinfo, TRUE);
 
@@ -312,36 +312,32 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
 # pragma GCC diagnostic pop
 #endif
 
-#ifdef QPDF_OSS_FUZZ
-    // Limit the memory used to decompress JPEG files during fuzzing. Excessive memory use during
-    // fuzzing is due to corrupt JPEG data which sometimes cannot be detected before
-    // jpeg_start_decompress is called. During normal use of qpdf very large JPEGs can occasionally
-    // occur legitimately and therefore must be allowed during normal operations.
-    cinfo->mem->max_memory_to_use = 1'000'000'000;
-    // For some corrupt files the memory used internally by libjpeg stays within the above limits
-    // even though the size written to the next pipeline is significantly larger.
-    m->corrupt_data_limit = 10'000'000;
-#endif
+    if (memory_limit > 0) {
+        cinfo->mem->max_memory_to_use = memory_limit;
+    }
+
     jpeg_buffer_src(cinfo, b);
 
     (void)jpeg_read_header(cinfo, TRUE);
+    if (throw_on_corrupt_data && cinfo->err->num_warnings > 0) {
+        throw std::runtime_error("Pl_DCT::decompress: JPEG data is corrupt");
+    }
     (void)jpeg_calc_output_dimensions(cinfo);
     unsigned int width = cinfo->output_width * QIntC::to_uint(cinfo->output_components);
-    if (cinfo->err->num_warnings == 0 || m->corrupt_data_limit == 0 ||
-        (width * QIntC::to_uint(cinfo->output_height)) < m->corrupt_data_limit) {
-        // err->num_warnings is the number of corrupt data warnings emitted.
-        // err->msg_code could also be the code of an informational message.
-        JSAMPARRAY buffer = (*cinfo->mem->alloc_sarray)(
-            reinterpret_cast<j_common_ptr>(cinfo), JPOOL_IMAGE, width, 1);
+    // err->num_warnings is the number of corrupt data warnings emitted.
+    // err->msg_code could also be the code of an informational message.
+    JSAMPARRAY buffer =
+        (*cinfo->mem->alloc_sarray)(reinterpret_cast<j_common_ptr>(cinfo), JPOOL_IMAGE, width, 1);
 
-        (void)jpeg_start_decompress(cinfo);
-        while (cinfo->output_scanline < cinfo->output_height) {
-            (void)jpeg_read_scanlines(cinfo, buffer, 1);
-            getNext()->write(buffer[0], width * sizeof(buffer[0][0]));
-        }
-        (void)jpeg_finish_decompress(cinfo);
-    } else {
-        *QPDFLogger::defaultLogger()->getError() << "corrupt JPEG data ignored" << "\n";
+    (void)jpeg_start_decompress(cinfo);
+    while (cinfo->output_scanline < cinfo->output_height &&
+           (!throw_on_corrupt_data || cinfo->err->num_warnings == 0)) {
+        (void)jpeg_read_scanlines(cinfo, buffer, 1);
+        getNext()->write(buffer[0], width * sizeof(buffer[0][0]));
+    }
+    (void)jpeg_finish_decompress(cinfo);
+    if (throw_on_corrupt_data && cinfo->err->num_warnings > 0) {
+        throw std::runtime_error("Pl_DCT::decompress: JPEG data is corrupt");
     }
     getNext()->finish();
 }

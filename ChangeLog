@@ -1,3 +1,44 @@
+2024-07-04  M Holger  <m.holger@qpdf.org>
+
+	* Treat corrupt JPEG streams as unfilterable. This avoids them 
+	getting uncompressed when writing PDF files with decode level all.
+
+2024-07-02  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QPDF::setMaxWarnings to set the maximum of warnings before
+	warning suppression.
+
+	* Add static option to Pl_DCT to limit memory usage of 
+	decompression. The option is generally exposed but is primarily
+	intended to support fuzz tests, which have explicit memory limits
+	that are smaller than what is commonly seen in the wild with PDF
+	files.
+
+	* Add static option to Pl_DCT to control whether decompression of
+	corrupt JPEG data is attempted.
+
+2024-07-01  M Holger  <m.holger@qpdf.org>
+
+	* Bug fix: certain invalid object streams caused the insertion of
+	invalid entries into in the xref table.
+
+2024-06-29  M Holger  <m.holger@qpdf.org>
+
+	* Bug fix: in QPDFOutlineObjectHelper detect loops in the list of 
+	direct children of an outline item.
+
+2024-06-27  M Holger  <m.holger@qpdf.org>
+
+	* Add sanity check in QPDF xref table reconstruction to reject 
+	objects with impossibly large object id in order to improve
+	handling of severely damaged PDF files.
+
+2024-06-25  M Holger  <m.holger@qpdf.org>
+
+	* Detect severely damaged PDF files early. After parsing the xref
+	table in QPDF throw a damagedPDF exception if the root of the pages
+	tree is not a dictionary.
+
 2024-06-07  Jay Berkenbilt  <ejb@ql.org>
 
 	* 11.9.1: release

@@ -14,21 +14,6 @@ usage()
     exit(2);
 }
 
-class Callback: public Pl_DCT::CompressConfig
-{
-  public:
-    Callback() = default;
-    ~Callback() override = default;
-    void apply(jpeg_compress_struct*) override;
-    bool called{false};
-};
-
-void
-Callback::apply(jpeg_compress_struct*)
-{
-    this->called = true;
-}
-
 int
 main(int argc, char* argv[])
 {
@@ -66,21 +51,12 @@ main(int argc, char* argv[])
     FILE* outfile = QUtil::safe_fopen(outfilename, "wb");
     Pl_StdioFile out("stdout", outfile);
     unsigned char buf[100];
-    bool done = false;
-    Callback callback;
-    Pl_DCT dct("dct", &out, width, height, components, cs, &callback);
-    while (!done) {
-        size_t len = fread(buf, 1, sizeof(buf), infile);
-        if (len <= 0) {
-            done = true;
-        } else {
-            dct.write(buf, len);
-        }
+    Pl_DCT dct("dct", &out, width, height, components, cs);
+    while (size_t len = fread(buf, 1, sizeof(buf), infile)) {
+        dct.write(buf, len);
     }
     dct.finish();
-    if (!callback.called) {
-        std::cout << "Callback was not called" << std::endl;
-    }
+
     fclose(infile);
     fclose(outfile);
     return 0;
