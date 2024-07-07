@@ -98,6 +98,7 @@ set(CORPUS_OTHER
   16172.fuzz
   16301.fuzz
   16953.fuzz
+  17630.fuzz
   18241.fuzz
   18247.fuzz
   23172.fuzz
