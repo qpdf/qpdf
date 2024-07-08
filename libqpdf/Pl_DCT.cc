@@ -320,12 +320,18 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
 
     (void)jpeg_read_header(cinfo, TRUE);
     if (throw_on_corrupt_data && cinfo->err->num_warnings > 0) {
+        // err->num_warnings is the number of corrupt data warnings emitted.
+        // err->msg_code could also be the code of an informational message.
         throw std::runtime_error("Pl_DCT::decompress: JPEG data is corrupt");
     }
     (void)jpeg_calc_output_dimensions(cinfo);
     unsigned int width = cinfo->output_width * QIntC::to_uint(cinfo->output_components);
-    // err->num_warnings is the number of corrupt data warnings emitted.
-    // err->msg_code could also be the code of an informational message.
+    if (memory_limit > 0 &&
+        width > (static_cast<unsigned long>(memory_limit) / (2U * cinfo->output_height))) {
+        // Even if jpeglib does not run out of memory, qpdf will while buffering thye data before
+        // writing it.
+        throw std::runtime_error("Pl_DCT::decompress: JPEG data exceeds memory limit");
+    }
     JSAMPARRAY buffer =
         (*cinfo->mem->alloc_sarray)(reinterpret_cast<j_common_ptr>(cinfo), JPOOL_IMAGE, width, 1);
 
