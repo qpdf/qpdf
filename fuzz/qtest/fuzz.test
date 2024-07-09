@@ -13,7 +13,7 @@ my $qpdf_corpus = $ENV{'QPDF_FUZZ_CORPUS'} || die "must set QPDF_FUZZ_CORPUS";
 
 my @fuzzers = (
     ['ascii85' => 1],
-    ['dct' => 1],
+    ['dct' => 2],
     ['flate' => 1],
     ['hex' => 1],
     ['json' => 40],
@@ -21,7 +21,7 @@ my @fuzzers = (
     ['pngpredictor' => 1],
     ['runlength' => 6],
     ['tiffpredictor' => 2],
-    ['qpdf' => 66],             # increment when adding new files
+    ['qpdf' => 67],             # increment when adding new files
     );
 
 my $n_tests = 0;
