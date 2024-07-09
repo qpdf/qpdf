@@ -334,7 +334,7 @@ QPDF::setSuppressWarnings(bool val)
 void
 QPDF::setMaxWarnings(int val)
 {
-    m->suppress_warnings = val;
+    m->max_warnings = val;
 }
 
 void
