@@ -123,6 +123,7 @@ set(CORPUS_OTHER
   69913.fuzz
   69969.fuzz
   69977.fuzz
+  69977a.fuzz
   70055.fuzz
 )
 

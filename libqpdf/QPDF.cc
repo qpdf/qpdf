@@ -334,7 +334,7 @@ QPDF::setSuppressWarnings(bool val)
 void
 QPDF::setMaxWarnings(int val)
 {
-    m->suppress_warnings = val;
+    m->max_warnings = val;
 }
 
 void
@@ -640,6 +640,11 @@ QPDF::reconstruct_xref(QPDFExc& e)
         // bad startxref pointers even when they have object streams.
 
         throw damagedPDF("", 0, "unable to find trailer dictionary while recovering damaged file");
+    }
+    if (m->xref_table.empty()) {
+        // We cannot check for an empty xref table in parse because empty tables are valid when
+        // creating QPDF objects from JSON.
+        throw damagedPDF("", 0, "unable to find objects while recovering damaged file");
     }
 
     // We could iterate through the objects looking for streams and try to find objects inside of
