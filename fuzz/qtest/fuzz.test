@@ -13,7 +13,7 @@ my $qpdf_corpus = $ENV{'QPDF_FUZZ_CORPUS'} || die "must set QPDF_FUZZ_CORPUS";
 
 my @fuzzers = (
     ['ascii85' => 1],
-    ['dct' => 2],
+    ['dct' => 4],
     ['flate' => 1],
     ['hex' => 1],
     ['json' => 40],
