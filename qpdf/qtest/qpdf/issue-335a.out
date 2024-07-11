@@ -1003,21 +1003,4 @@ WARNING: issue-335a.pdf (trailer, offset 20601): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 20602): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 20604): invalid character ({) in hexstring
 WARNING: issue-335a.pdf (trailer, offset 20604): too many errors; giving up on reading object
-WARNING: issue-335a.pdf (trailer, offset 20446): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 20601): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 20602): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 20604): invalid character ({) in hexstring
-WARNING: issue-335a.pdf (trailer, offset 20606): treating unexpected brace token as null
-WARNING: issue-335a.pdf (trailer, offset 20607): treating unexpected brace token as null
-WARNING: issue-335a.pdf (trailer, offset 20607): too many errors; giving up on reading object
-WARNING: issue-335a.pdf (trailer, offset 20598): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 20600): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 20601): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 20602): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 20604): invalid character ({) in hexstring
-WARNING: issue-335a.pdf (trailer, offset 20606): treating unexpected brace token as null
-WARNING: issue-335a.pdf (trailer, offset 20606): too many errors; giving up on reading object
-WARNING: issue-335a.pdf (trailer, offset 20684): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 20683): expected dictionary key but found non-name object; inserting key /QPDFFake1
-WARNING: issue-335a.pdf (trailer, offset 20747): stream keyword found in trailer
-qpdf: issue-335a.pdf: unable to find /Root dictionary
+qpdf: issue-335a.pdf: too many errors while reconstructing cross-reference table
