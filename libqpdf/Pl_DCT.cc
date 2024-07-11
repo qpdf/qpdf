@@ -335,10 +335,11 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
     (void)jpeg_calc_output_dimensions(cinfo);
     unsigned int width = cinfo->output_width * QIntC::to_uint(cinfo->output_components);
     if (memory_limit > 0 &&
-        width > (static_cast<unsigned long>(memory_limit) / (2U * cinfo->output_height))) {
-        // Even if jpeglib does not run out of memory, qpdf will while buffering thye data before
-        // writing it.
-        throw std::runtime_error("Pl_DCT::decompress: JPEG data exceeds memory limit");
+        width > (static_cast<unsigned long>(memory_limit) / (20U * cinfo->output_height))) {
+        // Even if jpeglib does not run out of memory, qpdf will while buffering the data before
+        // writing it. Furthermore, for very large images runtime can be significant before the
+        // first warning is encountered causing a timeout in oss-fuzz.
+        throw std::runtime_error("Pl_DCT::decompress: JPEG data large - may be too slow");
     }
     JSAMPARRAY buffer =
         (*cinfo->mem->alloc_sarray)(reinterpret_cast<j_common_ptr>(cinfo), JPOOL_IMAGE, width, 1);

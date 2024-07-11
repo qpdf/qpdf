@@ -99,7 +99,7 @@ QPDF::getAllPagesInternal(
     for (int i = 0; i < n; ++i) {
         auto kid = kids.getArrayItem(i);
         if (!kid.isDictionary()) {
-            kid.warnIfPossible("Pages tree includes non-dictionary object; removing");
+            kid.warnIfPossible("Pages tree includes non-dictionary object; ignoring");
             continue;
         }
         if (kid.hasKey("/Kids")) {
