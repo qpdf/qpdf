@@ -546,6 +546,11 @@ QPDF::reconstruct_xref(QPDFExc& e)
     // If recovery generates more than 1000 warnings, the file is so severely damaged that there
     // probably is no point trying to continue.
     const auto max_warnings = m->warnings.size() + 1000U;
+    auto check_warnings = [this, max_warnings]() {
+        if (m->warnings.size() > max_warnings) {
+            throw damagedPDF("", 0, "too many errors while reconstructing cross-reference table");
+        }
+    };
 
     m->reconstructed_xref = true;
     // We may find more objects, which may contain dangling references.
@@ -600,9 +605,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
                 setTrailer(t);
             }
         }
-        if (m->warnings.size() > max_warnings) {
-            throw damagedPDF("", 0, "too many errors while reconstructing cross-reference table");
-        }
+        check_warnings();
         m->file->seek(next_line_start, SEEK_SET);
         line_start = next_line_start;
     }
@@ -629,10 +632,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
                 max_offset = offset;
                 setTrailer(oh.getDict());
             }
-            if (m->warnings.size() > max_warnings) {
-                throw damagedPDF(
-                    "", 0, "too many errors while reconstructing cross-reference table");
-            }
+            check_warnings();
         }
         if (max_offset > 0) {
             try {
@@ -657,8 +657,13 @@ QPDF::reconstruct_xref(QPDFExc& e)
         // creating QPDF objects from JSON.
         throw damagedPDF("", 0, "unable to find objects while recovering damaged file");
     }
-    if (m->warnings.size() > max_warnings) {
-        throw damagedPDF("", 0, "too many errors while reconstructing cross-reference table");
+    check_warnings();
+    if (!m->parsed) {
+        getAllPages();
+        check_warnings();
+        if (m->all_pages.empty()) {
+            throw damagedPDF("", 0, "unable to find any pages while recovering damaged file");
+        }
     }
     // We could iterate through the objects looking for streams and try to find objects inside of
     // them, but it's probably not worth the trouble.  Acrobat can't recover files with any errors
