@@ -1,6 +1,12 @@
+2024-07-14  M Holger  <m.holger@qpdf.org>
+
+	* Bug fix: handle named destinations where the entry is a
+	dictionary with /D entry instead of an explicit destination.
+	Fixes #1238.
+
 2024-07-04  M Holger  <m.holger@qpdf.org>
 
-	* Treat corrupt JPEG streams as unfilterable. This avoids them 
+	* Treat corrupt JPEG streams as unfilterable. This avoids them
 	getting uncompressed when writing PDF files with decode level all.
 
 2024-07-02  Jay Berkenbilt  <ejb@ql.org>
@@ -24,12 +30,12 @@
 
 2024-06-29  M Holger  <m.holger@qpdf.org>
 
-	* Bug fix: in QPDFOutlineObjectHelper detect loops in the list of 
+	* Bug fix: in QPDFOutlineObjectHelper detect loops in the list of
 	direct children of an outline item.
 
 2024-06-27  M Holger  <m.holger@qpdf.org>
 
-	* Add sanity check in QPDF xref table reconstruction to reject 
+	* Add sanity check in QPDF xref table reconstruction to reject
 	objects with impossibly large object id in order to improve
 	handling of severely damaged PDF files.
 

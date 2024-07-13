@@ -88,5 +88,9 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
     if (!result.isInitialized()) {
         return QPDFObjectHandle::newNull();
     }
+    if (result.isDictionary()) {
+        QTC::TC("qpdf", "QPDFOutlineDocumentHelper named dest dictionary");
+        return result.getKey("/D");
+    }
     return result;
 }
