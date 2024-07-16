@@ -66,10 +66,12 @@ QPDF::getAllPages()
             getRoot().replaceKey("/Pages", pages);
         }
         seen.clear();
-        if (pages.hasKey("/Kids")) {
+        if (!pages.hasKey("/Kids")) {
             // Ensure we actually found a /Pages object.
-            getAllPagesInternal(pages, visited, seen, false);
+            throw QPDFExc(
+                qpdf_e_pages, m->file->getName(), "", 0, "root of pages tree has no /Kids array");
         }
+        getAllPagesInternal(pages, visited, seen, false);
         if (m->invalid_page_found) {
             flattenPagesTree();
             m->invalid_page_found = false;
