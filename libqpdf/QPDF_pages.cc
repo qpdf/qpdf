@@ -40,7 +40,7 @@ std::vector<QPDFObjectHandle> const&
 QPDF::getAllPages()
 {
     // Note that pushInheritedAttributesToPage may also be used to initialize m->all_pages.
-    if (m->all_pages.empty()) {
+    if (m->all_pages.empty() && !m->invalid_page_found) {
         m->ever_called_get_all_pages = true;
         QPDFObjGen::set visited;
         QPDFObjGen::set seen;
@@ -69,6 +69,10 @@ QPDF::getAllPages()
         if (pages.hasKey("/Kids")) {
             // Ensure we actually found a /Pages object.
             getAllPagesInternal(pages, visited, seen, false);
+        }
+        if (m->invalid_page_found) {
+            flattenPagesTree();
+            m->invalid_page_found = false;
         }
     }
     return m->all_pages;
@@ -100,6 +104,7 @@ QPDF::getAllPagesInternal(
         auto kid = kids.getArrayItem(i);
         if (!kid.isDictionary()) {
             kid.warnIfPossible("Pages tree includes non-dictionary object; ignoring");
+            m->invalid_page_found = true;
             continue;
         }
         if (kid.hasKey("/Kids")) {
@@ -181,7 +186,11 @@ QPDF::flattenPagesTree()
     pages.replaceKey("/Kids", QPDFObjectHandle::newArray(m->all_pages));
     // /Count has not changed
     if (pages.getKey("/Count").getUIntValue() != len) {
-        throw std::runtime_error("/Count is wrong after flattening pages tree");
+        if (m->invalid_page_found && pages.getKey("/Count").getUIntValue() > len) {
+            pages.replaceKey("/Count", QPDFObjectHandle::newInteger(toI(len)));
+        } else {
+            throw std::runtime_error("/Count is wrong after flattening pages tree");
+        }
     }
 }
 
