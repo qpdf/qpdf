@@ -33,6 +33,7 @@ FuzzHelper::doChecks()
         std::cerr << "runtime_error parsing json: " << e.what() << std::endl;
     }
     QPDF q;
+    q.setMaxWarnings(1000);
     Buffer buf(const_cast<unsigned char*>(data), size);
     auto is = std::make_shared<BufferInputSource>("json", &buf);
     q.createFromJSON(is);

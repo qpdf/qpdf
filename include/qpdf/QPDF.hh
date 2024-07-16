@@ -1515,6 +1515,7 @@ class QPDF
         std::set<QPDFObjGen> resolving;
         QPDFObjectHandle trailer;
         std::vector<QPDFObjectHandle> all_pages;
+        bool invalid_page_found{false};
         std::map<QPDFObjGen, int> pageobj_to_pages_pos;
         bool pushed_inherited_attributes_to_pages{false};
         bool ever_pushed_inherited_attributes_to_pages{false};
