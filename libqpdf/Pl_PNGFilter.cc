@@ -7,6 +7,11 @@
 #include <cstring>
 #include <stdexcept>
 
+namespace
+{
+    unsigned long long memory_limit{0};
+} // namespace
+
 static int
 abs_diff(int a, int b)
 {
@@ -41,6 +46,9 @@ Pl_PNGFilter::Pl_PNGFilter(
     if ((bpr == 0) || (bpr > (UINT_MAX - 1))) {
         throw std::runtime_error("PNGFilter created with invalid columns value");
     }
+    if (memory_limit > 0 && bpr > (memory_limit / 2U)) {
+        throw std::runtime_error("PNGFilter memory limit exceeded");
+    }
     this->bytes_per_row = bpr & UINT_MAX;
     this->buf1 = QUtil::make_shared_array<unsigned char>(this->bytes_per_row + 1);
     this->buf2 = QUtil::make_shared_array<unsigned char>(this->bytes_per_row + 1);
@@ -51,6 +59,12 @@ Pl_PNGFilter::Pl_PNGFilter(
 
     // number of bytes per incoming row
     this->incoming = (action == a_encode ? this->bytes_per_row : this->bytes_per_row + 1);
+}
+
+void
+Pl_PNGFilter::setMemoryLimit(unsigned long long limit)
+{
+    memory_limit = limit;
 }
 
 void
