@@ -18,6 +18,7 @@ my @outline_files = (
     'page-labels-and-outlines',
     'outlines-with-actions',
     'outlines-with-old-root-dests',
+    'outlines-with-old-root-dests-dict',
     'outlines-with-loop',
     );
 my $n_tests = scalar(@outline_files);
