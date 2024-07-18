@@ -332,7 +332,7 @@ QPDF::setSuppressWarnings(bool val)
 }
 
 void
-QPDF::setMaxWarnings(int val)
+QPDF::setMaxWarnings(size_t val)
 {
     m->max_warnings = val;
 }
@@ -504,13 +504,11 @@ QPDF::inParse(bool v)
 void
 QPDF::warn(QPDFExc const& e)
 {
+    if (m->max_warnings > 0 && m->warnings.size() >= m->max_warnings) {
+        stopOnError("Too many warnings - file is too badly damaged");
+    }
     m->warnings.push_back(e);
     if (!m->suppress_warnings) {
-        if (m->max_warnings > 0 && m->warnings.size() > 20) {
-            *m->log->getWarn() << "WARNING: too many warnings - additional warnings suppressed\n";
-            m->suppress_warnings = true;
-            return;
-        }
         *m->log->getWarn() << "WARNING: " << m->warnings.back().what() << "\n";
     }
 }

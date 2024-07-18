@@ -2,6 +2,8 @@
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/Pl_DCT.hh>
 #include <qpdf/Pl_Discard.hh>
+#include <qpdf/Pl_PNGFilter.hh>
+#include <qpdf/Pl_TIFFPredictor.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
@@ -57,7 +59,7 @@ FuzzHelper::getQpdf()
     auto is =
         std::shared_ptr<InputSource>(new BufferInputSource("fuzz input", &this->input_buffer));
     auto qpdf = QPDF::create();
-    qpdf->setMaxWarnings(20);
+    qpdf->setMaxWarnings(500);
     qpdf->processInputSource(is);
     return qpdf;
 }
@@ -178,6 +180,9 @@ FuzzHelper::doChecks()
     // jpeg_start_decompress is called. During normal use of qpdf very large JPEGs can occasionally
     // occur legitimately and therefore must be allowed during normal operations.
     Pl_DCT::setMemoryLimit(1'000'000'000);
+
+    Pl_PNGFilter::setMemoryLimit(1'000'000'000);
+    Pl_TIFFPredictor::setMemoryLimit(1'000'000'000);
 
     // Do not decompress corrupt data. This may cause extended runtime within jpeglib without
     // exercising additional code paths in qpdf, and potentially causing counterproductive timeouts.

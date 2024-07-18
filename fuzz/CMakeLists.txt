@@ -99,6 +99,7 @@ set(CORPUS_OTHER
   16301.fuzz
   16953.fuzz
   17630.fuzz
+  17630a.fuzz
   18241.fuzz
   18247.fuzz
   23172.fuzz
@@ -129,7 +130,6 @@ set(CORPUS_OTHER
   70055.fuzz
   70245.fuzz
   70306.fuzz
-  4826608268017664.fuzz
 )
 
 set(CORPUS_DIR ${CMAKE_CURRENT_BINARY_DIR}/qpdf_corpus)

@@ -7,6 +7,11 @@
 #include <climits>
 #include <stdexcept>
 
+namespace
+{
+    unsigned long long memory_limit{0};
+} // namespace
+
 Pl_TIFFPredictor::Pl_TIFFPredictor(
     char const* identifier,
     Pipeline* next,
@@ -31,7 +36,16 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(
     if ((bpr == 0) || (bpr > (UINT_MAX - 1))) {
         throw std::runtime_error("TIFFPredictor created with invalid columns value");
     }
+    if (memory_limit > 0 && bpr > (memory_limit / 2U)) {
+        throw std::runtime_error("TIFFPredictor memory limit exceeded");
+    }
     this->bytes_per_row = bpr & UINT_MAX;
+}
+
+void
+Pl_TIFFPredictor::setMemoryLimit(unsigned long long limit)
+{
+    memory_limit = limit;
 }
 
 void

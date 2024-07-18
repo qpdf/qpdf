@@ -22,6 +22,10 @@ class Pl_TIFFPredictor: public Pipeline
         unsigned int bits_per_sample = 8);
     ~Pl_TIFFPredictor() override = default;
 
+    // Limit the memory used.
+    // NB This is a static option affecting all Pl_TIFFPredictor instances.
+    static void setMemoryLimit(unsigned long long limit);
+
     void write(unsigned char const* data, size_t len) override;
     void finish() override;
 
