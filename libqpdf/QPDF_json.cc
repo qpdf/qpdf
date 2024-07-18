@@ -233,13 +233,12 @@ provide_data(std::shared_ptr<InputSource> is, qpdf_offset_t start, qpdf_offset_t
 class QPDF::JSONReactor: public JSON::Reactor
 {
   public:
-    JSONReactor(QPDF& pdf, std::shared_ptr<InputSource> is, bool must_be_complete, int max_warnings) :
+    JSONReactor(QPDF& pdf, std::shared_ptr<InputSource> is, bool must_be_complete) :
         pdf(pdf),
         is(is),
         must_be_complete(must_be_complete),
         descr(std::make_shared<QPDFValue::Description>(
-            QPDFValue::JSON_Descr(std::make_shared<std::string>(is->getName()), ""))),
-        max_warnings(max_warnings)
+            QPDFValue::JSON_Descr(std::make_shared<std::string>(is->getName()), "")))
     {
         for (auto& oc: pdf.m->obj_cache) {
             if (oc.second.object->getTypeCode() == ::ot_reserved) {
@@ -292,8 +291,7 @@ class QPDF::JSONReactor: public JSON::Reactor
     std::shared_ptr<InputSource> is;
     bool must_be_complete{true};
     std::shared_ptr<QPDFValue::Description> descr;
-    int errors{0};
-    int max_warnings{0};
+    bool errors{false};
     bool saw_qpdf{false};
     bool saw_qpdf_meta{false};
     bool saw_objects{false};
@@ -316,21 +314,18 @@ class QPDF::JSONReactor: public JSON::Reactor
 void
 QPDF::JSONReactor::error(qpdf_offset_t offset, std::string const& msg)
 {
-    ++errors;
+    errors = true;
     std::string object = this->cur_object;
     if (is->getName() != pdf.getFilename()) {
         object += " from " + is->getName();
     }
-    this->pdf.warn(qpdf_e_json, object, offset, msg);
-    if (max_warnings > 0 && errors >= max_warnings) {
-        throw std::runtime_error("errors found in JSON");
-    }
+    pdf.warn(qpdf_e_json, object, offset, msg);
 }
 
 bool
 QPDF::JSONReactor::anyErrors() const
 {
-    return errors > 0;
+    return errors;
 }
 
 void
@@ -825,7 +820,7 @@ QPDF::updateFromJSON(std::shared_ptr<InputSource> is)
 void
 QPDF::importJSON(std::shared_ptr<InputSource> is, bool must_be_complete)
 {
-    JSONReactor reactor(*this, is, must_be_complete, m->max_warnings);
+    JSONReactor reactor(*this, is, must_be_complete);
     try {
         JSON::parse(*is, &reactor);
     } catch (std::runtime_error& e) {
