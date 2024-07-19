@@ -201,8 +201,7 @@ Fuzz Errors
 
 * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=<N>
 
-* Ignoring these:
-  * Out of memory in dct: 35001, 32516
+* See also [discussion](https://github.com/qpdf/qpdf-dev/discussions/6).
 
 External Libraries
 ==================
@@ -396,6 +395,8 @@ so, I find it useful to make reference to them in this list.
   API. Move as many of the test drivers from the qpdf directory into the latter category as long as
   doing so isn't too troublesome from a coverage standpoint.
 
+* Refactor pages tree. See [discussion](https://github.com/qpdf/qpdf-dev/discussions/10).
+
 * Consider generating a non-flat pages tree before creating output to better handle files with lots
   of pages. If there are more than 256 pages, add a second layer with the second layer nodes having
   no more than 256 nodes and being as evenly sizes as possible. Don't worry about the case of more
@@ -583,6 +584,8 @@ time but subsequent implementations of std::shared_ptr became much more efficien
 
 QPDFPagesTree
 =============
+
+See also [discussion](https://github.com/qpdf/qpdf-dev/discussions/10).
 
 On a few occasions, I have considered implementing a QPDFPagesTree object that would allow the
 document's original page tree structure to be preserved. See comments at the top QPDF_pages.cc for
