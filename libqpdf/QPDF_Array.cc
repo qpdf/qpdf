@@ -130,8 +130,7 @@ QPDF_Array::unparse()
             for (int j = next; j < key; ++j) {
                 result += "null ";
             }
-            item.second->resolve();
-            auto og = item.second->getObjGen();
+            auto og = item.second->resolved_object()->getObjGen();
             result += og.isIndirect() ? og.unparse(' ') + " R " : item.second->unparse() + " ";
             next = ++key;
         }
@@ -140,8 +139,7 @@ QPDF_Array::unparse()
         }
     } else {
         for (auto const& item: elements) {
-            item->resolve();
-            auto og = item->getObjGen();
+            auto og = item->resolved_object()->getObjGen();
             result += og.isIndirect() ? og.unparse(' ') + " R " : item->unparse() + " ";
         }
     }
