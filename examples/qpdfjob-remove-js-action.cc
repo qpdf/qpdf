@@ -30,20 +30,11 @@ main(int argc, char* argv[])
             names.removeKey("/JavaScript");
         }
 
+        std::string name;
         for (auto obj: pdf.getAllObjects()) {
-            if (obj.isDictionaryOfType("/Action")) {
-                auto s = obj.getKey("/S");
-                if (s.isName() && s.getName() == "/JavaScript") {
-                    obj.replaceKey("/S", "null"_qpdf);
-                }
-
-                auto js = obj.getKey("/JS");
-                if (js.isString()) {
-                    obj.replaceKey("/JS", "null"_qpdf);
-                }
-
-                obj.replaceKey("/Action", "null"_qpdf);
-                pdf.getRoot().replaceKey("/Action", "null"_qpdf);
+            if (obj.isDictionaryOfType("/Action") && obj.getKey("/S").getValueAsName(name) &&
+                name == "/JavaScript") {
+                obj.replaceKey("/JS", QPDFObjectHandle::newString(""));
             }
         }
         j.writeQPDF(pdf);
