@@ -27,14 +27,7 @@ main(int argc, char* argv[])
 
         auto names = pdf.getRoot().getKey("/Names");
         if (names.isDictionary()) {
-            auto js = names.getKey("/JavaScript");
-            if (js.isDictionary()) {
-                auto nested_names = js.getKey("/Names");
-                if (nested_names.isArray()) {
-                    js.replaceKey("/Names", "null"_qpdf);
-                }
-                names.replaceKey("/JavaScript", "null"_qpdf);
-            }
+            names.removeKey("/JavaScript");
         }
 
         for (auto obj: pdf.getAllObjects()) {
