@@ -193,7 +193,12 @@ MD5_native::digest(Digest result)
 }
 
 // MD5 basic transformation. Transforms state based on block.
+//
+// NB The algorithm intentionally relies on unsigned integer wrap-around
 void MD5_native::transform(uint32_t state[4], unsigned char block[64])
+#if defined(__clang__)
+__attribute__((no_sanitize("unsigned-integer-overflow")))
+#endif
 {
     uint32_t a = state[0], b = state[1], c = state[2], d = state[3], x[16];
 
