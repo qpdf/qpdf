@@ -16,7 +16,8 @@ class QPDFParser
         std::string const& object_description,
         QPDFTokenizer& tokenizer,
         QPDFObjectHandle::StringDecrypter* decrypter,
-        QPDF* context) :
+        QPDF* context,
+        bool parse_pdf) :
         input(input),
         object_description(object_description),
         tokenizer(tokenizer),
