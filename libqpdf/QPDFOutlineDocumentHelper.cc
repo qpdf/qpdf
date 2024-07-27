@@ -71,7 +71,7 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
             m->dest_dict = qpdf.getRoot().getKey("/Dests");
         }
         QTC::TC("qpdf", "QPDFOutlineDocumentHelper name named dest");
-        result=  m->dest_dict.getKeyIfDict(name.getName());
+        result = m->dest_dict.getKeyIfDict(name.getName());
     } else if (name.isString()) {
         if (!m->names_dest) {
             auto dests = qpdf.getRoot().getKey("/Names").getKeyIfDict("/Dests");

@@ -1,5 +1,6 @@
 #include <qpdf/ContentNormalizer.hh>
 
+#include <qpdf/QPDF_Name.hh>
 #include <qpdf/QUtil.hh>
 
 ContentNormalizer::ContentNormalizer() :
@@ -43,11 +44,11 @@ ContentNormalizer::handleToken(QPDFTokenizer::Token const& token)
     case QPDFTokenizer::tt_string:
         // Replacing string and name tokens in this way normalizes their representation as this will
         // automatically handle quoting of unprintable characters, etc.
-        writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_string, token.getValue()));
+        write(QPDFObjectHandle::newString(token.getValue()).unparse());
         break;
 
     case QPDFTokenizer::tt_name:
-        writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_name, token.getValue()));
+        write(QPDF_Name::normalizeName(token.getValue()));
         break;
 
     default:
