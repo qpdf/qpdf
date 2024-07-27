@@ -904,7 +904,7 @@ QPDFTokenizer::readToken(
             throw QPDFExc(
                 qpdf_e_damaged_pdf,
                 input.getName(),
-                context,
+                context.empty() ? "offset " + std::to_string(input.getLastOffset()) : context,
                 input.getLastOffset(),
                 token.getErrorMessage());
         }
