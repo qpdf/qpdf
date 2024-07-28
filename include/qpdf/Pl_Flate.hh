@@ -42,6 +42,11 @@ class QPDF_DLL_CLASS Pl_Flate: public Pipeline
     QPDF_DLL
     ~Pl_Flate() override;
 
+    // Limit the memory used.
+    // NB This is a static option affecting all Pl_PNGFilter instances.
+    QPDF_DLL
+    static void setMemoryLimit(unsigned long long limit);
+
     QPDF_DLL
     void write(unsigned char const* data, size_t len) override;
     QPDF_DLL
@@ -87,6 +92,7 @@ class QPDF_DLL_CLASS Pl_Flate: public Pipeline
         action_e action;
         bool initialized;
         void* zdata;
+        unsigned long long written{0};
         std::function<void(char const*, int)> callback;
     };
 
