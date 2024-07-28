@@ -127,6 +127,7 @@ set(CORPUS_OTHER
   69977a.fuzz
   69977b.fuzz
   69977c.fuzz
+  69977d.fuzz
   70055.fuzz
   70245.fuzz
   70306.fuzz
