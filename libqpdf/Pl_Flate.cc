@@ -7,6 +7,11 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QUtil.hh>
 
+namespace
+{
+    unsigned long long memory_limit{0};
+} // namespace
+
 int Pl_Flate::compression_level = Z_DEFAULT_COMPRESSION;
 
 Pl_Flate::Members::Members(size_t out_bufsize, action_e action) :
@@ -61,6 +66,12 @@ Pl_Flate::Pl_Flate(
 Pl_Flate::~Pl_Flate() // NOLINT (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
+}
+
+void
+Pl_Flate::setMemoryLimit(unsigned long long limit)
+{
+    memory_limit = limit;
 }
 
 void
@@ -170,6 +181,12 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
                 }
                 uLong ready = QIntC::to_ulong(m->out_bufsize - zstream.avail_out);
                 if (ready > 0) {
+                    if (memory_limit) {
+                        m->written += ready;
+                        if (m->written > memory_limit) {
+                            throw std::runtime_error("PL_Flate memory limit exceeded");
+                        }
+                    }
                     this->getNext()->write(m->outbuf.get(), ready);
                     zstream.next_out = m->outbuf.get();
                     zstream.avail_out = QIntC::to_uint(m->out_bufsize);

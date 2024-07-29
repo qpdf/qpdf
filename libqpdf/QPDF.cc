@@ -572,18 +572,13 @@ QPDF::reconstruct_xref(QPDFExc& e)
     m->file->seek(0, SEEK_END);
     qpdf_offset_t eof = m->file->tell();
     m->file->seek(0, SEEK_SET);
-    qpdf_offset_t line_start = 0;
-    // Don't allow very long tokens here during recovery.
-    static size_t const MAX_LEN = 100;
+    // Don't allow very long tokens here during recovery. All the interesting tokens are covered.
+    static size_t const MAX_LEN = 10;
     while (m->file->tell() < eof) {
-        m->file->findAndSkipNextEOL();
-        qpdf_offset_t next_line_start = m->file->tell();
-        m->file->seek(line_start, SEEK_SET);
         QPDFTokenizer::Token t1 = readToken(m->file, MAX_LEN);
         qpdf_offset_t token_start = m->file->tell() - toO(t1.getValue().length());
-        if (token_start >= next_line_start) {
-            // don't process yet -- wait until we get to the line containing this token
-        } else if (t1.isInteger()) {
+        if (t1.isInteger()) {
+            auto pos = m->file->tell();
             QPDFTokenizer::Token t2 = readToken(m->file, MAX_LEN);
             if ((t2.isInteger()) && (readToken(m->file, MAX_LEN).isWord("obj"))) {
                 int obj = QUtil::string_to_int(t1.getValue().c_str());
@@ -595,17 +590,19 @@ QPDF::reconstruct_xref(QPDFExc& e)
                         "", 0, "ignoring object with impossibly large id " + std::to_string(obj)));
                 }
             }
+            m->file->seek(pos, SEEK_SET);
         } else if (!m->trailer.isInitialized() && t1.isWord("trailer")) {
+            auto pos = m->file->tell();
             QPDFObjectHandle t = readTrailer();
             if (!t.isDictionary()) {
                 // Oh well.  It was worth a try.
             } else {
                 setTrailer(t);
             }
+            m->file->seek(pos, SEEK_SET);
         }
         check_warnings();
-        m->file->seek(next_line_start, SEEK_SET);
-        line_start = next_line_start;
+        m->file->findAndSkipNextEOL();
     }
     m->deleted_objects.clear();
 
