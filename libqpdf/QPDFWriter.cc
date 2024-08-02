@@ -1236,8 +1236,8 @@ QPDFWriter::writeTrailer(
 bool
 QPDFWriter::willFilterStream(
     QPDFObjectHandle stream,
-    bool& compress_stream,
-    bool& is_metadata,
+    bool& compress_stream, // out only
+    bool& is_metadata, // out only
     std::shared_ptr<Buffer>* stream_data)
 {
     compress_stream = false;
@@ -1299,9 +1299,10 @@ QPDFWriter::willFilterStream(
             throw std::runtime_error(
                 "error while getting stream data for " + stream.unparse() + ": " + e.what());
         }
-        if (filter && (!filtered)) {
+        if (filter && !filtered) {
             // Try again
             filter = false;
+            stream.setFilterOnWrite(false);
         } else {
             break;
         }
