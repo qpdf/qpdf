@@ -62,6 +62,7 @@ class QPDF_DLL_CLASS Pl_RunLength: public Pipeline
         state_e state;
         unsigned char buf[128];
         unsigned int length;
+        std::string out;
     };
 
     std::shared_ptr<Members> m;

@@ -66,8 +66,9 @@ Pl_RunLength::encode(unsigned char const* data, size_t len)
 void
 Pl_RunLength::decode(unsigned char const* data, size_t len)
 {
+    m->out.reserve(len);
     for (size_t i = 0; i < len; ++i) {
-        unsigned char ch = data[i];
+        unsigned char const& ch = data[i];
         switch (m->state) {
         case st_top:
             if (ch < 128) {
@@ -85,16 +86,14 @@ Pl_RunLength::decode(unsigned char const* data, size_t len)
             break;
 
         case st_copying:
-            this->getNext()->write(&ch, 1);
+            m->out.append(1, static_cast<char>(ch));
             if (--m->length == 0) {
                 m->state = st_top;
             }
             break;
 
         case st_run:
-            for (unsigned int j = 0; j < m->length; ++j) {
-                this->getNext()->write(&ch, 1);
-            }
+            m->out.append(m->length, static_cast<char>(ch));
             m->state = st_top;
             break;
         }
@@ -137,10 +136,13 @@ Pl_RunLength::finish()
     // When decoding, we might have read a length byte not followed by data, which means the stream
     // was terminated early, but we will just ignore this case since this is the only sensible thing
     // to do.
+    auto next = getNext();
     if (m->action == a_encode) {
         flush_encode();
         unsigned char ch = 128;
-        this->getNext()->write(&ch, 1);
+        next->write(&ch, 1);
+    } else {
+        next->writeString(m->out);
     }
-    this->getNext()->finish();
+    next->finish();
 }
