@@ -180,11 +180,11 @@ FuzzHelper::doChecks()
     // fuzzing is due to corrupt JPEG data which sometimes cannot be detected before
     // jpeg_start_decompress is called. During normal use of qpdf very large JPEGs can occasionally
     // occur legitimately and therefore must be allowed during normal operations.
-    Pl_DCT::setMemoryLimit(1'000'000'000);
+    Pl_DCT::setMemoryLimit(100'000'000);
 
     Pl_PNGFilter::setMemoryLimit(1'000'000);
     Pl_TIFFPredictor::setMemoryLimit(1'000'000);
-    Pl_Flate::setMemoryLimit(10'000'000);
+    Pl_Flate::setMemoryLimit(1'000'000);
 
     // Do not decompress corrupt data. This may cause extended runtime within jpeglib without
     // exercising additional code paths in qpdf, and potentially causing counterproductive timeouts.
