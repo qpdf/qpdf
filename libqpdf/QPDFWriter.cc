@@ -1236,8 +1236,8 @@ QPDFWriter::writeTrailer(
 bool
 QPDFWriter::willFilterStream(
     QPDFObjectHandle stream,
-    bool& compress_stream,
-    bool& is_metadata,
+    bool& compress_stream, // out only
+    bool& is_metadata, // out only
     std::shared_ptr<Buffer>* stream_data)
 {
     compress_stream = false;
@@ -1299,9 +1299,10 @@ QPDFWriter::willFilterStream(
             throw std::runtime_error(
                 "error while getting stream data for " + stream.unparse() + ": " + e.what());
         }
-        if (filter && (!filtered)) {
+        if (filter && !filtered) {
             // Try again
             filter = false;
+            stream.setFilterOnWrite(false);
         } else {
             break;
         }
@@ -2543,14 +2544,20 @@ QPDFWriter::writeLinearized()
 {
     // Optimize file and enqueue objects in order
 
-    auto skip_stream_parameters = [this](QPDFObjectHandle& stream) {
-        bool compress_stream;
-        bool is_metadata;
-        if (willFilterStream(stream, compress_stream, is_metadata, nullptr)) {
-            return 2;
-        } else {
-            return 1;
+    std::map<int, int> stream_cache;
+
+    auto skip_stream_parameters = [this, &stream_cache](QPDFObjectHandle& stream) {
+        auto& result = stream_cache[stream.getObjectID()];
+        if (result == 0) {
+            bool compress_stream;
+            bool is_metadata;
+            if (willFilterStream(stream, compress_stream, is_metadata, nullptr)) {
+                result = 2;
+            } else {
+                result = 1;
+            }
         }
+        return result;
     };
 
     QPDF::Writer::optimize(m->pdf, m->obj, skip_stream_parameters);
