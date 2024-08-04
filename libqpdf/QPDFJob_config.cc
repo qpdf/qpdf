@@ -15,8 +15,8 @@ QPDFJob::Config::checkConfiguration()
 QPDFJob::Config*
 QPDFJob::Config::inputFile(std::string const& filename)
 {
-    if (o.m->infilename == nullptr) {
-        o.m->infilename = QUtil::make_shared_cstr(filename);
+    if (o.m->infilename.empty() && !o.m->empty_input) {
+        o.m->infilename = filename;
     } else {
         usage("input file has already been given");
     }
@@ -26,13 +26,13 @@ QPDFJob::Config::inputFile(std::string const& filename)
 QPDFJob::Config*
 QPDFJob::Config::emptyInput()
 {
-    if (o.m->infilename == nullptr) {
+    if (o.m->infilename.empty() && !o.m->empty_input) {
         // Various places in QPDFJob.cc know that the empty string for infile means empty. We set it
         // to something other than a null pointer as an indication that some input source has been
         // specified. This approach means that passing "" as the argument to inputFile in job JSON,
         // or equivalently using "" as a positional command-line argument would be the same as
         // --empty. This probably isn't worth blocking or coding around.
-        o.m->infilename = QUtil::make_shared_cstr("");
+        o.m->empty_input = true;
     } else {
         usage("empty input can't be used since input file has already been given");
     }
@@ -42,8 +42,8 @@ QPDFJob::Config::emptyInput()
 QPDFJob::Config*
 QPDFJob::Config::outputFile(std::string const& filename)
 {
-    if ((o.m->outfilename == nullptr) && (!o.m->replace_input)) {
-        o.m->outfilename = QUtil::make_shared_cstr(filename);
+    if (o.m->outfilename.empty() && !o.m->replace_input) {
+        o.m->outfilename = filename;
     } else {
         usage("output file has already been given");
     }
@@ -53,7 +53,7 @@ QPDFJob::Config::outputFile(std::string const& filename)
 QPDFJob::Config*
 QPDFJob::Config::replaceInput()
 {
-    if ((o.m->outfilename == nullptr) && (!o.m->replace_input)) {
+    if (o.m->outfilename.empty() && !o.m->replace_input) {
         o.m->replace_input = true;
     } else {
         usage("replace-input can't be used since output file has already been given");
@@ -142,7 +142,7 @@ QPDFJob::Config::compressionLevel(std::string const& parameter)
 QPDFJob::Config*
 QPDFJob::Config::copyEncryption(std::string const& parameter)
 {
-    o.m->encryption_file = parameter;
+    o.m->file_store.encryption_file = parameter;
     o.m->copy_encryption = true;
     o.m->encrypt = false;
     o.m->decrypt = false;
@@ -168,7 +168,7 @@ QPDFJob::Config::deterministicId()
 QPDFJob::Config*
 QPDFJob::Config::encryptionFilePassword(std::string const& parameter)
 {
-    o.m->encryption_file_password = QUtil::make_shared_cstr(parameter);
+    o.m->file_store.encryption_file_password = parameter;
     return this;
 }
 
@@ -341,15 +341,15 @@ QPDFJob::Config::testJsonSchema()
 QPDFJob::Config*
 QPDFJob::Config::keepFilesOpen(std::string const& parameter)
 {
-    o.m->keep_files_open_set = true;
-    o.m->keep_files_open = (parameter == "y");
+    o.m->file_store.keep_files_open_set = true;
+    o.m->file_store.keep_files_open = (parameter == "y");
     return this;
 }
 
 QPDFJob::Config*
 QPDFJob::Config::keepFilesOpenThreshold(std::string const& parameter)
 {
-    o.m->keep_files_open_threshold = QUtil::string_to_uint(parameter.c_str());
+    o.m->file_store.keep_files_open_threshold = QUtil::string_to_uint(parameter.c_str());
     return this;
 }
 
@@ -449,7 +449,7 @@ QPDFJob::Config::optimizeImages()
 QPDFJob::Config*
 QPDFJob::Config::password(std::string const& parameter)
 {
-    o.m->password = QUtil::make_shared_cstr(parameter);
+    o.m->password = parameter;
     return this;
 }
 
@@ -668,8 +668,8 @@ QPDFJob::Config::passwordFile(std::string const& parameter)
         QTC::TC("qpdf", "QPDFJob_config password file");
         lines = QUtil::read_lines_from_file(parameter.c_str());
     }
-    if (lines.size() >= 1) {
-        o.m->password = QUtil::make_shared_cstr(lines.front());
+    if (!lines.empty()) {
+        o.m->password = lines.front();
 
         if (lines.size() > 1) {
             *QPDFLogger::defaultLogger()->getError()
@@ -964,14 +964,14 @@ QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::pageSpec(
     std::string const& filename, std::string const& range, char const* password)
 {
-    this->config->o.m->page_specs.emplace_back(filename, password, range);
+    this->config->o.new_section(filename, password, range);
     return this;
 }
 
 QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::file(std::string const& arg)
 {
-    this->config->o.m->page_specs.emplace_back(arg, nullptr, "");
+    this->config->o.new_section(arg, nullptr, "");
     return this;
 }
 
@@ -999,11 +999,11 @@ QPDFJob::PagesConfig::password(std::string const& arg)
         usage("in --pages, --password must follow a file name");
     }
     auto& last = config->o.m->page_specs.back();
-    if (last.password) {
+    if (!last.password.empty()) {
         QTC::TC("qpdf", "QPDFJob duplicated pages password");
         usage("--password already specified for this file");
     }
-    last.password = QUtil::make_shared_cstr(arg);
+    last.password = arg;
     return this;
 }
 
