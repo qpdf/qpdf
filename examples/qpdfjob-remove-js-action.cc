@@ -1,0 +1,47 @@
+// This is an example how to use QPDFJob for removing all Javascript and Action in a PDF file
+
+#include <qpdf/QPDFJob.hh>
+#include <qpdf/QPDFUsage.hh>
+#include <qpdf/QUtil.hh>
+
+#include <cstdio>
+#include <cstdlib>
+#include <iostream>
+
+int
+main(int argc, char* argv[])
+{
+    if (argc != 3) {
+        std::cerr << "Usage: " << argv[0] << " <input file> <output file>\n";
+        return 1;
+    }
+
+    const char* inputFilePath = argv[1];
+    const char* outputFilePath = argv[2];
+
+    try {
+        QPDFJob j;
+        j.config()->inputFile(inputFilePath)->outputFile(outputFilePath)->checkConfiguration();
+        auto qpdf_sp = j.createQPDF();
+        auto& pdf = *qpdf_sp;
+
+        auto names = pdf.getRoot().getKey("/Names");
+        if (names.isDictionary()) {
+            names.removeKey("/JavaScript");
+        }
+
+        std::string name;
+        for (auto obj: pdf.getAllObjects()) {
+            if (obj.isDictionaryOfType("/Action") && obj.getKey("/S").getValueAsName(name) &&
+                name == "/JavaScript") {
+                obj.replaceKey("/JS", QPDFObjectHandle::newString(""));
+            }
+        }
+        j.writeQPDF(pdf);
+    } catch (std::exception& e) {
+        std::cerr << "ERROR: " << e.what() << std::endl;
+        exit(2);
+    }
+
+    return 0;
+}
