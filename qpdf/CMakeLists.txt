@@ -28,6 +28,7 @@ foreach(PROG ${MAIN_C_PROGRAMS})
   target_link_libraries(${PROG} libqpdf)
   set_property(TARGET ${PROG} PROPERTY LINKER_LANGUAGE CXX)
 endforeach()
+set_target_properties(${MAIN_CXX_PROGRAMS} ${MAIN_C_PROGRAMS} PROPERTIES INSTALL_RPATH "${Base_rpath}")
 target_include_directories(sizes PRIVATE ${JPEG_INCLUDE})
 
 set(needs_private_headers
