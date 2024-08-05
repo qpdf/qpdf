@@ -1,3 +1,8 @@
+2024-08-06  M Holger  <m.holger@qpdf.org>
+
+	* Bug fix: when writing real numbers as JSON ensure that they don't
+	have a trailing decimal point. Fixes #1261.
+
 2024-07-14  M Holger  <m.holger@qpdf.org>
 
 	* Bug fix: handle named destinations where the entry is a
