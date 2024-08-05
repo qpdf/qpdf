@@ -1,5 +1,6 @@
 #include <qpdf/assert_test.h>
 
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <functional>
