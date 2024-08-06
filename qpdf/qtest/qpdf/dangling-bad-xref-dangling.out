@@ -1,7 +1,7 @@
 WARNING: dangling-bad-xref.pdf: file is damaged
 WARNING: dangling-bad-xref.pdf (object 7 0, offset 10000): expected n n obj
 WARNING: dangling-bad-xref.pdf: Attempting to reconstruct cross-reference table
-new object: 13 0 R
+new object: 12 0 R
 all objects
 1 0 R
 2 0 R
@@ -10,10 +10,6 @@ all objects
 5 0 R
 6 0 R
 7 0 R
-8 0 R
-9 0 R
-10 0 R
 11 0 R
 12 0 R
-13 0 R
 test 53 done

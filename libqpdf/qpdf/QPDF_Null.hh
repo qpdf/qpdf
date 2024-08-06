@@ -7,7 +7,7 @@ class QPDF_Null: public QPDFValue
 {
   public:
     ~QPDF_Null() override = default;
-    static std::shared_ptr<QPDFObject> create();
+    static std::shared_ptr<QPDFObject> create(QPDF* qpdf = nullptr, QPDFObjGen og = QPDFObjGen());
     static std::shared_ptr<QPDFObject> create(
         std::shared_ptr<QPDFObject> parent,
         std::string_view const& static_descr,
@@ -21,7 +21,7 @@ class QPDF_Null: public QPDFValue
     void writeJSON(int json_version, JSON::Writer& p) override;
 
   private:
-    QPDF_Null();
+    QPDF_Null(QPDF* qpdf = nullptr, QPDFObjGen og = QPDFObjGen());
 };
 
 #endif // QPDF_NULL_HH

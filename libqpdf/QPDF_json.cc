@@ -240,11 +240,6 @@ class QPDF::JSONReactor: public JSON::Reactor
         descr(std::make_shared<QPDFValue::Description>(
             QPDFValue::JSON_Descr(std::make_shared<std::string>(is->getName()), "")))
     {
-        for (auto& oc: pdf.m->obj_cache) {
-            if (oc.second.object->getTypeCode() == ::ot_reserved) {
-                reserved.insert(oc.first);
-            }
-        }
     }
     ~JSONReactor() override = default;
     void dictionaryStart() override;
@@ -272,10 +267,10 @@ class QPDF::JSONReactor: public JSON::Reactor
     struct StackFrame
     {
         StackFrame(state_e state) :
-            state(state){};
+            state(state) {};
         StackFrame(state_e state, QPDFObjectHandle&& object) :
             state(state),
-            object(object){};
+            object(object) {};
         state_e state;
         QPDFObjectHandle object;
     };
@@ -305,7 +300,6 @@ class QPDF::JSONReactor: public JSON::Reactor
     bool saw_data{false};
     bool saw_datafile{false};
     bool this_stream_needs_data{false};
-    std::set<QPDFObjGen> reserved;
     std::vector<StackFrame> stack;
     QPDFObjectHandle next_obj;
     state_e next_state{st_top};
@@ -414,16 +408,6 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
                 } else {
                     QTC::TC("qpdf", "QPDF_json no stream data in update mode");
                 }
-            }
-        }
-    } else if (from_state == st_qpdf) {
-        // Handle dangling indirect object references which the PDF spec says to treat as nulls.
-        // It's tempting to make this an error, but that would be wrong since valid input files may
-        // have these.
-        for (auto& oc: pdf.m->obj_cache) {
-            if (oc.second.object->getTypeCode() == ::ot_reserved && reserved.count(oc.first) == 0) {
-                QTC::TC("qpdf", "QPDF_json non-trivial null reserved");
-                pdf.updateCache(oc.first, QPDF_Null::create(), -1, -1);
             }
         }
     }
@@ -565,7 +549,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
         } else if (is_obj_key(key, obj, gen)) {
             this->cur_object = key;
             if (setNextStateIfDictionary(key, value, st_object_top)) {
-                next_obj = pdf.reserveObjectIfNotExists(QPDFObjGen(obj, gen));
+                next_obj = pdf.getObjectForJSON(obj, gen);
             }
         } else {
             QTC::TC("qpdf", "QPDF_json bad object key");
@@ -767,7 +751,7 @@ QPDF::JSONReactor::makeObject(JSON const& value)
         int gen = 0;
         std::string str;
         if (is_indirect_object(str_v, obj, gen)) {
-            result = pdf.reserveObjectIfNotExists(QPDFObjGen(obj, gen));
+            result = pdf.getObjectForJSON(obj, gen);
         } else if (is_unicode_string(str_v, str)) {
             result = QPDFObjectHandle::newUnicodeString(str);
         } else if (is_binary_string(str_v, str)) {

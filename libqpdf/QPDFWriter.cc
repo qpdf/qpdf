@@ -1237,7 +1237,7 @@ bool
 QPDFWriter::willFilterStream(
     QPDFObjectHandle stream,
     bool& compress_stream, // out only
-    bool& is_metadata, // out only
+    bool& is_metadata,     // out only
     std::shared_ptr<Buffer>* stream_data)
 {
     compress_stream = false;

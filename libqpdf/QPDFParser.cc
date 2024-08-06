@@ -166,10 +166,7 @@ QPDFParser::parseRemainder(bool content_stream)
                 auto id = QIntC::to_int(int_buffer[(int_count - 1) % 2]);
                 auto gen = QIntC::to_int(int_buffer[(int_count) % 2]);
                 if (!(id < 1 || gen < 0 || gen >= 65535)) {
-                    // This action has the desirable side effect of causing dangling references
-                    // (references to indirect objects that don't appear in the PDF) in any parsed
-                    // object to appear in the object cache.
-                    add(std::move(context->getObject(id, gen).obj));
+                    add(QPDF::ParseGuard::getObject(context, id, gen, parse_pdf));
                 } else {
                     QTC::TC("qpdf", "QPDFParser invalid objgen");
                     addNull();
