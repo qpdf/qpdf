@@ -52,4 +52,7 @@ QPDF_Real::writeJSON(int json_version, JSON::Writer& p)
     } else {
         p << this->val;
     }
+    if (val.back() == '.') {
+        p << "0";
+    }
 }
