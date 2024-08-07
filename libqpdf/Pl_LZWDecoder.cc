@@ -8,25 +8,20 @@
 
 Pl_LZWDecoder::Pl_LZWDecoder(char const* identifier, Pipeline* next, bool early_code_change) :
     Pipeline(identifier, next),
-    code_size(9),
-    next(0),
-    byte_pos(0),
-    bit_pos(0),
-    bits_available(0),
-    code_change_delta(early_code_change),
-    eod(false),
-    last_code(256)
+    code_change_delta(early_code_change)
 {
-    memset(buf, 0, 3);
+    if (!next) {
+        throw std::logic_error("Attempt to create Pl_LZWDecoder with nullptr as next");
+    }
 }
 
 void
 Pl_LZWDecoder::write(unsigned char const* bytes, size_t len)
 {
     for (size_t i = 0; i < len; ++i) {
-        this->buf[next++] = bytes[i];
-        if (this->next == 3) {
-            this->next = 0;
+        buf[next_char_++] = bytes[i];
+        if (next_char_ == 3) {
+            next_char_ = 0;
         }
         this->bits_available += 8;
         if (this->bits_available >= this->code_size) {
@@ -38,7 +33,7 @@ Pl_LZWDecoder::write(unsigned char const* bytes, size_t len)
 void
 Pl_LZWDecoder::finish()
 {
-    getNext()->finish();
+    next()->finish();
 }
 
 void
@@ -101,7 +96,7 @@ Pl_LZWDecoder::getFirstChar(unsigned int code)
 }
 
 void
-Pl_LZWDecoder::addToTable(unsigned char next)
+Pl_LZWDecoder::addToTable(unsigned char c)
 {
     unsigned int last_size = 0;
     unsigned char const* last_data = nullptr;
@@ -128,7 +123,7 @@ Pl_LZWDecoder::addToTable(unsigned char next)
     Buffer entry(1 + last_size);
     unsigned char* new_data = entry.getBuffer();
     memcpy(new_data, last_data, last_size);
-    new_data[last_size] = next;
+    new_data[last_size] = c;
     this->table.push_back(std::move(entry));
 }
 
@@ -151,11 +146,11 @@ Pl_LZWDecoder::handleCode(unsigned int code)
         if (this->last_code != 256) {
             // Add to the table from last time.  New table entry would be what we read last plus the
             // first character of what we're reading now.
-            unsigned char next = '\0';
+            unsigned char next_c = '\0';
             unsigned int table_size = QIntC::to_uint(table.size());
             if (code < 256) {
-                // just read < 256; last time's next was code
-                next = static_cast<unsigned char>(code);
+                // just read < 256; last time's next_c was code
+                next_c = static_cast<unsigned char>(code);
             } else if (code > 257) {
                 size_t idx = code - 258;
                 if (idx > table_size) {
@@ -164,16 +159,16 @@ Pl_LZWDecoder::handleCode(unsigned int code)
                     // The encoder would have just created this entry, so the first character of
                     // this entry would have been the same as the first character of the last entry.
                     QTC::TC("libtests", "Pl_LZWDecoder last was table size");
-                    next = getFirstChar(this->last_code);
+                    next_c = getFirstChar(this->last_code);
                 } else {
-                    next = getFirstChar(code);
+                    next_c = getFirstChar(code);
                 }
             }
             unsigned int new_idx = 258 + table_size;
             if (new_idx == 4096) {
                 throw std::runtime_error("LZWDecoder: table full");
             }
-            addToTable(next);
+            addToTable(next_c);
             unsigned int change_idx = new_idx + code_change_delta;
             if ((change_idx == 511) || (change_idx == 1023) || (change_idx == 2047)) {
                 ++this->code_size;
@@ -182,14 +177,14 @@ Pl_LZWDecoder::handleCode(unsigned int code)
 
         if (code < 256) {
             auto ch = static_cast<unsigned char>(code);
-            getNext()->write(&ch, 1);
+            next()->write(&ch, 1);
         } else {
             unsigned int idx = code - 258;
             if (idx >= table.size()) {
                 throw std::runtime_error("Pl_LZWDecoder::handleCode: table overflow");
             }
             Buffer& b = table.at(idx);
-            getNext()->write(b.getBuffer(), b.getSize());
+            next()->write(b.getBuffer(), b.getSize());
         }
     }
 

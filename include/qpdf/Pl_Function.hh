@@ -19,6 +19,10 @@
 #ifndef PL_FUNCTION_HH
 #define PL_FUNCTION_HH
 
+#include <qpdf/Pipeline.hh>
+
+#include <functional>
+
 // This pipeline calls an arbitrary function with whatever data is passed to it. This pipeline can
 // be reused.
 //
@@ -29,11 +33,6 @@
 //
 // It is okay to keep calling write() after a previous write throws an exception as long as the
 // delegated function allows it.
-
-#include <qpdf/Pipeline.hh>
-
-#include <functional>
-
 class QPDF_DLL_CLASS Pl_Function: public Pipeline
 {
   public:

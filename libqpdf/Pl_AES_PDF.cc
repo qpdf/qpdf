@@ -18,14 +18,11 @@ Pl_AES_PDF::Pl_AES_PDF(
     Pipeline(identifier, next),
     crypto(QPDFCryptoProvider::getImpl()),
     encrypt(encrypt),
-    cbc_mode(true),
-    first(true),
-    offset(0),
-    key_bytes(key_bytes),
-    use_zero_iv(false),
-    use_specified_iv(false),
-    disable_padding(false)
+    key_bytes(key_bytes)
 {
+    if (!next) {
+        throw std::logic_error("Attempt to create Pl_AES_PDF with nullptr as next");
+    }
     this->key = std::make_unique<unsigned char[]>(key_bytes);
     std::memcpy(this->key.get(), key, key_bytes);
     std::memset(this->inbuf, 0, this->buf_size);
@@ -120,7 +117,7 @@ Pl_AES_PDF::finish()
         flush(!this->disable_padding);
     }
     this->crypto->rijndael_finalize();
-    getNext()->finish();
+    next()->finish();
 }
 
 void
@@ -157,7 +154,7 @@ Pl_AES_PDF::flush(bool strip_padding)
                 // output stream.
                 initializeVector();
                 if (!(this->use_zero_iv || this->use_specified_iv)) {
-                    getNext()->write(this->cbc_block, this->buf_size);
+                    next()->write(this->cbc_block, this->buf_size);
                 }
             } else if (this->use_zero_iv || this->use_specified_iv) {
                 // Initialize vector with zeroes; zero vector was not written to the beginning of
@@ -196,5 +193,5 @@ Pl_AES_PDF::flush(bool strip_padding)
         }
     }
     this->offset = 0;
-    getNext()->write(this->outbuf, bytes);
+    next()->write(this->outbuf, bytes);
 }

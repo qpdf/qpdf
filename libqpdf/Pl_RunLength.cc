@@ -4,9 +4,7 @@
 #include <qpdf/QUtil.hh>
 
 Pl_RunLength::Members::Members(action_e action) :
-    action(action),
-    state(st_top),
-    length(0)
+    action(action)
 {
 }
 
@@ -14,6 +12,9 @@ Pl_RunLength::Pl_RunLength(char const* identifier, Pipeline* next, action_e acti
     Pipeline(identifier, next),
     m(new Members(action))
 {
+    if (!next) {
+        throw std::logic_error("Attempt to create Pl_RunLength with nullptr as next");
+    }
 }
 
 Pl_RunLength::~Pl_RunLength() // NOLINT (modernize-use-equals-default)
@@ -119,12 +120,12 @@ Pl_RunLength::flush_encode()
             throw std::logic_error("Pl_RunLength: invalid length in flush_encode for run");
         }
         auto ch = static_cast<unsigned char>(257 - m->length);
-        this->getNext()->write(&ch, 1);
-        this->getNext()->write(&m->buf[0], 1);
+        next()->write(&ch, 1);
+        next()->write(&m->buf[0], 1);
     } else if (m->length > 0) {
         auto ch = static_cast<unsigned char>(m->length - 1);
-        this->getNext()->write(&ch, 1);
-        this->getNext()->write(m->buf, m->length);
+        next()->write(&ch, 1);
+        next()->write(m->buf, m->length);
     }
     m->state = st_top;
     m->length = 0;
@@ -136,13 +137,12 @@ Pl_RunLength::finish()
     // When decoding, we might have read a length byte not followed by data, which means the stream
     // was terminated early, but we will just ignore this case since this is the only sensible thing
     // to do.
-    auto next = getNext();
     if (m->action == a_encode) {
         flush_encode();
         unsigned char ch = 128;
-        next->write(&ch, 1);
+        next()->write(&ch, 1);
     } else {
-        next->writeString(m->out);
+        next()->writeString(m->out);
     }
-    next->finish();
+    next()->finish();
 }

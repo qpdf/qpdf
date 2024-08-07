@@ -23,9 +23,11 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(
     action(action),
     columns(columns),
     samples_per_pixel(samples_per_pixel),
-    bits_per_sample(bits_per_sample),
-    p_next(getNext())
+    bits_per_sample(bits_per_sample)
 {
+    if (!next) {
+        throw std::logic_error("Attempt to create Pl_TIFFPredictor with nullptr as next");
+    }
     if (samples_per_pixel < 1) {
         throw std::runtime_error("TIFFPredictor created with invalid samples_per_pixel");
     }
@@ -74,7 +76,7 @@ Pl_TIFFPredictor::processRow()
     QTC::TC("libtests", "Pl_TIFFPredictor processRow", (action == a_decode ? 0 : 1));
     previous.assign(samples_per_pixel, 0);
     if (bits_per_sample != 8) {
-        BitWriter bw(p_next);
+        BitWriter bw(next());
         BitStream in(cur_row.data(), cur_row.size());
         for (unsigned int col = 0; col < this->columns; ++col) {
             for (auto& prev: previous) {
@@ -93,13 +95,14 @@ Pl_TIFFPredictor::processRow()
         bw.flush();
     } else {
         out.clear();
-        auto next = cur_row.begin();
+        auto next_it = cur_row.begin();
         auto cr_end = cur_row.end();
         auto pr_end = previous.end();
 
-        while (next != cr_end) {
-            for (auto prev = previous.begin(); prev != pr_end && next != cr_end; ++prev, ++next) {
-                long long sample = *next;
+        while (next_it != cr_end) {
+            for (auto prev = previous.begin(); prev != pr_end && next_it != cr_end;
+                 ++prev, ++next_it) {
+                long long sample = *next_it;
                 long long new_sample = sample;
                 if (action == a_encode) {
                     new_sample -= *prev;
@@ -111,7 +114,7 @@ Pl_TIFFPredictor::processRow()
                 out.push_back(static_cast<unsigned char>(255U & new_sample));
             }
         }
-        p_next->write(out.data(), out.size());
+        next()->write(out.data(), out.size());
     }
 }
 
@@ -124,5 +127,5 @@ Pl_TIFFPredictor::finish()
         processRow();
     }
     cur_row.clear();
-    p_next->finish();
+    next()->finish();
 }

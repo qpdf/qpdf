@@ -5,11 +5,11 @@
 #include <stdexcept>
 
 Pl_ASCII85Decoder::Pl_ASCII85Decoder(char const* identifier, Pipeline* next) :
-    Pipeline(identifier, next),
-    pos(0),
-    eod(0)
+    Pipeline(identifier, next)
 {
-    memset(this->inbuf, 117, 5);
+    if (!next) {
+        throw std::logic_error("Attempt to create Pl_ASCII85Decoder with nullptr as next");
+    }
 }
 
 void
@@ -52,7 +52,7 @@ Pl_ASCII85Decoder::write(unsigned char const* buf, size_t len)
                     QTC::TC("libtests", "Pl_ASCII85Decoder read z");
                     unsigned char zeroes[4];
                     memset(zeroes, '\0', 4);
-                    getNext()->write(zeroes, 4);
+                    next()->write(zeroes, 4);
                 }
                 break;
 
@@ -97,12 +97,12 @@ Pl_ASCII85Decoder::flush()
     this->pos = 0;
     memset(this->inbuf, 117, 5);
 
-    getNext()->write(outbuf, t);
+    next()->write(outbuf, t);
 }
 
 void
 Pl_ASCII85Decoder::finish()
 {
     flush();
-    getNext()->finish();
+    next()->finish();
 }

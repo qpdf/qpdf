@@ -78,6 +78,9 @@ Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
     m(new Members())
 {
+    if (!next) {
+        throw std::logic_error("Attempt to create Pl_DCT with nullptr as next");
+    }
 }
 
 void
@@ -133,7 +136,7 @@ Pl_DCT::finish()
         // Special case: empty data will never succeed and probably means we're calling finish a
         // second time from an exception handler.
         delete b;
-        this->getNext()->finish();
+        next()->finish();
         return;
     }
 
@@ -300,7 +303,7 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
     static int const BUF_SIZE = 65536;
     auto outbuffer_ph = std::make_unique<unsigned char[]>(BUF_SIZE);
     unsigned char* outbuffer = outbuffer_ph.get();
-    jpeg_pipeline_dest(cinfo, outbuffer, BUF_SIZE, this->getNext());
+    jpeg_pipeline_dest(cinfo, outbuffer, BUF_SIZE, next());
 
     cinfo->image_width = m->image_width;
     cinfo->image_height = m->image_height;
@@ -326,7 +329,7 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
         (void)jpeg_write_scanlines(cinfo, row_pointer, 1);
     }
     jpeg_finish_compress(cinfo);
-    this->getNext()->finish();
+    next()->finish();
 }
 
 void
@@ -370,8 +373,8 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
     (void)jpeg_start_decompress(cinfo);
     while (cinfo->output_scanline < cinfo->output_height) {
         (void)jpeg_read_scanlines(cinfo, buffer, 1);
-        getNext()->write(buffer[0], width * sizeof(buffer[0][0]));
+        next()->write(buffer[0], width * sizeof(buffer[0][0]));
     }
     (void)jpeg_finish_decompress(cinfo);
-    getNext()->finish();
+    next()->finish();
 }
