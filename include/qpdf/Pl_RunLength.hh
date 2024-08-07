@@ -59,9 +59,9 @@ class QPDF_DLL_CLASS Pl_RunLength: public Pipeline
         Members(Members const&) = delete;
 
         action_e action;
-        state_e state;
+        state_e state{st_top};
         unsigned char buf[128];
-        unsigned int length;
+        unsigned int length{0};
         std::string out;
     };
 

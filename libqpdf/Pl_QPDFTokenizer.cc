@@ -5,7 +5,6 @@
 #include <stdexcept>
 
 Pl_QPDFTokenizer::Members::Members() :
-    filter(nullptr),
     buf("tokenizer buffer")
 {
 }
@@ -56,8 +55,7 @@ Pl_QPDFTokenizer::finish()
     }
     m->filter->handleEOF();
     QPDFObjectHandle::TokenFilter::PipelineAccessor::setPipeline(m->filter, nullptr);
-    Pipeline* next = this->getNext(true);
-    if (next) {
-        next->finish();
+    if (next()) {
+        next()->finish();
     }
 }

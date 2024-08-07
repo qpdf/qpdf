@@ -25,15 +25,15 @@ Pl_String::write(unsigned char const* buf, size_t len)
         return;
     }
     m->s.append(reinterpret_cast<char const*>(buf), len);
-    if (getNext(true)) {
-        getNext()->write(buf, len);
+    if (next()) {
+        next()->write(buf, len);
     }
 }
 
 void
 Pl_String::finish()
 {
-    if (getNext(true)) {
-        getNext()->finish();
+    if (next()) {
+        next()->finish();
     }
 }

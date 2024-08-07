@@ -7,8 +7,7 @@
 
 // This pipeline implements AES-128 and AES-256 with CBC and block padding as specified in the PDF
 // specification.
-
-class Pl_AES_PDF: public Pipeline
+class Pl_AES_PDF final: public Pipeline
 {
   public:
     // key should be a pointer to key_bytes bytes of data
@@ -18,10 +17,10 @@ class Pl_AES_PDF: public Pipeline
         bool encrypt,
         unsigned char const* key,
         size_t key_bytes);
-    ~Pl_AES_PDF() override = default;
+    ~Pl_AES_PDF() final = default;
 
-    void write(unsigned char const* data, size_t len) override;
-    void finish() override;
+    void write(unsigned char const* data, size_t len) final;
+    void finish() final;
 
     // Use zero initialization vector; needed for AESV3
     void useZeroIV();
@@ -45,18 +44,18 @@ class Pl_AES_PDF: public Pipeline
 
     std::shared_ptr<QPDFCryptoImpl> crypto;
     bool encrypt;
-    bool cbc_mode;
-    bool first;
-    size_t offset; // offset into memory buffer
+    bool cbc_mode{true};
+    bool first{true};
+    size_t offset{0}; // offset into memory buffer
     std::unique_ptr<unsigned char[]> key;
-    size_t key_bytes;
+    size_t key_bytes{0};
     unsigned char inbuf[buf_size];
     unsigned char outbuf[buf_size];
     unsigned char cbc_block[buf_size];
     unsigned char specified_iv[buf_size];
-    bool use_zero_iv;
-    bool use_specified_iv;
-    bool disable_padding;
+    bool use_zero_iv{false};
+    bool use_specified_iv{false};
+    bool disable_padding{false};
 };
 
 #endif // PL_AES_PDF_HH

@@ -181,13 +181,13 @@ QPDFObjectHandle::ParserCallbacks::terminateParsing()
 
 namespace
 {
-    class LastChar: public Pipeline
+    class LastChar final: public Pipeline
     {
       public:
-        LastChar(Pipeline* next);
-        ~LastChar() override = default;
-        void write(unsigned char const* data, size_t len) override;
-        void finish() override;
+        LastChar(Pipeline& next);
+        ~LastChar() final = default;
+        void write(unsigned char const* data, size_t len) final;
+        void finish() final;
         unsigned char getLastChar();
 
       private:
@@ -195,8 +195,8 @@ namespace
     };
 } // namespace
 
-LastChar::LastChar(Pipeline* next) :
-    Pipeline("lastchar", next)
+LastChar::LastChar(Pipeline& next) :
+    Pipeline("lastchar", &next)
 {
 }
 
@@ -206,13 +206,13 @@ LastChar::write(unsigned char const* data, size_t len)
     if (len > 0) {
         this->last_char = data[len - 1];
     }
-    getNext()->write(data, len);
+    next()->write(data, len);
 }
 
 void
 LastChar::finish()
 {
-    getNext()->finish();
+    next()->finish();
 }
 
 unsigned char
@@ -2073,7 +2073,7 @@ QPDFObjectHandle::pipeContentStreams(
         if (need_newline) {
             buf.writeCStr("\n");
         }
-        LastChar lc(&buf);
+        LastChar lc(buf);
         if (!stream.pipeStreamData(&lc, 0, qpdf_dl_specialized)) {
             QTC::TC("qpdf", "QPDFObjectHandle errors in parsecontent");
             throw QPDFExc(

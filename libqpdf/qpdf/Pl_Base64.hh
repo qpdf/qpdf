@@ -3,14 +3,14 @@
 
 #include <qpdf/Pipeline.hh>
 
-class Pl_Base64: public Pipeline
+class Pl_Base64 final: public Pipeline
 {
   public:
     enum action_e { a_encode, a_decode };
     Pl_Base64(char const* identifier, Pipeline* next, action_e);
-    ~Pl_Base64() override = default;
-    void write(unsigned char const* buf, size_t len) override;
-    void finish() override;
+    ~Pl_Base64() final = default;
+    void write(unsigned char const* buf, size_t len) final;
+    void finish() final;
 
   private:
     void decode(unsigned char const* buf, size_t len);
@@ -21,10 +21,10 @@ class Pl_Base64: public Pipeline
     void reset();
 
     action_e action;
-    unsigned char buf[4];
-    size_t pos;
-    bool end_of_data;
-    bool finished;
+    unsigned char buf[4]{0, 0, 0, 0};
+    size_t pos{0};
+    bool end_of_data{false};
+    bool finished{false};
 };
 
 #endif // PL_BASE64_HH

@@ -5,7 +5,7 @@
 
 #include <qpdf/RC4.hh>
 
-class Pl_RC4: public Pipeline
+class Pl_RC4 final: public Pipeline
 {
   public:
     static size_t const def_bufsize = 65536;
@@ -17,10 +17,10 @@ class Pl_RC4: public Pipeline
         unsigned char const* key_data,
         int key_len = -1,
         size_t out_bufsize = def_bufsize);
-    ~Pl_RC4() override = default;
+    ~Pl_RC4() final = default;
 
-    void write(unsigned char const* data, size_t len) override;
-    void finish() override;
+    void write(unsigned char const* data, size_t len) final;
+    void finish() final;
 
   private:
     std::shared_ptr<unsigned char> outbuf;

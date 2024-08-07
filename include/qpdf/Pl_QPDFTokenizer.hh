@@ -64,7 +64,7 @@ class QPDF_DLL_CLASS Pl_QPDFTokenizer: public Pipeline
         Members();
         Members(Members const&) = delete;
 
-        QPDFObjectHandle::TokenFilter* filter;
+        QPDFObjectHandle::TokenFilter* filter{nullptr};
         QPDFTokenizer tokenizer;
         Pl_Buffer buf;
     };

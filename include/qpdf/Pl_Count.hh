@@ -57,8 +57,8 @@ class QPDF_DLL_CLASS Pl_Count: public Pipeline
         Members(Members const&) = delete;
 
         // Must be qpdf_offset_t, not size_t, to handle writing more than size_t can handle.
-        qpdf_offset_t count;
-        unsigned char last_char;
+        qpdf_offset_t count{0};
+        unsigned char last_char{'\0'};
     };
 
     std::shared_ptr<Members> m;
