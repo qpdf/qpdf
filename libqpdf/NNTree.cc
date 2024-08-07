@@ -188,7 +188,7 @@ NNTreeIterator::resetLimits(QPDFObjectHandle node, std::list<PathElement>::itera
                 }
             }
         }
-        if (first.isInitialized() && last.isInitialized()) {
+        if (first && last) {
             auto limits = QPDFObjectHandle::newArray();
             limits.appendItem(first);
             limits.appendItem(last);

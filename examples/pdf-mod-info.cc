@@ -131,7 +131,7 @@ main(int argc, char* argv[])
         QPDFObjectHandle fileinfo;
 
         for (auto const& it: Keys) {
-            if (!fileinfo.isInitialized()) {
+            if (!fileinfo) {
                 if (filetrailer.hasKey("/Info")) {
                     QTC::TC("examples", "pdf-mod-info has info");
                     fileinfo = filetrailer.getKey("/Info");
