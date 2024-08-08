@@ -27,7 +27,7 @@ namespace
     class QPDFWordTokenFinder: public InputSource::Finder
     {
       public:
-        QPDFWordTokenFinder(std::shared_ptr<InputSource> is, std::string const& str) :
+        QPDFWordTokenFinder(InputSource& is, std::string const& str) :
             is(is),
             str(str)
         {
@@ -36,7 +36,7 @@ namespace
         bool check() override;
 
       private:
-        std::shared_ptr<InputSource> is;
+        InputSource& is;
         std::string str;
     };
 } // namespace
@@ -48,21 +48,21 @@ QPDFWordTokenFinder::check()
     // delimiter or EOF.
     QPDFTokenizer tokenizer;
     QPDFTokenizer::Token t = tokenizer.readToken(is, "finder", true);
-    qpdf_offset_t pos = is->tell();
+    qpdf_offset_t pos = is.tell();
     if (!(t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, str))) {
         QTC::TC("qpdf", "QPDFTokenizer finder found wrong word");
         return false;
     }
-    qpdf_offset_t token_start = is->getLastOffset();
+    qpdf_offset_t token_start = is.getLastOffset();
     char next;
     bool next_okay = false;
-    if (is->read(&next, 1) == 0) {
+    if (is.read(&next, 1) == 0) {
         QTC::TC("qpdf", "QPDFTokenizer inline image at EOF");
         next_okay = true;
     } else {
         next_okay = is_delimiter(next);
     }
-    is->seek(pos, SEEK_SET);
+    is.seek(pos, SEEK_SET);
     if (!next_okay) {
         return false;
     }
@@ -764,11 +764,17 @@ QPDFTokenizer::presentEOF()
 void
 QPDFTokenizer::expectInlineImage(std::shared_ptr<InputSource> input)
 {
+    expectInlineImage(*input);
+}
+
+void
+QPDFTokenizer::expectInlineImage(InputSource& input)
+{
     if (this->state == st_token_ready) {
         reset();
     } else if (this->state != st_before_token) {
-        throw std::logic_error("QPDFTokenizer::expectInlineImage called"
-                               " when tokenizer is in improper state");
+        throw std::logic_error(
+            "QPDFTokenizer::expectInlineImage called when tokenizer is in improper state");
     }
     findEI(input);
     this->before_token = false;
@@ -777,14 +783,10 @@ QPDFTokenizer::expectInlineImage(std::shared_ptr<InputSource> input)
 }
 
 void
-QPDFTokenizer::findEI(std::shared_ptr<InputSource> input)
+QPDFTokenizer::findEI(InputSource& input)
 {
-    if (!input.get()) {
-        return;
-    }
-
-    qpdf_offset_t last_offset = input->getLastOffset();
-    qpdf_offset_t pos = input->tell();
+    qpdf_offset_t last_offset = input.getLastOffset();
+    qpdf_offset_t pos = input.tell();
 
     // Use QPDFWordTokenFinder to find EI surrounded by delimiters. Then read the next several
     // tokens or up to EOF. If we find any suspicious-looking or tokens, this is probably still part
@@ -797,10 +799,10 @@ QPDFTokenizer::findEI(std::shared_ptr<InputSource> input)
     bool first_try = true;
     while (!okay) {
         QPDFWordTokenFinder f(input, "EI");
-        if (!input->findFirst("EI", input->tell(), 0, f)) {
+        if (!input.findFirst("EI", input.tell(), 0, f)) {
             break;
         }
-        this->inline_image_bytes = QIntC::to_size(input->tell() - pos - 2);
+        inline_image_bytes = QIntC::to_size(input.tell() - pos - 2);
 
         QPDFTokenizer check;
         bool found_bad = false;
@@ -858,8 +860,8 @@ QPDFTokenizer::findEI(std::shared_ptr<InputSource> input)
         QTC::TC("qpdf", "QPDFTokenizer found EI after more than one try");
     }
 
-    input->seek(pos, SEEK_SET);
-    input->setLastOffset(last_offset);
+    input.seek(pos, SEEK_SET);
+    input.setLastOffset(last_offset);
 }
 
 bool
@@ -902,7 +904,7 @@ QPDFTokenizer::readToken(
             throw QPDFExc(
                 qpdf_e_damaged_pdf,
                 input.getName(),
-                context,
+                context.empty() ? "offset " + std::to_string(input.getLastOffset()) : context,
                 input.getLastOffset(),
                 token.getErrorMessage());
         }
