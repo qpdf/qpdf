@@ -21,6 +21,9 @@ Pl_String::~Pl_String() // NOLINT (modernize-use-equals-default)
 void
 Pl_String::write(unsigned char const* buf, size_t len)
 {
+    if (!len) {
+        return;
+    }
     m->s.append(reinterpret_cast<char const*>(buf), len);
     if (getNext(true)) {
         getNext()->write(buf, len);
