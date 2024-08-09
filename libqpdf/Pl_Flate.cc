@@ -204,6 +204,9 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
 void
 Pl_Flate::finish()
 {
+    if (m->written > memory_limit) {
+        return;
+    }
     try {
         if (m->outbuf.get()) {
             if (m->initialized) {
