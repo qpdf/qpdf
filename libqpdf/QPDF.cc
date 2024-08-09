@@ -196,15 +196,16 @@ QPDF::EncryptionParameters::EncryptionParameters() :
 {
 }
 
-QPDF::Members::Members() :
+QPDF::Members::Members(QPDF& qpdf) :
     log(QPDFLogger::defaultLogger()),
     file(new InvalidInputSource()),
-    encp(new EncryptionParameters)
+    encp(new EncryptionParameters),
+    xref_table(qpdf)
 {
 }
 
 QPDF::QPDF() :
-    m(new Members())
+    m(new Members(*this))
 {
     m->tokenizer.allowEOF();
     // Generate a unique ID. It just has to be unique among all QPDF objects allocated throughout
@@ -585,7 +586,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
                 int obj = QUtil::string_to_int(t1.getValue().c_str());
                 int gen = QUtil::string_to_int(t2.getValue().c_str());
                 if (obj <= m->xref_table.max_id) {
-                    insertReconstructedXrefEntry(obj, token_start, gen);
+                    m->xref_table.insert_reconstructed(obj, token_start, gen);
                 } else {
                     warn(damagedPDF(
                         "", 0, "ignoring object with impossibly large id " + std::to_string(obj)));
@@ -981,9 +982,9 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
                     "xref table", "invalid xref entry (obj=" + std::to_string(i) + ")");
             }
             if (type == 'f') {
-                insertFreeXrefEntry(QPDFObjGen(toI(i), f2));
+                m->xref_table.insert_free(QPDFObjGen(toI(i), f2));
             } else {
-                insertXrefEntry(toI(i), 1, f1, f2);
+                m->xref_table.insert(toI(i), 1, f1, f2);
             }
         }
         qpdf_offset_t pos = m->file->tell();
@@ -1251,9 +1252,9 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
                 // Ignore fields[2], which we don't care about in this case. This works around the
                 // issue of some PDF files that put invalid values, like -1, here for deleted
                 // objects.
-                insertFreeXrefEntry(QPDFObjGen(obj, 0));
+                m->xref_table.insert_free(QPDFObjGen(obj, 0));
             } else {
-                insertXrefEntry(obj, toI(fields[0]), fields[1], toI(fields[2]));
+                m->xref_table.insert(obj, toI(fields[0]), fields[1], toI(fields[2]));
             }
             ++obj;
         }
@@ -1276,7 +1277,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 }
 
 void
-QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2)
+QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
 {
     // Populate the xref table in such a way that the first reference to an object that we see,
     // which is the one in the latest xref table in which it appears, is the one that gets stored.
@@ -1285,22 +1286,23 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2)
     // If there is already an entry for this object and generation in the table, it means that a
     // later xref table has registered this object.  Disregard this one.
 
-    if (obj > m->xref_table.max_id) {
+    if (obj > max_id) {
         // ignore impossibly large object ids or object ids > Size.
         return;
     }
 
-    if (m->xref_table.deleted_objects.count(obj)) {
+    if (deleted_objects.count(obj)) {
         QTC::TC("qpdf", "QPDF xref deleted object");
         return;
     }
 
     if (f0 == 2 && static_cast<int>(f1) == obj) {
-        warn(damagedPDF("xref stream", "self-referential object stream " + std::to_string(obj)));
+        qpdf.warn(qpdf.damagedPDF(
+            "xref stream", "self-referential object stream " + std::to_string(obj)));
         return;
     }
 
-    auto [iter, created] = m->xref_table.try_emplace(QPDFObjGen(obj, (f0 == 2 ? 0 : f2)));
+    auto [iter, created] = try_emplace(QPDFObjGen(obj, (f0 == 2 ? 0 : f2)));
     if (!created) {
         QTC::TC("qpdf", "QPDF xref reused object");
         return;
@@ -1318,35 +1320,36 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2)
         break;
 
     default:
-        throw damagedPDF("xref stream", "unknown xref stream entry type " + std::to_string(f0));
+        throw qpdf.damagedPDF(
+            "xref stream", "unknown xref stream entry type " + std::to_string(f0));
         break;
     }
 }
 
 void
-QPDF::insertFreeXrefEntry(QPDFObjGen og)
+QPDF::Xref_table::insert_free(QPDFObjGen og)
 {
-    if (!m->xref_table.count(og)) {
-        m->xref_table.deleted_objects.insert(og.getObj());
+    if (!count(og)) {
+        deleted_objects.insert(og.getObj());
     }
 }
 
 // Replace uncompressed object. This is used in xref recovery mode, which reads the file from
 // beginning to end.
 void
-QPDF::insertReconstructedXrefEntry(int obj, qpdf_offset_t f1, int f2)
+QPDF::Xref_table::insert_reconstructed(int obj, qpdf_offset_t f1, int f2)
 {
-    if (!(obj > 0 && obj <= m->xref_table.max_id && 0 <= f2 && f2 < 65535)) {
+    if (!(obj > 0 && obj <= max_id && 0 <= f2 && f2 < 65535)) {
         QTC::TC("qpdf", "QPDF xref overwrite invalid objgen");
         return;
     }
 
     QPDFObjGen og(obj, f2);
-    if (!m->xref_table.deleted_objects.count(obj)) {
+    if (!deleted_objects.count(obj)) {
         // deleted_objects stores the uncompressed objects removed from the xref table at the start
         // of recovery.
         QTC::TC("qpdf", "QPDF xref overwrite object");
-        m->xref_table[QPDFObjGen(obj, f2)] = QPDFXRefEntry(f1);
+        insert_or_assign(QPDFObjGen(obj, f2), QPDFXRefEntry(f1));
     }
 }
 

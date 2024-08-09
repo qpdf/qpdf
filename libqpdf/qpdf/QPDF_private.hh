@@ -7,6 +7,15 @@
 class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
 {
   public:
+    Xref_table(QPDF& qpdf) :
+        qpdf(qpdf)
+    {
+    }
+
+    void insert_reconstructed(int obj, qpdf_offset_t f1, int f2);
+    void insert(int obj, int f0, qpdf_offset_t f1, int f2);
+    void insert_free(QPDFObjGen);
+
     QPDFObjectHandle trailer;
     bool reconstructed{false};
     // Various tables are indexed by object id, with potential size id + 1
@@ -20,6 +29,9 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     // Linearization data
     bool uncompressed_after_compressed{false};
     qpdf_offset_t first_item_offset{0}; // actual value from file
+
+  private:
+    QPDF& qpdf;
 };
 
 // Writer class is restricted to QPDFWriter so that only it can call certain methods.
@@ -469,7 +481,7 @@ class QPDF::Members
     ~Members() = default;
 
   private:
-    Members();
+    Members(QPDF& qpdf);
     Members(Members const&) = delete;
 
     std::shared_ptr<QPDFLogger> log;
