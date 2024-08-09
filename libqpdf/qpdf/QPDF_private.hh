@@ -16,6 +16,8 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     void insert(int obj, int f0, qpdf_offset_t f1, int f2);
     void insert_free(QPDFObjGen);
 
+    void reconstruct(QPDFExc& e);
+
     QPDFObjectHandle trailer;
     bool reconstructed{false};
     // Various tables are indexed by object id, with potential size id + 1
@@ -31,6 +33,17 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     qpdf_offset_t first_item_offset{0}; // actual value from file
 
   private:
+    QPDFExc
+    damaged_pdf(std::string const& msg)
+    {
+        return qpdf.damagedPDF("", 0, msg);
+    }
+
+    void
+    warn_damaged(std::string const& msg)
+    {
+        qpdf.warn(damaged_pdf(msg));
+    }
     QPDF& qpdf;
 };
 

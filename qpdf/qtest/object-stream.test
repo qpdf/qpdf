@@ -102,11 +102,10 @@ $td->runtest("recover file with xref stream",
              {$td->COMMAND => "qpdf --static-id --compress-streams=n" .
                   " recover-xref-stream.pdf a.pdf"},
              {$td->FILE => "recover-xref-stream.out", $td->EXIT_STATUS => 3},
-             $td->EXPECT_FAILURE);
+             $td->NORMALIZE_NEWLINES);
 $td->runtest("check file",
              {$td->FILE => "a.pdf"},
-             {$td->FILE => "recover-xref-stream-recovered.pdf"},
-             $td->EXPECT_FAILURE);
+             {$td->FILE => "recover-xref-stream-recovered.pdf"});
 
 # Self-referential object stream
 $td->runtest("self-referential object stream",
