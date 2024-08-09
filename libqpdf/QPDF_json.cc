@@ -593,8 +593,8 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             this->saw_value = true;
             // The trailer must be a dictionary, so we can use setNextStateIfDictionary.
             if (setNextStateIfDictionary("trailer.value", value, st_object)) {
-                this->pdf.m->trailer = makeObject(value);
-                setObjectDescription(this->pdf.m->trailer, value);
+                pdf.m->xref_table.trailer = makeObject(value);
+                setObjectDescription(this->pdf.m->xref_table.trailer, value);
             }
         } else if (key == "stream") {
             // Don't need to set saw_stream here since there's already an error.

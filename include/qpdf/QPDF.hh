@@ -733,6 +733,7 @@ class QPDF
     class ParseGuard;
     class Pipe;
     class JobSetter;
+    class Xref_table;
 
     // For testing only -- do not add to DLL
     static bool test_json_validators();

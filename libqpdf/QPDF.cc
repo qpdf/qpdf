@@ -303,7 +303,7 @@ QPDF::registerStreamFilter(
 void
 QPDF::setIgnoreXRefStreams(bool val)
 {
-    m->ignore_xref_streams = val;
+    m->xref_table.ignore_streams = val;
 }
 
 std::shared_ptr<QPDFLogger>
@@ -341,6 +341,7 @@ void
 QPDF::setAttemptRecovery(bool val)
 {
     m->attempt_recovery = val;
+    m->xref_table.attempt_recovery = val;
 }
 
 void
@@ -447,11 +448,11 @@ QPDF::parse(char const* password)
     // 30 characters to leave room for the startxref stuff.
     m->file->seek(0, SEEK_END);
     qpdf_offset_t end_offset = m->file->tell();
-    m->xref_table_max_offset = end_offset;
+    m->xref_table.max_offset = end_offset;
     // Sanity check on object ids. All objects must appear in xref table / stream. In all realistic
     // scenarios at least 3 bytes are required.
-    if (m->xref_table_max_id > m->xref_table_max_offset / 3) {
-        m->xref_table_max_id = static_cast<int>(m->xref_table_max_offset / 3);
+    if (m->xref_table.max_id > m->xref_table.max_offset / 3) {
+        m->xref_table.max_id = static_cast<int>(m->xref_table.max_offset / 3);
     }
     qpdf_offset_t start_offset = (end_offset > 1054 ? end_offset - 1054 : 0);
     PatternFinder sf(*this, &QPDF::findStartxref);
@@ -482,7 +483,7 @@ QPDF::parse(char const* password)
     }
 
     initializeEncryption();
-    m->parsed = true;
+    m->xref_table.parsed = true;
     if (m->xref_table.size() > 0 && !getRoot().getKey("/Pages").isDictionary()) {
         // QPDFs created from JSON have an empty xref table and no root object yet.
         throw damagedPDF("", 0, "unable to find page tree");
@@ -526,16 +527,16 @@ QPDF::warn(
 void
 QPDF::setTrailer(QPDFObjectHandle obj)
 {
-    if (m->trailer) {
+    if (m->xref_table.trailer) {
         return;
     }
-    m->trailer = obj;
+    m->xref_table.trailer = obj;
 }
 
 void
 QPDF::reconstruct_xref(QPDFExc& e)
 {
-    if (m->reconstructed_xref) {
+    if (m->xref_table.reconstructed) {
         // Avoid xref reconstruction infinite loops. This is getting very hard to reproduce because
         // qpdf is throwing many fewer exceptions while parsing. Most situations are warnings now.
         throw e;
@@ -550,7 +551,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
         }
     };
 
-    m->reconstructed_xref = true;
+    m->xref_table.reconstructed = true;
     // We may find more objects, which may contain dangling references.
     m->fixed_dangling_refs = false;
 
@@ -583,7 +584,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
             if ((t2.isInteger()) && (readToken(*m->file, MAX_LEN).isWord("obj"))) {
                 int obj = QUtil::string_to_int(t1.getValue().c_str());
                 int gen = QUtil::string_to_int(t2.getValue().c_str());
-                if (obj <= m->xref_table_max_id) {
+                if (obj <= m->xref_table.max_id) {
                     insertReconstructedXrefEntry(obj, token_start, gen);
                 } else {
                     warn(damagedPDF(
@@ -591,7 +592,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
                 }
             }
             m->file->seek(pos, SEEK_SET);
-        } else if (!m->trailer && t1.isWord("trailer")) {
+        } else if (!m->xref_table.trailer && t1.isWord("trailer")) {
             auto pos = m->file->tell();
             QPDFObjectHandle t = readTrailer();
             if (!t.isDictionary()) {
@@ -604,9 +605,9 @@ QPDF::reconstruct_xref(QPDFExc& e)
         check_warnings();
         m->file->findAndSkipNextEOL();
     }
-    m->deleted_objects.clear();
+    m->xref_table.deleted_objects.clear();
 
-    if (!m->trailer) {
+    if (!m->xref_table.trailer) {
         qpdf_offset_t max_offset{0};
         // If there are any xref streams, take the last one to appear.
         for (auto const& iter: m->xref_table) {
@@ -640,7 +641,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
         }
     }
 
-    if (!m->trailer) {
+    if (!m->xref_table.trailer) {
         // We could check the last encountered object to see if it was an xref stream.  If so, we
         // could try to get the trailer from there.  This may make it possible to recover files with
         // bad startxref pointers even when they have object streams.
@@ -653,12 +654,12 @@ QPDF::reconstruct_xref(QPDFExc& e)
         throw damagedPDF("", 0, "unable to find objects while recovering damaged file");
     }
     check_warnings();
-    if (!m->parsed) {
-        m->parsed = true;
+    if (!m->xref_table.parsed) {
+        m->xref_table.parsed = true;
         getAllPages();
         check_warnings();
         if (m->all_pages.empty()) {
-            m->parsed = false;
+            m->xref_table.parsed = false;
             throw damagedPDF("", 0, "unable to find any pages while recovering damaged file");
         }
     }
@@ -730,16 +731,16 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
         }
     }
 
-    if (!m->trailer) {
+    if (!m->xref_table.trailer) {
         throw damagedPDF("", 0, "unable to find trailer while reading xref");
     }
-    int size = m->trailer.getKey("/Size").getIntValueAsInt();
+    int size = m->xref_table.trailer.getKey("/Size").getIntValueAsInt();
     int max_obj = 0;
     if (!m->xref_table.empty()) {
         max_obj = m->xref_table.rbegin()->first.getObj();
     }
-    if (!m->deleted_objects.empty()) {
-        max_obj = std::max(max_obj, *(m->deleted_objects.rbegin()));
+    if (!m->xref_table.deleted_objects.empty()) {
+        max_obj = std::max(max_obj, *(m->xref_table.deleted_objects.rbegin()));
     }
     if ((size < 1) || (size - 1 != max_obj)) {
         QTC::TC("qpdf", "QPDF xref size mismatch");
@@ -752,7 +753,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
 
     // We no longer need the deleted_objects table, so go ahead and clear it out to make sure we
     // never depend on its being set.
-    m->deleted_objects.clear();
+    m->xref_table.deleted_objects.clear();
 
     // Make sure we keep only the highest generation for any object.
     QPDFObjGen last_og{-1, 0};
@@ -968,7 +969,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
         for (qpdf_offset_t i = obj; i - num < obj; ++i) {
             if (i == 0) {
                 // This is needed by checkLinearization()
-                m->first_xref_item_offset = m->file->tell();
+                m->xref_table.first_item_offset = m->file->tell();
             }
             // For xref_table, these will always be small enough to be ints
             qpdf_offset_t f1 = 0;
@@ -1000,21 +1001,21 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
         throw damagedPDF("", "expected trailer dictionary");
     }
 
-    if (!m->trailer) {
+    if (!m->xref_table.trailer) {
         setTrailer(cur_trailer);
 
-        if (!m->trailer.hasKey("/Size")) {
+        if (!m->xref_table.trailer.hasKey("/Size")) {
             QTC::TC("qpdf", "QPDF trailer lacks size");
             throw damagedPDF("trailer", "trailer dictionary lacks /Size key");
         }
-        if (!m->trailer.getKey("/Size").isInteger()) {
+        if (!m->xref_table.trailer.getKey("/Size").isInteger()) {
             QTC::TC("qpdf", "QPDF trailer size not integer");
             throw damagedPDF("trailer", "/Size key in trailer dictionary is not an integer");
         }
     }
 
     if (cur_trailer.hasKey("/XRefStm")) {
-        if (m->ignore_xref_streams) {
+        if (m->xref_table.ignore_streams) {
             QTC::TC("qpdf", "QPDF ignoring XRefStm in trailer");
         } else {
             if (cur_trailer.getKey("/XRefStm").isInteger()) {
@@ -1043,7 +1044,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 qpdf_offset_t
 QPDF::read_xrefStream(qpdf_offset_t xref_offset)
 {
-    if (!m->ignore_xref_streams) {
+    if (!m->xref_table.ignore_streams) {
         QPDFObjGen x_og;
         QPDFObjectHandle xref_obj;
         try {
@@ -1238,14 +1239,14 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
             // object record, in which case the generation number appears as the third field.
             if (saw_first_compressed_object) {
                 if (fields[0] != 2) {
-                    m->uncompressed_after_compressed = true;
+                    m->xref_table.uncompressed_after_compressed = true;
                 }
             } else if (fields[0] == 2) {
                 saw_first_compressed_object = true;
             }
             if (obj == 0) {
                 // This is needed by checkLinearization()
-                m->first_xref_item_offset = xref_offset;
+                m->xref_table.first_item_offset = xref_offset;
             } else if (fields[0] == 0) {
                 // Ignore fields[2], which we don't care about in this case. This works around the
                 // issue of some PDF files that put invalid values, like -1, here for deleted
@@ -1258,7 +1259,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         }
     }
 
-    if (!m->trailer) {
+    if (!m->xref_table.trailer) {
         setTrailer(dict);
     }
 
@@ -1284,12 +1285,12 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2)
     // If there is already an entry for this object and generation in the table, it means that a
     // later xref table has registered this object.  Disregard this one.
 
-    if (obj > m->xref_table_max_id) {
+    if (obj > m->xref_table.max_id) {
         // ignore impossibly large object ids or object ids > Size.
         return;
     }
 
-    if (m->deleted_objects.count(obj)) {
+    if (m->xref_table.deleted_objects.count(obj)) {
         QTC::TC("qpdf", "QPDF xref deleted object");
         return;
     }
@@ -1326,7 +1327,7 @@ void
 QPDF::insertFreeXrefEntry(QPDFObjGen og)
 {
     if (!m->xref_table.count(og)) {
-        m->deleted_objects.insert(og.getObj());
+        m->xref_table.deleted_objects.insert(og.getObj());
     }
 }
 
@@ -1335,13 +1336,13 @@ QPDF::insertFreeXrefEntry(QPDFObjGen og)
 void
 QPDF::insertReconstructedXrefEntry(int obj, qpdf_offset_t f1, int f2)
 {
-    if (!(obj > 0 && obj <= m->xref_table_max_id && 0 <= f2 && f2 < 65535)) {
+    if (!(obj > 0 && obj <= m->xref_table.max_id && 0 <= f2 && f2 < 65535)) {
         QTC::TC("qpdf", "QPDF xref overwrite invalid objgen");
         return;
     }
 
     QPDFObjGen og(obj, f2);
-    if (!m->deleted_objects.count(obj)) {
+    if (!m->xref_table.deleted_objects.count(obj)) {
         // deleted_objects stores the uncompressed objects removed from the xref table at the start
         // of recovery.
         QTC::TC("qpdf", "QPDF xref overwrite object");
@@ -1381,11 +1382,11 @@ QPDF::showXRefTable()
 bool
 QPDF::resolveXRefTable()
 {
-    bool may_change = !m->reconstructed_xref;
+    bool may_change = !m->xref_table.reconstructed;
     for (auto& iter: m->xref_table) {
         if (isUnresolved(iter.first)) {
             resolve(iter.first);
-            if (may_change && m->reconstructed_xref) {
+            if (may_change && m->xref_table.reconstructed) {
                 return false;
             }
         }
@@ -1958,7 +1959,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 
         int num = QUtil::string_to_int(tnum.getValue().c_str());
         long long offset = QUtil::string_to_int(toffset.getValue().c_str());
-        if (num > m->xref_table_max_id) {
+        if (num > m->xref_table.max_id) {
             continue;
         }
         if (num == obj_stream_number) {
@@ -2101,7 +2102,7 @@ QPDF::getObjectForParser(int id, int gen, bool parse_pdf)
     if (auto iter = m->obj_cache.find(og); iter != m->obj_cache.end()) {
         return iter->second.object;
     }
-    if (m->xref_table.count(og) || !m->parsed) {
+    if (m->xref_table.count(og) || !m->xref_table.parsed) {
         return m->obj_cache.insert({og, QPDF_Unresolved::create(this, og)}).first->second.object;
     }
     if (parse_pdf) {
@@ -2117,8 +2118,9 @@ QPDF::getObjectForJSON(int id, int gen)
     auto [it, inserted] = m->obj_cache.try_emplace(og);
     auto& obj = it->second.object;
     if (inserted) {
-        obj = (m->parsed && !m->xref_table.count(og)) ? QPDF_Null::create(this, og)
-                                                      : QPDF_Unresolved::create(this, og);
+        obj = (m->xref_table.parsed && !m->xref_table.count(og))
+            ? QPDF_Null::create(this, og)
+            : QPDF_Unresolved::create(this, og);
     }
     return obj;
 }
@@ -2128,7 +2130,7 @@ QPDF::getObject(QPDFObjGen const& og)
 {
     if (auto it = m->obj_cache.find(og); it != m->obj_cache.end()) {
         return {it->second.object};
-    } else if (m->parsed && !m->xref_table.count(og)) {
+    } else if (m->xref_table.parsed && !m->xref_table.count(og)) {
         return QPDF_Null::create();
     } else {
         auto result = m->obj_cache.try_emplace(og, QPDF_Unresolved::create(this, og), -1, -1);
@@ -2526,13 +2528,13 @@ QPDF::getExtensionLevel()
 QPDFObjectHandle
 QPDF::getTrailer()
 {
-    return m->trailer;
+    return m->xref_table.trailer;
 }
 
 QPDFObjectHandle
 QPDF::getRoot()
 {
-    QPDFObjectHandle root = m->trailer.getKey("/Root");
+    QPDFObjectHandle root = m->xref_table.trailer.getKey("/Root");
     if (!root.isDictionary()) {
         throw damagedPDF("", 0, "unable to find /Root dictionary");
     } else if (
@@ -2554,7 +2556,7 @@ QPDF::getXRefTable()
 std::map<QPDFObjGen, QPDFXRefEntry> const&
 QPDF::getXRefTableInternal()
 {
-    if (!m->parsed) {
+    if (!m->xref_table.parsed) {
         throw std::logic_error("QPDF::getXRefTable called before parsing.");
     }
 
@@ -2604,14 +2606,14 @@ QPDF::getCompressibleObjGens()
     // iterating through the xref table since it avoids preserving orphaned items.
 
     // Exclude encryption dictionary, if any
-    QPDFObjectHandle encryption_dict = m->trailer.getKey("/Encrypt");
+    QPDFObjectHandle encryption_dict = m->xref_table.trailer.getKey("/Encrypt");
     QPDFObjGen encryption_dict_og = encryption_dict.getObjGen();
 
     const size_t max_obj = getObjectCount();
     std::vector<bool> visited(max_obj, false);
     std::vector<QPDFObjectHandle> queue;
     queue.reserve(512);
-    queue.push_back(m->trailer);
+    queue.push_back(m->xref_table.trailer);
     std::vector<T> result;
     if constexpr (std::is_same_v<T, QPDFObjGen>) {
         result.reserve(m->obj_cache.size());

@@ -3,6 +3,25 @@
 
 #include <qpdf/QPDF.hh>
 
+// Xref_table encapsulates the pdf's xref table and trailer.
+class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
+{
+  public:
+    QPDFObjectHandle trailer;
+    bool reconstructed{false};
+    // Various tables are indexed by object id, with potential size id + 1
+    int max_id{std::numeric_limits<int>::max() - 1};
+    qpdf_offset_t max_offset{0};
+    std::set<int> deleted_objects;
+    bool ignore_streams{false};
+    bool parsed{false};
+    bool attempt_recovery{true};
+
+    // Linearization data
+    bool uncompressed_after_compressed{false};
+    qpdf_offset_t first_item_offset{0}; // actual value from file
+};
+
 // Writer class is restricted to QPDFWriter so that only it can call certain methods.
 class QPDF::Writer
 {
@@ -459,21 +478,15 @@ class QPDF::Members
     std::shared_ptr<InputSource> file;
     std::string last_object_description;
     bool provided_password_is_hex_key{false};
-    bool ignore_xref_streams{false};
     bool suppress_warnings{false};
     size_t max_warnings{0};
     bool attempt_recovery{true};
     bool check_mode{false};
     std::shared_ptr<EncryptionParameters> encp;
     std::string pdf_version;
-    std::map<QPDFObjGen, QPDFXRefEntry> xref_table;
-    // Various tables are indexed by object id, with potential size id + 1
-    int xref_table_max_id{std::numeric_limits<int>::max() - 1};
-    qpdf_offset_t xref_table_max_offset{0};
-    std::set<int> deleted_objects;
+    Xref_table xref_table;
     std::map<QPDFObjGen, ObjCache> obj_cache;
     std::set<QPDFObjGen> resolving;
-    QPDFObjectHandle trailer;
     std::vector<QPDFObjectHandle> all_pages;
     bool invalid_page_found{false};
     std::map<QPDFObjGen, int> pageobj_to_pages_pos;
@@ -485,16 +498,12 @@ class QPDF::Members
     std::shared_ptr<QPDFObjectHandle::StreamDataProvider> copied_streams;
     // copied_stream_data_provider is owned by copied_streams
     CopiedStreamDataProvider* copied_stream_data_provider{nullptr};
-    bool reconstructed_xref{false};
     bool fixed_dangling_refs{false};
     bool immediate_copy_from{false};
     bool in_parse{false};
-    bool parsed{false};
     std::set<int> resolved_object_streams;
 
     // Linearization data
-    qpdf_offset_t first_xref_item_offset{0}; // actual value from file
-    bool uncompressed_after_compressed{false};
     bool linearization_warnings{false};
 
     // Linearization parameter dictionary and hint table data: may be read from file or computed
