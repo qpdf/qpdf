@@ -12,9 +12,7 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     {
     }
 
-    qpdf_offset_t read_table(qpdf_offset_t offset);
-    qpdf_offset_t read_stream(qpdf_offset_t offset);
-
+    void read(qpdf_offset_t offset);
     void reconstruct(QPDFExc& e);
 
     QPDFObjectHandle trailer;
@@ -32,9 +30,14 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     qpdf_offset_t first_item_offset{0}; // actual value from file
 
   private:
+    // Methods to parse tables
+    qpdf_offset_t read_table(qpdf_offset_t offset);
     bool parse_first(std::string const& line, int& obj, int& num, int& bytes);
     bool read_entry(qpdf_offset_t& f1, int& f2, char& type);
     bool read_bad_entry(qpdf_offset_t& f1, int& f2, char& type);
+
+    // Methods to parse streams
+    qpdf_offset_t read_stream(qpdf_offset_t offset);
     qpdf_offset_t process_stream(qpdf_offset_t offset, QPDFObjectHandle& xref_stream);
     std::pair<int, std::array<int, 3>>
     process_W(QPDFObjectHandle& dict, std::function<QPDFExc(std::string_view)> damaged);
@@ -45,6 +48,7 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
         int max_num_entries,
         std::function<QPDFExc(std::string_view)> damaged);
 
+    // Methods to insert table entries
     void insert_reconstructed(int obj, qpdf_offset_t f1, int f2);
     void insert(int obj, int f0, qpdf_offset_t f1, int f2);
     void insert_free(QPDFObjGen);

@@ -468,7 +468,7 @@ QPDF::parse(char const* password)
             throw damagedPDF("", 0, "can't find startxref");
         }
         try {
-            read_xref(xref_offset);
+            m->xref_table.read(xref_offset);
         } catch (QPDFExc&) {
             throw;
         } catch (std::exception& e) {
@@ -625,7 +625,7 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
         }
         if (max_offset > 0) {
             try {
-                qpdf.read_xref(max_offset);
+                read(max_offset);
             } catch (std::exception&) {
                 throw damaged_pdf(
                     "error decoding candidate xref stream while recovering damaged file");
@@ -664,8 +664,10 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
 }
 
 void
-QPDF::read_xref(qpdf_offset_t xref_offset)
+QPDF::Xref_table::read(qpdf_offset_t xref_offset)
 {
+    auto* m = qpdf.m.get();
+
     std::map<int, int> free_table;
     std::set<qpdf_offset_t> visited;
     while (xref_offset) {
@@ -700,7 +702,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
         if ((strncmp(buf, "xref", 4) == 0) && QUtil::is_space(buf[4])) {
             if (skipped_space) {
                 QTC::TC("qpdf", "QPDF xref skipped space");
-                warn(damagedPDF("", 0, "extraneous whitespace seen before xref"));
+                warn_damaged("extraneous whitespace seen before xref");
             }
             QTC::TC(
                 "qpdf",
@@ -714,46 +716,43 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
             while (QUtil::is_space(buf[skip])) {
                 ++skip;
             }
-            xref_offset = m->xref_table.read_table(xref_offset + skip);
+            xref_offset = read_table(xref_offset + skip);
         } else {
-            xref_offset = m->xref_table.read_stream(xref_offset);
+            xref_offset = read_stream(xref_offset);
         }
         if (visited.count(xref_offset) != 0) {
             QTC::TC("qpdf", "QPDF xref loop");
-            throw damagedPDF("", 0, "loop detected following xref tables");
+            throw damaged_pdf("loop detected following xref tables");
         }
     }
 
-    if (!m->xref_table.trailer) {
-        throw damagedPDF("", 0, "unable to find trailer while reading xref");
+    if (!trailer) {
+        throw damaged_pdf("unable to find trailer while reading xref");
     }
-    int size = m->xref_table.trailer.getKey("/Size").getIntValueAsInt();
+    int size = trailer.getKey("/Size").getIntValueAsInt();
     int max_obj = 0;
-    if (!m->xref_table.empty()) {
-        max_obj = m->xref_table.rbegin()->first.getObj();
+    if (!empty()) {
+        max_obj = rbegin()->first.getObj();
     }
-    if (!m->xref_table.deleted_objects.empty()) {
-        max_obj = std::max(max_obj, *(m->xref_table.deleted_objects.rbegin()));
+    if (!deleted_objects.empty()) {
+        max_obj = std::max(max_obj, *deleted_objects.rbegin());
     }
     if ((size < 1) || (size - 1 != max_obj)) {
         QTC::TC("qpdf", "QPDF xref size mismatch");
-        warn(damagedPDF(
-            "",
-            0,
-            ("reported number of objects (" + std::to_string(size) +
-             ") is not one plus the highest object number (" + std::to_string(max_obj) + ")")));
+        warn_damaged("reported number of objects (" + std::to_string(size) +
+             ") is not one plus the highest object number (" + std::to_string(max_obj) + ")");
     }
 
     // We no longer need the deleted_objects table, so go ahead and clear it out to make sure we
     // never depend on its being set.
-    m->xref_table.deleted_objects.clear();
+    deleted_objects.clear();
 
     // Make sure we keep only the highest generation for any object.
     QPDFObjGen last_og{-1, 0};
-    for (auto const& item: m->xref_table) {
+    for (auto const& item: *this) {
         auto id = item.first.getObj();
         if (id == last_og.getObj() && id > 0) {
-            removeObject(last_og);
+            qpdf.removeObject(last_og);
         }
         last_og = item.first;
     }

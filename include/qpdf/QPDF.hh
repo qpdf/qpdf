@@ -759,7 +759,6 @@ class QPDF
 
     void parse(char const* password);
     void inParse(bool);
-    void read_xref(qpdf_offset_t offset);
     bool resolveXRefTable();
     void setLastObjectDescription(std::string const& description, QPDFObjGen const& og);
     QPDFObjectHandle readTrailer();
