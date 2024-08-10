@@ -759,19 +759,8 @@ class QPDF
 
     void parse(char const* password);
     void inParse(bool);
-    void setTrailer(QPDFObjectHandle obj);
     void read_xref(qpdf_offset_t offset);
     bool resolveXRefTable();
-    qpdf_offset_t read_xrefStream(qpdf_offset_t offset);
-    qpdf_offset_t processXRefStream(qpdf_offset_t offset, QPDFObjectHandle& xref_stream);
-    std::pair<int, std::array<int, 3>>
-    processXRefW(QPDFObjectHandle& dict, std::function<QPDFExc(std::string_view)> damaged);
-    int processXRefSize(
-        QPDFObjectHandle& dict, int entry_size, std::function<QPDFExc(std::string_view)> damaged);
-    std::pair<int, std::vector<std::pair<int, int>>> processXRefIndex(
-        QPDFObjectHandle& dict,
-        int max_num_entries,
-        std::function<QPDFExc(std::string_view)> damaged);
     void setLastObjectDescription(std::string const& description, QPDFObjGen const& og);
     QPDFObjectHandle readTrailer();
     QPDFObjectHandle readObject(std::string const& description, QPDFObjGen og);

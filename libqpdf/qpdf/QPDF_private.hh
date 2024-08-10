@@ -13,10 +13,7 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     }
 
     qpdf_offset_t read_table(qpdf_offset_t offset);
-
-    void insert_reconstructed(int obj, qpdf_offset_t f1, int f2);
-    void insert(int obj, int f0, qpdf_offset_t f1, int f2);
-    void insert_free(QPDFObjGen);
+    qpdf_offset_t read_stream(qpdf_offset_t offset);
 
     void reconstruct(QPDFExc& e);
 
@@ -38,6 +35,19 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     bool parse_first(std::string const& line, int& obj, int& num, int& bytes);
     bool read_entry(qpdf_offset_t& f1, int& f2, char& type);
     bool read_bad_entry(qpdf_offset_t& f1, int& f2, char& type);
+    qpdf_offset_t process_stream(qpdf_offset_t offset, QPDFObjectHandle& xref_stream);
+    std::pair<int, std::array<int, 3>>
+    process_W(QPDFObjectHandle& dict, std::function<QPDFExc(std::string_view)> damaged);
+    int process_Size(
+        QPDFObjectHandle& dict, int entry_size, std::function<QPDFExc(std::string_view)> damaged);
+    std::pair<int, std::vector<std::pair<int, int>>> process_Index(
+        QPDFObjectHandle& dict,
+        int max_num_entries,
+        std::function<QPDFExc(std::string_view)> damaged);
+
+    void insert_reconstructed(int obj, qpdf_offset_t f1, int f2);
+    void insert(int obj, int f0, qpdf_offset_t f1, int f2);
+    void insert_free(QPDFObjGen);
 
     QPDFExc
     damaged_pdf(std::string const& msg)
