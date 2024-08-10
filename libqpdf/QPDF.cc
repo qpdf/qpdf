@@ -1769,20 +1769,17 @@ QPDF::readObjectAtOffset(
         if (try_recovery) {
             // Try again after reconstructing xref table
             m->xref_table.reconstruct(e);
-            if (m->xref_table.count(exp_og) && (m->xref_table[exp_og].getType() == 1)) {
-                qpdf_offset_t new_offset = m->xref_table[exp_og].getOffset();
-                QPDFObjectHandle result =
-                    readObjectAtOffset(false, new_offset, description, exp_og, og, false);
+            if (m->xref_table.type(exp_og) == 1) {
                 QTC::TC("qpdf", "QPDF recovered in readObjectAtOffset");
-                return result;
+                return readObjectAtOffset(
+                    false, m->xref_table.offset(exp_og), description, exp_og, og, false);
             } else {
                 QTC::TC("qpdf", "QPDF object gone after xref reconstruction");
                 warn(damagedPDF(
                     "",
                     0,
                     ("object " + exp_og.unparse(' ') +
-                     " not found in file after regenerating cross reference "
-                     "table")));
+                     " not found in file after regenerating cross reference table")));
                 return QPDFObjectHandle::newNull();
             }
         } else {
@@ -1815,7 +1812,7 @@ QPDF::readObjectAtOffset(
             }
         }
         qpdf_offset_t end_after_space = m->file->tell();
-        if (skip_cache_if_in_xref && m->xref_table.count(og)) {
+        if (skip_cache_if_in_xref && m->xref_table.type(og)) {
             // Ordinarily, an object gets read here when resolved through xref table or stream. In
             // the special case of the xref stream and linearization hint tables, the offset comes
             // from another source. For the specific case of xref streams, the xref stream is read
@@ -1867,33 +1864,32 @@ QPDF::resolve(QPDFObjGen og)
     }
     ResolveRecorder rr(this, og);
 
-    if (m->xref_table.count(og) != 0) {
-        QPDFXRefEntry const& entry = m->xref_table[og];
-        try {
-            switch (entry.getType()) {
-            case 1:
-                {
-                    qpdf_offset_t offset = entry.getOffset();
-                    // Object stored in cache by readObjectAtOffset
-                    QPDFObjGen a_og;
-                    QPDFObjectHandle oh = readObjectAtOffset(true, offset, "", og, a_og, false);
-                }
-                break;
-
-            case 2:
-                resolveObjectsInStream(entry.getObjStreamNumber());
-                break;
-
-            default:
-                throw damagedPDF(
-                    "", 0, ("object " + og.unparse('/') + " has unexpected xref entry type"));
+    try {
+        switch (m->xref_table.type(og)) {
+        case 0:
+            break;
+        case 1:
+            {
+                // Object stored in cache by readObjectAtOffset
+                QPDFObjGen a_og;
+                QPDFObjectHandle oh =
+                    readObjectAtOffset(true, m->xref_table.offset(og), "", og, a_og, false);
             }
-        } catch (QPDFExc& e) {
-            warn(e);
-        } catch (std::exception& e) {
-            warn(damagedPDF(
-                "", 0, ("object " + og.unparse('/') + ": error reading object: " + e.what())));
+            break;
+
+        case 2:
+            resolveObjectsInStream(m->xref_table.stream_number(og.getObj()));
+            break;
+
+        default:
+            throw damagedPDF(
+                "", 0, ("object " + og.unparse('/') + " has unexpected xref entry type"));
         }
+    } catch (QPDFExc& e) {
+        warn(e);
+    } catch (std::exception& e) {
+        warn(damagedPDF(
+            "", 0, ("object " + og.unparse('/') + ": error reading object: " + e.what())));
     }
 
     if (isUnresolved(og)) {
@@ -2107,7 +2103,7 @@ QPDF::getObjectForParser(int id, int gen, bool parse_pdf)
     if (auto iter = m->obj_cache.find(og); iter != m->obj_cache.end()) {
         return iter->second.object;
     }
-    if (m->xref_table.count(og) || !m->xref_table.parsed) {
+    if (m->xref_table.type(og) || !m->xref_table.parsed) {
         return m->obj_cache.insert({og, QPDF_Unresolved::create(this, og)}).first->second.object;
     }
     if (parse_pdf) {
@@ -2123,9 +2119,8 @@ QPDF::getObjectForJSON(int id, int gen)
     auto [it, inserted] = m->obj_cache.try_emplace(og);
     auto& obj = it->second.object;
     if (inserted) {
-        obj = (m->xref_table.parsed && !m->xref_table.count(og))
-            ? QPDF_Null::create(this, og)
-            : QPDF_Unresolved::create(this, og);
+        obj = (m->xref_table.parsed && !m->xref_table.type(og)) ? QPDF_Null::create(this, og)
+                                                                : QPDF_Unresolved::create(this, og);
     }
     return obj;
 }
@@ -2135,7 +2130,7 @@ QPDF::getObject(QPDFObjGen const& og)
 {
     if (auto it = m->obj_cache.find(og); it != m->obj_cache.end()) {
         return {it->second.object};
-    } else if (m->xref_table.parsed && !m->xref_table.count(og)) {
+    } else if (m->xref_table.parsed && !m->xref_table.type(og)) {
         return QPDF_Null::create();
     } else {
         auto result = m->obj_cache.try_emplace(og, QPDF_Unresolved::create(this, og), -1, -1);

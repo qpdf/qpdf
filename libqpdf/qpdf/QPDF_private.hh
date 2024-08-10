@@ -19,6 +19,37 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     void show();
     bool resolve();
 
+    // Returns 0 if og is not in table.
+    int
+    type(QPDFObjGen og) const
+    {
+        auto it = find(og);
+        return it == end() ? 0 : it->second.getType();
+    }
+
+    // Returns 0 if og is not in table.
+    qpdf_offset_t
+    offset(QPDFObjGen og) const
+    {
+        auto it = find(og);
+        return it == end() ? 0 : it->second.getOffset();
+    }
+
+    // Returns 0 if og is not in table.
+    int
+    stream_number(int id) const
+    {
+        auto it = find(QPDFObjGen(id, 0));
+        return it == end() ? 0 : it->second.getObjStreamNumber();
+    }
+
+    int
+    stream_index(int id) const
+    {
+        auto it = find(QPDFObjGen(id, 0));
+        return it == end() ? 0 : it->second.getObjStreamIndex();
+    }
+
     QPDFObjectHandle trailer;
     bool reconstructed{false};
     // Various tables are indexed by object id, with potential size id + 1
