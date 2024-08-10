@@ -445,46 +445,8 @@ QPDF::parse(char const* password)
         m->pdf_version = "1.2";
     }
 
-    // PDF spec says %%EOF must be found within the last 1024 bytes of/ the file.  We add an extra
-    // 30 characters to leave room for the startxref stuff.
-    m->file->seek(0, SEEK_END);
-    qpdf_offset_t end_offset = m->file->tell();
-    m->xref_table.max_offset = end_offset;
-    // Sanity check on object ids. All objects must appear in xref table / stream. In all realistic
-    // scenarios at least 3 bytes are required.
-    if (m->xref_table.max_id > m->xref_table.max_offset / 3) {
-        m->xref_table.max_id = static_cast<int>(m->xref_table.max_offset / 3);
-    }
-    qpdf_offset_t start_offset = (end_offset > 1054 ? end_offset - 1054 : 0);
-    PatternFinder sf(*this, &QPDF::findStartxref);
-    qpdf_offset_t xref_offset = 0;
-    if (m->file->findLast("startxref", start_offset, 0, sf)) {
-        xref_offset = QUtil::string_to_ll(readToken(*m->file).getValue().c_str());
-    }
-
-    try {
-        if (xref_offset == 0) {
-            QTC::TC("qpdf", "QPDF can't find startxref");
-            throw damagedPDF("", 0, "can't find startxref");
-        }
-        try {
-            m->xref_table.read(xref_offset);
-        } catch (QPDFExc&) {
-            throw;
-        } catch (std::exception& e) {
-            throw damagedPDF("", 0, std::string("error reading xref: ") + e.what());
-        }
-    } catch (QPDFExc& e) {
-        if (m->attempt_recovery) {
-            m->xref_table.reconstruct(e);
-            QTC::TC("qpdf", "QPDF reconstructed xref table");
-        } else {
-            throw;
-        }
-    }
-
+    m->xref_table.initialize();
     initializeEncryption();
-    m->xref_table.parsed = true;
     if (m->xref_table.size() > 0 && !getRoot().getKey("/Pages").isDictionary()) {
         // QPDFs created from JSON have an empty xref table and no root object yet.
         throw damagedPDF("", 0, "unable to find page tree");
@@ -523,6 +485,52 @@ QPDF::warn(
     std::string const& message)
 {
     warn(QPDFExc(error_code, getFilename(), object, offset, message));
+}
+
+void
+QPDF::Xref_table::initialize()
+{
+    auto* m = qpdf.m.get();
+
+    // PDF spec says %%EOF must be found within the last 1024 bytes of/ the file.  We add an extra
+    // 30 characters to leave room for the startxref stuff.
+    m->file->seek(0, SEEK_END);
+    qpdf_offset_t end_offset = m->file->tell();
+    max_offset = end_offset;
+    // Sanity check on object ids. All objects must appear in xref table / stream. In all realistic
+    // scenarios at least 3 bytes are required.
+    if (max_id > max_offset / 3) {
+        max_id = static_cast<int>(max_offset / 3);
+    }
+    qpdf_offset_t start_offset = (end_offset > 1054 ? end_offset - 1054 : 0);
+    PatternFinder sf(qpdf, &QPDF::findStartxref);
+    qpdf_offset_t xref_offset = 0;
+    if (m->file->findLast("startxref", start_offset, 0, sf)) {
+        xref_offset = QUtil::string_to_ll(qpdf.readToken(*m->file).getValue().c_str());
+    }
+
+    try {
+        if (xref_offset == 0) {
+            QTC::TC("qpdf", "QPDF can't find startxref");
+            throw damaged_pdf("can't find startxref");
+        }
+        try {
+            read(xref_offset);
+        } catch (QPDFExc&) {
+            throw;
+        } catch (std::exception& e) {
+            throw damaged_pdf(std::string("error reading xref: ") + e.what());
+        }
+    } catch (QPDFExc& e) {
+        if (attempt_recovery) {
+            reconstruct(e);
+            QTC::TC("qpdf", "QPDF reconstructed xref table");
+        } else {
+            throw;
+        }
+    }
+
+    parsed = true;
 }
 
 void
@@ -739,8 +747,9 @@ QPDF::Xref_table::read(qpdf_offset_t xref_offset)
     }
     if ((size < 1) || (size - 1 != max_obj)) {
         QTC::TC("qpdf", "QPDF xref size mismatch");
-        warn_damaged("reported number of objects (" + std::to_string(size) +
-             ") is not one plus the highest object number (" + std::to_string(max_obj) + ")");
+        warn_damaged(
+            "reported number of objects (" + std::to_string(size) +
+            ") is not one plus the highest object number (" + std::to_string(max_obj) + ")");
     }
 
     // We no longer need the deleted_objects table, so go ahead and clear it out to make sure we

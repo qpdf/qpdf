@@ -12,7 +12,7 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     {
     }
 
-    void read(qpdf_offset_t offset);
+    void initialize();
     void reconstruct(QPDFExc& e);
 
     QPDFObjectHandle trailer;
@@ -30,6 +30,8 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     qpdf_offset_t first_item_offset{0}; // actual value from file
 
   private:
+    void read(qpdf_offset_t offset);
+
     // Methods to parse tables
     qpdf_offset_t read_table(qpdf_offset_t offset);
     bool parse_first(std::string const& line, int& obj, int& num, int& bytes);
