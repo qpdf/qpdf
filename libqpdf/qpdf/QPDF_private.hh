@@ -12,6 +12,8 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     {
     }
 
+    qpdf_offset_t read_table(qpdf_offset_t offset);
+
     void insert_reconstructed(int obj, qpdf_offset_t f1, int f2);
     void insert(int obj, int f0, qpdf_offset_t f1, int f2);
     void insert_free(QPDFObjGen);
@@ -33,10 +35,20 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     qpdf_offset_t first_item_offset{0}; // actual value from file
 
   private:
+    bool parse_first(std::string const& line, int& obj, int& num, int& bytes);
+    bool read_entry(qpdf_offset_t& f1, int& f2, char& type);
+    bool read_bad_entry(qpdf_offset_t& f1, int& f2, char& type);
+
     QPDFExc
     damaged_pdf(std::string const& msg)
     {
         return qpdf.damagedPDF("", 0, msg);
+    }
+
+    QPDFExc
+    damaged_table(std::string const& msg)
+    {
+        return qpdf.damagedPDF("xref table", msg);
     }
 
     void

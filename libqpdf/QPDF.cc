@@ -723,7 +723,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
             while (QUtil::is_space(buf[skip])) {
                 ++skip;
             }
-            xref_offset = read_xrefTable(xref_offset + skip);
+            xref_offset = m->xref_table.read_table(xref_offset + skip);
         } else {
             xref_offset = read_xrefStream(xref_offset);
         }
@@ -769,7 +769,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
 }
 
 bool
-QPDF::parse_xrefFirst(std::string const& line, int& obj, int& num, int& bytes)
+QPDF::Xref_table::parse_first(std::string const& line, int& obj, int& num, int& bytes)
 {
     // is_space and is_digit both return false on '\0', so this will not overrun the null-terminated
     // buffer.
@@ -817,8 +817,10 @@ QPDF::parse_xrefFirst(std::string const& line, int& obj, int& num, int& bytes)
 }
 
 bool
-QPDF::read_bad_xrefEntry(qpdf_offset_t& f1, int& f2, char& type)
+QPDF::Xref_table::read_bad_entry(qpdf_offset_t& f1, int& f2, char& type)
 {
+    auto* m = qpdf.m.get();
+
     // Reposition after initial read attempt and reread.
     m->file->seek(m->file->getLastOffset(), SEEK_SET);
     auto line = m->file->readLine(30);
@@ -887,7 +889,7 @@ QPDF::read_bad_xrefEntry(qpdf_offset_t& f1, int& f2, char& type)
     }
 
     if (invalid) {
-        warn(damagedPDF("xref table", "accepting invalid xref table entry"));
+        qpdf.warn(damaged_table("accepting invalid xref table entry"));
     }
 
     f1 = QUtil::string_to_ll(f1_str.c_str());
@@ -899,8 +901,10 @@ QPDF::read_bad_xrefEntry(qpdf_offset_t& f1, int& f2, char& type)
 // Optimistically read and parse xref entry. If entry is bad, call read_bad_xrefEntry and return
 // result.
 bool
-QPDF::read_xrefEntry(qpdf_offset_t& f1, int& f2, char& type)
+QPDF::Xref_table::read_entry(qpdf_offset_t& f1, int& f2, char& type)
 {
+    auto* m = qpdf.m.get();
+
     std::array<char, 21> line;
     if (m->file->read(line.data(), 20) != 20) {
         // C++20: [[unlikely]]
@@ -948,13 +952,15 @@ QPDF::read_xrefEntry(qpdf_offset_t& f1, int& f2, char& type)
             return true;
         }
     }
-    return read_bad_xrefEntry(f1, f2, type);
+    return read_bad_entry(f1, f2, type);
 }
 
 // Read a single cross-reference table section and associated trailer.
 qpdf_offset_t
-QPDF::read_xrefTable(qpdf_offset_t xref_offset)
+QPDF::Xref_table::read_table(qpdf_offset_t xref_offset)
 {
+    auto* m = qpdf.m.get();
+
     m->file->seek(xref_offset, SEEK_SET);
     std::string line;
     while (true) {
@@ -963,33 +969,32 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
         int obj = 0;
         int num = 0;
         int bytes = 0;
-        if (!parse_xrefFirst(line, obj, num, bytes)) {
+        if (!parse_first(line, obj, num, bytes)) {
             QTC::TC("qpdf", "QPDF invalid xref");
-            throw damagedPDF("xref table", "xref syntax invalid");
+            throw damaged_table("xref syntax invalid");
         }
         m->file->seek(m->file->getLastOffset() + bytes, SEEK_SET);
         for (qpdf_offset_t i = obj; i - num < obj; ++i) {
             if (i == 0) {
                 // This is needed by checkLinearization()
-                m->xref_table.first_item_offset = m->file->tell();
+                first_item_offset = m->file->tell();
             }
             // For xref_table, these will always be small enough to be ints
             qpdf_offset_t f1 = 0;
             int f2 = 0;
             char type = '\0';
-            if (!read_xrefEntry(f1, f2, type)) {
+            if (!read_entry(f1, f2, type)) {
                 QTC::TC("qpdf", "QPDF invalid xref entry");
-                throw damagedPDF(
-                    "xref table", "invalid xref entry (obj=" + std::to_string(i) + ")");
+                throw damaged_table("invalid xref entry (obj=" + std::to_string(i) + ")");
             }
             if (type == 'f') {
-                m->xref_table.insert_free(QPDFObjGen(toI(i), f2));
+                insert_free(QPDFObjGen(toI(i), f2));
             } else {
-                m->xref_table.insert(toI(i), 1, f1, f2);
+                insert(toI(i), 1, f1, f2);
             }
         }
         qpdf_offset_t pos = m->file->tell();
-        if (readToken(*m->file).isWord("trailer")) {
+        if (qpdf.readToken(*m->file).isWord("trailer")) {
             break;
         } else {
             m->file->seek(pos, SEEK_SET);
@@ -997,35 +1002,35 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
     }
 
     // Set offset to previous xref table if any
-    QPDFObjectHandle cur_trailer = readTrailer();
+    auto cur_trailer = qpdf.readTrailer();
     if (!cur_trailer.isDictionary()) {
         QTC::TC("qpdf", "QPDF missing trailer");
-        throw damagedPDF("", "expected trailer dictionary");
+        throw qpdf.damagedPDF("", "expected trailer dictionary");
     }
 
-    if (!m->xref_table.trailer) {
-        setTrailer(cur_trailer);
+    if (!trailer) {
+        trailer = cur_trailer;
 
-        if (!m->xref_table.trailer.hasKey("/Size")) {
+        if (!trailer.hasKey("/Size")) {
             QTC::TC("qpdf", "QPDF trailer lacks size");
-            throw damagedPDF("trailer", "trailer dictionary lacks /Size key");
+            throw qpdf.damagedPDF("trailer", "trailer dictionary lacks /Size key");
         }
-        if (!m->xref_table.trailer.getKey("/Size").isInteger()) {
+        if (!trailer.getKey("/Size").isInteger()) {
             QTC::TC("qpdf", "QPDF trailer size not integer");
-            throw damagedPDF("trailer", "/Size key in trailer dictionary is not an integer");
+            throw qpdf.damagedPDF("trailer", "/Size key in trailer dictionary is not an integer");
         }
     }
 
     if (cur_trailer.hasKey("/XRefStm")) {
-        if (m->xref_table.ignore_streams) {
+        if (ignore_streams) {
             QTC::TC("qpdf", "QPDF ignoring XRefStm in trailer");
         } else {
             if (cur_trailer.getKey("/XRefStm").isInteger()) {
                 // Read the xref stream but disregard any return value -- we'll use our trailer's
                 // /Prev key instead of the xref stream's.
-                (void)read_xrefStream(cur_trailer.getKey("/XRefStm").getIntValue());
+                (void)qpdf.read_xrefStream(cur_trailer.getKey("/XRefStm").getIntValue());
             } else {
-                throw damagedPDF("xref stream", xref_offset, "invalid /XRefStm");
+                throw qpdf.damagedPDF("xref stream", xref_offset, "invalid /XRefStm");
             }
         }
     }
@@ -1033,7 +1038,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
     if (cur_trailer.hasKey("/Prev")) {
         if (!cur_trailer.getKey("/Prev").isInteger()) {
             QTC::TC("qpdf", "QPDF trailer prev not integer");
-            throw damagedPDF("trailer", "/Prev key in trailer dictionary is not an integer");
+            throw qpdf.damagedPDF("trailer", "/Prev key in trailer dictionary is not an integer");
         }
         QTC::TC("qpdf", "QPDF prev key in trailer dictionary");
         return cur_trailer.getKey("/Prev").getIntValue();
