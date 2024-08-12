@@ -17,6 +17,7 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     void initialize();
     void reconstruct(QPDFExc& e);
     void show();
+    bool resolve();
 
     QPDFObjectHandle trailer;
     bool reconstructed{false};

@@ -1385,13 +1385,13 @@ QPDF::Xref_table::show()
 // Resolve all objects in the xref table. If this triggers a xref table reconstruction abort and
 // return false. Otherwise return true.
 bool
-QPDF::resolveXRefTable()
+QPDF::Xref_table::resolve()
 {
-    bool may_change = !m->xref_table.reconstructed;
-    for (auto& iter: m->xref_table) {
-        if (isUnresolved(iter.first)) {
-            resolve(iter.first);
-            if (may_change && m->xref_table.reconstructed) {
+    bool may_change = !reconstructed;
+    for (auto& iter: *this) {
+        if (qpdf.isUnresolved(iter.first)) {
+            qpdf.resolve(iter.first);
+            if (may_change && reconstructed) {
                 return false;
             }
         }
@@ -1407,9 +1407,9 @@ QPDF::fixDanglingReferences(bool force)
     if (m->fixed_dangling_refs) {
         return;
     }
-    if (!resolveXRefTable()) {
+    if (!m->xref_table.resolve()) {
         QTC::TC("qpdf", "QPDF fix dangling triggered xref reconstruction");
-        resolveXRefTable();
+        m->xref_table.resolve();
     }
     m->fixed_dangling_refs = true;
 }

@@ -759,7 +759,6 @@ class QPDF
 
     void parse(char const* password);
     void inParse(bool);
-    bool resolveXRefTable();
     void setLastObjectDescription(std::string const& description, QPDFObjGen const& og);
     QPDFObjectHandle readTrailer();
     QPDFObjectHandle readObject(std::string const& description, QPDFObjGen og);
