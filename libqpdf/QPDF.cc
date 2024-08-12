@@ -596,7 +596,7 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
             file->seek(pos, SEEK_SET);
         } else if (!trailer && t1.isWord("trailer")) {
             auto pos = file->tell();
-            QPDFObjectHandle t = qpdf.readTrailer();
+            QPDFObjectHandle t = read_trailer();
             if (!t.isDictionary()) {
                 // Oh well.  It was worth a try.
             } else {
@@ -994,7 +994,7 @@ QPDF::Xref_table::read_table(qpdf_offset_t xref_offset)
     }
 
     // Set offset to previous xref table if any
-    auto cur_trailer = qpdf.readTrailer();
+    auto cur_trailer = read_trailer();
     if (!cur_trailer.isDictionary()) {
         QTC::TC("qpdf", "QPDF missing trailer");
         throw qpdf.damagedPDF("", "expected trailer dictionary");
@@ -1456,21 +1456,21 @@ QPDF::setLastObjectDescription(std::string const& description, QPDFObjGen const&
 }
 
 QPDFObjectHandle
-QPDF::readTrailer()
+QPDF::Xref_table::read_trailer()
 {
-    qpdf_offset_t offset = m->file->tell();
+    qpdf_offset_t offset = file->tell();
     bool empty = false;
     auto object =
-        QPDFParser(*m->file, "trailer", m->tokenizer, nullptr, this, true).parse(empty, false);
+        QPDFParser(*qpdf.m->file, "trailer", *tokenizer, nullptr, &qpdf, true).parse(empty, false);
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.
-        warn(damagedPDF("trailer", "empty object treated as null"));
-    } else if (object.isDictionary() && readToken(*m->file).isWord("stream")) {
-        warn(damagedPDF("trailer", m->file->tell(), "stream keyword found in trailer"));
+        qpdf.warn(qpdf.damagedPDF("trailer", "empty object treated as null"));
+    } else if (object.isDictionary() && read_token().isWord("stream")) {
+        qpdf.warn(qpdf.damagedPDF("trailer", file->tell(), "stream keyword found in trailer"));
     }
     // Override last_offset so that it points to the beginning of the object we just read
-    m->file->setLastOffset(offset);
+    file->setLastOffset(offset);
     return object;
 }
 

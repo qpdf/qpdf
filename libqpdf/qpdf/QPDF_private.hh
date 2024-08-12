@@ -54,6 +54,8 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
         int max_num_entries,
         std::function<QPDFExc(std::string_view)> damaged);
 
+    QPDFObjectHandle read_trailer();
+
     QPDFTokenizer::Token
     read_token(size_t max_len = 0)
     {

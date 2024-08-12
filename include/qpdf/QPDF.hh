@@ -760,7 +760,6 @@ class QPDF
     void parse(char const* password);
     void inParse(bool);
     void setLastObjectDescription(std::string const& description, QPDFObjGen const& og);
-    QPDFObjectHandle readTrailer();
     QPDFObjectHandle readObject(std::string const& description, QPDFObjGen og);
     void readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset);
     void validateStreamLineEnd(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset);
