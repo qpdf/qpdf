@@ -115,13 +115,13 @@ QPDF::optimize_internal(
     }
 
     // Traverse document-level items
-    for (auto const& key: m->xref_table.trailer.getKeys()) {
+    for (auto const& key: m->xref_table.trailer().getKeys()) {
         if (key == "/Root") {
             // handled separately
         } else {
             updateObjectMaps(
                 ObjUser(ObjUser::ou_trailer_key, key),
-                m->xref_table.trailer.getKey(key),
+                m->xref_table.trailer().getKey(key),
                 skip_stream_parameters);
         }
     }
@@ -169,7 +169,7 @@ QPDF::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
     // values for them.
     std::map<std::string, std::vector<QPDFObjectHandle>> key_ancestors;
     pushInheritedAttributesToPageInternal(
-        m->xref_table.trailer.getKey("/Root").getKey("/Pages"),
+        m->xref_table.trailer().getKey("/Root").getKey("/Pages"),
         key_ancestors,
         allow_changes,
         warn_skipped_keys);

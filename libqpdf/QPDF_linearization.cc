@@ -461,11 +461,11 @@ QPDF::checkLinearizationInternal()
             break;
         }
     }
-    if (m->file->tell() != m->xref_table.first_item_offset) {
+    if (m->file->tell() != m->xref_table.first_item_offset()) {
         QTC::TC("qpdf", "QPDF err /T mismatch");
         linearizationWarning(
             "space before first xref item (/T) mismatch (computed = " +
-            std::to_string(m->xref_table.first_item_offset) +
+            std::to_string(m->xref_table.first_item_offset()) +
             "; file = " + std::to_string(m->file->tell()));
     }
 
@@ -476,7 +476,7 @@ QPDF::checkLinearizationInternal()
     // compressed objects are supposed to be at the end of the containing xref section if any object
     // streams are in use.
 
-    if (m->xref_table.uncompressed_after_compressed) {
+    if (m->xref_table.uncompressed_after_compressed()) {
         linearizationWarning("linearized file contains an uncompressed object after a compressed "
                              "one in a cross-reference stream");
     }

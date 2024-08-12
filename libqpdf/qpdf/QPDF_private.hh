@@ -19,6 +19,18 @@ class QPDF::Xref_table
     void show();
     bool resolve();
 
+    QPDFObjectHandle
+    trailer() const
+    {
+        return trailer_;
+    }
+
+    void
+    trailer(QPDFObjectHandle&& oh)
+    {
+        trailer_ = std::move(oh);
+    }
+
     // Returns 0 if og is not in table.
     int
     type(QPDFObjGen og) const
@@ -61,22 +73,47 @@ class QPDF::Xref_table
     size_t
     size() const noexcept
     {
-        return trailer ? table.size() : 0;
+        return trailer_ ? table.size() : 0;
     }
 
-    QPDFObjectHandle trailer;
-    bool reconstructed{false};
-    // Various tables are indexed by object id, with potential size id + 1
-    int max_id{std::numeric_limits<int>::max() - 1};
-    qpdf_offset_t max_offset{0};
-    std::set<int> deleted_objects;
-    bool ignore_streams{false};
-    bool parsed{false};
-    bool attempt_recovery{true};
+    void
+    ignore_streams(bool val) noexcept
+    {
+        ignore_streams_ = val;
+    }
 
-    // Linearization data
-    bool uncompressed_after_compressed{false};
-    qpdf_offset_t first_item_offset{0}; // actual value from file
+    bool
+    initialized() const noexcept
+    {
+        return initialized_;
+    }
+
+    void
+    attempt_recovery(bool val) noexcept
+    {
+        attempt_recovery_ = val;
+    }
+
+    int
+    max_id() const noexcept
+    {
+        return max_id_;
+    }
+
+    // For Linearization
+
+    bool
+    uncompressed_after_compressed() const noexcept
+    {
+        return uncompressed_after_compressed_;
+    }
+
+    // Actual value from file
+    qpdf_offset_t
+    first_item_offset() const noexcept
+    {
+        return first_item_offset_;
+    }
 
   private:
     void read(qpdf_offset_t offset);
@@ -135,6 +172,19 @@ class QPDF::Xref_table
     QPDFTokenizer tokenizer;
 
     std::map<QPDFObjGen, QPDFXRefEntry> table;
+    QPDFObjectHandle trailer_;
+
+    bool attempt_recovery_{true};
+    bool initialized_{false};
+    bool ignore_streams_{false};
+    std::set<int> deleted_objects;
+    bool reconstructed_{false};
+    // Various tables are indexed by object id, with potential size id + 1
+    int max_id_{std::numeric_limits<int>::max() - 1};
+
+    // Linearization data
+    bool uncompressed_after_compressed_{false};
+    qpdf_offset_t first_item_offset_{0}; // actual value from file
 };
 
 // Writer class is restricted to QPDFWriter so that only it can call certain methods.
