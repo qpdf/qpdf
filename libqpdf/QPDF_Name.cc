@@ -4,7 +4,7 @@
 #include <qpdf/QUtil.hh>
 
 QPDF_Name::QPDF_Name(std::string const& name) :
-    QPDFValue(::ot_name, "name"),
+    QPDFValue(::ot_name),
     name(name)
 {
 }

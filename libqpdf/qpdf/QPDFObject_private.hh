@@ -58,12 +58,6 @@ class QPDFObject
     {
         return value->type_code;
     }
-    // Return a string literal that describes the type, useful for debugging and testing
-    char const*
-    getTypeName() const
-    {
-        return resolved_object()->value->type_name;
-    }
 
     QPDF*
     getQPDF() const

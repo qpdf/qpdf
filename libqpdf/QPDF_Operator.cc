@@ -3,7 +3,7 @@
 #include <qpdf/JSON_writer.hh>
 
 QPDF_Operator::QPDF_Operator(std::string const& val) :
-    QPDFValue(::ot_operator, "operator"),
+    QPDFValue(::ot_operator),
     val(val)
 {
 }

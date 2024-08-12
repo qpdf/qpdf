@@ -3,7 +3,7 @@
 #include <qpdf/JSON_writer.hh>
 
 QPDF_InlineImage::QPDF_InlineImage(std::string const& val) :
-    QPDFValue(::ot_inlineimage, "inline-image"),
+    QPDFValue(::ot_inlineimage),
     val(val)
 {
 }

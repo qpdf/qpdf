@@ -9,13 +9,13 @@
 using namespace std::literals;
 
 QPDF_Dictionary::QPDF_Dictionary(std::map<std::string, QPDFObjectHandle> const& items) :
-    QPDFValue(::ot_dictionary, "dictionary"),
+    QPDFValue(::ot_dictionary),
     items(items)
 {
 }
 
 QPDF_Dictionary::QPDF_Dictionary(std::map<std::string, QPDFObjectHandle>&& items) :
-    QPDFValue(::ot_dictionary, "dictionary"),
+    QPDFValue(::ot_dictionary),
     items(items)
 {
 }

@@ -26,24 +26,24 @@ QPDF_Array::checkOwnership(QPDFObjectHandle const& item) const
 }
 
 QPDF_Array::QPDF_Array() :
-    QPDFValue(::ot_array, "array")
+    QPDFValue(::ot_array)
 {
 }
 
 QPDF_Array::QPDF_Array(QPDF_Array const& other) :
-    QPDFValue(::ot_array, "array"),
+    QPDFValue(::ot_array),
     sp(other.sp ? std::make_unique<Sparse>(*other.sp) : nullptr)
 {
 }
 
 QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v) :
-    QPDFValue(::ot_array, "array")
+    QPDFValue(::ot_array)
 {
     setFromVector(v);
 }
 
 QPDF_Array::QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& v, bool sparse) :
-    QPDFValue(::ot_array, "array")
+    QPDFValue(::ot_array)
 {
     if (sparse) {
         sp = std::make_unique<Sparse>();

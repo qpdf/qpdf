@@ -4,7 +4,7 @@
 #include <qpdf/QPDFObject_private.hh>
 
 QPDF_Null::QPDF_Null(QPDF* qpdf, QPDFObjGen og) :
-    QPDFValue(::ot_null, "null", qpdf, og)
+    QPDFValue(::ot_null, qpdf, og)
 {
 }
 
