@@ -1355,26 +1355,30 @@ QPDF::Xref_table::insert_reconstructed(int obj, qpdf_offset_t f1, int f2)
 void
 QPDF::showXRefTable()
 {
-    auto& cout = *m->log->getInfo();
-    for (auto const& iter: m->xref_table) {
+    m->xref_table.show();
+}
+
+void
+QPDF::Xref_table::show()
+{
+    auto& cout = *qpdf.m->log->getInfo();
+    for (auto const& iter: *this) {
         QPDFObjGen const& og = iter.first;
         QPDFXRefEntry const& entry = iter.second;
         cout << og.unparse('/') << ": ";
         switch (entry.getType()) {
         case 1:
-            cout << "uncompressed; offset = " << entry.getOffset();
+            cout << "uncompressed; offset = " << entry.getOffset() << "\n";
             break;
 
         case 2:
-            *m->log->getInfo() << "compressed; stream = " << entry.getObjStreamNumber()
-                               << ", index = " << entry.getObjStreamIndex();
+            cout << "compressed; stream = " << entry.getObjStreamNumber()
+                 << ", index = " << entry.getObjStreamIndex() << "\n";
             break;
 
         default:
             throw std::logic_error("unknown cross-reference table type while showing xref_table");
-            break;
         }
-        m->log->info("\n");
     }
 }
 
