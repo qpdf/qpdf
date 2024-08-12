@@ -760,6 +760,7 @@ QPDF::Xref_table::read(qpdf_offset_t xref_offset)
     for (auto const& item: *this) {
         auto id = item.first.getObj();
         if (id == last_og.getObj() && id > 0) {
+            erase(last_og);
             qpdf.removeObject(last_og);
         }
         last_og = item.first;
@@ -2175,7 +2176,6 @@ QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
 void
 QPDF::removeObject(QPDFObjGen og)
 {
-    m->xref_table.erase(og);
     if (auto cached = m->obj_cache.find(og); cached != m->obj_cache.end()) {
         // Take care of any object handles that may be floating around.
         cached->second.object->assign(QPDF_Null::create());
