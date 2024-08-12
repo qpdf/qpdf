@@ -201,7 +201,7 @@ QPDF::Members::Members(QPDF& qpdf) :
     file_sp(new InvalidInputSource()),
     file(file_sp.get()),
     encp(new EncryptionParameters),
-    xref_table(qpdf)
+    xref_table(qpdf, file)
 {
 }
 
@@ -495,12 +495,10 @@ QPDF::warn(
 void
 QPDF::Xref_table::initialize()
 {
-    auto* m = qpdf.m.get();
-
     // PDF spec says %%EOF must be found within the last 1024 bytes of/ the file.  We add an extra
     // 30 characters to leave room for the startxref stuff.
-    m->file->seek(0, SEEK_END);
-    qpdf_offset_t end_offset = m->file->tell();
+    file->seek(0, SEEK_END);
+    qpdf_offset_t end_offset = file->tell();
     max_offset = end_offset;
     // Sanity check on object ids. All objects must appear in xref table / stream. In all realistic
     // scenarios at least 3 bytes are required.
@@ -510,8 +508,8 @@ QPDF::Xref_table::initialize()
     qpdf_offset_t start_offset = (end_offset > 1054 ? end_offset - 1054 : 0);
     PatternFinder sf(qpdf, &QPDF::findStartxref);
     qpdf_offset_t xref_offset = 0;
-    if (m->file->findLast("startxref", start_offset, 0, sf)) {
-        xref_offset = QUtil::string_to_ll(qpdf.readToken(*m->file).getValue().c_str());
+    if (file->findLast("startxref", start_offset, 0, sf)) {
+        xref_offset = QUtil::string_to_ll(read_token().getValue().c_str());
     }
 
     try {
@@ -547,11 +545,9 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
         throw e;
     }
 
-    auto* m = qpdf.m.get();
-
     // If recovery generates more than 1000 warnings, the file is so severely damaged that there
     // probably is no point trying to continue.
-    const auto max_warnings = m->warnings.size() + 1000U;
+    const auto max_warnings = qpdf.m->warnings.size() + 1000U;
     auto check_warnings = [this, max_warnings]() {
         if (qpdf.m->warnings.size() > max_warnings) {
             throw damaged_pdf("too many errors while reconstructing cross-reference table");
@@ -560,7 +556,7 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
 
     reconstructed = true;
     // We may find more objects, which may contain dangling references.
-    m->fixed_dangling_refs = false;
+    qpdf.m->fixed_dangling_refs = false;
 
     warn_damaged("file is damaged");
     qpdf.warn(e);
@@ -577,18 +573,18 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
         erase(iter);
     }
 
-    m->file->seek(0, SEEK_END);
-    qpdf_offset_t eof = m->file->tell();
-    m->file->seek(0, SEEK_SET);
+    file->seek(0, SEEK_END);
+    qpdf_offset_t eof = file->tell();
+    file->seek(0, SEEK_SET);
     // Don't allow very long tokens here during recovery. All the interesting tokens are covered.
     static size_t const MAX_LEN = 10;
-    while (m->file->tell() < eof) {
-        QPDFTokenizer::Token t1 = qpdf.readToken(*m->file, MAX_LEN);
-        qpdf_offset_t token_start = m->file->tell() - toO(t1.getValue().length());
+    while (file->tell() < eof) {
+        QPDFTokenizer::Token t1 = read_token(MAX_LEN);
+        qpdf_offset_t token_start = file->tell() - toO(t1.getValue().length());
         if (t1.isInteger()) {
-            auto pos = m->file->tell();
-            QPDFTokenizer::Token t2 = qpdf.readToken(*m->file, MAX_LEN);
-            if (t2.isInteger() && qpdf.readToken(*m->file, MAX_LEN).isWord("obj")) {
+            auto pos = file->tell();
+            QPDFTokenizer::Token t2 = read_token(MAX_LEN);
+            if (t2.isInteger() && read_token(MAX_LEN).isWord("obj")) {
                 int obj = QUtil::string_to_int(t1.getValue().c_str());
                 int gen = QUtil::string_to_int(t2.getValue().c_str());
                 if (obj <= max_id) {
@@ -597,19 +593,19 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
                     warn_damaged("ignoring object with impossibly large id " + std::to_string(obj));
                 }
             }
-            m->file->seek(pos, SEEK_SET);
+            file->seek(pos, SEEK_SET);
         } else if (!trailer && t1.isWord("trailer")) {
-            auto pos = m->file->tell();
+            auto pos = file->tell();
             QPDFObjectHandle t = qpdf.readTrailer();
             if (!t.isDictionary()) {
                 // Oh well.  It was worth a try.
             } else {
                 trailer = t;
             }
-            m->file->seek(pos, SEEK_SET);
+            file->seek(pos, SEEK_SET);
         }
         check_warnings();
-        m->file->findAndSkipNextEOL();
+        file->findAndSkipNextEOL();
     }
     deleted_objects.clear();
 
@@ -664,7 +660,7 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
         parsed = true;
         qpdf.getAllPages();
         check_warnings();
-        if (m->all_pages.empty()) {
+        if (qpdf.m->all_pages.empty()) {
             parsed = false;
             throw damaged_pdf("unable to find any pages while recovering damaged file");
         }
@@ -679,15 +675,13 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
 void
 QPDF::Xref_table::read(qpdf_offset_t xref_offset)
 {
-    auto* m = qpdf.m.get();
-
     std::map<int, int> free_table;
     std::set<qpdf_offset_t> visited;
     while (xref_offset) {
         visited.insert(xref_offset);
         char buf[7];
         memset(buf, 0, sizeof(buf));
-        m->file->seek(xref_offset, SEEK_SET);
+        file->seek(xref_offset, SEEK_SET);
         // Some files miss the mark a little with startxref. We could do a better job of searching
         // in the neighborhood for something that looks like either an xref table or stream, but the
         // simple heuristic of skipping whitespace can help with the xref table case and is harmless
@@ -696,11 +690,11 @@ QPDF::Xref_table::read(qpdf_offset_t xref_offset)
         bool skipped_space = false;
         while (!done) {
             char ch;
-            if (1 == m->file->read(&ch, 1)) {
+            if (1 == file->read(&ch, 1)) {
                 if (QUtil::is_space(ch)) {
                     skipped_space = true;
                 } else {
-                    m->file->unreadCh(ch);
+                    file->unreadCh(ch);
                     done = true;
                 }
             } else {
@@ -709,7 +703,7 @@ QPDF::Xref_table::read(qpdf_offset_t xref_offset)
             }
         }
 
-        m->file->read(buf, sizeof(buf) - 1);
+        file->read(buf, sizeof(buf) - 1);
         // The PDF spec says xref must be followed by a line terminator, but files exist in the wild
         // where it is terminated by arbitrary whitespace.
         if ((strncmp(buf, "xref", 4) == 0) && QUtil::is_space(buf[4])) {
@@ -823,11 +817,9 @@ QPDF::Xref_table::parse_first(std::string const& line, int& obj, int& num, int& 
 bool
 QPDF::Xref_table::read_bad_entry(qpdf_offset_t& f1, int& f2, char& type)
 {
-    auto* m = qpdf.m.get();
-
     // Reposition after initial read attempt and reread.
-    m->file->seek(m->file->getLastOffset(), SEEK_SET);
-    auto line = m->file->readLine(30);
+    file->seek(file->getLastOffset(), SEEK_SET);
+    auto line = file->readLine(30);
 
     // is_space and is_digit both return false on '\0', so this will not overrun the null-terminated
     // buffer.
@@ -907,10 +899,8 @@ QPDF::Xref_table::read_bad_entry(qpdf_offset_t& f1, int& f2, char& type)
 bool
 QPDF::Xref_table::read_entry(qpdf_offset_t& f1, int& f2, char& type)
 {
-    auto* m = qpdf.m.get();
-
     std::array<char, 21> line;
-    if (m->file->read(line.data(), 20) != 20) {
+    if (file->read(line.data(), 20) != 20) {
         // C++20: [[unlikely]]
         return false;
     }
@@ -963,13 +953,11 @@ QPDF::Xref_table::read_entry(qpdf_offset_t& f1, int& f2, char& type)
 qpdf_offset_t
 QPDF::Xref_table::read_table(qpdf_offset_t xref_offset)
 {
-    auto* m = qpdf.m.get();
-
-    m->file->seek(xref_offset, SEEK_SET);
+    file->seek(xref_offset, SEEK_SET);
     std::string line;
     while (true) {
         line.assign(50, '\0');
-        m->file->read(line.data(), line.size());
+        file->read(line.data(), line.size());
         int obj = 0;
         int num = 0;
         int bytes = 0;
@@ -977,11 +965,11 @@ QPDF::Xref_table::read_table(qpdf_offset_t xref_offset)
             QTC::TC("qpdf", "QPDF invalid xref");
             throw damaged_table("xref syntax invalid");
         }
-        m->file->seek(m->file->getLastOffset() + bytes, SEEK_SET);
+        file->seek(file->getLastOffset() + bytes, SEEK_SET);
         for (qpdf_offset_t i = obj; i - num < obj; ++i) {
             if (i == 0) {
                 // This is needed by checkLinearization()
-                first_item_offset = m->file->tell();
+                first_item_offset = file->tell();
             }
             // For xref_table, these will always be small enough to be ints
             qpdf_offset_t f1 = 0;
@@ -997,11 +985,11 @@ QPDF::Xref_table::read_table(qpdf_offset_t xref_offset)
                 insert(toI(i), 1, f1, f2);
             }
         }
-        qpdf_offset_t pos = m->file->tell();
-        if (qpdf.readToken(*m->file).isWord("trailer")) {
+        qpdf_offset_t pos = file->tell();
+        if (read_token().isWord("trailer")) {
             break;
         } else {
-            m->file->seek(pos, SEEK_SET);
+            file->seek(pos, SEEK_SET);
         }
     }
 

@@ -7,9 +7,11 @@
 class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
 {
   public:
-    Xref_table(QPDF& qpdf) :
-        qpdf(qpdf)
+    Xref_table(QPDF& qpdf, InputSource* const& file) :
+        qpdf(qpdf),
+        file(file)
     {
+        tokenizer.allowEOF();
     }
 
     void initialize();
@@ -50,6 +52,12 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
         int max_num_entries,
         std::function<QPDFExc(std::string_view)> damaged);
 
+    QPDFTokenizer::Token
+    read_token(size_t max_len = 0)
+    {
+        return tokenizer.readToken(*file, "", true, max_len);
+    }
+
     // Methods to insert table entries
     void insert_reconstructed(int obj, qpdf_offset_t f1, int f2);
     void insert(int obj, int f0, qpdf_offset_t f1, int f2);
@@ -72,7 +80,10 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     {
         qpdf.warn(damaged_pdf(msg));
     }
+
     QPDF& qpdf;
+    InputSource* const& file;
+    QPDFTokenizer tokenizer;
 };
 
 // Writer class is restricted to QPDFWriter so that only it can call certain methods.
