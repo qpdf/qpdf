@@ -561,13 +561,13 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
 
     // Delete all references to type 1 (uncompressed) objects
     std::set<QPDFObjGen> to_delete;
-    for (auto const& iter: *this) {
+    for (auto const& iter: table) {
         if (iter.second.getType() == 1) {
             to_delete.insert(iter.first);
         }
     }
     for (auto const& iter: to_delete) {
-        erase(iter);
+        table.erase(iter);
     }
 
     file->seek(0, SEEK_END);
@@ -609,7 +609,7 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
     if (!trailer) {
         qpdf_offset_t max_offset{0};
         // If there are any xref streams, take the last one to appear.
-        for (auto const& iter: *this) {
+        for (auto const& iter: table) {
             auto entry = iter.second;
             if (entry.getType() != 1) {
                 continue;
@@ -647,7 +647,7 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
 
         throw damaged_pdf("unable to find trailer dictionary while recovering damaged file");
     }
-    if (empty()) {
+    if (table.empty()) {
         // We cannot check for an empty xref table in parse because empty tables are valid when
         // creating QPDF objects from JSON.
         throw damaged_pdf("unable to find objects while recovering damaged file");
@@ -735,8 +735,8 @@ QPDF::Xref_table::read(qpdf_offset_t xref_offset)
     }
     int size = trailer.getKey("/Size").getIntValueAsInt();
     int max_obj = 0;
-    if (!empty()) {
-        max_obj = rbegin()->first.getObj();
+    if (!table.empty()) {
+        max_obj = table.rbegin()->first.getObj();
     }
     if (!deleted_objects.empty()) {
         max_obj = std::max(max_obj, *deleted_objects.rbegin());
@@ -754,10 +754,10 @@ QPDF::Xref_table::read(qpdf_offset_t xref_offset)
 
     // Make sure we keep only the highest generation for any object.
     QPDFObjGen last_og{-1, 0};
-    for (auto const& item: *this) {
+    for (auto const& item: table) {
         auto id = item.first.getObj();
         if (id == last_og.getObj() && id > 0) {
-            erase(last_og);
+            table.erase(last_og);
             qpdf.removeObject(last_og);
         }
         last_og = item.first;
@@ -1299,7 +1299,7 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
         return;
     }
 
-    auto [iter, created] = try_emplace(QPDFObjGen(obj, (f0 == 2 ? 0 : f2)));
+    auto [iter, created] = table.try_emplace(QPDFObjGen(obj, (f0 == 2 ? 0 : f2)));
     if (!created) {
         QTC::TC("qpdf", "QPDF xref reused object");
         return;
@@ -1326,7 +1326,7 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
 void
 QPDF::Xref_table::insert_free(QPDFObjGen og)
 {
-    if (!count(og)) {
+    if (!table.count(og)) {
         deleted_objects.insert(og.getObj());
     }
 }
@@ -1346,7 +1346,7 @@ QPDF::Xref_table::insert_reconstructed(int obj, qpdf_offset_t f1, int f2)
         // deleted_objects stores the uncompressed objects removed from the xref table at the start
         // of recovery.
         QTC::TC("qpdf", "QPDF xref overwrite object");
-        insert_or_assign(QPDFObjGen(obj, f2), QPDFXRefEntry(f1));
+        table.insert_or_assign(QPDFObjGen(obj, f2), QPDFXRefEntry(f1));
     }
 }
 
@@ -1360,7 +1360,7 @@ void
 QPDF::Xref_table::show()
 {
     auto& cout = *qpdf.m->log->getInfo();
-    for (auto const& iter: *this) {
+    for (auto const& iter: table) {
         QPDFObjGen const& og = iter.first;
         QPDFXRefEntry const& entry = iter.second;
         cout << og.unparse('/') << ": ";
@@ -1386,7 +1386,7 @@ bool
 QPDF::Xref_table::resolve()
 {
     bool may_change = !reconstructed;
-    for (auto& iter: *this) {
+    for (auto& iter: table) {
         if (qpdf.isUnresolved(iter.first)) {
             qpdf.resolve(iter.first);
             if (may_change && reconstructed) {
@@ -1459,7 +1459,7 @@ QPDF::Xref_table::read_trailer()
     qpdf_offset_t offset = file->tell();
     bool empty = false;
     auto object =
-        QPDFParser(*qpdf.m->file, "trailer", *tokenizer, nullptr, &qpdf, true).parse(empty, false);
+        QPDFParser(*file, "trailer", tokenizer, nullptr, &qpdf, true).parse(empty, false);
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.

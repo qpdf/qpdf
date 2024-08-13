@@ -4,7 +4,7 @@
 #include <qpdf/QPDF.hh>
 
 // Xref_table encapsulates the pdf's xref table and trailer.
-class QPDF::Xref_table: std::map<QPDFObjGen, QPDFXRefEntry>
+class QPDF::Xref_table
 {
   public:
     Xref_table(QPDF& qpdf, InputSource* const& file) :
@@ -23,45 +23,45 @@ class QPDF::Xref_table: std::map<QPDFObjGen, QPDFXRefEntry>
     int
     type(QPDFObjGen og) const
     {
-        auto it = find(og);
-        return it == end() ? 0 : it->second.getType();
+        auto it = table.find(og);
+        return it == table.end() ? 0 : it->second.getType();
     }
 
     // Returns 0 if og is not in table.
     qpdf_offset_t
     offset(QPDFObjGen og) const
     {
-        auto it = find(og);
-        return it == end() ? 0 : it->second.getOffset();
+        auto it = table.find(og);
+        return it == table.end() ? 0 : it->second.getOffset();
     }
 
     // Returns 0 if og is not in table.
     int
     stream_number(int id) const
     {
-        auto it = find(QPDFObjGen(id, 0));
-        return it == end() ? 0 : it->second.getObjStreamNumber();
+        auto it = table.find(QPDFObjGen(id, 0));
+        return it == table.end() ? 0 : it->second.getObjStreamNumber();
     }
 
     int
     stream_index(int id) const
     {
-        auto it = find(QPDFObjGen(id, 0));
-        return it == end() ? 0 : it->second.getObjStreamIndex();
+        auto it = table.find(QPDFObjGen(id, 0));
+        return it == table.end() ? 0 : it->second.getObjStreamIndex();
     }
 
     // Temporary access to underlying map
     std::map<QPDFObjGen, QPDFXRefEntry> const&
     as_map()
     {
-        return *this;
+        return table;
     }
 
     // Temporary access to underlying map size
     size_t
     size() const noexcept
     {
-        return trailer ? std::map<QPDFObjGen, QPDFXRefEntry>::size() : 0;
+        return trailer ? table.size() : 0;
     }
 
     QPDFObjectHandle trailer;
@@ -133,6 +133,8 @@ class QPDF::Xref_table: std::map<QPDFObjGen, QPDFXRefEntry>
     QPDF& qpdf;
     InputSource* const& file;
     QPDFTokenizer tokenizer;
+
+    std::map<QPDFObjGen, QPDFXRefEntry> table;
 };
 
 // Writer class is restricted to QPDFWriter so that only it can call certain methods.
