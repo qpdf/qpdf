@@ -495,6 +495,14 @@ QPDF::Xref_table::initialize_empty()
 }
 
 void
+QPDF::Xref_table::initialize_json()
+{
+    initialized_ = true;
+    trailer_ = QPDFObjectHandle::newDictionary();
+    trailer_.replaceKey("/Size", QPDFObjectHandle::newInteger(1));
+}
+
+void
 QPDF::Xref_table::initialize()
 {
     // PDF spec says %%EOF must be found within the last 1024 bytes of/ the file.  We add an extra

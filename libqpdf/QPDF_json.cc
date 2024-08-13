@@ -51,17 +51,6 @@
 //   ]                            |   <- st_top
 // }                              |
 
-static char const* JSON_PDF = (
-    // force line break
-    "%PDF-1.3\n"
-    "xref\n"
-    "0 1\n"
-    "0000000000 65535 f \n"
-    "trailer << /Size 1 >>\n"
-    "startxref\n"
-    "9\n"
-    "%%EOF\n");
-
 // Validator methods -- these are much more performant than std::regex.
 static bool
 is_indirect_object(std::string const& v, int& obj, int& gen)
@@ -785,7 +774,9 @@ QPDF::createFromJSON(std::string const& json_file)
 void
 QPDF::createFromJSON(std::shared_ptr<InputSource> is)
 {
-    processMemoryFile(is->getName().c_str(), JSON_PDF, strlen(JSON_PDF));
+    m->pdf_version = "1.3";
+    m->no_input_name = is->getName();
+    m->xref_table.initialize_json();
     importJSON(is, true);
 }
 

@@ -16,6 +16,7 @@ class QPDF::Xref_table
 
     void initialize();
     void initialize_empty();
+    void initialize_json();
     void reconstruct(QPDFExc& e);
     void show();
     bool resolve();
