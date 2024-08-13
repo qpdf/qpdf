@@ -15,6 +15,7 @@ class QPDF::Xref_table
     }
 
     void initialize();
+    void initialize_empty();
     void reconstruct(QPDFExc& e);
     void show();
     bool resolve();
@@ -640,6 +641,8 @@ class QPDF::Members
     std::shared_ptr<QPDFLogger> log;
     unsigned long long unique_id{0};
     QPDFTokenizer tokenizer;
+    // Filename to use if there is no input PDF
+    std::string no_input_name{"closed input source"};
     // If file_sp is updated, file must also be updated.
     std::shared_ptr<InputSource> file_sp;
     InputSource* file;

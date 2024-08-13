@@ -32,67 +32,51 @@
 // being static as well.
 std::string const QPDF::qpdf_version(QPDF_VERSION);
 
-static char const* EMPTY_PDF = (
-    // force line break
-    "%PDF-1.3\n"
-    "1 0 obj\n"
-    "<< /Type /Catalog /Pages 2 0 R >>\n"
-    "endobj\n"
-    "2 0 obj\n"
-    "<< /Type /Pages /Kids [] /Count 0 >>\n"
-    "endobj\n"
-    "xref\n"
-    "0 3\n"
-    "0000000000 65535 f \n"
-    "0000000009 00000 n \n"
-    "0000000058 00000 n \n"
-    "trailer << /Size 3 /Root 1 0 R >>\n"
-    "startxref\n"
-    "110\n"
-    "%%EOF\n");
-
 namespace
 {
-    class InvalidInputSource: public InputSource
+    class InvalidInputSource final: public InputSource
     {
       public:
-        ~InvalidInputSource() override = default;
+        InvalidInputSource(std::string const& name) :
+            name(name)
+        {
+        }
+        ~InvalidInputSource() final = default;
         qpdf_offset_t
-        findAndSkipNextEOL() override
+        findAndSkipNextEOL() final
         {
             throwException();
             return 0;
         }
         std::string const&
-        getName() const override
+        getName() const final
         {
-            static std::string name("closed input source");
             return name;
         }
         qpdf_offset_t
-        tell() override
+        tell() final
         {
             throwException();
             return 0;
         }
         void
-        seek(qpdf_offset_t offset, int whence) override
+        seek(qpdf_offset_t offset, int whence) final
         {
             throwException();
         }
         void
-        rewind() override
+        rewind() final
         {
             throwException();
         }
         size_t
-        read(char* buffer, size_t length) override
+        read(char* buffer, size_t length) final
         {
             throwException();
             return 0;
         }
         void
-        unreadCh(char ch) override
+        unreadCh(char ch) final
         {
             throwException();
         }
@@ -105,6 +89,8 @@ namespace
                                    "source. QPDF operations are invalid before processFile (or "
                                    "another process method) or after closeInputSource");
         }
+
+        std::string const& name;
     };
 } // namespace
 
@@ -198,7 +184,7 @@ QPDF::EncryptionParameters::EncryptionParameters() :
 
 QPDF::Members::Members(QPDF& qpdf) :
     log(QPDFLogger::defaultLogger()),
-    file_sp(new InvalidInputSource()),
+    file_sp(new InvalidInputSource(no_input_name)),
     file(file_sp.get()),
     encp(new EncryptionParameters),
     xref_table(qpdf, file)
@@ -278,7 +264,8 @@ QPDF::processInputSource(std::shared_ptr<InputSource> source, char const* passwo
 void
 QPDF::closeInputSource()
 {
-    m->file_sp = std::shared_ptr<InputSource>(new InvalidInputSource());
+    m->no_input_name = "closed input source";
+    m->file_sp = std::shared_ptr<InputSource>(new InvalidInputSource(m->no_input_name));
     m->file = m->file_sp.get();
 }
 
@@ -291,7 +278,9 @@ QPDF::setPasswordIsHexKey(bool val)
 void
 QPDF::emptyPDF()
 {
-    processMemoryFile("empty PDF", EMPTY_PDF, strlen(EMPTY_PDF));
+    m->pdf_version = "1.3";
+    m->no_input_name = "empty PDF";
+    m->xref_table.initialize_empty();
 }
 
 void
@@ -487,6 +476,22 @@ QPDF::warn(
     std::string const& message)
 {
     warn(QPDFExc(error_code, getFilename(), object, offset, message));
+}
+
+void
+QPDF::Xref_table::initialize_empty()
+{
+    initialized_ = true;
+    trailer_ = QPDFObjectHandle::newDictionary();
+    auto rt = qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
+    auto pgs = qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
+    pgs.replaceKey("/Type", QPDFObjectHandle::newName("/Pages"));
+    pgs.replaceKey("/Kids", QPDFObjectHandle::newArray());
+    pgs.replaceKey("/Count", QPDFObjectHandle::newInteger(0));
+    rt.replaceKey("/Type", QPDFObjectHandle::newName("/Catalog"));
+    rt.replaceKey("/Pages", pgs);
+    trailer_.replaceKey("/Root", rt);
+    trailer_.replaceKey("/Size", QPDFObjectHandle::newInteger(3));
 }
 
 void
