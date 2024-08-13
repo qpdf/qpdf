@@ -227,9 +227,6 @@ QPDF::~QPDF()
     // are reachable from this object to release their association with this QPDF. Direct objects
     // are not destroyed since they can be moved to other QPDF objects safely.
 
-    // At this point, obviously no one is still using the QPDF object, but we'll explicitly clear
-    // the xref table anyway just to prevent any possibility of resolve() succeeding.
-    m->xref_table.clear();
     for (auto const& iter: m->obj_cache) {
         iter.second.object->disconnect();
         if (iter.second.object->getTypeCode() != ::ot_null) {
@@ -1651,7 +1648,7 @@ QPDF::recoverStreamLength(
         QPDFObjGen found_og;
 
         // Make sure this is inside this object
-        for (auto const& [current_og, entry]: m->xref_table) {
+        for (auto const& [current_og, entry]: m->xref_table.as_map()) {
             if (entry.getType() == 1) {
                 qpdf_offset_t obj_offset = entry.getOffset();
                 if (found_offset < obj_offset && obj_offset < end) {
@@ -1984,9 +1981,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     m->last_object_description += "object ";
     for (auto const& iter: offsets) {
         QPDFObjGen og(iter.first, 0);
-        auto entry = m->xref_table.find(og);
-        if (entry != m->xref_table.end() && entry->second.getType() == 2 &&
-            entry->second.getObjStreamNumber() == obj_stream_number) {
+        if (m->xref_table.type(og) == 2 &&
+            m->xref_table.stream_number(og.getObj()) == obj_stream_number) {
             int offset = iter.second;
             input->seek(offset, SEEK_SET);
             QPDFObjectHandle oh = readObjectInStream(input, iter.first);
@@ -2560,7 +2556,7 @@ QPDF::getXRefTableInternal()
         throw std::logic_error("QPDF::getXRefTable called before parsing.");
     }
 
-    return m->xref_table;
+    return m->xref_table.as_map();
 }
 
 size_t
@@ -2568,7 +2564,7 @@ QPDF::tableSize()
 {
     // If obj_cache is dense, accommodate all object in tables,else accommodate only original
     // objects.
-    auto max_xref = m->xref_table.size() ? m->xref_table.crbegin()->first.getObj() : 0;
+    auto max_xref = m->xref_table.size() ? m->xref_table.as_map().crbegin()->first.getObj() : 0;
     auto max_obj = m->obj_cache.size() ? m->obj_cache.crbegin()->first.getObj() : 0;
     auto max_id = std::numeric_limits<int>::max() - 1;
     if (max_obj >= max_id || max_xref >= max_id) {

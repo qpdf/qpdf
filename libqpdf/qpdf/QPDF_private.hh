@@ -4,7 +4,7 @@
 #include <qpdf/QPDF.hh>
 
 // Xref_table encapsulates the pdf's xref table and trailer.
-class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
+class QPDF::Xref_table: std::map<QPDFObjGen, QPDFXRefEntry>
 {
   public:
     Xref_table(QPDF& qpdf, InputSource* const& file) :
@@ -48,6 +48,20 @@ class QPDF::Xref_table: public std::map<QPDFObjGen, QPDFXRefEntry>
     {
         auto it = find(QPDFObjGen(id, 0));
         return it == end() ? 0 : it->second.getObjStreamIndex();
+    }
+
+    // Temporary access to underlying map
+    std::map<QPDFObjGen, QPDFXRefEntry> const&
+    as_map()
+    {
+        return *this;
+    }
+
+    // Temporary access to underlying map size
+    size_t
+    size() const noexcept
+    {
+        return trailer ? std::map<QPDFObjGen, QPDFXRefEntry>::size() : 0;
     }
 
     QPDFObjectHandle trailer;

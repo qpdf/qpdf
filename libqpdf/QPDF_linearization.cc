@@ -486,7 +486,7 @@ QPDF::checkLinearizationInternal()
     // to figure out which objects are compressed and which are uncompressed.
     { // local scope
         std::map<int, int> object_stream_data;
-        for (auto const& iter: m->xref_table) {
+        for (auto const& iter: m->xref_table.as_map()) {
             QPDFObjGen const& og = iter.first;
             QPDFXRefEntry const& entry = iter.second;
             if (entry.getType() == 2) {
