@@ -827,7 +827,7 @@ class QPDF
 
     // For QPDFWriter:
 
-    std::map<QPDFObjGen, QPDFXRefEntry> const& getXRefTableInternal();
+    std::map<QPDFObjGen, QPDFXRefEntry> getXRefTableInternal();
     template <typename T>
     void optimize_internal(
         T const& object_stream_data,

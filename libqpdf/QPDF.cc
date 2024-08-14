@@ -498,6 +498,7 @@ void
 QPDF::Xref_table::initialize_json()
 {
     initialized_ = true;
+    table.resize(1);
     trailer_ = QPDFObjectHandle::newDictionary();
     trailer_.replaceKey("/Size", QPDFObjectHandle::newInteger(1));
 }
@@ -572,18 +573,15 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
     warn_damaged("Attempting to reconstruct cross-reference table");
 
     // Delete all references to type 1 (uncompressed) objects
-    std::set<QPDFObjGen> to_delete;
-    for (auto const& iter: table) {
-        if (iter.second.getType() == 1) {
-            to_delete.insert(iter.first);
+    for (auto& iter: table) {
+        if (iter.entry.getType() == 1) {
+            iter = {};
         }
-    }
-    for (auto const& iter: to_delete) {
-        table.erase(iter);
     }
 
     std::vector<std::tuple<int, int, qpdf_offset_t>> objects;
     std::vector<qpdf_offset_t> trailers;
+    int max_found = 0;
 
     file->seek(0, SEEK_END);
     qpdf_offset_t eof = file->tell();
@@ -601,6 +599,9 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
                 int gen = QUtil::string_to_int(t2.getValue().c_str());
                 if (obj <= max_id_) {
                     objects.emplace_back(obj, gen, token_start);
+                    if (obj > max_found) {
+                        max_found = obj;
+                    }
                 } else {
                     warn_damaged("ignoring object with impossibly large id " + std::to_string(obj));
                 }
@@ -611,6 +612,8 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
         }
         file->findAndSkipNextEOL();
     }
+
+    table.resize(toS(max_found) + 1);
 
     for (auto tr: trailers) {
         file->seek(tr, SEEK_SET);
@@ -636,12 +639,13 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
     if (!trailer_) {
         qpdf_offset_t max_offset{0};
         // If there are any xref streams, take the last one to appear.
-        for (auto const& iter: table) {
-            auto entry = iter.second;
+        int i = -1;
+        for (auto const& [gen, entry]: table) {
+            ++i;
             if (entry.getType() != 1) {
                 continue;
             }
-            auto oh = qpdf.getObjectByObjGen(iter.first);
+            auto oh = qpdf.getObject(i, gen);
             try {
                 if (!oh.isStreamOfType("/XRef")) {
                     continue;
@@ -760,35 +764,32 @@ QPDF::Xref_table::read(qpdf_offset_t xref_offset)
     if (!trailer_) {
         throw damaged_pdf("unable to find trailer while reading xref");
     }
-    int size = trailer_.getKey("/Size").getIntValueAsInt();
-    int max_obj = 0;
-    if (!table.empty()) {
-        max_obj = table.rbegin()->first.getObj();
-    }
-    if (!deleted_objects.empty()) {
-        max_obj = std::max(max_obj, *deleted_objects.rbegin());
-    }
-    if ((size < 1) || (size - 1 != max_obj)) {
-        QTC::TC("qpdf", "QPDF xref size mismatch");
-        warn_damaged(
-            "reported number of objects (" + std::to_string(size) +
-            ") is not one plus the highest object number (" + std::to_string(max_obj) + ")");
-    }
+
+    // We are no longer reporting what the highest id in the xref table is. I don't think it adds
+    // anything. If we want to report more detail, we should report the total number of missing
+    // entries, including missing entries before the last actual entry.
+    //
+    //    int size = trailer_.getKey("/Size").getIntValueAsInt();
+    //    int max_obj = 0;
+    //    if (!table.empty()) {
+    //        max_obj = table.rbegin()->first.getObj();
+    //    }
+    //    if (!deleted_objects.empty()) {
+    //        max_obj = std::max(max_obj, *deleted_objects.rbegin());
+    //    }
+    //    if ((size < 1) || (size - 1 != max_obj)) {
+    //        QTC::TC("qpdf", "QPDF xref size mismatch");
+    //        warn_damaged(
+    //            "reported number of objects (" + std::to_string(size) +
+    //            ") is not one plus the highest object number (" + std::to_string(max_obj) + ")");
+    //    }
 
     // We no longer need the deleted_objects table, so go ahead and clear it out to make sure we
     // never depend on its being set.
     deleted_objects.clear();
 
     // Make sure we keep only the highest generation for any object.
-    QPDFObjGen last_og{-1, 0};
-    for (auto const& item: table) {
-        auto id = item.first.getObj();
-        if (id == last_og.getObj() && id > 0) {
-            table.erase(last_og);
-            qpdf.removeObject(last_og);
-        }
-        last_og = item.first;
-    }
+    // No longer needed as compliance is guaranteed by vector.
 }
 
 QPDF::Xref_table::Subsection
@@ -1023,16 +1024,19 @@ QPDF::Xref_table::process_section(qpdf_offset_t xref_offset)
     }
 
     if (!trailer_) {
+        unsigned int sz;
         trailer_ = cur_trailer;
 
         if (!trailer_.hasKey("/Size")) {
             QTC::TC("qpdf", "QPDF trailer lacks size");
             throw qpdf.damagedPDF("trailer", "trailer dictionary lacks /Size key");
         }
-        if (!trailer_.getKey("/Size").isInteger()) {
+        if (!trailer_.getKey("/Size").getValueAsUInt(sz)) {
             QTC::TC("qpdf", "QPDF trailer size not integer");
             throw qpdf.damagedPDF("trailer", "/Size key in trailer dictionary is not an integer");
         }
+
+        table.resize(sz);
     }
 
     for (auto [obj, num, offset]: subs) {
@@ -1145,8 +1149,9 @@ QPDF::Xref_table::process_W(
     return {entry_size, W};
 }
 
-// Validate Size key and return the maximum number of entries that the xref stream can contain.
-int
+// Validate Size entry and return the maximum number of entries that the xref stream can contain and
+// the value of the Size entry.
+std::pair<int, size_t>
 QPDF::Xref_table::process_Size(
     QPDFObjectHandle& dict, int entry_size, std::function<QPDFExc(std::string_view)> damaged)
 {
@@ -1166,7 +1171,7 @@ QPDF::Xref_table::process_Size(
         throw damaged("Cross-reference stream has an impossibly large /Size key");
     }
     // We are not validating that Size <= (Size key of parent xref / trailer).
-    return max_num_entries;
+    return {max_num_entries, toS(size)};
 }
 
 // Return the number of entries of the xref stream and the processed Index array.
@@ -1247,7 +1252,7 @@ QPDF::Xref_table::process_stream(qpdf_offset_t xref_offset, QPDFObjectHandle& xr
     auto dict = xref_obj.getDict();
 
     auto [entry_size, W] = process_W(dict, damaged);
-    int max_num_entries = process_Size(dict, entry_size, damaged);
+    auto [max_num_entries, size] = process_Size(dict, entry_size, damaged);
     auto [num_entries, indx] = process_Index(dict, max_num_entries, damaged);
 
     std::shared_ptr<Buffer> bp = xref_obj.getStreamData(qpdf_dl_specialized);
@@ -1263,6 +1268,11 @@ QPDF::Xref_table::process_stream(qpdf_offset_t xref_offset, QPDFObjectHandle& xr
         } else {
             qpdf.warn(x);
         }
+    }
+
+    if (!trailer_) {
+        trailer_ = dict;
+        table.resize(size);
     }
 
     bool saw_first_compressed_object = false;
@@ -1310,10 +1320,6 @@ QPDF::Xref_table::process_stream(qpdf_offset_t xref_offset, QPDFObjectHandle& xr
         }
     }
 
-    if (!trailer_) {
-        trailer_ = dict;
-    }
-
     if (dict.hasKey("/Prev")) {
         if (!dict.getKey("/Prev").isInteger()) {
             throw qpdf.damagedPDF(
@@ -1338,13 +1344,15 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
 
     int new_gen = f0 == 2 ? 0 : f2;
 
-    if (!(obj > 0 && obj <= max_id_ && 0 <= f2 && new_gen < 65535)) {
+    if (!(obj > 0 && static_cast<size_t>(obj) < table.size() && 0 <= f2 && new_gen < 65535)) {
         // We are ignoring invalid objgens. Most will arrive here from xref reconstruction. There
         // is probably no point having another warning but we could count invalid items in order to
         // decide when to give up.
         QTC::TC("qpdf", "QPDF xref overwrite invalid objgen");
         return;
     }
+
+    auto& entry = table[static_cast<size_t>(obj)];
 
     if (deleted_objects.count(obj)) {
         QTC::TC("qpdf", "QPDF xref deleted object");
@@ -1357,8 +1365,7 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
         return;
     }
 
-    auto [iter, created] = table.try_emplace(QPDFObjGen(obj, new_gen));
-    if (!created) {
+    if (entry.entry.getType() && entry.gen >= new_gen) {
         QTC::TC("qpdf", "QPDF xref reused object");
         return;
     }
@@ -1366,12 +1373,12 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
     switch (f0) {
     case 1:
         // f2 is generation
-        QTC::TC("qpdf", "QPDF xref gen > 0", ((f2 > 0) ? 1 : 0));
-        iter->second = QPDFXRefEntry(f1);
+        QTC::TC("qpdf", "QPDF xref gen > 0", (f2 > 0) ? 1 : 0);
+        entry = {f2, QPDFXRefEntry(f1)};
         break;
 
     case 2:
-        iter->second = QPDFXRefEntry(toI(f1), f2);
+        entry = {0, QPDFXRefEntry(toI(f1), f2)};
         break;
 
     default:
@@ -1384,7 +1391,7 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
 void
 QPDF::Xref_table::insert_free(QPDFObjGen og)
 {
-    if (!table.count(og)) {
+    if (!type(og)) {
         deleted_objects.insert(og.getObj());
     }
 }
@@ -1399,22 +1406,26 @@ void
 QPDF::Xref_table::show()
 {
     auto& cout = *qpdf.m->log->getInfo();
-    for (auto const& iter: table) {
-        QPDFObjGen const& og = iter.first;
-        QPDFXRefEntry const& entry = iter.second;
-        cout << og.unparse('/') << ": ";
-        switch (entry.getType()) {
-        case 1:
-            cout << "uncompressed; offset = " << entry.getOffset() << "\n";
-            break;
+    int i = -1;
+    for (auto const& [gen, entry]: table) {
+        ++i;
+        auto type = entry.getType();
+        if (type) {
+            cout << std::to_string(i) << "/" << std::to_string(gen) << ": ";
+            switch (type) {
+            case 1:
+                cout << "uncompressed; offset = " << entry.getOffset() << "\n";
+                break;
 
-        case 2:
-            cout << "compressed; stream = " << entry.getObjStreamNumber()
-                 << ", index = " << entry.getObjStreamIndex() << "\n";
-            break;
+            case 2:
+                cout << "compressed; stream = " << entry.getObjStreamNumber()
+                     << ", index = " << entry.getObjStreamIndex() << "\n";
+                break;
 
-        default:
-            throw std::logic_error("unknown cross-reference table type while showing xref_table");
+            default:
+                throw std::logic_error(
+                    "unknown cross-reference table type while showing xref_table");
+            }
         }
     }
 }
@@ -1425,11 +1436,15 @@ bool
 QPDF::Xref_table::resolve()
 {
     bool may_change = !reconstructed_;
+    int i = -1;
     for (auto& iter: table) {
-        if (qpdf.isUnresolved(iter.first)) {
-            qpdf.resolve(iter.first);
-            if (may_change && reconstructed_) {
-                return false;
+        ++i;
+        if (iter.entry.getType()) {
+            if (qpdf.isUnresolved(QPDFObjGen(i, iter.gen))) {
+                qpdf.resolve(QPDFObjGen(i, iter.gen));
+                if (may_change && reconstructed_) {
+                    return false;
+                }
             }
         }
     }
@@ -2589,7 +2604,7 @@ QPDF::getXRefTable()
     return getXRefTableInternal();
 }
 
-std::map<QPDFObjGen, QPDFXRefEntry> const&
+std::map<QPDFObjGen, QPDFXRefEntry>
 QPDF::getXRefTableInternal()
 {
     if (!m->xref_table.initialized()) {
@@ -2604,7 +2619,10 @@ QPDF::tableSize()
 {
     // If obj_cache is dense, accommodate all object in tables,else accommodate only original
     // objects.
-    auto max_xref = m->xref_table.size() ? m->xref_table.as_map().crbegin()->first.getObj() : 0;
+    auto max_xref = toI(m->xref_table.size());
+    if (max_xref > 0) {
+        --max_xref;
+    }
     auto max_obj = m->obj_cache.size() ? m->obj_cache.crbegin()->first.getObj() : 0;
     auto max_id = std::numeric_limits<int>::max() - 1;
     if (max_obj >= max_id || max_xref >= max_id) {

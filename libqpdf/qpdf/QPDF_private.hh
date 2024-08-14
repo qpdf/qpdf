@@ -37,45 +37,63 @@ class QPDF::Xref_table
     int
     type(QPDFObjGen og) const
     {
-        auto it = table.find(og);
-        return it == table.end() ? 0 : it->second.getType();
+        if (og.getObj() >= toI(table.size())) {
+            return 0;
+        }
+        auto& e = table.at(toS(og.getObj()));
+        return e.gen == og.getGen() ? e.entry.getType() : 0;
     }
 
     // Returns 0 if og is not in table.
     qpdf_offset_t
     offset(QPDFObjGen og) const
     {
-        auto it = table.find(og);
-        return it == table.end() ? 0 : it->second.getOffset();
+        if (og.getObj() >= toI(table.size())) {
+            return 0;
+        }
+        auto& e = table.at(toS(og.getObj()));
+        return e.gen == og.getGen() ? e.entry.getOffset() : 0;
     }
 
     // Returns 0 if og is not in table.
     int
     stream_number(int id) const
     {
-        auto it = table.find(QPDFObjGen(id, 0));
-        return it == table.end() ? 0 : it->second.getObjStreamNumber();
+        if (id < 1 || static_cast<size_t>(id) >= table.size()) {
+            return 0;
+        }
+        return table[static_cast<size_t>(id)].entry.getObjStreamNumber();
     }
 
     int
     stream_index(int id) const
     {
-        auto it = table.find(QPDFObjGen(id, 0));
-        return it == table.end() ? 0 : it->second.getObjStreamIndex();
+        if (id < 1 || static_cast<size_t>(id) >= table.size()) {
+            return 0;
+        }
+        return table[static_cast<size_t>(id)].entry.getObjStreamIndex();
     }
 
     // Temporary access to underlying map
-    std::map<QPDFObjGen, QPDFXRefEntry> const&
+    std::map<QPDFObjGen, QPDFXRefEntry>
     as_map()
     {
-        return table;
+        std::map<QPDFObjGen, QPDFXRefEntry> result;
+        int i{0};
+        for (auto const& [gen, entry]: table) {
+            if (entry.getType()) {
+                result.emplace(QPDFObjGen(i, gen), entry);
+            }
+            ++i;
+        }
+        return result;
     }
 
-    // Temporary access to underlying map size
+    // Temporary access to underlying table size
     size_t
     size() const noexcept
     {
-        return trailer_ ? table.size() : 0;
+        return table.size();
     }
 
     void
@@ -121,6 +139,12 @@ class QPDF::Xref_table
     // Object, count, offset of first entry
     typedef std::tuple<int, int, qpdf_offset_t> Subsection;
 
+    struct Entry
+    {
+        int gen{0};
+        QPDFXRefEntry entry;
+    };
+
     void read(qpdf_offset_t offset);
 
     // Methods to parse tables
@@ -135,7 +159,7 @@ class QPDF::Xref_table
     qpdf_offset_t process_stream(qpdf_offset_t offset, QPDFObjectHandle& xref_stream);
     std::pair<int, std::array<int, 3>>
     process_W(QPDFObjectHandle& dict, std::function<QPDFExc(std::string_view)> damaged);
-    int process_Size(
+    std::pair<int, size_t> process_Size(
         QPDFObjectHandle& dict, int entry_size, std::function<QPDFExc(std::string_view)> damaged);
     std::pair<int, std::vector<std::pair<int, int>>> process_Index(
         QPDFObjectHandle& dict,
@@ -177,7 +201,7 @@ class QPDF::Xref_table
     InputSource* const& file;
     QPDFTokenizer tokenizer;
 
-    std::map<QPDFObjGen, QPDFXRefEntry> table;
+    std::vector<Entry> table;
     QPDFObjectHandle trailer_;
 
     bool attempt_recovery_{true};
@@ -185,7 +209,10 @@ class QPDF::Xref_table
     bool ignore_streams_{false};
     std::set<int> deleted_objects;
     bool reconstructed_{false};
-    // Various tables are indexed by object id, with potential size id + 1
+    // Before the xref table is initialized, max_id_ is an upper bound on the possible object ids
+    // that could be present in the PDF file. Once the trailer has been read, max_id_ is set to the
+    // value of /Size. If the file is damaged, max_id_ becomes the maximum object id in the xref
+    // table after reconstruction.
     int max_id_{std::numeric_limits<int>::max() - 1};
 
     // Linearization data
@@ -246,7 +273,7 @@ class QPDF::Writer
         return qpdf.getCompressibleObjSet();
     }
 
-    static std::map<QPDFObjGen, QPDFXRefEntry> const&
+    static std::map<QPDFObjGen, QPDFXRefEntry>
     getXRefTable(QPDF& qpdf)
     {
         return qpdf.getXRefTableInternal();

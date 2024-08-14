@@ -256,10 +256,10 @@ class QPDF::JSONReactor: public JSON::Reactor
     struct StackFrame
     {
         StackFrame(state_e state) :
-            state(state) {};
+            state(state){};
         StackFrame(state_e state, QPDFObjectHandle&& object) :
             state(state),
-            object(object) {};
+            object(object){};
         state_e state;
         QPDFObjectHandle object;
     };
