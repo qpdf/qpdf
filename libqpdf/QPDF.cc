@@ -582,6 +582,9 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
         table.erase(iter);
     }
 
+    std::vector<std::tuple<int, int, qpdf_offset_t>> objects;
+    std::vector<qpdf_offset_t> trailers;
+
     file->seek(0, SEEK_END);
     qpdf_offset_t eof = file->tell();
     file->seek(0, SEEK_SET);
@@ -597,25 +600,37 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
                 int obj = QUtil::string_to_int(t1.getValue().c_str());
                 int gen = QUtil::string_to_int(t2.getValue().c_str());
                 if (obj <= max_id_) {
-                    insert_reconstructed(obj, token_start, gen);
+                    objects.emplace_back(obj, gen, token_start);
                 } else {
                     warn_damaged("ignoring object with impossibly large id " + std::to_string(obj));
                 }
             }
             file->seek(pos, SEEK_SET);
         } else if (!trailer_ && t1.isWord("trailer")) {
-            auto pos = file->tell();
-            QPDFObjectHandle t = read_trailer();
-            if (!t.isDictionary()) {
-                // Oh well.  It was worth a try.
-            } else {
-                trailer_ = t;
-            }
-            file->seek(pos, SEEK_SET);
+            trailers.emplace_back(file->tell());
         }
-        check_warnings();
         file->findAndSkipNextEOL();
     }
+
+    for (auto tr: trailers) {
+        file->seek(tr, SEEK_SET);
+        auto t = read_trailer();
+        if (!t.isDictionary()) {
+            // Oh well.  It was worth a try.
+        } else {
+            trailer_ = t;
+            break;
+        }
+        check_warnings();
+    }
+
+    auto rend = objects.rend();
+    for (auto it = objects.rbegin(); it != rend; it++) {
+        auto [obj, gen, token_start] = *it;
+        insert(obj, 1, token_start, gen);
+        check_warnings();
+    }
+
     deleted_objects.clear();
 
     if (!trailer_) {
@@ -1321,8 +1336,13 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
     // If there is already an entry for this object and generation in the table, it means that a
     // later xref table has registered this object.  Disregard this one.
 
-    if (obj > max_id_) {
-        // ignore impossibly large object ids or object ids > Size.
+    int new_gen = f0 == 2 ? 0 : f2;
+
+    if (!(obj > 0 && obj <= max_id_ && 0 <= f2 && new_gen < 65535)) {
+        // We are ignoring invalid objgens. Most will arrive here from xref reconstruction. There
+        // is probably no point having another warning but we could count invalid items in order to
+        // decide when to give up.
+        QTC::TC("qpdf", "QPDF xref overwrite invalid objgen");
         return;
     }
 
@@ -1337,7 +1357,7 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
         return;
     }
 
-    auto [iter, created] = table.try_emplace(QPDFObjGen(obj, (f0 == 2 ? 0 : f2)));
+    auto [iter, created] = table.try_emplace(QPDFObjGen(obj, new_gen));
     if (!created) {
         QTC::TC("qpdf", "QPDF xref reused object");
         return;
@@ -1366,25 +1386,6 @@ QPDF::Xref_table::insert_free(QPDFObjGen og)
 {
     if (!table.count(og)) {
         deleted_objects.insert(og.getObj());
-    }
-}
-
-// Replace uncompressed object. This is used in xref recovery mode, which reads the file from
-// beginning to end.
-void
-QPDF::Xref_table::insert_reconstructed(int obj, qpdf_offset_t f1, int f2)
-{
-    if (!(obj > 0 && obj <= max_id_ && 0 <= f2 && f2 < 65535)) {
-        QTC::TC("qpdf", "QPDF xref overwrite invalid objgen");
-        return;
-    }
-
-    QPDFObjGen og(obj, f2);
-    if (!deleted_objects.count(obj)) {
-        // deleted_objects stores the uncompressed objects removed from the xref table at the start
-        // of recovery.
-        QTC::TC("qpdf", "QPDF xref overwrite object");
-        table.insert_or_assign(QPDFObjGen(obj, f2), QPDFXRefEntry(f1));
     }
 }
 
