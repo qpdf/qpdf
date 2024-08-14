@@ -118,11 +118,14 @@ class QPDF::Xref_table
     }
 
   private:
+    // Object, count, offset of first entry
+    typedef std::tuple<int, int, qpdf_offset_t> Subsection;
+
     void read(qpdf_offset_t offset);
 
     // Methods to parse tables
     qpdf_offset_t read_table(qpdf_offset_t offset);
-    bool parse_first(std::string const& line, int& obj, int& num, int& bytes);
+    Subsection subsection(std::string const& line);
     bool read_entry(qpdf_offset_t& f1, int& f2, char& type);
     bool read_bad_entry(qpdf_offset_t& f1, int& f2, char& type);
 

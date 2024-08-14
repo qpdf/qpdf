@@ -776,9 +776,14 @@ QPDF::Xref_table::read(qpdf_offset_t xref_offset)
     }
 }
 
-bool
-QPDF::Xref_table::parse_first(std::string const& line, int& obj, int& num, int& bytes)
+QPDF::Xref_table::Subsection
+QPDF::Xref_table::subsection(std::string const& line)
 {
+    auto terminate = [this]() -> void {
+        QTC::TC("qpdf", "QPDF invalid xref");
+        throw damaged_table("xref syntax invalid");
+    };
+
     // is_space and is_digit both return false on '\0', so this will not overrun the null-terminated
     // buffer.
     char const* p = line.c_str();
@@ -790,7 +795,7 @@ QPDF::Xref_table::parse_first(std::string const& line, int& obj, int& num, int& 
     }
     // Require digit
     if (!QUtil::is_digit(*p)) {
-        return false;
+        terminate();
     }
     // Gather digits
     std::string obj_str;
@@ -799,7 +804,7 @@ QPDF::Xref_table::parse_first(std::string const& line, int& obj, int& num, int& 
     }
     // Require space
     if (!QUtil::is_space(*p)) {
-        return false;
+        terminate();
     }
     // Skip spaces
     while (QUtil::is_space(*p)) {
@@ -807,7 +812,7 @@ QPDF::Xref_table::parse_first(std::string const& line, int& obj, int& num, int& 
     }
     // Require digit
     if (!QUtil::is_digit(*p)) {
-        return false;
+        terminate();
     }
     // Gather digits
     std::string num_str;
@@ -818,10 +823,10 @@ QPDF::Xref_table::parse_first(std::string const& line, int& obj, int& num, int& 
     while (QUtil::is_space(*p)) {
         ++p;
     }
-    bytes = toI(p - start);
-    obj = QUtil::string_to_int(obj_str.c_str());
-    num = QUtil::string_to_int(num_str.c_str());
-    return true;
+    return {
+        QUtil::string_to_int(obj_str.c_str()),
+        QUtil::string_to_int(num_str.c_str()),
+        file->getLastOffset() + toI(p - start)};
 }
 
 bool
@@ -968,14 +973,8 @@ QPDF::Xref_table::read_table(qpdf_offset_t xref_offset)
     while (true) {
         line.assign(50, '\0');
         file->read(line.data(), line.size());
-        int obj = 0;
-        int num = 0;
-        int bytes = 0;
-        if (!parse_first(line, obj, num, bytes)) {
-            QTC::TC("qpdf", "QPDF invalid xref");
-            throw damaged_table("xref syntax invalid");
-        }
-        file->seek(file->getLastOffset() + bytes, SEEK_SET);
+        auto [obj, num, offset] = subsection(line);
+        file->seek(offset, SEEK_SET);
         for (qpdf_offset_t i = obj; i - num < obj; ++i) {
             if (i == 0) {
                 // This is needed by checkLinearization()
