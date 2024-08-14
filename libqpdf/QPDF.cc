@@ -732,7 +732,7 @@ QPDF::Xref_table::read(qpdf_offset_t xref_offset)
             while (QUtil::is_space(buf[skip])) {
                 ++skip;
             }
-            xref_offset = read_table(xref_offset + skip);
+            xref_offset = process_section(xref_offset + skip);
         } else {
             xref_offset = read_stream(xref_offset);
         }
@@ -994,11 +994,32 @@ QPDF::Xref_table::read_entry(qpdf_offset_t& f1, int& f2, char& type)
 
 // Read a single cross-reference table section and associated trailer.
 qpdf_offset_t
-QPDF::Xref_table::read_table(qpdf_offset_t xref_offset)
+QPDF::Xref_table::process_section(qpdf_offset_t xref_offset)
 {
     file->seek(xref_offset, SEEK_SET);
     std::string line;
     auto subs = subsections(line);
+
+    auto cur_trailer_offset = file->tell();
+    auto cur_trailer = read_trailer();
+    if (!cur_trailer.isDictionary()) {
+        QTC::TC("qpdf", "QPDF missing trailer");
+        throw qpdf.damagedPDF("", "expected trailer dictionary");
+    }
+
+    if (!trailer_) {
+        trailer_ = cur_trailer;
+
+        if (!trailer_.hasKey("/Size")) {
+            QTC::TC("qpdf", "QPDF trailer lacks size");
+            throw qpdf.damagedPDF("trailer", "trailer dictionary lacks /Size key");
+        }
+        if (!trailer_.getKey("/Size").isInteger()) {
+            QTC::TC("qpdf", "QPDF trailer size not integer");
+            throw qpdf.damagedPDF("trailer", "/Size key in trailer dictionary is not an integer");
+        }
+    }
+
     for (auto [obj, num, offset]: subs) {
         file->seek(offset, SEEK_SET);
         for (qpdf_offset_t i = obj; i - num < obj; ++i) {
@@ -1027,26 +1048,6 @@ QPDF::Xref_table::read_table(qpdf_offset_t xref_offset)
         }
     }
 
-    // Set offset to previous xref table if any
-    auto cur_trailer = read_trailer();
-    if (!cur_trailer.isDictionary()) {
-        QTC::TC("qpdf", "QPDF missing trailer");
-        throw qpdf.damagedPDF("", "expected trailer dictionary");
-    }
-
-    if (!trailer_) {
-        trailer_ = cur_trailer;
-
-        if (!trailer_.hasKey("/Size")) {
-            QTC::TC("qpdf", "QPDF trailer lacks size");
-            throw qpdf.damagedPDF("trailer", "trailer dictionary lacks /Size key");
-        }
-        if (!trailer_.getKey("/Size").isInteger()) {
-            QTC::TC("qpdf", "QPDF trailer size not integer");
-            throw qpdf.damagedPDF("trailer", "/Size key in trailer dictionary is not an integer");
-        }
-    }
-
     if (cur_trailer.hasKey("/XRefStm")) {
         if (ignore_streams_) {
             QTC::TC("qpdf", "QPDF ignoring XRefStm in trailer");
@@ -1056,7 +1057,7 @@ QPDF::Xref_table::read_table(qpdf_offset_t xref_offset)
                 // /Prev key instead of the xref stream's.
                 (void)read_stream(cur_trailer.getKey("/XRefStm").getIntValue());
             } else {
-                throw qpdf.damagedPDF("xref stream", xref_offset, "invalid /XRefStm");
+                throw qpdf.damagedPDF("xref stream", cur_trailer_offset, "invalid /XRefStm");
             }
         }
     }
@@ -1064,7 +1065,8 @@ QPDF::Xref_table::read_table(qpdf_offset_t xref_offset)
     if (cur_trailer.hasKey("/Prev")) {
         if (!cur_trailer.getKey("/Prev").isInteger()) {
             QTC::TC("qpdf", "QPDF trailer prev not integer");
-            throw qpdf.damagedPDF("trailer", "/Prev key in trailer dictionary is not an integer");
+            throw qpdf.damagedPDF(
+                "trailer", cur_trailer_offset, "/Prev key in trailer dictionary is not an integer");
         }
         QTC::TC("qpdf", "QPDF prev key in trailer dictionary");
         return cur_trailer.getKey("/Prev").getIntValue();

@@ -124,7 +124,7 @@ class QPDF::Xref_table
     void read(qpdf_offset_t offset);
 
     // Methods to parse tables
-    qpdf_offset_t read_table(qpdf_offset_t offset);
+    qpdf_offset_t process_section(qpdf_offset_t offset);
     std::vector<Subsection> subsections(std::string& line);
     Subsection subsection(std::string const& line);
     bool read_entry(qpdf_offset_t& f1, int& f2, char& type);
