@@ -829,6 +829,34 @@ QPDF::Xref_table::subsection(std::string const& line)
         file->getLastOffset() + toI(p - start)};
 }
 
+std::vector<QPDF::Xref_table::Subsection>
+QPDF::Xref_table::subsections(std::string& line)
+{
+    std::vector<QPDF::Xref_table::Subsection> result;
+    qpdf_offset_t f1 = 0;
+    int f2 = 0;
+    char type = '\0';
+
+    while (true) {
+        line.assign(50, '\0');
+        file->read(line.data(), line.size());
+        auto [obj, num, offset] = result.emplace_back(subsection(line));
+        file->seek(offset, SEEK_SET);
+        for (qpdf_offset_t i = obj; i - num < obj; ++i) {
+            if (!read_entry(f1, f2, type)) {
+                QTC::TC("qpdf", "QPDF invalid xref entry");
+                throw damaged_table("invalid xref entry (obj=" + std::to_string(i) + ")");
+            }
+        }
+        qpdf_offset_t pos = file->tell();
+        if (read_token().isWord("trailer")) {
+            return result;
+        } else {
+            file->seek(pos, SEEK_SET);
+        }
+    }
+}
+
 bool
 QPDF::Xref_table::read_bad_entry(qpdf_offset_t& f1, int& f2, char& type)
 {
@@ -970,10 +998,8 @@ QPDF::Xref_table::read_table(qpdf_offset_t xref_offset)
 {
     file->seek(xref_offset, SEEK_SET);
     std::string line;
-    while (true) {
-        line.assign(50, '\0');
-        file->read(line.data(), line.size());
-        auto [obj, num, offset] = subsection(line);
+    auto subs = subsections(line);
+    for (auto [obj, num, offset]: subs) {
         file->seek(offset, SEEK_SET);
         for (qpdf_offset_t i = obj; i - num < obj; ++i) {
             if (i == 0) {
@@ -985,7 +1011,6 @@ QPDF::Xref_table::read_table(qpdf_offset_t xref_offset)
             int f2 = 0;
             char type = '\0';
             if (!read_entry(f1, f2, type)) {
-                QTC::TC("qpdf", "QPDF invalid xref entry");
                 throw damaged_table("invalid xref entry (obj=" + std::to_string(i) + ")");
             }
             if (type == 'f') {
