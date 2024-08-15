@@ -45,6 +45,16 @@ class QPDF::Xref_table
     }
 
     // Returns 0 if og is not in table.
+    int
+    type(size_t id) const
+    {
+        if (id >= table.size()) {
+            return 0;
+        }
+        return table[id].entry.getType();
+    }
+
+    // Returns 0 if og is not in table.
     qpdf_offset_t
     offset(QPDFObjGen og) const
     {
@@ -175,7 +185,6 @@ class QPDF::Xref_table
     }
 
     // Methods to insert table entries
-    void insert_reconstructed(int obj, qpdf_offset_t f1, int f2);
     void insert(int obj, int f0, qpdf_offset_t f1, int f2);
     void insert_free(QPDFObjGen);
 
@@ -207,7 +216,6 @@ class QPDF::Xref_table
     bool attempt_recovery_{true};
     bool initialized_{false};
     bool ignore_streams_{false};
-    std::set<int> deleted_objects;
     bool reconstructed_{false};
     // Before the xref table is initialized, max_id_ is an upper bound on the possible object ids
     // that could be present in the PDF file. Once the trailer has been read, max_id_ is set to the

@@ -634,8 +634,6 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
         check_warnings();
     }
 
-    deleted_objects.clear();
-
     if (!trailer_) {
         qpdf_offset_t max_offset{0};
         // If there are any xref streams, take the last one to appear.
@@ -764,32 +762,15 @@ QPDF::Xref_table::read(qpdf_offset_t xref_offset)
     if (!trailer_) {
         throw damaged_pdf("unable to find trailer while reading xref");
     }
+    int size = trailer_.getKey("/Size").getIntValueAsInt();
+
+    if (size < 3) {
+        throw damaged_pdf("too few objects - file can't have a page tree");
+    }
 
     // We are no longer reporting what the highest id in the xref table is. I don't think it adds
     // anything. If we want to report more detail, we should report the total number of missing
     // entries, including missing entries before the last actual entry.
-    //
-    //    int size = trailer_.getKey("/Size").getIntValueAsInt();
-    //    int max_obj = 0;
-    //    if (!table.empty()) {
-    //        max_obj = table.rbegin()->first.getObj();
-    //    }
-    //    if (!deleted_objects.empty()) {
-    //        max_obj = std::max(max_obj, *deleted_objects.rbegin());
-    //    }
-    //    if ((size < 1) || (size - 1 != max_obj)) {
-    //        QTC::TC("qpdf", "QPDF xref size mismatch");
-    //        warn_damaged(
-    //            "reported number of objects (" + std::to_string(size) +
-    //            ") is not one plus the highest object number (" + std::to_string(max_obj) + ")");
-    //    }
-
-    // We no longer need the deleted_objects table, so go ahead and clear it out to make sure we
-    // never depend on its being set.
-    deleted_objects.clear();
-
-    // Make sure we keep only the highest generation for any object.
-    // No longer needed as compliance is guaranteed by vector.
 }
 
 QPDF::Xref_table::Subsection
@@ -1353,8 +1334,13 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
     }
 
     auto& entry = table[static_cast<size_t>(obj)];
+    auto old_type = entry.entry.getType();
 
-    if (deleted_objects.count(obj)) {
+    if (!old_type && entry.gen > 0) {
+        // At the moment we are processing the updates last to first and therefore the gen doesn't
+        // matter as long as it > 0 to distinguish it from an uninitialized entry. This will need
+        // to be revisited when we want to support incremental updates or more comprhensive
+        // checking.
         QTC::TC("qpdf", "QPDF xref deleted object");
         return;
     }
@@ -1365,7 +1351,7 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
         return;
     }
 
-    if (entry.entry.getType() && entry.gen >= new_gen) {
+    if (old_type && entry.gen >= new_gen) {
         QTC::TC("qpdf", "QPDF xref reused object");
         return;
     }
@@ -1391,8 +1377,15 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
 void
 QPDF::Xref_table::insert_free(QPDFObjGen og)
 {
-    if (!type(og)) {
-        deleted_objects.insert(og.getObj());
+    // At the moment we are processing the updates last to first and therefore the gen doesn't
+    // matter as long as it > 0 to distinguish it from an uninitialized entry. This will need to be
+    // revisited when we want to support incremental updates or more comprhensive checking.
+    if (og.getObj() < 1) {
+        return;
+    }
+    size_t id = static_cast<size_t>(og.getObj());
+    if (id < table.size() && !type(id)) {
+        table[id] = {1, {}};
     }
 }
 
