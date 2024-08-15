@@ -1633,7 +1633,7 @@ test_45(QPDF& pdf, char const* arg2)
 {
     // Decode obfuscated files. This is here to help test with
     // files that trigger anti-virus warnings. See comments in
-    // qpdf.test for details.
+    // specific-bugs.test for details.
     QPDFWriter w(pdf, "a.pdf");
     w.setStaticID(true);
     w.write();
