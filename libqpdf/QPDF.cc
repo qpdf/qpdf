@@ -574,7 +574,7 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
 
     // Delete all references to type 1 (uncompressed) objects
     for (auto& iter: table) {
-        if (iter.entry.getType() == 1) {
+        if (iter.type() == 1) {
             iter = {};
         }
     }
@@ -638,12 +638,12 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
         qpdf_offset_t max_offset{0};
         // If there are any xref streams, take the last one to appear.
         int i = -1;
-        for (auto const& [gen, entry]: table) {
+        for (auto const& item: table) {
             ++i;
-            if (entry.getType() != 1) {
+            if (item.type() != 1) {
                 continue;
             }
-            auto oh = qpdf.getObject(i, gen);
+            auto oh = qpdf.getObject(i, item.gen());
             try {
                 if (!oh.isStreamOfType("/XRef")) {
                     continue;
@@ -651,7 +651,7 @@ QPDF::Xref_table::reconstruct(QPDFExc& e)
             } catch (std::exception&) {
                 continue;
             }
-            auto offset = entry.getOffset();
+            auto offset = item.offset();
             if (offset > max_offset) {
                 max_offset = offset;
                 trailer_ = oh.getDict();
@@ -1334,9 +1334,9 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
     }
 
     auto& entry = table[static_cast<size_t>(obj)];
-    auto old_type = entry.entry.getType();
+    auto old_type = entry.type();
 
-    if (!old_type && entry.gen > 0) {
+    if (!old_type && entry.gen() > 0) {
         // At the moment we are processing the updates last to first and therefore the gen doesn't
         // matter as long as it > 0 to distinguish it from an uninitialized entry. This will need
         // to be revisited when we want to support incremental updates or more comprhensive
@@ -1351,7 +1351,7 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
         return;
     }
 
-    if (old_type && entry.gen >= new_gen) {
+    if (old_type && entry.gen() >= new_gen) {
         QTC::TC("qpdf", "QPDF xref reused object");
         return;
     }
@@ -1360,11 +1360,11 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
     case 1:
         // f2 is generation
         QTC::TC("qpdf", "QPDF xref gen > 0", (f2 > 0) ? 1 : 0);
-        entry = {f2, QPDFXRefEntry(f1)};
+        entry = {f2, Uncompressed(f1)};
         break;
 
     case 2:
-        entry = {0, QPDFXRefEntry(toI(f1), f2)};
+        entry = {0, Compressed(toI(f1), f2)};
         break;
 
     default:
@@ -1400,19 +1400,18 @@ QPDF::Xref_table::show()
 {
     auto& cout = *qpdf.m->log->getInfo();
     int i = -1;
-    for (auto const& [gen, entry]: table) {
+    for (auto const& item: table) {
         ++i;
-        auto type = entry.getType();
-        if (type) {
-            cout << std::to_string(i) << "/" << std::to_string(gen) << ": ";
-            switch (type) {
+        if (item.type()) {
+            cout << std::to_string(i) << "/" << std::to_string(item.gen()) << ": ";
+            switch (item.type()) {
             case 1:
-                cout << "uncompressed; offset = " << entry.getOffset() << "\n";
+                cout << "uncompressed; offset = " << item.offset() << "\n";
                 break;
 
             case 2:
-                cout << "compressed; stream = " << entry.getObjStreamNumber()
-                     << ", index = " << entry.getObjStreamIndex() << "\n";
+                cout << "compressed; stream = " << item.stream_number()
+                     << ", index = " << item.stream_index() << "\n";
                 break;
 
             default:
@@ -1430,11 +1429,11 @@ QPDF::Xref_table::resolve()
 {
     bool may_change = !reconstructed_;
     int i = -1;
-    for (auto& iter: table) {
+    for (auto& item: table) {
         ++i;
-        if (iter.entry.getType()) {
-            if (qpdf.isUnresolved(QPDFObjGen(i, iter.gen))) {
-                qpdf.resolve(QPDFObjGen(i, iter.gen));
+        if (item.type()) {
+            if (qpdf.isUnresolved(QPDFObjGen(i, item.gen()))) {
+                qpdf.resolve(QPDFObjGen(i, item.gen()));
                 if (may_change && reconstructed_) {
                     return false;
                 }

@@ -3,6 +3,8 @@
 
 #include <qpdf/QPDF.hh>
 
+#include <variant>
+
 // Xref_table encapsulates the pdf's xref table and trailer.
 class QPDF::Xref_table
 {
@@ -34,54 +36,55 @@ class QPDF::Xref_table
     }
 
     // Returns 0 if og is not in table.
-    int
+    size_t
     type(QPDFObjGen og) const
     {
-        if (og.getObj() >= toI(table.size())) {
+        int id = og.getObj();
+        if (id < 1 || static_cast<size_t>(id) >= table.size()) {
             return 0;
         }
-        auto& e = table.at(toS(og.getObj()));
-        return e.gen == og.getGen() ? e.entry.getType() : 0;
+        auto& e = table[static_cast<size_t>(id)];
+        return e.gen() == og.getGen() ? e.type() : 0;
     }
 
     // Returns 0 if og is not in table.
-    int
-    type(size_t id) const
+    size_t
+    type(size_t id) const noexcept
     {
         if (id >= table.size()) {
             return 0;
         }
-        return table[id].entry.getType();
+        return table[id].type();
     }
 
     // Returns 0 if og is not in table.
     qpdf_offset_t
-    offset(QPDFObjGen og) const
+    offset(QPDFObjGen og) const noexcept
     {
-        if (og.getObj() >= toI(table.size())) {
+        int id = og.getObj();
+        if (id < 1 || static_cast<size_t>(id) >= table.size()) {
             return 0;
         }
-        auto& e = table.at(toS(og.getObj()));
-        return e.gen == og.getGen() ? e.entry.getOffset() : 0;
+        return table[static_cast<size_t>(id)].offset();
     }
 
-    // Returns 0 if og is not in table.
+    // Returns 0 if id is not in table.
     int
-    stream_number(int id) const
+    stream_number(int id) const noexcept
     {
         if (id < 1 || static_cast<size_t>(id) >= table.size()) {
             return 0;
         }
-        return table[static_cast<size_t>(id)].entry.getObjStreamNumber();
+        return table[static_cast<size_t>(id)].stream_number();
     }
 
     int
-    stream_index(int id) const
+    stream_index(int id) const noexcept
     {
         if (id < 1 || static_cast<size_t>(id) >= table.size()) {
             return 0;
         }
-        return table[static_cast<size_t>(id)].entry.getObjStreamIndex();
+        return table[static_cast<size_t>(id)].stream_index();
     }
 
     // Temporary access to underlying map
@@ -90,9 +93,19 @@ class QPDF::Xref_table
     {
         std::map<QPDFObjGen, QPDFXRefEntry> result;
         int i{0};
-        for (auto const& [gen, entry]: table) {
-            if (entry.getType()) {
-                result.emplace(QPDFObjGen(i, gen), entry);
+        for (auto const& item: table) {
+            switch (item.type()) {
+            case 0:
+                break;
+            case 1:
+                result.emplace(QPDFObjGen(i, item.gen()), item.offset());
+                break;
+            case 2:
+                result.emplace(
+                    QPDFObjGen(i, 0), QPDFXRefEntry(item.stream_number(), item.stream_index()));
+                break;
+            default:
+                throw std::logic_error("Xref_table: invalid entry type");
             }
             ++i;
         }
@@ -149,10 +162,62 @@ class QPDF::Xref_table
     // Object, count, offset of first entry
     typedef std::tuple<int, int, qpdf_offset_t> Subsection;
 
+    struct Uncompressed
+    {
+        Uncompressed(qpdf_offset_t offset) :
+            offset(offset)
+        {
+        }
+        qpdf_offset_t offset;
+    };
+
+    struct Compressed
+    {
+        Compressed(int stream_number, int stream_index) :
+            stream_number(stream_number),
+            stream_index(stream_index)
+        {
+        }
+        int stream_number{0};
+        int stream_index{0};
+    };
+
+    typedef std::variant<std::monostate, Uncompressed, Compressed> Xref;
+
     struct Entry
     {
-        int gen{0};
-        QPDFXRefEntry entry;
+        int
+        gen() const noexcept
+        {
+            return gen_;
+        }
+
+        size_t
+        type() const noexcept
+        {
+            return entry.index();
+        }
+
+        qpdf_offset_t
+        offset() const noexcept
+        {
+            return type() == 1 ? std::get<1>(entry).offset : 0;
+        }
+
+        int
+        stream_number() const noexcept
+        {
+            return type() == 2 ? std::get<2>(entry).stream_number : 0;
+        }
+
+        int
+        stream_index() const noexcept
+        {
+            return type() == 2 ? std::get<2>(entry).stream_index : 0;
+        }
+
+        int gen_{0};
+        Xref entry;
     };
 
     void read(qpdf_offset_t offset);
