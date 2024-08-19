@@ -836,6 +836,7 @@ class QPDF
     void optimize(
         QPDFWriter::ObjTable const& obj,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
+    void optimize(Xref_table const& obj);
     size_t tableSize();
 
     // Get lists of all objects in order according to the part of a linearized file that they belong
@@ -935,6 +936,7 @@ class QPDF
     QPDFObjectHandle
     getUncompressedObject(QPDFObjectHandle&, std::map<int, int> const& object_stream_data);
     QPDFObjectHandle getUncompressedObject(QPDFObjectHandle&, QPDFWriter::ObjTable const& obj);
+    QPDFObjectHandle getUncompressedObject(QPDFObjectHandle&, Xref_table const& obj);
     int lengthNextN(int first_object, int n);
     void
     checkHPageOffset(std::vector<QPDFObjectHandle> const& pages, std::map<int, int>& idx_to_obj);
@@ -980,6 +982,7 @@ class QPDF
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
     void filterCompressedObjects(QPDFWriter::ObjTable const& object_stream_data);
+    void filterCompressedObjects(Xref_table const& object_stream_data);
 
     // JSON import
     void importJSON(std::shared_ptr<InputSource>, bool must_be_complete);

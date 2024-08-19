@@ -484,18 +484,9 @@ QPDF::checkLinearizationInternal()
     // Further checking requires optimization and order calculation. Don't allow optimization to
     // make changes.  If it has to, then the file is not properly linearized.  We use the xref table
     // to figure out which objects are compressed and which are uncompressed.
-    { // local scope
-        std::map<int, int> object_stream_data;
-        for (auto const& iter: m->xref_table.as_map()) {
-            QPDFObjGen const& og = iter.first;
-            QPDFXRefEntry const& entry = iter.second;
-            if (entry.getType() == 2) {
-                object_stream_data[og.getObj()] = entry.getObjStreamNumber();
-            }
-        }
-        optimize(object_stream_data, false);
-        calculateLinearizationData(object_stream_data);
-    }
+
+    optimize(m->xref_table);
+    calculateLinearizationData(m->xref_table);
 
     // E: offset of end of first page -- Implementation note 123 says Acrobat includes on extra
     // object here by mistake.  pdlin fails to place thumbnail images in section 9, so when
@@ -579,6 +570,16 @@ QPDF::getUncompressedObject(QPDFObjectHandle& obj, std::map<int, int> const& obj
         int repl = (*(object_stream_data.find(obj.getObjectID()))).second;
         return getObject(repl, 0);
     }
+}
+
+QPDFObjectHandle
+QPDF::getUncompressedObject(QPDFObjectHandle& obj, Xref_table const& xref)
+{
+    auto og = obj.getObjGen();
+    if (obj.isNull() || xref.type(og) != 2) {
+        return obj;
+    }
+    return getObject(xref.stream_number(og.getObj()), 0);
 }
 
 QPDFObjectHandle
