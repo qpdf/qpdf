@@ -1365,6 +1365,7 @@ QPDF::Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
 
     case 2:
         entry = {0, Compressed(toI(f1), f2)};
+        object_streams_ = true;
         break;
 
     default:

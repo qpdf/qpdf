@@ -46,6 +46,12 @@ class ObjTable: public std::vector<T>
     }
 
     inline T const&
+    operator[](unsigned int idx) const
+    {
+        return element(idx);
+    }
+
+    inline T const&
     operator[](QPDFObjGen og) const
     {
         return element(static_cast<size_t>(og.getObj()));

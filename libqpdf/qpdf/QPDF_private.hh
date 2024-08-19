@@ -112,6 +112,33 @@ class QPDF::Xref_table
         return result;
     }
 
+    bool
+    object_streams() const noexcept
+    {
+        return object_streams_;
+    }
+
+    // Return a vector of object id and stream number for each compressed object.
+    std::vector<std::pair<unsigned int, int>>
+    compressed_objects() const
+    {
+        if (!initialized()) {
+            throw std::logic_error("Xref_table::compressed_objects called before parsing.");
+        }
+
+        std::vector<std::pair<unsigned int, int>> result;
+        result.reserve(table.size());
+
+        unsigned int i{0};
+        for (auto const& item: table) {
+            if (item.type() == 2) {
+                result.emplace_back(i, item.stream_number());
+            }
+            ++i;
+        }
+        return result;
+    }
+
     // Temporary access to underlying table size
     size_t
     size() const noexcept
@@ -282,6 +309,7 @@ class QPDF::Xref_table
     bool initialized_{false};
     bool ignore_streams_{false};
     bool reconstructed_{false};
+    bool object_streams_{false};
     // Before the xref table is initialized, max_id_ is an upper bound on the possible object ids
     // that could be present in the PDF file. Once the trailer has been read, max_id_ is set to the
     // value of /Size. If the file is damaged, max_id_ becomes the maximum object id in the xref
@@ -291,72 +319,6 @@ class QPDF::Xref_table
     // Linearization data
     bool uncompressed_after_compressed_{false};
     qpdf_offset_t first_item_offset_{0}; // actual value from file
-};
-
-// Writer class is restricted to QPDFWriter so that only it can call certain methods.
-class QPDF::Writer
-{
-    friend class QPDFWriter;
-
-  private:
-    static void
-    optimize(
-        QPDF& qpdf,
-        QPDFWriter::ObjTable const& obj,
-        std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
-    {
-        return qpdf.optimize(obj, skip_stream_parameters);
-    }
-
-    static void
-    getLinearizedParts(
-        QPDF& qpdf,
-        QPDFWriter::ObjTable const& obj,
-        std::vector<QPDFObjectHandle>& part4,
-        std::vector<QPDFObjectHandle>& part6,
-        std::vector<QPDFObjectHandle>& part7,
-        std::vector<QPDFObjectHandle>& part8,
-        std::vector<QPDFObjectHandle>& part9)
-    {
-        qpdf.getLinearizedParts(obj, part4, part6, part7, part8, part9);
-    }
-
-    static void
-    generateHintStream(
-        QPDF& qpdf,
-        QPDFWriter::NewObjTable const& new_obj,
-        QPDFWriter::ObjTable const& obj,
-        std::shared_ptr<Buffer>& hint_stream,
-        int& S,
-        int& O,
-        bool compressed)
-    {
-        return qpdf.generateHintStream(new_obj, obj, hint_stream, S, O, compressed);
-    }
-
-    static std::vector<QPDFObjGen>
-    getCompressibleObjGens(QPDF& qpdf)
-    {
-        return qpdf.getCompressibleObjVector();
-    }
-
-    static std::vector<bool>
-    getCompressibleObjSet(QPDF& qpdf)
-    {
-        return qpdf.getCompressibleObjSet();
-    }
-
-    static std::map<QPDFObjGen, QPDFXRefEntry>
-    getXRefTable(QPDF& qpdf)
-    {
-        return qpdf.getXRefTableInternal();
-    }
-
-    static size_t
-    tableSize(QPDF& qpdf)
-    {
-        return qpdf.tableSize();
-    }
 };
 
 // The Resolver class is restricted to QPDFObject so that only it can resolve indirect
@@ -839,6 +801,72 @@ class QPDF::ResolveRecorder
   private:
     QPDF* qpdf;
     std::set<QPDFObjGen>::const_iterator iter;
+};
+
+// Writer class is restricted to QPDFWriter so that only it can call certain methods.
+class QPDF::Writer
+{
+    friend class QPDFWriter;
+
+  private:
+    static void
+    optimize(
+        QPDF& qpdf,
+        QPDFWriter::ObjTable const& obj,
+        std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
+    {
+        return qpdf.optimize(obj, skip_stream_parameters);
+    }
+
+    static void
+    getLinearizedParts(
+        QPDF& qpdf,
+        QPDFWriter::ObjTable const& obj,
+        std::vector<QPDFObjectHandle>& part4,
+        std::vector<QPDFObjectHandle>& part6,
+        std::vector<QPDFObjectHandle>& part7,
+        std::vector<QPDFObjectHandle>& part8,
+        std::vector<QPDFObjectHandle>& part9)
+    {
+        qpdf.getLinearizedParts(obj, part4, part6, part7, part8, part9);
+    }
+
+    static void
+    generateHintStream(
+        QPDF& qpdf,
+        QPDFWriter::NewObjTable const& new_obj,
+        QPDFWriter::ObjTable const& obj,
+        std::shared_ptr<Buffer>& hint_stream,
+        int& S,
+        int& O,
+        bool compressed)
+    {
+        return qpdf.generateHintStream(new_obj, obj, hint_stream, S, O, compressed);
+    }
+
+    static std::vector<QPDFObjGen>
+    getCompressibleObjGens(QPDF& qpdf)
+    {
+        return qpdf.getCompressibleObjVector();
+    }
+
+    static std::vector<bool>
+    getCompressibleObjSet(QPDF& qpdf)
+    {
+        return qpdf.getCompressibleObjSet();
+    }
+
+    static Xref_table const&
+    getXRefTable(QPDF& qpdf)
+    {
+        return qpdf.m->xref_table;
+    }
+
+    static size_t
+    tableSize(QPDF& qpdf)
+    {
+        return qpdf.tableSize();
+    }
 };
 
 #endif // QPDF_PRIVATE_HH

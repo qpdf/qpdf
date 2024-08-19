@@ -1936,47 +1936,26 @@ void
 QPDFWriter::preserveObjectStreams()
 {
     auto const& xref = QPDF::Writer::getXRefTable(m->pdf);
-    // Our object_to_object_stream map has to map ObjGen -> ObjGen since we may be generating object
-    // streams out of old objects that have generation numbers greater than zero. However in an
-    // existing PDF, all object stream objects and all objects in them must have generation 0
-    // because the PDF spec does not provide any way to do otherwise. This code filters out objects
-    // that are not allowed to be in object streams. In addition to removing objects that were
-    // erroneously included in object streams in the source PDF, it also prevents unreferenced
-    // objects from being included.
-    auto end = xref.cend();
-    m->obj.streams_empty = true;
+    m->obj.streams_empty = !xref.object_streams();
+    if (m->obj.streams_empty) {
+        return;
+    }
+    // This code filters out objects that are not allowed to be in object streams. In addition to
+    // removing objects that were erroneously included in object streams in the source PDF, it also
+    // prevents unreferenced objects from being included.
     if (m->preserve_unreferenced_objects) {
-        for (auto iter = xref.cbegin(); iter != end; ++iter) {
-            if (iter->second.getType() == 2) {
-                // Pdf contains object streams.
-                QTC::TC("qpdf", "QPDFWriter preserve object streams preserve unreferenced");
-                m->obj.streams_empty = false;
-                m->obj[iter->first].object_stream = iter->second.getObjStreamNumber();
-            }
+        QTC::TC("qpdf", "QPDFWriter preserve object streams preserve unreferenced");
+        for (auto [id, stream]: xref.compressed_objects()) {
+            m->obj[id].object_stream = stream;
         }
     } else {
-        // Start by scanning for first compressed object in case we don't have any object streams to
-        // process.
-        for (auto iter = xref.cbegin(); iter != end; ++iter) {
-            if (iter->second.getType() == 2) {
-                // Pdf contains object streams.
-                QTC::TC("qpdf", "QPDFWriter preserve object streams");
-                m->obj.streams_empty = false;
-                auto eligible = QPDF::Writer::getCompressibleObjSet(m->pdf);
-                // The object pointed to by iter may be a previous generation, in which case it is
-                // removed by getCompressibleObjSet. We need to restart the loop (while the object
-                // table may contain multiple generations of an object).
-                for (iter = xref.cbegin(); iter != end; ++iter) {
-                    if (iter->second.getType() == 2) {
-                        auto id = static_cast<size_t>(iter->first.getObj());
-                        if (id < eligible.size() && eligible[id]) {
-                            m->obj[iter->first].object_stream = iter->second.getObjStreamNumber();
-                        } else {
-                            QTC::TC("qpdf", "QPDFWriter exclude from object stream");
-                        }
-                    }
-                }
-                return;
+        QTC::TC("qpdf", "QPDFWriter preserve object streams");
+        auto eligible = QPDF::Writer::getCompressibleObjSet(m->pdf);
+        for (auto [id, stream]: xref.compressed_objects()) {
+            if (eligible[id]) {
+                m->obj[id].object_stream = stream;
+            } else {
+                QTC::TC("qpdf", "QPDFWriter exclude from object stream");
             }
         }
     }
