@@ -17,7 +17,7 @@ my $td = new TestDriver('parsing');
 my $n_tests = 17;
 
 $td->runtest("parse objects from string",
-             {$td->COMMAND => "test_driver 31 bad39.qdf"},
+             {$td->COMMAND => "test_driver 31 bad-parse.qdf"},
              {$td->FILE => "parse-object.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("EOF terminating literal tokens",

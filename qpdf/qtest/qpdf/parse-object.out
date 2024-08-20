@@ -5,7 +5,7 @@ WARNING: parsed object (offset 9): unknown token while reading object; treating 
 WARNING: parsed object: treating unexpected brace token as null
 WARNING: parsed object: treating unexpected brace token as null
 WARNING: parsed object: unexpected dictionary close token
-WARNING: bad39.qdf (object 7 0, offset 1121): unexpected EOF
-WARNING: bad39.qdf (object 7 0, offset 1121): expected endobj
-WARNING: bad39.qdf (object 7 0, offset 1121): EOF after endobj
+WARNING: bad-parse.qdf (object 7 0, offset 1121): unexpected EOF
+WARNING: bad-parse.qdf (object 7 0, offset 1121): expected endobj
+WARNING: bad-parse.qdf (object 7 0, offset 1121): EOF after endobj
 test 31 done

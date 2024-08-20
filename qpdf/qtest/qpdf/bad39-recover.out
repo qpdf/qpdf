@@ -1,0 +1,13 @@
+WARNING: bad39.pdf (object 4 0, offset 385): expected endstream
+WARNING: bad39.pdf (object 4 0, offset 341): attempting to recover stream length
+WARNING: bad39.pdf (object 4 0, offset 341): unable to recover stream data; treating stream as empty
+/QTest is indirect and has type stream (10)
+/QTest is a stream.  Dictionary: << /Length 44 >>
+Raw stream data:
+
+Uncompressed stream data:
+
+End of stream data
+unparse: 4 0 R
+unparseResolved: 4 0 R
+test 1 done

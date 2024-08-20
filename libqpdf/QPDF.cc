@@ -1649,27 +1649,28 @@ QPDF::recoverStreamLength(
     }
 
     if (length) {
-        qpdf_offset_t this_obj_offset = 0;
-        QPDFObjGen this_og;
+        auto end = stream_offset + toO(length);
+        qpdf_offset_t found_offset = 0;
+        QPDFObjGen found_og;
 
         // Make sure this is inside this object
-        for (auto const& iter: m->xref_table) {
-            QPDFXRefEntry const& entry = iter.second;
+        for (auto const& [current_og, entry]: m->xref_table) {
             if (entry.getType() == 1) {
                 qpdf_offset_t obj_offset = entry.getOffset();
-                if ((obj_offset > stream_offset) &&
-                    ((this_obj_offset == 0) || (this_obj_offset > obj_offset))) {
-                    this_obj_offset = obj_offset;
-                    this_og = iter.first;
+                if (found_offset < obj_offset && obj_offset < end) {
+                    found_offset = obj_offset;
+                    found_og = current_og;
                 }
             }
         }
-        if (this_obj_offset && (this_og == og)) {
-            // Well, we found endstream\nendobj within the space allowed for this object, so we're
-            // probably in good shape.
-            throw std::logic_error("unreachable success");
+        if (!found_offset || found_og == og) {
+            // If we are trying to recover an XRef stream the xref table will not contain and
+            // won't contain any entries, therefore we cannot check the found length. Otherwise we
+            // found endstream\nendobj within the space allowed for this object, so we're probably
+            // in good shape.
         } else {
             QTC::TC("qpdf", "QPDF found wrong endstream in recovery");
+            length = 0;
         }
     }
 
