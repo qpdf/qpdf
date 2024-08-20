@@ -231,7 +231,7 @@ class QPDF::Xref_table
     // Methods to parse tables
     qpdf_offset_t process_section(qpdf_offset_t offset);
     std::vector<Subsection> subsections(std::string& line);
-    std::vector<Subsection> bad_subsections(std::string& line);
+    std::vector<Subsection> bad_subsections(std::string& line, qpdf_offset_t offset);
     Subsection subsection(std::string const& line);
     bool read_entry(qpdf_offset_t& f1, int& f2, char& type);
     bool read_bad_entry(qpdf_offset_t& f1, int& f2, char& type);

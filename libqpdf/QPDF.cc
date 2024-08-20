@@ -820,19 +820,23 @@ QPDF::Xref_table::subsection(std::string const& line)
     while (QUtil::is_space(*p)) {
         ++p;
     }
-    return {
-        QUtil::string_to_int(obj_str.c_str()),
-        QUtil::string_to_int(num_str.c_str()),
-        file->getLastOffset() + toI(p - start)};
+    auto obj = QUtil::string_to_int(obj_str.c_str());
+    auto count = QUtil::string_to_int(num_str.c_str());
+    if (obj > max_id() || count > max_id() || (obj + count) > max_id()) {
+        throw damaged_table("xref table subsection header contains impossibly large entry");
+    }
+    return {obj, count, file->getLastOffset() + toI(p - start)};
 }
 
 std::vector<QPDF::Xref_table::Subsection>
-QPDF::Xref_table::bad_subsections(std::string& line)
+QPDF::Xref_table::bad_subsections(std::string& line, qpdf_offset_t start)
 {
     std::vector<QPDF::Xref_table::Subsection> result;
     qpdf_offset_t f1 = 0;
     int f2 = 0;
     char type = '\0';
+
+    file->seek(start, SEEK_SET);
 
     while (true) {
         line.assign(50, '\0');
@@ -854,10 +858,36 @@ QPDF::Xref_table::bad_subsections(std::string& line)
     }
 }
 
+// Optimistically read and parse all subsection headers. If an error is encountered return the
+// result of bad_subsections.
 std::vector<QPDF::Xref_table::Subsection>
 QPDF::Xref_table::subsections(std::string& line)
 {
-    return bad_subsections(line);
+    auto recovery_offset = file->tell();
+    try {
+        std::vector<QPDF::Xref_table::Subsection> result;
+
+        while (true) {
+            line.assign(50, '\0');
+            file->read(line.data(), line.size());
+            auto& sub = result.emplace_back(subsection(line));
+            auto count = std::get<1>(sub);
+            auto offset = std::get<2>(sub);
+            file->seek(offset + 20 * toO(count) - 1, SEEK_SET);
+            file->read(line.data(), 1);
+            if (!(line[0] == '\n' || line[0] == '\n')) {
+                return bad_subsections(line, recovery_offset);
+            }
+            qpdf_offset_t pos = file->tell();
+            if (read_token().isWord("trailer")) {
+                return result;
+            } else {
+                file->seek(pos, SEEK_SET);
+            }
+        }
+    } catch (...) {
+        return bad_subsections(line, recovery_offset);
+    }
 }
 
 bool
