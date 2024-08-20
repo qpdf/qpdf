@@ -827,7 +827,7 @@ QPDF::Xref_table::subsection(std::string const& line)
 }
 
 std::vector<QPDF::Xref_table::Subsection>
-QPDF::Xref_table::subsections(std::string& line)
+QPDF::Xref_table::bad_subsections(std::string& line)
 {
     std::vector<QPDF::Xref_table::Subsection> result;
     qpdf_offset_t f1 = 0;
@@ -852,6 +852,12 @@ QPDF::Xref_table::subsections(std::string& line)
             file->seek(pos, SEEK_SET);
         }
     }
+}
+
+std::vector<QPDF::Xref_table::Subsection>
+QPDF::Xref_table::subsections(std::string& line)
+{
+    return bad_subsections(line);
 }
 
 bool
