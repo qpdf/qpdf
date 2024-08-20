@@ -1667,6 +1667,7 @@ QPDF::recoverStreamLength(
         if (this_obj_offset && (this_og == og)) {
             // Well, we found endstream\nendobj within the space allowed for this object, so we're
             // probably in good shape.
+            throw std::logic_error("unreachable success");
         } else {
             QTC::TC("qpdf", "QPDF found wrong endstream in recovery");
         }
