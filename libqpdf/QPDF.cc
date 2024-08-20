@@ -1410,6 +1410,30 @@ QPDF::Xref_table::at_offset(qpdf_offset_t offset) const noexcept
     return QPDFObjGen(id, gen);
 }
 
+std::map<QPDFObjGen, QPDFXRefEntry>
+QPDF::Xref_table::as_map() const
+{
+    std::map<QPDFObjGen, QPDFXRefEntry> result;
+    int i{0};
+    for (auto const& item: table) {
+        switch (item.type()) {
+        case 0:
+            break;
+        case 1:
+            result.emplace(QPDFObjGen(i, item.gen()), item.offset());
+            break;
+        case 2:
+            result.emplace(
+                QPDFObjGen(i, 0), QPDFXRefEntry(item.stream_number(), item.stream_index()));
+            break;
+        default:
+            throw std::logic_error("Xref_table: invalid entry type");
+        }
+        ++i;
+    }
+    return result;
+}
+
 void
 QPDF::showXRefTable()
 {
@@ -2602,16 +2626,9 @@ QPDF::getRoot()
 std::map<QPDFObjGen, QPDFXRefEntry>
 QPDF::getXRefTable()
 {
-    return getXRefTableInternal();
-}
-
-std::map<QPDFObjGen, QPDFXRefEntry>
-QPDF::getXRefTableInternal()
-{
     if (!m->xref_table.initialized()) {
         throw std::logic_error("QPDF::getXRefTable called before parsing.");
     }
-
     return m->xref_table.as_map();
 }
 

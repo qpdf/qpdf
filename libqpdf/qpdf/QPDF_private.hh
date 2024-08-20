@@ -89,30 +89,7 @@ class QPDF::Xref_table
 
     QPDFObjGen at_offset(qpdf_offset_t offset) const noexcept;
 
-    // Temporary access to underlying map
-    std::map<QPDFObjGen, QPDFXRefEntry>
-    as_map()
-    {
-        std::map<QPDFObjGen, QPDFXRefEntry> result;
-        int i{0};
-        for (auto const& item: table) {
-            switch (item.type()) {
-            case 0:
-                break;
-            case 1:
-                result.emplace(QPDFObjGen(i, item.gen()), item.offset());
-                break;
-            case 2:
-                result.emplace(
-                    QPDFObjGen(i, 0), QPDFXRefEntry(item.stream_number(), item.stream_index()));
-                break;
-            default:
-                throw std::logic_error("Xref_table: invalid entry type");
-            }
-            ++i;
-        }
-        return result;
-    }
+    std::map<QPDFObjGen, QPDFXRefEntry> as_map() const;
 
     bool
     object_streams() const noexcept
