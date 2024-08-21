@@ -148,7 +148,7 @@ QPDFObjectHandle::TokenFilter::write(std::string const& str)
 void
 QPDFObjectHandle::TokenFilter::writeToken(QPDFTokenizer::Token const& token)
 {
-    std::string value = token.getRawValue();
+    std::string const& value = token.getRawValue();
     write(value.c_str(), value.length());
 }
 
