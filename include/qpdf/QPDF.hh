@@ -1088,14 +1088,11 @@ class QPDF
         qpdf_offset_t end_before_space,
         qpdf_offset_t end_after_space);
     static QPDFExc damagedPDF(
-        std::shared_ptr<InputSource> const& input,
+        InputSource& input,
         std::string const& object,
         qpdf_offset_t offset,
         std::string const& message);
-    QPDFExc damagedPDF(
-        std::shared_ptr<InputSource> const& input,
-        qpdf_offset_t offset,
-        std::string const& message);
+    QPDFExc damagedPDF(InputSource& input, qpdf_offset_t offset, std::string const& message);
     QPDFExc damagedPDF(std::string const& object, qpdf_offset_t offset, std::string const& message);
     QPDFExc damagedPDF(std::string const& object, std::string const& message);
     QPDFExc damagedPDF(qpdf_offset_t offset, std::string const& message);

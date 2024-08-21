@@ -1493,7 +1493,7 @@ QPDF::readObject(std::string const& description, QPDFObjGen og)
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.
-        warn(damagedPDF(m->file, m->file->getLastOffset(), "empty object treated as null"));
+        warn(damagedPDF(*m->file, m->file->getLastOffset(), "empty object treated as null"));
         return object;
     }
     auto token = readToken(m->file);
@@ -1613,7 +1613,7 @@ QPDF::readObjectInStream(std::shared_ptr<InputSource>& input, int obj)
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.
-        warn(damagedPDF(input, input->getLastOffset(), "empty object treated as null"));
+        warn(damagedPDF(*input, input->getLastOffset(), "empty object treated as null"));
     }
     return object;
 }
@@ -1635,7 +1635,7 @@ QPDF::recoverStreamLength(
     std::shared_ptr<InputSource> input, QPDFObjGen const& og, qpdf_offset_t stream_offset)
 {
     // Try to reconstruct stream length by looking for endstream or endobj
-    warn(damagedPDF(input, stream_offset, "attempting to recover stream length"));
+    warn(damagedPDF(*input, stream_offset, "attempting to recover stream length"));
 
     PatternFinder ef(*this, &QPDF::findEndstream);
     size_t length = 0;
@@ -1674,10 +1674,10 @@ QPDF::recoverStreamLength(
 
     if (length == 0) {
         warn(damagedPDF(
-            input, stream_offset, "unable to recover stream data; treating stream as empty"));
+            *input, stream_offset, "unable to recover stream data; treating stream as empty"));
     } else {
-        warn(
-            damagedPDF(input, stream_offset, "recovered stream length: " + std::to_string(length)));
+        warn(damagedPDF(
+            *input, stream_offset, "recovered stream length: " + std::to_string(length)));
     }
 
     QTC::TC("qpdf", "QPDF recovered stream length");
@@ -1958,7 +1958,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
         QPDFTokenizer::Token toffset = readToken(input);
         if (!(tnum.isInteger() && toffset.isInteger())) {
             throw damagedPDF(
-                input,
+                *input,
                 m->last_object_description,
                 input->getLastOffset(),
                 "expected integer in object stream header");
@@ -1972,7 +1972,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
         if (num == obj_stream_number) {
             QTC::TC("qpdf", "QPDF ignore self-referential object stream");
             warn(damagedPDF(
-                input,
+                *input,
                 m->last_object_description,
                 input->getLastOffset(),
                 "object stream claims to contain itself"));
@@ -2726,7 +2726,7 @@ QPDF::pipeStreamData(
         file->seek(offset, SEEK_SET);
         auto buf = std::make_unique<char[]>(length);
         if (auto read = file->read(buf.get(), length); read != length) {
-            throw damagedPDF(file, "", offset + toO(read), "unexpected EOF reading stream data");
+            throw damagedPDF(*file, "", offset + toO(read), "unexpected EOF reading stream data");
         }
         pipeline->write(buf.get(), length);
         attempted_finish = true;
@@ -2742,7 +2742,7 @@ QPDF::pipeStreamData(
             qpdf_for_warning.warn(
                 // line-break
                 damagedPDF(
-                    file,
+                    *file,
                     "",
                     file->getLastOffset(),
                     ("error decoding stream data for object " + og.unparse(' ') + ": " +
@@ -2751,7 +2751,7 @@ QPDF::pipeStreamData(
                 qpdf_for_warning.warn(
                     // line-break
                     damagedPDF(
-                        file,
+                        *file,
                         "",
                         file->getLastOffset(),
                         "stream will be re-processed without filtering to avoid data loss"));
@@ -2825,19 +2825,15 @@ QPDF::stopOnError(std::string const& message)
 // Return an exception of type qpdf_e_damaged_pdf.
 QPDFExc
 QPDF::damagedPDF(
-    std::shared_ptr<InputSource> const& input,
-    std::string const& object,
-    qpdf_offset_t offset,
-    std::string const& message)
+    InputSource& input, std::string const& object, qpdf_offset_t offset, std::string const& message)
 {
-    return {qpdf_e_damaged_pdf, input->getName(), object, offset, message};
+    return {qpdf_e_damaged_pdf, input.getName(), object, offset, message};
 }
 
 // Return an exception of type qpdf_e_damaged_pdf.  The object is taken from
 // m->last_object_description.
 QPDFExc
-QPDF::damagedPDF(
-    std::shared_ptr<InputSource> const& input, qpdf_offset_t offset, std::string const& message)
+QPDF::damagedPDF(InputSource& input, qpdf_offset_t offset, std::string const& message)
 {
     return damagedPDF(input, m->last_object_description, offset, message);
 }
