@@ -419,7 +419,7 @@ QPDF::findHeader()
 bool
 QPDF::findStartxref()
 {
-    if (readToken(m->file).isWord("startxref") && readToken(m->file).isInteger()) {
+    if (readToken(*m->file).isWord("startxref") && readToken(*m->file).isInteger()) {
         // Position in front of offset token
         m->file->seek(m->file->getLastOffset(), SEEK_SET);
         return true;
@@ -457,7 +457,7 @@ QPDF::parse(char const* password)
     PatternFinder sf(*this, &QPDF::findStartxref);
     qpdf_offset_t xref_offset = 0;
     if (m->file->findLast("startxref", start_offset, 0, sf)) {
-        xref_offset = QUtil::string_to_ll(readToken(m->file).getValue().c_str());
+        xref_offset = QUtil::string_to_ll(readToken(*m->file).getValue().c_str());
     }
 
     try {
@@ -575,12 +575,12 @@ QPDF::reconstruct_xref(QPDFExc& e)
     // Don't allow very long tokens here during recovery. All the interesting tokens are covered.
     static size_t const MAX_LEN = 10;
     while (m->file->tell() < eof) {
-        QPDFTokenizer::Token t1 = readToken(m->file, MAX_LEN);
+        QPDFTokenizer::Token t1 = readToken(*m->file, MAX_LEN);
         qpdf_offset_t token_start = m->file->tell() - toO(t1.getValue().length());
         if (t1.isInteger()) {
             auto pos = m->file->tell();
-            QPDFTokenizer::Token t2 = readToken(m->file, MAX_LEN);
-            if ((t2.isInteger()) && (readToken(m->file, MAX_LEN).isWord("obj"))) {
+            QPDFTokenizer::Token t2 = readToken(*m->file, MAX_LEN);
+            if ((t2.isInteger()) && (readToken(*m->file, MAX_LEN).isWord("obj"))) {
                 int obj = QUtil::string_to_int(t1.getValue().c_str());
                 int gen = QUtil::string_to_int(t2.getValue().c_str());
                 if (obj <= m->xref_table_max_id) {
@@ -989,7 +989,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
             }
         }
         qpdf_offset_t pos = m->file->tell();
-        if (readToken(m->file).isWord("trailer")) {
+        if (readToken(*m->file).isWord("trailer")) {
             break;
         } else {
             m->file->seek(pos, SEEK_SET);
@@ -1470,7 +1470,7 @@ QPDF::readTrailer()
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.
         warn(damagedPDF("trailer", "empty object treated as null"));
-    } else if (object.isDictionary() && readToken(m->file).isWord("stream")) {
+    } else if (object.isDictionary() && readToken(*m->file).isWord("stream")) {
         warn(damagedPDF("trailer", m->file->tell(), "stream keyword found in trailer"));
     }
     // Override last_offset so that it points to the beginning of the object we just read
@@ -1496,10 +1496,10 @@ QPDF::readObject(std::string const& description, QPDFObjGen og)
         warn(damagedPDF(*m->file, m->file->getLastOffset(), "empty object treated as null"));
         return object;
     }
-    auto token = readToken(m->file);
+    auto token = readToken(*m->file);
     if (object.isDictionary() && token.isWord("stream")) {
         readStream(object, og, offset);
-        token = readToken(m->file);
+        token = readToken(*m->file);
     }
     if (!token.isWord("endobj")) {
         QTC::TC("qpdf", "QPDF err expected endobj");
@@ -1535,7 +1535,7 @@ QPDF::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
         // Seek in two steps to avoid potential integer overflow
         m->file->seek(stream_offset, SEEK_SET);
         m->file->seek(toO(length), SEEK_CUR);
-        if (!readToken(m->file).isWord("endstream")) {
+        if (!readToken(*m->file).isWord("endstream")) {
             QTC::TC("qpdf", "QPDF missing endstream");
             throw damagedPDF("expected endstream");
         }
@@ -1622,7 +1622,7 @@ bool
 QPDF::findEndstream()
 {
     // Find endstream or endobj. Position the input at that token.
-    auto t = readToken(m->file, 20);
+    auto t = readToken(*m->file, 20);
     if (t.isWord("endobj") || t.isWord("endstream")) {
         m->file->seek(m->file->getLastOffset(), SEEK_SET);
         return true;
@@ -1642,7 +1642,7 @@ QPDF::recoverStreamLength(
     if (m->file->findFirst("end", stream_offset, 0, ef)) {
         length = toS(m->file->tell() - stream_offset);
         // Reread endstream but, if it was endobj, don't skip that.
-        QPDFTokenizer::Token t = readToken(m->file);
+        QPDFTokenizer::Token t = readToken(*m->file);
         if (t.getValue() == "endobj") {
             m->file->seek(m->file->getLastOffset(), SEEK_SET);
         }
@@ -1685,7 +1685,7 @@ QPDF::recoverStreamLength(
 }
 
 QPDFTokenizer::Token
-QPDF::readToken(std::shared_ptr<InputSource> input, size_t max_len)
+QPDF::readToken(InputSource& input, size_t max_len)
 {
     return m->tokenizer.readToken(input, m->last_object_description, true, max_len);
 }
@@ -1728,20 +1728,20 @@ QPDF::readObjectAtOffset(
 
     m->file->seek(offset, SEEK_SET);
     try {
-        QPDFTokenizer::Token tobjid = readToken(m->file);
+        QPDFTokenizer::Token tobjid = readToken(*m->file);
         bool objidok = tobjid.isInteger();
         QTC::TC("qpdf", "QPDF check objid", objidok ? 1 : 0);
         if (!objidok) {
             QTC::TC("qpdf", "QPDF expected n n obj");
             throw damagedPDF(offset, "expected n n obj");
         }
-        QPDFTokenizer::Token tgen = readToken(m->file);
+        QPDFTokenizer::Token tgen = readToken(*m->file);
         bool genok = tgen.isInteger();
         QTC::TC("qpdf", "QPDF check generation", genok ? 1 : 0);
         if (!genok) {
             throw damagedPDF(offset, "expected n n obj");
         }
-        QPDFTokenizer::Token tobj = readToken(m->file);
+        QPDFTokenizer::Token tobj = readToken(*m->file);
 
         bool objok = tobj.isWord("obj");
         QTC::TC("qpdf", "QPDF check obj", objok ? 1 : 0);
@@ -1954,8 +1954,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             bp.get()));
 
     for (int i = 0; i < n; ++i) {
-        QPDFTokenizer::Token tnum = readToken(input);
-        QPDFTokenizer::Token toffset = readToken(input);
+        QPDFTokenizer::Token tnum = readToken(*input);
+        QPDFTokenizer::Token toffset = readToken(*input);
         if (!(tnum.isInteger() && toffset.isInteger())) {
             throw damagedPDF(
                 *input,
