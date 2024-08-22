@@ -1390,6 +1390,26 @@ QPDF::Xref_table::insert_free(QPDFObjGen og)
     }
 }
 
+QPDFObjGen
+QPDF::Xref_table::at_offset(qpdf_offset_t offset) const noexcept
+{
+    int id = 0;
+    int gen = 0;
+    qpdf_offset_t start = 0;
+
+    int i = 0;
+    for (auto const& item: table) {
+        auto o = item.offset();
+        if (start < o && o <= offset) {
+            start = o;
+            id = i;
+            gen = item.gen();
+        }
+        ++i;
+    }
+    return QPDFObjGen(id, gen);
+}
+
 void
 QPDF::showXRefTable()
 {
@@ -1690,21 +1710,9 @@ QPDF::recoverStreamLength(
     }
 
     if (length) {
-        auto end = stream_offset + toO(length);
-        qpdf_offset_t found_offset = 0;
-        QPDFObjGen found_og;
-
         // Make sure this is inside this object
-        for (auto const& [current_og, entry]: m->xref_table.as_map()) {
-            if (entry.getType() == 1) {
-                qpdf_offset_t obj_offset = entry.getOffset();
-                if (found_offset < obj_offset && obj_offset < end) {
-                    found_offset = obj_offset;
-                    found_og = current_og;
-                }
-            }
-        }
-        if (!found_offset || found_og == og) {
+        auto found = m->xref_table.at_offset(stream_offset + toO(length));
+        if (found == QPDFObjGen() || found == og) {
             // If we are trying to recover an XRef stream the xref table will not contain and
             // won't contain any entries, therefore we cannot check the found length. Otherwise we
             // found endstream\nendobj within the space allowed for this object, so we're probably

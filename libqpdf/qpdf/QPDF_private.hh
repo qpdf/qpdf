@@ -87,6 +87,8 @@ class QPDF::Xref_table
         return table[static_cast<size_t>(id)].stream_index();
     }
 
+    QPDFObjGen at_offset(qpdf_offset_t offset) const noexcept;
+
     // Temporary access to underlying map
     std::map<QPDFObjGen, QPDFXRefEntry>
     as_map()
