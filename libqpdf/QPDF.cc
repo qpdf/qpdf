@@ -1727,22 +1727,26 @@ QPDF::readObjectAtOffset(
     }
 
     m->file->seek(offset, SEEK_SET);
-
-    QPDFTokenizer::Token tobjid = readToken(m->file);
-    QPDFTokenizer::Token tgen = readToken(m->file);
-    QPDFTokenizer::Token tobj = readToken(m->file);
-
-    bool objidok = tobjid.isInteger();
-    bool genok = tgen.isInteger();
-    bool objok = tobj.isWord("obj");
-
-    QTC::TC("qpdf", "QPDF check objid", objidok ? 1 : 0);
-    QTC::TC("qpdf", "QPDF check generation", genok ? 1 : 0);
-    QTC::TC("qpdf", "QPDF check obj", objok ? 1 : 0);
-
     try {
-        if (!(objidok && genok && objok)) {
+        QPDFTokenizer::Token tobjid = readToken(m->file);
+        bool objidok = tobjid.isInteger();
+        QTC::TC("qpdf", "QPDF check objid", objidok ? 1 : 0);
+        if (!objidok) {
             QTC::TC("qpdf", "QPDF expected n n obj");
+            throw damagedPDF(offset, "expected n n obj");
+        }
+        QPDFTokenizer::Token tgen = readToken(m->file);
+        bool genok = tgen.isInteger();
+        QTC::TC("qpdf", "QPDF check generation", genok ? 1 : 0);
+        if (!genok) {
+            throw damagedPDF(offset, "expected n n obj");
+        }
+        QPDFTokenizer::Token tobj = readToken(m->file);
+
+        bool objok = tobj.isWord("obj");
+        QTC::TC("qpdf", "QPDF check obj", objok ? 1 : 0);
+
+        if (!objok) {
             throw damagedPDF(offset, "expected n n obj");
         }
         int objid = QUtil::string_to_int(tobjid.getValue().c_str());
