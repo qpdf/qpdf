@@ -2164,7 +2164,7 @@ QPDFObjectHandle::parseContentStream_data(
         qpdf_offset_t offset = input->getLastOffset();
         input->seek(offset, SEEK_SET);
         auto obj =
-            QPDFParser(input, "content", tokenizer, nullptr, context, false).parse(empty, true);
+            QPDFParser(*input, "content", tokenizer, nullptr, context, false).parse(empty, true);
         if (!obj.isInitialized()) {
             // EOF
             break;
@@ -2223,7 +2223,7 @@ QPDFObjectHandle::parse(
     StringDecrypter* decrypter,
     QPDF* context)
 {
-    return QPDFParser(input, object_description, tokenizer, decrypter, context, false)
+    return QPDFParser(*input, object_description, tokenizer, decrypter, context, false)
         .parse(empty, false);
 }
 

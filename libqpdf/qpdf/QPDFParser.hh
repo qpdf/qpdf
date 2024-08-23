@@ -12,7 +12,7 @@ class QPDFParser
   public:
     QPDFParser() = delete;
     QPDFParser(
-        std::shared_ptr<InputSource> input,
+        InputSource& input,
         std::string const& object_description,
         QPDFTokenizer& tokenizer,
         QPDFObjectHandle::StringDecrypter* decrypter,
@@ -24,7 +24,7 @@ class QPDFParser
         decrypter(decrypter),
         context(context),
         description(std::make_shared<QPDFValue::Description>(
-            std::string(input->getName() + ", " + object_description + " at offset $PO"))),
+            std::string(input.getName() + ", " + object_description + " at offset $PO"))),
         parse_pdf(parse_pdf)
     {
     }
@@ -39,9 +39,9 @@ class QPDFParser
 
     struct StackFrame
     {
-        StackFrame(std::shared_ptr<InputSource> const& input, parser_state_e state) :
+        StackFrame(InputSource& input, parser_state_e state) :
             state(state),
-            offset(input->tell())
+            offset(input.tell())
         {
         }
 
@@ -72,7 +72,7 @@ class QPDFParser
     // NB the offset includes any leading whitespace.
     QPDFObjectHandle withDescription(Args&&... args);
     void setDescription(std::shared_ptr<QPDFObject>& obj, qpdf_offset_t parsed_offset);
-    std::shared_ptr<InputSource> input;
+    InputSource& input;
     std::string const& object_description;
     QPDFTokenizer& tokenizer;
     QPDFObjectHandle::StringDecrypter* decrypter;
