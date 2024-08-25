@@ -412,6 +412,12 @@ addParameter([this](std::string const& p) { c_pages->range(p); });
 popHandler(); // key: range
 popHandler(); // array: .pages[]
 popHandler(); // key: pages
+pushKey("removeInfo");
+addBare([this]() { c_main->removeInfo(); });
+popHandler(); // key: removeInfo
+pushKey("removeMetadata");
+addBare([this]() { c_main->removeMetadata(); });
+popHandler(); // key: removeMetadata
 pushKey("removePageLabels");
 addBare([this]() { c_main->removePageLabels(); });
 popHandler(); // key: removePageLabels
