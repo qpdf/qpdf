@@ -22,6 +22,7 @@ namespace
     };
 
     long memory_limit{0};
+    int scan_limit{0};
     bool throw_on_corrupt_data{true};
 } // namespace
 
@@ -41,6 +42,17 @@ emit_message(j_common_ptr cinfo, int msg_level)
     if (msg_level == -1) {
         auto* jerr = reinterpret_cast<qpdf_jpeg_error_mgr*>(cinfo->err);
         jerr->msg = "Pl_DCT::decompress: JPEG data is corrupt";
+        longjmp(jerr->jmpbuf, 1);
+    }
+}
+
+static void
+progress_monitor(j_common_ptr cinfo)
+{
+    if (cinfo->is_decompressor &&
+        reinterpret_cast<jpeg_decompress_struct*>(cinfo)->input_scan_number > scan_limit) {
+        auto* jerr = reinterpret_cast<qpdf_jpeg_error_mgr*>(cinfo->err);
+        jerr->msg = "Pl_DCT::decompress: JPEG data has too many scans";
         longjmp(jerr->jmpbuf, 1);
     }
 }
@@ -72,6 +84,12 @@ void
 Pl_DCT::setMemoryLimit(long limit)
 {
     memory_limit = limit;
+}
+
+void
+Pl_DCT::setScanLimit(int limit)
+{
+    scan_limit = limit;
 }
 
 void
@@ -340,6 +358,11 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
         // writing it. Furthermore, for very large images runtime can be significant before the
         // first warning is encountered causing a timeout in oss-fuzz.
         throw std::runtime_error("Pl_DCT::decompress: JPEG data large - may be too slow");
+    }
+    jpeg_progress_mgr progress_mgr;
+    if (scan_limit > 0) {
+        progress_mgr.progress_monitor = &progress_monitor;
+        cinfo->progress = &progress_mgr;
     }
     JSAMPARRAY buffer =
         (*cinfo->mem->alloc_sarray)(reinterpret_cast<j_common_ptr>(cinfo), JPOOL_IMAGE, width, 1);

@@ -39,6 +39,11 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
     QPDF_DLL
     static void setMemoryLimit(long limit);
 
+    // Limit the number of scans used by jpeglib when decompressing progressive jpegs.
+    // NB This is a static option affecting all Pl_DCT instances.
+    QPDF_DLL
+    static void setScanLimit(int limit);
+
     // Treat corrupt data as a runtime error rather than attempting to decompress regardless. This
     // is the qpdf default behaviour. To attempt to decompress corrupt data set 'treat_as_error' to
     // false.
