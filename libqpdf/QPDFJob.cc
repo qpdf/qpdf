@@ -471,6 +471,21 @@ QPDFJob::createQPDF()
     }
     handleUnderOverlay(pdf);
     handleTransformations(pdf);
+    if (m->remove_info) {
+        auto trailer = pdf.getTrailer();
+        auto mod_date = trailer.getKey("/Info").getKeyIfDict("/ModDate");
+        if (mod_date.isNull()) {
+            trailer.removeKey("/Info");
+        } else {
+            auto info = trailer.replaceKeyAndGetNew(
+                "/Info", pdf.makeIndirectObject(QPDFObjectHandle::newDictionary()));
+            info.replaceKey("/ModDate", mod_date);
+        }
+        pdf.getRoot().removeKey("/Metadata");
+    }
+    if (m->remove_metadata) {
+        pdf.getRoot().removeKey("/Metadata");
+    }
 
     for (auto& foreign: page_heap) {
         if (foreign->anyWarnings()) {

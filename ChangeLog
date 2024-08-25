@@ -3,6 +3,12 @@
 	* Add C API qpdf_oh_free_buffer to release memory allocated by
 	stream data functions
 
+2024-08-25  M Holger  <m.holger@qpdf.org>
+
+	* Add new command-line arguments --remove-metadata and --remove-info
+	to exclude document metadata and information from the output PDF
+	file. Partially fixes #1145.
+
 2024-08-06  M Holger  <m.holger@qpdf.org>
 
 	* Bug fix: when writing real numbers as JSON ensure that they don't
