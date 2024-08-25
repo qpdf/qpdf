@@ -31,6 +31,7 @@ FuzzHelper::doChecks()
     // jpeg_start_decompress is called. During normal use of qpdf very large JPEGs can occasionally
     // occur legitimately and therefore must be allowed during normal operations.
     Pl_DCT::setMemoryLimit(200'000'000);
+    Pl_DCT::setScanLimit(50);
 
     // Do not decompress corrupt data. This may cause extended runtime within jpeglib without
     // exercising additional code paths in qpdf.
