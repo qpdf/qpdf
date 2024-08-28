@@ -3,7 +3,7 @@
 #include <qpdf/JSON_writer.hh>
 
 QPDF_Bool::QPDF_Bool(bool val) :
-    QPDFValue(::ot_boolean, "boolean"),
+    QPDFValue(::ot_boolean),
     val(val)
 {
 }

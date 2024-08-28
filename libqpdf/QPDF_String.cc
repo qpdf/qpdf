@@ -13,7 +13,7 @@ is_iso_latin1_printable(char ch)
 }
 
 QPDF_String::QPDF_String(std::string const& val) :
-    QPDFValue(::ot_string, "string"),
+    QPDFValue(::ot_string),
     val(val)
 {
 }

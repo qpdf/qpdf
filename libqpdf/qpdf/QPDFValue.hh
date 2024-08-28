@@ -122,15 +122,12 @@ class QPDFValue: public std::enable_shared_from_this<QPDFValue>
   protected:
     QPDFValue() = default;
 
-    QPDFValue(qpdf_object_type_e type_code, char const* type_name) :
-        type_code(type_code),
-        type_name(type_name)
+    QPDFValue(qpdf_object_type_e type_code) :
+        type_code(type_code)
     {
     }
-    QPDFValue(
-        qpdf_object_type_e type_code, char const* type_name, QPDF* qpdf, QPDFObjGen const& og) :
+    QPDFValue(qpdf_object_type_e type_code, QPDF* qpdf, QPDFObjGen og) :
         type_code(type_code),
-        type_name(type_name),
         qpdf(qpdf),
         og(og)
     {
@@ -144,7 +141,6 @@ class QPDFValue: public std::enable_shared_from_this<QPDFValue>
     std::shared_ptr<Description> object_description;
 
     const qpdf_object_type_e type_code{::ot_uninitialized};
-    char const* type_name{"uninitialized"};
 
   protected:
     QPDF* qpdf{nullptr};

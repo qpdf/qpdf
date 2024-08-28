@@ -4,7 +4,7 @@
 #include <qpdf/QUtil.hh>
 
 QPDF_Integer::QPDF_Integer(long long val) :
-    QPDFValue(::ot_integer, "integer"),
+    QPDFValue(::ot_integer),
     val(val)
 {
 }

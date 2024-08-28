@@ -4,7 +4,7 @@
 #include <qpdf/QPDFObject_private.hh>
 
 QPDF_Unresolved::QPDF_Unresolved(QPDF* qpdf, QPDFObjGen const& og) :
-    QPDFValue(::ot_unresolved, "unresolved", qpdf, og)
+    QPDFValue(::ot_unresolved, qpdf, og)
 {
 }
 
