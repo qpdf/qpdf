@@ -786,11 +786,7 @@ class QPDF
     std::shared_ptr<QPDFObject> getObjectForParser(int id, int gen, bool parse_pdf);
     std::shared_ptr<QPDFObject> getObjectForJSON(int id, int gen);
     void removeObject(QPDFObjGen og);
-    void updateCache(
-        QPDFObjGen const& og,
-        std::shared_ptr<QPDFObject> const& object,
-        qpdf_offset_t end_before_space,
-        qpdf_offset_t end_after_space);
+    void updateCache(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& object);
     static QPDFExc damagedPDF(
         InputSource& input,
         std::string const& object,

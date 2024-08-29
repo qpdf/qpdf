@@ -1953,7 +1953,9 @@ QPDF::readObjectAtOffset(
             // could use !check_og in place of skip_cache_if_in_xref.
             QTC::TC("qpdf", "QPDF skipping cache for known unchecked object");
         } else {
-            updateCache(og, oh.getObj(), end_before_space, end_after_space);
+            m->xref_table.linearization_offsets(
+                toS(og.getObj()), end_before_space, end_after_space);
+            updateCache(og, oh.getObj());
         }
     }
 
@@ -1972,7 +1974,7 @@ QPDF::resolve(QPDFObjGen og)
         // has to be resolved during object parsing, such as stream length.
         QTC::TC("qpdf", "QPDF recursion loop in resolve");
         warn(damagedPDF("", "loop detected resolving object " + og.unparse(' ')));
-        updateCache(og, QPDF_Null::create(), -1, -1);
+        updateCache(og, QPDF_Null::create());
         return m->obj_cache[og].object.get();
     }
     ResolveRecorder rr(this, og);
@@ -2008,7 +2010,7 @@ QPDF::resolve(QPDFObjGen og)
     if (isUnresolved(og)) {
         // PDF spec says unknown objects resolve to the null object.
         QTC::TC("qpdf", "QPDF resolve failure to null");
-        updateCache(og, QPDF_Null::create(), -1, -1);
+        updateCache(og, QPDF_Null::create());
     }
 
     auto result(m->obj_cache[og].object);
@@ -2029,12 +2031,6 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
         throw damagedPDF(
             "supposed object stream " + std::to_string(obj_stream_number) + " is not a stream");
     }
-
-    // For linearization data in the object, use the data from the object stream for the objects in
-    // the stream.
-    QPDFObjGen stream_og(obj_stream_number, 0);
-    qpdf_offset_t end_before_space = m->obj_cache[stream_og].end_before_space;
-    qpdf_offset_t end_after_space = m->obj_cache[stream_og].end_after_space;
 
     QPDFObjectHandle dict = obj_stream.getDict();
     if (!dict.isDictionaryOfType("/ObjStm")) {
@@ -2101,7 +2097,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             int offset = iter.second;
             input->seek(offset, SEEK_SET);
             QPDFObjectHandle oh = readObjectInStream(input, iter.first);
-            updateCache(og, oh.getObj(), end_before_space, end_after_space);
+            updateCache(og, oh.getObj());
         } else {
             QTC::TC("qpdf", "QPDF not caching overridden objstm object");
         }
@@ -2116,20 +2112,14 @@ QPDF::newIndirect(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& obj)
 }
 
 void
-QPDF::updateCache(
-    QPDFObjGen const& og,
-    std::shared_ptr<QPDFObject> const& object,
-    qpdf_offset_t end_before_space,
-    qpdf_offset_t end_after_space)
+QPDF::updateCache(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& object)
 {
     object->setObjGen(this, og);
     if (isCached(og)) {
         auto& cache = m->obj_cache[og];
         cache.object->assign(object);
-        cache.end_before_space = end_before_space;
-        cache.end_after_space = end_after_space;
     } else {
-        m->obj_cache[og] = ObjCache(object, end_before_space, end_after_space);
+        m->obj_cache[og] = ObjCache(object);
     }
 }
 
@@ -2159,7 +2149,7 @@ QPDFObjectHandle
 QPDF::makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj)
 {
     QPDFObjGen next{nextObjGen()};
-    m->obj_cache[next] = ObjCache(obj, -1, -1);
+    m->obj_cache[next] = ObjCache(obj);
     return newIndirect(next, m->obj_cache[next].object);
 }
 
@@ -2246,7 +2236,7 @@ QPDF::getObject(QPDFObjGen const& og)
     } else if (m->xref_table.initialized() && !m->xref_table.type(og)) {
         return QPDF_Null::create();
     } else {
-        auto result = m->obj_cache.try_emplace(og, QPDF_Unresolved::create(this, og), -1, -1);
+        auto result = m->obj_cache.try_emplace(og, QPDF_Unresolved::create(this, og));
         return {result.first->second.object};
     }
 }
@@ -2282,7 +2272,7 @@ QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
         QTC::TC("qpdf", "QPDF replaceObject called with indirect object");
         throw std::logic_error("QPDF::replaceObject called with indirect object handle");
     }
-    updateCache(og, oh.getObj(), -1, -1);
+    updateCache(og, oh.getObj());
 }
 
 void

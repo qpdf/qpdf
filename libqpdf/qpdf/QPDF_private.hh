@@ -151,6 +151,49 @@ class QPDF::Xref_table
 
     // For Linearization
 
+    qpdf_offset_t
+    end_after_space(QPDFObjGen og)
+    {
+        auto& e = entry(toS(og.getObj()));
+        switch (e.type()) {
+        case 1:
+            return e.end_after_space_;
+        case 2:
+            {
+                auto es = entry(toS(e.stream_number()));
+                return es.type() == 1 ? es.end_after_space_ : 0;
+            }
+        default:
+            return 0;
+        }
+    }
+
+    qpdf_offset_t
+    end_before_space(QPDFObjGen og)
+    {
+        auto& e = entry(toS(og.getObj()));
+        switch (e.type()) {
+        case 1:
+            return e.end_before_space_;
+        case 2:
+            {
+                auto es = entry(toS(e.stream_number()));
+                return es.type() == 1 ? es.end_before_space_ : 0;
+            }
+        default:
+            return 0;
+        }
+    }
+
+    void
+    linearization_offsets(size_t id, qpdf_offset_t before, qpdf_offset_t after)
+    {
+        if (type(id)) {
+            table[id].end_before_space_ = before;
+            table[id].end_after_space_ = after;
+        }
+    }
+
     bool
     uncompressed_after_compressed() const noexcept
     {
@@ -192,6 +235,14 @@ class QPDF::Xref_table
 
     struct Entry
     {
+        Entry() = default;
+
+        Entry(int gen, Xref entry) :
+            gen_(gen),
+            entry(entry)
+        {
+        }
+
         int
         gen() const noexcept
         {
@@ -224,7 +275,15 @@ class QPDF::Xref_table
 
         int gen_{0};
         Xref entry;
+        qpdf_offset_t end_before_space_{0};
+        qpdf_offset_t end_after_space_{0};
     };
+
+    Entry&
+    entry(size_t id)
+    {
+        return id < table.size() ? table[id] : table[0];
+    }
 
     void read(qpdf_offset_t offset);
 
@@ -384,24 +443,14 @@ class QPDF::Pipe
 class QPDF::ObjCache
 {
   public:
-    ObjCache() :
-        end_before_space(0),
-        end_after_space(0)
-    {
-    }
-    ObjCache(
-        std::shared_ptr<QPDFObject> object,
-        qpdf_offset_t end_before_space = 0,
-        qpdf_offset_t end_after_space = 0) :
-        object(object),
-        end_before_space(end_before_space),
-        end_after_space(end_after_space)
+    ObjCache() = default;
+
+    ObjCache(std::shared_ptr<QPDFObject> object) :
+        object(object)
     {
     }
 
     std::shared_ptr<QPDFObject> object;
-    qpdf_offset_t end_before_space;
-    qpdf_offset_t end_after_space;
 };
 
 class QPDF::ObjCopier
