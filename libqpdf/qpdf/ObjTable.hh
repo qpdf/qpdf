@@ -102,17 +102,26 @@ class ObjTable: public std::vector<T>
     void
     initialize(size_t idx)
     {
-        if (std::vector<T>::size() > 0 || sparse_elements.size() > 0) {
+        if (std::vector<T>::size() > 0 || !sparse_elements.empty()) {
             throw ::std::logic_error("ObjTable accessed before initialization");
-        } else if (
-            idx >= static_cast<size_t>(std::numeric_limits<int>::max()) ||
-            idx >= std::vector<T>::max_size()) {
-            throw std::runtime_error("Invalid maximum object id initializing ObjTable.");
-        } else {
-            std::vector<T>::resize(++idx);
         }
+        resize(++idx);
     }
 
+    void
+    resize(size_t a_size)
+    {
+        std::vector<T>::resize(a_size);
+        if (a_size > min_sparse) {
+            auto it = sparse_elements.begin();
+            auto end = sparse_elements.end();
+            while (it != end && it->first < a_size) {
+                std::vector<T>::operator[](it->first) = std::move(it->second);
+                it = sparse_elements.erase(it);
+            }
+            min_sparse = (it == end) ? std::numeric_limits<size_t>::max() : it->first;
+        }
+    }
 
     inline void
     forEach(std::function<void(int, const T&)> fn)
@@ -128,14 +137,27 @@ class ObjTable: public std::vector<T>
 
   private:
     std::map<size_t, T> sparse_elements;
+    // Smallest id present in sparse_elements.
+    size_t min_sparse{std::numeric_limits<size_t>::max()};
 
     inline T&
     element(size_t idx)
     {
-        static const size_t max_size = std::vector<T>::max_size();
         if (idx < std::vector<T>::size()) {
             return std::vector<T>::operator[](idx);
-        } else if (idx < max_size) {
+        }
+        return large_element(idx);
+    }
+
+    // Must only be called by element. Separated out from element to keep inlined code tight.
+    T&
+    large_element(size_t idx)
+    {
+        static const size_t max_size = std::vector<T>::max_size();
+        if (idx < min_sparse) {
+            min_sparse = idx;
+        }
+        if (idx < max_size) {
             return sparse_elements[idx];
         }
         throw std::runtime_error("Impossibly large object id encountered accessing ObjTable");
@@ -148,7 +170,8 @@ class ObjTable: public std::vector<T>
         static const size_t max_size = std::vector<T>::max_size();
         if (idx < std::vector<T>::size()) {
             return std::vector<T>::operator[](idx);
-        } else if (idx < max_size) {
+        }
+        if (idx < max_size) {
             return sparse_elements.at(idx);
         }
         throw std::runtime_error("Impossibly large object id encountered accessing ObjTable");
