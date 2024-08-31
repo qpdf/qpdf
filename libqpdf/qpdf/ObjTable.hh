@@ -100,15 +100,6 @@ class ObjTable: public std::vector<T>
     }
 
     void
-    initialize(size_t idx)
-    {
-        if (std::vector<T>::size() > 0 || !sparse_elements.empty()) {
-            throw ::std::logic_error("ObjTable accessed before initialization");
-        }
-        resize(++idx);
-    }
-
-    void
     resize(size_t a_size)
     {
         std::vector<T>::resize(a_size);
