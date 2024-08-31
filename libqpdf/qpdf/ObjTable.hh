@@ -113,6 +113,7 @@ class ObjTable: public std::vector<T>
         }
     }
 
+
     inline void
     forEach(std::function<void(int, const T&)> fn)
     {
@@ -131,24 +132,26 @@ class ObjTable: public std::vector<T>
     inline T&
     element(size_t idx)
     {
+        static const size_t max_size = std::vector<T>::max_size();
         if (idx < std::vector<T>::size()) {
             return std::vector<T>::operator[](idx);
-        } else if (idx < static_cast<size_t>(std::numeric_limits<int>::max())) {
+        } else if (idx < max_size) {
             return sparse_elements[idx];
         }
-        throw std::runtime_error("Invalid object id accessing ObjTable.");
+        throw std::runtime_error("Impossibly large object id encountered accessing ObjTable");
         return element(0); // doesn't return
     }
 
     inline T const&
     element(size_t idx) const
     {
+        static const size_t max_size = std::vector<T>::max_size();
         if (idx < std::vector<T>::size()) {
             return std::vector<T>::operator[](idx);
-        } else if (idx < static_cast<size_t>(std::numeric_limits<int>::max())) {
+        } else if (idx < max_size) {
             return sparse_elements.at(idx);
         }
-        throw std::runtime_error("Invalid object id accessing ObjTable.");
+        throw std::runtime_error("Impossibly large object id encountered accessing ObjTable");
         return element(0); // doesn't return
     }
 };
