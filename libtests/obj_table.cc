@@ -2,6 +2,11 @@
 
 struct Test
 {
+    Test() = default;
+    Test(int value) :
+        value(value)
+    {
+    }
     int value{0};
 };
 
@@ -24,10 +29,14 @@ class Table: public ObjTable<Test>
             (*this)[i].value = 2 * i;
         }
         resize(100);
-        for (int i: {1, 99, 100, 105, 110, 120, 220}) {
+        for (int i: {1, 99, 100, 105, 110, 120, 205, 206, 207, 210}) {
             (*this)[i].value = 3 * i;
         }
         resize(200);
+
+        for (int i = 1; i < 10; ++i) {
+            emplace_back(i);
+        }
 
         forEach([](auto i, auto const& item) -> void {
             if (item.value) {

@@ -28,6 +28,7 @@ template <class T>
 class ObjTable: public std::vector<T>
 {
   public:
+    using reference = T&;
     ObjTable() = default;
     ObjTable(const ObjTable&) = delete;
     ObjTable(ObjTable&&) = delete;
@@ -99,6 +100,18 @@ class ObjTable: public std::vector<T>
         return element(id);
     }
 
+    // emplace_back to the end of the vector. If there are any conflicting sparse elements, emplace
+    // them to the back of the vector before adding the current element.
+    template <class... Args>
+    inline T&
+    emplace_back(Args&&... args)
+    {
+        if (min_sparse == std::vector<T>::size()) {
+            return emplace_back_large(std::forward<Args&&...>(args...));
+        }
+        return std::vector<T>::emplace_back(std::forward<Args&&...>(args...));
+    }
+
     void
     resize(size_t a_size)
     {
@@ -167,6 +180,22 @@ class ObjTable: public std::vector<T>
         }
         throw std::runtime_error("Impossibly large object id encountered accessing ObjTable");
         return element(0); // doesn't return
+    }
+
+    // Must only be called by emplace_back. Separated out from emplace_back to keep inlined code
+    // tight.
+    template <class... Args>
+    T&
+    emplace_back_large(Args&&... args)
+    {
+        auto it = sparse_elements.begin();
+        auto end = sparse_elements.end();
+        while (it != end && it->first == std::vector<T>::size()) {
+            std::vector<T>::emplace_back(std::move(it->second));
+            it = sparse_elements.erase(it);
+        }
+        min_sparse = (it == end) ? std::numeric_limits<size_t>::max() : it->first;
+        return std::vector<T>::emplace_back(std::forward<Args&&...>(args...));
     }
 };
 
