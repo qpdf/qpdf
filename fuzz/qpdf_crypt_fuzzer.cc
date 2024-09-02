@@ -9,6 +9,7 @@
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
+
 #include <cstdlib>
 
 class DiscardContents: public QPDFObjectHandle::ParserCallbacks
@@ -87,12 +88,6 @@ FuzzHelper::testWrite()
 
     std::shared_ptr<QPDF> q;
     std::shared_ptr<QPDFWriter> w;
-
-    q = getQpdf();
-    w = getWriter(q);
-    w->setDeterministicID(true);
-    w->setQDFMode(true);
-    doWrite(w);
 
     q = getQpdf();
     w = getWriter(q);

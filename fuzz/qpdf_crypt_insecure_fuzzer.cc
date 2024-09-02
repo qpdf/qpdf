@@ -90,15 +90,10 @@ FuzzHelper::testWrite()
 
     q = getQpdf();
     w = getWriter(q);
-    w->setDeterministicID(true);
-    w->setQDFMode(true);
-    doWrite(w);
-
-    q = getQpdf();
-    w = getWriter(q);
     w->setStaticID(true);
-    w->setLinearization(true);
-    w->setR6EncryptionParameters("u", "o", true, true, true, true, true, true, qpdf_r3p_full, true);
+    w->setObjectStreamMode(qpdf_o_disable);
+    w->setR3EncryptionParametersInsecure(
+        "u", "o", true, true, true, true, true, true, qpdf_r3p_full);
     doWrite(w);
 }
 
