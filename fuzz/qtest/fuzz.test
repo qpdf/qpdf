@@ -11,6 +11,8 @@ my $td = new TestDriver('fuzz');
 
 my $qpdf_corpus = $ENV{'QPDF_FUZZ_CORPUS'} || die "must set QPDF_FUZZ_CORPUS";
 
+my $n_qpdf_files = 77;       # increment when adding new files
+
 my @fuzzers = (
     ['ascii85' => 1],
     ['dct' => 4],
@@ -21,7 +23,12 @@ my @fuzzers = (
     ['pngpredictor' => 1],
     ['runlength' => 6],
     ['tiffpredictor' => 2],
-    ['qpdf' => 77],             # increment when adding new files
+    ['qpdf' => $n_qpdf_files],
+    ['qpdf_crypt' => $n_qpdf_files],
+    ['qpdf_crypt_insecure' => $n_qpdf_files],
+    ['qpdf_lin' => $n_qpdf_files],
+    ['qpdf_pages' => $n_qpdf_files],
+    ['qpdf_outlines' => $n_qpdf_files],
     );
 
 my $n_tests = 0;

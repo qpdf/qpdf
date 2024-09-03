@@ -6,8 +6,8 @@
 #include <qpdf/Pl_PNGFilter.hh>
 #include <qpdf/Pl_TIFFPredictor.hh>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
-#include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
 #include <cstdlib>
 
@@ -33,9 +33,7 @@ class FuzzHelper
 
   private:
     std::shared_ptr<QPDF> getQpdf();
-    std::shared_ptr<QPDFWriter> getWriter(std::shared_ptr<QPDF>);
-    void doWrite(std::shared_ptr<QPDFWriter> w);
-    void testWrite();
+    void testOutlines();
     void doChecks();
 
     Buffer input_buffer;
@@ -59,47 +57,20 @@ FuzzHelper::getQpdf()
     return qpdf;
 }
 
-std::shared_ptr<QPDFWriter>
-FuzzHelper::getWriter(std::shared_ptr<QPDF> qpdf)
-{
-    auto w = std::make_shared<QPDFWriter>(*qpdf);
-    w->setOutputPipeline(&this->discard);
-    w->setDecodeLevel(qpdf_dl_all);
-    return w;
-}
-
 void
-FuzzHelper::doWrite(std::shared_ptr<QPDFWriter> w)
+FuzzHelper::testOutlines()
 {
-    try {
-        w->write();
-    } catch (QPDFExc const& e) {
-        std::cerr << e.what() << std::endl;
-    } catch (std::runtime_error const& e) {
-        std::cerr << e.what() << std::endl;
+    std::shared_ptr<QPDF> q = getQpdf();
+    std::list<std::vector<QPDFOutlineObjectHelper>> queue;
+    QPDFOutlineDocumentHelper odh(*q);
+    queue.push_back(odh.getTopLevelOutlines());
+    while (!queue.empty()) {
+        for (auto& ol: *(queue.begin())) {
+            ol.getDestPage();
+            queue.push_back(ol.getKids());
+        }
+        queue.pop_front();
     }
-}
-
-void
-FuzzHelper::testWrite()
-{
-    // Write in various ways to exercise QPDFWriter
-
-    std::shared_ptr<QPDF> q;
-    std::shared_ptr<QPDFWriter> w;
-
-    q = getQpdf();
-    w = getWriter(q);
-    w->setDeterministicID(true);
-    w->setQDFMode(true);
-    doWrite(w);
-
-    q = getQpdf();
-    w = getWriter(q);
-    w->setStaticID(true);
-    w->setLinearization(true);
-    w->setR6EncryptionParameters("u", "o", true, true, true, true, true, true, qpdf_r3p_full, true);
-    doWrite(w);
 }
 
 void
@@ -122,8 +93,8 @@ FuzzHelper::doChecks()
 
     // Get as much coverage as possible in parts of the library that
     // might benefit from fuzzing.
-    std::cerr << "\ninfo: starting testWrite\n";
-    testWrite();
+    std::cerr << "\ninfo: starting testOutlines\n";
+    testOutlines();
 }
 
 void
