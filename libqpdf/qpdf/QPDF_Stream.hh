@@ -13,22 +13,18 @@
 class Pipeline;
 class QPDF;
 
-class QPDF_Stream: public QPDFValue
+class QPDF_Stream final: public QPDFValue
 {
   public:
-    ~QPDF_Stream() override = default;
-    static std::shared_ptr<QPDFObject> create(
-        QPDF*,
-        QPDFObjGen const& og,
-        QPDFObjectHandle stream_dict,
-        qpdf_offset_t offset,
-        size_t length);
-    std::shared_ptr<QPDFObject> copy(bool shallow = false) override;
-    std::string unparse() override;
-    void writeJSON(int json_version, JSON::Writer& p) override;
+    ~QPDF_Stream() final = default;
+    static std::shared_ptr<QPDFObject>
+    create(QPDF*, QPDFObjGen og, QPDFObjectHandle stream_dict, qpdf_offset_t offset, size_t length);
+    std::shared_ptr<QPDFObject> copy(bool shallow = false) final;
+    std::string unparse() final;
+    void writeJSON(int json_version, JSON::Writer& p) final;
     void setDescription(
-        QPDF*, std::shared_ptr<QPDFValue::Description>& description, qpdf_offset_t offset) override;
-    void disconnect() override;
+        QPDF*, std::shared_ptr<QPDFValue::Description>& description, qpdf_offset_t offset) final;
+    void disconnect() final;
     QPDFObjectHandle getDict() const;
     bool isDataModified() const;
     void setFilterOnWrite(bool);
@@ -80,11 +76,7 @@ class QPDF_Stream: public QPDFValue
 
   private:
     QPDF_Stream(
-        QPDF*,
-        QPDFObjGen const& og,
-        QPDFObjectHandle stream_dict,
-        qpdf_offset_t offset,
-        size_t length);
+        QPDF*, QPDFObjGen og, QPDFObjectHandle stream_dict, qpdf_offset_t offset, size_t length);
     static std::map<std::string, std::string> filter_abbreviations;
     static std::map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>>
         filter_factories;

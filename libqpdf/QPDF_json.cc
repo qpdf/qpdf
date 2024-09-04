@@ -397,14 +397,12 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
                     QTC::TC("qpdf", "QPDF_json data datafile both or neither");
                     error(
                         value.getStart(),
-                        "new \"stream\" must have exactly one of \"data\" or "
-                        "\"datafile\"");
+                        "new \"stream\" must have exactly one of \"data\" or \"datafile\"");
                 } else if (saw_datafile) {
                     QTC::TC("qpdf", "QPDF_json data and datafile");
                     error(
                         value.getStart(),
-                        "existing \"stream\" may at most one of \"data\" or "
-                        "\"datafile\"");
+                        "existing \"stream\" may at most one of \"data\" or \"datafile\"");
                 } else {
                     QTC::TC("qpdf", "QPDF_json no stream data in update mode");
                 }
@@ -427,15 +425,15 @@ QPDF::JSONReactor::containerEnd(JSON const& value)
 void
 QPDF::JSONReactor::replaceObject(QPDFObjectHandle&& replacement, JSON const& value)
 {
-    if (replacement.isIndirect()) {
+    auto& tos = stack.back();
+    auto og = tos.object.getObjGen();
+    if (replacement.isIndirect() && !(replacement.isStream() && replacement.getObjGen() == og)) {
         error(
             replacement.getParsedOffset(),
             "the value of an object may not be an indirect object reference");
         return;
     }
-    auto& tos = stack.back();
-    auto og = tos.object.getObjGen();
-    this->pdf.replaceObject(og, replacement);
+    pdf.replaceObject(og, replacement);
     next_obj = pdf.getObject(og);
     setObjectDescription(tos.object, value);
 }
@@ -575,8 +573,11 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                 if (tos.object.isStream()) {
                     QTC::TC("qpdf", "QPDF_json updating existing stream");
                 } else {
-                    this->this_stream_needs_data = true;
-                    replaceObject(pdf.reserveStream(tos.object.getObjGen()), value);
+                    this_stream_needs_data = true;
+                    replaceObject(
+                        QPDF_Stream::create(
+                            &pdf, tos.object.getObjGen(), QPDFObjectHandle::newDictionary(), 0, 0),
+                        value);
                 }
                 next_obj = tos.object;
             } else {
