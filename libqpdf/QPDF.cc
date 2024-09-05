@@ -198,7 +198,8 @@ QPDF::EncryptionParameters::EncryptionParameters() :
 
 QPDF::Members::Members(QPDF& qpdf) :
     log(QPDFLogger::defaultLogger()),
-    file(new InvalidInputSource()),
+    file_sp(new InvalidInputSource()),
+    file(file_sp.get()),
     encp(new EncryptionParameters),
     xref_table(qpdf)
 {
@@ -272,14 +273,16 @@ QPDF::processMemoryFile(
 void
 QPDF::processInputSource(std::shared_ptr<InputSource> source, char const* password)
 {
-    m->file = source;
+    m->file_sp = source;
+    m->file = source.get();
     parse(password);
 }
 
 void
 QPDF::closeInputSource()
 {
-    m->file = std::shared_ptr<InputSource>(new InvalidInputSource());
+    m->file_sp = std::shared_ptr<InputSource>(new InvalidInputSource());
+    m->file = m->file_sp.get();
 }
 
 void
@@ -412,7 +415,9 @@ QPDF::findHeader()
             // PDF header, all explicit offsets in the file are such that 0 points to the beginning
             // of the header.
             QTC::TC("qpdf", "QPDF global offset");
-            m->file = std::shared_ptr<InputSource>(new OffsetInputSource(m->file, global_offset));
+            m->file_sp =
+                std::shared_ptr<InputSource>(new OffsetInputSource(m->file_sp, global_offset));
+            m->file = m->file_sp.get();
         }
     }
     return valid;
@@ -1541,7 +1546,7 @@ QPDF::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
     } catch (QPDFExc& e) {
         if (m->attempt_recovery) {
             warn(e);
-            length = recoverStreamLength(m->file, og, stream_offset);
+            length = recoverStreamLength(m->file_sp, og, stream_offset);
         } else {
             throw;
         }
@@ -2452,7 +2457,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
     } else {
         auto foreign_stream_data = std::make_shared<ForeignStreamData>(
             foreign_stream_qpdf.m->encp,
-            foreign_stream_qpdf.m->file,
+            foreign_stream_qpdf.m->file_sp,
             foreign.getObjGen(),
             stream->getParsedOffset(),
             stream->getLength(),
@@ -2776,7 +2781,7 @@ QPDF::pipeStreamData(
 {
     return pipeStreamData(
         m->encp,
-        m->file,
+        m->file_sp,
         *this,
         og,
         offset,
