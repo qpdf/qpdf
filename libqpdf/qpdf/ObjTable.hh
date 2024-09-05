@@ -28,6 +28,7 @@ template <class T>
 class ObjTable: public std::vector<T>
 {
   public:
+    using reference = T&;
     ObjTable() = default;
     ObjTable(const ObjTable&) = delete;
     ObjTable(ObjTable&&) = delete;
@@ -99,17 +100,30 @@ class ObjTable: public std::vector<T>
         return element(id);
     }
 
-    void
-    initialize(size_t idx)
+    // emplace_back to the end of the vector. If there are any conflicting sparse elements, emplace
+    // them to the back of the vector before adding the current element.
+    template <class... Args>
+    inline T&
+    emplace_back(Args&&... args)
     {
-        if (std::vector<T>::size() > 0 || sparse_elements.size() > 0) {
-            throw ::std::logic_error("ObjTable accessed before initialization");
-        } else if (
-            idx >= static_cast<size_t>(std::numeric_limits<int>::max()) ||
-            idx >= std::vector<T>::max_size()) {
-            throw std::runtime_error("Invalid maximum object id initializing ObjTable.");
-        } else {
-            std::vector<T>::resize(++idx);
+        if (min_sparse == std::vector<T>::size()) {
+            return emplace_back_large(std::forward<Args&&...>(args...));
+        }
+        return std::vector<T>::emplace_back(std::forward<Args&&...>(args...));
+    }
+
+    void
+    resize(size_t a_size)
+    {
+        std::vector<T>::resize(a_size);
+        if (a_size > min_sparse) {
+            auto it = sparse_elements.begin();
+            auto end = sparse_elements.end();
+            while (it != end && it->first < a_size) {
+                std::vector<T>::operator[](it->first) = std::move(it->second);
+                it = sparse_elements.erase(it);
+            }
+            min_sparse = (it == end) ? std::numeric_limits<size_t>::max() : it->first;
         }
     }
 
@@ -127,29 +141,61 @@ class ObjTable: public std::vector<T>
 
   private:
     std::map<size_t, T> sparse_elements;
+    // Smallest id present in sparse_elements.
+    size_t min_sparse{std::numeric_limits<size_t>::max()};
 
     inline T&
     element(size_t idx)
     {
         if (idx < std::vector<T>::size()) {
             return std::vector<T>::operator[](idx);
-        } else if (idx < static_cast<size_t>(std::numeric_limits<int>::max())) {
+        }
+        return large_element(idx);
+    }
+
+    // Must only be called by element. Separated out from element to keep inlined code tight.
+    T&
+    large_element(size_t idx)
+    {
+        static const size_t max_size = std::vector<T>::max_size();
+        if (idx < min_sparse) {
+            min_sparse = idx;
+        }
+        if (idx < max_size) {
             return sparse_elements[idx];
         }
-        throw std::runtime_error("Invalid object id accessing ObjTable.");
+        throw std::runtime_error("Impossibly large object id encountered accessing ObjTable");
         return element(0); // doesn't return
     }
 
     inline T const&
     element(size_t idx) const
     {
+        static const size_t max_size = std::vector<T>::max_size();
         if (idx < std::vector<T>::size()) {
             return std::vector<T>::operator[](idx);
-        } else if (idx < static_cast<size_t>(std::numeric_limits<int>::max())) {
+        }
+        if (idx < max_size) {
             return sparse_elements.at(idx);
         }
-        throw std::runtime_error("Invalid object id accessing ObjTable.");
+        throw std::runtime_error("Impossibly large object id encountered accessing ObjTable");
         return element(0); // doesn't return
+    }
+
+    // Must only be called by emplace_back. Separated out from emplace_back to keep inlined code
+    // tight.
+    template <class... Args>
+    T&
+    emplace_back_large(Args&&... args)
+    {
+        auto it = sparse_elements.begin();
+        auto end = sparse_elements.end();
+        while (it != end && it->first == std::vector<T>::size()) {
+            std::vector<T>::emplace_back(std::move(it->second));
+            it = sparse_elements.erase(it);
+        }
+        min_sparse = (it == end) ? std::numeric_limits<size_t>::max() : it->first;
+        return std::vector<T>::emplace_back(std::forward<Args&&...>(args...));
     }
 };
 

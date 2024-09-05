@@ -2077,8 +2077,8 @@ void
 QPDFWriter::initializeTables(size_t extra)
 {
     auto size = QIntC::to_size(QPDF::Writer::tableSize(m->pdf) + 100) + extra;
-    m->obj.initialize(size);
-    m->new_obj.initialize(size);
+    m->obj.resize(size);
+    m->new_obj.resize(size);
 }
 
 void
