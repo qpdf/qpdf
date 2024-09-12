@@ -306,6 +306,13 @@ class QPDF::Objects
             return id < table.size() ? table[id] : table[0];
         }
 
+        Entry&
+        entry(int id, int gen)
+        {
+            auto& e = entry(toS(id));
+            return e.gen_ == gen ? e : table[0];
+        }
+
         void read(qpdf_offset_t offset);
         void prepare_obj_table();
 
@@ -362,7 +369,7 @@ class QPDF::Objects
         }
 
         QPDF& qpdf;
-        QPDF::Objects& objects;
+        Objects& objects;
         InputSource* const& file;
         QPDFTokenizer tokenizer;
 
@@ -421,17 +428,34 @@ class QPDF::Objects
         return xref.trailer();
     }
 
+    bool
+    contains(int id, int gen) const noexcept
+    {
+        auto it = table.find(id);
+        return it != table.end() && it->second.gen == gen;
+    }
+
+    bool
+    contains(QPDFObjGen og) const noexcept
+    {
+        return contains(og.getObj(), og.getGen());
+    }
+
     QPDFObjectHandle
     get(QPDFObjGen og)
     {
-        if (auto it = table.find(og); it != table.end()) {
+        auto it = table.find(og.getObj());
+        if (it != table.end() && it->second.gen == og.getGen()) {
             return {it->second.object};
-        } else if (xref.initialized() && !xref.type(og)) {
-            return QPDF_Null::create();
-        } else {
-            auto result = table.try_emplace(og, QPDF_Unresolved::create(&qpdf, og));
-            return {result.first->second.object};
         }
+        if (it != table.end()) {
+            return {QPDF_Null::create()};
+        }
+        if (xref.initialized() && !xref.type(og)) {
+            return {QPDF_Null::create()};
+        }
+        return {table.try_emplace(og.getObj(), og.getGen(), QPDF_Unresolved::create(&qpdf, og))
+                    .first->second.object};
     }
 
     QPDFObjectHandle
@@ -448,6 +472,8 @@ class QPDF::Objects
 
     void swap(QPDFObjGen og1, QPDFObjGen og2);
 
+    std::shared_ptr<QPDFObject> make_indirect(std::shared_ptr<QPDFObject> const& obj);
+
     QPDFObjectHandle read(
         bool attempt_recovery,
         qpdf_offset_t offset,
@@ -456,12 +482,11 @@ class QPDF::Objects
         QPDFObjGen& og,
         bool skip_cache_if_in_xref);
 
-    QPDFObject* resolve(QPDFObjGen og);
-    void update_table(QPDFObjGen og, std::shared_ptr<QPDFObject> const& object);
+    QPDFObject* resolve(int id, int gen);
 
     // Return the highest id in use.
     int last_id();
-    QPDFObjectHandle make_indirect(std::shared_ptr<QPDFObject> const& obj);
+
     std::shared_ptr<QPDFObject> get_for_parser(int id, int gen, bool parse_pdf);
     std::shared_ptr<QPDFObject> get_for_json(int id, int gen);
 
@@ -479,15 +504,29 @@ class QPDF::Objects
     {
         Entry() = default;
 
-        Entry(std::shared_ptr<QPDFObject> object) :
+        Entry(int gen, std::shared_ptr<QPDFObject>&& object) :
+            gen(gen),
+            object(std::move(object))
+        {
+        }
+
+        Entry(int gen, std::shared_ptr<QPDFObject> const& object) :
+            gen(gen),
             object(object)
         {
         }
 
-        std::shared_ptr<QPDFObject> object;
-    };
+        // Return true if entry is valid (i.e. not default constructed).
+        explicit
+        operator bool() const noexcept
+        {
+            return static_cast<bool>(object);
+        }
 
-    bool cached(QPDFObjGen og);
+        int gen{0};
+        std::shared_ptr<QPDFObject> object;
+    }; // Entry
+
     bool unresolved(QPDFObjGen og);
     bool unresolved(int id, int gen);
 
@@ -505,9 +544,10 @@ class QPDF::Objects
     QPDF& qpdf;
     InputSource* const& file;
     QPDF::Members* m;
+
     Xref_table xref;
 
-    std::map<QPDFObjGen, Entry> table;
+    std::map<int, Entry> table;
 
     bool initialized_{false};
     int last_id_{0};

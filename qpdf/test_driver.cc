@@ -605,6 +605,13 @@ test_14(QPDF& pdf, char const* arg2)
     pdf.swapObjects(orig_page2.getObjGen(), orig_page3.getObjGen());
     assert(orig_page2.getKey("/OrigPage").getIntValue() == 3);
     assert(orig_page3.getKey("/OrigPage").getIntValue() == 2);
+    // Swap invalid object
+    try {
+        // Do it wrong first...
+        pdf.swapObjects(orig_page2.getObjGen(), QPDFObjGen(5, 1));
+    } catch (std::logic_error const&) {
+        std::cout << "swapObjects :caught logic error as expected\n";
+    }
     // Replace object and swap objects
     QPDFObjectHandle trailer = pdf.getTrailer();
     QPDFObjectHandle qdict = trailer.getKey("/QDict");
