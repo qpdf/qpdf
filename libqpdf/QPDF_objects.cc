@@ -171,12 +171,12 @@ Xref_table::initialize()
     initialized_ = true;
 }
 
-// Remove any dangling reference picked up while parsing the xref table from the object table..
+// Remove any dangling reference picked up while parsing the xref table.
 void
 Xref_table::prepare_obj_table()
 {
     for (auto it = objects.table.begin(), end = objects.table.end(); it != end;) {
-        if (type(it->first)) {
+        if (type(it->first, it->second.gen)) {
             ++it;
         } else {
             it->second.object->make_null();
@@ -1151,7 +1151,7 @@ Xref_table::resolve_all()
         ++i;
         if (item.type()) {
             if (objects.unresolved(i, item.gen())) {
-                objects.resolve(QPDFObjGen(i, item.gen()));
+                objects.resolve(i, item.gen());
                 if (may_change && reconstructed_) {
                     QTC::TC("qpdf", "QPDF fix dangling triggered xref reconstruction");
                     resolve_all();
@@ -1550,24 +1550,25 @@ Objects::read(
 }
 
 QPDFObject*
-Objects::resolve(QPDFObjGen og)
+Objects::resolve(int id, int gen)
 {
-    if (!unresolved(og)) {
-        return table[og].object.get();
+    if (!unresolved(id, gen)) {
+        return get(id, gen).getObjectPtr();
     }
 
+    auto og = QPDFObjGen(id, gen);
     if (m->resolving.count(og)) {
         // This can happen if an object references itself directly or indirectly in some key that
         // has to be resolved during object parsing, such as stream length.
         QTC::TC("qpdf", "QPDF recursion loop in resolve");
         qpdf.warn(qpdf.damagedPDF("", "loop detected resolving object " + og.unparse(' ')));
-        update_table(og.getObj(), og.getGen(), QPDF_Null::create());
-        return table[og].object.get();
+        update_table(id, gen, QPDF_Null::create());
+        return table[id].object.get();
     }
     ResolveRecorder rr(&qpdf, og);
 
     try {
-        switch (xref.type(og)) {
+        switch (xref.type(id, gen)) {
         case 0:
             break;
         case 1:
@@ -1593,13 +1594,13 @@ Objects::resolve(QPDFObjGen og)
             "", 0, ("object " + og.unparse('/') + ": error reading object: " + e.what())));
     }
 
-    if (unresolved(og)) {
+    if (unresolved(id, gen)) {
         // PDF spec says unknown objects resolve to the null object.
         QTC::TC("qpdf", "QPDF resolve failure to null");
-        update_table(og.getObj(), og.getGen(), QPDF_Null::create());
+        update_table(id, gen, QPDF_Null::create());
     }
 
-    return table[og].object.get();
+    return table[id].object.get();
 }
 
 void
@@ -1716,34 +1717,31 @@ Objects::~Objects()
 }
 
 void
-Objects::update_table(int id, int gen, const std::shared_ptr<QPDFObject>& object)
+Objects::update_table(int id, int gen, const std::shared_ptr<QPDFObject>& obj)
 {
-    auto og = QPDFObjGen(id, gen);
-    object->make_indirect(qpdf, id, gen);
-    if (cached(og)) {
-        auto& cache = table[og];
-        cache.object->assign(object);
+    obj->make_indirect(qpdf, id, gen);
+    auto& e = table[id];
+    if (e) {
+        if (e.gen != gen) {
+            throw std::logic_error("Internal eror in Objects::update_table");
+        }
+        e.object->assign(obj);
     } else {
-        table[og] = Entry(object);
+        e = Entry(gen, obj);
     }
-}
-
-bool
-Objects::cached(QPDFObjGen og)
-{
-    return table.count(og) != 0;
 }
 
 bool
 Objects::unresolved(QPDFObjGen og)
 {
-    return !cached(og) || table[og].object->isUnresolved();
+    return unresolved(og.getObj(), og.getGen());
 }
 
 bool
 Objects::unresolved(int id, int gen)
 {
-    return unresolved(QPDFObjGen(id, gen));
+    auto it = table.find(id);
+    return it == table.end() || (it->second.gen == gen && it->second.object->isUnresolved());
 }
 
 // Increment last_id and return the result.
@@ -1780,45 +1778,66 @@ Objects::initialize()
     last_id_ = std::max(last_id_, toI(xref.size() - 1));
 }
 
-QPDFObjectHandle
+std::shared_ptr<QPDFObject>
 Objects::make_indirect(std::shared_ptr<QPDFObject> const& obj)
 {
     auto next = next_id();
     update_table(next, 0, obj);
-    return table[QPDFObjGen(next, 0)].object;
+    return table[next].object;
 }
 
 std::shared_ptr<QPDFObject>
 Objects::get_for_parser(int id, int gen, bool parse_pdf)
 {
     // This method is called by the parser and therefore must not resolve any objects.
-    auto og = QPDFObjGen(id, gen);
-    if (auto iter = table.find(og); iter != table.end()) {
+    auto iter = table.find(id);
+    if (iter != table.end() && iter->second.gen == gen) {
         return iter->second.object;
     }
-    if (xref.type(og) || !xref.initialized()) {
-        return table.insert({og, QPDF_Unresolved::create(&qpdf, og)}).first->second.object;
+    if (iter != table.end()) {
+        // id in table, different gen
+        return QPDF_Null::create();
+    }
+    if (xref.type(id, gen) || !xref.initialized()) {
+        return table.insert({id, {gen, QPDF_Unresolved::create(&qpdf, QPDFObjGen(id, gen))}})
+            .first->second.object;
     }
     if (parse_pdf) {
         return QPDF_Null::create();
     }
-    return table.insert({og, QPDF_Null::create(&qpdf, og)}).first->second.object;
+    // For backward compatibility we return a indirect null if parse was called by user.
+    return table.insert({id, {gen, QPDF_Null::create(&qpdf, QPDFObjGen(id, gen))}})
+        .first->second.object;
 }
 
 std::shared_ptr<QPDFObject>
 Objects::get_for_json(int id, int gen)
 {
-    auto og = QPDFObjGen(id, gen);
-    auto [it, inserted] = table.try_emplace(og);
+    auto [it, inserted] = table.try_emplace(id);
     auto& obj = it->second.object;
     if (inserted) {
+        it->second.gen = gen;
         last_id_ = std::max(last_id_, id);
-        obj = (xref.initialized() && !xref.type(og)) ? QPDF_Null::create(&qpdf, og)
-                                                     : QPDF_Unresolved::create(&qpdf, og);
+        obj = xref.initialized() && !xref.type(id, gen)
+            ? QPDF_Null::create(&qpdf, QPDFObjGen(id, gen))
+            : QPDF_Unresolved::create(&qpdf, QPDFObjGen(id, gen));
+    } else {
+        if (it->second.gen != gen) {
+            return QPDF_Null::create();
+        }
     }
     return obj;
 }
 
+// Replace the object with oh. In the process oh will become almost, but not quite, the indirect
+// object (id, gen), the main difference being that if the object gets replaced again, oh will not
+// get updated.
+//
+// Replacing a non-existing object creates a new object, which is probably not what we want. In the
+// case where an object with the same id exists, the behaviour up to now depended on whether the
+// object table got cleaned (e.g. by creating object streams) or not, with either the objects
+// getting renumbered to have different ids, or the higher gen winning. From now, the higher gen
+// wins.
 void
 Objects::replace(int id, int gen, QPDFObjectHandle oh)
 {
@@ -1826,26 +1845,43 @@ Objects::replace(int id, int gen, QPDFObjectHandle oh)
         QTC::TC("qpdf", "QPDF replaceObject called with indirect object");
         throw std::logic_error("QPDF::replaceObject called with indirect object handle");
     }
+    auto& e = table[id];
+    if (e && e.gen > gen) {
+        // How do we want to handle this?
+        return;
+    }
+    if (e && e.gen < gen) {
+        erase(id, gen);
+    }
     update_table(id, gen, oh.getObj());
 }
 
 void
 Objects::erase(int id, int gen)
 {
-    if (auto cached = table.find(QPDFObjGen(id, gen)); cached != table.end()) {
+    if (auto it = table.find(id); it != table.end()) {
+        if (it->second.gen != gen) {
+            return;
+        }
         // Take care of any object handles that may be floating around.
-        cached->second.object->make_null();
-        table.erase(cached);
+        it->second.object->make_null();
+        table.erase(it);
     }
 }
 
 void
 Objects::swap(QPDFObjGen og1, QPDFObjGen og2)
 {
-    // Force objects to be read from the input source if needed, then swap them in the cache.
-    resolve(og1);
-    resolve(og2);
-    table[og1].object->swapWith(table[og2].object);
+    auto oh1 = get(og1);
+    auto oh2 = get(og2);
+    // Force objects to be read from the input source if needed, then swap them in the cache. We
+    // can't call resolve here as this could add an invalid entry to the object table.
+    (void)oh1.isNull();
+    (void)oh2.isNull();
+    if (!oh1.isIndirect() || !oh2.isIndirect()) {
+        throw std::logic_error("QPDF::swap called with invalid objgens");
+    }
+    oh1.getObj()->swapWith((oh2.getObj()));
 }
 
 size_t
@@ -1857,7 +1893,7 @@ Objects::table_size()
     if (max_xref > 0) {
         --max_xref;
     }
-    auto max_obj = table.size() ? table.crbegin()->first.getObj() : 0;
+    auto max_obj = table.size() ? table.crbegin()->first : 0;
     auto max_id = std::numeric_limits<int>::max() - 1;
     if (max_obj >= max_id || max_xref >= max_id) {
         // Temporary fix. Long-term solution is
@@ -1925,14 +1961,8 @@ Objects::compressible()
                 continue;
             }
 
-            // Check whether this is the current object. If not, remove it (which changes it into a
-            // direct null and therefore stops us from revisiting it) and move on to the next object
-            // in the queue.
-            auto upper = table.upper_bound(og);
-            if (upper != table.end() && upper->first.getObj() == og.getObj()) {
-                erase(og.getObj(), og.getGen());
-                continue;
-            }
+            // Check whether this is the current object. This is no longer needed as the object
+            // table holds at most one object per id.
 
             visited[id] = true;
 
