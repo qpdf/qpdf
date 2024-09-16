@@ -55,6 +55,7 @@ my @badfiles = ("not a PDF file",                       # 1
                 "bad dictionary key",                   # 36
                 "space before xref",                    # 37
                 "startxref to space then eof",          # 38
+                "stream lenth revocery overlapping",    # 39
                 );
 
 $n_tests += @badfiles + 8;
@@ -65,7 +66,7 @@ $n_tests += @badfiles + 8;
 # have error conditions that used to be fatal but are now considered
 # non-fatal.
 my %badtest_overrides = ();
-for(6, 12..15, 17, 18..32, 34..37)
+for(6, 12..15, 17, 18..32, 34..37, 39)
 {
     $badtest_overrides{$_} = 0;
 }

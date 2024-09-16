@@ -1,0 +1,7 @@
+WARNING: bad39.pdf (object 4 0, offset 385): expected endstream
+/QTest is implicit
+/QTest is indirect and has type null (2)
+/QTest is null
+unparse: 4 0 R
+unparseResolved: null
+test 0 done

@@ -3,7 +3,7 @@
     <RiderCodeStyleSettings>
       <option name="/Default/CodeStyle/CodeFormatting/CppClangFormat/EnableClangFormatSupport/@EntryValue" value="true" type="bool" />
     </RiderCodeStyleSettings>
-    <SqlCodeStyleSettings version="7">
+    <SqlCodeStyleSettings version="6">
       <option name="KEYWORD_CASE" value="2" />
     </SqlCodeStyleSettings>
     <clangFormatSettings>
