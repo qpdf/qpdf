@@ -71,7 +71,13 @@ QPDF::getAllPages()
             throw QPDFExc(
                 qpdf_e_pages, m->file->getName(), "", 0, "root of pages tree has no /Kids array");
         }
-        getAllPagesInternal(pages, visited, seen, false);
+        try {
+            getAllPagesInternal(pages, visited, seen, false);
+        } catch (...) {
+            m->all_pages.clear();
+            m->invalid_page_found = false;
+            throw;
+        }
         if (m->invalid_page_found) {
             flattenPagesTree();
             m->invalid_page_found = false;

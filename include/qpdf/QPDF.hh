@@ -676,7 +676,7 @@ class QPDF
     // Traverse page tree return all /Page objects. It also detects and resolves cases in which the
     // same /Page object is duplicated. For efficiency, this method returns a const reference to an
     // internal vector of pages. Calls to addPage, addPageAt, and removePage safely update this, but
-    // directly manipulation of the pages tree or pushing inheritable objects to the page level may
+    // direct manipulation of the pages tree or pushing inheritable objects to the page level may
     // invalidate it. See comments for updateAllPagesCache() for additional notes. Newer code should
     // use QPDFPageDocumentHelper::getAllPages instead. The decision to expose this internal cache
     // was arguably incorrect, but it is being left here for compatibility. It is, however,
