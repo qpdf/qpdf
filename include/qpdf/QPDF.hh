@@ -1061,7 +1061,7 @@ class QPDF
     QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>& input, int obj);
     size_t recoverStreamLength(
         std::shared_ptr<InputSource> input, QPDFObjGen const& og, qpdf_offset_t stream_offset);
-    QPDFTokenizer::Token readToken(std::shared_ptr<InputSource>, size_t max_len = 0);
+    QPDFTokenizer::Token readToken(InputSource&, size_t max_len = 0);
 
     QPDFObjectHandle readObjectAtOffset(
         bool attempt_recovery,
@@ -1088,14 +1088,11 @@ class QPDF
         qpdf_offset_t end_before_space,
         qpdf_offset_t end_after_space);
     static QPDFExc damagedPDF(
-        std::shared_ptr<InputSource> const& input,
+        InputSource& input,
         std::string const& object,
         qpdf_offset_t offset,
         std::string const& message);
-    QPDFExc damagedPDF(
-        std::shared_ptr<InputSource> const& input,
-        qpdf_offset_t offset,
-        std::string const& message);
+    QPDFExc damagedPDF(InputSource& input, qpdf_offset_t offset, std::string const& message);
     QPDFExc damagedPDF(std::string const& object, qpdf_offset_t offset, std::string const& message);
     QPDFExc damagedPDF(std::string const& object, std::string const& message);
     QPDFExc damagedPDF(qpdf_offset_t offset, std::string const& message);

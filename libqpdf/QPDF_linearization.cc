@@ -118,9 +118,10 @@ QPDF::isLinearized()
             ++p;
         }
 
-        QPDFTokenizer::Token t1 = readToken(m->file);
-        if (t1.isInteger() && readToken(m->file).isInteger() && readToken(m->file).isWord("obj") &&
-            (readToken(m->file).getType() == QPDFTokenizer::tt_dict_open)) {
+        QPDFTokenizer::Token t1 = readToken(*m->file);
+        if (t1.isInteger() && readToken(*m->file).isInteger() &&
+            readToken(*m->file).isWord("obj") &&
+            readToken(*m->file).getType() == QPDFTokenizer::tt_dict_open) {
             lindict_obj = toI(QUtil::string_to_ll(t1.getValue().c_str()));
         }
     }
