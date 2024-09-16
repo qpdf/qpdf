@@ -1547,7 +1547,7 @@ QPDF::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
             throw;
         }
     }
-    object = newIndirect(og, QPDF_Stream::create(this, og, object, stream_offset, length));
+    object = {QPDF_Stream::create(this, og, object, stream_offset, length)};
 }
 
 void
@@ -2101,12 +2101,6 @@ QPDF::newStream(std::string const& data)
     return result;
 }
 
-QPDFObjectHandle
-QPDF::reserveStream(QPDFObjGen const& og)
-{
-    return {QPDF_Stream::create(this, og, QPDFObjectHandle::newDictionary(), 0, 0)};
-}
-
 std::shared_ptr<QPDFObject>
 QPDF::getObjectForParser(int id, int gen, bool parse_pdf)
 {
@@ -2177,7 +2171,7 @@ QPDF::replaceObject(int objid, int generation, QPDFObjectHandle oh)
 void
 QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
 {
-    if (oh.isIndirect() || !oh.isInitialized()) {
+    if (!oh.isInitialized() || (oh.isIndirect() && !(oh.isStream() && oh.getObjGen() == og))) {
         QTC::TC("qpdf", "QPDF replaceObject called with indirect object");
         throw std::logic_error("QPDF::replaceObject called with indirect object handle");
     }

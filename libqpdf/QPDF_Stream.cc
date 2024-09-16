@@ -107,12 +107,8 @@ StreamBlobProvider::operator()(Pipeline* p)
 }
 
 QPDF_Stream::QPDF_Stream(
-    QPDF* qpdf,
-    QPDFObjGen const& og,
-    QPDFObjectHandle stream_dict,
-    qpdf_offset_t offset,
-    size_t length) :
-    QPDFValue(::ot_stream),
+    QPDF* qpdf, QPDFObjGen og, QPDFObjectHandle stream_dict, qpdf_offset_t offset, size_t length) :
+    QPDFValue(::ot_stream, qpdf, og),
     filter_on_write(true),
     stream_dict(stream_dict),
     length(length)
@@ -128,11 +124,7 @@ QPDF_Stream::QPDF_Stream(
 
 std::shared_ptr<QPDFObject>
 QPDF_Stream::create(
-    QPDF* qpdf,
-    QPDFObjGen const& og,
-    QPDFObjectHandle stream_dict,
-    qpdf_offset_t offset,
-    size_t length)
+    QPDF* qpdf, QPDFObjGen og, QPDFObjectHandle stream_dict, qpdf_offset_t offset, size_t length)
 {
     return do_create(new QPDF_Stream(qpdf, og, stream_dict, offset, length));
 }
