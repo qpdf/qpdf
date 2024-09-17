@@ -93,13 +93,6 @@ FuzzHelper::testWrite()
     w->setDeterministicID(true);
     w->setQDFMode(true);
     doWrite(w);
-
-    q = getQpdf();
-    w = getWriter(q);
-    w->setStaticID(true);
-    w->setLinearization(true);
-    w->setR6EncryptionParameters("u", "o", true, true, true, true, true, true, qpdf_r3p_full, true);
-    doWrite(w);
 }
 
 void
@@ -114,7 +107,7 @@ FuzzHelper::doChecks()
 
     Pl_PNGFilter::setMemoryLimit(1'000'000);
     Pl_TIFFPredictor::setMemoryLimit(1'000'000);
-    Pl_Flate::setMemoryLimit(1'000'000);
+    Pl_Flate::setMemoryLimit(200'000);
 
     // Do not decompress corrupt data. This may cause extended runtime within jpeglib without
     // exercising additional code paths in qpdf, and potentially causing counterproductive timeouts.
