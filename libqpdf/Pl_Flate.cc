@@ -181,7 +181,7 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
                 }
                 uLong ready = QIntC::to_ulong(m->out_bufsize - zstream.avail_out);
                 if (ready > 0) {
-                    if (memory_limit) {
+                    if (memory_limit && m->action != a_deflate) {
                         m->written += ready;
                         if (m->written > memory_limit) {
                             throw std::runtime_error("PL_Flate memory limit exceeded");
@@ -205,7 +205,7 @@ void
 Pl_Flate::finish()
 {
     if (m->written > memory_limit) {
-        return;
+        throw std::runtime_error("PL_Flate memory limit exceeded");
     }
     try {
         if (m->outbuf.get()) {
