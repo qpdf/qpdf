@@ -469,13 +469,14 @@ QPDFParser::fixMissingKeys()
 bool
 QPDFParser::tooManyBadTokens()
 {
-    if (good_count <= 4) {
-        if (++bad_count > 5) {
-            warn("too many errors; giving up on reading object");
-            return true;
-        }
-    } else {
+    if (--max_bad_count > 0 && good_count > 4) {
+        good_count = 0;
         bad_count = 1;
+        return false;
+    }
+    if (++bad_count > 5) {
+        warn("too many errors; giving up on reading object");
+        return true;
     }
     good_count = 0;
     return false;
