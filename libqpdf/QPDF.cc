@@ -952,8 +952,6 @@ QPDF::read_xrefEntry(qpdf_offset_t& f1, int& f2, char& type)
 qpdf_offset_t
 QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 {
-    std::vector<QPDFObjGen> deleted_items;
-
     m->file->seek(xref_offset, SEEK_SET);
     std::string line;
     while (true) {
@@ -982,8 +980,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
                     "xref table", "invalid xref entry (obj=" + std::to_string(i) + ")");
             }
             if (type == 'f') {
-                // Save deleted items until after we've checked the XRefStm, if any.
-                deleted_items.emplace_back(toI(i), f2);
+                insertFreeXrefEntry(QPDFObjGen(toI(i), f2));
             } else {
                 insertXrefEntry(toI(i), 1, f1, f2);
             }
@@ -1030,23 +1027,16 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
         }
     }
 
-    // Handle any deleted items now that we've read the /XRefStm.
-    for (auto const& og: deleted_items) {
-        insertFreeXrefEntry(og);
-    }
-
     if (cur_trailer.hasKey("/Prev")) {
         if (!cur_trailer.getKey("/Prev").isInteger()) {
             QTC::TC("qpdf", "QPDF trailer prev not integer");
             throw damagedPDF("trailer", "/Prev key in trailer dictionary is not an integer");
         }
         QTC::TC("qpdf", "QPDF prev key in trailer dictionary");
-        xref_offset = cur_trailer.getKey("/Prev").getIntValue();
-    } else {
-        xref_offset = 0;
+        return cur_trailer.getKey("/Prev").getIntValue();
     }
 
-    return xref_offset;
+    return 0;
 }
 
 // Read a single cross-reference stream.
