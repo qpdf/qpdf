@@ -723,7 +723,7 @@ $td->runtest("check file's validity",
 $td->runtest("handle missing/invalid Length",
              {$td->COMMAND => "qpdf --check bad-encryption-length.pdf"},
              {$td->FILE => "bad-encryption-length.out",
-                  $td->EXIT_STATUS => 0},
+                  $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();

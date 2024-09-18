@@ -56,7 +56,7 @@ $td->runtest("externalize damaged image",
                   "qpdf --externalize-inline-images" .
                   " --compress-streams=n --static-id" .
                   " damaged-inline-image.pdf a.pdf"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->FILE => "damaged-inline-image.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},

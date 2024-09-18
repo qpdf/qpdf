@@ -1,0 +1,3 @@
+WARNING: damaged-inline-image.pdf, stream object 8 0: error while getting stream data: stream inflate: inflate: data: invalid distance too far back
+WARNING: damaged-inline-image.pdf, stream object 8 0: qpdf will attempt to write the damaged stream unchanged
+qpdf: operation succeeded with warnings; resulting file may have some problems

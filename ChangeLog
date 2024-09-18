@@ -3,6 +3,11 @@
 	* Add C API function qpdf_oh_free_buffer to release memory allocated
 	by stream data functions.
 
+2024-09-19  M Holger  <m.holger@qpdf.org>
+
+	* Bug fix: QPDFWriter stream DecodeLevel incorrectly defaulted to
+	none instead of generalied. Fixes #1286.
+
 2024-08-25  M Holger  <m.holger@qpdf.org>
 
 	* Add new command-line arguments --remove-metadata and --remove-info
