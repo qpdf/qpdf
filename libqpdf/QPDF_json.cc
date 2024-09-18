@@ -325,7 +325,7 @@ QPDF::JSONReactor::anyErrors() const
 void
 QPDF::JSONReactor::containerStart()
 {
-    if (next_obj.isInitialized()) {
+    if (next_obj) {
         stack.emplace_back(next_state, std::move(next_obj));
         next_obj = QPDFObjectHandle();
     } else {
@@ -558,7 +558,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             throw std::logic_error("stack empty in st_object_top");
         }
         auto& tos = stack.back();
-        if (!tos.object.isInitialized()) {
+        if (!tos.object) {
             throw std::logic_error("current object uninitialized in st_object_top");
         }
         if (key == "value") {
@@ -767,7 +767,7 @@ QPDF::JSONReactor::makeObject(JSON const& value)
             result = QPDFObjectHandle::newNull();
         }
     }
-    if (!result.isInitialized()) {
+    if (!result) {
         throw std::logic_error("JSONReactor::makeObject didn't initialize the object");
     }
 

@@ -955,7 +955,7 @@ qpdf_oh_is_initialized(qpdf_data qpdf, qpdf_oh oh)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_initialized");
     return do_with_oh<QPDF_BOOL>(
-        qpdf, oh, return_false, [](QPDFObjectHandle& o) { return o.isInitialized(); });
+        qpdf, oh, return_false, [](QPDFObjectHandle& o) { return static_cast<bool>(o); });
 }
 
 QPDF_BOOL

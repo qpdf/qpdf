@@ -184,16 +184,16 @@ QPDF_Array::writeJSON(int json_version, JSON::Writer& p)
     p.writeEnd(']');
 }
 
-QPDFObjectHandle
+std::pair<bool, QPDFObjectHandle>
 QPDF_Array::at(int n) const noexcept
 {
     if (n < 0 || n >= size()) {
-        return {};
+        return {false, {}};
     } else if (sp) {
         auto const& iter = sp->elements.find(n);
-        return iter == sp->elements.end() ? null_oh : (*iter).second;
+        return {true, iter == sp->elements.end() ? null_oh : (*iter).second};
     } else {
-        return elements[size_t(n)];
+        return {true, elements[size_t(n)]};
     }
 }
 

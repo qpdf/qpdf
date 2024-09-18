@@ -295,8 +295,12 @@ class QPDFObjectHandle
     QPDF_DLL
     QPDFObjectHandle& operator=(QPDFObjectHandle&&) = default;
 
+    // Return true if the QPDFObjectHandle is initialized. This allows object handles to be used in
+    // if statements with initializer.
     QPDF_DLL
-    inline bool isInitialized() const noexcept;
+    explicit inline operator bool() const noexcept;
+
+    [[deprecated("use operator bool()")]] QPDF_DLL inline bool isInitialized() const noexcept;
 
     // This method returns true if the QPDFObjectHandle objects point to exactly the same underlying
     // object, meaning that changes to one are reflected in the other, or "if you paint one, the
@@ -1632,6 +1636,11 @@ inline bool
 QPDFObjectHandle::isInitialized() const noexcept
 {
     return obj != nullptr;
+}
+
+inline QPDFObjectHandle::operator bool() const noexcept
+{
+    return static_cast<bool>(obj);
 }
 
 #endif // QPDFOBJECTHANDLE_FUTURE_HH

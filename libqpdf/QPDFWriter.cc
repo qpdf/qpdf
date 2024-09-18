@@ -1381,7 +1381,7 @@ QPDFWriter::unparseObject(
             }
         }
 
-        if (extensions.isInitialized()) {
+        if (extensions) {
             std::set<std::string> keys = extensions.getKeys();
             if (keys.count("/ADBE") > 0) {
                 have_extensions_adbe = true;
@@ -1412,7 +1412,7 @@ QPDFWriter::unparseObject(
             }
         }
 
-        if (extensions.isInitialized()) {
+        if (extensions) {
             QTC::TC("qpdf", "QPDFWriter preserve Extensions");
             QPDFObjectHandle adbe = extensions.getKey("/ADBE");
             if (adbe.isDictionary() &&

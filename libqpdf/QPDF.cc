@@ -526,7 +526,7 @@ QPDF::warn(
 void
 QPDF::setTrailer(QPDFObjectHandle obj)
 {
-    if (m->trailer.isInitialized()) {
+    if (m->trailer) {
         return;
     }
     m->trailer = obj;
@@ -591,7 +591,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
                 }
             }
             m->file->seek(pos, SEEK_SET);
-        } else if (!m->trailer.isInitialized() && t1.isWord("trailer")) {
+        } else if (!m->trailer && t1.isWord("trailer")) {
             auto pos = m->file->tell();
             QPDFObjectHandle t = readTrailer();
             if (!t.isDictionary()) {
@@ -606,7 +606,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
     }
     m->deleted_objects.clear();
 
-    if (!m->trailer.isInitialized()) {
+    if (!m->trailer) {
         qpdf_offset_t max_offset{0};
         // If there are any xref streams, take the last one to appear.
         for (auto const& iter: m->xref_table) {
@@ -640,7 +640,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
         }
     }
 
-    if (!m->trailer.isInitialized()) {
+    if (!m->trailer) {
         // We could check the last encountered object to see if it was an xref stream.  If so, we
         // could try to get the trailer from there.  This may make it possible to recover files with
         // bad startxref pointers even when they have object streams.
@@ -730,7 +730,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
         }
     }
 
-    if (!m->trailer.isInitialized()) {
+    if (!m->trailer) {
         throw damagedPDF("", 0, "unable to find trailer while reading xref");
     }
     int size = m->trailer.getKey("/Size").getIntValueAsInt();
@@ -1000,7 +1000,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
         throw damagedPDF("", "expected trailer dictionary");
     }
 
-    if (!m->trailer.isInitialized()) {
+    if (!m->trailer) {
         setTrailer(cur_trailer);
 
         if (!m->trailer.hasKey("/Size")) {
@@ -1258,7 +1258,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         }
     }
 
-    if (!m->trailer.isInitialized()) {
+    if (!m->trailer) {
         setTrailer(dict);
     }
 
@@ -2052,7 +2052,7 @@ QPDF::makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj)
 QPDFObjectHandle
 QPDF::makeIndirectObject(QPDFObjectHandle oh)
 {
-    if (!oh.isInitialized()) {
+    if (!oh) {
         throw std::logic_error("attempted to make an uninitialized QPDFObjectHandle indirect");
     }
     return makeIndirectFromQPDFObject(oh.getObj());
@@ -2163,7 +2163,7 @@ QPDF::replaceObject(int objid, int generation, QPDFObjectHandle oh)
 void
 QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
 {
-    if (!oh.isInitialized() || (oh.isIndirect() && !(oh.isStream() && oh.getObjGen() == og))) {
+    if (!oh || (oh.isIndirect() && !(oh.isStream() && oh.getObjGen() == og))) {
         QTC::TC("qpdf", "QPDF replaceObject called with indirect object");
         throw std::logic_error("QPDF::replaceObject called with indirect object handle");
     }
