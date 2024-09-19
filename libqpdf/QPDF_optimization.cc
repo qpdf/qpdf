@@ -2,7 +2,7 @@
 
 #include <qpdf/assert_debug.h>
 
-#include <qpdf/QPDF.hh>
+#include <qpdf/QPDF_private.hh>
 
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFWriter_private.hh>
@@ -78,6 +78,12 @@ QPDF::optimize(
     optimize_internal(obj, true, skip_stream_parameters);
 }
 
+void
+QPDF::optimize(QPDF::Xref_table const& xref)
+{
+    optimize_internal(xref, false, nullptr);
+}
+
 template <typename T>
 void
 QPDF::optimize_internal(
@@ -115,13 +121,13 @@ QPDF::optimize_internal(
     }
 
     // Traverse document-level items
-    for (auto const& key: m->trailer.getKeys()) {
+    for (auto const& key: m->xref_table.trailer().getKeys()) {
         if (key == "/Root") {
             // handled separately
         } else {
             updateObjectMaps(
                 ObjUser(ObjUser::ou_trailer_key, key),
-                m->trailer.getKey(key),
+                m->xref_table.trailer().getKey(key),
                 skip_stream_parameters);
         }
     }
@@ -169,13 +175,13 @@ QPDF::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
     // values for them.
     std::map<std::string, std::vector<QPDFObjectHandle>> key_ancestors;
     pushInheritedAttributesToPageInternal(
-        m->trailer.getKey("/Root").getKey("/Pages"),
+        m->xref_table.trailer().getKey("/Root").getKey("/Pages"),
         key_ancestors,
         allow_changes,
         warn_skipped_keys);
     if (!key_ancestors.empty()) {
-        throw std::logic_error("key_ancestors not empty after"
-                               " pushing inherited attributes to pages");
+        throw std::logic_error(
+            "key_ancestors not empty after pushing inherited attributes to pages");
     }
     m->pushed_inherited_attributes_to_pages = true;
     m->ever_pushed_inherited_attributes_to_pages = true;
@@ -435,6 +441,48 @@ QPDF::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
                 } else {
                     t_object_to_obj_users[QPDFObjGen(i2, 0)].insert(ou);
                 }
+            }
+        }
+    }
+
+    m->obj_user_to_objects = t_obj_user_to_objects;
+    m->object_to_obj_users = t_object_to_obj_users;
+}
+
+void
+QPDF::filterCompressedObjects(QPDF::Xref_table const& xref)
+{
+    if (!xref.object_streams()) {
+        return;
+    }
+
+    // Transform object_to_obj_users and obj_user_to_objects so that they refer only to uncompressed
+    // objects.  If something is a user of a compressed object, then it is really a user of the
+    // object stream that contains it.
+
+    std::map<ObjUser, std::set<QPDFObjGen>> t_obj_user_to_objects;
+    std::map<QPDFObjGen, std::set<ObjUser>> t_object_to_obj_users;
+
+    for (auto const& i1: m->obj_user_to_objects) {
+        ObjUser const& ou = i1.first;
+        // Loop over objects.
+        for (auto const& og: i1.second) {
+            if (auto stream = xref.stream_number(og.getObj())) {
+                t_obj_user_to_objects[ou].insert(QPDFObjGen(stream, 0));
+            } else {
+                t_obj_user_to_objects[ou].insert(og);
+            }
+        }
+    }
+
+    for (auto const& i1: m->object_to_obj_users) {
+        QPDFObjGen const& og = i1.first;
+        // Loop over obj_users.
+        for (auto const& ou: i1.second) {
+            if (auto stream = xref.stream_number(og.getObj())) {
+                t_object_to_obj_users[QPDFObjGen(stream, 0)].insert(ou);
+            } else {
+                t_object_to_obj_users[og].insert(ou);
             }
         }
     }

@@ -51,17 +51,6 @@
 //   ]                            |   <- st_top
 // }                              |
 
-static char const* JSON_PDF = (
-    // force line break
-    "%PDF-1.3\n"
-    "xref\n"
-    "0 1\n"
-    "0000000000 65535 f \n"
-    "trailer << /Size 1 >>\n"
-    "startxref\n"
-    "9\n"
-    "%%EOF\n");
-
 // Validator methods -- these are much more performant than std::regex.
 static bool
 is_indirect_object(std::string const& v, int& obj, int& gen)
@@ -267,10 +256,10 @@ class QPDF::JSONReactor: public JSON::Reactor
     struct StackFrame
     {
         StackFrame(state_e state) :
-            state(state) {};
+            state(state){};
         StackFrame(state_e state, QPDFObjectHandle&& object) :
             state(state),
-            object(object) {};
+            object(object){};
         state_e state;
         QPDFObjectHandle object;
     };
@@ -593,8 +582,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             this->saw_value = true;
             // The trailer must be a dictionary, so we can use setNextStateIfDictionary.
             if (setNextStateIfDictionary("trailer.value", value, st_object)) {
-                this->pdf.m->trailer = makeObject(value);
-                setObjectDescription(this->pdf.m->trailer, value);
+                pdf.m->xref_table.trailer(makeObject(value));
             }
         } else if (key == "stream") {
             // Don't need to set saw_stream here since there's already an error.
@@ -786,7 +774,9 @@ QPDF::createFromJSON(std::string const& json_file)
 void
 QPDF::createFromJSON(std::shared_ptr<InputSource> is)
 {
-    processMemoryFile(is->getName().c_str(), JSON_PDF, strlen(JSON_PDF));
+    m->pdf_version = "1.3";
+    m->no_input_name = is->getName();
+    m->xref_table.initialize_json();
     importJSON(is, true);
 }
 
