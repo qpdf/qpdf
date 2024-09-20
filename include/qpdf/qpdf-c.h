@@ -929,11 +929,11 @@ extern "C" {
 
     /* Call free to release the buffer allocated with malloc. This function can be used to free 
      * buffers that were dynamically allocated by qpdf functions such as qpdf_oh_get_stream_data
-     * or qpdf_oh_get_page_content_data. The caller is responsible for calling qpdf_free_buffer
+     * or qpdf_oh_get_page_content_data. The caller is responsible for calling qpdf_oh_free_buffer
      * to manage memory properly and avoid memory leaks.
      */
     QPDF_DLL
-    void qpdf_free_buffer(unsigned char** bufp);
+    void qpdf_oh_free_buffer(unsigned char** bufp);
 
     /* The data pointed to by bufp will be copied by the library. It does not need to remain valid
      * after the call returns.
