@@ -1057,7 +1057,10 @@ QPDF::Xref_table::process_section(qpdf_offset_t xref_offset)
             QTC::TC("qpdf", "QPDF trailer size not integer");
             throw qpdf.damagedPDF("trailer", "/Size key in trailer dictionary is not an integer");
         }
-
+        if (sz >= static_cast<unsigned int>(max_id_)) {
+            QTC::TC("qpdf", "QPDF trailer size impossibly large");
+            throw qpdf.damagedPDF("trailer", "/Size key in trailer dictionary is impossibly large");
+        }
         table.resize(sz);
     }
 

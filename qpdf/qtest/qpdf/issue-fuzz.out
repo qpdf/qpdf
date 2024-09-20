@@ -1,0 +1,19 @@
+WARNING: issue-fuzz.pdf: can't find PDF header
+WARNING: issue-fuzz.pdf (xref table, offset 19): accepting invalid xref table entry
+WARNING: issue-fuzz.pdf (trailer, offset 36): unknown token while reading object; treating as string
+WARNING: issue-fuzz.pdf (trailer, offset 53): unexpected >
+WARNING: issue-fuzz.pdf (trailer, offset 54): unknown token while reading object; treating as string
+WARNING: issue-fuzz.pdf (trailer, offset 58): unknown token while reading object; treating as string
+WARNING: issue-fuzz.pdf (trailer, offset 72): unknown token while reading object; treating as string
+WARNING: issue-fuzz.pdf (trailer, offset 36): dictionary ended prematurely; using null as value for last key
+WARNING: issue-fuzz.pdf (trailer, offset 36): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-fuzz.pdf (trailer, offset 36): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-fuzz.pdf (trailer, offset 36): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-fuzz.pdf (trailer, offset 36): expected dictionary key but found non-name object; inserting key /QPDFFake4
+WARNING: issue-fuzz.pdf (trailer, offset 36): expected dictionary key but found non-name object; inserting key /QPDFFake5
+WARNING: issue-fuzz.pdf (trailer, offset 36): expected dictionary key but found non-name object; inserting key /QPDFFake6
+WARNING: issue-fuzz.pdf (trailer, offset 36): expected dictionary key but found non-name object; inserting key /QPDFFake7
+WARNING: issue-fuzz.pdf: file is damaged
+WARNING: issue-fuzz.pdf (trailer, offset 32): /Size key in trailer dictionary is impossibly large
+WARNING: issue-fuzz.pdf: Attempting to reconstruct cross-reference table
+qpdf: issue-fuzz.pdf: unable to find /Root dictionary
