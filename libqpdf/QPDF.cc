@@ -816,6 +816,10 @@ QPDF::parse_xrefFirst(std::string const& line, int& obj, int& num, int& bytes)
 bool
 QPDF::read_bad_xrefEntry(qpdf_offset_t& f1, int& f2, char& type)
 {
+    // Reinitialize output parameters.
+    f1 = 0;
+    f2 = 0;
+    type = '\0';
     // Reposition after initial read attempt and reread.
     m->file->seek(m->file->getLastOffset(), SEEK_SET);
     auto line = m->file->readLine(30);
