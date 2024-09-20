@@ -832,10 +832,6 @@ std::vector<QPDF::Xref_table::Subsection>
 QPDF::Xref_table::bad_subsections(std::string& line, qpdf_offset_t start)
 {
     std::vector<QPDF::Xref_table::Subsection> result;
-    qpdf_offset_t f1 = 0;
-    int f2 = 0;
-    char type = '\0';
-
     file->seek(start, SEEK_SET);
 
     while (true) {
@@ -844,7 +840,7 @@ QPDF::Xref_table::bad_subsections(std::string& line, qpdf_offset_t start)
         auto [obj, num, offset] = result.emplace_back(subsection(line));
         file->seek(offset, SEEK_SET);
         for (qpdf_offset_t i = obj; i - num < obj; ++i) {
-            if (!read_entry(f1, f2, type)) {
+            if (!std::get<0>(read_entry())) {
                 QTC::TC("qpdf", "QPDF invalid xref entry");
                 throw damaged_table("invalid xref entry (obj=" + std::to_string(i) + ")");
             }
@@ -890,9 +886,13 @@ QPDF::Xref_table::subsections(std::string& line)
     }
 }
 
-bool
-QPDF::Xref_table::read_bad_entry(qpdf_offset_t& f1, int& f2, char& type)
+// Returns (success, f1, f2, type).
+std::tuple<bool, qpdf_offset_t, int, char>
+QPDF::Xref_table::read_bad_entry()
 {
+    qpdf_offset_t f1{0};
+    int f2{0};
+    char type{'\0'};
     // Reposition after initial read attempt and reread.
     file->seek(file->getLastOffset(), SEEK_SET);
     auto line = file->readLine(30);
@@ -910,7 +910,7 @@ QPDF::Xref_table::read_bad_entry(qpdf_offset_t& f1, int& f2, char& type)
     }
     // Require digit
     if (!QUtil::is_digit(*p)) {
-        return false;
+        return {false, 0, 0, '\0'};
     }
     // Gather digits
     std::string f1_str;
@@ -919,7 +919,7 @@ QPDF::Xref_table::read_bad_entry(qpdf_offset_t& f1, int& f2, char& type)
     }
     // Require space
     if (!QUtil::is_space(*p)) {
-        return false;
+        return {false, 0, 0, '\0'};
     }
     if (QUtil::is_space(*(p + 1))) {
         QTC::TC("qpdf", "QPDF ignore first extra space in xref entry");
@@ -931,7 +931,7 @@ QPDF::Xref_table::read_bad_entry(qpdf_offset_t& f1, int& f2, char& type)
     }
     // Require digit
     if (!QUtil::is_digit(*p)) {
-        return false;
+        return {false, 0, 0, '\0'};
     }
     // Gather digits
     std::string f2_str;
@@ -940,7 +940,7 @@ QPDF::Xref_table::read_bad_entry(qpdf_offset_t& f1, int& f2, char& type)
     }
     // Require space
     if (!QUtil::is_space(*p)) {
-        return false;
+        return {false, 0, 0, '\0'};
     }
     if (QUtil::is_space(*(p + 1))) {
         QTC::TC("qpdf", "QPDF ignore second extra space in xref entry");
@@ -953,7 +953,7 @@ QPDF::Xref_table::read_bad_entry(qpdf_offset_t& f1, int& f2, char& type)
     if ((*p == 'f') || (*p == 'n')) {
         type = *p;
     } else {
-        return false;
+        return {false, 0, 0, '\0'};
     }
     if ((f1_str.length() != 10) || (f2_str.length() != 5)) {
         QTC::TC("qpdf", "QPDF ignore length error xref entry");
@@ -967,18 +967,23 @@ QPDF::Xref_table::read_bad_entry(qpdf_offset_t& f1, int& f2, char& type)
     f1 = QUtil::string_to_ll(f1_str.c_str());
     f2 = QUtil::string_to_int(f2_str.c_str());
 
-    return true;
+    return {true, f1, f2, type};
 }
 
 // Optimistically read and parse xref entry. If entry is bad, call read_bad_xrefEntry and return
-// result.
-bool
-QPDF::Xref_table::read_entry(qpdf_offset_t& f1, int& f2, char& type)
+// result. Returns (success, f1, f2, type).
+std::tuple<bool, qpdf_offset_t, int, char>
+QPDF::Xref_table::read_entry()
 {
+    qpdf_offset_t f1{0};
+    int f2{0};
+    char type{'\0'};
     std::array<char, 21> line;
+    f1 = 0;
+    f2 = 0;
     if (file->read(line.data(), 20) != 20) {
         // C++20: [[unlikely]]
-        return false;
+        return {false, 0, 0, '\0'};
     }
     line[20] = '\0';
     char const* p = line.data();
@@ -1002,7 +1007,7 @@ QPDF::Xref_table::read_entry(qpdf_offset_t& f1, int& f2, char& type)
     if (!QUtil::is_space(*p++)) {
         // Entry doesn't start with space or digit.
         // C++20: [[unlikely]]
-        return false;
+        return {false, 0, 0, '\0'};
     }
     // Gather digits. NB No risk of overflow as 99'999 < max int.
     while (*p == '0') {
@@ -1019,10 +1024,10 @@ QPDF::Xref_table::read_entry(qpdf_offset_t& f1, int& f2, char& type)
         // No test for valid line[19].
         if (*(++p) && *(++p) && (*p == '\n' || *p == '\r') && f1_len == 10 && f2_len == 5) {
             // C++20: [[likely]]
-            return true;
+            return {true, f1, f2, type};
         }
     }
-    return read_bad_entry(f1, f2, type);
+    return read_bad_entry();
 }
 
 // Read a single cross-reference table section and associated trailer.
@@ -1052,7 +1057,10 @@ QPDF::Xref_table::process_section(qpdf_offset_t xref_offset)
             QTC::TC("qpdf", "QPDF trailer size not integer");
             throw qpdf.damagedPDF("trailer", "/Size key in trailer dictionary is not an integer");
         }
-
+        if (sz >= static_cast<unsigned int>(max_id_)) {
+            QTC::TC("qpdf", "QPDF trailer size impossibly large");
+            throw qpdf.damagedPDF("trailer", "/Size key in trailer dictionary is impossibly large");
+        }
         table.resize(sz);
     }
 
@@ -1064,10 +1072,8 @@ QPDF::Xref_table::process_section(qpdf_offset_t xref_offset)
                 first_item_offset_ = file->tell();
             }
             // For xref_table, these will always be small enough to be ints
-            qpdf_offset_t f1 = 0;
-            int f2 = 0;
-            char type = '\0';
-            if (!read_entry(f1, f2, type)) {
+            auto [success, f1, f2, type] = read_entry();
+            if (!success) {
                 throw damaged_table("invalid xref entry (obj=" + std::to_string(i) + ")");
             }
             if (type == 'f') {
@@ -1585,8 +1591,7 @@ QPDF::Xref_table::read_trailer()
 {
     qpdf_offset_t offset = file->tell();
     bool empty = false;
-    auto object =
-        QPDFParser(*file, "trailer", tokenizer, nullptr, &qpdf, true).parse(empty, false);
+    auto object = QPDFParser(*file, "trailer", tokenizer, nullptr, &qpdf, true).parse(empty, false);
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.
