@@ -22,9 +22,10 @@
 
 #include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
+#include <qpdf/QPDFObjGen.hh>
 #include <qpdf/Types.h>
 
-#include <qpdf/QPDFObjGen.hh>
+#include <cstdint>
 
 class QPDF_Dictionary;
 class QPDFObject;
@@ -32,6 +33,11 @@ class QPDFObjectHandle;
 
 namespace qpdf
 {
+    class Dictionary;
+    class BaseDictionary;
+
+    enum typed : std::uint8_t { strict = 0, any_flag = 1, optional = 2, any = 3, error = 4};
+
     // Basehandle is only used as a base-class for QPDFObjectHandle like classes. Currently the only
     // methods exposed in public API are operators to convert derived objects to QPDFObjectHandle,
     // QPDFObjGen and bool.
@@ -43,6 +49,8 @@ namespace qpdf
         operator QPDFObjGen() const;
 
         // The rest of the header file is for qpdf internal use only.
+
+        inline qpdf_object_type_e type_code() const;
 
       protected:
         BaseHandle() = default;
