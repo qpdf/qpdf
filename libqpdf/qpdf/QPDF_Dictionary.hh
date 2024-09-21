@@ -6,7 +6,10 @@
 #include <map>
 #include <set>
 
+#include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDFObject_private.hh>
+#include <qpdf/QPDF_Null.hh>
 
 class QPDF_Dictionary: public QPDFValue
 {
@@ -19,22 +22,12 @@ class QPDF_Dictionary: public QPDFValue
     void writeJSON(int json_version, JSON::Writer& p) override;
     void disconnect() override;
 
-    // hasKey() and getKeys() treat keys with null values as if they aren't there.  getKey() returns
-    // null for the value of a non-existent key.  This is as per the PDF spec.
-    bool hasKey(std::string const&);
-    QPDFObjectHandle getKey(std::string const&);
-    std::set<std::string> getKeys();
-    std::map<std::string, QPDFObjectHandle> const& getAsMap() const;
-
-    // If value is null, remove key; otherwise, replace the value of key, adding it if it does not
-    // exist.
-    void replaceKey(std::string const& key, QPDFObjectHandle value);
-    // Remove key, doing nothing if key does not exist
-    void removeKey(std::string const& key);
-
   private:
+    friend class qpdf::BaseDictionary;
+
     QPDF_Dictionary(std::map<std::string, QPDFObjectHandle> const& items);
     QPDF_Dictionary(std::map<std::string, QPDFObjectHandle>&& items);
+
     std::map<std::string, QPDFObjectHandle> items;
 };
 

@@ -304,7 +304,7 @@ class QPDFObjectHandle final: public qpdf::BaseHandle
     // other one changes color." This does not perform a structural comparison of the contents of
     // the objects.
     QPDF_DLL
-    bool isSameObjectAs(QPDFObjectHandle const&) const noexcept;
+    bool isSameObjectAs(QPDFObjectHandle const&) const;
 
     // Return type code and type name of underlying object.  These are useful for doing rapid type
     // tests (like switch statements) or for testing and debugging.
@@ -1354,6 +1354,8 @@ class QPDFObjectHandle final: public qpdf::BaseHandle
     }
 
     void writeJSON(int json_version, JSON::Writer& p, bool dereference_indirect = false) const;
+
+    inline qpdf::Dictionary as_dictionary(qpdf::typed options = qpdf::typed::any) const;
 
   private:
     QPDF_Array* asArray() const;

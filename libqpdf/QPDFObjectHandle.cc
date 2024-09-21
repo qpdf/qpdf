@@ -1,4 +1,4 @@
-#include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/JSON_writer.hh>
@@ -38,7 +38,6 @@
 #include <stdexcept>
 
 using namespace std::literals;
-
 using namespace qpdf;
 
 BaseHandle::
@@ -230,7 +229,7 @@ LastChar::getLastChar()
 }
 
 bool
-QPDFObjectHandle::isSameObjectAs(QPDFObjectHandle const& rhs) const noexcept
+QPDFObjectHandle::isSameObjectAs(QPDFObjectHandle const& rhs) const
 {
     return this->obj == rhs.obj;
 }
@@ -986,9 +985,9 @@ QPDFObjectHandle::ditems()
 bool
 QPDFObjectHandle::hasKey(std::string const& key) const
 {
-    auto dict = asDictionary();
+    auto dict = as_dictionary(strict);
     if (dict) {
-        return dict->hasKey(key);
+        return dict.hasKey(key);
     } else {
         typeWarning("dictionary", "returning false for a key containment request");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary false for hasKey");
@@ -999,14 +998,13 @@ QPDFObjectHandle::hasKey(std::string const& key) const
 QPDFObjectHandle
 QPDFObjectHandle::getKey(std::string const& key) const
 {
-    if (auto dict = asDictionary()) {
-        return dict->getKey(key);
-    } else {
-        typeWarning("dictionary", "returning null for attempted key retrieval");
-        QTC::TC("qpdf", "QPDFObjectHandle dictionary null for getKey");
-        static auto constexpr msg = " -> null returned from getting key $VD from non-Dictionary"sv;
-        return QPDF_Null::create(obj, msg, "");
+    if (auto dict = as_dictionary(strict)) {
+        return dict.getKey(key);
     }
+    typeWarning("dictionary", "returning null for attempted key retrieval");
+    QTC::TC("qpdf", "QPDFObjectHandle dictionary null for getKey");
+    static auto constexpr msg = " -> null returned from getting key $VD from non-Dictionary"sv;
+    return QPDF_Null::create(obj, msg, "");
 }
 
 QPDFObjectHandle
@@ -1018,29 +1016,23 @@ QPDFObjectHandle::getKeyIfDict(std::string const& key) const
 std::set<std::string>
 QPDFObjectHandle::getKeys() const
 {
-    std::set<std::string> result;
-    auto dict = asDictionary();
-    if (dict) {
-        result = dict->getKeys();
-    } else {
-        typeWarning("dictionary", "treating as empty");
-        QTC::TC("qpdf", "QPDFObjectHandle dictionary empty set for getKeys");
+    if (auto dict = as_dictionary(strict)) {
+        return dict.getKeys();
     }
-    return result;
+    typeWarning("dictionary", "treating as empty");
+    QTC::TC("qpdf", "QPDFObjectHandle dictionary empty set for getKeys");
+    return {};
 }
 
 std::map<std::string, QPDFObjectHandle>
 QPDFObjectHandle::getDictAsMap() const
 {
-    std::map<std::string, QPDFObjectHandle> result;
-    auto dict = asDictionary();
-    if (dict) {
-        result = dict->getAsMap();
-    } else {
-        typeWarning("dictionary", "treating as empty");
-        QTC::TC("qpdf", "QPDFObjectHandle dictionary empty map for asMap");
+    if (auto dict = as_dictionary(strict)) {
+        return dict.getAsMap();
     }
-    return result;
+    typeWarning("dictionary", "treating as empty");
+    QTC::TC("qpdf", "QPDFObjectHandle dictionary empty map for asMap");
+    return {};
 }
 
 // Array and Name accessors
@@ -1221,14 +1213,13 @@ QPDFObjectHandle::getUniqueResourceName(
 void
 QPDFObjectHandle::replaceKey(std::string const& key, QPDFObjectHandle const& value)
 {
-    auto dict = asDictionary();
-    if (dict) {
+    if (auto dict = as_dictionary(strict)) {
         checkOwnership(value);
-        dict->replaceKey(key, value);
-    } else {
-        typeWarning("dictionary", "ignoring key replacement request");
-        QTC::TC("qpdf", "QPDFObjectHandle dictionary ignoring replaceKey");
+        dict.replaceKey(key, value);
+        return;
     }
+    typeWarning("dictionary", "ignoring key replacement request");
+    QTC::TC("qpdf", "QPDFObjectHandle dictionary ignoring replaceKey");
 }
 
 QPDFObjectHandle
@@ -1249,22 +1240,20 @@ QPDFObjectHandle::replaceKeyAndGetOld(std::string const& key, QPDFObjectHandle c
 void
 QPDFObjectHandle::removeKey(std::string const& key)
 {
-    auto dict = asDictionary();
-    if (dict) {
-        dict->removeKey(key);
-    } else {
-        typeWarning("dictionary", "ignoring key removal request");
-        QTC::TC("qpdf", "QPDFObjectHandle dictionary ignoring removeKey");
+    if (auto dict = as_dictionary(strict)) {
+        dict.removeKey(key);
+        return;
     }
+    typeWarning("dictionary", "ignoring key removal request");
+    QTC::TC("qpdf", "QPDFObjectHandle dictionary ignoring removeKey");
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::removeKeyAndGetOld(std::string const& key)
 {
     auto result = QPDFObjectHandle::newNull();
-    auto dict = asDictionary();
-    if (dict) {
-        result = dict->getKey(key);
+    if (auto dict = as_dictionary(strict)) {
+        result = dict.getKey(key);
     }
     removeKey(key);
     return result;
@@ -2115,9 +2104,9 @@ QPDFObjectHandle::makeDirect(QPDFObjGen::set& visited, bool stop_at_streams)
         this->obj = QPDF_Array::create(items);
     } else if (isDictionary()) {
         std::map<std::string, QPDFObjectHandle> items;
-        auto dict = asDictionary();
+        auto dict = as_dictionary(strict);
         for (auto const& key: getKeys()) {
-            items[key] = dict->getKey(key);
+            items[key] = dict.getKey(key);
             items[key].makeDirect(visited, stop_at_streams);
         }
         this->obj = QPDF_Dictionary::create(items);
