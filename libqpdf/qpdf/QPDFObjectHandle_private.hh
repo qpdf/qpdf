@@ -4,10 +4,40 @@
 #include <qpdf/QPDFObjectHandle.hh>
 
 #include <qpdf/QPDFObject_private.hh>
+#include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 
 namespace qpdf
 {
+    class Array final: public BaseHandle
+    {
+      public:
+        explicit Array(std::shared_ptr<QPDFObject> const& obj) :
+            BaseHandle(obj)
+        {
+        }
+
+        explicit Array(std::shared_ptr<QPDFObject>&& obj) :
+            BaseHandle(std::move(obj))
+        {
+        }
+
+        int size() const;
+        std::pair<bool, QPDFObjectHandle> at(int n) const;
+        bool setAt(int at, QPDFObjectHandle const& oh);
+        bool insert(int at, QPDFObjectHandle const& item);
+        void push_back(QPDFObjectHandle const& item);
+        bool erase(int at);
+
+        std::vector<QPDFObjectHandle> getAsVector() const;
+        void setFromVector(std::vector<QPDFObjectHandle> const& items);
+
+      private:
+        QPDF_Array* array() const;
+        void checkOwnership(QPDFObjectHandle const& item) const;
+        QPDFObjectHandle null() const;
+    };
+
     // BaseDictionary is only used as a base class. It does not contain any methods exposed in the
     // public API.
     class BaseDictionary: public BaseHandle
@@ -57,6 +87,19 @@ namespace qpdf
     }
 
 } // namespace qpdf
+
+inline qpdf::Array
+QPDFObjectHandle::as_array(qpdf::typed options) const
+{
+    if (options & qpdf::error) {
+        assertType("array", false);
+    }
+    if (options & qpdf::any_flag || type_code() == ::ot_array ||
+        (options & qpdf::optional && type_code() == ::ot_null)) {
+        return qpdf::Array(obj);
+    }
+    return qpdf::Array({});
+}
 
 inline qpdf::Dictionary
 QPDFObjectHandle::as_dictionary(qpdf::typed options) const

@@ -1359,6 +1359,7 @@ class QPDFObjectHandle final: public qpdf::BaseHandle
 
     void writeJSON(int json_version, JSON::Writer& p, bool dereference_indirect = false) const;
 
+    inline qpdf::Array as_array(qpdf::typed options = qpdf::typed::any) const;
     inline qpdf::Dictionary as_dictionary(qpdf::typed options = qpdf::typed::any) const;
 
   private:
