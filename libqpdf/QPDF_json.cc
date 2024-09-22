@@ -5,6 +5,7 @@
 #include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFValue.hh>
 #include <qpdf/QPDF_Null.hh>
@@ -821,7 +822,7 @@ void
 writeJSONStreamFile(
     int version,
     JSON::Writer& jw,
-    QPDF_Stream& stream,
+    qpdf::Stream& stream,
     int id,
     qpdf_stream_decode_level_e decode_level,
     std::string const& file_prefix)
@@ -894,13 +895,13 @@ QPDF::writeJSON(
             } else {
                 jw << "\n      },\n      \"" << key;
             }
-            if (auto* stream = obj.getObjectPtr()->as<QPDF_Stream>()) {
+            if (auto stream = obj.as_stream()) {
                 jw << "\": {\n        \"stream\": ";
                 if (json_stream_data == qpdf_sj_file) {
                     writeJSONStreamFile(
-                        version, jw, *stream, og.getObj(), decode_level, file_prefix);
+                        version, jw, stream, og.getObj(), decode_level, file_prefix);
                 } else {
-                    stream->writeStreamJSON(
+                    stream.writeStreamJSON(
                         version, jw, json_stream_data, decode_level, nullptr, "");
                 }
             } else {

@@ -1357,6 +1357,7 @@ class QPDFObjectHandle final: public qpdf::BaseHandle
 
     inline qpdf::Array as_array(qpdf::typed options = qpdf::typed::any) const;
     inline qpdf::Dictionary as_dictionary(qpdf::typed options = qpdf::typed::any) const;
+    inline qpdf::Stream as_stream(qpdf::typed options = qpdf::typed::strict) const;
 
   private:
     QPDF_Array* asArray() const;

@@ -17,9 +17,9 @@
 #include <qpdf/Pipeline.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFParser.hh>
-#include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QPDF_Null.hh>
 #include <qpdf/QPDF_Reserved.hh>
@@ -298,7 +298,7 @@ void
 QPDF::registerStreamFilter(
     std::string const& filter_name, std::function<std::shared_ptr<QPDFStreamFilter>()> factory)
 {
-    QPDF_Stream::registerStreamFilter(filter_name, factory);
+    qpdf::Stream::registerStreamFilter(filter_name, factory);
 }
 
 void
@@ -2442,13 +2442,11 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
     QPDF& foreign_stream_qpdf =
         foreign.getQPDF("unable to retrieve owning qpdf from foreign stream");
 
-    auto stream = foreign.getObjectPtr()->as<QPDF_Stream>();
-    if (stream == nullptr) {
-        throw std::logic_error(
-            "unable to retrieve underlying"
-            " stream object from foreign stream");
+    auto stream = foreign.as_stream();
+    if (!stream) {
+        throw std::logic_error("unable to retrieve underlying stream object from foreign stream");
     }
-    std::shared_ptr<Buffer> stream_buffer = stream->getStreamDataBuffer();
+    std::shared_ptr<Buffer> stream_buffer = stream.getStreamDataBuffer();
     if ((foreign_stream_qpdf.m->immediate_copy_from) && (stream_buffer == nullptr)) {
         // Pull the stream data into a buffer before attempting the copy operation. Do it on the
         // source stream so that if the source stream is copied multiple times, we don't have to
@@ -2458,10 +2456,10 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
             foreign.getRawStreamData(),
             old_dict.getKey("/Filter"),
             old_dict.getKey("/DecodeParms"));
-        stream_buffer = stream->getStreamDataBuffer();
+        stream_buffer = stream.getStreamDataBuffer();
     }
     std::shared_ptr<QPDFObjectHandle::StreamDataProvider> stream_provider =
-        stream->getStreamDataProvider();
+        stream.getStreamDataProvider();
     if (stream_buffer.get()) {
         QTC::TC("qpdf", "QPDF copy foreign stream with buffer");
         result.replaceStreamData(
@@ -2476,9 +2474,9 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
         auto foreign_stream_data = std::make_shared<ForeignStreamData>(
             foreign_stream_qpdf.m->encp,
             foreign_stream_qpdf.m->file,
-            foreign.getObjGen(),
-            stream->getParsedOffset(),
-            stream->getLength(),
+            foreign,
+            foreign.getParsedOffset(),
+            stream.getLength(),
             dict);
         m->copied_stream_data_provider->registerForeignStream(local_og, foreign_stream_data);
         result.replaceStreamData(
