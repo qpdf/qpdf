@@ -6,6 +6,7 @@
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Dictionary.hh>
+#include <qpdf/QPDF_Stream.hh>
 
 namespace qpdf
 {
@@ -80,6 +81,123 @@ namespace qpdf
         }
     };
 
+    class Stream final: public BaseHandle
+    {
+      public:
+        explicit Stream(std::shared_ptr<QPDFObject> const& obj) :
+            BaseHandle(obj)
+        {
+        }
+
+        explicit Stream(std::shared_ptr<QPDFObject>&& obj) :
+            BaseHandle(std::move(obj))
+        {
+        }
+
+        QPDFObjectHandle
+        getDict() const
+        {
+            return stream()->stream_dict;
+        }
+        bool
+        isDataModified() const
+        {
+            return !stream()->token_filters.empty();
+        }
+        void
+        setFilterOnWrite(bool val)
+        {
+            stream()->filter_on_write = val;
+        }
+        bool
+        getFilterOnWrite() const
+        {
+            return stream()->filter_on_write;
+        }
+
+        // Methods to help QPDF copy foreign streams
+        size_t
+        getLength() const
+        {
+            return stream()->length;
+        }
+        std::shared_ptr<Buffer>
+        getStreamDataBuffer() const
+        {
+            return stream()->stream_data;
+        }
+        std::shared_ptr<QPDFObjectHandle::StreamDataProvider>
+        getStreamDataProvider() const
+        {
+            return stream()->stream_provider;
+        }
+
+        // See comments in QPDFObjectHandle.hh for these methods.
+        bool pipeStreamData(
+            Pipeline* p,
+            bool* tried_filtering,
+            int encode_flags,
+            qpdf_stream_decode_level_e decode_level,
+            bool suppress_warnings,
+            bool will_retry);
+        std::shared_ptr<Buffer> getStreamData(qpdf_stream_decode_level_e level);
+        std::shared_ptr<Buffer> getRawStreamData();
+        void replaceStreamData(
+            std::shared_ptr<Buffer> data,
+            QPDFObjectHandle const& filter,
+            QPDFObjectHandle const& decode_parms);
+        void replaceStreamData(
+            std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider,
+            QPDFObjectHandle const& filter,
+            QPDFObjectHandle const& decode_parms);
+        void
+        addTokenFilter(std::shared_ptr<QPDFObjectHandle::TokenFilter> token_filter)
+        {
+            stream()->token_filters.emplace_back(token_filter);
+        }
+        JSON getStreamJSON(
+            int json_version,
+            qpdf_json_stream_data_e json_data,
+            qpdf_stream_decode_level_e decode_level,
+            Pipeline* p,
+            std::string const& data_filename);
+        qpdf_stream_decode_level_e writeStreamJSON(
+            int json_version,
+            JSON::Writer& jw,
+            qpdf_json_stream_data_e json_data,
+            qpdf_stream_decode_level_e decode_level,
+            Pipeline* p,
+            std::string const& data_filename,
+            bool no_data_key = false);
+        void
+        replaceDict(QPDFObjectHandle const& new_dict)
+        {
+            auto s = stream();
+            s->stream_dict = new_dict;
+            s->setDictDescription();
+        }
+
+        static void registerStreamFilter(
+            std::string const& filter_name,
+            std::function<std::shared_ptr<QPDFStreamFilter>()> factory);
+
+      private:
+        QPDF_Stream* stream() const;
+
+        bool filterable(
+            std::vector<std::shared_ptr<QPDFStreamFilter>>& filters,
+            bool& specialized_compression,
+            bool& lossy_compression);
+        void replaceFilterData(
+            QPDFObjectHandle const& filter, QPDFObjectHandle const& decode_parms, size_t length);
+
+        void warn(std::string const& message);
+
+        static std::map<std::string, std::string> filter_abbreviations;
+        static std::map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>>
+            filter_factories;
+    };
+
     inline qpdf_object_type_e
     BaseHandle::type_code() const
     {
@@ -98,7 +216,7 @@ QPDFObjectHandle::as_array(qpdf::typed options) const
         (options & qpdf::optional && type_code() == ::ot_null)) {
         return qpdf::Array(obj);
     }
-    return qpdf::Array({});
+    return qpdf::Array(std::shared_ptr<QPDFObject>());
 }
 
 inline qpdf::Dictionary
@@ -112,6 +230,19 @@ QPDFObjectHandle::as_dictionary(qpdf::typed options) const
         assertType("dictionary", false);
     }
     return qpdf::Dictionary(std::shared_ptr<QPDFObject>());
+}
+
+inline qpdf::Stream
+QPDFObjectHandle::as_stream(qpdf::typed options) const
+{
+    if (options & qpdf::any_flag || type_code() == ::ot_stream ||
+        (options & qpdf::optional && type_code() == ::ot_null)) {
+        return qpdf::Stream(obj);
+    }
+    if (options & qpdf::error) {
+        assertType("stream", false);
+    }
+    return qpdf::Stream(std::shared_ptr<QPDFObject>());
 }
 
 #endif // OBJECTHANDLE_PRIVATE_HH

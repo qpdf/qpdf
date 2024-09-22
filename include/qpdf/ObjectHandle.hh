@@ -35,8 +35,9 @@ class QPDFObjectHandle;
 namespace qpdf
 {
     class Array;
-    class Dictionary;
     class BaseDictionary;
+    class Dictionary;
+    class Stream;
 
     enum typed : std::uint8_t { strict = 0, any_flag = 1, optional = 2, any = 3, error = 4};
 

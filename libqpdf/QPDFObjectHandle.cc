@@ -962,43 +962,43 @@ QPDFObjectHandle::getUniqueResourceName(
 QPDFObjectHandle
 QPDFObjectHandle::getDict() const
 {
-    return asStreamWithAssert()->getDict();
+    return as_stream(error).getDict();
 }
 
 void
 QPDFObjectHandle::setFilterOnWrite(bool val)
 {
-    asStreamWithAssert()->setFilterOnWrite(val);
+    as_stream(error).setFilterOnWrite(val);
 }
 
 bool
 QPDFObjectHandle::getFilterOnWrite()
 {
-    return asStreamWithAssert()->getFilterOnWrite();
+    return as_stream(error).getFilterOnWrite();
 }
 
 bool
 QPDFObjectHandle::isDataModified()
 {
-    return asStreamWithAssert()->isDataModified();
+    return as_stream(error).isDataModified();
 }
 
 void
 QPDFObjectHandle::replaceDict(QPDFObjectHandle const& new_dict)
 {
-    asStreamWithAssert()->replaceDict(new_dict);
+    as_stream(error).replaceDict(new_dict);
 }
 
 std::shared_ptr<Buffer>
 QPDFObjectHandle::getStreamData(qpdf_stream_decode_level_e level)
 {
-    return asStreamWithAssert()->getStreamData(level);
+    return as_stream(error).getStreamData(level);
 }
 
 std::shared_ptr<Buffer>
 QPDFObjectHandle::getRawStreamData()
 {
-    return asStreamWithAssert()->getRawStreamData();
+    return as_stream(error).getRawStreamData();
 }
 
 bool
@@ -1010,7 +1010,7 @@ QPDFObjectHandle::pipeStreamData(
     bool suppress_warnings,
     bool will_retry)
 {
-    return asStreamWithAssert()->pipeStreamData(
+    return as_stream(error).pipeStreamData(
         p, filtering_attempted, encode_flags, decode_level, suppress_warnings, will_retry);
 }
 
@@ -1023,7 +1023,7 @@ QPDFObjectHandle::pipeStreamData(
     bool will_retry)
 {
     bool filtering_attempted;
-    asStreamWithAssert()->pipeStreamData(
+    as_stream(error).pipeStreamData(
         p, &filtering_attempted, encode_flags, decode_level, suppress_warnings, will_retry);
     return filtering_attempted;
 }
@@ -1051,7 +1051,7 @@ QPDFObjectHandle::replaceStreamData(
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
 {
-    asStreamWithAssert()->replaceStreamData(data, filter, decode_parms);
+    as_stream(error).replaceStreamData(data, filter, decode_parms);
 }
 
 void
@@ -1063,7 +1063,7 @@ QPDFObjectHandle::replaceStreamData(
     if (bp) {
         memcpy(bp, data.c_str(), data.length());
     }
-    asStreamWithAssert()->replaceStreamData(b, filter, decode_parms);
+    as_stream(error).replaceStreamData(b, filter, decode_parms);
 }
 
 void
@@ -1072,7 +1072,7 @@ QPDFObjectHandle::replaceStreamData(
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
 {
-    asStreamWithAssert()->replaceStreamData(provider, filter, decode_parms);
+    as_stream(error).replaceStreamData(provider, filter, decode_parms);
 }
 
 namespace
@@ -1119,7 +1119,7 @@ QPDFObjectHandle::replaceStreamData(
     QPDFObjectHandle const& decode_parms)
 {
     auto sdp = std::shared_ptr<StreamDataProvider>(new FunctionProvider(provider));
-    asStreamWithAssert()->replaceStreamData(sdp, filter, decode_parms);
+    as_stream(error).replaceStreamData(sdp, filter, decode_parms);
 }
 
 void
@@ -1129,7 +1129,7 @@ QPDFObjectHandle::replaceStreamData(
     QPDFObjectHandle const& decode_parms)
 {
     auto sdp = std::shared_ptr<StreamDataProvider>(new FunctionProvider(provider));
-    asStreamWithAssert()->replaceStreamData(sdp, filter, decode_parms);
+    as_stream(error).replaceStreamData(sdp, filter, decode_parms);
 }
 
 std::map<std::string, QPDFObjectHandle>
@@ -1348,8 +1348,7 @@ QPDFObjectHandle::getStreamJSON(
     Pipeline* p,
     std::string const& data_filename)
 {
-    return asStreamWithAssert()->getStreamJSON(
-        json_version, json_data, decode_level, p, data_filename);
+    return as_stream(error).getStreamJSON(json_version, json_data, decode_level, p, data_filename);
 }
 
 QPDFObjectHandle
@@ -1552,7 +1551,7 @@ QPDFObjectHandle::addContentTokenFilter(std::shared_ptr<TokenFilter> filter)
 void
 QPDFObjectHandle::addTokenFilter(std::shared_ptr<TokenFilter> filter)
 {
-    return asStreamWithAssert()->addTokenFilter(filter);
+    return as_stream(error).addTokenFilter(filter);
 }
 
 QPDFObjectHandle

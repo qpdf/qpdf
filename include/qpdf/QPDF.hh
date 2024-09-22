@@ -854,6 +854,7 @@ class QPDF
     class Pipe
     {
         friend class QPDF_Stream;
+        friend class qpdf::Stream;
 
       private:
         static bool
