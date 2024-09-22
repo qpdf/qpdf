@@ -1,6 +1,8 @@
 #ifndef QPDF_ARRAY_HH
 #define QPDF_ARRAY_HH
 
+#include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFValue.hh>
 
 #include <map>
@@ -25,24 +27,19 @@ class QPDF_Array: public QPDFValue
     void writeJSON(int json_version, JSON::Writer& p) override;
     void disconnect() override;
 
-    int
-    size() const noexcept
-    {
-        return sp ? sp->size : int(elements.size());
-    }
-    std::pair<bool, QPDFObjectHandle> at(int n) const noexcept;
-    bool setAt(int n, QPDFObjectHandle const& oh);
-    std::vector<QPDFObjectHandle> getAsVector() const;
-    void setFromVector(std::vector<QPDFObjectHandle> const& items);
-    bool insert(int at, QPDFObjectHandle const& item);
-    void push_back(QPDFObjectHandle const& item);
-    bool erase(int at);
-
   private:
+    friend class qpdf::Array;
     QPDF_Array();
     QPDF_Array(QPDF_Array const&);
     QPDF_Array(std::vector<QPDFObjectHandle> const& items);
     QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& items, bool sparse);
+
+    int
+    size() const
+    {
+        return sp ? sp->size : int(elements.size());
+    }
+    void setFromVector(std::vector<QPDFObjectHandle> const& items);
 
     void checkOwnership(QPDFObjectHandle const& item) const;
 

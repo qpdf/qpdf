@@ -1,19 +1,32 @@
 #include <qpdf/QPDF_Array.hh>
 
 #include <qpdf/JSON_writer.hh>
-#include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QTC.hh>
+
+using namespace qpdf;
 
 static const QPDFObjectHandle null_oh = QPDFObjectHandle::newNull();
 
 inline void
 QPDF_Array::checkOwnership(QPDFObjectHandle const& item) const
 {
-    if (auto obj = item.getObjectPtr()) {
-        if (qpdf) {
-            if (auto item_qpdf = obj->getQPDF()) {
-                if (qpdf != item_qpdf) {
+    // This is only called from QPDF_Array::setFromVector, which in turn is only called from create.
+    // At his point qpdf is a nullptr and therefore the ownership check reduces to an uninitialized
+    // check
+    if (!item.getObjectPtr()) {
+        throw std::logic_error("Attempting to add an uninitialized object to a QPDF_Array.");
+    }
+}
+
+inline void
+Array::checkOwnership(QPDFObjectHandle const& item) const
+{
+    if (auto o = item.getObjectPtr()) {
+        if (auto pdf = obj->getQPDF()) {
+            if (auto item_qpdf = o->getQPDF()) {
+                if (pdf != item_qpdf) {
                     throw std::logic_error(
                         "Attempting to add an object from a different QPDF. Use "
                         "QPDF::copyForeignObject to add objects from another file.");
@@ -184,47 +197,75 @@ QPDF_Array::writeJSON(int json_version, JSON::Writer& p)
     p.writeEnd(']');
 }
 
-std::pair<bool, QPDFObjectHandle>
-QPDF_Array::at(int n) const noexcept
+QPDF_Array*
+Array::array() const
 {
+    if (obj) {
+        if (auto a = obj->as<QPDF_Array>()) {
+            return a;
+        }
+    }
+    throw std::runtime_error("Expected an array but found a non-array object");
+    return nullptr; // unreachable
+}
+
+QPDFObjectHandle
+Array::null() const
+{
+    return null_oh;
+}
+
+int
+Array::size() const
+{
+    auto a = array();
+    return a->sp ? a->sp->size : int(a->elements.size());
+}
+
+std::pair<bool, QPDFObjectHandle>
+Array::at(int n) const
+{
+    auto a = array();
     if (n < 0 || n >= size()) {
         return {false, {}};
-    } else if (sp) {
-        auto const& iter = sp->elements.find(n);
-        return {true, iter == sp->elements.end() ? null_oh : (*iter).second};
-    } else {
-        return {true, elements[size_t(n)]};
     }
+    if (!a->sp) {
+        return {true, a->elements[size_t(n)]};
+    }
+    auto const& iter = a->sp->elements.find(n);
+    return {true, iter == a->sp->elements.end() ? null() : iter->second};
 }
 
 std::vector<QPDFObjectHandle>
-QPDF_Array::getAsVector() const
+Array::getAsVector() const
 {
-    if (sp) {
+    auto a = array();
+    if (a->sp) {
         std::vector<QPDFObjectHandle> v;
         v.reserve(size_t(size()));
-        for (auto const& item: sp->elements) {
+        for (auto const& item: a->sp->elements) {
             v.resize(size_t(item.first), null_oh);
             v.emplace_back(item.second);
         }
         v.resize(size_t(size()), null_oh);
         return v;
     } else {
-        return {elements.cbegin(), elements.cend()};
+        return {a->elements.cbegin(), a->elements.cend()};
     }
 }
 
 bool
-QPDF_Array::setAt(int at, QPDFObjectHandle const& oh)
+Array::setAt(int at, QPDFObjectHandle const& oh)
 {
     if (at < 0 || at >= size()) {
         return false;
     }
+    auto a = array();
     checkOwnership(oh);
-    if (sp) {
-        sp->elements[at] = oh.getObj();
+    if (a->sp) {
+        a->sp->elements[at] = oh.getObj();
     } else {
-        elements[size_t(at)] = oh.getObj();
+        a->elements[size_t(at)] = oh.getObj();
     }
     return true;
 }
@@ -240,9 +281,22 @@ QPDF_Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
     }
 }
 
-bool
-QPDF_Array::insert(int at, QPDFObjectHandle const& item)
+void
+Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
 {
+    auto a = array();
+    a->elements.resize(0);
+    a->elements.reserve(v.size());
+    for (auto const& item: v) {
+        checkOwnership(item);
+        a->elements.push_back(item.getObj());
+    }
+}
+
+bool
+Array::insert(int at, QPDFObjectHandle const& item)
+{
+    auto a = array();
     int sz = size();
     if (at < 0 || at > sz) {
         // As special case, also allow insert beyond the end
@@ -251,61 +305,63 @@ QPDF_Array::insert(int at, QPDFObjectHandle const& item)
         push_back(item);
     } else {
         checkOwnership(item);
-        if (sp) {
-            auto iter = sp->elements.crbegin();
-            while (iter != sp->elements.crend()) {
+        if (a->sp) {
+            auto iter = a->sp->elements.crbegin();
+            while (iter != a->sp->elements.crend()) {
                 auto key = (iter++)->first;
                 if (key >= at) {
-                    auto nh = sp->elements.extract(key);
+                    auto nh = a->sp->elements.extract(key);
                     ++nh.key();
-                    sp->elements.insert(std::move(nh));
+                    a->sp->elements.insert(std::move(nh));
                 } else {
                     break;
                 }
             }
-            sp->elements[at] = item.getObj();
-            ++sp->size;
+            a->sp->elements[at] = item.getObj();
+            ++a->sp->size;
         } else {
-            elements.insert(elements.cbegin() + at, item.getObj());
+            a->elements.insert(a->elements.cbegin() + at, item.getObj());
         }
     }
     return true;
 }
 
 void
-QPDF_Array::push_back(QPDFObjectHandle const& item)
+Array::push_back(QPDFObjectHandle const& item)
 {
+    auto a = array();
     checkOwnership(item);
-    if (sp) {
-        sp->elements[(sp->size)++] = item.getObj();
+    if (a->sp) {
+        a->sp->elements[(a->sp->size)++] = item.getObj();
     } else {
-        elements.push_back(item.getObj());
+        a->elements.push_back(item.getObj());
     }
 }
 
 bool
-QPDF_Array::erase(int at)
+Array::erase(int at)
 {
+    auto a = array();
     if (at < 0 || at >= size()) {
         return false;
     }
-    if (sp) {
-        auto end = sp->elements.end();
-        if (auto iter = sp->elements.lower_bound(at); iter != end) {
+    if (a->sp) {
+        auto end = a->sp->elements.end();
+        if (auto iter = a->sp->elements.lower_bound(at); iter != end) {
             if (iter->first == at) {
                 iter++;
-                sp->elements.erase(at);
+                a->sp->elements.erase(at);
             }
 
             while (iter != end) {
-                auto nh = sp->elements.extract(iter++);
+                auto nh = a->sp->elements.extract(iter++);
                 --nh.key();
-                sp->elements.insert(std::move(nh));
+                a->sp->elements.insert(std::move(nh));
             }
         }
-        --(sp->size);
+        --(a->sp->size);
     } else {
-        elements.erase(elements.cbegin() + at);
+        a->elements.erase(a->elements.cbegin() + at);
     }
     return true;
 }

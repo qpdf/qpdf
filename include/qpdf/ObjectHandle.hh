@@ -26,6 +26,7 @@
 #include <qpdf/Types.h>
 
 #include <cstdint>
+#include <memory>
 
 class QPDF_Dictionary;
 class QPDFObject;
@@ -33,6 +34,7 @@ class QPDFObjectHandle;
 
 namespace qpdf
 {
+    class Array;
     class Dictionary;
     class BaseDictionary;
 
