@@ -1,8 +1,8 @@
 #ifndef QPDFPARSER_HH
 #define QPDFPARSER_HH
 
-#include <qpdf/QPDFObjectHandle.hh>
-#include <qpdf/QPDFValue.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
+#include <qpdf/QPDFObject_private.hh>
 
 #include <memory>
 #include <string>
@@ -24,7 +24,7 @@ class QPDFParser
         decrypter(decrypter),
         context(context),
         description(
-            std::make_shared<QPDFValue::Description>(
+            std::make_shared<QPDFObject::Description>(
                 std::string(input.getName() + ", " + object_description + " at offset $PO"))),
         parse_pdf(parse_pdf)
     {
@@ -78,7 +78,7 @@ class QPDFParser
     QPDFTokenizer& tokenizer;
     QPDFObjectHandle::StringDecrypter* decrypter;
     QPDF* context;
-    std::shared_ptr<QPDFValue::Description> description;
+    std::shared_ptr<QPDFObject::Description> description;
     bool parse_pdf;
 
     std::vector<StackFrame> stack;

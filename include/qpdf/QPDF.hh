@@ -1087,7 +1087,8 @@ class QPDF
         QPDFObjGen og,
         std::shared_ptr<QPDFObject> const& object,
         qpdf_offset_t end_before_space,
-        qpdf_offset_t end_after_space);
+        qpdf_offset_t end_after_space,
+        bool destroy = true);
     static QPDFExc damagedPDF(
         InputSource& input,
         std::string const& object,

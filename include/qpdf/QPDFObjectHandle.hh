@@ -1254,8 +1254,7 @@ class QPDFObjectHandle final: public qpdf::BaseHandle
     // Provide access to specific classes for recursive disconnected().
     class DisconnectAccess
     {
-        friend class QPDF_Dictionary;
-        friend class QPDF_Stream;
+        friend class QPDFObject;
 
       private:
         static void

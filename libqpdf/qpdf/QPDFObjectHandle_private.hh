@@ -4,9 +4,7 @@
 #include <qpdf/QPDFObjectHandle.hh>
 
 #include <qpdf/QPDFObject_private.hh>
-#include <qpdf/QPDF_Array.hh>
-#include <qpdf/QPDF_Dictionary.hh>
-#include <qpdf/QPDF_Stream.hh>
+#include <qpdf/QUtil.hh>
 
 namespace qpdf
 {
@@ -106,6 +104,13 @@ namespace qpdf
         {
         }
 
+        Stream(
+            QPDF& qpdf,
+            QPDFObjGen og,
+            QPDFObjectHandle stream_dict,
+            qpdf_offset_t offset,
+            size_t length);
+
         QPDFObjectHandle
         getDict() const
         {
@@ -186,20 +191,22 @@ namespace qpdf
         {
             auto s = stream();
             s->stream_dict = new_dict;
-            s->setDictDescription();
+            setDictDescription();
         }
+
+        void setDictDescription();
 
         static void registerStreamFilter(
             std::string const& filter_name,
             std::function<std::shared_ptr<QPDFStreamFilter>()> factory);
 
       private:
-        QPDF_Stream*
+        QPDF_Stream::Members*
         stream() const
         {
             if (obj) {
                 if (auto s = obj->as<QPDF_Stream>()) {
-                    return s;
+                    return s->m.get();
                 }
             }
             throw std::runtime_error("operation for stream attempted on object of type dictionary");
@@ -226,6 +233,32 @@ namespace qpdf
     }
 
 } // namespace qpdf
+
+inline QPDF_Dictionary::QPDF_Dictionary(std::map<std::string, QPDFObjectHandle>&& items) :
+    items(std::move(items))
+{
+}
+
+inline std::shared_ptr<QPDFObject>
+QPDF_Null::create(
+    std::shared_ptr<QPDFObject> parent, std::string_view const& static_descr, std::string var_descr)
+{
+    auto n = QPDFObject::create<QPDF_Null>();
+    n->setChildDescription(parent->getQPDF(), parent, static_descr, var_descr);
+    return n;
+}
+
+inline QPDF_Real::QPDF_Real(double value, int decimal_places, bool trim_trailing_zeroes) :
+    val(QUtil::double_to_string(value, decimal_places, trim_trailing_zeroes))
+{
+}
+
+template <typename T, typename... Args>
+inline std::shared_ptr<QPDFObject>
+QPDFObject::create(Args&&... args)
+{
+    return std::make_shared<QPDFObject>(std::forward<T>(T(std::forward<Args>(args)...)));
+}
 
 inline qpdf::Array
 QPDFObjectHandle::as_array(qpdf::typed options) const

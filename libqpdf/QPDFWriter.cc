@@ -16,8 +16,7 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
-#include <qpdf/QPDF_Name.hh>
-#include <qpdf/QPDF_String.hh>
+#include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/RC4.hh>

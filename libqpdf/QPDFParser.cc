@@ -4,18 +4,6 @@
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFObject_private.hh>
-#include <qpdf/QPDF_Array.hh>
-#include <qpdf/QPDF_Bool.hh>
-#include <qpdf/QPDF_Dictionary.hh>
-#include <qpdf/QPDF_InlineImage.hh>
-#include <qpdf/QPDF_Integer.hh>
-#include <qpdf/QPDF_Name.hh>
-#include <qpdf/QPDF_Null.hh>
-#include <qpdf/QPDF_Operator.hh>
-#include <qpdf/QPDF_Real.hh>
-#include <qpdf/QPDF_Reserved.hh>
-#include <qpdf/QPDF_Stream.hh>
-#include <qpdf/QPDF_String.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
@@ -47,27 +35,27 @@ QPDFParser::parse(bool& empty, bool content_stream)
         }
         QTC::TC("qpdf", "QPDFParser eof in parse");
         warn("unexpected EOF");
-        return {QPDF_Null::create()};
+        return {QPDFObject::create<QPDF_Null>()};
 
     case QPDFTokenizer::tt_bad:
         QTC::TC("qpdf", "QPDFParser bad token in parse");
-        return {QPDF_Null::create()};
+        return {QPDFObject::create<QPDF_Null>()};
 
     case QPDFTokenizer::tt_brace_open:
     case QPDFTokenizer::tt_brace_close:
         QTC::TC("qpdf", "QPDFParser bad brace");
         warn("treating unexpected brace token as null");
-        return {QPDF_Null::create()};
+        return {QPDFObject::create<QPDF_Null>()};
 
     case QPDFTokenizer::tt_array_close:
         QTC::TC("qpdf", "QPDFParser bad array close");
         warn("treating unexpected array close token as null");
-        return {QPDF_Null::create()};
+        return {QPDFObject::create<QPDF_Null>()};
 
     case QPDFTokenizer::tt_dict_close:
         QTC::TC("qpdf", "QPDFParser bad dictionary close");
         warn("unexpected dictionary close token");
-        return {QPDF_Null::create()};
+        return {QPDFObject::create<QPDF_Null>()};
 
     case QPDFTokenizer::tt_array_open:
     case QPDFTokenizer::tt_dict_open:
@@ -82,7 +70,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
         return withDescription<QPDF_Bool>(tokenizer.getValue() == "true");
 
     case QPDFTokenizer::tt_null:
-        return {QPDF_Null::create()};
+        return {QPDFObject::create<QPDF_Null>()};
 
     case QPDFTokenizer::tt_integer:
         return withDescription<QPDF_Integer>(QUtil::string_to_ll(tokenizer.getValue().c_str()));
@@ -103,7 +91,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 // not move the input source's offset.
                 input.seek(input.getLastOffset(), SEEK_SET);
                 empty = true;
-                return {QPDF_Null::create()};
+                return {QPDFObject::create<QPDF_Null>()};
             } else {
                 QTC::TC("qpdf", "QPDFParser treat word as string");
                 warn("unknown token while reading object; treating as string");
@@ -122,7 +110,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
 
     default:
         warn("treating unknown token type as null while reading object");
-        return {QPDF_Null::create()};
+        return {QPDFObject::create<QPDF_Null>()};
     }
 }
 
@@ -194,12 +182,12 @@ QPDFParser::parseRemainder(bool content_stream)
             }
             QTC::TC("qpdf", "QPDFParser eof in parseRemainder");
             warn("unexpected EOF");
-            return {QPDF_Null::create()};
+            return {QPDFObject::create<QPDF_Null>()};
 
         case QPDFTokenizer::tt_bad:
             QTC::TC("qpdf", "QPDFParser bad token in parseRemainder");
             if (tooManyBadTokens()) {
-                return {QPDF_Null::create()};
+                return {QPDFObject::create<QPDF_Null>()};
             }
             addNull();
             continue;
@@ -209,7 +197,7 @@ QPDFParser::parseRemainder(bool content_stream)
             QTC::TC("qpdf", "QPDFParser bad brace in parseRemainder");
             warn("treating unexpected brace token as null");
             if (tooManyBadTokens()) {
-                return {QPDF_Null::create()};
+                return {QPDFObject::create<QPDF_Null>()};
             }
             addNull();
             continue;
@@ -218,10 +206,11 @@ QPDFParser::parseRemainder(bool content_stream)
             if (bad_count && !max_bad_count) {
                 // Trigger warning.
                 (void)tooManyBadTokens();
-                return {QPDF_Null::create()};
+                return {QPDFObject::create<QPDF_Null>()};
             }
             if (frame->state == st_array) {
-                auto object = QPDF_Array::create(std::move(frame->olist), frame->null_count > 100);
+                auto object = QPDFObject::create<QPDF_Array>(
+                    std::move(frame->olist), frame->null_count > 100);
                 setDescription(object, frame->offset - 1);
                 // The `offset` points to the next of "[".  Set the rewind offset to point to the
                 // beginning of "[". This has been explicitly tested with whitespace surrounding the
@@ -237,7 +226,7 @@ QPDFParser::parseRemainder(bool content_stream)
                 QTC::TC("qpdf", "QPDFParser bad array close in parseRemainder");
                 warn("treating unexpected array close token as null");
                 if (tooManyBadTokens()) {
-                    return {QPDF_Null::create()};
+                    return {QPDFObject::create<QPDF_Null>()};
                 }
                 addNull();
             }
@@ -247,7 +236,7 @@ QPDFParser::parseRemainder(bool content_stream)
             if (bad_count && !max_bad_count) {
                 // Trigger warning.
                 (void)tooManyBadTokens();
-                return {QPDF_Null::create()};
+                return {QPDFObject::create<QPDF_Null>()};
             }
             if (frame->state <= st_dictionary_value) {
                 // Attempt to recover more or less gracefully from invalid dictionaries.
@@ -258,7 +247,7 @@ QPDFParser::parseRemainder(bool content_stream)
                     warn(
                         frame->offset,
                         "dictionary ended prematurely; using null as value for last key");
-                    dict[frame->key] = QPDF_Null::create();
+                    dict[frame->key] = QPDFObject::create<QPDF_Null>();
                 }
 
                 if (!frame->olist.empty()) {
@@ -271,7 +260,7 @@ QPDFParser::parseRemainder(bool content_stream)
                     dict["/Contents"] = QPDFObjectHandle::newString(frame->contents_string);
                     dict["/Contents"].setParsedOffset(frame->contents_offset);
                 }
-                auto object = QPDF_Dictionary::create(std::move(dict));
+                auto object = QPDFObject::create<QPDF_Dictionary>(std::move(dict));
                 setDescription(object, frame->offset - 2);
                 // The `offset` points to the next of "<<". Set the rewind offset to point to the
                 // beginning of "<<". This has been explicitly tested with whitespace surrounding
@@ -287,7 +276,7 @@ QPDFParser::parseRemainder(bool content_stream)
                 QTC::TC("qpdf", "QPDFParser bad dictionary close in parseRemainder");
                 warn("unexpected dictionary close token");
                 if (tooManyBadTokens()) {
-                    return {QPDF_Null::create()};
+                    return {QPDFObject::create<QPDF_Null>()};
                 }
                 addNull();
             }
@@ -298,7 +287,7 @@ QPDFParser::parseRemainder(bool content_stream)
             if (stack.size() > 499) {
                 QTC::TC("qpdf", "QPDFParser too deep");
                 warn("ignoring excessively deeply nested data structure");
-                return {QPDF_Null::create()};
+                return {QPDFObject::create<QPDF_Null>()};
             } else {
                 b_contents = false;
                 stack.emplace_back(
@@ -350,7 +339,7 @@ QPDFParser::parseRemainder(bool content_stream)
                 QTC::TC("qpdf", "QPDFParser treat word as string in parseRemainder");
                 warn("unknown token while reading object; treating as string");
                 if (tooManyBadTokens()) {
-                    return {QPDF_Null::create()};
+                    return {QPDFObject::create<QPDF_Null>()};
                 }
                 addScalar<QPDF_String>(tokenizer.getValue());
             }
@@ -377,7 +366,7 @@ QPDFParser::parseRemainder(bool content_stream)
         default:
             warn("treating unknown token type as null while reading object");
             if (tooManyBadTokens()) {
-                return {QPDF_Null::create()};
+                return {QPDFObject::create<QPDF_Null>()};
             }
             addNull();
         }
@@ -402,7 +391,7 @@ QPDFParser::add(std::shared_ptr<QPDFObject>&& obj)
 void
 QPDFParser::addNull()
 {
-    const static ObjectPtr null_obj = QPDF_Null::create();
+    const static ObjectPtr null_obj = QPDFObject::create<QPDF_Null>();
 
     if (frame->state != st_dictionary_value) {
         // If state is st_dictionary_key then there is a missing key. Push onto olist for
@@ -420,7 +409,7 @@ QPDFParser::addNull()
 void
 QPDFParser::addInt(int count)
 {
-    auto obj = QPDF_Integer::create(int_buffer[count % 2]);
+    auto obj = QPDFObject::create<QPDF_Integer>(int_buffer[count % 2]);
     obj->setDescription(context, description, last_offset_buffer[count % 2]);
     add(std::move(obj));
 }
@@ -435,7 +424,7 @@ QPDFParser::addScalar(Args&&... args)
         max_bad_count = 0;
         return;
     }
-    auto obj = T::create(args...);
+    auto obj = QPDFObject::create<T>(std::forward<Args>(args)...);
     obj->setDescription(context, description, input.getLastOffset());
     add(std::move(obj));
 }
@@ -444,7 +433,7 @@ template <typename T, typename... Args>
 QPDFObjectHandle
 QPDFParser::withDescription(Args&&... args)
 {
-    auto obj = T::create(args...);
+    auto obj = QPDFObject::create<T>(std::forward<Args>(args)...);
     obj->setDescription(context, description, start);
     return {obj};
 }
