@@ -20,11 +20,6 @@
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFParser.hh>
-#include <qpdf/QPDF_Dictionary.hh>
-#include <qpdf/QPDF_Null.hh>
-#include <qpdf/QPDF_Reserved.hh>
-#include <qpdf/QPDF_Stream.hh>
-#include <qpdf/QPDF_Unresolved.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
@@ -1565,7 +1560,7 @@ QPDF::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
             throw;
         }
     }
-    object = {QPDF_Stream::create(this, og, object, stream_offset, length)};
+    object = QPDFObjectHandle(qpdf::Stream(*this, og, object, stream_offset, length));
 }
 
 void
@@ -1884,7 +1879,7 @@ QPDF::resolve(QPDFObjGen og)
         // has to be resolved during object parsing, such as stream length.
         QTC::TC("qpdf", "QPDF recursion loop in resolve");
         warn(damagedPDF("", "loop detected resolving object " + og.unparse(' ')));
-        updateCache(og, QPDF_Null::create(), -1, -1);
+        updateCache(og, QPDFObject::create<QPDF_Null>(), -1, -1);
         return m->obj_cache[og].object.get();
     }
     ResolveRecorder rr(this, og);
@@ -1921,7 +1916,7 @@ QPDF::resolve(QPDFObjGen og)
     if (isUnresolved(og)) {
         // PDF spec says unknown objects resolve to the null object.
         QTC::TC("qpdf", "QPDF resolve failure to null");
-        updateCache(og, QPDF_Null::create(), -1, -1);
+        updateCache(og, QPDFObject::create<QPDF_Null>(), -1, -1);
     }
 
     auto result(m->obj_cache[og].object);
@@ -2034,12 +2029,13 @@ QPDF::updateCache(
     QPDFObjGen og,
     std::shared_ptr<QPDFObject> const& object,
     qpdf_offset_t end_before_space,
-    qpdf_offset_t end_after_space)
+    qpdf_offset_t end_after_space,
+    bool destroy)
 {
     object->setObjGen(this, og);
     if (isCached(og)) {
         auto& cache = m->obj_cache[og];
-        cache.object->assign(object);
+        object->move_to(cache.object, destroy);
         cache.end_before_space = end_before_space;
         cache.end_after_space = end_after_space;
     } else {
@@ -2089,20 +2085,20 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
 QPDFObjectHandle
 QPDF::newReserved()
 {
-    return makeIndirectFromQPDFObject(QPDF_Reserved::create());
+    return makeIndirectFromQPDFObject(QPDFObject::create<QPDF_Reserved>());
 }
 
 QPDFObjectHandle
 QPDF::newIndirectNull()
 {
-    return makeIndirectFromQPDFObject(QPDF_Null::create());
+    return makeIndirectFromQPDFObject(QPDFObject::create<QPDF_Null>());
 }
 
 QPDFObjectHandle
 QPDF::newStream()
 {
-    return makeIndirectFromQPDFObject(
-        QPDF_Stream::create(this, nextObjGen(), QPDFObjectHandle::newDictionary(), 0, 0));
+    return makeIndirectObject(
+        qpdf::Stream(*this, nextObjGen(), QPDFObjectHandle::newDictionary(), 0, 0));
 }
 
 QPDFObjectHandle
@@ -2130,12 +2126,13 @@ QPDF::getObjectForParser(int id, int gen, bool parse_pdf)
         return iter->second.object;
     }
     if (m->xref_table.count(og) || !m->parsed) {
-        return m->obj_cache.insert({og, QPDF_Unresolved::create(this, og)}).first->second.object;
+        return m->obj_cache.insert({og, QPDFObject::create<QPDF_Unresolved>(this, og)})
+            .first->second.object;
     }
     if (parse_pdf) {
-        return QPDF_Null::create();
+        return QPDFObject::create<QPDF_Null>();
     }
-    return m->obj_cache.insert({og, QPDF_Null::create(this, og)}).first->second.object;
+    return m->obj_cache.insert({og, QPDFObject::create<QPDF_Null>(this, og)}).first->second.object;
 }
 
 std::shared_ptr<QPDFObject>
@@ -2145,8 +2142,9 @@ QPDF::getObjectForJSON(int id, int gen)
     auto [it, inserted] = m->obj_cache.try_emplace(og);
     auto& obj = it->second.object;
     if (inserted) {
-        obj = (m->parsed && !m->xref_table.count(og)) ? QPDF_Null::create(this, og)
-                                                      : QPDF_Unresolved::create(this, og);
+        obj = (m->parsed && !m->xref_table.count(og))
+            ? QPDFObject::create<QPDF_Null>(this, og)
+            : QPDFObject::create<QPDF_Unresolved>(this, og);
     }
     return obj;
 }
@@ -2157,9 +2155,10 @@ QPDF::getObject(QPDFObjGen og)
     if (auto it = m->obj_cache.find(og); it != m->obj_cache.end()) {
         return {it->second.object};
     } else if (m->parsed && !m->xref_table.count(og)) {
-        return QPDF_Null::create();
+        return QPDFObject::create<QPDF_Null>();
     } else {
-        auto result = m->obj_cache.try_emplace(og, QPDF_Unresolved::create(this, og), -1, -1);
+        auto result =
+            m->obj_cache.try_emplace(og, QPDFObject::create<QPDF_Unresolved>(this, og), -1, -1);
         return {result.first->second.object};
     }
 }
@@ -2195,7 +2194,7 @@ QPDF::replaceObject(QPDFObjGen og, QPDFObjectHandle oh)
         QTC::TC("qpdf", "QPDF replaceObject called with indirect object");
         throw std::logic_error("QPDF::replaceObject called with indirect object handle");
     }
-    updateCache(og, oh.getObj(), -1, -1);
+    updateCache(og, oh.getObj(), -1, -1, false);
 }
 
 void
@@ -2204,7 +2203,7 @@ QPDF::removeObject(QPDFObjGen og)
     m->xref_table.erase(og);
     if (auto cached = m->obj_cache.find(og); cached != m->obj_cache.end()) {
         // Take care of any object handles that may be floating around.
-        cached->second.object->assign(QPDF_Null::create());
+        cached->second.object->assign_null();
         cached->second.object->setObjGen(nullptr, QPDFObjGen());
         m->obj_cache.erase(cached);
     }

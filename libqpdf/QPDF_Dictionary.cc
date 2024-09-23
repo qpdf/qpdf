@@ -1,98 +1,10 @@
-#include <qpdf/QPDF_Dictionary.hh>
-
-#include <qpdf/JSON_writer.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
+
 #include <qpdf/QPDFObject_private.hh>
-#include <qpdf/QPDF_Name.hh>
 #include <qpdf/QTC.hh>
-#include <qpdf/QUtil.hh>
 
 using namespace std::literals;
 using namespace qpdf;
-
-QPDF_Dictionary::QPDF_Dictionary(std::map<std::string, QPDFObjectHandle> const& items) :
-    QPDFValue(::ot_dictionary),
-    items(items)
-{
-}
-
-QPDF_Dictionary::QPDF_Dictionary(std::map<std::string, QPDFObjectHandle>&& items) :
-    QPDFValue(::ot_dictionary),
-    items(items)
-{
-}
-
-std::shared_ptr<QPDFObject>
-QPDF_Dictionary::create(std::map<std::string, QPDFObjectHandle> const& items)
-{
-    return do_create(new QPDF_Dictionary(items));
-}
-
-std::shared_ptr<QPDFObject>
-QPDF_Dictionary::create(std::map<std::string, QPDFObjectHandle>&& items)
-{
-    return do_create(new QPDF_Dictionary(items));
-}
-
-std::shared_ptr<QPDFObject>
-QPDF_Dictionary::copy(bool shallow)
-{
-    if (shallow) {
-        return create(items);
-    } else {
-        std::map<std::string, QPDFObjectHandle> new_items;
-        for (auto const& item: this->items) {
-            auto value = item.second;
-            new_items[item.first] = value.isIndirect() ? value : value.shallowCopy();
-        }
-        return create(new_items);
-    }
-}
-
-void
-QPDF_Dictionary::disconnect()
-{
-    for (auto& iter: this->items) {
-        QPDFObjectHandle::DisconnectAccess::disconnect(iter.second);
-    }
-}
-
-std::string
-QPDF_Dictionary::unparse()
-{
-    std::string result = "<< ";
-    for (auto& iter: this->items) {
-        if (!iter.second.isNull()) {
-            result += Name::normalize(iter.first) + " " + iter.second.unparse() + " ";
-        }
-    }
-    result += ">>";
-    return result;
-}
-
-void
-QPDF_Dictionary::writeJSON(int json_version, JSON::Writer& p)
-{
-    p.writeStart('{');
-    for (auto& iter: this->items) {
-        if (!iter.second.isNull()) {
-            p.writeNext();
-            if (json_version == 1) {
-                p << "\"" << JSON::Writer::encode_string(Name::normalize(iter.first)) << "\": ";
-            } else if (auto res = Name::analyzeJSONEncoding(iter.first); res.first) {
-                if (res.second) {
-                    p << "\"" << iter.first << "\": ";
-                } else {
-                    p << "\"" << JSON::Writer::encode_string(iter.first) << "\": ";
-                }
-            } else {
-                p << "\"n:" << JSON::Writer::encode_string(Name::normalize(iter.first)) << "\": ";
-            }
-            iter.second.writeJSON(json_version, p);
-        }
-    }
-    p.writeEnd('}');
-}
 
 QPDF_Dictionary*
 BaseDictionary::dict() const

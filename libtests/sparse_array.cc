@@ -3,14 +3,13 @@
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObject_private.hh>
-#include <qpdf/QPDF_Array.hh>
 
 #include <iostream>
 
 int
 main()
 {
-    auto obj = QPDF_Array::create({}, true);
+    auto obj = QPDFObject::create<QPDF_Array>(std::vector<std::shared_ptr<QPDFObject>>(), true);
     auto a = qpdf::Array(obj);
 
     assert(a.size() == 0);
@@ -88,7 +87,8 @@ main()
     QPDF pdf;
     pdf.emptyPDF();
 
-    obj = QPDF_Array::create({10, "null"_qpdf.getObj()}, true);
+    obj = QPDFObject::create<QPDF_Array>(
+        std::vector<std::shared_ptr<QPDFObject>>{10, "null"_qpdf.getObj()}, true);
     auto b = qpdf::Array(obj);
     b.setAt(5, pdf.newIndirectNull());
     b.setAt(7, "[0 1 2 3]"_qpdf);

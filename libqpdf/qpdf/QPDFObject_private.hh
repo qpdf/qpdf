@@ -6,182 +6,508 @@
 
 #include <qpdf/Constants.h>
 #include <qpdf/JSON.hh>
+#include <qpdf/JSON_writer.hh>
 #include <qpdf/QPDF.hh>
-#include <qpdf/QPDFValue.hh>
+#include <qpdf/QPDFObjGen.hh>
 #include <qpdf/Types.h>
 
+#include <map>
+#include <memory>
 #include <string>
 #include <string_view>
+#include <variant>
+#include <vector>
 
-class QPDF;
+class QPDFObject;
 class QPDFObjectHandle;
+
+namespace qpdf
+{
+    class Array;
+    class BaseDictionary;
+    class Dictionary;
+    class Stream;
+} // namespace qpdf
+
+class QPDF_Array final
+{
+  private:
+    struct Sparse
+    {
+        int size{0};
+        std::map<int, std::shared_ptr<QPDFObject>> elements;
+    };
+
+  public:
+    QPDF_Array() = default;
+    QPDF_Array(QPDF_Array const& other) :
+        sp(other.sp ? std::make_unique<Sparse>(*other.sp) : nullptr)
+    {
+    }
+
+    QPDF_Array(QPDF_Array&&) = default;
+    QPDF_Array& operator=(QPDF_Array&&) = default;
+
+  private:
+    friend class QPDFObject;
+    friend class qpdf::Array;
+    QPDF_Array(std::vector<QPDFObjectHandle> const& items);
+    QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& items, bool sparse);
+
+    int
+    size() const
+    {
+        return sp ? sp->size : int(elements.size());
+    }
+    void setFromVector(std::vector<QPDFObjectHandle> const& items);
+    void checkOwnership(QPDFObjectHandle const& item) const;
+
+    std::unique_ptr<Sparse> sp;
+    std::vector<std::shared_ptr<QPDFObject>> elements;
+};
+
+class QPDF_Bool final
+{
+    friend class QPDFObject;
+    friend class QPDFObjectHandle;
+
+    explicit QPDF_Bool(bool val) :
+        val(val)
+    {
+    }
+    bool val;
+};
+
+class QPDF_Destroyed final
+{
+};
+
+class QPDF_Dictionary final
+{
+    friend class QPDFObject;
+    friend class qpdf::BaseDictionary;
+
+    QPDF_Dictionary(std::map<std::string, QPDFObjectHandle> const& items) :
+        items(items)
+    {
+    }
+    inline QPDF_Dictionary(std::map<std::string, QPDFObjectHandle>&& items);
+
+    std::map<std::string, QPDFObjectHandle> items;
+};
+
+class QPDF_InlineImage final
+{
+    friend class QPDFObject;
+
+    explicit QPDF_InlineImage(std::string val) :
+        val(std::move(val))
+    {
+    }
+    std::string val;
+};
+
+class QPDF_Integer final
+{
+    friend class QPDFObject;
+    friend class QPDFObjectHandle;
+
+    QPDF_Integer(long long val) :
+        val(val)
+    {
+    }
+    long long val;
+};
+
+class QPDF_Name final
+{
+    friend class QPDFObject;
+
+    explicit QPDF_Name(std::string name) :
+        name(std::move(name))
+    {
+    }
+    std::string name;
+};
+
+class QPDF_Null final
+{
+    friend class QPDFObject;
+
+  public:
+    static inline std::shared_ptr<QPDFObject> create(
+        std::shared_ptr<QPDFObject> parent,
+        std::string_view const& static_descr,
+        std::string var_descr);
+};
+
+class QPDF_Operator final
+{
+    friend class QPDFObject;
+
+    QPDF_Operator(std::string val) :
+        val(std::move(val))
+    {
+    }
+
+    std::string val;
+};
+
+class QPDF_Real final
+{
+    friend class QPDFObject;
+
+    QPDF_Real(std::string val) :
+        val(std::move(val))
+    {
+    }
+    inline QPDF_Real(double value, int decimal_places, bool trim_trailing_zeroes);
+    // Store reals as strings to avoid roundoff errors.
+    std::string val;
+};
+
+class QPDF_Reference
+{
+    // This is a minimal implementation to support QPDF::replaceObject. Once we support parsing of
+    // objects that are an indirect reference we will need to support multiple levels of
+    // indirection, including the possibility of circular references.
+    friend class QPDFObject;
+
+    QPDF_Reference(std::shared_ptr<QPDFObject> obj) :
+        obj(std::move(obj))
+    {
+    }
+
+    std::shared_ptr<QPDFObject> obj;
+};
+
+class QPDF_Reserved final
+{
+};
+
+class QPDF_Stream final
+{
+    class Members
+    {
+        friend class QPDF_Stream;
+        friend class QPDFObject;
+        friend class qpdf::Stream;
+
+      public:
+        Members(QPDFObjectHandle stream_dict, size_t length) :
+            stream_dict(std::move(stream_dict)),
+            length(length)
+        {
+        }
+
+      private:
+        void replaceFilterData(
+            QPDFObjectHandle const& filter, QPDFObjectHandle const& decode_parms, size_t length);
+
+        bool filter_on_write{true};
+        QPDFObjectHandle stream_dict;
+        size_t length{0};
+        std::shared_ptr<Buffer> stream_data;
+        std::shared_ptr<QPDFObjectHandle::StreamDataProvider> stream_provider;
+        std::vector<std::shared_ptr<QPDFObjectHandle::TokenFilter>> token_filters;
+    };
+
+    friend class QPDFObject;
+    friend class qpdf::Stream;
+
+    QPDF_Stream(QPDFObjectHandle stream_dict, size_t length) :
+        m(std::make_unique<Members>(stream_dict, length))
+    {
+        if (!stream_dict.isDictionary()) {
+            throw std::logic_error(
+                "stream object instantiated with non-dictionary object for dictionary");
+        }
+    }
+
+    std::unique_ptr<Members> m;
+};
+
+// QPDF_Strings may included embedded null characters.
+class QPDF_String final
+{
+    friend class QPDFObject;
+    friend class QPDFWriter;
+
+  public:
+    static std::shared_ptr<QPDFObject> create_utf16(std::string const& utf8_val);
+    std::string unparse(bool force_binary = false);
+    void writeJSON(int json_version, JSON::Writer& p);
+    std::string getUTF8Val() const;
+
+  private:
+    QPDF_String(std::string val) :
+        val(std::move(val))
+    {
+    }
+    bool useHexString() const;
+    std::string val;
+};
+
+class QPDF_Unresolved final
+{
+};
 
 class QPDFObject
 {
-    friend class QPDFValue;
-
   public:
-    QPDFObject() = default;
+    template <typename T>
+    QPDFObject(T&& value) :
+        value(std::forward<T>(value))
+    {
+    }
 
-    std::shared_ptr<QPDFObject>
-    copy(bool shallow = false)
+    template <typename T>
+    QPDFObject(QPDF* qpdf, QPDFObjGen og, T&& value) :
+        value(std::forward<T>(value)),
+        qpdf(qpdf),
+        og(og)
     {
-        return value->copy(shallow);
     }
-    std::string
-    unparse()
+
+    template <typename T, typename... Args>
+    inline static std::shared_ptr<QPDFObject> create(Args&&... args);
+
+    template <typename T, typename... Args>
+    inline static std::shared_ptr<QPDFObject>
+    create(QPDF* qpdf, QPDFObjGen og, Args&&... args)
     {
-        return value->unparse();
+        return std::make_shared<QPDFObject>(
+            qpdf, og, std::forward<T>(T(std::forward<Args>(args)...)));
     }
-    void
-    writeJSON(int json_version, JSON::Writer& p)
-    {
-        return value->writeJSON(json_version, p);
-    }
-    std::string
-    getStringValue() const
-    {
-        return value->getStringValue();
-    }
+
+    std::shared_ptr<QPDFObject> copy(bool shallow = false);
+    std::string unparse();
+    void write_json(int json_version, JSON::Writer& p);
+    void disconnect();
+    std::string getStringValue() const;
+
     // Return a unique type code for the resolved object
     qpdf_object_type_e
     getResolvedTypeCode() const
     {
-        auto tc = value->type_code;
-        return tc == ::ot_unresolved
-            ? QPDF::Resolver::resolved(value->qpdf, value->og)->value->type_code
-            : tc;
+        if (getTypeCode() == ::ot_unresolved) {
+            return QPDF::Resolver::resolved(qpdf, og)->getTypeCode();
+        }
+        if (getTypeCode() == ::ot_reference) {
+            return std::get<QPDF_Reference>(value).obj->getResolvedTypeCode();
+        }
+        return getTypeCode();
     }
     // Return a unique type code for the object
     qpdf_object_type_e
-    getTypeCode() const noexcept
+    getTypeCode() const
     {
-        return value->type_code;
+        return static_cast<qpdf_object_type_e>(value.index());
     }
 
     QPDF*
     getQPDF() const
     {
-        return value->qpdf;
+        return qpdf;
     }
     QPDFObjGen
     getObjGen() const
     {
-        return value->og;
+        return og;
     }
     void
-    setDescription(
-        QPDF* qpdf, std::shared_ptr<QPDFValue::Description>& description, qpdf_offset_t offset = -1)
+    assign_null()
     {
-        return value->setDescription(qpdf, description, offset);
+        value = QPDF_Null();
+        qpdf = nullptr;
+        og = QPDFObjGen();
+        object_description = nullptr;
+        parsed_offset = -1;
     }
     void
-    setChildDescription(
-        std::shared_ptr<QPDFObject> parent,
-        std::string_view const& static_descr,
-        std::string var_descr)
+    move_to(std::shared_ptr<QPDFObject>& o, bool destroy)
     {
-        auto qpdf = parent ? parent->value->qpdf : nullptr;
-        value->setChildDescription(qpdf, parent->value, static_descr, var_descr);
-    }
-    void
-    setChildDescription(
-        std::shared_ptr<QPDFValue> parent,
-        std::string_view const& static_descr,
-        std::string var_descr)
-    {
-        auto qpdf = parent ? parent->qpdf : nullptr;
-        value->setChildDescription(qpdf, parent, static_descr, var_descr);
-    }
-    bool
-    getDescription(QPDF*& qpdf, std::string& description)
-    {
-        qpdf = value->qpdf;
-        description = value->getDescription();
-        return qpdf != nullptr;
-    }
-    bool
-    hasDescription()
-    {
-        return value->hasDescription();
-    }
-    void
-    setParsedOffset(qpdf_offset_t offset)
-    {
-        value->setParsedOffset(offset);
-    }
-    qpdf_offset_t
-    getParsedOffset()
-    {
-        return value->getParsedOffset();
-    }
-    void
-    assign(std::shared_ptr<QPDFObject> o)
-    {
-        value = o->value;
+        o->value = std::move(value);
+        o->qpdf = qpdf;
+        o->og = og;
+        o->object_description = object_description;
+        o->parsed_offset = parsed_offset;
+        if (!destroy) {
+            value = QPDF_Reference(o);
+        }
     }
     void
     swapWith(std::shared_ptr<QPDFObject> o)
     {
-        auto v = value;
-        value = o->value;
-        o->value = v;
-        auto og = value->og;
-        value->og = o->value->og;
-        o->value->og = og;
+        std::swap(value, o->value);
+        std::swap(qpdf, o->qpdf);
+        std::swap(object_description, o->object_description);
+        std::swap(parsed_offset, o->parsed_offset);
     }
 
     void
-    setDefaultDescription(QPDF* qpdf, QPDFObjGen og)
+    setObjGen(QPDF* a_qpdf, QPDFObjGen a_og)
     {
-        // Intended for use by the QPDF class
-        value->setDefaultDescription(qpdf, og);
-    }
-    void
-    setObjGen(QPDF* qpdf, QPDFObjGen og)
-    {
-        value->qpdf = qpdf;
-        value->og = og;
-    }
-    void
-    disconnect()
-    {
-        // Disconnect an object from its owning QPDF. This is called by QPDF's destructor.
-        value->disconnect();
-        value->qpdf = nullptr;
-        value->og = QPDFObjGen();
+        qpdf = a_qpdf;
+        og = a_og;
     }
     // Mark an object as destroyed. Used by QPDF's destructor for its indirect objects.
-    void destroy();
+    void
+    destroy()
+    {
+        value = QPDF_Destroyed();
+    }
 
     bool
     isUnresolved() const
     {
-        return value->type_code == ::ot_unresolved;
+        return getTypeCode() == ::ot_unresolved;
     }
     const QPDFObject*
     resolved_object() const
     {
-        return isUnresolved() ? QPDF::Resolver::resolved(value->qpdf, value->og) : this;
+        return isUnresolved() ? QPDF::Resolver::resolved(qpdf, og) : this;
+    }
+
+    struct JSON_Descr
+    {
+        JSON_Descr(std::shared_ptr<std::string> input, std::string const& object) :
+            input(input),
+            object(object)
+        {
+        }
+
+        std::shared_ptr<std::string> input;
+        std::string object;
+    };
+
+    struct ChildDescr
+    {
+        ChildDescr(
+            std::shared_ptr<QPDFObject> parent,
+            std::string_view const& static_descr,
+            std::string var_descr) :
+            parent(parent),
+            static_descr(static_descr),
+            var_descr(var_descr)
+        {
+        }
+
+        std::weak_ptr<QPDFObject> parent;
+        std::string_view const& static_descr;
+        std::string var_descr;
+    };
+
+    using Description = std::variant<std::string, JSON_Descr, ChildDescr>;
+
+    void
+    setDescription(
+        QPDF* qpdf_p, std::shared_ptr<Description>& description, qpdf_offset_t offset = -1)
+    {
+        qpdf = qpdf_p;
+        object_description = description;
+        setParsedOffset(offset);
+    }
+    void
+    setDefaultDescription(QPDF* a_qpdf, QPDFObjGen const& a_og)
+    {
+        qpdf = a_qpdf;
+        og = a_og;
+    }
+    void
+    setChildDescription(
+        QPDF* a_qpdf,
+        std::shared_ptr<QPDFObject> parent,
+        std::string_view const& static_descr,
+        std::string var_descr)
+    {
+        object_description =
+            std::make_shared<Description>(ChildDescr(parent, static_descr, var_descr));
+        qpdf = a_qpdf;
+    }
+    std::string getDescription();
+    bool
+    hasDescription()
+    {
+        return object_description || og.isIndirect();
+    }
+    void
+    setParsedOffset(qpdf_offset_t offset)
+    {
+        if (parsed_offset < 0) {
+            parsed_offset = offset;
+        }
+    }
+    bool
+    getDescription(QPDF*& a_qpdf, std::string& description)
+    {
+        a_qpdf = qpdf;
+        description = getDescription();
+        return qpdf != nullptr;
+    }
+    qpdf_offset_t
+    getParsedOffset()
+    {
+        return parsed_offset;
+    }
+    QPDF*
+    getQPDF()
+    {
+        return qpdf;
+    }
+    QPDFObjGen
+    getObjGen()
+    {
+        return og;
     }
 
     template <typename T>
     T*
-    as() const
+    as()
     {
-        if (auto result = dynamic_cast<T*>(value.get())) {
-            return result;
-        } else {
-            return isUnresolved()
-                ? dynamic_cast<T*>(QPDF::Resolver::resolved(value->qpdf, value->og)->value.get())
-                : nullptr;
+        if (std::holds_alternative<T>(value)) {
+            return &std::get<T>(value);
         }
+        if (std::holds_alternative<QPDF_Unresolved>(value)) {
+            return QPDF::Resolver::resolved(qpdf, og)->as<T>();
+        }
+        if (std::holds_alternative<QPDF_Reference>(value)) {
+            // see comment in QPDF_Reference.
+            return std::get<QPDF_Reference>(value).obj->as<T>();
+        }
+        return nullptr;
     }
 
   private:
+    friend class QPDF_Stream;
+    typedef std::variant<
+        std::monostate,
+        QPDF_Reserved,
+        QPDF_Null,
+        QPDF_Bool,
+        QPDF_Integer,
+        QPDF_Real,
+        QPDF_String,
+        QPDF_Name,
+        QPDF_Array,
+        QPDF_Dictionary,
+        QPDF_Stream,
+        QPDF_Operator,
+        QPDF_InlineImage,
+        QPDF_Unresolved,
+        QPDF_Destroyed,
+        QPDF_Reference>
+        Value;
+    Value value;
+
     QPDFObject(QPDFObject const&) = delete;
     QPDFObject& operator=(QPDFObject const&) = delete;
-    std::shared_ptr<QPDFValue> value;
+
+    std::shared_ptr<Description> object_description;
+
+    QPDF* qpdf{nullptr};
+    QPDFObjGen og{};
+    qpdf_offset_t parsed_offset{-1};
 };
 
 #endif // QPDFOBJECT_HH

@@ -1,9 +1,5 @@
-#include <qpdf/QPDF_Array.hh>
-
-#include <qpdf/JSON_writer.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
-#include <qpdf/QPDFObject_private.hh>
-#include <qpdf/QPDF_Null.hh>
+
 #include <qpdf/QTC.hh>
 
 using namespace std::literals;
@@ -40,25 +36,12 @@ Array::checkOwnership(QPDFObjectHandle const& item) const
     }
 }
 
-QPDF_Array::QPDF_Array() :
-    QPDFValue(::ot_array)
-{
-}
-
-QPDF_Array::QPDF_Array(QPDF_Array const& other) :
-    QPDFValue(::ot_array),
-    sp(other.sp ? std::make_unique<Sparse>(*other.sp) : nullptr)
-{
-}
-
-QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v) :
-    QPDFValue(::ot_array)
+QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v)
 {
     setFromVector(v);
 }
 
-QPDF_Array::QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& v, bool sparse) :
-    QPDFValue(::ot_array)
+QPDF_Array::QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& v, bool sparse)
 {
     if (sparse) {
         sp = std::make_unique<Sparse>();
@@ -71,132 +54,6 @@ QPDF_Array::QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& v, bool sparse
     } else {
         elements = std::move(v);
     }
-}
-
-std::shared_ptr<QPDFObject>
-QPDF_Array::create(std::vector<QPDFObjectHandle> const& items)
-{
-    return do_create(new QPDF_Array(items));
-}
-
-std::shared_ptr<QPDFObject>
-QPDF_Array::create(std::vector<std::shared_ptr<QPDFObject>>&& items, bool sparse)
-{
-    return do_create(new QPDF_Array(std::move(items), sparse));
-}
-
-std::shared_ptr<QPDFObject>
-QPDF_Array::copy(bool shallow)
-{
-    if (shallow) {
-        return do_create(new QPDF_Array(*this));
-    } else {
-        QTC::TC("qpdf", "QPDF_Array copy", sp ? 0 : 1);
-        if (sp) {
-            auto* result = new QPDF_Array();
-            result->sp = std::make_unique<Sparse>();
-            result->sp->size = sp->size;
-            for (auto const& element: sp->elements) {
-                auto const& obj = element.second;
-                result->sp->elements[element.first] =
-                    obj->getObjGen().isIndirect() ? obj : obj->copy();
-            }
-            return do_create(result);
-        } else {
-            std::vector<std::shared_ptr<QPDFObject>> result;
-            result.reserve(elements.size());
-            for (auto const& element: elements) {
-                result.push_back(
-                    element ? (element->getObjGen().isIndirect() ? element : element->copy())
-                            : element);
-            }
-            return create(std::move(result), false);
-        }
-    }
-}
-
-void
-QPDF_Array::disconnect()
-{
-    if (sp) {
-        for (auto& item: sp->elements) {
-            auto& obj = item.second;
-            if (!obj->getObjGen().isIndirect()) {
-                obj->disconnect();
-            }
-        }
-    } else {
-        for (auto& obj: elements) {
-            if (!obj->getObjGen().isIndirect()) {
-                obj->disconnect();
-            }
-        }
-    }
-}
-
-std::string
-QPDF_Array::unparse()
-{
-    std::string result = "[ ";
-    if (sp) {
-        int next = 0;
-        for (auto& item: sp->elements) {
-            int key = item.first;
-            for (int j = next; j < key; ++j) {
-                result += "null ";
-            }
-            auto og = item.second->resolved_object()->getObjGen();
-            result += og.isIndirect() ? og.unparse(' ') + " R " : item.second->unparse() + " ";
-            next = ++key;
-        }
-        for (int j = next; j < sp->size; ++j) {
-            result += "null ";
-        }
-    } else {
-        for (auto const& item: elements) {
-            auto og = item->resolved_object()->getObjGen();
-            result += og.isIndirect() ? og.unparse(' ') + " R " : item->unparse() + " ";
-        }
-    }
-    result += "]";
-    return result;
-}
-
-void
-QPDF_Array::writeJSON(int json_version, JSON::Writer& p)
-{
-    p.writeStart('[');
-    if (sp) {
-        int next = 0;
-        for (auto& item: sp->elements) {
-            int key = item.first;
-            for (int j = next; j < key; ++j) {
-                p.writeNext() << "null";
-            }
-            p.writeNext();
-            auto og = item.second->getObjGen();
-            if (og.isIndirect()) {
-                p << "\"" << og.unparse(' ') << " R\"";
-            } else {
-                item.second->writeJSON(json_version, p);
-            }
-            next = ++key;
-        }
-        for (int j = next; j < sp->size; ++j) {
-            p.writeNext() << "null";
-        }
-    } else {
-        for (auto const& item: elements) {
-            p.writeNext();
-            auto og = item->getObjGen();
-            if (og.isIndirect()) {
-                p << "\"" << og.unparse(' ') << " R\"";
-            } else {
-                item->writeJSON(json_version, p);
-            }
-        }
-    }
-    p.writeEnd(']');
 }
 
 QPDF_Array*

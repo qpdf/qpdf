@@ -5,9 +5,8 @@
 #include <qpdf/QPDF.hh>
 
 #include <qpdf/QPDFExc.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFWriter_private.hh>
-#include <qpdf/QPDF_Array.hh>
-#include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QTC.hh>
 
 QPDF::ObjUser::ObjUser() :
