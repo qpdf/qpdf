@@ -47,7 +47,7 @@ QPDFWordTokenFinder::check()
     // Find a word token matching the given string, preceded by a delimiter, and followed by a
     // delimiter or EOF.
     QPDFTokenizer tokenizer;
-    QPDFTokenizer::Token t = tokenizer.readToken(is, "finder", true);
+    QPDFTokenizer::Token t = tokenizer.readToken(is, "finder", true, str.size() + 2);
     qpdf_offset_t pos = is.tell();
     if (!(t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, str))) {
         QTC::TC("qpdf", "QPDFTokenizer finder found wrong word");
