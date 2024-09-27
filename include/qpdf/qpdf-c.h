@@ -927,10 +927,11 @@ extern "C" {
     QPDF_ERROR_CODE qpdf_oh_get_page_content_data(
         qpdf_data qpdf, qpdf_oh page_oh, unsigned char** bufp, size_t* len);
 
-    /* Call free to release the buffer allocated with malloc. This function can be used to free 
-     * buffers that were dynamically allocated by qpdf functions such as qpdf_oh_get_stream_data
-     * or qpdf_oh_get_page_content_data. The caller is responsible for calling qpdf_oh_free_buffer
-     * to manage memory properly and avoid memory leaks.
+    /* Call free to release a buffer allocated with malloc. This function can be used to free
+     * buffers that were dynamically allocated by qpdf functions such as qpdf_oh_get_stream_data or
+     * qpdf_oh_get_page_content_data. The caller is responsible for calling qpdf_oh_free_buffer (or
+     * calling free directly) to manage memory properly and avoid memory leaks. This function has no
+     * equivalent in the C++ API.
      */
     QPDF_DLL
     void qpdf_oh_free_buffer(unsigned char** bufp);
