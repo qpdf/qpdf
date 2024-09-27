@@ -130,6 +130,8 @@ options:
       - qdf
       - raw-stream-data
       - recompress-flate
+      - remove-info
+      - remove-metadata
       - remove-page-labels
       - replace-input
       - report-memory-usage
@@ -440,6 +442,8 @@ json:
     - Pages.file:
       Pages.password:
       range:
+  remove-info:
+  remove-metadata:
   remove-page-labels:
   report-memory-usage:
   rotate:

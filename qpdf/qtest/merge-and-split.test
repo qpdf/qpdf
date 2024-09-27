@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('merge-and-split');
 
-my $n_tests = 28;
+my $n_tests = 34;
 
 # Select pages from the same file multiple times including selecting
 # twice from an encrypted file and specifying the password only the
@@ -102,6 +102,39 @@ $td->runtest("remove labels",
 $td->runtest("check output",
              {$td->COMMAND => "qpdf-test-compare a.pdf remove-labels.pdf"},
              {$td->FILE => "remove-labels.pdf", $td->EXIT_STATUS => 0});
+
+$td->runtest("remove metadata",
+             {$td->COMMAND =>
+                  "qpdf metadata-crypt-filter.pdf a.pdf" .
+                  " --remove-metadata" .
+                  " --decrypt" .
+                  " --static-id"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "remove-metadata.pdf"});
+
+$td->runtest("remove info (with moddate)",
+             {$td->COMMAND =>
+                  "qpdf remove-metadata.pdf a.pdf" .
+                  " --remove-info" .
+                  " --decrypt" .
+                  " --static-id"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "remove-info.pdf"});
+
+$td->runtest("remove info (without moddate)",
+             {$td->COMMAND =>
+                  "qpdf remove-metadata-no-moddate.pdf a.pdf" .
+                  " --remove-info" .
+                  " --decrypt" .
+                  " --static-id"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "remove-info-no-moddate.pdf"});
 
 $td->runtest("split with shared resources",
              {$td->COMMAND =>

@@ -511,6 +511,20 @@ QPDFJob::Config::removeAttachment(std::string const& parameter)
 }
 
 QPDFJob::Config*
+QPDFJob::Config::removeInfo()
+{
+    o.m->remove_info = true;
+    return this;
+}
+
+QPDFJob::Config*
+QPDFJob::Config::removeMetadata()
+{
+    o.m->remove_metadata = true;
+    return this;
+}
+
+QPDFJob::Config*
 QPDFJob::Config::removePageLabels()
 {
     o.m->remove_page_labels = true;

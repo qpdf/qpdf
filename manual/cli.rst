@@ -1773,6 +1773,27 @@ Related Options
    Prevent inline images from being included in image optimization
    done by :qpdf:ref:`--optimize-images`.
 
+.. qpdf:option:: --remove-info
+
+   .. help: remove file information
+
+      Exclude file information (except modification date) from the output file.
+
+   Exclude file information (except modification date) from the output file by
+   omitting all entries (except ``/ModDate``) from the ``/Info`` dictionary in
+   the document trailer.
+   See also :qpdf:ref:`--remove-metadata`.
+
+.. qpdf:option:: --remove-metadata
+
+   .. help: remove metadata
+
+      Exclude metadata from the output file.
+
+   Exclude metadata from the output file by omitting the ``/Metadata``
+   dictionary in the document catalog.
+   See also :qpdf:ref:`--remove-info`.
+
 .. qpdf:option:: --remove-page-labels
 
    .. help: remove explicit page numbers
