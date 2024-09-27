@@ -32,6 +32,8 @@ QPDF_DLL Config* progress();
 QPDF_DLL Config* qdf();
 QPDF_DLL Config* rawStreamData();
 QPDF_DLL Config* recompressFlate();
+QPDF_DLL Config* removeInfo();
+QPDF_DLL Config* removeMetadata();
 QPDF_DLL Config* removePageLabels();
 QPDF_DLL Config* reportMemoryUsage();
 QPDF_DLL Config* requiresPassword();

@@ -68,6 +68,8 @@ this->ap.addBare("progress", [this](){c_main->progress();});
 this->ap.addBare("qdf", [this](){c_main->qdf();});
 this->ap.addBare("raw-stream-data", [this](){c_main->rawStreamData();});
 this->ap.addBare("recompress-flate", [this](){c_main->recompressFlate();});
+this->ap.addBare("remove-info", [this](){c_main->removeInfo();});
+this->ap.addBare("remove-metadata", [this](){c_main->removeMetadata();});
 this->ap.addBare("remove-page-labels", [this](){c_main->removePageLabels();});
 this->ap.addBare("replace-input", b(&ArgParser::argReplaceInput));
 this->ap.addBare("report-memory-usage", [this](){c_main->reportMemoryUsage();});

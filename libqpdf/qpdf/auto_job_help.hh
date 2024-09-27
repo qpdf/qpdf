@@ -414,6 +414,13 @@ Don't optimize images whose area in pixels is below the specified value.
 )");
 ap.addOptionHelp("--keep-inline-images", "modification", "exclude inline images from optimization", R"(Prevent inline images from being considered by --optimize-images.
 )");
+ap.addOptionHelp("--remove-info", "modification", "remove file information", R"(Exclude file information (except modification date) from the output file.
+)");
+ap.addOptionHelp("--remove-metadata", "modification", "remove metadata", R"(Exclude metadata from the output file.
+)");
+}
+static void add_help_5(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--remove-page-labels", "modification", "remove explicit page numbers", R"(Exclude page labels (explicit page numbers) from the output file.
 )");
 ap.addOptionHelp("--set-page-labels", "modification", "number pages for the entire document", R"(--set-page-labels label-spec ... --
@@ -460,9 +467,6 @@ iv, then the remaining pages with Arabic numerals starting with
 1 and continuing sequentially until the end of the document. For
 additional examples, please consult the manual.
 )");
-}
-static void add_help_5(QPDFArgParser& ap)
-{
 ap.addHelpTopic("encryption", "create encrypted files", R"(Create encrypted files. Usage:
 
 --encrypt \
@@ -641,6 +645,9 @@ ap.addOptionHelp("--force-R5", "encryption", "use unsupported R=5 encryption", R
 algorithm that existed only in Acrobat version IX. This option
 should not be used except for compatibility testing.
 )");
+}
+static void add_help_6(QPDFArgParser& ap)
+{
 ap.addHelpTopic("page-selection", "select pages from one or more files", R"(Use the --pages option to select pages from multiple files. Usage:
 
 qpdf in.pdf --pages --file=input-file \
@@ -725,9 +732,6 @@ appearance: first underlays, then the original page, then overlays.
 
 Run qpdf --help=page-ranges for help with page ranges.
 )");
-}
-static void add_help_6(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--to", "overlay-underlay", "destination pages for underlay/overlay", R"(--to=page-range
 
 Specify the range of pages in the primary output to apply
@@ -829,6 +833,9 @@ its terminating "--".
 To copy attachments from a password-protected file, use
 the --password option after the file name.
 )");
+}
+static void add_help_7(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--prefix", "copy-attachments", "key prefix for copying attachments", R"(--prefix=prefix
 
 Prepend a prefix to each key; may be needed if there are
@@ -839,9 +846,6 @@ ap.addHelpTopic("inspection", "inspect PDF files", R"(These options provide tool
 the options in this section are specified, no output file may be
 given.
 )");
-}
-static void add_help_7(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--is-encrypted", "inspection", "silently test whether a file is encrypted", R"(Silently exit with a code indicating the file's encryption status:
 
 0: the file is encrypted
@@ -919,6 +923,9 @@ output as binary data. Get the key with --list-attachments.
 ap.addHelpTopic("json", "JSON output for PDF information", R"(Show information about the PDF file in JSON format. Please see the
 JSON chapter in the qpdf manual for details.
 )");
+}
+static void add_help_8(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--json", "json", "show file in JSON format", R"(--json[=version]
 
 Generate a JSON representation of the file. This is described in
@@ -932,9 +939,6 @@ Describe the format of the JSON output by writing to standard
 output a JSON object with the same keys and with values
 containing descriptive text.
 )");
-}
-static void add_help_8(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--json-key", "json", "limit which keys are in JSON output", R"(--json-key=key
 
 This option is repeatable. If given, only the specified
