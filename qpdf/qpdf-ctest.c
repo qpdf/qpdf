@@ -1152,6 +1152,7 @@ test38(char const* infile, char const* password, char const* outfile, char const
     assert(len == 53);
     assert(((int)buf[0] == 'x') && ((int)buf[1] == 0234));
     qpdf_oh_free_buffer(&buf);
+    assert(!buf);
 
     /* Test whether filterable */
     QPDF_BOOL filtered = QPDF_FALSE;
@@ -1169,7 +1170,7 @@ test38(char const* infile, char const* password, char const* outfile, char const
     assert(qpdf_oh_get_page_content_data(qpdf, page2, &buf2, &len) == 0);
     assert(len == 47);
     assert(memcmp(buf, buf2, len) == 0);
-    qpdf_oh_free_buffer(&buf);
+    free(buf);
     qpdf_oh_free_buffer(&buf2);
 
     /* errors */
