@@ -1295,6 +1295,9 @@ QPDF::Xref_table::process_stream(qpdf_offset_t xref_offset, QPDFObjectHandle& xr
 
     if (!trailer_) {
         trailer_ = dict;
+        if (size > toS(max_id_)) {
+            throw damaged("Cross-reference stream /Size entry is impossibly large");
+        }
         table.resize(size);
     }
 
