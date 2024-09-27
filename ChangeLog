@@ -1,3 +1,8 @@
+2024-09-20  Chao Li  <mslichao@outlook.com>
+
+	* Add C API qpdf_oh_free_buffer to release memory allocated by
+	stream data functions.
+
 2024-08-25  M Holger  <m.holger@qpdf.org>
 
 	* Add new command-line arguments --remove-metadata and --remove-info

@@ -1772,6 +1772,16 @@ qpdf_oh_get_page_content_data(qpdf_data qpdf, qpdf_oh page_oh, unsigned char** b
 }
 
 void
+qpdf_oh_free_buffer(unsigned char** bufp)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_free_buffer");
+    if (bufp && *bufp) {
+        free(*bufp);
+        *bufp = nullptr;
+    }
+}
+
+void
 qpdf_oh_replace_stream_data(
     qpdf_data qpdf,
     qpdf_oh stream_oh,

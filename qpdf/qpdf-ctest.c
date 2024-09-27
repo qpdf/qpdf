@@ -1151,7 +1151,7 @@ test38(char const* infile, char const* password, char const* outfile, char const
     assert(qpdf_oh_get_stream_data(qpdf, stream, qpdf_dl_none, 0, &buf, &len) == 0);
     assert(len == 53);
     assert(((int)buf[0] == 'x') && ((int)buf[1] == 0234));
-    free(buf);
+    qpdf_oh_free_buffer(&buf);
 
     /* Test whether filterable */
     QPDF_BOOL filtered = QPDF_FALSE;
@@ -1169,8 +1169,8 @@ test38(char const* infile, char const* password, char const* outfile, char const
     assert(qpdf_oh_get_page_content_data(qpdf, page2, &buf2, &len) == 0);
     assert(len == 47);
     assert(memcmp(buf, buf2, len) == 0);
-    free(buf);
-    free(buf2);
+    qpdf_oh_free_buffer(&buf);
+    qpdf_oh_free_buffer(&buf2);
 
     /* errors */
     printf("page content on broken page\n");
