@@ -1295,6 +1295,9 @@ QPDF::Xref_table::process_stream(qpdf_offset_t xref_offset, QPDFObjectHandle& xr
 
     if (!trailer_) {
         trailer_ = dict;
+        if (size > toS(max_id_)) {
+            throw damaged("Cross-reference stream /Size entry is impossibly large");
+        }
         table.resize(size);
     }
 
@@ -2061,6 +2064,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             (m->file->getName() + " object stream " + std::to_string(obj_stream_number)),
             bp.get()));
 
+    qpdf_offset_t last_offset = -1;
     for (int i = 0; i < n; ++i) {
         QPDFTokenizer::Token tnum = readToken(*input);
         QPDFTokenizer::Token toffset = readToken(*input);
@@ -2086,6 +2090,15 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
                 "object stream claims to contain itself"));
             continue;
         }
+        if (offset <= last_offset) {
+            throw damagedPDF(
+                *input,
+                m->last_object_description,
+                input->getLastOffset(),
+                "expected offsets in object stream to be increasing");
+        }
+        last_offset = offset;
+
         offsets[num] = toI(offset + first);
     }
 
