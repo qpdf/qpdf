@@ -25,12 +25,11 @@ to_i(int i)
 
 Pl_Base64::Pl_Base64(char const* identifier, Pipeline* next, action_e action) :
     Pipeline(identifier, next),
-    action(action),
-    pos(0),
-    end_of_data(false),
-    finished(false)
+    action(action)
 {
-    reset();
+    if (!next) {
+        throw std::logic_error("Attempt to create Pl_Base64 with nullptr as next");
+    }
 }
 
 void
@@ -125,7 +124,7 @@ Pl_Base64::flush_decode()
         to_uc(0xff & outval),
     };
 
-    getNext()->write(out, QIntC::to_size(3 - pad));
+    next()->write(out, QIntC::to_size(3 - pad));
 }
 
 void
@@ -158,7 +157,7 @@ Pl_Base64::flush_encode()
     for (size_t i = 0; i < 3 - this->pos; ++i) {
         out[3 - i] = '=';
     }
-    getNext()->write(out, 4);
+    next()->write(out, 4);
 }
 
 void
@@ -176,7 +175,7 @@ Pl_Base64::finish()
         flush();
     }
     this->finished = true;
-    getNext()->finish();
+    next()->finish();
 }
 
 void

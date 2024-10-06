@@ -6,13 +6,13 @@
 #include <qpdf/Buffer.hh>
 #include <vector>
 
-class Pl_LZWDecoder: public Pipeline
+class Pl_LZWDecoder final: public Pipeline
 {
   public:
     Pl_LZWDecoder(char const* identifier, Pipeline* next, bool early_code_change);
-    ~Pl_LZWDecoder() override = default;
-    void write(unsigned char const* buf, size_t len) override;
-    void finish() override;
+    ~Pl_LZWDecoder() final = default;
+    void write(unsigned char const* buf, size_t len) final;
+    void finish() final;
 
   private:
     void sendNextCode();
@@ -21,18 +21,18 @@ class Pl_LZWDecoder: public Pipeline
     void addToTable(unsigned char next);
 
     // members used for converting bits to codes
-    unsigned char buf[3];
-    unsigned int code_size;
-    unsigned int next;
-    unsigned int byte_pos;
-    unsigned int bit_pos; // left to right: 01234567
-    unsigned int bits_available;
+    unsigned char buf[3]{0, 0, 0};
+    unsigned int code_size{9};
+    unsigned int next_char_{0};
+    unsigned int byte_pos{0};
+    unsigned int bit_pos{0}; // left to right: 01234567
+    unsigned int bits_available{0};
 
     // members used for handle LZW decompression
-    bool code_change_delta;
-    bool eod;
+    bool code_change_delta{false};
+    bool eod{false};
     std::vector<Buffer> table;
-    unsigned int last_code;
+    unsigned int last_code{256};
 };
 
 #endif // PL_LZWDECODER_HH

@@ -5,18 +5,18 @@
 
 Pipeline::Pipeline(char const* identifier, Pipeline* next) :
     identifier(identifier),
-    next(next)
+    next_(next)
 {
 }
 
 Pipeline*
 Pipeline::getNext(bool allow_null)
 {
-    if ((this->next == nullptr) && (!allow_null)) {
+    if (!next_ && !allow_null) {
         throw std::logic_error(
             this->identifier + ": Pipeline::getNext() called on pipeline with no next");
     }
-    return this->next;
+    return next_;
 }
 
 std::string

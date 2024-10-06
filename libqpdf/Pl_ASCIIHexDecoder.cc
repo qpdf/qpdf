@@ -5,13 +5,11 @@
 #include <stdexcept>
 
 Pl_ASCIIHexDecoder::Pl_ASCIIHexDecoder(char const* identifier, Pipeline* next) :
-    Pipeline(identifier, next),
-    pos(0),
-    eod(false)
+    Pipeline(identifier, next)
 {
-    this->inbuf[0] = '0';
-    this->inbuf[1] = '0';
-    this->inbuf[2] = '\0';
+    if (!next) {
+        throw std::logic_error("Attempt to create Pl_ASCIIHexDecoder with nullptr as next");
+    }
 }
 
 void
@@ -85,12 +83,12 @@ Pl_ASCIIHexDecoder::flush()
     this->inbuf[1] = '0';
     this->inbuf[2] = '\0';
 
-    getNext()->write(&ch, 1);
+    next()->write(&ch, 1);
 }
 
 void
 Pl_ASCIIHexDecoder::finish()
 {
     flush();
-    getNext()->finish();
+    next()->finish();
 }

@@ -2,9 +2,7 @@
 
 #include <qpdf/QIntC.hh>
 
-Pl_Count::Members::Members() :
-    count(0),
-    last_char('\0')
+Pl_Count::Members::Members()
 {
 }
 
@@ -12,6 +10,9 @@ Pl_Count::Pl_Count(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
     m(new Members())
 {
+    if (!next) {
+        throw std::logic_error("Attempt to create Pl_Count with nullptr as next");
+    }
 }
 
 Pl_Count::~Pl_Count() // NOLINT (modernize-use-equals-default)
@@ -25,14 +26,14 @@ Pl_Count::write(unsigned char const* buf, size_t len)
     if (len) {
         m->count += QIntC::to_offset(len);
         m->last_char = buf[len - 1];
-        getNext()->write(buf, len);
+        next()->write(buf, len);
     }
 }
 
 void
 Pl_Count::finish()
 {
-    getNext()->finish();
+    next()->finish();
 }
 
 qpdf_offset_t

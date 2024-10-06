@@ -12,6 +12,9 @@ Pl_RC4::Pl_RC4(
     out_bufsize(out_bufsize),
     rc4(key_data, key_len)
 {
+    if (!next) {
+        throw std::logic_error("Attempt to create Pl_RC4 with nullptr as next");
+    }
     this->outbuf = QUtil::make_shared_array<unsigned char>(out_bufsize);
 }
 
@@ -31,13 +34,13 @@ Pl_RC4::write(unsigned char const* data, size_t len)
         // lgtm[cpp/weak-cryptographic-algorithm]
         rc4.process(p, bytes, outbuf.get());
         p += bytes;
-        getNext()->write(outbuf.get(), bytes);
+        next()->write(outbuf.get(), bytes);
     }
 }
 
 void
 Pl_RC4::finish()
 {
-    this->outbuf = nullptr;
-    this->getNext()->finish();
+    outbuf = nullptr;
+    next()->finish();
 }

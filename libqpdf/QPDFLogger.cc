@@ -14,19 +14,22 @@ namespace
         Pl_Track(char const* identifier, Pipeline* next) :
             Pipeline(identifier, next)
         {
+            if (!next) {
+                throw std::logic_error("Attempt to create Pl_Track with nullptr as next");
+            }
         }
 
         void
-        write(unsigned char const* data, size_t len) override
+        write(unsigned char const* data, size_t len) final
         {
-            this->used = true;
-            getNext()->write(data, len);
+            used = true;
+            next()->write(data, len);
         }
 
         void
-        finish() override
+        finish() final
         {
-            getNext()->finish();
+            next()->finish();
         }
 
         bool

@@ -98,13 +98,19 @@ class QPDF_DLL_CLASS Pipeline
   protected:
     QPDF_DLL
     Pipeline* getNext(bool allow_null = false);
+    QPDF_DLL
+    Pipeline*
+    next() const noexcept
+    {
+        return next_;
+    }
     std::string identifier;
 
   private:
     Pipeline(Pipeline const&) = delete;
     Pipeline& operator=(Pipeline const&) = delete;
 
-    Pipeline* next;
+    Pipeline* next_;
 };
 
 #endif // PIPELINE_HH

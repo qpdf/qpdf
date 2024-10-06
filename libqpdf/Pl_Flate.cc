@@ -61,6 +61,9 @@ Pl_Flate::Pl_Flate(
     Pipeline(identifier, next),
     m(new Members(QIntC::to_size(out_bufsize_int), action))
 {
+    if (!next) {
+        throw std::logic_error("Attempt to create Pl_Flate with nullptr as next");
+    }
 }
 
 Pl_Flate::~Pl_Flate() // NOLINT (modernize-use-equals-default)
@@ -187,7 +190,7 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
                             throw std::runtime_error("PL_Flate memory limit exceeded");
                         }
                     }
-                    this->getNext()->write(m->outbuf.get(), ready);
+                    next()->write(m->outbuf.get(), ready);
                     zstream.next_out = m->outbuf.get();
                     zstream.avail_out = QIntC::to_uint(m->out_bufsize);
                 }
@@ -228,13 +231,13 @@ Pl_Flate::finish()
         }
     } catch (std::exception& e) {
         try {
-            this->getNext()->finish();
+            next()->finish();
         } catch (...) {
             // ignore secondary exception
         }
         throw std::runtime_error(e.what());
     }
-    this->getNext()->finish();
+    next()->finish();
 }
 
 void

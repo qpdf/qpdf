@@ -31,16 +31,16 @@ Pl_SHA2::write(unsigned char const* buf, size_t len)
         data += bytes;
     }
 
-    if (this->getNext(true)) {
-        this->getNext()->write(buf, len);
+    if (next()) {
+        next()->write(buf, len);
     }
 }
 
 void
 Pl_SHA2::finish()
 {
-    if (this->getNext(true)) {
-        this->getNext()->finish();
+    if (next()) {
+        next()->finish();
     }
     this->crypto->SHA2_finalize();
     this->in_progress = false;

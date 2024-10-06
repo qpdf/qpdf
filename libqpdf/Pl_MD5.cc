@@ -3,11 +3,11 @@
 #include <stdexcept>
 
 Pl_MD5::Pl_MD5(char const* identifier, Pipeline* next) :
-    Pipeline(identifier, next),
-    in_progress(false),
-    enabled(true),
-    persist_across_finish(false)
+    Pipeline(identifier, next)
 {
+    if (!next) {
+        throw std::logic_error("Attempt to create Pl_MD5 with nullptr as next");
+    }
 }
 
 void
@@ -31,13 +31,13 @@ Pl_MD5::write(unsigned char const* buf, size_t len)
         }
     }
 
-    this->getNext()->write(buf, len);
+    next()->write(buf, len);
 }
 
 void
 Pl_MD5::finish()
 {
-    this->getNext()->finish();
+    next()->finish();
     if (!this->persist_across_finish) {
         this->in_progress = false;
     }

@@ -40,7 +40,6 @@ class Pl_TIFFPredictor: public Pipeline
     std::vector<unsigned char> cur_row;
     std::vector<long long> previous;
     std::vector<unsigned char> out;
-    Pipeline* p_next;
 };
 
 #endif // PL_TIFFPREDICTOR_HH

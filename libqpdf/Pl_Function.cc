@@ -48,15 +48,15 @@ void
 Pl_Function::write(unsigned char const* buf, size_t len)
 {
     m->fn(buf, len);
-    if (getNext(true)) {
-        getNext()->write(buf, len);
+    if (next()) {
+        next()->write(buf, len);
     }
 }
 
 void
 Pl_Function::finish()
 {
-    if (getNext(true)) {
-        getNext()->finish();
+    if (next()) {
+        next()->finish();
     }
 }
