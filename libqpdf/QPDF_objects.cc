@@ -747,8 +747,8 @@ Xref_table::read_stream(qpdf_offset_t xref_offset)
         QPDFObjGen x_og;
         QPDFObjectHandle xref_obj;
         try {
-            xref_obj = qpdf.objects().read(
-                false, xref_offset, "xref stream", QPDFObjGen(0, 0), x_og, true);
+            xref_obj =
+                objects.read(false, xref_offset, "xref stream", QPDFObjGen(0, 0), x_og, true);
         } catch (QPDFExc&) {
             // ignore -- report error below
         }
@@ -1693,7 +1693,7 @@ Objects::update_table(QPDFObjGen og, const std::shared_ptr<QPDFObject>& object)
         auto& cache = obj_cache[og];
         cache.object->assign(object);
     } else {
-        obj_cache[og] = ObjCache(object);
+        obj_cache[og] = Entry(object);
     }
 }
 
@@ -1723,7 +1723,7 @@ QPDFObjectHandle
 Objects::make_indirect(std::shared_ptr<QPDFObject> const& obj)
 {
     QPDFObjGen next{next_id()};
-    obj_cache[next] = ObjCache(obj);
+    obj_cache[next] = Entry(obj);
     return qpdf.newIndirect(next, obj_cache[next].object);
 }
 

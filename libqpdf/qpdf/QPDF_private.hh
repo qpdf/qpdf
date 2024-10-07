@@ -72,19 +72,6 @@ class QPDF::Pipe
     }
 };
 
-class QPDF::ObjCache
-{
-  public:
-    ObjCache() = default;
-
-    ObjCache(std::shared_ptr<QPDFObject> object) :
-        object(object)
-    {
-    }
-
-    std::shared_ptr<QPDFObject> object;
-};
-
 class QPDF::ObjCopier
 {
   public:

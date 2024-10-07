@@ -375,6 +375,18 @@ class QPDF::Objects
         qpdf_offset_t first_item_offset_{0}; // actual value from file
     }; // Xref_table;
 
+    struct Entry
+    {
+        Entry() = default;
+
+        Entry(std::shared_ptr<QPDFObject> object) :
+            object(std::move(object))
+        {
+        }
+
+        std::shared_ptr<QPDFObject> object;
+    };
+
     Objects(QPDF& qpdf, QPDF::Members* m, InputSource* const& file) :
         qpdf(qpdf),
         file(file),
@@ -407,7 +419,7 @@ class QPDF::Objects
         return xref.trailer();
     }
 
-    std::map<QPDFObjGen, ObjCache> obj_cache;
+    std::map<QPDFObjGen, Entry> obj_cache;
 
     QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>& input, int obj);
     QPDFObjectHandle read(
