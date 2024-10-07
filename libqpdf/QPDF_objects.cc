@@ -1758,13 +1758,13 @@ Objects::get_for_json(int id, int gen)
 }
 
 void
-QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
+Objects::replace(QPDFObjGen og, QPDFObjectHandle oh)
 {
     if (!oh || (oh.isIndirect() && !(oh.isStream() && oh.getObjGen() == og))) {
         QTC::TC("qpdf", "QPDF replaceObject called with indirect object");
         throw std::logic_error("QPDF::replaceObject called with indirect object handle");
     }
-    objects().update_table(og, oh.getObj());
+    update_table(og, oh.getObj());
 }
 
 void

@@ -441,6 +441,10 @@ class QPDF::Objects
         return get(QPDFObjGen(id, gen));
     }
 
+    void erase(QPDFObjGen og);
+
+    void replace(QPDFObjGen og, QPDFObjectHandle oh);
+
     std::map<QPDFObjGen, Entry> obj_cache;
 
     QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>& input, int obj);
@@ -469,7 +473,6 @@ class QPDF::Objects
     size_t table_size();
 
   private:
-    void erase(QPDFObjGen og);
     bool cached(QPDFObjGen og);
     bool unresolved(QPDFObjGen og);
 
