@@ -445,6 +445,8 @@ class QPDF::Objects
 
     void replace(QPDFObjGen og, QPDFObjectHandle oh);
 
+    void swap(QPDFObjGen og1, QPDFObjGen og2);
+
     std::map<QPDFObjGen, Entry> obj_cache;
 
     QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>& input, int obj);

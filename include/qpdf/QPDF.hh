@@ -391,7 +391,7 @@ class QPDF
     void replaceObject(int objid, int generation, QPDFObjectHandle);
 
     // Swap two objects given by ID. Prior to qpdf 10.2.1, existing QPDFObjectHandle instances that
-    // reference them objects not notice the swap, but this was fixed in 10.2.1.
+    // reference the objects did not notice the swap, but this was fixed in 10.2.1.
     QPDF_DLL
     void swapObjects(QPDFObjGen const& og1, QPDFObjGen const& og2);
     QPDF_DLL

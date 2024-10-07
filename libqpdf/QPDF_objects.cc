@@ -1779,12 +1779,12 @@ Objects::erase(QPDFObjGen og)
 }
 
 void
-QPDF::swapObjects(QPDFObjGen const& og1, QPDFObjGen const& og2)
+Objects::swap(QPDFObjGen og1, QPDFObjGen og2)
 {
     // Force objects to be read from the input source if needed, then swap them in the cache.
-    m->objects.resolve(og1);
-    m->objects.resolve(og2);
-    m->objects.obj_cache[og1].object->swapWith(m->objects.obj_cache[og2].object);
+    resolve(og1);
+    resolve(og2);
+    obj_cache[og1].object->swapWith(obj_cache[og2].object);
 }
 
 size_t

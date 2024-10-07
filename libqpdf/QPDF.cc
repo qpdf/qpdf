@@ -882,7 +882,13 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
 void
 QPDF::swapObjects(int objid1, int generation1, int objid2, int generation2)
 {
-    swapObjects(QPDFObjGen(objid1, generation1), QPDFObjGen(objid2, generation2));
+    m->objects.swap(QPDFObjGen(objid1, generation1), QPDFObjGen(objid2, generation2));
+}
+
+void
+QPDF::swapObjects(QPDFObjGen const& og1, QPDFObjGen const& og2)
+{
+    m->objects.swap(og1, og2);
 }
 
 unsigned long long
