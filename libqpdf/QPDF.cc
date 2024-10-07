@@ -500,6 +500,12 @@ QPDF::getObjectCount()
     return toS(og.getObj());
 }
 
+std::vector<QPDFObjectHandle>
+QPDF::getAllObjects()
+{
+    return m->objects.all();
+}
+
 void
 QPDF::setLastObjectDescription(std::string const& description, QPDFObjGen const& og)
 {

@@ -441,6 +441,8 @@ class QPDF::Objects
         return get(QPDFObjGen(id, gen));
     }
 
+    std::vector<QPDFObjectHandle> all();
+
     void erase(QPDFObjGen og);
 
     void replace(QPDFObjGen og, QPDFObjectHandle oh);

@@ -1149,13 +1149,13 @@ Xref_table::resolve()
 }
 
 std::vector<QPDFObjectHandle>
-QPDF::getAllObjects()
+Objects ::all()
 {
     // After fixDanglingReferences is called, all objects are in the object cache.
-    fixDanglingReferences();
+    qpdf.fixDanglingReferences();
     std::vector<QPDFObjectHandle> result;
-    for (auto const& iter: m->objects.obj_cache) {
-        result.push_back(newIndirect(iter.first, iter.second.object));
+    for (auto const& iter: obj_cache) {
+        result.emplace_back(iter.second.object);
     }
     return result;
 }
