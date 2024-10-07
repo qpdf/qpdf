@@ -185,8 +185,7 @@ QPDF::Members::Members(QPDF& qpdf) :
     file_sp(new InvalidInputSource(no_input_name)),
     file(file_sp.get()),
     encp(new EncryptionParameters),
-    objects(qpdf, this),
-    xref_table(qpdf, objects, file)
+    objects(qpdf, this, file)
 {
 }
 
@@ -279,7 +278,7 @@ QPDF::emptyPDF()
 {
     m->pdf_version = "1.3";
     m->no_input_name = "empty PDF";
-    m->xref_table.initialize_empty();
+    m->objects.xref_table().initialize_empty();
 }
 
 void
@@ -292,7 +291,7 @@ QPDF::registerStreamFilter(
 void
 QPDF::setIgnoreXRefStreams(bool val)
 {
-    m->xref_table.ignore_streams(val);
+    m->objects.xref_table().ignore_streams(val);
 }
 
 std::shared_ptr<QPDFLogger>
@@ -330,7 +329,7 @@ void
 QPDF::setAttemptRecovery(bool val)
 {
     m->attempt_recovery = val;
-    m->xref_table.attempt_recovery(val);
+    m->objects.xref_table().attempt_recovery(val);
 }
 
 void
@@ -424,9 +423,9 @@ QPDF::parse(char const* password)
         m->pdf_version = "1.2";
     }
 
-    m->xref_table.initialize();
+    m->objects.xref_table().initialize();
     initializeEncryption();
-    if (m->xref_table.size() > 0 && !getRoot().getKey("/Pages").isDictionary()) {
+    if (m->objects.xref_table().size() > 0 && !getRoot().getKey("/Pages").isDictionary()) {
         // QPDFs created from JSON have an empty xref table and no root object yet.
         throw damagedPDF("", 0, "unable to find page tree");
     }
@@ -469,7 +468,7 @@ QPDF::warn(
 void
 QPDF::showXRefTable()
 {
-    m->xref_table.show();
+    m->objects.xref_table().show();
 }
 
 // Ensure all objects in the pdf file, including those in indirect references, appear in the object
@@ -480,9 +479,9 @@ QPDF::fixDanglingReferences(bool force)
     if (m->fixed_dangling_refs) {
         return;
     }
-    if (!m->xref_table.resolve()) {
+    if (!m->objects.xref_table().resolve()) {
         QTC::TC("qpdf", "QPDF fix dangling triggered xref reconstruction");
-        m->xref_table.resolve();
+        m->objects.xref_table().resolve();
     }
     m->fixed_dangling_refs = true;
 }
@@ -578,7 +577,7 @@ QPDF::getObject(QPDFObjGen const& og)
 {
     if (auto it = m->objects.obj_cache.find(og); it != m->objects.obj_cache.end()) {
         return {it->second.object};
-    } else if (m->xref_table.initialized() && !m->xref_table.type(og)) {
+    } else if (m->objects.xref_table().initialized() && !m->objects.xref_table().type(og)) {
         return QPDF_Null::create();
     } else {
         auto result = m->objects.obj_cache.try_emplace(og, QPDF_Unresolved::create(this, og));
@@ -945,13 +944,13 @@ QPDF::getExtensionLevel()
 QPDFObjectHandle
 QPDF::getTrailer()
 {
-    return m->xref_table.trailer();
+    return m->objects.trailer();
 }
 
 QPDFObjectHandle
 QPDF::getRoot()
 {
-    QPDFObjectHandle root = m->xref_table.trailer().getKey("/Root");
+    auto root = m->objects.trailer().getKey("/Root");
     if (!root.isDictionary()) {
         throw damagedPDF("", 0, "unable to find /Root dictionary");
     } else if (
@@ -967,10 +966,10 @@ QPDF::getRoot()
 std::map<QPDFObjGen, QPDFXRefEntry>
 QPDF::getXRefTable()
 {
-    if (!m->xref_table.initialized()) {
+    if (!m->objects.xref_table().initialized()) {
         throw std::logic_error("QPDF::getXRefTable called before parsing.");
     }
-    return m->xref_table.as_map();
+    return m->objects.xref_table().as_map();
 }
 
 bool
