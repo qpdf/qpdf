@@ -535,26 +535,26 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
     if (!oh) {
         throw std::logic_error("attempted to make an uninitialized QPDFObjectHandle indirect");
     }
-    return makeIndirectFromQPDFObject(oh.getObj());
+    return m->objects.make_indirect(oh.getObj());
 }
 
 QPDFObjectHandle
 QPDF::newReserved()
 {
-    return makeIndirectFromQPDFObject(QPDF_Reserved::create());
+    return m->objects.make_indirect(QPDF_Reserved::create());
 }
 
 QPDFObjectHandle
 QPDF::newIndirectNull()
 {
-    return makeIndirectFromQPDFObject(QPDF_Null::create());
+    return m->objects.make_indirect(QPDF_Null::create());
 }
 
 QPDFObjectHandle
 QPDF::newStream()
 {
-    return makeIndirectFromQPDFObject(
-        QPDF_Stream::create(this, nextObjGen(), QPDFObjectHandle::newDictionary(), 0, 0));
+    return m->objects.make_indirect(
+        QPDF_Stream::create(this, m->objects.next_id(), QPDFObjectHandle::newDictionary(), 0, 0));
 }
 
 QPDFObjectHandle

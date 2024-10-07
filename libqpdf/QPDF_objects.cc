@@ -744,7 +744,7 @@ QPDF::Xref_table::read_stream(qpdf_offset_t xref_offset)
         QPDFObjGen x_og;
         QPDFObjectHandle xref_obj;
         try {
-            xref_obj = qpdf.readObjectAtOffset(
+            xref_obj = qpdf.objects().read(
                 false, xref_offset, "xref stream", QPDFObjGen(0, 0), x_og, true);
         } catch (QPDFExc&) {
             // ignore -- report error below
@@ -1135,8 +1135,8 @@ QPDF::Xref_table::resolve()
     for (auto& item: table) {
         ++i;
         if (item.type()) {
-            if (qpdf.isUnresolved(QPDFObjGen(i, item.gen()))) {
-                qpdf.resolve(QPDFObjGen(i, item.gen()));
+            if (objects.unresolved(QPDFObjGen(i, item.gen()))) {
+                objects.resolve(QPDFObjGen(i, item.gen()));
                 if (may_change && reconstructed_) {
                     return false;
                 }
@@ -1177,40 +1177,41 @@ QPDF::Xref_table::read_trailer()
 }
 
 QPDFObjectHandle
-QPDF::readObject(std::string const& description, QPDFObjGen og)
+QPDF::Objects::read_object(std::string const& description, QPDFObjGen og)
 {
-    setLastObjectDescription(description, og);
+    qpdf.setLastObjectDescription(description, og);
     qpdf_offset_t offset = m->file->tell();
     bool empty = false;
 
-    StringDecrypter decrypter{this, og};
+    StringDecrypter decrypter{&qpdf, og};
     StringDecrypter* decrypter_ptr = m->encp->encrypted ? &decrypter : nullptr;
     auto object =
-        QPDFParser(*m->file, m->last_object_description, m->tokenizer, decrypter_ptr, this, true)
+        QPDFParser(*m->file, m->last_object_description, m->tokenizer, decrypter_ptr, &qpdf, true)
             .parse(empty, false);
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.
-        warn(damagedPDF(*m->file, m->file->getLastOffset(), "empty object treated as null"));
+        qpdf.warn(
+            qpdf.damagedPDF(*m->file, m->file->getLastOffset(), "empty object treated as null"));
         return object;
     }
-    auto token = readToken(*m->file);
+    auto token = qpdf.readToken(*m->file);
     if (object.isDictionary() && token.isWord("stream")) {
-        readStream(object, og, offset);
-        token = readToken(*m->file);
+        read_stream(object, og, offset);
+        token = qpdf.readToken(*m->file);
     }
     if (!token.isWord("endobj")) {
         QTC::TC("qpdf", "QPDF err expected endobj");
-        warn(damagedPDF("expected endobj"));
+        qpdf.warn(qpdf.damagedPDF("expected endobj"));
     }
     return object;
 }
 
 // After reading stream dictionary and stream keyword, read rest of stream.
 void
-QPDF::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
+QPDF::Objects::read_stream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
 {
-    validateStreamLineEnd(object, og, offset);
+    validate_stream_line_end(object, og, offset);
 
     // Must get offset before accessing any additional objects since resolving a previously
     // unresolved indirect object will change file position.
@@ -1223,33 +1224,34 @@ QPDF::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
         if (!length_obj.isInteger()) {
             if (length_obj.isNull()) {
                 QTC::TC("qpdf", "QPDF stream without length");
-                throw damagedPDF(offset, "stream dictionary lacks /Length key");
+                throw qpdf.damagedPDF(offset, "stream dictionary lacks /Length key");
             }
             QTC::TC("qpdf", "QPDF stream length not integer");
-            throw damagedPDF(offset, "/Length key in stream dictionary is not an integer");
+            throw qpdf.damagedPDF(offset, "/Length key in stream dictionary is not an integer");
         }
 
         length = toS(length_obj.getUIntValue());
         // Seek in two steps to avoid potential integer overflow
         m->file->seek(stream_offset, SEEK_SET);
         m->file->seek(toO(length), SEEK_CUR);
-        if (!readToken(*m->file).isWord("endstream")) {
+        if (!qpdf.readToken(*m->file).isWord("endstream")) {
             QTC::TC("qpdf", "QPDF missing endstream");
-            throw damagedPDF("expected endstream");
+            throw qpdf.damagedPDF("expected endstream");
         }
     } catch (QPDFExc& e) {
         if (m->attempt_recovery) {
-            warn(e);
-            length = recoverStreamLength(m->file_sp, og, stream_offset);
+            qpdf.warn(e);
+            length = recover_stream_length(m->file_sp, og, stream_offset);
         } else {
             throw;
         }
     }
-    object = {QPDF_Stream::create(this, og, object, stream_offset, length)};
+    object = {QPDF_Stream::create(&qpdf, og, object, stream_offset, length)};
 }
 
 void
-QPDF::validateStreamLineEnd(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
+QPDF::Objects::validate_stream_line_end(
+    QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
 {
     // The PDF specification states that the word "stream" should be followed by either a carriage
     // return and a newline or by a newline alone.  It specifically disallowed following it by a
@@ -1281,7 +1283,7 @@ QPDF::validateStreamLineEnd(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset
                     // stream data in spite of not having seen a newline.
                     QTC::TC("qpdf", "QPDF stream with CR only");
                     m->file->unreadCh(ch);
-                    warn(damagedPDF(
+                    qpdf.warn(qpdf.damagedPDF(
                         m->file->tell(), "stream keyword followed by carriage return only"));
                 }
             }
@@ -1290,28 +1292,29 @@ QPDF::validateStreamLineEnd(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset
         if (!QUtil::is_space(ch)) {
             QTC::TC("qpdf", "QPDF stream without newline");
             m->file->unreadCh(ch);
-            warn(damagedPDF(
+            qpdf.warn(qpdf.damagedPDF(
                 m->file->tell(), "stream keyword not followed by proper line terminator"));
             return;
         }
-        warn(damagedPDF(m->file->tell(), "stream keyword followed by extraneous whitespace"));
+        qpdf.warn(
+            qpdf.damagedPDF(m->file->tell(), "stream keyword followed by extraneous whitespace"));
     }
 }
 
 QPDFObjectHandle
-QPDF::readObjectInStream(std::shared_ptr<InputSource>& input, int obj)
+QPDF::Objects::readObjectInStream(std::shared_ptr<InputSource>& input, int obj)
 {
     m->last_object_description.erase(7); // last_object_description starts with "object "
     m->last_object_description += std::to_string(obj);
     m->last_object_description += " 0";
 
     bool empty = false;
-    auto object = QPDFParser(*input, m->last_object_description, m->tokenizer, nullptr, this, true)
+    auto object = QPDFParser(*input, m->last_object_description, m->tokenizer, nullptr, &qpdf, true)
                       .parse(empty, false);
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.
-        warn(damagedPDF(*input, input->getLastOffset(), "empty object treated as null"));
+        qpdf.warn(qpdf.damagedPDF(*input, input->getLastOffset(), "empty object treated as null"));
     }
     return object;
 }
@@ -1329,18 +1332,18 @@ QPDF::findEndstream()
 }
 
 size_t
-QPDF::recoverStreamLength(
-    std::shared_ptr<InputSource> input, QPDFObjGen const& og, qpdf_offset_t stream_offset)
+QPDF::Objects::recover_stream_length(
+    std::shared_ptr<InputSource> input, QPDFObjGen og, qpdf_offset_t stream_offset)
 {
     // Try to reconstruct stream length by looking for endstream or endobj
-    warn(damagedPDF(*input, stream_offset, "attempting to recover stream length"));
+    qpdf.warn(qpdf.damagedPDF(*input, stream_offset, "attempting to recover stream length"));
 
-    PatternFinder ef(*this, &QPDF::findEndstream);
+    PatternFinder ef(qpdf, &QPDF::findEndstream);
     size_t length = 0;
     if (m->file->findFirst("end", stream_offset, 0, ef)) {
         length = toS(m->file->tell() - stream_offset);
         // Reread endstream but, if it was endobj, don't skip that.
-        QPDFTokenizer::Token t = readToken(*m->file);
+        QPDFTokenizer::Token t = qpdf.readToken(*m->file);
         if (t.getValue() == "endobj") {
             m->file->seek(m->file->getLastOffset(), SEEK_SET);
         }
@@ -1361,10 +1364,10 @@ QPDF::recoverStreamLength(
     }
 
     if (length == 0) {
-        warn(damagedPDF(
+        qpdf.warn(qpdf.damagedPDF(
             *input, stream_offset, "unable to recover stream data; treating stream as empty"));
     } else {
-        warn(damagedPDF(
+        qpdf.warn(qpdf.damagedPDF(
             *input, stream_offset, "recovered stream length: " + std::to_string(length)));
     }
 
@@ -1373,7 +1376,7 @@ QPDF::recoverStreamLength(
 }
 
 QPDFObjectHandle
-QPDF::readObjectAtOffset(
+QPDF::Objects::read(
     bool try_recovery,
     qpdf_offset_t offset,
     std::string const& description,
@@ -1392,7 +1395,7 @@ QPDF::readObjectAtOffset(
         check_og = false;
         try_recovery = false;
     }
-    setLastObjectDescription(description, exp_og);
+    qpdf.setLastObjectDescription(description, exp_og);
 
     if (!m->attempt_recovery) {
         try_recovery = false;
@@ -1404,49 +1407,49 @@ QPDF::readObjectAtOffset(
     // these.
     if (offset == 0) {
         QTC::TC("qpdf", "QPDF bogus 0 offset", 0);
-        warn(damagedPDF(0, "object has offset 0"));
+        qpdf.warn(qpdf.damagedPDF(0, "object has offset 0"));
         return QPDFObjectHandle::newNull();
     }
 
     m->file->seek(offset, SEEK_SET);
     try {
-        QPDFTokenizer::Token tobjid = readToken(*m->file);
+        QPDFTokenizer::Token tobjid = qpdf.readToken(*m->file);
         bool objidok = tobjid.isInteger();
         QTC::TC("qpdf", "QPDF check objid", objidok ? 1 : 0);
         if (!objidok) {
             QTC::TC("qpdf", "QPDF expected n n obj");
-            throw damagedPDF(offset, "expected n n obj");
+            throw qpdf.damagedPDF(offset, "expected n n obj");
         }
-        QPDFTokenizer::Token tgen = readToken(*m->file);
+        QPDFTokenizer::Token tgen = qpdf.readToken(*m->file);
         bool genok = tgen.isInteger();
         QTC::TC("qpdf", "QPDF check generation", genok ? 1 : 0);
         if (!genok) {
-            throw damagedPDF(offset, "expected n n obj");
+            throw qpdf.damagedPDF(offset, "expected n n obj");
         }
-        QPDFTokenizer::Token tobj = readToken(*m->file);
+        QPDFTokenizer::Token tobj = qpdf.readToken(*m->file);
 
         bool objok = tobj.isWord("obj");
         QTC::TC("qpdf", "QPDF check obj", objok ? 1 : 0);
 
         if (!objok) {
-            throw damagedPDF(offset, "expected n n obj");
+            throw qpdf.damagedPDF(offset, "expected n n obj");
         }
         int objid = QUtil::string_to_int(tobjid.getValue().c_str());
         int generation = QUtil::string_to_int(tgen.getValue().c_str());
         og = QPDFObjGen(objid, generation);
         if (objid == 0) {
             QTC::TC("qpdf", "QPDF object id 0");
-            throw damagedPDF(offset, "object with ID 0");
+            throw qpdf.damagedPDF(offset, "object with ID 0");
         }
         if (check_og && (exp_og != og)) {
             QTC::TC("qpdf", "QPDF err wrong objid/generation");
-            QPDFExc e = damagedPDF(offset, "expected " + exp_og.unparse(' ') + " obj");
+            QPDFExc e = qpdf.damagedPDF(offset, "expected " + exp_og.unparse(' ') + " obj");
             if (try_recovery) {
                 // Will be retried below
                 throw e;
             } else {
                 // We can try reading the object anyway even if the ID doesn't match.
-                warn(e);
+                qpdf.warn(e);
             }
         }
     } catch (QPDFExc& e) {
@@ -1455,11 +1458,10 @@ QPDF::readObjectAtOffset(
             m->xref_table.reconstruct(e);
             if (m->xref_table.type(exp_og) == 1) {
                 QTC::TC("qpdf", "QPDF recovered in readObjectAtOffset");
-                return readObjectAtOffset(
-                    false, m->xref_table.offset(exp_og), description, exp_og, og, false);
+                return read(false, m->xref_table.offset(exp_og), description, exp_og, og, false);
             } else {
                 QTC::TC("qpdf", "QPDF object gone after xref reconstruction");
-                warn(damagedPDF(
+                qpdf.warn(qpdf.damagedPDF(
                     "",
                     0,
                     ("object " + exp_og.unparse(' ') +
@@ -1471,9 +1473,9 @@ QPDF::readObjectAtOffset(
         }
     }
 
-    QPDFObjectHandle oh = readObject(description, og);
+    QPDFObjectHandle oh = read_object(description, og);
 
-    if (isUnresolved(og)) {
+    if (unresolved(og)) {
         // Store the object in the cache here so it gets cached whether we first know the offset or
         // whether we first know the object ID and generation (in which we case we would get here
         // through resolve).
@@ -1492,7 +1494,7 @@ QPDF::readObjectAtOffset(
                     break;
                 }
             } else {
-                throw damagedPDF(m->file->tell(), "EOF after endobj");
+                throw qpdf.damagedPDF(m->file->tell(), "EOF after endobj");
             }
         }
         qpdf_offset_t end_after_space = m->file->tell();
@@ -1526,7 +1528,7 @@ QPDF::readObjectAtOffset(
         } else {
             m->xref_table.linearization_offsets(
                 toS(og.getObj()), end_before_space, end_after_space);
-            updateCache(og, oh.getObj());
+            update_table(og, oh.getObj());
         }
     }
 
@@ -1534,21 +1536,21 @@ QPDF::readObjectAtOffset(
 }
 
 QPDFObject*
-QPDF::resolve(QPDFObjGen og)
+QPDF::Objects::resolve(QPDFObjGen og)
 {
-    if (!isUnresolved(og)) {
-        return m->objects.obj_cache[og].object.get();
+    if (!unresolved(og)) {
+        return obj_cache[og].object.get();
     }
 
     if (m->resolving.count(og)) {
         // This can happen if an object references itself directly or indirectly in some key that
         // has to be resolved during object parsing, such as stream length.
         QTC::TC("qpdf", "QPDF recursion loop in resolve");
-        warn(damagedPDF("", "loop detected resolving object " + og.unparse(' ')));
-        updateCache(og, QPDF_Null::create());
-        return m->objects.obj_cache[og].object.get();
+        qpdf.warn(qpdf.damagedPDF("", "loop detected resolving object " + og.unparse(' ')));
+        update_table(og, QPDF_Null::create());
+        return obj_cache[og].object.get();
     }
-    ResolveRecorder rr(this, og);
+    ResolveRecorder rr(&qpdf, og);
 
     try {
         switch (m->xref_table.type(og)) {
@@ -1558,8 +1560,7 @@ QPDF::resolve(QPDFObjGen og)
             {
                 // Object stored in cache by readObjectAtOffset
                 QPDFObjGen a_og;
-                QPDFObjectHandle oh =
-                    readObjectAtOffset(true, m->xref_table.offset(og), "", og, a_og, false);
+                QPDFObjectHandle oh = read(true, m->xref_table.offset(og), "", og, a_og, false);
             }
             break;
 
@@ -1568,50 +1569,50 @@ QPDF::resolve(QPDFObjGen og)
             break;
 
         default:
-            throw damagedPDF(
+            throw qpdf.damagedPDF(
                 "", 0, ("object " + og.unparse('/') + " has unexpected xref entry type"));
         }
     } catch (QPDFExc& e) {
-        warn(e);
+        qpdf.warn(e);
     } catch (std::exception& e) {
-        warn(damagedPDF(
+        qpdf.warn(qpdf.damagedPDF(
             "", 0, ("object " + og.unparse('/') + ": error reading object: " + e.what())));
     }
 
-    if (isUnresolved(og)) {
+    if (unresolved(og)) {
         // PDF spec says unknown objects resolve to the null object.
         QTC::TC("qpdf", "QPDF resolve failure to null");
-        updateCache(og, QPDF_Null::create());
+        update_table(og, QPDF_Null::create());
     }
 
-    auto result(m->objects.obj_cache[og].object);
-    result->setDefaultDescription(this, og);
+    auto result(obj_cache[og].object);
+    result->setDefaultDescription(&qpdf, og);
     return result.get();
 }
 
 void
-QPDF::resolveObjectsInStream(int obj_stream_number)
+QPDF::Objects::resolveObjectsInStream(int obj_stream_number)
 {
     if (m->resolved_object_streams.count(obj_stream_number)) {
         return;
     }
     m->resolved_object_streams.insert(obj_stream_number);
     // Force resolution of object stream
-    QPDFObjectHandle obj_stream = getObjectByID(obj_stream_number, 0);
+    QPDFObjectHandle obj_stream = qpdf.getObject(obj_stream_number, 0);
     if (!obj_stream.isStream()) {
-        throw damagedPDF(
+        throw qpdf.damagedPDF(
             "supposed object stream " + std::to_string(obj_stream_number) + " is not a stream");
     }
 
     QPDFObjectHandle dict = obj_stream.getDict();
     if (!dict.isDictionaryOfType("/ObjStm")) {
         QTC::TC("qpdf", "QPDF ERR object stream with wrong type");
-        warn(damagedPDF(
+        qpdf.warn(qpdf.damagedPDF(
             "supposed object stream " + std::to_string(obj_stream_number) + " has wrong type"));
     }
 
     if (!(dict.getKey("/N").isInteger() && dict.getKey("/First").isInteger())) {
-        throw damagedPDF(
+        throw qpdf.damagedPDF(
             ("object stream " + std::to_string(obj_stream_number) + " has incorrect keys"));
     }
 
@@ -1629,8 +1630,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 
     qpdf_offset_t last_offset = -1;
     for (int i = 0; i < n; ++i) {
-        QPDFTokenizer::Token tnum = readToken(*input);
-        QPDFTokenizer::Token toffset = readToken(*input);
+        QPDFTokenizer::Token tnum = qpdf.readToken(*input);
+        QPDFTokenizer::Token toffset = qpdf.readToken(*input);
         if (!(tnum.isInteger() && toffset.isInteger())) {
             throw damagedPDF(
                 *input,
@@ -1646,7 +1647,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
         }
         if (num == obj_stream_number) {
             QTC::TC("qpdf", "QPDF ignore self-referential object stream");
-            warn(damagedPDF(
+            qpdf.warn(damagedPDF(
                 *input,
                 m->last_object_description,
                 input->getLastOffset(),
@@ -1678,7 +1679,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             int offset = iter.second;
             input->seek(offset, SEEK_SET);
             QPDFObjectHandle oh = readObjectInStream(input, iter.first);
-            updateCache(og, oh.getObj());
+            update_table(og, oh.getObj());
         } else {
             QTC::TC("qpdf", "QPDF not caching overridden objstm object");
         }
@@ -1686,33 +1687,33 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 }
 
 void
-QPDF::updateCache(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& object)
+QPDF::Objects::update_table(QPDFObjGen og, const std::shared_ptr<QPDFObject>& object)
 {
-    object->setObjGen(this, og);
-    if (isCached(og)) {
-        auto& cache = m->objects.obj_cache[og];
+    object->setObjGen(&qpdf, og);
+    if (cached(og)) {
+        auto& cache = obj_cache[og];
         cache.object->assign(object);
     } else {
-        m->objects.obj_cache[og] = ObjCache(object);
+        obj_cache[og] = ObjCache(object);
     }
 }
 
 bool
-QPDF::isCached(QPDFObjGen const& og)
+QPDF::Objects::cached(QPDFObjGen og)
 {
-    return m->objects.obj_cache.count(og) != 0;
+    return obj_cache.count(og) != 0;
 }
 
 bool
-QPDF::isUnresolved(QPDFObjGen const& og)
+QPDF::Objects::unresolved(QPDFObjGen og)
 {
-    return !isCached(og) || m->objects.obj_cache[og].object->isUnresolved();
+    return !cached(og) || obj_cache[og].object->isUnresolved();
 }
 
 QPDFObjGen
-QPDF::nextObjGen()
+QPDF::Objects::next_id()
 {
-    int max_objid = toI(getObjectCount());
+    int max_objid = toI(qpdf.getObjectCount());
     if (max_objid == std::numeric_limits<int>::max()) {
         throw std::range_error("max object id is too high to create new objects");
     }
@@ -1720,41 +1721,40 @@ QPDF::nextObjGen()
 }
 
 QPDFObjectHandle
-QPDF::makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj)
+QPDF::Objects::make_indirect(std::shared_ptr<QPDFObject> const& obj)
 {
-    QPDFObjGen next{nextObjGen()};
-    m->objects.obj_cache[next] = ObjCache(obj);
-    return newIndirect(next, m->objects.obj_cache[next].object);
+    QPDFObjGen next{next_id()};
+    obj_cache[next] = ObjCache(obj);
+    return qpdf.newIndirect(next, obj_cache[next].object);
 }
 
 std::shared_ptr<QPDFObject>
-QPDF::getObjectForParser(int id, int gen, bool parse_pdf)
+QPDF::Objects::get_for_parser(int id, int gen, bool parse_pdf)
 {
     // This method is called by the parser and therefore must not resolve any objects.
     auto og = QPDFObjGen(id, gen);
-    if (auto iter = m->objects.obj_cache.find(og); iter != m->objects.obj_cache.end()) {
+    if (auto iter = obj_cache.find(og); iter != obj_cache.end()) {
         return iter->second.object;
     }
     if (m->xref_table.type(og) || !m->xref_table.initialized()) {
-        return m->objects.obj_cache.insert({og, QPDF_Unresolved::create(this, og)})
-            .first->second.object;
+        return obj_cache.insert({og, QPDF_Unresolved::create(&qpdf, og)}).first->second.object;
     }
     if (parse_pdf) {
         return QPDF_Null::create();
     }
-    return m->objects.obj_cache.insert({og, QPDF_Null::create(this, og)}).first->second.object;
+    return obj_cache.insert({og, QPDF_Null::create(&qpdf, og)}).first->second.object;
 }
 
 std::shared_ptr<QPDFObject>
-QPDF::getObjectForJSON(int id, int gen)
+QPDF::Objects::get_for_json(int id, int gen)
 {
     auto og = QPDFObjGen(id, gen);
-    auto [it, inserted] = m->objects.obj_cache.try_emplace(og);
+    auto [it, inserted] = obj_cache.try_emplace(og);
     auto& obj = it->second.object;
     if (inserted) {
         obj = (m->xref_table.initialized() && !m->xref_table.type(og))
-            ? QPDF_Null::create(this, og)
-            : QPDF_Unresolved::create(this, og);
+            ? QPDF_Null::create(&qpdf, og)
+            : QPDF_Unresolved::create(&qpdf, og);
     }
     return obj;
 }
@@ -1766,17 +1766,17 @@ QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
         QTC::TC("qpdf", "QPDF replaceObject called with indirect object");
         throw std::logic_error("QPDF::replaceObject called with indirect object handle");
     }
-    updateCache(og, oh.getObj());
+    objects().update_table(og, oh.getObj());
 }
 
 void
-QPDF::removeObject(QPDFObjGen og)
+QPDF::Objects::erase(QPDFObjGen og)
 {
-    if (auto cached = m->objects.obj_cache.find(og); cached != m->objects.obj_cache.end()) {
+    if (auto cached = obj_cache.find(og); cached != obj_cache.end()) {
         // Take care of any object handles that may be floating around.
         cached->second.object->assign(QPDF_Null::create());
         cached->second.object->setObjGen(nullptr, QPDFObjGen());
-        m->objects.obj_cache.erase(cached);
+        obj_cache.erase(cached);
     }
 }
 
@@ -1784,13 +1784,13 @@ void
 QPDF::swapObjects(QPDFObjGen const& og1, QPDFObjGen const& og2)
 {
     // Force objects to be read from the input source if needed, then swap them in the cache.
-    resolve(og1);
-    resolve(og2);
+    m->objects.resolve(og1);
+    m->objects.resolve(og2);
     m->objects.obj_cache[og1].object->swapWith(m->objects.obj_cache[og2].object);
 }
 
 size_t
-QPDF::tableSize()
+QPDF::Objects::table_size()
 {
     // If obj_cache is dense, accommodate all object in tables,else accommodate only original
     // objects.
@@ -1798,35 +1798,35 @@ QPDF::tableSize()
     if (max_xref > 0) {
         --max_xref;
     }
-    auto max_obj = m->objects.obj_cache.size() ? m->objects.obj_cache.crbegin()->first.getObj() : 0;
+    auto max_obj = obj_cache.size() ? obj_cache.crbegin()->first.getObj() : 0;
     auto max_id = std::numeric_limits<int>::max() - 1;
     if (max_obj >= max_id || max_xref >= max_id) {
         // Temporary fix. Long-term solution is
         // - QPDFObjGen to enforce objgens are valid and sensible
         // - xref table and obj cache to protect against insertion of impossibly large obj ids
-        stopOnError("Impossibly large object id encountered.");
+        qpdf.stopOnError("Impossibly large object id encountered.");
     }
-    if (max_obj < 1.1 * std::max(toI(m->objects.obj_cache.size()), max_xref)) {
+    if (max_obj < 1.1 * std::max(toI(obj_cache.size()), max_xref)) {
         return toS(++max_obj);
     }
     return toS(++max_xref);
 }
 
 std::vector<QPDFObjGen>
-QPDF::getCompressibleObjVector()
+QPDF::Objects::compressible_vector()
 {
-    return getCompressibleObjGens<QPDFObjGen>();
+    return compressible<QPDFObjGen>();
 }
 
 std::vector<bool>
-QPDF::getCompressibleObjSet()
+QPDF::Objects::compressible_set()
 {
-    return getCompressibleObjGens<bool>();
+    return compressible<bool>();
 }
 
 template <typename T>
 std::vector<T>
-QPDF::getCompressibleObjGens()
+QPDF::Objects::compressible()
 {
     // Return a list of objects that are allowed to be in object streams.  Walk through the objects
     // by traversing the document from the root, including a traversal of the pages tree.  This
@@ -1838,14 +1838,14 @@ QPDF::getCompressibleObjGens()
     QPDFObjectHandle encryption_dict = m->xref_table.trailer().getKey("/Encrypt");
     QPDFObjGen encryption_dict_og = encryption_dict.getObjGen();
 
-    const size_t max_obj = getObjectCount();
+    const size_t max_obj = qpdf.getObjectCount();
     std::vector<bool> visited(max_obj, false);
     std::vector<QPDFObjectHandle> queue;
     queue.reserve(512);
     queue.push_back(m->xref_table.trailer());
     std::vector<T> result;
     if constexpr (std::is_same_v<T, QPDFObjGen>) {
-        result.reserve(m->objects.obj_cache.size());
+        result.reserve(obj_cache.size());
     } else if constexpr (std::is_same_v<T, bool>) {
         result.resize(max_obj + 1U, false);
     } else {
@@ -1869,9 +1869,9 @@ QPDF::getCompressibleObjGens()
             // Check whether this is the current object. If not, remove it (which changes it into a
             // direct null and therefore stops us from revisiting it) and move on to the next object
             // in the queue.
-            auto upper = m->objects.obj_cache.upper_bound(og);
-            if (upper != m->objects.obj_cache.end() && upper->first.getObj() == og.getObj()) {
-                removeObject(og);
+            auto upper = obj_cache.upper_bound(og);
+            if (upper != obj_cache.end() && upper->first.getObj() == og.getObj()) {
+                erase(og);
                 continue;
             }
 

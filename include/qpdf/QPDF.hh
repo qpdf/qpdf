@@ -758,37 +758,15 @@ class QPDF
     class ResolveRecorder;
     class JSONReactor;
 
-    inline Objects& objects();
+    inline Objects& objects() noexcept;
+    inline Objects const& objects() const noexcept;
     void parse(char const* password);
     void inParse(bool);
     void setLastObjectDescription(std::string const& description, QPDFObjGen const& og);
-    QPDFObjectHandle readObject(std::string const& description, QPDFObjGen og);
-    void readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset);
-    void validateStreamLineEnd(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset);
-    QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>& input, int obj);
-    size_t recoverStreamLength(
-        std::shared_ptr<InputSource> input, QPDFObjGen const& og, qpdf_offset_t stream_offset);
     QPDFTokenizer::Token readToken(InputSource&, size_t max_len = 0);
 
-    QPDFObjectHandle readObjectAtOffset(
-        bool attempt_recovery,
-        qpdf_offset_t offset,
-        std::string const& description,
-        QPDFObjGen exp_og,
-        QPDFObjGen& og,
-        bool skip_cache_if_in_xref);
-    QPDFObject* resolve(QPDFObjGen og);
-    void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
-    QPDFObjGen nextObjGen();
     QPDFObjectHandle newIndirect(QPDFObjGen const&, std::shared_ptr<QPDFObject> const&);
-    QPDFObjectHandle makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj);
-    bool isCached(QPDFObjGen const& og);
-    bool isUnresolved(QPDFObjGen const& og);
-    std::shared_ptr<QPDFObject> getObjectForParser(int id, int gen, bool parse_pdf);
-    std::shared_ptr<QPDFObject> getObjectForJSON(int id, int gen);
-    void removeObject(QPDFObjGen og);
-    void updateCache(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& object);
     static QPDFExc damagedPDF(
         InputSource& input,
         std::string const& object,
@@ -834,7 +812,6 @@ class QPDF
         QPDFWriter::ObjTable const& obj,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
     void optimize(Xref_table const& obj);
-    size_t tableSize();
 
     // Get lists of all objects in order according to the part of a linearized file that they belong
     // to.
@@ -853,12 +830,6 @@ class QPDF
         int& S,
         int& O,
         bool compressed);
-
-    // Get a list of objects that would be permitted in an object stream.
-    template <typename T>
-    std::vector<T> getCompressibleObjGens();
-    std::vector<QPDFObjGen> getCompressibleObjVector();
-    std::vector<bool> getCompressibleObjSet();
 
     // methods to support page handling
 

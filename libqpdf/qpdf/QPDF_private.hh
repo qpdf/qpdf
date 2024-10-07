@@ -13,6 +13,7 @@ class QPDF::Xref_table
   public:
     Xref_table(QPDF& qpdf, QPDF::Objects& objects, InputSource* const& file) :
         qpdf(qpdf),
+        objects(objects),
         file(file)
     {
         tokenizer.allowEOF();
@@ -340,6 +341,7 @@ class QPDF::Xref_table
     }
 
     QPDF& qpdf;
+    QPDF::Objects& objects;
     InputSource* const& file;
     QPDFTokenizer tokenizer;
 
@@ -360,21 +362,6 @@ class QPDF::Xref_table
     // Linearization data
     bool uncompressed_after_compressed_{false};
     qpdf_offset_t first_item_offset_{0}; // actual value from file
-};
-
-// The Resolver class is restricted to QPDFObject so that only it can resolve indirect
-// references.
-class QPDF::Resolver
-{
-    friend class QPDFObject;
-    friend class QPDF_Unresolved;
-
-  private:
-    static QPDFObject*
-    resolved(QPDF* qpdf, QPDFObjGen og)
-    {
-        return qpdf->resolve(og);
-    }
 };
 
 // StreamCopier class is restricted to QPDFObjectHandle so it can copy stream data.
@@ -408,7 +395,7 @@ class QPDF::ParseGuard
     static std::shared_ptr<QPDFObject>
     getObject(QPDF* qpdf, int id, int gen, bool parse_pdf)
     {
-        return qpdf->getObjectForParser(id, gen, parse_pdf);
+        return qpdf->objects().get_for_parser(id, gen, parse_pdf);
     }
 
     ~ParseGuard()
@@ -803,10 +790,31 @@ class QPDF::Members
 };
 
 inline QPDF::Objects&
-QPDF::objects()
+QPDF::objects() noexcept
 {
     return m->objects;
 }
+
+inline QPDF::Objects const&
+QPDF::objects() const noexcept
+{
+    return m->objects;
+}
+
+// The Resolver class is restricted to QPDFObject so that only it can resolve indirect
+// references.
+class QPDF::Resolver
+{
+    friend class QPDFObject;
+    friend class QPDF_Unresolved;
+
+  private:
+    static QPDFObject*
+    resolved(QPDF* qpdf, QPDFObjGen og)
+    {
+        return qpdf->m->objects.resolve(og);
+    }
+};
 
 // JobSetter class is restricted to QPDFJob.
 class QPDF::JobSetter
@@ -884,13 +892,13 @@ class QPDF::Writer
     static std::vector<QPDFObjGen>
     getCompressibleObjGens(QPDF& qpdf)
     {
-        return qpdf.getCompressibleObjVector();
+        return qpdf.objects().compressible_vector();
     }
 
     static std::vector<bool>
     getCompressibleObjSet(QPDF& qpdf)
     {
-        return qpdf.getCompressibleObjSet();
+        return qpdf.objects().compressible_set();
     }
 
     static Xref_table const&
@@ -902,7 +910,7 @@ class QPDF::Writer
     static size_t
     tableSize(QPDF& qpdf)
     {
-        return qpdf.tableSize();
+        return qpdf.objects().table_size();
     }
 };
 
