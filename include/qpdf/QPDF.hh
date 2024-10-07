@@ -645,7 +645,7 @@ class QPDF
     QPDF_DLL
     void fixDanglingReferences(bool force = false);
 
-    // Return the approximate number of indirect objects. It is/ approximate because not all objects
+    // Return the approximate number of indirect objects. It is approximate because not all objects
     // in the file are preserved in all cases, and gaps in object numbering are not preserved.
     QPDF_DLL
     size_t getObjectCount();

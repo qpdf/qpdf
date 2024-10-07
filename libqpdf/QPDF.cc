@@ -492,12 +492,7 @@ QPDF::getObjectCount()
     // This method returns the next available indirect object number. makeIndirectObject uses it for
     // this purpose. After fixDanglingReferences is called, all objects in the xref table will also
     // be in obj_cache.
-    fixDanglingReferences();
-    QPDFObjGen og;
-    if (!m->objects.obj_cache.empty()) {
-        og = (*(m->objects.obj_cache.rbegin())).first;
-    }
-    return toS(og.getObj());
+    return toS(m->objects.next_id().getObj() - 1);
 }
 
 std::vector<QPDFObjectHandle>

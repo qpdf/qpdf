@@ -1712,7 +1712,12 @@ Objects::unresolved(QPDFObjGen og)
 QPDFObjGen
 Objects::next_id()
 {
-    int max_objid = toI(qpdf.getObjectCount());
+    qpdf.fixDanglingReferences();
+    QPDFObjGen og;
+    if (!obj_cache.empty()) {
+        og = (*(m->objects.obj_cache.rbegin())).first;
+    }
+    int max_objid = og.getObj();
     if (max_objid == std::numeric_limits<int>::max()) {
         throw std::range_error("max object id is too high to create new objects");
     }
