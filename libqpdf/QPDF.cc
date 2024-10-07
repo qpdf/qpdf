@@ -199,25 +199,7 @@ QPDF::QPDF() :
     m->unique_id = unique_id.fetch_add(1ULL);
 }
 
-QPDF::~QPDF()
-{
-    // If two objects are mutually referential (through each object having an array or dictionary
-    // that contains an indirect reference to the other), the circular references in the
-    // std::shared_ptr objects will prevent the objects from being deleted. Walk through all objects
-    // in the object cache, which is those objects that we read from the file, and break all
-    // resolved indirect references by replacing them with an internal object type representing that
-    // they have been destroyed. Note that we can't break references like this at any time when the
-    // QPDF object is active. The call to reset also causes all direct QPDFObjectHandle objects that
-    // are reachable from this object to release their association with this QPDF. Direct objects
-    // are not destroyed since they can be moved to other QPDF objects safely.
-
-    for (auto const& iter: m->objects.obj_cache) {
-        iter.second.object->disconnect();
-        if (iter.second.object->getTypeCode() != ::ot_null) {
-            iter.second.object->destroy();
-        }
-    }
-}
+QPDF::~QPDF() = default;
 
 std::shared_ptr<QPDF>
 QPDF::create()

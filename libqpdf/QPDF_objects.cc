@@ -1154,7 +1154,7 @@ Objects ::all()
     // After fixDanglingReferences is called, all objects are in the object cache.
     qpdf.fixDanglingReferences();
     std::vector<QPDFObjectHandle> result;
-    for (auto const& iter: obj_cache) {
+    for (auto const& iter: table) {
         result.emplace_back(iter.second.object);
     }
     return result;
@@ -1539,7 +1539,7 @@ QPDFObject*
 Objects::resolve(QPDFObjGen og)
 {
     if (!unresolved(og)) {
-        return obj_cache[og].object.get();
+        return table[og].object.get();
     }
 
     if (m->resolving.count(og)) {
@@ -1548,7 +1548,7 @@ Objects::resolve(QPDFObjGen og)
         QTC::TC("qpdf", "QPDF recursion loop in resolve");
         qpdf.warn(qpdf.damagedPDF("", "loop detected resolving object " + og.unparse(' ')));
         update_table(og, QPDF_Null::create());
-        return obj_cache[og].object.get();
+        return table[og].object.get();
     }
     ResolveRecorder rr(&qpdf, og);
 
@@ -1585,7 +1585,7 @@ Objects::resolve(QPDFObjGen og)
         update_table(og, QPDF_Null::create());
     }
 
-    auto result(obj_cache[og].object);
+    auto result(table[og].object);
     result->setDefaultDescription(&qpdf, og);
     return result.get();
 }
@@ -1685,28 +1685,48 @@ Objects::resolveObjectsInStream(int obj_stream_number)
     }
 }
 
+Objects::~Objects()
+{
+    // If two objects are mutually referential (through each object having an array or dictionary
+    // that contains an indirect reference to the other), the circular references in the
+    // std::shared_ptr objects will prevent the objects from being deleted. Walk through all objects
+    // in the object cache, which is those objects that we read from the file, and break all
+    // resolved indirect references by replacing them with an internal object type representing that
+    // they have been destroyed. Note that we can't break references like this at any time when the
+    // QPDF object is active. The call to reset also causes all direct QPDFObjectHandle objects that
+    // are reachable from this object to release their association with this QPDF. Direct objects
+    // are not destroyed since they can be moved to other QPDF objects safely.
+
+    for (auto const& iter: table) {
+        iter.second.object->disconnect();
+        if (iter.second.object->getTypeCode() != ::ot_null) {
+            iter.second.object->destroy();
+        }
+    }
+}
+
 void
 Objects::update_table(QPDFObjGen og, const std::shared_ptr<QPDFObject>& object)
 {
     object->setObjGen(&qpdf, og);
     if (cached(og)) {
-        auto& cache = obj_cache[og];
+        auto& cache = table[og];
         cache.object->assign(object);
     } else {
-        obj_cache[og] = Entry(object);
+        table[og] = Entry(object);
     }
 }
 
 bool
 Objects::cached(QPDFObjGen og)
 {
-    return obj_cache.count(og) != 0;
+    return table.count(og) != 0;
 }
 
 bool
 Objects::unresolved(QPDFObjGen og)
 {
-    return !cached(og) || obj_cache[og].object->isUnresolved();
+    return !cached(og) || table[og].object->isUnresolved();
 }
 
 QPDFObjGen
@@ -1714,8 +1734,8 @@ Objects::next_id()
 {
     qpdf.fixDanglingReferences();
     QPDFObjGen og;
-    if (!obj_cache.empty()) {
-        og = (*(m->objects.obj_cache.rbegin())).first;
+    if (!table.empty()) {
+        og = (*(m->objects.table.rbegin())).first;
     }
     int max_objid = og.getObj();
     if (max_objid == std::numeric_limits<int>::max()) {
@@ -1728,8 +1748,8 @@ QPDFObjectHandle
 Objects::make_indirect(std::shared_ptr<QPDFObject> const& obj)
 {
     QPDFObjGen next{next_id()};
-    obj_cache[next] = Entry(obj);
-    return qpdf.newIndirect(next, obj_cache[next].object);
+    table[next] = Entry(obj);
+    return qpdf.newIndirect(next, table[next].object);
 }
 
 std::shared_ptr<QPDFObject>
@@ -1737,23 +1757,23 @@ Objects::get_for_parser(int id, int gen, bool parse_pdf)
 {
     // This method is called by the parser and therefore must not resolve any objects.
     auto og = QPDFObjGen(id, gen);
-    if (auto iter = obj_cache.find(og); iter != obj_cache.end()) {
+    if (auto iter = table.find(og); iter != table.end()) {
         return iter->second.object;
     }
     if (xref.type(og) || !xref.initialized()) {
-        return obj_cache.insert({og, QPDF_Unresolved::create(&qpdf, og)}).first->second.object;
+        return table.insert({og, QPDF_Unresolved::create(&qpdf, og)}).first->second.object;
     }
     if (parse_pdf) {
         return QPDF_Null::create();
     }
-    return obj_cache.insert({og, QPDF_Null::create(&qpdf, og)}).first->second.object;
+    return table.insert({og, QPDF_Null::create(&qpdf, og)}).first->second.object;
 }
 
 std::shared_ptr<QPDFObject>
 Objects::get_for_json(int id, int gen)
 {
     auto og = QPDFObjGen(id, gen);
-    auto [it, inserted] = obj_cache.try_emplace(og);
+    auto [it, inserted] = table.try_emplace(og);
     auto& obj = it->second.object;
     if (inserted) {
         obj = (xref.initialized() && !xref.type(og)) ? QPDF_Null::create(&qpdf, og)
@@ -1775,11 +1795,11 @@ Objects::replace(QPDFObjGen og, QPDFObjectHandle oh)
 void
 Objects::erase(QPDFObjGen og)
 {
-    if (auto cached = obj_cache.find(og); cached != obj_cache.end()) {
+    if (auto cached = table.find(og); cached != table.end()) {
         // Take care of any object handles that may be floating around.
         cached->second.object->assign(QPDF_Null::create());
         cached->second.object->setObjGen(nullptr, QPDFObjGen());
-        obj_cache.erase(cached);
+        table.erase(cached);
     }
 }
 
@@ -1789,19 +1809,19 @@ Objects::swap(QPDFObjGen og1, QPDFObjGen og2)
     // Force objects to be read from the input source if needed, then swap them in the cache.
     resolve(og1);
     resolve(og2);
-    obj_cache[og1].object->swapWith(obj_cache[og2].object);
+    table[og1].object->swapWith(table[og2].object);
 }
 
 size_t
 Objects::table_size()
 {
-    // If obj_cache is dense, accommodate all object in tables,else accommodate only original
+    // If table is dense, accommodate all object in tables,else accommodate only original
     // objects.
     auto max_xref = toI(xref.size());
     if (max_xref > 0) {
         --max_xref;
     }
-    auto max_obj = obj_cache.size() ? obj_cache.crbegin()->first.getObj() : 0;
+    auto max_obj = table.size() ? table.crbegin()->first.getObj() : 0;
     auto max_id = std::numeric_limits<int>::max() - 1;
     if (max_obj >= max_id || max_xref >= max_id) {
         // Temporary fix. Long-term solution is
@@ -1809,7 +1829,7 @@ Objects::table_size()
         // - xref table and obj cache to protect against insertion of impossibly large obj ids
         qpdf.stopOnError("Impossibly large object id encountered.");
     }
-    if (max_obj < 1.1 * std::max(toI(obj_cache.size()), max_xref)) {
+    if (max_obj < 1.1 * std::max(toI(table.size()), max_xref)) {
         return toS(++max_obj);
     }
     return toS(++max_xref);
@@ -1848,7 +1868,7 @@ Objects::compressible()
     queue.emplace_back(trailer());
     std::vector<T> result;
     if constexpr (std::is_same_v<T, QPDFObjGen>) {
-        result.reserve(obj_cache.size());
+        result.reserve(table.size());
     } else if constexpr (std::is_same_v<T, bool>) {
         result.resize(max_obj + 1U, false);
     } else {
@@ -1872,8 +1892,8 @@ Objects::compressible()
             // Check whether this is the current object. If not, remove it (which changes it into a
             // direct null and therefore stops us from revisiting it) and move on to the next object
             // in the queue.
-            auto upper = obj_cache.upper_bound(og);
-            if (upper != obj_cache.end() && upper->first.getObj() == og.getObj()) {
+            auto upper = table.upper_bound(og);
+            if (upper != table.end() && upper->first.getObj() == og.getObj()) {
                 erase(og);
                 continue;
             }

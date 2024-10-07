@@ -378,17 +378,7 @@ class QPDF::Objects
         qpdf_offset_t first_item_offset_{0}; // actual value from file
     }; // Xref_table;
 
-    struct Entry
-    {
-        Entry() = default;
-
-        Entry(std::shared_ptr<QPDFObject> object) :
-            object(std::move(object))
-        {
-        }
-
-        std::shared_ptr<QPDFObject> object;
-    };
+    ~Objects();
 
     Objects(QPDF& qpdf, QPDF::Members* m, InputSource* const& file) :
         qpdf(qpdf),
@@ -425,12 +415,12 @@ class QPDF::Objects
     QPDFObjectHandle
     get(QPDFObjGen og)
     {
-        if (auto it = obj_cache.find(og); it != obj_cache.end()) {
+        if (auto it = table.find(og); it != table.end()) {
             return {it->second.object};
         } else if (xref.initialized() && !xref.type(og)) {
             return QPDF_Null::create();
         } else {
-            auto result = obj_cache.try_emplace(og, QPDF_Unresolved::create(&qpdf, og));
+            auto result = table.try_emplace(og, QPDF_Unresolved::create(&qpdf, og));
             return {result.first->second.object};
         }
     }
@@ -449,9 +439,6 @@ class QPDF::Objects
 
     void swap(QPDFObjGen og1, QPDFObjGen og2);
 
-    std::map<QPDFObjGen, Entry> obj_cache;
-
-    QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>& input, int obj);
     QPDFObjectHandle read(
         bool attempt_recovery,
         qpdf_offset_t offset,
@@ -460,7 +447,6 @@ class QPDF::Objects
         QPDFObjGen& og,
         bool skip_cache_if_in_xref);
     QPDFObject* resolve(QPDFObjGen og);
-    void resolveObjectsInStream(int obj_stream_number);
     void update_table(QPDFObjGen og, std::shared_ptr<QPDFObject> const& object);
     QPDFObjGen next_id();
     QPDFObjectHandle make_indirect(std::shared_ptr<QPDFObject> const& obj);
@@ -477,9 +463,23 @@ class QPDF::Objects
     size_t table_size();
 
   private:
+    struct Entry
+    {
+        Entry() = default;
+
+        Entry(std::shared_ptr<QPDFObject> object) :
+            object(object)
+        {
+        }
+
+        std::shared_ptr<QPDFObject> object;
+    };
+
     bool cached(QPDFObjGen og);
     bool unresolved(QPDFObjGen og);
 
+    QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>& input, int obj);
+    void resolveObjectsInStream(int obj_stream_number);
     QPDFObjectHandle read_object(std::string const& description, QPDFObjGen og);
     void read_stream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset);
     void validate_stream_line_end(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset);
@@ -490,6 +490,8 @@ class QPDF::Objects
     InputSource* const& file;
     QPDF::Members* m;
     Xref_table xref;
+
+    std::map<QPDFObjGen, Entry> table;
 }; // Objects
 
 #endif // QPDF_OBJECTS_HH
