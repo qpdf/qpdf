@@ -185,7 +185,8 @@ QPDF::Members::Members(QPDF& qpdf) :
     file_sp(new InvalidInputSource(no_input_name)),
     file(file_sp.get()),
     encp(new EncryptionParameters),
-    xref_table(qpdf, file)
+    objects(qpdf, this),
+    xref_table(qpdf, objects, file)
 {
 }
 
@@ -211,7 +212,7 @@ QPDF::~QPDF()
     // are reachable from this object to release their association with this QPDF. Direct objects
     // are not destroyed since they can be moved to other QPDF objects safely.
 
-    for (auto const& iter: m->obj_cache) {
+    for (auto const& iter: m->objects.obj_cache) {
         iter.second.object->disconnect();
         if (iter.second.object->getTypeCode() != ::ot_null) {
             iter.second.object->destroy();
@@ -494,8 +495,8 @@ QPDF::getObjectCount()
     // be in obj_cache.
     fixDanglingReferences();
     QPDFObjGen og;
-    if (!m->obj_cache.empty()) {
-        og = (*(m->obj_cache.rbegin())).first;
+    if (!m->objects.obj_cache.empty()) {
+        og = (*(m->objects.obj_cache.rbegin())).first;
     }
     return toS(og.getObj());
 }
@@ -575,12 +576,12 @@ QPDF::newStream(std::string const& data)
 QPDFObjectHandle
 QPDF::getObject(QPDFObjGen const& og)
 {
-    if (auto it = m->obj_cache.find(og); it != m->obj_cache.end()) {
+    if (auto it = m->objects.obj_cache.find(og); it != m->objects.obj_cache.end()) {
         return {it->second.object};
     } else if (m->xref_table.initialized() && !m->xref_table.type(og)) {
         return QPDF_Null::create();
     } else {
-        auto result = m->obj_cache.try_emplace(og, QPDF_Unresolved::create(this, og));
+        auto result = m->objects.obj_cache.try_emplace(og, QPDF_Unresolved::create(this, og));
         return {result.first->second.object};
     }
 }

@@ -730,6 +730,7 @@ class QPDF
     class Writer;
     class Resolver;
     class StreamCopier;
+    class Objects;
     class ParseGuard;
     class Pipe;
     class JobSetter;
@@ -757,6 +758,7 @@ class QPDF
     class ResolveRecorder;
     class JSONReactor;
 
+    inline Objects& objects();
     void parse(char const* password);
     void inParse(bool);
     void setLastObjectDescription(std::string const& description, QPDFObjGen const& og);

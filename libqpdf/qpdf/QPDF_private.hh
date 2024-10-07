@@ -3,13 +3,15 @@
 
 #include <qpdf/QPDF.hh>
 
+#include <qpdf/QPDF_objects.hh>
+
 #include <variant>
 
 // Xref_table encapsulates the pdf's xref table and trailer.
 class QPDF::Xref_table
 {
   public:
-    Xref_table(QPDF& qpdf, InputSource* const& file) :
+    Xref_table(QPDF& qpdf, QPDF::Objects& objects, InputSource* const& file) :
         qpdf(qpdf),
         file(file)
     {
@@ -750,8 +752,8 @@ class QPDF::Members
     bool check_mode{false};
     std::shared_ptr<EncryptionParameters> encp;
     std::string pdf_version;
+    Objects objects;
     Xref_table xref_table;
-    std::map<QPDFObjGen, ObjCache> obj_cache;
     std::set<QPDFObjGen> resolving;
     std::vector<QPDFObjectHandle> all_pages;
     bool invalid_page_found{false};
@@ -799,6 +801,12 @@ class QPDF::Members
     std::map<ObjUser, std::set<QPDFObjGen>> obj_user_to_objects;
     std::map<QPDFObjGen, std::set<ObjUser>> object_to_obj_users;
 };
+
+inline QPDF::Objects&
+QPDF::objects()
+{
+    return m->objects;
+}
 
 // JobSetter class is restricted to QPDFJob.
 class QPDF::JobSetter

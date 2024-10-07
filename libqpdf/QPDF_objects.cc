@@ -1152,7 +1152,7 @@ QPDF::getAllObjects()
     // After fixDanglingReferences is called, all objects are in the object cache.
     fixDanglingReferences();
     std::vector<QPDFObjectHandle> result;
-    for (auto const& iter: m->obj_cache) {
+    for (auto const& iter: m->objects.obj_cache) {
         result.push_back(newIndirect(iter.first, iter.second.object));
     }
     return result;
@@ -1537,7 +1537,7 @@ QPDFObject*
 QPDF::resolve(QPDFObjGen og)
 {
     if (!isUnresolved(og)) {
-        return m->obj_cache[og].object.get();
+        return m->objects.obj_cache[og].object.get();
     }
 
     if (m->resolving.count(og)) {
@@ -1546,7 +1546,7 @@ QPDF::resolve(QPDFObjGen og)
         QTC::TC("qpdf", "QPDF recursion loop in resolve");
         warn(damagedPDF("", "loop detected resolving object " + og.unparse(' ')));
         updateCache(og, QPDF_Null::create());
-        return m->obj_cache[og].object.get();
+        return m->objects.obj_cache[og].object.get();
     }
     ResolveRecorder rr(this, og);
 
@@ -1584,7 +1584,7 @@ QPDF::resolve(QPDFObjGen og)
         updateCache(og, QPDF_Null::create());
     }
 
-    auto result(m->obj_cache[og].object);
+    auto result(m->objects.obj_cache[og].object);
     result->setDefaultDescription(this, og);
     return result.get();
 }
@@ -1690,23 +1690,23 @@ QPDF::updateCache(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& objec
 {
     object->setObjGen(this, og);
     if (isCached(og)) {
-        auto& cache = m->obj_cache[og];
+        auto& cache = m->objects.obj_cache[og];
         cache.object->assign(object);
     } else {
-        m->obj_cache[og] = ObjCache(object);
+        m->objects.obj_cache[og] = ObjCache(object);
     }
 }
 
 bool
 QPDF::isCached(QPDFObjGen const& og)
 {
-    return m->obj_cache.count(og) != 0;
+    return m->objects.obj_cache.count(og) != 0;
 }
 
 bool
 QPDF::isUnresolved(QPDFObjGen const& og)
 {
-    return !isCached(og) || m->obj_cache[og].object->isUnresolved();
+    return !isCached(og) || m->objects.obj_cache[og].object->isUnresolved();
 }
 
 QPDFObjGen
@@ -1723,8 +1723,8 @@ QPDFObjectHandle
 QPDF::makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj)
 {
     QPDFObjGen next{nextObjGen()};
-    m->obj_cache[next] = ObjCache(obj);
-    return newIndirect(next, m->obj_cache[next].object);
+    m->objects.obj_cache[next] = ObjCache(obj);
+    return newIndirect(next, m->objects.obj_cache[next].object);
 }
 
 std::shared_ptr<QPDFObject>
@@ -1732,23 +1732,24 @@ QPDF::getObjectForParser(int id, int gen, bool parse_pdf)
 {
     // This method is called by the parser and therefore must not resolve any objects.
     auto og = QPDFObjGen(id, gen);
-    if (auto iter = m->obj_cache.find(og); iter != m->obj_cache.end()) {
+    if (auto iter = m->objects.obj_cache.find(og); iter != m->objects.obj_cache.end()) {
         return iter->second.object;
     }
     if (m->xref_table.type(og) || !m->xref_table.initialized()) {
-        return m->obj_cache.insert({og, QPDF_Unresolved::create(this, og)}).first->second.object;
+        return m->objects.obj_cache.insert({og, QPDF_Unresolved::create(this, og)})
+            .first->second.object;
     }
     if (parse_pdf) {
         return QPDF_Null::create();
     }
-    return m->obj_cache.insert({og, QPDF_Null::create(this, og)}).first->second.object;
+    return m->objects.obj_cache.insert({og, QPDF_Null::create(this, og)}).first->second.object;
 }
 
 std::shared_ptr<QPDFObject>
 QPDF::getObjectForJSON(int id, int gen)
 {
     auto og = QPDFObjGen(id, gen);
-    auto [it, inserted] = m->obj_cache.try_emplace(og);
+    auto [it, inserted] = m->objects.obj_cache.try_emplace(og);
     auto& obj = it->second.object;
     if (inserted) {
         obj = (m->xref_table.initialized() && !m->xref_table.type(og))
@@ -1771,11 +1772,11 @@ QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
 void
 QPDF::removeObject(QPDFObjGen og)
 {
-    if (auto cached = m->obj_cache.find(og); cached != m->obj_cache.end()) {
+    if (auto cached = m->objects.obj_cache.find(og); cached != m->objects.obj_cache.end()) {
         // Take care of any object handles that may be floating around.
         cached->second.object->assign(QPDF_Null::create());
         cached->second.object->setObjGen(nullptr, QPDFObjGen());
-        m->obj_cache.erase(cached);
+        m->objects.obj_cache.erase(cached);
     }
 }
 
@@ -1785,7 +1786,7 @@ QPDF::swapObjects(QPDFObjGen const& og1, QPDFObjGen const& og2)
     // Force objects to be read from the input source if needed, then swap them in the cache.
     resolve(og1);
     resolve(og2);
-    m->obj_cache[og1].object->swapWith(m->obj_cache[og2].object);
+    m->objects.obj_cache[og1].object->swapWith(m->objects.obj_cache[og2].object);
 }
 
 size_t
@@ -1797,7 +1798,7 @@ QPDF::tableSize()
     if (max_xref > 0) {
         --max_xref;
     }
-    auto max_obj = m->obj_cache.size() ? m->obj_cache.crbegin()->first.getObj() : 0;
+    auto max_obj = m->objects.obj_cache.size() ? m->objects.obj_cache.crbegin()->first.getObj() : 0;
     auto max_id = std::numeric_limits<int>::max() - 1;
     if (max_obj >= max_id || max_xref >= max_id) {
         // Temporary fix. Long-term solution is
@@ -1805,7 +1806,7 @@ QPDF::tableSize()
         // - xref table and obj cache to protect against insertion of impossibly large obj ids
         stopOnError("Impossibly large object id encountered.");
     }
-    if (max_obj < 1.1 * std::max(toI(m->obj_cache.size()), max_xref)) {
+    if (max_obj < 1.1 * std::max(toI(m->objects.obj_cache.size()), max_xref)) {
         return toS(++max_obj);
     }
     return toS(++max_xref);
@@ -1844,7 +1845,7 @@ QPDF::getCompressibleObjGens()
     queue.push_back(m->xref_table.trailer());
     std::vector<T> result;
     if constexpr (std::is_same_v<T, QPDFObjGen>) {
-        result.reserve(m->obj_cache.size());
+        result.reserve(m->objects.obj_cache.size());
     } else if constexpr (std::is_same_v<T, bool>) {
         result.resize(max_obj + 1U, false);
     } else {
@@ -1868,8 +1869,8 @@ QPDF::getCompressibleObjGens()
             // Check whether this is the current object. If not, remove it (which changes it into a
             // direct null and therefore stops us from revisiting it) and move on to the next object
             // in the queue.
-            auto upper = m->obj_cache.upper_bound(og);
-            if (upper != m->obj_cache.end() && upper->first.getObj() == og.getObj()) {
+            auto upper = m->objects.obj_cache.upper_bound(og);
+            if (upper != m->objects.obj_cache.end() && upper->first.getObj() == og.getObj()) {
                 removeObject(og);
                 continue;
             }
