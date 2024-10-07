@@ -575,32 +575,25 @@ QPDF::newStream(std::string const& data)
 QPDFObjectHandle
 QPDF::getObject(QPDFObjGen const& og)
 {
-    if (auto it = m->objects.obj_cache.find(og); it != m->objects.obj_cache.end()) {
-        return {it->second.object};
-    } else if (m->objects.xref_table().initialized() && !m->objects.xref_table().type(og)) {
-        return QPDF_Null::create();
-    } else {
-        auto result = m->objects.obj_cache.try_emplace(og, QPDF_Unresolved::create(this, og));
-        return {result.first->second.object};
-    }
+    return m->objects.get(og);
 }
 
 QPDFObjectHandle
-QPDF::getObject(int objid, int generation)
+QPDF::getObject(int id, int gen)
 {
-    return getObject(QPDFObjGen(objid, generation));
+    return m->objects.get(id, gen);
 }
 
 QPDFObjectHandle
 QPDF::getObjectByObjGen(QPDFObjGen const& og)
 {
-    return getObject(og);
+    return m->objects.get(og);
 }
 
 QPDFObjectHandle
-QPDF::getObjectByID(int objid, int generation)
+QPDF::getObjectByID(int id, int gen)
 {
-    return getObject(QPDFObjGen(objid, generation));
+    return m->objects.get(id, gen);
 }
 
 void

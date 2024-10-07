@@ -201,7 +201,7 @@ Xref_table::reconstruct(QPDFExc& e)
         }
     }
 
-    std::vector<std::tuple<int, int, qpdf_offset_t>> objects;
+    std::vector<std::tuple<int, int, qpdf_offset_t>> found_objects;
     std::vector<qpdf_offset_t> trailers;
     int max_found = 0;
 
@@ -220,7 +220,7 @@ Xref_table::reconstruct(QPDFExc& e)
                 int obj = QUtil::string_to_int(t1.getValue().c_str());
                 int gen = QUtil::string_to_int(t2.getValue().c_str());
                 if (obj <= max_id_) {
-                    objects.emplace_back(obj, gen, token_start);
+                    found_objects.emplace_back(obj, gen, token_start);
                     if (obj > max_found) {
                         max_found = obj;
                     }
@@ -249,8 +249,8 @@ Xref_table::reconstruct(QPDFExc& e)
         check_warnings();
     }
 
-    auto rend = objects.rend();
-    for (auto it = objects.rbegin(); it != rend; it++) {
+    auto rend = found_objects.rend();
+    for (auto it = found_objects.rbegin(); it != rend; it++) {
         auto [obj, gen, token_start] = *it;
         insert(obj, 1, token_start, gen);
         check_warnings();
@@ -265,7 +265,7 @@ Xref_table::reconstruct(QPDFExc& e)
             if (item.type() != 1) {
                 continue;
             }
-            auto oh = qpdf.getObject(i, item.gen());
+            auto oh = objects.get(i, item.gen());
             try {
                 if (!oh.isStreamOfType("/XRef")) {
                     continue;
@@ -1598,7 +1598,7 @@ Objects::resolveObjectsInStream(int obj_stream_number)
     }
     m->resolved_object_streams.insert(obj_stream_number);
     // Force resolution of object stream
-    QPDFObjectHandle obj_stream = qpdf.getObject(obj_stream_number, 0);
+    QPDFObjectHandle obj_stream = get(obj_stream_number, 0);
     if (!obj_stream.isStream()) {
         throw qpdf.damagedPDF(
             "supposed object stream " + std::to_string(obj_stream_number) + " is not a stream");

@@ -3,6 +3,9 @@
 
 #include <qpdf/QPDF.hh>
 
+#include <qpdf/QPDF_Null.hh>
+#include <qpdf/QPDF_Unresolved.hh>
+
 #include <variant>
 
 // The Objects class is responsible for keeping track of all objects belonging to a QPDF instance,
@@ -417,6 +420,25 @@ class QPDF::Objects
     trailer() const noexcept
     {
         return xref.trailer();
+    }
+
+    QPDFObjectHandle
+    get(QPDFObjGen og)
+    {
+        if (auto it = obj_cache.find(og); it != obj_cache.end()) {
+            return {it->second.object};
+        } else if (xref.initialized() && !xref.type(og)) {
+            return QPDF_Null::create();
+        } else {
+            auto result = obj_cache.try_emplace(og, QPDF_Unresolved::create(&qpdf, og));
+            return {result.first->second.object};
+        }
+    }
+
+    QPDFObjectHandle
+    get(int id, int gen)
+    {
+        return get(QPDFObjGen(id, gen));
     }
 
     std::map<QPDFObjGen, Entry> obj_cache;

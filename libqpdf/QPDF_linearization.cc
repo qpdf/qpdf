@@ -130,7 +130,7 @@ QPDF::isLinearized()
         return false;
     }
 
-    auto candidate = getObjectByID(lindict_obj, 0);
+    auto candidate = m->objects.get(lindict_obj, 0);
     if (!candidate.isDictionary()) {
         return false;
     }
@@ -563,11 +563,11 @@ QPDF::getLinearizationOffset(QPDFObjGen const& og)
 QPDFObjectHandle
 QPDF::getUncompressedObject(QPDFObjectHandle& obj, std::map<int, int> const& object_stream_data)
 {
-    if (obj.isNull() || (object_stream_data.count(obj.getObjectID()) == 0)) {
+    if (obj.isNull() || !object_stream_data.count(obj.getObjectID())) {
         return obj;
     } else {
         int repl = (*(object_stream_data.find(obj.getObjectID()))).second;
-        return getObject(repl, 0);
+        return m->objects.get(repl, 0);
     }
 }
 
@@ -578,7 +578,7 @@ QPDF::getUncompressedObject(QPDFObjectHandle& obj, Objects const& objects)
     if (obj.isNull() || objects.xref_table().type(og) != 2) {
         return obj;
     }
-    return getObject(objects.xref_table().stream_number(og.getObj()), 0);
+    return m->objects.get(objects.xref_table().stream_number(og.getObj()), 0);
 }
 
 QPDFObjectHandle
@@ -586,7 +586,7 @@ QPDF::getUncompressedObject(QPDFObjectHandle& oh, QPDFWriter::ObjTable const& ob
 {
     if (obj.contains(oh)) {
         if (auto id = obj[oh].object_stream; id > 0) {
-            return oh.isNull() ? oh : getObject(id, 0);
+            return oh.isNull() ? oh : m->objects.get(id, 0);
         }
     }
     return oh;
@@ -1430,9 +1430,9 @@ QPDF::pushOutlinesToPart(
     m->c_outline_data.first_object = outlines_og.getObj();
     m->c_outline_data.nobjects = 1;
     lc_outlines.erase(outlines_og);
-    part.push_back(outlines);
+    part.emplace_back(outlines);
     for (auto const& og: lc_outlines) {
-        part.push_back(getObject(og));
+        part.emplace_back(m->objects.get(og));
         ++m->c_outline_data.nobjects;
     }
 }
