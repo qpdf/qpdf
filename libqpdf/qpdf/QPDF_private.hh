@@ -382,7 +382,6 @@ class QPDF::Members
     std::shared_ptr<QPDFObjectHandle::StreamDataProvider> copied_streams;
     // copied_stream_data_provider is owned by copied_streams
     CopiedStreamDataProvider* copied_stream_data_provider{nullptr};
-    bool fixed_dangling_refs{false};
     bool immediate_copy_from{false};
     bool in_parse{false};
     std::set<int> resolved_object_streams;

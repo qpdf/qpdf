@@ -103,6 +103,7 @@ QPDF::findStartxref()
 void
 Xref_table::initialize_empty()
 {
+    objects.initialized_ = true;
     initialized_ = true;
     trailer_ = QPDFObjectHandle::newDictionary();
     auto rt = qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
@@ -119,6 +120,7 @@ Xref_table::initialize_empty()
 void
 Xref_table::initialize_json()
 {
+    objects.initialized_ = true;
     initialized_ = true;
     table.resize(1);
     trailer_ = QPDFObjectHandle::newDictionary();
@@ -203,8 +205,6 @@ Xref_table::reconstruct(QPDFExc& e)
     };
 
     reconstructed_ = true;
-    // We may find more objects, which may contain dangling references.
-    qpdf.m->fixed_dangling_refs = false;
 
     warn_damaged("file is damaged");
     qpdf.warn(e);
@@ -1166,8 +1166,8 @@ Xref_table::resolve_all()
 std::vector<QPDFObjectHandle>
 Objects ::all()
 {
-    // After fixDanglingReferences is called, all objects are in the object cache.
-    qpdf.fixDanglingReferences();
+    // After initialize is called, all objects are in the object cache.
+    initialize();
     std::vector<QPDFObjectHandle> result;
     for (auto const& iter: table) {
         result.emplace_back(iter.second.object);
@@ -1744,27 +1744,47 @@ Objects::unresolved(QPDFObjGen og)
     return !cached(og) || table[og].object->isUnresolved();
 }
 
-QPDFObjGen
+// Increment last_id and return the result.
+int
 Objects::next_id()
 {
-    qpdf.fixDanglingReferences();
-    QPDFObjGen og;
-    if (!table.empty()) {
-        og = (*(m->objects.table.rbegin())).first;
+    if (!initialized_) {
+        initialize();
     }
-    int max_objid = og.getObj();
-    if (max_objid == std::numeric_limits<int>::max()) {
-        throw std::range_error("max object id is too high to create new objects");
+    return ++last_id_;
+}
+
+// Return the last id used when creating a new object.
+int
+Objects::last_id()
+{
+    if (!initialized_) {
+        initialize();
     }
-    return QPDFObjGen(max_objid + 1, 0);
+    return last_id_;
+}
+
+void
+Objects::initialize()
+{
+    if (initialized_) {
+        return;
+    }
+    initialized_ = true;
+    // We need to resolve the xref table because during recovery the size of the xref table may
+    // increase. Arguably, if we read the xref table without errors, including finding a valid
+    // trailer, then we should stick with /Size as per the PDF spec. In this case we can remove this
+    // method entirely, and in the process avoid the need to read the entire PDF file unnecessarily.
+    xref.resolve_all();
+    last_id_ = std::max(last_id_, toI(xref.size() - 1));
 }
 
 QPDFObjectHandle
 Objects::make_indirect(std::shared_ptr<QPDFObject> const& obj)
 {
-    QPDFObjGen next{next_id()};
-    table[next] = Entry(obj);
-    return qpdf.newIndirect(next, table[next].object);
+    QPDFObjGen next{next_id(), 0};
+    update_table(next, obj);
+    return table[next].object;
 }
 
 std::shared_ptr<QPDFObject>
@@ -1791,6 +1811,7 @@ Objects::get_for_json(int id, int gen)
     auto [it, inserted] = table.try_emplace(og);
     auto& obj = it->second.object;
     if (inserted) {
+        last_id_ = std::max(last_id_, id);
         obj = (xref.initialized() && !xref.type(og)) ? QPDF_Null::create(&qpdf, og)
                                                      : QPDF_Unresolved::create(&qpdf, og);
     }
