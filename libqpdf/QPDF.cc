@@ -453,16 +453,11 @@ QPDF::showXRefTable()
     m->objects.xref_table().show();
 }
 
-// Ensure all objects in the pdf file, including those in indirect references, appear in the object
-// cache.
+// Ensure all objects in the pdf file appear in the object table.
 void
 QPDF::fixDanglingReferences(bool force)
 {
-    if (m->fixed_dangling_refs) {
-        return;
-    }
-    m->objects.xref_table().resolve_all();
-    m->fixed_dangling_refs = true;
+    m->objects.initialize();
 }
 
 size_t
@@ -471,7 +466,7 @@ QPDF::getObjectCount()
     // This method returns the next available indirect object number. makeIndirectObject uses it for
     // this purpose. After fixDanglingReferences is called, all objects in the xref table will also
     // be in obj_cache.
-    return toS(m->objects.next_id().getObj() - 1);
+    return toS(m->objects.last_id());
 }
 
 std::vector<QPDFObjectHandle>
@@ -502,13 +497,6 @@ QPDF::readToken(InputSource& input, size_t max_len)
 }
 
 QPDFObjectHandle
-QPDF::newIndirect(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& obj)
-{
-    obj->setDefaultDescription(this, og);
-    return {obj};
-}
-
-QPDFObjectHandle
 QPDF::makeIndirectObject(QPDFObjectHandle oh)
 {
     if (!oh) {
@@ -532,8 +520,8 @@ QPDF::newIndirectNull()
 QPDFObjectHandle
 QPDF::newStream()
 {
-    return m->objects.make_indirect(
-        QPDF_Stream::create(this, m->objects.next_id(), QPDFObjectHandle::newDictionary(), 0, 0));
+    return m->objects.make_indirect(QPDF_Stream::create(
+        this, QPDFObjGen(m->objects.last_id() + 1, 0), QPDFObjectHandle::newDictionary(), 0, 0));
 }
 
 QPDFObjectHandle

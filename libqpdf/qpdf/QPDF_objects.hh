@@ -389,6 +389,8 @@ class QPDF::Objects
 
     ~Objects();
 
+    void initialize();
+
     Xref_table&
     xref_table() noexcept
     {
@@ -447,9 +449,12 @@ class QPDF::Objects
         QPDFObjGen exp_og,
         QPDFObjGen& og,
         bool skip_cache_if_in_xref);
+
     QPDFObject* resolve(QPDFObjGen og);
     void update_table(QPDFObjGen og, std::shared_ptr<QPDFObject> const& object);
-    QPDFObjGen next_id();
+    // Return the highest id in use.
+    int last_id();
+    // Increment the highest id in use and return the result.
     QPDFObjectHandle make_indirect(std::shared_ptr<QPDFObject> const& obj);
     std::shared_ptr<QPDFObject> get_for_parser(int id, int gen, bool parse_pdf);
     std::shared_ptr<QPDFObject> get_for_json(int id, int gen);
@@ -479,6 +484,8 @@ class QPDF::Objects
     bool cached(QPDFObjGen og);
     bool unresolved(QPDFObjGen og);
 
+    int next_id();
+
     QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>& input, int obj);
     void resolveObjectsInStream(int obj_stream_number);
     QPDFObjectHandle read_object(std::string const& description, QPDFObjGen og);
@@ -493,6 +500,9 @@ class QPDF::Objects
     Xref_table xref;
 
     std::map<QPDFObjGen, Entry> table;
+
+    bool initialized_{false};
+    int last_id_{0};
 }; // Objects
 
 #endif // QPDF_OBJECTS_HH
