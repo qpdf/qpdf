@@ -30,7 +30,7 @@ class QPDF::Objects
         void initialize_json();
         void reconstruct(QPDFExc& e);
         void show();
-        bool resolve();
+        void resolve_all();
 
         QPDFObjectHandle
         trailer() noexcept
@@ -376,9 +376,7 @@ class QPDF::Objects
         // Linearization data
         bool uncompressed_after_compressed_{false};
         qpdf_offset_t first_item_offset_{0}; // actual value from file
-    }; // Xref_table;
-
-    ~Objects();
+    }; // Xref_table
 
     Objects(QPDF& qpdf, QPDF::Members* m, InputSource* const& file) :
         qpdf(qpdf),
@@ -387,6 +385,8 @@ class QPDF::Objects
         xref(*this)
     {
     }
+
+    ~Objects();
 
     Xref_table&
     xref_table() noexcept

@@ -601,8 +601,7 @@ Xref_table::read_entry()
     int f2{0};
     char type{'\0'};
     std::array<char, 21> line;
-    f1 = 0;
-    f2 = 0;
+
     if (file->read(line.data(), 20) != 20) {
         // C++20: [[unlikely]]
         return {false, 0, 0, '\0'};
@@ -1127,10 +1126,9 @@ Xref_table::show()
     }
 }
 
-// Resolve all objects in the xref table. If this triggers a xref table reconstruction abort and
-// return false. Otherwise return true.
-bool
-Xref_table::resolve()
+// Resolve all objects in the xref table.
+void
+Xref_table::resolve_all()
 {
     bool may_change = !reconstructed_;
     int i = -1;
@@ -1140,12 +1138,13 @@ Xref_table::resolve()
             if (objects.unresolved(QPDFObjGen(i, item.gen()))) {
                 objects.resolve(QPDFObjGen(i, item.gen()));
                 if (may_change && reconstructed_) {
-                    return false;
+                    QTC::TC("qpdf", "QPDF fix dangling triggered xref reconstruction");
+                    resolve_all();
+                    return;
                 }
             }
         }
     }
-    return true;
 }
 
 std::vector<QPDFObjectHandle>

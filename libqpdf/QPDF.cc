@@ -461,10 +461,7 @@ QPDF::fixDanglingReferences(bool force)
     if (m->fixed_dangling_refs) {
         return;
     }
-    if (!m->objects.xref_table().resolve()) {
-        QTC::TC("qpdf", "QPDF fix dangling triggered xref reconstruction");
-        m->objects.xref_table().resolve();
-    }
+    m->objects.xref_table().resolve_all();
     m->fixed_dangling_refs = true;
 }
 
