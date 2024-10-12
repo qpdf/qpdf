@@ -567,13 +567,13 @@ QPDF::getObjectByID(int id, int gen)
 void
 QPDF::replaceObject(int id, int gen, QPDFObjectHandle replacement)
 {
-    m->objects.replace(QPDFObjGen(id, gen), replacement);
+    m->objects.replace(id, gen, replacement);
 }
 
 void
 QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle replacement)
 {
-    m->objects.replace(og, replacement);
+    m->objects.replace(og.getObj(), og.getGen(), replacement);
 }
 
 void
@@ -584,7 +584,8 @@ QPDF::replaceReserved(QPDFObjectHandle reserved, QPDFObjectHandle replacement)
     if (!(tc == ::ot_reserved || tc == ::ot_null)) {
         throw std::logic_error("replaceReserved called with non-reserved object");
     }
-    m->objects.replace(reserved.getObjGen(), replacement);
+    auto og = reserved.getObjGen();
+    m->objects.replace(og.getObj(), og.getGen(), replacement);
 }
 
 QPDFObjectHandle
