@@ -301,6 +301,7 @@ class QPDF::Objects
         }
 
         void read(qpdf_offset_t offset);
+        void prepare_obj_table();
 
         // Methods to parse tables
         qpdf_offset_t process_section(qpdf_offset_t offset);
