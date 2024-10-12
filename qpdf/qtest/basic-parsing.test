@@ -35,6 +35,7 @@ my @goodfiles = ("implicit null",                       # 1
                  "xref with prev",                      # 19
                  "lots of compressible objects",        # 20
                  "array with indirect nulls",           # 21
+                 "dangling reference masking object",   # 22
                  );
 
 my $n_tests = (3 * @goodfiles) + 6;
@@ -43,6 +44,7 @@ my %goodtest_overrides = ('14' => 3);
 my %goodtest_flags =
     ('18' => '-ignore-xref-streams',
      '20' => '-object-streams=generate',
+     '22' => '-object-streams=generate',
     );
 for (my $i = 1; $i <= scalar(@goodfiles); ++$i)
 {

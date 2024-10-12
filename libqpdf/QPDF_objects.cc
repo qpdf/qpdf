@@ -165,7 +165,23 @@ Xref_table::initialize()
         }
     }
 
+    prepare_obj_table();
     initialized_ = true;
+}
+
+// Remove any dangling reference picked up while parsing the xref table from the object table..
+void
+Xref_table::prepare_obj_table()
+{
+    for (auto it = objects.table.begin(), end = objects.table.end(); it != end;) {
+        if (type(it->first)) {
+            ++it;
+        } else {
+            it->second.object->assign(QPDF_Null::create());
+            it->second.object->setObjGen(nullptr, QPDFObjGen());
+            it = objects.table.erase(it);
+        }
+    }
 }
 
 void
