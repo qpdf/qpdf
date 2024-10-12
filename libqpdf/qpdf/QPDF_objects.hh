@@ -54,12 +54,18 @@ class QPDF::Objects
         size_t
         type(QPDFObjGen og) const
         {
-            int id = og.getObj();
+            return type(og.getObj(), og.getGen());
+        }
+
+        // Returns 0 if og is not in table.
+        size_t
+        type(int id, int gen) const
+        {
             if (id < 1 || static_cast<size_t>(id) >= table.size()) {
                 return 0;
             }
             auto& e = table[static_cast<size_t>(id)];
-            return e.gen() == og.getGen() ? e.type() : 0;
+            return e.gen() == gen ? e.type() : 0;
         }
 
         // Returns 0 if og is not in table.
@@ -436,9 +442,9 @@ class QPDF::Objects
 
     std::vector<QPDFObjectHandle> all();
 
-    void erase(QPDFObjGen og);
+    void erase(int id, int gen);
 
-    void replace(QPDFObjGen og, QPDFObjectHandle oh);
+    void replace(int id, int gen, QPDFObjectHandle oh);
 
     void swap(QPDFObjGen og1, QPDFObjGen og2);
 
@@ -452,9 +458,9 @@ class QPDF::Objects
 
     QPDFObject* resolve(QPDFObjGen og);
     void update_table(QPDFObjGen og, std::shared_ptr<QPDFObject> const& object);
+
     // Return the highest id in use.
     int last_id();
-    // Increment the highest id in use and return the result.
     QPDFObjectHandle make_indirect(std::shared_ptr<QPDFObject> const& obj);
     std::shared_ptr<QPDFObject> get_for_parser(int id, int gen, bool parse_pdf);
     std::shared_ptr<QPDFObject> get_for_json(int id, int gen);
@@ -483,8 +489,10 @@ class QPDF::Objects
 
     bool cached(QPDFObjGen og);
     bool unresolved(QPDFObjGen og);
+    bool unresolved(int id, int gen);
 
     int next_id();
+    void update_table(int id, int gen, std::shared_ptr<QPDFObject> const& object);
 
     QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>& input, int obj);
     void resolveObjectsInStream(int obj_stream_number);
