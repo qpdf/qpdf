@@ -1719,7 +1719,7 @@ Objects::Entry::update(int a_gen, const std::shared_ptr<QPDFObject>& obj)
 {
     if (*this) {
         if (gen != a_gen) {
-            throw std::logic_error("Internal eror in Objects::update_table");
+            throw std::logic_error("Internal error in Objects::update_table");
         }
         object->assign(obj);
     } else {
@@ -1727,6 +1727,18 @@ Objects::Entry::update(int a_gen, const std::shared_ptr<QPDFObject>& obj)
         object = obj;
     }
     return object;
+}
+
+// Reset to uninitialised state, making any object null.
+void
+Objects::Entry::reset()
+{
+    if (object) {
+        object->make_null();
+    }
+    object = nullptr;
+    gen = 0;
+    unconfirmed = false;
 }
 
 std::shared_ptr<QPDFObject>
@@ -1752,7 +1764,14 @@ bool
 Objects::unresolved(int id, int gen)
 {
     auto it = table.find(id);
-    return it == table.end() || (it->second.gen == gen && it->second.object->isUnresolved());
+    if (it == table.end()) {
+        return true;
+    }
+    if (it->second.gen == gen) {
+        return it->second.object->isUnresolved();
+    }
+    auto it2 = unconfirmed_objects.find({id, gen});
+    return it2 != unconfirmed_objects.end() && it2->second->isUnresolved();
 }
 
 // Increment last_id and return the result.
@@ -1789,6 +1808,23 @@ Objects::initialize()
     last_id_ = std::max(last_id_, toI(xref.size() - 1));
 }
 
+void
+Objects::clear_unconfirmeds()
+{
+    for (auto it = table.begin(), end = table.end(); it != end;) {
+        if (it->second && it->second.unconfirmed) {
+            it->second.object->make_null();
+            it = table.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    for (auto& item: unconfirmed_objects) {
+        item.second->make_null();
+    }
+    unconfirmed_objects.clear();
+}
+
 std::shared_ptr<QPDFObject>
 Objects::make_indirect(std::shared_ptr<QPDFObject> const& obj)
 {
@@ -1820,22 +1856,85 @@ Objects::get_for_parser(int id, int gen, bool parse_pdf)
 }
 
 std::shared_ptr<QPDFObject>
-Objects::get_for_json(int id, int gen)
+Objects::get_when_uncertain(int id, int gen)
 {
-    auto [it, inserted] = table.try_emplace(id);
-    auto& obj = it->second.object;
-    if (inserted) {
-        it->second.gen = gen;
-        last_id_ = std::max(last_id_, id);
-        obj = xref.initialized() && !xref.type(id, gen)
-            ? QPDF_Null::create(&qpdf, QPDFObjGen(id, gen))
-            : QPDF_Unresolved::create(&qpdf, QPDFObjGen(id, gen));
-    } else {
-        if (it->second.gen != gen) {
-            return QPDF_Null::create();
+    auto& e = table[id];
+    if (!e) {
+        // There is no existing entry. If this (id, gen) is in the xref table, we encountered an
+        // unresolved object. Otherwise we optimistically assume that it is a reference to an actual
+        // object, but mark it as unconfirmed.
+        if (xref.initialized()) {
+            last_id_ = std::max(last_id_, id);
+        }
+        e.gen = gen;
+        if (!xref.type(id, gen)) {
+            e.unconfirmed = true;
+            return e.object = QPDF_Null::create(&qpdf, QPDFObjGen(id, gen));
+        } else {
+            return e.object = QPDF_Unresolved::create(&qpdf, QPDFObjGen(id, gen));
         }
     }
-    return obj;
+
+    // Existing entry
+    if (e.gen == gen) {
+        return e.object;
+    }
+    if (!e.unconfirmed && gen < e.gen) {
+        // Table contains a newer confirmed object. This (id, gen) is definitely a dangling
+        // reference.
+        return QPDF_Null::create();
+    }
+    // We don't know whether the table entry is valid, therefore this (id, gen) could still be
+    // valid despite the gen mismatch. Return a shared indirect null from unconfirmed_objects.
+    if (auto& j = unconfirmed_objects[{id, gen}]) {
+        return j;
+    } else {
+        return j = QPDF_Null::create(&qpdf, QPDFObjGen(id, gen));
+    }
+}
+
+QPDFObjectHandle
+Objects::replace_when_uncertain(int id, int gen, QPDFObjectHandle& oh)
+{
+    // This method is only called while loading a JSON file.
+    if (!id) {
+        // Direct null from a reference already identified as dangling.
+        return oh;
+    }
+    auto& e = table[id];
+
+    if (!e) {
+        // This  should not happen since the JSONReactor should have called replace_when_uncertain
+        // when starting to parse the object.
+        throw std::logic_error("Internal error in Objects::replace_for_json");
+    }
+    if (e.gen == gen) {
+        e.unconfirmed = false; // Now confirmed - this is an actual object.
+        return update_entry(e, id, gen, oh.getObj());
+    }
+
+    if (e.gen < gen) {
+        // The current entry will definitely be replaced by oh.
+        e.object->make_null();
+    } else if (!e.unconfirmed) {
+        // oh has been replaced by this current entry.
+        oh.getObj()->make_null();
+        return oh;
+    }
+
+    if (e.unconfirmed) {
+        // The current entry could still become live by a later replace. Let's stash it away.
+        unconfirmed_objects.emplace(std::pair{id, e.gen}, e.object);
+    }
+
+    e.reset();
+    // Make sure we don't clean up the actual object.
+    if (auto it = unconfirmed_objects.find({id, gen}); it != unconfirmed_objects.end()) {
+        e.object = it->second;
+        unconfirmed_objects.erase(it); // Make sure we don't clean up the actual object.
+    }
+    e.gen = gen;
+    return update_entry(e, id, gen, oh.getObj());
 }
 
 // Replace the object with oh. In the process oh will become almost, but not quite, the indirect

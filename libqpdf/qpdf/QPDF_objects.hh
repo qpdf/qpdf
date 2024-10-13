@@ -469,10 +469,14 @@ class QPDF::Objects
     void erase(int id, int gen);
 
     void replace(int id, int gen, QPDFObjectHandle oh);
+    // replace for when we cannot be sure whether object references are dangling.
+    QPDFObjectHandle replace_when_uncertain(int id, int gen, QPDFObjectHandle& oh);
 
     void swap(QPDFObjGen og1, QPDFObjGen og2);
 
     std::shared_ptr<QPDFObject> make_indirect(std::shared_ptr<QPDFObject> const& obj);
+
+    void clear_unconfirmeds();
 
     QPDFObjectHandle read(
         bool attempt_recovery,
@@ -488,7 +492,9 @@ class QPDF::Objects
     int last_id();
 
     std::shared_ptr<QPDFObject> get_for_parser(int id, int gen, bool parse_pdf);
-    std::shared_ptr<QPDFObject> get_for_json(int id, int gen);
+
+    // get for when we cannot be sure whether object references are dangling.
+    std::shared_ptr<QPDFObject> get_when_uncertain(int id, int gen);
 
     // Get a list of objects that would be permitted in an object stream.
     template <typename T>
@@ -524,8 +530,10 @@ class QPDF::Objects
         }
 
         std::shared_ptr<QPDFObject> update(int gen, const std::shared_ptr<QPDFObject>& obj);
+        void reset();
 
         int gen{0};
+        bool unconfirmed{false}; // True if we are uncertain whether the entry is a dangling ref.
         std::shared_ptr<QPDFObject> object;
     }; // Entry
 
@@ -553,7 +561,7 @@ class QPDF::Objects
     Xref_table xref;
 
     std::map<int, Entry> table;
-
+    std::map<std::pair<int, int>, std::shared_ptr<QPDFObject>> unconfirmed_objects;
     bool initialized_{false};
     int last_id_{0};
 }; // Objects
