@@ -179,8 +179,7 @@ Xref_table::prepare_obj_table()
         if (type(it->first)) {
             ++it;
         } else {
-            it->second.object->assign(QPDF_Null::create());
-            it->second.object->setObjGen(nullptr, QPDFObjGen());
+            it->second.object->make_null();
             it = objects.table.erase(it);
         }
     }
@@ -1600,9 +1599,7 @@ Objects::resolve(QPDFObjGen og)
         update_table(og.getObj(), og.getGen(), QPDF_Null::create());
     }
 
-    auto result(table[og].object);
-    result->setDefaultDescription(&qpdf, og);
-    return result.get();
+    return table[og].object.get();
 }
 
 void
@@ -1722,7 +1719,7 @@ void
 Objects::update_table(int id, int gen, const std::shared_ptr<QPDFObject>& object)
 {
     auto og = QPDFObjGen(id, gen);
-    object->setObjGen(&qpdf, og);
+    object->make_indirect(qpdf, id, gen);
     if (cached(og)) {
         auto& cache = table[og];
         cache.object->assign(object);
@@ -1837,8 +1834,7 @@ Objects::erase(int id, int gen)
 {
     if (auto cached = table.find(QPDFObjGen(id, gen)); cached != table.end()) {
         // Take care of any object handles that may be floating around.
-        cached->second.object->assign(QPDF_Null::create());
-        cached->second.object->setObjGen(nullptr, QPDFObjGen());
+        cached->second.object->make_null();
         table.erase(cached);
     }
 }
