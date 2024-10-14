@@ -1489,64 +1489,63 @@ Objects::read(
     }
 
     QPDFObjectHandle oh = read_object(description, og);
-
-    if (unresolved(og)) {
-        // Store the object in the cache here so it gets cached whether we first know the offset or
-        // whether we first know the object ID and generation (in which we case we would get here
-        // through resolve).
-
-        // Determine the end offset of this object before and after white space.  We use these
-        // numbers to validate linearization hint tables.  Offsets and lengths of objects may imply
-        // the end of an object to be anywhere between these values.
-        qpdf_offset_t end_before_space = m->file->tell();
-
-        // skip over spaces
-        while (true) {
-            char ch;
-            if (m->file->read(&ch, 1)) {
-                if (!isspace(static_cast<unsigned char>(ch))) {
-                    m->file->seek(-1, SEEK_CUR);
-                    break;
-                }
-            } else {
-                throw qpdf.damagedPDF(m->file->tell(), "EOF after endobj");
-            }
-        }
-        qpdf_offset_t end_after_space = m->file->tell();
-        if (skip_cache_if_in_xref && xref.type(og)) {
-            // Ordinarily, an object gets read here when resolved through xref table or stream. In
-            // the special case of the xref stream and linearization hint tables, the offset comes
-            // from another source. For the specific case of xref streams, the xref stream is read
-            // and loaded into the object cache very early in parsing. Ordinarily, when a file is
-            // updated by appending, items inserted into the xref table in later updates take
-            // precedence over earlier items. In the special case of reusing the object number
-            // previously used as the xref stream, we have the following order of events:
-            //
-            // * reused object gets loaded into the xref table
-            // * old object is read here while reading xref streams
-            // * original xref entry is ignored (since already in xref table)
-            //
-            // It is the second step that causes a problem. Even though the xref table is correct in
-            // this case, the old object is already in the cache and so effectively prevails over
-            // the reused object. To work around this issue, we have a special case for the xref
-            // stream (via the skip_cache_if_in_xref): if the object is already in the xref stream,
-            // don't cache what we read here.
-            //
-            // It is likely that the same bug may exist for linearization hint tables, but the
-            // existing code uses end_before_space and end_after_space from the cache, so fixing
-            // that would require more significant rework. The chances of a linearization hint
-            // stream being reused seems smaller because the xref stream is probably the highest
-            // object in the file and the linearization hint stream would be some random place in
-            // the middle, so I'm leaving that bug unfixed for now. If the bug were to be fixed, we
-            // could use !check_og in place of skip_cache_if_in_xref.
-            QTC::TC("qpdf", "QPDF skipping cache for known unchecked object");
-        } else {
-            xref.linearization_offsets(toS(og.getObj()), end_before_space, end_after_space);
-            update_table(og.getObj(), og.getGen(), oh.getObj());
-        }
+    if (!unresolved(og)) {
+        return oh;
     }
 
-    return oh;
+    // Store the object in the cache here so it gets cached whether we first know the offset or
+    // whether we first know the object ID and generation (in which we case we would get here
+    // through resolve).
+
+    // Determine the end offset of this object before and after white space.  We use these numbers
+    // to validate linearization hint tables.  Offsets and lengths of objects may imply the end of
+    // an object to be anywhere between these values.
+    qpdf_offset_t end_before_space = m->file->tell();
+
+    // skip over spaces
+    while (true) {
+        char ch;
+        if (m->file->read(&ch, 1)) {
+            if (!isspace(static_cast<unsigned char>(ch))) {
+                m->file->seek(-1, SEEK_CUR);
+                break;
+            }
+        } else {
+            throw qpdf.damagedPDF(m->file->tell(), "EOF after endobj");
+        }
+    }
+    qpdf_offset_t end_after_space = m->file->tell();
+    if (skip_cache_if_in_xref && xref.type(og)) {
+        // Ordinarily, an object gets read here when resolved through xref table or stream. In the
+        // special case of the xref stream and linearization hint tables, the offset comes from
+        // another source. For the specific case of xref streams, the xref stream is read and loaded
+        // into the object cache very early in parsing. Ordinarily, when a file is updated by
+        // appending, items inserted into the xref table in later updates take precedence over
+        // earlier items. In the special case of reusing the object number previously used as the
+        // xref stream, we have the following order of events:
+        //
+        // * reused object gets loaded into the xref table
+        // * old object is read here while reading xref streams
+        // * original xref entry is ignored (since already in xref table)
+        //
+        // It is the second step that causes a problem. Even though the xref table is correct in
+        // this case, the old object is already in the cache and so effectively prevails over the
+        // reused object. To work around this issue, we have a special case for the xref stream (via
+        // the skip_cache_if_in_xref): if the object is already in the xref stream, don't cache what
+        // we read here.
+        //
+        // It is likely that the same bug may exist for linearization hint tables, but the existing
+        // code uses end_before_space and end_after_space from the cache, so fixing that would
+        // require more significant rework. The chances of a linearization hint stream being reused
+        // seems smaller because the xref stream is probably the highest object in the file and the
+        // linearization hint stream would be some random place in the middle, so I'm leaving that
+        // bug unfixed for now. If the bug were to be fixed, we could use !check_og in place of
+        // skip_cache_if_in_xref.
+        QTC::TC("qpdf", "QPDF skipping cache for known unchecked object");
+        return oh;
+    }
+    xref.linearization_offsets(toS(og.getObj()), end_before_space, end_after_space);
+    return {update_table(og.getObj(), og.getGen(), oh.getObj())};
 }
 
 QPDFObject*
