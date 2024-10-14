@@ -523,6 +523,8 @@ class QPDF::Objects
             return static_cast<bool>(object);
         }
 
+        std::shared_ptr<QPDFObject> update(int gen, const std::shared_ptr<QPDFObject>& obj);
+
         int gen{0};
         std::shared_ptr<QPDFObject> object;
     }; // Entry
@@ -531,7 +533,10 @@ class QPDF::Objects
     bool unresolved(int id, int gen);
 
     int next_id();
-    void update_table(int id, int gen, std::shared_ptr<QPDFObject> const& object);
+    std::shared_ptr<QPDFObject>
+    update_entry(Entry& e, int id, int gen, const std::shared_ptr<QPDFObject>& obj);
+    std::shared_ptr<QPDFObject>
+    update_table(int id, int gen, std::shared_ptr<QPDFObject> const& object);
 
     QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>& input, int obj);
     void resolveObjectsInStream(int obj_stream_number);
