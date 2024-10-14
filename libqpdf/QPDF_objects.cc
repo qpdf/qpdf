@@ -1562,8 +1562,7 @@ Objects::resolve(int id, int gen)
         // has to be resolved during object parsing, such as stream length.
         QTC::TC("qpdf", "QPDF recursion loop in resolve");
         qpdf.warn(qpdf.damagedPDF("", "loop detected resolving object " + og.unparse(' ')));
-        update_table(id, gen, QPDF_Null::create());
-        return table[id].object.get();
+        return update_table(id, gen, QPDF_Null::create()).get();
     }
     ResolveRecorder rr(&qpdf, og);
 
@@ -1597,7 +1596,7 @@ Objects::resolve(int id, int gen)
     if (unresolved(id, gen)) {
         // PDF spec says unknown objects resolve to the null object.
         QTC::TC("qpdf", "QPDF resolve failure to null");
-        update_table(id, gen, QPDF_Null::create());
+        return update_table(id, gen, QPDF_Null::create()).get();
     }
 
     return table[id].object.get();
@@ -1716,19 +1715,32 @@ Objects::~Objects()
     }
 }
 
-void
-Objects::update_table(int id, int gen, const std::shared_ptr<QPDFObject>& obj)
+std::shared_ptr<QPDFObject>
+Objects::Entry::update(int a_gen, const std::shared_ptr<QPDFObject>& obj)
 {
-    obj->make_indirect(qpdf, id, gen);
-    auto& e = table[id];
-    if (e) {
-        if (e.gen != gen) {
+    if (*this) {
+        if (gen != a_gen) {
             throw std::logic_error("Internal eror in Objects::update_table");
         }
-        e.object->assign(obj);
+        object->assign(obj);
     } else {
-        e = Entry(gen, obj);
+        gen = a_gen;
+        object = obj;
     }
+    return object;
+}
+
+std::shared_ptr<QPDFObject>
+Objects::update_entry(Entry& e, int id, int gen, const std::shared_ptr<QPDFObject>& obj)
+{
+    obj->make_indirect(qpdf, id, gen);
+    return e.update(gen, obj);
+}
+
+std::shared_ptr<QPDFObject>
+Objects::update_table(int id, int gen, const std::shared_ptr<QPDFObject>& obj)
+{
+    return update_entry(table[id], id, gen, obj);
 }
 
 bool
@@ -1781,9 +1793,7 @@ Objects::initialize()
 std::shared_ptr<QPDFObject>
 Objects::make_indirect(std::shared_ptr<QPDFObject> const& obj)
 {
-    auto next = next_id();
-    update_table(next, 0, obj);
-    return table[next].object;
+    return update_table(next_id(), 0, obj);
 }
 
 std::shared_ptr<QPDFObject>
@@ -1853,7 +1863,7 @@ Objects::replace(int id, int gen, QPDFObjectHandle oh)
     if (e && e.gen < gen) {
         erase(id, gen);
     }
-    update_table(id, gen, oh.getObj());
+    update_entry(e, id, gen, oh.getObj());
 }
 
 void
