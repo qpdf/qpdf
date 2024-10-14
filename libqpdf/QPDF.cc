@@ -463,9 +463,8 @@ QPDF::fixDanglingReferences(bool force)
 size_t
 QPDF::getObjectCount()
 {
-    // This method returns the next available indirect object number. makeIndirectObject uses it for
-    // this purpose. After fixDanglingReferences is called, all objects in the xref table will also
-    // be in obj_cache.
+    // This method returns the highest used indirect object number. Calling this method will resolve
+    // all objects.
     return toS(m->objects.last_id());
 }
 

@@ -171,18 +171,28 @@ Xref_table::initialize()
     initialized_ = true;
 }
 
-// Remove any dangling reference picked up while parsing the xref table.
+// Remove any dangling reference picked up while parsing or reconstructing the xref table from the
+// object table.
 void
 Xref_table::prepare_obj_table()
 {
     for (auto it = objects.table.begin(), end = objects.table.end(); it != end;) {
-        if (type(it->first, it->second.gen)) {
-            ++it;
-        } else {
+        if (it->second.unconfirmed && !type(it->first, it->second.gen)) {
             it->second.object->make_null();
             it = objects.table.erase(it);
+        } else {
+            it->second.unconfirmed = false;
+            ++it;
         }
     }
+    for (auto& [id_gen, obj]: objects.unconfirmed_objects) {
+        if (type(id_gen.first, id_gen.second)) {
+            objects.update_table(id_gen.first, id_gen.second, obj);
+        } else {
+            obj->make_null();
+        }
+    }
+    objects.unconfirmed_objects.clear();
 }
 
 void
@@ -204,6 +214,8 @@ Xref_table::reconstruct(QPDFExc& e)
     };
 
     reconstructed_ = true;
+    bool called_during_resolve_attempt = initialized_;
+    initialized_ = false;
 
     warn_damaged("file is damaged");
     qpdf.warn(e);
@@ -280,7 +292,7 @@ Xref_table::reconstruct(QPDFExc& e)
             if (item.type() != 1) {
                 continue;
             }
-            auto oh = objects.get(i, item.gen());
+            QPDFObjectHandle oh{objects.get_when_uncertain(i, item.gen())};
             try {
                 if (!oh.isStreamOfType("/XRef")) {
                     continue;
@@ -319,8 +331,11 @@ Xref_table::reconstruct(QPDFExc& e)
         throw damaged_pdf("unable to find objects while recovering damaged file");
     }
     check_warnings();
-    if (!initialized_) {
-        initialized_ = true;
+    prepare_obj_table();
+    initialized_ = true;
+    if (!called_during_resolve_attempt) {
+        // We can't do the checks because we may try to resolve the object that triggered the
+        // reconstruction.
         qpdf.getAllPages();
         check_warnings();
         if (qpdf.m->all_pages.empty()) {
@@ -1552,7 +1567,7 @@ QPDFObject*
 Objects::resolve(int id, int gen)
 {
     if (!unresolved(id, gen)) {
-        return get(id, gen).getObjectPtr();
+        return get_for_parser(id, gen, true).get();
     }
 
     auto og = QPDFObjGen(id, gen);
@@ -1835,6 +1850,9 @@ std::shared_ptr<QPDFObject>
 Objects::get_for_parser(int id, int gen, bool parse_pdf)
 {
     // This method is called by the parser and therefore must not resolve any objects.
+    if (!xref.initialized() && parse_pdf) {
+        return get_when_uncertain(id, gen);
+    }
     auto iter = table.find(id);
     if (iter != table.end() && iter->second.gen == gen) {
         return iter->second.object;
@@ -1843,7 +1861,7 @@ Objects::get_for_parser(int id, int gen, bool parse_pdf)
         // id in table, different gen
         return QPDF_Null::create();
     }
-    if (xref.type(id, gen) || !xref.initialized()) {
+    if (xref.type(id, gen)) {
         return table.insert({id, {gen, QPDF_Unresolved::create(&qpdf, QPDFObjGen(id, gen))}})
             .first->second.object;
     }
@@ -1869,7 +1887,9 @@ Objects::get_when_uncertain(int id, int gen)
         e.gen = gen;
         if (!xref.type(id, gen)) {
             e.unconfirmed = true;
-            return e.object = QPDF_Null::create(&qpdf, QPDFObjGen(id, gen));
+            return e.object = xref.initialized()
+                ? QPDF_Null::create(&qpdf, QPDFObjGen(id, gen))
+                : QPDF_Unresolved::create(&qpdf, QPDFObjGen(id, gen));
         } else {
             return e.object = QPDF_Unresolved::create(&qpdf, QPDFObjGen(id, gen));
         }
@@ -1889,7 +1909,8 @@ Objects::get_when_uncertain(int id, int gen)
     if (auto& j = unconfirmed_objects[{id, gen}]) {
         return j;
     } else {
-        return j = QPDF_Null::create(&qpdf, QPDFObjGen(id, gen));
+        return j = xref.initialized() ? QPDF_Null::create(&qpdf, QPDFObjGen(id, gen))
+                                      : QPDF_Unresolved::create(&qpdf, QPDFObjGen(id, gen));
     }
 }
 
