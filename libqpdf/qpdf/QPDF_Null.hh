@@ -20,7 +20,6 @@ class QPDF_Null: public QPDFValue
     std::string unparse() override;
     void writeJSON(int json_version, JSON::Writer& p) override;
 
-  private:
     QPDF_Null(QPDF* qpdf = nullptr, QPDFObjGen og = QPDFObjGen());
 };
 

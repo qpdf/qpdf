@@ -148,7 +148,7 @@ $td->runtest("check manual JSON to JSON",
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check manual JSON to JSON to JSON",
              {$td->COMMAND => "qpdf --json-output=2 --json-input a.json -"},
-             {$td->FILE => "a.json", $td->EXIT_STATUS => 0},
+             {$td->FILE => "manual-qpdf-json-temporary-out.json", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 $n_tests += 6;
@@ -383,5 +383,42 @@ $td->runtest("write JSON to pipeline",
              {$td->COMMAND => "test_driver 98 minimal.pdf ''"},
              {$td->STRING => "test 98 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+
+$n_tests += 8;
+$td->runtest("manual JSON dangling refs to PDF",
+             {$td->COMMAND => "qpdf --json-input --static-id --qdf" .
+                  " manual-qpdf-json-dangle.json a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check manual JSON dangling refs to PDF",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "manual-qpdf-json-dangle.pdf"});
+$td->runtest("check manual JSON dangling refs to PDF to JSON",
+             {$td->COMMAND => "qpdf --json-output=2 a.pdf -"},
+             {$td->FILE => "manual-qpdf-json-pdf-dangle.json", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("manual JSON dangling refs to JSON",
+             {$td->COMMAND => "qpdf --json-input --json-output=2" .
+                  " manual-qpdf-json-pdf-dangle.json a.json"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check manual JSON dangling refs to JSON",
+             {$td->FILE => "a.json"},
+             {$td->FILE => "manual-qpdf-json-dangle-out.json"},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check manual JSON dangling refs to JSON to JSON",
+             {$td->COMMAND => "qpdf --json-output=2 --json-input a.json -"},
+             {$td->FILE => "manual-qpdf-json-dangle-out.json", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("manual JSON replaced stream to JSON",
+             {$td->COMMAND => "qpdf --json-input --json-output=2" .
+                  " manual-qpdf-json-bad-stream.json a.json"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check manual JSON dangling refs to JSON",
+             {$td->FILE => "a.json"},
+             {$td->FILE => "manual-qpdf-json-bad-stream-out.json"},
+             $td->NORMALIZE_NEWLINES);
+
 cleanup();
 $td->report($n_tests);
