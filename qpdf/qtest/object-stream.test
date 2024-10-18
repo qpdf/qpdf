@@ -16,7 +16,7 @@ cleanup();
 
 my $td = new TestDriver('object-stream');
 
-my $n_tests = 9 + (36 * 4) + (12 * 2);
+my $n_tests = 10 + (36 * 4) + (12 * 2);
 my $n_compare_pdfs = 36;
 
 for (my $n = 16; $n <= 19; ++$n)
@@ -117,6 +117,14 @@ $td->runtest("check file",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "object-stream-self-ref.out.pdf"});
 
+# The file no-space-compressed-object.pdf contains an object stream containing two
+# integer objects that are not separated by any white space. The test case exercises
+# that all objects in the stream have the correct value.
+$td->runtest("adjacent compressed objects",
+             {$td->COMMAND => "test_driver 99 no-space-compressed-object.pdf"},
+             {$td->FILE => "no-space-compressed-object.out",
+              $td->EXIT_STATUS => 0},
+             $td->EXPECT_FAILURE);
 
 cleanup();
 $td->report(calc_ntests($n_tests, $n_compare_pdfs));
