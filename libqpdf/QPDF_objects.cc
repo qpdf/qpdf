@@ -1031,23 +1031,18 @@ Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
     auto& entry = table[static_cast<size_t>(obj)];
     auto old_type = entry.type();
 
-    if (!old_type && entry.gen() > 0) {
+    if ((!old_type && entry.gen() > 0) || (old_type && entry.gen() >= new_gen)) {
         // At the moment we are processing the updates last to first and therefore the gen doesn't
-        // matter as long as it > 0 to distinguish it from an uninitialized entry. This will need
-        // to be revisited when we want to support incremental updates or more comprehensive
-        // checking.
-        QTC::TC("qpdf", "QPDF xref deleted object");
+        // matter for deleted objects as long as gen > 0 to distinguish it from an uninitialized
+        // entry. This will need to be revisited when we want to support incremental updates or more
+        // comprehensive checking.
+        QTC::TC("qpdf", "QPDF xref replaced / deleted object", old_type == 0 ? 0 : 1);
         return;
     }
 
     if (f0 == 2 && static_cast<int>(f1) == obj) {
         qpdf.warn(qpdf.damagedPDF(
             "xref stream", "self-referential object stream " + std::to_string(obj)));
-        return;
-    }
-
-    if (old_type && entry.gen() >= new_gen) {
-        QTC::TC("qpdf", "QPDF xref reused object");
         return;
     }
 

@@ -46,7 +46,6 @@ QPDFWriter write to file 0
 QPDF lin write nshared_total > nshared_first_page 1
 QPDFWriter encrypted hint stream 0
 QPDF opt inherited scalar 0
-QPDF xref reused object 0
 QPDF xref gen > 0 1
 QPDF not a pdf file 0
 QPDF can't find startxref 0
@@ -83,7 +82,7 @@ QPDF prev key in xref stream dictionary 0
 QPDF prev key in trailer dictionary 0
 QPDF found xref stream 0
 QPDF ignoring XRefStm in trailer 0
-QPDF xref deleted object 0
+QPDF xref replaced / deleted object 1
 SF_FlateLzwDecode PNG filter 0
 QPDF xref /Index is null 0
 QPDF xref /Index is array 1
