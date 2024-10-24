@@ -228,6 +228,8 @@ class QPDF::Objects
             return first_item_offset_;
         }
 
+        void test();
+
       private:
         // Object, count, offset of first entry
         typedef std::tuple<int, int, qpdf_offset_t> Subsection;
@@ -294,7 +296,14 @@ class QPDF::Objects
                 return type() == 2 ? std::get<2>(entry).stream_index : 0;
             }
 
+            size_t
+            length() const noexcept
+            {
+                return length_;
+            }
+
             int gen_{0};
+            size_t length_{0}; // For uncompressed objects.
             Xref entry;
             qpdf_offset_t end_before_space_{0};
             qpdf_offset_t end_after_space_{0};
@@ -314,6 +323,7 @@ class QPDF::Objects
         }
 
         void read(qpdf_offset_t offset);
+        void calc_lengths();
         void prepare_obj_table();
 
         // Methods to parse tables
@@ -375,6 +385,9 @@ class QPDF::Objects
 
         std::vector<Entry> table;
         QPDFObjectHandle trailer_;
+
+        // Temporary offset table used to calculate uncompressed object length.
+        std::vector<std::pair<qpdf_offset_t, size_t>> offsets;
 
         bool attempt_recovery_{true};
         bool initialized_{false};

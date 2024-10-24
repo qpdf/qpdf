@@ -1133,3 +1133,9 @@ QPDF::removeSecurityRestrictions()
         acroform.replaceKey("/SigFlags", QPDFObjectHandle::newInteger(0));
     }
 }
+
+void
+QPDF::test_xref()
+{
+    objects().xref_table().test();
+}

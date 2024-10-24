@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+
+chdir("xref") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('xref');
+
+my @files = ("incremental-1",
+             "incremental-1-bad",
+             );
+
+foreach my $file (@files)
+{
+    $td->runtest("xref $file",
+                 {$td->COMMAND => "xref $file.pdf"},
+                 {$td->FILE => "$file.out",
+                  $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+cleanup();
+
+$td->report(scalar(@files));
+
+sub cleanup
+{
+    unlink "tmp";
+}

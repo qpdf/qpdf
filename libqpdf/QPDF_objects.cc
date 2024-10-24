@@ -2,6 +2,7 @@
 
 #include <qpdf/QPDF_private.hh>
 
+#include <algorithm>
 #include <array>
 #include <cstring>
 #include <limits>
@@ -89,6 +90,21 @@ namespace
     };
 } // namespace
 
+void
+Xref_table::test()
+{
+    std::cout << "id, gen, offset, length, next\n";
+    int i = 0;
+    for (auto const& entry: table) {
+        if (entry.type() == 1) {
+            std::cout << i << ", " << entry.gen() << ", " << entry.type() << ", " << entry.offset()
+                      << ", " << entry.length() << ", " << (entry.offset() + toO(entry.length()))
+                      << '\n';
+        }
+        ++i;
+    }
+}
+
 bool
 QPDF::findStartxref()
 {
@@ -143,6 +159,7 @@ Xref_table::initialize()
     PatternFinder sf(qpdf, &QPDF::findStartxref);
     qpdf_offset_t xref_offset = 0;
     if (file->findLast("startxref", start_offset, 0, sf)) {
+        offsets.emplace_back(file->tell(), 0);
         xref_offset = QUtil::string_to_ll(read_token().getValue().c_str());
     }
 
@@ -167,8 +184,28 @@ Xref_table::initialize()
         }
     }
 
+    calc_lengths();
     prepare_obj_table();
     initialized_ = true;
+}
+
+void
+Xref_table::calc_lengths()
+{
+    if (offsets.size() > 1) {
+        std::sort(offsets.begin(), offsets.end());
+        size_t id = 0;
+        auto end = table.size();
+        qpdf_offset_t offset = 0;
+        for (auto const& item: offsets) {
+            if (id && id < end) {
+                table[id].length_ = toS(item.first - offset);
+            }
+            offset = item.first;
+            id = item.second;
+        }
+    }
+    offsets.clear();
 }
 
 // Remove any dangling reference picked up while parsing or reconstructing the xref table from the
@@ -234,6 +271,7 @@ Xref_table::reconstruct(QPDFExc& e)
 
     file->seek(0, SEEK_END);
     qpdf_offset_t eof = file->tell();
+    offsets.emplace_back(eof, 0);
     file->seek(0, SEEK_SET);
     // Don't allow very long tokens here during recovery. All the interesting tokens are covered.
     static size_t const MAX_LEN = 10;
@@ -256,8 +294,13 @@ Xref_table::reconstruct(QPDFExc& e)
                 }
             }
             file->seek(pos, SEEK_SET);
-        } else if (!trailer_ && t1.isWord("trailer")) {
-            trailers.emplace_back(file->tell());
+        } else if (t1.isWord("trailer")) {
+            offsets.emplace_back(token_start, 0);
+            if (!trailer_) {
+                trailers.emplace_back(file->tell());
+            }
+        } else if (t1.isWord("xref")) {
+            offsets.emplace_back(token_start, 0);
         }
         file->findAndSkipNextEOL();
     }
@@ -280,8 +323,9 @@ Xref_table::reconstruct(QPDFExc& e)
     for (auto it = found_objects.rbegin(); it != rend; it++) {
         auto [obj, gen, token_start] = *it;
         insert(obj, 1, token_start, gen);
-        check_warnings();
     }
+    calc_lengths();
+    check_warnings();
 
     if (!trailer_) {
         qpdf_offset_t max_offset{0};
@@ -401,6 +445,7 @@ Xref_table::read(qpdf_offset_t xref_offset)
             while (QUtil::is_space(buf[skip])) {
                 ++skip;
             }
+            offsets.emplace_back(xref_offset, 0);
             xref_offset = process_section(xref_offset + skip);
         } else {
             xref_offset = read_stream(xref_offset);
@@ -1037,6 +1082,11 @@ Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
         // entry. This will need to be revisited when we want to support incremental updates or more
         // comprehensive checking.
         QTC::TC("qpdf", "QPDF xref replaced / deleted object", old_type == 0 ? 0 : 1);
+        if (f0 == 1) {
+            // Save offset of deleted/replaced object to allow us to calculate object length once we
+            // are finished loading the xref table.
+            offsets.emplace_back(f1, 0);
+        }
         return;
     }
 
@@ -1051,12 +1101,13 @@ Xref_table::insert(int obj, int f0, qpdf_offset_t f1, int f2)
         // f2 is generation
         QTC::TC("qpdf", "QPDF xref gen > 0", (f2 > 0) ? 1 : 0);
         entry = {f2, Uncompressed(f1)};
-        break;
+        offsets.emplace_back(f1, static_cast<size_t>(obj));
+        return;
 
     case 2:
         entry = {0, Compressed(toI(f1), f2)};
         object_streams_ = true;
-        break;
+        return;
 
     default:
         throw qpdf.damagedPDF(
