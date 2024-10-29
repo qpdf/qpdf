@@ -493,7 +493,7 @@ Xref_table::subsections(std::string& line)
             auto offset = std::get<2>(sub);
             file->seek(offset + 20 * toO(count) - 1, SEEK_SET);
             file->read(line.data(), 1);
-            if (!(line[0] == '\n' || line[0] == '\n')) {
+            if (!(line[0] == '\n' || line[0] == '\r')) {
                 return bad_subsections(line, recovery_offset);
             }
             qpdf_offset_t pos = file->tell();
