@@ -146,7 +146,7 @@ Xref_table::initialize_json()
 void
 Xref_table::initialize()
 {
-    // PDF spec says %%EOF must be found within the last 1024 bytes of/ the file.  We add an extra
+    // PDF spec says %%EOF must be found within the last 1024 bytes of the file.  We add an extra
     // 30 characters to leave room for the startxref stuff.
     file->seek(0, SEEK_END);
     qpdf_offset_t end_offset = file->tell();
@@ -397,7 +397,6 @@ Xref_table::reconstruct(QPDFExc& e)
 void
 Xref_table::read(qpdf_offset_t xref_offset)
 {
-    std::map<int, int> free_table;
     std::set<qpdf_offset_t> visited;
     while (xref_offset) {
         visited.insert(xref_offset);
@@ -408,20 +407,19 @@ Xref_table::read(qpdf_offset_t xref_offset)
         // in the neighborhood for something that looks like either an xref table or stream, but the
         // simple heuristic of skipping whitespace can help with the xref table case and is harmless
         // with the stream case.
-        bool done = false;
         bool skipped_space = false;
-        while (!done) {
+        while (true) {
             char ch;
             if (1 == file->read(&ch, 1)) {
                 if (QUtil::is_space(ch)) {
                     skipped_space = true;
                 } else {
                     file->unreadCh(ch);
-                    done = true;
+                    break;
                 }
             } else {
                 QTC::TC("qpdf", "QPDF eof skipping spaces before xref", skipped_space ? 0 : 1);
-                done = true;
+                break;
             }
         }
 
@@ -1318,7 +1316,7 @@ Objects::read_stream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offs
     } catch (QPDFExc& e) {
         if (m->attempt_recovery) {
             qpdf.warn(e);
-            length = recover_stream_length(m->file_sp, og, stream_offset);
+            length = recover_stream_length(og, stream_offset);
         } else {
             throw;
         }
@@ -1408,11 +1406,10 @@ QPDF::findEndstream()
 }
 
 size_t
-Objects::recover_stream_length(
-    std::shared_ptr<InputSource> input, QPDFObjGen og, qpdf_offset_t stream_offset)
+Objects::recover_stream_length(QPDFObjGen og, qpdf_offset_t stream_offset)
 {
     // Try to reconstruct stream length by looking for endstream or endobj
-    qpdf.warn(qpdf.damagedPDF(*input, stream_offset, "attempting to recover stream length"));
+    qpdf.warn(qpdf.damagedPDF(stream_offset, "attempting to recover stream length"));
 
     PatternFinder ef(qpdf, &QPDF::findEndstream);
     size_t length = 0;
@@ -1440,11 +1437,9 @@ Objects::recover_stream_length(
     }
 
     if (length == 0) {
-        qpdf.warn(qpdf.damagedPDF(
-            *input, stream_offset, "unable to recover stream data; treating stream as empty"));
+        qpdf.warn(qpdf.damagedPDF(stream_offset, "unable to recover stream data; treating stream as empty"));
     } else {
-        qpdf.warn(qpdf.damagedPDF(
-            *input, stream_offset, "recovered stream length: " + std::to_string(length)));
+        qpdf.warn(qpdf.damagedPDF(stream_offset, "recovered stream length: " + std::to_string(length)));
     }
 
     QTC::TC("qpdf", "QPDF recovered stream length");
