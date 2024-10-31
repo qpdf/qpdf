@@ -1393,12 +1393,16 @@ Objects::readObjectInStream(std::shared_ptr<InputSource>& input, int obj)
     return object;
 }
 
+// Find endstream or endobj. If found, position the input at the end of endstream or the beginning
+// of endobj. In either case, last offset is at the beginning of the token.
 bool
 QPDF::findEndstream()
 {
-    // Find endstream or endobj. Position the input at that token.
-    auto t = readToken(*m->file, 20);
-    if (t.isWord("endobj") || t.isWord("endstream")) {
+    auto t = readToken(*m->file, 10);
+    if (t.isWord("endstream")) {
+        return true;
+    }
+    if (t.isWord("endobj")) {
         m->file->seek(m->file->getLastOffset(), SEEK_SET);
         return true;
     }
@@ -1414,12 +1418,7 @@ Objects::recover_stream_length(QPDFObjGen og, qpdf_offset_t stream_offset)
     PatternFinder ef(qpdf, &QPDF::findEndstream);
     size_t length = 0;
     if (m->file->findFirst("end", stream_offset, 0, ef)) {
-        length = toS(m->file->tell() - stream_offset);
-        // Reread endstream but, if it was endobj, don't skip that.
-        QPDFTokenizer::Token t = qpdf.readToken(*m->file);
-        if (t.getValue() == "endobj") {
-            m->file->seek(m->file->getLastOffset(), SEEK_SET);
-        }
+        length = toS(m->file->getLastOffset() - stream_offset);
     }
 
     if (length) {
