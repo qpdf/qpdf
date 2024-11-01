@@ -93,13 +93,13 @@ namespace
 void
 Xref_table::test()
 {
-    std::cout << "id, gen, offset, length, next\n";
+    std::cout << "id, gen, offset, length, next, upper_bound\n";
     int i = 0;
     for (auto const& entry: table) {
         if (entry.type() == 1) {
             std::cout << i << ", " << entry.gen() << ", " << entry.type() << ", " << entry.offset()
                       << ", " << entry.length() << ", " << (entry.offset() + toO(entry.length()))
-                      << '\n';
+                      << ", " << upper_bound(entry.offset() + 1) << '\n';
         }
         ++i;
     }
@@ -149,7 +149,7 @@ Xref_table::initialize()
     // PDF spec says %%EOF must be found within the last 1024 bytes of the file.  We add an extra
     // 30 characters to leave room for the startxref stuff.
     file->seek(0, SEEK_END);
-    qpdf_offset_t end_offset = file->tell();
+    end_offset = file->tell();
     // Sanity check on object ids. All objects must appear in xref table / stream. In all realistic
     // scenarios at least 3 bytes are required.
     if (max_id_ > end_offset / 3) {
@@ -1129,26 +1129,6 @@ Xref_table::insert_free(QPDFObjGen og)
     }
 }
 
-QPDFObjGen
-Xref_table::at_offset(qpdf_offset_t offset) const noexcept
-{
-    int id = 0;
-    int gen = 0;
-    qpdf_offset_t start = 0;
-
-    int i = 0;
-    for (auto const& item: table) {
-        auto o = item.offset();
-        if (start < o && o <= offset) {
-            start = o;
-            id = i;
-            gen = item.gen();
-        }
-        ++i;
-    }
-    return QPDFObjGen(id, gen);
-}
-
 std::map<QPDFObjGen, QPDFXRefEntry>
 Xref_table::as_map() const
 {
@@ -1409,6 +1389,30 @@ QPDF::findEndstream()
     return false;
 }
 
+// Return the smallest offset that is known to belong to a different item(object/xre table) from the
+// item at start.
+qpdf_offset_t
+Xref_table::upper_bound(qpdf_offset_t start) const noexcept
+{
+    auto upb = end_offset;
+    if (start >= end_offset) {
+        // Shouldn't be possible.
+        return start;
+    }
+    for (auto const& e: table) {
+        if (auto offset = e.offset(); offset > start) {
+            // Should never happen.
+            upb = std::min(upb, offset);
+        }
+    }
+    for (auto const& e: offsets) {
+        if (e.first > start) {
+            upb = std::min(upb, e.first);
+        }
+    }
+    return upb;
+}
+
 size_t
 Objects::recover_stream_length(QPDFObjGen og, qpdf_offset_t stream_offset)
 {
@@ -1416,30 +1420,19 @@ Objects::recover_stream_length(QPDFObjGen og, qpdf_offset_t stream_offset)
     qpdf.warn(qpdf.damagedPDF(stream_offset, "attempting to recover stream length"));
 
     PatternFinder ef(qpdf, &QPDF::findEndstream);
-    size_t length = 0;
-    if (m->file->findFirst("end", stream_offset, 0, ef)) {
+
+    auto length = xref.length(og);
+    length = length ? length - std::min(length, toS(stream_offset - xref.offset(og)))
+                    : toS(xref.upper_bound(stream_offset) - stream_offset);
+
+    if (m->file->findFirst("end", stream_offset, length, ef)) {
         length = toS(m->file->getLastOffset() - stream_offset);
-    }
-
-    if (length) {
-        // Make sure this is inside this object
-        auto found = xref.at_offset(stream_offset + toO(length));
-        if (found == QPDFObjGen() || found == og) {
-            // If we are trying to recover an XRef stream the xref table will not contain and
-            // won't contain any entries, therefore we cannot check the found length. Otherwise we
-            // found endstream\endobj within the space allowed for this object, so we're probably
-            // in good shape.
-        } else {
-            QTC::TC("qpdf", "QPDF found wrong endstream in recovery");
-            length = 0;
-        }
-    }
-
-    if (length == 0) {
-        qpdf.warn(qpdf.damagedPDF(stream_offset, "unable to recover stream data; treating stream as empty"));
     } else {
-        qpdf.warn(qpdf.damagedPDF(stream_offset, "recovered stream length: " + std::to_string(length)));
+        // NB findFirst ignores 'length' when reading data into the buffer and therefore leaves the
+        // file position beyond the end of the object if the target is not found.
+        m->file->seek(stream_offset + toO(length), SEEK_SET);
     }
+    qpdf.warn(qpdf.damagedPDF(stream_offset, "recovered stream length: " + std::to_string(length)));
 
     QTC::TC("qpdf", "QPDF recovered stream length");
     return length;

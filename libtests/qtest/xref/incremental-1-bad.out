@@ -1,12 +1,12 @@
 WARNING: incremental-1-bad.pdf: file is damaged
 WARNING: incremental-1-bad.pdf (offset 1241): xref not found
 WARNING: incremental-1-bad.pdf: Attempting to reconstruct cross-reference table
-id, gen, offset, length, next
-1, 0, 1, 9, 93, 102
-2, 0, 1, 102, 72, 174
-3, 0, 1, 1108, 172, 1280
-4, 1, 1, 987, 26, 1013
-5, 0, 1, 442, 35, 477
-6, 0, 1, 477, 118, 595
-7, 0, 1, 1013, 95, 1108
+id, gen, offset, length, next, upper_bound
+1, 0, 1, 9, 93, 102, 102
+2, 0, 1, 102, 72, 174, 442
+3, 0, 1, 1108, 172, 1280, 1462
+4, 1, 1, 987, 26, 1013, 1013
+5, 0, 1, 442, 35, 477, 477
+6, 0, 1, 477, 118, 595, 987
+7, 0, 1, 1013, 95, 1108, 1108
 xref done

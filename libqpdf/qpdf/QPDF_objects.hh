@@ -78,7 +78,7 @@ class QPDF::Objects
             return table[id].type();
         }
 
-        // Returns 0 if og is not in table.
+        // Returns 0 if og is not in table or is not an uncompressed object.
         qpdf_offset_t
         offset(QPDFObjGen og) const noexcept
         {
@@ -87,6 +87,18 @@ class QPDF::Objects
                 return 0;
             }
             return table[static_cast<size_t>(id)].offset();
+        }
+
+        // (Maximum possible) size of object. Returns 0 if og is not in table or is not an
+        // uncompressed object.
+        size_t
+        length(QPDFObjGen og) const noexcept
+        {
+            int id = og.getObj();
+            if (id < 1 || static_cast<size_t>(id) >= table.size()) {
+                return 0;
+            }
+            return table[static_cast<size_t>(id)].length();
         }
 
         // Returns 0 if id is not in table.
@@ -107,8 +119,6 @@ class QPDF::Objects
             }
             return table[static_cast<size_t>(id)].stream_index();
         }
-
-        QPDFObjGen at_offset(qpdf_offset_t offset) const noexcept;
 
         std::map<QPDFObjGen, QPDFXRefEntry> as_map() const;
 
@@ -227,6 +237,8 @@ class QPDF::Objects
         {
             return first_item_offset_;
         }
+
+        qpdf_offset_t upper_bound(qpdf_offset_t start) const noexcept;
 
         void test();
 
@@ -399,6 +411,7 @@ class QPDF::Objects
         // to the value of /Size. If the file is damaged, max_id_ becomes the maximum object id in
         // the xref table after reconstruction.
         int max_id_{std::numeric_limits<int>::max() - 1};
+        qpdf_offset_t end_offset{0}; // used for object length calc.
 
         // Linearization data
         bool uncompressed_after_compressed_{false};
