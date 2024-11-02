@@ -95,6 +95,7 @@ set(libqpdf_SOURCES
   QPDF_encryption.cc
   QPDF_json.cc
   QPDF_linearization.cc
+  QPDF_objects.cc
   QPDF_optimization.cc
   QPDF_pages.cc
   QTC.cc
