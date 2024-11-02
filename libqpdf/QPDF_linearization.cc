@@ -99,9 +99,8 @@ QPDF::isLinearized()
     // The PDF spec says the linearization dictionary must be completely contained within the first
     // 1024 bytes of the file. Add a byte for a null terminator.
     auto buffer = m->file->read(1024, 0);
-    int lindict_obj = -1;
     size_t pos = 0;
-    while (lindict_obj == -1) {
+    while (true) {
         // Find a digit or end of buffer
         pos = buffer.find_first_of("0123456789"sv, pos);
         if (pos == std::string::npos) {
@@ -111,46 +110,41 @@ QPDF::isLinearized()
         // next iteration.
         m->file->seek(toO(pos), SEEK_SET);
 
-        QPDFTokenizer::Token t1 = readToken(*m->file);
-        if (t1.isInteger() && readToken(*m->file).isInteger() &&
-            readToken(*m->file).isWord("obj")) {
-            lindict_obj = toI(QUtil::string_to_ll(t1.getValue().c_str()));
+        auto t1 = readToken(*m->file, 20);
+        if (!(t1.isInteger() && readToken(*m->file, 6).isInteger() &&
+              readToken(*m->file, 4).isWord("obj"))) {
+            pos = buffer.find_first_not_of("0123456789"sv, pos);
+            if (pos == std::string::npos) {
+                return false;
+            }
+            continue;
         }
-        pos = buffer.find_first_not_of("0123456789"sv, pos);
-        if (pos == std::string::npos) {
+
+        auto candidate = getObject(toI(QUtil::string_to_ll(t1.getValue().data())), 0);
+        if (!candidate.isDictionary()) {
             return false;
         }
-    }
 
-    if (lindict_obj <= 0) {
-        return false;
-    }
-
-    auto candidate = getObject(lindict_obj, 0);
-    if (!candidate.isDictionary()) {
-        return false;
-    }
-
-    QPDFObjectHandle linkey = candidate.getKey("/Linearized");
-    if (!(linkey.isNumber() && (toI(floor(linkey.getNumericValue())) == 1))) {
-        return false;
-    }
-
-    QPDFObjectHandle L = candidate.getKey("/L");
-    if (L.isInteger()) {
-        qpdf_offset_t Li = L.getIntValue();
-        m->file->seek(0, SEEK_END);
-        if (Li != m->file->tell()) {
-            QTC::TC("qpdf", "QPDF /L mismatch");
+        auto linkey = candidate.getKey("/Linearized");
+        if (!(linkey.isNumber() && toI(floor(linkey.getNumericValue())) == 1)) {
             return false;
-        } else {
-            m->linp.file_size = Li;
         }
+
+        QPDFObjectHandle L = candidate.getKey("/L");
+        if (L.isInteger()) {
+            qpdf_offset_t Li = L.getIntValue();
+            m->file->seek(0, SEEK_END);
+            if (Li != m->file->tell()) {
+                QTC::TC("qpdf", "QPDF /L mismatch");
+                return false;
+            } else {
+                m->linp.file_size = Li;
+            }
+        }
+
+        m->lindict = candidate;
+        return true;
     }
-
-    m->lindict = candidate;
-
-    return true;
 }
 
 void
