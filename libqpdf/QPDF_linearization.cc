@@ -130,18 +130,17 @@ QPDF::isLinearized()
             return false;
         }
 
-        QPDFObjectHandle L = candidate.getKey("/L");
-        if (L.isInteger()) {
-            qpdf_offset_t Li = L.getIntValue();
-            m->file->seek(0, SEEK_END);
-            if (Li != m->file->tell()) {
-                QTC::TC("qpdf", "QPDF /L mismatch");
-                return false;
-            } else {
-                m->linp.file_size = Li;
-            }
+        auto L = candidate.getKey("/L");
+        if (!L.isInteger()) {
+            return false;
         }
-
+        qpdf_offset_t Li = L.getIntValue();
+        m->file->seek(0, SEEK_END);
+        if (Li != m->file->tell()) {
+            QTC::TC("qpdf", "QPDF /L mismatch");
+            return false;
+        }
+        m->linp.file_size = Li;
         m->lindict = candidate;
         return true;
     }
