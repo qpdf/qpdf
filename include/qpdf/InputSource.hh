@@ -76,6 +76,8 @@ class QPDF_DLL_CLASS InputSource
     virtual void unreadCh(char ch) = 0;
 
     // The following methods are for internal use by qpdf only.
+    inline size_t read(std::string& str, size_t count, qpdf_offset_t at = -1);
+    inline std::string read(size_t count, qpdf_offset_t at = -1);
     inline qpdf_offset_t fastTell();
     inline bool fastRead(char&);
     inline void fastUnread(bool);
