@@ -19,27 +19,41 @@ InputSource::getLastOffset() const
     return this->last_offset;
 }
 
-std::string
-InputSource::readLine(size_t max_line_length)
+size_t
+InputSource::read_line(std::string& str, size_t count, qpdf_offset_t at)
 {
     // Return at most max_line_length characters from the next line. Lines are terminated by one or
     // more \r or \n characters. Consume the trailing newline characters but don't return them.
     // After this is called, the file will be positioned after a line terminator or at the end of
     // the file, and last_offset will point to position the file had when this method was called.
 
-    auto result = read(max_line_length);
-    auto eol = result.find_first_of("\n\r"sv);
+    read(str, count, at);
+    auto eol = str.find_first_of("\n\r"sv);
     if (eol != std::string::npos) {
-        auto next_line = result.find_first_not_of("\n\r"sv, eol);
-        result.resize(eol);
+        auto next_line = str.find_first_not_of("\n\r"sv, eol);
+        str.resize(eol);
         if (eol != std::string::npos) {
             seek(last_offset + static_cast<qpdf_offset_t>(next_line), SEEK_SET);
-            return result;
+            return eol;
         }
     }
     // We did not necessarily find the end of the trailing newline sequence.
     seek(last_offset, SEEK_SET);
     findAndSkipNextEOL();
+    return eol;
+}
+
+std::string
+InputSource::readLine(size_t max_line_length)
+{
+    return read_line(max_line_length);
+}
+
+inline std::string
+InputSource::read_line(size_t count, qpdf_offset_t at)
+{
+    std::string result(count, '\0');
+    read_line(result, count, at);
     return result;
 }
 
