@@ -3,6 +3,25 @@
 
 #include <qpdf/InputSource.hh>
 
+inline size_t
+InputSource::read(std::string& str, size_t count, qpdf_offset_t at)
+{
+    if (at >= 0) {
+        seek(at, SEEK_SET);
+    }
+    str.resize(count);
+    str.resize(read(str.data(), count));
+    return str.size();
+}
+
+inline std::string
+InputSource::read(size_t count, qpdf_offset_t at)
+{
+    std::string result(count, '\0');
+    (void)read(result, count, at);
+    return result;
+}
+
 inline void
 InputSource::loadBuffer()
 {
