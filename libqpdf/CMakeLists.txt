@@ -54,6 +54,7 @@ set(libqpdf_SOURCES
   Pl_StdioFile.cc
   Pl_String.cc
   Pl_TIFFPredictor.cc
+  QPDF.cc
   QPDFAcroFormDocumentHelper.cc
   QPDFAnnotationObjectHelper.cc
   QPDFArgParser.cc
