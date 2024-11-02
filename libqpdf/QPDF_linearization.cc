@@ -4,6 +4,7 @@
 
 #include <qpdf/BitStream.hh>
 #include <qpdf/BitWriter.hh>
+#include <qpdf/InputSource_private.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Count.hh>
 #include <qpdf/Pl_Flate.hh>
@@ -96,14 +97,10 @@ QPDF::isLinearized()
 
     // The PDF spec says the linearization dictionary must be completely contained within the first
     // 1024 bytes of the file. Add a byte for a null terminator.
-    static int const tbuf_size = 1025;
+    auto buffer =  m->file->read(1024, 0);
 
-    auto b = std::make_unique<char[]>(tbuf_size);
-    char* buf = b.get();
-    m->file->seek(0, SEEK_SET);
-    memset(buf, '\0', tbuf_size);
-    m->file->read(buf, tbuf_size - 1);
-
+    auto buf = buffer.data();
+    auto tbuf_size = buffer.size();
     int lindict_obj = -1;
     char* p = buf;
     while (lindict_obj == -1) {
