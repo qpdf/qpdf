@@ -1,4 +1,4 @@
-#include <qpdf/InputSource.hh>
+#include <qpdf/InputSource_private.hh>
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>

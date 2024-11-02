@@ -3,6 +3,7 @@
 // DO NOT USE ctype -- it is locale dependent for some things, and it's not worth the risk of
 // including it in case it may accidentally be used.
 
+#include <qpdf/InputSource_private.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjectHandle.hh>
