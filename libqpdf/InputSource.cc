@@ -5,6 +5,8 @@
 #include <cstring>
 #include <stdexcept>
 
+using namespace std::literals;
+
 void
 InputSource::setLastOffset(qpdf_offset_t offset)
 {
@@ -25,19 +27,20 @@ InputSource::readLine(size_t max_line_length)
     // After this is called, the file will be positioned after a line terminator or at the end of
     // the file, and last_offset will point to position the file had when this method was called.
 
-    qpdf_offset_t offset = this->tell();
-    auto bp = std::make_unique<char[]>(max_line_length + 1);
-    char* buf = bp.get();
-    memset(buf, '\0', max_line_length + 1);
-    this->read(buf, max_line_length);
-    this->seek(offset, SEEK_SET);
-    qpdf_offset_t eol = this->findAndSkipNextEOL();
-    this->last_offset = offset;
-    size_t line_length = QIntC::to_size(eol - offset);
-    if (line_length < max_line_length) {
-        buf[line_length] = '\0';
+    auto result = read(max_line_length);
+    auto eol = result.find_first_of("\n\r"sv);
+    if (eol != std::string::npos) {
+        auto next_line = result.find_first_not_of("\n\r"sv, eol);
+        result.resize(eol);
+        if (eol != std::string::npos) {
+            seek(last_offset + static_cast<qpdf_offset_t>(next_line), SEEK_SET);
+            return result;
+        }
     }
-    return {buf};
+    // We did not necessarily find the end of the trailing newline sequence.
+    seek(last_offset, SEEK_SET);
+    findAndSkipNextEOL();
+    return result;
 }
 
 bool
