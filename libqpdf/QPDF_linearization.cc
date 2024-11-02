@@ -20,6 +20,7 @@
 #include <cstring>
 
 using namespace qpdf;
+using namespace std::literals;
 
 template <class T, class int_type>
 static void
@@ -97,26 +98,18 @@ QPDF::isLinearized()
 
     // The PDF spec says the linearization dictionary must be completely contained within the first
     // 1024 bytes of the file. Add a byte for a null terminator.
-    auto buffer =  m->file->read(1024, 0);
-
-    auto buf = buffer.data();
-    auto tbuf_size = buffer.size();
+    auto buffer = m->file->read(1024, 0);
     int lindict_obj = -1;
-    char* p = buf;
+    size_t pos = 0;
     while (lindict_obj == -1) {
         // Find a digit or end of buffer
-        while (((p - buf) < tbuf_size) && (!util::is_digit(*p))) {
-            ++p;
-        }
-        if (p - buf == tbuf_size) {
-            break;
+        pos = buffer.find_first_of("0123456789"sv, pos);
+        if (pos == std::string::npos) {
+            return false;
         }
         // Seek to the digit. Then skip over digits for a potential
         // next iteration.
-        m->file->seek(p - buf, SEEK_SET);
-        while (((p - buf) < tbuf_size) && util::is_digit(*p)) {
-            ++p;
-        }
+        m->file->seek(toO(pos), SEEK_SET);
 
         QPDFTokenizer::Token t1 = readToken(*m->file);
         if (t1.isInteger() && readToken(*m->file).isInteger() &&
@@ -124,13 +117,17 @@ QPDF::isLinearized()
             readToken(*m->file).getType() == QPDFTokenizer::tt_dict_open) {
             lindict_obj = toI(QUtil::string_to_ll(t1.getValue().c_str()));
         }
+        pos = buffer.find_first_not_of("0123456789"sv, pos);
+        if (pos == std::string::npos) {
+            return false;
+        }
     }
 
     if (lindict_obj <= 0) {
         return false;
     }
 
-    auto candidate = getObjectByID(lindict_obj, 0);
+    auto candidate = getObject(lindict_obj, 0);
     if (!candidate.isDictionary()) {
         return false;
     }
@@ -545,7 +542,7 @@ QPDF::maxEnd(ObjUser const& ou)
     }
     qpdf_offset_t end = 0;
     for (auto const& og: m->obj_user_to_objects[ou]) {
-        if (m->obj_cache.count(og) == 0) {
+        if (!m->obj_cache.count(og)) {
             stopOnError("unknown object referenced in object user table");
         }
         end = std::max(end, m->obj_cache[og].end_after_space);
