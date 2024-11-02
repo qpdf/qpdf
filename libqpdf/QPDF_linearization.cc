@@ -113,8 +113,7 @@ QPDF::isLinearized()
 
         QPDFTokenizer::Token t1 = readToken(*m->file);
         if (t1.isInteger() && readToken(*m->file).isInteger() &&
-            readToken(*m->file).isWord("obj") &&
-            readToken(*m->file).getType() == QPDFTokenizer::tt_dict_open) {
+            readToken(*m->file).isWord("obj")) {
             lindict_obj = toI(QUtil::string_to_ll(t1.getValue().c_str()));
         }
         pos = buffer.find_first_not_of("0123456789"sv, pos);
