@@ -78,6 +78,8 @@ class QPDF_DLL_CLASS InputSource
     // The following methods are for internal use by qpdf only.
     inline size_t read(std::string& str, size_t count, qpdf_offset_t at = -1);
     inline std::string read(size_t count, qpdf_offset_t at = -1);
+    size_t read_line(std::string& str, size_t count, qpdf_offset_t at = -1);
+    std::string read_line(size_t count, qpdf_offset_t at = -1);
     inline qpdf_offset_t fastTell();
     inline bool fastRead(char&);
     inline void fastUnread(bool);
