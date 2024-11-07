@@ -94,7 +94,7 @@ QPDF::getAllPagesInternal(
         throw QPDFExc(
             qpdf_e_pages,
             m->file->getName(),
-            m->last_object_description,
+            "object " + cur_node.getObjGen().unparse(' '),
             0,
             "Loop detected in /Pages structure (getAllPages)");
     }
