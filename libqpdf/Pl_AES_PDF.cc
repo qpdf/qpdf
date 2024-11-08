@@ -23,6 +23,9 @@ Pl_AES_PDF::Pl_AES_PDF(
     if (!next) {
         throw std::logic_error("Attempt to create Pl_AES_PDF with nullptr as next");
     }
+    if (!(key_bytes == 32 || key_bytes == 16)) {
+        throw std::runtime_error("unsupported key length");
+    }
     this->key = std::make_unique<unsigned char[]>(key_bytes);
     std::memcpy(this->key.get(), key, key_bytes);
     std::memset(this->inbuf, 0, this->buf_size);
