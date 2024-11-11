@@ -7,6 +7,7 @@
 #include <qpdf/Constants.h>
 #include <qpdf/JSON.hh>
 #include <qpdf/QPDFValue.hh>
+#include <qpdf/QPDF_Null.hh>
 #include <qpdf/QPDF_private.hh>
 #include <qpdf/Types.h>
 
@@ -131,17 +132,25 @@ class QPDFObject
     }
 
     void
-    setDefaultDescription(QPDF* qpdf, QPDFObjGen const& og)
+    make_direct()
     {
-        // Intended for use by the QPDF class
-        value->setDefaultDescription(qpdf, og);
+        value->qpdf = nullptr;
+        value->og = QPDFObjGen();
     }
+
     void
-    setObjGen(QPDF* qpdf, QPDFObjGen const& og)
+    make_indirect(QPDF& qpdf, int id, int gen)
     {
-        value->qpdf = qpdf;
-        value->og = og;
+        value->qpdf = &qpdf;
+        value->og = QPDFObjGen(id, gen);
     }
+
+    void
+    make_null()
+    {
+        value = std::make_shared<QPDF_Null>();
+    }
+
     void
     disconnect()
     {
