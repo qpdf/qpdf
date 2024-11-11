@@ -46,7 +46,6 @@ QPDFWriter write to file 0
 QPDF lin write nshared_total > nshared_first_page 1
 QPDFWriter encrypted hint stream 0
 QPDF opt inherited scalar 0
-QPDF xref reused object 0
 QPDF xref gen > 0 1
 QPDF not a pdf file 0
 QPDF can't find startxref 0
@@ -83,7 +82,7 @@ QPDF prev key in xref stream dictionary 0
 QPDF prev key in trailer dictionary 0
 QPDF found xref stream 0
 QPDF ignoring XRefStm in trailer 0
-QPDF xref deleted object 0
+QPDF xref replaced / deleted object 1
 SF_FlateLzwDecode PNG filter 0
 QPDF xref /Index is null 0
 QPDF xref /Index is array 1
@@ -99,7 +98,6 @@ QPDF loop detected traversing objects 0
 QPDF reconstructed xref table 0
 QPDF recovered in readObjectAtOffset 0
 QPDF recovered stream length 0
-QPDF found wrong endstream in recovery 0
 QPDF_Stream pipeStreamData with null pipeline 0
 QPDFWriter not recompressing /FlateDecode 0
 QPDF_encryption xref stream from encrypted file 0

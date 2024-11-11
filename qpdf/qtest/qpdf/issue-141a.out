@@ -1,7 +1,7 @@
 WARNING: issue-141a.pdf: can't find PDF header
 WARNING: issue-141a.pdf (xref stream: object 9 0, offset 10): stream dictionary lacks /Length key
 WARNING: issue-141a.pdf (xref stream: object 9 0, offset 47): attempting to recover stream length
-WARNING: issue-141a.pdf (xref stream: object 9 0, offset 47): unable to recover stream data; treating stream as empty
+WARNING: issue-141a.pdf (xref stream: object 9 0, offset 47): recovered stream length: 0
 WARNING: issue-141a.pdf: file is damaged
 WARNING: issue-141a.pdf (xref stream, offset 3): Cross-reference stream's /W indicates entry size of 0
 WARNING: issue-141a.pdf: Attempting to reconstruct cross-reference table

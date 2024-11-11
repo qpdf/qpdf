@@ -34,7 +34,8 @@ set(TEST_PROGRAMS
   rc4
   runlength
   sha2
-  sparse_array)
+  sparse_array
+  xref)
 set(TEST_C_PROGRAMS
   logger_c)
 

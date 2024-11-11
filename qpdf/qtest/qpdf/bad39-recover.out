@@ -1,11 +1,28 @@
 WARNING: bad39.pdf (object 4 0, offset 385): expected endstream
 WARNING: bad39.pdf (object 4 0, offset 341): attempting to recover stream length
-WARNING: bad39.pdf (object 4 0, offset 341): unable to recover stream data; treating stream as empty
+WARNING: bad39.pdf (object 4 0, offset 341): recovered stream length: 62
+WARNING: bad39.pdf (object 4 0, offset 403): expected endobj
 /QTest is indirect and has type stream (10)
 /QTest is a stream.  Dictionary: << /Length 44 >>
 Raw stream data:
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ET
+enxstream
+enxobj
+
 
 Uncompressed stream data:
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ET
+enxstream
+enxobj
+
 
 End of stream data
 unparse: 4 0 R
