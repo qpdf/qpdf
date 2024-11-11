@@ -1,0 +1,195 @@
+{
+  "comment": [
+    "File with multiple definitions for the same object id and with dangling references.",
+    "Modified from manual-qpdf-json-dangle.json."
+  ],
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pdfversion": "2.0",
+      "maybe-future-key": {
+        "x": [
+          "Lots of times we ignore things",
+          "for forward-compatibility so we don't have",
+          "to change the version number if we add stuff",
+          "in the future"
+        ]
+      }
+    },
+    {
+      "obj:3 2 R": {
+        "value": {
+          "/Contents": "4 0 R",
+          "/Dangle": [
+            "2 0 R",
+            "2 3 R",
+            "u:2 1 R is actual",
+            "3 3 R",
+            "3 1 R",
+            "u:3 2 R is actual",
+            "8 7 R",
+            "8 0 R",
+            "8 5 R",
+            "u:8 5 R is actual, encounter gens 0, 5, 2, 7",
+            "1 0 R",
+            "u:1 2 R is actual",
+            "5 5 R",
+            "u:5 0 % is actual"
+          ],
+          "/MediaBox": [
+            0,
+            0,
+            612,
+            792
+          ],
+          "/Parent": "2 1 R",
+          "/Resources": {
+            "/Font": {
+              "/F1": "6 0 R"
+            },
+            "/ProcSet": "5 0 R"
+          },
+          "/Type": "/Page"
+        },
+        "ignore": "this is ignored"
+      },
+      "obj:1 0 R": {
+        "value": {
+          "/Pages": "2 0 R",
+          "/Type": "/Rubbish"
+        }
+      },
+      "obj:2 1 R": {
+        "value": {
+          "/Count": 1,
+          "/Kids": [
+            "3 2 R"
+          ],
+          "/Type": "/Pages"
+        },
+        "ignore": {
+          "potato": "salad",
+          "this": ["is ignored too"]
+        }
+      },
+      "obj:1 2 R": {
+        "value": {
+          "/Pages": "2 1 R",
+          "/Type": "/Catalog"
+        }
+      },
+      "obj:4 0 R": {
+        "stream": {
+          "what-is-this": "doesn't matter",
+          "dict": {},
+          "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo="
+        }
+      },
+      "obj:1 1 R": {
+        "value": {
+          "/Pages": "2 0 R",
+          "/Type": "/AlsoRubbish"
+        }
+      },
+      "obj:5 0 R": {
+        "value": [
+          "/PDF",
+          "/Text"
+        ]
+      },
+      "obj:6 0 R": {
+        "value": {
+          "/BaseFont": "/Helvetica",
+          "/Encoding": "/WinAnsiEncoding",
+          "/Name": "/F1",
+          "/Subtype": "/Type1",
+          "/Type": "/Font"
+        }
+      },
+      "trailer": {
+        "even-here-we-ignore": "stuff",
+        "value": {
+          "/QTest": "7 0 R",
+          "/Root": "1 2 R",
+          "/Size": 9
+        }
+      },
+      "obj:7 0 R": {
+        "value": {
+          "/hex strings": [
+            "u:Potato",
+            "b:01020300040560",
+            "u:AB"
+          ],
+          "/indirect": "8 0 R",
+          "/names": [
+            "/nesting",
+            "/hex strings",
+            "/text/plain"
+          ],
+          "/nesting": {
+            "/a": [
+              1,
+              2,
+              {
+                "/x": "u:y"
+              },
+              [
+                "u:z"
+              ]
+            ],
+            "/b": {
+              "/": "u:legal",
+              "/a": [
+                1,
+                2
+              ]
+            }
+          },
+          "/strings": [
+            "u:one",
+            "b:24a2",
+            "b:",
+            "u:",
+            "u:()",
+            "u:(",
+            "u:)",
+            "u:a\f\b\t\r\nb",
+            "u:\"",
+            "u:\"\"",
+            "u:\"(\")\"",
+            "b:410042",
+            "u:a\nb",
+            "u:a b",
+            ["u:π", "u:\u03c0", "b:EFBBBFCF80", "b:feff03c0"],
+            ["u:🥔", "u:\ud83e\udd54", "b:feffd83eDD54", "b:efbbbff09fa594"]
+          ]
+        }
+      },
+      "obj:8 0 R": {
+        "value": {
+          "/k1": "u:hello wrong",
+          "/dangling": ["100 0 R"]
+        }
+      },
+      "obj:8 5 R": {
+        "value": {
+          "/k1": "u:hello",
+          "/dangling": ["100 0 R"]
+        }
+      },
+      "obj:8 2 R": {
+        "value": {
+          "/k1": "u:hello also wrong",
+          "/dangling": ["100 0 R"]
+        }
+      },
+      "obj:8 7 R": {
+        "value": {
+          "/k1": "u:hello also wrong",
+          "/dangling": ["100 0 R"]
+        }
+      }
+    }
+  ]
+}

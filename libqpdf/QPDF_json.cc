@@ -256,10 +256,10 @@ class QPDF::JSONReactor: public JSON::Reactor
     struct StackFrame
     {
         StackFrame(state_e state) :
-            state(state){};
+            state(state) {};
         StackFrame(state_e state, QPDFObjectHandle&& object) :
             state(state),
-            object(object){};
+            object(object) {};
         state_e state;
         QPDFObjectHandle object;
     };
@@ -422,8 +422,7 @@ QPDF::JSONReactor::replaceObject(QPDFObjectHandle&& replacement, JSON const& val
             "the value of an object may not be an indirect object reference");
         return;
     }
-    pdf.replaceObject(og, replacement);
-    next_obj = pdf.getObject(og);
+    next_obj = pdf.m->objects.replace_when_uncertain(og.getObj(), og.getGen(), replacement);
     setObjectDescription(tos.object, value);
 }
 
@@ -536,7 +535,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
         } else if (is_obj_key(key, obj, gen)) {
             this->cur_object = key;
             if (setNextStateIfDictionary(key, value, st_object_top)) {
-                next_obj = pdf.objects().get_for_json(obj, gen);
+                next_obj = pdf.objects().get_when_uncertain(obj, gen);
             }
         } else {
             QTC::TC("qpdf", "QPDF_json bad object key");
@@ -597,7 +596,14 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             throw std::logic_error("stack empty in st_stream");
         }
         auto& tos = stack.back();
+
         if (!tos.object.isStream()) {
+            if (tos.object.isDirectNull()) {
+                // Object is direct null if it has been replaced.
+                saw_dict = true;
+                saw_data = true;
+                return true;
+            }
             throw std::logic_error("current object is not stream in st_stream");
         }
         auto uninitialized = QPDFObjectHandle();
@@ -740,7 +746,7 @@ QPDF::JSONReactor::makeObject(JSON const& value)
         int gen = 0;
         std::string str;
         if (is_indirect_object(str_v, obj, gen)) {
-            result = pdf.objects().get_for_json(obj, gen);
+            result = pdf.objects().get_when_uncertain(obj, gen);
         } else if (is_unicode_string(str_v, str)) {
             result = QPDFObjectHandle::newUnicodeString(str);
         } else if (is_binary_string(str_v, str)) {
@@ -798,6 +804,7 @@ QPDF::importJSON(std::shared_ptr<InputSource> is, bool must_be_complete)
     JSONReactor reactor(*this, is, must_be_complete);
     try {
         JSON::parse(*is, &reactor);
+        objects().clear_unconfirmeds();
     } catch (std::runtime_error& e) {
         throw std::runtime_error(is->getName() + ": " + e.what());
     }

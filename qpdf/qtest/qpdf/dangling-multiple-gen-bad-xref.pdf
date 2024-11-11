@@ -2,16 +2,23 @@
 %¿÷¢þ
 %QDF-1.0
 
-%% Original object ID: 1 0
-1 0 obj
+1 3 obj
 <<
-  /Pages 2 0 R
+  /Pages 2 3 R
   /Type /Catalog
+  /Dangling 8 0 R
+  /AlsoDangling [
+    9 0 R
+    <<
+      /yes 2 5 R
+      /no 10 0 R
+      /nope 8 0 R
+    >>
+  ]
 >>
 endobj
 
-%% Original object ID: 2 0
-2 0 obj
+2 3 obj
 <<
   /Count 1
   /Kids [
@@ -22,7 +29,6 @@ endobj
 endobj
 
 %% Page 1
-%% Original object ID: 3 0
 3 0 obj
 <<
   /Contents 4 0 R
@@ -44,7 +50,6 @@ endobj
 endobj
 
 %% Contents for page 1
-%% Original object ID: 4 0
 4 0 obj
 <<
   /Length 5 0 R
@@ -62,7 +67,6 @@ endobj
 44
 endobj
 
-%% Original object ID: 6 0
 6 0 obj
 <<
   /BaseFont /Helvetica
@@ -73,7 +77,6 @@ endobj
 >>
 endobj
 
-%% Original object ID: 5 0
 7 0 obj
 [
   /PDF
@@ -81,30 +84,35 @@ endobj
 ]
 endobj
 
+11 0 obj
+[
+  12 0 R
+  2 4 R
+  ]
+endobj
+
 xref
 0 8
 0000000000 65535 f 
-0000000052 00000 n 
-0000000133 00000 n 
-0000000242 00000 n 
-0000000484 00000 n 
-0000000583 00000 n 
-0000000629 00000 n 
-0000000774 00000 n 
+0000000025 00003 n 
+0000000195 00003 n 
+0000000277 00000 n 
+0000000492 00000 n 
+0000000591 00000 n 
+0000000610 00000 n 
+0000010000 00000 n 
 trailer <<
-  /QTest [
-    1
-    (2)
-    null
-    0.0
-    -0.0
-    0.
-    -0.
+  /Dangle [
+  1 0 R
+  1 6 R
+  2 6 R
+  2 0 R
+  4 6 R
   ]
-  /Root 1 0 R
+  /Root 1 3 R
   /Size 8
-  /ID [<31415926535897932384626433832795><31415926535897932384626433832795>]
+  /ID [<7141a6cf32de469328cf0f51982b5f89><7141a6cf32de469328cf0f51982b5f89>]
 >>
 startxref
-809
+803
 %%EOF

@@ -737,6 +737,7 @@ class QPDF
 
     // For testing only -- do not add to DLL
     static bool test_json_validators();
+    void test_xref();
 
   private:
     // It has never been safe to copy QPDF objects as there is code in the library that assumes
@@ -764,7 +765,6 @@ class QPDF
     QPDFTokenizer::Token readToken(InputSource&, size_t max_len = 0);
 
     void stopOnError(std::string const& message);
-    QPDFObjectHandle newIndirect(QPDFObjGen const&, std::shared_ptr<QPDFObject> const&);
     static QPDFExc damagedPDF(
         InputSource& input,
         std::string const& object,
