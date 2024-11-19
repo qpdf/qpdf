@@ -1948,11 +1948,11 @@ Encryption
    --encrypt user-password owner-password key-length [options] --
 
    The first form, with flags for the passwords and bit length, was
-   introduced in qpdf 11.7.0. Only the --bits option is is mandatory.
+   introduced in qpdf 11.7.0. Only the --bits option is mandatory.
    This form allows you to use any text as the password. If passwords
    are specified, they must be given before the --bits option.
 
-   The second form has been in qpdf since the beginning and wil
+   The second form has been in qpdf since the beginning and will
    continue to be supported. Either or both of user-password and
    owner-password may be empty strings.
 
@@ -1967,7 +1967,7 @@ Encryption
    40-bit encryption is insecure, as is 128-bit encryption without
    AES. Use 256-bit encryption unless you have a specific reason to
    use an insecure format, such as testing or compatibility with very
-   old viewers. You must use the --allow-weak-crypto to create
+   old viewers. You must use the --allow-weak-crypto flag to create
    encrypted files that use insecure cryptographic algorithms. The
    --allow-weak-crypto flag appears outside of --encrypt ... --
    (before --encrypt or after --).
@@ -2037,12 +2037,12 @@ OR
    --encrypt user-password owner-password key-length [options] --
 
 The first form, with flags for the passwords and bit length, was
-introduced in qpdf 11.7.0. Only the :qpdf:ref:`--bits` option is is
+introduced in qpdf 11.7.0. Only the :qpdf:ref:`--bits` option is
 mandatory. This form allows you to use any text as the password. If
 passwords are specified, they must be given before the
 :qpdf:ref:`--bits` option.
 
-The second form has been in qpdf since the beginning and wil
+The second form has been in qpdf since the beginning and will
 continue to be supported. Either or both of user-password and
 owner-password may be empty strings.
 
@@ -2206,7 +2206,7 @@ Related Options
       Set the owner password of the encrypted file.
 
    Set the owner password of the encrypted file. Conforming readers
-   apply allow security restrictions to be changed or overridden when
+   allow security restrictions to be changed or overridden when
    files are opened with the owner password.
 
 .. qpdf:option:: --bits={48|128|256}
