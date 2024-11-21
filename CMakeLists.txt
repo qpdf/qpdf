@@ -404,3 +404,63 @@ message(STATUS "")
 if(NOT (MULTI_CONFIG OR CMAKE_BUILD_TYPE))
   message(WARNING "  CMAKE_BUILD_TYPE is not set; using default settings")
 endif()
+
+option(EMSCRIPTEN "Build with Emscripten" OFF)
+
+if(EMSCRIPTEN)
+  set(CMAKE_C_COMPILER emcc)
+  set(CMAKE_CXX_COMPILER em++)
+  set(CMAKE_EXECUTABLE_SUFFIX ".js")
+
+  # Define runtime methods to export
+  set(EXPORTED_RUNTIME_METHODS
+    "callMain"
+    "FS"
+  )
+
+  # Enhanced debugging and safety flags
+  set(EMSCRIPTEN_LINK_FLAGS "\
+    -s WASM=1 \
+    -s ABORTING_MALLOC=1 \
+    -s SUPPORT_LONGJMP=1 \
+    -s EXPORTED_RUNTIME_METHODS='[${EXPORTED_RUNTIME_METHODS}]' \
+    -s EXPORT_ALL=1 \
+    -s FORCE_FILESYSTEM=1 \
+    -s ALLOW_MEMORY_GROWTH=1 \
+    -s MODULARIZE=1 \
+    -s USE_ZLIB=1 \
+    -s USE_LIBJPEG=1 \
+    -s BUILD_AS_WORKER=1 \
+    -s PROXY_TO_WORKER=1 \
+    -s ENVIRONMENT='worker' \
+    -s INVOKE_RUN=0 \
+    -s EXIT_RUNTIME=0 \
+    -s MAIN_MODULE=1 \
+    -s EXPORT_NAME='QPDF' \
+    -s ASSERTIONS=0 \
+    -s STACK_OVERFLOW_CHECK=0 \
+    -s DEMANGLE_SUPPORT=0 \
+    -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
+    -s DISABLE_EXCEPTION_CATCHING=1 \
+    -s SAFE_HEAP=0 \
+    -s SAFE_HEAP_LOG=0 \
+    -s EXCEPTION_DEBUG=0 \
+    -s EXCEPTION_STACK_TRACES=0 \
+    -O2"
+  )
+
+  # Add sanitizer flags for additional runtime checks
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EMSCRIPTEN_LINK_FLAGS} -fsanitize=address -fsanitize=undefined")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EMSCRIPTEN_LINK_FLAGS} -fsanitize=address -fsanitize=undefined")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${EMSCRIPTEN_LINK_FLAGS}")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${EMSCRIPTEN_LINK_FLAGS}")
+
+  # Use native crypto
+  set(REQUIRE_CRYPTO_NATIVE ON)
+  set(REQUIRE_CRYPTO_OPENSSL OFF)
+  set(USE_IMPLICIT_CRYPTO OFF)
+
+  # Static linking
+  set(BUILD_SHARED_LIBS OFF)
+  set(BUILD_STATIC_LIBS ON)
+endif()
