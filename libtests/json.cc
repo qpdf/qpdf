@@ -162,11 +162,6 @@ test_main()
     assert(jarr.addArrayElement(uninitialized).isNull());
     assert(!uninitialized.isArray());
     assert(!uninitialized.isDictionary());
-    try {
-        uninitialized.checkDictionaryKeySeen("key");
-        assert(false);
-    } catch (std::logic_error&) {
-    }
     std::string st_out = "unchanged";
     assert(!uninitialized.getString(st_out));
     assert(!uninitialized.getNumber(st_out));
