@@ -19,10 +19,12 @@
 #ifndef QPDFJOB_HH
 #define QPDFJOB_HH
 
+#include <qpdf/ClosedFileInputSource.hh>
 #include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
 #include <qpdf/PDFVersion.hh>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFOutlineObjectHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 
@@ -36,9 +38,9 @@
 #include <string>
 #include <vector>
 
-class QPDFWriter;
 class Pipeline;
 class QPDFLogger;
+class QPDFWriter;
 
 class QPDFJob
 {
@@ -153,15 +155,6 @@ class QPDFJob
         std::string mimetype;
         std::string description;
         bool replace{false};
-    };
-
-    struct PageSpec
-    {
-        PageSpec(std::string const& filename, char const* password, std::string const& range);
-
-        std::string filename;
-        std::shared_ptr<char> password;
-        std::string range;
     };
 
   public:
@@ -423,6 +416,67 @@ class QPDFJob
     [[deprecated("use job_json_schema(version)")]] static std::string QPDF_DLL job_json_schema_v1();
 
   private:
+    class Section
+    {
+        friend class QPDFJob;
+
+        Section(std::string const& filename, std::string const& password, std::string const& range);
+        Section(Section const& other, int page);
+
+        std::string filename;
+        std::string password;
+        std::string range;
+        QPDF* qpdf;
+        std::vector<int> selected_pages;
+    };
+
+    class FileStore;
+
+    struct InputFile
+    {
+        InputFile() = default;
+        InputFile(QPDF* qpdf) :
+            qpdf(qpdf)
+        {
+        }
+
+        void initialize(FileStore& fs);
+
+        std::string password;
+        std::unique_ptr<QPDF> qpdf_p;
+        QPDF* qpdf{};
+        ClosedFileInputSource* cfis{};
+        std::vector<QPDFObjectHandle> orig_pages;
+        int n_pages;
+        bool remove_unreferenced{false};
+        std::unique_ptr<QPDFAcroFormDocumentHelper> afdh{};
+    };
+
+    class FileStore
+    {
+        friend struct InputFile;
+        // These default values are duplicated in help and docs.
+        static int constexpr DEFAULT_KEEP_FILES_OPEN_THRESHOLD = 200;
+
+      public:
+        FileStore(QPDFJob& job) :
+            job(job)
+        {
+        }
+        void process_file(std::string const& filename, QPDFJob::InputFile& file_spec);
+        void process_files();
+        std::string encryption_file;
+        std::string encryption_file_password;
+        bool keep_files_open{true};
+        bool keep_files_open_set{false};
+        size_t keep_files_open_threshold{DEFAULT_KEEP_FILES_OPEN_THRESHOLD};
+
+        std::map<std::string, InputFile> files;
+
+      private:
+        QPDFJob& job;
+    };
+
     struct RotationSpec
     {
         RotationSpec(int angle = 0, bool relative = false) :
@@ -511,20 +565,21 @@ class QPDFJob
 
     // Transformations
     void setQPDFOptions(QPDF& pdf);
-    void handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_heap);
+    bool handlePageSpecs(QPDF& pdf);
     bool shouldRemoveUnreferencedResources(QPDF& pdf);
+    void new_section(std::string const& filename, char const* password, std::string const& range);
     void handleRotations(QPDF& pdf);
-    void getUOPagenos(
-        std::vector<UnderOverlay>& uo, std::map<int, std::map<size_t, std::vector<int>>>& pagenos);
+    std::map<std::pair<int, size_t>, std::vector<int>>
+    getUOPagenos(std::vector<UnderOverlay> const& uo);
     void handleUnderOverlay(QPDF& pdf);
     std::string doUnderOverlayForPage(
         QPDF& pdf,
+        std::map<unsigned long long int, std::unique_ptr<QPDFAcroFormDocumentHelper>>& afdh,
         UnderOverlay& uo,
-        std::map<int, std::map<size_t, std::vector<int>>>& pagenos,
-        size_t page_idx,
-        size_t uo_idx,
-        std::map<int, std::map<size_t, QPDFObjectHandle>>& fo,
-        std::vector<QPDFPageObjectHelper>& pages,
+        std::map<std::pair<int, size_t>, std::vector<int>> const& pagenos,
+        std::pair<int, size_t> pageno_uo_idx,
+        std::map<std::pair<int, size_t>, QPDFObjectHandle>& fo,
+        std::vector<QPDFPageObjectHelper>&& pages,
         QPDFPageObjectHelper& dest_page);
     void validateUnderOverlay(QPDF& pdf, UnderOverlay* uo);
     void handleTransformations(QPDF& pdf);
@@ -582,7 +637,7 @@ class QPDFJob
         static int constexpr DEFAULT_OI_MIN_AREA = 16384;
         static int constexpr DEFAULT_II_MIN_BYTES = 1024;
 
-        Members();
+        Members(QPDFJob& job);
         Members(Members const&) = delete;
 
         std::shared_ptr<QPDFLogger> log;
@@ -590,7 +645,7 @@ class QPDFJob
         bool warnings{false};
         unsigned long encryption_status{0};
         bool verbose{false};
-        std::shared_ptr<char> password;
+        std::string password;
         bool linearize{false};
         bool decrypt{false};
         bool remove_restrictions{false};
@@ -600,8 +655,6 @@ class QPDFJob
         bool suppress_warnings{false};
         bool warnings_exit_zero{false};
         bool copy_encryption{false};
-        std::string encryption_file;
-        std::shared_ptr<char> encryption_file_password;
         bool encrypt{false};
         bool password_is_hex_key{false};
         bool suppress_password_recovery{false};
@@ -644,9 +697,6 @@ class QPDFJob
         bool qdf_mode{false};
         bool preserve_unreferenced_objects{false};
         remove_unref_e remove_unreferenced_page_resources{re_auto};
-        bool keep_files_open{true};
-        bool keep_files_open_set{false};
-        size_t keep_files_open_threshold{DEFAULT_KEEP_FILES_OPEN_THRESHOLD};
         bool newline_before_endstream{false};
         std::string linearize_pass1;
         bool coalesce_contents{false};
@@ -702,14 +752,16 @@ class QPDFJob
         std::vector<UnderOverlay> underlay;
         std::vector<UnderOverlay> overlay;
         UnderOverlay* under_overlay{nullptr};
-        std::vector<PageSpec> page_specs;
+        std::vector<Section> page_specs;
+        FileStore file_store;
         std::map<std::string, RotationSpec> rotations;
         bool require_outfile{true};
         bool replace_input{false};
         bool check_is_encrypted{false};
         bool check_requires_password{false};
-        std::shared_ptr<char> infilename;
-        std::shared_ptr<char> outfilename;
+        bool empty_input{false};
+        std::string infilename;
+        std::string outfilename;
         bool json_input{false};
         bool json_output{false};
         std::string update_from_json;
