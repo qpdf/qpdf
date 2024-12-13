@@ -7,14 +7,17 @@ realmain(int argc, char* argv[])
     // In Windows, shell globbing is handled by the runtime, so
     // passing '*' as argument results in wildcard expansion. In
     // non-Windows, globbing is done by the shell, so passing '*'
-    // shows up as '*'. In Windows with MSVC, it is necessary to link
-    // a certain way for this to work. To test this, we invoke this
-    // program with a single quoted argument containing a shell glob
-    // expression. In Windows, we expect to see multiple arguments,
-    // none of which contain '*'. Otherwise, we expected to see the
-    // exact glob string that was passed in. The effectiveness of this
-    // test was exercised by manually breaking the link options for
-    // msvc and seeing that the test fails under that condition.
+    // shows up as '*'. In Windows, it is necessary to link a certain
+    // way for this to work. To test this, we invoke this program with
+    // a single quoted argument containing a shell glob expression. In
+    // Windows, we expect to see multiple arguments, none of which
+    // contain '*'. Otherwise, we expected to see the exact glob
+    // string that was passed in. The effectiveness of this test was
+    // exercised by manually breaking the link options for msvc and
+    // seeing that the test fails under that condition. Explicit link
+    // changes used to be needed only for MSVC, but as of late 2024,
+    // they are also neededed for mingw, which was found by CI failure
+    // of this test.
 
     bool found_star = false;
     for (int i = 1; i < argc; ++i) {
