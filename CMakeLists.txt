@@ -247,6 +247,14 @@ if(MSVC)
   list(APPEND CMAKE_REQUIRED_LINK_OPTIONS -link setargv.obj)
   list(APPEND WINDOWS_WMAIN_LINK -link wsetargv.obj)
 endif()
+if(MINGW)
+  execute_process(
+    COMMAND gcc --print-file-name=CRT_glob.o
+    OUTPUT_VARIABLE CRT_GLOB_O
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  list(APPEND WINDOWS_WMAIN_LINK ${CRT_GLOB_O})
+endif()
 
 include(GNUInstallDirs)
 
