@@ -7,6 +7,8 @@
 # forget, it will be a link error if someone tries to call it.
 
 choices:
+  # Predefined values that can be used with required_choices and optional_choices
+  # options. These are used for validation in both CLI and JSON interfaces.
   yn:
     - "y"
     - "n"
@@ -75,7 +77,26 @@ choices:
     - assembly
     - none
 options:
+  # Each table defines a group of related options and how they should be handled.
+  # Options can be:
+  #   bare: flag-like options that take no value
+  #         CLI: --decrypt
+  #         JSON: "decrypt": true
+  #   required_parameter: options that must have a value when used
+  #         CLI: --password=value
+  #         JSON: "password": "value"
+  #   optional_parameter: options that can be used with/without value
+  #         CLI: --split-pages[=pattern]
+  #         JSON: "splitPages": null or "splitPages": "pattern"
+  #   required_choices: options that must use one of predefined values
+  #         CLI: --password-mode=bytes
+  #         JSON: "passwordMode": "bytes"
+  #   optional_choices: options that can take predefined value or be omitted
+  #         CLI: --json[=1]
+  #         JSON: "json": "1" or "json": null
+
   - table: help
+    # Basic help and information commands that don't modify PDFs
     bare:
       - version
       - copyright
@@ -84,8 +105,9 @@ options:
     optional_choices:
       json-help: json_version
   - table: main
-    config: c_main
-    manual:
+    # Core QPDF operations and settings
+    config: c_main    # Maps to QPDFJob::Config class
+    manual:           # Complex options needing special handling
       - add-attachment
       - copy-attachments-from
       - encrypt
@@ -95,7 +117,7 @@ options:
       - empty
       - replace-input
       - set-page-labels
-    positional: true
+    positional: true  # Can take input/output files as positional args
     bare:
       - add-attachment
       - allow-weak-crypto
@@ -194,14 +216,16 @@ options:
       json: json_version
       json-output: json_output
   - table: pages
-    config: c_pages
-    prefix: Pages
+    # Page manipulation operations
+    config: c_pages   # Maps to separate config class
+    prefix: Pages     # Options prefixed with Pages.
     positional: true
     required_parameter:
-      file: file
+      file: file      # Pages.file=input.pdf
       range: page-range
       password: password
   - table: encryption
+    # Encryption settings (shared config with main table)
     config: c_main
     prefix: Enc
     positional: true
@@ -290,6 +314,38 @@ options:
   - table: set page labels
     prefix: PageLabels
     positional: true
+file_paths:
+  # This is the list of fields in the JSON that are file paths
+  # The knowledge of which fields are file paths is used to generate
+  # set the format to "uri-reference" in the JSON schema, letting bindings
+  # to QPDFJob JSON know that these fields are file paths.
+  # Each entry can specify a contentMediaType to indicate the expected file type
+  _inputFile:
+    contentMediaType: application/pdf
+  _outputFile:
+    contentMediaType: application/pdf
+  password-file:
+    contentMediaType: text/plain
+  copy-encryption:
+    contentMediaType: application/pdf
+  linearize-pass1:
+    contentMediaType: application/octet-stream  # Not a valid PDF
+  "add-attachment[]._file":
+    contentMediaType: application/octet-stream  # Can be any type
+  "copy-attachments-from[]._file":
+    contentMediaType: application/pdf
+  "pages[].Pages.file":
+    contentMediaType: application/pdf
+  "overlay[].UO.file":
+    contentMediaType: application/pdf
+  "underlay[].UO.file":
+    contentMediaType: application/pdf
+  job-json-file:
+    contentMediaType: application/json
+  "update-from-json":
+    contentMediaType: application/json
+  split-pages:
+      contentMediaType: application/pdf
 json:
   # The structure of this section defines what the json input to
   # QPDFJob looks like. If a key starts with underscore, it does not
@@ -306,6 +362,16 @@ json:
   # for the schema and must appear that way in the user-supplied json.
   # This makes it more convenient to populate JSON objects in some
   # languages.
+
+  # The mapping between CLI options and JSON is as follows:
+  #
+  # CLI Option Type | JSON Representation
+  # ----------------|--------------------
+  # bare            | boolean
+  # req_parameter   | string
+  # opt_parameter   | string or null
+  # req_choices     | string (enum)
+  # opt_choices     | string (enum) or null
 
   # input
   _inputFile: "input filename"
