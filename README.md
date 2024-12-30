@@ -136,6 +136,10 @@ pass `-DQTEST_COLOR=0` to cmake.
 
 For additional information, please refer to the [manual](https://qpdf.readthedocs.io/en/latest/installation.html).
 
+With the help of [qpdf-action](https://github.com/yegor256/qpdf-action) you can use
+`qpdf` in GitHub Actions.
+
+
 # Building on Windows
 
 qpdf is known to build and pass its test suite with mingw and Microsoft Visual C++. Both 32-bit and 64-bit versions
