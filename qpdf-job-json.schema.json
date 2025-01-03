@@ -545,18 +545,22 @@
     },
     "jsonKey": {
       "description": "This option is repeatable.\n\nIf given, only the specified top-level keys will be included in the JSON output. Otherwise, all keys will be included. With \"jsonOutput\", when not given, only the \"qpdf\" key will appear in the output.",
-      "type": "array",
+      "type": [
+        "array",
+        "string"
+      ],
       "items": {
-        "type": "string",
-        "description": null
+        "type": "string"
       }
     },
     "jsonObject": {
       "description": "This option is repeatable.\n\nIf given, only specified objects will be shown in the \"objects\" key of the JSON output. Otherwise, all objects will be shown.",
-      "type": "array",
+      "type": [
+        "array",
+        "string"
+      ],
       "items": {
-        "type": "string",
-        "description": null
+        "type": "string"
       }
     },
     "jsonStreamData": {
@@ -647,81 +651,111 @@
     },
     "addAttachment": {
       "description": "The \"addAttachment\" flag and its options may be repeated to add multiple attachments.\n\nRun qpdf --help=add-attachment for details.",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "description": "",
-        "properties": {
-          "file": {
-            "type": "string",
-            "description": "File to attach.",
-            "format": "uri-reference",
-            "contentMediaType": "application/octet-stream"
+      "$defs": {
+        "QPDF_add_attachment": {
+          "title": "QPDF_add_attachment",
+          "$id": "https://qpdf.org/schema/QPDF_add_attachment",
+          "type": "object",
+          "description": "",
+          "properties": {
+            "file": {
+              "type": "string",
+              "description": "File to attach.",
+              "format": "uri-reference",
+              "contentMediaType": "application/octet-stream"
+            },
+            "creationdate": {
+              "type": "string",
+              "description": "Specify the attachment's creation date in PDF format; defaults to the current time.\n\nRun qpdf --help=pdf-dates for information about the date format."
+            },
+            "description": {
+              "type": "string",
+              "description": "Supply descriptive text for the attachment, displayed by some PDF viewers."
+            },
+            "filename": {
+              "type": "string",
+              "description": "Specify the filename to be used for the attachment.\n\nThis is what is usually displayed to the user and is the name most graphical PDF viewers will use when saving a file. It defaults to the last element (basename) of the attached file's filename."
+            },
+            "key": {
+              "type": "string",
+              "description": "Specify the key to use for the attachment in the embedded files table.\n\nIt defaults to the last element (basename) of the attached file's filename."
+            },
+            "mimetype": {
+              "type": "string",
+              "description": "Specify the mime type for the attachment, such as text/plain, application/pdf, image/png, etc."
+            },
+            "moddate": {
+              "type": "string",
+              "description": "Specify the attachment's modification date in PDF format; defaults to the current time.\n\nRun qpdf --help=pdf-dates for information about the date format."
+            },
+            "replace": {
+              "type": "string",
+              "description": "Indicate that any existing attachment with the same key should be replaced by the new attachment.\n\nOtherwise, qpdf gives an error if an attachment with that key is already present."
+            }
           },
-          "creationdate": {
-            "type": "string",
-            "description": "Specify the attachment's creation date in PDF format; defaults to the current time.\n\nRun qpdf --help=pdf-dates for information about the date format."
-          },
-          "description": {
-            "type": "string",
-            "description": "Supply descriptive text for the attachment, displayed by some PDF viewers."
-          },
-          "filename": {
-            "type": "string",
-            "description": "Specify the filename to be used for the attachment.\n\nThis is what is usually displayed to the user and is the name most graphical PDF viewers will use when saving a file. It defaults to the last element (basename) of the attached file's filename."
-          },
-          "key": {
-            "type": "string",
-            "description": "Specify the key to use for the attachment in the embedded files table.\n\nIt defaults to the last element (basename) of the attached file's filename."
-          },
-          "mimetype": {
-            "type": "string",
-            "description": "Specify the mime type for the attachment, such as text/plain, application/pdf, image/png, etc."
-          },
-          "moddate": {
-            "type": "string",
-            "description": "Specify the attachment's modification date in PDF format; defaults to the current time.\n\nRun qpdf --help=pdf-dates for information about the date format."
-          },
-          "replace": {
-            "type": "string",
-            "description": "Indicate that any existing attachment with the same key should be replaced by the new attachment.\n\nOtherwise, qpdf gives an error if an attachment with that key is already present."
-          }
+          "additionalProperties": false
+        }
+      },
+      "anyOf": [
+        {
+          "$ref": "https://qpdf.org/schema/QPDF_add_attachment"
         },
-        "additionalProperties": false
-      }
+        {
+          "type": "array",
+          "items": {
+            "$ref": "https://qpdf.org/schema/QPDF_add_attachment"
+          }
+        }
+      ]
     },
     "removeAttachment": {
       "description": "Remove an embedded file using its key.\n\nGet the key with \"listAttachments\".",
-      "type": "array",
+      "type": [
+        "array",
+        "string"
+      ],
       "items": {
-        "type": "string",
-        "description": null
+        "type": "string"
       }
     },
     "copyAttachmentsFrom": {
       "description": "The \"copyAttachmentsFrom\" flag and its options may be repeated to copy attachments from multiple files.\n\nRun qpdf --help=copy-attachments for details.",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "description": "",
-        "properties": {
-          "file": {
-            "type": "string",
-            "description": "File to copy attachments from.",
-            "format": "uri-reference",
-            "contentMediaType": "application/pdf"
+      "$defs": {
+        "QPDF_copy_attachments_from": {
+          "title": "QPDF_copy_attachments_from",
+          "$id": "https://qpdf.org/schema/QPDF_copy_attachments_from",
+          "type": "object",
+          "description": "",
+          "properties": {
+            "file": {
+              "type": "string",
+              "description": "File to copy attachments from.",
+              "format": "uri-reference",
+              "contentMediaType": "application/pdf"
+            },
+            "password": {
+              "type": "string",
+              "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
+            },
+            "prefix": {
+              "type": "string",
+              "description": "Prepend a prefix to each key; may be needed if there are duplicate attachment keys.\n\nThis affects the key only, not the file name."
+            }
           },
-          "password": {
-            "type": "string",
-            "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
-          },
-          "prefix": {
-            "type": "string",
-            "description": "Prepend a prefix to each key; may be needed if there are duplicate attachment keys.\n\nThis affects the key only, not the file name."
-          }
+          "additionalProperties": false
+        }
+      },
+      "anyOf": [
+        {
+          "$ref": "https://qpdf.org/schema/QPDF_copy_attachments_from"
         },
-        "additionalProperties": false
-      }
+        {
+          "type": "array",
+          "items": {
+            "$ref": "https://qpdf.org/schema/QPDF_copy_attachments_from"
+          }
+        }
+      ]
     },
     "collate": {
       "type": [
@@ -766,28 +800,42 @@
     },
     "pages": {
       "description": "Run qpdf --help=page-selection for details.",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "description": "",
-        "properties": {
-          "file": {
-            "type": "string",
-            "description": "Specify the file for the current page operation.\n\nThis is used with \"pages\", \"overlay\", and \"underlay\" and appears between the option and the terminating --. Run qpdf --help=page-selection for details.",
-            "format": "uri-reference",
-            "contentMediaType": "application/pdf"
+      "$defs": {
+        "QPDF_pages": {
+          "title": "QPDF_pages",
+          "$id": "https://qpdf.org/schema/QPDF_pages",
+          "type": "object",
+          "description": "",
+          "properties": {
+            "file": {
+              "type": "string",
+              "description": "Specify the file for the current page operation.\n\nThis is used with \"pages\", \"overlay\", and \"underlay\" and appears between the option and the terminating --. Run qpdf --help=page-selection for details.",
+              "format": "uri-reference",
+              "contentMediaType": "application/pdf"
+            },
+            "password": {
+              "type": "string",
+              "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
+            },
+            "range": {
+              "type": "string",
+              "description": "Specify the page range for the current page operation with \"pages\".\n\nIf omitted, all pages are selected. This is used with \"pages\" and appears between \"pages\" and --. Run qpdf --help=page-selection for details."
+            }
           },
-          "password": {
-            "type": "string",
-            "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
-          },
-          "range": {
-            "type": "string",
-            "description": "Specify the page range for the current page operation with \"pages\".\n\nIf omitted, all pages are selected. This is used with \"pages\" and appears between \"pages\" and --. Run qpdf --help=page-selection for details."
-          }
+          "additionalProperties": false
+        }
+      },
+      "anyOf": [
+        {
+          "$ref": "https://qpdf.org/schema/QPDF_pages"
         },
-        "additionalProperties": false
-      }
+        {
+          "type": "array",
+          "items": {
+            "$ref": "https://qpdf.org/schema/QPDF_pages"
+          }
+        }
+      ]
     },
     "removeInfo": {
       "$ref": "#/$defs/bareOption",
@@ -811,77 +859,107 @@
     },
     "setPageLabels": {
       "description": "Set page labels (explicit page numbers) for the entire file.\n\nEach label-spec has the form\n first-page:[type][/start[/prefix]]\n where\n\n- \"first-page\" represents a sequential page number using the same format as page ranges: a number, a number preceded by \"r\" to indicate counting from the end, or \"z\" indicating the last page\n- \"type\" is one of - D: Arabic numerals (digits) - A: Upper-case alphabetic characters - a: Lower-case alphabetic characters - R: Upper-case Roman numerals - r: Lower-case Roman numerals - omitted: the page number does not appear, though the prefix, if specified will still appear\n- \"start\" must be a number >= 1\n- \"prefix\"` may be any string and is prepended to each page label\n\n The first label spec must have a first-page value of 1, indicating the first page of the document. If multiple page label specs are specified, they must be given in increasing order.\n If multiple page label specs are specified, they must be given in increasing order.\n A given page label spec causes pages to be numbered according to that scheme starting with first-page and continuing until the next label spec or the end of the document. If you want to omit numbering starting at a certain page, you can use first-page: as the spec.\n Example: \"1:r 5:D\" would number the first four pages i through iv, then the remaining pages with Arabic numerals starting with 1 and continuing sequentially until the end of the document. For additional examples, please consult the manual.",
-      "type": "array",
+      "type": [
+        "array",
+        "string"
+      ],
       "items": {
-        "type": "string",
-        "description": null
+        "type": "string"
       }
     },
     "overlay": {
       "description": "Overlay pages from another file on the output.\n\nRun qpdf --help=overlay-underlay for details.",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "description": "",
-        "properties": {
-          "file": {
-            "type": "string",
-            "description": "Specify the file for the current page operation.\n\nThis is used with \"pages\", \"overlay\", and \"underlay\" and appears between the option and the terminating --. Run qpdf --help=page-selection for details.",
-            "format": "uri-reference",
-            "contentMediaType": "application/pdf"
+      "$defs": {
+        "QPDF_overlay": {
+          "title": "QPDF_overlay",
+          "$id": "https://qpdf.org/schema/QPDF_overlay",
+          "type": "object",
+          "description": "",
+          "properties": {
+            "file": {
+              "type": "string",
+              "description": "Specify the file for the current page operation.\n\nThis is used with \"pages\", \"overlay\", and \"underlay\" and appears between the option and the terminating --. Run qpdf --help=page-selection for details.",
+              "format": "uri-reference",
+              "contentMediaType": "application/pdf"
+            },
+            "password": {
+              "type": "string",
+              "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
+            },
+            "from": {
+              "type": "string",
+              "description": "Specify pages from the overlay/underlay file that are applied to the destination pages.\n\nSee qpdf --help=page-ranges for help with the page range syntax. The page range may be omitted if \"repeat\" is used."
+            },
+            "repeat": {
+              "type": "string",
+              "description": "Specify pages from the overlay/underlay that are repeated after \"from\" pages have been exhausted.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
+            },
+            "to": {
+              "type": "string",
+              "description": "Specify the range of pages in the primary output to apply overlay/underlay to.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
+            }
           },
-          "password": {
-            "type": "string",
-            "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
-          },
-          "from": {
-            "type": "string",
-            "description": "Specify pages from the overlay/underlay file that are applied to the destination pages.\n\nSee qpdf --help=page-ranges for help with the page range syntax. The page range may be omitted if \"repeat\" is used."
-          },
-          "repeat": {
-            "type": "string",
-            "description": "Specify pages from the overlay/underlay that are repeated after \"from\" pages have been exhausted.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
-          },
-          "to": {
-            "type": "string",
-            "description": "Specify the range of pages in the primary output to apply overlay/underlay to.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
-          }
+          "additionalProperties": false
+        }
+      },
+      "anyOf": [
+        {
+          "$ref": "https://qpdf.org/schema/QPDF_overlay"
         },
-        "additionalProperties": false
-      }
+        {
+          "type": "array",
+          "items": {
+            "$ref": "https://qpdf.org/schema/QPDF_overlay"
+          }
+        }
+      ]
     },
     "underlay": {
       "description": "Underlay pages from another file on the output.\n\nRun qpdf --help=overlay-underlay for details.",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "description": "",
-        "properties": {
-          "file": {
-            "type": "string",
-            "description": "Specify the file for the current page operation.\n\nThis is used with \"pages\", \"overlay\", and \"underlay\" and appears between the option and the terminating --. Run qpdf --help=page-selection for details.",
-            "format": "uri-reference",
-            "contentMediaType": "application/pdf"
+      "$defs": {
+        "QPDF_underlay": {
+          "title": "QPDF_underlay",
+          "$id": "https://qpdf.org/schema/QPDF_underlay",
+          "type": "object",
+          "description": "",
+          "properties": {
+            "file": {
+              "type": "string",
+              "description": "Specify the file for the current page operation.\n\nThis is used with \"pages\", \"overlay\", and \"underlay\" and appears between the option and the terminating --. Run qpdf --help=page-selection for details.",
+              "format": "uri-reference",
+              "contentMediaType": "application/pdf"
+            },
+            "password": {
+              "type": "string",
+              "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
+            },
+            "from": {
+              "type": "string",
+              "description": "Specify pages from the overlay/underlay file that are applied to the destination pages.\n\nSee qpdf --help=page-ranges for help with the page range syntax. The page range may be omitted if \"repeat\" is used."
+            },
+            "repeat": {
+              "type": "string",
+              "description": "Specify pages from the overlay/underlay that are repeated after \"from\" pages have been exhausted.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
+            },
+            "to": {
+              "type": "string",
+              "description": "Specify the range of pages in the primary output to apply overlay/underlay to.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
+            }
           },
-          "password": {
-            "type": "string",
-            "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
-          },
-          "from": {
-            "type": "string",
-            "description": "Specify pages from the overlay/underlay file that are applied to the destination pages.\n\nSee qpdf --help=page-ranges for help with the page range syntax. The page range may be omitted if \"repeat\" is used."
-          },
-          "repeat": {
-            "type": "string",
-            "description": "Specify pages from the overlay/underlay that are repeated after \"from\" pages have been exhausted.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
-          },
-          "to": {
-            "type": "string",
-            "description": "Specify the range of pages in the primary output to apply overlay/underlay to.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
-          }
+          "additionalProperties": false
+        }
+      },
+      "anyOf": [
+        {
+          "$ref": "https://qpdf.org/schema/QPDF_underlay"
         },
-        "additionalProperties": false
-      }
+        {
+          "type": "array",
+          "items": {
+            "$ref": "https://qpdf.org/schema/QPDF_underlay"
+          }
+        }
+      ]
     },
     "warningExit0": {
       "$ref": "#/$defs/bareOption",

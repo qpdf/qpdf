@@ -1202,8 +1202,26 @@ A complete manual can be found at https://qpdf.readthedocs.io.
             return ret
         elif isinstance(obj, list) and len(obj) == 1:
             ret['description'] = self._jsonize_help_text('', help_texts.get(self._json_schema_key(key)))
-            ret['type'] = 'array'
-            ret['items'] = self._convert_to_schema(self._concat_keys(parent_key, key), '[]', obj[0], data, help_texts)
+            if obj[0] is None:
+                ret['type'] = ['array', 'string']
+                ret['items'] = { "type": "string" }
+            else:
+                object_type = self._convert_to_schema(self._concat_keys(parent_key, key), '[]', obj[0], data, help_texts)
+                if object_type.get('description'):
+                    object_type.pop('description')
+                def_key = f"QPDF_{key}".replace('-', '_')
+                def_id = "https://qpdf.org/schema/" + def_key
+                ret['$defs'] = {
+                    def_key: {
+                        "title": def_key,
+                        "$id": def_id,
+                        **object_type,
+                    }
+                }
+                ret['anyOf'] = [
+                    { "$ref": def_id },
+                    { "type": "array", "items": { "$ref": def_id } }
+                ]
             return ret
         else:
             return self._convert_primitive(parent_key, key, obj, data, help_texts)
