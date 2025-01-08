@@ -1110,6 +1110,16 @@ A complete manual can be found at https://qpdf.readthedocs.io.
             return stripped.lstrip() + '.'
 
         return stripped.lstrip()
+    
+    def _capitalize_first_letter(self, text):
+        if not text:
+            return text
+        return text[0].upper() + text[1:]
+    
+    def _capitalize_words(self, text):
+        if not text:
+            return text
+        return ' '.join(self._capitalize_first_letter(word) for word in text.split(' '))
 
     def _capitalize_sentences(self, text):
         """
@@ -1125,7 +1135,7 @@ A complete manual can be found at https://qpdf.readthedocs.io.
             if stripped == '':
                 capitalized.append('')
             else:
-                capitalized.append(lsep + stripped[0].upper() + stripped[1:])
+                capitalized.append(lsep + self._capitalize_first_letter(stripped))
         return '. '.join(capitalized)
 
     def _replace_cli_with_json_keys(self, text):
@@ -1188,7 +1198,16 @@ A complete manual can be found at https://qpdf.readthedocs.io.
             return parent_key + '.' + key
         return key
 
-    def _convert_to_schema(self, parent_key, key, obj, data, help_texts):
+    def _format_title(self, s):
+        if s is None:
+            return None
+        return 'QPDF ' + self._capitalize_words(s
+            .replace('.', ' ')
+            .replace('-', ' ')
+            .replace('_', ' ')
+            .replace(' ', ' '))
+
+    def _convert_to_schema(self, parent_key, key, obj, data, defs, help_texts):
         ret = {}
         if isinstance(obj, dict):
             # convert each value into properties
@@ -1198,7 +1217,7 @@ A complete manual can be found at https://qpdf.readthedocs.io.
             ret['additionalProperties'] = False
             for k, v in obj.items():
                 jsonKey = self._json_schema_key(k)
-                properties[jsonKey] = self._convert_to_schema(self._concat_keys(parent_key, key), k, v, data, help_texts)
+                properties[jsonKey] = self._convert_to_schema(self._concat_keys(parent_key, key), k, v, data, defs, help_texts)
             return ret
         elif isinstance(obj, list) and len(obj) == 1:
             ret['description'] = self._jsonize_help_text('', help_texts.get(self._json_schema_key(key)))
@@ -1206,25 +1225,24 @@ A complete manual can be found at https://qpdf.readthedocs.io.
                 ret['type'] = ['array', 'string']
                 ret['items'] = { "type": "string" }
             else:
-                object_type = self._convert_to_schema(self._concat_keys(parent_key, key), '[]', obj[0], data, help_texts)
+                object_type = self._convert_to_schema(self._concat_keys(parent_key, key), '[]', obj[0], data, defs, help_texts)
                 if object_type.get('description'):
                     object_type.pop('description')
                 def_key = f"QPDF_{key}".replace('-', '_')
-                def_id = "https://qpdf.org/schema/" + def_key
-                ret['$defs'] = {
-                    def_key: {
-                        "title": def_key,
-                        "$id": def_id,
-                        **object_type,
-                    }
+                while def_key in defs:
+                    print(f"WARNING: {def_key} already defined")
+                    def_key += '_'
+                defs[def_key] = {
+                    "title": self._format_title(key),
+                    **object_type,
                 }
                 ret['anyOf'] = [
-                    { "$ref": def_id },
-                    { "type": "array", "items": { "$ref": def_id } }
+                    { "$ref": '#/$defs/' + def_key },
+                    { "type": "array", "items": { "$ref": '#/$defs/' + def_key } }
                 ]
             return ret
         else:
-            return self._convert_primitive(parent_key, key, obj, data, help_texts)
+            return self._convert_primitive(parent_key, key, obj, data, defs, help_texts)
 
     def _key_prefix(self, key):
         tokens = key.split('.')
@@ -1245,7 +1263,7 @@ A complete manual can be found at https://qpdf.readthedocs.io.
                (not has_prefix and not option.get('prefix'))
         ]
     
-    def _convert_primitive(self, parent_key, key, value, data, help_texts):
+    def _convert_primitive(self, parent_key, key, value, data, defs, help_texts):
         """
         Convert a primitive value to a JSON Schema property.
         """
@@ -1300,26 +1318,71 @@ A complete manual can be found at https://qpdf.readthedocs.io.
         type = 'string'
         title = None
         ref = None
+        ref_key = None
+
         opt_choice = kind.get('is_opt_choice')
         if opt_choice:
             type = ["string", "null"]
-            ref = "#/$defs/QPDF_" + opt_choice.get('type')
-            title = 'QPDF_' + opt_choice.get('type')
-        
+            ref_key = "QPDF_" + opt_choice.get('type')
+            choice_type = opt_choice.get('type')
+
         req_choice = kind.get('is_req_choice')
         if req_choice:
-            ref = "#/$defs/QPDF_" + req_choice.get('type')
-            title = 'QPDF_' + req_choice.get('type')
-
+            ref_key = "QPDF_" + req_choice.get('type')
+            choice_type = req_choice.get('type')
+        
+        if req_choice or opt_choice:
+            # For setting the "title", I tested multiple options:
+            # 
+            # 1. No title.
+            # - ❌ quicktype will name it as the first field that used that choice.
+            #   For example:
+            #     extract?: CompressStreams;
+            #     form?: CompressStreams;
+            #   where "CompressStreams" is a 1 of the YN choices.
+            # - ✅ "json-schema-to-typescript" will not define a type, which is better,
+            #     extract?: "y" | "n"; form?: "y" | "n";
+            #
+            # 2. using the field name as the title:
+            # - ❌ quicktype will name the type using the common prefix of all
+            #   those fields titles, which will be QPDF, if already used it
+            #   or empty will do as if there's no title (cf above).
+            # - ✅ "json-schema-to-typescript" will define one
+            #   type for each field named like the field.
+            #
+            # 3. using choice_type as a title:
+            # - ❓ quicktype does an OK job, the enum is defined once and reused,
+            #   but it will merge all field documentatations into 1 to use it
+            #   for that the (which generally makes no sense)
+            # - ❌ "json-schema-to-typescript" does not do so good.
+            #   It will define as many types name QPDF<choice_type>#N as there
+            #   are fields using that choice. (example QPDFYn1, QPDFYn2, etc.)
+            #
+            # 4. combining choice_type and field name as a title:
+            # - ❓ quicktype does an OK job, the enum is defined once and reused,
+            #   it's name with the common prefix QPDF<choice_type>, behavior is
+            #   similar to the 3rd option (using the choice_type as the title).
+            # - ✅ "json-schema-to-typescript" will define one type per field
+            #   QPDF<ChoiceType><FieldName>, which is acceptable.
+            #
+            # search for _set_title_for_choice_type for the related code
+            #
+            title = choice_type + ' ' + key
         ret = {
             'type': type,
             # '$comment': comment,
             'description': self._jsonize_help_text(value, desc),
         }
-        if ref:
+        if ref_key:
+            ref = "#/$defs/" + ref_key
             ret['$ref'] = ref
+            # _set_title_for_choice_type
+            # I also tried setting the enum directly to force quicktype
+            # not to define a new type for each field, but that didn't work
+            # (cf "no title" above).
+            # ret['enum'] = defs[ref_key]['enum']
         if title:
-            ret['title'] = title
+            ret['title'] = self._format_title(title)
 
         file_info = data.get('file_paths', {}).get(full_key)
         if file_info:
@@ -1347,31 +1410,40 @@ A complete manual can be found at https://qpdf.readthedocs.io.
             help_texts[self._json_schema_key(option)] = text
             # print(f"{option}: {json.dumps(text, indent=2)}")
         project_url = "https://github.com/qpdf/qpdf/blob/main/"
-        obj = self._convert_to_schema('', '',  data.get('json'), data, help_texts)
-        json_schema = {
-            "$schema": "https://json-schema.org/draft/2020-12/schema",
-            "$id": project_url + self.DESTS["schema_json"],
-            "title": "QPDF Job JSON Schema", 
-            "description": "A QPDF Job configuration",
-            "type": "object",
-            "$defs": {},
-            **obj
-        }
+        defs = {}
 
         # Add a type definition for bare options
-        json_schema["$defs"]["bareOption"] = {
+        defs["bareOption"] = {
             "$comment": ("A bare option is an option that " +
-                         "is not followed by a value in QPDF cli"),
-            "title": "QPDF_bare_option",
-            "enum": [True, False, '', 'y', 'yes', 'true', 'n', 'no', 'false'],
+                         "is not followed by a value in QPDF cli. " +
+                         "As discussed here https://github.com/qpdf/qpdf/pull/1325, " +
+                         "to add those set the value to an empty string."),
+            # "title": "QPDF_bare_option",
+            "enum": [""]
         }
 
         # For each "choices" in "job.yml", add a "def"
         for choice_type, choices in data['choices'].items():
-            json_schema['$defs'][f'QPDF_{choice_type}'] = {
-                "title": 'QPDF_' + choice_type,
+            defs[f'QPDF_{choice_type}'] = {
+                # Somehow, setting the title here is ignored by some tools
+                # (quicktype at least). Keeping it doesn't hurt though.
+                # Cf discussion later in this file about setting the title
+                # search for: _set_title_for_choice_type
+                "title": self._format_title(choice_type),
                 "enum": [str(choice) for choice in choices],
             }
+
+        obj = self._convert_to_schema('', '',  data.get('json'), data, defs, help_texts)
+
+        json_schema = {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$id": project_url + self.DESTS["schema_json"],
+            "title": "QPDF Job JSON Schema",
+            "description": "A QPDF Job configuration",
+            "type": "object",
+            "$defs": defs,
+            **obj
+        }
 
         # Write schema to file
         with write_file(self.DESTS["schema_json"]) as f:
