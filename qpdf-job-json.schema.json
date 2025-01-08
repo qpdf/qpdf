@@ -6,29 +6,20 @@
   "type": "object",
   "$defs": {
     "bareOption": {
-      "$comment": "A bare option is an option that is not followed by a value in QPDF cli",
-      "title": "QPDF_bare_option",
+      "$comment": "A bare option is an option that is not followed by a value in QPDF cli. As discussed here https://github.com/qpdf/qpdf/pull/1325, to add those set the value to an empty string.",
       "enum": [
-        true,
-        false,
-        "",
-        "y",
-        "yes",
-        "true",
-        "n",
-        "no",
-        "false"
+        ""
       ]
     },
     "QPDF_yn": {
-      "title": "QPDF_yn",
+      "title": "QPDF Yn",
       "enum": [
         "y",
         "n"
       ]
     },
     "QPDF_password_mode": {
-      "title": "QPDF_password_mode",
+      "title": "QPDF Password Mode",
       "enum": [
         "bytes",
         "hex-bytes",
@@ -37,7 +28,7 @@
       ]
     },
     "QPDF_stream_data": {
-      "title": "QPDF_stream_data",
+      "title": "QPDF Stream Data",
       "enum": [
         "compress",
         "preserve",
@@ -45,7 +36,7 @@
       ]
     },
     "QPDF_decode_level": {
-      "title": "QPDF_decode_level",
+      "title": "QPDF Decode Level",
       "enum": [
         "none",
         "generalized",
@@ -54,7 +45,7 @@
       ]
     },
     "QPDF_object_streams": {
-      "title": "QPDF_object_streams",
+      "title": "QPDF Object Streams",
       "enum": [
         "disable",
         "preserve",
@@ -62,7 +53,7 @@
       ]
     },
     "QPDF_remove_unref": {
-      "title": "QPDF_remove_unref",
+      "title": "QPDF Remove Unref",
       "enum": [
         "auto",
         "yes",
@@ -70,7 +61,7 @@
       ]
     },
     "QPDF_flatten": {
-      "title": "QPDF_flatten",
+      "title": "QPDF Flatten",
       "enum": [
         "all",
         "print",
@@ -78,7 +69,7 @@
       ]
     },
     "QPDF_json_key": {
-      "title": "QPDF_json_key",
+      "title": "QPDF Json Key",
       "enum": [
         "acroform",
         "attachments",
@@ -92,14 +83,14 @@
       ]
     },
     "QPDF_json_output": {
-      "title": "QPDF_json_output",
+      "title": "QPDF Json Output",
       "enum": [
         "2",
         "latest"
       ]
     },
     "QPDF_json_stream_data": {
-      "title": "QPDF_json_stream_data",
+      "title": "QPDF Json Stream Data",
       "enum": [
         "none",
         "inline",
@@ -107,7 +98,7 @@
       ]
     },
     "QPDF_json_version": {
-      "title": "QPDF_json_version",
+      "title": "QPDF Json Version",
       "enum": [
         "1",
         "2",
@@ -115,7 +106,7 @@
       ]
     },
     "QPDF_enc_bits": {
-      "title": "QPDF_enc_bits",
+      "title": "QPDF Enc Bits",
       "enum": [
         "40",
         "128",
@@ -123,7 +114,7 @@
       ]
     },
     "QPDF_print128": {
-      "title": "QPDF_print128",
+      "title": "QPDF Print128",
       "enum": [
         "full",
         "low",
@@ -131,7 +122,7 @@
       ]
     },
     "QPDF_modify128": {
-      "title": "QPDF_modify128",
+      "title": "QPDF Modify128",
       "enum": [
         "all",
         "annotate",
@@ -139,6 +130,152 @@
         "assembly",
         "none"
       ]
+    },
+    "QPDF_add_attachment": {
+      "title": "QPDF Add Attachment",
+      "type": "object",
+      "description": "",
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "File to attach.",
+          "format": "uri-reference",
+          "contentMediaType": "application/octet-stream"
+        },
+        "creationdate": {
+          "type": "string",
+          "description": "Specify the attachment's creation date in PDF format; defaults to the current time.\n\nRun qpdf --help=pdf-dates for information about the date format."
+        },
+        "description": {
+          "type": "string",
+          "description": "Supply descriptive text for the attachment, displayed by some PDF viewers."
+        },
+        "filename": {
+          "type": "string",
+          "description": "Specify the filename to be used for the attachment.\n\nThis is what is usually displayed to the user and is the name most graphical PDF viewers will use when saving a file. It defaults to the last element (basename) of the attached file's filename."
+        },
+        "key": {
+          "type": "string",
+          "description": "Specify the key to use for the attachment in the embedded files table.\n\nIt defaults to the last element (basename) of the attached file's filename."
+        },
+        "mimetype": {
+          "type": "string",
+          "description": "Specify the mime type for the attachment, such as text/plain, application/pdf, image/png, etc."
+        },
+        "moddate": {
+          "type": "string",
+          "description": "Specify the attachment's modification date in PDF format; defaults to the current time.\n\nRun qpdf --help=pdf-dates for information about the date format."
+        },
+        "replace": {
+          "type": "string",
+          "description": "Indicate that any existing attachment with the same key should be replaced by the new attachment.\n\nOtherwise, qpdf gives an error if an attachment with that key is already present."
+        }
+      },
+      "additionalProperties": false
+    },
+    "QPDF_copy_attachments_from": {
+      "title": "QPDF Copy Attachments From",
+      "type": "object",
+      "description": "",
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "File to copy attachments from.",
+          "format": "uri-reference",
+          "contentMediaType": "application/pdf"
+        },
+        "password": {
+          "type": "string",
+          "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
+        },
+        "prefix": {
+          "type": "string",
+          "description": "Prepend a prefix to each key; may be needed if there are duplicate attachment keys.\n\nThis affects the key only, not the file name."
+        }
+      },
+      "additionalProperties": false
+    },
+    "QPDF_pages": {
+      "title": "QPDF Pages",
+      "type": "object",
+      "description": "",
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Specify the file for the current page operation.\n\nThis is used with \"pages\", \"overlay\", and \"underlay\" and appears between the option and the terminating --. Run qpdf --help=page-selection for details.",
+          "format": "uri-reference",
+          "contentMediaType": "application/pdf"
+        },
+        "password": {
+          "type": "string",
+          "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
+        },
+        "range": {
+          "type": "string",
+          "description": "Specify the page range for the current page operation with \"pages\".\n\nIf omitted, all pages are selected. This is used with \"pages\" and appears between \"pages\" and --. Run qpdf --help=page-selection for details."
+        }
+      },
+      "additionalProperties": false
+    },
+    "QPDF_overlay": {
+      "title": "QPDF Overlay",
+      "type": "object",
+      "description": "",
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Specify the file for the current page operation.\n\nThis is used with \"pages\", \"overlay\", and \"underlay\" and appears between the option and the terminating --. Run qpdf --help=page-selection for details.",
+          "format": "uri-reference",
+          "contentMediaType": "application/pdf"
+        },
+        "password": {
+          "type": "string",
+          "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
+        },
+        "from": {
+          "type": "string",
+          "description": "Specify pages from the overlay/underlay file that are applied to the destination pages.\n\nSee qpdf --help=page-ranges for help with the page range syntax. The page range may be omitted if \"repeat\" is used."
+        },
+        "repeat": {
+          "type": "string",
+          "description": "Specify pages from the overlay/underlay that are repeated after \"from\" pages have been exhausted.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
+        },
+        "to": {
+          "type": "string",
+          "description": "Specify the range of pages in the primary output to apply overlay/underlay to.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
+        }
+      },
+      "additionalProperties": false
+    },
+    "QPDF_underlay": {
+      "title": "QPDF Underlay",
+      "type": "object",
+      "description": "",
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Specify the file for the current page operation.\n\nThis is used with \"pages\", \"overlay\", and \"underlay\" and appears between the option and the terminating --. Run qpdf --help=page-selection for details.",
+          "format": "uri-reference",
+          "contentMediaType": "application/pdf"
+        },
+        "password": {
+          "type": "string",
+          "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
+        },
+        "from": {
+          "type": "string",
+          "description": "Specify pages from the overlay/underlay file that are applied to the destination pages.\n\nSee qpdf --help=page-ranges for help with the page range syntax. The page range may be omitted if \"repeat\" is used."
+        },
+        "repeat": {
+          "type": "string",
+          "description": "Specify pages from the overlay/underlay that are repeated after \"from\" pages have been exhausted.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
+        },
+        "to": {
+          "type": "string",
+          "description": "Specify the range of pages in the primary output to apply overlay/underlay to.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
+        }
+      },
+      "additionalProperties": false
     }
   },
   "properties": {
@@ -192,19 +329,19 @@
       "type": "string",
       "description": "Normalize newlines to UNIX-style newlines in PDF content streams, which is useful for viewing them in a programmer's text editor across multiple platforms.\n\nThis is also turned on by \"qdf\".",
       "$ref": "#/$defs/QPDF_yn",
-      "title": "QPDF_yn"
+      "title": "QPDF Yn Normalize Content"
     },
     "streamData": {
       "type": "string",
       "description": "This option controls how streams are compressed in the output.\n\nIt is less granular than the newer options, \"compressStreams\" and \"decodeLevel\".\n\n Parameters:\n- compress: same as \"compressStreams\":\"y\" \"decodeLevel\":\"generalized\"\n- preserve: same as \"compressStreams\":\"n\" \"decodeLevel\":\"none\"\n- uncompress: same as \"compressStreams\":\"n\" \"decodeLevel\":\"generalized\".",
       "$ref": "#/$defs/QPDF_stream_data",
-      "title": "QPDF_stream_data"
+      "title": "QPDF Stream Data Stream Data"
     },
     "compressStreams": {
       "type": "string",
       "description": "Setting \"compressStreams\":\"n\" prevents qpdf from compressing uncompressed streams.\n\nThis can be useful if you are leaving some streams uncompressed intentionally.",
       "$ref": "#/$defs/QPDF_yn",
-      "title": "QPDF_yn"
+      "title": "QPDF Yn Compress Streams"
     },
     "recompressFlate": {
       "$ref": "#/$defs/bareOption",
@@ -214,7 +351,7 @@
       "type": "string",
       "description": "When uncompressing streams, control which types of compression schemes should be uncompressed:\n- none: don't uncompress anything. This is the default with \"jsonOutput\".\n- generalized: uncompress streams compressed with a general-purpose compression algorithm. This is the default except when \"jsonOutput\" is given.\n- specialized: in addition to generalized, also uncompress streams compressed with a special-purpose but non-lossy compression scheme\n- all: in addition to specialized, uncompress streams compressed with lossy compression schemes like JPEG (DCT)\n qpdf does not know how to uncompress all compression schemes.",
       "$ref": "#/$defs/QPDF_decode_level",
-      "title": "QPDF_decode_level"
+      "title": "QPDF Decode Level Decode Level"
     },
     "decrypt": {
       "$ref": "#/$defs/bareOption",
@@ -260,7 +397,7 @@
       "type": "string",
       "description": "Control what qpdf does regarding object streams.\n\nOptions:\n- preserve: preserve original object streams, if any (the default)\n- disable: create output files with no object streams\n- generate: create object streams, and compress objects when possible.",
       "$ref": "#/$defs/QPDF_object_streams",
-      "title": "QPDF_object_streams"
+      "title": "QPDF Object Streams Object Streams"
     },
     "minVersion": {
       "type": "string",
@@ -288,7 +425,7 @@
       ],
       "description": "Implies \"json\":\"version\".\n\nChanges default values for certain options so that the JSON output written is the most faithful representation of the original PDF and contains no additional JSON keys. See also \"jsonStreamData\", \"jsonStreamPrefix\", and \"decodeLevel\".",
       "$ref": "#/$defs/QPDF_json_output",
-      "title": "QPDF_json_output"
+      "title": "QPDF Json Output Json Output"
     },
     "removeRestrictions": {
       "$ref": "#/$defs/bareOption",
@@ -318,25 +455,25 @@
               "type": "string",
               "description": "Enable/disable modifying annotations including making comments and filling in form fields.\n\nFor 128-bit and 256-bit encryption, this also enables editing, creating, and deleting form fields unless \"modifyOther\":\"n\" or \"modify\":\"none\" is also specified.",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc40 Annotate"
             },
             "extract": {
               "type": "string",
               "description": "Enable/disable text/graphic extraction for purposes other than accessibility.",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc40 Extract"
             },
             "modify": {
               "type": "string",
               "description": "For 40-bit files, modify-opt may only be y or n and controls all aspects of document modification.\n\n For 128-bit and 256-bit encryption, modify-opt values allow enabling and disabling levels of restriction in a manner similar to how some PDF creation tools do it. Modify-opt values map to other combinations of options as follows:\n all: allow full modification (the default) annotate: \"modifyOther\":\"n\" form: \"modifyOther\":\"n\" \"annotate\":\"n\" assembly: \"modifyOther\":\"n\" \"annotate\":\"n\" \"form\":\"n\" none: \"modifyOther\":\"n\" \"annotate\":\"n\" \"form\":\"n\" \"assemble\":\"n\".",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc40 Modify"
             },
             "print": {
               "type": "string",
               "description": "Control what kind of printing is allowed.\n\nFor 40-bit encryption, print-opt may only be y or n and enables or disables all printing. For 128-bit and 256-bit encryption, print-opt may have the following values:\n none: disallow printing low: allow low-resolution printing only full: allow full printing (the default).",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc40 Print"
             }
           },
           "additionalProperties": false
@@ -349,19 +486,19 @@
               "type": "string",
               "description": "This option is ignored except with very old encryption formats.\n\nThe current PDF specification does not allow restriction of document accessibility. This option is not available with 40-bit encryption.",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc128 Accessibility"
             },
             "annotate": {
               "type": "string",
               "description": "Enable/disable modifying annotations including making comments and filling in form fields.\n\nFor 128-bit and 256-bit encryption, this also enables editing, creating, and deleting form fields unless \"modifyOther\":\"n\" or \"modify\":\"none\" is also specified.",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc128 Annotate"
             },
             "assemble": {
               "type": "string",
               "description": "Enable/disable document assembly (rotation and reordering of pages).\n\nThis option is not available with 40-bit encryption.",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc128 Assemble"
             },
             "cleartextMetadata": {
               "$ref": "#/$defs/bareOption",
@@ -371,31 +508,31 @@
               "type": "string",
               "description": "Enable/disable text/graphic extraction for purposes other than accessibility.",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc128 Extract"
             },
             "form": {
               "type": "string",
               "description": "Enable/disable whether filling form fields is allowed even if modification of annotations is disabled.\n\nThis option is not available with 40-bit encryption.",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc128 Form"
             },
             "modifyOther": {
               "type": "string",
               "description": "Enable/disable modifications not controlled by \"assemble\", \"annotate\", or \"form\".\n\n\"modifyOther\":\"n\" is implied by any of the other \"modify\" options. This option is not available with 40-bit encryption.",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc128 Modify Other"
             },
             "modify": {
               "type": "string",
               "description": "For 40-bit files, modify-opt may only be y or n and controls all aspects of document modification.\n\n For 128-bit and 256-bit encryption, modify-opt values allow enabling and disabling levels of restriction in a manner similar to how some PDF creation tools do it. Modify-opt values map to other combinations of options as follows:\n all: allow full modification (the default) annotate: \"modifyOther\":\"n\" form: \"modifyOther\":\"n\" \"annotate\":\"n\" assembly: \"modifyOther\":\"n\" \"annotate\":\"n\" \"form\":\"n\" none: \"modifyOther\":\"n\" \"annotate\":\"n\" \"form\":\"n\" \"assemble\":\"n\".",
               "$ref": "#/$defs/QPDF_modify128",
-              "title": "QPDF_modify128"
+              "title": "QPDF Modify128 Enc128 Modify"
             },
             "print": {
               "type": "string",
               "description": "Control what kind of printing is allowed.\n\nFor 40-bit encryption, print-opt may only be y or n and enables or disables all printing. For 128-bit and 256-bit encryption, print-opt may have the following values:\n none: disallow printing low: allow low-resolution printing only full: allow full printing (the default).",
               "$ref": "#/$defs/QPDF_print128",
-              "title": "QPDF_print128"
+              "title": "QPDF Print128 Enc128 Print"
             },
             "forceV4": {
               "type": "string",
@@ -416,19 +553,19 @@
               "type": "string",
               "description": "This option is ignored except with very old encryption formats.\n\nThe current PDF specification does not allow restriction of document accessibility. This option is not available with 40-bit encryption.",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc256 Accessibility"
             },
             "annotate": {
               "type": "string",
               "description": "Enable/disable modifying annotations including making comments and filling in form fields.\n\nFor 128-bit and 256-bit encryption, this also enables editing, creating, and deleting form fields unless \"modifyOther\":\"n\" or \"modify\":\"none\" is also specified.",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc256 Annotate"
             },
             "assemble": {
               "type": "string",
               "description": "Enable/disable document assembly (rotation and reordering of pages).\n\nThis option is not available with 40-bit encryption.",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc256 Assemble"
             },
             "cleartextMetadata": {
               "$ref": "#/$defs/bareOption",
@@ -438,31 +575,31 @@
               "type": "string",
               "description": "Enable/disable text/graphic extraction for purposes other than accessibility.",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc256 Extract"
             },
             "form": {
               "type": "string",
               "description": "Enable/disable whether filling form fields is allowed even if modification of annotations is disabled.\n\nThis option is not available with 40-bit encryption.",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc256 Form"
             },
             "modifyOther": {
               "type": "string",
               "description": "Enable/disable modifications not controlled by \"assemble\", \"annotate\", or \"form\".\n\n\"modifyOther\":\"n\" is implied by any of the other \"modify\" options. This option is not available with 40-bit encryption.",
               "$ref": "#/$defs/QPDF_yn",
-              "title": "QPDF_yn"
+              "title": "QPDF Yn Enc256 Modify Other"
             },
             "modify": {
               "type": "string",
               "description": "For 40-bit files, modify-opt may only be y or n and controls all aspects of document modification.\n\n For 128-bit and 256-bit encryption, modify-opt values allow enabling and disabling levels of restriction in a manner similar to how some PDF creation tools do it. Modify-opt values map to other combinations of options as follows:\n all: allow full modification (the default) annotate: \"modifyOther\":\"n\" form: \"modifyOther\":\"n\" \"annotate\":\"n\" assembly: \"modifyOther\":\"n\" \"annotate\":\"n\" \"form\":\"n\" none: \"modifyOther\":\"n\" \"annotate\":\"n\" \"form\":\"n\" \"assemble\":\"n\".",
               "$ref": "#/$defs/QPDF_modify128",
-              "title": "QPDF_modify128"
+              "title": "QPDF Modify128 Enc256 Modify"
             },
             "print": {
               "type": "string",
               "description": "Control what kind of printing is allowed.\n\nFor 40-bit encryption, print-opt may only be y or n and enables or disables all printing. For 128-bit and 256-bit encryption, print-opt may have the following values:\n none: disallow printing low: allow low-resolution printing only full: allow full printing (the default).",
               "$ref": "#/$defs/QPDF_print128",
-              "title": "QPDF_print128"
+              "title": "QPDF Print128 Enc256 Print"
             },
             "allowInsecure": {
               "type": "string",
@@ -541,7 +678,7 @@
       ],
       "description": "Generate a JSON representation of the file.\n\nThis is described in depth in the JSON section of the manual. \"version\" may be a specific version or \"latest\" (the default). Run qpdf \"jsonHelp\" for a description of the generated JSON object.",
       "$ref": "#/$defs/QPDF_json_version",
-      "title": "QPDF_json_version"
+      "title": "QPDF Json Version Json"
     },
     "jsonKey": {
       "description": "This option is repeatable.\n\nIf given, only the specified top-level keys will be included in the JSON output. Otherwise, all keys will be included. With \"jsonOutput\", when not given, only the \"qpdf\" key will appear in the output.",
@@ -567,7 +704,7 @@
       "type": "string",
       "description": "When used with \"json\", this option controls whether streams in json output should be omitted, written inline (base64-encoded) or written to a file.\n\nIf \"file\" is chosen, the file will be the name of the output file appended with -nnn where nnn is the object number. The prefix can be overridden with \"jsonStreamPrefix\". The default is \"none\", except when \"jsonOutput\" is specified, in which case the default is \"inline\".",
       "$ref": "#/$defs/QPDF_json_stream_data",
-      "title": "QPDF_json_stream_data"
+      "title": "QPDF Json Stream Data Json Stream Data"
     },
     "jsonStreamPrefix": {
       "type": "string",
@@ -587,7 +724,7 @@
       "type": "string",
       "description": "When qpdf needs to work with many files, as when merging large numbers of files, explicitly indicate whether files should be kept open.\n\nThe default behavior is to determine this based on the number of files.",
       "$ref": "#/$defs/QPDF_yn",
-      "title": "QPDF_yn"
+      "title": "QPDF Yn Keep Files Open"
     },
     "keepFilesOpenThreshold": {
       "type": "string",
@@ -617,7 +754,7 @@
       "type": "string",
       "description": "Fine-tune how qpdf controls encoding of Unicode passwords.\n\nValid options are auto, bytes, hex-bytes, and unicode.",
       "$ref": "#/$defs/QPDF_password_mode",
-      "title": "QPDF_password_mode"
+      "title": "QPDF Password Mode Password Mode"
     },
     "suppressPasswordRecovery": {
       "$ref": "#/$defs/bareOption",
@@ -647,63 +784,18 @@
       "type": "string",
       "description": "Remove from a page's resource dictionary any resources that are not referenced in the page's contents.\n\nParameters: \"auto\" (default), \"yes\", \"no\".",
       "$ref": "#/$defs/QPDF_remove_unref",
-      "title": "QPDF_remove_unref"
+      "title": "QPDF Remove Unref Remove Unreferenced Resources"
     },
     "addAttachment": {
       "description": "The \"addAttachment\" flag and its options may be repeated to add multiple attachments.\n\nRun qpdf --help=add-attachment for details.",
-      "$defs": {
-        "QPDF_add_attachment": {
-          "title": "QPDF_add_attachment",
-          "$id": "https://qpdf.org/schema/QPDF_add_attachment",
-          "type": "object",
-          "description": "",
-          "properties": {
-            "file": {
-              "type": "string",
-              "description": "File to attach.",
-              "format": "uri-reference",
-              "contentMediaType": "application/octet-stream"
-            },
-            "creationdate": {
-              "type": "string",
-              "description": "Specify the attachment's creation date in PDF format; defaults to the current time.\n\nRun qpdf --help=pdf-dates for information about the date format."
-            },
-            "description": {
-              "type": "string",
-              "description": "Supply descriptive text for the attachment, displayed by some PDF viewers."
-            },
-            "filename": {
-              "type": "string",
-              "description": "Specify the filename to be used for the attachment.\n\nThis is what is usually displayed to the user and is the name most graphical PDF viewers will use when saving a file. It defaults to the last element (basename) of the attached file's filename."
-            },
-            "key": {
-              "type": "string",
-              "description": "Specify the key to use for the attachment in the embedded files table.\n\nIt defaults to the last element (basename) of the attached file's filename."
-            },
-            "mimetype": {
-              "type": "string",
-              "description": "Specify the mime type for the attachment, such as text/plain, application/pdf, image/png, etc."
-            },
-            "moddate": {
-              "type": "string",
-              "description": "Specify the attachment's modification date in PDF format; defaults to the current time.\n\nRun qpdf --help=pdf-dates for information about the date format."
-            },
-            "replace": {
-              "type": "string",
-              "description": "Indicate that any existing attachment with the same key should be replaced by the new attachment.\n\nOtherwise, qpdf gives an error if an attachment with that key is already present."
-            }
-          },
-          "additionalProperties": false
-        }
-      },
       "anyOf": [
         {
-          "$ref": "https://qpdf.org/schema/QPDF_add_attachment"
+          "$ref": "#/$defs/QPDF_add_attachment"
         },
         {
           "type": "array",
           "items": {
-            "$ref": "https://qpdf.org/schema/QPDF_add_attachment"
+            "$ref": "#/$defs/QPDF_add_attachment"
           }
         }
       ]
@@ -720,39 +812,14 @@
     },
     "copyAttachmentsFrom": {
       "description": "The \"copyAttachmentsFrom\" flag and its options may be repeated to copy attachments from multiple files.\n\nRun qpdf --help=copy-attachments for details.",
-      "$defs": {
-        "QPDF_copy_attachments_from": {
-          "title": "QPDF_copy_attachments_from",
-          "$id": "https://qpdf.org/schema/QPDF_copy_attachments_from",
-          "type": "object",
-          "description": "",
-          "properties": {
-            "file": {
-              "type": "string",
-              "description": "File to copy attachments from.",
-              "format": "uri-reference",
-              "contentMediaType": "application/pdf"
-            },
-            "password": {
-              "type": "string",
-              "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
-            },
-            "prefix": {
-              "type": "string",
-              "description": "Prepend a prefix to each key; may be needed if there are duplicate attachment keys.\n\nThis affects the key only, not the file name."
-            }
-          },
-          "additionalProperties": false
-        }
-      },
       "anyOf": [
         {
-          "$ref": "https://qpdf.org/schema/QPDF_copy_attachments_from"
+          "$ref": "#/$defs/QPDF_copy_attachments_from"
         },
         {
           "type": "array",
           "items": {
-            "$ref": "https://qpdf.org/schema/QPDF_copy_attachments_from"
+            "$ref": "#/$defs/QPDF_copy_attachments_from"
           }
         }
       ]
@@ -768,7 +835,7 @@
       "type": "string",
       "description": "Push page annotations into the content streams.\n\nThis may be necessary in some case when printing or splitting files. Parameters: \"all\", \"print\", \"screen\".",
       "$ref": "#/$defs/QPDF_flatten",
-      "title": "QPDF_flatten"
+      "title": "QPDF Flatten Flatten Annotations"
     },
     "flattenRotation": {
       "$ref": "#/$defs/bareOption",
@@ -800,39 +867,14 @@
     },
     "pages": {
       "description": "Run qpdf --help=page-selection for details.",
-      "$defs": {
-        "QPDF_pages": {
-          "title": "QPDF_pages",
-          "$id": "https://qpdf.org/schema/QPDF_pages",
-          "type": "object",
-          "description": "",
-          "properties": {
-            "file": {
-              "type": "string",
-              "description": "Specify the file for the current page operation.\n\nThis is used with \"pages\", \"overlay\", and \"underlay\" and appears between the option and the terminating --. Run qpdf --help=page-selection for details.",
-              "format": "uri-reference",
-              "contentMediaType": "application/pdf"
-            },
-            "password": {
-              "type": "string",
-              "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
-            },
-            "range": {
-              "type": "string",
-              "description": "Specify the page range for the current page operation with \"pages\".\n\nIf omitted, all pages are selected. This is used with \"pages\" and appears between \"pages\" and --. Run qpdf --help=page-selection for details."
-            }
-          },
-          "additionalProperties": false
-        }
-      },
       "anyOf": [
         {
-          "$ref": "https://qpdf.org/schema/QPDF_pages"
+          "$ref": "#/$defs/QPDF_pages"
         },
         {
           "type": "array",
           "items": {
-            "$ref": "https://qpdf.org/schema/QPDF_pages"
+            "$ref": "#/$defs/QPDF_pages"
           }
         }
       ]
@@ -869,94 +911,28 @@
     },
     "overlay": {
       "description": "Overlay pages from another file on the output.\n\nRun qpdf --help=overlay-underlay for details.",
-      "$defs": {
-        "QPDF_overlay": {
-          "title": "QPDF_overlay",
-          "$id": "https://qpdf.org/schema/QPDF_overlay",
-          "type": "object",
-          "description": "",
-          "properties": {
-            "file": {
-              "type": "string",
-              "description": "Specify the file for the current page operation.\n\nThis is used with \"pages\", \"overlay\", and \"underlay\" and appears between the option and the terminating --. Run qpdf --help=page-selection for details.",
-              "format": "uri-reference",
-              "contentMediaType": "application/pdf"
-            },
-            "password": {
-              "type": "string",
-              "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
-            },
-            "from": {
-              "type": "string",
-              "description": "Specify pages from the overlay/underlay file that are applied to the destination pages.\n\nSee qpdf --help=page-ranges for help with the page range syntax. The page range may be omitted if \"repeat\" is used."
-            },
-            "repeat": {
-              "type": "string",
-              "description": "Specify pages from the overlay/underlay that are repeated after \"from\" pages have been exhausted.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
-            },
-            "to": {
-              "type": "string",
-              "description": "Specify the range of pages in the primary output to apply overlay/underlay to.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
-            }
-          },
-          "additionalProperties": false
-        }
-      },
       "anyOf": [
         {
-          "$ref": "https://qpdf.org/schema/QPDF_overlay"
+          "$ref": "#/$defs/QPDF_overlay"
         },
         {
           "type": "array",
           "items": {
-            "$ref": "https://qpdf.org/schema/QPDF_overlay"
+            "$ref": "#/$defs/QPDF_overlay"
           }
         }
       ]
     },
     "underlay": {
       "description": "Underlay pages from another file on the output.\n\nRun qpdf --help=overlay-underlay for details.",
-      "$defs": {
-        "QPDF_underlay": {
-          "title": "QPDF_underlay",
-          "$id": "https://qpdf.org/schema/QPDF_underlay",
-          "type": "object",
-          "description": "",
-          "properties": {
-            "file": {
-              "type": "string",
-              "description": "Specify the file for the current page operation.\n\nThis is used with \"pages\", \"overlay\", and \"underlay\" and appears between the option and the terminating --. Run qpdf --help=page-selection for details.",
-              "format": "uri-reference",
-              "contentMediaType": "application/pdf"
-            },
-            "password": {
-              "type": "string",
-              "description": "Specify a password for an encrypted, password-protected file.\n\nNot needed for encrypted files without a password."
-            },
-            "from": {
-              "type": "string",
-              "description": "Specify pages from the overlay/underlay file that are applied to the destination pages.\n\nSee qpdf --help=page-ranges for help with the page range syntax. The page range may be omitted if \"repeat\" is used."
-            },
-            "repeat": {
-              "type": "string",
-              "description": "Specify pages from the overlay/underlay that are repeated after \"from\" pages have been exhausted.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
-            },
-            "to": {
-              "type": "string",
-              "description": "Specify the range of pages in the primary output to apply overlay/underlay to.\n\nSee qpdf --help=page-ranges for help with the page range syntax."
-            }
-          },
-          "additionalProperties": false
-        }
-      },
       "anyOf": [
         {
-          "$ref": "https://qpdf.org/schema/QPDF_underlay"
+          "$ref": "#/$defs/QPDF_underlay"
         },
         {
           "type": "array",
           "items": {
-            "$ref": "https://qpdf.org/schema/QPDF_underlay"
+            "$ref": "#/$defs/QPDF_underlay"
           }
         }
       ]
