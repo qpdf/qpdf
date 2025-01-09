@@ -30,7 +30,7 @@ class QPDF::Objects
         void initialize_json();
         void reconstruct(QPDFExc& e);
         void show();
-        bool resolve();
+        void resolve_all();
 
         QPDFObjectHandle
         trailer() noexcept
@@ -54,12 +54,18 @@ class QPDF::Objects
         size_t
         type(QPDFObjGen og) const
         {
-            int id = og.getObj();
+            return type(og.getObj(), og.getGen());
+        }
+
+        // Returns 0 if og is not in table.
+        size_t
+        type(int id, int gen) const
+        {
             if (id < 1 || static_cast<size_t>(id) >= table.size()) {
                 return 0;
             }
             auto& e = table[static_cast<size_t>(id)];
-            return e.gen() == og.getGen() ? e.type() : 0;
+            return e.gen() == gen ? e.type() : 0;
         }
 
         // Returns 0 if og is not in table.
@@ -300,7 +306,15 @@ class QPDF::Objects
             return id < table.size() ? table[id] : table[0];
         }
 
+        Entry&
+        entry(int id, int gen)
+        {
+            auto& e = entry(toS(id));
+            return e.gen_ == gen ? e : table[0];
+        }
+
         void read(qpdf_offset_t offset);
+        void prepare_obj_table();
 
         // Methods to parse tables
         qpdf_offset_t process_section(qpdf_offset_t offset);
@@ -355,7 +369,7 @@ class QPDF::Objects
         }
 
         QPDF& qpdf;
-        QPDF::Objects& objects;
+        Objects& objects;
         InputSource* const& file;
         QPDFTokenizer tokenizer;
 
@@ -376,9 +390,7 @@ class QPDF::Objects
         // Linearization data
         bool uncompressed_after_compressed_{false};
         qpdf_offset_t first_item_offset_{0}; // actual value from file
-    }; // Xref_table;
-
-    ~Objects();
+    }; // Xref_table
 
     Objects(QPDF& qpdf, QPDF::Members* m, InputSource* const& file) :
         qpdf(qpdf),
@@ -387,6 +399,10 @@ class QPDF::Objects
         xref(*this)
     {
     }
+
+    ~Objects();
+
+    void initialize();
 
     Xref_table&
     xref_table() noexcept
@@ -412,17 +428,34 @@ class QPDF::Objects
         return xref.trailer();
     }
 
+    bool
+    contains(int id, int gen) const noexcept
+    {
+        auto it = table.find(id);
+        return it != table.end() && it->second.gen == gen;
+    }
+
+    bool
+    contains(QPDFObjGen og) const noexcept
+    {
+        return contains(og.getObj(), og.getGen());
+    }
+
     QPDFObjectHandle
     get(QPDFObjGen og)
     {
-        if (auto it = table.find(og); it != table.end()) {
+        auto it = table.find(og.getObj());
+        if (it != table.end() && it->second.gen == og.getGen()) {
             return {it->second.object};
-        } else if (xref.initialized() && !xref.type(og)) {
-            return QPDF_Null::create();
-        } else {
-            auto result = table.try_emplace(og, QPDF_Unresolved::create(&qpdf, og));
-            return {result.first->second.object};
         }
+        if (it != table.end()) {
+            return {QPDF_Null::create()};
+        }
+        if (xref.initialized() && !xref.type(og)) {
+            return {QPDF_Null::create()};
+        }
+        return {table.try_emplace(og.getObj(), og.getGen(), QPDF_Unresolved::create(&qpdf, og))
+                    .first->second.object};
     }
 
     QPDFObjectHandle
@@ -433,11 +466,17 @@ class QPDF::Objects
 
     std::vector<QPDFObjectHandle> all();
 
-    void erase(QPDFObjGen og);
+    void erase(int id, int gen);
 
-    void replace(QPDFObjGen og, QPDFObjectHandle oh);
+    void replace(int id, int gen, QPDFObjectHandle oh);
+    // replace for when we cannot be sure whether object references are dangling.
+    QPDFObjectHandle replace_when_uncertain(int id, int gen, QPDFObjectHandle& oh);
 
     void swap(QPDFObjGen og1, QPDFObjGen og2);
+
+    std::shared_ptr<QPDFObject> make_indirect(std::shared_ptr<QPDFObject> const& obj);
+
+    void clear_unconfirmeds();
 
     QPDFObjectHandle read(
         bool attempt_recovery,
@@ -446,12 +485,16 @@ class QPDF::Objects
         QPDFObjGen exp_og,
         QPDFObjGen& og,
         bool skip_cache_if_in_xref);
-    QPDFObject* resolve(QPDFObjGen og);
-    void update_table(QPDFObjGen og, std::shared_ptr<QPDFObject> const& object);
-    QPDFObjGen next_id();
-    QPDFObjectHandle make_indirect(std::shared_ptr<QPDFObject> const& obj);
+
+    QPDFObject* resolve(int id, int gen);
+
+    // Return the highest id in use.
+    int last_id();
+
     std::shared_ptr<QPDFObject> get_for_parser(int id, int gen, bool parse_pdf);
-    std::shared_ptr<QPDFObject> get_for_json(int id, int gen);
+
+    // get for when we cannot be sure whether object references are dangling.
+    std::shared_ptr<QPDFObject> get_when_uncertain(int id, int gen);
 
     // Get a list of objects that would be permitted in an object stream.
     template <typename T>
@@ -467,16 +510,41 @@ class QPDF::Objects
     {
         Entry() = default;
 
-        Entry(std::shared_ptr<QPDFObject> object) :
+        Entry(int gen, std::shared_ptr<QPDFObject>&& object) :
+            gen(gen),
+            object(std::move(object))
+        {
+        }
+
+        Entry(int gen, std::shared_ptr<QPDFObject> const& object) :
+            gen(gen),
             object(object)
         {
         }
 
-        std::shared_ptr<QPDFObject> object;
-    };
+        // Return true if entry is valid (i.e. not default constructed).
+        explicit
+        operator bool() const noexcept
+        {
+            return static_cast<bool>(object);
+        }
 
-    bool cached(QPDFObjGen og);
+        std::shared_ptr<QPDFObject> update(int gen, const std::shared_ptr<QPDFObject>& obj);
+        void reset();
+
+        int gen{0};
+        bool unconfirmed{false}; // True if we are uncertain whether the entry is a dangling ref.
+        std::shared_ptr<QPDFObject> object;
+    }; // Entry
+
     bool unresolved(QPDFObjGen og);
+    bool unresolved(int id, int gen);
+
+    int next_id();
+    std::shared_ptr<QPDFObject>
+    update_entry(Entry& e, int id, int gen, const std::shared_ptr<QPDFObject>& obj);
+    std::shared_ptr<QPDFObject>
+    update_table(int id, int gen, std::shared_ptr<QPDFObject> const& object);
 
     QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>& input, int obj);
     void resolveObjectsInStream(int obj_stream_number);
@@ -489,9 +557,13 @@ class QPDF::Objects
     QPDF& qpdf;
     InputSource* const& file;
     QPDF::Members* m;
+
     Xref_table xref;
 
-    std::map<QPDFObjGen, Entry> table;
+    std::map<int, Entry> table;
+    std::map<std::pair<int, int>, std::shared_ptr<QPDFObject>> unconfirmed_objects;
+    bool initialized_{false};
+    int last_id_{0};
 }; // Objects
 
 #endif // QPDF_OBJECTS_HH

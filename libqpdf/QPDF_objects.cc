@@ -103,6 +103,7 @@ QPDF::findStartxref()
 void
 Xref_table::initialize_empty()
 {
+    objects.initialized_ = true;
     initialized_ = true;
     trailer_ = QPDFObjectHandle::newDictionary();
     auto rt = qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
@@ -119,6 +120,7 @@ Xref_table::initialize_empty()
 void
 Xref_table::initialize_json()
 {
+    objects.initialized_ = true;
     initialized_ = true;
     table.resize(1);
     trailer_ = QPDFObjectHandle::newDictionary();
@@ -165,7 +167,32 @@ Xref_table::initialize()
         }
     }
 
+    prepare_obj_table();
     initialized_ = true;
+}
+
+// Remove any dangling reference picked up while parsing or reconstructing the xref table from the
+// object table.
+void
+Xref_table::prepare_obj_table()
+{
+    for (auto it = objects.table.begin(), end = objects.table.end(); it != end;) {
+        if (it->second.unconfirmed && !type(it->first, it->second.gen)) {
+            it->second.object->make_null();
+            it = objects.table.erase(it);
+        } else {
+            it->second.unconfirmed = false;
+            ++it;
+        }
+    }
+    for (auto& [id_gen, obj]: objects.unconfirmed_objects) {
+        if (type(id_gen.first, id_gen.second)) {
+            objects.update_table(id_gen.first, id_gen.second, obj);
+        } else {
+            obj->make_null();
+        }
+    }
+    objects.unconfirmed_objects.clear();
 }
 
 void
@@ -187,8 +214,8 @@ Xref_table::reconstruct(QPDFExc& e)
     };
 
     reconstructed_ = true;
-    // We may find more objects, which may contain dangling references.
-    qpdf.m->fixed_dangling_refs = false;
+    bool called_during_resolve_attempt = initialized_;
+    initialized_ = false;
 
     warn_damaged("file is damaged");
     qpdf.warn(e);
@@ -265,7 +292,7 @@ Xref_table::reconstruct(QPDFExc& e)
             if (item.type() != 1) {
                 continue;
             }
-            auto oh = objects.get(i, item.gen());
+            QPDFObjectHandle oh{objects.get_when_uncertain(i, item.gen())};
             try {
                 if (!oh.isStreamOfType("/XRef")) {
                     continue;
@@ -304,8 +331,11 @@ Xref_table::reconstruct(QPDFExc& e)
         throw damaged_pdf("unable to find objects while recovering damaged file");
     }
     check_warnings();
-    if (!initialized_) {
-        initialized_ = true;
+    prepare_obj_table();
+    initialized_ = true;
+    if (!called_during_resolve_attempt) {
+        // We can't do the checks because we may try to resolve the object that triggered the
+        // reconstruction.
         qpdf.getAllPages();
         check_warnings();
         if (qpdf.m->all_pages.empty()) {
@@ -601,8 +631,7 @@ Xref_table::read_entry()
     int f2{0};
     char type{'\0'};
     std::array<char, 21> line;
-    f1 = 0;
-    f2 = 0;
+
     if (file->read(line.data(), 20) != 20) {
         // C++20: [[unlikely]]
         return {false, 0, 0, '\0'};
@@ -1127,32 +1156,32 @@ Xref_table::show()
     }
 }
 
-// Resolve all objects in the xref table. If this triggers a xref table reconstruction abort and
-// return false. Otherwise return true.
-bool
-Xref_table::resolve()
+// Resolve all objects in the xref table.
+void
+Xref_table::resolve_all()
 {
     bool may_change = !reconstructed_;
     int i = -1;
     for (auto& item: table) {
         ++i;
         if (item.type()) {
-            if (objects.unresolved(QPDFObjGen(i, item.gen()))) {
-                objects.resolve(QPDFObjGen(i, item.gen()));
+            if (objects.unresolved(i, item.gen())) {
+                objects.resolve(i, item.gen());
                 if (may_change && reconstructed_) {
-                    return false;
+                    QTC::TC("qpdf", "QPDF fix dangling triggered xref reconstruction");
+                    resolve_all();
+                    return;
                 }
             }
         }
     }
-    return true;
 }
 
 std::vector<QPDFObjectHandle>
 Objects ::all()
 {
-    // After fixDanglingReferences is called, all objects are in the object cache.
-    qpdf.fixDanglingReferences();
+    // After initialize is called, all objects are in the object cache.
+    initialize();
     std::vector<QPDFObjectHandle> result;
     for (auto const& iter: table) {
         result.emplace_back(iter.second.object);
@@ -1475,85 +1504,84 @@ Objects::read(
     }
 
     QPDFObjectHandle oh = read_object(description, og);
-
-    if (unresolved(og)) {
-        // Store the object in the cache here so it gets cached whether we first know the offset or
-        // whether we first know the object ID and generation (in which we case we would get here
-        // through resolve).
-
-        // Determine the end offset of this object before and after white space.  We use these
-        // numbers to validate linearization hint tables.  Offsets and lengths of objects may imply
-        // the end of an object to be anywhere between these values.
-        qpdf_offset_t end_before_space = m->file->tell();
-
-        // skip over spaces
-        while (true) {
-            char ch;
-            if (m->file->read(&ch, 1)) {
-                if (!isspace(static_cast<unsigned char>(ch))) {
-                    m->file->seek(-1, SEEK_CUR);
-                    break;
-                }
-            } else {
-                throw qpdf.damagedPDF(m->file->tell(), "EOF after endobj");
-            }
-        }
-        qpdf_offset_t end_after_space = m->file->tell();
-        if (skip_cache_if_in_xref && xref.type(og)) {
-            // Ordinarily, an object gets read here when resolved through xref table or stream. In
-            // the special case of the xref stream and linearization hint tables, the offset comes
-            // from another source. For the specific case of xref streams, the xref stream is read
-            // and loaded into the object cache very early in parsing. Ordinarily, when a file is
-            // updated by appending, items inserted into the xref table in later updates take
-            // precedence over earlier items. In the special case of reusing the object number
-            // previously used as the xref stream, we have the following order of events:
-            //
-            // * reused object gets loaded into the xref table
-            // * old object is read here while reading xref streams
-            // * original xref entry is ignored (since already in xref table)
-            //
-            // It is the second step that causes a problem. Even though the xref table is correct in
-            // this case, the old object is already in the cache and so effectively prevails over
-            // the reused object. To work around this issue, we have a special case for the xref
-            // stream (via the skip_cache_if_in_xref): if the object is already in the xref stream,
-            // don't cache what we read here.
-            //
-            // It is likely that the same bug may exist for linearization hint tables, but the
-            // existing code uses end_before_space and end_after_space from the cache, so fixing
-            // that would require more significant rework. The chances of a linearization hint
-            // stream being reused seems smaller because the xref stream is probably the highest
-            // object in the file and the linearization hint stream would be some random place in
-            // the middle, so I'm leaving that bug unfixed for now. If the bug were to be fixed, we
-            // could use !check_og in place of skip_cache_if_in_xref.
-            QTC::TC("qpdf", "QPDF skipping cache for known unchecked object");
-        } else {
-            xref.linearization_offsets(toS(og.getObj()), end_before_space, end_after_space);
-            update_table(og, oh.getObj());
-        }
+    if (!unresolved(og)) {
+        return oh;
     }
 
-    return oh;
+    // Store the object in the cache here so it gets cached whether we first know the offset or
+    // whether we first know the object ID and generation (in which we case we would get here
+    // through resolve).
+
+    // Determine the end offset of this object before and after white space.  We use these numbers
+    // to validate linearization hint tables.  Offsets and lengths of objects may imply the end of
+    // an object to be anywhere between these values.
+    qpdf_offset_t end_before_space = m->file->tell();
+
+    // skip over spaces
+    while (true) {
+        char ch;
+        if (m->file->read(&ch, 1)) {
+            if (!isspace(static_cast<unsigned char>(ch))) {
+                m->file->seek(-1, SEEK_CUR);
+                break;
+            }
+        } else {
+            throw qpdf.damagedPDF(m->file->tell(), "EOF after endobj");
+        }
+    }
+    qpdf_offset_t end_after_space = m->file->tell();
+    if (skip_cache_if_in_xref && xref.type(og)) {
+        // Ordinarily, an object gets read here when resolved through xref table or stream. In the
+        // special case of the xref stream and linearization hint tables, the offset comes from
+        // another source. For the specific case of xref streams, the xref stream is read and loaded
+        // into the object cache very early in parsing. Ordinarily, when a file is updated by
+        // appending, items inserted into the xref table in later updates take precedence over
+        // earlier items. In the special case of reusing the object number previously used as the
+        // xref stream, we have the following order of events:
+        //
+        // * reused object gets loaded into the xref table
+        // * old object is read here while reading xref streams
+        // * original xref entry is ignored (since already in xref table)
+        //
+        // It is the second step that causes a problem. Even though the xref table is correct in
+        // this case, the old object is already in the cache and so effectively prevails over the
+        // reused object. To work around this issue, we have a special case for the xref stream (via
+        // the skip_cache_if_in_xref): if the object is already in the xref stream, don't cache what
+        // we read here.
+        //
+        // It is likely that the same bug may exist for linearization hint tables, but the existing
+        // code uses end_before_space and end_after_space from the cache, so fixing that would
+        // require more significant rework. The chances of a linearization hint stream being reused
+        // seems smaller because the xref stream is probably the highest object in the file and the
+        // linearization hint stream would be some random place in the middle, so I'm leaving that
+        // bug unfixed for now. If the bug were to be fixed, we could use !check_og in place of
+        // skip_cache_if_in_xref.
+        QTC::TC("qpdf", "QPDF skipping cache for known unchecked object");
+        return oh;
+    }
+    xref.linearization_offsets(toS(og.getObj()), end_before_space, end_after_space);
+    return {update_table(og.getObj(), og.getGen(), oh.getObj())};
 }
 
 QPDFObject*
-Objects::resolve(QPDFObjGen og)
+Objects::resolve(int id, int gen)
 {
-    if (!unresolved(og)) {
-        return table[og].object.get();
+    if (!unresolved(id, gen)) {
+        return get_for_parser(id, gen, true).get();
     }
 
+    auto og = QPDFObjGen(id, gen);
     if (m->resolving.count(og)) {
         // This can happen if an object references itself directly or indirectly in some key that
         // has to be resolved during object parsing, such as stream length.
         QTC::TC("qpdf", "QPDF recursion loop in resolve");
         qpdf.warn(qpdf.damagedPDF("", "loop detected resolving object " + og.unparse(' ')));
-        update_table(og, QPDF_Null::create());
-        return table[og].object.get();
+        return update_table(id, gen, QPDF_Null::create()).get();
     }
     ResolveRecorder rr(&qpdf, og);
 
     try {
-        switch (xref.type(og)) {
+        switch (xref.type(id, gen)) {
         case 0:
             break;
         case 1:
@@ -1579,15 +1607,13 @@ Objects::resolve(QPDFObjGen og)
             "", 0, ("object " + og.unparse('/') + ": error reading object: " + e.what())));
     }
 
-    if (unresolved(og)) {
+    if (unresolved(id, gen)) {
         // PDF spec says unknown objects resolve to the null object.
         QTC::TC("qpdf", "QPDF resolve failure to null");
-        update_table(og, QPDF_Null::create());
+        return update_table(id, gen, QPDF_Null::create()).get();
     }
 
-    auto result(table[og].object);
-    result->setDefaultDescription(&qpdf, og);
-    return result.get();
+    return table[id].object.get();
 }
 
 void
@@ -1672,13 +1698,11 @@ Objects::resolveObjectsInStream(int obj_stream_number)
     // cache what would actually be resolved here.
     m->last_object_description.clear();
     m->last_object_description += "object ";
-    for (auto const& iter: offsets) {
-        QPDFObjGen og(iter.first, 0);
-        if (xref.type(og) == 2 && xref.stream_number(og.getObj()) == obj_stream_number) {
-            int offset = iter.second;
+    for (auto const& [id, offset]: offsets) {
+        if (xref.type(id, 0) == 2 && xref.stream_number(id) == obj_stream_number) {
             input->seek(offset, SEEK_SET);
-            QPDFObjectHandle oh = readObjectInStream(input, iter.first);
-            update_table(og, oh.getObj());
+            QPDFObjectHandle oh = readObjectInStream(input, id);
+            update_table(id, 0, oh.getObj());
         } else {
             QTC::TC("qpdf", "QPDF not caching overridden objstm object");
         }
@@ -1705,111 +1729,288 @@ Objects::~Objects()
     }
 }
 
-void
-Objects::update_table(QPDFObjGen og, const std::shared_ptr<QPDFObject>& object)
+std::shared_ptr<QPDFObject>
+Objects::Entry::update(int a_gen, const std::shared_ptr<QPDFObject>& obj)
 {
-    object->setObjGen(&qpdf, og);
-    if (cached(og)) {
-        auto& cache = table[og];
-        cache.object->assign(object);
+    if (*this) {
+        if (gen != a_gen) {
+            throw std::logic_error("Internal error in Objects::update_table");
+        }
+        object->assign(obj);
     } else {
-        table[og] = Entry(object);
+        gen = a_gen;
+        object = obj;
     }
+    return object;
 }
 
-bool
-Objects::cached(QPDFObjGen og)
+// Reset to uninitialised state, making any object null.
+void
+Objects::Entry::reset()
 {
-    return table.count(og) != 0;
+    if (object) {
+        object->make_null();
+    }
+    object = nullptr;
+    gen = 0;
+    unconfirmed = false;
+}
+
+std::shared_ptr<QPDFObject>
+Objects::update_entry(Entry& e, int id, int gen, const std::shared_ptr<QPDFObject>& obj)
+{
+    obj->make_indirect(qpdf, id, gen);
+    return e.update(gen, obj);
+}
+
+std::shared_ptr<QPDFObject>
+Objects::update_table(int id, int gen, const std::shared_ptr<QPDFObject>& obj)
+{
+    return update_entry(table[id], id, gen, obj);
 }
 
 bool
 Objects::unresolved(QPDFObjGen og)
 {
-    return !cached(og) || table[og].object->isUnresolved();
+    return unresolved(og.getObj(), og.getGen());
 }
 
-QPDFObjGen
+bool
+Objects::unresolved(int id, int gen)
+{
+    auto it = table.find(id);
+    if (it == table.end()) {
+        return true;
+    }
+    if (it->second.gen == gen) {
+        return it->second.object->isUnresolved();
+    }
+    auto it2 = unconfirmed_objects.find({id, gen});
+    return it2 != unconfirmed_objects.end() && it2->second->isUnresolved();
+}
+
+// Increment last_id and return the result.
+int
 Objects::next_id()
 {
-    qpdf.fixDanglingReferences();
-    QPDFObjGen og;
-    if (!table.empty()) {
-        og = (*(m->objects.table.rbegin())).first;
+    if (!initialized_) {
+        initialize();
     }
-    int max_objid = og.getObj();
-    if (max_objid == std::numeric_limits<int>::max()) {
-        throw std::range_error("max object id is too high to create new objects");
-    }
-    return QPDFObjGen(max_objid + 1, 0);
+    return ++last_id_;
 }
 
-QPDFObjectHandle
+int
+Objects::last_id()
+{
+    if (!initialized_) {
+        initialize();
+    }
+    return last_id_;
+}
+
+void
+Objects::initialize()
+{
+    if (initialized_) {
+        return;
+    }
+    initialized_ = true;
+    // We need to resolve the xref table because during recovery the size of the xref table may
+    // increase. Arguably, if we read the xref table without errors, including finding a valid
+    // trailer, then we should stick with /Size as per the PDF spec. In this case we can remove this
+    // method entirely, and in the process avoid the need to read the entire PDF file unnecessarily.
+    xref.resolve_all();
+    last_id_ = std::max(last_id_, toI(xref.size() - 1));
+}
+
+void
+Objects::clear_unconfirmeds()
+{
+    for (auto it = table.begin(), end = table.end(); it != end;) {
+        if (it->second && it->second.unconfirmed) {
+            it->second.object->make_null();
+            it = table.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    for (auto& item: unconfirmed_objects) {
+        item.second->make_null();
+    }
+    unconfirmed_objects.clear();
+}
+
+std::shared_ptr<QPDFObject>
 Objects::make_indirect(std::shared_ptr<QPDFObject> const& obj)
 {
-    QPDFObjGen next{next_id()};
-    table[next] = Entry(obj);
-    return qpdf.newIndirect(next, table[next].object);
+    return update_table(next_id(), 0, obj);
 }
 
 std::shared_ptr<QPDFObject>
 Objects::get_for_parser(int id, int gen, bool parse_pdf)
 {
     // This method is called by the parser and therefore must not resolve any objects.
-    auto og = QPDFObjGen(id, gen);
-    if (auto iter = table.find(og); iter != table.end()) {
+    if (!xref.initialized() && parse_pdf) {
+        return get_when_uncertain(id, gen);
+    }
+    auto iter = table.find(id);
+    if (iter != table.end() && iter->second.gen == gen) {
         return iter->second.object;
     }
-    if (xref.type(og) || !xref.initialized()) {
-        return table.insert({og, QPDF_Unresolved::create(&qpdf, og)}).first->second.object;
+    if (iter != table.end()) {
+        // id in table, different gen
+        return QPDF_Null::create();
+    }
+    if (xref.type(id, gen)) {
+        return table.insert({id, {gen, QPDF_Unresolved::create(&qpdf, QPDFObjGen(id, gen))}})
+            .first->second.object;
     }
     if (parse_pdf) {
         return QPDF_Null::create();
     }
-    return table.insert({og, QPDF_Null::create(&qpdf, og)}).first->second.object;
+    // For backward compatibility we return a indirect null if parse was called by user.
+    return table.insert({id, {gen, QPDF_Null::create(&qpdf, QPDFObjGen(id, gen))}})
+        .first->second.object;
 }
 
 std::shared_ptr<QPDFObject>
-Objects::get_for_json(int id, int gen)
+Objects::get_when_uncertain(int id, int gen)
 {
-    auto og = QPDFObjGen(id, gen);
-    auto [it, inserted] = table.try_emplace(og);
-    auto& obj = it->second.object;
-    if (inserted) {
-        obj = (xref.initialized() && !xref.type(og)) ? QPDF_Null::create(&qpdf, og)
-                                                     : QPDF_Unresolved::create(&qpdf, og);
+    auto& e = table[id];
+    if (!e) {
+        // There is no existing entry. If this (id, gen) is in the xref table, we encountered an
+        // unresolved object. Otherwise we optimistically assume that it is a reference to an actual
+        // object, but mark it as unconfirmed.
+        if (xref.initialized()) {
+            last_id_ = std::max(last_id_, id);
+        }
+        e.gen = gen;
+        if (!xref.type(id, gen)) {
+            e.unconfirmed = true;
+            return e.object = xref.initialized()
+                ? QPDF_Null::create(&qpdf, QPDFObjGen(id, gen))
+                : QPDF_Unresolved::create(&qpdf, QPDFObjGen(id, gen));
+        } else {
+            return e.object = QPDF_Unresolved::create(&qpdf, QPDFObjGen(id, gen));
+        }
     }
-    return obj;
+
+    // Existing entry
+    if (e.gen == gen) {
+        return e.object;
+    }
+    if (!e.unconfirmed && gen < e.gen) {
+        // Table contains a newer confirmed object. This (id, gen) is definitely a dangling
+        // reference.
+        return QPDF_Null::create();
+    }
+    // We don't know whether the table entry is valid, therefore this (id, gen) could still be
+    // valid despite the gen mismatch. Return a shared indirect null from unconfirmed_objects.
+    if (auto& j = unconfirmed_objects[{id, gen}]) {
+        return j;
+    } else {
+        return j = xref.initialized() ? QPDF_Null::create(&qpdf, QPDFObjGen(id, gen))
+                                      : QPDF_Unresolved::create(&qpdf, QPDFObjGen(id, gen));
+    }
 }
 
-void
-Objects::replace(QPDFObjGen og, QPDFObjectHandle oh)
+QPDFObjectHandle
+Objects::replace_when_uncertain(int id, int gen, QPDFObjectHandle& oh)
 {
-    if (!oh || (oh.isIndirect() && !(oh.isStream() && oh.getObjGen() == og))) {
+    // This method is only called while loading a JSON file.
+    if (!id) {
+        // Direct null from a reference already identified as dangling.
+        return oh;
+    }
+    auto& e = table[id];
+
+    if (!e) {
+        // This  should not happen since the JSONReactor should have called replace_when_uncertain
+        // when starting to parse the object.
+        throw std::logic_error("Internal error in Objects::replace_for_json");
+    }
+    if (e.gen == gen) {
+        e.unconfirmed = false; // Now confirmed - this is an actual object.
+        return update_entry(e, id, gen, oh.getObj());
+    }
+
+    if (e.gen < gen) {
+        // The current entry will definitely be replaced by oh.
+        e.object->make_null();
+    } else if (!e.unconfirmed) {
+        // oh has been replaced by this current entry.
+        oh.getObj()->make_null();
+        return oh;
+    }
+
+    if (e.unconfirmed) {
+        // The current entry could still become live by a later replace. Let's stash it away.
+        unconfirmed_objects.emplace(std::pair{id, e.gen}, e.object);
+    }
+
+    e.reset();
+    // Make sure we don't clean up the actual object.
+    if (auto it = unconfirmed_objects.find({id, gen}); it != unconfirmed_objects.end()) {
+        e.object = it->second;
+        unconfirmed_objects.erase(it); // Make sure we don't clean up the actual object.
+    }
+    e.gen = gen;
+    return update_entry(e, id, gen, oh.getObj());
+}
+
+// Replace the object with oh. In the process oh will become almost, but not quite, the indirect
+// object (id, gen), the main difference being that if the object gets replaced again, oh will not
+// get updated.
+//
+// Replacing a non-existing object creates a new object, which is probably not what we want. In the
+// case where an object with the same id exists, the behaviour up to now depended on whether the
+// object table got cleaned (e.g. by creating object streams) or not, with either the objects
+// getting renumbered to have different ids, or the higher gen winning. From now, the higher gen
+// wins.
+void
+Objects::replace(int id, int gen, QPDFObjectHandle oh)
+{
+    if (!oh || (oh.isIndirect() && !(oh.isStream() && oh.getObjGen() == QPDFObjGen(id, gen)))) {
         QTC::TC("qpdf", "QPDF replaceObject called with indirect object");
         throw std::logic_error("QPDF::replaceObject called with indirect object handle");
     }
-    update_table(og, oh.getObj());
+    auto& e = table[id];
+    if (e && e.gen > gen) {
+        // How do we want to handle this?
+        return;
+    }
+    if (e && e.gen < gen) {
+        erase(id, gen);
+    }
+    update_entry(e, id, gen, oh.getObj());
 }
 
 void
-Objects::erase(QPDFObjGen og)
+Objects::erase(int id, int gen)
 {
-    if (auto cached = table.find(og); cached != table.end()) {
+    if (auto it = table.find(id); it != table.end()) {
+        if (it->second.gen != gen) {
+            return;
+        }
         // Take care of any object handles that may be floating around.
-        cached->second.object->assign(QPDF_Null::create());
-        cached->second.object->setObjGen(nullptr, QPDFObjGen());
-        table.erase(cached);
+        it->second.object->make_null();
+        table.erase(it);
     }
 }
 
 void
 Objects::swap(QPDFObjGen og1, QPDFObjGen og2)
 {
-    // Force objects to be read from the input source if needed, then swap them in the cache.
-    resolve(og1);
-    resolve(og2);
-    table[og1].object->swapWith(table[og2].object);
+    auto oh1 = get(og1);
+    auto oh2 = get(og2);
+    // Force objects to be read from the input source if needed, then swap them in the cache. We
+    // can't call resolve here as this could add an invalid entry to the object table.
+    (void)oh1.isNull();
+    (void)oh2.isNull();
+    if (!oh1.isIndirect() || !oh2.isIndirect()) {
+        throw std::logic_error("QPDF::swap called with invalid objgens");
+    }
+    oh1.getObj()->swapWith((oh2.getObj()));
 }
 
 size_t
@@ -1821,7 +2022,7 @@ Objects::table_size()
     if (max_xref > 0) {
         --max_xref;
     }
-    auto max_obj = table.size() ? table.crbegin()->first.getObj() : 0;
+    auto max_obj = table.size() ? table.crbegin()->first : 0;
     auto max_id = std::numeric_limits<int>::max() - 1;
     if (max_obj >= max_id || max_xref >= max_id) {
         // Temporary fix. Long-term solution is
@@ -1889,14 +2090,8 @@ Objects::compressible()
                 continue;
             }
 
-            // Check whether this is the current object. If not, remove it (which changes it into a
-            // direct null and therefore stops us from revisiting it) and move on to the next object
-            // in the queue.
-            auto upper = table.upper_bound(og);
-            if (upper != table.end() && upper->first.getObj() == og.getObj()) {
-                erase(og);
-                continue;
-            }
+            // Check whether this is the current object. This is no longer needed as the object
+            // table holds at most one object per id.
 
             visited[id] = true;
 

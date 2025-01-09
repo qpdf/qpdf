@@ -8,31 +8,46 @@
       "maxobjectid": 100
     },
     {
-      "obj:1 0 R": {
+      "obj:1 2 R": {
         "value": {
-          "/Pages": "2 0 R",
+          "/Pages": "2 1 R",
           "/Type": "/Catalog"
         }
       },
-      "obj:2 0 R": {
+      "obj:2 1 R": {
         "value": {
           "/Count": 1,
           "/Kids": [
-            "3 0 R"
+            "3 2 R"
           ],
           "/Type": "/Pages"
         }
       },
-      "obj:3 0 R": {
+      "obj:3 2 R": {
         "value": {
-          "/Contents": "4 0 R",
+          "/Dangle": [
+            null,
+            null,
+            "u:2 1 R is actual",
+            null,
+            null,
+            "u:3 2 R is actual",
+            null,
+            null,
+            "8 5 R",
+            "u:8 5 R is actual, encounter gens 0, 5, 2, 7",
+            null,
+            "u:1 2 R is actual",
+            null,
+            "u:5 0 % is actual"
+          ],
           "/MediaBox": [
             0,
             0,
             612,
             792
           ],
-          "/Parent": "2 0 R",
+          "/Parent": "2 1 R",
           "/Resources": {
             "/Font": {
               "/F1": "6 0 R"
@@ -42,10 +57,9 @@
           "/Type": "/Page"
         }
       },
-      "obj:4 0 R": {
-        "stream": {
-          "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo=",
-          "dict": {}
+      "obj:4 2 R": {
+        "value": {
+          "/Type": "/Rubbish"
         }
       },
       "obj:5 0 R": {
@@ -70,7 +84,6 @@
             "b:01020300040560",
             "u:AB"
           ],
-          "/indirect": "8 0 R",
           "/names": [
             "/nesting",
             "/hex strings",
@@ -125,7 +138,7 @@
           ]
         }
       },
-      "obj:8 0 R": {
+      "obj:8 5 R": {
         "value": {
           "/dangling": [
             null
@@ -136,7 +149,7 @@
       "trailer": {
         "value": {
           "/QTest": "7 0 R",
-          "/Root": "1 0 R",
+          "/Root": "1 2 R",
           "/Size": 9
         }
       }
