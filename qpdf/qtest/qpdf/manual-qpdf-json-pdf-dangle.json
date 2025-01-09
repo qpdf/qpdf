@@ -21,7 +21,6 @@
             "b:01020300040560",
             "u:AB"
           ],
-          "/indirect": "4 0 R",
           "/names": [
             "/nesting",
             "/hex strings",
@@ -80,22 +79,30 @@
         "value": {
           "/Count": 1,
           "/Kids": [
-            "5 0 R"
+            "4 0 R"
           ],
           "/Type": "/Pages"
         }
       },
       "obj:4 0 R": {
         "value": {
-          "/dangling": [
-            null
+          "/Contents": "5 0 R",
+          "/Dangle": [
+            null,
+            null,
+            "u:2 1 R is actual",
+            null,
+            null,
+            "u:3 2 R is actual",
+            null,
+            null,
+            "7 0 R",
+            "u:8 5 R is actual, encounter gens 0, 5, 2, 7",
+            null,
+            "u:1 2 R is actual",
+            null,
+            "u:5 0 % is actual"
           ],
-          "/k1": "u:hello"
-        }
-      },
-      "obj:5 0 R": {
-        "value": {
-          "/Contents": "6 0 R",
           "/MediaBox": [
             0,
             0,
@@ -112,14 +119,22 @@
           "/Type": "/Page"
         }
       },
-      "obj:6 0 R": {
+      "obj:5 0 R": {
         "stream": {
           "data": "QlQKICAvRjEgMjQgVGYKICA3MiA3MjAgVGQKICAoUG90YXRvKSBUagpFVAo=",
           "dict": {}
         }
       },
-      "obj:7 0 R": {
+      "obj:6 0 R": {
         "value": 44
+      },
+      "obj:7 0 R": {
+        "value": {
+          "/dangling": [
+            null
+          ],
+          "/k1": "u:hello"
+        }
       },
       "obj:8 0 R": {
         "value": {
