@@ -11,6 +11,7 @@
 
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/FileInputSource.hh>
+#include <qpdf/InputSource_private.hh>
 #include <qpdf/OffsetInputSource.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/QPDFExc.hh>
@@ -22,7 +23,6 @@
 #include <qpdf/QPDF_Null.hh>
 #include <qpdf/QPDF_Reserved.hh>
 #include <qpdf/QPDF_Stream.hh>
-#include <qpdf/QPDF_Unresolved.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
@@ -980,12 +980,11 @@ QPDF::pipeStreamData(
 
     bool attempted_finish = false;
     try {
-        file->seek(offset, SEEK_SET);
-        auto buf = std::make_unique<char[]>(length);
-        if (auto read = file->read(buf.get(), length); read != length) {
-            throw damagedPDF(*file, "", offset + toO(read), "unexpected EOF reading stream data");
+        auto buf = file->read(length, offset);
+        if (buf.size() != length) {
+            throw damagedPDF(*file, "", offset + toO(buf.size()), "unexpected EOF reading stream data");
         }
-        pipeline->write(buf.get(), length);
+        pipeline->write(buf.data(), length);
         attempted_finish = true;
         pipeline->finish();
         return true;
