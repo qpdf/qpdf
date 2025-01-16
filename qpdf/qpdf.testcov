@@ -55,7 +55,6 @@ QPDF invalid xref entry 0
 QPDF missing trailer 0
 QPDF trailer lacks size 0
 QPDF trailer size not integer 0
-QPDF trailer size impossibly large 0
 QPDF trailer prev not integer 0
 QPDFParser bad brace 0
 QPDFParser bad brace in parseRemainder 0

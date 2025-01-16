@@ -292,8 +292,8 @@ class QPDF::Xref_table
     std::vector<Subsection> subsections(std::string& line);
     std::vector<Subsection> bad_subsections(std::string& line, qpdf_offset_t offset);
     Subsection subsection(std::string const& line);
-    std::tuple<bool, qpdf_offset_t, int, char> read_entry();
-    std::tuple<bool, qpdf_offset_t, int, char> read_bad_entry();
+    bool read_entry(qpdf_offset_t& f1, int& f2, char& type);
+    bool read_bad_entry(qpdf_offset_t& f1, int& f2, char& type);
 
     // Methods to parse streams
     qpdf_offset_t read_stream(qpdf_offset_t offset);
