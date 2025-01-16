@@ -1,4 +1,4 @@
-#include <qpdf/QPDF_private.hh>
+#include <qpdf/QPDF.hh>
 
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QTC.hh>
