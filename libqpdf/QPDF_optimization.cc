@@ -79,9 +79,9 @@ QPDF::optimize(
 }
 
 void
-QPDF::optimize(QPDF::Objects const& objects)
+QPDF::optimize(QPDF::Xref_table const& xref)
 {
-    optimize_internal(objects, false, nullptr);
+    optimize_internal(xref, false, nullptr);
 }
 
 template <typename T>
@@ -121,13 +121,13 @@ QPDF::optimize_internal(
     }
 
     // Traverse document-level items
-    for (auto const& key: m->objects.trailer().getKeys()) {
+    for (auto const& key: m->xref_table.trailer().getKeys()) {
         if (key == "/Root") {
             // handled separately
         } else {
             updateObjectMaps(
                 ObjUser(ObjUser::ou_trailer_key, key),
-                m->objects.trailer().getKey(key),
+                m->xref_table.trailer().getKey(key),
                 skip_stream_parameters);
         }
     }
@@ -175,7 +175,7 @@ QPDF::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
     // values for them.
     std::map<std::string, std::vector<QPDFObjectHandle>> key_ancestors;
     pushInheritedAttributesToPageInternal(
-        m->objects.trailer().getKey("/Root").getKey("/Pages"),
+        m->xref_table.trailer().getKey("/Root").getKey("/Pages"),
         key_ancestors,
         allow_changes,
         warn_skipped_keys);
@@ -450,9 +450,8 @@ QPDF::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
 }
 
 void
-QPDF::filterCompressedObjects(QPDF::Objects const& objects)
+QPDF::filterCompressedObjects(QPDF::Xref_table const& xref)
 {
-    auto const& xref = objects.xref_table();
     if (!xref.object_streams()) {
         return;
     }

@@ -536,7 +536,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
         } else if (is_obj_key(key, obj, gen)) {
             this->cur_object = key;
             if (setNextStateIfDictionary(key, value, st_object_top)) {
-                next_obj = pdf.objects().get_for_json(obj, gen);
+                next_obj = pdf.getObjectForJSON(obj, gen);
             }
         } else {
             QTC::TC("qpdf", "QPDF_json bad object key");
@@ -582,7 +582,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             this->saw_value = true;
             // The trailer must be a dictionary, so we can use setNextStateIfDictionary.
             if (setNextStateIfDictionary("trailer.value", value, st_object)) {
-                pdf.m->objects.xref_table().trailer(makeObject(value));
+                pdf.m->xref_table.trailer(makeObject(value));
             }
         } else if (key == "stream") {
             // Don't need to set saw_stream here since there's already an error.
@@ -740,7 +740,7 @@ QPDF::JSONReactor::makeObject(JSON const& value)
         int gen = 0;
         std::string str;
         if (is_indirect_object(str_v, obj, gen)) {
-            result = pdf.objects().get_for_json(obj, gen);
+            result = pdf.getObjectForJSON(obj, gen);
         } else if (is_unicode_string(str_v, str)) {
             result = QPDFObjectHandle::newUnicodeString(str);
         } else if (is_binary_string(str_v, str)) {
@@ -776,7 +776,7 @@ QPDF::createFromJSON(std::shared_ptr<InputSource> is)
 {
     m->pdf_version = "1.3";
     m->no_input_name = is->getName();
-    m->objects.xref_table().initialize_json();
+    m->xref_table.initialize_json();
     importJSON(is, true);
 }
 

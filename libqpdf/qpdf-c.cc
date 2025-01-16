@@ -905,7 +905,7 @@ qpdf_oh
 qpdf_get_object_by_id(qpdf_data qpdf, int objid, int generation)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_get_object_by_id");
-    return new_object(qpdf, qpdf->qpdf->getObject(objid, generation));
+    return new_object(qpdf, qpdf->qpdf->getObjectByID(objid, generation));
 }
 
 template <class RET>
