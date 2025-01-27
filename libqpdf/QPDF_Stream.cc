@@ -10,8 +10,8 @@
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_QPDFTokenizer.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QPDF.hh>
 #include <qpdf/QPDFExc.hh>
-#include <qpdf/QPDF_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/SF_ASCII85Decode.hh>

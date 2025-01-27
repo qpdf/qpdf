@@ -1,5 +1,5 @@
 WARNING: issue-335b.pdf: can't find PDF header
 WARNING: issue-335b.pdf: file is damaged
-WARNING: issue-335b.pdf (xref table, offset 11): xref table subsection header contains impossibly large entry
+WARNING: issue-335b.pdf (xref table, offset 23): invalid xref entry (obj=6)
 WARNING: issue-335b.pdf: Attempting to reconstruct cross-reference table
 qpdf: issue-335b.pdf: unable to find trailer dictionary while recovering damaged file

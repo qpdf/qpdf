@@ -2,7 +2,6 @@
 # Read the Docs configuration file
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
 
-# Required
 version: 2
 
 build:
@@ -11,12 +10,10 @@ build:
     python: "3.11"
 
 sphinx:
-   configuration: manual/conf.py
+  configuration: manual/conf.py
+  fail_on_warning: true
 
 formats: all
-
-sphinx:
-  fail_on_warning: true
 
 python:
   install:

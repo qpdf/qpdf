@@ -11,7 +11,7 @@ my $td = new TestDriver('fuzz');
 
 my $qpdf_corpus = $ENV{'QPDF_FUZZ_CORPUS'} || die "must set QPDF_FUZZ_CORPUS";
 
-my $n_qpdf_files = 87;       # increment when adding new files
+my $n_qpdf_files = 84;       # increment when adding new files
 
 my @fuzzers = (
     ['ascii85' => 1],
