@@ -6,17 +6,8 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
-If you are a developer and want to test your code against future API
-changes that are under consideration, you can build qpdf locally and
-enable the ``FUTURE`` build option (see :ref:`build-options`).
 
 Planned changes for future 12.x (subject to change):
-  - ``QPDFObjectHandle`` will support move construction/assignment.
-    This change will be invisible to most developers but may break
-    your code if you rely on specific behavior around how many
-    references to a QPDFObjectHandle's underlying object exist. You
-    would have to write code specifically to do that, so if you're not
-    sure, then you shouldn't have to worry.
 
   - ``Buffer`` copy constructor and assignment operator will be
     removed. ``Buffer`` copy operations are expensive as they always
@@ -30,6 +21,17 @@ Planned changes for future 12.x (subject to change):
 .. x.y.z: not yet released
 
 12.0.0: not yet released
+  - Library Enhancements
+
+    - ``QPDFObjectHandle`` supports move construction/assignment.
+      This change is invisible to most developers but may break
+      your code if you rely on specific behavior around how many
+      references to a QPDFObjectHandle's underlying object exist. You
+      would have to write code specifically to do that, so if you're not
+      sure, then you shouldn't have to worry.
+
+    - Most ``QPDFObjectHandle`` accessor methods are now const qualified.
+
   - Build Changes
 
     - If ``POINTERHOLDER_TRANSITION`` is not defined, define it to

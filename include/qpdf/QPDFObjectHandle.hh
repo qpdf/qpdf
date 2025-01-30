@@ -23,27 +23,22 @@
 #ifndef QPDFOBJECTHANDLE_HH
 #define QPDFOBJECTHANDLE_HH
 
-#ifdef QPDF_FUTURE
-# include <qpdf/QPDFObjectHandle_future.hh>
-#else
+#include <qpdf/Constants.h>
+#include <qpdf/DLL.h>
+#include <qpdf/Types.h>
 
-# include <qpdf/Constants.h>
-# include <qpdf/DLL.h>
-# include <qpdf/Types.h>
+#include <functional>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <vector>
 
-# include <functional>
-# include <map>
-# include <memory>
-# include <set>
-# include <string>
-# include <vector>
-
-# include <qpdf/Buffer.hh>
-# include <qpdf/InputSource.hh>
-# include <qpdf/JSON.hh>
-# include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
-# include <qpdf/QPDFObjGen.hh>
-# include <qpdf/QPDFTokenizer.hh>
+#include <qpdf/Buffer.hh>
+#include <qpdf/InputSource.hh>
+#include <qpdf/JSON.hh>
+#include <qpdf/QPDFObjGen.hh>
+#include <qpdf/QPDFTokenizer.hh>
 
 class Pipeline;
 class QPDF;
@@ -296,53 +291,58 @@ class QPDFObjectHandle
     QPDF_DLL
     QPDFObjectHandle& operator=(QPDFObjectHandle const&) = default;
 
+    QPDF_DLL
+    QPDFObjectHandle(QPDFObjectHandle&&) = default;
+    QPDF_DLL
+    QPDFObjectHandle& operator=(QPDFObjectHandle&&) = default;
+
     // Return true if the QPDFObjectHandle is initialized. This allows object handles to be used in
     // if statements with initializer.
     QPDF_DLL
     explicit inline operator bool() const noexcept;
 
-    [[deprecated("use operator bool()")]] QPDF_DLL inline bool isInitialized() const;
+    [[deprecated("use operator bool()")]] QPDF_DLL inline bool isInitialized() const noexcept;
 
     // This method returns true if the QPDFObjectHandle objects point to exactly the same underlying
     // object, meaning that changes to one are reflected in the other, or "if you paint one, the
     // other one changes color." This does not perform a structural comparison of the contents of
     // the objects.
     QPDF_DLL
-    bool isSameObjectAs(QPDFObjectHandle const&) const;
+    bool isSameObjectAs(QPDFObjectHandle const&) const noexcept;
 
     // Return type code and type name of underlying object.  These are useful for doing rapid type
     // tests (like switch statements) or for testing and debugging.
     QPDF_DLL
-    qpdf_object_type_e getTypeCode();
+    qpdf_object_type_e getTypeCode() const;
     QPDF_DLL
-    char const* getTypeName();
+    char const* getTypeName() const;
 
     // Exactly one of these will return true for any initialized object. Operator and InlineImage
     // are only allowed in content streams.
     QPDF_DLL
-    bool isBool();
+    bool isBool() const;
     QPDF_DLL
-    bool isNull();
+    bool isNull() const;
     QPDF_DLL
-    bool isInteger();
+    bool isInteger() const;
     QPDF_DLL
-    bool isReal();
+    bool isReal() const;
     QPDF_DLL
-    bool isName();
+    bool isName() const;
     QPDF_DLL
-    bool isString();
+    bool isString() const;
     QPDF_DLL
-    bool isOperator();
+    bool isOperator() const;
     QPDF_DLL
-    bool isInlineImage();
+    bool isInlineImage() const;
     QPDF_DLL
-    bool isArray();
+    bool isArray() const;
     QPDF_DLL
-    bool isDictionary();
+    bool isDictionary() const;
     QPDF_DLL
-    bool isStream();
+    bool isStream() const;
     QPDF_DLL
-    bool isReserved();
+    bool isReserved() const;
 
     // True for objects that are direct nulls. Does not attempt to resolve objects. This is intended
     // for internal use, but it can be used as an efficient way to check for nulls that are not
@@ -357,23 +357,23 @@ class QPDFObjectHandle
     // This returns true for indirect objects from a QPDF that has been destroyed. Trying unparse
     // such an object will throw a logic_error.
     QPDF_DLL
-    bool isDestroyed();
+    bool isDestroyed() const;
 
     // True for everything except array, dictionary, stream, word, and inline image.
     QPDF_DLL
-    bool isScalar();
+    bool isScalar() const;
 
     // True if the object is a name object representing the provided name.
     QPDF_DLL
-    bool isNameAndEquals(std::string const& name);
+    bool isNameAndEquals(std::string const& name) const;
 
     // True if the object is a dictionary of the specified type and subtype, if any.
     QPDF_DLL
-    bool isDictionaryOfType(std::string const& type, std::string const& subtype = "");
+    bool isDictionaryOfType(std::string const& type, std::string const& subtype = "") const;
 
     // True if the object is a stream of the specified type and subtype, if any.
     QPDF_DLL
-    bool isStreamOfType(std::string const& type, std::string const& subtype = "");
+    bool isStreamOfType(std::string const& type, std::string const& subtype = "") const;
 
     // Public factory methods
 
@@ -418,7 +418,7 @@ class QPDFObjectHandle
     // object was created without parsing. If the object is in a stream, the offset is from the
     // beginning of the stream. Otherwise, the offset is from the beginning of the file.
     QPDF_DLL
-    qpdf_offset_t getParsedOffset();
+    qpdf_offset_t getParsedOffset() const;
 
     // Older method: stream_or_array should be the value of /Contents from a page object. It's more
     // convenient to just call QPDFPageObjectHelper::parsePageContents on the page object, and error
@@ -590,7 +590,7 @@ class QPDFObjectHandle
     QPDF_DLL
     void setObjectDescription(QPDF* owning_qpdf, std::string const& object_description);
     QPDF_DLL
-    bool hasObjectDescription();
+    bool hasObjectDescription() const;
 
     // Accessor methods
     //
@@ -640,57 +640,57 @@ class QPDFObjectHandle
 
     // Methods for bool objects
     QPDF_DLL
-    bool getBoolValue();
+    bool getBoolValue() const;
     QPDF_DLL
-    bool getValueAsBool(bool&);
+    bool getValueAsBool(bool&) const;
 
     // Methods for integer objects. Note: if an integer value is too big (too far away from zero in
     // either direction) to fit in the requested return type, the maximum or minimum value for that
     // return type may be returned. For example, on a system with 32-bit int, a numeric object with
     // a value of 2^40 (or anything too big for 32 bits) will be returned as INT_MAX.
     QPDF_DLL
-    long long getIntValue();
+    long long getIntValue() const;
     QPDF_DLL
-    bool getValueAsInt(long long&);
+    bool getValueAsInt(long long&) const;
     QPDF_DLL
-    int getIntValueAsInt();
+    int getIntValueAsInt() const;
     QPDF_DLL
-    bool getValueAsInt(int&);
+    bool getValueAsInt(int&) const;
     QPDF_DLL
-    unsigned long long getUIntValue();
+    unsigned long long getUIntValue() const;
     QPDF_DLL
-    bool getValueAsUInt(unsigned long long&);
+    bool getValueAsUInt(unsigned long long&) const;
     QPDF_DLL
-    unsigned int getUIntValueAsUInt();
+    unsigned int getUIntValueAsUInt() const;
     QPDF_DLL
-    bool getValueAsUInt(unsigned int&);
+    bool getValueAsUInt(unsigned int&) const;
 
     // Methods for real objects
     QPDF_DLL
-    std::string getRealValue();
+    std::string getRealValue() const;
     QPDF_DLL
-    bool getValueAsReal(std::string&);
+    bool getValueAsReal(std::string&) const;
 
     // Methods that work for both integer and real objects
     QPDF_DLL
-    bool isNumber();
+    bool isNumber() const;
     QPDF_DLL
-    double getNumericValue();
+    double getNumericValue() const;
     QPDF_DLL
-    bool getValueAsNumber(double&);
+    bool getValueAsNumber(double&) const;
 
     // Methods for name objects. The returned name value is in qpdf's canonical form with all
     // escaping resolved. See comments for newName() for details.
     QPDF_DLL
-    std::string getName();
+    std::string getName() const;
     QPDF_DLL
-    bool getValueAsName(std::string&);
+    bool getValueAsName(std::string&) const;
 
     // Methods for string objects
     QPDF_DLL
-    std::string getStringValue();
+    std::string getStringValue() const;
     QPDF_DLL
-    bool getValueAsString(std::string&);
+    bool getValueAsString(std::string&) const;
 
     // If a string starts with the UTF-16 marker, it is converted from UTF-16 to UTF-8. Otherwise,
     // it is treated as a string encoded with PDF Doc Encoding. PDF Doc Encoding is identical to
@@ -698,19 +698,19 @@ class QPDFObjectHandle
     // to Unicode. QPDF versions prior to version 8.0.0 erroneously left characters in that range
     // unmapped.
     QPDF_DLL
-    std::string getUTF8Value();
+    std::string getUTF8Value() const;
     QPDF_DLL
-    bool getValueAsUTF8(std::string&);
+    bool getValueAsUTF8(std::string&) const;
 
     // Methods for content stream objects
     QPDF_DLL
-    std::string getOperatorValue();
+    std::string getOperatorValue() const;
     QPDF_DLL
-    bool getValueAsOperator(std::string&);
+    bool getValueAsOperator(std::string&) const;
     QPDF_DLL
-    std::string getInlineImageValue();
+    std::string getInlineImageValue() const;
     QPDF_DLL
-    bool getValueAsInlineImage(std::string&);
+    bool getValueAsInlineImage(std::string&) const;
 
     // Methods for array objects; see also name and array objects.
 
@@ -725,26 +725,26 @@ class QPDFObjectHandle
     QPDFArrayItems aitems();
 
     QPDF_DLL
-    int getArrayNItems();
+    int getArrayNItems() const;
     QPDF_DLL
-    QPDFObjectHandle getArrayItem(int n);
+    QPDFObjectHandle getArrayItem(int n) const;
     // Note: QPDF arrays internally optimize memory for arrays containing lots of nulls. Calling
     // getArrayAsVector may cause a lot of memory to be allocated for very large arrays with lots of
     // nulls.
     QPDF_DLL
-    std::vector<QPDFObjectHandle> getArrayAsVector();
+    std::vector<QPDFObjectHandle> getArrayAsVector() const;
     QPDF_DLL
-    bool isRectangle();
+    bool isRectangle() const;
     // If the array is an array of four numeric values, return as a rectangle. Otherwise, return the
     // rectangle [0, 0, 0, 0]
     QPDF_DLL
-    Rectangle getArrayAsRectangle();
+    Rectangle getArrayAsRectangle() const;
     QPDF_DLL
-    bool isMatrix();
+    bool isMatrix() const;
     // If the array is an array of six numeric values, return as a matrix. Otherwise, return the
     // matrix [1, 0, 0, 1, 0, 0]
     QPDF_DLL
-    Matrix getArrayAsMatrix();
+    Matrix getArrayAsMatrix() const;
 
     // Methods for dictionary objects. In all dictionary methods, keys are specified/represented as
     // canonical name strings starting with a leading slash and not containing any PDF syntax
@@ -764,27 +764,27 @@ class QPDFObjectHandle
     // Return true if key is present.  Keys with null values are treated as if they are not present.
     // This is as per the PDF spec.
     QPDF_DLL
-    bool hasKey(std::string const&);
+    bool hasKey(std::string const&) const;
     // Return the value for the key.  If the key is not present, null is returned.
     QPDF_DLL
-    QPDFObjectHandle getKey(std::string const&);
+    QPDFObjectHandle getKey(std::string const&) const;
     // If the object is null, return null. Otherwise, call getKey(). This makes it easier to access
     // lower-level dictionaries, as in
     // auto font = page.getKeyIfDict("/Resources").getKeyIfDict("/Font");
     QPDF_DLL
-    QPDFObjectHandle getKeyIfDict(std::string const&);
+    QPDFObjectHandle getKeyIfDict(std::string const&) const;
     // Return all keys.  Keys with null values are treated as if they are not present.  This is as
     // per the PDF spec.
     QPDF_DLL
-    std::set<std::string> getKeys();
+    std::set<std::string> getKeys() const;
     // Return dictionary as a map.  Entries with null values are included.
     QPDF_DLL
-    std::map<std::string, QPDFObjectHandle> getDictAsMap();
+    std::map<std::string, QPDFObjectHandle> getDictAsMap() const;
 
     // Methods for name and array objects. The name value is in qpdf's canonical form with all
     // escaping resolved. See comments for newName() for details.
     QPDF_DLL
-    bool isOrHasName(std::string const&);
+    bool isOrHasName(std::string const&) const;
 
     // Make all resources in a resource dictionary indirect. This just goes through all entries of
     // top-level subdictionaries and converts any direct objects to indirect objects. This can be
@@ -834,7 +834,7 @@ class QPDFObjectHandle
     // method returns a set of all the keys in all top-level subdictionaries. For resources
     // dictionaries, this is the collection of names that may be referenced in the content stream.
     QPDF_DLL
-    std::set<std::string> getResourceNames();
+    std::set<std::string> getResourceNames() const;
 
     // Find a unique name within a resource dictionary starting with a given prefix. This method
     // works by appending a number to the given prefix. It searches starting with min_suffix and
@@ -849,7 +849,7 @@ class QPDFObjectHandle
     std::string getUniqueResourceName(
         std::string const& prefix,
         int& min_suffix,
-        std::set<std::string>* resource_names = nullptr);
+        std::set<std::string>* resource_names = nullptr) const;
 
     // A QPDFObjectHandle has an owning QPDF if it is associated with ("owned by") a specific QPDF
     // object. Indirect objects always have an owning QPDF. Direct objects that are read from the
@@ -969,7 +969,7 @@ class QPDFObjectHandle
 
     // Methods for stream objects
     QPDF_DLL
-    QPDFObjectHandle getDict();
+    QPDFObjectHandle getDict() const;
 
     // By default, or if true passed, QPDFWriter will attempt to filter a stream based on decode
     // level, whether compression is enabled, and its ability to filter. Passing false will prevent
@@ -1158,12 +1158,12 @@ class QPDFObjectHandle
     inline int getGeneration() const;
 
     QPDF_DLL
-    std::string unparse();
+    std::string unparse() const;
     QPDF_DLL
-    std::string unparseResolved();
+    std::string unparseResolved() const;
     // For strings only, force binary representation. Otherwise, same as unparse.
     QPDF_DLL
-    std::string unparseBinary();
+    std::string unparseBinary() const;
 
     // Return encoded as JSON. The constant JSON::LATEST can be used to specify the latest available
     // JSON version. The JSON is generated as follows:
@@ -1197,19 +1197,19 @@ class QPDFObjectHandle
     // the object. The effect of dereference_indirect applies only to this object. It is not
     // recursive.
     QPDF_DLL
-    JSON getJSON(int json_version, bool dereference_indirect = false);
+    JSON getJSON(int json_version, bool dereference_indirect = false) const;
 
     // Write the object encoded as JSON to a pipeline. This is equivalent to, but more efficient
     // than, calling getJSON(json_version, dereference_indirect).write(p, depth). See the
     // documentation for getJSON and JSON::write for further detail.
     QPDF_DLL
-    void
-    writeJSON(int json_version, Pipeline* p, bool dereference_indirect = false, size_t depth = 0);
+    void writeJSON(
+        int json_version, Pipeline* p, bool dereference_indirect = false, size_t depth = 0) const;
 
     // Deprecated version uses v1 for backward compatibility.
     // ABI: remove for qpdf 12
     [[deprecated("Use getJSON(int version)")]] QPDF_DLL JSON
-    getJSON(bool dereference_indirect = false);
+    getJSON(bool dereference_indirect = false) const;
 
     // This method can be called on a stream to get a more extended JSON representation of the
     // stream that includes the stream's data. The JSON object returned is always a dictionary whose
@@ -1262,7 +1262,7 @@ class QPDFObjectHandle
     // normally from the file have descriptions. See comments on setObjectDescription for additional
     // details.
     QPDF_DLL
-    void warnIfPossible(std::string const& warning);
+    void warnIfPossible(std::string const& warning) const;
 
     // Provide access to specific classes for recursive disconnected().
     class DisconnectAccess
@@ -1285,55 +1285,55 @@ class QPDFObjectHandle
     void assertInitialized() const;
 
     QPDF_DLL
-    void assertNull();
+    void assertNull() const;
     QPDF_DLL
-    void assertBool();
+    void assertBool() const;
     QPDF_DLL
-    void assertInteger();
+    void assertInteger() const;
     QPDF_DLL
-    void assertReal();
+    void assertReal() const;
     QPDF_DLL
-    void assertName();
+    void assertName() const;
     QPDF_DLL
-    void assertString();
+    void assertString() const;
     QPDF_DLL
-    void assertOperator();
+    void assertOperator() const;
     QPDF_DLL
-    void assertInlineImage();
+    void assertInlineImage() const;
     QPDF_DLL
-    void assertArray();
+    void assertArray() const;
     QPDF_DLL
-    void assertDictionary();
+    void assertDictionary() const;
     QPDF_DLL
-    void assertStream();
+    void assertStream() const;
     QPDF_DLL
-    void assertReserved();
+    void assertReserved() const;
 
     QPDF_DLL
-    void assertIndirect();
+    void assertIndirect() const;
     QPDF_DLL
-    void assertScalar();
+    void assertScalar() const;
     QPDF_DLL
-    void assertNumber();
+    void assertNumber() const;
 
     // The isPageObject method checks the /Type key of the object. This is not completely reliable
     // as there are some otherwise valid files whose /Type is wrong for page objects. qpdf is
     // slightly more accepting but may still return false here when treating the object as a page
     // would work. Use this sparingly.
     QPDF_DLL
-    bool isPageObject();
+    bool isPageObject() const;
     QPDF_DLL
-    bool isPagesObject();
+    bool isPagesObject() const;
     QPDF_DLL
-    void assertPageObject();
+    void assertPageObject() const;
 
     QPDF_DLL
-    bool isFormXObject();
+    bool isFormXObject() const;
 
     // Indicate if this is an image. If exclude_imagemask is true, don't count image masks as
     // images.
     QPDF_DLL
-    bool isImage(bool exclude_imagemask = true);
+    bool isImage(bool exclude_imagemask = true) const;
 
     // The following methods do not form part of the public API and are for internal use only.
 
@@ -1362,7 +1362,7 @@ class QPDFObjectHandle
         return obj.get();
     }
 
-    void writeJSON(int json_version, JSON::Writer& p, bool dereference_indirect = false);
+    void writeJSON(int json_version, JSON::Writer& p, bool dereference_indirect = false) const;
 
   private:
     QPDF_Array* asArray() const;
@@ -1401,7 +1401,7 @@ class QPDFObjectHandle
     std::shared_ptr<QPDFObject> obj;
 };
 
-# ifndef QPDF_NO_QPDF_STRING
+#ifndef QPDF_NO_QPDF_STRING
 // This is short for QPDFObjectHandle::parse, so you can do
 
 // auto oh = "<< /Key (value) >>"_qpdf;
@@ -1410,14 +1410,14 @@ class QPDFObjectHandle
 // from being here.
 
 /* clang-format off */
-// Disable formatting for this declaration: emacs font-lock in cc-mode (as of 28.1) treats the rest
-// of the file as a string if clang-format removes the space after "operator", and as of
-// clang-format 15, there's no way to prevent it from doing so.
-QPDF_DLL
-QPDFObjectHandle operator ""_qpdf(char const* v, size_t len);
+  // Disable formatting for this declaration: emacs font-lock in cc-mode (as of 28.1) treats the rest
+  // of the file as a string if clang-format removes the space after "operator", and as of
+  // clang-format 15, there's no way to prevent it from doing so.
+  QPDF_DLL
+  QPDFObjectHandle operator ""_qpdf(char const* v, size_t len);
 /* clang-format on */
 
-# endif // QPDF_NO_QPDF_STRING
+#endif // QPDF_NO_QPDF_STRING
 
 class QPDFObjectHandle::QPDFDictItems
 {
@@ -1634,7 +1634,7 @@ QPDFObjectHandle::isIndirect() const
 }
 
 inline bool
-QPDFObjectHandle::isInitialized() const
+QPDFObjectHandle::isInitialized() const noexcept
 {
     return obj != nullptr;
 }
@@ -1645,5 +1645,4 @@ operator bool() const noexcept
     return static_cast<bool>(obj);
 }
 
-#endif // QPDF_FUTURE
 #endif // QPDFOBJECTHANDLE_HH
