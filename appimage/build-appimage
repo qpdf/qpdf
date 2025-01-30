@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2019-2024 Jay Berkenbilt and Kurt Pfeifle
+# Copyright (c) 2019-2025 Jay Berkenbilt and Kurt Pfeifle
 #
 # This script is used to build an 'AppImage' from GitHub sources of
 # QPDF (see https://appimage.org/). It is used in CI, but it also

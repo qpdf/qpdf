@@ -2,8 +2,8 @@
 #define RIJNDAEL_H
 
 #include <qpdf/qpdf-config.h>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 
 unsigned int rijndaelSetupEncrypt(uint32_t* rk, const unsigned char* key, size_t keybits);
 unsigned int rijndaelSetupDecrypt(uint32_t* rk, const unsigned char* key, size_t keybits);

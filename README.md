@@ -21,7 +21,7 @@ downloaded from a public key server.
 
 # Copyright, License
 
-qpdf is copyright (c) 2005-2024 Jay Berkenbilt
+qpdf is copyright (c) 2005-2021 Jay Berkenbilt, 2022-2025 Jay Berkenbilt and Manfred Holger
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
 License. You may obtain a copy of the License at

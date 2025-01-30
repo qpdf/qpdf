@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2005-2024 Jay Berkenbilt -->
+<!-- Copyright 2005-2021 Jay Berkenbilt, 2022-2025 Jay Berkenbilt and Manfred Holger -->
 <component>
 	<id>org.QPDF.qpdf.desktop</id>
 	<metadata_license>MIT</metadata_license>

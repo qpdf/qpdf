@@ -468,7 +468,7 @@ When done, the following should happen:
   * debian package -- search for copyright.*berkenbilt in debian/copyright
   * qtest-driver, TestDriver.pm in qtest source
 
-  Copyright last updated: 2024.
+  Copyright last updated: 2025.
 
 * Take a look at "External Libraries" in TODO to see if we need to
   make any changes. There is still some automation work left to do, so
