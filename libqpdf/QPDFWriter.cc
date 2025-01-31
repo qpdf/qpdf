@@ -26,6 +26,8 @@
 #include <cstdlib>
 #include <stdexcept>
 
+using namespace std::literals;
+
 QPDFWriter::ProgressReporter::~ProgressReporter() // NOLINT (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
@@ -1296,16 +1298,23 @@ QPDFWriter::willFilterStream(
                 !filter ? qpdf_dl_none : (uncompress ? qpdf_dl_all : m->stream_decode_level),
                 false,
                 first_attempt);
+            if (filter && !filtered) {
+                // Try again
+                filter = false;
+                stream.setFilterOnWrite(false);
+            } else {
+                break;
+            }
         } catch (std::runtime_error& e) {
+            if (filter && first_attempt) {
+                stream.warnIfPossible("error while getting stream data: "s + e.what());
+                stream.warnIfPossible("qpdf will attempt to write the damaged stream unchanged");
+                filter = false;
+                stream.setFilterOnWrite(false);
+                continue;
+            }
             throw std::runtime_error(
                 "error while getting stream data for " + stream.unparse() + ": " + e.what());
-        }
-        if (filter && !filtered) {
-            // Try again
-            filter = false;
-            stream.setFilterOnWrite(false);
-        } else {
-            break;
         }
     }
     if (!filtered) {

@@ -1,1 +1,3 @@
+WARNING: qjson-bad-data.json, obj:4 0 R at offset 0: error while getting stream data: base64-decode: base64 decode: invalid input
+WARNING: qjson-bad-data.json, obj:4 0 R at offset 0: qpdf will attempt to write the damaged stream unchanged
 qpdf: error while getting stream data for 4 0 R: base64-decode: base64 decode: invalid input
