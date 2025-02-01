@@ -127,7 +127,7 @@ $n_tests += @badfiles + 11;
 # though in some cases it may.  Acrobat Reader would not be able to
 # recover any of these files any better.
 my %recover_failures = ();
-for (1, 7, 16)
+for (1)
 {
     $recover_failures{$_} = 1;
 }

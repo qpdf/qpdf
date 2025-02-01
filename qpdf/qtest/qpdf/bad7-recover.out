@@ -3,4 +3,10 @@ WARNING: bad7.pdf (offset 698): expected trailer dictionary
 WARNING: bad7.pdf: Attempting to reconstruct cross-reference table
 WARNING: bad7.pdf (object 2 0, offset 128): expected endobj
 WARNING: bad7.pdf (object 4 0, offset 389): expected endobj
-bad7.pdf: unable to find trailer dictionary while recovering damaged file
+WARNING: bad7.pdf: unable to find trailer dictionary while recovering damaged file
+/QTest is implicit
+/QTest is direct and has type null (2)
+/QTest is null
+unparse: null
+unparseResolved: null
+test 1 done

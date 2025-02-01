@@ -12,4 +12,5 @@ WARNING: issue-148.pdf (xref stream: object 8 0, offset 73): attempting to recov
 WARNING: issue-148.pdf (xref stream: object 8 0, offset 73): recovered stream length: 2
 WARNING: issue-148.pdf (xref stream: object 8 0, offset 85): expected endobj
 WARNING: issue-148.pdf (offset 73): error decoding stream data for object 8 0: stream inflate: inflate: data: incorrect header check
-qpdf: issue-148.pdf: error decoding candidate xref stream while recovering damaged file
+WARNING: issue-148.pdf: error decoding candidate xref stream while recovering damaged file
+qpdf: issue-148.pdf: unable to find /Root dictionary
