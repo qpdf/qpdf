@@ -16,7 +16,7 @@ struct _qpdf_data
     _qpdf_data() = default;
 
     _qpdf_data(std::unique_ptr<QPDF>&& qpdf) :
-        qpdf(std::move(qpdf)) {};
+        qpdf(std::move(qpdf)){};
 
     ~_qpdf_data() = default;
 

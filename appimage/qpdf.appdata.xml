@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2005-2024 Jay Berkenbilt -->
+<!-- Copyright 2005-2021 Jay Berkenbilt, 2022-2025 Jay Berkenbilt and Manfred Holger -->
 <component>
 	<id>org.QPDF.qpdf.desktop</id>
 	<metadata_license>MIT</metadata_license>
 	<project_license>Apache-2.0</project_license>
-	<name>QPDF</name>
+	<name>qpdf</name>
 	<summary>Structural, content-preserving transformations on PDF files</summary>
 	<description>
-		<p> QPDF is a command-line program that does structural, content-preserving transformations on PDF files.
+		<p> qpdf is a command-line program that does structural, content-preserving transformations on PDF files.
 			It could have been called something like pdf-to-pdf.
 			It also provides many useful capabilities to developers of PDF-producing software or for people
 			who just want to look at the innards of a PDF file to learn more about how they work.</p>
-		<p> QPDF is capable of creating linearized (also known as web-optimized) files and encrypted files.
+		<p> qpdf is capable of creating linearized (also known as web-optimized) files and encrypted files.
 			It is also capable of converting PDF files with object streams (also known as compressed objects)
 			to files with no compressed objects or to generate object streams from files that don't have them
-			(or even those that already do). QPDF also supports a special mode designed to allow you to edit
+			(or even those that already do). qpdf also supports a special mode designed to allow you to edit
 			the content of PDF files in a text editor. For more details, please see the documentation links
 			below.</p>
-		<p> QPDF includes support for merging and splitting PDFs through the ability to copy objects from one PDF
-			file into another and to manipulate the list of pages in a PDF file. The QPDF library also makes
+		<p> qpdf includes support for merging and splitting PDFs through the ability to copy objects from one PDF
+			file into another and to manipulate the list of pages in a PDF file. The qpdf library also makes
 			it possible for you to create PDF files from scratch. In this mode, you are responsible for
-			supplying all the contents of the file, while the QPDF library takes care off all the syntactical
+			supplying all the contents of the file, while the qpdf library takes care off all the syntactical
 			representation of the objects, creation of cross references tables and, if you use them, object
 			streams, encryption, linearization, and other syntactic details.</p>
-		<p>QPDF is not a PDF content creation library, a PDF viewer, or a program capable of converting PDF into
-			other formats. In particular, QPDF knows nothing about the semantics of PDF content streams.
+		<p>qpdf is not a PDF content creation library, a PDF viewer, or a program capable of converting PDF into
+			other formats. In particular, qpdf knows nothing about the semantics of PDF content streams.
 			If you are looking for something that can do that, you should look elsewhere.
-			However, once you have a valid PDF file, QPDF can be used to transform that file in ways perhaps
+			However, once you have a valid PDF file, qpdf can be used to transform that file in ways perhaps
 			your original PDF creation can't handle. For example, programs generate simple PDF files but
 			can't password-protect them, web-optimize them, or perform other transformations of that type.</p>
 	</description>

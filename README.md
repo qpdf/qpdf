@@ -10,7 +10,7 @@ render PDFs or perform text extraction, and it does not contain higher-level int
 It is a low-level tool for working with the structure of PDF files and can be a valuable tool for anyone who wants to do
 programmatic or command-line-based manipulation of PDF files.
 
-The [qpdf Manual](https://qpdf.readthedocs.io) is hosted online at https://qpdf.readthedocs.io. The project website
+The [qpdf manual](https://qpdf.readthedocs.io) is hosted online at https://qpdf.readthedocs.io. The project website
 is https://qpdf.sourceforge.io. The source code repository is hosted at GitHub: https://github.com/qpdf/qpdf.
 
 # Verifying Distributions
@@ -21,7 +21,7 @@ downloaded from a public key server.
 
 # Copyright, License
 
-qpdf is copyright (c) 2005-2024 Jay Berkenbilt
+qpdf is copyright (c) 2005-2021 Jay Berkenbilt, 2022-2025 Jay Berkenbilt and Manfred Holger
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
 License. You may obtain a copy of the License at
