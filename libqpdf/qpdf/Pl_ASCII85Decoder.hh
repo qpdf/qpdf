@@ -17,6 +17,7 @@ class Pl_ASCII85Decoder final: public Pipeline
     unsigned char inbuf[5]{117, 117, 117, 117, 117};
     size_t pos{0};
     size_t eod{0};
+    bool error{false};
 };
 
 #endif // PL_ASCII85DECODER_HH

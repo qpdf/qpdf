@@ -146,7 +146,10 @@ set(CORPUS_OTHER
   99999e.fuzz
   369662293.fuzz
   369662293a.fuzz
+  376305073.fuzz
   377977949.fuzz
+  389974979.fuzz
+  391974927.fuzz
 )
 
 set(CORPUS_DIR ${CMAKE_CURRENT_BINARY_DIR}/qpdf_corpus)
