@@ -25,7 +25,7 @@ QPDFOutlineObjectHelper::QPDFOutlineObjectHelper(
 
     QPDFObjGen::set children;
     QPDFObjectHandle cur = oh.getKey("/First");
-    while (!cur.isNull() && children.add(cur)) {
+    while (!cur.isNull() && cur.isIndirect() && children.add(cur)) {
         QPDFOutlineObjectHelper new_ooh(cur, dh, 1 + depth);
         new_ooh.m->parent = std::make_shared<QPDFOutlineObjectHelper>(*this);
         m->kids.push_back(new_ooh);
