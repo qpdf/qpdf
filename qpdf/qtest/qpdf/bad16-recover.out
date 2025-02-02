@@ -11,4 +11,10 @@ WARNING: bad16.pdf (trailer, offset 756): unexpected dictionary close token
 WARNING: bad16.pdf (trailer, offset 759): unknown token while reading object; treating as string
 WARNING: bad16.pdf (trailer, offset 779): parse error while reading object
 WARNING: bad16.pdf (trailer, offset 779): unexpected EOF
-bad16.pdf: unable to find trailer dictionary while recovering damaged file
+WARNING: bad16.pdf: unable to find trailer dictionary while recovering damaged file
+/QTest is implicit
+/QTest is direct and has type null (2)
+/QTest is null
+unparse: null
+unparseResolved: null
+test 1 done

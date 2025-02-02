@@ -608,6 +608,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
 
     if (!m->trailer) {
         qpdf_offset_t max_offset{0};
+        size_t max_size{0};
         // If there are any xref streams, take the last one to appear.
         for (auto const& iter: m->xref_table) {
             auto entry = iter.second;
@@ -623,7 +624,8 @@ QPDF::reconstruct_xref(QPDFExc& e)
                 continue;
             }
             auto offset = entry.getOffset();
-            if (offset > max_offset) {
+            auto size = oh.getDict().getKey("/Size").getUIntValueAsUInt();
+            if (size > max_size || (size == max_size && offset > max_offset)) {
                 max_offset = offset;
                 setTrailer(oh.getDict());
             }
@@ -633,10 +635,32 @@ QPDF::reconstruct_xref(QPDFExc& e)
             try {
                 read_xref(max_offset);
             } catch (std::exception&) {
-                throw damagedPDF(
-                    "", 0, "error decoding candidate xref stream while recovering damaged file");
+                warn(damagedPDF(
+                    "", 0, "error decoding candidate xref stream while recovering damaged file"));
             }
             QTC::TC("qpdf", "QPDF recover xref stream");
+        }
+    }
+
+    if (!m->trailer || (!m->parsed && !m->trailer.getKey("/Root").isDictionary())) {
+        // Try to find a Root dictionary. As a quick fix try the one with the highest object id.
+        QPDFObjectHandle root;
+        for (auto const& iter: m->obj_cache) {
+            try {
+                if (QPDFObjectHandle(iter.second.object).isDictionaryOfType("/Catalog")) {
+                    root = iter.second.object;
+                }
+            } catch (std::exception&) {
+                continue;
+            }
+        }
+        if (root) {
+            if (!m->trailer) {
+                warn(damagedPDF(
+                    "", 0, "unable to find trailer dictionary while recovering damaged file"));
+                m->trailer = QPDFObjectHandle::newDictionary();
+            }
+            m->trailer.replaceKey("/Root", root);
         }
     }
 
