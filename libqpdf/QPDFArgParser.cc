@@ -9,6 +9,8 @@
 #include <cstring>
 #include <iostream>
 
+using namespace std::literals;
+
 QPDFArgParser::Members::Members(int argc, char const* const argv[], char const* progname_env) :
 
     argc(argc),
@@ -532,7 +534,13 @@ QPDFArgParser::parseArgs()
             }
             usage(message);
         }
+
         if (oe.bare_arg_handler) {
+            if (have_parameter) {
+                usage(
+                    "--"s + arg_s + " does not take a parameter, but \"" + parameter +
+                    "\" was given");
+            }
             oe.bare_arg_handler();
         } else if (oe.param_arg_handler) {
             oe.param_arg_handler(parameter);

@@ -1,3 +1,9 @@
+2024-02-01  M Holger  <m.holger@qpdf.org>
+
+	* Bug fix: in qpdf CLI / QPDFJob throw a QPDFUsage exception if a
+	parameter is given for a flag. Previously the parameter was ignored and
+	e.g. --encrypt=n was treated as --encrypt. Fixes #1329.
+
 2024-09-20  Chao Li  <mslichao@outlook.com>
 
 	* Add C API function qpdf_oh_free_buffer to release memory allocated

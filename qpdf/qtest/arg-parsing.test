@@ -15,7 +15,7 @@ cleanup();
 
 my $td = new TestDriver('arg-parsing');
 
-my $n_tests = 25;
+my $n_tests = 26;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -30,6 +30,11 @@ $td->runtest("required argument with choices",
 $td->runtest("required argument with choices",
              {$td->COMMAND => "qpdf --decode-level minimal.pdf"},
              {$td->REGEXP => "must be given as --decode-level=\\{.*all.*\\}",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("flag with parameter",
+             {$td->COMMAND => "qpdf --qdf=false minimal.pdf"},
+             {$td->REGEXP => "--qdf does not take a parameter, but \"false\" was given",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 copy("minimal.pdf", '@file.pdf');
