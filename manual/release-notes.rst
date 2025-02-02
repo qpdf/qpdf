@@ -38,6 +38,14 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
+11.10.0: not yet released
+  - CLI Enhancements
+
+    - The :command:`fix-qdf` command now allows an output file to be
+      specified as an optional second argument. This is useful for
+      environments in which writing a binary file to standard output
+      doesn't work (such as PowerShell 5).
+
 11.9.1: June 7, 2024
   - Bug Fixes
 

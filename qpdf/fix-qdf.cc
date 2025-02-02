@@ -4,17 +4,20 @@
 #include <qpdf/QUtil.hh>
 #include <cstdio>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <regex>
 #include <string_view>
 
+using namespace std::literals;
 static char const* whoami = nullptr;
 
 static void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " [filename]" << std::endl;
-    exit(2);
+    std::cerr << "Usage: " << whoami << " [infilename [outfilename]]" << std::endl
+              << "infilename defaults to standard output" << std::endl
+              << "outfilename defaults to standard output" << std::endl;
 }
 
 class QdfFixer
@@ -373,27 +376,44 @@ realmain(int argc, char* argv[])
     whoami = QUtil::getWhoami(argv[0]);
     QUtil::setLineBuf(stdout);
     char const* filename = nullptr;
-    if (argc > 2) {
+    char const* outfilename = nullptr;
+    if (argc > 3) {
         usage();
     } else if ((argc > 1) && (strcmp(argv[1], "--version") == 0)) {
         std::cout << whoami << " from qpdf version " << QPDF::QPDFVersion() << std::endl;
         return 0;
     } else if ((argc > 1) && (strcmp(argv[1], "--help") == 0)) {
         usage();
-    } else if (argc == 2) {
+    } else if (argc >= 2) {
         filename = argv[1];
+        if (argc == 3) {
+            outfilename = argv[2];
+        }
     }
-    std::string input;
-    if (filename == nullptr) {
-        filename = "standard input";
-        QUtil::binary_stdin();
-        input = QUtil::read_file_into_string(stdin);
-    } else {
-        input = QUtil::read_file_into_string(filename);
+    try {
+        std::string input;
+        if (filename == nullptr) {
+            filename = "standard input";
+            QUtil::binary_stdin();
+            input = QUtil::read_file_into_string(stdin);
+        } else {
+            input = QUtil::read_file_into_string(filename);
+        }
+        std::unique_ptr<std::ofstream> out = nullptr;
+        if (outfilename) {
+            out = std::make_unique<std::ofstream>(outfilename, std::ios::binary);
+            if (out->fail()) {
+                QUtil::throw_system_error("open "s + outfilename);
+            }
+        } else {
+            QUtil::binary_stdout();
+        }
+        QdfFixer qf(filename, out ? *out : std::cout);
+        qf.processLines(input);
+    } catch (std::exception& e) {
+        std::cerr << whoami << ": error: " << e.what() << std::endl;
+        exit(qpdf_exit_error);
     }
-    QUtil::binary_stdout();
-    QdfFixer qf(filename, std::cout);
-    qf.processLines(input);
     return 0;
 }
 
