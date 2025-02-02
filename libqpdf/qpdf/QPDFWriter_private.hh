@@ -65,7 +65,7 @@ class QPDFWriter::Members
     bool normalize_content{false};
     bool compress_streams{true};
     bool compress_streams_set{false};
-    qpdf_stream_decode_level_e stream_decode_level{qpdf_dl_none};
+    qpdf_stream_decode_level_e stream_decode_level{qpdf_dl_generalized};
     bool stream_decode_level_set{false};
     bool recompress_flate{false};
     bool qdf_mode{false};

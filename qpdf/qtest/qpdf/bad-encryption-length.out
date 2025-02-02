@@ -14,5 +14,5 @@ modify annotations: allowed
 modify other: allowed
 modify anything: allowed
 File is not linearized
-No syntax or stream encoding errors found; the file may still contain
-errors that qpdf cannot detect
+WARNING: bad-encryption-length.pdf, object 7 0 at offset 531 -> dictionary key /Length: operation for integer attempted on object of type null: returning 0
+qpdf: operation succeeded with warnings

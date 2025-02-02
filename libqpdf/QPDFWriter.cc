@@ -26,6 +26,8 @@
 #include <cstdlib>
 #include <stdexcept>
 
+using namespace std::literals;
+
 QPDFWriter::ProgressReporter::~ProgressReporter() // NOLINT (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
@@ -1249,7 +1251,7 @@ QPDFWriter::willFilterStream(
     if (stream_dict.isDictionaryOfType("/Metadata")) {
         is_metadata = true;
     }
-    bool filter = (stream.isDataModified() || m->compress_streams || m->stream_decode_level);
+    bool filter = stream.isDataModified() || m->compress_streams || m->stream_decode_level;
     bool filter_on_write = stream.getFilterOnWrite();
     if (!filter_on_write) {
         QTC::TC("qpdf", "QPDFWriter getFilterOnWrite false");
@@ -1261,15 +1263,15 @@ QPDFWriter::willFilterStream(
         // CPU cycles uncompressing and recompressing stuff. This can be overridden with
         // setRecompressFlate(true).
         QPDFObjectHandle filter_obj = stream_dict.getKey("/Filter");
-        if ((!m->recompress_flate) && (!stream.isDataModified()) && filter_obj.isName() &&
-            ((filter_obj.getName() == "/FlateDecode") || (filter_obj.getName() == "/Fl"))) {
+        if (!m->recompress_flate && !stream.isDataModified() && filter_obj.isName() &&
+            (filter_obj.getName() == "/FlateDecode" || filter_obj.getName() == "/Fl")) {
             QTC::TC("qpdf", "QPDFWriter not recompressing /FlateDecode");
             filter = false;
         }
     }
     bool normalize = false;
     bool uncompress = false;
-    if (filter_on_write && is_metadata && ((!m->encrypted) || (m->encrypt_metadata == false))) {
+    if (filter_on_write && is_metadata && (!m->encrypted || !m->encrypt_metadata)) {
         QTC::TC("qpdf", "QPDFWriter not compressing metadata");
         filter = true;
         compress_stream = false;
@@ -1283,28 +1285,36 @@ QPDFWriter::willFilterStream(
     }
 
     bool filtered = false;
-    for (int attempt = 1; attempt <= 2; ++attempt) {
+    for (bool first_attempt: {true, false}) {
         pushPipeline(new Pl_Buffer("stream data"));
         PipelinePopper pp_stream_data(this, stream_data);
         activatePipelineStack(pp_stream_data);
         try {
             filtered = stream.pipeStreamData(
                 m->pipeline,
-                (((filter && normalize) ? qpdf_ef_normalize : 0) |
-                 ((filter && compress_stream) ? qpdf_ef_compress : 0)),
-                (filter ? (uncompress ? qpdf_dl_all : m->stream_decode_level) : qpdf_dl_none),
+                !filter ? 0
+                        : ((normalize ? qpdf_ef_normalize : 0) |
+                           (compress_stream ? qpdf_ef_compress : 0)),
+                !filter ? qpdf_dl_none : (uncompress ? qpdf_dl_all : m->stream_decode_level),
                 false,
-                (attempt == 1));
+                first_attempt);
+            if (filter && !filtered) {
+                // Try again
+                filter = false;
+                stream.setFilterOnWrite(false);
+            } else {
+                break;
+            }
         } catch (std::runtime_error& e) {
+            if (filter && first_attempt) {
+                stream.warnIfPossible("error while getting stream data: "s + e.what());
+                stream.warnIfPossible("qpdf will attempt to write the damaged stream unchanged");
+                filter = false;
+                stream.setFilterOnWrite(false);
+                continue;
+            }
             throw std::runtime_error(
                 "error while getting stream data for " + stream.unparse() + ": " + e.what());
-        }
-        if (filter && !filtered) {
-            // Try again
-            filter = false;
-            stream.setFilterOnWrite(false);
-        } else {
-            break;
         }
     }
     if (!filtered) {
@@ -1866,7 +1876,7 @@ QPDFWriter::generateID()
         if (m->deterministic_id) {
             if (m->deterministic_id_data.empty()) {
                 QTC::TC("qpdf", "QPDFWriter deterministic with no data");
-                throw std::logic_error("INTERNAL ERROR: QPDFWriter::generateID has no data for "
+                throw std::runtime_error("INTERNAL ERROR: QPDFWriter::generateID has no data for "
                                        "deterministic ID.  This may happen if deterministic ID and "
                                        "file encryption are requested together.");
             }
@@ -2116,7 +2126,7 @@ QPDFWriter::doWriteSetup()
     if (m->encrypted) {
         // Encryption has been explicitly set
         m->preserve_encryption = false;
-    } else if (m->normalize_content || m->stream_decode_level || m->pclm || m->qdf_mode) {
+    } else if (m->normalize_content || !m->compress_streams || m->pclm || m->qdf_mode) {
         // Encryption makes looking at contents pretty useless.  If the user explicitly encrypted
         // though, we still obey that.
         m->preserve_encryption = false;

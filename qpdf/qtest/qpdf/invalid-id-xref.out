@@ -15,4 +15,6 @@ modify annotations: allowed
 modify other: not allowed
 modify anything: not allowed
 File is not linearized
+WARNING: invalid-id-xref.pdf, trailer at offset 910 -> dictionary key /ID: operation for array attempted on object of type null: returning null
+WARNING: invalid-id-xref.pdf, trailer at offset 910 -> dictionary key /ID -> null returned from invalid array access: operation for string attempted on object of type null: returning empty string
 qpdf: operation succeeded with warnings
