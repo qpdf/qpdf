@@ -58,6 +58,7 @@ Pl_ASCII85Decoder::write(unsigned char const* buf, size_t len)
 
             default:
                 if ((buf[i] < 33) || (buf[i] > 117)) {
+                    error = true;
                     throw std::runtime_error("character out of range during base 85 decode");
                 } else {
                     this->inbuf[this->pos++] = buf[i];
@@ -103,6 +104,9 @@ Pl_ASCII85Decoder::flush()
 void
 Pl_ASCII85Decoder::finish()
 {
+    if (error) {
+        return;
+    }
     flush();
     next()->finish();
 }
