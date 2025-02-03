@@ -7,3 +7,4 @@ appimage/build
 .cache
 /html
 Doxyfile
+/examples/qpdf-js/lib/
