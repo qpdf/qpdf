@@ -1,5 +1,8 @@
 2025-02-02  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add support for the zopfli compression library. See manual for
+	details. Fixes #1323.
+
 	* Have fix-qdf accept a second argument, interpreted as the output
 	file. Fixes #1330.
 

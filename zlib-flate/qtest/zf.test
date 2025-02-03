@@ -21,6 +21,9 @@ for (my $i = 0; $i < 100; $i++)
 }
 close(F);
 
+my $dev_null = File::Spec->devnull();
+my $n_tests = 9;
+
 foreach my $level ('', '=1', '=9')
 {
     my $f = $level;
@@ -35,11 +38,18 @@ foreach my $level ('', '=1', '=9')
                  {$td->FILE => "a.uncompressed", $td->EXIT_STATUS => 0});
 }
 
+chomp(my $zopfli = `zlib-flate --_zopfli`);
 my $size1 = (stat("a.=1"))[7];
 my $size9 = (stat("a.=9"))[7];
-$td->runtest("higher compression is smaller",
-             {$td->STRING => ($size9 < $size1 ? "YES\n" : "$size9 $size1\n")},
-             {$td->STRING => "YES\n"});
+if ($zopfli =~ m/1$/) {
+    $td->runtest("compression level is ignored with zopfli",
+                 {$td->STRING => ($size9 == $size1 ? "YES\n" : "$size9 $size1\n")},
+                 {$td->STRING => "YES\n"});
+} else {
+    $td->runtest("higher compression is smaller",
+                 {$td->STRING => ($size9 < $size1 ? "YES\n" : "$size9 $size1\n")},
+                 {$td->STRING => "YES\n"});
+}
 
 $td->runtest("error",
              {$td->COMMAND => "zlib-flate -uncompress < 1.uncompressed"},
@@ -54,7 +64,40 @@ $td->runtest("corrupted input",
                   $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 
-$td->report(9);
+# Exercise different values of the QPDF_ZOPFLI variable
+if ($zopfli =~ m/^0/) {
+    $n_tests += 4;
+    $td->runtest("disabled",
+                 {$td->COMMAND => "QPDF_ZOPFLI=disabled zlib-flate --_zopfli"},
+                 {$td->STRING => "00\n", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("force",
+                 {$td->COMMAND => "QPDF_ZOPFLI=force zlib-flate -compress < a.uncompressed"},
+                 {$td->REGEXP => "QPDF_ZOPFLI=force, and zopfli support is not enabled",
+                      $td->EXIT_STATUS => 2},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("silent",
+                 {$td->COMMAND => "QPDF_ZOPFLI=silent zlib-flate -compress < a.uncompressed > $dev_null"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("other",
+                 {$td->COMMAND => "QPDF_ZOPFLI=other zlib-flate -compress < a.uncompressed > $dev_null"},
+                 {$td->REGEXP => "QPDF_ZOPFLI is set, but libqpdf was not built with zopfli support",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+} else {
+    $n_tests += 2;
+    $td->runtest("disabled",
+                 {$td->COMMAND => "QPDF_ZOPFLI=disabled zlib-flate --_zopfli"},
+                 {$td->STRING => "10\n", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("force",
+                 {$td->COMMAND => "QPDF_ZOPFLI=force zlib-flate --_zopfli"},
+                 {$td->STRING => "11\n", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+$td->report($n_tests);
 
 cleanup();
 

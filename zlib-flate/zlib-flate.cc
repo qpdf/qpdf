@@ -6,7 +6,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <fcntl.h>
 #include <iostream>
 
 static char const* whoami = nullptr;
@@ -50,21 +49,29 @@ main(int argc, char* argv[])
         action = Pl_Flate::a_deflate;
         int level = QUtil::string_to_int(argv[1] + 10);
         Pl_Flate::setCompressionLevel(level);
+    } else if (strcmp(argv[1], "--_zopfli") == 0) {
+        // Undocumented option, but that doesn't mean someone doesn't use it...
+        // This is primarily here to support the test suite.
+        std::cout << (Pl_Flate::zopfli_supported() ? "1" : "0")
+                  << (Pl_Flate::zopfli_enabled() ? "1" : "0") << std::endl;
+        return 0;
     } else {
         usage();
     }
 
-    QUtil::binary_stdout();
-    QUtil::binary_stdin();
-    auto out = std::make_shared<Pl_StdioFile>("stdout", stdout);
-    auto flate = std::make_shared<Pl_Flate>("flate", out.get(), action);
     bool warn = false;
-    flate->setWarnCallback([&warn](char const* msg, int code) {
-        warn = true;
-        std::cerr << whoami << ": WARNING: zlib code " << code << ", msg = " << msg << std::endl;
-    });
-
     try {
+        QUtil::binary_stdout();
+        QUtil::binary_stdin();
+        Pl_Flate::zopfli_check_env();
+        auto out = std::make_shared<Pl_StdioFile>("stdout", stdout);
+        auto flate = std::make_shared<Pl_Flate>("flate", out.get(), action);
+        flate->setWarnCallback([&warn](char const* msg, int code) {
+            warn = true;
+            std::cerr << whoami << ": WARNING: zlib code " << code << ", msg = " << msg
+                      << std::endl;
+        });
+
         unsigned char buf[10000];
         bool done = false;
         while (!done) {

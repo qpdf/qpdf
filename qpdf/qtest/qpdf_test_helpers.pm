@@ -1,6 +1,6 @@
 use File::Spec;
 
-my $devNull = File::Spec->devnull();
+my $dev_null = File::Spec->devnull();
 
 my $compare_images = 0;
 if ((exists $ENV{'QPDF_TEST_COMPARE_IMAGES'}) &&
@@ -95,7 +95,7 @@ sub compare_pdfs
         $td->runtest("convert original file to image",
                      {$td->COMMAND =>
                           "(cd tif1;" .
-                          " gs 2>$devNull $x_gs_args" .
+                          " gs 2>$dev_null $x_gs_args" .
                           " -q -dNOPAUSE -sDEVICE=tiff24nc" .
                           " -sOutputFile=a.tif - < ../$f1)"},
                      {$td->STRING => "",
@@ -115,7 +115,7 @@ sub compare_pdfs
         $td->runtest("convert new file to image",
                      {$td->COMMAND =>
                           "(cd tif2;" .
-                          " gs 2>$devNull $x_gs_args" .
+                          " gs 2>$dev_null $x_gs_args" .
                           " -q -dNOPAUSE -sDEVICE=tiff24nc" .
                           " -sOutputFile=a.tif - < ../$f2)"},
                      {$td->STRING => "",

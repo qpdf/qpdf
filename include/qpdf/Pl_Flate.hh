@@ -24,8 +24,10 @@
 #define PL_FLATE_HH
 
 #include <qpdf/Pipeline.hh>
+#include <qpdf/QPDFLogger.hh>
 #include <functional>
 #include <memory>
+#include <string>
 
 class QPDF_DLL_CLASS Pl_Flate: public Pipeline
 {
@@ -65,6 +67,23 @@ class QPDF_DLL_CLASS Pl_Flate: public Pipeline
     QPDF_DLL
     void setWarnCallback(std::function<void(char const*, int)> callback);
 
+    // Returns true if qpdf was built with zopfli support.
+    QPDF_DLL
+    static bool zopfli_supported();
+
+    // Returns true if zopfli is enabled. Zopfli is enabled if QPDF_ZOPFLI is set to a value other
+    // than "disabled" and zopfli support is compiled in.
+    QPDF_DLL
+    static bool zopfli_enabled();
+
+    // If zopfli is supported, returns true. Otherwise, check the QPDF_ZOPFLI
+    // environment variable as follows:
+    // - "disabled" or "silent": return true
+    // - "force": qpdf_exit_error, throw an exception
+    // - Any other value: issue a warning, and return false
+    QPDF_DLL
+    static bool zopfli_check_env(QPDFLogger* logger = nullptr);
+
   private:
     QPDF_DLL_PRIVATE
     void handleData(unsigned char const* data, size_t len, int flush);
@@ -72,6 +91,8 @@ class QPDF_DLL_CLASS Pl_Flate: public Pipeline
     void checkError(char const* prefix, int error_code);
     QPDF_DLL_PRIVATE
     void warn(char const*, int error_code);
+    QPDF_DLL_PRIVATE
+    void finish_zopfli();
 
     QPDF_DLL_PRIVATE
     static int compression_level;
@@ -95,6 +116,7 @@ class QPDF_DLL_CLASS Pl_Flate: public Pipeline
         void* zdata;
         unsigned long long written{0};
         std::function<void(char const*, int)> callback;
+        std::unique_ptr<std::string> zopfli_buf;
     };
 
     std::shared_ptr<Members> m;

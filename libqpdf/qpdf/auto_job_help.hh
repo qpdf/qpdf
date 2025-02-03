@@ -73,6 +73,11 @@ default provider is shown first.
 ap.addOptionHelp("--job-json-help", "help", "show format of job JSON", R"(Describe the format of the QPDFJob JSON input used by
 --job-json-file.
 )");
+ap.addOptionHelp("--zopfli", "help", "indicate whether zopfli is enabled and active", R"(If zopfli support is compiled in, indicate whether it is active,
+and exit normally. Otherwise, indicate that it is not compiled
+in, and exit with an error code. If zopfli is compiled in,
+activate it by setting the ``QPDF_ZOPFLI`` environment variable.
+)");
 ap.addHelpTopic("general", "general options", R"(General options control qpdf's behavior in ways that are not
 directly related to the operation it is performing.
 )");
@@ -86,13 +91,13 @@ ap.addOptionHelp("--password-file", "general", "read password from a file", R"(-
 The first line of the specified file is used as the password.
 This is used in place of the --password option.
 )");
+}
+static void add_help_2(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--verbose", "general", "print additional information", R"(Output additional information about various things qpdf is
 doing, including information about files created and operations
 performed.
 )");
-}
-static void add_help_2(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--progress", "general", "show progress when writing", R"(Indicate progress when writing files.
 )");
 ap.addOptionHelp("--no-warn", "general", "suppress printing of warning messages", R"(Suppress printing of warning messages. If warnings were
@@ -168,14 +173,14 @@ Copy encryption details from the specified file instead of
 preserving the input file's encryption. Use --encryption-file-password
 to specify the encryption file's password.
 )");
+}
+static void add_help_3(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--encryption-file-password", "transformation", "supply password for --copy-encryption", R"(--encryption-file-password=password
 
 If the file named in --copy-encryption requires a password, use
 this option to supply the password.
 )");
-}
-static void add_help_3(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--qdf", "transformation", "enable viewing PDF code in a text editor", R"(Create a PDF file suitable for viewing in a text editor and even
 editing. This is for editing the PDF code, not the page contents.
 All streams that can be uncompressed are uncompressed, and
@@ -285,6 +290,9 @@ Force the output PDF file's PDF version header to be the specified
 value, even if the file uses features that may not be available
 in that version.
 )");
+}
+static void add_help_4(QPDFArgParser& ap)
+{
 ap.addHelpTopic("page-ranges", "page range syntax", R"(A full description of the page range syntax, with examples, can be
 found in the manual. In summary, a range is a comma-separated list
 of groups. A group is a number or a range of numbers separated by a
@@ -305,9 +313,6 @@ resulting set of pages, where :odd starts with the first page and
 :even starts with the second page. These are odd and even pages
 from the resulting set, not based on the original page numbers.
 )");
-}
-static void add_help_4(QPDFArgParser& ap)
-{
 ap.addHelpTopic("modification", "change parts of the PDF", R"(Modification options make systematic changes to certain parts of
 the PDF, causing the PDF to render differently from the original.
 )");
@@ -416,11 +421,11 @@ ap.addOptionHelp("--keep-inline-images", "modification", "exclude inline images 
 )");
 ap.addOptionHelp("--remove-info", "modification", "remove file information", R"(Exclude file information (except modification date) from the output file.
 )");
-ap.addOptionHelp("--remove-metadata", "modification", "remove metadata", R"(Exclude metadata from the output file.
-)");
 }
 static void add_help_5(QPDFArgParser& ap)
 {
+ap.addOptionHelp("--remove-metadata", "modification", "remove metadata", R"(Exclude metadata from the output file.
+)");
 ap.addOptionHelp("--remove-page-labels", "modification", "remove explicit page numbers", R"(Exclude page labels (explicit page numbers) from the output file.
 )");
 ap.addOptionHelp("--set-page-labels", "modification", "number pages for the entire document", R"(--set-page-labels label-spec ... --
@@ -641,13 +646,13 @@ non-empty user passwords when using 256-bit encryption.
 ap.addOptionHelp("--force-V4", "encryption", "force V=4 in encryption dictionary", R"(This option is for testing and is never needed in practice since
 qpdf does this automatically when needed.
 )");
+}
+static void add_help_6(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--force-R5", "encryption", "use unsupported R=5 encryption", R"(Use an undocumented, unsupported, deprecated encryption
 algorithm that existed only in Acrobat version IX. This option
 should not be used except for compatibility testing.
 )");
-}
-static void add_help_6(QPDFArgParser& ap)
-{
 ap.addHelpTopic("page-selection", "select pages from one or more files", R"(Use the --pages option to select pages from multiple files. Usage:
 
 qpdf in.pdf --pages --file=input-file \
@@ -827,15 +832,15 @@ ap.addOptionHelp("--replace", "add-attachment", "replace attachment with same ke
 be replaced by the new attachment. Otherwise, qpdf gives an
 error if an attachment with that key is already present.
 )");
+}
+static void add_help_7(QPDFArgParser& ap)
+{
 ap.addHelpTopic("copy-attachments", "copy attachments from another file", R"(The options listed below appear between --copy-attachments-from and
 its terminating "--".
 
 To copy attachments from a password-protected file, use
 the --password option after the file name.
 )");
-}
-static void add_help_7(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--prefix", "copy-attachments", "key prefix for copying attachments", R"(--prefix=prefix
 
 Prepend a prefix to each key; may be needed if there are
@@ -920,12 +925,12 @@ ap.addOptionHelp("--show-attachment", "inspection", "export an embedded file", R
 Write the contents of the specified attachment to standard
 output as binary data. Get the key with --list-attachments.
 )");
-ap.addHelpTopic("json", "JSON output for PDF information", R"(Show information about the PDF file in JSON format. Please see the
-JSON chapter in the qpdf manual for details.
-)");
 }
 static void add_help_8(QPDFArgParser& ap)
 {
+ap.addHelpTopic("json", "JSON output for PDF information", R"(Show information about the PDF file in JSON format. Please see the
+JSON chapter in the qpdf manual for details.
+)");
 ap.addOptionHelp("--json", "json", "show file in JSON format", R"(--json[=version]
 
 Generate a JSON representation of the file. This is described in

@@ -51,8 +51,9 @@ $td->runtest("indirect filters",
 foreach my $i (0, 1)
 {
     $td->runtest("check output",
-                 {$td->FILE => "auto-$i.pdf"},
-                 {$td->FILE => "indirect-filter-out-$i.pdf"});
+                 {$td->COMMAND =>
+                      "qpdf-test-compare auto-$i.pdf indirect-filter-out-$i.pdf"},
+                 {$td->FILE => "indirect-filter-out-$i.pdf", $td->EXIT_STATUS => 0});
 }
 $td->runtest("issue 449",
              {$td->COMMAND => "test_driver 69 issue-449.pdf"},

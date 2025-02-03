@@ -44,6 +44,15 @@ particularly useful to packagers.
   11, this was a recommendation for packagers but was not done
   automatically.
 
+- Starting with qpdf 11.10, qpdf can be built with zopfli support (see
+  :ref:`build-zopfli`). It is recommended not to build qpdf with zopfli
+  for distributions since it adds zopfli as a dependency, and this
+  library is less widely used that qpdf's other dependencies. Users
+  who want that probably know they want it, and they can compile from
+  source. Note that, per zopfli's own documentation, zopfli is about
+  100 times slower than zlib and produces compression output about 5%
+  smaller.
+
 .. _package-tests:
 
 Package Tests

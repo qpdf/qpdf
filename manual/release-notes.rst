@@ -46,6 +46,11 @@ Planned changes for future 12.x (subject to change):
       environments in which writing a binary file to standard output
       doesn't work (such as PowerShell 5).
 
+  - Library Enhancements
+
+    - qpdf can now be built with zopfli support. For details, see
+      :ref:`zopfli`.
+
 11.9.1: June 7, 2024
   - Bug Fixes
 

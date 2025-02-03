@@ -6,6 +6,11 @@
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/qpdf-config.h>
+
+#ifdef ZOPFLI
+# include <zopfli/zopfli.h>
+#endif
 
 namespace
 {
@@ -39,6 +44,10 @@ Pl_Flate::Members::Members(size_t out_bufsize, action_e action) :
     zstream.avail_in = 0;
     zstream.next_out = this->outbuf.get();
     zstream.avail_out = QIntC::to_uint(out_bufsize);
+
+    if (action == a_deflate && Pl_Flate::zopfli_enabled()) {
+        zopfli_buf = std::make_unique<std::string>();
+    }
 }
 
 Pl_Flate::Members::~Members()
@@ -59,7 +68,7 @@ Pl_Flate::Members::~Members()
 Pl_Flate::Pl_Flate(
     char const* identifier, Pipeline* next, action_e action, unsigned int out_bufsize_int) :
     Pipeline(identifier, next),
-    m(new Members(QIntC::to_size(out_bufsize_int), action))
+    m(std::shared_ptr<Members>(new Members(QIntC::to_size(out_bufsize_int), action)))
 {
     if (!next) {
         throw std::logic_error("Attempt to create Pl_Flate with nullptr as next");
@@ -97,6 +106,10 @@ Pl_Flate::write(unsigned char const* data, size_t len)
     if (m->outbuf == nullptr) {
         throw std::logic_error(
             this->identifier + ": Pl_Flate: write() called after finish() called");
+    }
+    if (m->zopfli_buf) {
+        m->zopfli_buf->append(reinterpret_cast<char const*>(data), len);
+        return;
     }
 
     // Write in chunks in case len is too big to fit in an int. Assume int is at least 32 bits.
@@ -211,7 +224,9 @@ Pl_Flate::finish()
         throw std::runtime_error("PL_Flate memory limit exceeded");
     }
     try {
-        if (m->outbuf.get()) {
+        if (m->zopfli_buf) {
+            finish_zopfli();
+        } else if (m->outbuf.get()) {
             if (m->initialized) {
                 z_stream& zstream = *(static_cast<z_stream*>(m->zdata));
                 unsigned char buf[1];
@@ -290,4 +305,77 @@ Pl_Flate::checkError(char const* prefix, int error_code)
 
         throw std::runtime_error(msg);
     }
+}
+
+void
+Pl_Flate::finish_zopfli()
+{
+#ifdef ZOPFLI
+    if (!m->zopfli_buf) {
+        return;
+    }
+    auto buf = std::move(*m->zopfli_buf.release());
+    ZopfliOptions z_opt;
+    ZopfliInitOptions(&z_opt);
+    unsigned char* out{nullptr};
+    size_t out_size{0};
+    ZopfliCompress(
+        &z_opt,
+        ZOPFLI_FORMAT_ZLIB,
+        reinterpret_cast<unsigned char const*>(buf.c_str()),
+        buf.size(),
+        &out,
+        &out_size);
+    std::unique_ptr<unsigned char, decltype(&free)> p(out, &free);
+    next()->write(out, out_size);
+    // next()->finish is called by finish()
+#endif
+}
+
+bool
+Pl_Flate::zopfli_supported()
+{
+#ifdef ZOPFLI
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool
+Pl_Flate::zopfli_enabled()
+{
+    if (zopfli_supported()) {
+        std::string value;
+        static bool enabled = QUtil::get_env("QPDF_ZOPFLI", &value) && value != "disabled";
+        return enabled;
+    } else {
+        return false;
+    }
+}
+
+bool
+Pl_Flate::zopfli_check_env(QPDFLogger* logger)
+{
+    if (Pl_Flate::zopfli_supported()) {
+        return true;
+    }
+    std::string value;
+    auto is_set = QUtil::get_env("QPDF_ZOPFLI", &value);
+    if (!is_set || value == "disabled" || value == "silent") {
+        return true;
+    }
+    if (!logger) {
+        logger = QPDFLogger::defaultLogger().get();
+    }
+
+    // This behavior is known in QPDFJob (for the --zopfli argument), Pl_Flate.hh, README.md,
+    // and the manual. Do a case-insensitive search for zopfli if changing the behavior.
+    if (value == "force") {
+        throw std::runtime_error("QPDF_ZOPFLI=force, and zopfli support is not enabled");
+    }
+    logger->warn("QPDF_ZOPFLI is set, but libqpdf was not built with zopfli support\n");
+    logger->warn(
+        "Set QPDF_ZOPFLI=silent to suppress this warning and use zopfli when available.\n");
+    return false;
 }

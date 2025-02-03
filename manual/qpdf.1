@@ -115,6 +115,12 @@ default provider is shown first.
 .B --job-json-help \-\- show format of job JSON
 Describe the format of the QPDFJob JSON input used by
 --job-json-file.
+.TP
+.B --zopfli \-\- indicate whether zopfli is enabled and active
+If zopfli support is compiled in, indicate whether it is active,
+and exit normally. Otherwise, indicate that it is not compiled
+in, and exit with an error code. If zopfli is compiled in,
+activate it by setting the ``QPDF_ZOPFLI`` environment variable.
 .SH GENERAL (general options)
 General options control qpdf's behavior in ways that are not
 directly related to the operation it is performing.
