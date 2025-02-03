@@ -1522,10 +1522,10 @@ Related Options
 
    .. help: begin overlay options
 
-      Overlay pages from another file on the output.
+      Overlay pages from another PDF file on the output.
       Run qpdf --help=overlay-underlay for details.
 
-   Overlay pages from another file on the output.
+   Overlay pages from another PDF file on the output.
 
    See :ref:`overlay-underlay` for details.
 
@@ -1533,10 +1533,10 @@ Related Options
 
    .. help: begin underlay options
 
-      Underlay pages from another file on the output.
+      Underlay pages from another PDF file on the output.
       Run qpdf --help=overlay-underlay for details.
 
-   Underlay pages from another file on the output.
+   Underlay pages from another PDF file on the output.
 
    See :ref:`overlay-underlay` for details.
 
@@ -2822,9 +2822,9 @@ else the page references.
 Overlay and Underlay
 --------------------
 
-.. help-topic overlay-underlay: overlay/underlay pages from other files
+.. help-topic overlay-underlay: overlay/underlay pages from other PDF files
 
-   These options allow pages from another file to be overlaid or
+   These options allow pages from another PDF file to be overlaid or
    underlaid on the primary output. Overlaid pages are drawn on top of
    the destination page and may obscure the page. Underlaid pages are
    drawn below the destination page. Usage:

@@ -463,13 +463,13 @@ for multi-page groups.
 .B --overlay \-\- begin overlay options
 --overlay file [options] --
 
-Overlay pages from another file on the output.
+Overlay pages from another PDF file on the output.
 Run qpdf --help=overlay-underlay for details.
 .TP
 .B --underlay \-\- begin underlay options
 --underlay file [options] --
 
-Underlay pages from another file on the output.
+Underlay pages from another PDF file on the output.
 Run qpdf --help=overlay-underlay for details.
 .TP
 .B --flatten-rotation \-\- remove rotation from page dictionary
@@ -843,8 +843,8 @@ to out.pdf. Use password "x" to open b.pdf:
   qpdf --empty --pages a.pdf b.pdf --password=x z-1 c.pdf 3,6
 
 More examples are in the manual.
-.SH OVERLAY-UNDERLAY (overlay/underlay pages from other files)
-These options allow pages from another file to be overlaid or
+.SH OVERLAY-UNDERLAY (overlay/underlay pages from other PDF files)
+These options allow pages from another PDF file to be overlaid or
 underlaid on the primary output. Overlaid pages are drawn on top of
 the destination page and may obscure the page. Underlaid pages are
 drawn below the destination page. Usage:

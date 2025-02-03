@@ -357,12 +357,12 @@ for multi-page groups.
 )");
 ap.addOptionHelp("--overlay", "modification", "begin overlay options", R"(--overlay file [options] --
 
-Overlay pages from another file on the output.
+Overlay pages from another PDF file on the output.
 Run qpdf --help=overlay-underlay for details.
 )");
 ap.addOptionHelp("--underlay", "modification", "begin underlay options", R"(--underlay file [options] --
 
-Underlay pages from another file on the output.
+Underlay pages from another PDF file on the output.
 Run qpdf --help=overlay-underlay for details.
 )");
 ap.addOptionHelp("--flatten-rotation", "modification", "remove rotation from page dictionary", R"(For each page that is rotated using the /Rotate key in the
@@ -706,7 +706,7 @@ Examples:
 
 More examples are in the manual.
 )");
-ap.addHelpTopic("overlay-underlay", "overlay/underlay pages from other files", R"(These options allow pages from another file to be overlaid or
+ap.addHelpTopic("overlay-underlay", "overlay/underlay pages from other PDF files", R"(These options allow pages from another PDF file to be overlaid or
 underlaid on the primary output. Overlaid pages are drawn on top of
 the destination page and may obscure the page. Underlaid pages are
 drawn below the destination page. Usage:
