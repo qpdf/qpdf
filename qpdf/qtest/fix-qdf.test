@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('fix-qdf');
 
-my $n_tests = 5;
+my $n_tests = 11;
 
 for (my $n = 1; $n <= 2; ++$n)
 {
@@ -22,6 +22,15 @@ for (my $n = 1; $n <= 2; ++$n)
                  {$td->COMMAND => "fix-qdf fix$n.qdf"},
                  {$td->FILE => "fix$n.qdf.out",
                   $td->EXIT_STATUS => 0});
+
+    $td->runtest("fix-qdf $n with named output",
+                 {$td->COMMAND => "fix-qdf fix$n.qdf a.pdf"},
+                 {$td->STRING => "",
+                  $td->EXIT_STATUS => 0});
+
+    $td->runtest("check fix-qdf $n output",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "fix$n.qdf.out"});
 
     $td->runtest("identity fix-qdf $n",
                  {$td->COMMAND => "fix-qdf fix$n.qdf.out"},
@@ -53,6 +62,16 @@ $td->runtest("fix-qdf with big object stream", # > 255 objects in a stream
              {$td->COMMAND => "fix-qdf big-ostream.pdf"},
              {$td->FILE => "big-ostream.pdf",
               $td->EXIT_STATUS => 0});
+
+$td->runtest("fix-qdf error opening input",
+             {$td->COMMAND => "fix-qdf /does/not/exist/potato.pdf"},
+             {$td->REGEXP => "^fix-qdf: error: open .*/does/not/exist/potato.pdf: .*",
+              $td->EXIT_STATUS => 2});
+
+$td->runtest("fix-qdf error opening output", # > 255 objects in a stream
+             {$td->COMMAND => "fix-qdf fix1.qdf /does/not/exist/salad.pdf"},
+             {$td->REGEXP => "^fix-qdf: error: open .*/does/not/exist/salad.pdf: .*",
+              $td->EXIT_STATUS => 2});
 
 cleanup();
 $td->report($n_tests);

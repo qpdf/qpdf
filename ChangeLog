@@ -1,3 +1,8 @@
+2025-02-02  Jay Berkenbilt  <ejb@ql.org>
+
+	* Have fix-qdf accept a second argument, interpreted as the output
+	file. Fixes #1330.
+
 2024-02-01  M Holger  <m.holger@qpdf.org>
 
 	* Bug fix: in qpdf CLI / QPDFJob throw a QPDFUsage exception if a

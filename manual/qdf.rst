@@ -23,10 +23,18 @@ files are full of offset and length information that makes it hard to
 add or remove data. A QDF file is organized in a manner such that, if
 edits are kept within certain constraints, the
 :command:`fix-qdf` program, distributed with qpdf, is
-able to restore edited files to a correct state. The
-:command:`fix-qdf` program takes no command-line
-arguments. It reads a possibly edited QDF file from standard input and
-writes a repaired file to standard output.
+able to restore edited files to a correct state.
+
+.. code-block:: bash
+
+  fix-qdf [infilename [outfilename]]
+
+With no arguments, :command:`fix-qdf` reads the possibly-edited QDF
+file from standard input and writes a repaired file to standard
+output. You can also specify the input and output files as
+command-line arguments. With one argument, the argument is taken as an
+input file. With two arguments, the first argument is an input file,
+and the second is an output file.
 
 For another way to work with PDF files in an editor, see :ref:`json`.
 Using qpdf JSON format allows you to edit the PDF file semantically
