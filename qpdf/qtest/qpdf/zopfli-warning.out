@@ -1,0 +1,3 @@
+QPDF_ZOPFLI is set, but libqpdf was not built with zopfli support
+Set QPDF_ZOPFLI=silent to suppress this warning and use zopfli when available.
+qpdf: operation succeeded with warnings; resulting file may have some problems

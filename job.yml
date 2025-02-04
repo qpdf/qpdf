@@ -81,6 +81,7 @@ options:
       - copyright
       - show-crypto
       - job-json-help
+      - zopfli
     optional_choices:
       json-help: json_version
   - table: main

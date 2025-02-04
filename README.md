@@ -66,6 +66,16 @@ below.
 
 Detailed information appears in the [manual](https://qpdf.readthedocs.io/en/latest/installation.html).
 
+## Zopfli
+
+If qpdf is built with [zopfli](https://github.com/google/zopfli) support and the `QPDF_ZOPFLI` environment variable is set to any value other than `disabled`, qpdf will use the zopfli compression library instead of zlib to generate flate-compressed streams. The zopfli algorithm is much slower (about 100x according to their website) than zlib but produces slightly smaller output, making it suitable for cases such as generation of archival PDFs where size is important regardless of speed. To build with zopfli support, you must have the zopfli library and header file installed.
+
+The environment variable `QPDF_ZOPFLI` can be set to the following values:
+* `disabled` (or unset): do not use zopfli
+* `force`: use zopfli; fail if zopfli is not compiled in
+* `silent`: use zopfli if available; otherwise silently fall back to zlib
+* any other value: use zopfli if available, and warn if not
+
 # Licensing terms of embedded software
 
 qpdf makes use of zlib and jpeg libraries for its functionality. These packages can be downloaded separately from their

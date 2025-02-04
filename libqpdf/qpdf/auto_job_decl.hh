@@ -19,6 +19,7 @@ void argVersion();
 void argCopyright();
 void argShowCrypto();
 void argJobJsonHelp();
+void argZopfli();
 void argJsonHelp(std::string const&);
 void argPositional(std::string const&);
 void argAddAttachment();

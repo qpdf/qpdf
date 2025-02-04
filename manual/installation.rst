@@ -30,6 +30,9 @@ Basic Dependencies
   <https://openssl.org/>`__ to be able to use the openssl crypto
   provider
 
+- If the ``ZOPFLI`` build option is specified (off by default), the
+  `zopfli <https://github.com/google/zopfli>`__ library.
+
 The qpdf source tree includes a few automatically generated files. The
 code generator uses Python 3. Automatic code generation is off by
 default. For a discussion, refer to :ref:`build-options`.
@@ -290,6 +293,10 @@ FUTURE
 QTEST_COLOR
   Turn this on or off to control whether qtest uses color in its
   output.
+
+ZOPFLI
+  Use the `zopfli <https://github.com/google/zopfli>`__ library for
+  zlib-compatible compression. See :ref:`zopfli`.
 
 Options for Working on qpdf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -647,6 +654,16 @@ provide their own implementations for basic filters like
 Implementing the registration functions and internal storage of
 registered providers was also easier using C++-11's functional
 interfaces, which was another reason to require C++-11 at this time.
+
+.. _build-zopfli:
+
+Building with zopfli support
+----------------------------
+
+If you compile with ``-DZOPFLI-ON`` and have the `zopfli
+<https://github.com/google/zopfli>`__ development files available,
+qpdf will be built with zopfli support. See :ref:`zopfli` for
+information about using zopfli with qpdf.
 
 .. _autoconf-to-cmake:
 

@@ -32,6 +32,7 @@ this->ap.addBare("version", b(&ArgParser::argVersion));
 this->ap.addBare("copyright", b(&ArgParser::argCopyright));
 this->ap.addBare("show-crypto", b(&ArgParser::argShowCrypto));
 this->ap.addBare("job-json-help", b(&ArgParser::argJobJsonHelp));
+this->ap.addBare("zopfli", b(&ArgParser::argZopfli));
 this->ap.addChoices("json-help", p(&ArgParser::argJsonHelp), false, json_version_choices);
 this->ap.selectMainOptionTable();
 this->ap.addPositional(p(&ArgParser::argPositional));

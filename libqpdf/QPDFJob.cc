@@ -498,6 +498,11 @@ QPDFJob::createQPDF()
 void
 QPDFJob::writeQPDF(QPDF& pdf)
 {
+    if (createsOutput()) {
+        if (!Pl_Flate::zopfli_check_env(pdf.getLogger().get())) {
+            m->warnings = true;
+        }
+    }
     if (!createsOutput()) {
         doInspection(pdf);
     } else if (m->split_pages) {

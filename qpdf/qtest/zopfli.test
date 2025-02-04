@@ -1,0 +1,85 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $dev_null = File::Spec->devnull();
+cleanup();
+
+my $td = new TestDriver('zopfli');
+
+my $n_tests = 0;
+
+my $zopfli_enabled = (system("qpdf --zopfli >$dev_null 2>&1") == 0);
+
+if (! $zopfli_enabled) {
+    # Variables are not checked
+    $n_tests = 8;
+    $td->runtest("zopfli not enabled",
+                 {$td->COMMAND => "QPDF_ZOPFLI=force qpdf --zopfli"},
+                 {$td->STRING => "zopfli support is not enabled\n",
+                      $td->EXIT_STATUS => 2},
+                 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("zopfli disabled",
+                 {$td->COMMAND => "QPDF_ZOPFLI=disabled qpdf minimal.pdf a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output",
+                 {$td->COMMAND => "qpdf-test-compare a.pdf minimal-out.pdf"},
+                 {$td->FILE => "minimal-out.pdf", $td->EXIT_STATUS => 0});
+    $td->runtest("zopfli silent",
+                 {$td->COMMAND => "QPDF_ZOPFLI=silent qpdf minimal.pdf a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output",
+                 {$td->COMMAND => "qpdf-test-compare a.pdf minimal-out.pdf"},
+                 {$td->FILE => "minimal-out.pdf", $td->EXIT_STATUS => 0});
+
+    $td->runtest("zopfli warning",
+                 {$td->COMMAND => "QPDF_ZOPFLI=on qpdf minimal.pdf a.pdf"},
+                 {$td->FILE => "zopfli-warning.out", $td->EXIT_STATUS => 3},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output",
+                 {$td->COMMAND => "qpdf-test-compare a.pdf minimal-out.pdf"},
+                 {$td->FILE => "minimal-out.pdf", $td->EXIT_STATUS => 0});
+
+    $td->runtest("zopfli error",
+                 {$td->COMMAND => "QPDF_ZOPFLI=force qpdf minimal.pdf a.pdf"},
+                 {$td->REGEXP => "QPDF_ZOPFLI=force, and zopfli support is not enabled",
+                      $td->EXIT_STATUS => 2},
+                 $td->NORMALIZE_NEWLINES);
+
+} else {
+    # Check variables
+    $n_tests = 4;
+    $td->runtest("zopfli supported and enabled",
+                 {$td->COMMAND => "QPDF_ZOPFLI=on qpdf --zopfli"},
+                 {$td->STRING => "zopfli support is enabled, and zopfli is active\n",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("zopfli supported and disabled",
+                 {$td->COMMAND => "QPDF_ZOPFLI=disabled qpdf --zopfli"},
+                 {$td->REGEXP => "(?s)zopfli support is enabled but not active.*QPDF_ZOPFLI.*\n",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    # CI runs the whole test suite with QPDF_ZOPFLI=force, but run one
+    # for a guarantee.
+    $td->runtest("run with zopfli",
+                 {$td->COMMAND => "QPDF_ZOPFLI=force qpdf minimal.pdf a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output",
+                 {$td->COMMAND => "qpdf-test-compare a.pdf minimal-out.pdf"},
+                 {$td->FILE => "minimal-out.pdf", $td->EXIT_STATUS => 0});
+}
+
+cleanup();
+$td->report($n_tests);

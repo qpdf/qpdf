@@ -190,6 +190,18 @@ if(NOT EXTERNAL_LIBS)
   endif()
 endif()
 
+if(ZOPFLI)
+  find_path(ZOPFLI_H_PATH zopfli/zopfli.h)
+  find_library(ZOPFLI_LIB_PATH NAMES zopfli)
+  if(ZOPFLI_H_PATH AND ZOPFLI_LIB_PATH)
+    list(APPEND dep_include_directories ${ZOPFLI_H_PATH})
+    list(APPEND dep_link_libraries ${ZOPFLI_LIB_PATH})
+  else()
+    message(SEND_ERROR "zopfli not found")
+    set(ANYTHING_MISSING 1)
+  endif()
+endif()
+
 # Update JPEG_INCLUDE in PARENT_SCOPE after we have finished setting it.
 set(JPEG_INCLUDE ${JPEG_INCLUDE} PARENT_SCOPE)
 

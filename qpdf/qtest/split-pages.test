@@ -172,8 +172,8 @@ $td->runtest("merge for compare",
                   " split-out-shared-form*.pdf -- a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "shared-form-images-merged.pdf"});
+             {$td->COMMAND => "qpdf-test-compare a.pdf shared-form-images-merged.pdf"},
+             {$td->FILE => "shared-form-images-merged.pdf", $td->EXIT_STATUS => 0});
 compare_pdfs($td, "shared-form-images.pdf", "a.pdf");
 
 $td->runtest("shared form xobject subkey",

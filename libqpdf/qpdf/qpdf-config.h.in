@@ -6,6 +6,7 @@
 #cmakedefine USE_CRYPTO_OPENSSL 1
 #cmakedefine USE_INSECURE_RANDOM 1
 #cmakedefine SKIP_OS_SECURE_RANDOM 1
+#cmakedefine ZOPFLI 1
 
 /* large file support -- may be needed for 32-bit systems */
 #cmakedefine _FILE_OFFSET_BITS ${_FILE_OFFSET_BITS}

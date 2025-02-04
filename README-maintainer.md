@@ -67,6 +67,10 @@ Note that, in early 2024, branch coverage information is not very accurate with 
 
 Memory checks:
 
+Note: if clang++ fails to create output, it may be necessary to install a specific version of
+libstdc++-dev. For example, with clang++ version 20 on Ubuntu 24.04, `clang++ -v` indicates the
+selected GCC installation is 14, so it is necessary to install `libstdc++-14-dev`.
+
 ```
 CFLAGS="-fsanitize=address -fsanitize=undefined" \
    CXXFLAGS="-fsanitize=address -fsanitize=undefined" \
@@ -298,8 +302,8 @@ Building docs from pull requests is also enabled.
 ## ZLIB COMPATIBILITY
 
 The qpdf test suite is designed to be independent of the output of any
-particular version of zlib. There are several strategies to make this
-work:
+particular version of zlib. (See also `ZOPFLI` in README.md.) There
+are several strategies to make this work:
 
 * `build-scripts/test-alt-zlib` runs in CI and runs the test suite
   with a non-default zlib. Please refer to that code for an example of

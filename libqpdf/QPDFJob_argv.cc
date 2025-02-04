@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 
+#include <qpdf/Pl_Flate.hh>
 #include <qpdf/QPDFArgParser.hh>
 #include <qpdf/QPDFCryptoProvider.hh>
 #include <qpdf/QPDFLogger.hh>
@@ -102,6 +103,27 @@ ArgParser::argVersion()
     *QPDFLogger::defaultLogger()->getInfo()
         << whoami << " version " << QPDF::QPDFVersion() << "\n"
         << "Run " << whoami << " --copyright to see copyright and license information.\n";
+}
+
+void
+ArgParser::argZopfli()
+{
+    auto logger = QPDFLogger::defaultLogger();
+    if (Pl_Flate::zopfli_supported()) {
+        if (Pl_Flate::zopfli_enabled()) {
+            logger->info("zopfli support is enabled, and zopfli is active\n");
+        } else {
+            logger->info("zopfli support is enabled but not active\n");
+            logger->info("Set the environment variable QPDF_ZOPFLI to activate.\n");
+            logger->info("* QPDF_ZOPFLI=disabled or QPDF_ZOPFLI not set: don't use zopfli.\n");
+            logger->info("* QPDF_ZOPFLI=force: use zopfli, and fail if not available.\n");
+            logger->info("* QPDF_ZOPFLI=silent: use zopfli if available and silently fall back if not.\n");
+            logger->info("* QPDF_ZOPFLI= any other value: use zopfli if available, and warn if not.\n");
+        }
+    } else {
+        logger->error("zopfli support is not enabled\n");
+        std::exit(qpdf_exit_error);
+    }
 }
 
 void
