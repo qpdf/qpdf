@@ -1877,8 +1877,8 @@ QPDFWriter::generateID()
             if (m->deterministic_id_data.empty()) {
                 QTC::TC("qpdf", "QPDFWriter deterministic with no data");
                 throw std::runtime_error("INTERNAL ERROR: QPDFWriter::generateID has no data for "
-                                       "deterministic ID.  This may happen if deterministic ID and "
-                                       "file encryption are requested together.");
+                                         "deterministic ID.  This may happen if deterministic ID "
+                                         "and file encryption are requested together.");
             }
             seed += m->deterministic_id_data;
         } else {

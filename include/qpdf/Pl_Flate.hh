@@ -46,7 +46,7 @@ class QPDF_DLL_CLASS Pl_Flate: public Pipeline
     ~Pl_Flate() override;
 
     // Limit the memory used.
-    // NB This is a static option affecting all Pl_PNGFilter instances.
+    // NB This is a static option affecting all Pl_Flate instances.
     QPDF_DLL
     static void setMemoryLimit(unsigned long long limit);
 

@@ -4,6 +4,7 @@
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_PNGFilter.hh>
+#include <qpdf/Pl_RunLength.hh>
 #include <qpdf/Pl_TIFFPredictor.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
@@ -106,6 +107,7 @@ FuzzHelper::doChecks()
     Pl_DCT::setScanLimit(50);
 
     Pl_PNGFilter::setMemoryLimit(1'000'000);
+    Pl_RunLength::setMemoryLimit(1'000'000);
     Pl_TIFFPredictor::setMemoryLimit(1'000'000);
     Pl_Flate::setMemoryLimit(200'000);
 

@@ -3,6 +3,11 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
+namespace
+{
+    unsigned long long memory_limit{0};
+} // namespace
+
 Pl_RunLength::Members::Members(action_e action) :
     action(action)
 {
@@ -15,6 +20,12 @@ Pl_RunLength::Pl_RunLength(char const* identifier, Pipeline* next, action_e acti
     if (!next) {
         throw std::logic_error("Attempt to create Pl_RunLength with nullptr as next");
     }
+}
+
+void
+Pl_RunLength::setMemoryLimit(unsigned long long limit)
+{
+    memory_limit = limit;
 }
 
 Pl_RunLength::~Pl_RunLength() // NOLINT (modernize-use-equals-default)
@@ -67,6 +78,9 @@ Pl_RunLength::encode(unsigned char const* data, size_t len)
 void
 Pl_RunLength::decode(unsigned char const* data, size_t len)
 {
+    if (memory_limit && (len + m->out.size()) > memory_limit) {
+        throw std::runtime_error("Pl_RunLength memory limit exceeded");
+    }
     m->out.reserve(len);
     for (size_t i = 0; i < len; ++i) {
         unsigned char const& ch = data[i];
