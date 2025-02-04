@@ -470,6 +470,11 @@ bool
 QPDFParser::tooManyBadTokens()
 {
     if (--max_bad_count > 0 && good_count > 4) {
+        if (frame->olist.size() > 100'000 || frame->dict.size() > 100'000) {
+            warn("encountered errors while parsing an array or dictionary with more than 100000 "
+                 "elements; giving up on reading object");
+            return true;
+        }
         good_count = 0;
         bad_count = 1;
         return false;

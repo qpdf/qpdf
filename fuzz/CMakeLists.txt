@@ -149,6 +149,7 @@ set(CORPUS_OTHER
   376305073.fuzz
   376305073a.fuzz
   377977949.fuzz
+  388571629.fuzz
   389339260.fuzz
   389974979.fuzz
   391974927.fuzz
