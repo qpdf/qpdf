@@ -1,12 +1,14 @@
 #include <qpdf/QPDF_Dictionary.hh>
 
 #include <qpdf/JSON_writer.hh>
+#include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDF_Name.hh>
 #include <qpdf/QPDF_Null.hh>
 #include <qpdf/QUtil.hh>
 
 using namespace std::literals;
+using namespace qpdf;
 
 QPDF_Dictionary::QPDF_Dictionary(std::map<std::string, QPDFObjectHandle> const& items) :
     QPDFValue(::ot_dictionary),

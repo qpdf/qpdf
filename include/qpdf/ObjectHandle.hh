@@ -1,0 +1,64 @@
+// Copyright (c) 2005-2021 Jay Berkenbilt
+// Copyright (c) 2022-2025 Jay Berkenbilt and Manfred Holger
+//
+// This file is part of qpdf.
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+// in compliance with the License. You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software distributed under the License
+// is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+// or implied. See the License for the specific language governing permissions and limitations under
+// the License.
+//
+// Versions of qpdf prior to version 7 were released under the terms of version 2.0 of the Artistic
+// License. At your option, you may continue to consider qpdf to be licensed under those terms.
+// Please see the manual for additional information.
+
+#ifndef OBJECTHANDLE_HH
+#define OBJECTHANDLE_HH
+
+#include <qpdf/Constants.h>
+#include <qpdf/DLL.h>
+#include <qpdf/Types.h>
+
+#include <qpdf/QPDFObjGen.hh>
+
+class QPDF_Dictionary;
+class QPDFObject;
+class QPDFObjectHandle;
+
+namespace qpdf
+{
+    // Basehandle is only used as a base-class for QPDFObjectHandle like classes. Currently the only
+    // methods exposed in public API are operators to convert derived objects to QPDFObjectHandle,
+    // QPDFObjGen and bool.
+    class BaseHandle
+    {
+      public:
+        explicit inline operator bool() const;
+        inline operator QPDFObjectHandle() const;
+        operator QPDFObjGen() const;
+
+        // The rest of the header file is for qpdf internal use only.
+
+      protected:
+        BaseHandle() = default;
+        BaseHandle(std::shared_ptr<QPDFObject> const& obj) :
+            obj(obj) {};
+        BaseHandle(std::shared_ptr<QPDFObject>&& obj) :
+            obj(std::move(obj)) {};
+        BaseHandle(BaseHandle const&) = default;
+        BaseHandle& operator=(BaseHandle const&) = default;
+        BaseHandle(BaseHandle&&) = default;
+        BaseHandle& operator=(BaseHandle&&) = default;
+        ~BaseHandle() = default;
+
+        std::shared_ptr<QPDFObject> obj;
+    };
+
+} // namespace qpdf
+
+#endif // QPDFOBJECTHANDLE_HH
