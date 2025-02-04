@@ -557,7 +557,7 @@ QPDF::maxEnd(ObjUser const& ou)
 }
 
 qpdf_offset_t
-QPDF::getLinearizationOffset(QPDFObjGen const& og)
+QPDF::getLinearizationOffset(QPDFObjGen og)
 {
     QPDFXRefEntry entry = m->xref_table[og];
     qpdf_offset_t result = 0;

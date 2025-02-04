@@ -179,7 +179,7 @@ class StreamReplacer: public QPDFObjectHandle::StreamDataProvider
 
   private:
     bool maybeReplace(
-        QPDFObjGen const& og,
+        QPDFObjGen og,
         QPDFObjectHandle& stream,
         Pipeline* pipeline,
         QPDFObjectHandle* dict_updates);
@@ -204,10 +204,7 @@ StreamReplacer::StreamReplacer(QPDF* pdf) :
 
 bool
 StreamReplacer::maybeReplace(
-    QPDFObjGen const& og,
-    QPDFObjectHandle& stream,
-    Pipeline* pipeline,
-    QPDFObjectHandle* dict_updates)
+    QPDFObjGen og, QPDFObjectHandle& stream, Pipeline* pipeline, QPDFObjectHandle* dict_updates)
 {
     // As described in the class comments, this method is called twice. Before writing has started
     // pipeline is nullptr, and dict_updates is provided. In this mode, we figure out whether we

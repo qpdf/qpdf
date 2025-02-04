@@ -58,16 +58,14 @@ class QPDFOutlineDocumentHelper: public QPDFDocumentHelper
 
     // Return a list outlines that are known to target the specified page.
     QPDF_DLL
-    std::vector<QPDFOutlineObjectHelper> getOutlinesForPage(QPDFObjGen const&);
+    std::vector<QPDFOutlineObjectHelper> getOutlinesForPage(QPDFObjGen);
 
     class Accessor
     {
         friend class QPDFOutlineObjectHelper;
 
-        // ABI: remove  QPDF_DLL and pass og by value.
-        QPDF_DLL
         static bool
-        checkSeen(QPDFOutlineDocumentHelper& dh, QPDFObjGen const& og)
+        checkSeen(QPDFOutlineDocumentHelper& dh, QPDFObjGen og)
         {
             return !dh.m->seen.add(og);
         }

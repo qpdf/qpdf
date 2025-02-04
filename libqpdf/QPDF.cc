@@ -112,7 +112,7 @@ namespace
 QPDF::ForeignStreamData::ForeignStreamData(
     std::shared_ptr<EncryptionParameters> encp,
     std::shared_ptr<InputSource> file,
-    QPDFObjGen const& foreign_og,
+    QPDFObjGen foreign_og,
     qpdf_offset_t offset,
     size_t length,
     QPDFObjectHandle local_dict) :
@@ -164,7 +164,7 @@ QPDF::CopiedStreamDataProvider::registerForeignStream(
     this->foreign_stream_data[local_og] = foreign_stream;
 }
 
-QPDF::StringDecrypter::StringDecrypter(QPDF* qpdf, QPDFObjGen const& og) :
+QPDF::StringDecrypter::StringDecrypter(QPDF* qpdf, QPDFObjGen og) :
     qpdf(qpdf),
     og(og)
 {
@@ -1463,7 +1463,7 @@ QPDF::getAllObjects()
 }
 
 void
-QPDF::setLastObjectDescription(std::string const& description, QPDFObjGen const& og)
+QPDF::setLastObjectDescription(std::string const& description, QPDFObjGen og)
 {
     m->last_object_description.clear();
     if (!description.empty()) {
@@ -1650,7 +1650,7 @@ QPDF::findEndstream()
 
 size_t
 QPDF::recoverStreamLength(
-    std::shared_ptr<InputSource> input, QPDFObjGen const& og, qpdf_offset_t stream_offset)
+    std::shared_ptr<InputSource> input, QPDFObjGen og, qpdf_offset_t stream_offset)
 {
     // Try to reconstruct stream length by looking for endstream or endobj
     warn(damagedPDF(*input, stream_offset, "attempting to recover stream length"));
@@ -2023,7 +2023,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 }
 
 QPDFObjectHandle
-QPDF::newIndirect(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& obj)
+QPDF::newIndirect(QPDFObjGen og, std::shared_ptr<QPDFObject> const& obj)
 {
     obj->setDefaultDescription(this, og);
     return {obj};
@@ -2031,7 +2031,7 @@ QPDF::newIndirect(QPDFObjGen const& og, std::shared_ptr<QPDFObject> const& obj)
 
 void
 QPDF::updateCache(
-    QPDFObjGen const& og,
+    QPDFObjGen og,
     std::shared_ptr<QPDFObject> const& object,
     qpdf_offset_t end_before_space,
     qpdf_offset_t end_after_space)
@@ -2048,13 +2048,13 @@ QPDF::updateCache(
 }
 
 bool
-QPDF::isCached(QPDFObjGen const& og)
+QPDF::isCached(QPDFObjGen og)
 {
     return m->obj_cache.count(og) != 0;
 }
 
 bool
-QPDF::isUnresolved(QPDFObjGen const& og)
+QPDF::isUnresolved(QPDFObjGen og)
 {
     return !isCached(og) || m->obj_cache[og].object->isUnresolved();
 }
@@ -2152,7 +2152,7 @@ QPDF::getObjectForJSON(int id, int gen)
 }
 
 QPDFObjectHandle
-QPDF::getObject(QPDFObjGen const& og)
+QPDF::getObject(QPDFObjGen og)
 {
     if (auto it = m->obj_cache.find(og); it != m->obj_cache.end()) {
         return {it->second.object};
@@ -2171,7 +2171,7 @@ QPDF::getObject(int objid, int generation)
 }
 
 QPDFObjectHandle
-QPDF::getObjectByObjGen(QPDFObjGen const& og)
+QPDF::getObjectByObjGen(QPDFObjGen og)
 {
     return getObject(og);
 }
@@ -2189,7 +2189,7 @@ QPDF::replaceObject(int objid, int generation, QPDFObjectHandle oh)
 }
 
 void
-QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
+QPDF::replaceObject(QPDFObjGen og, QPDFObjectHandle oh)
 {
     if (!oh || (oh.isIndirect() && !(oh.isStream() && oh.getObjGen() == og))) {
         QTC::TC("qpdf", "QPDF replaceObject called with indirect object");
@@ -2493,7 +2493,7 @@ QPDF::swapObjects(int objid1, int generation1, int objid2, int generation2)
 }
 
 void
-QPDF::swapObjects(QPDFObjGen const& og1, QPDFObjGen const& og2)
+QPDF::swapObjects(QPDFObjGen og1, QPDFObjGen og2)
 {
     // Force objects to be read from the input source if needed, then swap them in the cache.
     resolve(og1);
@@ -2727,7 +2727,7 @@ QPDF::pipeStreamData(
     std::shared_ptr<EncryptionParameters> encp,
     std::shared_ptr<InputSource> file,
     QPDF& qpdf_for_warning,
-    QPDFObjGen const& og,
+    QPDFObjGen og,
     qpdf_offset_t offset,
     size_t length,
     QPDFObjectHandle stream_dict,
@@ -2789,7 +2789,7 @@ QPDF::pipeStreamData(
 
 bool
 QPDF::pipeStreamData(
-    QPDFObjGen const& og,
+    QPDFObjGen og,
     qpdf_offset_t offset,
     size_t length,
     QPDFObjectHandle stream_dict,

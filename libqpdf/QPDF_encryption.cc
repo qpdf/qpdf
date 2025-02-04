@@ -952,8 +952,7 @@ QPDF::initializeEncryption()
 }
 
 std::string
-QPDF::getKeyForObject(
-    std::shared_ptr<EncryptionParameters> encp, QPDFObjGen const& og, bool use_aes)
+QPDF::getKeyForObject(std::shared_ptr<EncryptionParameters> encp, QPDFObjGen og, bool use_aes)
 {
     if (!encp->encrypted) {
         throw std::logic_error("request for encryption key in non-encrypted PDF");
@@ -974,7 +973,7 @@ QPDF::getKeyForObject(
 }
 
 void
-QPDF::decryptString(std::string& str, QPDFObjGen const& og)
+QPDF::decryptString(std::string& str, QPDFObjGen og)
 {
     if (!og.isIndirect()) {
         return;
@@ -1048,7 +1047,7 @@ QPDF::decryptStream(
     std::shared_ptr<InputSource> file,
     QPDF& qpdf_for_warning,
     Pipeline*& pipeline,
-    QPDFObjGen const& og,
+    QPDFObjGen og,
     QPDFObjectHandle& stream_dict,
     std::unique_ptr<Pipeline>& decrypt_pipeline)
 {
