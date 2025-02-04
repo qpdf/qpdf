@@ -39,6 +39,14 @@
 
 using namespace std::literals;
 
+using namespace qpdf;
+
+BaseHandle::
+operator QPDFObjGen() const
+{
+    return obj ? obj->getObjGen() : QPDFObjGen();
+}
+
 namespace
 {
     class TerminateParsing

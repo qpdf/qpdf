@@ -37,6 +37,7 @@
 #include <qpdf/Buffer.hh>
 #include <qpdf/InputSource.hh>
 #include <qpdf/JSON.hh>
+#include <qpdf/ObjectHandle.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFTokenizer.hh>
 
@@ -55,13 +56,14 @@ class QPDF_Reserved;
 class QPDF_Stream;
 class QPDF_String;
 class QPDFObject;
+class QPDFObjectHandle;
 class QPDFTokenizer;
 class QPDFExc;
 class Pl_QPDFTokenizer;
 class QPDFMatrix;
 class QPDFParser;
 
-class QPDFObjectHandle
+class QPDFObjectHandle final: public qpdf::BaseHandle
 {
     friend class QPDFParser;
 
@@ -290,18 +292,12 @@ class QPDFObjectHandle
     QPDFObjectHandle(QPDFObjectHandle const&) = default;
     QPDF_DLL
     QPDFObjectHandle& operator=(QPDFObjectHandle const&) = default;
-
     QPDF_DLL
     QPDFObjectHandle(QPDFObjectHandle&&) = default;
     QPDF_DLL
     QPDFObjectHandle& operator=(QPDFObjectHandle&&) = default;
 
-    // Return true if the QPDFObjectHandle is initialized. This allows object handles to be used in
-    // if statements with initializer.
-    QPDF_DLL
-    explicit inline operator bool() const noexcept;
-
-    [[deprecated("use operator bool()")]] QPDF_DLL inline bool isInitialized() const noexcept;
+    [[deprecated("use operator bool()")]] QPDF_DLL inline bool isInitialized() const;
 
     // This method returns true if the QPDFObjectHandle objects point to exactly the same underlying
     // object, meaning that changes to one are reflected in the other, or "if you paint one, the
@@ -1329,7 +1325,11 @@ class QPDFObjectHandle
     // The following methods do not form part of the public API and are for internal use only.
 
     QPDFObjectHandle(std::shared_ptr<QPDFObject> const& obj) :
-        obj(obj)
+        qpdf::BaseHandle(obj)
+    {
+    }
+    QPDFObjectHandle(std::shared_ptr<QPDFObject>&& obj) :
+        qpdf::BaseHandle(std::move(obj))
     {
     }
     std::shared_ptr<QPDFObject>
@@ -1386,10 +1386,6 @@ class QPDFObjectHandle
     arrayOrStreamToStreamArray(std::string const& description, std::string& all_description);
     static void warn(QPDF*, QPDFExc const&);
     void checkOwnership(QPDFObjectHandle const&) const;
-
-    // Moving members of QPDFObjectHandle into a smart pointer incurs a substantial performance
-    // penalty since QPDFObjectHandle objects are copied around so frequently.
-    std::shared_ptr<QPDFObject> obj;
 };
 
 #ifndef QPDF_NO_QPDF_STRING
@@ -1606,6 +1602,22 @@ class QPDFObjectHandle::QPDFArrayItems
     QPDFObjectHandle oh;
 };
 
+namespace qpdf
+{
+    inline BaseHandle::
+    operator bool() const
+    {
+        return static_cast<bool>(obj);
+    }
+
+    inline BaseHandle::
+    operator QPDFObjectHandle() const
+    {
+        return {obj};
+    }
+
+} // namespace qpdf
+
 inline int
 QPDFObjectHandle::getObjectID() const
 {
@@ -1625,15 +1637,9 @@ QPDFObjectHandle::isIndirect() const
 }
 
 inline bool
-QPDFObjectHandle::isInitialized() const noexcept
+QPDFObjectHandle::isInitialized() const
 {
     return obj != nullptr;
-}
-
-inline QPDFObjectHandle::
-operator bool() const noexcept
-{
-    return static_cast<bool>(obj);
 }
 
 #endif // QPDFOBJECTHANDLE_HH
