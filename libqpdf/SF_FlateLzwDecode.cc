@@ -14,7 +14,6 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
         return true;
     }
 
-    bool filterable = true;
     std::set<std::string> keys = decode_parms.getKeys();
     for (auto const& key: keys) {
         QPDFObjectHandle value = decode_parms.getKey(key);
@@ -22,10 +21,10 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
             if (value.isInteger()) {
                 predictor = value.getIntValueAsInt();
                 if (!(predictor == 1 || predictor == 2 || (predictor >= 10 && predictor <= 15))) {
-                    filterable = false;
+                    return false;
                 }
             } else {
-                filterable = false;
+                return false;
             }
         } else if (key == "/Columns" || key == "/Colors" || key == "/BitsPerComponent") {
             if (value.isInteger()) {
@@ -38,26 +37,26 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
                     bits_per_component = val;
                 }
             } else {
-                filterable = false;
+                return false;
             }
         } else if (lzw && (key == "/EarlyChange")) {
             if (value.isInteger()) {
                 int earlychange = value.getIntValueAsInt();
                 early_code_change = (earlychange == 1);
                 if (!(earlychange == 0 || earlychange == 1)) {
-                    filterable = false;
+                    return false;
                 }
             } else {
-                filterable = false;
+                return false;
             }
         }
     }
 
     if (predictor > 1 && columns == 0) {
-        filterable = false;
+        return false;
     }
 
-    return filterable;
+    return true;
 }
 
 Pipeline*
