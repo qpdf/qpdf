@@ -32,6 +32,11 @@ class QPDF_DLL_CLASS Pl_RunLength: public Pipeline
     QPDF_DLL
     ~Pl_RunLength() override;
 
+    // Limit the memory used.
+    // NB This is a static option affecting all Pl_RunLength instances.
+    QPDF_DLL
+    static void setMemoryLimit(unsigned long long limit);
+
     QPDF_DLL
     void write(unsigned char const* data, size_t len) override;
     QPDF_DLL
