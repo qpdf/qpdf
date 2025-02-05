@@ -14,6 +14,8 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
         return true;
     }
 
+    auto memory_limit = Pl_Flate::memory_limit();
+
     std::set<std::string> keys = decode_parms.getKeys();
     for (auto const& key: keys) {
         QPDFObjectHandle value = decode_parms.getKey(key);
@@ -29,6 +31,11 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
         } else if (key == "/Columns" || key == "/Colors" || key == "/BitsPerComponent") {
             if (value.isInteger()) {
                 int val = value.getIntValueAsInt();
+                if (memory_limit && static_cast<unsigned int>(val) > memory_limit) {
+                    QPDFLogger::defaultLogger()->warn(
+                        "SF_FlateLzwDecode parameter exceeds PL_Flate memory limit\n");
+                    return false;
+                }
                 if (key == "/Columns") {
                     columns = val;
                 } else if (key == "/Colors") {
