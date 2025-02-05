@@ -31,9 +31,9 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
         QPDFObjectHandle value = decode_parms.getKey(key);
         if (key == "/Predictor") {
             if (value.isInteger()) {
-                this->predictor = value.getIntValueAsInt();
-                if (!((this->predictor == 1) || (this->predictor == 2) ||
-                      ((this->predictor >= 10) && (this->predictor <= 15)))) {
+                predictor = value.getIntValueAsInt();
+                if (!((predictor == 1) || (predictor == 2) ||
+                      ((predictor >= 10) && (predictor <= 15)))) {
                     filterable = false;
                 }
             } else {
@@ -43,11 +43,11 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
             if (value.isInteger()) {
                 int val = value.getIntValueAsInt();
                 if (key == "/Columns") {
-                    this->columns = val;
+                    columns = val;
                 } else if (key == "/Colors") {
-                    this->colors = val;
+                    colors = val;
                 } else if (key == "/BitsPerComponent") {
-                    this->bits_per_component = val;
+                    bits_per_component = val;
                 }
             } else {
                 filterable = false;
@@ -55,7 +55,7 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
         } else if (lzw && (key == "/EarlyChange")) {
             if (value.isInteger()) {
                 int earlychange = value.getIntValueAsInt();
-                this->early_code_change = (earlychange == 1);
+                early_code_change = (earlychange == 1);
                 if (!((earlychange == 0) || (earlychange == 1))) {
                     filterable = false;
                 }
@@ -65,7 +65,7 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
         }
     }
 
-    if ((this->predictor > 1) && (this->columns == 0)) {
+    if ((predictor > 1) && (columns == 0)) {
         filterable = false;
     }
 
@@ -76,27 +76,27 @@ Pipeline*
 SF_FlateLzwDecode::getDecodePipeline(Pipeline* next)
 {
     std::shared_ptr<Pipeline> pipeline;
-    if ((this->predictor >= 10) && (this->predictor <= 15)) {
+    if ((predictor >= 10) && (predictor <= 15)) {
         QTC::TC("qpdf", "SF_FlateLzwDecode PNG filter");
         pipeline = std::make_shared<Pl_PNGFilter>(
             "png decode",
             next,
             Pl_PNGFilter::a_decode,
-            QIntC::to_uint(this->columns),
-            QIntC::to_uint(this->colors),
-            QIntC::to_uint(this->bits_per_component));
-        this->pipelines.push_back(pipeline);
+            QIntC::to_uint(columns),
+            QIntC::to_uint(colors),
+            QIntC::to_uint(bits_per_component));
+        pipelines.push_back(pipeline);
         next = pipeline.get();
-    } else if (this->predictor == 2) {
+    } else if (predictor == 2) {
         QTC::TC("qpdf", "SF_FlateLzwDecode TIFF predictor");
         pipeline = std::make_shared<Pl_TIFFPredictor>(
             "tiff decode",
             next,
             Pl_TIFFPredictor::a_decode,
-            QIntC::to_uint(this->columns),
-            QIntC::to_uint(this->colors),
-            QIntC::to_uint(this->bits_per_component));
-        this->pipelines.push_back(pipeline);
+            QIntC::to_uint(columns),
+            QIntC::to_uint(colors),
+            QIntC::to_uint(bits_per_component));
+        pipelines.push_back(pipeline);
         next = pipeline.get();
     }
 
@@ -105,7 +105,7 @@ SF_FlateLzwDecode::getDecodePipeline(Pipeline* next)
     } else {
         pipeline = std::make_shared<Pl_Flate>("stream inflate", next, Pl_Flate::a_inflate);
     }
-    this->pipelines.push_back(pipeline);
+    pipelines.push_back(pipeline);
     return pipeline.get();
 }
 
