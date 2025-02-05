@@ -7,17 +7,6 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 
-SF_FlateLzwDecode::SF_FlateLzwDecode(bool lzw) :
-    lzw(lzw),
-    // Initialize values to their defaults as per the PDF spec
-    predictor(1),
-    columns(1),
-    colors(1),
-    bits_per_component(8),
-    early_code_change(true)
-{
-}
-
 bool
 SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
 {
@@ -32,14 +21,13 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
         if (key == "/Predictor") {
             if (value.isInteger()) {
                 predictor = value.getIntValueAsInt();
-                if (!((predictor == 1) || (predictor == 2) ||
-                      ((predictor >= 10) && (predictor <= 15)))) {
+                if (!(predictor == 1 || predictor == 2 || (predictor >= 10 && predictor <= 15))) {
                     filterable = false;
                 }
             } else {
                 filterable = false;
             }
-        } else if ((key == "/Columns") || (key == "/Colors") || (key == "/BitsPerComponent")) {
+        } else if (key == "/Columns" || key == "/Colors" || key == "/BitsPerComponent") {
             if (value.isInteger()) {
                 int val = value.getIntValueAsInt();
                 if (key == "/Columns") {
@@ -56,7 +44,7 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
             if (value.isInteger()) {
                 int earlychange = value.getIntValueAsInt();
                 early_code_change = (earlychange == 1);
-                if (!((earlychange == 0) || (earlychange == 1))) {
+                if (!(earlychange == 0 || earlychange == 1)) {
                     filterable = false;
                 }
             } else {
@@ -65,7 +53,7 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
         }
     }
 
-    if ((predictor > 1) && (columns == 0)) {
+    if (predictor > 1 && columns == 0) {
         filterable = false;
     }
 
@@ -76,7 +64,7 @@ Pipeline*
 SF_FlateLzwDecode::getDecodePipeline(Pipeline* next)
 {
     std::shared_ptr<Pipeline> pipeline;
-    if ((predictor >= 10) && (predictor <= 15)) {
+    if (predictor >= 10 && predictor <= 15) {
         QTC::TC("qpdf", "SF_FlateLzwDecode PNG filter");
         pipeline = std::make_shared<Pl_PNGFilter>(
             "png decode",

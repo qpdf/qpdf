@@ -117,8 +117,10 @@ ArgParser::argZopfli()
             logger->info("Set the environment variable QPDF_ZOPFLI to activate.\n");
             logger->info("* QPDF_ZOPFLI=disabled or QPDF_ZOPFLI not set: don't use zopfli.\n");
             logger->info("* QPDF_ZOPFLI=force: use zopfli, and fail if not available.\n");
-            logger->info("* QPDF_ZOPFLI=silent: use zopfli if available and silently fall back if not.\n");
-            logger->info("* QPDF_ZOPFLI= any other value: use zopfli if available, and warn if not.\n");
+            logger->info(
+                "* QPDF_ZOPFLI=silent: use zopfli if available and silently fall back if not.\n");
+            logger->info(
+                "* QPDF_ZOPFLI= any other value: use zopfli if available, and warn if not.\n");
         }
     } else {
         logger->error("zopfli support is not enabled\n");
