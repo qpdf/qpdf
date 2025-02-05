@@ -87,7 +87,7 @@ FuzzHelper::doChecks()
     Pl_PNGFilter::setMemoryLimit(1'000'000);
     Pl_RunLength::setMemoryLimit(1'000'000);
     Pl_TIFFPredictor::setMemoryLimit(1'000'000);
-    Pl_Flate::setMemoryLimit(200'000);
+    Pl_Flate::memory_limit(200'000);
 
     // Do not decompress corrupt data. This may cause extended runtime within jpeglib without
     // exercising additional code paths in qpdf, and potentially causing counterproductive timeouts.

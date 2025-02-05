@@ -14,7 +14,7 @@
 
 namespace
 {
-    unsigned long long memory_limit{0};
+    unsigned long long memory_limit_{0};
 } // namespace
 
 int Pl_Flate::compression_level = Z_DEFAULT_COMPRESSION;
@@ -80,10 +80,16 @@ Pl_Flate::~Pl_Flate() // NOLINT (modernize-use-equals-default)
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
 }
 
-void
-Pl_Flate::setMemoryLimit(unsigned long long limit)
+unsigned long long
+Pl_Flate::memory_limit()
 {
-    memory_limit = limit;
+    return memory_limit_;
+}
+
+void
+Pl_Flate::memory_limit(unsigned long long limit)
+{
+    memory_limit_ = limit;
 }
 
 void
@@ -197,9 +203,9 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
                 }
                 uLong ready = QIntC::to_ulong(m->out_bufsize - zstream.avail_out);
                 if (ready > 0) {
-                    if (memory_limit && m->action != a_deflate) {
+                    if (memory_limit_ && m->action != a_deflate) {
                         m->written += ready;
-                        if (m->written > memory_limit) {
+                        if (m->written > memory_limit_) {
                             throw std::runtime_error("PL_Flate memory limit exceeded");
                         }
                     }
@@ -220,7 +226,7 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
 void
 Pl_Flate::finish()
 {
-    if (m->written > memory_limit) {
+    if (m->written > memory_limit_) {
         throw std::runtime_error("PL_Flate memory limit exceeded");
     }
     try {

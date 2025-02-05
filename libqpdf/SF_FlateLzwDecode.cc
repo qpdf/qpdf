@@ -7,17 +7,6 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 
-SF_FlateLzwDecode::SF_FlateLzwDecode(bool lzw) :
-    lzw(lzw),
-    // Initialize values to their defaults as per the PDF spec
-    predictor(1),
-    columns(1),
-    colors(1),
-    bits_per_component(8),
-    early_code_change(true)
-{
-}
-
 bool
 SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
 {
@@ -25,78 +14,83 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
         return true;
     }
 
-    bool filterable = true;
+    auto memory_limit = Pl_Flate::memory_limit();
+
     std::set<std::string> keys = decode_parms.getKeys();
     for (auto const& key: keys) {
         QPDFObjectHandle value = decode_parms.getKey(key);
         if (key == "/Predictor") {
             if (value.isInteger()) {
-                this->predictor = value.getIntValueAsInt();
-                if (!((this->predictor == 1) || (this->predictor == 2) ||
-                      ((this->predictor >= 10) && (this->predictor <= 15)))) {
-                    filterable = false;
+                predictor = value.getIntValueAsInt();
+                if (!(predictor == 1 || predictor == 2 || (predictor >= 10 && predictor <= 15))) {
+                    return false;
                 }
             } else {
-                filterable = false;
+                return false;
             }
-        } else if ((key == "/Columns") || (key == "/Colors") || (key == "/BitsPerComponent")) {
+        } else if (key == "/Columns" || key == "/Colors" || key == "/BitsPerComponent") {
             if (value.isInteger()) {
                 int val = value.getIntValueAsInt();
+                if (memory_limit && static_cast<unsigned int>(val) > memory_limit) {
+                    QPDFLogger::defaultLogger()->warn(
+                        "SF_FlateLzwDecode parameter exceeds PL_Flate memory limit\n");
+                    return false;
+                }
                 if (key == "/Columns") {
-                    this->columns = val;
+                    columns = val;
                 } else if (key == "/Colors") {
-                    this->colors = val;
+                    colors = val;
                 } else if (key == "/BitsPerComponent") {
-                    this->bits_per_component = val;
+                    bits_per_component = val;
                 }
             } else {
-                filterable = false;
+                return false;
             }
         } else if (lzw && (key == "/EarlyChange")) {
             if (value.isInteger()) {
                 int earlychange = value.getIntValueAsInt();
-                this->early_code_change = (earlychange == 1);
-                if (!((earlychange == 0) || (earlychange == 1))) {
-                    filterable = false;
+                early_code_change = (earlychange == 1);
+                if (!(earlychange == 0 || earlychange == 1)) {
+                    return false;
                 }
             } else {
-                filterable = false;
+                return false;
             }
         }
     }
 
-    if ((this->predictor > 1) && (this->columns == 0)) {
-        filterable = false;
+    if (predictor > 1 && columns == 0) {
+        return false;
     }
 
-    return filterable;
+    return true;
 }
 
 Pipeline*
 SF_FlateLzwDecode::getDecodePipeline(Pipeline* next)
 {
     std::shared_ptr<Pipeline> pipeline;
-    if ((this->predictor >= 10) && (this->predictor <= 15)) {
+    if (predictor >= 10 && predictor <= 15) {
         QTC::TC("qpdf", "SF_FlateLzwDecode PNG filter");
         pipeline = std::make_shared<Pl_PNGFilter>(
             "png decode",
             next,
             Pl_PNGFilter::a_decode,
-            QIntC::to_uint(this->columns),
-            QIntC::to_uint(this->colors),
-            QIntC::to_uint(this->bits_per_component));
-        this->pipelines.push_back(pipeline);
+            QIntC::to_uint(columns),
+            QIntC::to_uint(colors),
+            QIntC::to_uint(bits_per_component));
+        pipelines.push_back(pipeline);
         next = pipeline.get();
-    } else if (this->predictor == 2) {
+    } else if (predictor == 2) {
         QTC::TC("qpdf", "SF_FlateLzwDecode TIFF predictor");
         pipeline = std::make_shared<Pl_TIFFPredictor>(
             "tiff decode",
             next,
             Pl_TIFFPredictor::a_decode,
-            QIntC::to_uint(this->columns),
-            QIntC::to_uint(this->colors),
-            QIntC::to_uint(this->bits_per_component));
-        this->pipelines.push_back(pipeline);
+            QIntC::to_uint(columns),
+            QIntC::to_uint(colors),
+            QIntC::to_uint(bits_per_component));
+        pipelines.push_back(pipeline);
         next = pipeline.get();
     }
 
@@ -105,7 +99,7 @@ SF_FlateLzwDecode::getDecodePipeline(Pipeline* next)
     } else {
         pipeline = std::make_shared<Pl_Flate>("stream inflate", next, Pl_Flate::a_inflate);
     }
-    this->pipelines.push_back(pipeline);
+    pipelines.push_back(pipeline);
     return pipeline.get();
 }
 
