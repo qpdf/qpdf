@@ -33,6 +33,30 @@
 
 namespace
 {
+    // Page number (1 based) and index (0 based). Defaults to page number 1 / index 0.
+    struct Page
+    {
+        Page() = default;
+        Page(Page const&) = default;
+
+        Page(int no) :
+            idx{QIntC::to_size(no - 1)},
+            no{no}
+        {
+        }
+
+        Page&
+        operator++()
+        {
+            ++idx;
+            ++no;
+            return *this;
+        }
+
+        size_t idx{0};
+        int no{1};
+    };
+
     class ImageOptimizer: public QPDFObjectHandle::StreamDataProvider
     {
       public:
@@ -67,17 +91,6 @@ namespace
         handleEOF() override
         {
         }
-    };
-
-    struct QPDFPageData
-    {
-        QPDFPageData(std::string const& filename, QPDF* qpdf, std::string const& range);
-        QPDFPageData(QPDFPageData const& other, int page);
-
-        std::string filename;
-        QPDF* qpdf;
-        std::vector<QPDFObjectHandle> orig_pages;
-        std::vector<int> selected_pages;
     };
 
     class ProgressReporter: public QPDFWriter::ProgressReporter
@@ -246,35 +259,20 @@ ImageOptimizer::provideStreamData(QPDFObjGen const&, Pipeline* pipeline)
     image.pipeStreamData(p.get(), 0, qpdf_dl_specialized, false, false);
 }
 
-QPDFJob::PageSpec::PageSpec(
-    std::string const& filename, char const* password, std::string const& range) :
+QPDFJob::Section::Section(
+    std::string const& filename, std::string const& password, std::string const& range) :
     filename(filename),
+    password(password),
     range(range)
 {
-    if (password) {
-        this->password = QUtil::make_shared_cstr(password);
-    }
 }
 
-QPDFPageData::QPDFPageData(std::string const& filename, QPDF* qpdf, std::string const& range) :
-    filename(filename),
-    qpdf(qpdf),
-    orig_pages(qpdf->getAllPages())
-{
-    try {
-        this->selected_pages =
-            QUtil::parse_numrange(range.c_str(), QIntC::to_int(this->orig_pages.size()));
-    } catch (std::runtime_error& e) {
-        throw std::runtime_error("parsing numeric range for " + filename + ": " + e.what());
-    }
-}
-
-QPDFPageData::QPDFPageData(QPDFPageData const& other, int page) :
+QPDFJob::Section::Section(QPDFJob::Section const& other, int page) :
     filename(other.filename),
-    qpdf(other.qpdf),
-    orig_pages(other.orig_pages)
+    password(other.password)
+// range is no longer required when this constructor is called.
 {
-    this->selected_pages.push_back(page);
+    selected_pages.push_back(page);
 }
 
 void
@@ -283,13 +281,14 @@ ProgressReporter::reportProgress(int percentage)
     this->p << prefix << ": " << filename << ": write progress: " << percentage << "%\n";
 }
 
-QPDFJob::Members::Members() :
-    log(QPDFLogger::defaultLogger())
+QPDFJob::Members::Members(QPDFJob& job) :
+    log(QPDFLogger::defaultLogger()),
+    file_store(job)
 {
 }
 
 QPDFJob::QPDFJob() :
-    m(new Members())
+    m(new Members(*this))
 {
 }
 
@@ -431,7 +430,7 @@ QPDFJob::createQPDF()
     checkConfiguration();
     std::unique_ptr<QPDF> pdf_sp;
     try {
-        processFile(pdf_sp, m->infilename.get(), m->password.get(), true, true);
+        processFile(pdf_sp, m->infilename.data(), m->password.data(), true, true);
     } catch (QPDFExc& e) {
         if (e.getErrorCode() == qpdf_e_password) {
             // Allow certain operations to work when an incorrect password is supplied.
@@ -462,9 +461,10 @@ QPDFJob::createQPDF()
         pdf.updateFromJSON(m->update_from_json);
     }
 
-    std::vector<std::unique_ptr<QPDF>> page_heap;
     if (!m->page_specs.empty()) {
-        handlePageSpecs(pdf, page_heap);
+        if (!handlePageSpecs(pdf)) {
+            m->warnings = true;
+        }
     }
     if (!m->rotations.empty()) {
         handleRotations(pdf);
@@ -487,11 +487,6 @@ QPDFJob::createQPDF()
         pdf.getRoot().removeKey("/Metadata");
     }
 
-    for (auto& foreign: page_heap) {
-        if (foreign->anyWarnings()) {
-            m->warnings = true;
-        }
-    }
     return pdf_sp;
 }
 
@@ -548,7 +543,7 @@ QPDFJob::hasWarnings() const
 bool
 QPDFJob::createsOutput() const
 {
-    return ((m->outfilename != nullptr) || m->replace_input);
+    return (!m->outfilename.empty() || m->replace_input);
 }
 
 int
@@ -591,7 +586,7 @@ QPDFJob::checkConfiguration()
 
     if (m->replace_input) {
         // Check for --empty appears later after we have checked m->infilename.
-        if (m->outfilename) {
+        if (!m->outfilename.empty()) {
             usage("--replace-input may not be used when an output file is specified");
         } else if (m->split_pages) {
             usage("--split-pages may not be used with --replace-input");
@@ -599,18 +594,18 @@ QPDFJob::checkConfiguration()
             usage("--json may not be used with --replace-input");
         }
     }
-    if (m->json_version && (m->outfilename == nullptr)) {
+    if (m->json_version && m->outfilename.empty()) {
         // The output file is optional with --json for backward compatibility and defaults to
         // standard output.
-        m->outfilename = QUtil::make_shared_cstr("-");
+        m->outfilename = "-";
     }
-    if (m->infilename == nullptr) {
+    if (m->infilename.empty() && !m->empty_input) {
         usage("an input file name is required");
-    } else if (m->replace_input && (strlen(m->infilename.get()) == 0)) {
+    } else if (m->replace_input && m->empty_input) {
         usage("--replace-input may not be used with --empty");
-    } else if (m->require_outfile && (m->outfilename == nullptr) && (!m->replace_input)) {
+    } else if (m->require_outfile && m->outfilename.empty() && !m->replace_input) {
         usage("an output file name is required; use - for standard output");
-    } else if ((!m->require_outfile) && ((m->outfilename != nullptr) || m->replace_input)) {
+    } else if (!m->require_outfile && (!m->outfilename.empty() || m->replace_input)) {
         usage("no output file may be given for this option");
     }
     if (m->check_requires_password && m->check_is_encrypted) {
@@ -632,7 +627,7 @@ QPDFJob::checkConfiguration()
     }
 
     bool save_to_stdout = false;
-    if (m->require_outfile && m->outfilename && (strcmp(m->outfilename.get(), "-") == 0)) {
+    if (m->require_outfile && m->outfilename == "-") {
         if (m->split_pages) {
             usage("--split-pages may not be used when writing to standard output");
         }
@@ -644,7 +639,7 @@ QPDFJob::checkConfiguration()
     if (save_to_stdout) {
         m->log->saveToStandardOutput(true);
     }
-    if ((!m->split_pages) && QUtil::same_file(m->infilename.get(), m->outfilename.get())) {
+    if (!m->split_pages && QUtil::same_file(m->infilename.data(), m->outfilename.data())) {
         QTC::TC("qpdf", "QPDFJob same file error");
         usage("input file and output file are the same; use --replace-input to intentionally "
               "overwrite the input file");
@@ -768,7 +763,7 @@ QPDFJob::doCheck(QPDF& pdf)
     // may continue to perform additional checks after finding errors.
     bool okay = true;
     auto& cout = *m->log->getInfo();
-    cout << "checking " << m->infilename.get() << "\n";
+    cout << "checking " << m->infilename << "\n";
     QPDF::JobSetter::setCheckMode(pdf, true);
     try {
         int extension_level = pdf.getExtensionLevel();
@@ -926,7 +921,7 @@ QPDFJob::doListAttachments(QPDF& pdf)
             });
         }
     } else {
-        *m->log->getInfo() << m->infilename.get() << " has no embedded files\n";
+        *m->log->getInfo() << m->infilename << " has no embedded files\n";
     }
 }
 
@@ -1681,9 +1676,9 @@ QPDFJob::doInspection(QPDF& pdf)
     }
     if (m->check_linearization) {
         if (!pdf.isLinearized()) {
-            cout << m->infilename.get() << " is not linearized\n";
+            cout << m->infilename << " is not linearized\n";
         } else if (pdf.checkLinearization()) {
-            cout << m->infilename.get() << ": no linearization errors\n";
+            cout << m->infilename << ": no linearization errors\n";
         } else {
             m->warnings = true;
         }
@@ -1692,7 +1687,7 @@ QPDFJob::doInspection(QPDF& pdf)
         if (pdf.isLinearized()) {
             pdf.showLinearizationData();
         } else {
-            cout << m->infilename.get() << " is not linearized\n";
+            cout << m->infilename << " is not linearized\n";
         }
     }
     if (m->show_xref) {
@@ -1729,7 +1724,7 @@ QPDFJob::doProcessOnce(
     if (empty) {
         pdf->emptyPDF();
     } else if (main_input && m->json_input) {
-        pdf->createFromJSON(m->infilename.get());
+        pdf->createFromJSON(m->infilename);
     } else {
         fn(pdf.get(), password);
     }
@@ -1869,48 +1864,52 @@ QPDFJob::validateUnderOverlay(QPDF& pdf, UnderOverlay* uo)
 
 static QPDFAcroFormDocumentHelper*
 get_afdh_for_qpdf(
-    std::map<unsigned long long, std::shared_ptr<QPDFAcroFormDocumentHelper>>& afdh_map, QPDF* q)
+    std::map<unsigned long long, std::unique_ptr<QPDFAcroFormDocumentHelper>>& afdh_map, QPDF& q)
 {
-    auto uid = q->getUniqueId();
-    if (!afdh_map.count(uid)) {
-        afdh_map[uid] = std::make_shared<QPDFAcroFormDocumentHelper>(*q);
+    auto uid = q.getUniqueId();
+    if (auto it = afdh_map.find(uid); it != afdh_map.end()) {
+        return it->second.get();
+    } else {
+        return afdh_map.emplace(uid, std::make_unique<QPDFAcroFormDocumentHelper>(q))
+            .first->second.get();
     }
-    return afdh_map[uid].get();
 }
 
 std::string
 QPDFJob::doUnderOverlayForPage(
     QPDF& pdf,
+    std::map<unsigned long long int, std::unique_ptr<QPDFAcroFormDocumentHelper>>& afdh,
     UnderOverlay& uo,
-    std::map<int, std::map<size_t, std::vector<int>>>& pagenos,
-    size_t page_idx,
-    size_t uo_idx,
-    std::map<int, std::map<size_t, QPDFObjectHandle>>& fo,
-    std::vector<QPDFPageObjectHelper>& pages,
+    std::map<std::pair<int, size_t>, std::vector<int>> const& pagenos,
+    std::pair<int, size_t> pageno_uo_idx,
+    std::map<std::pair<int, size_t>, QPDFObjectHandle>& fo,
+    std::vector<QPDFPageObjectHelper>&& pages,
     QPDFPageObjectHelper& dest_page)
 {
-    int pageno = 1 + QIntC::to_int(page_idx);
-    if (!(pagenos.count(pageno) && pagenos[pageno].count(uo_idx))) {
+    auto pagenos_it = pagenos.find(pageno_uo_idx);
+    if (pagenos_it == pagenos.end()) {
         return "";
     }
 
-    std::map<unsigned long long, std::shared_ptr<QPDFAcroFormDocumentHelper>> afdh;
     auto make_afdh = [&](QPDFPageObjectHelper& ph) {
-        QPDF& q = ph.getObjectHandle().getQPDF();
-        return get_afdh_for_qpdf(afdh, &q);
+        return get_afdh_for_qpdf(afdh, ph.getObjectHandle().getQPDF());
     };
     auto dest_afdh = make_afdh(dest_page);
 
     std::string content;
     int min_suffix = 1;
     QPDFObjectHandle resources = dest_page.getAttribute("/Resources", true);
-    for (int from_pageno: pagenos[pageno][uo_idx]) {
+    for (Page from_page: pagenos_it->second) {
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-            v << "    " << uo.filename << " " << uo.which << " " << from_pageno << "\n";
+            v << "    " << uo.filename << " " << uo.which << " " << from_page.no << "\n";
         });
-        auto from_page = pages.at(QIntC::to_size(from_pageno - 1));
-        if (fo[from_pageno].count(uo_idx) == 0) {
-            fo[from_pageno][uo_idx] = pdf.copyForeignObject(from_page.getFormXObjectForPage());
+        auto from_page_ph = pages.at(from_page.idx);
+        std::pair<int, size_t> fo_index = {from_page.no, pageno_uo_idx.second};
+        auto fo_it = fo.find(fo_index);
+        if (fo_it == fo.end()) {
+            fo_it =
+                fo.insert({fo_index, pdf.copyForeignObject(from_page_ph.getFormXObjectForPage())})
+                    .first;
         }
 
         // If the same page is overlaid or underlaid multiple times, we'll generate multiple names
@@ -1918,13 +1917,13 @@ QPDFJob::doUnderOverlayForPage(
         std::string name = resources.getUniqueResourceName("/Fx", min_suffix);
         QPDFMatrix cm;
         std::string new_content = dest_page.placeFormXObject(
-            fo[from_pageno][uo_idx], name, dest_page.getTrimBox().getArrayAsRectangle(), cm);
-        dest_page.copyAnnotations(from_page, cm, dest_afdh, make_afdh(from_page));
+            fo_it->second, name, dest_page.getTrimBox().getArrayAsRectangle(), cm);
+        dest_page.copyAnnotations(from_page_ph, cm, dest_afdh, make_afdh(from_page_ph));
         if (!new_content.empty()) {
             resources.mergeResources("<< /XObject << >> >>"_qpdf);
             auto xobject = resources.getKey("/XObject");
             if (xobject.isDictionary()) {
-                xobject.replaceKey(name, fo[from_pageno][uo_idx]);
+                xobject.replaceKey(name, fo_it->second);
             }
             ++min_suffix;
             content += new_content;
@@ -1933,27 +1932,29 @@ QPDFJob::doUnderOverlayForPage(
     return content;
 }
 
-void
-QPDFJob::getUOPagenos(
-    std::vector<QPDFJob::UnderOverlay>& uos,
-    std::map<int, std::map<size_t, std::vector<int>>>& pagenos)
+std::map<std::pair<int, size_t>, std::vector<int>>
+QPDFJob::getUOPagenos(std::vector<QPDFJob::UnderOverlay> const& uos)
 {
+    std::map<std::pair<int, size_t>, std::vector<int>> pagenos;
     size_t uo_idx = 0;
     for (auto const& uo: uos) {
         size_t page_idx = 0;
-        size_t from_size = uo.from_pagenos.size();
+        auto from_it = uo.from_pagenos.cbegin();
+        auto from_end = uo.from_pagenos.cend();
+        auto from_size = uo.from_pagenos.size();
         size_t repeat_size = uo.repeat_pagenos.size();
         for (int to_pageno: uo.to_pagenos) {
-            if (page_idx < from_size) {
-                pagenos[to_pageno][uo_idx].push_back(uo.from_pagenos.at(page_idx));
+            if (from_it != from_end) {
+                pagenos[{to_pageno, uo_idx}].emplace_back(*from_it++);
             } else if (repeat_size) {
-                pagenos[to_pageno][uo_idx].push_back(
+                pagenos[{to_pageno, uo_idx}].push_back(
                     uo.repeat_pagenos.at((page_idx - from_size) % repeat_size));
             }
             ++page_idx;
         }
         ++uo_idx;
     }
+    return pagenos;
 }
 
 void
@@ -1971,44 +1972,39 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
 
     // First map key is 1-based page number. Second is index into the overlay/underlay vector. Watch
     // out to not reverse the keys or be off by one.
-    std::map<int, std::map<size_t, std::vector<int>>> underlay_pagenos;
-    std::map<int, std::map<size_t, std::vector<int>>> overlay_pagenos;
-    getUOPagenos(m->underlay, underlay_pagenos);
-    getUOPagenos(m->overlay, overlay_pagenos);
+    auto underlay_pagenos = getUOPagenos(m->underlay);
+    auto overlay_pagenos = getUOPagenos(m->overlay);
     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
         v << prefix << ": processing underlay/overlay\n";
     });
 
-    auto get_pages = [](std::vector<UnderOverlay>& v,
-                        std::vector<std::vector<QPDFPageObjectHelper>>& v_out) {
-        for (auto const& uo: v) {
-            if (uo.pdf) {
-                v_out.push_back(QPDFPageDocumentHelper(*(uo.pdf)).getAllPages());
-            }
+    auto get_pages = [](auto const& uo, auto idx) -> std::vector<QPDFPageObjectHelper> {
+        if (uo.pdf) {
+            return QPDFPageDocumentHelper(*uo.pdf).getAllPages();
         }
+        return {};
     };
-    std::vector<std::vector<QPDFPageObjectHelper>> upages;
-    get_pages(m->underlay, upages);
-    std::vector<std::vector<QPDFPageObjectHelper>> opages;
-    get_pages(m->overlay, opages);
 
-    std::map<int, std::map<size_t, QPDFObjectHandle>> underlay_fo;
-    std::map<int, std::map<size_t, QPDFObjectHandle>> overlay_fo;
+    std::map<unsigned long long int, std::unique_ptr<QPDFAcroFormDocumentHelper>> afdh;
+    std::map<std::pair<int, size_t>, QPDFObjectHandle> underlay_fo;
+    std::map<std::pair<int, size_t>, QPDFObjectHandle> overlay_fo;
     QPDFPageDocumentHelper main_pdh(pdf);
     auto main_pages = main_pdh.getAllPages();
     size_t main_npages = main_pages.size();
-    for (size_t page_idx = 0; page_idx < main_npages; ++page_idx) {
-        auto pageno = QIntC::to_int(page_idx) + 1;
+    for (Page page; page.idx < main_npages; ++page) {
         doIfVerbose(
-            [&](Pipeline& v, std::string const& prefix) { v << "  page " << pageno << "\n"; });
-        if (underlay_pagenos[pageno].empty() && overlay_pagenos[pageno].empty()) {
+            [&](Pipeline& v, std::string const& prefix) { v << "  page " << page.no << "\n"; });
+        if (underlay_pagenos.lower_bound({page.no, 0}) ==
+                underlay_pagenos.lower_bound({page.no + 1, 0}) &&
+            overlay_pagenos.lower_bound({page.no, 0}) ==
+                overlay_pagenos.lower_bound({page.no + 1, 0})) {
             continue;
         }
         // This code converts the original page, any underlays, and any overlays to form XObjects.
         // Then it concatenates display of all underlays, the original page, and all overlays. Prior
         // to 11.3.0, the original page contents were wrapped in q/Q, but this didn't work if the
         // original page had unbalanced q/Q operators. See GitHub issue #904.
-        auto& dest_page = main_pages.at(page_idx);
+        auto& dest_page = main_pages.at(page.idx);
         auto dest_page_oh = dest_page.getObjectHandle();
         auto this_page_fo = dest_page.getFormXObjectForPage();
         // The resulting form xobject lazily reads the content from the original page, which we are
@@ -2023,12 +2019,12 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         for (auto& underlay: m->underlay) {
             content += doUnderOverlayForPage(
                 pdf,
+                afdh,
                 underlay,
                 underlay_pagenos,
-                page_idx,
-                uo_idx,
+                {page.no, uo_idx},
                 underlay_fo,
-                upages[uo_idx],
+                get_pages(underlay, uo_idx),
                 dest_page);
             ++uo_idx;
         }
@@ -2043,12 +2039,12 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         for (auto& overlay: m->overlay) {
             content += doUnderOverlayForPage(
                 pdf,
+                afdh,
                 overlay,
                 overlay_pagenos,
-                page_idx,
-                uo_idx,
+                {page.no, uo_idx},
                 overlay_fo,
-                opages[uo_idx],
+                get_pages(overlay, uo_idx),
                 dest_page);
             ++uo_idx;
         }
@@ -2161,10 +2157,10 @@ void
 QPDFJob::handleTransformations(QPDF& pdf)
 {
     QPDFPageDocumentHelper dh(pdf);
-    std::shared_ptr<QPDFAcroFormDocumentHelper> afdh;
+    std::unique_ptr<QPDFAcroFormDocumentHelper> afdh;
     auto make_afdh = [&]() {
-        if (!afdh.get()) {
-            afdh = std::make_shared<QPDFAcroFormDocumentHelper>(pdf);
+        if (!afdh) {
+            afdh = std::make_unique<QPDFAcroFormDocumentHelper>(pdf);
         }
     };
     if (m->remove_restrictions) {
@@ -2379,106 +2375,127 @@ added_page(QPDF& pdf, QPDFPageObjectHelper page)
     return added_page(pdf, page.getObjectHandle());
 }
 
+// Initialize all members that depend on the QPDF object. If both qpdf and  qpdf_p are null do
+// nothing.
 void
-QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_heap)
+QPDFJob::InputFile::initialize(FileStore& fs)
 {
+    if (qpdf_p) {
+        qpdf = qpdf_p.get();
+    }
+    if (qpdf) {
+        orig_pages = qpdf->getAllPages();
+        n_pages = QIntC::to_int(orig_pages.size());
+
+        if (fs.job.m->remove_unreferenced_page_resources != QPDFJob::re_no) {
+            remove_unreferenced = fs.job.shouldRemoveUnreferencedResources(*qpdf);
+        }
+        afdh = std::make_unique<QPDFAcroFormDocumentHelper>(*qpdf);
+    }
+}
+
+void
+QPDFJob::new_section(std::string const& filename, char const* password, std::string const& range)
+{
+    m->page_specs.push_back({filename, (password ? password : ""), range});
+}
+
+void
+QPDFJob::FileStore::process_file(std::string const& filename, QPDFJob::InputFile& file_spec)
+{
+    // Open the PDF file and store the QPDF object. Throw a std::shared_ptr to the qpdf into
+    // a heap so that it survives through copying to the output but gets cleaned up
+    // automatically at the end. Do not canonicalize the file name. Using two different
+    // paths to refer to the same file is a documented workaround for duplicating a page. If
+    // you are using this an example of how to do this with the API, you can just create two
+    // different QPDF objects to the same underlying file with the same path to achieve the
+    // same effect.
+    auto password = file_spec.password;
+    if (!encryption_file.empty() && password.empty() && filename == encryption_file) {
+        QTC::TC("qpdf", "QPDFJob pages encryption password");
+        password = encryption_file_password;
+    }
+    job.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
+        v << prefix << ": processing " << filename << "\n";
+    });
+    std::shared_ptr<InputSource> is;
+    ClosedFileInputSource* cis = nullptr;
+    if (!keep_files_open) {
+        QTC::TC("qpdf", "QPDFJob keep files open n");
+        cis = new ClosedFileInputSource(filename.c_str());
+        is = std::shared_ptr<InputSource>(cis);
+        cis->stayOpen(true);
+    } else {
+        QTC::TC("qpdf", "QPDFJob keep files open y");
+        FileInputSource* fis = new FileInputSource(filename.c_str());
+        is = std::shared_ptr<InputSource>(fis);
+    }
+    job.processInputSource(file_spec.qpdf_p, is, password.data(), true);
+    file_spec.initialize(*this);
+
+    if (cis) {
+        cis->stayOpen(false);
+        file_spec.cfis = cis;
+    }
+}
+
+void
+QPDFJob::FileStore::process_files()
+{
+    if (!keep_files_open_set) {
+        // Count the number of distinct files to determine whether we should keep files open or not.
+        // Rather than trying to code some portable heuristic based on OS limits, just hard-code
+        // this at a given number and allow users to override.
+        keep_files_open = files.size() <= keep_files_open_threshold;
+        QTC::TC("qpdf", "QPDFJob automatically set keep files open", keep_files_open ? 0 : 1);
+        job.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
+            v << prefix << ": selecting --keep-open-files=" << (keep_files_open ? "y" : "n")
+              << "\n";
+        });
+    }
+
+    for (auto& [filename, file_spec]: files) {
+        if (!file_spec.qpdf) {
+            process_file(filename, file_spec);
+        }
+    }
+}
+
+// Handle all page specifications. Return true if it succeeded without warnings.
+bool
+QPDFJob::handlePageSpecs(QPDF& pdf)
+{
+    auto& this_spec = m->file_store.files.insert({m->infilename, &pdf}).first->second;
+    this_spec.initialize(m->file_store);
+
     // Parse all page specifications and translate them into lists of actual pages.
 
-    // Handle "." as a shortcut for the input file
+    // Handle "." as a shortcut for the input file.
     for (auto& page_spec: m->page_specs) {
         if (page_spec.filename == ".") {
-            page_spec.filename = m->infilename.get();
+            page_spec.filename = m->infilename;
+        }
+        auto result = m->file_store.files.insert({page_spec.filename, nullptr});
+        if (!page_spec.password.empty()) {
+            result.first->second.password = page_spec.password;
         }
         if (page_spec.range.empty()) {
             page_spec.range = "1-z";
         }
     }
 
-    if (!m->keep_files_open_set) {
-        // Count the number of distinct files to determine whether we should keep files open or not.
-        // Rather than trying to code some portable heuristic based on OS limits, just hard-code
-        // this at a given number and allow users to override.
-        std::set<std::string> filenames;
-        for (auto& page_spec: m->page_specs) {
-            filenames.insert(page_spec.filename);
-        }
-        m->keep_files_open = (filenames.size() <= m->keep_files_open_threshold);
-        QTC::TC("qpdf", "QPDFJob automatically set keep files open", m->keep_files_open ? 0 : 1);
-        doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-            v << prefix << ": selecting --keep-open-files=" << (m->keep_files_open ? "y" : "n")
-              << "\n";
-        });
-    }
+    m->file_store.process_files();
 
-    // Create a QPDF object for each file that we may take pages from.
-    std::map<std::string, QPDF*> page_spec_qpdfs;
-    std::map<std::string, ClosedFileInputSource*> page_spec_cfis;
-    page_spec_qpdfs[m->infilename.get()] = &pdf;
-    std::vector<QPDFPageData> parsed_specs;
     std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
     for (auto& page_spec: m->page_specs) {
-        if (page_spec_qpdfs.count(page_spec.filename) == 0) {
-            // Open the PDF file and store the QPDF object. Throw a std::shared_ptr to the qpdf into
-            // a heap so that it survives through copying to the output but gets cleaned up
-            // automatically at the end. Do not canonicalize the file name. Using two different
-            // paths to refer to the same file is a documented workaround for duplicating a page. If
-            // you are using this an example of how to do this with the API, you can just create two
-            // different QPDF objects to the same underlying file with the same path to achieve the
-            // same effect.
-            char const* password = page_spec.password.get();
-            if ((!m->encryption_file.empty()) && (password == nullptr) &&
-                (page_spec.filename == m->encryption_file)) {
-                QTC::TC("qpdf", "QPDFJob pages encryption password");
-                password = m->encryption_file_password.get();
-            }
-            doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-                v << prefix << ": processing " << page_spec.filename << "\n";
-            });
-            std::shared_ptr<InputSource> is;
-            ClosedFileInputSource* cis = nullptr;
-            if (!m->keep_files_open) {
-                QTC::TC("qpdf", "QPDFJob keep files open n");
-                cis = new ClosedFileInputSource(page_spec.filename.c_str());
-                is = std::shared_ptr<InputSource>(cis);
-                cis->stayOpen(true);
-            } else {
-                QTC::TC("qpdf", "QPDFJob keep files open y");
-                FileInputSource* fis = new FileInputSource(page_spec.filename.c_str());
-                is = std::shared_ptr<InputSource>(fis);
-            }
-            std::unique_ptr<QPDF> qpdf_sp;
-            processInputSource(qpdf_sp, is, password, true);
-            page_spec_qpdfs[page_spec.filename] = qpdf_sp.get();
-            page_heap.push_back(std::move(qpdf_sp));
-            if (cis) {
-                cis->stayOpen(false);
-                page_spec_cfis[page_spec.filename] = cis;
-            }
-        }
-
         // Read original pages from the PDF, and parse the page range associated with this
         // occurrence of the file.
-        parsed_specs.emplace_back(
-            page_spec.filename, page_spec_qpdfs[page_spec.filename], page_spec.range);
-    }
-
-    std::map<unsigned long long, bool> remove_unreferenced;
-    if (m->remove_unreferenced_page_resources != QPDFJob::re_no) {
-        for (auto const& iter: page_spec_qpdfs) {
-            std::string const& filename = iter.first;
-            ClosedFileInputSource* cis = nullptr;
-            if (page_spec_cfis.count(filename)) {
-                cis = page_spec_cfis[filename];
-                cis->stayOpen(true);
-            }
-            QPDF& other(*(iter.second));
-            auto other_uuid = other.getUniqueId();
-            if (remove_unreferenced.count(other_uuid) == 0) {
-                remove_unreferenced[other_uuid] = shouldRemoveUnreferencedResources(other);
-            }
-            if (cis) {
-                cis->stayOpen(false);
-            }
+        try {
+            page_spec.selected_pages = QUtil::parse_numrange(
+                page_spec.range.c_str(), m->file_store.files[page_spec.filename].n_pages);
+        } catch (std::runtime_error& e) {
+            throw std::runtime_error(
+                "parsing numeric range for " + page_spec.filename + ": " + e.what());
         }
     }
 
@@ -2495,15 +2512,16 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
     }
 
     auto n_collate = m->collate.size();
-    auto n_specs = parsed_specs.size();
+    auto n_specs = m->page_specs.size();
     if (!(n_collate == 0 || n_collate == 1 || n_collate == n_specs)) {
         usage("--pages: if --collate has more than one value, it must have one value per page "
               "specification");
     }
+
+    std::vector<Section> new_specs;
     if (n_collate > 0 && n_specs > 1) {
         // Collate the pages by selecting one page from each spec in order. When a spec runs out of
         // pages, stop selecting from it.
-        std::vector<QPDFPageData> new_parsed_specs;
         // Make sure we have a collate value for each spec. We have already checked that a non-empty
         // collate has either one value or one value per spec.
         for (auto i = n_collate; i < n_specs; ++i) {
@@ -2514,37 +2532,34 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
         while (got_pages) {
             got_pages = false;
             for (size_t i = 0; i < n_specs; ++i) {
-                QPDFPageData& page_data = parsed_specs.at(i);
+                auto& page_data = m->page_specs.at(i);
                 for (size_t j = 0; j < m->collate.at(i); ++j) {
                     if (cur_page.at(i) + j < page_data.selected_pages.size()) {
                         got_pages = true;
-                        new_parsed_specs.emplace_back(
-                            page_data, page_data.selected_pages.at(cur_page.at(i) + j));
+                        new_specs.push_back(
+                            {page_data, page_data.selected_pages.at(cur_page.at(i) + j)});
                     }
                 }
                 cur_page.at(i) += m->collate.at(i);
             }
         }
-        parsed_specs = new_parsed_specs;
     }
 
+    std::vector<Section>& page_specs = new_specs.empty() ? m->page_specs : new_specs;
     // Add all the pages from all the files in the order specified. Keep track of any pages from the
     // original file that we are selecting.
     std::set<int> selected_from_orig;
     std::vector<QPDFObjectHandle> new_labels;
     bool any_page_labels = false;
     int out_pageno = 0;
-    std::map<unsigned long long, std::shared_ptr<QPDFAcroFormDocumentHelper>> afdh_map;
-    auto this_afdh = get_afdh_for_qpdf(afdh_map, &pdf);
     std::set<QPDFObjGen> referenced_fields;
-    for (auto& page_data: parsed_specs) {
-        ClosedFileInputSource* cis = nullptr;
-        if (page_spec_cfis.count(page_data.filename)) {
-            cis = page_spec_cfis[page_data.filename];
-            cis->stayOpen(true);
+    for (auto& page_data: page_specs) {
+        auto& file_spec = m->file_store.files[page_data.filename];
+        if (file_spec.cfis) {
+            file_spec.cfis->stayOpen(true);
         }
-        QPDFPageLabelDocumentHelper pldh(*page_data.qpdf);
-        auto other_afdh = get_afdh_for_qpdf(afdh_map, page_data.qpdf);
+        QPDFPageLabelDocumentHelper pldh(*file_spec.qpdf);
+        auto& other_afdh = file_spec.afdh;
         if (pldh.hasPageLabels()) {
             any_page_labels = true;
         }
@@ -2555,24 +2570,24 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             // Pages are specified from 1 but numbered from 0 in the vector
             int pageno = pageno_iter - 1;
             pldh.getLabelsForPageRange(pageno, pageno, out_pageno++, new_labels);
-            QPDFPageObjectHelper to_copy = page_data.orig_pages.at(QIntC::to_size(pageno));
+            QPDFPageObjectHelper to_copy = file_spec.orig_pages.at(QIntC::to_size(pageno));
             QPDFObjGen to_copy_og = to_copy.getObjectHandle().getObjGen();
-            unsigned long long from_uuid = page_data.qpdf->getUniqueId();
+            unsigned long long from_uuid = file_spec.qpdf->getUniqueId();
             if (copied_pages[from_uuid].count(to_copy_og)) {
                 QTC::TC(
                     "qpdf",
                     "QPDFJob copy same page more than once",
-                    (page_data.qpdf == &pdf) ? 0 : 1);
+                    (file_spec.qpdf == &pdf) ? 0 : 1);
                 to_copy = to_copy.shallowCopyPage();
             } else {
                 copied_pages[from_uuid].insert(to_copy_og);
-                if (remove_unreferenced[from_uuid]) {
+                if (file_spec.remove_unreferenced) {
                     to_copy.removeUnreferencedResources();
                 }
             }
             dh.addPage(to_copy, false);
             bool first_copy_from_orig = false;
-            bool this_file = (page_data.qpdf == &pdf);
+            bool this_file = (file_spec.qpdf == &pdf);
             if (this_file) {
                 // This is a page from the original file. Keep track of the fact that we are using
                 // it.
@@ -2593,7 +2608,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
                     QTC::TC("qpdf", "QPDFJob copy fields non-first from orig");
                 }
                 try {
-                    this_afdh->fixCopiedAnnotations(
+                    this_spec.afdh->fixCopiedAnnotations(
                         new_page, to_copy.getObjectHandle(), *other_afdh, &referenced_fields);
                 } catch (std::exception& e) {
                     pdf.warn(
@@ -2606,8 +2621,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
                 }
             }
         }
-        if (cis) {
-            cis->stayOpen(false);
+        if (file_spec.cfis) {
+            file_spec.cfis->stayOpen(false);
         }
     }
     if (any_page_labels) {
@@ -2622,7 +2637,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
     for (size_t pageno = 0; pageno < orig_pages.size(); ++pageno) {
         auto page = orig_pages.at(pageno);
         if (selected_from_orig.count(QIntC::to_int(pageno))) {
-            for (auto field: this_afdh->getFormFieldsForPage(page)) {
+            for (auto field: this_spec.afdh->getFormFieldsForPage(page)) {
                 QTC::TC("qpdf", "QPDFJob pages keeping field from original");
                 referenced_fields.insert(field.getObjectHandle().getObjGen());
             }
@@ -2631,7 +2646,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
         }
     }
     // Remove unreferenced form fields
-    if (this_afdh->hasAcroForm()) {
+    if (this_spec.afdh->hasAcroForm()) {
         auto acroform = pdf.getRoot().getKey("/AcroForm");
         auto fields = acroform.getKey("/Fields");
         if (fields.isArray()) {
@@ -2653,6 +2668,14 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             }
         }
     }
+    for (auto& foreign: m->file_store.files) {
+        if (foreign.second.qpdf_p) { // exclude main input
+            if (foreign.second.qpdf->anyWarnings()) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 void
@@ -2915,8 +2938,8 @@ QPDFJob::setWriterOptions(QPDFWriter& w)
         std::unique_ptr<QPDF> encryption_pdf;
         processFile(
             encryption_pdf,
-            m->encryption_file.c_str(),
-            m->encryption_file_password.get(),
+            m->file_store.encryption_file.c_str(),
+            m->file_store.encryption_file_password.data(),
             false,
             false);
         w.copyEncryptionParameters(*encryption_pdf);
@@ -2951,7 +2974,8 @@ QPDFJob::setWriterOptions(QPDFWriter& w)
             w.registerProgressReporter(std::shared_ptr<QPDFWriter::ProgressReporter>(
                 new QPDFWriter::FunctionProgressReporter(m->progress_handler)));
         } else {
-            char const* outfilename = m->outfilename ? m->outfilename.get() : "standard output";
+            char const* outfilename =
+                !m->outfilename.empty() ? m->outfilename.data() : "standard output";
             w.registerProgressReporter(std::shared_ptr<QPDFWriter::ProgressReporter>(
                 // line-break
                 new ProgressReporter(*m->log->getInfo(), m->message_prefix, outfilename)));
@@ -2965,20 +2989,20 @@ QPDFJob::doSplitPages(QPDF& pdf)
     // Generate output file pattern
     std::string before;
     std::string after;
-    size_t len = strlen(m->outfilename.get());
-    char* num_spot = strstr(const_cast<char*>(m->outfilename.get()), "%d");
-    if (num_spot != nullptr) {
+    size_t len = m->outfilename.size();
+    auto num_spot = m->outfilename.find("%d");
+    if (num_spot != std::string::npos) {
         QTC::TC("qpdf", "QPDFJob split-pages %d");
-        before = std::string(m->outfilename.get(), QIntC::to_size(num_spot - m->outfilename.get()));
-        after = num_spot + 2;
+        before = m->outfilename.substr(0, num_spot);
+        after = m->outfilename.substr(num_spot + 2);
     } else if (
-        (len >= 4) && (QUtil::str_compare_nocase(m->outfilename.get() + len - 4, ".pdf") == 0)) {
+        (len >= 4) && (QUtil::str_compare_nocase(m->outfilename.data() + len - 4, ".pdf") == 0)) {
         QTC::TC("qpdf", "QPDFJob split-pages .pdf");
-        before = std::string(m->outfilename.get(), len - 4) + "-";
-        after = m->outfilename.get() + len - 4;
+        before = m->outfilename.substr(0, len - 4) + "-";
+        after = m->outfilename.substr(len - 4);
     } else {
         QTC::TC("qpdf", "QPDFJob split-pages other");
-        before = std::string(m->outfilename.get()) + "-";
+        before = m->outfilename + "-";
     }
 
     if (shouldRemoveUnreferencedResources(pdf)) {
@@ -3037,7 +3061,7 @@ QPDFJob::doSplitPages(QPDF& pdf)
             page_range += "-" + QUtil::uint_to_string(last, QIntC::to_int(pageno_len));
         }
         std::string outfile = before + page_range + after;
-        if (QUtil::same_file(m->infilename.get(), outfile.c_str())) {
+        if (QUtil::same_file(m->infilename.data(), outfile.c_str())) {
             throw std::runtime_error("split pages would overwrite input file with " + outfile);
         }
         QPDFWriter w(outpdf, outfile.c_str());
@@ -3052,15 +3076,15 @@ QPDFJob::doSplitPages(QPDF& pdf)
 void
 QPDFJob::writeOutfile(QPDF& pdf)
 {
-    std::shared_ptr<char> temp_out;
+    std::string temp_out;
     if (m->replace_input) {
         // Append but don't prepend to the path to generate a temporary name. This saves us from
         // having to split the path by directory and non-directory.
-        temp_out = QUtil::make_shared_cstr(std::string(m->infilename.get()) + ".~qpdf-temp#");
+        temp_out = m->infilename + ".~qpdf-temp#";
         // m->outfilename will be restored to 0 before temp_out goes out of scope.
         m->outfilename = temp_out;
-    } else if (strcmp(m->outfilename.get(), "-") == 0) {
-        m->outfilename = nullptr;
+    } else if (m->outfilename == "-") {
+        m->outfilename.clear();
     }
     if (m->json_version) {
         writeJSON(pdf);
@@ -3068,8 +3092,8 @@ QPDFJob::writeOutfile(QPDF& pdf)
         // QPDFWriter must have block scope so the output file will be closed after write()
         // finishes.
         QPDFWriter w(pdf);
-        if (m->outfilename) {
-            w.setOutputFilename(m->outfilename.get());
+        if (!m->outfilename.empty()) {
+            w.setOutputFilename(m->outfilename.data());
         } else {
             // saveToStandardOutput has already been called, but calling it again is defensive and
             // harmless.
@@ -3079,24 +3103,24 @@ QPDFJob::writeOutfile(QPDF& pdf)
         setWriterOptions(w);
         w.write();
     }
-    if (m->outfilename) {
+    if (!m->outfilename.empty()) {
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-            v << prefix << ": wrote file " << m->outfilename.get() << "\n";
+            v << prefix << ": wrote file " << m->outfilename << "\n";
         });
     }
     if (m->replace_input) {
-        m->outfilename = nullptr;
+        m->outfilename.clear();
     }
     if (m->replace_input) {
         // We must close the input before we can rename files
         pdf.closeInputSource();
-        std::string backup = std::string(m->infilename.get()) + ".~qpdf-orig";
+        std::string backup = m->infilename + ".~qpdf-orig";
         bool warnings = pdf.anyWarnings();
         if (!warnings) {
             backup.append(1, '#');
         }
-        QUtil::rename_file(m->infilename.get(), backup.c_str());
-        QUtil::rename_file(temp_out.get(), m->infilename.get());
+        QUtil::rename_file(m->infilename.data(), backup.c_str());
+        QUtil::rename_file(temp_out.data(), m->infilename.data());
         if (warnings) {
             *m->log->getError() << m->message_prefix
                                 << ": there are warnings; original file kept in " << backup << "\n";
@@ -3118,12 +3142,12 @@ QPDFJob::writeJSON(QPDF& pdf)
     // File pipeline must have block scope so it will be closed after write.
     std::shared_ptr<QUtil::FileCloser> fc;
     std::shared_ptr<Pipeline> fp;
-    if (m->outfilename.get()) {
+    if (!m->outfilename.empty()) {
         QTC::TC("qpdf", "QPDFJob write json to file");
         if (m->json_stream_prefix.empty()) {
-            m->json_stream_prefix = m->outfilename.get();
+            m->json_stream_prefix = m->outfilename;
         }
-        fc = std::make_shared<QUtil::FileCloser>(QUtil::safe_fopen(m->outfilename.get(), "w"));
+        fc = std::make_shared<QUtil::FileCloser>(QUtil::safe_fopen(m->outfilename.data(), "w"));
         fp = std::make_shared<Pl_StdioFile>("json output", fc->f);
     } else if ((m->json_stream_data == qpdf_sj_file) && m->json_stream_prefix.empty()) {
         QTC::TC("qpdf", "QPDFJob need json-stream-prefix for stdout");
