@@ -156,6 +156,9 @@ Pl_RunLength::finish()
         unsigned char ch = 128;
         next()->write(&ch, 1);
     } else {
+        if (memory_limit && (m->out.size()) > memory_limit) {
+            throw std::runtime_error("Pl_RunLength memory limit exceeded");
+        }
         next()->writeString(m->out);
     }
     next()->finish();
