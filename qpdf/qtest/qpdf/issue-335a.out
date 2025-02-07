@@ -49,14 +49,7 @@ WARNING: issue-335a.pdf (trailer, offset 284): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 285): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 563): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 596): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 597): name with stray # will not work with PDF >= 1.2
-WARNING: issue-335a.pdf (trailer, offset 600): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 134): dictionary has duplicated key /L
-WARNING: issue-335a.pdf (trailer, offset 601): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 648): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 649): name with stray # will not work with PDF >= 1.2
-WARNING: issue-335a.pdf (trailer, offset 652): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 652): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 596): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 148): treating unexpected brace token as null
 WARNING: issue-335a.pdf (trailer, offset 149): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 150): unexpected )
@@ -73,14 +66,7 @@ WARNING: issue-335a.pdf (trailer, offset 284): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 285): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 563): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 596): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 597): name with stray # will not work with PDF >= 1.2
-WARNING: issue-335a.pdf (trailer, offset 600): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 164): dictionary has duplicated key /L
-WARNING: issue-335a.pdf (trailer, offset 601): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 648): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 649): name with stray # will not work with PDF >= 1.2
-WARNING: issue-335a.pdf (trailer, offset 652): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 652): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 596): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 178): invalid character (<) in hexstring
 WARNING: issue-335a.pdf (trailer, offset 212): treating unexpected brace token as null
 WARNING: issue-335a.pdf (trailer, offset 213): unexpected )
@@ -97,14 +83,7 @@ WARNING: issue-335a.pdf (trailer, offset 284): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 285): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 563): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 596): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 597): name with stray # will not work with PDF >= 1.2
-WARNING: issue-335a.pdf (trailer, offset 600): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 231): dictionary has duplicated key /L
-WARNING: issue-335a.pdf (trailer, offset 601): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 648): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 649): name with stray # will not work with PDF >= 1.2
-WARNING: issue-335a.pdf (trailer, offset 652): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 652): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 596): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 245): treating unexpected brace token as null
 WARNING: issue-335a.pdf (trailer, offset 246): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 247): unexpected )
@@ -135,11 +114,7 @@ WARNING: issue-335a.pdf (trailer, offset 563): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 596): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 597): name with stray # will not work with PDF >= 1.2
 WARNING: issue-335a.pdf (trailer, offset 600): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 601): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 648): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 649): name with stray # will not work with PDF >= 1.2
-WARNING: issue-335a.pdf (trailer, offset 652): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 652): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 600): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 313): treating unexpected brace token as null
 WARNING: issue-335a.pdf (trailer, offset 314): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 315): unexpected )
@@ -147,22 +122,14 @@ WARNING: issue-335a.pdf (trailer, offset 563): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 596): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 597): name with stray # will not work with PDF >= 1.2
 WARNING: issue-335a.pdf (trailer, offset 600): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 601): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 648): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 649): name with stray # will not work with PDF >= 1.2
-WARNING: issue-335a.pdf (trailer, offset 652): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 652): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 600): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 329): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 403): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 563): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 596): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 597): name with stray # will not work with PDF >= 1.2
 WARNING: issue-335a.pdf (trailer, offset 600): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 601): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 648): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 649): name with stray # will not work with PDF >= 1.2
-WARNING: issue-335a.pdf (trailer, offset 652): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 652): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 600): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 361): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 379): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 380): unexpected )
@@ -170,13 +137,7 @@ WARNING: issue-335a.pdf (trailer, offset 381): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 403): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 563): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 596): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 597): name with stray # will not work with PDF >= 1.2
-WARNING: issue-335a.pdf (trailer, offset 600): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 601): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 648): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 649): name with stray # will not work with PDF >= 1.2
-WARNING: issue-335a.pdf (trailer, offset 652): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 652): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 596): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 377): treating unexpected brace token as null
 WARNING: issue-335a.pdf (trailer, offset 378): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 379): unknown token while reading object; treating as string
@@ -190,13 +151,7 @@ WARNING: issue-335a.pdf (trailer, offset 402): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 403): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 563): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 596): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 597): name with stray # will not work with PDF >= 1.2
-WARNING: issue-335a.pdf (trailer, offset 600): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 601): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 648): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 649): name with stray # will not work with PDF >= 1.2
-WARNING: issue-335a.pdf (trailer, offset 652): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 652): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 596): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 417): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 433): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 563): unexpected )
@@ -451,12 +406,7 @@ WARNING: issue-335a.pdf (trailer, offset 1168): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 1328): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 1329): name with stray # will not work with PDF >= 1.2
 WARNING: issue-335a.pdf (trailer, offset 1332): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 1033): dictionary has duplicated key /L
-WARNING: issue-335a.pdf (trailer, offset 1333): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 1344): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 1428): unexpected )
-WARNING: issue-335a.pdf (trailer, offset 1434): invalid character (#) in hexstring
-WARNING: issue-335a.pdf (trailer, offset 1434): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 1332): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 1047): treating unexpected brace token as null
 WARNING: issue-335a.pdf (trailer, offset 1048): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 1049): unexpected )
@@ -579,11 +529,7 @@ WARNING: issue-335a.pdf (trailer, offset 1713): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 1989): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 3057): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 3064): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3073): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3080): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3089): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3096): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3096): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 3064): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 1487): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 1710): invalid character (#) in hexstring
 WARNING: issue-335a.pdf (trailer, offset 1712): unexpected )
@@ -591,11 +537,7 @@ WARNING: issue-335a.pdf (trailer, offset 1713): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 1989): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 3057): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 3064): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3073): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3080): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3089): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3096): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3096): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 3064): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 1503): treating unexpected brace token as null
 WARNING: issue-335a.pdf (trailer, offset 1504): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 1704): unexpected )
@@ -680,22 +622,14 @@ WARNING: issue-335a.pdf (trailer, offset 1749): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 1989): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 3057): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 3064): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3073): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3080): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3089): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3096): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3096): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 3064): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 1763): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 1986): invalid character (#) in hexstring
 WARNING: issue-335a.pdf (trailer, offset 1988): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 1989): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 3057): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 3064): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3073): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3080): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3089): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3096): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3096): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 3064): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 1779): treating unexpected brace token as null
 WARNING: issue-335a.pdf (trailer, offset 1780): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 1980): unexpected )
@@ -711,11 +645,7 @@ WARNING: issue-335a.pdf (trailer, offset 1988): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 1989): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 3057): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 3064): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3073): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3080): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3089): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3096): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3096): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 3064): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 1809): invalid character (<) in hexstring
 WARNING: issue-335a.pdf (trailer, offset 1827): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 1845): unknown token while reading object; treating as string
@@ -785,20 +715,14 @@ WARNING: issue-335a.pdf (trailer, offset 2022): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 3057): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 3064): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 3073): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3080): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3089): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3096): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3096): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 3073): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 2020): treating unexpected brace token as null
 WARNING: issue-335a.pdf (trailer, offset 2021): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 2022): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 3057): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 3064): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 3073): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3080): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3089): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3096): unknown token while reading object; treating as string
-WARNING: issue-335a.pdf (trailer, offset 3096): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 3073): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 3585): treating unexpected brace token as null
 WARNING: issue-335a.pdf (trailer, offset 3586): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 3588): unexpected )
@@ -1003,4 +927,30 @@ WARNING: issue-335a.pdf (trailer, offset 20601): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 20602): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 20604): invalid character ({) in hexstring
 WARNING: issue-335a.pdf (trailer, offset 20604): too many errors; giving up on reading object
-qpdf: issue-335a.pdf: too many errors while reconstructing cross-reference table
+WARNING: issue-335a.pdf (trailer, offset 20446): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20601): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 20602): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20604): invalid character ({) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 20606): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 20607): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 20607): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 20598): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20600): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 20601): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 20602): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20604): invalid character ({) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 20606): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 20606): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 20684): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20683): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 20747): stream keyword found in trailer
+WARNING: issue-335a.pdf (object 5 0, offset 23451): invalid character (ÿ) in hexstring
+WARNING: issue-335a.pdf (object 5 0, offset 23458): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (object 5 0, offset 23444): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (object 5 0, offset 23444): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-335a.pdf (object 5 0, offset 23440): stream dictionary lacks /Length key
+WARNING: issue-335a.pdf (object 5 0, offset 23485): attempting to recover stream length
+WARNING: issue-335a.pdf (object 5 0, offset 23485): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (object 5 0, offset 24974): expected endobj
+WARNING: issue-335a.pdf (object 5 0, offset 24974): EOF after endobj
+qpdf: issue-335a.pdf: unable to find /Root dictionary

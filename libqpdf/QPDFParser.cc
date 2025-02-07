@@ -469,17 +469,20 @@ QPDFParser::fixMissingKeys()
 bool
 QPDFParser::tooManyBadTokens()
 {
+    if (frame->olist.size() > 5'000 || frame->dict.size() > 5'000) {
+        warn("encountered errors while parsing an array or dictionary with more than 5000 "
+             "elements; giving up on reading object");
+        return true;
+    }
     if (--max_bad_count > 0 && good_count > 4) {
-        if (frame->olist.size() > 100'000 || frame->dict.size() > 100'000) {
-            warn("encountered errors while parsing an array or dictionary with more than 100000 "
-                 "elements; giving up on reading object");
-            return true;
-        }
         good_count = 0;
         bad_count = 1;
         return false;
     }
-    if (++bad_count > 5) {
+    if (++bad_count > 5 ||
+        (frame->state != st_array && QIntC::to_size(max_bad_count) < frame->olist.size())) {
+        // Give up after 5 errors in close proximity or if the number of missing dictionary keys
+        // exceeds the remaining number of allowable total errors.
         warn("too many errors; giving up on reading object");
         return true;
     }
