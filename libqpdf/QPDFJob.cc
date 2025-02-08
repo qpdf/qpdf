@@ -614,8 +614,9 @@ QPDFJob::checkConfiguration()
         usage("no output file may be given for this option");
     }
     if (m->check_requires_password && m->check_is_encrypted) {
-        usage("--requires-password and --is-encrypted may not be given"
-              " together");
+        usage(
+            "--requires-password and --is-encrypted may not be given"
+            " together");
     }
 
     if (m->encrypt && (!m->allow_insecure) &&
@@ -646,8 +647,9 @@ QPDFJob::checkConfiguration()
     }
     if ((!m->split_pages) && QUtil::same_file(m->infilename.get(), m->outfilename.get())) {
         QTC::TC("qpdf", "QPDFJob same file error");
-        usage("input file and output file are the same; use --replace-input to intentionally "
-              "overwrite the input file");
+        usage(
+            "input file and output file are the same; use --replace-input to intentionally "
+            "overwrite the input file");
     }
 
     if (m->json_version == 1) {
@@ -2243,8 +2245,9 @@ QPDFJob::handleTransformations(QPDF& pdf)
             }
             last_page_seen = spec.first_page;
             nums.appendItem(QPDFObjectHandle::newInteger(spec.first_page - 1));
-            nums.appendItem(QPDFPageLabelDocumentHelper::pageLabelDict(
-                spec.label_type, spec.start_num, spec.prefix));
+            nums.appendItem(
+                QPDFPageLabelDocumentHelper::pageLabelDict(
+                    spec.label_type, spec.start_num, spec.prefix));
         }
         auto page_labels = QPDFObjectHandle::newDictionary();
         page_labels.replaceKey("/Nums", nums);
@@ -2497,8 +2500,9 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
     auto n_collate = m->collate.size();
     auto n_specs = parsed_specs.size();
     if (!(n_collate == 0 || n_collate == 1 || n_collate == n_specs)) {
-        usage("--pages: if --collate has more than one value, it must have one value per page "
-              "specification");
+        usage(
+            "--pages: if --collate has more than one value, it must have one value per page "
+            "specification");
     }
     if (n_collate > 0 && n_specs > 1) {
         // Collate the pages by selecting one page from each spec in order. When a spec runs out of
@@ -2706,8 +2710,9 @@ QPDFJob::maybeFixWritePassword(int R, std::string& password)
                     std::string encoded;
                     if (!QUtil::utf8_to_pdf_doc(password, encoded)) {
                         QTC::TC("qpdf", "QPDFJob password not encodable");
-                        throw std::runtime_error("supplied password cannot be encoded for 40-bit "
-                                                 "or 128-bit encryption formats");
+                        throw std::runtime_error(
+                            "supplied password cannot be encoded for 40-bit "
+                            "or 128-bit encryption formats");
                     }
                     password = encoded;
                 }
@@ -2948,13 +2953,15 @@ QPDFJob::setWriterOptions(QPDFWriter& w)
     }
     if (m->progress) {
         if (m->progress_handler) {
-            w.registerProgressReporter(std::shared_ptr<QPDFWriter::ProgressReporter>(
-                new QPDFWriter::FunctionProgressReporter(m->progress_handler)));
+            w.registerProgressReporter(
+                std::shared_ptr<QPDFWriter::ProgressReporter>(
+                    new QPDFWriter::FunctionProgressReporter(m->progress_handler)));
         } else {
             char const* outfilename = m->outfilename ? m->outfilename.get() : "standard output";
-            w.registerProgressReporter(std::shared_ptr<QPDFWriter::ProgressReporter>(
-                // line-break
-                new ProgressReporter(*m->log->getInfo(), m->message_prefix, outfilename)));
+            w.registerProgressReporter(
+                std::shared_ptr<QPDFWriter::ProgressReporter>(
+                    // line-break
+                    new ProgressReporter(*m->log->getInfo(), m->message_prefix, outfilename)));
         }
     }
 }
@@ -3127,8 +3134,9 @@ QPDFJob::writeJSON(QPDF& pdf)
         fp = std::make_shared<Pl_StdioFile>("json output", fc->f);
     } else if ((m->json_stream_data == qpdf_sj_file) && m->json_stream_prefix.empty()) {
         QTC::TC("qpdf", "QPDFJob need json-stream-prefix for stdout");
-        usage("please specify --json-stream-prefix since the input file "
-              "name is unknown");
+        usage(
+            "please specify --json-stream-prefix since the input file "
+            "name is unknown");
     } else {
         QTC::TC("qpdf", "QPDFJob write json to stdout");
         m->log->saveToStandardOutput(true);

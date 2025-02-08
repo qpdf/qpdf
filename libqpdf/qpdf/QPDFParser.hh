@@ -23,8 +23,9 @@ class QPDFParser
         tokenizer(tokenizer),
         decrypter(decrypter),
         context(context),
-        description(std::make_shared<QPDFValue::Description>(
-            std::string(input.getName() + ", " + object_description + " at offset $PO"))),
+        description(
+            std::make_shared<QPDFValue::Description>(
+                std::string(input.getName() + ", " + object_description + " at offset $PO"))),
         parse_pdf(parse_pdf)
     {
     }

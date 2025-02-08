@@ -551,9 +551,10 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
         ph.parseContents(&rf);
         size_t after_nw = (q ? q->numWarnings() : 0);
         if (after_nw > before_nw) {
-            ph.oh.warnIfPossible("Bad token found while scanning content stream; "
-                                 "not attempting to remove unreferenced objects from"
-                                 " this object");
+            ph.oh.warnIfPossible(
+                "Bad token found while scanning content stream; "
+                "not attempting to remove unreferenced objects from"
+                " this object");
             return false;
         }
     } catch (std::exception& e) {
@@ -715,8 +716,9 @@ QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
     newdict.replaceKey("/Group", getAttribute("/Group", false).shallowCopy());
     QPDFObjectHandle bbox = getTrimBox(false).shallowCopy();
     if (!bbox.isRectangle()) {
-        this->oh.warnIfPossible("bounding box is invalid; form"
-                                " XObject created from page will not work");
+        this->oh.warnIfPossible(
+            "bounding box is invalid; form"
+            " XObject created from page will not work");
     }
     newdict.replaceKey("/BBox", bbox);
     auto provider =
@@ -1018,8 +1020,9 @@ QPDFPageObjectHelper::copyAnnotations(
         from_afdh = afdh;
     } else if (from_afdh) {
         if (from_afdh->getQPDF().getUniqueId() != from_qpdf.getUniqueId()) {
-            throw std::logic_error("QPDFAcroFormDocumentHelper::copyAnnotations: from_afdh"
-                                   " is not from the same QPDF as from_page");
+            throw std::logic_error(
+                "QPDFAcroFormDocumentHelper::copyAnnotations: from_afdh"
+                " is not from the same QPDF as from_page");
         }
     } else {
         from_afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(from_qpdf);

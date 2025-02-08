@@ -200,8 +200,9 @@ QPDFLogger::setSave(std::shared_ptr<Pipeline> p, bool only_if_not_set)
     if (p == m->p_stdout) {
         auto pt = dynamic_cast<Pl_Track*>(p.get());
         if (pt->getUsed()) {
-            throw std::logic_error("QPDFLogger: called setSave on standard output after standard"
-                                   " output has already been used");
+            throw std::logic_error(
+                "QPDFLogger: called setSave on standard output after standard"
+                " output has already been used");
         }
         if (m->p_info == m->p_stdout) {
             m->p_info = m->p_stderr;

@@ -86,13 +86,14 @@ process(
 
     // Create appearance stream for the attachment.
 
-    auto ap = q.newStream("0 10 m\n"
-                          "10 0 l\n"
-                          "20 10 l\n"
-                          "10 0 m\n"
-                          "10 20 l\n"
-                          "0 0 20 20 re\n"
-                          "S\n");
+    auto ap = q.newStream(
+        "0 10 m\n"
+        "10 0 l\n"
+        "20 10 l\n"
+        "10 0 m\n"
+        "10 20 l\n"
+        "0 0 20 20 re\n"
+        "S\n");
     auto apdict = ap.getDict();
 
     // The following four lines demonstrate the use of the qpdf literal syntax introduced in
@@ -105,21 +106,22 @@ process(
     apdict.replaceKey("/Type", "/XObject"_qpdf);
     apdict.replaceKey("/Subtype", "/Form"_qpdf);
     apdict.replaceKey("/BBox", "[ 0 0 20 20 ]"_qpdf);
-    auto annot = q.makeIndirectObject(QPDFObjectHandle::parse(
-        &q,
-        ("<<"
-         "  /AP <<"
-         "    /N " +
-         ap.unparse() +
-         "  >>"
-         "  /Contents " +
-         QPDFObjectHandle::newUnicodeString(attachment).unparse() + "  /FS " +
-         fs.getObjectHandle().unparse() + "  /NM " +
-         QPDFObjectHandle::newUnicodeString(attachment).unparse() +
-         "  /Rect [ 72 700 92 720 ]"
-         "  /Subtype /FileAttachment"
-         "  /Type /Annot"
-         ">>")));
+    auto annot = q.makeIndirectObject(
+        QPDFObjectHandle::parse(
+            &q,
+            ("<<"
+             "  /AP <<"
+             "    /N " +
+             ap.unparse() +
+             "  >>"
+             "  /Contents " +
+             QPDFObjectHandle::newUnicodeString(attachment).unparse() + "  /FS " +
+             fs.getObjectHandle().unparse() + "  /NM " +
+             QPDFObjectHandle::newUnicodeString(attachment).unparse() +
+             "  /Rect [ 72 700 92 720 ]"
+             "  /Subtype /FileAttachment"
+             "  /Type /Annot"
+             ">>")));
 
     // Generate contents for the page.
     auto contents = q.newStream(("q\n"

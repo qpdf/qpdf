@@ -1507,8 +1507,9 @@ QPDFObjectHandle::getUniqueResourceName(
     // This could only happen if there is a coding error.
     // The number of candidates we test is more than the
     // number of keys we're checking against.
-    throw std::logic_error("unable to find unconflicting name in"
-                           " QPDFObjectHandle::getUniqueResourceName");
+    throw std::logic_error(
+        "unable to find unconflicting name in"
+        " QPDFObjectHandle::getUniqueResourceName");
 }
 
 // Dictionary mutators
@@ -2820,8 +2821,9 @@ QPDFObjectHandle::checkOwnership(QPDFObjectHandle const& item) const
     auto item_qpdf = item.getOwningQPDF();
     if ((qpdf != nullptr) && (item_qpdf != nullptr) && (qpdf != item_qpdf)) {
         QTC::TC("qpdf", "QPDFObjectHandle check ownership");
-        throw std::logic_error("Attempting to add an object from a different QPDF. Use "
-                               "QPDF::copyForeignObject to add objects from another file.");
+        throw std::logic_error(
+            "Attempting to add an object from a different QPDF. Use "
+            "QPDF::copyForeignObject to add objects from another file.");
     }
 }
 

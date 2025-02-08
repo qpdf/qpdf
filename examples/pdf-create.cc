@@ -194,10 +194,11 @@ add_page(
     QPDFObjectHandle contents = createPageContents(pdf, color_space + " with filter " + filter);
 
     // Create the page dictionary
-    QPDFObjectHandle page = pdf.makeIndirectObject("<<"
-                                                   " /Type /Page"
-                                                   " /MediaBox [0 0 612 392]"
-                                                   ">>"_qpdf);
+    QPDFObjectHandle page = pdf.makeIndirectObject(
+        "<<"
+        " /Type /Page"
+        " /MediaBox [0 0 612 392]"
+        ">>"_qpdf);
     page.replaceKey("/Contents", contents);
     page.replaceKey("/Resources", resources);
 

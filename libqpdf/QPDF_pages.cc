@@ -55,8 +55,9 @@ QPDF::getAllPages()
             // Files have been found in the wild where /Pages in the catalog points to the first
             // page. Try to work around this and similar cases with this heuristic.
             if (!warned) {
-                getRoot().warnIfPossible("document page tree root (root -> /Pages) doesn't point"
-                                         " to the root of the page tree; attempting to correct");
+                getRoot().warnIfPossible(
+                    "document page tree root (root -> /Pages) doesn't point"
+                    " to the root of the page tree; attempting to correct");
                 warned = true;
             }
             changed_pages = true;

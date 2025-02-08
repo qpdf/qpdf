@@ -607,8 +607,9 @@ hex_encode_decode_test()
     std::cout << "begin hex encode/decode\n";
     assert_hex_encode("", "");
     assert_hex_encode("Potato", "506f7461746f");
-    std::string with_null("a\367"
-                          "00w");
+    std::string with_null(
+        "a\367"
+        "00w");
     with_null[3] = '\0';
     assert_hex_encode(with_null, "61f7300077");
     assert_hex_decode("", "");

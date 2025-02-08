@@ -21,10 +21,12 @@ main(int, char*[])
     test_string("abc");
     test_string("message digest");
     test_string("abcdefghijklmnopqrstuvwxyz");
-    test_string("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi"
-                "jklmnopqrstuvwxyz0123456789");
-    test_string("1234567890123456789012345678901234567890"
-                "1234567890123456789012345678901234567890");
+    test_string(
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi"
+        "jklmnopqrstuvwxyz0123456789");
+    test_string(
+        "1234567890123456789012345678901234567890"
+        "1234567890123456789012345678901234567890");
     MD5 a;
     a.encodeFile("md5.in");
     std::cout << a.unparse() << std::endl;

@@ -1639,7 +1639,8 @@ QPDFObjectHandle::isInitialized() const noexcept
     return obj != nullptr;
 }
 
-inline QPDFObjectHandle::operator bool() const noexcept
+inline QPDFObjectHandle::
+operator bool() const noexcept
 {
     return static_cast<bool>(obj);
 }

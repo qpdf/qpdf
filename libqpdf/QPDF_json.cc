@@ -237,8 +237,9 @@ class QPDF::JSONReactor: public JSON::Reactor
         pdf(pdf),
         is(is),
         must_be_complete(must_be_complete),
-        descr(std::make_shared<QPDFValue::Description>(
-            QPDFValue::JSON_Descr(std::make_shared<std::string>(is->getName()), "")))
+        descr(
+            std::make_shared<QPDFValue::Description>(
+                QPDFValue::JSON_Descr(std::make_shared<std::string>(is->getName()), "")))
     {
     }
     ~JSONReactor() override = default;
@@ -267,10 +268,10 @@ class QPDF::JSONReactor: public JSON::Reactor
     struct StackFrame
     {
         StackFrame(state_e state) :
-            state(state){};
+            state(state) {};
         StackFrame(state_e state, QPDFObjectHandle&& object) :
             state(state),
-            object(object){};
+            object(object) {};
         state_e state;
         QPDFObjectHandle object;
     };

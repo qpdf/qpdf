@@ -111,8 +111,9 @@ Pl_AES_PDF::finish()
             // However, we have encountered files for which the output is not a multiple of the
             // block size.  In this case, pad with zeroes and hope for the best.
             if (this->offset >= this->buf_size) {
-                throw std::logic_error("buffer overflow in AES encryption"
-                                       " pipeline");
+                throw std::logic_error(
+                    "buffer overflow in AES encryption"
+                    " pipeline");
             }
             std::memset(this->inbuf + this->offset, 0, this->buf_size - this->offset);
             this->offset = this->buf_size;

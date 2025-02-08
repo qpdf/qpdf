@@ -276,8 +276,9 @@ QPDFAcroFormDocumentHelper::analyze()
                 // case such as a PDF creator adding a self-contained annotation (merged with the
                 // field dictionary) to the page's /Annots array and forgetting to also put it in
                 // /AcroForm.
-                annot.warnIfPossible("this widget annotation is not"
-                                     " reachable from /AcroForm in the document catalog");
+                annot.warnIfPossible(
+                    "this widget annotation is not"
+                    " reachable from /AcroForm in the document catalog");
                 m->annotation_to_field[og] = QPDFFormFieldObjectHelper(annot);
                 m->field_to_annotations[og].emplace_back(annot);
             }
@@ -296,14 +297,16 @@ QPDFAcroFormDocumentHelper::traverseField(
     }
     if (!field.isIndirect()) {
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper direct field");
-        field.warnIfPossible("encountered a direct object as a field or annotation while "
-                             "traversing /AcroForm; ignoring field or annotation");
+        field.warnIfPossible(
+            "encountered a direct object as a field or annotation while "
+            "traversing /AcroForm; ignoring field or annotation");
         return;
     }
     if (!field.isDictionary()) {
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper non-dictionary field");
-        field.warnIfPossible("encountered a non-dictionary as a field or annotation while"
-                             " traversing /AcroForm; ignoring field or annotation");
+        field.warnIfPossible(
+            "encountered a non-dictionary as a field or annotation while"
+            " traversing /AcroForm; ignoring field or annotation");
         return;
     }
     QPDFObjGen og(field.getObjGen());

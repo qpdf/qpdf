@@ -49,7 +49,7 @@
 	* Add QPDF::setMaxWarnings to set the maximum of warnings before
 	warning suppression.
 
-	* Add static option to Pl_DCT to limit memory usage of 
+	* Add static option to Pl_DCT to limit memory usage of
 	decompression. The option is generally exposed but is primarily
 	intended to support fuzz tests, which have explicit memory limits
 	that are smaller than what is commonly seen in the wild with PDF

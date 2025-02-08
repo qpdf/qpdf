@@ -38,14 +38,15 @@ runtest(int n)
     if (n == 0) {
         // Create a minimal PDF from scratch.
 
-        QPDFObjectHandle font =
-            pdf.makeIndirectObject(QPDFObjectHandle::parse("<<"
-                                                           " /Type /Font"
-                                                           " /Subtype /Type1"
-                                                           " /Name /F1"
-                                                           " /BaseFont /Helvetica"
-                                                           " /Encoding /WinAnsiEncoding"
-                                                           ">>"));
+        QPDFObjectHandle font = pdf.makeIndirectObject(
+            QPDFObjectHandle::parse(
+                "<<"
+                " /Type /Font"
+                " /Subtype /Type1"
+                " /Name /F1"
+                " /BaseFont /Helvetica"
+                " /Encoding /WinAnsiEncoding"
+                ">>"));
 
         QPDFObjectHandle procset = pdf.makeIndirectObject(QPDFObjectHandle::parse("[/PDF /Text]"));
 

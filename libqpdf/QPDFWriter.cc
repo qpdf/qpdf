@@ -1012,8 +1012,9 @@ QPDFWriter::pushMD5Pipeline(PipelinePopper& pp)
 {
     if (!m->id2.empty()) {
         // Can't happen in the code
-        throw std::logic_error("Deterministic ID computation enabled after ID"
-                               " generation has already occurred.");
+        throw std::logic_error(
+            "Deterministic ID computation enabled after ID"
+            " generation has already occurred.");
     }
     qpdf_assert_debug(m->deterministic_id);
     qpdf_assert_debug(m->md5_pipeline == nullptr);
@@ -1081,8 +1082,9 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
         // original QPDF gets destroyed, which just disconnects the QPDFObjectHandle from its owner.
         if (object.getOwningQPDF() != &(m->pdf)) {
             QTC::TC("qpdf", "QPDFWriter foreign object");
-            throw std::logic_error("QPDFObjectHandle from different QPDF found while writing.  Use "
-                                   "QPDF::copyForeignObject to add objects from another file.");
+            throw std::logic_error(
+                "QPDFObjectHandle from different QPDF found while writing.  Use "
+                "QPDF::copyForeignObject to add objects from another file.");
         }
 
         if (m->qdf_mode && object.isStreamOfType("/XRef")) {
@@ -1876,9 +1878,10 @@ QPDFWriter::generateID()
         if (m->deterministic_id) {
             if (m->deterministic_id_data.empty()) {
                 QTC::TC("qpdf", "QPDFWriter deterministic with no data");
-                throw std::runtime_error("INTERNAL ERROR: QPDFWriter::generateID has no data for "
-                                         "deterministic ID.  This may happen if deterministic ID "
-                                         "and file encryption are requested together.");
+                throw std::runtime_error(
+                    "INTERNAL ERROR: QPDFWriter::generateID has no data for "
+                    "deterministic ID.  This may happen if deterministic ID "
+                    "and file encryption are requested together.");
             }
             seed += m->deterministic_id_data;
         } else {

@@ -47,8 +47,9 @@ Pl_ASCIIHexDecoder::write(unsigned char const* buf, size_t len)
                 t[0] = ch;
                 t[1] = 0;
                 throw std::runtime_error(
-                    std::string("character out of range"
-                                " during base Hex decode: ") +
+                    std::string(
+                        "character out of range"
+                        " during base Hex decode: ") +
                     t);
             }
             break;

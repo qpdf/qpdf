@@ -160,8 +160,9 @@ QPDFParser::parseRemainder(bool content_stream)
                 tokenizer.getValue() == "R") {
                 if (context == nullptr) {
                     QTC::TC("qpdf", "QPDFParser indirect without context");
-                    throw std::logic_error("QPDFParser::parse called without context on an object "
-                                           "with indirect references");
+                    throw std::logic_error(
+                        "QPDFParser::parse called without context on an object "
+                        "with indirect references");
                 }
                 auto id = QIntC::to_int(int_buffer[(int_count - 1) % 2]);
                 auto gen = QIntC::to_int(int_buffer[(int_count) % 2]);
@@ -470,8 +471,9 @@ bool
 QPDFParser::tooManyBadTokens()
 {
     if (frame->olist.size() > 5'000 || frame->dict.size() > 5'000) {
-        warn("encountered errors while parsing an array or dictionary with more than 5000 "
-             "elements; giving up on reading object");
+        warn(
+            "encountered errors while parsing an array or dictionary with more than 5000 "
+            "elements; giving up on reading object");
         return true;
     }
     if (--max_bad_count > 0 && good_count > 4) {

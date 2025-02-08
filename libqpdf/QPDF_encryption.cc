@@ -997,8 +997,9 @@ QPDF::decryptString(std::string& str, QPDFObjGen const& og)
             break;
 
         default:
-            warn(damagedPDF("unknown encryption filter for strings (check /StrF in "
-                            "/Encrypt dictionary); strings may be decrypted improperly"));
+            warn(damagedPDF(
+                "unknown encryption filter for strings (check /StrF in "
+                "/Encrypt dictionary); strings may be decrypted improperly"));
             // To avoid repeated warnings, reset cf_string.  Assume we'd want to use AES if V == 4.
             m->encp->cf_string = e_aes;
             use_aes = true;

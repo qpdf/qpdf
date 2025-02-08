@@ -101,9 +101,10 @@ namespace
         void
         throwException()
         {
-            throw std::logic_error("QPDF operation attempted on a QPDF object with no input "
-                                   "source. QPDF operations are invalid before processFile (or "
-                                   "another process method) or after closeInputSource");
+            throw std::logic_error(
+                "QPDF operation attempted on a QPDF object with no input "
+                "source. QPDF operations are invalid before processFile (or "
+                "another process method) or after closeInputSource");
         }
     };
 } // namespace
@@ -495,8 +496,9 @@ QPDF::inParse(bool v)
     if (m->in_parse == v) {
         // This happens if QPDFParser::parse tries to resolve an indirect object while it is
         // parsing.
-        throw std::logic_error("QPDF: re-entrant parsing detected. This is a qpdf bug."
-                               " Please report at https://github.com/qpdf/qpdf/issues.");
+        throw std::logic_error(
+            "QPDF: re-entrant parsing detected. This is a qpdf bug."
+            " Please report at https://github.com/qpdf/qpdf/issues.");
     }
     m->in_parse = v;
 }
@@ -1188,8 +1190,9 @@ QPDF::processXRefIndex(
                         throw damaged(
                             "Cross-reference stream's /Index contains a negative object id");
                     } else if (first > max_num_entries) {
-                        throw damaged("Cross-reference stream's /Index contains an impossibly "
-                                      "large object id");
+                        throw damaged(
+                            "Cross-reference stream's /Index contains an impossibly "
+                            "large object id");
                     }
                 }
             } else {
@@ -1392,8 +1395,9 @@ QPDF::showXRefTable()
             break;
 
         default:
-            throw std::logic_error("unknown cross-reference table type while"
-                                   " showing xref_table");
+            throw std::logic_error(
+                "unknown cross-reference table type while"
+                " showing xref_table");
             break;
         }
         m->log->info("\n");
@@ -2266,8 +2270,9 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
 
     ObjCopier& obj_copier = m->object_copiers[other.m->unique_id];
     if (!obj_copier.visiting.empty()) {
-        throw std::logic_error("obj_copier.visiting is not empty"
-                               " at the beginning of copyForeignObject");
+        throw std::logic_error(
+            "obj_copier.visiting is not empty"
+            " at the beginning of copyForeignObject");
     }
 
     // Make sure we have an object in this file for every referenced object in the old file.
@@ -2439,8 +2444,9 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
 
     auto stream = foreign.getObjectPtr()->as<QPDF_Stream>();
     if (stream == nullptr) {
-        throw std::logic_error("unable to retrieve underlying"
-                               " stream object from foreign stream");
+        throw std::logic_error(
+            "unable to retrieve underlying"
+            " stream object from foreign stream");
     }
     std::shared_ptr<Buffer> stream_buffer = stream->getStreamDataBuffer();
     if ((foreign_stream_qpdf.m->immediate_copy_from) && (stream_buffer == nullptr)) {

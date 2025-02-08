@@ -59,8 +59,9 @@ QPDFPageDocumentHelper::flattenAnnotations(int required_flags, int forbidden_fla
     if (afdh.getNeedAppearances()) {
         this->qpdf.getRoot()
             .getKey("/AcroForm")
-            .warnIfPossible("document does not have updated appearance streams, so form fields "
-                            "will not be flattened");
+            .warnIfPossible(
+                "document does not have updated appearance streams, so form fields "
+                "will not be flattened");
     }
     for (auto& ph: getAllPages()) {
         QPDFObjectHandle resources = ph.getAttribute("/Resources", true);

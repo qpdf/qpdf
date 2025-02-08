@@ -174,8 +174,9 @@ QPDF::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
         allow_changes,
         warn_skipped_keys);
     if (!key_ancestors.empty()) {
-        throw std::logic_error("key_ancestors not empty after"
-                               " pushing inherited attributes to pages");
+        throw std::logic_error(
+            "key_ancestors not empty after"
+            " pushing inherited attributes to pages");
     }
     m->pushed_inherited_attributes_to_pages = true;
     m->ever_pushed_inherited_attributes_to_pages = true;

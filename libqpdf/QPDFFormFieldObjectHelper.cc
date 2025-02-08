@@ -331,9 +331,9 @@ QPDFFormFieldObjectHelper::setV(QPDFObjectHandle value, bool need_appearances)
         setFieldAttribute("/V", value);
     }
     if (need_appearances) {
-        QPDF& qpdf =
-            this->oh.getQPDF("QPDFFormFieldObjectHelper::setV called with need_appearances = "
-                             "true on an object that is not associated with an owning QPDF");
+        QPDF& qpdf = this->oh.getQPDF(
+            "QPDFFormFieldObjectHelper::setV called with need_appearances = "
+            "true on an object that is not associated with an owning QPDF");
         QPDFAcroFormDocumentHelper(qpdf).setNeedAppearances(true);
     }
 }
@@ -368,8 +368,9 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
 
     QPDFObjectHandle kids = this->oh.getKey("/Kids");
     if (!(isRadioButton() && parent.isNull() && kids.isArray())) {
-        this->oh.warnIfPossible("don't know how to set the value"
-                                " of this field as a radio button");
+        this->oh.warnIfPossible(
+            "don't know how to set the value"
+            " of this field as a radio button");
         return;
     }
     setFieldAttribute("/V", name);
@@ -770,9 +771,9 @@ QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& ao
         QTC::TC("qpdf", "QPDFFormFieldObjectHelper create AS from scratch");
         QPDFObjectHandle::Rectangle rect = aoh.getRect();
         QPDFObjectHandle::Rectangle bbox(0, 0, rect.urx - rect.llx, rect.ury - rect.lly);
-        QPDFObjectHandle dict =
-            QPDFObjectHandle::parse("<< /Resources << /ProcSet [ /PDF /Text ] >>"
-                                    " /Type /XObject /Subtype /Form >>");
+        QPDFObjectHandle dict = QPDFObjectHandle::parse(
+            "<< /Resources << /ProcSet [ /PDF /Text ] >>"
+            " /Type /XObject /Subtype /Form >>");
         dict.replaceKey("/BBox", QPDFObjectHandle::newFromRectangle(bbox));
         AS = QPDFObjectHandle::newStream(this->oh.getOwningQPDF(), "/Tx BMC\nEMC\n");
         AS.replaceDict(dict);

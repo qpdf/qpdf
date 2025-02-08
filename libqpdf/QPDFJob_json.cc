@@ -295,13 +295,15 @@ Handlers::beginEncrypt(JSON j)
     });
     if (key_len == 0) {
         QTC::TC("qpdf", "QPDFJob json encrypt no key length");
-        usage("exactly one of 40bit, 128bit, or 256bit must be given; an empty dictionary may be "
-              "supplied for one of them to set the key length without imposing any restrictions");
+        usage(
+            "exactly one of 40bit, 128bit, or 256bit must be given; an empty dictionary may be "
+            "supplied for one of them to set the key length without imposing any restrictions");
     }
     if (!(user_password_seen && owner_password_seen)) {
         QTC::TC("qpdf", "QPDFJob json encrypt missing password");
-        usage("the user and owner password are both required; use the empty string for the user "
-              "password if you don't want a password");
+        usage(
+            "the user and owner password are both required; use the empty string for the user "
+            "password if you don't want a password");
     }
     this->c_enc = c_main->encrypt(key_len, user_password, owner_password);
 }

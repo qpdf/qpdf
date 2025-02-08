@@ -20,7 +20,7 @@
 template <class T, class int_type>
 static void
 load_vector_int(
-    BitStream& bit_stream, int nitems, std::vector<T>& vec, int bits_wanted, int_type T::*field)
+    BitStream& bit_stream, int nitems, std::vector<T>& vec, int bits_wanted, int_type T::* field)
 {
     bool append = vec.empty();
     // nitems times, read bits_wanted from the given bit stream, storing results in the ith vector
@@ -46,9 +46,9 @@ load_vector_vector(
     BitStream& bit_stream,
     int nitems1,
     std::vector<T>& vec1,
-    int T::*nitems2,
+    int T::* nitems2,
     int bits_wanted,
-    std::vector<int> T::*vec2)
+    std::vector<int> T::* vec2)
 {
     // nitems1 times, read nitems2 (from the ith element of vec1) items into the vec2 vector field
     // of the ith item of vec1.
@@ -164,8 +164,9 @@ QPDF::readLinearizationData()
     // that prevent loading.
 
     if (!isLinearized()) {
-        throw std::logic_error("called readLinearizationData for file"
-                               " that is not linearized");
+        throw std::logic_error(
+            "called readLinearizationData for file"
+            " that is not linearized");
     }
 
     // /L is read and stored in linp by isLinearized()
@@ -478,8 +479,9 @@ QPDF::checkLinearizationInternal()
     // streams are in use.
 
     if (m->uncompressed_after_compressed) {
-        linearizationWarning("linearized file contains an uncompressed object after a compressed "
-                             "one in a cross-reference stream");
+        linearizationWarning(
+            "linearized file contains an uncompressed object after a compressed "
+            "one in a cross-reference stream");
     }
 
     // Further checking requires optimization and order calculation. Don't allow optimization to
@@ -689,8 +691,9 @@ QPDF::checkHPageOffset(
         for (size_t i = 0; i < toS(he.nshared_objects); ++i) {
             int idx = he.shared_identifiers.at(i);
             if (shared_idx_to_obj.count(idx) == 0) {
-                stopOnError("unable to get object for item in"
-                            " shared objects hint table");
+                stopOnError(
+                    "unable to get object for item in"
+                    " shared objects hint table");
             }
             hint_shared.insert(shared_idx_to_obj[idx]);
         }
@@ -753,8 +756,9 @@ QPDF::checkHSharedObject(std::vector<QPDFObjectHandle> const& pages, std::map<in
             if (i == so.nshared_first_page) {
                 QTC::TC("qpdf", "QPDF lin check shared past first page");
                 if (m->part8.empty()) {
-                    linearizationWarning("part 8 is empty but nshared_total > "
-                                         "nshared_first_page");
+                    linearizationWarning(
+                        "part 8 is empty but nshared_total > "
+                        "nshared_first_page");
                 } else {
                     int obj = m->part8.at(0).getObjectID();
                     if (obj != so.first_shared_obj) {
@@ -839,8 +843,9 @@ QPDF::checkHOutlines()
                     std::to_string(table_length) + "; computed = " + std::to_string(length));
             }
         } else {
-            linearizationWarning("incorrect first object number in outline "
-                                 "hints table.");
+            linearizationWarning(
+                "incorrect first object number in outline "
+                "hints table.");
         }
     } else {
         linearizationWarning("incorrect object count in outline hint table");
@@ -1123,8 +1128,9 @@ QPDF::calculateLinearizationData(T const& object_stream_data)
                 break;
 
             case ObjUser::ou_bad:
-                stopOnError("INTERNAL ERROR: QPDF::calculateLinearizationData: "
-                            "invalid user type");
+                stopOnError(
+                    "INTERNAL ERROR: QPDF::calculateLinearizationData: "
+                    "invalid user type");
                 break;
             }
         }
@@ -1187,8 +1193,9 @@ QPDF::calculateLinearizationData(T const& object_stream_data)
     // Part 4: open document objects.  We don't care about the order.
 
     if (lc_root.size() != 1) {
-        stopOnError("found other than one root while"
-                    " calculating linearization data");
+        stopOnError(
+            "found other than one root while"
+            " calculating linearization data");
     }
     m->part4.push_back(getObject(*(lc_root.begin())));
     for (auto const& og: lc_open_document) {
@@ -1205,8 +1212,9 @@ QPDF::calculateLinearizationData(T const& object_stream_data)
     }
     QPDFObjGen first_page_og(pages.at(0).getObjGen());
     if (!lc_first_page_private.count(first_page_og)) {
-        stopOnError("INTERNAL ERROR: QPDF::calculateLinearizationData: first page "
-                    "object not in lc_first_page_private");
+        stopOnError(
+            "INTERNAL ERROR: QPDF::calculateLinearizationData: first page "
+            "object not in lc_first_page_private");
     }
     lc_first_page_private.erase(first_page_og);
     m->c_linp.first_page_object = pages.at(0).getObjectID();
@@ -1258,8 +1266,9 @@ QPDF::calculateLinearizationData(T const& object_stream_data)
 
         ObjUser ou(ObjUser::ou_page, toI(i));
         if (m->obj_user_to_objects.count(ou) == 0) {
-            stopOnError("found unreferenced page while"
-                        " calculating linearization data");
+            stopOnError(
+                "found unreferenced page while"
+                " calculating linearization data");
         }
         for (auto const& og: m->obj_user_to_objects[ou]) {
             if (lc_other_page_private.count(og)) {
@@ -1271,9 +1280,10 @@ QPDF::calculateLinearizationData(T const& object_stream_data)
     }
     // That should have covered all part7 objects.
     if (!lc_other_page_private.empty()) {
-        stopOnError("INTERNAL ERROR:"
-                    " QPDF::calculateLinearizationData: lc_other_page_private is "
-                    "not empty after generation of part7");
+        stopOnError(
+            "INTERNAL ERROR:"
+            " QPDF::calculateLinearizationData: lc_other_page_private is "
+            "not empty after generation of part7");
     }
 
     // Part 8: other pages' shared objects
@@ -1294,8 +1304,9 @@ QPDF::calculateLinearizationData(T const& object_stream_data)
     std::set<QPDFObjGen> pages_ogs =
         m->obj_user_to_objects[ObjUser(ObjUser::ou_root_key, "/Pages")];
     if (pages_ogs.empty()) {
-        stopOnError("found empty pages tree while"
-                    " calculating linearization data");
+        stopOnError(
+            "found empty pages tree while"
+            " calculating linearization data");
     }
     for (auto const& og: pages_ogs) {
         if (lc_other.count(og)) {
@@ -1331,8 +1342,9 @@ QPDF::calculateLinearizationData(T const& object_stream_data)
         }
     }
     if (!lc_thumbnail_private.empty()) {
-        stopOnError("INTERNAL ERROR: QPDF::calculateLinearizationData: lc_thumbnail_private not "
-                    "empty after placing thumbnails");
+        stopOnError(
+            "INTERNAL ERROR: QPDF::calculateLinearizationData: lc_thumbnail_private not "
+            "empty after placing thumbnails");
     }
 
     // Place shared thumbnail objects
@@ -1403,8 +1415,9 @@ QPDF::calculateLinearizationData(T const& object_stream_data)
         CHPageOffsetEntry& pe = m->c_page_offset_data.entries.at(i);
         ObjUser ou(ObjUser::ou_page, toI(i));
         if (m->obj_user_to_objects.count(ou) == 0) {
-            stopOnError("found unreferenced page while"
-                        " calculating linearization data");
+            stopOnError(
+                "found unreferenced page while"
+                " calculating linearization data");
         }
         for (auto const& og: m->obj_user_to_objects[ou]) {
             if ((m->object_to_obj_users[og].size() > 1) && (obj_to_index.count(og.getObj()) > 0)) {
@@ -1559,8 +1572,9 @@ QPDF::calculateHPageOffset(QPDFWriter::NewObjTable const& new_obj, QPDFWriter::O
         // Adjust delta entries
         if ((phe.at(i).delta_nobjects < min_nobjects) ||
             (phe.at(i).delta_page_length < min_length)) {
-            stopOnError("found too small delta nobjects or delta page length while writing "
-                        "linearization data");
+            stopOnError(
+                "found too small delta nobjects or delta page length while writing "
+                "linearization data");
         }
         phe.at(i).delta_nobjects -= min_nobjects;
         phe.at(i).delta_page_length -= min_length;
@@ -1636,7 +1650,7 @@ QPDF::calculateHOutline(QPDFWriter::NewObjTable const& new_obj, QPDFWriter::ObjT
 
 template <class T, class int_type>
 static void
-write_vector_int(BitWriter& w, int nitems, std::vector<T>& vec, int bits, int_type T::*field)
+write_vector_int(BitWriter& w, int nitems, std::vector<T>& vec, int bits, int_type T::* field)
 {
     // nitems times, write bits bits from the given field of the ith vector to the given bit writer.
 
@@ -1654,9 +1668,9 @@ write_vector_vector(
     BitWriter& w,
     int nitems1,
     std::vector<T>& vec1,
-    int T::*nitems2,
+    int T::* nitems2,
     int bits,
-    std::vector<int> T::*vec2)
+    std::vector<int> T::* vec2)
 {
     // nitems1 times, write nitems2 (from the ith element of vec1) items from the vec2 vector field
     // of the ith item of vec1.
@@ -1742,8 +1756,9 @@ QPDF::writeHSharedObject(BitWriter& w)
     for (size_t i = 0; i < toS(nitems); ++i) {
         // If signature were present, we'd have to write a 128-bit hash.
         if (entries.at(i).signature_present != 0) {
-            stopOnError("found unexpected signature present"
-                        " while writing linearization data");
+            stopOnError(
+                "found unexpected signature present"
+                " while writing linearization data");
         }
     }
     write_vector_int(w, nitems, entries, t.nbits_nobjects, &HSharedObjectEntry::nobjects_minus_one);

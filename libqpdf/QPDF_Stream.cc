@@ -209,8 +209,9 @@ QPDF_Stream::writeStreamJSON(
     case qpdf_sj_none:
     case qpdf_sj_inline:
         if (p != nullptr) {
-            throw std::logic_error("QPDF_Stream::writeStreamJSON: pipeline should only be supplied "
-                                   "when json_data is file");
+            throw std::logic_error(
+                "QPDF_Stream::writeStreamJSON: pipeline should only be supplied "
+                "when json_data is file");
         }
         break;
     case qpdf_sj_file:
@@ -219,8 +220,9 @@ QPDF_Stream::writeStreamJSON(
                 "QPDF_Stream::writeStreamJSON: pipeline must be supplied when json_data is file");
         }
         if (data_filename.empty()) {
-            throw std::logic_error("QPDF_Stream::writeStreamJSON: data_filename must be supplied "
-                                   "when json_data is file");
+            throw std::logic_error(
+                "QPDF_Stream::writeStreamJSON: data_filename must be supplied "
+                "when json_data is file");
         }
         break;
     }
@@ -617,13 +619,15 @@ QPDF_Stream::pipeStreamData(
         warn("content normalization encountered bad tokens");
         if (normalizer->lastTokenWasBad()) {
             QTC::TC("qpdf", "QPDF_Stream bad token at end during normalize");
-            warn("normalized content ended with a bad token; you may be able to resolve this by "
-                 "coalescing content streams in combination with normalizing content. From the "
-                 "command line, specify --coalesce-contents");
+            warn(
+                "normalized content ended with a bad token; you may be able to resolve this by "
+                "coalescing content streams in combination with normalizing content. From the "
+                "command line, specify --coalesce-contents");
         }
-        warn("Resulting stream data may be corrupted but is may still useful for manual "
-             "inspection. For more information on this warning, search for content normalization "
-             "in the manual.");
+        warn(
+            "Resulting stream data may be corrupted but is may still useful for manual "
+            "inspection. For more information on this warning, search for content normalization "
+            "in the manual.");
     }
 
     return success;
