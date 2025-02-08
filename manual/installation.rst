@@ -660,6 +660,8 @@ interfaces, which was another reason to require C++-11 at this time.
 Building with zopfli support
 ----------------------------
 
+.. cSpell:ignore DZOPFLI
+
 If you compile with ``-DZOPFLI-ON`` and have the `zopfli
 <https://github.com/google/zopfli>`__ development files available,
 qpdf will be built with zopfli support. See :ref:`zopfli` for

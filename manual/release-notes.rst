@@ -105,9 +105,10 @@ Planned changes for future 12.x (subject to change):
 
     - The handling of corrupt filtered streams has changed. If a
       compressed stream cannot be successfully uncompressed, qpdf will
-      now write the undecoded stream even if decode-level generalized or
-      specialized is set. The result of attempting to decode a corrupt
-      stream is generally unusable and can be extremely large.
+      now write the raw (encoded) stream even if decode-level
+      generalized or specialized is set. The result of attempting to
+      decode a corrupt stream is generally unusable and can be
+      extremely large.
 
 11.9.1: June 7, 2024
   - Bug Fixes
@@ -120,7 +121,7 @@ Planned changes for future 12.x (subject to change):
     - Add a CLion build configuration for building with static
       libraries with Visual C++ on Windows. This configuration works
       "out of the box" with CLion, Visual C++, and the external
-      libraries binary distribution without any additoinal external
+      libraries binary distribution without any additional external
       tools.
 
     - Tweak use of ``std::string_view`` to handle upcoming changes to

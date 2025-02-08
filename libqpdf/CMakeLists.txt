@@ -158,6 +158,7 @@ if(NOT EXTERNAL_LIBS)
     list(APPEND dep_link_libraries ${pc_zlib_LIBRARIES})
   else()
     find_path(ZLIB_H_PATH zlib.h)
+    # cSpell:ignore zlibd
     find_library(ZLIB_LIB_PATH NAMES z zd zlib zlibd)
     if(ZLIB_H_PATH AND ZLIB_LIB_PATH)
       list(APPEND dep_include_directories ${ZLIB_H_PATH})

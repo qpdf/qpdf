@@ -119,7 +119,7 @@ MD5 is used in the following non-security-sensitive ways:
 - Generation of the document ID. The document ID is an input parameter
   to the document encryption but is not itself considered to be
   secure. They are supposed to be unique, but they are not
-  tamper-resistent in non-encrypted PDF files, and hash collisions
+  tamper-resistant in non-encrypted PDF files, and hash collisions
   must be tolerated.
 
   The PDF specification recommends but does not require the use of MD5

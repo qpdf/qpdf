@@ -207,7 +207,7 @@ PDF Security Restrictions
 PDF security restrictions are described by a bit field whose value is
 stored in the ``P`` field in the encryption dictionary. The value of
 ``P`` is used by the algorithms to recover the encryption key given
-the password, which makes the value of ``P`` tamper-resistent.
+the password, which makes the value of ``P`` tamper-resistant.
 
 ``P`` is a 32-bit integer, treated as a signed twos-complement number.
 A 1 in any bit position means the permission is granted. The PDF

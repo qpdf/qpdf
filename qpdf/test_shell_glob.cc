@@ -16,7 +16,7 @@ realmain(int argc, char* argv[])
     // exercised by manually breaking the link options for msvc and
     // seeing that the test fails under that condition. Explicit link
     // changes used to be needed only for MSVC, but as of late 2024,
-    // they are also neededed for mingw, which was found by CI failure
+    // they are also needed for mingw, which was found by CI failure
     // of this test.
 
     bool found_star = false;

@@ -69,6 +69,7 @@
     "cerr",
     "cfis",
     "cflags",
+    "chao",
     "ciphertext",
     "classname",
     "cleanpatch",
@@ -396,6 +397,7 @@
     "objdump",
     "objectinfo",
     "objgen",
+    "objgens",
     "objidok",
     "objok",
     "objspec",
@@ -622,9 +624,11 @@
     "streammethod",
     "strequal",
     "strerror",
+    "strgreater",
     "stringmethod",
     "stringprep",
     "stripesize",
+    "strless",
     "strtoui",
     "struct",
     "stylesheet",
@@ -742,6 +746,7 @@
     "zdenek",
     "zdenop",
     "zeroize",
-    "zeroizing"
+    "zeroizing",
+    "zopfli"
   ]
 }

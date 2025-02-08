@@ -191,6 +191,7 @@ add_test(
   --color ${QTEST_COLOR}
   --show-on-failure ${SHOW_FAILED_TEST_OUTPUT})
 
+# cSpell:ignore qpdg
 if(OSS_FUZZ)
   list(APPEND SEED_CORPUS_ZIPS)
   foreach(F ${FUZZERS})

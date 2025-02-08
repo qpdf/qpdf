@@ -20,13 +20,13 @@
 2024-09-19  M Holger  <m.holger@qpdf.org>
 
 	* Bug fix: QPDFWriter stream DecodeLevel incorrectly defaulted to
-	none instead of generalied. Fixes #1286.
+	none instead of generalized. Fixes #1286.
 
 2024-08-25  M Holger  <m.holger@qpdf.org>
 
 	* Add new command-line arguments --remove-metadata and --remove-info
 	to exclude document metadata and information from the output PDF
-	file. Patially fixes #1145.
+	file. Partially fixes #1145.
 
 2024-08-06  M Holger  <m.holger@qpdf.org>
 
