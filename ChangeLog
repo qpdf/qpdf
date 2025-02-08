@@ -1,3 +1,7 @@
+2025-02-08  Jay Berkenbilt  <ejb@ql.org>
+
+	* 11.10.0: release
+
 2025-02-02  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add support for the zopfli compression library. See manual for

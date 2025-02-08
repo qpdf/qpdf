@@ -29,7 +29,7 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
-11.10.0: not yet released
+11.10.0: February 8, 2025
   - Bug fixes
 
     - Detect and break loops in the outline (bookmark) tree.
