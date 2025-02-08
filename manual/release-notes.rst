@@ -18,15 +18,6 @@ Planned changes for future 12.x (subject to change):
     would have to write code specifically to do that, so if you're not
     sure, then you shouldn't have to worry.
 
-  - ``QPDFObjectHandle`` will be implicitly convertible to ``bool``
-    with undefined objects evaluating to ``false``. This can simplify
-    error handling and will facilitate use of ``QPDFObjectHandle``
-    with some newer standard library constructs. This change won't
-    affect any existing code unless you have written your own
-    conversion methods to/from ``QPDFObjectHandle``. In that case,
-    it's possible that the new qpdf-provided conversion may override
-    your conversion.
-
   - ``Buffer`` copy constructor and assignment operator will be
     removed. ``Buffer`` copy operations are expensive as they always
     involve copying the buffer content. Use ``buffer2 =
@@ -39,6 +30,42 @@ Planned changes for future 12.x (subject to change):
 .. x.y.z: not yet released
 
 11.10.0: not yet released
+  - Bug fixes
+
+    - Detect and break loops in the outline (bookmark) tree.
+
+    - Correctly handle outline (bookmark) items where the
+      destination is given as a dictionary with '/D' entry.
+
+    - When loading object streams, ignore any objects not included
+      in the xref table. The PDF specification requires any object
+      that is not present in the xref table to be treated as the
+      null object.
+
+    - When writing real numbers as JSON ensure they do not end in
+      a trailing decimal point. Numbers with trailing '.' are valid
+      PDF format but are not valid in JSON.
+
+    - When ``QPDF::getObject``, ``getObjectByObjGen`` or
+      ``getObjectByID`` are called with a ``QPDFObjGen`` that does
+      not exists in the xref and object tables return a direct null.
+      Previously the methods inserted an indirect reference to the
+      null object in the object table, potentially hiding a valid
+      object with the same object id.
+
+    - Fix handling of certain deleted objects in hybrid reference
+      files. Previously qpdf would incorrectly load a deleted
+      object if it was present in a cross-reference stream specified
+      by the /XRefStm entry.
+
+    - Default the stream decode level to ``generalized``. Previously
+      the decode level incorrectly defaulted to ``none``, affecting
+      both the :qpdf:ref:`--decode-level` CLI option and the
+      ``QPDFWriter::setDecodeLevel`` method.
+
+    - Reject CLI flags with parameters. Previously the parameter
+      was simply ignored (e.g. ``--encrypt=n`` was treated as ``--encrypt``).
+
   - CLI Enhancements
 
     - The :command:`fix-qdf` command now allows an output file to be
@@ -46,10 +73,41 @@ Planned changes for future 12.x (subject to change):
       environments in which writing a binary file to standard output
       doesn't work (such as PowerShell 5).
 
+    - New :qpdf:ref:`--remove-metadata` and :qpdf:ref:`--remove-info`
+      options to exclude document metadata and information from the
+      output PDF.
+
   - Library Enhancements
 
     - qpdf can now be built with zopfli support. For details, see
       :ref:`zopfli`.
+
+    - Add ``QPDFObjectHandle operator bool``. The operator returns true
+      if the object handle is initialized and is a replacement for the
+      ``isInitialized`` method. For more details see the
+      `qpdf wiki <https://github.com/qpdf/qpdf/wiki/Use-of-default-constructed-object-handles-in-qpdf-to-indicate-failure-or-error>`__.
+
+    - New C API function ``qpdf_oh_free_buffer`` to free malloc allocated
+      buffers.
+
+  - Other enhancements
+
+    - There has been some refactoring of the processing of xref tables
+      during the loading of PDF files, including the reconstruction of
+      xref tables of damaged files. As part of this additional
+      validations have been added. As a result, some damaged files will
+      produce errors during loading rather than during later processing
+      or writing. Repair of damaged files has been improved.
+
+    - As part of the additional validations during the loading of PDF
+      files, non-dictionary objects are now automatically removed from
+      pages tree.
+
+    - The handling of corrupt filtered streams has changed. If a
+      compressed stream cannot be successfully uncompressed, qpdf will
+      now write the undecoded stream even if decode-level generalized or
+      specialized is set. The result of attempting to decode a corrupt
+      stream is generally unusable and can be extremely large.
 
 11.9.1: June 7, 2024
   - Bug Fixes
