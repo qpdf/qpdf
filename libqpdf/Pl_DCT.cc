@@ -64,13 +64,18 @@ Pl_DCT::Members::Members() :
 }
 
 Pl_DCT::Members::Members(
-    JDIMENSION image_width, JDIMENSION image_height, int components, J_COLOR_SPACE color_space) :
+    JDIMENSION image_width,
+    JDIMENSION image_height,
+    int components,
+    J_COLOR_SPACE color_space,
+    CompressConfig* config_callback) :
     action(a_compress),
     buf("DCT uncompressed image"),
     image_width(image_width),
     image_height(image_height),
     components(components),
-    color_space(color_space)
+    color_space(color_space),
+    config_callback(config_callback)
 {
 }
 
@@ -107,9 +112,10 @@ Pl_DCT::Pl_DCT(
     JDIMENSION image_width,
     JDIMENSION image_height,
     int components,
-    J_COLOR_SPACE color_space) :
+    J_COLOR_SPACE color_space,
+    CompressConfig* compress_callback) :
     Pipeline(identifier, next),
-    m(new Members(image_width, image_height, components, color_space))
+    m(new Members(image_width, image_height, components, color_space, compress_callback))
 {
 }
 
@@ -310,6 +316,9 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
     cinfo->input_components = m->components;
     cinfo->in_color_space = m->color_space;
     jpeg_set_defaults(cinfo);
+    if (m->config_callback) {
+        m->config_callback->apply(cinfo);
+    }
 
     jpeg_start_compress(cinfo, TRUE);
 

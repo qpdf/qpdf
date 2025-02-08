@@ -52,6 +52,16 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
     QPDF_DLL
     static void setThrowOnCorruptData(bool treat_as_error);
 
+    class QPDF_DLL_CLASS CompressConfig
+    {
+      public:
+        QPDF_DLL
+        CompressConfig() = default;
+        QPDF_DLL
+        virtual ~CompressConfig() = default;
+        virtual void apply(jpeg_compress_struct*) = 0;
+    };
+
     // Constructor for compressing image data
     QPDF_DLL
     Pl_DCT(
@@ -60,7 +70,8 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
         JDIMENSION image_width,
         JDIMENSION image_height,
         int components,
-        J_COLOR_SPACE color_space);
+        J_COLOR_SPACE color_space,
+        CompressConfig* config_callback = nullptr);
 
     QPDF_DLL
     ~Pl_DCT() override;
@@ -93,7 +104,8 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
             JDIMENSION image_width,
             JDIMENSION image_height,
             int components,
-            J_COLOR_SPACE color_space);
+            J_COLOR_SPACE color_space,
+            CompressConfig* config_callback);
         // For decompression
         Members();
 
@@ -105,6 +117,8 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
         JDIMENSION image_height{0};
         int components{1};
         J_COLOR_SPACE color_space{JCS_GRAYSCALE};
+
+        CompressConfig* config_callback{nullptr};
     };
 
     std::shared_ptr<Members> m;
