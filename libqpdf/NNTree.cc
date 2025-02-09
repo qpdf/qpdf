@@ -63,8 +63,7 @@ NNTreeIterator::updateIValue(bool allow_invalid)
     if (!okay) {
         if (!allow_invalid) {
             throw std::logic_error(
-                "attempt made to dereference an invalid"
-                " name/number tree iterator");
+                "attempt made to dereference an invalid name/number tree iterator");
         }
         this->ivalue.first = QPDFObjectHandle();
         this->ivalue.second = QPDFObjectHandle();

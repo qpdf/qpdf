@@ -58,8 +58,7 @@ InputSource::findFirst(char const* start_chars, qpdf_offset_t offset, size_t len
     size_t size = sizeof(buf) - 1;
     if ((strlen(start_chars) < 1) || (strlen(start_chars) > size)) {
         throw std::logic_error(
-            "InputSource::findSource called with"
-            " too small or too large of a character sequence");
+            "InputSource::findSource called with too small or too large of a character sequence");
     }
 
     char* p = nullptr;
