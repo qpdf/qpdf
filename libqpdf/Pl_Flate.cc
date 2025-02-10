@@ -9,7 +9,7 @@
 #include <qpdf/qpdf-config.h>
 
 #ifdef ZOPFLI
-# include <zopfli/zopfli.h>
+# include <zopfli.h>
 #endif
 
 namespace
