@@ -192,7 +192,7 @@ if(NOT EXTERNAL_LIBS)
 endif()
 
 if(ZOPFLI)
-  find_path(ZOPFLI_H_PATH zopfli/zopfli.h)
+  find_path(ZOPFLI_H_PATH NAMES zopfli.h PATH_SUFFIXES zopfli)
   find_library(ZOPFLI_LIB_PATH NAMES zopfli)
   if(ZOPFLI_H_PATH AND ZOPFLI_LIB_PATH)
     list(APPEND dep_include_directories ${ZOPFLI_H_PATH})
