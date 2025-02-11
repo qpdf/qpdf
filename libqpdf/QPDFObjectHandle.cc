@@ -1615,13 +1615,6 @@ QPDFObjectHandle::unparseBinary() const
     }
 }
 
-// Deprecated versionless getJSON to be removed in qpdf 12
-JSON
-QPDFObjectHandle::getJSON(bool dereference_indirect) const
-{
-    return getJSON(1, dereference_indirect);
-}
-
 JSON
 QPDFObjectHandle::getJSON(int json_version, bool dereference_indirect) const
 {

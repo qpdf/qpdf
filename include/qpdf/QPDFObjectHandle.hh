@@ -1206,11 +1206,6 @@ class QPDFObjectHandle
     void writeJSON(
         int json_version, Pipeline* p, bool dereference_indirect = false, size_t depth = 0) const;
 
-    // Deprecated version uses v1 for backward compatibility.
-    // ABI: remove for qpdf 12
-    [[deprecated("Use getJSON(int version)")]] QPDF_DLL JSON
-    getJSON(bool dereference_indirect = false) const;
-
     // This method can be called on a stream to get a more extended JSON representation of the
     // stream that includes the stream's data. The JSON object returned is always a dictionary whose
     // "dict" key is an encoding of the stream's dictionary. The representation of the data is

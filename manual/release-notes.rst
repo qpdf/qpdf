@@ -11,6 +11,9 @@ For a detailed list of changes, please see the file
 12.0.0: not yet released
   - API: breaking changes
 
+    - Deprecated versionless overload of ``QPDFObjectHandle::getJSON``
+      has been removed.
+
     - ``Buffer`` copy constructor and assignment operator have been
       removed. ``Buffer`` copy operations are expensive as they always
       involve copying the buffer content. Use ``buffer2 = buffer1.copy();``
