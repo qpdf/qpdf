@@ -278,10 +278,9 @@ namespace QIntC // QIntC = qpdf Integer Conversion
         QIntC::range_check_error<T>(cur, delta);
     }
 
-    // ABI: fix spelling error in function name. Also remove "substract" from spelling dictionary.
     template <typename T>
     void
-    range_check_substract_error(T const& cur, T const& delta)
+    range_check_subtract_error(T const& cur, T const& delta)
     {
         if ((delta > 0) && ((std::numeric_limits<T>::min() + delta) > cur)) {
             std::ostringstream msg;
@@ -297,15 +296,14 @@ namespace QIntC // QIntC = qpdf Integer Conversion
         }
     }
 
-    // ABI: fix typo in function name
     template <typename T>
     inline void
-    range_check_substract(T const& cur, T const& delta)
+    range_check_subtract(T const& cur, T const& delta)
     {
         if ((delta >= 0) == (cur >= 0)) {
             return;
         }
-        QIntC::range_check_substract_error<T>(cur, delta);
+        QIntC::range_check_subtract_error<T>(cur, delta);
     }
 }; // namespace QIntC
 

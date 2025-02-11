@@ -6,12 +6,6 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
-
-Planned changes for future 12.x (subject to change):
-
-  - ``QIntC.hh`` contains the type ``substract``, which will be fixed
-    to ``subtract``. (Not enabled with ``FUTURE`` option.)
-
 .. x.y.z: not yet released
 
 12.0.0: not yet released
@@ -22,6 +16,9 @@ Planned changes for future 12.x (subject to change):
       involve copying the buffer content. Use ``buffer2 = buffer1.copy();``
       or ``Buffer buffer2{buffer1.copy()};`` to make it explicit that
       copying is intended.
+
+    - ``QIntC.hh`` contained the typ0 ``substract`` in function names,
+      which has been fixed to ``subtract``.
 
   - Library Enhancements
 

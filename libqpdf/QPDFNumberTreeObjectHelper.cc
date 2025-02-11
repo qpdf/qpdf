@@ -218,7 +218,7 @@ QPDFNumberTreeObjectHelper::findObjectAtOrBelow(
         return false;
     }
     oh = i->second;
-    QIntC::range_check_substract(idx, i->first);
+    QIntC::range_check_subtract(idx, i->first);
     offset = idx - i->first;
     return true;
 }

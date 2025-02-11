@@ -48,7 +48,7 @@ try_range_check_subtract_real(char const* description, bool exp_pass, T const& a
 {
     bool passed = false;
     try {
-        QIntC::range_check_substract(a, b);
+        QIntC::range_check_subtract(a, b);
         std::cout << description << ": okay";
         passed = true;
     } catch (std::range_error& e) {
