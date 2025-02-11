@@ -4,16 +4,23 @@
 
 #include <cstring>
 
-bool test_mode = false;
-
-// During CI the Buffer copy constructor and copy assignment operator throw an assertion error to
-// detect their accidental use. Call setTestMode to surpress the assertion errors for testing of
-// copy construction and assignment.
-void
-Buffer::setTestMode() noexcept
+class Buffer::Members
 {
-    test_mode = true;
-}
+    friend class Buffer;
+
+  public:
+    ~Members();
+
+  private:
+    Members(size_t size, unsigned char* buf, bool own_memory);
+    Members(std::string&& content);
+    Members(Members const&) = delete;
+
+    std::string str;
+    bool own_memory;
+    size_t size;
+    unsigned char* buf;
+};
 
 Buffer::Members::Members(size_t size, unsigned char* buf, bool own_memory) :
     own_memory(own_memory),
@@ -67,20 +74,6 @@ Buffer::Buffer(std::string& content) :
 {
 }
 
-Buffer::Buffer(Buffer const& rhs)
-{
-    assert(test_mode);
-    copy(rhs);
-}
-
-Buffer&
-Buffer::operator=(Buffer const& rhs)
-{
-    assert(test_mode);
-    copy(rhs);
-    return *this;
-}
-
 Buffer::Buffer(Buffer&& rhs) noexcept :
     m(std::move(rhs.m))
 {
@@ -92,6 +85,8 @@ Buffer::operator=(Buffer&& rhs) noexcept
     std::swap(m, rhs.m);
     return *this;
 }
+
+Buffer::~Buffer() = default;
 
 void
 Buffer::copy(Buffer const& rhs)
