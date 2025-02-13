@@ -974,65 +974,12 @@ QPDFObjectHandle::eraseItemAndGetOld(int at)
     return result;
 }
 
-// Dictionary accessors
+// Dictionary accessors are in QPDF_Dictionary.cc
 
 QPDFObjectHandle::QPDFDictItems
 QPDFObjectHandle::ditems()
 {
     return {*this};
-}
-
-bool
-QPDFObjectHandle::hasKey(std::string const& key) const
-{
-    auto dict = as_dictionary(strict);
-    if (dict) {
-        return dict.hasKey(key);
-    } else {
-        typeWarning("dictionary", "returning false for a key containment request");
-        QTC::TC("qpdf", "QPDFObjectHandle dictionary false for hasKey");
-        return false;
-    }
-}
-
-QPDFObjectHandle
-QPDFObjectHandle::getKey(std::string const& key) const
-{
-    if (auto dict = as_dictionary(strict)) {
-        return dict.getKey(key);
-    }
-    typeWarning("dictionary", "returning null for attempted key retrieval");
-    QTC::TC("qpdf", "QPDFObjectHandle dictionary null for getKey");
-    static auto constexpr msg = " -> null returned from getting key $VD from non-Dictionary"sv;
-    return QPDF_Null::create(obj, msg, "");
-}
-
-QPDFObjectHandle
-QPDFObjectHandle::getKeyIfDict(std::string const& key) const
-{
-    return isNull() ? newNull() : getKey(key);
-}
-
-std::set<std::string>
-QPDFObjectHandle::getKeys() const
-{
-    if (auto dict = as_dictionary(strict)) {
-        return dict.getKeys();
-    }
-    typeWarning("dictionary", "treating as empty");
-    QTC::TC("qpdf", "QPDFObjectHandle dictionary empty set for getKeys");
-    return {};
-}
-
-std::map<std::string, QPDFObjectHandle>
-QPDFObjectHandle::getDictAsMap() const
-{
-    if (auto dict = as_dictionary(strict)) {
-        return dict.getAsMap();
-    }
-    typeWarning("dictionary", "treating as empty");
-    QTC::TC("qpdf", "QPDFObjectHandle dictionary empty map for asMap");
-    return {};
 }
 
 // Array and Name accessors
@@ -1208,56 +1155,7 @@ QPDFObjectHandle::getUniqueResourceName(
         " QPDFObjectHandle::getUniqueResourceName");
 }
 
-// Dictionary mutators
-
-void
-QPDFObjectHandle::replaceKey(std::string const& key, QPDFObjectHandle const& value)
-{
-    if (auto dict = as_dictionary(strict)) {
-        checkOwnership(value);
-        dict.replaceKey(key, value);
-        return;
-    }
-    typeWarning("dictionary", "ignoring key replacement request");
-    QTC::TC("qpdf", "QPDFObjectHandle dictionary ignoring replaceKey");
-}
-
-QPDFObjectHandle
-QPDFObjectHandle::replaceKeyAndGetNew(std::string const& key, QPDFObjectHandle const& value)
-{
-    replaceKey(key, value);
-    return value;
-}
-
-QPDFObjectHandle
-QPDFObjectHandle::replaceKeyAndGetOld(std::string const& key, QPDFObjectHandle const& value)
-{
-    QPDFObjectHandle old = removeKeyAndGetOld(key);
-    replaceKey(key, value);
-    return old;
-}
-
-void
-QPDFObjectHandle::removeKey(std::string const& key)
-{
-    if (auto dict = as_dictionary(strict)) {
-        dict.removeKey(key);
-        return;
-    }
-    typeWarning("dictionary", "ignoring key removal request");
-    QTC::TC("qpdf", "QPDFObjectHandle dictionary ignoring removeKey");
-}
-
-QPDFObjectHandle
-QPDFObjectHandle::removeKeyAndGetOld(std::string const& key)
-{
-    auto result = QPDFObjectHandle::newNull();
-    if (auto dict = as_dictionary(strict)) {
-        result = dict.getKey(key);
-    }
-    removeKey(key);
-    return result;
-}
+// Dictionary mutators are in QPDF_Dictionary.cc
 
 // Stream accessors
 
@@ -2343,19 +2241,6 @@ QPDFObjectHandle::isImage(bool exclude_imagemask) const
         ((!exclude_imagemask) ||
          (!(getDict().getKey("/ImageMask").isBool() &&
             getDict().getKey("/ImageMask").getBoolValue()))));
-}
-
-void
-QPDFObjectHandle::checkOwnership(QPDFObjectHandle const& item) const
-{
-    auto qpdf = getOwningQPDF();
-    auto item_qpdf = item.getOwningQPDF();
-    if ((qpdf != nullptr) && (item_qpdf != nullptr) && (qpdf != item_qpdf)) {
-        QTC::TC("qpdf", "QPDFObjectHandle check ownership");
-        throw std::logic_error(
-            "Attempting to add an object from a different QPDF. Use "
-            "QPDF::copyForeignObject to add objects from another file.");
-    }
 }
 
 void
