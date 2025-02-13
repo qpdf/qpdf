@@ -25,7 +25,7 @@ std::string
 QPDFFileSpecObjectHelper::getDescription()
 {
     std::string result;
-    auto desc = this->oh.getKey("/Desc");
+    auto desc = oh().getKey("/Desc");
     if (desc.isString()) {
         result = desc.getUTF8Value();
     }
@@ -36,7 +36,7 @@ std::string
 QPDFFileSpecObjectHelper::getFilename()
 {
     for (auto const& i: name_keys) {
-        auto k = this->oh.getKey(i);
+        auto k = oh().getKey(i);
         if (k.isString()) {
             return k.getUTF8Value();
         }
@@ -49,7 +49,7 @@ QPDFFileSpecObjectHelper::getFilenames()
 {
     std::map<std::string, std::string> result;
     for (auto const& i: name_keys) {
-        auto k = this->oh.getKey(i);
+        auto k = oh().getKey(i);
         if (k.isString()) {
             result[i] = k.getUTF8Value();
         }
@@ -60,7 +60,7 @@ QPDFFileSpecObjectHelper::getFilenames()
 QPDFObjectHandle
 QPDFFileSpecObjectHelper::getEmbeddedFileStream(std::string const& key)
 {
-    auto ef = this->oh.getKey("/EF");
+    auto ef = oh().getKey("/EF");
     if (!ef.isDictionary()) {
         return QPDFObjectHandle::newNull();
     }
@@ -79,7 +79,7 @@ QPDFFileSpecObjectHelper::getEmbeddedFileStream(std::string const& key)
 QPDFObjectHandle
 QPDFFileSpecObjectHelper::getEmbeddedFileStreams()
 {
-    return this->oh.getKey("/EF");
+    return oh().getKey("/EF");
 }
 
 QPDFFileSpecObjectHelper
@@ -110,7 +110,7 @@ QPDFFileSpecObjectHelper::createFileSpec(
 QPDFFileSpecObjectHelper&
 QPDFFileSpecObjectHelper::setDescription(std::string const& desc)
 {
-    this->oh.replaceKey("/Desc", QPDFObjectHandle::newUnicodeString(desc));
+    oh().replaceKey("/Desc", QPDFObjectHandle::newUnicodeString(desc));
     return *this;
 }
 
@@ -119,13 +119,13 @@ QPDFFileSpecObjectHelper::setFilename(
     std::string const& unicode_name, std::string const& compat_name)
 {
     auto uf = QPDFObjectHandle::newUnicodeString(unicode_name);
-    this->oh.replaceKey("/UF", uf);
+    oh().replaceKey("/UF", uf);
     if (compat_name.empty()) {
         QTC::TC("qpdf", "QPDFFileSpecObjectHelper empty compat_name");
-        this->oh.replaceKey("/F", uf);
+        oh().replaceKey("/F", uf);
     } else {
         QTC::TC("qpdf", "QPDFFileSpecObjectHelper non-empty compat_name");
-        this->oh.replaceKey("/F", QPDFObjectHandle::newString(compat_name));
+        oh().replaceKey("/F", QPDFObjectHandle::newString(compat_name));
     }
     return *this;
 }

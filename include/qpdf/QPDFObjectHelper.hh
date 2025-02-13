@@ -31,13 +31,12 @@
 // underlying QPDF objects unless there is a specific comment in a specific helper method that says
 // otherwise. The pattern of using helper objects was introduced to allow creation of higher level
 // helper functions without polluting the public interface of QPDFObjectHandle.
-
-class QPDF_DLL_CLASS QPDFObjectHelper
+class QPDF_DLL_CLASS QPDFObjectHelper: public qpdf::BaseHandle
 {
   public:
     QPDF_DLL
     QPDFObjectHelper(QPDFObjectHandle oh) :
-        oh(oh)
+        qpdf::BaseHandle(oh.getObj())
     {
     }
     QPDF_DLL
@@ -46,17 +45,29 @@ class QPDF_DLL_CLASS QPDFObjectHelper
     QPDFObjectHandle
     getObjectHandle()
     {
-        return this->oh;
+        return {obj};
     }
     QPDF_DLL
     QPDFObjectHandle const
     getObjectHandle() const
     {
-        return this->oh;
+        return {obj};
     }
 
   protected:
-    QPDFObjectHandle oh;
+    QPDF_DLL_PRIVATE
+    QPDFObjectHandle
+    oh()
+    {
+        return {obj};
+    }
+    QPDF_DLL_PRIVATE
+    QPDFObjectHandle const
+    oh() const
+    {
+        return {obj};
+    }
+    QPDFObjectHandle oh_;
 };
 
 #endif // QPDFOBJECTHELPER_HH

@@ -9,8 +9,8 @@ QPDFOutlineObjectHelper::Members::Members(QPDFOutlineDocumentHelper& dh) :
 }
 
 QPDFOutlineObjectHelper::QPDFOutlineObjectHelper(
-    QPDFObjectHandle oh, QPDFOutlineDocumentHelper& dh, int depth) :
-    QPDFObjectHelper(oh),
+    QPDFObjectHandle a_oh, QPDFOutlineDocumentHelper& dh, int depth) :
+    QPDFObjectHelper(a_oh),
     m(new Members(dh))
 {
     if (depth > 50) {
@@ -18,13 +18,13 @@ QPDFOutlineObjectHelper::QPDFOutlineObjectHelper(
         // to 1.
         return;
     }
-    if (QPDFOutlineDocumentHelper::Accessor::checkSeen(m->dh, this->oh.getObjGen())) {
+    if (QPDFOutlineDocumentHelper::Accessor::checkSeen(m->dh, a_oh.getObjGen())) {
         QTC::TC("qpdf", "QPDFOutlineObjectHelper loop");
         return;
     }
 
     QPDFObjGen::set children;
-    QPDFObjectHandle cur = oh.getKey("/First");
+    QPDFObjectHandle cur = a_oh.getKey("/First");
     while (!cur.isNull() && cur.isIndirect() && children.add(cur)) {
         QPDFOutlineObjectHelper new_ooh(cur, dh, 1 + depth);
         new_ooh.m->parent = std::make_shared<QPDFOutlineObjectHelper>(*this);
@@ -50,11 +50,11 @@ QPDFOutlineObjectHelper::getDest()
 {
     QPDFObjectHandle dest;
     QPDFObjectHandle A;
-    if (this->oh.hasKey("/Dest")) {
+    if (oh().hasKey("/Dest")) {
         QTC::TC("qpdf", "QPDFOutlineObjectHelper direct dest");
-        dest = this->oh.getKey("/Dest");
+        dest = oh().getKey("/Dest");
     } else if (
-        (A = this->oh.getKey("/A")).isDictionary() && A.getKey("/S").isName() &&
+        (A = oh().getKey("/A")).isDictionary() && A.getKey("/S").isName() &&
         (A.getKey("/S").getName() == "/GoTo") && A.hasKey("/D")) {
         QTC::TC("qpdf", "QPDFOutlineObjectHelper action dest");
         dest = A.getKey("/D");
@@ -85,8 +85,8 @@ int
 QPDFOutlineObjectHelper::getCount()
 {
     int count = 0;
-    if (this->oh.hasKey("/Count")) {
-        count = this->oh.getKey("/Count").getIntValueAsInt();
+    if (oh().hasKey("/Count")) {
+        count = oh().getKey("/Count").getIntValueAsInt();
     }
     return count;
 }
@@ -95,8 +95,8 @@ std::string
 QPDFOutlineObjectHelper::getTitle()
 {
     std::string result;
-    if (this->oh.hasKey("/Title")) {
-        result = this->oh.getKey("/Title").getUTF8Value();
+    if (oh().hasKey("/Title")) {
+        result = oh().getKey("/Title").getUTF8Value();
     }
     return result;
 }
