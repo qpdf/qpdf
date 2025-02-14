@@ -29,6 +29,12 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
+11.10.1 not yet released
+  - Bug fixes
+
+    - When qpdf is build with :ref:`zopfli` support, fix the search
+      for the ``zopfli.h`` header.
+
 11.10.0: February 8, 2025
   - Bug fixes
 
