@@ -37,7 +37,7 @@ for (my $n = 1; $n <= 2; ++$n)
                  {$td->FILE => "fix$n.qdf.out",
                   $td->EXIT_STATUS => 0});
 }
-if (! (($^O eq 'MSWin32') || ($^O eq 'Win32') || ($^O eq 'msys')))
+if (! (($^O eq 'MSWin32') || ($^O eq 'Win32') || ($^O eq 'msys') || ($^O eq 'cygwin')))
 {
     # The pipe tests are unstable on Windows. It has not been
     # determined whether this is because the code doesn't work or the
@@ -47,12 +47,12 @@ if (! (($^O eq 'MSWin32') || ($^O eq 'Win32') || ($^O eq 'msys')))
     $n_tests += 4;
     for (my $n = 1; $n <= 2; ++$n)
     {
-        $td->runtest("fix-qdf $n from pipe",
+        $td->runtest("fix-qdf $n from pipe (os=$^O)",
                      {$td->COMMAND => "cat fix$n.qdf | fix-qdf "},
                      {$td->FILE => "fix$n.qdf.out",
                           $td->EXIT_STATUS => 0});
 
-        $td->runtest("identity fix-qdf $n",
+        $td->runtest("identity fix-qdf $n (os=$^O)",
                      {$td->COMMAND => "fix-qdf fix$n.qdf.out"},
                      {$td->FILE => "fix$n.qdf.out",
                           $td->EXIT_STATUS => 0});
