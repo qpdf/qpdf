@@ -29,6 +29,13 @@ Planned changes for future 12.x (subject to change):
 
 .. x.y.z: not yet released
 
+11.10.1: February 15, 2025
+  - Build fixes
+
+    - Fix incorrect detection of zopfli
+
+    - Recognize cygwin perl as Windows when running test suite
+
 11.10.0: February 8, 2025
   - Bug fixes
 

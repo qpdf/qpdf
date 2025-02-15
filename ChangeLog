@@ -1,3 +1,16 @@
+2025-02-15  Jay Berkenbilt  <ejb@ql.org>
+
+	* 11.10.1: release
+
+	* Detect cygwin as Windows for fix-qdf tests that don't work on
+	Windows. The perl used for the test runner in GitHub Actions
+	changed. This was causing some non-Windows tests to fail and also
+	causing path canonicalization to fail for absolute paths with
+	drive letters.
+
+	* Detect zopfli by looking for <zopfli/zopfli.h> rather than just
+	<zopfli.h>
+
 2025-02-08  Jay Berkenbilt  <ejb@ql.org>
 
 	* 11.10.0: release
