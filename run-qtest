@@ -40,7 +40,7 @@ while (@ARGV)
     elsif ($arg eq '--bin')
     {
         usage() unless @ARGV;
-        push(@bin, shift(@ARGV));
+        push(@bin, abs_path(shift(@ARGV)));
     }
     elsif ($arg eq '--color')
     {
