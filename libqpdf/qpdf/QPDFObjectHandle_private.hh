@@ -182,8 +182,17 @@ namespace qpdf
             std::function<std::shared_ptr<QPDFStreamFilter>()> factory);
 
       private:
-        QPDF_Stream* stream() const;
-
+        QPDF_Stream*
+        stream() const
+        {
+            if (obj) {
+                if (auto s = obj->as<QPDF_Stream>()) {
+                    return s;
+                }
+            }
+            throw std::runtime_error("operation for stream attempted on object of type dictionary");
+            return nullptr; // unreachable
+        }
         bool filterable(
             std::vector<std::shared_ptr<QPDFStreamFilter>>& filters,
             bool& specialized_compression,
