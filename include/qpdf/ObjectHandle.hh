@@ -39,7 +39,7 @@ namespace qpdf
     class Dictionary;
     class Stream;
 
-    enum typed : std::uint8_t { strict = 0, any_flag = 1, optional = 2, any = 3, error = 4};
+    enum typed : std::uint8_t { strict = 0, any_flag = 1, optional = 2, any = 3, error = 4 };
 
     // Basehandle is only used as a base-class for QPDFObjectHandle like classes. Currently the only
     // methods exposed in public API are operators to convert derived objects to QPDFObjectHandle,

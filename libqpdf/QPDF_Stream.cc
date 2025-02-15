@@ -162,18 +162,6 @@ QPDF_Stream::writeJSON(int json_version, JSON::Writer& jw)
     stream_dict.writeJSON(json_version, jw);
 }
 
-QPDF_Stream*
-Stream::stream() const
-{
-    if (obj) {
-        if (auto s = obj->as<QPDF_Stream>()) {
-            return s;
-        }
-    }
-    throw std::runtime_error("operation for stream attempted on object of type dictionary");
-    return nullptr; // unreachable
-}
-
 JSON
 Stream::getStreamJSON(
     int json_version,
@@ -656,4 +644,188 @@ Stream::warn(std::string const& message)
 {
     auto s = stream();
     s->qpdf->warn(qpdf_e_damaged_pdf, "", s->parsed_offset, message);
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::getDict() const
+{
+    return as_stream(error).getDict();
+}
+
+void
+QPDFObjectHandle::setFilterOnWrite(bool val)
+{
+    as_stream(error).setFilterOnWrite(val);
+}
+
+bool
+QPDFObjectHandle::getFilterOnWrite()
+{
+    return as_stream(error).getFilterOnWrite();
+}
+
+bool
+QPDFObjectHandle::isDataModified()
+{
+    return as_stream(error).isDataModified();
+}
+
+void
+QPDFObjectHandle::replaceDict(QPDFObjectHandle const& new_dict)
+{
+    as_stream(error).replaceDict(new_dict);
+}
+
+std::shared_ptr<Buffer>
+QPDFObjectHandle::getStreamData(qpdf_stream_decode_level_e level)
+{
+    return as_stream(error).getStreamData(level);
+}
+
+std::shared_ptr<Buffer>
+QPDFObjectHandle::getRawStreamData()
+{
+    return as_stream(error).getRawStreamData();
+}
+
+bool
+QPDFObjectHandle::pipeStreamData(
+    Pipeline* p,
+    bool* filtering_attempted,
+    int encode_flags,
+    qpdf_stream_decode_level_e decode_level,
+    bool suppress_warnings,
+    bool will_retry)
+{
+    return as_stream(error).pipeStreamData(
+        p, filtering_attempted, encode_flags, decode_level, suppress_warnings, will_retry);
+}
+
+bool
+QPDFObjectHandle::pipeStreamData(
+    Pipeline* p,
+    int encode_flags,
+    qpdf_stream_decode_level_e decode_level,
+    bool suppress_warnings,
+    bool will_retry)
+{
+    bool filtering_attempted;
+    as_stream(error).pipeStreamData(
+        p, &filtering_attempted, encode_flags, decode_level, suppress_warnings, will_retry);
+    return filtering_attempted;
+}
+
+bool
+QPDFObjectHandle::pipeStreamData(Pipeline* p, bool filter, bool normalize, bool compress)
+{
+    int encode_flags = 0;
+    qpdf_stream_decode_level_e decode_level = qpdf_dl_none;
+    if (filter) {
+        decode_level = qpdf_dl_generalized;
+        if (normalize) {
+            encode_flags |= qpdf_ef_normalize;
+        }
+        if (compress) {
+            encode_flags |= qpdf_ef_compress;
+        }
+    }
+    return pipeStreamData(p, encode_flags, decode_level, false);
+}
+
+void
+QPDFObjectHandle::replaceStreamData(
+    std::shared_ptr<Buffer> data,
+    QPDFObjectHandle const& filter,
+    QPDFObjectHandle const& decode_parms)
+{
+    as_stream(error).replaceStreamData(data, filter, decode_parms);
+}
+
+void
+QPDFObjectHandle::replaceStreamData(
+    std::string const& data, QPDFObjectHandle const& filter, QPDFObjectHandle const& decode_parms)
+{
+    auto b = std::make_shared<Buffer>(data.length());
+    unsigned char* bp = b->getBuffer();
+    if (bp) {
+        memcpy(bp, data.c_str(), data.length());
+    }
+    as_stream(error).replaceStreamData(b, filter, decode_parms);
+}
+
+void
+QPDFObjectHandle::replaceStreamData(
+    std::shared_ptr<StreamDataProvider> provider,
+    QPDFObjectHandle const& filter,
+    QPDFObjectHandle const& decode_parms)
+{
+    as_stream(error).replaceStreamData(provider, filter, decode_parms);
+}
+
+namespace
+{
+    class FunctionProvider: public QPDFObjectHandle::StreamDataProvider
+    {
+      public:
+        FunctionProvider(std::function<void(Pipeline*)> provider) :
+            StreamDataProvider(false),
+            p1(provider),
+            p2(nullptr)
+        {
+        }
+        FunctionProvider(std::function<bool(Pipeline*, bool, bool)> provider) :
+            StreamDataProvider(true),
+            p1(nullptr),
+            p2(provider)
+        {
+        }
+
+        void
+        provideStreamData(QPDFObjGen const&, Pipeline* pipeline) override
+        {
+            p1(pipeline);
+        }
+
+        bool
+        provideStreamData(
+            QPDFObjGen const&, Pipeline* pipeline, bool suppress_warnings, bool will_retry) override
+        {
+            return p2(pipeline, suppress_warnings, will_retry);
+        }
+
+      private:
+        std::function<void(Pipeline*)> p1;
+        std::function<bool(Pipeline*, bool, bool)> p2;
+    };
+} // namespace
+
+void
+QPDFObjectHandle::replaceStreamData(
+    std::function<void(Pipeline*)> provider,
+    QPDFObjectHandle const& filter,
+    QPDFObjectHandle const& decode_parms)
+{
+    auto sdp = std::shared_ptr<StreamDataProvider>(new FunctionProvider(provider));
+    as_stream(error).replaceStreamData(sdp, filter, decode_parms);
+}
+
+void
+QPDFObjectHandle::replaceStreamData(
+    std::function<bool(Pipeline*, bool, bool)> provider,
+    QPDFObjectHandle const& filter,
+    QPDFObjectHandle const& decode_parms)
+{
+    auto sdp = std::shared_ptr<StreamDataProvider>(new FunctionProvider(provider));
+    as_stream(error).replaceStreamData(sdp, filter, decode_parms);
+}
+
+JSON
+QPDFObjectHandle::getStreamJSON(
+    int json_version,
+    qpdf_json_stream_data_e json_data,
+    qpdf_stream_decode_level_e decode_level,
+    Pipeline* p,
+    std::string const& data_filename)
+{
+    return as_stream(error).getStreamJSON(json_version, json_data, decode_level, p, data_filename);
 }
