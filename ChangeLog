@@ -1,3 +1,7 @@
+2025-02-16  Jay Berkenbilt  <ejb@ql.org>
+
+	* Disable PointerHolder by default.
+
 2025-02-15  Jay Berkenbilt  <ejb@ql.org>
 
 	* 11.10.1: release

@@ -23,7 +23,6 @@
 #include <qpdf/Pipeline.hh>
 
 #include <qpdf/Pl_Buffer.hh>
-#include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFTokenizer.hh>
 

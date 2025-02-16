@@ -117,6 +117,18 @@ Planned changes for future 12.x (subject to change):
       decode a corrupt stream is generally unusable and can be
       extremely large.
 
+12.0.0: not yet released
+  - Build Changes
+
+    - If ``POINTERHOLDER_TRANSITION`` is not defined, define it to
+      ``4``, which completely removes ``PointerHolder`` from the API.
+      Stop including it from any headers that used to include it. This
+      means code that hasn't completed its ``PointerHolder``
+      transition will get errors unless it defines
+      ``POINTERHOLDER_TRANSITION``, and any file that uses
+      ``PointerHolder`` will have to explicitly include it rather than
+      relying on other headers to bring it along.
+
 11.9.1: June 7, 2024
   - Bug Fixes
 

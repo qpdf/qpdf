@@ -26,18 +26,12 @@
 #define POINTERHOLDER_IS_SHARED_POINTER
 
 #ifndef POINTERHOLDER_TRANSITION
-
-// #define POINTERHOLDER_TRANSITION 0 to suppress this warning, and see below.
-// See also https://qpdf.readthedocs.io/en/stable/design.html#smart-pointers
-# warning "POINTERHOLDER_TRANSITION is not defined -- see qpdf/PointerHolder.hh"
-
-// undefined = define as 0 and issue a warning
 // 0 = no deprecation warnings, backward-compatible API
 // 1 = make PointerHolder<T>(T*) explicit
 // 2 = warn for use of getPointer() and getRefcount()
 // 3 = warn for all use of PointerHolder
 // 4 = don't define PointerHolder at all
-# define POINTERHOLDER_TRANSITION 0
+# define POINTERHOLDER_TRANSITION 4
 #endif // !defined(POINTERHOLDER_TRANSITION)
 
 #if POINTERHOLDER_TRANSITION < 4
@@ -50,15 +44,19 @@
 // interface and is mutually assignable with std::shared_ptr. Code
 // that uses containers of PointerHolder will require adjustment.
 
+// In qpdf 11, a backward-compatible PointerHolder was provided with a
+// warning if POINTERHOLDER_TRANSITION was not defined. Starting in
+// qpdf 12, PointerHolder is absent if POINTERHOLDER_TRANSITION is not
+// defined. In a future version of qpdf, PointerHolder will be removed
+// outright if it becomes inconvenient to keep it around.
+
 // *** HOW TO TRANSITION ***
 
 // The symbol POINTERHOLDER_TRANSITION can be defined to help you
 // transition your code away from PointerHolder. You can define it
 // before including any qpdf header files or including its definition
 // in your build configuration. If not defined, it automatically gets
-// defined to 0 (with a warning), which enables full backward
-// compatibility. That way, you don't have to take action for your
-// code to continue to work.
+// defined to 4, which excludes PointerHolder entirely.
 
 // If you want to work gradually to transition your code away from
 // PointerHolder, you can define POINTERHOLDER_TRANSITION and fix the
@@ -123,7 +121,8 @@
 
 // POINTERHOLDER_TRANSITION = 4
 //
-// Suppress definition of the PointerHolder<T> type entirely.
+// Suppress definition of the PointerHolder<T> type entirely. This is
+// the default behavior starting with qpdf 12.
 
 // CONST BEHAVIOR
 
