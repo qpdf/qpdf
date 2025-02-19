@@ -50,7 +50,7 @@ QPDFOutlineDocumentHelper::initializeByPage()
 }
 
 std::vector<QPDFOutlineObjectHelper>
-QPDFOutlineDocumentHelper::getOutlinesForPage(QPDFObjGen const& og)
+QPDFOutlineDocumentHelper::getOutlinesForPage(QPDFObjGen og)
 {
     if (m->by_page.empty()) {
         initializeByPage();

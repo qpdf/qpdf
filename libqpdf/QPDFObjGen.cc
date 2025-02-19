@@ -6,21 +6,6 @@
 
 #include <stdexcept>
 
-// ABI: inline and pass og by value
-std::ostream&
-operator<<(std::ostream& os, const QPDFObjGen& og)
-{
-    os << og.obj << "," << og.gen;
-    return os;
-}
-
-// ABI: inline
-std::string
-QPDFObjGen::unparse(char separator) const
-{
-    return std::to_string(obj) + separator + std::to_string(gen);
-}
-
 bool
 QPDFObjGen::set::add(QPDFObjectHandle const& oh)
 {

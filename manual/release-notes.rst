@@ -6,28 +6,44 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
-If you are a developer and want to test your code against future API
-changes that are under consideration, you can build qpdf locally and
-enable the ``FUTURE`` build option (see :ref:`build-options`).
-
-Planned changes for future 12.x (subject to change):
-  - ``QPDFObjectHandle`` will support move construction/assignment.
-    This change will be invisible to most developers but may break
-    your code if you rely on specific behavior around how many
-    references to a QPDFObjectHandle's underlying object exist. You
-    would have to write code specifically to do that, so if you're not
-    sure, then you shouldn't have to worry.
-
-  - ``Buffer`` copy constructor and assignment operator will be
-    removed. ``Buffer`` copy operations are expensive as they always
-    involve copying the buffer content. Use ``buffer2 =
-    buffer1.copy();`` or ``Buffer buffer2{buffer1.copy()};`` to make
-    it explicit that copying is intended.
-
-  - ``QIntC.hh`` contains the type ``substract``, which will be fixed
-    to ``subtract``. (Not enabled with ``FUTURE`` option.)
-
 .. x.y.z: not yet released
+
+12.0.0: not yet released
+  - API: breaking changes
+
+    - Deprecated versionless overload of ``QPDFObjectHandle::getJSON``
+      has been removed.
+
+    - ``Buffer`` copy constructor and assignment operator have been
+      removed. ``Buffer`` copy operations are expensive as they always
+      involve copying the buffer content. Use ``buffer2 = buffer1.copy();``
+      or ``Buffer buffer2{buffer1.copy()};`` to make it explicit that
+      copying is intended.
+
+    - ``QIntC.hh`` contained the typ0 ``substract`` in function names,
+      which has been fixed to ``subtract``.
+
+  - Library Enhancements
+
+    - ``QPDFObjectHandle`` supports move construction/assignment.
+      This change is invisible to most developers but may break
+      your code if you rely on specific behavior around how many
+      references to a QPDFObjectHandle's underlying object exist. You
+      would have to write code specifically to do that, so if you're not
+      sure, then you shouldn't have to worry.
+
+    - Most ``QPDFObjectHandle`` accessor methods are now const qualified.
+
+  - Build Changes
+
+    - If ``POINTERHOLDER_TRANSITION`` is not defined, define it to
+      ``4``, which completely removes ``PointerHolder`` from the API.
+      Stop including it from any headers that used to include it. This
+      means code that hasn't completed its ``PointerHolder``
+      transition will get errors unless it defines
+      ``POINTERHOLDER_TRANSITION``, and any file that uses
+      ``PointerHolder`` will have to explicitly include it rather than
+      relying on other headers to bring it along.
 
 11.10.1: February 15, 2025
   - Build fixes

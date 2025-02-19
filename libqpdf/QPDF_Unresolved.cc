@@ -3,13 +3,13 @@
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObject_private.hh>
 
-QPDF_Unresolved::QPDF_Unresolved(QPDF* qpdf, QPDFObjGen const& og) :
+QPDF_Unresolved::QPDF_Unresolved(QPDF* qpdf, QPDFObjGen og) :
     QPDFValue(::ot_unresolved, qpdf, og)
 {
 }
 
 std::shared_ptr<QPDFObject>
-QPDF_Unresolved::create(QPDF* qpdf, QPDFObjGen const& og)
+QPDF_Unresolved::create(QPDF* qpdf, QPDFObjGen og)
 {
     return do_create(new QPDF_Unresolved(qpdf, og));
 }

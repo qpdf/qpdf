@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.16)
 # also find the version number here. generate_auto_job also reads the
 # version from here.
 project(qpdf
-  VERSION 11.10.1
+  VERSION 12.0.0
   LANGUAGES C CXX)
 
 # Enable correct rpath handling for MacOSX
@@ -120,7 +120,6 @@ if(NOT (BUILD_STATIC_LIBS OR BUILD_SHARED_LIBS))
 endif()
 
 set(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
-add_compile_definitions($<$<COMPILE_LANGUAGE:CXX>:POINTERHOLDER_TRANSITION=4>)
 
 if(ENABLE_QTC)
   set(ENABLE_QTC_ARG)

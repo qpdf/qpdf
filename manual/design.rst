@@ -860,8 +860,8 @@ modification of code.
 
 The ``POINTERHOLDER_TRANSITION`` preprocessor symbol was introduced in
 qpdf 10.6.0 to help people transition from ``PointerHolder`` to
-``std::shared_ptr``. If you don't define this, you will get a compiler
-warning. Defining it to any value will suppress the warning. An
+``std::shared_ptr``. If you don't define this, ``PointerHolder`` will
+be completely excluded from the API (starting with qpdf 12).An
 explanation appears below of the different possible values for this
 symbol and what they mean.
 
@@ -1003,7 +1003,7 @@ without consulting this manual.
      - meaning
 
    - - undefined
-     - Same as ``0`` but issues a warning
+     - Same as ``4``: ``PointerHolder`` is not defined.
 
    - - ``0``
      - Provide a backward compatible ``PointerHolder`` and suppress

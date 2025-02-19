@@ -323,7 +323,7 @@ QPDF::findPage(QPDFObjectHandle& page)
 }
 
 int
-QPDF::findPage(QPDFObjGen const& og)
+QPDF::findPage(QPDFObjGen og)
 {
     flattenPagesTree();
     auto it = m->pageobj_to_pages_pos.find(og);

@@ -1058,7 +1058,7 @@ QPDFWriter::closeObject(int objid)
 }
 
 void
-QPDFWriter::assignCompressedObjectNumbers(QPDFObjGen const& og)
+QPDFWriter::assignCompressedObjectNumbers(QPDFObjGen og)
 {
     int objid = og.getObj();
     if ((og.getGen() != 0) || (m->object_stream_to_objects.count(objid) == 0)) {

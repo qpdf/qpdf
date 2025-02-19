@@ -485,7 +485,7 @@ class QPDFWriter
     void writeStringQDF(std::string_view str);
     void writeStringNoQDF(std::string_view str);
     void writePad(size_t nspaces);
-    void assignCompressedObjectNumbers(QPDFObjGen const& og);
+    void assignCompressedObjectNumbers(QPDFObjGen og);
     void enqueueObject(QPDFObjectHandle object);
     void writeObjectStreamOffsets(std::vector<qpdf_offset_t>& offsets, int first_obj);
     void writeObjectStream(QPDFObjectHandle object);

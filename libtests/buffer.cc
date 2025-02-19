@@ -18,130 +18,65 @@ uc(char const* s)
 int
 main()
 {
-    {
-        // Test that buffers can be copied by value using Buffer::copy.
-        Buffer bc1(2);
-        unsigned char* bc1p = bc1.getBuffer();
-        bc1p[0] = 'Q';
-        bc1p[1] = 'W';
-        Buffer bc2(bc1.copy());
-        bc1p[0] = 'R';
-        unsigned char* bc2p = bc2.getBuffer();
-        assert(bc2p != bc1p);
-        assert(bc2p[0] == 'Q');
-        assert(bc2p[1] == 'W');
-        bc2 = bc1.copy();
-        bc2p = bc2.getBuffer();
-        assert(bc2p != bc1p);
-        assert(bc2p[0] == 'R');
-        assert(bc2p[1] == 'W');
+    // Test that buffers can be copied by value using Buffer::copy.
+    Buffer bc1(2);
+    unsigned char* bc1p = bc1.getBuffer();
+    bc1p[0] = 'Q';
+    bc1p[1] = 'W';
+    Buffer bc2(bc1.copy());
+    bc1p[0] = 'R';
+    unsigned char* bc2p = bc2.getBuffer();
+    assert(bc2p != bc1p);
+    assert(bc2p[0] == 'Q');
+    assert(bc2p[1] == 'W');
+    bc2 = bc1.copy();
+    bc2p = bc2.getBuffer();
+    assert(bc2p != bc1p);
+    assert(bc2p[0] == 'R');
+    assert(bc2p[1] == 'W');
 
-        // Test Buffer(std:string&&)
-        Buffer bc3("QW");
-        unsigned char* bc3p = bc3.getBuffer();
-        Buffer bc4(bc3.copy());
-        bc3p[0] = 'R';
-        unsigned char* bc4p = bc4.getBuffer();
-        assert(bc4p != bc3p);
-        assert(bc4p[0] == 'Q');
-        assert(bc4p[1] == 'W');
-        bc4 = bc3.copy();
-        bc4p = bc4.getBuffer();
-        assert(bc4p != bc3p);
-        assert(bc4p[0] == 'R');
-        assert(bc4p[1] == 'W');
-    }
+    // Test Buffer(std:string&&)
+    Buffer bc3("QW");
+    unsigned char* bc3p = bc3.getBuffer();
+    Buffer bc4(bc3.copy());
+    bc3p[0] = 'R';
+    unsigned char* bc4p = bc4.getBuffer();
+    assert(bc4p != bc3p);
+    assert(bc4p[0] == 'Q');
+    assert(bc4p[1] == 'W');
+    bc4 = bc3.copy();
+    bc4p = bc4.getBuffer();
+    assert(bc4p != bc3p);
+    assert(bc4p[0] == 'R');
+    assert(bc4p[1] == 'W');
 
-#ifdef _MSC_VER
-# pragma warning(disable : 4996)
-#endif
-#if (defined(__GNUC__) || defined(__clang__))
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-    {
-        // Test that buffers can be copied by value using copy construction / assignment.
-        Buffer::setTestMode();
-        Buffer bc1(2);
-        unsigned char* bc1p = bc1.getBuffer();
-        bc1p[0] = 'Q';
-        bc1p[1] = 'W';
-        Buffer bc2(bc1);
-        bc1p[0] = 'R';
-        unsigned char* bc2p = bc2.getBuffer();
-        assert(bc2p != bc1p);
-        assert(bc2p[0] == 'Q');
-        assert(bc2p[1] == 'W');
-        bc2 = bc1;
-        bc2p = bc2.getBuffer();
-        assert(bc2p != bc1p);
-        assert(bc2p[0] == 'R');
-        assert(bc2p[1] == 'W');
+    // Test that buffers can be moved.
+    Buffer bm1(2);
+    unsigned char* bm1p = bm1.getBuffer();
+    bm1p[0] = 'Q';
+    bm1p[1] = 'W';
+    Buffer bm2(std::move(bm1));
+    bm1p[0] = 'R';
+    unsigned char* bm2p = bm2.getBuffer();
+    assert(bm2p == bm1p);
+    assert(bm2p[0] == 'R');
 
-        // Test Buffer(std:string&&)
-        Buffer bc3("QW");
-        unsigned char* bc3p = bc3.getBuffer();
-        Buffer bc4(bc3);
-        bc3p[0] = 'R';
-        unsigned char* bc4p = bc4.getBuffer();
-        assert(bc4p != bc3p);
-        assert(bc4p[0] == 'Q');
-        assert(bc4p[1] == 'W');
-        bc4 = bc3;
-        bc4p = bc4.getBuffer();
-        assert(bc4p != bc3p);
-        assert(bc2p[0] == 'R');
-        assert(bc2p[1] == 'W');
+    Buffer bm3 = std::move(bm2);
+    unsigned char* bm3p = bm3.getBuffer();
+    assert(bm3p == bm2p);
 
-        // Test Buffer(std:string&)
-        std::string s{"QW"};
-        Buffer bc5(s);
-        unsigned char* bc5p = bc5.getBuffer();
-        Buffer bc6(bc5);
-        bc5p[0] = 'R';
-        unsigned char* bc6p = bc6.getBuffer();
-        assert(bc6p != bc5p);
-        assert(bc6p[0] == 'Q');
-        assert(bc6p[1] == 'W');
-        bc6 = bc5;
-        bc6p = bc6.getBuffer();
-        assert(bc6p != bc5p);
-        assert(bc2p[0] == 'R');
-        assert(bc2p[1] == 'W');
-    }
-#if (defined(__GNUC__) || defined(__clang__))
-# pragma GCC diagnostic pop
-#endif
+    // Test Buffer(dtd::string&&)
+    Buffer bm4("QW");
+    unsigned char* bm4p = bm4.getBuffer();
+    Buffer bm5(std::move(bm4));
+    bm4p[0] = 'R';
+    unsigned char* bm5p = bm5.getBuffer();
+    assert(bm5p == bm4p);
+    assert(bm5p[0] == 'R');
 
-    {
-        // Test that buffers can be moved.
-        Buffer bm1(2);
-        unsigned char* bm1p = bm1.getBuffer();
-        bm1p[0] = 'Q';
-        bm1p[1] = 'W';
-        Buffer bm2(std::move(bm1));
-        bm1p[0] = 'R';
-        unsigned char* bm2p = bm2.getBuffer();
-        assert(bm2p == bm1p);
-        assert(bm2p[0] == 'R');
-
-        Buffer bm3 = std::move(bm2);
-        unsigned char* bm3p = bm3.getBuffer();
-        assert(bm3p == bm2p);
-
-        // Test Buffer(dtd::string&&)
-        Buffer bm4("QW");
-        unsigned char* bm4p = bm4.getBuffer();
-        Buffer bm5(std::move(bm4));
-        bm4p[0] = 'R';
-        unsigned char* bm5p = bm5.getBuffer();
-        assert(bm5p == bm4p);
-        assert(bm5p[0] == 'R');
-
-        Buffer bm6 = std::move(bm5);
-        unsigned char* bm6p = bm6.getBuffer();
-        assert(bm6p == bm5p);
-    }
+    Buffer bm6 = std::move(bm5);
+    unsigned char* bm6p = bm6.getBuffer();
+    assert(bm6p == bm5p);
 
     try {
         Pl_Discard discard;

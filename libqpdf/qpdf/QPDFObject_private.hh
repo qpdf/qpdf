@@ -132,13 +132,13 @@ class QPDFObject
     }
 
     void
-    setDefaultDescription(QPDF* qpdf, QPDFObjGen const& og)
+    setDefaultDescription(QPDF* qpdf, QPDFObjGen og)
     {
         // Intended for use by the QPDF class
         value->setDefaultDescription(qpdf, og);
     }
     void
-    setObjGen(QPDF* qpdf, QPDFObjGen const& og)
+    setObjGen(QPDF* qpdf, QPDFObjGen og)
     {
         value->qpdf = qpdf;
         value->og = og;

@@ -21,7 +21,6 @@
 #define BUFFER_HH
 
 #include <qpdf/DLL.h>
-#include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
 
 #include <cstddef>
 #include <memory>
@@ -47,14 +46,12 @@ class Buffer
     QPDF_DLL
     Buffer(std::string& content);
 
-    [[deprecated("Move Buffer or use Buffer::copy instead")]] QPDF_DLL Buffer(Buffer const&);
-    [[deprecated("Move Buffer or use Buffer::copy instead")]] QPDF_DLL Buffer&
-    operator=(Buffer const&);
-
     QPDF_DLL
     Buffer(Buffer&&) noexcept;
     QPDF_DLL
     Buffer& operator=(Buffer&&) noexcept;
+    QPDF_DLL
+    ~Buffer();
     QPDF_DLL
     size_t getSize() const;
     QPDF_DLL
@@ -66,29 +63,8 @@ class Buffer
     QPDF_DLL
     Buffer copy() const;
 
-    // Only used during CI testing.
-    // ABI: remove when removing copy constructor / assignment operator
-    static void setTestMode() noexcept;
-
   private:
-    class Members
-    {
-        friend class Buffer;
-
-      public:
-        QPDF_DLL
-        ~Members();
-
-      private:
-        Members(size_t size, unsigned char* buf, bool own_memory);
-        Members(std::string&& content);
-        Members(Members const&) = delete;
-
-        std::string str;
-        bool own_memory;
-        size_t size;
-        unsigned char* buf;
-    };
+    class Members;
 
     void copy(Buffer const&);
 

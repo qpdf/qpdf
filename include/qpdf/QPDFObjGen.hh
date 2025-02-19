@@ -21,8 +21,10 @@
 #define QPDFOBJGEN_HH
 
 #include <qpdf/DLL.h>
+
 #include <iostream>
 #include <set>
+#include <string>
 
 class QPDFObjectHandle;
 class QPDFObjectHelper;
@@ -33,13 +35,10 @@ class QPDFObjectHelper;
 class QPDFObjGen
 {
   public:
-    // ABI: change to default.
     QPDF_DLL
-    QPDFObjGen()
-    {
-    }
+    QPDFObjGen() = default;
     QPDF_DLL
-    explicit QPDFObjGen(int obj, int gen) :
+    QPDFObjGen(int obj, int gen) :
         obj(obj),
         gen(gen)
     {
@@ -48,19 +47,19 @@ class QPDFObjGen
     bool
     operator<(QPDFObjGen const& rhs) const
     {
-        return (obj < rhs.obj) || ((obj == rhs.obj) && (gen < rhs.gen));
+        return (obj < rhs.obj) || (obj == rhs.obj && gen < rhs.gen);
     }
     QPDF_DLL
     bool
     operator==(QPDFObjGen const& rhs) const
     {
-        return (obj == rhs.obj) && (gen == rhs.gen);
+        return obj == rhs.obj && gen == rhs.gen;
     }
     QPDF_DLL
     bool
     operator!=(QPDFObjGen const& rhs) const
     {
-        return (obj != rhs.obj) || (gen != rhs.gen);
+        return !(*this == rhs);
     }
     QPDF_DLL
     int
@@ -81,9 +80,18 @@ class QPDFObjGen
         return obj != 0;
     }
     QPDF_DLL
-    std::string unparse(char separator = ',') const;
+    std::string
+    unparse(char separator = ',') const
+    {
+        return std::to_string(obj) + separator + std::to_string(gen);
+    }
     QPDF_DLL
-    friend std::ostream& operator<<(std::ostream& os, const QPDFObjGen& og);
+    friend std::ostream&
+    operator<<(std::ostream& os, QPDFObjGen og)
+    {
+        os << og.obj << "," << og.gen;
+        return os;
+    }
 
     // Convenience class for loop detection when processing objects.
     //
