@@ -90,6 +90,5 @@ JSON optional key 0
 JSON 16 high high 0
 JSON 16 low not after high 0
 JSON 16 dangling high 0
-JSON parse duplicate key 0
 JSON schema array for single item 0
 JSON schema array length mismatch 0

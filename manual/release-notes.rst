@@ -11,6 +11,10 @@ For a detailed list of changes, please see the file
 12.0.0: not yet released
   - API: breaking changes
 
+    - ``JSON::checkDictionaryKeySeen`` has been removed. If ``JSON::parse``
+      encounters duplicate keys the last value is silently accepted instead
+      of throwing a runtime error.
+
     - Deprecated versionless overload of ``QPDFObjectHandle::getJSON``
       has been removed.
 
@@ -20,7 +24,7 @@ For a detailed list of changes, please see the file
       or ``Buffer buffer2{buffer1.copy()};`` to make it explicit that
       copying is intended.
 
-    - ``QIntC.hh`` contained the typ0 ``substract`` in function names,
+    - ``QIntC.hh`` contained the typo ``substract`` in function names,
       which has been fixed to ``subtract``.
 
   - Library Enhancements

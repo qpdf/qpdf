@@ -32,7 +32,7 @@ if ($^O ne 'msys')
 
 cleanup();
 
-my $good = 11;
+my $good = 12;
 
 for (my $i = 1; $i <= $good; ++$i)
 {
@@ -120,7 +120,7 @@ my @bad = (
     "stray low surrogate",      # 37
     "high high surrogate",      # 38
     "dangling high surrogate",  # 39
-    "duplicate dictionary key", # 40
+    undef,                      # 40, removed
     "decimal point after minus",# 41
     "e after minus",            # 42
     "missing digit after e",    # 43
@@ -136,10 +136,22 @@ foreach my $d (@bad)
 {
     ++$i;
     my $n = sprintf("%02d", $i);
-    $td->runtest("$n: $d",
-                 {$td->COMMAND => "json_parse bad-$n.json"},
-                 {$td->FILE => "bad-$n.out", $td->EXIT_STATUS => 2},
-                 $td->NORMALIZE_NEWLINES);
+    if (defined $d)
+    {
+        $td->runtest("$n: $d",
+                     {$td->COMMAND => "json_parse bad-$n.json"},
+                     {$td->FILE => "bad-$n.out", $td->EXIT_STATUS => 2},
+                     $td->NORMALIZE_NEWLINES);
+    }
+    else
+    {
+        # We used to disallow duplicated keys but no longer do. Add
+        # this hack to ignore a test number rather than renaming
+        # tests.
+        $td->runtest("$n: no longer used",
+                     {$td->STRING => ""},
+                     {$td->STRING => ""});
+    }
 }
 
 cleanup();

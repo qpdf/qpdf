@@ -143,12 +143,6 @@ class JSON
     QPDF_DLL
     bool isDictionary() const;
 
-    // If the key is already in the dictionary, return true. Otherwise, mark it as seen and return
-    // false. This is primarily intended to be used by the parser to detect duplicate keys when the
-    // reactor blocks them from being added to the final dictionary.
-    QPDF_DLL
-    bool checkDictionaryKeySeen(std::string const& key);
-
     // Accessors. Accessor behavior:
     //
     // - If argument is wrong type, including null, return false
@@ -327,7 +321,6 @@ class JSON
         ~JSON_dictionary() override = default;
         void write(Pipeline*, size_t depth) const override;
         std::map<std::string, JSON> members;
-        std::set<std::string> parsed_keys;
     };
     struct JSON_array;
     struct JSON_string: public JSON_value
