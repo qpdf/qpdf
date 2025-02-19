@@ -21,6 +21,22 @@ namespace qpdf
         {
         }
 
+        using iterator = std::vector<QPDFObjectHandle>::iterator;
+        using const_iterator = std::vector<QPDFObjectHandle>::const_iterator;
+        using const_reverse_iterator = std::vector<QPDFObjectHandle>::const_reverse_iterator;
+
+        iterator begin();
+
+        iterator end();
+
+        const_iterator cbegin();
+
+        const_iterator cend();
+
+        const_reverse_iterator crbegin();
+
+        const_reverse_iterator crend();
+
         int size() const;
         std::pair<bool, QPDFObjectHandle> at(int n) const;
         bool setAt(int at, QPDFObjectHandle const& oh);
@@ -35,6 +51,8 @@ namespace qpdf
         QPDF_Array* array() const;
         void checkOwnership(QPDFObjectHandle const& item) const;
         QPDFObjectHandle null() const;
+
+        std::unique_ptr<std::vector<QPDFObjectHandle>> sp_elements{};
     };
 
     // BaseDictionary is only used as a base class. It does not contain any methods exposed in the

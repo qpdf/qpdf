@@ -46,6 +46,96 @@ Array::array() const
     return nullptr; // unreachable
 }
 
+Array::iterator
+Array::begin()
+{
+    if (auto a = as<QPDF_Array>()) {
+        if (!a->sp) {
+            return a->elements.begin();
+        }
+        if (!sp_elements) {
+            sp_elements = std::make_unique<std::vector<QPDFObjectHandle>>(getAsVector());
+        }
+        return sp_elements->begin();
+    }
+    return {};
+}
+
+Array::iterator
+Array::end()
+{
+    if (auto a = as<QPDF_Array>()) {
+        if (!a->sp) {
+            return a->elements.end();
+        }
+        if (!sp_elements) {
+            sp_elements = std::make_unique<std::vector<QPDFObjectHandle>>(getAsVector());
+        }
+        return sp_elements->end();
+    }
+    return {};
+}
+
+Array::const_iterator
+Array::cbegin()
+{
+    if (auto a = as<QPDF_Array>()) {
+        if (!a->sp) {
+            return a->elements.cbegin();
+        }
+        if (!sp_elements) {
+            sp_elements = std::make_unique<std::vector<QPDFObjectHandle>>(getAsVector());
+        }
+        return sp_elements->cbegin();
+    }
+    return {};
+}
+
+Array::const_iterator
+Array::cend()
+{
+    if (auto a = as<QPDF_Array>()) {
+        if (!a->sp) {
+            return a->elements.cend();
+        }
+        if (!sp_elements) {
+            sp_elements = std::make_unique<std::vector<QPDFObjectHandle>>(getAsVector());
+        }
+        return sp_elements->cend();
+    }
+    return {};
+}
+
+Array::const_reverse_iterator
+Array::crbegin()
+{
+    if (auto a = as<QPDF_Array>()) {
+        if (!a->sp) {
+            return a->elements.crbegin();
+        }
+        if (!sp_elements) {
+            sp_elements = std::make_unique<std::vector<QPDFObjectHandle>>(getAsVector());
+        }
+        return sp_elements->crbegin();
+    }
+    return {};
+}
+
+Array::const_reverse_iterator
+Array::crend()
+{
+    if (auto a = as<QPDF_Array>()) {
+        if (!a->sp) {
+            return a->elements.crend();
+        }
+        if (!sp_elements) {
+            sp_elements = std::make_unique<std::vector<QPDFObjectHandle>>(getAsVector());
+        }
+        return sp_elements->crend();
+    }
+    return {};
+}
+
 QPDFObjectHandle
 Array::null() const
 {
