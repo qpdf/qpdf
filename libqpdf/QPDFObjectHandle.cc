@@ -322,17 +322,18 @@ QPDFObject::copy(bool shallow)
                     for (auto const& element: a.sp->elements) {
                         auto const& obj = element.second;
                         result.sp->elements[element.first] =
-                            obj->getObjGen().isIndirect() ? obj : obj->copy();
+                            obj.getObj()->getObjGen().isIndirect() ? obj : obj.getObj()->copy();
                     }
                     return QPDFObject::create<QPDF_Array>(std::move(result));
                 } else {
-                    std::vector<std::shared_ptr<QPDFObject>> result;
+                    std::vector<QPDFObjectHandle> result;
                     result.reserve(a.elements.size());
                     for (auto const& element: a.elements) {
                         result.push_back(
-                            element
-                                ? (element->getObjGen().isIndirect() ? element : element->copy())
-                                : element);
+                            element ? (element.getObj()->getObjGen().isIndirect()
+                                           ? element
+                                           : element.getObj()->copy())
+                                    : element);
                     }
                     return QPDFObject::create<QPDF_Array>(std::move(result), false);
                 }
@@ -404,9 +405,9 @@ QPDFObject::unparse()
                     for (int j = next; j < key; ++j) {
                         result += "null ";
                     }
-                    auto item_og = item.second->resolved_object()->getObjGen();
+                    auto item_og = item.second.getObj()->resolved_object()->getObjGen();
                     result += item_og.isIndirect() ? item_og.unparse(' ') + " R "
-                                                   : item.second->unparse() + " ";
+                                                   : item.second.getObj()->unparse() + " ";
                     next = ++key;
                 }
                 for (int j = next; j < a.sp->size; ++j) {
@@ -414,9 +415,9 @@ QPDFObject::unparse()
                 }
             } else {
                 for (auto const& item: a.elements) {
-                    auto item_og = item->resolved_object()->getObjGen();
-                    result +=
-                        item_og.isIndirect() ? item_og.unparse(' ') + " R " : item->unparse() + " ";
+                    auto item_og = item.getObj()->resolved_object()->getObjGen();
+                    result += item_og.isIndirect() ? item_og.unparse(' ') + " R "
+                                                   : item.getObj()->unparse() + " ";
                 }
             }
             result += "]";
@@ -524,11 +525,11 @@ QPDFObject::write_json(int json_version, JSON::Writer& p)
                         p.writeNext() << "null";
                     }
                     p.writeNext();
-                    auto item_og = item.second->getObjGen();
+                    auto item_og = item.second.getObj()->getObjGen();
                     if (item_og.isIndirect()) {
                         p << "\"" << item_og.unparse(' ') << " R\"";
                     } else {
-                        item.second->write_json(json_version, p);
+                        item.second.getObj()->write_json(json_version, p);
                     }
                     next = ++key;
                 }
@@ -538,11 +539,11 @@ QPDFObject::write_json(int json_version, JSON::Writer& p)
             } else {
                 for (auto const& item: a.elements) {
                     p.writeNext();
-                    auto item_og = item->getObjGen();
+                    auto item_og = item.getObj()->getObjGen();
                     if (item_og.isIndirect()) {
                         p << "\"" << item_og.unparse(' ') << " R\"";
                     } else {
-                        item->write_json(json_version, p);
+                        item.getObj()->write_json(json_version, p);
                     }
                 }
             }
@@ -598,14 +599,14 @@ QPDFObject::disconnect()
             if (a.sp) {
                 for (auto& item: a.sp->elements) {
                     auto& obj = item.second;
-                    if (!obj->getObjGen().isIndirect()) {
-                        obj->disconnect();
+                    if (!obj.getObj()->getObjGen().isIndirect()) {
+                        obj.getObj()->disconnect();
                     }
                 }
             } else {
                 for (auto& obj: a.elements) {
-                    if (!obj->getObjGen().isIndirect()) {
-                        obj->disconnect();
+                    if (!obj.getObj()->getObjGen().isIndirect()) {
+                        obj.getObj()->disconnect();
                     }
                 }
             }

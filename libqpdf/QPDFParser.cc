@@ -209,8 +209,9 @@ QPDFParser::parseRemainder(bool content_stream)
                 return {QPDFObject::create<QPDF_Null>()};
             }
             if (frame->state == st_array) {
-                auto object = QPDFObject::create<QPDF_Array>(
-                    std::move(frame->olist), frame->null_count > 100);
+                auto object = frame->null_count > 100
+                    ? QPDFObject::create<QPDF_Array>(std::move(frame->olist), true)
+                    : QPDFObject::create<QPDF_Array>(std::move(frame->olist));
                 setDescription(object, frame->offset - 1);
                 // The `offset` points to the next of "[".  Set the rewind offset to point to the
                 // beginning of "[". This has been explicitly tested with whitespace surrounding the
@@ -451,8 +452,8 @@ QPDFParser::fixMissingKeys()
 {
     std::set<std::string> names;
     for (auto& obj: frame->olist) {
-        if (obj->getTypeCode() == ::ot_name) {
-            names.insert(obj->getStringValue());
+        if (obj.getObj()->getTypeCode() == ::ot_name) {
+            names.insert(obj.getObj()->getStringValue());
         }
     }
     int next_fake_key = 1;

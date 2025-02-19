@@ -46,7 +46,7 @@ class QPDFParser
         {
         }
 
-        std::vector<std::shared_ptr<QPDFObject>> olist;
+        std::vector<QPDFObjectHandle> olist;
         std::map<std::string, QPDFObjectHandle> dict;
         parser_state_e state;
         std::string key;

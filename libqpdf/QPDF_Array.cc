@@ -8,17 +8,6 @@ using namespace qpdf;
 static const QPDFObjectHandle null_oh = QPDFObjectHandle::newNull();
 
 inline void
-QPDF_Array::checkOwnership(QPDFObjectHandle const& item) const
-{
-    // This is only called from QPDF_Array::setFromVector, which in turn is only called from create.
-    // At his point qpdf is a nullptr and therefore the ownership check reduces to an uninitialized
-    // check
-    if (!item.getObjectPtr()) {
-        throw std::logic_error("Attempting to add an uninitialized object to a QPDF_Array.");
-    }
-}
-
-inline void
 Array::checkOwnership(QPDFObjectHandle const& item) const
 {
     if (auto o = item.getObjectPtr()) {
@@ -36,17 +25,13 @@ Array::checkOwnership(QPDFObjectHandle const& item) const
     }
 }
 
-QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v)
-{
-    setFromVector(v);
-}
-
-QPDF_Array::QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& v, bool sparse)
+QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle>&& v, bool sparse)
 {
     if (sparse) {
         sp = std::make_unique<Sparse>();
         for (auto&& item: v) {
-            if (item->getTypeCode() != ::ot_null || item->getObjGen().isIndirect()) {
+            if (item.getObj()->getTypeCode() != ::ot_null ||
+                item.getObj()->getObjGen().isIndirect()) {
                 sp->elements[sp->size] = std::move(item);
             }
             ++sp->size;
@@ -108,7 +93,7 @@ Array::getAsVector() const
         v.resize(size_t(size()), null_oh);
         return v;
     } else {
-        return {a->elements.cbegin(), a->elements.cend()};
+        return a->elements;
     }
 }
 
@@ -121,22 +106,11 @@ Array::setAt(int at, QPDFObjectHandle const& oh)
     auto a = array();
     checkOwnership(oh);
     if (a->sp) {
-        a->sp->elements[at] = oh.getObj();
+        a->sp->elements[at] = oh;
     } else {
-        a->elements[size_t(at)] = oh.getObj();
+        a->elements[size_t(at)] = oh;
     }
     return true;
-}
-
-void
-QPDF_Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
-{
-    elements.resize(0);
-    elements.reserve(v.size());
-    for (auto const& item: v) {
-        checkOwnership(item);
-        elements.push_back(item.getObj());
-    }
 }
 
 void
@@ -147,7 +121,7 @@ Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
     a->elements.reserve(v.size());
     for (auto const& item: v) {
         checkOwnership(item);
-        a->elements.push_back(item.getObj());
+        a->elements.emplace_back(item);
     }
 }
 
@@ -190,9 +164,9 @@ Array::push_back(QPDFObjectHandle const& item)
     auto a = array();
     checkOwnership(item);
     if (a->sp) {
-        a->sp->elements[(a->sp->size)++] = item.getObj();
+        a->sp->elements[(a->sp->size)++] = item;
     } else {
-        a->elements.push_back(item.getObj());
+        a->elements.emplace_back(item);
     }
 }
 

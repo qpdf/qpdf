@@ -35,7 +35,7 @@ class QPDF_Array final
     struct Sparse
     {
         int size{0};
-        std::map<int, std::shared_ptr<QPDFObject>> elements;
+        std::map<int, QPDFObjectHandle> elements;
     };
 
   public:
@@ -51,19 +51,25 @@ class QPDF_Array final
   private:
     friend class QPDFObject;
     friend class qpdf::Array;
-    QPDF_Array(std::vector<QPDFObjectHandle> const& items);
-    QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& items, bool sparse);
+    QPDF_Array(std::vector<QPDFObjectHandle> const& items) :
+        elements(items)
+    {
+    }
+    QPDF_Array(std::vector<QPDFObjectHandle>&& items, bool sparse);
+
+    QPDF_Array(std::vector<QPDFObjectHandle>&& items) :
+        elements(std::move(items))
+    {
+    }
 
     int
     size() const
     {
         return sp ? sp->size : int(elements.size());
     }
-    void setFromVector(std::vector<QPDFObjectHandle> const& items);
-    void checkOwnership(QPDFObjectHandle const& item) const;
 
     std::unique_ptr<Sparse> sp;
-    std::vector<std::shared_ptr<QPDFObject>> elements;
+    std::vector<QPDFObjectHandle> elements;
 };
 
 class QPDF_Bool final
@@ -202,9 +208,6 @@ class QPDF_Stream final
         }
 
       private:
-        void replaceFilterData(
-            QPDFObjectHandle const& filter, QPDFObjectHandle const& decode_parms, size_t length);
-
         bool filter_on_write{true};
         QPDFObjectHandle stream_dict;
         size_t length{0};

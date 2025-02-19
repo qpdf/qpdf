@@ -9,7 +9,7 @@
 int
 main()
 {
-    auto obj = QPDFObject::create<QPDF_Array>(std::vector<std::shared_ptr<QPDFObject>>(), true);
+    auto obj = QPDFObject::create<QPDF_Array>(std::vector<QPDFObjectHandle>(), true);
     auto a = qpdf::Array(obj);
 
     assert(a.size() == 0);
@@ -88,7 +88,7 @@ main()
     pdf.emptyPDF();
 
     obj = QPDFObject::create<QPDF_Array>(
-        std::vector<std::shared_ptr<QPDFObject>>{10, "null"_qpdf.getObj()}, true);
+        std::vector<QPDFObjectHandle>{10, "null"_qpdf.getObj()}, true);
     auto b = qpdf::Array(obj);
     b.setAt(5, pdf.newIndirectNull());
     b.setAt(7, "[0 1 2 3]"_qpdf);
