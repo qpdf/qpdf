@@ -23,6 +23,11 @@
 
 ## ROUTINE DEVELOPMENT
 
+**When making changes that users need to know about, update the release notes
+(manual/release-notes.rst) as you go.** Major changes to the internal API can also be mentioned in
+the release notes in a section called "Internal Changes" or similar. This removes ChangeLog as a
+separate mechanism for tracking changes.
+
 **Remember to check pull requests as well as issues in github.**
 
 Include `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` with cmake if using emacs lsp mode.
@@ -536,11 +541,9 @@ When done, the following should happen:
   `make_dist` verifies this consistency, and CI fails if they are
   inconsistent.
 
-* Update release notes in manual. Look at diffs and ChangeLog.
+* Update release notes in manual. Review version control history.
   Update release date in `manual/release-notes.rst`. Change "not yet
   released" to an actual date for the release.
-
-* Add a release entry to ChangeLog: "x.y.z: release"
 
 * Commit changes with title "Prepare x.y.z release"
 

@@ -1,6 +1,8 @@
-2025-02-15  Jay Berkenbilt  <ejb@ql.org>
+2025-02-19  Jay Berkenbilt  <ejb@ql.org>
 
-	* Disable PointerHolder by default.
+        * END USE OF ChangeLog. From this point forward, please consult
+        the release notes for important changes and version control
+        history for detailed changes.
 
 2025-02-15  Jay Berkenbilt  <ejb@ql.org>
 
