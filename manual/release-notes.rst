@@ -3,8 +3,10 @@
 Release Notes
 =============
 
-For a detailed list of changes, please see the file
-:file:`ChangeLog` in the source distribution.
+This is a curated list of user-facing and developer-facing changes.
+Prior to version 12, file :file:`ChangeLog` contained more detail.
+From version 12 onward, please consult version control history for
+more detail.
 
 .. x.y.z: not yet released
 
