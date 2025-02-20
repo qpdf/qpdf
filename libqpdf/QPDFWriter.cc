@@ -1173,7 +1173,10 @@ QPDFWriter::writeTrailer(
         writeString(" /Size ");
         writeString(std::to_string(size));
     } else {
-        for (auto const& key: trailer.getKeys()) {
+        for (auto const& [key, value]: trailer.as_dictionary()) {
+            if (value.null()) {
+                continue;
+            }
             writeStringQDF("  ");
             writeStringNoQDF(" ");
             writeString(Name::normalize(key));
@@ -1187,7 +1190,7 @@ QPDFWriter::writeTrailer(
                     writePad(QIntC::to_size(pos - m->pipeline->getCount() + 21));
                 }
             } else {
-                unparseChild(trailer.getKey(key), 1, 0);
+                unparseChild(value, 1, 0);
             }
             writeStringQDF("\n");
         }
@@ -2937,8 +2940,10 @@ QPDFWriter::enqueueObjectsStandard()
 
     // Next place any other objects referenced from the trailer dictionary into the queue, handling
     // direct objects recursively. Root is already there, so enqueuing it a second time is a no-op.
-    for (auto const& key: trailer.getKeys()) {
-        enqueueObject(trailer.getKey(key));
+    for (auto& item: trailer.as_dictionary()) {
+        if (!item.second.null()) {
+            enqueueObject(item.second);
+        }
     }
 }
 
@@ -2960,9 +2965,11 @@ QPDFWriter::enqueueObjectsPCLm()
 
         // enqueue all the strips for each page
         QPDFObjectHandle strips = page.getKey("/Resources").getKey("/XObject");
-        for (auto const& image: strips.getKeys()) {
-            enqueueObject(strips.getKey(image));
-            enqueueObject(QPDFObjectHandle::newStream(&m->pdf, image_transform_content));
+        for (auto& image: strips.as_dictionary()) {
+            if (!image.second.null()) {
+                enqueueObject(image.second);
+                enqueueObject(QPDFObjectHandle::newStream(&m->pdf, image_transform_content));
+            }
         }
     }
 
