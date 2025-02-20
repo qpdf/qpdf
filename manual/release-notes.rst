@@ -10,6 +10,8 @@ more detail.
 
 .. x.y.z: not yet released
 
+.. _r12-0-0:
+
 12.0.0: not yet released
   - API: breaking changes
 
@@ -28,6 +30,13 @@ more detail.
 
     - ``QIntC.hh`` contained the typo ``substract`` in function names,
       which has been fixed to ``subtract``.
+
+.. _r12-0-0-deprecate:
+
+    - The following are believed to be not in use and have been deprecated.
+      If you are relying on them please open a `ticket <https://issues.qpdf.org>`__:
+
+      - All ``QPDFTokenizer`` push-mode methods.
 
   - Library Enhancements
 
@@ -114,7 +123,7 @@ more detail.
     - Add ``QPDFObjectHandle operator bool``. The operator returns true
       if the object handle is initialized and is a replacement for the
       ``isInitialized`` method. For more details see the
-      `qpdf wiki <https://github.com/qpdf/qpdf/wiki/Use-of-default-constructed-object-handles-in-qpdf-to-indicate-failure-or-error>`__.
+      `qpdf wiki <https://wiki.qpdf.org/Use-of-default-constructed-object-handles-in-qpdf-to-indicate-failure-or-error>`__.
 
     - New C API function ``qpdf_oh_free_buffer`` to free malloc allocated
       buffers.
@@ -408,6 +417,7 @@ more detail.
       PDF files.
 
 11.3.0: February 25, 2023
+
   - CLI Enhancements
 
     - New option :qpdf:ref:`--remove-restrictions` removes security

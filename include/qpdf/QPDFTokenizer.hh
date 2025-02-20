@@ -145,11 +145,11 @@ class QPDFTokenizer
 
     // Push mode:
 
+    // deprecated, please see <https:manual.qpdf.org/release-notes.html#r12-0-0-deprecate>
+
     // Keep presenting characters with presentCharacter() and presentEOF() and calling getToken()
     // until getToken() returns true. When it does, be sure to check unread_ch and to unread ch if
-    // it is true.
-
-    // It these are called when a token is available, an exception will be thrown.
+    // it is true. If these are called when a token is available, an exception will be thrown.
     QPDF_DLL
     void presentCharacter(char ch);
     QPDF_DLL
@@ -164,8 +164,8 @@ class QPDFTokenizer
     // This function returns true of the current character is between tokens (i.e., white space that
     // is not part of a string) or is part of a comment.  A tokenizing filter can call this to
     // determine whether to output the character.
-    QPDF_DLL
-    bool betweenTokens();
+    [[deprecated("see <https:manual.qpdf.org/release-notes.html#r12-0-0-deprecate>")]] QPDF_DLL bool
+    betweenTokens();
 
     // Pull mode:
 
