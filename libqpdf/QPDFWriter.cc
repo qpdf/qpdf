@@ -1132,9 +1132,9 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
             for (auto& item: object.getArrayAsVector()) {
                 enqueueObject(item);
             }
-        } else if (object.isDictionary()) {
-            for (auto& item: object.getDictAsMap()) {
-                if (!item.second.isNull()) {
+        } else if (auto d = object.as_dictionary()) {
+            for (auto const& item: d) {
+                if (!item.second.null()) {
                     enqueueObject(item.second);
                 }
             }
@@ -1498,9 +1498,8 @@ QPDFWriter::unparseObject(
 
         writeString("<<");
 
-        for (auto& item: object.getDictAsMap()) {
-            if (!item.second.isNull()) {
-                auto const& key = item.first;
+        for (auto const& [key, value]: object.as_dictionary()) {
+            if (!value.null()) {
                 writeString(indent);
                 writeStringQDF("  ");
                 writeString(Name::normalize(key));
@@ -1508,10 +1507,9 @@ QPDFWriter::unparseObject(
                 if (key == "/Contents" && object.isDictionaryOfType("/Sig") &&
                     object.hasKey("/ByteRange")) {
                     QTC::TC("qpdf", "QPDFWriter no encryption sig contents");
-                    unparseChild(
-                        item.second, level + 1, child_flags | f_hex_string | f_no_encryption);
+                    unparseChild(value, level + 1, child_flags | f_hex_string | f_no_encryption);
                 } else {
-                    unparseChild(item.second, level + 1, child_flags);
+                    unparseChild(value, level + 1, child_flags);
                 }
             }
         }
