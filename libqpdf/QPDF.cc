@@ -2352,8 +2352,10 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
         }
     } else if (foreign_tc == ::ot_dictionary) {
         QTC::TC("qpdf", "QPDF reserve dictionary");
-        for (auto const& key: foreign.getKeys()) {
-            reserveObjects(foreign.getKey(key), obj_copier, false);
+        for (auto const& item: foreign.as_dictionary()) {
+            if (!item.second.null()) {
+                reserveObjects(item.second, obj_copier, false);
+            }
         }
     } else if (foreign_tc == ::ot_stream) {
         QTC::TC("qpdf", "QPDF reserve stream");
@@ -2391,21 +2393,20 @@ QPDF::replaceForeignIndirectObjects(QPDFObjectHandle foreign, ObjCopier& obj_cop
     } else if (foreign_tc == ::ot_dictionary) {
         QTC::TC("qpdf", "QPDF replace dictionary");
         result = QPDFObjectHandle::newDictionary();
-        std::set<std::string> keys = foreign.getKeys();
-        for (auto const& iter: keys) {
-            result.replaceKey(
-                iter, replaceForeignIndirectObjects(foreign.getKey(iter), obj_copier, false));
+        for (auto const& [key, value]: foreign.as_dictionary()) {
+            if (!value.null()) {
+                result.replaceKey(key, replaceForeignIndirectObjects(value, obj_copier, false));
+            }
         }
     } else if (foreign_tc == ::ot_stream) {
         QTC::TC("qpdf", "QPDF replace stream");
         result = obj_copier.object_map[foreign.getObjGen()];
-        result.assertStream();
         QPDFObjectHandle dict = result.getDict();
         QPDFObjectHandle old_dict = foreign.getDict();
-        std::set<std::string> keys = old_dict.getKeys();
-        for (auto const& iter: keys) {
-            dict.replaceKey(
-                iter, replaceForeignIndirectObjects(old_dict.getKey(iter), obj_copier, false));
+        for (auto const& [key, value]: old_dict.as_dictionary()) {
+            if (!value.null()) {
+                dict.replaceKey(key, replaceForeignIndirectObjects(value, obj_copier, false));
+            }
         }
         copyStreamData(result, foreign);
     } else {
@@ -2689,24 +2690,29 @@ QPDF::getCompressibleObjGens()
             }
         }
         if (obj.isStream()) {
-            QPDFObjectHandle dict = obj.getDict();
-            std::set<std::string> keys = dict.getKeys();
-            for (auto iter = keys.rbegin(); iter != keys.rend(); ++iter) {
-                std::string const& key = *iter;
-                QPDFObjectHandle value = dict.getKey(key);
-                if (key == "/Length") {
-                    // omit stream lengths
-                    if (value.isIndirect()) {
-                        QTC::TC("qpdf", "QPDF exclude indirect length");
+            auto dict = obj.getDict().as_dictionary();
+            auto end = dict.crend();
+            for (auto iter = dict.crbegin(); iter != end; ++iter) {
+                std::string const& key = iter->first;
+                QPDFObjectHandle const& value = iter->second;
+                if (!value.null()) {
+                    if (key == "/Length") {
+                        // omit stream lengths
+                        if (value.isIndirect()) {
+                            QTC::TC("qpdf", "QPDF exclude indirect length");
+                        }
+                    } else {
+                        queue.emplace_back(value);
                     }
-                } else {
-                    queue.push_back(value);
                 }
             }
         } else if (obj.isDictionary()) {
-            std::set<std::string> keys = obj.getKeys();
-            for (auto iter = keys.rbegin(); iter != keys.rend(); ++iter) {
-                queue.push_back(obj.getKey(*iter));
+            auto dict = obj.as_dictionary();
+            auto end = dict.crend();
+            for (auto iter = dict.crbegin(); iter != end; ++iter) {
+                if (!iter->second.null()) {
+                    queue.emplace_back(iter->second);
+                }
             }
         } else if (obj.isArray()) {
             int n = obj.getArrayNItems();

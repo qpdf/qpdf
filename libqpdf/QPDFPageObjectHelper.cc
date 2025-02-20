@@ -7,6 +7,7 @@
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFMatrix.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/ResourceFinder.hh>
@@ -72,9 +73,12 @@ InlineImageTracker::convertIIDict(QPDFObjectHandle odict)
     QPDFObjectHandle dict = QPDFObjectHandle::newDictionary();
     dict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
     dict.replaceKey("/Subtype", QPDFObjectHandle::newName("/Image"));
-    std::set<std::string> keys = odict.getKeys();
-    for (auto key: keys) {
-        QPDFObjectHandle value = odict.getKey(key);
+    for (auto const& [k, v]: odict.as_dictionary()) {
+        if (v.null()) {
+            continue;
+        }
+        auto key = k;
+        auto value = v;
         if (key == "/BPC") {
             key = "/BitsPerComponent";
         } else if (key == "/CS") {
@@ -327,20 +331,21 @@ QPDFPageObjectHelper::forEachXObject(
         recursive ? (oh().isFormXObject() ? 0 : 1) : (oh().isFormXObject() ? 2 : 3));
     QPDFObjGen::set seen;
     std::list<QPDFPageObjectHelper> queue;
-    queue.push_back(*this);
+    queue.emplace_back(*this);
     while (!queue.empty()) {
         auto& ph = queue.front();
         if (seen.add(ph)) {
             auto xobj_dict = ph.getAttribute("/Resources", false).getKeyIfDict("/XObject");
-            if (xobj_dict.isDictionary()) {
-                for (auto const& key: xobj_dict.getKeys()) {
-                    QPDFObjectHandle obj = xobj_dict.getKey(key);
-                    if ((!selector) || selector(obj)) {
-                        action(obj, xobj_dict, key);
-                    }
-                    if (recursive && obj.isFormXObject()) {
-                        queue.emplace_back(obj);
-                    }
+            for (auto const& [key, value]: xobj_dict.as_dictionary()) {
+                if (value.null()) {
+                    continue;
+                }
+                auto obj = value;
+                if ((!selector) || selector(obj)) {
+                    action(obj, xobj_dict, key);
+                }
+                if (recursive && obj.isFormXObject()) {
+                    queue.emplace_back(obj);
                 }
             }
         }

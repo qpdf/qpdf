@@ -19,6 +19,7 @@
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
@@ -2347,12 +2348,10 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                     return true;
                 }
             }
-            if (xobject.isDictionary()) {
-                for (auto const& k: xobject.getKeys()) {
-                    QPDFObjectHandle xobj = xobject.getKey(k);
-                    if (xobj.isFormXObject()) {
-                        queue.push_back(xobj);
-                    }
+
+            for (auto const& xobj: xobject.as_dictionary()) {
+                if (xobj.second.isFormXObject()) {
+                    queue.emplace_back(xobj.second);
                 }
             }
         }
