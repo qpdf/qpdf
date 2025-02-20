@@ -15,7 +15,7 @@
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDF.hh>
-#include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDF_Name.hh>
 #include <qpdf/QPDF_String.hh>
 #include <qpdf/QTC.hh>
@@ -27,6 +27,7 @@
 #include <stdexcept>
 
 using namespace std::literals;
+using namespace qpdf;
 
 QPDFWriter::ProgressReporter::~ProgressReporter() // NOLINT (modernize-use-equals-default)
 {
@@ -1176,7 +1177,7 @@ QPDFWriter::writeTrailer(
         for (auto const& key: trailer.getKeys()) {
             writeStringQDF("  ");
             writeStringNoQDF(" ");
-            writeString(QPDF_Name::normalizeName(key));
+            writeString(Name::normalize(key));
             writeString(" ");
             if (key == "/Size") {
                 writeString(std::to_string(size));
@@ -1503,7 +1504,7 @@ QPDFWriter::unparseObject(
                 auto const& key = item.first;
                 writeString(indent);
                 writeStringQDF("  ");
-                writeString(QPDF_Name::normalizeName(key));
+                writeString(Name::normalize(key));
                 writeString(" ");
                 if (key == "/Contents" && object.isDictionaryOfType("/Sig") &&
                     object.hasKey("/ByteRange")) {
