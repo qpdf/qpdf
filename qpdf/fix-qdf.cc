@@ -15,9 +15,9 @@ static char const* whoami = nullptr;
 static void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " [infilename [outfilename]]" << std::endl
-              << "infilename defaults to standard output" << std::endl
-              << "outfilename defaults to standard output" << std::endl;
+    std::cerr << "Usage: " << whoami << " [infilename [outfilename]]\n"
+              << "infilename defaults to standard input\n"
+              << "outfilename defaults to standard output\n";
 }
 
 class QdfFixer
