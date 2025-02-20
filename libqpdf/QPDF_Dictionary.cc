@@ -63,7 +63,7 @@ QPDF_Dictionary::unparse()
     std::string result = "<< ";
     for (auto& iter: this->items) {
         if (!iter.second.isNull()) {
-            result += QPDF_Name::normalizeName(iter.first) + " " + iter.second.unparse() + " ";
+            result += Name::normalize(iter.first) + " " + iter.second.unparse() + " ";
         }
     }
     result += ">>";
@@ -78,17 +78,15 @@ QPDF_Dictionary::writeJSON(int json_version, JSON::Writer& p)
         if (!iter.second.isNull()) {
             p.writeNext();
             if (json_version == 1) {
-                p << "\"" << JSON::Writer::encode_string(QPDF_Name::normalizeName(iter.first))
-                  << "\": ";
-            } else if (auto res = QPDF_Name::analyzeJSONEncoding(iter.first); res.first) {
+                p << "\"" << JSON::Writer::encode_string(Name::normalize(iter.first)) << "\": ";
+            } else if (auto res = Name::analyzeJSONEncoding(iter.first); res.first) {
                 if (res.second) {
                     p << "\"" << iter.first << "\": ";
                 } else {
                     p << "\"" << JSON::Writer::encode_string(iter.first) << "\": ";
                 }
             } else {
-                p << "\"n:" << JSON::Writer::encode_string(QPDF_Name::normalizeName(iter.first))
-                  << "\": ";
+                p << "\"n:" << JSON::Writer::encode_string(Name::normalize(iter.first)) << "\": ";
             }
             iter.second.writeJSON(json_version, p);
         }

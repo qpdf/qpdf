@@ -1,7 +1,10 @@
 #include <qpdf/QPDF_Name.hh>
 
 #include <qpdf/JSON_writer.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QUtil.hh>
+
+using namespace qpdf;
 
 QPDF_Name::QPDF_Name(std::string const& name) :
     QPDFValue(::ot_name),
@@ -22,7 +25,7 @@ QPDF_Name::copy(bool shallow)
 }
 
 std::string
-QPDF_Name::normalizeName(std::string const& name)
+Name::normalize(std::string const& name)
 {
     if (name.empty()) {
         return name;
@@ -49,11 +52,11 @@ QPDF_Name::normalizeName(std::string const& name)
 std::string
 QPDF_Name::unparse()
 {
-    return normalizeName(this->name);
+    return Name::normalize(name);
 }
 
 std::pair<bool, bool>
-QPDF_Name::analyzeJSONEncoding(const std::string& name)
+Name::analyzeJSONEncoding(const std::string& name)
 {
     int tail = 0;       // Number of continuation characters expected.
     bool tail2 = false; // Potential overlong 3 octet utf-8.
@@ -105,16 +108,16 @@ QPDF_Name::writeJSON(int json_version, JSON::Writer& p)
     // For performance reasons this code is duplicated in QPDF_Dictionary::writeJSON. When updating
     // this method make sure QPDF_Dictionary is also update.
     if (json_version == 1) {
-        p << "\"" << JSON::Writer::encode_string(normalizeName(name)) << "\"";
+        p << "\"" << JSON::Writer::encode_string(Name::normalize(name)) << "\"";
     } else {
-        if (auto res = analyzeJSONEncoding(name); res.first) {
+        if (auto res = Name::analyzeJSONEncoding(name); res.first) {
             if (res.second) {
                 p << "\"" << name << "\"";
             } else {
                 p << "\"" << JSON::Writer::encode_string(name) << "\"";
             }
         } else {
-            p << "\"n:" << JSON::Writer::encode_string(normalizeName(name)) << "\"";
+            p << "\"n:" << JSON::Writer::encode_string(Name::normalize(name)) << "\"";
         }
     }
 }
