@@ -120,15 +120,14 @@ JSON::JSON_array::write(Pipeline* p, size_t depth) const
 
 JSON::JSON_string::JSON_string(std::string const& utf8) :
     JSON_value(vt_string),
-    utf8(utf8),
-    encoded(Writer::encode_string(utf8))
+    utf8(utf8)
 {
 }
 
 void
 JSON::JSON_string::write(Pipeline* p, size_t) const
 {
-    *p << std::string("\"") + encoded + "\"";
+    *p << std::string("\"") + Writer::encode_string(utf8) + "\"";
 }
 
 JSON::JSON_number::JSON_number(long long value) :
