@@ -325,6 +325,12 @@ namespace qpdf
         return nullptr;
     }
 
+    inline bool
+    BaseHandle::null() const
+    {
+        return !obj || obj->getResolvedTypeCode() == ::ot_null;
+    }
+
     inline qpdf_object_type_e
     BaseHandle::type_code() const
     {
