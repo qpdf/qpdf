@@ -53,6 +53,7 @@ namespace qpdf
 
         // The rest of the header file is for qpdf internal use only.
 
+        inline bool null() const;
         inline qpdf_object_type_e type_code() const;
 
       protected:
