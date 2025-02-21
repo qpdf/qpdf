@@ -42,6 +42,84 @@ namespace qpdf
     class BaseDictionary: public BaseHandle
     {
       public:
+        using iterator = std::map<std::string, QPDFObjectHandle>::iterator;
+        using const_iterator = std::map<std::string, QPDFObjectHandle>::const_iterator;
+        using reverse_iterator = std::map<std::string, QPDFObjectHandle>::reverse_iterator;
+        using const_reverse_iterator =
+            std::map<std::string, QPDFObjectHandle>::const_reverse_iterator;
+
+        iterator
+        begin()
+        {
+            if (auto d = as<QPDF_Dictionary>()) {
+                return d->items.begin();
+            }
+            return {};
+        }
+
+        iterator
+        end()
+        {
+            if (auto d = as<QPDF_Dictionary>()) {
+                return d->items.end();
+            }
+            return {};
+        }
+
+        const_iterator
+        cbegin()
+        {
+            if (auto d = as<QPDF_Dictionary>()) {
+                return d->items.cbegin();
+            }
+            return {};
+        }
+
+        const_iterator
+        cend()
+        {
+            if (auto d = as<QPDF_Dictionary>()) {
+                return d->items.cend();
+            }
+            return {};
+        }
+
+        reverse_iterator
+        rbegin()
+        {
+            if (auto d = as<QPDF_Dictionary>()) {
+                return d->items.rbegin();
+            }
+            return {};
+        }
+
+        reverse_iterator
+        rend()
+        {
+            if (auto d = as<QPDF_Dictionary>()) {
+                return d->items.rend();
+            }
+            return {};
+        }
+
+        const_reverse_iterator
+        crbegin()
+        {
+            if (auto d = as<QPDF_Dictionary>()) {
+                return d->items.crbegin();
+            }
+            return {};
+        }
+
+        const_reverse_iterator
+        crend()
+        {
+            if (auto d = as<QPDF_Dictionary>()) {
+                return d->items.crend();
+            }
+            return {};
+        }
+
         // The following methods are not part of the public API.
         bool hasKey(std::string const& key) const;
         QPDFObjectHandle getKey(std::string const& key) const;
