@@ -1141,19 +1141,10 @@ QPDFObjectHandle::isOrHasName(std::string const& value) const
 void
 QPDFObjectHandle::makeResourcesIndirect(QPDF& owning_qpdf)
 {
-    if (!isDictionary()) {
-        return;
-    }
-    for (auto const& i1: ditems()) {
-        QPDFObjectHandle sub = i1.second;
-        if (!sub.isDictionary()) {
-            continue;
-        }
-        for (auto const& i2: sub.ditems()) {
-            std::string const& key = i2.first;
-            QPDFObjectHandle val = i2.second;
-            if (!val.isIndirect()) {
-                sub.replaceKey(key, owning_qpdf.makeIndirectObject(val));
+    for (auto const& i1: as_dictionary()) {
+        for (auto& i2: i1.second.as_dictionary()) {
+            if (!i2.second.null() && !i2.second.isIndirect()) {
+                i2.second = owning_qpdf.makeIndirectObject(i2.second);
             }
         }
     }
@@ -1170,18 +1161,17 @@ QPDFObjectHandle::mergeResources(
 
     auto make_og_to_name = [](QPDFObjectHandle& dict,
                               std::map<QPDFObjGen, std::string>& og_to_name) {
-        for (auto const& i: dict.ditems()) {
-            if (i.second.isIndirect()) {
-                og_to_name[i.second.getObjGen()] = i.first;
+        for (auto const& [key, value]: dict.as_dictionary()) {
+            if (!value.null() && value.isIndirect()) {
+                og_to_name.insert_or_assign(value.getObjGen(), key);
             }
         }
     };
 
     // This algorithm is described in comments in QPDFObjectHandle.hh
     // above the declaration of mergeResources.
-    for (auto const& o_top: other.ditems()) {
-        std::string const& rtype = o_top.first;
-        QPDFObjectHandle other_val = o_top.second;
+    for (auto const& [rtype, value1]: other.as_dictionary()) {
+        auto other_val = value1;
         if (hasKey(rtype)) {
             QPDFObjectHandle this_val = getKey(rtype);
             if (this_val.isDictionary() && other_val.isDictionary()) {
@@ -1196,9 +1186,8 @@ QPDFObjectHandle::mergeResources(
                 std::set<std::string> rnames;
                 int min_suffix = 1;
                 bool initialized_maps = false;
-                for (auto const& ov_iter: other_val.ditems()) {
-                    std::string const& key = ov_iter.first;
-                    QPDFObjectHandle rval = ov_iter.second;
+                for (auto const& [key, value2]: other_val.as_dictionary()) {
+                    QPDFObjectHandle rval = value2;
                     if (!this_val.hasKey(key)) {
                         if (!rval.isIndirect()) {
                             QTC::TC("qpdf", "QPDFObjectHandle merge shallow copy");

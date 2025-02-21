@@ -1,6 +1,7 @@
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 
 #include <qpdf/Pl_Buffer.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -975,17 +976,14 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         auto replace_stream = [](auto& dict, auto& key, auto& old) {
             return dict.replaceKeyAndGetNew(key, old.copyStream());
         };
-        if (apdict.isDictionary()) {
-            for (auto& ap: apdict.ditems()) {
-                if (ap.second.isStream()) {
-                    streams.push_back(replace_stream(apdict, ap.first, ap.second));
-                } else if (ap.second.isDictionary()) {
-                    for (auto& ap2: ap.second.ditems()) {
-                        if (ap2.second.isStream()) {
-                            streams.push_back(
-                                // line-break
-                                replace_stream(ap.second, ap2.first, ap2.second));
-                        }
+
+        for (auto& [key1, value1]: apdict.as_dictionary()) {
+            if (value1.isStream()) {
+                streams.emplace_back(replace_stream(apdict, key1, value1));
+            } else {
+                for (auto& [key2, value2]: value1.as_dictionary()) {
+                    if (value2.isStream()) {
+                        streams.emplace_back(replace_stream(value1, key2, value2));
                     }
                 }
             }

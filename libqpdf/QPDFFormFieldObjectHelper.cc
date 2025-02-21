@@ -4,6 +4,7 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFAnnotationObjectHelper.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <cstdlib>
@@ -442,13 +443,10 @@ QPDFFormFieldObjectHelper::setCheckBoxValue(bool value)
         // Set the "on" value to the first value in the appearance stream's normal state dictionary
         // that isn't /Off. If not found, fall back to /Yes.
         if (AP.isDictionary()) {
-            auto N = AP.getKey("/N");
-            if (N.isDictionary()) {
-                for (auto const& iter: N.ditems()) {
-                    if (iter.first != "/Off") {
-                        on_value = iter.first;
-                        break;
-                    }
+            for (auto const& item: AP.getKey("/N").as_dictionary()) {
+                if (item.first != "/Off") {
+                    on_value = item.first;
+                    break;
                 }
             }
         }
