@@ -59,11 +59,10 @@ QPDF_Array::QPDF_Array(std::vector<std::shared_ptr<QPDFObject>>&& v, bool sparse
 QPDF_Array*
 Array::array() const
 {
-    if (obj) {
-        if (auto a = obj->as<QPDF_Array>()) {
-            return a;
-        }
+    if (auto a = as<QPDF_Array>()) {
+        return a;
     }
+
     throw std::runtime_error("Expected an array but found a non-array object");
     return nullptr; // unreachable
 }

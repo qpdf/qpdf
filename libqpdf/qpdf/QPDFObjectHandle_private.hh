@@ -204,12 +204,13 @@ namespace qpdf
         QPDF_Stream::Members*
         stream() const
         {
-            if (obj) {
-                if (auto s = obj->as<QPDF_Stream>()) {
-                    return s->m.get();
+            if (auto s = as<QPDF_Stream>()) {
+                if (auto ptr = s->m.get()) {
+                    return ptr;
                 }
+                throw std::logic_error("QPDF_Stream: unexpected nullptr");
             }
-            throw std::runtime_error("operation for stream attempted on object of type dictionary");
+            throw std::runtime_error("operation for stream attempted on non-stream object");
             return nullptr; // unreachable
         }
         bool filterable(
@@ -225,6 +226,26 @@ namespace qpdf
         static std::map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>>
             filter_factories;
     };
+
+    template <typename T>
+    T*
+    BaseHandle::as() const
+    {
+        if (!obj) {
+            return nullptr;
+        }
+        if (std::holds_alternative<T>(obj->value)) {
+            return &std::get<T>(obj->value);
+        }
+        if (std::holds_alternative<QPDF_Unresolved>(obj->value)) {
+            return BaseHandle(QPDF::Resolver::resolved(obj->qpdf, obj->og)).as<T>();
+        }
+        if (std::holds_alternative<QPDF_Reference>(obj->value)) {
+            // see comment in QPDF_Reference.
+            return BaseHandle(std::get<QPDF_Reference>(obj->value).obj).as<T>();
+        }
+        return nullptr;
+    }
 
     inline qpdf_object_type_e
     BaseHandle::type_code() const
