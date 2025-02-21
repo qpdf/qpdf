@@ -67,6 +67,9 @@ namespace qpdf
         BaseHandle& operator=(BaseHandle&&) = default;
         ~BaseHandle() = default;
 
+        template <typename T>
+        T* as() const;
+
         std::shared_ptr<QPDFObject> obj;
     };
 

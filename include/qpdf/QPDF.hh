@@ -798,9 +798,10 @@ class QPDF
     {
         friend class QPDFObject;
         friend class QPDF_Unresolved;
+        friend class qpdf::BaseHandle;
 
       private:
-        static QPDFObject*
+        static std::shared_ptr<QPDFObject> const&
         resolved(QPDF* qpdf, QPDFObjGen og)
         {
             return qpdf->resolve(og);
@@ -1072,7 +1073,7 @@ class QPDF
         QPDFObjGen exp_og,
         QPDFObjGen& og,
         bool skip_cache_if_in_xref);
-    QPDFObject* resolve(QPDFObjGen og);
+    std::shared_ptr<QPDFObject> const& resolve(QPDFObjGen og);
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
     QPDFObjGen nextObjGen();

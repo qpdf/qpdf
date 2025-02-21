@@ -9,10 +9,8 @@ using namespace qpdf;
 QPDF_Dictionary*
 BaseDictionary::dict() const
 {
-    if (obj) {
-        if (auto d = obj->as<QPDF_Dictionary>()) {
-            return d;
-        }
+    if (auto d = as<QPDF_Dictionary>()) {
+        return d;
     }
     throw std::runtime_error("Expected a dictionary but found a non-dictionary object");
     return nullptr; // unreachable

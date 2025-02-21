@@ -1867,11 +1867,11 @@ QPDF::readObjectAtOffset(
     return oh;
 }
 
-QPDFObject*
+std::shared_ptr<QPDFObject> const&
 QPDF::resolve(QPDFObjGen og)
 {
     if (!isUnresolved(og)) {
-        return m->obj_cache[og].object.get();
+        return m->obj_cache[og].object;
     }
 
     if (m->resolving.count(og)) {
@@ -1880,7 +1880,7 @@ QPDF::resolve(QPDFObjGen og)
         QTC::TC("qpdf", "QPDF recursion loop in resolve");
         warn(damagedPDF("", "loop detected resolving object " + og.unparse(' ')));
         updateCache(og, QPDFObject::create<QPDF_Null>(), -1, -1);
-        return m->obj_cache[og].object.get();
+        return m->obj_cache[og].object;
     }
     ResolveRecorder rr(this, og);
 
@@ -1919,9 +1919,9 @@ QPDF::resolve(QPDFObjGen og)
         updateCache(og, QPDFObject::create<QPDF_Null>(), -1, -1);
     }
 
-    auto result(m->obj_cache[og].object);
+    auto& result(m->obj_cache[og].object);
     result->setDefaultDescription(this, og);
-    return result.get();
+    return result;
 }
 
 void

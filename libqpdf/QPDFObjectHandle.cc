@@ -697,24 +697,6 @@ QPDFObjectHandle::getTypeName() const
     return obj ? tn[getTypeCode()] : "uninitialized";
 }
 
-QPDF_Bool*
-QPDFObjectHandle::asBool() const
-{
-    return obj ? obj->as<QPDF_Bool>() : nullptr;
-}
-
-QPDF_Integer*
-QPDFObjectHandle::asInteger() const
-{
-    return obj ? obj->as<QPDF_Integer>() : nullptr;
-}
-
-QPDF_String*
-QPDFObjectHandle::asString() const
-{
-    return obj ? obj->as<QPDF_String>() : nullptr;
-}
-
 bool
 QPDFObjectHandle::isDestroyed() const
 {
@@ -861,8 +843,7 @@ QPDFObjectHandle::isStreamOfType(std::string const& type, std::string const& sub
 bool
 QPDFObjectHandle::getBoolValue() const
 {
-    auto boolean = asBool();
-    if (boolean) {
+    if (auto boolean = as<QPDF_Bool>()) {
         return boolean->val;
     } else {
         typeWarning("boolean", "returning false");
@@ -874,12 +855,11 @@ QPDFObjectHandle::getBoolValue() const
 bool
 QPDFObjectHandle::getValueAsBool(bool& value) const
 {
-    auto boolean = asBool();
-    if (boolean == nullptr) {
-        return false;
+    if (auto boolean = as<QPDF_Bool>()) {
+        value = boolean->val;
+        return true;
     }
-    value = boolean->val;
-    return true;
+    return false;
 }
 
 // Integer accessors
@@ -887,8 +867,7 @@ QPDFObjectHandle::getValueAsBool(bool& value) const
 long long
 QPDFObjectHandle::getIntValue() const
 {
-    auto integer = asInteger();
-    if (integer) {
+    if (auto integer = as<QPDF_Integer>()) {
         return integer->val;
     } else {
         typeWarning("integer", "returning 0");
@@ -900,12 +879,11 @@ QPDFObjectHandle::getIntValue() const
 bool
 QPDFObjectHandle::getValueAsInt(long long& value) const
 {
-    auto integer = asInteger();
-    if (integer == nullptr) {
-        return false;
+    if (auto integer = as<QPDF_Integer>()) {
+        value = integer->val;
+        return true;
     }
-    value = integer->val;
-    return true;
+    return false;
 }
 
 int
@@ -1062,8 +1040,7 @@ QPDFObjectHandle::getValueAsString(std::string& value) const
 std::string
 QPDFObjectHandle::getUTF8Value() const
 {
-    auto str = asString();
-    if (str) {
+    if (auto str = as<QPDF_String>()) {
         return str->getUTF8Val();
     } else {
         typeWarning("string", "returning empty string");
@@ -1075,12 +1052,11 @@ QPDFObjectHandle::getUTF8Value() const
 bool
 QPDFObjectHandle::getValueAsUTF8(std::string& value) const
 {
-    auto str = asString();
-    if (str == nullptr) {
-        return false;
+    if (auto str = as<QPDF_String>()) {
+        value = str->getUTF8Val();
+        return true;
     }
-    value = str->getUTF8Val();
-    return true;
+    return false;
 }
 
 // Operator and Inline Image accessors
@@ -1487,7 +1463,7 @@ QPDFObjectHandle::unparseResolved() const
 std::string
 QPDFObjectHandle::unparseBinary() const
 {
-    if (auto str = asString()) {
+    if (auto str = as<QPDF_String>()) {
         return str->unparse(true);
     } else {
         return unparse();

@@ -1359,20 +1359,6 @@ class QPDFObjectHandle final: public qpdf::BaseHandle
     inline qpdf::Stream as_stream(qpdf::typed options = qpdf::typed::strict) const;
 
   private:
-    QPDF_Array* asArray() const;
-    QPDF_Bool* asBool() const;
-    QPDF_Dictionary* asDictionary() const;
-    QPDF_InlineImage* asInlineImage() const;
-    QPDF_Integer* asInteger() const;
-    QPDF_Name* asName() const;
-    QPDF_Null* asNull() const;
-    QPDF_Operator* asOperator() const;
-    QPDF_Real* asReal() const;
-    QPDF_Reserved* asReserved() const;
-    QPDF_Stream* asStream() const;
-    QPDF_Stream* asStreamWithAssert() const;
-    QPDF_String* asString() const;
-
     void typeWarning(char const* expected_type, std::string const& warning) const;
     void objectWarning(std::string const& warning) const;
     void assertType(char const* type_name, bool istype) const;

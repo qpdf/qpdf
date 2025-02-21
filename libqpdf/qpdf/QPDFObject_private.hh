@@ -172,6 +172,7 @@ class QPDF_Reference
     // objects that are an indirect reference we will need to support multiple levels of
     // indirection, including the possibility of circular references.
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
 
     QPDF_Reference(std::shared_ptr<QPDFObject> obj) :
         obj(std::move(obj))
@@ -366,7 +367,7 @@ class QPDFObject
     const QPDFObject*
     resolved_object() const
     {
-        return isUnresolved() ? QPDF::Resolver::resolved(qpdf, og) : this;
+        return isUnresolved() ? QPDF::Resolver::resolved(qpdf, og).get() : this;
     }
 
     struct JSON_Descr
@@ -461,25 +462,10 @@ class QPDFObject
         return og;
     }
 
-    template <typename T>
-    T*
-    as()
-    {
-        if (std::holds_alternative<T>(value)) {
-            return &std::get<T>(value);
-        }
-        if (std::holds_alternative<QPDF_Unresolved>(value)) {
-            return QPDF::Resolver::resolved(qpdf, og)->as<T>();
-        }
-        if (std::holds_alternative<QPDF_Reference>(value)) {
-            // see comment in QPDF_Reference.
-            return std::get<QPDF_Reference>(value).obj->as<T>();
-        }
-        return nullptr;
-    }
-
   private:
     friend class QPDF_Stream;
+    friend class qpdf::BaseHandle;
+
     typedef std::variant<
         std::monostate,
         QPDF_Reserved,
