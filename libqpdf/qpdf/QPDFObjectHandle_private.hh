@@ -325,16 +325,49 @@ namespace qpdf
         return nullptr;
     }
 
+    inline QPDFObjGen
+    BaseHandle::id_gen() const
+    {
+        return obj ? obj->og : QPDFObjGen();
+    }
+
+    inline bool
+    BaseHandle::indirect() const
+    {
+        return obj ? obj->og.isIndirect() : false;
+    }
+
     inline bool
     BaseHandle::null() const
     {
         return !obj || obj->getResolvedTypeCode() == ::ot_null;
     }
 
+    inline QPDF*
+    BaseHandle::qpdf() const
+    {
+        return obj ? obj->qpdf : nullptr;
+    }
+
+    inline qpdf_object_type_e
+    BaseHandle::raw_type_code() const
+    {
+        return obj ? static_cast<qpdf_object_type_e>(obj->value.index()) : ::ot_uninitialized;
+    }
+
     inline qpdf_object_type_e
     BaseHandle::type_code() const
     {
-        return obj ? obj->getResolvedTypeCode() : ::ot_uninitialized;
+        if (!obj) {
+            return ::ot_uninitialized;
+        }
+        if (raw_type_code() == ::ot_unresolved) {
+            return QPDF::Resolver::resolved(obj->qpdf, obj->og)->getTypeCode();
+        }
+        if (raw_type_code() == ::ot_reference) {
+            return std::get<QPDF_Reference>(obj->value).obj->getResolvedTypeCode();
+        }
+        return raw_type_code();
     }
 
 } // namespace qpdf

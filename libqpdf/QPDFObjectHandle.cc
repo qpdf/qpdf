@@ -319,20 +319,16 @@ QPDFObject::copy(bool shallow)
                     QPDF_Array result;
                     result.sp = std::make_unique<QPDF_Array::Sparse>();
                     result.sp->size = a.sp->size;
-                    for (auto const& element: a.sp->elements) {
-                        auto const& obj = element.second;
-                        result.sp->elements[element.first] =
-                            obj.getObj()->getObjGen().isIndirect() ? obj : obj.getObj()->copy();
+                    for (auto const& [idx, oh]: a.sp->elements) {
+                        result.sp->elements[idx] = oh.indirect() ? oh : oh.getObj()->copy();
                     }
                     return QPDFObject::create<QPDF_Array>(std::move(result));
                 } else {
                     std::vector<QPDFObjectHandle> result;
                     result.reserve(a.elements.size());
                     for (auto const& element: a.elements) {
-                        result.push_back(
-                            element ? (element.getObj()->getObjGen().isIndirect()
-                                           ? element
-                                           : element.getObj()->copy())
+                        result.emplace_back(
+                            element ? (element.indirect() ? element : element.getObj()->copy())
                                     : element);
                     }
                     return QPDFObject::create<QPDF_Array>(std::move(result), false);
@@ -347,7 +343,7 @@ QPDFObject::copy(bool shallow)
             } else {
                 std::map<std::string, QPDFObjectHandle> new_items;
                 for (auto const& [key, val]: d.items) {
-                    new_items[key] = val.isIndirect() ? val : val.getObj()->copy();
+                    new_items[key] = val.indirect() ? val : val.getObj()->copy();
                 }
                 return QPDFObject::create<QPDF_Dictionary>(new_items);
             }
@@ -405,7 +401,7 @@ QPDFObject::unparse()
                     for (int j = next; j < key; ++j) {
                         result += "null ";
                     }
-                    auto item_og = item.second.getObj()->resolved_object()->getObjGen();
+                    auto item_og = item.second.id_gen();
                     result += item_og.isIndirect() ? item_og.unparse(' ') + " R "
                                                    : item.second.getObj()->unparse() + " ";
                     next = ++key;
@@ -415,7 +411,7 @@ QPDFObject::unparse()
                 }
             } else {
                 for (auto const& item: a.elements) {
-                    auto item_og = item.getObj()->resolved_object()->getObjGen();
+                    auto item_og = item.id_gen();
                     result += item_og.isIndirect() ? item_og.unparse(' ') + " R "
                                                    : item.getObj()->unparse() + " ";
                 }
@@ -428,7 +424,7 @@ QPDFObject::unparse()
             auto const& items = std::get<QPDF_Dictionary>(value).items;
             std::string result = "<< ";
             for (auto& iter: items) {
-                if (!iter.second.isNull()) {
+                if (!iter.second.null()) {
                     result += Name::normalize(iter.first) + " " + iter.second.unparse() + " ";
                 }
             }
@@ -555,7 +551,7 @@ QPDFObject::write_json(int json_version, JSON::Writer& p)
             auto const& d = std::get<QPDF_Dictionary>(value);
             p.writeStart('{');
             for (auto& iter: d.items) {
-                if (!iter.second.isNull()) {
+                if (!iter.second.null()) {
                     p.writeNext();
                     if (json_version == 1) {
                         p << "\"" << JSON::Writer::encode_string(Name::normalize(iter.first))
@@ -599,13 +595,13 @@ QPDFObject::disconnect()
             if (a.sp) {
                 for (auto& item: a.sp->elements) {
                     auto& obj = item.second;
-                    if (!obj.getObj()->getObjGen().isIndirect()) {
+                    if (!obj.indirect()) {
                         obj.getObj()->disconnect();
                     }
                 }
             } else {
                 for (auto& obj: a.elements) {
-                    if (!obj.getObj()->getObjGen().isIndirect()) {
+                    if (!obj.indirect()) {
                         obj.getObj()->disconnect();
                     }
                 }
@@ -701,13 +697,13 @@ QPDFObjectHandle::getTypeName() const
 bool
 QPDFObjectHandle::isDestroyed() const
 {
-    return obj && obj->getResolvedTypeCode() == ::ot_destroyed;
+    return type_code() == ::ot_destroyed;
 }
 
 bool
 QPDFObjectHandle::isBool() const
 {
-    return obj && obj->getResolvedTypeCode() == ::ot_boolean;
+    return type_code() == ::ot_boolean;
 }
 
 bool
@@ -715,25 +711,25 @@ QPDFObjectHandle::isDirectNull() const
 {
     // Don't call dereference() -- this is a const method, and we know
     // objid == 0, so there's nothing to resolve.
-    return (obj && getObjectID() == 0 && obj->getTypeCode() == ::ot_null);
+    return !indirect() && raw_type_code() == ::ot_null;
 }
 
 bool
 QPDFObjectHandle::isNull() const
 {
-    return obj && obj->getResolvedTypeCode() == ::ot_null;
+    return type_code() == ::ot_null;
 }
 
 bool
 QPDFObjectHandle::isInteger() const
 {
-    return obj && obj->getResolvedTypeCode() == ::ot_integer;
+    return type_code() == ::ot_integer;
 }
 
 bool
 QPDFObjectHandle::isReal() const
 {
-    return obj && obj->getResolvedTypeCode() == ::ot_real;
+    return type_code() == ::ot_real;
 }
 
 bool
@@ -769,49 +765,49 @@ QPDFObjectHandle::getValueAsNumber(double& value) const
 bool
 QPDFObjectHandle::isName() const
 {
-    return obj && obj->getResolvedTypeCode() == ::ot_name;
+    return type_code() == ::ot_name;
 }
 
 bool
 QPDFObjectHandle::isString() const
 {
-    return obj && obj->getResolvedTypeCode() == ::ot_string;
+    return type_code() == ::ot_string;
 }
 
 bool
 QPDFObjectHandle::isOperator() const
 {
-    return obj && obj->getResolvedTypeCode() == ::ot_operator;
+    return type_code() == ::ot_operator;
 }
 
 bool
 QPDFObjectHandle::isInlineImage() const
 {
-    return obj && obj->getResolvedTypeCode() == ::ot_inlineimage;
+    return type_code() == ::ot_inlineimage;
 }
 
 bool
 QPDFObjectHandle::isArray() const
 {
-    return obj && obj->getResolvedTypeCode() == ::ot_array;
+    return type_code() == ::ot_array;
 }
 
 bool
 QPDFObjectHandle::isDictionary() const
 {
-    return obj && obj->getResolvedTypeCode() == ::ot_dictionary;
+    return type_code() == ::ot_dictionary;
 }
 
 bool
 QPDFObjectHandle::isStream() const
 {
-    return obj && obj->getResolvedTypeCode() == ::ot_stream;
+    return type_code() == ::ot_stream;
 }
 
 bool
 QPDFObjectHandle::isReserved() const
 {
-    return obj && obj->getResolvedTypeCode() == ::ot_reserved;
+    return type_code() == ::ot_reserved;
 }
 
 bool

@@ -308,17 +308,6 @@ class QPDFObject
     {
         return static_cast<qpdf_object_type_e>(value.index());
     }
-
-    QPDF*
-    getQPDF() const
-    {
-        return qpdf;
-    }
-    QPDFObjGen
-    getObjGen() const
-    {
-        return og;
-    }
     void
     assign_null()
     {

@@ -10,18 +10,13 @@ static const QPDFObjectHandle null_oh = QPDFObjectHandle::newNull();
 inline void
 Array::checkOwnership(QPDFObjectHandle const& item) const
 {
-    if (auto o = item.getObjectPtr()) {
-        if (auto pdf = obj->getQPDF()) {
-            if (auto item_qpdf = o->getQPDF()) {
-                if (pdf != item_qpdf) {
-                    throw std::logic_error(
-                        "Attempting to add an object from a different QPDF. Use "
-                        "QPDF::copyForeignObject to add objects from another file.");
-                }
-            }
-        }
-    } else {
+    if (!item) {
         throw std::logic_error("Attempting to add an uninitialized object to a QPDF_Array.");
+    }
+    if (qpdf() && item.qpdf() && qpdf() != item.qpdf()) {
+        throw std::logic_error(
+            "Attempting to add an object from a different QPDF. Use "
+            "QPDF::copyForeignObject to add objects from another file.");
     }
 }
 
@@ -29,9 +24,8 @@ QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle>&& v, bool sparse)
 {
     if (sparse) {
         sp = std::make_unique<Sparse>();
-        for (auto&& item: v) {
-            if (item.getObj()->getTypeCode() != ::ot_null ||
-                item.getObj()->getObjGen().isIndirect()) {
+        for (auto& item: v) {
+            if (item.raw_type_code() != ::ot_null || item.indirect()) {
                 sp->elements[sp->size] = std::move(item);
             }
             ++sp->size;

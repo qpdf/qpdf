@@ -28,6 +28,7 @@
 #include <cstdint>
 #include <memory>
 
+class QPDF;
 class QPDF_Dictionary;
 class QPDFObject;
 class QPDFObjectHandle;
@@ -53,7 +54,11 @@ namespace qpdf
 
         // The rest of the header file is for qpdf internal use only.
 
+        inline QPDFObjGen id_gen() const;
+        inline bool indirect() const;
         inline bool null() const;
+        inline QPDF* qpdf() const;
+        inline qpdf_object_type_e raw_type_code() const;
         inline qpdf_object_type_e type_code() const;
 
       protected:
