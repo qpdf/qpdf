@@ -2346,9 +2346,8 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
 
     if (foreign_tc == ::ot_array) {
         QTC::TC("qpdf", "QPDF reserve array");
-        int n = foreign.getArrayNItems();
-        for (int i = 0; i < n; ++i) {
-            reserveObjects(foreign.getArrayItem(i), obj_copier, false);
+        for (auto const& item: foreign.as_array()) {
+            reserveObjects(item, obj_copier, false);
         }
     } else if (foreign_tc == ::ot_dictionary) {
         QTC::TC("qpdf", "QPDF reserve dictionary");
@@ -2384,11 +2383,8 @@ QPDF::replaceForeignIndirectObjects(QPDFObjectHandle foreign, ObjCopier& obj_cop
     } else if (foreign_tc == ::ot_array) {
         QTC::TC("qpdf", "QPDF replace array");
         result = QPDFObjectHandle::newArray();
-        int n = foreign.getArrayNItems();
-        for (int i = 0; i < n; ++i) {
-            result.appendItem(
-                // line-break
-                replaceForeignIndirectObjects(foreign.getArrayItem(i), obj_copier, false));
+        for (auto const& item: foreign.as_array()) {
+            result.appendItem(replaceForeignIndirectObjects(item, obj_copier, false));
         }
     } else if (foreign_tc == ::ot_dictionary) {
         QTC::TC("qpdf", "QPDF replace dictionary");
@@ -2714,11 +2710,8 @@ QPDF::getCompressibleObjGens()
                     queue.emplace_back(iter->second);
                 }
             }
-        } else if (obj.isArray()) {
-            int n = obj.getArrayNItems();
-            for (int i = 1; i <= n; ++i) {
-                queue.push_back(obj.getArrayItem(n - i));
-            }
+        } else if (auto items = obj.as_array()) {
+            queue.insert(queue.end(), items.crbegin(), items.crend());
         }
     }
 

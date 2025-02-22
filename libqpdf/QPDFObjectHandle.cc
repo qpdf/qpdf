@@ -365,7 +365,7 @@ QPDFObject::copy(bool shallow)
     case ::ot_reference:
         return qpdf->getObject(og).getObj();
     }
-    return {}; // does not return
+    return {}; // unreachable
 }
 
 std::string
@@ -446,7 +446,7 @@ QPDFObject::unparse()
     case ::ot_reference:
         return og.unparse(' ') + " R";
     }
-    return {}; // does not return
+    return {}; // unreachable
 }
 
 void
@@ -644,9 +644,8 @@ QPDFObject::getStringValue() const
         return std::get<QPDF_Reference>(value).obj->getStringValue();
     default:
         throw std::logic_error("Internal error in QPDFObject::getStringValue");
-        return ""; // does not return
     }
-    return {}; // does not return
+    return ""; // unreachable
 }
 
 bool
@@ -1927,12 +1926,10 @@ QPDFObjectHandle::makeDirect(QPDFObjGen::set& visited, bool stop_at_streams)
 
     if (isBool() || isInteger() || isName() || isNull() || isReal() || isString()) {
         this->obj = obj->copy(true);
-    } else if (isArray()) {
+    } else if (auto a = as_array(strict)) {
         std::vector<QPDFObjectHandle> items;
-        auto array = as_array(strict);
-        int n = array.size();
-        for (int i = 0; i < n; ++i) {
-            items.emplace_back(array.at(i).second);
+        for (auto const& item: a) {
+            items.emplace_back(item);
             items.back().makeDirect(visited, stop_at_streams);
         }
         this->obj = QPDFObject::create<QPDF_Array>(items);

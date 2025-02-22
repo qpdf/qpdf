@@ -272,14 +272,9 @@ QPDFFormFieldObjectHelper::getChoices()
     if (!isChoice()) {
         return result;
     }
-    QPDFObjectHandle opt = getInheritableFieldValue("/Opt");
-    if (opt.isArray()) {
-        int n = opt.getArrayNItems();
-        for (int i = 0; i < n; ++i) {
-            QPDFObjectHandle item = opt.getArrayItem(i);
-            if (item.isString()) {
-                result.push_back(item.getUTF8Value());
-            }
+    for (auto const& item: getInheritableFieldValue("/Opt").as_array()) {
+        if (item.isString()) {
+            result.emplace_back(item.getUTF8Value());
         }
     }
     return result;
@@ -369,30 +364,21 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
 
     QPDFObjectHandle kids = oh().getKey("/Kids");
     if (!(isRadioButton() && parent.isNull() && kids.isArray())) {
-        oh().warnIfPossible(
-            "don't know how to set the value"
-            " of this field as a radio button");
+        oh().warnIfPossible("don't know how to set the value of this field as a radio button");
         return;
     }
     setFieldAttribute("/V", name);
-    int nkids = kids.getArrayNItems();
-    for (int i = 0; i < nkids; ++i) {
-        QPDFObjectHandle kid = kids.getArrayItem(i);
+    for (auto const& kid: kids.as_array()) {
         QPDFObjectHandle AP = kid.getKey("/AP");
         QPDFObjectHandle annot;
-        if (AP.isNull()) {
+        if (AP.null()) {
             // The widget may be below. If there is more than one, just find the first one.
-            QPDFObjectHandle grandkids = kid.getKey("/Kids");
-            if (grandkids.isArray()) {
-                int ngrandkids = grandkids.getArrayNItems();
-                for (int j = 0; j < ngrandkids; ++j) {
-                    QPDFObjectHandle grandkid = grandkids.getArrayItem(j);
-                    AP = grandkid.getKey("/AP");
-                    if (!AP.isNull()) {
-                        QTC::TC("qpdf", "QPDFFormFieldObjectHelper radio button grandkid");
-                        annot = grandkid;
-                        break;
-                    }
+            for (auto const& grandkid: kid.getKey("/Kids").as_array()) {
+                AP = grandkid.getKey("/AP");
+                if (!AP.null()) {
+                    QTC::TC("qpdf", "QPDFFormFieldObjectHelper radio button grandkid");
+                    annot = grandkid;
+                    break;
                 }
             }
         } else {
@@ -419,20 +405,16 @@ QPDFFormFieldObjectHelper::setCheckBoxValue(bool value)
 {
     QPDFObjectHandle AP = oh().getKey("/AP");
     QPDFObjectHandle annot;
-    if (AP.isNull()) {
+    if (AP.null()) {
         // The widget may be below. If there is more than one, just
         // find the first one.
         QPDFObjectHandle kids = oh().getKey("/Kids");
-        if (kids.isArray()) {
-            int nkids = kids.getArrayNItems();
-            for (int i = 0; i < nkids; ++i) {
-                QPDFObjectHandle kid = kids.getArrayItem(i);
-                AP = kid.getKey("/AP");
-                if (!AP.isNull()) {
-                    QTC::TC("qpdf", "QPDFFormFieldObjectHelper checkbox kid widget");
-                    annot = kid;
-                    break;
-                }
+        for (auto const& kid: oh().getKey("/Kids").as_array(qpdf::strict)) {
+            AP = kid.getKey("/AP");
+            if (!AP.null()) {
+                QTC::TC("qpdf", "QPDFFormFieldObjectHelper checkbox kid widget");
+                annot = kid;
+                break;
             }
         }
     } else {

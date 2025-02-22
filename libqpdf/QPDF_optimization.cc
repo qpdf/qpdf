@@ -319,9 +319,8 @@ QPDF::updateObjectMaps(
         }
 
         if (cur.oh.isArray()) {
-            int n = cur.oh.getArrayNItems();
-            for (int i = 0; i < n; ++i) {
-                pending.emplace_back(cur.ou, cur.oh.getArrayItem(i), false);
+            for (auto const& item: cur.oh.as_array()) {
+                pending.emplace_back(cur.ou, item, false);
             }
         } else if (cur.oh.isDictionary() || cur.oh.isStream()) {
             QPDFObjectHandle dict = cur.oh;

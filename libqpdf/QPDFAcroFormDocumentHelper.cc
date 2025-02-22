@@ -7,6 +7,8 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/ResourceFinder.hh>
 
+using namespace qpdf;
+
 QPDFAcroFormDocumentHelper::Members::Members() :
     cache_valid(false)
 {
@@ -239,24 +241,23 @@ QPDFAcroFormDocumentHelper::analyze()
         return;
     }
     m->cache_valid = true;
-    QPDFObjectHandle acroform = this->qpdf.getRoot().getKey("/AcroForm");
+    QPDFObjectHandle acroform = qpdf.getRoot().getKey("/AcroForm");
     if (!(acroform.isDictionary() && acroform.hasKey("/Fields"))) {
         return;
     }
     QPDFObjectHandle fields = acroform.getKey("/Fields");
-    if (!fields.isArray()) {
+    if (auto fa = fields.as_array(strict)) {
+        // Traverse /AcroForm to find annotations and map them bidirectionally to fields.
+
+        QPDFObjGen::set visited;
+        QPDFObjectHandle null(QPDFObjectHandle::newNull());
+        for (auto const& field: fa) {
+            traverseField(field, null, 0, visited);
+        }
+    } else {
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper fields not array");
         acroform.warnIfPossible("/Fields key of /AcroForm dictionary is not an array; ignoring");
         fields = QPDFObjectHandle::newArray();
-    }
-
-    // Traverse /AcroForm to find annotations and map them bidirectionally to fields.
-
-    QPDFObjGen::set visited;
-    int nfields = fields.getArrayNItems();
-    QPDFObjectHandle null(QPDFObjectHandle::newNull());
-    for (int i = 0; i < nfields; ++i) {
-        traverseField(fields.getArrayItem(i), null, 0, visited);
     }
 
     // All Widget annotations should have been encountered by traversing /AcroForm, but in case any
@@ -325,12 +326,10 @@ QPDFAcroFormDocumentHelper::traverseField(
 
     bool is_annotation = false;
     bool is_field = (0 == depth);
-    QPDFObjectHandle kids = field.getKey("/Kids");
-    if (kids.isArray()) {
+    if (auto a = field.getKey("/Kids").as_array(strict)) {
         is_field = true;
-        int nkids = kids.getArrayNItems();
-        for (int k = 0; k < nkids; ++k) {
-            traverseField(kids.getArrayItem(k), field, 1 + depth, visited);
+        for (auto const& item: a) {
+            traverseField(item, field, 1 + depth, visited);
         }
     } else {
         if (field.hasKey("/Parent")) {

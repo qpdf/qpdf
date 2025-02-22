@@ -1129,7 +1129,7 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
         return;
     } else if (!m->linearized) {
         if (object.isArray()) {
-            for (auto& item: object.getArrayAsVector()) {
+            for (auto& item: object.as_array()) {
                 enqueueObject(item);
             }
         } else if (auto d = object.as_dictionary()) {
@@ -1350,7 +1350,7 @@ QPDFWriter::unparseObject(
         // [ in the /H key of the linearization parameter dictionary.  We'll do this unconditionally
         // for all arrays because it looks nicer and doesn't make the files that much bigger.
         writeString("[");
-        for (auto const& item: object.getArrayAsVector()) {
+        for (auto const& item: object.as_array()) {
             writeString(indent);
             writeStringQDF("  ");
             unparseChild(item, level + 1, child_flags);
@@ -1892,12 +1892,10 @@ QPDFWriter::generateID()
         }
         seed += " QPDF ";
         if (trailer.hasKey("/Info")) {
-            QPDFObjectHandle info = trailer.getKey("/Info");
-            for (auto const& key: info.getKeys()) {
-                QPDFObjectHandle obj = info.getKey(key);
-                if (obj.isString()) {
+            for (auto const& item: trailer.getKey("/Info").as_dictionary()) {
+                if (item.second.isString()) {
                     seed += " ";
-                    seed += obj.getStringValue();
+                    seed += item.second.getStringValue();
                 }
             }
         }
@@ -1923,8 +1921,7 @@ QPDFWriter::generateID()
 void
 QPDFWriter::initializeSpecialStreams()
 {
-    // Mark all page content streams in case we are filtering or
-    // normalizing.
+    // Mark all page content streams in case we are filtering or normalizing.
     std::vector<QPDFObjectHandle> pages = m->pdf.getAllPages();
     int num = 0;
     for (auto& page: pages) {
