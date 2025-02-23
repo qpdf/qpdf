@@ -329,7 +329,6 @@ class JSON
         ~JSON_string() override = default;
         void write(Pipeline*, size_t depth) const override;
         std::string utf8;
-        std::string encoded;
     };
     struct JSON_number: public JSON_value
     {
