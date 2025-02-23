@@ -126,6 +126,7 @@ enum qpdf_object_type_e {
     /* Object types internal to qpdf */
     ot_unresolved,
     ot_destroyed,
+    ot_reference,
 };
 
 /* Write Parameters. See QPDFWriter.hh for details. */

@@ -109,7 +109,6 @@ main()
     print_size(QPDFNumberTreeObjectHelper);
     print_size(QPDFNumberTreeObjectHelper::iterator);
     print_size(QPDFObjGen);
-    print_size(QPDFObjGen::set);
     print_size(QPDFObjectHandle);
     print_size(QPDFObjectHandle::ParserCallbacks);
     print_size(QPDFObjectHandle::QPDFArrayItems);
@@ -118,6 +117,7 @@ main()
     print_size(QPDFObjectHandle::QPDFDictItems::iterator);
     print_size(QPDFObjectHandle::StreamDataProvider);
     print_size(QPDFObjectHandle::TokenFilter);
+    print_size(QPDFObjectHelper);
     print_size(QPDFOutlineDocumentHelper);
     print_size(QPDFOutlineObjectHelper);
     print_size(QPDFPageDocumentHelper);
