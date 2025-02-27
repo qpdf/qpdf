@@ -301,6 +301,7 @@ previous group. A number may be one of
 
 - <n>        where <n> represents a number is the <n>th page
 - r<n>       is the <n>th page from the end
+- m<n>       is the <n>th page or the last page, if <n> is larger than the number of pages
 - z          the last page, same as r1
 
 - a,b,c      pages a, b, and c

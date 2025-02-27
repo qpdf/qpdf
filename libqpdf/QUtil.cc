@@ -1308,7 +1308,7 @@ QUtil::parse_numrange(char const* range, int max)
     // range parsing is used only during argument processing. It is not used during processing of
     // PDF files.
 
-    static std::regex group_re(R"((x)?(z|r?\d+)(?:-(z|r?\d+))?)");
+    static std::regex group_re(R"((x)?(z|[rm]?\d+)(?:-(z|[rm]?\d+))?)");
     auto parse_num = [&max](std::string const& s) -> int {
         if (s == "z") {
             return max;
@@ -1316,6 +1316,9 @@ QUtil::parse_numrange(char const* range, int max)
         int num;
         if (s.at(0) == 'r') {
             num = max + 1 - string_to_int(s.substr(1).c_str());
+        }
+        else if (s.at(0) == 'm') {
+          num = std::min(string_to_int(s.substr(1).c_str()), max);
         } else {
             num = string_to_int(s.c_str());
         }
