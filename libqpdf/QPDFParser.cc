@@ -215,6 +215,11 @@ QPDFParser::parseRemainder(bool content_stream)
             continue;
 
         case QPDFTokenizer::tt_array_close:
+            if (bad_count && !max_bad_count) {
+                // Trigger warning.
+                (void)tooManyBadTokens();
+                return {QPDF_Null::create()};
+            }
             if (frame->state == st_array) {
                 auto object = QPDF_Array::create(std::move(frame->olist), frame->null_count > 100);
                 setDescription(object, frame->offset - 1);
@@ -239,6 +244,11 @@ QPDFParser::parseRemainder(bool content_stream)
             continue;
 
         case QPDFTokenizer::tt_dict_close:
+            if (bad_count && !max_bad_count) {
+                // Trigger warning.
+                (void)tooManyBadTokens();
+                return {QPDF_Null::create()};
+            }
             if (frame->state <= st_dictionary_value) {
                 // Attempt to recover more or less gracefully from invalid dictionaries.
                 auto& dict = frame->dict;
@@ -419,6 +429,12 @@ template <typename T, typename... Args>
 void
 QPDFParser::addScalar(Args&&... args)
 {
+    if (bad_count && (frame->olist.size() > 5'000 || frame->dict.size() > 5'000)) {
+        // Stop adding scalars. We are going to abort when the close token or a bad token is
+        // encountered.
+        max_bad_count = 0;
+        return;
+    }
     auto obj = T::create(args...);
     obj->setDescription(context, description, input.getLastOffset());
     add(std::move(obj));
