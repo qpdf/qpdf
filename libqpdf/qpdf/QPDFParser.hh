@@ -83,7 +83,8 @@ class QPDFParser
 
     std::vector<StackFrame> stack;
     StackFrame* frame;
-    // Number of recent bad tokens.
+    // Number of recent bad tokens. This will always be > 0 once a bad token has been encountered as
+    // it only gets incremented or reset when a bad token is encountered.
     int bad_count{0};
     // Number of bad tokens (remaining) before giving up.
     int max_bad_count{15};
