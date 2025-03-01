@@ -8,10 +8,10 @@ namespace qpdf
 
     class Tokenizer
     {
-        friend class ::QPDFTokenizer;
-
       public:
         Tokenizer();
+        Tokenizer(Tokenizer const&) = delete;
+        Tokenizer& operator=(Tokenizer const&) = delete;
 
         // Methods to support QPDFTokenizer. See QPDFTokenizer.hh for detail. Some of these are used
         // by Tokenizer internally but are not accessed directly by the rest of qpdf.
@@ -20,13 +20,12 @@ namespace qpdf
         void includeIgnorable();
         void presentCharacter(char ch);
         void presentEOF();
+        bool betweenTokens();
 
         // If a token is available, return true and initialize token with the token, unread_char
         // with whether or not we have to unread the last character, and if unread_char, ch with the
         // character to unread.
         bool getToken(QPDFTokenizer::Token& token, bool& unread_char, char& ch);
-
-        // Pull mode:
 
         // Read a token from an input source. Context describes the context in which the token is
         // being read and is used in the exception thrown if there is an error. After a token is
@@ -55,7 +54,6 @@ namespace qpdf
 
         void expectInlineImage(InputSource& input);
 
-      private:
         // Read a token from an input source. Context describes the context in which the token is
         // being read and is used in the exception thrown if there is an error. After a token is
         // read, the position of the input source returned by input->tell() points to just after the
@@ -73,9 +71,7 @@ namespace qpdf
         inline std::string const& getRawValue() const;
         inline std::string const& getErrorMessage() const;
 
-        Tokenizer(Tokenizer const&) = delete;
-        Tokenizer& operator=(Tokenizer const&) = delete;
-
+      private:
         bool isSpace(char);
         bool isDelimiter(char);
         void findEI(InputSource& input);
@@ -178,26 +174,5 @@ namespace qpdf
     }
 
 } // namespace qpdf
-
-inline QPDFTokenizer::token_type_e
-QPDFTokenizer::getType() const noexcept
-{
-    return m->type;
-}
-inline std::string const&
-QPDFTokenizer::getValue() const noexcept
-{
-    return (m->type == tt_name || m->type == tt_string) ? m->val : m->raw_val;
-}
-inline std::string const&
-QPDFTokenizer::getRawValue() const noexcept
-{
-    return m->raw_val;
-}
-inline std::string const&
-QPDFTokenizer::getErrorMessage() const noexcept
-{
-    return m->error_message;
-}
 
 #endif // QPDFTOKENIZER_PRIVATE_HH

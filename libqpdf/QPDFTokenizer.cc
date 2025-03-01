@@ -936,7 +936,13 @@ Tokenizer::getToken(Token& token, bool& unread_char, char& ch)
 bool
 QPDFTokenizer::betweenTokens()
 {
-    return m->before_token;
+    return m->betweenTokens();
+}
+
+bool
+Tokenizer::betweenTokens()
+{
+    return before_token;
 }
 
 QPDFTokenizer::Token
@@ -983,12 +989,6 @@ Tokenizer::readToken(
     std::shared_ptr<InputSource> input, std::string const& context, bool allow_bad, size_t max_len)
 {
     return readToken(*input, context, allow_bad, max_len);
-}
-
-bool
-QPDFTokenizer::nextToken(InputSource& input, std::string const& context, size_t max_len)
-{
-    return m->nextToken(input, context, max_len);
 }
 
 bool

@@ -3,6 +3,7 @@
 
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObject_private.hh>
+#include <qpdf/QPDFTokenizer_private.hh>
 
 #include <memory>
 #include <string>
@@ -20,7 +21,7 @@ class QPDFParser
         bool parse_pdf) :
         input(input),
         object_description(object_description),
-        tokenizer(tokenizer),
+        tokenizer(*tokenizer.m),
         decrypter(decrypter),
         context(context),
         description(
@@ -75,7 +76,7 @@ class QPDFParser
     void setDescription(std::shared_ptr<QPDFObject>& obj, qpdf_offset_t parsed_offset);
     InputSource& input;
     std::string const& object_description;
-    QPDFTokenizer& tokenizer;
+    qpdf::Tokenizer& tokenizer;
     QPDFObjectHandle::StringDecrypter* decrypter;
     QPDF* context;
     std::shared_ptr<QPDFObject::Description> description;

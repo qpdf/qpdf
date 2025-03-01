@@ -206,23 +206,6 @@ class QPDFTokenizer
   private:
     friend class QPDFParser;
 
-    // Read a token from an input source. Context describes the context in which the token is being
-    // read and is used in the exception thrown if there is an error. After a token is read, the
-    // position of the input source returned by input->tell() points to just after the token, and
-    // the input source's "last offset" as returned by input->getLastOffset() points to the
-    // beginning of the token. Returns false if the token is bad or if scanning produced an error
-    // message for any reason.
-
-    bool nextToken(InputSource& input, std::string const& context, size_t max_len = 0);
-
-    // The following methods are only valid after nextToken has been called and until another
-    // QPDFTokenizer method is called. They allow the results of calling nextToken to be accessed
-    // without creating a Token, thus avoiding copying information that may not be needed.
-    inline token_type_e getType() const noexcept;
-    inline std::string const& getValue() const noexcept;
-    inline std::string const& getRawValue() const noexcept;
-    inline std::string const& getErrorMessage() const noexcept;
-
     QPDFTokenizer(QPDFTokenizer const&) = delete;
     QPDFTokenizer& operator=(QPDFTokenizer const&) = delete;
 
