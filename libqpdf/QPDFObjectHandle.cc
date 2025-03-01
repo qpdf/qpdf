@@ -1262,12 +1262,6 @@ QPDFObjectHandle::removeKeyAndGetOld(std::string const& key)
     return result;
 }
 
-void
-QPDFObjectHandle::replaceOrRemoveKey(std::string const& key, QPDFObjectHandle const& value)
-{
-    replaceKey(key, value);
-}
-
 // Stream accessors
 
 QPDFObjectHandle

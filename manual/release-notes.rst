@@ -15,6 +15,14 @@ more detail.
 12.0.0: not yet released
   - API: breaking changes
 
+    - The header file ``qpdf/QPDFObject.hh`` now generates an error if
+      included. This is to prevent that includes it from accidentally
+      working because an old version is installed somewhere on the
+      system.
+
+    - ``QPDFObjectHandle::replaceOrRemoveKey`` has been removed since
+      it was identical to ``QPDFObjectHandle::replaceKey``.
+
     - ``JSON::checkDictionaryKeySeen`` has been removed. If ``JSON::parse``
       encounters duplicate keys the last value is silently accepted instead
       of throwing a runtime error.

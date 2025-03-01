@@ -23,58 +23,14 @@
 #ifndef QPDFOBJECT_OLD_HH
 #define QPDFOBJECT_OLD_HH
 
-// **********************************************************************
-//
-//   This file is for backward compatibility. The header file for the
-//   internal QPDFObject class (not part of the public API) is in
-//   QPDFObject_private.hh (not installed).
-//
-// **********************************************************************
+// This file exists so that if anyone still includes <qpdf/QPDFObject.hh>
+// and has been ignoring the warning, they will get an error. This reduces
+// the chances of someone accidentally including the file from an
+// installed, old version. The QPDFObject API, which is not part of the
+// public API, is defined in QPDFObject_private.hh. Prior to qpdf 11, this
+// file was exposed for some constants. This error was introduced in qpdf
+// 12.
 
-// ABI: in qpdf 12, leave this file in place and have it generate an
-// error. This is to prevent someone from being able to successfully
-// include this file and get a copy from a previous installation
-// thereby accidentally creating sources depend on having an older
-// version installed. When enough time has passed, this file can be
-// removed, and libqpdf/qpdf/QPDFObject_private.hh can be renamed to
-// libqpdf/qpdf/QPDFObject.hh.
-
-#ifndef QPDF_OBJECT_NOWARN
-// ABI: remove this file in qpdf 12
-# warning "QPDFObject.hh is deprecated see comments in QPDFObject.hh"
-#endif
-
-#include <qpdf/Constants.h>
-class QPDFObject
-{
-  public:
-    // This file and these symbols will be removed in QPDF 12. Instead
-    // of including this header, include <qpdf/Constants.h>. Replace
-    // `QPDFObject::ot_` with `::ot_` in your code.
-
-    // Prior to qpdf 10.5, qpdf_object_type_e was
-    // QPDFObject::object_type_e but was moved to make it accessible
-    // to the C API. The code below is for backward compatibility
-    // until qpdf 12.
-    typedef enum qpdf_object_type_e object_type_e;
-    static constexpr object_type_e ot_uninitialized = ::ot_uninitialized;
-    static constexpr object_type_e ot_reserved = ::ot_reserved;
-    static constexpr object_type_e ot_null = ::ot_null;
-    static constexpr object_type_e ot_boolean = ::ot_boolean;
-    static constexpr object_type_e ot_integer = ::ot_integer;
-    static constexpr object_type_e ot_real = ::ot_real;
-    static constexpr object_type_e ot_string = ::ot_string;
-    static constexpr object_type_e ot_name = ::ot_name;
-    static constexpr object_type_e ot_array = ::ot_array;
-    static constexpr object_type_e ot_dictionary = ::ot_dictionary;
-    static constexpr object_type_e ot_stream = ::ot_stream;
-    static constexpr object_type_e ot_operator = ::ot_operator;
-    static constexpr object_type_e ot_inlineimage = ::ot_inlineimage;
-
-  private:
-    QPDFObject() = delete;
-    QPDFObject(QPDFObject const&) = delete;
-    QPDFObject& operator=(QPDFObject const&) = delete;
-};
+#error "QPDFObject.hh is no longer a valid QPDF Header file"
 
 #endif // QPDFOBJECT_OLD_HH
