@@ -38,20 +38,12 @@ namespace qpdf
             bool allow_bad = false,
             size_t max_len = 0);
 
-        QPDFTokenizer::Token readToken(
-            std::shared_ptr<InputSource> input,
-            std::string const& context,
-            bool allow_bad = false,
-            size_t max_len = 0);
-
         // Calling this method puts the tokenizer in a state for reading inline images. You should
         // call this method after reading the character following the ID operator. In that state, it
         // will return all data up to BUT NOT INCLUDING the next EI token. After you call this
         // method, the next call to readToken (or the token created next time getToken returns true)
         // will either be tt_inline_image or tt_bad. This is the only way readToken returns a
         // tt_inline_image token.
-        void expectInlineImage(std::shared_ptr<InputSource> input);
-
         void expectInlineImage(InputSource& input);
 
         // Read a token from an input source. Context describes the context in which the token is
@@ -66,10 +58,29 @@ namespace qpdf
         // QPDFTokenizer method is called. They allow the results of calling nextToken to be
         // accessed without creating a Token, thus avoiding copying information that may not be
         // needed.
-        inline QPDFTokenizer::token_type_e getType() const;
-        inline std::string const& getValue() const;
-        inline std::string const& getRawValue() const;
-        inline std::string const& getErrorMessage() const;
+
+        inline QPDFTokenizer::token_type_e
+        getType() const
+        {
+            return this->type;
+        }
+        inline std::string const&
+        getValue() const
+        {
+            return (this->type == QPDFTokenizer::tt_name || this->type == QPDFTokenizer::tt_string)
+                ? this->val
+                : this->raw_val;
+        }
+        inline std::string const&
+        getRawValue() const
+        {
+            return this->raw_val;
+        }
+        inline std::string const&
+        getErrorMessage() const
+        {
+            return this->error_message;
+        }
 
       private:
         bool isSpace(char);
@@ -149,29 +160,6 @@ namespace qpdf
         char hex_char;
         int digit_count;
     };
-
-    inline QPDFTokenizer::token_type_e
-    Tokenizer::getType() const
-    {
-        return this->type;
-    }
-    inline std::string const&
-    Tokenizer::getValue() const
-    {
-        return (this->type == QPDFTokenizer::tt_name || this->type == QPDFTokenizer::tt_string)
-            ? this->val
-            : this->raw_val;
-    }
-    inline std::string const&
-    Tokenizer::getRawValue() const
-    {
-        return this->raw_val;
-    }
-    inline std::string const&
-    Tokenizer::getErrorMessage() const
-    {
-        return this->error_message;
-    }
 
 } // namespace qpdf
 

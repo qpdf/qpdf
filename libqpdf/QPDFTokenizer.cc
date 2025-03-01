@@ -799,13 +799,7 @@ Tokenizer::presentEOF()
 void
 QPDFTokenizer::expectInlineImage(std::shared_ptr<InputSource> input)
 {
-    m->expectInlineImage(input);
-}
-
-void
-Tokenizer::expectInlineImage(std::shared_ptr<InputSource> input)
-{
-    expectInlineImage(*input);
+    m->expectInlineImage(*input);
 }
 
 void
@@ -953,6 +947,13 @@ QPDFTokenizer::readToken(
 }
 
 QPDFTokenizer::Token
+QPDFTokenizer::readToken(
+    std::shared_ptr<InputSource> input, std::string const& context, bool allow_bad, size_t max_len)
+{
+    return m->readToken(*input, context, allow_bad, max_len);
+}
+
+QPDFTokenizer::Token
 Tokenizer::readToken(InputSource& input, std::string const& context, bool allow_bad, size_t max_len)
 {
     nextToken(input, context, max_len);
@@ -975,20 +976,6 @@ Tokenizer::readToken(InputSource& input, std::string const& context, bool allow_
         }
     }
     return token;
-}
-
-QPDFTokenizer::Token
-QPDFTokenizer::readToken(
-    std::shared_ptr<InputSource> input, std::string const& context, bool allow_bad, size_t max_len)
-{
-    return m->readToken(*input, context, allow_bad, max_len);
-}
-
-QPDFTokenizer::Token
-Tokenizer::readToken(
-    std::shared_ptr<InputSource> input, std::string const& context, bool allow_bad, size_t max_len)
-{
-    return readToken(*input, context, allow_bad, max_len);
 }
 
 bool
