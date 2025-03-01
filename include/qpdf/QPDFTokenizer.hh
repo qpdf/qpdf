@@ -29,6 +29,11 @@
 #include <memory>
 #include <string>
 
+namespace qpdf
+{
+    class Tokenizer;
+} // namespace qpdf
+
 class QPDFTokenizer
 {
   public:
@@ -129,6 +134,9 @@ class QPDFTokenizer
     QPDF_DLL
     QPDFTokenizer();
 
+    QPDF_DLL
+    ~QPDFTokenizer();
+
     // If called, treat EOF as a separate token type instead of an error.  This was introduced in
     // QPDF 4.1 to facilitate tokenizing content streams.
     QPDF_DLL
@@ -218,103 +226,7 @@ class QPDFTokenizer
     QPDFTokenizer(QPDFTokenizer const&) = delete;
     QPDFTokenizer& operator=(QPDFTokenizer const&) = delete;
 
-    bool isSpace(char);
-    bool isDelimiter(char);
-    void findEI(InputSource& input);
-
-    enum state_e {
-        st_top,
-        st_in_hexstring,
-        st_in_string,
-        st_in_hexstring_2nd,
-        st_name,
-        st_literal,
-        st_in_space,
-        st_in_comment,
-        st_string_escape,
-        st_char_code,
-        st_string_after_cr,
-        st_lt,
-        st_gt,
-        st_inline_image,
-        st_sign,
-        st_number,
-        st_real,
-        st_decimal,
-        st_name_hex1,
-        st_name_hex2,
-        st_before_token,
-        st_token_ready
-    };
-
-    void handleCharacter(char);
-    void inBeforeToken(char);
-    void inTop(char);
-    void inSpace(char);
-    void inComment(char);
-    void inString(char);
-    void inName(char);
-    void inLt(char);
-    void inGt(char);
-    void inStringAfterCR(char);
-    void inStringEscape(char);
-    void inLiteral(char);
-    void inCharCode(char);
-    void inHexstring(char);
-    void inHexstring2nd(char);
-    void inInlineImage(char);
-    void inTokenReady(char);
-    void inNameHex1(char);
-    void inNameHex2(char);
-    void inSign(char);
-    void inDecimal(char);
-    void inNumber(char);
-    void inReal(char);
-    void reset();
-
-    // Lexer state
-    state_e state;
-
-    bool allow_eof;
-    bool include_ignorable;
-
-    // Current token accumulation
-    token_type_e type;
-    std::string val;
-    std::string raw_val;
-    std::string error_message;
-    bool before_token;
-    bool in_token;
-    char char_to_unread;
-    size_t inline_image_bytes;
-    bool bad;
-
-    // State for strings
-    int string_depth;
-    int char_code;
-    char hex_char;
-    int digit_count;
+    std::unique_ptr<qpdf::Tokenizer> m;
 };
-
-inline QPDFTokenizer::token_type_e
-QPDFTokenizer::getType() const noexcept
-{
-    return this->type;
-}
-inline std::string const&
-QPDFTokenizer::getValue() const noexcept
-{
-    return (this->type == tt_name || this->type == tt_string) ? this->val : this->raw_val;
-}
-inline std::string const&
-QPDFTokenizer::getRawValue() const noexcept
-{
-    return this->raw_val;
-}
-inline std::string const&
-QPDFTokenizer::getErrorMessage() const noexcept
-{
-    return this->error_message;
-}
 
 #endif // QPDFTOKENIZER_HH

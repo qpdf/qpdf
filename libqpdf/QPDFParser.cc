@@ -4,6 +4,7 @@
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFObject_private.hh>
+#include <qpdf/QPDFTokenizer_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
