@@ -23,14 +23,14 @@
 #ifndef QPDFOBJECT_OLD_HH
 #define QPDFOBJECT_OLD_HH
 
-// This file exists so that if anyone still includes <qpdf/QPDFObject.hh>
-// and has been ignoring the warning, they will get an error. This reduces
-// the chances of someone accidentally including the file from an
-// installed, old version. The QPDFObject API, which is not part of the
-// public API, is defined in QPDFObject_private.hh. Prior to qpdf 11, this
-// file was exposed for some constants. This error was introduced in qpdf
-// 12.
+// Current code should not include <qpdf/QPDFObject.hh>. This file exists
+// to ensure that code that includes it doesn't accidentally work because
+// of an old qpdf installed on the system. Including this file became an
+// error with qpdf version 12. The internal QPDFObject API is defined in
+// QPDFObject_private.hh, which is not part of the public API.
 
-#error "QPDFObject.hh is no longer a valid QPDF Header file"
+// Instead of including this header, include <qpdf/Constants.h>, and
+// replace `QPDFObject::ot_` with `::ot_` in your code.
+#error "QPDFObject.hh is obsolete; see comments in QPDFObject.hh for details"
 
 #endif // QPDFOBJECT_OLD_HH

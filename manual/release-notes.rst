@@ -18,7 +18,9 @@ more detail.
     - The header file ``qpdf/QPDFObject.hh`` now generates an error if
       included. This is to prevent code that includes it from
       accidentally working because an old version is installed
-      somewhere on the system.
+      somewhere on the system. Instead of including that header,
+      include ``<qpdf/Constants.h>``, and replace ``QPDFObject::ot_``
+      with ``::ot_`` in your code.
 
     - ``QPDFObjectHandle::replaceOrRemoveKey`` has been removed since
       it was identical to ``QPDFObjectHandle::replaceKey``.
