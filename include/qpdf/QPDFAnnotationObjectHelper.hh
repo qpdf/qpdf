@@ -30,7 +30,7 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
   public:
     QPDF_DLL
     QPDFAnnotationObjectHelper(QPDFObjectHandle);
-    QPDF_DLL
+
     ~QPDFAnnotationObjectHelper() override = default;
 
     // This class provides helper methods for annotations. More functionality will likely be added
@@ -92,7 +92,6 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
         friend class QPDFAnnotationObjectHelper;
 
       public:
-        QPDF_DLL
         ~Members() = default;
 
       private:

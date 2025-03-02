@@ -17,9 +17,6 @@
 // License. At your option, you may continue to consider qpdf to be licensed under those terms.
 // Please see the manual for additional information.
 
-// This class implements a simple writer for saving QPDF objects to new PDF files.  See comments
-// through the header file for additional details.
-
 #ifndef QPDFWRITER_HH
 #define QPDFWRITER_HH
 
@@ -51,6 +48,8 @@ class QPDF;
 class Pl_Count;
 class Pl_MD5;
 
+// This class implements a simple writer for saving QPDF objects to new PDF files.  See comments
+// through the header file for additional details.
 class QPDFWriter
 {
   public:
@@ -71,7 +70,6 @@ class QPDFWriter
     QPDF_DLL
     QPDFWriter(QPDF& pdf, char const* description, FILE* file, bool close_file);
 
-    QPDF_DLL
     ~QPDFWriter() = default;
 
     class QPDF_DLL_CLASS ProgressReporter

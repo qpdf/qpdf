@@ -20,12 +20,11 @@
 #ifndef PL_DISCARD_HH
 #define PL_DISCARD_HH
 
-// This pipeline discards its output.  It is an end-of-line pipeline (with no next).
-
-// This pipeline is reusable; i.e., it is safe to call write() after calling finish().
-
 #include <qpdf/Pipeline.hh>
 
+// This pipeline discards its output.  It is an end-of-line pipeline (with no next).
+//
+// This pipeline is reusable; i.e., it is safe to call write() after calling finish().
 class QPDF_DLL_CLASS Pl_Discard: public Pipeline
 {
   public:
@@ -37,22 +36,6 @@ class QPDF_DLL_CLASS Pl_Discard: public Pipeline
     void write(unsigned char const*, size_t) override;
     QPDF_DLL
     void finish() override;
-
-  private:
-    class QPDF_DLL_PRIVATE Members
-    {
-        friend class Pl_Discard;
-
-      public:
-        QPDF_DLL
-        ~Members() = default;
-
-      private:
-        Members() = default;
-        Members(Members const&) = delete;
-    };
-
-    std::shared_ptr<Members> m;
 };
 
 #endif // PL_DISCARD_HH

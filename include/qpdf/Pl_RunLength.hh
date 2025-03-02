@@ -52,26 +52,9 @@ class QPDF_DLL_CLASS Pl_RunLength: public Pipeline
 
     enum state_e { st_top, st_copying, st_run };
 
-    class QPDF_DLL_PRIVATE Members
-    {
-        friend class Pl_RunLength;
+    class Members;
 
-      public:
-        QPDF_DLL
-        ~Members() = default;
-
-      private:
-        Members(action_e);
-        Members(Members const&) = delete;
-
-        action_e action;
-        state_e state{st_top};
-        unsigned char buf[128];
-        unsigned int length{0};
-        std::string out;
-    };
-
-    std::shared_ptr<Members> m;
+    std::unique_ptr<Members> m;
 };
 
 #endif // PL_RUNLENGTH_HH

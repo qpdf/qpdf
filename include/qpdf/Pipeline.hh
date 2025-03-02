@@ -17,6 +17,14 @@
 // License. At your option, you may continue to consider qpdf to be licensed under those terms.
 // Please see the manual for additional information.
 
+#ifndef PIPELINE_HH
+#define PIPELINE_HH
+
+#include <qpdf/DLL.h>
+
+#include <memory>
+#include <string>
+
 // Generalized Pipeline interface.  By convention, subclasses of Pipeline are called Pl_Something.
 //
 // When an instance of Pipeline is created with a pointer to a next pipeline, that pipeline writes
@@ -32,15 +40,7 @@
 // Some pipelines are reusable (i.e., you can call write() after calling finish() and can call
 // finish() multiple times) while others are not.  It is up to the caller to use a pipeline
 // according to its own restrictions.
-
-#ifndef PIPELINE_HH
-#define PIPELINE_HH
-
-#include <qpdf/DLL.h>
-
-#include <memory>
-#include <string>
-
+//
 // Remember to use QPDF_DLL_CLASS on anything derived from Pipeline so it will work with
 // dynamic_cast across the shared object boundary.
 class QPDF_DLL_CLASS Pipeline
@@ -49,7 +49,6 @@ class QPDF_DLL_CLASS Pipeline
     QPDF_DLL
     Pipeline(char const* identifier, Pipeline* next);
 
-    QPDF_DLL
     virtual ~Pipeline() = default;
 
     // Subclasses should implement write and finish to do their jobs and then, if they are not
@@ -98,7 +97,7 @@ class QPDF_DLL_CLASS Pipeline
   protected:
     QPDF_DLL
     Pipeline* getNext(bool allow_null = false);
-    QPDF_DLL
+
     Pipeline*
     next() const noexcept
     {

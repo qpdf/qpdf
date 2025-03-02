@@ -34,20 +34,17 @@
 class QPDF_DLL_CLASS QPDFObjectHelper: public qpdf::BaseHandle
 {
   public:
-    QPDF_DLL
     QPDFObjectHelper(QPDFObjectHandle oh) :
         qpdf::BaseHandle(oh.getObj())
     {
     }
     QPDF_DLL
     virtual ~QPDFObjectHelper();
-    QPDF_DLL
     QPDFObjectHandle
     getObjectHandle()
     {
         return {obj};
     }
-    QPDF_DLL
     QPDFObjectHandle const
     getObjectHandle() const
     {

@@ -32,11 +32,8 @@
 class QPDF_DLL_CLASS InputSource
 {
   public:
-    QPDF_DLL
-    InputSource()
-    {
-    }
-    QPDF_DLL
+    InputSource() = default;
+
     virtual ~InputSource() = default;
 
     class QPDF_DLL_CLASS Finder

@@ -17,8 +17,6 @@
 // License. At your option, you may continue to consider qpdf to be licensed under those terms.
 // Please see the manual for additional information.
 
-// End-of-line pipeline that simply writes its data to a stdio FILE* object.
-
 #ifndef PL_OSTREAM_HH
 #define PL_OSTREAM_HH
 
@@ -26,10 +24,9 @@
 
 #include <iostream>
 
+// End-of-line pipeline that simply writes its data to a stdio FILE* object.
 //
 // This pipeline is reusable.
-//
-
 class QPDF_DLL_CLASS Pl_OStream: public Pipeline
 {
   public:
@@ -45,22 +42,9 @@ class QPDF_DLL_CLASS Pl_OStream: public Pipeline
     void finish() override;
 
   private:
-    class QPDF_DLL_PRIVATE Members
-    {
-        friend class Pl_OStream;
+    class Members;
 
-      public:
-        QPDF_DLL
-        ~Members() = default;
-
-      private:
-        Members(std::ostream&);
-        Members(Members const&) = delete;
-
-        std::ostream& os;
-    };
-
-    std::shared_ptr<Members> m;
+    std::unique_ptr<Members> m;
 };
 
 #endif // PL_OSTREAM_HH

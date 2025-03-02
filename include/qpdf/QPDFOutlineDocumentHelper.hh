@@ -35,13 +35,12 @@
 // section 12.3.3 of the PDF spec (ISO-32000). With the help of QPDFOutlineObjectHelper, the
 // outlines tree is traversed, and a bidirectional map is made between pages and outlines. See also
 // QPDFOutlineObjectHelper.
-
 class QPDFOutlineDocumentHelper: public QPDFDocumentHelper
 {
   public:
     QPDF_DLL
     QPDFOutlineDocumentHelper(QPDF&);
-    QPDF_DLL
+
     ~QPDFOutlineDocumentHelper() override = default;
 
     QPDF_DLL
@@ -79,7 +78,6 @@ class QPDFOutlineDocumentHelper: public QPDFDocumentHelper
         friend class QPDFOutlineDocumentHelper;
 
       public:
-        QPDF_DLL
         ~Members() = default;
 
       private:

@@ -156,9 +156,7 @@ class QPDFObjectHandle final: public qpdf::BaseHandle
     class QPDF_DLL_CLASS TokenFilter
     {
       public:
-        QPDF_DLL
         TokenFilter() = default;
-        QPDF_DLL
         virtual ~TokenFilter() = default;
         virtual void handleToken(QPDFTokenizer::Token const&) = 0;
         QPDF_DLL
@@ -196,7 +194,6 @@ class QPDFObjectHandle final: public qpdf::BaseHandle
     class StringDecrypter
     {
       public:
-        QPDF_DLL
         virtual ~StringDecrypter() = default;
         virtual void decryptString(std::string& val) = 0;
     };
@@ -206,7 +203,6 @@ class QPDFObjectHandle final: public qpdf::BaseHandle
     class QPDF_DLL_CLASS ParserCallbacks
     {
       public:
-        QPDF_DLL
         virtual ~ParserCallbacks() = default;
         // One of the handleObject methods must be overridden.
         QPDF_DLL
@@ -286,18 +282,13 @@ class QPDFObjectHandle final: public qpdf::BaseHandle
         double f;
     };
 
-    QPDF_DLL
     QPDFObjectHandle() = default;
-    QPDF_DLL
     QPDFObjectHandle(QPDFObjectHandle const&) = default;
-    QPDF_DLL
     QPDFObjectHandle& operator=(QPDFObjectHandle const&) = default;
-    QPDF_DLL
     QPDFObjectHandle(QPDFObjectHandle&&) = default;
-    QPDF_DLL
     QPDFObjectHandle& operator=(QPDFObjectHandle&&) = default;
 
-    [[deprecated("use operator bool()")]] QPDF_DLL inline bool isInitialized() const;
+    [[deprecated("use operator bool()")]] inline bool isInitialized() const;
 
     // This method returns true if the QPDFObjectHandle objects point to exactly the same underlying
     // object, meaning that changes to one are reflected in the other, or "if you paint one, the
@@ -348,7 +339,7 @@ class QPDFObjectHandle final: public qpdf::BaseHandle
 
     // This returns true in addition to the query for the specific type for indirect objects.
     QPDF_DLL
-    inline bool isIndirect() const;
+    bool isIndirect() const;
 
     // This returns true for indirect objects from a QPDF that has been destroyed. Trying unparse
     // such an object will throw a logic_error.
@@ -1145,9 +1136,9 @@ class QPDFObjectHandle final: public qpdf::BaseHandle
     QPDF_DLL
     QPDFObjGen getObjGen() const;
     QPDF_DLL
-    inline int getObjectID() const;
+    int getObjectID() const;
     QPDF_DLL
-    inline int getGeneration() const;
+    int getGeneration() const;
 
     QPDF_DLL
     std::string unparse() const;
@@ -1424,11 +1415,9 @@ class QPDFObjectHandle::QPDFDictItems
         using pointer = T*;
         using reference = T&;
 
-        QPDF_DLL
         virtual ~iterator() = default;
         QPDF_DLL
         iterator& operator++();
-        QPDF_DLL
         iterator
         operator++(int)
         {
@@ -1438,7 +1427,6 @@ class QPDFObjectHandle::QPDFDictItems
         }
         QPDF_DLL
         iterator& operator--();
-        QPDF_DLL
         iterator
         operator--(int)
         {
@@ -1452,7 +1440,6 @@ class QPDFObjectHandle::QPDFDictItems
         pointer operator->();
         QPDF_DLL
         bool operator==(iterator const& other) const;
-        QPDF_DLL
         bool
         operator!=(iterator const& other) const
         {
@@ -1468,7 +1455,6 @@ class QPDFObjectHandle::QPDFDictItems
             friend class QPDFDictItems::iterator;
 
           public:
-            QPDF_DLL
             ~Members() = default;
 
           private:
@@ -1522,11 +1508,9 @@ class QPDFObjectHandle::QPDFArrayItems
         using pointer = T*;
         using reference = T&;
 
-        QPDF_DLL
         virtual ~iterator() = default;
         QPDF_DLL
         iterator& operator++();
-        QPDF_DLL
         iterator
         operator++(int)
         {
@@ -1536,7 +1520,6 @@ class QPDFObjectHandle::QPDFArrayItems
         }
         QPDF_DLL
         iterator& operator--();
-        QPDF_DLL
         iterator
         operator--(int)
         {
@@ -1550,7 +1533,6 @@ class QPDFObjectHandle::QPDFArrayItems
         pointer operator->();
         QPDF_DLL
         bool operator==(iterator const& other) const;
-        QPDF_DLL
         bool
         operator!=(iterator const& other) const
         {
@@ -1566,7 +1548,6 @@ class QPDFObjectHandle::QPDFArrayItems
             friend class QPDFArrayItems::iterator;
 
           public:
-            QPDF_DLL
             ~Members() = default;
 
           private:
@@ -1606,24 +1587,6 @@ namespace qpdf
     }
 
 } // namespace qpdf
-
-inline int
-QPDFObjectHandle::getObjectID() const
-{
-    return getObjGen().getObj();
-}
-
-inline int
-QPDFObjectHandle::getGeneration() const
-{
-    return getObjGen().getGen();
-}
-
-inline bool
-QPDFObjectHandle::isIndirect() const
-{
-    return (obj != nullptr) && (getObjectID() != 0);
-}
 
 inline bool
 QPDFObjectHandle::isInitialized() const

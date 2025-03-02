@@ -44,7 +44,7 @@ class QPDFPageLabelDocumentHelper: public QPDFDocumentHelper
   public:
     QPDF_DLL
     QPDFPageLabelDocumentHelper(QPDF&);
-    QPDF_DLL
+
     ~QPDFPageLabelDocumentHelper() override = default;
 
     QPDF_DLL
@@ -82,7 +82,6 @@ class QPDFPageLabelDocumentHelper: public QPDFDocumentHelper
         friend class QPDFPageLabelDocumentHelper;
 
       public:
-        QPDF_DLL
         ~Members() = default;
 
       private:

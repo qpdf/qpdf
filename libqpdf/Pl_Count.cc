@@ -2,13 +2,21 @@
 
 #include <qpdf/QIntC.hh>
 
-Pl_Count::Members::Members()
+class Pl_Count::Members
 {
-}
+  public:
+    Members() = default;
+    Members(Members const&) = delete;
+    ~Members() = default;
+
+    // Must be qpdf_offset_t, not size_t, to handle writing more than size_t can handle.
+    qpdf_offset_t count{0};
+    unsigned char last_char{'\0'};
+};
 
 Pl_Count::Pl_Count(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
-    m(new Members())
+    m(std::make_unique<Members>())
 {
     if (!next) {
         throw std::logic_error("Attempt to create Pl_Count with nullptr as next");

@@ -89,39 +89,9 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
 
     enum action_e { a_compress, a_decompress };
 
-    class QPDF_DLL_PRIVATE Members
-    {
-        friend class Pl_DCT;
+    class Members;
 
-      public:
-        QPDF_DLL
-        ~Members() = default;
-        Members(Members const&) = delete;
-
-      private:
-        // For compression
-        Members(
-            JDIMENSION image_width,
-            JDIMENSION image_height,
-            int components,
-            J_COLOR_SPACE color_space,
-            CompressConfig* config_callback);
-        // For decompression
-        Members();
-
-        action_e action;
-        Pl_Buffer buf;
-
-        // Used for compression
-        JDIMENSION image_width{0};
-        JDIMENSION image_height{0};
-        int components{1};
-        J_COLOR_SPACE color_space{JCS_GRAYSCALE};
-
-        CompressConfig* config_callback{nullptr};
-    };
-
-    std::shared_ptr<Members> m;
+    std::unique_ptr<Members> m;
 };
 
 #endif // PL_DCT_HH

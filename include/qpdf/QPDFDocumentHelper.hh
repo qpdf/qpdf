@@ -30,28 +30,24 @@
 // the underlying QPDF object unless there is a specific comment in a specific helper method that
 // says otherwise. The pattern of using helper objects was introduced to allow creation of higher
 // level helper functions without polluting the public interface of QPDF.
-
 class QPDF_DLL_CLASS QPDFDocumentHelper
 {
   public:
-    QPDF_DLL
     QPDFDocumentHelper(QPDF& qpdf) :
         qpdf(qpdf)
     {
     }
     QPDF_DLL
     virtual ~QPDFDocumentHelper();
-    QPDF_DLL
     QPDF&
     getQPDF()
     {
-        return this->qpdf;
+        return qpdf;
     }
-    QPDF_DLL
     QPDF const&
     getQPDF() const
     {
-        return this->qpdf;
+        return qpdf;
     }
 
   protected:

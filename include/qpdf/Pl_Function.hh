@@ -62,22 +62,9 @@ class QPDF_DLL_CLASS Pl_Function: public Pipeline
     void finish() override;
 
   private:
-    class QPDF_DLL_PRIVATE Members
-    {
-        friend class Pl_Function;
+    class Members;
 
-      public:
-        QPDF_DLL
-        ~Members() = default;
-
-      private:
-        Members(writer_t);
-        Members(Members const&) = delete;
-
-        writer_t fn;
-    };
-
-    std::shared_ptr<Members> m;
+    std::unique_ptr<Members> m;
 };
 
 #endif // PL_FUNCTION_HH

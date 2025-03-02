@@ -2369,6 +2369,24 @@ QPDFObjectHandle::getObjGen() const
     return obj ? obj->getObjGen() : QPDFObjGen();
 }
 
+int
+QPDFObjectHandle::getObjectID() const
+{
+    return getObjGen().getObj();
+}
+
+int
+QPDFObjectHandle::getGeneration() const
+{
+    return getObjGen().getGen();
+}
+
+bool
+QPDFObjectHandle::isIndirect() const
+{
+    return getObjectID() != 0;
+}
+
 // Indirect object accessors
 QPDF*
 QPDFObjectHandle::getOwningQPDF() const

@@ -5,16 +5,24 @@
 #include <cstring>
 #include <stdexcept>
 
+class Pl_Buffer::Members
+{
+  public:
+    Members() = default;
+    Members(Members const&) = delete;
+
+    bool ready{true};
+    std::string data;
+};
+
 Pl_Buffer::Pl_Buffer(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
-    m(new Members())
+    m(std::make_unique<Members>())
 {
 }
 
-Pl_Buffer::~Pl_Buffer() // NOLINT (modernize-use-equals-default)
-{
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
-}
+// Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
+Pl_Buffer::~Pl_Buffer() = default;
 
 void
 Pl_Buffer::write(unsigned char const* buf, size_t len)

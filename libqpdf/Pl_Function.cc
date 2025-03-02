@@ -2,20 +2,28 @@
 
 #include <stdexcept>
 
-Pl_Function::Members::Members(writer_t fn) :
-    fn(fn)
+class Pl_Function::Members
 {
-}
+  public:
+    Members(writer_t fn) :
+        fn(fn)
+    {
+    }
+    Members(Members const&) = delete;
+    ~Members() = default;
+
+    writer_t fn;
+};
 
 Pl_Function::Pl_Function(char const* identifier, Pipeline* next, writer_t fn) :
     Pipeline(identifier, next),
-    m(new Members(fn))
+    m(std::make_unique<Members>(fn))
 {
 }
 
 Pl_Function::Pl_Function(char const* identifier, Pipeline* next, writer_c_t fn, void* udata) :
     Pipeline(identifier, next),
-    m(new Members(nullptr))
+    m(std::make_unique<Members>(nullptr))
 {
     m->fn = [identifier, fn, udata](unsigned char const* data, size_t len) {
         int code = fn(data, len, udata);

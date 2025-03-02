@@ -104,11 +104,10 @@ class QPDF_DLL_CLASS Pl_Flate: public Pipeline
         friend class Pl_Flate;
 
       public:
-        QPDF_DLL
+        Members(size_t out_bufsize, action_e action);
         ~Members();
 
       private:
-        Members(size_t out_bufsize, action_e action);
         Members(Members const&) = delete;
 
         std::shared_ptr<unsigned char> outbuf;
@@ -121,7 +120,7 @@ class QPDF_DLL_CLASS Pl_Flate: public Pipeline
         std::unique_ptr<std::string> zopfli_buf;
     };
 
-    std::shared_ptr<Members> m;
+    std::unique_ptr<Members> m;
 };
 
 #endif // PL_FLATE_HH

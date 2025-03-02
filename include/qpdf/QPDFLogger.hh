@@ -143,7 +143,6 @@ class QPDFLogger
         friend class QPDFLogger;
 
       public:
-        QPDF_DLL
         ~Members();
 
       private:

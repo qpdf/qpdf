@@ -20,6 +20,10 @@
 #ifndef PL_STRING_HH
 #define PL_STRING_HH
 
+#include <qpdf/Pipeline.hh>
+
+#include <string>
+
 // This pipeline accumulates the data passed to it into a std::string, a reference to which is
 // passed in at construction. Each subsequent use of this pipeline appends to the data accumulated
 // so far.
@@ -31,11 +35,6 @@
 // this in front of another pipeline to capture data that is written to the other pipeline without
 // interfering with when finish is called on the other pipeline and without having to put a
 // Pl_Concatenate after it.
-
-#include <qpdf/Pipeline.hh>
-
-#include <string>
-
 class QPDF_DLL_CLASS Pl_String: public Pipeline
 {
   public:
@@ -50,22 +49,9 @@ class QPDF_DLL_CLASS Pl_String: public Pipeline
     void finish() override;
 
   private:
-    class QPDF_DLL_PRIVATE Members
-    {
-        friend class Pl_String;
+    class Members;
 
-      public:
-        QPDF_DLL
-        ~Members() = default;
-
-      private:
-        Members(std::string&);
-        Members(Members const&) = delete;
-
-        std::string& s;
-    };
-
-    std::shared_ptr<Members> m;
+    std::unique_ptr<Members> m;
 };
 
 #endif // PL_STRING_HH

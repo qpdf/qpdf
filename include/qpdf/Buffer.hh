@@ -46,6 +46,9 @@ class Buffer
     QPDF_DLL
     Buffer(std::string& content);
 
+    Buffer(Buffer const&) = delete;
+    Buffer& operator=(Buffer const&) = delete;
+
     QPDF_DLL
     Buffer(Buffer&&) noexcept;
     QPDF_DLL

@@ -4,15 +4,22 @@
 #include <qpdf/QTC.hh>
 #include <stdexcept>
 
-Pl_QPDFTokenizer::Members::Members() :
-    buf("tokenizer buffer")
+class Pl_QPDFTokenizer::Members
 {
-}
+  public:
+    Members() = default;
+    Members(Members const&) = delete;
+    ~Members() = default;
+
+    QPDFObjectHandle::TokenFilter* filter{nullptr};
+    QPDFTokenizer tokenizer;
+    Pl_Buffer buf{"tokenizer buffer"};
+};
 
 Pl_QPDFTokenizer::Pl_QPDFTokenizer(
     char const* identifier, QPDFObjectHandle::TokenFilter* filter, Pipeline* next) :
     Pipeline(identifier, next),
-    m(new Members)
+    m(std::make_unique<Members>())
 {
     m->filter = filter;
     QPDFObjectHandle::TokenFilter::PipelineAccessor::setPipeline(m->filter, next);
@@ -20,10 +27,8 @@ Pl_QPDFTokenizer::Pl_QPDFTokenizer(
     m->tokenizer.includeIgnorable();
 }
 
-Pl_QPDFTokenizer::~Pl_QPDFTokenizer() // NOLINT (modernize-use-equals-default)
-{
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
-}
+// Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
+Pl_QPDFTokenizer::~Pl_QPDFTokenizer() = default;
 
 void
 Pl_QPDFTokenizer::write(unsigned char const* data, size_t len)

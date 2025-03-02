@@ -200,7 +200,7 @@ QPDF::Members::Members() :
 }
 
 QPDF::QPDF() :
-    m(new Members())
+    m(std::make_unique<Members>())
 {
     m->tokenizer.allowEOF();
     // Generate a unique ID. It just has to be unique among all QPDF objects allocated throughout

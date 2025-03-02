@@ -37,14 +37,12 @@ class QPDFXRefEntry
     QPDF_DLL
     QPDFXRefEntry(int type, qpdf_offset_t field1, int field2);
     // Create a type 1 "uncompressed" entry.
-    QPDF_DLL
     QPDFXRefEntry(qpdf_offset_t offset) :
         type(1),
         field1(offset)
     {
     }
     // Create a type 2 "compressed" entry.
-    QPDF_DLL
     QPDFXRefEntry(int stream_number, int index) :
         type(2),
         field1(stream_number),
