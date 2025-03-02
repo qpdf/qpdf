@@ -76,7 +76,6 @@ set(libqpdf_SOURCES
   QPDFObject.cc
   QPDFObjectHandle.cc
   QPDFObjectHelper.cc
-  QPDFObjGen.cc
   QPDFOutlineDocumentHelper.cc
   QPDFOutlineObjectHelper.cc
   QPDFPageDocumentHelper.cc
@@ -87,23 +86,12 @@ set(libqpdf_SOURCES
   QPDFSystemError.cc
   QPDFTokenizer.cc
   QPDFUsage.cc
-  QPDFValue.cc
   QPDFWriter.cc
   QPDFXRefEntry.cc
   QPDF_Array.cc
-  QPDF_Bool.cc
-  QPDF_Destroyed.cc
   QPDF_Dictionary.cc
-  QPDF_InlineImage.cc
-  QPDF_Integer.cc
-  QPDF_Name.cc
-  QPDF_Null.cc
-  QPDF_Operator.cc
-  QPDF_Real.cc
-  QPDF_Reserved.cc
   QPDF_Stream.cc
   QPDF_String.cc
-  QPDF_Unresolved.cc
   QPDF_encryption.cc
   QPDF_json.cc
   QPDF_linearization.cc

@@ -1,6 +1,6 @@
-#include <qpdf/QPDF_String.hh>
+#include <qpdf/QPDFObject_private.hh>
 
-#include <qpdf/JSON_writer.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QUtil.hh>
 
 // DO NOT USE ctype -- it is locale dependent for some things, and it's not worth the risk of
@@ -12,18 +12,6 @@ is_iso_latin1_printable(char ch)
     return (((ch >= 32) && (ch <= 126)) || (static_cast<unsigned char>(ch) >= 160));
 }
 
-QPDF_String::QPDF_String(std::string const& val) :
-    QPDFValue(::ot_string),
-    val(val)
-{
-}
-
-std::shared_ptr<QPDFObject>
-QPDF_String::create(std::string const& val)
-{
-    return do_create(new QPDF_String(val));
-}
-
 std::shared_ptr<QPDFObject>
 QPDF_String::create_utf16(std::string const& utf8_val)
 {
@@ -31,19 +19,7 @@ QPDF_String::create_utf16(std::string const& utf8_val)
     if (!QUtil::utf8_to_pdf_doc(utf8_val, result, '?')) {
         result = QUtil::utf8_to_utf16(utf8_val);
     }
-    return do_create(new QPDF_String(result));
-}
-
-std::shared_ptr<QPDFObject>
-QPDF_String::copy(bool shallow)
-{
-    return create(val);
-}
-
-std::string
-QPDF_String::unparse()
-{
-    return unparse(false);
+    return QPDFObject::create<QPDF_String>(result);
 }
 
 void

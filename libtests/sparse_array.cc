@@ -1,17 +1,16 @@
 #include <qpdf/assert_test.h>
 
 #include <qpdf/QPDF.hh>
-#include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObject_private.hh>
-#include <qpdf/QPDF_Array.hh>
 
 #include <iostream>
 
 int
 main()
 {
-    auto obj = QPDF_Array::create({}, true);
-    QPDF_Array& a = *obj->as<QPDF_Array>();
+    auto obj = QPDFObject::create<QPDF_Array>(std::vector<QPDFObjectHandle>(), true);
+    auto a = qpdf::Array(obj);
 
     assert(a.size() == 0);
 
@@ -88,16 +87,17 @@ main()
     QPDF pdf;
     pdf.emptyPDF();
 
-    obj = QPDF_Array::create({10, "null"_qpdf.getObj()}, true);
-    QPDF_Array& b = *obj->as<QPDF_Array>();
+    obj = QPDFObject::create<QPDF_Array>(
+        std::vector<QPDFObjectHandle>{10, "null"_qpdf.getObj()}, true);
+    auto b = qpdf::Array(obj);
     b.setAt(5, pdf.newIndirectNull());
     b.setAt(7, "[0 1 2 3]"_qpdf);
     assert(b.at(3).second.isNull());
     assert(b.at(8).second.isNull());
     assert(b.at(5).second.isIndirect());
-    assert(b.unparse() == "[ null null null null null 3 0 R null [ 0 1 2 3 ] null null ]");
-    auto c = b.copy(true);
-    auto d = b.copy(false);
+    assert(obj->unparse() == "[ null null null null null 3 0 R null [ 0 1 2 3 ] null null ]");
+    auto c = obj->copy(true);
+    auto d = obj->copy(false);
     b.at(7).second.setArrayItem(2, "42"_qpdf);
     assert(c->unparse() == "[ null null null null null 3 0 R null [ 0 1 42 3 ] null null ]");
     assert(d->unparse() == "[ null null null null null 3 0 R null [ 0 1 2 3 ] null null ]");

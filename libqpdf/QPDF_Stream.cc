@@ -1,4 +1,4 @@
-#include <qpdf/QPDF_Stream.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 
 #include <qpdf/ContentNormalizer.hh>
 #include <qpdf/JSON_writer.hh>
@@ -21,6 +21,9 @@
 #include <qpdf/SF_RunLengthDecode.hh>
 
 #include <stdexcept>
+
+using namespace std::literals;
+using namespace qpdf;
 
 namespace
 {
@@ -60,16 +63,24 @@ namespace
     class StreamBlobProvider
     {
       public:
-        StreamBlobProvider(QPDF_Stream* stream, qpdf_stream_decode_level_e decode_level);
-        void operator()(Pipeline*);
+        StreamBlobProvider(Stream stream, qpdf_stream_decode_level_e decode_level) :
+            stream(stream),
+            decode_level(decode_level)
+        {
+        }
+        void
+        operator()(Pipeline* p)
+        {
+            stream.pipeStreamData(p, nullptr, 0, decode_level, false, false);
+        }
 
       private:
-        QPDF_Stream* stream;
+        Stream stream;
         qpdf_stream_decode_level_e decode_level;
     };
 } // namespace
 
-std::map<std::string, std::string> QPDF_Stream::filter_abbreviations = {
+std::map<std::string, std::string> Stream::filter_abbreviations = {
     // The PDF specification provides these filter abbreviations for use in inline images, but
     // according to table H.1 in the pre-ISO versions of the PDF specification, Adobe Reader also
     // accepts them for stream filters.
@@ -82,8 +93,8 @@ std::map<std::string, std::string> QPDF_Stream::filter_abbreviations = {
     {"/DCT", "/DCTDecode"},
 };
 
-std::map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>>
-    QPDF_Stream::filter_factories = {
+std::map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>> Stream::filter_factories =
+    {
         {"/Crypt", []() { return std::make_shared<SF_Crypt>(); }},
         {"/FlateDecode", SF_FlateLzwDecode::flate_factory},
         {"/LZWDecode", SF_FlateLzwDecode::lzw_factory},
@@ -93,90 +104,25 @@ std::map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>>
         {"/ASCIIHexDecode", SF_ASCIIHexDecode::factory},
 };
 
-StreamBlobProvider::StreamBlobProvider(
-    QPDF_Stream* stream, qpdf_stream_decode_level_e decode_level) :
-    stream(stream),
-    decode_level(decode_level)
+Stream::Stream(
+    QPDF& qpdf, QPDFObjGen og, QPDFObjectHandle stream_dict, qpdf_offset_t offset, size_t length) :
+    BaseHandle(QPDFObject::create<QPDF_Stream>(&qpdf, og, std::move(stream_dict), length))
 {
+    auto descr = std::make_shared<QPDFObject::Description>(
+        qpdf.getFilename() + ", stream object " + og.unparse(' '));
+    obj->setDescription(&qpdf, descr, offset);
+    setDictDescription();
 }
 
 void
-StreamBlobProvider::operator()(Pipeline* p)
-{
-    this->stream->pipeStreamData(p, nullptr, 0, decode_level, false, false);
-}
-
-QPDF_Stream::QPDF_Stream(
-    QPDF* qpdf, QPDFObjGen og, QPDFObjectHandle stream_dict, qpdf_offset_t offset, size_t length) :
-    QPDFValue(::ot_stream, qpdf, og),
-    filter_on_write(true),
-    stream_dict(stream_dict),
-    length(length)
-{
-    if (!stream_dict.isDictionary()) {
-        throw std::logic_error(
-            "stream object instantiated with non-dictionary object for dictionary");
-    }
-    auto descr = std::make_shared<QPDFValue::Description>(
-        qpdf->getFilename() + ", stream object " + og.unparse(' '));
-    setDescription(qpdf, descr, offset);
-}
-
-std::shared_ptr<QPDFObject>
-QPDF_Stream::create(
-    QPDF* qpdf, QPDFObjGen og, QPDFObjectHandle stream_dict, qpdf_offset_t offset, size_t length)
-{
-    return do_create(new QPDF_Stream(qpdf, og, stream_dict, offset, length));
-}
-
-std::shared_ptr<QPDFObject>
-QPDF_Stream::copy(bool shallow)
-{
-    QTC::TC("qpdf", "QPDF_Stream ERR shallow copy stream");
-    throw std::runtime_error("stream objects cannot be cloned");
-}
-
-void
-QPDF_Stream::registerStreamFilter(
+Stream::registerStreamFilter(
     std::string const& filter_name, std::function<std::shared_ptr<QPDFStreamFilter>()> factory)
 {
     filter_factories[filter_name] = factory;
 }
 
-void
-QPDF_Stream::setFilterOnWrite(bool val)
-{
-    this->filter_on_write = val;
-}
-
-bool
-QPDF_Stream::getFilterOnWrite() const
-{
-    return this->filter_on_write;
-}
-
-void
-QPDF_Stream::disconnect()
-{
-    this->stream_provider = nullptr;
-    QPDFObjectHandle::DisconnectAccess::disconnect(this->stream_dict);
-}
-
-std::string
-QPDF_Stream::unparse()
-{
-    // Unparse stream objects as indirect references
-    return og.unparse(' ') + " R";
-}
-
-void
-QPDF_Stream::writeJSON(int json_version, JSON::Writer& jw)
-{
-    stream_dict.writeJSON(json_version, jw);
-}
-
 JSON
-QPDF_Stream::getStreamJSON(
+Stream::getStreamJSON(
     int json_version,
     qpdf_json_stream_data_e json_data,
     qpdf_stream_decode_level_e decode_level,
@@ -190,13 +136,13 @@ QPDF_Stream::getStreamJSON(
     pb.finish();
     auto result = JSON::parse(pb.getString());
     if (json_data == qpdf_sj_inline) {
-        result.addDictionaryMember("data", JSON::makeBlob(StreamBlobProvider(this, decode_level)));
+        result.addDictionaryMember("data", JSON::makeBlob(StreamBlobProvider(*this, decode_level)));
     }
     return result;
 }
 
 qpdf_stream_decode_level_e
-QPDF_Stream::writeStreamJSON(
+Stream::writeStreamJSON(
     int json_version,
     JSON::Writer& jw,
     qpdf_json_stream_data_e json_data,
@@ -205,6 +151,7 @@ QPDF_Stream::writeStreamJSON(
     std::string const& data_filename,
     bool no_data_key)
 {
+    auto s = stream();
     switch (json_data) {
     case qpdf_sj_none:
     case qpdf_sj_inline:
@@ -232,7 +179,7 @@ QPDF_Stream::writeStreamJSON(
     if (json_data == qpdf_sj_none) {
         jw.writeNext();
         jw << R"("dict": )";
-        stream_dict.writeJSON(json_version, jw);
+        s->stream_dict.writeJSON(json_version, jw);
         jw.writeEnd('}');
         return decode_level;
     }
@@ -264,7 +211,7 @@ QPDF_Stream::writeStreamJSON(
         throw std::logic_error("QPDF_Stream: failed to get stream data");
     }
     // We can use unsafeShallowCopy because we are only touching top-level keys.
-    auto dict = stream_dict.unsafeShallowCopy();
+    auto dict = s->stream_dict.unsafeShallowCopy();
     dict.removeKey("/Length");
     if (filter && filtered) {
         dict.removeKey("/Filter");
@@ -290,53 +237,17 @@ QPDF_Stream::writeStreamJSON(
 }
 
 void
-QPDF_Stream::setDescription(
-    QPDF* qpdf, std::shared_ptr<QPDFValue::Description>& description, qpdf_offset_t offset)
+qpdf::Stream::setDictDescription()
 {
-    this->QPDFValue::setDescription(qpdf, description, offset);
-    setDictDescription();
-}
-
-void
-QPDF_Stream::setDictDescription()
-{
-    if (!this->stream_dict.hasObjectDescription()) {
-        this->stream_dict.setObjectDescription(qpdf, getDescription() + " -> stream dictionary");
+    auto s = stream();
+    if (!s->stream_dict.hasObjectDescription()) {
+        s->stream_dict.setObjectDescription(
+            obj->getQPDF(), obj->getDescription() + " -> stream dictionary");
     }
 }
 
-QPDFObjectHandle
-QPDF_Stream::getDict() const
-{
-    return this->stream_dict;
-}
-
-bool
-QPDF_Stream::isDataModified() const
-{
-    return (!this->token_filters.empty());
-}
-
-size_t
-QPDF_Stream::getLength() const
-{
-    return this->length;
-}
-
 std::shared_ptr<Buffer>
-QPDF_Stream::getStreamDataBuffer() const
-{
-    return this->stream_data;
-}
-
-std::shared_ptr<QPDFObjectHandle::StreamDataProvider>
-QPDF_Stream::getStreamDataProvider() const
-{
-    return this->stream_provider;
-}
-
-std::shared_ptr<Buffer>
-QPDF_Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
+Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
 {
     Pl_Buffer buf("stream data buffer");
     bool filtered;
@@ -344,9 +255,9 @@ QPDF_Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
     if (!filtered) {
         throw QPDFExc(
             qpdf_e_unsupported,
-            qpdf->getFilename(),
+            obj->getQPDF()->getFilename(),
             "",
-            this->parsed_offset,
+            obj->getParsedOffset(),
             "getStreamData called on unfilterable stream");
     }
     QTC::TC("qpdf", "QPDF_Stream getStreamData");
@@ -354,15 +265,15 @@ QPDF_Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
 }
 
 std::shared_ptr<Buffer>
-QPDF_Stream::getRawStreamData()
+Stream::getRawStreamData()
 {
     Pl_Buffer buf("stream data buffer");
     if (!pipeStreamData(&buf, nullptr, 0, qpdf_dl_none, false, false)) {
         throw QPDFExc(
             qpdf_e_unsupported,
-            qpdf->getFilename(),
+            obj->getQPDF()->getFilename(),
             "",
-            this->parsed_offset,
+            obj->getParsedOffset(),
             "error getting raw stream data");
     }
     QTC::TC("qpdf", "QPDF_Stream getRawStreamData");
@@ -370,14 +281,15 @@ QPDF_Stream::getRawStreamData()
 }
 
 bool
-QPDF_Stream::filterable(
+Stream::filterable(
     std::vector<std::shared_ptr<QPDFStreamFilter>>& filters,
     bool& specialized_compression,
     bool& lossy_compression)
 {
+    auto s = stream();
     // Check filters
 
-    QPDFObjectHandle filter_obj = this->stream_dict.getKey("/Filter");
+    QPDFObjectHandle filter_obj = s->stream_dict.getKey("/Filter");
     bool filters_okay = true;
 
     std::vector<std::string> filter_names;
@@ -432,7 +344,7 @@ QPDF_Stream::filterable(
 
     // See if we can support any decode parameters that are specified.
 
-    QPDFObjectHandle decode_obj = this->stream_dict.getKey("/DecodeParms");
+    QPDFObjectHandle decode_obj = s->stream_dict.getKey("/DecodeParms");
     std::vector<QPDFObjectHandle> decode_parms;
     if (decode_obj.isArray() && (decode_obj.getArrayNItems() == 0)) {
         decode_obj = QPDFObjectHandle::newNull();
@@ -479,7 +391,7 @@ QPDF_Stream::filterable(
 }
 
 bool
-QPDF_Stream::pipeStreamData(
+Stream::pipeStreamData(
     Pipeline* pipeline,
     bool* filterp,
     int encode_flags,
@@ -487,6 +399,7 @@ QPDF_Stream::pipeStreamData(
     bool suppress_warnings,
     bool will_retry)
 {
+    auto s = stream();
     std::vector<std::shared_ptr<QPDFStreamFilter>> filters;
     bool specialized_compression = false;
     bool lossy_compression = false;
@@ -543,7 +456,7 @@ QPDF_Stream::pipeStreamData(
             pipeline = new_pipeline.get();
         }
 
-        for (auto iter = this->token_filters.rbegin(); iter != this->token_filters.rend(); ++iter) {
+        for (auto iter = s->token_filters.rbegin(); iter != s->token_filters.rend(); ++iter) {
             new_pipeline =
                 std::make_shared<Pl_QPDFTokenizer>("token filter", (*iter).get(), pipeline);
             to_delete.push_back(new_pipeline);
@@ -562,25 +475,25 @@ QPDF_Stream::pipeStreamData(
         }
     }
 
-    if (this->stream_data.get()) {
+    if (s->stream_data.get()) {
         QTC::TC("qpdf", "QPDF_Stream pipe replaced stream data");
-        pipeline->write(this->stream_data->getBuffer(), this->stream_data->getSize());
+        pipeline->write(s->stream_data->getBuffer(), s->stream_data->getSize());
         pipeline->finish();
-    } else if (this->stream_provider.get()) {
+    } else if (s->stream_provider.get()) {
         Pl_Count count("stream provider count", pipeline);
-        if (this->stream_provider->supportsRetry()) {
-            if (!this->stream_provider->provideStreamData(
-                    og, &count, suppress_warnings, will_retry)) {
+        if (s->stream_provider->supportsRetry()) {
+            if (!s->stream_provider->provideStreamData(
+                    obj->getObjGen(), &count, suppress_warnings, will_retry)) {
                 filter = false;
                 success = false;
             }
         } else {
-            this->stream_provider->provideStreamData(og, &count);
+            s->stream_provider->provideStreamData(obj->getObjGen(), &count);
         }
         qpdf_offset_t actual_length = count.getCount();
         qpdf_offset_t desired_length = 0;
-        if (success && this->stream_dict.hasKey("/Length")) {
-            desired_length = this->stream_dict.getKey("/Length").getIntValue();
+        if (success && s->stream_dict.hasKey("/Length")) {
+            desired_length = s->stream_dict.getKey("/Length").getIntValue();
             if (actual_length == desired_length) {
                 QTC::TC("qpdf", "QPDF_Stream pipe use stream provider");
             } else {
@@ -588,25 +501,25 @@ QPDF_Stream::pipeStreamData(
                 // This would be caused by programmer error on the part of a library user, not by
                 // invalid input data.
                 throw std::runtime_error(
-                    "stream data provider for " + og.unparse(' ') + " provided " +
+                    "stream data provider for " + obj->getObjGen().unparse(' ') + " provided " +
                     std::to_string(actual_length) + " bytes instead of expected " +
                     std::to_string(desired_length) + " bytes");
             }
         } else if (success) {
             QTC::TC("qpdf", "QPDF_Stream provider length not provided");
-            this->stream_dict.replaceKey("/Length", QPDFObjectHandle::newInteger(actual_length));
+            s->stream_dict.replaceKey("/Length", QPDFObjectHandle::newInteger(actual_length));
         }
-    } else if (this->parsed_offset == 0) {
+    } else if (obj->getParsedOffset() == 0) {
         QTC::TC("qpdf", "QPDF_Stream pipe no stream data");
         throw std::logic_error("pipeStreamData called for stream with no data");
     } else {
         QTC::TC("qpdf", "QPDF_Stream pipe original stream data");
         if (!QPDF::Pipe::pipeStreamData(
-                this->qpdf,
-                og,
-                this->parsed_offset,
-                this->length,
-                this->stream_dict,
+                obj->getQPDF(),
+                obj->getObjGen(),
+                obj->getParsedOffset(),
+                s->length,
+                s->stream_dict,
                 pipeline,
                 suppress_warnings,
                 will_retry)) {
@@ -634,60 +547,235 @@ QPDF_Stream::pipeStreamData(
 }
 
 void
-QPDF_Stream::replaceStreamData(
+Stream::replaceStreamData(
     std::shared_ptr<Buffer> data,
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
 {
-    this->stream_data = data;
-    this->stream_provider = nullptr;
+    auto s = stream();
+    s->stream_data = data;
+    s->stream_provider = nullptr;
     replaceFilterData(filter, decode_parms, data->getSize());
 }
 
 void
-QPDF_Stream::replaceStreamData(
+Stream::replaceStreamData(
     std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider,
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
 {
-    this->stream_provider = provider;
-    this->stream_data = nullptr;
+    auto s = stream();
+    s->stream_provider = provider;
+    s->stream_data = nullptr;
     replaceFilterData(filter, decode_parms, 0);
 }
 
 void
-QPDF_Stream::addTokenFilter(std::shared_ptr<QPDFObjectHandle::TokenFilter> token_filter)
-{
-    this->token_filters.push_back(token_filter);
-}
-
-void
-QPDF_Stream::replaceFilterData(
+Stream::replaceFilterData(
     QPDFObjectHandle const& filter, QPDFObjectHandle const& decode_parms, size_t length)
 {
+    auto s = stream();
     if (filter) {
-        stream_dict.replaceKey("/Filter", filter);
+        s->stream_dict.replaceKey("/Filter", filter);
     }
     if (decode_parms) {
-        stream_dict.replaceKey("/DecodeParms", decode_parms);
+        s->stream_dict.replaceKey("/DecodeParms", decode_parms);
     }
     if (length == 0) {
         QTC::TC("qpdf", "QPDF_Stream unknown stream length");
-        stream_dict.removeKey("/Length");
+        s->stream_dict.removeKey("/Length");
     } else {
-        stream_dict.replaceKey("/Length", QPDFObjectHandle::newInteger(QIntC::to_longlong(length)));
+        s->stream_dict.replaceKey(
+            "/Length", QPDFObjectHandle::newInteger(QIntC::to_longlong(length)));
     }
 }
 
 void
-QPDF_Stream::replaceDict(QPDFObjectHandle const& new_dict)
+Stream::warn(std::string const& message)
 {
-    this->stream_dict = new_dict;
-    setDictDescription();
+    obj->getQPDF()->warn(qpdf_e_damaged_pdf, "", obj->getParsedOffset(), message);
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::getDict() const
+{
+    return as_stream(error).getDict();
 }
 
 void
-QPDF_Stream::warn(std::string const& message)
+QPDFObjectHandle::setFilterOnWrite(bool val)
 {
-    this->qpdf->warn(qpdf_e_damaged_pdf, "", this->parsed_offset, message);
+    as_stream(error).setFilterOnWrite(val);
+}
+
+bool
+QPDFObjectHandle::getFilterOnWrite()
+{
+    return as_stream(error).getFilterOnWrite();
+}
+
+bool
+QPDFObjectHandle::isDataModified()
+{
+    return as_stream(error).isDataModified();
+}
+
+void
+QPDFObjectHandle::replaceDict(QPDFObjectHandle const& new_dict)
+{
+    as_stream(error).replaceDict(new_dict);
+}
+
+std::shared_ptr<Buffer>
+QPDFObjectHandle::getStreamData(qpdf_stream_decode_level_e level)
+{
+    return as_stream(error).getStreamData(level);
+}
+
+std::shared_ptr<Buffer>
+QPDFObjectHandle::getRawStreamData()
+{
+    return as_stream(error).getRawStreamData();
+}
+
+bool
+QPDFObjectHandle::pipeStreamData(
+    Pipeline* p,
+    bool* filtering_attempted,
+    int encode_flags,
+    qpdf_stream_decode_level_e decode_level,
+    bool suppress_warnings,
+    bool will_retry)
+{
+    return as_stream(error).pipeStreamData(
+        p, filtering_attempted, encode_flags, decode_level, suppress_warnings, will_retry);
+}
+
+bool
+QPDFObjectHandle::pipeStreamData(
+    Pipeline* p,
+    int encode_flags,
+    qpdf_stream_decode_level_e decode_level,
+    bool suppress_warnings,
+    bool will_retry)
+{
+    bool filtering_attempted;
+    as_stream(error).pipeStreamData(
+        p, &filtering_attempted, encode_flags, decode_level, suppress_warnings, will_retry);
+    return filtering_attempted;
+}
+
+bool
+QPDFObjectHandle::pipeStreamData(Pipeline* p, bool filter, bool normalize, bool compress)
+{
+    int encode_flags = 0;
+    qpdf_stream_decode_level_e decode_level = qpdf_dl_none;
+    if (filter) {
+        decode_level = qpdf_dl_generalized;
+        if (normalize) {
+            encode_flags |= qpdf_ef_normalize;
+        }
+        if (compress) {
+            encode_flags |= qpdf_ef_compress;
+        }
+    }
+    return pipeStreamData(p, encode_flags, decode_level, false);
+}
+
+void
+QPDFObjectHandle::replaceStreamData(
+    std::shared_ptr<Buffer> data,
+    QPDFObjectHandle const& filter,
+    QPDFObjectHandle const& decode_parms)
+{
+    as_stream(error).replaceStreamData(data, filter, decode_parms);
+}
+
+void
+QPDFObjectHandle::replaceStreamData(
+    std::string const& data, QPDFObjectHandle const& filter, QPDFObjectHandle const& decode_parms)
+{
+    auto b = std::make_shared<Buffer>(data.length());
+    unsigned char* bp = b->getBuffer();
+    if (bp) {
+        memcpy(bp, data.c_str(), data.length());
+    }
+    as_stream(error).replaceStreamData(b, filter, decode_parms);
+}
+
+void
+QPDFObjectHandle::replaceStreamData(
+    std::shared_ptr<StreamDataProvider> provider,
+    QPDFObjectHandle const& filter,
+    QPDFObjectHandle const& decode_parms)
+{
+    as_stream(error).replaceStreamData(provider, filter, decode_parms);
+}
+
+namespace
+{
+    class FunctionProvider: public QPDFObjectHandle::StreamDataProvider
+    {
+      public:
+        FunctionProvider(std::function<void(Pipeline*)> provider) :
+            StreamDataProvider(false),
+            p1(provider),
+            p2(nullptr)
+        {
+        }
+        FunctionProvider(std::function<bool(Pipeline*, bool, bool)> provider) :
+            StreamDataProvider(true),
+            p1(nullptr),
+            p2(provider)
+        {
+        }
+
+        void
+        provideStreamData(QPDFObjGen const&, Pipeline* pipeline) override
+        {
+            p1(pipeline);
+        }
+
+        bool
+        provideStreamData(
+            QPDFObjGen const&, Pipeline* pipeline, bool suppress_warnings, bool will_retry) override
+        {
+            return p2(pipeline, suppress_warnings, will_retry);
+        }
+
+      private:
+        std::function<void(Pipeline*)> p1;
+        std::function<bool(Pipeline*, bool, bool)> p2;
+    };
+} // namespace
+
+void
+QPDFObjectHandle::replaceStreamData(
+    std::function<void(Pipeline*)> provider,
+    QPDFObjectHandle const& filter,
+    QPDFObjectHandle const& decode_parms)
+{
+    auto sdp = std::shared_ptr<StreamDataProvider>(new FunctionProvider(provider));
+    as_stream(error).replaceStreamData(sdp, filter, decode_parms);
+}
+
+void
+QPDFObjectHandle::replaceStreamData(
+    std::function<bool(Pipeline*, bool, bool)> provider,
+    QPDFObjectHandle const& filter,
+    QPDFObjectHandle const& decode_parms)
+{
+    auto sdp = std::shared_ptr<StreamDataProvider>(new FunctionProvider(provider));
+    as_stream(error).replaceStreamData(sdp, filter, decode_parms);
+}
+
+JSON
+QPDFObjectHandle::getStreamJSON(
+    int json_version,
+    qpdf_json_stream_data_e json_data,
+    qpdf_stream_decode_level_e decode_level,
+    Pipeline* p,
+    std::string const& data_filename)
+{
+    return as_stream(error).getStreamJSON(json_version, json_data, decode_level, p, data_filename);
 }

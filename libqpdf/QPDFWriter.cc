@@ -15,9 +15,8 @@
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDF.hh>
-#include <qpdf/QPDFObjectHandle.hh>
-#include <qpdf/QPDF_Name.hh>
-#include <qpdf/QPDF_String.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
+#include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/RC4.hh>
@@ -27,6 +26,7 @@
 #include <stdexcept>
 
 using namespace std::literals;
+using namespace qpdf;
 
 QPDFWriter::ProgressReporter::~ProgressReporter() // NOLINT (modernize-use-equals-default)
 {
@@ -1129,12 +1129,12 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
         return;
     } else if (!m->linearized) {
         if (object.isArray()) {
-            for (auto& item: object.getArrayAsVector()) {
+            for (auto& item: object.as_array()) {
                 enqueueObject(item);
             }
-        } else if (object.isDictionary()) {
-            for (auto& item: object.getDictAsMap()) {
-                if (!item.second.isNull()) {
+        } else if (auto d = object.as_dictionary()) {
+            for (auto const& item: d) {
+                if (!item.second.null()) {
                     enqueueObject(item.second);
                 }
             }
@@ -1173,10 +1173,13 @@ QPDFWriter::writeTrailer(
         writeString(" /Size ");
         writeString(std::to_string(size));
     } else {
-        for (auto const& key: trailer.getKeys()) {
+        for (auto const& [key, value]: trailer.as_dictionary()) {
+            if (value.null()) {
+                continue;
+            }
             writeStringQDF("  ");
             writeStringNoQDF(" ");
-            writeString(QPDF_Name::normalizeName(key));
+            writeString(Name::normalize(key));
             writeString(" ");
             if (key == "/Size") {
                 writeString(std::to_string(size));
@@ -1187,7 +1190,7 @@ QPDFWriter::writeTrailer(
                     writePad(QIntC::to_size(pos - m->pipeline->getCount() + 21));
                 }
             } else {
-                unparseChild(trailer.getKey(key), 1, 0);
+                unparseChild(value, 1, 0);
             }
             writeStringQDF("\n");
         }
@@ -1347,7 +1350,7 @@ QPDFWriter::unparseObject(
         // [ in the /H key of the linearization parameter dictionary.  We'll do this unconditionally
         // for all arrays because it looks nicer and doesn't make the files that much bigger.
         writeString("[");
-        for (auto const& item: object.getArrayAsVector()) {
+        for (auto const& item: object.as_array()) {
             writeString(indent);
             writeStringQDF("  ");
             unparseChild(item, level + 1, child_flags);
@@ -1498,20 +1501,18 @@ QPDFWriter::unparseObject(
 
         writeString("<<");
 
-        for (auto& item: object.getDictAsMap()) {
-            if (!item.second.isNull()) {
-                auto const& key = item.first;
+        for (auto const& [key, value]: object.as_dictionary()) {
+            if (!value.null()) {
                 writeString(indent);
                 writeStringQDF("  ");
-                writeString(QPDF_Name::normalizeName(key));
+                writeString(Name::normalize(key));
                 writeString(" ");
                 if (key == "/Contents" && object.isDictionaryOfType("/Sig") &&
                     object.hasKey("/ByteRange")) {
                     QTC::TC("qpdf", "QPDFWriter no encryption sig contents");
-                    unparseChild(
-                        item.second, level + 1, child_flags | f_hex_string | f_no_encryption);
+                    unparseChild(value, level + 1, child_flags | f_hex_string | f_no_encryption);
                 } else {
-                    unparseChild(item.second, level + 1, child_flags);
+                    unparseChild(value, level + 1, child_flags);
                 }
             }
         }
@@ -1891,12 +1892,10 @@ QPDFWriter::generateID()
         }
         seed += " QPDF ";
         if (trailer.hasKey("/Info")) {
-            QPDFObjectHandle info = trailer.getKey("/Info");
-            for (auto const& key: info.getKeys()) {
-                QPDFObjectHandle obj = info.getKey(key);
-                if (obj.isString()) {
+            for (auto const& item: trailer.getKey("/Info").as_dictionary()) {
+                if (item.second.isString()) {
                     seed += " ";
-                    seed += obj.getStringValue();
+                    seed += item.second.getStringValue();
                 }
             }
         }
@@ -1922,8 +1921,7 @@ QPDFWriter::generateID()
 void
 QPDFWriter::initializeSpecialStreams()
 {
-    // Mark all page content streams in case we are filtering or
-    // normalizing.
+    // Mark all page content streams in case we are filtering or normalizing.
     std::vector<QPDFObjectHandle> pages = m->pdf.getAllPages();
     int num = 0;
     for (auto& page: pages) {
@@ -2939,8 +2937,10 @@ QPDFWriter::enqueueObjectsStandard()
 
     // Next place any other objects referenced from the trailer dictionary into the queue, handling
     // direct objects recursively. Root is already there, so enqueuing it a second time is a no-op.
-    for (auto const& key: trailer.getKeys()) {
-        enqueueObject(trailer.getKey(key));
+    for (auto& item: trailer.as_dictionary()) {
+        if (!item.second.null()) {
+            enqueueObject(item.second);
+        }
     }
 }
 
@@ -2962,9 +2962,11 @@ QPDFWriter::enqueueObjectsPCLm()
 
         // enqueue all the strips for each page
         QPDFObjectHandle strips = page.getKey("/Resources").getKey("/XObject");
-        for (auto const& image: strips.getKeys()) {
-            enqueueObject(strips.getKey(image));
-            enqueueObject(QPDFObjectHandle::newStream(&m->pdf, image_transform_content));
+        for (auto& image: strips.as_dictionary()) {
+            if (!image.second.null()) {
+                enqueueObject(image.second);
+                enqueueObject(QPDFObjectHandle::newStream(&m->pdf, image_transform_content));
+            }
         }
     }
 

@@ -19,6 +19,7 @@
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
@@ -916,10 +917,13 @@ QPDFJob::doListAttachments(QPDF& pdf)
                     v << "    " << i2.first << " -> " << i2.second << "\n";
                 }
                 v << "  all data streams:\n";
-                for (auto const& i2: efoh->getEmbeddedFileStreams().ditems()) {
-                    auto efs = QPDFEFStreamObjectHelper(i2.second);
-                    v << "    " << i2.first << " -> "
-                      << efs.getObjectHandle().getObjGen().unparse(',') << "\n";
+                for (auto const& [key2, value2]: efoh->getEmbeddedFileStreams().as_dictionary()) {
+                    if (value2.null()) {
+                        continue;
+                    }
+                    auto efs = QPDFEFStreamObjectHelper(value2);
+                    v << "    " << key2 << " -> " << efs.getObjectHandle().getObjGen().unparse(',')
+                      << "\n";
                     v << "      creation date: " << efs.getCreationDate() << "\n"
                       << "      modification date: " << efs.getModDate() << "\n"
                       << "      mime type: " << efs.getSubtype() << "\n"
@@ -1338,9 +1342,12 @@ QPDFJob::doJSONAttachments(Pipeline* p, bool& first, QPDF& pdf)
             j_names.addDictionaryMember(i2.first, JSON::makeString(i2.second));
         }
         auto j_streams = j_details.addDictionaryMember("streams", JSON::makeDictionary());
-        for (auto const& i2: fsoh->getEmbeddedFileStreams().ditems()) {
-            auto efs = QPDFEFStreamObjectHelper(i2.second);
-            auto j_stream = j_streams.addDictionaryMember(i2.first, JSON::makeDictionary());
+        for (auto const& [key2, value2]: fsoh->getEmbeddedFileStreams().as_dictionary()) {
+            if (value2.null()) {
+                continue;
+            }
+            auto efs = QPDFEFStreamObjectHelper(value2);
+            auto j_stream = j_streams.addDictionaryMember(key2, JSON::makeDictionary());
             j_stream.addDictionaryMember(
                 "creationdate", null_or_string(to_iso8601(efs.getCreationDate())));
             j_stream.addDictionaryMember(
@@ -2347,12 +2354,10 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                     return true;
                 }
             }
-            if (xobject.isDictionary()) {
-                for (auto const& k: xobject.getKeys()) {
-                    QPDFObjectHandle xobj = xobject.getKey(k);
-                    if (xobj.isFormXObject()) {
-                        queue.push_back(xobj);
-                    }
+
+            for (auto const& xobj: xobject.as_dictionary()) {
+                if (xobj.second.isFormXObject()) {
+                    queue.emplace_back(xobj.second);
                 }
             }
         }

@@ -13,27 +13,27 @@ QPDFAnnotationObjectHelper::QPDFAnnotationObjectHelper(QPDFObjectHandle oh) :
 std::string
 QPDFAnnotationObjectHelper::getSubtype()
 {
-    return this->oh.getKey("/Subtype").getName();
+    return oh().getKey("/Subtype").getName();
 }
 
 QPDFObjectHandle::Rectangle
 QPDFAnnotationObjectHelper::getRect()
 {
-    return this->oh.getKey("/Rect").getArrayAsRectangle();
+    return oh().getKey("/Rect").getArrayAsRectangle();
 }
 
 QPDFObjectHandle
 QPDFAnnotationObjectHelper::getAppearanceDictionary()
 {
-    return this->oh.getKey("/AP");
+    return oh().getKey("/AP");
 }
 
 std::string
 QPDFAnnotationObjectHelper::getAppearanceState()
 {
-    if (this->oh.getKey("/AS").isName()) {
+    if (oh().getKey("/AS").isName()) {
         QTC::TC("qpdf", "QPDFAnnotationObjectHelper AS present");
-        return this->oh.getKey("/AS").getName();
+        return oh().getKey("/AS").getName();
     }
     QTC::TC("qpdf", "QPDFAnnotationObjectHelper AS absent");
     return "";
@@ -42,7 +42,7 @@ QPDFAnnotationObjectHelper::getAppearanceState()
 int
 QPDFAnnotationObjectHelper::getFlags()
 {
-    QPDFObjectHandle flags_obj = this->oh.getKey("/F");
+    QPDFObjectHandle flags_obj = oh().getKey("/F");
     return flags_obj.isInteger() ? flags_obj.getIntValueAsInt() : 0;
 }
 
@@ -143,7 +143,7 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
 
     // 3. Apply the rotation to A as computed above to get the final appearance matrix.
 
-    QPDFObjectHandle rect_obj = this->oh.getKey("/Rect");
+    QPDFObjectHandle rect_obj = oh().getKey("/Rect");
     QPDFObjectHandle as = getAppearanceStream("/N").getDict();
     QPDFObjectHandle bbox_obj = as.getKey("/BBox");
     QPDFObjectHandle matrix_obj = as.getKey("/Matrix");

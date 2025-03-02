@@ -798,9 +798,10 @@ class QPDF
     {
         friend class QPDFObject;
         friend class QPDF_Unresolved;
+        friend class qpdf::BaseHandle;
 
       private:
-        static QPDFObject*
+        static std::shared_ptr<QPDFObject> const&
         resolved(QPDF* qpdf, QPDFObjGen og)
         {
             return qpdf->resolve(og);
@@ -854,6 +855,7 @@ class QPDF
     class Pipe
     {
         friend class QPDF_Stream;
+        friend class qpdf::Stream;
 
       private:
         static bool
@@ -1071,7 +1073,7 @@ class QPDF
         QPDFObjGen exp_og,
         QPDFObjGen& og,
         bool skip_cache_if_in_xref);
-    QPDFObject* resolve(QPDFObjGen og);
+    std::shared_ptr<QPDFObject> const& resolve(QPDFObjGen og);
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
     QPDFObjGen nextObjGen();
@@ -1086,7 +1088,8 @@ class QPDF
         QPDFObjGen og,
         std::shared_ptr<QPDFObject> const& object,
         qpdf_offset_t end_before_space,
-        qpdf_offset_t end_after_space);
+        qpdf_offset_t end_after_space,
+        bool destroy = true);
     static QPDFExc damagedPDF(
         InputSource& input,
         std::string const& object,

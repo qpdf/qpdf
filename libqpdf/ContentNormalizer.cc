@@ -1,7 +1,9 @@
 #include <qpdf/ContentNormalizer.hh>
 
-#include <qpdf/QPDF_Name.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QUtil.hh>
+
+using namespace qpdf;
 
 ContentNormalizer::ContentNormalizer() :
     any_bad_tokens(false),
@@ -55,7 +57,7 @@ ContentNormalizer::handleToken(QPDFTokenizer::Token const& token)
         break;
 
     case QPDFTokenizer::tt_name:
-        write(QPDF_Name::normalizeName(token.getValue()));
+        write(Name::normalize(token.getValue()));
         break;
 
     default:

@@ -1,6 +1,7 @@
 #include <qpdf/QPDF.hh>
 
 #include <qpdf/QPDFExc.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
@@ -108,9 +109,9 @@ QPDF::getAllPagesInternal(
         QTC::TC("qpdf", "QPDF inherit mediabox", media_box ? 0 : 1);
     }
     auto kids = cur_node.getKey("/Kids");
-    int n = kids.getArrayNItems();
-    for (int i = 0; i < n; ++i) {
-        auto kid = kids.getArrayItem(i);
+    int i = -1;
+    for (auto& kid: kids.as_array()) {
+        ++i;
         if (!kid.isDictionary()) {
             kid.warnIfPossible("Pages tree includes non-dictionary object; ignoring");
             m->invalid_page_found = true;
@@ -133,7 +134,6 @@ QPDF::getAllPagesInternal(
                 cur_node.warnIfPossible(
                     "kid " + std::to_string(i) + " (from 0) is direct; converting to indirect");
                 kid = makeIndirectObject(kid);
-                kids.setArrayItem(i, kid);
             } else if (!seen.add(kid)) {
                 // Make a copy of the page. This does the same as shallowCopyPage in
                 // QPDFPageObjectHelper.
@@ -144,7 +144,6 @@ QPDF::getAllPagesInternal(
                     " creating a new page object as a copy");
                 kid = makeIndirectObject(QPDFObjectHandle(kid).shallowCopy());
                 seen.add(kid);
-                kids.setArrayItem(i, kid);
             }
             if (!kid.isDictionaryOfType("/Page")) {
                 kid.warnIfPossible("/Type key should be /Page but is not; overriding");

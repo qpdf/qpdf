@@ -5,9 +5,8 @@
 #include <qpdf/QPDF.hh>
 
 #include <qpdf/QPDFExc.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFWriter_private.hh>
-#include <qpdf/QPDF_Array.hh>
-#include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QTC.hh>
 
 QPDF::ObjUser::ObjUser() :
@@ -115,24 +114,25 @@ QPDF::optimize_internal(
     }
 
     // Traverse document-level items
-    for (auto const& key: m->trailer.getKeys()) {
+    for (auto const& [key, value]: m->trailer.as_dictionary()) {
         if (key == "/Root") {
             // handled separately
         } else {
-            updateObjectMaps(
-                ObjUser(ObjUser::ou_trailer_key, key),
-                m->trailer.getKey(key),
-                skip_stream_parameters);
+            if (!value.null()) {
+                updateObjectMaps(
+                    ObjUser(ObjUser::ou_trailer_key, key), value, skip_stream_parameters);
+            }
         }
     }
 
-    for (auto const& key: root.getKeys()) {
+    for (auto const& [key, value]: root.as_dictionary()) {
         // Technically, /I keys from /Thread dictionaries are supposed to be handled separately, but
         // we are going to disregard that specification for now.  There is loads of evidence that
         // pdlin and Acrobat both disregard things like this from time to time, so this is almost
         // certain not to cause any problems.
-        updateObjectMaps(
-            ObjUser(ObjUser::ou_root_key, key), root.getKey(key), skip_stream_parameters);
+        if (!value.null()) {
+            updateObjectMaps(ObjUser(ObjUser::ou_root_key, key), value, skip_stream_parameters);
+        }
     }
 
     ObjUser root_ou = ObjUser(ObjUser::ou_root);
@@ -319,9 +319,8 @@ QPDF::updateObjectMaps(
         }
 
         if (cur.oh.isArray()) {
-            int n = cur.oh.getArrayNItems();
-            for (int i = 0; i < n; ++i) {
-                pending.emplace_back(cur.ou, cur.oh.getArrayItem(i), false);
+            for (auto const& item: cur.oh.as_array()) {
+                pending.emplace_back(cur.ou, item, false);
             }
         } else if (cur.oh.isDictionary() || cur.oh.isStream()) {
             QPDFObjectHandle dict = cur.oh;
@@ -334,7 +333,11 @@ QPDF::updateObjectMaps(
                 }
             }
 
-            for (auto const& key: dict.getKeys()) {
+            for (auto& [key, value]: dict.as_dictionary()) {
+                if (value.null()) {
+                    continue;
+                }
+
                 if (is_page_node && (key == "/Thumb")) {
                     // Traverse page thumbnail dictionaries as a special case. There can only ever
                     // be one /Thumb key on a page, and we see at most one page node per call.
@@ -347,7 +350,7 @@ QPDF::updateObjectMaps(
                     ((ssp >= 2) && ((key == "/Filter") || (key == "/DecodeParms")))) {
                     // Don't traverse into stream parameters that we are not going to write.
                 } else {
-                    pending.emplace_back(cur.ou, dict.getKey(key), false);
+                    pending.emplace_back(cur.ou, value, false);
                 }
             }
         }

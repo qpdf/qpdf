@@ -5,10 +5,8 @@
 #include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObject_private.hh>
-#include <qpdf/QPDFValue.hh>
-#include <qpdf/QPDF_Null.hh>
-#include <qpdf/QPDF_Stream.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <algorithm>
@@ -238,8 +236,8 @@ class QPDF::JSONReactor: public JSON::Reactor
         is(is),
         must_be_complete(must_be_complete),
         descr(
-            std::make_shared<QPDFValue::Description>(
-                QPDFValue::JSON_Descr(std::make_shared<std::string>(is->getName()), "")))
+            std::make_shared<QPDFObject::Description>(
+                QPDFObject::JSON_Descr(std::make_shared<std::string>(is->getName()), "")))
     {
     }
     ~JSONReactor() override = default;
@@ -286,7 +284,7 @@ class QPDF::JSONReactor: public JSON::Reactor
     QPDF& pdf;
     std::shared_ptr<InputSource> is;
     bool must_be_complete{true};
-    std::shared_ptr<QPDFValue::Description> descr;
+    std::shared_ptr<QPDFObject::Description> descr;
     bool errors{false};
     bool saw_qpdf{false};
     bool saw_qpdf_meta{false};
@@ -576,8 +574,8 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                 } else {
                     this_stream_needs_data = true;
                     replaceObject(
-                        QPDF_Stream::create(
-                            &pdf, tos.object.getObjGen(), QPDFObjectHandle::newDictionary(), 0, 0),
+                        qpdf::Stream(
+                            pdf, tos.object.getObjGen(), QPDFObjectHandle::newDictionary(), 0, 0),
                         value);
                 }
                 next_obj = tos.object;
@@ -706,10 +704,10 @@ QPDF::JSONReactor::arrayItem(JSON const& value)
 void
 QPDF::JSONReactor::setObjectDescription(QPDFObjectHandle& oh, JSON const& value)
 {
-    auto j_descr = std::get<QPDFValue::JSON_Descr>(*descr);
+    auto j_descr = std::get<QPDFObject::JSON_Descr>(*descr);
     if (j_descr.object != cur_object) {
-        descr = std::make_shared<QPDFValue::Description>(
-            QPDFValue::JSON_Descr(j_descr.input, cur_object));
+        descr = std::make_shared<QPDFObject::Description>(
+            QPDFObject::JSON_Descr(j_descr.input, cur_object));
     }
 
     oh.getObjectPtr()->setDescription(&pdf, descr, value.getStart());
@@ -821,7 +819,7 @@ void
 writeJSONStreamFile(
     int version,
     JSON::Writer& jw,
-    QPDF_Stream& stream,
+    qpdf::Stream& stream,
     int id,
     qpdf_stream_decode_level_e decode_level,
     std::string const& file_prefix)
@@ -894,13 +892,13 @@ QPDF::writeJSON(
             } else {
                 jw << "\n      },\n      \"" << key;
             }
-            if (auto* stream = obj.getObjectPtr()->as<QPDF_Stream>()) {
+            if (auto stream = obj.as_stream()) {
                 jw << "\": {\n        \"stream\": ";
                 if (json_stream_data == qpdf_sj_file) {
                     writeJSONStreamFile(
-                        version, jw, *stream, og.getObj(), decode_level, file_prefix);
+                        version, jw, stream, og.getObj(), decode_level, file_prefix);
                 } else {
-                    stream->writeStreamJSON(
+                    stream.writeStreamJSON(
                         version, jw, json_stream_data, decode_level, nullptr, "");
                 }
             } else {
