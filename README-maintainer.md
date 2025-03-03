@@ -886,7 +886,7 @@ still things that could potentially break ABI, such as
 * Changes to the types of public or protected data members without
   changing the size
 
-* Changes to the meanings of parameters with changing the signature
+* Changes to the meanings of parameters without changing the signature
 
 Not breaking ABI/API still requires care.
 
