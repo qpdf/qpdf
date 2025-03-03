@@ -22,6 +22,9 @@
 #include <qpdf/QPDFParser.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
+
+using namespace qpdf;
 
 // This must be a fixed value. This API returns a const reference to it, and the C API relies on its
 // being static as well.
@@ -368,14 +371,14 @@ QPDF::numWarnings() const
 bool
 QPDF::validatePDFVersion(char const*& p, std::string& version)
 {
-    bool valid = QUtil::is_digit(*p);
+    bool valid = util::is_digit(*p);
     if (valid) {
-        while (QUtil::is_digit(*p)) {
+        while (util::is_digit(*p)) {
             version.append(1, *p++);
         }
-        if ((*p == '.') && QUtil::is_digit(*(p + 1))) {
+        if ((*p == '.') && util::is_digit(*(p + 1))) {
             version.append(1, *p++);
-            while (QUtil::is_digit(*p)) {
+            while (util::is_digit(*p)) {
                 version.append(1, *p++);
             }
         } else {
@@ -709,7 +712,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
         while (!done) {
             char ch;
             if (1 == m->file->read(&ch, 1)) {
-                if (QUtil::is_space(ch)) {
+                if (util::is_space(ch)) {
                     skipped_space = true;
                 } else {
                     m->file->unreadCh(ch);
@@ -724,7 +727,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
         m->file->read(buf, sizeof(buf) - 1);
         // The PDF spec says xref must be followed by a line terminator, but files exist in the wild
         // where it is terminated by arbitrary whitespace.
-        if ((strncmp(buf, "xref", 4) == 0) && QUtil::is_space(buf[4])) {
+        if ((strncmp(buf, "xref", 4) == 0) && util::is_space(buf[4])) {
             if (skipped_space) {
                 QTC::TC("qpdf", "QPDF xref skipped space");
                 warn(damagedPDF("", 0, "extraneous whitespace seen before xref"));
@@ -737,8 +740,8 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
                      : (buf[4] == ' ')  ? 2
                                         : 9999));
             int skip = 4;
-            // buf is null-terminated, and QUtil::is_space('\0') is false, so this won't overrun.
-            while (QUtil::is_space(buf[skip])) {
+            // buf is null-terminated, and util::is_space('\0') is false, so this won't overrun.
+            while (util::is_space(buf[skip])) {
                 ++skip;
             }
             xref_offset = read_xrefTable(xref_offset + skip);
@@ -795,37 +798,37 @@ QPDF::parse_xrefFirst(std::string const& line, int& obj, int& num, int& bytes)
     char const* start = line.c_str();
 
     // Skip zero or more spaces
-    while (QUtil::is_space(*p)) {
+    while (util::is_space(*p)) {
         ++p;
     }
     // Require digit
-    if (!QUtil::is_digit(*p)) {
+    if (!util::is_digit(*p)) {
         return false;
     }
     // Gather digits
     std::string obj_str;
-    while (QUtil::is_digit(*p)) {
+    while (util::is_digit(*p)) {
         obj_str.append(1, *p++);
     }
     // Require space
-    if (!QUtil::is_space(*p)) {
+    if (!util::is_space(*p)) {
         return false;
     }
     // Skip spaces
-    while (QUtil::is_space(*p)) {
+    while (util::is_space(*p)) {
         ++p;
     }
     // Require digit
-    if (!QUtil::is_digit(*p)) {
+    if (!util::is_digit(*p)) {
         return false;
     }
     // Gather digits
     std::string num_str;
-    while (QUtil::is_digit(*p)) {
+    while (util::is_digit(*p)) {
         num_str.append(1, *p++);
     }
     // Skip any space including line terminators
-    while (QUtil::is_space(*p)) {
+    while (util::is_space(*p)) {
         ++p;
     }
     bytes = toI(p - start);
@@ -847,51 +850,51 @@ QPDF::read_bad_xrefEntry(qpdf_offset_t& f1, int& f2, char& type)
 
     // Skip zero or more spaces. There aren't supposed to be any.
     bool invalid = false;
-    while (QUtil::is_space(*p)) {
+    while (util::is_space(*p)) {
         ++p;
         QTC::TC("qpdf", "QPDF ignore first space in xref entry");
         invalid = true;
     }
     // Require digit
-    if (!QUtil::is_digit(*p)) {
+    if (!util::is_digit(*p)) {
         return false;
     }
     // Gather digits
     std::string f1_str;
-    while (QUtil::is_digit(*p)) {
+    while (util::is_digit(*p)) {
         f1_str.append(1, *p++);
     }
     // Require space
-    if (!QUtil::is_space(*p)) {
+    if (!util::is_space(*p)) {
         return false;
     }
-    if (QUtil::is_space(*(p + 1))) {
+    if (util::is_space(*(p + 1))) {
         QTC::TC("qpdf", "QPDF ignore first extra space in xref entry");
         invalid = true;
     }
     // Skip spaces
-    while (QUtil::is_space(*p)) {
+    while (util::is_space(*p)) {
         ++p;
     }
     // Require digit
-    if (!QUtil::is_digit(*p)) {
+    if (!util::is_digit(*p)) {
         return false;
     }
     // Gather digits
     std::string f2_str;
-    while (QUtil::is_digit(*p)) {
+    while (util::is_digit(*p)) {
         f2_str.append(1, *p++);
     }
     // Require space
-    if (!QUtil::is_space(*p)) {
+    if (!util::is_space(*p)) {
         return false;
     }
-    if (QUtil::is_space(*(p + 1))) {
+    if (util::is_space(*(p + 1))) {
         QTC::TC("qpdf", "QPDF ignore second extra space in xref entry");
         invalid = true;
     }
     // Skip spaces
-    while (QUtil::is_space(*p)) {
+    while (util::is_space(*p)) {
         ++p;
     }
     if ((*p == 'f') || (*p == 'n')) {
@@ -938,12 +941,12 @@ QPDF::read_xrefEntry(qpdf_offset_t& f1, int& f2, char& type)
         ++f1_len;
         ++p;
     }
-    while (QUtil::is_digit(*p) && f1_len++ < 10) {
+    while (util::is_digit(*p) && f1_len++ < 10) {
         f1 *= 10;
         f1 += *p++ - '0';
     }
     // Require space
-    if (!QUtil::is_space(*p++)) {
+    if (!util::is_space(*p++)) {
         // Entry doesn't start with space or digit.
         // C++20: [[unlikely]]
         return false;
@@ -953,11 +956,11 @@ QPDF::read_xrefEntry(qpdf_offset_t& f1, int& f2, char& type)
         ++f2_len;
         ++p;
     }
-    while (QUtil::is_digit(*p) && f2_len++ < 5) {
+    while (util::is_digit(*p) && f2_len++ < 5) {
         f2 *= 10;
         f2 += static_cast<int>(*p++ - '0');
     }
-    if (QUtil::is_space(*p++) && (*p == 'f' || *p == 'n')) {
+    if (util::is_space(*p++) && (*p == 'f' || *p == 'n')) {
         // C++20: [[likely]]
         type = *p;
         // No test for valid line[19].
@@ -1602,7 +1605,7 @@ QPDF::validateStreamLineEnd(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset
             }
             return;
         }
-        if (!QUtil::is_space(ch)) {
+        if (!util::is_space(ch)) {
             QTC::TC("qpdf", "QPDF stream without newline");
             m->file->unreadCh(ch);
             warn(damagedPDF(

@@ -9,8 +9,12 @@
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
+
 #include <algorithm>
 #include <cstring>
+
+using namespace qpdf;
 
 // This chart shows an example of the state transitions that would occur in parsing a minimal file.
 
@@ -67,10 +71,10 @@ is_indirect_object(std::string const& v, int& obj, int& gen)
     char const* p = v.c_str();
     std::string o_str;
     std::string g_str;
-    if (!QUtil::is_digit(*p)) {
+    if (!util::is_digit(*p)) {
         return false;
     }
-    while (QUtil::is_digit(*p)) {
+    while (util::is_digit(*p)) {
         o_str.append(1, *p++);
     }
     if (*p != ' ') {
@@ -79,10 +83,10 @@ is_indirect_object(std::string const& v, int& obj, int& gen)
     while (*p == ' ') {
         ++p;
     }
-    if (!QUtil::is_digit(*p)) {
+    if (!util::is_digit(*p)) {
         return false;
     }
-    while (QUtil::is_digit(*p)) {
+    while (util::is_digit(*p)) {
         g_str.append(1, *p++);
     }
     if (*p != ' ') {
@@ -128,7 +132,7 @@ is_binary_string(std::string const& v, std::string& str)
         str = v.substr(2);
         int count = 0;
         for (char c: str) {
-            if (!QUtil::is_hex_digit(c)) {
+            if (!util::is_hex_digit(c)) {
                 return false;
             }
             ++count;

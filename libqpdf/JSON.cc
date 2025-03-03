@@ -8,8 +8,12 @@
 #include <qpdf/Pl_String.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
+
 #include <cstring>
 #include <stdexcept>
+
+using namespace qpdf;
 
 JSON::Members::Members(std::unique_ptr<JSON_value> value) :
     value(std::move(value))
@@ -761,7 +765,7 @@ JSONParser::tokenError()
         QTC::TC("libtests", "JSON parse unexpected sign");
         throw std::runtime_error(
             "JSON: offset " + std::to_string(offset) + ": numeric literal: unexpected sign");
-    } else if (QUtil::is_space(*p) || strchr("{}[]:,", *p)) {
+    } else if (util::is_space(*p) || strchr("{}[]:,", *p)) {
         QTC::TC("libtests", "JSON parse incomplete number");
         throw std::runtime_error(
             "JSON: offset " + std::to_string(offset) + ": numeric literal: incomplete number");
@@ -1078,7 +1082,7 @@ JSONParser::getToken()
 
             case ls_u4:
                 using ui = unsigned int;
-                if (ui val = ui(QUtil::hex_decode_char(*p)); val < 16) {
+                if (ui val = ui(util::hex_decode_char(*p)); val < 16) {
                     u_value = 16 * u_value + val;
                 } else {
                     tokenError();

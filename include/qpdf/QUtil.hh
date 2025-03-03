@@ -190,7 +190,7 @@ namespace QUtil
 
     // Returns lower-case hex-encoded version of the char including a leading "#".
     QPDF_DLL
-    inline std::string hex_encode_char(char);
+    std::string hex_encode_char(char);
 
     // Returns a string that is the result of decoding the input string. The input string may
     // consist of mixed case hexadecimal digits. Any characters that are not hexadecimal digits will
@@ -202,7 +202,7 @@ namespace QUtil
     // Decode a single hex digit into a char in the range 0 <= char < 16. Return a char >= 16 if
     // digit is not a valid hex digit.
     QPDF_DLL
-    inline constexpr char hex_decode_char(char digit) noexcept;
+    char hex_decode_char(char digit);
 
     // Set stdin, stdout to binary mode
     QPDF_DLL
@@ -431,16 +431,16 @@ namespace QUtil
     // These routines help the tokenizer recognize certain character classes without using ctype,
     // which we avoid because of locale considerations.
     QPDF_DLL
-    inline bool is_hex_digit(char);
+    bool is_hex_digit(char);
 
     QPDF_DLL
-    inline bool is_space(char);
+    bool is_space(char);
 
     QPDF_DLL
-    inline bool is_digit(char);
+    bool is_digit(char);
 
     QPDF_DLL
-    inline bool is_number(char const*);
+    bool is_number(char const*);
 
     // This method parses the numeric range syntax used by the qpdf command-line tool. May throw
     // std::runtime_error. A numeric range is as comma-separated list of groups. A group may be a
@@ -488,66 +488,5 @@ namespace QUtil
     QPDF_DLL
     size_t get_max_memory_usage();
 }; // namespace QUtil
-
-inline bool
-QUtil::is_hex_digit(char ch)
-{
-    return hex_decode_char(ch) < '\20';
-}
-
-inline bool
-QUtil::is_space(char ch)
-{
-    return ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t' || ch == '\f' || ch == '\v';
-}
-
-inline bool
-QUtil::is_digit(char ch)
-{
-    return ((ch >= '0') && (ch <= '9'));
-}
-
-inline bool
-QUtil::is_number(char const* p)
-{
-    // ^[\+\-]?(\.\d*|\d+(\.\d*)?)$
-    if (!*p) {
-        return false;
-    }
-    if ((*p == '-') || (*p == '+')) {
-        ++p;
-    }
-    bool found_dot = false;
-    bool found_digit = false;
-    for (; *p; ++p) {
-        if (*p == '.') {
-            if (found_dot) {
-                // only one dot
-                return false;
-            }
-            found_dot = true;
-        } else if (QUtil::is_digit(*p)) {
-            found_digit = true;
-        } else {
-            return false;
-        }
-    }
-    return found_digit;
-}
-
-inline std::string
-QUtil::hex_encode_char(char c)
-{
-    static auto constexpr hexchars = "0123456789abcdef";
-    return {'#', hexchars[static_cast<unsigned char>(c) >> 4], hexchars[c & 0x0f]};
-}
-
-inline constexpr char
-QUtil::hex_decode_char(char digit) noexcept
-{
-    return digit <= '9' && digit >= '0'
-        ? char(digit - '0')
-        : (digit >= 'a' ? char(digit - 'a' + 10) : (digit >= 'A' ? char(digit - 'A' + 10) : '\20'));
-}
 
 #endif // QUTIL_HH

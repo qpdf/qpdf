@@ -12,10 +12,13 @@
 #include <qpdf/QPDFWriter_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+
+using namespace qpdf;
 
 template <class T, class int_type>
 static void
@@ -105,7 +108,7 @@ QPDF::isLinearized()
     char* p = buf;
     while (lindict_obj == -1) {
         // Find a digit or end of buffer
-        while (((p - buf) < tbuf_size) && (!QUtil::is_digit(*p))) {
+        while (((p - buf) < tbuf_size) && (!util::is_digit(*p))) {
             ++p;
         }
         if (p - buf == tbuf_size) {
@@ -114,7 +117,7 @@ QPDF::isLinearized()
         // Seek to the digit. Then skip over digits for a potential
         // next iteration.
         m->file->seek(p - buf, SEEK_SET);
-        while (((p - buf) < tbuf_size) && QUtil::is_digit(*p)) {
+        while (((p - buf) < tbuf_size) && util::is_digit(*p)) {
             ++p;
         }
 

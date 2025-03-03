@@ -5,10 +5,13 @@
 #include <qpdf/QPDFUsage.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
+
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 
+using namespace qpdf;
 using namespace std::literals;
 
 QPDFArgParser::Members::Members(int argc, char const* const argv[], char const* progname_env) :
@@ -285,7 +288,7 @@ QPDFArgParser::handleBashArguments()
             bool append = false;
             switch (state) {
             case st_top:
-                if (QUtil::is_space(ch)) {
+                if (util::is_space(ch)) {
                     if (!arg.empty()) {
                         m->bash_argv.push_back(QUtil::make_shared_cstr(arg));
                         arg.clear();

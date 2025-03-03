@@ -29,8 +29,11 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 
 #include <qpdf/auto_job_schema.hh> // JOB_SCHEMA_DATA
+
+using namespace qpdf;
 
 namespace
 {
@@ -388,7 +391,7 @@ QPDFJob::parseRotationParameter(std::string const& parameter)
         if ((first == '+') || (first == '-')) {
             relative = ((first == '+') ? 1 : -1);
             angle_str = angle_str.substr(1);
-        } else if (!QUtil::is_digit(angle_str.at(0))) {
+        } else if (!util::is_digit(angle_str.at(0))) {
             angle_str = "";
         }
     }

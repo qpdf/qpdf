@@ -2,8 +2,12 @@
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
+
 #include <cstring>
 #include <stdexcept>
+
+using namespace qpdf;
 
 static char
 to_c(unsigned int ch)
@@ -50,7 +54,7 @@ Pl_Base64::decode(unsigned char const* data, size_t len)
 {
     unsigned char const* p = data;
     while (len > 0) {
-        if (!QUtil::is_space(to_c(*p))) {
+        if (!util::is_space(to_c(*p))) {
             this->buf[this->pos++] = *p;
             if (this->pos == 4) {
                 flush();
