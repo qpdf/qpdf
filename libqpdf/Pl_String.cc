@@ -2,21 +2,27 @@
 
 #include <stdexcept>
 
-Pl_String::Members::Members(std::string& s) :
-    s(s)
+class Pl_String::Members
 {
-}
+  public:
+    Members(std::string& s) :
+        s(s)
+    {
+    }
+    Members(Members const&) = delete;
+    ~Members() = default;
+
+    std::string& s;
+};
 
 Pl_String::Pl_String(char const* identifier, Pipeline* next, std::string& s) :
     Pipeline(identifier, next),
-    m(new Members(s))
+    m(std::make_unique<Members>(s))
 {
 }
 
-Pl_String::~Pl_String() // NOLINT (modernize-use-equals-default)
-{
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
-}
+// Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
+Pl_String::~Pl_String() = default;
 
 void
 Pl_String::write(unsigned char const* buf, size_t len)

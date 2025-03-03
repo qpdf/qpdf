@@ -30,11 +30,9 @@ class QPDFOutlineDocumentHelper;
 
 // This is an object helper for outline items. Outlines, also known as bookmarks, are described in
 // section 12.3.3 of the PDF spec (ISO-32000). See comments below for details.
-
 class QPDFOutlineObjectHelper: public QPDFObjectHelper
 {
   public:
-    QPDF_DLL
     ~QPDFOutlineObjectHelper() override
     {
         // This must be cleared explicitly to avoid circular references that prevent cleanup of
@@ -87,7 +85,6 @@ class QPDFOutlineObjectHelper: public QPDFObjectHelper
     };
 
   private:
-    QPDF_DLL
     QPDFOutlineObjectHelper(QPDFObjectHandle, QPDFOutlineDocumentHelper&, int);
 
     class Members
@@ -95,7 +92,6 @@ class QPDFOutlineObjectHelper: public QPDFObjectHelper
         friend class QPDFOutlineObjectHelper;
 
       public:
-        QPDF_DLL
         ~Members() = default;
 
       private:

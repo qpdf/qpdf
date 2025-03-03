@@ -5,12 +5,6 @@
 #include <algorithm>
 #include <cstring>
 
-FileInputSource::FileInputSource() :
-    close_file(false),
-    file(nullptr)
-{
-}
-
 FileInputSource::FileInputSource(char const* filename) :
     close_file(true),
     filename(filename),

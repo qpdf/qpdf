@@ -2,11 +2,6 @@
 
 #include <qpdf/QUtil.hh>
 
-PDFVersion::PDFVersion() :
-    PDFVersion(0, 0, 0)
-{
-}
-
 PDFVersion::PDFVersion(int major_version, int minor_version, int extension_level) :
     major_version(major_version),
     minor_version(minor_version),

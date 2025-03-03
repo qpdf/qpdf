@@ -31,7 +31,6 @@
 // (a, b, c, d, e, f) = │ c d 0 │
 //                      │ e f 1 │
 //                      └       ┘
-
 class QPDFMatrix
 {
   public:
@@ -79,12 +78,9 @@ class QPDFMatrix
     // operator== tests for exact equality, not considering deltas for floating point.
     QPDF_DLL
     bool operator==(QPDFMatrix const& rhs) const;
+
     QPDF_DLL
-    bool
-    operator!=(QPDFMatrix const& rhs) const
-    {
-        return !operator==(rhs);
-    }
+    bool operator!=(QPDFMatrix const& rhs) const;
 
     double a;
     double b;

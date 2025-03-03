@@ -8,14 +8,26 @@ namespace
     unsigned long long memory_limit{0};
 } // namespace
 
-Pl_RunLength::Members::Members(action_e action) :
-    action(action)
+class Pl_RunLength::Members
 {
-}
+  public:
+    Members(action_e action) :
+        action(action)
+    {
+    }
+    Members(Members const&) = delete;
+    ~Members() = default;
+
+    action_e action;
+    state_e state{st_top};
+    unsigned char buf[128];
+    unsigned int length{0};
+    std::string out;
+};
 
 Pl_RunLength::Pl_RunLength(char const* identifier, Pipeline* next, action_e action) :
     Pipeline(identifier, next),
-    m(new Members(action))
+    m(std::make_unique<Members>(action))
 {
     if (!next) {
         throw std::logic_error("Attempt to create Pl_RunLength with nullptr as next");

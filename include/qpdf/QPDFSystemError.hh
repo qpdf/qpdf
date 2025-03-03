@@ -32,7 +32,7 @@ class QPDF_DLL_CLASS QPDFSystemError: public std::runtime_error
   public:
     QPDF_DLL
     QPDFSystemError(std::string const& description, int system_errno);
-    QPDF_DLL
+
     ~QPDFSystemError() noexcept override = default;
 
     // To get a complete error string, call what(), provided by std::exception.  The accessors below

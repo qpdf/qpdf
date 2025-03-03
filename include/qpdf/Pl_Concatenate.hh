@@ -20,18 +20,18 @@
 #ifndef PL_CONCATENATE_HH
 #define PL_CONCATENATE_HH
 
+#include <qpdf/Pipeline.hh>
+
 // This pipeline will drop all regular finish calls rather than passing them onto next.  To finish
 // downstream streams, call manualFinish.  This makes it possible to pipe multiple streams (e.g.
 // with QPDFObjectHandle::pipeStreamData) to a downstream like Pl_Flate that can't handle multiple
 // calls to finish().
-
-#include <qpdf/Pipeline.hh>
-
 class QPDF_DLL_CLASS Pl_Concatenate: public Pipeline
 {
   public:
     QPDF_DLL
     Pl_Concatenate(char const* identifier, Pipeline* next);
+
     QPDF_DLL
     ~Pl_Concatenate() override;
 
@@ -51,7 +51,6 @@ class QPDF_DLL_CLASS Pl_Concatenate: public Pipeline
         friend class Pl_Concatenate;
 
       public:
-        QPDF_DLL
         ~Members() = default;
 
       private:
@@ -59,7 +58,7 @@ class QPDF_DLL_CLASS Pl_Concatenate: public Pipeline
         Members(Members const&) = delete;
     };
 
-    std::shared_ptr<Members> m;
+    std::unique_ptr<Members> m{nullptr};
 };
 
 #endif // PL_CONCATENATE_HH

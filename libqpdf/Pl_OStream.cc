@@ -2,21 +2,27 @@
 
 #include <stdexcept>
 
-Pl_OStream::Members::Members(std::ostream& os) :
-    os(os)
+class Pl_OStream::Members
 {
-}
+  public:
+    Members(std::ostream& os) :
+        os(os)
+    {
+    }
+    Members(Members const&) = delete;
+    ~Members() = default;
+
+    std::ostream& os;
+};
 
 Pl_OStream::Pl_OStream(char const* identifier, std::ostream& os) :
     Pipeline(identifier, nullptr),
-    m(new Members(os))
+    m(std::make_unique<Members>(os))
 {
 }
 
-Pl_OStream::~Pl_OStream() // NOLINT (modernize-use-equals-default)
-{
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
-}
+// Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
+Pl_OStream::~Pl_OStream() = default;
 
 void
 Pl_OStream::write(unsigned char const* buf, size_t len)

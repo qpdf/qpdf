@@ -33,13 +33,12 @@
 // This class provides a higher level interface around document-level file attachments, also known
 // as embedded files. These are discussed in sections 7.7.4 and 7.11 of the ISO-32000 PDF
 // specification.
-
 class QPDFEmbeddedFileDocumentHelper: public QPDFDocumentHelper
 {
   public:
     QPDF_DLL
     QPDFEmbeddedFileDocumentHelper(QPDF&);
-    QPDF_DLL
+
     ~QPDFEmbeddedFileDocumentHelper() override = default;
 
     QPDF_DLL
@@ -73,7 +72,6 @@ class QPDFEmbeddedFileDocumentHelper: public QPDFDocumentHelper
         friend class QPDFEmbeddedFileDocumentHelper;
 
       public:
-        QPDF_DLL
         ~Members() = default;
 
       private:

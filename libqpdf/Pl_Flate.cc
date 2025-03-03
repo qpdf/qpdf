@@ -68,17 +68,15 @@ Pl_Flate::Members::~Members()
 Pl_Flate::Pl_Flate(
     char const* identifier, Pipeline* next, action_e action, unsigned int out_bufsize_int) :
     Pipeline(identifier, next),
-    m(std::shared_ptr<Members>(new Members(QIntC::to_size(out_bufsize_int), action)))
+    m(std::make_unique<Members>(QIntC::to_size(out_bufsize_int), action))
 {
     if (!next) {
         throw std::logic_error("Attempt to create Pl_Flate with nullptr as next");
     }
 }
 
-Pl_Flate::~Pl_Flate() // NOLINT (modernize-use-equals-default)
-{
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
-}
+// Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
+Pl_Flate::~Pl_Flate() = default;
 
 unsigned long long
 Pl_Flate::memory_limit()

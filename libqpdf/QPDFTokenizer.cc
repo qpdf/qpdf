@@ -8,10 +8,13 @@
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
+
+using namespace qpdf;
 
 static inline bool
 is_delimiter(char ch)
@@ -123,7 +126,7 @@ QPDFTokenizer::includeIgnorable()
 bool
 QPDFTokenizer::isSpace(char ch)
 {
-    return ((ch == '\0') || QUtil::is_space(ch));
+    return (ch == '\0' || util::is_space(ch));
 }
 
 bool
@@ -440,7 +443,7 @@ QPDFTokenizer::inNameHex1(char ch)
 {
     this->hex_char = ch;
 
-    if (char hval = QUtil::hex_decode_char(ch); hval < '\20') {
+    if (char hval = util::hex_decode_char(ch); hval < '\20') {
         this->char_code = int(hval) << 4;
         this->state = st_name_hex2;
     } else {
@@ -456,7 +459,7 @@ QPDFTokenizer::inNameHex1(char ch)
 void
 QPDFTokenizer::inNameHex2(char ch)
 {
-    if (char hval = QUtil::hex_decode_char(ch); hval < '\20') {
+    if (char hval = util::hex_decode_char(ch); hval < '\20') {
         this->char_code |= int(hval);
     } else {
         QTC::TC("qpdf", "QPDFTokenizer bad name 2");
@@ -483,7 +486,7 @@ QPDFTokenizer::inNameHex2(char ch)
 void
 QPDFTokenizer::inSign(char ch)
 {
-    if (QUtil::is_digit(ch)) {
+    if (util::is_digit(ch)) {
         this->state = st_number;
     } else if (ch == '.') {
         this->state = st_decimal;
@@ -496,7 +499,7 @@ QPDFTokenizer::inSign(char ch)
 void
 QPDFTokenizer::inDecimal(char ch)
 {
-    if (QUtil::is_digit(ch)) {
+    if (util::is_digit(ch)) {
         this->state = st_real;
     } else {
         this->state = st_literal;
@@ -507,7 +510,7 @@ QPDFTokenizer::inDecimal(char ch)
 void
 QPDFTokenizer::inNumber(char ch)
 {
-    if (QUtil::is_digit(ch)) {
+    if (util::is_digit(ch)) {
     } else if (ch == '.') {
         this->state = st_real;
     } else if (isDelimiter(ch)) {
@@ -523,7 +526,7 @@ QPDFTokenizer::inNumber(char ch)
 void
 QPDFTokenizer::inReal(char ch)
 {
-    if (QUtil::is_digit(ch)) {
+    if (util::is_digit(ch)) {
     } else if (isDelimiter(ch)) {
         this->type = tt_real;
         this->state = st_token_ready;
@@ -645,7 +648,7 @@ QPDFTokenizer::inLiteral(char ch)
 void
 QPDFTokenizer::inHexstring(char ch)
 {
-    if (char hval = QUtil::hex_decode_char(ch); hval < '\20') {
+    if (char hval = util::hex_decode_char(ch); hval < '\20') {
         this->char_code = int(hval) << 4;
         this->state = st_in_hexstring_2nd;
 
@@ -667,7 +670,7 @@ QPDFTokenizer::inHexstring(char ch)
 void
 QPDFTokenizer::inHexstring2nd(char ch)
 {
-    if (char hval = QUtil::hex_decode_char(ch); hval < '\20') {
+    if (char hval = util::hex_decode_char(ch); hval < '\20') {
         this->val += char(this->char_code) | hval;
         this->state = st_in_hexstring;
 

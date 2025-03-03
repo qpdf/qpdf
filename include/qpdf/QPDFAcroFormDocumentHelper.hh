@@ -20,6 +20,18 @@
 #ifndef QPDFACROFORMDOCUMENTHELPER_HH
 #define QPDFACROFORMDOCUMENTHELPER_HH
 
+#include <qpdf/QPDFDocumentHelper.hh>
+
+#include <qpdf/DLL.h>
+
+#include <qpdf/QPDFAnnotationObjectHelper.hh>
+#include <qpdf/QPDFFormFieldObjectHelper.hh>
+#include <qpdf/QPDFPageObjectHelper.hh>
+
+#include <map>
+#include <set>
+#include <vector>
+
 // This document helper is intended to help with operations on interactive forms. Here are the key
 // things to know:
 
@@ -53,25 +65,12 @@
 //     under "/Fields" in the "/AcroForm" dictionary. In a more complex case, you may have to trace
 //     through various "/Kids" elements in the "/AcroForm" field entry until you find the annotation
 //     dictionary.
-
-#include <qpdf/QPDFDocumentHelper.hh>
-
-#include <qpdf/DLL.h>
-
-#include <qpdf/QPDFAnnotationObjectHelper.hh>
-#include <qpdf/QPDFFormFieldObjectHelper.hh>
-#include <qpdf/QPDFPageObjectHelper.hh>
-
-#include <map>
-#include <set>
-#include <vector>
-
 class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
 {
   public:
     QPDF_DLL
     QPDFAcroFormDocumentHelper(QPDF&);
-    QPDF_DLL
+
     ~QPDFAcroFormDocumentHelper() override = default;
 
     // This class lazily creates an internal cache of the mapping among form fields, annotations,
@@ -232,7 +231,6 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
         friend class QPDFAcroFormDocumentHelper;
 
       public:
-        QPDF_DLL
         ~Members() = default;
 
       private:

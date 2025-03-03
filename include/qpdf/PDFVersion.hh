@@ -23,18 +23,16 @@
 #include <qpdf/DLL.h>
 #include <string>
 
+// Represent a PDF version. PDF versions are typically major.minor, but PDF 1.7 has several
+// extension levels as the ISO 32000 spec was in progress. This class helps with comparison of
+// versions.
 class PDFVersion
 {
   public:
-    // Represent a PDF version. PDF versions are typically major.minor, but PDF 1.7 has several
-    // extension levels as the ISO 32000 spec was in progress. This class helps with comparison of
-    // versions.
-    QPDF_DLL
-    PDFVersion();
-    QPDF_DLL
+    PDFVersion() = default;
     PDFVersion(PDFVersion const&) = default;
-    QPDF_DLL
     PDFVersion& operator=(PDFVersion const&) = default;
+
     QPDF_DLL
     PDFVersion(int major, int minor, int extension = 0);
     QPDF_DLL
@@ -59,9 +57,9 @@ class PDFVersion
     int getExtensionLevel() const;
 
   private:
-    int major_version;
-    int minor_version;
-    int extension_level;
+    int major_version{0};
+    int minor_version{0};
+    int extension_level{0};
 };
 
 #endif // PDFVERSION_HH

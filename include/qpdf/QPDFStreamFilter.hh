@@ -27,10 +27,8 @@
 class QPDF_DLL_CLASS QPDFStreamFilter
 {
   public:
-    QPDF_DLL
     QPDFStreamFilter() = default;
 
-    QPDF_DLL
     virtual ~QPDFStreamFilter() = default;
 
     // A QPDFStreamFilter class must implement, at a minimum, setDecodeParms() and

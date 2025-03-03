@@ -57,31 +57,52 @@ progress_monitor(j_common_ptr cinfo)
     }
 }
 
-Pl_DCT::Members::Members() :
-    action(a_decompress),
-    buf("DCT compressed image")
+class Pl_DCT::Members
 {
-}
+  public:
+    // For compression
+    Members(
+        JDIMENSION image_width,
+        JDIMENSION image_height,
+        int components,
+        J_COLOR_SPACE color_space,
+        CompressConfig* config_callback) :
+        action(a_compress),
+        buf("DCT uncompressed image"),
+        image_width(image_width),
+        image_height(image_height),
+        components(components),
+        color_space(color_space),
+        config_callback(config_callback)
+    {
+    }
 
-Pl_DCT::Members::Members(
-    JDIMENSION image_width,
-    JDIMENSION image_height,
-    int components,
-    J_COLOR_SPACE color_space,
-    CompressConfig* config_callback) :
-    action(a_compress),
-    buf("DCT uncompressed image"),
-    image_width(image_width),
-    image_height(image_height),
-    components(components),
-    color_space(color_space),
-    config_callback(config_callback)
-{
-}
+    // For decompression
+    Members() :
+        action(a_decompress),
+        buf("DCT compressed image")
+    {
+    }
+
+    Members(Members const&) = delete;
+
+    ~Members() = default;
+
+    action_e action;
+    Pl_Buffer buf;
+
+    // Used for compression
+    JDIMENSION image_width{0};
+    JDIMENSION image_height{0};
+    int components{1};
+    J_COLOR_SPACE color_space{JCS_GRAYSCALE};
+
+    CompressConfig* config_callback{nullptr};
+};
 
 Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
-    m(new Members())
+    m(std::make_unique<Members>())
 {
     if (!next) {
         throw std::logic_error("Attempt to create Pl_DCT with nullptr as next");
@@ -115,14 +136,13 @@ Pl_DCT::Pl_DCT(
     J_COLOR_SPACE color_space,
     CompressConfig* compress_callback) :
     Pipeline(identifier, next),
-    m(new Members(image_width, image_height, components, color_space, compress_callback))
+    m(std::make_unique<Members>(
+        image_width, image_height, components, color_space, compress_callback))
 {
 }
 
-Pl_DCT::~Pl_DCT() // NOLINT (modernize-use-equals-default)
-{
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
-}
+// Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
+Pl_DCT::~Pl_DCT() = default;
 
 void
 Pl_DCT::write(unsigned char const* data, size_t len)

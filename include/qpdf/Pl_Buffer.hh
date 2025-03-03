@@ -20,6 +20,12 @@
 #ifndef PL_BUFFER_HH
 #define PL_BUFFER_HH
 
+#include <qpdf/Buffer.hh>
+#include <qpdf/Pipeline.hh>
+
+#include <memory>
+#include <string>
+
 // This pipeline accumulates the data passed to it into a memory buffer.  Each subsequent use of
 // this buffer appends to the data accumulated so far.  getBuffer() may be called only after calling
 // finish() and before calling any subsequent write().  At that point, a dynamically allocated
@@ -28,13 +34,6 @@
 //
 // For this pipeline, "next" may be null.  If a next pointer is provided, this pipeline will also
 // pass the data through to it.
-
-#include <qpdf/Buffer.hh>
-#include <qpdf/Pipeline.hh>
-
-#include <memory>
-#include <string>
-
 class QPDF_DLL_CLASS Pl_Buffer: public Pipeline
 {
   public:
@@ -69,23 +68,9 @@ class QPDF_DLL_CLASS Pl_Buffer: public Pipeline
     std::string getString();
 
   private:
-    class QPDF_DLL_PRIVATE Members
-    {
-        friend class Pl_Buffer;
+    class Members;
 
-      public:
-        QPDF_DLL
-        ~Members() = default;
-
-      private:
-        Members() = default;
-        Members(Members const&) = delete;
-
-        bool ready{true};
-        std::string data;
-    };
-
-    std::shared_ptr<Members> m;
+    std::unique_ptr<Members> m;
 };
 
 #endif // PL_BUFFER_HH

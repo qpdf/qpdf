@@ -1496,13 +1496,11 @@ class QPDF
         friend class ResolveRecorder;
 
       public:
-        QPDF_DLL
+        Members();
+        Members(Members const&) = delete;
         ~Members() = default;
 
       private:
-        Members();
-        Members(Members const&) = delete;
-
         std::shared_ptr<QPDFLogger> log;
         unsigned long long unique_id{0};
         QPDFTokenizer tokenizer;
@@ -1577,7 +1575,7 @@ class QPDF
 
     // Keep all member variables inside the Members object, which we dynamically allocate. This
     // makes it possible to add new private members without breaking binary compatibility.
-    std::shared_ptr<Members> m;
+    std::unique_ptr<Members> m;
 };
 
 #endif // QPDF_HH

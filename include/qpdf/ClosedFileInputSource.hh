@@ -20,22 +20,25 @@
 #ifndef QPDF_CLOSEDFILEINPUTSOURCE_HH
 #define QPDF_CLOSEDFILEINPUTSOURCE_HH
 
-// This is an input source that reads from files, like FileInputSource, except that it opens and
-// closes the file surrounding every operation. This decreases efficiency, but it allows many more
-// of these to exist at once than the maximum number of open file descriptors. This is used for
-// merging large numbers of files.
-
 #include <qpdf/InputSource.hh>
 
 #include <memory>
 
 class FileInputSource;
 
+// This is an input source that reads from files, like FileInputSource, except that it opens and
+// closes the file surrounding every operation. This decreases efficiency, but it allows many more
+// of these to exist at once than the maximum number of open file descriptors. This is used for
+// merging large numbers of files.
 class QPDF_DLL_CLASS ClosedFileInputSource: public InputSource
 {
   public:
     QPDF_DLL
     ClosedFileInputSource(char const* filename);
+
+    ClosedFileInputSource(ClosedFileInputSource const&) = delete;
+    ClosedFileInputSource& operator=(ClosedFileInputSource const&) = delete;
+
     QPDF_DLL
     ~ClosedFileInputSource() override;
     QPDF_DLL
@@ -60,9 +63,6 @@ class QPDF_DLL_CLASS ClosedFileInputSource: public InputSource
     void stayOpen(bool);
 
   private:
-    ClosedFileInputSource(ClosedFileInputSource const&) = delete;
-    ClosedFileInputSource& operator=(ClosedFileInputSource const&) = delete;
-
     QPDF_DLL_PRIVATE
     void before();
     QPDF_DLL_PRIVATE

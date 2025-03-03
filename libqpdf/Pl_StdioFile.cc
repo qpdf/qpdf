@@ -6,21 +6,27 @@
 #include <cerrno>
 #include <stdexcept>
 
-Pl_StdioFile::Members::Members(FILE* f) :
-    file(f)
+class Pl_StdioFile::Members
 {
-}
+  public:
+    Members(FILE* f) :
+        file(f)
+    {
+    }
+    Members(Members const&) = delete;
+    ~Members() = default;
+
+    FILE* file;
+};
 
 Pl_StdioFile::Pl_StdioFile(char const* identifier, FILE* f) :
     Pipeline(identifier, nullptr),
-    m(new Members(f))
+    m(std::make_unique<Members>(f))
 {
 }
 
-Pl_StdioFile::~Pl_StdioFile() // NOLINT (modernize-use-equals-default)
-{
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
-}
+// Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
+Pl_StdioFile::~Pl_StdioFile() = default;
 
 void
 Pl_StdioFile::write(unsigned char const* buf, size_t len)

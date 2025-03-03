@@ -31,7 +31,6 @@
 // This class is part of qpdf's pluggable crypto provider support. Most users won't need to know or
 // care about this class, but you can use it if you want to supply your own crypto implementation.
 // See also comments in QPDFCryptoImpl.hh.
-
 class QPDFCryptoProvider
 {
   public:
@@ -92,7 +91,6 @@ class QPDFCryptoProvider
 
       public:
         Members() = default;
-        QPDF_DLL
         ~Members() = default;
 
       private:

@@ -138,3 +138,9 @@ QPDFMatrix::operator==(QPDFMatrix const& rhs) const
         (this->a == rhs.a) && (this->b == rhs.b) && (this->c == rhs.c) && (this->d == rhs.d) &&
         (this->e == rhs.e) && (this->f == rhs.f));
 }
+
+bool
+QPDFMatrix::operator!=(QPDFMatrix const& rhs) const
+{
+    return !operator==(rhs);
+}

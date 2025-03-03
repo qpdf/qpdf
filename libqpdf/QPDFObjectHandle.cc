@@ -15,6 +15,7 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 
 #include <algorithm>
 #include <array>
@@ -279,7 +280,7 @@ Name::normalize(std::string const& name)
         } else if (
             ch < 33 || ch == '#' || ch == '/' || ch == '(' || ch == ')' || ch == '{' || ch == '}' ||
             ch == '<' || ch == '>' || ch == '[' || ch == ']' || ch == '%' || ch > 126) {
-            result += QUtil::hex_encode_char(ch);
+            result += util::hex_encode_char(ch);
         } else {
             result += ch;
         }
@@ -2367,6 +2368,24 @@ QPDFObjGen
 QPDFObjectHandle::getObjGen() const
 {
     return obj ? obj->getObjGen() : QPDFObjGen();
+}
+
+int
+QPDFObjectHandle::getObjectID() const
+{
+    return getObjGen().getObj();
+}
+
+int
+QPDFObjectHandle::getGeneration() const
+{
+    return getObjGen().getGen();
+}
+
+bool
+QPDFObjectHandle::isIndirect() const
+{
+    return getObjectID() != 0;
 }
 
 // Indirect object accessors

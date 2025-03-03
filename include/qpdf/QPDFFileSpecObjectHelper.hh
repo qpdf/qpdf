@@ -29,13 +29,12 @@
 
 // This class provides a higher level interface around File Specification dictionaries, which are
 // discussed in section 7.11 of the ISO-32000 PDF specification.
-
 class QPDFFileSpecObjectHelper: public QPDFObjectHelper
 {
   public:
     QPDF_DLL
     QPDFFileSpecObjectHelper(QPDFObjectHandle);
-    QPDF_DLL
+
     ~QPDFFileSpecObjectHelper() override = default;
 
     QPDF_DLL
@@ -93,7 +92,6 @@ class QPDFFileSpecObjectHelper: public QPDFObjectHelper
         friend class QPDFFileSpecObjectHelper;
 
       public:
-        QPDF_DLL
         ~Members() = default;
 
       private:

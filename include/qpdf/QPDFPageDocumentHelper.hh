@@ -37,7 +37,7 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
   public:
     QPDF_DLL
     QPDFPageDocumentHelper(QPDF&);
-    QPDF_DLL
+
     ~QPDFPageDocumentHelper() override = default;
 
     // Traverse page tree, and return all /Page objects wrapped in QPDFPageObjectHelper objects.
@@ -117,7 +117,6 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
         friend class QPDFPageDocumentHelper;
 
       public:
-        QPDF_DLL
         ~Members() = default;
 
       private:

@@ -8,6 +8,7 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/Util.hh>
 
 #include <cerrno>
 #include <cstdlib>
@@ -36,6 +37,8 @@
 #ifdef HAVE_MALLOC_INFO
 # include <malloc.h>
 #endif
+
+using namespace qpdf;
 
 // First element is 24
 static unsigned short pdf_doc_low_to_unicode[] = {
@@ -396,7 +399,7 @@ unsigned long long
 QUtil::string_to_ull(char const* str)
 {
     char const* p = str;
-    while (*p && is_space(*p)) {
+    while (*p && util::is_space(*p)) {
         ++p;
     }
     if (*p == '-') {
@@ -739,7 +742,7 @@ QUtil::hex_decode(std::string const& input)
     bool first = true;
     char decoded;
     for (auto ch: input) {
-        ch = hex_decode_char(ch);
+        ch = util::hex_decode_char(ch);
         if (ch < '\20') {
             if (first) {
                 decoded = static_cast<char>(ch << 4);
@@ -2001,4 +2004,64 @@ QUtil::get_max_memory_usage()
 #else
     return 0;
 #endif
+}
+
+char
+QUtil::hex_decode_char(char digit)
+{
+    return util::hex_decode_char(digit);
+}
+
+std::string
+QUtil::hex_encode_char(char c)
+{
+    return util::hex_encode_char(c);
+}
+
+bool
+QUtil::is_number(char const* p)
+{
+    // No longer used by qpdf.
+
+    // ^[\+\-]?(\.\d*|\d+(\.\d*)?)$
+    if (!*p) {
+        return false;
+    }
+    if ((*p == '-') || (*p == '+')) {
+        ++p;
+    }
+    bool found_dot = false;
+    bool found_digit = false;
+    for (; *p; ++p) {
+        if (*p == '.') {
+            if (found_dot) {
+                // only one dot
+                return false;
+            }
+            found_dot = true;
+        } else if (util::is_digit(*p)) {
+            found_digit = true;
+        } else {
+            return false;
+        }
+    }
+    return found_digit;
+}
+
+bool
+QUtil::is_space(char c)
+{
+    return util::is_space(c);
+}
+
+bool
+QUtil::is_digit(char c)
+{
+    return util::is_digit(c);
+}
+
+bool
+QUtil::is_hex_digit(char c)
+{
+    return util::is_hex_digit(c);
 }
