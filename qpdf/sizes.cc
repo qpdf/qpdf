@@ -117,7 +117,6 @@ main()
     print_size(QPDFObjectHandle::QPDFDictItems::iterator);
     print_size(QPDFObjectHandle::StreamDataProvider);
     print_size(QPDFObjectHandle::TokenFilter);
-    print_size(QPDFObjectHelper);
     print_size(QPDFOutlineDocumentHelper);
     print_size(QPDFOutlineObjectHelper);
     print_size(QPDFPageDocumentHelper);
