@@ -30,11 +30,10 @@ QPDFCryptoProvider::getImpl(std::string const& name)
     return getInstance().getImpl_internal(name);
 }
 
-template <typename T>
 void
-QPDFCryptoProvider::registerImpl(std::string const& name)
+QPDFCryptoProvider::registerImpl(std::string const& name, provider_fn f)
 {
-    getInstance().registerImpl_internal<T>(name);
+    getInstance().registerImpl_internal(name, std::move(f));
 }
 
 void
@@ -47,13 +46,13 @@ QPDFCryptoProvider::QPDFCryptoProvider() :
     m(std::make_shared<Members>())
 {
 #ifdef USE_CRYPTO_NATIVE
-    registerImpl_internal<QPDFCrypto_native>("native");
+    registerImpl_internal("native", std::make_shared<QPDFCrypto_native>);
 #endif
 #ifdef USE_CRYPTO_GNUTLS
-    registerImpl_internal<QPDFCrypto_gnutls>("gnutls");
+    registerImpl_internal("gnutls", std::make_shared<QPDFCrypto_gnutls>);
 #endif
 #ifdef USE_CRYPTO_OPENSSL
-    registerImpl_internal<QPDFCrypto_openssl>("openssl");
+    registerImpl_internal("openssl", std::make_shared<QPDFCrypto_openssl>);
 #endif
     std::string default_crypto;
     if (!QUtil::get_env("QPDF_CRYPTO_PROVIDER", &default_crypto)) {
@@ -80,11 +79,10 @@ QPDFCryptoProvider::getImpl_internal(std::string const& name) const
     return m->providers[name]();
 }
 
-template <typename T>
 void
-QPDFCryptoProvider::registerImpl_internal(std::string const& name)
+QPDFCryptoProvider::registerImpl_internal(std::string const& name, provider_fn f)
 {
-    m->providers[name] = std::make_shared<T>;
+    m->providers[name] = std::move(f);
 }
 
 void
