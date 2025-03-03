@@ -8,6 +8,7 @@ set(TEST_PROGRAMS
   buffer
   closed_file_input_source
   concatenate
+  crypto_provider
   dct_compress
   dct_uncompress
   flate
