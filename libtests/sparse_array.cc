@@ -95,12 +95,14 @@ main()
     assert(b.at(3).second.isNull());
     assert(b.at(8).second.isNull());
     assert(b.at(5).second.isIndirect());
-    assert(obj->unparse() == "[ null null null null null 3 0 R null [ 0 1 2 3 ] null null ]");
-    auto c = obj->copy(true);
-    auto d = obj->copy(false);
+    assert(
+        QPDFObjectHandle(obj).unparse() ==
+        "[ null null null null null 3 0 R null [ 0 1 2 3 ] null null ]");
+    auto c = QPDFObjectHandle(obj).unsafeShallowCopy();
+    auto d = QPDFObjectHandle(obj).shallowCopy();
     b.at(7).second.setArrayItem(2, "42"_qpdf);
-    assert(c->unparse() == "[ null null null null null 3 0 R null [ 0 1 42 3 ] null null ]");
-    assert(d->unparse() == "[ null null null null null 3 0 R null [ 0 1 2 3 ] null null ]");
+    assert(c.unparse() == "[ null null null null null 3 0 R null [ 0 1 42 3 ] null null ]");
+    assert(d.unparse() == "[ null null null null null 3 0 R null [ 0 1 2 3 ] null null ]");
 
     try {
         b.setAt(3, {});
