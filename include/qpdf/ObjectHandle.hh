@@ -47,6 +47,8 @@ namespace qpdf
     // QPDFObjGen and bool.
     class BaseHandle
     {
+        friend class QPDF;
+
       public:
         explicit inline operator bool() const;
         inline operator QPDFObjectHandle() const;
@@ -55,6 +57,9 @@ namespace qpdf
         // The rest of the header file is for qpdf internal use only.
 
         std::shared_ptr<QPDFObject> copy(bool shallow = false) const;
+        // Recursively remove association with any QPDF object. This method may only be called
+        // during final destruction.
+        void disconnect(bool only_direct = true);
         inline QPDFObjGen id_gen() const;
         inline bool indirect() const;
         inline bool null() const;
