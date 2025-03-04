@@ -50,7 +50,9 @@ class QPDF_Array final
 
   private:
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
     friend class qpdf::Array;
+
     QPDF_Array(std::vector<QPDFObjectHandle> const& items) :
         elements(items)
     {
@@ -75,6 +77,7 @@ class QPDF_Array final
 class QPDF_Bool final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
     friend class QPDFObjectHandle;
 
     explicit QPDF_Bool(bool val) :
@@ -92,6 +95,7 @@ class QPDF_Dictionary final
 {
     friend class QPDFObject;
     friend class qpdf::BaseDictionary;
+    friend class qpdf::BaseHandle;
 
     QPDF_Dictionary(std::map<std::string, QPDFObjectHandle> const& items) :
         items(items)
@@ -105,6 +109,7 @@ class QPDF_Dictionary final
 class QPDF_InlineImage final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
 
     explicit QPDF_InlineImage(std::string val) :
         val(std::move(val))
@@ -116,6 +121,7 @@ class QPDF_InlineImage final
 class QPDF_Integer final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
     friend class QPDFObjectHandle;
 
     QPDF_Integer(long long val) :
@@ -128,6 +134,7 @@ class QPDF_Integer final
 class QPDF_Name final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
 
     explicit QPDF_Name(std::string name) :
         name(std::move(name))
@@ -139,6 +146,7 @@ class QPDF_Name final
 class QPDF_Null final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
 
   public:
     static inline std::shared_ptr<QPDFObject> create(
@@ -150,6 +158,7 @@ class QPDF_Null final
 class QPDF_Operator final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
 
     QPDF_Operator(std::string val) :
         val(std::move(val))
@@ -162,6 +171,7 @@ class QPDF_Operator final
 class QPDF_Real final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
 
     QPDF_Real(std::string val) :
         val(std::move(val))
@@ -235,6 +245,7 @@ class QPDF_Stream final
 class QPDF_String final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
     friend class QPDFWriter;
 
   public:
@@ -284,7 +295,6 @@ class QPDFObject
             qpdf, og, std::forward<T>(T(std::forward<Args>(args)...)));
     }
 
-    std::shared_ptr<QPDFObject> copy(bool shallow = false);
     std::string unparse();
     void write_json(int json_version, JSON::Writer& p);
     void disconnect();

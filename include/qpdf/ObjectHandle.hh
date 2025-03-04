@@ -54,6 +54,7 @@ namespace qpdf
 
         // The rest of the header file is for qpdf internal use only.
 
+        std::shared_ptr<QPDFObject> copy(bool shallow = false) const;
         inline QPDFObjGen id_gen() const;
         inline bool indirect() const;
         inline bool null() const;
