@@ -580,48 +580,49 @@ BaseHandle::write_json(int json_version, JSON::Writer& p) const
 }
 
 void
-QPDFObject::disconnect()
+BaseHandle::disconnect(bool only_direct)
 {
-    // Disconnect an object from its owning QPDF. This is called by QPDF's destructor.
+    // QPDF::~QPDF() calls disconnect for indirect objects, so we don't do that here.
+    if (only_direct && indirect()) {
+        return;
+    }
 
-    switch (getTypeCode()) {
+    switch (raw_type_code()) {
     case ::ot_array:
         {
-            auto& a = std::get<QPDF_Array>(value);
+            auto& a = std::get<QPDF_Array>(obj->value);
             if (a.sp) {
                 for (auto& item: a.sp->elements) {
-                    auto& obj = item.second;
-                    if (!obj.indirect()) {
-                        obj.getObj()->disconnect();
-                    }
+                    item.second.disconnect();
                 }
             } else {
-                for (auto& obj: a.elements) {
-                    if (!obj.indirect()) {
-                        obj.getObj()->disconnect();
-                    }
+                for (auto& oh: a.elements) {
+                    oh.disconnect();
                 }
             }
         }
         break;
     case ::ot_dictionary:
-        for (auto& iter: std::get<QPDF_Dictionary>(value).items) {
-            QPDFObjectHandle::DisconnectAccess::disconnect(iter.second);
+        for (auto& iter: std::get<QPDF_Dictionary>(obj->value).items) {
+            iter.second.disconnect();
         }
         break;
     case ::ot_stream:
         {
-            auto& s = std::get<QPDF_Stream>(value);
+            auto& s = std::get<QPDF_Stream>(obj->value);
             s.m->stream_provider = nullptr;
-            QPDFObjectHandle::DisconnectAccess::disconnect(s.m->stream_dict);
+            s.m->stream_dict.disconnect();
         }
         break;
+    case ::ot_uninitialized:
+        return;
     default:
         break;
     }
-    qpdf = nullptr;
-    og = QPDFObjGen();
+    obj->qpdf = nullptr;
+    obj->og = QPDFObjGen();
 }
+
 std::string
 QPDFObject::getStringValue() const
 {
@@ -648,16 +649,6 @@ bool
 QPDFObjectHandle::isSameObjectAs(QPDFObjectHandle const& rhs) const
 {
     return this->obj == rhs.obj;
-}
-void
-QPDFObjectHandle::disconnect()
-{
-    // Recursively remove association with any QPDF object. This method may only be called during
-    // final destruction. QPDF::~QPDF() calls it for indirect objects using the object pointer
-    // itself, so we don't do that here. Other objects call it through this method.
-    if (obj && !isIndirect()) {
-        this->obj->disconnect();
-    }
 }
 
 qpdf_object_type_e

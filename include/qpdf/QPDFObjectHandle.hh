@@ -1242,19 +1242,6 @@ class QPDFObjectHandle final: public qpdf::BaseHandle
     QPDF_DLL
     void warnIfPossible(std::string const& warning) const;
 
-    // Provide access to specific classes for recursive disconnected().
-    class DisconnectAccess
-    {
-        friend class QPDFObject;
-
-      private:
-        static void
-        disconnect(QPDFObjectHandle o)
-        {
-            o.disconnect();
-        }
-    };
-
     // Convenience routine: Throws if the assumption is violated. Your code will be better if you
     // call one of the isType methods and handle the case of the type being wrong, but these can be
     // convenient if you have already verified the type.
@@ -1354,7 +1341,6 @@ class QPDFObjectHandle final: public qpdf::BaseHandle
     void objectWarning(std::string const& warning) const;
     void assertType(char const* type_name, bool istype) const;
     void makeDirect(QPDFObjGen::set& visited, bool stop_at_streams);
-    void disconnect();
     void setParsedOffset(qpdf_offset_t offset);
     void parseContentStream_internal(std::string const& description, ParserCallbacks* callbacks);
     static void parseContentStream_data(

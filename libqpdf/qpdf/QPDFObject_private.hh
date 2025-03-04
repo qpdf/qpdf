@@ -18,6 +18,7 @@
 #include <variant>
 #include <vector>
 
+class Disconnect;
 class QPDFObject;
 class QPDFObjectHandle;
 
@@ -297,7 +298,6 @@ class QPDFObject
             qpdf, og, std::forward<T>(T(std::forward<Args>(args)...)));
     }
 
-    void disconnect();
     std::string getStringValue() const;
 
     // Return a unique type code for the resolved object
@@ -308,7 +308,7 @@ class QPDFObject
             return QPDF::Resolver::resolved(qpdf, og)->getTypeCode();
         }
         if (getTypeCode() == ::ot_reference) {
-            return std::get<QPDF_Reference>(value).obj->getResolvedTypeCode();
+            return std::get<QPDF_Reference>(value).obj->getTypeCode();
         }
         return getTypeCode();
     }
@@ -354,22 +354,11 @@ class QPDFObject
         qpdf = a_qpdf;
         og = a_og;
     }
-    // Mark an object as destroyed. Used by QPDF's destructor for its indirect objects.
-    void
-    destroy()
-    {
-        value = QPDF_Destroyed();
-    }
 
     bool
     isUnresolved() const
     {
         return getTypeCode() == ::ot_unresolved;
-    }
-    const QPDFObject*
-    resolved_object() const
-    {
-        return isUnresolved() ? QPDF::Resolver::resolved(qpdf, og).get() : this;
     }
 
     struct JSON_Descr
@@ -467,6 +456,7 @@ class QPDFObject
   private:
     friend class QPDF_Stream;
     friend class qpdf::BaseHandle;
+    friend class Disconnect;
 
     typedef std::variant<
         std::monostate,
