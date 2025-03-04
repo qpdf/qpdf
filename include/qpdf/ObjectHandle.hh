@@ -62,6 +62,7 @@ namespace qpdf
         inline qpdf_object_type_e raw_type_code() const;
         inline qpdf_object_type_e type_code() const;
         std::string unparse() const;
+        void write_json(int json_version, JSON::Writer& p) const;
 
       protected:
         BaseHandle() = default;

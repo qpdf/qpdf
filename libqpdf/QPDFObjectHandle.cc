@@ -446,9 +446,9 @@ BaseHandle::unparse() const
 }
 
 void
-QPDFObject::write_json(int json_version, JSON::Writer& p)
+BaseHandle::write_json(int json_version, JSON::Writer& p) const
 {
-    switch (getResolvedTypeCode()) {
+    switch (type_code()) {
     case ::ot_uninitialized:
         throw std::logic_error(
             "QPDFObjectHandle: attempting to get JSON from a uninitialized object");
@@ -459,14 +459,14 @@ QPDFObject::write_json(int json_version, JSON::Writer& p)
         p << "null";
         break;
     case ::ot_boolean:
-        p << std::get<QPDF_Bool>(value).val;
+        p << std::get<QPDF_Bool>(obj->value).val;
         break;
     case ::ot_integer:
-        p << std::to_string(std::get<QPDF_Integer>(value).val);
+        p << std::to_string(std::get<QPDF_Integer>(obj->value).val);
         break;
     case ::ot_real:
         {
-            auto const& val = std::get<QPDF_Real>(value).val;
+            auto const& val = std::get<QPDF_Real>(obj->value).val;
             if (val.length() == 0) {
                 // Can't really happen...
                 p << "0";
@@ -483,11 +483,11 @@ QPDFObject::write_json(int json_version, JSON::Writer& p)
         }
         break;
     case ::ot_string:
-        std::get<QPDF_String>(value).writeJSON(json_version, p);
+        std::get<QPDF_String>(obj->value).writeJSON(json_version, p);
         break;
     case ::ot_name:
         {
-            auto const& n = std::get<QPDF_Name>(value);
+            auto const& n = std::get<QPDF_Name>(obj->value);
             // For performance reasons this code is duplicated in QPDF_Dictionary::writeJSON. When
             // updating this method make sure QPDF_Dictionary is also update.
             if (json_version == 1) {
@@ -507,7 +507,7 @@ QPDFObject::write_json(int json_version, JSON::Writer& p)
         break;
     case ::ot_array:
         {
-            auto const& a = std::get<QPDF_Array>(value);
+            auto const& a = std::get<QPDF_Array>(obj->value);
             p.writeStart('[');
             if (a.sp) {
                 int next = 0;
@@ -521,7 +521,7 @@ QPDFObject::write_json(int json_version, JSON::Writer& p)
                     if (item_og.isIndirect()) {
                         p << "\"" << item_og.unparse(' ') << " R\"";
                     } else {
-                        item.second.getObj()->write_json(json_version, p);
+                        item.second.write_json(json_version, p);
                     }
                     next = ++key;
                 }
@@ -535,7 +535,7 @@ QPDFObject::write_json(int json_version, JSON::Writer& p)
                     if (item_og.isIndirect()) {
                         p << "\"" << item_og.unparse(' ') << " R\"";
                     } else {
-                        item.getObj()->write_json(json_version, p);
+                        item.write_json(json_version, p);
                     }
                 }
             }
@@ -544,7 +544,7 @@ QPDFObject::write_json(int json_version, JSON::Writer& p)
         break;
     case ::ot_dictionary:
         {
-            auto const& d = std::get<QPDF_Dictionary>(value);
+            auto const& d = std::get<QPDF_Dictionary>(obj->value);
             p.writeStart('{');
             for (auto& iter: d.items) {
                 if (!iter.second.null()) {
@@ -569,10 +569,10 @@ QPDFObject::write_json(int json_version, JSON::Writer& p)
         }
         break;
     case ::ot_stream:
-        std::get<QPDF_Stream>(value).m->stream_dict.writeJSON(json_version, p);
+        std::get<QPDF_Stream>(obj->value).m->stream_dict.writeJSON(json_version, p);
         break;
     case ::ot_reference:
-        p << "\"" << getObjGen().unparse(' ') << " R\"";
+        p << "\"" << obj->og.unparse(' ') << " R\"";
         break;
     default:
         throw std::logic_error("attempted to write an unsuitable object as JSON");
@@ -1471,7 +1471,7 @@ QPDFObjectHandle::writeJSON(int json_version, JSON::Writer& p, bool dereference_
     } else if (!obj) {
         throw std::logic_error("attempted to dereference an uninitialized QPDFObjectHandle");
     } else {
-        obj->write_json(json_version, p);
+        write_json(json_version, p);
     }
 }
 

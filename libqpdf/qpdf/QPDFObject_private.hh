@@ -209,6 +209,7 @@ class QPDF_Stream final
         friend class QPDF_Stream;
         friend class QPDFObject;
         friend class qpdf::Stream;
+        friend class qpdf::BaseHandle;
 
       public:
         Members(QPDFObjectHandle stream_dict, size_t length) :
@@ -227,6 +228,7 @@ class QPDF_Stream final
     };
 
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
     friend class qpdf::Stream;
 
     QPDF_Stream(QPDFObjectHandle stream_dict, size_t length) :
@@ -295,7 +297,6 @@ class QPDFObject
             qpdf, og, std::forward<T>(T(std::forward<Args>(args)...)));
     }
 
-    void write_json(int json_version, JSON::Writer& p);
     void disconnect();
     std::string getStringValue() const;
 
