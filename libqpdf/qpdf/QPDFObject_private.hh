@@ -295,7 +295,6 @@ class QPDFObject
             qpdf, og, std::forward<T>(T(std::forward<Args>(args)...)));
     }
 
-    std::string unparse();
     void write_json(int json_version, JSON::Writer& p);
     void disconnect();
     std::string getStringValue() const;

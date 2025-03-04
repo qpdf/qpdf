@@ -369,9 +369,9 @@ BaseHandle::copy(bool shallow) const
 }
 
 std::string
-QPDFObject::unparse()
+BaseHandle::unparse() const
 {
-    switch (getResolvedTypeCode()) {
+    switch (type_code()) {
     case ::ot_uninitialized:
         throw std::logic_error("QPDFObjectHandle: attempting to unparse an uninitialized object");
         return ""; // does not return
@@ -381,18 +381,18 @@ QPDFObject::unparse()
     case ::ot_null:
         return "null";
     case ::ot_boolean:
-        return std::get<QPDF_Bool>(value).val ? "true" : "false";
+        return std::get<QPDF_Bool>(obj->value).val ? "true" : "false";
     case ::ot_integer:
-        return std::to_string(std::get<QPDF_Integer>(value).val);
+        return std::to_string(std::get<QPDF_Integer>(obj->value).val);
     case ::ot_real:
-        return std::get<QPDF_Real>(value).val;
+        return std::get<QPDF_Real>(obj->value).val;
     case ::ot_string:
-        return std::get<QPDF_String>(value).unparse(false);
+        return std::get<QPDF_String>(obj->value).unparse(false);
     case ::ot_name:
-        return Name::normalize(std::get<QPDF_Name>(value).name);
+        return Name::normalize(std::get<QPDF_Name>(obj->value).name);
     case ::ot_array:
         {
-            auto const& a = std::get<QPDF_Array>(value);
+            auto const& a = std::get<QPDF_Array>(obj->value);
             std::string result = "[ ";
             if (a.sp) {
                 int next = 0;
@@ -401,9 +401,7 @@ QPDFObject::unparse()
                     for (int j = next; j < key; ++j) {
                         result += "null ";
                     }
-                    auto item_og = item.second.id_gen();
-                    result += item_og.isIndirect() ? item_og.unparse(' ') + " R "
-                                                   : item.second.getObj()->unparse() + " ";
+                    result += item.second.unparse() + " ";
                     next = ++key;
                 }
                 for (int j = next; j < a.sp->size; ++j) {
@@ -411,9 +409,7 @@ QPDFObject::unparse()
                 }
             } else {
                 for (auto const& item: a.elements) {
-                    auto item_og = item.id_gen();
-                    result += item_og.isIndirect() ? item_og.unparse(' ') + " R "
-                                                   : item.getObj()->unparse() + " ";
+                    result += item.unparse() + " ";
                 }
             }
             result += "]";
@@ -421,7 +417,7 @@ QPDFObject::unparse()
         }
     case ::ot_dictionary:
         {
-            auto const& items = std::get<QPDF_Dictionary>(value).items;
+            auto const& items = std::get<QPDF_Dictionary>(obj->value).items;
             std::string result = "<< ";
             for (auto& iter: items) {
                 if (!iter.second.null()) {
@@ -432,11 +428,11 @@ QPDFObject::unparse()
             return result;
         }
     case ::ot_stream:
-        return og.unparse(' ') + " R";
+        return obj->og.unparse(' ') + " R";
     case ::ot_operator:
-        return std::get<QPDF_Operator>(value).val;
+        return std::get<QPDF_Operator>(obj->value).val;
     case ::ot_inlineimage:
-        return std::get<QPDF_InlineImage>(value).val;
+        return std::get<QPDF_InlineImage>(obj->value).val;
     case ::ot_unresolved:
         throw std::logic_error("QPDFObjectHandle: attempting to unparse a unresolved object");
         return ""; // does not return
@@ -444,7 +440,7 @@ QPDFObject::unparse()
         throw std::logic_error("attempted to unparse a QPDFObjectHandle from a destroyed QPDF");
         return ""; // does not return
     case ::ot_reference:
-        return og.unparse(' ') + " R";
+        return obj->og.unparse(' ') + " R";
     }
     return {}; // unreachable
 }
@@ -1438,7 +1434,7 @@ QPDFObjectHandle::unparseResolved() const
     if (!obj) {
         throw std::logic_error("attempted to dereference an uninitialized QPDFObjectHandle");
     }
-    return obj->unparse();
+    return BaseHandle::unparse();
 }
 
 std::string
