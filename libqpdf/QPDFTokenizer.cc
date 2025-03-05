@@ -53,9 +53,9 @@ QPDFWordTokenFinder::check()
     // Find a word token matching the given string, preceded by a delimiter, and followed by a
     // delimiter or EOF.
     Tokenizer tokenizer;
-    auto t = tokenizer.readToken(is, "finder", true, str.size() + 2);
+    tokenizer.nextToken(is, "finder", str.size() + 2);
     qpdf_offset_t pos = is.tell();
-    if (!(t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, str))) {
+    if (tokenizer.getType() != tt::tt_word || tokenizer.getValue() != str) {
         QTC::TC("qpdf", "QPDFTokenizer finder found wrong word");
         return false;
     }
@@ -853,13 +853,13 @@ Tokenizer::findEI(InputSource& input)
         // all required as well as a BI and ID. If we get 10 good tokens in a row or hit EOF, we can
         // be pretty sure we've found the actual EI.
         for (int i = 0; i < 10; ++i) {
-            auto t = check.readToken(input, "checker", true);
-            auto type = t.getType();
-            if (type == tt::tt_eof) {
+            check.nextToken(input, "checker");
+            auto typ = check.getType();
+            if (typ == tt::tt_eof) {
                 okay = true;
-            } else if (type == tt::tt_bad) {
+            } else if (typ == tt::tt_bad) {
                 found_bad = true;
-            } else if (t.isWord()) {
+            } else if (typ == tt::tt_word) {
                 // The qpdf tokenizer lumps alphabetic and otherwise uncategorized characters into
                 // "words". We recognize strings of alphabetic characters as potential valid
                 // operators for purposes of telling whether we're in valid content or not. It's not
@@ -868,13 +868,12 @@ Tokenizer::findEI(InputSource& input)
                 bool found_alpha = false;
                 bool found_non_printable = false;
                 bool found_other = false;
-                for (char ch: t.getValue()) {
-                    if (((ch >= 'a') && (ch <= 'z')) || ((ch >= 'A') && (ch <= 'Z')) ||
-                        (ch == '*')) {
+                for (char ch: check.getValue()) {
+                    if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch == '*')) {
                         // Treat '*' as alpha since there are valid PDF operators that contain *
                         // along with alphabetic characters.
                         found_alpha = true;
-                    } else if ((static_cast<signed char>(ch) < 32) && (!isSpace(ch))) {
+                    } else if (static_cast<signed char>(ch) < 32 && !isSpace(ch)) {
                         // Compare ch as a signed char so characters outside of 7-bit will be < 0.
                         found_non_printable = true;
                         break;
