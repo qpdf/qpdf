@@ -212,6 +212,25 @@ QPDF::QPDF() :
     m->unique_id = unique_id.fetch_add(1ULL);
 }
 
+// Provide access to disconnect(). Disconnect will in due course be merged into the current ObjCache
+// (future Objects::Entry) to centralize all QPDF access to QPDFObject.
+class Disconnect: BaseHandle
+{
+  public:
+    Disconnect(std::shared_ptr<QPDFObject> const& obj) :
+        BaseHandle(obj)
+    {
+    }
+    void
+    disconnect()
+    {
+        BaseHandle::disconnect(false);
+        if (raw_type_code() != ::ot_null) {
+            obj->value = QPDF_Destroyed();
+        }
+    }
+};
+
 QPDF::~QPDF()
 {
     // If two objects are mutually referential (through each object having an array or dictionary
@@ -228,10 +247,7 @@ QPDF::~QPDF()
     // the xref table anyway just to prevent any possibility of resolve() succeeding.
     m->xref_table.clear();
     for (auto const& iter: m->obj_cache) {
-        iter.second.object->disconnect();
-        if (iter.second.object->getTypeCode() != ::ot_null) {
-            iter.second.object->destroy();
-        }
+        Disconnect(iter.second.object).disconnect();
     }
 }
 

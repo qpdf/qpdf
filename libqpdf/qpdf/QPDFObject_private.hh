@@ -18,6 +18,7 @@
 #include <variant>
 #include <vector>
 
+class Disconnect;
 class QPDFObject;
 class QPDFObjectHandle;
 
@@ -50,7 +51,9 @@ class QPDF_Array final
 
   private:
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
     friend class qpdf::Array;
+
     QPDF_Array(std::vector<QPDFObjectHandle> const& items) :
         elements(items)
     {
@@ -75,6 +78,7 @@ class QPDF_Array final
 class QPDF_Bool final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
     friend class QPDFObjectHandle;
 
     explicit QPDF_Bool(bool val) :
@@ -92,6 +96,7 @@ class QPDF_Dictionary final
 {
     friend class QPDFObject;
     friend class qpdf::BaseDictionary;
+    friend class qpdf::BaseHandle;
 
     QPDF_Dictionary(std::map<std::string, QPDFObjectHandle> const& items) :
         items(items)
@@ -105,6 +110,7 @@ class QPDF_Dictionary final
 class QPDF_InlineImage final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
 
     explicit QPDF_InlineImage(std::string val) :
         val(std::move(val))
@@ -116,6 +122,7 @@ class QPDF_InlineImage final
 class QPDF_Integer final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
     friend class QPDFObjectHandle;
 
     QPDF_Integer(long long val) :
@@ -128,6 +135,7 @@ class QPDF_Integer final
 class QPDF_Name final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
 
     explicit QPDF_Name(std::string name) :
         name(std::move(name))
@@ -139,6 +147,7 @@ class QPDF_Name final
 class QPDF_Null final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
 
   public:
     static inline std::shared_ptr<QPDFObject> create(
@@ -150,6 +159,7 @@ class QPDF_Null final
 class QPDF_Operator final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
 
     QPDF_Operator(std::string val) :
         val(std::move(val))
@@ -162,6 +172,7 @@ class QPDF_Operator final
 class QPDF_Real final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
 
     QPDF_Real(std::string val) :
         val(std::move(val))
@@ -199,6 +210,7 @@ class QPDF_Stream final
         friend class QPDF_Stream;
         friend class QPDFObject;
         friend class qpdf::Stream;
+        friend class qpdf::BaseHandle;
 
       public:
         Members(QPDFObjectHandle stream_dict, size_t length) :
@@ -217,6 +229,7 @@ class QPDF_Stream final
     };
 
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
     friend class qpdf::Stream;
 
     QPDF_Stream(QPDFObjectHandle stream_dict, size_t length) :
@@ -235,6 +248,7 @@ class QPDF_Stream final
 class QPDF_String final
 {
     friend class QPDFObject;
+    friend class qpdf::BaseHandle;
     friend class QPDFWriter;
 
   public:
@@ -284,10 +298,6 @@ class QPDFObject
             qpdf, og, std::forward<T>(T(std::forward<Args>(args)...)));
     }
 
-    std::shared_ptr<QPDFObject> copy(bool shallow = false);
-    std::string unparse();
-    void write_json(int json_version, JSON::Writer& p);
-    void disconnect();
     std::string getStringValue() const;
 
     // Return a unique type code for the resolved object
@@ -298,7 +308,7 @@ class QPDFObject
             return QPDF::Resolver::resolved(qpdf, og)->getTypeCode();
         }
         if (getTypeCode() == ::ot_reference) {
-            return std::get<QPDF_Reference>(value).obj->getResolvedTypeCode();
+            return std::get<QPDF_Reference>(value).obj->getTypeCode();
         }
         return getTypeCode();
     }
@@ -344,22 +354,11 @@ class QPDFObject
         qpdf = a_qpdf;
         og = a_og;
     }
-    // Mark an object as destroyed. Used by QPDF's destructor for its indirect objects.
-    void
-    destroy()
-    {
-        value = QPDF_Destroyed();
-    }
 
     bool
     isUnresolved() const
     {
         return getTypeCode() == ::ot_unresolved;
-    }
-    const QPDFObject*
-    resolved_object() const
-    {
-        return isUnresolved() ? QPDF::Resolver::resolved(qpdf, og).get() : this;
     }
 
     struct JSON_Descr
@@ -457,6 +456,7 @@ class QPDFObject
   private:
     friend class QPDF_Stream;
     friend class qpdf::BaseHandle;
+    friend class Disconnect;
 
     typedef std::variant<
         std::monostate,

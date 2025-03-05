@@ -358,7 +358,7 @@ namespace qpdf
     inline bool
     BaseHandle::null() const
     {
-        return !obj || obj->getResolvedTypeCode() == ::ot_null;
+        return !obj || type_code() == ::ot_null;
     }
 
     inline QPDF*
@@ -383,7 +383,7 @@ namespace qpdf
             return QPDF::Resolver::resolved(obj->qpdf, obj->og)->getTypeCode();
         }
         if (raw_type_code() == ::ot_reference) {
-            return std::get<QPDF_Reference>(obj->value).obj->getResolvedTypeCode();
+            return std::get<QPDF_Reference>(obj->value).obj->getTypeCode();
         }
         return raw_type_code();
     }
