@@ -1626,7 +1626,7 @@ QPDFObjectHandle::parseContentStream_data(
         // Read a token and seek to the beginning. The offset we get from this process is the
         // beginning of the next non-ignorable (space, comment) token. This way, the offset and
         // don't including ignorable content.
-        tokenizer.readToken(input, "content", true);
+        tokenizer.nextToken(input, "content", true);
         qpdf_offset_t offset = input.getLastOffset();
         input.seek(offset, SEEK_SET);
         auto obj =
@@ -1644,10 +1644,10 @@ QPDFObjectHandle::parseContentStream_data(
             char ch;
             input.read(&ch, 1);
             tokenizer.expectInlineImage(input);
-            QPDFTokenizer::Token t = tokenizer.readToken(input, description, true);
+            tokenizer.nextToken(input, description);
             offset = input.getLastOffset();
             length = QIntC::to_size(input.tell() - offset);
-            if (t.getType() == QPDFTokenizer::tt_bad) {
+            if (tokenizer.getType() == QPDFTokenizer::tt_bad) {
                 QTC::TC("qpdf", "QPDFObjectHandle EOF in inline image");
                 warn(
                     context,
@@ -1658,10 +1658,11 @@ QPDFObjectHandle::parseContentStream_data(
                         input.tell(),
                         "EOF found while reading inline image"));
             } else {
-                std::string inline_image = t.getValue();
                 QTC::TC("qpdf", "QPDFObjectHandle inline image token");
                 callbacks->handleObject(
-                    QPDFObjectHandle::newInlineImage(inline_image), QIntC::to_size(offset), length);
+                    QPDFObjectHandle::newInlineImage(tokenizer.getValue()),
+                    QIntC::to_size(offset),
+                    length);
             }
         }
     }
