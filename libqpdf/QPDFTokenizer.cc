@@ -52,8 +52,8 @@ QPDFWordTokenFinder::check()
 {
     // Find a word token matching the given string, preceded by a delimiter, and followed by a
     // delimiter or EOF.
-    QPDFTokenizer tokenizer;
-    QPDFTokenizer::Token t = tokenizer.readToken(is, "finder", true, str.size() + 2);
+    Tokenizer tokenizer;
+    auto t = tokenizer.readToken(is, "finder", true, str.size() + 2);
     qpdf_offset_t pos = is.tell();
     if (!(t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, str))) {
         QTC::TC("qpdf", "QPDFTokenizer finder found wrong word");
@@ -845,7 +845,7 @@ Tokenizer::findEI(InputSource& input)
         }
         inline_image_bytes = QIntC::to_size(input.tell() - pos - 2);
 
-        QPDFTokenizer check;
+        Tokenizer check;
         bool found_bad = false;
         // Look at the next 10 tokens or up to EOF. The next inline image's image data would look
         // like bad tokens, but there will always be at least 10 tokens between one inline image's
@@ -853,8 +853,8 @@ Tokenizer::findEI(InputSource& input)
         // all required as well as a BI and ID. If we get 10 good tokens in a row or hit EOF, we can
         // be pretty sure we've found the actual EI.
         for (int i = 0; i < 10; ++i) {
-            QPDFTokenizer::Token t = check.readToken(input, "checker", true);
-            QPDFTokenizer::token_type_e type = t.getType();
+            auto t = check.readToken(input, "checker", true);
+            auto type = t.getType();
             if (type == tt::tt_eof) {
                 okay = true;
             } else if (type == tt::tt_bad) {

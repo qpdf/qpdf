@@ -1495,19 +1495,23 @@ QPDFObjectHandle
 QPDFObjectHandle::parse(
     QPDF* context, std::string const& object_str, std::string const& object_description)
 {
-    auto input = std::shared_ptr<InputSource>(new BufferInputSource("parsed object", object_str));
-    QPDFTokenizer tokenizer;
+    // BufferInputSource does not modify the input, but Buffer either requires a string& or copies
+    // the string.
+    Buffer buf(const_cast<std::string&>(object_str));
+    auto input = BufferInputSource("parsed object", &buf);
+    qpdf::Tokenizer tokenizer;
     bool empty = false;
-    QPDFObjectHandle result = parse(input, object_description, tokenizer, empty, nullptr, context);
-    size_t offset = QIntC::to_size(input->tell());
+    auto result = QPDFParser(input, object_description, tokenizer, nullptr, context, false)
+                      .parse(empty, false);
+    size_t offset = QIntC::to_size(input.tell());
     while (offset < object_str.length()) {
         if (!isspace(object_str.at(offset))) {
             QTC::TC("qpdf", "QPDFObjectHandle trailing data in parse");
             throw QPDFExc(
                 qpdf_e_damaged_pdf,
-                input->getName(),
+                "parsed object",
                 object_description,
-                input->getLastOffset(),
+                input.getLastOffset(),
                 "trailing data found parsing object from string");
         }
         ++offset;
@@ -1614,45 +1618,44 @@ QPDFObjectHandle::parseContentStream_data(
     QPDF* context)
 {
     size_t stream_length = stream_data->getSize();
-    auto input =
-        std::shared_ptr<InputSource>(new BufferInputSource(description, stream_data.get()));
-    QPDFTokenizer tokenizer;
+    auto input = BufferInputSource(description, stream_data.get());
+    Tokenizer tokenizer;
     tokenizer.allowEOF();
     bool empty = false;
-    while (QIntC::to_size(input->tell()) < stream_length) {
+    while (QIntC::to_size(input.tell()) < stream_length) {
         // Read a token and seek to the beginning. The offset we get from this process is the
         // beginning of the next non-ignorable (space, comment) token. This way, the offset and
         // don't including ignorable content.
         tokenizer.readToken(input, "content", true);
-        qpdf_offset_t offset = input->getLastOffset();
-        input->seek(offset, SEEK_SET);
+        qpdf_offset_t offset = input.getLastOffset();
+        input.seek(offset, SEEK_SET);
         auto obj =
-            QPDFParser(*input, "content", tokenizer, nullptr, context, false).parse(empty, true);
+            QPDFParser(input, "content", tokenizer, nullptr, context, false).parse(empty, true);
         if (!obj) {
             // EOF
             break;
         }
-        size_t length = QIntC::to_size(input->tell() - offset);
+        size_t length = QIntC::to_size(input.tell() - offset);
 
         callbacks->handleObject(obj, QIntC::to_size(offset), length);
         if (obj.isOperator() && (obj.getOperatorValue() == "ID")) {
             // Discard next character; it is the space after ID that terminated the token.  Read
             // until end of inline image.
             char ch;
-            input->read(&ch, 1);
+            input.read(&ch, 1);
             tokenizer.expectInlineImage(input);
             QPDFTokenizer::Token t = tokenizer.readToken(input, description, true);
-            offset = input->getLastOffset();
-            length = QIntC::to_size(input->tell() - offset);
+            offset = input.getLastOffset();
+            length = QIntC::to_size(input.tell() - offset);
             if (t.getType() == QPDFTokenizer::tt_bad) {
                 QTC::TC("qpdf", "QPDFObjectHandle EOF in inline image");
                 warn(
                     context,
                     QPDFExc(
                         qpdf_e_damaged_pdf,
-                        input->getName(),
+                        description,
                         "stream data",
-                        input->tell(),
+                        input.tell(),
                         "EOF found while reading inline image"));
             } else {
                 std::string inline_image = t.getValue();
