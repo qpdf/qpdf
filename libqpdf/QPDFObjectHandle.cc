@@ -1621,6 +1621,7 @@ QPDFObjectHandle::parseContentStream_data(
     auto input = BufferInputSource(description, stream_data.get());
     Tokenizer tokenizer;
     tokenizer.allowEOF();
+    auto sp_description = QPDFParser::make_description(description, "content");
     bool empty = false;
     while (QIntC::to_size(input.tell()) < stream_length) {
         // Read a token and seek to the beginning. The offset we get from this process is the
@@ -1630,7 +1631,7 @@ QPDFObjectHandle::parseContentStream_data(
         qpdf_offset_t offset = input.getLastOffset();
         input.seek(offset, SEEK_SET);
         auto obj =
-            QPDFParser(input, "content", tokenizer, nullptr, context, false).parse(empty, true);
+            QPDFParser(input, sp_description, "content", tokenizer, context).parse(empty, true);
         if (!obj) {
             // EOF
             break;

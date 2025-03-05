@@ -26,9 +26,7 @@ class QPDFParser
         tokenizer(*tokenizer.m),
         decrypter(decrypter),
         context(context),
-        description(
-            std::make_shared<QPDFObject::Description>(
-                std::string(input.getName() + ", " + object_description + " at offset $PO"))),
+        description(make_description(input.getName(), object_description)),
         parse_pdf(parse_pdf)
     {
     }
@@ -45,15 +43,38 @@ class QPDFParser
         tokenizer(tokenizer),
         decrypter(decrypter),
         context(context),
-        description(
-            std::make_shared<QPDFObject::Description>(
-                std::string(input.getName() + ", " + object_description + " at offset $PO"))),
+        description(make_description(input.getName(), object_description)),
         parse_pdf(parse_pdf)
+    {
+    }
+
+    // Used by parseContentStream_data only
+    QPDFParser(
+        InputSource& input,
+        std::shared_ptr<QPDFObject::Description> sp_description,
+        std::string const& object_description,
+        qpdf::Tokenizer& tokenizer,
+        QPDF* context) :
+        input(input),
+        object_description(object_description),
+        tokenizer(tokenizer),
+        decrypter(nullptr),
+        context(context),
+        description(std::move(sp_description)),
+        parse_pdf(false)
     {
     }
     ~QPDFParser() = default;
 
     QPDFObjectHandle parse(bool& empty, bool content_stream);
+
+    static std::shared_ptr<QPDFObject::Description>
+    make_description(std::string const& input_name, std::string const& object_description)
+    {
+        using namespace std::literals;
+        return std::make_shared<QPDFObject::Description>(
+            input_name + ", " + object_description + " at offset $PO");
+    }
 
   private:
     // Parser state.  Note:
