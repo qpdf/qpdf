@@ -1,3 +1,6 @@
+.. _ticket: https://issues.qpdf.org
+.. _shared null: https://wiki.qpdf.org/PDF-null-objects-vs-qpdf-null-objects
+
 .. _release-notes:
 
 Release Notes
@@ -41,12 +44,41 @@ more detail.
     - ``QIntC.hh`` contained the typo ``substract`` in function names,
       which has been fixed to ``subtract``.
 
+    - The protected ``QPDFObjectHelper::oh`` data member has been replaced with
+      the new accessor method ``QPDFObjectHelper::oh()``.
+
+    - Except for abstract classes and the exceptions listed below, sub-classing of
+      qpdf classes is not supported. These classes were never designed to be used as a
+      base class and will be made final in version 13. If you have a use case for
+      extending one of these classes, please open a ticket_.
+
+      Exceptions:
+
+      - ``QPDFDocumentHelper``
+      - ``QPDFObjectHelper``
+
+    - Upcasting to ``QPDFObjectHelper`` and ``QPDFDocumentHelper`` is not supported. Their
+      destructors will be made protected in version 13.
+
+    - Catching of logic errors thrown as the result of using an uninitialized
+      ``QPDFObjectHandle`` is not supported. In version 13 uninitialized object handles
+      will be treated as immutable `shared null`_ objects. Using them will no longer throw
+      any logic errors, but may where appropriate generate type warnings or exceptions.
+
 .. _r12-0-0-deprecate:
 
     - The following are believed to be not in use and have been deprecated.
-      If you are relying on them please open a `ticket <https://issues.qpdf.org>`__:
+      If you are relying on them please open a ticket_.
 
       - All ``QPDFTokenizer`` push-mode methods.
+
+  - CLI breaking Changes
+
+    - To support the future introduction of sub-commands, the use of filenames without
+      extension and path element as the first argument is no longer supported, and the
+      result may change in the future. For example, ``qpdf check out.pdf`` currently
+      copies the file ``check`` to ``out.pdf`` but may in future check ``out.pdf``.
+      Use ``qpdf ./check out.pdf`` or ``qpdf -- check out.pdf`` instead.
 
   - Library Enhancements
 
@@ -59,6 +91,12 @@ more detail.
 
     - Most ``QPDFObjectHandle`` accessor methods are now const qualified.
 
+    - ``QPDFObjectHandle`` and all object helper classes are now explicitly convertible
+      to ``QPDFObjGen``, and therefore can be passed as parameter where a ``QPDFObjGen``
+      is required. Redundant overloaded methods have been removed.
+
+    - All object helper classes are now explicitly convertible to ``QPDFObjectHandle``.
+
   - Build Changes
 
     - If ``POINTERHOLDER_TRANSITION`` is not defined, define it to
@@ -70,12 +108,26 @@ more detail.
       ``PointerHolder`` will have to explicitly include it rather than
       relying on other headers to bring it along.
 
+  - Other Changes
+
+    - The internal implementation of objects has been extensively refactored, using
+      std::variant to eliminate one level of indirection. This has saved one shared pointer
+      per object with some improvement both in runtime and memory usage. A new class
+      ``BaseHandle`` has been added as common base class of both ``QPDFObjectHandle``
+      and ``QPDFObjectHelper`` to provide common functionality appropriate for all
+      object-handle-like classes including e.g. the operator to convert to ``QPDFObjGen``.
+      ``BaseHandle`` is an implementation detail and not directly usable by library users.
+
+    - There has also been significant refactoring of how qpdf internally iterates over
+      arrays and dictionaries.
+
+
 11.10.1: February 15, 2025
   - Build fixes
 
-    - Fix incorrect detection of zopfli
+    - Fix incorrect detection of zopfli.
 
-    - Recognize cygwin perl as Windows when running test suite
+    - Recognize cygwin perl as Windows when running test suite.
 
 11.10.0: February 8, 2025
   - Bug fixes

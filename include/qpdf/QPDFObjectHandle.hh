@@ -63,7 +63,7 @@ class Pl_QPDFTokenizer;
 class QPDFMatrix;
 class QPDFParser;
 
-class QPDFObjectHandle final: public qpdf::BaseHandle
+class QPDFObjectHandle: public qpdf::BaseHandle
 {
     friend class QPDFParser;
 
