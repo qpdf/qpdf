@@ -15,7 +15,7 @@ class QPDF::Writer
         QPDFWriter::ObjTable const& obj,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
     {
-        return qpdf.optimize(obj, skip_stream_parameters);
+        qpdf.optimize(obj, skip_stream_parameters);
     }
 
     static void
@@ -41,7 +41,7 @@ class QPDF::Writer
         int& O,
         bool compressed)
     {
-        return qpdf.generateHintStream(new_obj, obj, hint_stream, S, O, compressed);
+        qpdf.generateHintStream(new_obj, obj, hint_stream, S, O, compressed);
     }
 
     static std::vector<QPDFObjGen>
@@ -152,24 +152,20 @@ class QPDF::Pipe
 class QPDF::ObjCache
 {
   public:
-    ObjCache() :
-        end_before_space(0),
-        end_after_space(0)
-    {
-    }
+    ObjCache() = default;
     ObjCache(
         std::shared_ptr<QPDFObject> object,
         qpdf_offset_t end_before_space = 0,
         qpdf_offset_t end_after_space = 0) :
-        object(object),
+        object(std::move(object)),
         end_before_space(end_before_space),
         end_after_space(end_after_space)
     {
     }
 
     std::shared_ptr<QPDFObject> object;
-    qpdf_offset_t end_before_space;
-    qpdf_offset_t end_after_space;
+    qpdf_offset_t end_before_space{0};
+    qpdf_offset_t end_after_space{0};
 };
 
 class QPDF::ObjCopier
@@ -185,25 +181,25 @@ class QPDF::EncryptionParameters
     friend class QPDF;
 
   public:
-    EncryptionParameters();
+    EncryptionParameters() = default;
 
   private:
-    bool encrypted;
-    bool encryption_initialized;
-    int encryption_V;
-    int encryption_R;
-    bool encrypt_metadata;
+    bool encrypted{false};
+    bool encryption_initialized{false};
+    int encryption_V{0};
+    int encryption_R{0};
+    bool encrypt_metadata{true};
     std::map<std::string, encryption_method_e> crypt_filters;
-    encryption_method_e cf_stream;
-    encryption_method_e cf_string;
-    encryption_method_e cf_file;
+    encryption_method_e cf_stream{e_none};
+    encryption_method_e cf_string{e_none};
+    encryption_method_e cf_file{e_none};
     std::string provided_password;
     std::string user_password;
     std::string encryption_key;
     std::string cached_object_encryption_key;
-    QPDFObjGen cached_key_og;
-    bool user_password_matched;
-    bool owner_password_matched;
+    QPDFObjGen cached_key_og{};
+    bool user_password_matched{false};
+    bool owner_password_matched{false};
 };
 
 class QPDF::ForeignStreamData
@@ -244,14 +240,18 @@ class QPDF::CopiedStreamDataProvider: public QPDFObjectHandle::StreamDataProvide
     std::map<QPDFObjGen, std::shared_ptr<ForeignStreamData>> foreign_stream_data;
 };
 
-class QPDF::StringDecrypter: public QPDFObjectHandle::StringDecrypter
+class QPDF::StringDecrypter final: public QPDFObjectHandle::StringDecrypter
 {
     friend class QPDF;
 
   public:
     StringDecrypter(QPDF* qpdf, QPDFObjGen og);
-    ~StringDecrypter() override = default;
-    void decryptString(std::string& val) override;
+    ~StringDecrypter() final = default;
+    void
+    decryptString(std::string& val) final
+    {
+        qpdf->decryptString(val, og);
+    }
 
   private:
     QPDF* qpdf;
@@ -392,8 +392,7 @@ class QPDF::ObjUser
   public:
     enum user_e { ou_bad, ou_page, ou_thumb, ou_trailer_key, ou_root_key, ou_root };
 
-    // type is set to ou_bad
-    ObjUser();
+    ObjUser() = default;
 
     // type must be ou_root
     ObjUser(user_e type);
@@ -406,8 +405,8 @@ class QPDF::ObjUser
 
     bool operator<(ObjUser const&) const;
 
-    user_e ou_type;
-    int pageno;      // if ou_page;
+    user_e ou_type{ou_bad};
+    int pageno{0};   // if ou_page;
     std::string key; // if ou_trailer_key or ou_root_key
 };
 
@@ -420,7 +419,7 @@ struct QPDF::UpdateObjectMapsFrame
     bool top;
 };
 
-class QPDF::PatternFinder: public InputSource::Finder
+class QPDF::PatternFinder final: public InputSource::Finder
 {
   public:
     PatternFinder(QPDF& qpdf, bool (QPDF::*checker)()) :
@@ -428,9 +427,9 @@ class QPDF::PatternFinder: public InputSource::Finder
         checker(checker)
     {
     }
-    ~PatternFinder() override = default;
+    ~PatternFinder() final = default;
     bool
-    check() override
+    check() final
     {
         return (this->qpdf.*checker)();
     }

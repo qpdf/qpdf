@@ -9,15 +9,8 @@
 #include <qpdf/QPDFWriter_private.hh>
 #include <qpdf/QTC.hh>
 
-QPDF::ObjUser::ObjUser() :
-    ou_type(ou_bad),
-    pageno(0)
-{
-}
-
 QPDF::ObjUser::ObjUser(user_e type) :
-    ou_type(type),
-    pageno(0)
+    ou_type(type)
 {
     qpdf_assert_debug(type == ou_root);
 }
@@ -31,7 +24,6 @@ QPDF::ObjUser::ObjUser(user_e type, int pageno) :
 
 QPDF::ObjUser::ObjUser(user_e type, std::string const& key) :
     ou_type(type),
-    pageno(0),
     key(key)
 {
     qpdf_assert_debug((type == ou_trailer_key) || (type == ou_root_key));
