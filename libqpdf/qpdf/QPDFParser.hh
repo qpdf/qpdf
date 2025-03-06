@@ -12,6 +12,8 @@ class QPDFParser
 {
   public:
     QPDFParser() = delete;
+
+    // This constructor is only used by QPDFObjectHandle::parse overload taking a QPDFTokenizer.
     QPDFParser(
         InputSource& input,
         std::string const& object_description,
@@ -24,15 +26,55 @@ class QPDFParser
         tokenizer(*tokenizer.m),
         decrypter(decrypter),
         context(context),
-        description(
-            std::make_shared<QPDFObject::Description>(
-                std::string(input.getName() + ", " + object_description + " at offset $PO"))),
+        description(make_description(input.getName(), object_description)),
         parse_pdf(parse_pdf)
     {
     }
-    virtual ~QPDFParser() = default;
+
+    QPDFParser(
+        InputSource& input,
+        std::string const& object_description,
+        qpdf::Tokenizer& tokenizer,
+        QPDFObjectHandle::StringDecrypter* decrypter,
+        QPDF* context,
+        bool parse_pdf) :
+        input(input),
+        object_description(object_description),
+        tokenizer(tokenizer),
+        decrypter(decrypter),
+        context(context),
+        description(make_description(input.getName(), object_description)),
+        parse_pdf(parse_pdf)
+    {
+    }
+
+    // Used by parseContentStream_data only
+    QPDFParser(
+        InputSource& input,
+        std::shared_ptr<QPDFObject::Description> sp_description,
+        std::string const& object_description,
+        qpdf::Tokenizer& tokenizer,
+        QPDF* context) :
+        input(input),
+        object_description(object_description),
+        tokenizer(tokenizer),
+        decrypter(nullptr),
+        context(context),
+        description(std::move(sp_description)),
+        parse_pdf(false)
+    {
+    }
+    ~QPDFParser() = default;
 
     QPDFObjectHandle parse(bool& empty, bool content_stream);
+
+    static std::shared_ptr<QPDFObject::Description>
+    make_description(std::string const& input_name, std::string const& object_description)
+    {
+        using namespace std::literals;
+        return std::make_shared<QPDFObject::Description>(
+            input_name + ", " + object_description + " at offset $PO");
+    }
 
   private:
     // Parser state.  Note:
@@ -83,7 +125,7 @@ class QPDFParser
     bool parse_pdf;
 
     std::vector<StackFrame> stack;
-    StackFrame* frame;
+    StackFrame* frame{nullptr};
     // Number of recent bad tokens. This will always be > 0 once a bad token has been encountered as
     // it only gets incremented or reset when a bad token is encountered.
     int bad_count{0};
@@ -92,9 +134,9 @@ class QPDFParser
     // Number of good tokens since last bad token. Irrelevant if bad_count == 0.
     int good_count{0};
     // Start offset including any leading whitespace.
-    qpdf_offset_t start;
+    qpdf_offset_t start{0};
     // Number of successive integer tokens.
-    int int_count = 0;
+    int int_count{0};
     long long int_buffer[2]{0, 0};
     qpdf_offset_t last_offset_buffer[2]{0, 0};
 };

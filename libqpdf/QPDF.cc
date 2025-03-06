@@ -1,6 +1,6 @@
 #include <qpdf/qpdf-config.h> // include first for large file support
 
-#include <qpdf/QPDF.hh>
+#include <qpdf/QPDF_private.hh>
 
 #include <array>
 #include <atomic>
@@ -168,31 +168,11 @@ QPDF::StringDecrypter::StringDecrypter(QPDF* qpdf, QPDFObjGen og) :
 {
 }
 
-void
-QPDF::StringDecrypter::decryptString(std::string& val)
-{
-    qpdf->decryptString(val, og);
-}
-
 std::string const&
 QPDF::QPDFVersion()
 {
     // The C API relies on this being a static value.
     return QPDF::qpdf_version;
-}
-
-QPDF::EncryptionParameters::EncryptionParameters() :
-    encrypted(false),
-    encryption_initialized(false),
-    encryption_V(0),
-    encryption_R(0),
-    encrypt_metadata(true),
-    cf_stream(e_none),
-    cf_string(e_none),
-    cf_file(e_none),
-    user_password_matched(false),
-    owner_password_matched(false)
-{
 }
 
 QPDF::Members::Members() :

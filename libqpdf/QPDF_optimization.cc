@@ -2,22 +2,15 @@
 
 #include <qpdf/assert_debug.h>
 
-#include <qpdf/QPDF.hh>
+#include <qpdf/QPDF_private.hh>
 
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFWriter_private.hh>
 #include <qpdf/QTC.hh>
 
-QPDF::ObjUser::ObjUser() :
-    ou_type(ou_bad),
-    pageno(0)
-{
-}
-
 QPDF::ObjUser::ObjUser(user_e type) :
-    ou_type(type),
-    pageno(0)
+    ou_type(type)
 {
     qpdf_assert_debug(type == ou_root);
 }
@@ -31,7 +24,6 @@ QPDF::ObjUser::ObjUser(user_e type, int pageno) :
 
 QPDF::ObjUser::ObjUser(user_e type, std::string const& key) :
     ou_type(type),
-    pageno(0),
     key(key)
 {
     qpdf_assert_debug((type == ou_trailer_key) || (type == ou_root_key));
@@ -40,16 +32,17 @@ QPDF::ObjUser::ObjUser(user_e type, std::string const& key) :
 bool
 QPDF::ObjUser::operator<(ObjUser const& rhs) const
 {
-    if (this->ou_type < rhs.ou_type) {
+    if (ou_type < rhs.ou_type) {
         return true;
-    } else if (this->ou_type == rhs.ou_type) {
-        if (this->pageno < rhs.pageno) {
+    }
+    if (ou_type == rhs.ou_type) {
+        if (pageno < rhs.pageno) {
             return true;
-        } else if (this->pageno == rhs.pageno) {
-            return (this->key < rhs.key);
+        }
+        if (pageno == rhs.pageno) {
+            return key < rhs.key;
         }
     }
-
     return false;
 }
 

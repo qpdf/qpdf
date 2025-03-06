@@ -7,8 +7,8 @@
 #include <qpdf/Constants.h>
 #include <qpdf/JSON.hh>
 #include <qpdf/JSON_writer.hh>
-#include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjGen.hh>
+#include <qpdf/QPDF_private.hh>
 #include <qpdf/Types.h>
 
 #include <map>
