@@ -14,6 +14,7 @@ class QPDFParser
     QPDFParser() = delete;
 
     // This constructor is only used by QPDFObjectHandle::parse overload taking a QPDFTokenizer.
+    // ABI: remove when removing QPDFObjectHandle::parse overload.
     QPDFParser(
         InputSource& input,
         std::string const& object_description,

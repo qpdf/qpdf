@@ -71,6 +71,7 @@ more detail.
       If you are relying on them please open a ticket_.
 
       - All ``QPDFTokenizer`` push-mode methods.
+      - ``QPDFObjectHandle::parse`` overload taking a ``QPDFTokenizer`` parameter.
 
   - CLI breaking Changes
 
