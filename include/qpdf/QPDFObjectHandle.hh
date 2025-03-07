@@ -288,7 +288,9 @@ class QPDFObjectHandle: public qpdf::BaseHandle
     QPDFObjectHandle(QPDFObjectHandle&&) = default;
     QPDFObjectHandle& operator=(QPDFObjectHandle&&) = default;
 
-    [[deprecated("use operator bool()")]] inline bool isInitialized() const;
+    // This method is provided for backward compatibility only. New code should convert to bool
+    // instead.
+    inline bool isInitialized() const;
 
     // This method returns true if the QPDFObjectHandle objects point to exactly the same underlying
     // object, meaning that changes to one are reflected in the other, or "if you paint one, the
@@ -390,10 +392,10 @@ class QPDFObjectHandle: public qpdf::BaseHandle
 
     // Construct an object as above by reading from the given InputSource at its current position
     // and using the tokenizer you supply.  Indirect objects and encrypted strings are permitted.
-    // This method was intended to be called by QPDF for parsing objects that are ready from the
-    // object's input stream.
-    QPDF_DLL
-    static QPDFObjectHandle parse(
+    // This method was intended to be called by QPDF for parsing objects that are read from the
+    // object's input stream. To be removed in qpdf 13. See
+    // <https:manual.qpdf.org/release-notes.html#r12-0-0-deprecate>.
+    [[deprecated("to be removed in qpdf 13")]] QPDF_DLL static QPDFObjectHandle parse(
         std::shared_ptr<InputSource> input,
         std::string const& object_description,
         QPDFTokenizer&,

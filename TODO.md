@@ -463,10 +463,10 @@ so, I find it useful to make reference to them in this list.
   which includes machine-readable dump of table D.2 in the ISO-32000 PDF spec. This shows the
   mapping between Unicode, StandardEncoding, WinAnsiEncoding, MacRomanEncoding, and PDFDocEncoding.
 
-* Some test cases on bad files fail because qpdf is unable to find the root dictionary when it fails
-  to read the trailer. Recovery could find the root dictionary and even the info dictionary in other
-  ways. In particular, issue-202.pdf can be opened by evince, and there's no real reason that qpdf
-  couldn't be made to be able to recover that file as well.
+* Some test cases on bad files failed because qpdf was unable to find the root dictionary when it
+  failed to read the trailer. Ths was fixed in https://github.com/qpdf/qpdf/pull/1343 . A similar
+  issue with a similar solution exists for failure to find the pages tree
+  (see https://github.com/qpdf/qpdf/issues/1362).
 
 * Audit every place where qpdf allocates memory to see whether there are cases where malicious
   inputs could cause qpdf to attempt to grab very large amounts of memory. Certainly there are cases
@@ -499,10 +499,10 @@ so, I find it useful to make reference to them in this list.
   ../misc/digital-signatures/digitally-signed-pdf-xfa.pdf. If digital signatures are implemented,
   update the docs on crypto providers, which mention that this may happen in the future.
 
-* Qpdf does not honor /EFF when adding new file attachments. When it encrypts, it never generates
+* qpdf does not honor /EFF when adding new file attachments. When it encrypts, it never generates
   streams with explicit crypt filters. Prior to 10.2, there was an incorrect attempt to treat /EFF
   as a default value for decrypting file attachment streams, but it is not supposed to mean that.
-  Instead, it is intended for conforming writers to obey this when adding new attachments. Qpdf is
+  Instead, it is intended for conforming writers to obey this when adding new attachments. qpdf is
   not a conforming writer in that respect.
 
 * The whole xref handling code in the QPDF object allows the same object with more than one
@@ -533,6 +533,10 @@ so, I find it useful to make reference to them in this list.
 * Look at places in the code where object traversal is being done and, where possible, try to avoid
   it entirely or at least avoid ever traversing the same objects multiple times.
 
+* The CLI warants a thorough review, including the introduction of proper sub-commands. Add warnings
+  for file names without extension or path element as first parameter
+  (see https://github.com/qpdf/qpdf/pull/1381).
+
 ----------------------------------------------------------------------
 
 ### HISTORICAL NOTES
@@ -548,7 +552,7 @@ As described in https://github.com/qpdf/qpdf/issues/401, there was great perform
 between qpdf 7.1.1 and 9.1.1. Doing a bisect between dac65a21fb4fa5f871e31c314280b75adde89a6c and
 release-qpdf-7.1.1, I found several commits that damaged performance. I fixed some of them to
 improve performance by about 70% (as measured by saying that old times were 170% of new times). The
-remaining commits that broke performance either can't be correct because they would re-introduce an
+remaining commits that broke performance either can't be corrected because they would re-introduce an
 old bug or aren't worth correcting because of the high value they offer relative to a relatively low
 penalty. For historical reference, here are the commits. The numbers are the time in seconds on the
 machine I happened to be using of splitting the first 100 pages of PDF32000_2008.pdf 20 times and
