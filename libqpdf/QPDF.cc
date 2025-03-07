@@ -25,6 +25,7 @@
 #include <qpdf/Util.hh>
 
 using namespace qpdf;
+using namespace std::literals;
 
 // This must be a fixed value. This API returns a const reference to it, and the C API relies on its
 // being static as well.
@@ -1967,6 +1968,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             (m->file->getName() + " object stream " + std::to_string(obj_stream_number)),
             bp.get()));
 
+    long long last_offset = -1;
     for (int i = 0; i < n; ++i) {
         QPDFTokenizer::Token tnum = readToken(*input);
         QPDFTokenizer::Token toffset = readToken(*input);
@@ -1980,9 +1982,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 
         int num = QUtil::string_to_int(tnum.getValue().c_str());
         long long offset = QUtil::string_to_int(toffset.getValue().c_str());
-        if (num > m->xref_table_max_id) {
-            continue;
-        }
+
         if (num == obj_stream_number) {
             QTC::TC("qpdf", "QPDF ignore self-referential object stream");
             warn(damagedPDF(
@@ -1992,6 +1992,33 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
                 "object stream claims to contain itself"));
             continue;
         }
+
+        if (num < 1) {
+            QTC::TC("qpdf", "QPDF object stream contains id < 1");
+            warn(damagedPDF(
+                *input,
+                "object "s + std::to_string(num) + " 0, offset " + std::to_string(offset),
+                0,
+                "object id is invalid"s));
+            continue;
+        }
+
+        if (offset <= last_offset) {
+            QTC::TC("qpdf", "QPDF object stream offsets not increasing");
+            warn(damagedPDF(
+                *input,
+                "object "s + std::to_string(num) + " 0, offset " + std::to_string(offset),
+                0,
+                "offset is invalid (must be larger than previous offset " +
+                    std::to_string(last_offset) + ")"));
+            continue;
+        }
+        last_offset = offset;
+
+        if (num > m->xref_table_max_id) {
+            continue;
+        }
+
         offsets[num] = toI(offset + first);
     }
 

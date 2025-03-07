@@ -62,6 +62,9 @@ class QPDFXRefEntry
   private:
     // This class does not use the Members pattern to avoid a memory allocation for every one of
     // these. A lot of these get created.
+
+    // The layout can be changed to reduce the size from 24 to 16 bytes. However, this would have a
+    // definite runtime cost.
     int type{0};
     qpdf_offset_t field1{0};
     int field2{0};
