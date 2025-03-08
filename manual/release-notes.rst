@@ -81,6 +81,12 @@ more detail.
       copies the file ``check`` to ``out.pdf`` but may in future check ``out.pdf``.
       Use ``qpdf ./check out.pdf`` or ``qpdf -- check out.pdf`` instead.
 
+
+  - Bug fixes
+
+    - In object streams ignore objects with invalid offset. Report objects with invalid
+      id or offset.
+
   - Library Enhancements
 
     - ``QPDFObjectHandle`` supports move construction/assignment.
