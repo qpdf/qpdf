@@ -23,6 +23,8 @@
 #ifndef QPDFOBJECTHANDLE_HH
 #define QPDFOBJECTHANDLE_HH
 
+#include <qpdf/ObjectHandle.hh>
+
 #include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
@@ -37,7 +39,6 @@
 #include <qpdf/Buffer.hh>
 #include <qpdf/InputSource.hh>
 #include <qpdf/JSON.hh>
-#include <qpdf/ObjectHandle.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFTokenizer.hh>
 

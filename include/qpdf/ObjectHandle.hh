@@ -22,6 +22,7 @@
 
 #include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
+#include <qpdf/JSON.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/Types.h>
 
