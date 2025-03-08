@@ -374,6 +374,18 @@ namespace qpdf
     }
 
     inline qpdf_object_type_e
+    BaseHandle::resolved_type_code() const
+    {
+        if (!obj) {
+            return ::ot_uninitialized;
+        }
+        if (raw_type_code() == ::ot_unresolved) {
+            return QPDF::Resolver::resolved(obj->qpdf, obj->og)->getTypeCode();
+        }
+        return raw_type_code();
+    }
+
+    inline qpdf_object_type_e
     BaseHandle::type_code() const
     {
         if (!obj) {
