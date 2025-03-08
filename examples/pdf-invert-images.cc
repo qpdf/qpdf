@@ -48,7 +48,7 @@ ImageInverter::registerImage(
     // class from ever being deleted since the reference count will never drop to zero (and
     // std::shared_ptr doesn't have weak references).
 
-    QPDFObjGen og(image.getObjGen());
+    QPDFObjGen og(image);
     // Store information about the images based on the object and generation number. Recall that a
     // single image object may be used more than once, so no need to update the same stream multiple
     // times.

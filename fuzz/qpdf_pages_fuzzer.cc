@@ -84,13 +84,13 @@ FuzzHelper::testPages()
             pldh.getLabelForPage(pageno);
             QPDFObjectHandle page_obj(page.getObjectHandle());
             page_obj.getJSON(JSON::LATEST, true).unparse();
-            odh.getOutlinesForPage(page_obj.getObjGen());
+            odh.getOutlinesForPage(page_obj);
 
             for (auto& aoh: afdh.getWidgetAnnotationsForPage(page)) {
                 afdh.getFieldForAnnotation(aoh);
             }
         } catch (QPDFExc& e) {
-            std::cerr << "page " << pageno << ": " << e.what() << std::endl;
+            std::cerr << "page " << pageno << ": " << e.what() << '\n';
         }
     }
 }

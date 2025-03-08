@@ -50,7 +50,7 @@ generate_page_map(QPDF& qpdf)
     QPDFPageDocumentHelper dh(qpdf);
     int n = 0;
     for (auto const& page: dh.getAllPages()) {
-        page_map[page.getObjectHandle().getObjGen()] = ++n;
+        page_map[page] = ++n;
     }
 }
 
@@ -104,15 +104,14 @@ show_bookmark_details(QPDFOutlineObjectHelper outline, std::vector<int> numbers)
         QPDFObjectHandle dest_page = outline.getDestPage();
         if (!dest_page.isNull()) {
             QTC::TC("examples", "pdf-bookmarks dest");
-            QPDFObjGen og = dest_page.getObjGen();
-            if (page_map.count(og)) {
-                target = std::to_string(page_map[og]);
+            if (page_map.count(dest_page)) {
+                target = std::to_string(page_map[dest_page]);
             }
         }
         std::cout << "[ -> " << target << " ] ";
     }
 
-    std::cout << outline.getTitle() << std::endl;
+    std::cout << outline.getTitle() << '\n';
 }
 
 void
