@@ -15,6 +15,8 @@ more detail.
 
 .. _r12-0-0:
 
+.. cSpell:ignore substract
+
 12.0.0: not yet released
   - API: breaking changes
 

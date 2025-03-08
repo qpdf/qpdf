@@ -533,7 +533,7 @@ so, I find it useful to make reference to them in this list.
 * Look at places in the code where object traversal is being done and, where possible, try to avoid
   it entirely or at least avoid ever traversing the same objects multiple times.
 
-* The CLI warants a thorough review, including the introduction of proper sub-commands. Add warnings
+* The CLI warrants a thorough review, including the introduction of proper sub-commands. Add warnings
   for file names without extension or path element as first parameter
   (see https://github.com/qpdf/qpdf/pull/1381).
 
