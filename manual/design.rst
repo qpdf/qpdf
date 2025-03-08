@@ -340,7 +340,7 @@ qpdf Object Internals
 ---------------------
 
 The internals of ``QPDFObjectHandle`` and how qpdf stores objects were
-significantly rewritten for qpdf 11. Here are some additional details.
+significantly rewritten for qpdf 11 and 12. Here are some additional details.
 
 Object Internals
 ~~~~~~~~~~~~~~~~
@@ -355,6 +355,9 @@ any changes are reflected.
 
 Objects in qpdf 11 and Newer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+qpdf 11
+.......
 
 The object cache in ``QPDF`` contains a shared pointer to
 ``QPDFObject``. Any ``QPDFObjectHandle`` resolved from an indirect
@@ -390,6 +393,15 @@ operation also has the effect of breaking any circular references
 (which are common and, in some cases, required by the PDF
 specification), thus preventing memory leaks when ``QPDF`` objects are
 destroyed.
+
+qpdf 12
+.......
+
+In qpdf 12, the shared pointer to a ``QPDFValue`` contained in each
+``QPDFObject`` was replaced with a ``std::variant``. The base class
+``QPDFValue`` was merged into ``QPDFObject``, and its sub-classes
+became independent classes.
+
 
 Objects prior to qpdf 11
 ~~~~~~~~~~~~~~~~~~~~~~~~
