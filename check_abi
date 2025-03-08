@@ -4,9 +4,10 @@ import sys
 import argparse
 import subprocess
 import re
+import xml.etree.ElementTree as ET
+from operator import itemgetter
 
 whoami = os.path.basename(sys.argv[0])
-whereami = os.path.dirname(os.path.realpath(__file__))
 
 
 def warn(*args, **kwargs):
@@ -18,8 +19,8 @@ class Main:
         options = self.parse_args(args, prog)
         if options.action == 'dump':
             self.dump(options)
-        elif options.action == 'check-sizes':
-            self.check_sizes(options)
+        elif options.action == 'get-sizes':
+            self.get_sizes(options)
         elif options.action == 'compare':
             self.compare(options)
         else:
@@ -43,10 +44,12 @@ class Main:
             help='dump qpdf symbols in a library')
         p_dump.add_argument(lib_arg[0], **lib_arg[1])
 
-        p_check_sizes = subparsers.add_parser(
-            'check-sizes',
-            help='check consistency between library and sizes.cc')
-        p_check_sizes.add_argument(lib_arg[0], **lib_arg[1])
+        p_get_sizes = subparsers.add_parser(
+            'get-sizes',
+            help='dump sizes of all public classes')
+        p_get_sizes.add_argument('--include',
+                                 help='include path',
+                                 required=True)
 
         p_compare = subparsers.add_parser(
             'compare',
@@ -103,60 +106,73 @@ class Main:
         for i in sorted(self.get_symbols(options.lib)):
             print(i)
 
-    def check_sizes(self, options):
-        # Make sure that every class with methods in the public API
-        # appears in sizes.cc either explicitly ignored or in a
-        # print_size call. This enables us to reliably test whether
-        # any object changed size by following the ABI checking
-        # procedures outlined in README-maintainer.
+    @staticmethod
+    def get_header_sizes(include, filename):
+        print(f'{filename}...', file=sys.stderr)
+        p = subprocess.run([
+            'castxml', '--castxml-output=1', f'-I{include}',
+            f'{include}/{filename}', '-o', '-',
+        ], stdout=subprocess.PIPE, check=True)
+        tree = ET.fromstring(p.stdout)
+        this_file = tree.find(f'.//File[@name="{include}/{filename}"]')
+        if this_file is None:
+            # This file doesn't define anything, e.g., DLL.h
+            return []
+        this_file_id = this_file.attrib["id"]
+        wanted = [
+            'Namespace',
+            'Struct', 'Union', 'Class',  # records
+        ]
 
-        # To keep things up to date, whenever we add or remove
-        # objects, we have to update sizes.cc. The check-sizes option
-        # can be run at any time on an up-to-date build.
+        by_id = {}
+        for elem in tree:
+            # Reference
+            # https://github.com/CastXML/CastXML/blob/master/doc/manual/castxml.xsd
+            if elem.tag not in wanted:
+                continue
+            is_record = elem.tag != 'Namespace'
+            record = {
+                'is_record': is_record,
+                'in_file': (elem.get('file') == this_file_id and
+                            elem.get('incomplete') is None),
+                'name': elem.get('name'),
+                'access':  elem.get('access'),
+                'context': elem.get('context'),
+                'size': elem.get('size'),
+            }
+            by_id[elem.attrib['id']] = record
+        classes = []
+        for id_, record in by_id.items():
+            cur = record
+            if not cur['in_file']:
+                continue
+            name = ''
+            private = False
+            while cur is not None:
+                if cur.get('access') == 'private':
+                    private = True
+                parent = cur.get('context')
+                name = f'{cur["name"]}{name}'
+                if parent is None or parent == '_1':
+                    break
+                name = f'::{name}'
+                cur = by_id.get(cur.get('context'))
+            if not private:
+                classes.append([name, record['size']])
+        return classes
 
-        lib = self.get_symbols(options.lib)
-        classes = set()
-        for i in sorted(lib):
-            # Find a symbol that looks like a class method.
-            m = re.match(
-                r'(((?:^\S*?::)?(?:[^:\s]+))::([^:\s]+))(?:\[[^\]]+\])?\(',
-                i)
-            if m:
-                full = m.group(1)
-                clas = m.group(2)
-                method = m.group(3)
-                if full.startswith('std::') or method.startswith('~'):
-                    # Sometimes std:: template instantiations make it
-                    # into the library. Ignore those. Also ignore
-                    # classes whose only exported method is a
-                    # destructor.
-                    continue
-                # Otherwise, if the class exports a method, we
-                # potentially care about changes to its size, so add
-                # it.
-                classes.add(clas)
-        in_sizes = set()
-        # Read the sizes.cc to make sure everything's there.
-        with open(os.path.join(whereami, 'qpdf/sizes.cc'), 'r') as f:
-            for line in f.readlines():
-                m = re.search(r'^\s*(?:ignore_class|print_size)\((.*?)\)',
-                              line)
-                if m:
-                    in_sizes.add(m.group(1))
-        sizes_only = in_sizes - classes
-        classes_only = classes - in_sizes
-        if sizes_only or classes_only:
-            if sizes_only:
-                print("classes in sizes.cc but not in the library:")
-                for i in sorted(sizes_only):
-                    print(' ', i)
-            if classes_only:
-                print("classes in the library but not in sizes.cc:")
-                for i in sorted(classes_only):
-                    print(' ', i)
-            exit(f'{whoami}: mismatch between library and sizes.cc')
-        else:
-            print(f'{whoami}: sizes.cc is consistent with the library')
+    def get_sizes(self, options):
+        classes = []
+        for f in os.listdir(f'{options.include}/qpdf'):
+            if f.startswith('auto_') or f == 'QPDFObject.hh':
+                continue
+            if f.endswith('.h') or f.endswith('.hh'):
+                classes.extend(self.get_header_sizes(
+                    options.include, f"qpdf/{f}"))
+
+        classes.sort(key=itemgetter(0))
+        for c, s in classes:
+            print(c, s)
 
     def read_sizes(self, filename):
         sizes = {}
@@ -216,6 +232,12 @@ class Main:
 
 
 if __name__ == '__main__':
+    try:
+        subprocess.run(['castxml', '--version'],
+                       stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL)
+    except Exception:
+        exit('f{whoami}: castxml must be installed')
     try:
         Main().main()
     except KeyboardInterrupt:

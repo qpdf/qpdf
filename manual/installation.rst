@@ -80,6 +80,13 @@ made because developers have to set the environment variable
 themselves now rather than setting it through the build. Either way,
 they are off by default.
 
+Maintainer Dependencies
+~~~~~~~~~~~~~~~~~~~~~~~
+
+- To run ABI checks as a maintainer, you need `castxml
+  <https://github.com/CastXML/CastXML>`__, which is used by
+  ``check_abi`` to generate sizes of all public classes.
+
 Additional Requirements on Windows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -301,14 +308,6 @@ ZOPFLI
 Options for Working on qpdf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-CHECK_SIZES
-  The source file :file:`qpdf/sizes.cc` is used to display the sizes
-  of all objects in the public API. Consistency of its output between
-  releases is used as part of the check against accidental breakage of
-  the binary interface (ABI). Turning this on causes a test to be run
-  that ensures an exact match between classes in ``sizes.cc`` and
-  classes in the library's public API. This option requires Python 3.
-
 ENABLE_COVERAGE
   Compile with ``--coverage``. See README-maintainer.md for
   information about generating coverage reports.
@@ -360,8 +359,6 @@ MAINTAINER_MODE
   maintaining qpdf. In turns on the following:
 
   - ``BUILD_DOC``
-
-  - ``CHECK_SIZES``
 
   - ``ENABLE_QTC``
 

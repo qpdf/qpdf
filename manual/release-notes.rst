@@ -132,6 +132,10 @@ more detail.
     - There has also been significant refactoring of how qpdf internally iterates over
       arrays and dictionaries.
 
+    - The internal mechanism used to check object sizes for binary
+      compatibility between releases has been changed. As such, the
+      ``CHECK_SIZES`` maintainer-only build option has been removed.
+
 
 11.10.1: February 15, 2025
   - Build fixes

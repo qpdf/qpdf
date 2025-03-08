@@ -862,6 +862,8 @@ RelWithDebInfo when using external-libs.
 
 ## ABI checks
 
+Note: the check_abi program requires [castxml](https://github.com/CastXML/CastXML) to be installed.
+
 Until the conversion of the build to cmake, we relied on running the
 test suite with old executables and a new library. When QPDFJob was
 introduced, this method got much less reliable since a lot of public
@@ -891,9 +893,7 @@ still things that could potentially break ABI, such as
 Not breaking ABI/API still requires care.
 
 The check_abi script is responsible for performing many of these
-steps. See comments in check_abi for additional notes. Running
-"check_abi check-sizes" is run by ctest on Linux when CHECK_SIZES is
-on.
+steps. See comments in check_abi for additional notes.
 
 ## CODE FORMATTING
 

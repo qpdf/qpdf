@@ -2,7 +2,6 @@ set(MAIN_CXX_PROGRAMS
   qpdf
   fix-qdf
   pdf_from_scratch
-  sizes
   test_char_sign
   test_driver
   test_large_file
@@ -28,7 +27,6 @@ foreach(PROG ${MAIN_C_PROGRAMS})
   target_link_libraries(${PROG} libqpdf)
   set_property(TARGET ${PROG} PROPERTY LINKER_LANGUAGE CXX)
 endforeach()
-target_include_directories(sizes PRIVATE ${JPEG_INCLUDE})
 
 set(needs_private_headers
   test_large_file

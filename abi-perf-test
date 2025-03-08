@@ -59,7 +59,7 @@ cmake --build build -j$(nproc)
 
 echo "** saving old library and size information **"
 
-./build/qpdf/sizes >| $work/old/sizes
+$source/check_abi get-sizes --include include >| $work/old/sizes
 cp build/libqpdf/libqpdf.so.*.* $work/old
 
 if [ "$SKIP_PERF" != "1" ]; then
@@ -74,12 +74,11 @@ git checkout abi-new
 cmake -S . -B build \
   -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 -DBUILD_DOC=0 \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo
-cmake --build build -j$(nproc) --target sizes
+cmake --build build -j$(nproc) --target libqpdf
 
 echo "** saving new library and size information **"
 
-$source/check_abi check-sizes --lib build/libqpdf/libqpdf.so
-./build/qpdf/sizes >| $work/new/sizes
+$source/check_abi get-sizes --include include >| $work/new/sizes
 cp build/libqpdf/libqpdf.so.*.* $work/new
 
 echo "** running ABI comparison **"
