@@ -115,7 +115,9 @@ more detail.
       transition will get errors unless it defines
       ``POINTERHOLDER_TRANSITION``, and any file that uses
       ``PointerHolder`` will have to explicitly include it rather than
-      relying on other headers to bring it along.
+      relying on other headers to bring it along. Additionally,
+      ``qpdf/PointerHolder.hh`` is no longer included by any qpdf
+      header files.
 
   - Other Changes
 

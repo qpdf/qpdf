@@ -39,7 +39,6 @@
 #include <qpdf/PDFVersion.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Pl_Buffer.hh>
-#include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFXRefEntry.hh>

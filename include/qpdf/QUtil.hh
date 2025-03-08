@@ -21,7 +21,6 @@
 #define QUTIL_HH
 
 #include <qpdf/DLL.h>
-#include <qpdf/PointerHolder.hh> // unused -- remove in qpdf 12 (see #785)
 #include <qpdf/Types.h>
 #include <cstdio>
 #include <cstring>
