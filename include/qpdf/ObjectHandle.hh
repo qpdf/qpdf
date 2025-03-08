@@ -52,6 +52,7 @@ namespace qpdf
       public:
         explicit inline operator bool() const;
         inline operator QPDFObjectHandle() const;
+        QPDF_DLL
         operator QPDFObjGen() const;
 
         // The rest of the header file is for qpdf internal use only.
@@ -65,6 +66,7 @@ namespace qpdf
         inline bool null() const;
         inline QPDF* qpdf() const;
         inline qpdf_object_type_e raw_type_code() const;
+        inline qpdf_object_type_e resolved_type_code() const;
         inline qpdf_object_type_e type_code() const;
         std::string unparse() const;
         void write_json(int json_version, JSON::Writer& p) const;

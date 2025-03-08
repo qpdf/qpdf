@@ -1403,8 +1403,7 @@ test_41(QPDF& pdf, char const* arg2)
 static void
 test_42(QPDF& pdf, char const* arg2)
 {
-    // Access objects as wrong type. This test case is crafted to
-    // work with object-types.pdf.
+    // Access objects as wrong type. This test case is crafted to work with object-types.pdf.
     QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
     QPDFObjectHandle array = qtest.getKey("/Dictionary").getKey("/Key2");
     QPDFObjectHandle dictionary = qtest.getKey("/Dictionary");
@@ -1537,12 +1536,35 @@ test_42(QPDF& pdf, char const* arg2)
     assert(!"42"_qpdf.isMatrix());
     m1 = "42"_qpdf.getArrayAsMatrix();
     assert(m1.a == 0 && m1.b == 0 && m1.c == 0 && m1.d == 0 && m1.e == 0 && m1.f == 0);
+
     // Uninitialized
     QPDFObjectHandle uninitialized;
     assert(!uninitialized);
     assert(!uninitialized.isInteger());
     assert(!uninitialized.isDictionary());
     assert(!uninitialized.isScalar());
+
+    // Reference
+    auto indirect = pdf.newIndirectNull();
+    QPDFObjGen indirect_og{indirect.getObjGen()};
+    pdf.replaceObject(indirect, array);
+    assert(array.isIndirect());
+    assert(indirect.isArray());
+    assert(array.getObjGen() == indirect_og);
+    assert(array.isArray());
+    assert(indirect.isArray());
+    assert(indirect.unparse() == indirect_og.unparse(' ') + " R");
+
+    auto pl1 = Pl_Buffer("");
+    array.writeJSON(2, &pl1, true);
+    pl1.finish();
+    assert(pl1.getString() == std::string("\"" + indirect_og.unparse(' ') + " R\""));
+
+    array.setArrayItem(1, "42"_qpdf);
+    assert(indirect.getArrayItem(1).getIntValue() == 42);
+
+    pdf.replaceObject(indirect, "42"_qpdf);
+    assert(array.isInteger());
 }
 
 static void

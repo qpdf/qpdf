@@ -291,7 +291,7 @@ Name::normalize(std::string const& name)
 std::shared_ptr<QPDFObject>
 BaseHandle::copy(bool shallow) const
 {
-    switch (type_code()) {
+    switch (resolved_type_code()) {
     case ::ot_uninitialized:
         throw std::logic_error("QPDFObjectHandle: attempting to copy an uninitialized object");
         return {}; // does not return
@@ -371,7 +371,7 @@ BaseHandle::copy(bool shallow) const
 std::string
 BaseHandle::unparse() const
 {
-    switch (type_code()) {
+    switch (resolved_type_code()) {
     case ::ot_uninitialized:
         throw std::logic_error("QPDFObjectHandle: attempting to unparse an uninitialized object");
         return ""; // does not return
@@ -448,7 +448,7 @@ BaseHandle::unparse() const
 void
 BaseHandle::write_json(int json_version, JSON::Writer& p) const
 {
-    switch (type_code()) {
+    switch (resolved_type_code()) {
     case ::ot_uninitialized:
         throw std::logic_error(
             "QPDFObjectHandle: attempting to get JSON from a uninitialized object");
