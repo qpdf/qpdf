@@ -27,21 +27,22 @@ more detail.
       include ``<qpdf/Constants.h>``, and replace ``QPDFObject::ot_``
       with ``::ot_`` in your code.
 
-    - ``QPDFObjectHandle::replaceOrRemoveKey`` has been removed since
-      it was identical to ``QPDFObjectHandle::replaceKey``.
+    - The deprecated ``QPDFObjectHandle::replaceOrRemoveKey`` method has been
+      removed since it was identical to ``QPDFObjectHandle::replaceKey``.
 
-    - ``JSON::checkDictionaryKeySeen`` has been removed. If ``JSON::parse``
-      encounters duplicate keys the last value is silently accepted instead
-      of throwing a runtime error.
+    - The deprecated ``JSON::checkDictionaryKeySeen`` function has been removed.
+      If ``JSON::parse`` encounters duplicate keys the last value is silently
+      accepted instead of throwing a runtime error. This is consistent with the
+      JSON specification.
 
-    - Deprecated versionless overload of ``QPDFObjectHandle::getJSON``
-      has been removed.
+    - The deprecated versionless overload of ``QPDFObjectHandle::getJSON`` has
+      been removed.
 
-    - ``Buffer`` copy constructor and assignment operator have been
-      removed. ``Buffer`` copy operations are expensive as they always
-      involve copying the buffer content. Use ``buffer2 = buffer1.copy();``
-      or ``Buffer buffer2{buffer1.copy()};`` to make it explicit that
-      copying is intended.
+    - The deprecated ``Buffer`` copy constructor and assignment operator have
+      been removed. ``Buffer`` copy operations are expensive as they always
+      involve copying the buffer content. Use ``buffer2 = buffer1.copy();`` or
+      ``Buffer buffer2{buffer1.copy()};`` to make it explicit that copying is
+      intended.
 
     - ``QIntC.hh`` contained the typo ``substract`` in function names,
       which has been fixed to ``subtract``.
@@ -83,10 +84,9 @@ more detail.
       copies the file ``check`` to ``out.pdf`` but may in future check ``out.pdf``.
       Use ``qpdf ./check out.pdf`` or ``qpdf -- check out.pdf`` instead.
 
-
   - Bug fixes
 
-    - In object streams ignore objects with invalid offset. Report objects with invalid
+    - In object streams, ignore objects with invalid offset. Report objects with invalid
       id or offset.
 
   - Library Enhancements
@@ -98,7 +98,7 @@ more detail.
       would have to write code specifically to do that, so if you're not
       sure, then you shouldn't have to worry.
 
-    - Most ``QPDFObjectHandle`` accessor methods are now const qualified.
+    - Most ``QPDFObjectHandle`` accessor methods are now ``const`` qualified.
 
     - ``QPDFObjectHandle`` and all object helper classes are now explicitly convertible
       to ``QPDFObjGen``, and therefore can be passed as parameter where a ``QPDFObjGen``
@@ -108,28 +108,25 @@ more detail.
 
   - Build Changes
 
-    - If ``POINTERHOLDER_TRANSITION`` is not defined, define it to
-      ``4``, which completely removes ``PointerHolder`` from the API.
-      Stop including it from any headers that used to include it. This
-      means code that hasn't completed its ``PointerHolder``
-      transition will get errors unless it defines
-      ``POINTERHOLDER_TRANSITION``, and any file that uses
-      ``PointerHolder`` will have to explicitly include it rather than
-      relying on other headers to bring it along. Additionally,
-      ``qpdf/PointerHolder.hh`` is no longer included by any qpdf
-      header files.
+    - If ``POINTERHOLDER_TRANSITION`` is not defined, it is now automatically
+      defined to ``4``, which completely removes ``PointerHolder`` from the API.
+      It is no longer included by any qpdf headers. This means code that hasn't
+      completed its ``PointerHolder`` transition will get errors unless it
+      defines ``POINTERHOLDER_TRANSITION``, and any file that uses
+      ``PointerHolder`` will have to explicitly include it rather than relying
+      on other headers to bring it along.
 
   - Other Changes
 
     - The internal implementation of objects has been extensively refactored, using
-      std::variant to eliminate one level of indirection. This has saved one shared pointer
+      ``std::variant`` to eliminate one level of indirection. This has saved one shared pointer
       per object with some improvement both in runtime and memory usage. A new class
       ``BaseHandle`` has been added as common base class of both ``QPDFObjectHandle``
       and ``QPDFObjectHelper`` to provide common functionality appropriate for all
-      object-handle-like classes including e.g. the operator to convert to ``QPDFObjGen``.
+      object-handle-like classes such as the operator to convert to ``QPDFObjGen``.
       ``BaseHandle`` is an implementation detail and not directly usable by library users.
 
-    - There has also been significant refactoring of how qpdf internally iterates over
+    - There has been significant refactoring of how qpdf internally iterates over
       arrays and dictionaries.
 
     - The internal mechanism used to check object sizes for binary
