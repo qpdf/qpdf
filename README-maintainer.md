@@ -541,9 +541,9 @@ When done, the following should happen:
   `make_dist` verifies this consistency, and CI fails if they are
   inconsistent.
 
-* Update release notes in manual. Review version control history.
-  Update release date in `manual/release-notes.rst`. Change "not yet
-  released" to an actual date for the release.
+* Review version control history. Update release date in
+  `manual/release-notes.rst`. Change "not yet released" to an actual
+  date for the release.
 
 * Commit changes with title "Prepare x.y.z release"
 
@@ -574,7 +574,7 @@ When done, the following should happen:
   verify the checksums from the job output, rename to remove -ci from
   the names, and extract to the release archive area.
 
-* Sign the source distribution:
+* From the release area, sign the source distribution:
 
 ```
 version=x.y.z
@@ -602,10 +602,10 @@ chmod 555 *.AppImage
   `README-what-to-download.md` separately onto the download area if
   needed.
 
-* Ensure that the main branch has been pushed to github. The
-  rev-parse command below should show the same commit hash for all its
-  arguments. Create and push a signed tag. This should be run with
-  HEAD pointing to the tip of main.
+* From the source tree, ensure that the main branch has been pushed to
+  github. The rev-parse command below should show the same commit hash
+  for all its arguments. Create and push a signed tag. This should be
+  run with HEAD pointing to the tip of main.
 
 ```
 git rev-parse qpdf/main @
@@ -638,29 +638,33 @@ url=$(gcurl -s -XPOST https://api.github.com/repos/qpdf/qpdf/releases -d'{"tag_n
 # Get upload url
 upload_url=$(gcurl -s $url | jq -r '.upload_url' | sed -E -e 's/\{.*\}//')
 echo $upload_url
+```
 
-# Upload all the files. You can add a label attribute too, which
-# overrides the name.
+* From the release area, Upload all the files.
+
+```
 for i in *; do
   mime=$(file -b --mime-type $i)
   gcurl -H "Content-Type: $mime" --data-binary @$i "$upload_url?name=$i"
 done
 ```
 
-If needed, go onto github and make any manual updates such as
-indicating a pre-release, adding release notes, etc.
+Go onto github, and make any manual updates such as indicating a
+pre-release, adding release notes, etc.
 
-Template for release notes.
-
-```
-This is qpdf version x.y.z. (Brief description)
-
-For a full list of changes from previous releases, please see the [release notes](https://qpdf.readthedocs.io/en/stable/release-notes.html). See also [README-what-to-download](./README-what-to-download.md) for details about
-the available source and binary distributions.
-```
+Here is a template for the release notes. Change
+`README-what-to-download` to just a file reference for SourceForge
+since there is no relative link target from the news area.
 
 ```
-# Publish release
+This is qpdf version x.y.z. (Brief description, summary of highlights)
+
+For a full list of changes from previous releases, please see the [release notes](https://qpdf.readthedocs.io/en/stable/release-notes.html). See also [README-what-to-download](./README-what-to-download.md) for details about the available source and binary distributions.
+```
+
+* Publish release.
+
+```
 gcurl -XPOST $url -d'{"draft": false}'
 ```
 
@@ -673,8 +677,9 @@ rsync -vrlcO ./ jay_berkenbilt,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/q
 * On sourceforge, make the source package the default for all but
   Windows, and make the 64-bit msvc build the default for Windows.
 
-* Publish a news item manually on sourceforge using the release notes text. Remove the relative link
-  to README-what-to-download.md (just reference the file by name)
+* Publish a news item manually on sourceforge using the release notes
+  text. Remove the relative link to README-what-to-download.md (just
+  reference the file by name)
 
 * Upload the debian package and Ubuntu ppa backports.
 
