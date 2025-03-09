@@ -17,7 +17,7 @@ more detail.
 
 .. cSpell:ignore substract
 
-12.0.0: not yet released
+12.0.0: March 9, 2025
   - API: breaking changes
 
     - The header file ``qpdf/QPDFObject.hh`` now generates an error if
