@@ -85,21 +85,6 @@ class QPDF_DLL_CLASS InputSource
     qpdf_offset_t last_offset{0};
 
   private:
-    class QPDF_DLL_PRIVATE Members
-    {
-        friend class InputSource;
-
-      public:
-        QPDF_DLL
-        ~Members() = default;
-
-      private:
-        Members() = default;
-        Members(Members const&) = delete;
-    };
-
-    std::shared_ptr<Members> m;
-
     // State for fast... methods
     static const qpdf_offset_t buf_size = 128;
     char buffer[buf_size];
