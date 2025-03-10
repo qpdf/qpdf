@@ -779,7 +779,6 @@ class QPDF
         std::function<QPDFExc(std::string_view)> damaged);
     void insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2);
     void insertFreeXrefEntry(QPDFObjGen);
-    void insertReconstructedXrefEntry(int obj, qpdf_offset_t f1, int f2);
     void setLastObjectDescription(std::string const& description, QPDFObjGen og);
     QPDFObjectHandle readTrailer();
     QPDFObjectHandle readObject(std::string const& description, QPDFObjGen og);
