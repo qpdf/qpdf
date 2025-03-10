@@ -1,5 +1,5 @@
 WARNING: recover-xref-stream.pdf: file is damaged
 WARNING: recover-xref-stream.pdf: can't find startxref
 WARNING: recover-xref-stream.pdf: Attempting to reconstruct cross-reference table
-WARNING: recover-xref-stream.pdf: reported number of objects (14) is not one plus the highest object number (15)
+WARNING: recover-xref-stream.pdf: startxref was more than 1024 bytes before end of file
 qpdf: operation succeeded with warnings; resulting file may have some problems

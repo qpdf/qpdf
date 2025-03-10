@@ -53,6 +53,7 @@ QPDF xref gen > 0 1
 QPDF xref size mismatch 0
 QPDF not a pdf file 0
 QPDF can't find startxref 0
+QPDF startxref more than 1024 before end 0
 QPDF invalid xref 0
 QPDF invalid xref entry 0
 QPDF missing trailer 0

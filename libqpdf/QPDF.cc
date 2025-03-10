@@ -470,7 +470,7 @@ QPDF::parse(char const* password)
         }
     } catch (QPDFExc& e) {
         if (m->attempt_recovery) {
-            reconstruct_xref(e);
+            reconstruct_xref(e, xref_offset > 0);
             QTC::TC("qpdf", "QPDF reconstructed xref table");
         } else {
             throw;
@@ -530,7 +530,7 @@ QPDF::setTrailer(QPDFObjectHandle obj)
 }
 
 void
-QPDF::reconstruct_xref(QPDFExc& e)
+QPDF::reconstruct_xref(QPDFExc& e, bool found_startxref)
 {
     if (m->reconstructed_xref) {
         // Avoid xref reconstruction infinite loops. This is getting very hard to reproduce because
@@ -568,6 +568,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
 
     std::vector<std::tuple<int, int, qpdf_offset_t>> found_objects;
     std::vector<qpdf_offset_t> trailers;
+    std::vector<qpdf_offset_t> startxrefs;
 
     m->file->seek(0, SEEK_END);
     qpdf_offset_t eof = m->file->tell();
@@ -593,9 +594,32 @@ QPDF::reconstruct_xref(QPDFExc& e)
             m->file->seek(pos, SEEK_SET);
         } else if (!m->trailer && t1.isWord("trailer")) {
             trailers.emplace_back(m->file->tell());
+        } else if (!found_startxref && t1.isWord("startxref")) {
+            startxrefs.emplace_back(m->file->tell());
         }
         check_warnings();
         m->file->findAndSkipNextEOL();
+    }
+
+    if (!found_startxref && !startxrefs.empty() && !found_objects.empty() &&
+        startxrefs.back() > std::get<2>(found_objects.back())) {
+        try {
+            m->file->seek(startxrefs.back(), SEEK_SET);
+            if (auto offset = QUtil::string_to_ll(readToken(*m->file).getValue().data())) {
+                read_xref(offset);
+                if (getRoot().getKey("/Pages").isDictionary()) {
+                    QTC::TC("qpdf", "QPDF startxref more than 1024 before end");
+                    warn(
+                        damagedPDF("", 0, "startxref was more than 1024 bytes before end of file"));
+                    initializeEncryption();
+                    m->parsed = true;
+                    m->reconstructed_xref = false;
+                    return;
+                }
+            }
+        } catch (...) {
+            // ok, bad luck. Do recovery.
+        }
     }
 
     auto rend = found_objects.rend();
