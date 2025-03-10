@@ -107,7 +107,6 @@ QPDFWriter not recompressing /FlateDecode 0
 QPDF_encryption xref stream from encrypted file 0
 QPDFJob unable to filter 0
 QUtil non-trivial UTF-16 0
-QPDF xref overwrite object 0
 QPDF xref overwrite invalid objgen 0
 QPDF decoding error warning 0
 qpdf-c called qpdf_init 0
@@ -439,7 +438,6 @@ QPDF xref skipped space 0
 QPDF eof skipping spaces before xref 1
 QPDF_encryption user matches owner V < 5 0
 QPDF_encryption same password 1
-QPDFWriter stream in ostream 0
 QPDFParser duplicate dict key 0
 QPDFWriter no encryption sig contents 0
 QPDFPageObjectHelper colorspace lookup 0
