@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>QPDF Test</title>
+</head>
+
+<body>
+    <h1>QPDF Test</h1>
+    <pre id="output"></pre>
+
+    <script src="./qpdf.js"></script>
+    <script>
+        function print(text) {
+            document.getElementById('output').textContent += text + '\n';
+            console.log(text); // Also log to console for debugging
+        }
+
+        QPDF.path = '/';
+
+        function testCheck(done) {
+            QPDF({
+                keepAlive: true,
+                logger: function (text) {
+                    print(text);
+                },
+                ready: function (qpdf) {
+                    // First test just the copyright notice
+                    qpdf.execute(['--copyright'], function (err) {
+                        if (err) {
+                            print('Error showing copyright: ' + err.message);
+                            return;
+                        }
+
+                        // Create and test a minimal PDF
+                        qpdf.save('input.pdf', myPDF(), function (err) {
+                            if (err) {
+                                print('Error saving PDF: ' + err.message);
+                                return;
+                            }
+                        });
+
+                        // Check with verbose output
+                        qpdf.execute(['--verbose', '--check', 'input.pdf'], function (err) {
+                            if (err) {
+                                print('Error checking PDF: ' + err.message);
+                                return;
+                            }
+                            print('PDF check completed successfully');
+                            done();
+                        });
+                    });
+                }
+            });
+        }
+
+        function testEncrypt(done) {
+            QPDF.encrypt({
+                arrayBuffer: myPDF(),
+                userPassword: 'test',
+                ownerPassword: 'test',
+                keyLength: 256,
+                logger: print,
+                callback: function (err, content) {
+                    print('callback: ' + err + ' ' + QPDF.arrayBufferToBase64(content));
+                    done();
+                }
+            });
+        }
+
+        function myPDF() {
+            // generated with "cat my-pdf.pdf | base64"
+            const pageWithA = 'JVBERi0xLjMKJb/3ov4KJVFERi0xLjAKCjEgMCBvYmoKPDwKICAvUGFnZXMgMiAwIFIKICAvVHlwZSAvQ2F0YWxvZwo+PgplbmRvYmoKCjIgMCBvYmoKPDwKICAvQ291bnQgMQogIC9LaWRzIFsKICAgIDMgMCBSCiAgXQogIC9UeXBlIC9QYWdlcwo+PgplbmRvYmoKCiUlIFBhZ2UgMQozIDAgb2JqCjw8CiAgL0NvbnRlbnRzIDQgMCBSCiAgL01lZGlhQm94IFsKICAgIDAKICAgIDAKICAgIDYxMgogICAgNzkyCiAgXQogIC9QYXJlbnQgMiAwIFIKICAvUmVzb3VyY2VzIDw8CiAgICAvRm9udCA8PAogICAgICAvRjEgNiAwIFIKICAgID4+CiAgICAvUHJvY1NldCA3IDAgUgogID4+CiAgL1R5cGUgL1BhZ2UKPj4KZW5kb2JqCgolJSBDb250ZW50cyBmb3IgcGFnZSAxCjQgMCBvYmoKPDwKICAvTGVuZ3RoIDUgMCBSCj4+CnN0cmVhbQpCVAogIC9GMSAyNCBUZgogIDcyIDcyMCBUZAogIChBKSBUagpFVAplbmRzdHJlYW0KZW5kb2JqCgo1IDAgb2JqCjM5CmVuZG9iagoKNiAwIG9iago8PAogIC9CYXNlRm9udCAvSGVsdmV0aWNhCiAgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcKICAvTmFtZSAvRjEKICAvU3VidHlwZSAvVHlwZTEKICAvVHlwZSAvRm9udAo+PgplbmRvYmoKCjcgMCBvYmoKWwogIC9QREYKICAvVGV4dApdCmVuZG9iagoKeHJlZgowIDgKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDI1IDAwMDAwIG4gCjAwMDAwMDAwNzkgMDAwMDAgbiAKMDAwMDAwMDE2MSAwMDAwMCBuIAowMDAwMDAwMzc2IDAwMDAwIG4gCjAwMDAwMDA0NzAgMDAwMDAgbiAKMDAwMDAwMDQ4OSAwMDAwMCBuIAowMDAwMDAwNjA3IDAwMDAwIG4gCnRyYWlsZXIgPDwKICAvUm9vdCAxIDAgUgogIC9TaXplIDgKICAvSUQgWzwzNmIwNzIzMmQ3NjU3NjU4YzU0ODAwNjE1MWQ0YzU3Yz48MzZiMDcyMzJkNzY1NzY1OGM1NDgwMDYxNTFkNGM1N2M+XQo+PgpzdGFydHhyZWYKNjQyCiUlRU9GCg==';
+            return QPDF.base64ToArrayBuffer(pageWithA);
+        }
+
+        testCheck(function () {
+            testEncrypt(function () {
+                print('ALL TESTS PASSED');
+            });
+        });
+    </script>
+</body>
+
+</html>

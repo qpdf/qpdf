@@ -152,6 +152,10 @@ qpdf is known to build and pass its test suite with mingw and Microsoft Visual C
 work. In addition to the manual, see [README-windows.md](README-windows.md) for more details on how to build under
 Windows.
 
+## WebAssembly / JavaScript Support
+
+QPDF can be compiled to WebAssembly for use in browsers and JavaScript environments. For most users, we recommend using [qpdf.js](https://github.com/j3k0/qpdf.js) which provides pre-built bundles and a convenient wrapper around the WebAssembly build. If you need to build the WebAssembly version yourself, see [README-emscripten.md](README-emscripten.md) for instructions.
+
 # Building Documentation
 
 The qpdf manual is written in reStructured Text format and is build with [sphinx](https://www.sphinx-doc.org). The
