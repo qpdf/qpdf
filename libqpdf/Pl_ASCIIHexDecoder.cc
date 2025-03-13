@@ -4,6 +4,8 @@
 #include <cctype>
 #include <stdexcept>
 
+using namespace std::literals;
+
 Pl_ASCIIHexDecoder::Pl_ASCIIHexDecoder(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next)
 {
@@ -46,11 +48,7 @@ Pl_ASCIIHexDecoder::write(unsigned char const* buf, size_t len)
                 char t[2];
                 t[0] = ch;
                 t[1] = 0;
-                throw std::runtime_error(
-                    std::string(
-                        "character out of range"
-                        " during base Hex decode: ") +
-                    t);
+                throw std::runtime_error("character out of range during base Hex decode: "s + t);
             }
             break;
         }

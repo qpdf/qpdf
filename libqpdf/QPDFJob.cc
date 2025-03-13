@@ -618,9 +618,7 @@ QPDFJob::checkConfiguration()
         usage("no output file may be given for this option");
     }
     if (m->check_requires_password && m->check_is_encrypted) {
-        usage(
-            "--requires-password and --is-encrypted may not be given"
-            " together");
+        usage("--requires-password and --is-encrypted may not be given together");
     }
 
     if (m->encrypt && (!m->allow_insecure) &&
@@ -3142,9 +3140,7 @@ QPDFJob::writeJSON(QPDF& pdf)
         fp = std::make_shared<Pl_StdioFile>("json output", fc->f);
     } else if ((m->json_stream_data == qpdf_sj_file) && m->json_stream_prefix.empty()) {
         QTC::TC("qpdf", "QPDFJob need json-stream-prefix for stdout");
-        usage(
-            "please specify --json-stream-prefix since the input file "
-            "name is unknown");
+        usage("please specify --json-stream-prefix since the input file name is unknown");
     } else {
         QTC::TC("qpdf", "QPDFJob write json to stdout");
         m->log->saveToStandardOutput(true);

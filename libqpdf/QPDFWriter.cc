@@ -1013,8 +1013,7 @@ QPDFWriter::pushMD5Pipeline(PipelinePopper& pp)
     if (!m->id2.empty()) {
         // Can't happen in the code
         throw std::logic_error(
-            "Deterministic ID computation enabled after ID"
-            " generation has already occurred.");
+            "Deterministic ID computation enabled after ID generation has already occurred.");
     }
     qpdf_assert_debug(m->deterministic_id);
     qpdf_assert_debug(m->md5_pipeline == nullptr);

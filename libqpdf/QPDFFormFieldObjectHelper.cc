@@ -752,8 +752,7 @@ QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& ao
         QPDFObjectHandle::Rectangle rect = aoh.getRect();
         QPDFObjectHandle::Rectangle bbox(0, 0, rect.urx - rect.llx, rect.ury - rect.lly);
         QPDFObjectHandle dict = QPDFObjectHandle::parse(
-            "<< /Resources << /ProcSet [ /PDF /Text ] >>"
-            " /Type /XObject /Subtype /Form >>");
+            "<< /Resources << /ProcSet [ /PDF /Text ] >> /Type /XObject /Subtype /Form >>");
         dict.replaceKey("/BBox", QPDFObjectHandle::newFromRectangle(bbox));
         AS = QPDFObjectHandle::newStream(oh().getOwningQPDF(), "/Tx BMC\nEMC\n");
         AS.replaceDict(dict);

@@ -1390,9 +1390,7 @@ QPDF::showXRefTable()
             break;
 
         default:
-            throw std::logic_error(
-                "unknown cross-reference table type while"
-                " showing xref_table");
+            throw std::logic_error("unknown cross-reference table type while showing xref_table");
             break;
         }
         m->log->info("\n");
@@ -2296,8 +2294,7 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
     ObjCopier& obj_copier = m->object_copiers[other.m->unique_id];
     if (!obj_copier.visiting.empty()) {
         throw std::logic_error(
-            "obj_copier.visiting is not empty"
-            " at the beginning of copyForeignObject");
+            "obj_copier.visiting is not empty at the beginning of copyForeignObject");
     }
 
     // Make sure we have an object in this file for every referenced object in the old file.

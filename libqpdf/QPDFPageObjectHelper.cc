@@ -718,8 +718,7 @@ QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
     QPDFObjectHandle bbox = getTrimBox(false).shallowCopy();
     if (!bbox.isRectangle()) {
         oh().warnIfPossible(
-            "bounding box is invalid; form"
-            " XObject created from page will not work");
+            "bounding box is invalid; form XObject created from page will not work");
     }
     newdict.replaceKey("/BBox", bbox);
     auto provider =
