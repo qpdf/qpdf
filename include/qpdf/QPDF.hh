@@ -48,6 +48,7 @@
 class QPDF_Stream;
 class BitStream;
 class BitWriter;
+class BufferInputSource;
 class QPDFLogger;
 class QPDFParser;
 
@@ -784,7 +785,7 @@ class QPDF
     QPDFObjectHandle readObject(std::string const& description, QPDFObjGen og);
     void readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset);
     void validateStreamLineEnd(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset);
-    QPDFObjectHandle readObjectInStream(std::shared_ptr<InputSource>& input, int obj);
+    QPDFObjectHandle readObjectInStream(BufferInputSource& input, int obj);
     size_t recoverStreamLength(
         std::shared_ptr<InputSource> input, QPDFObjGen og, qpdf_offset_t stream_offset);
     QPDFTokenizer::Token readToken(InputSource&, size_t max_len = 0);
