@@ -75,7 +75,11 @@ class QPDF_DLL_CLASS InputSource
     // semantically equivalent to seek(-1, SEEK_CUR) but is much more efficient.
     virtual void unreadCh(char ch) = 0;
 
-    // The following methods are for use by QPDFTokenizer
+    // The following methods are for internal use by qpdf only.
+    inline size_t read(std::string& str, size_t count, qpdf_offset_t at = -1);
+    inline std::string read(size_t count, qpdf_offset_t at = -1);
+    size_t read_line(std::string& str, size_t count, qpdf_offset_t at = -1);
+    std::string read_line(size_t count, qpdf_offset_t at = -1);
     inline qpdf_offset_t fastTell();
     inline bool fastRead(char&);
     inline void fastUnread(bool);
@@ -92,58 +96,5 @@ class QPDF_DLL_CLASS InputSource
     qpdf_offset_t buf_idx = 0;
     qpdf_offset_t buf_start = 0;
 };
-
-inline void
-InputSource::loadBuffer()
-{
-    this->buf_idx = 0;
-    this->buf_len = qpdf_offset_t(read(this->buffer, this->buf_size));
-    // NB read sets last_offset
-    this->buf_start = this->last_offset;
-}
-
-inline qpdf_offset_t
-InputSource::fastTell()
-{
-    if (this->buf_len == 0) {
-        loadBuffer();
-    } else {
-        auto curr = tell();
-        if (curr < this->buf_start || curr >= (this->buf_start + this->buf_len)) {
-            loadBuffer();
-        } else {
-            this->last_offset = curr;
-            this->buf_idx = curr - this->buf_start;
-        }
-    }
-    return this->last_offset;
-}
-
-inline bool
-InputSource::fastRead(char& ch)
-{
-    // Before calling fastRead, fastTell must be called to prepare the buffer. Once reading is
-    // complete, fastUnread must be called to set the correct file position.
-    if (this->buf_idx < this->buf_len) {
-        ch = this->buffer[this->buf_idx];
-        ++(this->buf_idx);
-        ++(this->last_offset);
-        return true;
-
-    } else if (this->buf_len == 0) {
-        return false;
-    } else {
-        seek(this->buf_start + this->buf_len, SEEK_SET);
-        fastTell();
-        return fastRead(ch);
-    }
-}
-
-inline void
-InputSource::fastUnread(bool back)
-{
-    this->last_offset -= back ? 1 : 0;
-    seek(this->last_offset, SEEK_SET);
-}
 
 #endif // QPDF_INPUTSOURCE_HH

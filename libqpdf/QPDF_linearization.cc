@@ -4,6 +4,7 @@
 
 #include <qpdf/BitStream.hh>
 #include <qpdf/BitWriter.hh>
+#include <qpdf/InputSource_private.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Count.hh>
 #include <qpdf/Pl_Flate.hh>
@@ -19,6 +20,7 @@
 #include <cstring>
 
 using namespace qpdf;
+using namespace std::literals;
 
 template <class T, class int_type>
 static void
@@ -96,68 +98,52 @@ QPDF::isLinearized()
 
     // The PDF spec says the linearization dictionary must be completely contained within the first
     // 1024 bytes of the file. Add a byte for a null terminator.
-    static int const tbuf_size = 1025;
-
-    auto b = std::make_unique<char[]>(tbuf_size);
-    char* buf = b.get();
-    m->file->seek(0, SEEK_SET);
-    memset(buf, '\0', tbuf_size);
-    m->file->read(buf, tbuf_size - 1);
-
-    int lindict_obj = -1;
-    char* p = buf;
-    while (lindict_obj == -1) {
+    auto buffer = m->file->read(1024, 0);
+    size_t pos = 0;
+    while (true) {
         // Find a digit or end of buffer
-        while (((p - buf) < tbuf_size) && (!util::is_digit(*p))) {
-            ++p;
-        }
-        if (p - buf == tbuf_size) {
-            break;
+        pos = buffer.find_first_of("0123456789"sv, pos);
+        if (pos == std::string::npos) {
+            return false;
         }
         // Seek to the digit. Then skip over digits for a potential
         // next iteration.
-        m->file->seek(p - buf, SEEK_SET);
-        while (((p - buf) < tbuf_size) && util::is_digit(*p)) {
-            ++p;
+        m->file->seek(toO(pos), SEEK_SET);
+
+        auto t1 = readToken(*m->file, 20);
+        if (!(t1.isInteger() && readToken(*m->file, 6).isInteger() &&
+              readToken(*m->file, 4).isWord("obj"))) {
+            pos = buffer.find_first_not_of("0123456789"sv, pos);
+            if (pos == std::string::npos) {
+                return false;
+            }
+            continue;
         }
 
-        QPDFTokenizer::Token t1 = readToken(*m->file);
-        if (t1.isInteger() && readToken(*m->file).isInteger() &&
-            readToken(*m->file).isWord("obj") &&
-            readToken(*m->file).getType() == QPDFTokenizer::tt_dict_open) {
-            lindict_obj = toI(QUtil::string_to_ll(t1.getValue().c_str()));
+        auto candidate = getObject(toI(QUtil::string_to_ll(t1.getValue().data())), 0);
+        if (!candidate.isDictionary()) {
+            return false;
         }
-    }
 
-    if (lindict_obj <= 0) {
-        return false;
-    }
+        auto linkey = candidate.getKey("/Linearized");
+        if (!(linkey.isNumber() && toI(floor(linkey.getNumericValue())) == 1)) {
+            return false;
+        }
 
-    auto candidate = getObjectByID(lindict_obj, 0);
-    if (!candidate.isDictionary()) {
-        return false;
-    }
-
-    QPDFObjectHandle linkey = candidate.getKey("/Linearized");
-    if (!(linkey.isNumber() && (toI(floor(linkey.getNumericValue())) == 1))) {
-        return false;
-    }
-
-    QPDFObjectHandle L = candidate.getKey("/L");
-    if (L.isInteger()) {
+        auto L = candidate.getKey("/L");
+        if (!L.isInteger()) {
+            return false;
+        }
         qpdf_offset_t Li = L.getIntValue();
         m->file->seek(0, SEEK_END);
         if (Li != m->file->tell()) {
             QTC::TC("qpdf", "QPDF /L mismatch");
             return false;
-        } else {
-            m->linp.file_size = Li;
         }
+        m->linp.file_size = Li;
+        m->lindict = candidate;
+        return true;
     }
-
-    m->lindict = candidate;
-
-    return true;
 }
 
 void
@@ -548,7 +534,7 @@ QPDF::maxEnd(ObjUser const& ou)
     }
     qpdf_offset_t end = 0;
     for (auto const& og: m->obj_user_to_objects[ou]) {
-        if (m->obj_cache.count(og) == 0) {
+        if (!m->obj_cache.count(og)) {
             stopOnError("unknown object referenced in object user table");
         }
         end = std::max(end, m->obj_cache[og].end_after_space);

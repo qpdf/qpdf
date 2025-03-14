@@ -13,12 +13,20 @@ more detail.
 
 .. x.y.z: not yet released
 
+12.0.1: not yet released
+  - Bug fixes
+
+    - In ``QPDF::isLinearized`` return false if the first object in the file is
+      not a linearization parameter dictionary or its ``/L`` entry is not an
+      integer object. Previously the method returned false if the first
+      dictionary object was not a linearization parameter dictionary.
+
 .. _r12-0-0:
 
 .. cSpell:ignore substract
 
 12.0.0: March 9, 2025
-  - API: breaking changes
+  - API breaking changes
 
     - The header file ``qpdf/QPDFObject.hh`` now generates an error if
       included. This is to prevent code that includes it from
