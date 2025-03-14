@@ -10,6 +10,8 @@
 
 #include <memory>
 
+using namespace std::literals;
+
 using ObjectPtr = std::shared_ptr<QPDFObject>;
 
 QPDFObjectHandle
@@ -524,7 +526,13 @@ QPDFParser::warnDuplicateKey()
 void
 QPDFParser::warn(qpdf_offset_t offset, std::string const& msg) const
 {
-    warn(QPDFExc(qpdf_e_damaged_pdf, input.getName(), object_description, offset, msg));
+    if (stream_id) {
+        std::string descr = "object "s + std::to_string(obj_id) + " 0";
+        std::string name = context->getFilename() + " object stream " + std::to_string(stream_id);
+        warn(QPDFExc(qpdf_e_damaged_pdf, name, descr, offset, msg));
+    } else {
+        warn(QPDFExc(qpdf_e_damaged_pdf, input.getName(), object_description, offset, msg));
+    }
 }
 
 void

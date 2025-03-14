@@ -29,6 +29,12 @@ more detail.
     - There have been further enhancements to how files with damaged xref
       tables are recovered.
 
+  - Other changes
+
+    - The parsing of object streams including the creation of error/warning
+      messages and object descriptions has been refactored with some
+      improvement both in runtime and memory usage.
+
     - There has been some refactoring of how object streams are written with
       some performance improvement.
 

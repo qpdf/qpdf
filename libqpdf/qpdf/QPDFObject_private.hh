@@ -381,7 +381,17 @@ class QPDFObject
         std::string var_descr;
     };
 
-    using Description = std::variant<std::string, JSON_Descr, ChildDescr>;
+    struct ObjStreamDescr
+    {
+        ObjStreamDescr(int stream_id, int obj_id) :
+            stream_id(stream_id),
+            obj_id(obj_id) {};
+
+        int stream_id;
+        int obj_id;
+    };
+
+    using Description = std::variant<std::string, JSON_Descr, ChildDescr, ObjStreamDescr>;
 
     void
     setDescription(
