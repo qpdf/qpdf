@@ -7,8 +7,8 @@
 #include <qpdf/Constants.h>
 #include <qpdf/JSON.hh>
 #include <qpdf/JSON_writer.hh>
+#include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjGen.hh>
-#include <qpdf/QPDF_private.hh>
 #include <qpdf/Types.h>
 
 #include <map>
@@ -301,17 +301,8 @@ class QPDFObject
     std::string getStringValue() const;
 
     // Return a unique type code for the resolved object
-    qpdf_object_type_e
-    getResolvedTypeCode() const
-    {
-        if (getTypeCode() == ::ot_unresolved) {
-            return QPDF::Resolver::resolved(qpdf, og)->getTypeCode();
-        }
-        if (getTypeCode() == ::ot_reference) {
-            return std::get<QPDF_Reference>(value).obj->getTypeCode();
-        }
-        return getTypeCode();
-    }
+    inline qpdf_object_type_e getResolvedTypeCode() const;
+
     // Return a unique type code for the object
     qpdf_object_type_e
     getTypeCode() const
