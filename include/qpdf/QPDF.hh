@@ -762,7 +762,7 @@ class QPDF
     void setTrailer(QPDFObjectHandle obj);
     void read_xref(qpdf_offset_t offset);
     bool resolveXRefTable();
-    void reconstruct_xref(QPDFExc& e);
+    void reconstruct_xref(QPDFExc& e, bool found_startxref = true);
     bool parse_xrefFirst(std::string const& line, int& obj, int& num, int& bytes);
     bool read_xrefEntry(qpdf_offset_t& f1, int& f2, char& type);
     bool read_bad_xrefEntry(qpdf_offset_t& f1, int& f2, char& type);
@@ -779,7 +779,6 @@ class QPDF
         std::function<QPDFExc(std::string_view)> damaged);
     void insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2);
     void insertFreeXrefEntry(QPDFObjGen);
-    void insertReconstructedXrefEntry(int obj, qpdf_offset_t f1, int f2);
     void setLastObjectDescription(std::string const& description, QPDFObjGen og);
     QPDFObjectHandle readTrailer();
     QPDFObjectHandle readObject(std::string const& description, QPDFObjGen og);
