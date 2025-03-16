@@ -23,6 +23,12 @@ more detail.
 
 .. _r12-0-0:
 
+12.0.1: not yet released
+ - Other enhancements
+
+   - There have been further enhancements to how files with damaged xref
+     tables are recovered.
+
 .. cSpell:ignore substract
 
 12.0.0: March 9, 2025

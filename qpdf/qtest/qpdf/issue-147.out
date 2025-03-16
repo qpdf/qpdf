@@ -2,6 +2,7 @@ WARNING: issue-147.pdf: can't find PDF header
 WARNING: issue-147.pdf: file is damaged
 WARNING: issue-147.pdf: can't find startxref
 WARNING: issue-147.pdf: Attempting to reconstruct cross-reference table
-WARNING: issue-147.pdf (trailer, offset 9): expected dictionary key but found non-name object; inserting key /QPDFFake1
 WARNING: issue-147.pdf: ignoring object with impossibly large id 62
-qpdf: issue-147.pdf: unable to find objects while recovering damaged file
+WARNING: issue-147.pdf (trailer, offset 9): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-147.pdf (trailer, offset 7): recovered trailer has no /Root entry
+qpdf: issue-147.pdf: unable to find trailer dictionary while recovering damaged file

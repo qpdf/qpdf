@@ -1710,7 +1710,6 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
             if (obj_to_write.isStream()) {
                 // This condition occurred in a fuzz input. Ideally we should block it at parse
                 // time, but it's not clear to me how to construct a case for this.
-                QTC::TC("qpdf", "QPDFWriter stream in ostream");
                 obj_to_write.warnIfPossible("stream found inside object stream; treating as null");
                 obj_to_write = QPDFObjectHandle::newNull();
             }
