@@ -21,14 +21,15 @@ more detail.
       integer object. Previously the method returned false if the first
       dictionary object was not a linearization parameter dictionary.
 
-  - Other enhancements
+.. _r12-0-0:
 
-    - There have been further enhancements to how files with damaged xref
-      tables are recovered.
+12.0.1: not yet released
+ - Other enhancements
+
+   - There have been further enhancements to how files with damaged xref
+     tables are recovered.
 
 .. cSpell:ignore substract
-
-.. _r12-0-0:
 
 12.0.0: March 9, 2025
   - API breaking changes
