@@ -1613,6 +1613,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     QPDFObjectHandle obj_stream = getObjectByID(obj_stream_number, 0);
     if (!obj_stream.isStream()) {
         throw damagedPDF(
+            "object " + std::to_string(obj_stream_number) + " 0",
             "supposed object stream " + std::to_string(obj_stream_number) + " is not a stream");
     }
 
@@ -1626,12 +1627,14 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     if (!dict.isDictionaryOfType("/ObjStm")) {
         QTC::TC("qpdf", "QPDF ERR object stream with wrong type");
         warn(damagedPDF(
+            "object " + std::to_string(obj_stream_number) + " 0",
             "supposed object stream " + std::to_string(obj_stream_number) + " has wrong type"));
     }
 
     if (!(dict.getKey("/N").isInteger() && dict.getKey("/First").isInteger())) {
         throw damagedPDF(
-            ("object stream " + std::to_string(obj_stream_number) + " has incorrect keys"));
+            "object " + std::to_string(obj_stream_number) + " 0",
+            "object stream " + std::to_string(obj_stream_number) + " has incorrect keys");
     }
 
     int n = dict.getKey("/N").getIntValueAsInt();
@@ -1653,7 +1656,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
         if (!(tnum.isInteger() && toffset.isInteger())) {
             throw damagedPDF(
                 *input,
-                m->last_object_description,
+                "object " + std::to_string(obj_stream_number) + " 0",
                 input->getLastOffset(),
                 "expected integer in object stream header");
         }
@@ -1665,7 +1668,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             QTC::TC("qpdf", "QPDF ignore self-referential object stream");
             warn(damagedPDF(
                 *input,
-                m->last_object_description,
+                "object " + std::to_string(obj_stream_number) + " 0",
                 input->getLastOffset(),
                 "object stream claims to contain itself"));
             continue;
@@ -1675,8 +1678,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             QTC::TC("qpdf", "QPDF object stream contains id < 1");
             warn(damagedPDF(
                 *input,
-                "object "s + std::to_string(num) + " 0, offset " + std::to_string(offset),
-                0,
+                "object " + std::to_string(num) + " 0",
+                input->getLastOffset(),
                 "object id is invalid"s));
             continue;
         }
@@ -1685,8 +1688,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             QTC::TC("qpdf", "QPDF object stream offsets not increasing");
             warn(damagedPDF(
                 *input,
-                "object "s + std::to_string(num) + " 0, offset " + std::to_string(offset),
-                0,
+                "object " + std::to_string(num) + " 0",
+                offset,
                 "offset is invalid (must be larger than previous offset " +
                     std::to_string(last_offset) + ")"));
             continue;
