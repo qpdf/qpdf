@@ -4,6 +4,7 @@
 #include <qpdf/QPDFObjectHandle.hh>
 
 #include <qpdf/QPDFObject_private.hh>
+#include <qpdf/QPDF_private.hh>
 #include <qpdf/QUtil.hh>
 
 namespace qpdf
@@ -426,6 +427,18 @@ inline std::shared_ptr<QPDFObject>
 QPDFObject::create(Args&&... args)
 {
     return std::make_shared<QPDFObject>(std::forward<T>(T(std::forward<Args>(args)...)));
+}
+
+inline qpdf_object_type_e
+QPDFObject::getResolvedTypeCode() const
+{
+    if (getTypeCode() == ::ot_unresolved) {
+        return QPDF::Resolver::resolved(qpdf, og)->getTypeCode();
+    }
+    if (getTypeCode() == ::ot_reference) {
+        return std::get<QPDF_Reference>(value).obj->getTypeCode();
+    }
+    return getTypeCode();
 }
 
 inline qpdf::Array

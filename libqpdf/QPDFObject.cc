@@ -3,6 +3,10 @@
 std::string
 QPDFObject::getDescription()
 {
+    qpdf_offset_t shift = (getTypeCode() == ::ot_dictionary) ? 2
+        : (getTypeCode() == ::ot_array)                      ? 1
+                                                             : 0;
+
     if (object_description) {
         switch (object_description->index()) {
         case 0:
@@ -14,10 +18,6 @@ QPDFObject::getDescription()
                     description.replace(pos, 3, og.unparse(' '));
                 }
                 if (auto pos = description.find("$PO"); pos != std::string::npos) {
-                    qpdf_offset_t shift = (getTypeCode() == ::ot_dictionary) ? 2
-                        : (getTypeCode() == ::ot_array)                      ? 1
-                                                                             : 0;
-
                     description.replace(pos, 3, std::to_string(parsed_offset + shift));
                 }
                 return description;
@@ -44,7 +44,14 @@ QPDFObject::getDescription()
                 }
                 return result;
             }
+        case 3:
+            auto [stream_id, obj_id] = std::get<3>(*object_description);
+            std::string result = qpdf ? qpdf->getFilename() : "";
+            result += " object stream " + std::to_string(stream_id) + ", object " +
+                std::to_string(obj_id) + " 0 at offset " + std::to_string(parsed_offset + shift);
+            return result;
         }
+
     } else if (og.isIndirect()) {
         return "object " + og.unparse(' ');
     }

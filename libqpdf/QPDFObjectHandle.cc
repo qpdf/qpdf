@@ -1498,10 +1498,7 @@ QPDFObjectHandle::parse(
     // the string.
     Buffer buf(const_cast<std::string&>(object_str));
     auto input = BufferInputSource("parsed object", &buf);
-    qpdf::Tokenizer tokenizer;
-    bool empty = false;
-    auto result = QPDFParser(input, object_description, tokenizer, nullptr, context, false)
-                      .parse(empty, false);
+    auto result = QPDFParser::parse(input, object_description, context);
     size_t offset = QIntC::to_size(input.tell());
     while (offset < object_str.length()) {
         if (!isspace(object_str.at(offset))) {
@@ -1621,7 +1618,6 @@ QPDFObjectHandle::parseContentStream_data(
     Tokenizer tokenizer;
     tokenizer.allowEOF();
     auto sp_description = QPDFParser::make_description(description, "content");
-    bool empty = false;
     while (QIntC::to_size(input.tell()) < stream_length) {
         // Read a token and seek to the beginning. The offset we get from this process is the
         // beginning of the next non-ignorable (space, comment) token. This way, the offset and
@@ -1629,8 +1625,7 @@ QPDFObjectHandle::parseContentStream_data(
         tokenizer.nextToken(input, "content", true);
         qpdf_offset_t offset = input.getLastOffset();
         input.seek(offset, SEEK_SET);
-        auto obj =
-            QPDFParser(input, sp_description, "content", tokenizer, context).parse(empty, true);
+        auto obj = QPDFParser::parse_content(input, sp_description, tokenizer, context);
         if (!obj) {
             // EOF
             break;
@@ -1690,8 +1685,7 @@ QPDFObjectHandle::parse(
     StringDecrypter* decrypter,
     QPDF* context)
 {
-    return QPDFParser(*input, object_description, tokenizer, decrypter, context, false)
-        .parse(empty, false);
+    return QPDFParser::parse(*input, object_description, tokenizer, empty, decrypter, context);
 }
 
 qpdf_offset_t
