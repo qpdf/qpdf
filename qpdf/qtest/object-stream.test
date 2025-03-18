@@ -124,7 +124,7 @@ $td->runtest("adjacent compressed objects",
              {$td->COMMAND => "test_driver 99 no-space-compressed-object.pdf"},
              {$td->FILE => "no-space-compressed-object.out",
               $td->EXIT_STATUS => 0},
-             $td->EXPECT_FAILURE);
+             $td->NORMALIZE_NEWLINES);
 
 cleanup();
 $td->report(calc_ntests($n_tests, $n_compare_pdfs));
