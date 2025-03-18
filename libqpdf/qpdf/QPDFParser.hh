@@ -62,9 +62,32 @@ class QPDFParser
         decrypter(nullptr),
         context(context),
         description(std::move(sp_description)),
-        parse_pdf(false)
+        parse_pdf(true)
     {
     }
+
+    // Used by readObjectInStream only
+    QPDFParser(
+        InputSource& input,
+        int stream_id,
+        int obj_id,
+        std::string const& object_description,
+        qpdf::Tokenizer& tokenizer,
+        QPDF* context) :
+        input(input),
+        object_description(object_description),
+        tokenizer(tokenizer),
+        decrypter(nullptr),
+        context(context),
+        description(
+            std::make_shared<QPDFObject::Description>(
+                QPDFObject::ObjStreamDescr(stream_id, obj_id))),
+        parse_pdf(true),
+        stream_id(stream_id),
+        obj_id(obj_id)
+    {
+    }
+
     ~QPDFParser() = default;
 
     QPDFObjectHandle parse(bool& empty, bool content_stream);
@@ -124,6 +147,8 @@ class QPDFParser
     QPDF* context;
     std::shared_ptr<QPDFObject::Description> description;
     bool parse_pdf;
+    int stream_id{0};
+    int obj_id{0};
 
     std::vector<StackFrame> stack;
     StackFrame* frame{nullptr};

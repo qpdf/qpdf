@@ -21,10 +21,20 @@ more detail.
       integer object. Previously the method returned false if the first
       dictionary object was not a linearization parameter dictionary.
 
+    - Fix two object stream error/warning messages that reported the wrong
+      object id.
+
   - Other enhancements
 
     - There have been further enhancements to how files with damaged xref
       tables are recovered.
+
+
+  - Other Changes
+
+    - The parsing of object streams including the creation of error/warning
+      messages and object descriptions has been refactored with some
+      improvement both in runtime and memory usage.
 
 .. cSpell:ignore substract
 

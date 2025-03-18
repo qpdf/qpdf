@@ -3,6 +3,7 @@
 
 #include <qpdf/QPDF.hh>
 
+#include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFTokenizer_private.hh>
 
 // Writer class is restricted to QPDFWriter so that only it can call certain methods.
@@ -457,6 +458,7 @@ class QPDF::Members
     qpdf::Tokenizer tokenizer;
     std::shared_ptr<InputSource> file;
     std::string last_object_description;
+    std::shared_ptr<QPDFObject::Description> last_ostream_description;
     bool provided_password_is_hex_key{false};
     bool ignore_xref_streams{false};
     bool suppress_warnings{false};
