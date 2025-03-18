@@ -1,6 +1,7 @@
 #ifndef QPDFPARSER_HH
 #define QPDFPARSER_HH
 
+#include <qpdf/InputSource_private.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFTokenizer_private.hh>
@@ -11,63 +12,38 @@
 class QPDFParser
 {
   public:
-    QPDFParser() = delete;
+    static QPDFObjectHandle
+    parse(InputSource& input, std::string const& object_description, QPDF* context);
 
-    // This constructor is only used by QPDFObjectHandle::parse overload taking a QPDFTokenizer.
-    // ABI: remove when removing QPDFObjectHandle::parse overload.
-    QPDFParser(
+    static QPDFObjectHandle parse_content(
+        InputSource& input,
+        std::shared_ptr<QPDFObject::Description> sp_description,
+        qpdf::Tokenizer& tokenizer,
+        QPDF* context);
+
+    // For use by deprecated QPDFObjectHandle::parse.
+    static QPDFObjectHandle parse(
         InputSource& input,
         std::string const& object_description,
         QPDFTokenizer& tokenizer,
+        bool& empty,
         QPDFObjectHandle::StringDecrypter* decrypter,
-        QPDF* context,
-        bool parse_pdf) :
-        input(input),
-        object_description(object_description),
-        tokenizer(*tokenizer.m),
-        decrypter(decrypter),
-        context(context),
-        description(make_description(input.getName(), object_description)),
-        parse_pdf(parse_pdf)
-    {
-    }
+        QPDF* context);
 
-    QPDFParser(
+    // For use by QPDF. Return parsed object and whether it is empty.
+    static std::pair<QPDFObjectHandle, bool> parse(
         InputSource& input,
         std::string const& object_description,
         qpdf::Tokenizer& tokenizer,
         QPDFObjectHandle::StringDecrypter* decrypter,
-        QPDF* context,
-        bool parse_pdf) :
-        input(input),
-        object_description(object_description),
-        tokenizer(tokenizer),
-        decrypter(decrypter),
-        context(context),
-        description(make_description(input.getName(), object_description)),
-        parse_pdf(parse_pdf)
-    {
-    }
+        QPDF& context);
 
-    // Used by parseContentStream_data only
-    QPDFParser(
-        InputSource& input,
-        std::shared_ptr<QPDFObject::Description> sp_description,
-        std::string const& object_description,
+    static std::pair<QPDFObjectHandle, bool> parse(
+        qpdf::is::OffsetBuffer& input,
+        int stream_id,
+        int obj_id,
         qpdf::Tokenizer& tokenizer,
-        QPDF* context) :
-        input(input),
-        object_description(object_description),
-        tokenizer(tokenizer),
-        decrypter(nullptr),
-        context(context),
-        description(std::move(sp_description)),
-        parse_pdf(false)
-    {
-    }
-    ~QPDFParser() = default;
-
-    QPDFObjectHandle parse(bool& empty, bool content_stream);
+        QPDF& context);
 
     static std::shared_ptr<QPDFObject::Description>
     make_description(std::string const& input_name, std::string const& object_description)
@@ -78,6 +54,28 @@ class QPDFParser
     }
 
   private:
+    QPDFParser(
+        InputSource& input,
+        std::shared_ptr<QPDFObject::Description> sp_description,
+        std::string const& object_description,
+        qpdf::Tokenizer& tokenizer,
+        QPDFObjectHandle::StringDecrypter* decrypter,
+        QPDF* context,
+        bool parse_pdf,
+        int stream_id = 0,
+        int obj_id = 0) :
+        input(input),
+        object_description(object_description),
+        tokenizer(tokenizer),
+        decrypter(decrypter),
+        context(context),
+        description(std::move(sp_description)),
+        parse_pdf(parse_pdf),
+        stream_id(stream_id),
+        obj_id(obj_id)
+    {
+    }
+
     // Parser state.  Note:
     // state <= st_dictionary_value == (state = st_dictionary_key || state = st_dictionary_value)
     enum parser_state_e { st_dictionary_key, st_dictionary_value, st_array };
@@ -100,6 +98,7 @@ class QPDFParser
         int null_count{0};
     };
 
+    QPDFObjectHandle parse(bool& empty, bool content_stream);
     QPDFObjectHandle parseRemainder(bool content_stream);
     void add(std::shared_ptr<QPDFObject>&& obj);
     void addNull();
@@ -123,7 +122,9 @@ class QPDFParser
     QPDFObjectHandle::StringDecrypter* decrypter;
     QPDF* context;
     std::shared_ptr<QPDFObject::Description> description;
-    bool parse_pdf;
+    bool parse_pdf{false};
+    int stream_id{0};
+    int obj_id{0};
 
     std::vector<StackFrame> stack;
     StackFrame* frame{nullptr};
