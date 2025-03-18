@@ -1,5 +1,6 @@
 #include <qpdf/QPDFParser.hh>
 
+#include <qpdf/BufferInputSource.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFObjectHandle.hh>
@@ -13,6 +14,96 @@
 using namespace std::literals;
 
 using ObjectPtr = std::shared_ptr<QPDFObject>;
+
+QPDFObjectHandle
+QPDFParser::parse(InputSource& input, std::string const& object_description, QPDF* context)
+{
+    qpdf::Tokenizer tokenizer;
+    bool empty = false;
+    return QPDFParser(
+               input,
+               make_description(input.getName(), object_description),
+               object_description,
+               tokenizer,
+               nullptr,
+               context,
+               false)
+        .parse(empty, false);
+}
+
+QPDFObjectHandle
+QPDFParser::parse_content(
+    InputSource& input,
+    std::shared_ptr<QPDFObject::Description> sp_description,
+    qpdf::Tokenizer& tokenizer,
+    QPDF* context)
+{
+    bool empty = false;
+    return QPDFParser(
+               input, std::move(sp_description), "content", tokenizer, nullptr, context, true)
+        .parse(empty, true);
+}
+
+QPDFObjectHandle
+QPDFParser::parse(
+    InputSource& input,
+    std::string const& object_description,
+    QPDFTokenizer& tokenizer,
+    bool& empty,
+    QPDFObjectHandle::StringDecrypter* decrypter,
+    QPDF* context)
+{
+    return QPDFParser(
+               input,
+               make_description(input.getName(), object_description),
+               object_description,
+               *tokenizer.m,
+               decrypter,
+               context,
+               false)
+        .parse(empty, false);
+}
+
+std::pair<QPDFObjectHandle, bool>
+QPDFParser::parse(
+    InputSource& input,
+    std::string const& object_description,
+    qpdf::Tokenizer& tokenizer,
+    QPDFObjectHandle::StringDecrypter* decrypter,
+    QPDF& context)
+{
+    bool empty{false};
+    auto result = QPDFParser(
+                      input,
+                      make_description(input.getName(), object_description),
+                      object_description,
+                      tokenizer,
+                      decrypter,
+                      &context,
+                      true)
+                      .parse(empty, false);
+    return {result, empty};
+}
+
+std::pair<QPDFObjectHandle, bool>
+QPDFParser::parse(
+    BufferInputSource& input, int stream_id, int obj_id, qpdf::Tokenizer& tokenizer, QPDF& context)
+{
+    bool empty{false};
+    auto result = QPDFParser(
+                      input,
+                      std::make_shared<QPDFObject::Description>(
+                          QPDFObject::ObjStreamDescr(stream_id, obj_id)),
+                      "",
+                      tokenizer,
+                      nullptr,
+                      &context,
+                      true,
+                      stream_id,
+                      obj_id)
+                      .parse(empty, false);
+    return {result, empty};
+}
 
 QPDFObjectHandle
 QPDFParser::parse(bool& empty, bool content_stream)
