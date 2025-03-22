@@ -1646,36 +1646,12 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
     std::shared_ptr<Buffer> stream_buffer;
     int first_obj = -1;
     bool compressed = false;
-    for (int pass = 1; pass <= 2; ++pass) {
-        // stream_buffer will be initialized only for pass 2
-        PipelinePopper pp_ostream(this, &stream_buffer);
-        if (pass == 1) {
-            pushDiscardFilter(pp_ostream);
-        } else {
-            // Adjust offsets to skip over comment before first object
-            first = offsets.at(0);
-            for (auto& iter: offsets) {
-                iter -= first;
-            }
+    {
+        // Pass 1
+        PipelinePopper pp_ostream_pass1(this, &stream_buffer);
 
-            // Take one pass at writing pairs of numbers so we can get their size information
-            {
-                PipelinePopper pp_discard(this);
-                pushDiscardFilter(pp_discard);
-                writeObjectStreamOffsets(offsets, first_obj);
-                first += m->pipeline->getCount();
-            }
-
-            // Set up a stream to write the stream data into a buffer.
-            Pipeline* next = pushPipeline(new Pl_Buffer("object stream"));
-            if (m->compress_streams && !m->qdf_mode) {
-                compressed = true;
-                next =
-                    pushPipeline(new Pl_Flate("compress object stream", next, Pl_Flate::a_deflate));
-            }
-            activatePipelineStack(pp_ostream);
-            writeObjectStreamOffsets(offsets, first_obj);
-        }
+        pushPipeline(new Pl_Buffer("object stream"));
+        activatePipelineStack(pp_ostream_pass1);
 
         int count = -1;
         for (auto const& obj: m->object_stream_to_objects[old_id]) {
@@ -1700,12 +1676,12 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
                 }
                 writeString("\n");
             }
-            if (pass == 1) {
-                offsets.push_back(m->pipeline->getCount());
-                // To avoid double-counting objects being written in object streams for progress
-                // reporting, decrement in pass 1.
-                indicateProgress(true, false);
-            }
+
+            offsets.push_back(m->pipeline->getCount());
+            // To avoid double-counting objects being written in object streams for progress
+            // reporting, decrement in pass 1.
+            indicateProgress(true, false);
+
             QPDFObjectHandle obj_to_write = m->pdf.getObject(obj);
             if (obj_to_write.isStream()) {
                 // This condition occurred in a fuzz input. Ideally we should block it at parse
@@ -1717,6 +1693,32 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
 
             m->new_obj[new_obj].xref = QPDFXRefEntry(new_stream_id, count);
         }
+    }
+    {
+        PipelinePopper pp_ostream(this, &stream_buffer);
+        // Adjust offsets to skip over comment before first object
+        first = offsets.at(0);
+        for (auto& iter: offsets) {
+            iter -= first;
+        }
+
+        // Take one pass at writing pairs of numbers so we can get their size information
+        {
+            PipelinePopper pp_discard(this);
+            pushDiscardFilter(pp_discard);
+            writeObjectStreamOffsets(offsets, first_obj);
+            first += m->pipeline->getCount();
+        }
+
+        // Set up a stream to write the stream data into a buffer.
+        Pipeline* next = pushPipeline(new Pl_Buffer("object stream"));
+        if (m->compress_streams && !m->qdf_mode) {
+            compressed = true;
+            next = pushPipeline(new Pl_Flate("compress object stream", next, Pl_Flate::a_deflate));
+        }
+        activatePipelineStack(pp_ostream);
+        writeObjectStreamOffsets(offsets, first_obj);
+        writeBuffer(stream_buffer);
     }
 
     // Write the object
