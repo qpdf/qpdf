@@ -1646,11 +1646,11 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
     std::shared_ptr<Buffer> stream_buffer;
     int first_obj = -1;
     bool compressed = false;
-    for (int pass = 1; pass <= 2; ++pass) {
-        // stream_buffer will be initialized only for pass 2
+    for (int pass: {1, 2}) {
         PipelinePopper pp_ostream(this, &stream_buffer);
         if (pass == 1) {
-            pushDiscardFilter(pp_ostream);
+            pushPipeline(new Pl_Buffer("object stream"));
+            activatePipelineStack(pp_ostream);
         } else {
             // Adjust offsets to skip over comment before first object
             first = offsets.at(0);
@@ -1675,47 +1675,51 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
             }
             activatePipelineStack(pp_ostream);
             writeObjectStreamOffsets(offsets, first_obj);
+            writeBuffer(stream_buffer);
         }
 
-        int count = -1;
-        for (auto const& obj: m->object_stream_to_objects[old_id]) {
-            ++count;
-            int new_obj = m->obj[obj].renumber;
-            if (first_obj == -1) {
-                first_obj = new_obj;
-            }
-            if (m->qdf_mode) {
-                writeString(
-                    "%% Object stream: object " + std::to_string(new_obj) + ", index " +
-                    std::to_string(count));
-                if (!m->suppress_original_object_ids) {
-                    writeString("; original object ID: " + std::to_string(obj.getObj()));
-                    // For compatibility, only write the generation if non-zero.  While object
-                    // streams only allow objects with generation 0, if we are generating object
-                    // streams, the old object could have a non-zero generation.
-                    if (obj.getGen() != 0) {
-                        QTC::TC("qpdf", "QPDFWriter original obj non-zero gen");
-                        writeString(" " + std::to_string(obj.getGen()));
-                    }
+        if (pass == 1) {
+            int count = -1;
+            for (auto const& obj: m->object_stream_to_objects[old_id]) {
+                ++count;
+                int new_obj = m->obj[obj].renumber;
+                if (first_obj == -1) {
+                    first_obj = new_obj;
                 }
-                writeString("\n");
-            }
-            if (pass == 1) {
-                offsets.push_back(m->pipeline->getCount());
-                // To avoid double-counting objects being written in object streams for progress
-                // reporting, decrement in pass 1.
-                indicateProgress(true, false);
-            }
-            QPDFObjectHandle obj_to_write = m->pdf.getObject(obj);
-            if (obj_to_write.isStream()) {
-                // This condition occurred in a fuzz input. Ideally we should block it at parse
-                // time, but it's not clear to me how to construct a case for this.
-                obj_to_write.warnIfPossible("stream found inside object stream; treating as null");
-                obj_to_write = QPDFObjectHandle::newNull();
-            }
-            writeObject(obj_to_write, count);
+                if (m->qdf_mode) {
+                    writeString(
+                        "%% Object stream: object " + std::to_string(new_obj) + ", index " +
+                        std::to_string(count));
+                    if (!m->suppress_original_object_ids) {
+                        writeString("; original object ID: " + std::to_string(obj.getObj()));
+                        // For compatibility, only write the generation if non-zero.  While object
+                        // streams only allow objects with generation 0, if we are generating object
+                        // streams, the old object could have a non-zero generation.
+                        if (obj.getGen() != 0) {
+                            QTC::TC("qpdf", "QPDFWriter original obj non-zero gen");
+                            writeString(" " + std::to_string(obj.getGen()));
+                        }
+                    }
+                    writeString("\n");
+                }
+                if (pass == 1) {
+                    offsets.push_back(m->pipeline->getCount());
+                    // To avoid double-counting objects being written in object streams for progress
+                    // reporting, decrement in pass 1.
+                    indicateProgress(true, false);
+                }
+                QPDFObjectHandle obj_to_write = m->pdf.getObject(obj);
+                if (obj_to_write.isStream()) {
+                    // This condition occurred in a fuzz input. Ideally we should block it at parse
+                    // time, but it's not clear to me how to construct a case for this.
+                    obj_to_write.warnIfPossible(
+                        "stream found inside object stream; treating as null");
+                    obj_to_write = QPDFObjectHandle::newNull();
+                }
+                writeObject(obj_to_write, count);
 
-            m->new_obj[new_obj].xref = QPDFXRefEntry(new_stream_id, count);
+                m->new_obj[new_obj].xref = QPDFXRefEntry(new_stream_id, count);
+            }
         }
     }
 
