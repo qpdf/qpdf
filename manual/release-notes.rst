@@ -21,7 +21,7 @@ more detail.
       integer object. Previously the method returned false if the first
       dictionary object was not a linearization parameter dictionary.
 
-    = Fix parsing of object streams containing objects not seperated by
+    - Fix parsing of object streams containing objects not seperated by
       white-space. Pre-2020 editions of the PDF specification incorrectly
       stated that white-space was required between objects. qpdf relied on this
       when parsing object streams.
@@ -40,8 +40,8 @@ more detail.
       messages and object descriptions has been refactored with some
       improvement both in runtime and memory usage.
 
-    - There has been some refactoring of how object streams are written with
-      some performance improvement.
+    - There has been some refactoring of QPDFWriter including how object
+      streams are written with some performance improvement.
 
 .. cSpell:ignore substract
 

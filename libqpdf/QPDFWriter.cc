@@ -917,11 +917,33 @@ QPDFWriter::initializePipelineStack(Pipeline* p)
 }
 
 void
-QPDFWriter::activatePipelineStack(PipelinePopper& pp, bool discard, std::string* str)
+QPDFWriter::activatePipelineStack(PipelinePopper& pp, std::string& str)
+{
+    activatePipelineStack(pp, false, &str, nullptr);
+}
+
+void
+QPDFWriter::activatePipelineStack(PipelinePopper& pp, std::unique_ptr<pl::Link> link)
+{
+    m->count_buffer.clear();
+    activatePipelineStack(pp, false, &m->count_buffer, std::move(link));
+}
+
+void
+QPDFWriter::activatePipelineStack(
+    PipelinePopper& pp, bool discard, std::string* str, std::unique_ptr<pl::Link> link)
 {
     std::string stack_id("stack " + std::to_string(m->next_stack_id));
-    auto* c = str ? new pl::Count(stack_id.c_str(), str)
-                  : new pl::Count(stack_id.c_str(), discard ? nullptr : m->pipeline_stack.back());
+    pl::Count* c;
+    if (link) {
+        c = new pl::Count(stack_id.c_str(), m->count_buffer, std::move(link));
+    } else if (discard) {
+        c = new pl::Count(stack_id.c_str(), nullptr);
+    } else if (!str) {
+        c = new pl::Count(stack_id.c_str(), m->pipeline_stack.back());
+    } else {
+        c = new pl::Count(stack_id.c_str(), *str);
+    }
     ++m->next_stack_id;
     m->pipeline_stack.emplace_back(c);
     m->pipeline = c;
@@ -988,18 +1010,6 @@ QPDFWriter::pushEncryptionFilter(PipelinePopper& pp)
     // Must call this unconditionally so we can call popPipelineStack to balance
     // pushEncryptionFilter().
     activatePipelineStack(pp);
-}
-
-void
-QPDFWriter::pushDiscardFilter(PipelinePopper& pp)
-{
-    activatePipelineStack(pp, true);
-}
-
-void
-QPDFWriter::pushStringPipeline(PipelinePopper& pp, std::string& str)
-{
-    activatePipelineStack(pp, true, &str);
 }
 
 void
@@ -1287,9 +1297,9 @@ QPDFWriter::willFilterStream(
     for (bool first_attempt: {true, false}) {
         PipelinePopper pp_stream_data(this);
         if (stream_data != nullptr) {
-            pushStringPipeline(pp_stream_data, *stream_data);
+            activatePipelineStack(pp_stream_data, *stream_data);
         } else {
-            pushDiscardFilter(pp_stream_data);
+            activatePipelineStack(pp_stream_data, true);
         }
         try {
             filtered = stream.pipeStreamData(
@@ -1646,11 +1656,11 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
     std::string stream_buffer_pass1;
     std::string stream_buffer_pass2;
     int first_obj = -1;
-    bool compressed = false;
+    const bool compressed = m->compress_streams && !m->qdf_mode;
     {
         // Pass 1
         PipelinePopper pp_ostream_pass1(this);
-        pushStringPipeline(pp_ostream_pass1, stream_buffer_pass1);
+        activatePipelineStack(pp_ostream_pass1, stream_buffer_pass1);
 
         int count = -1;
         for (auto const& obj: m->object_stream_to_objects[old_id]) {
@@ -1704,18 +1714,20 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
         // Take one pass at writing pairs of numbers so we can get their size information
         {
             PipelinePopper pp_discard(this);
-            pushDiscardFilter(pp_discard);
+            activatePipelineStack(pp_discard, true);
             writeObjectStreamOffsets(offsets, first_obj);
             first += m->pipeline->getCount();
         }
 
         // Set up a stream to write the stream data into a buffer.
-        Pipeline* next = pushPipeline(new Pl_String("object stream", nullptr, stream_buffer_pass2));
-        if (m->compress_streams && !m->qdf_mode) {
-            compressed = true;
-            next = pushPipeline(new Pl_Flate("compress object stream", next, Pl_Flate::a_deflate));
+        if (compressed) {
+            activatePipelineStack(
+                pp_ostream,
+                pl::create<Pl_Flate>(
+                    pl::create<pl::String>(stream_buffer_pass2), Pl_Flate::a_deflate));
+        } else {
+            activatePipelineStack(pp_ostream, stream_buffer_pass2);
         }
-        activatePipelineStack(pp_ostream);
         writeObjectStreamOffsets(offsets, first_obj);
         writeString(stream_buffer_pass1);
         stream_buffer_pass1.clear();
@@ -2464,20 +2476,23 @@ QPDFWriter::writeXRefStream(
     m->new_obj[xref_id].xref = QPDFXRefEntry(m->pipeline->getCount());
 
     std::string xref_data;
-    Pipeline* p = pushPipeline(new Pl_String("xref stream", nullptr, xref_data));
-    bool compressed = false;
-    if (m->compress_streams && !m->qdf_mode) {
-        compressed = true;
-        if (!skip_compression) {
-            // Write the stream dictionary for compression but don't actually compress.  This helps
-            // us with computation of padding for pass 1 of linearization.
-            p = pushPipeline(new Pl_Flate("compress xref", p, Pl_Flate::a_deflate));
-        }
-        p = pushPipeline(new Pl_PNGFilter("pngify xref", p, Pl_PNGFilter::a_encode, esize));
-    }
+    const bool compressed = m->compress_streams && !m->qdf_mode;
     {
         PipelinePopper pp_xref(this);
-        activatePipelineStack(pp_xref);
+        if (compressed) {
+            m->count_buffer.clear();
+            auto link = pl::create<pl::String>(xref_data);
+            if (!skip_compression) {
+                // Write the stream dictionary for compression but don't actually compress.  This
+                // helps us with computation of padding for pass 1 of linearization.
+                link = pl::create<Pl_Flate>(std::move(link), Pl_Flate::a_deflate);
+            }
+            activatePipelineStack(
+                pp_xref, pl::create<Pl_PNGFilter>(std::move(link), Pl_PNGFilter::a_encode, esize));
+        } else {
+            activatePipelineStack(pp_xref, xref_data);
+        }
+
         for (int i = first; i <= last; ++i) {
             QPDFXRefEntry& e = m->new_obj[i].xref;
             switch (e.getType()) {
@@ -2688,7 +2703,7 @@ QPDFWriter::writeLinearized()
                 pushPipeline(new Pl_StdioFile("linearization pass1", lin_pass1_file));
                 activatePipelineStack(*pp_pass1);
             } else {
-                pushDiscardFilter(*pp_pass1);
+                activatePipelineStack(*pp_pass1, true);
             }
             if (m->deterministic_id) {
                 pushMD5Pipeline(*pp_md5);
@@ -2893,7 +2908,7 @@ QPDFWriter::writeLinearized()
             // Write hint stream to a buffer
             {
                 PipelinePopper pp_hint(this);
-                pushStringPipeline(pp_hint, hint_buffer);
+                activatePipelineStack(pp_hint, hint_buffer);
                 writeHintStream(hint_id);
             }
             hint_length = QIntC::to_offset(hint_buffer.size());

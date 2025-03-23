@@ -1755,24 +1755,23 @@ QPDF::generateHintStream(
 
     // Write the hint stream itself into a compressed memory buffer. Write through a counter so we
     // can get offsets.
-    Pl_String hint_stream("hint stream", nullptr, hint_buffer);
-    Pipeline* next = &hint_stream;
-    std::unique_ptr<Pipeline> flate;
-    if (compressed) {
-        flate =
-            std::make_unique<Pl_Flate>("compress hint stream", &hint_stream, Pl_Flate::a_deflate);
-        next = flate.get();
-    }
-    pl::Count c("count", next);
-    BitWriter w(&c);
+    std::string b;
+    auto c = compressed
+        ? std::make_unique<pl::Count>(
+              "count",
+              b,
+              pl::create<Pl_Flate>(pl::create<pl::String>(hint_buffer), Pl_Flate::a_deflate))
+        : std::make_unique<pl::Count>("count", hint_buffer);
+
+    BitWriter w(c.get());
 
     writeHPageOffset(w);
-    S = toI(c.getCount());
+    S = toI(c->getCount());
     writeHSharedObject(w);
     O = 0;
     if (m->outline_hints.nobjects > 0) {
-        O = toI(c.getCount());
+        O = toI(c->getCount());
         writeHGeneric(w, m->outline_hints);
     }
-    c.finish();
+    c->finish();
 }

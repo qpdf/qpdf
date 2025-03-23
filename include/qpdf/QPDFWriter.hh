@@ -43,6 +43,11 @@
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFXRefEntry.hh>
 
+namespace qpdf::pl
+{
+    struct Link;
+}
+
 class QPDF;
 class Pl_Count;
 class Pl_MD5;
@@ -597,14 +602,17 @@ class QPDFWriter
     // activate the pipeline stack. When the passed in PipelinePopper goes out of scope, the stack
     // is popped.
     Pipeline* pushPipeline(Pipeline*);
-    void
-    activatePipelineStack(PipelinePopper& pp, bool discard = false, std::string* str = nullptr);
+    void activatePipelineStack(PipelinePopper& pp, std::string& str);
+    void activatePipelineStack(PipelinePopper& pp, std::unique_ptr<qpdf::pl::Link> link);
+    void activatePipelineStack(
+        PipelinePopper& pp,
+        bool discard = false,
+        std::string* str = nullptr,
+        std::unique_ptr<qpdf::pl::Link> link = nullptr);
     void initializePipelineStack(Pipeline*);
 
     void adjustAESStreamLength(size_t& length);
     void pushEncryptionFilter(PipelinePopper&);
-    void pushDiscardFilter(PipelinePopper&);
-    void pushStringPipeline(PipelinePopper&, std::string& str);
     void pushMD5Pipeline(PipelinePopper&);
     void computeDeterministicIDData();
 
