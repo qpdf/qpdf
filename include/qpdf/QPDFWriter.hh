@@ -462,23 +462,20 @@ class QPDFWriter
         friend class QPDFWriter;
 
       public:
-        PipelinePopper(QPDFWriter* qw, std::shared_ptr<Buffer>* bp = nullptr) :
-            qw(qw),
-            bp(bp)
+        PipelinePopper(QPDFWriter* qw) :
+            qw(qw)
         {
         }
         ~PipelinePopper();
 
       private:
         QPDFWriter* qw;
-        std::shared_ptr<Buffer>* bp;
         std::string stack_id;
     };
 
     unsigned int bytesNeeded(long long n);
     void writeBinary(unsigned long long val, unsigned int bytes);
     void writeString(std::string_view str);
-    void writeBuffer(std::shared_ptr<Buffer>&);
     void writeStringQDF(std::string_view str);
     void writeStringNoQDF(std::string_view str);
     void writePad(size_t nspaces);

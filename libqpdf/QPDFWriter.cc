@@ -881,12 +881,6 @@ QPDFWriter::writeString(std::string_view str)
 }
 
 void
-QPDFWriter::writeBuffer(std::shared_ptr<Buffer>& b)
-{
-    m->pipeline->write(b->getBuffer(), b->getSize());
-}
-
-void
 QPDFWriter::writeStringQDF(std::string_view str)
 {
     if (m->qdf_mode) {
@@ -956,10 +950,6 @@ QPDFWriter::PipelinePopper::~PipelinePopper()
             qw->m->md5_pipeline = nullptr;
         }
         qw->m->pipeline_stack.pop_back();
-        auto* buf = dynamic_cast<Pl_Buffer*>(p);
-        if (bp && buf) {
-            *bp = buf->getBufferSharedPointer();
-        }
         delete p;
     }
     qw->m->pipeline = dynamic_cast<Pl_Count*>(qw->m->pipeline_stack.back());
