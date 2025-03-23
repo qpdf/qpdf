@@ -597,7 +597,7 @@ class QPDFWriter
     // activate the pipeline stack. When the passed in PipelinePopper goes out of scope, the stack
     // is popped.
     Pipeline* pushPipeline(Pipeline*);
-    void activatePipelineStack(PipelinePopper&);
+    void activatePipelineStack(PipelinePopper& pp, bool discard = false);
     void initializePipelineStack(Pipeline*);
 
     void adjustAESStreamLength(size_t& length);

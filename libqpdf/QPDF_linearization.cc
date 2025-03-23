@@ -5,8 +5,8 @@
 #include <qpdf/BitStream.hh>
 #include <qpdf/BitWriter.hh>
 #include <qpdf/InputSource_private.hh>
+#include <qpdf/Pipeline_private.hh>
 #include <qpdf/Pl_Buffer.hh>
-#include <qpdf/Pl_Count.hh>
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_String.hh>
 #include <qpdf/QPDFExc.hh>
@@ -1757,13 +1757,13 @@ QPDF::generateHintStream(
     // can get offsets.
     Pl_String hint_stream("hint stream", nullptr, hint_buffer);
     Pipeline* next = &hint_stream;
-    std::shared_ptr<Pipeline> flate;
+    std::unique_ptr<Pipeline> flate;
     if (compressed) {
         flate =
-            std::make_shared<Pl_Flate>("compress hint stream", &hint_stream, Pl_Flate::a_deflate);
+            std::make_unique<Pl_Flate>("compress hint stream", &hint_stream, Pl_Flate::a_deflate);
         next = flate.get();
     }
-    Pl_Count c("count", next);
+    pl::Count c("count", next);
     BitWriter w(&c);
 
     writeHPageOffset(w);
