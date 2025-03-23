@@ -1650,14 +1650,15 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
 
     // Generate stream itself.  We have to do this in two passes so we can calculate offsets in the
     // first pass.
-    std::shared_ptr<Buffer> stream_buffer;
+    std::string stream_buffer_pass1;
+    std::string stream_buffer_pass2;
     int first_obj = -1;
     bool compressed = false;
     {
         // Pass 1
-        PipelinePopper pp_ostream_pass1(this, &stream_buffer);
+        PipelinePopper pp_ostream_pass1(this);
 
-        pushPipeline(new Pl_Buffer("object stream"));
+        pushPipeline(new Pl_String("object stream", nullptr, stream_buffer_pass1));
         activatePipelineStack(pp_ostream_pass1);
 
         int count = -1;
@@ -1702,7 +1703,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
         }
     }
     {
-        PipelinePopper pp_ostream(this, &stream_buffer);
+        PipelinePopper pp_ostream(this);
         // Adjust offsets to skip over comment before first object
         first = offsets.at(0);
         for (auto& iter: offsets) {
@@ -1718,14 +1719,16 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
         }
 
         // Set up a stream to write the stream data into a buffer.
-        Pipeline* next = pushPipeline(new Pl_Buffer("object stream"));
+        Pipeline* next = pushPipeline(new Pl_String("object stream", nullptr, stream_buffer_pass2));
         if (m->compress_streams && !m->qdf_mode) {
             compressed = true;
             next = pushPipeline(new Pl_Flate("compress object stream", next, Pl_Flate::a_deflate));
         }
         activatePipelineStack(pp_ostream);
         writeObjectStreamOffsets(offsets, first_obj);
-        writeBuffer(stream_buffer);
+        writeString(stream_buffer_pass1);
+        stream_buffer_pass1.clear();
+        stream_buffer_pass1.shrink_to_fit();
     }
 
     // Write the object
@@ -1735,7 +1738,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
     writeStringQDF("\n ");
     writeString(" /Type /ObjStm");
     writeStringQDF("\n ");
-    size_t length = stream_buffer->getSize();
+    size_t length = stream_buffer_pass2.size();
     adjustAESStreamLength(length);
     writeString(" /Length " + std::to_string(length));
     writeStringQDF("\n ");
@@ -1765,7 +1768,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
     {
         PipelinePopper pp_enc(this);
         pushEncryptionFilter(pp_enc);
-        writeBuffer(stream_buffer);
+        writeString(stream_buffer_pass2);
     }
     if (m->newline_before_endstream) {
         writeString("\n");
