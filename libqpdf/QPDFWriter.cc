@@ -13,6 +13,7 @@
 #include <qpdf/Pl_PNGFilter.hh>
 #include <qpdf/Pl_RC4.hh>
 #include <qpdf/Pl_StdioFile.hh>
+#include <qpdf/Pl_String.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObject_private.hh>
@@ -1244,7 +1245,7 @@ QPDFWriter::willFilterStream(
     QPDFObjectHandle stream,
     bool& compress_stream, // out only
     bool& is_metadata,     // out only
-    std::shared_ptr<Buffer>* stream_data)
+    std::string* stream_data)
 {
     compress_stream = false;
     is_metadata = false;
@@ -1290,8 +1291,12 @@ QPDFWriter::willFilterStream(
 
     bool filtered = false;
     for (bool first_attempt: {true, false}) {
-        pushPipeline(new Pl_Buffer("stream data"));
-        PipelinePopper pp_stream_data(this, stream_data);
+        if (stream_data != nullptr) {
+            pushPipeline(new Pl_String("stream data", nullptr, *stream_data));
+        } else {
+            pushPipeline(new Pl_Discard());
+        }
+        PipelinePopper pp_stream_data(this);
         activatePipelineStack(pp_stream_data);
         try {
             filtered = stream.pipeStreamData(
@@ -1319,6 +1324,9 @@ QPDFWriter::willFilterStream(
             }
             throw std::runtime_error(
                 "error while getting stream data for " + stream.unparse() + ": " + e.what());
+        }
+        if (stream_data) {
+            stream_data->clear();
         }
     }
     if (!filtered) {
@@ -1545,29 +1553,28 @@ QPDFWriter::unparseObject(
         flags |= f_stream;
         bool compress_stream = false;
         bool is_metadata = false;
-        std::shared_ptr<Buffer> stream_data;
+        std::string stream_data;
         if (willFilterStream(object, compress_stream, is_metadata, &stream_data)) {
             flags |= f_filtered;
         }
         QPDFObjectHandle stream_dict = object.getDict();
 
-        m->cur_stream_length = stream_data->getSize();
+        m->cur_stream_length = stream_data.size();
         if (is_metadata && m->encrypted && (!m->encrypt_metadata)) {
             // Don't encrypt stream data for the metadata stream
             m->cur_data_key.clear();
         }
         adjustAESStreamLength(m->cur_stream_length);
         unparseObject(stream_dict, 0, flags, m->cur_stream_length, compress_stream);
-        unsigned char last_char = '\0';
+        char last_char = stream_data.empty() ? '\0' : stream_data.back();
         writeString("\nstream\n");
         {
             PipelinePopper pp_enc(this);
             pushEncryptionFilter(pp_enc);
-            writeBuffer(stream_data);
-            last_char = m->pipeline->getLastChar();
+            writeString(stream_data);
         }
 
-        if (m->newline_before_endstream || (m->qdf_mode && (last_char != '\n'))) {
+        if (m->newline_before_endstream || (m->qdf_mode && last_char != '\n')) {
             writeString("\n");
             m->added_newline = true;
         } else {

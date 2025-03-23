@@ -493,7 +493,7 @@ class QPDFWriter
         QPDFObjectHandle stream,
         bool& compress_stream,
         bool& is_metadata,
-        std::shared_ptr<Buffer>* stream_data);
+        std::string* stream_data);
     void unparseObject(
         QPDFObjectHandle object,
         int level,
