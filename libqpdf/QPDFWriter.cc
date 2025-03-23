@@ -2473,7 +2473,8 @@ QPDFWriter::writeXRefStream(
     // openObject to do it.
     m->new_obj[xref_id].xref = QPDFXRefEntry(m->pipeline->getCount());
 
-    Pipeline* p = pushPipeline(new Pl_Buffer("xref stream"));
+    std::string xref_data;
+    Pipeline* p = pushPipeline(new Pl_String("xref stream", nullptr, xref_data));
     bool compressed = false;
     if (m->compress_streams && !m->qdf_mode) {
         compressed = true;
@@ -2484,9 +2485,8 @@ QPDFWriter::writeXRefStream(
         }
         p = pushPipeline(new Pl_PNGFilter("pngify xref", p, Pl_PNGFilter::a_encode, esize));
     }
-    std::shared_ptr<Buffer> xref_data;
     {
-        PipelinePopper pp_xref(this, &xref_data);
+        PipelinePopper pp_xref(this);
         activatePipelineStack(pp_xref);
         for (int i = first; i <= last; ++i) {
             QPDFXRefEntry& e = m->new_obj[i].xref;
@@ -2527,7 +2527,7 @@ QPDFWriter::writeXRefStream(
     writeStringQDF("\n ");
     writeString(" /Type /XRef");
     writeStringQDF("\n ");
-    writeString(" /Length " + std::to_string(xref_data->getSize()));
+    writeString(" /Length " + std::to_string(xref_data.size()));
     if (compressed) {
         writeStringQDF("\n ");
         writeString(" /Filter /FlateDecode");
@@ -2542,7 +2542,7 @@ QPDFWriter::writeXRefStream(
     }
     writeTrailer(which, size, true, prev, linearization_pass);
     writeString("\nstream\n");
-    writeBuffer(xref_data);
+    writeString(xref_data);
     writeString("\nendstream");
     closeObject(xref_id);
     return space_before_zero;
