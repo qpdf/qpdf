@@ -2684,14 +2684,14 @@ QPDFWriter::writeLinearized()
     }
 
     qpdf_offset_t hint_length = 0;
-    std::shared_ptr<Buffer> hint_buffer;
+    std::string hint_buffer;
 
     // Write file in two passes.  Part numbers refer to PDF spec 1.4.
 
     FILE* lin_pass1_file = nullptr;
     auto pp_pass1 = std::make_shared<PipelinePopper>(this);
     auto pp_md5 = std::make_shared<PipelinePopper>(this);
-    for (int pass = 1; pass <= 2; ++pass) {
+    for (int pass: {1, 2}) {
         if (pass == 1) {
             if (!m->lin_pass1_filename.empty()) {
                 lin_pass1_file = QUtil::safe_fopen(m->lin_pass1_filename.c_str(), "wb");
@@ -2828,7 +2828,7 @@ QPDFWriter::writeLinearized()
                     m->new_obj[hint_id].xref = QPDFXRefEntry(m->pipeline->getCount());
                 } else {
                     // Part 5: hint stream
-                    writeBuffer(hint_buffer);
+                    writeString(hint_buffer);
                 }
             }
             if (cur_object.getObjectID() == part6_end_marker) {
@@ -2902,12 +2902,12 @@ QPDFWriter::writeLinearized()
 
             // Write hint stream to a buffer
             {
-                pushPipeline(new Pl_Buffer("hint buffer"));
-                PipelinePopper pp_hint(this, &hint_buffer);
+                pushPipeline(new Pl_String("hint buffer", nullptr, hint_buffer));
+                PipelinePopper pp_hint(this);
                 activatePipelineStack(pp_hint);
                 writeHintStream(hint_id);
             }
-            hint_length = QIntC::to_offset(hint_buffer->getSize());
+            hint_length = QIntC::to_offset(hint_buffer.size());
 
             // Restore hint offset
             m->new_obj[hint_id].xref = QPDFXRefEntry(hint_offset1);
