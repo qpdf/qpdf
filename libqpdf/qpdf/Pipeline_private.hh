@@ -13,12 +13,22 @@ namespace qpdf::pl
         {
         }
 
+        Count(char const* identifier, std::string* str) :
+            Pipeline(identifier, nullptr),
+            str(str)
+        {
+        }
+
         ~Count() final = default;
 
         void
         write(unsigned char const* buf, size_t len) final
         {
             if (len) {
+                if (str) {
+                    str->append(reinterpret_cast<char const*>(buf), len);
+                    return;
+                }
                 count += static_cast<qpdf_offset_t>(len);
                 if (next()) {
                     next()->write(buf, len);
@@ -37,11 +47,12 @@ namespace qpdf::pl
         qpdf_offset_t
         getCount() const
         {
-            return count;
+            return str ? static_cast<qpdf_offset_t>(str->size()) : count;
         }
 
       private:
         qpdf_offset_t count{0};
+        std::string* str{nullptr};
     };
 } // namespace qpdf::pl
 

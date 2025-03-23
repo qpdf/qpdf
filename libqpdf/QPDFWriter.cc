@@ -917,10 +917,11 @@ QPDFWriter::initializePipelineStack(Pipeline* p)
 }
 
 void
-QPDFWriter::activatePipelineStack(PipelinePopper& pp, bool discard)
+QPDFWriter::activatePipelineStack(PipelinePopper& pp, bool discard, std::string* str)
 {
     std::string stack_id("stack " + std::to_string(m->next_stack_id));
-    auto* c = new pl::Count(stack_id.c_str(), discard ? nullptr : m->pipeline_stack.back());
+    auto* c = str ? new pl::Count(stack_id.c_str(), str)
+                  : new pl::Count(stack_id.c_str(), discard ? nullptr : m->pipeline_stack.back());
     ++m->next_stack_id;
     m->pipeline_stack.emplace_back(c);
     m->pipeline = c;
@@ -993,6 +994,12 @@ void
 QPDFWriter::pushDiscardFilter(PipelinePopper& pp)
 {
     activatePipelineStack(pp, true);
+}
+
+void
+QPDFWriter::pushStringPipeline(PipelinePopper& pp, std::string& str)
+{
+    activatePipelineStack(pp, true, &str);
 }
 
 void
@@ -1280,8 +1287,7 @@ QPDFWriter::willFilterStream(
     for (bool first_attempt: {true, false}) {
         PipelinePopper pp_stream_data(this);
         if (stream_data != nullptr) {
-            pushPipeline(new Pl_String("stream data", nullptr, *stream_data));
-            activatePipelineStack(pp_stream_data);
+            pushStringPipeline(pp_stream_data, *stream_data);
         } else {
             pushDiscardFilter(pp_stream_data);
         }
@@ -1644,9 +1650,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
     {
         // Pass 1
         PipelinePopper pp_ostream_pass1(this);
-
-        pushPipeline(new Pl_String("object stream", nullptr, stream_buffer_pass1));
-        activatePipelineStack(pp_ostream_pass1);
+        pushStringPipeline(pp_ostream_pass1, stream_buffer_pass1);
 
         int count = -1;
         for (auto const& obj: m->object_stream_to_objects[old_id]) {
@@ -2888,9 +2892,8 @@ QPDFWriter::writeLinearized()
 
             // Write hint stream to a buffer
             {
-                pushPipeline(new Pl_String("hint buffer", nullptr, hint_buffer));
                 PipelinePopper pp_hint(this);
-                activatePipelineStack(pp_hint);
+                pushStringPipeline(pp_hint, hint_buffer);
                 writeHintStream(hint_id);
             }
             hint_length = QIntC::to_offset(hint_buffer.size());
