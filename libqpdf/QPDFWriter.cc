@@ -2341,7 +2341,7 @@ QPDFWriter::writeHeader()
 void
 QPDFWriter::writeHintStream(int hint_id)
 {
-    std::shared_ptr<Buffer> hint_buffer;
+    std::string hint_buffer;
     int S = 0;
     int O = 0;
     bool compressed = (m->compress_streams && !m->qdf_mode);
@@ -2350,7 +2350,7 @@ QPDFWriter::writeHintStream(int hint_id)
     openObject(hint_id);
     setDataKey(hint_id);
 
-    size_t hlen = hint_buffer->getSize();
+    size_t hlen = hint_buffer.size();
 
     writeString("<< ");
     if (compressed) {
@@ -2370,12 +2370,11 @@ QPDFWriter::writeHintStream(int hint_id)
     if (m->encrypted) {
         QTC::TC("qpdf", "QPDFWriter encrypted hint stream");
     }
-    unsigned char last_char = '\0';
+    char last_char = hint_buffer.empty() ? '\0' : hint_buffer.back();
     {
         PipelinePopper pp_enc(this);
         pushEncryptionFilter(pp_enc);
-        writeBuffer(hint_buffer);
-        last_char = m->pipeline->getLastChar();
+        writeString(hint_buffer);
     }
 
     if (last_char != '\n') {
