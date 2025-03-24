@@ -26,6 +26,9 @@ more detail.
     - There have been further enhancements to how files with damaged xref
       tables are recovered.
 
+    - There has been some refactoring of how object streams are written with
+      some performance improvement.
+
 .. cSpell:ignore substract
 
 .. _r12-0-0:
