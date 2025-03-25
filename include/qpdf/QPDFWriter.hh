@@ -43,6 +43,11 @@
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFXRefEntry.hh>
 
+namespace qpdf::pl
+{
+    struct Link;
+}
+
 class QPDF;
 class Pl_Count;
 class Pl_MD5;
@@ -462,23 +467,20 @@ class QPDFWriter
         friend class QPDFWriter;
 
       public:
-        PipelinePopper(QPDFWriter* qw, std::shared_ptr<Buffer>* bp = nullptr) :
-            qw(qw),
-            bp(bp)
+        PipelinePopper(QPDFWriter* qw) :
+            qw(qw)
         {
         }
         ~PipelinePopper();
 
       private:
-        QPDFWriter* qw;
-        std::shared_ptr<Buffer>* bp;
-        std::string stack_id;
+        QPDFWriter* qw{nullptr};
+        unsigned long stack_id{0};
     };
 
     unsigned int bytesNeeded(long long n);
     void writeBinary(unsigned long long val, unsigned int bytes);
     void writeString(std::string_view str);
-    void writeBuffer(std::shared_ptr<Buffer>&);
     void writeStringQDF(std::string_view str);
     void writeStringNoQDF(std::string_view str);
     void writePad(size_t nspaces);
@@ -493,7 +495,7 @@ class QPDFWriter
         QPDFObjectHandle stream,
         bool& compress_stream,
         bool& is_metadata,
-        std::shared_ptr<Buffer>* stream_data);
+        std::string* stream_data);
     void unparseObject(
         QPDFObjectHandle object,
         int level,
@@ -600,12 +602,17 @@ class QPDFWriter
     // activate the pipeline stack. When the passed in PipelinePopper goes out of scope, the stack
     // is popped.
     Pipeline* pushPipeline(Pipeline*);
-    void activatePipelineStack(PipelinePopper&);
+    void activatePipelineStack(PipelinePopper& pp, std::string& str);
+    void activatePipelineStack(PipelinePopper& pp, std::unique_ptr<qpdf::pl::Link> link);
+    void activatePipelineStack(
+        PipelinePopper& pp,
+        bool discard = false,
+        std::string* str = nullptr,
+        std::unique_ptr<qpdf::pl::Link> link = nullptr);
     void initializePipelineStack(Pipeline*);
 
     void adjustAESStreamLength(size_t& length);
     void pushEncryptionFilter(PipelinePopper&);
-    void pushDiscardFilter(PipelinePopper&);
     void pushMD5Pipeline(PipelinePopper&);
     void computeDeterministicIDData();
 

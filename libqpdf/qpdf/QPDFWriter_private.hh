@@ -4,6 +4,7 @@
 #include <qpdf/QPDFWriter.hh>
 
 #include <qpdf/ObjTable.hh>
+#include <qpdf/Pipeline_private.hh>
 
 // This file is intended for inclusion by QPDFWriter, QPDF, QPDF_optimization and QPDF_linearization
 // only.
@@ -98,7 +99,7 @@ class QPDFWriter::Members
     int encryption_dict_objid{0};
     std::string cur_data_key;
     std::list<std::shared_ptr<Pipeline>> to_delete;
-    Pl_Count* pipeline{nullptr};
+    qpdf::pl::Count* pipeline{nullptr};
     std::vector<QPDFObjectHandle> object_queue;
     size_t object_queue_front{0};
     QPDFWriter::ObjTable obj;
@@ -112,8 +113,9 @@ class QPDFWriter::Members
     std::map<QPDFObjGen, int> page_object_to_seq;
     std::map<QPDFObjGen, int> contents_to_page_seq;
     std::map<int, std::vector<QPDFObjGen>> object_stream_to_objects;
-    std::list<Pipeline*> pipeline_stack;
-    unsigned long long next_stack_id{0};
+    std::vector<Pipeline*> pipeline_stack;
+    unsigned long next_stack_id{2};
+    std::string count_buffer;
     bool deterministic_id{false};
     Pl_MD5* md5_pipeline{nullptr};
     std::string deterministic_id_data;
