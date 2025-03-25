@@ -69,27 +69,30 @@ namespace qpdf::pl
       public:
         // Count the number of characters written. If 'next' is not set, the content written will be
         // discarded.
-        Count(char const* identifier, Pipeline* next = nullptr) :
-            Pipeline(identifier, next),
+        Count(unsigned long id, Pipeline* next = nullptr) :
+            Pipeline("", next),
+            id_(id),
             pass_immediately_to_next(next)
         {
         }
 
         // Count the number of characters written. If 'next' is not set, the content written will be
         // discarded.
-        Count(char const* identifier, std::unique_ptr<Link> link = nullptr) :
-            Pipeline(identifier, link ? link->next_pl.get() : nullptr),
+        Count(unsigned long id, std::unique_ptr<Link> link) :
+            Pipeline("", link ? link->next_pl.get() : nullptr),
             link(std::move(link)),
+            id_(id),
             pass_immediately_to_next(link)
         {
         }
 
         // Write to 'str'. If 'next' is set, 'str' will be written to 'next' when 'finish' is
         // called.
-        Count(char const* identifier, std::string& str, std::unique_ptr<Link> link = nullptr) :
-            Pipeline(identifier, link ? link->next_pl.get() : nullptr),
+        Count(unsigned long id, std::string& str, std::unique_ptr<Link> link = nullptr) :
+            Pipeline("", link ? link->next_pl.get() : nullptr),
             str(&str),
-            link(std::move(link))
+            link(std::move(link)),
+            id_(id)
         {
         }
 
@@ -127,10 +130,17 @@ namespace qpdf::pl
             return str ? static_cast<qpdf_offset_t>(str->size()) : count;
         }
 
+        unsigned long long
+        id() const
+        {
+            return id_;
+        }
+
       private:
         qpdf_offset_t count{0};
         std::string* str{nullptr};
         std::unique_ptr<Link> link{nullptr};
+        unsigned long id_{0};
         bool pass_immediately_to_next{false};
     };
 } // namespace qpdf::pl

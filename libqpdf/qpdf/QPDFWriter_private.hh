@@ -114,7 +114,7 @@ class QPDFWriter::Members
     std::map<QPDFObjGen, int> contents_to_page_seq;
     std::map<int, std::vector<QPDFObjGen>> object_stream_to_objects;
     std::vector<Pipeline*> pipeline_stack;
-    unsigned long long next_stack_id{0};
+    unsigned long next_stack_id{2};
     std::string count_buffer;
     bool deterministic_id{false};
     Pl_MD5* md5_pipeline{nullptr};

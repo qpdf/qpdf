@@ -474,8 +474,8 @@ class QPDFWriter
         ~PipelinePopper();
 
       private:
-        QPDFWriter* qw;
-        std::string stack_id;
+        QPDFWriter* qw{nullptr};
+        unsigned long stack_id{0};
     };
 
     unsigned int bytesNeeded(long long n);

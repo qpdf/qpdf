@@ -911,7 +911,7 @@ QPDFWriter::pushPipeline(Pipeline* p)
 void
 QPDFWriter::initializePipelineStack(Pipeline* p)
 {
-    m->pipeline = new pl::Count("pipeline stack base", p);
+    m->pipeline = new pl::Count(1, p);
     m->to_delete.emplace_back(std::shared_ptr<Pipeline>(m->pipeline));
     m->pipeline_stack.emplace_back(m->pipeline);
 }
@@ -933,26 +933,25 @@ void
 QPDFWriter::activatePipelineStack(
     PipelinePopper& pp, bool discard, std::string* str, std::unique_ptr<pl::Link> link)
 {
-    std::string stack_id("stack " + std::to_string(m->next_stack_id));
     pl::Count* c;
     if (link) {
-        c = new pl::Count(stack_id.c_str(), m->count_buffer, std::move(link));
+        c = new pl::Count(m->next_stack_id, m->count_buffer, std::move(link));
     } else if (discard) {
-        c = new pl::Count(stack_id.c_str(), nullptr);
+        c = new pl::Count(m->next_stack_id, nullptr);
     } else if (!str) {
-        c = new pl::Count(stack_id.c_str(), m->pipeline_stack.back());
+        c = new pl::Count(m->next_stack_id, m->pipeline_stack.back());
     } else {
-        c = new pl::Count(stack_id.c_str(), *str);
+        c = new pl::Count(m->next_stack_id, *str);
     }
-    ++m->next_stack_id;
+    pp.stack_id = m->next_stack_id;
     m->pipeline_stack.emplace_back(c);
     m->pipeline = c;
-    pp.stack_id = stack_id;
+    ++m->next_stack_id;
 }
 
 QPDFWriter::PipelinePopper::~PipelinePopper()
 {
-    if (stack_id.empty()) {
+    if (!stack_id) {
         return;
     }
     qpdf_assert_debug(qw->m->pipeline_stack.size() >= 2);
@@ -962,7 +961,7 @@ QPDFWriter::PipelinePopper::~PipelinePopper()
     // deterministic ID, but I don't think so. As of this writing, this is the only case in which
     // two dynamically allocated PipelinePopper objects ever exist at the same time, so the
     // assertion will fail if they get popped out of order from automatic destruction.
-    qpdf_assert_debug(qw->m->pipeline->getIdentifier() == stack_id);
+    qpdf_assert_debug(qw->m->pipeline->id() == stack_id);
     delete qw->m->pipeline_stack.back();
     qw->m->pipeline_stack.pop_back();
     while (!dynamic_cast<pl::Count*>(qw->m->pipeline_stack.back())) {
