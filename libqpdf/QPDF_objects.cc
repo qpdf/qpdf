@@ -1154,9 +1154,7 @@ QPDFObjectHandle
 QPDF::readTrailer()
 {
     qpdf_offset_t offset = m->file->tell();
-    bool empty = false;
-    auto object =
-        QPDFParser(*m->file, "trailer", m->tokenizer, nullptr, this, true).parse(empty, false);
+    auto [object, empty] = QPDFParser::parse(*m->file, "trailer", m->tokenizer, nullptr, *this);
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.
@@ -1174,13 +1172,11 @@ QPDF::readObject(std::string const& description, QPDFObjGen og)
 {
     setLastObjectDescription(description, og);
     qpdf_offset_t offset = m->file->tell();
-    bool empty = false;
 
     StringDecrypter decrypter{this, og};
     StringDecrypter* decrypter_ptr = m->encp->encrypted ? &decrypter : nullptr;
-    auto object =
-        QPDFParser(*m->file, m->last_object_description, m->tokenizer, decrypter_ptr, this, true)
-            .parse(empty, false);
+    auto [object, empty] =
+        QPDFParser::parse(*m->file, m->last_object_description, m->tokenizer, decrypter_ptr, *this);
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.
@@ -1294,10 +1290,7 @@ QPDF::validateStreamLineEnd(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset
 QPDFObjectHandle
 QPDF::readObjectInStream(BufferInputSource& input, int stream_id, int obj_id)
 {
-    bool empty = false;
-    auto object =
-        QPDFParser(input, stream_id, obj_id, m->last_object_description, m->tokenizer, this)
-            .parse(empty, false);
+    auto [object, empty] = QPDFParser::parse(input, stream_id, obj_id, m->tokenizer, *this);
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.
