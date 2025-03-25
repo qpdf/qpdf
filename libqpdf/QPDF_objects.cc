@@ -1288,7 +1288,7 @@ QPDF::validateStreamLineEnd(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset
 }
 
 QPDFObjectHandle
-QPDF::readObjectInStream(BufferInputSource& input, int stream_id, int obj_id)
+QPDF::readObjectInStream(is::OffsetBuffer& input, int stream_id, int obj_id)
 {
     auto [object, empty] = QPDFParser::parse(input, stream_id, obj_id, m->tokenizer, *this);
     if (empty) {
@@ -1645,12 +1645,26 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             "object stream " + std::to_string(obj_stream_number) + " has incorrect keys");
     }
 
-    std::vector<std::pair<int, long long>> offsets;
+    // id, offset, size
+    std::vector<std::tuple<int, qpdf_offset_t, size_t>> offsets;
 
     auto bp = obj_stream.getStreamData(qpdf_dl_specialized);
+
     BufferInputSource input("", bp.get());
 
+    const auto b_size = bp->getSize();
+    const auto end_offset = static_cast<qpdf_offset_t>(b_size);
+    auto b_start = bp->getBuffer();
+
+    if (first >= end_offset) {
+        throw damagedPDF(
+            "object " + std::to_string(obj_stream_number) + " 0",
+            "object stream " + std::to_string(obj_stream_number) + " has invalid /First entry");
+    }
+
+    int id = 0;
     long long last_offset = -1;
+    bool is_first = true;
     for (unsigned int i = 0; i < n; ++i) {
         auto tnum = readToken(input);
         auto toffset = readToken(input);
@@ -1682,26 +1696,45 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
                     std::to_string(last_offset) + ")"));
             continue;
         }
-        last_offset = offset;
 
         if (num > m->xref_table_max_id) {
             continue;
         }
 
-        offsets.emplace_back(num, offset + first);
+        if (first + offset >= end_offset) {
+            warn(damaged(num, offset, "offset is too large"));
+            continue;
+        }
+
+        if (is_first) {
+            is_first = false;
+        } else {
+            offsets.emplace_back(
+                id, last_offset + first, static_cast<size_t>(offset - last_offset));
+        }
+
+        last_offset = offset;
+        id = num;
+    }
+
+    if (!is_first) {
+        // We found at least one valid entry.
+        offsets.emplace_back(
+            id, last_offset + first, b_size - static_cast<size_t>(last_offset + first));
     }
 
     // To avoid having to read the object stream multiple times, store all objects that would be
     // found here in the cache.  Remember that some objects stored here might have been overridden
     // by new objects appended to the file, so it is necessary to recheck the xref table and only
     // cache what would actually be resolved here.
-    for (auto const& [id, offset]: offsets) {
-        QPDFObjGen og(id, 0);
+    for (auto const& [obj_id, obj_offset, obj_size]: offsets) {
+        QPDFObjGen og(obj_id, 0);
         auto entry = m->xref_table.find(og);
         if (entry != m->xref_table.end() && entry->second.getType() == 2 &&
             entry->second.getObjStreamNumber() == obj_stream_number) {
-            input.seek(offset, SEEK_SET);
-            QPDFObjectHandle oh = readObjectInStream(input, obj_stream_number, id);
+            Buffer obj_buffer{b_start + obj_offset, obj_size};
+            is::OffsetBuffer in("", &obj_buffer, obj_offset);
+            auto oh = readObjectInStream(in, obj_stream_number, obj_id);
             updateCache(og, oh.getObj(), end_before_space, end_after_space);
         } else {
             QTC::TC("qpdf", "QPDF not caching overridden objstm object");

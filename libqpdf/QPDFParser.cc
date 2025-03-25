@@ -12,6 +12,7 @@
 #include <memory>
 
 using namespace std::literals;
+using namespace qpdf;
 
 using ObjectPtr = std::shared_ptr<QPDFObject>;
 
@@ -87,7 +88,7 @@ QPDFParser::parse(
 
 std::pair<QPDFObjectHandle, bool>
 QPDFParser::parse(
-    BufferInputSource& input, int stream_id, int obj_id, qpdf::Tokenizer& tokenizer, QPDF& context)
+    is::OffsetBuffer& input, int stream_id, int obj_id, qpdf::Tokenizer& tokenizer, QPDF& context)
 {
     bool empty{false};
     auto result = QPDFParser(

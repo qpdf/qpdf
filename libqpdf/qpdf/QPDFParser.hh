@@ -1,6 +1,7 @@
 #ifndef QPDFPARSER_HH
 #define QPDFPARSER_HH
 
+#include <qpdf/InputSource_private.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFTokenizer_private.hh>
@@ -38,7 +39,7 @@ class QPDFParser
         QPDF& context);
 
     static std::pair<QPDFObjectHandle, bool> parse(
-        BufferInputSource& input,
+        qpdf::is::OffsetBuffer& input,
         int stream_id,
         int obj_id,
         qpdf::Tokenizer& tokenizer,
