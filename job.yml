@@ -134,6 +134,7 @@ options:
       - remove-info
       - remove-metadata
       - remove-page-labels
+      - remove-structure
       - replace-input
       - report-memory-usage
       - requires-password
@@ -446,6 +447,7 @@ json:
   remove-info:
   remove-metadata:
   remove-page-labels:
+  remove-structure:
   report-memory-usage:
   rotate:
   set-page-labels:

@@ -532,6 +532,13 @@ QPDFJob::Config::removePageLabels()
 }
 
 QPDFJob::Config*
+QPDFJob::Config::removeStructure()
+{
+    o.m->remove_structure = true;
+    return this;
+}
+
+QPDFJob::Config*
 QPDFJob::Config::reportMemoryUsage()
 {
     o.m->report_mem_usage = true;

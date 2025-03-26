@@ -428,6 +428,8 @@ ap.addOptionHelp("--remove-metadata", "modification", "remove metadata", R"(Excl
 )");
 ap.addOptionHelp("--remove-page-labels", "modification", "remove explicit page numbers", R"(Exclude page labels (explicit page numbers) from the output file.
 )");
+ap.addOptionHelp("--remove-structure", "modification", "remove metadata", R"(Exclude the structure tree from the output file.
+)");
 ap.addOptionHelp("--set-page-labels", "modification", "number pages for the entire document", R"(--set-page-labels label-spec ... --
 
 Set page labels (explicit page numbers) for the entire file.
@@ -643,12 +645,12 @@ reasons. Use 256-bit encryption instead.
 ap.addOptionHelp("--allow-insecure", "encryption", "allow empty owner passwords", R"(Allow creation of PDF files with empty owner passwords and
 non-empty user passwords when using 256-bit encryption.
 )");
-ap.addOptionHelp("--force-V4", "encryption", "force V=4 in encryption dictionary", R"(This option is for testing and is never needed in practice since
-qpdf does this automatically when needed.
-)");
 }
 static void add_help_6(QPDFArgParser& ap)
 {
+ap.addOptionHelp("--force-V4", "encryption", "force V=4 in encryption dictionary", R"(This option is for testing and is never needed in practice since
+qpdf does this automatically when needed.
+)");
 ap.addOptionHelp("--force-R5", "encryption", "use unsupported R=5 encryption", R"(Use an undocumented, unsupported, deprecated encryption
 algorithm that existed only in Acrobat version IX. This option
 should not be used except for compatibility testing.
@@ -828,13 +830,13 @@ ap.addOptionHelp("--description", "add-attachment", "set attachment's descriptio
 Supply descriptive text for the attachment, displayed by some
 PDF viewers.
 )");
+}
+static void add_help_7(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--replace", "add-attachment", "replace attachment with same key", R"(Indicate that any existing attachment with the same key should
 be replaced by the new attachment. Otherwise, qpdf gives an
 error if an attachment with that key is already present.
 )");
-}
-static void add_help_7(QPDFArgParser& ap)
-{
 ap.addHelpTopic("copy-attachments", "copy attachments from another file", R"(The options listed below appear between --copy-attachments-from and
 its terminating "--".
 
@@ -920,14 +922,14 @@ generation numbers for the image objects on each page.
 ap.addOptionHelp("--list-attachments", "inspection", "list embedded files", R"(Show the key and stream number for each embedded file. Combine
 with --verbose for more detailed information.
 )");
+}
+static void add_help_8(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--show-attachment", "inspection", "export an embedded file", R"(--show-attachment=key
 
 Write the contents of the specified attachment to standard
 output as binary data. Get the key with --list-attachments.
 )");
-}
-static void add_help_8(QPDFArgParser& ap)
-{
 ap.addHelpTopic("json", "JSON output for PDF information", R"(Show information about the PDF file in JSON format. Please see the
 JSON chapter in the qpdf manual for details.
 )");

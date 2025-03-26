@@ -421,6 +421,9 @@ popHandler(); // key: removeMetadata
 pushKey("removePageLabels");
 addBare([this]() { c_main->removePageLabels(); });
 popHandler(); // key: removePageLabels
+pushKey("removeStructure");
+addBare([this]() { c_main->removeStructure(); });
+popHandler(); // key: removeStructure
 pushKey("reportMemoryUsage");
 addBare([this]() { c_main->reportMemoryUsage(); });
 popHandler(); // key: reportMemoryUsage

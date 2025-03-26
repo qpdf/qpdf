@@ -72,6 +72,7 @@ this->ap.addBare("recompress-flate", [this](){c_main->recompressFlate();});
 this->ap.addBare("remove-info", [this](){c_main->removeInfo();});
 this->ap.addBare("remove-metadata", [this](){c_main->removeMetadata();});
 this->ap.addBare("remove-page-labels", [this](){c_main->removePageLabels();});
+this->ap.addBare("remove-structure", [this](){c_main->removeStructure();});
 this->ap.addBare("replace-input", b(&ArgParser::argReplaceInput));
 this->ap.addBare("report-memory-usage", [this](){c_main->reportMemoryUsage();});
 this->ap.addBare("requires-password", [this](){c_main->requiresPassword();});
