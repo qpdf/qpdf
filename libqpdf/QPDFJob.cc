@@ -398,24 +398,19 @@ QPDFJob::parseRotationParameter(std::string const& parameter)
     if (range.empty()) {
         range = "1-z";
     }
-    bool range_valid = false;
     try {
         QUtil::parse_numrange(range.c_str(), 0);
-        range_valid = true;
     } catch (std::runtime_error const&) {
-        // ignore
-    }
-    if (range_valid &&
-        ((angle_str == "0") || (angle_str == "90") || (angle_str == "180") ||
-         (angle_str == "270"))) {
-        int angle = QUtil::string_to_int(angle_str.c_str());
-        if (relative == -1) {
-            angle = -angle;
-        }
-        m->rotations[range] = RotationSpec(angle, (relative != 0));
-    } else {
         usage("invalid parameter to rotate: " + parameter);
     }
+    int angle = QUtil::string_to_int(angle_str.c_str()) % 360;
+    if (angle % 90 != 0) {
+        usage("invalid parameter to rotate (angle must be a multiple of 90): " + parameter);
+    }
+    if (relative == -1) {
+        angle = -angle;
+    }
+    m->rotations[range] = RotationSpec(angle, (relative != 0));
 }
 
 std::vector<int>
