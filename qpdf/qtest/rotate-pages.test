@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('rotate-pages');
 
-my $n_tests = 18;
+my $n_tests = 21;
 
 # Do absolute, positive, and negative on ranges that include
 # inherited and non-inherited.
@@ -31,6 +31,22 @@ $td->runtest("page rotation",
 $td->runtest("check output",
              {$td->COMMAND => "qpdf-test-compare a.pdf rotated.pdf"},
              {$td->FILE => "rotated.pdf", $td->EXIT_STATUS => 0});
+
+$td->runtest("page rotation (>270)",
+             {$td->COMMAND => "qpdf --static-id to-rotate.pdf a.pdf" .
+                  " --rotate=+450:1,4,11,16" .
+                  " --rotate=900:2,5,12-13" .
+                  " --rotate=-1890:3,15,17,18"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->COMMAND => "qpdf-test-compare a.pdf rotated.pdf"},
+             {$td->FILE => "rotated.pdf", $td->EXIT_STATUS => 0});
+
+$td->runtest("invald page rotation",
+             {$td->COMMAND => "qpdf --static-id to-rotate.pdf a.pdf" .
+                  " --rotate=45:1,4,11,16"},
+             {$td->FILE => "invalid-rotated.out", $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("remove rotation",
              {$td->COMMAND => "qpdf --static-id rotated.pdf a.pdf" .
