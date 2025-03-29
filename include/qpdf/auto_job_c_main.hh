@@ -35,6 +35,7 @@ QPDF_DLL Config* recompressFlate();
 QPDF_DLL Config* removeInfo();
 QPDF_DLL Config* removeMetadata();
 QPDF_DLL Config* removePageLabels();
+QPDF_DLL Config* removeStructure();
 QPDF_DLL Config* reportMemoryUsage();
 QPDF_DLL Config* requiresPassword();
 QPDF_DLL Config* removeRestrictions();

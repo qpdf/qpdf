@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('merge-and-split');
 
-my $n_tests = 34;
+my $n_tests = 36;
 
 # Select pages from the same file multiple times including selecting
 # twice from an encrypted file and specifying the password only the
@@ -135,6 +135,15 @@ $td->runtest("remove info (without moddate)",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "remove-info-no-moddate.pdf"});
+
+$td->runtest("remove structure tree",
+             {$td->COMMAND =>
+                  "qpdf remove-structure.pdf a.pdf" .
+                  " --qdf --remove-structure --static-id"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "remove-structure.out.pdf"});
 
 $td->runtest("split with shared resources",
              {$td->COMMAND =>

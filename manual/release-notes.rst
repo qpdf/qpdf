@@ -13,7 +13,7 @@ more detail.
 
 .. x.y.z: not yet released
 
-12.0.1: not yet released
+12.1.0: not yet released
   - Bug fixes
 
     - In ``QPDF::isLinearized`` return false if the first object in the file is
@@ -28,6 +28,11 @@ more detail.
 
     - Fix two object stream error/warning messages that reported the wrong
       object id.
+
+  - CLI Enhancements
+
+    - New :qpdf:ref:`--remove-structure` option to exclude the document
+      structure tree from the output PDF.
 
   - Other enhancements
 

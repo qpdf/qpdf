@@ -1799,7 +1799,7 @@ Related Options
    Exclude file information (except modification date) from the output file by
    omitting all entries (except ``/ModDate``) from the ``/Info`` dictionary in
    the document trailer.
-   See also :qpdf:ref:`--remove-metadata`.
+   See also :qpdf:ref:`--remove-metadata`, :qpdf:ref:`--remove-structure`.
 
 .. qpdf:option:: --remove-metadata
 
@@ -1809,7 +1809,7 @@ Related Options
 
    Exclude metadata from the output file by omitting the ``/Metadata``
    dictionary in the document catalog.
-   See also :qpdf:ref:`--remove-info`.
+   See also :qpdf:ref:`--remove-info`, :qpdf:ref:`--remove-structure`.
 
 .. qpdf:option:: --remove-page-labels
 
@@ -1820,6 +1820,19 @@ Related Options
    Exclude page labels (explicit page numbers) from the output file by
    omitting the ``/PageLabels`` dictionary in the document catalog.
    See also :qpdf:ref:`--set-page-labels`.
+
+.. qpdf:option:: --remove-structure
+
+   .. help: remove metadata
+
+      Exclude the structure tree from the output file.
+
+   Exclude the structure tree from the output file by omitting the
+   ``/StructTreeRoot`` and ``/MarkInfo`` dictionaries in the document
+   catalog.
+   See also :qpdf:ref:`--remove-info`, :qpdf:ref:`--remove-metadata`.
+
+
 
 .. qpdf:option:: --set-page-labels label-spec ... --
 

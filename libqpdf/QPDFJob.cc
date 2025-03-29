@@ -490,6 +490,10 @@ QPDFJob::createQPDF()
     if (m->remove_metadata) {
         pdf.getRoot().removeKey("/Metadata");
     }
+    if (m->remove_structure) {
+        pdf.getRoot().removeKey("/StructTreeRoot");
+        pdf.getRoot().removeKey("/MarkInfo");
+    }
 
     for (auto& foreign: page_heap) {
         if (foreign->anyWarnings()) {
