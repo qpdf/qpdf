@@ -813,12 +813,12 @@ QPDF::getRoot()
 {
     QPDFObjectHandle root = m->trailer.getKey("/Root");
     if (!root.isDictionary()) {
-        throw damagedPDF("", 0, "unable to find /Root dictionary");
+        throw damagedPDF("", -1, "unable to find /Root dictionary");
     } else if (
         // Check_mode is an interim solution to request #810 pending a more comprehensive review of
         // the approach to more extensive checks and warning levels.
         m->check_mode && !root.getKey("/Type").isNameAndEquals("/Catalog")) {
-        warn(damagedPDF("", 0, "catalog /Type entry missing or invalid"));
+        warn(damagedPDF("", -1, "catalog /Type entry missing or invalid"));
         root.replaceKey("/Type", "/Catalog"_qpdf);
     }
     return root;
@@ -964,7 +964,7 @@ QPDFExc
 QPDF::damagedPDF(
     InputSource& input, std::string const& object, qpdf_offset_t offset, std::string const& message)
 {
-    return {qpdf_e_damaged_pdf, input.getName(), object, offset, message};
+    return {qpdf_e_damaged_pdf, input.getName(), object, offset, message, true};
 }
 
 // Return an exception of type qpdf_e_damaged_pdf.  The object is taken from
@@ -979,7 +979,7 @@ QPDF::damagedPDF(InputSource& input, qpdf_offset_t offset, std::string const& me
 QPDFExc
 QPDF::damagedPDF(std::string const& object, qpdf_offset_t offset, std::string const& message)
 {
-    return {qpdf_e_damaged_pdf, m->file->getName(), object, offset, message};
+    return {qpdf_e_damaged_pdf, m->file->getName(), object, offset, message, true};
 }
 
 // Return an exception of type qpdf_e_damaged_pdf.  The filename is taken from m->file and the

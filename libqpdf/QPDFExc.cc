@@ -6,11 +6,28 @@ QPDFExc::QPDFExc(
     std::string const& object,
     qpdf_offset_t offset,
     std::string const& message) :
-    std::runtime_error(createWhat(filename, object, offset, message)),
+    std::runtime_error(createWhat(filename, object, (offset ? offset : -1), message)),
     error_code(error_code),
     filename(filename),
     object(object),
-    offset(offset),
+    offset(offset ? offset : -1),
+    message(message)
+{
+}
+
+QPDFExc::QPDFExc(
+    qpdf_error_code_e error_code,
+    std::string const& filename,
+    std::string const& object,
+    qpdf_offset_t offset,
+    std::string const& message,
+    bool zero_offset_valid) :
+    std::runtime_error(
+        createWhat(filename, object, (offset || zero_offset_valid ? offset : -1), message)),
+    error_code(error_code),
+    filename(filename),
+    object(object),
+    offset(offset || zero_offset_valid ? offset : -1),
     message(message)
 {
 }
@@ -26,17 +43,17 @@ QPDFExc::createWhat(
     if (!filename.empty()) {
         result += filename;
     }
-    if (!(object.empty() && offset == 0)) {
+    if (!(object.empty() && offset < 0)) {
         if (!filename.empty()) {
             result += " (";
         }
         if (!object.empty()) {
             result += object;
-            if (offset > 0) {
+            if (offset >= 0) {
                 result += ", ";
             }
         }
-        if (offset > 0) {
+        if (offset >= 0) {
             result += "offset " + std::to_string(offset);
         }
         if (!filename.empty()) {
@@ -71,7 +88,7 @@ QPDFExc::getObject() const
 qpdf_offset_t
 QPDFExc::getFilePosition() const
 {
-    return this->offset;
+    return offset < 0 ? 0 : offset;
 }
 
 std::string const&
