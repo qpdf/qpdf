@@ -7,3 +7,8 @@ appimage/build
 .cache
 /html
 Doxyfile
+/CMakeUserPresets.json
+/compile_commands.json
+
+# ./Testing is created if you run ctest from the wrong place.
+/Testing

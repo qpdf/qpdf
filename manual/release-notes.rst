@@ -21,7 +21,7 @@ more detail.
       integer object. Previously the method returned false if the first
       dictionary object was not a linearization parameter dictionary.
 
-    - Fix parsing of object streams containing objects not seperated by
+    - Fix parsing of object streams containing objects not separated by
       white-space. Pre-2020 editions of the PDF specification incorrectly
       stated that white-space was required between objects. qpdf relied on this
       when parsing object streams.
@@ -38,6 +38,16 @@ more detail.
 
     - There have been further enhancements to how files with damaged xref
       tables are recovered.
+
+  - Build changes
+
+    - The file ``.idea/cmake.xml`` has been removed. Instead of
+      shipping with some CMake profiles in the CLion-specific
+      configuration, we now include a ``CMakePresets.json``. There is
+      information about using it in ``README-maintainer.md``. For
+      most users, running ``cmake`` in the normal way is fine.
+      Suggestions are welcome. None of the official builds use cmake
+      presets at the time of initial introduction.
 
   - Other changes
 

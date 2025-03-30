@@ -7,3 +7,5 @@
 /dataSources/
 /dataSources.local.xml
 /inspectionProfiles
+# We use CMakePresets.json. Don't check in cmake profiles.
+/cmake.xml

@@ -1,0 +1,204 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 19,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base-config",
+      "hidden": true,
+      "description": "Common base settings",
+      "binaryDir": "${sourceDir}/cmake-build-${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "base-debug",
+      "hidden": true,
+      "inherits": "base-config",
+      "description": "Base settings for debug builds",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_SHARED_LIBS": "OFF"
+      }
+    },
+    {
+      "name": "base-unix",
+      "hidden": true,
+      "inherits": "base-config",
+      "description": "Base settings for Linux & macOS",
+      "condition": {
+        "type": "anyOf",
+        "conditions": [
+          {
+            "type": "equals",
+            "lhs": "${hostSystemName}",
+            "rhs": "Linux"
+          },
+          {
+            "type": "equals",
+            "lhs": "${hostSystemName}",
+            "rhs": "Darwin"
+          }
+        ]
+      },
+      "generator": "Ninja"
+    },
+    {
+      "name": "base-msvc",
+      "hidden": true,
+      "inherits": "base-config",
+      "description": "Base settings for Windows using MSVC",
+      "environment": {
+        "TOOLCHAIN_NAME": "Visual Studio"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "base-maintainer",
+      "hidden": true,
+      "displayName": "Base settings for maintainer mode",
+      "description": "Unix Maintainer build",
+      "inherits": "base-unix",
+      "cacheVariables": {
+        "MAINTAINER_MODE": "ON",
+        "BUILD_STATIC_LIBS": "OFF"
+      }
+    },
+    {
+      "name": "maintainer",
+      "displayName": "Maintainer",
+      "description": "Unix Maintainer build",
+      "inherits": "base-maintainer",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "maintainer-debug",
+      "displayName": "Maintainer (debug)",
+      "description": "Unix Maintainer build",
+      "inherits": [
+        "base-maintainer",
+        "base-debug"
+      ],
+      "cacheVariables": {
+        "BUILD_STATIC_LIBS": "ON"
+      }
+    },
+    {
+      "name": "maintainer-coverage",
+      "displayName": "Maintainer (coverage)",
+      "description": "Unix Maintainer build",
+      "inherits": "maintainer-debug",
+      "cacheVariables": {
+        "ENABLE_COVERAGE": "ON"
+      }
+    },
+    {
+      "name": "maintainer-profile",
+      "displayName": "Maintainer (profile)",
+      "description": "Unix Maintainer build",
+      "inherits": "maintainer-debug",
+      "environment": {
+        "CFLAGS": "-pg",
+        "CXXFLAGS": "-pg",
+        "LDFLAGS": "-pg"
+      }
+    },
+    {
+      "name": "debug",
+      "displayName": "Debug",
+      "description": "Debug build",
+      "inherits": "base-config",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release",
+      "description": "Release build",
+      "inherits": "base-config",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "sanitizers",
+      "displayName": "Unix + clang sanitizers",
+      "description": "Debug build with AddressSanitizer enabled",
+      "inherits": [
+        "base-unix",
+        "debug"
+      ],
+      "environment": {
+        "CFLAGS": "-fsanitize=address -fsanitize=undefined",
+        "CXXFLAGS": "-fsanitize=address -fsanitize=undefined",
+        "LDFLAGS": "-fsanitize=address -fsanitize=undefined",
+        "CC": "clang",
+        "CXX": "clang++"
+      },
+      "cacheVariables": {
+        "MAINTAINER_MODE": "ON",
+        "BUILD_SHARED_LIBS": "OFF",
+        "REQUIRE_CRYPTO_OPENSSL": "ON",
+        "REQUIRE_CRYPTO_GNUTLS": "ON",
+        "ENABLE_QTC": "ON"
+      }
+    },
+    {
+      "name": "msvc",
+      "displayName": "Windows/MSVC",
+      "description": "Visual Studio release with debug info build",
+      "inherits": [
+        "base-msvc"
+      ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "BUILD_SHARED_LIBS": "OFF"
+      }
+    },
+    {
+      "name": "msvc-release",
+      "displayName": "Windows/MSVC Release",
+      "description": "Visual Studio release build",
+      "inherits": [
+        "base-msvc",
+        "release"
+      ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "maintainer",
+      "configurePreset": "maintainer",
+      "description": "Run build for maintainer mode"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "maintainer",
+      "configurePreset": "maintainer",
+      "description": "Run default tests for maintainer mode",
+      "output": {
+        "verbosity": "verbose"
+      }
+    },
+    {
+      "name": "msvc",
+      "configurePreset": "msvc",
+      "description": "Run default tests for msvc",
+      "output": {
+        "verbosity": "verbose"
+      }
+    }
+  ]
+}
