@@ -1,0 +1,9 @@
+
+qpdf: invalid parameter to rotate (angle must be a multiple of 90): 45:1,4,11,16
+
+For help:
+  qpdf --help=usage       usage information
+  qpdf --help=topic       help on a topic
+  qpdf --help=--option    help on an option
+  qpdf --help             general help and a topic list
+
