@@ -1298,6 +1298,7 @@ Page Ranges
 
    - <n>        where <n> represents a number is the <n>th page
    - r<n>       is the <n>th page from the end
+   - m<n>       is the <n>th page or the last page, if <n> is larger than the number of pages
    - z          the last page, same as r1
 
    - a,b,c      pages a, b, and c
@@ -1318,6 +1319,9 @@ section describes the syntax of a page range.
 
 - A number preceded by ``r`` counts from the end, so ``r1`` is the
   last page, ``r2`` is the second-to-last page, etc.
+
+- A number preceded by ``m`` indicates the page numbered from 1 or the last page,
+  if the number is greater than the number of pages in the document.
 
 - The letter ``z`` represents the last page and is the same as ``r1``.
 
@@ -1387,6 +1391,10 @@ section describes the syntax of a page range.
        that order. That is pages 4 through 10 except 7 through 9
        followed by 12 through 8 descending except 11 (the fifth page
        from the end)
+
+   - - ``1-m10``
+     - In a 15-page file, this is the first 10 pages, in a 5 page
+       file this is the first 5 pages.
 
 .. _modification-options:
 
