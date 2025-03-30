@@ -1608,7 +1608,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             m->file->getName() + " object stream " + std::to_string(obj_stream_number),
             +"object " + std::to_string(id) + " 0",
             offset,
-            msg};
+            msg,
+            true};
     };
 
     if (m->resolved_object_streams.count(obj_stream_number)) {
@@ -1667,6 +1668,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     bool is_first = true;
     for (unsigned int i = 0; i < n; ++i) {
         auto tnum = readToken(input);
+        auto id_offset = input.getLastOffset();
         auto toffset = readToken(input);
         if (!(tnum.isInteger() && toffset.isInteger())) {
             throw damaged(0, input.getLastOffset(), "expected integer in object stream header");
@@ -1677,13 +1679,13 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 
         if (num == obj_stream_number) {
             QTC::TC("qpdf", "QPDF ignore self-referential object stream");
-            warn(damaged(num, input.getLastOffset(), "object stream claims to contain itself"));
+            warn(damaged(num, id_offset, "object stream claims to contain itself"));
             continue;
         }
 
         if (num < 1) {
             QTC::TC("qpdf", "QPDF object stream contains id < 1");
-            warn(damaged(num, input.getLastOffset(), "object id is invalid"s));
+            warn(damaged(num, id_offset, "object id is invalid"s));
             continue;
         }
 
@@ -1691,8 +1693,9 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             QTC::TC("qpdf", "QPDF object stream offsets not increasing");
             warn(damaged(
                 num,
-                offset,
-                "offset is invalid (must be larger than previous offset " +
+                input.getLastOffset(),
+                "offset " + std::to_string(offset) +
+                    " is invalid (must be larger than previous offset " +
                     std::to_string(last_offset) + ")"));
             continue;
         }
@@ -1702,7 +1705,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
         }
 
         if (first + offset >= end_offset) {
-            warn(damaged(num, offset, "offset is too large"));
+            warn(damaged(
+                num, input.getLastOffset(), "offset " + std::to_string(offset) + " is too large"));
             continue;
         }
 
