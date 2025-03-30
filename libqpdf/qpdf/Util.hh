@@ -44,6 +44,21 @@ namespace qpdf::util
         return {'#', hexchars[static_cast<unsigned char>(c) >> 4], hexchars[c & 0x0f]};
     }
 
+    // Numerically increment a digit string. Ignore the last 'tail' characters.
+    inline void
+    increment(std::string& s, int tail = 0)
+    {
+        auto end = s.rend();
+        for (auto it = s.rbegin() + tail; it != end; ++it) {
+            ++*it;
+            if (*it != ':') {
+                return;
+            }
+            *it = '0';
+        }
+        s.insert(0, 1, '1');
+    }
+
 } // namespace qpdf::util
 
 #endif // UTIL_HH

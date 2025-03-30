@@ -19,6 +19,7 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/RC4.hh>
+#include <qpdf/Util.hh>
 
 #include <algorithm>
 #include <cstdlib>
@@ -1624,14 +1625,19 @@ QPDFWriter::unparseObject(
 void
 QPDFWriter::writeObjectStreamOffsets(std::vector<qpdf_offset_t>& offsets, int first_obj)
 {
-    for (size_t i = 0; i < offsets.size(); ++i) {
-        if (i != 0) {
+    qpdf_assert_debug(first_obj > 0);
+    bool is_first = true;
+    auto id = std::to_string(first_obj) + ' ';
+    for (auto& offset: offsets) {
+        if (is_first) {
+            is_first = false;
+        } else {
             writeStringQDF("\n");
             writeStringNoQDF(" ");
         }
-        writeString(std::to_string(i + QIntC::to_size(first_obj)));
-        writeString(" ");
-        writeString(std::to_string(offsets.at(i)));
+        writeString(id);
+        util::increment(id, 1);
+        writeString(std::to_string(offset));
     }
     writeString("\n");
 }
