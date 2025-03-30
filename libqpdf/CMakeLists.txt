@@ -328,7 +328,7 @@ check_c_source_compiles(
 #include <stdio.h>
 int main(int argc, char* argv[]) {
     tzset();
-    printf(\"%ld\", timezone);
+    printf(\"%ld\", timezone / 60);
     return 0;
 }"
     HAVE_EXTERN_LONG_TIMEZONE)
