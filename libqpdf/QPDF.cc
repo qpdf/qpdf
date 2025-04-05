@@ -115,13 +115,15 @@ QPDF::ForeignStreamData::ForeignStreamData(
     QPDFObjGen foreign_og,
     qpdf_offset_t offset,
     size_t length,
-    QPDFObjectHandle local_dict) :
+    QPDFObjectHandle local_dict,
+    bool is_root_metadata) :
     encp(encp),
     file(file),
     foreign_og(foreign_og),
     offset(offset),
     length(length),
-    local_dict(local_dict)
+    local_dict(local_dict),
+    is_root_metadata(is_root_metadata)
 {
 }
 
@@ -740,7 +742,8 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
             foreign,
             foreign.getParsedOffset(),
             stream.getLength(),
-            dict);
+            dict,
+            stream.isRootMetadata());
         m->copied_stream_data_provider->registerForeignStream(local_og, foreign_stream_data);
         result.replaceStreamData(
             m->copied_streams, dict.getKey("/Filter"), dict.getKey("/DecodeParms"));
@@ -849,13 +852,15 @@ QPDF::pipeStreamData(
     qpdf_offset_t offset,
     size_t length,
     QPDFObjectHandle stream_dict,
+    bool is_root_metadata,
     Pipeline* pipeline,
     bool suppress_warnings,
     bool will_retry)
 {
     std::unique_ptr<Pipeline> to_delete;
     if (encp->encrypted) {
-        decryptStream(encp, file, qpdf_for_warning, pipeline, og, stream_dict, to_delete);
+        decryptStream(
+            encp, file, qpdf_for_warning, pipeline, og, stream_dict, is_root_metadata, to_delete);
     }
 
     bool attempted_finish = false;
@@ -911,6 +916,7 @@ QPDF::pipeStreamData(
     qpdf_offset_t offset,
     size_t length,
     QPDFObjectHandle stream_dict,
+    bool is_root_metadata,
     Pipeline* pipeline,
     bool suppress_warnings,
     bool will_retry)
@@ -923,6 +929,7 @@ QPDF::pipeStreamData(
         offset,
         length,
         stream_dict,
+        is_root_metadata,
         pipeline,
         suppress_warnings,
         will_retry);
@@ -946,6 +953,7 @@ QPDF::pipeForeignStreamData(
         foreign->offset,
         foreign->length,
         foreign->local_dict,
+        foreign->is_root_metadata,
         pipeline,
         suppress_warnings,
         will_retry);

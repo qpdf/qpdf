@@ -835,6 +835,7 @@ class QPDF
         qpdf_offset_t offset,
         size_t length,
         QPDFObjectHandle dict,
+        bool is_root_metadata,
         Pipeline* pipeline,
         bool suppress_warnings,
         bool will_retry);
@@ -848,6 +849,7 @@ class QPDF
         qpdf_offset_t offset,
         size_t length,
         QPDFObjectHandle dict,
+        bool is_root_metadata,
         Pipeline* pipeline,
         bool suppress_warnings,
         bool will_retry);
@@ -920,6 +922,7 @@ class QPDF
         Pipeline*& pipeline,
         QPDFObjGen og,
         QPDFObjectHandle& stream_dict,
+        bool is_root_metadata,
         std::unique_ptr<Pipeline>& heap);
 
     // Methods to support object copying

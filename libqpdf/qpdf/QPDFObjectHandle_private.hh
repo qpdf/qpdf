@@ -246,6 +246,7 @@ namespace qpdf
             return stream()->stream_provider;
         }
 
+
         // See comments in QPDFObjectHandle.hh for these methods.
         bool pipeStreamData(
             Pipeline* p,
@@ -296,6 +297,8 @@ namespace qpdf
         static void registerStreamFilter(
             std::string const& filter_name,
             std::function<std::shared_ptr<QPDFStreamFilter>()> factory);
+
+        bool isRootMetadata() const;
 
       private:
         QPDF_Stream::Members*
