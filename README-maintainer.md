@@ -30,69 +30,84 @@ separate mechanism for tracking changes.
 
 **Remember to check pull requests as well as issues in github.**
 
-Include `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` with cmake if using emacs lsp mode.
-
-Default:
+Run `cmake --list-presets` to see available cmake presets. Routine maintainer development can be
 
 ```
-cmake -DMAINTAINER_MODE=ON -DBUILD_STATIC_LIBS=OFF \
-   -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+cmake --preset maintainer
+cmake --build --preset maintainer
+ctest --preset maintainer
 ```
 
-Debugging:
+See [CMakePresets.json](CMakePresets.json) for additional presets. Reminders about presets:
+* You can override/enhance configure presets, e.g., `cmake --preset maintainer -DCMAKE_BUILD_TYPE=Release`
+* You can pass flags to ctest, e.g., `ctest --preset maintainer -R zlib-flate`.
+* You can't override the build directory for build and test presets, but you _can_ override the
+  directory for configure presets and then run `cmake --build build-dir` and `ctest` manually, as
+  shown below.
+* The base configuration includes `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`, which is useful for LSP mode
+  in C++. This is harmless in environments where it's not needed. You may need to make a symlink
+  from compile_commands.json to the one in whichever build directory you are using.
+* If you have common configurations you'd like to see, pull requests are welcome, but
+  `CMakeUserPresets.json` is your friend. You can copy or inherit from CMakeUserPresets.json for
+  your own use. Note that CMakeUserPresets.json is not part of the stable API. We reserve the right
+  to modify these presets in a non-compatible fashion at any time without regard to qpdf version
+  numbers, but we should mention changes in the release notes.
+* Study the CMakePresets.json file for details on how these are implemented.
+
+See also ./build-scripts for other ways to run the build for different configurations.
+
+### Useful build examples
+
+To run a maintainer build in release mode and run only the unicode-filenames test, you could run
 
 ```
-cmake -DMAINTAINER_MODE=ON -DBUILD_SHARED_LIBS=OFF \
-   -DCMAKE_BUILD_TYPE=Debug ..
+cmake --preset maintainer -DCMAKE_BUILD_TYPE=Release
+cmake --build --preset maintainer
+TESTS=unicode-filenames ctest --preset maintainer -R qpdf
 ```
 
-Profiling:
+To run a maintainer build in release mode in a _different directory_ and run only the
+unicode-filenames test, you could run the following. Trying to override the directory on the command
+line of `cmake --build` or `ctest` in conjunction with `--preset` may silently ignore the directory
+override, and you may not get what you think you are getting.
 
 ```
-CFLAGS=-pg LDFLAGS=-pg \
-   cmake -DMAINTAINER_MODE=ON -DBUILD_SHARED_LIBS=OFF \
-   -DCMAKE_BUILD_TYPE=Debug ..
+cmake --preset maintainer -DCMAKE_BUILD_TYPE=Release -B cmake-build-release
+cmake --build cmake-build-release
+TESTS=unicode-filenames ctest --verbose --test-dir cmake-build-release -R qpdf
 ```
 
-Then run `gprof gmon.out`. Note that gmon.out is not cumulative.
+### Profiling
 
-Coverage:
+When running with the `maintainer-profile` preset (or any time you run profiling), run `gprof
+gmon.out`. Note that gmon.out is not cumulative.
 
-```
-cmake -DMAINTAINER_MODE=ON -DBUILD_SHARED_LIBS=OFF \
-   -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=ON..
-```
+### Coverage
 
-Then, from the build directory, run the test suite (`ctest --verbose`) followed by
+When running with the `maintainer-coverage` preset, after running tests:
 ```
 gcovr -r .. --html --html-details -o coverage-report.html
 ```
 
 Note that, in early 2024, branch coverage information is not very accurate with C++.
 
-Memory checks:
+### Sanitizers/Memory Checks
 
-Note: if clang++ fails to create output, it may be necessary to install a specific version of
-libstdc++-dev. For example, with clang++ version 20 on Ubuntu 24.04, `clang++ -v` indicates the
-selected GCC installation is 14, so it is necessary to install `libstdc++-14-dev`.
+If `clang++` fails to create output during configuration, it may be necessary to install a specific
+version of libstdc++-dev. For example, with clang++ version 20 on Ubuntu 24.04, `clang++ -v`
+indicates the selected GCC installation is 14, so it is necessary to install `libstdc++-14-dev`.
 
-```
-CFLAGS="-fsanitize=address -fsanitize=undefined" \
-   CXXFLAGS="-fsanitize=address -fsanitize=undefined" \
-   LDFLAGS="-fsanitize=address -fsanitize=undefined" \
-   CC=clang CXX=clang++ \
-   cmake -DMAINTAINER_MODE=ON -DBUILD_SHARED_LIBS=OFF \
-   -DCMAKE_BUILD_TYPE=Debug ..
-```
+### Windows
 
-Windows:
+You can use this for command-line builds, which does a bit more than the presets. The msvc presets
+are known to work in CLion if the environment is set up as described in
+[README-windows.md](./README-windows.md), but for regular command-line builds (and CI), continue to
+use `cmake-win` from inside a build directory. Look at `build-scripts/build-windows` to see how this
+is used.
 
 ```
 ../cmake-win {mingw|msvc} maint
 ```
-
-See ./build-scripts for other ways to run the build for different
-configurations.
 
 ## VERSIONS
 
