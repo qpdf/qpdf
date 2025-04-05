@@ -290,6 +290,7 @@ namespace qpdf
             s->stream_dict = new_dict;
             setDictDescription();
         }
+        bool isRootMetadata() const;
 
         void setDictDescription();
 

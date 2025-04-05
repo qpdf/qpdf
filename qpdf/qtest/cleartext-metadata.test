@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('cleartext-metadata');
 
-my $n_tests = 58;
+my $n_tests = 61;
 
 # args: file, exp_encrypted, exp_cleartext
 check_metadata($td, "compressed-metadata.pdf", 0, 0);
@@ -67,6 +67,17 @@ foreach my $f (qw(compressed-metadata.pdf enc-base.pdf))
         unlink "b.pdf", "c.pdf";
     }
 }
+
+$td->runtest("only root metadata is compressed",
+             {$td->COMMAND => "qpdf --deterministic-id compressed-metadata.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check file",
+             {$td->COMMAND => "qpdf-test-compare a.pdf compressed-metadata-out-normal.pdf"},
+             {$td->FILE => "compressed-metadata-out-normal.pdf", $td->EXIT_STATUS => 0});
+$td->runtest("additional cleartext metadata tests",
+             {$td->COMMAND => "test_driver 100 compressed-metadata.pdf"},
+             {$td->STRING => "test 100 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 cleanup();
 $td->report($n_tests);

@@ -3482,6 +3482,85 @@ test_99(QPDF& pdf, char const* arg2)
     }
 }
 
+static void
+test_100(QPDF& pdf, char const* arg2)
+{
+    // Designed for compressed-metadata.pdf
+    auto is_cleartext = [](QPDFObjectHandle& metadata, bool raw) {
+        std::string buf;
+        Pl_String bufpl("buffer", nullptr, buf);
+        metadata.pipeStreamData(&bufpl, 0, raw ? qpdf_dl_none : qpdf_dl_generalized);
+        return buf.substr(0, 9) == "<?xpacket";
+    };
+    auto is_cleartext_in_file = [](std::string const& raw_bytes,
+                                   QPDFObjectHandle& metadata) -> bool {
+        auto buf = metadata.getRawStreamData();
+        auto offset = metadata.getParsedOffset();
+        auto from_file = raw_bytes.substr(QIntC::to_size(offset), 10);
+        assert(buf->getSize() > 10);
+        auto from_buf = std::string(reinterpret_cast<char*>(buf->getBuffer()), from_file.size());
+        return from_buf == from_file;
+    };
+
+    {
+        QPDFWriter w(pdf, "a.pdf");
+        w.setR6EncryptionParameters(
+            "", "", true, true, true, true, true, true, qpdf_r3p_full, false);
+        w.write();
+    }
+    {
+        QPDF encrypted;
+        encrypted.processFile("a.pdf");
+        auto raw_bytes = QUtil::read_file_into_string("a.pdf");
+        auto root = encrypted.getRoot();
+        auto root_metadata = root.getKey("/Metadata");
+        if (!root_metadata.isStream()) {
+            throw std::logic_error("test 100 run on file with no metadata");
+        }
+        assert(is_cleartext_in_file(raw_bytes, root_metadata));
+        assert(is_cleartext(root_metadata, true));
+        auto n_pages = QIntC::to_size(root.getKey("/Pages").getKey("/Count").getIntValue());
+        auto page = encrypted.getAllPages().at(n_pages - 1);
+        auto page_metadata = page.getKey("/Metadata");
+        if (!page_metadata.isStream()) {
+            throw std::logic_error("test 100 run on file with no metadata on last page");
+        }
+        // It's encrypted in the file, but you can recover the data, so it is properly decrypted.
+        assert(!is_cleartext_in_file(raw_bytes, page_metadata));
+        assert(!is_cleartext(page_metadata, true));
+        assert(is_cleartext(page_metadata, false));
+
+        // Now copy these metadata objects to the file and write it out again.
+        auto copied_root_metadata = pdf.copyForeignObject(root_metadata);
+        auto copied_page_metadata = pdf.copyForeignObject(page_metadata);
+        pdf.getRoot().replaceKey("/CopiedRootMetadata", copied_root_metadata);
+        pdf.getRoot().replaceKey("/CopiedPageMetadata", copied_root_metadata);
+        QPDFWriter w(pdf, "b.pdf");
+        w.setR6EncryptionParameters(
+            "", "", true, true, true, true, true, true, qpdf_r3p_full, false);
+        w.write();
+    }
+    auto raw_bytes = QUtil::read_file_into_string("b.pdf");
+    QPDF updated;
+    updated.processFile("b.pdf");
+    auto root = updated.getRoot();
+    auto root_metadata = root.getKey("/Metadata");
+    auto n_pages = QIntC::to_size(root.getKey("/Pages").getKey("/Count").getIntValue());
+    auto page = updated.getAllPages().at(n_pages - 1);
+    auto page_metadata = page.getKey("/Metadata");
+    auto copied_root = root.getKey("/CopiedRootMetadata");
+    auto copied_page = root.getKey("/CopiedPageMetadata");
+    // The ultimate root is still clear-text in file
+    assert(is_cleartext_in_file(raw_bytes, root_metadata));
+    assert(is_cleartext(root_metadata, true));
+    // Everything else is compressed and encrypted in the file (not handled as special case).
+    for (auto o: {page_metadata, copied_root, copied_page}) {
+        assert(!is_cleartext_in_file(raw_bytes, o));
+        assert(!is_cleartext(o, true));
+        assert(is_cleartext(o, false));
+    }
+}
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -3563,23 +3642,23 @@ runtest(int n, char const* filename1, char const* arg2)
     }
 
     std::map<int, void (*)(QPDF&, char const*)> test_functions = {
-        {0, test_0_1}, {1, test_0_1}, {2, test_2},   {3, test_3},   {4, test_4},   {5, test_5},
-        {6, test_6},   {7, test_7},   {8, test_8},   {9, test_9},   {10, test_10}, {11, test_11},
-        {12, test_12}, {13, test_13}, {14, test_14}, {15, test_15}, {16, test_16}, {17, test_17},
-        {18, test_18}, {19, test_19}, {20, test_20}, {21, test_21}, {22, test_22}, {23, test_23},
-        {24, test_24}, {25, test_25}, {26, test_26}, {27, test_27}, {28, test_28}, {29, test_29},
-        {30, test_30}, {31, test_31}, {32, test_32}, {33, test_33}, {34, test_34}, {35, test_35},
-        {36, test_36}, {37, test_37}, {38, test_38}, {39, test_39}, {40, test_40}, {41, test_41},
-        {42, test_42}, {43, test_43}, {44, test_44}, {45, test_45}, {46, test_46}, {47, test_47},
-        {48, test_48}, {49, test_49}, {50, test_50}, {51, test_51}, {52, test_52}, {53, test_53},
-        {54, test_54}, {55, test_55}, {56, test_56}, {57, test_57}, {58, test_58}, {59, test_59},
-        {60, test_60}, {61, test_61}, {62, test_62}, {63, test_63}, {64, test_64}, {65, test_65},
-        {66, test_66}, {67, test_67}, {68, test_68}, {69, test_69}, {70, test_70}, {71, test_71},
-        {72, test_72}, {73, test_73}, {74, test_74}, {75, test_75}, {76, test_76}, {77, test_77},
-        {78, test_78}, {79, test_79}, {80, test_80}, {81, test_81}, {82, test_82}, {83, test_83},
-        {84, test_84}, {85, test_85}, {86, test_86}, {87, test_87}, {88, test_88}, {89, test_89},
-        {90, test_90}, {91, test_91}, {92, test_92}, {93, test_93}, {94, test_94}, {95, test_95},
-        {96, test_96}, {97, test_97}, {98, test_98}, {99, test_99}};
+        {0, test_0_1}, {1, test_0_1}, {2, test_2},   {3, test_3},   {4, test_4},    {5, test_5},
+        {6, test_6},   {7, test_7},   {8, test_8},   {9, test_9},   {10, test_10},  {11, test_11},
+        {12, test_12}, {13, test_13}, {14, test_14}, {15, test_15}, {16, test_16},  {17, test_17},
+        {18, test_18}, {19, test_19}, {20, test_20}, {21, test_21}, {22, test_22},  {23, test_23},
+        {24, test_24}, {25, test_25}, {26, test_26}, {27, test_27}, {28, test_28},  {29, test_29},
+        {30, test_30}, {31, test_31}, {32, test_32}, {33, test_33}, {34, test_34},  {35, test_35},
+        {36, test_36}, {37, test_37}, {38, test_38}, {39, test_39}, {40, test_40},  {41, test_41},
+        {42, test_42}, {43, test_43}, {44, test_44}, {45, test_45}, {46, test_46},  {47, test_47},
+        {48, test_48}, {49, test_49}, {50, test_50}, {51, test_51}, {52, test_52},  {53, test_53},
+        {54, test_54}, {55, test_55}, {56, test_56}, {57, test_57}, {58, test_58},  {59, test_59},
+        {60, test_60}, {61, test_61}, {62, test_62}, {63, test_63}, {64, test_64},  {65, test_65},
+        {66, test_66}, {67, test_67}, {68, test_68}, {69, test_69}, {70, test_70},  {71, test_71},
+        {72, test_72}, {73, test_73}, {74, test_74}, {75, test_75}, {76, test_76},  {77, test_77},
+        {78, test_78}, {79, test_79}, {80, test_80}, {81, test_81}, {82, test_82},  {83, test_83},
+        {84, test_84}, {85, test_85}, {86, test_86}, {87, test_87}, {88, test_88},  {89, test_89},
+        {90, test_90}, {91, test_91}, {92, test_92}, {93, test_93}, {94, test_94},  {95, test_95},
+        {96, test_96}, {97, test_97}, {98, test_98}, {99, test_99}, {100, test_100}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {

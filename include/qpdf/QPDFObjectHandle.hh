@@ -1063,6 +1063,10 @@ class QPDFObjectHandle: public qpdf::BaseHandle
     QPDF_DLL
     void replaceDict(QPDFObjectHandle const&);
 
+    // Test whether a stream is the root XMP /Metadata object of its owning QPDF.
+    QPDF_DLL
+    bool isRootMetadata() const;
+
     // REPLACING STREAM DATA
 
     // Note about all replaceStreamData methods: whatever values are passed as filter and
