@@ -1049,6 +1049,7 @@ QPDF::decryptStream(
     Pipeline*& pipeline,
     QPDFObjGen og,
     QPDFObjectHandle& stream_dict,
+    bool is_root_metadata,
     std::unique_ptr<Pipeline>& decrypt_pipeline)
 {
     std::string type;
@@ -1094,7 +1095,7 @@ QPDF::decryptStream(
         }
 
         if (method == e_unknown) {
-            if ((!encp->encrypt_metadata) && (type == "/Metadata")) {
+            if ((!encp->encrypt_metadata) && is_root_metadata) {
                 QTC::TC("qpdf", "QPDF_encryption cleartext metadata");
                 method = e_none;
             } else {

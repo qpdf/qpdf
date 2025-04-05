@@ -281,6 +281,16 @@ Stream::getRawStreamData()
 }
 
 bool
+Stream::isRootMetadata() const
+{
+    if (!getDict().isDictionaryOfType("/Metadata", "/XML")) {
+        return false;
+    }
+    auto root_metadata = qpdf()->getRoot().getKey("/Metadata");
+    return root_metadata.isSameObjectAs(obj);
+}
+
+bool
 Stream::filterable(
     std::vector<std::shared_ptr<QPDFStreamFilter>>& filters,
     bool& specialized_compression,
@@ -520,6 +530,7 @@ Stream::pipeStreamData(
                 obj->getParsedOffset(),
                 s->length,
                 s->stream_dict,
+                isRootMetadata(),
                 pipeline,
                 suppress_warnings,
                 will_retry)) {
@@ -624,6 +635,12 @@ void
 QPDFObjectHandle::replaceDict(QPDFObjectHandle const& new_dict)
 {
     as_stream(error).replaceDict(new_dict);
+}
+
+bool
+QPDFObjectHandle::isRootMetadata() const
+{
+    return as_stream(error).isRootMetadata();
 }
 
 std::shared_ptr<Buffer>

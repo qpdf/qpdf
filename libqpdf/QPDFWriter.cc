@@ -1247,18 +1247,18 @@ QPDFWriter::writeTrailer(
 bool
 QPDFWriter::willFilterStream(
     QPDFObjectHandle stream,
-    bool& compress_stream, // out only
-    bool& is_metadata,     // out only
+    bool& compress_stream,  // out only
+    bool& is_root_metadata, // out only
     std::string* stream_data)
 {
     compress_stream = false;
-    is_metadata = false;
+    is_root_metadata = false;
 
     QPDFObjGen old_og = stream.getObjGen();
     QPDFObjectHandle stream_dict = stream.getDict();
 
-    if (stream_dict.isDictionaryOfType("/Metadata")) {
-        is_metadata = true;
+    if (stream.isRootMetadata()) {
+        is_root_metadata = true;
     }
     bool filter = stream.isDataModified() || m->compress_streams || m->stream_decode_level;
     bool filter_on_write = stream.getFilterOnWrite();
@@ -1280,7 +1280,7 @@ QPDFWriter::willFilterStream(
     }
     bool normalize = false;
     bool uncompress = false;
-    if (filter_on_write && is_metadata && (!m->encrypted || !m->encrypt_metadata)) {
+    if (filter_on_write && is_root_metadata && (!m->encrypted || !m->encrypt_metadata)) {
         QTC::TC("qpdf", "QPDFWriter not compressing metadata");
         filter = true;
         compress_stream = false;

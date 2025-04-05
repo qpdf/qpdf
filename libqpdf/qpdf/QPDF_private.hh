@@ -143,12 +143,13 @@ class QPDF::Pipe
         qpdf_offset_t offset,
         size_t length,
         QPDFObjectHandle dict,
+        bool is_root_metadata,
         Pipeline* pipeline,
         bool suppress_warnings,
         bool will_retry)
     {
         return qpdf->pipeStreamData(
-            og, offset, length, dict, pipeline, suppress_warnings, will_retry);
+            og, offset, length, dict, is_root_metadata, pipeline, suppress_warnings, will_retry);
     }
 };
 
@@ -216,7 +217,8 @@ class QPDF::ForeignStreamData
         QPDFObjGen foreign_og,
         qpdf_offset_t offset,
         size_t length,
-        QPDFObjectHandle local_dict);
+        QPDFObjectHandle local_dict,
+        bool is_root_metadata);
 
   private:
     std::shared_ptr<EncryptionParameters> encp;
@@ -225,6 +227,7 @@ class QPDF::ForeignStreamData
     qpdf_offset_t offset;
     size_t length;
     QPDFObjectHandle local_dict;
+    bool is_root_metadata{false};
 };
 
 class QPDF::CopiedStreamDataProvider: public QPDFObjectHandle::StreamDataProvider

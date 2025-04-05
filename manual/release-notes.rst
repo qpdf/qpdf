@@ -32,6 +32,12 @@ more detail.
     - Accept an array for ``rotate`` in qpdf job JSON since it is a
       repeatable option.
 
+    - When reading an encrypted PDF with cleartext metadata, only
+      expect top-level /Metadata to be clear-text. When writing an
+      encrypted PDF with cleartext metadata, only leave top-level
+      unencrypted. qpdf has always incorrectly handled all
+      ``/Metadata`` streams as special with cleartext metadata.
+
   - CLI Enhancements
 
     - New :qpdf:ref:`--remove-structure` option to exclude the document
