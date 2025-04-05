@@ -674,8 +674,7 @@ class QPDF
     // /Length, /Filter, and /DecodeParms; 1 if it should discard /Length, and 0 if it should
     // preserve all keys. This is used by QPDFWriter to avoid creation of dangling objects for
     // stream dictionary keys it will be regenerating.
-    QPDF_DLL
-    void optimize(
+    [[deprecated("Unused - see release notes for qpdf 12.1.0")]] QPDF_DLL void optimize(
         std::map<int, int> const& object_stream_data,
         bool allow_changes = true,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters = nullptr);

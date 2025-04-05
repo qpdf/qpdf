@@ -41,6 +41,9 @@ more detail.
 
   - Other changes
 
+    - The ``QPDF::optimize`` method is believed to be not in use and has been
+      deprecated. If you are relying on it please open a ticket_.
+
     - The parsing of object streams including the creation of error/warning
       messages and object descriptions has been refactored with some
       improvement both in runtime and memory usage.
