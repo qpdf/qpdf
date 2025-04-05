@@ -29,6 +29,9 @@ more detail.
     - Fix two object stream error/warning messages that reported the wrong
       object id.
 
+    - Accept an array for ``rotate`` in qpdf job JSON since it is a
+      repeatable option.
+
   - CLI Enhancements
 
     - New :qpdf:ref:`--remove-structure` option to exclude the document

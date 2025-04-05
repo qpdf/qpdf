@@ -428,7 +428,9 @@ pushKey("reportMemoryUsage");
 addBare([this]() { c_main->reportMemoryUsage(); });
 popHandler(); // key: reportMemoryUsage
 pushKey("rotate");
+beginArray(bindJSON(&Handlers::beginRotateArray), bindBare(&Handlers::endRotateArray)); // .rotate[]
 addParameter([this](std::string const& p) { c_main->rotate(p); });
+popHandler(); // array: .rotate[]
 popHandler(); // key: rotate
 pushKey("setPageLabels");
 beginArray(bindJSON(&Handlers::beginSetPageLabelsArray), bindBare(&Handlers::endSetPageLabelsArray)); // .setPageLabels[]

@@ -450,6 +450,7 @@ json:
   remove-structure:
   report-memory-usage:
   rotate:
+    - null
   set-page-labels:
     - null
   overlay:

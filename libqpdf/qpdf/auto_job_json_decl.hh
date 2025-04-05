@@ -43,6 +43,8 @@ void beginPages(JSON);
 void endPages();
 void setupPagesFile();
 void setupPagesPassword();
+void beginRotateArray(JSON);
+void endRotateArray();
 void beginSetPageLabelsArray(JSON);
 void endSetPageLabelsArray();
 void setupSetPageLabels();
