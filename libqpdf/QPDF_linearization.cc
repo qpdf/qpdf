@@ -483,7 +483,7 @@ QPDF::checkLinearizationInternal()
                 object_stream_data[og.getObj()] = entry.getObjStreamNumber();
             }
         }
-        optimize(object_stream_data, false);
+        optimize_internal(object_stream_data, false, nullptr);
         calculateLinearizationData(object_stream_data);
     }
 
