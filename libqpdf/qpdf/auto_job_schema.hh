@@ -150,7 +150,9 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "removePageLabels": "remove explicit page numbers",
   "removeStructure": "remove metadata",
   "reportMemoryUsage": "best effort report of memory usage",
-  "rotate": "rotate pages",
+  "rotate": [
+    "rotate pages"
+  ],
   "setPageLabels": [
     "number pages for the entire document"
   ],

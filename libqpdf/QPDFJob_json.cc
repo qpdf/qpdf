@@ -590,6 +590,18 @@ Handlers::setupUnderlayPassword()
 }
 
 void
+Handlers::beginRotateArray(JSON)
+{
+    // nothing needed
+}
+
+void
+Handlers::endRotateArray()
+{
+    // nothing needed
+}
+
+void
 Handlers::setupSetPageLabels()
 {
     accumulated_args.clear();
