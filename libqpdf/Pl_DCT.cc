@@ -1,6 +1,5 @@
 #include <qpdf/Pl_DCT.hh>
 
-#include "qpdf/QPDFLogger.hh"
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 
@@ -14,6 +13,23 @@
 
 namespace
 {
+    class FunctionCallbackConfig: public Pl_DCT::CompressConfig
+    {
+      public:
+        explicit FunctionCallbackConfig(std::function<void(jpeg_compress_struct*)> f) :
+            f(std::move(f))
+        {
+        }
+        ~FunctionCallbackConfig() override = default;
+        void
+        apply(jpeg_compress_struct* config) override
+        {
+            f(config);
+        };
+
+        std::function<void(jpeg_compress_struct*)> f;
+    };
+
     struct qpdf_jpeg_error_mgr
     {
         struct jpeg_error_mgr pub;
@@ -406,4 +422,10 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
     }
     (void)jpeg_finish_decompress(cinfo);
     next()->finish();
+}
+
+std::shared_ptr<Pl_DCT::CompressConfig>
+Pl_DCT::make_compress_config(std::function<void(jpeg_compress_struct*)> f)
+{
+    return std::make_shared<FunctionCallbackConfig>(f);
 }

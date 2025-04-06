@@ -1,6 +1,7 @@
 #include <qpdf/Pl_DCT.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/assert_test.h>
 
 #include <cstdio>
 #include <cstdlib>
@@ -50,12 +51,16 @@ main(int argc, char* argv[])
     FILE* infile = QUtil::safe_fopen(infilename, "rb");
     FILE* outfile = QUtil::safe_fopen(outfilename, "wb");
     Pl_StdioFile out("stdout", outfile);
+    bool called = false;
+    auto callback = [&called](jpeg_compress_struct*) { called = true; };
+    auto config = Pl_DCT::make_compress_config(callback);
     unsigned char buf[100];
-    Pl_DCT dct("dct", &out, width, height, components, cs);
+    Pl_DCT dct("dct", &out, width, height, components, cs, config.get());
     while (size_t len = fread(buf, 1, sizeof(buf), infile)) {
         dct.write(buf, len);
     }
     dct.finish();
+    assert(called);
 
     fclose(infile);
     fclose(outfile);

@@ -38,6 +38,12 @@ more detail.
       unencrypted. qpdf has always incorrectly handled all
       ``/Metadata`` streams as special with cleartext metadata.
 
+  - Library Enhancements
+
+    - Add function ``Pl_DCT::make_compress_config`` to return a
+      ``Pl_DCT::CompressConfig`` shared pointer from a
+      ``std::function`` for a more modern configuration option.
+
   - CLI Enhancements
 
     - New :qpdf:ref:`--remove-structure` option to exclude the document

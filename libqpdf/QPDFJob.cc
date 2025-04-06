@@ -57,6 +57,7 @@ namespace
         size_t oi_min_height;
         size_t oi_min_area;
         QPDFObjectHandle image;
+        std::shared_ptr<Pl_DCT::CompressConfig> config;
     };
 
     class DiscardContents: public QPDFObjectHandle::ParserCallbacks
@@ -115,6 +116,7 @@ ImageOptimizer::ImageOptimizer(
     oi_min_area(oi_min_area),
     image(image)
 {
+    config = Pl_DCT::make_compress_config([](jpeg_compress_struct* config) {});
 }
 
 std::shared_ptr<Pipeline>
@@ -195,7 +197,7 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         return result;
     }
 
-    result = std::make_shared<Pl_DCT>("jpg", next, w, h, components, cs);
+    result = std::make_shared<Pl_DCT>("jpg", next, w, h, components, cs, config.get());
     return result;
 }
 

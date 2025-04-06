@@ -24,6 +24,7 @@
 
 #include <qpdf/Pl_Buffer.hh>
 #include <cstddef>
+#include <functional>
 
 // jpeglib.h must be included after cstddef or else it messes up the definition of size_t.
 #include <jpeglib.h>
@@ -61,6 +62,10 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
         virtual ~CompressConfig() = default;
         virtual void apply(jpeg_compress_struct*) = 0;
     };
+
+    QPDF_DLL
+    static std::shared_ptr<CompressConfig>
+        make_compress_config(std::function<void(jpeg_compress_struct*)>);
 
     // Constructor for compressing image data
     QPDF_DLL
