@@ -64,7 +64,7 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
     };
 
     QPDF_DLL
-    static std::shared_ptr<CompressConfig>
+    static std::unique_ptr<CompressConfig>
         make_compress_config(std::function<void(jpeg_compress_struct*)>);
 
     // Constructor for compressing image data

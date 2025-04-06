@@ -41,13 +41,17 @@ more detail.
   - Library Enhancements
 
     - Add function ``Pl_DCT::make_compress_config`` to return a
-      ``Pl_DCT::CompressConfig`` shared pointer from a
-      ``std::function`` for a more modern configuration option.
+      ``Pl_DCT::CompressConfig`` unique pointer to a
+      ``CompressConfig`` from a ``std::function`` for a more modern
+      configuration option.
 
   - CLI Enhancements
 
     - New :qpdf:ref:`--remove-structure` option to exclude the document
       structure tree from the output PDF.
+
+    - New :qpdf:ref:`--jpeg-quality` option to set jpeg quality used
+      with :qpdf:ref:`--optimize-images`.
 
   - Other enhancements
 

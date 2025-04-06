@@ -1,7 +1,8 @@
+#include <qpdf/assert_test.h>
+
 #include <qpdf/Pl_DCT.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QUtil.hh>
-#include <qpdf/assert_test.h>
 
 #include <cstdio>
 #include <cstdlib>

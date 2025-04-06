@@ -104,6 +104,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "suppressRecovery": "suppress error recovery",
   "coalesceContents": "combine content streams",
   "compressionLevel": "set compression level for flate",
+  "jpegQuality": "set jpeg quality level for jpeg",
   "externalizeInlineImages": "convert inline to regular images",
   "iiMinBytes": "set minimum size for externalizeInlineImages",
   "removeUnreferencedResources": "remove unreferenced page resources",

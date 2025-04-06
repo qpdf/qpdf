@@ -1028,6 +1028,26 @@ Related Options
    defers to the compression library's default behavior. See also
    :ref:`small-files`.
 
+.. qpdf:option:: --jpeg-quality=level
+
+   .. help: set jpeg quality level for jpeg
+
+      When rewriting images with --optimize-images, set a quality
+      level from 0 (lowest) to 100 (highest) for writing new images.
+      Higher quality results in larger images, and lower quality
+      results in smaller images. This option is only effective when
+      combined with --optimize-images.
+
+   When rewriting images with :qpdf:ref:`--optimize-images`, set a
+   quality level from 0 (lowest) to 100 (highest) for writing new
+   images. Higher quality results in larger images, and lower quality
+   results in smaller images. Be sure to check your output to see if
+   the quality is acceptable. This option is only effective when
+   combined with :qpdf:ref:`--optimize-images`. This option also
+   causes files that are already compressed with JPEG compression to
+   be uncompressed and recompressed, potentially introducing
+   additional loss of image quality. See also :ref:`small-files`.
+
 .. qpdf:option:: --normalize-content=[y|n]
 
    .. help: fix newlines in content streams
@@ -4004,6 +4024,13 @@ generate:
   the size. Images are not resampled, but bear in mind that JPEG is
   lossy, so images may have artifacts. These are not usually
   noticeable to the casual observer.
+
+- ``--jpeg-quality=n``: set the JPEG quality used by :qpdf:ref:`--optimize-images`
+  when writing JPEG files. Use a lower number for ``n`` for smaller,
+  lower-quality images. The default of most JPEG libraries is 75.
+  Smaller numbers result in lower-quality but smaller images. The
+  :qpdf:ref:`--jpeg-quality` option was added in qpdf 12.1. This only
+  works in combination with :qpdf:ref:`--optimize-images`.
 
 - ``--object-streams=generate``: generate object streams, which means
   that more of the PDF file's structural content will be compressed

@@ -314,6 +314,9 @@ popHandler(); // key: coalesceContents
 pushKey("compressionLevel");
 addParameter([this](std::string const& p) { c_main->compressionLevel(p); });
 popHandler(); // key: compressionLevel
+pushKey("jpegQuality");
+addParameter([this](std::string const& p) { c_main->jpegQuality(p); });
+popHandler(); // key: jpegQuality
 pushKey("externalizeInlineImages");
 addBare([this]() { c_main->externalizeInlineImages(); });
 popHandler(); // key: externalizeInlineImages

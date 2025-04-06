@@ -634,6 +634,7 @@ class QPDFJob
         bool recompress_flate{false};
         bool recompress_flate_set{false};
         int compression_level{-1};
+        int jpeg_quality{-1};
         qpdf_stream_decode_level_e decode_level{qpdf_dl_generalized};
         bool decode_level_set{false};
         bool normalize_set{false};

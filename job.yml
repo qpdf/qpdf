@@ -160,6 +160,7 @@ options:
       - split-pages
     required_parameter:
       compression-level: level
+      jpeg-quality: level
       copy-encryption: file
       encryption-file-password: password
       force-version: version
@@ -413,6 +414,7 @@ json:
   suppress-recovery:
   coalesce-contents:
   compression-level:
+  jpeg-quality:
   externalize-inline-images:
   ii-min-bytes:
   remove-unreferenced-resources:

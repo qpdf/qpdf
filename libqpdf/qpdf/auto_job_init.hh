@@ -94,6 +94,7 @@ this->ap.addBare("verbose", [this](){c_main->verbose();});
 this->ap.addBare("warning-exit-0", [this](){c_main->warningExit0();});
 this->ap.addBare("with-images", [this](){c_main->withImages();});
 this->ap.addRequiredParameter("compression-level", [this](std::string const& x){c_main->compressionLevel(x);}, "level");
+this->ap.addRequiredParameter("jpeg-quality", [this](std::string const& x){c_main->jpegQuality(x);}, "level");
 this->ap.addRequiredParameter("copy-encryption", [this](std::string const& x){c_main->copyEncryption(x);}, "file");
 this->ap.addRequiredParameter("encryption-file-password", [this](std::string const& x){c_main->encryptionFilePassword(x);}, "password");
 this->ap.addRequiredParameter("force-version", [this](std::string const& x){c_main->forceVersion(x);}, "version");

@@ -140,6 +140,13 @@ QPDFJob::Config::compressionLevel(std::string const& parameter)
 }
 
 QPDFJob::Config*
+QPDFJob::Config::jpegQuality(std::string const& parameter)
+{
+    o.m->jpeg_quality = QUtil::string_to_int(parameter.c_str());
+    return this;
+}
+
+QPDFJob::Config*
 QPDFJob::Config::copyEncryption(std::string const& parameter)
 {
     o.m->encryption_file = parameter;

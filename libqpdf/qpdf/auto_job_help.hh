@@ -239,6 +239,14 @@ gzip), which is the default compression for most PDF files.
 You need --recompress-flate with this option if you want to
 change already compressed streams.
 )");
+ap.addOptionHelp("--jpeg-quality", "transformation", "set jpeg quality level for jpeg", R"(--jpeg-quality=level
+
+When rewriting images with --optimize-images, set a quality
+level from 0 (lowest) to 100 (highest) for writing new images.
+Higher quality results in larger images, and lower quality
+results in smaller images. This option is only effective when
+combined with --optimize-images.
+)");
 ap.addOptionHelp("--normalize-content", "transformation", "fix newlines in content streams", R"(--normalize-content=[y|n]
 
 Normalize newlines to UNIX-style newlines in PDF content
@@ -284,15 +292,15 @@ version. The version number format is
 to "major.minor" and the extension level, if specified, to
 "extension-level".
 )");
+}
+static void add_help_4(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--force-version", "transformation", "set output PDF version", R"(--force-version=version
 
 Force the output PDF file's PDF version header to be the specified
 value, even if the file uses features that may not be available
 in that version.
 )");
-}
-static void add_help_4(QPDFArgParser& ap)
-{
 ap.addHelpTopic("page-ranges", "page range syntax", R"(A full description of the page range syntax, with examples, can be
 found in the manual. In summary, a range is a comma-separated list
 of groups. A group is a number or a range of numbers separated by a
@@ -419,11 +427,11 @@ Don't optimize images whose area in pixels is below the specified value.
 )");
 ap.addOptionHelp("--keep-inline-images", "modification", "exclude inline images from optimization", R"(Prevent inline images from being considered by --optimize-images.
 )");
-ap.addOptionHelp("--remove-info", "modification", "remove file information", R"(Exclude file information (except modification date) from the output file.
-)");
 }
 static void add_help_5(QPDFArgParser& ap)
 {
+ap.addOptionHelp("--remove-info", "modification", "remove file information", R"(Exclude file information (except modification date) from the output file.
+)");
 ap.addOptionHelp("--remove-metadata", "modification", "remove metadata", R"(Exclude metadata from the output file.
 )");
 ap.addOptionHelp("--remove-page-labels", "modification", "remove explicit page numbers", R"(Exclude page labels (explicit page numbers) from the output file.
@@ -642,12 +650,12 @@ version to be at least 1.6. This option is only available with
 128-bit encryption. The default is "n" for compatibility
 reasons. Use 256-bit encryption instead.
 )");
-ap.addOptionHelp("--allow-insecure", "encryption", "allow empty owner passwords", R"(Allow creation of PDF files with empty owner passwords and
-non-empty user passwords when using 256-bit encryption.
-)");
 }
 static void add_help_6(QPDFArgParser& ap)
 {
+ap.addOptionHelp("--allow-insecure", "encryption", "allow empty owner passwords", R"(Allow creation of PDF files with empty owner passwords and
+non-empty user passwords when using 256-bit encryption.
+)");
 ap.addOptionHelp("--force-V4", "encryption", "force V=4 in encryption dictionary", R"(This option is for testing and is never needed in practice since
 qpdf does this automatically when needed.
 )");
@@ -825,14 +833,14 @@ ap.addOptionHelp("--mimetype", "add-attachment", "attachment mime type, e.g. app
 Specify the mime type for the attachment, such as text/plain,
 application/pdf, image/png, etc.
 )");
+}
+static void add_help_7(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--description", "add-attachment", "set attachment's description", R"(--description="text"
 
 Supply descriptive text for the attachment, displayed by some
 PDF viewers.
 )");
-}
-static void add_help_7(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--replace", "add-attachment", "replace attachment with same key", R"(Indicate that any existing attachment with the same key should
 be replaced by the new attachment. Otherwise, qpdf gives an
 error if an attachment with that key is already present.
@@ -919,12 +927,12 @@ object and for each content stream associated with the page.
 ap.addOptionHelp("--with-images", "inspection", "include image details with --show-pages", R"(When used with --show-pages, also shows the object and
 generation numbers for the image objects on each page.
 )");
-ap.addOptionHelp("--list-attachments", "inspection", "list embedded files", R"(Show the key and stream number for each embedded file. Combine
-with --verbose for more detailed information.
-)");
 }
 static void add_help_8(QPDFArgParser& ap)
 {
+ap.addOptionHelp("--list-attachments", "inspection", "list embedded files", R"(Show the key and stream number for each embedded file. Combine
+with --verbose for more detailed information.
+)");
 ap.addOptionHelp("--show-attachment", "inspection", "export an embedded file", R"(--show-attachment=key
 
 Write the contents of the specified attachment to standard

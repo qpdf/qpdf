@@ -37,7 +37,7 @@ my @image_opt = (
      '--oi-min-width=0 --oi-min-height=0 --oi-min-area=0']
     );
 
-my $n_tests = 2 * scalar(@image_opt);
+my $n_tests = 2 * scalar(@image_opt) + 5;
 
 foreach my $d (@image_opt)
 {
@@ -57,6 +57,35 @@ foreach my $d (@image_opt)
                       $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 }
+
+$td->runtest("quality = 100",
+             {$td->COMMAND =>
+                  "qpdf --static-id --optimize-images --jpeg-quality=100" .
+                  " large-inline-image.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("quality = 50",
+             {$td->COMMAND =>
+                  "qpdf --static-id --optimize-images --jpeg-quality=50" .
+                  " large-inline-image.pdf b.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("quality = 50 from DCT",
+             {$td->COMMAND =>
+                  "qpdf --static-id --optimize-images --jpeg-quality=50" .
+                  " a.pdf c.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+my $size100 = (stat("a.pdf"))[7];
+my $size50 = (stat("b.pdf"))[7];
+my $size50b = (stat("c.pdf"))[7];
+my $result = $size50 < $size100 ? "ok\n" : "failed\n";
+$td->runtest("quality 50 < quality 100",
+             {$td->STRING => $result},
+             {$td->STRING => "ok\n"},
+             $td->NORMALIZE_NEWLINES);
+$result = $size50b < $size100 ? "ok\n" : "failed\n";
+$td->runtest("quality 50 from DCT < quality 100",
+             {$td->STRING => $result},
+             {$td->STRING => "ok\n"},
+             $td->NORMALIZE_NEWLINES);
 
 cleanup();
 $td->report($n_tests);

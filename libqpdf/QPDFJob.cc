@@ -45,6 +45,7 @@ namespace
             size_t oi_min_width,
             size_t oi_min_height,
             size_t oi_min_area,
+            int quality,
             QPDFObjectHandle& image);
         ~ImageOptimizer() override = default;
         void provideStreamData(QPDFObjGen const&, Pipeline* pipeline) override;
@@ -56,6 +57,7 @@ namespace
         size_t oi_min_width;
         size_t oi_min_height;
         size_t oi_min_area;
+        qpdf_stream_decode_level_e decode_level{qpdf_dl_specialized};
         QPDFObjectHandle image;
         std::shared_ptr<Pl_DCT::CompressConfig> config;
     };
@@ -109,6 +111,7 @@ ImageOptimizer::ImageOptimizer(
     size_t oi_min_width,
     size_t oi_min_height,
     size_t oi_min_area,
+    int quality,
     QPDFObjectHandle& image) :
     o(o),
     oi_min_width(oi_min_width),
@@ -116,7 +119,12 @@ ImageOptimizer::ImageOptimizer(
     oi_min_area(oi_min_area),
     image(image)
 {
-    config = Pl_DCT::make_compress_config([](jpeg_compress_struct* config) {});
+    if (quality >= 0) {
+        // Recompress existing jpeg.
+        decode_level = qpdf_dl_all;
+        config = Pl_DCT::make_compress_config(
+            [quality](jpeg_compress_struct* cinfo) { jpeg_set_quality(cinfo, quality, false); });
+    }
 }
 
 std::shared_ptr<Pipeline>
@@ -204,7 +212,8 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
 bool
 ImageOptimizer::evaluate(std::string const& description)
 {
-    if (!image.pipeStreamData(nullptr, 0, qpdf_dl_specialized, true)) {
+    // Note: passing nullptr as pipeline (first argument) just tests whether we can filter.
+    if (!image.pipeStreamData(nullptr, 0, decode_level, true)) {
         QTC::TC("qpdf", "QPDFJob image optimize no pipeline");
         o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << prefix << ": " << description
@@ -219,7 +228,7 @@ ImageOptimizer::evaluate(std::string const& description)
         // message issued by makePipeline
         return false;
     }
-    if (!image.pipeStreamData(p.get(), 0, qpdf_dl_specialized)) {
+    if (!image.pipeStreamData(p.get(), 0, decode_level)) {
         return false;
     }
     long long orig_length = image.getDict().getKey("/Length").getIntValue();
@@ -249,7 +258,7 @@ ImageOptimizer::provideStreamData(QPDFObjGen const&, Pipeline* pipeline)
         pipeline->finish();
         return;
     }
-    image.pipeStreamData(p.get(), 0, qpdf_dl_specialized, false, false);
+    image.pipeStreamData(p.get(), 0, decode_level, false, false);
 }
 
 QPDFJob::PageSpec::PageSpec(
@@ -2196,7 +2205,12 @@ QPDFJob::handleTransformations(QPDF& pdf)
                 [this, pageno, &pdf](
                     QPDFObjectHandle& obj, QPDFObjectHandle& xobj_dict, std::string const& key) {
                     auto io = std::make_unique<ImageOptimizer>(
-                        *this, m->oi_min_width, m->oi_min_height, m->oi_min_area, obj);
+                        *this,
+                        m->oi_min_width,
+                        m->oi_min_height,
+                        m->oi_min_area,
+                        m->jpeg_quality,
+                        obj);
                     if (io->evaluate("image " + key + " on page " + std::to_string(pageno))) {
                         QPDFObjectHandle new_image = pdf.newStream();
                         new_image.replaceDict(obj.getDict().shallowCopy());

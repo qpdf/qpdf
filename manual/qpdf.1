@@ -317,6 +317,15 @@ gzip), which is the default compression for most PDF files.
 You need --recompress-flate with this option if you want to
 change already compressed streams.
 .TP
+.B --jpeg-quality \-\- set jpeg quality level for jpeg
+--jpeg-quality=level
+
+When rewriting images with --optimize-images, set a quality
+level from 0 (lowest) to 100 (highest) for writing new images.
+Higher quality results in larger images, and lower quality
+results in smaller images. This option is only effective when
+combined with --optimize-images.
+.TP
 .B --normalize-content \-\- fix newlines in content streams
 --normalize-content=[y|n]
 

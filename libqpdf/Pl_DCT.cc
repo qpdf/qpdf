@@ -424,8 +424,8 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
     next()->finish();
 }
 
-std::shared_ptr<Pl_DCT::CompressConfig>
+std::unique_ptr<Pl_DCT::CompressConfig>
 Pl_DCT::make_compress_config(std::function<void(jpeg_compress_struct*)> f)
 {
-    return std::make_shared<FunctionCallbackConfig>(f);
+    return std::make_unique<FunctionCallbackConfig>(f);
 }

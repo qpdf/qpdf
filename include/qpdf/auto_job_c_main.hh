@@ -54,6 +54,7 @@ QPDF_DLL Config* verbose();
 QPDF_DLL Config* warningExit0();
 QPDF_DLL Config* withImages();
 QPDF_DLL Config* compressionLevel(std::string const& parameter);
+QPDF_DLL Config* jpegQuality(std::string const& parameter);
 QPDF_DLL Config* copyEncryption(std::string const& parameter);
 QPDF_DLL Config* encryptionFilePassword(std::string const& parameter);
 QPDF_DLL Config* forceVersion(std::string const& parameter);
