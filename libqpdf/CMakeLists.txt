@@ -318,8 +318,6 @@ list(REMOVE_DUPLICATES dep_link_libraries)
 
 check_type_size(size_t SIZEOF_SIZE_T)
 check_include_file("inttypes.h" HAVE_INTTYPES_H)
-check_symbol_exists(fseeko "stdio.h" HAVE_FSEEKO)
-check_symbol_exists(fseeko64 "stdio.h" HAVE_FSEEKO64)
 check_symbol_exists(localtime_r "time.h" HAVE_LOCALTIME_R)
 check_symbol_exists(random "stdlib.h" HAVE_RANDOM)
 
@@ -361,6 +359,13 @@ int main(int argc, char* argv[]) {
 if(LFS_WITH_MACROS AND NOT LFS_WITHOUT_MACROS)
   set(_FILE_OFFSET_BITS 64)
 endif()
+
+# fseeko may not exist with _FILE_OFFSET_BITS=64 but can exist with
+# _FILE_OFFSET_BITS unset or 32 (e.g. Android ARMv7 with NDK 26b and
+# API level < 24) so we need to test fseeko after testing for
+# _FILE_OFFSET_BITS. See https://github.com/qpdf/qpdf/issues/950.
+check_symbol_exists(fseeko "stdio.h" HAVE_FSEEKO)
+check_symbol_exists(fseeko64 "stdio.h" HAVE_FSEEKO64)
 
 check_c_source_compiles(
 "#include <malloc.h>
