@@ -13,6 +13,11 @@ more detail.
 
 .. x.y.z: not yet released
 
+12.1.1:  not yet released
+  - Build fixes
+
+    - Fix macOS build failure.
+
 12.1.0: April 6, 2025
   - Upcoming C++ Version Change
 
