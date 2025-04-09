@@ -13,6 +13,21 @@ more detail.
 
 .. x.y.z: not yet released
 
+12.1.1: not yet released
+  - Bug fixes
+
+    - In QPDF::getAllPages detect shared /Kids arrays to avoid stack overflows
+      in (specially constructed) damaged input files.
+
+    - Fix severe performance issues in QPDFFormFieldObjectHelper with some
+      (specially constructed) damaged input files.
+
+    - Add missing QPDFFormFieldObjectHelper::isChecked implementation.
+
+  - Build fixes
+
+    - Fix Android build issues.
+
 12.1.0: April 6, 2025
   - Upcoming C++ Version Change
 
