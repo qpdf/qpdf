@@ -1274,8 +1274,14 @@ QPDFWriter::willFilterStream(
         QPDFObjectHandle filter_obj = stream_dict.getKey("/Filter");
         if (!m->recompress_flate && !stream.isDataModified() && filter_obj.isName() &&
             (filter_obj.getName() == "/FlateDecode" || filter_obj.getName() == "/Fl")) {
-            QTC::TC("qpdf", "QPDFWriter not recompressing /FlateDecode");
-            filter = false;
+            bool empty_stream = stream_dict.getKey("/Length").getIntValue() == 0;
+            if (empty_stream) {
+                QTC::TC("qpdf", "QPDFWriter is removing /FlateDecode from an empty stream");
+                filter = true;
+            } else {
+                QTC::TC("qpdf", "QPDFWriter not recompressing /FlateDecode");
+                filter = false;
+            }
         }
     }
     bool normalize = false;
@@ -1532,13 +1538,16 @@ QPDFWriter::unparseObject(
             writeStringQDF("  ");
             writeString("/Length ");
 
+            bool empty_stream = false;
             if (m->direct_stream_lengths) {
                 writeString(std::to_string(stream_length));
+                empty_stream = stream_length == 0;
             } else {
                 writeString(std::to_string(m->cur_stream_length_id));
                 writeString(" 0 R");
+                empty_stream = m->cur_stream_length == 0;
             }
-            if (compress && (flags & f_filtered)) {
+            if (compress && (flags & f_filtered) && !empty_stream) {
                 writeString(indent);
                 writeStringQDF("  ");
                 writeString("/Filter /FlateDecode");
@@ -1750,7 +1759,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
     adjustAESStreamLength(length);
     writeString(" /Length " + std::to_string(length));
     writeStringQDF("\n ");
-    if (compressed) {
+    if (compressed && length > 0) {
         writeString(" /Filter /FlateDecode");
     }
     writeString(" /N " + std::to_string(offsets.size()));
