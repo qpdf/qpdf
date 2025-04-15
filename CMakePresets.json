@@ -151,6 +151,7 @@
         "BUILD_SHARED_LIBS": "OFF",
         "REQUIRE_CRYPTO_OPENSSL": "ON",
         "REQUIRE_CRYPTO_GNUTLS": "ON",
+        "REQUIRE_CRYPTO_MBEDTLS": "ON",
         "ENABLE_QTC": "ON"
       }
     },

@@ -4,12 +4,12 @@ sudo apt-get update
 sudo apt-get -y install \
    build-essential cmake \
    zlib1g-dev libjpeg-dev libgnutls28-dev libssl-dev \
-   libzopfli-dev
+   libmbedtls-dev libzopfli-dev
 
 cmake -S . -B build \
     -DCI_MODE=1 -DBUILD_STATIC_LIBS=0 -DCMAKE_BUILD_TYPE=Release \
     -DREQUIRE_CRYPTO_OPENSSL=1 -DREQUIRE_CRYPTO_GNUTLS=1 \
-    -DENABLE_QTC=1 -DZOPFLI=1
+    -DREQUIRE_CRYPTO_MBEDTLS=1 -DENABLE_QTC=1 -DZOPFLI=1
 cmake --build build --verbose -j$(nproc) -- -k
 
 # Make sure we are using zopfli
