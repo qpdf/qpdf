@@ -91,6 +91,7 @@ CMAKE_DEPENDENT_OPTION(
   "NOT MAINTAINER_MODE; NOT CI_MODE" ON)
 option(REQUIRE_CRYPTO_OPENSSL "Require openssl crypto" OFF)
 option(REQUIRE_CRYPTO_GNUTLS "Require gnutls crypto" OFF)
+option(REQUIRE_CRYPTO_MBEDTLS "Require mbedtls crypto" OFF)
 set(DEFAULT_CRYPTO CACHE STRING "")
 option(DEFAULT_CRYPTO
   "Specify default crypto; otherwise chosen automatically" "")

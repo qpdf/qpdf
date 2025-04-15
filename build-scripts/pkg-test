@@ -3,7 +3,7 @@ set -e
 sudo apt-get update
 sudo apt-get -y install \
    build-essential cmake \
-   zlib1g-dev libjpeg-dev libgnutls28-dev libssl-dev
+   zlib1g-dev libjpeg-dev libgnutls28-dev libssl-dev libmbedtls-dev
 
 cmake -S . -B build \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/tmp/inst

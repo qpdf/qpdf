@@ -13,6 +13,9 @@
 #ifdef USE_CRYPTO_OPENSSL
 # include <qpdf/QPDFCrypto_openssl.hh>
 #endif
+#ifdef USE_CRYPTO_MBEDTLS
+# include <qpdf/QPDFCrypto_mbedtls.hh>
+#endif
 
 std::shared_ptr<QPDFCryptoImpl>
 QPDFCryptoProvider::getImpl()
@@ -53,6 +56,9 @@ QPDFCryptoProvider::QPDFCryptoProvider() :
 #endif
 #ifdef USE_CRYPTO_OPENSSL
     registerImpl_internal("openssl", std::make_shared<QPDFCrypto_openssl>);
+#endif
+#ifdef USE_CRYPTO_MBEDTLS
+    registerImpl_internal("mbedtls", std::make_shared<QPDFCrypto_mbedtls>);
 #endif
     std::string default_crypto;
     if (!QUtil::get_env("QPDF_CRYPTO_PROVIDER", &default_crypto)) {

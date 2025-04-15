@@ -2,6 +2,7 @@
 #cmakedefine AVOID_WINDOWS_HANDLE 1
 #cmakedefine DEFAULT_CRYPTO "${DEFAULT_CRYPTO}"
 #cmakedefine USE_CRYPTO_GNUTLS 1
+#cmakedefine USE_CRYPTO_MBEDTLS 1
 #cmakedefine USE_CRYPTO_NATIVE 1
 #cmakedefine USE_CRYPTO_OPENSSL 1
 #cmakedefine USE_INSECURE_RANDOM 1

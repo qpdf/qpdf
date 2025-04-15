@@ -8,7 +8,7 @@ if [ "$1" = "future" ]; then
 fi
 sudo apt-get update
 sudo apt-get -y install \
-   build-essential cmake zlib1g-dev libjpeg-dev libgnutls28-dev
+   build-essential cmake zlib1g-dev libjpeg-dev libgnutls28-dev libmbedtls-dev
 cmake -S . -B build -DBUILD_STATIC_LIBS=0 -DCMAKE_BUILD_TYPE=RelWithDebInfo $cmake_extra
 cmake --build build --verbose -j$(nproc) --target libqpdf -- -k
 if [ "$future" = "1" ]; then
