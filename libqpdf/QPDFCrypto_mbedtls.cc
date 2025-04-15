@@ -1,6 +1,11 @@
 #include <qpdf/QPDFCrypto_mbedtls.hh>
 
-#include <mbedtls/entropy.h>
+#ifdef QPDF_MBEDTLS_2
+# include <mbedtls/entropy_poll.h>
+#else
+# include <mbedtls/entropy.h>
+#endif
+
 #include <mbedtls/error.h>
 #include <stdexcept>
 
@@ -58,7 +63,12 @@ QPDFCrypto_mbedtls::MD5_update(unsigned char const* data, size_t len)
 void
 QPDFCrypto_mbedtls::MD5_finalize()
 {
-    if (mbedtls_md_get_type(mbedtls_md_info_from_ctx(&md_ctx)) != MBEDTLS_MD_NONE) {
+#ifdef QPDF_MBEDTLS_2
+    auto info = md_ctx.md_info;
+#else
+    auto info = mbedtls_md_info_from_ctx(&md_ctx);
+#endif
+    if (mbedtls_md_get_type(info) != MBEDTLS_MD_NONE) {
         check_mbedtls(mbedtls_md_finish(&md_ctx, md_out));
         mbedtls_md_free(&md_ctx);
     }
@@ -120,7 +130,12 @@ QPDFCrypto_mbedtls::SHA2_update(unsigned char const* data, size_t len)
 void
 QPDFCrypto_mbedtls::SHA2_finalize()
 {
-    if (mbedtls_md_get_type(mbedtls_md_info_from_ctx(&md_ctx)) != MBEDTLS_MD_NONE) {
+#ifdef QPDF_MBEDTLS_2
+    auto info = md_ctx.md_info;
+#else
+    auto info = mbedtls_md_info_from_ctx(&md_ctx);
+#endif
+    if (mbedtls_md_get_type(info) != MBEDTLS_MD_NONE) {
         check_mbedtls(mbedtls_md_finish(&md_ctx, md_out));
         mbedtls_md_free(&md_ctx);
     }
@@ -148,6 +163,9 @@ QPDFCrypto_mbedtls::rijndael_init(
     check_mbedtls(mbedtls_cipher_setup(&cipher_ctx, info));
     check_mbedtls(
         mbedtls_cipher_setkey(&cipher_ctx, key_data, static_cast<int>(key_len * 8), operation));
+    if (cbc_mode) {
+        check_mbedtls(mbedtls_cipher_set_padding_mode(&cipher_ctx, MBEDTLS_PADDING_NONE));
+    }
     check_mbedtls(mbedtls_cipher_set_iv(&cipher_ctx, cbc_block, rijndael_buf_size));
     check_mbedtls(mbedtls_cipher_reset(&cipher_ctx));
 }
@@ -157,6 +175,9 @@ QPDFCrypto_mbedtls::rijndael_process(unsigned char* in_data, unsigned char* out_
 {
     size_t len = 0;
     check_mbedtls(mbedtls_cipher_update(&cipher_ctx, in_data, rijndael_buf_size, out_data, &len));
+    if (len != rijndael_buf_size) {
+        throw std::runtime_error(std::string("Incorrect AES output size ") + std::to_string(len));
+    }
 }
 
 void

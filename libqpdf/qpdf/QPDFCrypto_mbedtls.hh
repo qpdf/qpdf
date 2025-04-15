@@ -6,7 +6,12 @@
 
 #include <mbedtls/cipher.h>
 #include <mbedtls/md.h>
+#include <mbedtls/version.h>
 #include <memory>
+
+#if MBEDTLS_VERSION_MAJOR == 2
+# define QPDF_MBEDTLS_2
+#endif
 
 class QPDFCrypto_mbedtls: public QPDFCryptoImpl
 {
