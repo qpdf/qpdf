@@ -26,7 +26,9 @@ Basic Dependencies
   `libjpeg-turbo <https://libjpeg-turbo.org/>`__
 
 - *Recommended but not required:* `gnutls <https://www.gnutls.org/>`__
-  to be able to use the gnutls crypto provider and/or `openssl
+  to be able to use the gnutls crypto provider, 
+  `mbedtls <https://www.trustedfirmware.org/projects/mbed-tls/>`__
+  to be able to use the mbedtls crypto provider, and/or `openssl
   <https://openssl.org/>`__ to be able to use the openssl crypto
   provider
 
@@ -411,6 +413,10 @@ REQUIRE_CRYPTO_GNUTLS
   Require the gnutls crypto provider. Turning this on makes in an
   error if the gnutls library is not available.
 
+REQUIRE_CRYPTO_MBEDTLS
+  Require the mbedtls crypto provider. Turning this on makes in an
+  error if the mbedtls library is not available.
+
 REQUIRE_CRYPTO_OPENSSL
   Require the openssl crypto provider. Turning this on makes in an
   error if the openssl library is not available.
@@ -419,8 +425,8 @@ DEFAULT_CRYPTO
   Explicitly select which crypto provider is used by default. See
   :ref:`crypto.runtime` for information about run-time selection of
   the crypto provider. If not specified, qpdf will pick gnutls if
-  available, otherwise openssl if available, and finally native as a
-  last priority.
+  available, then openssl if available, then mbedtls if available, 
+  and finally native as a last priority.
 
 Example: if you wanted to build with only the gnutls crypto provider,
 you should run cmake with ``-DUSE_IMPLICIT_CRYPTO=0
@@ -538,8 +544,8 @@ beyond this. Some of these are weak cryptographic algorithms. For a
 discussion of why they're needed, see :ref:`weak-crypto`.
 
 The available crypto provider implementations are ``gnutls``,
-``openssl``, and ``native``. OpenSSL support was added in qpdf 10.0.0
-with support for OpenSSL added in 10.4.0. GnuTLS support was
+``openssl``, ``mbedtls``, and ``native``. OpenSSL support was added in 
+qpdf 10.0.0 with support for OpenSSL added in 10.4.0. GnuTLS support was
 introduced in qpdf 9.1.0. Additional implementations can be added as
 needed. It is also possible for a developer to provide their own
 implementation without modifying the qpdf library.
@@ -737,6 +743,9 @@ their equivalents in cmake.
 
    - - enable-crypto-gnutls
      - REQUIRE_CRYPTO_GNUTLS
+
+   - - enable-crypto-mbedtls
+     - REQUIRE_CRYPTO_MBEDTLS
 
    - - enable-crypto-native
      - REQUIRE_CRYPTO_NATIVE (but see above)

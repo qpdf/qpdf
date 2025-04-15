@@ -60,9 +60,7 @@ Linux distribution and are readily available. Download information appears in th
 download pre-built binary versions of these libraries for some compilers; see [README-windows.md](README-windows.md) for
 additional details.
 
-Depending on which crypto providers are enabled, then [GnuTLS](https://www.gnutls.org/)
-and [OpenSSL](https://openssl.org) may also be required. This is discussed more in [Crypto providers](#crypto-providers)
-below.
+Depending on which crypto providers are enabled, then [GnuTLS](https://www.gnutls.org/), [MbedTLS](https://www.trustedfirmware.org/projects/mbed-tls/) and [OpenSSL](https://openssl.org) may also be required. This is discussed more in [Crypto providers](#crypto-providers) below.
 
 Detailed information appears in the [manual](https://qpdf.readthedocs.io/en/latest/installation.html).
 
@@ -79,8 +77,8 @@ The environment variable `QPDF_ZOPFLI` can be set to the following values:
 # Licensing terms of embedded software
 
 qpdf makes use of zlib and jpeg libraries for its functionality. These packages can be downloaded separately from their
-own download locations. If the optional GnuTLS or OpenSSL crypto providers are enabled, then GnuTLS and/or OpenSSL are
-also required.
+own download locations. If the optional GnuTLS, MbedTLS or OpenSSL crypto providers are enabled, then GnuTLS, 
+MbedTLS and/or OpenSSL are also required.
 
 Please see the [NOTICE](NOTICE.md) file for information on licenses of embedded software.
 
@@ -93,6 +91,8 @@ default if any external providers are available at build time.
 The following providers are available:
 
 * `gnutls`: an implementation that uses the GnuTLS library to provide crypto; causes libqpdf to link with the GnuTLS
+  library
+* `mbedtls`: an implementation that uses the MbedTLS library to provide crypto; causes libqpdf to link with the MbedTLS
   library
 * `openssl`: an implementation that can use the OpenSSL (or BoringSSL) libraries to provide crypto; causes libqpdf to
   link with the OpenSSL library
