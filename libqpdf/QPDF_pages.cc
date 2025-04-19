@@ -109,6 +109,14 @@ QPDF::getAllPagesInternal(
         QTC::TC("qpdf", "QPDF inherit mediabox", media_box ? 0 : 1);
     }
     auto kids = cur_node.getKey("/Kids");
+    if (!visited.add(kids)) {
+        throw QPDFExc(
+            qpdf_e_pages,
+            m->file->getName(),
+            "object " + cur_node.getObjGen().unparse(' '),
+            0,
+            "Loop detected in /Pages structure (getAllPages)");
+    }
     int i = -1;
     for (auto& kid: kids.as_array()) {
         ++i;
