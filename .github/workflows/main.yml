@@ -163,6 +163,7 @@ jobs:
           - test-alt-zlib
           - test-unsigned-char
           - test-c++-next
+          - build-android-ndk
     steps:
       - uses: actions/checkout@v4
       - name: ${{ matrix.script }}

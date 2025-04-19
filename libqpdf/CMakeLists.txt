@@ -349,7 +349,11 @@ int main(int argc, char* argv[]) {
     LFS_WITHOUT_MACROS)
 
 check_c_source_compiles(
-"#define _FILE_OFFSET_BITS 64
+"#if !(defined(__ANDROID__) && __ANDROID_API__ <= 24)
+// Defining _FILE_OFFSET_BITS on Android <= 24 is known to
+// produce incorrect results.
+#define _FILE_OFFSET_BITS 64
+#endif
 #include <stdio.h>
 #include <sys/types.h>
 int main(int argc, char* argv[]) {
@@ -359,11 +363,6 @@ int main(int argc, char* argv[]) {
 if(LFS_WITH_MACROS AND NOT LFS_WITHOUT_MACROS)
   set(_FILE_OFFSET_BITS 64)
 endif()
-
-# fseeko may not exist with _FILE_OFFSET_BITS=64 but can exist with
-# _FILE_OFFSET_BITS unset or 32 (e.g. Android ARMv7 with NDK 26b and
-# API level < 24) so we need to test fseeko after testing for
-# _FILE_OFFSET_BITS. See https://github.com/qpdf/qpdf/issues/950.
 check_symbol_exists(fseeko "stdio.h" HAVE_FSEEKO)
 check_symbol_exists(fseeko64 "stdio.h" HAVE_FSEEKO64)
 
