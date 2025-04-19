@@ -16,7 +16,7 @@ cleanup();
 
 my $td = new TestDriver('object-stream');
 
-my $n_tests = 10 + (36 * 4) + (12 * 2);
+my $n_tests = 10 + (36 * 4) + (12 * 2) + 4;
 my $n_compare_pdfs = 36;
 
 for (my $n = 16; $n <= 19; ++$n)
@@ -125,6 +125,24 @@ $td->runtest("adjacent compressed objects",
              {$td->FILE => "no-space-compressed-object.out",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+
+# Never compress empty streams
+$td->runtest("never compress empty streams",
+             {$td->COMMAND => "qpdf --compress-streams=y --static-id" .
+                  " empty-stream-uncompressed.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "empty-stream-uncompressed.pdf"});
+
+# Always remove filters from compressed empty streams
+$td->runtest("always remove filters from empty streams",
+             {$td->COMMAND => "qpdf --compress-streams=y --static-id" .
+                  " empty-stream-compressed.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "empty-stream-uncompressed.pdf"});
 
 cleanup();
 $td->report(calc_ntests($n_tests, $n_compare_pdfs));
