@@ -1,0 +1,41 @@
+#!/bin/bash
+set -xeo pipefail
+cd $(dirname $0)/..
+
+# Build a static libqpdf for android with an ABI version <= 24. This
+# is just to exercise that configuring for that platform works.
+
+declare -a android_flags
+android_flags=( \
+      -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK/build/cmake/android.toolchain.cmake" \
+      -DANDROID_ABI=armeabi-v7a \
+      -DANDROID_PLATFORM=android-21 \
+)
+
+rm -rf android-work build-android
+mkdir android-work
+pushd android-work
+export WORK=$PWD
+git clone https://github.com/libjpeg-turbo/libjpeg-turbo
+cd libjpeg-turbo
+cmake -S . -B build \
+      "${android_flags[@]}" \
+      -DCMAKE_INSTALL_PREFIX="$WORK" \
+      -DENABLE_STATIC=ON \
+      -DENABLE_SHARED=OFF \
+      -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+make -C build -j$(nproc)
+make -C build install
+popd
+
+export CMAKE_PREFIX_PATH=$WORK LDFLAGS="-L$WORK/lib"
+cmake -S . -B build-android \
+      "${android_flags[@]}" \
+      -DCMAKE_BUILD_TYPE=RelWithDebinfo \
+      -DUSE_IMPLICIT_CRYPTO=OFF \
+      -DBUILD_SHARED_LIBS=OFF \
+      -DBUILD_STATIC_LIBS=ON \
+      -DREQUIRE_CRYPTO_NATIVE=ON
+
+cmake --build build-android -t libqpdf --verbose -j$(nproc) -- -k
+file build-android/libqpdf/CMakeFiles/libqpdf_object.dir/QUtil.cc.o | grep 'ARM, EABI5'
