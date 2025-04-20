@@ -10,9 +10,8 @@ project(qpdf
   VERSION 12.1.1
   LANGUAGES C CXX)
 
-# Enable correct rpath handling for MacOSX
-cmake_policy(SET CMP0042 NEW)
-# Honor CMAKE_REQUIRED_LIBRARIES when checking for include files
+# Honor CMAKE_REQUIRED_LIBRARIES when checking for include files. This
+# can be removed in cmake >= 3.17.
 cmake_policy(SET CMP0075 NEW)
 
 # *** OPTIONS ***
@@ -246,6 +245,7 @@ if(MSVC)
   list(APPEND WINDOWS_WMAIN_LINK -link wsetargv.obj)
 endif()
 if(MINGW)
+  get_filename_component(MINGW_BIN_DIR "${CMAKE_CXX_COMPILER}" DIRECTORY)
   execute_process(
     COMMAND gcc --print-file-name=CRT_glob.o
     OUTPUT_VARIABLE CRT_GLOB_O
@@ -387,6 +387,11 @@ message(STATUS "  QTC test coverage: ${ENABLE_QTC}")
 message(STATUS "  include future changes: ${FUTURE}")
 message(STATUS "  system: ${CPACK_SYSTEM_NAME}")
 message(STATUS "")
+if(MINGW)
+    message(STATUS "MinGW compiler: ${CMAKE_CXX_COMPILER}")
+    message(STATUS "MinGW bin dirrectory: ${MINGW_BIN_DIR}")
+    message(STATUS "")
+endif()
 message(STATUS "*** Options Summary ***")
 foreach(PROP
     COMPILE_OPTIONS INTERFACE_COMPILE_OPTIONS
