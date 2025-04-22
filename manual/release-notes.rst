@@ -24,6 +24,12 @@ more detail.
 
     - Add missing QPDFFormFieldObjectHelper::isChecked implementation.
 
+    - Fix bug in QPDFNameTreeObjectHelper / QPDFNumberTreeObjectHelper. Under
+      certain conditions tree insertions resulted in a /Range entry being
+      written to the tree root node, which is not permitted. One of the
+      possible consequences is that some readers would not recognize
+      embedded / attached files.
+
   - Build fixes
 
     - Fix Android build issues.

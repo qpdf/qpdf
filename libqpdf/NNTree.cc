@@ -203,7 +203,7 @@ NNTreeIterator::resetLimits(QPDFObjectHandle node, std::list<PathElement>::itera
                     changed = false;
                 }
             }
-            if (changed) {
+            if (changed && !node.isSameObjectAs(path.begin()->node)) {
                 node.replaceKey("/Limits", limits);
             }
         } else {
