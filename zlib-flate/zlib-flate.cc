@@ -13,7 +13,8 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " { -uncompress | -compress[=n] }" << std::endl
+    std::cerr << "Usage: " << whoami << " [ -skip=N ] { -uncompress | -compress[=n] }" << std::endl
+              << "  skip=N will discard first N bytes of input before doing [un]compress" << std::endl
               << "If n is specified with -compress, it is a zlib compression level from"
               << std::endl
               << "1 to 9 where lower numbers are faster and less compressed and higher" << std::endl
@@ -35,27 +36,35 @@ main(int argc, char* argv[])
         exit(0);
     }
 
-    if (argc != 2) {
-        usage();
-    }
-
     Pl_Flate::action_e action = Pl_Flate::a_inflate;
 
-    if ((strcmp(argv[1], "-uncompress") == 0)) {
-        // okay
-    } else if ((strcmp(argv[1], "-compress") == 0)) {
-        action = Pl_Flate::a_deflate;
-    } else if ((strncmp(argv[1], "-compress=", 10) == 0)) {
-        action = Pl_Flate::a_deflate;
-        int level = QUtil::string_to_int(argv[1] + 10);
-        Pl_Flate::setCompressionLevel(level);
-    } else if (strcmp(argv[1], "--_zopfli") == 0) {
-        // Undocumented option, but that doesn't mean someone doesn't use it...
-        // This is primarily here to support the test suite.
-        std::cout << (Pl_Flate::zopfli_supported() ? "1" : "0")
-                  << (Pl_Flate::zopfli_enabled() ? "1" : "0") << std::endl;
-        return 0;
-    } else {
+    bool args_valid = false;
+    size_t skip = 0;
+    for (int i = 1; i < argc; ++i) {
+        if ((strncmp(argv[i], "-skip=", 6) == 0)) {
+            skip = QUtil::string_to_int(argv[i] + 6);
+        } else if ((strcmp(argv[i], "-uncompress") == 0)) {
+             args_valid = true;
+        } else if ((strcmp(argv[i], "-compress") == 0)) {
+            action = Pl_Flate::a_deflate;
+            args_valid = true;
+        } else if ((strncmp(argv[i], "-compress=", 10) == 0)) {
+            action = Pl_Flate::a_deflate;
+            int level = QUtil::string_to_int(argv[i] + 10);
+            Pl_Flate::setCompressionLevel(level);
+            args_valid = true;
+        } else if (strcmp(argv[i], "--_zopfli") == 0) {
+            // Undocumented option, but that doesn't mean someone doesn't use it...
+            // This is primarily here to support the test suite.
+            std::cout << (Pl_Flate::zopfli_supported() ? "1" : "0")
+                      << (Pl_Flate::zopfli_enabled() ? "1" : "0") << std::endl;
+            return 0;
+        } else {
+            usage();
+        }
+    }
+
+    if (!args_valid) {
         usage();
     }
 
@@ -74,6 +83,17 @@ main(int argc, char* argv[])
 
         unsigned char buf[10000];
         bool done = false;
+
+        while (skip > 0) {
+            size_t chunk = skip > 10000 ? 10000 : skip;
+            size_t len = fread(buf, 1, chunk, stdin);
+            if (len >= 0 ) {
+                skip -= len;
+            } else {
+                break;
+            }
+        }
+
         while (!done) {
             size_t len = fread(buf, 1, sizeof(buf), stdin);
             if (len <= 0) {
