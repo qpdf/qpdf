@@ -490,6 +490,7 @@ class QPDF::Members
     // copied_stream_data_provider is owned by copied_streams
     CopiedStreamDataProvider* copied_stream_data_provider{nullptr};
     bool reconstructed_xref{false};
+    bool in_xref_reconstruction{false};
     bool fixed_dangling_refs{false};
     bool immediate_copy_from{false};
     bool in_parse{false};

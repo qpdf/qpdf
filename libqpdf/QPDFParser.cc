@@ -71,7 +71,8 @@ QPDFParser::parse(
     std::string const& object_description,
     qpdf::Tokenizer& tokenizer,
     QPDFObjectHandle::StringDecrypter* decrypter,
-    QPDF& context)
+    QPDF& context,
+    bool sanity_checks)
 {
     bool empty{false};
     auto result = QPDFParser(
@@ -81,7 +82,10 @@ QPDFParser::parse(
                       tokenizer,
                       decrypter,
                       &context,
-                      true)
+                      true,
+                      0,
+                      0,
+                      sanity_checks)
                       .parse(empty, false);
     return {result, empty};
 }
@@ -298,7 +302,7 @@ QPDFParser::parseRemainder(bool content_stream)
             continue;
 
         case QPDFTokenizer::tt_array_close:
-            if (bad_count && !max_bad_count) {
+            if ((bad_count || sanity_checks) && !max_bad_count) {
                 // Trigger warning.
                 (void)tooManyBadTokens();
                 return {QPDFObject::create<QPDF_Null>()};
@@ -329,7 +333,7 @@ QPDFParser::parseRemainder(bool content_stream)
             continue;
 
         case QPDFTokenizer::tt_dict_close:
-            if (bad_count && !max_bad_count) {
+            if ((bad_count || sanity_checks) && !max_bad_count) {
                 // Trigger warning.
                 (void)tooManyBadTokens();
                 return {QPDFObject::create<QPDF_Null>()};
@@ -514,7 +518,8 @@ template <typename T, typename... Args>
 void
 QPDFParser::addScalar(Args&&... args)
 {
-    if (bad_count && (frame->olist.size() > 5'000 || frame->dict.size() > 5'000)) {
+    if ((bad_count || sanity_checks) &&
+        (frame->olist.size() > 5'000 || frame->dict.size() > 5'000)) {
         // Stop adding scalars. We are going to abort when the close token or a bad token is
         // encountered.
         max_bad_count = 0;
@@ -572,10 +577,15 @@ bool
 QPDFParser::tooManyBadTokens()
 {
     if (frame->olist.size() > 5'000 || frame->dict.size() > 5'000) {
+        if (bad_count) {
+            warn(
+                "encountered errors while parsing an array or dictionary with more than 5000 "
+                "elements; giving up on reading object");
+            return true;
+        }
         warn(
-            "encountered errors while parsing an array or dictionary with more than 5000 "
-            "elements; giving up on reading object");
-        return true;
+            "encountered an array or dictionary with more than 5000 elements during xref recovery; "
+            "giving up on reading object");
     }
     if (--max_bad_count > 0 && good_count > 4) {
         good_count = 0;
