@@ -36,7 +36,8 @@ class QPDFParser
         std::string const& object_description,
         qpdf::Tokenizer& tokenizer,
         QPDFObjectHandle::StringDecrypter* decrypter,
-        QPDF& context);
+        QPDF& context,
+        bool sanity_checks);
 
     static std::pair<QPDFObjectHandle, bool> parse(
         qpdf::is::OffsetBuffer& input,
@@ -63,7 +64,8 @@ class QPDFParser
         QPDF* context,
         bool parse_pdf,
         int stream_id = 0,
-        int obj_id = 0) :
+        int obj_id = 0,
+        bool sanity_checks = false) :
         input(input),
         object_description(object_description),
         tokenizer(tokenizer),
@@ -72,7 +74,8 @@ class QPDFParser
         description(std::move(sp_description)),
         parse_pdf(parse_pdf),
         stream_id(stream_id),
-        obj_id(obj_id)
+        obj_id(obj_id),
+        sanity_checks(sanity_checks)
     {
     }
 
@@ -125,6 +128,7 @@ class QPDFParser
     bool parse_pdf{false};
     int stream_id{0};
     int obj_id{0};
+    bool sanity_checks{false};
 
     std::vector<StackFrame> stack;
     StackFrame* frame{nullptr};
