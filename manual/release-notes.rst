@@ -41,6 +41,14 @@ more detail.
 
     - Fix Android build issues.
 
+  - Other enhancements
+
+    - More sanity checks have been added when files with damaged xref tables
+      are recovered in order to avoid long runtimes and large memory use.
+      Objects with with very large arrays or dictionaries (more than 5000
+      elements) and duplicate pages are ignored as they are almost certainly
+      invalid.
+
 12.1.0: April 6, 2025
   - Upcoming C++ Version Change
 
