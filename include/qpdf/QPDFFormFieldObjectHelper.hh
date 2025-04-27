@@ -147,7 +147,7 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     // Returns true if fields if of type /Ch
     QPDF_DLL
     bool isChoice();
-    // Returns choices as UTF-8 strings
+    // Returns choices display values as UTF-8 strings
     QPDF_DLL
     std::vector<std::string> getChoices();
 

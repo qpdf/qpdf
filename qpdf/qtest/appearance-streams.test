@@ -16,7 +16,7 @@ my $td = new TestDriver('appearance-streams');
 
 my $n_tests = 12;
 
-foreach my $f ('need-appearances',
+foreach my $f ('need-appearances2',
                'need-appearances-more',
                'need-appearances-more2',
                'need-appearances-more3')
