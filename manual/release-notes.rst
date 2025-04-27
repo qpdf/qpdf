@@ -32,6 +32,13 @@ more detail.
 
   - Build fixes
 
+    - Improve experience for local development on Windows. Perl is no
+      longer required to build when using MinGW. qpdf should build
+      "out of the box" on Windows with an IDE such as JetBrains CLion
+      that bundles mingw or that uses an installation of Visual
+      Studio. Perl and a POSIX-like environment such as msys2 is still
+      required to run tests.
+
     - Fix Android build issues.
 
 12.1.0: April 6, 2025
