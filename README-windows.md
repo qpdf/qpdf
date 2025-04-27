@@ -1,3 +1,30 @@
+Quick Start with JetBrains CLion
+================================
+
+The following *should* work but has not been tested on a completely clean system with CLion. It may
+work with other "batteries-included" IDEs as well.
+
+* Install `external-libs` from [prebuilt static external libraries from the qpdf/external-libs
+  github repository](https://github.com/qpdf/external-libs/releases) by unzipping the binary
+  distribution into an otherwise clean source tree.
+* Using the default toolchain, you can create a cmake build of type *other than Debug*. A `Debug`
+  build will not work with the external libraries since debug versions are not redistributable. If
+  you want a Debug build, you'll have to build the external libraries yourself. The external-libs
+  repo above can be a hint, or you can get them from other sources.
+* If you have MSVC, you can enable one of the `msvc` presets that you should see when you edit CMake
+  configurations.
+
+In any of these, it should work to build and run the executables from the IDE. Note that, if you
+start a terminal from CLion and mingw is not in your path, the executables built my mingw won't run.
+If mingw is in your path, it should work. You can also start a mingw64 shell. The executables should
+work from there. This works because the cmake configuration copies the qpdf DLL into the bin
+directory. If you want the other executables to work, you should add the `libqpdf` directory of your
+build directory to your path or disable shared libraries. For more details, consult the qpdf manual
+and the rest of this file.
+
+Additional dependencies are required for running tests. For the foreseeable future, that requires
+msys2, though this may eventually not be the case.
+
 Common Setup
 ============
 

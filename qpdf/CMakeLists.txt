@@ -72,13 +72,26 @@ if(MINGW)
   set(ONE_GNU_DLL extra-dlls/libstdc++-6.dll)
   add_custom_command(OUTPUT ${ONE_GNU_DLL}
     COMMAND
-    perl ${qpdf_SOURCE_DIR}/copy_dlls
-    qpdf.exe
-    ${CMAKE_BINARY_DIR}/libqpdf
-    extra-dlls)
+    pwsh.exe -NoProfile -ExecutionPolicy Bypass -Command
+    "${qpdf_SOURCE_DIR}/copy_dlls.ps1"
+    -exe $<TARGET_FILE:qpdf>
+    -dest "${CMAKE_CURRENT_BINARY_DIR}/extra-dlls"
+    -mingwBinDir "${MINGW_BIN_DIR}"
+    VERBATIM
+    COMMAND_EXPAND_LISTS
+    DEPENDS qpdf)
   add_custom_target(extra_dlls ALL DEPENDS ${ONE_GNU_DLL})
   add_dependencies(extra_dlls qpdf)
   if(BUILD_SHARED_LIBS)
+    set(LIBQPDF_NAME get_filename_component($<TARGET_FILE:libqpdf> NAME))
+    add_custom_command(
+        TARGET qpdf POST_BUILD
+        COMMAND
+            ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_FILE:libqpdf>
+                $<TARGET_FILE_DIR:qpdf>
+        VERBATIM
+        COMMAND_EXPAND_LISTS)
     set(EXTRA_DLL_COMPONENT ${COMPONENT_LIB})
   else()
     set(EXTRA_DLL_COMPONENT ${COMPONENT_CLI})
