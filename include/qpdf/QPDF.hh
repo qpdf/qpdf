@@ -765,15 +765,15 @@ class QPDF
     void parse(char const* password);
     void inParse(bool);
     void setTrailer(QPDFObjectHandle obj);
-    void read_xref(qpdf_offset_t offset);
+    void read_xref(qpdf_offset_t offset, bool in_stream_recovery = false);
     bool resolveXRefTable();
     void reconstruct_xref(QPDFExc& e, bool found_startxref = true);
     bool parse_xrefFirst(std::string const& line, int& obj, int& num, int& bytes);
     bool read_xrefEntry(qpdf_offset_t& f1, int& f2, char& type);
     bool read_bad_xrefEntry(qpdf_offset_t& f1, int& f2, char& type);
     qpdf_offset_t read_xrefTable(qpdf_offset_t offset);
-    qpdf_offset_t read_xrefStream(qpdf_offset_t offset);
-    qpdf_offset_t processXRefStream(qpdf_offset_t offset, QPDFObjectHandle& xref_stream);
+    qpdf_offset_t read_xrefStream(qpdf_offset_t offset, bool in_stream_recovery=false);
+    qpdf_offset_t processXRefStream(qpdf_offset_t offset, QPDFObjectHandle& xref_stream, bool in_stream_recovery=false);
     std::pair<int, std::array<int, 3>>
     processXRefW(QPDFObjectHandle& dict, std::function<QPDFExc(std::string_view)> damaged);
     int processXRefSize(

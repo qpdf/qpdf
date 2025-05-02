@@ -325,7 +325,7 @@ QPDF::reconstruct_xref(QPDFExc& e, bool found_startxref)
         }
         if (max_offset > 0) {
             try {
-                read_xref(max_offset);
+                read_xref(max_offset, true);
             } catch (std::exception&) {
                 warn(damagedPDF(
                     "", -1, "error decoding candidate xref stream while recovering damaged file"));
@@ -388,7 +388,7 @@ QPDF::reconstruct_xref(QPDFExc& e, bool found_startxref)
 }
 
 void
-QPDF::read_xref(qpdf_offset_t xref_offset)
+QPDF::read_xref(qpdf_offset_t xref_offset, bool in_stream_recovery)
 {
     std::map<int, int> free_table;
     std::set<qpdf_offset_t> visited;
@@ -440,7 +440,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
             }
             xref_offset = read_xrefTable(xref_offset + skip);
         } else {
-            xref_offset = read_xrefStream(xref_offset);
+            xref_offset = read_xrefStream(xref_offset, in_stream_recovery);
         }
         if (visited.count(xref_offset) != 0) {
             QTC::TC("qpdf", "QPDF xref loop");
@@ -759,7 +759,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 
 // Read a single cross-reference stream.
 qpdf_offset_t
-QPDF::read_xrefStream(qpdf_offset_t xref_offset)
+QPDF::read_xrefStream(qpdf_offset_t xref_offset, bool in_stream_recovery)
 {
     if (!m->ignore_xref_streams) {
         QPDFObjGen x_og;
@@ -772,7 +772,7 @@ QPDF::read_xrefStream(qpdf_offset_t xref_offset)
         }
         if (xref_obj.isStreamOfType("/XRef")) {
             QTC::TC("qpdf", "QPDF found xref stream");
-            return processXRefStream(xref_offset, xref_obj);
+            return processXRefStream(xref_offset, xref_obj, in_stream_recovery);
         }
     }
 
@@ -905,7 +905,8 @@ QPDF::processXRefIndex(
 }
 
 qpdf_offset_t
-QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
+QPDF::processXRefStream(
+    qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj, bool in_stream_recovery)
 {
     auto damaged = [this, xref_offset](std::string_view msg) -> QPDFExc {
         return damagedPDF("xref stream", xref_offset, msg.data());
@@ -971,7 +972,13 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
                 // objects.
                 insertFreeXrefEntry(QPDFObjGen(obj, 0));
             } else {
-                insertXrefEntry(obj, toI(fields[0]), fields[1], toI(fields[2]));
+                auto typ = toI(fields[0]);
+                if (!in_stream_recovery || typ == 2) {
+                    // If we are in xref stream recovery all actual uncompressed objects have
+                    // already been inserted into the xref table. Avoid adding junk data into the
+                    // xref table.
+                    insertXrefEntry(obj, toI(fields[0]), fields[1], toI(fields[2]));
+                }
             }
             ++obj;
         }
