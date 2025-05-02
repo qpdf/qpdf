@@ -772,8 +772,9 @@ class QPDF
     bool read_xrefEntry(qpdf_offset_t& f1, int& f2, char& type);
     bool read_bad_xrefEntry(qpdf_offset_t& f1, int& f2, char& type);
     qpdf_offset_t read_xrefTable(qpdf_offset_t offset);
-    qpdf_offset_t read_xrefStream(qpdf_offset_t offset, bool in_stream_recovery=false);
-    qpdf_offset_t processXRefStream(qpdf_offset_t offset, QPDFObjectHandle& xref_stream, bool in_stream_recovery=false);
+    qpdf_offset_t read_xrefStream(qpdf_offset_t offset, bool in_stream_recovery = false);
+    qpdf_offset_t processXRefStream(
+        qpdf_offset_t offset, QPDFObjectHandle& xref_stream, bool in_stream_recovery = false);
     std::pair<int, std::array<int, 3>>
     processXRefW(QPDFObjectHandle& dict, std::function<QPDFExc(std::string_view)> damaged);
     int processXRefSize(
@@ -897,7 +898,8 @@ class QPDF
         QPDFObjectHandle cur_pages,
         QPDFObjGen::set& visited,
         QPDFObjGen::set& seen,
-        bool media_box);
+        bool media_box,
+        bool resources);
     void insertPage(QPDFObjectHandle newpage, int pos);
     void flattenPagesTree();
     void insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_duplicate);
