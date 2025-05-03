@@ -14,6 +14,12 @@ more detail.
 .. x.y.z: not yet released
 
 12.1.1: not yet released
+  - Upcoming C++ and CMake Version Change
+
+    - This is expected to be the last minor release of qpdf to work
+      with C++-17. We will be switching to C++-20 for 12.2.0 and will require
+      CMake version 3.21 or later.
+
   - Bug fixes
 
     - In QPDF::getAllPages detect shared /Kids arrays to avoid stack overflows
