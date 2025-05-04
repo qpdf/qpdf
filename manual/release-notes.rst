@@ -13,7 +13,12 @@ more detail.
 
 .. x.y.z: not yet released
 
-12.1.1: not yet released
+12.2.0: May 4, 2025
+  - Upcoming C++ Version Change
+
+    - This is expected to be the last minor release of qpdf to work
+      with C++-17. We will be switching to C++-20 for 12.3.0.
+
   - Bug fixes
 
     - In ``QPDF::getAllPages`` detect shared ``/Kids`` arrays to avoid stack
@@ -59,11 +64,6 @@ more detail.
       invalid.
 
 12.1.0: April 6, 2025
-  - Upcoming C++ Version Change
-
-    - This is expected to be the last minor release of qpdf to work
-      with C++-17. We will be switching to C++-20 for 12.2.0.
-
   - Bug fixes
 
     - In ``QPDF::isLinearized`` return false if the first object in the file is

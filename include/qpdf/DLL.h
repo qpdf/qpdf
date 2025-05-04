@@ -26,13 +26,13 @@
 
 /* The first version of qpdf to include the version constants is 10.6.0. */
 #define QPDF_MAJOR_VERSION 12
-#define QPDF_MINOR_VERSION 1
-#define QPDF_PATCH_VERSION 1
+#define QPDF_MINOR_VERSION 2
+#define QPDF_PATCH_VERSION 0
 
 #ifdef QPDF_FUTURE
-# define QPDF_VERSION "12.1.1+future"
+# define QPDF_VERSION "12.2.0+future"
 #else
-# define QPDF_VERSION "12.1.1"
+# define QPDF_VERSION "12.2.0"
 #endif
 
 /*
