@@ -46,6 +46,10 @@ more detail.
 
     - Fix Android build issues.
 
+    - Fix incorrect use of jpeg library introduced with the
+      ``--jpeg-quality`` feature introduced in 12.1.0. This was
+      causing build failures on some platforms.
+
   - Other enhancements
 
     - More sanity checks have been added when files with damaged xref tables

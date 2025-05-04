@@ -123,7 +123,7 @@ ImageOptimizer::ImageOptimizer(
         // Recompress existing jpeg.
         decode_level = qpdf_dl_all;
         config = Pl_DCT::make_compress_config(
-            [quality](jpeg_compress_struct* cinfo) { jpeg_set_quality(cinfo, quality, false); });
+            [quality](jpeg_compress_struct* cinfo) { jpeg_set_quality(cinfo, quality, FALSE); });
     }
 }
 
