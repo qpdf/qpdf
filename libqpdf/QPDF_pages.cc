@@ -43,9 +43,10 @@ QPDF::getAllPages()
     // Note that pushInheritedAttributesToPage may also be used to initialize m->all_pages.
     if (m->all_pages.empty() && !m->invalid_page_found) {
         m->ever_called_get_all_pages = true;
+        auto root = getRoot();
         QPDFObjGen::set visited;
         QPDFObjGen::set seen;
-        QPDFObjectHandle pages = getRoot().getKey("/Pages");
+        QPDFObjectHandle pages = root.getKey("/Pages");
         bool warned = false;
         bool changed_pages = false;
         while (pages.isDictionary() && pages.hasKey("/Parent")) {
@@ -56,7 +57,7 @@ QPDF::getAllPages()
             // Files have been found in the wild where /Pages in the catalog points to the first
             // page. Try to work around this and similar cases with this heuristic.
             if (!warned) {
-                getRoot().warnIfPossible(
+                root.warnIfPossible(
                     "document page tree root (root -> /Pages) doesn't point"
                     " to the root of the page tree; attempting to correct");
                 warned = true;
@@ -65,7 +66,7 @@ QPDF::getAllPages()
             pages = pages.getKey("/Parent");
         }
         if (changed_pages) {
-            getRoot().replaceKey("/Pages", pages);
+            root.replaceKey("/Pages", pages);
         }
         seen.clear();
         if (!pages.hasKey("/Kids")) {
@@ -74,7 +75,7 @@ QPDF::getAllPages()
                 qpdf_e_pages, m->file->getName(), "", 0, "root of pages tree has no /Kids array");
         }
         try {
-            getAllPagesInternal(pages, visited, seen, false);
+            getAllPagesInternal(pages, visited, seen, false, false);
         } catch (...) {
             m->all_pages.clear();
             m->invalid_page_found = false;
@@ -90,7 +91,11 @@ QPDF::getAllPages()
 
 void
 QPDF::getAllPagesInternal(
-    QPDFObjectHandle cur_node, QPDFObjGen::set& visited, QPDFObjGen::set& seen, bool media_box)
+    QPDFObjectHandle cur_node,
+    QPDFObjGen::set& visited,
+    QPDFObjGen::set& seen,
+    bool media_box,
+    bool resources)
 {
     if (!visited.add(cur_node)) {
         throw QPDFExc(
@@ -101,12 +106,18 @@ QPDF::getAllPagesInternal(
             "Loop detected in /Pages structure (getAllPages)");
     }
     if (!cur_node.isDictionaryOfType("/Pages")) {
+        // During fuzzing files were encountered where the root object appeared in the pages tree.
+        // Unconditionally setting the /Type to /Pages could cause problems, but trying to
+        // accommodate the possibility may be excessive.
         cur_node.warnIfPossible("/Type key should be /Pages but is not; overriding");
         cur_node.replaceKey("/Type", "/Pages"_qpdf);
     }
     if (!media_box) {
         media_box = cur_node.getKey("/MediaBox").isRectangle();
         QTC::TC("qpdf", "QPDF inherit mediabox", media_box ? 0 : 1);
+    }
+    if (!resources) {
+        resources = cur_node.getKey("/Resources").isDictionary();
     }
     auto kids = cur_node.getKey("/Kids");
     if (!visited.add(kids)) {
@@ -120,13 +131,22 @@ QPDF::getAllPagesInternal(
     int i = -1;
     for (auto& kid: kids.as_array()) {
         ++i;
+        int errors = 0;
+
         if (!kid.isDictionary()) {
             kid.warnIfPossible("Pages tree includes non-dictionary object; ignoring");
             m->invalid_page_found = true;
             continue;
         }
+        if (!kid.isIndirect()) {
+            QTC::TC("qpdf", "QPDF handle direct page object");
+            cur_node.warnIfPossible(
+                "kid " + std::to_string(i) + " (from 0) is direct; converting to indirect");
+            kid = makeIndirectObject(kid);
+            ++errors;
+        }
         if (kid.hasKey("/Kids")) {
-            getAllPagesInternal(kid, visited, seen, media_box);
+            getAllPagesInternal(kid, visited, seen, media_box, resources);
         } else {
             if (!media_box && !kid.getKey("/MediaBox").isRectangle()) {
                 QTC::TC("qpdf", "QPDF missing mediabox");
@@ -136,13 +156,13 @@ QPDF::getAllPagesInternal(
                 kid.replaceKey(
                     "/MediaBox",
                     QPDFObjectHandle::newArray(QPDFObjectHandle::Rectangle(0, 0, 612, 792)));
+                ++errors;
             }
-            if (!kid.isIndirect()) {
-                QTC::TC("qpdf", "QPDF handle direct page object");
-                cur_node.warnIfPossible(
-                    "kid " + std::to_string(i) + " (from 0) is direct; converting to indirect");
-                kid = makeIndirectObject(kid);
-            } else if (!seen.add(kid)) {
+            if (!resources && !kid.getKey("/Resources").isDictionary()) {
+                // Consider adding an information message
+                ++errors;
+            }
+            if (!seen.add(kid)) {
                 // Make a copy of the page. This does the same as shallowCopyPage in
                 // QPDFPageObjectHelper.
                 QTC::TC("qpdf", "QPDF resolve duplicated page object");
@@ -151,6 +171,8 @@ QPDF::getAllPagesInternal(
                         "kid " + std::to_string(i) +
                         " (from 0) appears more than once in the pages tree;"
                         " creating a new page object as a copy");
+                    // This needs to be fixed. shallowCopy does not necessarily produce a valid
+                    // page.
                     kid = makeIndirectObject(QPDFObjectHandle(kid).shallowCopy());
                     seen.add(kid);
                 } else {
@@ -161,12 +183,24 @@ QPDF::getAllPagesInternal(
                     kid = QPDFObjectHandle::newNull();
                     continue;
                 }
+                if (!kid.getKey("/Parent").isSameObjectAs(cur_node)) {
+                    // Consider fixing and adding an information message.
+                    ++errors;
+                }
             }
             if (!kid.isDictionaryOfType("/Page")) {
                 kid.warnIfPossible("/Type key should be /Page but is not; overriding");
                 kid.replaceKey("/Type", "/Page"_qpdf);
+                ++errors;
             }
-            m->all_pages.push_back(kid);
+            if (m->in_xref_reconstruction && errors > 2) {
+                cur_node.warnIfPossible(
+                    "kid " + std::to_string(i) + " (from 0) has too many errors; ignoring page");
+                m->invalid_page_found = true;
+                kid = QPDFObjectHandle::newNull();
+                continue;
+            }
+            m->all_pages.emplace_back(kid);
         }
     }
 }
