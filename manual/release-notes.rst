@@ -13,6 +13,16 @@ more detail.
 
 .. x.y.z: not yet released
 
+12.3.0: not yet released
+  - Build changes
+
+    - A C++-20 compiler is now required.
+
+    - The AppImage and Linux standalone binary distributions are now
+      built with Ubuntu 22.04 to support C++-20, which means they will
+      not work on some older Linux distributions. If you need support
+      for an older distribution, please use version 12.2.0 or below.
+
 12.2.0: May 4, 2025
   - Upcoming C++ Version Change
 
