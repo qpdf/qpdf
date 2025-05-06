@@ -13,6 +13,11 @@ more detail.
 
 .. x.y.z: not yet released
 
+12.3.0: not yet released
+  - Build changes
+
+    - A C++-20 compiler is now required.
+
 12.2.0: May 4, 2025
   - Upcoming C++ Version Change
 
