@@ -10,11 +10,13 @@ class ContentNormalizer final: public QPDFObjectHandle::TokenFilter
     ~ContentNormalizer() final = default;
     void handleToken(QPDFTokenizer::Token const&) final;
 
-    bool anyBadTokens() const
+    bool
+    anyBadTokens() const
     {
         return any_bad_tokens;
     }
-    bool lastTokenWasBad() const
+    bool
+    lastTokenWasBad() const
     {
         return last_token_was_bad;
     }

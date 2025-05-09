@@ -519,24 +519,20 @@ Stream::pipeStreamData(
         pipeline->write(s->stream_data->getBuffer(), s->stream_data->getSize());
         pipeline->finish();
     } else if (s->stream_provider.get()) {
-        bool success = true;
         Pl_Count count("stream provider count", pipeline);
         if (s->stream_provider->supportsRetry()) {
             if (!s->stream_provider->provideStreamData(
                     obj->getObjGen(), &count, suppress_warnings, will_retry)) {
                 filter = false;
-                success = false;
+                return false;
             }
         } else {
             s->stream_provider->provideStreamData(obj->getObjGen(), &count);
         }
         qpdf_offset_t actual_length = count.getCount();
-        qpdf_offset_t desired_length = 0;
-        if (success && s->stream_dict.hasKey("/Length")) {
-            desired_length = s->stream_dict.getKey("/Length").getIntValue();
-            if (actual_length == desired_length) {
-                QTC::TC("qpdf", "QPDF_Stream pipe use stream provider");
-            } else {
+        if (s->stream_dict.hasKey("/Length")) {
+            auto desired_length = s->stream_dict.getKey("/Length").getIntValue();
+            if (actual_length != desired_length) {
                 QTC::TC("qpdf", "QPDF_Stream provider length mismatch");
                 // This would be caused by programmer error on the part of a library user, not by
                 // invalid input data.
@@ -545,17 +541,15 @@ Stream::pipeStreamData(
                     std::to_string(actual_length) + " bytes instead of expected " +
                     std::to_string(desired_length) + " bytes");
             }
-        } else if (success) {
+        } else {
             QTC::TC("qpdf", "QPDF_Stream provider length not provided");
             s->stream_dict.replaceKey("/Length", QPDFObjectHandle::newInteger(actual_length));
         }
-        if (!success) {
-            return false;
-        }
-    } else if (obj->getParsedOffset() == 0) {
-        QTC::TC("qpdf", "QPDF_Stream pipe no stream data");
-        throw std::logic_error("pipeStreamData called for stream with no data");
     } else {
+        if (obj->getParsedOffset() == 0) {
+            QTC::TC("qpdf", "QPDF_Stream pipe no stream data");
+            throw std::logic_error("pipeStreamData called for stream with no data");
+        }
         QTC::TC("qpdf", "QPDF_Stream pipe original stream data");
         if (!QPDF::Pipe::pipeStreamData(
                 obj->getQPDF(),
