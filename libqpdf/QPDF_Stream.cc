@@ -325,14 +325,14 @@ Stream::filterable(
         // No filters
     } else if (filter_obj.isName()) {
         // One filter
-        filter_names.push_back(filter_obj.getName());
+        filter_names.emplace_back(s->expand_filter_name(filter_obj.getName()));
     } else if (filter_obj.isArray()) {
         // Potentially multiple filters
         int n = filter_obj.getArrayNItems();
         for (int i = 0; i < n; ++i) {
             QPDFObjectHandle item = filter_obj.getArrayItem(i);
             if (item.isName()) {
-                filter_names.push_back(item.getName());
+                filter_names.emplace_back(s->expand_filter_name(filter_obj.getName()));
             } else {
                 filters_okay = false;
             }
@@ -350,8 +350,6 @@ Stream::filterable(
     bool filterable = true;
 
     for (auto& filter_name: filter_names) {
-        filter_name = s->expand_filter_name(filter_name);
-
         auto ff = filter_factories.find(filter_name);
         if (ff == filter_factories.end()) {
             filterable = false;
