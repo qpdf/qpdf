@@ -407,22 +407,16 @@ Stream::filterable(
             }
         }
     } else {
-        std::vector<QPDFObjectHandle> decode_parms;
-        for (auto& item: decode_array) {
-            decode_parms.emplace_back(item);
-        }
         // Ignore /DecodeParms entirely if /Filters is empty.  At least one case of a file whose
         // /DecodeParms was [ << >> ] when /Filters was empty has been seen in the wild.
-        if (!filters.empty() && decode_parms.size() != filters.size()) {
+        if (!filters.empty() && QIntC::to_size(decode_array.size()) != filters.size()) {
             warn("stream /DecodeParms length is inconsistent with filters");
             return false;
         }
 
-        for (size_t i = 0; i < filters.size(); ++i) {
-            auto filter = filters.at(i);
-            auto decode_item = decode_parms.at(i);
-
-            if (!filter->setDecodeParms(decode_item)) {
+        int i = -1;
+        for (auto& filter: filters) {
+            if (!filter->setDecodeParms(decode_array.at(++i).second)) {
                 return false;
             }
             if (filter->isLossyCompression()) {
