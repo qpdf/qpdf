@@ -13,6 +13,14 @@ more detail.
 
 .. x.y.z: not yet released
 
+12.2.1: not yet released
+  - Other enhancements
+
+    - ``QPDFWriter`` will no longer add filters when writing empty streams.
+
+    - More sanity checks have been added when files with damaged xref tables
+      are recovered.
+
 12.2.0: May 4, 2025
   - Upcoming C++ Version Change
 
