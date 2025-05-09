@@ -352,15 +352,17 @@ Stream::filterable(
 
     auto filter_obj = s->stream_dict.getKey("/Filter");
 
-    std::vector<std::string> filter_names;
-
     if (filter_obj.isNull()) {
         // No filters
         return true;
     }
     if (filter_obj.isName()) {
         // One filter
-        filter_names.emplace_back(filter_obj.getName());
+        auto ff = s->filter_factory(filter_obj.getName());
+        if (!ff) {
+            return false;
+        }
+        filters.emplace_back(ff());
     } else if (filter_obj.isArray()) {
         // Potentially multiple filters
         int n = filter_obj.getArrayNItems();
@@ -370,18 +372,15 @@ Stream::filterable(
                 warn("stream filter type is not name or array");
                 return false;
             }
-            filter_names.emplace_back(item.getName());
+            auto ff = s->filter_factory(item.getName());
+            if (!ff) {
+                filters.clear();
+                return false;
+            }
+            filters.emplace_back(ff());
         }
     } else {
         warn("stream filter type is not name or array");
-        return false;
-    }
-
-    for (auto& filter_name: filter_names) {
-        if (auto ff = s->filter_factory(filter_name)) {
-            filters.emplace_back(ff());
-            continue;
-        }
         return false;
     }
 
@@ -401,7 +400,7 @@ Stream::filterable(
             decode_parms.push_back(decode_obj.getArrayItem(i));
         }
     } else {
-        for (unsigned int i = 0; i < filter_names.size(); ++i) {
+        for (unsigned int i = 0; i < filters.size(); ++i) {
             decode_parms.push_back(decode_obj);
         }
     }
