@@ -363,11 +363,9 @@ Stream::filterable(
             return false;
         }
         filters.emplace_back(ff());
-    } else if (filter_obj.isArray()) {
+    } else if (auto array = filter_obj.as_array(strict)) {
         // Potentially multiple filters
-        int n = filter_obj.getArrayNItems();
-        for (int i = 0; i < n; ++i) {
-            QPDFObjectHandle item = filter_obj.getArrayItem(i);
+        for (auto const& item: array) {
             if (!item.isName()) {
                 warn("stream filter type is not name or array");
                 return false;
