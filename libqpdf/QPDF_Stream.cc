@@ -78,6 +78,9 @@ namespace
         Stream stream;
         qpdf_stream_decode_level_e decode_level;
     };
+
+    /// User defined streamfilter factories
+    std::map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>> filter_factories;
 } // namespace
 
 std::string
@@ -110,16 +113,47 @@ QPDF_Stream::Members::expand_filter_name(std::string const& name) const
     return name;
 };
 
-std::map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>> Stream::filter_factories =
-    {
-        {"/Crypt", []() { return std::make_shared<SF_Crypt>(); }},
-        {"/FlateDecode", SF_FlateLzwDecode::flate_factory},
-        {"/LZWDecode", SF_FlateLzwDecode::lzw_factory},
-        {"/RunLengthDecode", SF_RunLengthDecode::factory},
-        {"/DCTDecode", SF_DCTDecode::factory},
-        {"/ASCII85Decode", SF_ASCII85Decode::factory},
-        {"/ASCIIHexDecode", SF_ASCIIHexDecode::factory},
-};
+std::function<std::shared_ptr<QPDFStreamFilter>()>
+QPDF_Stream::Members::filter_factory(std::string const& name) const
+{
+    auto e_name = expand_filter_name(name);
+    if (e_name == "/Crypt") {
+        return []() { return std::make_shared<SF_Crypt>(); };
+    }
+    if (e_name == "/FlateDecode") {
+        return SF_FlateLzwDecode::flate_factory;
+    }
+    if (e_name == "/LZWDecode") {
+        return SF_FlateLzwDecode::lzw_factory;
+    }
+    if (e_name == "/RunLengthDecode") {
+        return SF_RunLengthDecode::factory;
+    }
+    if (e_name == "/DCTDecode") {
+        return SF_DCTDecode::factory;
+    }
+    if (e_name == "/ASCII85Decode") {
+        return SF_ASCII85Decode::factory;
+    }
+    if (e_name == "/RunLengthDecode") {
+        return SF_RunLengthDecode::factory;
+    }
+    if (e_name == "/DCTDecode") {
+        return SF_DCTDecode::factory;
+    }
+    if (e_name == "/ASCII85Decode") {
+        return SF_ASCII85Decode::factory;
+    }
+    if (e_name == "/ASCIIHexDecode") {
+        return SF_ASCIIHexDecode::factory;
+    }
+
+    auto ff = filter_factories.find(e_name);
+    if (ff == filter_factories.end()) {
+        return nullptr;
+    }
+    return ff->second;
+}
 
 Stream::Stream(
     QPDF& qpdf, QPDFObjGen og, QPDFObjectHandle stream_dict, qpdf_offset_t offset, size_t length) :
@@ -316,51 +350,42 @@ Stream::filterable(
     auto s = stream();
     // Check filters
 
-    QPDFObjectHandle filter_obj = s->stream_dict.getKey("/Filter");
-    bool filters_okay = true;
+    auto filter_obj = s->stream_dict.getKey("/Filter");
 
     std::vector<std::string> filter_names;
 
     if (filter_obj.isNull()) {
         // No filters
-    } else if (filter_obj.isName()) {
+        return true;
+    }
+    if (filter_obj.isName()) {
         // One filter
-        filter_names.emplace_back(s->expand_filter_name(filter_obj.getName()));
+        filter_names.emplace_back(filter_obj.getName());
     } else if (filter_obj.isArray()) {
         // Potentially multiple filters
         int n = filter_obj.getArrayNItems();
         for (int i = 0; i < n; ++i) {
             QPDFObjectHandle item = filter_obj.getArrayItem(i);
-            if (item.isName()) {
-                filter_names.emplace_back(s->expand_filter_name(filter_obj.getName()));
-            } else {
-                filters_okay = false;
+            if (!item.isName()) {
+                warn("stream filter type is not name or array");
+                return false;
             }
+            filter_names.emplace_back(item.getName());
         }
     } else {
-        filters_okay = false;
-    }
-
-    if (!filters_okay) {
-        QTC::TC("qpdf", "QPDF_Stream invalid filter");
         warn("stream filter type is not name or array");
         return false;
     }
 
-    bool filterable = true;
-
     for (auto& filter_name: filter_names) {
-        auto ff = filter_factories.find(filter_name);
-        if (ff == filter_factories.end()) {
-            filterable = false;
-        } else {
-            filters.push_back((ff->second)());
+        if (auto ff = s->filter_factory(filter_name)) {
+            filters.emplace_back(ff());
+            continue;
         }
-    }
-
-    if (!filterable) {
         return false;
     }
+
+    bool filterable = true;
 
     // filters now contains a list of filters to be applied in order. See which ones we can support.
 

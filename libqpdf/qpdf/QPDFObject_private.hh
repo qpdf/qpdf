@@ -227,6 +227,8 @@ class QPDF_Stream final
         std::shared_ptr<QPDFObjectHandle::StreamDataProvider> stream_provider;
         std::vector<std::shared_ptr<QPDFObjectHandle::TokenFilter>> token_filters;
         std::string expand_filter_name(std::string const& name) const;
+        std::function<std::shared_ptr<QPDFStreamFilter>()>
+        filter_factory(std::string const& name) const;
     };
 
     friend class QPDFObject;
