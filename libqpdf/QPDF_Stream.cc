@@ -383,21 +383,21 @@ Stream::filterable(
     }
 
     // filters now contains a list of filters to be applied in order. See which ones we can support.
-
     // See if we can support any decode parameters that are specified.
 
-    QPDFObjectHandle decode_obj = s->stream_dict.getKey("/DecodeParms");
+    auto decode_obj = s->stream_dict.getKey("/DecodeParms");
     std::vector<QPDFObjectHandle> decode_parms;
-    if (decode_obj.isArray() && (decode_obj.getArrayNItems() == 0)) {
-        decode_obj = QPDFObjectHandle::newNull();
-    }
-    if (decode_obj.isArray()) {
-        for (int i = 0; i < decode_obj.getArrayNItems(); ++i) {
-            decode_parms.push_back(decode_obj.getArrayItem(i));
+
+    auto decode_array = decode_obj.as_array(strict);
+    if (!decode_array || decode_array.size() == 0) {
+        if (decode_array) {
+            decode_parms.assign(filters.size(), QPDFObjectHandle::newNull());
+        } else {
+            decode_parms.assign(filters.size(), decode_obj);
         }
     } else {
-        for (unsigned int i = 0; i < filters.size(); ++i) {
-            decode_parms.push_back(decode_obj);
+        for (auto& item: decode_array) {
+            decode_parms.emplace_back(item);
         }
     }
 
