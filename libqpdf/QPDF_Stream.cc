@@ -386,16 +386,28 @@ Stream::filterable(
     // See if we can support any decode parameters that are specified.
 
     auto decode_obj = s->stream_dict.getKey("/DecodeParms");
-    std::vector<QPDFObjectHandle> decode_parms;
 
     auto decode_array = decode_obj.as_array(strict);
     if (!decode_array || decode_array.size() == 0) {
         if (decode_array) {
-            decode_parms.assign(filters.size(), QPDFObjectHandle::newNull());
-        } else {
-            decode_parms.assign(filters.size(), decode_obj);
+            decode_obj = QPDFObjectHandle::newNull();
+        }
+
+        for (auto& filter: filters) {
+            if (!filter->setDecodeParms(decode_obj)) {
+                return false;
+            }
+            if (filter->isLossyCompression()) {
+                specialized_compression = true;
+                lossy_compression = true;
+                continue;
+            }
+            if (filter->isSpecializedCompression()) {
+                specialized_compression = true;
+            }
         }
     } else {
+        std::vector<QPDFObjectHandle> decode_parms;
         for (auto& item: decode_array) {
             decode_parms.emplace_back(item);
         }
@@ -405,22 +417,22 @@ Stream::filterable(
             warn("stream /DecodeParms length is inconsistent with filters");
             return false;
         }
-    }
 
-    for (size_t i = 0; i < filters.size(); ++i) {
-        auto filter = filters.at(i);
-        auto decode_item = decode_parms.at(i);
+        for (size_t i = 0; i < filters.size(); ++i) {
+            auto filter = filters.at(i);
+            auto decode_item = decode_parms.at(i);
 
-        if (!filter->setDecodeParms(decode_item)) {
-            return false;
-        }
-        if (filter->isLossyCompression()) {
-            specialized_compression = true;
-            lossy_compression = true;
-            continue;
-        }
-        if (filter->isSpecializedCompression()) {
-            specialized_compression = true;
+            if (!filter->setDecodeParms(decode_item)) {
+                return false;
+            }
+            if (filter->isLossyCompression()) {
+                specialized_compression = true;
+                lossy_compression = true;
+                continue;
+            }
+            if (filter->isSpecializedCompression()) {
+                specialized_compression = true;
+            }
         }
     }
 
