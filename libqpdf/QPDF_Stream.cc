@@ -399,13 +399,12 @@ Stream::filterable(
         for (auto& item: decode_array) {
             decode_parms.emplace_back(item);
         }
-    }
-
-    // Ignore /DecodeParms entirely if /Filters is empty.  At least one case of a file whose
-    // /DecodeParms was [ << >> ] when /Filters was empty has been seen in the wild.
-    if ((filters.size() != 0) && (decode_parms.size() != filters.size())) {
-        warn("stream /DecodeParms length is inconsistent with filters");
-        return false;
+        // Ignore /DecodeParms entirely if /Filters is empty.  At least one case of a file whose
+        // /DecodeParms was [ << >> ] when /Filters was empty has been seen in the wild.
+        if (!filters.empty() && decode_parms.size() != filters.size()) {
+            warn("stream /DecodeParms length is inconsistent with filters");
+            return false;
+        }
     }
 
     for (size_t i = 0; i < filters.size(); ++i) {
