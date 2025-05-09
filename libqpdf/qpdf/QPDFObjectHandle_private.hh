@@ -321,8 +321,6 @@ namespace qpdf
         void warn(std::string const& message);
 
         static std::map<std::string, std::string> filter_abbreviations;
-        static std::map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>>
-            filter_factories;
     };
 
     template <typename T>
