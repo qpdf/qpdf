@@ -451,10 +451,18 @@ Stream::pipeStreamData(
         filterp = &ignored;
     }
     bool& filter = *filterp;
-    filter = !(!encode_flags && decode_level == qpdf_dl_none);
-    if (filter) {
+
+    const bool empty_stream = !s->stream_provider && !s->stream_data && s->length == 0;
+    const bool empty_stream_data = s->stream_data && s->stream_data->getSize() == 0;
+    const bool empty = empty_stream || empty_stream_data;
+
+    if(empty_stream || empty_stream_data) {
+        filter = true;
+    }
+    filter = empty || !(!encode_flags && decode_level == qpdf_dl_none);
+    if (filter && !empty) {
         filter = filterable(filters, specialized_compression, lossy_compression);
-        if ((decode_level < qpdf_dl_all) && lossy_compression) {
+        if (decode_level < qpdf_dl_all && lossy_compression) {
             filter = false;
         }
         if (decode_level < qpdf_dl_specialized && specialized_compression) {
