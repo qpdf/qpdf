@@ -382,8 +382,6 @@ Stream::filterable(
         return false;
     }
 
-    bool filterable = true;
-
     // filters now contains a list of filters to be applied in order. See which ones we can support.
 
     // See if we can support any decode parameters that are specified.
@@ -407,10 +405,6 @@ Stream::filterable(
     // /DecodeParms was [ << >> ] when /Filters was empty has been seen in the wild.
     if ((filters.size() != 0) && (decode_parms.size() != filters.size())) {
         warn("stream /DecodeParms length is inconsistent with filters");
-        filterable = false;
-    }
-
-    if (!filterable) {
         return false;
     }
 
@@ -418,20 +412,20 @@ Stream::filterable(
         auto filter = filters.at(i);
         auto decode_item = decode_parms.at(i);
 
-        if (filter->setDecodeParms(decode_item)) {
-            if (filter->isSpecializedCompression()) {
-                specialized_compression = true;
-            }
-            if (filter->isLossyCompression()) {
-                specialized_compression = true;
-                lossy_compression = true;
-            }
-        } else {
-            filterable = false;
+        if (!filter->setDecodeParms(decode_item)) {
+            return false;
+        }
+        if (filter->isLossyCompression()) {
+            specialized_compression = true;
+            lossy_compression = true;
+            continue;
+        }
+        if (filter->isSpecializedCompression()) {
+            specialized_compression = true;
         }
     }
 
-    return filterable;
+    return true;
 }
 
 bool
