@@ -278,7 +278,6 @@ QPDF ignore second extra space in xref entry 0
 QPDF ignore length error xref entry 0
 QPDF_encryption pad short parameter 0
 QPDFObjectHandle found old angle 1
-QPDF_Stream special filters 3
 QPDFTokenizer block long token 0
 qpdf-c called qpdf_set_decode_level 0
 qpdf-c called qpdf_set_compress_streams 0

@@ -343,9 +343,8 @@ Stream::isRootMetadata() const
 
 bool
 Stream::filterable(
-    std::vector<std::shared_ptr<QPDFStreamFilter>>& filters,
-    bool& specialized_compression,
-    bool& lossy_compression)
+    qpdf_stream_decode_level_e decode_level,
+    std::vector<std::shared_ptr<QPDFStreamFilter>>& filters)
 {
     auto s = stream();
     // Check filters
@@ -387,6 +386,16 @@ Stream::filterable(
 
     auto decode_obj = s->stream_dict.getKey("/DecodeParms");
 
+    auto can_filter = // linebreak
+        [](auto d_level, auto& filter, auto& d_obj) -> bool {
+        if (!filter.setDecodeParms(d_obj) ||
+            (d_level < qpdf_dl_all && filter.isLossyCompression()) ||
+            (d_level < qpdf_dl_specialized && filter.isSpecializedCompression())) {
+            return false;
+        }
+        return true;
+    };
+
     auto decode_array = decode_obj.as_array(strict);
     if (!decode_array || decode_array.size() == 0) {
         if (decode_array) {
@@ -394,16 +403,8 @@ Stream::filterable(
         }
 
         for (auto& filter: filters) {
-            if (!filter->setDecodeParms(decode_obj)) {
+            if (!can_filter(decode_level, *filter, decode_obj)) {
                 return false;
-            }
-            if (filter->isLossyCompression()) {
-                specialized_compression = true;
-                lossy_compression = true;
-                continue;
-            }
-            if (filter->isSpecializedCompression()) {
-                specialized_compression = true;
             }
         }
     } else {
@@ -416,16 +417,9 @@ Stream::filterable(
 
         int i = -1;
         for (auto& filter: filters) {
-            if (!filter->setDecodeParms(decode_array.at(++i).second)) {
+            auto d_obj = decode_array.at(++i).second;
+            if (!can_filter(decode_level, *filter, d_obj)) {
                 return false;
-            }
-            if (filter->isLossyCompression()) {
-                specialized_compression = true;
-                lossy_compression = true;
-                continue;
-            }
-            if (filter->isSpecializedCompression()) {
-                specialized_compression = true;
             }
         }
     }
@@ -444,8 +438,6 @@ Stream::pipeStreamData(
 {
     auto s = stream();
     std::vector<std::shared_ptr<QPDFStreamFilter>> filters;
-    bool specialized_compression = false;
-    bool lossy_compression = false;
     bool ignored;
     if (!filterp) {
         filterp = &ignored;
@@ -453,20 +445,7 @@ Stream::pipeStreamData(
     bool& filter = *filterp;
     filter = encode_flags || decode_level != qpdf_dl_none;
     if (filter) {
-        filter = filterable(filters, specialized_compression, lossy_compression);
-        if ((decode_level < qpdf_dl_all) && lossy_compression) {
-            filter = false;
-        }
-        if (decode_level < qpdf_dl_specialized && specialized_compression) {
-            filter = false;
-        }
-        QTC::TC(
-            "qpdf",
-            "QPDF_Stream special filters",
-            (!filter)                     ? 0
-                : lossy_compression       ? 1
-                : specialized_compression ? 2
-                                          : 3);
+        filter = filterable(decode_level, filters);
     }
 
     if (!pipeline) {
