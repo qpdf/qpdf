@@ -80,17 +80,34 @@ namespace
     };
 } // namespace
 
-std::map<std::string, std::string> Stream::filter_abbreviations = {
+std::string
+QPDF_Stream::Members::expand_filter_name(std::string const& name) const
+{
     // The PDF specification provides these filter abbreviations for use in inline images, but
     // according to table H.1 in the pre-ISO versions of the PDF specification, Adobe Reader also
     // accepts them for stream filters.
-    {"/AHx", "/ASCIIHexDecode"},
-    {"/A85", "/ASCII85Decode"},
-    {"/LZW", "/LZWDecode"},
-    {"/Fl", "/FlateDecode"},
-    {"/RL", "/RunLengthDecode"},
-    {"/CCF", "/CCITTFaxDecode"},
-    {"/DCT", "/DCTDecode"},
+    if (name == "/AHx") {
+        return "/ASCIIHexDecode";
+    }
+    if (name == "/A85") {
+        return "/ASCII85Decode";
+    }
+    if (name == "/LZW") {
+        return "/LZWDecode";
+    }
+    if (name == "/Fl") {
+        return "/FlateDecode";
+    }
+    if (name == "/RL") {
+        return "/RunLengthDecode";
+    }
+    if (name == "/CCF") {
+        return "/CCITTFaxDecode";
+    }
+    if (name == "/DCT") {
+        return "/DCTDecode";
+    }
+    return name;
 };
 
 std::map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>> Stream::filter_factories =
@@ -333,10 +350,7 @@ Stream::filterable(
     bool filterable = true;
 
     for (auto& filter_name: filter_names) {
-        if (filter_abbreviations.count(filter_name)) {
-            QTC::TC("qpdf", "QPDF_Stream expand filter abbreviation");
-            filter_name = filter_abbreviations[filter_name];
-        }
+        filter_name = s->expand_filter_name(filter_name);
 
         auto ff = filter_factories.find(filter_name);
         if (ff == filter_factories.end()) {

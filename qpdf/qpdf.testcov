@@ -177,7 +177,6 @@ QPDFObjectHandle prepend page contents 0
 QPDFObjectHandle append page contents 0
 QPDF_Stream getRawStreamData 0
 QPDF_Stream getStreamData 0
-QPDF_Stream expand filter abbreviation 0
 qpdf-c called qpdf_read_memory 0
 QPDF stream without newline 0
 QPDF stream with CR only 0
