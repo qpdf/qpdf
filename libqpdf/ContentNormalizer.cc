@@ -71,15 +71,3 @@ ContentNormalizer::handleToken(QPDFTokenizer::Token const& token)
         write("\n");
     }
 }
-
-bool
-ContentNormalizer::anyBadTokens() const
-{
-    return this->any_bad_tokens;
-}
-
-bool
-ContentNormalizer::lastTokenWasBad() const
-{
-    return this->last_token_was_bad;
-}
