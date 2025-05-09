@@ -447,18 +447,17 @@ Stream::pipeStreamData(
     bool specialized_compression = false;
     bool lossy_compression = false;
     bool ignored;
-    if (filterp == nullptr) {
+    if (!filterp) {
         filterp = &ignored;
     }
     bool& filter = *filterp;
-    filter = (!((encode_flags == 0) && (decode_level == qpdf_dl_none)));
-    bool success = true;
+    filter = encode_flags || decode_level != qpdf_dl_none;
     if (filter) {
         filter = filterable(filters, specialized_compression, lossy_compression);
         if ((decode_level < qpdf_dl_all) && lossy_compression) {
             filter = false;
         }
-        if ((decode_level < qpdf_dl_specialized) && specialized_compression) {
+        if (decode_level < qpdf_dl_specialized && specialized_compression) {
             filter = false;
         }
         QTC::TC(
@@ -470,7 +469,7 @@ Stream::pipeStreamData(
                                           : 3);
     }
 
-    if (pipeline == nullptr) {
+    if (!pipeline) {
         QTC::TC("qpdf", "QPDF_Stream pipeStreamData with null pipeline");
         // Return value is whether we can filter in this case.
         return filter;
@@ -479,40 +478,37 @@ Stream::pipeStreamData(
     // Construct the pipeline in reverse order. Force pipelines we create to be deleted when this
     // function finishes. Pipelines created by QPDFStreamFilter objects will be deleted by those
     // objects.
-    std::vector<std::shared_ptr<Pipeline>> to_delete;
+    std::vector<std::unique_ptr<Pipeline>> to_delete;
 
-    std::shared_ptr<ContentNormalizer> normalizer;
-    std::shared_ptr<Pipeline> new_pipeline;
+    ContentNormalizer normalizer;
     if (filter) {
         if (encode_flags & qpdf_ef_compress) {
-            new_pipeline =
-                std::make_shared<Pl_Flate>("compress stream", pipeline, Pl_Flate::a_deflate);
-            to_delete.push_back(new_pipeline);
+            auto new_pipeline =
+                std::make_unique<Pl_Flate>("compress stream", pipeline, Pl_Flate::a_deflate);
             pipeline = new_pipeline.get();
+            to_delete.push_back(std::move(new_pipeline));
         }
 
         if (encode_flags & qpdf_ef_normalize) {
-            normalizer = std::make_shared<ContentNormalizer>();
-            new_pipeline =
-                std::make_shared<Pl_QPDFTokenizer>("normalizer", normalizer.get(), pipeline);
-            to_delete.push_back(new_pipeline);
+            auto new_pipeline =
+                std::make_unique<Pl_QPDFTokenizer>("normalizer", &normalizer, pipeline);
             pipeline = new_pipeline.get();
+            to_delete.push_back(std::move(new_pipeline));
         }
 
         for (auto iter = s->token_filters.rbegin(); iter != s->token_filters.rend(); ++iter) {
-            new_pipeline =
-                std::make_shared<Pl_QPDFTokenizer>("token filter", (*iter).get(), pipeline);
-            to_delete.push_back(new_pipeline);
+            auto new_pipeline =
+                std::make_unique<Pl_QPDFTokenizer>("token filter", (*iter).get(), pipeline);
             pipeline = new_pipeline.get();
+            to_delete.push_back(std::move(new_pipeline));
         }
 
         for (auto f_iter = filters.rbegin(); f_iter != filters.rend(); ++f_iter) {
-            auto decode_pipeline = (*f_iter)->getDecodePipeline(pipeline);
-            if (decode_pipeline) {
+            if (auto decode_pipeline = (*f_iter)->getDecodePipeline(pipeline)) {
                 pipeline = decode_pipeline;
             }
             auto* flate = dynamic_cast<Pl_Flate*>(pipeline);
-            if (flate != nullptr) {
+            if (flate) {
                 flate->setWarnCallback([this](char const* msg, int code) { warn(msg); });
             }
         }
@@ -523,6 +519,7 @@ Stream::pipeStreamData(
         pipeline->write(s->stream_data->getBuffer(), s->stream_data->getSize());
         pipeline->finish();
     } else if (s->stream_provider.get()) {
+        bool success = true;
         Pl_Count count("stream provider count", pipeline);
         if (s->stream_provider->supportsRetry()) {
             if (!s->stream_provider->provideStreamData(
@@ -552,6 +549,9 @@ Stream::pipeStreamData(
             QTC::TC("qpdf", "QPDF_Stream provider length not provided");
             s->stream_dict.replaceKey("/Length", QPDFObjectHandle::newInteger(actual_length));
         }
+        if (!success) {
+            return false;
+        }
     } else if (obj->getParsedOffset() == 0) {
         QTC::TC("qpdf", "QPDF_Stream pipe no stream data");
         throw std::logic_error("pipeStreamData called for stream with no data");
@@ -568,13 +568,13 @@ Stream::pipeStreamData(
                 suppress_warnings,
                 will_retry)) {
             filter = false;
-            success = false;
+            return false;
         }
     }
 
-    if (filter && (!suppress_warnings) && normalizer.get() && normalizer->anyBadTokens()) {
+    if (filter && !suppress_warnings && normalizer.anyBadTokens()) {
         warn("content normalization encountered bad tokens");
-        if (normalizer->lastTokenWasBad()) {
+        if (normalizer.lastTokenWasBad()) {
             QTC::TC("qpdf", "QPDF_Stream bad token at end during normalize");
             warn(
                 "normalized content ended with a bad token; you may be able to resolve this by "
@@ -587,7 +587,7 @@ Stream::pipeStreamData(
             "in the manual.");
     }
 
-    return success;
+    return true;
 }
 
 void
