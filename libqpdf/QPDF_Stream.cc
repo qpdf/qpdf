@@ -83,72 +83,57 @@ namespace
     std::map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>> filter_factories;
 } // namespace
 
-std::string
-QPDF_Stream::Members::expand_filter_name(std::string const& name) const
-{
-    // The PDF specification provides these filter abbreviations for use in inline images, but
-    // according to table H.1 in the pre-ISO versions of the PDF specification, Adobe Reader also
-    // accepts them for stream filters.
-    if (name == "/AHx") {
-        return "/ASCIIHexDecode";
-    }
-    if (name == "/A85") {
-        return "/ASCII85Decode";
-    }
-    if (name == "/LZW") {
-        return "/LZWDecode";
-    }
-    if (name == "/Fl") {
-        return "/FlateDecode";
-    }
-    if (name == "/RL") {
-        return "/RunLengthDecode";
-    }
-    if (name == "/CCF") {
-        return "/CCITTFaxDecode";
-    }
-    if (name == "/DCT") {
-        return "/DCTDecode";
-    }
-    return name;
-};
-
 std::function<std::shared_ptr<QPDFStreamFilter>()>
 QPDF_Stream::Members::filter_factory(std::string const& name) const
 {
-    auto e_name = expand_filter_name(name);
-    if (e_name == "/Crypt") {
-        return []() { return std::make_shared<SF_Crypt>(); };
-    }
-    if (e_name == "/FlateDecode") {
+    if (name == "/FlateDecode") {
         return SF_FlateLzwDecode::flate_factory;
     }
-    if (e_name == "/LZWDecode") {
+    if (name == "/Crypt") {
+        return []() { return std::make_shared<SF_Crypt>(); };
+    }
+    if (name == "/LZWDecode") {
         return SF_FlateLzwDecode::lzw_factory;
     }
-    if (e_name == "/RunLengthDecode") {
+    if (name == "/RunLengthDecode") {
         return SF_RunLengthDecode::factory;
     }
-    if (e_name == "/DCTDecode") {
+    if (name == "/DCTDecode") {
         return SF_DCTDecode::factory;
     }
-    if (e_name == "/ASCII85Decode") {
+    if (name == "/ASCII85Decode") {
         return SF_ASCII85Decode::factory;
     }
-    if (e_name == "/RunLengthDecode") {
-        return SF_RunLengthDecode::factory;
-    }
-    if (e_name == "/DCTDecode") {
-        return SF_DCTDecode::factory;
-    }
-    if (e_name == "/ASCII85Decode") {
-        return SF_ASCII85Decode::factory;
-    }
-    if (e_name == "/ASCIIHexDecode") {
+    if (name == "/ASCIIHexDecode") {
         return SF_ASCIIHexDecode::factory;
     }
+    // The PDF specification provides these filter abbreviations for use in inline images, but
+    // according to table H.1 in the pre-ISO versions of the PDF specification, Adobe Reader also
+    // accepts them for stream filters.
 
-    auto ff = filter_factories.find(e_name);
+    if (name == "/Fl") {
+        return SF_FlateLzwDecode::flate_factory;
+    }
+    if (name == "/AHx") {
+        return SF_ASCIIHexDecode::factory;
+    }
+    if (name == "/A85") {
+        return SF_ASCII85Decode::factory;
+    }
+    if (name == "/LZW") {
+        return SF_FlateLzwDecode::lzw_factory;
+    }
+    if (name == "/RL") {
+        return SF_RunLengthDecode::factory;
+    }
+    if (name == "/DCT") {
+        return SF_DCTDecode::factory;
+    }
+    if (filter_factories.empty()) {
+        return nullptr;
+    }
+    auto ff =
+        name == "/CCF" ? filter_factories.find("/CCITTFaxDecode") : filter_factories.find(name);
     if (ff == filter_factories.end()) {
         return nullptr;
     }
