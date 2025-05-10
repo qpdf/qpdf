@@ -27,33 +27,37 @@ using namespace qpdf;
 
 namespace
 {
-    class SF_Crypt: public QPDFStreamFilter
+    class SF_Crypt final: public QPDFStreamFilter
     {
       public:
         SF_Crypt() = default;
-        ~SF_Crypt() override = default;
+        ~SF_Crypt() final = default;
 
         bool
-        setDecodeParms(QPDFObjectHandle decode_parms) override
+        setDecodeParms(QPDFObjectHandle decode_parms) final
         {
-            if (decode_parms.isNull()) {
+            // we only validate here - processing happens in decryptStream
+            if (auto dict = decode_parms.as_dictionary(optional)) {
+                for (auto const& [key, value]: dict) {
+                    if (key == "/Type" &&
+                        (value.null() ||
+                         (value.isName() && value.getName() == "/CryptFilterDecodeParms"))) {
+                        continue;
+                    }
+                    if (key == "/Name") {
+                        continue;
+                    }
+                    if (!value.null()) {
+                        return false;
+                    }
+                }
                 return true;
             }
-            bool filterable = true;
-            for (auto const& key: decode_parms.getKeys()) {
-                if (((key == "/Type") || (key == "/Name")) &&
-                    ((!decode_parms.hasKey("/Type")) ||
-                     decode_parms.isDictionaryOfType("/CryptFilterDecodeParms"))) {
-                    // we handle this in decryptStream
-                } else {
-                    filterable = false;
-                }
-            }
-            return filterable;
+            return false;
         }
 
         Pipeline*
-        getDecodePipeline(Pipeline*) override
+        getDecodePipeline(Pipeline*) final
         {
             // Not used -- handled by pipeStreamData
             return nullptr;
