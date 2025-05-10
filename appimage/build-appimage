@@ -47,14 +47,14 @@ fi
 _osversion=$(cat /etc/os-release | grep PRETTY_NAME | awk -F'=' '{print $2}' | sed 's#"##g')
 
 # Warn users building the AppImage locally:
-if [[ ! $_osversion =~ Ubuntu\ 18.04.*\ LTS ]]; then
+if [[ ! $_osversion =~ Ubuntu\ 22.04.*\ LTS ]]; then
 set +x
     echo ""
     #    0         1         2         3         4         5         6         7
     #    01234567890123456789012345678901234567890123456789012345678901234567890123456789
     echo "+===========================================================================+"
     echo "|| WARNING: You are about to build a QPDF AppImage on a system which is    ||"
-    echo "|| NOT Ubuntu 18.04 LTS.                                                   ||"
+    echo "|| NOT Ubuntu 22.04 LTS.                                                   ||"
     echo "||                                                                         ||"
     echo "||    It is recommended that you use a distribution that is at least a     ||"
     echo "||    few years old to maximize the number of Linux distributions the      ||"
@@ -66,7 +66,6 @@ set +x
     echo ""
 set -x
 fi
-
 
 # From where do we run this script?
 here="$(dirname $(readlink -f "$0"))"
@@ -116,9 +115,7 @@ cd $here/build
 for width in 64 128 256 512; do
     dir=appdir/usr/share/icons/hicolor/${width}x${width}/apps
     mkdir -p $dir
-    inkscape -z -e qpdf-tmp.png -w $width -b white $top/logo/qpdf.svg
-    convert qpdf-tmp.png -gravity center -background white -extent ${width}x${width} $dir/qpdf.png
-    rm qpdf-tmp.png
+    convert $top/logo/qpdf.svg -gravity center -background white -extent ${width}x${width} $dir/qpdf.png
 done
 
 # Copy .desktop and .appdata.xml metadata for desktop integration into place:
@@ -173,21 +170,7 @@ export LD_LIBRARY_PATH=$(dirname $(find $appdir -type l -name 'libqpdf.so.*'))
 # Replace symlink with custom script
 rm appdir/AppRun; cp $top/appimage/AppRun appdir; chmod a+x appdir/AppRun
 
-# If we are not on Ubuntu Trusty, we need to disable 'appstreamcli' validation:
-if [[ $_osversion =~ Ubuntu\ 14.04.*\ LTS ]]; then
-    appimagetool_param=""
-else
-    appimagetool_param="-n"
-    set +x
-    echo ""
-    echo " Running 'appimagetool' with '-n' parameter..."
-    echo " Reason: this does not seem to be a build running on"
-    echo " Ubuntu Trusty 14.04."
-    echo " '-n' disables checking of AppStream data by the 'appstreamcli'"
-    echo " utility since post-Trusty versions have incompatible changes."
-    echo ""
-    set -x
-fi
+appimagetool_param="-n"
 
 # Set up a version string to include in the AppImage name
 MAJOR_QPDF_VERSION=$( ./appdir/usr/bin/qpdf --version | grep "qpdf version" | awk '{print $3}' )
