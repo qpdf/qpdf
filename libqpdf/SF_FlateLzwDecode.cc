@@ -69,48 +69,37 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
 Pipeline*
 SF_FlateLzwDecode::getDecodePipeline(Pipeline* next)
 {
-    std::shared_ptr<Pipeline> pipeline;
+    std::unique_ptr<Pipeline> pipeline;
     if (predictor >= 10 && predictor <= 15) {
         QTC::TC("qpdf", "SF_FlateLzwDecode PNG filter");
-        pipeline = std::make_shared<Pl_PNGFilter>(
+        pipeline = std::make_unique<Pl_PNGFilter>(
             "png decode",
             next,
             Pl_PNGFilter::a_decode,
             QIntC::to_uint(columns),
             QIntC::to_uint(colors),
             QIntC::to_uint(bits_per_component));
-        pipelines.push_back(pipeline);
         next = pipeline.get();
+        pipelines.push_back(std::move(pipeline));
     } else if (predictor == 2) {
         QTC::TC("qpdf", "SF_FlateLzwDecode TIFF predictor");
-        pipeline = std::make_shared<Pl_TIFFPredictor>(
+        pipeline = std::make_unique<Pl_TIFFPredictor>(
             "tiff decode",
             next,
             Pl_TIFFPredictor::a_decode,
             QIntC::to_uint(columns),
             QIntC::to_uint(colors),
             QIntC::to_uint(bits_per_component));
-        pipelines.push_back(pipeline);
         next = pipeline.get();
+        pipelines.push_back(std::move(pipeline));
     }
 
     if (lzw) {
-        pipeline = std::make_shared<Pl_LZWDecoder>("lzw decode", next, early_code_change);
+        pipeline = std::make_unique<Pl_LZWDecoder>("lzw decode", next, early_code_change);
     } else {
-        pipeline = std::make_shared<Pl_Flate>("stream inflate", next, Pl_Flate::a_inflate);
+        pipeline = std::make_unique<Pl_Flate>("stream inflate", next, Pl_Flate::a_inflate);
     }
-    pipelines.push_back(pipeline);
-    return pipeline.get();
-}
-
-std::shared_ptr<QPDFStreamFilter>
-SF_FlateLzwDecode::flate_factory()
-{
-    return std::make_shared<SF_FlateLzwDecode>(false);
-}
-
-std::shared_ptr<QPDFStreamFilter>
-SF_FlateLzwDecode::lzw_factory()
-{
-    return std::make_shared<SF_FlateLzwDecode>(true);
+    next = pipeline.get();
+    pipelines.push_back(std::move(pipeline));
+    return next;
 }
