@@ -432,7 +432,16 @@ Stream::pipeStreamData(
         filterp = &ignored;
     }
     bool& filter = *filterp;
-    filter = encode_flags || decode_level != qpdf_dl_none;
+
+    const bool empty_stream = !s->stream_provider && !s->stream_data && s->length == 0;
+    const bool empty_stream_data = s->stream_data && s->stream_data->getSize() == 0;
+    const bool empty = empty_stream || empty_stream_data;
+
+    if(empty_stream || empty_stream_data) {
+        filter = true;
+    }
+
+    filter = empty || encode_flags || decode_level != qpdf_dl_none;
     if (filter) {
         filter = filterable(decode_level, filters);
     }

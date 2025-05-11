@@ -1293,6 +1293,12 @@ QPDFWriter::willFilterStream(
         QTC::TC("qpdf", "QPDFWriter compressing uncompressed stream");
     }
 
+    // Disable compression for empty streams to improve compatibility
+    if (stream_dict.getKey("/Length").isInteger() && stream_dict.getKey("/Length").getIntValue() == 0) {
+        filter = true;
+        compress_stream = false;
+    }
+
     bool filtered = false;
     for (bool first_attempt: {true, false}) {
         PipelinePopper pp_stream_data(this);

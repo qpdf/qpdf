@@ -23,6 +23,13 @@ more detail.
       not work on some older Linux distributions. If you need support
       for an older distribution, please use version 12.2.0 or below.
 
+  - Other enhancements
+
+    - ``QPDFWriter`` will no longer add filters when writing empty streams.
+
+    - More sanity checks have been added when files with damaged xref tables
+      are recovered.
+
 12.2.0: May 4, 2025
   - Upcoming C++ Version Change
 
