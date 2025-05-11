@@ -85,11 +85,51 @@ namespace
 
     /// User defined streamfilter factories
     std::map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>> filter_factories;
+    bool filter_factories_registered = false;
 } // namespace
+
+std::string
+QPDF_Stream::Members::expand_filter_name(std::string const& name) const
+{
+    // The PDF specification provides these filter abbreviations for use in inline images, but
+    // according to table H.1 in the pre-ISO versions of the PDF specification, Adobe Reader also
+    // accepts them for stream filters.
+    if (name == "/AHx") {
+        return "/ASCIIHexDecode";
+    }
+    if (name == "/A85") {
+        return "/ASCII85Decode";
+    }
+    if (name == "/LZW") {
+        return "/LZWDecode";
+    }
+    if (name == "/Fl") {
+        return "/FlateDecode";
+    }
+    if (name == "/RL") {
+        return "/RunLengthDecode";
+    }
+    if (name == "/CCF") {
+        return "/CCITTFaxDecode";
+    }
+    if (name == "/DCT") {
+        return "/DCTDecode";
+    }
+    return name;
+};
 
 std::function<std::shared_ptr<QPDFStreamFilter>()>
 QPDF_Stream::Members::filter_factory(std::string const& name) const
 {
+    if (filter_factories_registered) [[unlikely]] {
+        // We need to check user provided filters first as we allow users to replace qpdf provided
+        // default filters. This will have a performance impact if the facility to register stream
+        // filters is actually used. We can optimize this away if necessary.
+        auto ff = filter_factories.find(expand_filter_name(name));
+        if (ff != filter_factories.end()) {
+            return ff->second;
+        }
+    }
     if (name == "/FlateDecode") {
         return SF_FlateLzwDecode::flate_factory;
     }
@@ -112,8 +152,8 @@ QPDF_Stream::Members::filter_factory(std::string const& name) const
         return SF_ASCIIHexDecode::factory;
     }
     // The PDF specification provides these filter abbreviations for use in inline images, but
-    // according to table H.1 in the pre-ISO versions of the PDF specification, Adobe Reader also
-    // accepts them for stream filters.
+    // according to table H.1 in the pre-ISO versions of the PDF specification, Adobe Reader
+    // also accepts them for stream filters.
 
     if (name == "/Fl") {
         return SF_FlateLzwDecode::flate_factory;
@@ -133,15 +173,7 @@ QPDF_Stream::Members::filter_factory(std::string const& name) const
     if (name == "/DCT") {
         return SF_DCTDecode::factory;
     }
-    if (filter_factories.empty()) {
-        return nullptr;
-    }
-    auto ff =
-        name == "/CCF" ? filter_factories.find("/CCITTFaxDecode") : filter_factories.find(name);
-    if (ff == filter_factories.end()) {
-        return nullptr;
-    }
-    return ff->second;
+    return nullptr;
 }
 
 Stream::Stream(
@@ -159,6 +191,7 @@ Stream::registerStreamFilter(
     std::string const& filter_name, std::function<std::shared_ptr<QPDFStreamFilter>()> factory)
 {
     filter_factories[filter_name] = factory;
+    filter_factories_registered = true;
 }
 
 JSON
@@ -437,7 +470,7 @@ Stream::pipeStreamData(
     const bool empty_stream_data = s->stream_data && s->stream_data->getSize() == 0;
     const bool empty = empty_stream || empty_stream_data;
 
-    if(empty_stream || empty_stream_data) {
+    if (empty_stream || empty_stream_data) {
         filter = true;
     }
 

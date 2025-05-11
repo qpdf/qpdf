@@ -1294,7 +1294,8 @@ QPDFWriter::willFilterStream(
     }
 
     // Disable compression for empty streams to improve compatibility
-    if (stream_dict.getKey("/Length").isInteger() && stream_dict.getKey("/Length").getIntValue() == 0) {
+    if (stream_dict.getKey("/Length").isInteger() &&
+        stream_dict.getKey("/Length").getIntValue() == 0) {
         filter = true;
         compress_stream = false;
     }

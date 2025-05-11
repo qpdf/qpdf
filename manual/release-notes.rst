@@ -30,6 +30,13 @@ more detail.
     - More sanity checks have been added when files with damaged xref tables
       are recovered.
 
+  - Other changes
+
+    - There has been some refactoring of stream filtering. These are optimized
+      for the common case where no user provided stream filters  are
+      registered by calling ``QPDF::registerStreamFilter``. If you are
+      providing your own stream filters please open a ticket_.
+
 12.2.0: May 4, 2025
   - Upcoming C++ Version Change
 
