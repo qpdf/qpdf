@@ -77,7 +77,6 @@ QPDFTokenizer bad hexstring 2nd character 0
 QPDFTokenizer null in name 0
 QPDFTokenizer bad name 1 0
 QPDFTokenizer bad name 2 0
-QPDF_Stream invalid filter 0
 QPDF UseOutlines but no Outlines 0
 QPDFObjectHandle makeDirect loop 0
 QPDFObjectHandle copy stream 1
@@ -168,7 +167,6 @@ qpdf-c called qpdf_has_error 0
 qpdf-c called qpdf_get_qpdf_version 0
 QPDF_Stream pipe original stream data 0
 QPDF_Stream pipe replaced stream data 0
-QPDF_Stream pipe use stream provider 0
 QPDF_Stream provider length mismatch 0
 QPDFObjectHandle newStream 0
 QPDFObjectHandle newStream with data 0
@@ -177,7 +175,6 @@ QPDFObjectHandle prepend page contents 0
 QPDFObjectHandle append page contents 0
 QPDF_Stream getRawStreamData 0
 QPDF_Stream getStreamData 0
-QPDF_Stream expand filter abbreviation 0
 qpdf-c called qpdf_read_memory 0
 QPDF stream without newline 0
 QPDF stream with CR only 0
@@ -281,7 +278,6 @@ QPDF ignore second extra space in xref entry 0
 QPDF ignore length error xref entry 0
 QPDF_encryption pad short parameter 0
 QPDFObjectHandle found old angle 1
-QPDF_Stream special filters 3
 QPDFTokenizer block long token 0
 qpdf-c called qpdf_set_decode_level 0
 qpdf-c called qpdf_set_compress_streams 0

@@ -17,8 +17,16 @@ class SF_FlateLzwDecode final: public QPDFStreamFilter
     bool setDecodeParms(QPDFObjectHandle decode_parms) final;
     Pipeline* getDecodePipeline(Pipeline* next) final;
 
-    static std::shared_ptr<QPDFStreamFilter> flate_factory();
-    static std::shared_ptr<QPDFStreamFilter> lzw_factory();
+    static std::shared_ptr<QPDFStreamFilter>
+    flate_factory()
+    {
+        return std::make_shared<SF_FlateLzwDecode>(false);
+    }
+    static std::shared_ptr<QPDFStreamFilter>
+    lzw_factory()
+    {
+        return std::make_shared<SF_FlateLzwDecode>(true);
+    }
 
   private:
     bool lzw{};
@@ -28,7 +36,7 @@ class SF_FlateLzwDecode final: public QPDFStreamFilter
     int colors{1};
     int bits_per_component{8};
     bool early_code_change{true};
-    std::vector<std::shared_ptr<Pipeline>> pipelines;
+    std::vector<std::unique_ptr<Pipeline>> pipelines;
 };
 
 #endif // SF_FLATELZWDECODE_HH

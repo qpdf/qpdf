@@ -312,17 +312,14 @@ namespace qpdf
             return nullptr; // unreachable
         }
         bool filterable(
-            std::vector<std::shared_ptr<QPDFStreamFilter>>& filters,
-            bool& specialized_compression,
-            bool& lossy_compression);
+            qpdf_stream_decode_level_e decode_level,
+            std::vector<std::shared_ptr<QPDFStreamFilter>>& filters);
         void replaceFilterData(
             QPDFObjectHandle const& filter, QPDFObjectHandle const& decode_parms, size_t length);
 
         void warn(std::string const& message);
 
         static std::map<std::string, std::string> filter_abbreviations;
-        static std::map<std::string, std::function<std::shared_ptr<QPDFStreamFilter>()>>
-            filter_factories;
     };
 
     template <typename T>
