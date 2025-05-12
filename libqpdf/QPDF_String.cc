@@ -30,12 +30,12 @@ QPDF_String::writeJSON(int json_version, JSON::Writer& p)
         p << "\"" << JSON::Writer::encode_string(candidate) << "\"";
     } else {
         // See if we can unambiguously represent as Unicode.
-        if (QUtil::is_utf16(this->val) || QUtil::is_explicit_utf8(this->val)) {
+        if (QUtil::is_utf16(val) || QUtil::is_explicit_utf8(val)) {
             p << "\"u:" << JSON::Writer::encode_string(candidate) << "\"";
             return;
         } else if (!useHexString()) {
             std::string test;
-            if (QUtil::utf8_to_pdf_doc(candidate, test, '?') && (test == this->val)) {
+            if (QUtil::utf8_to_pdf_doc(candidate, test, '?') && (test == val)) {
                 // This is a PDF-doc string that can be losslessly encoded as Unicode.
                 p << "\"u:" << JSON::Writer::encode_string(candidate) << "\"";
                 return;
@@ -52,7 +52,7 @@ QPDF_String::useHexString() const
     // PDF Doc encoding) characters or if too large of a proportion of the string consists of
     // non-ASCII characters.
     unsigned int non_ascii = 0;
-    for (auto const ch: this->val) {
+    for (auto const ch: val) {
         if (ch > 126) {
             ++non_ascii;
         } else if (ch >= 32) {
@@ -73,17 +73,17 @@ QPDF_String::unparse(bool force_binary)
     std::string result;
     if (use_hexstring) {
         static auto constexpr hexchars = "0123456789abcdef";
-        result.reserve(2 * this->val.length() + 2);
+        result.reserve(2 * val.length() + 2);
         result += '<';
-        for (const char c: this->val) {
+        for (const char c: val) {
             result += hexchars[static_cast<unsigned char>(c) >> 4];
             result += hexchars[c & 0x0f];
         }
         result += '>';
     } else {
         result += "(";
-        for (unsigned int i = 0; i < this->val.length(); ++i) {
-            char ch = this->val.at(i);
+        for (unsigned int i = 0; i < val.length(); ++i) {
+            char ch = val.at(i);
             switch (ch) {
             case '\n':
                 result += "\\n";
@@ -119,7 +119,7 @@ QPDF_String::unparse(bool force_binary)
 
             default:
                 if (is_iso_latin1_printable(ch)) {
-                    result += this->val.at(i);
+                    result += val.at(i);
                 } else {
                     result += "\\" +
                         QUtil::int_to_string_base(
@@ -137,13 +137,13 @@ QPDF_String::unparse(bool force_binary)
 std::string
 QPDF_String::getUTF8Val() const
 {
-    if (QUtil::is_utf16(this->val)) {
-        return QUtil::utf16_to_utf8(this->val);
-    } else if (QUtil::is_explicit_utf8(this->val)) {
+    if (QUtil::is_utf16(val)) {
+        return QUtil::utf16_to_utf8(val);
+    } else if (QUtil::is_explicit_utf8(val)) {
         // PDF 2.0 allows UTF-8 strings when explicitly prefixed with the three-byte representation
         // of U+FEFF.
-        return this->val.substr(3);
+        return val.substr(3);
     } else {
-        return QUtil::pdf_doc_to_utf8(this->val);
+        return QUtil::pdf_doc_to_utf8(val);
     }
 }

@@ -553,7 +553,7 @@ ValueSetter::handleToken(QPDFTokenizer::Token const& token)
 void
 ValueSetter::handleEOF()
 {
-    if (!this->replaced) {
+    if (!replaced) {
         QTC::TC("qpdf", "QPDFFormFieldObjectHelper replaced BMC at EOF");
         write("/Tx BMC\n");
         writeAppearance();
@@ -563,7 +563,7 @@ ValueSetter::handleEOF()
 void
 ValueSetter::writeAppearance()
 {
-    this->replaced = true;
+    replaced = true;
 
     // This code does not take quadding into consideration because doing so requires font metric
     // information, which we don't have in many cases.
@@ -713,18 +713,18 @@ TfFinder::handleToken(QPDFTokenizer::Token const& token)
 double
 TfFinder::getTf()
 {
-    return this->tf;
+    return tf;
 }
 
 std::string
 TfFinder::getDA()
 {
     std::string result;
-    size_t n = this->DA.size();
+    size_t n = DA.size();
     for (size_t i = 0; i < n; ++i) {
-        std::string cur = this->DA.at(i);
+        std::string cur = DA.at(i);
         if (QIntC::to_int(i) == tf_idx) {
-            double delta = strtod(cur.c_str(), nullptr) - this->tf;
+            double delta = strtod(cur.c_str(), nullptr) - tf;
             if ((delta > 0.001) || (delta < -0.001)) {
                 // tf doesn't match the font size passed to Tf, so substitute.
                 QTC::TC("qpdf", "QPDFFormFieldObjectHelper fallback Tf");
@@ -739,7 +739,7 @@ TfFinder::getDA()
 std::string
 TfFinder::getFontName()
 {
-    return this->font_name;
+    return font_name;
 }
 
 QPDFObjectHandle

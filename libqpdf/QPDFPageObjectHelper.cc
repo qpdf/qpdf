@@ -177,13 +177,13 @@ InlineImageTracker::handleToken(QPDFTokenizer::Token const& token)
         if (token.getType() == QPDFTokenizer::tt_inline_image) {
             std::string image_data(token.getValue());
             size_t len = image_data.length();
-            if (len >= this->min_size) {
+            if (len >= min_size) {
                 QTC::TC("qpdf", "QPDFPageObjectHelper externalize inline image");
                 QPDFObjectHandle dict = convertIIDict(QPDFObjectHandle::parse(dict_str));
                 dict.replaceKey("/Length", QPDFObjectHandle::newInteger(QIntC::to_longlong(len)));
-                std::string name = resources.getUniqueResourceName("/IIm", this->min_suffix);
+                std::string name = resources.getUniqueResourceName("/IIm", min_suffix);
                 QPDFObjectHandle image = QPDFObjectHandle::newStream(
-                    this->qpdf, std::make_shared<Buffer>(std::move(image_data)));
+                    qpdf, std::make_shared<Buffer>(std::move(image_data)));
                 image.replaceDict(dict);
                 resources.getKey("/XObject").replaceKey(name, image);
                 write(name);
@@ -278,7 +278,7 @@ QPDFPageObjectHelper::getCropBox(bool copy_if_shared, bool copy_if_fallback)
     return getAttribute(
         "/CropBox",
         copy_if_shared,
-        [this, copy_if_shared]() { return this->getMediaBox(copy_if_shared); },
+        [this, copy_if_shared]() { return getMediaBox(copy_if_shared); },
         copy_if_fallback);
 }
 
@@ -289,7 +289,7 @@ QPDFPageObjectHelper::getTrimBox(bool copy_if_shared, bool copy_if_fallback)
         "/TrimBox",
         copy_if_shared,
         [this, copy_if_shared, copy_if_fallback]() {
-            return this->getCropBox(copy_if_shared, copy_if_fallback);
+            return getCropBox(copy_if_shared, copy_if_fallback);
         },
         copy_if_fallback);
 }
@@ -301,7 +301,7 @@ QPDFPageObjectHelper::getArtBox(bool copy_if_shared, bool copy_if_fallback)
         "/ArtBox",
         copy_if_shared,
         [this, copy_if_shared, copy_if_fallback]() {
-            return this->getCropBox(copy_if_shared, copy_if_fallback);
+            return getCropBox(copy_if_shared, copy_if_fallback);
         },
         copy_if_fallback);
 }
@@ -313,7 +313,7 @@ QPDFPageObjectHelper::getBleedBox(bool copy_if_shared, bool copy_if_fallback)
         "/BleedBox",
         copy_if_shared,
         [this, copy_if_shared, copy_if_fallback]() {
-            return this->getCropBox(copy_if_shared, copy_if_fallback);
+            return getCropBox(copy_if_shared, copy_if_fallback);
         },
         copy_if_fallback);
 }

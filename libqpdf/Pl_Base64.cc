@@ -42,7 +42,7 @@ Pl_Base64::write(unsigned char const* data, size_t len)
     if (finished) {
         throw std::logic_error("Pl_Base64 used after finished");
     }
-    if (this->action == a_decode) {
+    if (action == a_decode) {
         decode(data, len);
     } else {
         encode(data, len);
@@ -55,8 +55,8 @@ Pl_Base64::decode(unsigned char const* data, size_t len)
     unsigned char const* p = data;
     while (len > 0) {
         if (!util::is_space(to_c(*p))) {
-            this->buf[this->pos++] = *p;
-            if (this->pos == 4) {
+            buf[pos++] = *p;
+            if (pos == 4) {
                 flush();
             }
         }
@@ -70,8 +70,8 @@ Pl_Base64::encode(unsigned char const* data, size_t len)
 {
     unsigned char const* p = data;
     while (len > 0) {
-        this->buf[this->pos++] = *p;
-        if (this->pos == 3) {
+        buf[pos++] = *p;
+        if (pos == 3) {
             flush();
         }
         ++p;
@@ -82,7 +82,7 @@ Pl_Base64::encode(unsigned char const* data, size_t len)
 void
 Pl_Base64::flush()
 {
-    if (this->action == a_decode) {
+    if (action == a_decode) {
         flush_decode();
     } else {
         flush_encode();
@@ -93,7 +93,7 @@ Pl_Base64::flush()
 void
 Pl_Base64::flush_decode()
 {
-    if (this->end_of_data) {
+    if (end_of_data) {
         throw std::runtime_error(getIdentifier() + ": base64 decode: data follows pad characters");
     }
     int pad = 0;
@@ -101,7 +101,7 @@ Pl_Base64::flush_decode()
     int outval = 0;
     for (size_t i = 0; i < 4; ++i) {
         int v = 0;
-        char ch = to_c(this->buf[i]);
+        char ch = to_c(buf[i]);
         if ((ch >= 'A') && (ch <= 'Z')) {
             v = ch - 'A';
         } else if ((ch >= 'a') && (ch <= 'z')) {
@@ -112,9 +112,9 @@ Pl_Base64::flush_decode()
             v = 62;
         } else if ((ch == '/') || (ch == '_')) {
             v = 63;
-        } else if ((ch == '=') && ((i == 3) || ((i == 2) && (this->buf[3] == '=')))) {
+        } else if ((ch == '=') && ((i == 3) || ((i == 2) && (buf[3] == '=')))) {
             ++pad;
-            this->end_of_data = true;
+            end_of_data = true;
             v = 0;
         } else {
             throw std::runtime_error(getIdentifier() + ": base64 decode: invalid input");
@@ -134,7 +134,7 @@ Pl_Base64::flush_decode()
 void
 Pl_Base64::flush_encode()
 {
-    int outval = ((this->buf[0] << 16) | (this->buf[1] << 8) | (this->buf[2]));
+    int outval = ((buf[0] << 16) | (buf[1] << 8) | (buf[2]));
     unsigned char out[4] = {
         to_uc(outval >> 18),
         to_uc(0x3f & (outval >> 12)),
@@ -158,7 +158,7 @@ Pl_Base64::flush_encode()
         }
         out[i] = to_uc(ch);
     }
-    for (size_t i = 0; i < 3 - this->pos; ++i) {
+    for (size_t i = 0; i < 3 - pos; ++i) {
         out[3 - i] = '=';
     }
     next()->write(out, 4);
@@ -167,24 +167,24 @@ Pl_Base64::flush_encode()
 void
 Pl_Base64::finish()
 {
-    if (this->pos > 0) {
+    if (pos > 0) {
         if (finished) {
             throw std::logic_error("Pl_Base64 used after finished");
         }
-        if (this->action == a_decode) {
-            for (size_t i = this->pos; i < 4; ++i) {
-                this->buf[i] = '=';
+        if (action == a_decode) {
+            for (size_t i = pos; i < 4; ++i) {
+                buf[i] = '=';
             }
         }
         flush();
     }
-    this->finished = true;
+    finished = true;
     next()->finish();
 }
 
 void
 Pl_Base64::reset()
 {
-    this->pos = 0;
+    pos = 0;
     memset(buf, 0, 4);
 }
