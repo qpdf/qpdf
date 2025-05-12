@@ -85,7 +85,7 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(std::vector<QPDFObjectHandle>
                 // this field's /T is always at the end of the fully qualified name, appending to /T
                 // has the effect of appending the same thing to the fully qualified name.
                 std::string old_name = QPDFFormFieldObjectHelper(obj).getFullyQualifiedName();
-                if (renames.count(old_name) == 0) {
+                if (!renames.contains(old_name)) {
                     std::string new_name = old_name;
                     int suffix = 0;
                     std::string append;
@@ -145,7 +145,7 @@ QPDFAcroFormDocumentHelper::removeFormFields(std::set<QPDFObjGen> const& to_remo
     int i = 0;
     while (i < fields.getArrayNItems()) {
         auto field = fields.getArrayItem(i);
-        if (to_remove.count(field.getObjGen())) {
+        if (to_remove.contains(field.getObjGen())) {
             fields.eraseItem(i);
         } else {
             ++i;
@@ -191,7 +191,7 @@ QPDFAcroFormDocumentHelper::getAnnotationsForField(QPDFFormFieldObjectHelper h)
     analyze();
     std::vector<QPDFAnnotationObjectHelper> result;
     QPDFObjGen og(h.getObjectHandle().getObjGen());
-    if (m->field_to_annotations.count(og)) {
+    if (m->field_to_annotations.contains(og)) {
         result = m->field_to_annotations[og];
     }
     return result;
@@ -228,7 +228,7 @@ QPDFAcroFormDocumentHelper::getFieldForAnnotation(QPDFAnnotationObjectHelper h)
     }
     analyze();
     QPDFObjGen og(oh.getObjGen());
-    if (m->annotation_to_field.count(og)) {
+    if (m->annotation_to_field.contains(og)) {
         result = m->annotation_to_field[og];
     }
     return result;
@@ -271,7 +271,7 @@ QPDFAcroFormDocumentHelper::analyze()
         for (auto const& iter: getWidgetAnnotationsForPage(ph)) {
             QPDFObjectHandle annot(iter.getObjectHandle());
             QPDFObjGen og(annot.getObjGen());
-            if (m->annotation_to_field.count(og) == 0) {
+            if (!m->annotation_to_field.contains(og)) {
                 QTC::TC("qpdf", "QPDFAcroFormDocumentHelper orphaned widget");
                 // This is not supposed to happen, but it's easy enough for us to handle this case.
                 // Treat the annotation as its own field. This could allow qpdf to sensibly handle a
@@ -542,7 +542,7 @@ ResourceReplacer::handleToken(QPDFTokenizer::Token const& token)
     bool wrote = false;
     if (token.getType() == QPDFTokenizer::tt_name) {
         std::string name = QPDFObjectHandle::newName(token.getValue()).getName();
-        if (to_replace.count(name) && to_replace[name].count(offset)) {
+        if (to_replace.contains(name) && to_replace[name].contains(offset)) {
             QTC::TC("qpdf", "QPDFAcroFormDocumentHelper replaced DA token");
             write(to_replace[name][offset]);
             wrote = true;
@@ -807,7 +807,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     std::map<QPDFObjGen, QPDFObjectHandle> orig_to_copy;
     auto maybe_copy_object = [&](QPDFObjectHandle& to_copy) {
         auto og = to_copy.getObjGen();
-        if (orig_to_copy.count(og)) {
+        if (orig_to_copy.contains(og)) {
             to_copy = orig_to_copy[og];
             return false;
         } else {
@@ -893,7 +893,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                     auto parent = obj.getKey("/Parent");
                     if (parent.isIndirect()) {
                         auto parent_og = parent.getObjGen();
-                        if (orig_to_copy.count(parent_og)) {
+                        if (orig_to_copy.contains(parent_og)) {
                             obj.replaceKey("/Parent", orig_to_copy[parent_og]);
                         } else {
                             parent.warnIfPossible(

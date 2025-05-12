@@ -1065,7 +1065,7 @@ void
 QPDFWriter::assignCompressedObjectNumbers(QPDFObjGen og)
 {
     int objid = og.getObj();
-    if ((og.getGen() != 0) || (m->object_stream_to_objects.count(objid) == 0)) {
+    if ((og.getGen() != 0) || (!m->object_stream_to_objects.contains(objid))) {
         // This is not an object stream.
         return;
     }
@@ -1115,7 +1115,7 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
                 m->object_queue.push_back(object);
                 obj.renumber = m->next_objid++;
 
-                if ((og.getGen() == 0) && m->object_stream_to_objects.count(og.getObj())) {
+                if ((og.getGen() == 0) && m->object_stream_to_objects.contains(og.getObj())) {
                     // For linearized files, uncompressed objects go at end, and we take care of
                     // assigning numbers to them elsewhere.
                     if (!m->linearized) {
@@ -1285,7 +1285,7 @@ QPDFWriter::willFilterStream(
         filter = true;
         compress_stream = false;
         uncompress = true;
-    } else if (filter_on_write && m->normalize_content && m->normalized_streams.count(old_og)) {
+    } else if (filter_on_write && m->normalize_content && m->normalized_streams.contains(old_og)) {
         normalize = true;
         filter = true;
     } else if (filter_on_write && filter && m->compress_streams) {
@@ -1415,7 +1415,7 @@ QPDFWriter::unparseObject(
 
         if (extensions) {
             std::set<std::string> keys = extensions.getKeys();
-            if (keys.count("/ADBE") > 0) {
+            if (keys.contains("/ADBE")) {
                 have_extensions_adbe = true;
                 keys.erase("/ADBE");
             }
@@ -1807,12 +1807,12 @@ QPDFWriter::writeObject(QPDFObjectHandle object, int object_stream_index)
     indicateProgress(false, false);
     auto new_id = m->obj[old_og].renumber;
     if (m->qdf_mode) {
-        if (m->page_object_to_seq.count(old_og)) {
+        if (m->page_object_to_seq.contains(old_og)) {
             writeString("%% Page ");
             writeString(std::to_string(m->page_object_to_seq[old_og]));
             writeString("\n");
         }
-        if (m->contents_to_page_seq.count(old_og)) {
+        if (m->contents_to_page_seq.contains(old_og)) {
             writeString("%% Contents for page ");
             writeString(std::to_string(m->contents_to_page_seq[old_og]));
             writeString("\n");

@@ -303,7 +303,7 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
                                               : 2); // insert in middle
 
     auto og = newpage.getObjGen();
-    if (m->pageobj_to_pages_pos.count(og)) {
+    if (m->pageobj_to_pages_pos.contains(og)) {
         QTC::TC("qpdf", "QPDF resolve duplicated page in insert");
         newpage = makeIndirectObject(QPDFObjectHandle(newpage).shallowCopy());
     }

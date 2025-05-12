@@ -276,7 +276,7 @@ StreamReplacer::registerStream(
     // We don't need to process a stream more than once. In this example, we are just iterating
     // through objects, but if we were doing something like iterating through images on pages, we
     // might realistically encounter the same stream more than once.
-    if (this->copied_streams.count(og) > 0) {
+    if (this->copied_streams.contains(og)) {
         return;
     }
     // Store something in copied_streams so that we don't double-process even in the negative case.

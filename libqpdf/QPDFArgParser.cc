@@ -71,7 +71,7 @@ QPDFArgParser::selectOptionTable(std::string const& name)
 void
 QPDFArgParser::registerOptionTable(std::string const& name, bare_arg_handler_t end_handler)
 {
-    if (0 != m->option_tables.count(name)) {
+    if (m->option_tables.contains(name)) {
         QTC::TC("libtests", "QPDFArgParser register registered table");
         throw std::logic_error(
             "QPDFArgParser: registering already registered option table " + name);
@@ -84,7 +84,7 @@ QPDFArgParser::registerOptionTable(std::string const& name, bare_arg_handler_t e
 QPDFArgParser::OptionEntry&
 QPDFArgParser::registerArg(std::string const& arg)
 {
-    if (0 != m->option_table->count(arg)) {
+    if (m->option_table->contains(arg)) {
         QTC::TC("libtests", "QPDFArgParser duplicate handler");
         throw std::logic_error(
             "QPDFArgParser: adding a duplicate handler for option " + arg + " in " +
@@ -481,7 +481,7 @@ QPDFArgParser::parseArgs()
             }
 
             if ((!m->bash_completion) && (m->argc == 2) && (m->cur_arg == 1) &&
-                m->help_option_table.count(arg_s)) {
+                m->help_option_table.contains(arg_s)) {
                 // Handle help option, which is only valid as the sole option.
                 QTC::TC("libtests", "QPDFArgParser help option");
                 oep = m->help_option_table.find(arg_s);
@@ -508,8 +508,8 @@ QPDFArgParser::parseArgs()
         }
 
         OptionEntry& oe = oep->second;
-        if ((oe.parameter_needed && (!have_parameter)) ||
-            ((!oe.choices.empty() && have_parameter && (0 == oe.choices.count(parameter))))) {
+        if ((oe.parameter_needed && !have_parameter) ||
+            (!oe.choices.empty() && have_parameter && !oe.choices.contains(parameter))) {
             std::string message = "--" + arg_s + " must be given as --" + arg_s + "=";
             if (oe.invalid_choice_handler) {
                 oe.invalid_choice_handler(parameter);
@@ -584,7 +584,7 @@ void
 QPDFArgParser::addChoicesToCompletions(
     option_table_t& option_table, std::string const& option, std::string const& extra_prefix)
 {
-    if (option_table.count(option) != 0) {
+    if (option_table.contains(option)) {
         OptionEntry& oe = option_table[option];
         for (auto const& choice: oe.choices) {
             QTC::TC("libtests", "QPDFArgParser complete choices");
@@ -690,7 +690,7 @@ QPDFArgParser::addHelpTopic(
         QTC::TC("libtests", "QPDFArgParser bad topic for help");
         throw std::logic_error("QPDFArgParser: help topics must not start with -");
     }
-    if (m->help_topics.count(topic)) {
+    if (m->help_topics.contains(topic)) {
         QTC::TC("libtests", "QPDFArgParser add existing topic");
         throw std::logic_error("QPDFArgParser: topic " + topic + " has already been added");
     }
@@ -710,7 +710,7 @@ QPDFArgParser::addOptionHelp(
         QTC::TC("libtests", "QPDFArgParser bad option for help");
         throw std::logic_error("QPDFArgParser: options for help must start with --");
     }
-    if (m->option_help.count(option_name)) {
+    if (m->option_help.contains(option_name)) {
         QTC::TC("libtests", "QPDFArgParser duplicate option help");
         throw std::logic_error("QPDFArgParser: option " + option_name + " already has help");
     }
@@ -782,9 +782,9 @@ QPDFArgParser::getHelp(std::string const& arg)
     } else {
         if (arg == "all") {
             getAllHelp(msg);
-        } else if (m->option_help.count(arg)) {
+        } else if (m->option_help.contains(arg)) {
             getTopicHelp(arg, m->option_help[arg], msg);
-        } else if (m->help_topics.count(arg)) {
+        } else if (m->help_topics.contains(arg)) {
             getTopicHelp(arg, m->help_topics[arg], msg);
         } else {
             // should not be possible

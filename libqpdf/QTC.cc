@@ -39,7 +39,7 @@ QTC::TC_real(char const* const scope, char const* const ccase, int n)
     }
 #undef TC_ENV
 
-    if (cache.count(std::make_pair(ccase, n))) {
+    if (cache.contains(std::make_pair(ccase, n))) {
         return;
     }
     cache.insert(std::make_pair(ccase, n));

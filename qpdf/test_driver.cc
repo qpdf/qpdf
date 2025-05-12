@@ -3621,7 +3621,7 @@ runtest(int n, char const* filename1, char const* arg2)
             p[i] = static_cast<char>(p[i] ^ 0xcc);
         }
         pdf.processMemoryFile((std::string(filename1) + ".pdf").c_str(), p, size);
-    } else if (ignore_filename.count(n)) {
+    } else if (ignore_filename.contains(n)) {
         // Ignore filename argument entirely
     } else if (n == 89) {
         pdf.createFromJSON(filename1);

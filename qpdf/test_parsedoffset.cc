@@ -77,7 +77,7 @@ process(std::string fn, std::vector<std::vector<std::pair<qpdf_offset_t, std::st
     std::map<QPDFObjGen, QPDFXRefEntry> xrefs = qpdf.getXRefTable();
 
     for (auto const& oh: qpdf.getAllObjects()) {
-        if (xrefs.count(oh.getObjGen()) == 0) {
+        if (!xrefs.contains(oh.getObjGen())) {
             std::cerr << oh.getObjectID() << "/" << oh.getGeneration()
                       << " is not found in xref table" << std::endl;
             std::exit(2);

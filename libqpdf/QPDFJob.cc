@@ -673,7 +673,7 @@ QPDFJob::checkConfiguration()
             usage("json key \"qpdf\" is only valid for json version > 1");
         }
     } else {
-        if (m->json_keys.contains("objectinfo") || m->json_keys.count("objects")) {
+        if (m->json_keys.contains("objectinfo") || m->json_keys.contains("objects")) {
             usage("json keys \"objects\" and \"objectinfo\" are only valid for json version 1");
         }
     }
@@ -1007,13 +1007,13 @@ QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
         for (auto& obj: pdf.getAllObjects()) {
             std::string key = obj.unparse();
 
-            if (all_objects || wanted_og.count(obj.getObjGen())) {
+            if (all_objects || wanted_og.contains(obj.getObjGen())) {
                 JSON::writeDictionaryKey(p, first_object, obj.unparse(), 2);
                 obj.writeJSON(1, p, true, 2);
                 first_object = false;
             }
         }
-        if (all_objects || m->json_objects.count("trailer")) {
+        if (all_objects || m->json_objects.contains("trailer")) {
             JSON::writeDictionaryKey(p, first_object, "trailer", 2);
             pdf.getTrailer().writeJSON(1, p, true, 2);
             first_object = false;
@@ -1021,7 +1021,7 @@ QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
         JSON::writeDictionaryClose(p, first_object, 1);
     } else {
         std::set<std::string> json_objects;
-        if (m->json_objects.count("trailer")) {
+        if (m->json_objects.contains("trailer")) {
             json_objects.insert("trailer");
         }
         for (auto og: getWantedJSONObjects()) {
@@ -1048,7 +1048,7 @@ QPDFJob::doJSONObjectinfo(Pipeline* p, bool& first, QPDF& pdf)
     bool all_objects = m->json_objects.empty();
     auto wanted_og = getWantedJSONObjects();
     for (auto& obj: pdf.getAllObjects()) {
-        if (all_objects || wanted_og.count(obj.getObjGen())) {
+        if (all_objects || wanted_og.contains(obj.getObjGen())) {
             auto j_details = JSON::makeDictionary();
             auto j_stream = j_details.addDictionaryMember("stream", JSON::makeDictionary());
             bool is_stream = obj.isStream();
@@ -1170,7 +1170,7 @@ QPDFJob::addOutlinesToJson(
         JSON j_destpage = JSON::makeNull();
         if (page.isIndirect()) {
             QPDFObjGen og = page.getObjGen();
-            if (page_numbers.count(og)) {
+            if (page_numbers.contains(og)) {
                 j_destpage = JSON::makeInt(page_numbers[og]);
             }
         }
@@ -1913,7 +1913,7 @@ get_afdh_for_qpdf(
     std::map<unsigned long long, std::shared_ptr<QPDFAcroFormDocumentHelper>>& afdh_map, QPDF* q)
 {
     auto uid = q->getUniqueId();
-    if (!afdh_map.count(uid)) {
+    if (!afdh_map.contains(uid)) {
         afdh_map[uid] = std::make_shared<QPDFAcroFormDocumentHelper>(*q);
     }
     return afdh_map[uid].get();
@@ -1931,7 +1931,7 @@ QPDFJob::doUnderOverlayForPage(
     QPDFPageObjectHelper& dest_page)
 {
     int pageno = 1 + QIntC::to_int(page_idx);
-    if (!(pagenos.count(pageno) && pagenos[pageno].count(uo_idx))) {
+    if (!(pagenos.contains(pageno) && pagenos[pageno].contains(uo_idx))) {
         return "";
     }
 
@@ -1950,7 +1950,7 @@ QPDFJob::doUnderOverlayForPage(
             v << "    " << uo.filename << " " << uo.which << " " << from_pageno << "\n";
         });
         auto from_page = pages.at(QIntC::to_size(from_pageno - 1));
-        if (fo[from_pageno].count(uo_idx) == 0) {
+        if (!fo[from_pageno].contains(uo_idx)) {
             fo[from_pageno][uo_idx] = pdf.copyForeignObject(from_page.getFormXObjectForPage());
         }
 
@@ -2462,7 +2462,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
     std::vector<QPDFPageData> parsed_specs;
     std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
     for (auto& page_spec: m->page_specs) {
-        if (page_spec_qpdfs.count(page_spec.filename) == 0) {
+        if (!page_spec_qpdfs.contains(page_spec.filename)) {
             // Open the PDF file and store the QPDF object. Throw a std::shared_ptr to the qpdf into
             // a heap so that it survives through copying to the output but gets cleaned up
             // automatically at the end. Do not canonicalize the file name. Using two different
@@ -2512,13 +2512,13 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
         for (auto const& iter: page_spec_qpdfs) {
             std::string const& filename = iter.first;
             ClosedFileInputSource* cis = nullptr;
-            if (page_spec_cfis.count(filename)) {
+            if (page_spec_cfis.contains(filename)) {
                 cis = page_spec_cfis[filename];
                 cis->stayOpen(true);
             }
             QPDF& other(*(iter.second));
             auto other_uuid = other.getUniqueId();
-            if (remove_unreferenced.count(other_uuid) == 0) {
+            if (!remove_unreferenced.contains(other_uuid)) {
                 remove_unreferenced[other_uuid] = shouldRemoveUnreferencedResources(other);
             }
             if (cis) {
@@ -2585,7 +2585,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
     std::set<QPDFObjGen> referenced_fields;
     for (auto& page_data: parsed_specs) {
         ClosedFileInputSource* cis = nullptr;
-        if (page_spec_cfis.count(page_data.filename)) {
+        if (page_spec_cfis.contains(page_data.filename)) {
             cis = page_spec_cfis[page_data.filename];
             cis->stayOpen(true);
         }
@@ -2604,7 +2604,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             QPDFPageObjectHelper to_copy = page_data.orig_pages.at(QIntC::to_size(pageno));
             QPDFObjGen to_copy_og = to_copy.getObjectHandle().getObjGen();
             unsigned long long from_uuid = page_data.qpdf->getUniqueId();
-            if (copied_pages[from_uuid].count(to_copy_og)) {
+            if (copied_pages[from_uuid].contains(to_copy_og)) {
                 QTC::TC(
                     "qpdf",
                     "QPDFJob copy same page more than once",
@@ -2622,7 +2622,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             if (this_file) {
                 // This is a page from the original file. Keep track of the fact that we are using
                 // it.
-                first_copy_from_orig = (selected_from_orig.count(pageno) == 0);
+                first_copy_from_orig = (!selected_from_orig.contains(pageno));
                 selected_from_orig.insert(pageno);
             }
             auto new_page = added_page(pdf, to_copy);
@@ -2667,7 +2667,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
     // sure we keep form fields from pages we preserved.
     for (size_t pageno = 0; pageno < orig_pages.size(); ++pageno) {
         auto page = orig_pages.at(pageno);
-        if (selected_from_orig.count(QIntC::to_int(pageno))) {
+        if (selected_from_orig.contains(QIntC::to_int(pageno))) {
             for (auto field: this_afdh->getFormFieldsForPage(page)) {
                 QTC::TC("qpdf", "QPDFJob pages keeping field from original");
                 referenced_fields.insert(field.getObjectHandle().getObjGen());
@@ -2686,7 +2686,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
                 new_fields = pdf.makeIndirectObject(new_fields);
             }
             for (auto const& field: fields.aitems()) {
-                if (referenced_fields.count(field.getObjGen())) {
+                if (referenced_fields.contains(field.getObjGen())) {
                     new_fields.appendItem(field);
                 }
             }

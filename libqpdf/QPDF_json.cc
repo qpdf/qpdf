@@ -889,7 +889,7 @@ QPDF::writeJSON(
     for (auto& obj: getAllObjects()) {
         auto const og = obj.getObjGen();
         std::string key = "obj:" + og.unparse(' ') + " R";
-        if (all_objects || wanted_objects.count(key)) {
+        if (all_objects || wanted_objects.contains(key)) {
             if (first) {
                 jw << "\n      \"" << key;
                 first = false;
@@ -911,7 +911,7 @@ QPDF::writeJSON(
             }
         }
     }
-    if (all_objects || wanted_objects.count("trailer")) {
+    if (all_objects || wanted_objects.contains("trailer")) {
         if (!first) {
             jw << "\n      },";
         }

@@ -26,7 +26,7 @@ compare(QPDFObjectHandle a, QPDFObjectHandle b)
 {
     static std::set<QPDFObjGen> visited;
     if (a.isIndirect()) {
-        if (visited.count(a.getObjGen())) {
+        if (visited.contains(a.getObjGen())) {
             return true;
         }
         visited.insert(a.getObjGen());
@@ -128,7 +128,7 @@ compare_xref_table(std::map<QPDFObjGen, QPDFXRefEntry> a, std::map<QPDFObjGen, Q
         std::cout << "xref entry for " << iter.first.getObj() << "/" << iter.first.getGen()
                   << std::endl;
 
-        if (b.count(iter.first) == 0) {
+        if (!b.contains(iter.first)) {
             std::cerr << "not found" << std::endl;
             return false;
         }

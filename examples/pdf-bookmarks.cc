@@ -104,7 +104,7 @@ show_bookmark_details(QPDFOutlineObjectHelper outline, std::vector<int> numbers)
         QPDFObjectHandle dest_page = outline.getDestPage();
         if (!dest_page.isNull()) {
             QTC::TC("examples", "pdf-bookmarks dest");
-            if (page_map.count(dest_page)) {
+            if (page_map.contains(dest_page)) {
                 target = std::to_string(page_map[dest_page]);
             }
         }

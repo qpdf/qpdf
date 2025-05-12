@@ -1395,7 +1395,7 @@ QUtil::parse_numrange(char const* range, int max)
                 work = last_group;
                 last_group.clear();
                 for (auto n: work) {
-                    if (exclusions.count(n) == 0) {
+                    if (!exclusions.contains(n)) {
                         last_group.emplace_back(n);
                     }
                 }
@@ -1886,7 +1886,7 @@ QUtil::possible_repaired_encodings(std::string supplied)
     std::vector<std::string> t;
     std::set<std::string> seen;
     for (auto const& iter: result) {
-        if (!seen.count(iter)) {
+        if (!seen.contains(iter)) {
             seen.insert(iter);
             t.push_back(iter);
         }
@@ -1988,7 +1988,7 @@ QUtil::get_max_memory_usage()
                     attrs[m2->str(1)] = m2->str(2);
                 }
                 if (tag == "total") {
-                    if (attrs.count("size") > 0) {
+                    if (attrs.contains("size")) {
                         result += QIntC::to_size(QUtil::string_to_ull(attrs["size"].c_str()));
                     }
                 } else if (tag == "system" && attrs["type"] == "max") {

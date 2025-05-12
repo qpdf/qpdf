@@ -516,11 +516,11 @@ JSON::checkSchemaInternal(
                 }
             }
         }
-        for (auto const& [key, val]: this_dict->members) {
-            if (!sch_dict->members.contains(key)) {
+        for (auto const& item: this_dict->members) {
+            if (!sch_dict->members.contains(item.first)) {
                 QTC::TC("libtests", "JSON key extra in object");
                 errors.emplace_back(
-                    err_prefix + ": key \"" + key +
+                    err_prefix + ": key \"" + item.first +
                     "\" is not present in schema but appears in object");
             }
         }

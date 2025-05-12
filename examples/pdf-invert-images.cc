@@ -52,7 +52,7 @@ ImageInverter::registerImage(
     // Store information about the images based on the object and generation number. Recall that a
     // single image object may be used more than once, so no need to update the same stream multiple
     // times.
-    if (this->copied_images.count(og) > 0) {
+    if (copied_images.contains(og)) {
         return;
     }
     this->copied_images[og] = image.copyStream();
