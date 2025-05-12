@@ -13,7 +13,7 @@ std::vector<QPDFPageObjectHelper>
 QPDFPageDocumentHelper::getAllPages()
 {
     std::vector<QPDFPageObjectHelper> pages;
-    for (auto const& iter: this->qpdf.getAllPages()) {
+    for (auto const& iter: qpdf.getAllPages()) {
         pages.emplace_back(iter);
     }
     return pages;
@@ -22,7 +22,7 @@ QPDFPageDocumentHelper::getAllPages()
 void
 QPDFPageDocumentHelper::pushInheritedAttributesToPage()
 {
-    this->qpdf.pushInheritedAttributesToPage();
+    qpdf.pushInheritedAttributesToPage();
 }
 
 void
@@ -36,28 +36,28 @@ QPDFPageDocumentHelper::removeUnreferencedResources()
 void
 QPDFPageDocumentHelper::addPage(QPDFPageObjectHelper newpage, bool first)
 {
-    this->qpdf.addPage(newpage.getObjectHandle(), first);
+    qpdf.addPage(newpage.getObjectHandle(), first);
 }
 
 void
 QPDFPageDocumentHelper::addPageAt(
     QPDFPageObjectHelper newpage, bool before, QPDFPageObjectHelper refpage)
 {
-    this->qpdf.addPageAt(newpage.getObjectHandle(), before, refpage.getObjectHandle());
+    qpdf.addPageAt(newpage.getObjectHandle(), before, refpage.getObjectHandle());
 }
 
 void
 QPDFPageDocumentHelper::removePage(QPDFPageObjectHelper page)
 {
-    this->qpdf.removePage(page.getObjectHandle());
+    qpdf.removePage(page.getObjectHandle());
 }
 
 void
 QPDFPageDocumentHelper::flattenAnnotations(int required_flags, int forbidden_flags)
 {
-    QPDFAcroFormDocumentHelper afdh(this->qpdf);
+    QPDFAcroFormDocumentHelper afdh(qpdf);
     if (afdh.getNeedAppearances()) {
-        this->qpdf.getRoot()
+        qpdf.getRoot()
             .getKey("/AcroForm")
             .warnIfPossible(
                 "document does not have updated appearance streams, so form fields "
@@ -73,7 +73,7 @@ QPDFPageDocumentHelper::flattenAnnotations(int required_flags, int forbidden_fla
         flattenAnnotationsForPage(ph, resources, afdh, required_flags, forbidden_flags);
     }
     if (!afdh.getNeedAppearances()) {
-        this->qpdf.getRoot().removeKey("/AcroForm");
+        qpdf.getRoot().removeKey("/AcroForm");
     }
 }
 
@@ -147,7 +147,7 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
             QPDFObjectHandle new_annots_oh = QPDFObjectHandle::newArray(new_annots);
             if (old_annots.isIndirect()) {
                 QTC::TC("qpdf", "QPDFPageDocumentHelper replace indirect annots");
-                this->qpdf.replaceObject(old_annots.getObjGen(), new_annots_oh);
+                qpdf.replaceObject(old_annots.getObjGen(), new_annots_oh);
             } else {
                 QTC::TC("qpdf", "QPDFPageDocumentHelper replace direct annots");
                 page_oh.replaceKey("/Annots", new_annots_oh);

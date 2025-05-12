@@ -191,9 +191,9 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         }
         return result;
     }
-    if (((this->oi_min_width > 0) && (w <= this->oi_min_width)) ||
-        ((this->oi_min_height > 0) && (h <= this->oi_min_height)) ||
-        ((this->oi_min_area > 0) && ((w * h) <= this->oi_min_area))) {
+    if (((oi_min_width > 0) && (w <= oi_min_width)) ||
+        ((oi_min_height > 0) && (h <= oi_min_height)) ||
+        ((oi_min_area > 0) && ((w * h) <= oi_min_area))) {
         QTC::TC("qpdf", "QPDFJob image optimize too small");
         if (!description.empty()) {
             o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -277,8 +277,7 @@ QPDFPageData::QPDFPageData(std::string const& filename, QPDF* qpdf, std::string 
     orig_pages(qpdf->getAllPages())
 {
     try {
-        this->selected_pages =
-            QUtil::parse_numrange(range.c_str(), QIntC::to_int(this->orig_pages.size()));
+        selected_pages = QUtil::parse_numrange(range.c_str(), QIntC::to_int(orig_pages.size()));
     } catch (std::runtime_error& e) {
         throw std::runtime_error("parsing numeric range for " + filename + ": " + e.what());
     }
@@ -289,13 +288,13 @@ QPDFPageData::QPDFPageData(QPDFPageData const& other, int page) :
     qpdf(other.qpdf),
     orig_pages(other.orig_pages)
 {
-    this->selected_pages.push_back(page);
+    selected_pages.push_back(page);
 }
 
 void
 ProgressReporter::reportProgress(int percentage)
 {
-    this->p << prefix << ": " << filename << ": write progress: " << percentage << "%\n";
+    p << prefix << ": " << filename << ": write progress: " << percentage << "%\n";
 }
 
 QPDFJob::Members::Members() :
