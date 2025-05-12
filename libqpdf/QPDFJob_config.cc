@@ -696,7 +696,7 @@ QPDFJob::Config::passwordFile(std::string const& parameter)
         QTC::TC("qpdf", "QPDFJob_config password file");
         lines = QUtil::read_lines_from_file(parameter.c_str());
     }
-    if (lines.size() >= 1) {
+    if (!lines.empty()) {
         o.m->password = QUtil::make_shared_cstr(lines.front());
 
         if (lines.size() > 1) {

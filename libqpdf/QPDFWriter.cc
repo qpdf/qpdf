@@ -271,7 +271,7 @@ void
 QPDFWriter::setExtraHeaderText(std::string const& text)
 {
     m->extra_header_text = text;
-    if ((m->extra_header_text.length() > 0) && (*(m->extra_header_text.rbegin()) != '\n')) {
+    if (!m->extra_header_text.empty() && *m->extra_header_text.rbegin() != '\n') {
         QTC::TC("qpdf", "QPDFWriter extra header text add newline");
         m->extra_header_text += "\n";
     } else {
@@ -1419,7 +1419,7 @@ QPDFWriter::unparseObject(
                 have_extensions_adbe = true;
                 keys.erase("/ADBE");
             }
-            if (keys.size() > 0) {
+            if (!keys.empty()) {
                 have_extensions_other = true;
             }
         }

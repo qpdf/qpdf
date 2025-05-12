@@ -192,7 +192,7 @@ QPDF::test_json_validators()
     check(is_unicode_string("u:potato", str));
     check(str == "potato");
     check(is_unicode_string("u:", str));
-    check(str == "");
+    check(str.empty());
     check(!is_binary_string("", str));
     check(!is_binary_string("x:", str));
     check(!is_binary_string("b:1", str));

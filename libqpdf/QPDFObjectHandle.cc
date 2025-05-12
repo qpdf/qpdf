@@ -467,7 +467,7 @@ BaseHandle::write_json(int json_version, JSON::Writer& p) const
     case ::ot_real:
         {
             auto const& val = std::get<QPDF_Real>(obj->value).val;
-            if (val.length() == 0) {
+            if (val.empty()) {
                 // Can't really happen...
                 p << "0";
             } else if (val.at(0) == '.') {

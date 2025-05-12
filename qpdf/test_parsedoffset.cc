@@ -120,7 +120,7 @@ main(int argc, char* argv[])
         process(argv[1], table);
 
         for (size_t i = 0; i < table.size(); ++i) {
-            if (table[i].size() == 0) {
+            if (table[i].empty()) {
                 continue;
             }
 

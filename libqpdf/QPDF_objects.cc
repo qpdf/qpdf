@@ -153,7 +153,7 @@ QPDF::parse(char const* password)
 
     initializeEncryption();
     m->parsed = true;
-    if (m->xref_table.size() > 0 && !getRoot().getKey("/Pages").isDictionary()) {
+    if (!m->xref_table.empty() && !getRoot().getKey("/Pages").isDictionary()) {
         // QPDFs created from JSON have an empty xref table and no root object yet.
         throw damagedPDF("", -1, "unable to find page tree");
     }
@@ -1932,8 +1932,8 @@ QPDF::tableSize()
 {
     // If obj_cache is dense, accommodate all object in tables,else accommodate only original
     // objects.
-    auto max_xref = m->xref_table.size() ? m->xref_table.crbegin()->first.getObj() : 0;
-    auto max_obj = m->obj_cache.size() ? m->obj_cache.crbegin()->first.getObj() : 0;
+    auto max_xref = !m->xref_table.empty() ? m->xref_table.crbegin()->first.getObj() : 0;
+    auto max_obj = !m->obj_cache.empty() ? m->obj_cache.crbegin()->first.getObj() : 0;
     auto max_id = std::numeric_limits<int>::max() - 1;
     if (max_obj >= max_id || max_xref >= max_id) {
         // Temporary fix. Long-term solution is

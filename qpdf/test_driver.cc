@@ -1442,7 +1442,7 @@ test_42(QPDF& pdf, char const* arg2)
         assert(i == di.end());
         assert(!i_value.second);
     }
-    assert("" == qtest.getStringValue());
+    assert(qtest.getStringValue().empty());
     array.getArrayItem(-1).assertNull();
     array.getArrayItem(16059).assertNull();
     integer.getArrayItem(0).assertNull();
@@ -3111,7 +3111,7 @@ test_87(QPDF& pdf, char const* arg2)
     assert(dict.getKeys() == std::set<std::string>({"/A"}));
     dict.replaceKey("/A", QPDFObjectHandle::newNull());
     assert(dict.unparse() == "<< >>");
-    assert(dict.getKeys() == std::set<std::string>());
+    assert(dict.getKeys().empty());
     dict = QPDFObjectHandle::newDictionary({
         {"/A", "2"_qpdf},
         {"/B", QPDFObjectHandle::newNull()},

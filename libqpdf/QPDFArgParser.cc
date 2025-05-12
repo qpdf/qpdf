@@ -471,7 +471,7 @@ QPDFArgParser::parseArgs()
             // positional arguments. Besides, it doesn't make sense to have an empty option.
             arg_s = arg;
             size_t equal_pos = std::string::npos;
-            if (arg_s.length() > 0) {
+            if (!arg_s.empty()) {
                 equal_pos = arg_s.find('=', 1);
             }
             if (equal_pos != std::string::npos) {
@@ -686,7 +686,7 @@ QPDFArgParser::addHelpTopic(
         QTC::TC("libtests", "QPDFArgParser add reserved help topic");
         throw std::logic_error("QPDFArgParser: can't register reserved help topic " + topic);
     }
-    if (!((topic.length() > 0) && (topic.at(0) != '-'))) {
+    if (topic.empty() || topic.at(0) == '-') {
         QTC::TC("libtests", "QPDFArgParser bad topic for help");
         throw std::logic_error("QPDFArgParser: help topics must not start with -");
     }

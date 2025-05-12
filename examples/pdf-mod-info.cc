@@ -90,11 +90,11 @@ main(int argc, char* argv[])
         } else if ((!strcmp(argv[i], "--key")) && (++i < argc)) {
             QTC::TC("examples", "pdf-mod-info -key");
             cur_key = argv[i];
-            if (!((cur_key.length() > 0) && (cur_key.at(0) == '/'))) {
+            if (cur_key.empty() || cur_key.at(0) != '/') {
                 cur_key = "/" + cur_key;
             }
             Keys[cur_key] = "";
-        } else if ((!strcmp(argv[i], "--val")) && (++i < argc)) {
+        } else if (!strcmp(argv[i], "--val") && ++i < argc) {
             if (cur_key.empty()) {
                 QTC::TC("examples", "pdf-mod-info usage wrong val");
                 usage();
@@ -115,7 +115,7 @@ main(int argc, char* argv[])
         QTC::TC("examples", "pdf-mod-info in-place");
         fl_out = fl_in;
     }
-    if (Keys.size() == 0) {
+    if (Keys.empty()) {
         QTC::TC("examples", "pdf-mod-info no keys");
         usage();
     }
@@ -141,7 +141,7 @@ main(int argc, char* argv[])
                     filetrailer.replaceKey("/Info", fileinfo);
                 }
             }
-            if (it.second == "") {
+            if (it.second.empty()) {
                 fileinfo.removeKey(it.first);
             } else {
                 QPDFObjectHandle elt = fileinfo.newString(it.second);

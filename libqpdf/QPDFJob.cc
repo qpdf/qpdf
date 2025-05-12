@@ -396,7 +396,7 @@ QPDFJob::parseRotationParameter(std::string const& parameter)
     } else {
         angle_str = parameter;
     }
-    if (angle_str.length() > 0) {
+    if (!angle_str.empty()) {
         char first = angle_str.at(0);
         if ((first == '+') || (first == '-')) {
             relative = ((first == '+') ? 1 : -1);

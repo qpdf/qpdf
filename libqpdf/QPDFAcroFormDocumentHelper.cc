@@ -675,7 +675,7 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
     resources.mergeResources(merge_with, &dr_map);
     // Remove empty subdictionaries
     for (auto iter: resources.ditems()) {
-        if (iter.second.isDictionary() && (iter.second.getKeys().size() == 0)) {
+        if (iter.second.isDictionary() && iter.second.getKeys().empty()) {
             resources.removeKey(iter.first);
         }
     }
