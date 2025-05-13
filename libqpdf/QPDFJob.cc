@@ -561,7 +561,7 @@ QPDFJob::hasWarnings() const
 bool
 QPDFJob::createsOutput() const
 {
-    return ((m->outfilename != nullptr) || m->replace_input);
+    return (!m->outfilename.empty() || m->replace_input);
 }
 
 int
@@ -604,7 +604,7 @@ QPDFJob::checkConfiguration()
 
     if (m->replace_input) {
         // Check for --empty appears later after we have checked m->infilename.
-        if (m->outfilename) {
+        if (!m->outfilename.empty()) {
             usage("--replace-input may not be used when an output file is specified");
         }
         if (m->split_pages) {
@@ -614,10 +614,10 @@ QPDFJob::checkConfiguration()
             usage("--json may not be used with --replace-input");
         }
     }
-    if (m->json_version && !m->outfilename) {
+    if (m->json_version && m->outfilename.empty()) {
         // The output file is optional with --json for backward compatibility and defaults to
         // standard output.
-        m->outfilename = QUtil::make_shared_cstr("-");
+        m->outfilename = "-";
     }
     if (!m->infilename) {
         usage("an input file name is required");
@@ -625,10 +625,10 @@ QPDFJob::checkConfiguration()
     if (m->replace_input && (strlen(m->infilename.get()) == 0)) {
         usage("--replace-input may not be used with --empty");
     }
-    if (m->require_outfile && (m->outfilename == nullptr) && (!m->replace_input)) {
+    if (m->require_outfile && m->outfilename.empty() && !m->replace_input) {
         usage("an output file name is required; use - for standard output");
     }
-    if ((!m->require_outfile) && ((m->outfilename != nullptr) || m->replace_input)) {
+    if (!m->require_outfile && (!m->outfilename.empty() || m->replace_input)) {
         usage("no output file may be given for this option");
     }
     if (m->check_requires_password && m->check_is_encrypted) {
@@ -649,7 +649,7 @@ QPDFJob::checkConfiguration()
     }
 
     bool save_to_stdout = false;
-    if (m->require_outfile && m->outfilename && (strcmp(m->outfilename.get(), "-") == 0)) {
+    if (m->require_outfile && m->outfilename == "-") {
         if (m->split_pages) {
             usage("--split-pages may not be used when writing to standard output");
         }
@@ -661,7 +661,7 @@ QPDFJob::checkConfiguration()
     if (save_to_stdout) {
         m->log->saveToStandardOutput(true);
     }
-    if (!m->split_pages && QUtil::same_file(m->infilename.get(), m->outfilename.get())) {
+    if (!m->split_pages && QUtil::same_file(m->infilename.get(), m->outfilename.data())) {
         QTC::TC("qpdf", "QPDFJob same file error");
         usage(
             "input file and output file are the same; use --replace-input to intentionally "
@@ -2999,7 +2999,8 @@ QPDFJob::setWriterOptions(QPDFWriter& w)
                 std::shared_ptr<QPDFWriter::ProgressReporter>(
                     new QPDFWriter::FunctionProgressReporter(m->progress_handler)));
         } else {
-            char const* outfilename = m->outfilename ? m->outfilename.get() : "standard output";
+            char const* outfilename =
+                !m->outfilename.empty() ? m->outfilename.data() : "standard output";
             w.registerProgressReporter(
                 std::shared_ptr<QPDFWriter::ProgressReporter>(
                     // line-break
@@ -3014,20 +3015,20 @@ QPDFJob::doSplitPages(QPDF& pdf)
     // Generate output file pattern
     std::string before;
     std::string after;
-    size_t len = strlen(m->outfilename.get());
-    char* num_spot = strstr(const_cast<char*>(m->outfilename.get()), "%d");
-    if (num_spot != nullptr) {
+    size_t len = m->outfilename.size();
+    auto num_spot = m->outfilename.find("%d");
+    if (num_spot != std::string::npos) {
         QTC::TC("qpdf", "QPDFJob split-pages %d");
-        before = std::string(m->outfilename.get(), QIntC::to_size(num_spot - m->outfilename.get()));
-        after = num_spot + 2;
+        before = m->outfilename.substr(0, num_spot);
+        after = m->outfilename.substr(num_spot + 2);
     } else if (
-        (len >= 4) && (QUtil::str_compare_nocase(m->outfilename.get() + len - 4, ".pdf") == 0)) {
+        len >= 4 && QUtil::str_compare_nocase(m->outfilename.substr(len - 4).data(), ".pdf") == 0) {
         QTC::TC("qpdf", "QPDFJob split-pages .pdf");
-        before = std::string(m->outfilename.get(), len - 4) + "-";
-        after = m->outfilename.get() + len - 4;
+        before = std::string(m->outfilename.data(), len - 4) + "-";
+        after = m->outfilename.data() + len - 4;
     } else {
         QTC::TC("qpdf", "QPDFJob split-pages other");
-        before = std::string(m->outfilename.get()) + "-";
+        before = m->outfilename + "-";
     }
 
     if (shouldRemoveUnreferencedResources(pdf)) {
@@ -3101,15 +3102,15 @@ QPDFJob::doSplitPages(QPDF& pdf)
 void
 QPDFJob::writeOutfile(QPDF& pdf)
 {
-    std::shared_ptr<char> temp_out;
+    std::string temp_out;
     if (m->replace_input) {
         // Append but don't prepend to the path to generate a temporary name. This saves us from
         // having to split the path by directory and non-directory.
-        temp_out = QUtil::make_shared_cstr(std::string(m->infilename.get()) + ".~qpdf-temp#");
+        temp_out = std::string(m->infilename.get()) + ".~qpdf-temp#";
         // m->outfilename will be restored to 0 before temp_out goes out of scope.
         m->outfilename = temp_out;
-    } else if (strcmp(m->outfilename.get(), "-") == 0) {
-        m->outfilename = nullptr;
+    } else if (m->outfilename == "-") {
+        m->outfilename.clear();
     }
     if (m->json_version) {
         writeJSON(pdf);
@@ -3117,8 +3118,8 @@ QPDFJob::writeOutfile(QPDF& pdf)
         // QPDFWriter must have block scope so the output file will be closed after write()
         // finishes.
         QPDFWriter w(pdf);
-        if (m->outfilename) {
-            w.setOutputFilename(m->outfilename.get());
+        if (!m->outfilename.empty()) {
+            w.setOutputFilename(m->outfilename.data());
         } else {
             // saveToStandardOutput has already been called, but calling it again is defensive and
             // harmless.
@@ -3128,13 +3129,13 @@ QPDFJob::writeOutfile(QPDF& pdf)
         setWriterOptions(w);
         w.write();
     }
-    if (m->outfilename) {
+    if (!m->outfilename.empty()) {
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-            v << prefix << ": wrote file " << m->outfilename.get() << "\n";
+            v << prefix << ": wrote file " << m->outfilename << "\n";
         });
     }
     if (m->replace_input) {
-        m->outfilename = nullptr;
+        m->outfilename.clear();
     }
     if (m->replace_input) {
         // We must close the input before we can rename files
@@ -3145,7 +3146,7 @@ QPDFJob::writeOutfile(QPDF& pdf)
             backup.append(1, '#');
         }
         QUtil::rename_file(m->infilename.get(), backup.c_str());
-        QUtil::rename_file(temp_out.get(), m->infilename.get());
+        QUtil::rename_file(temp_out.data(), m->infilename.get());
         if (warnings) {
             *m->log->getError() << m->message_prefix
                                 << ": there are warnings; original file kept in " << backup << "\n";
@@ -3167,12 +3168,12 @@ QPDFJob::writeJSON(QPDF& pdf)
     // File pipeline must have block scope so it will be closed after write.
     std::shared_ptr<QUtil::FileCloser> fc;
     std::shared_ptr<Pipeline> fp;
-    if (m->outfilename.get()) {
+    if (!m->outfilename.empty()) {
         QTC::TC("qpdf", "QPDFJob write json to file");
         if (m->json_stream_prefix.empty()) {
-            m->json_stream_prefix = m->outfilename.get();
+            m->json_stream_prefix = m->outfilename;
         }
-        fc = std::make_shared<QUtil::FileCloser>(QUtil::safe_fopen(m->outfilename.get(), "w"));
+        fc = std::make_shared<QUtil::FileCloser>(QUtil::safe_fopen(m->outfilename.data(), "w"));
         fp = std::make_shared<Pl_StdioFile>("json output", fc->f);
     } else if ((m->json_stream_data == qpdf_sj_file) && m->json_stream_prefix.empty()) {
         QTC::TC("qpdf", "QPDFJob need json-stream-prefix for stdout");

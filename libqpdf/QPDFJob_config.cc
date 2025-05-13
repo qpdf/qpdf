@@ -42,8 +42,8 @@ QPDFJob::Config::emptyInput()
 QPDFJob::Config*
 QPDFJob::Config::outputFile(std::string const& filename)
 {
-    if ((o.m->outfilename == nullptr) && (!o.m->replace_input)) {
-        o.m->outfilename = QUtil::make_shared_cstr(filename);
+    if (o.m->outfilename.empty() && !o.m->replace_input) {
+        o.m->outfilename = filename;
     } else {
         usage("output file has already been given");
     }
@@ -53,7 +53,7 @@ QPDFJob::Config::outputFile(std::string const& filename)
 QPDFJob::Config*
 QPDFJob::Config::replaceInput()
 {
-    if ((o.m->outfilename == nullptr) && (!o.m->replace_input)) {
+    if (o.m->outfilename.empty() && !o.m->replace_input) {
         o.m->replace_input = true;
     } else {
         usage("replace-input can't be used since output file has already been given");
