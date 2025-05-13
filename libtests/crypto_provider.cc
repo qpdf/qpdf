@@ -47,7 +47,7 @@ class Potato: public QPDFCryptoImpl
     std::string
     SHA2_digest() override
     {
-        return std::string();
+        return {};
     }
     void
     RC4_init(const unsigned char* key_data, int key_len) override

@@ -2285,7 +2285,7 @@ QPDFWriter::write()
 QPDFObjGen
 QPDFWriter::getRenumberedObjGen(QPDFObjGen og)
 {
-    return QPDFObjGen(m->obj[og].renumber, 0);
+    return {m->obj[og].renumber, 0};
 }
 
 std::map<QPDFObjGen, QPDFXRefEntry>

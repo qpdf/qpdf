@@ -23,7 +23,8 @@ class QPDFCrypto_native final: public QPDFCryptoImpl
     void MD5_digest(MD5_Digest) final;
 
     void RC4_init(unsigned char const* key_data, int key_len = -1) final;
-    void RC4_process(unsigned char const* in_data, size_t len, unsigned char* out_data = 0) final;
+    void
+    RC4_process(unsigned char const* in_data, size_t len, unsigned char* out_data = nullptr) final;
     void RC4_finalize() final;
 
     void SHA2_init(int bits) final;

@@ -1807,7 +1807,7 @@ QPDF::nextObjGen()
     if (max_objid == std::numeric_limits<int>::max()) {
         throw std::range_error("max object id is too high to create new objects");
     }
-    return QPDFObjGen(max_objid + 1, 0);
+    return {max_objid + 1, 0};
 }
 
 QPDFObjectHandle
