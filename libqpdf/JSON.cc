@@ -494,11 +494,7 @@ JSON::checkSchemaInternal(
         auto pattern_schema = sch_dict->members[pattern_key].m->value.get();
         for (auto const& [key, val]: this_dict->members) {
             checkSchemaInternal(
-                val.m->value.get(),
-                pattern_schema,
-                flags,
-                errors,
-                prefix + "." + key);
+                val.m->value.get(), pattern_schema, flags, errors, prefix + "." + key);
         }
     } else if (sch_dict) {
         for (auto& [key, val]: sch_dict->members) {

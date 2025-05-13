@@ -702,17 +702,17 @@ QPDF::interpretCF(std::shared_ptr<EncryptionParameters> encp, QPDFObjectHandle c
 {
     if (cf.isName()) {
         std::string filter = cf.getName();
-        if (encp->crypt_filters.count(filter) != 0) {
-            return encp->crypt_filters[filter];
-        } else if (filter == "/Identity") {
-            return e_none;
-        } else {
-            return e_unknown;
+        auto it = encp->crypt_filters.find(filter);
+        if (it != encp->crypt_filters.end()) {
+            return it->second;
         }
-    } else {
-        // Default: /Identity
-        return e_none;
+        if (filter == "/Identity") {
+            return e_none;
+        }
+        return e_unknown;
     }
+    // Default: /Identity
+    return e_none;
 }
 
 void
