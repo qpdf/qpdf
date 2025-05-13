@@ -440,7 +440,7 @@ QPDFJob::createQPDF()
     checkConfiguration();
     std::unique_ptr<QPDF> pdf_sp;
     try {
-        processFile(pdf_sp, m->infilename.data(), m->password.get(), true, true);
+        processFile(pdf_sp, m->infilename.data(), m->password.data(), true, true);
     } catch (QPDFExc& e) {
         if (e.getErrorCode() == qpdf_e_password) {
             // Allow certain operations to work when an incorrect password is supplied.
@@ -2471,10 +2471,10 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             // different QPDF objects to the same underlying file with the same path to achieve the
             // same effect.
             char const* password = page_spec.password.get();
-            if ((!m->encryption_file.empty()) && (password == nullptr) &&
-                (page_spec.filename == m->encryption_file)) {
+            if (!m->encryption_file.empty() && password == nullptr &&
+                page_spec.filename == m->encryption_file) {
                 QTC::TC("qpdf", "QPDFJob pages encryption password");
-                password = m->encryption_file_password.get();
+                password = m->encryption_file_password.data();
             }
             doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                 v << prefix << ": processing " << page_spec.filename << "\n";
@@ -2962,8 +2962,8 @@ QPDFJob::setWriterOptions(QPDFWriter& w)
         std::unique_ptr<QPDF> encryption_pdf;
         processFile(
             encryption_pdf,
-            m->encryption_file.c_str(),
-            m->encryption_file_password.get(),
+            m->encryption_file.data(),
+            m->encryption_file_password.data(),
             false,
             false);
         w.copyEncryptionParameters(*encryption_pdf);
