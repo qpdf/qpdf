@@ -1389,6 +1389,167 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
     // mismatch is a bug in qpdf. This helps to enforce our policy of consistently providing a known
     // structure where every documented key will always be present, which makes it easier to consume
     // our JSON. This is discussed in more depth in the manual.
+
+    static constexpr const char* objects_schema_v1 = R"({
+      "<n n R|trailer>": "json representation of object"
+    })";
+
+    static constexpr const char* objectinfo_schema_v1 = R"({
+      "<object-id>": {
+        "stream": {
+          "filter": "if stream, its filters, otherwise null",
+          "is": "whether the object is a stream",
+          "length": "if stream, its length, otherwise null"
+        }
+      }
+    })";
+
+    static constexpr const char* qpdf_schema = R"([{
+      "jsonversion": "numeric JSON version",
+      "pdfversion": "PDF version as x.y",
+      "pushedinheritedpageresources": "whether inherited attributes were pushed to the page level",
+      "calledgetallpages": "whether getAllPages was called",
+      "maxobjectid": "highest object ID in output, ignored on input"
+    },
+    {
+      "<obj:n n R|trailer>": "json representation of object"
+    }])";
+
+    static constexpr const char* pages_schema = R"([
+      {
+        "contents": [
+          "reference to each content stream"
+        ],
+        "images": [
+          {
+            "bitspercomponent": "bits per component",
+            "colorspace": "color space",
+            "decodeparms": [
+              "decode parameters for image data"
+            ],
+            "filter": [
+              "filters applied to image data"
+            ],
+            "filterable": "whether image data can be decoded using the decode level qpdf was invoked with",
+            "height": "image height",
+            "name": "name of image in XObject table",
+            "object": "reference to image stream",
+            "width": "image width"
+          }
+        ],
+        "label": "page label dictionary, or null if none",
+        "object": "reference to original page object",
+        "outlines": [
+          {
+            "dest": "outline destination dictionary",
+            "object": "reference to outline that targets this page",
+            "title": "outline title"
+          }
+        ],
+        "pageposfrom1": "position of page in document numbering from 1"
+      }
+    ])";
+
+    static constexpr const char* pagelabels_schema = R"([
+      {
+        "index": "starting page position starting from zero",
+        "label": "page label dictionary"
+      }
+    ])";
+
+    static constexpr const char* outlines_schema = R"([
+      {
+        "dest": "outline destination dictionary",
+        "destpageposfrom1": "position of destination page in document numbered from 1; null if not known",
+        "kids": "array of descendent outlines",
+        "object": "reference to this outline",
+        "open": "whether the outline is displayed expanded",
+        "title": "outline title"
+      }
+    ])";
+
+    static constexpr const char* acroform_schema = R"({
+      "fields": [
+        {
+          "alternativename": "alternative name of field -- this is the one usually shown to users",
+          "annotation": {
+            "annotationflags": "annotation flags from /F -- see pdf_annotation_flag_e in qpdf/Constants.h",
+            "appearancestate": "appearance state -- can be used to determine value for checkboxes and radio buttons",
+            "object": "reference to the annotation object"
+          },
+          "choices": "for choices fields, the list of choices presented to the user",
+          "defaultvalue": "default value of field",
+          "fieldflags": "form field flags from /Ff -- see pdf_form_field_flag_e in qpdf/Constants.h",
+          "fieldtype": "field type",
+          "fullname": "full name of field",
+          "ischeckbox": "whether field is a checkbox",
+          "ischoice": "whether field is a list, combo, or dropdown",
+          "isradiobutton": "whether field is a radio button -- buttons in a single group share a parent",
+          "istext": "whether field is a text field",
+          "mappingname": "mapping name of field",
+          "object": "reference to this form field",
+          "pageposfrom1": "position of containing page numbered from 1",
+          "parent": "reference to this field's parent",
+          "partialname": "partial name of field",
+          "quadding": "field quadding -- number indicating left, center, or right",
+          "value": "value of field"
+        }
+      ],
+      "hasacroform": "whether the document has interactive forms",
+      "needappearances": "whether the form fields' appearance streams need to be regenerated"
+    })";
+
+    static constexpr const char* encrypt_schema1 = R"({
+      "capabilities": {
+        "accessibility": "allow extraction for accessibility?",
+        "extract": "allow extraction?",
+        ")";
+
+    static constexpr const char* encrypt_schema2 = R"(": "allow modifying annotations?",
+        "modify": "allow all modifications?",
+        "modifyassembly": "allow modifying document assembly?",
+        "modifyforms": "allow modifying forms?",
+        "modifyother": "allow other modifications?",
+        "printhigh": "allow high resolution printing?",
+        "printlow": "allow low resolution printing?"
+      },
+      "encrypted": "whether the document is encrypted",
+      "ownerpasswordmatched": "whether supplied password matched owner password; always false for non-encrypted files",
+      "recovereduserpassword": "If the owner password was used to recover the user password, reveal user password; otherwise null",
+      "parameters": {
+        "P": "P value from Encrypt dictionary",
+        "R": "R value from Encrypt dictionary",
+        "V": "V value from Encrypt dictionary",
+        "bits": "encryption key bit length",
+        "filemethod": "encryption method for attachments",
+        "key": "encryption key; will be null unless --show-encryption-key was specified",
+        "method": "overall encryption method: none, mixed, RC4, AESv2, AESv3",
+        "streammethod": "encryption method for streams",
+        "stringmethod": "encryption method for string"
+      },
+      "userpasswordmatched": "whether supplied password matched user password; always false for non-encrypted files"
+    })";
+
+    static constexpr const char* attachments_schema = R"({
+      "<attachment-key>": {
+        "filespec": "object containing the file spec",
+        "preferredcontents": "most preferred embedded file stream",
+        "preferredname": "most preferred file name",
+        "description": "description of attachment",
+        "names": {
+          "<name-key>": "file name for key"
+        },
+        "streams": {
+          "<stream-key>": {
+            "creationdate": "ISO-8601 creation date or null",
+            "modificationdate": "ISO-8601 modification date or null",
+            "mimetype": "mime type or null",
+            "checksum": "MD5 checksum or null"
+          }
+        }
+      }
+    })";
+
     JSON schema = JSON::makeDictionary();
     schema.addDictionaryMember(
         "version",
@@ -1408,169 +1569,20 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
     // The list of selectable top-level keys id duplicated in the following places: job.yml,
     // QPDFJob::json_schema, and QPDFJob::doJSON.
     if (json_version == 1) {
-        add_if_want_key("objects", R"({
-  "<n n R|trailer>": "json representation of object"
-})");
-
-        add_if_want_key("objectinfo", R"({
-  "<object-id>": {
-    "stream": {
-      "filter": "if stream, its filters, otherwise null",
-      "is": "whether the object is a stream",
-      "length": "if stream, its length, otherwise null"
-    }
-  }
-})");
-
+        add_if_want_key("objects", objects_schema_v1);
+        add_if_want_key("objectinfo", objectinfo_schema_v1);
     } else {
-        add_if_want_key("qpdf", R"([{
-  "jsonversion": "numeric JSON version",
-  "pdfversion": "PDF version as x.y",
-  "pushedinheritedpageresources": "whether inherited attributes were pushed to the page level",
-  "calledgetallpages": "whether getAllPages was called",
-  "maxobjectid": "highest object ID in output, ignored on input"
-},
-{
-  "<obj:n n R|trailer>": "json representation of object"
-}])");
+        add_if_want_key("qpdf", qpdf_schema);
     }
-    add_if_want_key("pages", R"([
-  {
-    "contents": [
-      "reference to each content stream"
-    ],
-    "images": [
-      {
-        "bitspercomponent": "bits per component",
-        "colorspace": "color space",
-        "decodeparms": [
-          "decode parameters for image data"
-        ],
-        "filter": [
-          "filters applied to image data"
-        ],
-        "filterable": "whether image data can be decoded using the decode level qpdf was invoked with",
-        "height": "image height",
-        "name": "name of image in XObject table",
-        "object": "reference to image stream",
-        "width": "image width"
-      }
-    ],
-    "label": "page label dictionary, or null if none",
-    "object": "reference to original page object",
-    "outlines": [
-      {
-        "dest": "outline destination dictionary",
-        "object": "reference to outline that targets this page",
-        "title": "outline title"
-      }
-    ],
-    "pageposfrom1": "position of page in document numbering from 1"
-  }
-])");
-
-    add_if_want_key("pagelabels", R"([
-  {
-    "index": "starting page position starting from zero",
-    "label": "page label dictionary"
-  }
-])");
-
-    add_if_want_key("outlines", R"([
-  {
-    "dest": "outline destination dictionary",
-    "destpageposfrom1": "position of destination page in document numbered from 1; null if not known",
-    "kids": "array of descendent outlines",
-    "object": "reference to this outline",
-    "open": "whether the outline is displayed expanded",
-    "title": "outline title"
-  }
-])");
-
-    add_if_want_key("acroform", R"({
-  "fields": [
-    {
-      "alternativename": "alternative name of field -- this is the one usually shown to users",
-      "annotation": {
-        "annotationflags": "annotation flags from /F -- see pdf_annotation_flag_e in qpdf/Constants.h",
-        "appearancestate": "appearance state -- can be used to determine value for checkboxes and radio buttons",
-        "object": "reference to the annotation object"
-      },
-      "choices": "for choices fields, the list of choices presented to the user",
-      "defaultvalue": "default value of field",
-      "fieldflags": "form field flags from /Ff -- see pdf_form_field_flag_e in qpdf/Constants.h",
-      "fieldtype": "field type",
-      "fullname": "full name of field",
-      "ischeckbox": "whether field is a checkbox",
-      "ischoice": "whether field is a list, combo, or dropdown",
-      "isradiobutton": "whether field is a radio button -- buttons in a single group share a parent",
-      "istext": "whether field is a text field",
-      "mappingname": "mapping name of field",
-      "object": "reference to this form field",
-      "pageposfrom1": "position of containing page numbered from 1",
-      "parent": "reference to this field's parent",
-      "partialname": "partial name of field",
-      "quadding": "field quadding -- number indicating left, center, or right",
-      "value": "value of field"
-    }
-  ],
-  "hasacroform": "whether the document has interactive forms",
-  "needappearances": "whether the form fields' appearance streams need to be regenerated"
-})");
+    add_if_want_key("pages", pages_schema);
+    add_if_want_key("pagelabels", pagelabels_schema);
+    add_if_want_key("outlines", outlines_schema);
+    add_if_want_key("acroform", acroform_schema);
 
     std::string MODIFY_ANNOTATIONS =
         (json_version == 1 ? "moddifyannotations" : "modifyannotations");
-    add_if_want_key(
-        "encrypt",
-        R"({
-  "capabilities": {
-    "accessibility": "allow extraction for accessibility?",
-    "extract": "allow extraction?",
-    ")" + MODIFY_ANNOTATIONS +
-            R"(": "allow modifying annotations?",
-    "modify": "allow all modifications?",
-    "modifyassembly": "allow modifying document assembly?",
-    "modifyforms": "allow modifying forms?",
-    "modifyother": "allow other modifications?",
-    "printhigh": "allow high resolution printing?",
-    "printlow": "allow low resolution printing?"
-  },
-  "encrypted": "whether the document is encrypted",
-  "ownerpasswordmatched": "whether supplied password matched owner password; always false for non-encrypted files",
-  "recovereduserpassword": "If the owner password was used to recover the user password, reveal user password; otherwise null",
-  "parameters": {
-    "P": "P value from Encrypt dictionary",
-    "R": "R value from Encrypt dictionary",
-    "V": "V value from Encrypt dictionary",
-    "bits": "encryption key bit length",
-    "filemethod": "encryption method for attachments",
-    "key": "encryption key; will be null unless --show-encryption-key was specified",
-    "method": "overall encryption method: none, mixed, RC4, AESv2, AESv3",
-    "streammethod": "encryption method for streams",
-    "stringmethod": "encryption method for string"
-  },
-  "userpasswordmatched": "whether supplied password matched user password; always false for non-encrypted files"
-})");
-
-    add_if_want_key("attachments", R"({
-  "<attachment-key>": {
-    "filespec": "object containing the file spec",
-    "preferredcontents": "most preferred embedded file stream",
-    "preferredname": "most preferred file name",
-    "description": "description of attachment",
-    "names": {
-      "<name-key>": "file name for key"
-    },
-    "streams": {
-      "<stream-key>": {
-        "creationdate": "ISO-8601 creation date or null",
-        "modificationdate": "ISO-8601 modification date or null",
-        "mimetype": "mime type or null",
-        "checksum": "MD5 checksum or null"
-      }
-    }
-  }
-})");
+    add_if_want_key("encrypt", encrypt_schema1 + MODIFY_ANNOTATIONS + encrypt_schema2);
+    add_if_want_key("attachments", attachments_schema);
 
     return schema;
 }
