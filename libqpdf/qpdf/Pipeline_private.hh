@@ -4,6 +4,7 @@
 #include <qpdf/Pipeline.hh>
 
 #include <qpdf/Pl_Flate.hh>
+#include <qpdf/Types.h>
 
 namespace qpdf::pl
 {
