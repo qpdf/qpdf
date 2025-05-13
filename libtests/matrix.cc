@@ -9,7 +9,7 @@ check(QPDFMatrix const& m, std::string const& exp)
 {
     std::string u = m.unparse();
     if (u != exp) {
-        std::cout << "got " << u << ", wanted " << exp << std::endl;
+        std::cout << "got " << u << ", wanted " << exp << '\n';
     }
 }
 
@@ -18,7 +18,7 @@ check_xy(double x, double y, std::string const& exp)
 {
     std::string u = (QUtil::double_to_string(x, 2) + " " + QUtil::double_to_string(y, 2));
     if (u != exp) {
-        std::cout << "got " << u << ", wanted " << exp << std::endl;
+        std::cout << "got " << u << ", wanted " << exp << '\n';
     }
 }
 
@@ -32,7 +32,7 @@ check_rect(QPDFObjectHandle::Rectangle const& r, double llx, double lly, double 
         (QUtil::double_to_string(llx, 2) + " " + QUtil::double_to_string(lly, 2) + " " +
          QUtil::double_to_string(urx, 2) + " " + QUtil::double_to_string(ury, 2));
     if (actual != wanted) {
-        std::cout << "got " << actual << ", wanted " << wanted << std::endl;
+        std::cout << "got " << actual << ", wanted " << wanted << '\n';
     }
 }
 
@@ -78,6 +78,6 @@ main()
     m.translate(200, -100);
     check_rect(m.transformRectangle(QPDFObjectHandle::Rectangle(10, 20, 30, 50)), 50, 210, 80, 230);
 
-    std::cout << "matrix tests done" << std::endl;
+    std::cout << "matrix tests done" << '\n';
     return 0;
 }

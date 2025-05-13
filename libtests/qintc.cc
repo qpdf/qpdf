@@ -18,7 +18,7 @@ try_convert_real(char const* description, bool exp_pass, To (*fn)(From const&), 
         std::cout << description << ": " << e.what();
         passed = false;
     }
-    std::cout << ((passed == exp_pass) ? " PASSED" : " FAILED") << std::endl;
+    std::cout << ((passed == exp_pass) ? " PASSED" : " FAILED") << '\n';
 }
 
 #define try_range_check(exp_pass, a, b) try_range_check_real(#a " + " #b, exp_pass, a, b)
@@ -36,7 +36,7 @@ try_range_check_real(char const* description, bool exp_pass, T const& a, T const
         std::cout << description << ": " << e.what();
         passed = false;
     }
-    std::cout << ((passed == exp_pass) ? " PASSED" : " FAILED") << std::endl;
+    std::cout << ((passed == exp_pass) ? " PASSED" : " FAILED") << '\n';
 }
 
 #define try_range_check_subtract(exp_pass, a, b) \
@@ -55,7 +55,7 @@ try_range_check_subtract_real(char const* description, bool exp_pass, T const& a
         std::cout << description << ": " << e.what();
         passed = false;
     }
-    std::cout << ((passed == exp_pass) ? " PASSED" : " FAILED") << std::endl;
+    std::cout << ((passed == exp_pass) ? " PASSED" : " FAILED") << '\n';
 }
 
 int

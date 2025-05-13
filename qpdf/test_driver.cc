@@ -39,7 +39,7 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " n filename1 [arg2]" << std::endl;
+    std::cerr << "Usage: " << whoami << " n filename1 [arg2]" << '\n';
     exit(2);
 }
 
@@ -58,7 +58,7 @@ ExtendNameTree::ExtendNameTree(QPDFObjectHandle o, QPDF& q) :
 
 ExtendNameTree::~ExtendNameTree()
 {
-    std::cout << "~ExtendNameTree called" << std::endl;
+    std::cout << "~ExtendNameTree called" << '\n';
 }
 
 class Provider: public QPDFObjectHandle::StreamDataProvider
@@ -104,30 +104,30 @@ class ParserCallbacks: public QPDFObjectHandle::ParserCallbacks
 void
 ParserCallbacks::contentSize(size_t size)
 {
-    std::cout << "content size: " << size << std::endl;
+    std::cout << "content size: " << size << '\n';
 }
 
 void
 ParserCallbacks::handleObject(QPDFObjectHandle obj, size_t offset, size_t length)
 {
     if (obj.isName() && (obj.getName() == "/Abort")) {
-        std::cout << "test suite: terminating parsing" << std::endl;
+        std::cout << "test suite: terminating parsing" << '\n';
         terminateParsing();
     }
     std::cout << obj.getTypeName() << ", offset=" << offset << ", length=" << length << ": ";
     if (obj.isInlineImage()) {
         // Exercise getTypeCode
         assert(obj.getTypeCode() == ::ot_inlineimage);
-        std::cout << QUtil::hex_encode(obj.getInlineImageValue()) << std::endl;
+        std::cout << QUtil::hex_encode(obj.getInlineImageValue()) << '\n';
     } else {
-        std::cout << obj.unparse() << std::endl;
+        std::cout << obj.unparse() << '\n';
     }
 }
 
 void
 ParserCallbacks::handleEOF()
 {
-    std::cout << "-EOF-" << std::endl;
+    std::cout << "-EOF-" << '\n';
 }
 
 class TokenFilter: public QPDFObjectHandle::TokenFilter
@@ -165,7 +165,7 @@ checkPageContents(QPDFObjectHandle page, std::string const& wanted_string)
 {
     std::string contents = getPageContents(page);
     if (contents.find(wanted_string) == std::string::npos) {
-        std::cout << "didn't find " << wanted_string << " in " << contents << std::endl;
+        std::cout << "didn't find " << wanted_string << " in " << contents << '\n';
     }
 }
 
@@ -207,77 +207,77 @@ test_0_1(QPDF& pdf, char const* arg2)
         // any difference between a key that is present and null
         // and a key that is absent.
         QTC::TC("qpdf", "main QTest implicit");
-        std::cout << "/QTest is implicit" << std::endl;
+        std::cout << "/QTest is implicit" << '\n';
     }
 
     QTC::TC("qpdf", "main QTest indirect", qtest.isIndirect() ? 1 : 0);
     std::cout << "/QTest is " << (qtest.isIndirect() ? "in" : "") << "direct and has type "
-              << qtest.getTypeName() << " (" << qtest.getTypeCode() << ")" << std::endl;
+              << qtest.getTypeName() << " (" << qtest.getTypeCode() << ")" << '\n';
 
     if (qtest.isNull()) {
         QTC::TC("qpdf", "main QTest null");
-        std::cout << "/QTest is null" << std::endl;
+        std::cout << "/QTest is null" << '\n';
     } else if (qtest.isBool()) {
         QTC::TC("qpdf", "main QTest bool", qtest.getBoolValue() ? 1 : 0);
         std::cout << "/QTest is Boolean with value " << (qtest.getBoolValue() ? "true" : "false")
-                  << std::endl;
+                  << '\n';
     } else if (qtest.isInteger()) {
         QTC::TC("qpdf", "main QTest int");
-        std::cout << "/QTest is an integer with value " << qtest.getIntValue() << std::endl;
+        std::cout << "/QTest is an integer with value " << qtest.getIntValue() << '\n';
     } else if (qtest.isReal()) {
         QTC::TC("qpdf", "main QTest real");
-        std::cout << "/QTest is a real number with value " << qtest.getRealValue() << std::endl;
+        std::cout << "/QTest is a real number with value " << qtest.getRealValue() << '\n';
     } else if (qtest.isName()) {
         QTC::TC("qpdf", "main QTest name");
-        std::cout << "/QTest is a name with value " << qtest.getName() << std::endl;
+        std::cout << "/QTest is a name with value " << qtest.getName() << '\n';
     } else if (qtest.isString()) {
         QTC::TC("qpdf", "main QTest string");
-        std::cout << "/QTest is a string with value " << qtest.getStringValue() << std::endl;
+        std::cout << "/QTest is a string with value " << qtest.getStringValue() << '\n';
     } else if (qtest.isArray()) {
         QTC::TC("qpdf", "main QTest array");
-        std::cout << "/QTest is an array with " << qtest.getArrayNItems() << " items" << std::endl;
+        std::cout << "/QTest is an array with " << qtest.getArrayNItems() << " items" << '\n';
         int i = 0;
         for (auto& iter: qtest.aitems()) {
             QTC::TC("qpdf", "main QTest array indirect", iter.isIndirect() ? 1 : 0);
             std::cout << "  item " << i << " is " << (iter.isIndirect() ? "in" : "") << "direct"
-                      << std::endl;
+                      << '\n';
             ++i;
         }
     } else if (qtest.isDictionary()) {
         QTC::TC("qpdf", "main QTest dictionary");
-        std::cout << "/QTest is a dictionary" << std::endl;
+        std::cout << "/QTest is a dictionary" << '\n';
         for (auto& iter: qtest.ditems()) {
             QTC::TC("qpdf", "main QTest dictionary indirect", iter.second.isIndirect() ? 1 : 0);
             std::cout << "  " << iter.first << " is " << (iter.second.isIndirect() ? "in" : "")
-                      << "direct" << std::endl;
+                      << "direct" << '\n';
         }
     } else if (qtest.isStream()) {
         QTC::TC("qpdf", "main QTest stream");
-        std::cout << "/QTest is a stream.  Dictionary: " << qtest.getDict().unparse() << std::endl;
+        std::cout << "/QTest is a stream.  Dictionary: " << qtest.getDict().unparse() << '\n';
 
-        std::cout << "Raw stream data:" << std::endl;
+        std::cout << "Raw stream data:" << '\n';
         std::cout.flush();
         QUtil::binary_stdout();
         auto out = std::make_shared<Pl_StdioFile>("raw", stdout);
         qtest.pipeStreamData(out.get(), 0, qpdf_dl_none);
 
-        std::cout << std::endl << "Uncompressed stream data:" << std::endl;
+        std::cout << '\n' << "Uncompressed stream data:" << '\n';
         if (qtest.pipeStreamData(nullptr, 0, qpdf_dl_all)) {
             std::cout.flush();
             QUtil::binary_stdout();
             out = std::make_shared<Pl_StdioFile>("filtered", stdout);
             qtest.pipeStreamData(out.get(), 0, qpdf_dl_all);
-            std::cout << std::endl << "End of stream data" << std::endl;
+            std::cout << '\n' << "End of stream data" << '\n';
         } else {
-            std::cout << "Stream data is not filterable." << std::endl;
+            std::cout << "Stream data is not filterable." << '\n';
         }
     } else {
         // Should not happen!
-        std::cout << "/QTest is an unknown object" << std::endl;
+        std::cout << "/QTest is an unknown object" << '\n';
     }
 
-    std::cout << "unparse: " << qtest.unparse() << std::endl
-              << "unparseResolved: " << qtest.unparseResolved() << std::endl;
+    std::cout << "unparse: " << qtest.unparse() << '\n'
+              << "unparseResolved: " << qtest.unparseResolved() << '\n';
 }
 
 static void
@@ -287,12 +287,12 @@ test_2(QPDF& pdf, char const* arg2)
     // PDF file.
 
     QPDFObjectHandle trailer = pdf.getTrailer();
-    std::cout << trailer.getKey("/Info").getKey("/CreationDate").getStringValue() << std::endl;
-    std::cout << trailer.getKey("/Info").getKey("/Producer").getStringValue() << std::endl;
+    std::cout << trailer.getKey("/Info").getKey("/CreationDate").getStringValue() << '\n';
+    std::cout << trailer.getKey("/Info").getKey("/Producer").getStringValue() << '\n';
 
     QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
-    std::cout << encrypt.getKey("/O").unparse() << std::endl;
-    std::cout << encrypt.getKey("/U").unparse() << std::endl;
+    std::cout << encrypt.getKey("/O").unparse() << '\n';
+    std::cout << encrypt.getKey("/U").unparse() << '\n';
 
     QPDFObjectHandle root = pdf.getRoot();
     QPDFObjectHandle pages = root.getKey("/Pages");
@@ -310,7 +310,7 @@ test_3(QPDF& pdf, char const* arg2)
     QPDFObjectHandle streams = pdf.getTrailer().getKey("/QStreams");
     for (int i = 0; i < streams.getArrayNItems(); ++i) {
         QPDFObjectHandle stream = streams.getArrayItem(i);
-        std::cout << "-- stream " << i << " --" << std::endl;
+        std::cout << "-- stream " << i << " --" << '\n';
         std::cout.flush();
         QUtil::binary_stdout();
         auto out = std::make_shared<Pl_StdioFile>("tokenized stream", stdout);
@@ -374,44 +374,44 @@ test_5(QPDF& pdf, char const* arg2)
     int pageno = 0;
     for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
         ++pageno;
-        std::cout << "page " << pageno << ":" << std::endl;
-        std::cout << "  images:" << std::endl;
+        std::cout << "page " << pageno << ":" << '\n';
+        std::cout << "  images:" << '\n';
         for (auto const& iter2: page.getImages()) {
             std::string const& name = iter2.first;
             QPDFObjectHandle image = iter2.second;
             QPDFObjectHandle dict = image.getDict();
             long long width = dict.getKey("/Width").getIntValue();
             long long height = dict.getKey("/Height").getIntValue();
-            std::cout << "    " << name << ": " << width << " x " << height << std::endl;
+            std::cout << "    " << name << ": " << width << " x " << height << '\n';
         }
 
-        std::cout << "  content:" << std::endl;
+        std::cout << "  content:" << '\n';
         std::vector<QPDFObjectHandle> content = page.getPageContents();
         for (auto& iter2: content) {
-            std::cout << "    " << iter2.unparse() << std::endl;
+            std::cout << "    " << iter2.unparse() << '\n';
         }
 
-        std::cout << "end page " << pageno << std::endl;
+        std::cout << "end page " << pageno << '\n';
     }
 
     QPDFObjectHandle root = pdf.getRoot();
     QPDFObjectHandle qstrings = root.getKey("/QStrings");
     if (qstrings.isArray()) {
-        std::cout << "QStrings:" << std::endl;
+        std::cout << "QStrings:" << '\n';
         int nitems = qstrings.getArrayNItems();
         for (int i = 0; i < nitems; ++i) {
-            std::cout << qstrings.getArrayItem(i).getUTF8Value() << std::endl;
+            std::cout << qstrings.getArrayItem(i).getUTF8Value() << '\n';
         }
     }
 
     QPDFObjectHandle qnumbers = root.getKey("/QNumbers");
     if (qnumbers.isArray()) {
-        std::cout << "QNumbers:" << std::endl;
+        std::cout << "QNumbers:" << '\n';
         int nitems = qnumbers.getArrayNItems();
         for (int i = 0; i < nitems; ++i) {
             std::cout << QUtil::double_to_string(
                              qnumbers.getArrayItem(i).getNumericValue(), 3, false)
-                      << std::endl;
+                      << '\n';
         }
     }
 }
@@ -432,7 +432,7 @@ test_6(QPDF& pdf, char const* arg2)
         cleartext = true;
     }
     std::cout << "encrypted=" << (pdf.isEncrypted() ? 1 : 0)
-              << "; cleartext=" << (cleartext ? 1 : 0) << std::endl;
+              << "; cleartext=" << (cleartext ? 1 : 0) << '\n';
 }
 
 static void
@@ -483,9 +483,9 @@ test_8(QPDF& pdf, char const* arg2)
     provider->badLength(true);
     try {
         qstream.getStreamData();
-        std::cout << "oops -- getStreamData didn't throw" << std::endl;
+        std::cout << "oops -- getStreamData didn't throw" << '\n';
     } catch (std::exception const& e) {
-        std::cout << "exception: " << e.what() << std::endl;
+        std::cout << "exception: " << e.what() << '\n';
     }
 }
 
@@ -501,9 +501,9 @@ test_9(QPDF& pdf, char const* arg2)
     QPDFObjectHandle rstream = QPDFObjectHandle::newStream(&pdf);
     try {
         rstream.getStreamData();
-        std::cout << "oops -- getStreamData didn't throw" << std::endl;
+        std::cout << "oops -- getStreamData didn't throw" << '\n';
     } catch (std::logic_error const& e) {
-        std::cout << "exception: " << e.what() << std::endl;
+        std::cout << "exception: " << e.what() << '\n';
     }
     rstream.replaceStreamData(
         "data for other stream\n", QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
@@ -539,10 +539,10 @@ test_11(QPDF& pdf, char const* arg2)
     std::shared_ptr<Buffer> b1 = qstream.getStreamData();
     std::shared_ptr<Buffer> b2 = qstream.getRawStreamData();
     if ((b1->getSize() == 7) && (memcmp(b1->getBuffer(), "potato\n", 7) == 0)) {
-        std::cout << "filtered stream data okay" << std::endl;
+        std::cout << "filtered stream data okay" << '\n';
     }
     if ((b2->getSize() == 15) && (memcmp(b2->getBuffer(), "706F7461746F0A\n", 15) == 0)) {
-        std::cout << "raw stream data okay" << std::endl;
+        std::cout << "raw stream data okay" << '\n';
     }
 }
 
@@ -580,9 +580,7 @@ test_13(QPDF& pdf, char const* arg2)
 # pragma GCC diagnostic pop
 #endif
     pdf.showLinearizationData();
-    std::cout << "---output---" << std::endl
-              << out.str() << "---error---" << std::endl
-              << err.str();
+    std::cout << "---output---" << '\n' << out.str() << "---error---" << '\n' << err.str();
 }
 
 static void
@@ -614,27 +612,27 @@ test_14(QPDF& pdf, char const* arg2)
         // Do it wrong first...
         pdf.replaceObject(qdict.getObjGen(), qdict);
     } catch (std::logic_error const&) {
-        std::cout << "caught logic error as expected" << std::endl;
+        std::cout << "caught logic error as expected" << '\n';
     }
     pdf.replaceObject(qdict.getObjGen(), new_dict);
     // Now qdict points to the new dictionary
-    std::cout << "old dict: " << qdict.getKey("/NewDict").getIntValue() << std::endl;
+    std::cout << "old dict: " << qdict.getKey("/NewDict").getIntValue() << '\n';
     // Swap dict and array
     pdf.swapObjects(qdict.getObjGen(), qarray.getObjGen());
     // Now qarray will resolve to new object and qdict resolves to
     // the array
-    std::cout << "swapped array: " << qdict.getArrayItem(0).getName() << std::endl;
-    std::cout << "new dict: " << qarray.getKey("/NewDict").getIntValue() << std::endl;
+    std::cout << "swapped array: " << qdict.getArrayItem(0).getName() << '\n';
+    std::cout << "new dict: " << qarray.getKey("/NewDict").getIntValue() << '\n';
     // Reread qdict, still pointing to an array
     qdict = pdf.getObjectByObjGen(qdict.getObjGen());
-    std::cout << "swapped array: " << qdict.getArrayItem(0).getName() << std::endl;
+    std::cout << "swapped array: " << qdict.getArrayItem(0).getName() << '\n';
 
     // Exercise getAsMap and getAsArray
     std::vector<QPDFObjectHandle> array_elements = qdict.getArrayAsVector();
     std::map<std::string, QPDFObjectHandle> dict_items = qarray.getDictAsMap();
     if ((array_elements.size() == 1) && (array_elements.at(0).getName() == "/Array") &&
         (dict_items.size() == 1) && (dict_items["/NewDict"].getIntValue() == 2)) {
-        std::cout << "array and dictionary contents are correct" << std::endl;
+        std::cout << "array and dictionary contents are correct" << '\n';
     }
 
     // Exercise writing to memory buffer
@@ -853,7 +851,7 @@ test_21(QPDF& pdf, char const* arg2)
     QPDFObjectHandle page = pages.at(0);
     QPDFObjectHandle contents = page.getKey("/Contents");
     contents.shallowCopy();
-    std::cout << "you can't see this" << std::endl;
+    std::cout << "you can't see this" << '\n';
 }
 
 static void
@@ -865,7 +863,7 @@ test_22(QPDF& pdf, char const* arg2)
     QPDFPageObjectHelper& page = pages.at(0);
     dh.removePage(page);
     dh.removePage(page);
-    std::cout << "you can't see this" << std::endl;
+    std::cout << "you can't see this" << '\n';
 }
 
 static void
@@ -895,44 +893,44 @@ test_24(QPDF& pdf, char const* arg2)
     // Make sure trying to ask questions about a reserved object
     // doesn't break it.
     if (res1.isArray()) {
-        std::cout << "oops -- res1 is an array" << std::endl;
+        std::cout << "oops -- res1 is an array" << '\n';
     }
     if (res1.isReserved()) {
-        std::cout << "res1 is still reserved after checking if array" << std::endl;
+        std::cout << "res1 is still reserved after checking if array" << '\n';
     }
     pdf.replaceReserved(res1, array1);
     if (res1.isReserved()) {
-        std::cout << "oops -- res1 is still reserved" << std::endl;
+        std::cout << "oops -- res1 is still reserved" << '\n';
     } else {
-        std::cout << "res1 is no longer reserved" << std::endl;
+        std::cout << "res1 is no longer reserved" << '\n';
     }
     res1.assertArray();
-    std::cout << "res1 is an array" << std::endl;
+    std::cout << "res1 is an array" << '\n';
 
     try {
         res2.unparseResolved();
-        std::cout << "oops -- didn't throw" << std::endl;
+        std::cout << "oops -- didn't throw" << '\n';
     } catch (std::logic_error const& e) {
-        std::cout << "logic error: " << e.what() << std::endl;
+        std::cout << "logic error: " << e.what() << '\n';
     }
     try {
         res2.makeDirect();
-        std::cout << "oops -- didn't throw" << std::endl;
+        std::cout << "oops -- didn't throw" << '\n';
     } catch (std::logic_error const& e) {
-        std::cout << "logic error: " << e.what() << std::endl;
+        std::cout << "logic error: " << e.what() << '\n';
     }
 
     pdf.replaceReserved(res2, array2);
 
     res2.assertArray();
-    std::cout << "res2 is an array" << std::endl;
+    std::cout << "res2 is an array" << '\n';
 
     // Verify that the previously added reserved keys can be
     // dereferenced properly now
     int i1 = res1.getArrayItem(0).getArrayItem(1).getIntValueAsInt();
     int i2 = res2.getArrayItem(0).getArrayItem(1).getIntValueAsInt();
     if ((i1 == 2) && (i2 == 1)) {
-        std::cout << "circular access and lazy resolution worked" << std::endl;
+        std::cout << "circular access and lazy resolution worked" << '\n';
     }
 
     QPDFWriter w(pdf, "a.pdf");
@@ -1078,15 +1076,15 @@ test_28(QPDF& pdf, char const* arg2)
     // Copy foreign object errors
     try {
         pdf.copyForeignObject(pdf.getTrailer().getKey("/QTest"));
-        std::cout << "oops -- didn't throw" << std::endl;
+        std::cout << "oops -- didn't throw" << '\n';
     } catch (std::logic_error const& e) {
-        std::cout << "logic error: " << e.what() << std::endl;
+        std::cout << "logic error: " << e.what() << '\n';
     }
     try {
         pdf.copyForeignObject(QPDFObjectHandle::newInteger(1));
-        std::cout << "oops -- didn't throw" << std::endl;
+        std::cout << "oops -- didn't throw" << '\n';
     } catch (std::logic_error const& e) {
-        std::cout << "logic error: " << e.what() << std::endl;
+        std::cout << "logic error: " << e.what() << '\n';
     }
 }
 
@@ -1111,9 +1109,9 @@ test_29(QPDF& pdf, char const* arg2)
     try {
         QPDFWriter w(*other, "a.pdf");
         w.write();
-        std::cout << "oops -- didn't throw" << std::endl;
+        std::cout << "oops -- didn't throw" << '\n';
     } catch (std::logic_error const& e) {
-        std::cout << "logic error: " << e.what() << std::endl;
+        std::cout << "logic error: " << e.what() << '\n';
     }
 
     // Make sure deleting the other source doesn't prevent detection.
@@ -1126,9 +1124,9 @@ test_29(QPDF& pdf, char const* arg2)
     try {
         QPDFWriter w(*other, "a.pdf");
         w.write();
-        std::cout << "oops -- didn't throw" << std::endl;
+        std::cout << "oops -- didn't throw" << '\n';
     } catch (std::logic_error const& e) {
-        std::cout << "logic error: " << e.what() << std::endl;
+        std::cout << "logic error: " << e.what() << '\n';
     }
 
     // Detect adding a foreign object
@@ -1137,7 +1135,7 @@ test_29(QPDF& pdf, char const* arg2)
     try {
         root1.replaceKey("/Oops", root2);
     } catch (std::logic_error const& e) {
-        std::cout << "logic error: " << e.what() << std::endl;
+        std::cout << "logic error: " << e.what() << '\n';
     }
 }
 
@@ -1160,10 +1158,10 @@ test_30(QPDF& pdf, char const* arg2)
     pages = final.getAllPages();
     std::string new_contents = getPageContents(pages.at(0));
     if (orig_contents != new_contents) {
-        std::cout << "oops -- page contents don't match" << std::endl
+        std::cout << "oops -- page contents don't match" << '\n'
                   << "original:\n"
                   << orig_contents << "new:\n"
-                  << new_contents << std::endl;
+                  << new_contents << '\n';
     }
 }
 
@@ -1172,20 +1170,20 @@ test_31(QPDF& pdf, char const* arg2)
 {
     auto o1 = "[/name 16059 3.14159 false\n"
               " << /key true /other [ (string1) (string2) ] >> null]"_qpdf;
-    std::cout << o1.unparse() << std::endl;
+    std::cout << o1.unparse() << '\n';
     QPDFObjectHandle o2 = QPDFObjectHandle::parse("   12345 \f  ");
     assert(o2.isInteger() && (o2.getIntValue() == 12345));
     try {
         QPDFObjectHandle::parse("[1 0 R]", "indirect test");
-        std::cout << "oops -- didn't throw" << std::endl;
+        std::cout << "oops -- didn't throw" << '\n';
     } catch (std::logic_error const& e) {
-        std::cout << "logic error parsing indirect: " << e.what() << std::endl;
+        std::cout << "logic error parsing indirect: " << e.what() << '\n';
     }
     try {
         QPDFObjectHandle::parse("0 trailing", "trailing test");
-        std::cout << "oops -- didn't throw" << std::endl;
+        std::cout << "oops -- didn't throw" << '\n';
     } catch (std::runtime_error const& e) {
-        std::cout << "trailing data: " << e.what() << std::endl;
+        std::cout << "trailing data: " << e.what() << '\n';
     }
     assert(QPDFObjectHandle::parse(&pdf, "[5 0 R]").getArrayItem(0).isInteger());
     assert(!QPDFObjectHandle::parse(&pdf, "[5 0 R]").getArrayItem(0).isDirectNull());
@@ -1218,9 +1216,9 @@ test_32(QPDF& pdf, char const* arg2)
         bool newline = ((i & 2) != 0);
         QPDFWriter w(pdf, filenames[i]);
         w.setStaticID(true);
-        std::cout << "file: " << filenames[i] << std::endl
-                  << "linearized: " << (linearized ? "yes" : "no") << std::endl
-                  << "newline: " << (newline ? "yes" : "no") << std::endl;
+        std::cout << "file: " << filenames[i] << '\n'
+                  << "linearized: " << (linearized ? "yes" : "no") << '\n'
+                  << "newline: " << (newline ? "yes" : "no") << '\n';
         w.setLinearization(linearized);
         if (linearized) {
             w.setCompressStreams(false); // avoid dependency on zlib's output
@@ -1249,14 +1247,14 @@ static void
 test_34(QPDF& pdf, char const* arg2)
 {
     // Look at Extensions dictionary
-    std::cout << "version: " << pdf.getPDFVersion() << std::endl
-              << "extension level: " << pdf.getExtensionLevel() << std::endl
-              << pdf.getRoot().getKey("/Extensions").unparse() << std::endl;
+    std::cout << "version: " << pdf.getPDFVersion() << '\n'
+              << "extension level: " << pdf.getExtensionLevel() << '\n'
+              << pdf.getRoot().getKey("/Extensions").unparse() << '\n';
     auto v = pdf.getVersionAsPDFVersion();
     std::string v_string;
     int extension_level;
     v.getVersion(v_string, extension_level);
-    std::cout << "As PDFVersion: " << v_string << "/" << extension_level << std::endl;
+    std::cout << "As PDFVersion: " << v_string << "/" << extension_level << '\n';
 }
 
 static void
@@ -1350,7 +1348,7 @@ test_38(QPDF& pdf, char const* arg2)
     // Designed for override-compressed-object.pdf
     QPDFObjectHandle qtest = pdf.getRoot().getKey("/QTest");
     for (int i = 0; i < qtest.getArrayNItems(); ++i) {
-        std::cout << qtest.getArrayItem(i).unparseResolved() << std::endl;
+        std::cout << qtest.getArrayItem(i).unparseResolved() << '\n';
     }
 }
 
@@ -1360,13 +1358,13 @@ test_39(QPDF& pdf, char const* arg2)
     // Display image filter and color set for each image on each page
     int pageno = 0;
     for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
-        std::cout << "page " << ++pageno << std::endl;
+        std::cout << "page " << ++pageno << '\n';
         std::map<std::string, QPDFObjectHandle> images = page.getImages();
         for (auto& i_iter: images) {
             QPDFObjectHandle image_dict = i_iter.second.getDict();
             std::cout << "filter: " << image_dict.getKey("/Filter").unparseResolved()
                       << ", color space: " << image_dict.getKey("/ColorSpace").unparseResolved()
-                      << std::endl;
+                      << '\n';
         }
     }
 }
@@ -1578,51 +1576,51 @@ test_43(QPDF& pdf, char const* arg2)
     }
     std::cout << "iterating over form fields\n";
     for (auto& ffh: afdh.getFormFields()) {
-        std::cout << "Field: " << ffh.getObjectHandle().unparse() << std::endl;
+        std::cout << "Field: " << ffh.getObjectHandle().unparse() << '\n';
         QPDFFormFieldObjectHelper node = ffh;
         while (!node.isNull()) {
             QPDFFormFieldObjectHelper parent(node.getParent());
             std::cout << "  Parent: "
                       << (parent.isNull() ? std::string("none")
                                           : parent.getObjectHandle().unparse())
-                      << std::endl;
+                      << '\n';
             node = parent;
         }
-        std::cout << "  Fully qualified name: " << ffh.getFullyQualifiedName() << std::endl;
-        std::cout << "  Partial name: " << ffh.getPartialName() << std::endl;
-        std::cout << "  Alternative name: " << ffh.getAlternativeName() << std::endl;
-        std::cout << "  Mapping name: " << ffh.getMappingName() << std::endl;
-        std::cout << "  Field type: " << ffh.getFieldType() << std::endl;
-        std::cout << "  Value: " << ffh.getValue().unparse() << std::endl;
-        std::cout << "  Value as string: " << ffh.getValueAsString() << std::endl;
-        std::cout << "  Default value: " << ffh.getDefaultValue().unparse() << std::endl;
-        std::cout << "  Default value as string: " << ffh.getDefaultValueAsString() << std::endl;
-        std::cout << "  Default appearance: " << ffh.getDefaultAppearance() << std::endl;
-        std::cout << "  Quadding: " << ffh.getQuadding() << std::endl;
+        std::cout << "  Fully qualified name: " << ffh.getFullyQualifiedName() << '\n';
+        std::cout << "  Partial name: " << ffh.getPartialName() << '\n';
+        std::cout << "  Alternative name: " << ffh.getAlternativeName() << '\n';
+        std::cout << "  Mapping name: " << ffh.getMappingName() << '\n';
+        std::cout << "  Field type: " << ffh.getFieldType() << '\n';
+        std::cout << "  Value: " << ffh.getValue().unparse() << '\n';
+        std::cout << "  Value as string: " << ffh.getValueAsString() << '\n';
+        std::cout << "  Default value: " << ffh.getDefaultValue().unparse() << '\n';
+        std::cout << "  Default value as string: " << ffh.getDefaultValueAsString() << '\n';
+        std::cout << "  Default appearance: " << ffh.getDefaultAppearance() << '\n';
+        std::cout << "  Quadding: " << ffh.getQuadding() << '\n';
         std::vector<QPDFAnnotationObjectHelper> annotations = afdh.getAnnotationsForField(ffh);
         for (auto& aoh: annotations) {
-            std::cout << "  Annotation: " << aoh.getObjectHandle().unparse() << std::endl;
+            std::cout << "  Annotation: " << aoh.getObjectHandle().unparse() << '\n';
         }
     }
     std::cout << "iterating over annotations per page\n";
     for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
-        std::cout << "Page: " << page.getObjectHandle().unparse() << std::endl;
+        std::cout << "Page: " << page.getObjectHandle().unparse() << '\n';
         for (auto& ah: afdh.getWidgetAnnotationsForPage(page)) {
-            std::cout << "  Annotation: " << ah.getObjectHandle().unparse() << std::endl;
+            std::cout << "  Annotation: " << ah.getObjectHandle().unparse() << '\n';
             std::cout << "    Field: "
-                      << (afdh.getFieldForAnnotation(ah).getObjectHandle().unparse()) << std::endl;
-            std::cout << "    Subtype: " << ah.getSubtype() << std::endl;
+                      << (afdh.getFieldForAnnotation(ah).getObjectHandle().unparse()) << '\n';
+            std::cout << "    Subtype: " << ah.getSubtype() << '\n';
             std::cout << "    Rect: ";
             print_rect(std::cout, ah.getRect());
-            std::cout << std::endl;
+            std::cout << '\n';
             std::string state = ah.getAppearanceState();
             if (!state.empty()) {
-                std::cout << "    Appearance state: " << state << std::endl;
+                std::cout << "    Appearance state: " << state << '\n';
             }
             std::cout << "    Appearance stream (/N): " << ah.getAppearanceStream("/N").unparse()
-                      << std::endl;
+                      << '\n';
             std::cout << "    Appearance stream (/N, /3): "
-                      << ah.getAppearanceStream("/N", "/3").unparse() << std::endl;
+                      << ah.getAppearanceStream("/N", "/3").unparse() << '\n';
         }
     }
 }
@@ -1637,7 +1635,7 @@ test_44(QPDF& pdf, char const* arg2)
             // \xc3\xb7 is utf-8 for U+00F7 (divided by)
             field.setV("3.14 \xc3\xb7 0");
             std::cout << "Set field value: " << field.getFullyQualifiedName() << " -> "
-                      << field.getValueAsString() << std::endl;
+                      << field.getValueAsString() << '\n';
         }
     }
     QPDFWriter w(pdf, "a.pdf");
@@ -1669,11 +1667,11 @@ test_46(QPDF& pdf, char const* arg2)
     QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
     QPDFNumberTreeObjectHelper ntoh(qtest, pdf);
     for (auto& iter: ntoh) {
-        std::cout << iter.first << " " << iter.second.getStringValue() << std::endl;
+        std::cout << iter.first << " " << iter.second.getStringValue() << '\n';
     }
     QPDFNumberTreeObjectHelper::idx_map ntoh_map = ntoh.getAsMap();
     for (auto& iter: ntoh_map) {
-        std::cout << iter.first << " " << iter.second.getStringValue() << std::endl;
+        std::cout << iter.first << " " << iter.second.getStringValue() << '\n';
     }
     assert(1 == ntoh.getMin());
     assert(29 == ntoh.getMax());
@@ -1719,7 +1717,7 @@ test_46(QPDF& pdf, char const* arg2)
     --iter1;
     assert(iter1->first == 2);
 
-    std::cout << "insertAfter" << std::endl;
+    std::cout << "insertAfter" << '\n';
     auto new2 = QPDFNumberTreeObjectHelper::newEmpty(pdf);
     auto iter2 = new2.begin();
     assert(iter2 == new2.end());
@@ -1728,23 +1726,23 @@ test_46(QPDF& pdf, char const* arg2)
     iter2.insertAfter(4, QPDFObjectHandle::newString("4!"));
     assert(iter2->first == 4);
     for (auto& i: new2) {
-        std::cout << i.first << " " << i.second.unparse() << std::endl;
+        std::cout << i.first << " " << i.second.unparse() << '\n';
     }
 
-    std::cout << "/Bad1" << std::endl;
+    std::cout << "/Bad1" << '\n';
     auto bad1 = QPDFNumberTreeObjectHelper(pdf.getTrailer().getKey("/Bad1"), pdf);
     assert(bad1.begin() == bad1.end());
     assert(bad1.last() == bad1.end());
 
-    std::cout << "/Bad2" << std::endl;
+    std::cout << "/Bad2" << '\n';
     auto bad2 = QPDFNumberTreeObjectHelper(pdf.getTrailer().getKey("/Bad2"), pdf);
     for (auto& i: bad2) {
-        std::cout << i.first << " " << i.second.unparse() << std::endl;
+        std::cout << i.first << " " << i.second.unparse() << '\n';
     }
 
     std::vector<std::string> empties = {"/Empty1", "/Empty2"};
     for (auto const& k: empties) {
-        std::cout << k << std::endl;
+        std::cout << k << '\n';
         auto empty = QPDFNumberTreeObjectHelper(pdf.getTrailer().getKey(k), pdf);
         assert(empty.begin() == empty.end());
         assert(empty.last() == empty.end());
@@ -1765,37 +1763,37 @@ test_46(QPDF& pdf, char const* arg2)
         assert(empty.last()->first == 6);
         assert(empty.last()->second.getStringValue() == "6");
     }
-    std::cout << "Insert into invalid" << std::endl;
+    std::cout << "Insert into invalid" << '\n';
     auto invalid1 = QPDFNumberTreeObjectHelper(QPDFObjectHandle::newDictionary(), pdf);
     try {
         invalid1.insert(1, QPDFObjectHandle::newNull());
     } catch (QPDFExc& e) {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
 
-    std::cout << "/Bad3, no repair" << std::endl;
+    std::cout << "/Bad3, no repair" << '\n';
     auto bad3_oh = pdf.getTrailer().getKey("/Bad3");
     auto bad3 = QPDFNumberTreeObjectHelper(bad3_oh, pdf, false);
     for (auto& i: bad3) {
-        std::cout << i.first << " " << i.second.unparse() << std::endl;
+        std::cout << i.first << " " << i.second.unparse() << '\n';
     }
     assert(!bad3_oh.getKey("/Kids").getArrayItem(0).isIndirect());
 
-    std::cout << "/Bad3, repair" << std::endl;
+    std::cout << "/Bad3, repair" << '\n';
     bad3 = QPDFNumberTreeObjectHelper(bad3_oh, pdf, true);
     for (auto& i: bad3) {
-        std::cout << i.first << " " << i.second.unparse() << std::endl;
+        std::cout << i.first << " " << i.second.unparse() << '\n';
     }
     assert(bad3_oh.getKey("/Kids").getArrayItem(0).isIndirect());
 
-    std::cout << "/Bad4 -- missing limits" << std::endl;
+    std::cout << "/Bad4 -- missing limits" << '\n';
     auto bad4 = QPDFNumberTreeObjectHelper(pdf.getTrailer().getKey("/Bad4"), pdf);
     bad4.insert(5, QPDFObjectHandle::newString("5"));
     for (auto& i: bad4) {
-        std::cout << i.first << " " << i.second.unparse() << std::endl;
+        std::cout << i.first << " " << i.second.unparse() << '\n';
     }
 
-    std::cout << "/Bad5 -- limit errors" << std::endl;
+    std::cout << "/Bad5 -- limit errors" << '\n';
     auto bad5 = QPDFNumberTreeObjectHelper(pdf.getTrailer().getKey("/Bad5"), pdf);
     assert(bad5.find(10) == bad5.end());
 }
@@ -1810,7 +1808,7 @@ test_47(QPDF& pdf, char const* arg2)
     pldh.getLabelsForPageRange(0, npages - 1, 1, labels);
     assert(labels.size() % 2 == 0);
     for (size_t i = 0; i < labels.size(); i += 2) {
-        std::cout << labels.at(i).getIntValue() << " " << labels.at(i + 1).unparse() << std::endl;
+        std::cout << labels.at(i).getIntValue() << " " << labels.at(i + 1).unparse() << '\n';
     }
 }
 
@@ -1822,11 +1820,11 @@ test_48(QPDF& pdf, char const* arg2)
     QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
     QPDFNameTreeObjectHelper ntoh(qtest, pdf);
     for (auto& iter: ntoh) {
-        std::cout << iter.first << " -> " << iter.second.getStringValue() << std::endl;
+        std::cout << iter.first << " -> " << iter.second.getStringValue() << '\n';
     }
     std::map<std::string, QPDFObjectHandle> ntoh_map = ntoh.getAsMap();
     for (auto& iter: ntoh_map) {
-        std::cout << iter.first << " -> " << iter.second.getStringValue() << std::endl;
+        std::cout << iter.first << " -> " << iter.second.getStringValue() << '\n';
     }
     assert(ntoh.hasName("11 elephant"));
     assert(ntoh.hasName("07 sev\xe2\x80\xa2n"));
@@ -1869,7 +1867,7 @@ test_48(QPDF& pdf, char const* arg2)
     --iter1;
     assert(iter1->first == "2");
 
-    std::cout << "insertAfter" << std::endl;
+    std::cout << "insertAfter" << '\n';
     auto new2 = QPDFNameTreeObjectHelper::newEmpty(pdf);
     auto iter2 = new2.begin();
     assert(iter2 == new2.end());
@@ -1878,12 +1876,12 @@ test_48(QPDF& pdf, char const* arg2)
     iter2.insertAfter("4", QPDFObjectHandle::newString("4!"));
     assert(iter2->first == "4");
     for (auto& i: new2) {
-        std::cout << i.first << " " << i.second.unparse() << std::endl;
+        std::cout << i.first << " " << i.second.unparse() << '\n';
     }
 
     std::vector<std::string> empties = {"/Empty1", "/Empty2"};
     for (auto const& k: empties) {
-        std::cout << k << std::endl;
+        std::cout << k << '\n';
         auto empty = QPDFNameTreeObjectHelper(pdf.getTrailer().getKey(k), pdf);
         assert(empty.begin() == empty.end());
         assert(empty.last() == empty.end());
@@ -1905,36 +1903,36 @@ test_48(QPDF& pdf, char const* arg2)
         assert(empty.last()->second.getStringValue() == "6");
     }
 
-    std::cout << "/Bad1 -- wrong key type" << std::endl;
+    std::cout << "/Bad1 -- wrong key type" << '\n';
     auto bad1 = QPDFNameTreeObjectHelper(pdf.getTrailer().getKey("/Bad1"), pdf);
     assert(bad1.find("G", true)->first == "A");
     for (auto const& i: bad1) {
-        std::cout << i.first << std::endl;
+        std::cout << i.first << '\n';
     }
 
-    std::cout << "/Bad2 -- invalid kid" << std::endl;
+    std::cout << "/Bad2 -- invalid kid" << '\n';
     auto bad2 = QPDFNameTreeObjectHelper(pdf.getTrailer().getKey("/Bad2"), pdf);
     assert(bad2.find("G", true)->first == "B");
     for (auto const& i: bad2) {
-        std::cout << i.first << std::endl;
+        std::cout << i.first << '\n';
     }
 
-    std::cout << "/Bad3 -- invalid kid" << std::endl;
+    std::cout << "/Bad3 -- invalid kid" << '\n';
     auto bad3 = QPDFNameTreeObjectHelper(pdf.getTrailer().getKey("/Bad3"), pdf);
     assert(bad3.find("G", true) == bad3.end());
 
-    std::cout << "/Bad4 -- invalid kid" << std::endl;
+    std::cout << "/Bad4 -- invalid kid" << '\n';
     auto bad4 = QPDFNameTreeObjectHelper(pdf.getTrailer().getKey("/Bad4"), pdf);
     assert(bad4.find("F", true)->first == "C");
     for (auto const& i: bad4) {
-        std::cout << i.first << std::endl;
+        std::cout << i.first << '\n';
     }
 
-    std::cout << "/Bad5 -- loop in find" << std::endl;
+    std::cout << "/Bad5 -- loop in find" << '\n';
     auto bad5 = QPDFNameTreeObjectHelper(pdf.getTrailer().getKey("/Bad5"), pdf);
     assert(bad5.find("F", true)->first == "D");
 
-    std::cout << "/Bad6 -- bad limits" << std::endl;
+    std::cout << "/Bad6 -- bad limits" << '\n';
     auto bad6 = QPDFNameTreeObjectHelper(pdf.getTrailer().getKey("/Bad6"), pdf);
     assert(bad6.insert("H", QPDFObjectHandle::newNull())->first == "H");
 }
@@ -1949,7 +1947,7 @@ test_49(QPDF& pdf, char const* arg2)
         auto outlines = odh.getOutlinesForPage(page.getObjectHandle().getObjGen());
         for (auto& ol: outlines) {
             std::cout << "page " << pageno << ": " << ol.getTitle() << " -> "
-                      << ol.getDest().unparseResolved() << std::endl;
+                      << ol.getDest().unparseResolved() << '\n';
         }
         ++pageno;
     }
@@ -1963,11 +1961,11 @@ test_50(QPDF& pdf, char const* arg2)
     QPDFObjectHandle d1 = pdf.getTrailer().getKey("/Dict1");
     QPDFObjectHandle d2 = pdf.getTrailer().getKey("/Dict2");
     d1.mergeResources(d2);
-    std::cout << d1.getJSON(JSON::LATEST).unparse() << std::endl;
+    std::cout << d1.getJSON(JSON::LATEST).unparse() << '\n';
     // Top-level type mismatch
     d1.mergeResources(d2.getKey("/k1"));
     for (auto const& name: d1.getResourceNames()) {
-        std::cout << name << std::endl;
+        std::cout << name << '\n';
     }
 }
 
@@ -2047,10 +2045,10 @@ test_53(QPDF& pdf, char const* arg2)
     QPDFObjectHandle root = pdf.getRoot();
     auto new_obj = pdf.makeIndirectObject(QPDFObjectHandle::newString("potato"));
     root.replaceKey("/Q1", new_obj);
-    std::cout << "new object: " << new_obj.unparse() << std::endl;
-    std::cout << "all objects" << std::endl;
+    std::cout << "new object: " << new_obj.unparse() << '\n';
+    std::cout << "all objects" << '\n';
     for (auto& obj: pdf.getAllObjects()) {
-        std::cout << obj.unparse() << std::endl;
+        std::cout << obj.unparse() << '\n';
     }
 
     QPDFWriter w(pdf, "a.pdf");
@@ -2068,7 +2066,7 @@ test_54(QPDF& pdf, char const* arg2)
     assert(pdf.getPDFVersion() != "1.5");
     w.setObjectStreamMode(qpdf_o_generate);
     if (w.getFinalVersion() != "1.5") {
-        std::cout << "oops: " << w.getFinalVersion() << std::endl;
+        std::cout << "oops: " << w.getFinalVersion() << '\n';
     }
 }
 
@@ -2193,11 +2191,11 @@ test_60(QPDF& pdf, char const* arg2)
 
     std::map<std::string, std::map<std::string, std::string>> conflicts;
     auto show_conflicts = [&](std::string const& msg) {
-        std::cout << msg << std::endl;
+        std::cout << msg << '\n';
         for (auto const& i1: conflicts) {
-            std::cout << i1.first << ":" << std::endl;
+            std::cout << i1.first << ":" << '\n';
             for (auto const& i2: i1.second) {
-                std::cout << "  " << i2.first << " -> " << i2.second << std::endl;
+                std::cout << "  " << i2.first << " -> " << i2.second << '\n';
             }
         }
     };
@@ -2242,22 +2240,22 @@ test_61(QPDF& pdf, char const* arg2)
     try {
         pdf.processMemoryFile("empty", "", 0);
     } catch (QPDFExc const&) {
-        std::cout << "Caught QPDFExc as expected" << std::endl;
+        std::cout << "Caught QPDFExc as expected" << '\n';
     }
     try {
         QUtil::safe_fopen("/does/not/exist", "r");
     } catch (QPDFSystemError const&) {
-        std::cout << "Caught QPDFSystemError as expected" << std::endl;
+        std::cout << "Caught QPDFSystemError as expected" << '\n';
     }
     try {
         QUtil::int_to_string_base(0, 12);
     } catch (std::logic_error const&) {
-        std::cout << "Caught logic_error as expected" << std::endl;
+        std::cout << "Caught logic_error as expected" << '\n';
     }
     try {
         QUtil::toUTF8(0xffffffff);
     } catch (std::runtime_error const&) {
-        std::cout << "Caught runtime_error as expected" << std::endl;
+        std::cout << "Caught runtime_error as expected" << '\n';
     }
 
     // Spot check RTTI for dynamic cast. We intend to have pipelines
@@ -2389,18 +2387,18 @@ test_68(QPDF& pdf, char const* arg2)
     QPDFObjectHandle qstream = root.getKey("/QStream");
     try {
         qstream.getStreamData();
-        std::cout << "oops -- didn't throw" << std::endl;
+        std::cout << "oops -- didn't throw" << '\n';
     } catch (std::exception& e) {
-        std::cout << "get unfilterable stream: " << e.what() << std::endl;
+        std::cout << "get unfilterable stream: " << e.what() << '\n';
     }
     std::shared_ptr<Buffer> b1 = qstream.getStreamData(qpdf_dl_all);
     if ((b1->getSize() > 10) && (memcmp(b1->getBuffer(), "wwwwwwwww", 9) == 0)) {
-        std::cout << "filtered stream data okay" << std::endl;
+        std::cout << "filtered stream data okay" << '\n';
     }
     std::shared_ptr<Buffer> b2 = qstream.getRawStreamData();
     if ((b2->getSize() > 10) &&
         (memcmp(b2->getBuffer(), "\xff\xd8\xff\xe0\x00\x10\x4a\x46\x49\x46", 10) == 0)) {
-        std::cout << "raw stream data okay" << std::endl;
+        std::cout << "raw stream data okay" << '\n';
     }
 }
 
@@ -2436,42 +2434,42 @@ static void
 test_71(QPDF& pdf, char const* arg2)
 {
     auto show = [](QPDFObjectHandle& obj, QPDFObjectHandle& xobj_dict, std::string const& key) {
-        std::cout << xobj_dict.unparse() << " -> " << key << " -> " << obj.unparse() << std::endl;
+        std::cout << xobj_dict.unparse() << " -> " << key << " -> " << obj.unparse() << '\n';
     };
     auto page = QPDFPageDocumentHelper(pdf).getAllPages().at(0);
-    std::cout << "--- recursive, all ---" << std::endl;
+    std::cout << "--- recursive, all ---" << '\n';
     page.forEachXObject(true, show);
-    std::cout << "--- non-recursive, all ---" << std::endl;
+    std::cout << "--- non-recursive, all ---" << '\n';
     page.forEachXObject(false, show);
-    std::cout << "--- recursive, images ---" << std::endl;
+    std::cout << "--- recursive, images ---" << '\n';
     page.forEachImage(true, show);
-    std::cout << "--- non-recursive, images ---" << std::endl;
+    std::cout << "--- non-recursive, images ---" << '\n';
     page.forEachImage(false, show);
-    std::cout << "--- recursive, form XObjects ---" << std::endl;
+    std::cout << "--- recursive, form XObjects ---" << '\n';
     page.forEachFormXObject(true, show);
-    std::cout << "--- non-recursive, form XObjects ---" << std::endl;
+    std::cout << "--- non-recursive, form XObjects ---" << '\n';
     page.forEachFormXObject(false, show);
     auto fx1 = QPDFPageObjectHelper(
         page.getObjectHandle().getKey("/Resources").getKey("/XObject").getKey("/Fx1"));
-    std::cout << "--- recursive, all, from fx1 ---" << std::endl;
+    std::cout << "--- recursive, all, from fx1 ---" << '\n';
     fx1.forEachXObject(true, show);
-    std::cout << "--- non-recursive, all, from fx1 ---" << std::endl;
+    std::cout << "--- non-recursive, all, from fx1 ---" << '\n';
     fx1.forEachXObject(false, show);
-    std::cout << "--- get images, page ---" << std::endl;
+    std::cout << "--- get images, page ---" << '\n';
     for (auto& i: page.getImages()) {
-        std::cout << i.first << " -> " << i.second.unparse() << std::endl;
+        std::cout << i.first << " -> " << i.second.unparse() << '\n';
     }
-    std::cout << "--- get images, fx ---" << std::endl;
+    std::cout << "--- get images, fx ---" << '\n';
     for (auto& i: fx1.getImages()) {
-        std::cout << i.first << " -> " << i.second.unparse() << std::endl;
+        std::cout << i.first << " -> " << i.second.unparse() << '\n';
     }
-    std::cout << "--- get form XObjects, page ---" << std::endl;
+    std::cout << "--- get form XObjects, page ---" << '\n';
     for (auto& i: page.getFormXObjects()) {
-        std::cout << i.first << " -> " << i.second.unparse() << std::endl;
+        std::cout << i.first << " -> " << i.second.unparse() << '\n';
     }
-    std::cout << "--- get form XObjects, fx ---" << std::endl;
+    std::cout << "--- get form XObjects, fx ---" << '\n';
     for (auto& i: fx1.getFormXObjects()) {
-        std::cout << i.first << " -> " << i.second.unparse() << std::endl;
+        std::cout << i.first << " -> " << i.second.unparse() << '\n';
     }
 }
 
@@ -2482,7 +2480,7 @@ test_72(QPDF& pdf, char const* arg2)
     auto page = QPDFPageDocumentHelper(pdf).getAllPages().at(0);
     auto fx1 = QPDFPageObjectHelper(
         page.getObjectHandle().getKey("/Resources").getKey("/XObject").getKey("/Fx1"));
-    std::cout << "--- parseContents ---" << std::endl;
+    std::cout << "--- parseContents ---" << '\n';
     ParserCallbacks cb;
     fx1.parseContents(&cb);
     // Do this once with addContentTokenFilter and once with
@@ -2511,7 +2509,7 @@ test_73(QPDF& pdf, char const* arg2)
         QPDF pdf2;
         pdf2.getRoot();
     } catch (std::exception& e) {
-        std::cerr << "getRoot: " << e.what() << std::endl;
+        std::cerr << "getRoot: " << e.what() << '\n';
     }
 
     pdf.closeInputSource();
@@ -2522,7 +2520,7 @@ static void
 test_74(QPDF& pdf, char const* arg2)
 {
     // This test is crafted to work with split-nntree.pdf
-    std::cout << "/Split1" << std::endl;
+    std::cout << "/Split1" << '\n';
     auto split1 = QPDFNumberTreeObjectHelper(pdf.getTrailer().getKey("/Split1"), pdf);
     split1.setSplitThreshold(4);
     auto check_split1 = [&split1](int k) {
@@ -2533,10 +2531,10 @@ test_74(QPDF& pdf, char const* arg2)
     check_split1(35);
     check_split1(125);
     for (auto const& i: split1) {
-        std::cout << i.first << std::endl;
+        std::cout << i.first << '\n';
     }
 
-    std::cout << "/Split2" << std::endl;
+    std::cout << "/Split2" << '\n';
     auto split2 = QPDFNameTreeObjectHelper(pdf.getTrailer().getKey("/Split2"), pdf);
     split2.setSplitThreshold(4);
     auto check_split2 = [](QPDFNameTreeObjectHelper& noh, std::string const& k) {
@@ -2545,16 +2543,16 @@ test_74(QPDF& pdf, char const* arg2)
     };
     check_split2(split2, "C");
     for (auto const& i: split2) {
-        std::cout << i.first << std::endl;
+        std::cout << i.first << '\n';
     }
 
-    std::cout << "/Split3" << std::endl;
+    std::cout << "/Split3" << '\n';
     auto split3 = QPDFNameTreeObjectHelper(pdf.getTrailer().getKey("/Split3"), pdf);
     split3.setSplitThreshold(4);
     check_split2(split3, "P");
     check_split2(split3, "\xcf\x80");
     for (auto& i: split3) {
-        std::cout << i.first << " " << i.second.unparse() << std::endl;
+        std::cout << i.first << " " << i.second.unparse() << '\n';
     }
 
     QPDFWriter w(pdf, "a.pdf");
@@ -2655,7 +2653,7 @@ test_76(QPDF& pdf, char const* arg2)
     assert(QUtil::hex_encode(efs2.getChecksum()) == "2fce9c8228e360ba9b04a1bd1bf63d6b");
 
     for (auto const& iter: efdh.getEmbeddedFiles()) {
-        std::cout << iter.first << " -> " << iter.second->getFilename() << std::endl;
+        std::cout << iter.first << " -> " << iter.second->getFilename() << '\n';
     }
     assert(efdh.getEmbeddedFile("att1")->getFilename() == "att1.txt");
     assert(!efdh.getEmbeddedFile("potato"));
@@ -2689,17 +2687,17 @@ test_78(QPDF& pdf, char const* arg2)
         p->finish();
     };
     auto f2 = [](Pipeline* p, bool suppress_warnings, bool will_retry) {
-        std::cerr << "f2" << std::endl;
+        std::cerr << "f2" << '\n';
         if (will_retry) {
-            std::cerr << "failing" << std::endl;
+            std::cerr << "failing" << '\n';
             return false;
         }
         if (!suppress_warnings) {
-            std::cerr << "warning" << std::endl;
+            std::cerr << "warning" << '\n';
         }
         p->writeCStr("salad");
         p->finish();
-        std::cerr << "f2 done" << std::endl;
+        std::cerr << "f2 done" << '\n';
         return true;
     };
 
@@ -2709,11 +2707,11 @@ test_78(QPDF& pdf, char const* arg2)
     auto s2 = QPDFObjectHandle::newStream(&pdf);
     s2.replaceStreamData(f2, null, null);
     pdf.getTrailer().replaceKey("/Streams", QPDFObjectHandle::newArray({s1, s2}));
-    std::cout << "piping with warning suppression" << std::endl;
+    std::cout << "piping with warning suppression" << '\n';
     Pl_Discard d;
     s2.pipeStreamData(&d, nullptr, 0, qpdf_dl_all, true, false);
 
-    std::cout << "writing" << std::endl;
+    std::cout << "writing" << '\n';
     QPDFWriter w(pdf, "a.pdf");
     w.setStaticID(true);
     w.setQDFMode(true);
@@ -2890,13 +2888,13 @@ test_83(QPDF& pdf, char const* arg2)
     size_t size;
     QUtil::read_file_into_memory(arg2, file_buf, size);
     try {
-        std::cout << "calling initializeFromJson" << std::endl;
+        std::cout << "calling initializeFromJson" << '\n';
         j.initializeFromJson(std::string(file_buf.get(), size));
-        std::cout << "called initializeFromJson" << std::endl;
+        std::cout << "called initializeFromJson" << '\n';
     } catch (QPDFUsage& e) {
-        std::cerr << "usage: " << e.what() << std::endl;
+        std::cerr << "usage: " << e.what() << '\n';
     } catch (std::exception& e) {
-        std::cerr << "exception: " << e.what() << std::endl;
+        std::cerr << "exception: " << e.what() << '\n';
     }
 }
 
@@ -2905,7 +2903,7 @@ test_84(QPDF& pdf, char const* arg2)
 {
     // Test QPDFJob API
 
-    std::cout << "normal" << std::endl;
+    std::cout << "normal" << '\n';
     {
         QPDFJob j;
         j.config()
@@ -2922,11 +2920,11 @@ test_84(QPDF& pdf, char const* arg2)
         assert(j.getEncryptionStatus() == 0);
     }
 
-    std::cout << "custom progress reporter" << std::endl;
+    std::cout << "custom progress reporter" << '\n';
     {
         QPDFJob j;
         j.registerProgressReporter(
-            [](int p) { std::cout << "custom write progress: " << p << "%" << std::endl; });
+            [](int p) { std::cout << "custom write progress: " << p << "%" << '\n'; });
         j.config()
             ->inputFile("minimal.pdf")
             ->outputFile("a.pdf")
@@ -2941,29 +2939,29 @@ test_84(QPDF& pdf, char const* arg2)
         assert(j.getEncryptionStatus() == 0);
     }
 
-    std::cout << "error caught by check" << std::endl;
+    std::cout << "error caught by check" << '\n';
     try {
         QPDFJob j;
         j.config()->outputFile("a.pdf")->qdf();
-        std::cout << "finished config" << std::endl;
+        std::cout << "finished config" << '\n';
         j.checkConfiguration();
         assert(false);
     } catch (QPDFUsage& e) {
-        std::cout << "usage: " << e.what() << std::endl;
+        std::cout << "usage: " << e.what() << '\n';
     }
 
-    std::cout << "error caught by run" << std::endl;
+    std::cout << "error caught by run" << '\n';
     try {
         QPDFJob j;
         j.config()->outputFile("a.pdf")->qdf();
-        std::cout << "finished config" << std::endl;
+        std::cout << "finished config" << '\n';
         j.run();
         assert(false);
     } catch (QPDFUsage& e) {
-        std::cout << "usage: " << e.what() << std::endl;
+        std::cout << "usage: " << e.what() << '\n';
     }
 
-    std::cout << "output capture" << std::endl;
+    std::cout << "output capture" << '\n';
     std::ostringstream cout;
     std::ostringstream cerr;
     {
@@ -2980,11 +2978,11 @@ test_84(QPDF& pdf, char const* arg2)
 # pragma GCC diagnostic pop
 #endif
         j.config()->inputFile("bad2.pdf")->showObject("4,0")->checkConfiguration();
-        std::cout << "calling run" << std::endl;
+        std::cout << "calling run" << '\n';
         j.run();
-        std::cout << "captured stdout" << std::endl;
+        std::cout << "captured stdout" << '\n';
         std::cout << cout.str();
-        std::cout << "captured stderr" << std::endl;
+        std::cout << "captured stderr" << '\n';
         std::cout << cerr.str();
     }
 }
@@ -3478,7 +3476,7 @@ test_99(QPDF& pdf, char const* arg2)
     // Designed for no-space-compressed-object.pdf
     QPDFObjectHandle qtest = pdf.getRoot().getKey("/QTest");
     for (int i = 0; i < qtest.getArrayNItems(); ++i) {
-        std::cout << qtest.getArrayItem(i).unparseResolved() << std::endl;
+        std::cout << qtest.getArrayItem(i).unparseResolved() << '\n';
     }
 }
 
@@ -3669,7 +3667,7 @@ runtest(int n, char const* filename1, char const* arg2)
     if (filep) {
         fclose(filep);
     }
-    std::cout << "test " << n << " done" << std::endl;
+    std::cout << "test " << n << " done" << '\n';
 }
 
 int
@@ -3692,7 +3690,7 @@ main(int argc, char* argv[])
         char const* arg2 = argv[3];
         runtest(n, filename1, arg2);
     } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
         exit(2);
     }
 

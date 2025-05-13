@@ -20,7 +20,7 @@ write_some(FILE* f, size_t bytes, Pipeline* p)
     }
     if (len < bytes) {
         if (ferror(f)) {
-            std::cerr << "error reading file" << std::endl;
+            std::cerr << "error reading file" << '\n';
             exit(2);
         }
         p->finish();
@@ -32,7 +32,7 @@ write_some(FILE* f, size_t bytes, Pipeline* p)
 static void
 usage()
 {
-    std::cerr << "Usage: base64 encode|decode" << std::endl;
+    std::cerr << "Usage: base64 encode|decode" << '\n';
     exit(2);
 }
 
@@ -74,7 +74,7 @@ main(int argc, char* argv[])
             }
         }
     } catch (std::exception& e) {
-        std::cout << "exception: " << e.what() << std::endl;
+        std::cout << "exception: " << e.what() << '\n';
         exit(2);
     }
 

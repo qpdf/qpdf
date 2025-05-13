@@ -30,7 +30,7 @@ FuzzHelper::doChecks()
     try {
         JSON::parse(std::string(reinterpret_cast<char const*>(data), size));
     } catch (std::runtime_error& e) {
-        std::cerr << "runtime_error parsing json: " << e.what() << std::endl;
+        std::cerr << "runtime_error parsing json: " << e.what() << '\n';
     }
     QPDF q;
     q.setMaxWarnings(1000);
@@ -45,7 +45,7 @@ FuzzHelper::run()
     try {
         doChecks();
     } catch (std::runtime_error const& e) {
-        std::cerr << "runtime_error: " << e.what() << std::endl;
+        std::cerr << "runtime_error: " << e.what() << '\n';
     }
 }
 

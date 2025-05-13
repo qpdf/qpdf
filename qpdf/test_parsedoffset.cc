@@ -13,7 +13,7 @@
 void
 usage()
 {
-    std::cerr << "Usage: test_parsedoffset INPUT.pdf" << std::endl;
+    std::cerr << "Usage: test_parsedoffset INPUT.pdf" << '\n';
 }
 
 std::string
@@ -79,7 +79,7 @@ process(std::string fn, std::vector<std::vector<std::pair<qpdf_offset_t, std::st
     for (auto const& oh: qpdf.getAllObjects()) {
         if (!xrefs.contains(oh.getObjGen())) {
             std::cerr << oh.getObjectID() << "/" << oh.getGeneration()
-                      << " is not found in xref table" << std::endl;
+                      << " is not found in xref table" << '\n';
             std::exit(2);
         }
 
@@ -89,7 +89,7 @@ process(std::string fn, std::vector<std::vector<std::pair<qpdf_offset_t, std::st
         switch (xref.getType()) {
         case 0:
             std::cerr << oh.getObjectID() << "/" << oh.getGeneration() << " xref entry is free"
-                      << std::endl;
+                      << '\n';
             std::exit(2);
         case 1:
             stream_number = 0;
@@ -98,7 +98,7 @@ process(std::string fn, std::vector<std::vector<std::pair<qpdf_offset_t, std::st
             stream_number = static_cast<size_t>(xref.getObjStreamNumber());
             break;
         default:
-            std::cerr << "unknown xref entry type" << std::endl;
+            std::cerr << "unknown xref entry type" << '\n';
             std::exit(2);
         }
 
@@ -126,19 +126,19 @@ main(int argc, char* argv[])
 
             std::sort(table[i].begin(), table[i].end());
             if (i == 0) {
-                std::cout << "--- objects not in streams ---" << std::endl;
+                std::cout << "--- objects not in streams ---" << '\n';
             } else {
-                std::cout << "--- objects in stream " << i << " ---" << std::endl;
+                std::cout << "--- objects in stream " << i << " ---" << '\n';
             }
 
             for (auto const& iter: table[i]) {
-                std::cout << iter.second << std::endl;
+                std::cout << iter.second << '\n';
             }
         }
 
-        std::cout << "succeeded" << std::endl;
+        std::cout << "succeeded" << '\n';
     } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
         std::exit(2);
     }
 

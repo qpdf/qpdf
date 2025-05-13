@@ -8,43 +8,43 @@
 static void
 print_null(std::string const& path)
 {
-    std::cout << path << ": null" << std::endl;
+    std::cout << path << ": null" << '\n';
 }
 
 static void
 print_string(std::string const& path, std::string const& value)
 {
-    std::cout << path << ": string: " << value << std::endl;
+    std::cout << path << ": string: " << value << '\n';
 }
 
 static void
 print_number(std::string const& path, std::string const& value)
 {
-    std::cout << path << ": number: " << value << std::endl;
+    std::cout << path << ": number: " << value << '\n';
 }
 
 static void
 print_bool(std::string const& path, bool value)
 {
-    std::cout << path << ": bool: " << (value ? "true" : "false") << std::endl;
+    std::cout << path << ": bool: " << (value ? "true" : "false") << '\n';
 }
 
 static void
 print_json(std::string const& path, JSON value)
 {
-    std::cout << path << ": json: " << value.unparse() << std::endl;
+    std::cout << path << ": json: " << value.unparse() << '\n';
 }
 
 static JSONHandler::void_handler_t
 make_print_message(std::string msg)
 {
-    return [msg](std::string const& path) { std::cout << path << ": json: " << msg << std::endl; };
+    return [msg](std::string const& path) { std::cout << path << ": json: " << msg << '\n'; };
 }
 
 static void
 test_scalar()
 {
-    std::cout << "-- scalar --" << std::endl;
+    std::cout << "-- scalar --" << '\n';
     JSONHandler h;
     h.addStringHandler(print_string);
     JSON j = JSON::parse("\"potato\"");
@@ -97,7 +97,7 @@ make_all_handler()
 static void
 test_all()
 {
-    std::cout << "-- all --" << std::endl;
+    std::cout << "-- all --" << '\n';
     auto h = make_all_handler();
     /* cSpell: ignore phour */
     JSON j = JSON::parse(R"({
@@ -110,7 +110,7 @@ test_all()
    "six": {"a": {"b": "quack", "Q": "baaa"}, "b": "moo"}
 })");
     h->handle(".", j);
-    std::cerr << "-- fallback --" << std::endl;
+    std::cerr << "-- fallback --" << '\n';
     j = JSON::parse(R"({
    "five": "not-array"
 })");
@@ -120,14 +120,14 @@ test_all()
 static void
 test_errors()
 {
-    std::cout << "-- errors --" << std::endl;
+    std::cout << "-- errors --" << '\n';
     auto h = make_all_handler();
     auto t = [h](std::string const& msg, std::function<void()> fn) {
         try {
             fn();
             assert(false);
         } catch (QPDFUsage& e) {
-            std::cout << msg << ": " << e.what() << std::endl;
+            std::cout << msg << ": " << e.what() << '\n';
         }
     };
 

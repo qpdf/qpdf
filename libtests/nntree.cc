@@ -20,7 +20,7 @@ report(QPDF& q, QPDFObjectHandle oh, long long item, long long exp_item)
     auto show = [&failed, &oh, &item]() {
         if (!failed) {
             failed = true;
-            std::cout << "key = " << item << ", oh = " << oh.unparseResolved() << std::endl;
+            std::cout << "key = " << item << ", oh = " << oh.unparseResolved() << '\n';
         }
     };
 
@@ -37,11 +37,11 @@ report(QPDF& q, QPDFObjectHandle oh, long long item, long long exp_item)
 
     if (i1_wanted != i1_actual) {
         show();
-        std::cout << "i1: wanted " << i1_wanted << ", got " << i1_actual << std::endl;
+        std::cout << "i1: wanted " << i1_wanted << ", got " << i1_actual << '\n';
     }
     if (i2_wanted != i2_actual) {
         show();
-        std::cout << "i2: wanted " << i2_wanted << ", got " << i2_actual << std::endl;
+        std::cout << "i2: wanted " << i2_wanted << ", got " << i2_actual << '\n';
     }
 
     return failed;
@@ -106,7 +106,7 @@ test_bsearch()
     r(d, 25, 20);
 
     if (!any_failures) {
-        std::cout << "bsearch tests passed" << std::endl;
+        std::cout << "bsearch tests passed" << '\n';
     }
 }
 
@@ -128,7 +128,7 @@ check_find(QPDFNameTreeObjectHelper& nh, std::string const& key, bool prev_if_no
     } else {
         std::cout << (*i).first << " -> " << (*i).second.unparse();
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 void
@@ -183,13 +183,13 @@ test_depth()
     }
 
     QPDFNameTreeObjectHelper nh(n0, q);
-    std::cout << "--- forward ---" << std::endl;
+    std::cout << "--- forward ---" << '\n';
     for (auto i: nh) {
-        std::cout << i.first << " -> " << i.second.unparse() << std::endl;
+        std::cout << i.first << " -> " << i.second.unparse() << '\n';
     }
-    std::cout << "--- backward ---" << std::endl;
+    std::cout << "--- backward ---" << '\n';
     for (auto i = nh.last(); i.valid(); --i) {
-        std::cout << (*i).first << " -> " << (*i).second.unparse() << std::endl;
+        std::cout << (*i).first << " -> " << (*i).second.unparse() << '\n';
     }
 
     // Find

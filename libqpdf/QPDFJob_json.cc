@@ -630,7 +630,7 @@ QPDFJob::initializeFromJson(std::string const& json, bool partial)
         std::ostringstream msg;
         msg << m->message_prefix << ": job json has errors:";
         for (auto const& error: errors) {
-            msg << std::endl << "  " << error;
+            msg << "\n  " << error;
         }
         throw std::runtime_error(msg.str());
     }

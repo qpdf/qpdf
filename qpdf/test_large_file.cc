@@ -94,7 +94,7 @@ void
 ImageChecker::finish()
 {
     if (!okay) {
-        std::cout << "errors found checking image data for page " << n << std::endl;
+        std::cout << "errors found checking image data for page " << n << '\n';
     }
 }
 
@@ -120,7 +120,7 @@ ImageProvider::provideStreamData(int objid, int generation, Pipeline* pipeline)
     if (buf == nullptr) {
         buf = new unsigned char[width * stripesize];
     }
-    std::cout << "page " << n << " of " << npages << std::endl;
+    std::cout << "page " << n << " of " << npages << '\n';
     for (size_t y = 0; y < nstripes; ++y) {
         unsigned char color = get_pixel_color(n, y);
         memset(buf, color, width * stripesize);
@@ -132,7 +132,7 @@ ImageProvider::provideStreamData(int objid, int generation, Pipeline* pipeline)
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " {read|write} {large|small} outfile" << std::endl;
+    std::cerr << "Usage: " << whoami << " {read|write} {large|small} outfile" << '\n';
     exit(2);
 }
 
@@ -247,7 +247,7 @@ check_page_contents(size_t pageno, QPDFObjectHandle page)
         std::string(reinterpret_cast<char*>(buf->getBuffer()), buf->getSize());
     std::string expected_contents = generate_page_contents(pageno);
     if (expected_contents != actual_contents) {
-        std::cout << "page contents wrong for page " << pageno << std::endl
+        std::cout << "page contents wrong for page " << pageno << '\n'
                   << "ACTUAL: " << actual_contents << "EXPECTED: " << expected_contents << "----\n";
     }
 }
@@ -269,7 +269,7 @@ check_pdf(char const* filename)
     assert(pages.size() == QIntC::to_size(npages));
     for (size_t i = 0; i < npages; ++i) {
         size_t pageno = i + 1;
-        std::cout << "page " << pageno << " of " << npages << std::endl;
+        std::cout << "page " << pageno << " of " << npages << '\n';
         check_page_contents(pageno, pages.at(i));
         check_image(pageno, pages.at(i));
     }
@@ -316,7 +316,7 @@ main(int argc, char* argv[])
             check_pdf(filename);
         }
     } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
         exit(2);
     }
 

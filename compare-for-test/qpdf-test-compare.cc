@@ -13,18 +13,14 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " actual expected" << std::endl
-              << R"(Where "actual" is the actual output and "expected" is the expected)"
-              << std::endl
-              << "output of a test, compare the two PDF files. The files are considered"
-              << std::endl
-              << "to match if all their objects are identical except that, if a stream is"
-              << std::endl
-              << "compressed with FlateDecode, the uncompressed data must match." << std::endl
-              << std::endl
-              << "If the files match, the output is the expected file. Otherwise, it is"
-              << std::endl
-              << "the actual file. Read comments in the code for rationale." << std::endl;
+    std::cerr << "Usage: " << whoami << " actual expected" << '\n'
+              << R"(Where "actual" is the actual output and "expected" is the expected)" << '\n'
+              << "output of a test, compare the two PDF files. The files are considered" << '\n'
+              << "to match if all their objects are identical except that, if a stream is" << '\n'
+              << "compressed with FlateDecode, the uncompressed data must match." << '\n'
+              << '\n'
+              << "If the files match, the output is the expected file. Otherwise, it is" << '\n'
+              << "the actual file. Read comments in the code for rationale." << '\n';
     exit(2);
 }
 
@@ -187,7 +183,7 @@ main(int argc, char* argv[])
     }
 
     if ((argc == 2) && (strcmp(argv[1], "--version") == 0)) {
-        std::cout << whoami << " from qpdf version " << QPDF::QPDFVersion() << std::endl;
+        std::cout << whoami << " from qpdf version " << QPDF::QPDFVersion() << '\n';
         exit(0);
     }
 
@@ -211,7 +207,7 @@ main(int argc, char* argv[])
             to_output = expected;
         } else {
             if (show_why) {
-                std::cerr << difference << std::endl;
+                std::cerr << difference << '\n';
                 exit(2);
             }
             // The files differ; write the actual file. If it is determined that the actual file
@@ -237,7 +233,7 @@ main(int argc, char* argv[])
             exit(2);
         }
     } catch (std::exception& e) {
-        std::cerr << whoami << ": " << e.what() << std::endl;
+        std::cerr << whoami << ": " << e.what() << '\n';
         exit(2);
     }
     return 0;

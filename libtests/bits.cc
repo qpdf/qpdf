@@ -16,7 +16,7 @@ static void
 print_values(long long byte_offset, size_t bit_offset, size_t bits_available)
 {
     std::cout << "byte offset = " << byte_offset << ", " << "bit offset = " << bit_offset << ", "
-              << "bits available = " << bits_available << std::endl;
+              << "bits available = " << bits_available << '\n';
 }
 
 static void
@@ -29,7 +29,7 @@ test_read_bits(
 {
     unsigned long result = QIntC::to_ulong(read_bits(p, bit_offset, bits_available, bits_wanted));
 
-    std::cout << "bits read: " << bits_wanted << ", result = " << result << std::endl;
+    std::cout << "bits read: " << bits_wanted << ", result = " << result << '\n';
     print_values(p - buf, bit_offset, bits_available);
 }
 
@@ -39,7 +39,7 @@ test_write_bits(
 {
     write_bits(ch, bit_offset, val, bits, bp);
     std::cout << "ch = " << QUtil::uint_to_string_base(ch, 16, 2) << ", bit_offset = " << bit_offset
-              << std::endl;
+              << '\n';
 }
 
 static void
@@ -52,7 +52,7 @@ print_buffer(Pl_Buffer* bp)
     for (unsigned long i = 0; i < l; ++i) {
         std::cout << QUtil::uint_to_string_base(p[i], 16, 2) << ((i == l - 1) ? "\n" : " ");
     }
-    std::cout << std::endl;
+    std::cout << '\n';
     delete b;
 }
 
@@ -86,12 +86,12 @@ test()
     try {
         test_read_bits(buf, p, bit_offset, bits_available, 4);
     } catch (std::exception& e) {
-        std::cout << "exception: " << e.what() << std::endl;
+        std::cout << "exception: " << e.what() << '\n';
         print_values(p - buf, bit_offset, bits_available);
     }
 
     test_read_bits(buf, p, bit_offset, bits_available, 3);
-    std::cout << std::endl;
+    std::cout << '\n';
 
     // 11110101 00010101 01100101 01111001: 00010010 10001001 01110101 01001011
 
@@ -101,29 +101,29 @@ test()
     print_values(p - buf, bit_offset, bits_available);
     test_read_bits(buf, p, bit_offset, bits_available, 32);
     test_read_bits(buf, p, bit_offset, bits_available, 32);
-    std::cout << std::endl;
+    std::cout << '\n';
 
     BitStream b(buf, 8);
-    std::cout << b.getBits(32) << std::endl;
+    std::cout << b.getBits(32) << '\n';
     b.reset();
-    std::cout << b.getBits(32) << std::endl;
-    std::cout << b.getBits(32) << std::endl;
-    std::cout << std::endl;
+    std::cout << b.getBits(32) << '\n';
+    std::cout << b.getBits(32) << '\n';
+    std::cout << '\n';
 
     b.reset();
-    std::cout << b.getBits(6) << std::endl;
+    std::cout << b.getBits(6) << '\n';
     b.skipToNextByte();
-    std::cout << b.getBits(8) << std::endl;
+    std::cout << b.getBits(8) << '\n';
     b.skipToNextByte();
-    std::cout << b.getBits(8) << std::endl;
-    std::cout << std::endl;
+    std::cout << b.getBits(8) << '\n';
+    std::cout << '\n';
     b.reset();
-    std::cout << b.getBitsSigned(3) << std::endl;
-    std::cout << b.getBitsSigned(6) << std::endl;
-    std::cout << b.getBitsSigned(5) << std::endl;
-    std::cout << b.getBitsSigned(1) << std::endl;
-    std::cout << b.getBitsSigned(17) << std::endl;
-    std::cout << std::endl;
+    std::cout << b.getBitsSigned(3) << '\n';
+    std::cout << b.getBitsSigned(6) << '\n';
+    std::cout << b.getBitsSigned(5) << '\n';
+    std::cout << b.getBitsSigned(1) << '\n';
+    std::cout << b.getBitsSigned(17) << '\n';
+    std::cout << '\n';
 
     // Write tests
 
@@ -176,9 +176,9 @@ main()
     try {
         test();
     } catch (std::exception& e) {
-        std::cout << "unexpected exception: " << e.what() << std::endl;
+        std::cout << "unexpected exception: " << e.what() << '\n';
         exit(2);
     }
-    std::cout << "done" << std::endl;
+    std::cout << "done" << '\n';
     return 0;
 }

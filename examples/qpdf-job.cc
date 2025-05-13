@@ -10,11 +10,10 @@ static char const* whoami = nullptr;
 static void
 usage()
 {
-    std::cerr << "Usage: " << whoami << std::endl
+    std::cerr << "Usage: " << whoami << '\n'
               << "This program linearizes the first page of in.pdf to out1.pdf, out2.pdf, and"
-              << std::endl
-              << " out3.pdf, each demonstrating a different way to use the QPDFJob API"
-              << std::endl;
+              << '\n'
+              << " out3.pdf, each demonstrating a different way to use the QPDFJob API" << '\n';
     exit(2);
 }
 
@@ -49,9 +48,9 @@ main(int argc, char* argv[])
             ->compressStreams("n") // avoid dependency on zlib output
             ->checkConfiguration();
         j.run();
-        std::cout << "out1 status: " << j.getExitCode() << std::endl;
+        std::cout << "out1 status: " << j.getExitCode() << '\n';
     } catch (std::exception& e) {
-        std::cerr << "exception: " << e.what() << std::endl;
+        std::cerr << "exception: " << e.what() << '\n';
         return 2;
     }
 
@@ -71,9 +70,9 @@ main(int argc, char* argv[])
         QPDFJob j;
         j.initializeFromArgv(new_argv);
         j.run();
-        std::cout << "out2 status: " << j.getExitCode() << std::endl;
+        std::cout << "out2 status: " << j.getExitCode() << '\n';
     } catch (std::exception& e) {
-        std::cerr << "exception: " << e.what() << std::endl;
+        std::cerr << "exception: " << e.what() << '\n';
         return 2;
     }
 
@@ -95,9 +94,9 @@ main(int argc, char* argv[])
 }
 )");
         j.run();
-        std::cout << "out3 status: " << j.getExitCode() << std::endl;
+        std::cout << "out3 status: " << j.getExitCode() << '\n';
     } catch (std::exception& e) {
-        std::cerr << "exception: " << e.what() << std::endl;
+        std::cerr << "exception: " << e.what() << '\n';
         return 2;
     }
 

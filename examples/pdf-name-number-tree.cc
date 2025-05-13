@@ -10,8 +10,8 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " outfile.pdf" << std::endl
-              << "Create some name/number trees and write to a file" << std::endl;
+    std::cerr << "Usage: " << whoami << " outfile.pdf" << '\n'
+              << "Create some name/number trees and write to a file\n";
     exit(2);
 }
 
@@ -57,64 +57,63 @@ main(int argc, char* argv[])
     name_tree.insert("N", QPDFObjectHandle::newUnicodeString("knight"));
     auto iter = name_tree.insert("P", QPDFObjectHandle::newUnicodeString("pawn"));
     // Look at the iterator
-    std::cout << "just inserted " << iter->first << " -> " << iter->second.unparse() << std::endl;
+    std::cout << "just inserted " << iter->first << " -> " << iter->second.unparse() << '\n';
     --iter;
-    std::cout << "predecessor: " << iter->first << " -> " << iter->second.unparse() << std::endl;
+    std::cout << "predecessor: " << iter->first << " -> " << iter->second.unparse() << '\n';
     ++iter;
     ++iter;
-    std::cout << "successor: " << iter->first << " -> " << iter->second.unparse() << std::endl;
+    std::cout << "successor: " << iter->first << " -> " << iter->second.unparse() << '\n';
 
     // Use range-for iteration
-    std::cout << "Name tree items:" << std::endl;
+    std::cout << "Name tree items:\n";
     for (auto i: name_tree) {
-        std::cout << "  " << i.first << " -> " << i.second.unparse() << std::endl;
+        std::cout << "  " << i.first << " -> " << i.second.unparse() << '\n';
     }
 
     // This is a small tree, so everything will be at the root. We can look at it using dictionary
     // and array iterators.
-    std::cout << "Keys in name tree object:" << std::endl;
+    std::cout << "Keys in name tree object:\n";
     QPDFObjectHandle names;
     for (auto const& i: name_tree_oh.ditems()) {
-        std::cout << i.first << std::endl;
+        std::cout << i.first << '\n';
         if (i.first == "/Names") {
             names = i.second;
         }
     }
     // Values in names array:
-    std::cout << "Values in names:" << std::endl;
+    std::cout << "Values in names:\n";
     for (auto& i: names.aitems()) {
-        std::cout << "  " << i.unparse() << std::endl;
+        std::cout << "  " << i.unparse() << '\n';
     }
 
     // pre 10.2 API
-    std::cout << "Has Q?: " << name_tree.hasName("Q") << std::endl;
-    std::cout << "Has W?: " << name_tree.hasName("W") << std::endl;
+    std::cout << "Has Q?: " << name_tree.hasName("Q") << '\n';
+    std::cout << "Has W?: " << name_tree.hasName("W") << '\n';
     QPDFObjectHandle obj;
-    std::cout << "Found W?: " << name_tree.findObject("W", obj) << std::endl;
-    std::cout << "Found Q?: " << name_tree.findObject("Q", obj) << std::endl;
-    std::cout << "Q: " << obj.unparse() << std::endl;
+    std::cout << "Found W?: " << name_tree.findObject("W", obj) << '\n';
+    std::cout << "Found Q?: " << name_tree.findObject("Q", obj) << '\n';
+    std::cout << "Q: " << obj.unparse() << '\n';
 
     // 10.2 API
     iter = name_tree.find("Q");
-    std::cout << "Q: " << iter->first << " -> " << iter->second.unparse() << std::endl;
+    std::cout << "Q: " << iter->first << " -> " << iter->second.unparse() << '\n';
     iter = name_tree.find("W");
-    std::cout << "W found: " << (iter != name_tree.end()) << std::endl;
+    std::cout << "W found: " << (iter != name_tree.end()) << '\n';
     // Allow find to return predecessor
     iter = name_tree.find("W", true);
-    std::cout << "W's predecessor: " << iter->first << " -> " << iter->second.unparse()
-              << std::endl;
+    std::cout << "W's predecessor: " << iter->first << " -> " << iter->second.unparse() << '\n';
 
     // We can also remove items
-    std::cout << "Remove P: " << name_tree.remove("P", &obj) << std::endl;
-    std::cout << "Value removed: " << obj.unparse() << std::endl;
-    std::cout << "Has P?: " << name_tree.hasName("P") << std::endl;
+    std::cout << "Remove P: " << name_tree.remove("P", &obj) << '\n';
+    std::cout << "Value removed: " << obj.unparse() << '\n';
+    std::cout << "Has P?: " << name_tree.hasName("P") << '\n';
     // Or we can remove using an iterator
     iter = name_tree.find("K");
-    std::cout << "Find K: " << iter->second.unparse() << std::endl;
+    std::cout << "Find K: " << iter->second.unparse() << '\n';
     iter.remove();
     std::cout << "Iter after removing K: " << iter->first << " -> " << iter->second.unparse()
-              << std::endl;
-    std::cout << "Has K?: " << name_tree.hasName("K") << std::endl;
+              << '\n';
+    std::cout << "Has K?: " << name_tree.hasName("K") << '\n';
 
     // Illustrate some more advanced usage using number trees. These calls work for name trees too.
 
@@ -129,14 +128,14 @@ main(int argc, char* argv[])
     for (int i = 7; i <= 350; i += 7) {
         iter2.insertAfter(i, QPDFObjectHandle::newString("-" + std::to_string(i) + "-"));
     }
-    std::cout << "Numbers:" << std::endl;
+    std::cout << "Numbers:\n";
     int n = 1;
     for (auto& i: number_tree) {
         std::cout << i.first << " -> " << i.second.getUTF8Value();
         if (n % 5) {
             std::cout << ", ";
         } else {
-            std::cout << std::endl;
+            std::cout << '\n';
         }
         ++n;
     }
@@ -151,14 +150,14 @@ main(int argc, char* argv[])
             ++iter2;
         }
     }
-    std::cout << "Numbers after filtering:" << std::endl;
+    std::cout << "Numbers after filtering:\n";
     n = 1;
     for (auto& i: number_tree) {
         std::cout << i.first << " -> " << i.second.getUTF8Value();
         if (n % 5) {
             std::cout << ", ";
         } else {
-            std::cout << std::endl;
+            std::cout << '\n';
         }
         ++n;
     }

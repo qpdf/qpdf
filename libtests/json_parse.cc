@@ -26,13 +26,13 @@ namespace
 void
 Reactor::dictionaryStart()
 {
-    std::cout << "dictionary start" << std::endl;
+    std::cout << "dictionary start" << '\n';
 }
 
 void
 Reactor::arrayStart()
 {
-    std::cout << "array start" << std::endl;
+    std::cout << "array start" << '\n';
 }
 
 void
@@ -45,7 +45,7 @@ Reactor::containerEnd(JSON const& value)
 void
 Reactor::topLevelScalar()
 {
-    std::cout << "top-level scalar" << std::endl;
+    std::cout << "top-level scalar" << '\n';
 }
 
 bool
@@ -74,13 +74,13 @@ Reactor::arrayItem(JSON const& value)
 void
 Reactor::printItem(JSON const& j)
 {
-    std::cout << "[" << j.getStart() << ", " << j.getEnd() << "): " << j.unparse() << std::endl;
+    std::cout << "[" << j.getStart() << ", " << j.getEnd() << "): " << j.unparse() << '\n';
 }
 
 static void
 usage()
 {
-    std::cerr << "Usage: json_parse file [--react]" << std::endl;
+    std::cerr << "Usage: json_parse file [--react]" << '\n';
     exit(2);
 }
 
@@ -102,9 +102,9 @@ main(int argc, char* argv[])
     }
     try {
         FileInputSource is(filename);
-        std::cout << JSON::parse(is, reactor.get()).unparse() << std::endl;
+        std::cout << JSON::parse(is, reactor.get()).unparse() << '\n';
     } catch (std::exception& e) {
-        std::cerr << "exception: " << filename << ": " << e.what() << std::endl;
+        std::cerr << "exception: " << filename << ": " << e.what() << '\n';
         return 2;
     }
     return 0;

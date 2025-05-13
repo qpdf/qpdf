@@ -116,7 +116,7 @@ SF_XORDecode::setDecodeParms(QPDFObjectHandle decode_parms)
         this->key = buf->getBuffer()[0];
         return true;
     } catch (std::exception& e) {
-        std::cerr << "Error extracting key for /XORDecode: " << e.what() << std::endl;
+        std::cerr << "Error extracting key for /XORDecode: " << e.what() << '\n';
     }
     return false;
 }
@@ -361,15 +361,13 @@ process(char const* infilename, char const* outfilename, bool decode_specialized
     // For the test suite, use static IDs.
     w.setStaticID(true); // for testing only
     w.write();
-    std::cout << whoami << ": new file written to " << outfilename << std::endl;
+    std::cout << whoami << ": new file written to " << outfilename << '\n';
 }
 
 static void
 usage()
 {
-    std::cerr << "\n"
-              << "Usage: " << whoami << " [--decode-specialized] infile outfile\n"
-              << std::endl;
+    std::cerr << '\n' << "Usage: " << whoami << " [--decode-specialized] infile outfile\n" << '\n';
     exit(2);
 }
 
@@ -404,7 +402,7 @@ main(int argc, char* argv[])
         // Do the actual processing.
         process(infilename, outfilename, decode_specialized);
     } catch (std::exception& e) {
-        std::cerr << whoami << ": exception: " << e.what() << std::endl;
+        std::cerr << whoami << ": exception: " << e.what() << '\n';
         exit(2);
     }
 

@@ -198,13 +198,13 @@ QPDFArgParser::completionCommon(bool zsh)
     if (!zsh) {
         std::cout << " -o nospace";
     }
-    std::cout << " -C \"" << progname << "\" " << m->whoami << std::endl;
+    std::cout << " -C \"" << progname << "\" " << m->whoami << '\n';
     // Put output before error so calling from zsh works properly
     std::string path = progname;
     size_t slash = path.find('/');
     if ((slash != 0) && (slash != std::string::npos)) {
         std::cerr << "WARNING: " << m->whoami << " completion enabled"
-                  << " using relative path to executable" << std::endl;
+                  << " using relative path to executable" << '\n';
     }
 }
 
@@ -666,7 +666,7 @@ QPDFArgParser::handleCompletion()
     std::string prefix = extra_prefix + m->bash_cur;
     for (auto const& iter: m->completions) {
         if (prefix.empty() || (iter.substr(0, prefix.length()) == prefix)) {
-            std::cout << iter << std::endl;
+            std::cout << iter << '\n';
         }
     }
     exit(0);
@@ -729,13 +729,13 @@ QPDFArgParser::addOptionHelp(
 void
 QPDFArgParser::getTopHelp(std::ostringstream& msg)
 {
-    msg << "Run \"" << m->whoami << " --help=topic\" for help on a topic." << std::endl
-        << "Run \"" << m->whoami << " --help=--option\" for help on an option." << std::endl
-        << "Run \"" << m->whoami << " --help=all\" to see all available help." << std::endl
-        << std::endl
-        << "Topics:" << std::endl;
+    msg << "Run \"" << m->whoami << " --help=topic\" for help on a topic." << '\n'
+        << "Run \"" << m->whoami << " --help=--option\" for help on an option." << '\n'
+        << "Run \"" << m->whoami << " --help=all\" to see all available help." << '\n'
+        << '\n'
+        << "Topics:" << '\n';
     for (auto const& i: m->help_topics) {
-        msg << "  " << i.first << ": " << i.second.short_text << std::endl;
+        msg << "  " << i.first << ": " << i.second.short_text << '\n';
     }
 }
 
@@ -746,29 +746,27 @@ QPDFArgParser::getAllHelp(std::ostringstream& msg)
     auto show = [this, &msg](std::map<std::string, HelpTopic>& topics) {
         for (auto const& i: topics) {
             auto const& topic = i.first;
-            msg << std::endl
-                << "== " << topic << " (" << i.second.short_text << ") ==" << std::endl
-                << std::endl;
+            msg << '\n' << "== " << topic << " (" << i.second.short_text << ") ==" << '\n' << '\n';
             getTopicHelp(topic, i.second, msg);
         }
     };
     show(m->help_topics);
     show(m->option_help);
-    msg << std::endl << "====" << std::endl;
+    msg << '\n' << "====" << '\n';
 }
 
 void
 QPDFArgParser::getTopicHelp(std::string const& name, HelpTopic const& ht, std::ostringstream& msg)
 {
     if (ht.long_text.empty()) {
-        msg << ht.short_text << std::endl;
+        msg << ht.short_text << '\n';
     } else {
         msg << ht.long_text;
     }
     if (!ht.options.empty()) {
-        msg << std::endl << "Related options:" << std::endl;
+        msg << '\n' << "Related options:" << '\n';
         for (auto const& i: ht.options) {
-            msg << "  " << i << ": " << m->option_help[i].short_text << std::endl;
+            msg << "  " << i << ": " << m->option_help[i].short_text << '\n';
         }
     }
 }

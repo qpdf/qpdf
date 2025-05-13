@@ -13,7 +13,7 @@ main(int argc, char* argv[])
     auto whoami = QUtil::getWhoami(argv[0]);
 
     if (argc != 4) {
-        std::cerr << "Usage: " << whoami << " file attachment-key outfile" << std::endl;
+        std::cerr << "Usage: " << whoami << " file attachment-key outfile" << '\n';
         exit(2);
     }
 
@@ -40,10 +40,10 @@ main(int argc, char* argv[])
         j.initializeFromArgv(j_argv);
         j.run();
     } catch (std::exception& e) {
-        std::cerr << whoami << ": " << e.what() << std::endl;
+        std::cerr << whoami << ": " << e.what() << '\n';
         exit(2);
     }
 
-    std::cout << whoami << ": wrote attachment to " << outfilename << std::endl;
+    std::cout << whoami << ": wrote attachment to " << outfilename << '\n';
     return 0;
 }

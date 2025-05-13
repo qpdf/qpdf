@@ -31,9 +31,9 @@ main(int argc, char* argv[])
     auto b2_buf = b2.getBufferSharedPointer();
     std::string result(reinterpret_cast<char*>(b2_buf->getBuffer()), b2_buf->getSize());
     if (result == "-one--two-") {
-        std::cout << "concatenate test passed" << std::endl;
+        std::cout << "concatenate test passed" << '\n';
     } else {
-        std::cout << "concatenate test failed: " << result << std::endl;
+        std::cout << "concatenate test failed: " << result << '\n';
     }
     return 0;
 }

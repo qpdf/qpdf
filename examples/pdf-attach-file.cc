@@ -19,15 +19,15 @@ static char const* whoami = nullptr;
 static void
 usage(std::string const& msg)
 {
-    std::cerr << msg << std::endl
-              << std::endl
-              << "Usage: " << whoami << " options" << std::endl
-              << "Options:" << std::endl
-              << " --infile infile.pdf" << std::endl
-              << " --outfile outfile.pdf" << std::endl
-              << " --attachment attachment" << std::endl
-              << " [--password infile-password]" << std::endl
-              << " [--mimetype attachment mime type]" << std::endl;
+    std::cerr << msg << '\n'
+              << '\n'
+              << "Usage: " << whoami << " options\n"
+              << "Options:\n"
+              << " --infile infile.pdf\n"
+              << " --outfile outfile.pdf\n"
+              << " --attachment attachment\n"
+              << " [--password infile-password]\n"
+              << " [--mimetype attachment mime type]\n";
     exit(2);
 }
 
@@ -69,7 +69,7 @@ process(
 
     // Create a file spec.
     std::string key = QUtil::path_basename(attachment);
-    std::cout << whoami << ": attaching " << attachment << " as " << key << std::endl;
+    std::cout << whoami << ": attaching " << attachment << " as " << key << '\n';
     auto fs = QPDFFileSpecObjectHelper::createFileSpec(q, key, attachment);
 
     if (mimetype) {
@@ -208,7 +208,7 @@ main(int argc, char* argv[])
     try {
         process(infilename, password, attachment, mimetype, outfilename);
     } catch (std::exception& e) {
-        std::cerr << whoami << " exception: " << e.what() << std::endl;
+        std::cerr << whoami << " exception: " << e.what() << '\n';
         exit(2);
     }
 

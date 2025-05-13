@@ -39,7 +39,7 @@ dumpInfoDict(QPDF& pdf, std::ostream& os = std::cout, std::string const& sep = "
             {
                 val = it.second.unparseResolved();
             }
-            os << it.first.substr(1) << sep << val << std::endl; // skip '/'
+            os << it.first.substr(1) << sep << val << '\n'; // skip '/'
         }
     }
 }
@@ -52,7 +52,7 @@ pdfDumpInfoDict(char const* fname)
         pdf.processFile(fname);
         dumpInfoDict(pdf);
     } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
         exit(2);
     }
 }
@@ -66,7 +66,7 @@ main(int argc, char* argv[])
     whoami = QUtil::getWhoami(argv[0]);
 
     if ((argc == 2) && (!strcmp(argv[1], "--version"))) {
-        std::cout << whoami << " version " << version << std::endl;
+        std::cout << whoami << " version " << version << '\n';
         exit(0);
     }
     if ((argc == 3) && (!strcmp(argv[1], "--dump"))) {
@@ -155,7 +155,7 @@ main(int argc, char* argv[])
         w.setStaticID(static_id); // for testing only
         w.write();
     } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
         exit(2);
     }
 
@@ -164,7 +164,7 @@ main(int argc, char* argv[])
         QUtil::os_wrapper(
             "rename " + fl_tmp + " " + std::string(fl_out), rename(fl_tmp.c_str(), fl_out));
     } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
         exit(2);
     }
 

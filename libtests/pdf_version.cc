@@ -48,6 +48,6 @@ main()
     assert(PDFVersion(2, 0) == PDFVersion(2, 0));
     assert(PDFVersion(2, 0, 1) == PDFVersion(2, 0, 1));
 
-    std::cout << "PDFVersion assertions passed" << std::endl;
+    std::cout << "PDFVersion assertions passed" << '\n';
     return 0;
 }

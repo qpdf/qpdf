@@ -14,7 +14,7 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " n" << std::endl;
+    std::cerr << "Usage: " << whoami << " n\n";
     exit(2);
 }
 
@@ -77,7 +77,7 @@ runtest(int n)
         throw std::runtime_error(std::string("invalid test ") + std::to_string(n));
     }
 
-    std::cout << "test " << n << " done" << std::endl;
+    std::cout << "test " << n << " done\n";
 }
 
 int
@@ -98,7 +98,7 @@ main(int argc, char* argv[])
         int n = QUtil::string_to_int(argv[1]);
         runtest(n);
     } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
         exit(2);
     }
 

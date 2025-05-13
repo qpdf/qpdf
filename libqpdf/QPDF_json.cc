@@ -161,7 +161,7 @@ QPDF::test_json_validators()
     auto check_fn = [&passed](char const* msg, bool expr) {
         if (!expr) {
             passed = false;
-            std::cerr << msg << std::endl;
+            std::cerr << msg << '\n';
         }
     };
 #define check(expr) check_fn(#expr, expr)

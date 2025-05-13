@@ -11,7 +11,7 @@ int
 main(int argc, char* argv[])
 {
     if (argc != 4) {
-        std::cerr << "Usage: runlength {-encode|-decode} infile outfile" << std::endl;
+        std::cerr << "Usage: runlength {-encode|-decode} infile outfile" << '\n';
         exit(2);
     }
 

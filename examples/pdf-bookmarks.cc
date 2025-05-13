@@ -23,12 +23,12 @@ static std::map<QPDFObjGen, int> page_map;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " [options] file.pdf [password]" << std::endl
-              << "Options:" << std::endl
-              << "  --numbers        give bookmarks outline-style numbers" << std::endl
-              << "  --lines          draw lines to show bookmark hierarchy" << std::endl
-              << "  --show-open      indicate whether a bookmark is initially open" << std::endl
-              << "  --show-targets   show target if possible" << std::endl;
+    std::cerr << "Usage: " << whoami << " [options] file.pdf [password]\n"
+              << "Options:\n"
+              << "  --numbers        give bookmarks outline-style numbers\n"
+              << "  --lines          draw lines to show bookmark hierarchy\n"
+              << "  --show-open      indicate whether a bookmark is initially open\n"
+              << "  --show-targets   show target if possible\n";
     exit(2);
 }
 
@@ -74,7 +74,7 @@ show_bookmark_details(QPDFOutlineObjectHelper outline, std::vector<int> numbers)
     case st_lines:
         QTC::TC("examples", "pdf-bookmarks lines");
         print_lines(numbers);
-        std::cout << "|" << std::endl;
+        std::cout << "|\n";
         print_lines(numbers);
         std::cout << "+-+ ";
         break;
@@ -136,7 +136,7 @@ main(int argc, char* argv[])
     whoami = QUtil::getWhoami(argv[0]);
 
     if ((argc == 2) && (strcmp(argv[1], "--version") == 0)) {
-        std::cout << whoami << " version 1.5" << std::endl;
+        std::cout << whoami << " version 1.5\n";
         exit(0);
     }
 
@@ -185,10 +185,10 @@ main(int argc, char* argv[])
             }
             extract_bookmarks(odh.getTopLevelOutlines(), numbers);
         } else {
-            std::cout << filename << " has no bookmarks" << std::endl;
+            std::cout << filename << " has no bookmarks\n";
         }
     } catch (std::exception& e) {
-        std::cerr << whoami << " processing file " << filename << ": " << e.what() << std::endl;
+        std::cerr << whoami << " processing file " << filename << ": " << e.what() << '\n';
         exit(2);
     }
 

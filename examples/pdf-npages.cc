@@ -10,8 +10,8 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " filename" << std::endl
-              << "Prints the number of pages in filename" << std::endl;
+    std::cerr << "Usage: " << whoami << " filename\n"
+              << "Prints the number of pages in filename\n";
     exit(2);
 }
 
@@ -21,7 +21,7 @@ main(int argc, char* argv[])
     whoami = QUtil::getWhoami(argv[0]);
 
     if ((argc == 2) && (strcmp(argv[1], "--version") == 0)) {
-        std::cout << whoami << " version 1.3" << std::endl;
+        std::cout << whoami << " version 1.3\n";
         exit(0);
     }
 
@@ -36,9 +36,9 @@ main(int argc, char* argv[])
         QPDFObjectHandle root = pdf.getRoot();
         QPDFObjectHandle pages = root.getKey("/Pages");
         QPDFObjectHandle count = pages.getKey("/Count");
-        std::cout << count.getIntValue() << std::endl;
+        std::cout << count.getIntValue() << '\n';
     } catch (std::exception& e) {
-        std::cerr << whoami << ": " << e.what() << std::endl;
+        std::cerr << whoami << ": " << e.what() << '\n';
         exit(2);
     }
 

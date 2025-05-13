@@ -26,24 +26,24 @@ int Object::next_id = 0;
 Object::Object()
 {
     this->id = ++next_id;
-    std::cout << "created Object, id " << this->id << std::endl;
+    std::cout << "created Object, id " << this->id << '\n';
 }
 
 Object::~Object()
 {
-    std::cout << "destroyed Object, id " << this->id << std::endl;
+    std::cout << "destroyed Object, id " << this->id << '\n';
 }
 
 void
 Object::hello()
 {
-    std::cout << "calling Object::hello for " << this->id << std::endl;
+    std::cout << "calling Object::hello for " << this->id << '\n';
 }
 
 void
 Object::hello() const
 {
-    std::cout << "calling Object::hello const for " << this->id << std::endl;
+    std::cout << "calling Object::hello const for " << this->id << '\n';
 }
 
 typedef PointerHolder<Object> ObjectHolder;
@@ -71,27 +71,27 @@ test_ph()
 
     ObjectHolder oh0;
     {
-        std::cout << "hello" << std::endl;
+        std::cout << "hello" << '\n';
         auto* o1 = new Object;
         ObjectHolder oh1(o1);
-        std::cout << "oh1 refcount = " << oh1.getRefcount() << std::endl;
+        std::cout << "oh1 refcount = " << oh1.getRefcount() << '\n';
         ObjectHolder oh2(oh1);
-        std::cout << "oh1 refcount = " << oh1.getRefcount() << std::endl;
-        std::cout << "oh2 refcount = " << oh2.use_count() << std::endl;
+        std::cout << "oh1 refcount = " << oh1.getRefcount() << '\n';
+        std::cout << "oh2 refcount = " << oh2.use_count() << '\n';
         ObjectHolder oh3(new Object);
         ObjectHolder oh4;
         ObjectHolder oh5;
-        std::cout << "oh5 refcount = " << oh5.getRefcount() << std::endl;
+        std::cout << "oh5 refcount = " << oh5.getRefcount() << '\n';
         if (oh4 == oh5) {
-            std::cout << "nulls equal" << std::endl;
+            std::cout << "nulls equal" << '\n';
         }
         oh3 = oh1;
         oh4 = oh2;
         if (oh3 == oh4) {
-            std::cout << "equal okay" << std::endl;
+            std::cout << "equal okay" << '\n';
         }
         if ((!(oh3 < oh4)) && (!(oh4 < oh3))) {
-            std::cout << "less than okay" << std::endl;
+            std::cout << "less than okay" << '\n';
         }
         ol1.push_back(oh3);
         ol1.push_back(oh3);
@@ -107,9 +107,9 @@ test_ph()
     callHello(ol1.front());
     callHelloWithGet(ol1.front());
     ol1.pop_front();
-    std::cout << "array" << std::endl;
+    std::cout << "array" << '\n';
     PointerHolder<Object> o_arr1_ph(true, new Object[2]);
-    std::cout << "goodbye" << std::endl;
+    std::cout << "goodbye" << '\n';
 }
 
 PointerHolder<Object>
@@ -165,7 +165,7 @@ ph_sp_compat()
 {
     // Ensure bidirectional compatibility between PointerHolder and
     // shared_ptr.
-    std::cout << "compat" << std::endl;
+    std::cout << "compat" << '\n';
     PointerHolder<Object> ph_from_ph = make_object_ph();
     std::shared_ptr<Object> sp_from_ph = make_object_ph();
     PointerHolder<Object> ph_from_sp = make_object_sp();
@@ -184,21 +184,21 @@ ph_sp_compat()
     hello_ph_const(sp_const_from_sp);
     PointerHolder<Object> arr1_ph;
     {
-        std::cout << "initialize ph array from shared_ptr" << std::endl;
+        std::cout << "initialize ph array from shared_ptr" << '\n';
         std::shared_ptr<Object> arr1(new Object[2], std::default_delete<Object[]>());
         arr1_ph = arr1;
     }
-    std::cout << "delete ph array" << std::endl;
+    std::cout << "delete ph array" << '\n';
     arr1_ph = nullptr;
     std::shared_ptr<Object> arr2_sp;
     {
-        std::cout << "initialize sp array from PointerHolder" << std::endl;
+        std::cout << "initialize sp array from PointerHolder" << '\n';
         PointerHolder<Object> arr2(true, new Object[2]);
         arr2_sp = arr2;
     }
-    std::cout << "delete sp array" << std::endl;
+    std::cout << "delete sp array" << '\n';
     arr2_sp = nullptr;
-    std::cout << "end compat" << std::endl;
+    std::cout << "end compat" << '\n';
 }
 
 std::list<PointerHolder<Object>>
@@ -224,13 +224,13 @@ get_sp_list()
 void
 ph_sp_containers()
 {
-    std::cout << "containers" << std::endl;
+    std::cout << "containers" << '\n';
     // Demonstrate that using auto makes it easy to switch interfaces
     // from using a container of one shared pointer type to a
     // container of the other.
     auto phl1 = get_ph_list();
     auto phl2 = get_sp_list();
-    std::cout << "end containers" << std::endl;
+    std::cout << "end containers" << '\n';
 }
 
 int

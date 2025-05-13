@@ -13,11 +13,10 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " { -uncompress | -compress[=n] }" << std::endl
-              << "If n is specified with -compress, it is a zlib compression level from"
-              << std::endl
-              << "1 to 9 where lower numbers are faster and less compressed and higher" << std::endl
-              << "numbers are slower and more compressed" << std::endl;
+    std::cerr << "Usage: " << whoami << " { -uncompress | -compress[=n] }" << '\n'
+              << "If n is specified with -compress, it is a zlib compression level from" << '\n'
+              << "1 to 9 where lower numbers are faster and less compressed and higher" << '\n'
+              << "numbers are slower and more compressed" << '\n';
     exit(2);
 }
 
@@ -31,7 +30,7 @@ main(int argc, char* argv[])
     }
 
     if ((argc == 2) && (strcmp(argv[1], "--version") == 0)) {
-        std::cout << whoami << " from qpdf version " << QPDF::QPDFVersion() << std::endl;
+        std::cout << whoami << " from qpdf version " << QPDF::QPDFVersion() << '\n';
         exit(0);
     }
 
@@ -53,7 +52,7 @@ main(int argc, char* argv[])
         // Undocumented option, but that doesn't mean someone doesn't use it...
         // This is primarily here to support the test suite.
         std::cout << (Pl_Flate::zopfli_supported() ? "1" : "0")
-                  << (Pl_Flate::zopfli_enabled() ? "1" : "0") << std::endl;
+                  << (Pl_Flate::zopfli_enabled() ? "1" : "0") << '\n';
         return 0;
     } else {
         usage();
@@ -68,8 +67,7 @@ main(int argc, char* argv[])
         auto flate = std::make_shared<Pl_Flate>("flate", out.get(), action);
         flate->setWarnCallback([&warn](char const* msg, int code) {
             warn = true;
-            std::cerr << whoami << ": WARNING: zlib code " << code << ", msg = " << msg
-                      << std::endl;
+            std::cerr << whoami << ": WARNING: zlib code " << code << ", msg = " << msg << '\n';
         });
 
         unsigned char buf[10000];
@@ -84,7 +82,7 @@ main(int argc, char* argv[])
         }
         flate->finish();
     } catch (std::exception& e) {
-        std::cerr << whoami << ": " << e.what() << std::endl;
+        std::cerr << whoami << ": " << e.what() << '\n';
         exit(2);
     }
 

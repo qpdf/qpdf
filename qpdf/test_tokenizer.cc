@@ -16,7 +16,7 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " [-maxlen len | -no-ignorable] filename" << std::endl;
+    std::cerr << "Usage: " << whoami << " [-maxlen len | -no-ignorable] filename" << '\n';
     exit(2);
 }
 
@@ -115,10 +115,10 @@ try_skipping(
     char const* what,
     Finder& f)
 {
-    std::cout << "skipping to " << what << std::endl;
+    std::cout << "skipping to " << what << '\n';
     qpdf_offset_t offset = is->tell();
     if (!is->findFirst(what, offset, 0, f)) {
-        std::cout << what << " not found" << std::endl;
+        std::cout << what << " not found" << '\n';
         is->seek(offset, SEEK_SET);
     }
 }
@@ -133,7 +133,7 @@ dump_tokens(
     bool skip_inline_images)
 {
     Finder f1(is, "endstream");
-    std::cout << "--- BEGIN " << label << " ---" << std::endl;
+    std::cout << "--- BEGIN " << label << " ---" << '\n';
     bool done = false;
     QPDFTokenizer tokenizer;
     tokenizer.allowEOF();
@@ -145,7 +145,7 @@ dump_tokens(
         QPDFTokenizer::Token token =
             tokenizer.readToken(is, "test", true, inline_image_offset ? 0 : max_len);
         if (inline_image_offset && (token.getType() == QPDFTokenizer::tt_bad)) {
-            std::cout << "EI not found; resuming normal scanning" << std::endl;
+            std::cout << "EI not found; resuming normal scanning" << '\n';
             is->seek(inline_image_offset, SEEK_SET);
             inline_image_offset = 0;
             continue;
@@ -163,7 +163,7 @@ dump_tokens(
         if (!token.getErrorMessage().empty()) {
             std::cout << " (" << token.getErrorMessage() << ")";
         }
-        std::cout << std::endl;
+        std::cout << '\n';
         if (skip_streams && (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "stream"))) {
             try_skipping(tokenizer, is, max_len, "endstream", f1);
         } else if (
@@ -176,7 +176,7 @@ dump_tokens(
             done = true;
         }
     }
-    std::cout << "--- END " << label << " ---" << std::endl;
+    std::cout << "--- END " << label << " ---" << '\n';
 }
 
 static void
