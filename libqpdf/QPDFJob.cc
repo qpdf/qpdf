@@ -1397,18 +1397,20 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
   "decodelevel": "decode level used to determine stream filterability"
 })"));
 
-    bool all_keys = ((keys == nullptr) || keys->empty());
+    bool all_keys = !keys || keys->empty();
+
+    auto want_key = [&](std::string const& key) -> bool { return all_keys || keys->contains(key); };
 
     // The list of selectable top-level keys id duplicated in the following places: job.yml,
     // QPDFJob::json_schema, and QPDFJob::doJSON.
     if (json_version == 1) {
-        if (all_keys || keys->count("objects")) {
-            schema.addDictionaryMember("objects", JSON::parse(R"({
+        if (want_key("objects")) {
+            (void)schema.addDictionaryMember("objects", JSON::parse(R"({
   "<n n R|trailer>": "json representation of object"
 })"));
         }
-        if (all_keys || keys->count("objectinfo")) {
-            JSON objectinfo = schema.addDictionaryMember("objectinfo", JSON::parse(R"({
+        if (want_key("objectinfo")) {
+            (void)schema.addDictionaryMember("objectinfo", JSON::parse(R"({
   "<object-id>": {
     "stream": {
       "filter": "if stream, its filters, otherwise null",
@@ -1419,8 +1421,8 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
 })"));
         }
     } else {
-        if (all_keys || keys->count("qpdf")) {
-            schema.addDictionaryMember("qpdf", JSON::parse(R"([{
+        if (want_key("qpdf")) {
+            (void)schema.addDictionaryMember("qpdf", JSON::parse(R"([{
   "jsonversion": "numeric JSON version",
   "pdfversion": "PDF version as x.y",
   "pushedinheritedpageresources": "whether inherited attributes were pushed to the page level",
@@ -1432,8 +1434,8 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
 }])"));
         }
     }
-    if (all_keys || keys->count("pages")) {
-        JSON page = schema.addDictionaryMember("pages", JSON::parse(R"([
+    if (want_key("pages")) {
+        (void)schema.addDictionaryMember("pages", JSON::parse(R"([
   {
     "contents": [
       "reference to each content stream"
@@ -1468,16 +1470,16 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
   }
 ])"));
     }
-    if (all_keys || keys->count("pagelabels")) {
-        JSON labels = schema.addDictionaryMember("pagelabels", JSON::parse(R"([
+    if (want_key("pagelabels")) {
+        (void)schema.addDictionaryMember("pagelabels", JSON::parse(R"([
   {
     "index": "starting page position starting from zero",
     "label": "page label dictionary"
   }
 ])"));
     }
-    if (all_keys || keys->count("outlines")) {
-        JSON outlines = schema.addDictionaryMember("outlines", JSON::parse(R"([
+    if (want_key("outlines")) {
+        (void)schema.addDictionaryMember("outlines", JSON::parse(R"([
   {
     "dest": "outline destination dictionary",
     "destpageposfrom1": "position of destination page in document numbered from 1; null if not known",
@@ -1488,8 +1490,8 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
   }
 ])"));
     }
-    if (all_keys || keys->count("acroform")) {
-        JSON acroform = schema.addDictionaryMember("acroform", JSON::parse(R"({
+    if (want_key("acroform")) {
+        (void)schema.addDictionaryMember("acroform", JSON::parse(R"({
   "fields": [
     {
       "alternativename": "alternative name of field -- this is the one usually shown to users",
@@ -1522,8 +1524,8 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
     }
     std::string MODIFY_ANNOTATIONS =
         (json_version == 1 ? "moddifyannotations" : "modifyannotations");
-    if (all_keys || keys->count("encrypt")) {
-        JSON encrypt = schema.addDictionaryMember("encrypt", JSON::parse(R"({
+    if (want_key("encrypt")) {
+        (void)schema.addDictionaryMember("encrypt", JSON::parse(R"({
   "capabilities": {
     "accessibility": "allow extraction for accessibility?",
     "extract": "allow extraction?",
@@ -1552,8 +1554,8 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
   "userpasswordmatched": "whether supplied password matched user password; always false for non-encrypted files"
 })"));
     }
-    if (all_keys || keys->count("attachments")) {
-        JSON attachments = schema.addDictionaryMember("attachments", JSON::parse(R"({
+    if (want_key("attachments")) {
+        (void)schema.addDictionaryMember("attachments", JSON::parse(R"({
   "<attachment-key>": {
     "filespec": "object containing the file spec",
     "preferredcontents": "most preferred embedded file stream",
