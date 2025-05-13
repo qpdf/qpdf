@@ -8,7 +8,7 @@ wmain_test()
     // writable args and function args
     auto realmain = [](int argc, char* argv[]) {
         for (int i = 0; i < argc; ++i) {
-            std::cout << argv[i] << std::endl;
+            std::cout << argv[i] << '\n';
         }
         return 0;
     };
@@ -28,7 +28,7 @@ cwmain_test()
     // const args and function args
     auto realmain = [](int argc, char const* const argv[]) {
         for (int i = 0; i < argc; ++i) {
-            std::cout << "const " << argv[i] << std::endl;
+            std::cout << "const " << argv[i] << '\n';
         }
         return 0;
     };
@@ -49,7 +49,7 @@ main(int argc, char* argv[])
         wmain_test();
         cwmain_test();
     } catch (std::exception& e) {
-        std::cout << "unexpected exception: " << e.what() << std::endl;
+        std::cout << "unexpected exception: " << e.what() << '\n';
     }
 #endif // QPDF_NO_WCHAR_T
 

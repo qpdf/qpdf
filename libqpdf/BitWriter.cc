@@ -5,9 +5,7 @@
 #include <qpdf/bits_functions.hh>
 
 BitWriter::BitWriter(Pipeline* pl) :
-    pl(pl),
-    ch(0),
-    bit_offset(7)
+    pl(pl)
 {
 }
 

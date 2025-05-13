@@ -12,7 +12,7 @@
 static void
 usage()
 {
-    std::cerr << "Usage: dct_compress infile outfile width height {rgb|cmyk|gray}" << std::endl;
+    std::cerr << "Usage: dct_compress infile outfile width height {rgb|cmyk|gray}" << '\n';
     exit(2);
 }
 

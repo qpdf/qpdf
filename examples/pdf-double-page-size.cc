@@ -13,8 +13,8 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " infile.pdf outfile.pdf [in-password]" << std::endl
-              << "Double size of all pages in infile.pdf; write output to outfile.pdf" << std::endl;
+    std::cerr << "Usage: " << whoami << " infile.pdf outfile.pdf [in-password]\n"
+              << "Double size of all pages in infile.pdf; write output to outfile.pdf\n";
     exit(2);
 }
 
@@ -87,9 +87,9 @@ main(int argc, char* argv[])
             w.setStreamDataMode(qpdf_s_uncompress);
         }
         w.write();
-        std::cout << whoami << ": new file written to " << outfilename << std::endl;
+        std::cout << whoami << ": new file written to " << outfilename << '\n';
     } catch (std::exception& e) {
-        std::cerr << whoami << " processing file " << infilename << ": " << e.what() << std::endl;
+        std::cerr << whoami << " processing file " << infilename << ": " << e.what() << '\n';
         exit(2);
     }
 

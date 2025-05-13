@@ -47,7 +47,7 @@ Finder::check()
 void
 check(char const* description, bool expected, bool actual)
 {
-    std::cout << description << ": " << ((actual == expected) ? "PASS" : "FAIL") << std::endl;
+    std::cout << description << ": " << ((actual == expected) ? "PASS" : "FAIL") << '\n';
 }
 
 int

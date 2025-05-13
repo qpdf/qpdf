@@ -1,10 +1,5 @@
 #include <qpdf/ResourceFinder.hh>
 
-ResourceFinder::ResourceFinder() :
-    last_name_offset(0)
-{
-}
-
 void
 ResourceFinder::handleObject(QPDFObjectHandle obj, size_t offset, size_t)
 {

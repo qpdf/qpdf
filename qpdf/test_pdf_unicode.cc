@@ -9,7 +9,7 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " infile" << std::endl;
+    std::cerr << "Usage: " << whoami << " infile" << '\n';
     exit(2);
 }
 
@@ -28,7 +28,7 @@ main(int argc, char* argv[])
     char const* infilename = argv[1];
     for (auto const& line: QUtil::read_lines_from_file(infilename)) {
         QPDFObjectHandle str = QPDFObjectHandle::newUnicodeString(line);
-        std::cout << str.getUTF8Value() << " // " << str.unparseBinary() << std::endl;
+        std::cout << str.getUTF8Value() << " // " << str.unparseBinary() << '\n';
     }
     return 0;
 }

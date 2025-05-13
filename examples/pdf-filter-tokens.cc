@@ -20,8 +20,8 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " infile outfile" << std::endl
-              << "Applies token filters to infile and writes outfile" << std::endl;
+    std::cerr << "Usage: " << whoami << " infile outfile\n"
+              << "Applies token filters to infile and writes outfile\n";
     exit(2);
 }
 
@@ -184,7 +184,7 @@ main(int argc, char* argv[])
         w.setQDFMode(true);
         w.write();
     } catch (std::exception& e) {
-        std::cerr << whoami << ": " << e.what() << std::endl;
+        std::cerr << whoami << ": " << e.what() << '\n';
         exit(2);
     }
 

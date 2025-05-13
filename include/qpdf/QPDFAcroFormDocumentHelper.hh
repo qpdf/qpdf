@@ -234,10 +234,10 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
         ~Members() = default;
 
       private:
-        Members();
+        Members() = default;
         Members(Members const&) = delete;
 
-        bool cache_valid;
+        bool cache_valid{false};
         std::map<QPDFObjGen, std::vector<QPDFAnnotationObjectHelper>> field_to_annotations;
         std::map<QPDFObjGen, QPDFFormFieldObjectHelper> annotation_to_field;
         std::map<QPDFObjGen, std::string> field_to_name;

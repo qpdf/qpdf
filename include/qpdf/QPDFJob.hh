@@ -158,10 +158,11 @@ class QPDFJob
 
     struct PageSpec
     {
-        PageSpec(std::string const& filename, char const* password, std::string const& range);
+        PageSpec(
+            std::string const& filename, std::string const& password, std::string const& range);
 
         std::string filename;
-        std::shared_ptr<char> password;
+        std::string password;
         std::string range;
     };
 
@@ -450,7 +451,7 @@ class QPDFJob
 
         std::string which;
         std::string filename;
-        std::shared_ptr<char> password;
+        std::string password;
         std::string to_nr;
         std::string from_nr;
         std::string repeat_nr;
@@ -591,7 +592,7 @@ class QPDFJob
         bool warnings{false};
         unsigned long encryption_status{0};
         bool verbose{false};
-        std::shared_ptr<char> password;
+        std::string password;
         bool linearize{false};
         bool decrypt{false};
         bool remove_restrictions{false};
@@ -602,7 +603,7 @@ class QPDFJob
         bool warnings_exit_zero{false};
         bool copy_encryption{false};
         std::string encryption_file;
-        std::shared_ptr<char> encryption_file_password;
+        std::string encryption_file_password;
         bool encrypt{false};
         bool password_is_hex_key{false};
         bool suppress_password_recovery{false};
@@ -711,8 +712,9 @@ class QPDFJob
         bool replace_input{false};
         bool check_is_encrypted{false};
         bool check_requires_password{false};
-        std::shared_ptr<char> infilename;
-        std::shared_ptr<char> outfilename;
+        std::string infilename;
+        bool empty_input{false};
+        std::string outfilename;
         bool json_input{false};
         bool json_output{false};
         std::string update_from_json;

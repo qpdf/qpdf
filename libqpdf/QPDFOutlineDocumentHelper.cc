@@ -56,7 +56,7 @@ QPDFOutlineDocumentHelper::getOutlinesForPage(QPDFObjGen og)
         initializeByPage();
     }
     std::vector<QPDFOutlineObjectHelper> result;
-    if (m->by_page.count(og)) {
+    if (m->by_page.contains(og)) {
         result = m->by_page[og];
     }
     return result;

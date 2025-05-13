@@ -564,7 +564,7 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
     obj_copier.to_copy.clear();
 
     auto og = foreign.getObjGen();
-    if (!obj_copier.object_map.count(og)) {
+    if (!obj_copier.object_map.contains(og)) {
         warn(damagedPDF(
             other.getFilename() + " object " + og.unparse(' '),
             foreign.getParsedOffset(),
@@ -594,7 +594,7 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
             QTC::TC("qpdf", "QPDF loop reserving objects");
             return;
         }
-        if (obj_copier.object_map.count(foreign_og) > 0) {
+        if (obj_copier.object_map.contains(foreign_og)) {
             QTC::TC("qpdf", "QPDF already reserved object");
             if (!(top && foreign.isPageObject() && obj_copier.object_map[foreign_og].isNull())) {
                 obj_copier.visiting.erase(foreign);

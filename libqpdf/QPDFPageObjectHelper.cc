@@ -593,7 +593,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     for (auto const& i1: to_filter) {
         for (auto const& n_iter: names_by_rtype[i1]) {
             std::string const& name = n_iter.first;
-            if (!known_names.count(name)) {
+            if (!known_names.contains(name)) {
                 unresolved.insert(name);
                 local_unresolved.insert(name);
             }
@@ -624,10 +624,10 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
 
     for (auto& dict: rdicts) {
         for (auto const& key: dict.getKeys()) {
-            if (is_page && unresolved.count(key)) {
+            if (is_page && unresolved.contains(key)) {
                 // This name is referenced by some nested form xobject, so don't remove it.
                 QTC::TC("qpdf", "QPDFPageObjectHelper resolving unresolved");
-            } else if (!rf.getNames().count(key)) {
+            } else if (!rf.getNames().contains(key)) {
                 dict.removeKey(key);
             }
         }

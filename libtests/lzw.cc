@@ -15,7 +15,7 @@ main(int argc, char* argv[])
     }
 
     if (argc < 3) {
-        std::cerr << "Usage: lzw infile outfile [ --no-early-code-change ]" << std::endl;
+        std::cerr << "Usage: lzw infile outfile [ --no-early-code-change ]" << '\n';
         exit(2);
     }
 
@@ -41,7 +41,7 @@ main(int argc, char* argv[])
         }
         decode.finish();
     } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
         exit(2);
     }
 

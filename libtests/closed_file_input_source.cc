@@ -8,7 +8,7 @@ void
 check(std::string const& what, bool result)
 {
     if (!result) {
-        std::cout << "FAIL: " << what << std::endl;
+        std::cout << "FAIL: " << what << '\n';
     }
 }
 
@@ -73,6 +73,6 @@ main()
     std::cout << "testing with FileInputSource\n";
     FileInputSource f("input");
     do_tests(&f);
-    std::cout << "all assertions passed" << std::endl;
+    std::cout << "all assertions passed" << '\n';
     return 0;
 }

@@ -88,7 +88,7 @@ QPDFCryptoProvider::registerImpl_internal(std::string const& name, provider_fn f
 void
 QPDFCryptoProvider::setDefaultProvider_internal(std::string const& name)
 {
-    if (!m->providers.count(name)) {
+    if (!m->providers.contains(name)) {
         throw std::logic_error(
             "QPDFCryptoProvider: request to set default provider to unknown implementation \"" +
             name + "\"");

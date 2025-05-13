@@ -15,8 +15,8 @@ QPDFJob::Config::checkConfiguration()
 QPDFJob::Config*
 QPDFJob::Config::inputFile(std::string const& filename)
 {
-    if (o.m->infilename == nullptr) {
-        o.m->infilename = QUtil::make_shared_cstr(filename);
+    if (o.m->infilename.empty()) {
+        o.m->infilename = filename;
     } else {
         usage("input file has already been given");
     }
@@ -26,13 +26,13 @@ QPDFJob::Config::inputFile(std::string const& filename)
 QPDFJob::Config*
 QPDFJob::Config::emptyInput()
 {
-    if (o.m->infilename == nullptr) {
-        // Various places in QPDFJob.cc know that the empty string for infile means empty. We set it
-        // to something other than a null pointer as an indication that some input source has been
-        // specified. This approach means that passing "" as the argument to inputFile in job JSON,
-        // or equivalently using "" as a positional command-line argument would be the same as
-        // --empty. This probably isn't worth blocking or coding around.
-        o.m->infilename = QUtil::make_shared_cstr("");
+    if (o.m->infilename.empty()) {
+        // Various places in QPDFJob.cc used to know that the empty string for infile means empty.
+        // This approach meant that passing "" as the argument to inputFile in job JSON, or
+        // equivalently using "" as a positional command-line argument would be the same as
+        // --empty. This was deemed to be not worth blocking or coding around. This no longer holds
+        // from 12.3.
+        o.m->empty_input = true;
     } else {
         usage("empty input can't be used since input file has already been given");
     }
@@ -42,8 +42,8 @@ QPDFJob::Config::emptyInput()
 QPDFJob::Config*
 QPDFJob::Config::outputFile(std::string const& filename)
 {
-    if ((o.m->outfilename == nullptr) && (!o.m->replace_input)) {
-        o.m->outfilename = QUtil::make_shared_cstr(filename);
+    if (o.m->outfilename.empty() && !o.m->replace_input) {
+        o.m->outfilename = filename;
     } else {
         usage("output file has already been given");
     }
@@ -53,7 +53,7 @@ QPDFJob::Config::outputFile(std::string const& filename)
 QPDFJob::Config*
 QPDFJob::Config::replaceInput()
 {
-    if ((o.m->outfilename == nullptr) && (!o.m->replace_input)) {
+    if (o.m->outfilename.empty() && !o.m->replace_input) {
         o.m->replace_input = true;
     } else {
         usage("replace-input can't be used since output file has already been given");
@@ -175,7 +175,7 @@ QPDFJob::Config::deterministicId()
 QPDFJob::Config*
 QPDFJob::Config::encryptionFilePassword(std::string const& parameter)
 {
-    o.m->encryption_file_password = QUtil::make_shared_cstr(parameter);
+    o.m->encryption_file_password = parameter;
     return this;
 }
 
@@ -456,7 +456,7 @@ QPDFJob::Config::optimizeImages()
 QPDFJob::Config*
 QPDFJob::Config::password(std::string const& parameter)
 {
-    o.m->password = QUtil::make_shared_cstr(parameter);
+    o.m->password = parameter;
     return this;
 }
 
@@ -696,12 +696,12 @@ QPDFJob::Config::passwordFile(std::string const& parameter)
         QTC::TC("qpdf", "QPDFJob_config password file");
         lines = QUtil::read_lines_from_file(parameter.c_str());
     }
-    if (lines.size() >= 1) {
-        o.m->password = QUtil::make_shared_cstr(lines.front());
+    if (!lines.empty()) {
+        o.m->password = lines.front();
 
         if (lines.size() > 1) {
             *QPDFLogger::defaultLogger()->getError()
-                << this->o.m->message_prefix << ": WARNING: all but the first line of"
+                << o.m->message_prefix << ": WARNING: all but the first line of"
                 << " the password file are ignored\n";
         }
     }
@@ -806,7 +806,7 @@ QPDFJob::Config::jobJsonFile(std::string const& parameter)
     } catch (std::exception& e) {
         throw std::runtime_error(
             "error with job-json file " + std::string(parameter) + ": " + e.what() + "\nRun " +
-            this->o.m->message_prefix + " --job-json-help for information on the file format.");
+            o.m->message_prefix + " --job-json-help for information on the file format.");
     }
     return this;
 }
@@ -832,32 +832,32 @@ QPDFJob::CopyAttConfig::CopyAttConfig(Config* c) :
 QPDFJob::CopyAttConfig*
 QPDFJob::CopyAttConfig::file(std::string const& parameter)
 {
-    this->caf.path = parameter;
+    caf.path = parameter;
     return this;
 }
 
 QPDFJob::CopyAttConfig*
 QPDFJob::CopyAttConfig::prefix(std::string const& parameter)
 {
-    this->caf.prefix = parameter;
+    caf.prefix = parameter;
     return this;
 }
 
 QPDFJob::CopyAttConfig*
 QPDFJob::CopyAttConfig::password(std::string const& parameter)
 {
-    this->caf.password = parameter;
+    caf.password = parameter;
     return this;
 }
 
 QPDFJob::Config*
 QPDFJob::CopyAttConfig::endCopyAttachmentsFrom()
 {
-    if (this->caf.path.empty()) {
+    if (caf.path.empty()) {
         usage("copy attachments: no file specified");
     }
-    this->config->o.m->attachments_to_copy.push_back(this->caf);
-    return this->config;
+    config->o.m->attachments_to_copy.push_back(caf);
+    return config;
 }
 
 QPDFJob::AttConfig::AttConfig(Config* c) :
@@ -874,21 +874,21 @@ QPDFJob::Config::addAttachment()
 QPDFJob::AttConfig*
 QPDFJob::AttConfig::file(std::string const& parameter)
 {
-    this->att.path = parameter;
+    att.path = parameter;
     return this;
 }
 
 QPDFJob::AttConfig*
 QPDFJob::AttConfig::key(std::string const& parameter)
 {
-    this->att.key = parameter;
+    att.key = parameter;
     return this;
 }
 
 QPDFJob::AttConfig*
 QPDFJob::AttConfig::filename(std::string const& parameter)
 {
-    this->att.filename = parameter;
+    att.filename = parameter;
     return this;
 }
 
@@ -898,7 +898,7 @@ QPDFJob::AttConfig::creationdate(std::string const& parameter)
     if (!QUtil::pdf_time_to_qpdf_time(parameter)) {
         usage(std::string(parameter) + " is not a valid PDF timestamp");
     }
-    this->att.creationdate = parameter;
+    att.creationdate = parameter;
     return this;
 }
 
@@ -908,7 +908,7 @@ QPDFJob::AttConfig::moddate(std::string const& parameter)
     if (!QUtil::pdf_time_to_qpdf_time(parameter)) {
         usage(std::string(parameter) + " is not a valid PDF timestamp");
     }
-    this->att.moddate = parameter;
+    att.moddate = parameter;
     return this;
 }
 
@@ -918,21 +918,21 @@ QPDFJob::AttConfig::mimetype(std::string const& parameter)
     if (parameter.find('/') == std::string::npos) {
         usage("mime type should be specified as type/subtype");
     }
-    this->att.mimetype = parameter;
+    att.mimetype = parameter;
     return this;
 }
 
 QPDFJob::AttConfig*
 QPDFJob::AttConfig::description(std::string const& parameter)
 {
-    this->att.description = parameter;
+    att.description = parameter;
     return this;
 }
 
 QPDFJob::AttConfig*
 QPDFJob::AttConfig::replace()
 {
-    this->att.replace = true;
+    att.replace = true;
     return this;
 }
 
@@ -940,28 +940,28 @@ QPDFJob::Config*
 QPDFJob::AttConfig::endAddAttachment()
 {
     static std::string now = QUtil::qpdf_time_to_pdf_time(QUtil::get_current_qpdf_time());
-    if (this->att.path.empty()) {
+    if (att.path.empty()) {
         usage("add attachment: no file specified");
     }
-    std::string last_element = QUtil::path_basename(this->att.path);
+    std::string last_element = QUtil::path_basename(att.path);
     if (last_element.empty()) {
         usage("file for --add-attachment may not be empty");
     }
-    if (this->att.filename.empty()) {
-        this->att.filename = last_element;
+    if (att.filename.empty()) {
+        att.filename = last_element;
     }
-    if (this->att.key.empty()) {
-        this->att.key = last_element;
+    if (att.key.empty()) {
+        att.key = last_element;
     }
-    if (this->att.creationdate.empty()) {
-        this->att.creationdate = now;
+    if (att.creationdate.empty()) {
+        att.creationdate = now;
     }
-    if (this->att.moddate.empty()) {
-        this->att.moddate = now;
+    if (att.moddate.empty()) {
+        att.moddate = now;
     }
 
-    this->config->o.m->attachments_to_add.push_back(this->att);
-    return this->config;
+    config->o.m->attachments_to_add.push_back(att);
+    return config;
 }
 
 QPDFJob::PagesConfig::PagesConfig(Config* c) :
@@ -985,21 +985,21 @@ QPDFJob::PagesConfig::endPages()
     if (n_specs == 0) {
         usage("--pages: no page specifications given");
     }
-    return this->config;
+    return config;
 }
 
 QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::pageSpec(
     std::string const& filename, std::string const& range, char const* password)
 {
-    this->config->o.m->page_specs.emplace_back(filename, password, range);
+    config->o.m->page_specs.emplace_back(filename, password, range);
     return this;
 }
 
 QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::file(std::string const& arg)
 {
-    this->config->o.m->page_specs.emplace_back(arg, nullptr, "");
+    config->o.m->page_specs.emplace_back(arg, "", "");
     return this;
 }
 
@@ -1027,11 +1027,11 @@ QPDFJob::PagesConfig::password(std::string const& arg)
         usage("in --pages, --password must follow a file name");
     }
     auto& last = config->o.m->page_specs.back();
-    if (last.password) {
+    if (!last.password.empty()) {
         QTC::TC("qpdf", "QPDFJob duplicated pages password");
         usage("--password already specified for this file");
     }
-    last.password = QUtil::make_shared_cstr(arg);
+    last.password = arg;
     return this;
 }
 
@@ -1063,7 +1063,7 @@ QPDFJob::UOConfig::endUnderlayOverlay()
         usage(config->o.m->under_overlay->which + " file not specified");
     }
     config->o.m->under_overlay = nullptr;
-    return this->config;
+    return config;
 }
 
 QPDFJob::UOConfig*
@@ -1108,7 +1108,7 @@ QPDFJob::UOConfig::repeat(std::string const& parameter)
 QPDFJob::UOConfig*
 QPDFJob::UOConfig::password(std::string const& parameter)
 {
-    config->o.m->under_overlay->password = QUtil::make_shared_cstr(parameter);
+    config->o.m->under_overlay->password = parameter;
     return this;
 }
 
@@ -1192,7 +1192,7 @@ QPDFJob::EncConfig::endEncrypt()
     config->o.m->encrypt = true;
     config->o.m->decrypt = false;
     config->o.m->copy_encryption = false;
-    return this->config;
+    return config;
 }
 
 QPDFJob::EncConfig*
@@ -1341,5 +1341,5 @@ QPDFJob::PageLabelsConfig::PageLabelsConfig(Config* c) :
 QPDFJob::Config*
 QPDFJob::PageLabelsConfig::endSetPageLabels()
 {
-    return this->config;
+    return config;
 }

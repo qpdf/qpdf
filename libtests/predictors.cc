@@ -39,7 +39,7 @@ run(char const* filename,
             samples_per_pixel,
             bits_per_sample);
     } else {
-        std::cerr << "unknown filter " << filter << std::endl;
+        std::cerr << "unknown filter " << filter << '\n';
         exit(2);
     }
     assert((2 * (columns + 1)) < 1024);
@@ -69,7 +69,7 @@ run(char const* filename,
     fclose(o1);
     fclose(in);
 
-    std::cout << "done" << std::endl;
+    std::cout << "done" << '\n';
 }
 
 int
@@ -77,7 +77,7 @@ main(int argc, char* argv[])
 {
     if (argc != 7) {
         std::cerr << "Usage: predictor {png|tiff} {en,de}code filename"
-                  << " columns samples-per-pixel bits-per-sample" << std::endl;
+                  << " columns samples-per-pixel bits-per-sample" << '\n';
         exit(2);
     }
     char* filter = argv[1];
@@ -95,7 +95,7 @@ main(int argc, char* argv[])
             QIntC::to_uint(bits_per_sample),
             QIntC::to_uint(samples_per_pixel));
     } catch (std::exception& e) {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
     return 0;
 }

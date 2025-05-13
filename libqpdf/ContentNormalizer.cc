@@ -5,12 +5,6 @@
 
 using namespace qpdf;
 
-ContentNormalizer::ContentNormalizer() :
-    any_bad_tokens(false),
-    last_token_was_bad(false)
-{
-}
-
 void
 ContentNormalizer::handleToken(QPDFTokenizer::Token const& token)
 {

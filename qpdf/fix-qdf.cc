@@ -81,7 +81,7 @@ QdfFixer::QdfFixer(std::string const& filename, std::ostream& out) :
 void
 QdfFixer::fatal(std::string const& msg)
 {
-    std::cerr << msg << std::endl;
+    std::cerr << msg << '\n';
     exit(2);
 }
 
@@ -380,7 +380,7 @@ realmain(int argc, char* argv[])
     if (argc > 3) {
         usage();
     } else if ((argc > 1) && (strcmp(argv[1], "--version") == 0)) {
-        std::cout << whoami << " from qpdf version " << QPDF::QPDFVersion() << std::endl;
+        std::cout << whoami << " from qpdf version " << QPDF::QPDFVersion() << '\n';
         return 0;
     } else if ((argc > 1) && (strcmp(argv[1], "--help") == 0)) {
         usage();
@@ -411,7 +411,7 @@ realmain(int argc, char* argv[])
         QdfFixer qf(filename, out ? *out : std::cout);
         qf.processLines(input);
     } catch (std::exception& e) {
-        std::cerr << whoami << ": error: " << e.what() << std::endl;
+        std::cerr << whoami << ": error: " << e.what() << '\n';
         exit(qpdf_exit_error);
     }
     return 0;

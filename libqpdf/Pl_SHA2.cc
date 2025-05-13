@@ -5,8 +5,7 @@
 #include <stdexcept>
 
 Pl_SHA2::Pl_SHA2(int bits, Pipeline* next) :
-    Pipeline("sha2", next),
-    in_progress(false)
+    Pipeline("sha2", next)
 {
     if (bits) {
         resetBits(bits);

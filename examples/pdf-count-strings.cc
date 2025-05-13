@@ -18,8 +18,8 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " infile" << std::endl
-              << "Applies token filters to infile" << std::endl;
+    std::cerr << "Usage: " << whoami << " infile\n"
+              << "Applies token filters to infile\n";
     exit(2);
 }
 
@@ -88,14 +88,14 @@ main(int argc, char* argv[])
             } else {
                 // Write output to stdout for even pages.
                 Pl_StdioFile out("stdout", stdout);
-                std::cout << "% Contents of page " << pageno << std::endl;
+                std::cout << "% Contents of page " << pageno << '\n';
                 page.filterContents(&counter, &out);
-                std::cout << "\n% end " << pageno << std::endl;
+                std::cout << "\n% end " << pageno << '\n';
             }
-            std::cout << "Page " << pageno << ": strings = " << counter.getCount() << std::endl;
+            std::cout << "Page " << pageno << ": strings = " << counter.getCount() << '\n';
         }
     } catch (std::exception& e) {
-        std::cerr << whoami << ": " << e.what() << std::endl;
+        std::cerr << whoami << ": " << e.what() << '\n';
         exit(2);
     }
 

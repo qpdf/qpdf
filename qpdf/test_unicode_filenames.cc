@@ -13,7 +13,7 @@ static void
 do_copy(FILE* in, FILE* out)
 {
     if ((in == nullptr) || (out == nullptr)) {
-        std::cerr << "errors opening files" << std::endl;
+        std::cerr << "errors opening files" << '\n';
         exit(2);
     }
     char buf[10240];
@@ -22,7 +22,7 @@ do_copy(FILE* in, FILE* out)
         fwrite(buf, 1, len, out);
     }
     if (len != 0) {
-        std::cerr << "errors reading or writing" << std::endl;
+        std::cerr << "errors reading or writing" << '\n';
         exit(2);
     }
     fclose(in);
@@ -76,7 +76,7 @@ main(int argc, char* argv[])
     char const* f2 = "auto-\xc3\xb6\xcf\x80.pdf";
     copy(f1);
     copy(f2);
-    std::cout << "created Unicode filenames" << std::endl;
+    std::cout << "created Unicode filenames" << '\n';
     return 0;
 }
 

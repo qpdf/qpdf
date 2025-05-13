@@ -85,22 +85,22 @@ main()
         bp1.write(uc("12345"), 5);
         bp1.write(uc("67890"), 5);
         bp1.finish();
-        std::cout << "count: " << count.getCount() << std::endl;
+        std::cout << "count: " << count.getCount() << '\n';
         bp1.write(uc("abcde"), 5);
         bp1.write(uc("fghij"), 6);
         bp1.finish();
-        std::cout << "count: " << count.getCount() << std::endl;
+        std::cout << "count: " << count.getCount() << '\n';
         Buffer* b = bp1.getBuffer();
-        std::cout << "size: " << b->getSize() << std::endl;
-        std::cout << "data: " << b->getBuffer() << std::endl;
+        std::cout << "size: " << b->getSize() << '\n';
+        std::cout << "data: " << b->getBuffer() << '\n';
         delete b;
         bp1.write(uc("qwert"), 5);
         bp1.write(uc("yuiop"), 6);
         bp1.finish();
-        std::cout << "count: " << count.getCount() << std::endl;
+        std::cout << "count: " << count.getCount() << '\n';
         b = bp1.getBuffer();
-        std::cout << "size: " << b->getSize() << std::endl;
-        std::cout << "data: " << b->getBuffer() << std::endl;
+        std::cout << "size: " << b->getSize() << '\n';
+        std::cout << "data: " << b->getBuffer() << '\n';
         delete b;
 
         Pl_Buffer bp2("bp2");
@@ -109,12 +109,12 @@ main()
         try {
             delete bp2.getBuffer();
         } catch (std::exception& e) {
-            std::cout << e.what() << std::endl;
+            std::cout << e.what() << '\n';
         }
         bp2.finish();
         b = bp2.getBuffer();
-        std::cout << "size: " << b->getSize() << std::endl;
-        std::cout << "data: " << b->getBuffer() << std::endl;
+        std::cout << "size: " << b->getSize() << '\n';
+        std::cout << "data: " << b->getBuffer() << '\n';
         delete b;
 
         unsigned char lbuf[10];
@@ -125,17 +125,17 @@ main()
 
         Pl_Buffer bp3("bp3");
         b = bp3.getBuffer();
-        std::cout << "size: " << b->getSize() << std::endl;
+        std::cout << "size: " << b->getSize() << '\n';
         delete b;
         // Should be able to call getBuffer again and get an empty buffer
         b = bp3.getBuffer();
-        std::cout << "size: " << b->getSize() << std::endl;
+        std::cout << "size: " << b->getSize() << '\n';
         delete b;
         // Also can write 0 and do it.
         bp3.write(uc(""), 0);
         bp3.finish();
         b = bp3.getBuffer();
-        std::cout << "size: " << b->getSize() << std::endl;
+        std::cout << "size: " << b->getSize() << '\n';
         delete b;
 
         // Malloc buffer should behave similarly.
@@ -147,7 +147,7 @@ main()
             bp4.getMallocBuffer(&mbuf, &len);
             assert(false);
         } catch (std::logic_error& e) {
-            std::cout << "malloc buffer logic error: " << e.what() << std::endl;
+            std::cout << "malloc buffer logic error: " << e.what() << '\n';
         }
         bp4.finish();
         bp4.getMallocBuffer(&mbuf, &len);
@@ -160,10 +160,10 @@ main()
         assert(mbuf == nullptr);
         assert(len == 0);
     } catch (std::exception& e) {
-        std::cout << "unexpected exception: " << e.what() << std::endl;
+        std::cout << "unexpected exception: " << e.what() << '\n';
         exit(2);
     }
 
-    std::cout << "done" << std::endl;
+    std::cout << "done" << '\n';
     return 0;
 }

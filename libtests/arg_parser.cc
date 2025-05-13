@@ -82,7 +82,7 @@ void
 ArgParser::output(std::string const& msg)
 {
     if (!this->ap.isCompleting()) {
-        std::cout << msg << std::endl;
+        std::cout << msg << '\n';
     }
 }
 
@@ -160,7 +160,7 @@ ArgParser::test_exceptions()
             fn();
             assert(msg == nullptr);
         } catch (std::exception& e) {
-            std::cout << msg << ": " << e.what() << std::endl;
+            std::cout << msg << ": " << e.what() << '\n';
         }
     };
 
@@ -196,10 +196,10 @@ main(int argc, char* argv[])
     try {
         ap.parseArgs();
     } catch (QPDFUsage& e) {
-        std::cerr << "usage: " << e.what() << std::endl;
+        std::cerr << "usage: " << e.what() << '\n';
         exit(2);
     } catch (std::exception& e) {
-        std::cerr << "exception: " << e.what() << std::endl;
+        std::cerr << "exception: " << e.what() << '\n';
         exit(3);
     }
     return 0;

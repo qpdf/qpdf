@@ -467,7 +467,7 @@ BaseHandle::write_json(int json_version, JSON::Writer& p) const
     case ::ot_real:
         {
             auto const& val = std::get<QPDF_Real>(obj->value).val;
-            if (val.length() == 0) {
+            if (val.empty()) {
                 // Can't really happen...
                 p << "0";
             } else if (val.at(0) == '.') {
@@ -1184,7 +1184,7 @@ QPDFObjectHandle::mergeResources(
                             initialized_maps = true;
                         }
                         auto rval_og = rval.getObjGen();
-                        if (rval.isIndirect() && og_to_name.count(rval_og)) {
+                        if (rval.isIndirect() && og_to_name.contains(rval_og)) {
                             QTC::TC("qpdf", "QPDFObjectHandle merge reuse");
                             auto new_key = og_to_name[rval_og];
                             if (new_key != key) {
@@ -1208,7 +1208,7 @@ QPDFObjectHandle::mergeResources(
                 }
                 for (auto other_item: other_val.aitems()) {
                     if (other_item.isScalar()) {
-                        if (scalars.count(other_item.unparse()) == 0) {
+                        if (!scalars.contains(other_item.unparse())) {
                             QTC::TC("qpdf", "QPDFObjectHandle merge array");
                             this_val.appendItem(other_item);
                         } else {
@@ -1247,7 +1247,7 @@ QPDFObjectHandle::getUniqueResourceName(
     int max_suffix = min_suffix + QIntC::to_int(names.size());
     while (min_suffix <= max_suffix) {
         std::string candidate = prefix + std::to_string(min_suffix);
-        if (names.count(candidate) == 0) {
+        if (!names.contains(candidate)) {
             return candidate;
         }
         // Increment after return; min_suffix should be the value

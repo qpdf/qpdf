@@ -153,7 +153,7 @@ QPDF::parse(char const* password)
 
     initializeEncryption();
     m->parsed = true;
-    if (m->xref_table.size() > 0 && !getRoot().getKey("/Pages").isDictionary()) {
+    if (!m->xref_table.empty() && !getRoot().getKey("/Pages").isDictionary()) {
         // QPDFs created from JSON have an empty xref table and no root object yet.
         throw damagedPDF("", -1, "unable to find page tree");
     }
@@ -442,7 +442,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset, bool in_stream_recovery)
         } else {
             xref_offset = read_xrefStream(xref_offset, in_stream_recovery);
         }
-        if (visited.count(xref_offset) != 0) {
+        if (visited.contains(xref_offset)) {
             QTC::TC("qpdf", "QPDF xref loop");
             throw damagedPDF("", -1, "loop detected following xref tables");
         }
@@ -1020,7 +1020,7 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2)
         return;
     }
 
-    if (m->deleted_objects.count(obj)) {
+    if (m->deleted_objects.contains(obj)) {
         QTC::TC("qpdf", "QPDF xref deleted object");
         return;
     }
@@ -1056,7 +1056,7 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2)
 void
 QPDF::insertFreeXrefEntry(QPDFObjGen og)
 {
-    if (!m->xref_table.count(og)) {
+    if (!m->xref_table.contains(og)) {
         m->deleted_objects.insert(og.getObj());
     }
 }
@@ -1476,7 +1476,7 @@ QPDF::readObjectAtOffset(
         if (try_recovery) {
             // Try again after reconstructing xref table
             reconstruct_xref(e);
-            if (m->xref_table.count(exp_og) && (m->xref_table[exp_og].getType() == 1)) {
+            if (m->xref_table.contains(exp_og) && m->xref_table[exp_og].getType() == 1) {
                 qpdf_offset_t new_offset = m->xref_table[exp_og].getOffset();
                 QPDFObjectHandle result =
                     readObjectAtOffset(false, new_offset, description, exp_og, og, false);
@@ -1522,7 +1522,7 @@ QPDF::readObjectAtOffset(
             }
         }
         qpdf_offset_t end_after_space = m->file->tell();
-        if (skip_cache_if_in_xref && m->xref_table.count(og)) {
+        if (skip_cache_if_in_xref && m->xref_table.contains(og)) {
             // Ordinarily, an object gets read here when resolved through xref table or stream. In
             // the special case of the xref stream and linearization hint tables, the offset comes
             // from another source. For the specific case of xref streams, the xref stream is read
@@ -1564,7 +1564,7 @@ QPDF::resolve(QPDFObjGen og)
         return m->obj_cache[og].object;
     }
 
-    if (m->resolving.count(og)) {
+    if (m->resolving.contains(og)) {
         // This can happen if an object references itself directly or indirectly in some key that
         // has to be resolved during object parsing, such as stream length.
         QTC::TC("qpdf", "QPDF recursion loop in resolve");
@@ -1574,7 +1574,7 @@ QPDF::resolve(QPDFObjGen og)
     }
     ResolveRecorder rr(this, og);
 
-    if (m->xref_table.count(og) != 0) {
+    if (m->xref_table.contains(og)) {
         QPDFXRefEntry const& entry = m->xref_table[og];
         try {
             switch (entry.getType()) {
@@ -1628,7 +1628,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             true};
     };
 
-    if (m->resolved_object_streams.count(obj_stream_number)) {
+    if (m->resolved_object_streams.contains(obj_stream_number)) {
         return;
     }
     m->resolved_object_streams.insert(obj_stream_number);
@@ -1791,7 +1791,7 @@ QPDF::updateCache(
 bool
 QPDF::isCached(QPDFObjGen og)
 {
-    return m->obj_cache.count(og) != 0;
+    return m->obj_cache.contains(og);
 }
 
 bool
@@ -1807,7 +1807,7 @@ QPDF::nextObjGen()
     if (max_objid == std::numeric_limits<int>::max()) {
         throw std::range_error("max object id is too high to create new objects");
     }
-    return QPDFObjGen(max_objid + 1, 0);
+    return {max_objid + 1, 0};
 }
 
 QPDFObjectHandle
@@ -1835,7 +1835,7 @@ QPDF::getObjectForParser(int id, int gen, bool parse_pdf)
     if (auto iter = m->obj_cache.find(og); iter != m->obj_cache.end()) {
         return iter->second.object;
     }
-    if (m->xref_table.count(og) || !m->parsed) {
+    if (m->xref_table.contains(og) || !m->parsed) {
         return m->obj_cache.insert({og, QPDFObject::create<QPDF_Unresolved>(this, og)})
             .first->second.object;
     }
@@ -1852,7 +1852,7 @@ QPDF::getObjectForJSON(int id, int gen)
     auto [it, inserted] = m->obj_cache.try_emplace(og);
     auto& obj = it->second.object;
     if (inserted) {
-        obj = (m->parsed && !m->xref_table.count(og))
+        obj = (m->parsed && !m->xref_table.contains(og))
             ? QPDFObject::create<QPDF_Null>(this, og)
             : QPDFObject::create<QPDF_Unresolved>(this, og);
     }
@@ -1864,7 +1864,7 @@ QPDF::getObject(QPDFObjGen og)
 {
     if (auto it = m->obj_cache.find(og); it != m->obj_cache.end()) {
         return {it->second.object};
-    } else if (m->parsed && !m->xref_table.count(og)) {
+    } else if (m->parsed && !m->xref_table.contains(og)) {
         return QPDFObject::create<QPDF_Null>();
     } else {
         auto result =
@@ -1932,8 +1932,8 @@ QPDF::tableSize()
 {
     // If obj_cache is dense, accommodate all object in tables,else accommodate only original
     // objects.
-    auto max_xref = m->xref_table.size() ? m->xref_table.crbegin()->first.getObj() : 0;
-    auto max_obj = m->obj_cache.size() ? m->obj_cache.crbegin()->first.getObj() : 0;
+    auto max_xref = !m->xref_table.empty() ? m->xref_table.crbegin()->first.getObj() : 0;
+    auto max_obj = !m->obj_cache.empty() ? m->obj_cache.crbegin()->first.getObj() : 0;
     auto max_id = std::numeric_limits<int>::max() - 1;
     if (max_obj >= max_id || max_xref >= max_id) {
         // Temporary fix. Long-term solution is

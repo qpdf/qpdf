@@ -20,7 +20,7 @@ bool
 BaseDictionary::hasKey(std::string const& key) const
 {
     auto d = dict();
-    return d->items.count(key) > 0 && !d->items[key].isNull();
+    return d->items.contains(key) && !d->items[key].null();
 }
 
 QPDFObjectHandle

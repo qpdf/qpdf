@@ -25,7 +25,7 @@ class Pl_SHA2 final: public Pipeline
     std::string getRawDigest();
 
   private:
-    bool in_progress;
+    bool in_progress{false};
     std::shared_ptr<QPDFCryptoImpl> crypto;
 };
 

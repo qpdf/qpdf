@@ -49,7 +49,7 @@ FuzzHelper::run()
     try {
         doChecks();
     } catch (std::runtime_error const& e) {
-        std::cerr << "runtime_error: " << e.what() << std::endl;
+        std::cerr << "runtime_error: " << e.what() << '\n';
     }
 }
 

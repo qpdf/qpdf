@@ -84,7 +84,7 @@ class NNTreeIterator
     NNTreeImpl& impl;
     std::list<PathElement> path;
     QPDFObjectHandle node;
-    int item_number;
+    int item_number{-1};
     value_type ivalue;
 };
 
@@ -123,7 +123,7 @@ class NNTreeImpl
 
     NNTreeDetails const& details;
     QPDF& qpdf;
-    int split_threshold;
+    int split_threshold{32};
     QPDFObjectHandle oh;
     bool auto_repair;
 };

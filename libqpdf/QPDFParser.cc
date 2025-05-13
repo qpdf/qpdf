@@ -354,9 +354,9 @@ QPDFParser::parseRemainder(bool content_stream)
                     fixMissingKeys();
                 }
 
-                if (!frame->contents_string.empty() && dict.count("/Type") &&
-                    dict["/Type"].isNameAndEquals("/Sig") && dict.count("/ByteRange") &&
-                    dict.count("/Contents") && dict["/Contents"].isString()) {
+                if (!frame->contents_string.empty() && dict.contains("/Type") &&
+                    dict["/Type"].isNameAndEquals("/Sig") && dict.contains("/ByteRange") &&
+                    dict.contains("/Contents") && dict["/Contents"].isString()) {
                     dict["/Contents"] = QPDFObjectHandle::newString(frame->contents_string);
                     dict["/Contents"].setParsedOffset(frame->contents_offset);
                 }
@@ -560,7 +560,7 @@ QPDFParser::fixMissingKeys()
     for (auto const& item: frame->olist) {
         while (true) {
             const std::string key = "/QPDFFake" + std::to_string(next_fake_key++);
-            const bool found_fake = frame->dict.count(key) == 0 && names.count(key) == 0;
+            const bool found_fake = !frame->dict.contains(key) && !names.contains(key);
             QTC::TC("qpdf", "QPDFParser found fake", (found_fake ? 0 : 1));
             if (found_fake) {
                 warn(

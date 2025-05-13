@@ -110,7 +110,7 @@ class QPDFObjGen
         add(QPDFObjGen og)
         {
             if (og.isIndirect()) {
-                if (count(og) > 0) {
+                if (count(og)) {
                     return false;
                 }
                 emplace(og);

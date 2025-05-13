@@ -53,7 +53,7 @@ run(char const* filename)
 
     def3->finish();
 
-    std::cout << "bytes written to o3: " << count3->getCount() << std::endl;
+    std::cout << "bytes written to o3: " << count3->getCount() << '\n';
 
     delete def3;
     delete inf3;
@@ -76,14 +76,14 @@ run(char const* filename)
     // At this point, filename, filename.2, and filename.3 should have
     // identical contents.  filename.1 should be a compressed version.
 
-    std::cout << "done" << std::endl;
+    std::cout << "done" << '\n';
 }
 
 int
 main(int argc, char* argv[])
 {
     if (argc != 2) {
-        std::cerr << "Usage: pipeline filename" << std::endl;
+        std::cerr << "Usage: pipeline filename" << '\n';
         exit(2);
     }
     char* filename = argv[1];
@@ -91,7 +91,7 @@ main(int argc, char* argv[])
     try {
         run(filename);
     } catch (std::exception& e) {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << '\n';
     }
     return 0;
 }

@@ -8,7 +8,7 @@ int
 main(int argc, char* argv[])
 {
     if (argc != 2) {
-        std::cerr << "usage: test_xref INPUT.pdf" << std::endl;
+        std::cerr << "usage: test_xref INPUT.pdf" << '\n';
         std::exit(2);
     }
 
@@ -20,23 +20,23 @@ main(int argc, char* argv[])
             std::cout << iter.first.getObj() << "/" << iter.first.getGen() << ", ";
             switch (iter.second.getType()) {
             case 0:
-                std::cout << "free entry" << std::endl;
+                std::cout << "free entry" << '\n';
                 break;
             case 1:
                 std::cout << "uncompressed, offset = " << iter.second.getOffset() << " (0x"
-                          << std::hex << iter.second.getOffset() << std::dec << ")" << std::endl;
+                          << std::hex << iter.second.getOffset() << std::dec << ")" << '\n';
                 break;
             case 2:
                 std::cout << "compressed, stream number = " << iter.second.getObjStreamNumber()
-                          << ", stream index = " << iter.second.getObjStreamIndex() << std::endl;
+                          << ", stream index = " << iter.second.getObjStreamIndex() << '\n';
                 break;
             default:
-                std::cerr << "unknown" << std::endl;
+                std::cerr << "unknown" << '\n';
                 std::exit(2);
             }
         }
     } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
         std::exit(2);
     }
 

@@ -161,7 +161,7 @@ QPDF::test_json_validators()
     auto check_fn = [&passed](char const* msg, bool expr) {
         if (!expr) {
             passed = false;
-            std::cerr << msg << std::endl;
+            std::cerr << msg << '\n';
         }
     };
 #define check(expr) check_fn(#expr, expr)
@@ -192,7 +192,7 @@ QPDF::test_json_validators()
     check(is_unicode_string("u:potato", str));
     check(str == "potato");
     check(is_unicode_string("u:", str));
-    check(str == "");
+    check(str.empty());
     check(!is_binary_string("", str));
     check(!is_binary_string("x:", str));
     check(!is_binary_string("b:1", str));
@@ -889,7 +889,7 @@ QPDF::writeJSON(
     for (auto& obj: getAllObjects()) {
         auto const og = obj.getObjGen();
         std::string key = "obj:" + og.unparse(' ') + " R";
-        if (all_objects || wanted_objects.count(key)) {
+        if (all_objects || wanted_objects.contains(key)) {
             if (first) {
                 jw << "\n      \"" << key;
                 first = false;
@@ -911,7 +911,7 @@ QPDF::writeJSON(
             }
         }
     }
-    if (all_objects || wanted_objects.count("trailer")) {
+    if (all_objects || wanted_objects.contains("trailer")) {
         if (!first) {
             jw << "\n      },";
         }

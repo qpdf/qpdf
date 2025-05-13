@@ -10,7 +10,7 @@ main(int argc, char* argv[])
 {
     auto whoami = QUtil::getWhoami(argv[0]);
     if (argc != 2) {
-        std::cerr << "Usage: " << whoami << " outfile.pdf" << std::endl;
+        std::cerr << "Usage: " << whoami << " outfile.pdf" << '\n';
         exit(2);
     }
     char const* outfile = argv[1];

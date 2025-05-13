@@ -186,12 +186,12 @@ static void
 check_schema(JSON& obj, JSON& schema, unsigned long flags, bool exp, std::string const& description)
 {
     std::list<std::string> errors;
-    std::cout << "--- " << description << std::endl;
+    std::cout << "--- " << description << '\n';
     assert(exp == obj.checkSchema(schema, flags, errors));
     for (auto const& error: errors) {
-        std::cout << error << std::endl;
+        std::cout << error << '\n';
     }
-    std::cout << "---" << std::endl;
+    std::cout << "---" << '\n';
 }
 
 static void

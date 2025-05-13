@@ -42,7 +42,7 @@ process(char const* whoami, char const* infile, std::string outprefix)
 void
 usage(char const* whoami)
 {
-    std::cerr << "Usage: " << whoami << " infile outprefix" << std::endl;
+    std::cerr << "Usage: " << whoami << " infile outprefix\n";
     exit(2);
 }
 
@@ -64,7 +64,7 @@ main(int argc, char* argv[])
     try {
         process(whoami, argv[1], argv[2]);
     } catch (std::exception const& e) {
-        std::cerr << whoami << ": exception: " << e.what() << std::endl;
+        std::cerr << whoami << ": exception: " << e.what() << '\n';
         return 2;
     }
     return 0;

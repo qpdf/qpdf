@@ -117,8 +117,8 @@ ImageProvider::provideStreamData(QPDFObjGen const&, Pipeline* pipeline)
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " filename" << std::endl
-              << "Creates a simple PDF and writes it to filename" << std::endl;
+    std::cerr << "Usage: " << whoami << " filename\n"
+              << "Creates a simple PDF and writes it to filename\n";
     exit(2);
 }
 
@@ -257,12 +257,12 @@ check(
         if (!filter.isNameAndEquals(desired_filter)) {
             this_errors = errors = true;
             std::cout << "page " << pageno << ": expected filter " << desired_filter
-                      << "; actual filter = " << filter.unparse() << std::endl;
+                      << "; actual filter = " << filter.unparse() << '\n';
         }
         if (!color_space.isNameAndEquals(desired_color_space)) {
             this_errors = errors = true;
             std::cout << "page " << pageno << ": expected color space " << desired_color_space
-                      << "; actual color space = " << color_space.unparse() << std::endl;
+                      << "; actual color space = " << color_space.unparse() << '\n';
         }
 
         if (!this_errors) {
@@ -275,7 +275,7 @@ check(
             std::shared_ptr<Buffer> desired_data(b_p.getBuffer());
 
             if (desired_data->getSize() != actual_data->getSize()) {
-                std::cout << "page " << pageno << ": image data length mismatch" << std::endl;
+                std::cout << "page " << pageno << ": image data length mismatch\n";
                 this_errors = errors = true;
             } else {
                 // Compare bytes. For JPEG, allow a certain number of the bytes to be off desired by
@@ -297,7 +297,7 @@ check(
                 if (mismatches > threshold) {
                     std::cout << "page " << pageno << ": " << desired_color_space << ", "
                               << desired_filter << ": mismatches: " << mismatches << " of " << len
-                              << std::endl;
+                              << '\n';
                     this_errors = errors = true;
                 }
             }
@@ -308,7 +308,7 @@ check(
     if (errors) {
         throw std::logic_error("errors found");
     } else {
-        std::cout << "all checks passed" << std::endl;
+        std::cout << "all checks passed\n";
     }
 }
 
@@ -366,7 +366,7 @@ main(int argc, char* argv[])
     try {
         create_pdf(filename);
     } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
         exit(2);
     }
 

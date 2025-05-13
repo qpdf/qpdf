@@ -3,9 +3,7 @@
 #include <qpdf/FileInputSource.hh>
 
 ClosedFileInputSource::ClosedFileInputSource(char const* filename) :
-    filename(filename),
-    offset(0),
-    stay_open(false)
+    filename(filename)
 {
 }
 

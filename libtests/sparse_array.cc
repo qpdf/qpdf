@@ -118,6 +118,6 @@ main()
     } catch (std::logic_error&) {
     }
 
-    std::cout << "sparse array tests done" << std::endl;
+    std::cout << "sparse array tests done" << '\n';
     return 0;
 }

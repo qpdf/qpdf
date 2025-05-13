@@ -14,11 +14,11 @@
 void
 usage()
 {
-    std::cerr << "Usage: test_renumber [OPTION] INPUT.pdf" << std::endl
-              << "Option:" << std::endl
-              << "  --object-streams=preserve|disable|generate" << std::endl
-              << "  --linearize" << std::endl
-              << "  --preserve-unreferenced" << std::endl;
+    std::cerr << "Usage: test_renumber [OPTION] INPUT.pdf" << '\n'
+              << "Option:" << '\n'
+              << "  --object-streams=preserve|disable|generate" << '\n'
+              << "  --linearize" << '\n'
+              << "  --preserve-unreferenced" << '\n';
 }
 
 bool
@@ -26,45 +26,45 @@ compare(QPDFObjectHandle a, QPDFObjectHandle b)
 {
     static std::set<QPDFObjGen> visited;
     if (a.isIndirect()) {
-        if (visited.count(a.getObjGen())) {
+        if (visited.contains(a.getObjGen())) {
             return true;
         }
         visited.insert(a.getObjGen());
     }
 
     if (a.getTypeCode() != b.getTypeCode()) {
-        std::cerr << "different type code" << std::endl;
+        std::cerr << "different type code" << '\n';
         return false;
     }
 
     switch (a.getTypeCode()) {
     case ::ot_boolean:
         if (a.getBoolValue() != b.getBoolValue()) {
-            std::cerr << "different boolean" << std::endl;
+            std::cerr << "different boolean" << '\n';
             return false;
         }
         break;
     case ::ot_integer:
         if (a.getIntValue() != b.getIntValue()) {
-            std::cerr << "different integer" << std::endl;
+            std::cerr << "different integer" << '\n';
             return false;
         }
         break;
     case ::ot_real:
         if (a.getRealValue() != b.getRealValue()) {
-            std::cerr << "different real" << std::endl;
+            std::cerr << "different real" << '\n';
             return false;
         }
         break;
     case ::ot_string:
         if (a.getStringValue() != b.getStringValue()) {
-            std::cerr << "different string" << std::endl;
+            std::cerr << "different string" << '\n';
             return false;
         }
         break;
     case ::ot_name:
         if (a.getName() != b.getName()) {
-            std::cerr << "different name" << std::endl;
+            std::cerr << "different name" << '\n';
             return false;
         }
         break;
@@ -74,13 +74,13 @@ compare(QPDFObjectHandle a, QPDFObjectHandle b)
             std::vector<QPDFObjectHandle> objs_b = b.getArrayAsVector();
             size_t items = objs_a.size();
             if (items != objs_b.size()) {
-                std::cerr << "different array size" << std::endl;
+                std::cerr << "different array size" << '\n';
                 return false;
             }
 
             for (size_t i = 0; i < items; ++i) {
                 if (!compare(objs_a[i], objs_b[i])) {
-                    std::cerr << "different array item" << std::endl;
+                    std::cerr << "different array item" << '\n';
                     return false;
                 }
             }
@@ -91,13 +91,13 @@ compare(QPDFObjectHandle a, QPDFObjectHandle b)
             std::set<std::string> keys_a = a.getKeys();
             std::set<std::string> keys_b = b.getKeys();
             if (keys_a != keys_b) {
-                std::cerr << "different dictionary keys" << std::endl;
+                std::cerr << "different dictionary keys" << '\n';
                 return false;
             }
 
             for (auto const& key: keys_a) {
                 if (!compare(a.getKey(key), b.getKey(key))) {
-                    std::cerr << "different dictionary item" << std::endl;
+                    std::cerr << "different dictionary item" << '\n';
                     return false;
                 }
             }
@@ -106,10 +106,10 @@ compare(QPDFObjectHandle a, QPDFObjectHandle b)
     case ::ot_null:
         break;
     case ::ot_stream:
-        std::cout << "stream objects are not compared" << std::endl;
+        std::cout << "stream objects are not compared" << '\n';
         break;
     default:
-        std::cerr << "unknown object type" << std::endl;
+        std::cerr << "unknown object type" << '\n';
         std::exit(2);
     }
 
@@ -120,23 +120,22 @@ bool
 compare_xref_table(std::map<QPDFObjGen, QPDFXRefEntry> a, std::map<QPDFObjGen, QPDFXRefEntry> b)
 {
     if (a.size() != b.size()) {
-        std::cerr << "different size" << std::endl;
+        std::cerr << "different size" << '\n';
         return false;
     }
 
     for (auto const& iter: a) {
-        std::cout << "xref entry for " << iter.first.getObj() << "/" << iter.first.getGen()
-                  << std::endl;
+        std::cout << "xref entry for " << iter.first.getObj() << "/" << iter.first.getGen() << '\n';
 
-        if (b.count(iter.first) == 0) {
-            std::cerr << "not found" << std::endl;
+        if (!b.contains(iter.first)) {
+            std::cerr << "not found" << '\n';
             return false;
         }
 
         QPDFXRefEntry xref_a = iter.second;
         QPDFXRefEntry xref_b = b[iter.first];
         if (xref_a.getType() != xref_b.getType()) {
-            std::cerr << "different xref entry type" << std::endl;
+            std::cerr << "different xref entry type" << '\n';
             return false;
         }
 
@@ -145,19 +144,19 @@ compare_xref_table(std::map<QPDFObjGen, QPDFXRefEntry> a, std::map<QPDFObjGen, Q
             break;
         case 1:
             if (xref_a.getOffset() != xref_a.getOffset()) {
-                std::cerr << "different offset" << std::endl;
+                std::cerr << "different offset" << '\n';
                 return false;
             }
             break;
         case 2:
             if (xref_a.getObjStreamNumber() != xref_a.getObjStreamNumber() ||
                 xref_a.getObjStreamIndex() != xref_a.getObjStreamIndex()) {
-                std::cerr << "different stream number or index" << std::endl;
+                std::cerr << "different stream number or index" << '\n';
                 return false;
             }
             break;
         default:
-            std::cerr << "unknown xref entry type" << std::endl;
+            std::cerr << "unknown xref entry type" << '\n';
             std::exit(2);
         }
     }
@@ -223,36 +222,36 @@ main(int argc, char* argv[])
             "renumbered", reinterpret_cast<char*>(buf->getBuffer()), buf->getSize());
         std::map<QPDFObjGen, QPDFXRefEntry> xrefs_ren = qpdf_ren.getXRefTable();
 
-        std::cout << "--- compare between input and renumbered objects ---" << std::endl;
+        std::cout << "--- compare between input and renumbered objects ---" << '\n';
         for (auto const& iter: objs_in) {
             QPDFObjGen og_in = iter.getObjGen();
             QPDFObjGen og_ren = w.getRenumberedObjGen(og_in);
 
             std::cout << "input " << og_in.getObj() << "/" << og_in.getGen() << " -> renumbered "
-                      << og_ren.getObj() << "/" << og_ren.getGen() << std::endl;
+                      << og_ren.getObj() << "/" << og_ren.getGen() << '\n';
 
             if (og_ren.getObj() == 0) {
-                std::cout << "deleted" << std::endl;
+                std::cout << "deleted" << '\n';
                 continue;
             }
 
             if (!compare(iter, qpdf_ren.getObjectByObjGen(og_ren))) {
-                std::cerr << "different" << std::endl;
+                std::cerr << "different" << '\n';
                 std::exit(2);
             }
         }
-        std::cout << "complete" << std::endl;
+        std::cout << "complete" << '\n';
 
-        std::cout << "--- compare between written and reloaded xref tables ---" << std::endl;
+        std::cout << "--- compare between written and reloaded xref tables ---" << '\n';
         if (!compare_xref_table(xrefs_w, xrefs_ren)) {
-            std::cerr << "different" << std::endl;
+            std::cerr << "different" << '\n';
             std::exit(2);
         }
-        std::cout << "complete" << std::endl;
+        std::cout << "complete" << '\n';
 
-        std::cout << "succeeded" << std::endl;
+        std::cout << "succeeded" << '\n';
     } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << '\n';
         std::exit(2);
     }
 

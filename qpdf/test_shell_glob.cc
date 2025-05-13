@@ -32,11 +32,11 @@ realmain(int argc, char* argv[])
     bool passed = (found_star && (argc == 2));
 #endif
     if (passed) {
-        std::cout << "PASSED" << std::endl;
+        std::cout << "PASSED" << '\n';
     } else {
-        std::cout << "FAILED" << std::endl;
+        std::cout << "FAILED" << '\n';
         for (int i = 1; i < argc; ++i) {
-            std::cout << argv[i] << std::endl;
+            std::cout << argv[i] << '\n';
         }
     }
     return 0;

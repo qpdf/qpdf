@@ -15,9 +15,8 @@ static char const* whoami = nullptr;
 void
 usage()
 {
-    std::cerr << "Usage: " << whoami << " infile pagefile outfile" << std::endl
-              << "Stamp page 1 of pagefile on every page of infile, writing to outfile"
-              << std::endl;
+    std::cerr << "Usage: " << whoami << " infile pagefile outfile\n"
+              << "Stamp page 1 of pagefile on every page of infile, writing to outfile\n";
     exit(2);
 }
 
@@ -81,7 +80,7 @@ main(int argc, char* argv[])
     try {
         stamp_page(infile, stampfile, outfile);
     } catch (std::exception& e) {
-        std::cerr << whoami << ": " << e.what() << std::endl;
+        std::cerr << whoami << ": " << e.what() << '\n';
         exit(2);
     }
     return 0;

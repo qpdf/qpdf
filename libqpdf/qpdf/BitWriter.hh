@@ -21,8 +21,8 @@ class BitWriter
 
   private:
     Pipeline* pl;
-    unsigned char ch;
-    size_t bit_offset;
+    unsigned char ch{0};
+    size_t bit_offset{7};
 };
 
 #endif // BITWRITER_HH

@@ -11,15 +11,15 @@ static char const* whoami = nullptr;
 static void
 usageExit(std::string const& msg)
 {
-    std::cerr << std::endl
-              << whoami << ": " << msg << std::endl
-              << std::endl
-              << "For help:" << std::endl
-              << "  " << whoami << " --help=usage       usage information" << std::endl
-              << "  " << whoami << " --help=topic       help on a topic" << std::endl
-              << "  " << whoami << " --help=--option    help on an option" << std::endl
-              << "  " << whoami << " --help             general help and a topic list" << std::endl
-              << std::endl;
+    std::cerr << '\n'
+              << whoami << ": " << msg << '\n'
+              << '\n'
+              << "For help:\n"
+              << "  " << whoami << " --help=usage       usage information\n"
+              << "  " << whoami << " --help=topic       help on a topic\n"
+              << "  " << whoami << " --help=--option    help on an option\n"
+              << "  " << whoami << " --help             general help and a topic list\n"
+              << '\n';
     exit(QPDFJob::EXIT_ERROR);
 }
 
@@ -37,7 +37,7 @@ realmain(int argc, char* argv[])
     } catch (QPDFUsage& e) {
         usageExit(e.what());
     } catch (std::exception& e) {
-        std::cerr << whoami << ": " << e.what() << std::endl;
+        std::cerr << whoami << ": " << e.what() << '\n';
         return QPDFJob::EXIT_ERROR;
     }
     return j.getExitCode();
