@@ -45,7 +45,6 @@ with modern equivalent. Key updates are:
 Next steps are:
 
 * review function signatures in the public API
-* replace code that uses QUtil::make_shared_cstr etc
 
 Except for the above, prefer to make modernization changes as part of other updates.
 

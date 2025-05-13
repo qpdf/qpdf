@@ -158,10 +158,11 @@ class QPDFJob
 
     struct PageSpec
     {
-        PageSpec(std::string const& filename, char const* password, std::string const& range);
+        PageSpec(
+            std::string const& filename, std::string const& password, std::string const& range);
 
         std::string filename;
-        std::shared_ptr<char> password;
+        std::string password;
         std::string range;
     };
 

@@ -262,13 +262,11 @@ ImageOptimizer::provideStreamData(QPDFObjGen const&, Pipeline* pipeline)
 }
 
 QPDFJob::PageSpec::PageSpec(
-    std::string const& filename, char const* password, std::string const& range) :
+    std::string const& filename, std::string const& password, std::string const& range) :
     filename(filename),
+    password(password.empty() ? "" : password),
     range(range)
 {
-    if (password) {
-        this->password = QUtil::make_shared_cstr(password);
-    }
 }
 
 QPDFPageData::QPDFPageData(std::string const& filename, QPDF* qpdf, std::string const& range) :
@@ -2470,11 +2468,11 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             // you are using this an example of how to do this with the API, you can just create two
             // different QPDF objects to the same underlying file with the same path to achieve the
             // same effect.
-            char const* password = page_spec.password.get();
-            if (!m->encryption_file.empty() && password == nullptr &&
+            auto password = page_spec.password;
+            if (!m->encryption_file.empty() && password.empty() &&
                 page_spec.filename == m->encryption_file) {
                 QTC::TC("qpdf", "QPDFJob pages encryption password");
-                password = m->encryption_file_password.data();
+                password = m->encryption_file_password;
             }
             doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                 v << prefix << ": processing " << page_spec.filename << "\n";
@@ -2492,7 +2490,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
                 is = std::shared_ptr<InputSource>(fis);
             }
             std::unique_ptr<QPDF> qpdf_sp;
-            processInputSource(qpdf_sp, is, password, true);
+            processInputSource(qpdf_sp, is, password.data(), true);
             page_spec_qpdfs[page_spec.filename] = qpdf_sp.get();
             page_heap.push_back(std::move(qpdf_sp));
             if (cis) {
