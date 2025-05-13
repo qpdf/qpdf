@@ -1397,20 +1397,22 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
   "decodelevel": "decode level used to determine stream filterability"
 })"));
 
-    bool all_keys = !keys || keys->empty();
+    const bool all_keys = !keys || keys->empty();
 
-    auto want_key = [&](std::string const& key) -> bool { return all_keys || keys->contains(key); };
+    auto add_if_want_key = [&](std::string const& key, std::string const& json) -> void {
+        if (all_keys || keys->contains(key)) {
+            (void)schema.addDictionaryMember(key, JSON::parse(json));
+        }
+    };
 
     // The list of selectable top-level keys id duplicated in the following places: job.yml,
     // QPDFJob::json_schema, and QPDFJob::doJSON.
     if (json_version == 1) {
-        if (want_key("objects")) {
-            (void)schema.addDictionaryMember("objects", JSON::parse(R"({
+        add_if_want_key("objects", R"({
   "<n n R|trailer>": "json representation of object"
-})"));
-        }
-        if (want_key("objectinfo")) {
-            (void)schema.addDictionaryMember("objectinfo", JSON::parse(R"({
+})");
+
+        add_if_want_key("objectinfo", R"({
   "<object-id>": {
     "stream": {
       "filter": "if stream, its filters, otherwise null",
@@ -1418,11 +1420,10 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
       "length": "if stream, its length, otherwise null"
     }
   }
-})"));
-        }
+})");
+
     } else {
-        if (want_key("qpdf")) {
-            (void)schema.addDictionaryMember("qpdf", JSON::parse(R"([{
+        add_if_want_key("qpdf", R"([{
   "jsonversion": "numeric JSON version",
   "pdfversion": "PDF version as x.y",
   "pushedinheritedpageresources": "whether inherited attributes were pushed to the page level",
@@ -1431,11 +1432,9 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
 },
 {
   "<obj:n n R|trailer>": "json representation of object"
-}])"));
-        }
+}])");
     }
-    if (want_key("pages")) {
-        (void)schema.addDictionaryMember("pages", JSON::parse(R"([
+    add_if_want_key("pages", R"([
   {
     "contents": [
       "reference to each content stream"
@@ -1468,18 +1467,16 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
     ],
     "pageposfrom1": "position of page in document numbering from 1"
   }
-])"));
-    }
-    if (want_key("pagelabels")) {
-        (void)schema.addDictionaryMember("pagelabels", JSON::parse(R"([
+])");
+
+    add_if_want_key("pagelabels", R"([
   {
     "index": "starting page position starting from zero",
     "label": "page label dictionary"
   }
-])"));
-    }
-    if (want_key("outlines")) {
-        (void)schema.addDictionaryMember("outlines", JSON::parse(R"([
+])");
+
+    add_if_want_key("outlines", R"([
   {
     "dest": "outline destination dictionary",
     "destpageposfrom1": "position of destination page in document numbered from 1; null if not known",
@@ -1488,10 +1485,9 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
     "open": "whether the outline is displayed expanded",
     "title": "outline title"
   }
-])"));
-    }
-    if (want_key("acroform")) {
-        (void)schema.addDictionaryMember("acroform", JSON::parse(R"({
+])");
+
+    add_if_want_key("acroform", R"({
   "fields": [
     {
       "alternativename": "alternative name of field -- this is the one usually shown to users",
@@ -1520,16 +1516,18 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
   ],
   "hasacroform": "whether the document has interactive forms",
   "needappearances": "whether the form fields' appearance streams need to be regenerated"
-})"));
-    }
+})");
+
     std::string MODIFY_ANNOTATIONS =
         (json_version == 1 ? "moddifyannotations" : "modifyannotations");
-    if (want_key("encrypt")) {
-        (void)schema.addDictionaryMember("encrypt", JSON::parse(R"({
+    add_if_want_key(
+        "encrypt",
+        R"({
   "capabilities": {
     "accessibility": "allow extraction for accessibility?",
     "extract": "allow extraction?",
-    ")" + MODIFY_ANNOTATIONS + R"(": "allow modifying annotations?",
+    ")" + MODIFY_ANNOTATIONS +
+            R"(": "allow modifying annotations?",
     "modify": "allow all modifications?",
     "modifyassembly": "allow modifying document assembly?",
     "modifyforms": "allow modifying forms?",
@@ -1552,10 +1550,9 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
     "stringmethod": "encryption method for string"
   },
   "userpasswordmatched": "whether supplied password matched user password; always false for non-encrypted files"
-})"));
-    }
-    if (want_key("attachments")) {
-        (void)schema.addDictionaryMember("attachments", JSON::parse(R"({
+})");
+
+    add_if_want_key("attachments", R"({
   "<attachment-key>": {
     "filespec": "object containing the file spec",
     "preferredcontents": "most preferred embedded file stream",
@@ -1573,8 +1570,8 @@ QPDFJob::json_schema(int json_version, std::set<std::string>* keys)
       }
     }
   }
-})"));
-    }
+})");
+
     return schema;
 }
 
