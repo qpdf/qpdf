@@ -239,7 +239,7 @@ QPDFArgParser::handleArgFileArguments()
     // Support reading arguments from files. Create a new argv. Ensure that argv itself as well as
     // all its contents are automatically deleted by using shared pointers back to the pointers in
     // argv.
-    m->new_argv.push_back(QUtil::make_shared_cstr(m->argv[0]));
+    m->new_argv.emplace_back(m->argv[0]);
     for (int i = 1; i < m->argc; ++i) {
         char const* argfile = nullptr;
         if ((strlen(m->argv[i]) > 1) && (m->argv[i][0] == '@')) {
@@ -254,12 +254,12 @@ QPDFArgParser::handleArgFileArguments()
         if (argfile) {
             readArgsFromFile(1 + m->argv[i]);
         } else {
-            m->new_argv.push_back(QUtil::make_shared_cstr(m->argv[i]));
+            m->new_argv.emplace_back(m->argv[i]);
         }
     }
     m->argv_ph = QUtil::make_shared_array<char const*>(1 + m->new_argv.size());
     for (size_t i = 0; i < m->new_argv.size(); ++i) {
-        m->argv_ph.get()[i] = m->new_argv.at(i).get();
+        m->argv_ph.get()[i] = m->new_argv.at(i).data();
     }
     m->argc = QIntC::to_int(m->new_argv.size());
     m->argv_ph.get()[m->argc] = nullptr;
@@ -290,7 +290,7 @@ QPDFArgParser::handleBashArguments()
             case st_top:
                 if (util::is_space(ch)) {
                     if (!arg.empty()) {
-                        m->bash_argv.push_back(QUtil::make_shared_cstr(arg));
+                        m->bash_argv.emplace_back(arg);
                         arg.clear();
                     }
                 } else if (ch == '"') {
@@ -326,12 +326,12 @@ QPDFArgParser::handleBashArguments()
     if (m->bash_argv.empty()) {
         // This can't happen if properly invoked by bash, but ensure we have a valid argv[0]
         // regardless.
-        m->bash_argv.push_back(QUtil::make_shared_cstr(m->argv[0]));
+        m->bash_argv.emplace_back(m->argv[0]);
     }
     // Explicitly discard any non-space-terminated word. The "current word" is handled specially.
     m->bash_argv_ph = QUtil::make_shared_array<char const*>(1 + m->bash_argv.size());
     for (size_t i = 0; i < m->bash_argv.size(); ++i) {
-        m->bash_argv_ph.get()[i] = m->bash_argv.at(i).get();
+        m->bash_argv_ph.get()[i] = m->bash_argv.at(i).data();
     }
     m->argc = QIntC::to_int(m->bash_argv.size());
     m->bash_argv_ph.get()[m->argc] = nullptr;
@@ -360,7 +360,7 @@ QPDFArgParser::readArgsFromFile(std::string const& filename)
         lines = QUtil::read_lines_from_file(filename.c_str());
     }
     for (auto const& line: lines) {
-        m->new_argv.push_back(QUtil::make_shared_cstr(line));
+        m->new_argv.emplace_back(line);
     }
 }
 
