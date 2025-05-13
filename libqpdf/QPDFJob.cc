@@ -1606,9 +1606,9 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
     // are reserved for users.
 
     std::string captured_json;
-    std::shared_ptr<Pl_String> pl_str;
+    std::unique_ptr<Pl_String> pl_str;
     if (m->test_json_schema) {
-        pl_str = std::make_shared<Pl_String>("capture json", p, captured_json);
+        pl_str = std::make_unique<Pl_String>("capture json", p, captured_json);
         p = pl_str.get();
     }
 
@@ -1642,43 +1642,49 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
         j_params.addDictionaryMember("decodelevel", JSON::makeString(decode_level_str));
         JSON::writeDictionaryItem(p, first, "parameters", j_params, 1);
     }
-    bool all_keys = m->json_keys.empty();
+
+    const bool all_keys = m->json_keys.empty();
+
+    auto want_key = [&](std::string const& key) -> bool {
+        return all_keys || m->json_keys.contains(key);
+    };
+
     // The list of selectable top-level keys id duplicated in the following places: job.yml,
     // QPDFJob::json_schema, and QPDFJob::doJSON.
 
     // We do pages and pagelabels first since they have the side effect of repairing the pages tree,
     // which could potentially impact object references in remaining items.
-    if (all_keys || m->json_keys.count("pages")) {
+    if (want_key("pages")) {
         doJSONPages(p, first, pdf);
     }
-    if (all_keys || m->json_keys.count("pagelabels")) {
+    if (want_key("pagelabels")) {
         doJSONPageLabels(p, first, pdf);
     }
 
     // The non-special keys are output in alphabetical order, but the order doesn't actually matter.
-    if (all_keys || m->json_keys.count("acroform")) {
+    if (want_key("acroform")) {
         doJSONAcroform(p, first, pdf);
     }
-    if (all_keys || m->json_keys.count("attachments")) {
+    if (want_key("attachments")) {
         doJSONAttachments(p, first, pdf);
     }
-    if (all_keys || m->json_keys.count("encrypt")) {
+    if (want_key("encrypt")) {
         doJSONEncrypt(p, first, pdf);
     }
-    if (all_keys || m->json_keys.count("outlines")) {
+    if (want_key("outlines")) {
         doJSONOutlines(p, first, pdf);
     }
 
     // We do objects last so their information is consistent with repairing the page tree. To see
     // the original file with any page tree problems and the page tree not flattened, select
     // qpdf/objects/objectinfo without other keys.
-    if (all_keys || m->json_keys.count("objects") || m->json_keys.count("qpdf")) {
+    if (want_key("objects") || want_key("qpdf")) {
         doJSONObjects(p, first, pdf);
     }
     if (m->json_version == 1) {
         // "objectinfo" is not needed for version >1 since you can tell streams from other objects
         // in "objects".
-        if (all_keys || m->json_keys.count("objectinfo")) {
+        if (want_key("objectinfo")) {
             doJSONObjectinfo(p, first, pdf);
         }
     }
