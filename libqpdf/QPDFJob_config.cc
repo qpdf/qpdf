@@ -1108,7 +1108,7 @@ QPDFJob::UOConfig::repeat(std::string const& parameter)
 QPDFJob::UOConfig*
 QPDFJob::UOConfig::password(std::string const& parameter)
 {
-    config->o.m->under_overlay->password = QUtil::make_shared_cstr(parameter);
+    config->o.m->under_overlay->password = parameter;
     return this;
 }
 

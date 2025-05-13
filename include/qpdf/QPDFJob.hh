@@ -451,7 +451,7 @@ class QPDFJob
 
         std::string which;
         std::string filename;
-        std::shared_ptr<char> password;
+        std::string password;
         std::string to_nr;
         std::string from_nr;
         std::string repeat_nr;

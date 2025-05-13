@@ -1882,7 +1882,7 @@ QPDFJob::validateUnderOverlay(QPDF& pdf, UnderOverlay* uo)
 {
     QPDFPageDocumentHelper main_pdh(pdf);
     int main_npages = QIntC::to_int(main_pdh.getAllPages().size());
-    processFile(uo->pdf, uo->filename.c_str(), uo->password.get(), true, false);
+    processFile(uo->pdf, uo->filename.data(), uo->password.data(), true, false);
     QPDFPageDocumentHelper uo_pdh(*(uo->pdf));
     int uo_npages = QIntC::to_int(uo_pdh.getAllPages().size());
     try {
