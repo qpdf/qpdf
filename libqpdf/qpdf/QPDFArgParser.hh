@@ -221,8 +221,8 @@ class QPDFArgParser
         bare_arg_handler_t final_check_handler;
         std::vector<std::string> new_argv;
         std::vector<std::string> bash_argv;
-        std::shared_ptr<char const*> argv_ph;
-        std::shared_ptr<char const*> bash_argv_ph;
+        std::vector<char const*> argv_ph;
+        std::vector<char const*> bash_argv_ph;
         std::map<std::string, HelpTopic> help_topics;
         std::map<std::string, HelpTopic> option_help;
         std::string help_footer;

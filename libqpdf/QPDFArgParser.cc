@@ -257,13 +257,13 @@ QPDFArgParser::handleArgFileArguments()
             m->new_argv.emplace_back(m->argv[i]);
         }
     }
-    m->argv_ph = QUtil::make_shared_array<char const*>(1 + m->new_argv.size());
-    for (size_t i = 0; i < m->new_argv.size(); ++i) {
-        m->argv_ph.get()[i] = m->new_argv.at(i).data();
+    m->argv_ph.reserve(1 + m->new_argv.size());
+    for (auto const& a: m->new_argv) {
+        m->argv_ph.push_back(a.data());
     }
     m->argc = QIntC::to_int(m->new_argv.size());
-    m->argv_ph.get()[m->argc] = nullptr;
-    m->argv = m->argv_ph.get();
+    m->argv_ph.push_back(nullptr);
+    m->argv = m->argv_ph.data();
 }
 
 void
@@ -329,13 +329,13 @@ QPDFArgParser::handleBashArguments()
         m->bash_argv.emplace_back(m->argv[0]);
     }
     // Explicitly discard any non-space-terminated word. The "current word" is handled specially.
-    m->bash_argv_ph = QUtil::make_shared_array<char const*>(1 + m->bash_argv.size());
-    for (size_t i = 0; i < m->bash_argv.size(); ++i) {
-        m->bash_argv_ph.get()[i] = m->bash_argv.at(i).data();
+    m->bash_argv_ph.reserve(1 + m->bash_argv.size());
+    for (auto const& a: m->bash_argv) {
+        m->bash_argv_ph.push_back(a.data());
     }
     m->argc = QIntC::to_int(m->bash_argv.size());
-    m->bash_argv_ph.get()[m->argc] = nullptr;
-    m->argv = m->bash_argv_ph.get();
+    m->bash_argv_ph.push_back(nullptr);
+    m->argv = m->bash_argv_ph.data();
 }
 
 void
