@@ -29,7 +29,7 @@ Pl_Flate::Members::Members(size_t out_bufsize, action_e action) :
     // Indirect through zdata to reach the z_stream so we don't have to include zlib.h in
     // Pl_Flate.hh.  This means people using shared library versions of qpdf don't have to have zlib
     // development files available, which particularly helps in a Windows environment.
-    this->zdata = new z_stream;
+    zdata = new z_stream;
 
     if (out_bufsize > UINT_MAX) {
         throw std::runtime_error(
@@ -52,8 +52,8 @@ Pl_Flate::Members::Members(size_t out_bufsize, action_e action) :
 
 Pl_Flate::Members::~Members()
 {
-    if (this->initialized) {
-        z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
+    if (initialized) {
+        z_stream& zstream = *(static_cast<z_stream*>(zdata));
         if (action == a_deflate) {
             deflateEnd(&zstream);
         } else {
@@ -62,7 +62,7 @@ Pl_Flate::Members::~Members()
     }
 
     delete static_cast<z_stream*>(this->zdata);
-    this->zdata = nullptr;
+    zdata = nullptr;
 }
 
 Pl_Flate::Pl_Flate(
@@ -99,7 +99,7 @@ Pl_Flate::setWarnCallback(std::function<void(char const*, int)> callback)
 void
 Pl_Flate::warn(char const* msg, int code)
 {
-    if (m->callback != nullptr) {
+    if (m->callback) {
         m->callback(msg, code);
     }
 }
@@ -107,7 +107,7 @@ Pl_Flate::warn(char const* msg, int code)
 void
 Pl_Flate::write(unsigned char const* data, size_t len)
 {
-    if (m->outbuf == nullptr) {
+    if (!m->outbuf) {
         throw std::logic_error(
             this->identifier + ": Pl_Flate: write() called after finish() called");
     }
@@ -184,7 +184,7 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
             // this error (including at least one in qpdf's test suite). In some cases, we want to
             // know about this, because it indicates incorrect compression, so call a callback if
             // provided.
-            this->warn("input stream is complete but output may still be valid", err);
+            warn("input stream is complete but output may still be valid", err);
             done = true;
             break;
 
@@ -215,7 +215,7 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
             break;
 
         default:
-            this->checkError("data", err);
+            checkError("data", err);
             break;
         }
     }
@@ -271,7 +271,7 @@ Pl_Flate::checkError(char const* prefix, int error_code)
     z_stream& zstream = *(static_cast<z_stream*>(m->zdata));
     if (error_code != Z_OK) {
         char const* action_str = (m->action == a_deflate ? "deflate" : "inflate");
-        std::string msg = this->identifier + ": " + action_str + ": " + prefix + ": ";
+        std::string msg = identifier + ": " + action_str + ": " + prefix + ": ";
 
         if (zstream.msg) {
             msg += zstream.msg;

@@ -58,25 +58,25 @@ void
 ArgParser::initOptionTables()
 {
 #include <qpdf/auto_job_init.hh>
-    this->ap.addFinalCheck([this]() { c_main->checkConfiguration(); });
+    ap.addFinalCheck([this]() { c_main->checkConfiguration(); });
     // add_help is defined in auto_job_help.hh
-    add_help(this->ap);
+    add_help(ap);
     // Special case: ignore -- at the top level. This undocumented behavior is for backward
     // compatibility; it was unintentionally the case prior to 10.6, and some users were relying on
     // it.
-    this->ap.selectMainOptionTable();
-    this->ap.addBare("--", []() {});
+    ap.selectMainOptionTable();
+    ap.addBare("--", []() {});
 }
 
 void
 ArgParser::argPositional(std::string const& arg)
 {
-    if (!this->gave_input) {
+    if (!gave_input) {
         c_main->inputFile(arg);
-        this->gave_input = true;
-    } else if (!this->gave_output) {
+        gave_input = true;
+    } else if (!gave_output) {
         c_main->outputFile(arg);
-        this->gave_output = true;
+        gave_output = true;
     } else {
         usage("unknown argument " + arg);
     }
@@ -86,20 +86,20 @@ void
 ArgParser::argEmpty()
 {
     c_main->emptyInput();
-    this->gave_input = true;
+    gave_input = true;
 }
 
 void
 ArgParser::argReplaceInput()
 {
     c_main->replaceInput();
-    this->gave_output = true;
+    gave_output = true;
 }
 
 void
 ArgParser::argVersion()
 {
-    auto whoami = this->ap.getProgname();
+    auto whoami = ap.getProgname();
     *QPDFLogger::defaultLogger()->getInfo()
         << whoami << " version " << QPDF::QPDFVersion() << "\n"
         << "Run " << whoami << " --copyright to see copyright and license information.\n";
@@ -136,7 +136,7 @@ ArgParser::argCopyright()
     //               1         2         3         4         5         6         7         8
     //      12345678901234567890123456789012345678901234567890123456789012345678901234567890
     *QPDFLogger::defaultLogger()->getInfo()
-        << this->ap.getProgname()
+        << ap.getProgname()
         << " version " << QPDF::QPDFVersion() << "\n"
         << "\n"
         << "Copyright (c) 2005-2021 Jay Berkenbilt\n"
@@ -190,9 +190,9 @@ ArgParser::argShowCrypto()
 void
 ArgParser::argEncrypt()
 {
-    this->c_enc = c_main->encrypt(0, "", "");
-    this->accumulated_args.clear();
-    this->ap.selectOptionTable(O_ENCRYPTION);
+    c_enc = c_main->encrypt(0, "", "");
+    accumulated_args.clear();
+    ap.selectOptionTable(O_ENCRYPTION);
 }
 
 void
@@ -202,14 +202,14 @@ ArgParser::argEncPositional(std::string const& arg)
         usage("positional and dashed encryption arguments may not be mixed");
     }
 
-    this->accumulated_args.push_back(arg);
-    if (this->accumulated_args.size() < 3) {
+    accumulated_args.push_back(arg);
+    if (accumulated_args.size() < 3) {
         return;
     }
-    user_password = this->accumulated_args.at(0);
-    owner_password = this->accumulated_args.at(1);
-    auto len_str = this->accumulated_args.at(2);
-    this->accumulated_args.clear();
+    user_password = accumulated_args.at(0);
+    owner_password = accumulated_args.at(1);
+    auto len_str = accumulated_args.at(2);
+    accumulated_args.clear();
     argEncBits(len_str);
 }
 
@@ -219,8 +219,8 @@ ArgParser::argEncUserPassword(std::string const& arg)
     if (!accumulated_args.empty()) {
         usage("positional and dashed encryption arguments may not be mixed");
     }
-    this->used_enc_password_args = true;
-    this->user_password = arg;
+    used_enc_password_args = true;
+    user_password = arg;
 }
 
 void
@@ -229,8 +229,8 @@ ArgParser::argEncOwnerPassword(std::string const& arg)
     if (!accumulated_args.empty()) {
         usage("positional and dashed encryption arguments may not be mixed");
     }
-    this->used_enc_password_args = true;
-    this->owner_password = arg;
+    used_enc_password_args = true;
+    owner_password = arg;
 }
 
 void
@@ -242,25 +242,25 @@ ArgParser::argEncBits(std::string const& arg)
     int keylen = 0;
     if (arg == "40") {
         keylen = 40;
-        this->ap.selectOptionTable(O_40_BIT_ENCRYPTION);
+        ap.selectOptionTable(O_40_BIT_ENCRYPTION);
     } else if (arg == "128") {
         keylen = 128;
-        this->ap.selectOptionTable(O_128_BIT_ENCRYPTION);
+        ap.selectOptionTable(O_128_BIT_ENCRYPTION);
     } else if (arg == "256") {
         keylen = 256;
-        this->ap.selectOptionTable(O_256_BIT_ENCRYPTION);
+        ap.selectOptionTable(O_256_BIT_ENCRYPTION);
     } else {
         usage("encryption key length must be 40, 128, or 256");
     }
-    this->c_enc = c_main->encrypt(keylen, user_password, owner_password);
+    c_enc = c_main->encrypt(keylen, user_password, owner_password);
 }
 
 void
 ArgParser::argPages()
 {
-    this->accumulated_args.clear();
-    this->c_pages = c_main->pages();
-    this->ap.selectOptionTable(O_PAGES);
+    accumulated_args.clear();
+    c_pages = c_main->pages();
+    ap.selectOptionTable(O_PAGES);
 }
 
 void
@@ -308,29 +308,29 @@ ArgParser::argEndPages()
 void
 ArgParser::argUnderlay()
 {
-    this->c_uo = c_main->underlay();
-    this->ap.selectOptionTable(O_UNDERLAY_OVERLAY);
+    c_uo = c_main->underlay();
+    ap.selectOptionTable(O_UNDERLAY_OVERLAY);
 }
 
 void
 ArgParser::argOverlay()
 {
-    this->c_uo = c_main->overlay();
-    this->ap.selectOptionTable(O_UNDERLAY_OVERLAY);
+    c_uo = c_main->overlay();
+    ap.selectOptionTable(O_UNDERLAY_OVERLAY);
 }
 
 void
 ArgParser::argAddAttachment()
 {
-    this->c_att = c_main->addAttachment();
-    this->ap.selectOptionTable(O_ATTACHMENT);
+    c_att = c_main->addAttachment();
+    ap.selectOptionTable(O_ATTACHMENT);
 }
 
 void
 ArgParser::argCopyAttachmentsFrom()
 {
-    this->c_copy_att = c_main->copyAttachmentsFrom();
-    this->ap.selectOptionTable(O_COPY_ATTACHMENT);
+    c_copy_att = c_main->copyAttachmentsFrom();
+    ap.selectOptionTable(O_COPY_ATTACHMENT);
 }
 
 void
@@ -400,7 +400,7 @@ ArgParser::argEndCopyAttachment()
 void
 ArgParser::argSetPageLabels()
 {
-    this->ap.selectOptionTable(O_SET_PAGE_LABELS);
+    ap.selectOptionTable(O_SET_PAGE_LABELS);
     accumulated_args.clear();
 }
 
@@ -427,14 +427,14 @@ ArgParser::argJobJsonHelp()
 void
 ArgParser::usage(std::string const& message)
 {
-    this->ap.usage(message);
+    ap.usage(message);
 }
 
 void
 ArgParser::parseOptions()
 {
     try {
-        this->ap.parseArgs();
+        ap.parseArgs();
     } catch (std::runtime_error& e) {
         usage(e.what());
     }
