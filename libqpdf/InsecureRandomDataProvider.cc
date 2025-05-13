@@ -4,11 +4,6 @@
 #include <qpdf/qpdf-config.h>
 #include <cstdlib>
 
-InsecureRandomDataProvider::InsecureRandomDataProvider() :
-    seeded_random(false)
-{
-}
-
 void
 InsecureRandomDataProvider::provideRandomData(unsigned char* data, size_t len)
 {

@@ -3,18 +3,18 @@
 
 #include <qpdf/RandomDataProvider.hh>
 
-class InsecureRandomDataProvider: public RandomDataProvider
+class InsecureRandomDataProvider final: public RandomDataProvider
 {
   public:
-    InsecureRandomDataProvider();
-    ~InsecureRandomDataProvider() override = default;
-    void provideRandomData(unsigned char* data, size_t len) override;
+    InsecureRandomDataProvider() = default;
+    ~InsecureRandomDataProvider() final = default;
+    void provideRandomData(unsigned char* data, size_t len) final;
     static RandomDataProvider* getInstance();
 
   private:
     long random();
 
-    bool seeded_random;
+    bool seeded_random{false};
 };
 
 #endif // INSECURERANDOMDATAPROVIDER_HH

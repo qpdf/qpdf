@@ -9,11 +9,6 @@
 
 using namespace qpdf;
 
-QPDFAcroFormDocumentHelper::Members::Members() :
-    cache_valid(false)
-{
-}
-
 QPDFAcroFormDocumentHelper::QPDFAcroFormDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
     m(new Members())

@@ -17,8 +17,7 @@ AES_PDF_native::AES_PDF_native(
     unsigned char* cbc_block) :
     encrypt(encrypt),
     cbc_mode(cbc_mode),
-    cbc_block(cbc_block),
-    nrounds(0)
+    cbc_block(cbc_block)
 {
     size_t keybits = 8 * key_bytes;
     this->key = std::make_unique<unsigned char[]>(key_bytes);

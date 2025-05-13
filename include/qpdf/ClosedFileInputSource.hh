@@ -69,9 +69,9 @@ class QPDF_DLL_CLASS ClosedFileInputSource: public InputSource
     void after();
 
     std::string filename;
-    qpdf_offset_t offset;
+    qpdf_offset_t offset{0};
     std::shared_ptr<FileInputSource> fis;
-    bool stay_open;
+    bool stay_open{false};
 };
 
 #endif // QPDF_CLOSEDFILEINPUTSOURCE_HH

@@ -25,7 +25,7 @@ class AES_PDF_native
     unsigned char* cbc_block;
     std::unique_ptr<unsigned char[]> key;
     std::unique_ptr<uint32_t[]> rk;
-    unsigned int nrounds;
+    unsigned int nrounds{0};
 };
 
 #endif // AES_PDF_NATIVE_HH

@@ -28,8 +28,7 @@ error(QPDF& qpdf, QPDFObjectHandle& node, std::string const& msg)
 }
 
 NNTreeIterator::NNTreeIterator(NNTreeImpl& impl) :
-    impl(impl),
-    item_number(-1)
+    impl(impl)
 {
 }
 
@@ -666,7 +665,6 @@ NNTreeImpl::NNTreeImpl(
     NNTreeDetails const& details, QPDF& qpdf, QPDFObjectHandle& oh, bool auto_repair) :
     details(details),
     qpdf(qpdf),
-    split_threshold(32),
     oh(oh),
     auto_repair(auto_repair)
 {

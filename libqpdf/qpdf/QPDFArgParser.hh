@@ -206,9 +206,9 @@ class QPDFArgParser
         char const* const* argv;
         std::string whoami;
         std::string progname_env;
-        int cur_arg;
-        bool bash_completion;
-        bool zsh_completion;
+        int cur_arg{0};
+        bool bash_completion{false};
+        bool zsh_completion{false};
         std::string bash_prev;
         std::string bash_cur;
         std::string bash_line;
@@ -216,9 +216,9 @@ class QPDFArgParser
         std::map<std::string, option_table_t> option_tables;
         option_table_t main_option_table;
         option_table_t help_option_table;
-        option_table_t* option_table;
+        option_table_t* option_table{nullptr};
         std::string option_table_name;
-        bare_arg_handler_t final_check_handler;
+        bare_arg_handler_t final_check_handler{nullptr};
         std::vector<std::string> new_argv;
         std::vector<std::string> bash_argv;
         std::vector<char const*> argv_ph;

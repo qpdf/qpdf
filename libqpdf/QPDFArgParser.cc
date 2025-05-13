@@ -18,12 +18,7 @@ QPDFArgParser::Members::Members(int argc, char const* const argv[], char const* 
 
     argc(argc),
     argv(argv),
-    progname_env(progname_env),
-    cur_arg(0),
-    bash_completion(false),
-    zsh_completion(false),
-    option_table(nullptr),
-    final_check_handler(nullptr)
+    progname_env(progname_env)
 {
     auto tmp = QUtil::make_unique_cstr(argv[0]);
     whoami = QUtil::getWhoami(tmp.get());
