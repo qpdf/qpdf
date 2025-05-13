@@ -490,24 +490,22 @@ JSON::checkSchemaInternal(
         }
     }
 
-    if (sch_dict && (!pattern_key.empty())) {
+    if (sch_dict && !pattern_key.empty()) {
         auto pattern_schema = sch_dict->members[pattern_key].m->value.get();
-        for (auto const& iter: this_dict->members) {
-            std::string const& key = iter.first;
+        for (auto const& [key, val]: this_dict->members) {
             checkSchemaInternal(
-                this_dict->members[key].m->value.get(),
+                val.m->value.get(),
                 pattern_schema,
                 flags,
                 errors,
                 prefix + "." + key);
         }
     } else if (sch_dict) {
-        for (auto& iter: sch_dict->members) {
-            std::string const& key = iter.first;
-            if (this_dict->members.count(key)) {
+        for (auto& [key, val]: sch_dict->members) {
+            if (this_dict->members.contains(key)) {
                 checkSchemaInternal(
                     this_dict->members[key].m->value.get(),
-                    iter.second.m->value.get(),
+                    val.m->value.get(),
                     flags,
                     errors,
                     prefix + "." + key);
@@ -516,17 +514,16 @@ JSON::checkSchemaInternal(
                     QTC::TC("libtests", "JSON optional key");
                 } else {
                     QTC::TC("libtests", "JSON key missing in object");
-                    errors.push_back(
+                    errors.emplace_back(
                         err_prefix + ": key \"" + key +
                         "\" is present in schema but missing in object");
                 }
             }
         }
-        for (auto const& iter: this_dict->members) {
-            std::string const& key = iter.first;
-            if (sch_dict->members.count(key) == 0) {
+        for (auto const& [key, val]: this_dict->members) {
+            if (!sch_dict->members.contains(key)) {
                 QTC::TC("libtests", "JSON key extra in object");
-                errors.push_back(
+                errors.emplace_back(
                     err_prefix + ": key \"" + key +
                     "\" is not present in schema but appears in object");
             }
@@ -554,9 +551,9 @@ JSON::checkSchemaInternal(
                 checkSchemaInternal(
                     this_v, sch_arr->elements.at(0).m->value.get(), flags, errors, prefix);
             }
-        } else if (!this_arr || (this_arr->elements.size() != n_elements)) {
+        } else if (!this_arr || this_arr->elements.size() != n_elements) {
             QTC::TC("libtests", "JSON schema array length mismatch");
-            errors.push_back(
+            errors.emplace_back(
                 err_prefix + " is supposed to be an array of length " + std::to_string(n_elements));
             return false;
         } else {
@@ -576,7 +573,7 @@ JSON::checkSchemaInternal(
         }
     } else if (!sch_str) {
         QTC::TC("libtests", "JSON schema other type");
-        errors.push_back(err_prefix + " schema value is not dictionary, array, or string");
+        errors.emplace_back(err_prefix + " schema value is not dictionary, array, or string");
         return false;
     }
 
