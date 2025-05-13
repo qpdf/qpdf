@@ -606,32 +606,37 @@ QPDFJob::checkConfiguration()
         // Check for --empty appears later after we have checked m->infilename.
         if (m->outfilename) {
             usage("--replace-input may not be used when an output file is specified");
-        } else if (m->split_pages) {
+        }
+        if (m->split_pages) {
             usage("--split-pages may not be used with --replace-input");
-        } else if (m->json_version) {
+        }
+        if (m->json_version) {
             usage("--json may not be used with --replace-input");
         }
     }
-    if (m->json_version && (m->outfilename == nullptr)) {
+    if (m->json_version && !m->outfilename) {
         // The output file is optional with --json for backward compatibility and defaults to
         // standard output.
         m->outfilename = QUtil::make_shared_cstr("-");
     }
-    if (m->infilename == nullptr) {
+    if (!m->infilename) {
         usage("an input file name is required");
-    } else if (m->replace_input && (strlen(m->infilename.get()) == 0)) {
+    }
+    if (m->replace_input && (strlen(m->infilename.get()) == 0)) {
         usage("--replace-input may not be used with --empty");
-    } else if (m->require_outfile && (m->outfilename == nullptr) && (!m->replace_input)) {
+    }
+    if (m->require_outfile && (m->outfilename == nullptr) && (!m->replace_input)) {
         usage("an output file name is required; use - for standard output");
-    } else if ((!m->require_outfile) && ((m->outfilename != nullptr) || m->replace_input)) {
+    }
+    if ((!m->require_outfile) && ((m->outfilename != nullptr) || m->replace_input)) {
         usage("no output file may be given for this option");
     }
     if (m->check_requires_password && m->check_is_encrypted) {
         usage("--requires-password and --is-encrypted may not be given together");
     }
 
-    if (m->encrypt && (!m->allow_insecure) &&
-        (m->owner_password.empty() && (!m->user_password.empty()) && (m->keylen == 256))) {
+    if (m->encrypt && !m->allow_insecure && m->owner_password.empty() &&
+        !m->user_password.empty() && m->keylen == 256) {
         // Note that empty owner passwords for R < 5 are copied from the user password, so this lack
         // of security is not an issue for those files. Also we are consider only the ability to
         // open the file without a password to be insecure. We are not concerned about whether the
@@ -656,7 +661,7 @@ QPDFJob::checkConfiguration()
     if (save_to_stdout) {
         m->log->saveToStandardOutput(true);
     }
-    if ((!m->split_pages) && QUtil::same_file(m->infilename.get(), m->outfilename.get())) {
+    if (!m->split_pages && QUtil::same_file(m->infilename.get(), m->outfilename.get())) {
         QTC::TC("qpdf", "QPDFJob same file error");
         usage(
             "input file and output file are the same; use --replace-input to intentionally "
@@ -664,11 +669,11 @@ QPDFJob::checkConfiguration()
     }
 
     if (m->json_version == 1) {
-        if (m->json_keys.count("qpdf")) {
+        if (m->json_keys.contains("qpdf")) {
             usage("json key \"qpdf\" is only valid for json version > 1");
         }
     } else {
-        if (m->json_keys.count("objectinfo") || m->json_keys.count("objects")) {
+        if (m->json_keys.contains("objectinfo") || m->json_keys.count("objects")) {
             usage("json keys \"objects\" and \"objectinfo\" are only valid for json version 1");
         }
     }
