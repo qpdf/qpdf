@@ -15,8 +15,8 @@ QPDFJob::Config::checkConfiguration()
 QPDFJob::Config*
 QPDFJob::Config::inputFile(std::string const& filename)
 {
-    if (o.m->infilename == nullptr) {
-        o.m->infilename = QUtil::make_shared_cstr(filename);
+    if (o.m->infilename.empty()) {
+        o.m->infilename = filename;
     } else {
         usage("input file has already been given");
     }
@@ -26,13 +26,13 @@ QPDFJob::Config::inputFile(std::string const& filename)
 QPDFJob::Config*
 QPDFJob::Config::emptyInput()
 {
-    if (o.m->infilename == nullptr) {
-        // Various places in QPDFJob.cc know that the empty string for infile means empty. We set it
-        // to something other than a null pointer as an indication that some input source has been
-        // specified. This approach means that passing "" as the argument to inputFile in job JSON,
-        // or equivalently using "" as a positional command-line argument would be the same as
-        // --empty. This probably isn't worth blocking or coding around.
-        o.m->infilename = QUtil::make_shared_cstr("");
+    if (o.m->infilename.empty()) {
+        // Various places in QPDFJob.cc used to know that the empty string for infile means empty.
+        // This approach meant that passing "" as the argument to inputFile in job JSON, or
+        // equivalently using "" as a positional command-line argument would be the same as
+        // --empty. This was deemed to be not worth blocking or coding around. This no longer holds
+        // from 12.3.
+        o.m->empty_input = true;
     } else {
         usage("empty input can't be used since input file has already been given");
     }

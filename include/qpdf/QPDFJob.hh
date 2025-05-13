@@ -711,7 +711,8 @@ class QPDFJob
         bool replace_input{false};
         bool check_is_encrypted{false};
         bool check_requires_password{false};
-        std::shared_ptr<char> infilename;
+        std::string infilename;
+        bool empty_input{false};
         std::string outfilename;
         bool json_input{false};
         bool json_output{false};
