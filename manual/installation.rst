@@ -659,7 +659,7 @@ Building with zopfli support
 
 .. cSpell:ignore DZOPFLI
 
-If you compile with ``-DZOPFLI-ON`` and have the `zopfli
+If you compile with ``-DZOPFLI=ON`` and have the `zopfli
 <https://github.com/google/zopfli>`__ development files available,
 qpdf will be built with zopfli support. See :ref:`zopfli` for
 information about using zopfli with qpdf.
