@@ -1375,93 +1375,84 @@ QPDFWriter::unparseObject(
         writeString(indent);
         writeString("]");
     } else if (tc == ::ot_dictionary) {
-        // Make a shallow copy of this object so we can modify it safely without affecting the
-        // original. This code has logic to skip certain keys in agreement with prepareFileForWrite
-        // and with skip_stream_parameters so that replacing them doesn't leave unreferenced objects
-        // in the output. We can use unsafeShallowCopy here because all we are doing is removing or
-        // replacing top-level keys.
-        object = object.unsafeShallowCopy();
-
         // Handle special cases for specific dictionaries.
 
-        // Extensions dictionaries.
+        if (old_og == m->root_og) {
+            // Extensions dictionaries.
 
-        // We have one of several cases:
-        //
-        // * We need ADBE
-        //    - We already have Extensions
-        //       - If it has the right ADBE, preserve it
-        //       - Otherwise, replace ADBE
-        //    - We don't have Extensions: create one from scratch
-        // * We don't want ADBE
-        //    - We already have Extensions
-        //       - If it only has ADBE, remove it
-        //       - If it has other things, keep those and remove ADBE
-        //    - We have no extensions: no action required
-        //
-        // Before writing, we guarantee that /Extensions, if present, is direct through the ADBE
-        // dictionary, so we can modify in place.
+            // We have one of several cases:
+            //
+            // * We need ADBE
+            //    - We already have Extensions
+            //       - If it has the right ADBE, preserve it
+            //       - Otherwise, replace ADBE
+            //    - We don't have Extensions: create one from scratch
+            // * We don't want ADBE
+            //    - We already have Extensions
+            //       - If it only has ADBE, remove it
+            //       - If it has other things, keep those and remove ADBE
+            //    - We have no extensions: no action required
+            //
+            // Before writing, we guarantee that /Extensions, if present, is direct through the ADBE
+            // dictionary, so we can modify in place.
 
-        const bool is_root = (old_og == m->root_og);
-        bool have_extensions_other = false;
-        bool have_extensions_adbe = false;
+            auto extensions = object.getKey("/Extensions");
+            const bool has_extensions = extensions.isDictionary();
+            const bool need_extensions_adbe = m->final_extension_level > 0;
 
-        QPDFObjectHandle extensions;
-        if (is_root) {
-            if (object.hasKey("/Extensions") && object.getKey("/Extensions").isDictionary()) {
-                extensions = object.getKey("/Extensions");
-            }
-        }
-
-        if (extensions) {
-            std::set<std::string> keys = extensions.getKeys();
-            if (keys.contains("/ADBE")) {
-                have_extensions_adbe = true;
-                keys.erase("/ADBE");
-            }
-            if (!keys.empty()) {
-                have_extensions_other = true;
-            }
-        }
-
-        bool need_extensions_adbe = (m->final_extension_level > 0);
-
-        if (is_root) {
-            if (need_extensions_adbe) {
-                if (!(have_extensions_other || have_extensions_adbe)) {
-                    // We need Extensions and don't have it.  Create it here.
-                    QTC::TC("qpdf", "QPDFWriter create Extensions", m->qdf_mode ? 0 : 1);
-                    extensions = object.replaceKeyAndGetNew(
-                        "/Extensions", QPDFObjectHandle::newDictionary());
+            if (has_extensions || need_extensions_adbe) {
+                // Make a shallow copy of this object so we can modify it safely without affecting
+                // the original. This code has logic to skip certain keys in agreement with
+                // prepareFileForWrite and with skip_stream_parameters so that replacing them
+                // doesn't leave unreferenced objects in the output. We can use unsafeShallowCopy
+                // here because all we are doing is removing or replacing top-level keys.
+                object = object.unsafeShallowCopy();
+                if (!has_extensions) {
+                    extensions = QPDFObjectHandle();
                 }
-            } else if (!have_extensions_other) {
-                // We have Extensions dictionary and don't want one.
-                if (have_extensions_adbe) {
-                    QTC::TC("qpdf", "QPDFWriter remove existing Extensions");
-                    object.removeKey("/Extensions");
-                    extensions = QPDFObjectHandle(); // uninitialized
-                }
-            }
-        }
 
-        if (extensions) {
-            QTC::TC("qpdf", "QPDFWriter preserve Extensions");
-            QPDFObjectHandle adbe = extensions.getKey("/ADBE");
-            if (adbe.isDictionary() &&
-                adbe.getKey("/BaseVersion").isNameAndEquals("/" + m->final_pdf_version) &&
-                adbe.getKey("/ExtensionLevel").isInteger() &&
-                (adbe.getKey("/ExtensionLevel").getIntValue() == m->final_extension_level)) {
-                QTC::TC("qpdf", "QPDFWriter preserve ADBE");
-            } else {
+                const bool have_extensions_adbe = extensions && extensions.hasKey("/ADBE");
+                const bool have_extensions_other =
+                    extensions && extensions.getKeys().size() > (have_extensions_adbe ? 1u : 0u);
+
                 if (need_extensions_adbe) {
-                    extensions.replaceKey(
-                        "/ADBE",
-                        QPDFObjectHandle::parse(
-                            "<< /BaseVersion /" + m->final_pdf_version + " /ExtensionLevel " +
-                            std::to_string(m->final_extension_level) + " >>"));
-                } else {
-                    QTC::TC("qpdf", "QPDFWriter remove ADBE");
-                    extensions.removeKey("/ADBE");
+                    if (!(have_extensions_other || have_extensions_adbe)) {
+                        // We need Extensions and don't have it.  Create it here.
+                        QTC::TC("qpdf", "QPDFWriter create Extensions", m->qdf_mode ? 0 : 1);
+                        extensions = object.replaceKeyAndGetNew(
+                            "/Extensions", QPDFObjectHandle::newDictionary());
+                    }
+                } else if (!have_extensions_other) {
+                    // We have Extensions dictionary and don't want one.
+                    if (have_extensions_adbe) {
+                        QTC::TC("qpdf", "QPDFWriter remove existing Extensions");
+                        object.removeKey("/Extensions");
+                        extensions = QPDFObjectHandle(); // uninitialized
+                    }
+                }
+
+                if (extensions) {
+                    QTC::TC("qpdf", "QPDFWriter preserve Extensions");
+                    QPDFObjectHandle adbe = extensions.getKey("/ADBE");
+                    if (adbe.isDictionary() &&
+                        adbe.getKey("/BaseVersion").isNameAndEquals("/" + m->final_pdf_version) &&
+                        adbe.getKey("/ExtensionLevel").isInteger() &&
+                        (adbe.getKey("/ExtensionLevel").getIntValue() ==
+                         m->final_extension_level)) {
+                        QTC::TC("qpdf", "QPDFWriter preserve ADBE");
+                    } else {
+                        if (need_extensions_adbe) {
+                            extensions.replaceKey(
+                                "/ADBE",
+                                QPDFObjectHandle::parse(
+                                    "<< /BaseVersion /" + m->final_pdf_version +
+                                    " /ExtensionLevel " + std::to_string(m->final_extension_level) +
+                                    " >>"));
+                        } else {
+                            QTC::TC("qpdf", "QPDFWriter remove ADBE");
+                            extensions.removeKey("/ADBE");
+                        }
+                    }
                 }
             }
         }
@@ -1470,6 +1461,14 @@ QPDFWriter::unparseObject(
 
         if (flags & f_stream) {
             // Suppress /Length since we will write it manually
+
+            // Make a shallow copy of this object so we can modify it safely without affecting the
+            // original. This code has logic to skip certain keys in agreement with
+            // prepareFileForWrite and with skip_stream_parameters so that replacing them doesn't
+            // leave unreferenced objects in the output. We can use unsafeShallowCopy here because
+            // all we are doing is removing or replacing top-level keys.
+            object = object.unsafeShallowCopy();
+
             object.removeKey("/Length");
 
             // If /DecodeParms is an empty list, remove it.
@@ -1480,8 +1479,7 @@ QPDFWriter::unparseObject(
             }
 
             if (flags & f_filtered) {
-                // We will supply our own filter and decode
-                // parameters.
+                // We will supply our own filter and decode parameters.
                 object.removeKey("/Filter");
                 object.removeKey("/DecodeParms");
             } else {
