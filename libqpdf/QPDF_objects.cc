@@ -256,10 +256,12 @@ QPDF::reconstruct_xref(QPDFExc& e, bool found_startxref)
 
     if (!found_startxref && !startxrefs.empty() && !found_objects.empty() &&
         startxrefs.back() > std::get<2>(found_objects.back())) {
+        auto xref_backup{m->xref_table};
         try {
             m->file->seek(startxrefs.back(), SEEK_SET);
             if (auto offset = QUtil::string_to_ll(readToken(*m->file).getValue().data())) {
                 read_xref(offset);
+
                 if (getRoot().getKey("/Pages").isDictionary()) {
                     QTC::TC("qpdf", "QPDF startxref more than 1024 before end");
                     warn(damagedPDF(
@@ -273,6 +275,7 @@ QPDF::reconstruct_xref(QPDFExc& e, bool found_startxref)
         } catch (...) {
             // ok, bad luck. Do recovery.
         }
+        m->xref_table = std::move(xref_backup);
     }
 
     auto rend = found_objects.rend();
@@ -1010,6 +1013,10 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2)
     // If there is already an entry for this object and generation in the table, it means that a
     // later xref table has registered this object.  Disregard this one.
     int new_gen = f0 == 2 ? 0 : f2;
+
+    if (!(f0 == 1 || f0 == 2)) {
+        return;
+    }
 
     if (!(obj > 0 && obj <= m->xref_table_max_id && 0 <= f2 && new_gen < 65535)) {
         // We are ignoring invalid objgens. Most will arrive here from xref reconstruction. There
