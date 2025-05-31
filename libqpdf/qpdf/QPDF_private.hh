@@ -491,6 +491,7 @@ class QPDF::Members
     CopiedStreamDataProvider* copied_stream_data_provider{nullptr};
     bool reconstructed_xref{false};
     bool in_xref_reconstruction{false};
+    bool in_read_xref_stream{false};
     bool fixed_dangling_refs{false};
     bool immediate_copy_from{false};
     bool in_parse{false};
