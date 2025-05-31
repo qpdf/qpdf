@@ -768,11 +768,13 @@ QPDF::read_xrefStream(qpdf_offset_t xref_offset, bool in_stream_recovery)
         QPDFObjGen x_og;
         QPDFObjectHandle xref_obj;
         try {
+            m->in_read_xref_stream = true;
             xref_obj =
                 readObjectAtOffset(false, xref_offset, "xref stream", QPDFObjGen(0, 0), x_og, true);
         } catch (QPDFExc&) {
             // ignore -- report error below
         }
+        m->in_read_xref_stream = false;
         if (xref_obj.isStreamOfType("/XRef")) {
             QTC::TC("qpdf", "QPDF found xref stream");
             return processXRefStream(xref_offset, xref_obj, in_stream_recovery);
@@ -1199,7 +1201,8 @@ QPDF::readObject(std::string const& description, QPDFObjGen og)
         m->tokenizer,
         decrypter_ptr,
         *this,
-        m->in_xref_reconstruction);
+        m->in_xref_reconstruction || m->in_read_xref_stream);
+    ;
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.
