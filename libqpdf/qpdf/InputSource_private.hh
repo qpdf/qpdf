@@ -15,8 +15,11 @@ namespace qpdf::is
       public:
         OffsetBuffer(std::string const& description, Buffer* buf, qpdf_offset_t global_offset) :
             description(description),
-            buf(buf),
-            max_offset(buf ? static_cast<qpdf_offset_t>(buf->getSize()) : 0),
+            view_(
+                buf && buf->getSize()
+                    ? std::string_view(
+                          reinterpret_cast<const char*>(buf->getBuffer()), buf->getSize())
+                    : std::string_view()),
             global_offset(global_offset)
         {
             if (global_offset < 0) {
@@ -76,9 +79,8 @@ namespace qpdf::is
         void seek_internal(qpdf_offset_t offset, int whence);
 
         std::string description;
-        Buffer* buf;
         qpdf_offset_t cur_offset{0};
-        qpdf_offset_t max_offset;
+        std::string_view view_;
         qpdf_offset_t global_offset;
     };
 
