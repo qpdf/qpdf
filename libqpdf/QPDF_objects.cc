@@ -12,7 +12,6 @@
 #include <vector>
 
 #include <qpdf/BufferInputSource.hh>
-#include <qpdf/FileInputSource.hh>
 #include <qpdf/InputSource_private.hh>
 #include <qpdf/OffsetInputSource.hh>
 #include <qpdf/Pipeline.hh>

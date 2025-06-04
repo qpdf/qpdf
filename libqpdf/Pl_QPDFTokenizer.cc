@@ -1,8 +1,12 @@
 #include <qpdf/Pl_QPDFTokenizer.hh>
 
-#include <qpdf/BufferInputSource.hh>
+#include <qpdf/InputSource_private.hh>
+#include <qpdf/Pipeline_private.hh>
 #include <qpdf/QTC.hh>
+
 #include <stdexcept>
+
+using namespace qpdf;
 
 class Pl_QPDFTokenizer::Members
 {
@@ -13,7 +17,8 @@ class Pl_QPDFTokenizer::Members
 
     QPDFObjectHandle::TokenFilter* filter{nullptr};
     QPDFTokenizer tokenizer;
-    Pl_Buffer buf{"tokenizer buffer"};
+    std::string buffer;
+    pl::String buf{"pl_tokenizer", nullptr, buffer};
 };
 
 Pl_QPDFTokenizer::Pl_QPDFTokenizer(
@@ -39,8 +44,7 @@ Pl_QPDFTokenizer::write(unsigned char const* data, size_t len)
 void
 Pl_QPDFTokenizer::finish()
 {
-    m->buf.finish();
-    auto input = BufferInputSource("tokenizer data", m->buf.getBuffer(), true);
+    auto input = is::OffsetBuffer("tokenizer data", m->buffer);
     std::string empty;
     while (true) {
         auto token = m->tokenizer.readToken(input, empty, true);
