@@ -13,19 +13,29 @@ namespace qpdf::is
     class OffsetBuffer final: public InputSource
     {
       public:
-        OffsetBuffer(std::string const& description, Buffer* buf, qpdf_offset_t global_offset) :
+        OffsetBuffer(
+            std::string const& description,
+            std::string_view view,
+            qpdf_offset_t global_offset = 0) :
             description(description),
-            view_(
-                buf && buf->getSize()
-                    ? std::string_view(
-                          reinterpret_cast<const char*>(buf->getBuffer()), buf->getSize())
-                    : std::string_view()),
+            view_(view),
             global_offset(global_offset)
         {
             if (global_offset < 0) {
                 throw std::logic_error("is::OffsetBuffer constructed with negative offset");
             }
             last_offset = global_offset;
+        }
+
+        OffsetBuffer(std::string const& description, Buffer* buf, qpdf_offset_t global_offset = 0) :
+            OffsetBuffer(
+                description,
+                {buf && buf->getSize()
+                     ? std::string_view(
+                           reinterpret_cast<const char*>(buf->getBuffer()), buf->getSize())
+                     : std::string_view()},
+                global_offset)
+        {
         }
 
         ~OffsetBuffer() final = default;
