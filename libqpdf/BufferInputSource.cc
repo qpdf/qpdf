@@ -146,57 +146,57 @@ BufferInputSource::unreadCh(char ch)
 }
 
 qpdf_offset_t
-is::OffsetBuffer::findAndSkipNextEOL_internal()
+is::OffsetBuffer::findAndSkipNextEOL()
 {
-    if (cur_offset < 0) {
+    if (pos < 0) {
         throw std::logic_error("INTERNAL ERROR: is::OffsetBuffer offset < 0");
     }
     auto end_pos = static_cast<qpdf_offset_t>(view_.size());
-    if (cur_offset >= end_pos) {
+    if (pos >= end_pos) {
         last_offset = end_pos + global_offset;
-        cur_offset = end_pos;
-        return end_pos;
+        pos = end_pos;
+        return end_pos + global_offset;
     }
 
     qpdf_offset_t result = 0;
     auto buffer = view_.begin();
     auto end = view_.end();
-    auto p = buffer + cur_offset;
+    auto p = buffer + pos;
 
     while (p < end && !(*p == '\r' || *p == '\n')) {
         ++p;
     }
     if (p < end) {
         result = p - buffer;
-        cur_offset = result + 1;
+        pos = result + 1;
         ++p;
-        while (cur_offset < end_pos && (*p == '\r' || *p == '\n')) {
+        while (pos < end_pos && (*p == '\r' || *p == '\n')) {
             ++p;
-            ++cur_offset;
+            ++pos;
         }
     } else {
-        cur_offset = end_pos;
+        pos = end_pos;
         result = end_pos;
     }
-    return result;
+    return result + global_offset;
 }
 
 void
-is::OffsetBuffer::seek_internal(qpdf_offset_t offset, int whence)
+is::OffsetBuffer::seek(qpdf_offset_t offset, int whence)
 {
     switch (whence) {
     case SEEK_SET:
-        cur_offset = offset;
+        pos = offset - global_offset;
         break;
 
     case SEEK_END:
         QIntC::range_check(static_cast<qpdf_offset_t>(view_.size()), offset);
-        cur_offset = static_cast<qpdf_offset_t>(view_.size()) + offset;
+        pos = static_cast<qpdf_offset_t>(view_.size()) + offset;
         break;
 
     case SEEK_CUR:
-        QIntC::range_check(cur_offset, offset);
-        cur_offset += offset;
+        QIntC::range_check(pos, offset);
+        pos += offset;
         break;
 
     default:
@@ -204,7 +204,7 @@ is::OffsetBuffer::seek_internal(qpdf_offset_t offset, int whence)
         break;
     }
 
-    if (cur_offset < 0) {
+    if (pos < 0) {
         throw std::runtime_error(description + ": seek before beginning of buffer");
     }
 }
@@ -212,18 +212,18 @@ is::OffsetBuffer::seek_internal(qpdf_offset_t offset, int whence)
 size_t
 is::OffsetBuffer::read(char* buffer, size_t length)
 {
-    if (cur_offset < 0) {
+    if (pos < 0) {
         throw std::logic_error("INTERNAL ERROR: is::OffsetBuffer offset < 0");
     }
     auto end_pos = static_cast<qpdf_offset_t>(view_.size());
-    if (cur_offset >= end_pos) {
+    if (pos >= end_pos) {
         last_offset = end_pos + global_offset;
         return 0;
     }
 
-    last_offset = cur_offset + global_offset;
-    size_t len = std::min(QIntC::to_size(end_pos - cur_offset), length);
-    memcpy(buffer, view_.data() + cur_offset, len);
-    cur_offset += QIntC::to_offset(len);
+    last_offset = pos + global_offset;
+    size_t len = std::min(QIntC::to_size(end_pos - pos), length);
+    memcpy(buffer, view_.data() + pos, len);
+    pos += QIntC::to_offset(len);
     return len;
 }

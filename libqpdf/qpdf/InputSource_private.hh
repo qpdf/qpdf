@@ -30,11 +30,7 @@ namespace qpdf::is
 
         ~OffsetBuffer() final = default;
 
-        qpdf_offset_t
-        findAndSkipNextEOL() final
-        {
-            return findAndSkipNextEOL_internal() + global_offset;
-        }
+        qpdf_offset_t findAndSkipNextEOL() final;
 
         std::string const&
         getName() const final
@@ -45,23 +41,15 @@ namespace qpdf::is
         qpdf_offset_t
         tell() final
         {
-            return cur_offset + global_offset;
+            return pos + global_offset;
         }
 
-        void
-        seek(qpdf_offset_t offset, int whence) final
-        {
-            if (whence == SEEK_SET) {
-                seek_internal(offset - global_offset, whence);
-            } else {
-                seek_internal(offset, whence);
-            }
-        }
+        void seek(qpdf_offset_t offset, int whence) final;
 
         void
         rewind() final
         {
-            seek_internal(0, SEEK_SET);
+            pos = 0;
         }
 
         size_t read(char* buffer, size_t length) final;
@@ -69,17 +57,14 @@ namespace qpdf::is
         void
         unreadCh(char ch) final
         {
-            if (cur_offset > 0) {
-                --cur_offset;
+            if (pos > 0) {
+                --pos;
             }
         }
 
       private:
-        qpdf_offset_t findAndSkipNextEOL_internal();
-        void seek_internal(qpdf_offset_t offset, int whence);
-
         std::string description;
-        qpdf_offset_t cur_offset{0};
+        qpdf_offset_t pos{0};
         std::string_view view_;
         qpdf_offset_t global_offset;
     };
