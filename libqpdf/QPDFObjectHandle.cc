@@ -2,7 +2,7 @@
 
 #include <qpdf/QPDFObjectHandle_private.hh>
 
-#include <qpdf/InputSource_private.hh>
+#include <qpdf/BufferInputSource.hh>
 #include <qpdf/JSON_writer.hh>
 #include <qpdf/Pipeline_private.hh>
 #include <qpdf/Pl_Buffer.hh>
