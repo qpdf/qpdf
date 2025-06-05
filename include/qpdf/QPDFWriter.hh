@@ -447,6 +447,7 @@ class QPDFWriter
     struct NewObject;
     class ObjTable;
     class NewObjTable;
+    class PipelinePopper;
 
   private:
     // flags used by unparseObject
@@ -457,28 +458,6 @@ class QPDFWriter
     static int const f_no_encryption = 1 << 4;
 
     enum trailer_e { t_normal, t_lin_first, t_lin_second };
-
-    // An reference to a PipelinePopper instance is passed into activatePipelineStack. When the
-    // PipelinePopper goes out of scope, the pipeline stack is popped. PipelinePopper's destructor
-    // calls finish on the current pipeline and pops the pipeline stack until the top of stack is a
-    // previous active top of stack, and restores the pipeline to that point. It deletes any
-    // pipelines that it pops. If the bp argument is non-null and any of the stack items are of type
-    // Pl_Buffer, the buffer is retrieved.
-    class PipelinePopper
-    {
-        friend class QPDFWriter;
-
-      public:
-        PipelinePopper(QPDFWriter* qw) :
-            qw(qw)
-        {
-        }
-        ~PipelinePopper();
-
-      private:
-        QPDFWriter* qw{nullptr};
-        unsigned long stack_id{0};
-    };
 
     unsigned int bytesNeeded(long long n);
     void writeBinary(unsigned long long val, unsigned int bytes);
@@ -588,15 +567,6 @@ class QPDFWriter
     // When filtering subsections, push additional pipelines to the stack. When ready to switch,
     // activate the pipeline stack. When the passed in PipelinePopper goes out of scope, the stack
     // is popped.
-    Pipeline* pushPipeline(Pipeline*);
-    void activatePipelineStack(PipelinePopper& pp, std::string& str);
-    void activatePipelineStack(PipelinePopper& pp, std::unique_ptr<qpdf::pl::Link> link);
-    void activatePipelineStack(
-        PipelinePopper& pp,
-        bool discard = false,
-        std::string* str = nullptr,
-        std::unique_ptr<qpdf::pl::Link> link = nullptr);
-    void initializePipelineStack(Pipeline*);
 
     void adjustAESStreamLength(size_t& length);
     void pushEncryptionFilter(PipelinePopper&);
