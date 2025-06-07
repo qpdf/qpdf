@@ -84,8 +84,9 @@ main(int argc, char* argv[])
         key[i / 2] = static_cast<unsigned char>(val);
     }
 
+    std::string keystr(reinterpret_cast<char const*>(key), keylen);
     auto* out = new Pl_StdioFile("stdout", outfile);
-    auto* aes = new Pl_AES_PDF("aes_128_cbc", out, encrypt, key, keylen);
+    auto* aes = new Pl_AES_PDF("aes_128_cbc", out, encrypt, keystr);
     delete[] key;
     key = nullptr;
     if (!cbc_mode) {

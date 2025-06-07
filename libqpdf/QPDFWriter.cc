@@ -1109,18 +1109,9 @@ QPDFWriter::write_encrypted(std::string_view str)
     if (!(m->encryption && !m->cur_data_key.empty())) {
         write(str);
     } else if (m->encrypt_use_aes) {
-        write(
-            pl::pipe<Pl_AES_PDF>(
-                str,
-                true,
-                QUtil::unsigned_char_pointer(m->cur_data_key),
-                m->cur_data_key.length()));
+        write(pl::pipe<Pl_AES_PDF>(str, true, m->cur_data_key));
     } else {
-        write(
-            pl::pipe<Pl_RC4>(
-                str,
-                QUtil::unsigned_char_pointer(m->cur_data_key),
-                QIntC::to_int(m->cur_data_key.length())));
+        write(pl::pipe<Pl_RC4>(str, m->cur_data_key));
     }
 
     return *this;
@@ -1654,12 +1645,7 @@ QPDFWriter::unparseObject(
             val = object.getStringValue();
             if (m->encrypt_use_aes) {
                 Pl_Buffer bufpl("encrypted string");
-                Pl_AES_PDF pl(
-                    "aes encrypt string",
-                    &bufpl,
-                    true,
-                    QUtil::unsigned_char_pointer(m->cur_data_key),
-                    m->cur_data_key.length());
+                Pl_AES_PDF pl("aes encrypt string", &bufpl, true, m->cur_data_key);
                 pl.writeString(val);
                 pl.finish();
                 val = QPDF_String(bufpl.getString()).unparse(true);

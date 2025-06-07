@@ -11,12 +11,7 @@ class Pl_AES_PDF final: public Pipeline
 {
   public:
     // key should be a pointer to key_bytes bytes of data
-    Pl_AES_PDF(
-        char const* identifier,
-        Pipeline* next,
-        bool encrypt,
-        unsigned char const* key,
-        size_t key_bytes);
+    Pl_AES_PDF(char const* identifier, Pipeline* next, bool encrypt, std::string key);
     ~Pl_AES_PDF() final = default;
 
     void write(unsigned char const* data, size_t len) final;
@@ -42,13 +37,12 @@ class Pl_AES_PDF final: public Pipeline
     static unsigned int const buf_size = QPDFCryptoImpl::rijndael_buf_size;
     static bool use_static_iv;
 
+    std::string key;
     std::shared_ptr<QPDFCryptoImpl> crypto;
     bool encrypt;
     bool cbc_mode{true};
     bool first{true};
     size_t offset{0}; // offset into memory buffer
-    std::unique_ptr<unsigned char[]> key;
-    size_t key_bytes{0};
     unsigned char inbuf[buf_size];
     unsigned char outbuf[buf_size];
     unsigned char cbc_block[buf_size];

@@ -230,8 +230,7 @@ process_with_aes(
     size_t iv_length = 0)
 {
     Pl_Buffer buffer("buffer");
-    Pl_AES_PDF aes(
-        "aes", &buffer, encrypt, QUtil::unsigned_char_pointer(key), QIntC::to_uint(key.length()));
+    Pl_AES_PDF aes("aes", &buffer, encrypt, key);
     if (iv) {
         aes.setIV(iv, iv_length);
     } else {
@@ -902,12 +901,7 @@ QPDF::decryptString(std::string& str, QPDFObjGen og)
         if (use_aes) {
             QTC::TC("qpdf", "QPDF_encryption aes decode string");
             Pl_Buffer bufpl("decrypted string");
-            Pl_AES_PDF pl(
-                "aes decrypt string",
-                &bufpl,
-                false,
-                QUtil::unsigned_char_pointer(key),
-                key.length());
+            Pl_AES_PDF pl("aes decrypt string", &bufpl, false, key);
             pl.writeString(str);
             pl.finish();
             str = bufpl.getString();
@@ -1028,19 +1022,11 @@ QPDF::decryptStream(
     std::string key = getKeyForObject(encp, og, use_aes);
     if (use_aes) {
         QTC::TC("qpdf", "QPDF_encryption aes decode stream");
-        decrypt_pipeline = std::make_unique<Pl_AES_PDF>(
-            "AES stream decryption",
-            pipeline,
-            false,
-            QUtil::unsigned_char_pointer(key),
-            key.length());
+        decrypt_pipeline =
+            std::make_unique<Pl_AES_PDF>("AES stream decryption", pipeline, false, key);
     } else {
         QTC::TC("qpdf", "QPDF_encryption rc4 decode stream");
-        decrypt_pipeline = std::make_unique<Pl_RC4>(
-            "RC4 stream decryption",
-            pipeline,
-            QUtil::unsigned_char_pointer(key),
-            toI(key.length()));
+        decrypt_pipeline = std::make_unique<Pl_RC4>("RC4 stream decryption", pipeline, key);
     }
     pipeline = decrypt_pipeline.get();
 }

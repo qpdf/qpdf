@@ -9,25 +9,18 @@
 
 bool Pl_AES_PDF::use_static_iv = false;
 
-Pl_AES_PDF::Pl_AES_PDF(
-    char const* identifier,
-    Pipeline* next,
-    bool encrypt,
-    unsigned char const* key,
-    size_t key_bytes) :
+Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next, bool encrypt, std::string key) :
     Pipeline(identifier, next),
+    key(key),
     crypto(QPDFCryptoProvider::getImpl()),
-    encrypt(encrypt),
-    key_bytes(key_bytes)
+    encrypt(encrypt)
 {
     if (!next) {
         throw std::logic_error("Attempt to create Pl_AES_PDF with nullptr as next");
     }
-    if (!(key_bytes == 32 || key_bytes == 16)) {
+    if (!(key.size() == 32 || key.size() == 16)) {
         throw std::runtime_error("unsupported key length");
     }
-    this->key = std::make_unique<unsigned char[]>(key_bytes);
-    std::memcpy(this->key.get(), key, key_bytes);
     std::memset(this->inbuf, 0, this->buf_size);
     std::memset(this->outbuf, 0, this->buf_size);
     std::memset(this->cbc_block, 0, this->buf_size);
@@ -170,7 +163,12 @@ Pl_AES_PDF::flush(bool strip_padding)
                 return_after_init = true;
             }
         }
-        crypto->rijndael_init(encrypt, key.get(), key_bytes, cbc_mode, cbc_block);
+        crypto->rijndael_init(
+            encrypt,
+            reinterpret_cast<const unsigned char*>(key.data()),
+            key.size(),
+            cbc_mode,
+            cbc_block);
         if (return_after_init) {
             return;
         }
