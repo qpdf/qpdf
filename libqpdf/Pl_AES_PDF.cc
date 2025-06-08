@@ -68,6 +68,8 @@ Pl_AES_PDF::write(unsigned char const* data, size_t len)
     if (!first) {
         throw std::logic_error("AES pipeline: write called more than once");
     }
+    first = false;
+
     if (encrypt) {
         write_encrypt(data, len);
     } else {
@@ -78,17 +80,40 @@ Pl_AES_PDF::write(unsigned char const* data, size_t len)
 void
 Pl_AES_PDF::write_decrypt(unsigned char const* data, size_t len)
 {
-    size_t bytes_left = len;
     unsigned char const* p = data;
     size_t reps = len < buf_size ? 0 : (len - 1) / buf_size;
+    size_t bytes_left = len - (buf_size * reps);
+
+    if (cbc_mode) {
+        if (use_zero_iv || use_specified_iv) {
+            // Initialize vector with zeroes; zero vector was not written to the beginning of
+            // the input file.
+            initializeVector();
+        } else {
+            // Take the first block of input as the initialization vector. Don't write it to output.
+            if (len < buf_size) {
+                return;
+            }
+            memcpy(cbc_block.data(), p, buf_size);
+            p += buf_size;
+            if (reps > 0) {
+                --reps;
+            } else {
+                bytes_left = 0;
+            }
+        }
+    }
+    crypto->rijndael_init(
+        false,
+        reinterpret_cast<const unsigned char*>(key.data()),
+        key.size(),
+        cbc_mode,
+        cbc_block.data());
 
     for (size_t i = 0; i < reps; ++i) {
         flush_decrypt(p, false);
         p += buf_size;
     }
-
-    bytes_left = len - (buf_size * reps);
-    std::memcpy(inbuf.data(), p, bytes_left);
 
     if (bytes_left != buf_size) {
         // This is never supposed to happen as the output is always supposed to be padded.
@@ -111,33 +136,6 @@ void
 Pl_AES_PDF::flush_decrypt(const unsigned char* const_in, bool strip_padding)
 {
     auto in = const_cast<unsigned char*>(const_in);
-
-    if (first) {
-        first = false;
-        bool return_after_init = false;
-        if (cbc_mode) {
-            if (use_zero_iv || use_specified_iv) {
-                // Initialize vector with zeroes; zero vector was not written to the beginning of
-                // the input file.
-                initializeVector();
-            } else {
-                // Take the first block of input as the initialization vector.  There's nothing to
-                // write at this time.
-                memcpy(cbc_block.data(), in, buf_size);
-                return_after_init = true;
-            }
-        }
-        crypto->rijndael_init(
-            encrypt,
-            reinterpret_cast<const unsigned char*>(key.data()),
-            key.size(),
-            cbc_mode,
-            cbc_block.data());
-        if (return_after_init) {
-            return;
-        }
-    }
-
     crypto->rijndael_process(in, outbuf.data());
     unsigned int bytes = buf_size;
     if (strip_padding) {
@@ -161,7 +159,21 @@ Pl_AES_PDF::flush_decrypt(const unsigned char* const_in, bool strip_padding)
 void
 Pl_AES_PDF::write_encrypt(const unsigned char* data, size_t len)
 {
-    size_t bytes_left = len;
+    if (cbc_mode) {
+        // Set cbc_block to the initialization vector, and if not zero, write it to the
+        // output stream.
+        initializeVector();
+        if (!(use_zero_iv || use_specified_iv)) {
+            next()->write(cbc_block.data(), buf_size);
+        }
+    }
+    crypto->rijndael_init(
+        true,
+        reinterpret_cast<const unsigned char*>(key.data()),
+        key.size(),
+        cbc_mode,
+        cbc_block.data());
+
     unsigned char const* p = data;
     size_t reps = len < buf_size ? 0 : (len - 1) / buf_size;
 
@@ -170,7 +182,7 @@ Pl_AES_PDF::write_encrypt(const unsigned char* data, size_t len)
         p += buf_size;
     }
 
-    bytes_left = len - (buf_size * reps);
+    size_t bytes_left = len - (buf_size * reps);
     std::memcpy(inbuf.data(), p, bytes_left);
 
     if (bytes_left == buf_size) {
@@ -192,29 +204,8 @@ void
 Pl_AES_PDF::flush_encrypt(const unsigned char* const_in)
 {
     auto in = const_cast<unsigned char*>(const_in);
-
-    if (first) {
-        first = false;
-        if (cbc_mode) {
-            // Set cbc_block to the initialization vector, and if not zero, write it to the
-            // output stream.
-            initializeVector();
-            if (!(use_zero_iv || use_specified_iv)) {
-                next()->write(cbc_block.data(), buf_size);
-            }
-        }
-        crypto->rijndael_init(
-            encrypt,
-            reinterpret_cast<const unsigned char*>(key.data()),
-            key.size(),
-            cbc_mode,
-            cbc_block.data());
-    }
-
     crypto->rijndael_process(in, outbuf.data());
-    unsigned int bytes = buf_size;
-
-    next()->write(outbuf.data(), bytes);
+    next()->write(outbuf.data(), buf_size);
 }
 
 void
