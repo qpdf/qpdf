@@ -68,75 +68,47 @@ Pl_AES_PDF::write(unsigned char const* data, size_t len)
     if (!first) {
         throw std::logic_error("AES pipeline: write called more than once");
     }
+    if (encrypt) {
+        write_encrypt(data, len);
+    } else {
+        write_decrypt(data, len);
+    }
+}
+
+void
+Pl_AES_PDF::write_decrypt(unsigned char const* data, size_t len)
+{
     size_t bytes_left = len;
     unsigned char const* p = data;
     size_t reps = len < buf_size ? 0 : (len - 1) / buf_size;
 
     for (size_t i = 0; i < reps; ++i) {
-        flush(p, false);
+        flush_decrypt(p, false);
         p += buf_size;
     }
 
     bytes_left = len - (buf_size * reps);
     std::memcpy(inbuf.data(), p, bytes_left);
 
-    if (encrypt) {
-        if (bytes_left == buf_size) {
-            flush(inbuf.data(), false);
+    if (bytes_left != buf_size) {
+        // This is never supposed to happen as the output is always supposed to be padded.
+        // However, we have encountered files for which the output is not a multiple of the
+        // block size.  In this case, pad with zeroes and hope for the best.
+        if (bytes_left >= buf_size) {
+            throw std::logic_error("buffer overflow in AES encryption pipeline");
         }
-        if (!disable_padding) {
-            // Pad as described in section 3.5.1 of version 1.7 of the PDF specification, including
-            // providing an entire block of padding if the input was a multiple of 16 bytes.
-            size_t offset = bytes_left == buf_size ? 0 : bytes_left;
-            unsigned char pad = QIntC::to_uchar(buf_size - offset);
-            std::memcpy(inbuf.data(), p, bytes_left);
-            memset(inbuf.data() + offset, pad, pad);
-            flush(inbuf.data(), false);
-        }
+        std::memcpy(inbuf.data(), p, bytes_left);
+        std::memset(inbuf.data() + bytes_left, 0, buf_size - bytes_left);
+        flush_decrypt(inbuf.data(), !disable_padding);
     } else {
-        if (bytes_left != buf_size) {
-            // This is never supposed to happen as the output is always supposed to be padded.
-            // However, we have encountered files for which the output is not a multiple of the
-            // block size.  In this case, pad with zeroes and hope for the best.
-            if (bytes_left >= buf_size) {
-                throw std::logic_error("buffer overflow in AES encryption pipeline");
-            }
-            std::memcpy(inbuf.data(), p, bytes_left);
-            std::memset(inbuf.data() + bytes_left, 0, buf_size - bytes_left);
-            flush(inbuf.data(), !disable_padding);
-        } else {
-            flush(p, !disable_padding);
-        }
+        flush_decrypt(p, !disable_padding);
     }
+
     crypto->rijndael_finalize();
 }
 
 void
-Pl_AES_PDF::finish()
-{
-    next()->finish();
-}
-
-void
-Pl_AES_PDF::initializeVector()
-{
-    if (use_zero_iv) {
-        for (unsigned int i = 0; i < buf_size; ++i) {
-            cbc_block[i] = 0;
-        }
-    } else if (use_specified_iv) {
-        std::memcpy(cbc_block.data(), specified_iv.data(), buf_size);
-    } else if (use_static_iv) {
-        for (unsigned int i = 0; i < buf_size; ++i) {
-            cbc_block[i] = static_cast<unsigned char>(14U * (1U + i));
-        }
-    } else {
-        QUtil::initializeWithRandomBytes(cbc_block.data(), buf_size);
-    }
-}
-
-void
-Pl_AES_PDF::flush(unsigned char const* const_in, bool strip_padding)
+Pl_AES_PDF::flush_decrypt(const unsigned char* const_in, bool strip_padding)
 {
     auto in = const_cast<unsigned char*>(const_in);
 
@@ -144,14 +116,7 @@ Pl_AES_PDF::flush(unsigned char const* const_in, bool strip_padding)
         first = false;
         bool return_after_init = false;
         if (cbc_mode) {
-            if (encrypt) {
-                // Set cbc_block to the initialization vector, and if not zero, write it to the
-                // output stream.
-                initializeVector();
-                if (!(use_zero_iv || use_specified_iv)) {
-                    next()->write(cbc_block.data(), buf_size);
-                }
-            } else if (use_zero_iv || use_specified_iv) {
+            if (use_zero_iv || use_specified_iv) {
                 // Initialize vector with zeroes; zero vector was not written to the beginning of
                 // the input file.
                 initializeVector();
@@ -191,4 +156,87 @@ Pl_AES_PDF::flush(unsigned char const* const_in, bool strip_padding)
         }
     }
     next()->write(outbuf.data(), bytes);
+}
+
+void
+Pl_AES_PDF::write_encrypt(const unsigned char* data, size_t len)
+{
+    size_t bytes_left = len;
+    unsigned char const* p = data;
+    size_t reps = len < buf_size ? 0 : (len - 1) / buf_size;
+
+    for (size_t i = 0; i < reps; ++i) {
+        flush_encrypt(p);
+        p += buf_size;
+    }
+
+    bytes_left = len - (buf_size * reps);
+    std::memcpy(inbuf.data(), p, bytes_left);
+
+    if (bytes_left == buf_size) {
+        flush_encrypt(inbuf.data());
+    }
+    if (!disable_padding) {
+        // Pad as described in section 3.5.1 of version 1.7 of the PDF specification, including
+        // providing an entire block of padding if the input was a multiple of 16 bytes.
+        size_t offset = bytes_left == buf_size ? 0 : bytes_left;
+        unsigned char pad = QIntC::to_uchar(buf_size - offset);
+        std::memcpy(inbuf.data(), p, bytes_left);
+        memset(inbuf.data() + offset, pad, pad);
+        flush_encrypt(inbuf.data());
+    }
+    crypto->rijndael_finalize();
+}
+
+void
+Pl_AES_PDF::flush_encrypt(const unsigned char* const_in)
+{
+    auto in = const_cast<unsigned char*>(const_in);
+
+    if (first) {
+        first = false;
+        if (cbc_mode) {
+            // Set cbc_block to the initialization vector, and if not zero, write it to the
+            // output stream.
+            initializeVector();
+            if (!(use_zero_iv || use_specified_iv)) {
+                next()->write(cbc_block.data(), buf_size);
+            }
+        }
+        crypto->rijndael_init(
+            encrypt,
+            reinterpret_cast<const unsigned char*>(key.data()),
+            key.size(),
+            cbc_mode,
+            cbc_block.data());
+    }
+
+    crypto->rijndael_process(in, outbuf.data());
+    unsigned int bytes = buf_size;
+
+    next()->write(outbuf.data(), bytes);
+}
+
+void
+Pl_AES_PDF::finish()
+{
+    next()->finish();
+}
+
+void
+Pl_AES_PDF::initializeVector()
+{
+    if (use_zero_iv) {
+        for (unsigned int i = 0; i < buf_size; ++i) {
+            cbc_block[i] = 0;
+        }
+    } else if (use_specified_iv) {
+        std::memcpy(cbc_block.data(), specified_iv.data(), buf_size);
+    } else if (use_static_iv) {
+        for (unsigned int i = 0; i < buf_size; ++i) {
+            cbc_block[i] = static_cast<unsigned char>(14U * (1U + i));
+        }
+    } else {
+        QUtil::initializeWithRandomBytes(cbc_block.data(), buf_size);
+    }
 }
