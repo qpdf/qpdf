@@ -3,6 +3,8 @@
 
 #include <qpdf/Pipeline.hh>
 #include <qpdf/QPDFCryptoImpl.hh>
+
+#include <array>
 #include <memory>
 
 // This pipeline implements AES-128 and AES-256 with CBC and block padding as specified in the PDF
@@ -23,7 +25,7 @@ class Pl_AES_PDF final: public Pipeline
     void disablePadding();
     // Specify an initialization vector, which will not be included in
     // the output.
-    void setIV(unsigned char const* iv, size_t bytes);
+    void setIV(std::string&& iv);
 
     // For testing only; PDF always uses CBC
     void disableCBC();
@@ -43,10 +45,10 @@ class Pl_AES_PDF final: public Pipeline
     bool cbc_mode{true};
     bool first{true};
     size_t offset{0}; // offset into memory buffer
-    unsigned char inbuf[buf_size];
-    unsigned char outbuf[buf_size];
-    unsigned char cbc_block[buf_size];
-    unsigned char specified_iv[buf_size];
+    std::array<unsigned char, buf_size> inbuf;
+    std::array<unsigned char, buf_size> outbuf;
+    std::array<unsigned char, buf_size> cbc_block;
+    std::string specified_iv;
     bool use_zero_iv{false};
     bool use_specified_iv{false};
     bool disable_padding{false};

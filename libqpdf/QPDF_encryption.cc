@@ -8,6 +8,7 @@
 #include <qpdf/QPDFExc.hh>
 
 #include <qpdf/MD5.hh>
+#include <qpdf/Pipeline_private.hh>
 #include <qpdf/Pl_AES_PDF.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_RC4.hh>
@@ -224,15 +225,14 @@ process_with_aes(
     std::string const& key,
     bool encrypt,
     std::string const& data,
-    size_t outlength = 0,
     unsigned int repetitions = 1,
-    unsigned char const* iv = nullptr,
-    size_t iv_length = 0)
+    std::string&& iv = "")
 {
-    Pl_Buffer buffer("buffer");
+    std::string result;
+    pl::String buffer(result);
     Pl_AES_PDF aes("aes", &buffer, encrypt, key);
-    if (iv) {
-        aes.setIV(iv, iv_length);
+    if (!iv.empty()) {
+        aes.setIV(std::move(iv));
     } else {
         aes.useZeroIV();
     }
@@ -241,11 +241,7 @@ process_with_aes(
         aes.writeString(data);
     }
     aes.finish();
-    if (outlength == 0) {
-        return buffer.getString();
-    } else {
-        return buffer.getString().substr(0, outlength);
-    }
+    return result;
 }
 
 std::string
@@ -283,14 +279,7 @@ QPDF::EncryptionData::hash_V5(
             ++round_number;
             std::string K1 = password + K + udata;
             qpdf_assert_debug(K.length() >= 32);
-            std::string E = process_with_aes(
-                K.substr(0, 16),
-                true,
-                K1,
-                0,
-                64,
-                QUtil::unsigned_char_pointer(K.substr(16, 16)),
-                16);
+            std::string E = process_with_aes(K.substr(0, 16), true, K1, 64, K.substr(16, 16));
 
             // E_mod_3 is supposed to be mod 3 of the first 16 bytes of E taken as as a (128-bit)
             // big-endian number.  Since (xy mod n) is equal to ((x mod n) + (y mod n)) mod n and
