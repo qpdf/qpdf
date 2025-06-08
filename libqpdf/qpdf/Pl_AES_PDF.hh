@@ -34,7 +34,10 @@ class Pl_AES_PDF final: public Pipeline
     static void useStaticIV();
 
   private:
-    void flush(unsigned char const* in, bool discard_padding);
+    void write_decrypt(unsigned char const* data, size_t len);
+    void write_encrypt(unsigned char const* data, size_t len);
+    void flush_decrypt(unsigned char const* in, bool discard_padding);
+    void flush_encrypt(unsigned char const* in);
     void initializeVector();
 
     static unsigned int const buf_size = QPDFCryptoImpl::rijndael_buf_size;
