@@ -222,11 +222,7 @@ iterate_rc4(std::string& data, std::string_view okey, int iterations, bool rever
 
 static std::string
 process_with_aes(
-    std::string const& key,
-    bool encrypt,
-    std::string const& data,
-    unsigned int repetitions = 1,
-    std::string&& iv = "")
+    std::string const& key, bool encrypt, std::string const& data, std::string&& iv = "")
 {
     std::string result;
     pl::String buffer(result);
@@ -237,9 +233,7 @@ process_with_aes(
         aes.useZeroIV();
     }
     aes.disablePadding();
-    for (unsigned int i = 0; i < repetitions; ++i) {
-        aes.writeString(data);
-    }
+    aes.writeString(data);
     aes.finish();
     return result;
 }
@@ -277,9 +271,14 @@ QPDF::EncryptionData::hash_V5(
             // terminated repetition.
 
             ++round_number;
-            std::string K1 = password + K + udata;
+            std::string K1;
+            K1.reserve(64 * (password.size() + K.size() + udata.size()));
+            K1.append(password).append(K).append(udata);
+            for (int i = 0; i < 6; ++i) {
+                K1.append(K1);
+            }
             qpdf_assert_debug(K.length() >= 32);
-            std::string E = process_with_aes(K.substr(0, 16), true, K1, 64, K.substr(16, 16));
+            std::string E = process_with_aes(K.substr(0, 16), true, K1, K.substr(16, 16));
 
             // E_mod_3 is supposed to be mod 3 of the first 16 bytes of E taken as as a (128-bit)
             // big-endian number.  Since (xy mod n) is equal to ((x mod n) + (y mod n)) mod n and
