@@ -70,41 +70,43 @@ Pl_AES_PDF::write(unsigned char const* data, size_t len)
     }
     size_t bytes_left = len;
     unsigned char const* p = data;
+    size_t reps = len < buf_size ? 0 : (len - 1) / buf_size;
 
-    while (bytes_left > buf_size) {
-        bytes_left -= buf_size;
-        std::memcpy(inbuf.data(), p, buf_size);
-        offset = buf_size;
+    for (size_t i = 0; i < reps; ++i) {
+        flush(p, false);
         p += buf_size;
-        flush(false);
     }
+
+    bytes_left = len - (buf_size * reps);
     std::memcpy(inbuf.data(), p, bytes_left);
-    offset = bytes_left;
 
     if (encrypt) {
-        if (offset == buf_size) {
-            flush(false);
+        if (bytes_left == buf_size) {
+            flush(inbuf.data(), false);
         }
         if (!disable_padding) {
             // Pad as described in section 3.5.1 of version 1.7 of the PDF specification, including
             // providing an entire block of padding if the input was a multiple of 16 bytes.
+            size_t offset = bytes_left == buf_size ? 0 : bytes_left;
             unsigned char pad = QIntC::to_uchar(buf_size - offset);
+            std::memcpy(inbuf.data(), p, bytes_left);
             memset(inbuf.data() + offset, pad, pad);
-            offset = buf_size;
-            flush(false);
+            flush(inbuf.data(), false);
         }
     } else {
-        if (offset != buf_size) {
+        if (bytes_left != buf_size) {
             // This is never supposed to happen as the output is always supposed to be padded.
             // However, we have encountered files for which the output is not a multiple of the
             // block size.  In this case, pad with zeroes and hope for the best.
-            if (offset >= buf_size) {
+            if (bytes_left >= buf_size) {
                 throw std::logic_error("buffer overflow in AES encryption pipeline");
             }
-            std::memset(inbuf.data() + offset, 0, buf_size - offset);
-            offset = buf_size;
+            std::memcpy(inbuf.data(), p, bytes_left);
+            std::memset(inbuf.data() + bytes_left, 0, buf_size - bytes_left);
+            flush(inbuf.data(), !disable_padding);
+        } else {
+            flush(p, !disable_padding);
         }
-        flush(!disable_padding);
     }
     crypto->rijndael_finalize();
 }
@@ -134,11 +136,9 @@ Pl_AES_PDF::initializeVector()
 }
 
 void
-Pl_AES_PDF::flush(bool strip_padding)
+Pl_AES_PDF::flush(unsigned char const* const_in, bool strip_padding)
 {
-    if (offset != buf_size) {
-        throw std::logic_error("AES pipeline: flush called when buffer was not full");
-    }
+    auto in = const_cast<unsigned char*>(const_in);
 
     if (first) {
         first = false;
@@ -158,8 +158,7 @@ Pl_AES_PDF::flush(bool strip_padding)
             } else {
                 // Take the first block of input as the initialization vector.  There's nothing to
                 // write at this time.
-                memcpy(cbc_block.data(), inbuf.data(), buf_size);
-                offset = 0;
+                memcpy(cbc_block.data(), in, buf_size);
                 return_after_init = true;
             }
         }
@@ -174,7 +173,7 @@ Pl_AES_PDF::flush(bool strip_padding)
         }
     }
 
-    crypto->rijndael_process(inbuf.data(), outbuf.data());
+    crypto->rijndael_process(in, outbuf.data());
     unsigned int bytes = buf_size;
     if (strip_padding) {
         unsigned char last = outbuf[buf_size - 1];
@@ -191,6 +190,5 @@ Pl_AES_PDF::flush(bool strip_padding)
             }
         }
     }
-    offset = 0;
     next()->write(outbuf.data(), bytes);
 }
