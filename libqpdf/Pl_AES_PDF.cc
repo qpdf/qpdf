@@ -65,26 +65,22 @@ Pl_AES_PDF::useStaticIV()
 void
 Pl_AES_PDF::write(unsigned char const* data, size_t len)
 {
+    if (!first) {
+        throw std::logic_error("AES pipeline: write called more than once");
+    }
     size_t bytes_left = len;
     unsigned char const* p = data;
 
-    while (bytes_left > 0) {
-        if (offset == buf_size) {
-            flush(false);
-        }
-
-        size_t available = buf_size - offset;
-        size_t bytes = std::min(bytes_left, available);
-        bytes_left -= bytes;
-        std::memcpy(inbuf.data() + offset, p, bytes);
-        offset += bytes;
-        p += bytes;
+    while (bytes_left > buf_size) {
+        bytes_left -= buf_size;
+        std::memcpy(inbuf.data(), p, buf_size);
+        offset = buf_size;
+        p += buf_size;
+        flush(false);
     }
-}
+    std::memcpy(inbuf.data(), p, bytes_left);
+    offset = bytes_left;
 
-void
-Pl_AES_PDF::finish()
-{
     if (encrypt) {
         if (offset == buf_size) {
             flush(false);
@@ -111,6 +107,11 @@ Pl_AES_PDF::finish()
         flush(!disable_padding);
     }
     crypto->rijndael_finalize();
+}
+
+void
+Pl_AES_PDF::finish()
+{
     next()->finish();
 }
 

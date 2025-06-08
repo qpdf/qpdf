@@ -16,6 +16,7 @@ class Pl_AES_PDF final: public Pipeline
     Pl_AES_PDF(char const* identifier, Pipeline* next, bool encrypt, std::string key);
     ~Pl_AES_PDF() final = default;
 
+    // Pl_AES_PDF only supports calling write a single time.
     void write(unsigned char const* data, size_t len) final;
     void finish() final;
 
