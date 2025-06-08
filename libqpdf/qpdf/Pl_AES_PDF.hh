@@ -34,7 +34,7 @@ class Pl_AES_PDF final: public Pipeline
     static void useStaticIV();
 
   private:
-    void flush(bool discard_padding);
+    void flush(unsigned char const* in, bool discard_padding);
     void initializeVector();
 
     static unsigned int const buf_size = QPDFCryptoImpl::rijndael_buf_size;
@@ -45,7 +45,6 @@ class Pl_AES_PDF final: public Pipeline
     bool encrypt;
     bool cbc_mode{true};
     bool first{true};
-    size_t offset{0}; // offset into memory buffer
     std::array<unsigned char, buf_size> inbuf;
     std::array<unsigned char, buf_size> outbuf;
     std::array<unsigned char, buf_size> cbc_block;
