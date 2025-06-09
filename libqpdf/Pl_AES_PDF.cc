@@ -9,15 +9,13 @@
 
 bool Pl_AES_PDF::use_static_iv = false;
 
-Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next, bool encrypt, std::string key) :
+Pl_AES_PDF::Pl_AES_PDF(
+    char const* identifier, Pipeline* next, bool encrypt, std::string const& key) :
     Pipeline(identifier, next),
     key(key),
     crypto(QPDFCryptoProvider::getImpl()),
-    encrypt(encrypt)
+    encrypt_(encrypt)
 {
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_AES_PDF with nullptr as next");
-    }
     if (!(key.size() == 32 || key.size() == 16)) {
         throw std::runtime_error("unsupported key length");
     }
@@ -38,7 +36,7 @@ Pl_AES_PDF::disablePadding()
 }
 
 void
-Pl_AES_PDF::setIV(std::string&& iv)
+Pl_AES_PDF::setIV(std::string const& iv)
 {
     if (iv.size() != buf_size) {
         throw std::logic_error(
@@ -46,7 +44,7 @@ Pl_AES_PDF::setIV(std::string&& iv)
             std::to_string(buf_size));
     }
     use_specified_iv = true;
-    specified_iv = std::move(iv);
+    specified_iv = iv;
 }
 
 void
@@ -69,11 +67,41 @@ Pl_AES_PDF::write(unsigned char const* data, size_t len)
     }
     first = false;
 
-    if (encrypt) {
+    if (encrypt_) {
         write_encrypt({reinterpret_cast<const char*>(data), len});
     } else {
         write_decrypt({reinterpret_cast<const char*>(data), len});
     }
+}
+
+std::string
+Pl_AES_PDF::encrypt(
+    std::string const& key, std::string const& data, bool aes_v3, std::string const& iv)
+{
+    Pl_AES_PDF aes("", nullptr, true, key);
+    if (iv.empty()) {
+        if (aes_v3) {
+            aes.useZeroIV();
+        }
+    } else {
+        aes.setIV(iv);
+    }
+    if (aes_v3) {
+        aes.disablePadding();
+    }
+    aes.write_encrypt(data);
+    return std::move(aes.out);
+}
+
+std::string
+Pl_AES_PDF::decrypt(std::string const& key, std::string const& data, bool aes_v3)
+{
+    Pl_AES_PDF aes("", nullptr, false, key);
+    if (aes_v3) {
+        aes.useZeroIV();
+    }
+    aes.write_decrypt(data);
+    return std::move(aes.out);
 }
 
 void
@@ -157,7 +185,7 @@ Pl_AES_PDF::write_encrypt(std::string_view sv)
 {
     char const* p = sv.data();
     size_t reps = sv.size() < buf_size ? 0 : (sv.size() - 1) / buf_size;
-    out.resize((reps + 3) * buf_size);
+    out.resize((reps + 4) * buf_size);
     auto* out_p = out.data();
 
     if (cbc_mode) {
@@ -205,8 +233,10 @@ Pl_AES_PDF::flush_encrypt(const char* in, char*& out_p)
 void
 Pl_AES_PDF::finish()
 {
-    next()->write(reinterpret_cast<unsigned char const*>(out.data()), out.size());
-    next()->finish();
+    if (next()) {
+        next()->write(reinterpret_cast<unsigned char const*>(out.data()), out.size());
+        next()->finish();
+    }
 }
 
 void

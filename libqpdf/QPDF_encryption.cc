@@ -210,24 +210,6 @@ iterate_rc4(
 }
 
 static std::string
-process_with_aes(
-    std::string const& key, bool encrypt, std::string const& data, std::string&& iv = "")
-{
-    std::string result;
-    pl::String buffer(result);
-    Pl_AES_PDF aes("aes", &buffer, encrypt, key);
-    if (!iv.empty()) {
-        aes.setIV(std::move(iv));
-    } else {
-        aes.useZeroIV();
-    }
-    aes.disablePadding();
-    aes.writeString(data);
-    aes.finish();
-    return result;
-}
-
-static std::string
 hash_V5(
     std::string const& password,
     std::string const& salt,
@@ -270,7 +252,7 @@ hash_V5(
                 K1.append(K1);
             }
             qpdf_assert_debug(K.length() >= 32);
-            std::string E = process_with_aes(K.substr(0, 16), true, K1, K.substr(16, 16));
+            std::string E = Pl_AES_PDF::encrypt(K.substr(0, 16), K1, true, K.substr(16, 16));
 
             // E_mod_3 is supposed to be mod 3 of the first 16 bytes of E taken as as a (128-bit)
             // big-endian number.  Since (xy mod n) is equal to ((x mod n) + (y mod n)) mod n and
@@ -601,7 +583,7 @@ compute_U_UE_value_V5(
     std::string key_salt(k + 8, 8);
     U = hash_V5(user_password, validation_salt, "", data) + validation_salt + key_salt;
     std::string intermediate_key = hash_V5(user_password, key_salt, "", data);
-    UE = process_with_aes(intermediate_key, true, encryption_key);
+    UE = Pl_AES_PDF::encrypt(intermediate_key, encryption_key, true);
 }
 
 static void
@@ -620,7 +602,7 @@ compute_O_OE_value_V5(
     std::string key_salt(k + 8, 8);
     O = hash_V5(owner_password, validation_salt, U, data) + validation_salt + key_salt;
     std::string intermediate_key = hash_V5(owner_password, key_salt, U, data);
-    OE = process_with_aes(intermediate_key, true, encryption_key);
+    OE = Pl_AES_PDF::encrypt(intermediate_key, encryption_key, true);
 }
 
 void
@@ -647,8 +629,8 @@ compute_Perms_value_V5(std::string const& encryption_key, QPDF::EncryptionData c
     // Algorithm 3.10 from the PDF 1.7 extension level 3
     unsigned char k[16];
     compute_Perms_value_V5_clear(encryption_key, data, k);
-    return process_with_aes(
-        encryption_key, true, std::string(reinterpret_cast<char*>(k), sizeof(k)));
+    return Pl_AES_PDF::encrypt(
+        encryption_key, std::string(reinterpret_cast<char*>(k), sizeof(k)), true);
 }
 
 std::string
@@ -675,10 +657,10 @@ QPDF::recover_encryption_key_with_password(
         encrypted_file_key = data.getUE().substr(0, 32);
     }
     std::string intermediate_key = hash_V5(key_password, key_salt, user_data, data);
-    std::string file_key = process_with_aes(intermediate_key, false, encrypted_file_key);
+    std::string file_key = Pl_AES_PDF::decrypt(intermediate_key, encrypted_file_key, true);
 
     // Decrypt Perms and check against expected value
-    auto perms_check = process_with_aes(file_key, false, data.getPerms()).substr(0, 12);
+    auto perms_check = Pl_AES_PDF::decrypt(file_key, data.getPerms(), true).substr(0, 12);
     unsigned char k[16];
     compute_Perms_value_V5_clear(file_key, data, k);
     perms_valid = (memcmp(perms_check.c_str(), k, 12) == 0);
@@ -999,11 +981,7 @@ QPDF::decryptString(std::string& str, QPDFObjGen og)
     try {
         if (use_aes) {
             QTC::TC("qpdf", "QPDF_encryption aes decode string");
-            Pl_Buffer bufpl("decrypted string");
-            Pl_AES_PDF pl("aes decrypt string", &bufpl, false, key);
-            pl.writeString(str);
-            pl.finish();
-            str = bufpl.getString();
+            str = Pl_AES_PDF::decrypt(key, str, false);
         } else {
             QTC::TC("qpdf", "QPDF_encryption rc4 decode string");
             size_t vlen = str.length();
