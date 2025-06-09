@@ -71,18 +71,18 @@ Pl_AES_PDF::write(unsigned char const* data, size_t len)
     first = false;
 
     if (encrypt) {
-        write_encrypt(data, len);
+        write_encrypt({reinterpret_cast<const char*>(data), len});
     } else {
-        write_decrypt(data, len);
+        write_decrypt({reinterpret_cast<const char*>(data), len});
     }
 }
 
 void
-Pl_AES_PDF::write_decrypt(unsigned char const* data, size_t len)
+Pl_AES_PDF::write_decrypt(std::string_view sv)
 {
-    unsigned char const* p = data;
-    size_t reps = len < buf_size ? 0 : (len - 1) / buf_size;
-    size_t bytes_left = len - (buf_size * reps);
+    char const* p = sv.data();
+    size_t reps = sv.size() < buf_size ? 0 : (sv.size() - 1) / buf_size;
+    size_t bytes_left = sv.size() - (buf_size * reps);
 
     if (cbc_mode) {
         if (use_zero_iv || use_specified_iv) {
@@ -91,7 +91,7 @@ Pl_AES_PDF::write_decrypt(unsigned char const* data, size_t len)
             initializeVector();
         } else {
             // Take the first block of input as the initialization vector. Don't write it to output.
-            if (len < buf_size) {
+            if (sv.size() < buf_size) {
                 return;
             }
             memcpy(cbc_block.data(), p, buf_size);
@@ -103,12 +103,7 @@ Pl_AES_PDF::write_decrypt(unsigned char const* data, size_t len)
             }
         }
     }
-    crypto->rijndael_init(
-        false,
-        reinterpret_cast<const unsigned char*>(key.data()),
-        key.size(),
-        cbc_mode,
-        cbc_block.data());
+    crypto->rijndael_init(false, key, cbc_mode, cbc_block.data());
 
     for (size_t i = 0; i < reps; ++i) {
         flush_decrypt(p, false);
@@ -133,13 +128,12 @@ Pl_AES_PDF::write_decrypt(unsigned char const* data, size_t len)
 }
 
 void
-Pl_AES_PDF::flush_decrypt(const unsigned char* const_in, bool strip_padding)
+Pl_AES_PDF::flush_decrypt(const char* in, bool strip_padding)
 {
-    auto in = const_cast<unsigned char*>(const_in);
     crypto->rijndael_process(in, outbuf.data());
     unsigned int bytes = buf_size;
     if (strip_padding) {
-        unsigned char last = outbuf[buf_size - 1];
+        unsigned char last = static_cast<unsigned char>(outbuf.back());
         if (last <= buf_size) {
             bool strip = true;
             for (unsigned int i = 1; i <= last; ++i) {
@@ -153,36 +147,31 @@ Pl_AES_PDF::flush_decrypt(const unsigned char* const_in, bool strip_padding)
             }
         }
     }
-    next()->write(outbuf.data(), bytes);
+    next()->write(reinterpret_cast<unsigned char*>(outbuf.data()), bytes);
 }
 
 void
-Pl_AES_PDF::write_encrypt(const unsigned char* data, size_t len)
+Pl_AES_PDF::write_encrypt(std::string_view sv)
 {
     if (cbc_mode) {
         // Set cbc_block to the initialization vector, and if not zero, write it to the
         // output stream.
         initializeVector();
         if (!(use_zero_iv || use_specified_iv)) {
-            next()->write(cbc_block.data(), buf_size);
+            next()->write(reinterpret_cast<unsigned char*>(cbc_block.data()), buf_size);
         }
     }
-    crypto->rijndael_init(
-        true,
-        reinterpret_cast<const unsigned char*>(key.data()),
-        key.size(),
-        cbc_mode,
-        cbc_block.data());
+    crypto->rijndael_init(true, key, cbc_mode, cbc_block.data());
 
-    unsigned char const* p = data;
-    size_t reps = len < buf_size ? 0 : (len - 1) / buf_size;
+    char const* p = sv.data();
+    size_t reps = sv.size() < buf_size ? 0 : (sv.size() - 1) / buf_size;
 
     for (size_t i = 0; i < reps; ++i) {
         flush_encrypt(p);
         p += buf_size;
     }
 
-    size_t bytes_left = len - (buf_size * reps);
+    size_t bytes_left = sv.size() - (buf_size * reps);
     std::memcpy(inbuf.data(), p, bytes_left);
 
     if (bytes_left == buf_size) {
@@ -201,11 +190,10 @@ Pl_AES_PDF::write_encrypt(const unsigned char* data, size_t len)
 }
 
 void
-Pl_AES_PDF::flush_encrypt(const unsigned char* const_in)
+Pl_AES_PDF::flush_encrypt(const char* in)
 {
-    auto in = const_cast<unsigned char*>(const_in);
     crypto->rijndael_process(in, outbuf.data());
-    next()->write(outbuf.data(), buf_size);
+    next()->write(reinterpret_cast<unsigned char*>(outbuf.data()), buf_size);
 }
 
 void
@@ -225,9 +213,10 @@ Pl_AES_PDF::initializeVector()
         std::memcpy(cbc_block.data(), specified_iv.data(), buf_size);
     } else if (use_static_iv) {
         for (unsigned int i = 0; i < buf_size; ++i) {
-            cbc_block[i] = static_cast<unsigned char>(14U * (1U + i));
+            cbc_block[i] = static_cast<char>(14U * (1U + i));
         }
     } else {
-        QUtil::initializeWithRandomBytes(cbc_block.data(), buf_size);
+        QUtil::initializeWithRandomBytes(
+            reinterpret_cast<unsigned char*>(cbc_block.data()), buf_size);
     }
 }

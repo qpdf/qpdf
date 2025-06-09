@@ -26,12 +26,11 @@
 #include <qpdf/DLL.h>
 #include <string>
 
-// This class is part of qpdf's pluggable crypto provider support.
-// Most users won't need to know or care about this class, but you can
-// use it if you want to supply your own crypto implementation. To do
-// so, provide an implementation of QPDFCryptoImpl, ensure that you
-// register it by calling QPDFCryptoProvider::registerImpl, and make
-// it the default by calling QPDFCryptoProvider::setDefaultProvider.
+// This class is part of qpdf's pluggable crypto provider support.  Most users won't need to know or
+// care about this class, but you can use it if you want to supply your own crypto implementation.
+// To do so, provide an implementation of QPDFCryptoImpl, ensure that you register it by calling
+// QPDFCryptoProvider::registerImpl, and make it the default by calling
+// QPDFCryptoProvider::setDefaultProvider.
 class QPDF_DLL_CLASS QPDFCryptoImpl
 {
   public:
@@ -58,8 +57,8 @@ class QPDF_DLL_CLASS QPDFCryptoImpl
 
     // Encryption/Decryption
 
-    // QPDF must support RC4 to be able to work with older PDF files
-    // and readers. Search for RC4 in README.md
+    // qpdf must support RC4 to be able to work with older PDF files and readers. Search for RC4 in
+    // README.md
 
     // key_len of -1 means treat key_data as a null-terminated string
     virtual void RC4_init(unsigned char const* key_data, int key_len = -1) = 0;
@@ -77,6 +76,25 @@ class QPDF_DLL_CLASS QPDFCryptoImpl
         unsigned char* cbc_block) = 0;
     virtual void rijndael_process(unsigned char* in_data, unsigned char* out_data) = 0;
     virtual void rijndael_finalize() = 0;
+
+    // Convenience functions to support chars and strings
+    void
+    rijndael_init(bool encrypt, std::string_view key, bool cbc_mode, std::string_view cbc_block)
+    {
+        rijndael_init(
+            encrypt,
+            reinterpret_cast<const unsigned char*>(key.data()),
+            key.size(),
+            cbc_mode,
+            reinterpret_cast<unsigned char*>(const_cast<char*>(cbc_block.data())));
+    }
+    void
+    rijndael_process(const char* in_data, char* out_data)
+    {
+        rijndael_process(
+            reinterpret_cast<unsigned char*>(const_cast<char*>(in_data)),
+            reinterpret_cast<unsigned char*>(out_data));
+    }
 };
 
 #endif // QPDFCRYPTOIMPL_HH
