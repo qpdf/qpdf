@@ -22,7 +22,6 @@ Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next, bool encrypt, std
         throw std::runtime_error("unsupported key length");
     }
     inbuf.fill(0);
-    outbuf.fill(0);
     cbc_block.fill(0);
 }
 
@@ -83,6 +82,8 @@ Pl_AES_PDF::write_decrypt(std::string_view sv)
     char const* p = sv.data();
     size_t reps = sv.size() < buf_size ? 0 : (sv.size() - 1) / buf_size;
     size_t bytes_left = sv.size() - (buf_size * reps);
+
+    out.reserve((reps +2) * buf_size);
 
     if (cbc_mode) {
         if (use_zero_iv || use_specified_iv) {
@@ -147,24 +148,26 @@ Pl_AES_PDF::flush_decrypt(const char* in, bool strip_padding)
             }
         }
     }
-    next()->write(reinterpret_cast<unsigned char*>(outbuf.data()), bytes);
+    out.append(outbuf.data(), bytes);
 }
 
 void
 Pl_AES_PDF::write_encrypt(std::string_view sv)
 {
+    char const* p = sv.data();
+    size_t reps = sv.size() < buf_size ? 0 : (sv.size() - 1) / buf_size;
+    out.reserve((reps +2) * buf_size);
+
     if (cbc_mode) {
         // Set cbc_block to the initialization vector, and if not zero, write it to the
         // output stream.
         initializeVector();
         if (!(use_zero_iv || use_specified_iv)) {
-            next()->write(reinterpret_cast<unsigned char*>(cbc_block.data()), buf_size);
+            out.append(cbc_block.data(), buf_size);
         }
     }
     crypto->rijndael_init(true, key, cbc_mode, cbc_block.data());
 
-    char const* p = sv.data();
-    size_t reps = sv.size() < buf_size ? 0 : (sv.size() - 1) / buf_size;
 
     for (size_t i = 0; i < reps; ++i) {
         flush_encrypt(p);
@@ -193,12 +196,13 @@ void
 Pl_AES_PDF::flush_encrypt(const char* in)
 {
     crypto->rijndael_process(in, outbuf.data());
-    next()->write(reinterpret_cast<unsigned char*>(outbuf.data()), buf_size);
+    out.append(outbuf.data(), buf_size);
 }
 
 void
 Pl_AES_PDF::finish()
 {
+    next()->write(reinterpret_cast<unsigned char const*>(out.data()), out.size());
     next()->finish();
 }
 

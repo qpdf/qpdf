@@ -50,6 +50,7 @@ class Pl_AES_PDF final: public Pipeline
     bool first{true};
     std::array<char, buf_size> inbuf;
     std::array<char, buf_size> outbuf;
+    std::string out;
     std::array<char, buf_size> cbc_block;
     std::string specified_iv;
     bool use_zero_iv{false};
