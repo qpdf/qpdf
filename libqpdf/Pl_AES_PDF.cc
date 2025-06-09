@@ -83,7 +83,8 @@ Pl_AES_PDF::write_decrypt(std::string_view sv)
     size_t reps = sv.size() < buf_size ? 0 : (sv.size() - 1) / buf_size;
     size_t bytes_left = sv.size() - (buf_size * reps);
 
-    out.reserve((reps +2) * buf_size);
+    out.resize((reps + 2) * buf_size);
+    char* o = out.data();
 
     if (cbc_mode) {
         if (use_zero_iv || use_specified_iv) {
@@ -107,7 +108,7 @@ Pl_AES_PDF::write_decrypt(std::string_view sv)
     crypto->rijndael_init(false, key, cbc_mode, cbc_block.data());
 
     for (size_t i = 0; i < reps; ++i) {
-        flush_decrypt(p, false);
+        flush_decrypt(p, o, false);
         p += buf_size;
     }
 
@@ -120,35 +121,35 @@ Pl_AES_PDF::write_decrypt(std::string_view sv)
         }
         std::memcpy(inbuf.data(), p, bytes_left);
         std::memset(inbuf.data() + bytes_left, 0, buf_size - bytes_left);
-        flush_decrypt(inbuf.data(), !disable_padding);
+        flush_decrypt(inbuf.data(), o, !disable_padding);
     } else {
-        flush_decrypt(p, !disable_padding);
+        flush_decrypt(p, o, !disable_padding);
     }
+    out.resize(static_cast<size_t>(o - out.data()));
 
     crypto->rijndael_finalize();
 }
 
 void
-Pl_AES_PDF::flush_decrypt(const char* in, bool strip_padding)
+Pl_AES_PDF::flush_decrypt(const char* in, char*& out_p, bool strip_padding)
 {
-    crypto->rijndael_process(in, outbuf.data());
-    unsigned int bytes = buf_size;
-    if (strip_padding) {
-        unsigned char last = static_cast<unsigned char>(outbuf.back());
-        if (last <= buf_size) {
-            bool strip = true;
-            for (unsigned int i = 1; i <= last; ++i) {
-                if (outbuf[buf_size - i] != last) {
-                    strip = false;
-                    break;
-                }
-            }
-            if (strip) {
-                bytes -= last;
+    crypto->rijndael_process(in, out_p);
+    out_p += buf_size;
+    if (!strip_padding) {
+        return;
+    }
+
+    auto last = static_cast<unsigned char>(*(out_p - 1));
+    ;
+    if (last <= buf_size) {
+        auto p = out_p;
+        for (unsigned int i = 1; i <= last; ++i) {
+            if (*(--p) != last) {
+                return;
             }
         }
+        out_p = p;
     }
-    out.append(outbuf.data(), bytes);
 }
 
 void
@@ -156,21 +157,22 @@ Pl_AES_PDF::write_encrypt(std::string_view sv)
 {
     char const* p = sv.data();
     size_t reps = sv.size() < buf_size ? 0 : (sv.size() - 1) / buf_size;
-    out.reserve((reps +2) * buf_size);
+    out.resize((reps + 3) * buf_size);
+    auto* out_p = out.data();
 
     if (cbc_mode) {
         // Set cbc_block to the initialization vector, and if not zero, write it to the
         // output stream.
         initializeVector();
         if (!(use_zero_iv || use_specified_iv)) {
-            out.append(cbc_block.data(), buf_size);
+            out.replace(0, buf_size, {cbc_block.data(), buf_size});
+            out_p += buf_size;
         }
     }
     crypto->rijndael_init(true, key, cbc_mode, cbc_block.data());
 
-
     for (size_t i = 0; i < reps; ++i) {
-        flush_encrypt(p);
+        flush_encrypt(p, out_p);
         p += buf_size;
     }
 
@@ -178,7 +180,7 @@ Pl_AES_PDF::write_encrypt(std::string_view sv)
     std::memcpy(inbuf.data(), p, bytes_left);
 
     if (bytes_left == buf_size) {
-        flush_encrypt(inbuf.data());
+        flush_encrypt(inbuf.data(), out_p);
     }
     if (!disable_padding) {
         // Pad as described in section 3.5.1 of version 1.7 of the PDF specification, including
@@ -187,16 +189,17 @@ Pl_AES_PDF::write_encrypt(std::string_view sv)
         unsigned char pad = QIntC::to_uchar(buf_size - offset);
         std::memcpy(inbuf.data(), p, bytes_left);
         memset(inbuf.data() + offset, pad, pad);
-        flush_encrypt(inbuf.data());
+        flush_encrypt(inbuf.data(), out_p);
     }
+    out.resize(static_cast<size_t>(out_p - out.data()));
     crypto->rijndael_finalize();
 }
 
 void
-Pl_AES_PDF::flush_encrypt(const char* in)
+Pl_AES_PDF::flush_encrypt(const char* in, char*& out_p)
 {
-    crypto->rijndael_process(in, outbuf.data());
-    out.append(outbuf.data(), buf_size);
+    crypto->rijndael_process(in, out_p);
+    out_p += buf_size;
 }
 
 void

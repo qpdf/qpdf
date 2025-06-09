@@ -36,8 +36,8 @@ class Pl_AES_PDF final: public Pipeline
   private:
     void write_decrypt(std::string_view sv);
     void write_encrypt(std::string_view sv);
-    void flush_decrypt(const char* in, bool discard_padding);
-    void flush_encrypt(const char* in);
+    void flush_decrypt(const char* in, char*& out, bool discard_padding);
+    void flush_encrypt(const char* in, char*& out);
     void initializeVector();
 
     static unsigned int const buf_size = QPDFCryptoImpl::rijndael_buf_size;
@@ -49,7 +49,6 @@ class Pl_AES_PDF final: public Pipeline
     bool cbc_mode{true};
     bool first{true};
     std::array<char, buf_size> inbuf;
-    std::array<char, buf_size> outbuf;
     std::string out;
     std::array<char, buf_size> cbc_block;
     std::string specified_iv;
