@@ -220,24 +220,6 @@ iterate_rc4(std::string& data, std::string_view okey, int iterations, bool rever
     }
 }
 
-static std::string
-process_with_aes(
-    std::string const& key, bool encrypt, std::string const& data, std::string&& iv = "")
-{
-    std::string result;
-    pl::String buffer(result);
-    Pl_AES_PDF aes("aes", &buffer, encrypt, key);
-    if (!iv.empty()) {
-        aes.setIV(std::move(iv));
-    } else {
-        aes.useZeroIV();
-    }
-    aes.disablePadding();
-    aes.writeString(data);
-    aes.finish();
-    return result;
-}
-
 std::string
 QPDF::EncryptionData::hash_V5(
     std::string const& password, std::string const& salt, std::string const& udata) const
@@ -278,7 +260,7 @@ QPDF::EncryptionData::hash_V5(
                 K1.append(K1);
             }
             qpdf_assert_debug(K.length() >= 32);
-            std::string E = process_with_aes(K.substr(0, 16), true, K1, K.substr(16, 16));
+            std::string E = Pl_AES_PDF::encrypt(K.substr(0, 16), K1, true, K.substr(16, 16));
 
             // E_mod_3 is supposed to be mod 3 of the first 16 bytes of E taken as as a (128-bit)
             // big-endian number.  Since (xy mod n) is equal to ((x mod n) + (y mod n)) mod n and
@@ -579,10 +561,10 @@ QPDF::EncryptionData::recover_encryption_key_with_password(
         encrypted_file_key = getUE().substr(0, 32);
     }
     std::string intermediate_key = hash_V5(key_password, key_salt, user_data);
-    std::string file_key = process_with_aes(intermediate_key, false, encrypted_file_key);
+    std::string file_key = Pl_AES_PDF::decrypt(intermediate_key, encrypted_file_key, true);
 
     // Decrypt Perms and check against expected value
-    auto perms_check = process_with_aes(file_key, false, getPerms()).substr(0, 12);
+    auto perms_check = Pl_AES_PDF::decrypt(file_key, getPerms(), true).substr(0, 12);
     perms_valid = compute_Perms_value_V5_clear().substr(0, 12) == perms_check;
     return file_key;
 }
@@ -1085,15 +1067,15 @@ QPDF::EncryptionData::compute_encryption_parameters_V5(
     auto key_salt = util::random_string(8);
     U = hash_V5(user_password, validation_salt, "").append(validation_salt).append(key_salt);
     auto intermediate_key = hash_V5(user_password, key_salt, "");
-    UE = process_with_aes(intermediate_key, true, out_encryption_key);
+    UE = Pl_AES_PDF::encrypt(intermediate_key, out_encryption_key, true);
     // Algorithm 9 from the PDF 2.0
     validation_salt = util::random_string(8);
     key_salt = util::random_string(8);
     O = hash_V5(owner_password, validation_salt, U) + validation_salt + key_salt;
     intermediate_key = hash_V5(owner_password, key_salt, U);
-    OE = process_with_aes(intermediate_key, true, out_encryption_key);
+    OE = Pl_AES_PDF::encrypt(intermediate_key, out_encryption_key, true);
     // Algorithm 10 from the PDF 2.0
-    Perms = process_with_aes(out_encryption_key, true, compute_Perms_value_V5_clear());
+    Perms = Pl_AES_PDF::encrypt(out_encryption_key, compute_Perms_value_V5_clear(), true);
     return out_encryption_key;
 }
 

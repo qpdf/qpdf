@@ -1641,11 +1641,7 @@ QPDFWriter::unparseObject(
             !m->cur_data_key.empty()) {
             val = object.getStringValue();
             if (m->encrypt_use_aes) {
-                Pl_Buffer bufpl("encrypted string");
-                Pl_AES_PDF pl("aes encrypt string", &bufpl, true, m->cur_data_key);
-                pl.writeString(val);
-                pl.finish();
-                val = QPDF_String(bufpl.getString()).unparse(true);
+                val = QPDF_String(Pl_AES_PDF::encrypt(m->cur_data_key, val)).unparse(true);
             } else {
                 auto tmp_ph = QUtil::make_unique_cstr(val);
                 char* tmp = tmp_ph.get();

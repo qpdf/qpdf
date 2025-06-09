@@ -13,8 +13,17 @@ class Pl_AES_PDF final: public Pipeline
 {
   public:
     // key should be a pointer to key_bytes bytes of data
-    Pl_AES_PDF(char const* identifier, Pipeline* next, bool encrypt, std::string key);
+    Pl_AES_PDF(char const* identifier, Pipeline* next, bool encrypt, std::string const& key);
     ~Pl_AES_PDF() final = default;
+
+    static std::string
+    decrypt(std::string const& key, std::string const& data, bool aes_v3 = false);
+
+    static std::string encrypt(
+        std::string const& key,
+        std::string const& data,
+        bool aes_v3 = false,
+        std::string const& iv = "");
 
     // Pl_AES_PDF only supports calling write a single time.
     void write(unsigned char const* data, size_t len) final;
@@ -26,7 +35,7 @@ class Pl_AES_PDF final: public Pipeline
     void disablePadding();
     // Specify an initialization vector, which will not be included in
     // the output.
-    void setIV(std::string&& iv);
+    void setIV(std::string const& iv);
 
     // For testing only; PDF always uses CBC
     void disableCBC();
@@ -45,7 +54,7 @@ class Pl_AES_PDF final: public Pipeline
 
     std::string key;
     std::shared_ptr<QPDFCryptoImpl> crypto;
-    bool encrypt;
+    bool encrypt_;
     bool cbc_mode{true};
     bool first{true};
     std::array<char, buf_size> inbuf;
