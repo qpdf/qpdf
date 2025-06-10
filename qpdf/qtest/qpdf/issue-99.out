@@ -11,28 +11,14 @@ WARNING: issue-99.pdf (object 1 0, offset 855): too many errors; giving up on re
 WARNING: issue-99.pdf (object 1 0, offset 858): expected endobj
 WARNING: issue-99.pdf (object 2 0, offset 64): expected endobj
 WARNING: issue-99.pdf (object 5 0, offset 2452): unknown token while reading object; treating as string
-WARNING: issue-99.pdf (object 6 0, offset 2506): treating unexpected array close token as null
-WARNING: issue-99.pdf (object 6 0, offset 2507): unknown token while reading object; treating as string
-WARNING: issue-99.pdf (object 6 0, offset 2551): unknown token while reading object; treating as string
-WARNING: issue-99.pdf (object 6 0, offset 2475): dictionary has duplicated key /Type; last occurrence overrides earlier ones
-WARNING: issue-99.pdf (object 6 0, offset 2475): dictionary has duplicated key /Parent; last occurrence overrides earlier ones
-WARNING: issue-99.pdf (object 6 0, offset 2475): dictionary has duplicated key /Group; last occurrence overrides earlier ones
-WARNING: issue-99.pdf (object 6 0, offset 2475): expected dictionary key but found non-name object; inserting key /QPDFFake1
-WARNING: issue-99.pdf (object 6 0, offset 2475): expected dictionary key but found non-name object; inserting key /QPDFFake2
-WARNING: issue-99.pdf (object 6 0, offset 2475): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-99.pdf (object 6 0, offset 2506): unexpected array close token; giving up on reading object
+WARNING: issue-99.pdf (object 6 0, offset 2507): expected endobj
 WARNING: issue-99.pdf (object 10 0, offset 3708): expected dictionary key but found non-name object; inserting key /QPDFFake1
 WARNING: issue-99.pdf (object 11 0, offset 4485): unknown token while reading object; treating as string
-WARNING: issue-99.pdf (object 11 0, offset 4497): treating unexpected array close token as null
-WARNING: issue-99.pdf (object 11 0, offset 4502): unexpected )
-WARNING: issue-99.pdf (object 11 0, offset 4504): unexpected >
-WARNING: issue-99.pdf (object 11 0, offset 4508): unknown token while reading object; treating as string
-WARNING: issue-99.pdf (object 11 0, offset 4520): unknown token while reading object; treating as string
-WARNING: issue-99.pdf (object 11 0, offset 4520): too many errors; giving up on reading object
-WARNING: issue-99.pdf (object 11 0, offset 4524): expected endobj
+WARNING: issue-99.pdf (object 11 0, offset 4497): unexpected array close token; giving up on reading object
+WARNING: issue-99.pdf (object 11 0, offset 4499): expected endobj
 WARNING: issue-99.pdf: unable to find trailer dictionary while recovering damaged file
 WARNING: object 1 0: Pages tree includes non-dictionary object; ignoring
-WARNING: object 1 0: operation for dictionary attempted on object of type null: returning false for a key containment request
-WARNING: object 1 0: operation for dictionary attempted on object of type null: ignoring key replacement request
 WARNING: object 1 0: operation for dictionary attempted on object of type null: returning false for a key containment request
 WARNING: object 1 0: operation for dictionary attempted on object of type null: ignoring key replacement request
 qpdf: issue-99.pdf: unable to find any pages while recovering damaged file

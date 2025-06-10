@@ -324,6 +324,12 @@ QPDFParser::parseRemainder(bool content_stream)
                 add(std::move(object));
             } else {
                 QTC::TC("qpdf", "QPDFParser bad array close in parseRemainder");
+                if (sanity_checks) {
+                    // During sanity checks, assume nesting of containers is corrupt and object is
+                    // unusable.
+                    warn("unexpected array close token; giving up on reading object");
+                    return {QPDFObject::create<QPDF_Null>()};
+                }
                 warn("treating unexpected array close token as null");
                 if (tooManyBadTokens()) {
                     return {QPDFObject::create<QPDF_Null>()};
@@ -374,6 +380,12 @@ QPDFParser::parseRemainder(bool content_stream)
                 add(std::move(object));
             } else {
                 QTC::TC("qpdf", "QPDFParser bad dictionary close in parseRemainder");
+                if (sanity_checks) {
+                    // During sanity checks, assume nesting of containers is corrupt and object is
+                    // unusable.
+                    warn("unexpected dictionary close token; giving up on reading object");
+                    return {QPDFObject::create<QPDF_Null>()};
+                }
                 warn("unexpected dictionary close token");
                 if (tooManyBadTokens()) {
                     return {QPDFObject::create<QPDF_Null>()};
@@ -436,6 +448,15 @@ QPDFParser::parseRemainder(bool content_stream)
             if (content_stream) {
                 addScalar<QPDF_Operator>(tokenizer.getValue());
             } else {
+                if (sanity_checks &&
+                    (tokenizer.getValue() == "endobj" || tokenizer.getValue() == "endstream")) {
+                    // During sanity checks, assume an unexpected endobj or endstream indicates that
+                    // we are parsing past the end of the object.
+                    warn(
+                        "unexpected 'endobj' or 'endstream' while reading object; giving up on "
+                        "reading object");
+                    return {QPDFObject::create<QPDF_Null>()};
+                }
                 QTC::TC("qpdf", "QPDFParser treat word as string in parseRemainder");
                 warn("unknown token while reading object; treating as string");
                 if (tooManyBadTokens()) {
