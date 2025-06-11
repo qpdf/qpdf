@@ -11,7 +11,7 @@
 
 AES_PDF_native::AES_PDF_native(
     bool encrypt,
-    unsigned char const* key,
+    unsigned char const* a_key,
     size_t key_bytes,
     bool cbc_mode,
     unsigned char* cbc_block) :
@@ -20,38 +20,38 @@ AES_PDF_native::AES_PDF_native(
     cbc_block(cbc_block)
 {
     size_t keybits = 8 * key_bytes;
-    this->key = std::make_unique<unsigned char[]>(key_bytes);
-    this->rk = std::make_unique<uint32_t[]>(RKLENGTH(keybits));
+    key = std::make_unique<unsigned char[]>(key_bytes);
+    rk = std::make_unique<uint32_t[]>(RKLENGTH(keybits));
     size_t rk_bytes = RKLENGTH(keybits) * sizeof(uint32_t);
-    std::memcpy(this->key.get(), key, key_bytes);
-    std::memset(this->rk.get(), 0, rk_bytes);
+    std::memcpy(key.get(), a_key, key_bytes);
+    std::memset(rk.get(), 0, rk_bytes);
     if (encrypt) {
-        this->nrounds = rijndaelSetupEncrypt(this->rk.get(), this->key.get(), keybits);
+        nrounds = rijndaelSetupEncrypt(rk.get(), key.get(), keybits);
     } else {
-        this->nrounds = rijndaelSetupDecrypt(this->rk.get(), this->key.get(), keybits);
+        nrounds = rijndaelSetupDecrypt(rk.get(), key.get(), keybits);
     }
 }
 
 void
 AES_PDF_native::update(unsigned char* in_data, unsigned char* out_data)
 {
-    if (this->encrypt) {
-        if (this->cbc_mode) {
+    if (encrypt) {
+        if (cbc_mode) {
             for (size_t i = 0; i < QPDFCryptoImpl::rijndael_buf_size; ++i) {
-                in_data[i] ^= this->cbc_block[i];
+                in_data[i] ^= cbc_block[i];
             }
         }
-        rijndaelEncrypt(this->rk.get(), this->nrounds, in_data, out_data);
-        if (this->cbc_mode) {
-            memcpy(this->cbc_block, out_data, QPDFCryptoImpl::rijndael_buf_size);
+        rijndaelEncrypt(rk.get(), nrounds, in_data, out_data);
+        if (cbc_mode) {
+            memcpy(cbc_block, out_data, QPDFCryptoImpl::rijndael_buf_size);
         }
     } else {
-        rijndaelDecrypt(this->rk.get(), this->nrounds, in_data, out_data);
-        if (this->cbc_mode) {
+        rijndaelDecrypt(rk.get(), nrounds, in_data, out_data);
+        if (cbc_mode) {
             for (size_t i = 0; i < QPDFCryptoImpl::rijndael_buf_size; ++i) {
-                out_data[i] ^= this->cbc_block[i];
+                out_data[i] ^= cbc_block[i];
             }
-            memcpy(this->cbc_block, in_data, QPDFCryptoImpl::rijndael_buf_size);
+            memcpy(cbc_block, in_data, QPDFCryptoImpl::rijndael_buf_size);
         }
     }
 }

@@ -1169,8 +1169,8 @@ QPDFObjectHandle
 QPDF::readTrailer()
 {
     qpdf_offset_t offset = m->file->tell();
-    auto [object, empty] = QPDFParser::parse(
-        *m->file, "trailer", m->tokenizer, nullptr, *this, m->reconstructed_xref);
+    auto [object, empty] =
+        QPDFParser::parse(*m->file, "trailer", m->tokenizer, nullptr, *this, m->reconstructed_xref);
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.

@@ -6,6 +6,7 @@
 #include <qpdf/QPDFCryptoImpl.hh>
 #include <qpdf/RC4_native.hh>
 #include <qpdf/SHA2_native.hh>
+
 #include <memory>
 
 class QPDFCrypto_native final: public QPDFCryptoImpl

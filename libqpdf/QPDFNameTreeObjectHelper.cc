@@ -89,11 +89,11 @@ QPDFNameTreeObjectHelper::iterator::updateIValue()
 {
     if (impl->valid()) {
         auto p = *impl;
-        this->ivalue.first = p->first.getUTF8Value();
-        this->ivalue.second = p->second;
+        ivalue.first = p->first.getUTF8Value();
+        ivalue.second = p->second;
     } else {
-        this->ivalue.first = "";
-        this->ivalue.second = QPDFObjectHandle();
+        ivalue.first = "";
+        ivalue.second = QPDFObjectHandle();
     }
 }
 
@@ -101,14 +101,14 @@ QPDFNameTreeObjectHelper::iterator::reference
 QPDFNameTreeObjectHelper::iterator::operator*()
 {
     updateIValue();
-    return this->ivalue;
+    return ivalue;
 }
 
 QPDFNameTreeObjectHelper::iterator::pointer
 QPDFNameTreeObjectHelper::iterator::operator->()
 {
     updateIValue();
-    return &this->ivalue;
+    return &ivalue;
 }
 
 bool

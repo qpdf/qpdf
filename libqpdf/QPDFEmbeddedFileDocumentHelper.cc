@@ -63,7 +63,7 @@ QPDFEmbeddedFileDocumentHelper::initEmbeddedFiles()
     }
     auto embedded_files = names.getKey("/EmbeddedFiles");
     if (!embedded_files.isDictionary()) {
-        auto nth = QPDFNameTreeObjectHelper::newEmpty(this->qpdf);
+        auto nth = QPDFNameTreeObjectHelper::newEmpty(qpdf);
         names.replaceKey("/EmbeddedFiles", nth.getObjectHandle());
         m->embedded_files = std::make_shared<QPDFNameTreeObjectHelper>(nth);
     }
@@ -115,7 +115,7 @@ QPDFEmbeddedFileDocumentHelper::removeEmbeddedFile(std::string const& name)
     auto oh = iter->second;
     iter.remove();
     if (oh.isIndirect()) {
-        this->qpdf.replaceObject(oh.getObjGen(), QPDFObjectHandle::newNull());
+        qpdf.replaceObject(oh.getObjGen(), QPDFObjectHandle::newNull());
     }
 
     return true;

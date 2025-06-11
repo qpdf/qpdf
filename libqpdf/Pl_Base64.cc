@@ -102,17 +102,17 @@ Pl_Base64::flush_decode()
     for (size_t i = 0; i < 4; ++i) {
         int v = 0;
         char ch = to_c(buf[i]);
-        if ((ch >= 'A') && (ch <= 'Z')) {
+        if (ch >= 'A' && ch <= 'Z') {
             v = ch - 'A';
-        } else if ((ch >= 'a') && (ch <= 'z')) {
+        } else if (ch >= 'a' && ch <= 'z') {
             v = ch - 'a' + 26;
-        } else if ((ch >= '0') && (ch <= '9')) {
+        } else if (ch >= '0' && ch <= '9') {
             v = ch - '0' + 52;
-        } else if ((ch == '+') || (ch == '-')) {
+        } else if (ch == '+' || ch == '-') {
             v = 62;
-        } else if ((ch == '/') || (ch == '_')) {
+        } else if (ch == '/' || ch == '_') {
             v = 63;
-        } else if ((ch == '=') && ((i == 3) || ((i == 2) && (buf[3] == '=')))) {
+        } else if (ch == '=' && (i == 3 || (i == 2 && buf[3] == '='))) {
             ++pad;
             end_of_data = true;
             v = 0;
@@ -134,7 +134,7 @@ Pl_Base64::flush_decode()
 void
 Pl_Base64::flush_encode()
 {
-    int outval = ((buf[0] << 16) | (buf[1] << 8) | (buf[2]));
+    int outval = ((buf[0] << 16) | (buf[1] << 8) | buf[2]);
     unsigned char out[4] = {
         to_uc(outval >> 18),
         to_uc(0x3f & (outval >> 12)),
