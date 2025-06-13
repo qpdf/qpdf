@@ -2,18 +2,18 @@ WARNING: issue-100.pdf: file is damaged
 WARNING: issue-100.pdf (offset 736): xref not found
 WARNING: issue-100.pdf: Attempting to reconstruct cross-reference table
 WARNING: issue-100.pdf (trailer, offset 953): dictionary ended prematurely; using null as value for last key
-WARNING: issue-100.pdf (trailer, offset 953): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-100.pdf (trailer, offset 953): expected dictionary keys but found non-name objects; ignoring
 WARNING: issue-100.pdf (trailer, offset 950): recovered trailer has no /Root entry
 WARNING: issue-100.pdf (trailer, offset 488): stream keyword found in trailer
 WARNING: issue-100.pdf (trailer, offset 418): recovered trailer has no /Root entry
 WARNING: issue-100.pdf (object 1 0, offset 83): unexpected dictionary close token
 WARNING: issue-100.pdf (object 1 0, offset 87): expected endobj
-WARNING: issue-100.pdf (object 5 0, offset 268): unknown token while reading object; treating as string
-WARNING: issue-100.pdf (object 5 0, offset 286): unknown token while reading object; treating as string
-WARNING: issue-100.pdf (object 5 0, offset 289): unknown token while reading object; treating as string
-WARNING: issue-100.pdf (object 5 0, offset 294): unknown token while reading object; treating as string
-WARNING: issue-100.pdf (object 5 0, offset 297): unknown token while reading object; treating as string
-WARNING: issue-100.pdf (object 5 0, offset 304): unknown token while reading object; treating as string
+WARNING: issue-100.pdf (object 5 0, offset 268): unknown token while reading object; treating as null
+WARNING: issue-100.pdf (object 5 0, offset 286): unknown token while reading object; treating as null
+WARNING: issue-100.pdf (object 5 0, offset 289): unknown token while reading object; treating as null
+WARNING: issue-100.pdf (object 5 0, offset 294): unknown token while reading object; treating as null
+WARNING: issue-100.pdf (object 5 0, offset 297): unknown token while reading object; treating as null
+WARNING: issue-100.pdf (object 5 0, offset 304): unknown token while reading object; treating as null
 WARNING: issue-100.pdf (object 5 0, offset 304): too many errors; giving up on reading object
 WARNING: issue-100.pdf (object 5 0, offset 308): expected endobj
 WARNING: issue-100.pdf (object 8 0, offset 107): invalid character ()) in hexstring

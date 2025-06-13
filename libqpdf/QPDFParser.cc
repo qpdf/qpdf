@@ -355,9 +355,14 @@ QPDFParser::parseRemainder(bool content_stream)
                         "dictionary ended prematurely; using null as value for last key");
                     dict[frame->key] = QPDFObject::create<QPDF_Null>();
                 }
-
                 if (!frame->olist.empty()) {
-                    fixMissingKeys();
+                    if (sanity_checks) {
+                        warn(
+                            frame->offset,
+                            "expected dictionary keys but found non-name objects; ignoring");
+                    } else {
+                        fixMissingKeys();
+                    }
                 }
 
                 if (!frame->contents_string.empty() && dict.contains("/Type") &&
@@ -447,9 +452,11 @@ QPDFParser::parseRemainder(bool content_stream)
         case QPDFTokenizer::tt_word:
             if (content_stream) {
                 addScalar<QPDF_Operator>(tokenizer.getValue());
-            } else {
-                if (sanity_checks &&
-                    (tokenizer.getValue() == "endobj" || tokenizer.getValue() == "endstream")) {
+                continue;
+            }
+
+            if (sanity_checks) {
+                if (tokenizer.getValue() == "endobj" || tokenizer.getValue() == "endstream") {
                     // During sanity checks, assume an unexpected endobj or endstream indicates that
                     // we are parsing past the end of the object.
                     warn(
@@ -457,13 +464,22 @@ QPDFParser::parseRemainder(bool content_stream)
                         "reading object");
                     return {QPDFObject::create<QPDF_Null>()};
                 }
-                QTC::TC("qpdf", "QPDFParser treat word as string in parseRemainder");
-                warn("unknown token while reading object; treating as string");
+
+                warn("unknown token while reading object; treating as null");
                 if (tooManyBadTokens()) {
                     return {QPDFObject::create<QPDF_Null>()};
                 }
-                addScalar<QPDF_String>(tokenizer.getValue());
+                addNull();
+                continue;
             }
+
+            QTC::TC("qpdf", "QPDFParser treat word as string in parseRemainder");
+            warn("unknown token while reading object; treating as string");
+            if (tooManyBadTokens()) {
+                return {QPDFObject::create<QPDF_Null>()};
+            }
+            addScalar<QPDF_String>(tokenizer.getValue());
+
             continue;
 
         case QPDFTokenizer::tt_string:
