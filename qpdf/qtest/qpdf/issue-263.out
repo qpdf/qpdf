@@ -2,11 +2,11 @@ WARNING: issue-263.pdf: can't find PDF header
 WARNING: issue-263.pdf: file is damaged
 WARNING: issue-263.pdf: can't find startxref
 WARNING: issue-263.pdf: Attempting to reconstruct cross-reference table
-WARNING: issue-263.pdf (trailer, offset 66): unknown token while reading object; treating as string
-WARNING: issue-263.pdf (trailer, offset 75): unknown token while reading object; treating as string
-WARNING: issue-263.pdf (trailer, offset 79): unknown token while reading object; treating as string
+WARNING: issue-263.pdf (trailer, offset 66): unknown token while reading object; treating as null
+WARNING: issue-263.pdf (trailer, offset 75): unknown token while reading object; treating as null
+WARNING: issue-263.pdf (trailer, offset 79): unknown token while reading object; treating as null
 WARNING: issue-263.pdf (trailer, offset 82): unexpected )
-WARNING: issue-263.pdf (trailer, offset 83): unknown token while reading object; treating as string
+WARNING: issue-263.pdf (trailer, offset 83): unknown token while reading object; treating as null
 WARNING: issue-263.pdf (trailer, offset 87): unexpected >
 WARNING: issue-263.pdf (trailer, offset 87): too many errors; giving up on reading object
 qpdf: issue-263.pdf: unable to find trailer dictionary while recovering damaged file
