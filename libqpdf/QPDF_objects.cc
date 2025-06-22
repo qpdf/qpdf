@@ -1845,7 +1845,7 @@ QPDF::getObjectForParser(int id, int gen, bool parse_pdf)
     if (auto iter = m->obj_cache.find(og); iter != m->obj_cache.end()) {
         return iter->second.object;
     }
-    if (m->xref_table.contains(og) || !m->parsed) {
+    if (m->xref_table.contains(og) || (!m->parsed && og.getObj() < m->xref_table_max_id)) {
         return m->obj_cache.insert({og, QPDFObject::create<QPDF_Unresolved>(this, og)})
             .first->second.object;
     }
