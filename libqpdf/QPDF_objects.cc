@@ -763,12 +763,10 @@ qpdf_offset_t
 QPDF::read_xrefStream(qpdf_offset_t xref_offset, bool in_stream_recovery)
 {
     if (!m->ignore_xref_streams) {
-        QPDFObjGen x_og;
         QPDFObjectHandle xref_obj;
         try {
             m->in_read_xref_stream = true;
-            xref_obj =
-                readObjectAtOffset(false, xref_offset, "xref stream", QPDFObjGen(0, 0), x_og, true);
+            xref_obj = readObjectAtOffset(xref_offset, "xref stream", true);
         } catch (QPDFExc&) {
             // ignore -- report error below
         }
@@ -1403,26 +1401,45 @@ QPDF::readToken(InputSource& input, size_t max_len)
     return m->tokenizer.readToken(input, m->last_object_description, true, max_len);
 }
 
-QPDFObjectHandle
-QPDF::readObjectAtOffset(
-    bool try_recovery,
-    qpdf_offset_t offset,
-    std::string const& description,
-    QPDFObjGen exp_og,
-    QPDFObjGen& og,
-    bool skip_cache_if_in_xref)
+QPDFObjGen
+QPDF::read_object_start(qpdf_offset_t offset)
 {
-    bool check_og = true;
-    if (exp_og.getObj() == 0) {
-        // This method uses an expect object ID of 0 to indicate that we don't know or don't care
-        // what the actual object ID is at this offset. This is true when we read the xref stream
-        // and linearization hint streams. In this case, we don't verify the expect object
-        // ID/generation against what was read from the file. There is also no reason to attempt
-        // xref recovery if we get a failure in this case since the read attempt was not triggered
-        // by an xref lookup.
-        check_og = false;
-        try_recovery = false;
+    m->file->seek(offset, SEEK_SET);
+    QPDFTokenizer::Token tobjid = readToken(*m->file);
+    bool objidok = tobjid.isInteger();
+    QTC::TC("qpdf", "QPDF check objid", objidok ? 1 : 0);
+    if (!objidok) {
+        QTC::TC("qpdf", "QPDF expected n n obj");
+        throw damagedPDF(offset, "expected n n obj");
     }
+    QPDFTokenizer::Token tgen = readToken(*m->file);
+    bool genok = tgen.isInteger();
+    QTC::TC("qpdf", "QPDF check generation", genok ? 1 : 0);
+    if (!genok) {
+        throw damagedPDF(offset, "expected n n obj");
+    }
+    QPDFTokenizer::Token tobj = readToken(*m->file);
+
+    bool objok = tobj.isWord("obj");
+    QTC::TC("qpdf", "QPDF check obj", objok ? 1 : 0);
+
+    if (!objok) {
+        throw damagedPDF(offset, "expected n n obj");
+    }
+    int objid = QUtil::string_to_int(tobjid.getValue().c_str());
+    int generation = QUtil::string_to_int(tgen.getValue().c_str());
+    if (objid == 0) {
+        QTC::TC("qpdf", "QPDF object id 0");
+        throw damagedPDF(offset, "object with ID 0");
+    }
+    return {objid, generation};
+}
+
+void
+QPDF::readObjectAtOffset(
+    bool try_recovery, qpdf_offset_t offset, std::string const& description, QPDFObjGen exp_og)
+{
+    QPDFObjGen og;
     setLastObjectDescription(description, exp_og);
 
     if (!m->attempt_recovery) {
@@ -1436,40 +1453,12 @@ QPDF::readObjectAtOffset(
     if (offset == 0) {
         QTC::TC("qpdf", "QPDF bogus 0 offset", 0);
         warn(damagedPDF(-1, "object has offset 0"));
-        return QPDFObjectHandle::newNull();
+        return;
     }
 
-    m->file->seek(offset, SEEK_SET);
     try {
-        QPDFTokenizer::Token tobjid = readToken(*m->file);
-        bool objidok = tobjid.isInteger();
-        QTC::TC("qpdf", "QPDF check objid", objidok ? 1 : 0);
-        if (!objidok) {
-            QTC::TC("qpdf", "QPDF expected n n obj");
-            throw damagedPDF(offset, "expected n n obj");
-        }
-        QPDFTokenizer::Token tgen = readToken(*m->file);
-        bool genok = tgen.isInteger();
-        QTC::TC("qpdf", "QPDF check generation", genok ? 1 : 0);
-        if (!genok) {
-            throw damagedPDF(offset, "expected n n obj");
-        }
-        QPDFTokenizer::Token tobj = readToken(*m->file);
-
-        bool objok = tobj.isWord("obj");
-        QTC::TC("qpdf", "QPDF check obj", objok ? 1 : 0);
-
-        if (!objok) {
-            throw damagedPDF(offset, "expected n n obj");
-        }
-        int objid = QUtil::string_to_int(tobjid.getValue().c_str());
-        int generation = QUtil::string_to_int(tgen.getValue().c_str());
-        og = QPDFObjGen(objid, generation);
-        if (objid == 0) {
-            QTC::TC("qpdf", "QPDF object id 0");
-            throw damagedPDF(offset, "object with ID 0");
-        }
-        if (check_og && (exp_og != og)) {
+        og = read_object_start(offset);
+        if (exp_og != og) {
             QTC::TC("qpdf", "QPDF err wrong objid/generation");
             QPDFExc e = damagedPDF(offset, "expected " + exp_og.unparse(' ') + " obj");
             if (try_recovery) {
@@ -1481,86 +1470,104 @@ QPDF::readObjectAtOffset(
             }
         }
     } catch (QPDFExc& e) {
-        if (try_recovery) {
-            // Try again after reconstructing xref table
-            reconstruct_xref(e);
-            if (m->xref_table.contains(exp_og) && m->xref_table[exp_og].getType() == 1) {
-                qpdf_offset_t new_offset = m->xref_table[exp_og].getOffset();
-                QPDFObjectHandle result =
-                    readObjectAtOffset(false, new_offset, description, exp_og, og, false);
-                QTC::TC("qpdf", "QPDF recovered in readObjectAtOffset");
-                return result;
-            } else {
-                QTC::TC("qpdf", "QPDF object gone after xref reconstruction");
-                warn(damagedPDF(
-                    "",
-                    -1,
-                    ("object " + exp_og.unparse(' ') +
-                     " not found in file after regenerating cross reference "
-                     "table")));
-                return QPDFObjectHandle::newNull();
-            }
-        } else {
+        if (!try_recovery) {
             throw;
         }
+        // Try again after reconstructing xref table
+        reconstruct_xref(e);
+        if (m->xref_table.contains(exp_og) && m->xref_table[exp_og].getType() == 1) {
+            qpdf_offset_t new_offset = m->xref_table[exp_og].getOffset();
+            readObjectAtOffset(false, new_offset, description, exp_og);
+            QTC::TC("qpdf", "QPDF recovered in readObjectAtOffset");
+            return;
+        }
+        QTC::TC("qpdf", "QPDF object gone after xref reconstruction");
+        warn(damagedPDF(
+            "",
+            -1,
+            ("object " + exp_og.unparse(' ') +
+             " not found in file after regenerating cross reference table")));
+        return;
     }
 
     QPDFObjectHandle oh = readObject(description, og);
 
-    if (isUnresolved(og)) {
-        // Store the object in the cache here so it gets cached whether we first know the offset or
-        // whether we first know the object ID and generation (in which we case we would get here
-        // through resolve).
+    // Determine the end offset of this object before and after white space.  We use these
+    // numbers to validate linearization hint tables.  Offsets and lengths of objects may imply
+    // the end of an object to be anywhere between these values.
+    qpdf_offset_t end_before_space = m->file->tell();
 
-        // Determine the end offset of this object before and after white space.  We use these
-        // numbers to validate linearization hint tables.  Offsets and lengths of objects may imply
-        // the end of an object to be anywhere between these values.
-        qpdf_offset_t end_before_space = m->file->tell();
-
-        // skip over spaces
-        while (true) {
-            char ch;
-            if (m->file->read(&ch, 1)) {
-                if (!isspace(static_cast<unsigned char>(ch))) {
-                    m->file->seek(-1, SEEK_CUR);
-                    break;
-                }
-            } else {
-                throw damagedPDF(m->file->tell(), "EOF after endobj");
-            }
+    // skip over spaces
+    while (true) {
+        char ch;
+        if (!m->file->read(&ch, 1)) {
+            throw damagedPDF(m->file->tell(), "EOF after endobj");
         }
-        qpdf_offset_t end_after_space = m->file->tell();
-        if (skip_cache_if_in_xref && m->xref_table.contains(og)) {
-            // Ordinarily, an object gets read here when resolved through xref table or stream. In
-            // the special case of the xref stream and linearization hint tables, the offset comes
-            // from another source. For the specific case of xref streams, the xref stream is read
-            // and loaded into the object cache very early in parsing. Ordinarily, when a file is
-            // updated by appending, items inserted into the xref table in later updates take
-            // precedence over earlier items. In the special case of reusing the object number
-            // previously used as the xref stream, we have the following order of events:
-            //
-            // * reused object gets loaded into the xref table
-            // * old object is read here while reading xref streams
-            // * original xref entry is ignored (since already in xref table)
-            //
-            // It is the second step that causes a problem. Even though the xref table is correct in
-            // this case, the old object is already in the cache and so effectively prevails over
-            // the reused object. To work around this issue, we have a special case for the xref
-            // stream (via the skip_cache_if_in_xref): if the object is already in the xref stream,
-            // don't cache what we read here.
-            //
-            // It is likely that the same bug may exist for linearization hint tables, but the
-            // existing code uses end_before_space and end_after_space from the cache, so fixing
-            // that would require more significant rework. The chances of a linearization hint
-            // stream being reused seems smaller because the xref stream is probably the highest
-            // object in the file and the linearization hint stream would be some random place in
-            // the middle, so I'm leaving that bug unfixed for now. If the bug were to be fixed, we
-            // could use !check_og in place of skip_cache_if_in_xref.
-            QTC::TC("qpdf", "QPDF skipping cache for known unchecked object");
-        } else {
-            updateCache(og, oh.getObj(), end_before_space, end_after_space);
+        if (!isspace(static_cast<unsigned char>(ch))) {
+            m->file->seek(-1, SEEK_CUR);
+            break;
         }
     }
+    updateCache(og, oh.getObj(), end_before_space, m->file->tell());
+}
+
+QPDFObjectHandle
+QPDF::readObjectAtOffset(
+    qpdf_offset_t offset, std::string const& description, bool skip_cache_if_in_xref)
+{
+    auto og = read_object_start(offset);
+    auto oh = readObject(description, og);
+
+    if (!isUnresolved(og)) {
+        return oh;
+    }
+
+    if (skip_cache_if_in_xref && m->xref_table.contains(og)) {
+        // In the special case of the xref stream and linearization hint tables, the offset comes
+        // from another source. For the specific case of xref streams, the xref stream is read and
+        // loaded into the object cache very early in parsing. Ordinarily, when a file is updated by
+        // appending, items inserted into the xref table in later updates take precedence over
+        // earlier items. In the special case of reusing the object number previously used as the
+        // xref stream, we have the following order of events:
+        //
+        // * reused object gets loaded into the xref table
+        // * old object is read here while reading xref streams
+        // * original xref entry is ignored (since already in xref table)
+        //
+        // It is the second step that causes a problem. Even though the xref table is correct in
+        // this case, the old object is already in the cache and so effectively prevails over the
+        // reused object. To work around this issue, we have a special case for the xref stream (via
+        // the skip_cache_if_in_xref): if the object is already in the xref stream, don't cache what
+        // we read here.
+        //
+        // It is likely that the same bug may exist for linearization hint tables, but the existing
+        // code uses end_before_space and end_after_space from the cache, so fixing that would
+        // require more significant rework. The chances of a linearization hint stream being reused
+        // seems smaller because the xref stream is probably the highest object in the file and the
+        // linearization hint stream would be some random place in the middle, so I'm leaving that
+        // bug unfixed for now. If the bug were to be fixed, we could use !check_og in place of
+        // skip_cache_if_in_xref.
+        QTC::TC("qpdf", "QPDF skipping cache for known unchecked object");
+        return oh;
+    }
+
+    // Determine the end offset of this object before and after white space.  We use these
+    // numbers to validate linearization hint tables.  Offsets and lengths of objects may imply
+    // the end of an object to be anywhere between these values.
+    qpdf_offset_t end_before_space = m->file->tell();
+
+    // skip over spaces
+    while (true) {
+        char ch;
+        if (!m->file->read(&ch, 1)) {
+            throw damagedPDF(m->file->tell(), "EOF after endobj");
+        }
+        if (!isspace(static_cast<unsigned char>(ch))) {
+            m->file->seek(-1, SEEK_CUR);
+            break;
+        }
+    }
+    updateCache(og, oh.getObj(), end_before_space, m->file->tell());
 
     return oh;
 }
@@ -1587,12 +1594,8 @@ QPDF::resolve(QPDFObjGen og)
         try {
             switch (entry.getType()) {
             case 1:
-                {
-                    qpdf_offset_t offset = entry.getOffset();
-                    // Object stored in cache by readObjectAtOffset
-                    QPDFObjGen a_og;
-                    QPDFObjectHandle oh = readObjectAtOffset(true, offset, "", og, a_og, false);
-                }
+                // Object stored in cache by readObjectAtOffset
+                readObjectAtOffset(true, entry.getOffset(), "", og);
                 break;
 
             case 2:
