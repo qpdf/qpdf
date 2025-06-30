@@ -22,7 +22,6 @@
 
 #include <qpdf/Pipeline.hh>
 
-#include <qpdf/Pl_Buffer.hh>
 #include <cstddef>
 #include <functional>
 
@@ -88,9 +87,9 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
 
   private:
     QPDF_DLL_PRIVATE
-    void compress(void* cinfo, Buffer*);
+    void compress(void* cinfo);
     QPDF_DLL_PRIVATE
-    void decompress(void* cinfo, Buffer*);
+    void decompress(void* cinfo);
 
     enum action_e { a_compress, a_decompress };
 

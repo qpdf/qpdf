@@ -84,7 +84,6 @@ class Pl_DCT::Members
         J_COLOR_SPACE color_space,
         CompressConfig* config_callback) :
         action(a_compress),
-        buf("DCT uncompressed image"),
         image_width(image_width),
         image_height(image_height),
         components(components),
@@ -95,8 +94,7 @@ class Pl_DCT::Members
 
     // For decompression
     Members() :
-        action(a_decompress),
-        buf("DCT compressed image")
+        action(a_decompress)
     {
     }
 
@@ -105,7 +103,7 @@ class Pl_DCT::Members
     ~Members() = default;
 
     action_e action;
-    Pl_Buffer buf;
+    std::string buf;
 
     // Used for compression
     JDIMENSION image_width{0};
@@ -163,21 +161,17 @@ Pl_DCT::~Pl_DCT() = default;
 void
 Pl_DCT::write(unsigned char const* data, size_t len)
 {
-    m->buf.write(data, len);
+    if (len > 0) {
+        m->buf.append(reinterpret_cast<char const*>(data), len);
+    }
 }
 
 void
 Pl_DCT::finish()
 {
-    m->buf.finish();
-
-    // Using a std::shared_ptr<Buffer> here and passing it into compress and decompress causes a
-    // memory leak with setjmp/longjmp. Just use a pointer and delete it.
-    Buffer* b = m->buf.getBuffer();
-    if (b->getSize() == 0) {
+    if (m->buf.empty()) {
         // Special case: empty data will never succeed and probably means we're calling finish a
         // second time from an exception handler.
-        delete b;
         next()->finish();
         return;
     }
@@ -198,9 +192,9 @@ Pl_DCT::finish()
     if (setjmp(jerr.jmpbuf) == 0) {
         try {
             if (m->action == a_compress) {
-                compress(reinterpret_cast<void*>(&cinfo_compress), b);
+                compress(reinterpret_cast<void*>(&cinfo_compress));
             } else {
-                decompress(reinterpret_cast<void*>(&cinfo_decompress), b);
+                decompress(reinterpret_cast<void*>(&cinfo_decompress));
             }
         } catch (std::exception& e) {
             // Convert an exception back to a longjmp so we can ensure that the right cleanup
@@ -211,7 +205,6 @@ Pl_DCT::finish()
     } else {
         error = true;
     }
-    delete b;
 
     if (m->action == a_compress) {
         jpeg_destroy_compress(&cinfo_compress);
@@ -312,7 +305,7 @@ term_buffer_source(j_decompress_ptr)
 }
 
 static void
-jpeg_buffer_src(j_decompress_ptr cinfo, Buffer* buffer)
+jpeg_buffer_src(j_decompress_ptr cinfo, std::string& buffer)
 {
     cinfo->src = reinterpret_cast<jpeg_source_mgr*>(
         // line-break
@@ -325,12 +318,12 @@ jpeg_buffer_src(j_decompress_ptr cinfo, Buffer* buffer)
     src->skip_input_data = skip_buffer_input_data;
     src->resync_to_restart = jpeg_resync_to_restart; /* use default method */
     src->term_source = term_buffer_source;
-    src->bytes_in_buffer = buffer->getSize();
-    src->next_input_byte = buffer->getBuffer();
+    src->bytes_in_buffer = buffer.size();
+    src->next_input_byte = reinterpret_cast<unsigned char*>(buffer.data());
 }
 
 void
-Pl_DCT::compress(void* cinfo_p, Buffer* b)
+Pl_DCT::compress(void* cinfo_p)
 {
     auto* cinfo = reinterpret_cast<jpeg_compress_struct*>(cinfo_p);
 
@@ -361,13 +354,13 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
     unsigned int width = cinfo->image_width * QIntC::to_uint(cinfo->input_components);
     size_t expected_size = QIntC::to_size(cinfo->image_height) *
         QIntC::to_size(cinfo->image_width) * QIntC::to_size(cinfo->input_components);
-    if (b->getSize() != expected_size) {
+    if (m->buf.size() != expected_size) {
         throw std::runtime_error(
-            "Pl_DCT: image buffer size = " + std::to_string(b->getSize()) +
+            "Pl_DCT: image buffer size = " + std::to_string(m->buf.size()) +
             "; expected size = " + std::to_string(expected_size));
     }
     JSAMPROW row_pointer[1];
-    unsigned char* buffer = b->getBuffer();
+    auto buffer = reinterpret_cast<unsigned char*>(m->buf.data());
     while (cinfo->next_scanline < cinfo->image_height) {
         // We already verified that the buffer is big enough.
         row_pointer[0] = &buffer[cinfo->next_scanline * width];
@@ -378,7 +371,7 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
 }
 
 void
-Pl_DCT::decompress(void* cinfo_p, Buffer* b)
+Pl_DCT::decompress(void* cinfo_p)
 {
     auto* cinfo = reinterpret_cast<jpeg_decompress_struct*>(cinfo_p);
 
@@ -395,10 +388,10 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
         cinfo->mem->max_memory_to_use = memory_limit;
     }
 
-    jpeg_buffer_src(cinfo, b);
+    jpeg_buffer_src(cinfo, m->buf);
 
     (void)jpeg_read_header(cinfo, TRUE);
-    (void)jpeg_calc_output_dimensions(cinfo);
+    jpeg_calc_output_dimensions(cinfo);
     unsigned int width = cinfo->output_width * QIntC::to_uint(cinfo->output_components);
     if (memory_limit > 0 &&
         width > (static_cast<unsigned long>(memory_limit) / (20U * cinfo->output_height))) {
