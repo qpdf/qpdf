@@ -166,7 +166,7 @@ QPDF::getAllPagesInternal(
                 // Make a copy of the page. This does the same as shallowCopyPage in
                 // QPDFPageObjectHelper.
                 QTC::TC("qpdf", "QPDF resolve duplicated page object");
-                if (!m->in_xref_reconstruction) {
+                if (!m->reconstructed_xref) {
                     cur_node.warnIfPossible(
                         "kid " + std::to_string(i) +
                         " (from 0) appears more than once in the pages tree;"
@@ -193,7 +193,7 @@ QPDF::getAllPagesInternal(
                 kid.replaceKey("/Type", "/Page"_qpdf);
                 ++errors;
             }
-            if (m->in_xref_reconstruction && errors > 2) {
+            if (m->reconstructed_xref && errors > 2) {
                 cur_node.warnIfPossible(
                     "kid " + std::to_string(i) + " (from 0) has too many errors; ignoring page");
                 m->invalid_page_found = true;

@@ -7,10 +7,7 @@ WARNING: issue-143.pdf (xref stream, offset 654): self-referential object stream
 WARNING: issue-143.pdf: file is damaged
 WARNING: issue-143.pdf (object 1 0, offset 48): expected n n obj
 WARNING: issue-143.pdf: Attempting to reconstruct cross-reference table
-WARNING: issue-143.pdf (object 1 0, offset 24): expected dictionary key but found non-name object; inserting key /QPDFFake1
-WARNING: issue-143.pdf (object 1 0, offset 24): expected dictionary key but found non-name object; inserting key /QPDFFake2
-WARNING: issue-143.pdf (object 1 0, offset 24): expected dictionary key but found non-name object; inserting key /QPDFFake3
-WARNING: issue-143.pdf (object 1 0, offset 24): expected dictionary key but found non-name object; inserting key /QPDFFake4
+WARNING: issue-143.pdf (object 1 0, offset 24): expected dictionary keys but found non-name objects; ignoring
 WARNING: issue-143.pdf (object 1 0, offset 21): stream dictionary lacks /Length key
 WARNING: issue-143.pdf (object 1 0, offset 84): attempting to recover stream length
 WARNING: issue-143.pdf (object 1 0, offset 84): recovered stream length: 606

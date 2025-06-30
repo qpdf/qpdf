@@ -200,7 +200,6 @@ QPDF::reconstruct_xref(QPDFExc& e, bool found_startxref)
     };
 
     m->reconstructed_xref = true;
-    m->in_xref_reconstruction = true;
     // We may find more objects, which may contain dangling references.
     m->fixed_dangling_refs = false;
 
@@ -382,7 +381,6 @@ QPDF::reconstruct_xref(QPDFExc& e, bool found_startxref)
         }
     }
 
-    m->in_xref_reconstruction = false;
     // We could iterate through the objects looking for streams and try to find objects inside of
     // them, but it's probably not worth the trouble.  Acrobat can't recover files with any errors
     // in an xref stream, and this would be a real long shot anyway.  If we wanted to do anything
@@ -1174,7 +1172,7 @@ QPDF::readTrailer()
 {
     qpdf_offset_t offset = m->file->tell();
     auto [object, empty] = QPDFParser::parse(
-        *m->file, "trailer", m->tokenizer, nullptr, *this, m->in_xref_reconstruction);
+        *m->file, "trailer", m->tokenizer, nullptr, *this, m->reconstructed_xref);
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
         // actual PDF files and Adobe Reader appears to ignore them.
@@ -1201,7 +1199,7 @@ QPDF::readObject(std::string const& description, QPDFObjGen og)
         m->tokenizer,
         decrypter_ptr,
         *this,
-        m->in_xref_reconstruction || m->in_read_xref_stream);
+        m->reconstructed_xref || m->in_read_xref_stream);
     ;
     if (empty) {
         // Nothing in the PDF spec appears to allow empty objects, but they have been encountered in
