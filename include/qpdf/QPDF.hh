@@ -795,13 +795,14 @@ class QPDF
         std::shared_ptr<InputSource> input, QPDFObjGen og, qpdf_offset_t stream_offset);
     QPDFTokenizer::Token readToken(InputSource&, size_t max_len = 0);
 
-    QPDFObjectHandle readObjectAtOffset(
+    QPDFObjGen read_object_start(qpdf_offset_t offset);
+    void readObjectAtOffset(
         bool attempt_recovery,
         qpdf_offset_t offset,
         std::string const& description,
-        QPDFObjGen exp_og,
-        QPDFObjGen& og,
-        bool skip_cache_if_in_xref);
+        QPDFObjGen exp_og);
+    QPDFObjectHandle readObjectAtOffset(
+        qpdf_offset_t offset, std::string const& description, bool skip_cache_if_in_xref);
     std::shared_ptr<QPDFObject> const& resolve(QPDFObjGen og);
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
