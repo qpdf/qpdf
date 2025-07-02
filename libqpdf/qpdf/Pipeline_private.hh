@@ -46,6 +46,12 @@ namespace qpdf::pl
         {
         }
 
+        String(std::string& str) :
+            Pipeline("", nullptr),
+            str(str)
+        {
+        }
+
         ~String() final = default;
 
         void

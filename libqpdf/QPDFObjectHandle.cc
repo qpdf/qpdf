@@ -1,9 +1,13 @@
+#include <qpdf/assert_debug.h>
+
 #include <qpdf/QPDFObjectHandle_private.hh>
 
-#include <qpdf/BufferInputSource.hh>
+#include <qpdf/InputSource_private.hh>
 #include <qpdf/JSON_writer.hh>
+#include <qpdf/Pipeline_private.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_QPDFTokenizer.hh>
+#include <qpdf/QIntC.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
@@ -11,13 +15,9 @@
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFParser.hh>
-
-#include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
-#include <qpdf/QUtil.hh>
 #include <qpdf/Util.hh>
 
-#include <algorithm>
 #include <array>
 #include <cctype>
 #include <climits>
@@ -172,48 +172,6 @@ void
 QPDFObjectHandle::ParserCallbacks::terminateParsing()
 {
     throw TerminateParsing();
-}
-
-namespace
-{
-    class LastChar final: public Pipeline
-    {
-      public:
-        LastChar(Pipeline& next);
-        ~LastChar() final = default;
-        void write(unsigned char const* data, size_t len) final;
-        void finish() final;
-        unsigned char getLastChar();
-
-      private:
-        unsigned char last_char{0};
-    };
-} // namespace
-
-LastChar::LastChar(Pipeline& next) :
-    Pipeline("lastchar", &next)
-{
-}
-
-void
-LastChar::write(unsigned char const* data, size_t len)
-{
-    if (len > 0) {
-        last_char = data[len - 1];
-    }
-    next()->write(data, len);
-}
-
-void
-LastChar::finish()
-{
-    next()->finish();
-}
-
-unsigned char
-LastChar::getLastChar()
-{
-    return last_char;
 }
 
 std::pair<bool, bool>
@@ -1527,16 +1485,14 @@ void
 QPDFObjectHandle::pipeContentStreams(
     Pipeline* p, std::string const& description, std::string& all_description)
 {
-    std::vector<QPDFObjectHandle> streams =
-        arrayOrStreamToStreamArray(description, all_description);
     bool need_newline = false;
-    Pl_Buffer buf("concatenated content stream buffer");
-    for (auto stream: streams) {
+    std::string buffer;
+    pl::String buf(buffer);
+    for (auto stream: arrayOrStreamToStreamArray(description, all_description)) {
         if (need_newline) {
             buf.writeCStr("\n");
         }
-        LastChar lc(buf);
-        if (!stream.pipeStreamData(&lc, 0, qpdf_dl_specialized)) {
+        if (!stream.pipeStreamData(&buf, 0, qpdf_dl_specialized)) {
             QTC::TC("qpdf", "QPDFObjectHandle errors in parsecontent");
             throw QPDFExc(
                 qpdf_e_damaged_pdf,
@@ -1545,11 +1501,11 @@ QPDFObjectHandle::pipeContentStreams(
                 0,
                 "errors while decoding content stream");
         }
-        lc.finish();
-        need_newline = (lc.getLastChar() != static_cast<unsigned char>('\n'));
+        need_newline = buffer.empty() || buffer.back() != '\n';
         QTC::TC("qpdf", "QPDFObjectHandle need_newline", need_newline ? 0 : 1);
+        p->writeString(buffer);
+        buffer.clear();
     }
-    p->writeString(buf.getString());
     p->finish();
 }
 

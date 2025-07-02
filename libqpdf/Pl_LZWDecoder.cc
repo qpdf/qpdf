@@ -23,8 +23,8 @@ Pl_LZWDecoder::write(unsigned char const* bytes, size_t len)
         if (next_char_ == 3) {
             next_char_ = 0;
         }
-        this->bits_available += 8;
-        if (this->bits_available >= this->code_size) {
+        bits_available += 8;
+        if (bits_available >= code_size) {
             sendNextCode();
         }
     }
@@ -39,12 +39,12 @@ Pl_LZWDecoder::finish()
 void
 Pl_LZWDecoder::sendNextCode()
 {
-    unsigned int high = this->byte_pos;
-    unsigned int med = (this->byte_pos + 1) % 3;
-    unsigned int low = (this->byte_pos + 2) % 3;
+    unsigned int high = byte_pos;
+    unsigned int med = (byte_pos + 1) % 3;
+    unsigned int low = (byte_pos + 2) % 3;
 
-    unsigned int bits_from_high = 8 - this->bit_pos;
-    unsigned int bits_from_med = this->code_size - bits_from_high;
+    unsigned int bits_from_high = 8 - bit_pos;
+    unsigned int bits_from_med = code_size - bits_from_high;
     unsigned int bits_from_low = 0;
     if (bits_from_med > 8) {
         bits_from_low = bits_from_med - 8;
@@ -54,23 +54,23 @@ Pl_LZWDecoder::sendNextCode()
     unsigned int med_mask = 0xff - ((1U << (8 - bits_from_med)) - 1U);
     unsigned int low_mask = 0xff - ((1U << (8 - bits_from_low)) - 1U);
     unsigned int code = 0;
-    code += (this->buf[high] & high_mask) << bits_from_med;
-    code += ((this->buf[med] & med_mask) >> (8 - bits_from_med));
+    code += (buf[high] & high_mask) << bits_from_med;
+    code += ((buf[med] & med_mask) >> (8 - bits_from_med));
     if (bits_from_low) {
         code <<= bits_from_low;
-        code += ((this->buf[low] & low_mask) >> (8 - bits_from_low));
-        this->byte_pos = low;
-        this->bit_pos = bits_from_low;
+        code += ((buf[low] & low_mask) >> (8 - bits_from_low));
+        byte_pos = low;
+        bit_pos = bits_from_low;
     } else {
-        this->byte_pos = med;
-        this->bit_pos = bits_from_med;
+        byte_pos = med;
+        bit_pos = bits_from_med;
     }
-    if (this->bit_pos == 8) {
-        this->bit_pos = 0;
-        ++this->byte_pos;
-        this->byte_pos %= 3;
+    if (bit_pos == 8) {
+        bit_pos = 0;
+        ++byte_pos;
+        byte_pos %= 3;
     }
-    this->bits_available -= this->code_size;
+    bits_available -= code_size;
 
     handleCode(code);
 }
@@ -102,12 +102,12 @@ Pl_LZWDecoder::addToTable(unsigned char c)
     unsigned char const* last_data = nullptr;
     unsigned char tmp[1];
 
-    if (this->last_code < 256) {
-        tmp[0] = static_cast<unsigned char>(this->last_code);
+    if (last_code < 256) {
+        tmp[0] = static_cast<unsigned char>(last_code);
         last_data = tmp;
         last_size = 1;
-    } else if (this->last_code > 257) {
-        unsigned int idx = this->last_code - 258;
+    } else if (last_code > 257) {
+        unsigned int idx = last_code - 258;
         if (idx >= table.size()) {
             throw std::runtime_error("Pl_LZWDecoder::addToTable: table overflow");
         }
@@ -116,34 +116,34 @@ Pl_LZWDecoder::addToTable(unsigned char c)
         last_size = QIntC::to_uint(b.getSize());
     } else {
         throw std::runtime_error(
-            "Pl_LZWDecoder::addToTable called with invalid code (" +
-            std::to_string(this->last_code) + ")");
+            "Pl_LZWDecoder::addToTable called with invalid code (" + std::to_string(last_code) +
+            ")");
     }
 
     Buffer entry(1 + last_size);
     unsigned char* new_data = entry.getBuffer();
     memcpy(new_data, last_data, last_size);
     new_data[last_size] = c;
-    this->table.push_back(std::move(entry));
+    table.push_back(std::move(entry));
 }
 
 void
 Pl_LZWDecoder::handleCode(unsigned int code)
 {
-    if (this->eod) {
+    if (eod) {
         return;
     }
 
     if (code == 256) {
-        if (!this->table.empty()) {
+        if (!table.empty()) {
             QTC::TC("libtests", "Pl_LZWDecoder intermediate reset");
         }
-        this->table.clear();
-        this->code_size = 9;
+        table.clear();
+        code_size = 9;
     } else if (code == 257) {
-        this->eod = true;
+        eod = true;
     } else {
-        if (this->last_code != 256) {
+        if (last_code != 256) {
             // Add to the table from last time.  New table entry would be what we read last plus the
             // first character of what we're reading now.
             unsigned char next_c = '\0';
@@ -159,7 +159,7 @@ Pl_LZWDecoder::handleCode(unsigned int code)
                     // The encoder would have just created this entry, so the first character of
                     // this entry would have been the same as the first character of the last entry.
                     QTC::TC("libtests", "Pl_LZWDecoder last was table size");
-                    next_c = getFirstChar(this->last_code);
+                    next_c = getFirstChar(last_code);
                 } else {
                     next_c = getFirstChar(code);
                 }
@@ -171,7 +171,7 @@ Pl_LZWDecoder::handleCode(unsigned int code)
             addToTable(next_c);
             unsigned int change_idx = new_idx + code_change_delta;
             if ((change_idx == 511) || (change_idx == 1023) || (change_idx == 2047)) {
-                ++this->code_size;
+                ++code_size;
             }
         }
 
@@ -188,5 +188,5 @@ Pl_LZWDecoder::handleCode(unsigned int code)
         }
     }
 
-    this->last_code = code;
+    last_code = code;
 }

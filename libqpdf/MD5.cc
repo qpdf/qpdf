@@ -14,14 +14,14 @@ MD5::MD5()
 void
 MD5::init()
 {
-    this->crypto = QPDFCryptoProvider::getImpl();
-    this->crypto->MD5_init();
+    crypto = QPDFCryptoProvider::getImpl();
+    crypto->MD5_init();
 }
 
 void
 MD5::finalize()
 {
-    this->crypto->MD5_finalize();
+    crypto->MD5_finalize();
 }
 
 void
@@ -48,7 +48,7 @@ MD5::appendString(char const* input_string)
 void
 MD5::encodeDataIncrementally(char const* data, size_t len)
 {
-    this->crypto->MD5_update(QUtil::unsigned_char_pointer(data), len);
+    crypto->MD5_update(QUtil::unsigned_char_pointer(data), len);
 }
 
 void
@@ -84,14 +84,14 @@ MD5::encodeFile(char const* filename, qpdf_offset_t up_to_offset)
     }
     (void)fclose(file);
 
-    this->crypto->MD5_finalize();
+    crypto->MD5_finalize();
 }
 
 void
 MD5::digest(Digest result)
 {
-    this->crypto->MD5_finalize();
-    this->crypto->MD5_digest(result);
+    crypto->MD5_finalize();
+    crypto->MD5_digest(result);
 }
 
 void
@@ -110,7 +110,7 @@ MD5::print()
 std::string
 MD5::unparse()
 {
-    this->crypto->MD5_finalize();
+    crypto->MD5_finalize();
     Digest digest_val;
     digest(digest_val);
     return QUtil::hex_encode(std::string(reinterpret_cast<char*>(digest_val), 16));

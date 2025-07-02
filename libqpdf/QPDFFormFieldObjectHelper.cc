@@ -655,15 +655,76 @@ ValueSetter::writeAppearance()
 
 namespace
 {
-    class TfFinder: public QPDFObjectHandle::TokenFilter
+    class TfFinder final: public QPDFObjectHandle::TokenFilter
     {
       public:
         TfFinder() = default;
-        ~TfFinder() override = default;
-        void handleToken(QPDFTokenizer::Token const&) override;
-        double getTf();
-        std::string getFontName();
-        std::string getDA();
+        ~TfFinder() final = default;
+
+        void
+        handleToken(QPDFTokenizer::Token const& token) final
+        {
+            auto ttype = token.getType();
+            auto const& value = token.getValue();
+            DA.emplace_back(token.getRawValue());
+            switch (ttype) {
+            case QPDFTokenizer::tt_integer:
+            case QPDFTokenizer::tt_real:
+                last_num = strtod(value.c_str(), nullptr);
+                last_num_idx = QIntC::to_int(DA.size() - 1);
+                break;
+
+            case QPDFTokenizer::tt_name:
+                last_name = value;
+                break;
+
+            case QPDFTokenizer::tt_word:
+                if (token.isWord("Tf")) {
+                    if ((last_num > 1.0) && (last_num < 1000.0)) {
+                        // These ranges are arbitrary but keep us from doing insane things or
+                        // suffering from over/underflow
+                        tf = last_num;
+                    }
+                    tf_idx = last_num_idx;
+                    font_name = last_name;
+                }
+                break;
+
+            default:
+                break;
+            }
+        }
+
+        double
+        getTf() const
+        {
+            return tf;
+        }
+        std::string
+        getFontName() const
+        {
+            return font_name;
+        }
+
+        std::string
+        getDA()
+        {
+            std::string result;
+            int i = -1;
+            for (auto const& cur: DA) {
+                if (++i == tf_idx) {
+                    double delta = strtod(cur.c_str(), nullptr) - tf;
+                    if (delta > 0.001 || delta < -0.001) {
+                        // tf doesn't match the font size passed to Tf, so substitute.
+                        QTC::TC("qpdf", "QPDFFormFieldObjectHelper fallback Tf");
+                        result += QUtil::double_to_string(tf);
+                        continue;
+                    }
+                }
+                result += cur;
+            }
+            return result;
+        }
 
       private:
         double tf{11.0};
@@ -675,72 +736,6 @@ namespace
         std::vector<std::string> DA;
     };
 } // namespace
-
-void
-TfFinder::handleToken(QPDFTokenizer::Token const& token)
-{
-    QPDFTokenizer::token_type_e ttype = token.getType();
-    std::string value = token.getValue();
-    DA.push_back(token.getRawValue());
-    switch (ttype) {
-    case QPDFTokenizer::tt_integer:
-    case QPDFTokenizer::tt_real:
-        last_num = strtod(value.c_str(), nullptr);
-        last_num_idx = QIntC::to_int(DA.size() - 1);
-        break;
-
-    case QPDFTokenizer::tt_name:
-        last_name = value;
-        break;
-
-    case QPDFTokenizer::tt_word:
-        if (token.isWord("Tf")) {
-            if ((last_num > 1.0) && (last_num < 1000.0)) {
-                // These ranges are arbitrary but keep us from doing insane things or suffering from
-                // over/underflow
-                tf = last_num;
-            }
-            tf_idx = last_num_idx;
-            font_name = last_name;
-        }
-        break;
-
-    default:
-        break;
-    }
-}
-
-double
-TfFinder::getTf()
-{
-    return tf;
-}
-
-std::string
-TfFinder::getDA()
-{
-    std::string result;
-    size_t n = DA.size();
-    for (size_t i = 0; i < n; ++i) {
-        std::string cur = DA.at(i);
-        if (QIntC::to_int(i) == tf_idx) {
-            double delta = strtod(cur.c_str(), nullptr) - tf;
-            if ((delta > 0.001) || (delta < -0.001)) {
-                // tf doesn't match the font size passed to Tf, so substitute.
-                QTC::TC("qpdf", "QPDFFormFieldObjectHelper fallback Tf");
-                cur = QUtil::double_to_string(tf);
-            }
-        }
-        result += cur;
-    }
-    return result;
-}
-
-std::string
-TfFinder::getFontName()
-{
-    return font_name;
-}
 
 QPDFObjectHandle
 QPDFFormFieldObjectHelper::getFontFromResource(QPDFObjectHandle resources, std::string const& name)
