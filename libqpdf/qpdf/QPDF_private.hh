@@ -188,8 +188,10 @@ class QPDF::EncryptionParameters
     EncryptionParameters() = default;
 
   private:
+    void initialize(QPDF& qpdf);
     bool encrypted{false};
     bool encryption_initialized{false};
+    int encryption_P{0};
     int encryption_V{0};
     int encryption_R{0};
     bool encrypt_metadata{true};

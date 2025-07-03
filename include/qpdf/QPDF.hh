@@ -964,8 +964,7 @@ class QPDF
     void insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_duplicate);
 
     // methods to support encryption -- implemented in QPDF_encryption.cc
-    static encryption_method_e
-    interpretCF(std::shared_ptr<EncryptionParameters> encp, QPDFObjectHandle);
+    static encryption_method_e interpretCF(EncryptionParameters& encp, QPDFObjectHandle const& cf);
     void initializeEncryption();
     static std::string
     getKeyForObject(std::shared_ptr<EncryptionParameters> encp, QPDFObjGen og, bool use_aes);

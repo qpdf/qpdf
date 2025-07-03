@@ -12,6 +12,7 @@
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_RC4.hh>
 #include <qpdf/Pl_SHA2.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/RC4.hh>
@@ -686,12 +687,12 @@ QPDF::EncryptionData::recover_encryption_key_with_password(
 }
 
 QPDF::encryption_method_e
-QPDF::interpretCF(std::shared_ptr<EncryptionParameters> encp, QPDFObjectHandle cf)
+QPDF::interpretCF(EncryptionParameters& encp, QPDFObjectHandle const& cf)
 {
     if (cf.isName()) {
         std::string filter = cf.getName();
-        auto it = encp->crypt_filters.find(filter);
-        if (it != encp->crypt_filters.end()) {
+        auto it = encp.crypt_filters.find(filter);
+        if (it != encp.crypt_filters.end()) {
             return it->second;
         }
         if (filter == "/Identity") {
@@ -706,62 +707,75 @@ QPDF::interpretCF(std::shared_ptr<EncryptionParameters> encp, QPDFObjectHandle c
 void
 QPDF::initializeEncryption()
 {
-    if (m->encp->encryption_initialized) {
+    m->encp->initialize(*this);
+}
+
+void
+QPDF::EncryptionParameters::initialize(QPDF& qpdf)
+{
+    if (encryption_initialized) {
         return;
     }
-    m->encp->encryption_initialized = true;
+    encryption_initialized = true;
+
+    auto& qm = *qpdf.m;
+    auto& trailer = qm.trailer;
+    auto& file = qm.file;
+
+    auto warn_damaged_pdf = [&qpdf](std::string const& msg) {
+        qpdf.warn(qpdf.damagedPDF("encryption dictionary", msg));
+    };
+    auto throw_damaged_pdf = [&qpdf](std::string const& msg) {
+        throw qpdf.damagedPDF("encryption dictionary", msg);
+    };
+    auto unsupported = [&file](std::string const& msg) -> QPDFExc {
+        return {
+            qpdf_e_unsupported,
+            file->getName(),
+            "encryption dictionary",
+            file->getLastOffset(),
+            msg};
+    };
 
     // After we initialize encryption parameters, we must use stored key information and never look
     // at /Encrypt again.  Otherwise, things could go wrong if someone mutates the encryption
     // dictionary.
 
-    if (!m->trailer.hasKey("/Encrypt")) {
+    if (!trailer.hasKey("/Encrypt")) {
         return;
     }
 
     // Go ahead and set m->encrypted here.  That way, isEncrypted will return true even if there
     // were errors reading the encryption dictionary.
-    m->encp->encrypted = true;
+    encrypted = true;
 
     std::string id1;
-    QPDFObjectHandle id_obj = m->trailer.getKey("/ID");
-    if ((id_obj.isArray() && (id_obj.getArrayNItems() == 2) && id_obj.getArrayItem(0).isString())) {
-        id1 = id_obj.getArrayItem(0).getStringValue();
-    } else {
+    auto id_obj = trailer.getKey("/ID");
+    if (!id_obj.isArray() || id_obj.getArrayNItems() != 2 || !id_obj.getArrayItem(0).isString()) {
         // Treating a missing ID as the empty string enables qpdf to decrypt some invalid encrypted
         // files with no /ID that poppler can read but Adobe Reader can't.
-        warn(damagedPDF("trailer", "invalid /ID in trailer dictionary"));
+        qpdf.warn(qpdf.damagedPDF("trailer", "invalid /ID in trailer dictionary"));
+    } else {
+        id1 = id_obj.getArrayItem(0).getStringValue();
     }
 
-    QPDFObjectHandle encryption_dict = m->trailer.getKey("/Encrypt");
+    auto encryption_dict = trailer.getKey("/Encrypt");
     if (!encryption_dict.isDictionary()) {
-        throw damagedPDF("/Encrypt in trailer dictionary is not a dictionary");
+        throw qpdf.damagedPDF("/Encrypt in trailer dictionary is not a dictionary");
     }
 
     if (!(encryption_dict.getKey("/Filter").isName() &&
           (encryption_dict.getKey("/Filter").getName() == "/Standard"))) {
-        throw QPDFExc(
-            qpdf_e_unsupported,
-            m->file->getName(),
-            "encryption dictionary",
-            m->file->getLastOffset(),
-            "unsupported encryption filter");
+        throw unsupported("unsupported encryption filter");
     }
     if (!encryption_dict.getKey("/SubFilter").isNull()) {
-        warn(
-            qpdf_e_unsupported,
-            "encryption dictionary",
-            m->file->getLastOffset(),
-            "file uses encryption SubFilters, which qpdf does not support");
+        qpdf.warn(unsupported("file uses encryption SubFilters, which qpdf does not support"));
     }
 
     if (!(encryption_dict.getKey("/V").isInteger() && encryption_dict.getKey("/R").isInteger() &&
           encryption_dict.getKey("/O").isString() && encryption_dict.getKey("/U").isString() &&
           encryption_dict.getKey("/P").isInteger())) {
-        throw damagedPDF(
-            "encryption dictionary",
-            "some encryption dictionary parameters are missing or the wrong "
-            "type");
+        throw_damaged_pdf("some encryption dictionary parameters are missing or the wrong type");
     }
 
     int V = encryption_dict.getKey("/V").getIntValueAsInt();
@@ -772,18 +786,15 @@ QPDF::initializeEncryption()
 
     // If supporting new encryption R/V values, remember to update error message inside this if
     // statement.
-    if (!(((R >= 2) && (R <= 6)) && ((V == 1) || (V == 2) || (V == 4) || (V == 5)))) {
-        throw QPDFExc(
-            qpdf_e_unsupported,
-            m->file->getName(),
-            "encryption dictionary",
-            m->file->getLastOffset(),
+    if (!(2 <= R && R <= 6 && (V == 1 || V == 2 || V == 4 || V == 5))) {
+        throw unsupported(
             "Unsupported /R or /V in encryption dictionary; R = " + std::to_string(R) +
-                " (max 6), V = " + std::to_string(V) + " (max 5)");
+            " (max 6), V = " + std::to_string(V) + " (max 5)");
     }
 
-    m->encp->encryption_V = V;
-    m->encp->encryption_R = R;
+    encryption_P = P;
+    encryption_V = V;
+    encryption_R = R;
 
     // OE, UE, and Perms are only present if V >= 5.
     std::string OE;
@@ -794,19 +805,15 @@ QPDF::initializeEncryption()
         // These must be exactly the right number of bytes.
         pad_short_parameter(O, key_bytes);
         pad_short_parameter(U, key_bytes);
-        if (!((O.length() == key_bytes) && (U.length() == key_bytes))) {
-            throw damagedPDF(
-                "encryption dictionary",
-                "incorrect length for /O and/or /U in encryption dictionary");
+        if (!(O.length() == key_bytes && U.length() == key_bytes)) {
+            throw_damaged_pdf("incorrect length for /O and/or /U in encryption dictionary");
         }
     } else {
         if (!(encryption_dict.getKey("/OE").isString() &&
               encryption_dict.getKey("/UE").isString() &&
               encryption_dict.getKey("/Perms").isString())) {
-            throw damagedPDF(
-                "encryption dictionary",
-                "some V=5 encryption dictionary parameters are missing or the "
-                "wrong type");
+            throw_damaged_pdf(
+                "some V=5 encryption dictionary parameters are missing or the wrong type");
         }
         OE = encryption_dict.getKey("/OE").getStringValue();
         UE = encryption_dict.getKey("/UE").getStringValue();
@@ -820,7 +827,7 @@ QPDF::initializeEncryption()
         pad_short_parameter(Perms, Perms_key_bytes_V5);
     }
 
-    int Length = 0;
+    int Length = 128; // Just take a guess.
     if (V <= 1) {
         Length = 40;
     } else if (V == 4) {
@@ -830,25 +837,20 @@ QPDF::initializeEncryption()
     } else {
         if (encryption_dict.getKey("/Length").isInteger()) {
             Length = encryption_dict.getKey("/Length").getIntValueAsInt();
-            if ((Length % 8) || (Length < 40) || (Length > 128)) {
-                Length = 0;
+            if (Length % 8 || Length < 40 || Length > 128) {
+                Length = 128; // Just take a guess.
             }
         }
     }
-    if (Length == 0) {
-        // Still no Length? Just take a guess.
-        Length = 128;
+
+    encrypt_metadata = true;
+    if (V >= 4 && encryption_dict.getKey("/EncryptMetadata").isBool()) {
+        encrypt_metadata = encryption_dict.getKey("/EncryptMetadata").getBoolValue();
     }
 
-    m->encp->encrypt_metadata = true;
-    if ((V >= 4) && (encryption_dict.getKey("/EncryptMetadata").isBool())) {
-        m->encp->encrypt_metadata = encryption_dict.getKey("/EncryptMetadata").getBoolValue();
-    }
-
-    if ((V == 4) || (V == 5)) {
-        QPDFObjectHandle CF = encryption_dict.getKey("/CF");
-        for (auto const& filter: CF.getKeys()) {
-            QPDFObjectHandle cdict = CF.getKey(filter);
+    if (V == 4 || V == 5) {
+        auto CF = encryption_dict.getKey("/CF");
+        for (auto const& [filter, cdict]: CF.as_dictionary()) {
             if (cdict.isDictionary()) {
                 encryption_method_e method = e_none;
                 if (cdict.getKey("/CFM").isName()) {
@@ -867,16 +869,13 @@ QPDF::initializeEncryption()
                         method = e_unknown;
                     }
                 }
-                m->encp->crypt_filters[filter] = method;
+                crypt_filters[filter] = method;
             }
         }
 
-        QPDFObjectHandle StmF = encryption_dict.getKey("/StmF");
-        QPDFObjectHandle StrF = encryption_dict.getKey("/StrF");
-        QPDFObjectHandle EFF = encryption_dict.getKey("/EFF");
-        m->encp->cf_stream = interpretCF(m->encp, StmF);
-        m->encp->cf_string = interpretCF(m->encp, StrF);
-        if (EFF.isName()) {
+        cf_stream = interpretCF(*this, encryption_dict.getKey("/StmF"));
+        cf_string = interpretCF(*this, encryption_dict.getKey("/StrF"));
+        if (auto EFF = encryption_dict.getKey("/EFF"); EFF.isName()) {
             // qpdf does not use this for anything other than informational purposes. This is
             // intended to instruct conforming writers on which crypt filter should be used when new
             // file attachments are added to a PDF file, but qpdf never generates encrypted files
@@ -886,54 +885,50 @@ QPDF::initializeEncryption()
             // the way I was imagining. Still, providing this information could be useful when
             // looking at a file generated by something else, such as Acrobat when specifying that
             // only attachments should be encrypted.
-            m->encp->cf_file = interpretCF(m->encp, EFF);
+            cf_file = interpretCF(*this, EFF);
         } else {
-            m->encp->cf_file = m->encp->cf_stream;
+            cf_file = cf_stream;
         }
     }
 
-    EncryptionData data(V, R, Length / 8, P, O, U, OE, UE, Perms, id1, m->encp->encrypt_metadata);
-    if (m->provided_password_is_hex_key) {
+    EncryptionData data(V, R, Length / 8, P, O, U, OE, UE, Perms, id1, encrypt_metadata);
+    if (qm.provided_password_is_hex_key) {
         // ignore passwords in file
-    } else {
-        m->encp->owner_password_matched =
-            data.check_owner_password(m->encp->user_password, m->encp->provided_password);
-        if (m->encp->owner_password_matched && (V < 5)) {
-            // password supplied was owner password; user_password has been initialized for V < 5
-            if (getTrimmedUserPassword() == m->encp->provided_password) {
-                m->encp->user_password_matched = true;
-                QTC::TC("qpdf", "QPDF_encryption user matches owner V < 5");
-            }
-        } else {
-            m->encp->user_password_matched = data.check_user_password(m->encp->provided_password);
-            if (m->encp->user_password_matched) {
-                m->encp->user_password = m->encp->provided_password;
-            }
-        }
-        if (m->encp->user_password_matched && m->encp->owner_password_matched) {
-            QTC::TC("qpdf", "QPDF_encryption same password", (V < 5) ? 0 : 1);
-        }
-        if (!(m->encp->owner_password_matched || m->encp->user_password_matched)) {
-            throw QPDFExc(qpdf_e_password, m->file->getName(), "", 0, "invalid password");
-        }
+        encryption_key = QUtil::hex_decode(provided_password);
+        return;
     }
 
-    if (m->provided_password_is_hex_key) {
-        m->encp->encryption_key = QUtil::hex_decode(m->encp->provided_password);
-    } else if (V < 5) {
+    owner_password_matched = data.check_owner_password(user_password, provided_password);
+    if (owner_password_matched && V < 5) {
+        // password supplied was owner password; user_password has been initialized for V < 5
+        if (qpdf.getTrimmedUserPassword() == provided_password) {
+            user_password_matched = true;
+            QTC::TC("qpdf", "QPDF_encryption user matches owner V < 5");
+        }
+    } else {
+        user_password_matched = data.check_user_password(provided_password);
+        if (user_password_matched) {
+            user_password = provided_password;
+        }
+    }
+    if (user_password_matched && owner_password_matched) {
+        QTC::TC("qpdf", "QPDF_encryption same password", (V < 5) ? 0 : 1);
+    }
+    if (!(owner_password_matched || user_password_matched)) {
+        throw QPDFExc(qpdf_e_password, file->getName(), "", 0, "invalid password");
+    }
+
+    if (V < 5) {
         // For V < 5, the user password is encrypted with the owner password, and the user password
         // is always used for computing the encryption key.
-        m->encp->encryption_key = compute_encryption_key(m->encp->user_password, data);
+        encryption_key = data.compute_encryption_key(user_password);
     } else {
         // For V >= 5, either password can be used independently to compute the encryption key, and
         // neither password can be used to recover the other.
         bool perms_valid;
-        m->encp->encryption_key =
-            data.recover_encryption_key_with_password(m->encp->provided_password, perms_valid);
+        encryption_key = data.recover_encryption_key_with_password(provided_password, perms_valid);
         if (!perms_valid) {
-            warn(damagedPDF(
-                "encryption dictionary",
-                "/Perms field in encryption dictionary doesn't match expected value"));
+            warn_damaged_pdf("/Perms field in encryption dictionary doesn't match expected value");
         }
     }
 }
@@ -1057,7 +1052,7 @@ QPDF::decryptStream(
                 QPDFObjectHandle decode_parms = stream_dict.getKey("/DecodeParms");
                 if (decode_parms.isDictionaryOfType("/CryptFilterDecodeParms")) {
                     QTC::TC("qpdf", "QPDF_encryption stream crypt filter");
-                    method = interpretCF(encp, decode_parms.getKey("/Name"));
+                    method = interpretCF(*encp, decode_parms.getKey("/Name"));
                     method_source = "stream's Crypt decode parameters";
                 }
             } else if (
@@ -1072,7 +1067,7 @@ QPDF::decryptStream(
                             if (crypt_params.isDictionary() &&
                                 crypt_params.getKey("/Name").isName()) {
                                 QTC::TC("qpdf", "QPDF_encrypt crypt array");
-                                method = interpretCF(encp, crypt_params.getKey("/Name"));
+                                method = interpretCF(*encp, crypt_params.getKey("/Name"));
                                 method_source = "stream's Crypt decode parameters (array)";
                             }
                         }
