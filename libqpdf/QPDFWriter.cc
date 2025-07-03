@@ -992,18 +992,9 @@ QPDFWriter::pushEncryptionFilter(PipelinePopper& pp)
     if (m->encrypted && (!m->cur_data_key.empty())) {
         Pipeline* p = nullptr;
         if (m->encrypt_use_aes) {
-            p = new Pl_AES_PDF(
-                "aes stream encryption",
-                m->pipeline,
-                true,
-                QUtil::unsigned_char_pointer(m->cur_data_key),
-                m->cur_data_key.length());
+            p = new Pl_AES_PDF("aes stream encryption", m->pipeline, true, m->cur_data_key);
         } else {
-            p = new Pl_RC4(
-                "rc4 stream encryption",
-                m->pipeline,
-                QUtil::unsigned_char_pointer(m->cur_data_key),
-                QIntC::to_int(m->cur_data_key.length()));
+            p = new Pl_RC4("rc4 stream encryption", m->pipeline, m->cur_data_key);
         }
         pushPipeline(p);
     }
@@ -1591,20 +1582,11 @@ QPDFWriter::unparseObject(
         writeString("endstream");
     } else if (tc == ::ot_string) {
         std::string val;
-        if (m->encrypted && (!(flags & f_in_ostream)) && (!(flags & f_no_encryption)) &&
-            (!m->cur_data_key.empty())) {
+        if (m->encrypted && !(flags & f_in_ostream) && !(flags & f_no_encryption) &&
+            !m->cur_data_key.empty()) {
             val = object.getStringValue();
             if (m->encrypt_use_aes) {
-                Pl_Buffer bufpl("encrypted string");
-                Pl_AES_PDF pl(
-                    "aes encrypt string",
-                    &bufpl,
-                    true,
-                    QUtil::unsigned_char_pointer(m->cur_data_key),
-                    m->cur_data_key.length());
-                pl.writeString(val);
-                pl.finish();
-                val = QPDF_String(bufpl.getString()).unparse(true);
+                val = QPDF_String(Pl_AES_PDF::encrypt(m->cur_data_key, val)).unparse(true);
             } else {
                 auto tmp_ph = QUtil::make_unique_cstr(val);
                 char* tmp = tmp_ph.get();

@@ -8,6 +8,7 @@
 #include <qpdf/QPDFExc.hh>
 
 #include <qpdf/MD5.hh>
+#include <qpdf/Pipeline_private.hh>
 #include <qpdf/Pl_AES_PDF.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_RC4.hh>
@@ -18,6 +19,8 @@
 
 #include <algorithm>
 #include <cstring>
+
+using namespace qpdf;
 
 static unsigned char const padding_string[] = {
     0x28, 0xbf, 0x4e, 0x5e, 0x4e, 0x75, 0x8a, 0x41, 0x64, 0x00, 0x4e, 0x56, 0xff, 0xfa, 0x01, 0x08,
@@ -207,36 +210,6 @@ iterate_rc4(
 }
 
 static std::string
-process_with_aes(
-    std::string const& key,
-    bool encrypt,
-    std::string const& data,
-    size_t outlength = 0,
-    unsigned int repetitions = 1,
-    unsigned char const* iv = nullptr,
-    size_t iv_length = 0)
-{
-    Pl_Buffer buffer("buffer");
-    Pl_AES_PDF aes(
-        "aes", &buffer, encrypt, QUtil::unsigned_char_pointer(key), QIntC::to_uint(key.length()));
-    if (iv) {
-        aes.setIV(iv, iv_length);
-    } else {
-        aes.useZeroIV();
-    }
-    aes.disablePadding();
-    for (unsigned int i = 0; i < repetitions; ++i) {
-        aes.writeString(data);
-    }
-    aes.finish();
-    if (outlength == 0) {
-        return buffer.getString();
-    } else {
-        return buffer.getString().substr(0, outlength);
-    }
-}
-
-static std::string
 hash_V5(
     std::string const& password,
     std::string const& salt,
@@ -272,16 +245,14 @@ hash_V5(
             // terminated repetition.
 
             ++round_number;
-            std::string K1 = password + K + udata;
+            std::string K1;
+            K1.reserve(64 * (password.size() + K.size() + udata.size()));
+            K1.append(password).append(K).append(udata);
+            for (int i = 0; i < 6; ++i) {
+                K1.append(K1);
+            }
             qpdf_assert_debug(K.length() >= 32);
-            std::string E = process_with_aes(
-                K.substr(0, 16),
-                true,
-                K1,
-                0,
-                64,
-                QUtil::unsigned_char_pointer(K.substr(16, 16)),
-                16);
+            std::string E = Pl_AES_PDF::encrypt(K.substr(0, 16), K1, true, K.substr(16, 16));
 
             // E_mod_3 is supposed to be mod 3 of the first 16 bytes of E taken as as a (128-bit)
             // big-endian number.  Since (xy mod n) is equal to ((x mod n) + (y mod n)) mod n and
@@ -612,7 +583,7 @@ compute_U_UE_value_V5(
     std::string key_salt(k + 8, 8);
     U = hash_V5(user_password, validation_salt, "", data) + validation_salt + key_salt;
     std::string intermediate_key = hash_V5(user_password, key_salt, "", data);
-    UE = process_with_aes(intermediate_key, true, encryption_key);
+    UE = Pl_AES_PDF::encrypt(intermediate_key, encryption_key, true);
 }
 
 static void
@@ -631,7 +602,7 @@ compute_O_OE_value_V5(
     std::string key_salt(k + 8, 8);
     O = hash_V5(owner_password, validation_salt, U, data) + validation_salt + key_salt;
     std::string intermediate_key = hash_V5(owner_password, key_salt, U, data);
-    OE = process_with_aes(intermediate_key, true, encryption_key);
+    OE = Pl_AES_PDF::encrypt(intermediate_key, encryption_key, true);
 }
 
 void
@@ -658,8 +629,8 @@ compute_Perms_value_V5(std::string const& encryption_key, QPDF::EncryptionData c
     // Algorithm 3.10 from the PDF 1.7 extension level 3
     unsigned char k[16];
     compute_Perms_value_V5_clear(encryption_key, data, k);
-    return process_with_aes(
-        encryption_key, true, std::string(reinterpret_cast<char*>(k), sizeof(k)));
+    return Pl_AES_PDF::encrypt(
+        encryption_key, std::string(reinterpret_cast<char*>(k), sizeof(k)), true);
 }
 
 std::string
@@ -686,10 +657,10 @@ QPDF::recover_encryption_key_with_password(
         encrypted_file_key = data.getUE().substr(0, 32);
     }
     std::string intermediate_key = hash_V5(key_password, key_salt, user_data, data);
-    std::string file_key = process_with_aes(intermediate_key, false, encrypted_file_key);
+    std::string file_key = Pl_AES_PDF::decrypt(intermediate_key, encrypted_file_key, true);
 
     // Decrypt Perms and check against expected value
-    std::string perms_check = process_with_aes(file_key, false, data.getPerms(), 12);
+    auto perms_check = Pl_AES_PDF::decrypt(file_key, data.getPerms(), true).substr(0, 12);
     unsigned char k[16];
     compute_Perms_value_V5_clear(file_key, data, k);
     perms_valid = (memcmp(perms_check.c_str(), k, 12) == 0);
@@ -1010,16 +981,7 @@ QPDF::decryptString(std::string& str, QPDFObjGen og)
     try {
         if (use_aes) {
             QTC::TC("qpdf", "QPDF_encryption aes decode string");
-            Pl_Buffer bufpl("decrypted string");
-            Pl_AES_PDF pl(
-                "aes decrypt string",
-                &bufpl,
-                false,
-                QUtil::unsigned_char_pointer(key),
-                key.length());
-            pl.writeString(str);
-            pl.finish();
-            str = bufpl.getString();
+            str = Pl_AES_PDF::decrypt(key, str, false);
         } else {
             QTC::TC("qpdf", "QPDF_encryption rc4 decode string");
             size_t vlen = str.length();
@@ -1137,19 +1099,11 @@ QPDF::decryptStream(
     std::string key = getKeyForObject(encp, og, use_aes);
     if (use_aes) {
         QTC::TC("qpdf", "QPDF_encryption aes decode stream");
-        decrypt_pipeline = std::make_unique<Pl_AES_PDF>(
-            "AES stream decryption",
-            pipeline,
-            false,
-            QUtil::unsigned_char_pointer(key),
-            key.length());
+        decrypt_pipeline =
+            std::make_unique<Pl_AES_PDF>("AES stream decryption", pipeline, false, key);
     } else {
         QTC::TC("qpdf", "QPDF_encryption rc4 decode stream");
-        decrypt_pipeline = std::make_unique<Pl_RC4>(
-            "RC4 stream decryption",
-            pipeline,
-            QUtil::unsigned_char_pointer(key),
-            toI(key.length()));
+        decrypt_pipeline = std::make_unique<Pl_RC4>("RC4 stream decryption", pipeline, key);
     }
     pipeline = decrypt_pipeline.get();
 }
