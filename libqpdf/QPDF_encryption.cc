@@ -1236,9 +1236,12 @@ QPDF::isEncrypted() const
 bool
 QPDF::isEncrypted(int& R, int& P)
 {
-    int V;
-    encryption_method_e stream, string, file;
-    return isEncrypted(R, P, V, stream, string, file);
+    if (!m->encp->encrypted) {
+        return false;
+    }
+    P = m->encp->encryption_P;
+    R = m->encp->encryption_R;
+    return true;
 }
 
 bool
@@ -1250,22 +1253,16 @@ QPDF::isEncrypted(
     encryption_method_e& string_method,
     encryption_method_e& file_method)
 {
-    if (m->encp->encrypted) {
-        QPDFObjectHandle trailer = getTrailer();
-        QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
-        QPDFObjectHandle Pkey = encrypt.getKey("/P");
-        QPDFObjectHandle Rkey = encrypt.getKey("/R");
-        QPDFObjectHandle Vkey = encrypt.getKey("/V");
-        P = static_cast<int>(Pkey.getIntValue());
-        R = Rkey.getIntValueAsInt();
-        V = Vkey.getIntValueAsInt();
-        stream_method = m->encp->cf_stream;
-        string_method = m->encp->cf_string;
-        file_method = m->encp->cf_file;
-        return true;
-    } else {
+    if (!m->encp->encrypted) {
         return false;
     }
+    P = m->encp->encryption_P;
+    R = m->encp->encryption_R;
+    V = m->encp->encryption_V;
+    stream_method = m->encp->cf_stream;
+    string_method = m->encp->cf_string;
+    file_method = m->encp->cf_file;
+    return true;
 }
 
 bool
