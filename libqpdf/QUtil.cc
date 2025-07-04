@@ -2,6 +2,7 @@
 #include <qpdf/qpdf-config.h>
 
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 
 #include <qpdf/CryptoRandomDataProvider.hh>
 #include <qpdf/Pipeline.hh>
@@ -1129,6 +1130,14 @@ void
 QUtil::initializeWithRandomBytes(unsigned char* data, size_t len)
 {
     getRandomDataProvider()->provideRandomData(data, len);
+}
+
+std::string
+util::random_string(size_t len)
+{
+    std::string result(len, '\0');
+    QUtil::initializeWithRandomBytes(reinterpret_cast<unsigned char*>(result.data()), len);
+    return result;
 }
 
 long

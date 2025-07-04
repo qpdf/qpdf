@@ -59,6 +59,8 @@ namespace qpdf::util
         s.insert(0, 1, '1');
     }
 
+    std::string random_string(size_t len);
+
 } // namespace qpdf::util
 
 #endif // UTIL_HH

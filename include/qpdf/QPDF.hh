@@ -552,8 +552,7 @@ class QPDF
         bool check_owner_password_V4(
             std::string& user_password, std::string const& owner_password) const;
         bool check_owner_password_V5(std::string const& owner_passworda) const;
-        void
-        compute_Perms_value_V5_clear(std::string const& encryption_key, unsigned char k[16]) const;
+        std::string compute_Perms_value_V5_clear() const;
         void compute_O_rc4_key(
             std::string const& user_password,
             std::string const& owner_password,

@@ -16,9 +16,12 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/RC4.hh>
+#include <qpdf/Util.hh>
 
 #include <algorithm>
 #include <cstring>
+
+using namespace qpdf;
 
 static unsigned char const padding_string[] = {
     0x28, 0xbf, 0x4e, 0x5e, 0x4e, 0x75, 0x8a, 0x41, 0x64, 0x00, 0x4e, 0x56, 0xff, 0xfa, 0x01, 0x08,
@@ -617,12 +620,10 @@ QPDF::EncryptionData::compute_U_UE_value_V5(
     std::string& out_UE) const
 {
     // Algorithm 3.8 from the PDF 1.7 extension level 3
-    char k[16];
-    QUtil::initializeWithRandomBytes(reinterpret_cast<unsigned char*>(k), sizeof(k));
-    std::string validation_salt(k, 8);
-    std::string key_salt(k + 8, 8);
-    out_U = hash_V5(user_password, validation_salt, "") + validation_salt + key_salt;
-    std::string intermediate_key = hash_V5(user_password, key_salt, "");
+    auto validation_salt = util::random_string(8);
+    auto key_salt = util::random_string(8);
+    out_U = hash_V5(user_password, validation_salt, "").append(validation_salt).append(key_salt);
+    auto intermediate_key = hash_V5(user_password, key_salt, "");
     out_UE = process_with_aes(intermediate_key, true, encryption_key);
 }
 
@@ -635,41 +636,35 @@ QPDF::EncryptionData::compute_O_OE_value_V5(
     std::string& out_OE) const
 {
     // Algorithm 3.9 from the PDF 1.7 extension level 3
-    char k[16];
-    QUtil::initializeWithRandomBytes(reinterpret_cast<unsigned char*>(k), sizeof(k));
-    std::string validation_salt(k, 8);
-    std::string key_salt(k + 8, 8);
+    auto validation_salt = util::random_string(8);
+    auto key_salt = util::random_string(8);
     out_O = hash_V5(owner_password, validation_salt, in_U) + validation_salt + key_salt;
     std::string intermediate_key = hash_V5(owner_password, key_salt, in_U);
     out_OE = process_with_aes(intermediate_key, true, encryption_key);
 }
 
-void
-QPDF::EncryptionData::compute_Perms_value_V5_clear(
-    std::string const& encryption_key, unsigned char k[16]) const
+std::string
+QPDF::EncryptionData::compute_Perms_value_V5_clear() const
 {
     // From algorithm 3.10 from the PDF 1.7 extension level 3
-    unsigned long long extended_perms =
-        0xffffffff00000000LL | static_cast<unsigned long long>(getP());
-    for (int i = 0; i < 8; ++i) {
-        k[i] = static_cast<unsigned char>(extended_perms & 0xff);
-        extended_perms >>= 8;
+    std::string k = "    \xff\xff\xff\xffTadb    ";
+    int perms = getP();
+    for (size_t i = 0; i < 4; ++i) {
+        k[i] = static_cast<char>(perms & 0xff);
+        perms >>= 8;
     }
-    k[8] = getEncryptMetadata() ? 'T' : 'F';
-    k[9] = 'a';
-    k[10] = 'd';
-    k[11] = 'b';
-    QUtil::initializeWithRandomBytes(k + 12, 4);
+    if (!getEncryptMetadata()) {
+        k[8] = 'F';
+    }
+    QUtil::initializeWithRandomBytes(reinterpret_cast<unsigned char*>(&k[12]), 4);
+    return k;
 }
 
 std::string
 QPDF::EncryptionData::compute_Perms_value_V5(std::string const& encryption_key) const
 {
     // Algorithm 3.10 from the PDF 1.7 extension level 3
-    unsigned char k[16];
-    compute_Perms_value_V5_clear(encryption_key, k);
-    return process_with_aes(
-        encryption_key, true, std::string(reinterpret_cast<char*>(k), sizeof(k)));
+    return process_with_aes(encryption_key, true, compute_Perms_value_V5_clear());
 }
 
 std::string
@@ -700,10 +695,7 @@ QPDF::EncryptionData::recover_encryption_key_with_password(
 
     // Decrypt Perms and check against expected value
     auto perms_check = process_with_aes(file_key, false, getPerms()).substr(0, 12);
-    unsigned char k[16];
-    compute_Perms_value_V5_clear(file_key, k);
-    perms_valid = (memcmp(perms_check.c_str(), k, 12) == 0);
-
+    perms_valid = compute_Perms_value_V5_clear().substr(0, 12) == perms_check;
     return file_key;
 }
 
@@ -1214,9 +1206,7 @@ QPDF::EncryptionData::compute_encryption_parameters_V5(
     std::string& out_UE,
     std::string& out_Perms)
 {
-    unsigned char k[key_bytes];
-    QUtil::initializeWithRandomBytes(k, key_bytes);
-    out_encryption_key = std::string(reinterpret_cast<char*>(k), key_bytes);
+    out_encryption_key = util::random_string(key_bytes);
     compute_U_UE_value_V5(user_password, out_encryption_key, out_U, out_UE);
     compute_O_OE_value_V5(owner_password, out_encryption_key, out_U, out_O, out_OE);
     out_Perms = compute_Perms_value_V5(out_encryption_key);
