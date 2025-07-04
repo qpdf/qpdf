@@ -497,9 +497,67 @@ class QPDF
             std::string const& UE,
             std::string const& Perms);
 
+        std::string compute_encryption_key(std::string const& password) const;
+
+        bool
+        check_owner_password(std::string& user_password, std::string const& owner_password) const;
+
+        bool check_user_password(std::string const& user_password) const;
+
+        std::string
+        recover_encryption_key_with_password(std::string const& password, bool& perms_valid) const;
+
+        void compute_encryption_O_U(
+            char const* user_password, char const* owner_password, std::string& O, std::string& U);
+
+        void compute_encryption_parameters_V5(
+            char const* user_password,
+            char const* owner_password,
+            std::string& encryption_key,
+            std::string& O,
+            std::string& U,
+            std::string& OE,
+            std::string& UE,
+            std::string& Perms);
+
       private:
+        static constexpr unsigned int OU_key_bytes_V4 = 16; // ( == sizeof(MD5::Digest)
+
         EncryptionData(EncryptionData const&) = delete;
         EncryptionData& operator=(EncryptionData const&) = delete;
+
+        std::string hash_V5(
+            std::string const& password, std::string const& salt, std::string const& udata) const;
+        std::string compute_Perms_value_V5(std::string const& encryption_key) const;
+        std::string
+        compute_O_value(std::string const& user_password, std::string const& owner_password) const;
+        std::string compute_U_value(std::string const& user_password) const;
+        void compute_O_OE_value_V5(
+            std::string const& owner_password,
+            std::string const& encryption_key,
+            std::string const& U,
+            std::string& O,
+            std::string& OE) const;
+        void compute_U_UE_value_V5(
+            std::string const& user_password,
+            std::string const& encryption_key,
+            std::string& U,
+            std::string& UE) const;
+        std::string compute_encryption_key_from_password(std::string const& password) const;
+        std::string recover_encryption_key_with_password(std::string const& password) const;
+        bool check_owner_password_V4(
+            std::string& user_password, std::string const& owner_password) const;
+        bool check_owner_password_V5(std::string const& owner_passworda) const;
+        void
+        compute_Perms_value_V5_clear(std::string const& encryption_key, unsigned char k[16]) const;
+        void compute_O_rc4_key(
+            std::string const& user_password,
+            std::string const& owner_password,
+            unsigned char key[OU_key_bytes_V4]) const;
+        std::string compute_U_value_R2(std::string const& user_password) const;
+        std::string compute_U_value_R3(std::string const& user_password) const;
+        bool check_user_password_V4(std::string const& user_password) const;
+        bool check_user_password_V5(std::string const& user_password) const;
 
         int V;
         int R;
@@ -912,12 +970,6 @@ class QPDF
     static std::string
     getKeyForObject(std::shared_ptr<EncryptionParameters> encp, QPDFObjGen og, bool use_aes);
     void decryptString(std::string&, QPDFObjGen og);
-    static std::string
-    compute_encryption_key_from_password(std::string const& password, EncryptionData const& data);
-    static std::string
-    recover_encryption_key_with_password(std::string const& password, EncryptionData const& data);
-    static std::string recover_encryption_key_with_password(
-        std::string const& password, EncryptionData const& data, bool& perms_valid);
     static void decryptStream(
         std::shared_ptr<EncryptionParameters> encp,
         std::shared_ptr<InputSource> file,
