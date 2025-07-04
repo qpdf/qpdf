@@ -612,37 +612,6 @@ QPDF::EncryptionData::recover_encryption_key_with_password(std::string const& pa
     return recover_encryption_key_with_password(password, disregard);
 }
 
-void
-QPDF::EncryptionData::compute_U_UE_value_V5(
-    std::string const& user_password,
-    std::string const& encryption_key,
-    std::string& out_U,
-    std::string& out_UE) const
-{
-    // Algorithm 3.8 from the PDF 1.7 extension level 3
-    auto validation_salt = util::random_string(8);
-    auto key_salt = util::random_string(8);
-    out_U = hash_V5(user_password, validation_salt, "").append(validation_salt).append(key_salt);
-    auto intermediate_key = hash_V5(user_password, key_salt, "");
-    out_UE = process_with_aes(intermediate_key, true, encryption_key);
-}
-
-void
-QPDF::EncryptionData::compute_O_OE_value_V5(
-    std::string const& owner_password,
-    std::string const& encryption_key,
-    std::string const& in_U,
-    std::string& out_O,
-    std::string& out_OE) const
-{
-    // Algorithm 3.9 from the PDF 1.7 extension level 3
-    auto validation_salt = util::random_string(8);
-    auto key_salt = util::random_string(8);
-    out_O = hash_V5(owner_password, validation_salt, in_U) + validation_salt + key_salt;
-    std::string intermediate_key = hash_V5(owner_password, key_salt, in_U);
-    out_OE = process_with_aes(intermediate_key, true, encryption_key);
-}
-
 std::string
 QPDF::EncryptionData::compute_Perms_value_V5_clear() const
 {
@@ -658,13 +627,6 @@ QPDF::EncryptionData::compute_Perms_value_V5_clear() const
     }
     QUtil::initializeWithRandomBytes(reinterpret_cast<unsigned char*>(&k[12]), 4);
     return k;
-}
-
-std::string
-QPDF::EncryptionData::compute_Perms_value_V5(std::string const& encryption_key) const
-{
-    // Algorithm 3.10 from the PDF 1.7 extension level 3
-    return process_with_aes(encryption_key, true, compute_Perms_value_V5_clear());
 }
 
 std::string
@@ -1207,9 +1169,20 @@ QPDF::EncryptionData::compute_encryption_parameters_V5(
     std::string& out_Perms)
 {
     out_encryption_key = util::random_string(key_bytes);
-    compute_U_UE_value_V5(user_password, out_encryption_key, out_U, out_UE);
-    compute_O_OE_value_V5(owner_password, out_encryption_key, out_U, out_O, out_OE);
-    out_Perms = compute_Perms_value_V5(out_encryption_key);
+    // Algorithm 8 from the PDF 2.0
+    auto validation_salt = util::random_string(8);
+    auto key_salt = util::random_string(8);
+    out_U = hash_V5(user_password, validation_salt, "").append(validation_salt).append(key_salt);
+    auto intermediate_key = hash_V5(user_password, key_salt, "");
+    out_UE = process_with_aes(intermediate_key, true, out_encryption_key);
+    // Algorithm 9 from the PDF 2.0
+    validation_salt = util::random_string(8);
+    key_salt = util::random_string(8);
+    out_O = hash_V5(owner_password, validation_salt, out_U) + validation_salt + key_salt;
+    intermediate_key = hash_V5(owner_password, key_salt, out_U);
+    out_OE = process_with_aes(intermediate_key, true, out_encryption_key);
+    // Algorithm 10 from the PDF 2.0
+    out_Perms = process_with_aes(out_encryption_key, true, compute_Perms_value_V5_clear());
     setV5EncryptionParameters(out_O, out_OE, out_U, out_UE, out_Perms);
 }
 

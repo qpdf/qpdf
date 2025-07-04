@@ -532,21 +532,9 @@ class QPDF
 
         std::string hash_V5(
             std::string const& password, std::string const& salt, std::string const& udata) const;
-        std::string compute_Perms_value_V5(std::string const& encryption_key) const;
         std::string
         compute_O_value(std::string const& user_password, std::string const& owner_password) const;
         std::string compute_U_value(std::string const& user_password) const;
-        void compute_O_OE_value_V5(
-            std::string const& owner_password,
-            std::string const& encryption_key,
-            std::string const& U,
-            std::string& O,
-            std::string& OE) const;
-        void compute_U_UE_value_V5(
-            std::string const& user_password,
-            std::string const& encryption_key,
-            std::string& U,
-            std::string& UE) const;
         std::string compute_encryption_key_from_password(std::string const& password) const;
         std::string recover_encryption_key_with_password(std::string const& password) const;
         bool check_owner_password_V4(
