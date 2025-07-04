@@ -187,8 +187,11 @@ class QPDF::EncryptionParameters
   public:
     EncryptionParameters() = default;
 
+    encryption_method_e interpretCF(QPDFObjectHandle const& cf) const;
+
   private:
     void initialize(QPDF& qpdf);
+
     bool encrypted{false};
     bool encryption_initialized{false};
     int encryption_P{0};
