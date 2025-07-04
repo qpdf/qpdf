@@ -511,18 +511,12 @@ class QPDF
         std::string
         recover_encryption_key_with_password(std::string const& password, bool& perms_valid) const;
 
-        void compute_encryption_O_U(
-            char const* user_password, char const* owner_password, std::string& O, std::string& U);
+        void compute_encryption_O_U(char const* user_password, char const* owner_password);
 
-        void compute_encryption_parameters_V5(
-            char const* user_password,
-            char const* owner_password,
-            std::string& encryption_key,
-            std::string& O,
-            std::string& U,
-            std::string& OE,
-            std::string& UE,
-            std::string& Perms);
+        std::string
+        compute_encryption_parameters_V5(char const* user_password, char const* owner_password);
+
+        std::string compute_parameters(char const* user_password, char const* owner_password);
 
       private:
         static constexpr unsigned int OU_key_bytes_V4 = 16; // ( == sizeof(MD5::Digest)

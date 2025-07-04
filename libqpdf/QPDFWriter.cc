@@ -619,34 +619,22 @@ QPDFWriter::setEncryptionParameters(
     P = ~P;
 
     generateID();
-    std::string O;
-    std::string U;
-    std::string OE;
-    std::string UE;
-    std::string Perms;
-    std::string encryption_key;
-    if (V < 5) {
-        QPDF::compute_encryption_O_U(
-            user_password, owner_password, V, R, key_len, P, m->encrypt_metadata, m->id1, O, U);
-    } else {
-        QPDF::compute_encryption_parameters_V5(
-            user_password,
-            owner_password,
-            V,
-            R,
-            key_len,
-            P,
-            m->encrypt_metadata,
-            m->id1,
-            encryption_key,
-            O,
-            U,
-            OE,
-            UE,
-            Perms);
-    }
+    QPDF::EncryptionData encryption_data(
+        V, R, key_len, P, "", "", "", "", "", m->id1, m->encrypt_metadata);
+    auto encryption_key = encryption_data.compute_parameters(user_password, owner_password);
     setEncryptionParametersInternal(
-        V, R, key_len, P, O, U, OE, UE, Perms, m->id1, user_password, encryption_key);
+        V,
+        R,
+        key_len,
+        P,
+        encryption_data.getO(),
+        encryption_data.getU(),
+        encryption_data.getOE(),
+        encryption_data.getUE(),
+        encryption_data.getPerms(),
+        m->id1,
+        user_password,
+        encryption_key);
 }
 
 void

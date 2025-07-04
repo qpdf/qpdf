@@ -1116,23 +1116,23 @@ QPDF::compute_encryption_O_U(
     int P,
     bool encrypt_metadata,
     std::string const& id1,
-    std::string& O,
-    std::string& U)
+    std::string& out_O,
+    std::string& out_U)
 {
-    EncryptionData(V, R, key_len, P, "", "", "", "", "", id1, encrypt_metadata)
-        .compute_encryption_O_U(user_password, owner_password, O, U);
+    EncryptionData data(V, R, key_len, P, "", "", "", "", "", id1, encrypt_metadata);
+    data.compute_encryption_O_U(user_password, owner_password);
+    out_O = data.getO();
+    out_U = data.getU();
 }
 
 void
-QPDF::EncryptionData::compute_encryption_O_U(
-    char const* user_password, char const* owner_password, std::string& out_O, std::string& out_U)
+QPDF::EncryptionData::compute_encryption_O_U(char const* user_password, char const* owner_password)
 {
     if (V >= 5) {
         throw std::logic_error("compute_encryption_O_U called for file with V >= 5");
     }
-    setO(compute_O_value(user_password, owner_password));
-    out_O = getO();
-    out_U = compute_U_value(user_password);
+    O = compute_O_value(user_password, owner_password);
+    U = compute_U_value(user_password);
 }
 
 void
@@ -1146,44 +1146,53 @@ QPDF::compute_encryption_parameters_V5(
     bool encrypt_metadata,
     std::string const& id1,
     std::string& encryption_key,
-    std::string& O,
-    std::string& U,
-    std::string& OE,
-    std::string& UE,
-    std::string& Perms)
-{
-    EncryptionData(V, R, key_len, P, "", "", "", "", "", id1, encrypt_metadata)
-        .compute_encryption_parameters_V5(
-            user_password, owner_password, encryption_key, O, U, OE, UE, Perms);
-}
-
-void
-QPDF::EncryptionData::compute_encryption_parameters_V5(
-    char const* user_password,
-    char const* owner_password,
-    std::string& out_encryption_key,
     std::string& out_O,
     std::string& out_U,
     std::string& out_OE,
     std::string& out_UE,
     std::string& out_Perms)
 {
-    out_encryption_key = util::random_string(key_bytes);
+    EncryptionData data(V, R, key_len, P, "", "", "", "", "", id1, encrypt_metadata);
+    encryption_key = data.compute_encryption_parameters_V5(user_password, owner_password);
+
+    out_O = data.getO();
+    out_U = data.getU();
+    out_OE = data.getOE();
+    out_UE = data.getUE();
+    out_Perms = data.getPerms();
+}
+
+std::string
+QPDF::EncryptionData::compute_encryption_parameters_V5(
+    char const* user_password, char const* owner_password)
+{
+    auto out_encryption_key = util::random_string(key_bytes);
     // Algorithm 8 from the PDF 2.0
     auto validation_salt = util::random_string(8);
     auto key_salt = util::random_string(8);
-    out_U = hash_V5(user_password, validation_salt, "").append(validation_salt).append(key_salt);
+    U = hash_V5(user_password, validation_salt, "").append(validation_salt).append(key_salt);
     auto intermediate_key = hash_V5(user_password, key_salt, "");
-    out_UE = process_with_aes(intermediate_key, true, out_encryption_key);
+    UE = process_with_aes(intermediate_key, true, out_encryption_key);
     // Algorithm 9 from the PDF 2.0
     validation_salt = util::random_string(8);
     key_salt = util::random_string(8);
-    out_O = hash_V5(owner_password, validation_salt, out_U) + validation_salt + key_salt;
-    intermediate_key = hash_V5(owner_password, key_salt, out_U);
-    out_OE = process_with_aes(intermediate_key, true, out_encryption_key);
+    O = hash_V5(owner_password, validation_salt, U) + validation_salt + key_salt;
+    intermediate_key = hash_V5(owner_password, key_salt, U);
+    OE = process_with_aes(intermediate_key, true, out_encryption_key);
     // Algorithm 10 from the PDF 2.0
-    out_Perms = process_with_aes(out_encryption_key, true, compute_Perms_value_V5_clear());
-    setV5EncryptionParameters(out_O, out_OE, out_U, out_UE, out_Perms);
+    Perms = process_with_aes(out_encryption_key, true, compute_Perms_value_V5_clear());
+    return out_encryption_key;
+}
+
+std::string
+QPDF::EncryptionData::compute_parameters(char const* user_password, char const* owner_password)
+{
+    if (V < 5) {
+        compute_encryption_O_U(user_password, owner_password);
+        return {};
+    } else {
+        return compute_encryption_parameters_V5(user_password, owner_password);
+    }
 }
 
 std::string const&
