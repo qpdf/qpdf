@@ -50,6 +50,93 @@ QPDFWriter::FunctionProgressReporter::reportProgress(int progress)
     this->handler(progress);
 }
 
+class QPDFWriter::Members
+{
+    friend class QPDFWriter;
+
+  public:
+    ~Members();
+
+  private:
+    Members(QPDF& pdf);
+    Members(Members const&) = delete;
+
+    QPDF& pdf;
+    QPDFObjGen root_og{-1, 0};
+    char const* filename{"unspecified"};
+    FILE* file{nullptr};
+    bool close_file{false};
+    Pl_Buffer* buffer_pipeline{nullptr};
+    Buffer* output_buffer{nullptr};
+    bool normalize_content_set{false};
+    bool normalize_content{false};
+    bool compress_streams{true};
+    bool compress_streams_set{false};
+    qpdf_stream_decode_level_e stream_decode_level{qpdf_dl_generalized};
+    bool stream_decode_level_set{false};
+    bool recompress_flate{false};
+    bool qdf_mode{false};
+    bool preserve_unreferenced_objects{false};
+    bool newline_before_endstream{false};
+    bool static_id{false};
+    bool suppress_original_object_ids{false};
+    bool direct_stream_lengths{true};
+    bool encrypted{false};
+    bool preserve_encryption{true};
+    bool linearized{false};
+    bool pclm{false};
+    qpdf_object_stream_e object_stream_mode{qpdf_o_preserve};
+
+    std::unique_ptr<QPDF::EncryptionData> encryption;
+    std::string encryption_key;
+    bool encrypt_metadata{true};
+    bool encrypt_use_aes{false};
+    std::map<std::string, std::string> encryption_dictionary;
+
+    std::string id1; // for /ID key of
+    std::string id2; // trailer dictionary
+    std::string final_pdf_version;
+    int final_extension_level{0};
+    std::string min_pdf_version;
+    int min_extension_level{0};
+    std::string forced_pdf_version;
+    int forced_extension_level{0};
+    std::string extra_header_text;
+    int encryption_dict_objid{0};
+    std::string cur_data_key;
+    std::list<std::shared_ptr<Pipeline>> to_delete;
+    qpdf::pl::Count* pipeline{nullptr};
+    std::vector<QPDFObjectHandle> object_queue;
+    size_t object_queue_front{0};
+    QPDFWriter::ObjTable obj;
+    QPDFWriter::NewObjTable new_obj;
+    int next_objid{1};
+    int cur_stream_length_id{0};
+    size_t cur_stream_length{0};
+    bool added_newline{false};
+    size_t max_ostream_index{0};
+    std::set<QPDFObjGen> normalized_streams;
+    std::map<QPDFObjGen, int> page_object_to_seq;
+    std::map<QPDFObjGen, int> contents_to_page_seq;
+    std::map<int, std::vector<QPDFObjGen>> object_stream_to_objects;
+    std::vector<Pipeline*> pipeline_stack;
+    unsigned long next_stack_id{2};
+    std::string count_buffer;
+    bool deterministic_id{false};
+    Pl_MD5* md5_pipeline{nullptr};
+    std::string deterministic_id_data;
+    bool did_write_setup{false};
+
+    // For linearization only
+    std::string lin_pass1_filename;
+
+    // For progress reporting
+    std::shared_ptr<QPDFWriter::ProgressReporter> progress_reporter;
+    int events_expected{0};
+    int events_seen{0};
+    int next_progress_report{0};
+};
+
 QPDFWriter::Members::Members(QPDF& pdf) :
     pdf(pdf),
     root_og(pdf.getRoot().getObjGen().isIndirect() ? pdf.getRoot().getObjGen() : QPDFObjGen(-1, 0))
@@ -619,22 +706,10 @@ QPDFWriter::setEncryptionParameters(
     P = ~P;
 
     generateID();
-    QPDF::EncryptionData encryption_data(
+    m->encryption = std::make_unique<QPDF::EncryptionData>(
         V, R, key_len, P, "", "", "", "", "", m->id1, m->encrypt_metadata);
-    auto encryption_key = encryption_data.compute_parameters(user_password, owner_password);
-    setEncryptionParametersInternal(
-        V,
-        R,
-        key_len,
-        P,
-        encryption_data.getO(),
-        encryption_data.getU(),
-        encryption_data.getOE(),
-        encryption_data.getUE(),
-        encryption_data.getPerms(),
-        m->id1,
-        user_password,
-        encryption_key);
+    auto encryption_key = m->encryption->compute_parameters(user_password, owner_password);
+    setEncryptionParametersInternal(user_password, encryption_key);
 }
 
 void
@@ -675,7 +750,7 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
             encryption_key = qpdf.getEncryptionKey();
         }
 
-        setEncryptionParametersInternal(
+        m->encryption = std::make_unique<QPDF::EncryptionData>(
             V,
             encrypt.getKey("/R").getIntValueAsInt(),
             key_len,
@@ -686,8 +761,9 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
             UE,
             Perms,
             m->id1, // m->id1 == the other file's id1
-            qpdf.getPaddedUserPassword(),
-            encryption_key);
+            m->encrypt_metadata);
+
+        setEncryptionParametersInternal(qpdf.getPaddedUserPassword(), encryption_key);
     }
 }
 
@@ -765,32 +841,22 @@ QPDFWriter::compareVersions(int major1, int minor1, int major2, int minor2) cons
 
 void
 QPDFWriter::setEncryptionParametersInternal(
-    int V,
-    int R,
-    int key_len,
-    int P,
-    std::string const& O,
-    std::string const& U,
-    std::string const& OE,
-    std::string const& UE,
-    std::string const& Perms,
-    std::string const& id1,
-    std::string const& user_password,
-    std::string const& encryption_key)
+    std::string const& user_password, std::string const& encryption_key)
 {
-    m->encryption_V = V;
-    m->encryption_R = R;
+    auto& enc = *m->encryption;
+    auto const V = enc.getV();
+    auto const R = enc.getR();
     m->encryption_dictionary["/Filter"] = "/Standard";
-    m->encryption_dictionary["/V"] = std::to_string(V);
-    m->encryption_dictionary["/Length"] = std::to_string(key_len * 8);
-    m->encryption_dictionary["/R"] = std::to_string(R);
-    m->encryption_dictionary["/P"] = std::to_string(P);
-    m->encryption_dictionary["/O"] = QPDF_String(O).unparse(true);
-    m->encryption_dictionary["/U"] = QPDF_String(U).unparse(true);
+    m->encryption_dictionary["/V"] = std::to_string(enc.getV());
+    m->encryption_dictionary["/Length"] = std::to_string(enc.getLengthBytes() * 8);
+    m->encryption_dictionary["/R"] = std::to_string(enc.getR());
+    m->encryption_dictionary["/P"] = std::to_string(enc.getP());
+    m->encryption_dictionary["/O"] = QPDF_String(enc.getO()).unparse(true);
+    m->encryption_dictionary["/U"] = QPDF_String(enc.getU()).unparse(true);
     if (V >= 5) {
-        m->encryption_dictionary["/OE"] = QPDF_String(OE).unparse(true);
-        m->encryption_dictionary["/UE"] = QPDF_String(UE).unparse(true);
-        m->encryption_dictionary["/Perms"] = QPDF_String(Perms).unparse(true);
+        m->encryption_dictionary["/OE"] = QPDF_String(enc.getOE()).unparse(true);
+        m->encryption_dictionary["/UE"] = QPDF_String(enc.getUE()).unparse(true);
+        m->encryption_dictionary["/Perms"] = QPDF_String(enc.getPerms()).unparse(true);
     }
     if (R >= 6) {
         setMinimumPDFVersion("1.7", 8);
@@ -804,7 +870,7 @@ QPDFWriter::setEncryptionParametersInternal(
         setMinimumPDFVersion("1.3");
     }
 
-    if ((R >= 4) && (!m->encrypt_metadata)) {
+    if (R >= 4 && !m->encrypt_metadata) {
         m->encryption_dictionary["/EncryptMetadata"] = "false";
     }
     if ((V == 4) || (V == 5)) {
@@ -820,10 +886,8 @@ QPDFWriter::setEncryptionParametersInternal(
     }
 
     m->encrypted = true;
-    QPDF::EncryptionData encryption_data(
-        V, R, key_len, P, O, U, OE, UE, Perms, id1, m->encrypt_metadata);
     if (V < 5) {
-        m->encryption_key = QPDF::compute_encryption_key(user_password, encryption_data);
+        m->encryption_key = enc.compute_encryption_key(user_password);
     } else {
         m->encryption_key = encryption_key;
     }
@@ -832,8 +896,15 @@ QPDFWriter::setEncryptionParametersInternal(
 void
 QPDFWriter::setDataKey(int objid)
 {
-    m->cur_data_key = QPDF::compute_data_key(
-        m->encryption_key, objid, 0, m->encrypt_use_aes, m->encryption_V, m->encryption_R);
+    if (m->encrypted) {
+        m->cur_data_key = QPDF::compute_data_key(
+            m->encryption_key,
+            objid,
+            0,
+            m->encrypt_use_aes,
+            m->encryption->getV(),
+            m->encryption->getR());
+    }
 }
 
 unsigned int

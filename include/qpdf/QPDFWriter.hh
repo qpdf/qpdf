@@ -532,18 +532,7 @@ class QPDFWriter
         int key_len,
         std::set<int>& bits_to_clear);
     void setEncryptionParametersInternal(
-        int V,
-        int R,
-        int key_len,
-        int P,
-        std::string const& O,
-        std::string const& U,
-        std::string const& OE,
-        std::string const& UE,
-        std::string const& Perms,
-        std::string const& id1,
-        std::string const& user_password,
-        std::string const& encryption_key);
+        std::string const& user_password, std::string const& encryption_key);
     void setDataKey(int objid);
     int openObject(int objid = 0);
     void closeObject(int objid);
