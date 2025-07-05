@@ -89,7 +89,6 @@ class QPDFWriter::Members
 
     std::unique_ptr<QPDF::EncryptionData> encryption;
     std::string encryption_key;
-    bool encrypt_metadata{true};
     bool encrypt_use_aes{false};
     std::map<std::string, std::string> encryption_dictionary;
 
@@ -445,7 +444,7 @@ QPDFWriter::setR2EncryptionParametersInsecure(
         clear.insert(6);
     }
 
-    setEncryptionParameters(user_password, owner_password, 1, 2, 5, clear);
+    setEncryptionParameters(user_password, owner_password, 1, 2, 5, true, clear);
 }
 
 void
@@ -473,7 +472,7 @@ QPDFWriter::setR3EncryptionParametersInsecure(
         allow_modify_other,
         print,
         qpdf_r3m_all);
-    setEncryptionParameters(user_password, owner_password, 2, 3, 16, clear);
+    setEncryptionParameters(user_password, owner_password, 2, 3, 16, true, clear);
 }
 
 void
@@ -504,8 +503,7 @@ QPDFWriter::setR4EncryptionParametersInsecure(
         print,
         qpdf_r3m_all);
     m->encrypt_use_aes = use_aes;
-    m->encrypt_metadata = encrypt_metadata;
-    setEncryptionParameters(user_password, owner_password, 4, 4, 16, clear);
+    setEncryptionParameters(user_password, owner_password, 4, 4, 16, encrypt_metadata, clear);
 }
 
 void
@@ -535,8 +533,7 @@ QPDFWriter::setR5EncryptionParameters(
         print,
         qpdf_r3m_all);
     m->encrypt_use_aes = true;
-    m->encrypt_metadata = encrypt_metadata;
-    setEncryptionParameters(user_password, owner_password, 5, 5, 32, clear);
+    setEncryptionParameters(user_password, owner_password, 5, 5, 32, encrypt_metadata, clear);
 }
 
 void
@@ -566,8 +563,7 @@ QPDFWriter::setR6EncryptionParameters(
         print,
         qpdf_r3m_all);
     m->encrypt_use_aes = true;
-    m->encrypt_metadata = encrypt_metadata;
-    setEncryptionParameters(user_password, owner_password, 5, 6, 32, clear);
+    setEncryptionParameters(user_password, owner_password, 5, 6, 32, encrypt_metadata, clear);
 }
 
 void
@@ -683,6 +679,7 @@ QPDFWriter::setEncryptionParameters(
     int V,
     int R,
     int key_len,
+    bool encrypt_metadata,
     std::set<int>& bits_to_clear)
 {
     // PDF specification refers to bits with the low bit numbered 1.
@@ -707,7 +704,7 @@ QPDFWriter::setEncryptionParameters(
 
     generateID();
     m->encryption = std::make_unique<QPDF::EncryptionData>(
-        V, R, key_len, P, "", "", "", "", "", m->id1, m->encrypt_metadata);
+        V, R, key_len, P, "", "", "", "", "", m->id1, encrypt_metadata);
     auto encryption_key = m->encryption->compute_parameters(user_password, owner_password);
     setEncryptionParametersInternal(user_password, encryption_key);
 }
@@ -726,9 +723,10 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
         if (V > 1) {
             key_len = encrypt.getKey("/Length").getIntValueAsInt() / 8;
         }
-        if (encrypt.hasKey("/EncryptMetadata") && encrypt.getKey("/EncryptMetadata").isBool()) {
-            m->encrypt_metadata = encrypt.getKey("/EncryptMetadata").getBoolValue();
-        }
+        const bool encrypt_metadata =
+            encrypt.hasKey("/EncryptMetadata") && encrypt.getKey("/EncryptMetadata").isBool()
+            ? encrypt.getKey("/EncryptMetadata").getBoolValue()
+            : true;
         if (V >= 4) {
             // When copying encryption parameters, use AES even if the original file did not.
             // Acrobat doesn't create files with V >= 4 that don't use AES, and the logic of
@@ -736,17 +734,11 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
             // all potentially having different values.
             m->encrypt_use_aes = true;
         }
-        QTC::TC("qpdf", "QPDFWriter copy encrypt metadata", m->encrypt_metadata ? 0 : 1);
+        QTC::TC("qpdf", "QPDFWriter copy encrypt metadata", encrypt_metadata ? 0 : 1);
         QTC::TC("qpdf", "QPDFWriter copy use_aes", m->encrypt_use_aes ? 0 : 1);
-        std::string OE;
-        std::string UE;
-        std::string Perms;
         std::string encryption_key;
         if (V >= 5) {
             QTC::TC("qpdf", "QPDFWriter copy V5");
-            OE = encrypt.getKey("/OE").getStringValue();
-            UE = encrypt.getKey("/UE").getStringValue();
-            Perms = encrypt.getKey("/Perms").getStringValue();
             encryption_key = qpdf.getEncryptionKey();
         }
 
@@ -757,11 +749,11 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
             static_cast<int>(encrypt.getKey("/P").getIntValue()),
             encrypt.getKey("/O").getStringValue(),
             encrypt.getKey("/U").getStringValue(),
-            OE,
-            UE,
-            Perms,
+            V < 5 ? "" : encrypt.getKey("/OE").getStringValue(),
+            V < 5 ? "" : encrypt.getKey("/UE").getStringValue(),
+            V < 5 ? "" : encrypt.getKey("/Perms").getStringValue(),
             m->id1, // m->id1 == the other file's id1
-            m->encrypt_metadata);
+            encrypt_metadata);
 
         setEncryptionParametersInternal(qpdf.getPaddedUserPassword(), encryption_key);
     }
@@ -870,7 +862,7 @@ QPDFWriter::setEncryptionParametersInternal(
         setMinimumPDFVersion("1.3");
     }
 
-    if (R >= 4 && !m->encrypt_metadata) {
+    if (R >= 4 && !m->encryption->getEncryptMetadata()) {
         m->encryption_dictionary["/EncryptMetadata"] = "false";
     }
     if ((V == 4) || (V == 5)) {
@@ -1339,7 +1331,8 @@ QPDFWriter::willFilterStream(
     }
     bool normalize = false;
     bool uncompress = false;
-    if (filter_on_write && is_root_metadata && (!m->encrypted || !m->encrypt_metadata)) {
+    if (filter_on_write && is_root_metadata &&
+        (!m->encrypted || !m->encryption->getEncryptMetadata())) {
         QTC::TC("qpdf", "QPDFWriter not compressing metadata");
         filter = true;
         compress_stream = false;
@@ -1627,7 +1620,7 @@ QPDFWriter::unparseObject(
         QPDFObjectHandle stream_dict = object.getDict();
 
         m->cur_stream_length = stream_data.size();
-        if (is_metadata && m->encrypted && (!m->encrypt_metadata)) {
+        if (is_metadata && m->encrypted && !m->encryption->getEncryptMetadata()) {
             // Don't encrypt stream data for the metadata stream
             m->cur_data_key.clear();
         }
@@ -1641,13 +1634,12 @@ QPDFWriter::unparseObject(
             writeString(stream_data);
         }
 
-        if (m->newline_before_endstream || (m->qdf_mode && last_char != '\n')) {
-            writeString("\n");
-            m->added_newline = true;
+        if ((m->added_newline =
+                 m->newline_before_endstream || (m->qdf_mode && last_char != '\n'))) {
+            writeString("\nendstream");
         } else {
-            m->added_newline = false;
+            writeString("endstream");
         }
-        writeString("endstream");
     } else if (tc == ::ot_string) {
         std::string val;
         if (m->encrypted && (!(flags & f_in_ostream)) && (!(flags & f_no_encryption)) &&

@@ -530,6 +530,7 @@ class QPDFWriter
         int V,
         int R,
         int key_len,
+        bool encrypt_metadata,
         std::set<int>& bits_to_clear);
     void setEncryptionParametersInternal(
         std::string const& user_password, std::string const& encryption_key);
