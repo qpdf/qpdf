@@ -89,7 +89,6 @@ class QPDFWriter::Members
     std::unique_ptr<QPDF::EncryptionData> encryption;
     std::string encryption_key;
     bool encrypt_use_aes{false};
-    std::map<std::string, std::string> encryption_dictionary;
 
     std::string id1; // for /ID key of
     std::string id2; // trailer dictionary
@@ -783,21 +782,7 @@ void
 QPDFWriter::setEncryptionParametersInternal(
     std::string const& user_password, std::string const& encryption_key)
 {
-    auto& enc = *m->encryption;
-    auto const V = enc.getV();
-    auto const R = enc.getR();
-    m->encryption_dictionary["/Filter"] = "/Standard";
-    m->encryption_dictionary["/V"] = std::to_string(enc.getV());
-    m->encryption_dictionary["/Length"] = std::to_string(enc.getLengthBytes() * 8);
-    m->encryption_dictionary["/R"] = std::to_string(enc.getR());
-    m->encryption_dictionary["/P"] = std::to_string(enc.getP());
-    m->encryption_dictionary["/O"] = QPDF_String(enc.getO()).unparse(true);
-    m->encryption_dictionary["/U"] = QPDF_String(enc.getU()).unparse(true);
-    if (V >= 5) {
-        m->encryption_dictionary["/OE"] = QPDF_String(enc.getOE()).unparse(true);
-        m->encryption_dictionary["/UE"] = QPDF_String(enc.getUE()).unparse(true);
-        m->encryption_dictionary["/Perms"] = QPDF_String(enc.getPerms()).unparse(true);
-    }
+    auto const R = m->encryption->getR();
     if (R >= 6) {
         setMinimumPDFVersion("1.7", 8);
     } else if (R == 5) {
@@ -810,23 +795,8 @@ QPDFWriter::setEncryptionParametersInternal(
         setMinimumPDFVersion("1.3");
     }
 
-    if (R >= 4 && !m->encryption->getEncryptMetadata()) {
-        m->encryption_dictionary["/EncryptMetadata"] = "false";
-    }
-    if ((V == 4) || (V == 5)) {
-        // The spec says the value for the crypt filter key can be anything, and xpdf seems to
-        // agree.  However, Adobe Reader won't open our files unless we use /StdCF.
-        m->encryption_dictionary["/StmF"] = "/StdCF";
-        m->encryption_dictionary["/StrF"] = "/StdCF";
-        std::string method = (m->encrypt_use_aes ? ((V < 5) ? "/AESV2" : "/AESV3") : "/V2");
-        // The PDF spec says the /Length key is optional, but the PDF previewer on some versions of
-        // MacOS won't open encrypted files without it.
-        m->encryption_dictionary["/CF"] = "<< /StdCF << /AuthEvent /DocOpen /CFM " + method +
-            " /Length " + std::string((V < 5) ? "16" : "32") + " >> >>";
-    }
-
-    if (V < 5) {
-        m->encryption_key = enc.compute_encryption_key(user_password);
+    if (m->encryption->getV() < 5) {
+        m->encryption_key = m->encryption->compute_encryption_key(user_password);
     } else {
         m->encryption_key = encryption_key;
     }
@@ -2310,13 +2280,48 @@ void
 QPDFWriter::writeEncryptionDictionary()
 {
     m->encryption_dict_objid = openObject(m->encryption_dict_objid);
+    auto& enc = *m->encryption;
+    auto const V = enc.getV();
+
     writeString("<<");
-    for (auto const& iter: m->encryption_dictionary) {
-        writeString(" ");
-        writeString(iter.first);
-        writeString(" ");
-        writeString(iter.second);
+    if (V >= 4) {
+        writeString(" /CF << /StdCF << /AuthEvent /DocOpen /CFM ");
+        writeString(m->encrypt_use_aes ? ((V < 5) ? "/AESV2" : "/AESV3") : "/V2");
+        // The PDF spec says the /Length key is optional, but the PDF previewer on some versions of
+        // MacOS won't open encrypted files without it.
+        writeString((V < 5) ? " /Length 16 >> >>" : " /Length 32 >> >>");
+        if (!m->encryption->getEncryptMetadata()) {
+            writeString(" /EncryptMetadata false");
+        }
     }
+    writeString(" /Filter /Standard /Length ");
+    writeString(std::to_string(enc.getLengthBytes() * 8));
+    writeString(" /O ");
+    writeString(QPDF_String(enc.getO()).unparse(true));
+    if (V >= 4) {
+        writeString(" /OE ");
+        writeString(QPDF_String(enc.getOE()).unparse(true));
+    }
+    writeString(" /P ");
+    writeString(std::to_string(enc.getP()));
+    if (V >= 5) {
+        writeString(" /Perms ");
+        writeString(QPDF_String(enc.getPerms()).unparse(true));
+    }
+    writeString(" /R ");
+    writeString(std::to_string(enc.getR()));
+
+    if (V >= 4) {
+        writeString(" /StmF /StdCF /StrF /StdCF");
+    }
+    writeString(" /U ");
+    writeString(QPDF_String(enc.getU()).unparse(true));
+    if (V >= 4) {
+        writeString(" /UE ");
+        writeString(QPDF_String(enc.getUE()).unparse(true));
+    }
+    writeString(" /V ");
+    writeString(std::to_string(enc.getV()));
     writeString(" >>");
     closeObject(m->encryption_dict_objid);
 }
