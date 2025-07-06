@@ -51,7 +51,21 @@ QPDF::EncryptionData::getLengthBytes() const
 int
 QPDF::EncryptionData::getP() const
 {
-    return this->P;
+    return static_cast<int>(P.to_ullong());
+}
+
+bool
+QPDF::EncryptionData::getP(size_t bit) const
+{
+    qpdf_assert_debug(bit);
+    return P.test(bit - 1);
+}
+
+bool
+QPDF::EncryptionParameters::P(size_t bit) const
+{
+    qpdf_assert_debug(bit);
+    return P_.test(bit - 1);
 }
 
 std::string const&
@@ -106,6 +120,13 @@ void
 QPDF::EncryptionData::setU(std::string const& U)
 {
     this->U = U;
+}
+
+void
+QPDF::EncryptionData::setP(size_t bit, bool val)
+{
+    qpdf_assert_debug(bit);
+    P.set(bit - 1, val);
 }
 
 void
@@ -782,7 +803,7 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
     int R = encryption_dict.getKey("/R").getIntValueAsInt();
     std::string O = encryption_dict.getKey("/O").getStringValue();
     std::string U = encryption_dict.getKey("/U").getStringValue();
-    int P = static_cast<int>(encryption_dict.getKey("/P").getIntValue());
+    int p = static_cast<int>(encryption_dict.getKey("/P").getIntValue());
 
     // If supporting new encryption R/V values, remember to update error message inside this if
     // statement.
@@ -792,9 +813,9 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
             " (max 6), V = " + std::to_string(V) + " (max 5)");
     }
 
-    encryption_P = P;
+    P_ = std::bitset<32>(static_cast<unsigned long long>(p));
     encryption_V = V;
-    encryption_R = R;
+    R_ = R;
 
     // OE, UE, and Perms are only present if V >= 5.
     std::string OE;
@@ -891,7 +912,7 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
         }
     }
 
-    EncryptionData data(V, R, Length / 8, P, O, U, OE, UE, Perms, id1, encrypt_metadata);
+    EncryptionData data(V, R, Length / 8, p, O, U, OE, UE, Perms, id1, encrypt_metadata);
     if (qm.provided_password_is_hex_key) {
         // ignore passwords in file
         encryption_key = QUtil::hex_decode(provided_password);
@@ -942,12 +963,7 @@ QPDF::getKeyForObject(std::shared_ptr<EncryptionParameters> encp, QPDFObjGen og,
 
     if (og != encp->cached_key_og) {
         encp->cached_object_encryption_key = compute_data_key(
-            encp->encryption_key,
-            og.getObj(),
-            og.getGen(),
-            use_aes,
-            encp->encryption_V,
-            encp->encryption_R);
+            encp->encryption_key, og.getObj(), og.getGen(), use_aes, encp->encryption_V, encp->R());
         encp->cached_key_og = og;
     }
 
@@ -1239,8 +1255,8 @@ QPDF::isEncrypted(int& R, int& P)
     if (!m->encp->encrypted) {
         return false;
     }
-    P = m->encp->encryption_P;
-    R = m->encp->encryption_R;
+    P = m->encp->P();
+    R = m->encp->R();
     return true;
 }
 
@@ -1256,8 +1272,8 @@ QPDF::isEncrypted(
     if (!m->encp->encrypted) {
         return false;
     }
-    P = m->encp->encryption_P;
-    R = m->encp->encryption_R;
+    P = m->encp->P();
+    R = m->encp->R();
     V = m->encp->encryption_V;
     stream_method = m->encp->cf_stream;
     string_method = m->encp->cf_string;
@@ -1277,135 +1293,57 @@ QPDF::userPasswordMatched() const
     return m->encp->user_password_matched;
 }
 
-static bool
-is_bit_set(int P, int bit)
-{
-    // Bits in P are numbered from 1 in the spec
-    return ((P & (1 << (bit - 1))) != 0);
-}
-
 bool
 QPDF::allowAccessibility()
 {
-    int R = 0;
-    int P = 0;
-    bool status = true;
-    if (isEncrypted(R, P)) {
-        if (R < 3) {
-            status = is_bit_set(P, 5);
-        } else {
-            status = is_bit_set(P, 10);
-        }
-    }
-    return status;
+    return m->encp->R() < 3 ? m->encp->P(5) : m->encp->P(10);
 }
 
 bool
 QPDF::allowExtractAll()
 {
-    int R = 0;
-    int P = 0;
-    bool status = true;
-    if (isEncrypted(R, P)) {
-        status = is_bit_set(P, 5);
-    }
-    return status;
+    return m->encp->P(5);
 }
 
 bool
 QPDF::allowPrintLowRes()
 {
-    int R = 0;
-    int P = 0;
-    bool status = true;
-    if (isEncrypted(R, P)) {
-        status = is_bit_set(P, 3);
-    }
-    return status;
+    return m->encp->P(3);
 }
 
 bool
 QPDF::allowPrintHighRes()
 {
-    int R = 0;
-    int P = 0;
-    bool status = true;
-    if (isEncrypted(R, P)) {
-        status = is_bit_set(P, 3);
-        if ((R >= 3) && (!is_bit_set(P, 12))) {
-            status = false;
-        }
-    }
-    return status;
+    return allowPrintLowRes() && (m->encp->R() < 3 ? true : m->encp->P(12));
 }
 
 bool
 QPDF::allowModifyAssembly()
 {
-    int R = 0;
-    int P = 0;
-    bool status = true;
-    if (isEncrypted(R, P)) {
-        if (R < 3) {
-            status = is_bit_set(P, 4);
-        } else {
-            status = is_bit_set(P, 11);
-        }
-    }
-    return status;
+    return m->encp->R() < 3 ? m->encp->P(4) : m->encp->P(11);
 }
 
 bool
 QPDF::allowModifyForm()
 {
-    int R = 0;
-    int P = 0;
-    bool status = true;
-    if (isEncrypted(R, P)) {
-        if (R < 3) {
-            status = is_bit_set(P, 6);
-        } else {
-            status = is_bit_set(P, 9);
-        }
-    }
-    return status;
+    return m->encp->R() < 3 ? m->encp->P(6) : m->encp->P(9);
 }
 
 bool
 QPDF::allowModifyAnnotation()
 {
-    int R = 0;
-    int P = 0;
-    bool status = true;
-    if (isEncrypted(R, P)) {
-        status = is_bit_set(P, 6);
-    }
-    return status;
+    return m->encp->P(6);
 }
 
 bool
 QPDF::allowModifyOther()
 {
-    int R = 0;
-    int P = 0;
-    bool status = true;
-    if (isEncrypted(R, P)) {
-        status = is_bit_set(P, 4);
-    }
-    return status;
+    return m->encp->P(4);
 }
 
 bool
 QPDF::allowModifyAll()
 {
-    int R = 0;
-    int P = 0;
-    bool status = true;
-    if (isEncrypted(R, P)) {
-        status = (is_bit_set(P, 4) && is_bit_set(P, 6));
-        if (R >= 3) {
-            status = status && (is_bit_set(P, 9) && is_bit_set(P, 11));
-        }
-    }
-    return status;
+    return allowModifyAnnotation() && allowModifyOther() &&
+        (m->encp->R() < 3 ? true : allowModifyForm() && allowModifyAssembly());
 }

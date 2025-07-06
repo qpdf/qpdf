@@ -23,6 +23,7 @@
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
 
+#include <bitset>
 #include <cstdio>
 #include <functional>
 #include <iostream>
@@ -465,7 +466,7 @@ class QPDF
             V(V),
             R(R),
             Length_bytes(Length_bytes),
-            P(P),
+            P(static_cast<unsigned long long>(P)),
             O(O),
             U(U),
             OE(OE),
@@ -480,6 +481,8 @@ class QPDF
         int getR() const;
         int getLengthBytes() const;
         int getP() const;
+        //  Bits in P are numbered from 1 as in the PDF spec.
+        bool getP(size_t bit) const;
         std::string const& getO() const;
         std::string const& getU() const;
         std::string const& getOE() const;
@@ -487,7 +490,8 @@ class QPDF
         std::string const& getPerms() const;
         std::string const& getId1() const;
         bool getEncryptMetadata() const;
-
+        //  Bits in P are numbered from 1 as in the PDF spec.
+        void setP(size_t bit, bool val);
         void setO(std::string const&);
         void setU(std::string const&);
         void setV5EncryptionParameters(
@@ -562,7 +566,7 @@ class QPDF
         int V;
         int R;
         int Length_bytes;
-        int P;
+        std::bitset<32> P{0xfffffffc}; // Specification always requires bits 1 and 2 to be cleared.
         std::string O;
         std::string U;
         std::string OE;

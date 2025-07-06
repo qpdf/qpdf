@@ -187,16 +187,30 @@ class QPDF::EncryptionParameters
   public:
     EncryptionParameters() = default;
 
+    int
+    P() const
+    {
+        return static_cast<int>(P_.to_ullong());
+    }
+
+    //  Bits in P are numbered from 1 as in the PDF spec.
+    bool P(size_t bit) const;
+
+    int
+    R()
+    {
+        return R_;
+    }
+
+    void initialize(QPDF& qpdf);
     encryption_method_e interpretCF(QPDFObjectHandle const& cf) const;
 
   private:
-    void initialize(QPDF& qpdf);
-
     bool encrypted{false};
     bool encryption_initialized{false};
-    int encryption_P{0};
+    std::bitset<32> P_{0xfffffffc}; // Specification always requires bits 1 and 2 to be cleared.
     int encryption_V{0};
-    int encryption_R{0};
+    int R_{0};
     bool encrypt_metadata{true};
     std::map<std::string, encryption_method_e> crypt_filters;
     encryption_method_e cf_stream{e_none};
