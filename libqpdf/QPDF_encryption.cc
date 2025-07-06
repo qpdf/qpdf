@@ -1201,7 +1201,7 @@ QPDF::EncryptionData::compute_parameters(char const* user_password, char const* 
 {
     if (V < 5) {
         compute_encryption_O_U(user_password, owner_password);
-        return {};
+        return compute_encryption_key(user_password);
     } else {
         return compute_encryption_parameters_V5(user_password, owner_password);
     }

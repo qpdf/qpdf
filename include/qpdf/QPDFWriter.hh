@@ -523,8 +523,7 @@ class QPDFWriter
     void parseVersion(std::string const& version, int& major, int& minor) const;
     int compareVersions(int major1, int minor1, int major2, int minor2) const;
     void setEncryptionParameters(char const* user_password, char const* owner_password);
-    void setEncryptionParametersInternal(
-        std::string const& user_password, std::string const& encryption_key);
+    void setEncryptionMinimumVersion();
     void setDataKey(int objid);
     int openObject(int objid = 0);
     void closeObject(int objid);

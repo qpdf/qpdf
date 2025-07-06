@@ -228,7 +228,6 @@ QPDFWriter extra header text no newline 0
 QPDFWriter extra header text add newline 0
 QPDF bogus 0 offset 0
 QPDF global offset 0
-QPDFWriter copy V5 0
 QPDFWriter increasing extension level 0
 QPDFWriter make Extensions direct 0
 QPDFWriter make ADBE direct 1

@@ -655,8 +655,8 @@ QPDFWriter::setEncryptionParameters(char const* user_password, char const* owner
 {
     generateID();
     m->encryption->setId1(m->id1);
-    auto encryption_key = m->encryption->compute_parameters(user_password, owner_password);
-    setEncryptionParametersInternal(user_password, encryption_key);
+    m->encryption_key = m->encryption->compute_parameters(user_password, owner_password);
+    setEncryptionMinimumVersion();
 }
 
 void
@@ -686,11 +686,6 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
         }
         QTC::TC("qpdf", "QPDFWriter copy encrypt metadata", encrypt_metadata ? 0 : 1);
         QTC::TC("qpdf", "QPDFWriter copy use_aes", m->encrypt_use_aes ? 0 : 1);
-        std::string encryption_key;
-        if (V >= 5) {
-            QTC::TC("qpdf", "QPDFWriter copy V5");
-            encryption_key = qpdf.getEncryptionKey();
-        }
 
         m->encryption = std::make_unique<QPDF::EncryptionData>(
             V,
@@ -704,7 +699,10 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
             V < 5 ? "" : encrypt.getKey("/Perms").getStringValue(),
             m->id1, // m->id1 == the other file's id1
             encrypt_metadata);
-        setEncryptionParametersInternal(qpdf.getPaddedUserPassword(), encryption_key);
+        m->encryption_key = V >= 5
+            ? qpdf.getEncryptionKey()
+            : m->encryption->compute_encryption_key(qpdf.getPaddedUserPassword());
+        setEncryptionMinimumVersion();
     }
 }
 
@@ -779,8 +777,7 @@ QPDFWriter::compareVersions(int major1, int minor1, int major2, int minor2) cons
 }
 
 void
-QPDFWriter::setEncryptionParametersInternal(
-    std::string const& user_password, std::string const& encryption_key)
+QPDFWriter::setEncryptionMinimumVersion()
 {
     auto const R = m->encryption->getR();
     if (R >= 6) {
@@ -793,12 +790,6 @@ QPDFWriter::setEncryptionParametersInternal(
         setMinimumPDFVersion("1.4");
     } else {
         setMinimumPDFVersion("1.3");
-    }
-
-    if (m->encryption->getV() < 5) {
-        m->encryption_key = m->encryption->compute_encryption_key(user_password);
-    } else {
-        m->encryption_key = encryption_key;
     }
 }
 
