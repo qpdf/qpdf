@@ -81,7 +81,6 @@ class QPDFWriter::Members
     bool static_id{false};
     bool suppress_original_object_ids{false};
     bool direct_stream_lengths{true};
-    bool encrypted{false};
     bool preserve_encryption{true};
     bool linearized{false};
     bool pclm{false};
@@ -713,39 +712,37 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
 void
 QPDFWriter::disableIncompatibleEncryption(int major, int minor, int extension_level)
 {
-    if (!m->encrypted) {
+    if (!m->encryption) {
         return;
     }
-
-    bool disable = false;
     if (compareVersions(major, minor, 1, 3) < 0) {
-        disable = true;
-    } else {
-        int V = QUtil::string_to_int(m->encryption_dictionary["/V"].c_str());
-        int R = QUtil::string_to_int(m->encryption_dictionary["/R"].c_str());
-        if (compareVersions(major, minor, 1, 4) < 0) {
-            if ((V > 1) || (R > 2)) {
-                disable = true;
-            }
-        } else if (compareVersions(major, minor, 1, 5) < 0) {
-            if ((V > 2) || (R > 3)) {
-                disable = true;
-            }
-        } else if (compareVersions(major, minor, 1, 6) < 0) {
-            if (m->encrypt_use_aes) {
-                disable = true;
-            }
-        } else if (
-            (compareVersions(major, minor, 1, 7) < 0) ||
-            ((compareVersions(major, minor, 1, 7) == 0) && extension_level < 3)) {
-            if ((V >= 5) || (R >= 5)) {
-                disable = true;
-            }
+        m->encryption = nullptr;
+        return;
+    }
+    int V = m->encryption->getV();
+    int R = m->encryption->getR();
+    if (compareVersions(major, minor, 1, 4) < 0) {
+        if (V > 1 || R > 2) {
+            m->encryption = nullptr;
+        }
+    } else if (compareVersions(major, minor, 1, 5) < 0) {
+        if (V > 2 || R > 3) {
+            m->encryption = nullptr;
+        }
+    } else if (compareVersions(major, minor, 1, 6) < 0) {
+        if (m->encrypt_use_aes) {
+            m->encryption = nullptr;
+        }
+    } else if (
+        (compareVersions(major, minor, 1, 7) < 0) ||
+        ((compareVersions(major, minor, 1, 7) == 0) && extension_level < 3)) {
+        if (V >= 5 || R >= 5) {
+            m->encryption = nullptr;
         }
     }
-    if (disable) {
+
+    if (!m->encryption) {
         QTC::TC("qpdf", "QPDFWriter forced version disabled encryption");
-        m->encrypted = false;
     }
 }
 
@@ -828,7 +825,6 @@ QPDFWriter::setEncryptionParametersInternal(
             " /Length " + std::string((V < 5) ? "16" : "32") + " >> >>";
     }
 
-    m->encrypted = true;
     if (V < 5) {
         m->encryption_key = enc.compute_encryption_key(user_password);
     } else {
@@ -839,7 +835,7 @@ QPDFWriter::setEncryptionParametersInternal(
 void
 QPDFWriter::setDataKey(int objid)
 {
-    if (m->encrypted) {
+    if (m->encryption) {
         m->cur_data_key = QPDF::compute_data_key(
             m->encryption_key,
             objid,
@@ -981,7 +977,7 @@ QPDFWriter::PipelinePopper::~PipelinePopper()
 void
 QPDFWriter::adjustAESStreamLength(size_t& length)
 {
-    if (m->encrypted && (!m->cur_data_key.empty()) && m->encrypt_use_aes) {
+    if (m->encryption && !m->cur_data_key.empty() && m->encrypt_use_aes) {
         // Stream length will be padded with 1 to 16 bytes to end up as a multiple of 16.  It will
         // also be prepended by 16 bits of random data.
         length += 32 - (length & 0xf);
@@ -991,7 +987,7 @@ QPDFWriter::adjustAESStreamLength(size_t& length)
 void
 QPDFWriter::pushEncryptionFilter(PipelinePopper& pp)
 {
-    if (m->encrypted && (!m->cur_data_key.empty())) {
+    if (m->encryption && !m->cur_data_key.empty()) {
         Pipeline* p = nullptr;
         if (m->encrypt_use_aes) {
             p = new Pl_AES_PDF(
@@ -1234,7 +1230,7 @@ QPDFWriter::writeTrailer(
 
     if (which != t_lin_second) {
         // Write reference to encryption dictionary
-        if (m->encrypted) {
+        if (m->encryption) {
             writeString(" /Encrypt ");
             writeString(std::to_string(m->encryption_dict_objid));
             writeString(" 0 R");
@@ -1283,7 +1279,7 @@ QPDFWriter::willFilterStream(
     bool normalize = false;
     bool uncompress = false;
     if (filter_on_write && is_root_metadata &&
-        (!m->encrypted || !m->encryption->getEncryptMetadata())) {
+        (!m->encryption || !m->encryption->getEncryptMetadata())) {
         QTC::TC("qpdf", "QPDFWriter not compressing metadata");
         filter = true;
         compress_stream = false;
@@ -1571,7 +1567,7 @@ QPDFWriter::unparseObject(
         QPDFObjectHandle stream_dict = object.getDict();
 
         m->cur_stream_length = stream_data.size();
-        if (is_metadata && m->encrypted && !m->encryption->getEncryptMetadata()) {
+        if (is_metadata && m->encryption && !m->encryption->getEncryptMetadata()) {
             // Don't encrypt stream data for the metadata stream
             m->cur_data_key.clear();
         }
@@ -1593,8 +1589,8 @@ QPDFWriter::unparseObject(
         }
     } else if (tc == ::ot_string) {
         std::string val;
-        if (m->encrypted && (!(flags & f_in_ostream)) && (!(flags & f_no_encryption)) &&
-            (!m->cur_data_key.empty())) {
+        if (m->encryption && !(flags & f_in_ostream) && !(flags & f_no_encryption) &&
+            !m->cur_data_key.empty()) {
             val = object.getStringValue();
             if (m->encrypt_use_aes) {
                 Pl_Buffer bufpl("encrypted string");
@@ -1777,7 +1773,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
     writeStringQDF("\n");
     writeStringNoQDF(" ");
     writeString(">>\nstream\n");
-    if (m->encrypted) {
+    if (m->encryption) {
         QTC::TC("qpdf", "QPDFWriter encrypt object stream");
     }
     {
@@ -2134,7 +2130,7 @@ QPDFWriter::doWriteSetup()
     if (m->pclm) {
         m->stream_decode_level = qpdf_dl_none;
         m->compress_streams = false;
-        m->encrypted = false;
+        m->encryption = nullptr;
     }
 
     if (m->qdf_mode) {
@@ -2149,7 +2145,7 @@ QPDFWriter::doWriteSetup()
         }
     }
 
-    if (m->encrypted) {
+    if (m->encryption) {
         // Encryption has been explicitly set
         m->preserve_encryption = false;
     } else if (m->normalize_content || !m->compress_streams || m->pclm || m->qdf_mode) {
@@ -2213,7 +2209,7 @@ QPDFWriter::doWriteSetup()
             }
         }
 
-        if (m->linearized || m->encrypted) {
+        if (m->linearized || m->encryption) {
             // The document catalog is not allowed to be compressed in linearized files either.  It
             // also appears that Adobe Reader 8.0.0 has a bug that prevents it from being able to
             // handle encrypted files with compressed document catalogs, so we disable them in that
@@ -2382,7 +2378,7 @@ QPDFWriter::writeHintStream(int hint_id)
     writeString(std::to_string(hlen));
     writeString(" >>\nstream\n");
 
-    if (m->encrypted) {
+    if (m->encryption) {
         QTC::TC("qpdf", "QPDFWriter encrypted hint stream");
     }
     char last_char = hint_buffer.empty() ? '\0' : hint_buffer.back();
@@ -2653,7 +2649,7 @@ QPDFWriter::writeLinearized()
     int part4_first_obj = m->next_objid;
     m->next_objid += QIntC::to_int(part4.size());
     int after_part4 = m->next_objid;
-    if (m->encrypted) {
+    if (m->encryption) {
         m->encryption_dict_objid = m->next_objid++;
     }
     int hint_id = m->next_objid++;
@@ -2838,7 +2834,7 @@ QPDFWriter::writeLinearized()
             }
             writeObject(cur_object);
             if (cur_object.getObjectID() == part4_end_marker) {
-                if (m->encrypted) {
+                if (m->encryption) {
                     writeEncryptionDictionary();
                 }
                 if (pass == 1) {
@@ -3062,7 +3058,7 @@ QPDFWriter::writeStandard()
     }
 
     // Write out the encryption dictionary, if any
-    if (m->encrypted) {
+    if (m->encryption) {
         writeEncryptionDictionary();
     }
 
