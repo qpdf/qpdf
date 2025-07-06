@@ -54,7 +54,7 @@ QPDF::EncryptionData::getLengthBytes() const
 int
 QPDF::EncryptionData::getP() const
 {
-    return static_cast<int>(P.to_ullong());
+    return static_cast<int>(P.to_ulong());
 }
 
 bool
@@ -130,6 +130,18 @@ QPDF::EncryptionData::setP(size_t bit, bool val)
 {
     qpdf_assert_debug(bit);
     P.set(bit - 1, val);
+}
+
+void
+QPDF::EncryptionData::setP(unsigned long val)
+{
+    P = std::bitset<32>(val);
+}
+
+void
+QPDF::EncryptionData::setId1(std::string const& val)
+{
+    id1 = val;
 }
 
 void

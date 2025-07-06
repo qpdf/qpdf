@@ -476,6 +476,13 @@ class QPDF
             encrypt_metadata(encrypt_metadata)
         {
         }
+        EncryptionData(int V, int R, int Length_bytes, bool encrypt_metadata) :
+            V(V),
+            R(R),
+            Length_bytes(Length_bytes),
+            encrypt_metadata(encrypt_metadata)
+        {
+        }
 
         int getV() const;
         int getR() const;
@@ -492,8 +499,10 @@ class QPDF
         bool getEncryptMetadata() const;
         //  Bits in P are numbered from 1 as in the PDF spec.
         void setP(size_t bit, bool val);
+        void setP(unsigned long val);
         void setO(std::string const&);
         void setU(std::string const&);
+        void setId1(std::string const& val);
         void setV5EncryptionParameters(
             std::string const& O,
             std::string const& OE,

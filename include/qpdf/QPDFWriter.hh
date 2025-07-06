@@ -23,6 +23,7 @@
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
 
+#include <bitset>
 #include <cstdio>
 #include <functional>
 #include <list>
@@ -510,9 +511,6 @@ class QPDFWriter
     std::string getOriginalID1();
     void generateID();
     void interpretR3EncryptionParameters(
-        std::set<int>& bits_to_clear,
-        char const* user_password,
-        char const* owner_password,
         bool allow_accessibility,
         bool allow_extract,
         bool allow_assemble,
@@ -524,14 +522,7 @@ class QPDFWriter
     void disableIncompatibleEncryption(int major, int minor, int extension_level);
     void parseVersion(std::string const& version, int& major, int& minor) const;
     int compareVersions(int major1, int minor1, int major2, int minor2) const;
-    void setEncryptionParameters(
-        char const* user_password,
-        char const* owner_password,
-        int V,
-        int R,
-        int key_len,
-        bool encrypt_metadata,
-        std::set<int>& bits_to_clear);
+    void setEncryptionParameters(char const* user_password, char const* owner_password);
     void setEncryptionParametersInternal(
         std::string const& user_password, std::string const& encryption_key);
     void setDataKey(int objid);
