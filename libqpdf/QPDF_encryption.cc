@@ -170,7 +170,7 @@ QPDF::trim_user_password(std::string& user_password)
     }
 
     auto idx = user_password.find('\x28');
-    ;
+
     while (idx != user_password.npos) {
         if (padding_string.starts_with(user_password.substr(idx))) {
             user_password.resize(idx);
@@ -206,23 +206,16 @@ iterate_md5_digest(MD5& md5, int iterations, int key_len)
 }
 
 static void
-iterate_rc4(
-    unsigned char* data,
-    size_t data_len,
-    unsigned char* okey,
-    int key_len,
-    int iterations,
-    bool reverse)
+iterate_rc4(std::string& data, std::string_view okey, int iterations, bool reverse)
 {
-    auto key_ph = std::make_unique<unsigned char[]>(QIntC::to_size(key_len));
-    unsigned char* key = key_ph.get();
+    auto len = okey.size();
+    std::string key(len, '\0');
     for (int i = 0; i < iterations; ++i) {
         int const xor_value = (reverse ? iterations - 1 - i : i);
-        for (int j = 0; j < key_len; ++j) {
-            key[j] = static_cast<unsigned char>(okey[j] ^ xor_value);
+        for (size_t j = 0; j < len; ++j) {
+            key[j] = static_cast<char>(okey[j] ^ xor_value);
         }
-        RC4 rc4(key, QIntC::to_int(key_len));
-        rc4.process(data, data_len, data);
+        RC4::process(key, data);
     }
 }
 
@@ -437,13 +430,7 @@ QPDF::EncryptionData::compute_O_value(
     auto upass = pad_or_truncate_password_V4(user_password);
     std::string O_key = compute_O_rc4_key(user_password, owner_password);
     pad_short_parameter(O_key, QIntC::to_size(getLengthBytes()));
-    iterate_rc4(
-        QUtil::unsigned_char_pointer(upass),
-        key_bytes,
-        QUtil::unsigned_char_pointer(O_key.data()),
-        getLengthBytes(),
-        getR() >= 3 ? 20 : 1,
-        false);
+    iterate_rc4(upass, O_key, getR() >= 3 ? 20 : 1, false);
     return upass;
 }
 
@@ -455,13 +442,7 @@ QPDF::EncryptionData::compute_U_value_R2(std::string const& user_password) const
     std::string k1 = compute_encryption_key(user_password);
     auto udata = padding_string;
     pad_short_parameter(k1, QIntC::to_size(getLengthBytes()));
-    iterate_rc4(
-        QUtil::unsigned_char_pointer(udata.data()),
-        key_bytes,
-        QUtil::unsigned_char_pointer(k1),
-        getLengthBytes(),
-        1,
-        false);
+    iterate_rc4(udata, k1, 1, false);
     return udata;
 }
 
@@ -474,18 +455,12 @@ QPDF::EncryptionData::compute_U_value_R3(std::string const& user_password) const
     MD5 md5;
     md5.encodeDataIncrementally(padding_string);
     md5.encodeDataIncrementally(getId1());
-    MD5::Digest digest;
-    md5.digest(digest);
+    auto result = md5.digest();
     pad_short_parameter(k1, QIntC::to_size(getLengthBytes()));
-    iterate_rc4(
-        digest, sizeof(MD5::Digest), QUtil::unsigned_char_pointer(k1), getLengthBytes(), 20, false);
-    char result[key_bytes];
-    memcpy(result, digest, sizeof(MD5::Digest));
+    iterate_rc4(result, k1, 20, false);
     // pad with arbitrary data -- make it consistent for the sake of testing
-    for (unsigned int i = sizeof(MD5::Digest); i < key_bytes; ++i) {
-        result[i] = static_cast<char>((i * i) % 0xff);
-    }
-    return {result, key_bytes};
+    result += "\x0\x21\x44\x69\x90\xb9\xe4\x11\x40\x71\xa4\xd9\x10\x49\x84\xc1"s;
+    return result;
 }
 
 std::string
@@ -538,13 +513,7 @@ QPDF::EncryptionData::check_owner_password_V4(
     auto key = compute_O_rc4_key(user_password, owner_password);
     pad_short_parameter(key, QIntC::to_size(getLengthBytes()));
     auto new_user_password = O.substr(0, key_bytes);
-    iterate_rc4(
-        QUtil::unsigned_char_pointer(new_user_password.data()),
-        key_bytes,
-        QUtil::unsigned_char_pointer(key),
-        getLengthBytes(),
-        (getR() >= 3) ? 20 : 1,
-        true);
+    iterate_rc4(new_user_password, key, (getR() >= 3) ? 20 : 1, true);
     if (check_user_password(new_user_password)) {
         user_password = new_user_password;
         return true;
