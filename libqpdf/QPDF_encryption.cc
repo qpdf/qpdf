@@ -191,16 +191,18 @@ pad_or_truncate_password_V4(std::string password)
     return password;
 }
 
-static void
-iterate_md5_digest(MD5& md5, MD5::Digest& digest, int iterations, int key_len)
+static std::string
+iterate_md5_digest(MD5& md5, int iterations, int key_len)
 {
+    MD5::Digest digest;
     md5.digest(digest);
-
+    auto len = std::min(QIntC::to_size(key_len), sizeof(digest));
     for (int i = 0; i < iterations; ++i) {
         MD5 m;
-        m.encodeDataIncrementally(reinterpret_cast<char*>(digest), QIntC::to_size(key_len));
+        m.encodeDataIncrementally(reinterpret_cast<char*>(digest), len);
         m.digest(digest);
     }
+    return {reinterpret_cast<char*>(digest), len};
 }
 
 static void
@@ -363,12 +365,7 @@ QPDF::compute_data_key(
     if (use_aes) {
         result += "sAlT";
     }
-
-    MD5 md5;
-    md5.encodeDataIncrementally(result);
-    MD5::Digest digest;
-    md5.digest(digest);
-    return {reinterpret_cast<char*>(digest), std::min(result.length(), toS(16))};
+    return MD5::digest(result).substr(0, result.size());
 }
 
 std::string
@@ -415,10 +412,7 @@ QPDF::EncryptionData::compute_encryption_key_from_password(std::string const& pa
     if (getR() >= 4 && !getEncryptMetadata()) {
         md5.encodeDataIncrementally("\xff\xff\xff\xff");
     }
-    MD5::Digest digest;
-    int key_len = std::min(toI(sizeof(digest)), getLengthBytes());
-    iterate_md5_digest(md5, digest, (getR() >= 3 ? 50 : 0), key_len);
-    return {reinterpret_cast<char*>(digest), toS(key_len)};
+    return iterate_md5_digest(md5, (getR() >= 3 ? 50 : 0), getLengthBytes());
 }
 
 std::string
@@ -428,16 +422,10 @@ QPDF::EncryptionData::compute_O_rc4_key(
     if (getV() >= 5) {
         throw std::logic_error("compute_O_rc4_key called for file with V >= 5");
     }
-    std::string password = owner_password;
-    if (password.empty()) {
-        password = user_password;
-    }
+    std::string password = owner_password.empty() ? user_password : owner_password;
     MD5 md5;
     md5.encodeDataIncrementally(pad_or_truncate_password_V4(password));
-    MD5::Digest digest;
-    int key_len = std::min(QIntC::to_int(sizeof(digest)), getLengthBytes());
-    iterate_md5_digest(md5, digest, (getR() >= 3 ? 50 : 0), key_len);
-    return {reinterpret_cast<const char*>(digest), OU_key_bytes_V4};
+    return iterate_md5_digest(md5, (getR() >= 3 ? 50 : 0), getLengthBytes());
 }
 
 std::string

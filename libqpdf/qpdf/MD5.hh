@@ -41,6 +41,8 @@ class MD5
 
     // computes a raw digest
     void digest(Digest);
+    std::string digest();
+    static std::string digest(std::string_view data);
 
     // prints the digest to stdout terminated with \r\n (primarily for testing)
     void print();

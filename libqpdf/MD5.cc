@@ -88,6 +88,24 @@ MD5::digest(Digest result)
     crypto->MD5_digest(result);
 }
 
+std::string
+MD5::digest()
+{
+    Digest digest_val;
+    digest(digest_val);
+    return {reinterpret_cast<char*>(digest_val), 16};
+}
+
+std::string
+MD5::digest(std::string_view data)
+{
+    MD5 m;
+    m.encodeDataIncrementally(data.data(), data.size());
+    Digest digest_val;
+    m.digest(digest_val);
+    return {reinterpret_cast<char*>(digest_val), 16};
+}
+
 void
 MD5::print()
 {
