@@ -191,12 +191,6 @@ pad_or_truncate_password_V4(std::string password)
     return password;
 }
 
-static std::string
-truncate_password_V5(std::string const& password)
-{
-    return password.substr(0, std::min(static_cast<size_t>(127), password.length()));
-}
-
 static void
 iterate_md5_digest(MD5& md5, MD5::Digest& digest, int iterations, int key_len)
 {
@@ -533,8 +527,8 @@ QPDF::EncryptionData::check_user_password_V5(std::string const& user_password) c
 
     std::string user_data = getU().substr(0, 32);
     std::string validation_salt = getU().substr(32, 8);
-    std::string password = truncate_password_V5(user_password);
-    return hash_V5(password, validation_salt, "") == user_data;
+    std::string password = user_password.substr(0, 127);
+    return hash_V5(user_password.substr(0, 127), validation_salt, "") == user_data;
 }
 
 bool
@@ -578,8 +572,7 @@ QPDF::EncryptionData::check_owner_password_V5(std::string const& owner_password)
     std::string user_data = getU().substr(0, 48);
     std::string owner_data = getO().substr(0, 32);
     std::string validation_salt = getO().substr(32, 8);
-    std::string password = truncate_password_V5(owner_password);
-    return hash_V5(password, validation_salt, user_data) == owner_data;
+    return hash_V5(owner_password.substr(0, 127), validation_salt, user_data) == owner_data;
 }
 
 bool
@@ -629,7 +622,7 @@ QPDF::EncryptionData::recover_encryption_key_with_password(
     // profile of stringprep (RFC 3454) and then convert the result to UTF-8.
 
     perms_valid = false;
-    std::string key_password = truncate_password_V5(password);
+    std::string key_password = password.substr(0, 127);
     std::string key_salt;
     std::string user_data;
     std::string encrypted_file_key;
