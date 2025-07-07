@@ -22,10 +22,11 @@
 #include <cstring>
 
 using namespace qpdf;
+using namespace std::literals;
 
-static unsigned char const padding_string[] = {
-    0x28, 0xbf, 0x4e, 0x5e, 0x4e, 0x75, 0x8a, 0x41, 0x64, 0x00, 0x4e, 0x56, 0xff, 0xfa, 0x01, 0x08,
-    0x2e, 0x2e, 0x00, 0xb6, 0xd0, 0x68, 0x3e, 0x80, 0x2f, 0x0c, 0xa9, 0xfe, 0x64, 0x53, 0x69, 0x7a};
+static std::string padding_string =
+    "\x28\xbf\x4e\x5e\x4e\x75\x8a\x41\x64\x00\x4e\x56\xff\xfa\x01\x08"
+    "\x2e\x2e\x00\xb6\xd0\x68\x3e\x80\x2f\x0c\xa9\xfe\x64\x53\x69\x7a"s;
 
 static unsigned int const key_bytes = 32;
 
@@ -159,46 +160,35 @@ QPDF::EncryptionData::setV5EncryptionParameters(
     this->Perms = Perms;
 }
 
-static void
-pad_or_truncate_password_V4(std::string const& password, char k1[key_bytes])
-{
-    size_t password_bytes = std::min(QIntC::to_size(key_bytes), password.length());
-    size_t pad_bytes = key_bytes - password_bytes;
-    memcpy(k1, password.c_str(), password_bytes);
-    memcpy(k1 + password_bytes, padding_string, pad_bytes);
-}
-
 void
 QPDF::trim_user_password(std::string& user_password)
 {
     // Although unnecessary, this routine trims the padding string from the end of a user password.
     // Its only purpose is for recovery of user passwords which is done in the test suite.
-    char const* cstr = user_password.c_str();
-    size_t len = user_password.length();
-    if (len < key_bytes) {
+    if (user_password.size() < key_bytes) {
         return;
     }
 
-    char const* p1 = cstr;
-    char const* p2 = nullptr;
-    while ((p2 = strchr(p1, '\x28')) != nullptr) {
-        size_t idx = toS(p2 - cstr);
-        if (memcmp(p2, padding_string, len - idx) == 0) {
-            user_password = user_password.substr(0, idx);
+    auto idx = user_password.find('\x28');
+    ;
+    while (idx != user_password.npos) {
+        if (padding_string.starts_with(user_password.substr(idx))) {
+            user_password.resize(idx);
             return;
-        } else {
-            QTC::TC("qpdf", "QPDF_encryption skip 0x28");
-            p1 = p2 + 1;
         }
+        QTC::TC("qpdf", "QPDF_encryption skip 0x28");
+        idx = user_password.find('\x28', ++idx);
     }
 }
 
 static std::string
-pad_or_truncate_password_V4(std::string const& password)
+pad_or_truncate_password_V4(std::string password)
 {
-    char k1[key_bytes];
-    pad_or_truncate_password_V4(password, k1);
-    return {k1, key_bytes};
+    if (password.size() < key_bytes) {
+        password.append(padding_string);
+    }
+    password.resize(key_bytes);
+    return password;
 }
 
 static std::string
@@ -381,7 +371,7 @@ QPDF::compute_data_key(
     }
 
     MD5 md5;
-    md5.encodeDataIncrementally(result.c_str(), result.length());
+    md5.encodeDataIncrementally(result);
     MD5::Digest digest;
     md5.digest(digest);
     return {reinterpret_cast<char*>(digest), std::min(result.length(), toS(16))};
@@ -418,20 +408,18 @@ QPDF::EncryptionData::compute_encryption_key_from_password(std::string const& pa
     // password to be presented in its final form.
 
     MD5 md5;
-    md5.encodeDataIncrementally(pad_or_truncate_password_V4(password).c_str(), key_bytes);
-    md5.encodeDataIncrementally(getO().c_str(), key_bytes);
+    md5.encodeDataIncrementally(pad_or_truncate_password_V4(password));
+    md5.encodeDataIncrementally(getO());
     char pbytes[4];
-    int P = getP();
-    pbytes[0] = static_cast<char>(P & 0xff);
-    pbytes[1] = static_cast<char>((P >> 8) & 0xff);
-    pbytes[2] = static_cast<char>((P >> 16) & 0xff);
-    pbytes[3] = static_cast<char>((P >> 24) & 0xff);
+    int p = getP();
+    pbytes[0] = static_cast<char>(p & 0xff);
+    pbytes[1] = static_cast<char>((p >> 8) & 0xff);
+    pbytes[2] = static_cast<char>((p >> 16) & 0xff);
+    pbytes[3] = static_cast<char>((p >> 24) & 0xff);
     md5.encodeDataIncrementally(pbytes, 4);
-    md5.encodeDataIncrementally(getId1().c_str(), getId1().length());
+    md5.encodeDataIncrementally(getId1());
     if (getR() >= 4 && !getEncryptMetadata()) {
-        char bytes[4];
-        memset(bytes, 0xff, 4);
-        md5.encodeDataIncrementally(bytes, 4);
+        md5.encodeDataIncrementally("\xff\xff\xff\xff");
     }
     MD5::Digest digest;
     int key_len = std::min(toI(sizeof(digest)), getLengthBytes());
@@ -453,7 +441,7 @@ QPDF::EncryptionData::compute_O_rc4_key(
         password = user_password;
     }
     MD5 md5;
-    md5.encodeDataIncrementally(pad_or_truncate_password_V4(password).c_str(), key_bytes);
+    md5.encodeDataIncrementally(pad_or_truncate_password_V4(password));
     MD5::Digest digest;
     int key_len = std::min(QIntC::to_int(sizeof(digest)), getLengthBytes());
     iterate_md5_digest(md5, digest, (getR() >= 3 ? 50 : 0), key_len);
@@ -469,8 +457,7 @@ QPDF::EncryptionData::compute_O_value(
     unsigned char O_key[OU_key_bytes_V4];
     compute_O_rc4_key(user_password, owner_password, O_key);
 
-    char upass[key_bytes];
-    pad_or_truncate_password_V4(user_password, upass);
+    auto upass = pad_or_truncate_password_V4(user_password);
     std::string k1(reinterpret_cast<char*>(O_key), OU_key_bytes_V4);
     pad_short_parameter(k1, QIntC::to_size(getLengthBytes()));
     iterate_rc4(
@@ -480,7 +467,7 @@ QPDF::EncryptionData::compute_O_value(
         getLengthBytes(),
         getR() >= 3 ? 20 : 1,
         false);
-    return {upass, key_bytes};
+    return upass;
 }
 
 std::string
@@ -489,17 +476,16 @@ QPDF::EncryptionData::compute_U_value_R2(std::string const& user_password) const
     // Algorithm 3.4 from the PDF 1.7 Reference Manual
 
     std::string k1 = compute_encryption_key(user_password);
-    char udata[key_bytes];
-    pad_or_truncate_password_V4("", udata);
+    auto udata = padding_string;
     pad_short_parameter(k1, QIntC::to_size(getLengthBytes()));
     iterate_rc4(
-        QUtil::unsigned_char_pointer(udata),
+        QUtil::unsigned_char_pointer(udata.data()),
         key_bytes,
         QUtil::unsigned_char_pointer(k1),
         getLengthBytes(),
         1,
         false);
-    return {udata, key_bytes};
+    return udata;
 }
 
 std::string
@@ -509,8 +495,8 @@ QPDF::EncryptionData::compute_U_value_R3(std::string const& user_password) const
 
     std::string k1 = compute_encryption_key(user_password);
     MD5 md5;
-    md5.encodeDataIncrementally(pad_or_truncate_password_V4("").c_str(), key_bytes);
-    md5.encodeDataIncrementally(getId1().c_str(), getId1().length());
+    md5.encodeDataIncrementally(padding_string);
+    md5.encodeDataIncrementally(getId1());
     MD5::Digest digest;
     md5.digest(digest);
     pad_short_parameter(k1, QIntC::to_size(getLengthBytes()));
