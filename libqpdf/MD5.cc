@@ -46,12 +46,6 @@ MD5::appendString(char const* input_string)
 }
 
 void
-MD5::encodeDataIncrementally(char const* data, size_t len)
-{
-    crypto->MD5_update(QUtil::unsigned_char_pointer(data), len);
-}
-
-void
 MD5::encodeFile(char const* filename, qpdf_offset_t up_to_offset)
 {
     char buffer[1024];
