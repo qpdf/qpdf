@@ -427,11 +427,9 @@ QPDF::EncryptionData::compute_encryption_key_from_password(std::string const& pa
     return {reinterpret_cast<char*>(digest), toS(key_len)};
 }
 
-void
+std::string
 QPDF::EncryptionData::compute_O_rc4_key(
-    std::string const& user_password,
-    std::string const& owner_password,
-    unsigned char key[OU_key_bytes_V4]) const
+    std::string const& user_password, std::string const& owner_password) const
 {
     if (getV() >= 5) {
         throw std::logic_error("compute_O_rc4_key called for file with V >= 5");
@@ -445,7 +443,7 @@ QPDF::EncryptionData::compute_O_rc4_key(
     MD5::Digest digest;
     int key_len = std::min(QIntC::to_int(sizeof(digest)), getLengthBytes());
     iterate_md5_digest(md5, digest, (getR() >= 3 ? 50 : 0), key_len);
-    memcpy(key, digest, OU_key_bytes_V4);
+    return {reinterpret_cast<const char*>(digest), OU_key_bytes_V4};
 }
 
 std::string
@@ -454,16 +452,13 @@ QPDF::EncryptionData::compute_O_value(
 {
     // Algorithm 3.3 from the PDF 1.7 Reference Manual
 
-    unsigned char O_key[OU_key_bytes_V4];
-    compute_O_rc4_key(user_password, owner_password, O_key);
-
     auto upass = pad_or_truncate_password_V4(user_password);
-    std::string k1(reinterpret_cast<char*>(O_key), OU_key_bytes_V4);
-    pad_short_parameter(k1, QIntC::to_size(getLengthBytes()));
+    std::string O_key = compute_O_rc4_key(user_password, owner_password);
+    pad_short_parameter(O_key, QIntC::to_size(getLengthBytes()));
     iterate_rc4(
         QUtil::unsigned_char_pointer(upass),
         key_bytes,
-        O_key,
+        QUtil::unsigned_char_pointer(O_key.data()),
         getLengthBytes(),
         getR() >= 3 ? 20 : 1,
         false);
@@ -558,20 +553,16 @@ QPDF::EncryptionData::check_owner_password_V4(
 {
     // Algorithm 3.7 from the PDF 1.7 Reference Manual
 
-    unsigned char key[OU_key_bytes_V4];
-    compute_O_rc4_key(user_password, owner_password, key);
-    unsigned char O_data[key_bytes];
-    memcpy(O_data, QUtil::unsigned_char_pointer(getO()), key_bytes);
-    std::string k1(reinterpret_cast<char*>(key), OU_key_bytes_V4);
-    pad_short_parameter(k1, QIntC::to_size(getLengthBytes()));
+    auto key = compute_O_rc4_key(user_password, owner_password);
+    pad_short_parameter(key, QIntC::to_size(getLengthBytes()));
+    auto new_user_password = O.substr(0, key_bytes);
     iterate_rc4(
-        O_data,
+        QUtil::unsigned_char_pointer(new_user_password.data()),
         key_bytes,
-        QUtil::unsigned_char_pointer(k1),
+        QUtil::unsigned_char_pointer(key),
         getLengthBytes(),
         (getR() >= 3) ? 20 : 1,
         true);
-    std::string new_user_password = std::string(reinterpret_cast<char*>(O_data), key_bytes);
     if (check_user_password(new_user_password)) {
         user_password = new_user_password;
         return true;
