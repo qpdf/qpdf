@@ -1309,13 +1309,14 @@ QPDFWriter::unparseObject(
     if (level < 0) {
         throw std::logic_error("invalid level in QPDFWriter::unparseObject");
     }
-    // For non-qdf, "indent" is a single space between tokens. For qdf, indent includes the
-    // preceding newline.
-    std::string indent = " ";
+    // For non-qdf, "indent" and "indent_large" are a single space between tokens. For qdf, they
+    // include the preceding newline.
+    std::string indent_large = " ";
     if (m->qdf_mode) {
-        indent.append(static_cast<size_t>(2 * level), ' ');
-        indent[0] = '\n';
+        indent_large.append(static_cast<size_t>(2 * (level + 1)), ' ');
+        indent_large[0] = '\n';
     }
+    std::string_view indent{indent_large.data(), m->qdf_mode ? indent_large.size() - 2 : 1};
 
     if (auto const tc = object.getTypeCode(); tc == ::ot_array) {
         // Note: PDF spec 1.4 implementation note 121 states that Acrobat requires a space after the
@@ -1323,7 +1324,7 @@ QPDFWriter::unparseObject(
         // for all arrays because it looks nicer and doesn't make the files that much bigger.
         write("[");
         for (auto const& item: object.as_array()) {
-            write(indent).write_qdf("  ");
+            write(indent_large);
             unparseChild(item, level + 1, child_flags);
         }
         write(indent).write("]");
@@ -1471,7 +1472,7 @@ QPDFWriter::unparseObject(
 
         for (auto const& [key, value]: object.as_dictionary()) {
             if (!value.null()) {
-                write(indent).write_qdf("  ").write(Name::normalize(key)).write(" ");
+                write(indent_large).write(Name::normalize(key)).write(" ");
                 if (key == "/Contents" && object.isDictionaryOfType("/Sig") &&
                     object.hasKey("/ByteRange")) {
                     QTC::TC("qpdf", "QPDFWriter no encryption sig contents");
@@ -1483,7 +1484,7 @@ QPDFWriter::unparseObject(
         }
 
         if (flags & f_stream) {
-            write(indent).write_qdf("  ").write("/Length ");
+            write(indent_large).write("/Length ");
 
             if (m->direct_stream_lengths) {
                 write(stream_length);
@@ -1491,7 +1492,7 @@ QPDFWriter::unparseObject(
                 write(m->cur_stream_length_id).write(" 0 R");
             }
             if (compress && (flags & f_filtered)) {
-                write(indent).write_qdf("  ").write("/Filter /FlateDecode");
+                write(indent_large).write("/Filter /FlateDecode");
             }
         }
 
