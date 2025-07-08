@@ -24,6 +24,7 @@
 #include <qpdf/Types.h>
 
 #include <bitset>
+#include <concepts>
 #include <cstdio>
 #include <functional>
 #include <list>
@@ -481,10 +482,13 @@ class QPDFWriter
 
     unsigned int bytesNeeded(long long n);
     void writeBinary(unsigned long long val, unsigned int bytes);
-    void writeString(std::string_view str);
-    void writeStringQDF(std::string_view str);
-    void writeStringNoQDF(std::string_view str);
-    void writePad(size_t nspaces);
+    QPDFWriter& write(std::string_view str);
+    QPDFWriter& write(size_t count, char c);
+    QPDFWriter& write(std::integral auto val);
+    template <typename... Args>
+    QPDFWriter& write_qdf(Args&&... args);
+    template <typename... Args>
+    QPDFWriter& write_no_qdf(Args&&... args);
     void assignCompressedObjectNumbers(QPDFObjGen og);
     void enqueueObject(QPDFObjectHandle object);
     void writeObjectStreamOffsets(std::vector<qpdf_offset_t>& offsets, int first_obj);
