@@ -24,10 +24,25 @@ class MD5
     void appendString(char const* input_string);
 
     // appends arbitrary data to current md5 object
-    void encodeDataIncrementally(char const* input_data, size_t len);
+    void
+    encodeDataIncrementally(char const* input_data, size_t len)
+    {
+        crypto->MD5_update(reinterpret_cast<unsigned char*>(const_cast<char*>(input_data)), len);
+    }
+
+    // appends arbitrary data to current md5 object
+    void
+    encodeDataIncrementally(std::string_view input_data)
+    {
+        crypto->MD5_update(
+            reinterpret_cast<unsigned char*>(const_cast<char*>(input_data.data())),
+            input_data.size());
+    }
 
     // computes a raw digest
     void digest(Digest);
+    std::string digest();
+    static std::string digest(std::string_view data);
 
     // prints the digest to stdout terminated with \r\n (primarily for testing)
     void print();

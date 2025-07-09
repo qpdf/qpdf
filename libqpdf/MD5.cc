@@ -46,12 +46,6 @@ MD5::appendString(char const* input_string)
 }
 
 void
-MD5::encodeDataIncrementally(char const* data, size_t len)
-{
-    crypto->MD5_update(QUtil::unsigned_char_pointer(data), len);
-}
-
-void
 MD5::encodeFile(char const* filename, qpdf_offset_t up_to_offset)
 {
     char buffer[1024];
@@ -92,6 +86,24 @@ MD5::digest(Digest result)
 {
     crypto->MD5_finalize();
     crypto->MD5_digest(result);
+}
+
+std::string
+MD5::digest()
+{
+    Digest digest_val;
+    digest(digest_val);
+    return {reinterpret_cast<char*>(digest_val), 16};
+}
+
+std::string
+MD5::digest(std::string_view data)
+{
+    MD5 m;
+    m.encodeDataIncrementally(data.data(), data.size());
+    Digest digest_val;
+    m.digest(digest_val);
+    return {reinterpret_cast<char*>(digest_val), 16};
 }
 
 void
