@@ -109,13 +109,36 @@ namespace qpdf::pl
         write(unsigned char const* buf, size_t len) final
         {
             if (len) {
+                Count::write(std::string_view(reinterpret_cast<char const*>(buf), len));
+            }
+        }
+
+        void
+        write(std::string_view sv)
+        {
+            if (sv.size()) {
                 if (str) {
-                    str->append(reinterpret_cast<char const*>(buf), len);
+                    str->append(sv);
+                    return;
+                }
+                count += static_cast<qpdf_offset_t>(sv.size());
+                if (pass_immediately_to_next) {
+                    next()->write(reinterpret_cast<char const*>(sv.data()), sv.size());
+                }
+            }
+        }
+
+        void
+        write(size_t len, char c)
+        {
+            if (len) {
+                if (str) {
+                    str->append(len, c);
                     return;
                 }
                 count += static_cast<qpdf_offset_t>(len);
                 if (pass_immediately_to_next) {
-                    next()->write(buf, len);
+                    next()->writeString(std::string(len, c));
                 }
             }
         }
