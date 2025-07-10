@@ -485,6 +485,9 @@ class QPDFWriter
     QPDFWriter& write(std::string_view str);
     QPDFWriter& write(size_t count, char c);
     QPDFWriter& write(std::integral auto val);
+    QPDFWriter& write_name(std::string const& str);
+    QPDFWriter& write_string(std::string const& str, bool force_binary = false);
+
     template <typename... Args>
     QPDFWriter& write_qdf(Args&&... args);
     template <typename... Args>

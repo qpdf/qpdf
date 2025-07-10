@@ -853,6 +853,20 @@ QPDFWriter::write(size_t count, char c)
     return *this;
 }
 
+QPDFWriter&
+QPDFWriter::write_name(std::string const& str)
+{
+    m->pipeline->write(Name::normalize(str));
+    return *this;
+}
+
+QPDFWriter&
+QPDFWriter::write_string(std::string const& str, bool force_binary)
+{
+    m->pipeline->write(QPDF_String(str).unparse(force_binary));
+    return *this;
+}
+
 template <typename... Args>
 QPDFWriter&
 QPDFWriter::write_qdf(Args&&... args)
@@ -1149,7 +1163,7 @@ QPDFWriter::writeTrailer(
             if (value.null()) {
                 continue;
             }
-            write_qdf("  ").write_no_qdf(" ").write(Name::normalize(key)).write(" ");
+            write_qdf("  ").write_no_qdf(" ").write_name(key).write(" ");
             if (key == "/Size") {
                 write(size);
                 if (which == t_lin_first) {
@@ -1184,7 +1198,7 @@ QPDFWriter::writeTrailer(
             computeDeterministicIDData();
         }
         generateID();
-        write(QPDF_String(m->id1).unparse(true)).write(QPDF_String(m->id2).unparse(true));
+        write_string(m->id1, true).write_string(m->id2, true);
     }
     write("]");
 
@@ -1472,7 +1486,7 @@ QPDFWriter::unparseObject(
 
         for (auto const& [key, value]: object.as_dictionary()) {
             if (!value.null()) {
-                write(indent_large).write(Name::normalize(key)).write(" ");
+                write(indent_large).write_name(key).write(" ");
                 if (key == "/Contents" && object.isDictionaryOfType("/Sig") &&
                     object.hasKey("/ByteRange")) {
                     QTC::TC("qpdf", "QPDFWriter no encryption sig contents");
@@ -2255,22 +2269,22 @@ QPDFWriter::writeEncryptionDictionary()
         }
     }
     write(" /Filter /Standard /Length ").write(enc.getLengthBytes() * 8);
-    write(" /O ").write(QPDF_String(enc.getO()).unparse(true));
+    write(" /O ").write_string(enc.getO(), true);
     if (V >= 4) {
-        write(" /OE ").write(QPDF_String(enc.getOE()).unparse(true));
+        write(" /OE ").write_string(enc.getOE(), true);
     }
     write(" /P ").write(enc.getP());
     if (V >= 5) {
-        write(" /Perms ").write(QPDF_String(enc.getPerms()).unparse(true));
+        write(" /Perms ").write_string(enc.getPerms(), true);
     }
     write(" /R ").write(enc.getR());
 
     if (V >= 4) {
         write(" /StmF /StdCF /StrF /StdCF");
     }
-    write(" /U ").write(QPDF_String(enc.getU()).unparse(true));
+    write(" /U ").write_string(enc.getU(), true);
     if (V >= 4) {
-        write(" /UE ").write(QPDF_String(enc.getUE()).unparse(true));
+        write(" /UE ").write_string(enc.getUE(), true);
     }
     write(" /V ").write(enc.getV()).write(" >>");
     closeObject(m->encryption_dict_objid);
