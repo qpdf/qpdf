@@ -438,6 +438,9 @@ class QPDF
     // Encryption support
 
     enum encryption_method_e { e_none, e_unknown, e_rc4, e_aes, e_aesv3 };
+
+    // To be removed from the public API in qpdf 13. See
+    // <https:manual.qpdf.org/release-notes.html#r12-3-0-deprecate>.
     class EncryptionData
     {
       public:
@@ -558,8 +561,10 @@ class QPDF
         bool use_aes,
         int encryption_V,
         int encryption_R);
-    QPDF_DLL
-    static std::string
+
+    // To be removed in qpdf 13. See <https:manual.qpdf.org/release-notes.html#r12-3-0-deprecate>.
+    [[deprecated("to be removed in qpdf 13")]]
+    QPDF_DLL static std::string
     compute_encryption_key(std::string const& password, EncryptionData const& data);
 
     QPDF_DLL
