@@ -569,7 +569,7 @@ class QPDFWriter
     // is popped.
 
     void adjustAESStreamLength(size_t& length);
-    void pushEncryptionFilter(PipelinePopper&);
+    PipelinePopper pushEncryptionFilter();
     void pushMD5Pipeline(PipelinePopper&);
     void computeDeterministicIDData();
 
