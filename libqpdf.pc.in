@@ -8,4 +8,4 @@ Description: PDF transformation library
 Version: @PROJECT_VERSION@
 Requires.private: zlib, libjpeg@CRYPTO_PKG@
 Libs: -L${libdir} -lqpdf
-Cflags: -I${includedir}
+Cflags: -I${includedir} -std=c++20
