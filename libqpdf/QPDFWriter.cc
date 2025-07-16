@@ -2751,8 +2751,11 @@ QPDFWriter::writeLinearized()
         if (pass == 1) {
             if (!m->lin_pass1_filename.empty()) {
                 lin_pass1_file = QUtil::safe_fopen(m->lin_pass1_filename.c_str(), "wb");
-                m->pipeline_stack.push(new Pl_StdioFile("linearization pass1", lin_pass1_file));
-                m->pipeline_stack.activate(pp_pass1);
+                m->pipeline_stack.activate(
+                    pp_pass1,
+                    std::make_unique<pl::Link>(
+                        nullptr,
+                        std::make_unique<Pl_StdioFile>("linearization pass1", lin_pass1_file)));
             } else {
                 m->pipeline_stack.activate(pp_pass1, true);
             }
