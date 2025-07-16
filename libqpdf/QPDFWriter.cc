@@ -1098,32 +1098,27 @@ QPDFWriter::adjustAESStreamLength(size_t& length)
     }
 }
 
-QPDFWriter::PipelinePopper
-QPDFWriter::pushEncryptionFilter()
+QPDFWriter&
+QPDFWriter::write_encrypted(std::string_view str)
 {
-    auto pp = m->pipeline_stack.popper();
-    if (m->encryption && !m->cur_data_key.empty()) {
-        Pipeline* p = nullptr;
-        if (m->encrypt_use_aes) {
-            p = new Pl_AES_PDF(
-                "aes stream encryption",
-                m->pipeline,
+    if (!(m->encryption && !m->cur_data_key.empty())) {
+        write(str);
+    } else if (m->encrypt_use_aes) {
+        write(
+            pl::pipe<Pl_AES_PDF>(
+                str,
                 true,
                 QUtil::unsigned_char_pointer(m->cur_data_key),
-                m->cur_data_key.length());
-        } else {
-            p = new Pl_RC4(
-                "rc4 stream encryption",
-                m->pipeline,
+                m->cur_data_key.length()));
+    } else {
+        write(
+            pl::pipe<Pl_RC4>(
+                str,
                 QUtil::unsigned_char_pointer(m->cur_data_key),
-                QIntC::to_int(m->cur_data_key.length()));
-        }
-        m->pipeline_stack.push(p);
+                QIntC::to_int(m->cur_data_key.length())));
     }
-    // Must call this unconditionally so we can call popPipelineStack to balance
-    // pushEncryptionFilter().
-    m->pipeline_stack.activate(pp);
-    return pp;
+
+    return *this;
 }
 
 void
@@ -1659,18 +1654,9 @@ QPDFWriter::unparseObject(
         adjustAESStreamLength(m->cur_stream_length);
         unparseObject(stream_dict, 0, flags, m->cur_stream_length, compress_stream);
         char last_char = stream_data.empty() ? '\0' : stream_data.back();
-        write("\nstream\n");
-        {
-            auto pp_enc = pushEncryptionFilter();
-            write(stream_data);
-        }
-
-        if ((m->added_newline =
-                 m->newline_before_endstream || (m->qdf_mode && last_char != '\n'))) {
-            write("\nendstream");
-        } else {
-            write("endstream");
-        }
+        write("\nstream\n").write_encrypted(stream_data);
+        m->added_newline = m->newline_before_endstream || (m->qdf_mode && last_char != '\n');
+        write(m->added_newline ? "\nendstream" : "endstream");
     } else if (tc == ::ot_string) {
         std::string val;
         if (m->encryption && !(flags & f_in_ostream) && !(flags & f_no_encryption) &&
@@ -1842,18 +1828,11 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
             unparseChild(extends, 1, f_in_ostream);
         }
     }
-    write_qdf("\n").write_no_qdf(" ").write(">>\nstream\n");
+    write_qdf("\n").write_no_qdf(" ").write(">>\nstream\n").write_encrypted(stream_buffer_pass2);
     if (m->encryption) {
         QTC::TC("qpdf", "QPDFWriter encrypt object stream");
     }
-    {
-        auto pp_enc = pushEncryptionFilter();
-        write(stream_buffer_pass2);
-    }
-    if (m->newline_before_endstream) {
-        write("\n");
-    }
-    write("endstream");
+    write(m->newline_before_endstream ? "\nendstream" : "endstream");
     m->cur_data_key.clear();
     closeObject(new_stream_id);
 }
@@ -2462,21 +2441,13 @@ QPDFWriter::writeHintStream(int hint_id)
     }
     adjustAESStreamLength(hlen);
     write(" /Length ").write(hlen);
-    write(" >>\nstream\n");
+    write(" >>\nstream\n").write_encrypted(hint_buffer);
 
     if (m->encryption) {
         QTC::TC("qpdf", "QPDFWriter encrypted hint stream");
     }
-    char last_char = hint_buffer.empty() ? '\0' : hint_buffer.back();
-    {
-        auto pp_enc = pushEncryptionFilter();
-        write(hint_buffer);
-    }
 
-    if (last_char != '\n') {
-        write("\n");
-    }
-    write("endstream");
+    write(hint_buffer.empty() || hint_buffer.back() != '\n' ? "\nendstream" : "endstream");
     closeObject(hint_id);
 }
 

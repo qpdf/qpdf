@@ -466,6 +466,7 @@ class QPDFWriter
     QPDFWriter& write(std::integral auto val);
     QPDFWriter& write_name(std::string const& str);
     QPDFWriter& write_string(std::string const& str, bool force_binary = false);
+    QPDFWriter& write_encrypted(std::string_view str);
 
     template <typename... Args>
     QPDFWriter& write_qdf(Args&&... args);
@@ -569,7 +570,6 @@ class QPDFWriter
     // is popped.
 
     void adjustAESStreamLength(size_t& length);
-    PipelinePopper pushEncryptionFilter();
     void pushMD5Pipeline(PipelinePopper&);
     void computeDeterministicIDData();
 

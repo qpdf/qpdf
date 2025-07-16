@@ -173,6 +173,18 @@ namespace qpdf::pl
         unsigned long id_{0};
         bool pass_immediately_to_next{false};
     };
+
+    template <typename P, typename... Args>
+    std::string
+    pipe(std::string_view data, Args&&... args)
+    {
+        std::string result;
+        String s("", nullptr, result);
+        P pl("", &s, std::forward<Args>(args)...);
+        pl.write(reinterpret_cast<unsigned char const*>(data.data()), data.size());
+        pl.finish();
+        return result;
+    }
 } // namespace qpdf::pl
 
 #endif // PIPELINE_PRIVATE_HH
