@@ -95,6 +95,9 @@ class QPDFWriter::PipelinePopper
 
     ~PipelinePopper();
 
+    // Manually pop pipeline from the pipeline stack.
+    void pop();
+
     Pl_stack* stack{nullptr};
     unsigned long stack_id{0};
 };
@@ -198,11 +201,10 @@ namespace
             qpdf_assert_debug(stack.size() >= 2);
             top->finish();
             qpdf_assert_debug(dynamic_cast<pl::Count*>(stack.back()) == top);
-            // It might be possible for this assertion to fail if writeLinearized exits by exception
-            // when deterministic ID, but I don't think so. As of this writing, this is the only
-            // case in which two dynamically allocated PipelinePopper objects ever exist at the same
-            // time, so the assertion will fail if they get popped out of order from automatic
-            // destruction.
+            // It used to be possible for this assertion to fail if writeLinearized exits by
+            // exception when deterministic ID. There are no longer any cases in which two
+            // dynamically allocated PipelinePopper objects ever exist at the same time, so the
+            // assertion will fail if they get popped out of order from automatic destruction.
             qpdf_assert_debug(top->id() == stack_id);
             delete stack.back();
             stack.pop_back();
@@ -238,6 +240,16 @@ QPDFWriter::PipelinePopper::~PipelinePopper()
     if (stack) {
         stack->pop(stack_id);
     }
+}
+
+void
+QPDFWriter::PipelinePopper::pop()
+{
+    if (stack) {
+        stack->pop(stack_id);
+    }
+    stack_id = 0;
+    stack = nullptr;
 }
 
 class QPDFWriter::Members
@@ -2762,19 +2774,19 @@ QPDFWriter::writeLinearized()
     // Write file in two passes.  Part numbers refer to PDF spec 1.4.
 
     FILE* lin_pass1_file = nullptr;
-    auto pp_pass1 = std::make_unique<PipelinePopper>(m->pipeline_stack);
-    auto pp_md5 = std::make_unique<PipelinePopper>(m->pipeline_stack);
+    auto pp_pass1 = m->pipeline_stack.popper();
+    auto pp_md5 = m->pipeline_stack.popper();
     for (int pass: {1, 2}) {
         if (pass == 1) {
             if (!m->lin_pass1_filename.empty()) {
                 lin_pass1_file = QUtil::safe_fopen(m->lin_pass1_filename.c_str(), "wb");
                 m->pipeline_stack.push(new Pl_StdioFile("linearization pass1", lin_pass1_file));
-                m->pipeline_stack.activate(*pp_pass1);
+                m->pipeline_stack.activate(pp_pass1);
             } else {
-                m->pipeline_stack.activate(*pp_pass1, true);
+                m->pipeline_stack.activate(pp_pass1, true);
             }
             if (m->deterministic_id) {
-                pushMD5Pipeline(*pp_md5);
+                pushMD5Pipeline(pp_md5);
             }
         }
 
@@ -2949,13 +2961,13 @@ QPDFWriter::writeLinearized()
             if (m->deterministic_id) {
                 QTC::TC("qpdf", "QPDFWriter linearized deterministic ID", need_xref_stream ? 0 : 1);
                 computeDeterministicIDData();
-                pp_md5 = nullptr;
+                pp_md5.pop();
                 qpdf_assert_debug(m->md5_pipeline == nullptr);
             }
 
             // Close first pass pipeline
             file_size = m->pipeline->getCount();
-            pp_pass1 = nullptr;
+            pp_pass1.pop();
 
             // Save hint offset since it will be set to zero by calling openObject.
             qpdf_offset_t hint_offset1 = m->new_obj[hint_id].xref.getOffset();
