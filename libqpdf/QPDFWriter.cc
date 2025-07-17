@@ -107,9 +107,8 @@ namespace
         };
 
       public:
-        Pl_stack(pl::Count*& top, std::unique_ptr<Pl_MD5>& md5_pipeline) :
-            top(top),
-            md5_pipeline(md5_pipeline)
+        Pl_stack(pl::Count*& top) :
+            top(top)
         {
         }
 
@@ -196,6 +195,16 @@ namespace
             stack.emplace_back(std::move(c));
         }
 
+        // Return the hex digest and disable the MD5 pipeline.
+        std::string
+        hex_digest()
+        {
+            qpdf_assert_debug(md5_pipeline);
+            auto digest = md5_pipeline->getHexDigest();
+            md5_pipeline->enable(false);
+            return digest;
+        }
+
         void
         clear_buffer()
         {
@@ -227,7 +236,7 @@ namespace
 
         std::vector<std::unique_ptr<pl::Count>> stack;
         pl::Count*& top;
-        std::unique_ptr<Pl_MD5>& md5_pipeline;
+        std::unique_ptr<Pl_MD5> md5_pipeline{nullptr};
         unsigned long last_id{0};
         unsigned long md5_id{0};
         std::string count_buffer;
@@ -319,7 +328,6 @@ class QPDFWriter::Members
     std::map<int, std::vector<QPDFObjGen>> object_stream_to_objects;
     Pl_stack pipeline_stack;
     bool deterministic_id{false};
-    std::unique_ptr<Pl_MD5> md5_pipeline{nullptr};
     std::string deterministic_id_data;
     bool did_write_setup{false};
 
@@ -336,7 +344,7 @@ class QPDFWriter::Members
 QPDFWriter::Members::Members(QPDF& pdf) :
     pdf(pdf),
     root_og(pdf.getRoot().getObjGen().isIndirect() ? pdf.getRoot().getObjGen() : QPDFObjGen(-1, 0)),
-    pipeline_stack(pipeline, md5_pipeline)
+    pipeline_stack(pipeline)
 {
 }
 
@@ -1128,10 +1136,8 @@ QPDFWriter::computeDeterministicIDData()
         throw std::logic_error(
             "Deterministic ID computation enabled after ID generation has already occurred.");
     }
-    qpdf_assert_debug(m->md5_pipeline != nullptr);
     qpdf_assert_debug(m->deterministic_id_data.empty());
-    m->deterministic_id_data = m->md5_pipeline->getHexDigest();
-    m->md5_pipeline->enable(false);
+    m->deterministic_id_data = m->pipeline_stack.hex_digest();
 }
 
 int
@@ -2922,7 +2928,6 @@ QPDFWriter::writeLinearized()
                 QTC::TC("qpdf", "QPDFWriter linearized deterministic ID", need_xref_stream ? 0 : 1);
                 computeDeterministicIDData();
                 pp_md5.pop();
-                qpdf_assert_debug(m->md5_pipeline == nullptr);
             }
 
             // Close first pass pipeline
