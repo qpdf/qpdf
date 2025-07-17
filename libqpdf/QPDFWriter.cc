@@ -122,7 +122,7 @@ namespace
         void
         initialize(Pipeline* p)
         {
-            auto c = std::make_unique<pl::Count>(1, p);
+            auto c = std::make_unique<pl::Count>(++last_id, p);
             top = c.get();
             stack.emplace_back(std::move(c));
         }
@@ -168,18 +168,17 @@ namespace
         {
             std::unique_ptr<pl::Count> c;
             if (link) {
-                c = std::make_unique<pl::Count>(next_stack_id, count_buffer, std::move(link));
+                c = std::make_unique<pl::Count>(++last_id, count_buffer, std::move(link));
             } else if (discard) {
-                c = std::make_unique<pl::Count>(next_stack_id, nullptr);
+                c = std::make_unique<pl::Count>(++last_id, nullptr);
             } else if (!str) {
-                c = std::make_unique<pl::Count>(next_stack_id, top);
+                c = std::make_unique<pl::Count>(++last_id, top);
             } else {
-                c = std::make_unique<pl::Count>(next_stack_id, *str);
+                c = std::make_unique<pl::Count>(++last_id, *str);
             }
-            pp.stack_id = next_stack_id;
+            pp.stack_id = last_id;
             top = c.get();
             stack.emplace_back(std::move(c));
-            ++next_stack_id;
         }
         void
         activate_md5(Popper& pp)
@@ -190,12 +189,11 @@ namespace
             md5_pipeline = std::make_unique<Pl_MD5>("qpdf md5", top);
             md5_pipeline->persistAcrossFinish(true);
             // Special case code in pop clears m->md5_pipeline upon deletion.
-            auto c = std::make_unique<pl::Count>(next_stack_id, md5_pipeline.get());
-            pp.stack_id = next_stack_id;
-            md5_id = next_stack_id;
+            auto c = std::make_unique<pl::Count>(++last_id, md5_pipeline.get());
+            pp.stack_id = last_id;
+            md5_id = last_id;
             top = c.get();
             stack.emplace_back(std::move(c));
-            ++next_stack_id;
         }
 
         void
@@ -230,11 +228,10 @@ namespace
         std::vector<std::unique_ptr<pl::Count>> stack;
         pl::Count*& top;
         std::unique_ptr<Pl_MD5>& md5_pipeline;
-        unsigned long next_stack_id{2};
+        unsigned long last_id{0};
         unsigned long md5_id{0};
         std::string count_buffer;
     };
-
 } // namespace
 
 Pl_stack::Popper::~Popper()
