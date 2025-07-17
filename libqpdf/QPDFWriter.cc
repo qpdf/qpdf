@@ -276,7 +276,7 @@ class QPDFWriter::Members
     char const* filename{"unspecified"};
     FILE* file{nullptr};
     bool close_file{false};
-    Pl_Buffer* buffer_pipeline{nullptr};
+    std::unique_ptr<Pl_Buffer> buffer_pipeline{nullptr};
     Buffer* output_buffer{nullptr};
     bool normalize_content_set{false};
     bool normalize_content{false};
@@ -311,7 +311,7 @@ class QPDFWriter::Members
     std::string extra_header_text;
     int encryption_dict_objid{0};
     std::string cur_data_key;
-    std::list<std::shared_ptr<Pipeline>> to_delete;
+    std::unique_ptr<Pipeline> file_pl;
     qpdf::pl::Count* pipeline{nullptr};
     std::vector<QPDFObjectHandle> object_queue;
     size_t object_queue_front{0};
@@ -398,18 +398,16 @@ QPDFWriter::setOutputFile(char const* description, FILE* file, bool close_file)
     m->filename = description;
     m->file = file;
     m->close_file = close_file;
-    std::shared_ptr<Pipeline> p = std::make_shared<Pl_StdioFile>("qpdf output", file);
-    m->to_delete.push_back(p);
-    m->pipeline_stack.initialize(p.get());
+    m->file_pl = std::make_unique<Pl_StdioFile>("qpdf output", file);
+    m->pipeline_stack.initialize(m->file_pl.get());
 }
 
 void
 QPDFWriter::setOutputMemory()
 {
     m->filename = "memory buffer";
-    m->buffer_pipeline = new Pl_Buffer("qpdf output");
-    m->to_delete.push_back(std::shared_ptr<Pipeline>(m->buffer_pipeline));
-    m->pipeline_stack.initialize(m->buffer_pipeline);
+    m->buffer_pipeline = std::make_unique<Pl_Buffer>("qpdf output");
+    m->pipeline_stack.initialize(m->buffer_pipeline.get());
 }
 
 Buffer*
