@@ -109,7 +109,7 @@ namespace
         using PP = QPDFWriter::PipelinePopper;
 
       public:
-        Pl_stack(pl::Count*& top, Pl_MD5*& md5_pipeline) :
+        Pl_stack(pl::Count*& top, std::unique_ptr<Pl_MD5>& md5_pipeline) :
             top(top),
             md5_pipeline(md5_pipeline)
         {
@@ -183,12 +183,21 @@ namespace
             top = c;
             ++next_stack_id;
         }
-        Pipeline*
-        push(Pipeline* p)
+        void
+        activate_md5(PP& pp)
         {
-            qpdf_assert_debug(!dynamic_cast<pl::Count*>(p));
-            stack.emplace_back(p);
-            return p;
+            qpdf_assert_debug(!md5_pipeline);
+            qpdf_assert_debug(md5_id == 0);
+            qpdf_assert_debug(top->getCount() == 0);
+            md5_pipeline = std::make_unique<Pl_MD5>("qpdf md5", top);
+            md5_pipeline->persistAcrossFinish(true);
+            // Special case code in pop clears m->md5_pipeline upon deletion.
+            auto* c = new pl::Count(next_stack_id, md5_pipeline.get());
+            pp.stack_id = next_stack_id;
+            md5_id = next_stack_id;
+            stack.emplace_back(c);
+            top = c;
+            ++next_stack_id;
         }
 
         void
@@ -205,16 +214,17 @@ namespace
             // exception when deterministic ID. There are no longer any cases in which two
             // dynamically allocated PipelinePopper objects ever exist at the same time, so the
             // assertion will fail if they get popped out of order from automatic destruction.
+            if (stack_id == md5_id) {
+                md5_pipeline = nullptr;
+                md5_id = 0;
+            }
             qpdf_assert_debug(top->id() == stack_id);
             delete stack.back();
             stack.pop_back();
+
             while (!dynamic_cast<pl::Count*>(stack.back())) {
-                Pipeline* p = stack.back();
-                if (dynamic_cast<Pl_MD5*>(p) == md5_pipeline) {
-                    md5_pipeline = nullptr;
-                }
+                delete stack.back();
                 stack.pop_back();
-                delete p;
             }
             top = dynamic_cast<pl::Count*>(stack.back());
         }
@@ -228,9 +238,10 @@ namespace
       private:
         std::vector<Pipeline*> stack;
         pl::Count*& top;
-        Pl_MD5*& md5_pipeline;
+        std::unique_ptr<Pl_MD5>& md5_pipeline;
         std::vector<std::unique_ptr<Pipeline>> to_delete;
         unsigned long next_stack_id{2};
+        unsigned long md5_id{0};
         std::string count_buffer;
     };
 } // namespace
@@ -320,7 +331,7 @@ class QPDFWriter::Members
     std::map<int, std::vector<QPDFObjGen>> object_stream_to_objects;
     Pl_stack pipeline_stack;
     bool deterministic_id{false};
-    Pl_MD5* md5_pipeline{nullptr};
+    std::unique_ptr<Pl_MD5> md5_pipeline{nullptr};
     std::string deterministic_id_data;
     bool did_write_setup{false};
 
@@ -1122,26 +1133,13 @@ QPDFWriter::write_encrypted(std::string_view str)
 }
 
 void
-QPDFWriter::pushMD5Pipeline(PipelinePopper& pp)
+QPDFWriter::computeDeterministicIDData()
 {
     if (!m->id2.empty()) {
         // Can't happen in the code
         throw std::logic_error(
             "Deterministic ID computation enabled after ID generation has already occurred.");
     }
-    qpdf_assert_debug(m->deterministic_id);
-    qpdf_assert_debug(m->md5_pipeline == nullptr);
-    qpdf_assert_debug(m->pipeline->getCount() == 0);
-    m->md5_pipeline = new Pl_MD5("qpdf md5", m->pipeline);
-    m->md5_pipeline->persistAcrossFinish(true);
-    // Special case code in popPipelineStack clears m->md5_pipeline upon deletion.
-    m->pipeline_stack.push(m->md5_pipeline);
-    m->pipeline_stack.activate(pp);
-}
-
-void
-QPDFWriter::computeDeterministicIDData()
-{
     qpdf_assert_debug(m->md5_pipeline != nullptr);
     qpdf_assert_debug(m->deterministic_id_data.empty());
     m->deterministic_id_data = m->md5_pipeline->getHexDigest();
@@ -2760,7 +2758,7 @@ QPDFWriter::writeLinearized()
                 m->pipeline_stack.activate(pp_pass1, true);
             }
             if (m->deterministic_id) {
-                pushMD5Pipeline(pp_md5);
+                m->pipeline_stack.activate_md5(pp_md5);
             }
         }
 
@@ -3068,7 +3066,7 @@ QPDFWriter::writeStandard()
 {
     auto pp_md5 = m->pipeline_stack.popper();
     if (m->deterministic_id) {
-        pushMD5Pipeline(pp_md5);
+        m->pipeline_stack.activate_md5(pp_md5);
     }
 
     // Start writing
