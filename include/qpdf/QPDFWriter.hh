@@ -447,7 +447,6 @@ class QPDFWriter
     struct NewObject;
     class ObjTable;
     class NewObjTable;
-    class PipelinePopper;
 
   private:
     // flags used by unparseObject

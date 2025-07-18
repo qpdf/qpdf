@@ -52,61 +52,59 @@ QPDFWriter::FunctionProgressReporter::reportProgress(int progress)
 
 namespace
 {
-    class Pl_stack;
-}
-
-// A PipelinePopper is normally returned by Pl_stack::activate, or, if necessary, a  reference to a
-// PipelinePopper instance can be passed into activate. When the PipelinePopper goes out of scope,
-// the pipeline stack is popped. This causes finish to be called  on the current pipeline and the
-// pipeline stack to be popped until the top of stack is a previous active top of stack, and
-// restores the pipeline to that point. It deletes any pipelines that it pops.
-class QPDFWriter::PipelinePopper
-{
-  public:
-    PipelinePopper(Pl_stack& stack) :
-        stack(&stack)
-    {
-    }
-    PipelinePopper() = default;
-    PipelinePopper(PipelinePopper const&) = delete;
-    PipelinePopper(PipelinePopper&& other) noexcept
-    {
-        // For MSVC, default pops the stack
-        if (this != &other) {
-            stack = other.stack;
-            stack_id = other.stack_id;
-            other.stack = nullptr;
-            other.stack_id = 0;
-        };
-    }
-    PipelinePopper& operator=(PipelinePopper const&) = delete;
-    PipelinePopper&
-    operator=(PipelinePopper&& other) noexcept
-    {
-        // For MSVC, default pops the stack
-        if (this != &other) {
-            stack = other.stack;
-            stack_id = other.stack_id;
-            other.stack = nullptr;
-            other.stack_id = 0;
-        };
-        return *this;
-    }
-
-    ~PipelinePopper();
-
-    // Manually pop pipeline from the pipeline stack.
-    void pop();
-
-    Pl_stack* stack{nullptr};
-    unsigned long stack_id{0};
-};
-
-namespace
-{
     class Pl_stack
     {
-        using PP = QPDFWriter::PipelinePopper;
+        // A pipeline Popper is normally returned by Pl_stack::activate, or, if necessary, a
+        // reference to a Popper instance can be passed into activate. When the Popper goes out of
+        // scope, the pipeline stack is popped. This causes finish to be called on the current
+        // pipeline and the pipeline stack to be popped until the top of stack is a previous active
+        // top of stack and restores the pipeline to that point. It deletes any pipelines that it
+        // pops.
+        class Popper
+        {
+            friend class Pl_stack;
+
+          public:
+            Popper() = default;
+            Popper(Popper const&) = delete;
+            Popper(Popper&& other) noexcept
+            {
+                // For MSVC, default pops the stack
+                if (this != &other) {
+                    stack = other.stack;
+                    stack_id = other.stack_id;
+                    other.stack = nullptr;
+                    other.stack_id = 0;
+                };
+            }
+            Popper& operator=(Popper const&) = delete;
+            Popper&
+            operator=(Popper&& other) noexcept
+            {
+                // For MSVC, default pops the stack
+                if (this != &other) {
+                    stack = other.stack;
+                    stack_id = other.stack_id;
+                    other.stack = nullptr;
+                    other.stack_id = 0;
+                };
+                return *this;
+            }
+
+            ~Popper();
+
+            // Manually pop pipeline from the pipeline stack.
+            void pop();
+
+          private:
+            Popper(Pl_stack& stack) :
+                stack(&stack)
+            {
+            }
+
+            Pl_stack* stack{nullptr};
+            unsigned long stack_id{0};
+        };
 
       public:
         Pl_stack(pl::Count*& top, std::unique_ptr<Pl_MD5>& md5_pipeline) :
@@ -115,7 +113,7 @@ namespace
         {
         }
 
-        PP
+        Popper
         popper()
         {
             return {*this};
@@ -129,41 +127,41 @@ namespace
             stack.emplace_back(std::move(c));
         }
 
-        PP
+        Popper
         activate(std::string& str)
         {
-            PP pp{*this};
+            Popper pp{*this};
             activate(pp, str);
             return pp;
         }
 
         void
-        activate(PP& pp, std::string& str)
+        activate(Popper& pp, std::string& str)
         {
             activate(pp, false, &str, nullptr);
         }
 
         void
-        activate(PP& pp, std::unique_ptr<pl::Link> link)
+        activate(Popper& pp, std::unique_ptr<pl::Link> link)
         {
             count_buffer.clear();
             activate(pp, false, &count_buffer, std::move(link));
         }
 
-        PP
+        Popper
         activate(
             bool discard = false,
             std::string* str = nullptr,
             std::unique_ptr<pl::Link> link = nullptr)
         {
-            PP pp{*this};
+            Popper pp{*this};
             activate(pp, discard, str, std::move(link));
             return pp;
         }
 
         void
         activate(
-            PP& pp,
+            Popper& pp,
             bool discard = false,
             std::string* str = nullptr,
             std::unique_ptr<pl::Link> link = nullptr)
@@ -184,7 +182,7 @@ namespace
             ++next_stack_id;
         }
         void
-        activate_md5(PP& pp)
+        activate_md5(Popper& pp)
         {
             qpdf_assert_debug(!md5_pipeline);
             qpdf_assert_debug(md5_id == 0);
@@ -201,8 +199,14 @@ namespace
         }
 
         void
-        pop(unsigned long stack_id)
+        clear_buffer()
+        {
+            count_buffer.clear();
+        }
 
+      private:
+        void
+        pop(unsigned long stack_id)
         {
             if (!stack_id) {
                 return;
@@ -212,7 +216,7 @@ namespace
             qpdf_assert_debug(stack.back().get() == top);
             // It used to be possible for this assertion to fail if writeLinearized exits by
             // exception when deterministic ID. There are no longer any cases in which two
-            // dynamically allocated PipelinePopper objects ever exist at the same time, so the
+            // dynamically allocated pipeline Popper objects ever exist at the same time, so the
             // assertion will fail if they get popped out of order from automatic destruction.
             qpdf_assert_debug(top->id() == stack_id);
             if (stack_id == md5_id) {
@@ -223,13 +227,6 @@ namespace
             top = stack.back().get();
         }
 
-        void
-        clear_buffer()
-        {
-            count_buffer.clear();
-        }
-
-      private:
         std::vector<std::unique_ptr<pl::Count>> stack;
         pl::Count*& top;
         std::unique_ptr<Pl_MD5>& md5_pipeline;
@@ -237,9 +234,10 @@ namespace
         unsigned long md5_id{0};
         std::string count_buffer;
     };
+
 } // namespace
 
-QPDFWriter::PipelinePopper::~PipelinePopper()
+Pl_stack::Popper::~Popper()
 {
     if (stack) {
         stack->pop(stack_id);
@@ -247,7 +245,7 @@ QPDFWriter::PipelinePopper::~PipelinePopper()
 }
 
 void
-QPDFWriter::PipelinePopper::pop()
+Pl_stack::Popper::pop()
 {
     if (stack) {
         stack->pop(stack_id);
