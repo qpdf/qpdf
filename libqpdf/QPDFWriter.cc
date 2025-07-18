@@ -124,9 +124,9 @@ namespace
         void
         initialize(Pipeline* p)
         {
-            top = new pl::Count(1, p);
-            to_delete.emplace_back(std::unique_ptr<Pipeline>(top));
-            stack.emplace_back(top);
+            auto c = std::make_unique<pl::Count>(1, p);
+            top = c.get();
+            stack.emplace_back(std::move(c));
         }
 
         PP
@@ -168,19 +168,19 @@ namespace
             std::string* str = nullptr,
             std::unique_ptr<pl::Link> link = nullptr)
         {
-            pl::Count* c;
+            std::unique_ptr<pl::Count> c;
             if (link) {
-                c = new pl::Count(next_stack_id, count_buffer, std::move(link));
+                c = std::make_unique<pl::Count>(next_stack_id, count_buffer, std::move(link));
             } else if (discard) {
-                c = new pl::Count(next_stack_id, nullptr);
+                c = std::make_unique<pl::Count>(next_stack_id, nullptr);
             } else if (!str) {
-                c = new pl::Count(next_stack_id, stack.back());
+                c = std::make_unique<pl::Count>(next_stack_id, top);
             } else {
-                c = new pl::Count(next_stack_id, *str);
+                c = std::make_unique<pl::Count>(next_stack_id, *str);
             }
             pp.stack_id = next_stack_id;
-            stack.emplace_back(c);
-            top = c;
+            top = c.get();
+            stack.emplace_back(std::move(c));
             ++next_stack_id;
         }
         void
@@ -192,11 +192,11 @@ namespace
             md5_pipeline = std::make_unique<Pl_MD5>("qpdf md5", top);
             md5_pipeline->persistAcrossFinish(true);
             // Special case code in pop clears m->md5_pipeline upon deletion.
-            auto* c = new pl::Count(next_stack_id, md5_pipeline.get());
+            auto c = std::make_unique<pl::Count>(next_stack_id, md5_pipeline.get());
             pp.stack_id = next_stack_id;
             md5_id = next_stack_id;
-            stack.emplace_back(c);
-            top = c;
+            top = c.get();
+            stack.emplace_back(std::move(c));
             ++next_stack_id;
         }
 
@@ -209,24 +209,18 @@ namespace
             }
             qpdf_assert_debug(stack.size() >= 2);
             top->finish();
-            qpdf_assert_debug(dynamic_cast<pl::Count*>(stack.back()) == top);
+            qpdf_assert_debug(stack.back().get() == top);
             // It used to be possible for this assertion to fail if writeLinearized exits by
             // exception when deterministic ID. There are no longer any cases in which two
             // dynamically allocated PipelinePopper objects ever exist at the same time, so the
             // assertion will fail if they get popped out of order from automatic destruction.
+            qpdf_assert_debug(top->id() == stack_id);
             if (stack_id == md5_id) {
                 md5_pipeline = nullptr;
                 md5_id = 0;
             }
-            qpdf_assert_debug(top->id() == stack_id);
-            delete stack.back();
             stack.pop_back();
-
-            while (!dynamic_cast<pl::Count*>(stack.back())) {
-                delete stack.back();
-                stack.pop_back();
-            }
-            top = dynamic_cast<pl::Count*>(stack.back());
+            top = stack.back().get();
         }
 
         void
@@ -236,10 +230,9 @@ namespace
         }
 
       private:
-        std::vector<Pipeline*> stack;
+        std::vector<std::unique_ptr<pl::Count>> stack;
         pl::Count*& top;
         std::unique_ptr<Pl_MD5>& md5_pipeline;
-        std::vector<std::unique_ptr<Pipeline>> to_delete;
         unsigned long next_stack_id{2};
         unsigned long md5_id{0};
         std::string count_buffer;
