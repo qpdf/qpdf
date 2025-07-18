@@ -32,6 +32,15 @@ more detail.
 
   - Other changes
 
+.. _r12-3-0-deprecate:
+
+    - The following are believed to be not in use and have been deprecated.
+      If you are relying on them please open a ticket_.
+
+      - QPDF::compute_encryption_key
+      - All QPDF::EncryptionData methods. These methods are not exported in the
+        shared library and are only useable in statically linked programs.
+
     - There has been some refactoring of stream filtering. These are optimized
       for the common case where no user provided stream filters  are
       registered by calling ``QPDF::registerStreamFilter``. If you are
