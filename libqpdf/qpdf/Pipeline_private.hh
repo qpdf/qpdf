@@ -8,35 +8,6 @@
 
 namespace qpdf::pl
 {
-    struct Link
-    {
-        Link(std::unique_ptr<Link> next_link, std::unique_ptr<Pipeline> next_pl) :
-            next_link(std::move(next_link)),
-            next_pl(std::move(next_pl))
-        {
-        }
-
-        std::unique_ptr<Link> next_link{nullptr};
-        std::unique_ptr<Pipeline> next_pl{nullptr};
-    };
-
-    template <typename P, typename... Args>
-    std::unique_ptr<Link>
-    create(Args&&... args)
-    {
-        return std::make_unique<Link>(
-            nullptr, std::make_unique<P>("", nullptr, std::forward<Args>(args)...));
-    }
-
-    template <typename P, typename... Args>
-    std::unique_ptr<Link>
-    create(std::unique_ptr<Link> link, Args&&... args)
-    {
-        auto* next = link->next_pl.get();
-        return std::make_unique<Link>(
-            std::move(link), std::make_unique<P>("", next, std::forward<Args>(args)...));
-    }
-
     class String final: public Pipeline
     {
       public:
@@ -85,8 +56,8 @@ namespace qpdf::pl
 
         // Count the number of characters written. If 'next' is not set, the content written will be
         // discarded.
-        Count(unsigned long id, std::unique_ptr<Link> link) :
-            Pipeline("", link ? link->next_pl.get() : nullptr),
+        Count(unsigned long id, std::unique_ptr<Pipeline> link) :
+            Pipeline("", link ? link.get() : nullptr),
             link(std::move(link)),
             id_(id),
             pass_immediately_to_next(link)
@@ -95,8 +66,8 @@ namespace qpdf::pl
 
         // Write to 'str'. If 'next' is set, 'str' will be written to 'next' when 'finish' is
         // called.
-        Count(unsigned long id, std::string& str, std::unique_ptr<Link> link = nullptr) :
-            Pipeline("", link ? link->next_pl.get() : nullptr),
+        Count(unsigned long id, std::string& str, std::unique_ptr<Pipeline> link = nullptr) :
+            Pipeline("", link ? link.get() : nullptr),
             str(&str),
             link(std::move(link)),
             id_(id)
@@ -169,7 +140,7 @@ namespace qpdf::pl
       private:
         qpdf_offset_t count{0};
         std::string* str{nullptr};
-        std::unique_ptr<Link> link{nullptr};
+        std::unique_ptr<Pipeline> link{nullptr};
         unsigned long id_{0};
         bool pass_immediately_to_next{false};
     };

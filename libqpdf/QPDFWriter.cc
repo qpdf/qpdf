@@ -141,7 +141,7 @@ namespace
         }
 
         void
-        activate(Popper& pp, std::unique_ptr<pl::Link> link)
+        activate(Popper& pp, std::unique_ptr<Pipeline> link)
         {
             count_buffer.clear();
             activate(pp, false, &count_buffer, std::move(link));
@@ -151,7 +151,7 @@ namespace
         activate(
             bool discard = false,
             std::string* str = nullptr,
-            std::unique_ptr<pl::Link> link = nullptr)
+            std::unique_ptr<Pipeline> link = nullptr)
         {
             Popper pp{*this};
             activate(pp, discard, str, std::move(link));
@@ -163,7 +163,7 @@ namespace
             Popper& pp,
             bool discard = false,
             std::string* str = nullptr,
-            std::unique_ptr<pl::Link> link = nullptr)
+            std::unique_ptr<Pipeline> link = nullptr)
         {
             std::unique_ptr<pl::Count> c;
             if (link) {
@@ -2735,9 +2735,7 @@ QPDFWriter::writeLinearized()
                 lin_pass1_file = QUtil::safe_fopen(m->lin_pass1_filename.c_str(), "wb");
                 m->pipeline_stack.activate(
                     pp_pass1,
-                    std::make_unique<pl::Link>(
-                        nullptr,
-                        std::make_unique<Pl_StdioFile>("linearization pass1", lin_pass1_file)));
+                    std::make_unique<Pl_StdioFile>("linearization pass1", lin_pass1_file));
             } else {
                 m->pipeline_stack.activate(pp_pass1, true);
             }
