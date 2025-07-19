@@ -1768,7 +1768,6 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
         }
     }
     {
-        auto pp_ostream = m->pipeline_stack.popper();
         // Adjust offsets to skip over comment before first object
         first = offsets.at(0);
         for (auto& iter: offsets) {
@@ -1783,18 +1782,15 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
         }
 
         // Set up a stream to write the stream data into a buffer.
-        if (compressed) {
-            m->pipeline_stack.activate(
-                pp_ostream,
-                pl::create<Pl_Flate>(
-                    pl::create<pl::String>(stream_buffer_pass2), Pl_Flate::a_deflate));
-        } else {
-            m->pipeline_stack.activate(pp_ostream, stream_buffer_pass2);
-        }
+        auto pp_ostream = m->pipeline_stack.activate(stream_buffer_pass2);
+
         writeObjectStreamOffsets(offsets, first_obj);
         write(stream_buffer_pass1);
         stream_buffer_pass1.clear();
         stream_buffer_pass1.shrink_to_fit();
+        if (compressed) {
+            stream_buffer_pass2 = pl::pipe<Pl_Flate>(stream_buffer_pass2, Pl_Flate::a_deflate);
+        }
     }
 
     // Write the object
@@ -2528,20 +2524,7 @@ QPDFWriter::writeXRefStream(
     std::string xref_data;
     const bool compressed = m->compress_streams && !m->qdf_mode;
     {
-        auto pp_xref = m->pipeline_stack.popper();
-        if (compressed) {
-            m->pipeline_stack.clear_buffer();
-            auto link = pl::create<pl::String>(xref_data);
-            if (!skip_compression) {
-                // Write the stream dictionary for compression but don't actually compress.  This
-                // helps us with computation of padding for pass 1 of linearization.
-                link = pl::create<Pl_Flate>(std::move(link), Pl_Flate::a_deflate);
-            }
-            m->pipeline_stack.activate(
-                pp_xref, pl::create<Pl_PNGFilter>(std::move(link), Pl_PNGFilter::a_encode, esize));
-        } else {
-            m->pipeline_stack.activate(pp_xref, xref_data);
-        }
+        auto pp_xref = m->pipeline_stack.activate(xref_data);
 
         for (int i = first; i <= last; ++i) {
             QPDFXRefEntry& e = m->new_obj[i].xref;
@@ -2574,6 +2557,15 @@ QPDFWriter::writeXRefStream(
                 throw std::logic_error("invalid type writing xref stream");
                 break;
             }
+        }
+    }
+
+    if (compressed) {
+        xref_data = pl::pipe<Pl_PNGFilter>(xref_data, Pl_PNGFilter::a_encode, esize);
+        if (!skip_compression) {
+            // Write the stream dictionary for compression but don't actually compress.  This
+            // helps us with computation of padding for pass 1 of linearization.
+            xref_data = pl::pipe<Pl_Flate>(xref_data, Pl_Flate::a_deflate);
         }
     }
 
