@@ -54,20 +54,10 @@ namespace qpdf::pl
         {
         }
 
-        // Count the number of characters written. If 'next' is not set, the content written will be
-        // discarded.
-        Count(unsigned long id, std::unique_ptr<Pipeline> link) :
-            Pipeline("", link ? link.get() : nullptr),
-            link(std::move(link)),
-            id_(id),
-            pass_immediately_to_next(link)
-        {
-        }
-
         // Write to 'str'. If 'next' is set, 'str' will be written to 'next' when 'finish' is
         // called.
         Count(unsigned long id, std::string& str, std::unique_ptr<Pipeline> link = nullptr) :
-            Pipeline("", link ? link.get() : nullptr),
+            Pipeline("", link.get()),
             str(&str),
             link(std::move(link)),
             id_(id)

@@ -141,20 +141,20 @@ namespace
         }
 
         void
-        activate(Popper& pp, std::unique_ptr<Pipeline> link)
+        activate(Popper& pp, std::unique_ptr<Pipeline> next)
         {
             count_buffer.clear();
-            activate(pp, false, &count_buffer, std::move(link));
+            activate(pp, false, &count_buffer, std::move(next));
         }
 
         Popper
         activate(
             bool discard = false,
             std::string* str = nullptr,
-            std::unique_ptr<Pipeline> link = nullptr)
+            std::unique_ptr<Pipeline> next = nullptr)
         {
             Popper pp{*this};
-            activate(pp, discard, str, std::move(link));
+            activate(pp, discard, str, std::move(next));
             return pp;
         }
 
@@ -163,11 +163,11 @@ namespace
             Popper& pp,
             bool discard = false,
             std::string* str = nullptr,
-            std::unique_ptr<Pipeline> link = nullptr)
+            std::unique_ptr<Pipeline> next = nullptr)
         {
             std::unique_ptr<pl::Count> c;
-            if (link) {
-                c = std::make_unique<pl::Count>(++last_id, count_buffer, std::move(link));
+            if (next) {
+                c = std::make_unique<pl::Count>(++last_id, count_buffer, std::move(next));
             } else if (discard) {
                 c = std::make_unique<pl::Count>(++last_id, nullptr);
             } else if (!str) {
