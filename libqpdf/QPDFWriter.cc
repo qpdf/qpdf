@@ -141,20 +141,20 @@ namespace
         }
 
         void
-        activate(Popper& pp, std::unique_ptr<pl::Link> link)
+        activate(Popper& pp, std::unique_ptr<Pipeline> next)
         {
             count_buffer.clear();
-            activate(pp, false, &count_buffer, std::move(link));
+            activate(pp, false, &count_buffer, std::move(next));
         }
 
         Popper
         activate(
             bool discard = false,
             std::string* str = nullptr,
-            std::unique_ptr<pl::Link> link = nullptr)
+            std::unique_ptr<Pipeline> next = nullptr)
         {
             Popper pp{*this};
-            activate(pp, discard, str, std::move(link));
+            activate(pp, discard, str, std::move(next));
             return pp;
         }
 
@@ -163,11 +163,11 @@ namespace
             Popper& pp,
             bool discard = false,
             std::string* str = nullptr,
-            std::unique_ptr<pl::Link> link = nullptr)
+            std::unique_ptr<Pipeline> next = nullptr)
         {
             std::unique_ptr<pl::Count> c;
-            if (link) {
-                c = std::make_unique<pl::Count>(++last_id, count_buffer, std::move(link));
+            if (next) {
+                c = std::make_unique<pl::Count>(++last_id, count_buffer, std::move(next));
             } else if (discard) {
                 c = std::make_unique<pl::Count>(++last_id, nullptr);
             } else if (!str) {
@@ -1109,18 +1109,9 @@ QPDFWriter::write_encrypted(std::string_view str)
     if (!(m->encryption && !m->cur_data_key.empty())) {
         write(str);
     } else if (m->encrypt_use_aes) {
-        write(
-            pl::pipe<Pl_AES_PDF>(
-                str,
-                true,
-                QUtil::unsigned_char_pointer(m->cur_data_key),
-                m->cur_data_key.length()));
+        write(pl::pipe<Pl_AES_PDF>(str, true, m->cur_data_key));
     } else {
-        write(
-            pl::pipe<Pl_RC4>(
-                str,
-                QUtil::unsigned_char_pointer(m->cur_data_key),
-                QIntC::to_int(m->cur_data_key.length())));
+        write(pl::pipe<Pl_RC4>(str, m->cur_data_key));
     }
 
     return *this;
@@ -1654,12 +1645,7 @@ QPDFWriter::unparseObject(
             val = object.getStringValue();
             if (m->encrypt_use_aes) {
                 Pl_Buffer bufpl("encrypted string");
-                Pl_AES_PDF pl(
-                    "aes encrypt string",
-                    &bufpl,
-                    true,
-                    QUtil::unsigned_char_pointer(m->cur_data_key),
-                    m->cur_data_key.length());
+                Pl_AES_PDF pl("aes encrypt string", &bufpl, true, m->cur_data_key);
                 pl.writeString(val);
                 pl.finish();
                 val = QPDF_String(bufpl.getString()).unparse(true);
@@ -1768,7 +1754,6 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
         }
     }
     {
-        auto pp_ostream = m->pipeline_stack.popper();
         // Adjust offsets to skip over comment before first object
         first = offsets.at(0);
         for (auto& iter: offsets) {
@@ -1783,18 +1768,15 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
         }
 
         // Set up a stream to write the stream data into a buffer.
-        if (compressed) {
-            m->pipeline_stack.activate(
-                pp_ostream,
-                pl::create<Pl_Flate>(
-                    pl::create<pl::String>(stream_buffer_pass2), Pl_Flate::a_deflate));
-        } else {
-            m->pipeline_stack.activate(pp_ostream, stream_buffer_pass2);
-        }
+        auto pp_ostream = m->pipeline_stack.activate(stream_buffer_pass2);
+
         writeObjectStreamOffsets(offsets, first_obj);
         write(stream_buffer_pass1);
         stream_buffer_pass1.clear();
         stream_buffer_pass1.shrink_to_fit();
+        if (compressed) {
+            stream_buffer_pass2 = pl::pipe<Pl_Flate>(stream_buffer_pass2, Pl_Flate::a_deflate);
+        }
     }
 
     // Write the object
@@ -2528,20 +2510,7 @@ QPDFWriter::writeXRefStream(
     std::string xref_data;
     const bool compressed = m->compress_streams && !m->qdf_mode;
     {
-        auto pp_xref = m->pipeline_stack.popper();
-        if (compressed) {
-            m->pipeline_stack.clear_buffer();
-            auto link = pl::create<pl::String>(xref_data);
-            if (!skip_compression) {
-                // Write the stream dictionary for compression but don't actually compress.  This
-                // helps us with computation of padding for pass 1 of linearization.
-                link = pl::create<Pl_Flate>(std::move(link), Pl_Flate::a_deflate);
-            }
-            m->pipeline_stack.activate(
-                pp_xref, pl::create<Pl_PNGFilter>(std::move(link), Pl_PNGFilter::a_encode, esize));
-        } else {
-            m->pipeline_stack.activate(pp_xref, xref_data);
-        }
+        auto pp_xref = m->pipeline_stack.activate(xref_data);
 
         for (int i = first; i <= last; ++i) {
             QPDFXRefEntry& e = m->new_obj[i].xref;
@@ -2574,6 +2543,15 @@ QPDFWriter::writeXRefStream(
                 throw std::logic_error("invalid type writing xref stream");
                 break;
             }
+        }
+    }
+
+    if (compressed) {
+        xref_data = pl::pipe<Pl_PNGFilter>(xref_data, Pl_PNGFilter::a_encode, esize);
+        if (!skip_compression) {
+            // Write the stream dictionary for compression but don't actually compress.  This
+            // helps us with computation of padding for pass 1 of linearization.
+            xref_data = pl::pipe<Pl_Flate>(xref_data, Pl_Flate::a_deflate);
         }
     }
 
@@ -2743,9 +2721,7 @@ QPDFWriter::writeLinearized()
                 lin_pass1_file = QUtil::safe_fopen(m->lin_pass1_filename.c_str(), "wb");
                 m->pipeline_stack.activate(
                     pp_pass1,
-                    std::make_unique<pl::Link>(
-                        nullptr,
-                        std::make_unique<Pl_StdioFile>("linearization pass1", lin_pass1_file)));
+                    std::make_unique<Pl_StdioFile>("linearization pass1", lin_pass1_file));
             } else {
                 m->pipeline_stack.activate(pp_pass1, true);
             }
