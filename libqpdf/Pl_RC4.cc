@@ -2,15 +2,10 @@
 
 #include <qpdf/QUtil.hh>
 
-Pl_RC4::Pl_RC4(
-    char const* identifier,
-    Pipeline* next,
-    unsigned char const* key_data,
-    int key_len,
-    size_t out_bufsize) :
+Pl_RC4::Pl_RC4(char const* identifier, Pipeline* next, std::string key, size_t out_bufsize) :
     Pipeline(identifier, next),
     out_bufsize(out_bufsize),
-    rc4(key_data, key_len)
+    rc4(reinterpret_cast<unsigned char const*>(key.data()), static_cast<int>(key.size()))
 {
     if (!next) {
         throw std::logic_error("Attempt to create Pl_RC4 with nullptr as next");
