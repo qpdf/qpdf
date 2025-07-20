@@ -2,7 +2,6 @@
 
 #include <qpdf/QPDFObjectHandle_private.hh>
 
-#include <qpdf/InputSource_private.hh>
 #include <qpdf/JSON_writer.hh>
 #include <qpdf/Pipeline_private.hh>
 #include <qpdf/Pl_Buffer.hh>
@@ -1452,10 +1451,7 @@ QPDFObjectHandle
 QPDFObjectHandle::parse(
     QPDF* context, std::string const& object_str, std::string const& object_description)
 {
-    // BufferInputSource does not modify the input, but Buffer either requires a string& or copies
-    // the string.
-    Buffer buf(const_cast<std::string&>(object_str));
-    auto input = BufferInputSource("parsed object", &buf);
+    auto input = is::OffsetBuffer("parsed object", object_str);
     auto result = QPDFParser::parse(input, object_description, context);
     size_t offset = QIntC::to_size(input.tell());
     while (offset < object_str.length()) {
@@ -1549,11 +1545,11 @@ void
 QPDFObjectHandle::parseContentStream_internal(
     std::string const& description, ParserCallbacks* callbacks)
 {
-    Pl_Buffer buf("concatenated stream data buffer");
+    std::string stream_data;
+    pl::String buf(stream_data);
     std::string all_description;
     pipeContentStreams(&buf, description, all_description);
-    auto stream_data = buf.getBufferSharedPointer();
-    callbacks->contentSize(stream_data->getSize());
+    callbacks->contentSize(stream_data.size());
     try {
         parseContentStream_data(stream_data, all_description, callbacks, getOwningQPDF());
     } catch (TerminateParsing&) {
@@ -1564,13 +1560,13 @@ QPDFObjectHandle::parseContentStream_internal(
 
 void
 QPDFObjectHandle::parseContentStream_data(
-    std::shared_ptr<Buffer> stream_data,
+    std::string_view stream_data,
     std::string const& description,
     ParserCallbacks* callbacks,
     QPDF* context)
 {
-    size_t stream_length = stream_data->getSize();
-    auto input = BufferInputSource(description, stream_data.get());
+    size_t stream_length = stream_data.size();
+    auto input = is::OffsetBuffer(description, stream_data);
     Tokenizer tokenizer;
     tokenizer.allowEOF();
     auto sp_description = QPDFParser::make_description(description, "content");

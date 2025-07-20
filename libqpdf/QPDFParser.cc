@@ -1,6 +1,5 @@
 #include <qpdf/QPDFParser.hh>
 
-#include <qpdf/BufferInputSource.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFObjectHandle.hh>

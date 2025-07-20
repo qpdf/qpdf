@@ -3,6 +3,7 @@
 #include <qpdf/ContentNormalizer.hh>
 #include <qpdf/JSON_writer.hh>
 #include <qpdf/Pipeline.hh>
+#include <qpdf/Pipeline_private.hh>
 #include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Count.hh>
@@ -319,10 +320,11 @@ qpdf::Stream::setDictDescription()
     }
 }
 
-std::shared_ptr<Buffer>
+std::string
 Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
 {
-    Pl_Buffer buf("stream data buffer");
+    std::string result;
+    pl::String buf(result);
     bool filtered;
     pipeStreamData(&buf, &filtered, 0, decode_level, false, false);
     if (!filtered) {
@@ -334,13 +336,14 @@ Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
             "getStreamData called on unfilterable stream");
     }
     QTC::TC("qpdf", "QPDF_Stream getStreamData");
-    return buf.getBufferSharedPointer();
+    return result;
 }
 
-std::shared_ptr<Buffer>
+std::string
 Stream::getRawStreamData()
 {
-    Pl_Buffer buf("stream data buffer");
+    std::string result;
+    pl::String buf(result);
     if (!pipeStreamData(&buf, nullptr, 0, qpdf_dl_none, false, false)) {
         throw QPDFExc(
             qpdf_e_unsupported,
@@ -350,7 +353,7 @@ Stream::getRawStreamData()
             "error getting raw stream data");
     }
     QTC::TC("qpdf", "QPDF_Stream getRawStreamData");
-    return buf.getBufferSharedPointer();
+    return result;
 }
 
 bool
@@ -683,13 +686,13 @@ QPDFObjectHandle::isRootMetadata() const
 std::shared_ptr<Buffer>
 QPDFObjectHandle::getStreamData(qpdf_stream_decode_level_e level)
 {
-    return as_stream(error).getStreamData(level);
+    return std::make_shared<Buffer>(as_stream(error).getStreamData(level));
 }
 
 std::shared_ptr<Buffer>
 QPDFObjectHandle::getRawStreamData()
 {
-    return as_stream(error).getRawStreamData();
+    return std::make_shared<Buffer>(as_stream(error).getRawStreamData());
 }
 
 bool

@@ -11,7 +11,6 @@
 #include <sstream>
 #include <vector>
 
-#include <qpdf/BufferInputSource.hh>
 #include <qpdf/FileInputSource.hh>
 #include <qpdf/InputSource_private.hh>
 #include <qpdf/OffsetInputSource.hh>
@@ -259,12 +258,8 @@ void
 QPDF::processMemoryFile(
     char const* description, char const* buf, size_t length, char const* password)
 {
-    processInputSource(
-        std::shared_ptr<InputSource>(
-            // line-break
-            new BufferInputSource(
-                description, new Buffer(QUtil::unsigned_char_pointer(buf), length), true)),
-        password);
+    auto is = std::make_shared<is::OffsetBuffer>(description, std::string_view{buf, length});
+    processInputSource(is, password);
 }
 
 void

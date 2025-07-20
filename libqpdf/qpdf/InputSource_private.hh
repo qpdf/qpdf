@@ -1,7 +1,7 @@
 #ifndef QPDF_INPUTSOURCE_PRIVATE_HH
 #define QPDF_INPUTSOURCE_PRIVATE_HH
 
-#include <qpdf/BufferInputSource.hh>
+#include <qpdf/Buffer.hh>
 #include <qpdf/InputSource.hh>
 
 #include <limits>
@@ -13,8 +13,12 @@ namespace qpdf::is
     class OffsetBuffer final: public InputSource
     {
       public:
-        OffsetBuffer(std::string const& description, Buffer* buf, qpdf_offset_t global_offset) :
-            proxied(description, buf),
+        OffsetBuffer(
+            std::string const& description,
+            std::string_view view,
+            qpdf_offset_t global_offset = 0) :
+            description(description),
+            view_(view),
             global_offset(global_offset)
         {
             if (global_offset < 0) {
@@ -23,58 +27,55 @@ namespace qpdf::is
             last_offset = global_offset;
         }
 
+        OffsetBuffer(std::string const& description, Buffer* buf, qpdf_offset_t global_offset = 0) :
+            OffsetBuffer(
+                description,
+                {buf && buf->getSize()
+                     ? std::string_view(
+                           reinterpret_cast<const char*>(buf->getBuffer()), buf->getSize())
+                     : std::string_view()},
+                global_offset)
+        {
+        }
+
         ~OffsetBuffer() final = default;
 
-        qpdf_offset_t
-        findAndSkipNextEOL() final
-        {
-            return proxied.findAndSkipNextEOL() + global_offset;
-        }
+        qpdf_offset_t findAndSkipNextEOL() final;
 
         std::string const&
         getName() const final
         {
-            return proxied.getName();
+            return description;
         }
 
         qpdf_offset_t
         tell() final
         {
-            return proxied.tell() + global_offset;
+            return pos + global_offset;
         }
 
-        void
-        seek(qpdf_offset_t offset, int whence) final
-        {
-            if (whence == SEEK_SET) {
-                proxied.seek(offset - global_offset, whence);
-            } else {
-                proxied.seek(offset, whence);
-            }
-        }
+        void seek(qpdf_offset_t offset, int whence) final;
 
         void
         rewind() final
         {
-            seek(0, SEEK_SET);
+            pos = 0;
         }
 
-        size_t
-        read(char* buffer, size_t length) final
-        {
-            size_t result = proxied.read(buffer, length);
-            setLastOffset(proxied.getLastOffset() + global_offset);
-            return result;
-        }
+        size_t read(char* buffer, size_t length) final;
 
         void
         unreadCh(char ch) final
         {
-            proxied.unreadCh(ch);
+            if (pos > 0) {
+                --pos;
+            }
         }
 
       private:
-        BufferInputSource proxied;
+        std::string description;
+        qpdf_offset_t pos{0};
+        std::string_view view_;
         qpdf_offset_t global_offset;
     };
 

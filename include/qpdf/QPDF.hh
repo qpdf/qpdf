@@ -95,7 +95,8 @@ class QPDF
 
     // Parse a PDF file loaded into a memory buffer.  This works exactly like processFile except
     // that the PDF file is in memory instead of on disk.  The description appears in any warning or
-    // error message in place of the file name.
+    // error message in place of the file name. The buffer is owned by the caller and must remain
+    // valid for the lifetime of the QPDF object.
     QPDF_DLL
     void processMemoryFile(
         char const* description, char const* buf, size_t length, char const* password = nullptr);

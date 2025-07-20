@@ -2,19 +2,7 @@
 
 #include <qpdf/QPDF_private.hh>
 
-#include <array>
-#include <atomic>
-#include <cstring>
-#include <limits>
-#include <map>
-#include <regex>
-#include <sstream>
-#include <vector>
-
-#include <qpdf/BufferInputSource.hh>
-#include <qpdf/FileInputSource.hh>
 #include <qpdf/InputSource_private.hh>
-#include <qpdf/OffsetInputSource.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
@@ -24,6 +12,13 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/Util.hh>
+
+#include <array>
+#include <atomic>
+#include <cstring>
+#include <limits>
+#include <map>
+#include <vector>
 
 using namespace qpdf;
 using namespace std::literals;
@@ -1676,13 +1671,13 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     // id, offset, size
     std::vector<std::tuple<int, qpdf_offset_t, size_t>> offsets;
 
-    auto bp = obj_stream.getStreamData(qpdf_dl_specialized);
+    auto stream_data = obj_stream.getStreamData(qpdf_dl_specialized);
 
-    BufferInputSource input("", bp.get());
+    is::OffsetBuffer input("", stream_data);
 
-    const auto b_size = bp->getSize();
+    const auto b_size = stream_data.size();
     const auto end_offset = static_cast<qpdf_offset_t>(b_size);
-    auto b_start = bp->getBuffer();
+    auto b_start = stream_data.data();
 
     if (first >= end_offset) {
         throw damagedPDF(
@@ -1763,8 +1758,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
         auto entry = m->xref_table.find(og);
         if (entry != m->xref_table.end() && entry->second.getType() == 2 &&
             entry->second.getObjStreamNumber() == obj_stream_number) {
-            Buffer obj_buffer{b_start + obj_offset, obj_size};
-            is::OffsetBuffer in("", &obj_buffer, obj_offset);
+            is::OffsetBuffer in("", {b_start + obj_offset, obj_size}, obj_offset);
             auto oh = readObjectInStream(in, obj_stream_number, obj_id);
             updateCache(og, oh.getObj(), end_before_space, end_after_space);
         } else {

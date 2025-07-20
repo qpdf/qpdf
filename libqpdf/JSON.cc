@@ -2,7 +2,7 @@
 
 #include <qpdf/JSON_writer.hh>
 
-#include <qpdf/BufferInputSource.hh>
+#include <qpdf/InputSource_private.hh>
 #include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_Concatenate.hh>
 #include <qpdf/Pl_String.hh>
@@ -1348,7 +1348,7 @@ JSON::parse(InputSource& is, Reactor* reactor)
 JSON
 JSON::parse(std::string const& s)
 {
-    BufferInputSource bis("json input", s);
+    is::OffsetBuffer bis("json input", s);
     JSONParser jp(bis, nullptr);
     return jp.parse();
 }
