@@ -10,6 +10,8 @@
 
 using namespace qpdf;
 
+#ifndef QPDF_FUTURE
+
 BufferInputSource::BufferInputSource(std::string const& description, Buffer* buf, bool own_memory) :
     own_memory(own_memory),
     description(description),
@@ -145,6 +147,86 @@ BufferInputSource::unreadCh(char ch)
     }
 }
 
+#else
+
+class BufferInputSource::Members
+{
+  public:
+    Members(std::string const& description, Buffer* buf, bool own_memory) :
+        buf(own_memory ? buf : nullptr),
+        is(description,
+           buf && buf->getSize() > 0
+               ? std::string_view(reinterpret_cast<const char*>(buf->getBuffer()), buf->getSize())
+               : std::string_view())
+    {
+    }
+
+    Members(std::string const& description, std::string const& str) :
+        content(str),
+        is(description, content)
+    {
+    }
+
+    ~Members() = default;
+
+    std::unique_ptr<Buffer> buf{nullptr};
+    std::string content;
+    is::OffsetBuffer is;
+};
+
+BufferInputSource::BufferInputSource(std::string const& description, Buffer* buf, bool own_memory) :
+    m(std::make_unique<Members>(description, buf, own_memory))
+{
+}
+
+BufferInputSource::BufferInputSource(std::string const& description, std::string const& contents) :
+    m(std::make_unique<Members>(description, contents))
+{
+}
+BufferInputSource::~BufferInputSource() = default;
+
+qpdf_offset_t
+BufferInputSource::findAndSkipNextEOL()
+{
+    auto result = m->is.findAndSkipNextEOL();
+    last_offset = m->is.getLastOffset();
+    return result;
+}
+std::string const&
+BufferInputSource::getName() const
+{
+    return m->is.getName();
+}
+qpdf_offset_t
+BufferInputSource::tell()
+{
+    return m->is.tell();
+}
+void
+BufferInputSource::seek(qpdf_offset_t offset, int whence)
+{
+    m->is.seek(offset, whence);
+}
+void
+BufferInputSource::rewind()
+{
+    m->is.rewind();
+}
+size_t
+BufferInputSource::read(char* buffer, size_t length)
+{
+    auto result = m->is.read(buffer, length);
+    last_offset = m->is.getLastOffset();
+    return result;
+}
+void
+BufferInputSource::unreadCh(char ch)
+{
+    m->is.unreadCh(ch);
+}
+
+#endif // QPDF_FUTURE
+
 qpdf_offset_t
 is::OffsetBuffer::findAndSkipNextEOL()
 {
@@ -161,7 +243,7 @@ is::OffsetBuffer::findAndSkipNextEOL()
     qpdf_offset_t result = 0;
     auto buffer = view_.begin();
     auto end = view_.end();
-    auto p = buffer + pos;
+    auto p = buffer + static_cast<std::ptrdiff_t>(pos);
 
     while (p < end && !(*p == '\r' || *p == '\n')) {
         ++p;
