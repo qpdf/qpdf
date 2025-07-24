@@ -773,6 +773,12 @@ QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& ao
         aoh.getObjectHandle().warnIfPossible("unable to get normal appearance stream for update");
         return;
     }
+
+    if (AS.getObj().use_count() > 4) {
+        aoh.getObjectHandle().warnIfPossible(
+            "unable to generate text appearance from shared appearance stream for update");
+        return;
+    }
     QPDFObjectHandle bbox_obj = AS.getDict().getKey("/BBox");
     if (!bbox_obj.isRectangle()) {
         aoh.getObjectHandle().warnIfPossible("unable to get appearance stream bounding box");
@@ -831,7 +837,6 @@ QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& ao
     for (size_t i = 0; i < opt.size(); ++i) {
         opt.at(i) = (*encoder)(opt.at(i), '?');
     }
-
     AS.addTokenFilter(
         std::shared_ptr<QPDFObjectHandle::TokenFilter>(new ValueSetter(DA, V, opt, tf, bbox)));
 }
