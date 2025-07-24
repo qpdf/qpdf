@@ -120,12 +120,15 @@ class NNTreeImpl
         int (NNTreeImpl::*compare)(QPDFObjectHandle& key, QPDFObjectHandle& arr, int item));
     int compareKeyItem(QPDFObjectHandle& key, QPDFObjectHandle& items, int idx);
     int compareKeyKid(QPDFObjectHandle& key, QPDFObjectHandle& items, int idx);
+    void warn(QPDFObjectHandle& node, std::string const& msg);
+    void error(QPDFObjectHandle& node, std::string const& msg);
 
     NNTreeDetails const& details;
     QPDF& qpdf;
     int split_threshold{32};
     QPDFObjectHandle oh;
-    bool auto_repair;
+    bool auto_repair{true};
+    size_t error_count{0};
 };
 
 #endif // NNTREE_HH

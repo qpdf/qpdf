@@ -791,6 +791,8 @@ class QPDF
     class Pipe;
     class JobSetter;
 
+    inline bool reconstructed_xref() const;
+
     // For testing only -- do not add to DLL
     static bool test_json_validators();
 

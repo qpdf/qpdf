@@ -581,4 +581,10 @@ class QPDF::ResolveRecorder
     std::set<QPDFObjGen>::const_iterator iter;
 };
 
+inline bool
+QPDF::reconstructed_xref() const
+{
+    return m->reconstructed_xref;
+}
+
 #endif // QPDF_PRIVATE_HH
