@@ -1,5 +1,6 @@
 #include <qpdf/NNTree.hh>
 
+#include <qpdf/QPDF_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
@@ -15,14 +16,17 @@ get_description(QPDFObjectHandle& node)
     return result;
 }
 
-static void
-warn(QPDF& qpdf, QPDFObjectHandle& node, std::string const& msg)
+void
+NNTreeImpl::warn(QPDFObjectHandle& node, std::string const& msg)
 {
     qpdf.warn(qpdf_e_damaged_pdf, get_description(node), 0, msg);
+    if (++error_count > 5 && qpdf.reconstructed_xref()) {
+        error(node, "too many errors - giving up");
+    }
 }
 
-static void
-error(QPDF& qpdf, QPDFObjectHandle& node, std::string const& msg)
+void
+NNTreeImpl::error(QPDFObjectHandle& node, std::string const& msg)
 {
     throw QPDFExc(qpdf_e_damaged_pdf, qpdf.getFilename(), get_description(node), 0, msg);
 }
@@ -56,7 +60,7 @@ NNTreeIterator::updateIValue(bool allow_invalid)
             ivalue.first = items.getArrayItem(item_number);
             ivalue.second = items.getArrayItem(1 + item_number);
         } else {
-            error(impl.qpdf, node, "update ivalue: items array is too short");
+            impl.error(node, "update ivalue: items array is too short");
         }
     }
     if (!okay) {
@@ -90,8 +94,7 @@ NNTreeIterator::getNextKid(PathElement& pe, bool backward)
                 found = true;
             } else {
                 QTC::TC("qpdf", "NNTree skip invalid kid");
-                warn(
-                    impl.qpdf,
+                impl.warn(
                     pe.node,
                     ("skipping over invalid kid at index " + std::to_string(pe.kid_number)));
             }
@@ -138,13 +141,10 @@ NNTreeIterator::increment(bool backward)
             items = node.getKey(impl.details.itemsKey());
             if (item_number + 1 >= items.getArrayNItems()) {
                 QTC::TC("qpdf", "NNTree skip item at end of short items");
-                warn(impl.qpdf, node, "items array doesn't have enough elements");
+                impl.warn(node, "items array doesn't have enough elements");
             } else if (!impl.details.keyValid(items.getArrayItem(item_number))) {
                 QTC::TC("qpdf", "NNTree skip invalid key");
-                warn(
-                    impl.qpdf,
-                    node,
-                    ("item " + std::to_string(item_number) + " has the wrong type"));
+                impl.warn(node, ("item " + std::to_string(item_number) + " has the wrong type"));
             } else {
                 found_valid_key = true;
             }
@@ -207,7 +207,7 @@ NNTreeIterator::resetLimits(QPDFObjectHandle a_node, std::list<PathElement>::ite
             }
         } else {
             QTC::TC("qpdf", "NNTree unable to determine limits");
-            warn(impl.qpdf, a_node, "unable to determine limits");
+            impl.warn(a_node, "unable to determine limits");
         }
 
         if (!changed || parent == path.begin()) {
@@ -396,10 +396,10 @@ NNTreeIterator::insertAfter(QPDFObjectHandle key, QPDFObjectHandle value)
 
     auto items = node.getKey(impl.details.itemsKey());
     if (!items.isArray()) {
-        error(impl.qpdf, node, "node contains no items array");
+        impl.error(node, "node contains no items array");
     }
     if (items.getArrayNItems() < item_number + 2) {
-        error(impl.qpdf, node, "insert: items array is too short");
+        impl.error(node, "insert: items array is too short");
     }
     items.insertItem(item_number + 2, key);
     items.insertItem(item_number + 3, value);
@@ -419,7 +419,7 @@ NNTreeIterator::remove()
     auto items = node.getKey(impl.details.itemsKey());
     int nitems = items.getArrayNItems();
     if (item_number + 2 > nitems) {
-        error(impl.qpdf, node, "found short items array while removing an item");
+        impl.error(node, "found short items array while removing an item");
     }
 
     items.eraseItem(item_number);
@@ -596,14 +596,14 @@ NNTreeIterator::deepen(QPDFObjectHandle a_node, bool first, bool allow_empty)
     while (!failed) {
         if (!seen.add(a_node)) {
             QTC::TC("qpdf", "NNTree deepen: loop");
-            warn(impl.qpdf, a_node, "loop detected while traversing name/number tree");
+            impl.warn(a_node, "loop detected while traversing name/number tree");
             failed = true;
             break;
         }
 
         if (!a_node.isDictionary()) {
             QTC::TC("qpdf", "NNTree node is not a dictionary");
-            warn(impl.qpdf, a_node, "non-dictionary node while traversing name/number tree");
+            impl.warn(a_node, "non-dictionary node while traversing name/number tree");
             failed = true;
             break;
         }
@@ -622,8 +622,7 @@ NNTreeIterator::deepen(QPDFObjectHandle a_node, bool first, bool allow_empty)
             if (!next.isIndirect()) {
                 if (impl.auto_repair) {
                     QTC::TC("qpdf", "NNTree fix indirect kid");
-                    warn(
-                        impl.qpdf,
+                    impl.warn(
                         a_node,
                         ("converting kid number " + std::to_string(kid_number) +
                          " to an indirect object"));
@@ -631,8 +630,7 @@ NNTreeIterator::deepen(QPDFObjectHandle a_node, bool first, bool allow_empty)
                     kids.setArrayItem(kid_number, next);
                 } else {
                     QTC::TC("qpdf", "NNTree warn indirect kid");
-                    warn(
-                        impl.qpdf,
+                    impl.warn(
                         a_node,
                         ("kid number " + std::to_string(kid_number) +
                          " is not an indirect object"));
@@ -645,8 +643,7 @@ NNTreeIterator::deepen(QPDFObjectHandle a_node, bool first, bool allow_empty)
             break;
         } else {
             QTC::TC("qpdf", "NNTree deepen: invalid node");
-            warn(
-                impl.qpdf,
+            impl.warn(
                 a_node,
                 ("name/number tree node has neither non-empty " + impl.details.itemsKey() +
                  " nor /Kids"));
@@ -712,7 +709,7 @@ NNTreeImpl::withinLimits(QPDFObjectHandle key, QPDFObjectHandle node)
         }
     } else {
         QTC::TC("qpdf", "NNTree missing limits");
-        error(qpdf, node, "node is missing /Limits");
+        error(node, "node is missing /Limits");
     }
     return result;
 }
@@ -782,7 +779,7 @@ NNTreeImpl::compareKeyItem(QPDFObjectHandle& key, QPDFObjectHandle& items, int i
     if (!((items.isArray() && (items.getArrayNItems() > (2 * idx)) &&
            details.keyValid(items.getArrayItem(2 * idx))))) {
         QTC::TC("qpdf", "NNTree item is wrong type");
-        error(qpdf, oh, ("item at index " + std::to_string(2 * idx) + " is not the right type"));
+        error(oh, ("item at index " + std::to_string(2 * idx) + " is not the right type"));
     }
     return details.compareKeys(key, items.getArrayItem(2 * idx));
 }
@@ -793,7 +790,7 @@ NNTreeImpl::compareKeyKid(QPDFObjectHandle& key, QPDFObjectHandle& kids, int idx
     if (!(kids.isArray() && (idx < kids.getArrayNItems()) &&
           kids.getArrayItem(idx).isDictionary())) {
         QTC::TC("qpdf", "NNTree kid is invalid");
-        error(qpdf, oh, "invalid kid at index " + std::to_string(idx));
+        error(oh, "invalid kid at index " + std::to_string(idx));
     }
     return withinLimits(key, kids.getArrayItem(idx));
 }
@@ -819,7 +816,7 @@ NNTreeImpl::find(QPDFObjectHandle key, bool return_prev_if_not_found)
     } catch (QPDFExc& e) {
         if (auto_repair) {
             QTC::TC("qpdf", "NNTree repair");
-            warn(qpdf, oh, std::string("attempting to repair after error: ") + e.what());
+            warn(oh, std::string("attempting to repair after error: ") + e.what());
             repair();
             return findInternal(key, return_prev_if_not_found);
         } else {
@@ -859,7 +856,7 @@ NNTreeImpl::findInternal(QPDFObjectHandle key, bool return_prev_if_not_found)
     while (true) {
         if (!seen.add(node)) {
             QTC::TC("qpdf", "NNTree loop in find");
-            error(qpdf, node, "loop detected in find");
+            error(node, "loop detected in find");
         }
 
         auto kids = node.getKey("/Kids");
@@ -877,17 +874,13 @@ NNTreeImpl::findInternal(QPDFObjectHandle key, bool return_prev_if_not_found)
             int idx = binarySearch(key, kids, nkids, true, &NNTreeImpl::compareKeyKid);
             if (idx == -1) {
                 QTC::TC("qpdf", "NNTree -1 in binary search");
-                error(
-                    qpdf,
-                    node,
-                    "unexpected -1 from binary search of kids;"
-                    " limits may by wrong");
+                error(node, "unexpected -1 from binary search of kids; limits may by wrong");
             }
             result.addPathElement(node, idx);
             node = kids.getArrayItem(idx);
         } else {
             QTC::TC("qpdf", "NNTree bad node during find");
-            error(qpdf, node, "bad node during find");
+            error(node, "bad node during find");
         }
     }
 
@@ -904,7 +897,7 @@ NNTreeImpl::insertFirst(QPDFObjectHandle key, QPDFObjectHandle value)
     }
     if (!(items.isArray())) {
         QTC::TC("qpdf", "NNTree no valid items node in insertFirst");
-        error(qpdf, oh, "unable to find a valid items node");
+        error(oh, "unable to find a valid items node");
     }
     items.insertItem(0, key);
     items.insertItem(1, value);
