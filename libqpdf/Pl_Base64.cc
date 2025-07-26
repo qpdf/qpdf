@@ -39,14 +39,7 @@ Pl_Base64::Pl_Base64(char const* identifier, Pipeline* next, action_e action) :
 void
 Pl_Base64::write(unsigned char const* data, size_t len)
 {
-    if (finished) {
-        throw std::logic_error("Pl_Base64 used after finished");
-    }
-    if (action == a_decode) {
-        decode(data, len);
-    } else {
-        encode(data, len);
-    }
+    in_buffer.append(reinterpret_cast<const char*>(data), len);
 }
 
 void
@@ -57,7 +50,7 @@ Pl_Base64::decode(unsigned char const* data, size_t len)
         if (!util::is_space(to_c(*p))) {
             buf[pos++] = *p;
             if (pos == 4) {
-                flush();
+                flush_decode();
             }
         }
         ++p;
@@ -72,22 +65,11 @@ Pl_Base64::encode(unsigned char const* data, size_t len)
     while (len > 0) {
         buf[pos++] = *p;
         if (pos == 3) {
-            flush();
+            flush_encode();
         }
         ++p;
         --len;
     }
-}
-
-void
-Pl_Base64::flush()
-{
-    if (action == a_decode) {
-        flush_decode();
-    } else {
-        flush_encode();
-    }
-    reset();
 }
 
 void
@@ -129,6 +111,7 @@ Pl_Base64::flush_decode()
     };
 
     next()->write(out, QIntC::to_size(3 - pad));
+    reset();
 }
 
 void
@@ -162,23 +145,28 @@ Pl_Base64::flush_encode()
         out[3 - i] = '=';
     }
     next()->write(out, 4);
+    reset();
 }
 
 void
 Pl_Base64::finish()
 {
-    if (pos > 0) {
-        if (finished) {
-            throw std::logic_error("Pl_Base64 used after finished");
-        }
-        if (action == a_decode) {
+    if (action == a_decode) {
+        decode(reinterpret_cast<unsigned char const*>(in_buffer.data()), in_buffer.size());
+        if (pos > 0) {
             for (size_t i = pos; i < 4; ++i) {
                 buf[i] = '=';
             }
+            flush_decode();
         }
-        flush();
+    } else {
+        encode(reinterpret_cast<unsigned char const*>(in_buffer.data()), in_buffer.size());
+        if (pos > 0) {
+            flush_encode();
+        }
     }
-    finished = true;
+    in_buffer.clear();
+    in_buffer.shrink_to_fit();
     next()->finish();
 }
 
