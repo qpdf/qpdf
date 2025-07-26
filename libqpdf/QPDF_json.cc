@@ -1,6 +1,7 @@
 #include <qpdf/QPDF.hh>
 
 #include <qpdf/FileInputSource.hh>
+#include <qpdf/InputSource_private.hh>
 #include <qpdf/JSON_writer.hh>
 #include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_StdioFile.hh>
@@ -216,18 +217,8 @@ provide_data(std::shared_ptr<InputSource> is, qpdf_offset_t start, qpdf_offset_t
 {
     return [is, start, end](Pipeline* p) {
         Pl_Base64 decode("base64-decode", p, Pl_Base64::a_decode);
-        p = &decode;
-        size_t bytes = QIntC::to_size(end - start);
-        char buf[8192];
-        is->seek(start, SEEK_SET);
-        size_t len = 0;
-        while ((len = is->read(buf, std::min(bytes, sizeof(buf)))) > 0) {
-            p->write(buf, len);
-            bytes -= len;
-            if (bytes == 0) {
-                break;
-            }
-        }
+        auto data = is->read(QIntC::to_size(end - start), start);
+        decode.write(reinterpret_cast<const unsigned char*>(data.data()), data.size());
         decode.finish();
     };
 }
@@ -615,7 +606,6 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
         if (!tos.object.isStream()) {
             throw std::logic_error("current object is not stream in st_stream");
         }
-        auto uninitialized = QPDFObjectHandle();
         if (key == "dict") {
             this->saw_dict = true;
             if (setNextStateIfDictionary("stream.dict", value, st_object)) {
@@ -630,7 +620,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             if (!value.getString(v)) {
                 QTC::TC("qpdf", "QPDF_json stream data not string");
                 error(value.getStart(), "\"stream.data\" must be a string");
-                tos.object.replaceStreamData("", uninitialized, uninitialized);
+                tos.object.replaceStreamData("", {}, {});
             } else {
                 // The range includes the quotes.
                 auto start = value.getStart() + 1;
@@ -638,8 +628,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                 if (end < start) {
                     throw std::logic_error("QPDF_json: JSON string length < 0");
                 }
-                tos.object.replaceStreamData(
-                    provide_data(is, start, end), uninitialized, uninitialized);
+                tos.object.replaceStreamData(provide_data(is, start, end), {}, {});
             }
         } else if (key == "datafile") {
             this->saw_datafile = true;
@@ -649,10 +638,9 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                 error(
                     value.getStart(),
                     "\"stream.datafile\" must be a string containing a file name");
-                tos.object.replaceStreamData("", uninitialized, uninitialized);
+                tos.object.replaceStreamData("", {}, {});
             } else {
-                tos.object.replaceStreamData(
-                    QUtil::file_provider(filename), uninitialized, uninitialized);
+                tos.object.replaceStreamData(QUtil::file_provider(filename), {}, {});
             }
         } else {
             // Ignore unknown keys for forward compatibility.
