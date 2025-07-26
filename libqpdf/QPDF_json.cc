@@ -216,10 +216,10 @@ static std::function<void(Pipeline*)>
 provide_data(std::shared_ptr<InputSource> is, qpdf_offset_t start, qpdf_offset_t end)
 {
     return [is, start, end](Pipeline* p) {
-        Pl_Base64 decode("base64-decode", p, Pl_Base64::a_decode);
         auto data = is->read(QIntC::to_size(end - start), start);
-        decode.write(reinterpret_cast<const unsigned char*>(data.data()), data.size());
-        decode.finish();
+        data = Pl_Base64::decode(data);
+        p->write(reinterpret_cast<const unsigned char*>(data.data()), data.size());
+        p->finish();
     };
 }
 

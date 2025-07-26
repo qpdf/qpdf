@@ -33,9 +33,6 @@ Pl_Base64::Pl_Base64(char const* identifier, Pipeline* next, action_e action) :
     Pipeline(identifier, next),
     action(action)
 {
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_Base64 with nullptr as next");
-    }
 }
 
 void
@@ -44,8 +41,24 @@ Pl_Base64::write(unsigned char const* data, size_t len)
     in_buffer.append(reinterpret_cast<const char*>(data), len);
 }
 
-void
+std::string
 Pl_Base64::decode(std::string_view data)
+{
+    Pl_Base64 p("base64-decode", nullptr, a_decode);
+    p.decode_internal(data);
+    return std::move(p.out_buffer);
+}
+
+std::string
+Pl_Base64::encode(std::string_view data)
+{
+    Pl_Base64 p("base64-encode", nullptr, a_encode);
+    p.encode_internal(data);
+    return std::move(p.out_buffer);
+}
+
+void
+Pl_Base64::decode_internal(std::string_view data)
 {
     auto len = data.size();
     auto res = (len / 4u + 1u) * 3u;
@@ -71,7 +84,7 @@ Pl_Base64::decode(std::string_view data)
 }
 
 void
-Pl_Base64::encode(std::string_view data)
+Pl_Base64::encode_internal(std::string_view data)
 {
     auto len = data.size();
     static const size_t max_len = (std::string().max_size() / 4u - 1u) * 3u;
@@ -177,17 +190,19 @@ void
 Pl_Base64::finish()
 {
     if (action == a_decode) {
-        decode(in_buffer);
+        decode_internal(in_buffer);
 
     } else {
-        encode(in_buffer);
+        encode_internal(in_buffer);
     }
-    in_buffer.clear();
-    in_buffer.shrink_to_fit();
-    next()->write(reinterpret_cast<unsigned char const*>(out_buffer.data()), out_buffer.size());
-    out_buffer.clear();
-    out_buffer.shrink_to_fit();
-    next()->finish();
+    if (next()) {
+        in_buffer.clear();
+        in_buffer.shrink_to_fit();
+        next()->write(reinterpret_cast<unsigned char const*>(out_buffer.data()), out_buffer.size());
+        out_buffer.clear();
+        out_buffer.shrink_to_fit();
+        next()->finish();
+    }
 }
 
 void

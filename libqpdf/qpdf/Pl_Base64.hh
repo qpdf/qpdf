@@ -12,9 +12,12 @@ class Pl_Base64 final: public Pipeline
     void write(unsigned char const* buf, size_t len) final;
     void finish() final;
 
+    static std::string encode(std::string_view data);
+    static std::string decode(std::string_view data);
+
   private:
-    void decode(std::string_view data);
-    void encode(std::string_view data);
+    void decode_internal(std::string_view data);
+    void encode_internal(std::string_view data);
     void flush_decode();
     void flush_encode();
     void reset();
