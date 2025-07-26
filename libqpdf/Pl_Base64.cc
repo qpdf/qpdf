@@ -1,3 +1,5 @@
+#include <qpdf/assert_debug.h>
+
 #include <qpdf/Pl_Base64.hh>
 
 #include <qpdf/QIntC.hh>
@@ -43,9 +45,12 @@ Pl_Base64::write(unsigned char const* data, size_t len)
 }
 
 void
-Pl_Base64::decode(unsigned char const* data, size_t len)
+Pl_Base64::decode(std::string_view data)
 {
-    unsigned char const* p = data;
+    auto len = data.size();
+    auto res = (len / 4u + 1u) * 3u;
+    out_buffer.reserve(res);
+    unsigned char const* p = reinterpret_cast<const unsigned char*>(data.data());
     while (len > 0) {
         if (!util::is_space(to_c(*p))) {
             buf[pos++] = *p;
@@ -56,12 +61,28 @@ Pl_Base64::decode(unsigned char const* data, size_t len)
         ++p;
         --len;
     }
+    if (pos > 0) {
+        for (size_t i = pos; i < 4; ++i) {
+            buf[i] = '=';
+        }
+        flush_decode();
+    }
+    qpdf_assert_debug(out_buffer.size() <= res);
 }
 
 void
-Pl_Base64::encode(unsigned char const* data, size_t len)
+Pl_Base64::encode(std::string_view data)
 {
-    unsigned char const* p = data;
+    auto len = data.size();
+    static const size_t max_len = (std::string().max_size() / 4u - 1u) * 3u;
+    // Change to constexpr once AppImage is build with GCC >= 12
+    if (len > max_len) {
+        throw std::length_error(getIdentifier() + ": base64 decode: data exceeds maximum length");
+    }
+
+    auto res = (len / 3u + 1u) * 4u;
+    out_buffer.reserve(res);
+    unsigned char const* p = reinterpret_cast<const unsigned char*>(data.data());
     while (len > 0) {
         buf[pos++] = *p;
         if (pos == 3) {
@@ -70,6 +91,10 @@ Pl_Base64::encode(unsigned char const* data, size_t len)
         ++p;
         --len;
     }
+    if (pos > 0) {
+        flush_encode();
+    }
+    qpdf_assert_debug(out_buffer.size() <= res);
 }
 
 void
@@ -78,7 +103,7 @@ Pl_Base64::flush_decode()
     if (end_of_data) {
         throw std::runtime_error(getIdentifier() + ": base64 decode: data follows pad characters");
     }
-    int pad = 0;
+    size_t pad = 0;
     int shift = 18;
     int outval = 0;
     for (size_t i = 0; i < 4; ++i) {
@@ -110,7 +135,7 @@ Pl_Base64::flush_decode()
         to_uc(0xff & outval),
     };
 
-    next()->write(out, QIntC::to_size(3 - pad));
+    out_buffer.append(reinterpret_cast<const char*>(out), 3u - pad);
     reset();
 }
 
@@ -144,7 +169,7 @@ Pl_Base64::flush_encode()
     for (size_t i = 0; i < 3 - pos; ++i) {
         out[3 - i] = '=';
     }
-    next()->write(out, 4);
+    out_buffer.append(reinterpret_cast<const char*>(out), 4);
     reset();
 }
 
@@ -152,21 +177,16 @@ void
 Pl_Base64::finish()
 {
     if (action == a_decode) {
-        decode(reinterpret_cast<unsigned char const*>(in_buffer.data()), in_buffer.size());
-        if (pos > 0) {
-            for (size_t i = pos; i < 4; ++i) {
-                buf[i] = '=';
-            }
-            flush_decode();
-        }
+        decode(in_buffer);
+
     } else {
-        encode(reinterpret_cast<unsigned char const*>(in_buffer.data()), in_buffer.size());
-        if (pos > 0) {
-            flush_encode();
-        }
+        encode(in_buffer);
     }
     in_buffer.clear();
     in_buffer.shrink_to_fit();
+    next()->write(reinterpret_cast<unsigned char const*>(out_buffer.data()), out_buffer.size());
+    out_buffer.clear();
+    out_buffer.shrink_to_fit();
     next()->finish();
 }
 

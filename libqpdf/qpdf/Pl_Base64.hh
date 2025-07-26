@@ -13,8 +13,8 @@ class Pl_Base64 final: public Pipeline
     void finish() final;
 
   private:
-    void decode(unsigned char const* buf, size_t len);
-    void encode(unsigned char const* buf, size_t len);
+    void decode(std::string_view data);
+    void encode(std::string_view data);
     void flush_decode();
     void flush_encode();
     void reset();
@@ -23,8 +23,8 @@ class Pl_Base64 final: public Pipeline
     unsigned char buf[4]{0, 0, 0, 0};
     size_t pos{0};
     std::string in_buffer;
+    std::string out_buffer;
     bool end_of_data{false};
-    bool finished{false};
 };
 
 #endif // PL_BASE64_HH
