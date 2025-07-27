@@ -40,7 +40,16 @@ QPDFParser::parse_content(
 {
     bool empty = false;
     return QPDFParser(
-               input, std::move(sp_description), "content", tokenizer, nullptr, context, true)
+               input,
+               std::move(sp_description),
+               "content",
+               tokenizer,
+               nullptr,
+               context,
+               true,
+               0,
+               0,
+               context && context->reconstructed_xref())
         .parse(empty, true);
 }
 
@@ -623,7 +632,7 @@ QPDFParser::tooManyBadTokens()
             "encountered an array or dictionary with more than 5000 elements during xref recovery; "
             "giving up on reading object");
     }
-    if (--max_bad_count > 0 && good_count > 4) {
+    if (max_bad_count && --max_bad_count > 0 && good_count > 4) {
         good_count = 0;
         bad_count = 1;
         return false;
