@@ -12,10 +12,12 @@ class Pl_Base64 final: public Pipeline
     void write(unsigned char const* buf, size_t len) final;
     void finish() final;
 
+    static std::string encode(std::string_view data);
+    static std::string decode(std::string_view data);
+
   private:
-    void decode(unsigned char const* buf, size_t len);
-    void encode(unsigned char const* buf, size_t len);
-    void flush();
+    void decode_internal(std::string_view data);
+    void encode_internal(std::string_view data);
     void flush_decode();
     void flush_encode();
     void reset();
@@ -23,8 +25,9 @@ class Pl_Base64 final: public Pipeline
     action_e action;
     unsigned char buf[4]{0, 0, 0, 0};
     size_t pos{0};
+    std::string in_buffer;
+    std::string out_buffer;
     bool end_of_data{false};
-    bool finished{false};
 };
 
 #endif // PL_BASE64_HH

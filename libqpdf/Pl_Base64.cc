@@ -1,3 +1,5 @@
+#include <qpdf/assert_debug.h>
+
 #include <qpdf/Pl_Base64.hh>
 
 #include <qpdf/QIntC.hh>
@@ -31,63 +33,81 @@ Pl_Base64::Pl_Base64(char const* identifier, Pipeline* next, action_e action) :
     Pipeline(identifier, next),
     action(action)
 {
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_Base64 with nullptr as next");
-    }
 }
 
 void
 Pl_Base64::write(unsigned char const* data, size_t len)
 {
-    if (finished) {
-        throw std::logic_error("Pl_Base64 used after finished");
-    }
-    if (action == a_decode) {
-        decode(data, len);
-    } else {
-        encode(data, len);
-    }
+    in_buffer.append(reinterpret_cast<const char*>(data), len);
+}
+
+std::string
+Pl_Base64::decode(std::string_view data)
+{
+    Pl_Base64 p("base64-decode", nullptr, a_decode);
+    p.decode_internal(data);
+    return std::move(p.out_buffer);
+}
+
+std::string
+Pl_Base64::encode(std::string_view data)
+{
+    Pl_Base64 p("base64-encode", nullptr, a_encode);
+    p.encode_internal(data);
+    return std::move(p.out_buffer);
 }
 
 void
-Pl_Base64::decode(unsigned char const* data, size_t len)
+Pl_Base64::decode_internal(std::string_view data)
 {
-    unsigned char const* p = data;
+    auto len = data.size();
+    auto res = (len / 4u + 1u) * 3u;
+    out_buffer.reserve(res);
+    unsigned char const* p = reinterpret_cast<const unsigned char*>(data.data());
     while (len > 0) {
         if (!util::is_space(to_c(*p))) {
             buf[pos++] = *p;
             if (pos == 4) {
-                flush();
+                flush_decode();
             }
         }
         ++p;
         --len;
     }
+    if (pos > 0) {
+        for (size_t i = pos; i < 4; ++i) {
+            buf[i] = '=';
+        }
+        flush_decode();
+    }
+    qpdf_assert_debug(out_buffer.size() <= res);
 }
 
 void
-Pl_Base64::encode(unsigned char const* data, size_t len)
+Pl_Base64::encode_internal(std::string_view data)
 {
-    unsigned char const* p = data;
+    auto len = data.size();
+    static const size_t max_len = (std::string().max_size() / 4u - 1u) * 3u;
+    // Change to constexpr once AppImage is build with GCC >= 12
+    if (len > max_len) {
+        throw std::length_error(getIdentifier() + ": base64 decode: data exceeds maximum length");
+    }
+
+    auto res = (len / 3u + 1u) * 4u;
+    out_buffer.reserve(res);
+    unsigned char const* p = reinterpret_cast<const unsigned char*>(data.data());
     while (len > 0) {
         buf[pos++] = *p;
         if (pos == 3) {
-            flush();
+            flush_encode();
         }
         ++p;
         --len;
     }
-}
-
-void
-Pl_Base64::flush()
-{
-    if (action == a_decode) {
-        flush_decode();
-    } else {
+    if (pos > 0) {
         flush_encode();
     }
-    reset();
+    qpdf_assert_debug(out_buffer.size() <= res);
 }
 
 void
@@ -96,7 +116,7 @@ Pl_Base64::flush_decode()
     if (end_of_data) {
         throw std::runtime_error(getIdentifier() + ": base64 decode: data follows pad characters");
     }
-    int pad = 0;
+    size_t pad = 0;
     int shift = 18;
     int outval = 0;
     for (size_t i = 0; i < 4; ++i) {
@@ -128,7 +148,8 @@ Pl_Base64::flush_decode()
         to_uc(0xff & outval),
     };
 
-    next()->write(out, QIntC::to_size(3 - pad));
+    out_buffer.append(reinterpret_cast<const char*>(out), 3u - pad);
+    reset();
 }
 
 void
@@ -161,25 +182,27 @@ Pl_Base64::flush_encode()
     for (size_t i = 0; i < 3 - pos; ++i) {
         out[3 - i] = '=';
     }
-    next()->write(out, 4);
+    out_buffer.append(reinterpret_cast<const char*>(out), 4);
+    reset();
 }
 
 void
 Pl_Base64::finish()
 {
-    if (pos > 0) {
-        if (finished) {
-            throw std::logic_error("Pl_Base64 used after finished");
-        }
-        if (action == a_decode) {
-            for (size_t i = pos; i < 4; ++i) {
-                buf[i] = '=';
-            }
-        }
-        flush();
+    if (action == a_decode) {
+        decode_internal(in_buffer);
+
+    } else {
+        encode_internal(in_buffer);
     }
-    finished = true;
-    next()->finish();
+    if (next()) {
+        in_buffer.clear();
+        in_buffer.shrink_to_fit();
+        next()->write(reinterpret_cast<unsigned char const*>(out_buffer.data()), out_buffer.size());
+        out_buffer.clear();
+        out_buffer.shrink_to_fit();
+        next()->finish();
+    }
 }
 
 void
