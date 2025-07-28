@@ -27,11 +27,6 @@ main QTest stream 0
 QPDF lin write nshared_total > nshared_first_page 1
 QPDFWriter encrypted hint stream 0
 QPDF xref gen > 0 1
-QPDFParser bad brace 0
-QPDFParser bad brace in parseRemainder 0
-QPDFParser bad array close 0
-QPDFParser bad array close in parseRemainder 0
-QPDFParser bad dictionary close 0
 QPDFTokenizer bad ) 0
 QPDFTokenizer bad > 0
 QPDFTokenizer bad hexstring character 0
@@ -123,7 +118,6 @@ QPDF_Stream provider length not provided 0
 QPDF_Stream unknown stream length 0
 QPDF replaceReserved 0
 QPDFWriter copy use_aes 1
-QPDFParser indirect without context 0
 QPDFObjectHandle trailing data in parse 0
 QPDFTokenizer EOF reading token 0
 QPDFTokenizer EOF reading appendable token 0
@@ -145,11 +139,7 @@ QPDFJob pages range omitted in middle 0
 QPDFWriter standard deterministic ID 1
 QPDFWriter linearized deterministic ID 1
 qpdf-c called qpdf_set_deterministic_ID 0
-QPDFParser invalid objgen 0
-QPDFParser treat word as string 0
-QPDFParser treat word as string in parseRemainder 0
 QPDFParser found fake 1
-QPDFParser no val for last key 0
 QPDFObjectHandle errors in parsecontent 0
 QPDFJob split-pages %d 0
 QPDFJob split-pages .pdf 0
@@ -168,10 +158,6 @@ Pl_QPDFTokenizer found ID 0
 QPDFObjectHandle coalesce called on stream 0
 QPDFObjectHandle coalesce provide stream data 0
 QPDF_Stream bad token at end during normalize 0
-QPDFParser bad token in parse 0
-QPDFParser bad token in parseRemainder 0
-QPDFParser eof in parse 0
-QPDFParser eof in parseRemainder 0
 QPDFObjectHandle boolean returning false 0
 QPDFObjectHandle real returning 0.0 0
 QPDFObjectHandle operator returning fake value 0
@@ -189,7 +175,6 @@ QPDFObjectHandle dictionary ignoring replaceKey 0
 QPDFObjectHandle numeric non-numeric 0
 QPDFObjectHandle erase array bounds 0
 qpdf-c called qpdf_check_pdf 0
-QPDFParser too deep 0
 QPDFFormFieldObjectHelper TU present 0
 QPDFFormFieldObjectHelper TM present 0
 QPDFFormFieldObjectHelper TU absent 0
@@ -252,7 +237,6 @@ QPDFJob image optimize bits per component 0
 QPDF eof skipping spaces before xref 1
 QPDF_encryption user matches owner V < 5 0
 QPDF_encryption same password 1
-QPDFParser duplicate dict key 0
 QPDFWriter no encryption sig contents 0
 QPDFPageObjectHelper colorspace lookup 0
 QPDFPageObjectHelper filter form xobject 0

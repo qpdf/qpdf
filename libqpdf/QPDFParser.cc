@@ -15,6 +15,8 @@ using namespace qpdf;
 
 using ObjectPtr = std::shared_ptr<QPDFObject>;
 
+static uint32_t const& max_nesting{global::Limits::objects_max_nesting()};
+
 // The ParseGuard class allows QPDFParser to detect re-entrant parsing. It also provides
 // special access to allow the parser to create unresolved objects and dangling references.
 class QPDF::Doc::ParseGuard
@@ -170,27 +172,22 @@ QPDFParser::parse(bool& empty, bool content_stream)
             // In content stream mode, leave object uninitialized to indicate EOF
             return {};
         }
-        QTC::TC("qpdf", "QPDFParser eof in parse");
         warn("unexpected EOF");
         return {QPDFObject::create<QPDF_Null>()};
 
     case QPDFTokenizer::tt_bad:
-        QTC::TC("qpdf", "QPDFParser bad token in parse");
         return {QPDFObject::create<QPDF_Null>()};
 
     case QPDFTokenizer::tt_brace_open:
     case QPDFTokenizer::tt_brace_close:
-        QTC::TC("qpdf", "QPDFParser bad brace");
         warn("treating unexpected brace token as null");
         return {QPDFObject::create<QPDF_Null>()};
 
     case QPDFTokenizer::tt_array_close:
-        QTC::TC("qpdf", "QPDFParser bad array close");
         warn("treating unexpected array close token as null");
         return {QPDFObject::create<QPDF_Null>()};
 
     case QPDFTokenizer::tt_dict_close:
-        QTC::TC("qpdf", "QPDFParser bad dictionary close");
         warn("unexpected dictionary close token");
         return {QPDFObject::create<QPDF_Null>()};
 
@@ -230,7 +227,6 @@ QPDFParser::parse(bool& empty, bool content_stream)
                 empty = true;
                 return {QPDFObject::create<QPDF_Null>()};
             } else {
-                QTC::TC("qpdf", "QPDFParser treat word as string");
                 warn("unknown token while reading object; treating as string");
                 return withDescription<QPDF_String>(value);
             }
@@ -283,8 +279,7 @@ QPDFParser::parseRemainder(bool content_stream)
             } else if (
                 int_count >= 2 && tokenizer.getType() == QPDFTokenizer::tt_word &&
                 tokenizer.getValue() == "R") {
-                if (context == nullptr) {
-                    QTC::TC("qpdf", "QPDFParser indirect without context");
+                if (!context) {
                     throw std::logic_error(
                         "QPDFParser::parse called without context on an object "
                         "with indirect references");
@@ -294,7 +289,6 @@ QPDFParser::parseRemainder(bool content_stream)
                 if (!(id < 1 || gen < 0 || gen >= 65535)) {
                     add(ParseGuard::getObject(context, id, gen, parse_pdf));
                 } else {
-                    QTC::TC("qpdf", "QPDFParser invalid objgen");
                     addNull();
                 }
                 int_count = 0;
@@ -317,12 +311,10 @@ QPDFParser::parseRemainder(bool content_stream)
                 // In content stream mode, leave object uninitialized to indicate EOF
                 return {};
             }
-            QTC::TC("qpdf", "QPDFParser eof in parseRemainder");
             warn("unexpected EOF");
             return {QPDFObject::create<QPDF_Null>()};
 
         case QPDFTokenizer::tt_bad:
-            QTC::TC("qpdf", "QPDFParser bad token in parseRemainder");
             if (tooManyBadTokens()) {
                 return {QPDFObject::create<QPDF_Null>()};
             }
@@ -331,7 +323,6 @@ QPDFParser::parseRemainder(bool content_stream)
 
         case QPDFTokenizer::tt_brace_open:
         case QPDFTokenizer::tt_brace_close:
-            QTC::TC("qpdf", "QPDFParser bad brace in parseRemainder");
             warn("treating unexpected brace token as null");
             if (tooManyBadTokens()) {
                 return {QPDFObject::create<QPDF_Null>()};
@@ -361,7 +352,6 @@ QPDFParser::parseRemainder(bool content_stream)
                 frame = &stack.back();
                 add(std::move(object));
             } else {
-                QTC::TC("qpdf", "QPDFParser bad array close in parseRemainder");
                 if (sanity_checks) {
                     // During sanity checks, assume nesting of containers is corrupt and object is
                     // unusable.
@@ -387,7 +377,6 @@ QPDFParser::parseRemainder(bool content_stream)
                 auto& dict = frame->dict;
 
                 if (frame->state == st_dictionary_value) {
-                    QTC::TC("qpdf", "QPDFParser no val for last key");
                     warn(
                         frame->offset,
                         "dictionary ended prematurely; using null as value for last key");
@@ -438,8 +427,7 @@ QPDFParser::parseRemainder(bool content_stream)
 
         case QPDFTokenizer::tt_array_open:
         case QPDFTokenizer::tt_dict_open:
-            if (stack.size() > 499) {
-                QTC::TC("qpdf", "QPDFParser too deep");
+            if (stack.size() > max_nesting) {
                 warn("ignoring excessively deeply nested data structure");
                 return {QPDFObject::create<QPDF_Null>()};
             } else {
@@ -510,7 +498,6 @@ QPDFParser::parseRemainder(bool content_stream)
                 continue;
             }
 
-            QTC::TC("qpdf", "QPDFParser treat word as string in parseRemainder");
             warn("unknown token while reading object; treating as string");
             if (tooManyBadTokens()) {
                 return {QPDFObject::create<QPDF_Null>()};
@@ -592,8 +579,8 @@ template <typename T, typename... Args>
 void
 QPDFParser::addScalar(Args&&... args)
 {
-    if ((bad_count || sanity_checks) &&
-        (frame->olist.size() > 5'000 || frame->dict.size() > 5'000)) {
+    auto limit = Limits::objects_max_container_size(bad_count || sanity_checks);
+    if (frame->olist.size() > limit || frame->dict.size() > limit) {
         // Stop adding scalars. We are going to abort when the close token or a bad token is
         // encountered.
         max_bad_count = 0;
@@ -650,16 +637,17 @@ QPDFParser::fixMissingKeys()
 bool
 QPDFParser::tooManyBadTokens()
 {
-    if (frame->olist.size() > 5'000 || frame->dict.size() > 5'000) {
+    auto limit = Limits::objects_max_container_size(bad_count || sanity_checks);
+    if (frame->olist.size() > limit || frame->dict.size() > limit) {
         if (bad_count) {
             warn(
-                "encountered errors while parsing an array or dictionary with more than 5000 "
-                "elements; giving up on reading object");
+                "encountered errors while parsing an array or dictionary with more than " +
+                std::to_string(limit) + " elements; giving up on reading object");
             return true;
         }
         warn(
-            "encountered an array or dictionary with more than 5000 elements during xref recovery; "
-            "giving up on reading object");
+            "encountered an array or dictionary with more than " + std::to_string(limit) +
+            " elements during xref recovery; giving up on reading object");
     }
     if (max_bad_count && --max_bad_count > 0 && good_count > 4) {
         good_count = 0;
@@ -693,7 +681,6 @@ QPDFParser::warn(QPDFExc const& e) const
 void
 QPDFParser::warnDuplicateKey()
 {
-    QTC::TC("qpdf", "QPDFParser duplicate dict key");
     warn(
         frame->offset,
         "dictionary has duplicated key " + frame->key + "; last occurrence overrides earlier ones");

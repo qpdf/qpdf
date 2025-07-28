@@ -5,9 +5,13 @@
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFTokenizer_private.hh>
+#include <qpdf/global_private.hh>
 
 #include <memory>
 #include <string>
+
+using namespace qpdf;
+using namespace qpdf::global;
 
 class QPDFParser
 {
@@ -136,7 +140,7 @@ class QPDFParser
     // it only gets incremented or reset when a bad token is encountered.
     int bad_count{0};
     // Number of bad tokens (remaining) before giving up.
-    int max_bad_count{15};
+    uint32_t max_bad_count{Limits::objects_max_errors()};
     // Number of good tokens since last bad token. Irrelevant if bad_count == 0.
     int good_count{0};
     // Start offset including any leading whitespace.
