@@ -320,7 +320,9 @@ QPDFParser::parseRemainder(bool content_stream)
                 if (!(id < 1 || gen < 0 || gen >= 65535)) {
                     add(ParseGuard::getObject(context, id, gen, parse_pdf));
                 } else {
-                    addNull();
+                    add_bad_null(
+                        "treating bad indirect reference (" + std::to_string(id) + " " +
+                        std::to_string(gen) + " R) as null");
                 }
                 int_count = 0;
                 continue;
