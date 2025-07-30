@@ -1,6 +1,7 @@
 WARNING: issue-150.pdf: can't find PDF header
+WARNING: issue-150.pdf (xref stream: object 8 0, offset 56): treating object as null because of error during parsing : overflow/underflow converting 9900000000000000000 to 64-bit integer
+WARNING: issue-150.pdf (xref stream: object 8 0, offset 75): expected endobj
 WARNING: issue-150.pdf: file is damaged
-WARNING: issue-150.pdf: error reading xref: overflow/underflow converting 9900000000000000000 to 64-bit integer
+WARNING: issue-150.pdf (offset 4): xref not found
 WARNING: issue-150.pdf: Attempting to reconstruct cross-reference table
-WARNING: issue-150.pdf (object 8 0): object has offset 0
 qpdf: issue-150.pdf: unable to find trailer dictionary while recovering damaged file

@@ -16,6 +16,13 @@ using namespace qpdf::global;
 class QPDFParser
 {
   public:
+    class Error: public std::exception
+    {
+      public:
+        Error() = default;
+        virtual ~Error() noexcept = default;
+    };
+
     static QPDFObjectHandle
     parse(InputSource& input, std::string const& object_description, QPDF* context);
 
@@ -106,13 +113,15 @@ class QPDFParser
     };
 
     QPDFObjectHandle parse(bool& empty, bool content_stream);
+    QPDFObjectHandle parse_first(bool& empty, bool content_stream);
     QPDFObjectHandle parseRemainder(bool content_stream);
     void add(std::shared_ptr<QPDFObject>&& obj);
     void addNull();
+    void add_bad_null(std::string const& msg);
     void addInt(int count);
     template <typename T, typename... Args>
     void addScalar(Args&&... args);
-    bool tooManyBadTokens();
+    void check_too_many_bad_tokens();
     void warnDuplicateKey();
     void fixMissingKeys();
     void warn(qpdf_offset_t offset, std::string const& msg) const;
