@@ -1,3 +1,7 @@
 WARNING: issue-118.pdf: can't find PDF header
 WARNING: issue-118.pdf (xref stream, offset 732): self-referential object stream 2
+WARNING: issue-118.pdf (xref stream, offset 732): object stream id 12336 for object 3 is impossibly large
+WARNING: issue-118.pdf (xref stream, offset 732): object stream id 12336 for object 4 is impossibly large
+WARNING: issue-118.pdf (xref stream, offset 732): object stream id 12336 for object 5 is impossibly large
+WARNING: issue-118.pdf (xref stream, offset 732): object stream id 12336 for object 6 is impossibly large
 issue-118.pdf: unable to find /Root dictionary

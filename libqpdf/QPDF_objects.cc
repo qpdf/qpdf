@@ -1025,9 +1025,20 @@ QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2)
         return;
     }
 
-    if (f0 == 2 && static_cast<int>(f1) == obj) {
-        warn(damagedPDF("xref stream", "self-referential object stream " + std::to_string(obj)));
-        return;
+    if (f0 == 2) {
+        if (f1 == obj) {
+            warn(
+                damagedPDF("xref stream", "self-referential object stream " + std::to_string(obj)));
+            return;
+        }
+        if (f1 > m->xref_table_max_id) {
+            // ignore impossibly large object stream ids
+            warn(damagedPDF(
+                "xref stream",
+                "object stream id " + std::to_string(f1) + " for object " + std::to_string(obj) +
+                    " is impossibly large"));
+            return;
+        }
     }
 
     auto [iter, created] = m->xref_table.try_emplace(QPDFObjGen(obj, (f0 == 2 ? 0 : f2)));
