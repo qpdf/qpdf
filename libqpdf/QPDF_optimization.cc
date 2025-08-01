@@ -1,7 +1,5 @@
 // See the "Optimization" section of the manual.
 
-#include <qpdf/assert_debug.h>
-
 #include <qpdf/QPDF_private.hh>
 
 #include <qpdf/QPDFExc.hh>

@@ -1,13 +1,16 @@
 #ifndef UTIL_HH
 #define UTIL_HH
 
+#include <qpdf/assert_debug.h>
+
 #include <string>
+#include <utility>
 
 namespace qpdf::util
 {
-    // This is a collection of useful utility functions for qpdf internal use. They include inline
-    // functions, some of which are exposed as regular functions in QUtil. Implementations are in
-    // QUtil.cc.
+    // qpdf::util is a collection of useful utility functions for qpdf internal use. It includes
+    // inline functions, some of which are exposed as regular functions in QUtil. Implementations
+    // are in QUtil.cc.
 
     inline constexpr char
     hex_decode_char(char digit)

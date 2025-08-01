@@ -200,7 +200,15 @@ Building docs from pull requests is also enabled.
 
   * Test code: #include <qpdf/assert_test.h> first.
   * Debug code: #include <qpdf/assert_debug.h> first and use
-    qpdf_assert_debug instead of assert.
+    qpdf_assert_debug instead of assert. Note that <qpdf/Util.hh>
+    includes assert_debug.h. Include this instead if 'At most one
+    qpdf/assert header ...' errors are encounted, especially when
+    using assert in private header files.
+  * Use 'qpdf_expect', 'qpdf_static_expect', 'qpdf_ensures' and
+    'qpdf_ionvariant' to document pre/post-conditions and ivariants.
+    This requires inclusion of 'assert_debug.h' or 'Util.hh'. Remember
+    that these (except for 'qpdf_static_expect') are only checked in
+    debug builds.
 
   These rules are enforced by the check-assert test. This practices
   serves to
