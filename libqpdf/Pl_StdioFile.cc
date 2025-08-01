@@ -3,8 +3,12 @@
 #include <qpdf/Pl_StdioFile.hh>
 
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
+
 #include <cerrno>
 #include <stdexcept>
+
+using namespace qpdf;
 
 class Pl_StdioFile::Members
 {
@@ -46,7 +50,7 @@ Pl_StdioFile::write(unsigned char const* buf, size_t len)
 void
 Pl_StdioFile::finish()
 {
-    if ((fflush(m->file) == -1) && (errno == EBADF)) {
-        throw std::logic_error(this->identifier + ": Pl_StdioFile::finish: stream already closed");
-    }
+    util::assertion(
+        !(fflush(m->file) == -1 && errno == EBADF),
+        identifier + ": Pl_StdioFile::finish: stream already closed");
 }

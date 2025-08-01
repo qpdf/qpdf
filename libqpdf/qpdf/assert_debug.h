@@ -12,7 +12,7 @@
 #else
 # define QPDF_ASSERT_H
 
-# include <assert.h>
+# include <cassert>
 # define qpdf_assert_debug assert
 // Alias for assert. Pre-condition is only enforced in debug builds.
 # define qpdf_expect assert

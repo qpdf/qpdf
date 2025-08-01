@@ -389,9 +389,7 @@ QPDF::findHeader()
     qpdf_offset_t global_offset = m->file->tell();
     std::string line = m->file->readLine(1024);
     char const* p = line.c_str();
-    if (strncmp(p, "%PDF-", 5) != 0) {
-        throw std::logic_error("findHeader is not looking at %PDF-");
-    }
+    util::assertion(strncmp(p, "%PDF-", 5) == 0, "findHeader is not looking at %PDF-");
     p += 5;
     std::string version;
     // Note: The string returned by line.c_str() is always null-terminated. The code below never
@@ -533,10 +531,9 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
     }
 
     ObjCopier& obj_copier = m->object_copiers[other.m->unique_id];
-    if (!obj_copier.visiting.empty()) {
-        throw std::logic_error(
-            "obj_copier.visiting is not empty at the beginning of copyForeignObject");
-    }
+    util::assertion(
+        obj_copier.visiting.empty(),
+        "obj_copier.visiting is not empty at the beginning of copyForeignObject");
 
     // Make sure we have an object in this file for every referenced object in the old file.
     // obj_copier.object_map maps foreign QPDFObjGen to local objects.  For everything new that we
@@ -544,9 +541,8 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
     // the local object will already be a stream.
     reserveObjects(foreign, obj_copier, true);
 
-    if (!obj_copier.visiting.empty()) {
-        throw std::logic_error("obj_copier.visiting is not empty after reserving objects");
-    }
+    util::assertion(
+        obj_copier.visiting.empty(), "obj_copier.visiting is not empty after reserving objects");
 
     // Copy any new objects and replace the reservations.
     for (auto& to_copy: obj_copier.to_copy) {
@@ -574,9 +570,8 @@ void
 QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
 {
     auto foreign_tc = foreign.getTypeCode();
-    if (foreign_tc == ::ot_reserved) {
-        throw std::logic_error("QPDF: attempting to copy a foreign reserved object");
-    }
+    util::assertion(
+        foreign_tc != ::ot_reserved, "QPDF: attempting to copy a foreign reserved object");
 
     if (foreign.isPagesObject()) {
         QTC::TC("qpdf", "QPDF not copying pages object");
@@ -675,10 +670,9 @@ QPDF::replaceForeignIndirectObjects(QPDFObjectHandle foreign, ObjCopier& obj_cop
         result.makeDirect();
     }
 
-    if (top && (!result.isStream()) && result.isIndirect()) {
-        throw std::logic_error("replacement for foreign object is indirect");
-    }
-
+    util::assertion(
+        !(top && !result.isStream() && result.isIndirect()),
+        "replacement for foreign object is indirect");
     return result;
 }
 
@@ -703,11 +697,12 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
         foreign.getQPDF("unable to retrieve owning qpdf from foreign stream");
 
     auto stream = foreign.as_stream();
-    if (!stream) {
-        throw std::logic_error("unable to retrieve underlying stream object from foreign stream");
-    }
+    util::assertion(
+        static_cast<bool>(stream),
+        "unable to retrieve underlying stream object from foreign stream");
+
     std::shared_ptr<Buffer> stream_buffer = stream.getStreamDataBuffer();
-    if ((foreign_stream_qpdf.m->immediate_copy_from) && (stream_buffer == nullptr)) {
+    if (foreign_stream_qpdf.m->immediate_copy_from && !stream_buffer) {
         // Pull the stream data into a buffer before attempting the copy operation. Do it on the
         // source stream so that if the source stream is copied multiple times, we don't have to
         // keep duplicating the memory.
@@ -831,10 +826,7 @@ QPDF::getXRefTable()
 std::map<QPDFObjGen, QPDFXRefEntry> const&
 QPDF::getXRefTableInternal()
 {
-    if (!m->parsed) {
-        throw std::logic_error("QPDF::getXRefTable called before parsing.");
-    }
-
+    util::assertion(m->parsed, "QPDF::getXRefTable called before parsing.");
     return m->xref_table;
 }
 

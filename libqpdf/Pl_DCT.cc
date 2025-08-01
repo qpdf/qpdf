@@ -2,10 +2,13 @@
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/Util.hh>
 
 #include <csetjmp>
 #include <stdexcept>
 #include <string>
+
+using namespace qpdf;
 
 #if BITS_IN_JSAMPLE != 8
 # error "qpdf does not support libjpeg built with BITS_IN_JSAMPLE != 8"
@@ -118,9 +121,7 @@ Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
     m(std::make_unique<Members>())
 {
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_DCT with nullptr as next");
-    }
+    util::assertion(next, "Attempt to create Pl_DCT with nullptr as next");
 }
 
 void

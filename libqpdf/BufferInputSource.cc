@@ -41,9 +41,7 @@ BufferInputSource::~BufferInputSource()
 qpdf_offset_t
 BufferInputSource::findAndSkipNextEOL()
 {
-    if (cur_offset < 0) {
-        throw std::logic_error("INTERNAL ERROR: BufferInputSource offset < 0");
-    }
+    util::assertion(cur_offset >= 0, "INTERNAL ERROR: BufferInputSource offset < 0");
     qpdf_offset_t end_pos = max_offset;
     if (cur_offset >= end_pos) {
         last_offset = end_pos;

@@ -1,7 +1,9 @@
 #include <qpdf/QPDFCryptoProvider.hh>
 
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 #include <qpdf/qpdf-config.h>
+
 #include <stdexcept>
 
 #ifdef USE_CRYPTO_NATIVE
@@ -14,13 +16,15 @@
 # include <qpdf/QPDFCrypto_openssl.hh>
 #endif
 
+using namespace qpdf;
+
 std::shared_ptr<QPDFCryptoImpl>
 QPDFCryptoProvider::getImpl()
 {
     QPDFCryptoProvider& p = getInstance();
-    if (p.m->default_provider.empty()) {
-        throw std::logic_error("QPDFCryptoProvider::getImpl called with no default provider.");
-    }
+    util::assertion(
+        !p.m->default_provider.empty(),
+        "QPDFCryptoProvider::getImpl called with no default provider");
     return p.getImpl_internal(p.m->default_provider);
 }
 
@@ -72,10 +76,9 @@ std::shared_ptr<QPDFCryptoImpl>
 QPDFCryptoProvider::getImpl_internal(std::string const& name) const
 {
     auto iter = m->providers.find(name);
-    if (iter == m->providers.end()) {
-        throw std::logic_error(
-            "QPDFCryptoProvider requested unknown implementation \"" + name + "\"");
-    }
+    util::assertion(
+        iter != m->providers.end(),
+        "QPDFCryptoProvider requested unknown implementation \"" + name + "\"");
     return m->providers[name]();
 }
 
@@ -88,11 +91,10 @@ QPDFCryptoProvider::registerImpl_internal(std::string const& name, provider_fn f
 void
 QPDFCryptoProvider::setDefaultProvider_internal(std::string const& name)
 {
-    if (!m->providers.contains(name)) {
-        throw std::logic_error(
-            "QPDFCryptoProvider: request to set default provider to unknown implementation \"" +
-            name + "\"");
-    }
+    util::assertion(
+        m->providers.contains(name),
+        "QPDFCryptoProvider: request to set default provider to unknown implementation \"" + name +
+            "\"");
     m->default_provider = name;
 }
 

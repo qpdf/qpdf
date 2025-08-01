@@ -1,13 +1,15 @@
 #include <qpdf/Pl_MD5.hh>
 
+#include <qpdf/Util.hh>
+
 #include <stdexcept>
+
+using namespace qpdf;
 
 Pl_MD5::Pl_MD5(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next)
 {
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_MD5 with nullptr as next");
-    }
+    util::assertion(next, "Attempt to create Pl_MD5 with nullptr as next");
 }
 
 void
@@ -58,9 +60,7 @@ Pl_MD5::persistAcrossFinish(bool persist)
 std::string
 Pl_MD5::getHexDigest()
 {
-    if (!enabled) {
-        throw std::logic_error("digest requested for a disabled MD5 Pipeline");
-    }
+    util::assertion(enabled, "digest requested for a disabled MD5 Pipeline");
     in_progress = false;
     return md5.unparse();
 }

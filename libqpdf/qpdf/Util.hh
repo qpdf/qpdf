@@ -3,6 +3,7 @@
 
 #include <qpdf/assert_debug.h>
 
+#include <stdexcept>
 #include <string>
 #include <utility>
 
@@ -11,6 +12,15 @@ namespace qpdf::util
     // qpdf::util is a collection of useful utility functions for qpdf internal use. It includes
     // inline functions, some of which are exposed as regular functions in QUtil. Implementations
     // are in QUtil.cc.
+
+    // Throw a logic_error if 'cond' does not hold.
+    inline void
+    assertion(bool cond, std::string const msg)
+    {
+        if (!cond) {
+            throw std::logic_error(msg);
+        }
+    }
 
     inline constexpr char
     hex_decode_char(char digit)

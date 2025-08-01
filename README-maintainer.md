@@ -208,6 +208,10 @@ Building docs from pull requests is also enabled.
     document pre and post-conditions. They require inclusion of
     'assert_debug.h' or 'Util.hh'. Remember that pre and
     post-conditions are only checked in debug builds.
+  * Use 'util::assertion' when checks should also be carried out in
+    release code in preference to throwing logic_errors directly, as
+    these are generally not covered by tests, which can obscure 
+    genuine gaps in coverage.
 
   These rules are enforced by the check-assert test. This practices
   serves to
