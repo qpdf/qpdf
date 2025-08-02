@@ -1,0 +1,101 @@
+WARNING: issue-1503.pdf: can't find PDF header
+WARNING: issue-1503.pdf: file is damaged
+WARNING: issue-1503.pdf: can't find startxref
+WARNING: issue-1503.pdf: Attempting to reconstruct cross-reference table
+WARNING: issue-1503.pdf (object 31 0, offset 813): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 31 0, offset 851): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 31 0, offset 856): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 31 0, offset 861): unexpected 'endobj' or 'endstream' while reading object; giving up on reading object
+WARNING: issue-1503.pdf (object 31 0, offset 871): expected endobj
+WARNING: issue-1503.pdf (object 38 0, offset 1126): unexpected 'endobj' or 'endstream' while reading object; giving up on reading object
+WARNING: issue-1503.pdf (object 38 0, offset 1133): expected endobj
+WARNING: issue-1503.pdf (object 40 0, offset 1195): unexpected array close token; giving up on reading object
+WARNING: issue-1503.pdf (object 40 0, offset 1198): expected endobj
+WARNING: issue-1503.pdf (object 41 0, offset 1359): stream dictionary lacks /Length key
+WARNING: issue-1503.pdf (object 41 0, offset 1411): attempting to recover stream length
+WARNING: issue-1503.pdf (object 41 0, offset 1411): recovered stream length: 54
+WARNING: issue-1503.pdf (object 44 0, offset 1744): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 44 0, offset 1767): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 44 0, offset 1775): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 44 0, offset 1779): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 44 0, offset 1814): name with stray # will not work with PDF >= 1.2
+WARNING: issue-1503.pdf (object 44 0, offset 1821): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 44 0, offset 1826): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 44 0, offset 1826): too many errors; giving up on reading object
+WARNING: issue-1503.pdf (object 44 0, offset 1829): expected endobj
+WARNING: issue-1503.pdf (object 46 0, offset 1923): unexpected array close token; giving up on reading object
+WARNING: issue-1503.pdf (object 46 0, offset 1926): expected endobj
+WARNING: issue-1503.pdf (object 47 0, offset 2087): stream dictionary lacks /Length key
+WARNING: issue-1503.pdf (object 47 0, offset 2139): attempting to recover stream length
+WARNING: issue-1503.pdf (object 47 0, offset 2139): recovered stream length: 54
+WARNING: issue-1503.pdf (object 49 0, offset 2256): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 49 0, offset 2271): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 49 0, offset 2241): expected dictionary keys but found non-name objects; ignoring
+WARNING: issue-1503.pdf (object 50 0, offset 2483): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 50 0, offset 2453): expected dictionary keys but found non-name objects; ignoring
+WARNING: issue-1503.pdf (object 50 0, offset 2450): stream dictionary lacks /Length key
+WARNING: issue-1503.pdf (object 50 0, offset 2530): attempting to recover stream length
+WARNING: issue-1503.pdf (object 50 0, offset 2530): unable to recover stream data; treating stream as empty
+WARNING: issue-1503.pdf (object 114 0, offset 2693): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 114 0, offset 2697): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 114 0, offset 2652): expected dictionary keys but found non-name objects; ignoring
+WARNING: issue-1503.pdf (object 114 0, offset 2649): stream dictionary lacks /Length key
+WARNING: issue-1503.pdf (object 114 0, offset 2783): attempting to recover stream length
+WARNING: issue-1503.pdf (object 114 0, offset 2783): recovered stream length: 84
+WARNING: issue-1503.pdf (object 116 0, offset 2927): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 116 0, offset 2914): stream dictionary lacks /Length key
+WARNING: issue-1503.pdf (object 116 0, offset 3101): attempting to recover stream length
+WARNING: issue-1503.pdf (object 116 0, offset 3101): recovered stream length: 84
+WARNING: issue-1503.pdf (object 118 0, offset 3271): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 118 0, offset 3235): expected dictionary keys but found non-name objects; ignoring
+WARNING: issue-1503.pdf (object 118 0, offset 3232): /Length key in stream dictionary is not an integer
+WARNING: issue-1503.pdf (object 118 0, offset 3370): attempting to recover stream length
+WARNING: issue-1503.pdf (object 118 0, offset 3370): recovered stream length: 102
+WARNING: issue-1503.pdf (object 120 0, offset 3519): stream dictionary lacks /Length key
+WARNING: issue-1503.pdf (object 120 0, offset 3653): attempting to recover stream length
+WARNING: issue-1503.pdf (object 120 0, offset 3653): unable to recover stream data; treating stream as empty
+WARNING: issue-1503.pdf (object 122 0, offset 3723): expected endobj
+WARNING: issue-1503.pdf (object 151 0, offset 3836): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 151 0, offset 3958): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 152 0, offset 4088): parse error while reading object
+WARNING: issue-1503.pdf (object 152 0, offset 4088): unexpected EOF
+WARNING: issue-1503.pdf (object 152 0, offset 4088): expected endobj
+WARNING: issue-1503.pdf (object 152 0, offset 4088): EOF after endobj
+WARNING: issue-1503.pdf (object 155 0, offset 162): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 155 0, offset 342): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 155 0, offset 345): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 155 0, offset 334): expected dictionary keys but found non-name objects; ignoring
+WARNING: issue-1503.pdf (object 155 0, offset 152): expected dictionary keys but found non-name objects; ignoring
+WARNING: issue-1503.pdf (object 155 0, offset 405): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 155 0, offset 479): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 155 0, offset 485): unknown token while reading object; treating as null
+WARNING: issue-1503.pdf (object 155 0, offset 136): expected dictionary keys but found non-name objects; ignoring
+WARNING: issue-1503.pdf (object 173 0, offset 574): expected endobj
+WARNING: issue-1503.pdf: unable to find trailer dictionary while recovering damaged file
+WARNING: object 157 0: Pages tree includes non-dictionary object; ignoring
+WARNING: issue-1503.pdf, object 151 0 at offset 3831: Pages tree includes non-dictionary object; ignoring
+WARNING: issue-1503.pdf, object 151 0 at offset 3834: Pages tree includes non-dictionary object; ignoring
+Pages tree includes non-dictionary object; ignoring
+WARNING: object 22 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 25 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 28 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 31 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 34 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 37 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 40 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 46 0: Pages tree includes non-dictionary object; ignoring
+WARNING: issue-1503.pdf, object 49 0 at offset 2241: kid 13 (from 0) MediaBox is undefined; setting to letter / ANSI A
+WARNING: object 52 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 55 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 58 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 61 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 64 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 67 0: Pages tree includes non-dictionary object; ignoring
+WARNING: issue-1503.pdf, object 151 0 at offset 3953: Pages tree includes non-dictionary object; ignoring
+Pages tree includes non-dictionary object; ignoring
+WARNING: object 73 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 76 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 79 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 82 0: Pages tree includes non-dictionary object; ignoring
+WARNING: object 85 0: Pages tree includes non-dictionary object; ignoring
+qpdf: operation succeeded with warnings; resulting file may have some problems
