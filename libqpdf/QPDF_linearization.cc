@@ -1412,14 +1412,20 @@ QPDF::pushOutlinesToPart(
     QTC::TC(
         "qpdf",
         "QPDF lin outlines in part",
-        ((&part == (&m->part6))       ? 0
-             : (&part == (&m->part9)) ? 1
-                                      : 9999)); // can't happen
-    m->c_outline_data.first_object = outlines_og.getObj();
-    m->c_outline_data.nobjects = 1;
-    lc_outlines.erase(outlines_og);
-    part.push_back(outlines);
+        &part == &m->part6         ? 0
+            : (&part == &m->part9) ? 1
+                                   : 9999); // can't happen
+    if (lc_outlines.erase(outlines_og)) {
+        // Make sure outlines is in lc_outlines in case the file is damaged. in which case it may be
+        // included in an earlier part.
+        part.push_back(outlines);
+        m->c_outline_data.first_object = outlines_og.getObj();
+        m->c_outline_data.nobjects = 1;
+    }
     for (auto const& og: lc_outlines) {
+        if (!m->c_outline_data.first_object) {
+            m->c_outline_data.first_object = og.getObj();
+        }
         part.push_back(getObject(og));
         ++m->c_outline_data.nobjects;
     }
