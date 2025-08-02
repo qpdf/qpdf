@@ -1,13 +1,14 @@
 // See the "Optimization" section of the manual.
 
-#include <qpdf/assert_debug.h>
-
 #include <qpdf/QPDF_private.hh>
 
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFWriter_private.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/Util.hh>
+
+using namespace qpdf;
 
 QPDF::ObjUser::ObjUser(user_e type) :
     ou_type(type)
@@ -166,10 +167,9 @@ QPDF::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
         key_ancestors,
         allow_changes,
         warn_skipped_keys);
-    if (!key_ancestors.empty()) {
-        throw std::logic_error(
-            "key_ancestors not empty after pushing inherited attributes to pages");
-    }
+    util::assertion(
+        key_ancestors.empty(),
+        "key_ancestors not empty after pushing inherited attributes to pages");
     m->pushed_inherited_attributes_to_pages = true;
     m->ever_pushed_inherited_attributes_to_pages = true;
 }

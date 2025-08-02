@@ -13,12 +13,10 @@
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFWriter_private.hh>
 #include <qpdf/QTC.hh>
-#include <qpdf/QUtil.hh>
 #include <qpdf/Util.hh>
 
 #include <algorithm>
 #include <cmath>
-#include <cstring>
 
 using namespace qpdf;
 using namespace std::literals;
@@ -38,9 +36,7 @@ load_vector_int(
         }
         vec.at(i).*field = bit_stream.getBitsInt(QIntC::to_size(bits_wanted));
     }
-    if (QIntC::to_int(vec.size()) != nitems) {
-        throw std::logic_error("vector has wrong size in load_vector_int");
-    }
+    util::assertion(std::cmp_equal(vec.size(), nitems), "vector has wrong size in load_vector_int");
     // The PDF spec says that each hint table starts at a byte boundary.  Each "row" actually must
     // start on a byte boundary.
     bit_stream.skipToNextByte();
@@ -153,9 +149,7 @@ QPDF::readLinearizationData()
     // This function throws an exception (which is trapped by checkLinearization()) for any errors
     // that prevent loading.
 
-    if (!isLinearized()) {
-        throw std::logic_error("called readLinearizationData for file that is not linearized");
-    }
+    util::assertion(isLinearized(), "called readLinearizationData for file that is not linearized");
 
     // /L is read and stored in linp by isLinearized()
     QPDFObjectHandle H = m->lindict.getKey("/H");
@@ -500,10 +494,8 @@ QPDF::checkLinearizationInternal()
     qpdf_offset_t max_E = -1;
     for (auto const& oh: m->part6) {
         QPDFObjGen og(oh.getObjGen());
-        if (!m->obj_cache.contains(og)) {
-            // All objects have to have been dereferenced to be classified.
-            throw std::logic_error("linearization part6 object not in cache");
-        }
+        // All objects have to have been dereferenced to be classified.
+        util::assertion(m->obj_cache.contains(og), "linearization part6 object not in cache");
         ObjCache const& oc = m->obj_cache[og];
         min_E = std::max(min_E, oc.end_before_space);
         max_E = std::max(max_E, oc.end_after_space);
@@ -964,12 +956,11 @@ QPDF::calculateLinearizationData(T const& object_stream_data)
     // file must be optimized (via calling optimize()) prior to calling this function.  Note that
     // actual offsets and lengths are not computed here, but anything related to object ordering is.
 
-    if (m->object_to_obj_users.empty()) {
-        // Note that we can't call optimize here because we don't know whether it should be called
-        // with or without allow changes.
-        throw std::logic_error(
-            "INTERNAL ERROR: QPDF::calculateLinearizationData called before optimize()");
-    }
+    util::assertion(
+        !m->object_to_obj_users.empty(),
+        "INTERNAL ERROR: QPDF::calculateLinearizationData called before optimize()");
+    // Note that we can't call optimize here because we don't know whether it should be called
+    // with or without allow changes.
 
     // Separate objects into the categories sufficient for us to determine which part of the
     // linearized file should contain the object.  This categorization is useful for other purposes
@@ -1305,11 +1296,10 @@ QPDF::calculateLinearizationData(T const& object_stream_data)
             }
         }
     }
-    if (!lc_thumbnail_private.empty()) {
-        stopOnError(
-            "INTERNAL ERROR: QPDF::calculateLinearizationData: lc_thumbnail_private not "
-            "empty after placing thumbnails");
-    }
+    util::assertion(
+        lc_thumbnail_private.empty(),
+        "INTERNAL ERROR: QPDF::calculateLinearizationData: lc_thumbnail_private not "
+        "empty after placing thumbnails");
 
     // Place shared thumbnail objects
     for (auto const& og: lc_thumbnail_shared) {
@@ -1331,12 +1321,11 @@ QPDF::calculateLinearizationData(T const& object_stream_data)
     size_t num_placed =
         m->part4.size() + m->part6.size() + m->part7.size() + m->part8.size() + m->part9.size();
     size_t num_wanted = m->object_to_obj_users.size();
-    if (num_placed != num_wanted) {
-        stopOnError(
-            "INTERNAL ERROR: QPDF::calculateLinearizationData: wrong "
-            "number of objects placed (num_placed = " +
+    util::assertion(
+        num_placed == num_wanted,
+        "INTERNAL ERROR: QPDF::calculateLinearizationData: wrong "
+        "number of objects placed (num_placed = " +
             std::to_string(num_placed) + "; number of objects: " + std::to_string(num_wanted));
-    }
 
     // Calculate shared object hint table information including references to shared objects from
     // page offset hint data.

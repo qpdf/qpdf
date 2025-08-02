@@ -1,13 +1,15 @@
 #include <qpdf/Pl_Concatenate.hh>
 
+#include <qpdf/Util.hh>
+
 #include <stdexcept>
+
+using namespace qpdf;
 
 Pl_Concatenate::Pl_Concatenate(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next)
 {
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_Concatenate with nullptr as next");
-    }
+    util::assertion(next, "Attempt to create Pl_Concatenate with nullptr as next");
 }
 
 // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer

@@ -1,6 +1,9 @@
 #include <qpdf/Pl_Count.hh>
 
 #include <qpdf/QIntC.hh>
+#include <qpdf/Util.hh>
+
+using namespace qpdf;
 
 class Pl_Count::Members
 {
@@ -18,9 +21,7 @@ Pl_Count::Pl_Count(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
     m(std::make_unique<Members>())
 {
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_Count with nullptr as next");
-    }
+    util::assertion(next, "Attempt to create Pl_Count with nullptr as next");
 }
 
 Pl_Count::~Pl_Count() // NOLINT (modernize-use-equals-default)

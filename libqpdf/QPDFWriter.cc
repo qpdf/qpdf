@@ -1,5 +1,3 @@
-#include <qpdf/assert_debug.h>
-
 #include <qpdf/qpdf-config.h> // include early for large file support
 
 #include <qpdf/QPDFWriter_private.hh>

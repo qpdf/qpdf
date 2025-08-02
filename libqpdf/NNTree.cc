@@ -2,9 +2,9 @@
 
 #include <qpdf/QPDF_private.hh>
 #include <qpdf/QTC.hh>
-#include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 
-#include <exception>
+using namespace qpdf;
 
 static std::string
 get_description(QPDFObjectHandle& node)
@@ -249,9 +249,7 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
     //   node: A
     //   item_number: 0
 
-    if (!valid()) {
-        throw std::logic_error("NNTreeIterator::split called an invalid iterator");
-    }
+    util::assertion(valid(), "NNTreeIterator::split called an invalid iterator");
 
     // Find the array we actually need to split, which is either this node's kids or items.
     auto kids = to_split.getKey("/Kids");
@@ -413,9 +411,7 @@ NNTreeIterator::remove()
 {
     // Remove this item, leaving the tree valid and this iterator pointing to the next item.
 
-    if (!valid()) {
-        throw std::logic_error("attempt made to remove an invalid iterator");
-    }
+    util::assertion(valid(), "attempt made to remove an invalid iterator");
     auto items = node.getKey(impl.details.itemsKey());
     int nitems = items.getArrayNItems();
     if (item_number + 2 > nitems) {
@@ -449,7 +445,7 @@ NNTreeIterator::remove()
             updateIValue();
         } else {
             // We already checked to ensure this condition would not happen.
-            throw std::logic_error("NNTreeIterator::remove: item_number > nitems after erase");
+            util::assertion(false, "NNTreeIterator::remove: item_number > nitems after erase");
         }
         return;
     }

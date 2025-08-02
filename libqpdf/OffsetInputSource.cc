@@ -1,17 +1,19 @@
 #include <qpdf/OffsetInputSource.hh>
 
+#include <qpdf/Util.hh>
+
 #include <limits>
 #include <sstream>
 #include <stdexcept>
+
+using namespace qpdf;
 
 OffsetInputSource::OffsetInputSource(
     std::shared_ptr<InputSource> proxied, qpdf_offset_t global_offset) :
     proxied(proxied),
     global_offset(global_offset)
 {
-    if (global_offset < 0) {
-        throw std::logic_error("OffsetInputSource constructed with negative offset");
-    }
+    util::assertion(global_offset >= 0, "OffsetInputSource constructed with negative offset");
     this->max_safe_offset = std::numeric_limits<qpdf_offset_t>::max() - global_offset;
 }
 
