@@ -485,12 +485,12 @@ class QPDFWriter
         std::string* stream_data);
     void unparseObject(
         QPDFObjectHandle object,
-        int level,
+        size_t level,
         int flags,
         // for stream dictionaries
         size_t stream_length = 0,
         bool compress = false);
-    void unparseChild(QPDFObjectHandle child, int level, int flags);
+    void unparseChild(QPDFObjectHandle const& child, size_t level, int flags);
     void initializeSpecialStreams();
     void preserveObjectStreams();
     void generateObjectStreams();
