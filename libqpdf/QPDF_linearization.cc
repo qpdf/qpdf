@@ -1288,24 +1288,20 @@ QPDF::calculateLinearizationData(T const& object_stream_data)
     for (size_t i = 0; i < toS(npages); ++i) {
         QPDFObjectHandle thumb = pages.at(i).getKey("/Thumb");
         thumb = getUncompressedObject(thumb, object_stream_data);
-        if (!thumb.isNull()) {
-            // Output the thumbnail itself
-            QPDFObjGen thumb_og(thumb.getObjGen());
-            if (lc_thumbnail_private.contains(thumb_og)) {
-                lc_thumbnail_private.erase(thumb_og);
-                m->part9.push_back(thumb);
-            } else {
-                // No internal error this time...there's nothing to stop this object from having
-                // been referred to somewhere else outside of a page's /Thumb, and if it had been,
-                // there's nothing to prevent it from having been in some set other than
-                // lc_thumbnail_private.
-            }
-            std::set<QPDFObjGen>& ogs = m->obj_user_to_objects[ObjUser(ObjUser::ou_thumb, toI(i))];
-            for (auto const& og: ogs) {
-                if (lc_thumbnail_private.contains(og)) {
-                    lc_thumbnail_private.erase(og);
-                    m->part9.push_back(getObject(og));
-                }
+        QPDFObjGen thumb_og(thumb.getObjGen());
+        // Output the thumbnail itself
+        if (lc_thumbnail_private.erase(thumb_og) && !thumb.isNull()) {
+            m->part9.emplace_back(thumb);
+        } else {
+            // No internal error this time...there's nothing to stop this object from having
+            // been referred to somewhere else outside of a page's /Thumb, and if it had been,
+            // there's nothing to prevent it from having been in some set other than
+            // lc_thumbnail_private.
+        }
+        std::set<QPDFObjGen>& ogs = m->obj_user_to_objects[ObjUser(ObjUser::ou_thumb, toI(i))];
+        for (auto const& og: ogs) {
+            if (lc_thumbnail_private.erase(og)) {
+                m->part9.emplace_back(getObject(og));
             }
         }
     }
