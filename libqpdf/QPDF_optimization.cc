@@ -15,7 +15,7 @@ QPDF::ObjUser::ObjUser(user_e type) :
     qpdf_assert_debug(type == ou_root);
 }
 
-QPDF::ObjUser::ObjUser(user_e type, int pageno) :
+QPDF::ObjUser::ObjUser(user_e type, size_t pageno) :
     ou_type(type),
     pageno(pageno)
 {
@@ -98,12 +98,10 @@ QPDF::optimize_internal(
     pushInheritedAttributesToPage(allow_changes, false);
 
     // Traverse pages
-    int n = toI(m->all_pages.size());
-    for (int pageno = 0; pageno < n; ++pageno) {
+    size_t n = m->all_pages.size();
+    for (size_t pageno = 0; pageno < n; ++pageno) {
         updateObjectMaps(
-            ObjUser(ObjUser::ou_page, pageno),
-            m->all_pages.at(toS(pageno)),
-            skip_stream_parameters);
+            ObjUser(ObjUser::ou_page, pageno), m->all_pages.at(pageno), skip_stream_parameters);
     }
 
     // Traverse document-level items

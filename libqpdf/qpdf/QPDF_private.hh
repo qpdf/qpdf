@@ -356,7 +356,7 @@ struct QPDF::LinParameters
     qpdf_offset_t file_size{0};        // /L
     int first_page_object{0};          // /O
     qpdf_offset_t first_page_end{0};   // /E
-    int npages{0};                     // /N
+    size_t npages{0};                  // /N
     qpdf_offset_t xref_zero_offset{0}; // /T
     int first_page{0};                 // /P
     qpdf_offset_t H_offset{0};         // offset of primary hint stream
@@ -415,7 +415,7 @@ struct QPDF::CHSharedObject
 class QPDF::ObjUser
 {
   public:
-    enum user_e {ou_page = 1, ou_thumb, ou_trailer_key, ou_root_key, ou_root };
+    enum user_e { ou_page = 1, ou_thumb, ou_trailer_key, ou_root_key, ou_root };
 
     ObjUser() = delete;
 
@@ -423,7 +423,7 @@ class QPDF::ObjUser
     ObjUser(user_e type);
 
     // type must be one of ou_page or ou_thumb
-    ObjUser(user_e type, int pageno);
+    ObjUser(user_e type, size_t pageno);
 
     // type must be one of ou_trailer_key or ou_root_key
     ObjUser(user_e type, std::string const& key);
@@ -431,8 +431,8 @@ class QPDF::ObjUser
     bool operator<(ObjUser const&) const;
 
     user_e ou_type;
-    int pageno{0};   // if ou_page;
-    std::string key; // if ou_trailer_key or ou_root_key
+    size_t pageno{0}; // if ou_page;
+    std::string key;  // if ou_trailer_key or ou_root_key
 };
 
 struct QPDF::UpdateObjectMapsFrame
