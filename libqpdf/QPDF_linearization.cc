@@ -1104,10 +1104,6 @@ QPDF::calculateLinearizationData(T const& object_stream_data)
             case ObjUser::ou_root:
                 is_root = true;
                 break;
-
-            case ObjUser::ou_bad:
-                stopOnError("INTERNAL ERROR: QPDF::calculateLinearizationData: invalid user type");
-                break;
             }
         }
 

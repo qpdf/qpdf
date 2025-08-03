@@ -415,9 +415,9 @@ struct QPDF::CHSharedObject
 class QPDF::ObjUser
 {
   public:
-    enum user_e { ou_bad, ou_page, ou_thumb, ou_trailer_key, ou_root_key, ou_root };
+    enum user_e {ou_page = 1, ou_thumb, ou_trailer_key, ou_root_key, ou_root };
 
-    ObjUser() = default;
+    ObjUser() = delete;
 
     // type must be ou_root
     ObjUser(user_e type);
@@ -430,7 +430,7 @@ class QPDF::ObjUser
 
     bool operator<(ObjUser const&) const;
 
-    user_e ou_type{ou_bad};
+    user_e ou_type;
     int pageno{0};   // if ou_page;
     std::string key; // if ou_trailer_key or ou_root_key
 };
