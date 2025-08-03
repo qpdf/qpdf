@@ -1484,18 +1484,19 @@ QPDF::calculateHPageOffset(QPDFWriter::NewObjTable const& new_obj, QPDFWriter::O
 
     // Calculate minimum and maximum values for number of objects per page and page length.
 
-    int min_nobjects = cphe.at(0).nobjects;
-    int max_nobjects = min_nobjects;
-    int min_length = outputLengthNextN(pages.at(0).getObjectID(), min_nobjects, new_obj, obj);
-    int max_length = min_length;
-    int max_shared = cphe.at(0).nshared_objects;
+    int min_nobjects = std::numeric_limits<int>::max();
+    int max_nobjects = 0;
+    int min_length = std::numeric_limits<int>::max();
+    int max_length = 0;
+    int max_shared = 0;
 
     HPageOffset& ph = m->page_offset_hints;
     std::vector<HPageOffsetEntry>& phe = ph.entries;
     // npages is the size of the existing pages array.
     phe = std::vector<HPageOffsetEntry>(npages);
 
-    for (unsigned int i = 0; i < npages; ++i) {
+    size_t i = 0;
+    for (auto& phe_i: phe) {
         // Calculate values for each page, assigning full values to the delta items.  They will be
         // adjusted later.
 
@@ -1512,9 +1513,10 @@ QPDF::calculateHPageOffset(QPDFWriter::NewObjTable const& new_obj, QPDFWriter::O
         max_length = std::max(max_length, length);
         max_shared = std::max(max_shared, nshared);
 
-        phe.at(i).delta_nobjects = nobjects;
-        phe.at(i).delta_page_length = length;
-        phe.at(i).nshared_objects = nshared;
+        phe_i.delta_nobjects = nobjects;
+        phe_i.delta_page_length = length;
+        phe_i.nshared_objects = nshared;
+        ++i;
     }
 
     ph.min_nobjects = min_nobjects;
@@ -1533,23 +1535,22 @@ QPDF::calculateHPageOffset(QPDFWriter::NewObjTable const& new_obj, QPDFWriter::O
     ph.nbits_delta_content_length = ph.nbits_delta_page_length;
     ph.min_content_length = ph.min_page_length;
 
-    for (size_t i = 0; i < npages; ++i) {
+    i = 0;
+    for (auto& phe_i: phe) {
         // Adjust delta entries
-        if ((phe.at(i).delta_nobjects < min_nobjects) ||
-            (phe.at(i).delta_page_length < min_length)) {
+        if (phe_i.delta_nobjects < min_nobjects || phe_i.delta_page_length < min_length) {
             stopOnError(
                 "found too small delta nobjects or delta page length while writing "
                 "linearization data");
         }
-        phe.at(i).delta_nobjects -= min_nobjects;
-        phe.at(i).delta_page_length -= min_length;
-        phe.at(i).delta_content_length = phe.at(i).delta_page_length;
+        phe_i.delta_nobjects -= min_nobjects;
+        phe_i.delta_page_length -= min_length;
+        phe_i.delta_content_length = phe_i.delta_page_length;
 
-        auto nso = toS(cphe.at(i).nshared_objects);
-        for (size_t j = 0; j < nso; ++j) {
-            phe.at(i).shared_identifiers.push_back(cphe.at(i).shared_identifiers.at(j));
-            phe.at(i).shared_numerators.push_back(0);
-        }
+        auto& si = cphe.at(i).shared_identifiers;
+        phe_i.shared_identifiers.insert(phe_i.shared_identifiers.end(), si.begin(), si.end());
+        phe_i.shared_numerators.insert(phe_i.shared_numerators.end(), si.size(), 0);
+        ++i;
     }
 }
 
