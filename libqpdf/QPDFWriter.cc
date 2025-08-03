@@ -1237,7 +1237,7 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
 }
 
 void
-QPDFWriter::unparseChild(QPDFObjectHandle child, int level, int flags)
+QPDFWriter::unparseChild(QPDFObjectHandle const& child, size_t level, int flags)
 {
     if (!m->linearized) {
         enqueueObject(child);
@@ -1417,18 +1417,15 @@ QPDFWriter::willFilterStream(
 
 void
 QPDFWriter::unparseObject(
-    QPDFObjectHandle object, int level, int flags, size_t stream_length, bool compress)
+    QPDFObjectHandle object, size_t level, int flags, size_t stream_length, bool compress)
 {
     QPDFObjGen old_og = object.getObjGen();
     int child_flags = flags & ~f_stream;
-    if (level < 0) {
-        throw std::logic_error("invalid level in QPDFWriter::unparseObject");
-    }
     // For non-qdf, "indent" and "indent_large" are a single space between tokens. For qdf, they
     // include the preceding newline.
     std::string indent_large = " ";
     if (m->qdf_mode) {
-        indent_large.append(static_cast<size_t>(2 * (level + 1)), ' ');
+        indent_large.append(2 * (level + 1), ' ');
         indent_large[0] = '\n';
     }
     std::string_view indent{indent_large.data(), m->qdf_mode ? indent_large.size() - 2 : 1};
