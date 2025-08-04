@@ -366,21 +366,20 @@ QPDF::numWarnings() const
 bool
 QPDF::validatePDFVersion(char const*& p, std::string& version)
 {
-    bool valid = util::is_digit(*p);
-    if (valid) {
-        while (util::is_digit(*p)) {
-            version.append(1, *p++);
-        }
-        if ((*p == '.') && util::is_digit(*(p + 1))) {
-            version.append(1, *p++);
-            while (util::is_digit(*p)) {
-                version.append(1, *p++);
-            }
-        } else {
-            valid = false;
-        }
+    if (!util::is_digit(*p)) {
+        return false;
     }
-    return valid;
+    while (util::is_digit(*p)) {
+        version.append(1, *p++);
+    }
+    if (!(*p == '.' && util::is_digit(*(p + 1)))) {
+        return false;
+    }
+    version.append(1, *p++);
+    while (util::is_digit(*p)) {
+        version.append(1, *p++);
+    }
+    return true;
 }
 
 bool
@@ -388,26 +387,26 @@ QPDF::findHeader()
 {
     qpdf_offset_t global_offset = m->file->tell();
     std::string line = m->file->readLine(1024);
-    char const* p = line.c_str();
+    char const* p = line.data();
     if (strncmp(p, "%PDF-", 5) != 0) {
         throw std::logic_error("findHeader is not looking at %PDF-");
     }
     p += 5;
     std::string version;
-    // Note: The string returned by line.c_str() is always null-terminated. The code below never
+    // Note: The string returned by line.data() is always null-terminated. The code below never
     // overruns the buffer because a null character always short-circuits further advancement.
-    bool valid = validatePDFVersion(p, version);
-    if (valid) {
-        m->pdf_version = version;
-        if (global_offset != 0) {
-            // Empirical evidence strongly suggests that when there is leading material prior to the
-            // PDF header, all explicit offsets in the file are such that 0 points to the beginning
-            // of the header.
-            QTC::TC("qpdf", "QPDF global offset");
-            m->file = std::shared_ptr<InputSource>(new OffsetInputSource(m->file, global_offset));
-        }
+    if (!validatePDFVersion(p, version)) {
+        return false;
     }
-    return valid;
+    m->pdf_version = version;
+    if (global_offset != 0) {
+        // Empirical evidence strongly suggests (codified in PDF 2.0 spec) that when there is
+        // leading material prior to the PDF header, all explicit offsets in the file are such that
+        // 0 points to the beginning of the header.
+        QTC::TC("qpdf", "QPDF global offset");
+        m->file = std::make_shared<OffsetInputSource>(m->file, global_offset);
+    }
+    return true;
 }
 
 void
