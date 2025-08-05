@@ -71,6 +71,25 @@ more detail.
 
   - Other changes
 
+    - qpdf now writes an end-of-line marker between stream data and the ``endstream``
+      keyword by default, as recommended by the PDF specification and required by
+      the PDF/A specifications. For backward compatibility, this can be disabled
+      by  setting the `` `--global`  `--no-eol-before-endstream` --``
+      CLI options or in the library using the ``qpdf::global::eol_before_endstream``
+      fundtion.
+
+    - qpdf now limits the number of indirect objects to 8,388,607 by default. This
+      limit was recommended by the PDF 1.7 specification and is required by the
+      the PDF/A specifications. The limit can be changed using the
+      `--max-indirect-objects` CLI global option or the
+      ``qpdf::global::limits::max_indirect_objects`` function.
+
+    - qpdf now honours the xref table ``/Size`` entry by default and treats all
+      objects with ``object id >= Size`` as ``null`` as per the PDF specification,
+      unless the xref table is damaged and needs to be reconstructed. To
+      ignore the ``/Size`` entry use the `--ignore-xref-size` CLI global
+      option or the ``qpdf::global::ignore_xref_size`` function.
+
     - When running in a FIPS environment using the GnuTLS crypto provider,
       calls to GnuTLS now use 'LAX' mode as the use of weak algorithms is
       required to decrypt existing files and is specified by the PDF standards
