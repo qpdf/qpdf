@@ -23,6 +23,12 @@ more detail.
       not work on some older Linux distributions. If you need support
       for an older distribution, please use version 12.2.0 or below.
 
+  - CLI Enhancements
+
+    - New `--remove-javascript` option to disable JavaScript/ECMAScript actions
+      in the output PDF.
+
+
   - Other enhancements
 
     - ``QPDFWriter`` will no longer add filters when writing empty streams.
