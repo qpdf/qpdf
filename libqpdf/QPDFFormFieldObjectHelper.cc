@@ -304,25 +304,26 @@ QPDFFormFieldObjectHelper::setV(QPDFObjectHandle value, bool need_appearances)
 {
     if (getFieldType() == "/Btn") {
         if (isCheckbox()) {
-            bool okay = false;
-            if (value.isName()) {
-                std::string name = value.getName();
-                okay = true;
-                // Accept any value other than /Off to mean checked. Files have been seen that use
-                // /1 or other values.
-                setCheckBoxValue((name != "/Off"));
-            }
-            if (!okay) {
+            if (!value.isName()) {
                 warn("ignoring attempt to set a checkbox field to a value whose type is not name");
+                return;
             }
-        } else if (isRadioButton()) {
-            if (value.isName()) {
-                setRadioButtonValue(value);
-            } else {
+            std::string name = value.getName();
+            // Accept any value other than /Off to mean checked. Files have been seen that use
+            // /1 or other values.
+            setCheckBoxValue(name != "/Off");
+            return;
+        }
+        if (isRadioButton()) {
+            if (!value.isName()) {
                 warn(
                     "ignoring attempt to set a radio button field to an object that is not a name");
+                return;
             }
-        } else if (isPushbutton()) {
+            setRadioButtonValue(value);
+            return;
+        }
+        if (isPushbutton()) {
             warn("ignoring attempt set the value of a pushbutton field");
         }
         return;
