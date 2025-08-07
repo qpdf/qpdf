@@ -62,6 +62,9 @@ more detail.
    - Option :qpdf:ref:`--check` now includes additional basic checks of the
      AcroForm, Dests, Outlines, and PageLabels structures.
 
+    - New `--remove-javascript` option to disable JavaScript/ECMAScript actions
+      in the output PDF.
+
   - Other enhancements
 
     - ``QPDFWriter`` will no longer add filters when writing empty streams.
