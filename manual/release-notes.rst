@@ -23,6 +23,13 @@ more detail.
       not work on some older Linux distributions. If you need support
       for an older distribution, please use version 12.2.0 or below.
 
+  - CLI Enhancements
+
+   - Disallow option :qpdf:ref:`--deterministic-id` to be used together
+     with the incompatible options :qpdf:ref:`--encrypt` or
+     :qpdf:ref:`--copy-encryption`.
+
+
   - Other enhancements
 
     - ``QPDFWriter`` will no longer add filters when writing empty streams.

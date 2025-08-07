@@ -254,7 +254,6 @@ QPDFJob npages 0
 QPDF already reserved object 0
 QPDFWriter standard deterministic ID 1
 QPDFWriter linearized deterministic ID 1
-QPDFWriter deterministic with no data 0
 qpdf-c called qpdf_set_deterministic_ID 0
 QPDFParser invalid objgen 0
 QPDF object id 0 0
