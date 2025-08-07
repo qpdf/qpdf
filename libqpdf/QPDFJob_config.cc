@@ -149,6 +149,9 @@ QPDFJob::Config::jpegQuality(std::string const& parameter)
 QPDFJob::Config*
 QPDFJob::Config::copyEncryption(std::string const& parameter)
 {
+    if (o.m->deterministic_id) {
+        usage("the deterministic-id option is incompatible with encrypted output files");
+    }
     o.m->encryption_file = parameter;
     o.m->copy_encryption = true;
     o.m->encrypt = false;
@@ -168,6 +171,9 @@ QPDFJob::Config::decrypt()
 QPDFJob::Config*
 QPDFJob::Config::deterministicId()
 {
+    if (o.m->encrypt || o.m->copy_encryption) {
+        usage("the deterministic-id option is incompatible with encrypted output files");
+    }
     o.m->deterministic_id = true;
     return this;
 }
@@ -1116,6 +1122,9 @@ std::shared_ptr<QPDFJob::EncConfig>
 QPDFJob::Config::encrypt(
     int keylen, std::string const& user_password, std::string const& owner_password)
 {
+    if (o.m->deterministic_id) {
+        usage("the deterministic-id option is incompatible with encrypted output files");
+    }
     o.m->keylen = keylen;
     if (keylen == 256) {
         o.m->use_aes = true;

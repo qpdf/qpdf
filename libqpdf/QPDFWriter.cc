@@ -859,7 +859,7 @@ QPDFWriter::interpretR3EncryptionParameters(
 void
 QPDFWriter::setEncryptionParameters(char const* user_password, char const* owner_password)
 {
-    generateID();
+    generateID(true);
     m->encryption->setId1(m->id1);
     m->encryption_key = m->encryption->compute_parameters(user_password, owner_password);
     setEncryptionMinimumVersion();
@@ -871,7 +871,7 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
     m->preserve_encryption = false;
     QPDFObjectHandle trailer = qpdf.getTrailer();
     if (trailer.hasKey("/Encrypt")) {
-        generateID();
+        generateID(true);
         m->id1 = trailer.getKey("/ID").getArrayItem(0).getStringValue();
         QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
         int V = encrypt.getKey("/V").getIntValueAsInt();
@@ -1301,7 +1301,7 @@ QPDFWriter::writeTrailer(
         if (linearization_pass == 0 && m->deterministic_id) {
             computeDeterministicIDData();
         }
-        generateID();
+        generateID(m->encryption.get());
         write_string(m->id1, true).write_string(m->id2, true);
     }
     write("]");
@@ -1865,7 +1865,7 @@ QPDFWriter::getOriginalID1()
 }
 
 void
-QPDFWriter::generateID()
+QPDFWriter::generateID(bool encrypted)
 {
     // Generate the ID lazily so that we can handle the user's preference to use static or
     // deterministic ID generation.
@@ -1911,12 +1911,14 @@ QPDFWriter::generateID()
 
         std::string seed;
         if (m->deterministic_id) {
-            if (m->deterministic_id_data.empty()) {
-                QTC::TC("qpdf", "QPDFWriter deterministic with no data");
+            if (encrypted) {
                 throw std::runtime_error(
-                    "INTERNAL ERROR: QPDFWriter::generateID has no data for "
-                    "deterministic ID.  This may happen if deterministic ID "
-                    "and file encryption are requested together.");
+                    "QPDFWriter: unable to generated a deterministic ID because the file to be "
+                    "written is encrypted (even though the file may not require a password)");
+            }
+            if (m->deterministic_id_data.empty()) {
+                throw std::logic_error(
+                    "INTERNAL ERROR: QPDFWriter::generateID has no data for deterministic ID");
             }
             seed += m->deterministic_id_data;
         } else {

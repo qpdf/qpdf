@@ -54,11 +54,10 @@ foreach my $d ('nn', 'ny', 'yn', 'yy')
 
 $td->runtest("deterministic ID with encryption",
              {$td->COMMAND => "qpdf -deterministic-id encrypted-with-images.pdf a.pdf"},
-             {$td->STRING => "qpdf: INTERNAL ERROR: QPDFWriter::generateID" .
-                  " has no data for deterministic ID." .
-                  "  This may happen if deterministic ID and" .
-                  " file encryption are requested together.\n",
-              $td->EXIT_STATUS => 2},
+             {$td->STRING => "qpdf: QPDFWriter: unable to generated a deterministic ID " .
+                    "because the file to be written is encrypted (even though the file " .
+                    "may not require a password)\n",
+             $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("deterministic ID (C API)",
              {$td->COMMAND =>

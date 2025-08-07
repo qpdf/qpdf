@@ -15,7 +15,7 @@ cleanup();
 
 my $td = new TestDriver('arg-parsing');
 
-my $n_tests = 26;
+my $n_tests = 30;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -136,6 +136,26 @@ $td->runtest("empty and replace-input",
 $td->runtest("missing key length",
              {$td->COMMAND => "qpdf --encrypt --"},
              {$td->REGEXP => ".*encryption key length is required",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("encrypt and deterministic-id 1",
+             {$td->COMMAND => "qpdf --deterministic-id --encrypt --"},
+             {$td->REGEXP => ".*the deterministic-id option is incompatible with encrypted output files",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("encrypt and deterministic-id 2",
+             {$td->COMMAND => "qpdf --deterministic-id --encrypt --bits=256 -- --deterministic-id"},
+             {$td->REGEXP => ".*the deterministic-id option is incompatible with encrypted output files",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("copy-encryption and deterministic-id 1",
+             {$td->COMMAND => "qpdf --deterministic-id --copy-encryption=missing.pdf"},
+             {$td->REGEXP => ".*the deterministic-id option is incompatible with encrypted output files",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("copy-encryption and deterministic-id 2",
+             {$td->COMMAND => "qpdf --copy-encryption=missing.pdf --deterministic-id"},
+             {$td->REGEXP => ".*the deterministic-id option is incompatible with encrypted output files",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 
