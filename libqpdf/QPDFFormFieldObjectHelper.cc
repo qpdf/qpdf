@@ -88,23 +88,21 @@ QPDFFormFieldObjectHelper::getInheritableFieldValue(std::string const& name)
 std::string
 QPDFFormFieldObjectHelper::getInheritableFieldValueAsString(std::string const& name)
 {
-    QPDFObjectHandle fv = getInheritableFieldValue(name);
-    std::string result;
+    auto fv = getInheritableFieldValue(name);
     if (fv.isString()) {
-        result = fv.getUTF8Value();
+        return fv.getUTF8Value();
     }
-    return result;
+    return {};
 }
 
 std::string
 QPDFFormFieldObjectHelper::getInheritableFieldValueAsName(std::string const& name)
 {
-    QPDFObjectHandle fv = getInheritableFieldValue(name);
-    std::string result;
+    auto fv = getInheritableFieldValue(name);
     if (fv.isName()) {
-        result = fv.getName();
+        return fv.getName();
     }
-    return result;
+    return {};
 }
 
 std::string
@@ -203,12 +201,11 @@ QPDFFormFieldObjectHelper::getDefaultAppearance()
         value = getFieldFromAcroForm("/DA");
         looked_in_acroform = true;
     }
-    std::string result;
     if (value.isString()) {
         QTC::TC("qpdf", "QPDFFormFieldObjectHelper DA present", looked_in_acroform ? 0 : 1);
-        result = value.getUTF8Value();
+        return value.getUTF8Value();
     }
-    return result;
+    return {};
 }
 
 int
@@ -220,12 +217,11 @@ QPDFFormFieldObjectHelper::getQuadding()
         fv = getFieldFromAcroForm("/Q");
         looked_in_acroform = true;
     }
-    int result = 0;
     if (fv.isInteger()) {
         QTC::TC("qpdf", "QPDFFormFieldObjectHelper Q present", looked_in_acroform ? 0 : 1);
-        result = QIntC::to_int(fv.getIntValue());
+        return QIntC::to_int(fv.getIntValue());
     }
-    return result;
+    return 0;
 }
 
 int
@@ -238,46 +234,46 @@ QPDFFormFieldObjectHelper::getFlags()
 bool
 QPDFFormFieldObjectHelper::isText()
 {
-    return (getFieldType() == "/Tx");
+    return getFieldType() == "/Tx";
 }
 
 bool
 QPDFFormFieldObjectHelper::isCheckbox()
 {
-    return ((getFieldType() == "/Btn") && ((getFlags() & (ff_btn_radio | ff_btn_pushbutton)) == 0));
+    return getFieldType() == "/Btn" && (getFlags() & (ff_btn_radio | ff_btn_pushbutton)) == 0;
 }
 
 bool
 QPDFFormFieldObjectHelper::isChecked()
 {
-    return isCheckbox() && getValue().isName() && (getValue().getName() != "/Off");
+    return isCheckbox() && getValue().isName() && getValue().getName() != "/Off";
 }
 
 bool
 QPDFFormFieldObjectHelper::isRadioButton()
 {
-    return ((getFieldType() == "/Btn") && ((getFlags() & ff_btn_radio) == ff_btn_radio));
+    return getFieldType() == "/Btn" && (getFlags() & ff_btn_radio) == ff_btn_radio;
 }
 
 bool
 QPDFFormFieldObjectHelper::isPushbutton()
 {
-    return ((getFieldType() == "/Btn") && ((getFlags() & ff_btn_pushbutton) == ff_btn_pushbutton));
+    return getFieldType() == "/Btn" && (getFlags() & ff_btn_pushbutton) == ff_btn_pushbutton;
 }
 
 bool
 QPDFFormFieldObjectHelper::isChoice()
 {
-    return (getFieldType() == "/Ch");
+    return getFieldType() == "/Ch";
 }
 
 std::vector<std::string>
 QPDFFormFieldObjectHelper::getChoices()
 {
-    std::vector<std::string> result;
     if (!isChoice()) {
-        return result;
+        return {};
     }
+    std::vector<std::string> result;
     for (auto const& item: getInheritableFieldValue("/Opt").as_array()) {
         if (item.isString()) {
             result.emplace_back(item.getUTF8Value());
