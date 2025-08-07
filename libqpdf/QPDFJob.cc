@@ -1180,7 +1180,7 @@ void
 QPDFJob::doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf)
 {
     JSON j_acroform = JSON::makeDictionary();
-    QPDFAcroFormDocumentHelper afdh(pdf);
+    auto& afdh = pdf.acroform();
     j_acroform.addDictionaryMember("hasacroform", JSON::makeBool(afdh.hasAcroForm()));
     j_acroform.addDictionaryMember("needappearances", JSON::makeBool(afdh.getNeedAppearances()));
     JSON j_fields = j_acroform.addDictionaryMember("fields", JSON::makeArray());
@@ -3013,7 +3013,7 @@ QPDFJob::doSplitPages(QPDF& pdf)
         dh.removeUnreferencedResources();
     }
     QPDFPageLabelDocumentHelper pldh(pdf);
-    QPDFAcroFormDocumentHelper afdh(pdf);
+    auto& afdh = pdf.acroform();
     std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
     size_t pageno_len = std::to_string(pages.size()).length();
     size_t num_pages = pages.size();

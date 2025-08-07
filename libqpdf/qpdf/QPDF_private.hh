@@ -3,6 +3,7 @@
 
 #include <qpdf/QPDF.hh>
 
+#include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFTokenizer_private.hh>
 
@@ -547,6 +548,9 @@ class QPDF::Members
     // Optimization data
     std::map<ObjUser, std::set<QPDFObjGen>> obj_user_to_objects;
     std::map<QPDFObjGen, std::set<ObjUser>> object_to_obj_users;
+
+    // Document Helpers;
+    std::unique_ptr<QPDFAcroFormDocumentHelper> acroform;
 };
 
 // JobSetter class is restricted to QPDFJob.
@@ -567,6 +571,15 @@ inline bool
 QPDF::reconstructed_xref() const
 {
     return m->reconstructed_xref;
+}
+
+inline QPDFAcroFormDocumentHelper&
+QPDF::acroform()
+{
+    if (!m->acroform) {
+        m->acroform = std::make_unique<QPDFAcroFormDocumentHelper>(*this);
+    }
+    return *m->acroform;
 }
 
 #endif // QPDF_PRIVATE_HH
