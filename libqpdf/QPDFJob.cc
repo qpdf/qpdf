@@ -6,7 +6,7 @@
 
 #include <qpdf/ClosedFileInputSource.hh>
 #include <qpdf/FileInputSource.hh>
-#include <qpdf/Pl_Count.hh>
+#include <qpdf/Pipeline_private.hh>
 #include <qpdf/Pl_DCT.hh>
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/Pl_Flate.hh>
@@ -37,7 +37,7 @@ using namespace qpdf;
 
 namespace
 {
-    class ImageOptimizer: public QPDFObjectHandle::StreamDataProvider
+    class ImageOptimizer final: public QPDFObjectHandle::StreamDataProvider
     {
       public:
         ImageOptimizer(
@@ -47,12 +47,13 @@ namespace
             size_t oi_min_area,
             int quality,
             QPDFObjectHandle& image);
-        ~ImageOptimizer() override = default;
-        void provideStreamData(QPDFObjGen const&, Pipeline* pipeline) override;
-        std::shared_ptr<Pipeline> makePipeline(std::string const& description, Pipeline* next);
+        ~ImageOptimizer() final = default;
+        void provideStreamData(QPDFObjGen const&, Pipeline* pipeline) final;
         bool evaluate(std::string const& description);
 
       private:
+        std::unique_ptr<Pipeline> makePipeline(std::string const& description, Pipeline* next);
+
         QPDFJob& o;
         size_t oi_min_width;
         size_t oi_min_height;
@@ -113,10 +114,9 @@ ImageOptimizer::ImageOptimizer(
     }
 }
 
-std::shared_ptr<Pipeline>
+std::unique_ptr<Pipeline>
 ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
 {
-    std::shared_ptr<Pipeline> result;
     QPDFObjectHandle dict = image.getDict();
     QPDFObjectHandle w_obj = dict.getKey("/Width");
     QPDFObjectHandle h_obj = dict.getKey("/Height");
@@ -128,10 +128,10 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
                   << ": not optimizing because image dictionary is missing required keys\n";
             });
         }
-        return result;
+        return {};
     }
     QPDFObjectHandle components_obj = dict.getKey("/BitsPerComponent");
-    if (!(components_obj.isInteger() && (components_obj.getIntValue() == 8))) {
+    if (!(components_obj.isInteger() && components_obj.getIntValue() == 8)) {
         QTC::TC("qpdf", "QPDFJob image optimize bits per component");
         if (!description.empty()) {
             o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -139,7 +139,7 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
                   << ": not optimizing because image has other than 8 bits per component\n";
             });
         }
-        return result;
+        return {};
     }
     // Files have been seen in the wild whose width and height are floating point, which is goofy,
     // but we can deal with it.
@@ -175,11 +175,10 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
                   << ": not optimizing because qpdf can't optimize images with this colorspace\n";
             });
         }
-        return result;
+        return {};
     }
-    if (((oi_min_width > 0) && (w <= oi_min_width)) ||
-        ((oi_min_height > 0) && (h <= oi_min_height)) ||
-        ((oi_min_area > 0) && ((w * h) <= oi_min_area))) {
+    if ((oi_min_width > 0 && w <= oi_min_width) || (oi_min_height > 0 && h <= oi_min_height) ||
+        (oi_min_area > 0 && (w * h) <= oi_min_area)) {
         QTC::TC("qpdf", "QPDFJob image optimize too small");
         if (!description.empty()) {
             o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -188,11 +187,10 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
                      "dimensions\n";
             });
         }
-        return result;
+        return {};
     }
 
-    result = std::make_shared<Pl_DCT>("jpg", next, w, h, components, cs, config.get());
-    return result;
+    return std::make_unique<Pl_DCT>("jpg", next, w, h, components, cs, config.get());
 }
 
 bool
@@ -207,10 +205,9 @@ ImageOptimizer::evaluate(std::string const& description)
         });
         return false;
     }
-    Pl_Discard d;
-    Pl_Count c("count", &d);
-    std::shared_ptr<Pipeline> p = makePipeline(description, &c);
-    if (p == nullptr) {
+    pl::Count c(0);
+    auto p = makePipeline(description, &c);
+    if (!p) {
         // message issued by makePipeline
         return false;
     }
@@ -236,8 +233,8 @@ ImageOptimizer::evaluate(std::string const& description)
 void
 ImageOptimizer::provideStreamData(QPDFObjGen const&, Pipeline* pipeline)
 {
-    std::shared_ptr<Pipeline> p = makePipeline("", pipeline);
-    if (p == nullptr) {
+    auto p = makePipeline("", pipeline);
+    if (!p) {
         // Should not be possible
         image.warnIfPossible(
             "unable to create pipeline after previous success; image data will be lost");
@@ -836,7 +833,7 @@ QPDFJob::doShowObj(QPDF& pdf)
     if (obj.isStream()) {
         if (m->show_raw_stream_data || m->show_filtered_stream_data) {
             bool filter = m->show_filtered_stream_data;
-            if (filter && (!obj.pipeStreamData(nullptr, 0, qpdf_dl_all))) {
+            if (filter && !obj.pipeStreamData(nullptr, 0, qpdf_dl_all)) {
                 QTC::TC("qpdf", "QPDFJob unable to filter");
                 obj.warnIfPossible("unable to filter stream data");
                 error = true;
