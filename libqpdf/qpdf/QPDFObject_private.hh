@@ -434,13 +434,6 @@ class QPDFObject
             parsed_offset = offset;
         }
     }
-    bool
-    getDescription(QPDF*& a_qpdf, std::string& description)
-    {
-        a_qpdf = qpdf;
-        description = getDescription();
-        return qpdf != nullptr;
-    }
     qpdf_offset_t
     getParsedOffset()
     {

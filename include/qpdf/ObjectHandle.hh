@@ -22,7 +22,10 @@
 
 #include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
+#include <qpdf/Types.h>
+
 #include <qpdf/JSON.hh>
+#include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/Types.h>
 
@@ -71,6 +74,9 @@ namespace qpdf
         inline qpdf_object_type_e type_code() const;
         std::string unparse() const;
         void write_json(int json_version, JSON::Writer& p) const;
+        static void warn(QPDF*, QPDFExc&&);
+        void warn(QPDFExc&&) const;
+        void warn(std::string const& warning) const;
 
       protected:
         BaseHandle() = default;
@@ -86,6 +92,11 @@ namespace qpdf
 
         template <typename T>
         T* as() const;
+
+        std::string description() const;
+        std::runtime_error type_error(char const* expected_type) const;
+        QPDFExc type_error(char const* expected_type, std::string const& message) const;
+        char const* type_name() const;
 
         std::shared_ptr<QPDFObject> obj;
     };
