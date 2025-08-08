@@ -1396,8 +1396,8 @@ QPDFWriter::willFilterStream(
             }
         } catch (std::runtime_error& e) {
             if (filter && first_attempt) {
-                stream.warnIfPossible("error while getting stream data: "s + e.what());
-                stream.warnIfPossible("qpdf will attempt to write the damaged stream unchanged");
+                stream.warn("error while getting stream data: "s + e.what());
+                stream.warn("qpdf will attempt to write the damaged stream unchanged");
                 filter = false;
                 stream.setFilterOnWrite(false);
                 continue;
@@ -1742,7 +1742,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
             if (obj_to_write.isStream()) {
                 // This condition occurred in a fuzz input. Ideally we should block it at parse
                 // time, but it's not clear to me how to construct a case for this.
-                obj_to_write.warnIfPossible("stream found inside object stream; treating as null");
+                obj_to_write.warn("stream found inside object stream; treating as null");
                 obj_to_write = QPDFObjectHandle::newNull();
             }
             writeObject(obj_to_write, count);

@@ -4,32 +4,33 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
+#include <array>
 #include <string>
-#include <vector>
+
+using namespace std::literals;
 
 QPDFFileSpecObjectHelper::QPDFFileSpecObjectHelper(QPDFObjectHandle oh) :
     QPDFObjectHelper(oh)
 {
     if (!oh.isDictionary()) {
-        oh.warnIfPossible("Embedded file object is not a dictionary");
+        warn("Embedded file object is not a dictionary");
         return;
     }
     if (!oh.isDictionaryOfType("/Filespec")) {
-        oh.warnIfPossible("Embedded file object's type is not /Filespec");
+        warn("Embedded file object's type is not /Filespec");
     }
 }
 
-static std::vector<std::string> name_keys = {"/UF", "/F", "/Unix", "/DOS", "/Mac"};
+static const std::array<std::string, 5> name_keys = {"/UF"s, "/F"s, "/Unix"s, "/DOS"s, "/Mac"s};
 
 std::string
 QPDFFileSpecObjectHelper::getDescription()
 {
-    std::string result;
     auto desc = oh().getKey("/Desc");
     if (desc.isString()) {
-        result = desc.getUTF8Value();
+        return desc.getUTF8Value();
     }
-    return result;
+    return {};
 }
 
 std::string

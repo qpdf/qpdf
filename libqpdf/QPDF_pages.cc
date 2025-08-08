@@ -57,7 +57,7 @@ QPDF::getAllPages()
             // Files have been found in the wild where /Pages in the catalog points to the first
             // page. Try to work around this and similar cases with this heuristic.
             if (!warned) {
-                root.warnIfPossible(
+                root.warn(
                     "document page tree root (root -> /Pages) doesn't point"
                     " to the root of the page tree; attempting to correct");
                 warned = true;
@@ -109,7 +109,7 @@ QPDF::getAllPagesInternal(
         // During fuzzing files were encountered where the root object appeared in the pages tree.
         // Unconditionally setting the /Type to /Pages could cause problems, but trying to
         // accommodate the possibility may be excessive.
-        cur_node.warnIfPossible("/Type key should be /Pages but is not; overriding");
+        cur_node.warn("/Type key should be /Pages but is not; overriding");
         cur_node.replaceKey("/Type", "/Pages"_qpdf);
     }
     if (!media_box) {
@@ -134,13 +134,13 @@ QPDF::getAllPagesInternal(
         int errors = 0;
 
         if (!kid.isDictionary()) {
-            kid.warnIfPossible("Pages tree includes non-dictionary object; ignoring");
+            kid.warn("Pages tree includes non-dictionary object; ignoring");
             m->invalid_page_found = true;
             continue;
         }
         if (!kid.isIndirect()) {
             QTC::TC("qpdf", "QPDF handle direct page object");
-            cur_node.warnIfPossible(
+            cur_node.warn(
                 "kid " + std::to_string(i) + " (from 0) is direct; converting to indirect");
             kid = makeIndirectObject(kid);
             ++errors;
@@ -150,7 +150,7 @@ QPDF::getAllPagesInternal(
         } else {
             if (!media_box && !kid.getKey("/MediaBox").isRectangle()) {
                 QTC::TC("qpdf", "QPDF missing mediabox");
-                kid.warnIfPossible(
+                kid.warn(
                     "kid " + std::to_string(i) +
                     " (from 0) MediaBox is undefined; setting to letter / ANSI A");
                 kid.replaceKey(
@@ -167,7 +167,7 @@ QPDF::getAllPagesInternal(
                 // QPDFPageObjectHelper.
                 QTC::TC("qpdf", "QPDF resolve duplicated page object");
                 if (!m->reconstructed_xref) {
-                    cur_node.warnIfPossible(
+                    cur_node.warn(
                         "kid " + std::to_string(i) +
                         " (from 0) appears more than once in the pages tree;"
                         " creating a new page object as a copy");
@@ -176,7 +176,7 @@ QPDF::getAllPagesInternal(
                     kid = makeIndirectObject(QPDFObjectHandle(kid).shallowCopy());
                     seen.add(kid);
                 } else {
-                    cur_node.warnIfPossible(
+                    cur_node.warn(
                         "kid " + std::to_string(i) +
                         " (from 0) appears more than once in the pages tree; ignoring duplicate");
                     m->invalid_page_found = true;
@@ -189,12 +189,12 @@ QPDF::getAllPagesInternal(
                 }
             }
             if (!kid.isDictionaryOfType("/Page")) {
-                kid.warnIfPossible("/Type key should be /Page but is not; overriding");
+                kid.warn("/Type key should be /Page but is not; overriding");
                 kid.replaceKey("/Type", "/Page"_qpdf);
                 ++errors;
             }
             if (m->reconstructed_xref && errors > 2) {
-                cur_node.warnIfPossible(
+                cur_node.warn(
                     "kid " + std::to_string(i) + " (from 0) has too many errors; ignoring page");
                 m->invalid_page_found = true;
                 kid = QPDFObjectHandle::newNull();

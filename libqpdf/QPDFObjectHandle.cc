@@ -835,20 +835,16 @@ QPDFObjectHandle::getValueAsInt(long long& value) const
 int
 QPDFObjectHandle::getIntValueAsInt() const
 {
-    int result = 0;
     long long v = getIntValue();
     if (v < INT_MIN) {
-        QTC::TC("qpdf", "QPDFObjectHandle int returning INT_MIN");
-        warnIfPossible("requested value of integer is too small; returning INT_MIN");
-        result = INT_MIN;
-    } else if (v > INT_MAX) {
-        QTC::TC("qpdf", "QPDFObjectHandle int returning INT_MAX");
-        warnIfPossible("requested value of integer is too big; returning INT_MAX");
-        result = INT_MAX;
-    } else {
-        result = static_cast<int>(v);
+        warn("requested value of integer is too small; returning INT_MIN");
+        return INT_MIN;
     }
-    return result;
+    if (v > INT_MAX) {
+        warn("requested value of integer is too big; returning INT_MAX");
+        return INT_MAX;
+    }
+    return static_cast<int>(v);
 }
 
 bool
@@ -866,8 +862,7 @@ QPDFObjectHandle::getUIntValue() const
 {
     long long v = getIntValue();
     if (v < 0) {
-        QTC::TC("qpdf", "QPDFObjectHandle uint returning 0");
-        warnIfPossible("unsigned value request for negative number; returning 0");
+        warn("unsigned value request for negative number; returning 0");
         return 0;
     } else {
         return static_cast<unsigned long long>(v);
@@ -889,16 +884,14 @@ QPDFObjectHandle::getUIntValueAsUInt() const
 {
     long long v = getIntValue();
     if (v < 0) {
-        QTC::TC("qpdf", "QPDFObjectHandle uint uint returning 0");
-        warnIfPossible("unsigned integer value request for negative number; returning 0");
+        warn("unsigned integer value request for negative number; returning 0");
         return 0;
-    } else if (v > UINT_MAX) {
-        QTC::TC("qpdf", "QPDFObjectHandle uint returning UINT_MAX");
-        warnIfPossible("requested value of unsigned integer is too big; returning UINT_MAX");
-        return UINT_MAX;
-    } else {
-        return static_cast<unsigned int>(v);
     }
+    if (v > UINT_MAX) {
+        warn("requested value of unsigned integer is too big; returning UINT_MAX");
+        return UINT_MAX;
+    }
+    return static_cast<unsigned int>(v);
 }
 
 bool

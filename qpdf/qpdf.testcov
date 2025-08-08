@@ -424,11 +424,6 @@ QPDFPageObjectHelper keep inline image 0
 QPDFJob image optimize colorspace 0
 QPDFJob image optimize bits per component 0
 QPDFWriter remove empty DecodeParms 0
-QPDFObjectHandle uint returning 0 0
-QPDFObjectHandle int returning INT_MIN 0
-QPDFObjectHandle int returning INT_MAX 0
-QPDFObjectHandle uint returning UINT_MAX 0
-QPDFObjectHandle uint uint returning 0 0
 QPDF xref skipped space 0
 QPDF eof skipping spaces before xref 1
 QPDF_encryption user matches owner V < 5 0
@@ -592,7 +587,7 @@ QPDFAcroFormDocumentHelper replaced DA token 0
 QPDFAcroFormDocumentHelper ap conflict 0
 QPDFAcroFormDocumentHelper ap rename 0
 QPDFAcroFormDocumentHelper /DA parse error 0
-QPDFAcroFormDocumentHelper AP parse error 0
+QPDFAcroFormDocumentHelper AP parse error 1
 QPDFJob copy fields not this file 0
 QPDFJob copy fields non-first from orig 0
 QPDF resolve duplicated page in insert 0

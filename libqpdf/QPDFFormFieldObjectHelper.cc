@@ -317,18 +317,17 @@ QPDFFormFieldObjectHelper::setV(QPDFObjectHandle value, bool need_appearances)
                 setCheckBoxValue((name != "/Off"));
             }
             if (!okay) {
-                oh().warnIfPossible(
-                    "ignoring attempt to set a checkbox field to a value whose type is not name");
+                warn("ignoring attempt to set a checkbox field to a value whose type is not name");
             }
         } else if (isRadioButton()) {
             if (value.isName()) {
                 setRadioButtonValue(value);
             } else {
-                oh().warnIfPossible(
+                warn(
                     "ignoring attempt to set a radio button field to an object that is not a name");
             }
         } else if (isPushbutton()) {
-            oh().warnIfPossible("ignoring attempt set the value of a pushbutton field");
+            warn("ignoring attempt set the value of a pushbutton field");
         }
         return;
     }
@@ -375,7 +374,7 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
 
     QPDFObjectHandle kids = oh().getKey("/Kids");
     if (!(isRadioButton() && parent.isNull() && kids.isArray())) {
-        oh().warnIfPossible("don't know how to set the value of this field as a radio button");
+        warn("don't know how to set the value of this field as a radio button");
         return;
     }
     setFieldAttribute("/V", name);
@@ -397,7 +396,7 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
         }
         if (!annot) {
             QTC::TC("qpdf", "QPDFObjectHandle broken radio button");
-            oh().warnIfPossible("unable to set the value of this radio button");
+            warn("unable to set the value of this radio button");
             continue;
         }
         if (AP.isDictionary() && AP.getKey("/N").isDictionary() &&
@@ -453,7 +452,7 @@ QPDFFormFieldObjectHelper::setCheckBoxValue(bool value)
     setFieldAttribute("/V", name);
     if (!annot) {
         QTC::TC("qpdf", "QPDFObjectHandle broken checkbox");
-        oh().warnIfPossible("unable to set the value of this checkbox");
+        warn("unable to set the value of this checkbox");
         return;
     }
     QTC::TC("qpdf", "QPDFFormFieldObjectHelper set checkbox AS");
@@ -770,18 +769,17 @@ QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& ao
         AP.replaceKey("/N", AS);
     }
     if (!AS.isStream()) {
-        aoh.getObjectHandle().warnIfPossible("unable to get normal appearance stream for update");
+        aoh.warn("unable to get normal appearance stream for update");
         return;
     }
 
     if (AS.getObj().use_count() > 4) {
-        aoh.getObjectHandle().warnIfPossible(
-            "unable to generate text appearance from shared appearance stream for update");
+        aoh.warn("unable to generate text appearance from shared appearance stream for update");
         return;
     }
     QPDFObjectHandle bbox_obj = AS.getDict().getKey("/BBox");
     if (!bbox_obj.isRectangle()) {
-        aoh.getObjectHandle().warnIfPossible("unable to get appearance stream bounding box");
+        aoh.warn("unable to get appearance stream bounding box");
         return;
     }
     QPDFObjectHandle::Rectangle bbox = bbox_obj.getArrayAsRectangle();
