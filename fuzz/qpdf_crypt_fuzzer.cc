@@ -13,20 +13,6 @@
 
 #include <cstdlib>
 
-class DiscardContents: public QPDFObjectHandle::ParserCallbacks
-{
-  public:
-    ~DiscardContents() override = default;
-    void
-    handleObject(QPDFObjectHandle) override
-    {
-    }
-    void
-    handleEOF() override
-    {
-    }
-};
-
 class FuzzHelper
 {
   public:

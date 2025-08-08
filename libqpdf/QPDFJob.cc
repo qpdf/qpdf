@@ -62,20 +62,6 @@ namespace
         std::shared_ptr<Pl_DCT::CompressConfig> config;
     };
 
-    class DiscardContents: public QPDFObjectHandle::ParserCallbacks
-    {
-      public:
-        ~DiscardContents() override = default;
-        void
-        handleObject(QPDFObjectHandle) override
-        {
-        }
-        void
-        handleEOF() override
-        {
-        }
-    };
-
     struct QPDFPageData
     {
         QPDFPageData(std::string const& filename, QPDF* qpdf, std::string const& range);
@@ -810,12 +796,11 @@ QPDFJob::doCheck(QPDF& pdf)
         w.write();
 
         // Parse all content streams
-        DiscardContents discard_contents;
         int pageno = 0;
         for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
             ++pageno;
             try {
-                page.parseContents(&discard_contents);
+                page.parseContents(nullptr);
             } catch (QPDFExc& e) {
                 okay = false;
                 *m->log->getError() << "ERROR: page " << pageno << ": " << e.what() << "\n";

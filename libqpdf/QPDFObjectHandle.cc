@@ -1549,13 +1549,17 @@ QPDFObjectHandle::parseContentStream_internal(
     pl::String buf(stream_data);
     std::string all_description;
     pipeContentStreams(&buf, description, all_description);
-    callbacks->contentSize(stream_data.size());
+    if (callbacks) {
+        callbacks->contentSize(stream_data.size());
+    }
     try {
         parseContentStream_data(stream_data, all_description, callbacks, getOwningQPDF());
     } catch (TerminateParsing&) {
         return;
     }
-    callbacks->handleEOF();
+    if (callbacks) {
+        callbacks->handleEOF();
+    }
 }
 
 void
@@ -1583,8 +1587,9 @@ QPDFObjectHandle::parseContentStream_data(
             break;
         }
         size_t length = QIntC::to_size(input.tell() - offset);
-
-        callbacks->handleObject(obj, QIntC::to_size(offset), length);
+        if (callbacks) {
+            callbacks->handleObject(obj, QIntC::to_size(offset), length);
+        }
         if (obj.isOperator() && (obj.getOperatorValue() == "ID")) {
             // Discard next character; it is the space after ID that terminated the token.  Read
             // until end of inline image.
@@ -1606,10 +1611,12 @@ QPDFObjectHandle::parseContentStream_data(
                         "EOF found while reading inline image"));
             } else {
                 QTC::TC("qpdf", "QPDFObjectHandle inline image token");
-                callbacks->handleObject(
-                    QPDFObjectHandle::newInlineImage(tokenizer.getValue()),
-                    QIntC::to_size(offset),
-                    length);
+                if (callbacks) {
+                    callbacks->handleObject(
+                        QPDFObjectHandle::newInlineImage(tokenizer.getValue()),
+                        QIntC::to_size(offset),
+                        length);
+                }
             }
         }
     }

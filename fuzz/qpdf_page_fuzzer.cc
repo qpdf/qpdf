@@ -17,20 +17,6 @@
 #include <cstdlib>
 #include <iostream>
 
-class DiscardContents: public QPDFObjectHandle::ParserCallbacks
-{
-  public:
-    ~DiscardContents() override = default;
-    void
-    handleObject(QPDFObjectHandle) override
-    {
-    }
-    void
-    handleEOF() override
-    {
-    }
-};
-
 class FuzzHelper
 {
   public:
@@ -92,7 +78,6 @@ FuzzHelper::testPages()
     info("generateAppearancesIfNeeded done");
     pdh.flattenAnnotations();
     info("flattenAnnotations done");
-    DiscardContents discard_contents;
     int pageno = 0;
     for (auto& page: pdh.getAllPages()) {
         ++pageno;
@@ -100,7 +85,7 @@ FuzzHelper::testPages()
             info("start page", pageno);
             page.coalesceContentStreams();
             info("coalesceContentStreams done");
-            page.parseContents(&discard_contents);
+            page.parseContents(nullptr);
             info("parseContents done");
             page.getImages();
             info("getImages done");
