@@ -489,7 +489,7 @@ namespace
       public:
         ResourceReplacer(
             std::map<std::string, std::map<std::string, std::string>> const& dr_map,
-            std::map<std::string, std::map<std::string, std::set<size_t>>> const& rnames);
+            std::map<std::string, std::map<std::string, std::vector<size_t>>> const& rnames);
         ~ResourceReplacer() override = default;
         void handleToken(QPDFTokenizer::Token const&) override;
 
@@ -501,7 +501,7 @@ namespace
 
 ResourceReplacer::ResourceReplacer(
     std::map<std::string, std::map<std::string, std::string>> const& dr_map,
-    std::map<std::string, std::map<std::string, std::set<size_t>>> const& rnames)
+    std::map<std::string, std::map<std::string, std::vector<size_t>>> const& rnames)
 {
     // We have:
     // * dr_map[resource_type][key] == new_key
@@ -510,22 +510,18 @@ ResourceReplacer::ResourceReplacer(
     // We want:
     // * to_replace[key][offset] = new_key
 
-    for (auto const& rn_iter: rnames) {
-        std::string const& rtype = rn_iter.first;
+    for (auto const& [rtype, key_offsets]: rnames) {
         auto dr_map_rtype = dr_map.find(rtype);
         if (dr_map_rtype == dr_map.end()) {
             continue;
         }
-        auto const& key_offsets = rn_iter.second;
-        for (auto const& ko_iter: key_offsets) {
-            std::string const& old_key = ko_iter.first;
+        for (auto const& [old_key, offsets]: key_offsets) {
             auto dr_map_rtype_old = dr_map_rtype->second.find(old_key);
             if (dr_map_rtype_old == dr_map_rtype->second.end()) {
                 continue;
             }
-            auto const& offsets = ko_iter.second;
-            for (auto const& o_iter: offsets) {
-                to_replace[old_key][o_iter] = dr_map_rtype_old->second;
+            for (auto const& offs: offsets) {
+                to_replace[old_key][offs] = dr_map_rtype_old->second;
             }
         }
     }
@@ -534,19 +530,20 @@ ResourceReplacer::ResourceReplacer(
 void
 ResourceReplacer::handleToken(QPDFTokenizer::Token const& token)
 {
-    bool wrote = false;
     if (token.getType() == QPDFTokenizer::tt_name) {
-        std::string name = QPDFObjectHandle::newName(token.getValue()).getName();
-        if (to_replace.contains(name) && to_replace[name].contains(offset)) {
-            QTC::TC("qpdf", "QPDFAcroFormDocumentHelper replaced DA token");
-            write(to_replace[name][offset]);
-            wrote = true;
+        auto it1 = to_replace.find(token.getValue());
+        if (it1 != to_replace.end()) {
+            auto it2 = it1->second.find(offset);
+            if (it2 != it1->second.end()) {
+                QTC::TC("qpdf", "QPDFAcroFormDocumentHelper replaced DA token");
+                write(it2->second);
+                offset += token.getRawValue().length();
+                return;
+            }
         }
     }
     offset += token.getRawValue().length();
-    if (!wrote) {
-        writeToken(token);
-    }
+    writeToken(token);
 }
 
 void
