@@ -543,14 +543,14 @@ bool
 QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     QPDFPageObjectHelper ph, std::set<std::string>& unresolved)
 {
-    bool is_page = (!ph.oh().isFormXObject());
+    const bool is_page = !ph.oh().isFormXObject();
     if (!is_page) {
         QTC::TC("qpdf", "QPDFPageObjectHelper filter form xobject");
     }
 
     ResourceFinder rf;
     try {
-        auto q = ph.oh().getOwningQPDF();
+        auto q = ph.qpdf();
         size_t before_nw = (q ? q->numWarnings() : 0);
         ph.parseContents(&rf);
         size_t after_nw = (q ? q->numWarnings() : 0);
@@ -575,23 +575,25 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
     std::vector<QPDFObjectHandle> rdicts;
     std::set<std::string> known_names;
-    std::vector<std::string> to_filter = {"/Font", "/XObject"};
     if (resources.isDictionary()) {
-        for (auto const& iter: to_filter) {
+        for (auto const& iter: {"/Font", "/XObject"}) {
             QPDFObjectHandle dict = resources.getKey(iter);
             if (dict.isDictionary()) {
                 dict = resources.replaceKeyAndGetNew(iter, dict.shallowCopy());
                 rdicts.push_back(dict);
-                auto keys = dict.getKeys();
-                known_names.insert(keys.begin(), keys.end());
+                known_names.merge(dict.getKeys());
             }
         }
     }
 
     std::set<std::string> local_unresolved;
-    auto names_by_rtype = rf.getNamesByResourceType();
-    for (auto const& i1: to_filter) {
-        for (auto const& n_iter: names_by_rtype[i1]) {
+    auto const& names_by_rtype = rf.getNamesByResourceType();
+    for (auto const& i1: {"/Font", "/XObject"}) {
+        auto it = names_by_rtype.find(i1);
+        if (it == names_by_rtype.end()) {
+            continue;
+        }
+        for (auto const& n_iter: it->second) {
             std::string const& name = n_iter.first;
             if (!known_names.contains(name)) {
                 unresolved.insert(name);
@@ -610,7 +612,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     // unresolved names, and for page objects, we avoid removing any such names found in nested form
     // XObjects.
 
-    if ((!local_unresolved.empty()) && resources.isDictionary()) {
+    if (!local_unresolved.empty() && resources.isDictionary()) {
         // It's not worth issuing a warning for this case. From qpdf 10.3, we are hopefully only
         // looking at names that are referencing fonts and XObjects, but until we're certain that we
         // know the meaning of every name in a content stream, we don't want to give warnings that
