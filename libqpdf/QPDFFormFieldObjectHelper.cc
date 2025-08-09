@@ -281,7 +281,7 @@ QPDFFormFieldObjectHelper::getChoices()
     for (auto const& item: getInheritableFieldValue("/Opt").as_array()) {
         if (item.isString()) {
             result.emplace_back(item.getUTF8Value());
-        } else if (item.isArray() && item.getArrayNItems() == 2) {
+        } else if (item.size() == 2) {
             auto display = item.getArrayItem(1);
             if (display.isString()) {
                 result.emplace_back(display.getUTF8Value());

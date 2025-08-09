@@ -445,14 +445,9 @@ std::vector<QPDFAnnotationObjectHelper>
 QPDFPageObjectHelper::getAnnotations(std::string const& only_subtype)
 {
     std::vector<QPDFAnnotationObjectHelper> result;
-    QPDFObjectHandle annots = oh().getKey("/Annots");
-    if (annots.isArray()) {
-        int nannots = annots.getArrayNItems();
-        for (int i = 0; i < nannots; ++i) {
-            QPDFObjectHandle annot = annots.getArrayItem(i);
-            if (annot.isDictionaryOfType("", only_subtype)) {
-                result.emplace_back(annot);
-            }
+    for (auto const& annot: oh().getKey("/Annots").as_array()) {
+        if (annot.isDictionaryOfType("", only_subtype)) {
+            result.emplace_back(annot);
         }
     }
     return result;
