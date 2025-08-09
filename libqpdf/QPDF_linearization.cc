@@ -174,14 +174,13 @@ QPDF::readLinearizationData()
     }
 
     // Hint table array: offset length [ offset length ]
-    size_t n_H_items = toS(H.getArrayNItems());
-    if (!((n_H_items == 2) || (n_H_items == 4))) {
+    size_t n_H_items = H.size();
+    if (!(n_H_items == 2 || n_H_items == 4)) {
         throw damagedPDF("linearization dictionary", "H has the wrong number of items");
     }
 
     std::vector<int> H_items;
-    for (size_t i = 0; i < n_H_items; ++i) {
-        QPDFObjectHandle oh(H.getArrayItem(toI(i)));
+    for (auto const& oh: H.as_array()) {
         if (oh.isInteger()) {
             H_items.push_back(oh.getIntValueAsInt());
         } else {

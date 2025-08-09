@@ -664,7 +664,7 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
 
     std::string id1;
     auto id_obj = trailer.getKey("/ID");
-    if (!id_obj.isArray() || id_obj.getArrayNItems() != 2 || !id_obj.getArrayItem(0).isString()) {
+    if (id_obj.size() != 2 || !id_obj.getArrayItem(0).isString()) {
         // Treating a missing ID as the empty string enables qpdf to decrypt some invalid encrypted
         // files with no /ID that poppler can read but Adobe Reader can't.
         qpdf.warn(qpdf.damagedPDF("trailer", "invalid /ID in trailer dictionary"));
@@ -961,19 +961,21 @@ QPDF::decryptStream(
             } else if (
                 stream_dict.getKey("/DecodeParms").isArray() &&
                 stream_dict.getKey("/Filter").isArray()) {
-                QPDFObjectHandle filter = stream_dict.getKey("/Filter");
-                QPDFObjectHandle decode = stream_dict.getKey("/DecodeParms");
-                if (filter.getArrayNItems() == decode.getArrayNItems()) {
-                    for (int i = 0; i < filter.getArrayNItems(); ++i) {
-                        if (filter.getArrayItem(i).isNameAndEquals("/Crypt")) {
-                            QPDFObjectHandle crypt_params = decode.getArrayItem(i);
+                auto filter = stream_dict.getKey("/Filter");
+                auto decode = stream_dict.getKey("/DecodeParms");
+                if (filter.size() == decode.size()) {
+                    int i = 0;
+                    for (auto const& item: filter.as_array()) {
+                        if (item.isNameAndEquals("/Crypt")) {
+                            auto crypt_params = decode.getArrayItem(i);
                             if (crypt_params.isDictionary() &&
                                 crypt_params.getKey("/Name").isName()) {
-                                QTC::TC("qpdf", "QPDF_encrypt crypt array");
                                 method = encp->interpretCF(crypt_params.getKey("/Name"));
                                 method_source = "stream's Crypt decode parameters (array)";
                             }
+                            break;
                         }
+                        ++i;
                     }
                 }
             }

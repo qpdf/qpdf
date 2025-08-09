@@ -313,7 +313,7 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
 
     newpage.replaceKey("/Parent", pages);
     kids.insertItem(pos, newpage);
-    int npages = kids.getArrayNItems();
+    int npages = static_cast<int>(kids.size());
     pages.replaceKey("/Count", QPDFObjectHandle::newInteger(npages));
     m->all_pages.insert(m->all_pages.begin() + pos, newpage);
     for (int i = pos + 1; i < npages; ++i) {
@@ -337,7 +337,7 @@ QPDF::removePage(QPDFObjectHandle page)
     QPDFObjectHandle kids = pages.getKey("/Kids");
 
     kids.eraseItem(pos);
-    int npages = kids.getArrayNItems();
+    int npages = static_cast<int>(kids.size());
     pages.replaceKey("/Count", QPDFObjectHandle::newInteger(npages));
     m->all_pages.erase(m->all_pages.begin() + pos);
     m->pageobj_to_pages_pos.erase(page.getObjGen());

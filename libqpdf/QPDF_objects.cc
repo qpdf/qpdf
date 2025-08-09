@@ -782,7 +782,7 @@ std::pair<int, std::array<int, 3>>
 QPDF::processXRefW(QPDFObjectHandle& dict, std::function<QPDFExc(std::string_view)> damaged)
 {
     auto W_obj = dict.getKey("/W");
-    if (!(W_obj.isArray() && (W_obj.getArrayNItems() >= 3) && W_obj.getArrayItem(0).isInteger() &&
+    if (!(W_obj.size() >= 3 && W_obj.getArrayItem(0).isInteger() &&
           W_obj.getArrayItem(1).isInteger() && W_obj.getArrayItem(2).isInteger())) {
         throw damaged("Cross-reference stream does not have a proper /W key");
     }
