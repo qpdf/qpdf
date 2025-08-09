@@ -352,16 +352,15 @@ BaseHandle::unparse() const
             auto const& a = std::get<QPDF_Array>(obj->value);
             std::string result = "[ ";
             if (a.sp) {
-                int next = 0;
-                for (auto& item: a.sp->elements) {
-                    int key = item.first;
-                    for (int j = next; j < key; ++j) {
+                size_t next = 0;
+                for (auto& [key, value]: a.sp->elements) {
+                    for (size_t j = next; j < key; ++j) {
                         result += "null ";
                     }
-                    result += item.second.unparse() + " ";
-                    next = ++key;
+                    result += value.unparse() + " ";
+                    next = key + 1;
                 }
-                for (int j = next; j < a.sp->size; ++j) {
+                for (size_t j = next; j < a.sp->size; ++j) {
                     result += "null ";
                 }
             } else {
@@ -467,22 +466,21 @@ BaseHandle::write_json(int json_version, JSON::Writer& p) const
             auto const& a = std::get<QPDF_Array>(obj->value);
             p.writeStart('[');
             if (a.sp) {
-                int next = 0;
-                for (auto& item: a.sp->elements) {
-                    int key = item.first;
-                    for (int j = next; j < key; ++j) {
+                size_t next = 0;
+                for (auto& [key, value]: a.sp->elements) {
+                    for (size_t j = next; j < key; ++j) {
                         p.writeNext() << "null";
                     }
                     p.writeNext();
-                    auto item_og = item.second.getObj()->getObjGen();
+                    auto item_og = value.getObj()->getObjGen();
                     if (item_og.isIndirect()) {
                         p << "\"" << item_og.unparse(' ') << " R\"";
                     } else {
-                        item.second.write_json(json_version, p);
+                        value.write_json(json_version, p);
                     }
-                    next = ++key;
+                    next = key + 1;
                 }
-                for (int j = next; j < a.sp->size; ++j) {
+                for (size_t j = next; j < a.sp->size; ++j) {
                     p.writeNext() << "null";
                 }
             } else {
@@ -611,11 +609,11 @@ QPDFObjectHandle::isSameObjectAs(QPDFObjectHandle const& rhs) const
 qpdf_object_type_e
 QPDFObjectHandle::getTypeCode() const
 {
-    return obj ? obj->getResolvedTypeCode() : ::ot_uninitialized;
+    return type_code();
 }
 
 char const*
-QPDFObjectHandle::getTypeName() const
+BaseHandle::type_name() const
 {
     static constexpr std::array<char const*, 16> tn{
         "uninitialized",
@@ -634,7 +632,13 @@ QPDFObjectHandle::getTypeName() const
         "unresolved",
         "destroyed",
         "reference"};
-    return obj ? tn[getTypeCode()] : "uninitialized";
+    return tn[type_code()];
+}
+
+char const*
+QPDFObjectHandle::getTypeName() const
+{
+    return type_name();
 }
 
 bool
@@ -829,20 +833,16 @@ QPDFObjectHandle::getValueAsInt(long long& value) const
 int
 QPDFObjectHandle::getIntValueAsInt() const
 {
-    int result = 0;
     long long v = getIntValue();
     if (v < INT_MIN) {
-        QTC::TC("qpdf", "QPDFObjectHandle int returning INT_MIN");
-        warnIfPossible("requested value of integer is too small; returning INT_MIN");
-        result = INT_MIN;
-    } else if (v > INT_MAX) {
-        QTC::TC("qpdf", "QPDFObjectHandle int returning INT_MAX");
-        warnIfPossible("requested value of integer is too big; returning INT_MAX");
-        result = INT_MAX;
-    } else {
-        result = static_cast<int>(v);
+        warn("requested value of integer is too small; returning INT_MIN");
+        return INT_MIN;
     }
-    return result;
+    if (v > INT_MAX) {
+        warn("requested value of integer is too big; returning INT_MAX");
+        return INT_MAX;
+    }
+    return static_cast<int>(v);
 }
 
 bool
@@ -860,8 +860,7 @@ QPDFObjectHandle::getUIntValue() const
 {
     long long v = getIntValue();
     if (v < 0) {
-        QTC::TC("qpdf", "QPDFObjectHandle uint returning 0");
-        warnIfPossible("unsigned value request for negative number; returning 0");
+        warn("unsigned value request for negative number; returning 0");
         return 0;
     } else {
         return static_cast<unsigned long long>(v);
@@ -883,16 +882,14 @@ QPDFObjectHandle::getUIntValueAsUInt() const
 {
     long long v = getIntValue();
     if (v < 0) {
-        QTC::TC("qpdf", "QPDFObjectHandle uint uint returning 0");
-        warnIfPossible("unsigned integer value request for negative number; returning 0");
+        warn("unsigned integer value request for negative number; returning 0");
         return 0;
-    } else if (v > UINT_MAX) {
-        QTC::TC("qpdf", "QPDFObjectHandle uint returning UINT_MAX");
-        warnIfPossible("requested value of unsigned integer is too big; returning UINT_MAX");
-        return UINT_MAX;
-    } else {
-        return static_cast<unsigned int>(v);
     }
+    if (v > UINT_MAX) {
+        warn("requested value of unsigned integer is too big; returning UINT_MAX");
+        return UINT_MAX;
+    }
+    return static_cast<unsigned int>(v);
 }
 
 bool
@@ -1235,34 +1232,30 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
     all_description = description;
     std::vector<QPDFObjectHandle> result;
     if (auto array = as_array(strict)) {
-        int n_items = array.size();
+        int n_items = static_cast<int>(array.size());
         for (int i = 0; i < n_items; ++i) {
             QPDFObjectHandle item = array.at(i).second;
             if (item.isStream()) {
                 result.emplace_back(item);
             } else {
                 QTC::TC("qpdf", "QPDFObjectHandle non-stream in stream array");
-                warn(
-                    item.getOwningQPDF(),
-                    QPDFExc(
-                        qpdf_e_damaged_pdf,
-                        "",
-                        description + ": item index " + std::to_string(i) + " (from 0)",
-                        0,
-                        "ignoring non-stream in an array of streams"));
+                item.warn(
+                    {qpdf_e_damaged_pdf,
+                     "",
+                     description + ": item index " + std::to_string(i) + " (from 0)",
+                     0,
+                     "ignoring non-stream in an array of streams"});
             }
         }
     } else if (isStream()) {
         result.emplace_back(*this);
-    } else if (!isNull()) {
+    } else if (!null()) {
         warn(
-            getOwningQPDF(),
-            QPDFExc(
-                qpdf_e_damaged_pdf,
-                "",
-                description,
-                0,
-                " object is supposed to be a stream or an array of streams but is neither"));
+            {qpdf_e_damaged_pdf,
+             "",
+             description,
+             0,
+             " object is supposed to be a stream or an array of streams but is neither"});
     }
 
     bool first = true;
@@ -1824,6 +1817,12 @@ QPDFObjectHandle::newReserved(QPDF* qpdf)
     return qpdf->newReserved();
 }
 
+std::string
+BaseHandle::description() const
+{
+    return obj ? obj->getDescription() : ""s;
+}
+
 void
 QPDFObjectHandle::setObjectDescription(QPDF* owning_qpdf, std::string const& object_description)
 {
@@ -1934,50 +1933,44 @@ QPDFObjectHandle::assertInitialized() const
     }
 }
 
-void
-QPDFObjectHandle::typeWarning(char const* expected_type, std::string const& warning) const
+std::runtime_error
+BaseHandle::type_error(char const* expected_type) const
 {
-    QPDF* context = nullptr;
-    std::string description;
-    // Type checks above guarantee that the object has been dereferenced. Nevertheless, dereference
-    // throws exceptions in the test suite
+    return std::runtime_error(
+        "operation for "s + expected_type + " attempted on object of type " + type_name());
+}
+
+QPDFExc
+BaseHandle::type_error(char const* expected_type, std::string const& message) const
+{
+    return {
+        qpdf_e_object,
+        "",
+        description(),
+        0,
+        "operation for "s + expected_type + " attempted on object of type " + type_name() + ": " +
+            message};
+}
+
+void
+QPDFObjectHandle::typeWarning(char const* expected_type, std::string const& message) const
+{
     if (!obj) {
         throw std::logic_error("attempted to dereference an uninitialized QPDFObjectHandle");
     }
-    obj->getDescription(context, description);
-    // Null context handled by warn
-    warn(
-        context,
-        QPDFExc(
-            qpdf_e_object,
-            "",
-            description,
-            0,
-            std::string("operation for ") + expected_type + " attempted on object of type " +
-                QPDFObjectHandle(*this).getTypeName() + ": " + warning));
+    warn(type_error(expected_type, message));
 }
 
 void
 QPDFObjectHandle::warnIfPossible(std::string const& warning) const
 {
-    QPDF* context = nullptr;
-    std::string description;
-    if (obj && obj->getDescription(context, description)) {
-        warn(context, QPDFExc(qpdf_e_damaged_pdf, "", description, 0, warning));
-    } else {
-        *QPDFLogger::defaultLogger()->getError() << warning << "\n";
-    }
+    warn(warning);
 }
 
 void
 QPDFObjectHandle::objectWarning(std::string const& warning) const
 {
-    QPDF* context = nullptr;
-    std::string description;
-    // Type checks above guarantee that the object is initialized.
-    obj->getDescription(context, description);
-    // Null context handled by warn
-    warn(context, QPDFExc(qpdf_e_object, "", description, 0, warning));
+    warn({qpdf_e_object, "", description(), 0, warning});
 }
 
 void
@@ -2130,15 +2123,30 @@ QPDFObjectHandle::assertPageObject() const
 }
 
 void
-QPDFObjectHandle::warn(QPDF* qpdf, QPDFExc const& e)
+BaseHandle::warn(QPDF* qpdf, QPDFExc&& e)
 {
-    // If parsing on behalf of a QPDF object and want to give a warning, we can warn through the
-    // object. If parsing for some other reason, such as an explicit creation of an object from a
-    // string, then just throw the exception.
-    if (qpdf) {
-        qpdf->warn(e);
+    if (!qpdf) {
+        throw std::move(e);
+    }
+    qpdf->warn(std::move(e));
+}
+
+void
+BaseHandle::warn(QPDFExc&& e) const
+{
+    if (!qpdf()) {
+        throw std::move(e);
+    }
+    qpdf()->warn(std::move(e));
+}
+
+void
+BaseHandle::warn(std::string const& warning) const
+{
+    if (qpdf()) {
+        warn({qpdf_e_damaged_pdf, "", description(), 0, warning});
     } else {
-        throw e;
+        *QPDFLogger::defaultLogger()->getError() << warning << "\n";
     }
 }
 

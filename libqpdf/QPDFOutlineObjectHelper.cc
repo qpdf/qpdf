@@ -75,7 +75,7 @@ QPDFObjectHandle
 QPDFOutlineObjectHelper::getDestPage()
 {
     QPDFObjectHandle dest = getDest();
-    if ((dest.isArray()) && (dest.getArrayNItems() > 0)) {
+    if (!dest.empty() && dest.isArray()) {
         return dest.getArrayItem(0);
     }
     return QPDFObjectHandle::newNull();

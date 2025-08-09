@@ -12,6 +12,8 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/ResourceFinder.hh>
 
+using namespace std::literals;
+
 namespace
 {
     class ContentProvider: public QPDFObjectHandle::StreamDataProvider
@@ -118,7 +120,7 @@ InlineImageTracker::convertIIDict(QPDFObjectHandle odict)
                         QTC::TC("qpdf", "QPDFPageObjectHelper colorspace lookup");
                         value = colorspace.getKey(name);
                     } else {
-                        resources.warnIfPossible("unable to resolve colorspace " + name);
+                        resources.warn("unable to resolve colorspace " + name);
                     }
                     name.clear();
                 }
@@ -414,8 +416,8 @@ QPDFPageObjectHelper::externalizeInlineImages(size_t min_size, bool shallow)
             filterContents(&iit, &b);
             filtered = true;
         } catch (std::exception& e) {
-            oh().warnIfPossible(
-                std::string("Unable to filter content stream: ") + e.what() +
+            warn(
+                "Unable to filter content stream: "s + e.what() +
                 "; not attempting to externalize inline images from this stream");
         }
         if (filtered && iit.any_images) {
@@ -443,14 +445,9 @@ std::vector<QPDFAnnotationObjectHelper>
 QPDFPageObjectHelper::getAnnotations(std::string const& only_subtype)
 {
     std::vector<QPDFAnnotationObjectHelper> result;
-    QPDFObjectHandle annots = oh().getKey("/Annots");
-    if (annots.isArray()) {
-        int nannots = annots.getArrayNItems();
-        for (int i = 0; i < nannots; ++i) {
-            QPDFObjectHandle annot = annots.getArrayItem(i);
-            if (annot.isDictionaryOfType("", only_subtype)) {
-                result.emplace_back(annot);
-            }
+    for (auto const& annot: oh().getKey("/Annots").as_array()) {
+        if (annot.isDictionaryOfType("", only_subtype)) {
+            result.emplace_back(annot);
         }
     }
     return result;
@@ -555,15 +552,15 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
         ph.parseContents(&rf);
         size_t after_nw = (q ? q->numWarnings() : 0);
         if (after_nw > before_nw) {
-            ph.oh().warnIfPossible(
+            ph.warn(
                 "Bad token found while scanning content stream; "
                 "not attempting to remove unreferenced objects from this object");
             return false;
         }
     } catch (std::exception& e) {
         QTC::TC("qpdf", "QPDFPageObjectHelper bad token finding names");
-        ph.oh().warnIfPossible(
-            std::string("Unable to parse content stream: ") + e.what() +
+        ph.warn(
+            "Unable to parse content stream: "s + e.what() +
             "; not attempting to remove unreferenced objects from this object");
         return false;
     }
@@ -719,8 +716,7 @@ QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
     newdict.replaceKey("/Group", getAttribute("/Group", false).shallowCopy());
     QPDFObjectHandle bbox = getTrimBox(false).shallowCopy();
     if (!bbox.isRectangle()) {
-        oh().warnIfPossible(
-            "bounding box is invalid; form XObject created from page will not work");
+        warn("bounding box is invalid; form XObject created from page will not work");
     }
     newdict.replaceKey("/BBox", bbox);
     auto provider =

@@ -1396,8 +1396,8 @@ QPDFWriter::willFilterStream(
             }
         } catch (std::runtime_error& e) {
             if (filter && first_attempt) {
-                stream.warnIfPossible("error while getting stream data: "s + e.what());
-                stream.warnIfPossible("qpdf will attempt to write the damaged stream unchanged");
+                stream.warn("error while getting stream data: "s + e.what());
+                stream.warn("qpdf will attempt to write the damaged stream unchanged");
                 filter = false;
                 stream.setFilterOnWrite(false);
                 continue;
@@ -1538,9 +1538,7 @@ QPDFWriter::unparseObject(
             object.removeKey("/Length");
 
             // If /DecodeParms is an empty list, remove it.
-            if (object.getKey("/DecodeParms").isArray() &&
-                (0 == object.getKey("/DecodeParms").getArrayNItems())) {
-                QTC::TC("qpdf", "QPDFWriter remove empty DecodeParms");
+            if (object.getKey("/DecodeParms").empty()) {
                 object.removeKey("/DecodeParms");
             }
 
@@ -1558,22 +1556,19 @@ QPDFWriter::unparseObject(
                         object.removeKey("/Filter");
                         object.removeKey("/DecodeParms");
                     } else {
-                        int idx = -1;
-                        for (int i = 0; i < filter.getArrayNItems(); ++i) {
-                            QPDFObjectHandle item = filter.getArrayItem(i);
+                        int idx = 0;
+                        for (auto const& item: filter.as_array()) {
                             if (item.isNameAndEquals("/Crypt")) {
-                                idx = i;
+                                // If filter is an array, then the code in QPDF_Stream has already
+                                // verified that DecodeParms and Filters are arrays of the same
+                                // length, but if they weren't for some reason, eraseItem does type
+                                // and bounds checking. Fuzzing tells us that this can actually
+                                // happen.
+                                filter.eraseItem(idx);
+                                decode_parms.eraseItem(idx);
                                 break;
                             }
-                        }
-                        if (idx >= 0) {
-                            // If filter is an array, then the code in QPDF_Stream has already
-                            // verified that DecodeParms and Filters are arrays of the same length,
-                            // but if they weren't for some reason, eraseItem does type and bounds
-                            // checking.
-                            QTC::TC("qpdf", "QPDFWriter remove Crypt");
-                            filter.eraseItem(idx);
-                            decode_parms.eraseItem(idx);
+                            ++idx;
                         }
                     }
                 }
@@ -1742,7 +1737,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
             if (obj_to_write.isStream()) {
                 // This condition occurred in a fuzz input. Ideally we should block it at parse
                 // time, but it's not clear to me how to construct a case for this.
-                obj_to_write.warnIfPossible("stream found inside object stream; treating as null");
+                obj_to_write.warn("stream found inside object stream; treating as null");
                 obj_to_write = QPDFObjectHandle::newNull();
             }
             writeObject(obj_to_write, count);
@@ -1965,7 +1960,7 @@ QPDFWriter::initializeSpecialStreams()
         QPDFObjectHandle contents = page.getKey("/Contents");
         std::vector<QPDFObjGen> contents_objects;
         if (contents.isArray()) {
-            int n = contents.getArrayNItems();
+            int n = static_cast<int>(contents.size());
             for (int i = 0; i < n; ++i) {
                 contents_objects.push_back(contents.getArrayItem(i).getObjGen());
             }

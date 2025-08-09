@@ -237,9 +237,7 @@ QPDFWriter remove ADBE 0
 QPDFWriter remove existing Extensions 0
 QPDFWriter preserve ADBE 0
 QPDF_encryption skip 0x28 0
-QPDF_encrypt crypt array 0
 QPDF_encryption CFM AESV3 0
-QPDFWriter remove Crypt 0
 qpdf-c called qpdf_get_pdf_extension_level 0
 qpdf-c called qpdf_set_r5_encryption_parameters 0
 qpdf-c called qpdf_set_r6_encryption_parameters 0
@@ -423,12 +421,6 @@ QPDFPageObjectHelper externalize inline image 0
 QPDFPageObjectHelper keep inline image 0
 QPDFJob image optimize colorspace 0
 QPDFJob image optimize bits per component 0
-QPDFWriter remove empty DecodeParms 0
-QPDFObjectHandle uint returning 0 0
-QPDFObjectHandle int returning INT_MIN 0
-QPDFObjectHandle int returning INT_MAX 0
-QPDFObjectHandle uint returning UINT_MAX 0
-QPDFObjectHandle uint uint returning 0 0
 QPDF xref skipped space 0
 QPDF eof skipping spaces before xref 1
 QPDF_encryption user matches owner V < 5 0
@@ -580,9 +572,7 @@ QPDFAcroFormDocumentHelper copy annotation 3
 QPDFAcroFormDocumentHelper field with parent 3
 QPDFAcroFormDocumentHelper modify ap matrix 0
 QPDFJob copy form fields in split_pages 0
-QPDFJob keep some fields in pages 0
 QPDFJob pages keeping field from original 0
-QPDFJob no more fields in pages 0
 QPDFObjectHandle merge reuse 0
 QPDFObjectHandle merge generate 0
 QPDFFormFieldObjectHelper get font from /DR 0
@@ -592,7 +582,7 @@ QPDFAcroFormDocumentHelper replaced DA token 0
 QPDFAcroFormDocumentHelper ap conflict 0
 QPDFAcroFormDocumentHelper ap rename 0
 QPDFAcroFormDocumentHelper /DA parse error 0
-QPDFAcroFormDocumentHelper AP parse error 0
+QPDFAcroFormDocumentHelper AP parse error 1
 QPDFJob copy fields not this file 0
 QPDFJob copy fields non-first from orig 0
 QPDF resolve duplicated page in insert 0

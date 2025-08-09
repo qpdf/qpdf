@@ -138,7 +138,7 @@ QPDFEFStreamObjectHelper::newFromStream(QPDFObjectHandle stream)
     Pl_MD5 md5("EF md5", &discard);
     Pl_Count count("EF size", &md5);
     if (!stream.pipeStreamData(&count, nullptr, 0, qpdf_dl_all)) {
-        stream.warnIfPossible("unable to get stream data for new embedded file stream");
+        stream.warn("unable to get stream data for new embedded file stream");
     } else {
         result.setParam("/Size", QPDFObjectHandle::newInteger(count.getCount()));
         result.setParam(

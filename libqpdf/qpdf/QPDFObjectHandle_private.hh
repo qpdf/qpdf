@@ -38,7 +38,7 @@ namespace qpdf
 
         const_reverse_iterator crend();
 
-        int size() const;
+        size_t size() const;
         std::pair<bool, QPDFObjectHandle> at(int n) const;
         bool setAt(int at, QPDFObjectHandle const& oh);
         bool insert(int at, QPDFObjectHandle const& item);

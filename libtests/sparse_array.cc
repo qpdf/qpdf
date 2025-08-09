@@ -7,6 +7,12 @@
 #include <iostream>
 
 int
+to_i(size_t n)
+{
+    return static_cast<int>(n);
+}
+
+int
 main()
 {
     auto obj = QPDFObject::create<QPDF_Array>(std::vector<QPDFObjectHandle>(), true);
@@ -65,20 +71,20 @@ main()
     a.setAt(4, QPDFObjectHandle::newNull());
     assert(a.at(4).second.isNull());
 
-    a.erase(a.size() - 1);
+    a.erase(to_i(a.size()) - 1);
     assert(a.size() == 5);
     assert(a.at(0).second.isName() && (a.at(0).second.getName() == "/First"));
     assert(a.at(1).second.isInteger() && (a.at(1).second.getIntValue() == 1));
     assert(a.at(3).second.isName() && (a.at(3).second.getName() == "/Third"));
     assert(a.at(4).second.isNull());
 
-    a.erase(a.size() - 1);
+    a.erase(to_i(a.size()) - 1);
     assert(a.size() == 4);
     assert(a.at(0).second.isName() && (a.at(0).second.getName() == "/First"));
     assert(a.at(1).second.isInteger() && (a.at(1).second.getIntValue() == 1));
     assert(a.at(3).second.isName() && (a.at(3).second.getName() == "/Third"));
 
-    a.erase(a.size() - 1);
+    a.erase(to_i(a.size()) - 1);
     assert(a.size() == 3);
     assert(a.at(0).second.isName() && (a.at(0).second.getName() == "/First"));
     assert(a.at(1).second.isInteger() && (a.at(1).second.getIntValue() == 1));

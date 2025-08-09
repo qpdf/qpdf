@@ -7,7 +7,10 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/ResourceFinder.hh>
 
+#include <utility>
+
 using namespace qpdf;
+using namespace std::literals;
 
 QPDFAcroFormDocumentHelper::QPDFAcroFormDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
@@ -138,7 +141,7 @@ QPDFAcroFormDocumentHelper::removeFormFields(std::set<QPDFObjGen> const& to_remo
     }
 
     int i = 0;
-    while (i < fields.getArrayNItems()) {
+    while (std::cmp_less(i, fields.size())) {
         auto field = fields.getArrayItem(i);
         if (to_remove.contains(field.getObjGen())) {
             fields.eraseItem(i);
@@ -251,7 +254,7 @@ QPDFAcroFormDocumentHelper::analyze()
         }
     } else {
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper fields not array");
-        acroform.warnIfPossible("/Fields key of /AcroForm dictionary is not an array; ignoring");
+        acroform.warn("/Fields key of /AcroForm dictionary is not an array; ignoring");
         fields = QPDFObjectHandle::newArray();
     }
 
@@ -273,9 +276,9 @@ QPDFAcroFormDocumentHelper::analyze()
                 // case such as a PDF creator adding a self-contained annotation (merged with the
                 // field dictionary) to the page's /Annots array and forgetting to also put it in
                 // /AcroForm.
-                annot.warnIfPossible(
-                    "this widget annotation is not"
-                    " reachable from /AcroForm in the document catalog");
+                annot.warn(
+                    "this widget annotation is not reachable from /AcroForm in the document "
+                    "catalog");
                 m->annotation_to_field[og] = QPDFFormFieldObjectHelper(annot);
                 m->field_to_annotations[og].emplace_back(annot);
             }
@@ -292,16 +295,16 @@ QPDFAcroFormDocumentHelper::traverseField(
         // could cause stack overflow.
         return;
     }
-    if (!field.isIndirect()) {
+    if (!field.indirect()) {
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper direct field");
-        field.warnIfPossible(
+        field.warn(
             "encountered a direct object as a field or annotation while "
             "traversing /AcroForm; ignoring field or annotation");
         return;
     }
     if (!field.isDictionary()) {
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper non-dictionary field");
-        field.warnIfPossible(
+        field.warn(
             "encountered a non-dictionary as a field or annotation while"
             " traversing /AcroForm; ignoring field or annotation");
         return;
@@ -309,7 +312,7 @@ QPDFAcroFormDocumentHelper::traverseField(
     QPDFObjGen og(field.getObjGen());
     if (!visited.add(og)) {
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper loop");
-        field.warnIfPossible("loop detected while traversing /AcroForm");
+        field.warn("loop detected while traversing /AcroForm");
         return;
     }
 
@@ -375,7 +378,7 @@ QPDFAcroFormDocumentHelper::setNeedAppearances(bool val)
 {
     QPDFObjectHandle acroform = qpdf.getRoot().getKey("/AcroForm");
     if (!acroform.isDictionary()) {
-        qpdf.getRoot().warnIfPossible(
+        qpdf.getRoot().warn(
             "ignoring call to QPDFAcroFormDocumentHelper::setNeedAppearances"
             " on a file that lacks an /AcroForm dictionary");
         return;
@@ -592,9 +595,7 @@ QPDFAcroFormDocumentHelper::adjustDefaultAppearances(
     } catch (std::exception& e) {
         // No way to reproduce in test suite right now since error conditions are converted to
         // warnings.
-        obj.warnIfPossible(
-            std::string("Unable to parse /DA: ") + e.what() +
-            "; this form field may not update properly");
+        obj.warn("Unable to parse /DA: "s + e.what() + "; this form field may not update properly");
         return;
     }
 
@@ -677,16 +678,17 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
     try {
         auto nwarnings = qpdf.numWarnings();
         stream.parseAsContents(&rf);
-        if (qpdf.numWarnings() > nwarnings) {
-            QTC::TC("qpdf", "QPDFAcroFormDocumentHelper AP parse error");
-        }
+        QTC::TC(
+            "qpdf",
+            "QPDFAcroFormDocumentHelper AP parse error",
+            qpdf.numWarnings() > nwarnings ? 0 : 1);
         auto rr = new ResourceReplacer(dr_map, rf.getNamesByResourceType());
         auto tf = std::shared_ptr<QPDFObjectHandle::TokenFilter>(rr);
         stream.addTokenFilter(tf);
     } catch (std::exception& e) {
         // No way to reproduce in test suite right now since error conditions are converted to
         // warnings.
-        stream.warnIfPossible(std::string("Unable to parse appearance stream: ") + e.what());
+        stream.warn("Unable to parse appearance stream: "s + e.what());
     }
 }
 
@@ -814,7 +816,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     QPDFObjGen::set added_new_fields;
     for (auto annot: old_annots.aitems()) {
         if (annot.isStream()) {
-            annot.warnIfPossible("ignoring annotation that's a stream");
+            annot.warn("ignoring annotation that's a stream");
             continue;
         }
 
@@ -847,10 +849,10 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         bool have_field = false;
         bool have_parent = false;
         if (ffield_oh.isStream()) {
-            ffield_oh.warnIfPossible("ignoring form field that's a stream");
+            ffield.warn("ignoring form field that's a stream");
         } else if ((!ffield_oh.isNull()) && (!ffield_oh.isIndirect())) {
-            ffield_oh.warnIfPossible("ignoring form field not indirect");
-        } else if (!ffield_oh.isNull()) {
+            ffield.warn("ignoring form field not indirect");
+        } else if (!ffield.null()) {
             // A field and its associated annotation can be the same object. This matters because we
             // don't want to clone the annotation and field separately in this case.
             have_field = true;
@@ -888,7 +890,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                         if (orig_to_copy.contains(parent_og)) {
                             obj.replaceKey("/Parent", orig_to_copy[parent_og]);
                         } else {
-                            parent.warnIfPossible(
+                            parent.warn(
                                 "while traversing field " + obj.getObjGen().unparse(',') +
                                 ", found parent (" + parent_og.unparse(',') +
                                 ") that had not been seen, indicating likely invalid field "
@@ -896,12 +898,13 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                         }
                     }
                     auto kids = obj.getKey("/Kids");
-                    if (kids.isArray()) {
-                        for (int i = 0; i < kids.getArrayNItems(); ++i) {
+                    int sz = static_cast<int>(kids.size());
+                    if (sz != 1 || kids.isArray()) {
+                        for (int i = 0; i < sz; ++i) {
                             auto kid = kids.getArrayItem(i);
                             if (maybe_copy_object(kid)) {
                                 kids.setArrayItem(i, kid);
-                                queue.push_back(kid);
+                                queue.emplace_back(kid);
                             }
                         }
                     }
@@ -1013,7 +1016,7 @@ QPDFAcroFormDocumentHelper::fixCopiedAnnotations(
     std::set<QPDFObjGen>* added_fields)
 {
     auto old_annots = from_page.getKey("/Annots");
-    if ((!old_annots.isArray()) || (old_annots.getArrayNItems() == 0)) {
+    if (old_annots.empty() || !old_annots.isArray()) {
         return;
     }
 
