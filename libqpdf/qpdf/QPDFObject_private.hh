@@ -35,8 +35,8 @@ class QPDF_Array final
   private:
     struct Sparse
     {
-        int size{0};
-        std::map<int, QPDFObjectHandle> elements;
+        size_t size{0};
+        std::map<size_t, QPDFObjectHandle> elements;
     };
 
   public:
@@ -65,10 +65,10 @@ class QPDF_Array final
     {
     }
 
-    int
+    size_t
     size() const
     {
-        return sp ? sp->size : int(elements.size());
+        return sp ? sp->size : elements.size();
     }
 
     std::unique_ptr<Sparse> sp;

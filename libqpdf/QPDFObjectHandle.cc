@@ -352,16 +352,15 @@ BaseHandle::unparse() const
             auto const& a = std::get<QPDF_Array>(obj->value);
             std::string result = "[ ";
             if (a.sp) {
-                int next = 0;
-                for (auto& item: a.sp->elements) {
-                    int key = item.first;
-                    for (int j = next; j < key; ++j) {
+                size_t next = 0;
+                for (auto& [key, value]: a.sp->elements) {
+                    for (size_t j = next; j < key; ++j) {
                         result += "null ";
                     }
-                    result += item.second.unparse() + " ";
-                    next = ++key;
+                    result += value.unparse() + " ";
+                    next = key + 1;
                 }
-                for (int j = next; j < a.sp->size; ++j) {
+                for (size_t j = next; j < a.sp->size; ++j) {
                     result += "null ";
                 }
             } else {
@@ -467,22 +466,21 @@ BaseHandle::write_json(int json_version, JSON::Writer& p) const
             auto const& a = std::get<QPDF_Array>(obj->value);
             p.writeStart('[');
             if (a.sp) {
-                int next = 0;
-                for (auto& item: a.sp->elements) {
-                    int key = item.first;
-                    for (int j = next; j < key; ++j) {
+                size_t next = 0;
+                for (auto& [key, value]: a.sp->elements) {
+                    for (size_t j = next; j < key; ++j) {
                         p.writeNext() << "null";
                     }
                     p.writeNext();
-                    auto item_og = item.second.getObj()->getObjGen();
+                    auto item_og = value.getObj()->getObjGen();
                     if (item_og.isIndirect()) {
                         p << "\"" << item_og.unparse(' ') << " R\"";
                     } else {
-                        item.second.write_json(json_version, p);
+                        value.write_json(json_version, p);
                     }
-                    next = ++key;
+                    next = key + 1;
                 }
-                for (int j = next; j < a.sp->size; ++j) {
+                for (size_t j = next; j < a.sp->size; ++j) {
                     p.writeNext() << "null";
                 }
             } else {
@@ -1234,7 +1232,7 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
     all_description = description;
     std::vector<QPDFObjectHandle> result;
     if (auto array = as_array(strict)) {
-        int n_items = array.size();
+        int n_items = static_cast<int>(array.size());
         for (int i = 0; i < n_items; ++i) {
             QPDFObjectHandle item = array.at(i).second;
             if (item.isStream()) {

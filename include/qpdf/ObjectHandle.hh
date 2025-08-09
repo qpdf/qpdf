@@ -61,6 +61,11 @@ namespace qpdf
 
         // The rest of the header file is for qpdf internal use only.
 
+        // For arrays, return the number of items in the array.
+        // For null-like objects, return 0.
+        // For all other objects, return 1.
+        size_t size() const;
+
         std::shared_ptr<QPDFObject> copy(bool shallow = false) const;
         // Recursively remove association with any QPDF object. This method may only be called
         // during final destruction.

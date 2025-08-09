@@ -2,10 +2,24 @@
 
 #include <qpdf/QTC.hh>
 
+#include <utility>
+
 using namespace std::literals;
 using namespace qpdf;
 
 static const QPDFObjectHandle null_oh = QPDFObjectHandle::newNull();
+
+static size_t
+to_s(int n)
+{
+    return static_cast<size_t>(n);
+}
+
+static int
+to_i(size_t n)
+{
+    return static_cast<int>(n);
+}
 
 inline void
 Array::checkOwnership(QPDFObjectHandle const& item) const
@@ -142,24 +156,24 @@ Array::null() const
     return null_oh;
 }
 
-int
+size_t
 Array::size() const
 {
     auto a = array();
-    return a->sp ? a->sp->size : int(a->elements.size());
+    return a->sp ? a->sp->size : a->elements.size();
 }
 
 std::pair<bool, QPDFObjectHandle>
 Array::at(int n) const
 {
     auto a = array();
-    if (n < 0 || n >= size()) {
+    if (n < 0 || std::cmp_greater_equal(n, size())) {
         return {false, {}};
     }
     if (!a->sp) {
-        return {true, a->elements[size_t(n)]};
+        return {true, a->elements[to_s(n)]};
     }
-    auto const& iter = a->sp->elements.find(n);
+    auto const& iter = a->sp->elements.find(to_s(n));
     return {true, iter == a->sp->elements.end() ? null() : iter->second};
 }
 
@@ -169,12 +183,12 @@ Array::getAsVector() const
     auto a = array();
     if (a->sp) {
         std::vector<QPDFObjectHandle> v;
-        v.reserve(size_t(size()));
+        v.reserve(size());
         for (auto const& item: a->sp->elements) {
-            v.resize(size_t(item.first), null_oh);
+            v.resize(item.first, null_oh);
             v.emplace_back(item.second);
         }
-        v.resize(size_t(size()), null_oh);
+        v.resize(size(), null_oh);
         return v;
     } else {
         return a->elements;
@@ -184,15 +198,15 @@ Array::getAsVector() const
 bool
 Array::setAt(int at, QPDFObjectHandle const& oh)
 {
-    if (at < 0 || at >= size()) {
+    if (at < 0 || std::cmp_greater_equal(at, size())) {
         return false;
     }
     auto a = array();
     checkOwnership(oh);
     if (a->sp) {
-        a->sp->elements[at] = oh;
+        a->sp->elements[to_s(at)] = oh;
     } else {
-        a->elements[size_t(at)] = oh;
+        a->elements[to_s(at)] = oh;
     }
     return true;
 }
@@ -210,34 +224,39 @@ Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
 }
 
 bool
-Array::insert(int at, QPDFObjectHandle const& item)
+Array::insert(int at_i, QPDFObjectHandle const& item)
 {
     auto a = array();
-    int sz = size();
-    if (at < 0 || at > sz) {
-        // As special case, also allow insert beyond the end
+    size_t sz = size();
+    if (at_i < 0) {
         return false;
-    } else if (at == sz) {
+    }
+    size_t at = to_s(at_i);
+    if (at > sz) {
+        return false;
+    }
+    if (at == sz) {
+        // As special case, also allow insert beyond the end
         push_back(item);
-    } else {
-        checkOwnership(item);
-        if (a->sp) {
-            auto iter = a->sp->elements.crbegin();
-            while (iter != a->sp->elements.crend()) {
-                auto key = (iter++)->first;
-                if (key >= at) {
-                    auto nh = a->sp->elements.extract(key);
-                    ++nh.key();
-                    a->sp->elements.insert(std::move(nh));
-                } else {
-                    break;
-                }
+        return true;
+    }
+    checkOwnership(item);
+    if (a->sp) {
+        auto iter = a->sp->elements.crbegin();
+        while (iter != a->sp->elements.crend()) {
+            auto key = (iter++)->first;
+            if (key >= at) {
+                auto nh = a->sp->elements.extract(key);
+                ++nh.key();
+                a->sp->elements.insert(std::move(nh));
+            } else {
+                break;
             }
-            a->sp->elements[at] = item.getObj();
-            ++a->sp->size;
-        } else {
-            a->elements.insert(a->elements.cbegin() + at, item.getObj());
         }
+        a->sp->elements[at] = item.getObj();
+        ++a->sp->size;
+    } else {
+        a->elements.insert(a->elements.cbegin() + at_i, item.getObj());
     }
     return true;
 }
@@ -255,10 +274,14 @@ Array::push_back(QPDFObjectHandle const& item)
 }
 
 bool
-Array::erase(int at)
+Array::erase(int at_i)
 {
     auto a = array();
-    if (at < 0 || at >= size()) {
+    if (at_i < 0) {
+        return false;
+    }
+    size_t at = to_s(at_i);
+    if (at >= size()) {
         return false;
     }
     if (a->sp) {
@@ -277,7 +300,7 @@ Array::erase(int at)
         }
         --(a->sp->size);
     } else {
-        a->elements.erase(a->elements.cbegin() + at);
+        a->elements.erase(a->elements.cbegin() + at_i);
     }
     return true;
 }
@@ -286,7 +309,7 @@ int
 QPDFObjectHandle::getArrayNItems() const
 {
     if (auto array = as_array(strict)) {
-        return array.size();
+        return to_i(array.size());
     }
     typeWarning("array", "treating as empty");
     QTC::TC("qpdf", "QPDFObjectHandle array treating as empty");
@@ -471,7 +494,37 @@ QPDFObjectHandle
 QPDFObjectHandle::eraseItemAndGetOld(int at)
 {
     auto array = as_array(strict);
-    auto result = (array && at < array.size() && at >= 0) ? array.at(at).second : newNull();
+    auto result =
+        (array && std::cmp_less(at, array.size()) && at >= 0) ? array.at(at).second : newNull();
     eraseItem(at);
     return result;
+}
+
+size_t
+BaseHandle::size() const
+{
+    switch (resolved_type_code()) {
+    case ::ot_array:
+        return as<QPDF_Array>()->size();
+    case ::ot_uninitialized:
+    case ::ot_reserved:
+    case ::ot_null:
+    case ::ot_destroyed:
+    case ::ot_unresolved:
+    case ::ot_reference:
+        return 0;
+    case ::ot_boolean:
+    case ::ot_integer:
+    case ::ot_real:
+    case ::ot_string:
+    case ::ot_name:
+    case ::ot_dictionary:
+    case ::ot_stream:
+    case ::ot_inlineimage:
+    case ::ot_operator:
+        return 1;
+    default:
+        throw std::logic_error("Unexpected type code in size"); // unreachable
+        return 0;                                               // unreachable
+    }
 }
