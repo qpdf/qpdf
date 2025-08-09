@@ -66,6 +66,13 @@ namespace qpdf
         // For all other objects, return 1.
         size_t size() const;
 
+        // Return 'true' if size() == 0.
+        bool
+        empty() const
+        {
+            return size() == 0;
+        }
+
         std::shared_ptr<QPDFObject> copy(bool shallow = false) const;
         // Recursively remove association with any QPDF object. This method may only be called
         // during final destruction.
