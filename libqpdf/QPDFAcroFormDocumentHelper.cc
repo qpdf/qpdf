@@ -7,6 +7,8 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/ResourceFinder.hh>
 
+#include <utility>
+
 using namespace qpdf;
 using namespace std::literals;
 
@@ -139,7 +141,7 @@ QPDFAcroFormDocumentHelper::removeFormFields(std::set<QPDFObjGen> const& to_remo
     }
 
     int i = 0;
-    while (i < fields.getArrayNItems()) {
+    while (std::cmp_less(i, fields.size())) {
         auto field = fields.getArrayItem(i);
         if (to_remove.contains(field.getObjGen())) {
             fields.eraseItem(i);
@@ -896,12 +898,13 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                         }
                     }
                     auto kids = obj.getKey("/Kids");
-                    if (kids.isArray()) {
-                        for (int i = 0; i < kids.getArrayNItems(); ++i) {
+                    int sz = static_cast<int>(kids.size());
+                    if (sz != 1 || kids.isArray()) {
+                        for (int i = 0; i < sz; ++i) {
                             auto kid = kids.getArrayItem(i);
                             if (maybe_copy_object(kid)) {
                                 kids.setArrayItem(i, kid);
-                                queue.push_back(kid);
+                                queue.emplace_back(kid);
                             }
                         }
                     }
@@ -1013,7 +1016,7 @@ QPDFAcroFormDocumentHelper::fixCopiedAnnotations(
     std::set<QPDFObjGen>* added_fields)
 {
     auto old_annots = from_page.getKey("/Annots");
-    if ((!old_annots.isArray()) || (old_annots.getArrayNItems() == 0)) {
+    if (old_annots.empty() || !old_annots.isArray()) {
         return;
     }
 
