@@ -519,7 +519,7 @@ class QPDF::Members
     // Linearization data
     qpdf_offset_t first_xref_item_offset{0}; // actual value from file
     bool uncompressed_after_compressed{false};
-    bool linearization_warnings{false};
+    bool linearization_warnings{false}; // set by linearizationWarning, used by checkLinearization
 
     // Linearization parameter dictionary and hint table data: may be read from file or computed
     // prior to writing a linearized file

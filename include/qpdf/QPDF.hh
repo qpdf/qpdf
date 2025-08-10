@@ -1001,7 +1001,7 @@ class QPDF
 
     // methods to support linearization checking -- implemented in QPDF_linearization.cc
     void readLinearizationData();
-    bool checkLinearizationInternal();
+    void checkLinearizationInternal();
     void dumpLinearizationDataInternal();
     void linearizationWarning(std::string_view);
     QPDFObjectHandle readHintStream(Pipeline&, qpdf_offset_t offset, size_t length);
