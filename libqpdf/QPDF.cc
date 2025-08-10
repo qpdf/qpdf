@@ -946,7 +946,7 @@ QPDF::pipeForeignStreamData(
 }
 
 // Throw a generic exception when we lack context for something more specific. New code should not
-// use this. This method exists to improve somewhat from calling assert in very old code.
+// use this.
 void
 QPDF::stopOnError(std::string const& message)
 {
