@@ -77,15 +77,15 @@ QPDF::linearizationWarning(std::string_view msg)
 bool
 QPDF::checkLinearization()
 {
-    bool result = false;
     try {
         readLinearizationData();
-        result = checkLinearizationInternal();
+        checkLinearizationInternal();
+        return !m->linearization_warnings;
     } catch (std::runtime_error& e) {
         linearizationWarning(
             "error encountered while checking linearization data: " + std::string(e.what()));
+        return false;
     }
-    return result;
 }
 
 bool
@@ -404,7 +404,7 @@ QPDF::readHGeneric(BitStream h, HGeneric& t)
     t.group_length = h.getBitsInt(32);        // 4
 }
 
-bool
+void
 QPDF::checkLinearizationInternal()
 {
     // All comments referring to the PDF spec refer to the spec for version 1.4.
@@ -521,8 +521,6 @@ QPDF::checkLinearizationInternal()
     checkHSharedObject(pages, shared_idx_to_obj);
     checkHPageOffset(pages, shared_idx_to_obj);
     checkHOutlines();
-
-    return !m->linearization_warnings;
 }
 
 qpdf_offset_t
