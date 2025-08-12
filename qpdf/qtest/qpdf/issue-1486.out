@@ -1,0 +1,43 @@
+WARNING: issue-1486.pdf: can't find PDF header
+WARNING: issue-1486.pdf: file is damaged
+WARNING: issue-1486.pdf: can't find startxref
+WARNING: issue-1486.pdf: Attempting to reconstruct cross-reference table
+WARNING: issue-1486.pdf (trailer, offset 1513): unknown token while reading object; treating as null
+WARNING: issue-1486.pdf (trailer, offset 1492): expected dictionary keys but found non-name objects; ignoring
+WARNING: issue-1486.pdf (object 1 0, offset 88): expected endobj
+WARNING: issue-1486.pdf (object 2 0, offset 148): unknown token while reading object; treating as null
+WARNING: issue-1486.pdf (object 5 0, offset 857): unknown token while reading object; treating as null
+WARNING: issue-1486.pdf (object 5 0, offset 837): expected dictionary keys but found non-name objects; ignoring
+WARNING: issue-1486.pdf, object 5 0 at offset 837: /Type key should be /Page but is not; overriding
+Pages tree includes non-dictionary object; ignoring
+WARNING: issue-1486.pdf (trailer, offset 1423): invalid /ID in trailer dictionary
+WARNING: issue-1486.pdf (object 7 0, offset 1446): unknown token while reading object; treating as null
+WARNING: issue-1486.pdf (object 7 0, offset 1479): unknown token while reading object; treating as null
+WARNING: issue-1486.pdf (object 7 0, offset 1482): unknown token while reading object; treating as null
+WARNING: issue-1486.pdf (object 7 0, offset 1513): unknown token while reading object; treating as null
+WARNING: issue-1486.pdf (object 7 0, offset 1492): expected dictionary keys but found non-name objects; ignoring
+WARNING: issue-1486.pdf (object 7 0, offset 1606): unknown token while reading object; treating as null
+WARNING: issue-1486.pdf (object 7 0, offset 1615): parse error while reading object
+WARNING: issue-1486.pdf (object 7 0, offset 1615): unexpected EOF
+WARNING: issue-1486.pdf (object 7 0, offset 1615): expected endobj
+WARNING: issue-1486.pdf (object 7 0, offset 1615): EOF after endobj
+WARNING: issue-1486.pdf (encryption dictionary, offset 1615): /Perms field in encryption dictionary doesn't match expected value
+WARNING: issue-1486.pdf, trailer at offset 1492 -> dictionary key /ID: operation for array attempted on object of type null: returning null
+WARNING: issue-1486.pdf, trailer at offset 1492 -> dictionary key /ID -> null returned from invalid array access: operation for string attempted on object of type null: returning empty string
+WARNING: issue-1486.pdf (object 3 0, offset 195): unknown token while reading object; treating as null
+WARNING: issue-1486.pdf (object 3 0, offset 195): expected dictionary keys but found non-name objects; ignoring
+WARNING: issue-1486.pdf (object 3 0, offset 192): /Length key in stream dictionary is not an integer
+WARNING: issue-1486.pdf (object 3 0, offset 248): attempting to recover stream length
+WARNING: issue-1486.pdf (object 3 0, offset 248): recovered stream length: 532
+WARNING: issue-1486.pdf (object 8 0, offset 1479): unknown token while reading object; treating as null
+WARNING: issue-1486.pdf (object 8 0, offset 1482): unknown token while reading object; treating as null
+WARNING: issue-1486.pdf (object 8 0, offset 1513): unknown token while reading object; treating as null
+WARNING: issue-1486.pdf (object 8 0, offset 1518): unknown encryption filter for strings (check /StrF in /Encrypt dictionary); strings may be decrypted improperly
+WARNING: issue-1486.pdf (object 8 0, offset 1492): expected dictionary keys but found non-name objects; ignoring
+WARNING: issue-1486.pdf (object 8 0, offset 1606): unknown token while reading object; treating as null
+WARNING: issue-1486.pdf (object 8 0, offset 1615): parse error while reading object
+WARNING: issue-1486.pdf (object 8 0, offset 1615): unexpected EOF
+WARNING: issue-1486.pdf (object 8 0, offset 1615): expected endobj
+WARNING: issue-1486.pdf (object 8 0, offset 1615): EOF after endobj
+WARNING: issue-1486.pdf (offset 1615): unknown encryption filter for streams (check /StmF from /Encrypt dictionary); streams may be decrypted improperly
+qpdf: operation succeeded with warnings; resulting file may have some problems
