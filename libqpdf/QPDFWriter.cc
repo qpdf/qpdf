@@ -2179,7 +2179,7 @@ QPDFWriter::doWriteSetup()
         }
     }
 
-    if (m->qdf_mode || m->normalize_content || m->stream_decode_level) {
+    if (m->qdf_mode || m->normalize_content) {
         initializeSpecialStreams();
     }
 
