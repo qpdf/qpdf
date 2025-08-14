@@ -27,7 +27,7 @@ my @fuzzers = (
     ['qpdf_crypt' => $n_qpdf_files],
     ['qpdf_crypt_insecure' => $n_qpdf_files],
     ['qpdf_lin' => $n_qpdf_files],
-    ['qpdf_page' => $n_qpdf_files],
+    ['qpdf_pages' => $n_qpdf_files],
     ['qpdf_outlines' => $n_qpdf_files],
     );
 

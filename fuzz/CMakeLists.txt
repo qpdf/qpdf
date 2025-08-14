@@ -6,7 +6,7 @@ set(FUZZERS
   qpdf_crypt_fuzzer
   qpdf_crypt_insecure_fuzzer
   qpdf_lin_fuzzer
-  qpdf_page_fuzzer
+  qpdf_pages_fuzzer
   qpdf_outlines_fuzzer
   ascii85_fuzzer
   dct_fuzzer
