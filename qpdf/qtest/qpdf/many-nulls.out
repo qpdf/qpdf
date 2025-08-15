@@ -2,5 +2,5 @@ checking a.pdf
 PDF Version: 1.5
 File is not encrypted
 File is not linearized
-No syntax or stream encoding errors found; the file may still contain
-errors that qpdf cannot detect
+WARNING: a.pdf object stream 1, object 5 0 at offset 2000188: kid 0 (from 0) Resources is missing or invalid; repairing
+qpdf: operation succeeded with warnings

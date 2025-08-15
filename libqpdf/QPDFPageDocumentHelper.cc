@@ -66,7 +66,7 @@ QPDFPageDocumentHelper::flattenAnnotations(int required_flags, int forbidden_fla
     for (auto& ph: getAllPages()) {
         QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
         if (!resources.isDictionary()) {
-            QTC::TC("qpdf", "QPDFPageDocumentHelper flatten resources missing or invalid");
+            // As of #1521, this should be impossible unless a user inserted an invalid page.
             resources = ph.getObjectHandle().replaceKeyAndGetNew(
                 "/Resources", QPDFObjectHandle::newDictionary());
         }

@@ -96,7 +96,7 @@ $td->runtest("overlay on page with no resources",
              {$td->COMMAND =>
                   "qpdf --deterministic-id page-with-no-resources.pdf" .
                   " --overlay minimal.pdf -- a.pdf"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->FILE => "page-with-no-resources.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check overlay with no resources output",
              {$td->COMMAND => "qpdf-test-compare a.pdf overlay-no-resources.pdf"},

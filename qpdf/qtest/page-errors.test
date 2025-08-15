@@ -29,7 +29,7 @@ $td->runtest("check output",
              {$td->FILE => "page-missing-mediabox-out.pdf"});
 $td->runtest("handle page with inherited MediaBox",
              {$td->COMMAND => "qpdf --static-id --empty --pages page-inherit-mediabox.pdf -- a.pdf"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->FILE => "page-inherit-mediabox.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
              {$td->COMMAND => "qpdf-test-compare a.pdf page-inherit-mediabox-out.pdf"},
