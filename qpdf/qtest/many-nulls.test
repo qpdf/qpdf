@@ -27,7 +27,7 @@ $td->runtest("compare output",
              {$td->FILE => "many-nulls.pdf", $td->EXIT_STATUS => 0});
 $td->runtest("run check file",
              {$td->COMMAND => "qpdf --check a.pdf"},
-             {$td->FILE => "many-nulls.out", $td->EXIT_STATUS => 0},
+             {$td->FILE => "many-nulls.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("copy sparse array",
              {$td->COMMAND => "test_driver 97 many-nulls.pdf"},

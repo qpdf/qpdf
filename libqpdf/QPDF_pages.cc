@@ -158,10 +158,38 @@ QPDF::getAllPagesInternal(
                     QPDFObjectHandle::newArray(QPDFObjectHandle::Rectangle(0, 0, 612, 792)));
                 ++errors;
             }
-            if (!resources && !kid.getKey("/Resources").isDictionary()) {
-                // Consider adding an information message
-                ++errors;
+            if (!resources) {
+                auto res = kid.getKey("/Resources");
+
+                if (!res.isDictionary()) {
+                    ++errors;
+                    kid.warn(
+                        "kid " + std::to_string(i) +
+                        " (from 0) Resources is missing or invalid; repairing");
+                    kid.replaceKey("/Resources", QPDFObjectHandle::newDictionary());
+                }
             }
+            auto annots = kid.getKey("/Annots");
+            if (!annots.null()) {
+                if (!annots.isArray()) {
+                    kid.warn(
+                        "kid " + std::to_string(i) + " (from 0) Annots is not an array; removing");
+                    kid.removeKey("/Annots");
+                    ++errors;
+                } else {
+                    QPDFObjGen::set seen_annots;
+                    for (auto& annot: annots.as_array()) {
+                        if (!seen_annots.add(annot)) {
+                            kid.warn(
+                                "kid " + std::to_string(i) +
+                                " (from 0) Annots has duplicate entry for annotation " +
+                                annot.id_gen().unparse(' '));
+                            ++errors;
+                        }
+                    }
+                }
+            }
+
             if (!seen.add(kid)) {
                 // Make a copy of the page. This does the same as shallowCopyPage in
                 // QPDFPageObjectHelper.
