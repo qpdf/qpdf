@@ -1593,7 +1593,7 @@ QPDF::resolve(QPDFObjGen og)
         updateCache(og, QPDFObject::create<QPDF_Null>(), -1, -1);
         return m->obj_cache[og].object;
     }
-    ResolveRecorder rr(this, og);
+    ResolveRecorder rr(*this, og);
 
     if (m->xref_table.contains(og)) {
         QPDFXRefEntry const& entry = m->xref_table[og];

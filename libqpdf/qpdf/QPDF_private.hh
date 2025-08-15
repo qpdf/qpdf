@@ -563,21 +563,21 @@ class QPDF::JobSetter
     }
 };
 
-class QPDF::ResolveRecorder
+class QPDF::ResolveRecorder final
 {
   public:
-    ResolveRecorder(QPDF* qpdf, QPDFObjGen const& og) :
+    ResolveRecorder(QPDF& qpdf, QPDFObjGen const& og) :
         qpdf(qpdf),
-        iter(qpdf->m->resolving.insert(og).first)
+        iter(qpdf.m->resolving.insert(og).first)
     {
     }
-    virtual ~ResolveRecorder()
+    ~ResolveRecorder()
     {
-        this->qpdf->m->resolving.erase(iter);
+        qpdf.m->resolving.erase(iter);
     }
 
   private:
-    QPDF* qpdf;
+    QPDF& qpdf;
     std::set<QPDFObjGen>::const_iterator iter;
 };
 
