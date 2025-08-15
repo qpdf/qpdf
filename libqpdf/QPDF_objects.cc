@@ -81,6 +81,24 @@ namespace
     };
 } // namespace
 
+class QPDF::ResolveRecorder final
+{
+  public:
+    ResolveRecorder(QPDF& qpdf, QPDFObjGen const& og) :
+        qpdf(qpdf),
+        iter(qpdf.m->resolving.insert(og).first)
+    {
+    }
+    ~ResolveRecorder()
+    {
+        qpdf.m->resolving.erase(iter);
+    }
+
+  private:
+    QPDF& qpdf;
+    std::set<QPDFObjGen>::const_iterator iter;
+};
+
 bool
 QPDF::findStartxref()
 {
@@ -1593,7 +1611,7 @@ QPDF::resolve(QPDFObjGen og)
         updateCache(og, QPDFObject::create<QPDF_Null>(), -1, -1);
         return m->obj_cache[og].object;
     }
-    ResolveRecorder rr(this, og);
+    ResolveRecorder rr(*this, og);
 
     if (m->xref_table.contains(og)) {
         QPDFXRefEntry const& entry = m->xref_table[og];
