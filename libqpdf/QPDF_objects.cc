@@ -81,6 +81,24 @@ namespace
     };
 } // namespace
 
+class QPDF::ResolveRecorder final
+{
+  public:
+    ResolveRecorder(QPDF& qpdf, QPDFObjGen const& og) :
+        qpdf(qpdf),
+        iter(qpdf.m->resolving.insert(og).first)
+    {
+    }
+    ~ResolveRecorder()
+    {
+        qpdf.m->resolving.erase(iter);
+    }
+
+  private:
+    QPDF& qpdf;
+    std::set<QPDFObjGen>::const_iterator iter;
+};
+
 bool
 QPDF::findStartxref()
 {
