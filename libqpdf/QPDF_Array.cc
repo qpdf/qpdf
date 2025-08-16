@@ -528,3 +528,47 @@ BaseHandle::size() const
         return 0;                                               // unreachable
     }
 }
+
+QPDFObjectHandle
+BaseHandle::operator[](size_t n) const
+{
+    switch (resolved_type_code()) {
+    case ::ot_array:
+        {
+            auto a = as<QPDF_Array>();
+            if (n >= a->size()) {
+                return {};
+            }
+            return Array(obj).at(static_cast<int>(n)).second;
+        }
+    case ::ot_uninitialized:
+    case ::ot_reserved:
+    case ::ot_null:
+    case ::ot_destroyed:
+    case ::ot_unresolved:
+    case ::ot_reference:
+        return {};
+    case ::ot_boolean:
+    case ::ot_integer:
+    case ::ot_real:
+    case ::ot_string:
+    case ::ot_name:
+    case ::ot_dictionary:
+    case ::ot_stream:
+    case ::ot_inlineimage:
+    case ::ot_operator:
+        return {obj};
+    default:
+        throw std::logic_error("Unexpected type code in size"); // unreachable
+        return {};                                              // unreachable
+    }
+}
+
+QPDFObjectHandle
+BaseHandle::operator[](int n) const
+{
+    if (n < 0) {
+        return {};
+    }
+    return (*this)[static_cast<size_t>(n)];
+}
