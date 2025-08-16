@@ -253,10 +253,10 @@ Array::insert(int at_i, QPDFObjectHandle const& item)
                 break;
             }
         }
-        a->sp->elements[at] = item.getObj();
+        a->sp->elements[at] = item;
         ++a->sp->size;
     } else {
-        a->elements.insert(a->elements.cbegin() + at_i, item.getObj());
+        a->elements.insert(a->elements.cbegin() + at_i, item);
     }
     return true;
 }

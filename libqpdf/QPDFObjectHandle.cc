@@ -486,7 +486,7 @@ BaseHandle::write_json(int json_version, JSON::Writer& p) const
             } else {
                 for (auto const& item: a.elements) {
                     p.writeNext();
-                    auto item_og = item.getObj()->getObjGen();
+                    auto item_og = item.id_gen();
                     if (item_og.isIndirect()) {
                         p << "\"" << item_og.unparse(' ') << " R\"";
                     } else {
