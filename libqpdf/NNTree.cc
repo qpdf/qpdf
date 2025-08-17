@@ -592,73 +592,63 @@ NNTreeIterator::deepen(QPDFObjectHandle a_node, bool first, bool allow_empty)
     // items. If we succeed, return true; otherwise return false and leave path alone.
 
     auto opath = path;
-    bool failed = false;
+
+    auto fail = [this, &opath](QPDFObjectHandle const& failed_node, std::string const& msg) {
+        impl.warn(failed_node, msg);
+        path = opath;
+        return false;
+    };
 
     QPDFObjGen::set seen;
     for (auto const& i: path) {
         seen.add(i.node);
     }
-    while (!failed) {
+    while (true) {
         if (!seen.add(a_node)) {
-            QTC::TC("qpdf", "NNTree deepen: loop");
-            impl.warn(a_node, "loop detected while traversing name/number tree");
-            failed = true;
-            break;
+            return fail(a_node, "loop detected while traversing name/number tree");
         }
 
         if (!a_node.isDictionary()) {
-            QTC::TC("qpdf", "NNTree node is not a dictionary");
-            impl.warn(a_node, "non-dictionary node while traversing name/number tree");
-            failed = true;
+            return fail(a_node, "non-dictionary node while traversing name/number tree");
+        }
+
+        auto items = a_node.getKey(impl.details.itemsKey());
+        int nitems = static_cast<int>(items.size());
+        if (nitems > 1) {
+            setItemNumber(a_node, first ? 0 : nitems - 2);
             break;
         }
 
         auto kids = a_node.getKey("/Kids");
-        int nkids = kids.isArray() ? kids.getArrayNItems() : 0;
-        auto items = a_node.getKey(impl.details.itemsKey());
-        int nitems = items.isArray() ? items.getArrayNItems() : 0;
-        if (nitems > 0) {
-            setItemNumber(a_node, first ? 0 : nitems - 2);
-            break;
-        } else if (nkids > 0) {
+        int nkids = kids.isArray() ? static_cast<int>(kids.size()) : 0;
+        if (nkids > 0) {
             int kid_number = first ? 0 : nkids - 1;
             addPathElement(a_node, kid_number);
-            auto next = kids.getArrayItem(kid_number);
+            auto next = kids[kid_number];
             if (!next.isIndirect()) {
                 if (impl.auto_repair) {
-                    QTC::TC("qpdf", "NNTree fix indirect kid");
                     impl.warn(
                         a_node,
-                        ("converting kid number " + std::to_string(kid_number) +
-                         " to an indirect object"));
+                        "converting kid number " + std::to_string(kid_number) +
+                            " to an indirect object");
                     next = impl.qpdf.makeIndirectObject(next);
                     kids.setArrayItem(kid_number, next);
                 } else {
-                    QTC::TC("qpdf", "NNTree warn indirect kid");
                     impl.warn(
                         a_node,
-                        ("kid number " + std::to_string(kid_number) +
-                         " is not an indirect object"));
+                        "kid number " + std::to_string(kid_number) + " is not an indirect object");
                 }
             }
             a_node = next;
         } else if (allow_empty && items.isArray()) {
-            QTC::TC("qpdf", "NNTree deepen found empty");
             setItemNumber(a_node, -1);
             break;
         } else {
-            QTC::TC("qpdf", "NNTree deepen: invalid node");
-            impl.warn(
+            return fail(
                 a_node,
-                ("name/number tree node has neither non-empty " + impl.details.itemsKey() +
-                 " nor /Kids"));
-            failed = true;
-            break;
+                "name/number tree node has neither non-empty " + impl.details.itemsKey() +
+                    " nor /Kids");
         }
-    }
-    if (failed) {
-        path = opath;
-        return false;
     }
     return true;
 }
