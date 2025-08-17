@@ -524,13 +524,6 @@ NNTree skip item at end of short items 0
 NNTree skip invalid key 0
 NNTree unable to determine limits 0
 NNTree repair 0
-NNTree split root + leaf 0
-NNTree split root + !leaf 0
-NNTree split kids 0
-NNTree split items 0
-NNTree split second half item 0
-NNTree split parent 0
-NNTree split second half kid 0
 NNTree limits didn't change 0
 NNTree increment end() 0
 NNTree insertAfter inserts first 0

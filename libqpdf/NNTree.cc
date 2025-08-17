@@ -260,22 +260,20 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
 
     // Find the array we actually need to split, which is either this node's kids or items.
     auto kids = to_split.getKey("/Kids");
-    int nkids = kids.isArray() ? kids.getArrayNItems() : 0;
+    int nkids = kids.isArray() ? static_cast<int>(kids.size()) : 0;
     auto items = to_split.getKey(impl.details.itemsKey());
-    int nitems = items.isArray() ? items.getArrayNItems() : 0;
+    int nitems = items.isArray() ? static_cast<int>(items.size()) : 0;
 
     QPDFObjectHandle first_half;
     int n = 0;
     std::string key;
     int threshold = 0;
     if (nkids > 0) {
-        QTC::TC("qpdf", "NNTree split kids");
         first_half = kids;
         n = nkids;
         threshold = impl.split_threshold;
         key = "/Kids";
     } else if (nitems > 0) {
-        QTC::TC("qpdf", "NNTree split items");
         first_half = items;
         n = nitems;
         threshold = 2 * impl.split_threshold;
@@ -288,8 +286,8 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
         return;
     }
 
-    bool is_root = (parent == path.end());
-    bool is_leaf = (nitems > 0);
+    bool is_root = parent == path.end();
+    bool is_leaf = nitems > 0;
 
     // CURRENT STATE: tree is in original state; iterator is valid and unchanged.
 
@@ -316,10 +314,8 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
         to_split.removeKey(impl.details.itemsKey());
         to_split.replaceKey("/Kids", new_kids);
         if (is_leaf) {
-            QTC::TC("qpdf", "NNTree split root + leaf");
             node = first_node;
         } else {
-            QTC::TC("qpdf", "NNTree split root + !leaf");
             auto next = path.begin();
             next->node = first_node;
         }
@@ -335,8 +331,8 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
     // array.
     QPDFObjectHandle second_half = QPDFObjectHandle::newArray();
     int start_idx = ((n / 2) & ~1);
-    while (first_half.getArrayNItems() > start_idx) {
-        second_half.appendItem(first_half.getArrayItem(start_idx));
+    while (std::cmp_greater(first_half.size(), start_idx)) {
+        second_half.appendItem(first_half[start_idx]);
         first_half.eraseItem(start_idx);
     }
     resetLimits(to_split, parent);
@@ -362,16 +358,13 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
     if (old_idx >= start_idx) {
         ++parent->kid_number;
         if (is_leaf) {
-            QTC::TC("qpdf", "NNTree split second half item");
             setItemNumber(second_node, item_number - start_idx);
         } else {
-            QTC::TC("qpdf", "NNTree split second half kid");
             cur_elem->node = second_node;
             cur_elem->kid_number -= start_idx;
         }
     }
     if (!is_root) {
-        QTC::TC("qpdf", "NNTree split parent");
         auto next = parent->node;
         resetLimits(next, parent);
         --parent;
