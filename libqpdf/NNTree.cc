@@ -121,21 +121,20 @@ void
 NNTreeIterator::increment(bool backward)
 {
     if (item_number < 0) {
-        QTC::TC("qpdf", "NNTree increment end()");
         deepen(impl.oh, !backward, true);
         return;
     }
-    bool found_valid_key = false;
-    while (valid() && !found_valid_key) {
+
+    while (valid()) {
         item_number += backward ? -2 : 2;
         auto items = node.getKey(impl.details.itemsKey());
-        if (item_number < 0 || item_number >= items.getArrayNItems()) {
+        if (item_number < 0 || std::cmp_greater_equal(item_number, items.size())) {
             bool found = false;
             setItemNumber(QPDFObjectHandle(), -1);
             while (!(found || path.empty())) {
                 auto& element = path.back();
                 auto pe_node = getNextKid(element, backward);
-                if (pe_node.isNull()) {
+                if (pe_node.null()) {
                     path.pop_back();
                 } else {
                     found = deepen(pe_node, !backward, false);
@@ -144,14 +143,12 @@ NNTreeIterator::increment(bool backward)
         }
         if (item_number >= 0) {
             items = node.getKey(impl.details.itemsKey());
-            if (item_number + 1 >= items.getArrayNItems()) {
-                QTC::TC("qpdf", "NNTree skip item at end of short items");
+            if (std::cmp_greater_equal(item_number + 1, items.size())) {
                 impl.warn(node, "items array doesn't have enough elements");
-            } else if (!impl.details.keyValid(items.getArrayItem(item_number))) {
-                QTC::TC("qpdf", "NNTree skip invalid key");
+            } else if (!impl.details.keyValid(items[item_number])) {
                 impl.warn(node, ("item " + std::to_string(item_number) + " has the wrong type"));
             } else {
-                found_valid_key = true;
+                return;
             }
         }
     }
