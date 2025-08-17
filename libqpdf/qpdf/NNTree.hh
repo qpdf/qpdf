@@ -56,7 +56,7 @@ class NNTreeIterator
         return !operator==(other);
     }
 
-    void insertAfter(QPDFObjectHandle key, QPDFObjectHandle value);
+    void insertAfter(QPDFObjectHandle const& key, QPDFObjectHandle const& value);
     void remove();
 
   private:
@@ -100,9 +100,9 @@ class NNTreeImpl
     iterator end();
     iterator last();
     iterator find(QPDFObjectHandle key, bool return_prev_if_not_found = false);
-    iterator insertFirst(QPDFObjectHandle key, QPDFObjectHandle value);
-    iterator insert(QPDFObjectHandle key, QPDFObjectHandle value);
-    bool remove(QPDFObjectHandle key, QPDFObjectHandle* value = nullptr);
+    iterator insertFirst(QPDFObjectHandle const& key, QPDFObjectHandle const& value);
+    iterator insert(QPDFObjectHandle const& key, QPDFObjectHandle const& value);
+    bool remove(QPDFObjectHandle const& key, QPDFObjectHandle* value = nullptr);
 
     // Change the split threshold for easier testing. There's no real reason to expose this to
     // downstream tree helpers, but it has to be public so we can call it from the test suite.
@@ -110,18 +110,18 @@ class NNTreeImpl
 
   private:
     void repair();
-    iterator findInternal(QPDFObjectHandle key, bool return_prev_if_not_found = false);
-    int withinLimits(QPDFObjectHandle key, QPDFObjectHandle node);
+    iterator findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_found = false);
+    int withinLimits(QPDFObjectHandle const& key, QPDFObjectHandle const& node);
     int binarySearch(
         QPDFObjectHandle key,
         QPDFObjectHandle items,
-        int num_items,
+        size_t num_items,
         bool return_prev_if_not_found,
         int (NNTreeImpl::*compare)(QPDFObjectHandle& key, QPDFObjectHandle& arr, int item));
     int compareKeyItem(QPDFObjectHandle& key, QPDFObjectHandle& items, int idx);
     int compareKeyKid(QPDFObjectHandle& key, QPDFObjectHandle& items, int idx);
-    void warn(QPDFObjectHandle& node, std::string const& msg);
-    void error(QPDFObjectHandle& node, std::string const& msg);
+    void warn(QPDFObjectHandle const& node, std::string const& msg);
+    void error(QPDFObjectHandle const& node, std::string const& msg);
 
     NNTreeDetails const& details;
     QPDF& qpdf;
