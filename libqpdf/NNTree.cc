@@ -1,10 +1,15 @@
+#include <qpdf/assert_debug.h>
+
 #include <qpdf/NNTree.hh>
 
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDF_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
+#include <bit>
 #include <exception>
+#include <utility>
 
 static std::string
 get_description(QPDFObjectHandle& node)
@@ -718,59 +723,44 @@ int
 NNTreeImpl::binarySearch(
     QPDFObjectHandle key,
     QPDFObjectHandle items,
-    int num_items,
+    size_t num_items,
     bool return_prev_if_not_found,
     int (NNTreeImpl::*compare)(QPDFObjectHandle& key, QPDFObjectHandle& arr, int item))
 {
-    int max_idx = 1;
-    while (max_idx < num_items) {
-        max_idx <<= 1;
-    }
+    size_t max_idx = std::bit_ceil(num_items);
 
-    int step = max_idx / 2;
-    int checks = max_idx;
+    int step = static_cast<int>(max_idx / 2);
+    size_t checks = max_idx;
     int idx = step;
     int found_idx = -1;
-    bool found = false;
-    bool found_leq = false;
-    int status = 0;
 
-    while ((!found) && (checks > 0)) {
-        if (idx < num_items) {
+    while (checks > 0) {
+        int status = -1;
+        if (std::cmp_less(idx, num_items)) {
             status = (this->*compare)(key, items, idx);
-            if (status >= 0) {
-                found_leq = true;
+            if (status == 0) {
+                return idx;
+            }
+            if (status > 0) {
                 found_idx = idx;
             }
-        } else {
-            // consider item to be below anything after the top
-            status = -1;
         }
+        checks >>= 1;
+        if (checks > 0) {
+            step >>= 1;
+            if (step == 0) {
+                step = 1;
+            }
 
-        if (status == 0) {
-            found = true;
-        } else {
-            checks >>= 1;
-            if (checks > 0) {
-                step >>= 1;
-                if (step == 0) {
-                    step = 1;
-                }
-
-                if (status < 0) {
-                    idx -= step;
-                } else {
-                    idx += step;
-                }
+            if (status < 0) {
+                idx -= step;
+            } else {
+                idx += step;
             }
         }
     }
 
-    if (found || (found_leq && return_prev_if_not_found)) {
-        return found_idx;
-    } else {
-        return -1;
-    }
+    return return_prev_if_not_found ? found_idx : -1;
 }
 
 int
@@ -826,28 +816,19 @@ NNTreeImpl::find(QPDFObjectHandle key, bool return_prev_if_not_found)
 }
 
 NNTreeImpl::iterator
-NNTreeImpl::findInternal(QPDFObjectHandle key, bool return_prev_if_not_found)
+NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_found)
 {
     auto first_item = begin();
     auto last_item = end();
     if (first_item == end()) {
-        // Empty
         return end();
-    } else if (
-        first_item.valid() && details.keyValid(first_item->first) &&
+    }
+    if (first_item.valid() && details.keyValid(first_item->first) &&
         details.compareKeys(key, first_item->first) < 0) {
         // Before the first key
         return end();
-    } else if (
-        last_item.valid() && details.keyValid(last_item->first) &&
-        details.compareKeys(key, last_item->first) > 0) {
-        // After the last key
-        if (return_prev_if_not_found) {
-            return last_item;
-        } else {
-            return end();
-        }
     }
+    qpdf_assert_debug(!last_item.valid());
 
     QPDFObjGen::set seen;
     auto node = oh;
@@ -855,36 +836,33 @@ NNTreeImpl::findInternal(QPDFObjectHandle key, bool return_prev_if_not_found)
 
     while (true) {
         if (!seen.add(node)) {
-            QTC::TC("qpdf", "NNTree loop in find");
             error(node, "loop detected in find");
         }
 
-        auto kids = node.getKey("/Kids");
-        int nkids = kids.isArray() ? kids.getArrayNItems() : 0;
         auto items = node.getKey(details.itemsKey());
-        int nitems = items.isArray() ? items.getArrayNItems() : 0;
-        if (nitems > 0) {
+        size_t nitems = items.size();
+        if (nitems > 1) {
             int idx = binarySearch(
                 key, items, nitems / 2, return_prev_if_not_found, &NNTreeImpl::compareKeyItem);
             if (idx >= 0) {
                 result.setItemNumber(node, 2 * idx);
             }
-            break;
-        } else if (nkids > 0) {
+            return result;
+        }
+
+        auto kids = node.getKey("/Kids");
+        size_t nkids = kids.isArray() ? kids.size() : 0;
+        if (nkids > 0) {
             int idx = binarySearch(key, kids, nkids, true, &NNTreeImpl::compareKeyKid);
             if (idx == -1) {
-                QTC::TC("qpdf", "NNTree -1 in binary search");
                 error(node, "unexpected -1 from binary search of kids; limits may by wrong");
             }
             result.addPathElement(node, idx);
-            node = kids.getArrayItem(idx);
+            node = kids[idx];
         } else {
-            QTC::TC("qpdf", "NNTree bad node during find");
             error(node, "bad node during find");
         }
     }
-
-    return result;
 }
 
 NNTreeImpl::iterator

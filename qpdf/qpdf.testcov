@@ -543,9 +543,6 @@ NNTree split second half kid 0
 NNTree missing limits 0
 NNTree item is wrong type 0
 NNTree kid is invalid 0
-NNTree loop in find 0
-NNTree -1 in binary search 0
-NNTree bad node during find 0
 NNTree node is not a dictionary 0
 NNTree limits didn't change 0
 NNTree increment end() 0
