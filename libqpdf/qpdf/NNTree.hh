@@ -56,7 +56,7 @@ class NNTreeIterator
         return !operator==(other);
     }
 
-    void insertAfter(QPDFObjectHandle key, QPDFObjectHandle value);
+    void insertAfter(QPDFObjectHandle const& key, QPDFObjectHandle const& value);
     void remove();
 
   private:

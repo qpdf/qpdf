@@ -390,7 +390,7 @@ NNTreeIterator::lastPathElement()
 }
 
 void
-NNTreeIterator::insertAfter(QPDFObjectHandle key, QPDFObjectHandle value)
+NNTreeIterator::insertAfter(QPDFObjectHandle const& key, QPDFObjectHandle const& value)
 {
     if (!valid()) {
         QTC::TC("qpdf", "NNTree insertAfter inserts first");
@@ -400,10 +400,11 @@ NNTreeIterator::insertAfter(QPDFObjectHandle key, QPDFObjectHandle value)
     }
 
     auto items = node.getKey(impl.details.itemsKey());
-    if (!items.isArray()) {
-        impl.error(node, "node contains no items array");
-    }
-    if (items.getArrayNItems() < item_number + 2) {
+
+    if (std::cmp_less(items.size(), item_number + 2)) {
+        if (!items.isArray()) {
+            impl.error(node, "node contains no items array");
+        }
         impl.error(node, "insert: items array is too short");
     }
     items.insertItem(item_number + 2, key);
