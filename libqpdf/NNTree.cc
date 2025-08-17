@@ -12,17 +12,17 @@
 #include <utility>
 
 static std::string
-get_description(QPDFObjectHandle& node)
+get_description(QPDFObjectHandle const& node)
 {
     std::string result("Name/Number tree node");
-    if (node.isIndirect()) {
+    if (node.indirect()) {
         result += " (object " + std::to_string(node.getObjectID()) + ")";
     }
     return result;
 }
 
 void
-NNTreeImpl::warn(QPDFObjectHandle& node, std::string const& msg)
+NNTreeImpl::warn(QPDFObjectHandle const& node, std::string const& msg)
 {
     qpdf.warn(qpdf_e_damaged_pdf, get_description(node), 0, msg);
     if (++error_count > 5 && qpdf.reconstructed_xref()) {
@@ -31,7 +31,7 @@ NNTreeImpl::warn(QPDFObjectHandle& node, std::string const& msg)
 }
 
 void
-NNTreeImpl::error(QPDFObjectHandle& node, std::string const& msg)
+NNTreeImpl::error(QPDFObjectHandle const& node, std::string const& msg)
 {
     throw QPDFExc(qpdf_e_damaged_pdf, qpdf.getFilename(), get_description(node), 0, msg);
 }
@@ -701,22 +701,19 @@ NNTreeImpl::last()
 }
 
 int
-NNTreeImpl::withinLimits(QPDFObjectHandle key, QPDFObjectHandle node)
+NNTreeImpl::withinLimits(QPDFObjectHandle const& key, QPDFObjectHandle const& node)
 {
-    int result = 0;
     auto limits = node.getKey("/Limits");
-    if (limits.isArray() && (limits.getArrayNItems() >= 2) &&
-        details.keyValid(limits.getArrayItem(0)) && details.keyValid(limits.getArrayItem(1))) {
-        if (details.compareKeys(key, limits.getArrayItem(0)) < 0) {
-            result = -1;
-        } else if (details.compareKeys(key, limits.getArrayItem(1)) > 0) {
-            result = 1;
-        }
-    } else {
-        QTC::TC("qpdf", "NNTree missing limits");
+    if (!(limits.size() >= 2 && details.keyValid(limits[0]) && details.keyValid(limits[1]))) {
         error(node, "node is missing /Limits");
     }
-    return result;
+    if (details.compareKeys(key, limits[0]) < 0) {
+        return -1;
+    }
+    if (details.compareKeys(key, limits[1]) > 0) {
+        return 1;
+    }
+    return 0;
 }
 
 int
