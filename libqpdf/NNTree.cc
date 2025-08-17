@@ -57,25 +57,21 @@ NNTreeIterator::updateIValue(bool allow_invalid)
     // we must call updateIValue as well. These cases are handled, and for good measure, we also
     // call updateIValue in operator* and operator->.
 
-    bool okay = false;
-    if (item_number >= 0 && node.isDictionary()) {
-        auto items = node.getKey(impl.details.itemsKey());
-        if (item_number + 1 < items.getArrayNItems()) {
-            okay = true;
-            ivalue.first = items.getArrayItem(item_number);
-            ivalue.second = items.getArrayItem(1 + item_number);
-        } else {
-            impl.error(node, "update ivalue: items array is too short");
-        }
-    }
-    if (!okay) {
+    if (item_number < 0 || !node.isDictionary()) {
         if (!allow_invalid) {
             throw std::logic_error(
                 "attempt made to dereference an invalid name/number tree iterator");
         }
         ivalue.first = QPDFObjectHandle();
         ivalue.second = QPDFObjectHandle();
+        return;
     }
+    auto items = node.getKey(impl.details.itemsKey());
+    if (!std::cmp_less(item_number + 1, items.size())) {
+        impl.error(node, "update ivalue: items array is too short");
+    }
+    ivalue.first = items[item_number];
+    ivalue.second = items[1 + item_number];
 }
 
 NNTreeIterator::PathElement::PathElement(QPDFObjectHandle const& node, int kid_number) :
