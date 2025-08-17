@@ -866,15 +866,14 @@ NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_fo
 }
 
 NNTreeImpl::iterator
-NNTreeImpl::insertFirst(QPDFObjectHandle key, QPDFObjectHandle value)
+NNTreeImpl::insertFirst(QPDFObjectHandle const& key, QPDFObjectHandle const& value)
 {
     auto iter = begin();
     QPDFObjectHandle items;
     if (iter.node.isDictionary()) {
         items = iter.node.getKey(details.itemsKey());
     }
-    if (!(items.isArray())) {
-        QTC::TC("qpdf", "NNTree no valid items node in insertFirst");
+    if (!items.isArray()) {
         error(oh, "unable to find a valid items node");
     }
     items.insertItem(0, key);
@@ -886,30 +885,26 @@ NNTreeImpl::insertFirst(QPDFObjectHandle key, QPDFObjectHandle value)
 }
 
 NNTreeImpl::iterator
-NNTreeImpl::insert(QPDFObjectHandle key, QPDFObjectHandle value)
+NNTreeImpl::insert(QPDFObjectHandle const& key, QPDFObjectHandle const& value)
 {
     auto iter = find(key, true);
     if (!iter.valid()) {
-        QTC::TC("qpdf", "NNTree insert inserts first");
         return insertFirst(key, value);
     } else if (details.compareKeys(key, iter->first) == 0) {
-        QTC::TC("qpdf", "NNTree insert replaces");
         auto items = iter.node.getKey(details.itemsKey());
         items.setArrayItem(iter.item_number + 1, value);
         iter.updateIValue();
     } else {
-        QTC::TC("qpdf", "NNTree insert inserts after");
         iter.insertAfter(key, value);
     }
     return iter;
 }
 
 bool
-NNTreeImpl::remove(QPDFObjectHandle key, QPDFObjectHandle* value)
+NNTreeImpl::remove(QPDFObjectHandle const& key, QPDFObjectHandle* value)
 {
     auto iter = find(key, false);
     if (!iter.valid()) {
-        QTC::TC("qpdf", "NNTree remove not found");
         return false;
     }
     if (value) {

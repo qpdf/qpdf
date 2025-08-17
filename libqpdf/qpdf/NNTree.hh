@@ -100,9 +100,9 @@ class NNTreeImpl
     iterator end();
     iterator last();
     iterator find(QPDFObjectHandle key, bool return_prev_if_not_found = false);
-    iterator insertFirst(QPDFObjectHandle key, QPDFObjectHandle value);
-    iterator insert(QPDFObjectHandle key, QPDFObjectHandle value);
-    bool remove(QPDFObjectHandle key, QPDFObjectHandle* value = nullptr);
+    iterator insertFirst(QPDFObjectHandle const& key, QPDFObjectHandle const& value);
+    iterator insert(QPDFObjectHandle const& key, QPDFObjectHandle const& value);
+    bool remove(QPDFObjectHandle const& key, QPDFObjectHandle* value = nullptr);
 
     // Change the split threshold for easier testing. There's no real reason to expose this to
     // downstream tree helpers, but it has to be public so we can call it from the test suite.
