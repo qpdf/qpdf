@@ -766,23 +766,19 @@ NNTreeImpl::binarySearch(
 int
 NNTreeImpl::compareKeyItem(QPDFObjectHandle& key, QPDFObjectHandle& items, int idx)
 {
-    if (!((items.isArray() && (items.getArrayNItems() > (2 * idx)) &&
-           details.keyValid(items.getArrayItem(2 * idx))))) {
-        QTC::TC("qpdf", "NNTree item is wrong type");
+    if (!(std::cmp_greater(items.size(), 2 * idx) && details.keyValid(items[2 * idx]))) {
         error(oh, ("item at index " + std::to_string(2 * idx) + " is not the right type"));
     }
-    return details.compareKeys(key, items.getArrayItem(2 * idx));
+    return details.compareKeys(key, items[2 * idx]);
 }
 
 int
 NNTreeImpl::compareKeyKid(QPDFObjectHandle& key, QPDFObjectHandle& kids, int idx)
 {
-    if (!(kids.isArray() && (idx < kids.getArrayNItems()) &&
-          kids.getArrayItem(idx).isDictionary())) {
-        QTC::TC("qpdf", "NNTree kid is invalid");
+    if (!(std::cmp_less(idx, kids.size()) && kids[idx].isDictionary())) {
         error(oh, "invalid kid at index " + std::to_string(idx));
     }
-    return withinLimits(key, kids.getArrayItem(idx));
+    return withinLimits(key, kids[idx]);
 }
 
 void
