@@ -160,35 +160,31 @@ NNTreeIterator::increment(bool backward)
 void
 NNTreeIterator::resetLimits(QPDFObjectHandle a_node, std::list<PathElement>::iterator parent)
 {
-    bool done = false;
-    while (!done) {
+    while (true) {
         if (parent == path.end()) {
-            QTC::TC("qpdf", "NNTree remove limits from root");
             a_node.removeKey("/Limits");
-            done = true;
             break;
         }
         auto kids = a_node.getKey("/Kids");
-        int nkids = kids.isArray() ? kids.getArrayNItems() : 0;
+        size_t nkids = kids.isArray() ? kids.size() : 0;
         auto items = a_node.getKey(impl.details.itemsKey());
-        int nitems = items.isArray() ? items.getArrayNItems() : 0;
+        size_t nitems = items.size();
 
         bool changed = true;
         QPDFObjectHandle first;
         QPDFObjectHandle last;
         if (nitems >= 2) {
-            first = items.getArrayItem(0);
-            last = items.getArrayItem((nitems - 1) & ~1);
+            first = items[0];
+            last = items[(nitems - 1u) & ~1u];
         } else if (nkids > 0) {
-            auto first_kid = kids.getArrayItem(0);
-            auto last_kid = kids.getArrayItem(nkids - 1);
+            auto first_kid = kids[0];
+            auto last_kid = kids[nkids - 1u];
             if (first_kid.isDictionary() && last_kid.isDictionary()) {
                 auto first_limits = first_kid.getKey("/Limits");
                 auto last_limits = last_kid.getKey("/Limits");
-                if (first_limits.isArray() && (first_limits.getArrayNItems() >= 2) &&
-                    last_limits.isArray() && (last_limits.getArrayNItems() >= 2)) {
-                    first = first_limits.getArrayItem(0);
-                    last = last_limits.getArrayItem(1);
+                if (first_limits.size() >= 2 && last_limits.size() >= 2) {
+                    first = first_limits[0];
+                    last = last_limits[1];
                 }
             }
         }
@@ -197,13 +193,12 @@ NNTreeIterator::resetLimits(QPDFObjectHandle a_node, std::list<PathElement>::ite
             limits.appendItem(first);
             limits.appendItem(last);
             auto olimits = a_node.getKey("/Limits");
-            if (olimits.isArray() && (olimits.getArrayNItems() == 2)) {
-                auto ofirst = olimits.getArrayItem(0);
-                auto olast = olimits.getArrayItem(1);
+            if (olimits.size() == 2) {
+                auto ofirst = olimits[0];
+                auto olast = olimits[1];
                 if (impl.details.keyValid(ofirst) && impl.details.keyValid(olast) &&
                     (impl.details.compareKeys(first, ofirst) == 0) &&
                     (impl.details.compareKeys(last, olast) == 0)) {
-                    QTC::TC("qpdf", "NNTree limits didn't change");
                     changed = false;
                 }
             }
@@ -211,12 +206,11 @@ NNTreeIterator::resetLimits(QPDFObjectHandle a_node, std::list<PathElement>::ite
                 a_node.replaceKey("/Limits", limits);
             }
         } else {
-            QTC::TC("qpdf", "NNTree unable to determine limits");
             impl.warn(a_node, "unable to determine limits");
         }
 
         if (!changed || parent == path.begin()) {
-            done = true;
+            break;
         } else {
             a_node = parent->node;
             --parent;
