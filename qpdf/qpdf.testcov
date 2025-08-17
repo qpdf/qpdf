@@ -534,17 +534,7 @@ NNTree split second half kid 0
 NNTree limits didn't change 0
 NNTree increment end() 0
 NNTree insertAfter inserts first 0
-NNTree remove reset limits 0
-NNTree erased last item 0
-NNTree erased non-last item 0
-NNTree items is empty after remove 0
-NNTree erased all items on leaf/root 0
-NNTree erased first or last kid 0
-NNTree erased last kid 0
-NNTree erased non-last kid 0
-NNTree non-flat tree is empty after remove 0
-NNTree remove walking up tree 0
-NNTree erased last item in tree 0
+NNTree erased last kid/item in tree 1
 NNTree remove limits from root 0
 QPDFPageObjectHelper unresolved names 0
 QPDFPageObjectHelper resolving unresolved 0

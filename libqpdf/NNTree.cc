@@ -422,8 +422,8 @@ NNTreeIterator::remove()
         throw std::logic_error("attempt made to remove an invalid iterator");
     }
     auto items = node.getKey(impl.details.itemsKey());
-    int nitems = items.getArrayNItems();
-    if (item_number + 2 > nitems) {
+    int nitems = static_cast<int>(items.size());
+    if (std::cmp_greater(item_number + 2, nitems)) {
         impl.error(node, "found short items array while removing an item");
     }
 
@@ -437,20 +437,17 @@ NNTreeIterator::remove()
         if (item_number == 0 || item_number == nitems) {
             // We removed either the first or last item of an items array that remains non-empty, so
             // we have to adjust limits.
-            QTC::TC("qpdf", "NNTree remove reset limits");
             resetLimits(node, lastPathElement());
         }
 
         if (item_number == nitems) {
             // We removed the last item of a non-empty items array, so advance to the successor of
             // the previous item.
-            QTC::TC("qpdf", "NNTree erased last item");
             item_number -= 2;
             increment(false);
         } else if (item_number < nitems) {
             // We don't have to do anything since the removed item's successor now occupies its
             // former location.
-            QTC::TC("qpdf", "NNTree erased non-last item");
             updateIValue();
         } else {
             // We already checked to ensure this condition would not happen.
@@ -461,61 +458,51 @@ NNTreeIterator::remove()
 
     if (path.empty()) {
         // Special case: if this is the root node, we can leave it empty.
-        QTC::TC("qpdf", "NNTree erased all items on leaf/root");
         setItemNumber(impl.oh, -1);
         return;
     }
 
-    QTC::TC("qpdf", "NNTree items is empty after remove");
-
     // We removed the last item from this items array, so we need to remove this node from the
     // parent on up the tree. Then we need to position ourselves at the removed item's successor.
-    bool done = false;
-    while (!done) {
+    while (true) {
         auto element = lastPathElement();
         auto parent = element;
         --parent;
         auto kids = element->node.getKey("/Kids");
         kids.eraseItem(element->kid_number);
-        auto nkids = kids.getArrayNItems();
+        auto nkids = kids.size();
         if (nkids > 0) {
             // The logic here is similar to the items case.
-            if ((element->kid_number == 0) || (element->kid_number == nkids)) {
-                QTC::TC("qpdf", "NNTree erased first or last kid");
+            if (element->kid_number == 0 || std::cmp_equal(element->kid_number, nkids)) {
                 resetLimits(element->node, parent);
             }
-            if (element->kid_number == nkids) {
+            if (std::cmp_equal(element->kid_number, nkids)) {
                 // Move to the successor of the last child of the previous kid.
-                setItemNumber(QPDFObjectHandle(), -1);
+                setItemNumber({}, -1);
                 --element->kid_number;
-                deepen(kids.getArrayItem(element->kid_number), false, true);
+                deepen(kids[element->kid_number], false, true);
                 if (valid()) {
                     increment(false);
-                    if (!valid()) {
-                        QTC::TC("qpdf", "NNTree erased last item in tree");
-                    } else {
-                        QTC::TC("qpdf", "NNTree erased last kid");
-                    }
+                    QTC::TC("qpdf", "NNTree erased last kid/item in tree", valid() ? 0 : 1);
                 }
             } else {
                 // Next kid is in deleted kid's position
-                QTC::TC("qpdf", "NNTree erased non-last kid");
                 deepen(kids.getArrayItem(element->kid_number), true, true);
             }
-            done = true;
-        } else if (parent == path.end()) {
+            return;
+        }
+
+        if (parent == path.end()) {
             // We erased the very last item. Convert the root to an empty items array.
-            QTC::TC("qpdf", "NNTree non-flat tree is empty after remove");
             element->node.removeKey("/Kids");
             element->node.replaceKey(impl.details.itemsKey(), QPDFObjectHandle::newArray());
             path.clear();
             setItemNumber(impl.oh, -1);
-            done = true;
-        } else {
-            // Walk up the tree and continue
-            QTC::TC("qpdf", "NNTree remove walking up tree");
-            path.pop_back();
+            return;
         }
+
+        // Walk up the tree and continue
+        path.pop_back();
     }
 }
 
