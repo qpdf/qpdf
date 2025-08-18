@@ -74,7 +74,6 @@ namespace qpdf
         }
 
         QPDFObjectHandle operator[](size_t n) const;
-
         QPDFObjectHandle operator[](int n) const;
 
         std::shared_ptr<QPDFObject> copy(bool shallow = false) const;

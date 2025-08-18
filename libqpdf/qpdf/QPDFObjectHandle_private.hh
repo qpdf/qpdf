@@ -70,6 +70,10 @@ namespace qpdf
             return *this;
         }
 
+        QPDFObjectHandle const& operator[](size_t n) const;
+
+        QPDFObjectHandle const& operator[](int n) const;
+
         using iterator = std::vector<QPDFObjectHandle>::iterator;
         using const_iterator = std::vector<QPDFObjectHandle>::const_iterator;
         using const_reverse_iterator = std::vector<QPDFObjectHandle>::const_reverse_iterator;

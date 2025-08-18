@@ -180,6 +180,31 @@ Array::size() const
     return 0;
 }
 
+QPDFObjectHandle const&
+Array::operator[](size_t n) const
+{
+    static const QPDFObjectHandle null_obj;
+    auto a = as<QPDF_Array>();
+    if (!a) {
+        return null_obj;
+    }
+    if (a->sp) {
+        auto const& iter = a->sp->elements.find(n);
+        return iter == a->sp->elements.end() ? null_obj : iter->second;
+    }
+    return n >= a->elements.size() ? null_obj : a->elements[n];
+}
+
+QPDFObjectHandle const&
+Array::operator[](int n) const
+{
+    static const QPDFObjectHandle null_obj;
+    if (n < 0) {
+        return null_obj;
+    }
+    return (*this)[static_cast<size_t>(n)];
+}
+
 std::pair<bool, QPDFObjectHandle>
 Array::at(int n) const
 {
@@ -549,36 +574,13 @@ BaseHandle::size() const
 QPDFObjectHandle
 BaseHandle::operator[](size_t n) const
 {
-    switch (resolved_type_code()) {
-    case ::ot_array:
-        {
-            auto a = as<QPDF_Array>();
-            if (n >= a->size()) {
-                return {};
-            }
-            return Array(obj).at(static_cast<int>(n)).second;
-        }
-    case ::ot_uninitialized:
-    case ::ot_reserved:
-    case ::ot_null:
-    case ::ot_destroyed:
-    case ::ot_unresolved:
-    case ::ot_reference:
-        return {};
-    case ::ot_boolean:
-    case ::ot_integer:
-    case ::ot_real:
-    case ::ot_string:
-    case ::ot_name:
-    case ::ot_dictionary:
-    case ::ot_stream:
-    case ::ot_inlineimage:
-    case ::ot_operator:
-        return {obj};
-    default:
-        throw std::logic_error("Unexpected type code in size"); // unreachable
-        return {};                                              // unreachable
+    if (resolved_type_code() == ::ot_array) {
+        return Array(obj)[n];
     }
+    if (n < size()) {
+        return *this;
+    }
+    return {};
 }
 
 QPDFObjectHandle
