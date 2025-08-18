@@ -530,11 +530,9 @@ QPDFObjectHandle::eraseItem(int at)
 QPDFObjectHandle
 QPDFObjectHandle::eraseItemAndGetOld(int at)
 {
-    auto array = as_array(strict);
-    auto result =
-        (array && std::cmp_less(at, array.size()) && at >= 0) ? array.at(at).second : newNull();
+    auto result = Array(*this)[at];
     eraseItem(at);
-    return result;
+    return result ? result : newNull();
 }
 
 size_t
