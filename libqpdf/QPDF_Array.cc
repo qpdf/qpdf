@@ -350,11 +350,11 @@ Array::erase(int at_i)
 int
 QPDFObjectHandle::getArrayNItems() const
 {
-    if (auto array = as_array(strict)) {
-        return to_i(array.size());
+    auto s = size();
+    if (s > 1 || isArray()) {
+        return to_i(s);
     }
     typeWarning("array", "treating as empty");
-    QTC::TC("qpdf", "QPDFObjectHandle array treating as empty");
     return 0;
 }
 

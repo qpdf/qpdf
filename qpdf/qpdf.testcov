@@ -299,7 +299,6 @@ QPDFObjectHandle string returning empty string 0
 QPDFObjectHandle string returning empty utf8 0
 QPDFObjectHandle operator returning fake value 0
 QPDFObjectHandle inlineimage returning empty data 0
-QPDFObjectHandle array treating as empty 0
 QPDFObjectHandle array null for non-array 0
 QPDFObjectHandle array treating as empty vector 0
 QPDFObjectHandle array ignoring set item 0
