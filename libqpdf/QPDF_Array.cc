@@ -174,8 +174,10 @@ Array::null() const
 size_t
 Array::size() const
 {
-    auto a = array();
-    return a->sp ? a->sp->size : a->elements.size();
+    if (auto a = as<QPDF_Array>()) {
+        return a->sp ? a->sp->size : a->elements.size();
+    }
+    return 0;
 }
 
 std::pair<bool, QPDFObjectHandle>
