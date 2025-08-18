@@ -2,6 +2,7 @@
 
 #include <qpdf/QTC.hh>
 
+#include <array>
 #include <utility>
 
 using namespace std::literals;
@@ -381,69 +382,61 @@ QPDFObjectHandle::getArrayItem(int n) const
 bool
 QPDFObjectHandle::isRectangle() const
 {
-    if (auto array = as_array(strict)) {
-        for (int i = 0; i < 4; ++i) {
-            if (auto item = array.at(i).second; !item.isNumber()) {
-                return false;
-            }
+    Array array(*this);
+    for (auto const& oh: array) {
+        if (!oh.isNumber()) {
+            return false;
         }
-        return array.size() == 4;
     }
-    return false;
+    return array.size() == 4;
 }
 
 bool
 QPDFObjectHandle::isMatrix() const
 {
-    if (auto array = as_array(strict)) {
-        for (int i = 0; i < 6; ++i) {
-            if (auto item = array.at(i).second; !item.isNumber()) {
-                return false;
-            }
+    Array array(*this);
+    for (auto const& oh: array) {
+        if (!oh.isNumber()) {
+            return false;
         }
-        return array.size() == 6;
     }
-    return false;
+    return array.size() == 6;
 }
 
 QPDFObjectHandle::Rectangle
 QPDFObjectHandle::getArrayAsRectangle() const
 {
-    if (auto array = as_array(strict)) {
-        if (array.size() != 4) {
+    Array array(*this);
+    if (array.size() != 4) {
+        return {};
+    }
+    std::array<double, 4> items;
+    for (size_t i = 0; i < 4; ++i) {
+        if (!array[i].getValueAsNumber(items[i])) {
             return {};
         }
-        double items[4];
-        for (int i = 0; i < 4; ++i) {
-            if (auto item = array.at(i).second; !item.getValueAsNumber(items[i])) {
-                return {};
-            }
-        }
-        return {
-            std::min(items[0], items[2]),
-            std::min(items[1], items[3]),
-            std::max(items[0], items[2]),
-            std::max(items[1], items[3])};
     }
-    return {};
+    return {
+        std::min(items[0], items[2]),
+        std::min(items[1], items[3]),
+        std::max(items[0], items[2]),
+        std::max(items[1], items[3])};
 }
 
 QPDFObjectHandle::Matrix
 QPDFObjectHandle::getArrayAsMatrix() const
 {
-    if (auto array = as_array(strict)) {
-        if (array.size() != 6) {
+    Array array(*this);
+    if (array.size() != 6) {
+        return {};
+    }
+    std::array<double, 6> items;
+    for (size_t i = 0; i < 6; ++i) {
+        if (!array[i].getValueAsNumber(items[i])) {
             return {};
         }
-        double items[6];
-        for (int i = 0; i < 6; ++i) {
-            if (auto item = array.at(i).second; !item.getValueAsNumber(items[i])) {
-                return {};
-            }
-        }
-        return {items[0], items[1], items[2], items[3], items[4], items[5]};
     }
-    return {};
+    return {items[0], items[1], items[2], items[3], items[4], items[5]};
 }
 
 std::vector<QPDFObjectHandle>
