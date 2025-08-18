@@ -361,16 +361,18 @@ QPDFObjectHandle::getArrayNItems() const
 QPDFObjectHandle
 QPDFObjectHandle::getArrayItem(int n) const
 {
-    if (auto array = as_array(strict)) {
-        if (auto const [success, oh] = array.at(n); success) {
-            return oh;
-        } else {
-            objectWarning("returning null for out of bounds array access");
-            QTC::TC("qpdf", "QPDFObjectHandle array bounds");
+    if (auto array = Array(*this)) {
+        if (auto result = array[n]) {
+            return result;
         }
+        if (n >= 0 && std::cmp_less(n, array.size())) {
+            // sparse array null
+            return newNull();
+        }
+        objectWarning("returning null for out of bounds array access");
+
     } else {
         typeWarning("array", "returning null");
-        QTC::TC("qpdf", "QPDFObjectHandle array null for non-array");
     }
     static auto constexpr msg = " -> null returned from invalid array access"sv;
     return QPDF_Null::create(obj, msg, "");
