@@ -1234,11 +1234,10 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
     if (auto array = as_array(strict)) {
         int n_items = static_cast<int>(array.size());
         for (int i = 0; i < n_items; ++i) {
-            QPDFObjectHandle item = array.at(i).second;
+            QPDFObjectHandle item = array[i];
             if (item.isStream()) {
                 result.emplace_back(item);
             } else {
-                QTC::TC("qpdf", "QPDFObjectHandle non-stream in stream array");
                 item.warn(
                     {qpdf_e_damaged_pdf,
                      "",
