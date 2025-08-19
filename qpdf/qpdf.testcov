@@ -513,8 +513,6 @@ qpdf-c called qpdf_oh_unparse_resolved 0
 qpdf-c called qpdf_oh_unparse_binary 0
 QPDFWriter getFilterOnWrite false 0
 QPDFPageObjectHelper::forEachXObject 3
-NNTree repair 0
-NNTree insertAfter inserts first 0
 NNTree erased last kid/item in tree 1
 QPDFPageObjectHelper unresolved names 0
 QPDFPageObjectHelper resolving unresolved 0
