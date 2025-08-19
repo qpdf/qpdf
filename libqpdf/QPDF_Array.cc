@@ -400,7 +400,6 @@ QPDFObjectHandle::getArrayItem(int n) const
             return newNull();
         }
         objectWarning("returning null for out of bounds array access");
-
     } else {
         typeWarning("array", "returning null");
     }

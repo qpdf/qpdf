@@ -61,6 +61,13 @@ namespace qpdf
 
         // The rest of the header file is for qpdf internal use only.
 
+        // Return true if both object handles refer to the same underlying object.
+        bool
+        operator==(BaseHandle const& other) const
+        {
+            return obj == other.obj;
+        }
+
         // For arrays, return the number of items in the array.
         // For null-like objects, return 0.
         // For all other objects, return 1.
