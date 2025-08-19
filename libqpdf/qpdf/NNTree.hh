@@ -128,12 +128,12 @@ class NNTreeImpl final
 
     NNTreeImpl(
         QPDF& qpdf,
-        QPDFObjectHandle& oh,
+        QPDFObjectHandle oh,
         qpdf_object_type_e key_type,
         std::function<bool(QPDFObjectHandle const&)> value_validator,
         bool auto_repair) :
         qpdf(qpdf),
-        oh(oh),
+        oh(std::move(oh)),
         key_type(key_type),
         items_key(key_type == ::ot_string ? "/Names" : "/Nums"),
         value_valid(value_validator),

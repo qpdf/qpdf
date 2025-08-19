@@ -662,16 +662,15 @@ NNTreeImpl::compareKeyKid(QPDFObjectHandle const& key, Array const& kids, int id
 void
 NNTreeImpl::repair()
 {
-    auto new_node = QPDFObjectHandle::newDictionary();
-    new_node.replaceKey(itemsKey(), Array::empty());
+    auto new_node = Dictionary({{itemsKey(), Array::empty()}});
     NNTreeImpl repl(qpdf, new_node, key_type, value_valid, false);
     for (auto const& [key, value]: *this) {
         if (key && value) {
             repl.insert(key, value);
         }
     }
-    oh.replaceKey("/Kids", new_node.getKey("/Kids"));
-    oh.replaceKey(itemsKey(), new_node.getKey(itemsKey()));
+    oh.replaceKey("/Kids", new_node["/Kids"]);
+    oh.replaceKey(itemsKey(), new_node[itemsKey()]);
 }
 
 NNTreeImpl::iterator
@@ -757,10 +756,7 @@ NNTreeImpl::iterator
 NNTreeImpl::insertFirst(QPDFObjectHandle const& key, QPDFObjectHandle const& value)
 {
     auto iter = begin();
-    Array items;
-    if (iter.node.isDictionary()) {
-        items = iter.node.getKey(itemsKey());
-    }
+    Array items = iter.node[items_key];
     if (!items) {
         error(oh, "unable to find a valid items node");
     }
@@ -785,7 +781,7 @@ NNTreeImpl::insert(QPDFObjectHandle const& key, QPDFObjectHandle const& value)
     if (!iter.valid()) {
         return insertFirst(key, value);
     } else if (compareKeys(key, iter->first) == 0) {
-        Array items = iter.node.getKey(itemsKey());
+        Array items = iter.node[itemsKey()];
         items.set(iter.item_number + 1, value);
         iter.updateIValue();
     } else {
