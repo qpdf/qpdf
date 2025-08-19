@@ -206,18 +206,27 @@ Array::operator[](int n) const
     return (*this)[static_cast<size_t>(n)];
 }
 
-std::pair<bool, QPDFObjectHandle>
-Array::at(int n) const
+QPDFObjectHandle
+Array::get(size_t n) const
 {
+    if (n >= size()) {
+        return {};
+    }
     auto a = array();
-    if (n < 0 || std::cmp_greater_equal(n, size())) {
-        return {false, {}};
-    }
     if (!a->sp) {
-        return {true, a->elements[to_s(n)]};
+        return a->elements[n];
     }
-    auto const& iter = a->sp->elements.find(to_s(n));
-    return {true, iter == a->sp->elements.end() ? null() : iter->second};
+    auto const& iter = a->sp->elements.find(n);
+    return iter == a->sp->elements.end() ? null() : iter->second;
+}
+
+QPDFObjectHandle
+Array::get(int n) const
+{
+    if (n < 0) {
+        return {};
+    }
+    return get(to_s(n));
 }
 
 std::vector<QPDFObjectHandle>

@@ -92,7 +92,8 @@ namespace qpdf
 
         // Return the number of elements in the array. Return 0 if the object is not an array.
         size_t size() const;
-        std::pair<bool, QPDFObjectHandle> at(int n) const;
+        QPDFObjectHandle get(size_t n) const;
+        QPDFObjectHandle get(int n) const;
         bool setAt(int at, QPDFObjectHandle const& oh);
         bool insert(int at, QPDFObjectHandle const& item);
         void push_back(QPDFObjectHandle const& item);
