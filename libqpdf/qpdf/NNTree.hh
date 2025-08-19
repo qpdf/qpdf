@@ -107,7 +107,7 @@ class NNTreeIterator final
     }
     qpdf::Dictionary getNextKid(PathElement& element, bool backward);
     void increment(bool backward);
-    void resetLimits(QPDFObjectHandle node, std::list<PathElement>::iterator parent);
+    void resetLimits(qpdf::Dictionary node, std::list<PathElement>::iterator parent);
 
     void split(QPDFObjectHandle to_split, std::list<PathElement>::iterator parent);
     std::list<PathElement>::iterator lastPathElement();

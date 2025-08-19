@@ -135,60 +135,54 @@ NNTreeIterator::increment(bool backward)
 }
 
 void
-NNTreeIterator::resetLimits(QPDFObjectHandle a_node, std::list<PathElement>::iterator parent)
+NNTreeIterator::resetLimits(Dictionary a_node, std::list<PathElement>::iterator parent)
 {
     while (true) {
         if (parent == path.end()) {
-            a_node.removeKey("/Limits");
-            break;
+            a_node.erase("/Limits");
+            return;
         }
-        Array kids = a_node.getKey("/Kids");
-        size_t nkids = kids.size();
-        Array items = a_node.getKey(impl.itemsKey());
-        size_t nitems = items.size();
 
-        bool changed = true;
         QPDFObjectHandle first;
         QPDFObjectHandle last;
+        Array items = a_node[impl.itemsKey()];
+        size_t nitems = items.size();
         if (nitems >= 2) {
             first = items[0];
             last = items[(nitems - 1u) & ~1u];
-        } else if (nkids > 0) {
-            auto first_kid = kids[0];
-            auto last_kid = kids[nkids - 1u];
-            if (first_kid.isDictionary() && last_kid.isDictionary()) {
-                Array first_limits = first_kid.getKey("/Limits");
-                Array last_limits = last_kid.getKey("/Limits");
-                if (first_limits.size() >= 2 && last_limits.size() >= 2) {
+        } else {
+            Array kids = a_node["/Kids"];
+            size_t nkids = kids.size();
+            if (nkids > 0) {
+                Array first_limits = kids[0]["/Limits"];
+                if (first_limits.size() >= 2) {
                     first = first_limits[0];
-                    last = last_limits[1];
+                    last = kids[nkids - 1u]["/Limits"][1];
                 }
             }
         }
-        if (first && last) {
-            Array limits({first, last});
-            Array olimits = a_node.getKey("/Limits");
+        if (!(first && last)) {
+            impl.warn(a_node, "unable to determine limits");
+        } else {
+            Array olimits = a_node["/Limits"];
             if (olimits.size() == 2) {
                 auto ofirst = olimits[0];
                 auto olast = olimits[1];
                 if (impl.keyValid(ofirst) && impl.keyValid(olast) &&
                     impl.compareKeys(first, ofirst) == 0 && impl.compareKeys(last, olast) == 0) {
-                    changed = false;
+                    return;
                 }
             }
-            if (changed && !a_node.isSameObjectAs(path.begin()->node)) {
-                a_node.replaceKey("/Limits", limits);
+            if (a_node != path.begin()->node) {
+                a_node.replaceKey("/Limits", Array({first, last}));
             }
-        } else {
-            impl.warn(a_node, "unable to determine limits");
         }
 
-        if (!changed || parent == path.begin()) {
-            break;
-        } else {
-            a_node = parent->node;
-            --parent;
+        if (parent == path.begin()) {
+            return;
         }
+        a_node = parent->node;
+        --parent;
     }
 }
 
