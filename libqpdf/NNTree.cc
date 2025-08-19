@@ -57,21 +57,21 @@ NNTreeIterator::updateIValue(bool allow_invalid)
     // we must call updateIValue as well. These cases are handled, and for good measure, we also
     // call updateIValue in operator* and operator->.
 
+    Array items = node[impl.itemsKey()];
+    ivalue.first = items[item_number];
+    ivalue.second = items[item_number + 1];
+    if (ivalue.second) {
+        return;
+    }
+
     if (item_number < 0 || !node.isDictionary()) {
         if (!allow_invalid) {
             throw std::logic_error(
                 "attempt made to dereference an invalid name/number tree iterator");
         }
-        ivalue.first = QPDFObjectHandle();
-        ivalue.second = QPDFObjectHandle();
         return;
     }
-    Array items = node.getKey(impl.itemsKey());
-    if (!std::cmp_less(item_number + 1, items.size())) {
-        impl.error(node, "update ivalue: items array is too short");
-    }
-    ivalue.first = items[item_number];
-    ivalue.second = items[1 + item_number];
+    impl.error(node, "update ivalue: items array is too short");
 }
 
 NNTreeIterator::PathElement::PathElement(QPDFObjectHandle const& node, int kid_number) :
@@ -80,24 +80,19 @@ NNTreeIterator::PathElement::PathElement(QPDFObjectHandle const& node, int kid_n
 {
 }
 
-QPDFObjectHandle
+Dictionary
 NNTreeIterator::getNextKid(PathElement& pe, bool backward)
 {
     while (true) {
         pe.kid_number += backward ? -1 : 1;
-        Array kids = pe.node.getKey("/Kids");
-        if (pe.kid_number >= 0 && std::cmp_less(pe.kid_number, kids.size())) {
-            auto result = kids[pe.kid_number];
-            if (result.isDictionary() &&
-                (result.hasKey("/Kids") || result.hasKey(impl.itemsKey()))) {
-                return result;
-            } else {
-                impl.warn(
-                    pe.node, "skipping over invalid kid at index " + std::to_string(pe.kid_number));
-            }
-        } else {
-            return QPDFObjectHandle::newNull();
+        Dictionary result = pe.node["/Kids"][pe.kid_number];
+        if (result.contains("/Kids") || result.contains(impl.itemsKey())) {
+            return result;
         }
+        if (pe.kid_number < 0 || std::cmp_greater_equal(pe.kid_number, pe.node["/Kids"].size())) {
+            return {};
+        }
+        impl.warn(pe.node, "skipping over invalid kid at index " + std::to_string(pe.kid_number));
     }
 }
 void
@@ -110,22 +105,22 @@ NNTreeIterator::increment(bool backward)
 
     while (valid()) {
         item_number += backward ? -2 : 2;
-        Array items = node.getKey(impl.itemsKey());
+        Array items = node[impl.itemsKey()];
         if (item_number < 0 || std::cmp_greater_equal(item_number, items.size())) {
-            bool found = false;
             setItemNumber(QPDFObjectHandle(), -1);
-            while (!(found || path.empty())) {
+            while (!path.empty()) {
                 auto& element = path.back();
-                auto pe_node = getNextKid(element, backward);
-                if (pe_node.null()) {
-                    path.pop_back();
+                if (auto pe_node = getNextKid(element, backward)) {
+                    if (deepen(pe_node, !backward, false)) {
+                        break;
+                    }
                 } else {
-                    found = deepen(pe_node, !backward, false);
+                    path.pop_back();
                 }
             }
         }
         if (item_number >= 0) {
-            items = node.getKey(impl.itemsKey());
+            items = node[impl.itemsKey()];
             if (std::cmp_greater_equal(item_number + 1, items.size())) {
                 impl.warn(node, "items array doesn't have enough elements");
             } else if (!impl.keyValid(items[item_number])) {
