@@ -13,11 +13,11 @@ namespace qpdf
     {
       public:
         // Create an empty Array. If 'empty' is false, create a null Array.
-        Array(bool empty = true);
+        explicit Array(bool empty = true);
 
-        Array(std::vector<QPDFObjectHandle> const& items);
+        explicit Array(std::vector<QPDFObjectHandle> const& items);
 
-        Array(std::vector<QPDFObjectHandle>&& items);
+        explicit Array(std::vector<QPDFObjectHandle>&& items);
 
         Array(Array const& other) :
             BaseHandle(other.obj)

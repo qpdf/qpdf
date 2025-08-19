@@ -95,9 +95,9 @@ namespace qpdf
 
       protected:
         BaseHandle() = default;
-        BaseHandle(std::shared_ptr<QPDFObject> const& obj) :
+        explicit BaseHandle(std::shared_ptr<QPDFObject> const& obj) :
             obj(obj) {};
-        BaseHandle(std::shared_ptr<QPDFObject>&& obj) :
+        explicit BaseHandle(std::shared_ptr<QPDFObject>&& obj) :
             obj(std::move(obj)) {};
         BaseHandle(BaseHandle const&) = default;
         BaseHandle& operator=(BaseHandle const&) = default;

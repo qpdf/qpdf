@@ -1706,18 +1706,6 @@ QPDFObjectHandle::newInlineImage(std::string const& value)
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::newArray()
-{
-    return newArray(std::vector<QPDFObjectHandle>());
-}
-
-QPDFObjectHandle
-QPDFObjectHandle::newArray(std::vector<QPDFObjectHandle> const& items)
-{
-    return {QPDFObject::create<QPDF_Array>(items)};
-}
-
-QPDFObjectHandle
 QPDFObjectHandle::newArray(Rectangle const& rect)
 {
     return newArray({newReal(rect.llx), newReal(rect.lly), newReal(rect.urx), newReal(rect.ury)});
