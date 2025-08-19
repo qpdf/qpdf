@@ -382,7 +382,7 @@ NNTreeIterator::remove()
     if (!valid()) {
         throw std::logic_error("attempt made to remove an invalid iterator");
     }
-    Array items = node.getKey(impl.itemsKey());
+    Array items = node[impl.itemsKey()];
     int nitems = static_cast<int>(items.size());
     if (std::cmp_greater(item_number + 2, nitems)) {
         impl.error(node, "found short items array while removing an item");
@@ -429,7 +429,7 @@ NNTreeIterator::remove()
         auto element = lastPathElement();
         auto parent = element;
         --parent;
-        Array kids = element->node.getKey("/Kids");
+        Array kids = element->node["/Kids"];
         kids.erase(element->kid_number);
         auto nkids = kids.size();
         if (nkids > 0) {
@@ -489,14 +489,14 @@ NNTreeIterator::operator==(NNTreeIterator const& other) const
 }
 
 bool
-NNTreeIterator::deepen(QPDFObjectHandle a_node, bool first, bool allow_empty)
+NNTreeIterator::deepen(Dictionary a_node, bool first, bool allow_empty)
 {
     // Starting at this node, descend through the first or last kid until we reach a node with
     // items. If we succeed, return true; otherwise return false and leave path alone.
 
     auto opath = path;
 
-    auto fail = [this, &opath](QPDFObjectHandle const& failed_node, std::string const& msg) {
+    auto fail = [this, &opath](Dictionary const& failed_node, std::string const& msg) {
         impl.warn(failed_node, msg);
         path = opath;
         return false;
@@ -511,51 +511,52 @@ NNTreeIterator::deepen(QPDFObjectHandle a_node, bool first, bool allow_empty)
             return fail(a_node, "loop detected while traversing name/number tree");
         }
 
-        if (!a_node.isDictionary()) {
+        if (!a_node) {
             return fail(a_node, "non-dictionary node while traversing name/number tree");
         }
 
-        Array items = a_node.getKey(impl.itemsKey());
+        Array items = a_node[impl.itemsKey()];
         int nitems = static_cast<int>(items.size());
         if (nitems > 1) {
             setItemNumber(a_node, first ? 0 : nitems - 2);
-            break;
+            return true;
         }
 
-        Array kids = a_node.getKey("/Kids");
+        Array kids = a_node["/Kids"];
         int nkids = static_cast<int>(kids.size());
-        if (nkids > 0) {
-            int kid_number = first ? 0 : nkids - 1;
-            addPathElement(a_node, kid_number);
-            auto next = kids[kid_number];
-            if (!next) {
-                return fail(a_node, "kid number " + std::to_string(kid_number) + " is invalid");
+        if (nkids == 0) {
+            if (allow_empty && items) {
+                setItemNumber(a_node, -1);
+                return true;
             }
-            if (!next.indirect()) {
-                if (impl.auto_repair) {
-                    impl.warn(
-                        a_node,
-                        "converting kid number " + std::to_string(kid_number) +
-                            " to an indirect object");
-                    next = impl.qpdf.makeIndirectObject(next);
-                    kids.set(kid_number, next);
-                } else {
-                    impl.warn(
-                        a_node,
-                        "kid number " + std::to_string(kid_number) + " is not an indirect object");
-                }
-            }
-            a_node = next;
-        } else if (allow_empty && items) {
-            setItemNumber(a_node, -1);
-            break;
-        } else {
             return fail(
                 a_node,
                 "name/number tree node has neither non-empty " + impl.itemsKey() + " nor /Kids");
         }
+
+        int kid_number = first ? 0 : nkids - 1;
+        addPathElement(a_node, kid_number);
+        Dictionary next = kids[kid_number];
+        if (!next) {
+            return fail(a_node, "kid number " + std::to_string(kid_number) + " is invalid");
+        }
+        if (!next.indirect()) {
+            if (impl.auto_repair) {
+                impl.warn(
+                    a_node,
+                    "converting kid number " + std::to_string(kid_number) +
+                        " to an indirect object");
+                next = impl.qpdf.makeIndirectObject(next);
+                kids.set(kid_number, next);
+            } else {
+                impl.warn(
+                    a_node,
+                    "kid number " + std::to_string(kid_number) + " is not an indirect object");
+            }
+        }
+
+        a_node = next;
     }
-    return true;
 }
 
 NNTreeImpl::iterator

@@ -33,7 +33,7 @@ WARNING: name-tree.pdf (Name/Number tree node (object 17)): skipping over invali
 B
 W
 /Bad3 -- invalid kid
-WARNING: name-tree.pdf (Name/Number tree node (object 25)): non-dictionary node while traversing name/number tree
+WARNING: name-tree.pdf (Name/Number tree node (object 22)): kid number 0 is invalid
 /Bad4 -- invalid kid
 WARNING: name-tree.pdf (Name/Number tree node (object 23)): attempting to repair after error: name-tree.pdf (Name/Number tree node (object 23)): invalid kid at index 1
 WARNING: name-tree.pdf (Name/Number tree node (object 23)): skipping over invalid kid at index 1

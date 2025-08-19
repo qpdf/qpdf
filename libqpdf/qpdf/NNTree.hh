@@ -92,7 +92,7 @@ class NNTreeIterator final
     {
     }
     void updateIValue(bool allow_invalid = true);
-    bool deepen(QPDFObjectHandle node, bool first, bool allow_empty);
+    bool deepen(qpdf::Dictionary node, bool first, bool allow_empty);
     void
     setItemNumber(QPDFObjectHandle const& a_node, int n)
     {
