@@ -94,7 +94,8 @@ namespace qpdf
         size_t size() const;
         QPDFObjectHandle get(size_t n) const;
         QPDFObjectHandle get(int n) const;
-        bool setAt(int at, QPDFObjectHandle const& oh);
+        bool set(size_t at, QPDFObjectHandle const& oh);
+        bool set(int at, QPDFObjectHandle const& oh);
         bool insert(int at, QPDFObjectHandle const& item);
         void push_back(QPDFObjectHandle const& item);
         bool erase(int at);

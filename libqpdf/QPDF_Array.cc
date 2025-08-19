@@ -248,19 +248,28 @@ Array::getAsVector() const
 }
 
 bool
-Array::setAt(int at, QPDFObjectHandle const& oh)
+Array::set(size_t at, QPDFObjectHandle const& oh)
 {
-    if (at < 0 || std::cmp_greater_equal(at, size())) {
+    if (at >= size()) {
         return false;
     }
     auto a = array();
     checkOwnership(oh);
     if (a->sp) {
-        a->sp->elements[to_s(at)] = oh;
+        a->sp->elements[at] = oh;
     } else {
-        a->elements[to_s(at)] = oh;
+        a->elements[at] = oh;
     }
     return true;
+}
+
+bool
+Array::set(int at, QPDFObjectHandle const& oh)
+{
+    if (at < 0) {
+        return false;
+    }
+    return set(to_s(at), oh);
 }
 
 void
@@ -463,13 +472,11 @@ void
 QPDFObjectHandle::setArrayItem(int n, QPDFObjectHandle const& item)
 {
     if (auto array = as_array(strict)) {
-        if (!array.setAt(n, item)) {
+        if (!array.set(n, item)) {
             objectWarning("ignoring attempt to set out of bounds array item");
-            QTC::TC("qpdf", "QPDFObjectHandle set array bounds");
         }
     } else {
         typeWarning("array", "ignoring attempt to set item");
-        QTC::TC("qpdf", "QPDFObjectHandle array ignoring set item");
     }
 }
 void

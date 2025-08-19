@@ -66,9 +66,9 @@ main()
     assert(a[4].isNull());
     assert(a[5].isNull());
 
-    a.setAt(4, QPDFObjectHandle::parse("12"));
+    a.set(4, QPDFObjectHandle::parse("12"));
     assert(a[4].isInteger() && (a[4].getIntValue() == 12));
-    a.setAt(4, QPDFObjectHandle::newNull());
+    a.set(4, QPDFObjectHandle::newNull());
     assert(a[4].isNull());
 
     a.erase(to_i(a.size()) - 1);
@@ -96,8 +96,8 @@ main()
     obj = QPDFObject::create<QPDF_Array>(
         std::vector<QPDFObjectHandle>{10, "null"_qpdf.getObj()}, true);
     auto b = qpdf::Array(obj);
-    b.setAt(5, pdf.newIndirectNull());
-    b.setAt(7, "[0 1 2 3]"_qpdf);
+    b.set(5, pdf.newIndirectNull());
+    b.set(7, "[0 1 2 3]"_qpdf);
     assert(b[3].null());
     assert(b[8].null());
     assert(b[5].indirect());
@@ -111,7 +111,7 @@ main()
     assert(d.unparse() == "[ null null null null null 3 0 R null [ 0 1 2 3 ] null null ]");
 
     try {
-        b.setAt(3, {});
+        b.set(3, {});
         std::cout << "inserted uninitialized object\n";
     } catch (std::logic_error&) {
     }
@@ -119,7 +119,7 @@ main()
     pdf2.emptyPDF();
     try {
         pdf.makeIndirectObject(obj);
-        b.setAt(3, pdf2.getObject(1, 0));
+        b.set(3, pdf2.getObject(1, 0));
         std::cout << "inserted uninitialized object\n";
     } catch (std::logic_error&) {
     }
