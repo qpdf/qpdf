@@ -83,6 +83,8 @@ namespace qpdf
         QPDFObjectHandle operator[](size_t n) const;
         QPDFObjectHandle operator[](int n) const;
 
+        QPDFObjectHandle const& operator[](std::string const& key) const;
+
         std::shared_ptr<QPDFObject> copy(bool shallow = false) const;
         // Recursively remove association with any QPDF object. This method may only be called
         // during final destruction.

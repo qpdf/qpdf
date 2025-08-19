@@ -16,6 +16,19 @@ BaseDictionary::dict() const
     return nullptr; // unreachable
 }
 
+QPDFObjectHandle const&
+BaseHandle::operator[](std::string const& key) const
+{
+    if (auto d = as<QPDF_Dictionary>()) {
+        auto it = d->items.find(key);
+        if (it != d->items.end()) {
+            return it->second;
+        }
+    }
+    static const QPDFObjectHandle null_obj;
+    return null_obj;
+}
+
 bool
 BaseDictionary::hasKey(std::string const& key) const
 {
@@ -78,13 +91,28 @@ BaseDictionary::replaceKey(std::string const& key, QPDFObjectHandle value)
     }
 }
 
+Dictionary::Dictionary(std::map<std::string, QPDFObjectHandle>&& dict) :
+    BaseDictionary(std::move(dict))
+{
+}
+
+Dictionary::Dictionary(std::shared_ptr<QPDFObject> const& obj) :
+    BaseDictionary(obj)
+{
+}
+
+Dictionary
+Dictionary::empty()
+{
+    return Dictionary(std::map<std::string, QPDFObjectHandle>());
+}
+
 void
 QPDFObjectHandle::checkOwnership(QPDFObjectHandle const& item) const
 {
     auto qpdf = getOwningQPDF();
     auto item_qpdf = item.getOwningQPDF();
     if (qpdf && item_qpdf && qpdf != item_qpdf) {
-        QTC::TC("qpdf", "QPDFObjectHandle check ownership");
         throw std::logic_error(
             "Attempting to add an object from a different QPDF. Use "
             "QPDF::copyForeignObject to add objects from another file.");

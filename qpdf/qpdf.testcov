@@ -537,7 +537,6 @@ QPDFWriter preserve object streams 0
 QPDFWriter preserve object streams preserve unreferenced 0
 QPDFWriter exclude from object stream 0
 QPDF_pages findPage not found 0
-QPDFObjectHandle check ownership 0
 QPDFJob weak crypto error 0
 qpdf-c called qpdf_oh_is_initialized 0
 qpdf-c registered progress reporter 0

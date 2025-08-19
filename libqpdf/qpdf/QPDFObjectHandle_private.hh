@@ -119,6 +119,14 @@ namespace qpdf
     class BaseDictionary: public BaseHandle
     {
       public:
+        // The following methods are not part of the public API.
+        bool hasKey(std::string const& key) const;
+        QPDFObjectHandle getKey(std::string const& key) const;
+        std::set<std::string> getKeys();
+        std::map<std::string, QPDFObjectHandle> const& getAsMap() const;
+        void removeKey(std::string const& key);
+        void replaceKey(std::string const& key, QPDFObjectHandle value);
+
         using iterator = std::map<std::string, QPDFObjectHandle>::iterator;
         using const_iterator = std::map<std::string, QPDFObjectHandle>::const_iterator;
         using reverse_iterator = std::map<std::string, QPDFObjectHandle>::reverse_iterator;
@@ -197,41 +205,87 @@ namespace qpdf
             return {};
         }
 
-        // The following methods are not part of the public API.
-        bool hasKey(std::string const& key) const;
-        QPDFObjectHandle getKey(std::string const& key) const;
-        std::set<std::string> getKeys();
-        std::map<std::string, QPDFObjectHandle> const& getAsMap() const;
-        void removeKey(std::string const& key);
-        void replaceKey(std::string const& key, QPDFObjectHandle value);
-
       protected:
         BaseDictionary() = default;
-        BaseDictionary(std::shared_ptr<QPDFObject> const& obj) :
-            BaseHandle(obj) {};
-        BaseDictionary(std::shared_ptr<QPDFObject>&& obj) :
-            BaseHandle(std::move(obj)) {};
+
+        explicit BaseDictionary(std::map<std::string, QPDFObjectHandle> const& dict) :
+            BaseHandle(QPDFObject::create<QPDF_Dictionary>(dict))
+        {
+        }
+
+        explicit BaseDictionary(std::map<std::string, QPDFObjectHandle>&& dict) :
+            BaseHandle(QPDFObject::create<QPDF_Dictionary>(std::move(dict)))
+        {
+        }
+
+        explicit BaseDictionary(std::shared_ptr<QPDFObject> const& obj) :
+            BaseHandle(obj)
+        {
+        }
+        explicit BaseDictionary(std::shared_ptr<QPDFObject>&& obj) :
+            BaseHandle(std::move(obj))
+        {
+        }
         BaseDictionary(BaseDictionary const&) = default;
         BaseDictionary& operator=(BaseDictionary const&) = default;
         BaseDictionary(BaseDictionary&&) = default;
         BaseDictionary& operator=(BaseDictionary&&) = default;
+
+        explicit BaseDictionary(QPDFObjectHandle const& oh) :
+            BaseHandle(oh.resolved_type_code() == ::ot_dictionary ? oh : QPDFObjectHandle())
+        {
+        }
+
+        explicit BaseDictionary(QPDFObjectHandle&& oh) :
+            BaseHandle(
+                oh.resolved_type_code() == ::ot_dictionary ? std::move(oh) : QPDFObjectHandle())
+        {
+        }
         ~BaseDictionary() = default;
 
         QPDF_Dictionary* dict() const;
     };
 
+    // Dictionary only defines con/destructors. All other methods are inherited from BaseDictionary.
     class Dictionary final: public BaseDictionary
     {
       public:
-        explicit Dictionary(std::shared_ptr<QPDFObject> const& obj) :
-            BaseDictionary(obj)
+        Dictionary() = default;
+        explicit Dictionary(std::map<std::string, QPDFObjectHandle>&& dict);
+        explicit Dictionary(std::shared_ptr<QPDFObject> const& obj);
+
+        static Dictionary empty();
+
+        Dictionary(Dictionary const&) = default;
+        Dictionary& operator=(Dictionary const&) = default;
+        Dictionary(Dictionary&&) = default;
+        Dictionary& operator=(Dictionary&&) = default;
+
+        Dictionary(QPDFObjectHandle const& oh) :
+            BaseDictionary(oh)
         {
         }
 
-        explicit Dictionary(std::shared_ptr<QPDFObject>&& obj) :
-            BaseDictionary(std::move(obj))
+        Dictionary&
+        operator=(QPDFObjectHandle const& oh)
+        {
+            assign(::ot_dictionary, oh);
+            return *this;
+        }
+
+        Dictionary(QPDFObjectHandle&& oh) :
+            BaseDictionary(std::move(oh))
         {
         }
+
+        Dictionary&
+        operator=(QPDFObjectHandle&& oh)
+        {
+            assign(::ot_dictionary, std::move(oh));
+            return *this;
+        }
+
+        ~Dictionary() = default;
     };
 
     class Name final: public BaseHandle
