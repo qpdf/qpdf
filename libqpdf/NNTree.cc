@@ -337,11 +337,7 @@ NNTreeIterator::split(Dictionary to_split, std::list<PathElement>::iterator pare
 std::list<NNTreeIterator::PathElement>::iterator
 NNTreeIterator::lastPathElement()
 {
-    auto result = path.end();
-    if (!path.empty()) {
-        --result;
-    }
-    return result;
+    return path.empty() ? path.end() : std::prev(path.end());
 }
 
 void
