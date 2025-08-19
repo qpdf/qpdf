@@ -187,7 +187,7 @@ NNTreeIterator::resetLimits(Dictionary a_node, std::list<PathElement>::iterator 
 }
 
 void
-NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterator parent)
+NNTreeIterator::split(Dictionary to_split, std::list<PathElement>::iterator parent)
 {
     // Split some node along the path to the item pointed to by this iterator, and adjust the
     // iterator so it points to the same item.
@@ -221,9 +221,9 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
     }
 
     // Find the array we actually need to split, which is either this node's kids or items.
-    Array kids = to_split.getKey("/Kids");
+    Array kids = to_split["/Kids"];
     size_t nkids = kids.size();
-    Array items = to_split.getKey(impl.itemsKey());
+    Array items = to_split[impl.itemsKey()];
     size_t nitems = items.size();
 
     Array first_half;
@@ -267,12 +267,11 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
         // is the new first half. In this way, we make the root case identical to the non-root case
         // so remaining logic can handle them in the same way.
 
-        auto first_node = impl.qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
-        first_node.replaceKey(key, first_half);
+        Dictionary first_node = impl.qpdf.makeIndirectObject(Dictionary({{key, first_half}}));
         auto new_kids = Array::empty();
         new_kids.push_back(first_node);
-        to_split.removeKey("/Limits"); // already shouldn't be there for root
-        to_split.removeKey(impl.itemsKey());
+        to_split.erase("/Limits"); // already shouldn't be there for root
+        to_split.erase(impl.itemsKey());
         to_split.replaceKey("/Kids", new_kids);
         if (is_leaf) {
             node = first_node;
@@ -299,8 +298,7 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
     resetLimits(to_split, parent);
 
     // Create a new node to contain the second half
-    QPDFObjectHandle second_node = impl.qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
-    second_node.replaceKey(key, second_half);
+    Dictionary second_node = impl.qpdf.makeIndirectObject(Dictionary({{key, second_half}}));
     resetLimits(second_node, parent);
 
     // CURRENT STATE: half the items from the kids or items array in the node being split have been
@@ -311,7 +309,7 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
     // kid_number to traverse through it. We need to update to_split's path element, or the node if
     // this is a leaf, so that the kid/item number points to the right place.
 
-    Array parent_kids = parent->node.getKey("/Kids");
+    Array parent_kids = parent->node["/Kids"];
     if (!parent_kids) {
         impl.error(parent->node, "parent node has no /Kids array");
     }
