@@ -285,41 +285,46 @@ Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
 }
 
 bool
-Array::insert(int at_i, QPDFObjectHandle const& item)
+Array::insert(size_t at, QPDFObjectHandle const& item)
 {
     auto a = array();
     size_t sz = size();
-    if (at_i < 0) {
-        return false;
-    }
-    size_t at = to_s(at_i);
     if (at > sz) {
         return false;
     }
+    checkOwnership(item);
     if (at == sz) {
         // As special case, also allow insert beyond the end
         push_back(item);
         return true;
     }
-    checkOwnership(item);
-    if (a->sp) {
-        auto iter = a->sp->elements.crbegin();
-        while (iter != a->sp->elements.crend()) {
-            auto key = (iter++)->first;
-            if (key >= at) {
-                auto nh = a->sp->elements.extract(key);
-                ++nh.key();
-                a->sp->elements.insert(std::move(nh));
-            } else {
-                break;
-            }
-        }
-        a->sp->elements[at] = item;
-        ++a->sp->size;
-    } else {
-        a->elements.insert(a->elements.cbegin() + at_i, item);
+    if (!a->sp) {
+        a->elements.insert(a->elements.cbegin() + to_i(at), item);
+        return true;
     }
+    auto iter = a->sp->elements.crbegin();
+    while (iter != a->sp->elements.crend()) {
+        auto key = (iter++)->first;
+        if (key >= at) {
+            auto nh = a->sp->elements.extract(key);
+            ++nh.key();
+            a->sp->elements.insert(std::move(nh));
+        } else {
+            break;
+        }
+    }
+    a->sp->elements[at] = item;
+    ++a->sp->size;
     return true;
+}
+
+bool
+Array::insert(int at_i, QPDFObjectHandle const& item)
+{
+    if (at_i < 0) {
+        return false;
+    }
+    return insert(to_s(at_i), item);
 }
 
 void
