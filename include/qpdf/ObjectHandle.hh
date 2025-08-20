@@ -83,6 +83,7 @@ namespace qpdf
         QPDFObjectHandle operator[](size_t n) const;
         QPDFObjectHandle operator[](int n) const;
 
+        bool contains(std::string const& key) const;
         QPDFObjectHandle const& operator[](std::string const& key) const;
 
         std::shared_ptr<QPDFObject> copy(bool shallow = false) const;

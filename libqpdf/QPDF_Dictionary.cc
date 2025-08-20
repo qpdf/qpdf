@@ -30,10 +30,9 @@ BaseHandle::operator[](std::string const& key) const
 }
 
 bool
-BaseDictionary::hasKey(std::string const& key) const
+BaseHandle::contains(std::string const& key) const
 {
-    auto d = dict();
-    return d->items.contains(key) && !d->items[key].null();
+    return !(*this)[key].null();
 }
 
 QPDFObjectHandle
@@ -122,9 +121,8 @@ QPDFObjectHandle::checkOwnership(QPDFObjectHandle const& item) const
 bool
 QPDFObjectHandle::hasKey(std::string const& key) const
 {
-    auto dict = as_dictionary(strict);
-    if (dict) {
-        return dict.hasKey(key);
+    if (Dictionary dict = *this) {
+        return dict.contains(key);
     } else {
         typeWarning("dictionary", "returning false for a key containment request");
         QTC::TC("qpdf", "QPDFObjectHandle dictionary false for hasKey");
