@@ -11,6 +11,8 @@
 #include <exception>
 #include <utility>
 
+using namespace qpdf;
+
 static std::string
 get_description(QPDFObjectHandle const& node)
 {
@@ -66,7 +68,7 @@ NNTreeIterator::updateIValue(bool allow_invalid)
         ivalue.second = QPDFObjectHandle();
         return;
     }
-    auto items = node.getKey(impl.details.itemsKey());
+    Array items = node.getKey(impl.details.itemsKey());
     if (!std::cmp_less(item_number + 1, items.size())) {
         impl.error(node, "update ivalue: items array is too short");
     }
@@ -85,7 +87,7 @@ NNTreeIterator::getNextKid(PathElement& pe, bool backward)
 {
     while (true) {
         pe.kid_number += backward ? -1 : 1;
-        auto kids = pe.node.getKey("/Kids");
+        Array kids = pe.node.getKey("/Kids");
         if (pe.kid_number >= 0 && std::cmp_less(pe.kid_number, kids.size())) {
             auto result = kids[pe.kid_number];
             if (result.isDictionary() &&
@@ -117,7 +119,7 @@ NNTreeIterator::increment(bool backward)
 
     while (valid()) {
         item_number += backward ? -2 : 2;
-        auto items = node.getKey(impl.details.itemsKey());
+        Array items = node.getKey(impl.details.itemsKey());
         if (item_number < 0 || std::cmp_greater_equal(item_number, items.size())) {
             bool found = false;
             setItemNumber(QPDFObjectHandle(), -1);
@@ -152,9 +154,9 @@ NNTreeIterator::resetLimits(QPDFObjectHandle a_node, std::list<PathElement>::ite
             a_node.removeKey("/Limits");
             break;
         }
-        auto kids = a_node.getKey("/Kids");
-        size_t nkids = kids.isArray() ? kids.size() : 0;
-        auto items = a_node.getKey(impl.details.itemsKey());
+        Array kids = a_node.getKey("/Kids");
+        size_t nkids = kids.size();
+        Array items = a_node.getKey(impl.details.itemsKey());
         size_t nitems = items.size();
 
         bool changed = true;
@@ -167,8 +169,8 @@ NNTreeIterator::resetLimits(QPDFObjectHandle a_node, std::list<PathElement>::ite
             auto first_kid = kids[0];
             auto last_kid = kids[nkids - 1u];
             if (first_kid.isDictionary() && last_kid.isDictionary()) {
-                auto first_limits = first_kid.getKey("/Limits");
-                auto last_limits = last_kid.getKey("/Limits");
+                Array first_limits = first_kid.getKey("/Limits");
+                Array last_limits = last_kid.getKey("/Limits");
                 if (first_limits.size() >= 2 && last_limits.size() >= 2) {
                     first = first_limits[0];
                     last = last_limits[1];
@@ -176,16 +178,14 @@ NNTreeIterator::resetLimits(QPDFObjectHandle a_node, std::list<PathElement>::ite
             }
         }
         if (first && last) {
-            auto limits = QPDFObjectHandle::newArray();
-            limits.appendItem(first);
-            limits.appendItem(last);
-            auto olimits = a_node.getKey("/Limits");
+            Array limits({first, last});
+            Array olimits = a_node.getKey("/Limits");
             if (olimits.size() == 2) {
                 auto ofirst = olimits[0];
                 auto olast = olimits[1];
                 if (impl.details.keyValid(ofirst) && impl.details.keyValid(olast) &&
-                    (impl.details.compareKeys(first, ofirst) == 0) &&
-                    (impl.details.compareKeys(last, olast) == 0)) {
+                    impl.details.compareKeys(first, ofirst) == 0 &&
+                    impl.details.compareKeys(last, olast) == 0) {
                     changed = false;
                 }
             }
@@ -240,24 +240,23 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
     }
 
     // Find the array we actually need to split, which is either this node's kids or items.
-    auto kids = to_split.getKey("/Kids");
-    int nkids = kids.isArray() ? static_cast<int>(kids.size()) : 0;
-    auto items = to_split.getKey(impl.details.itemsKey());
-    int nitems = items.isArray() ? static_cast<int>(items.size()) : 0;
+    Array kids = to_split.getKey("/Kids");
+    size_t nkids = kids.size();
+    Array items = to_split.getKey(impl.details.itemsKey());
+    size_t nitems = items.size();
 
-    QPDFObjectHandle first_half;
-    int n = 0;
+    Array first_half;
+    size_t n = 0;
     std::string key;
-    int threshold = 0;
+    size_t threshold = static_cast<size_t>(impl.split_threshold);
     if (nkids > 0) {
         first_half = kids;
         n = nkids;
-        threshold = impl.split_threshold;
         key = "/Kids";
     } else if (nitems > 0) {
         first_half = items;
         n = nitems;
-        threshold = 2 * impl.split_threshold;
+        threshold *= 2;
         key = impl.details.itemsKey();
     } else {
         throw std::logic_error("NNTreeIterator::split called on invalid node");
@@ -289,8 +288,8 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
 
         auto first_node = impl.qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
         first_node.replaceKey(key, first_half);
-        QPDFObjectHandle new_kids = QPDFObjectHandle::newArray();
-        new_kids.appendItem(first_node);
+        Array new_kids;
+        new_kids.push_back(first_node);
         to_split.removeKey("/Limits"); // already shouldn't be there for root
         to_split.removeKey(impl.details.itemsKey());
         to_split.replaceKey("/Kids", new_kids);
@@ -310,11 +309,11 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
 
     // Create a second half array, and transfer the second half of the items into the second half
     // array.
-    QPDFObjectHandle second_half = QPDFObjectHandle::newArray();
-    int start_idx = ((n / 2) & ~1);
+    Array second_half;
+    auto start_idx = static_cast<int>((n / 2) & ~1u);
     while (std::cmp_greater(first_half.size(), start_idx)) {
-        second_half.appendItem(first_half[start_idx]);
-        first_half.eraseItem(start_idx);
+        second_half.push_back(first_half[start_idx]);
+        first_half.erase(start_idx);
     }
     resetLimits(to_split, parent);
 
@@ -331,8 +330,8 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
     // kid_number to traverse through it. We need to update to_split's path element, or the node if
     // this is a leaf, so that the kid/item number points to the right place.
 
-    auto parent_kids = parent->node.getKey("/Kids");
-    parent_kids.insertItem(parent->kid_number + 1, second_node);
+    Array parent_kids = parent->node.getKey("/Kids");
+    parent_kids.insert(parent->kid_number + 1, second_node);
     auto cur_elem = parent;
     ++cur_elem; // points to end() for leaf nodes
     int old_idx = (is_leaf ? item_number : cur_elem->kid_number);
@@ -367,22 +366,21 @@ void
 NNTreeIterator::insertAfter(QPDFObjectHandle const& key, QPDFObjectHandle const& value)
 {
     if (!valid()) {
-        QTC::TC("qpdf", "NNTree insertAfter inserts first");
         impl.insertFirst(key, value);
         deepen(impl.oh, true, false);
         return;
     }
 
-    auto items = node.getKey(impl.details.itemsKey());
+    Array items = node.getKey(impl.details.itemsKey());
+    if (!items) {
+        impl.error(node, "node contains no items array");
+    }
 
     if (std::cmp_less(items.size(), item_number + 2)) {
-        if (!items.isArray()) {
-            impl.error(node, "node contains no items array");
-        }
         impl.error(node, "insert: items array is too short");
     }
-    items.insertItem(item_number + 2, key);
-    items.insertItem(item_number + 3, value);
+    items.insert(item_number + 2, key);
+    items.insert(item_number + 3, value);
     resetLimits(node, lastPathElement());
     split(node, lastPathElement());
     increment(false);
@@ -396,14 +394,14 @@ NNTreeIterator::remove()
     if (!valid()) {
         throw std::logic_error("attempt made to remove an invalid iterator");
     }
-    auto items = node.getKey(impl.details.itemsKey());
+    Array items = node.getKey(impl.details.itemsKey());
     int nitems = static_cast<int>(items.size());
     if (std::cmp_greater(item_number + 2, nitems)) {
         impl.error(node, "found short items array while removing an item");
     }
 
-    items.eraseItem(item_number);
-    items.eraseItem(item_number);
+    items.erase(item_number);
+    items.erase(item_number);
     nitems -= 2;
 
     if (nitems > 0) {
@@ -443,8 +441,8 @@ NNTreeIterator::remove()
         auto element = lastPathElement();
         auto parent = element;
         --parent;
-        auto kids = element->node.getKey("/Kids");
-        kids.eraseItem(element->kid_number);
+        Array kids = element->node.getKey("/Kids");
+        kids.erase(element->kid_number);
         auto nkids = kids.size();
         if (nkids > 0) {
             // The logic here is similar to the items case.
@@ -462,7 +460,7 @@ NNTreeIterator::remove()
                 }
             } else {
                 // Next kid is in deleted kid's position
-                deepen(kids.getArrayItem(element->kid_number), true, true);
+                deepen(kids.get(element->kid_number), true, true);
             }
             return;
         }
@@ -470,7 +468,7 @@ NNTreeIterator::remove()
         if (parent == path.end()) {
             // We erased the very last item. Convert the root to an empty items array.
             element->node.removeKey("/Kids");
-            element->node.replaceKey(impl.details.itemsKey(), QPDFObjectHandle::newArray());
+            element->node.replaceKey(impl.details.itemsKey(), Array());
             path.clear();
             setItemNumber(impl.oh, -1);
             return;
@@ -527,10 +525,7 @@ NNTreeIterator::operator==(NNTreeIterator const& other) const
         ++tpi;
         ++opi;
     }
-    if (item_number != other.item_number) {
-        return false;
-    }
-    return true;
+    return item_number == other.item_number;
 }
 
 void
@@ -574,27 +569,30 @@ NNTreeIterator::deepen(QPDFObjectHandle a_node, bool first, bool allow_empty)
             return fail(a_node, "non-dictionary node while traversing name/number tree");
         }
 
-        auto items = a_node.getKey(impl.details.itemsKey());
+        Array items = a_node.getKey(impl.details.itemsKey());
         int nitems = static_cast<int>(items.size());
         if (nitems > 1) {
             setItemNumber(a_node, first ? 0 : nitems - 2);
             break;
         }
 
-        auto kids = a_node.getKey("/Kids");
-        int nkids = kids.isArray() ? static_cast<int>(kids.size()) : 0;
+        Array kids = a_node.getKey("/Kids");
+        int nkids = static_cast<int>(kids.size());
         if (nkids > 0) {
             int kid_number = first ? 0 : nkids - 1;
             addPathElement(a_node, kid_number);
             auto next = kids[kid_number];
-            if (!next.isIndirect()) {
+            if (!next) {
+                return fail(a_node, "kid number " + std::to_string(kid_number) + " is invalid");
+            }
+            if (!next.indirect()) {
                 if (impl.auto_repair) {
                     impl.warn(
                         a_node,
                         "converting kid number " + std::to_string(kid_number) +
                             " to an indirect object");
                     next = impl.qpdf.makeIndirectObject(next);
-                    kids.setArrayItem(kid_number, next);
+                    kids.set(kid_number, next);
                 } else {
                     impl.warn(
                         a_node,
@@ -602,7 +600,7 @@ NNTreeIterator::deepen(QPDFObjectHandle a_node, bool first, bool allow_empty)
                 }
             }
             a_node = next;
-        } else if (allow_empty && items.isArray()) {
+        } else if (allow_empty && items) {
             setItemNumber(a_node, -1);
             break;
         } else {
@@ -655,8 +653,8 @@ NNTreeImpl::last()
 int
 NNTreeImpl::withinLimits(QPDFObjectHandle const& key, QPDFObjectHandle const& node)
 {
-    auto limits = node.getKey("/Limits");
-    if (!(limits.size() >= 2 && details.keyValid(limits[0]) && details.keyValid(limits[1]))) {
+    Array limits = node.getKey("/Limits");
+    if (!(details.keyValid(limits[0]) && details.keyValid(limits[1]))) {
         error(node, "node is missing /Limits");
     }
     if (details.compareKeys(key, limits[0]) < 0) {
@@ -734,7 +732,7 @@ void
 NNTreeImpl::repair()
 {
     auto new_node = QPDFObjectHandle::newDictionary();
-    new_node.replaceKey(details.itemsKey(), QPDFObjectHandle::newArray());
+    new_node.replaceKey(details.itemsKey(), Array());
     NNTreeImpl repl(details, qpdf, new_node, false);
     for (auto const& i: *this) {
         repl.insert(i.first, i.second);
@@ -750,7 +748,6 @@ NNTreeImpl::find(QPDFObjectHandle key, bool return_prev_if_not_found)
         return findInternal(key, return_prev_if_not_found);
     } catch (QPDFExc& e) {
         if (auto_repair) {
-            QTC::TC("qpdf", "NNTree repair");
             warn(oh, std::string("attempting to repair after error: ") + e.what());
             repair();
             return findInternal(key, return_prev_if_not_found);
@@ -784,7 +781,7 @@ NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_fo
             error(node, "loop detected in find");
         }
 
-        auto items = node.getKey(details.itemsKey());
+        Array items = node.getKey(details.itemsKey());
         size_t nitems = items.size();
         if (nitems > 1) {
             int idx = binarySearch(
@@ -795,8 +792,8 @@ NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_fo
             return result;
         }
 
-        auto kids = node.getKey("/Kids");
-        size_t nkids = kids.isArray() ? kids.size() : 0;
+        Array kids = node.getKey("/Kids");
+        size_t nkids = kids.size();
         if (nkids > 0) {
             int idx = binarySearch(key, kids, nkids, true, &NNTreeImpl::compareKeyKid);
             if (idx == -1) {
@@ -814,15 +811,15 @@ NNTreeImpl::iterator
 NNTreeImpl::insertFirst(QPDFObjectHandle const& key, QPDFObjectHandle const& value)
 {
     auto iter = begin();
-    QPDFObjectHandle items;
+    Array items(nullptr);
     if (iter.node.isDictionary()) {
         items = iter.node.getKey(details.itemsKey());
     }
-    if (!items.isArray()) {
+    if (!items) {
         error(oh, "unable to find a valid items node");
     }
-    items.insertItem(0, key);
-    items.insertItem(1, value);
+    items.insert(0, key);
+    items.insert(1, value);
     iter.setItemNumber(iter.node, 0);
     iter.resetLimits(iter.node, iter.lastPathElement());
     iter.split(iter.node, iter.lastPathElement());
@@ -836,8 +833,8 @@ NNTreeImpl::insert(QPDFObjectHandle const& key, QPDFObjectHandle const& value)
     if (!iter.valid()) {
         return insertFirst(key, value);
     } else if (details.compareKeys(key, iter->first) == 0) {
-        auto items = iter.node.getKey(details.itemsKey());
-        items.setArrayItem(iter.item_number + 1, value);
+        Array items = iter.node.getKey(details.itemsKey());
+        items.set(iter.item_number + 1, value);
         iter.updateIValue();
     } else {
         iter.insertAfter(key, value);

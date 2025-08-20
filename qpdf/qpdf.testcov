@@ -282,7 +282,6 @@ qpdf-c called qpdf_set_newline_before_endstream 0
 SF_FlateLzwDecode TIFF predictor 0
 QPDFTokenizer inline image at EOF 0
 Pl_QPDFTokenizer found ID 0
-QPDFObjectHandle non-stream in stream array 0
 QPDFObjectHandle coalesce called on stream 0
 QPDFObjectHandle coalesce provide stream data 0
 QPDF_Stream bad token at end during normalize 0
@@ -290,7 +289,6 @@ QPDFParser bad token in parse 0
 QPDFParser bad token in parseRemainder 0
 QPDFParser eof in parse 0
 QPDFParser eof in parseRemainder 0
-QPDFObjectHandle array bounds 0
 QPDFObjectHandle boolean returning false 0
 QPDFObjectHandle integer returning 0 0
 QPDFObjectHandle real returning 0.0 0
@@ -299,11 +297,7 @@ QPDFObjectHandle string returning empty string 0
 QPDFObjectHandle string returning empty utf8 0
 QPDFObjectHandle operator returning fake value 0
 QPDFObjectHandle inlineimage returning empty data 0
-QPDFObjectHandle array treating as empty 0
-QPDFObjectHandle array null for non-array 0
 QPDFObjectHandle array treating as empty vector 0
-QPDFObjectHandle array ignoring set item 0
-QPDFObjectHandle set array bounds 0
 QPDFObjectHandle array ignoring replace items 0
 QPDFObjectHandle array ignoring insert item 0
 QPDFObjectHandle insert array bounds 0
@@ -519,8 +513,6 @@ qpdf-c called qpdf_oh_unparse_resolved 0
 qpdf-c called qpdf_oh_unparse_binary 0
 QPDFWriter getFilterOnWrite false 0
 QPDFPageObjectHelper::forEachXObject 3
-NNTree repair 0
-NNTree insertAfter inserts first 0
 NNTree erased last kid/item in tree 1
 QPDFPageObjectHelper unresolved names 0
 QPDFPageObjectHelper resolving unresolved 0

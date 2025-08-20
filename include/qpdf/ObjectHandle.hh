@@ -74,7 +74,6 @@ namespace qpdf
         }
 
         QPDFObjectHandle operator[](size_t n) const;
-
         QPDFObjectHandle operator[](int n) const;
 
         std::shared_ptr<QPDFObject> copy(bool shallow = false) const;
@@ -104,10 +103,17 @@ namespace qpdf
         BaseHandle& operator=(BaseHandle const&) = default;
         BaseHandle(BaseHandle&&) = default;
         BaseHandle& operator=(BaseHandle&&) = default;
+
+        inline BaseHandle(QPDFObjectHandle const& oh);
+        inline BaseHandle(QPDFObjectHandle&& oh);
+
         ~BaseHandle() = default;
 
         template <typename T>
         T* as() const;
+
+        inline void assign(qpdf_object_type_e required, BaseHandle const& other);
+        inline void assign(qpdf_object_type_e required, BaseHandle&& other);
 
         std::string description() const;
         std::runtime_error type_error(char const* expected_type) const;

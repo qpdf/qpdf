@@ -442,7 +442,7 @@ Stream::filterable(
 
         int i = -1;
         for (auto& filter: filters) {
-            auto d_obj = decode_array.at(++i).second;
+            auto d_obj = decode_array.get(++i);
             if (!can_filter(decode_level, *filter, d_obj)) {
                 return false;
             }

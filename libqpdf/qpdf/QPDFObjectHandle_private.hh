@@ -12,6 +12,30 @@ namespace qpdf
     class Array final: public BaseHandle
     {
       public:
+        // Create an empty Array. If 'empty' is false, create a null Array.
+        Array(bool empty = true);
+
+        Array(std::vector<QPDFObjectHandle> const& items);
+
+        Array(std::vector<QPDFObjectHandle>&& items);
+
+        Array(Array const& other) :
+            BaseHandle(other.obj)
+        {
+        }
+
+        Array&
+        operator=(Array const& other)
+        {
+            if (obj != other.obj) {
+                obj = other.obj;
+            }
+            return *this;
+        }
+
+        Array(Array&&) = default;
+        Array& operator=(Array&&) = default;
+
         explicit Array(std::shared_ptr<QPDFObject> const& obj) :
             BaseHandle(obj)
         {
@@ -21,6 +45,34 @@ namespace qpdf
             BaseHandle(std::move(obj))
         {
         }
+
+        Array(QPDFObjectHandle const& oh) :
+            BaseHandle(oh.resolved_type_code() == ::ot_array ? oh : QPDFObjectHandle())
+        {
+        }
+
+        Array&
+        operator=(QPDFObjectHandle const& oh)
+        {
+            assign(::ot_array, oh);
+            return *this;
+        }
+
+        Array(QPDFObjectHandle&& oh) :
+            BaseHandle(oh.resolved_type_code() == ::ot_array ? std::move(oh) : QPDFObjectHandle())
+        {
+        }
+
+        Array&
+        operator=(QPDFObjectHandle&& oh)
+        {
+            assign(::ot_array, std::move(oh));
+            return *this;
+        }
+
+        QPDFObjectHandle const& operator[](size_t n) const;
+
+        QPDFObjectHandle const& operator[](int n) const;
 
         using iterator = std::vector<QPDFObjectHandle>::iterator;
         using const_iterator = std::vector<QPDFObjectHandle>::const_iterator;
@@ -38,11 +90,16 @@ namespace qpdf
 
         const_reverse_iterator crend();
 
+        // Return the number of elements in the array. Return 0 if the object is not an array.
         size_t size() const;
-        std::pair<bool, QPDFObjectHandle> at(int n) const;
-        bool setAt(int at, QPDFObjectHandle const& oh);
+        QPDFObjectHandle get(size_t n) const;
+        QPDFObjectHandle get(int n) const;
+        bool set(size_t at, QPDFObjectHandle const& oh);
+        bool set(int at, QPDFObjectHandle const& oh);
+        bool insert(size_t at, QPDFObjectHandle const& item);
         bool insert(int at, QPDFObjectHandle const& item);
         void push_back(QPDFObjectHandle const& item);
+        bool erase(size_t at);
         bool erase(int at);
 
         std::vector<QPDFObjectHandle> getAsVector() const;
@@ -340,6 +397,32 @@ namespace qpdf
             return BaseHandle(std::get<QPDF_Reference>(obj->value).obj).as<T>();
         }
         return nullptr;
+    }
+
+    inline BaseHandle::BaseHandle(QPDFObjectHandle const& oh) :
+        obj(oh.obj)
+    {
+    }
+
+    inline BaseHandle::BaseHandle(QPDFObjectHandle&& oh) :
+        obj(std::move(oh.obj))
+    {
+    }
+
+    inline void
+    BaseHandle::assign(qpdf_object_type_e required, BaseHandle const& other)
+    {
+        if (obj != other.obj) {
+            obj = other.resolved_type_code() == required ? other.obj : nullptr;
+        }
+    }
+
+    inline void
+    BaseHandle::assign(qpdf_object_type_e required, BaseHandle&& other)
+    {
+        if (obj != other.obj) {
+            obj = other.resolved_type_code() == required ? std::move(other.obj) : nullptr;
+        }
     }
 
     inline QPDFObjGen
