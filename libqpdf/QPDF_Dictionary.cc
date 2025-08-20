@@ -53,11 +53,14 @@ BaseDictionary::getAsMap() const
     return dict()->items;
 }
 
-void
-BaseDictionary::removeKey(std::string const& key)
+size_t
+BaseHandle::erase(const std::string& key)
 {
     // no-op if key does not exist
-    dict()->items.erase(key);
+    if (auto d = as<QPDF_Dictionary>()) {
+        return d->items.erase(key);
+    }
+    return 0;
 }
 
 void
@@ -188,18 +191,16 @@ QPDFObjectHandle::replaceKeyAndGetOld(std::string const& key, QPDFObjectHandle c
 void
 QPDFObjectHandle::removeKey(std::string const& key)
 {
-    if (auto dict = as_dictionary(strict)) {
-        dict.removeKey(key);
+    if (erase(key) || isDictionary()) {
         return;
     }
     typeWarning("dictionary", "ignoring key removal request");
-    QTC::TC("qpdf", "QPDFObjectHandle dictionary ignoring removeKey");
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::removeKeyAndGetOld(std::string const& key)
 {
     auto result = (*this)[key];
-    removeKey(key);
+    erase(key);
     return result ? result : newNull();
 }

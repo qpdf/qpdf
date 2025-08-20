@@ -122,7 +122,6 @@ namespace qpdf
         // The following methods are not part of the public API.
         std::set<std::string> getKeys();
         std::map<std::string, QPDFObjectHandle> const& getAsMap() const;
-        void removeKey(std::string const& key);
         void replaceKey(std::string const& key, QPDFObjectHandle value);
 
         using iterator = std::map<std::string, QPDFObjectHandle>::iterator;
