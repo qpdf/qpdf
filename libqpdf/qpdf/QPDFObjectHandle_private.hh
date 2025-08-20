@@ -120,7 +120,6 @@ namespace qpdf
     {
       public:
         // The following methods are not part of the public API.
-        QPDFObjectHandle getKey(std::string const& key) const;
         std::set<std::string> getKeys();
         std::map<std::string, QPDFObjectHandle> const& getAsMap() const;
         void removeKey(std::string const& key);

@@ -35,21 +35,6 @@ BaseHandle::contains(std::string const& key) const
     return !(*this)[key].null();
 }
 
-QPDFObjectHandle
-BaseDictionary::getKey(std::string const& key) const
-{
-    auto d = dict();
-
-    // PDF spec says fetching a non-existent key from a dictionary returns the null object.
-    auto item = d->items.find(key);
-    if (item != d->items.end()) {
-        // May be a null object
-        return item->second;
-    }
-    static auto constexpr msg = " -> dictionary key $VD"sv;
-    return QPDF_Null::create(obj, msg, key);
-}
-
 std::set<std::string>
 BaseDictionary::getKeys()
 {
@@ -133,11 +118,14 @@ QPDFObjectHandle::hasKey(std::string const& key) const
 QPDFObjectHandle
 QPDFObjectHandle::getKey(std::string const& key) const
 {
-    if (auto dict = as_dictionary(strict)) {
-        return dict.getKey(key);
+    if (auto result = (*this)[key]) {
+        return result;
+    }
+    if (isDictionary()) {
+        static auto constexpr msg = " -> dictionary key $VD"sv;
+        return QPDF_Null::create(obj, msg, key);
     }
     typeWarning("dictionary", "returning null for attempted key retrieval");
-    QTC::TC("qpdf", "QPDFObjectHandle dictionary null for getKey");
     static auto constexpr msg = " -> null returned from getting key $VD from non-Dictionary"sv;
     return QPDF_Null::create(obj, msg, "");
 }
@@ -211,10 +199,7 @@ QPDFObjectHandle::removeKey(std::string const& key)
 QPDFObjectHandle
 QPDFObjectHandle::removeKeyAndGetOld(std::string const& key)
 {
-    auto result = QPDFObjectHandle::newNull();
-    if (auto dict = as_dictionary(strict)) {
-        result = dict.getKey(key);
-    }
+    auto result = (*this)[key];
     removeKey(key);
-    return result;
+    return result ? result : newNull();
 }

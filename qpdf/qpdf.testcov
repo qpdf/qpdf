@@ -304,7 +304,6 @@ QPDFObjectHandle insert array bounds 0
 QPDFObjectHandle array ignoring append item 0
 QPDFObjectHandle array ignoring erase item 0
 QPDFObjectHandle dictionary false for hasKey 0
-QPDFObjectHandle dictionary null for getKey 0
 QPDFObjectHandle dictionary empty set for getKeys 0
 QPDFObjectHandle dictionary empty map for asMap 0
 QPDFObjectHandle dictionary ignoring replaceKey 0
