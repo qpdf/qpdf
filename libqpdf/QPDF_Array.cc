@@ -60,6 +60,21 @@ Array::array() const
     return nullptr; // unreachable
 }
 
+Array::Array(bool empty) :
+    BaseHandle(empty ? QPDFObject::create<QPDF_Array>() : nullptr)
+{
+}
+
+Array::Array(std::vector<QPDFObjectHandle> const& items) :
+    BaseHandle(QPDFObject::create<QPDF_Array>(items))
+{
+}
+
+Array::Array(std::vector<QPDFObjectHandle>&& items) :
+    BaseHandle(QPDFObject::create<QPDF_Array>(std::move(items)))
+{
+}
+
 Array::iterator
 Array::begin()
 {
