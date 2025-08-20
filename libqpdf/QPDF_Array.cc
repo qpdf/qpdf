@@ -340,35 +340,40 @@ Array::push_back(QPDFObjectHandle const& item)
 }
 
 bool
-Array::erase(int at_i)
+Array::erase(size_t at)
 {
     auto a = array();
-    if (at_i < 0) {
-        return false;
-    }
-    size_t at = to_s(at_i);
     if (at >= size()) {
         return false;
     }
-    if (a->sp) {
-        auto end = a->sp->elements.end();
-        if (auto iter = a->sp->elements.lower_bound(at); iter != end) {
-            if (iter->first == at) {
-                iter++;
-                a->sp->elements.erase(at);
-            }
-
-            while (iter != end) {
-                auto nh = a->sp->elements.extract(iter++);
-                --nh.key();
-                a->sp->elements.insert(std::move(nh));
-            }
-        }
-        --(a->sp->size);
-    } else {
-        a->elements.erase(a->elements.cbegin() + at_i);
+    if (!a->sp) {
+        a->elements.erase(a->elements.cbegin() + to_i(at));
+        return true;
     }
+    auto end = a->sp->elements.end();
+    if (auto iter = a->sp->elements.lower_bound(at); iter != end) {
+        if (iter->first == at) {
+            iter++;
+            a->sp->elements.erase(at);
+        }
+
+        while (iter != end) {
+            auto nh = a->sp->elements.extract(iter++);
+            --nh.key();
+            a->sp->elements.insert(std::move(nh));
+        }
+    }
+    --(a->sp->size);
     return true;
+}
+
+bool
+Array::erase(int at_i)
+{
+    if (at_i < 0) {
+        return false;
+    }
+    return erase(to_s(at_i));
 }
 
 int

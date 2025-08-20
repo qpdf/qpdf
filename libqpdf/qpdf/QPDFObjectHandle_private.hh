@@ -99,6 +99,7 @@ namespace qpdf
         bool insert(size_t at, QPDFObjectHandle const& item);
         bool insert(int at, QPDFObjectHandle const& item);
         void push_back(QPDFObjectHandle const& item);
+        bool erase(size_t at);
         bool erase(int at);
 
         std::vector<QPDFObjectHandle> getAsVector() const;
