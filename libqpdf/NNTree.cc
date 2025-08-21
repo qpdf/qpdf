@@ -139,6 +139,8 @@ NNTreeIterator::increment(bool backward)
                 impl.warn(node, "items array doesn't have enough elements");
             } else if (!impl.details.keyValid(items[item_number])) {
                 impl.warn(node, ("item " + std::to_string(item_number) + " has the wrong type"));
+            } else if (!items[item_number + 1]) {
+                impl.warn(node, "item " + std::to_string(item_number) + " is null");
             } else {
                 return;
             }
@@ -734,8 +736,12 @@ NNTreeImpl::repair()
     auto new_node = QPDFObjectHandle::newDictionary();
     new_node.replaceKey(details.itemsKey(), Array());
     NNTreeImpl repl(details, qpdf, new_node, false);
-    for (auto const& i: *this) {
-        repl.insert(i.first, i.second);
+    for (auto const& [key, value]: *this) {
+//        if (key && value) {
+            repl.insert(key, value);
+//        } else {
+//            std::cerr << key.unparse() << "\n";
+//        }
     }
     oh.replaceKey("/Kids", new_node.getKey("/Kids"));
     oh.replaceKey(details.itemsKey(), new_node.getKey(details.itemsKey()));
