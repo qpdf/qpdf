@@ -106,7 +106,7 @@ NNTreeIterator::getNextKid(PathElement& pe, bool backward)
 bool
 NNTreeIterator::valid() const
 {
-    return item_number >= 0;
+    return item_number >= 0 && ivalue.first && ivalue.second;
 }
 
 void
@@ -380,6 +380,9 @@ NNTreeIterator::insertAfter(QPDFObjectHandle const& key, QPDFObjectHandle const&
 
     if (std::cmp_less(items.size(), item_number + 2)) {
         impl.error(node, "insert: items array is too short");
+    }
+    if (!(key && value)) {
+        impl.error(node, "insert: key or value is null");
     }
     items.insert(item_number + 2, key);
     items.insert(item_number + 3, value);
@@ -737,11 +740,9 @@ NNTreeImpl::repair()
     new_node.replaceKey(details.itemsKey(), Array());
     NNTreeImpl repl(details, qpdf, new_node, false);
     for (auto const& [key, value]: *this) {
-//        if (key && value) {
+        if (key && value) {
             repl.insert(key, value);
-//        } else {
-//            std::cerr << key.unparse() << "\n";
-//        }
+        }
     }
     oh.replaceKey("/Kids", new_node.getKey("/Kids"));
     oh.replaceKey(details.itemsKey(), new_node.getKey(details.itemsKey()));
@@ -823,6 +824,9 @@ NNTreeImpl::insertFirst(QPDFObjectHandle const& key, QPDFObjectHandle const& val
     }
     if (!items) {
         error(oh, "unable to find a valid items node");
+    }
+    if (!(key && value)) {
+        error(oh, "unable to insert null key or value");
     }
     items.insert(0, key);
     items.insert(1, value);
