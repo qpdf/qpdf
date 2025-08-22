@@ -376,6 +376,18 @@ Array::erase(int at_i)
     return erase(to_s(at_i));
 }
 
+QPDFObjectHandle
+QPDFObjectHandle::newArray()
+{
+    return {Array()};
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::newArray(std::vector<QPDFObjectHandle> const& items)
+{
+    return {Array(items)};
+}
+
 int
 QPDFObjectHandle::getArrayNItems() const
 {
