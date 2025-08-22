@@ -1,10 +1,12 @@
 #ifndef PIPELINE_PRIVATE_HH
 #define PIPELINE_PRIVATE_HH
 
+#include <qpdf/Types.h>
+
 #include <qpdf/Pipeline.hh>
 
 #include <qpdf/Pl_Flate.hh>
-#include <qpdf/Types.h>
+#include <qpdf/Util.hh>
 
 namespace qpdf::pl
 {

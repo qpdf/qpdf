@@ -1,9 +1,6 @@
-#include <qpdf/assert_debug.h>
-
 #include <qpdf/Pl_Base64.hh>
 
 #include <qpdf/QIntC.hh>
-#include <qpdf/QUtil.hh>
 #include <qpdf/Util.hh>
 
 #include <cstring>

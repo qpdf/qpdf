@@ -1,5 +1,3 @@
-#include <qpdf/assert_debug.h>
-
 #include <qpdf/QPDFObjectHandle_private.hh>
 
 #include <qpdf/JSON_writer.hh>

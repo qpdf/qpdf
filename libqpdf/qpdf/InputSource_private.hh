@@ -3,6 +3,7 @@
 
 #include <qpdf/Buffer.hh>
 #include <qpdf/InputSource.hh>
+#include <qpdf/Util.hh>
 
 #include <limits>
 #include <sstream>
