@@ -338,7 +338,6 @@ QPDFAcroFormDocumentHelper annotation found 1
 QPDFJob keep files open n 0
 QPDFJob keep files open y 0
 QPDFJob automatically set keep files open 1
-QPDFPageLabelDocumentHelper skip first 0
 QPDFOutlineObjectHelper direct dest 0
 QPDFOutlineObjectHelper action dest 0
 QPDFOutlineObjectHelper named dest 0

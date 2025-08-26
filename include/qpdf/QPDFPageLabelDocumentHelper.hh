@@ -77,19 +77,7 @@ class QPDFPageLabelDocumentHelper: public QPDFDocumentHelper
         std::vector<QPDFObjectHandle>& new_labels);
 
   private:
-    class Members
-    {
-        friend class QPDFPageLabelDocumentHelper;
-
-      public:
-        ~Members() = default;
-
-      private:
-        Members() = default;
-        Members(Members const&) = delete;
-
-        std::shared_ptr<QPDFNumberTreeObjectHelper> labels;
-    };
+    class Members;
 
     std::shared_ptr<Members> m;
 };
