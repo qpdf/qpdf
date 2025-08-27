@@ -103,10 +103,12 @@ NNTreeIterator::getNextKid(PathElement& pe, bool backward)
     }
 }
 
+// iterator can be incremented or decremented, or dereferenced. This does not imply that it points
+// to a valid item.
 bool
 NNTreeIterator::valid() const
 {
-    return item_number >= 0 && ivalue.first && ivalue.second;
+    return item_number >= 0;
 }
 
 void
