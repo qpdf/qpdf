@@ -2,22 +2,42 @@
 
 #include <qpdf/QTC.hh>
 
+class QPDFOutlineDocumentHelper::Members
+{
+  public:
+    Members() = default;
+    Members(Members const&) = delete;
+    ~Members() = default;
+
+    std::vector<QPDFOutlineObjectHelper> outlines;
+    QPDFObjGen::set seen;
+    QPDFObjectHandle dest_dict;
+    std::unique_ptr<QPDFNameTreeObjectHelper> names_dest;
+    std::map<QPDFObjGen, std::vector<QPDFOutlineObjectHelper>> by_page;
+};
+
+bool
+QPDFOutlineDocumentHelper::Accessor::checkSeen(QPDFOutlineDocumentHelper& dh, QPDFObjGen og)
+{
+    return !dh.m->seen.add(og);
+}
+
 QPDFOutlineDocumentHelper::QPDFOutlineDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
-    m(new Members())
+    m(std::make_shared<Members>())
 {
     QPDFObjectHandle root = qpdf.getRoot();
     if (!root.hasKey("/Outlines")) {
         return;
     }
-    QPDFObjectHandle outlines = root.getKey("/Outlines");
+    auto outlines = root.getKey("/Outlines");
     if (!(outlines.isDictionary() && outlines.hasKey("/First"))) {
         return;
     }
     QPDFObjectHandle cur = outlines.getKey("/First");
     QPDFObjGen::set seen;
     while (!cur.isNull() && seen.add(cur)) {
-        m->outlines.push_back(QPDFOutlineObjectHelper::Accessor::create(cur, *this, 1));
+        m->outlines.emplace_back(QPDFOutlineObjectHelper::Accessor::create(cur, *this, 1));
         cur = cur.getKey("/Next");
     }
 }
@@ -55,11 +75,10 @@ QPDFOutlineDocumentHelper::getOutlinesForPage(QPDFObjGen og)
     if (m->by_page.empty()) {
         initializeByPage();
     }
-    std::vector<QPDFOutlineObjectHelper> result;
     if (m->by_page.contains(og)) {
-        result = m->by_page[og];
+        return m->by_page[og];
     }
-    return result;
+    return {};
 }
 
 QPDFObjectHandle
@@ -70,13 +89,12 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
         if (!m->dest_dict) {
             m->dest_dict = qpdf.getRoot().getKey("/Dests");
         }
-        QTC::TC("qpdf", "QPDFOutlineDocumentHelper name named dest");
         result = m->dest_dict.getKeyIfDict(name.getName());
     } else if (name.isString()) {
         if (!m->names_dest) {
             auto dests = qpdf.getRoot().getKey("/Names").getKeyIfDict("/Dests");
             if (dests.isDictionary()) {
-                m->names_dest = std::make_shared<QPDFNameTreeObjectHelper>(dests, qpdf);
+                m->names_dest = std::make_unique<QPDFNameTreeObjectHelper>(dests, qpdf);
             }
         }
         if (m->names_dest) {
@@ -89,7 +107,6 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
         return QPDFObjectHandle::newNull();
     }
     if (result.isDictionary()) {
-        QTC::TC("qpdf", "QPDFOutlineDocumentHelper named dest dictionary");
         return result.getKey("/D");
     }
     return result;

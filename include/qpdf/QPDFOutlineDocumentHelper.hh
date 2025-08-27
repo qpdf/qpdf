@@ -63,33 +63,13 @@ class QPDFOutlineDocumentHelper: public QPDFDocumentHelper
     {
         friend class QPDFOutlineObjectHelper;
 
-        static bool
-        checkSeen(QPDFOutlineDocumentHelper& dh, QPDFObjGen og)
-        {
-            return !dh.m->seen.add(og);
-        }
+        static bool checkSeen(QPDFOutlineDocumentHelper& dh, QPDFObjGen og);
     };
 
   private:
     void initializeByPage();
 
-    class Members
-    {
-        friend class QPDFOutlineDocumentHelper;
-
-      public:
-        ~Members() = default;
-
-      private:
-        Members() = default;
-        Members(Members const&) = delete;
-
-        std::vector<QPDFOutlineObjectHelper> outlines;
-        QPDFObjGen::set seen;
-        QPDFObjectHandle dest_dict;
-        std::shared_ptr<QPDFNameTreeObjectHelper> names_dest;
-        std::map<QPDFObjGen, std::vector<QPDFOutlineObjectHelper>> by_page;
-    };
+    class Members;
 
     std::shared_ptr<Members> m;
 };
