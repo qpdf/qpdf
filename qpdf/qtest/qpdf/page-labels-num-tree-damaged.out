@@ -1,0 +1,16 @@
+WARNING: page-labels-num-tree-damaged.pdf (Name/Number tree node (object 2)): attempting to repair after error: page-labels-num-tree-damaged.pdf (Name/Number tree node (object 2)): keys are not sorted in validate
+WARNING: page-labels-num-tree-damaged.pdf (Name/Number tree node (object 37)): item 1 is invalid
+1 << /S /r /St 1 >>
+3 << /P (blank) /St 1 >>
+4 << /P (X-) /S /A /St 17 >>
+6 << /P () /St 1 >>
+7 << /S /R /St 3 >>
+10 << /S /D /St 1 >>
+13 << /S /a /St 3 >>
+16 << /P (q.) /S /D /St 6 >>
+20 << /P (www) /St 1 >>
+21 << /S /D /St 12 >>
+23 << /S /D /St 16059 >>
+24 << /S /R /St 50 >>
+30 << /S /r /St 54 >>
+test 47 done
