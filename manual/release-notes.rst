@@ -23,6 +23,16 @@ more detail.
       not work on some older Linux distributions. If you need support
       for an older distribution, please use version 12.2.0 or below.
 
+  - Library Enhancements
+
+    - Add ``QPDFNameTreeObjectHelper`` and ``QPDFNumberTreeObjectHelper``
+      constructor overloads that allow a function to ne passed to
+      validate the values in the tree.
+
+    - Add new ``QPDFNameTreeObjectHelper`` and ``QPDFNumberTreeObjectHelper``
+      ``validate`` method to validate and optionally repair the name/number
+      tree.
+
   - CLI Enhancements
 
    - Disallow option :qpdf:ref:`--deterministic-id` to be used together

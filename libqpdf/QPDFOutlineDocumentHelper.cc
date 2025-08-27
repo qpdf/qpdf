@@ -94,7 +94,14 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
         if (!m->names_dest) {
             auto dests = qpdf.getRoot().getKey("/Names").getKeyIfDict("/Dests");
             if (dests.isDictionary()) {
-                m->names_dest = std::make_unique<QPDFNameTreeObjectHelper>(dests, qpdf);
+                m->names_dest = std::make_unique<QPDFNameTreeObjectHelper>(
+                    dests,
+                    qpdf,
+                    [](QPDFObjectHandle const& o) -> bool {
+                        return o.isArray() || o.isDictionary();
+                    },
+                    true);
+                m->names_dest->validate();
             }
         }
         if (m->names_dest) {
