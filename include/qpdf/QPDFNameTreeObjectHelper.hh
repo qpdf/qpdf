@@ -50,7 +50,13 @@ class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
         QPDFObjectHandle,
         QPDF&,
         std::function<bool(QPDFObjectHandle const&)> value_validator,
-        bool auto_repair = true);
+        bool auto_repair);
+
+    // Validate the name tree. Returns true if the tree is valid.
+    //
+    // If the tree is not valid and auto_repair is true, attempt to repair the tree.
+    QPDF_DLL
+    bool validate(bool repair = true);
 
     // Create an empty name tree
     QPDF_DLL

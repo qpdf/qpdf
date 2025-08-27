@@ -48,7 +48,7 @@ class QPDF_DLL_CLASS QPDFNumberTreeObjectHelper: public QPDFObjectHelper
         QPDFObjectHandle,
         QPDF&,
         std::function<bool(QPDFObjectHandle const&)> value_validator,
-        bool auto_repair = true);
+        bool auto_repair);
 
     QPDF_DLL
     ~QPDFNumberTreeObjectHelper() override;
@@ -58,6 +58,12 @@ class QPDF_DLL_CLASS QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     static QPDFNumberTreeObjectHelper newEmpty(QPDF&, bool auto_repair = true);
 
     typedef long long int numtree_number;
+
+    // Validate the name tree. Returns true if the tree is valid.
+    //
+    // If the tree is not valid and auto_repair is true, attempt to repair the tree.
+    QPDF_DLL
+    bool validate(bool repair = true);
 
     // Return overall minimum and maximum indices
     QPDF_DLL

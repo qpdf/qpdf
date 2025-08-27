@@ -891,3 +891,33 @@ NNTreeImpl::remove(QPDFObjectHandle const& key, QPDFObjectHandle* value)
     iter.remove();
     return true;
 }
+
+bool
+NNTreeImpl::validate(bool a_repair)
+{
+    bool first = true;
+    QPDFObjectHandle last_key;
+    try {
+        for (auto const& [key, value]: *this) {
+            if (!details.keyValid(key)) {
+                error(oh, "invalid key in validate");
+            }
+            if (!value_valid(value)) {
+                error(oh, "invalid value in validate");
+            }
+            if (first) {
+                first = false;
+            } else if (last_key && details.compareKeys(last_key, key) != -1) {
+                error(oh, "keys are not sorted in validate");
+            }
+            last_key = key;
+        }
+    } catch (QPDFExc& e) {
+        if (a_repair) {
+            warn(oh, std::string("attempting to repair after error: ") + e.what());
+            repair();
+        }
+        return false;
+    }
+    return true;
+}

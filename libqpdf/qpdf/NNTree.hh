@@ -109,6 +109,8 @@ class NNTreeImpl
     iterator insert(QPDFObjectHandle const& key, QPDFObjectHandle const& value);
     bool remove(QPDFObjectHandle const& key, QPDFObjectHandle* value = nullptr);
 
+    bool validate(bool repair = true);
+
     // Change the split threshold for easier testing. There's no real reason to expose this to
     // downstream tree helpers, but it has to be public so we can call it from the test suite.
     void setSplitThreshold(int split_threshold);

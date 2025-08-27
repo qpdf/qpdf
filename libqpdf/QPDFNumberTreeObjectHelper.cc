@@ -251,3 +251,9 @@ QPDFNumberTreeObjectHelper::getAsMap() const
     result.insert(begin(), end());
     return result;
 }
+
+bool
+QPDFNumberTreeObjectHelper::validate(bool repair)
+{
+    return m->impl->validate(repair);
+}
