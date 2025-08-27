@@ -48,7 +48,12 @@ QPDFEmbeddedFileDocumentHelper::QPDFEmbeddedFileDocumentHelper(QPDF& qpdf) :
     if (names.isDictionary()) {
         auto embedded_files = names.getKey("/EmbeddedFiles");
         if (embedded_files.isDictionary()) {
-            m->embedded_files = std::make_unique<QPDFNameTreeObjectHelper>(embedded_files, qpdf);
+            m->embedded_files = std::make_unique<QPDFNameTreeObjectHelper>(
+                embedded_files,
+                qpdf,
+                [](QPDFObjectHandle const& o) -> bool { return o.isDictionary(); },
+                true);
+            m->embedded_files->validate();
         }
     }
 }
@@ -74,7 +79,8 @@ QPDFEmbeddedFileDocumentHelper::initEmbeddedFiles()
     if (!embedded_files.isDictionary()) {
         auto nth = QPDFNameTreeObjectHelper::newEmpty(qpdf);
         names.replaceKey("/EmbeddedFiles", nth.getObjectHandle());
-        m->embedded_files = std::make_unique<QPDFNameTreeObjectHelper>(nth);
+        m->embedded_files = std::make_unique<QPDFNameTreeObjectHelper>(
+            nth, qpdf, [](QPDFObjectHandle const& o) -> bool { return o.isDictionary(); }, true);
     }
 }
 
