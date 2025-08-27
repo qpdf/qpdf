@@ -44,6 +44,13 @@ class QPDF_DLL_CLASS QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     QPDFNumberTreeObjectHelper(QPDFObjectHandle, QPDF&, bool auto_repair = true);
 
     QPDF_DLL
+    QPDFNumberTreeObjectHelper(
+        QPDFObjectHandle,
+        QPDF&,
+        std::function<bool(QPDFObjectHandle const&)> value_validator,
+        bool auto_repair = true);
+
+    QPDF_DLL
     ~QPDFNumberTreeObjectHelper() override;
 
     // Create an empty number tree
@@ -188,7 +195,11 @@ class QPDF_DLL_CLASS QPDFNumberTreeObjectHelper: public QPDFObjectHelper
         ~Members() = default;
 
       private:
-        Members(QPDFObjectHandle& oh, QPDF&, bool auto_repair);
+        Members(
+            QPDFObjectHandle& oh,
+            QPDF&,
+            std::function<bool(QPDFObjectHandle const&)> value_validator,
+            bool auto_repair);
         Members(Members const&) = delete;
 
         std::shared_ptr<NNTreeImpl> impl;

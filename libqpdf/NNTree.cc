@@ -141,8 +141,8 @@ NNTreeIterator::increment(bool backward)
                 impl.warn(node, "items array doesn't have enough elements");
             } else if (!impl.details.keyValid(items[item_number])) {
                 impl.warn(node, ("item " + std::to_string(item_number) + " has the wrong type"));
-            } else if (!items[item_number + 1]) {
-                impl.warn(node, "item " + std::to_string(item_number) + " is null");
+            } else if (!impl.value_valid(items[item_number + 1])) {
+                impl.warn(node, "item " + std::to_string(item_number + 1) + " is invalid");
             } else {
                 return;
             }
@@ -386,6 +386,9 @@ NNTreeIterator::insertAfter(QPDFObjectHandle const& key, QPDFObjectHandle const&
     if (!(key && value)) {
         impl.error(node, "insert: key or value is null");
     }
+    if (!impl.value_valid(value)) {
+        impl.error(node, "insert: value is invalid");
+    }
     items.insert(item_number + 2, key);
     items.insert(item_number + 3, value);
     resetLimits(node, lastPathElement());
@@ -621,10 +624,15 @@ NNTreeIterator::deepen(QPDFObjectHandle a_node, bool first, bool allow_empty)
 }
 
 NNTreeImpl::NNTreeImpl(
-    NNTreeDetails const& details, QPDF& qpdf, QPDFObjectHandle& oh, bool auto_repair) :
+    NNTreeDetails const& details,
+    QPDF& qpdf,
+    QPDFObjectHandle& oh,
+    std::function<bool(QPDFObjectHandle const&)> value_validator,
+    bool auto_repair) :
     details(details),
     qpdf(qpdf),
     oh(oh),
+    value_valid(value_validator),
     auto_repair(auto_repair)
 {
 }
@@ -740,7 +748,7 @@ NNTreeImpl::repair()
 {
     auto new_node = QPDFObjectHandle::newDictionary();
     new_node.replaceKey(details.itemsKey(), Array());
-    NNTreeImpl repl(details, qpdf, new_node, false);
+    NNTreeImpl repl(details, qpdf, new_node, value_valid, false);
     for (auto const& [key, value]: *this) {
         if (key && value) {
             repl.insert(key, value);
@@ -774,10 +782,17 @@ NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_fo
     if (first_item == end()) {
         return end();
     }
-    if (first_item.valid() && details.keyValid(first_item->first) &&
-        details.compareKeys(key, first_item->first) < 0) {
-        // Before the first key
-        return end();
+    if (first_item.valid()) {
+        if (!details.keyValid(first_item->first)) {
+            error(oh, "encountered invalid key in find");
+        }
+        if (!value_valid(first_item->second)) {
+            error(oh, "encountered invalid value in find");
+        }
+        if (details.compareKeys(key, first_item->first) < 0) {
+            // Before the first key
+            return end();
+        }
     }
     qpdf_assert_debug(!last_item.valid());
 
@@ -797,6 +812,12 @@ NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_fo
                 key, items, nitems / 2, return_prev_if_not_found, &NNTreeImpl::compareKeyItem);
             if (idx >= 0) {
                 result.setItemNumber(node, 2 * idx);
+                if (!result.impl.details.keyValid(result.ivalue.first)) {
+                    error(node, "encountered invalid key in find");
+                }
+                if (!result.impl.value_valid(result.ivalue.second)) {
+                    error(oh, "encountered invalid value in find");
+                }
             }
             return result;
         }
@@ -829,6 +850,9 @@ NNTreeImpl::insertFirst(QPDFObjectHandle const& key, QPDFObjectHandle const& val
     }
     if (!(key && value)) {
         error(oh, "unable to insert null key or value");
+    }
+    if (!value_valid(value)) {
+        error(oh, "attempting to insert an invalid value");
     }
     items.insert(0, key);
     items.insert(1, value);

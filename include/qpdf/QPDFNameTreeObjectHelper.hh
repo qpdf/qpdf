@@ -45,6 +45,13 @@ class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     QPDFNameTreeObjectHelper(QPDFObjectHandle, QPDF&, bool auto_repair = true);
 
+    QPDF_DLL
+    QPDFNameTreeObjectHelper(
+        QPDFObjectHandle,
+        QPDF&,
+        std::function<bool(QPDFObjectHandle const&)> value_validator,
+        bool auto_repair = true);
+
     // Create an empty name tree
     QPDF_DLL
     static QPDFNameTreeObjectHelper newEmpty(QPDF&, bool auto_repair = true);
@@ -171,7 +178,11 @@ class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
         ~Members() = default;
 
       private:
-        Members(QPDFObjectHandle& oh, QPDF&, bool auto_repair);
+        Members(
+            QPDFObjectHandle& oh,
+            QPDF&,
+            std::function<bool(QPDFObjectHandle const&)> value_validator,
+            bool auto_repair);
         Members(Members const&) = delete;
 
         std::shared_ptr<NNTreeImpl> impl;
