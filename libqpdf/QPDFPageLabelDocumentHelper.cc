@@ -18,8 +18,12 @@ QPDFPageLabelDocumentHelper::QPDFPageLabelDocumentHelper(QPDF& qpdf) :
 {
     QPDFObjectHandle root = qpdf.getRoot();
     if (root.hasKey("/PageLabels")) {
-        m->labels =
-            std::make_unique<QPDFNumberTreeObjectHelper>(root.getKey("/PageLabels"), this->qpdf);
+        m->labels = std::make_unique<QPDFNumberTreeObjectHelper>(
+            root.getKey("/PageLabels"),
+            this->qpdf,
+            [](QPDFObjectHandle const& o) -> bool { return o.isDictionary(); },
+            true);
+        m->labels->validate();
     }
 }
 
@@ -37,7 +41,7 @@ QPDFPageLabelDocumentHelper::getLabelForPage(long long page_idx)
     }
     QPDFNumberTreeObjectHelper::numtree_number offset = 0;
     QPDFObjectHandle label;
-    if (!m->labels->findObjectAtOrBelow(page_idx, label, offset) || !label.isDictionary()) {
+    if (!m->labels->findObjectAtOrBelow(page_idx, label, offset)) {
         return QPDFObjectHandle::newNull();
     }
     QPDFObjectHandle S = label.getKey("/S");   // type (D, R, r, A, a)

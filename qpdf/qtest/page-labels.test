@@ -36,8 +36,7 @@ $td->runtest("no page labels",
 $td->runtest("damaged page labels",
              {$td->COMMAND => "test_driver 47 page-labels-num-tree-damaged.pdf"},
              {$td->FILE => "page-labels-num-tree-damaged.out", $td->EXIT_STATUS => 0},
-#             $td->NORMALIZE_NEWLINES,
-             $td->EXPECT_FAILURE);
+             $td->NORMALIZE_NEWLINES);
 
 # --set-page-labels
 my @errors = (
