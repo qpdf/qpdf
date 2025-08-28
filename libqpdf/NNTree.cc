@@ -851,25 +851,30 @@ NNTreeImpl::validate(bool a_repair)
     return true;
 }
 
-QPDFNameTreeObjectHelper::~QPDFNameTreeObjectHelper() // NOLINT (modernize-use-equals-default)
+class QPDFNameTreeObjectHelper::Members
 {
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer. For this specific
-    // class, see github issue #745.
-}
+  public:
+    Members(
+        QPDFObjectHandle& oh,
+        QPDF& q,
+        std::function<bool(QPDFObjectHandle const&)> value_validator,
+        bool auto_repair) :
+        impl(q, oh, ::ot_string, value_validator, auto_repair)
+    {
+    }
+    Members(Members const&) = delete;
+    ~Members() = default;
 
-QPDFNameTreeObjectHelper::Members::Members(
-    QPDFObjectHandle& oh,
-    QPDF& q,
-    std::function<bool(QPDFObjectHandle const&)> value_validator,
-    bool auto_repair) :
-    impl(std::make_shared<NNTreeImpl>(q, oh, ::ot_string, value_validator, auto_repair))
-{
-}
+    NNTreeImpl impl;
+};
+
+// Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer. For this specific
+// class, see github issue #745.
+QPDFNameTreeObjectHelper::~QPDFNameTreeObjectHelper() = default;
 
 QPDFNameTreeObjectHelper::QPDFNameTreeObjectHelper(QPDFObjectHandle oh, QPDF& q, bool auto_repair) :
-    QPDFObjectHelper(oh),
-    m(new Members(
-        oh, q, [](QPDFObjectHandle const& o) -> bool { return static_cast<bool>(o); }, auto_repair))
+    QPDFNameTreeObjectHelper(
+        oh, q, [](QPDFObjectHandle const& o) -> bool { return static_cast<bool>(o); }, auto_repair)
 {
 }
 
@@ -879,7 +884,7 @@ QPDFNameTreeObjectHelper::QPDFNameTreeObjectHelper(
     std::function<bool(QPDFObjectHandle const&)> value_validator,
     bool auto_repair) :
     QPDFObjectHelper(oh),
-    m(new Members(oh, q, value_validator, auto_repair))
+    m(std::make_shared<Members>(oh, q, value_validator, auto_repair))
 {
 }
 
@@ -966,39 +971,39 @@ QPDFNameTreeObjectHelper::iterator::remove()
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::begin() const
 {
-    return {std::make_shared<NNTreeIterator>(m->impl->begin())};
+    return {std::make_shared<NNTreeIterator>(m->impl.begin())};
 }
 
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::end() const
 {
-    return {std::make_shared<NNTreeIterator>(m->impl->end())};
+    return {std::make_shared<NNTreeIterator>(m->impl.end())};
 }
 
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::last() const
 {
-    return {std::make_shared<NNTreeIterator>(m->impl->last())};
+    return {std::make_shared<NNTreeIterator>(m->impl.last())};
 }
 
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::find(std::string const& key, bool return_prev_if_not_found)
 {
-    auto i = m->impl->find(QPDFObjectHandle::newUnicodeString(key), return_prev_if_not_found);
+    auto i = m->impl.find(QPDFObjectHandle::newUnicodeString(key), return_prev_if_not_found);
     return {std::make_shared<NNTreeIterator>(i)};
 }
 
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::insert(std::string const& key, QPDFObjectHandle value)
 {
-    auto i = m->impl->insert(QPDFObjectHandle::newUnicodeString(key), value);
+    auto i = m->impl.insert(QPDFObjectHandle::newUnicodeString(key), value);
     return {std::make_shared<NNTreeIterator>(i)};
 }
 
 bool
 QPDFNameTreeObjectHelper::remove(std::string const& key, QPDFObjectHandle* value)
 {
-    return m->impl->remove(QPDFObjectHandle::newUnicodeString(key), value);
+    return m->impl.remove(QPDFObjectHandle::newUnicodeString(key), value);
 }
 
 bool
@@ -1022,7 +1027,7 @@ QPDFNameTreeObjectHelper::findObject(std::string const& name, QPDFObjectHandle& 
 void
 QPDFNameTreeObjectHelper::setSplitThreshold(int t)
 {
-    m->impl->setSplitThreshold(t);
+    m->impl.setSplitThreshold(t);
 }
 
 std::map<std::string, QPDFObjectHandle>
@@ -1036,29 +1041,36 @@ QPDFNameTreeObjectHelper::getAsMap() const
 bool
 QPDFNameTreeObjectHelper::validate(bool repair)
 {
-    return m->impl->validate(repair);
+    return m->impl.validate(repair);
 }
 
-QPDFNumberTreeObjectHelper::~QPDFNumberTreeObjectHelper() // NOLINT (modernize-use-equals-default)
+class QPDFNumberTreeObjectHelper::Members
 {
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer. For this specific
-    // class, see github issue #745.
-}
+    typedef QPDFNumberTreeObjectHelper::numtree_number numtree_number;
 
-QPDFNumberTreeObjectHelper::Members::Members(
-    QPDFObjectHandle& oh,
-    QPDF& q,
-    std::function<bool(QPDFObjectHandle const&)> value_validator,
-    bool auto_repair) :
-    impl(std::make_shared<NNTreeImpl>(q, oh, ::ot_integer, value_validator, auto_repair))
-{
-}
+  public:
+    Members(
+        QPDFObjectHandle& oh,
+        QPDF& q,
+        std::function<bool(QPDFObjectHandle const&)> value_validator,
+        bool auto_repair) :
+        impl(q, oh, ::ot_integer, value_validator, auto_repair)
+    {
+    }
+    Members(Members const&) = delete;
+    ~Members() = default;
+
+    NNTreeImpl impl;
+};
+
+// Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer. For this specific
+// class, see github issue #745.
+QPDFNumberTreeObjectHelper::~QPDFNumberTreeObjectHelper() = default;
 
 QPDFNumberTreeObjectHelper::QPDFNumberTreeObjectHelper(
     QPDFObjectHandle oh, QPDF& q, bool auto_repair) :
-    QPDFObjectHelper(oh),
-    m(new Members(
-        oh, q, [](QPDFObjectHandle const& o) -> bool { return static_cast<bool>(o); }, auto_repair))
+    QPDFNumberTreeObjectHelper(
+        oh, q, [](QPDFObjectHandle const& o) -> bool { return static_cast<bool>(o); }, auto_repair)
 {
 }
 
@@ -1068,7 +1080,7 @@ QPDFNumberTreeObjectHelper::QPDFNumberTreeObjectHelper(
     std::function<bool(QPDFObjectHandle const&)> value_validator,
     bool auto_repair) :
     QPDFObjectHelper(oh),
-    m(new Members(oh, q, value_validator, auto_repair))
+    m(std::make_shared<Members>(oh, q, value_validator, auto_repair))
 {
 }
 
@@ -1155,39 +1167,39 @@ QPDFNumberTreeObjectHelper::iterator::remove()
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::begin() const
 {
-    return {std::make_shared<NNTreeIterator>(m->impl->begin())};
+    return {std::make_shared<NNTreeIterator>(m->impl.begin())};
 }
 
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::end() const
 {
-    return {std::make_shared<NNTreeIterator>(m->impl->end())};
+    return {std::make_shared<NNTreeIterator>(m->impl.end())};
 }
 
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::last() const
 {
-    return {std::make_shared<NNTreeIterator>(m->impl->last())};
+    return {std::make_shared<NNTreeIterator>(m->impl.last())};
 }
 
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::find(numtree_number key, bool return_prev_if_not_found)
 {
-    auto i = m->impl->find(QPDFObjectHandle::newInteger(key), return_prev_if_not_found);
+    auto i = m->impl.find(QPDFObjectHandle::newInteger(key), return_prev_if_not_found);
     return {std::make_shared<NNTreeIterator>(i)};
 }
 
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::insert(numtree_number key, QPDFObjectHandle value)
 {
-    auto i = m->impl->insert(QPDFObjectHandle::newInteger(key), value);
+    auto i = m->impl.insert(QPDFObjectHandle::newInteger(key), value);
     return {std::make_shared<NNTreeIterator>(i)};
 }
 
 bool
 QPDFNumberTreeObjectHelper::remove(numtree_number key, QPDFObjectHandle* value)
 {
-    return m->impl->remove(QPDFObjectHandle::newInteger(key), value);
+    return m->impl.remove(QPDFObjectHandle::newInteger(key), value);
 }
 
 QPDFNumberTreeObjectHelper::numtree_number
@@ -1245,7 +1257,7 @@ QPDFNumberTreeObjectHelper::findObjectAtOrBelow(
 void
 QPDFNumberTreeObjectHelper::setSplitThreshold(int t)
 {
-    m->impl->setSplitThreshold(t);
+    m->impl.setSplitThreshold(t);
 }
 
 std::map<QPDFNumberTreeObjectHelper::numtree_number, QPDFObjectHandle>
@@ -1259,5 +1271,5 @@ QPDFNumberTreeObjectHelper::getAsMap() const
 bool
 QPDFNumberTreeObjectHelper::validate(bool repair)
 {
-    return m->impl->validate(repair);
+    return m->impl.validate(repair);
 }
