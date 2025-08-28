@@ -68,7 +68,7 @@ NNTreeIterator::updateIValue(bool allow_invalid)
         ivalue.second = QPDFObjectHandle();
         return;
     }
-    Array items = node.getKey(impl.details.itemsKey());
+    Array items = node.getKey(impl.itemsKey());
     if (!std::cmp_less(item_number + 1, items.size())) {
         impl.error(node, "update ivalue: items array is too short");
     }
@@ -91,7 +91,7 @@ NNTreeIterator::getNextKid(PathElement& pe, bool backward)
         if (pe.kid_number >= 0 && std::cmp_less(pe.kid_number, kids.size())) {
             auto result = kids[pe.kid_number];
             if (result.isDictionary() &&
-                (result.hasKey("/Kids") || result.hasKey(impl.details.itemsKey()))) {
+                (result.hasKey("/Kids") || result.hasKey(impl.itemsKey()))) {
                 return result;
             } else {
                 impl.warn(
@@ -121,7 +121,7 @@ NNTreeIterator::increment(bool backward)
 
     while (valid()) {
         item_number += backward ? -2 : 2;
-        Array items = node.getKey(impl.details.itemsKey());
+        Array items = node.getKey(impl.itemsKey());
         if (item_number < 0 || std::cmp_greater_equal(item_number, items.size())) {
             bool found = false;
             setItemNumber(QPDFObjectHandle(), -1);
@@ -136,10 +136,10 @@ NNTreeIterator::increment(bool backward)
             }
         }
         if (item_number >= 0) {
-            items = node.getKey(impl.details.itemsKey());
+            items = node.getKey(impl.itemsKey());
             if (std::cmp_greater_equal(item_number + 1, items.size())) {
                 impl.warn(node, "items array doesn't have enough elements");
-            } else if (!impl.details.keyValid(items[item_number])) {
+            } else if (!impl.keyValid(items[item_number])) {
                 impl.warn(node, ("item " + std::to_string(item_number) + " has the wrong type"));
             } else if (!impl.value_valid(items[item_number + 1])) {
                 impl.warn(node, "item " + std::to_string(item_number + 1) + " is invalid");
@@ -160,7 +160,7 @@ NNTreeIterator::resetLimits(QPDFObjectHandle a_node, std::list<PathElement>::ite
         }
         Array kids = a_node.getKey("/Kids");
         size_t nkids = kids.size();
-        Array items = a_node.getKey(impl.details.itemsKey());
+        Array items = a_node.getKey(impl.itemsKey());
         size_t nitems = items.size();
 
         bool changed = true;
@@ -187,9 +187,8 @@ NNTreeIterator::resetLimits(QPDFObjectHandle a_node, std::list<PathElement>::ite
             if (olimits.size() == 2) {
                 auto ofirst = olimits[0];
                 auto olast = olimits[1];
-                if (impl.details.keyValid(ofirst) && impl.details.keyValid(olast) &&
-                    impl.details.compareKeys(first, ofirst) == 0 &&
-                    impl.details.compareKeys(last, olast) == 0) {
+                if (impl.keyValid(ofirst) && impl.keyValid(olast) &&
+                    impl.compareKeys(first, ofirst) == 0 && impl.compareKeys(last, olast) == 0) {
                     changed = false;
                 }
             }
@@ -246,7 +245,7 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
     // Find the array we actually need to split, which is either this node's kids or items.
     Array kids = to_split.getKey("/Kids");
     size_t nkids = kids.size();
-    Array items = to_split.getKey(impl.details.itemsKey());
+    Array items = to_split.getKey(impl.itemsKey());
     size_t nitems = items.size();
 
     Array first_half;
@@ -261,7 +260,7 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
         first_half = items;
         n = nitems;
         threshold *= 2;
-        key = impl.details.itemsKey();
+        key = impl.itemsKey();
     } else {
         throw std::logic_error("NNTreeIterator::split called on invalid node");
     }
@@ -295,7 +294,7 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
         Array new_kids;
         new_kids.push_back(first_node);
         to_split.removeKey("/Limits"); // already shouldn't be there for root
-        to_split.removeKey(impl.details.itemsKey());
+        to_split.removeKey(impl.itemsKey());
         to_split.replaceKey("/Kids", new_kids);
         if (is_leaf) {
             node = first_node;
@@ -375,7 +374,7 @@ NNTreeIterator::insertAfter(QPDFObjectHandle const& key, QPDFObjectHandle const&
         return;
     }
 
-    Array items = node.getKey(impl.details.itemsKey());
+    Array items = node.getKey(impl.itemsKey());
     if (!items) {
         impl.error(node, "node contains no items array");
     }
@@ -404,7 +403,7 @@ NNTreeIterator::remove()
     if (!valid()) {
         throw std::logic_error("attempt made to remove an invalid iterator");
     }
-    Array items = node.getKey(impl.details.itemsKey());
+    Array items = node.getKey(impl.itemsKey());
     int nitems = static_cast<int>(items.size());
     if (std::cmp_greater(item_number + 2, nitems)) {
         impl.error(node, "found short items array while removing an item");
@@ -478,7 +477,7 @@ NNTreeIterator::remove()
         if (parent == path.end()) {
             // We erased the very last item. Convert the root to an empty items array.
             element->node.removeKey("/Kids");
-            element->node.replaceKey(impl.details.itemsKey(), Array());
+            element->node.replaceKey(impl.itemsKey(), Array());
             path.clear();
             setItemNumber(impl.oh, -1);
             return;
@@ -579,7 +578,7 @@ NNTreeIterator::deepen(QPDFObjectHandle a_node, bool first, bool allow_empty)
             return fail(a_node, "non-dictionary node while traversing name/number tree");
         }
 
-        Array items = a_node.getKey(impl.details.itemsKey());
+        Array items = a_node.getKey(impl.itemsKey());
         int nitems = static_cast<int>(items.size());
         if (nitems > 1) {
             setItemNumber(a_node, first ? 0 : nitems - 2);
@@ -616,22 +615,22 @@ NNTreeIterator::deepen(QPDFObjectHandle a_node, bool first, bool allow_empty)
         } else {
             return fail(
                 a_node,
-                "name/number tree node has neither non-empty " + impl.details.itemsKey() +
-                    " nor /Kids");
+                "name/number tree node has neither non-empty " + impl.itemsKey() + " nor /Kids");
         }
     }
     return true;
 }
 
 NNTreeImpl::NNTreeImpl(
-    NNTreeDetails const& details,
     QPDF& qpdf,
     QPDFObjectHandle& oh,
+    qpdf_object_type_e key_type,
     std::function<bool(QPDFObjectHandle const&)> value_validator,
     bool auto_repair) :
-    details(details),
     qpdf(qpdf),
     oh(oh),
+    key_type(key_type),
+    items_key(key_type == ::ot_string ? "/Names" : "/Nums"),
     value_valid(value_validator),
     auto_repair(auto_repair)
 {
@@ -666,16 +665,32 @@ NNTreeImpl::last()
 }
 
 int
+NNTreeImpl::compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const
+{
+        // We don't call this without calling keyValid first
+        qpdf_assert_debug(keyValid(a));
+        qpdf_assert_debug(keyValid(b));
+    if (key_type == ::ot_string) {
+        auto as = a.getUTF8Value();
+        auto bs = b.getUTF8Value();
+        return as < bs ? -1 : (as > bs ? 1 : 0);
+    }
+    auto as = a.getIntValue();
+    auto bs = b.getIntValue();
+    return as < bs ? -1 : (as > bs ? 1 : 0);
+}
+
+int
 NNTreeImpl::withinLimits(QPDFObjectHandle const& key, QPDFObjectHandle const& node)
 {
     Array limits = node.getKey("/Limits");
-    if (!(details.keyValid(limits[0]) && details.keyValid(limits[1]))) {
+    if (!(keyValid(limits[0]) && keyValid(limits[1]))) {
         error(node, "node is missing /Limits");
     }
-    if (details.compareKeys(key, limits[0]) < 0) {
+    if (compareKeys(key, limits[0]) < 0) {
         return -1;
     }
-    if (details.compareKeys(key, limits[1]) > 0) {
+    if (compareKeys(key, limits[1]) > 0) {
         return 1;
     }
     return 0;
@@ -728,10 +743,10 @@ NNTreeImpl::binarySearch(
 int
 NNTreeImpl::compareKeyItem(QPDFObjectHandle& key, QPDFObjectHandle& items, int idx)
 {
-    if (!(std::cmp_greater(items.size(), 2 * idx) && details.keyValid(items[2 * idx]))) {
+    if (!(std::cmp_greater(items.size(), 2 * idx) && keyValid(items[2 * idx]))) {
         error(oh, ("item at index " + std::to_string(2 * idx) + " is not the right type"));
     }
-    return details.compareKeys(key, items[2 * idx]);
+    return compareKeys(key, items[2 * idx]);
 }
 
 int
@@ -747,15 +762,15 @@ void
 NNTreeImpl::repair()
 {
     auto new_node = QPDFObjectHandle::newDictionary();
-    new_node.replaceKey(details.itemsKey(), Array());
-    NNTreeImpl repl(details, qpdf, new_node, value_valid, false);
+    new_node.replaceKey(itemsKey(), Array());
+    NNTreeImpl repl(qpdf, new_node, key_type, value_valid, false);
     for (auto const& [key, value]: *this) {
         if (key && value) {
             repl.insert(key, value);
         }
     }
     oh.replaceKey("/Kids", new_node.getKey("/Kids"));
-    oh.replaceKey(details.itemsKey(), new_node.getKey(details.itemsKey()));
+    oh.replaceKey(itemsKey(), new_node.getKey(itemsKey()));
 }
 
 NNTreeImpl::iterator
@@ -783,13 +798,13 @@ NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_fo
         return end();
     }
     if (first_item.valid()) {
-        if (!details.keyValid(first_item->first)) {
+        if (!keyValid(first_item->first)) {
             error(oh, "encountered invalid key in find");
         }
         if (!value_valid(first_item->second)) {
             error(oh, "encountered invalid value in find");
         }
-        if (details.compareKeys(key, first_item->first) < 0) {
+        if (compareKeys(key, first_item->first) < 0) {
             // Before the first key
             return end();
         }
@@ -805,14 +820,14 @@ NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_fo
             error(node, "loop detected in find");
         }
 
-        Array items = node.getKey(details.itemsKey());
+        Array items = node.getKey(itemsKey());
         size_t nitems = items.size();
         if (nitems > 1) {
             int idx = binarySearch(
                 key, items, nitems / 2, return_prev_if_not_found, &NNTreeImpl::compareKeyItem);
             if (idx >= 0) {
                 result.setItemNumber(node, 2 * idx);
-                if (!result.impl.details.keyValid(result.ivalue.first)) {
+                if (!result.impl.keyValid(result.ivalue.first)) {
                     error(node, "encountered invalid key in find");
                 }
                 if (!result.impl.value_valid(result.ivalue.second)) {
@@ -843,7 +858,7 @@ NNTreeImpl::insertFirst(QPDFObjectHandle const& key, QPDFObjectHandle const& val
     auto iter = begin();
     Array items(nullptr);
     if (iter.node.isDictionary()) {
-        items = iter.node.getKey(details.itemsKey());
+        items = iter.node.getKey(itemsKey());
     }
     if (!items) {
         error(oh, "unable to find a valid items node");
@@ -868,8 +883,8 @@ NNTreeImpl::insert(QPDFObjectHandle const& key, QPDFObjectHandle const& value)
     auto iter = find(key, true);
     if (!iter.valid()) {
         return insertFirst(key, value);
-    } else if (details.compareKeys(key, iter->first) == 0) {
-        Array items = iter.node.getKey(details.itemsKey());
+    } else if (compareKeys(key, iter->first) == 0) {
+        Array items = iter.node.getKey(itemsKey());
         items.set(iter.item_number + 1, value);
         iter.updateIValue();
     } else {
@@ -899,7 +914,7 @@ NNTreeImpl::validate(bool a_repair)
     QPDFObjectHandle last_key;
     try {
         for (auto const& [key, value]: *this) {
-            if (!details.keyValid(key)) {
+            if (!keyValid(key)) {
                 error(oh, "invalid key in validate");
             }
             if (!value_valid(value)) {
@@ -907,7 +922,7 @@ NNTreeImpl::validate(bool a_repair)
             }
             if (first) {
                 first = false;
-            } else if (last_key && details.compareKeys(last_key, key) != -1) {
+            } else if (last_key && compareKeys(last_key, key) != -1) {
                 error(oh, "keys are not sorted in validate");
             }
             last_key = key;

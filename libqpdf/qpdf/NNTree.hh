@@ -2,19 +2,11 @@
 #define NNTREE_HH
 
 #include <qpdf/QPDF.hh>
-#include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 
 #include <iterator>
 #include <list>
 #include <memory>
-
-class NNTreeDetails
-{
-  public:
-    virtual std::string const& itemsKey() const = 0;
-    virtual bool keyValid(QPDFObjectHandle) const = 0;
-    virtual int compareKeys(QPDFObjectHandle, QPDFObjectHandle) const = 0;
-};
 
 class NNTreeImpl;
 class NNTreeIterator
@@ -96,9 +88,9 @@ class NNTreeImpl
     typedef NNTreeIterator iterator;
 
     NNTreeImpl(
-        NNTreeDetails const&,
         QPDF&,
         QPDFObjectHandle&,
+        qpdf_object_type_e key_type,
         std::function<bool(QPDFObjectHandle const&)> value_validator,
         bool auto_repair = true);
     iterator begin();
@@ -130,10 +122,24 @@ class NNTreeImpl
     void warn(QPDFObjectHandle const& node, std::string const& msg);
     void error(QPDFObjectHandle const& node, std::string const& msg);
 
-    NNTreeDetails const& details;
+    std::string const&
+    itemsKey() const
+    {
+        return items_key;
+    }
+    bool
+    keyValid(QPDFObjectHandle o) const
+    {
+        return o.resolved_type_code() == key_type;
+    }
+    int
+    compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const;
+
     QPDF& qpdf;
     int split_threshold{32};
     QPDFObjectHandle oh;
+    const qpdf_object_type_e key_type;
+    const std::string items_key;
     const std::function<bool(QPDFObjectHandle const&)> value_valid;
     bool auto_repair{true};
     size_t error_count{0};

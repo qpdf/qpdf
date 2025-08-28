@@ -3,38 +3,6 @@
 #include <qpdf/NNTree.hh>
 #include <qpdf/QIntC.hh>
 
-namespace
-{
-    class NumberTreeDetails: public NNTreeDetails
-    {
-      public:
-        std::string const&
-        itemsKey() const override
-        {
-            static std::string k("/Nums");
-            return k;
-        }
-        bool
-        keyValid(QPDFObjectHandle oh) const override
-        {
-            return oh.isInteger();
-        }
-        int
-        compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const override
-        {
-            if (!(keyValid(a) && keyValid(b))) {
-                // We don't call this without calling keyValid first
-                throw std::logic_error("comparing invalid keys");
-            }
-            auto as = a.getIntValue();
-            auto bs = b.getIntValue();
-            return ((as < bs) ? -1 : (as > bs) ? 1 : 0);
-        }
-    };
-} // namespace
-
-static NumberTreeDetails number_tree_details;
-
 QPDFNumberTreeObjectHelper::~QPDFNumberTreeObjectHelper() // NOLINT (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer. For this specific
@@ -46,7 +14,7 @@ QPDFNumberTreeObjectHelper::Members::Members(
     QPDF& q,
     std::function<bool(QPDFObjectHandle const&)> value_validator,
     bool auto_repair) :
-    impl(std::make_shared<NNTreeImpl>(number_tree_details, q, oh, value_validator, auto_repair))
+    impl(std::make_shared<NNTreeImpl>(q, oh, ::ot_integer, value_validator, auto_repair))
 {
 }
 
