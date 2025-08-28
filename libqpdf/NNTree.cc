@@ -667,9 +667,9 @@ NNTreeImpl::last()
 int
 NNTreeImpl::compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const
 {
-        // We don't call this without calling keyValid first
-        qpdf_assert_debug(keyValid(a));
-        qpdf_assert_debug(keyValid(b));
+    // We don't call this without calling keyValid first
+    qpdf_assert_debug(keyValid(a));
+    qpdf_assert_debug(keyValid(b));
     if (key_type == ::ot_string) {
         auto as = a.getUTF8Value();
         auto bs = b.getUTF8Value();
@@ -678,22 +678,6 @@ NNTreeImpl::compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const
     auto as = a.getIntValue();
     auto bs = b.getIntValue();
     return as < bs ? -1 : (as > bs ? 1 : 0);
-}
-
-int
-NNTreeImpl::withinLimits(QPDFObjectHandle const& key, QPDFObjectHandle const& node)
-{
-    Array limits = node.getKey("/Limits");
-    if (!(keyValid(limits[0]) && keyValid(limits[1]))) {
-        error(node, "node is missing /Limits");
-    }
-    if (compareKeys(key, limits[0]) < 0) {
-        return -1;
-    }
-    if (compareKeys(key, limits[1]) > 0) {
-        return 1;
-    }
-    return 0;
 }
 
 int
@@ -755,7 +739,17 @@ NNTreeImpl::compareKeyKid(QPDFObjectHandle& key, QPDFObjectHandle& kids, int idx
     if (!(std::cmp_less(idx, kids.size()) && kids[idx].isDictionary())) {
         error(oh, "invalid kid at index " + std::to_string(idx));
     }
-    return withinLimits(key, kids[idx]);
+    Array limits = kids[idx].getKey("/Limits");
+    if (!(keyValid(limits[0]) && keyValid(limits[1]))) {
+        error(kids[idx], "node is missing /Limits");
+    }
+    if (compareKeys(key, limits[0]) < 0) {
+        return -1;
+    }
+    if (compareKeys(key, limits[1]) > 0) {
+        return 1;
+    }
+    return 0;
 }
 
 void

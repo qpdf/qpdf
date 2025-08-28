@@ -110,7 +110,6 @@ class NNTreeImpl
   private:
     void repair();
     iterator findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_found = false);
-    int withinLimits(QPDFObjectHandle const& key, QPDFObjectHandle const& node);
     int binarySearch(
         QPDFObjectHandle key,
         QPDFObjectHandle items,
@@ -132,8 +131,7 @@ class NNTreeImpl
     {
         return o.resolved_type_code() == key_type;
     }
-    int
-    compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const;
+    int compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const;
 
     QPDF& qpdf;
     int split_threshold{32};
