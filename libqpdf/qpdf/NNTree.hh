@@ -9,7 +9,7 @@
 #include <memory>
 
 class NNTreeImpl;
-class NNTreeIterator
+class NNTreeIterator final
 {
     friend class NNTreeImpl;
 
@@ -21,9 +21,20 @@ class NNTreeIterator
     using pointer = T*;
     using reference = T&;
 
-    virtual ~NNTreeIterator() = default;
-    bool valid() const;
-    NNTreeIterator& operator++();
+    ~NNTreeIterator() = default;
+    // iterator can be incremented or decremented, or dereferenced. This does not imply that it
+    // points to a valid item.
+    bool
+    valid() const
+    {
+        return item_number >= 0;
+    }
+    NNTreeIterator&
+    operator++()
+    {
+        increment(false);
+        return *this;
+    }
     NNTreeIterator
     operator++(int)
     {
@@ -31,7 +42,12 @@ class NNTreeIterator
         ++(*this);
         return t;
     }
-    NNTreeIterator& operator--();
+    NNTreeIterator&
+    operator--()
+    {
+        increment(true);
+        return *this;
+    }
     NNTreeIterator
     operator--(int)
     {
@@ -39,8 +55,18 @@ class NNTreeIterator
         --(*this);
         return t;
     }
-    reference operator*();
-    pointer operator->();
+    reference
+    operator*()
+    {
+        updateIValue(false);
+        return ivalue;
+    }
+    pointer
+    operator->()
+    {
+        updateIValue(false);
+        return &ivalue;
+    }
     bool operator==(NNTreeIterator const& other) const;
     bool
     operator!=(NNTreeIterator const& other) const
@@ -61,11 +87,24 @@ class NNTreeIterator
         int kid_number;
     };
 
-    NNTreeIterator(NNTreeImpl& impl);
+    NNTreeIterator(NNTreeImpl& impl) :
+        impl(impl)
+    {
+    }
     void updateIValue(bool allow_invalid = true);
     bool deepen(QPDFObjectHandle node, bool first, bool allow_empty);
-    void setItemNumber(QPDFObjectHandle const& node, int);
-    void addPathElement(QPDFObjectHandle const& node, int kid_number);
+    void
+    setItemNumber(QPDFObjectHandle const& a_node, int n)
+    {
+        node = a_node;
+        item_number = n;
+        updateIValue();
+    }
+    void
+    addPathElement(QPDFObjectHandle const& a_node, int kid_number)
+    {
+        path.emplace_back(a_node, kid_number);
+    }
     QPDFObjectHandle getNextKid(PathElement& element, bool backward);
     void increment(bool backward);
     void resetLimits(QPDFObjectHandle node, std::list<PathElement>::iterator parent);
@@ -80,7 +119,7 @@ class NNTreeIterator
     value_type ivalue;
 };
 
-class NNTreeImpl
+class NNTreeImpl final
 {
     friend class NNTreeIterator;
 
@@ -88,13 +127,25 @@ class NNTreeImpl
     typedef NNTreeIterator iterator;
 
     NNTreeImpl(
-        QPDF&,
-        QPDFObjectHandle&,
+        QPDF& qpdf,
+        QPDFObjectHandle& oh,
         qpdf_object_type_e key_type,
         std::function<bool(QPDFObjectHandle const&)> value_validator,
-        bool auto_repair = true);
+        bool auto_repair) :
+        qpdf(qpdf),
+        oh(oh),
+        key_type(key_type),
+        items_key(key_type == ::ot_string ? "/Names" : "/Nums"),
+        value_valid(value_validator),
+        auto_repair(auto_repair)
+    {
+    }
     iterator begin();
-    iterator end();
+    iterator
+    end()
+    {
+        return {*this};
+    }
     iterator last();
     iterator find(QPDFObjectHandle key, bool return_prev_if_not_found = false);
     iterator insertFirst(QPDFObjectHandle const& key, QPDFObjectHandle const& value);
@@ -105,7 +156,11 @@ class NNTreeImpl
 
     // Change the split threshold for easier testing. There's no real reason to expose this to
     // downstream tree helpers, but it has to be public so we can call it from the test suite.
-    void setSplitThreshold(int split_threshold);
+    void
+    setSplitThreshold(int threshold)
+    {
+        split_threshold = threshold;
+    }
 
   private:
     void repair();

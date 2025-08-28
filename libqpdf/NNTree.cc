@@ -38,11 +38,6 @@ NNTreeImpl::error(QPDFObjectHandle const& node, std::string const& msg) const
     throw QPDFExc(qpdf_e_damaged_pdf, qpdf.getFilename(), get_description(node), 0, msg);
 }
 
-NNTreeIterator::NNTreeIterator(NNTreeImpl& impl) :
-    impl(impl)
-{
-}
-
 void
 NNTreeIterator::updateIValue(bool allow_invalid)
 {
@@ -102,15 +97,6 @@ NNTreeIterator::getNextKid(PathElement& pe, bool backward)
         }
     }
 }
-
-// iterator can be incremented or decremented, or dereferenced. This does not imply that it points
-// to a valid item.
-bool
-NNTreeIterator::valid() const
-{
-    return item_number >= 0;
-}
-
 void
 NNTreeIterator::increment(bool backward)
 {
@@ -488,34 +474,6 @@ NNTreeIterator::remove()
     }
 }
 
-NNTreeIterator&
-NNTreeIterator::operator++()
-{
-    increment(false);
-    return *this;
-}
-
-NNTreeIterator&
-NNTreeIterator::operator--()
-{
-    increment(true);
-    return *this;
-}
-
-NNTreeIterator::reference
-NNTreeIterator::operator*()
-{
-    updateIValue(false);
-    return ivalue;
-}
-
-NNTreeIterator::pointer
-NNTreeIterator::operator->()
-{
-    updateIValue(false);
-    return &ivalue;
-}
-
 bool
 NNTreeIterator::operator==(NNTreeIterator const& other) const
 {
@@ -535,20 +493,6 @@ NNTreeIterator::operator==(NNTreeIterator const& other) const
         ++opi;
     }
     return item_number == other.item_number;
-}
-
-void
-NNTreeIterator::setItemNumber(QPDFObjectHandle const& a_node, int n)
-{
-    node = a_node;
-    item_number = n;
-    updateIValue();
-}
-
-void
-NNTreeIterator::addPathElement(QPDFObjectHandle const& a_node, int kid_number)
-{
-    path.emplace_back(a_node, kid_number);
 }
 
 bool
@@ -621,39 +565,12 @@ NNTreeIterator::deepen(QPDFObjectHandle a_node, bool first, bool allow_empty)
     return true;
 }
 
-NNTreeImpl::NNTreeImpl(
-    QPDF& qpdf,
-    QPDFObjectHandle& oh,
-    qpdf_object_type_e key_type,
-    std::function<bool(QPDFObjectHandle const&)> value_validator,
-    bool auto_repair) :
-    qpdf(qpdf),
-    oh(oh),
-    key_type(key_type),
-    items_key(key_type == ::ot_string ? "/Names" : "/Nums"),
-    value_valid(value_validator),
-    auto_repair(auto_repair)
-{
-}
-
-void
-NNTreeImpl::setSplitThreshold(int threshold)
-{
-    split_threshold = threshold;
-}
-
 NNTreeImpl::iterator
 NNTreeImpl::begin()
 {
     iterator result(*this);
     result.deepen(oh, true, true);
     return result;
-}
-
-NNTreeImpl::iterator
-NNTreeImpl::end()
-{
-    return {*this};
 }
 
 NNTreeImpl::iterator
