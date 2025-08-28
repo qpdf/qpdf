@@ -33,7 +33,7 @@ NNTreeImpl::warn(QPDFObjectHandle const& node, std::string const& msg)
 }
 
 void
-NNTreeImpl::error(QPDFObjectHandle const& node, std::string const& msg)
+NNTreeImpl::error(QPDFObjectHandle const& node, std::string const& msg) const
 {
     throw QPDFExc(qpdf_e_damaged_pdf, qpdf.getFilename(), get_description(node), 0, msg);
 }
@@ -682,11 +682,11 @@ NNTreeImpl::compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const
 
 int
 NNTreeImpl::binarySearch(
-    QPDFObjectHandle key,
-    QPDFObjectHandle items,
+    QPDFObjectHandle const& key,
+    Array const& items,
     size_t num_items,
     bool return_prev_if_not_found,
-    int (NNTreeImpl::*compare)(QPDFObjectHandle& key, QPDFObjectHandle& arr, int item))
+    int (NNTreeImpl::*compare)(QPDFObjectHandle const& key, Array const& arr, int item) const) const
 {
     size_t max_idx = std::bit_ceil(num_items);
 
@@ -725,18 +725,18 @@ NNTreeImpl::binarySearch(
 }
 
 int
-NNTreeImpl::compareKeyItem(QPDFObjectHandle& key, QPDFObjectHandle& items, int idx)
+NNTreeImpl::compareKeyItem(QPDFObjectHandle const& key, Array const& items, int idx) const
 {
-    if (!(std::cmp_greater(items.size(), 2 * idx) && keyValid(items[2 * idx]))) {
+    if (!keyValid(items[2 * idx])) {
         error(oh, ("item at index " + std::to_string(2 * idx) + " is not the right type"));
     }
     return compareKeys(key, items[2 * idx]);
 }
 
 int
-NNTreeImpl::compareKeyKid(QPDFObjectHandle& key, QPDFObjectHandle& kids, int idx)
+NNTreeImpl::compareKeyKid(QPDFObjectHandle const& key, Array const& kids, int idx) const
 {
-    if (!(std::cmp_less(idx, kids.size()) && kids[idx].isDictionary())) {
+    if (!kids[idx].isDictionary()) {
         error(oh, "invalid kid at index " + std::to_string(idx));
     }
     Array limits = kids[idx].getKey("/Limits");

@@ -111,15 +111,16 @@ class NNTreeImpl
     void repair();
     iterator findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_found = false);
     int binarySearch(
-        QPDFObjectHandle key,
-        QPDFObjectHandle items,
+        QPDFObjectHandle const& key,
+        qpdf::Array const& items,
         size_t num_items,
         bool return_prev_if_not_found,
-        int (NNTreeImpl::*compare)(QPDFObjectHandle& key, QPDFObjectHandle& arr, int item));
-    int compareKeyItem(QPDFObjectHandle& key, QPDFObjectHandle& items, int idx);
-    int compareKeyKid(QPDFObjectHandle& key, QPDFObjectHandle& items, int idx);
+        int (NNTreeImpl::*compare)(QPDFObjectHandle const& key, qpdf::Array const& arr, int item)
+            const) const;
+    int compareKeyItem(QPDFObjectHandle const& key, qpdf::Array const& items, int idx) const;
+    int compareKeyKid(QPDFObjectHandle const& key, qpdf::Array const& items, int idx) const;
     void warn(QPDFObjectHandle const& node, std::string const& msg);
-    void error(QPDFObjectHandle const& node, std::string const& msg);
+    void error(QPDFObjectHandle const& node, std::string const& msg) const;
 
     std::string const&
     itemsKey() const
