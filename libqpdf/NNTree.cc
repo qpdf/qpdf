@@ -280,7 +280,7 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
 
         auto first_node = impl.qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
         first_node.replaceKey(key, first_half);
-        Array new_kids;
+        auto new_kids = Array::empty();
         new_kids.push_back(first_node);
         to_split.removeKey("/Limits"); // already shouldn't be there for root
         to_split.removeKey(impl.itemsKey());
@@ -301,7 +301,7 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
 
     // Create a second half array, and transfer the second half of the items into the second half
     // array.
-    Array second_half;
+    auto second_half = Array::empty();
     auto start_idx = static_cast<int>((n / 2) & ~1u);
     while (std::cmp_greater(first_half.size(), start_idx)) {
         second_half.push_back(first_half[start_idx]);
@@ -323,6 +323,9 @@ NNTreeIterator::split(QPDFObjectHandle to_split, std::list<PathElement>::iterato
     // this is a leaf, so that the kid/item number points to the right place.
 
     Array parent_kids = parent->node.getKey("/Kids");
+    if (!parent_kids) {
+        impl.error(parent->node, "parent node has no /Kids array");
+    }
     parent_kids.insert(parent->kid_number + 1, second_node);
     auto cur_elem = parent;
     ++cur_elem; // points to end() for leaf nodes
@@ -466,7 +469,7 @@ NNTreeIterator::remove()
         if (parent == path.end()) {
             // We erased the very last item. Convert the root to an empty items array.
             element->node.removeKey("/Kids");
-            element->node.replaceKey(impl.itemsKey(), Array());
+            element->node.replaceKey(impl.itemsKey(), Array::empty());
             path.clear();
             setItemNumber(impl.oh, -1);
             return;
@@ -676,7 +679,7 @@ void
 NNTreeImpl::repair()
 {
     auto new_node = QPDFObjectHandle::newDictionary();
-    new_node.replaceKey(itemsKey(), Array());
+    new_node.replaceKey(itemsKey(), Array::empty());
     NNTreeImpl repl(qpdf, new_node, key_type, value_valid, false);
     for (auto const& [key, value]: *this) {
         if (key && value) {
@@ -770,7 +773,7 @@ NNTreeImpl::iterator
 NNTreeImpl::insertFirst(QPDFObjectHandle const& key, QPDFObjectHandle const& value)
 {
     auto iter = begin();
-    Array items(nullptr);
+    Array items;
     if (iter.node.isDictionary()) {
         items = iter.node.getKey(itemsKey());
     }
