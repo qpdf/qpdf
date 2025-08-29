@@ -99,7 +99,7 @@ void
 NNTreeIterator::increment(bool backward)
 {
     if (item_number < 0) {
-        deepen(impl.oh, !backward, true);
+        deepen(impl.tree_root, !backward, true);
         return;
     }
 
@@ -345,7 +345,7 @@ NNTreeIterator::insertAfter(QPDFObjectHandle const& key, QPDFObjectHandle const&
 {
     if (!valid()) {
         impl.insertFirst(key, value);
-        deepen(impl.oh, true, false);
+        deepen(impl.tree_root, true, false);
         return;
     }
 
@@ -415,7 +415,7 @@ NNTreeIterator::remove()
 
     if (path.empty()) {
         // Special case: if this is the root node, we can leave it empty.
-        setItemNumber(impl.oh, -1);
+        setItemNumber(impl.tree_root, -1);
         return;
     }
 
@@ -454,7 +454,7 @@ NNTreeIterator::remove()
             element->node.removeKey("/Kids");
             element->node.replaceKey(impl.itemsKey(), Array::empty());
             path.clear();
-            setItemNumber(impl.oh, -1);
+            setItemNumber(impl.tree_root, -1);
             return;
         }
 
@@ -559,7 +559,7 @@ NNTreeImpl::iterator
 NNTreeImpl::begin()
 {
     iterator result(*this);
-    result.deepen(oh, true, true);
+    result.deepen(tree_root, true, true);
     return result;
 }
 
@@ -567,7 +567,7 @@ NNTreeImpl::iterator
 NNTreeImpl::last()
 {
     iterator result(*this);
-    result.deepen(oh, false, true);
+    result.deepen(tree_root, false, true);
     return result;
 }
 
@@ -623,7 +623,7 @@ int
 NNTreeImpl::compareKeyItem(QPDFObjectHandle const& key, Array const& items, int idx) const
 {
     if (!keyValid(items[2 * idx])) {
-        error(oh, ("item at index " + std::to_string(2 * idx) + " is not the right type"));
+        error(tree_root, ("item at index " + std::to_string(2 * idx) + " is not the right type"));
     }
     return compareKeys(key, items[2 * idx]);
 }
@@ -633,7 +633,7 @@ NNTreeImpl::compareKeyKid(QPDFObjectHandle const& key, Array const& kids, int id
 {
     Dictionary kid = kids[idx];
     if (!kid) {
-        error(oh, "invalid kid at index " + std::to_string(idx));
+        error(tree_root, "invalid kid at index " + std::to_string(idx));
     }
     Array limits = kid["/Limits"];
     if (!(keyValid(limits[0]) && keyValid(limits[1]))) {
@@ -658,8 +658,8 @@ NNTreeImpl::repair()
             repl.insert(key, value);
         }
     }
-    oh.replaceKey("/Kids", new_node["/Kids"]);
-    oh.replaceKey(itemsKey(), new_node[itemsKey()]);
+    tree_root.replaceKey("/Kids", new_node["/Kids"]);
+    tree_root.replaceKey(itemsKey(), new_node[itemsKey()]);
 }
 
 NNTreeImpl::iterator
@@ -669,7 +669,7 @@ NNTreeImpl::find(QPDFObjectHandle const& key, bool return_prev_if_not_found)
         return findInternal(key, return_prev_if_not_found);
     } catch (QPDFExc& e) {
         if (auto_repair) {
-            warn(oh, std::string("attempting to repair after error: ") + e.what());
+            warn(tree_root, std::string("attempting to repair after error: ") + e.what());
             repair();
             return findInternal(key, return_prev_if_not_found);
         } else {
@@ -686,10 +686,10 @@ NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_fo
         return end();
     }
     if (!keyValid(first_item->first)) {
-        error(oh, "encountered invalid key in find");
+        error(tree_root, "encountered invalid key in find");
     }
     if (!value_valid(first_item->second)) {
-        error(oh, "encountered invalid value in find");
+        error(tree_root, "encountered invalid value in find");
     }
     if (compareKeys(key, first_item->first) < 0) {
         // Before the first key
@@ -697,7 +697,7 @@ NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_fo
     }
 
     QPDFObjGen::set seen;
-    auto node = oh;
+    auto node = tree_root;
     iterator result(*this);
 
     while (true) {
@@ -715,7 +715,7 @@ NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_fo
                     error(node, "encountered invalid key in find");
                 }
                 if (!result.impl.value_valid(result.ivalue.second)) {
-                    error(oh, "encountered invalid value in find");
+                    error(tree_root, "encountered invalid value in find");
                 }
             }
             return result;
@@ -741,13 +741,13 @@ NNTreeImpl::insertFirst(QPDFObjectHandle const& key, QPDFObjectHandle const& val
     auto iter = begin();
     Array items = iter.node[items_key];
     if (!items) {
-        error(oh, "unable to find a valid items node");
+        error(tree_root, "unable to find a valid items node");
     }
     if (!(key && value)) {
-        error(oh, "unable to insert null key or value");
+        error(tree_root, "unable to insert null key or value");
     }
     if (!value_valid(value)) {
-        error(oh, "attempting to insert an invalid value");
+        error(tree_root, "attempting to insert an invalid value");
     }
     items.insert(0, key);
     items.insert(1, value);
@@ -795,21 +795,21 @@ NNTreeImpl::validate(bool a_repair)
     try {
         for (auto const& [key, value]: *this) {
             if (!keyValid(key)) {
-                error(oh, "invalid key in validate");
+                error(tree_root, "invalid key in validate");
             }
             if (!value_valid(value)) {
-                error(oh, "invalid value in validate");
+                error(tree_root, "invalid value in validate");
             }
             if (first) {
                 first = false;
             } else if (last_key && compareKeys(last_key, key) != -1) {
-                error(oh, "keys are not sorted in validate");
+                error(tree_root, "keys are not sorted in validate");
             }
             last_key = key;
         }
     } catch (QPDFExc& e) {
         if (a_repair) {
-            warn(oh, std::string("attempting to repair after error: ") + e.what());
+            warn(tree_root, std::string("attempting to repair after error: ") + e.what());
             repair();
         }
         return false;

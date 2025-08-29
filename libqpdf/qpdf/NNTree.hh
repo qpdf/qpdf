@@ -128,12 +128,12 @@ class NNTreeImpl final
 
     NNTreeImpl(
         QPDF& qpdf,
-        QPDFObjectHandle oh,
+        qpdf::Dictionary tree_root,
         qpdf_object_type_e key_type,
         std::function<bool(QPDFObjectHandle const&)> value_validator,
         bool auto_repair) :
         qpdf(qpdf),
-        oh(std::move(oh)),
+        tree_root(std::move(tree_root)),
         key_type(key_type),
         items_key(key_type == ::ot_string ? "/Names" : "/Nums"),
         value_valid(value_validator),
@@ -190,7 +190,7 @@ class NNTreeImpl final
 
     QPDF& qpdf;
     int split_threshold{32};
-    QPDFObjectHandle oh;
+    qpdf::Dictionary tree_root;
     const qpdf_object_type_e key_type;
     const std::string items_key;
     const std::function<bool(QPDFObjectHandle const&)> value_valid;
