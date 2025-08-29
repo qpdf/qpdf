@@ -40,14 +40,29 @@ QPDFNameTreeObjectHelper::~QPDFNameTreeObjectHelper() // NOLINT (modernize-use-e
     // class, see github issue #745.
 }
 
-QPDFNameTreeObjectHelper::Members::Members(QPDFObjectHandle& oh, QPDF& q, bool auto_repair) :
-    impl(std::make_shared<NNTreeImpl>(name_tree_details, q, oh, auto_repair))
+QPDFNameTreeObjectHelper::Members::Members(
+    QPDFObjectHandle& oh,
+    QPDF& q,
+    std::function<bool(QPDFObjectHandle const&)> value_validator,
+    bool auto_repair) :
+    impl(std::make_shared<NNTreeImpl>(name_tree_details, q, oh, value_validator, auto_repair))
 {
 }
 
 QPDFNameTreeObjectHelper::QPDFNameTreeObjectHelper(QPDFObjectHandle oh, QPDF& q, bool auto_repair) :
     QPDFObjectHelper(oh),
-    m(new Members(oh, q, auto_repair))
+    m(new Members(
+        oh, q, [](QPDFObjectHandle const& o) -> bool { return static_cast<bool>(o); }, auto_repair))
+{
+}
+
+QPDFNameTreeObjectHelper::QPDFNameTreeObjectHelper(
+    QPDFObjectHandle oh,
+    QPDF& q,
+    std::function<bool(QPDFObjectHandle const&)> value_validator,
+    bool auto_repair) :
+    QPDFObjectHelper(oh),
+    m(new Members(oh, q, value_validator, auto_repair))
 {
 }
 
@@ -199,4 +214,10 @@ QPDFNameTreeObjectHelper::getAsMap() const
     std::map<std::string, QPDFObjectHandle> result;
     result.insert(begin(), end());
     return result;
+}
+
+bool
+QPDFNameTreeObjectHelper::validate(bool repair)
+{
+    return m->impl->validate(repair);
 }

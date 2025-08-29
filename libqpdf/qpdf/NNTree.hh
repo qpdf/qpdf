@@ -95,7 +95,12 @@ class NNTreeImpl
   public:
     typedef NNTreeIterator iterator;
 
-    NNTreeImpl(NNTreeDetails const&, QPDF&, QPDFObjectHandle&, bool auto_repair = true);
+    NNTreeImpl(
+        NNTreeDetails const&,
+        QPDF&,
+        QPDFObjectHandle&,
+        std::function<bool(QPDFObjectHandle const&)> value_validator,
+        bool auto_repair = true);
     iterator begin();
     iterator end();
     iterator last();
@@ -103,6 +108,8 @@ class NNTreeImpl
     iterator insertFirst(QPDFObjectHandle const& key, QPDFObjectHandle const& value);
     iterator insert(QPDFObjectHandle const& key, QPDFObjectHandle const& value);
     bool remove(QPDFObjectHandle const& key, QPDFObjectHandle* value = nullptr);
+
+    bool validate(bool repair = true);
 
     // Change the split threshold for easier testing. There's no real reason to expose this to
     // downstream tree helpers, but it has to be public so we can call it from the test suite.
@@ -127,6 +134,7 @@ class NNTreeImpl
     QPDF& qpdf;
     int split_threshold{32};
     QPDFObjectHandle oh;
+    const std::function<bool(QPDFObjectHandle const&)> value_valid;
     bool auto_repair{true};
     size_t error_count{0};
 };

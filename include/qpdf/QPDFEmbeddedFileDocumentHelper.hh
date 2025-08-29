@@ -67,19 +67,7 @@ class QPDFEmbeddedFileDocumentHelper: public QPDFDocumentHelper
   private:
     void initEmbeddedFiles();
 
-    class Members
-    {
-        friend class QPDFEmbeddedFileDocumentHelper;
-
-      public:
-        ~Members() = default;
-
-      private:
-        Members() = default;
-        Members(Members const&) = delete;
-
-        std::shared_ptr<QPDFNameTreeObjectHelper> embedded_files;
-    };
+    class Members;
 
     std::shared_ptr<Members> m;
 };

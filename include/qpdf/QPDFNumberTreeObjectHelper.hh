@@ -44,6 +44,13 @@ class QPDF_DLL_CLASS QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     QPDFNumberTreeObjectHelper(QPDFObjectHandle, QPDF&, bool auto_repair = true);
 
     QPDF_DLL
+    QPDFNumberTreeObjectHelper(
+        QPDFObjectHandle,
+        QPDF&,
+        std::function<bool(QPDFObjectHandle const&)> value_validator,
+        bool auto_repair);
+
+    QPDF_DLL
     ~QPDFNumberTreeObjectHelper() override;
 
     // Create an empty number tree
@@ -51,6 +58,12 @@ class QPDF_DLL_CLASS QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     static QPDFNumberTreeObjectHelper newEmpty(QPDF&, bool auto_repair = true);
 
     typedef long long int numtree_number;
+
+    // Validate the name tree. Returns true if the tree is valid.
+    //
+    // If the tree is not valid and auto_repair is true, attempt to repair the tree.
+    QPDF_DLL
+    bool validate(bool repair = true);
 
     // Return overall minimum and maximum indices
     QPDF_DLL
@@ -188,7 +201,11 @@ class QPDF_DLL_CLASS QPDFNumberTreeObjectHelper: public QPDFObjectHelper
         ~Members() = default;
 
       private:
-        Members(QPDFObjectHandle& oh, QPDF&, bool auto_repair);
+        Members(
+            QPDFObjectHandle& oh,
+            QPDF&,
+            std::function<bool(QPDFObjectHandle const&)> value_validator,
+            bool auto_repair);
         Members(Members const&) = delete;
 
         std::shared_ptr<NNTreeImpl> impl;

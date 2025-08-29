@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('page-labels');
 
-my $n_tests = 3;
+my $n_tests = 4;
 
 $td->runtest("complex page labels",
              {$td->COMMAND => "test_driver 47 page-labels-num-tree.pdf"},
@@ -27,6 +27,15 @@ $td->runtest("no zero entry for page labels",
 $td->runtest("no page labels",
              {$td->COMMAND => "test_driver 47 minimal.pdf"},
              {$td->FILE => "no-page-labels.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# page-labels-num-tree-damaged.pdf has the following errors:
+# - entry for page 29 preceedes entry for page 20
+# - entry for page 3 follows entry for page 6
+# - entry for page 12 is an integer rather than a dictionary
+$td->runtest("damaged page labels",
+             {$td->COMMAND => "test_driver 47 page-labels-num-tree-damaged.pdf"},
+             {$td->FILE => "page-labels-num-tree-damaged.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 # --set-page-labels

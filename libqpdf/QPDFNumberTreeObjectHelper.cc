@@ -41,15 +41,30 @@ QPDFNumberTreeObjectHelper::~QPDFNumberTreeObjectHelper() // NOLINT (modernize-u
     // class, see github issue #745.
 }
 
-QPDFNumberTreeObjectHelper::Members::Members(QPDFObjectHandle& oh, QPDF& q, bool auto_repair) :
-    impl(std::make_shared<NNTreeImpl>(number_tree_details, q, oh, auto_repair))
+QPDFNumberTreeObjectHelper::Members::Members(
+    QPDFObjectHandle& oh,
+    QPDF& q,
+    std::function<bool(QPDFObjectHandle const&)> value_validator,
+    bool auto_repair) :
+    impl(std::make_shared<NNTreeImpl>(number_tree_details, q, oh, value_validator, auto_repair))
 {
 }
 
 QPDFNumberTreeObjectHelper::QPDFNumberTreeObjectHelper(
     QPDFObjectHandle oh, QPDF& q, bool auto_repair) :
     QPDFObjectHelper(oh),
-    m(new Members(oh, q, auto_repair))
+    m(new Members(
+        oh, q, [](QPDFObjectHandle const& o) -> bool { return static_cast<bool>(o); }, auto_repair))
+{
+}
+
+QPDFNumberTreeObjectHelper::QPDFNumberTreeObjectHelper(
+    QPDFObjectHandle oh,
+    QPDF& q,
+    std::function<bool(QPDFObjectHandle const&)> value_validator,
+    bool auto_repair) :
+    QPDFObjectHelper(oh),
+    m(new Members(oh, q, value_validator, auto_repair))
 {
 }
 
@@ -235,4 +250,10 @@ QPDFNumberTreeObjectHelper::getAsMap() const
     std::map<numtree_number, QPDFObjectHandle> result;
     result.insert(begin(), end());
     return result;
+}
+
+bool
+QPDFNumberTreeObjectHelper::validate(bool repair)
+{
+    return m->impl->validate(repair);
 }
