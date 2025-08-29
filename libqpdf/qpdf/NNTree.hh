@@ -147,7 +147,7 @@ class NNTreeImpl final
         return {*this};
     }
     iterator last();
-    iterator find(QPDFObjectHandle key, bool return_prev_if_not_found = false);
+    iterator find(QPDFObjectHandle const& key, bool return_prev_if_not_found = false);
     iterator insertFirst(QPDFObjectHandle const& key, QPDFObjectHandle const& value);
     iterator insert(QPDFObjectHandle const& key, QPDFObjectHandle const& value);
     bool remove(QPDFObjectHandle const& key, QPDFObjectHandle* value = nullptr);

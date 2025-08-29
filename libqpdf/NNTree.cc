@@ -674,7 +674,7 @@ NNTreeImpl::repair()
 }
 
 NNTreeImpl::iterator
-NNTreeImpl::find(QPDFObjectHandle key, bool return_prev_if_not_found)
+NNTreeImpl::find(QPDFObjectHandle const& key, bool return_prev_if_not_found)
 {
     try {
         return findInternal(key, return_prev_if_not_found);
@@ -693,23 +693,19 @@ NNTreeImpl::iterator
 NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_found)
 {
     auto first_item = begin();
-    auto last_item = end();
-    if (first_item == end()) {
+    if (!first_item.valid()) {
         return end();
     }
-    if (first_item.valid()) {
-        if (!keyValid(first_item->first)) {
-            error(oh, "encountered invalid key in find");
-        }
-        if (!value_valid(first_item->second)) {
-            error(oh, "encountered invalid value in find");
-        }
-        if (compareKeys(key, first_item->first) < 0) {
-            // Before the first key
-            return end();
-        }
+    if (!keyValid(first_item->first)) {
+        error(oh, "encountered invalid key in find");
     }
-    qpdf_assert_debug(!last_item.valid());
+    if (!value_valid(first_item->second)) {
+        error(oh, "encountered invalid value in find");
+    }
+    if (compareKeys(key, first_item->first) < 0) {
+        // Before the first key
+        return end();
+    }
 
     QPDFObjGen::set seen;
     auto node = oh;
@@ -720,7 +716,7 @@ NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_fo
             error(node, "loop detected in find");
         }
 
-        Array items = node.getKey(itemsKey());
+        Array items = node[itemsKey()];
         size_t nitems = items.size();
         if (nitems > 1) {
             int idx = binarySearch(
@@ -737,18 +733,17 @@ NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_fo
             return result;
         }
 
-        Array kids = node.getKey("/Kids");
+        Array kids = node["/Kids"];
         size_t nkids = kids.size();
-        if (nkids > 0) {
-            int idx = binarySearch(key, kids, nkids, true, &NNTreeImpl::compareKeyKid);
-            if (idx == -1) {
-                error(node, "unexpected -1 from binary search of kids; limits may by wrong");
-            }
-            result.addPathElement(node, idx);
-            node = kids[idx];
-        } else {
+        if (nkids == 0) {
             error(node, "bad node during find");
         }
+        int idx = binarySearch(key, kids, nkids, true, &NNTreeImpl::compareKeyKid);
+        if (idx == -1) {
+            error(node, "unexpected -1 from binary search of kids; limits may by wrong");
+        }
+        result.addPathElement(node, idx);
+        node = kids[idx];
     }
 }
 
