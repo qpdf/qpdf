@@ -170,8 +170,7 @@ class NNTreeImpl final
         qpdf::Array const& items,
         size_t num_items,
         bool return_prev_if_not_found,
-        int (NNTreeImpl::*compare)(QPDFObjectHandle const& key, qpdf::Array const& arr, int item)
-            const) const;
+        bool search_kids) const;
     int compareKeyItem(QPDFObjectHandle const& key, qpdf::Array const& items, int idx) const;
     int compareKeyKid(QPDFObjectHandle const& key, qpdf::Array const& items, int idx) const;
     void warn(QPDFObjectHandle const& node, std::string const& msg);

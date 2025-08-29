@@ -593,19 +593,19 @@ NNTreeImpl::binarySearch(
     Array const& items,
     size_t num_items,
     bool return_prev_if_not_found,
-    int (NNTreeImpl::*compare)(QPDFObjectHandle const& key, Array const& arr, int item) const) const
+    bool search_kids) const
 {
     size_t max_idx = std::bit_ceil(num_items);
 
     int step = static_cast<int>(max_idx / 2);
-    size_t checks = max_idx;
+    int checks = static_cast<int>(std::bit_width(max_idx)); // AppImage gcc version returns size_t
     int idx = step;
     int found_idx = -1;
 
-    while (checks > 0) {
+    for (int i = 0; i < checks; ++i) {
         int status = -1;
         if (std::cmp_less(idx, num_items)) {
-            status = (this->*compare)(key, items, idx);
+            status = search_kids ? compareKeyKid(key, items, idx) : compareKeyItem(key, items, idx);
             if (status == 0) {
                 return idx;
             }
@@ -613,21 +613,9 @@ NNTreeImpl::binarySearch(
                 found_idx = idx;
             }
         }
-        checks >>= 1;
-        if (checks > 0) {
-            step >>= 1;
-            if (step == 0) {
-                step = 1;
-            }
-
-            if (status < 0) {
-                idx -= step;
-            } else {
-                idx += step;
-            }
-        }
+        step = std::max(step / 2, 1);
+        idx += status * step;
     }
-
     return return_prev_if_not_found ? found_idx : -1;
 }
 
@@ -643,10 +631,11 @@ NNTreeImpl::compareKeyItem(QPDFObjectHandle const& key, Array const& items, int 
 int
 NNTreeImpl::compareKeyKid(QPDFObjectHandle const& key, Array const& kids, int idx) const
 {
-    if (!kids[idx].isDictionary()) {
+    Dictionary kid = kids[idx];
+    if (!kid) {
         error(oh, "invalid kid at index " + std::to_string(idx));
     }
-    Array limits = kids[idx].getKey("/Limits");
+    Array limits = kid["/Limits"];
     if (!(keyValid(limits[0]) && keyValid(limits[1]))) {
         error(kids[idx], "node is missing /Limits");
     }
@@ -719,8 +708,7 @@ NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_fo
         Array items = node[itemsKey()];
         size_t nitems = items.size();
         if (nitems > 1) {
-            int idx = binarySearch(
-                key, items, nitems / 2, return_prev_if_not_found, &NNTreeImpl::compareKeyItem);
+            int idx = binarySearch(key, items, nitems / 2, return_prev_if_not_found, false);
             if (idx >= 0) {
                 result.setItemNumber(node, 2 * idx);
                 if (!result.impl.keyValid(result.ivalue.first)) {
@@ -738,7 +726,7 @@ NNTreeImpl::findInternal(QPDFObjectHandle const& key, bool return_prev_if_not_fo
         if (nkids == 0) {
             error(node, "bad node during find");
         }
-        int idx = binarySearch(key, kids, nkids, true, &NNTreeImpl::compareKeyKid);
+        int idx = binarySearch(key, kids, nkids, true, true);
         if (idx == -1) {
             error(node, "unexpected -1 from binary search of kids; limits may by wrong");
         }
