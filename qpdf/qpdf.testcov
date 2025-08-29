@@ -7,10 +7,8 @@ QPDF check obj 1
 QPDF object stream offsets not increasing 0
 QPDF ignore self-referential object stream 0
 QPDF object stream contains id < 1 0
-QPDF hint table length indirect 0
 QPDF hint table length direct 0
 QPDF P absent in lindict 0
-QPDF P present in lindict 0
 QPDF expected n n obj 0
 QPDF /L mismatch 0
 QPDF err /T mismatch 0

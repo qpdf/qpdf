@@ -569,4 +569,13 @@ QPDF::reconstructed_xref() const
     return m->reconstructed_xref;
 }
 
+// Throw a generic exception for unusual error conditions that do not be covered during CI testing.
+inline void
+QPDF::no_ci_stop_if(bool condition, std::string const& message, std::string const& context)
+{
+    if (condition) {
+        throw damagedPDF(context, message);
+    }
+}
+
 #endif // QPDF_PRIVATE_HH
