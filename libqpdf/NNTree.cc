@@ -64,7 +64,7 @@ NNTreeIterator::updateIValue(bool allow_invalid)
         return;
     }
 
-    if (item_number < 0 || !node.isDictionary()) {
+    if (item_number < 0 || !node) {
         if (!allow_invalid) {
             throw std::logic_error(
                 "attempt made to dereference an invalid name/number tree iterator");
@@ -72,12 +72,6 @@ NNTreeIterator::updateIValue(bool allow_invalid)
         return;
     }
     impl.error(node, "update ivalue: items array is too short");
-}
-
-NNTreeIterator::PathElement::PathElement(QPDFObjectHandle const& node, int kid_number) :
-    node(node),
-    kid_number(kid_number)
-{
 }
 
 Dictionary
@@ -349,7 +343,7 @@ NNTreeIterator::insertAfter(QPDFObjectHandle const& key, QPDFObjectHandle const&
         return;
     }
 
-    Array items = node.getKey(impl.itemsKey());
+    Array items = node[impl.itemsKey()];
     if (!items) {
         impl.error(node, "node contains no items array");
     }
@@ -451,7 +445,7 @@ NNTreeIterator::remove()
 
         if (parent == path.end()) {
             // We erased the very last item. Convert the root to an empty items array.
-            element->node.removeKey("/Kids");
+            element->node.erase("/Kids");
             element->node.replaceKey(impl.itemsKey(), Array::empty());
             path.clear();
             setItemNumber(impl.tree_root, -1);

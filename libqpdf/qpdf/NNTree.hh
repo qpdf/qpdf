@@ -81,9 +81,13 @@ class NNTreeIterator final
     class PathElement
     {
       public:
-        PathElement(QPDFObjectHandle const& node, int kid_number);
+        PathElement(qpdf::Dictionary const& node, int kid_number) :
+            node(node),
+            kid_number(kid_number)
+        {
+        }
 
-        QPDFObjectHandle node;
+        qpdf::Dictionary node;
         int kid_number;
     };
 
@@ -114,7 +118,7 @@ class NNTreeIterator final
 
     NNTreeImpl& impl;
     std::list<PathElement> path;
-    QPDFObjectHandle node;
+    qpdf::Dictionary node;
     int item_number{-1};
     value_type ivalue;
 };
