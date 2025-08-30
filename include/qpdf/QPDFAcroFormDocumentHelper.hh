@@ -241,23 +241,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     void adjustAppearanceStream(
         QPDFObjectHandle stream, std::map<std::string, std::map<std::string, std::string>> dr_map);
 
-    class Members
-    {
-        friend class QPDFAcroFormDocumentHelper;
-
-      public:
-        ~Members() = default;
-
-      private:
-        Members() = default;
-        Members(Members const&) = delete;
-
-        bool cache_valid{false};
-        std::map<QPDFObjGen, std::vector<QPDFAnnotationObjectHelper>> field_to_annotations;
-        std::map<QPDFObjGen, QPDFFormFieldObjectHelper> annotation_to_field;
-        std::map<QPDFObjGen, std::string> field_to_name;
-        std::map<std::string, std::set<QPDFObjGen>> name_to_fields;
-    };
+    class Members;
 
     std::shared_ptr<Members> m;
 };

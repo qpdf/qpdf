@@ -13,9 +13,23 @@
 using namespace qpdf;
 using namespace std::literals;
 
+class QPDFAcroFormDocumentHelper::Members
+{
+  public:
+    Members() = default;
+    Members(Members const&) = delete;
+    ~Members() = default;
+
+    bool cache_valid{false};
+    std::map<QPDFObjGen, std::vector<QPDFAnnotationObjectHelper>> field_to_annotations;
+    std::map<QPDFObjGen, QPDFFormFieldObjectHelper> annotation_to_field;
+    std::map<QPDFObjGen, std::string> field_to_name;
+    std::map<std::string, std::set<QPDFObjGen>> name_to_fields;
+};
+
 QPDFAcroFormDocumentHelper::QPDFAcroFormDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
-    m(new Members())
+    m(std::make_shared<Members>())
 {
     // We have to analyze up front. Otherwise, when we are adding annotations and fields, we are in
     // a temporarily unstable configuration where some widget annotations are not reachable.
