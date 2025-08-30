@@ -68,6 +68,21 @@
 class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
 {
   public:
+    // Get a shared document helper for a given QPDF object.
+    //
+    // Retrieving a document helper for a QPDF object rather than creating a new one avoids repeated
+    // validation of the Acroform structure, which can be expensive.
+    QPDF_DLL
+    static QPDFAcroFormDocumentHelper& get(QPDF& qpdf);
+
+    // Re-validate the AcroForm structure. This is useful if you have modified the structure of the
+    // AcroForm dictionary in a way that would invalidate the cache.
+    //
+    // If repair is true, the document will be repaired if possible if the validation encounters
+    // errors.
+    QPDF_DLL
+    void validate(bool repair = true);
+
     QPDF_DLL
     QPDFAcroFormDocumentHelper(QPDF&);
 

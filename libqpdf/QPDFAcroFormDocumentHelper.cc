@@ -3,6 +3,7 @@
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
+#include <qpdf/QPDF_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/ResourceFinder.hh>
@@ -18,6 +19,19 @@ QPDFAcroFormDocumentHelper::QPDFAcroFormDocumentHelper(QPDF& qpdf) :
 {
     // We have to analyze up front. Otherwise, when we are adding annotations and fields, we are in
     // a temporarily unstable configuration where some widget annotations are not reachable.
+    analyze();
+}
+
+QPDFAcroFormDocumentHelper&
+QPDFAcroFormDocumentHelper::get(QPDF& qpdf)
+{
+    return qpdf.acroform();
+}
+
+void
+QPDFAcroFormDocumentHelper::validate(bool repair)
+{
+    invalidateCache();
     analyze();
 }
 
