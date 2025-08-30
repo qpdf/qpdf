@@ -71,8 +71,6 @@ set(libqpdf_SOURCES
   QPDFJob_json.cc
   QPDFLogger.cc
   QPDFMatrix.cc
-  QPDFNameTreeObjectHelper.cc
-  QPDFNumberTreeObjectHelper.cc
   QPDFObject.cc
   QPDFObjectHandle.cc
   QPDFObjectHelper.cc

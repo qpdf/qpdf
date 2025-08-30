@@ -176,23 +176,7 @@ class QPDF_DLL_CLASS QPDFNameTreeObjectHelper: public QPDFObjectHelper
     void setSplitThreshold(int);
 
   private:
-    class QPDF_DLL_PRIVATE Members
-    {
-        friend class QPDFNameTreeObjectHelper;
-
-      public:
-        ~Members() = default;
-
-      private:
-        Members(
-            QPDFObjectHandle& oh,
-            QPDF&,
-            std::function<bool(QPDFObjectHandle const&)> value_validator,
-            bool auto_repair);
-        Members(Members const&) = delete;
-
-        std::shared_ptr<NNTreeImpl> impl;
-    };
+    class QPDF_DLL_PRIVATE Members;
 
     std::shared_ptr<Members> m;
 };
