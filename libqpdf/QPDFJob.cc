@@ -1180,7 +1180,7 @@ void
 QPDFJob::doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf)
 {
     JSON j_acroform = JSON::makeDictionary();
-    QPDFAcroFormDocumentHelper afdh(pdf);
+    auto& afdh = pdf.acroform();
     j_acroform.addDictionaryMember("hasacroform", JSON::makeBool(afdh.hasAcroForm()));
     j_acroform.addDictionaryMember("needappearances", JSON::makeBool(afdh.getNeedAppearances()));
     JSON j_fields = j_acroform.addDictionaryMember("fields", JSON::makeArray());
@@ -1888,17 +1888,6 @@ QPDFJob::validateUnderOverlay(QPDF& pdf, UnderOverlay* uo)
     }
 }
 
-static QPDFAcroFormDocumentHelper*
-get_afdh_for_qpdf(
-    std::map<unsigned long long, std::shared_ptr<QPDFAcroFormDocumentHelper>>& afdh_map, QPDF* q)
-{
-    auto uid = q->getUniqueId();
-    if (!afdh_map.contains(uid)) {
-        afdh_map[uid] = std::make_shared<QPDFAcroFormDocumentHelper>(*q);
-    }
-    return afdh_map[uid].get();
-}
-
 std::string
 QPDFJob::doUnderOverlayForPage(
     QPDF& pdf,
@@ -1914,13 +1903,7 @@ QPDFJob::doUnderOverlayForPage(
     if (!(pagenos.contains(pageno) && pagenos[pageno].contains(uo_idx))) {
         return "";
     }
-
-    std::map<unsigned long long, std::shared_ptr<QPDFAcroFormDocumentHelper>> afdh;
-    auto make_afdh = [&](QPDFPageObjectHelper& ph) {
-        QPDF& q = ph.getObjectHandle().getQPDF();
-        return get_afdh_for_qpdf(afdh, &q);
-    };
-    auto dest_afdh = make_afdh(dest_page);
+    auto& dest_afdh = dest_page.qpdf()->acroform();
 
     std::string content;
     int min_suffix = 1;
@@ -1940,7 +1923,7 @@ QPDFJob::doUnderOverlayForPage(
         QPDFMatrix cm;
         std::string new_content = dest_page.placeFormXObject(
             fo[from_pageno][uo_idx], name, dest_page.getTrimBox().getArrayAsRectangle(), cm);
-        dest_page.copyAnnotations(from_page, cm, dest_afdh, make_afdh(from_page));
+        dest_page.copyAnnotations(from_page, cm, &dest_afdh, &from_page.qpdf()->acroform());
         if (!new_content.empty()) {
             resources.mergeResources("<< /XObject << >> >>"_qpdf);
             auto xobject = resources.getKey("/XObject");
@@ -2182,15 +2165,15 @@ void
 QPDFJob::handleTransformations(QPDF& pdf)
 {
     QPDFPageDocumentHelper dh(pdf);
-    std::shared_ptr<QPDFAcroFormDocumentHelper> afdh;
-    auto make_afdh = [&]() {
-        if (!afdh.get()) {
-            afdh = std::make_shared<QPDFAcroFormDocumentHelper>(pdf);
+    QPDFAcroFormDocumentHelper* afdh_ptr = nullptr;
+    auto afdh = [&]() -> QPDFAcroFormDocumentHelper& {
+        if (!afdh_ptr) {
+            afdh_ptr = &pdf.acroform();
         }
+        return *afdh_ptr;
     };
     if (m->remove_restrictions) {
-        make_afdh();
-        afdh->disableDigitalSignatures();
+        afdh().disableDigitalSignatures();
     }
     if (m->externalize_inline_images || (m->optimize_images && (!m->keep_inline_images))) {
         for (auto& ph: dh.getAllPages()) {
@@ -2225,8 +2208,7 @@ QPDFJob::handleTransformations(QPDF& pdf)
         }
     }
     if (m->generate_appearances) {
-        make_afdh();
-        afdh->generateAppearancesIfNeeded();
+        afdh().generateAppearancesIfNeeded();
     }
     if (m->flatten_annotations) {
         dh.flattenAnnotations(m->flatten_annotations_required, m->flatten_annotations_forbidden);
@@ -2237,9 +2219,8 @@ QPDFJob::handleTransformations(QPDF& pdf)
         }
     }
     if (m->flatten_rotation) {
-        make_afdh();
         for (auto& page: dh.getAllPages()) {
-            page.flattenRotation(afdh.get());
+            page.flattenRotation(&afdh());
         }
     }
     if (m->remove_page_labels) {
@@ -2559,8 +2540,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
     std::vector<QPDFObjectHandle> new_labels;
     bool any_page_labels = false;
     int out_pageno = 0;
-    std::map<unsigned long long, std::shared_ptr<QPDFAcroFormDocumentHelper>> afdh_map;
-    auto this_afdh = get_afdh_for_qpdf(afdh_map, &pdf);
+    auto& this_afdh = pdf.acroform();
     std::set<QPDFObjGen> referenced_fields;
     for (auto& page_data: parsed_specs) {
         ClosedFileInputSource* cis = nullptr;
@@ -2569,7 +2549,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             cis->stayOpen(true);
         }
         QPDFPageLabelDocumentHelper pldh(*page_data.qpdf);
-        auto other_afdh = get_afdh_for_qpdf(afdh_map, page_data.qpdf);
+        auto& other_afdh = page_data.qpdf->acroform();
         if (pldh.hasPageLabels()) {
             any_page_labels = true;
         }
@@ -2611,15 +2591,15 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             // the original file until all copy operations are completed, any foreign pages that
             // conflict with original pages will be adjusted. If we copy any page from the original
             // file more than once, that page would be in conflict with the previous copy of itself.
-            if ((!this_file && other_afdh->hasAcroForm()) || !first_copy_from_orig) {
+            if ((!this_file && other_afdh.hasAcroForm()) || !first_copy_from_orig) {
                 if (!this_file) {
                     QTC::TC("qpdf", "QPDFJob copy fields not this file");
                 } else if (!first_copy_from_orig) {
                     QTC::TC("qpdf", "QPDFJob copy fields non-first from orig");
                 }
                 try {
-                    this_afdh->fixCopiedAnnotations(
-                        new_page, to_copy.getObjectHandle(), *other_afdh, &referenced_fields);
+                    this_afdh.fixCopiedAnnotations(
+                        new_page, to_copy.getObjectHandle(), other_afdh, &referenced_fields);
                 } catch (std::exception& e) {
                     pdf.warn(
                         qpdf_e_damaged_pdf,
@@ -2647,7 +2627,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
     for (size_t pageno = 0; pageno < orig_pages.size(); ++pageno) {
         auto page = orig_pages.at(pageno);
         if (selected_from_orig.contains(QIntC::to_int(pageno))) {
-            for (auto field: this_afdh->getFormFieldsForPage(page)) {
+            for (auto field: this_afdh.getFormFieldsForPage(page)) {
                 QTC::TC("qpdf", "QPDFJob pages keeping field from original");
                 referenced_fields.insert(field.getObjectHandle().getObjGen());
             }
@@ -2656,7 +2636,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
         }
     }
     // Remove unreferenced form fields
-    if (this_afdh->hasAcroForm()) {
+    if (this_afdh.hasAcroForm()) {
         auto acroform = pdf.getRoot().getKey("/AcroForm");
         auto fields = acroform.getKey("/Fields");
         if (fields.isArray()) {
@@ -3013,7 +2993,7 @@ QPDFJob::doSplitPages(QPDF& pdf)
         dh.removeUnreferencedResources();
     }
     QPDFPageLabelDocumentHelper pldh(pdf);
-    QPDFAcroFormDocumentHelper afdh(pdf);
+    auto& afdh = pdf.acroform();
     std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
     size_t pageno_len = std::to_string(pages.size()).length();
     size_t num_pages = pages.size();
@@ -3025,10 +3005,7 @@ QPDFJob::doSplitPages(QPDF& pdf)
         }
         QPDF outpdf;
         outpdf.emptyPDF();
-        std::shared_ptr<QPDFAcroFormDocumentHelper> out_afdh;
-        if (afdh.hasAcroForm()) {
-            out_afdh = std::make_shared<QPDFAcroFormDocumentHelper>(outpdf);
-        }
+        QPDFAcroFormDocumentHelper* out_afdh = afdh.hasAcroForm() ? &outpdf.acroform() : nullptr;
         if (m->suppress_warnings) {
             outpdf.setSuppressWarnings(true);
         }
@@ -3036,8 +3013,7 @@ QPDFJob::doSplitPages(QPDF& pdf)
             QPDFObjectHandle page = pages.at(pageno - 1);
             outpdf.addPage(page, false);
             auto new_page = added_page(outpdf, page);
-            if (out_afdh.get()) {
-                QTC::TC("qpdf", "QPDFJob copy form fields in split_pages");
+            if (out_afdh) {
                 try {
                     out_afdh->fixCopiedAnnotations(new_page, page, afdh);
                 } catch (std::exception& e) {

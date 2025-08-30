@@ -1,6 +1,7 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
+#include <qpdf/QPDF_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
@@ -55,7 +56,7 @@ QPDFPageDocumentHelper::removePage(QPDFPageObjectHelper page)
 void
 QPDFPageDocumentHelper::flattenAnnotations(int required_flags, int forbidden_flags)
 {
-    QPDFAcroFormDocumentHelper afdh(qpdf);
+    auto& afdh = qpdf.acroform();
     if (afdh.getNeedAppearances()) {
         qpdf.getRoot()
             .getKey("/AcroForm")

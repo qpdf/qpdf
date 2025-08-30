@@ -68,6 +68,21 @@
 class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
 {
   public:
+    // Get a shared document helper for a given QPDF object.
+    //
+    // Retrieving a document helper for a QPDF object rather than creating a new one avoids repeated
+    // validation of the Acroform structure, which can be expensive.
+    QPDF_DLL
+    static QPDFAcroFormDocumentHelper& get(QPDF& qpdf);
+
+    // Re-validate the AcroForm structure. This is useful if you have modified the structure of the
+    // AcroForm dictionary in a way that would invalidate the cache.
+    //
+    // If repair is true, the document will be repaired if possible if the validation encounters
+    // errors.
+    QPDF_DLL
+    void validate(bool repair = true);
+
     QPDF_DLL
     QPDFAcroFormDocumentHelper(QPDF&);
 
@@ -226,23 +241,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     void adjustAppearanceStream(
         QPDFObjectHandle stream, std::map<std::string, std::map<std::string, std::string>> dr_map);
 
-    class Members
-    {
-        friend class QPDFAcroFormDocumentHelper;
-
-      public:
-        ~Members() = default;
-
-      private:
-        Members() = default;
-        Members(Members const&) = delete;
-
-        bool cache_valid{false};
-        std::map<QPDFObjGen, std::vector<QPDFAnnotationObjectHelper>> field_to_annotations;
-        std::map<QPDFObjGen, QPDFFormFieldObjectHelper> annotation_to_field;
-        std::map<QPDFObjGen, std::string> field_to_name;
-        std::map<std::string, std::set<QPDFObjGen>> name_to_fields;
-    };
+    class Members;
 
     std::shared_ptr<Members> m;
 };

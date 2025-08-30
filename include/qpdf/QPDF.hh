@@ -57,6 +57,7 @@ class BitWriter;
 class BufferInputSource;
 class QPDFLogger;
 class QPDFParser;
+class QPDFAcroFormDocumentHelper;
 
 class QPDF
 {
@@ -792,6 +793,7 @@ class QPDF
     class JobSetter;
 
     inline bool reconstructed_xref() const;
+    inline QPDFAcroFormDocumentHelper& acroform();
 
     // For testing only -- do not add to DLL
     static bool test_json_validators();
