@@ -103,15 +103,15 @@ main(int argc, char* argv[])
 
     // 16 < buffer size, buffer_size is not a multiple of 8 for testing
     unsigned char buf[83];
-    bool done = false;
-    while (!done) {
+    std::string data;
+    while (true) {
         size_t len = fread(buf, 1, sizeof(buf), infile);
+        data.append(reinterpret_cast<char const*>(buf), len);
         if (len <= 0) {
-            done = true;
-        } else {
-            aes->write(buf, len);
+            break;
         }
     }
+    aes->write(reinterpret_cast<const unsigned char*>(data.data()), data.size());
     aes->finish();
     delete aes;
     delete out;
