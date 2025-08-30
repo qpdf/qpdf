@@ -304,11 +304,9 @@ QPDFObjectHandle insert array bounds 0
 QPDFObjectHandle array ignoring append item 0
 QPDFObjectHandle array ignoring erase item 0
 QPDFObjectHandle dictionary false for hasKey 0
-QPDFObjectHandle dictionary null for getKey 0
 QPDFObjectHandle dictionary empty set for getKeys 0
 QPDFObjectHandle dictionary empty map for asMap 0
 QPDFObjectHandle dictionary ignoring replaceKey 0
-QPDFObjectHandle dictionary ignoring removeKey 0
 QPDFObjectHandle numeric non-numeric 0
 QPDFObjectHandle erase array bounds 0
 qpdf-c called qpdf_check_pdf 0
@@ -537,7 +535,6 @@ QPDFWriter preserve object streams 0
 QPDFWriter preserve object streams preserve unreferenced 0
 QPDFWriter exclude from object stream 0
 QPDF_pages findPage not found 0
-QPDFObjectHandle check ownership 0
 QPDFJob weak crypto error 0
 qpdf-c called qpdf_oh_is_initialized 0
 qpdf-c registered progress reporter 0

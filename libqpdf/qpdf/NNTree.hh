@@ -81,9 +81,13 @@ class NNTreeIterator final
     class PathElement
     {
       public:
-        PathElement(QPDFObjectHandle const& node, int kid_number);
+        PathElement(qpdf::Dictionary const& node, int kid_number) :
+            node(node),
+            kid_number(kid_number)
+        {
+        }
 
-        QPDFObjectHandle node;
+        qpdf::Dictionary node;
         int kid_number;
     };
 
@@ -92,7 +96,7 @@ class NNTreeIterator final
     {
     }
     void updateIValue(bool allow_invalid = true);
-    bool deepen(QPDFObjectHandle node, bool first, bool allow_empty);
+    bool deepen(qpdf::Dictionary node, bool first, bool allow_empty);
     void
     setItemNumber(QPDFObjectHandle const& a_node, int n)
     {
@@ -105,16 +109,16 @@ class NNTreeIterator final
     {
         path.emplace_back(a_node, kid_number);
     }
-    QPDFObjectHandle getNextKid(PathElement& element, bool backward);
+    qpdf::Dictionary getNextKid(PathElement& element, bool backward);
     void increment(bool backward);
-    void resetLimits(QPDFObjectHandle node, std::list<PathElement>::iterator parent);
+    void resetLimits(qpdf::Dictionary node, std::list<PathElement>::iterator parent);
 
-    void split(QPDFObjectHandle to_split, std::list<PathElement>::iterator parent);
+    void split(qpdf::Dictionary to_split, std::list<PathElement>::iterator parent);
     std::list<PathElement>::iterator lastPathElement();
 
     NNTreeImpl& impl;
     std::list<PathElement> path;
-    QPDFObjectHandle node;
+    qpdf::Dictionary node;
     int item_number{-1};
     value_type ivalue;
 };
@@ -128,12 +132,12 @@ class NNTreeImpl final
 
     NNTreeImpl(
         QPDF& qpdf,
-        QPDFObjectHandle& oh,
+        qpdf::Dictionary tree_root,
         qpdf_object_type_e key_type,
         std::function<bool(QPDFObjectHandle const&)> value_validator,
         bool auto_repair) :
         qpdf(qpdf),
-        oh(oh),
+        tree_root(std::move(tree_root)),
         key_type(key_type),
         items_key(key_type == ::ot_string ? "/Names" : "/Nums"),
         value_valid(value_validator),
@@ -147,7 +151,7 @@ class NNTreeImpl final
         return {*this};
     }
     iterator last();
-    iterator find(QPDFObjectHandle key, bool return_prev_if_not_found = false);
+    iterator find(QPDFObjectHandle const& key, bool return_prev_if_not_found = false);
     iterator insertFirst(QPDFObjectHandle const& key, QPDFObjectHandle const& value);
     iterator insert(QPDFObjectHandle const& key, QPDFObjectHandle const& value);
     bool remove(QPDFObjectHandle const& key, QPDFObjectHandle* value = nullptr);
@@ -170,8 +174,7 @@ class NNTreeImpl final
         qpdf::Array const& items,
         size_t num_items,
         bool return_prev_if_not_found,
-        int (NNTreeImpl::*compare)(QPDFObjectHandle const& key, qpdf::Array const& arr, int item)
-            const) const;
+        bool search_kids) const;
     int compareKeyItem(QPDFObjectHandle const& key, qpdf::Array const& items, int idx) const;
     int compareKeyKid(QPDFObjectHandle const& key, qpdf::Array const& items, int idx) const;
     void warn(QPDFObjectHandle const& node, std::string const& msg);
@@ -191,7 +194,7 @@ class NNTreeImpl final
 
     QPDF& qpdf;
     int split_threshold{32};
-    QPDFObjectHandle oh;
+    qpdf::Dictionary tree_root;
     const qpdf_object_type_e key_type;
     const std::string items_key;
     const std::function<bool(QPDFObjectHandle const&)> value_valid;

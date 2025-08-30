@@ -61,6 +61,13 @@ namespace qpdf
 
         // The rest of the header file is for qpdf internal use only.
 
+        // Return true if both object handles refer to the same underlying object.
+        bool
+        operator==(BaseHandle const& other) const
+        {
+            return obj == other.obj;
+        }
+
         // For arrays, return the number of items in the array.
         // For null-like objects, return 0.
         // For all other objects, return 1.
@@ -75,6 +82,10 @@ namespace qpdf
 
         QPDFObjectHandle operator[](size_t n) const;
         QPDFObjectHandle operator[](int n) const;
+
+        bool contains(std::string const& key) const;
+        size_t erase(std::string const& key);
+        QPDFObjectHandle const& operator[](std::string const& key) const;
 
         std::shared_ptr<QPDFObject> copy(bool shallow = false) const;
         // Recursively remove association with any QPDF object. This method may only be called
