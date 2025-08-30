@@ -519,7 +519,6 @@ QPDFPageObjectHelper flatten inherit rotate 0
 QPDFAcroFormDocumentHelper copy annotation 3
 QPDFAcroFormDocumentHelper field with parent 3
 QPDFAcroFormDocumentHelper modify ap matrix 0
-QPDFJob copy form fields in split_pages 0
 QPDFJob pages keeping field from original 0
 QPDFObjectHandle merge reuse 0
 QPDFObjectHandle merge generate 0
