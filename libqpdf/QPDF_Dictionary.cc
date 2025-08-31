@@ -67,7 +67,7 @@ void
 BaseDictionary::replaceKey(std::string const& key, QPDFObjectHandle value)
 {
     auto d = dict();
-    if (value.isNull() && !value.isIndirect()) {
+    if (value.null() && !value.indirect()) {
         // The PDF spec doesn't distinguish between keys with null values and missing keys.
         // Allow indirect nulls which are equivalent to a dangling reference, which is
         // permitted by the spec.
