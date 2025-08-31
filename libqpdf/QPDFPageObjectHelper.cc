@@ -238,15 +238,14 @@ QPDFPageObjectHelper::getAttribute(
     auto dict = is_form_xobject ? oh().getDict() : oh();
     auto result = dict.getKey(name);
 
-    if (!is_form_xobject && result.isNull() &&
+    if (!is_form_xobject && result.null() &&
         (name == "/MediaBox" || name == "/CropBox" || name == "/Resources" || name == "/Rotate")) {
         QPDFObjectHandle node = dict;
         QPDFObjGen::set seen{};
         while (seen.add(node) && node.hasKey("/Parent")) {
             node = node.getKey("/Parent");
             result = node.getKey(name);
-            if (!result.isNull()) {
-                QTC::TC("qpdf", "QPDFPageObjectHelper non-trivial inheritance");
+            if (!result.null()) {
                 inherited = true;
                 break;
             }
@@ -256,10 +255,9 @@ QPDFPageObjectHelper::getAttribute(
         QTC::TC("qpdf", "QPDFPageObjectHelper copy shared attribute", is_form_xobject ? 0 : 1);
         result = dict.replaceKeyAndGetNew(name, result.shallowCopy());
     }
-    if (result.isNull() && get_fallback) {
+    if (result.null() && get_fallback) {
         result = get_fallback();
-        if (copy_if_fallback && !result.isNull()) {
-            QTC::TC("qpdf", "QPDFPageObjectHelper copied fallback");
+        if (copy_if_fallback && !result.null()) {
             result = dict.replaceKeyAndGetNew(name, result.shallowCopy());
         } else {
             QTC::TC("qpdf", "QPDFPageObjectHelper used fallback without copying");
@@ -670,7 +668,7 @@ QPDFPageObjectHelper::getMatrixForTransformations(bool invert)
     }
     QPDFObjectHandle rotate_obj = getAttribute("/Rotate", false);
     QPDFObjectHandle scale_obj = getAttribute("/UserUnit", false);
-    if (!(rotate_obj.isNull() && scale_obj.isNull())) {
+    if (!(rotate_obj.null() && scale_obj.null())) {
         QPDFObjectHandle::Rectangle rect = bbox.getArrayAsRectangle();
         double width = rect.urx - rect.llx;
         double height = rect.ury - rect.lly;
@@ -724,7 +722,7 @@ QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
     result.replaceStreamData(provider, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
     QPDFObjectHandle rotate_obj = getAttribute("/Rotate", false);
     QPDFObjectHandle scale_obj = getAttribute("/UserUnit", false);
-    if (handle_transformations && (!(rotate_obj.isNull() && scale_obj.isNull()))) {
+    if (handle_transformations && !(rotate_obj.null() && scale_obj.null())) {
         newdict.replaceKey("/Matrix", QPDFObjectHandle::newArray(getMatrixForTransformations()));
     }
 
@@ -963,8 +961,7 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
     oh().addPageContents(qpdf.newStream("\nQ\n"), false);
     oh().removeKey("/Rotate");
     QPDFObjectHandle rotate_obj = getAttribute("/Rotate", false);
-    if (!rotate_obj.isNull()) {
-        QTC::TC("qpdf", "QPDFPageObjectHelper flatten inherit rotate");
+    if (!rotate_obj.null()) {
         oh().replaceKey("/Rotate", QPDFObjectHandle::newInteger(0));
     }
 
