@@ -1,5 +1,6 @@
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QTC.hh>
 
 class QPDFOutlineDocumentHelper::Members
@@ -36,7 +37,7 @@ QPDFOutlineDocumentHelper::QPDFOutlineDocumentHelper(QPDF& qpdf) :
     }
     QPDFObjectHandle cur = outlines.getKey("/First");
     QPDFObjGen::set seen;
-    while (!cur.isNull() && seen.add(cur)) {
+    while (!cur.null() && seen.add(cur)) {
         m->outlines.emplace_back(QPDFOutlineObjectHelper::Accessor::create(cur, *this, 1));
         cur = cur.getKey("/Next");
     }

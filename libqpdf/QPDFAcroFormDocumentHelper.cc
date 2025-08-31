@@ -502,9 +502,9 @@ QPDFAcroFormDocumentHelper::adjustInheritedFields(
             int q = cur_field.getQuadding();
             if (q != from_default_q) {
                 obj.replaceKey("/Q", QPDFObjectHandle::newInteger(from_default_q));
+            }
         }
     }
-}
 }
 
 namespace

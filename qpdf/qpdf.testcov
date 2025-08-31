@@ -326,7 +326,6 @@ QPDFOutlineObjectHelper direct dest 0
 QPDFOutlineObjectHelper action dest 0
 QPDFOutlineObjectHelper named dest 0
 QPDFOutlineDocumentHelper string named dest 0
-QPDFOutlineObjectHelper loop 0
 QPDFObjectHandle merge top type mismatch 0
 QPDFObjectHandle merge shallow copy 0
 QPDFObjectHandle merge array 0
