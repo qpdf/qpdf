@@ -487,11 +487,7 @@ QPDFAcroFormDocumentHelper::adjustInheritedFields(
         if (field.getObjectHandle().hasKey(key)) {
             return true;
         }
-        auto oh = field.getInheritableFieldValue(key);
-        if (!oh.isNull()) {
-            return true;
-        }
-        return false;
+        return !field.getInheritableFieldValue(key).null();
     };
 
     if (override_da || override_q) {
@@ -499,14 +495,12 @@ QPDFAcroFormDocumentHelper::adjustInheritedFields(
         if (override_da && (!has_explicit(cur_field, "/DA"))) {
             std::string da = cur_field.getDefaultAppearance();
             if (da != from_default_da) {
-                QTC::TC("qpdf", "QPDFAcroFormDocumentHelper override da");
                 obj.replaceKey("/DA", QPDFObjectHandle::newUnicodeString(from_default_da));
             }
         }
         if (override_q && (!has_explicit(cur_field, "/Q"))) {
             int q = cur_field.getQuadding();
             if (q != from_default_q) {
-                QTC::TC("qpdf", "QPDFAcroFormDocumentHelper override q");
                 obj.replaceKey("/Q", QPDFObjectHandle::newInteger(from_default_q));
             }
         }
@@ -675,17 +669,15 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
             std::string const& old_key = i2.first;
             std::string const& new_key = i2.second;
             auto existing_new = subdict.getKey(new_key);
-            if (!existing_new.isNull()) {
+            if (!existing_new.null()) {
                 // The resource dictionary already has a key in it matching what we remapped an old
                 // key to, so we'll have to move it out of the way. Stick it in merge_with, which we
                 // will re-merge with the dictionary when we're done. We know merge_with already has
                 // dictionaries for all the top keys.
-                QTC::TC("qpdf", "QPDFAcroFormDocumentHelper ap conflict");
                 merge_with.getKey(top_key).replaceKey(new_key, existing_new);
             }
             auto existing_old = subdict.getKey(old_key);
-            if (!existing_old.isNull()) {
-                QTC::TC("qpdf", "QPDFAcroFormDocumentHelper ap rename");
+            if (!existing_old.null()) {
                 subdict.replaceKey(new_key, existing_old);
                 subdict.removeKey(old_key);
             }
@@ -878,7 +870,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         bool have_parent = false;
         if (ffield_oh.isStream()) {
             ffield.warn("ignoring form field that's a stream");
-        } else if ((!ffield_oh.isNull()) && (!ffield_oh.isIndirect())) {
+        } else if (!ffield_oh.null() && !ffield_oh.isIndirect()) {
             ffield.warn("ignoring form field not indirect");
         } else if (!ffield.null()) {
             // A field and its associated annotation can be the same object. This matters because we

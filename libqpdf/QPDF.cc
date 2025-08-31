@@ -578,49 +578,41 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
     }
 
     if (foreign.isPagesObject()) {
-        QTC::TC("qpdf", "QPDF not copying pages object");
         return;
     }
 
     if (foreign.isIndirect()) {
         QPDFObjGen foreign_og(foreign.getObjGen());
         if (!obj_copier.visiting.add(foreign_og)) {
-            QTC::TC("qpdf", "QPDF loop reserving objects");
             return;
         }
         if (obj_copier.object_map.contains(foreign_og)) {
-            QTC::TC("qpdf", "QPDF already reserved object");
-            if (!(top && foreign.isPageObject() && obj_copier.object_map[foreign_og].isNull())) {
+            if (!(top && foreign.isPageObject() && obj_copier.object_map[foreign_og].null())) {
                 obj_copier.visiting.erase(foreign);
                 return;
             }
         } else {
-            QTC::TC("qpdf", "QPDF copy indirect");
             obj_copier.object_map[foreign_og] =
                 foreign.isStream() ? newStream() : newIndirectNull();
-            if ((!top) && foreign.isPageObject()) {
-                QTC::TC("qpdf", "QPDF not crossing page boundary");
+            if (!top && foreign.isPageObject()) {
                 obj_copier.visiting.erase(foreign_og);
                 return;
             }
         }
-        obj_copier.to_copy.push_back(foreign);
+        obj_copier.to_copy.emplace_back(foreign);
     }
 
     if (foreign_tc == ::ot_array) {
-        QTC::TC("qpdf", "QPDF reserve array");
         for (auto const& item: foreign.as_array()) {
             reserveObjects(item, obj_copier, false);
         }
     } else if (foreign_tc == ::ot_dictionary) {
-        QTC::TC("qpdf", "QPDF reserve dictionary");
         for (auto const& item: foreign.as_dictionary()) {
             if (!item.second.null()) {
                 reserveObjects(item.second, obj_copier, false);
             }
         }
     } else if (foreign_tc == ::ot_stream) {
-        QTC::TC("qpdf", "QPDF reserve stream");
         reserveObjects(foreign.getDict(), obj_copier, false);
     }
 

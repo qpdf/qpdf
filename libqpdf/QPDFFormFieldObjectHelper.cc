@@ -25,7 +25,7 @@ QPDFFormFieldObjectHelper::QPDFFormFieldObjectHelper() :
 bool
 QPDFFormFieldObjectHelper::isNull()
 {
-    return oh().isNull();
+    return oh().null();
 }
 
 QPDFFormFieldObjectHelper
@@ -39,7 +39,7 @@ QPDFFormFieldObjectHelper::getTopLevelField(bool* is_different)
 {
     auto top_field = oh();
     QPDFObjGen::set seen;
-    while (seen.add(top_field) && !top_field.getKeyIfDict("/Parent").isNull()) {
+    while (seen.add(top_field) && !top_field.getKeyIfDict("/Parent").null()) {
         top_field = top_field.getKey("/Parent");
         if (is_different) {
             *is_different = true;
@@ -72,13 +72,12 @@ QPDFFormFieldObjectHelper::getInheritableFieldValue(std::string const& name)
         return QPDFObjectHandle::newNull();
     }
     QPDFObjectHandle result(node.getKey(name));
-    if (result.isNull()) {
+    if (result.null()) {
         QPDFObjGen::set seen;
         while (seen.add(node) && node.hasKey("/Parent")) {
             node = node.getKey("/Parent");
             result = node.getKey(name);
-            if (!result.isNull()) {
-                QTC::TC("qpdf", "QPDFFormFieldObjectHelper non-trivial inheritance");
+            if (!result.null()) {
                 return result;
             }
         }
@@ -118,10 +117,9 @@ QPDFFormFieldObjectHelper::getFullyQualifiedName()
     std::string result;
     QPDFObjectHandle node = oh();
     QPDFObjGen::set seen;
-    while (!node.isNull() && seen.add(node)) {
+    while (!node.null() && seen.add(node)) {
         if (node.getKey("/T").isString()) {
             if (!result.empty()) {
-                QTC::TC("qpdf", "QPDFFormFieldObjectHelper non-trivial qualified name");
                 result = "." + result;
             }
             result = node.getKey("/T").getUTF8Value() + result;
@@ -360,18 +358,17 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
     //   is a member, set /AS to /Off.
     // Note that we never turn on /NeedAppearances when setting a radio button field.
     QPDFObjectHandle parent = oh().getKey("/Parent");
-    if (parent.isDictionary() && parent.getKey("/Parent").isNull()) {
+    if (parent.isDictionary() && parent.getKey("/Parent").null()) {
         QPDFFormFieldObjectHelper ph(parent);
         if (ph.isRadioButton()) {
             // This is most likely one of the individual buttons. Try calling on the parent.
-            QTC::TC("qpdf", "QPDFFormFieldObjectHelper set parent radio button");
             ph.setRadioButtonValue(name);
             return;
         }
     }
 
     QPDFObjectHandle kids = oh().getKey("/Kids");
-    if (!(isRadioButton() && parent.isNull() && kids.isArray())) {
+    if (!(isRadioButton() && parent.null() && kids.isArray())) {
         warn("don't know how to set the value of this field as a radio button");
         return;
     }
@@ -384,7 +381,6 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
             for (auto const& grandkid: kid.getKey("/Kids").as_array()) {
                 AP = grandkid.getKey("/AP");
                 if (!AP.null()) {
-                    QTC::TC("qpdf", "QPDFFormFieldObjectHelper radio button grandkid");
                     annot = grandkid;
                     break;
                 }
@@ -393,16 +389,13 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
             annot = kid;
         }
         if (!annot) {
-            QTC::TC("qpdf", "QPDFObjectHandle broken radio button");
             warn("unable to set the value of this radio button");
             continue;
         }
         if (AP.isDictionary() && AP.getKey("/N").isDictionary() &&
             AP.getKey("/N").hasKey(name.getName())) {
-            QTC::TC("qpdf", "QPDFFormFieldObjectHelper turn on radio button");
             annot.replaceKey("/AS", name);
         } else {
-            QTC::TC("qpdf", "QPDFFormFieldObjectHelper turn off radio button");
             annot.replaceKey("/AS", QPDFObjectHandle::newName("/Off"));
         }
     }
@@ -749,7 +742,7 @@ void
 QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
 {
     QPDFObjectHandle AS = aoh.getAppearanceStream("/N");
-    if (AS.isNull()) {
+    if (AS.null()) {
         QTC::TC("qpdf", "QPDFFormFieldObjectHelper create AS from scratch");
         QPDFObjectHandle::Rectangle rect = aoh.getRect();
         QPDFObjectHandle::Rectangle bbox(0, 0, rect.urx - rect.llx, rect.ury - rect.lly);
@@ -759,8 +752,7 @@ QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& ao
         AS = QPDFObjectHandle::newStream(oh().getOwningQPDF(), "/Tx BMC\nEMC\n");
         AS.replaceDict(dict);
         QPDFObjectHandle AP = aoh.getAppearanceDictionary();
-        if (AP.isNull()) {
-            QTC::TC("qpdf", "QPDFFormFieldObjectHelper create AP from scratch");
+        if (AP.null()) {
             aoh.getObjectHandle().replaceKey("/AP", QPDFObjectHandle::newDictionary());
             AP = aoh.getAppearanceDictionary();
         }
@@ -808,7 +800,6 @@ QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& ao
             found_font_in_dr = font.isDictionary();
         }
         if (found_font_in_dr && resources.isDictionary()) {
-            QTC::TC("qpdf", "QPDFFormFieldObjectHelper get font from /DR");
             if (resources.isIndirect()) {
                 resources = resources.getQPDF().makeIndirectObject(resources.shallowCopy());
                 AS.getDict().replaceKey("/Resources", resources);
@@ -821,7 +812,6 @@ QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& ao
         if (font.isDictionary() && font.getKey("/Encoding").isName()) {
             std::string encoding = font.getKey("/Encoding").getName();
             if (encoding == "/WinAnsiEncoding") {
-                QTC::TC("qpdf", "QPDFFormFieldObjectHelper WinAnsi");
                 encoder = &QUtil::utf8_to_win_ansi;
             } else if (encoding == "/MacRomanEncoding") {
                 encoder = &QUtil::utf8_to_mac_roman;

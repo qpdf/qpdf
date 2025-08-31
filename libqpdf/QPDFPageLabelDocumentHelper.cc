@@ -1,6 +1,6 @@
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
 
-#include <qpdf/QTC.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 
 class QPDFPageLabelDocumentHelper::Members
 {
@@ -72,7 +72,7 @@ QPDFPageLabelDocumentHelper::getLabelsForPageRange(
     // prior entry. If there is no entry for the first page, fabricate one that would match how the
     // page would look in a new file in which it also didn't have an explicit label.
     QPDFObjectHandle label = getLabelForPage(start_idx);
-    if (label.isNull()) {
+    if (label.null()) {
         label = QPDFObjectHandle::newDictionary();
         label.replaceKey("/St", QPDFObjectHandle::newInteger(1 + new_start_idx));
     }

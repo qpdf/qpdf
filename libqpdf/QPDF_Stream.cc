@@ -376,7 +376,7 @@ Stream::filterable(
 
     auto filter_obj = s->stream_dict.getKey("/Filter");
 
-    if (filter_obj.isNull()) {
+    if (filter_obj.null()) {
         // No filters
         return true;
     }

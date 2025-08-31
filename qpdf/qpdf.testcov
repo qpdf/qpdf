@@ -64,9 +64,6 @@ QPDFParser bad brace 0
 QPDFParser bad brace in parseRemainder 0
 QPDFParser bad array close 0
 QPDFParser bad array close in parseRemainder 0
-QPDF stream without length 0
-QPDF stream length not integer 0
-QPDF missing endstream 0
 QPDFParser bad dictionary close 0
 QPDFParser bad dictionary close in parseRemainder 0
 QPDF can't find xref 0
@@ -87,9 +84,7 @@ QPDF found xref stream 0
 QPDF ignoring XRefStm in trailer 0
 QPDF xref deleted object 0
 SF_FlateLzwDecode PNG filter 0
-QPDF xref /Index is null 0
 QPDF xref /Index is array 1
-QPDFWriter copy Extends 0
 QPDFWriter encrypt object stream 0
 QPDFWriter uncompressing page dictionary 0
 QPDFWriter uncompressing root 0
@@ -204,18 +199,11 @@ QPDF_Stream unknown stream length 0
 QPDF replaceReserved 0
 QPDF copyForeign direct 0
 QPDF copyForeign not foreign 0
-QPDF copy indirect 0
-QPDF loop reserving objects 0
 QPDF replace indirect 0
 QPDF replace array 0
 QPDF replace dictionary 0
 QPDF replace stream 0
-QPDF reserve array 0
-QPDF reserve dictionary 0
-QPDF reserve stream 0
-QPDF not crossing page boundary 0
 QPDF replace foreign indirect with null 0
-QPDF not copying pages object 0
 QPDF insert foreign page 0
 QPDFWriter foreign object 0
 QPDFWriter copy use_aes 1
@@ -249,7 +237,6 @@ QPDF_optimization indirect outlines 0
 QPDF xref space 2
 QPDFJob pages range omitted in middle 0
 QPDFJob npages 0
-QPDF already reserved object 0
 QPDFWriter standard deterministic ID 1
 QPDFWriter linearized deterministic ID 1
 qpdf-c called qpdf_set_deterministic_ID 0
@@ -312,8 +299,6 @@ QPDFObjectHandle erase array bounds 0
 qpdf-c called qpdf_check_pdf 0
 QPDF xref loop 0
 QPDFParser too deep 0
-QPDFFormFieldObjectHelper non-trivial inheritance 0
-QPDFFormFieldObjectHelper non-trivial qualified name 0
 QPDFFormFieldObjectHelper TU present 0
 QPDFFormFieldObjectHelper TM present 0
 QPDFFormFieldObjectHelper TU absent 0
@@ -340,7 +325,6 @@ QPDFOutlineObjectHelper direct dest 0
 QPDFOutlineObjectHelper action dest 0
 QPDFOutlineObjectHelper named dest 0
 QPDFOutlineDocumentHelper string named dest 0
-QPDFOutlineObjectHelper loop 0
 QPDFObjectHandle merge top type mismatch 0
 QPDFObjectHandle merge shallow copy 0
 QPDFObjectHandle merge array 0
@@ -361,12 +345,7 @@ QPDFObjectHandle replace with copy 0
 QPDFPageDocumentHelper indirect as resources 0
 QPDFAnnotationObjectHelper forbidden flags 0
 QPDFAnnotationObjectHelper missing required flags 0
-QPDFFormFieldObjectHelper set parent radio button 0
-QPDFFormFieldObjectHelper radio button grandkid 0
-QPDFFormFieldObjectHelper turn on radio button 0
-QPDFFormFieldObjectHelper turn off radio button 0
 QPDFFormFieldObjectHelper checkbox kid widget 0
-QPDFObjectHandle broken radio button 0
 QPDFFormFieldObjectHelper set checkbox AS 0
 QPDFObjectHandle broken checkbox 0
 QPDFFormFieldObjectHelper list not found 0
@@ -376,7 +355,6 @@ QPDFFormFieldObjectHelper list last too high 0
 QPDFJob image optimize no pipeline 0
 QPDFJob image optimize no shrink 0
 QPDFJob image optimize too small 0
-QPDFFormFieldObjectHelper WinAnsi 0
 QPDF pipe foreign encrypted stream 0
 QPDF copy foreign stream with provider 0
 QPDF copy foreign stream with buffer 0
@@ -393,10 +371,8 @@ QPDFJob invalid utf-8 in auto 0
 QPDFJob input password hex-bytes 0
 QPDFPageDocumentHelper ignore annotation with no appearance 0
 QPDFFormFieldObjectHelper create AS from scratch 0
-QPDFFormFieldObjectHelper create AP from scratch 0
 QPDFFormFieldObjectHelper replaced BMC at EOF 0
 QPDFFormFieldObjectHelper fallback Tf 0
-QPDFPageObjectHelper non-trivial inheritance 0
 QPDFPageObjectHelper copy shared attribute 1
 QPDFJob from_nr from repeat_nr 0
 QPDF resolve duplicated page object 0
@@ -513,19 +489,13 @@ QPDFPageObjectHelper unresolved names 0
 QPDFPageObjectHelper resolving unresolved 0
 QPDFFileSpecObjectHelper empty compat_name 0
 QPDFFileSpecObjectHelper non-empty compat_name 0
-QPDFPageObjectHelper flatten inherit rotate 0
 QPDFAcroFormDocumentHelper copy annotation 3
 QPDFAcroFormDocumentHelper field with parent 3
 QPDFAcroFormDocumentHelper modify ap matrix 0
 QPDFJob pages keeping field from original 0
 QPDFObjectHandle merge reuse 0
 QPDFObjectHandle merge generate 0
-QPDFFormFieldObjectHelper get font from /DR 0
-QPDFAcroFormDocumentHelper override da 0
-QPDFAcroFormDocumentHelper override q 0
 QPDFAcroFormDocumentHelper replaced DA token 0
-QPDFAcroFormDocumentHelper ap conflict 0
-QPDFAcroFormDocumentHelper ap rename 0
 QPDFAcroFormDocumentHelper /DA parse error 0
 QPDFAcroFormDocumentHelper AP parse error 1
 QPDFJob copy fields not this file 0
@@ -614,7 +584,6 @@ QPDF_json missing json version 0
 QPDF_json bad json version 0
 QPDF_json bad calledgetallpages 0
 QPDF_json bad pushedinheritedpageresources 0
-QPDFPageObjectHelper copied fallback 0
 QPDFPageObjectHelper used fallback without copying 0
 QPDF skipping cache for known unchecked object 0
 QPDF fix dangling triggered xref reconstruction 0

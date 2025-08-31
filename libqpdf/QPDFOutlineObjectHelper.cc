@@ -1,5 +1,6 @@
 #include <qpdf/QPDFOutlineObjectHelper.hh>
 
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QTC.hh>
 
@@ -19,13 +20,12 @@ QPDFOutlineObjectHelper::QPDFOutlineObjectHelper(
         return;
     }
     if (QPDFOutlineDocumentHelper::Accessor::checkSeen(m->dh, a_oh.getObjGen())) {
-        QTC::TC("qpdf", "QPDFOutlineObjectHelper loop");
         return;
     }
 
     QPDFObjGen::set children;
     QPDFObjectHandle cur = a_oh.getKey("/First");
-    while (!cur.isNull() && cur.isIndirect() && children.add(cur)) {
+    while (!cur.null() && cur.isIndirect() && children.add(cur)) {
         QPDFOutlineObjectHelper new_ooh(cur, dh, 1 + depth);
         new_ooh.m->parent = std::make_shared<QPDFOutlineObjectHelper>(*this);
         m->kids.push_back(new_ooh);

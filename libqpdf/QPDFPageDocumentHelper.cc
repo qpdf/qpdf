@@ -1,6 +1,7 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDF_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -127,7 +128,7 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
                 ++next_fx;
             }
             new_content += content;
-        } else if (process && !aoh.getAppearanceDictionary().isNull()) {
+        } else if (process && !aoh.getAppearanceDictionary().null()) {
             // If an annotation has no selected appearance stream, just drop the annotation when
             // flattening. This can happen for unchecked checkboxes and radio buttons, popup windows
             // associated with comments that aren't visible, and other types of annotations that

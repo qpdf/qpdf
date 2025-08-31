@@ -40,7 +40,7 @@ BaseDictionary::getKeys()
 {
     std::set<std::string> result;
     for (auto& iter: dict()->items) {
-        if (!iter.second.isNull()) {
+        if (!iter.second.null()) {
             result.insert(iter.first);
         }
     }

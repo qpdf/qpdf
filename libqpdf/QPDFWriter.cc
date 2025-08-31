@@ -1782,12 +1782,11 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
         write(" /Filter /FlateDecode");
     }
     write(" /N ").write(offsets.size()).write_qdf("\n ").write(" /First ").write(first);
-    if (!object.isNull()) {
+    if (!object.null()) {
         // If the original object has an /Extends key, preserve it.
         QPDFObjectHandle dict = object.getDict();
         QPDFObjectHandle extends = dict.getKey("/Extends");
         if (extends.isIndirect()) {
-            QTC::TC("qpdf", "QPDFWriter copy Extends");
             write_qdf("\n ").write(" /Extends ");
             unparseChild(extends, 1, f_in_ostream);
         }

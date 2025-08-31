@@ -464,7 +464,7 @@ QPDFJob::createQPDF()
     if (m->remove_info) {
         auto trailer = pdf.getTrailer();
         auto mod_date = trailer.getKey("/Info").getKeyIfDict("/ModDate");
-        if (mod_date.isNull()) {
+        if (mod_date.null()) {
             trailer.removeKey("/Info");
         } else {
             auto info = trailer.replaceKeyAndGetNew(
@@ -2064,7 +2064,7 @@ static void
 maybe_set_pagemode(QPDF& pdf, std::string const& pagemode)
 {
     auto root = pdf.getRoot();
-    if (root.getKey("/PageMode").isNull()) {
+    if (root.getKey("/PageMode").null()) {
         root.replaceKey("/PageMode", QPDFObjectHandle::newName(pagemode));
     }
 }

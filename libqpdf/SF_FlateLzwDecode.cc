@@ -5,12 +5,13 @@
 #include <qpdf/Pl_PNGFilter.hh>
 #include <qpdf/Pl_TIFFPredictor.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QTC.hh>
 
 bool
 SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
 {
-    if (decode_parms.isNull()) {
+    if (decode_parms.null()) {
         return true;
     }
 

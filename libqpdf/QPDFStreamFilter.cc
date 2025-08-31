@@ -1,9 +1,11 @@
 #include <qpdf/QPDFStreamFilter.hh>
 
+#include <qpdf/QPDFObjectHandle_private.hh>
+
 bool
 QPDFStreamFilter::setDecodeParms(QPDFObjectHandle decode_parms)
 {
-    return decode_parms.isNull();
+    return decode_parms.null();
 }
 
 bool
