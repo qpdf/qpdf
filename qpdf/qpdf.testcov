@@ -85,7 +85,6 @@ QPDF ignoring XRefStm in trailer 0
 QPDF xref deleted object 0
 SF_FlateLzwDecode PNG filter 0
 QPDF xref /Index is array 1
-QPDFWriter copy Extends 0
 QPDFWriter encrypt object stream 0
 QPDFWriter uncompressing page dictionary 0
 QPDFWriter uncompressing root 0
