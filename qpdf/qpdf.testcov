@@ -204,18 +204,11 @@ QPDF_Stream unknown stream length 0
 QPDF replaceReserved 0
 QPDF copyForeign direct 0
 QPDF copyForeign not foreign 0
-QPDF copy indirect 0
-QPDF loop reserving objects 0
 QPDF replace indirect 0
 QPDF replace array 0
 QPDF replace dictionary 0
 QPDF replace stream 0
-QPDF reserve array 0
-QPDF reserve dictionary 0
-QPDF reserve stream 0
-QPDF not crossing page boundary 0
 QPDF replace foreign indirect with null 0
-QPDF not copying pages object 0
 QPDF insert foreign page 0
 QPDFWriter foreign object 0
 QPDFWriter copy use_aes 1
@@ -249,7 +242,6 @@ QPDF_optimization indirect outlines 0
 QPDF xref space 2
 QPDFJob pages range omitted in middle 0
 QPDFJob npages 0
-QPDF already reserved object 0
 QPDFWriter standard deterministic ID 1
 QPDFWriter linearized deterministic ID 1
 qpdf-c called qpdf_set_deterministic_ID 0
