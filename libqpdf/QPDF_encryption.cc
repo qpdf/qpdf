@@ -681,7 +681,7 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
           (encryption_dict.getKey("/Filter").getName() == "/Standard"))) {
         throw unsupported("unsupported encryption filter");
     }
-    if (!encryption_dict.getKey("/SubFilter").isNull()) {
+    if (!encryption_dict.getKey("/SubFilter").null()) {
         qpdf.warn(unsupported("file uses encryption SubFilters, which qpdf does not support"));
     }
 

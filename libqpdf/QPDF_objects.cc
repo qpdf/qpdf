@@ -910,8 +910,7 @@ QPDF::processXRefIndex(
         }
         QTC::TC("qpdf", "QPDF xref /Index is array", index_vec.size() == 2 ? 0 : 1);
         return {num_entries, indx};
-    } else if (Index_obj.isNull()) {
-        QTC::TC("qpdf", "QPDF xref /Index is null");
+    } else if (Index_obj.null()) {
         return {size, {{0, size}}};
     } else {
         throw damaged("Cross-reference stream does not have a proper /Index key");
@@ -1256,11 +1255,9 @@ QPDF::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
         auto length_obj = object.getKey("/Length");
 
         if (!length_obj.isInteger()) {
-            if (length_obj.isNull()) {
-                QTC::TC("qpdf", "QPDF stream without length");
+            if (length_obj.null()) {
                 throw damagedPDF(offset, "stream dictionary lacks /Length key");
             }
-            QTC::TC("qpdf", "QPDF stream length not integer");
             throw damagedPDF(offset, "/Length key in stream dictionary is not an integer");
         }
 
@@ -1269,7 +1266,6 @@ QPDF::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset)
         m->file->seek(stream_offset, SEEK_SET);
         m->file->seek(toO(length), SEEK_CUR);
         if (!readToken(*m->file).isWord("endstream")) {
-            QTC::TC("qpdf", "QPDF missing endstream");
             throw damagedPDF("expected endstream");
         }
     } catch (QPDFExc& e) {

@@ -167,7 +167,7 @@ QPDF::readLinearizationData()
     QPDFObjectHandle P = m->lindict.getKey("/P");
 
     if (!(H.isArray() && O.isInteger() && E.isInteger() && N.isInteger() && T.isInteger() &&
-          (P.isInteger() || P.isNull()))) {
+          (P.isInteger() || P.null()))) {
         throw damagedPDF(
             "linearization dictionary",
             "some keys in linearization dictionary are of the wrong type");
@@ -577,7 +577,7 @@ QPDF::getUncompressedObject(QPDFObjectHandle& oh, QPDFWriter::ObjTable const& ob
 {
     if (obj.contains(oh)) {
         if (auto id = obj[oh].object_stream; id > 0) {
-            return oh.isNull() ? oh : getObject(id, 0);
+            return oh.null() ? oh : getObject(id, 0);
         }
     }
     return oh;
@@ -1284,7 +1284,7 @@ QPDF::calculateLinearizationData(T const& object_stream_data)
         thumb = getUncompressedObject(thumb, object_stream_data);
         QPDFObjGen thumb_og(thumb.getObjGen());
         // Output the thumbnail itself
-        if (lc_thumbnail_private.erase(thumb_og) && !thumb.isNull()) {
+        if (lc_thumbnail_private.erase(thumb_og) && !thumb.null()) {
             m->part9.emplace_back(thumb);
         } else {
             // No internal error this time...there's nothing to stop this object from having
@@ -1394,7 +1394,7 @@ QPDF::pushOutlinesToPart(
 {
     QPDFObjectHandle root = getRoot();
     QPDFObjectHandle outlines = root.getKey("/Outlines");
-    if (outlines.isNull()) {
+    if (outlines.null()) {
         return;
     }
     outlines = getUncompressedObject(outlines, object_stream_data);

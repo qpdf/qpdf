@@ -64,9 +64,6 @@ QPDFParser bad brace 0
 QPDFParser bad brace in parseRemainder 0
 QPDFParser bad array close 0
 QPDFParser bad array close in parseRemainder 0
-QPDF stream without length 0
-QPDF stream length not integer 0
-QPDF missing endstream 0
 QPDFParser bad dictionary close 0
 QPDFParser bad dictionary close in parseRemainder 0
 QPDF can't find xref 0
@@ -87,7 +84,6 @@ QPDF found xref stream 0
 QPDF ignoring XRefStm in trailer 0
 QPDF xref deleted object 0
 SF_FlateLzwDecode PNG filter 0
-QPDF xref /Index is null 0
 QPDF xref /Index is array 1
 QPDFWriter copy Extends 0
 QPDFWriter encrypt object stream 0
