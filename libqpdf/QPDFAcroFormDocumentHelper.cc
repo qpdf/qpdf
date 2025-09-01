@@ -20,10 +20,15 @@ class QPDFAcroFormDocumentHelper::Members
     Members(Members const&) = delete;
     ~Members() = default;
 
+    struct FieldData
+    {
+        std::vector<QPDFAnnotationObjectHelper> annotations;
+        std::string name;
+    };
+
     bool cache_valid{false};
-    std::map<QPDFObjGen, std::vector<QPDFAnnotationObjectHelper>> field_to_annotations;
+    std::map<QPDFObjGen, FieldData> field_to;
     std::map<QPDFObjGen, QPDFFormFieldObjectHelper> annotation_to_field;
-    std::map<QPDFObjGen, std::string> field_to_name;
     std::map<std::string, std::set<QPDFObjGen>> name_to_fields;
 };
 
@@ -53,7 +58,7 @@ void
 QPDFAcroFormDocumentHelper::invalidateCache()
 {
     m->cache_valid = false;
-    m->field_to_annotations.clear();
+    m->field_to.clear();
     m->annotation_to_field.clear();
 }
 
@@ -151,20 +156,19 @@ QPDFAcroFormDocumentHelper::removeFormFields(std::set<QPDFObjGen> const& to_remo
     }
 
     for (auto const& og: to_remove) {
-        auto annotations = m->field_to_annotations.find(og);
-        if (annotations != m->field_to_annotations.end()) {
-            for (auto aoh: annotations->second) {
+        auto it = m->field_to.find(og);
+        if (it != m->field_to.end()) {
+            for (auto aoh: it->second.annotations) {
                 m->annotation_to_field.erase(aoh.getObjectHandle().getObjGen());
             }
-            m->field_to_annotations.erase(og);
-        }
-        auto name = m->field_to_name.find(og);
-        if (name != m->field_to_name.end()) {
-            m->name_to_fields[name->second].erase(og);
-            if (m->name_to_fields[name->second].empty()) {
-                m->name_to_fields.erase(name->second);
+            auto const& name = it->second.name;
+            if (!name.empty()) {
+                m->name_to_fields[name].erase(og);
+                if (m->name_to_fields[name].empty()) {
+                    m->name_to_fields.erase(name);
+                }
             }
-            m->field_to_name.erase(og);
+            m->field_to.erase(og);
         }
     }
 
@@ -193,8 +197,10 @@ QPDFAcroFormDocumentHelper::getFormFields()
 {
     analyze();
     std::vector<QPDFFormFieldObjectHelper> result;
-    for (auto const& iter: m->field_to_annotations) {
-        result.emplace_back(qpdf.getObject(iter.first));
+    for (auto const& [og, data]: m->field_to) {
+        if (!(data.annotations.empty())) {
+            result.emplace_back(qpdf.getObject(og));
+        }
     }
     return result;
 }
@@ -217,8 +223,8 @@ QPDFAcroFormDocumentHelper::getAnnotationsForField(QPDFFormFieldObjectHelper h)
     analyze();
     std::vector<QPDFAnnotationObjectHelper> result;
     QPDFObjGen og(h.getObjectHandle().getObjGen());
-    if (m->field_to_annotations.contains(og)) {
-        result = m->field_to_annotations[og];
+    if (m->field_to.contains(og)) {
+        result = m->field_to[og].annotations;
     }
     return result;
 }
@@ -308,7 +314,7 @@ QPDFAcroFormDocumentHelper::analyze()
                     "this widget annotation is not reachable from /AcroForm in the document "
                     "catalog");
                 m->annotation_to_field[og] = QPDFFormFieldObjectHelper(annot);
-                m->field_to_annotations[og].emplace_back(annot);
+                m->field_to[og].annotations.emplace_back(annot);
             }
         }
     }
@@ -371,7 +377,7 @@ QPDFAcroFormDocumentHelper::traverseField(
 
     if (is_annotation) {
         QPDFObjectHandle our_field = (is_field ? field : parent);
-        m->field_to_annotations[our_field.getObjGen()].emplace_back(field);
+        m->field_to[our_field.getObjGen()].annotations.emplace_back(field);
         m->annotation_to_field[og] = QPDFFormFieldObjectHelper(our_field);
     }
 
@@ -379,13 +385,12 @@ QPDFAcroFormDocumentHelper::traverseField(
         QPDFFormFieldObjectHelper foh(field);
         auto f_og = field.getObjGen();
         std::string name = foh.getFullyQualifiedName();
-        auto old = m->field_to_name.find(f_og);
-        if (old != m->field_to_name.end()) {
+        auto old = m->field_to.find(f_og);
+        if (old != m->field_to.end() && !old->second.name.empty()) {
             // We might be updating after a name change, so remove any old information
-            std::string old_name = old->second;
-            m->name_to_fields[old_name].erase(f_og);
+            m->name_to_fields[old->second.name].erase(f_og);
         }
-        m->field_to_name[f_og] = name;
+        m->field_to[f_og].name = name;
         m->name_to_fields[name].insert(f_og);
     }
 }
