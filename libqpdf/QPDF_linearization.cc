@@ -150,80 +150,57 @@ QPDF::readLinearizationData()
     }
 
     // /L is read and stored in linp by isLinearized()
-    QPDFObjectHandle H = m->lindict.getKey("/H");
-    QPDFObjectHandle O = m->lindict.getKey("/O");
-    QPDFObjectHandle E = m->lindict.getKey("/E");
-    QPDFObjectHandle N = m->lindict.getKey("/N");
-    QPDFObjectHandle T = m->lindict.getKey("/T");
-    QPDFObjectHandle P = m->lindict.getKey("/P");
+    Array H = m->lindict["/H"]; // hint table offset/length for primary and overflow hint tables
+    auto H_size = H.size();
+    Integer H_0 = H[0]; // hint table offset
+    Integer H_1 = H[1]; // hint table length
+    Integer H_2 = H[2]; // hint table offset for overflow hint table
+    Integer H_3 = H[3]; // hint table length for overflow hint table
+    Integer O = m->lindict["/O"];
+    Integer E = m->lindict["/E"];
+    Integer N = m->lindict["/N"];
+    Integer T = m->lindict["/T"];
+    auto P_oh = m->lindict["/P"];
+    Integer P = P_oh; // first page number
+    QTC::TC("qpdf", "QPDF P absent in lindict", P ? 0 : 1);
 
-    if (!(H.isArray() && O.isInteger() && E.isInteger() && N.isInteger() && T.isInteger() &&
-          (P.isInteger() || P.null()))) {
+    if (!(H && O && E && N && T && (P || P_oh.null()))) {
         throw damagedPDF(
             "linearization dictionary",
             "some keys in linearization dictionary are of the wrong type");
     }
 
-    // Hint table array: offset length [ offset length ]
-    size_t n_H_items = H.size();
-    if (!(n_H_items == 2 || n_H_items == 4)) {
+    if (!(H_size == 2 || H_size == 4)) {
         throw damagedPDF("linearization dictionary", "H has the wrong number of items");
     }
 
-    std::vector<int> H_items;
-    for (auto const& oh: H.as_array()) {
-        if (oh.isInteger()) {
-            H_items.push_back(oh.getIntValueAsInt());
-        } else {
-            throw damagedPDF("linearization dictionary", "some H items are of the wrong type");
-        }
-    }
-
-    // H: hint table offset/length for primary and overflow hint tables
-    int H0_offset = H_items.at(0);
-    int H0_length = H_items.at(1);
-    int H1_offset = 0;
-    int H1_length = 0;
-    if (H_items.size() == 4) {
-        // Acrobat doesn't read or write these (as PDF 1.4), so we don't have a way to generate a
-        // test case.
-        // QTC::TC("qpdf", "QPDF overflow hint table");
-        H1_offset = H_items.at(2);
-        H1_length = H_items.at(3);
-    }
-
-    // P: first page number
-    int first_page = 0;
-    if (P.isInteger()) {
-        QTC::TC("qpdf", "QPDF P present in lindict");
-        first_page = P.getIntValueAsInt();
-    } else {
-        QTC::TC("qpdf", "QPDF P absent in lindict");
+    if (!(H_0 && H_1 && (H_size == 2 || (H_2 && H_3)))) {
+        throw damagedPDF("linearization dictionary", "some H items are of the wrong type");
     }
 
     // Store linearization parameter data
 
     // Various places in the code use linp.npages, which is initialized from N, to pre-allocate
     // memory, so make sure it's accurate and bail right now if it's not.
-    if (N.getIntValue() != static_cast<long long>(getAllPages().size())) {
+    if (N != getAllPages().size()) {
         throw damagedPDF("linearization hint table", "/N does not match number of pages");
     }
 
     // file_size initialized by isLinearized()
-    m->linp.first_page_object = O.getIntValueAsInt();
-    m->linp.first_page_end = E.getIntValue();
-    m->linp.npages = N.getUIntValueAsUInt();
-    m->linp.xref_zero_offset = T.getIntValue();
-    m->linp.first_page = first_page;
-    m->linp.H_offset = H0_offset;
-    m->linp.H_length = H0_length;
+    m->linp.first_page_object = O;
+    m->linp.first_page_end = E;
+    m->linp.npages = N;
+    m->linp.xref_zero_offset = T;
+    m->linp.first_page = P ? P : 0;
+    m->linp.H_offset = H_0;
+    m->linp.H_length = H_1;
 
     // Read hint streams
 
     Pl_Buffer pb("hint buffer");
-    QPDFObjectHandle H0 = readHintStream(pb, H0_offset, toS(H0_length));
-    if (H1_offset) {
-        (void)readHintStream(pb, H1_offset, toS(H1_length));
+    auto H0 = readHintStream(pb, H_0, H_1);
+    if (H_2) {
+        (void)readHintStream(pb, H_2, H_3);
     }
 
     // PDF 1.4 hint tables that we ignore:
@@ -237,8 +214,8 @@ QPDF::readLinearizationData()
     //  /L    page label
 
     // Individual hint table offsets
-    QPDFObjectHandle HS = H0.getKey("/S"); // shared object
-    QPDFObjectHandle HO = H0.getKey("/O"); // outline
+    Integer HS = H0["/S"]; // shared object
+    Integer HO = H0["/O"]; // outline
 
     auto hbp = pb.getBufferSharedPointer();
     Buffer* hb = hbp.get();
@@ -247,18 +224,18 @@ QPDF::readLinearizationData()
 
     readHPageOffset(BitStream(h_buf, h_size));
 
-    int HSi = HS.getIntValueAsInt();
-    if ((HSi < 0) || (toS(HSi) >= h_size)) {
+    size_t HSi = HS;
+    if (HSi < 0 || HSi >= h_size) {
         throw damagedPDF("linearization hint table", "/S (shared object) offset is out of bounds");
     }
-    readHSharedObject(BitStream(h_buf + HSi, h_size - toS(HSi)));
+    readHSharedObject(BitStream(h_buf + HSi, h_size - HSi));
 
-    if (HO.isInteger()) {
-        int HOi = HO.getIntValueAsInt();
-        if ((HOi < 0) || (toS(HOi) >= h_size)) {
+    if (HO) {
+        if (HO < 0 || HO >= h_size) {
             throw damagedPDF("linearization hint table", "/O (outline) offset is out of bounds");
         }
-        readHGeneric(BitStream(h_buf + HOi, h_size - toS(HOi)), m->outline_hints);
+        size_t HOi = HO;
+        readHGeneric(BitStream(h_buf + HO, h_size - HOi), m->outline_hints);
     }
 }
 
