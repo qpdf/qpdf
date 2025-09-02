@@ -262,7 +262,7 @@ QPDF::readLinearizationData()
     }
 }
 
-QPDFObjectHandle
+Dictionary
 QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
 {
     auto H = readObjectAtOffset(offset, "linearization hint stream", false);
@@ -273,18 +273,14 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
         throw damagedPDF("linearization dictionary", "hint table is not a stream");
     }
 
-    QPDFObjectHandle Hdict = H.getDict();
+    Dictionary Hdict = H.getDict();
 
     // Some versions of Acrobat make /Length indirect and place it immediately after the stream,
     // increasing length to cover it, even though the specification says all objects in the
     // linearization parameter dictionary must be direct.  We have to get the file position of the
     // end of length in this case.
-    QPDFObjectHandle length_obj = Hdict.getKey("/Length");
-    if (length_obj.isIndirect()) {
-        QTC::TC("qpdf", "QPDF hint table length indirect");
-        // Force resolution
-        (void)length_obj.getIntValue();
-        ObjCache& oc2 = m->obj_cache[length_obj.getObjGen()];
+    if (Hdict["/Length"].indirect()) {
+        ObjCache& oc2 = m->obj_cache[Hdict["/Length"]];
         min_end_offset = oc2.end_before_space;
         max_end_offset = oc2.end_after_space;
     } else {

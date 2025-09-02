@@ -46,10 +46,15 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QPDFXRefEntry.hh>
 
-namespace qpdf::is
+namespace qpdf
 {
-    class OffsetBuffer;
-}
+    class Dictionary;
+
+    namespace is
+    {
+        class OffsetBuffer;
+    }
+} // namespace qpdf
 
 class QPDF_Stream;
 class BitStream;
@@ -1006,7 +1011,7 @@ class QPDF
     void checkLinearizationInternal();
     void dumpLinearizationDataInternal();
     void linearizationWarning(std::string_view);
-    QPDFObjectHandle readHintStream(Pipeline&, qpdf_offset_t offset, size_t length);
+    qpdf::Dictionary readHintStream(Pipeline&, qpdf_offset_t offset, size_t length);
     void readHPageOffset(BitStream);
     void readHSharedObject(BitStream);
     void readHGeneric(BitStream, HGeneric&);
