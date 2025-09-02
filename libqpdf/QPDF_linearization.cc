@@ -122,27 +122,18 @@ QPDF::isLinearized()
             continue;
         }
 
-        auto candidate = getObject(toI(QUtil::string_to_ll(t1.getValue().data())), 0);
-        if (!candidate.isDictionary()) {
-            return false;
-        }
-
-        auto linkey = candidate.getKey("/Linearized");
+        Dictionary candidate = getObject(toI(QUtil::string_to_ll(t1.getValue().data())), 0);
+        auto linkey = candidate["/Linearized"];
         if (!(linkey.isNumber() && toI(floor(linkey.getNumericValue())) == 1)) {
             return false;
         }
 
-        auto L = candidate.getKey("/L");
-        if (!L.isInteger()) {
-            return false;
-        }
-        qpdf_offset_t Li = L.getIntValue();
         m->file->seek(0, SEEK_END);
-        if (Li != m->file->tell()) {
-            QTC::TC("qpdf", "QPDF /L mismatch");
+        Integer L = candidate["/L"];
+        if (L != m->file->tell()) {
             return false;
         }
-        m->linp.file_size = Li;
+        m->linp.file_size = L;
         m->lindict = candidate;
         return true;
     }
