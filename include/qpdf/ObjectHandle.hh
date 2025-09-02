@@ -27,7 +27,6 @@
 #include <qpdf/JSON.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjGen.hh>
-#include <qpdf/Types.h>
 
 #include <cstdint>
 #include <memory>
@@ -42,6 +41,7 @@ namespace qpdf
     class Array;
     class BaseDictionary;
     class Dictionary;
+    class Integer;
     class Stream;
 
     enum typed : std::uint8_t { strict = 0, any_flag = 1, optional = 2, any = 3, error = 4 };
@@ -127,6 +127,7 @@ namespace qpdf
         inline void assign(qpdf_object_type_e required, BaseHandle&& other);
 
         std::string description() const;
+        std::invalid_argument invalid_error(std::string const& method) const;
         std::runtime_error type_error(char const* expected_type) const;
         QPDFExc type_error(char const* expected_type, std::string const& message) const;
         char const* type_name() const;

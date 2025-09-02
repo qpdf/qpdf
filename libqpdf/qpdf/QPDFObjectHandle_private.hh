@@ -7,6 +7,11 @@
 #include <qpdf/QPDF_private.hh>
 #include <qpdf/QUtil.hh>
 
+#include <concepts>
+#include <utility>
+
+using namespace std::literals;
+
 namespace qpdf
 {
     class Array final: public BaseHandle
@@ -284,6 +289,97 @@ namespace qpdf
 
         ~Dictionary() = default;
     };
+
+    class Integer final: public BaseHandle
+    {
+      public:
+        Integer() = default;
+        Integer(Integer const&) = default;
+        Integer(Integer&&) = default;
+        Integer& operator=(Integer const&) = default;
+        Integer& operator=(Integer&&) = default;
+        ~Integer() = default;
+
+        explicit Integer(long long value);
+
+        explicit Integer(std::integral auto value) :
+            Integer(static_cast<long long>(value))
+        {
+            if constexpr (
+                std::numeric_limits<decltype(value)>::max() >
+                std::numeric_limits<long long>::max()) {
+                if (value > std::numeric_limits<long long>::max()) {
+                    throw std::overflow_error("overflow constructing Integer");
+                }
+            }
+        }
+
+        Integer(QPDFObjectHandle const& oh) :
+            BaseHandle(oh.type_code() == ::ot_integer ? oh : QPDFObjectHandle())
+        {
+        }
+
+        Integer(QPDFObjectHandle&& oh) :
+            BaseHandle(oh.type_code() == ::ot_integer ? std::move(oh) : QPDFObjectHandle())
+        {
+        }
+
+        // Return the integer value. If the object is not a valid integer, throw a
+        // std::invalid_argument exception. If the object is out of range for the target type,
+        // throw a std::overflow_error or std::underflow_error exception.
+        template <std::integral T>
+        operator T() const
+        {
+            auto v = value();
+
+            if (std::cmp_greater(v, std::numeric_limits<T>::max())) {
+                throw std::overflow_error("Integer conversion overflow");
+            }
+            if (std::cmp_less(v, std::numeric_limits<T>::min())) {
+                throw std::underflow_error("Integer conversion underflow");
+            }
+            return static_cast<T>(v);
+        }
+
+        // Return the integer value. If the object is not a valid integer, throw a
+        // std::invalid_argument exception.
+        int64_t value() const;
+
+        // Return true if object value is equal to the 'rhs' value. Return false if the object is
+        // not a valid Integer.
+        friend bool
+        operator==(Integer const& lhs, std::integral auto rhs)
+        {
+            return lhs && std::cmp_equal(lhs.value(), rhs);
+        }
+
+        // Compare the object value to the 'rhs' value. Throw a std::invalid_argument exception if
+        // the object is not a valid Integer.
+        friend std::strong_ordering
+        operator<=>(Integer const& lhs, std::integral auto rhs)
+        {
+            if (!lhs) {
+                throw lhs.invalid_error("Integer");
+            }
+            if (std::cmp_less(lhs.value(), rhs)) {
+                return std::strong_ordering::less;
+            }
+            return std::cmp_greater(lhs.value(), rhs) ? std::strong_ordering::greater
+                                                      : std::strong_ordering::equal;
+        }
+    };
+
+    bool
+    operator==(std::integral auto lhs, Integer const& rhs)
+    {
+        return rhs == lhs;
+    }
+
+    std::strong_ordering
+    operator<=>(std::integral auto lhs, Integer const& rhs)
+    {
+        return rhs <=> lhs;
+    }
 
     class Name final: public BaseHandle
     {

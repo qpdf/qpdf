@@ -806,16 +806,36 @@ QPDFObjectHandle::getValueAsBool(bool& value) const
     return false;
 }
 
-// Integer accessors
+// Integer methods
+
+Integer::Integer(long long value) :
+    BaseHandle(QPDFObject::create<QPDF_Integer>(value))
+{
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::newInteger(long long value)
+{
+    return {QPDFObject::create<QPDF_Integer>(value)};
+}
+
+int64_t
+Integer::value() const
+{
+    auto* i = as<QPDF_Integer>();
+    if (!i) {
+        throw invalid_error("Integer");
+    }
+    return i->val;
+}
 
 long long
 QPDFObjectHandle::getIntValue() const
 {
-    if (auto integer = as<QPDF_Integer>()) {
-        return integer->val;
+    if (auto const integer = Integer(*this)) {
+        return integer;
     } else {
         typeWarning("integer", "returning 0");
-        QTC::TC("qpdf", "QPDFObjectHandle integer returning 0");
         return 0;
     }
 }
@@ -823,8 +843,8 @@ QPDFObjectHandle::getIntValue() const
 bool
 QPDFObjectHandle::getValueAsInt(long long& value) const
 {
-    if (auto integer = as<QPDF_Integer>()) {
-        value = integer->val;
+    if (auto const integer = Integer(*this)) {
+        value = integer;
         return true;
     }
     return false;
@@ -833,16 +853,18 @@ QPDFObjectHandle::getValueAsInt(long long& value) const
 int
 QPDFObjectHandle::getIntValueAsInt() const
 {
-    long long v = getIntValue();
-    if (v < INT_MIN) {
+    try {
+        return Integer(*this);
+    } catch (std::underflow_error&) {
         warn("requested value of integer is too small; returning INT_MIN");
         return INT_MIN;
-    }
-    if (v > INT_MAX) {
+    } catch (std::overflow_error&) {
         warn("requested value of integer is too big; returning INT_MAX");
         return INT_MAX;
+    } catch (std::invalid_argument&) {
+        typeWarning("integer", "returning 0");
+        return 0;
     }
-    return static_cast<int>(v);
 }
 
 bool
@@ -858,12 +880,14 @@ QPDFObjectHandle::getValueAsInt(int& value) const
 unsigned long long
 QPDFObjectHandle::getUIntValue() const
 {
-    long long v = getIntValue();
-    if (v < 0) {
+    try {
+        return Integer(*this);
+    } catch (std::underflow_error&) {
         warn("unsigned value request for negative number; returning 0");
         return 0;
-    } else {
-        return static_cast<unsigned long long>(v);
+    } catch (std::invalid_argument&) {
+        typeWarning("integer", "returning 0");
+        return 0;
     }
 }
 
@@ -880,16 +904,18 @@ QPDFObjectHandle::getValueAsUInt(unsigned long long& value) const
 unsigned int
 QPDFObjectHandle::getUIntValueAsUInt() const
 {
-    long long v = getIntValue();
-    if (v < 0) {
+    try {
+        return Integer(*this);
+    } catch (std::underflow_error&) {
         warn("unsigned integer value request for negative number; returning 0");
         return 0;
-    }
-    if (v > UINT_MAX) {
+    } catch (std::overflow_error&) {
         warn("requested value of unsigned integer is too big; returning UINT_MAX");
         return UINT_MAX;
+    } catch (std::invalid_argument&) {
+        typeWarning("integer", "returning 0");
+        return 0;
     }
-    return static_cast<unsigned int>(v);
 }
 
 bool
@@ -1329,7 +1355,7 @@ QPDFObjectHandle::rotatePage(int angle, bool relative)
     }
     new_angle = (new_angle + 360) % 360;
     // Make this explicit even with new_angle == 0 since /Rotate can be inherited.
-    replaceKey("/Rotate", QPDFObjectHandle::newInteger(new_angle));
+    replaceKey("/Rotate", Integer(new_angle));
 }
 
 void
@@ -1595,12 +1621,11 @@ QPDFObjectHandle::parseContentStream_data(
                 QTC::TC("qpdf", "QPDFObjectHandle EOF in inline image");
                 warn(
                     context,
-                    QPDFExc(
-                        qpdf_e_damaged_pdf,
-                        description,
-                        "stream data",
-                        input.tell(),
-                        "EOF found while reading inline image"));
+                    {qpdf_e_damaged_pdf,
+                     description,
+                     "stream data",
+                     input.tell(),
+                     "EOF found while reading inline image"});
             } else {
                 QTC::TC("qpdf", "QPDFObjectHandle inline image token");
                 if (callbacks) {
@@ -1655,12 +1680,6 @@ QPDFObjectHandle
 QPDFObjectHandle::newNull()
 {
     return {QPDFObject::create<QPDF_Null>()};
-}
-
-QPDFObjectHandle
-QPDFObjectHandle::newInteger(long long value)
-{
-    return {QPDFObject::create<QPDF_Integer>(value)};
 }
 
 QPDFObjectHandle
@@ -1932,6 +1951,11 @@ QPDFObjectHandle::assertInitialized() const
     }
 }
 
+std::invalid_argument
+BaseHandle::invalid_error(std::string const& method) const
+{
+    return std::invalid_argument(method + " operation attempted on invalid object");
+}
 std::runtime_error
 BaseHandle::type_error(char const* expected_type) const
 {
@@ -1976,9 +2000,7 @@ void
 QPDFObjectHandle::assertType(char const* type_name, bool istype) const
 {
     if (!istype) {
-        throw std::runtime_error(
-            std::string("operation for ") + type_name + " attempted on object of type " +
-            QPDFObjectHandle(*this).getTypeName());
+        throw type_error(type_name);
     }
 }
 

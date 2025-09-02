@@ -27,6 +27,7 @@ namespace qpdf
     class Array;
     class BaseDictionary;
     class Dictionary;
+    class Integer;
     class Stream;
 } // namespace qpdf
 
@@ -123,6 +124,7 @@ class QPDF_Integer final
 {
     friend class QPDFObject;
     friend class qpdf::BaseHandle;
+    friend class qpdf::Integer;
     friend class QPDFObjectHandle;
 
     QPDF_Integer(long long val) :
