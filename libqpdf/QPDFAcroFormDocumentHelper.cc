@@ -834,6 +834,58 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         }
     };
 
+    auto traverse_field = [&](QPDFObjectHandle& top_field) -> void {
+        std::list<Dictionary> queue;
+        QPDFObjGen::set seen;
+        queue.emplace_back(top_field);
+        for (; !queue.empty(); queue.pop_front()) {
+            auto& obj = queue.front();
+            if (seen.add(obj)) {
+                auto parent = obj["/Parent"];
+                if (parent.isIndirect()) {
+                    auto parent_og = parent.id_gen();
+                    if (orig_to_copy.contains(parent_og)) {
+                        obj.replaceKey("/Parent", orig_to_copy[parent_og]);
+                    } else {
+                        parent.warn(
+                            "while traversing field " + obj.id_gen().unparse(',') +
+                            ", found parent (" + parent_og.unparse(',') +
+                            ") that had not been seen, indicating likely invalid field "
+                            "structure");
+                    }
+                }
+                size_t i = 0;
+                Array Kids = obj["/Kids"];
+                for (auto& kid: Kids) {
+                    if (maybe_copy_object(kid)) {
+                        Kids.set(i, kid);
+                        queue.emplace_back(kid);
+                    }
+                    ++i;
+                }
+                adjustInheritedFields(
+                    obj, override_da, from_default_da, override_q, from_default_q);
+                if (foreign) {
+                    // Lazily initialize our /DR and the conflict map.
+                    init_dr_map();
+                    // The spec doesn't say anything about /DR on the field, but lots of writers
+                    // put one there, and it is frequently the same as the document-level /DR.
+                    // To avoid having the field's /DR point to information that we are not
+                    // maintaining, just reset it to that if it exists. Empirical evidence
+                    // suggests that many readers, including Acrobat, Adobe Acrobat Reader,
+                    // chrome, firefox, the mac Preview application, and several of the free
+                    // readers on Linux all ignore /DR at the field level.
+                    if (obj.contains("/DR")) {
+                        obj.replaceKey("/DR", dr);
+                    }
+                    if (obj["/DA"].isString() && !dr_map.empty()) {
+                        adjustDefaultAppearances(obj, dr_map);
+                    }
+                }
+            }
+        }
+    };
+
     auto transform_annotation =
         [&](QPDFObjectHandle& annot) -> std::tuple<QPDFObjectHandle, bool, bool> {
         // Make copies of annotations and fields down to the appearance streams, preserving all
@@ -896,55 +948,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
 
         // Traverse the field, copying kids, and preserving integrity.
         if (maybe_copy_object(top_field)) {
-            std::list<Dictionary> queue;
-            QPDFObjGen::set seen;
-            queue.emplace_back(top_field);
-            for (; !queue.empty(); queue.pop_front()) {
-                auto& obj = queue.front();
-                if (seen.add(obj)) {
-                    auto parent = obj["/Parent"];
-                    if (parent.isIndirect()) {
-                        auto parent_og = parent.id_gen();
-                        if (orig_to_copy.contains(parent_og)) {
-                            obj.replaceKey("/Parent", orig_to_copy[parent_og]);
-                        } else {
-                            parent.warn(
-                                "while traversing field " + obj.id_gen().unparse(',') +
-                                ", found parent (" + parent_og.unparse(',') +
-                                ") that had not been seen, indicating likely invalid field "
-                                "structure");
-                        }
-                    }
-                    size_t i = 0;
-                    Array Kids = obj["/Kids"];
-                    for (auto& kid: Kids) {
-                        if (maybe_copy_object(kid)) {
-                            Kids.set(i, kid);
-                            queue.emplace_back(kid);
-                        }
-                        ++i;
-                    }
-                    adjustInheritedFields(
-                        obj, override_da, from_default_da, override_q, from_default_q);
-                    if (foreign) {
-                        // Lazily initialize our /DR and the conflict map.
-                        init_dr_map();
-                        // The spec doesn't say anything about /DR on the field, but lots of writers
-                        // put one there, and it is frequently the same as the document-level /DR.
-                        // To avoid having the field's /DR point to information that we are not
-                        // maintaining, just reset it to that if it exists. Empirical evidence
-                        // suggests that many readers, including Acrobat, Adobe Acrobat Reader,
-                        // chrome, firefox, the mac Preview application, and several of the free
-                        // readers on Linux all ignore /DR at the field level.
-                        if (obj.contains("/DR")) {
-                            obj.replaceKey("/DR", dr);
-                        }
-                        if (obj["/DA"].isString() && !dr_map.empty()) {
-                            adjustDefaultAppearances(obj, dr_map);
-                        }
-                    }
-                }
-            }
+            traverse_field(top_field);
         }
 
         // Now switch to copies. We already switched for top_field
