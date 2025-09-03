@@ -480,6 +480,9 @@ QPDFAcroFormDocumentHelper::adjustInheritedFields(
     bool override_q,
     int from_default_q)
 {
+    if (!(override_da || override_q)) {
+        return;
+    }
     // Override /Q or /DA if needed. If this object has a field type, directly or inherited, it is a
     // field and not just an annotation. In that case, we need to override if we are getting a value
     // from the document that is different from the value we would have gotten from the old
@@ -892,65 +895,60 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         }
 
         // Traverse the field, copying kids, and preserving integrity.
-        std::list<QPDFObjectHandle> queue;
-        QPDFObjGen::set seen;
         if (maybe_copy_object(top_field)) {
+            std::list<Dictionary> queue;
+            QPDFObjGen::set seen;
             queue.emplace_back(top_field);
-        }
-        for (; !queue.empty(); queue.pop_front()) {
-            auto& obj = queue.front();
-            if (seen.add(obj)) {
-                auto parent = obj["/Parent"];
-                if (parent.isIndirect()) {
-                    auto parent_og = parent.getObjGen();
-                    if (orig_to_copy.contains(parent_og)) {
-                        obj.replaceKey("/Parent", orig_to_copy[parent_og]);
-                    } else {
-                        parent.warn(
-                            "while traversing field " + obj.getObjGen().unparse(',') +
-                            ", found parent (" + parent_og.unparse(',') +
-                            ") that had not been seen, indicating likely invalid field structure");
-                    }
-                }
-                auto kids = obj["/Kids"];
-                int sz = static_cast<int>(kids.size());
-                if (sz != 1 || kids.isArray()) {
-                    for (int i = 0; i < sz; ++i) {
-                        auto kid = kids.getArrayItem(i);
-                        if (maybe_copy_object(kid)) {
-                            kids.setArrayItem(i, kid);
-                            queue.emplace_back(kid);
+            for (; !queue.empty(); queue.pop_front()) {
+                auto& obj = queue.front();
+                if (seen.add(obj)) {
+                    auto parent = obj["/Parent"];
+                    if (parent.isIndirect()) {
+                        auto parent_og = parent.id_gen();
+                        if (orig_to_copy.contains(parent_og)) {
+                            obj.replaceKey("/Parent", orig_to_copy[parent_og]);
+                        } else {
+                            parent.warn(
+                                "while traversing field " + obj.id_gen().unparse(',') +
+                                ", found parent (" + parent_og.unparse(',') +
+                                ") that had not been seen, indicating likely invalid field "
+                                "structure");
                         }
                     }
-                }
-
-                if (override_da || override_q) {
+                    size_t i = 0;
+                    Array Kids = obj["/Kids"];
+                    for (auto& kid: Kids) {
+                        if (maybe_copy_object(kid)) {
+                            Kids.set(i, kid);
+                            queue.emplace_back(kid);
+                        }
+                        ++i;
+                    }
                     adjustInheritedFields(
                         obj, override_da, from_default_da, override_q, from_default_q);
-                }
-                if (foreign) {
-                    // Lazily initialize our /DR and the conflict map.
-                    init_dr_map();
-                    // The spec doesn't say anything about /DR on the field, but lots of writers
-                    // put one there, and it is frequently the same as the document-level /DR.
-                    // To avoid having the field's /DR point to information that we are not
-                    // maintaining, just reset it to that if it exists. Empirical evidence
-                    // suggests that many readers, including Acrobat, Adobe Acrobat Reader,
-                    // chrome, firefox, the mac Preview application, and several of the free
-                    // readers on Linux all ignore /DR at the field level.
-                    if (obj.hasKey("/DR")) {
-                        obj.replaceKey("/DR", dr);
+                    if (foreign) {
+                        // Lazily initialize our /DR and the conflict map.
+                        init_dr_map();
+                        // The spec doesn't say anything about /DR on the field, but lots of writers
+                        // put one there, and it is frequently the same as the document-level /DR.
+                        // To avoid having the field's /DR point to information that we are not
+                        // maintaining, just reset it to that if it exists. Empirical evidence
+                        // suggests that many readers, including Acrobat, Adobe Acrobat Reader,
+                        // chrome, firefox, the mac Preview application, and several of the free
+                        // readers on Linux all ignore /DR at the field level.
+                        if (obj.contains("/DR")) {
+                            obj.replaceKey("/DR", dr);
+                        }
+                        if (obj["/DA"].isString() && !dr_map.empty()) {
+                            adjustDefaultAppearances(obj, dr_map);
+                        }
                     }
-                }
-                if (foreign && obj["/DA"].isString() && !dr_map.empty()) {
-                    adjustDefaultAppearances(obj, dr_map);
                 }
             }
         }
 
         // Now switch to copies. We already switched for top_field
         maybe_copy_object(ffield_oh);
-        ffield = QPDFFormFieldObjectHelper(ffield_oh);
         return {top_field, true, have_parent};
     };
 
