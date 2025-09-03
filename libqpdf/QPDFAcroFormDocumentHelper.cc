@@ -831,15 +831,8 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         }
     };
 
-    // Now do the actual copies.
-
-    QPDFObjGen::set added_new_fields;
-    for (auto annot: old_annots) {
-        if (annot.isStream()) {
-            annot.warn("ignoring annotation that's a stream");
-            continue;
-        }
-
+    auto transform_annotation =
+        [&](QPDFObjectHandle& annot) -> std::tuple<QPDFObjectHandle, bool, bool> {
         // Make copies of annotations and fields down to the appearance streams, preserving all
         // internal referential integrity. When the incoming annotations are from a different file,
         // we first copy them locally. Then, whether local or foreign, we copy them again so that if
@@ -865,98 +858,111 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
 
         auto ffield = from_afdh->getFieldForAnnotation(annot);
         auto ffield_oh = ffield.getObjectHandle();
-        QPDFObjectHandle top_field;
-        bool have_field = false;
-        bool have_parent = false;
+        if (ffield.null()) {
+            return {{}, false, false};
+        }
         if (ffield_oh.isStream()) {
             ffield.warn("ignoring form field that's a stream");
-        } else if (!ffield_oh.null() && !ffield_oh.isIndirect()) {
+            return {{}, false, false};
+        }
+        if (!ffield_oh.isIndirect()) {
             ffield.warn("ignoring form field not indirect");
-        } else if (!ffield.null()) {
-            // A field and its associated annotation can be the same object. This matters because we
-            // don't want to clone the annotation and field separately in this case.
-            have_field = true;
-            // Find the top-level field. It may be the field itself.
-            top_field = ffield.getTopLevelField(&have_parent).getObjectHandle();
-            if (foreign) {
-                // copyForeignObject returns the same value if called multiple times with the same
-                // field. Create/retrieve the local copy of the original field. This pulls over
-                // everything the field references including annotations and appearance streams, but
-                // it's harmless to call copyForeignObject on them too. They will already be copied,
-                // so we'll get the right object back.
+            return {{}, false, false};
+        }
+        // A field and its associated annotation can be the same object. This matters because we
+        // don't want to clone the annotation and field separately in this case.
+        // Find the top-level field. It may be the field itself.
+        bool have_parent = false;
+        QPDFObjectHandle top_field = ffield.getTopLevelField(&have_parent).getObjectHandle();
+        if (foreign) {
+            // copyForeignObject returns the same value if called multiple times with the same
+            // field. Create/retrieve the local copy of the original field. This pulls over
+            // everything the field references including annotations and appearance streams, but
+            // it's harmless to call copyForeignObject on them too. They will already be copied,
+            // so we'll get the right object back.
 
-                // top_field and ffield_oh are known to be indirect.
-                top_field = qpdf.copyForeignObject(top_field);
-                ffield_oh = qpdf.copyForeignObject(ffield_oh);
-            } else {
-                // We don't need to add top_field to old_fields if it's foreign because the new copy
-                // of the foreign field won't be referenced anywhere. It's just the starting point
-                // for us to make an additional local copy of.
-                old_fields.insert(top_field.getObjGen());
-            }
+            // top_field and ffield_oh are known to be indirect.
+            top_field = qpdf.copyForeignObject(top_field);
+            ffield_oh = qpdf.copyForeignObject(ffield_oh);
+        } else {
+            // We don't need to add top_field to old_fields if it's foreign because the new copy
+            // of the foreign field won't be referenced anywhere. It's just the starting point
+            // for us to make an additional local copy of.
+            old_fields.insert(top_field.getObjGen());
+        }
 
-            // Traverse the field, copying kids, and preserving integrity.
-            std::list<QPDFObjectHandle> queue;
-            QPDFObjGen::set seen;
-            if (maybe_copy_object(top_field)) {
-                queue.emplace_back(top_field);
-            }
-            for (; !queue.empty(); queue.pop_front()) {
-                auto& obj = queue.front();
-                if (seen.add(obj)) {
-                    auto parent = obj["/Parent"];
-                    if (parent.isIndirect()) {
-                        auto parent_og = parent.getObjGen();
-                        if (orig_to_copy.contains(parent_og)) {
-                            obj.replaceKey("/Parent", orig_to_copy[parent_og]);
-                        } else {
-                            parent.warn(
-                                "while traversing field " + obj.getObjGen().unparse(',') +
-                                ", found parent (" + parent_og.unparse(',') +
-                                ") that had not been seen, indicating likely invalid field "
-                                "structure");
-                        }
-                    }
-                    auto kids = obj["/Kids"];
-                    int sz = static_cast<int>(kids.size());
-                    if (sz != 1 || kids.isArray()) {
-                        for (int i = 0; i < sz; ++i) {
-                            auto kid = kids.getArrayItem(i);
-                            if (maybe_copy_object(kid)) {
-                                kids.setArrayItem(i, kid);
-                                queue.emplace_back(kid);
-                            }
-                        }
-                    }
-
-                    if (override_da || override_q) {
-                        adjustInheritedFields(
-                            obj, override_da, from_default_da, override_q, from_default_q);
-                    }
-                    if (foreign) {
-                        // Lazily initialize our /DR and the conflict map.
-                        init_dr_map();
-                        // The spec doesn't say anything about /DR on the field, but lots of writers
-                        // put one there, and it is frequently the same as the document-level /DR.
-                        // To avoid having the field's /DR point to information that we are not
-                        // maintaining, just reset it to that if it exists. Empirical evidence
-                        // suggests that many readers, including Acrobat, Adobe Acrobat Reader,
-                        // chrome, firefox, the mac Preview application, and several of the free
-                        // readers on Linux all ignore /DR at the field level.
-                        if (obj.hasKey("/DR")) {
-                            obj.replaceKey("/DR", dr);
-                        }
-                    }
-                    if (foreign && obj["/DA"].isString() && !dr_map.empty()) {
-                        adjustDefaultAppearances(obj, dr_map);
+        // Traverse the field, copying kids, and preserving integrity.
+        std::list<QPDFObjectHandle> queue;
+        QPDFObjGen::set seen;
+        if (maybe_copy_object(top_field)) {
+            queue.emplace_back(top_field);
+        }
+        for (; !queue.empty(); queue.pop_front()) {
+            auto& obj = queue.front();
+            if (seen.add(obj)) {
+                auto parent = obj["/Parent"];
+                if (parent.isIndirect()) {
+                    auto parent_og = parent.getObjGen();
+                    if (orig_to_copy.contains(parent_og)) {
+                        obj.replaceKey("/Parent", orig_to_copy[parent_og]);
+                    } else {
+                        parent.warn(
+                            "while traversing field " + obj.getObjGen().unparse(',') +
+                            ", found parent (" + parent_og.unparse(',') +
+                            ") that had not been seen, indicating likely invalid field structure");
                     }
                 }
-            }
+                auto kids = obj["/Kids"];
+                int sz = static_cast<int>(kids.size());
+                if (sz != 1 || kids.isArray()) {
+                    for (int i = 0; i < sz; ++i) {
+                        auto kid = kids.getArrayItem(i);
+                        if (maybe_copy_object(kid)) {
+                            kids.setArrayItem(i, kid);
+                            queue.emplace_back(kid);
+                        }
+                    }
+                }
 
-            // Now switch to copies. We already switched for top_field
-            maybe_copy_object(ffield_oh);
-            ffield = QPDFFormFieldObjectHelper(ffield_oh);
+                if (override_da || override_q) {
+                    adjustInheritedFields(
+                        obj, override_da, from_default_da, override_q, from_default_q);
+                }
+                if (foreign) {
+                    // Lazily initialize our /DR and the conflict map.
+                    init_dr_map();
+                    // The spec doesn't say anything about /DR on the field, but lots of writers
+                    // put one there, and it is frequently the same as the document-level /DR.
+                    // To avoid having the field's /DR point to information that we are not
+                    // maintaining, just reset it to that if it exists. Empirical evidence
+                    // suggests that many readers, including Acrobat, Adobe Acrobat Reader,
+                    // chrome, firefox, the mac Preview application, and several of the free
+                    // readers on Linux all ignore /DR at the field level.
+                    if (obj.hasKey("/DR")) {
+                        obj.replaceKey("/DR", dr);
+                    }
+                }
+                if (foreign && obj["/DA"].isString() && !dr_map.empty()) {
+                    adjustDefaultAppearances(obj, dr_map);
+                }
+            }
         }
+
+        // Now switch to copies. We already switched for top_field
+        maybe_copy_object(ffield_oh);
+        ffield = QPDFFormFieldObjectHelper(ffield_oh);
+        return {top_field, true, have_parent};
+    };
+
+    // Now do the actual copies.
+
+    QPDFObjGen::set added_new_fields;
+    for (auto annot: old_annots) {
+        if (annot.isStream()) {
+            annot.warn("ignoring annotation that's a stream");
+            continue;
+        }
+        auto [top_field, have_field, have_parent] = transform_annotation(annot);
 
         QTC::TC(
             "qpdf",
