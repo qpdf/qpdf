@@ -992,17 +992,18 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         // Identify and copy any appearance streams
 
         auto ah = QPDFAnnotationObjectHelper(annot);
-        auto apdict = ah.getAppearanceDictionary();
+        Dictionary apdict = ah.getAppearanceDictionary();
         std::vector<QPDFObjectHandle> streams;
         auto replace_stream = [](auto& dict, auto& key, auto& old) {
-            return dict.replaceKeyAndGetNew(key, old.copyStream());
+            dict.replaceKey(key, old.copyStream());
+            return dict[key];
         };
 
-        for (auto& [key1, value1]: apdict.as_dictionary()) {
+        for (auto& [key1, value1]: apdict) {
             if (value1.isStream()) {
                 streams.emplace_back(replace_stream(apdict, key1, value1));
             } else {
-                for (auto& [key2, value2]: value1.as_dictionary()) {
+                for (auto& [key2, value2]: Dictionary(value1)) {
                     if (value2.isStream()) {
                         streams.emplace_back(replace_stream(value1, key2, value2));
                     }
@@ -1012,21 +1013,19 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
 
         // Now we can safely mutate the annotation and its appearance streams.
         for (auto& stream: streams) {
-            auto dict = stream.getDict();
-            auto omatrix = dict["/Matrix"];
+            Dictionary dict = stream.getDict();
+
             QPDFMatrix apcm;
-            if (omatrix.isArray()) {
-                QTC::TC("qpdf", "QPDFAcroFormDocumentHelper modify ap matrix");
-                auto m1 = omatrix.getArrayAsMatrix();
-                apcm = QPDFMatrix(m1);
+            Array omatrix = dict["/Matrix"];
+            if (omatrix) {
+                apcm = QPDFMatrix(QPDFObjectHandle(omatrix).getArrayAsMatrix());
             }
             apcm.concat(cm);
-            auto new_matrix = QPDFObjectHandle::newFromMatrix(apcm);
-            if (omatrix.isArray() || (apcm != QPDFMatrix())) {
-                dict.replaceKey("/Matrix", new_matrix);
+            if (omatrix || apcm != QPDFMatrix()) {
+                dict.replaceKey("/Matrix", QPDFObjectHandle::newFromMatrix(apcm));
             }
-            auto resources = dict["/Resources"];
-            if ((!dr_map.empty()) && resources.isDictionary()) {
+            Dictionary resources = dict["/Resources"];
+            if (!dr_map.empty() && resources) {
                 adjustAppearanceStream(stream, dr_map);
             }
         }
