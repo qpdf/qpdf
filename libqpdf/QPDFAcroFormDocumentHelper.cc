@@ -789,12 +789,10 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     // If we have to merge /DR, we will need a mapping of conflicting keys for rewriting /DA. Set
     // this up for lazy initialization in case we encounter any form fields.
     std::map<std::string, std::map<std::string, std::string>> dr_map;
-    bool initialized_dr_map = false;
     Dictionary dr;
 
     auto init_dr_map = [&]() {
-        if (!initialized_dr_map) {
-            initialized_dr_map = true;
+        if (!dr) {
             // Ensure that we have a /DR that is an indirect
             // dictionary object.
             if (!acroform) {
