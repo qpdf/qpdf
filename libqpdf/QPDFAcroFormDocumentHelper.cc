@@ -8,6 +8,7 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/ResourceFinder.hh>
 
+#include <deque>
 #include <utility>
 
 using namespace qpdf;
@@ -834,15 +835,15 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         }
     };
 
+    // Traverse the field, copying kids, and preserving integrity.
     auto traverse_field = [&](QPDFObjectHandle& top_field) -> void {
-        std::list<Dictionary> queue;
+        std::deque<Dictionary> queue({top_field});
         QPDFObjGen::set seen;
-        queue.emplace_back(top_field);
-        for (; !queue.empty(); queue.pop_front()) {
-            auto& obj = queue.front();
+        for (auto it = queue.begin(); it != queue.end(); ++it) {
+            auto& obj = *it;
             if (seen.add(obj)) {
-                auto parent = obj["/Parent"];
-                if (parent.isIndirect()) {
+                Dictionary parent = obj["/Parent"];
+                if (parent.indirect()) {
                     auto parent_og = parent.id_gen();
                     if (orig_to_copy.contains(parent_og)) {
                         obj.replaceKey("/Parent", orig_to_copy[parent_og]);
@@ -850,8 +851,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                         parent.warn(
                             "while traversing field " + obj.id_gen().unparse(',') +
                             ", found parent (" + parent_og.unparse(',') +
-                            ") that had not been seen, indicating likely invalid field "
-                            "structure");
+                            ") that had not been seen, indicating likely invalid field structure");
                     }
                 }
                 size_t i = 0;
@@ -946,7 +946,6 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             old_fields.insert(top_field.getObjGen());
         }
 
-        // Traverse the field, copying kids, and preserving integrity.
         if (maybe_copy_object(top_field)) {
             traverse_field(top_field);
         }
@@ -986,9 +985,9 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
 
         // Now we have copies, so we can safely mutate.
         if (have_field && added_new_fields.add(top_field)) {
-            new_fields.push_back(top_field);
+            new_fields.emplace_back(top_field);
         }
-        new_annots.push_back(annot);
+        new_annots.emplace_back(annot);
 
         // Identify and copy any appearance streams
 
