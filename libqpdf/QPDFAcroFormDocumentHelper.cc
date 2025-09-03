@@ -719,7 +719,7 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
 
 void
 QPDFAcroFormDocumentHelper::transformAnnotations(
-    QPDFObjectHandle old_annots,
+    QPDFObjectHandle a_old_annots,
     std::vector<QPDFObjectHandle>& new_annots,
     std::vector<QPDFObjectHandle>& new_fields,
     std::set<QPDFObjGen>& old_fields,
@@ -727,94 +727,89 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     QPDF* from_qpdf,
     QPDFAcroFormDocumentHelper* from_afdh)
 {
-    std::shared_ptr<QPDFAcroFormDocumentHelper> afdhph;
+    Array old_annots = std::move(a_old_annots);
     if (!from_qpdf) {
         // Assume these are from the same QPDF.
         from_qpdf = &qpdf;
         from_afdh = this;
-    } else if ((from_qpdf != &qpdf) && (!from_afdh)) {
-        afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(*from_qpdf);
-        from_afdh = afdhph.get();
+    } else if (from_qpdf != &qpdf && !from_afdh) {
+        from_afdh = &QPDFAcroFormDocumentHelper::get(*from_qpdf);
     }
-    bool foreign = (from_qpdf != &qpdf);
+    const bool foreign = from_qpdf != &qpdf;
 
     // It's possible that we will transform annotations that don't include any form fields. This
     // code takes care not to muck around with /AcroForm unless we have to.
 
-    QPDFObjectHandle acroform = qpdf.getRoot().getKey("/AcroForm");
-    QPDFObjectHandle from_acroform = from_qpdf->getRoot().getKey("/AcroForm");
+    Dictionary acroform = qpdf.getRoot()["/AcroForm"];
+    Dictionary from_acroform = from_qpdf->getRoot()["/AcroForm"];
 
     // /DA and /Q may be inherited from the document-level /AcroForm dictionary. If we are copying a
     // foreign stream and the stream is getting one of these values from its document's /AcroForm,
     // we will need to copy the value explicitly so that it doesn't start getting its default from
     // the destination document.
-    bool override_da = false;
-    bool override_q = false;
     std::string from_default_da;
     int from_default_q = 0;
     // If we copy any form fields, we will need to merge the source document's /DR into this
     // document's /DR.
-    QPDFObjectHandle from_dr = QPDFObjectHandle::newNull();
+    Dictionary from_dr;
+    std::string default_da;
+    int default_q = 0;
     if (foreign) {
-        std::string default_da;
-        int default_q = 0;
-        if (acroform.isDictionary()) {
-            if (acroform.getKey("/DA").isString()) {
-                default_da = acroform.getKey("/DA").getUTF8Value();
+        if (acroform) {
+            if (acroform["/DA"].isString()) {
+                default_da = acroform["/DA"].getUTF8Value();
             }
-            if (acroform.getKey("/Q").isInteger()) {
-                default_q = acroform.getKey("/Q").getIntValueAsInt();
+            if (Integer Q = acroform["/Q"]) {
+                default_q = Q;
             }
         }
-        if (from_acroform.isDictionary()) {
-            if (from_acroform.getKey("/DR").isDictionary()) {
-                from_dr = from_acroform.getKey("/DR");
-                if (!from_dr.isIndirect()) {
+        if (from_acroform) {
+            from_dr = from_acroform["/DR"];
+            if (from_dr) {
+                if (!from_dr.indirect()) {
                     from_dr = from_qpdf->makeIndirectObject(from_dr);
                 }
                 from_dr = qpdf.copyForeignObject(from_dr);
             }
-            if (from_acroform.getKey("/DA").isString()) {
-                from_default_da = from_acroform.getKey("/DA").getUTF8Value();
+            if (from_acroform["/DA"].isString()) {
+                from_default_da = from_acroform["/DA"].getUTF8Value();
             }
-            if (from_acroform.getKey("/Q").isInteger()) {
-                from_default_q = from_acroform.getKey("/Q").getIntValueAsInt();
+            if (Integer Q = from_acroform["/Q"]) {
+                from_default_q = Q;
             }
-        }
-        if (from_default_da != default_da) {
-            override_da = true;
-        }
-        if (from_default_q != default_q) {
-            override_q = true;
         }
     }
+    const bool override_da = from_acroform ? from_default_da != default_da : false;
+    const bool override_q = from_acroform ? from_default_q != default_q : false;
 
     // If we have to merge /DR, we will need a mapping of conflicting keys for rewriting /DA. Set
     // this up for lazy initialization in case we encounter any form fields.
     std::map<std::string, std::map<std::string, std::string>> dr_map;
     bool initialized_dr_map = false;
-    QPDFObjectHandle dr = QPDFObjectHandle::newNull();
+    Dictionary dr;
+
     auto init_dr_map = [&]() {
         if (!initialized_dr_map) {
             initialized_dr_map = true;
             // Ensure that we have a /DR that is an indirect
             // dictionary object.
-            if (!acroform.isDictionary()) {
+            if (!acroform) {
                 acroform = getOrCreateAcroForm();
             }
-            dr = acroform.getKey("/DR");
-            if (!dr.isDictionary()) {
-                dr = QPDFObjectHandle::newDictionary();
+            dr = acroform["/DR"];
+            if (!dr) {
+                dr = Dictionary::empty();
             }
-            dr.makeResourcesIndirect(qpdf);
-            if (!dr.isIndirect()) {
-                dr = acroform.replaceKeyAndGetNew("/DR", qpdf.makeIndirectObject(dr));
+            QPDFObjectHandle(dr).makeResourcesIndirect(qpdf);
+            if (!dr.indirect()) {
+                acroform.replaceKey("/DR", qpdf.makeIndirectObject(dr));
+                dr = acroform["/DR"];
             }
             // Merge the other document's /DR, creating a conflict map. mergeResources checks to
             // make sure both objects are dictionaries. By this point, if this is foreign, from_dr
             // has been copied, so we use the target qpdf as the owning qpdf.
-            from_dr.makeResourcesIndirect(qpdf);
-            dr.mergeResources(from_dr, &dr_map);
+            QPDFObjectHandle(from_dr).makeResourcesIndirect(qpdf);
+            QPDFObjectHandle(dr).mergeResources(from_dr, &dr_map);
 
             if (from_afdh->getNeedAppearances()) {
                 setNeedAppearances(true);
@@ -839,7 +834,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     // Now do the actual copies.
 
     QPDFObjGen::set added_new_fields;
-    for (auto annot: old_annots.aitems()) {
+    for (auto annot: old_annots) {
         if (annot.isStream()) {
             annot.warn("ignoring annotation that's a stream");
             continue;
@@ -904,12 +899,12 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             std::list<QPDFObjectHandle> queue;
             QPDFObjGen::set seen;
             if (maybe_copy_object(top_field)) {
-                queue.push_back(top_field);
+                queue.emplace_back(top_field);
             }
             for (; !queue.empty(); queue.pop_front()) {
                 auto& obj = queue.front();
                 if (seen.add(obj)) {
-                    auto parent = obj.getKey("/Parent");
+                    auto parent = obj["/Parent"];
                     if (parent.isIndirect()) {
                         auto parent_og = parent.getObjGen();
                         if (orig_to_copy.contains(parent_og)) {
@@ -922,7 +917,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                                 "structure");
                         }
                     }
-                    auto kids = obj.getKey("/Kids");
+                    auto kids = obj["/Kids"];
                     int sz = static_cast<int>(kids.size());
                     if (sz != 1 || kids.isArray()) {
                         for (int i = 0; i < sz; ++i) {
@@ -952,7 +947,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                             obj.replaceKey("/DR", dr);
                         }
                     }
-                    if (foreign && obj.getKey("/DA").isString() && (!dr_map.empty())) {
+                    if (foreign && obj["/DA"].isString() && !dr_map.empty()) {
                         adjustDefaultAppearances(obj, dr_map);
                     }
                 }
@@ -1011,7 +1006,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         // Now we can safely mutate the annotation and its appearance streams.
         for (auto& stream: streams) {
             auto dict = stream.getDict();
-            auto omatrix = dict.getKey("/Matrix");
+            auto omatrix = dict["/Matrix"];
             QPDFMatrix apcm;
             if (omatrix.isArray()) {
                 QTC::TC("qpdf", "QPDFAcroFormDocumentHelper modify ap matrix");
@@ -1023,12 +1018,12 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             if (omatrix.isArray() || (apcm != QPDFMatrix())) {
                 dict.replaceKey("/Matrix", new_matrix);
             }
-            auto resources = dict.getKey("/Resources");
+            auto resources = dict["/Resources"];
             if ((!dr_map.empty()) && resources.isDictionary()) {
                 adjustAppearanceStream(stream, dr_map);
             }
         }
-        auto rect = cm.transformRectangle(annot.getKey("/Rect").getArrayAsRectangle());
+        auto rect = cm.transformRectangle(annot["/Rect"].getArrayAsRectangle());
         annot.replaceKey("/Rect", QPDFObjectHandle::newFromRectangle(rect));
     }
 }
