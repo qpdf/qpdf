@@ -324,7 +324,7 @@ namespace qpdf
         {
         }
 
-        // Return the integer value. If the object is not a valid integer, throw a
+        // Return the integer value. If the object is not a valid Integer, throw a
         // std::invalid_argument exception. If the object is out of range for the target type,
         // throw a std::overflow_error or std::underflow_error exception.
         template <std::integral T>
@@ -391,6 +391,45 @@ namespace qpdf
         // escaping. Return {false, false} if the name is not valid utf-8, otherwise return {true,
         // true} if no characters require or {true, false} if escaping is required.
         static std::pair<bool, bool> analyzeJSONEncoding(std::string const& name);
+
+        Name() = default;
+        Name(Name const&) = default;
+        Name(Name&&) = default;
+        Name& operator=(Name const&) = default;
+        Name& operator=(Name&&) = default;
+        ~Name() = default;
+
+        explicit Name(std::string const&);
+        explicit Name(std::string&&);
+
+        Name(QPDFObjectHandle const& oh) :
+            BaseHandle(oh.type_code() == ::ot_name ? oh : QPDFObjectHandle())
+        {
+        }
+
+        Name(QPDFObjectHandle&& oh) :
+            BaseHandle(oh.type_code() == ::ot_name ? std::move(oh) : QPDFObjectHandle())
+        {
+        }
+
+        // Return the name value. If the object is not a valid Name, throw a
+        // std::invalid_argument exception.
+        operator std::string() const&
+        {
+            return value();
+        }
+
+        // Return the integer value. If the object is not a valid integer, throw a
+        // std::invalid_argument exception.
+        std::string const& value() const;
+
+        // Return true if object value is equal to the 'rhs' value. Return false if the object is
+        // not a valid Name.
+        friend bool
+        operator==(Name const& lhs, std::string_view rhs)
+        {
+            return lhs && lhs.value() == rhs;
+        }
     };
 
     class Stream final: public BaseHandle

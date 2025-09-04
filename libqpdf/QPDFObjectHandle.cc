@@ -952,7 +952,33 @@ QPDFObjectHandle::getValueAsReal(std::string& value) const
     return true;
 }
 
-// Name accessors
+// Name methods
+
+QPDFObjectHandle
+QPDFObjectHandle::newName(std::string const& name)
+{
+    return {QPDFObject::create<QPDF_Name>(name)};
+}
+
+Name::Name(std::string const& name) :
+    BaseHandle(QPDFObject::create<QPDF_Name>(name))
+{
+}
+
+Name::Name(std::string&& name) :
+    BaseHandle(QPDFObject::create<QPDF_Name>(std::move(name)))
+{
+}
+
+std::string const&
+Name::value() const
+{
+    auto* n = as<QPDF_Name>();
+    if (!n) {
+        throw invalid_error("Name");
+    }
+    return n->name;
+}
 
 std::string
 QPDFObjectHandle::getName() const
@@ -1692,12 +1718,6 @@ QPDFObjectHandle
 QPDFObjectHandle::newReal(double value, int decimal_places, bool trim_trailing_zeroes)
 {
     return {QPDFObject::create<QPDF_Real>(value, decimal_places, trim_trailing_zeroes)};
-}
-
-QPDFObjectHandle
-QPDFObjectHandle::newName(std::string const& name)
-{
-    return {QPDFObject::create<QPDF_Name>(name)};
 }
 
 QPDFObjectHandle
