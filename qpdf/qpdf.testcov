@@ -7,12 +7,9 @@ QPDF check obj 1
 QPDF object stream offsets not increasing 0
 QPDF ignore self-referential object stream 0
 QPDF object stream contains id < 1 0
-QPDF hint table length indirect 0
 QPDF hint table length direct 0
-QPDF P absent in lindict 0
-QPDF P present in lindict 0
+QPDF P absent in lindict 1
 QPDF expected n n obj 0
-QPDF /L mismatch 0
 QPDF err /T mismatch 0
 QPDF err /O mismatch 0
 QPDF opt direct pages resource 1
@@ -277,7 +274,6 @@ QPDFParser bad token in parseRemainder 0
 QPDFParser eof in parse 0
 QPDFParser eof in parseRemainder 0
 QPDFObjectHandle boolean returning false 0
-QPDFObjectHandle integer returning 0 0
 QPDFObjectHandle real returning 0.0 0
 QPDFObjectHandle name returning dummy name 0
 QPDFObjectHandle string returning empty string 0
