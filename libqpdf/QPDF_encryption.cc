@@ -676,8 +676,7 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
         throw qpdf.damagedPDF("/Encrypt in trailer dictionary is not a dictionary");
     }
 
-    if (!(encryption_dict.getKey("/Filter").isName() &&
-          (encryption_dict.getKey("/Filter").getName() == "/Standard"))) {
+    if (Name(encryption_dict["/Filter"]) != "/Standard") {
         throw unsupported("unsupported encryption filter");
     }
     if (!encryption_dict.getKey("/SubFilter").null()) {
@@ -765,16 +764,12 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
         for (auto const& [filter, cdict]: CF.as_dictionary()) {
             if (cdict.isDictionary()) {
                 encryption_method_e method = e_none;
-                if (cdict.getKey("/CFM").isName()) {
-                    std::string method_name = cdict.getKey("/CFM").getName();
-                    if (method_name == "/V2") {
-                        QTC::TC("qpdf", "QPDF_encryption CFM V2");
+                if (Name const& CFM = cdict["/CFM"]) {
+                    if (CFM == "/V2") {
                         method = e_rc4;
-                    } else if (method_name == "/AESV2") {
-                        QTC::TC("qpdf", "QPDF_encryption CFM AESV2");
+                    } else if (CFM == "/AESV2") {
                         method = e_aes;
-                    } else if (method_name == "/AESV3") {
-                        QTC::TC("qpdf", "QPDF_encryption CFM AESV3");
+                    } else if (CFM == "/AESV3") {
                         method = e_aesv3;
                     } else {
                         // Don't complain now -- maybe we won't need to reference this type.
@@ -785,9 +780,9 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
             }
         }
 
-        cf_stream = interpretCF(encryption_dict.getKey("/StmF"));
-        cf_string = interpretCF(encryption_dict.getKey("/StrF"));
-        if (auto EFF = encryption_dict.getKey("/EFF"); EFF.isName()) {
+        cf_stream = interpretCF(encryption_dict["/StmF"]);
+        cf_string = interpretCF(encryption_dict["/StrF"]);
+        if (Name const& EFF = encryption_dict["/EFF"]) {
             // qpdf does not use this for anything other than informational purposes. This is
             // intended to instruct conforming writers on which crypt filter should be used when new
             // file attachments are added to a PDF file, but qpdf never generates encrypted files
