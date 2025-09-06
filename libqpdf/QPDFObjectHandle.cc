@@ -766,14 +766,14 @@ QPDFObjectHandle::isScalar() const
 bool
 QPDFObjectHandle::isNameAndEquals(std::string const& name) const
 {
-    return isName() && (getName() == name);
+    return Name(*this) == name;
 }
 
 bool
 QPDFObjectHandle::isDictionaryOfType(std::string const& type, std::string const& subtype) const
 {
-    return isDictionary() && (type.empty() || getKey("/Type").isNameAndEquals(type)) &&
-        (subtype.empty() || getKey("/Subtype").isNameAndEquals(subtype));
+    return isDictionary() && (type.empty() || Name((*this)["/Type"]) == type) &&
+        (subtype.empty() || Name((*this)["/Subtype"]) == subtype);
 }
 
 bool
@@ -987,7 +987,6 @@ QPDFObjectHandle::getName() const
         return obj->getStringValue();
     } else {
         typeWarning("name", "returning dummy name");
-        QTC::TC("qpdf", "QPDFObjectHandle name returning dummy name");
         return "/QPDFFakeName";
     }
 }

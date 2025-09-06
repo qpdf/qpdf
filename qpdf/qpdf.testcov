@@ -275,7 +275,6 @@ QPDFParser eof in parse 0
 QPDFParser eof in parseRemainder 0
 QPDFObjectHandle boolean returning false 0
 QPDFObjectHandle real returning 0.0 0
-QPDFObjectHandle name returning dummy name 0
 QPDFObjectHandle string returning empty string 0
 QPDFObjectHandle string returning empty utf8 0
 QPDFObjectHandle operator returning fake value 0
