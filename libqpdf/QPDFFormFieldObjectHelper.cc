@@ -10,6 +10,8 @@
 #include <qpdf/QUtil.hh>
 #include <cstdlib>
 
+using namespace qpdf;
+
 QPDFFormFieldObjectHelper::QPDFFormFieldObjectHelper(QPDFObjectHandle oh) :
     QPDFObjectHelper(oh),
     m(new Members())
@@ -98,9 +100,8 @@ QPDFFormFieldObjectHelper::getInheritableFieldValueAsString(std::string const& n
 std::string
 QPDFFormFieldObjectHelper::getInheritableFieldValueAsName(std::string const& name)
 {
-    auto fv = getInheritableFieldValue(name);
-    if (fv.isName()) {
-        return fv.getName();
+    if (Name fv = getInheritableFieldValue(name)) {
+        return fv;
     }
     return {};
 }
@@ -245,7 +246,7 @@ QPDFFormFieldObjectHelper::isCheckbox()
 bool
 QPDFFormFieldObjectHelper::isChecked()
 {
-    return isCheckbox() && getValue().isName() && getValue().getName() != "/Off";
+    return isCheckbox() && Name(getValue()) != "/Off";
 }
 
 bool
@@ -301,25 +302,25 @@ QPDFFormFieldObjectHelper::setFieldAttribute(std::string const& key, std::string
 void
 QPDFFormFieldObjectHelper::setV(QPDFObjectHandle value, bool need_appearances)
 {
+    Name name = value;
     if (getFieldType() == "/Btn") {
         if (isCheckbox()) {
-            if (!value.isName()) {
+            if (!name) {
                 warn("ignoring attempt to set a checkbox field to a value whose type is not name");
                 return;
             }
-            std::string name = value.getName();
             // Accept any value other than /Off to mean checked. Files have been seen that use
             // /1 or other values.
             setCheckBoxValue(name != "/Off");
             return;
         }
         if (isRadioButton()) {
-            if (!value.isName()) {
+            if (!name) {
                 warn(
                     "ignoring attempt to set a radio button field to an object that is not a name");
                 return;
             }
-            setRadioButtonValue(value);
+            setRadioButtonValue(name);
             return;
         }
         if (isPushbutton()) {
