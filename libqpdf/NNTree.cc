@@ -642,15 +642,36 @@ NNTreeImpl::compareKeyKid(QPDFObjectHandle const& key, Array const& kids, int id
     return 0;
 }
 
+namespace
+{
+    struct Cmp
+    {
+        bool
+        operator()(const QPDFObjectHandle& lhs, const QPDFObjectHandle& rhs) const
+        {
+            Integer l = lhs;
+            Integer r = rhs;
+            if (l && r) {
+                return l.value() < r.value();
+            }
+            return lhs.getUTF8Value() < rhs.getUTF8Value();
+        }
+    };
+} // namespace
+
 void
 NNTreeImpl::repair()
 {
     auto new_node = Dictionary({{itemsKey(), Array::empty()}});
     NNTreeImpl repl(qpdf, new_node, key_type, value_valid, false);
+    std::map<QPDFObjectHandle, QPDFObjectHandle, Cmp> items;
     for (auto const& [key, value]: *this) {
         if (key && value) {
-            repl.insert(key, value);
+            items.insert_or_assign(key, value);
         }
+    }
+    for (auto const& [key, value]: items) {
+        repl.insert(key, value);
     }
     tree_root.replaceKey("/Kids", new_node["/Kids"]);
     tree_root.replaceKey(itemsKey(), new_node[itemsKey()]);
