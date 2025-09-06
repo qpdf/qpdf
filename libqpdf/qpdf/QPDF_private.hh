@@ -7,6 +7,8 @@
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFTokenizer_private.hh>
 
+using namespace qpdf;
+
 // Writer class is restricted to QPDFWriter so that only it can call certain methods.
 class QPDF::Writer
 {
@@ -204,7 +206,7 @@ class QPDF::EncryptionParameters
     }
 
     void initialize(QPDF& qpdf);
-    encryption_method_e interpretCF(QPDFObjectHandle const& cf) const;
+    encryption_method_e interpretCF(Name const& cf) const;
 
   private:
     bool encrypted{false};

@@ -600,18 +600,17 @@ QPDF::EncryptionData::recover_encryption_key_with_password(
 }
 
 QPDF::encryption_method_e
-QPDF::EncryptionParameters::interpretCF(QPDFObjectHandle const& cf) const
+QPDF::EncryptionParameters::interpretCF(Name const& cf) const
 {
-    if (!cf.isName()) {
+    if (!cf) {
         // Default: /Identity
         return e_none;
     }
-    std::string filter = cf.getName();
-    auto it = crypt_filters.find(filter);
+    auto it = crypt_filters.find(cf);
     if (it != crypt_filters.end()) {
         return it->second;
     }
-    if (filter == "/Identity") {
+    if (cf == "/Identity") {
         return e_none;
     }
     return e_unknown;
