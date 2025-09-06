@@ -1802,7 +1802,7 @@ static void
 test_47(QPDF& pdf, char const* arg2)
 {
     // Test page labels.
-    QPDFPageLabelDocumentHelper pldh(pdf);
+    auto& pldh = QPDFPageLabelDocumentHelper::get(pdf);
     long long npages = pdf.getRoot().getKey("/Pages").getKey("/Count").getIntValue();
     std::vector<QPDFObjectHandle> labels;
     pldh.getLabelsForPageRange(0, npages - 1, 1, labels);

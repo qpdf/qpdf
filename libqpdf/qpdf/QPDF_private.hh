@@ -5,6 +5,7 @@
 
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFObject_private.hh>
+#include <qpdf/QPDFPageLabelDocumentHelper.hh>
 #include <qpdf/QPDFTokenizer_private.hh>
 
 using namespace qpdf;
@@ -553,6 +554,7 @@ class QPDF::Members
 
     // Document Helpers;
     std::unique_ptr<QPDFAcroFormDocumentHelper> acroform;
+    std::unique_ptr<QPDFPageLabelDocumentHelper> page_labels;
 };
 
 // JobSetter class is restricted to QPDFJob.
@@ -582,6 +584,15 @@ QPDF::acroform()
         m->acroform = std::make_unique<QPDFAcroFormDocumentHelper>(*this);
     }
     return *m->acroform;
+}
+
+inline QPDFPageLabelDocumentHelper&
+QPDF::page_labels()
+{
+    if (!m->page_labels) {
+        m->page_labels = std::make_unique<QPDFPageLabelDocumentHelper>(*this);
+    }
+    return *m->page_labels;
 }
 
 #endif // QPDF_PRIVATE_HH

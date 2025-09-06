@@ -1,6 +1,10 @@
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
 
+#include <qpdf/QPDFNumberTreeObjectHelper.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
+#include <qpdf/QPDF_private.hh>
+
+using namespace qpdf;
 
 class QPDFPageLabelDocumentHelper::Members
 {
@@ -16,14 +20,23 @@ QPDFPageLabelDocumentHelper::QPDFPageLabelDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
     m(std::make_shared<Members>())
 {
-    QPDFObjectHandle root = qpdf.getRoot();
-    if (root.hasKey("/PageLabels")) {
+    validate();
+}
+
+QPDFPageLabelDocumentHelper&
+QPDFPageLabelDocumentHelper::get(QPDF& qpdf)
+{
+    return qpdf.page_labels();
+}
+
+void
+QPDFPageLabelDocumentHelper::validate(bool repair)
+{
+    m->labels = nullptr;
+    if (Dictionary labels = qpdf.getRoot()["/PageLabels"]) {
         m->labels = std::make_unique<QPDFNumberTreeObjectHelper>(
-            root.getKey("/PageLabels"),
-            this->qpdf,
-            [](QPDFObjectHandle const& o) -> bool { return o.isDictionary(); },
-            true);
-        m->labels->validate();
+            labels, qpdf, [](QPDFObjectHandle const& o) -> bool { return o.isDictionary(); }, true);
+        m->labels->validate(repair);
     }
 }
 

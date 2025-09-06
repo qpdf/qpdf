@@ -1053,7 +1053,7 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
     JSON::writeDictionaryKey(p, first, "pages", 1);
     bool first_page = true;
     JSON::writeArrayOpen(p, first_page, 2);
-    QPDFPageLabelDocumentHelper pldh(pdf);
+    auto& pldh = pdf.page_labels();
     QPDFOutlineDocumentHelper odh(pdf);
     int pageno = -1;
     for (auto& ph: QPDFPageDocumentHelper(pdf).getAllPages()) {
@@ -1116,7 +1116,7 @@ void
 QPDFJob::doJSONPageLabels(Pipeline* p, bool& first, QPDF& pdf)
 {
     JSON j_labels = JSON::makeArray();
-    QPDFPageLabelDocumentHelper pldh(pdf);
+    auto& pldh = pdf.page_labels();
     long long npages = QIntC::to_longlong(QPDFPageDocumentHelper(pdf).getAllPages().size());
     if (pldh.hasPageLabels()) {
         std::vector<QPDFObjectHandle> labels;
@@ -2548,7 +2548,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             cis = page_spec_cfis[page_data.filename];
             cis->stayOpen(true);
         }
-        QPDFPageLabelDocumentHelper pldh(*page_data.qpdf);
+        auto& pldh = page_data.qpdf->page_labels();
         auto& other_afdh = page_data.qpdf->acroform();
         if (pldh.hasPageLabels()) {
             any_page_labels = true;
@@ -2992,7 +2992,7 @@ QPDFJob::doSplitPages(QPDF& pdf)
         QPDFPageDocumentHelper dh(pdf);
         dh.removeUnreferencedResources();
     }
-    QPDFPageLabelDocumentHelper pldh(pdf);
+    auto& pldh = pdf.page_labels();
     auto& afdh = pdf.acroform();
     std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
     size_t pageno_len = std::to_string(pages.size()).length();
