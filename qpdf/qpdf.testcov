@@ -366,7 +366,6 @@ QPDFJob bytes fallback warning 0
 QPDFJob invalid utf-8 in auto 0
 QPDFJob input password hex-bytes 0
 QPDFPageDocumentHelper ignore annotation with no appearance 0
-QPDFFormFieldObjectHelper create AS from scratch 0
 QPDFFormFieldObjectHelper replaced BMC at EOF 0
 QPDFFormFieldObjectHelper fallback Tf 0
 QPDFPageObjectHelper copy shared attribute 1
