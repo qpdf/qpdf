@@ -38,11 +38,10 @@ namespace
         setDecodeParms(QPDFObjectHandle decode_parms) final
         {
             // we only validate here - processing happens in decryptStream
-            if (auto dict = decode_parms.as_dictionary(optional)) {
+            if (Dictionary dict = decode_parms) {
                 for (auto const& [key, value]: dict) {
                     if (key == "/Type" &&
-                        (value.null() ||
-                         (value.isName() && value.getName() == "/CryptFilterDecodeParms"))) {
+                        (value.null() || Name(value) == "/CryptFilterDecodeParms")) {
                         continue;
                     }
                     if (key == "/Name") {
@@ -54,7 +53,7 @@ namespace
                 }
                 return true;
             }
-            return false;
+            return decode_parms.null();
         }
 
         Pipeline*
@@ -374,7 +373,7 @@ Stream::filterable(
     auto s = stream();
     // Check filters
 
-    auto filter_obj = s->stream_dict.getKey("/Filter");
+    auto const& filter_obj = s->stream_dict["/Filter"];
 
     if (filter_obj.null()) {
         // No filters
@@ -387,14 +386,14 @@ Stream::filterable(
             return false;
         }
         filters.emplace_back(ff());
-    } else if (auto array = filter_obj.as_array(strict)) {
+    } else if (Array array = filter_obj) {
         // Potentially multiple filters
-        for (auto const& item: array) {
-            if (!item.isName()) {
+        for (Name item: array) {
+            if (!item) {
                 warn("stream filter type is not name or array");
                 return false;
             }
-            auto ff = s->filter_factory(item.getName());
+            auto ff = s->filter_factory(item);
             if (!ff) {
                 filters.clear();
                 return false;
