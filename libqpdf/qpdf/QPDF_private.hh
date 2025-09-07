@@ -6,6 +6,7 @@
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
 #include <qpdf/QPDFObject_private.hh>
+#include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
 #include <qpdf/QPDFTokenizer_private.hh>
 
@@ -556,6 +557,7 @@ class QPDF::Members
     // Document Helpers;
     std::unique_ptr<QPDFAcroFormDocumentHelper> acroform;
     std::unique_ptr<QPDFEmbeddedFileDocumentHelper> embedded_files;
+    std::unique_ptr<QPDFOutlineDocumentHelper> outlines;
     std::unique_ptr<QPDFPageLabelDocumentHelper> page_labels;
 };
 
@@ -595,6 +597,15 @@ QPDF::embedded_files()
         m->embedded_files = std::make_unique<QPDFEmbeddedFileDocumentHelper>(*this);
     }
     return *m->embedded_files;
+}
+
+inline QPDFOutlineDocumentHelper&
+QPDF::outlines()
+{
+    if (!m->outlines) {
+        m->outlines = std::make_unique<QPDFOutlineDocumentHelper>(*this);
+    }
+    return *m->outlines;
 }
 
 inline QPDFPageLabelDocumentHelper&

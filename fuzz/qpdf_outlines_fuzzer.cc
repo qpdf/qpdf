@@ -49,7 +49,7 @@ FuzzHelper::testOutlines()
 {
     std::shared_ptr<QPDF> q = getQpdf();
     std::list<std::vector<QPDFOutlineObjectHelper>> queue;
-    QPDFOutlineDocumentHelper odh(*q);
+    auto& odh = QPDFOutlineDocumentHelper::get(*q);
     queue.push_back(odh.getTopLevelOutlines());
     while (!queue.empty()) {
         for (auto& ol: *(queue.begin())) {

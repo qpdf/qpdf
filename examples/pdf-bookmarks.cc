@@ -177,7 +177,7 @@ main(int argc, char* argv[])
         QPDF qpdf;
         qpdf.processFile(filename, password);
 
-        QPDFOutlineDocumentHelper odh(qpdf);
+        auto& odh = QPDFOutlineDocumentHelper::get(qpdf);
         if (odh.hasOutlines()) {
             std::vector<int> numbers;
             if (show_targets) {

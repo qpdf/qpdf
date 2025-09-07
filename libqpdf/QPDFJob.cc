@@ -17,7 +17,6 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
-#include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFSystemError.hh>
@@ -1051,7 +1050,7 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
     bool first_page = true;
     JSON::writeArrayOpen(p, first_page, 2);
     auto& pldh = pdf.page_labels();
-    QPDFOutlineDocumentHelper odh(pdf);
+    auto& odh = pdf.outlines();
     int pageno = -1;
     for (auto& ph: QPDFPageDocumentHelper(pdf).getAllPages()) {
         ++pageno;
@@ -1168,8 +1167,7 @@ QPDFJob::doJSONOutlines(Pipeline* p, bool& first, QPDF& pdf)
     }
 
     JSON j_outlines = JSON::makeArray();
-    QPDFOutlineDocumentHelper odh(pdf);
-    addOutlinesToJson(odh.getTopLevelOutlines(), j_outlines, page_numbers);
+    addOutlinesToJson(pdf.outlines().getTopLevelOutlines(), j_outlines, page_numbers);
     JSON::writeDictionaryItem(p, first, "outlines", j_outlines, 1);
 }
 
