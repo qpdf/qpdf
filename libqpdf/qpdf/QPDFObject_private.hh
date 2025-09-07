@@ -28,6 +28,7 @@ namespace qpdf
     class BaseDictionary;
     class Dictionary;
     class Integer;
+    class Name;
     class Stream;
 } // namespace qpdf
 
@@ -138,6 +139,7 @@ class QPDF_Name final
 {
     friend class QPDFObject;
     friend class qpdf::BaseHandle;
+    friend class qpdf::Name;
 
     explicit QPDF_Name(std::string name) :
         name(std::move(name))

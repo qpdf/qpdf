@@ -600,18 +600,17 @@ QPDF::EncryptionData::recover_encryption_key_with_password(
 }
 
 QPDF::encryption_method_e
-QPDF::EncryptionParameters::interpretCF(QPDFObjectHandle const& cf) const
+QPDF::EncryptionParameters::interpretCF(Name const& cf) const
 {
-    if (!cf.isName()) {
+    if (!cf) {
         // Default: /Identity
         return e_none;
     }
-    std::string filter = cf.getName();
-    auto it = crypt_filters.find(filter);
+    auto it = crypt_filters.find(cf);
     if (it != crypt_filters.end()) {
         return it->second;
     }
-    if (filter == "/Identity") {
+    if (cf == "/Identity") {
         return e_none;
     }
     return e_unknown;
@@ -677,8 +676,7 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
         throw qpdf.damagedPDF("/Encrypt in trailer dictionary is not a dictionary");
     }
 
-    if (!(encryption_dict.getKey("/Filter").isName() &&
-          (encryption_dict.getKey("/Filter").getName() == "/Standard"))) {
+    if (Name(encryption_dict["/Filter"]) != "/Standard") {
         throw unsupported("unsupported encryption filter");
     }
     if (!encryption_dict.getKey("/SubFilter").null()) {
@@ -766,16 +764,12 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
         for (auto const& [filter, cdict]: CF.as_dictionary()) {
             if (cdict.isDictionary()) {
                 encryption_method_e method = e_none;
-                if (cdict.getKey("/CFM").isName()) {
-                    std::string method_name = cdict.getKey("/CFM").getName();
-                    if (method_name == "/V2") {
-                        QTC::TC("qpdf", "QPDF_encryption CFM V2");
+                if (Name const& CFM = cdict["/CFM"]) {
+                    if (CFM == "/V2") {
                         method = e_rc4;
-                    } else if (method_name == "/AESV2") {
-                        QTC::TC("qpdf", "QPDF_encryption CFM AESV2");
+                    } else if (CFM == "/AESV2") {
                         method = e_aes;
-                    } else if (method_name == "/AESV3") {
-                        QTC::TC("qpdf", "QPDF_encryption CFM AESV3");
+                    } else if (CFM == "/AESV3") {
                         method = e_aesv3;
                     } else {
                         // Don't complain now -- maybe we won't need to reference this type.
@@ -786,9 +780,9 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
             }
         }
 
-        cf_stream = interpretCF(encryption_dict.getKey("/StmF"));
-        cf_string = interpretCF(encryption_dict.getKey("/StrF"));
-        if (auto EFF = encryption_dict.getKey("/EFF"); EFF.isName()) {
+        cf_stream = interpretCF(encryption_dict["/StmF"]);
+        cf_string = interpretCF(encryption_dict["/StrF"]);
+        if (Name const& EFF = encryption_dict["/EFF"]) {
             // qpdf does not use this for anything other than informational purposes. This is
             // intended to instruct conforming writers on which crypt filter should be used when new
             // file attachments are added to a PDF file, but qpdf never generates encrypted files
@@ -937,12 +931,7 @@ QPDF::decryptStream(
     bool is_root_metadata,
     std::unique_ptr<Pipeline>& decrypt_pipeline)
 {
-    std::string type;
-    if (stream_dict.getKey("/Type").isName()) {
-        type = stream_dict.getKey("/Type").getName();
-    }
-    if (type == "/XRef") {
-        QTC::TC("qpdf", "QPDF_encryption xref stream from encrypted file");
+    if (Name(stream_dict["/Type"]) == "/XRef") {
         return;
     }
     bool use_aes = false;
@@ -951,26 +940,20 @@ QPDF::decryptStream(
         std::string method_source = "/StmF from /Encrypt dictionary";
 
         if (stream_dict.getKey("/Filter").isOrHasName("/Crypt")) {
-            if (stream_dict.getKey("/DecodeParms").isDictionary()) {
-                QPDFObjectHandle decode_parms = stream_dict.getKey("/DecodeParms");
-                if (decode_parms.isDictionaryOfType("/CryptFilterDecodeParms")) {
-                    QTC::TC("qpdf", "QPDF_encryption stream crypt filter");
-                    method = encp->interpretCF(decode_parms.getKey("/Name"));
+            if (Dictionary decode_parms = stream_dict["/DecodeParms"]) {
+                if (Name(decode_parms["/Type"]) == "/CryptFilterDecodeParms") {
+                    method = encp->interpretCF(decode_parms["/Name"]);
                     method_source = "stream's Crypt decode parameters";
                 }
-            } else if (
-                stream_dict.getKey("/DecodeParms").isArray() &&
-                stream_dict.getKey("/Filter").isArray()) {
-                auto filter = stream_dict.getKey("/Filter");
-                auto decode = stream_dict.getKey("/DecodeParms");
+            } else {
+                Array filter = stream_dict["/Filter"];
+                Array decode = stream_dict.getKey("/DecodeParms");
                 if (filter.size() == decode.size()) {
-                    int i = 0;
-                    for (auto const& item: filter.as_array()) {
-                        if (item.isNameAndEquals("/Crypt")) {
-                            auto crypt_params = decode.getArrayItem(i);
-                            if (crypt_params.isDictionary() &&
-                                crypt_params.getKey("/Name").isName()) {
-                                method = encp->interpretCF(crypt_params.getKey("/Name"));
+                    size_t i = 0;
+                    for (Name item: filter) {
+                        if (item == "/Crypt") {
+                            if (Name name = decode[i]["/Name"]) {
+                                method = encp->interpretCF(name);
                                 method_source = "stream's Crypt decode parameters (array)";
                             }
                             break;
@@ -982,8 +965,7 @@ QPDF::decryptStream(
         }
 
         if (method == e_unknown) {
-            if ((!encp->encrypt_metadata) && is_root_metadata) {
-                QTC::TC("qpdf", "QPDF_encryption cleartext metadata");
+            if (!encp->encrypt_metadata && is_root_metadata) {
                 method = e_none;
             } else {
                 method = encp->cf_stream;
@@ -1008,13 +990,13 @@ QPDF::decryptStream(
 
         default:
             // filter local to this stream.
-            qpdf_for_warning.warn(QPDFExc(
-                qpdf_e_damaged_pdf,
-                file->getName(),
-                "",
-                file->getLastOffset(),
-                "unknown encryption filter for streams (check " + method_source +
-                    "); streams may be decrypted improperly"));
+            qpdf_for_warning.warn(
+                {qpdf_e_damaged_pdf,
+                 file->getName(),
+                 "",
+                 file->getLastOffset(),
+                 "unknown encryption filter for streams (check " + method_source +
+                     "); streams may be decrypted improperly"});
             // To avoid repeated warnings, reset cf_stream.  Assume we'd want to use AES if V == 4.
             encp->cf_stream = e_aes;
             use_aes = true;
@@ -1023,11 +1005,9 @@ QPDF::decryptStream(
     }
     std::string key = getKeyForObject(encp, og, use_aes);
     if (use_aes) {
-        QTC::TC("qpdf", "QPDF_encryption aes decode stream");
         decrypt_pipeline =
             std::make_unique<Pl_AES_PDF>("AES stream decryption", pipeline, false, key);
     } else {
-        QTC::TC("qpdf", "QPDF_encryption rc4 decode stream");
         decrypt_pipeline = std::make_unique<Pl_RC4>("RC4 stream decryption", pipeline, key);
     }
     pipeline = decrypt_pipeline.get();

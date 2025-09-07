@@ -10,6 +10,8 @@
 #include <qpdf/QUtil.hh>
 #include <cstdlib>
 
+using namespace qpdf;
+
 QPDFFormFieldObjectHelper::QPDFFormFieldObjectHelper(QPDFObjectHandle oh) :
     QPDFObjectHelper(oh),
     m(new Members())
@@ -98,9 +100,8 @@ QPDFFormFieldObjectHelper::getInheritableFieldValueAsString(std::string const& n
 std::string
 QPDFFormFieldObjectHelper::getInheritableFieldValueAsName(std::string const& name)
 {
-    auto fv = getInheritableFieldValue(name);
-    if (fv.isName()) {
-        return fv.getName();
+    if (Name fv = getInheritableFieldValue(name)) {
+        return fv;
     }
     return {};
 }
@@ -245,7 +246,7 @@ QPDFFormFieldObjectHelper::isCheckbox()
 bool
 QPDFFormFieldObjectHelper::isChecked()
 {
-    return isCheckbox() && getValue().isName() && getValue().getName() != "/Off";
+    return isCheckbox() && Name(getValue()) != "/Off";
 }
 
 bool
@@ -301,25 +302,25 @@ QPDFFormFieldObjectHelper::setFieldAttribute(std::string const& key, std::string
 void
 QPDFFormFieldObjectHelper::setV(QPDFObjectHandle value, bool need_appearances)
 {
+    Name name = value;
     if (getFieldType() == "/Btn") {
         if (isCheckbox()) {
-            if (!value.isName()) {
+            if (!name) {
                 warn("ignoring attempt to set a checkbox field to a value whose type is not name");
                 return;
             }
-            std::string name = value.getName();
             // Accept any value other than /Off to mean checked. Files have been seen that use
             // /1 or other values.
             setCheckBoxValue(name != "/Off");
             return;
         }
         if (isRadioButton()) {
-            if (!value.isName()) {
+            if (!name) {
                 warn(
                     "ignoring attempt to set a radio button field to an object that is not a name");
                 return;
             }
-            setRadioButtonValue(value);
+            setRadioButtonValue(name);
             return;
         }
         if (isPushbutton()) {
@@ -743,17 +744,18 @@ QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& ao
 {
     QPDFObjectHandle AS = aoh.getAppearanceStream("/N");
     if (AS.null()) {
-        QTC::TC("qpdf", "QPDFFormFieldObjectHelper create AS from scratch");
         QPDFObjectHandle::Rectangle rect = aoh.getRect();
         QPDFObjectHandle::Rectangle bbox(0, 0, rect.urx - rect.llx, rect.ury - rect.lly);
-        QPDFObjectHandle dict = QPDFObjectHandle::parse(
-            "<< /Resources << /ProcSet [ /PDF /Text ] >> /Type /XObject /Subtype /Form >>");
-        dict.replaceKey("/BBox", QPDFObjectHandle::newFromRectangle(bbox));
+        auto dict = Dictionary(
+            {{"/BBox", QPDFObjectHandle::newFromRectangle(bbox)},
+             {"/Resources", Dictionary({{"/ProcSet", Array({Name("/PDF"), Name("/Text")})}})},
+             {"/Type", Name("/XObject")},
+             {"/Subtype", Name("/Form")}});
         AS = QPDFObjectHandle::newStream(oh().getOwningQPDF(), "/Tx BMC\nEMC\n");
         AS.replaceDict(dict);
-        QPDFObjectHandle AP = aoh.getAppearanceDictionary();
-        if (AP.null()) {
-            aoh.getObjectHandle().replaceKey("/AP", QPDFObjectHandle::newDictionary());
+        Dictionary AP = aoh.getAppearanceDictionary();
+        if (!AP) {
+            aoh.getObjectHandle().replaceKey("/AP", Dictionary::empty());
             AP = aoh.getAppearanceDictionary();
         }
         AP.replaceKey("/N", AS);
@@ -776,7 +778,7 @@ QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& ao
     std::string DA = getDefaultAppearance();
     std::string V = getValueAsString();
     std::vector<std::string> opt;
-    if (isChoice() && ((getFlags() & ff_ch_combo) == 0)) {
+    if (isChoice() && (getFlags() & ff_ch_combo) == 0) {
         opt = getChoices();
     }
 
@@ -791,29 +793,26 @@ QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& ao
     std::string font_name = tff.getFontName();
     if (!font_name.empty()) {
         // See if the font is encoded with something we know about.
-        QPDFObjectHandle resources = AS.getDict().getKey("/Resources");
-        QPDFObjectHandle font = getFontFromResource(resources, font_name);
-        bool found_font_in_dr = false;
+        Dictionary resources = AS.getDict()["/Resources"];
+        Dictionary font = getFontFromResource(resources, font_name);
         if (!font) {
-            QPDFObjectHandle dr = getDefaultResources();
-            font = getFontFromResource(dr, font_name);
-            found_font_in_dr = font.isDictionary();
-        }
-        if (found_font_in_dr && resources.isDictionary()) {
-            if (resources.isIndirect()) {
-                resources = resources.getQPDF().makeIndirectObject(resources.shallowCopy());
-                AS.getDict().replaceKey("/Resources", resources);
+            font = getFontFromResource(getDefaultResources(), font_name);
+            if (resources) {
+                if (resources.indirect()) {
+                    resources = resources.qpdf()->makeIndirectObject(resources.copy());
+                    AS.getDict().replaceKey("/Resources", resources);
+                }
+                // Use mergeResources to force /Font to be local
+                QPDFObjectHandle res = resources;
+                res.mergeResources(Dictionary({{"/Font", Dictionary::empty()}}));
+                res.getKey("/Font").replaceKey(font_name, font);
             }
-            // Use mergeResources to force /Font to be local
-            resources.mergeResources("<< /Font << >> >>"_qpdf);
-            resources.getKey("/Font").replaceKey(font_name, font);
         }
 
-        if (font.isDictionary() && font.getKey("/Encoding").isName()) {
-            std::string encoding = font.getKey("/Encoding").getName();
-            if (encoding == "/WinAnsiEncoding") {
+        if (Name Encoding = font["/Encoding"]) {
+            if (Encoding == "/WinAnsiEncoding") {
                 encoder = &QUtil::utf8_to_win_ansi;
-            } else if (encoding == "/MacRomanEncoding") {
+            } else if (Encoding == "/MacRomanEncoding") {
                 encoder = &QUtil::utf8_to_mac_roman;
             }
         }

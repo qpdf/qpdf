@@ -766,14 +766,14 @@ QPDFObjectHandle::isScalar() const
 bool
 QPDFObjectHandle::isNameAndEquals(std::string const& name) const
 {
-    return isName() && (getName() == name);
+    return Name(*this) == name;
 }
 
 bool
 QPDFObjectHandle::isDictionaryOfType(std::string const& type, std::string const& subtype) const
 {
-    return isDictionary() && (type.empty() || getKey("/Type").isNameAndEquals(type)) &&
-        (subtype.empty() || getKey("/Subtype").isNameAndEquals(subtype));
+    return isDictionary() && (type.empty() || Name((*this)["/Type"]) == type) &&
+        (subtype.empty() || Name((*this)["/Subtype"]) == subtype);
 }
 
 bool
@@ -952,7 +952,33 @@ QPDFObjectHandle::getValueAsReal(std::string& value) const
     return true;
 }
 
-// Name accessors
+// Name methods
+
+QPDFObjectHandle
+QPDFObjectHandle::newName(std::string const& name)
+{
+    return {QPDFObject::create<QPDF_Name>(name)};
+}
+
+Name::Name(std::string const& name) :
+    BaseHandle(QPDFObject::create<QPDF_Name>(name))
+{
+}
+
+Name::Name(std::string&& name) :
+    BaseHandle(QPDFObject::create<QPDF_Name>(std::move(name)))
+{
+}
+
+std::string const&
+Name::value() const
+{
+    auto* n = as<QPDF_Name>();
+    if (!n) {
+        throw invalid_error("Name");
+    }
+    return n->name;
+}
 
 std::string
 QPDFObjectHandle::getName() const
@@ -961,7 +987,6 @@ QPDFObjectHandle::getName() const
         return obj->getStringValue();
     } else {
         typeWarning("name", "returning dummy name");
-        QTC::TC("qpdf", "QPDFObjectHandle name returning dummy name");
         return "/QPDFFakeName";
     }
 }
@@ -1692,12 +1717,6 @@ QPDFObjectHandle
 QPDFObjectHandle::newReal(double value, int decimal_places, bool trim_trailing_zeroes)
 {
     return {QPDFObject::create<QPDF_Real>(value, decimal_places, trim_trailing_zeroes)};
-}
-
-QPDFObjectHandle
-QPDFObjectHandle::newName(std::string const& name)
-{
-    return {QPDFObject::create<QPDF_Name>(name)};
 }
 
 QPDFObjectHandle

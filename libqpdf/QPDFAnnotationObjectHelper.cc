@@ -1,9 +1,11 @@
 #include <qpdf/QPDFAnnotationObjectHelper.hh>
 
-#include <qpdf/QPDF.hh>
 #include <qpdf/QPDFMatrix.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+
+using namespace qpdf;
 
 QPDFAnnotationObjectHelper::QPDFAnnotationObjectHelper(QPDFObjectHandle oh) :
     QPDFObjectHelper(oh)
@@ -31,19 +33,15 @@ QPDFAnnotationObjectHelper::getAppearanceDictionary()
 std::string
 QPDFAnnotationObjectHelper::getAppearanceState()
 {
-    if (oh().getKey("/AS").isName()) {
-        QTC::TC("qpdf", "QPDFAnnotationObjectHelper AS present");
-        return oh().getKey("/AS").getName();
-    }
-    QTC::TC("qpdf", "QPDFAnnotationObjectHelper AS absent");
-    return "";
+    Name AS = (*this)["/AS"];
+    return AS ? AS.value() : "";
 }
 
 int
 QPDFAnnotationObjectHelper::getFlags()
 {
-    QPDFObjectHandle flags_obj = oh().getKey("/F");
-    return flags_obj.isInteger() ? flags_obj.getIntValueAsInt() : 0;
+    Integer flags_obj = (*this)["/F"];
+    return flags_obj ? flags_obj : 0;
 }
 
 QPDFObjectHandle

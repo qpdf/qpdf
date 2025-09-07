@@ -48,26 +48,19 @@ QPDFOutlineObjectHelper::getKids()
 QPDFObjectHandle
 QPDFOutlineObjectHelper::getDest()
 {
-    QPDFObjectHandle dest;
-    QPDFObjectHandle A;
-    if (oh().hasKey("/Dest")) {
-        QTC::TC("qpdf", "QPDFOutlineObjectHelper direct dest");
-        dest = oh().getKey("/Dest");
-    } else if (
-        (A = oh().getKey("/A")).isDictionary() && A.getKey("/S").isName() &&
-        (A.getKey("/S").getName() == "/GoTo") && A.hasKey("/D")) {
-        QTC::TC("qpdf", "QPDFOutlineObjectHelper action dest");
-        dest = A.getKey("/D");
+    auto dest = (*this)["/Dest"];
+    if (dest.null()) {
+        auto const& A = (*this)["/A"];
+        if (Name(A["/S"]) == "/GoTo") {
+            dest = A["/D"];
+        }
     }
-    if (!dest) {
+    if (dest.null()) {
         return QPDFObjectHandle::newNull();
     }
-
     if (dest.isName() || dest.isString()) {
-        QTC::TC("qpdf", "QPDFOutlineObjectHelper named dest");
-        dest = m->dh.resolveNamedDest(dest);
+        return m->dh.resolveNamedDest(dest);
     }
-
     return dest;
 }
 
