@@ -63,6 +63,7 @@ class BufferInputSource;
 class QPDFLogger;
 class QPDFParser;
 class QPDFAcroFormDocumentHelper;
+class QPDFEmbeddedFileDocumentHelper;
 class QPDFPageLabelDocumentHelper;
 
 class QPDF
@@ -800,6 +801,7 @@ class QPDF
 
     inline bool reconstructed_xref() const;
     inline QPDFAcroFormDocumentHelper& acroform();
+    inline QPDFEmbeddedFileDocumentHelper& embedded_files();
     inline QPDFPageLabelDocumentHelper& page_labels();
 
     // For testing only -- do not add to DLL

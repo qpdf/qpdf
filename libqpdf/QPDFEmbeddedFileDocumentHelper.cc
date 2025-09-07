@@ -1,5 +1,8 @@
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
 
+#include <qpdf/QPDFNameTreeObjectHelper.hh>
+#include <qpdf/QPDF_private.hh>
+
 // File attachments are stored in the /EmbeddedFiles (name tree) key of the /Names dictionary from
 // the document catalog. Each entry points to a /FileSpec, which in turn points to one more Embedded
 // File Streams. Note that file specs can appear in other places as well, such as file attachment
@@ -44,6 +47,19 @@ QPDFEmbeddedFileDocumentHelper::QPDFEmbeddedFileDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
     m(std::make_shared<Members>())
 {
+    validate();
+}
+
+QPDFEmbeddedFileDocumentHelper&
+QPDFEmbeddedFileDocumentHelper::get(QPDF& qpdf)
+{
+    return qpdf.embedded_files();
+}
+
+void
+QPDFEmbeddedFileDocumentHelper::validate(bool repair)
+{
+    m->embedded_files.reset();
     auto names = qpdf.getRoot().getKey("/Names");
     if (names.isDictionary()) {
         auto embedded_files = names.getKey("/EmbeddedFiles");
@@ -53,7 +69,7 @@ QPDFEmbeddedFileDocumentHelper::QPDFEmbeddedFileDocumentHelper(QPDF& qpdf) :
                 qpdf,
                 [](QPDFObjectHandle const& o) -> bool { return o.isDictionary(); },
                 true);
-            m->embedded_files->validate();
+            m->embedded_files->validate(repair);
         }
     }
 }

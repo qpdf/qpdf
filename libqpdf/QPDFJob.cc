@@ -13,15 +13,12 @@
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/Pl_String.hh>
 #include <qpdf/QIntC.hh>
-#include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFCryptoProvider.hh>
-#include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
-#include <qpdf/QPDFPageLabelDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QPDFUsage.hh>
@@ -894,7 +891,7 @@ QPDFJob::doShowPages(QPDF& pdf)
 void
 QPDFJob::doListAttachments(QPDF& pdf)
 {
-    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    auto& efdh = pdf.embedded_files();
     if (efdh.hasEmbeddedFiles()) {
         for (auto const& i: efdh.getEmbeddedFiles()) {
             std::string const& key = i.first;
@@ -934,7 +931,7 @@ QPDFJob::doListAttachments(QPDF& pdf)
 void
 QPDFJob::doShowAttachment(QPDF& pdf)
 {
-    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    auto& efdh = pdf.embedded_files();
     auto fs = efdh.getEmbeddedFile(m->attachment_to_show);
     if (!fs) {
         throw std::runtime_error("attachment " + m->attachment_to_show + " not found");
@@ -1321,7 +1318,7 @@ QPDFJob::doJSONAttachments(Pipeline* p, bool& first, QPDF& pdf)
     };
 
     JSON j_attachments = JSON::makeDictionary();
-    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    auto& efdh = pdf.embedded_files();
     for (auto const& iter: efdh.getEmbeddedFiles()) {
         std::string const& key = iter.first;
         auto fsoh = iter.second;
@@ -2073,7 +2070,7 @@ void
 QPDFJob::addAttachments(QPDF& pdf)
 {
     maybe_set_pagemode(pdf, "/UseAttachments");
-    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    auto& efdh = pdf.embedded_files();
     std::vector<std::string> duplicated_keys;
     for (auto const& to_add: m->attachments_to_add) {
         if ((!to_add.replace) && efdh.getEmbeddedFile(to_add.key)) {
@@ -2117,7 +2114,7 @@ void
 QPDFJob::copyAttachments(QPDF& pdf)
 {
     maybe_set_pagemode(pdf, "/UseAttachments");
-    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    auto& efdh = pdf.embedded_files();
     std::vector<std::string> duplicates;
     for (auto const& to_copy: m->attachments_to_copy) {
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -2125,7 +2122,7 @@ QPDFJob::copyAttachments(QPDF& pdf)
         });
         std::unique_ptr<QPDF> other;
         processFile(other, to_copy.path.c_str(), to_copy.password.c_str(), false, false);
-        QPDFEmbeddedFileDocumentHelper other_efdh(*other);
+        auto& other_efdh = other->embedded_files();
         auto other_attachments = other_efdh.getEmbeddedFiles();
         for (auto const& iter: other_attachments) {
             std::string new_key = to_copy.prefix + iter.first;
@@ -2259,7 +2256,7 @@ QPDFJob::handleTransformations(QPDF& pdf)
         pdf.getRoot().replaceKey("/PageLabels", page_labels);
     }
     if (!m->attachments_to_remove.empty()) {
-        QPDFEmbeddedFileDocumentHelper efdh(pdf);
+        auto& efdh = pdf.embedded_files();
         for (auto const& key: m->attachments_to_remove) {
             if (efdh.removeEmbeddedFile(key)) {
                 doIfVerbose([&](Pipeline& v, std::string const& prefix) {
