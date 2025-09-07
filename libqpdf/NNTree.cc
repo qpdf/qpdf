@@ -666,7 +666,7 @@ NNTreeImpl::repair()
     NNTreeImpl repl(qpdf, new_node, key_type, value_valid, false);
     std::map<QPDFObjectHandle, QPDFObjectHandle, Cmp> items;
     for (auto const& [key, value]: *this) {
-        if (key && value) {
+        if (key && value && repl.keyValid(key) && repl.value_valid(value) ) {
             items.insert_or_assign(key, value);
         }
     }
