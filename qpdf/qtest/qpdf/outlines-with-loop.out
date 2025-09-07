@@ -1,3 +1,5 @@
+WARNING: outlines-with-loop.pdf, object 4 0 at offset 637: Loop detected loop in /Outlines tree
+WARNING: outlines-with-loop.pdf, object 5 0 at offset 855: Loop detected loop in /Outlines tree
 page 5: Potato 1 -> 5: /XYZ null null null -> [ 11 0 R /XYZ null null null ]
 page 5: Potato 1 -> 5: /XYZ null null null -> [ 11 0 R /XYZ null null null ]
 page 11: Mern 1.1 -> 11: /Fit -> [ 17 0 R /Fit ]

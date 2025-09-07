@@ -53,7 +53,11 @@ QPDFOutlineDocumentHelper::validate(bool repair)
     }
     QPDFObjectHandle cur = outlines.getKey("/First");
     QPDFObjGen::set seen;
-    while (!cur.null() && seen.add(cur)) {
+    while (!cur.null()) {
+        if (!seen.add(cur)) {
+            cur.warn("Loop detected loop in /Outlines tree");
+            return;
+        }
         m->outlines.emplace_back(QPDFOutlineObjectHelper::Accessor::create(cur, *this, 1));
         cur = cur.getKey("/Next");
     }
