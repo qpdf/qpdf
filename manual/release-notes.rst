@@ -47,6 +47,9 @@ more detail.
      with the incompatible options :qpdf:ref:`--encrypt` or
      :qpdf:ref:`--copy-encryption`.
 
+   - Option :qpdf:ref:`--check` now includes additional basic checks of the
+     AcroForm, Dests, Outlines, and PageLabels structures.
+
   - Other enhancements
 
     - ``QPDFWriter`` will no longer add filters when writing empty streams.

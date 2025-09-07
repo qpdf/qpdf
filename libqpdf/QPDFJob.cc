@@ -779,6 +779,14 @@ QPDFJob::doCheck(QPDF& pdf)
             cout << "File is not linearized\n";
         }
 
+        // Create all document helper to trigger any validations they carry out.
+        auto& pages = pdf.pages();
+        (void)pdf.acroform();
+        (void)pdf.embedded_files();
+        (void)pdf.page_labels();
+        (void)pdf.outlines().resolveNamedDest(QPDFObjectHandle::newString("dummy"));
+        (void)pdf.outlines().getOutlinesForPage(pages.getAllPages().at(0));
+
         // Write the file to nowhere, uncompressing streams.  This causes full file traversal and
         // decoding of all streams we can decode.
         QPDFWriter w(pdf);
@@ -789,7 +797,7 @@ QPDFJob::doCheck(QPDF& pdf)
 
         // Parse all content streams
         int pageno = 0;
-        for (auto& page: pdf.pages().getAllPages()) {
+        for (auto& page: pages.getAllPages()) {
             ++pageno;
             try {
                 page.parseContents(nullptr);

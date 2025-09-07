@@ -21,7 +21,7 @@ my @outline_files = (
     'outlines-with-old-root-dests-dict',
     'outlines-with-loop',
     );
-my $n_tests = scalar(@outline_files);
+my $n_tests = scalar(@outline_files) + 1;
 foreach my $f (@outline_files)
 {
     $td->runtest("outlines: $f",
@@ -29,6 +29,11 @@ foreach my $f (@outline_files)
                  {$td->FILE => "$f.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 }
+
+$td->runtest("outlines: outlines-with-loop --check",
+             {$td->COMMAND => "qpdf --check outlines-with-loop.pdf"},
+             {$td->FILE => "outlines-with-loop-check.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 cleanup();
 $td->report($n_tests);
