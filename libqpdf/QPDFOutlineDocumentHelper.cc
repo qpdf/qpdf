@@ -1,6 +1,7 @@
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 
 #include <qpdf/QPDFObjectHandle_private.hh>
+#include <qpdf/QPDF_private.hh>
 #include <qpdf/QTC.hh>
 
 class QPDFOutlineDocumentHelper::Members
@@ -27,6 +28,21 @@ QPDFOutlineDocumentHelper::QPDFOutlineDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
     m(std::make_shared<Members>())
 {
+    validate();
+}
+
+QPDFOutlineDocumentHelper&
+QPDFOutlineDocumentHelper::get(QPDF& qpdf)
+{
+    return qpdf.outlines();
+}
+
+void
+QPDFOutlineDocumentHelper::validate(bool repair)
+{
+    m->outlines.clear();
+    m->names_dest = nullptr;
+
     QPDFObjectHandle root = qpdf.getRoot();
     if (!root.hasKey("/Outlines")) {
         return;
@@ -37,7 +53,11 @@ QPDFOutlineDocumentHelper::QPDFOutlineDocumentHelper(QPDF& qpdf) :
     }
     QPDFObjectHandle cur = outlines.getKey("/First");
     QPDFObjGen::set seen;
-    while (!cur.null() && seen.add(cur)) {
+    while (!cur.null()) {
+        if (!seen.add(cur)) {
+            cur.warn("Loop detected loop in /Outlines tree");
+            return;
+        }
         m->outlines.emplace_back(QPDFOutlineObjectHelper::Accessor::create(cur, *this, 1));
         cur = cur.getKey("/Next");
     }

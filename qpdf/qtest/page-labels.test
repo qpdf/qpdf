@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('page-labels');
 
-my $n_tests = 4;
+my $n_tests = 5;
 
 $td->runtest("complex page labels",
              {$td->COMMAND => "test_driver 47 page-labels-num-tree.pdf"},
@@ -36,6 +36,11 @@ $td->runtest("no page labels",
 $td->runtest("damaged page labels",
              {$td->COMMAND => "test_driver 47 page-labels-num-tree-damaged.pdf"},
              {$td->FILE => "page-labels-num-tree-damaged.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("damaged page labels --check",
+             {$td->COMMAND => "qpdf --check page-labels-num-tree-damaged.pdf"},
+             {$td->FILE => "page-labels-num-tree-damaged-check.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 
 # --set-page-labels

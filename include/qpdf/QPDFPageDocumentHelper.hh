@@ -35,6 +35,21 @@ class QPDFAcroFormDocumentHelper;
 class QPDFPageDocumentHelper: public QPDFDocumentHelper
 {
   public:
+    // Get a shared document helper for a given QPDF object.
+    //
+    // Retrieving a document helper for a QPDF object rather than creating a new one avoids repeated
+    // validation of the Acroform structure, which can be expensive.
+    QPDF_DLL
+    static QPDFPageDocumentHelper& get(QPDF& qpdf);
+
+    // Re-validate the Pages structure. This is useful if you have modified the Pages structure  in
+    // a way that would invalidate the cache.
+    //
+    // If repair is true, the document will be repaired if possible if the validation encounters
+    // errors.
+    QPDF_DLL
+    void validate(bool repair = true);
+
     QPDF_DLL
     QPDFPageDocumentHelper(QPDF&);
 
@@ -112,17 +127,7 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
         int required_flags,
         int forbidden_flags);
 
-    class Members
-    {
-        friend class QPDFPageDocumentHelper;
-
-      public:
-        ~Members() = default;
-
-      private:
-        Members() = default;
-        Members(Members const&) = delete;
-    };
+    class Members;
 
     std::shared_ptr<Members> m;
 };

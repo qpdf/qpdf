@@ -13,15 +13,10 @@
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/Pl_String.hh>
 #include <qpdf/QIntC.hh>
-#include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFCryptoProvider.hh>
-#include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
-#include <qpdf/QPDFOutlineDocumentHelper.hh>
-#include <qpdf/QPDFPageDocumentHelper.hh>
-#include <qpdf/QPDFPageLabelDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QPDFUsage.hh>
@@ -784,6 +779,14 @@ QPDFJob::doCheck(QPDF& pdf)
             cout << "File is not linearized\n";
         }
 
+        // Create all document helper to trigger any validations they carry out.
+        auto& pages = pdf.pages();
+        (void)pdf.acroform();
+        (void)pdf.embedded_files();
+        (void)pdf.page_labels();
+        (void)pdf.outlines().resolveNamedDest(QPDFObjectHandle::newString("dummy"));
+        (void)pdf.outlines().getOutlinesForPage(pages.getAllPages().at(0));
+
         // Write the file to nowhere, uncompressing streams.  This causes full file traversal and
         // decoding of all streams we can decode.
         QPDFWriter w(pdf);
@@ -794,7 +797,7 @@ QPDFJob::doCheck(QPDF& pdf)
 
         // Parse all content streams
         int pageno = 0;
-        for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
+        for (auto& page: pages.getAllPages()) {
             ++pageno;
             try {
                 page.parseContents(nullptr);
@@ -862,7 +865,7 @@ QPDFJob::doShowPages(QPDF& pdf)
 {
     int pageno = 0;
     auto& cout = *m->log->getInfo();
-    for (auto& ph: QPDFPageDocumentHelper(pdf).getAllPages()) {
+    for (auto& ph: pdf.pages().getAllPages()) {
         QPDFObjectHandle page = ph.getObjectHandle();
         ++pageno;
 
@@ -894,7 +897,7 @@ QPDFJob::doShowPages(QPDF& pdf)
 void
 QPDFJob::doListAttachments(QPDF& pdf)
 {
-    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    auto& efdh = pdf.embedded_files();
     if (efdh.hasEmbeddedFiles()) {
         for (auto const& i: efdh.getEmbeddedFiles()) {
             std::string const& key = i.first;
@@ -934,7 +937,7 @@ QPDFJob::doListAttachments(QPDF& pdf)
 void
 QPDFJob::doShowAttachment(QPDF& pdf)
 {
-    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    auto& efdh = pdf.embedded_files();
     auto fs = efdh.getEmbeddedFile(m->attachment_to_show);
     if (!fs) {
         throw std::runtime_error("attachment " + m->attachment_to_show + " not found");
@@ -1053,10 +1056,10 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
     JSON::writeDictionaryKey(p, first, "pages", 1);
     bool first_page = true;
     JSON::writeArrayOpen(p, first_page, 2);
-    QPDFPageLabelDocumentHelper pldh(pdf);
-    QPDFOutlineDocumentHelper odh(pdf);
+    auto& pldh = pdf.page_labels();
+    auto& odh = pdf.outlines();
     int pageno = -1;
-    for (auto& ph: QPDFPageDocumentHelper(pdf).getAllPages()) {
+    for (auto& ph: pdf.pages().getAllPages()) {
         ++pageno;
         JSON j_page = JSON::makeDictionary();
         QPDFObjectHandle page = ph.getObjectHandle();
@@ -1116,8 +1119,8 @@ void
 QPDFJob::doJSONPageLabels(Pipeline* p, bool& first, QPDF& pdf)
 {
     JSON j_labels = JSON::makeArray();
-    QPDFPageLabelDocumentHelper pldh(pdf);
-    long long npages = QIntC::to_longlong(QPDFPageDocumentHelper(pdf).getAllPages().size());
+    auto& pldh = pdf.page_labels();
+    long long npages = QIntC::to_longlong(pdf.pages().getAllPages().size());
     if (pldh.hasPageLabels()) {
         std::vector<QPDFObjectHandle> labels;
         pldh.getLabelsForPageRange(0, npages - 1, 0, labels);
@@ -1165,14 +1168,13 @@ QPDFJob::doJSONOutlines(Pipeline* p, bool& first, QPDF& pdf)
 {
     std::map<QPDFObjGen, int> page_numbers;
     int n = 0;
-    for (auto const& ph: QPDFPageDocumentHelper(pdf).getAllPages()) {
+    for (auto const& ph: pdf.pages().getAllPages()) {
         QPDFObjectHandle oh = ph.getObjectHandle();
         page_numbers[oh.getObjGen()] = ++n;
     }
 
     JSON j_outlines = JSON::makeArray();
-    QPDFOutlineDocumentHelper odh(pdf);
-    addOutlinesToJson(odh.getTopLevelOutlines(), j_outlines, page_numbers);
+    addOutlinesToJson(pdf.outlines().getTopLevelOutlines(), j_outlines, page_numbers);
     JSON::writeDictionaryItem(p, first, "outlines", j_outlines, 1);
 }
 
@@ -1185,7 +1187,7 @@ QPDFJob::doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf)
     j_acroform.addDictionaryMember("needappearances", JSON::makeBool(afdh.getNeedAppearances()));
     JSON j_fields = j_acroform.addDictionaryMember("fields", JSON::makeArray());
     int pagepos1 = 0;
-    for (auto const& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
+    for (auto const& page: pdf.pages().getAllPages()) {
         ++pagepos1;
         for (auto& aoh: afdh.getWidgetAnnotationsForPage(page)) {
             QPDFFormFieldObjectHelper ffh = afdh.getFieldForAnnotation(aoh);
@@ -1321,7 +1323,7 @@ QPDFJob::doJSONAttachments(Pipeline* p, bool& first, QPDF& pdf)
     };
 
     JSON j_attachments = JSON::makeDictionary();
-    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    auto& efdh = pdf.embedded_files();
     for (auto const& iter: efdh.getEmbeddedFiles()) {
         std::string const& key = iter.first;
         auto fsoh = iter.second;
@@ -1862,7 +1864,7 @@ QPDFJob::processInputSource(
 void
 QPDFJob::validateUnderOverlay(QPDF& pdf, UnderOverlay* uo)
 {
-    QPDFPageDocumentHelper main_pdh(pdf);
+    auto& main_pdh = pdf.pages();
     int main_npages = QIntC::to_int(main_pdh.getAllPages().size());
     processFile(uo->pdf, uo->filename.data(), uo->password.data(), true, false);
     QPDFPageDocumentHelper uo_pdh(*(uo->pdf));
@@ -2073,7 +2075,7 @@ void
 QPDFJob::addAttachments(QPDF& pdf)
 {
     maybe_set_pagemode(pdf, "/UseAttachments");
-    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    auto& efdh = pdf.embedded_files();
     std::vector<std::string> duplicated_keys;
     for (auto const& to_add: m->attachments_to_add) {
         if ((!to_add.replace) && efdh.getEmbeddedFile(to_add.key)) {
@@ -2117,7 +2119,7 @@ void
 QPDFJob::copyAttachments(QPDF& pdf)
 {
     maybe_set_pagemode(pdf, "/UseAttachments");
-    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    auto& efdh = pdf.embedded_files();
     std::vector<std::string> duplicates;
     for (auto const& to_copy: m->attachments_to_copy) {
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -2125,7 +2127,7 @@ QPDFJob::copyAttachments(QPDF& pdf)
         });
         std::unique_ptr<QPDF> other;
         processFile(other, to_copy.path.c_str(), to_copy.password.c_str(), false, false);
-        QPDFEmbeddedFileDocumentHelper other_efdh(*other);
+        auto& other_efdh = other->embedded_files();
         auto other_attachments = other_efdh.getEmbeddedFiles();
         for (auto const& iter: other_attachments) {
             std::string new_key = to_copy.prefix + iter.first;
@@ -2259,7 +2261,7 @@ QPDFJob::handleTransformations(QPDF& pdf)
         pdf.getRoot().replaceKey("/PageLabels", page_labels);
     }
     if (!m->attachments_to_remove.empty()) {
-        QPDFEmbeddedFileDocumentHelper efdh(pdf);
+        auto& efdh = pdf.embedded_files();
         for (auto const& key: m->attachments_to_remove) {
             if (efdh.removeEmbeddedFile(key)) {
                 doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -2548,7 +2550,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             cis = page_spec_cfis[page_data.filename];
             cis->stayOpen(true);
         }
-        QPDFPageLabelDocumentHelper pldh(*page_data.qpdf);
+        auto& pldh = page_data.qpdf->page_labels();
         auto& other_afdh = page_data.qpdf->acroform();
         if (pldh.hasPageLabels()) {
             any_page_labels = true;
@@ -2992,7 +2994,7 @@ QPDFJob::doSplitPages(QPDF& pdf)
         QPDFPageDocumentHelper dh(pdf);
         dh.removeUnreferencedResources();
     }
-    QPDFPageLabelDocumentHelper pldh(pdf);
+    auto& pldh = pdf.page_labels();
     auto& afdh = pdf.acroform();
     std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
     size_t pageno_len = std::to_string(pages.size()).length();

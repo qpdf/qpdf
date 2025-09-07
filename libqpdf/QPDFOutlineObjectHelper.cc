@@ -20,15 +20,20 @@ QPDFOutlineObjectHelper::QPDFOutlineObjectHelper(
         return;
     }
     if (QPDFOutlineDocumentHelper::Accessor::checkSeen(m->dh, a_oh.getObjGen())) {
+        a_oh.warn("Loop detected loop in /Outlines tree");
         return;
     }
 
     QPDFObjGen::set children;
     QPDFObjectHandle cur = a_oh.getKey("/First");
-    while (!cur.null() && cur.isIndirect() && children.add(cur)) {
+    while (!cur.null() && cur.isIndirect()) {
+        if (!children.add(cur)) {
+            cur.warn("Loop detected loop in /Outlines tree");
+            break;
+        }
         QPDFOutlineObjectHelper new_ooh(cur, dh, 1 + depth);
         new_ooh.m->parent = std::make_shared<QPDFOutlineObjectHelper>(*this);
-        m->kids.push_back(new_ooh);
+        m->kids.emplace_back(new_ooh);
         cur = cur.getKey("/Next");
     }
 }

@@ -6,8 +6,23 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
+class QPDFPageDocumentHelper::Members
+{
+};
+
 QPDFPageDocumentHelper::QPDFPageDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf)
+{
+}
+
+QPDFPageDocumentHelper&
+QPDFPageDocumentHelper::get(QPDF& qpdf)
+{
+    return qpdf.pages();
+}
+
+void
+QPDFPageDocumentHelper::validate(bool repair)
 {
 }
 

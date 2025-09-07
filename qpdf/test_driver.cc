@@ -1802,7 +1802,7 @@ static void
 test_47(QPDF& pdf, char const* arg2)
 {
     // Test page labels.
-    QPDFPageLabelDocumentHelper pldh(pdf);
+    auto& pldh = QPDFPageLabelDocumentHelper::get(pdf);
     long long npages = pdf.getRoot().getKey("/Pages").getKey("/Count").getIntValue();
     std::vector<QPDFObjectHandle> labels;
     pldh.getLabelsForPageRange(0, npages - 1, 1, labels);
@@ -2624,7 +2624,7 @@ test_76(QPDF& pdf, char const* arg2)
 {
     // Embedded files. arg2 is a file to attach. Hard-code the
     // mime type and file name for test purposes.
-    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    auto &efdh = QPDFEmbeddedFileDocumentHelper::get(pdf);
     auto fs1 = QPDFFileSpecObjectHelper::createFileSpec(pdf, "att1.txt", arg2);
     fs1.setDescription("some text");
     auto efs1 = QPDFEFStreamObjectHelper(fs1.getEmbeddedFileStream());

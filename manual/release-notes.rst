@@ -26,12 +26,20 @@ more detail.
   - Library Enhancements
 
     - Add ``QPDFNameTreeObjectHelper`` and ``QPDFNumberTreeObjectHelper``
-      constructor overloads that allow a function to ne passed to
+      constructor overloads that allow a function to be passed to
       validate the values in the tree.
 
     - Add new ``QPDFNameTreeObjectHelper`` and ``QPDFNumberTreeObjectHelper``
       ``validate`` method to validate and optionally repair the name/number
       tree.
+
+    - Add new ``get`` and ``validate`` methods to all DocumentHelper classes.
+      The ``get`` method retrieves a shared DocumentHelper, avoiding the the
+      overhead of repeatedly validating the underlying document structure
+      and/or building internal caches. If the underlying document structure
+      is directly modified (without the use of DocumentHelpers), the
+      ``validate`` methods revalidates the structure and resynchronizes any
+      internal caches.
 
   - CLI Enhancements
 
@@ -39,6 +47,8 @@ more detail.
      with the incompatible options :qpdf:ref:`--encrypt` or
      :qpdf:ref:`--copy-encryption`.
 
+   - Option :qpdf:ref:`--check` now includes additional basic checks of the
+     AcroForm, Dests, Outlines, and PageLabels structures.
 
   - Other enhancements
 

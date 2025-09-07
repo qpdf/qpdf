@@ -79,7 +79,7 @@ process(
     }
 
     // Add the embedded file at the document level as an attachment.
-    auto efdh = QPDFEmbeddedFileDocumentHelper(q);
+    auto& efdh = QPDFEmbeddedFileDocumentHelper::get(q);
     efdh.replaceEmbeddedFile(key, fs);
 
     // Create a file attachment annotation.

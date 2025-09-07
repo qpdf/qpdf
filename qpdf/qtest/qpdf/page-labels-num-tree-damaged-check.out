@@ -1,0 +1,7 @@
+checking page-labels-num-tree-damaged.pdf
+PDF Version: 1.3
+File is not encrypted
+File is not linearized
+WARNING: page-labels-num-tree-damaged.pdf (Name/Number tree node (object 2)): attempting to repair after error: page-labels-num-tree-damaged.pdf (Name/Number tree node (object 2)): keys are not sorted in validate
+WARNING: page-labels-num-tree-damaged.pdf (Name/Number tree node (object 37)): item 1 is invalid
+qpdf: operation succeeded with warnings
