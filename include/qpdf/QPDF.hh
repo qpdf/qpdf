@@ -65,6 +65,7 @@ class QPDFParser;
 class QPDFAcroFormDocumentHelper;
 class QPDFEmbeddedFileDocumentHelper;
 class QPDFOutlineDocumentHelper;
+class QPDFPageDocumentHelper;
 class QPDFPageLabelDocumentHelper;
 
 class QPDF
@@ -804,6 +805,7 @@ class QPDF
     inline QPDFAcroFormDocumentHelper& acroform();
     inline QPDFEmbeddedFileDocumentHelper& embedded_files();
     inline QPDFOutlineDocumentHelper& outlines();
+    inline QPDFPageDocumentHelper& pages();
     inline QPDFPageLabelDocumentHelper& page_labels();
 
     // For testing only -- do not add to DLL

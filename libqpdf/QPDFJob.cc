@@ -17,7 +17,6 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
-#include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QPDFUsage.hh>
@@ -790,7 +789,7 @@ QPDFJob::doCheck(QPDF& pdf)
 
         // Parse all content streams
         int pageno = 0;
-        for (auto& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
+        for (auto& page: pdf.pages().getAllPages()) {
             ++pageno;
             try {
                 page.parseContents(nullptr);
@@ -858,7 +857,7 @@ QPDFJob::doShowPages(QPDF& pdf)
 {
     int pageno = 0;
     auto& cout = *m->log->getInfo();
-    for (auto& ph: QPDFPageDocumentHelper(pdf).getAllPages()) {
+    for (auto& ph: pdf.pages().getAllPages()) {
         QPDFObjectHandle page = ph.getObjectHandle();
         ++pageno;
 
@@ -1052,7 +1051,7 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
     auto& pldh = pdf.page_labels();
     auto& odh = pdf.outlines();
     int pageno = -1;
-    for (auto& ph: QPDFPageDocumentHelper(pdf).getAllPages()) {
+    for (auto& ph: pdf.pages().getAllPages()) {
         ++pageno;
         JSON j_page = JSON::makeDictionary();
         QPDFObjectHandle page = ph.getObjectHandle();
@@ -1113,7 +1112,7 @@ QPDFJob::doJSONPageLabels(Pipeline* p, bool& first, QPDF& pdf)
 {
     JSON j_labels = JSON::makeArray();
     auto& pldh = pdf.page_labels();
-    long long npages = QIntC::to_longlong(QPDFPageDocumentHelper(pdf).getAllPages().size());
+    long long npages = QIntC::to_longlong(pdf.pages().getAllPages().size());
     if (pldh.hasPageLabels()) {
         std::vector<QPDFObjectHandle> labels;
         pldh.getLabelsForPageRange(0, npages - 1, 0, labels);
@@ -1161,7 +1160,7 @@ QPDFJob::doJSONOutlines(Pipeline* p, bool& first, QPDF& pdf)
 {
     std::map<QPDFObjGen, int> page_numbers;
     int n = 0;
-    for (auto const& ph: QPDFPageDocumentHelper(pdf).getAllPages()) {
+    for (auto const& ph: pdf.pages().getAllPages()) {
         QPDFObjectHandle oh = ph.getObjectHandle();
         page_numbers[oh.getObjGen()] = ++n;
     }
@@ -1180,7 +1179,7 @@ QPDFJob::doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf)
     j_acroform.addDictionaryMember("needappearances", JSON::makeBool(afdh.getNeedAppearances()));
     JSON j_fields = j_acroform.addDictionaryMember("fields", JSON::makeArray());
     int pagepos1 = 0;
-    for (auto const& page: QPDFPageDocumentHelper(pdf).getAllPages()) {
+    for (auto const& page: pdf.pages().getAllPages()) {
         ++pagepos1;
         for (auto& aoh: afdh.getWidgetAnnotationsForPage(page)) {
             QPDFFormFieldObjectHelper ffh = afdh.getFieldForAnnotation(aoh);
@@ -1857,7 +1856,7 @@ QPDFJob::processInputSource(
 void
 QPDFJob::validateUnderOverlay(QPDF& pdf, UnderOverlay* uo)
 {
-    QPDFPageDocumentHelper main_pdh(pdf);
+    auto& main_pdh = pdf.pages();
     int main_npages = QIntC::to_int(main_pdh.getAllPages().size());
     processFile(uo->pdf, uo->filename.data(), uo->password.data(), true, false);
     QPDFPageDocumentHelper uo_pdh(*(uo->pdf));

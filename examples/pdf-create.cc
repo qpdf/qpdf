@@ -229,7 +229,7 @@ check(
 
     QPDF pdf;
     pdf.processFile(filename);
-    auto pages = QPDFPageDocumentHelper(pdf).getAllPages();
+    auto pages = QPDFPageDocumentHelper::get(pdf).getAllPages();
     if (n_color_spaces * n_filters != pages.size()) {
         throw std::logic_error("incorrect number of pages");
     }

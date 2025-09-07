@@ -47,7 +47,7 @@ print_lines(std::vector<int>& numbers)
 void
 generate_page_map(QPDF& qpdf)
 {
-    QPDFPageDocumentHelper dh(qpdf);
+    auto& dh = QPDFPageDocumentHelper::get(qpdf);
     int n = 0;
     for (auto const& page: dh.getAllPages()) {
         page_map[page] = ++n;
@@ -60,11 +60,9 @@ show_bookmark_details(QPDFOutlineObjectHelper outline, std::vector<int> numbers)
     // No default so gcc will warn on missing tag
     switch (style) {
     case st_none:
-        QTC::TC("examples", "pdf-bookmarks none");
         break;
 
     case st_numbers:
-        QTC::TC("examples", "pdf-bookmarks numbers");
         for (auto const& number: numbers) {
             std::cout << number << ".";
         }
@@ -72,7 +70,6 @@ show_bookmark_details(QPDFOutlineObjectHelper outline, std::vector<int> numbers)
         break;
 
     case st_lines:
-        QTC::TC("examples", "pdf-bookmarks lines");
         print_lines(numbers);
         std::cout << "|\n";
         print_lines(numbers);
@@ -83,27 +80,21 @@ show_bookmark_details(QPDFOutlineObjectHelper outline, std::vector<int> numbers)
     if (show_open) {
         int count = outline.getCount();
         if (count) {
-            QTC::TC("examples", "pdf-bookmarks has count");
             if (count > 0) {
                 // hierarchy is open at this point
-                QTC::TC("examples", "pdf-bookmarks open");
                 std::cout << "(v) ";
             } else {
-                QTC::TC("examples", "pdf-bookmarks closed");
                 std::cout << "(>) ";
             }
         } else {
-            QTC::TC("examples", "pdf-bookmarks no count");
             std::cout << "( ) ";
         }
     }
 
     if (show_targets) {
-        QTC::TC("examples", "pdf-bookmarks targets");
         std::string target = "unknown";
         QPDFObjectHandle dest_page = outline.getDestPage();
         if (!dest_page.isNull()) {
-            QTC::TC("examples", "pdf-bookmarks dest");
             if (page_map.contains(dest_page)) {
                 target = std::to_string(page_map[dest_page]);
             }
