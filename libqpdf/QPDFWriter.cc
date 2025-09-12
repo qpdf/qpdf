@@ -293,6 +293,8 @@ class QPDFWriter::Members
         delete output_buffer;
     }
 
+    void write();
+    std::map<QPDFObjGen, QPDFXRefEntry> getWrittenXRefTable();
     void setMinimumPDFVersion(std::string const& version, int extension_level);
     void copyEncryptionParameters(QPDF&);
     void doWriteSetup();
@@ -2366,30 +2368,36 @@ QPDFWriter::Members::doWriteSetup()
 void
 QPDFWriter::write()
 {
-    m->doWriteSetup();
+    m->write();
+}
+
+void
+QPDFWriter::Members::write()
+{
+    doWriteSetup();
 
     // Set up progress reporting. For linearized files, we write two passes. events_expected is an
     // approximation, but it's good enough for progress reporting, which is mostly a guess anyway.
-    m->events_expected = QIntC::to_int(m->pdf.getObjectCount() * (m->linearized ? 2 : 1));
+    events_expected = QIntC::to_int(pdf.getObjectCount() * (linearized ? 2 : 1));
 
-    m->prepareFileForWrite();
+    prepareFileForWrite();
 
-    if (m->linearized) {
-        m->writeLinearized();
+    if (linearized) {
+        writeLinearized();
     } else {
-        m->writeStandard();
+        writeStandard();
     }
 
-    m->pipeline->finish();
-    if (m->close_file) {
-        fclose(m->file);
+    pipeline->finish();
+    if (close_file) {
+        fclose(file);
     }
-    m->file = nullptr;
-    if (m->buffer_pipeline) {
-        m->output_buffer = m->buffer_pipeline->getBuffer();
-        m->buffer_pipeline = nullptr;
+    file = nullptr;
+    if (buffer_pipeline) {
+        output_buffer = buffer_pipeline->getBuffer();
+        buffer_pipeline = nullptr;
     }
-    m->indicateProgress(false, true);
+    indicateProgress(false, true);
 }
 
 QPDFObjGen
@@ -2401,10 +2409,16 @@ QPDFWriter::getRenumberedObjGen(QPDFObjGen og)
 std::map<QPDFObjGen, QPDFXRefEntry>
 QPDFWriter::getWrittenXRefTable()
 {
+    return m->getWrittenXRefTable();
+}
+
+std::map<QPDFObjGen, QPDFXRefEntry>
+QPDFWriter::Members::getWrittenXRefTable()
+{
     std::map<QPDFObjGen, QPDFXRefEntry> result;
 
     auto it = result.begin();
-    m->new_obj.forEach([&it, &result](auto id, auto const& item) -> void {
+    new_obj.forEach([&it, &result](auto id, auto const& item) -> void {
         if (item.xref.getType() != 0) {
             it = result.emplace_hint(it, QPDFObjGen(id, 0), item.xref);
         }

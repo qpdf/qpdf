@@ -20,9 +20,9 @@
 #ifndef QPDFWRITER_HH
 #define QPDFWRITER_HH
 
+#include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
-#include <qpdf/Constants.h>
 
 #include <qpdf/Buffer.hh>
 #include <qpdf/PDFVersion.hh>
