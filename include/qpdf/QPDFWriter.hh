@@ -22,19 +22,6 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
-
-#include <bitset>
-#include <concepts>
-#include <cstdio>
-#include <functional>
-#include <list>
-#include <map>
-#include <memory>
-#include <set>
-#include <string>
-#include <string_view>
-#include <vector>
-
 #include <qpdf/Constants.h>
 
 #include <qpdf/Buffer.hh>
@@ -45,14 +32,18 @@
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFXRefEntry.hh>
 
-namespace qpdf::pl
-{
-    struct Link;
-}
+#include <bitset>
+#include <cstdio>
+#include <functional>
+#include <list>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <string_view>
+#include <vector>
 
 class QPDF;
-class Pl_Count;
-class Pl_MD5;
 
 // This class implements a simple writer for saving QPDF objects to new PDF files.  See comments
 // through the header file for additional details.
@@ -449,31 +440,8 @@ class QPDFWriter
     class NewObjTable;
 
   private:
-    // flags used by unparseObject
-    static int const f_stream = 1 << 0;
-    static int const f_filtered = 1 << 1;
-    static int const f_in_ostream = 1 << 2;
-    static int const f_hex_string = 1 << 3;
-    static int const f_no_encryption = 1 << 4;
-
-    enum trailer_e { t_normal, t_lin_first, t_lin_second };
-
-    void interpretR3EncryptionParameters(
-        bool allow_accessibility,
-        bool allow_extract,
-        bool allow_assemble,
-        bool allow_annotate_and_form,
-        bool allow_form_filling,
-        bool allow_modify_other,
-        qpdf_r3_print_e print,
-        qpdf_r3_modify_e modify);
-    void setEncryptionParameters(char const* user_password, char const* owner_password);
-    void setEncryptionMinimumVersion();
-
     class Members;
 
-    // Keep all member variables inside the Members object, which we dynamically allocate. This
-    // makes it possible to add new private members without breaking binary compatibility.
     std::shared_ptr<Members> m;
 };
 

@@ -11,7 +11,6 @@
 #include <qpdf/Pl_PNGFilter.hh>
 #include <qpdf/Pl_RC4.hh>
 #include <qpdf/Pl_StdioFile.hh>
-#include <qpdf/Pl_String.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObject_private.hh>
@@ -22,6 +21,7 @@
 #include <qpdf/Util.hh>
 
 #include <algorithm>
+#include <concepts>
 #include <cstdlib>
 #include <stdexcept>
 
@@ -265,6 +265,15 @@ class QPDFWriter::Members
     friend class QPDFWriter;
 
   public:
+    // flags used by unparseObject
+    static int const f_stream = 1 << 0;
+    static int const f_filtered = 1 << 1;
+    static int const f_in_ostream = 1 << 2;
+    static int const f_hex_string = 1 << 3;
+    static int const f_no_encryption = 1 << 4;
+
+    enum trailer_e { t_normal, t_lin_first, t_lin_second };
+
     Members(QPDFWriter& w, QPDF& pdf) :
         w(w),
         pdf(pdf),
@@ -290,6 +299,17 @@ class QPDFWriter::Members
     void prepareFileForWrite();
 
     void disableIncompatibleEncryption(int major, int minor, int extension_level);
+    void interpretR3EncryptionParameters(
+        bool allow_accessibility,
+        bool allow_extract,
+        bool allow_assemble,
+        bool allow_annotate_and_form,
+        bool allow_form_filling,
+        bool allow_modify_other,
+        qpdf_r3_print_e print,
+        qpdf_r3_modify_e modify);
+    void setEncryptionParameters(char const* user_password, char const* owner_password);
+    void setEncryptionMinimumVersion();
     void parseVersion(std::string const& version, int& major, int& minor) const;
     int compareVersions(int major1, int minor1, int major2, int minor2) const;
     void generateID(bool encrypted);
@@ -752,7 +772,7 @@ QPDFWriter::setR2EncryptionParametersInsecure(
     if (!allow_annotate) {
         m->encryption->setP(6, false);
     }
-    setEncryptionParameters(user_password, owner_password);
+    m->setEncryptionParameters(user_password, owner_password);
 }
 
 void
@@ -768,7 +788,7 @@ QPDFWriter::setR3EncryptionParametersInsecure(
     qpdf_r3_print_e print)
 {
     m->encryption = std::make_unique<QPDF::EncryptionData>(2, 3, 16, true);
-    interpretR3EncryptionParameters(
+    m->interpretR3EncryptionParameters(
         allow_accessibility,
         allow_extract,
         allow_assemble,
@@ -777,7 +797,7 @@ QPDFWriter::setR3EncryptionParametersInsecure(
         allow_modify_other,
         print,
         qpdf_r3m_all);
-    setEncryptionParameters(user_password, owner_password);
+    m->setEncryptionParameters(user_password, owner_password);
 }
 
 void
@@ -796,7 +816,7 @@ QPDFWriter::setR4EncryptionParametersInsecure(
 {
     m->encryption = std::make_unique<QPDF::EncryptionData>(4, 4, 16, encrypt_metadata);
     m->encrypt_use_aes = use_aes;
-    interpretR3EncryptionParameters(
+    m->interpretR3EncryptionParameters(
         allow_accessibility,
         allow_extract,
         allow_assemble,
@@ -805,7 +825,7 @@ QPDFWriter::setR4EncryptionParametersInsecure(
         allow_modify_other,
         print,
         qpdf_r3m_all);
-    setEncryptionParameters(user_password, owner_password);
+    m->setEncryptionParameters(user_password, owner_password);
 }
 
 void
@@ -823,7 +843,7 @@ QPDFWriter::setR5EncryptionParameters(
 {
     m->encryption = std::make_unique<QPDF::EncryptionData>(5, 5, 32, encrypt_metadata);
     m->encrypt_use_aes = true;
-    interpretR3EncryptionParameters(
+    m->interpretR3EncryptionParameters(
         allow_accessibility,
         allow_extract,
         allow_assemble,
@@ -832,7 +852,7 @@ QPDFWriter::setR5EncryptionParameters(
         allow_modify_other,
         print,
         qpdf_r3m_all);
-    setEncryptionParameters(user_password, owner_password);
+    m->setEncryptionParameters(user_password, owner_password);
 }
 
 void
@@ -849,7 +869,7 @@ QPDFWriter::setR6EncryptionParameters(
     bool encrypt_metadata)
 {
     m->encryption = std::make_unique<QPDF::EncryptionData>(5, 6, 32, encrypt_metadata);
-    interpretR3EncryptionParameters(
+    m->interpretR3EncryptionParameters(
         allow_accessibility,
         allow_extract,
         allow_assemble,
@@ -859,11 +879,11 @@ QPDFWriter::setR6EncryptionParameters(
         print,
         qpdf_r3m_all);
     m->encrypt_use_aes = true;
-    setEncryptionParameters(user_password, owner_password);
+    m->setEncryptionParameters(user_password, owner_password);
 }
 
 void
-QPDFWriter::interpretR3EncryptionParameters(
+QPDFWriter::Members::interpretR3EncryptionParameters(
     bool allow_accessibility,
     bool allow_extract,
     bool allow_assemble,
@@ -902,21 +922,21 @@ QPDFWriter::interpretR3EncryptionParameters(
     // 10: accessibility; ignored by readers, should always be set
     // 11: document assembly even if 4 is clear
     // 12: high-resolution printing
-    if (!allow_accessibility && m->encryption->getR() <= 3) {
+    if (!allow_accessibility && encryption->getR() <= 3) {
         // Bit 10 is deprecated and should always be set.  This used to mean accessibility.  There
         // is no way to disable accessibility with R > 3.
-        m->encryption->setP(10, false);
+        encryption->setP(10, false);
     }
     if (!allow_extract) {
-        m->encryption->setP(5, false);
+        encryption->setP(5, false);
     }
 
     switch (print) {
     case qpdf_r3p_none:
-        m->encryption->setP(3, false); // any printing
+        encryption->setP(3, false); // any printing
         [[fallthrough]];
     case qpdf_r3p_low:
-        m->encryption->setP(12, false); // high resolution printing
+        encryption->setP(12, false); // high resolution printing
         [[fallthrough]];
     case qpdf_r3p_full:
         break;
@@ -930,16 +950,16 @@ QPDFWriter::interpretR3EncryptionParameters(
     // NOT EXERCISED IN TEST SUITE
     switch (modify) {
     case qpdf_r3m_none:
-        m->encryption->setP(11, false); // document assembly
+        encryption->setP(11, false); // document assembly
         [[fallthrough]];
     case qpdf_r3m_assembly:
-        m->encryption->setP(9, false); // filling in form fields
+        encryption->setP(9, false); // filling in form fields
         [[fallthrough]];
     case qpdf_r3m_form:
-        m->encryption->setP(6, false); // modify annotations, fill in form fields
+        encryption->setP(6, false); // modify annotations, fill in form fields
         [[fallthrough]];
     case qpdf_r3m_annotate:
-        m->encryption->setP(4, false); // other modifications
+        encryption->setP(4, false); // other modifications
         [[fallthrough]];
     case qpdf_r3m_all:
         break;
@@ -948,25 +968,25 @@ QPDFWriter::interpretR3EncryptionParameters(
     // END NOT EXERCISED IN TEST SUITE
 
     if (!allow_assemble) {
-        m->encryption->setP(11, false);
+        encryption->setP(11, false);
     }
     if (!allow_annotate_and_form) {
-        m->encryption->setP(6, false);
+        encryption->setP(6, false);
     }
     if (!allow_form_filling) {
-        m->encryption->setP(9, false);
+        encryption->setP(9, false);
     }
     if (!allow_modify_other) {
-        m->encryption->setP(4, false);
+        encryption->setP(4, false);
     }
 }
 
 void
-QPDFWriter::setEncryptionParameters(char const* user_password, char const* owner_password)
+QPDFWriter::Members::setEncryptionParameters(char const* user_password, char const* owner_password)
 {
-    m->generateID(true);
-    m->encryption->setId1(m->id1);
-    m->encryption_key = m->encryption->compute_parameters(user_password, owner_password);
+    generateID(true);
+    encryption->setId1(id1);
+    encryption_key = encryption->compute_parameters(user_password, owner_password);
     setEncryptionMinimumVersion();
 }
 
@@ -1018,7 +1038,7 @@ QPDFWriter::Members::copyEncryptionParameters(QPDF& qpdf)
             encrypt_metadata);
         encryption_key = V >= 5 ? qpdf.getEncryptionKey()
                                 : encryption->compute_encryption_key(qpdf.getPaddedUserPassword());
-        w.setEncryptionMinimumVersion();
+        setEncryptionMinimumVersion();
     }
 }
 
@@ -1092,19 +1112,19 @@ QPDFWriter::Members::compareVersions(int major1, int minor1, int major2, int min
 }
 
 void
-QPDFWriter::setEncryptionMinimumVersion()
+QPDFWriter::Members::setEncryptionMinimumVersion()
 {
-    auto const R = m->encryption->getR();
+    auto const R = encryption->getR();
     if (R >= 6) {
-        setMinimumPDFVersion("1.7", 8);
+        w.setMinimumPDFVersion("1.7", 8);
     } else if (R == 5) {
-        setMinimumPDFVersion("1.7", 3);
+        w.setMinimumPDFVersion("1.7", 3);
     } else if (R == 4) {
-        setMinimumPDFVersion(m->encrypt_use_aes ? "1.6" : "1.5");
+        w.setMinimumPDFVersion(encrypt_use_aes ? "1.6" : "1.5");
     } else if (R == 3) {
-        setMinimumPDFVersion("1.4");
+        w.setMinimumPDFVersion("1.4");
     } else {
-        setMinimumPDFVersion("1.3");
+        w.setMinimumPDFVersion("1.3");
     }
 }
 
