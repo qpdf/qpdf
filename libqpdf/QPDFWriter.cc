@@ -287,6 +287,7 @@ class QPDFWriter::Members
     void setMinimumPDFVersion(std::string const& version, int extension_level);
     void copyEncryptionParameters(QPDF&);
     void doWriteSetup();
+    void prepareFileForWrite();
 
     void disableIncompatibleEncryption(int major, int minor, int extension_level);
     void parseVersion(std::string const& version, int& major, int& minor) const;
@@ -297,6 +298,12 @@ class QPDFWriter::Members
     void preserveObjectStreams();
     void generateObjectStreams();
     void initializeSpecialStreams();
+    void enqueueObject(QPDFObjectHandle object);
+    void enqueueObjectsStandard();
+    void enqueueObjectsPCLm();
+    void enqueuePart(std::vector<QPDFObjectHandle>& part);
+    void assignCompressedObjectNumbers(QPDFObjGen og);
+    QPDFObjectHandle getTrimmedTrailer();
 
   private:
     QPDFWriter& w;
@@ -1170,76 +1177,74 @@ QPDFWriter::closeObject(int objid)
 }
 
 void
-QPDFWriter::assignCompressedObjectNumbers(QPDFObjGen og)
+QPDFWriter::Members::assignCompressedObjectNumbers(QPDFObjGen og)
 {
     int objid = og.getObj();
-    if ((og.getGen() != 0) || (!m->object_stream_to_objects.contains(objid))) {
+    if (og.getGen() != 0 || !object_stream_to_objects.contains(objid)) {
         // This is not an object stream.
         return;
     }
 
     // Reserve numbers for the objects that belong to this object stream.
-    for (auto const& iter: m->object_stream_to_objects[objid]) {
-        m->obj[iter].renumber = m->next_objid++;
+    for (auto const& iter: object_stream_to_objects[objid]) {
+        obj[iter].renumber = next_objid++;
     }
 }
 
 void
-QPDFWriter::enqueueObject(QPDFObjectHandle object)
+QPDFWriter::Members::enqueueObject(QPDFObjectHandle object)
 {
     if (object.isIndirect()) {
         // This owner check can only be done for indirect objects. It is possible for a direct
         // object to have an owning QPDF that is from another file if a direct QPDFObjectHandle from
         // one file was insert into another file without copying. Doing that is safe even if the
         // original QPDF gets destroyed, which just disconnects the QPDFObjectHandle from its owner.
-        if (object.getOwningQPDF() != &(m->pdf)) {
-            QTC::TC("qpdf", "QPDFWriter foreign object");
+        if (object.getOwningQPDF() != &pdf) {
             throw std::logic_error(
                 "QPDFObjectHandle from different QPDF found while writing.  Use "
                 "QPDF::copyForeignObject to add objects from another file.");
         }
 
-        if (m->qdf_mode && object.isStreamOfType("/XRef")) {
+        if (qdf_mode && object.isStreamOfType("/XRef")) {
             // As a special case, do not output any extraneous XRef streams in QDF mode. Doing so
             // will confuse fix-qdf, which expects to see only one XRef stream at the end of the
             // file. This case can occur when creating a QDF from a file with object streams when
             // preserving unreferenced objects since the old cross reference streams are not
             // actually referenced by object number.
-            QTC::TC("qpdf", "QPDFWriter ignore XRef in qdf mode");
             return;
         }
 
         QPDFObjGen og = object.getObjGen();
-        auto& obj = m->obj[og];
+        auto& o = obj[og];
 
-        if (obj.renumber == 0) {
-            if (obj.object_stream > 0) {
+        if (o.renumber == 0) {
+            if (o.object_stream > 0) {
                 // This is in an object stream.  Don't process it here.  Instead, enqueue the object
                 // stream.  Object streams always have generation 0.
                 // Detect loops by storing invalid object ID -1, which will get overwritten later.
-                obj.renumber = -1;
-                enqueueObject(m->pdf.getObject(obj.object_stream, 0));
+                o.renumber = -1;
+                enqueueObject(pdf.getObject(o.object_stream, 0));
             } else {
-                m->object_queue.push_back(object);
-                obj.renumber = m->next_objid++;
+                object_queue.emplace_back(object);
+                o.renumber = next_objid++;
 
-                if ((og.getGen() == 0) && m->object_stream_to_objects.contains(og.getObj())) {
+                if (og.getGen() == 0 && object_stream_to_objects.contains(og.getObj())) {
                     // For linearized files, uncompressed objects go at end, and we take care of
                     // assigning numbers to them elsewhere.
-                    if (!m->linearized) {
+                    if (!linearized) {
                         assignCompressedObjectNumbers(og);
                     }
-                } else if ((!m->direct_stream_lengths) && object.isStream()) {
+                } else if (!direct_stream_lengths && object.isStream()) {
                     // reserve next object ID for length
-                    ++m->next_objid;
+                    ++next_objid;
                 }
             }
-        } else if (obj.renumber == -1) {
+        } else if (o.renumber == -1) {
             // This can happen if a specially constructed file indicates that an object stream is
             // inside itself.
         }
         return;
-    } else if (!m->linearized) {
+    } else if (!linearized) {
         if (object.isArray()) {
             for (auto& item: object.as_array()) {
                 enqueueObject(item);
@@ -1260,7 +1265,7 @@ void
 QPDFWriter::unparseChild(QPDFObjectHandle const& child, size_t level, int flags)
 {
     if (!m->linearized) {
-        enqueueObject(child);
+        m->enqueueObject(child);
     }
     if (child.isIndirect()) {
         write(m->obj[child].renumber).write(" 0 R");
@@ -1273,7 +1278,7 @@ void
 QPDFWriter::writeTrailer(
     trailer_e which, int size, bool xref_stream, qpdf_offset_t prev, int linearization_pass)
 {
-    QPDFObjectHandle trailer = getTrimmedTrailer();
+    QPDFObjectHandle trailer = m->getTrimmedTrailer();
     if (xref_stream) {
         m->cur_data_key.clear();
     } else {
@@ -2082,11 +2087,11 @@ QPDFWriter::Members::generateObjectStreams()
 }
 
 QPDFObjectHandle
-QPDFWriter::getTrimmedTrailer()
+QPDFWriter::Members::getTrimmedTrailer()
 {
     // Remove keys from the trailer that necessarily have to be replaced when writing the file.
 
-    QPDFObjectHandle trailer = m->pdf.getTrailer().unsafeShallowCopy();
+    QPDFObjectHandle trailer = pdf.getTrailer().unsafeShallowCopy();
 
     // Remove encryption keys
     trailer.removeKey("/ID");
@@ -2109,10 +2114,10 @@ QPDFWriter::getTrimmedTrailer()
 
 // Make document extension level information direct as required by the spec.
 void
-QPDFWriter::prepareFileForWrite()
+QPDFWriter::Members::prepareFileForWrite()
 {
-    m->pdf.fixDanglingReferences();
-    auto root = m->pdf.getRoot();
+    pdf.fixDanglingReferences();
+    auto root = pdf.getRoot();
     auto oh = root.getKey("/Extensions");
     if (oh.isDictionary()) {
         const bool extensions_indirect = oh.isIndirect();
@@ -2280,7 +2285,7 @@ QPDFWriter::write()
     // approximation, but it's good enough for progress reporting, which is mostly a guess anyway.
     m->events_expected = QIntC::to_int(m->pdf.getObjectCount() * (m->linearized ? 2 : 1));
 
-    prepareFileForWrite();
+    m->prepareFileForWrite();
 
     if (m->linearized) {
         writeLinearized();
@@ -2321,7 +2326,7 @@ QPDFWriter::getWrittenXRefTable()
 }
 
 void
-QPDFWriter::enqueuePart(std::vector<QPDFObjectHandle>& part)
+QPDFWriter::Members::enqueuePart(std::vector<QPDFObjectHandle>& part)
 {
     for (auto const& oh: part) {
         enqueueObject(oh);
@@ -2650,7 +2655,7 @@ QPDFWriter::writeLinearized()
     std::vector<QPDFObjectHandle>* vecs2[] = {&part7, &part8, &part9};
     for (int i = 0; i < 3; ++i) {
         for (auto const& oh: *vecs2[i]) {
-            assignCompressedObjectNumbers(oh.getObjGen());
+            m->assignCompressedObjectNumbers(oh.getObjGen());
         }
     }
     int second_half_end = m->next_objid - 1;
@@ -2677,7 +2682,7 @@ QPDFWriter::writeLinearized()
     std::vector<QPDFObjectHandle>* vecs1[] = {&part4, &part6};
     for (int i = 0; i < 2; ++i) {
         for (auto const& oh: *vecs1[i]) {
-            assignCompressedObjectNumbers(oh.getObjGen());
+            m->assignCompressedObjectNumbers(oh.getObjGen());
         }
     }
     int first_half_end = m->next_objid - 1;
@@ -2694,21 +2699,21 @@ QPDFWriter::writeLinearized()
     qpdf_offset_t second_xref_end = 0;
 
     m->next_objid = part4_first_obj;
-    enqueuePart(part4);
+    m->enqueuePart(part4);
     if (m->next_objid != after_part4) {
         // This can happen with very botched files as in the fuzzer test. There are likely some
         // faulty assumptions in calculateLinearizationData
         throw std::runtime_error("error encountered after writing part 4 of linearized data");
     }
     m->next_objid = part6_first_obj;
-    enqueuePart(part6);
+    m->enqueuePart(part6);
     if (m->next_objid != after_part6) {
         throw std::runtime_error("error encountered after writing part 6 of linearized data");
     }
     m->next_objid = second_half_first_obj;
-    enqueuePart(part7);
-    enqueuePart(part8);
-    enqueuePart(part9);
+    m->enqueuePart(part7);
+    m->enqueuePart(part8);
+    m->enqueuePart(part9);
     if (m->next_objid != after_second_half) {
         throw std::runtime_error("error encountered after writing part 9 of linearized data");
     }
@@ -2947,11 +2952,10 @@ QPDFWriter::writeLinearized()
 }
 
 void
-QPDFWriter::enqueueObjectsStandard()
+QPDFWriter::Members::enqueueObjectsStandard()
 {
-    if (m->preserve_unreferenced_objects) {
-        QTC::TC("qpdf", "QPDFWriter preserve unreferenced standard");
-        for (auto const& oh: m->pdf.getAllObjects()) {
+    if (preserve_unreferenced_objects) {
+        for (auto const& oh: pdf.getAllObjects()) {
             enqueueObject(oh);
         }
     }
@@ -2970,14 +2974,14 @@ QPDFWriter::enqueueObjectsStandard()
 }
 
 void
-QPDFWriter::enqueueObjectsPCLm()
+QPDFWriter::Members::enqueueObjectsPCLm()
 {
     // Image transform stream content for page strip images. Each of this new stream has to come
     // after every page image strip written in the pclm file.
     std::string image_transform_content = "q /image Do Q\n";
 
     // enqueue all pages first
-    std::vector<QPDFObjectHandle> all = m->pdf.getAllPages();
+    std::vector<QPDFObjectHandle> all = pdf.getAllPages();
     for (auto& page: all) {
         // enqueue page
         enqueueObject(page);
@@ -2990,7 +2994,7 @@ QPDFWriter::enqueueObjectsPCLm()
         for (auto& image: strips.as_dictionary()) {
             if (!image.second.null()) {
                 enqueueObject(image.second);
-                enqueueObject(QPDFObjectHandle::newStream(&m->pdf, image_transform_content));
+                enqueueObject(QPDFObjectHandle::newStream(&pdf, image_transform_content));
             }
         }
     }
@@ -3048,9 +3052,9 @@ QPDFWriter::writeStandard()
     write(m->extra_header_text);
 
     if (m->pclm) {
-        enqueueObjectsPCLm();
+        m->enqueueObjectsPCLm();
     } else {
-        enqueueObjectsStandard();
+        m->enqueueObjectsStandard();
     }
 
     // Now start walking queue, outputting each object.

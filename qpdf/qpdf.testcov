@@ -188,7 +188,6 @@ QPDF replace dictionary 0
 QPDF replace stream 0
 QPDF replace foreign indirect with null 0
 QPDF insert foreign page 0
-QPDFWriter foreign object 0
 QPDFWriter copy use_aes 1
 QPDFParser indirect without context 0
 QPDFObjectHandle trailing data in parse 0
@@ -228,7 +227,6 @@ QPDFParser treat word as string in parseRemainder 0
 QPDFParser found fake 1
 QPDFParser no val for last key 0
 QPDF resolve failure to null 0
-QPDFWriter preserve unreferenced standard 0
 QPDFObjectHandle errors in parsecontent 0
 QPDFJob same file error 0
 QPDFJob split-pages %d 0
@@ -365,7 +363,6 @@ QPDF_encryption same password 1
 QPDFParser duplicate dict key 0
 QPDFWriter no encryption sig contents 0
 QPDFPageObjectHelper colorspace lookup 0
-QPDFWriter ignore XRef in qdf mode 0
 QPDFPageObjectHelper filter form xobject 0
 QPDFJob found resources in non-leaf 0
 QPDFJob found shared resources in leaf 0

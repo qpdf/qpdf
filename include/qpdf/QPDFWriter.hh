@@ -471,8 +471,6 @@ class QPDFWriter
     QPDFWriter& write_qdf(Args&&... args);
     template <typename... Args>
     QPDFWriter& write_no_qdf(Args&&... args);
-    void assignCompressedObjectNumbers(QPDFObjGen og);
-    void enqueueObject(QPDFObjectHandle object);
     void writeObjectStreamOffsets(std::vector<qpdf_offset_t>& offsets, int first_obj);
     void writeObjectStream(QPDFObjectHandle object);
     void writeObject(QPDFObjectHandle object, int object_stream_index = -1);
@@ -505,14 +503,9 @@ class QPDFWriter
     void setDataKey(int objid);
     int openObject(int objid = 0);
     void closeObject(int objid);
-    QPDFObjectHandle getTrimmedTrailer();
-    void prepareFileForWrite();
-    void enqueueObjectsStandard();
-    void enqueueObjectsPCLm();
     void indicateProgress(bool decrement, bool finished);
     void writeStandard();
     void writeLinearized();
-    void enqueuePart(std::vector<QPDFObjectHandle>& part);
     void writeEncryptionDictionary();
     void writeHeader();
     void writeHintStream(int hint_id);
