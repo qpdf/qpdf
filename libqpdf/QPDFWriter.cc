@@ -284,6 +284,12 @@ class QPDFWriter::Members
         delete output_buffer;
     }
 
+    void setMinimumPDFVersion(std::string const& version, int extension_level);
+
+    void disableIncompatibleEncryption(int major, int minor, int extension_level);
+    void parseVersion(std::string const& version, int& major, int& minor) const;
+    int compareVersions(int major1, int minor1, int major2, int minor2) const;
+
   private:
     QPDFWriter& w;
     QPDF& pdf;
@@ -381,11 +387,9 @@ QPDFWriter::setOutputFilename(char const* filename)
     bool close_file = false;
     if (filename == nullptr) {
         description = "standard output";
-        QTC::TC("qpdf", "QPDFWriter write to stdout");
         f = stdout;
         QUtil::binary_stdout();
     } else {
-        QTC::TC("qpdf", "QPDFWriter write to file");
         f = QUtil::safe_fopen(filename, "wb+");
         close_file = true;
     }
@@ -508,9 +512,15 @@ QPDFWriter::setNewlineBeforeEndstream(bool val)
 void
 QPDFWriter::setMinimumPDFVersion(std::string const& version, int extension_level)
 {
+    m->setMinimumPDFVersion(version, extension_level);
+}
+
+void
+QPDFWriter::Members::setMinimumPDFVersion(std::string const& version, int extension_level)
+{
     bool set_version = false;
     bool set_extension_level = false;
-    if (m->min_pdf_version.empty()) {
+    if (min_pdf_version.empty()) {
         set_version = true;
         set_extension_level = true;
     } else {
@@ -519,25 +529,24 @@ QPDFWriter::setMinimumPDFVersion(std::string const& version, int extension_level
         int min_major = 0;
         int min_minor = 0;
         parseVersion(version, old_major, old_minor);
-        parseVersion(m->min_pdf_version, min_major, min_minor);
+        parseVersion(min_pdf_version, min_major, min_minor);
         int compare = compareVersions(old_major, old_minor, min_major, min_minor);
         if (compare > 0) {
             QTC::TC("qpdf", "QPDFWriter increasing minimum version", extension_level == 0 ? 0 : 1);
             set_version = true;
             set_extension_level = true;
         } else if (compare == 0) {
-            if (extension_level > m->min_extension_level) {
-                QTC::TC("qpdf", "QPDFWriter increasing extension level");
+            if (extension_level > min_extension_level) {
                 set_extension_level = true;
             }
         }
     }
 
     if (set_version) {
-        m->min_pdf_version = version;
+        min_pdf_version = version;
     }
     if (set_extension_level) {
-        m->min_extension_level = extension_level;
+        min_extension_level = extension_level;
     }
 }
 
@@ -562,7 +571,6 @@ QPDFWriter::setExtraHeaderText(std::string const& text)
 {
     m->extra_header_text = text;
     if (!m->extra_header_text.empty() && *m->extra_header_text.rbegin() != '\n') {
-        QTC::TC("qpdf", "QPDFWriter extra header text add newline");
         m->extra_header_text += "\n";
     } else {
         QTC::TC("qpdf", "QPDFWriter extra header text no newline");
@@ -913,44 +921,44 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
 }
 
 void
-QPDFWriter::disableIncompatibleEncryption(int major, int minor, int extension_level)
+QPDFWriter::Members::disableIncompatibleEncryption(int major, int minor, int extension_level)
 {
-    if (!m->encryption) {
+    if (!encryption) {
         return;
     }
     if (compareVersions(major, minor, 1, 3) < 0) {
-        m->encryption = nullptr;
+        encryption = nullptr;
         return;
     }
-    int V = m->encryption->getV();
-    int R = m->encryption->getR();
+    int V = encryption->getV();
+    int R = encryption->getR();
     if (compareVersions(major, minor, 1, 4) < 0) {
         if (V > 1 || R > 2) {
-            m->encryption = nullptr;
+            encryption = nullptr;
         }
     } else if (compareVersions(major, minor, 1, 5) < 0) {
         if (V > 2 || R > 3) {
-            m->encryption = nullptr;
+            encryption = nullptr;
         }
     } else if (compareVersions(major, minor, 1, 6) < 0) {
-        if (m->encrypt_use_aes) {
-            m->encryption = nullptr;
+        if (encrypt_use_aes) {
+            encryption = nullptr;
         }
     } else if (
         (compareVersions(major, minor, 1, 7) < 0) ||
         ((compareVersions(major, minor, 1, 7) == 0) && extension_level < 3)) {
         if (V >= 5 || R >= 5) {
-            m->encryption = nullptr;
+            encryption = nullptr;
         }
     }
 
-    if (!m->encryption) {
+    if (!encryption) {
         QTC::TC("qpdf", "QPDFWriter forced version disabled encryption");
     }
 }
 
 void
-QPDFWriter::parseVersion(std::string const& version, int& major, int& minor) const
+QPDFWriter::Members::parseVersion(std::string const& version, int& major, int& minor) const
 {
     major = QUtil::string_to_int(version.c_str());
     minor = 0;
@@ -967,19 +975,18 @@ QPDFWriter::parseVersion(std::string const& version, int& major, int& minor) con
 }
 
 int
-QPDFWriter::compareVersions(int major1, int minor1, int major2, int minor2) const
+QPDFWriter::Members::compareVersions(int major1, int minor1, int major2, int minor2) const
 {
     if (major1 < major2) {
         return -1;
-    } else if (major1 > major2) {
-        return 1;
-    } else if (minor1 < minor2) {
-        return -1;
-    } else if (minor1 > minor2) {
-        return 1;
-    } else {
-        return 0;
     }
+    if (major1 > major2) {
+        return 1;
+    }
+    if (minor1 < minor2) {
+        return -1;
+    }
+    return minor1 > minor2 ? 1 : 0;
 }
 
 void
@@ -2170,10 +2177,9 @@ QPDFWriter::doWriteSetup()
     if (!m->forced_pdf_version.empty()) {
         int major = 0;
         int minor = 0;
-        parseVersion(m->forced_pdf_version, major, minor);
-        disableIncompatibleEncryption(major, minor, m->forced_extension_level);
-        if (compareVersions(major, minor, 1, 5) < 0) {
-            QTC::TC("qpdf", "QPDFWriter forcing object stream disable");
+        m->parseVersion(m->forced_pdf_version, major, minor);
+        m->disableIncompatibleEncryption(major, minor, m->forced_extension_level);
+        if (m->compareVersions(major, minor, 1, 5) < 0) {
             m->object_stream_mode = qpdf_o_disable;
         }
     }

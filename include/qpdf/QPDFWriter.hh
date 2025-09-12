@@ -505,9 +505,6 @@ class QPDFWriter
         bool allow_modify_other,
         qpdf_r3_print_e print,
         qpdf_r3_modify_e modify);
-    void disableIncompatibleEncryption(int major, int minor, int extension_level);
-    void parseVersion(std::string const& version, int& major, int& minor) const;
-    int compareVersions(int major1, int minor1, int major2, int minor2) const;
     void setEncryptionParameters(char const* user_password, char const* owner_password);
     void setEncryptionMinimumVersion();
     void setDataKey(int objid);
