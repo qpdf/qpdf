@@ -81,7 +81,6 @@ QPDF xref deleted object 0
 SF_FlateLzwDecode PNG filter 0
 QPDF xref /Index is array 1
 QPDFWriter encrypt object stream 0
-QPDFWriter compressing uncompressed stream 0
 QPDF exclude indirect length 0
 QPDF exclude encryption dictionary 0
 QPDF loop detected traversing objects 0
@@ -90,7 +89,6 @@ QPDF recovered in readObjectAtOffset 0
 QPDF recovered stream length 0
 QPDF found wrong endstream in recovery 0
 QPDF_Stream pipeStreamData with null pipeline 0
-QPDFWriter not recompressing /FlateDecode 0
 QPDFJob unable to filter 0
 QUtil non-trivial UTF-16 0
 QPDF xref overwrite invalid objgen 0
@@ -134,7 +132,6 @@ qpdf-c called qpdf_set_minimum_pdf_version 0
 qpdf-c called qpdf_force_pdf_version 0
 qpdf-c called qpdf_init_write multiple times 0
 QPDF_encryption rc4 decode string 0
-QPDFWriter not compressing metadata 0
 QPDF_encryption aes decode string 0
 QPDFWriter forced version disabled encryption 0
 qpdf-c called qpdf_set_r4_encryption_parameters_insecure 0
@@ -451,7 +448,6 @@ qpdf-c called qpdf_oh_get_generation 0
 qpdf-c called qpdf_oh_unparse 0
 qpdf-c called qpdf_oh_unparse_resolved 0
 qpdf-c called qpdf_oh_unparse_binary 0
-QPDFWriter getFilterOnWrite false 0
 QPDFPageObjectHelper::forEachXObject 3
 NNTree erased last kid/item in tree 1
 QPDFPageObjectHelper unresolved names 0
