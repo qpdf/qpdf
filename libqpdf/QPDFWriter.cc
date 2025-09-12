@@ -286,12 +286,17 @@ class QPDFWriter::Members
 
     void setMinimumPDFVersion(std::string const& version, int extension_level);
     void copyEncryptionParameters(QPDF&);
+    void doWriteSetup();
 
     void disableIncompatibleEncryption(int major, int minor, int extension_level);
     void parseVersion(std::string const& version, int& major, int& minor) const;
     int compareVersions(int major1, int minor1, int major2, int minor2) const;
     void generateID(bool encrypted);
     std::string getOriginalID1();
+    void initializeTables(size_t extra = 0);
+    void preserveObjectStreams();
+    void generateObjectStreams();
+    void initializeSpecialStreams();
 
   private:
     QPDFWriter& w;
@@ -1964,13 +1969,13 @@ QPDFWriter::Members::generateID(bool encrypted)
 }
 
 void
-QPDFWriter::initializeSpecialStreams()
+QPDFWriter::Members::initializeSpecialStreams()
 {
     // Mark all page content streams in case we are filtering or normalizing.
-    std::vector<QPDFObjectHandle> pages = m->pdf.getAllPages();
+    std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
     int num = 0;
     for (auto& page: pages) {
-        m->page_object_to_seq[page.getObjGen()] = ++num;
+        page_object_to_seq[page.getObjGen()] = ++num;
         QPDFObjectHandle contents = page.getKey("/Contents");
         std::vector<QPDFObjGen> contents_objects;
         if (contents.isArray()) {
@@ -1983,16 +1988,16 @@ QPDFWriter::initializeSpecialStreams()
         }
 
         for (auto const& c: contents_objects) {
-            m->contents_to_page_seq[c] = num;
-            m->normalized_streams.insert(c);
+            contents_to_page_seq[c] = num;
+            normalized_streams.insert(c);
         }
     }
 }
 
 void
-QPDFWriter::preserveObjectStreams()
+QPDFWriter::Members::preserveObjectStreams()
 {
-    auto const& xref = QPDF::Writer::getXRefTable(m->pdf);
+    auto const& xref = QPDF::Writer::getXRefTable(pdf);
     // Our object_to_object_stream map has to map ObjGen -> ObjGen since we may be generating object
     // streams out of old objects that have generation numbers greater than zero. However in an
     // existing PDF, all object stream objects and all objects in them must have generation 0
@@ -2001,14 +2006,13 @@ QPDFWriter::preserveObjectStreams()
     // erroneously included in object streams in the source PDF, it also prevents unreferenced
     // objects from being included.
     auto end = xref.cend();
-    m->obj.streams_empty = true;
-    if (m->preserve_unreferenced_objects) {
+    obj.streams_empty = true;
+    if (preserve_unreferenced_objects) {
         for (auto iter = xref.cbegin(); iter != end; ++iter) {
             if (iter->second.getType() == 2) {
                 // Pdf contains object streams.
-                QTC::TC("qpdf", "QPDFWriter preserve object streams preserve unreferenced");
-                m->obj.streams_empty = false;
-                m->obj[iter->first].object_stream = iter->second.getObjStreamNumber();
+                obj.streams_empty = false;
+                obj[iter->first].object_stream = iter->second.getObjStreamNumber();
             }
         }
     } else {
@@ -2017,9 +2021,8 @@ QPDFWriter::preserveObjectStreams()
         for (auto iter = xref.cbegin(); iter != end; ++iter) {
             if (iter->second.getType() == 2) {
                 // Pdf contains object streams.
-                QTC::TC("qpdf", "QPDFWriter preserve object streams");
-                m->obj.streams_empty = false;
-                auto eligible = QPDF::Writer::getCompressibleObjSet(m->pdf);
+                obj.streams_empty = false;
+                auto eligible = QPDF::Writer::getCompressibleObjSet(pdf);
                 // The object pointed to by iter may be a previous generation, in which case it is
                 // removed by getCompressibleObjSet. We need to restart the loop (while the object
                 // table may contain multiple generations of an object).
@@ -2027,7 +2030,7 @@ QPDFWriter::preserveObjectStreams()
                     if (iter->second.getType() == 2) {
                         auto id = static_cast<size_t>(iter->first.getObj());
                         if (id < eligible.size() && eligible[id]) {
-                            m->obj[iter->first].object_stream = iter->second.getObjStreamNumber();
+                            obj[iter->first].object_stream = iter->second.getObjStreamNumber();
                         } else {
                             QTC::TC("qpdf", "QPDFWriter exclude from object stream");
                         }
@@ -2040,7 +2043,7 @@ QPDFWriter::preserveObjectStreams()
 }
 
 void
-QPDFWriter::generateObjectStreams()
+QPDFWriter::Members::generateObjectStreams()
 {
     // Basic strategy: make a list of objects that can go into an object stream.  Then figure out
     // how many object streams are needed so that we can distribute objects approximately evenly
@@ -2050,12 +2053,12 @@ QPDFWriter::generateObjectStreams()
 
     // This code doesn't do anything with /Extends.
 
-    std::vector<QPDFObjGen> eligible = QPDF::Writer::getCompressibleObjGens(m->pdf);
+    std::vector<QPDFObjGen> eligible = QPDF::Writer::getCompressibleObjGens(pdf);
     size_t n_object_streams = (eligible.size() + 99U) / 100U;
 
     initializeTables(2U * n_object_streams);
     if (n_object_streams == 0) {
-        m->obj.streams_empty = true;
+        obj.streams_empty = true;
         return;
     }
     size_t n_per = eligible.size() / n_object_streams;
@@ -2063,18 +2066,17 @@ QPDFWriter::generateObjectStreams()
         ++n_per;
     }
     unsigned int n = 0;
-    int cur_ostream = m->pdf.newIndirectNull().getObjectID();
+    int cur_ostream = pdf.newIndirectNull().getObjectID();
     for (auto const& item: eligible) {
         if (n == n_per) {
-            QTC::TC("qpdf", "QPDFWriter generate >1 ostream");
             n = 0;
             // Construct a new null object as the "original" object stream.  The rest of the code
             // knows that this means we're creating the object stream from scratch.
-            cur_ostream = m->pdf.newIndirectNull().getObjectID();
+            cur_ostream = pdf.newIndirectNull().getObjectID();
         }
-        auto& obj = m->obj[item];
-        obj.object_stream = cur_ostream;
-        obj.gen = item.getGen();
+        auto& o = obj[item];
+        o.object_stream = cur_ostream;
+        o.gen = item.getGen();
         ++n;
     }
 }
@@ -2130,83 +2132,83 @@ QPDFWriter::prepareFileForWrite()
 }
 
 void
-QPDFWriter::initializeTables(size_t extra)
+QPDFWriter::Members::initializeTables(size_t extra)
 {
-    auto size = QIntC::to_size(QPDF::Writer::tableSize(m->pdf) + 100) + extra;
-    m->obj.resize(size);
-    m->new_obj.resize(size);
+    auto size = QIntC::to_size(QPDF::Writer::tableSize(pdf) + 100) + extra;
+    obj.resize(size);
+    new_obj.resize(size);
 }
 
 void
-QPDFWriter::doWriteSetup()
+QPDFWriter::Members::doWriteSetup()
 {
-    if (m->did_write_setup) {
+    if (did_write_setup) {
         return;
     }
-    m->did_write_setup = true;
+    did_write_setup = true;
 
     // Do preliminary setup
 
-    if (m->linearized) {
-        m->qdf_mode = false;
+    if (linearized) {
+        qdf_mode = false;
     }
 
-    if (m->pclm) {
-        m->stream_decode_level = qpdf_dl_none;
-        m->compress_streams = false;
-        m->encryption = nullptr;
+    if (pclm) {
+        stream_decode_level = qpdf_dl_none;
+        compress_streams = false;
+        encryption = nullptr;
     }
 
-    if (m->qdf_mode) {
-        if (!m->normalize_content_set) {
-            m->normalize_content = true;
+    if (qdf_mode) {
+        if (!normalize_content_set) {
+            normalize_content = true;
         }
-        if (!m->compress_streams_set) {
-            m->compress_streams = false;
+        if (!compress_streams_set) {
+            compress_streams = false;
         }
-        if (!m->stream_decode_level_set) {
-            m->stream_decode_level = qpdf_dl_generalized;
+        if (!stream_decode_level_set) {
+            stream_decode_level = qpdf_dl_generalized;
         }
     }
 
-    if (m->encryption) {
+    if (encryption) {
         // Encryption has been explicitly set
-        m->preserve_encryption = false;
-    } else if (m->normalize_content || !m->compress_streams || m->pclm || m->qdf_mode) {
+        preserve_encryption = false;
+    } else if (normalize_content || !compress_streams || pclm || qdf_mode) {
         // Encryption makes looking at contents pretty useless.  If the user explicitly encrypted
         // though, we still obey that.
-        m->preserve_encryption = false;
+        preserve_encryption = false;
     }
 
-    if (m->preserve_encryption) {
-        copyEncryptionParameters(m->pdf);
+    if (preserve_encryption) {
+        copyEncryptionParameters(pdf);
     }
 
-    if (!m->forced_pdf_version.empty()) {
+    if (!forced_pdf_version.empty()) {
         int major = 0;
         int minor = 0;
-        m->parseVersion(m->forced_pdf_version, major, minor);
-        m->disableIncompatibleEncryption(major, minor, m->forced_extension_level);
-        if (m->compareVersions(major, minor, 1, 5) < 0) {
-            m->object_stream_mode = qpdf_o_disable;
+        parseVersion(forced_pdf_version, major, minor);
+        disableIncompatibleEncryption(major, minor, forced_extension_level);
+        if (compareVersions(major, minor, 1, 5) < 0) {
+            object_stream_mode = qpdf_o_disable;
         }
     }
 
-    if (m->qdf_mode || m->normalize_content) {
+    if (qdf_mode || normalize_content) {
         initializeSpecialStreams();
     }
 
-    if (m->qdf_mode) {
+    if (qdf_mode) {
         // Generate indirect stream lengths for qdf mode since fix-qdf uses them for storing
         // recomputed stream length data. Certain streams such as object streams, xref streams, and
         // hint streams always get direct stream lengths.
-        m->direct_stream_lengths = false;
+        direct_stream_lengths = false;
     }
 
-    switch (m->object_stream_mode) {
+    switch (object_stream_mode) {
     case qpdf_o_disable:
         initializeTables();
-        m->obj.streams_empty = true;
+        obj.streams_empty = true;
         break;
 
     case qpdf_o_preserve:
@@ -2221,61 +2223,58 @@ QPDFWriter::doWriteSetup()
         // no default so gcc will warn for missing case tag
     }
 
-    if (!m->obj.streams_empty) {
-        if (m->linearized) {
+    if (!obj.streams_empty) {
+        if (linearized) {
             // Page dictionaries are not allowed to be compressed objects.
-            for (auto& page: m->pdf.getAllPages()) {
-                if (m->obj[page].object_stream > 0) {
-                    QTC::TC("qpdf", "QPDFWriter uncompressing page dictionary");
-                    m->obj[page].object_stream = 0;
+            for (auto& page: pdf.getAllPages()) {
+                if (obj[page].object_stream > 0) {
+                    obj[page].object_stream = 0;
                 }
             }
         }
 
-        if (m->linearized || m->encryption) {
+        if (linearized || encryption) {
             // The document catalog is not allowed to be compressed in linearized files either.  It
             // also appears that Adobe Reader 8.0.0 has a bug that prevents it from being able to
             // handle encrypted files with compressed document catalogs, so we disable them in that
             // case as well.
-            if (m->obj[m->root_og].object_stream > 0) {
-                QTC::TC("qpdf", "QPDFWriter uncompressing root");
-                m->obj[m->root_og].object_stream = 0;
+            if (obj[root_og].object_stream > 0) {
+                obj[root_og].object_stream = 0;
             }
         }
 
         // Generate reverse mapping from object stream to objects
-        m->obj.forEach([this](auto id, auto const& item) -> void {
+        obj.forEach([this](auto id, auto const& item) -> void {
             if (item.object_stream > 0) {
-                auto& vec = m->object_stream_to_objects[item.object_stream];
+                auto& vec = object_stream_to_objects[item.object_stream];
                 vec.emplace_back(id, item.gen);
-                if (m->max_ostream_index < vec.size()) {
-                    ++m->max_ostream_index;
+                if (max_ostream_index < vec.size()) {
+                    ++max_ostream_index;
                 }
             }
         });
-        --m->max_ostream_index;
+        --max_ostream_index;
 
-        if (m->object_stream_to_objects.empty()) {
-            m->obj.streams_empty = true;
+        if (object_stream_to_objects.empty()) {
+            obj.streams_empty = true;
         } else {
-            setMinimumPDFVersion("1.5");
+            w.setMinimumPDFVersion("1.5");
         }
     }
 
-    setMinimumPDFVersion(m->pdf.getPDFVersion(), m->pdf.getExtensionLevel());
-    m->final_pdf_version = m->min_pdf_version;
-    m->final_extension_level = m->min_extension_level;
-    if (!m->forced_pdf_version.empty()) {
-        QTC::TC("qpdf", "QPDFWriter using forced PDF version");
-        m->final_pdf_version = m->forced_pdf_version;
-        m->final_extension_level = m->forced_extension_level;
+    setMinimumPDFVersion(pdf.getPDFVersion(), pdf.getExtensionLevel());
+    final_pdf_version = min_pdf_version;
+    final_extension_level = min_extension_level;
+    if (!forced_pdf_version.empty()) {
+        final_pdf_version = forced_pdf_version;
+        final_extension_level = forced_extension_level;
     }
 }
 
 void
 QPDFWriter::write()
 {
-    doWriteSetup();
+    m->doWriteSetup();
 
     // Set up progress reporting. For linearized files, we write two passes. events_expected is an
     // approximation, but it's good enough for progress reporting, which is mostly a guess anyway.
@@ -2372,7 +2371,7 @@ QPDFWriter::writeEncryptionDictionary()
 std::string
 QPDFWriter::getFinalVersion()
 {
-    doWriteSetup();
+    m->doWriteSetup();
     return m->final_pdf_version;
 }
 

@@ -491,9 +491,6 @@ class QPDFWriter
         size_t stream_length = 0,
         bool compress = false);
     void unparseChild(QPDFObjectHandle const& child, size_t level, int flags);
-    void initializeSpecialStreams();
-    void preserveObjectStreams();
-    void generateObjectStreams();
     void interpretR3EncryptionParameters(
         bool allow_accessibility,
         bool allow_extract,
@@ -517,8 +514,6 @@ class QPDFWriter
     void writeLinearized();
     void enqueuePart(std::vector<QPDFObjectHandle>& part);
     void writeEncryptionDictionary();
-    void initializeTables(size_t extra = 0);
-    void doWriteSetup();
     void writeHeader();
     void writeHintStream(int hint_id);
     qpdf_offset_t writeXRefTable(trailer_e which, int first, int last, int size);

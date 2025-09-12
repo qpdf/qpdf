@@ -81,11 +81,8 @@ QPDF xref deleted object 0
 SF_FlateLzwDecode PNG filter 0
 QPDF xref /Index is array 1
 QPDFWriter encrypt object stream 0
-QPDFWriter uncompressing page dictionary 0
-QPDFWriter uncompressing root 0
 QPDFWriter compressing uncompressed stream 0
 QPDF exclude indirect length 0
-QPDFWriter generate >1 ostream 0
 QPDF exclude encryption dictionary 0
 QPDF loop detected traversing objects 0
 QPDF reconstructed xref table 0
@@ -133,7 +130,6 @@ qpdf-c called qpdf_allow_modify_annotation 0
 qpdf-c called qpdf_allow_modify_other 0
 qpdf-c called qpdf_allow_modify_all 0
 QPDFWriter increasing minimum version 1
-QPDFWriter using forced PDF version 0
 qpdf-c called qpdf_set_minimum_pdf_version 0
 qpdf-c called qpdf_force_pdf_version 0
 qpdf-c called qpdf_init_write multiple times 0
@@ -476,8 +472,6 @@ QPDFAcroFormDocumentHelper AP parse error 1
 QPDFJob copy fields not this file 0
 QPDFJob copy fields non-first from orig 0
 QPDF resolve duplicated page in insert 0
-QPDFWriter preserve object streams 0
-QPDFWriter preserve object streams preserve unreferenced 0
 QPDFWriter exclude from object stream 0
 QPDF_pages findPage not found 0
 QPDFJob weak crypto error 0
