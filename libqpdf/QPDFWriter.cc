@@ -265,7 +265,8 @@ class QPDFWriter::Members
     friend class QPDFWriter;
 
   public:
-    Members(QPDF& pdf) :
+    Members(QPDFWriter& w, QPDF& pdf) :
+        w(w),
         pdf(pdf),
         root_og(
             pdf.getRoot().getObjGen().isIndirect() ? pdf.getRoot().getObjGen() : QPDFObjGen(-1, 0)),
@@ -284,6 +285,7 @@ class QPDFWriter::Members
     }
 
   private:
+    QPDFWriter& w;
     QPDF& pdf;
     QPDFObjGen root_og{-1, 0};
     char const* filename{"unspecified"};
@@ -355,18 +357,18 @@ class QPDFWriter::Members
 };
 
 QPDFWriter::QPDFWriter(QPDF& pdf) :
-    m(std::make_shared<Members>(pdf))
+    m(std::make_shared<Members>(*this, pdf))
 {
 }
 
 QPDFWriter::QPDFWriter(QPDF& pdf, char const* filename) :
-    m(std::make_shared<Members>(pdf))
+    m(std::make_shared<Members>(*this, pdf))
 {
     setOutputFilename(filename);
 }
 
 QPDFWriter::QPDFWriter(QPDF& pdf, char const* description, FILE* file, bool close_file) :
-    m(std::make_shared<Members>(pdf))
+    m(std::make_shared<Members>(*this, pdf))
 {
     setOutputFile(description, file, close_file);
 }
