@@ -469,16 +469,6 @@ class QPDFWriter
         qpdf_r3_modify_e modify);
     void setEncryptionParameters(char const* user_password, char const* owner_password);
     void setEncryptionMinimumVersion();
-    void setDataKey(int objid);
-    void indicateProgress(bool decrement, bool finished);
-    size_t calculateXrefStreamPadding(qpdf_offset_t xref_bytes);
-
-    // When filtering subsections, push additional pipelines to the stack. When ready to switch,
-    // activate the pipeline stack. When the passed in PipelinePopper goes out of scope, the stack
-    // is popped.
-
-    void adjustAESStreamLength(size_t& length);
-    void computeDeterministicIDData();
 
     class Members;
 

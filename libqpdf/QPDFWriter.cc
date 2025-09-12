@@ -380,6 +380,13 @@ class QPDFWriter::Members
         bool skip_compression,
         int linearization_pass);
 
+    void setDataKey(int objid);
+    void indicateProgress(bool decrement, bool finished);
+    size_t calculateXrefStreamPadding(qpdf_offset_t xref_bytes);
+
+    void adjustAESStreamLength(size_t& length);
+    void computeDeterministicIDData();
+
   private:
     QPDFWriter& w;
     QPDF& pdf;
@@ -1102,16 +1109,11 @@ QPDFWriter::setEncryptionMinimumVersion()
 }
 
 void
-QPDFWriter::setDataKey(int objid)
+QPDFWriter::Members::setDataKey(int objid)
 {
-    if (m->encryption) {
-        m->cur_data_key = QPDF::compute_data_key(
-            m->encryption_key,
-            objid,
-            0,
-            m->encrypt_use_aes,
-            m->encryption->getV(),
-            m->encryption->getR());
+    if (encryption) {
+        cur_data_key = QPDF::compute_data_key(
+            encryption_key, objid, 0, encrypt_use_aes, encryption->getV(), encryption->getR());
     }
 }
 
@@ -1196,9 +1198,9 @@ QPDFWriter::Members::write_no_qdf(Args&&... args)
 }
 
 void
-QPDFWriter::adjustAESStreamLength(size_t& length)
+QPDFWriter::Members::adjustAESStreamLength(size_t& length)
 {
-    if (m->encryption && !m->cur_data_key.empty() && m->encrypt_use_aes) {
+    if (encryption && !cur_data_key.empty() && encrypt_use_aes) {
         // Stream length will be padded with 1 to 16 bytes to end up as a multiple of 16.  It will
         // also be prepended by 16 bits of random data.
         length += 32 - (length & 0xf);
@@ -1220,15 +1222,15 @@ QPDFWriter::Members::write_encrypted(std::string_view str)
 }
 
 void
-QPDFWriter::computeDeterministicIDData()
+QPDFWriter::Members::computeDeterministicIDData()
 {
-    if (!m->id2.empty()) {
+    if (!id2.empty()) {
         // Can't happen in the code
         throw std::logic_error(
             "Deterministic ID computation enabled after ID generation has already occurred.");
     }
-    qpdf_assert_debug(m->deterministic_id_data.empty());
-    m->deterministic_id_data = m->pipeline_stack.hex_digest();
+    qpdf_assert_debug(deterministic_id_data.empty());
+    deterministic_id_data = pipeline_stack.hex_digest();
 }
 
 int
@@ -1399,7 +1401,7 @@ QPDFWriter::Members::writeTrailer(
         write("<00000000000000000000000000000000>");
     } else {
         if (linearization_pass == 0 && deterministic_id) {
-            w.computeDeterministicIDData();
+            computeDeterministicIDData();
         }
         generateID(encryption.get());
         write_string(id1, true).write_string(id2, true);
@@ -1715,7 +1717,7 @@ QPDFWriter::Members::unparseObject(
             // Don't encrypt stream data for the metadata stream
             cur_data_key.clear();
         }
-        w.adjustAESStreamLength(cur_stream_length);
+        adjustAESStreamLength(cur_stream_length);
         unparseObject(stream_dict, 0, flags, cur_stream_length, compress_stream);
         char last_char = stream_data.empty() ? '\0' : stream_data.back();
         write("\nstream\n").write_encrypted(stream_data);
@@ -1821,7 +1823,7 @@ QPDFWriter::Members::writeObjectStream(QPDFObjectHandle object)
             offsets.push_back(pipeline->getCount());
             // To avoid double-counting objects being written in object streams for progress
             // reporting, decrement in pass 1.
-            w.indicateProgress(true, false);
+            indicateProgress(true, false);
 
             QPDFObjectHandle obj_to_write = pdf.getObject(og);
             if (obj_to_write.isStream()) {
@@ -1863,10 +1865,10 @@ QPDFWriter::Members::writeObjectStream(QPDFObjectHandle object)
 
     // Write the object
     openObject(new_stream_id);
-    w.setDataKey(new_stream_id);
+    setDataKey(new_stream_id);
     write("<<").write_qdf("\n ").write(" /Type /ObjStm").write_qdf("\n ");
     size_t length = stream_buffer_pass2.size();
-    w.adjustAESStreamLength(length);
+    adjustAESStreamLength(length);
     write(" /Length ").write(length).write_qdf("\n ");
     if (compressed) {
         write(" /Filter /FlateDecode");
@@ -1901,7 +1903,7 @@ QPDFWriter::Members::writeObject(QPDFObjectHandle object, int object_stream_inde
         return;
     }
 
-    w.indicateProgress(false, false);
+    indicateProgress(false, false);
     auto new_id = obj[old_og].renumber;
     if (qdf_mode) {
         if (page_object_to_seq.contains(old_og)) {
@@ -1916,7 +1918,7 @@ QPDFWriter::Members::writeObject(QPDFObjectHandle object, int object_stream_inde
             write("%% Original object ID: ").write(object.getObjGen().unparse(' ')).write("\n");
         }
         openObject(new_id);
-        w.setDataKey(new_id);
+        setDataKey(new_id);
         unparseObject(object, 0, 0);
         cur_data_key.clear();
         closeObject(new_id);
@@ -2367,7 +2369,7 @@ QPDFWriter::write()
         m->output_buffer = m->buffer_pipeline->getBuffer();
         m->buffer_pipeline = nullptr;
     }
-    indicateProgress(false, true);
+    m->indicateProgress(false, true);
 }
 
 QPDFObjGen
@@ -2475,7 +2477,7 @@ QPDFWriter::Members::writeHintStream(int hint_id)
     QPDF::Writer::generateHintStream(pdf, new_obj, obj, hint_buffer, S, O, compressed);
 
     openObject(hint_id);
-    w.setDataKey(hint_id);
+    setDataKey(hint_id);
 
     size_t hlen = hint_buffer.size();
 
@@ -2487,7 +2489,7 @@ QPDFWriter::Members::writeHintStream(int hint_id)
     if (O) {
         write(" /O ").write(O);
     }
-    w.adjustAESStreamLength(hlen);
+    adjustAESStreamLength(hlen);
     write(" /Length ").write(hlen);
     write(" >>\nstream\n").write_encrypted(hint_buffer);
 
@@ -2649,7 +2651,7 @@ QPDFWriter::Members::writeXRefStream(
 }
 
 size_t
-QPDFWriter::calculateXrefStreamPadding(qpdf_offset_t xref_bytes)
+QPDFWriter::Members::calculateXrefStreamPadding(qpdf_offset_t xref_bytes)
 {
     // This routine is called right after a linearization first pass xref stream has been written
     // without compression.  Calculate the amount of padding that would be required in the worst
@@ -2876,7 +2878,7 @@ QPDFWriter::Members::writeLinearized()
             qpdf_offset_t endpos = pipeline->getCount();
             if (pass == 1) {
                 // Pad so we have enough room for the real xref stream.
-                write(w.calculateXrefStreamPadding(endpos - pos), ' ');
+                write(calculateXrefStreamPadding(endpos - pos), ' ');
                 first_xref_end = pipeline->getCount();
             } else {
                 // Pad so that the next object starts at the same place as in pass 1.
@@ -2953,7 +2955,7 @@ QPDFWriter::Members::writeLinearized()
             if (pass == 1) {
                 // Pad so we have enough room for the real xref stream.  See comments for previous
                 // xref stream on how we calculate the padding.
-                write(w.calculateXrefStreamPadding(endpos - pos), ' ').write("\n");
+                write(calculateXrefStreamPadding(endpos - pos), ' ').write("\n");
                 second_xref_end = pipeline->getCount();
             } else {
                 // Make the file size the same.
@@ -2976,7 +2978,7 @@ QPDFWriter::Members::writeLinearized()
         if (pass == 1) {
             if (deterministic_id) {
                 QTC::TC("qpdf", "QPDFWriter linearized deterministic ID", need_xref_stream ? 0 : 1);
-                w.computeDeterministicIDData();
+                computeDeterministicIDData();
                 pp_md5.pop();
             }
 
@@ -3070,30 +3072,30 @@ QPDFWriter::Members::enqueueObjectsPCLm()
 }
 
 void
-QPDFWriter::indicateProgress(bool decrement, bool finished)
+QPDFWriter::Members::indicateProgress(bool decrement, bool finished)
 {
     if (decrement) {
-        --m->events_seen;
+        --events_seen;
         return;
     }
 
-    ++m->events_seen;
+    ++events_seen;
 
-    if (!m->progress_reporter.get()) {
+    if (!progress_reporter.get()) {
         return;
     }
 
-    if (finished || (m->events_seen >= m->next_progress_report)) {
+    if (finished || events_seen >= next_progress_report) {
         int percentage =
             (finished ? 100
-                 : m->next_progress_report == 0
+                 : next_progress_report == 0
                  ? 0
-                 : std::min(99, 1 + ((100 * m->events_seen) / m->events_expected)));
-        m->progress_reporter->reportProgress(percentage);
+                 : std::min(99, 1 + ((100 * events_seen) / events_expected)));
+        progress_reporter->reportProgress(percentage);
     }
-    int increment = std::max(1, (m->events_expected / 100));
-    while (m->events_seen >= m->next_progress_report) {
-        m->next_progress_report += increment;
+    int increment = std::max(1, (events_expected / 100));
+    while (events_seen >= next_progress_report) {
+        next_progress_report += increment;
     }
 }
 
