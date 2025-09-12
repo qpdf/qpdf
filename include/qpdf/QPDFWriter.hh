@@ -458,32 +458,6 @@ class QPDFWriter
 
     enum trailer_e { t_normal, t_lin_first, t_lin_second };
 
-    unsigned int bytesNeeded(long long n);
-    void writeBinary(unsigned long long val, unsigned int bytes);
-    QPDFWriter& write(std::string_view str);
-    QPDFWriter& write(size_t count, char c);
-    QPDFWriter& write(std::integral auto val);
-    QPDFWriter& write_name(std::string const& str);
-    QPDFWriter& write_string(std::string const& str, bool force_binary = false);
-    QPDFWriter& write_encrypted(std::string_view str);
-
-    template <typename... Args>
-    QPDFWriter& write_qdf(Args&&... args);
-    template <typename... Args>
-    QPDFWriter& write_no_qdf(Args&&... args);
-    void writeObjectStreamOffsets(std::vector<qpdf_offset_t>& offsets, int first_obj);
-    void writeObjectStream(QPDFObjectHandle object);
-    void writeObject(QPDFObjectHandle object, int object_stream_index = -1);
-    void writeTrailer(
-        trailer_e which, int size, bool xref_stream, qpdf_offset_t prev, int linearization_pass);
-    void unparseObject(
-        QPDFObjectHandle object,
-        size_t level,
-        int flags,
-        // for stream dictionaries
-        size_t stream_length = 0,
-        bool compress = false);
-    void unparseChild(QPDFObjectHandle const& child, size_t level, int flags);
     void interpretR3EncryptionParameters(
         bool allow_accessibility,
         bool allow_extract,
@@ -496,50 +470,7 @@ class QPDFWriter
     void setEncryptionParameters(char const* user_password, char const* owner_password);
     void setEncryptionMinimumVersion();
     void setDataKey(int objid);
-    int openObject(int objid = 0);
-    void closeObject(int objid);
     void indicateProgress(bool decrement, bool finished);
-    void writeStandard();
-    void writeLinearized();
-    void writeEncryptionDictionary();
-    void writeHeader();
-    void writeHintStream(int hint_id);
-    qpdf_offset_t writeXRefTable(trailer_e which, int first, int last, int size);
-    qpdf_offset_t writeXRefTable(
-        trailer_e which,
-        int first,
-        int last,
-        int size,
-        // for linearization
-        qpdf_offset_t prev,
-        bool suppress_offsets,
-        int hint_id,
-        qpdf_offset_t hint_offset,
-        qpdf_offset_t hint_length,
-        int linearization_pass);
-    qpdf_offset_t writeXRefStream(
-        int objid,
-        int max_id,
-        qpdf_offset_t max_offset,
-        trailer_e which,
-        int first,
-        int last,
-        int size);
-    qpdf_offset_t writeXRefStream(
-        int objid,
-        int max_id,
-        qpdf_offset_t max_offset,
-        trailer_e which,
-        int first,
-        int last,
-        int size,
-        // for linearization
-        qpdf_offset_t prev,
-        int hint_id,
-        qpdf_offset_t hint_offset,
-        qpdf_offset_t hint_length,
-        bool skip_compression,
-        int linearization_pass);
     size_t calculateXrefStreamPadding(qpdf_offset_t xref_bytes);
 
     // When filtering subsections, push additional pipelines to the stack. When ready to switch,

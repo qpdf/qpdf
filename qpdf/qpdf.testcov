@@ -198,9 +198,7 @@ QPDFWriter make Extensions direct 0
 QPDFWriter make ADBE direct 1
 QPDFWriter preserve Extensions 0
 QPDFWriter create Extensions 1
-QPDFWriter remove ADBE 0
 QPDFWriter remove existing Extensions 0
-QPDFWriter preserve ADBE 0
 QPDF_encryption skip 0x28 0
 qpdf-c called qpdf_get_pdf_extension_level 0
 qpdf-c called qpdf_set_r5_encryption_parameters 0
@@ -208,7 +206,6 @@ qpdf-c called qpdf_set_r6_encryption_parameters 0
 QPDFObjectHandle EOF in inline image 0
 QPDFObjectHandle inline image token 0
 QPDF not caching overridden objstm object 0
-QPDFWriter original obj non-zero gen 0
 QPDF_optimization indirect outlines 0
 QPDF xref space 2
 QPDFJob pages range omitted in middle 0
