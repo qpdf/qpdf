@@ -285,10 +285,13 @@ class QPDFWriter::Members
     }
 
     void setMinimumPDFVersion(std::string const& version, int extension_level);
+    void copyEncryptionParameters(QPDF&);
 
     void disableIncompatibleEncryption(int major, int minor, int extension_level);
     void parseVersion(std::string const& version, int& major, int& minor) const;
     int compareVersions(int major1, int minor1, int major2, int minor2) const;
+    void generateID(bool encrypted);
+    std::string getOriginalID1();
 
   private:
     QPDFWriter& w;
@@ -867,7 +870,7 @@ QPDFWriter::interpretR3EncryptionParameters(
 void
 QPDFWriter::setEncryptionParameters(char const* user_password, char const* owner_password)
 {
-    generateID(true);
+    m->generateID(true);
     m->encryption->setId1(m->id1);
     m->encryption_key = m->encryption->compute_parameters(user_password, owner_password);
     setEncryptionMinimumVersion();
@@ -876,11 +879,17 @@ QPDFWriter::setEncryptionParameters(char const* user_password, char const* owner
 void
 QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
 {
-    m->preserve_encryption = false;
+    m->copyEncryptionParameters(qpdf);
+}
+
+void
+QPDFWriter::Members::copyEncryptionParameters(QPDF& qpdf)
+{
+    preserve_encryption = false;
     QPDFObjectHandle trailer = qpdf.getTrailer();
     if (trailer.hasKey("/Encrypt")) {
         generateID(true);
-        m->id1 = trailer.getKey("/ID").getArrayItem(0).getStringValue();
+        id1 = trailer.getKey("/ID").getArrayItem(0).getStringValue();
         QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
         int V = encrypt.getKey("/V").getIntValueAsInt();
         int key_len = 5;
@@ -896,12 +905,12 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
             // Acrobat doesn't create files with V >= 4 that don't use AES, and the logic of
             // figuring out whether AES is used or not is complicated with /StmF, /StrF, and /EFF
             // all potentially having different values.
-            m->encrypt_use_aes = true;
+            encrypt_use_aes = true;
         }
         QTC::TC("qpdf", "QPDFWriter copy encrypt metadata", encrypt_metadata ? 0 : 1);
-        QTC::TC("qpdf", "QPDFWriter copy use_aes", m->encrypt_use_aes ? 0 : 1);
+        QTC::TC("qpdf", "QPDFWriter copy use_aes", encrypt_use_aes ? 0 : 1);
 
-        m->encryption = std::make_unique<QPDF::EncryptionData>(
+        encryption = std::make_unique<QPDF::EncryptionData>(
             V,
             encrypt.getKey("/R").getIntValueAsInt(),
             key_len,
@@ -911,12 +920,11 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
             V < 5 ? "" : encrypt.getKey("/OE").getStringValue(),
             V < 5 ? "" : encrypt.getKey("/UE").getStringValue(),
             V < 5 ? "" : encrypt.getKey("/Perms").getStringValue(),
-            m->id1, // m->id1 == the other file's id1
+            id1, // id1 == the other file's id1
             encrypt_metadata);
-        m->encryption_key = V >= 5
-            ? qpdf.getEncryptionKey()
-            : m->encryption->compute_encryption_key(qpdf.getPaddedUserPassword());
-        setEncryptionMinimumVersion();
+        encryption_key = V >= 5 ? qpdf.getEncryptionKey()
+                                : encryption->compute_encryption_key(qpdf.getPaddedUserPassword());
+        w.setEncryptionMinimumVersion();
     }
 }
 
@@ -1292,7 +1300,7 @@ QPDFWriter::writeTrailer(
     // Write ID
     write_qdf(" ").write(" /ID [");
     if (linearization_pass == 1) {
-        std::string original_id1 = getOriginalID1();
+        std::string original_id1 = m->getOriginalID1();
         if (original_id1.empty()) {
             write("<00000000000000000000000000000000>");
         } else {
@@ -1308,7 +1316,7 @@ QPDFWriter::writeTrailer(
         if (linearization_pass == 0 && m->deterministic_id) {
             computeDeterministicIDData();
         }
-        generateID(m->encryption.get());
+        m->generateID(m->encryption.get());
         write_string(m->id1, true).write_string(m->id2, true);
     }
     write("]");
@@ -1855,9 +1863,9 @@ QPDFWriter::writeObject(QPDFObjectHandle object, int object_stream_index)
 }
 
 std::string
-QPDFWriter::getOriginalID1()
+QPDFWriter::Members::getOriginalID1()
 {
-    QPDFObjectHandle trailer = m->pdf.getTrailer();
+    QPDFObjectHandle trailer = pdf.getTrailer();
     if (trailer.hasKey("/ID")) {
         return trailer.getKey("/ID").getArrayItem(0).getStringValue();
     } else {
@@ -1866,20 +1874,20 @@ QPDFWriter::getOriginalID1()
 }
 
 void
-QPDFWriter::generateID(bool encrypted)
+QPDFWriter::Members::generateID(bool encrypted)
 {
     // Generate the ID lazily so that we can handle the user's preference to use static or
     // deterministic ID generation.
 
-    if (!m->id2.empty()) {
+    if (!id2.empty()) {
         return;
     }
 
-    QPDFObjectHandle trailer = m->pdf.getTrailer();
+    QPDFObjectHandle trailer = pdf.getTrailer();
 
     std::string result;
 
-    if (m->static_id) {
+    if (static_id) {
         // For test suite use only...
         static unsigned char tmp[] = {
             0x31,
@@ -1911,20 +1919,20 @@ QPDFWriter::generateID(bool encrypted)
         // that case, would have the same ID regardless of the output file's name.
 
         std::string seed;
-        if (m->deterministic_id) {
+        if (deterministic_id) {
             if (encrypted) {
                 throw std::runtime_error(
                     "QPDFWriter: unable to generated a deterministic ID because the file to be "
                     "written is encrypted (even though the file may not require a password)");
             }
-            if (m->deterministic_id_data.empty()) {
+            if (deterministic_id_data.empty()) {
                 throw std::logic_error(
                     "INTERNAL ERROR: QPDFWriter::generateID has no data for deterministic ID");
             }
-            seed += m->deterministic_id_data;
+            seed += deterministic_id_data;
         } else {
             seed += std::to_string(QUtil::get_current_time());
-            seed += m->filename;
+            seed += filename;
             seed += " ";
         }
         seed += " QPDF ";
@@ -1937,21 +1945,21 @@ QPDFWriter::generateID(bool encrypted)
             }
         }
 
-        MD5 m;
-        m.encodeString(seed.c_str());
+        MD5 md5;
+        md5.encodeString(seed.c_str());
         MD5::Digest digest;
-        m.digest(digest);
+        md5.digest(digest);
         result = std::string(reinterpret_cast<char*>(digest), sizeof(MD5::Digest));
     }
 
     // If /ID already exists, follow the spec: use the original first word and generate a new second
     // word.  Otherwise, we'll use the generated ID for both.
 
-    m->id2 = result;
+    id2 = result;
     // Note: keep /ID from old file even if --static-id was given.
-    m->id1 = getOriginalID1();
-    if (m->id1.empty()) {
-        m->id1 = m->id2;
+    id1 = getOriginalID1();
+    if (id1.empty()) {
+        id1 = id2;
     }
 }
 
