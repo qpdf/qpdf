@@ -40,8 +40,6 @@ main QTest array indirect 1
 main QTest dictionary 0
 main QTest dictionary indirect 1
 main QTest stream 0
-QPDFWriter write to stdout 0
-QPDFWriter write to file 0
 QPDF lin write nshared_total > nshared_first_page 1
 QPDFWriter encrypted hint stream 0
 QPDF opt inherited scalar 0
@@ -83,11 +81,7 @@ QPDF xref deleted object 0
 SF_FlateLzwDecode PNG filter 0
 QPDF xref /Index is array 1
 QPDFWriter encrypt object stream 0
-QPDFWriter uncompressing page dictionary 0
-QPDFWriter uncompressing root 0
-QPDFWriter compressing uncompressed stream 0
 QPDF exclude indirect length 0
-QPDFWriter generate >1 ostream 0
 QPDF exclude encryption dictionary 0
 QPDF loop detected traversing objects 0
 QPDF reconstructed xref table 0
@@ -95,7 +89,6 @@ QPDF recovered in readObjectAtOffset 0
 QPDF recovered stream length 0
 QPDF found wrong endstream in recovery 0
 QPDF_Stream pipeStreamData with null pipeline 0
-QPDFWriter not recompressing /FlateDecode 0
 QPDFJob unable to filter 0
 QUtil non-trivial UTF-16 0
 QPDF xref overwrite invalid objgen 0
@@ -135,14 +128,11 @@ qpdf-c called qpdf_allow_modify_annotation 0
 qpdf-c called qpdf_allow_modify_other 0
 qpdf-c called qpdf_allow_modify_all 0
 QPDFWriter increasing minimum version 1
-QPDFWriter using forced PDF version 0
 qpdf-c called qpdf_set_minimum_pdf_version 0
 qpdf-c called qpdf_force_pdf_version 0
 qpdf-c called qpdf_init_write multiple times 0
 QPDF_encryption rc4 decode string 0
-QPDFWriter not compressing metadata 0
 QPDF_encryption aes decode string 0
-QPDFWriter forcing object stream disable 0
 QPDFWriter forced version disabled encryption 0
 qpdf-c called qpdf_set_r4_encryption_parameters_insecure 0
 qpdf-c called qpdf_set_static_aes_IV 0
@@ -195,7 +185,6 @@ QPDF replace dictionary 0
 QPDF replace stream 0
 QPDF replace foreign indirect with null 0
 QPDF insert foreign page 0
-QPDFWriter foreign object 0
 QPDFWriter copy use_aes 1
 QPDFParser indirect without context 0
 QPDFObjectHandle trailing data in parse 0
@@ -203,17 +192,13 @@ QPDFJob pages encryption password 0
 QPDFTokenizer EOF reading token 0
 QPDFTokenizer EOF reading appendable token 0
 QPDFWriter extra header text no newline 0
-QPDFWriter extra header text add newline 0
 QPDF bogus 0 offset 0
 QPDF global offset 0
-QPDFWriter increasing extension level 0
 QPDFWriter make Extensions direct 0
 QPDFWriter make ADBE direct 1
 QPDFWriter preserve Extensions 0
 QPDFWriter create Extensions 1
-QPDFWriter remove ADBE 0
 QPDFWriter remove existing Extensions 0
-QPDFWriter preserve ADBE 0
 QPDF_encryption skip 0x28 0
 qpdf-c called qpdf_get_pdf_extension_level 0
 qpdf-c called qpdf_set_r5_encryption_parameters 0
@@ -221,7 +206,6 @@ qpdf-c called qpdf_set_r6_encryption_parameters 0
 QPDFObjectHandle EOF in inline image 0
 QPDFObjectHandle inline image token 0
 QPDF not caching overridden objstm object 0
-QPDFWriter original obj non-zero gen 0
 QPDF_optimization indirect outlines 0
 QPDF xref space 2
 QPDFJob pages range omitted in middle 0
@@ -237,7 +221,6 @@ QPDFParser treat word as string in parseRemainder 0
 QPDFParser found fake 1
 QPDFParser no val for last key 0
 QPDF resolve failure to null 0
-QPDFWriter preserve unreferenced standard 0
 QPDFObjectHandle errors in parsecontent 0
 QPDFJob same file error 0
 QPDFJob split-pages %d 0
@@ -374,7 +357,6 @@ QPDF_encryption same password 1
 QPDFParser duplicate dict key 0
 QPDFWriter no encryption sig contents 0
 QPDFPageObjectHelper colorspace lookup 0
-QPDFWriter ignore XRef in qdf mode 0
 QPDFPageObjectHelper filter form xobject 0
 QPDFJob found resources in non-leaf 0
 QPDFJob found shared resources in leaf 0
@@ -463,7 +445,6 @@ qpdf-c called qpdf_oh_get_generation 0
 qpdf-c called qpdf_oh_unparse 0
 qpdf-c called qpdf_oh_unparse_resolved 0
 qpdf-c called qpdf_oh_unparse_binary 0
-QPDFWriter getFilterOnWrite false 0
 QPDFPageObjectHelper::forEachXObject 3
 NNTree erased last kid/item in tree 1
 QPDFPageObjectHelper unresolved names 0
@@ -481,8 +462,6 @@ QPDFAcroFormDocumentHelper AP parse error 1
 QPDFJob copy fields not this file 0
 QPDFJob copy fields non-first from orig 0
 QPDF resolve duplicated page in insert 0
-QPDFWriter preserve object streams 0
-QPDFWriter preserve object streams preserve unreferenced 0
 QPDFWriter exclude from object stream 0
 QPDF_pages findPage not found 0
 QPDFJob weak crypto error 0
