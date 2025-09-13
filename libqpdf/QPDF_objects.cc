@@ -298,7 +298,10 @@ QPDF::reconstruct_xref(QPDFExc& e, bool found_startxref)
     }
     m->deleted_objects.clear();
 
-    for (auto it = trailers.rbegin(); it != trailers.rend(); it++) {
+    // Search at most the last 100 trailer candidates. If none of them are valid, odds are this file
+    // is deliberately broken.
+    int end_index = trailers.size() > 100 ? static_cast<int>(trailers.size()) - 100 : 0;
+    for (auto it = trailers.rbegin(); it != std::prev(trailers.rend(), end_index); it++) {
         m->file->seek(*it, SEEK_SET);
         auto t = readTrailer();
         if (!t.isDictionary()) {
