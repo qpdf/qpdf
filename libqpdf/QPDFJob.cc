@@ -1884,25 +1884,22 @@ QPDFJob::processInputSource(
 void
 QPDFJob::validateUnderOverlay(QPDF& pdf, UnderOverlay* uo)
 {
-    auto& main_pdh = pdf.pages();
-    int main_npages = QIntC::to_int(main_pdh.getAllPages().size());
     processFile(uo->pdf, uo->filename.data(), uo->password.data(), true, false);
-    QPDFPageDocumentHelper uo_pdh(*(uo->pdf));
-    int uo_npages = QIntC::to_int(uo_pdh.getAllPages().size());
     try {
-        uo->to_pagenos = QUtil::parse_numrange(uo->to_nr.c_str(), main_npages);
+        uo->to_pagenos =
+            QUtil::parse_numrange(uo->to_nr.data(), static_cast<int>(pdf.getAllPages().size()));
     } catch (std::runtime_error& e) {
         throw std::runtime_error(
             "parsing numeric range for " + uo->which + " \"to\" pages: " + e.what());
     }
     try {
         if (uo->from_nr.empty()) {
-            QTC::TC("qpdf", "QPDFJob from_nr from repeat_nr");
             uo->from_nr = uo->repeat_nr;
         }
-        uo->from_pagenos = QUtil::parse_numrange(uo->from_nr.c_str(), uo_npages);
+        int uo_npages = static_cast<int>(uo->pdf->getAllPages().size());
+        uo->from_pagenos = QUtil::parse_numrange(uo->from_nr.data(), uo_npages);
         if (!uo->repeat_nr.empty()) {
-            uo->repeat_pagenos = QUtil::parse_numrange(uo->repeat_nr.c_str(), uo_npages);
+            uo->repeat_pagenos = QUtil::parse_numrange(uo->repeat_nr.data(), uo_npages);
         }
     } catch (std::runtime_error& e) {
         throw std::runtime_error(
