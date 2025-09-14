@@ -425,6 +425,7 @@ class QPDFJob
     [[deprecated("use job_json_schema(version)")]] static std::string QPDF_DLL job_json_schema_v1();
 
   private:
+    struct PageNo;
     struct RotationSpec;
     struct UnderOverlay;
     struct PageLabelSpec;
