@@ -978,7 +978,7 @@ QPDFJob::PagesConfig::PagesConfig(Config* c) :
 std::shared_ptr<QPDFJob::PagesConfig>
 QPDFJob::Config::pages()
 {
-    if (!o.m->page_specs.empty()) {
+    if (!o.m->selections.empty()) {
         usage("--pages may only be specified one time");
     }
     return std::shared_ptr<PagesConfig>(new PagesConfig(this));
@@ -987,7 +987,7 @@ QPDFJob::Config::pages()
 QPDFJob::Config*
 QPDFJob::PagesConfig::endPages()
 {
-    auto n_specs = config->o.m->page_specs.size();
+    auto n_specs = config->o.m->selections.size();
     if (n_specs == 0) {
         usage("--pages: no page specifications given");
     }
@@ -998,27 +998,25 @@ QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::pageSpec(
     std::string const& filename, std::string const& range, char const* password)
 {
-    config->o.m->page_specs.emplace_back(filename, password, range);
+    config->o.new_selection(filename, {password ? password : ""}, range);
     return this;
 }
 
 QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::file(std::string const& arg)
 {
-    config->o.m->page_specs.emplace_back(arg, "", "");
+    config->o.new_selection(arg, {}, {});
     return this;
 }
 
 QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::range(std::string const& arg)
 {
-    if (config->o.m->page_specs.empty()) {
-        QTC::TC("qpdf", "QPDFJob misplaced page range");
+    if (config->o.m->selections.empty()) {
         usage("in --range must follow a file name");
     }
-    auto& last = config->o.m->page_specs.back();
+    auto& last = config->o.m->selections.back();
     if (!last.range.empty()) {
-        QTC::TC("qpdf", "QPDFJob duplicated range");
         usage("--range already specified for this file");
     }
     last.range = arg;
@@ -1028,13 +1026,11 @@ QPDFJob::PagesConfig::range(std::string const& arg)
 QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::password(std::string const& arg)
 {
-    if (config->o.m->page_specs.empty()) {
-        QTC::TC("qpdf", "QPDFJob misplaced pages password");
+    if (config->o.m->selections.empty()) {
         usage("in --pages, --password must follow a file name");
     }
-    auto& last = config->o.m->page_specs.back();
+    auto& last = config->o.m->selections.back();
     if (!last.password.empty()) {
-        QTC::TC("qpdf", "QPDFJob duplicated pages password");
         usage("--password already specified for this file");
     }
     last.password = arg;

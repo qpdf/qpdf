@@ -6,6 +6,22 @@
 #include <qpdf/ClosedFileInputSource.hh>
 #include <qpdf/QPDFLogger.hh>
 
+// A selection of pages from a single input PDF to be included in the output. This corresponds to a
+// single clause in the --pages option.
+struct QPDFJob::Selection
+{
+    Selection(std::string const& filename, std::string const& password, std::string const& range) :
+        filename(filename),
+        password(password),
+        range(range)
+    {
+    }
+
+    std::string filename;
+    std::string password;
+    std::string range;
+};
+
 struct QPDFJob::RotationSpec
 {
     RotationSpec(int angle = 0, bool relative = false) :
@@ -195,7 +211,7 @@ class QPDFJob::Members
     std::vector<UnderOverlay> underlay;
     std::vector<UnderOverlay> overlay;
     UnderOverlay* under_overlay{nullptr};
-    std::vector<PageSpec> page_specs;
+    std::vector<Selection> selections;
     std::map<std::string, RotationSpec> rotations;
     bool require_outfile{true};
     bool replace_input{false};

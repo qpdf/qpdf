@@ -156,16 +156,6 @@ class QPDFJob
         bool replace{false};
     };
 
-    struct PageSpec
-    {
-        PageSpec(
-            std::string const& filename, std::string const& password, std::string const& range);
-
-        std::string filename;
-        std::string password;
-        std::string range;
-    };
-
   public:
     // CONFIGURATION
 
@@ -426,6 +416,7 @@ class QPDFJob
 
   private:
     struct PageNo;
+    struct Selection;
     struct RotationSpec;
     struct UnderOverlay;
     struct PageLabelSpec;
@@ -470,6 +461,8 @@ class QPDFJob
     void setQPDFOptions(QPDF& pdf);
     bool handlePageSpecs(QPDF& pdf);
     bool shouldRemoveUnreferencedResources(QPDF& pdf);
+    void new_selection(
+        std::string const& filename, std::string const& password, std::string const& range);
     void handleRotations(QPDF& pdf);
     void getUOPagenos(
         std::vector<UnderOverlay>& uo, std::vector<std::map<size_t, std::vector<int>>>& pagenos);
