@@ -1995,6 +1995,8 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         validateUnderOverlay(pdf, &uo);
     }
 
+    auto const& main_pages = pdf.getAllPages();
+
     // First map key is 1-based page number. Second is index into the overlay/underlay vector. Watch
     // out to not reverse the keys or be off by one.
     std::map<int, std::map<size_t, std::vector<int>>> underlay_pagenos;
@@ -2020,29 +2022,27 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
 
     std::map<int, std::map<size_t, QPDFObjectHandle>> underlay_fo;
     std::map<int, std::map<size_t, QPDFObjectHandle>> overlay_fo;
-    QPDFPageDocumentHelper main_pdh(pdf);
-    auto main_pages = main_pdh.getAllPages();
-    size_t main_npages = main_pages.size();
-    for (PageNo page; page.idx < main_npages; ++page) {
-        doIfVerbose(
-            [&](Pipeline& v, std::string const& prefix) { v << "  page " << page.no << "\n"; });
-        if (underlay_pagenos[page.no].empty() && overlay_pagenos[page.no].empty()) {
+    PageNo dest_page_no;
+    for (QPDFPageObjectHelper dest_page: main_pages) {
+        doIfVerbose([&](Pipeline& v, std::string const& prefix) {
+            v << "  page " << dest_page_no.no << "\n";
+        });
+        if (underlay_pagenos[dest_page_no.no].empty() && overlay_pagenos[dest_page_no.no].empty()) {
+            ++dest_page_no;
             continue;
         }
         // This code converts the original page, any underlays, and any overlays to form XObjects.
         // Then it concatenates display of all underlays, the original page, and all overlays. Prior
         // to 11.3.0, the original page contents were wrapped in q/Q, but this didn't work if the
         // original page had unbalanced q/Q operators. See GitHub issue #904.
-        auto& dest_page = main_pages.at(page.idx);
-        auto dest_page_oh = dest_page.getObjectHandle();
         auto this_page_fo = dest_page.getFormXObjectForPage();
         // The resulting form xobject lazily reads the content from the original page, which we are
         // going to replace. Therefore, we have to explicitly copy it.
         auto content_data = this_page_fo.getRawStreamData();
         this_page_fo.replaceStreamData(content_data, QPDFObjectHandle(), QPDFObjectHandle());
-        auto resources =
-            dest_page_oh.replaceKeyAndGetNew("/Resources", "<< /XObject << >> >>"_qpdf);
-        resources.getKey("/XObject").replaceKeyAndGetNew("/Fx0", this_page_fo);
+        auto resources = dest_page.getObjectHandle().replaceKeyAndGetNew(
+            "/Resources", Dictionary({{"/XObject", Dictionary({{"/Fx0", this_page_fo}})}}));
+
         size_t uo_idx{0};
         std::string content;
         for (auto& underlay: m->underlay) {
@@ -2050,7 +2050,7 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
                 pdf,
                 underlay,
                 underlay_pagenos,
-                page.idx,
+                dest_page_no.idx,
                 uo_idx,
                 underlay_fo,
                 upages[uo_idx],
@@ -2070,14 +2070,15 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
                 pdf,
                 overlay,
                 overlay_pagenos,
-                page.idx,
+                dest_page_no.idx,
                 uo_idx,
                 overlay_fo,
                 opages[uo_idx],
                 dest_page);
             ++uo_idx;
         }
-        dest_page_oh.replaceKey("/Contents", pdf.newStream(content));
+        dest_page.getObjectHandle().replaceKey("/Contents", pdf.newStream(content));
+        ++dest_page_no;
     }
 }
 
