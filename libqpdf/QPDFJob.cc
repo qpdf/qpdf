@@ -58,17 +58,6 @@ namespace
         std::shared_ptr<Pl_DCT::CompressConfig> config;
     };
 
-    struct QPDFPageData
-    {
-        QPDFPageData(std::string const& filename, QPDF* qpdf, std::string const& range);
-        QPDFPageData(QPDFPageData const& other, int page);
-
-        std::string filename;
-        QPDF* qpdf;
-        std::vector<QPDFObjectHandle> orig_pages;
-        std::vector<int> selected_pages;
-    };
-
     class ProgressReporter final: public QPDFWriter::ProgressReporter
     {
       public:
@@ -266,26 +255,6 @@ struct QPDFJob::PageNo
     size_t idx{0};
     int no{1};
 };
-
-QPDFPageData::QPDFPageData(std::string const& filename, QPDF* qpdf, std::string const& range) :
-    filename(filename),
-    qpdf(qpdf),
-    orig_pages(qpdf->getAllPages())
-{
-    try {
-        selected_pages = QUtil::parse_numrange(range.c_str(), QIntC::to_int(orig_pages.size()));
-    } catch (std::runtime_error& e) {
-        throw std::runtime_error("parsing numeric range for " + filename + ": " + e.what());
-    }
-}
-
-QPDFPageData::QPDFPageData(QPDFPageData const& other, int page) :
-    filename(other.filename),
-    qpdf(other.qpdf),
-    orig_pages(other.orig_pages)
-{
-    selected_pages.push_back(page);
-}
 
 QPDFJob::QPDFJob() :
     m(std::make_shared<Members>())
@@ -2411,7 +2380,6 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     std::map<std::string, QPDF*> page_spec_qpdfs;
     std::map<std::string, ClosedFileInputSource*> page_spec_cfis;
     page_spec_qpdfs[m->infilename] = &pdf;
-    std::vector<QPDFPageData> parsed_specs;
     std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
     for (auto& selection: m->selections) {
         if (!page_spec_qpdfs.contains(selection.filename)) {
@@ -2425,7 +2393,6 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             auto password = selection.password;
             if (!m->encryption_file.empty() && password.empty() &&
                 selection.filename == m->encryption_file) {
-                QTC::TC("qpdf", "QPDFJob pages encryption password");
                 password = m->encryption_file_password;
             }
             doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -2434,13 +2401,11 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             std::shared_ptr<InputSource> is;
             ClosedFileInputSource* cis = nullptr;
             if (!m->keep_files_open) {
-                QTC::TC("qpdf", "QPDFJob keep files open n");
-                cis = new ClosedFileInputSource(selection.filename.c_str());
+                cis = new ClosedFileInputSource(selection.filename.data());
                 is = std::shared_ptr<InputSource>(cis);
                 cis->stayOpen(true);
             } else {
-                QTC::TC("qpdf", "QPDFJob keep files open y");
-                FileInputSource* fis = new FileInputSource(selection.filename.c_str());
+                FileInputSource* fis = new FileInputSource(selection.filename.data());
                 is = std::shared_ptr<InputSource>(fis);
             }
             std::unique_ptr<QPDF> qpdf_sp;
@@ -2455,8 +2420,15 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
 
         // Read original pages from the PDF, and parse the page range associated with this
         // occurrence of the file.
-        parsed_specs.emplace_back(
-            selection.filename, page_spec_qpdfs[selection.filename], selection.range);
+        selection.qpdf = page_spec_qpdfs[selection.filename];
+        selection.orig_pages = selection.qpdf->getAllPages();
+        try {
+            selection.selected_pages = QUtil::parse_numrange(
+                selection.range.data(), static_cast<int>(selection.orig_pages.size()));
+        } catch (std::runtime_error& e) {
+            throw std::runtime_error(
+                "parsing numeric range for " + selection.filename + ": " + e.what());
+        }
     }
 
     std::map<unsigned long long, bool> remove_unreferenced;
@@ -2491,16 +2463,17 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     }
 
     auto n_collate = m->collate.size();
-    auto n_specs = parsed_specs.size();
+    auto n_specs = m->selections.size();
     if (!(n_collate == 0 || n_collate == 1 || n_collate == n_specs)) {
         usage(
             "--pages: if --collate has more than one value, it must have one value per page "
             "specification");
     }
+
+    std::vector<Selection> new_specs;
     if (n_collate > 0 && n_specs > 1) {
         // Collate the pages by selecting one page from each spec in order. When a spec runs out of
         // pages, stop selecting from it.
-        std::vector<QPDFPageData> new_parsed_specs;
         // Make sure we have a collate value for each spec. We have already checked that a non-empty
         // collate has either one value or one value per spec.
         for (auto i = n_collate; i < n_specs; ++i) {
@@ -2511,20 +2484,20 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
         while (got_pages) {
             got_pages = false;
             for (size_t i = 0; i < n_specs; ++i) {
-                QPDFPageData& page_data = parsed_specs.at(i);
+                auto& page_data = m->selections.at(i);
                 for (size_t j = 0; j < m->collate.at(i); ++j) {
                     if (cur_page.at(i) + j < page_data.selected_pages.size()) {
                         got_pages = true;
-                        new_parsed_specs.emplace_back(
+                        new_specs.emplace_back(
                             page_data, page_data.selected_pages.at(cur_page.at(i) + j));
                     }
                 }
                 cur_page.at(i) += m->collate.at(i);
             }
         }
-        parsed_specs = new_parsed_specs;
     }
 
+    std::vector<Selection>& page_specs = new_specs.empty() ? m->selections : new_specs;
     // Add all the pages from all the files in the order specified. Keep track of any pages from the
     // original file that we are selecting.
     std::set<int> selected_from_orig;
@@ -2533,7 +2506,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     int out_pageno = 0;
     auto& this_afdh = pdf.acroform();
     std::set<QPDFObjGen> referenced_fields;
-    for (auto& page_data: parsed_specs) {
+    for (auto& page_data: page_specs) {
         ClosedFileInputSource* cis = nullptr;
         if (page_spec_cfis.contains(page_data.filename)) {
             cis = page_spec_cfis[page_data.filename];

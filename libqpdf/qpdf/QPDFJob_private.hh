@@ -17,9 +17,21 @@ struct QPDFJob::Selection
     {
     }
 
+    Selection(QPDFJob::Selection const& other, int page) :
+        filename(other.filename),
+        // range and password are no longer required when this constructor is called.
+        qpdf(other.qpdf),
+        orig_pages(other.orig_pages),
+        selected_pages({page})
+    {
+    }
+
     std::string filename;
     std::string password;
     std::string range;
+    QPDF* qpdf;
+    std::vector<QPDFObjectHandle> orig_pages;
+    std::vector<int> selected_pages;
 };
 
 struct QPDFJob::RotationSpec

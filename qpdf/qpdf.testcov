@@ -188,7 +188,6 @@ QPDF insert foreign page 0
 QPDFWriter copy use_aes 1
 QPDFParser indirect without context 0
 QPDFObjectHandle trailing data in parse 0
-QPDFJob pages encryption password 0
 QPDFTokenizer EOF reading token 0
 QPDFTokenizer EOF reading appendable token 0
 QPDFWriter extra header text no newline 0
@@ -286,8 +285,6 @@ QPDFAcroFormDocumentHelper non-dictionary field 0
 QPDFAcroFormDocumentHelper loop 0
 QPDFAcroFormDocumentHelper field found 1
 QPDFAcroFormDocumentHelper annotation found 1
-QPDFJob keep files open n 0
-QPDFJob keep files open y 0
 QPDFJob automatically set keep files open 1
 QPDFOutlineDocumentHelper string named dest 0
 QPDFObjectHandle merge top type mismatch 0
