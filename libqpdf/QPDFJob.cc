@@ -1911,13 +1911,13 @@ std::string
 QPDFJob::doUnderOverlayForPage(
     QPDF& pdf,
     UnderOverlay& uo,
-    std::map<int, std::map<size_t, std::vector<int>>>& pagenos,
+    std::vector<std::map<size_t, std::vector<int>>>& pagenos,
     PageNo const& pageno,
     size_t uo_idx,
     std::map<int, std::map<size_t, QPDFObjectHandle>>& fo,
     QPDFPageObjectHelper& dest_page)
 {
-    if (!(uo.pdf && pagenos.contains(pageno.no) && pagenos[pageno.no].contains(uo_idx))) {
+    if (!(uo.pdf && pagenos[pageno.idx].contains(uo_idx))) {
         return "";
     }
     auto& dest_afdh = dest_page.qpdf()->acroform();
@@ -1926,7 +1926,7 @@ QPDFJob::doUnderOverlayForPage(
     std::string content;
     int min_suffix = 1;
     QPDFObjectHandle resources = dest_page.getAttribute("/Resources", true);
-    for (PageNo from_no: pagenos[pageno.no][uo_idx]) {
+    for (PageNo from_no: pagenos[pageno.idx][uo_idx]) {
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << "    " << uo.filename << " " << uo.which << " " << from_no.no << "\n";
         });
@@ -1958,14 +1958,15 @@ QPDFJob::doUnderOverlayForPage(
 void
 QPDFJob::getUOPagenos(
     std::vector<QPDFJob::UnderOverlay>& uos,
-    std::map<int, std::map<size_t, std::vector<int>>>& pagenos)
+    std::vector<std::map<size_t, std::vector<int>>>& pagenos)
 {
     size_t uo_idx = 0;
     for (auto const& uo: uos) {
         size_t page_idx = 0;
         size_t from_size = uo.from_pagenos.size();
         size_t repeat_size = uo.repeat_pagenos.size();
-        for (int to_pageno: uo.to_pagenos) {
+        for (int to_pageno_i: uo.to_pagenos) {
+            size_t to_pageno = static_cast<size_t>(to_pageno_i - 1);
             if (page_idx < from_size) {
                 pagenos[to_pageno][uo_idx].push_back(uo.from_pagenos.at(page_idx));
             } else if (repeat_size) {
@@ -1991,12 +1992,12 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         validateUnderOverlay(pdf, &uo);
     }
 
-    auto const& main_pages = pdf.getAllPages();
+    auto const& dest_pages = pdf.getAllPages();
 
-    // First map key is 1-based page number. Second is index into the overlay/underlay vector. Watch
-    // out to not reverse the keys or be off by one.
-    std::map<int, std::map<size_t, std::vector<int>>> underlay_pagenos;
-    std::map<int, std::map<size_t, std::vector<int>>> overlay_pagenos;
+    // First vector key is 0-based page number. Second is index into the overlay/underlay vector.
+    // Watch out to not reverse the keys or be off by one.
+    std::vector<std::map<size_t, std::vector<int>>> underlay_pagenos(dest_pages.size());
+    std::vector<std::map<size_t, std::vector<int>>> overlay_pagenos(dest_pages.size());
     getUOPagenos(m->underlay, underlay_pagenos);
     getUOPagenos(m->overlay, overlay_pagenos);
     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -2006,11 +2007,12 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
     std::map<int, std::map<size_t, QPDFObjectHandle>> underlay_fo;
     std::map<int, std::map<size_t, QPDFObjectHandle>> overlay_fo;
     PageNo dest_page_no;
-    for (QPDFPageObjectHelper dest_page: main_pages) {
+    for (QPDFPageObjectHelper dest_page: dest_pages) {
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << "  page " << dest_page_no.no << "\n";
         });
-        if (underlay_pagenos[dest_page_no.no].empty() && overlay_pagenos[dest_page_no.no].empty()) {
+        if (underlay_pagenos[dest_page_no.idx].empty() &&
+            overlay_pagenos[dest_page_no.idx].empty()) {
             ++dest_page_no;
             continue;
         }
