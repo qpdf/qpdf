@@ -468,7 +468,7 @@ class QPDFJob
 
     // Transformations
     void setQPDFOptions(QPDF& pdf);
-    void handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_heap);
+    bool handlePageSpecs(QPDF& pdf);
     bool shouldRemoveUnreferencedResources(QPDF& pdf);
     void handleRotations(QPDF& pdf);
     void getUOPagenos(

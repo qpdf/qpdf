@@ -464,40 +464,37 @@ QPDFJob::createQPDF()
         pdf.updateFromJSON(m->update_from_json);
     }
 
-    std::vector<std::unique_ptr<QPDF>> page_heap;
     if (!m->page_specs.empty()) {
-        handlePageSpecs(pdf, page_heap);
+        if (!handlePageSpecs(pdf)) {
+            m->warnings = true;
+        }
     }
     if (!m->rotations.empty()) {
         handleRotations(pdf);
     }
     handleUnderOverlay(pdf);
     handleTransformations(pdf);
+
+    auto root = pdf.getRoot();
     if (m->remove_info) {
         auto trailer = pdf.getTrailer();
-        auto mod_date = trailer.getKey("/Info").getKeyIfDict("/ModDate");
+        auto mod_date = trailer["/Info"]["/ModDate"];
         if (mod_date.null()) {
-            trailer.removeKey("/Info");
+            trailer.erase("/Info");
         } else {
-            auto info = trailer.replaceKeyAndGetNew(
-                "/Info", pdf.makeIndirectObject(QPDFObjectHandle::newDictionary()));
-            info.replaceKey("/ModDate", mod_date);
+            trailer.replaceKey(
+                "/Info", pdf.makeIndirectObject(Dictionary({{"/ModDate", mod_date}})));
         }
-        pdf.getRoot().removeKey("/Metadata");
+        root.erase("/Metadata");
     }
     if (m->remove_metadata) {
-        pdf.getRoot().removeKey("/Metadata");
+        root.erase("/Metadata");
     }
     if (m->remove_structure) {
-        pdf.getRoot().removeKey("/StructTreeRoot");
-        pdf.getRoot().removeKey("/MarkInfo");
+        root.erase("/StructTreeRoot");
+        root.erase("/MarkInfo");
     }
 
-    for (auto& foreign: page_heap) {
-        if (foreign->anyWarnings()) {
-            m->warnings = true;
-        }
-    }
     return pdf_sp;
 }
 
@@ -2377,9 +2374,12 @@ added_page(QPDF& pdf, QPDFPageObjectHelper page)
     return added_page(pdf, page.getObjectHandle());
 }
 
-void
-QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_heap)
+// Handle all page specifications. Return true if it succeeded without warnings.
+bool
+QPDFJob::handlePageSpecs(QPDF& pdf)
 {
+    std::vector<std::unique_ptr<QPDF>> page_heap;
+
     // Parse all page specifications and translate them into lists of actual pages.
 
     // Handle "." as a shortcut for the input file
@@ -2649,6 +2649,12 @@ QPDFJob::handlePageSpecs(QPDF& pdf, std::vector<std::unique_ptr<QPDF>>& page_hea
             }
         }
     }
+    for (auto& foreign: page_heap) {
+        if (foreign->anyWarnings()) {
+            return false;
+        }
+    }
+    return true;
 }
 
 void
