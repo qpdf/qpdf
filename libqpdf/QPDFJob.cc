@@ -1915,26 +1915,25 @@ QPDFJob::doUnderOverlayForPage(
     QPDF& pdf,
     UnderOverlay& uo,
     std::map<int, std::map<size_t, std::vector<int>>>& pagenos,
-    size_t page_idx,
+    PageNo const& pageno,
     size_t uo_idx,
     std::map<int, std::map<size_t, QPDFObjectHandle>>& fo,
-    std::vector<QPDFPageObjectHelper>& pages,
     QPDFPageObjectHelper& dest_page)
 {
-    int pageno = 1 + QIntC::to_int(page_idx);
-    if (!(pagenos.contains(pageno) && pagenos[pageno].contains(uo_idx))) {
+    if (!(uo.pdf && pagenos.contains(pageno.no) && pagenos[pageno.no].contains(uo_idx))) {
         return "";
     }
     auto& dest_afdh = dest_page.qpdf()->acroform();
 
+    auto const& pages = uo.pdf->getAllPages();
     std::string content;
     int min_suffix = 1;
     QPDFObjectHandle resources = dest_page.getAttribute("/Resources", true);
-    for (PageNo from_no: pagenos[pageno][uo_idx]) {
+    for (PageNo from_no: pagenos[pageno.no][uo_idx]) {
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << "    " << uo.filename << " " << uo.which << " " << from_no.no << "\n";
         });
-        auto from_page = pages.at(from_no.idx);
+        QPDFPageObjectHelper from_page = pages.at(from_no.idx);
         if (!fo[from_no.no].contains(uo_idx)) {
             fo[from_no.no][uo_idx] = pdf.copyForeignObject(from_page.getFormXObjectForPage());
         }
@@ -2007,19 +2006,6 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         v << prefix << ": processing underlay/overlay\n";
     });
 
-    auto get_pages = [](std::vector<UnderOverlay>& v,
-                        std::vector<std::vector<QPDFPageObjectHelper>>& v_out) {
-        for (auto const& uo: v) {
-            if (uo.pdf) {
-                v_out.push_back(QPDFPageDocumentHelper(*(uo.pdf)).getAllPages());
-            }
-        }
-    };
-    std::vector<std::vector<QPDFPageObjectHelper>> upages;
-    get_pages(m->underlay, upages);
-    std::vector<std::vector<QPDFPageObjectHelper>> opages;
-    get_pages(m->overlay, opages);
-
     std::map<int, std::map<size_t, QPDFObjectHandle>> underlay_fo;
     std::map<int, std::map<size_t, QPDFObjectHandle>> overlay_fo;
     PageNo dest_page_no;
@@ -2047,14 +2033,7 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         std::string content;
         for (auto& underlay: m->underlay) {
             content += doUnderOverlayForPage(
-                pdf,
-                underlay,
-                underlay_pagenos,
-                dest_page_no.idx,
-                uo_idx,
-                underlay_fo,
-                upages[uo_idx],
-                dest_page);
+                pdf, underlay, underlay_pagenos, dest_page_no, uo_idx, underlay_fo, dest_page);
             ++uo_idx;
         }
         content += dest_page.placeFormXObject(
@@ -2067,14 +2046,7 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         uo_idx = 0;
         for (auto& overlay: m->overlay) {
             content += doUnderOverlayForPage(
-                pdf,
-                overlay,
-                overlay_pagenos,
-                dest_page_no.idx,
-                uo_idx,
-                overlay_fo,
-                opages[uo_idx],
-                dest_page);
+                pdf, overlay, overlay_pagenos, dest_page_no, uo_idx, overlay_fo, dest_page);
             ++uo_idx;
         }
         dest_page.getObjectHandle().replaceKey("/Contents", pdf.newStream(content));
