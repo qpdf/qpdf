@@ -2486,10 +2486,9 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
         v << prefix << ": removing unreferenced pages from primary input\n";
     });
-    QPDFPageDocumentHelper dh(pdf);
-    std::vector<QPDFPageObjectHelper> orig_pages = dh.getAllPages();
+    auto orig_pages = pdf.getAllPages();
     for (auto const& page: orig_pages) {
-        dh.removePage(page);
+        pdf.removePage(page);
     }
 
     auto n_collate = m->collate.size();
@@ -2568,7 +2567,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
                     to_copy.removeUnreferencedResources();
                 }
             }
-            dh.addPage(to_copy, false);
+            pdf.addPage(to_copy, false);
             bool first_copy_from_orig = false;
             bool this_file = (page_data.qpdf == &pdf);
             if (this_file) {
@@ -2609,43 +2608,41 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
         }
     }
     if (any_page_labels) {
-        QPDFObjectHandle page_labels = QPDFObjectHandle::newDictionary();
-        page_labels.replaceKey("/Nums", QPDFObjectHandle::newArray(new_labels));
-        pdf.getRoot().replaceKey("/PageLabels", page_labels);
+        pdf.getRoot().replaceKey("/PageLabels", Dictionary({{"/Nums", Array(new_labels)}}));
     }
 
     // Delete page objects for unused page in primary. This prevents those objects from being
     // preserved by being referred to from other places, such as the outlines dictionary. Also make
     // sure we keep form fields from pages we preserved.
-    for (size_t pageno = 0; pageno < orig_pages.size(); ++pageno) {
-        auto page = orig_pages.at(pageno);
-        if (selected_from_orig.contains(QIntC::to_int(pageno))) {
+    int page_idx = 0;
+    for (auto const& page: orig_pages) {
+        if (selected_from_orig.contains(page_idx)) {
             for (auto field: this_afdh.getFormFieldsForPage(page)) {
-                QTC::TC("qpdf", "QPDFJob pages keeping field from original");
-                referenced_fields.insert(field.getObjectHandle().getObjGen());
+                referenced_fields.insert(field);
             }
         } else {
-            pdf.replaceObject(page.getObjectHandle().getObjGen(), QPDFObjectHandle::newNull());
+            pdf.replaceObject(page, QPDFObjectHandle::newNull());
         }
+        ++page_idx;
     }
     // Remove unreferenced form fields
     if (this_afdh.hasAcroForm()) {
-        auto acroform = pdf.getRoot().getKey("/AcroForm");
-        auto fields = acroform.getKey("/Fields");
-        if (fields.isArray()) {
-            auto new_fields = QPDFObjectHandle::newArray();
-            if (fields.isIndirect()) {
-                new_fields = pdf.makeIndirectObject(new_fields);
-            }
-            for (auto const& field: fields.aitems()) {
+        auto acroform = pdf.getRoot()["/AcroForm"];
+        if (Array fields = acroform["/Fields"]) {
+            std::vector<QPDFObjectHandle> new_fields;
+            new_fields.reserve(referenced_fields.size());
+            for (auto const& field: fields) {
                 if (referenced_fields.contains(field.getObjGen())) {
-                    new_fields.appendItem(field);
+                    new_fields.emplace_back(field);
                 }
             }
             if (new_fields.empty()) {
-                pdf.getRoot().removeKey("/AcroForm");
+                pdf.getRoot().erase("/AcroForm");
             } else {
-                acroform.replaceKey("/Fields", new_fields);
+                acroform.replaceKey(
+                    "/Fields",
+                    fields.indirect() ? pdf.makeIndirectObject(Array(new_fields))
+                                      : QPDFObjectHandle(Array(new_fields)));
             }
         }
     }
