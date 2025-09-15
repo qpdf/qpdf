@@ -49,7 +49,25 @@ struct QPDFJob::Input
 // All PDF input files for a job.
 struct QPDFJob::Inputs
 {
+    // These default values are duplicated in help and docs.
+    static int constexpr DEFAULT_KEEP_FILES_OPEN_THRESHOLD = 200;
+
+    Inputs(QPDFJob& job) :
+        job(job)
+    {
+    }
+    void process(std::string const& filename, QPDFJob::Input& file_spec);
+    void process_all();
+    std::string encryption_file;
+    std::string encryption_file_password;
+    bool keep_files_open{true};
+    bool keep_files_open_set{false};
+    size_t keep_files_open_threshold{DEFAULT_KEEP_FILES_OPEN_THRESHOLD};
+
     std::map<std::string, Input> files;
+
+  private:
+    QPDFJob& job;
 };
 
 struct QPDFJob::RotationSpec
@@ -107,8 +125,9 @@ class QPDFJob::Members
     friend class QPDFJob;
 
   public:
-    Members() :
-        log(QPDFLogger::defaultLogger())
+    Members(QPDFJob& job) :
+        log(QPDFLogger::defaultLogger()),
+        inputs(job)
     {
     }
     Members(Members const&) = delete;
@@ -116,7 +135,6 @@ class QPDFJob::Members
 
   private:
     // These default values are duplicated in help and docs.
-    static int constexpr DEFAULT_KEEP_FILES_OPEN_THRESHOLD = 200;
     static int constexpr DEFAULT_OI_MIN_WIDTH = 128;
     static int constexpr DEFAULT_OI_MIN_HEIGHT = 128;
     static int constexpr DEFAULT_OI_MIN_AREA = 16384;
@@ -137,8 +155,6 @@ class QPDFJob::Members
     bool suppress_warnings{false};
     bool warnings_exit_zero{false};
     bool copy_encryption{false};
-    std::string encryption_file;
-    std::string encryption_file_password;
     bool encrypt{false};
     bool password_is_hex_key{false};
     bool suppress_password_recovery{false};
@@ -182,9 +198,6 @@ class QPDFJob::Members
     bool qdf_mode{false};
     bool preserve_unreferenced_objects{false};
     remove_unref_e remove_unreferenced_page_resources{re_auto};
-    bool keep_files_open{true};
-    bool keep_files_open_set{false};
-    size_t keep_files_open_threshold{DEFAULT_KEEP_FILES_OPEN_THRESHOLD};
     bool newline_before_endstream{false};
     std::string linearize_pass1;
     bool coalesce_contents{false};
