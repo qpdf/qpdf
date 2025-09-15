@@ -21,7 +21,6 @@ struct QPDFJob::Selection
         filename(other.filename),
         // range and password are no longer required when this constructor is called.
         qpdf(other.qpdf),
-        orig_pages(other.orig_pages),
         selected_pages({page})
     {
     }
@@ -30,7 +29,6 @@ struct QPDFJob::Selection
     std::string password;
     std::string range;
     QPDF* qpdf;
-    std::vector<QPDFObjectHandle> orig_pages;
     std::vector<int> selected_pages;
 };
 
@@ -44,6 +42,8 @@ struct QPDFJob::Input
     std::unique_ptr<QPDF> qpdf_p;
     QPDF* qpdf;
     ClosedFileInputSource* cfis{};
+    std::vector<QPDFObjectHandle> orig_pages;
+    int n_pages;
 };
 
 // All PDF input files for a job.

@@ -2346,7 +2346,10 @@ QPDFJob::new_selection(
 bool
 QPDFJob::handlePageSpecs(QPDF& pdf)
 {
-    m->inputs.files[m->infilename].qpdf = &pdf;
+    auto& in_file = m->inputs.files[m->infilename];
+    in_file.qpdf = &pdf;
+    in_file.orig_pages = pdf.getAllPages();
+    in_file.n_pages = QIntC::to_int(in_file.orig_pages.size());
 
     // Parse all page specifications and translate them into lists of actual pages.
 
@@ -2409,6 +2412,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
                     true);
             }
             input.qpdf = input.qpdf_p.get();
+            input.orig_pages = input.qpdf->getAllPages();
+            input.n_pages = QIntC::to_int(input.orig_pages.size());
             if (input.cfis) {
                 input.cfis->stayOpen(false);
             }
@@ -2419,11 +2424,11 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     for (auto& selection: m->selections) {
         // Read original pages from the PDF, and parse the page range associated with this
         // occurrence of the file.
-        selection.qpdf = m->inputs.files[selection.filename].qpdf;
-        selection.orig_pages = selection.qpdf->getAllPages();
+        auto const& input = m->inputs.files[selection.filename];
+        selection.qpdf = input.qpdf;
         try {
-            selection.selected_pages = QUtil::parse_numrange(
-                selection.range.data(), static_cast<int>(selection.orig_pages.size()));
+            selection.selected_pages =
+                QUtil::parse_numrange(selection.range.data(), input.n_pages);
         } catch (std::runtime_error& e) {
             throw std::runtime_error(
                 "parsing numeric range for " + selection.filename + ": " + e.what());
@@ -2519,14 +2524,12 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             // Pages are specified from 1 but numbered from 0 in the vector
             int pageno = pageno_iter - 1;
             pldh.getLabelsForPageRange(pageno, pageno, out_pageno++, new_labels);
-            QPDFPageObjectHelper to_copy = page_data.orig_pages.at(QIntC::to_size(pageno));
+            QPDFPageObjectHelper to_copy = input.orig_pages.at(QIntC::to_size(pageno));
             QPDFObjGen to_copy_og = to_copy.getObjectHandle().getObjGen();
-            unsigned long long from_uuid = page_data.qpdf->getUniqueId();
+            unsigned long long from_uuid = input.qpdf->getUniqueId();
             if (copied_pages[from_uuid].contains(to_copy_og)) {
                 QTC::TC(
-                    "qpdf",
-                    "QPDFJob copy same page more than once",
-                    (page_data.qpdf == &pdf) ? 0 : 1);
+                    "qpdf", "QPDFJob copy same page more than once", (input.qpdf == &pdf) ? 0 : 1);
                 to_copy = to_copy.shallowCopyPage();
             } else {
                 copied_pages[from_uuid].insert(to_copy_og);
@@ -2536,7 +2539,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             }
             pdf.addPage(to_copy, false);
             bool first_copy_from_orig = false;
-            bool this_file = (page_data.qpdf == &pdf);
+            bool this_file = input.qpdf == &pdf;
             if (this_file) {
                 // This is a page from the original file. Keep track of the fact that we are using
                 // it.
