@@ -40,6 +40,7 @@ struct QPDFJob::Selection
 // filename.  This is a documented work-around.
 struct QPDFJob::Input
 {
+    std::string password;
     std::unique_ptr<QPDF> qpdf_p;
     QPDF* qpdf;
     ClosedFileInputSource* cfis{};

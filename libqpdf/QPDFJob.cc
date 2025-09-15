@@ -2350,13 +2350,16 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
 
     // Parse all page specifications and translate them into lists of actual pages.
 
-    // Handle "." as a shortcut for the input file
+    // Handle "." as a shortcut for the input file.
     for (auto& selection: m->selections) {
         if (selection.filename == ".") {
             selection.filename = m->infilename;
         } else {
             // Force insertion
             (void)m->inputs.files[selection.filename];
+        }
+        if (!selection.password.empty()) {
+            m->inputs.files[selection.filename].password = selection.password;
         }
         if (selection.range.empty()) {
             selection.range = "1-z";
@@ -2376,9 +2379,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     }
 
     // Create a QPDF object for each file that we may take pages from.
-    std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
-    for (auto& selection: m->selections) {
-        auto& input = m->inputs.files[selection.filename];
+    for (auto& [filename, input]: m->inputs.files) {
         if (!input.qpdf) {
             // Open the PDF file and store the QPDF object. Throw a std::shared_ptr to the qpdf into
             // a heap so that it survives through copying to the output but gets cleaned up
@@ -2387,16 +2388,15 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             // you are using this an example of how to do this with the API, you can just create two
             // different QPDF objects to the same underlying file with the same path to achieve the
             // same effect.
-            auto password = selection.password;
-            if (!m->encryption_file.empty() && password.empty() &&
-                selection.filename == m->encryption_file) {
+            auto password = input.password;
+            if (!m->encryption_file.empty() && password.empty() && filename == m->encryption_file) {
                 password = m->encryption_file_password;
             }
             doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-                v << prefix << ": processing " << selection.filename << "\n";
+                v << prefix << ": processing " << filename << "\n";
             });
             if (!m->keep_files_open) {
-                auto cis = std::make_shared<ClosedFileInputSource>(selection.filename.data());
+                auto cis = std::make_shared<ClosedFileInputSource>(filename.data());
                 cis->stayOpen(true);
                 processInputSource(input.qpdf_p, cis, password.data(), true);
                 cis->stayOpen(false);
@@ -2404,7 +2404,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             } else {
                 processInputSource(
                     input.qpdf_p,
-                    std::make_shared<FileInputSource>(selection.filename.data()),
+                    std::make_shared<FileInputSource>(filename.data()),
                     password.data(),
                     true);
             }
@@ -2413,7 +2413,10 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
                 input.cfis->stayOpen(false);
             }
         }
+    }
 
+    std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
+    for (auto& selection: m->selections) {
         // Read original pages from the PDF, and parse the page range associated with this
         // occurrence of the file.
         selection.qpdf = m->inputs.files[selection.filename].qpdf;
