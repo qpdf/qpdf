@@ -44,6 +44,7 @@ struct QPDFJob::Input
     ClosedFileInputSource* cfis{};
     std::vector<QPDFObjectHandle> orig_pages;
     int n_pages;
+    bool remove_unreferenced{false};
 };
 
 // All PDF input files for a job.

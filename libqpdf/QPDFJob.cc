@@ -2372,6 +2372,11 @@ QPDFJob::Inputs::process(std::string const& filename, QPDFJob::Input& input)
     input.qpdf = input.qpdf_p.get();
     input.orig_pages = input.qpdf->getAllPages();
     input.n_pages = QIntC::to_int(input.orig_pages.size());
+
+    if (job.m->remove_unreferenced_page_resources != QPDFJob::re_no) {
+        input.remove_unreferenced = job.shouldRemoveUnreferencedResources(*input.qpdf);
+    }
+
     if (input.cfis) {
         input.cfis->stayOpen(false);
     }
@@ -2407,6 +2412,9 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     in_file.qpdf = &pdf;
     in_file.orig_pages = pdf.getAllPages();
     in_file.n_pages = QIntC::to_int(in_file.orig_pages.size());
+    if (m->remove_unreferenced_page_resources != QPDFJob::re_no) {
+        in_file.remove_unreferenced = shouldRemoveUnreferencedResources(pdf);
+    }
 
     // Parse all page specifications and translate them into lists of actual pages.
 
@@ -2439,23 +2447,6 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
         } catch (std::runtime_error& e) {
             throw std::runtime_error(
                 "parsing numeric range for " + selection.filename + ": " + e.what());
-        }
-    }
-
-    std::map<unsigned long long, bool> remove_unreferenced;
-    if (m->remove_unreferenced_page_resources != QPDFJob::re_no) {
-        for (auto const& [filename, input]: m->inputs.files) {
-            if (input.cfis) {
-                input.cfis->stayOpen(true);
-            }
-            QPDF& other(*input.qpdf);
-            auto other_uuid = other.getUniqueId();
-            if (!remove_unreferenced.contains(other_uuid)) {
-                remove_unreferenced[other_uuid] = shouldRemoveUnreferencedResources(other);
-            }
-            if (input.cfis) {
-                input.cfis->stayOpen(false);
-            }
         }
     }
 
@@ -2540,7 +2531,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
                 to_copy = to_copy.shallowCopyPage();
             } else {
                 copied_pages[from_uuid].insert(to_copy_og);
-                if (remove_unreferenced[from_uuid]) {
+                if (input.remove_unreferenced) {
                     to_copy.removeUnreferencedResources();
                 }
             }

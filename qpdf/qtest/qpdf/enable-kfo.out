@@ -1,34 +1,34 @@
-qpdf: selecting --keep-open-files=y
-qpdf: processing 010-kfo.pdf
-qpdf: processing 011-kfo.pdf
-qpdf: processing 012-kfo.pdf
-qpdf: processing 013-kfo.pdf
-qpdf: processing 014-kfo.pdf
-qpdf: processing 015-kfo.pdf
-qpdf: processing 016-kfo.pdf
-qpdf: processing 017-kfo.pdf
-qpdf: processing 018-kfo.pdf
-qpdf: processing 019-kfo.pdf
 qpdf: empty PDF: checking for shared resources
 qpdf: no shared resources found
+qpdf: selecting --keep-open-files=y
+qpdf: processing 010-kfo.pdf
 qpdf: 010-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 011-kfo.pdf
 qpdf: 011-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 012-kfo.pdf
 qpdf: 012-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 013-kfo.pdf
 qpdf: 013-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 014-kfo.pdf
 qpdf: 014-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 015-kfo.pdf
 qpdf: 015-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 016-kfo.pdf
 qpdf: 016-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 017-kfo.pdf
 qpdf: 017-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 018-kfo.pdf
 qpdf: 018-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 019-kfo.pdf
 qpdf: 019-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
 qpdf: removing unreferenced pages from primary input
