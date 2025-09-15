@@ -417,6 +417,8 @@ class QPDFJob
   private:
     struct PageNo;
     struct Selection;
+    struct Input;
+    struct Inputs;
     struct RotationSpec;
     struct UnderOverlay;
     struct PageLabelSpec;

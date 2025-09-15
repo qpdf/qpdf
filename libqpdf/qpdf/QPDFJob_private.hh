@@ -34,6 +34,22 @@ struct QPDFJob::Selection
     std::vector<int> selected_pages;
 };
 
+// A single input PDF.
+//
+// N.B. A single input PDF may be represented by multiple Input instances using variations of the
+// filename.  This is a documented work-around.
+struct QPDFJob::Input
+{
+    std::unique_ptr<QPDF> qpdf_p;
+    QPDF* qpdf;
+};
+
+// All PDF input files for a job.
+struct QPDFJob::Inputs
+{
+    std::map<std::string, Input> files;
+};
+
 struct QPDFJob::RotationSpec
 {
     RotationSpec(int angle = 0, bool relative = false) :
@@ -223,6 +239,7 @@ class QPDFJob::Members
     std::vector<UnderOverlay> underlay;
     std::vector<UnderOverlay> overlay;
     UnderOverlay* under_overlay{nullptr};
+    Inputs inputs;
     std::vector<Selection> selections;
     std::map<std::string, RotationSpec> rotations;
     bool require_outfile{true};

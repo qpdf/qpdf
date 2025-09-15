@@ -2346,7 +2346,7 @@ QPDFJob::new_selection(
 bool
 QPDFJob::handlePageSpecs(QPDF& pdf)
 {
-    std::vector<std::unique_ptr<QPDF>> page_heap;
+    m->inputs.files[m->infilename].qpdf = &pdf;
 
     // Parse all page specifications and translate them into lists of actual pages.
 
@@ -2354,6 +2354,9 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     for (auto& selection: m->selections) {
         if (selection.filename == ".") {
             selection.filename = m->infilename;
+        } else {
+            // Force insertion
+            (void)m->inputs.files[selection.filename];
         }
         if (selection.range.empty()) {
             selection.range = "1-z";
@@ -2364,11 +2367,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
         // Count the number of distinct files to determine whether we should keep files open or not.
         // Rather than trying to code some portable heuristic based on OS limits, just hard-code
         // this at a given number and allow users to override.
-        std::set<std::string> filenames;
-        for (auto& selection: m->selections) {
-            filenames.insert(selection.filename);
-        }
-        m->keep_files_open = (filenames.size() <= m->keep_files_open_threshold);
+        m->keep_files_open = m->inputs.files.size() <= m->keep_files_open_threshold;
         QTC::TC("qpdf", "QPDFJob automatically set keep files open", m->keep_files_open ? 0 : 1);
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << prefix << ": selecting --keep-open-files=" << (m->keep_files_open ? "y" : "n")
@@ -2377,12 +2376,11 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     }
 
     // Create a QPDF object for each file that we may take pages from.
-    std::map<std::string, QPDF*> page_spec_qpdfs;
     std::map<std::string, ClosedFileInputSource*> page_spec_cfis;
-    page_spec_qpdfs[m->infilename] = &pdf;
     std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
     for (auto& selection: m->selections) {
-        if (!page_spec_qpdfs.contains(selection.filename)) {
+        auto& input = m->inputs.files[selection.filename];
+        if (!input.qpdf) {
             // Open the PDF file and store the QPDF object. Throw a std::shared_ptr to the qpdf into
             // a heap so that it survives through copying to the output but gets cleaned up
             // automatically at the end. Do not canonicalize the file name. Using two different
@@ -2408,10 +2406,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
                 FileInputSource* fis = new FileInputSource(selection.filename.data());
                 is = std::shared_ptr<InputSource>(fis);
             }
-            std::unique_ptr<QPDF> qpdf_sp;
-            processInputSource(qpdf_sp, is, password.data(), true);
-            page_spec_qpdfs[selection.filename] = qpdf_sp.get();
-            page_heap.push_back(std::move(qpdf_sp));
+            processInputSource(input.qpdf_p, is, password.data(), true);
+            input.qpdf = input.qpdf_p.get();
             if (cis) {
                 cis->stayOpen(false);
                 page_spec_cfis[selection.filename] = cis;
@@ -2420,7 +2416,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
 
         // Read original pages from the PDF, and parse the page range associated with this
         // occurrence of the file.
-        selection.qpdf = page_spec_qpdfs[selection.filename];
+        selection.qpdf = m->inputs.files[selection.filename].qpdf;
         selection.orig_pages = selection.qpdf->getAllPages();
         try {
             selection.selected_pages = QUtil::parse_numrange(
@@ -2433,14 +2429,13 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
 
     std::map<unsigned long long, bool> remove_unreferenced;
     if (m->remove_unreferenced_page_resources != QPDFJob::re_no) {
-        for (auto const& iter: page_spec_qpdfs) {
-            std::string const& filename = iter.first;
+        for (auto const& [filename, input]: m->inputs.files) {
             ClosedFileInputSource* cis = nullptr;
             if (page_spec_cfis.contains(filename)) {
                 cis = page_spec_cfis[filename];
                 cis->stayOpen(true);
             }
-            QPDF& other(*(iter.second));
+            QPDF& other(*input.qpdf);
             auto other_uuid = other.getUniqueId();
             if (!remove_unreferenced.contains(other_uuid)) {
                 remove_unreferenced[other_uuid] = shouldRemoveUnreferencedResources(other);
@@ -2618,9 +2613,11 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             }
         }
     }
-    for (auto& foreign: page_heap) {
-        if (foreign->anyWarnings()) {
-            return false;
+    for (auto& foreign: m->inputs.files) {
+        if (foreign.second.qpdf_p) { // exclude main input
+            if (foreign.second.qpdf->anyWarnings()) {
+                return false;
+            }
         }
     }
     return true;
