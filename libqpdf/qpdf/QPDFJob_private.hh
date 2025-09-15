@@ -42,6 +42,7 @@ struct QPDFJob::Input
 {
     std::unique_ptr<QPDF> qpdf_p;
     QPDF* qpdf;
+    ClosedFileInputSource* cfis{};
 };
 
 // All PDF input files for a job.

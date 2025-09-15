@@ -2376,7 +2376,6 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     }
 
     // Create a QPDF object for each file that we may take pages from.
-    std::map<std::string, ClosedFileInputSource*> page_spec_cfis;
     std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
     for (auto& selection: m->selections) {
         auto& input = m->inputs.files[selection.filename];
@@ -2396,21 +2395,22 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                 v << prefix << ": processing " << selection.filename << "\n";
             });
-            std::shared_ptr<InputSource> is;
-            ClosedFileInputSource* cis = nullptr;
             if (!m->keep_files_open) {
-                cis = new ClosedFileInputSource(selection.filename.data());
-                is = std::shared_ptr<InputSource>(cis);
+                auto cis = std::make_shared<ClosedFileInputSource>(selection.filename.data());
                 cis->stayOpen(true);
-            } else {
-                FileInputSource* fis = new FileInputSource(selection.filename.data());
-                is = std::shared_ptr<InputSource>(fis);
-            }
-            processInputSource(input.qpdf_p, is, password.data(), true);
-            input.qpdf = input.qpdf_p.get();
-            if (cis) {
+                processInputSource(input.qpdf_p, cis, password.data(), true);
                 cis->stayOpen(false);
-                page_spec_cfis[selection.filename] = cis;
+                input.cfis = cis.get();
+            } else {
+                processInputSource(
+                    input.qpdf_p,
+                    std::make_shared<FileInputSource>(selection.filename.data()),
+                    password.data(),
+                    true);
+            }
+            input.qpdf = input.qpdf_p.get();
+            if (input.cfis) {
+                input.cfis->stayOpen(false);
             }
         }
 
@@ -2430,18 +2430,16 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     std::map<unsigned long long, bool> remove_unreferenced;
     if (m->remove_unreferenced_page_resources != QPDFJob::re_no) {
         for (auto const& [filename, input]: m->inputs.files) {
-            ClosedFileInputSource* cis = nullptr;
-            if (page_spec_cfis.contains(filename)) {
-                cis = page_spec_cfis[filename];
-                cis->stayOpen(true);
+            if (input.cfis) {
+                input.cfis->stayOpen(true);
             }
             QPDF& other(*input.qpdf);
             auto other_uuid = other.getUniqueId();
             if (!remove_unreferenced.contains(other_uuid)) {
                 remove_unreferenced[other_uuid] = shouldRemoveUnreferencedResources(other);
             }
-            if (cis) {
-                cis->stayOpen(false);
+            if (input.cfis) {
+                input.cfis->stayOpen(false);
             }
         }
     }
@@ -2502,10 +2500,9 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     auto& this_afdh = pdf.acroform();
     std::set<QPDFObjGen> referenced_fields;
     for (auto& page_data: page_specs) {
-        ClosedFileInputSource* cis = nullptr;
-        if (page_spec_cfis.contains(page_data.filename)) {
-            cis = page_spec_cfis[page_data.filename];
-            cis->stayOpen(true);
+        auto& input = m->inputs.files[page_data.filename];
+        if (input.cfis) {
+            input.cfis->stayOpen(true);
         }
         auto& pldh = page_data.qpdf->page_labels();
         auto& other_afdh = page_data.qpdf->acroform();
@@ -2570,8 +2567,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
                 }
             }
         }
-        if (cis) {
-            cis->stayOpen(false);
+        if (input.cfis) {
+            input.cfis->stayOpen(false);
         }
     }
     if (any_page_labels) {
