@@ -38,6 +38,8 @@ struct QPDFJob::Selection
 // filename.  This is a documented work-around.
 struct QPDFJob::Input
 {
+    void initialize(Inputs& in, QPDF* qpdf = nullptr);
+
     std::string password;
     std::unique_ptr<QPDF> qpdf_p;
     QPDF* qpdf;
@@ -50,6 +52,7 @@ struct QPDFJob::Input
 // All PDF input files for a job.
 struct QPDFJob::Inputs
 {
+    friend struct Input;
     // These default values are duplicated in help and docs.
     static int constexpr DEFAULT_KEEP_FILES_OPEN_THRESHOLD = 200;
 

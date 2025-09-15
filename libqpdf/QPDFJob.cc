@@ -2335,6 +2335,22 @@ added_page(QPDF& pdf, QPDFPageObjectHelper page)
     return added_page(pdf, page.getObjectHandle());
 }
 
+// Initialize all members that depend on the QPDF object. If both qpdf and  qpdf_p are null do
+// nothing.
+void
+QPDFJob::Input::initialize(Inputs& in, QPDF* a_qpdf)
+{
+    qpdf = a_qpdf ? a_qpdf : qpdf_p.get();
+    if (qpdf) {
+        orig_pages = qpdf->getAllPages();
+        n_pages = QIntC::to_int(orig_pages.size());
+
+        if (in.job.m->remove_unreferenced_page_resources != QPDFJob::re_no) {
+            remove_unreferenced = in.job.shouldRemoveUnreferencedResources(*qpdf);
+        }
+    }
+}
+
 void
 QPDFJob::new_selection(
     std::string const& filename, std::string const& password, std::string const& range)
@@ -2369,13 +2385,7 @@ QPDFJob::Inputs::process(std::string const& filename, QPDFJob::Input& input)
             password.data(),
             true);
     }
-    input.qpdf = input.qpdf_p.get();
-    input.orig_pages = input.qpdf->getAllPages();
-    input.n_pages = QIntC::to_int(input.orig_pages.size());
-
-    if (job.m->remove_unreferenced_page_resources != QPDFJob::re_no) {
-        input.remove_unreferenced = job.shouldRemoveUnreferencedResources(*input.qpdf);
-    }
+    input.initialize(*this);
 
     if (input.cfis) {
         input.cfis->stayOpen(false);
@@ -2408,15 +2418,8 @@ QPDFJob::Inputs::process_all()
 bool
 QPDFJob::handlePageSpecs(QPDF& pdf)
 {
-    auto& in_file = m->inputs.files[m->infilename];
-    in_file.qpdf = &pdf;
-    in_file.orig_pages = pdf.getAllPages();
-    in_file.n_pages = QIntC::to_int(in_file.orig_pages.size());
-    if (m->remove_unreferenced_page_resources != QPDFJob::re_no) {
-        in_file.remove_unreferenced = shouldRemoveUnreferencedResources(pdf);
-    }
-
-    // Parse all page specifications and translate them into lists of actual pages.
+    auto& main_input = m->inputs.files[m->infilename];
+    main_input.initialize(m->inputs, &pdf);
 
     // Handle "." as a shortcut for the input file.
     for (auto& selection: m->selections) {
@@ -2456,8 +2459,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
         v << prefix << ": removing unreferenced pages from primary input\n";
     });
-    auto orig_pages = pdf.getAllPages();
-    for (auto const& page: orig_pages) {
+    for (auto const& page: main_input.orig_pages) {
         pdf.removePage(page);
     }
 
@@ -2496,7 +2498,6 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
         }
     }
 
-    std::vector<Selection>& page_specs = new_specs.empty() ? m->selections : new_specs;
     // Add all the pages from all the files in the order specified. Keep track of any pages from the
     // original file that we are selecting.
     std::set<int> selected_from_orig;
@@ -2505,20 +2506,20 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     int out_pageno = 0;
     auto& this_afdh = pdf.acroform();
     std::set<QPDFObjGen> referenced_fields;
-    for (auto& page_data: page_specs) {
-        auto& input = m->inputs.files[page_data.filename];
+    for (auto& selection: new_specs.empty() ? m->selections : new_specs) {
+        auto& input = m->inputs.files[selection.filename];
         if (input.cfis) {
             input.cfis->stayOpen(true);
         }
-        auto& pldh = page_data.qpdf->page_labels();
-        auto& other_afdh = page_data.qpdf->acroform();
+        auto& pldh = selection.qpdf->page_labels();
+        auto& other_afdh = selection.qpdf->acroform();
         if (pldh.hasPageLabels()) {
             any_page_labels = true;
         }
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-            v << prefix << ": adding pages from " << page_data.filename << "\n";
+            v << prefix << ": adding pages from " << selection.filename << "\n";
         });
-        for (auto pageno_iter: page_data.selected_pages) {
+        for (auto pageno_iter: selection.selected_pages) {
             // Pages are specified from 1 but numbered from 0 in the vector
             int pageno = pageno_iter - 1;
             pldh.getLabelsForPageRange(pageno, pageno, out_pageno++, new_labels);
@@ -2583,7 +2584,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     // preserved by being referred to from other places, such as the outlines dictionary. Also make
     // sure we keep form fields from pages we preserved.
     int page_idx = 0;
-    for (auto const& page: orig_pages) {
+    for (auto const& page: main_input.orig_pages) {
         if (selected_from_orig.contains(page_idx)) {
             for (auto field: this_afdh.getFormFieldsForPage(page)) {
                 referenced_fields.insert(field);
