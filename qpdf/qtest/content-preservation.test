@@ -30,8 +30,8 @@ my @flags = (["-qdf",                                           # 1
               "qdf not uncompressed"],
              ["-qdf --stream-data=preserve --normalize-content=n", # 4
               "qdf not normalized or uncompressed"],
-             ["--stream-data=uncompress",                       # 5
-              "uncompresed"],
+             ["--stream-data=uncompress --decrypt",             # 5
+              "uncompresed (and decrpted)"],
              ["--normalize-content=y",                          # 6
               "normalized"],
              ["--stream-data=uncompress --normalize-content=y", # 7
