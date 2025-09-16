@@ -59,6 +59,11 @@ more detail.
 
   - Other changes
 
+    - Setting :qpdf:ref:`--compress-streams` to ``n`` or
+      ``QPDFWriter::setCompressStreams(false)`` no longer automatically
+      causes the outputfile to be decrypted. Set :qpdf:ref:`--decrypt` if this
+      is the intended behaviour.
+
     - There has been some refactoring of stream filtering. These are optimized
       for the common case where no user provided stream filters  are
       registered by calling ``QPDF::registerStreamFilter``. If you are

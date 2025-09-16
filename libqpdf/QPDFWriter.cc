@@ -2268,7 +2268,7 @@ QPDFWriter::Members::doWriteSetup()
     if (encryption) {
         // Encryption has been explicitly set
         preserve_encryption = false;
-    } else if (normalize_content || !compress_streams || pclm || qdf_mode) {
+    } else if (normalize_content || pclm || qdf_mode) {
         // Encryption makes looking at contents pretty useless.  If the user explicitly encrypted
         // though, we still obey that.
         preserve_encryption = false;
