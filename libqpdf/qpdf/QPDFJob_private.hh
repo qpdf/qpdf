@@ -62,6 +62,10 @@ struct QPDFJob::Inputs
     }
     void process(std::string const& filename, QPDFJob::Input& file_spec);
     void process_all();
+
+    // Destroy all owned QPDF objects. Return false if any of the QPDF objects recorded warnings.
+    bool clear();
+
     std::string encryption_file;
     std::string encryption_file_password;
     bool keep_files_open{true};

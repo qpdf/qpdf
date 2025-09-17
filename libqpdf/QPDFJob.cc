@@ -426,15 +426,14 @@ QPDFJob::createQPDF()
     }
 
     if (!m->selections.empty()) {
-        if (!handlePageSpecs(pdf)) {
-            m->warnings = true;
-        }
+        handlePageSpecs(pdf);
     }
     if (!m->rotations.empty()) {
         handleRotations(pdf);
     }
     handleUnderOverlay(pdf);
     handleTransformations(pdf);
+    m->warnings |= m->inputs.clear();
 
     auto root = pdf.getRoot();
     if (m->remove_info) {
@@ -2414,8 +2413,21 @@ QPDFJob::Inputs::process_all()
     }
 }
 
-// Handle all page specifications. Return true if it succeeded without warnings.
 bool
+QPDFJob::Inputs::clear()
+{
+    bool any_warnings = false;
+    for (auto& [filename, file_spec]: files) {
+        if (auto& pdf = file_spec.qpdf_p) {
+            any_warnings |= pdf->anyWarnings();
+            pdf = nullptr;
+        }
+    }
+    return any_warnings;
+}
+
+// Handle all page specifications.
+void
 QPDFJob::handlePageSpecs(QPDF& pdf)
 {
     auto& main_input = m->inputs.files[m->infilename];
@@ -2615,14 +2627,6 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             }
         }
     }
-    for (auto& foreign: m->inputs.files) {
-        if (foreign.second.qpdf_p) { // exclude main input
-            if (foreign.second.qpdf->anyWarnings()) {
-                return false;
-            }
-        }
-    }
-    return true;
 }
 
 void
