@@ -4,6 +4,7 @@
 #include <qpdf/QPDFJob.hh>
 
 #include <qpdf/ClosedFileInputSource.hh>
+#include <qpdf/QPDFLogger.hh>
 
 struct QPDFJob::RotationSpec
 {
@@ -60,6 +61,11 @@ class QPDFJob::Members
     friend class QPDFJob;
 
   public:
+    Members() :
+        log(QPDFLogger::defaultLogger())
+    {
+    }
+    Members(Members const&) = delete;
     ~Members() = default;
 
   private:
@@ -69,9 +75,6 @@ class QPDFJob::Members
     static int constexpr DEFAULT_OI_MIN_HEIGHT = 128;
     static int constexpr DEFAULT_OI_MIN_AREA = 16384;
     static int constexpr DEFAULT_II_MIN_BYTES = 1024;
-
-    Members();
-    Members(Members const&) = delete;
 
     std::shared_ptr<QPDFLogger> log;
     std::string message_prefix{"qpdf"};

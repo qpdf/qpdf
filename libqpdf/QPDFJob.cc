@@ -69,7 +69,7 @@ namespace
         std::vector<int> selected_pages;
     };
 
-    class ProgressReporter: public QPDFWriter::ProgressReporter
+    class ProgressReporter final: public QPDFWriter::ProgressReporter
     {
       public:
         ProgressReporter(Pipeline& p, std::string const& prefix, char const* filename) :
@@ -78,8 +78,12 @@ namespace
             filename(filename)
         {
         }
-        ~ProgressReporter() override = default;
-        void reportProgress(int) override;
+        ~ProgressReporter() final = default;
+        void
+        reportProgress(int percentage) final
+        {
+            p << prefix << ": " << filename << ": write progress: " << percentage << "%\n";
+        }
 
       private:
         Pipeline& p;
@@ -267,19 +271,8 @@ QPDFPageData::QPDFPageData(QPDFPageData const& other, int page) :
     selected_pages.push_back(page);
 }
 
-void
-ProgressReporter::reportProgress(int percentage)
-{
-    p << prefix << ": " << filename << ": write progress: " << percentage << "%\n";
-}
-
-QPDFJob::Members::Members() :
-    log(QPDFLogger::defaultLogger())
-{
-}
-
 QPDFJob::QPDFJob() :
-    m(new Members())
+    m(std::make_shared<Members>())
 {
 }
 
