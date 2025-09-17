@@ -2390,6 +2390,10 @@ QPDFJob::Inputs::process(std::string const& filename, QPDFJob::Input& input)
 void
 QPDFJob::Inputs::process_all()
 {
+    for (auto& selection: selections) {
+        selection.process(*this);
+    }
+
     if (!keep_files_open_set) {
         // Count the number of distinct files to determine whether we should keep files open or not.
         // Rather than trying to code some portable heuristic based on OS limits, just hard-code
@@ -2407,6 +2411,27 @@ QPDFJob::Inputs::process_all()
             process(filename, input);
         }
     }
+
+    for (auto& selection: selections) {
+        // Read original pages from the PDF, and parse the page range associated with this
+        // occurrence of the file.
+        auto const& file_spec = files[selection.filename];
+        selection.qpdf = file_spec.qpdf;
+        if (selection.range.empty()) {
+            selection.selected_pages.reserve(static_cast<size_t>(file_spec.n_pages));
+            for (int i = 1; i <= file_spec.n_pages; ++i) {
+                selection.selected_pages.push_back(i);
+            }
+            continue;
+        }
+        try {
+            selection.selected_pages =
+                QUtil::parse_numrange(selection.range.data(), files[selection.filename].n_pages);
+        } catch (std::runtime_error& e) {
+            throw std::runtime_error(
+                "parsing numeric range for " + selection.filename + ": " + e.what());
+        }
+    }
 }
 
 bool
@@ -2422,6 +2447,19 @@ QPDFJob::Inputs::clear()
     return any_warnings;
 }
 
+void
+QPDFJob::Selection::process(QPDFJob::Inputs& in)
+{
+    // Handle "." as a shortcut for the input file.
+    if (filename == ".") {
+        filename = in.infile_name();
+    }
+    auto& input = in.files[filename];
+    if (!password.empty()) {
+        input.password = password;
+    }
+}
+
 // Handle all page specifications.
 void
 QPDFJob::handlePageSpecs(QPDF& pdf)
@@ -2432,37 +2470,10 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     auto& main_input = m->inputs.files[m->infile_name()];
     main_input.initialize(m->inputs, &pdf);
 
-    // Handle "." as a shortcut for the input file.
-    for (auto& selection: m->inputs.selections) {
-        if (selection.filename == ".") {
-            selection.filename = m->infile_name();
-        } else {
-            // Force insertion
-            (void)m->inputs.files[selection.filename];
-        }
-        if (!selection.password.empty()) {
-            m->inputs.files[selection.filename].password = selection.password;
-        }
-        if (selection.range.empty()) {
-            selection.range = "1-z";
-        }
-    }
-
+    // Parse all section and translate them into lists of actual pages.
     m->inputs.process_all();
 
     std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
-    for (auto& selection: m->inputs.selections) {
-        // Read original pages from the PDF, and parse the page range associated with this
-        // occurrence of the file.
-        auto const& input = m->inputs.files[selection.filename];
-        selection.qpdf = input.qpdf;
-        try {
-            selection.selected_pages = QUtil::parse_numrange(selection.range.data(), input.n_pages);
-        } catch (std::runtime_error& e) {
-            throw std::runtime_error(
-                "parsing numeric range for " + selection.filename + ": " + e.what());
-        }
-    }
 
     // Clear all pages out of the primary QPDF's pages tree but leave the objects in place in the
     // file so they can be re-added without changing their object numbers. This enables other things

@@ -25,6 +25,8 @@ struct QPDFJob::Selection
     {
     }
 
+    void process(Inputs& in);
+
     std::string filename;
     std::string password;
     std::string range;
