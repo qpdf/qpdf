@@ -208,7 +208,6 @@ QPDF not caching overridden objstm object 0
 QPDF_optimization indirect outlines 0
 QPDF xref space 2
 QPDFJob pages range omitted in middle 0
-QPDFJob npages 0
 QPDFWriter standard deterministic ID 1
 QPDFWriter linearized deterministic ID 1
 qpdf-c called qpdf_set_deterministic_ID 0
@@ -221,7 +220,6 @@ QPDFParser found fake 1
 QPDFParser no val for last key 0
 QPDF resolve failure to null 0
 QPDFObjectHandle errors in parsecontent 0
-QPDFJob same file error 0
 QPDFJob split-pages %d 0
 QPDFJob split-pages .pdf 0
 QPDFJob split-pages other 0

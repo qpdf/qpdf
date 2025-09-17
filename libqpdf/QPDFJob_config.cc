@@ -15,18 +15,14 @@ QPDFJob::Config::checkConfiguration()
 QPDFJob::Config*
 QPDFJob::Config::inputFile(std::string const& filename)
 {
-    if (o.m->infilename.empty()) {
-        o.m->infilename = filename;
-    } else {
-        usage("input file has already been given");
-    }
+    o.m->inputs.infile_name(filename);
     return this;
 }
 
 QPDFJob::Config*
 QPDFJob::Config::emptyInput()
 {
-    if (o.m->infilename.empty()) {
+    if (o.m->infile_name().empty()) {
         // Various places in QPDFJob.cc used to know that the empty string for infile means empty.
         // This approach meant that passing "" as the argument to inputFile in job JSON, or
         // equivalently using "" as a positional command-line argument would be the same as

@@ -69,6 +69,22 @@ struct QPDFJob::Inputs
     void new_selection(
         std::string const& filename, std::string const& password, std::string const& range);
 
+    std::string const&
+    infile_name() const
+    {
+        return infile_name_;
+    }
+
+    void
+    infile_name(std::string const& name)
+    {
+        if (!infile_name_.empty()) {
+            usage("input file has already been given");
+        }
+        infile_name_ = name;
+    }
+
+    std::string infile_name_;
     std::string encryption_file;
     std::string encryption_file_password;
     bool keep_files_open{true};
@@ -144,6 +160,10 @@ class QPDFJob::Members
     }
     Members(Members const&) = delete;
     ~Members() = default;
+
+    inline const char* infile_nm() const;
+
+    inline std::string const& infile_name() const;
 
   private:
     // These default values are duplicated in help and docs.
@@ -272,7 +292,6 @@ class QPDFJob::Members
     bool replace_input{false};
     bool check_is_encrypted{false};
     bool check_requires_password{false};
-    std::string infilename;
     bool empty_input{false};
     std::string outfilename;
     bool json_input{false};
@@ -282,4 +301,16 @@ class QPDFJob::Members
     std::vector<PageLabelSpec> page_label_specs;
 };
 
-#endif // QPDFOBJECT_PRIVATE_HH
+inline const char*
+QPDFJob::Members::infile_nm() const
+{
+    return inputs.infile_name().data();
+}
+
+inline std::string const&
+QPDFJob::Members::infile_name() const
+{
+    return inputs.infile_name();
+}
+
+#endif // QPDFJOB_PRIVATE_HH
