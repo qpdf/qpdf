@@ -20,7 +20,6 @@ struct QPDFJob::Selection
     Selection(QPDFJob::Selection const& other, int page) :
         filename(other.filename),
         // range and password are no longer required when this constructor is called.
-        qpdf(other.qpdf),
         selected_pages({page})
     {
     }
@@ -30,7 +29,6 @@ struct QPDFJob::Selection
     std::string filename;
     std::string password;
     std::string range;
-    QPDF* qpdf;
     std::vector<int> selected_pages;
 };
 

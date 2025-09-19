@@ -2416,7 +2416,6 @@ QPDFJob::Inputs::process_all()
         // Read original pages from the PDF, and parse the page range associated with this
         // occurrence of the file.
         auto const& file_spec = files[selection.filename];
-        selection.qpdf = file_spec.qpdf;
         if (selection.range.empty()) {
             selection.selected_pages.reserve(static_cast<size_t>(file_spec.n_pages));
             for (int i = 1; i <= file_spec.n_pages; ++i) {
@@ -2533,8 +2532,8 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
         if (input.cfis) {
             input.cfis->stayOpen(true);
         }
-        auto& pldh = selection.qpdf->page_labels();
-        auto& other_afdh = selection.qpdf->acroform();
+        auto& pldh = input.qpdf->page_labels();
+        auto& other_afdh = input.qpdf->acroform();
         if (pldh.hasPageLabels()) {
             any_page_labels = true;
         }
