@@ -66,6 +66,9 @@ struct QPDFJob::Inputs
     // Destroy all owned QPDF objects. Return false if any of the QPDF objects recorded warnings.
     bool clear();
 
+    void new_selection(
+        std::string const& filename, std::string const& password, std::string const& range);
+
     std::string encryption_file;
     std::string encryption_file_password;
     bool keep_files_open{true};
@@ -73,6 +76,7 @@ struct QPDFJob::Inputs
     size_t keep_files_open_threshold{DEFAULT_KEEP_FILES_OPEN_THRESHOLD};
 
     std::map<std::string, Input> files;
+    std::vector<Selection> selections;
 
   private:
     QPDFJob& job;
@@ -263,7 +267,6 @@ class QPDFJob::Members
     std::vector<UnderOverlay> overlay;
     UnderOverlay* under_overlay{nullptr};
     Inputs inputs;
-    std::vector<Selection> selections;
     std::map<std::string, RotationSpec> rotations;
     bool require_outfile{true};
     bool replace_input{false};

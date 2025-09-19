@@ -425,9 +425,7 @@ QPDFJob::createQPDF()
         pdf.updateFromJSON(m->update_from_json);
     }
 
-    if (!m->selections.empty()) {
-        handlePageSpecs(pdf);
-    }
+    handlePageSpecs(pdf);
     if (!m->rotations.empty()) {
         handleRotations(pdf);
     }
@@ -2351,10 +2349,10 @@ QPDFJob::Input::initialize(Inputs& in, QPDF* a_qpdf)
 }
 
 void
-QPDFJob::new_selection(
+QPDFJob::Inputs::new_selection(
     std::string const& filename, std::string const& password, std::string const& range)
 {
-    m->selections.emplace_back(filename, password, range);
+    selections.emplace_back(filename, password, range);
 }
 
 void
@@ -2430,11 +2428,14 @@ QPDFJob::Inputs::clear()
 void
 QPDFJob::handlePageSpecs(QPDF& pdf)
 {
+    if (m->inputs.selections.empty()) {
+        return;
+    }
     auto& main_input = m->inputs.files[m->infilename];
     main_input.initialize(m->inputs, &pdf);
 
     // Handle "." as a shortcut for the input file.
-    for (auto& selection: m->selections) {
+    for (auto& selection: m->inputs.selections) {
         if (selection.filename == ".") {
             selection.filename = m->infilename;
         } else {
@@ -2452,7 +2453,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     m->inputs.process_all();
 
     std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
-    for (auto& selection: m->selections) {
+    for (auto& selection: m->inputs.selections) {
         // Read original pages from the PDF, and parse the page range associated with this
         // occurrence of the file.
         auto const& input = m->inputs.files[selection.filename];
@@ -2476,7 +2477,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     }
 
     auto n_collate = m->collate.size();
-    auto n_specs = m->selections.size();
+    auto n_specs = m->inputs.selections.size();
     if (!(n_collate == 0 || n_collate == 1 || n_collate == n_specs)) {
         usage(
             "--pages: if --collate has more than one value, it must have one value per page "
@@ -2497,7 +2498,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
         while (got_pages) {
             got_pages = false;
             for (size_t i = 0; i < n_specs; ++i) {
-                auto& page_data = m->selections.at(i);
+                auto& page_data = m->inputs.selections.at(i);
                 for (size_t j = 0; j < m->collate.at(i); ++j) {
                     if (cur_page.at(i) + j < page_data.selected_pages.size()) {
                         got_pages = true;
@@ -2518,7 +2519,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     int out_pageno = 0;
     auto& this_afdh = pdf.acroform();
     std::set<QPDFObjGen> referenced_fields;
-    for (auto& selection: new_specs.empty() ? m->selections : new_specs) {
+    for (auto& selection: new_specs.empty() ? m->inputs.selections : new_specs) {
         auto& input = m->inputs.files[selection.filename];
         if (input.cfis) {
             input.cfis->stayOpen(true);

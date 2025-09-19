@@ -978,7 +978,7 @@ QPDFJob::PagesConfig::PagesConfig(Config* c) :
 std::shared_ptr<QPDFJob::PagesConfig>
 QPDFJob::Config::pages()
 {
-    if (!o.m->selections.empty()) {
+    if (!o.m->inputs.selections.empty()) {
         usage("--pages may only be specified one time");
     }
     return std::shared_ptr<PagesConfig>(new PagesConfig(this));
@@ -987,7 +987,7 @@ QPDFJob::Config::pages()
 QPDFJob::Config*
 QPDFJob::PagesConfig::endPages()
 {
-    auto n_specs = config->o.m->selections.size();
+    auto n_specs = config->o.m->inputs.selections.size();
     if (n_specs == 0) {
         usage("--pages: no page specifications given");
     }
@@ -998,24 +998,24 @@ QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::pageSpec(
     std::string const& filename, std::string const& range, char const* password)
 {
-    config->o.new_selection(filename, {password ? password : ""}, range);
+    config->o.m->inputs.new_selection(filename, {password ? password : ""}, range);
     return this;
 }
 
 QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::file(std::string const& arg)
 {
-    config->o.new_selection(arg, {}, {});
+    config->o.m->inputs.new_selection(arg, {}, {});
     return this;
 }
 
 QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::range(std::string const& arg)
 {
-    if (config->o.m->selections.empty()) {
+    if (config->o.m->inputs.selections.empty()) {
         usage("in --range must follow a file name");
     }
-    auto& last = config->o.m->selections.back();
+    auto& last = config->o.m->inputs.selections.back();
     if (!last.range.empty()) {
         usage("--range already specified for this file");
     }
@@ -1026,10 +1026,10 @@ QPDFJob::PagesConfig::range(std::string const& arg)
 QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::password(std::string const& arg)
 {
-    if (config->o.m->selections.empty()) {
+    if (config->o.m->inputs.selections.empty()) {
         usage("in --pages, --password must follow a file name");
     }
-    auto& last = config->o.m->selections.back();
+    auto& last = config->o.m->inputs.selections.back();
     if (!last.password.empty()) {
         usage("--password already specified for this file");
     }
