@@ -793,6 +793,11 @@ QPDFJob::doCheck(QPDF& pdf)
         Pl_Discard discard;
         w.setOutputPipeline(&discard);
         w.setDecodeLevel(qpdf_dl_all);
+        // Disable compression of streams, since we only need to confirm we can decode them. This
+        // avoids JPEG DCT -> Flate recompression of all images.
+        w.setCompressStreams(false);
+        // Also disable recompression of Flate streams since are only checking.
+        w.setRecompressFlate(false);
         w.write();
 
         // Parse all content streams
