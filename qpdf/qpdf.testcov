@@ -188,7 +188,6 @@ QPDF insert foreign page 0
 QPDFWriter copy use_aes 1
 QPDFParser indirect without context 0
 QPDFObjectHandle trailing data in parse 0
-QPDFJob pages encryption password 0
 QPDFTokenizer EOF reading token 0
 QPDFTokenizer EOF reading appendable token 0
 QPDFWriter extra header text no newline 0
@@ -209,7 +208,6 @@ QPDF not caching overridden objstm object 0
 QPDF_optimization indirect outlines 0
 QPDF xref space 2
 QPDFJob pages range omitted in middle 0
-QPDFJob npages 0
 QPDFWriter standard deterministic ID 1
 QPDFWriter linearized deterministic ID 1
 qpdf-c called qpdf_set_deterministic_ID 0
@@ -222,7 +220,6 @@ QPDFParser found fake 1
 QPDFParser no val for last key 0
 QPDF resolve failure to null 0
 QPDFObjectHandle errors in parsecontent 0
-QPDFJob same file error 0
 QPDFJob split-pages %d 0
 QPDFJob split-pages .pdf 0
 QPDFJob split-pages other 0
@@ -286,8 +283,6 @@ QPDFAcroFormDocumentHelper non-dictionary field 0
 QPDFAcroFormDocumentHelper loop 0
 QPDFAcroFormDocumentHelper field found 1
 QPDFAcroFormDocumentHelper annotation found 1
-QPDFJob keep files open n 0
-QPDFJob keep files open y 0
 QPDFJob automatically set keep files open 1
 QPDFOutlineDocumentHelper string named dest 0
 QPDFObjectHandle merge top type mismatch 0
@@ -338,7 +333,6 @@ QPDFPageDocumentHelper ignore annotation with no appearance 0
 QPDFFormFieldObjectHelper replaced BMC at EOF 0
 QPDFFormFieldObjectHelper fallback Tf 0
 QPDFPageObjectHelper copy shared attribute 1
-QPDFJob from_nr from repeat_nr 0
 QPDF resolve duplicated page object 0
 QPDF handle direct page object 0
 QPDF missing mediabox 0
@@ -453,7 +447,6 @@ QPDFFileSpecObjectHelper empty compat_name 0
 QPDFFileSpecObjectHelper non-empty compat_name 0
 QPDFAcroFormDocumentHelper copy annotation 3
 QPDFAcroFormDocumentHelper field with parent 3
-QPDFJob pages keeping field from original 0
 QPDFObjectHandle merge reuse 0
 QPDFObjectHandle merge generate 0
 QPDFAcroFormDocumentHelper replaced DA token 0
@@ -493,8 +486,6 @@ qpdf-c called qpdf_oh_get_binary_string_value 0
 qpdf-c called qpdf_oh_get_binary_utf8_value 0
 qpdf-c called qpdf_oh_new_binary_string 0
 qpdf-c called qpdf_oh_new_binary_unicode_string 0
-QPDFJob duplicated pages password 0
-QPDFJob misplaced pages password 0
 QPDFJob check encrypted encrypted 0
 QPDFJob check encrypted not encrypted 0
 QPDFJob check password password incorrect 0
@@ -547,8 +538,6 @@ QPDFPageObjectHelper used fallback without copying 0
 QPDF skipping cache for known unchecked object 0
 QPDF fix dangling triggered xref reconstruction 0
 QPDF recover xref stream 0
-QPDFJob misplaced page range 0
-QPDFJob duplicated range 0
 QPDFJob json over/under no file 0
 QPDF_Array copy 1
 QPDF_json stream data not string 0

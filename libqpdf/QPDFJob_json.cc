@@ -1,4 +1,4 @@
-#include <qpdf/QPDFJob.hh>
+#include <qpdf/QPDFJob_private.hh>
 
 #include <qpdf/JSONHandler.hh>
 #include <qpdf/QPDFUsage.hh>

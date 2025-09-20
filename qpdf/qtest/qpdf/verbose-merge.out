@@ -1,14 +1,14 @@
+qpdf: page-labels-and-outlines.pdf: checking for shared resources
+qpdf: no shared resources found
 qpdf: selecting --keep-open-files=y
-qpdf: processing 20-pages.pdf
 qpdf: processing ./20-pages.pdf
-qpdf: processing minimal.pdf
 qpdf: ./20-pages.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 20-pages.pdf
 qpdf: 20-pages.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing minimal.pdf
 qpdf: minimal.pdf: checking for shared resources
-qpdf: no shared resources found
-qpdf: page-labels-and-outlines.pdf: checking for shared resources
 qpdf: no shared resources found
 qpdf: removing unreferenced pages from primary input
 qpdf: adding pages from page-labels-and-outlines.pdf

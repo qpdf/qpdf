@@ -1,157 +1,157 @@
-qpdf: selecting --keep-open-files=n
-qpdf: processing 001-kfo.pdf
-qpdf: processing 002-kfo.pdf
-qpdf: processing 003-kfo.pdf
-qpdf: processing 004-kfo.pdf
-qpdf: processing 005-kfo.pdf
-qpdf: processing 006-kfo.pdf
-qpdf: processing 007-kfo.pdf
-qpdf: processing 008-kfo.pdf
-qpdf: processing 009-kfo.pdf
-qpdf: processing 010-kfo.pdf
-qpdf: processing 011-kfo.pdf
-qpdf: processing 012-kfo.pdf
-qpdf: processing 013-kfo.pdf
-qpdf: processing 014-kfo.pdf
-qpdf: processing 015-kfo.pdf
-qpdf: processing 016-kfo.pdf
-qpdf: processing 017-kfo.pdf
-qpdf: processing 018-kfo.pdf
-qpdf: processing 019-kfo.pdf
-qpdf: processing 020-kfo.pdf
-qpdf: processing 021-kfo.pdf
-qpdf: processing 022-kfo.pdf
-qpdf: processing 023-kfo.pdf
-qpdf: processing 024-kfo.pdf
-qpdf: processing 025-kfo.pdf
-qpdf: processing 026-kfo.pdf
-qpdf: processing 027-kfo.pdf
-qpdf: processing 028-kfo.pdf
-qpdf: processing 029-kfo.pdf
-qpdf: processing 030-kfo.pdf
-qpdf: processing 031-kfo.pdf
-qpdf: processing 032-kfo.pdf
-qpdf: processing 033-kfo.pdf
-qpdf: processing 034-kfo.pdf
-qpdf: processing 035-kfo.pdf
-qpdf: processing 036-kfo.pdf
-qpdf: processing 037-kfo.pdf
-qpdf: processing 038-kfo.pdf
-qpdf: processing 039-kfo.pdf
-qpdf: processing 040-kfo.pdf
-qpdf: processing 041-kfo.pdf
-qpdf: processing 042-kfo.pdf
-qpdf: processing 043-kfo.pdf
-qpdf: processing 044-kfo.pdf
-qpdf: processing 045-kfo.pdf
-qpdf: processing 046-kfo.pdf
-qpdf: processing 047-kfo.pdf
-qpdf: processing 048-kfo.pdf
-qpdf: processing 049-kfo.pdf
-qpdf: processing 050-kfo.pdf
-qpdf: processing 051-kfo.pdf
 qpdf: empty PDF: checking for shared resources
 qpdf: no shared resources found
+qpdf: selecting --keep-open-files=n
+qpdf: processing 001-kfo.pdf
 qpdf: 001-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 002-kfo.pdf
 qpdf: 002-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 003-kfo.pdf
 qpdf: 003-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 004-kfo.pdf
 qpdf: 004-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 005-kfo.pdf
 qpdf: 005-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 006-kfo.pdf
 qpdf: 006-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 007-kfo.pdf
 qpdf: 007-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 008-kfo.pdf
 qpdf: 008-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 009-kfo.pdf
 qpdf: 009-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 010-kfo.pdf
 qpdf: 010-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 011-kfo.pdf
 qpdf: 011-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 012-kfo.pdf
 qpdf: 012-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 013-kfo.pdf
 qpdf: 013-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 014-kfo.pdf
 qpdf: 014-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 015-kfo.pdf
 qpdf: 015-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 016-kfo.pdf
 qpdf: 016-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 017-kfo.pdf
 qpdf: 017-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 018-kfo.pdf
 qpdf: 018-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 019-kfo.pdf
 qpdf: 019-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 020-kfo.pdf
 qpdf: 020-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 021-kfo.pdf
 qpdf: 021-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 022-kfo.pdf
 qpdf: 022-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 023-kfo.pdf
 qpdf: 023-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 024-kfo.pdf
 qpdf: 024-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 025-kfo.pdf
 qpdf: 025-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 026-kfo.pdf
 qpdf: 026-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 027-kfo.pdf
 qpdf: 027-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 028-kfo.pdf
 qpdf: 028-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 029-kfo.pdf
 qpdf: 029-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 030-kfo.pdf
 qpdf: 030-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 031-kfo.pdf
 qpdf: 031-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 032-kfo.pdf
 qpdf: 032-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 033-kfo.pdf
 qpdf: 033-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 034-kfo.pdf
 qpdf: 034-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 035-kfo.pdf
 qpdf: 035-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 036-kfo.pdf
 qpdf: 036-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 037-kfo.pdf
 qpdf: 037-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 038-kfo.pdf
 qpdf: 038-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 039-kfo.pdf
 qpdf: 039-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 040-kfo.pdf
 qpdf: 040-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 041-kfo.pdf
 qpdf: 041-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 042-kfo.pdf
 qpdf: 042-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 043-kfo.pdf
 qpdf: 043-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 044-kfo.pdf
 qpdf: 044-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 045-kfo.pdf
 qpdf: 045-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 046-kfo.pdf
 qpdf: 046-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 047-kfo.pdf
 qpdf: 047-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 048-kfo.pdf
 qpdf: 048-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 049-kfo.pdf
 qpdf: 049-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 050-kfo.pdf
 qpdf: 050-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
+qpdf: processing 051-kfo.pdf
 qpdf: 051-kfo.pdf: checking for shared resources
 qpdf: no shared resources found
 qpdf: removing unreferenced pages from primary input

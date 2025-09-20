@@ -1,4 +1,4 @@
-#include <qpdf/QPDFJob.hh>
+#include <qpdf/QPDFJob_private.hh>
 
 #include <regex>
 
@@ -15,18 +15,14 @@ QPDFJob::Config::checkConfiguration()
 QPDFJob::Config*
 QPDFJob::Config::inputFile(std::string const& filename)
 {
-    if (o.m->infilename.empty()) {
-        o.m->infilename = filename;
-    } else {
-        usage("input file has already been given");
-    }
+    o.m->inputs.infile_name(filename);
     return this;
 }
 
 QPDFJob::Config*
 QPDFJob::Config::emptyInput()
 {
-    if (o.m->infilename.empty()) {
+    if (o.m->infile_name().empty()) {
         // Various places in QPDFJob.cc used to know that the empty string for infile means empty.
         // This approach meant that passing "" as the argument to inputFile in job JSON, or
         // equivalently using "" as a positional command-line argument would be the same as
@@ -152,7 +148,7 @@ QPDFJob::Config::copyEncryption(std::string const& parameter)
     if (o.m->deterministic_id) {
         usage("the deterministic-id option is incompatible with encrypted output files");
     }
-    o.m->encryption_file = parameter;
+    o.m->inputs.encryption_file = parameter;
     o.m->copy_encryption = true;
     o.m->encrypt = false;
     o.m->decrypt = false;
@@ -181,7 +177,7 @@ QPDFJob::Config::deterministicId()
 QPDFJob::Config*
 QPDFJob::Config::encryptionFilePassword(std::string const& parameter)
 {
-    o.m->encryption_file_password = parameter;
+    o.m->inputs.encryption_file_password = parameter;
     return this;
 }
 
@@ -354,15 +350,15 @@ QPDFJob::Config::testJsonSchema()
 QPDFJob::Config*
 QPDFJob::Config::keepFilesOpen(std::string const& parameter)
 {
-    o.m->keep_files_open_set = true;
-    o.m->keep_files_open = (parameter == "y");
+    o.m->inputs.keep_files_open_set = true;
+    o.m->inputs.keep_files_open = (parameter == "y");
     return this;
 }
 
 QPDFJob::Config*
 QPDFJob::Config::keepFilesOpenThreshold(std::string const& parameter)
 {
-    o.m->keep_files_open_threshold = QUtil::string_to_uint(parameter.c_str());
+    o.m->inputs.keep_files_open_threshold = QUtil::string_to_uint(parameter.c_str());
     return this;
 }
 
@@ -978,7 +974,7 @@ QPDFJob::PagesConfig::PagesConfig(Config* c) :
 std::shared_ptr<QPDFJob::PagesConfig>
 QPDFJob::Config::pages()
 {
-    if (!o.m->page_specs.empty()) {
+    if (!o.m->inputs.selections.empty()) {
         usage("--pages may only be specified one time");
     }
     return std::shared_ptr<PagesConfig>(new PagesConfig(this));
@@ -987,7 +983,7 @@ QPDFJob::Config::pages()
 QPDFJob::Config*
 QPDFJob::PagesConfig::endPages()
 {
-    auto n_specs = config->o.m->page_specs.size();
+    auto n_specs = config->o.m->inputs.selections.size();
     if (n_specs == 0) {
         usage("--pages: no page specifications given");
     }
@@ -998,27 +994,25 @@ QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::pageSpec(
     std::string const& filename, std::string const& range, char const* password)
 {
-    config->o.m->page_specs.emplace_back(filename, password, range);
+    config->o.m->inputs.new_selection(filename, {password ? password : ""}, range);
     return this;
 }
 
 QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::file(std::string const& arg)
 {
-    config->o.m->page_specs.emplace_back(arg, "", "");
+    (void)config->o.m->inputs.new_selection(arg);
     return this;
 }
 
 QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::range(std::string const& arg)
 {
-    if (config->o.m->page_specs.empty()) {
-        QTC::TC("qpdf", "QPDFJob misplaced page range");
+    if (config->o.m->inputs.selections.empty()) {
         usage("in --range must follow a file name");
     }
-    auto& last = config->o.m->page_specs.back();
+    auto& last = config->o.m->inputs.selections.back();
     if (!last.range.empty()) {
-        QTC::TC("qpdf", "QPDFJob duplicated range");
         usage("--range already specified for this file");
     }
     last.range = arg;
@@ -1028,16 +1022,10 @@ QPDFJob::PagesConfig::range(std::string const& arg)
 QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::password(std::string const& arg)
 {
-    if (config->o.m->page_specs.empty()) {
-        QTC::TC("qpdf", "QPDFJob misplaced pages password");
+    if (config->o.m->inputs.selections.empty()) {
         usage("in --pages, --password must follow a file name");
     }
-    auto& last = config->o.m->page_specs.back();
-    if (!last.password.empty()) {
-        QTC::TC("qpdf", "QPDFJob duplicated pages password");
-        usage("--password already specified for this file");
-    }
-    last.password = arg;
+    config->o.m->inputs.selections.back().password(arg);
     return this;
 }
 
