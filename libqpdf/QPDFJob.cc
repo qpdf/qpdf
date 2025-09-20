@@ -2405,10 +2405,6 @@ QPDFJob::Inputs::process(std::string const& filename, QPDFJob::Input& input)
 void
 QPDFJob::Inputs::process_all()
 {
-    for (auto& selection: selections) {
-        selection.process(*this);
-    }
-
     if (!infile_name().empty()) {
         files.erase("");
     }
@@ -2479,7 +2475,7 @@ QPDFJob::Inputs::new_selection(
     std::string const& filename, std::string const& password, std::string const& range)
 {
     auto& selection = new_selection(filename);
-    selection.password = password;
+    selection.password(password);
     selection.range = range;
 }
 
@@ -2501,11 +2497,13 @@ QPDFJob::Selection::filename()
 }
 
 void
-QPDFJob::Selection::process(QPDFJob::Inputs& in)
+QPDFJob::Selection::password(std::string password)
 {
-    if (!password.empty()) {
-        input().password = password;
+    auto& in = input();
+    if (!in.password.empty()) {
+        usage("--password already specified for this file");
     }
+    in.password = password;
 }
 
 // Handle all page specifications.

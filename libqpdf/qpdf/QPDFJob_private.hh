@@ -12,9 +12,9 @@ struct QPDFJob::Selection
 {
     Selection() = delete;
 
-    Selection(std::pair<const std::string, QPDFJob::Input>& entry);
+    Selection(std::pair<const std::string, Input>& entry);
 
-    Selection(QPDFJob::Selection const& other, int page) :
+    Selection(Selection const& other, int page) :
         in_entry(other.in_entry),
         selected_pages({page})
     {
@@ -22,11 +22,9 @@ struct QPDFJob::Selection
 
     QPDFJob::Input& input();
     std::string const& filename();
-
-    void process(Inputs& in);
+    void password(std::string password);
 
     std::pair<const std::string, QPDFJob::Input>* in_entry{nullptr};
-    std::string password;
     std::string range; // An empty range means all pages.
     std::vector<int> selected_pages;
 };

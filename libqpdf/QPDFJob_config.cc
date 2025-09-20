@@ -1025,11 +1025,7 @@ QPDFJob::PagesConfig::password(std::string const& arg)
     if (config->o.m->inputs.selections.empty()) {
         usage("in --pages, --password must follow a file name");
     }
-    auto& last = config->o.m->inputs.selections.back();
-    if (!last.password.empty()) {
-        usage("--password already specified for this file");
-    }
-    last.password = arg;
+    config->o.m->inputs.selections.back().password(arg);
     return this;
 }
 
