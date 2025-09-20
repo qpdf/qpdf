@@ -2338,7 +2338,8 @@ QPDFJob::Input::initialize(Inputs& in, QPDF* a_qpdf)
     qpdf = a_qpdf ? a_qpdf : qpdf_p.get();
     if (qpdf) {
         orig_pages = qpdf->getAllPages();
-        n_pages = QIntC::to_int(orig_pages.size());
+        n_pages = static_cast<int>(orig_pages.size());
+        copied_pages = std::vector<bool>(orig_pages.size(), false);
 
         if (in.job.m->remove_unreferenced_page_resources != QPDFJob::re_no) {
             remove_unreferenced = in.job.shouldRemoveUnreferencedResources(*qpdf);
@@ -2367,7 +2368,6 @@ QPDFJob::Inputs::infile_name(std::string const& name)
         files.erase(it);
     }
 }
-
 
 void
 QPDFJob::Inputs::process(std::string const& filename, QPDFJob::Input& input)
@@ -2522,8 +2522,6 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     // Parse all section and translate them into lists of actual pages.
     m->inputs.process_all();
 
-    std::map<unsigned long long, std::set<QPDFObjGen>> copied_pages;
-
     // Clear all pages out of the primary QPDF's pages tree but leave the objects in place in the
     // file so they can be re-added without changing their object numbers. This enables other things
     // in the original file, such as outlines, to continue to work.
@@ -2571,7 +2569,6 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
 
     // Add all the pages from all the files in the order specified. Keep track of any pages from the
     // original file that we are selecting.
-    std::set<int> selected_from_orig;
     std::vector<QPDFObjectHandle> new_labels;
     bool any_page_labels = false;
     int out_pageno = 0;
@@ -2590,32 +2587,25 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << prefix << ": adding pages from " << selection.filename() << "\n";
         });
-        for (auto pageno_iter: selection.selected_pages) {
+        for (PageNo page: selection.selected_pages) {
+            const bool this_file = input.qpdf == &pdf;
+            bool first_copy_from_orig = this_file && !main_input.copied_pages[page.idx];
+
             // Pages are specified from 1 but numbered from 0 in the vector
-            int pageno = pageno_iter - 1;
+            int pageno = page.no - 1;
             pldh.getLabelsForPageRange(pageno, pageno, out_pageno++, new_labels);
-            QPDFPageObjectHelper to_copy = input.orig_pages.at(QIntC::to_size(pageno));
-            QPDFObjGen to_copy_og = to_copy.getObjectHandle().getObjGen();
-            unsigned long long from_uuid = input.qpdf->getUniqueId();
-            if (copied_pages[from_uuid].contains(to_copy_og)) {
+            QPDFPageObjectHelper to_copy = input.orig_pages.at(page.idx);
+            if (input.copied_pages[page.idx]) {
                 QTC::TC(
                     "qpdf", "QPDFJob copy same page more than once", (input.qpdf == &pdf) ? 0 : 1);
                 to_copy = to_copy.shallowCopyPage();
             } else {
-                copied_pages[from_uuid].insert(to_copy_og);
+                input.copied_pages[page.idx] = true;
                 if (input.remove_unreferenced) {
                     to_copy.removeUnreferencedResources();
                 }
             }
             pdf.addPage(to_copy, false);
-            bool first_copy_from_orig = false;
-            bool this_file = input.qpdf == &pdf;
-            if (this_file) {
-                // This is a page from the original file. Keep track of the fact that we are using
-                // it.
-                first_copy_from_orig = (!selected_from_orig.contains(pageno));
-                selected_from_orig.insert(pageno);
-            }
             auto new_page = added_page(pdf, to_copy);
             // Try to avoid gratuitously renaming fields. In the case of where we're just extracting
             // a bunch of pages from the original file and not copying any page more than once,
@@ -2654,9 +2644,9 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     // Delete page objects for unused page in primary. This prevents those objects from being
     // preserved by being referred to from other places, such as the outlines dictionary. Also make
     // sure we keep form fields from pages we preserved.
-    int page_idx = 0;
+    size_t page_idx = 0;
     for (auto const& page: main_input.orig_pages) {
-        if (selected_from_orig.contains(page_idx)) {
+        if (main_input.copied_pages[page_idx]) {
             for (auto field: this_afdh.getFormFieldsForPage(page)) {
                 referenced_fields.insert(field);
             }

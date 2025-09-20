@@ -43,6 +43,7 @@ struct QPDFJob::Input
     ClosedFileInputSource* cfis{};
     std::vector<QPDFObjectHandle> orig_pages;
     int n_pages;
+    std::vector<bool> copied_pages;
     bool remove_unreferenced{false};
 };
 
