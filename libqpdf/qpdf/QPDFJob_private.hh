@@ -10,25 +10,24 @@
 // single clause in the --pages option.
 struct QPDFJob::Selection
 {
-    Selection(std::string const& filename, std::string const& password, std::string const& range) :
-        filename(filename),
-        password(password),
-        range(range)
-    {
-    }
+    Selection() = delete;
+
+    Selection(std::pair<const std::string, QPDFJob::Input>& entry);
 
     Selection(QPDFJob::Selection const& other, int page) :
-        filename(other.filename),
-        // range and password are no longer required when this constructor is called.
+        in_entry(other.in_entry),
         selected_pages({page})
     {
     }
 
+    QPDFJob::Input& input();
+    std::string const& filename();
+
     void process(Inputs& in);
 
-    std::string filename;
+    std::pair<const std::string, QPDFJob::Input>* in_entry{nullptr};
     std::string password;
-    std::string range;
+    std::string range; // An empty range means all pages.
     std::vector<int> selected_pages;
 };
 
@@ -66,6 +65,8 @@ struct QPDFJob::Inputs
     // Destroy all owned QPDF objects. Return false if any of the QPDF objects recorded warnings.
     bool clear();
 
+    Selection& new_selection(std::string const& filename);
+
     void new_selection(
         std::string const& filename, std::string const& password, std::string const& range);
 
@@ -75,14 +76,7 @@ struct QPDFJob::Inputs
         return infile_name_;
     }
 
-    void
-    infile_name(std::string const& name)
-    {
-        if (!infile_name_.empty()) {
-            usage("input file has already been given");
-        }
-        infile_name_ = name;
-    }
+    void infile_name(std::string const& name);
 
     std::string infile_name_;
     std::string encryption_file;

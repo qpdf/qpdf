@@ -1001,7 +1001,7 @@ QPDFJob::PagesConfig::pageSpec(
 QPDFJob::PagesConfig*
 QPDFJob::PagesConfig::file(std::string const& arg)
 {
-    config->o.m->inputs.new_selection(arg, {}, {});
+    (void)config->o.m->inputs.new_selection(arg);
     return this;
 }
 

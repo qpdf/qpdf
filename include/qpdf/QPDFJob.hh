@@ -463,8 +463,6 @@ class QPDFJob
     void setQPDFOptions(QPDF& pdf);
     void handlePageSpecs(QPDF& pdf);
     bool shouldRemoveUnreferencedResources(QPDF& pdf);
-    void new_selection(
-        std::string const& filename, std::string const& password, std::string const& range);
     void handleRotations(QPDF& pdf);
     void getUOPagenos(
         std::vector<UnderOverlay>& uo, std::vector<std::map<size_t, std::vector<int>>>& pagenos);

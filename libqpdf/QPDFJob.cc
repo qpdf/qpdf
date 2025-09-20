@@ -2347,10 +2347,25 @@ QPDFJob::Input::initialize(Inputs& in, QPDF* a_qpdf)
 }
 
 void
-QPDFJob::Inputs::new_selection(
-    std::string const& filename, std::string const& password, std::string const& range)
+QPDFJob::Inputs::infile_name(std::string const& name)
 {
-    selections.emplace_back(filename, password, range);
+    if (!infile_name_.empty()) {
+        usage("input file has already been given");
+    }
+    infile_name_ = name;
+
+    auto& in_entry = *files.insert({name, Input()}).first;
+    auto it = files.find("");
+    if (it != files.end()) {
+        // We allready have selection entries for the main input file. We need to fix them to point
+        // to the correct files entry.
+        for (auto& selection: selections) {
+            if (selection.in_entry == &*it) {
+                selection.in_entry = &in_entry;
+            }
+        }
+        files.erase(it);
+    }
 }
 
 void
@@ -2394,6 +2409,9 @@ QPDFJob::Inputs::process_all()
         selection.process(*this);
     }
 
+    if (!infile_name().empty()) {
+        files.erase("");
+    }
     if (!keep_files_open_set) {
         // Count the number of distinct files to determine whether we should keep files open or not.
         // Rather than trying to code some portable heuristic based on OS limits, just hard-code
@@ -2415,20 +2433,20 @@ QPDFJob::Inputs::process_all()
     for (auto& selection: selections) {
         // Read original pages from the PDF, and parse the page range associated with this
         // occurrence of the file.
-        auto const& file_spec = files[selection.filename];
+        auto const& input = selection.input();
         if (selection.range.empty()) {
-            selection.selected_pages.reserve(static_cast<size_t>(file_spec.n_pages));
-            for (int i = 1; i <= file_spec.n_pages; ++i) {
+            selection.selected_pages.reserve(static_cast<size_t>(input.n_pages));
+            for (int i = 1; i <= input.n_pages; ++i) {
                 selection.selected_pages.push_back(i);
             }
             continue;
         }
         try {
             selection.selected_pages =
-                QUtil::parse_numrange(selection.range.data(), files[selection.filename].n_pages);
+                QUtil::parse_numrange(selection.range.data(), selection.input().n_pages);
         } catch (std::runtime_error& e) {
             throw std::runtime_error(
-                "parsing numeric range for " + selection.filename + ": " + e.what());
+                "parsing numeric range for " + selection.filename() + ": " + e.what());
         }
     }
 }
@@ -2446,16 +2464,47 @@ QPDFJob::Inputs::clear()
     return any_warnings;
 }
 
+QPDFJob::Selection&
+QPDFJob::Inputs::new_selection(std::string const& filename)
+{
+    // Handle "." as a shortcut for the input file. Note that infile_name may not be known yet, in
+    // which case we are wrongly entering an empty name. This will be corrected in the infile_name
+    // setter.
+    return selections.emplace_back(
+        *files.insert({(filename == "." ? infile_name() : filename), Input()}).first);
+}
+
+void
+QPDFJob::Inputs::new_selection(
+    std::string const& filename, std::string const& password, std::string const& range)
+{
+    auto& selection = new_selection(filename);
+    selection.password = password;
+    selection.range = range;
+}
+
+QPDFJob::Selection::Selection(std::pair<const std::string, QPDFJob::Input>& entry) :
+    in_entry(&entry)
+{
+}
+
+QPDFJob::Input&
+QPDFJob::Selection::input()
+{
+    return in_entry->second;
+}
+
+std::string const&
+QPDFJob::Selection::filename()
+{
+    return in_entry->first;
+}
+
 void
 QPDFJob::Selection::process(QPDFJob::Inputs& in)
 {
-    // Handle "." as a shortcut for the input file.
-    if (filename == ".") {
-        filename = in.infile_name();
-    }
-    auto& input = in.files[filename];
     if (!password.empty()) {
-        input.password = password;
+        input().password = password;
     }
 }
 
@@ -2528,7 +2577,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     auto& this_afdh = pdf.acroform();
     std::set<QPDFObjGen> referenced_fields;
     for (auto& selection: new_specs.empty() ? m->inputs.selections : new_specs) {
-        auto& input = m->inputs.files[selection.filename];
+        auto& input = selection.input();
         if (input.cfis) {
             input.cfis->stayOpen(true);
         }
@@ -2538,7 +2587,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             any_page_labels = true;
         }
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
-            v << prefix << ": adding pages from " << selection.filename << "\n";
+            v << prefix << ": adding pages from " << selection.filename() << "\n";
         });
         for (auto pageno_iter: selection.selected_pages) {
             // Pages are specified from 1 but numbered from 0 in the vector
