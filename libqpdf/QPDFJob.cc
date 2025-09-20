@@ -2368,6 +2368,7 @@ QPDFJob::Inputs::infile_name(std::string const& name)
     }
 }
 
+
 void
 QPDFJob::Inputs::process(std::string const& filename, QPDFJob::Input& input)
 {
@@ -2424,25 +2425,27 @@ QPDFJob::Inputs::process_all()
         if (!input.qpdf) {
             process(filename, input);
         }
-    }
 
-    for (auto& selection: selections) {
-        // Read original pages from the PDF, and parse the page range associated with this
-        // occurrence of the file.
-        auto const& input = selection.input();
-        if (selection.range.empty()) {
-            selection.selected_pages.reserve(static_cast<size_t>(input.n_pages));
-            for (int i = 1; i <= input.n_pages; ++i) {
-                selection.selected_pages.push_back(i);
+        for (auto& selection: selections) {
+            if (&selection.input() != &input) {
+                continue;
             }
-            continue;
-        }
-        try {
-            selection.selected_pages =
-                QUtil::parse_numrange(selection.range.data(), selection.input().n_pages);
-        } catch (std::runtime_error& e) {
-            throw std::runtime_error(
-                "parsing numeric range for " + selection.filename() + ": " + e.what());
+            // Read original pages from the PDF, and parse the page range associated with this
+            // occurrence of the file.
+            if (selection.range.empty()) {
+                selection.selected_pages.reserve(static_cast<size_t>(input.n_pages));
+                for (int i = 1; i <= input.n_pages; ++i) {
+                    selection.selected_pages.push_back(i);
+                }
+                continue;
+            }
+            try {
+                selection.selected_pages =
+                    QUtil::parse_numrange(selection.range.data(), selection.input().n_pages);
+            } catch (std::runtime_error& e) {
+                throw std::runtime_error(
+                    "parsing numeric range for " + selection.filename() + ": " + e.what());
+            }
         }
     }
 }
