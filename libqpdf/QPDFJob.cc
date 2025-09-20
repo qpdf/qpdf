@@ -2344,6 +2344,9 @@ QPDFJob::Input::initialize(Inputs& in, QPDF* a_qpdf)
         if (in.job.m->remove_unreferenced_page_resources != QPDFJob::re_no) {
             remove_unreferenced = in.job.shouldRemoveUnreferencedResources(*qpdf);
         }
+        if (qpdf->page_labels().hasPageLabels()) {
+            in.any_page_labels = true;
+        }
     }
 }
 
@@ -2570,7 +2573,6 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     // Add all the pages from all the files in the order specified. Keep track of any pages from the
     // original file that we are selecting.
     std::vector<QPDFObjectHandle> new_labels;
-    bool any_page_labels = false;
     int out_pageno = 0;
     auto& this_afdh = pdf.acroform();
     std::set<QPDFObjGen> referenced_fields;
@@ -2579,25 +2581,23 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
         if (input.cfis) {
             input.cfis->stayOpen(true);
         }
-        auto& pldh = input.qpdf->page_labels();
+        auto* pldh = m->inputs.any_page_labels ? &input.qpdf->page_labels() : nullptr;
         auto& other_afdh = input.qpdf->acroform();
-        if (pldh.hasPageLabels()) {
-            any_page_labels = true;
-        }
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << prefix << ": adding pages from " << selection.filename() << "\n";
         });
+        const bool this_file = input.qpdf == &pdf;
         for (PageNo page: selection.selected_pages) {
-            const bool this_file = input.qpdf == &pdf;
             bool first_copy_from_orig = this_file && !main_input.copied_pages[page.idx];
 
             // Pages are specified from 1 but numbered from 0 in the vector
             int pageno = page.no - 1;
-            pldh.getLabelsForPageRange(pageno, pageno, out_pageno++, new_labels);
+            if (pldh) {
+                pldh->getLabelsForPageRange(pageno, pageno, out_pageno++, new_labels);
+            }
             QPDFPageObjectHelper to_copy = input.orig_pages.at(page.idx);
             if (input.copied_pages[page.idx]) {
-                QTC::TC(
-                    "qpdf", "QPDFJob copy same page more than once", (input.qpdf == &pdf) ? 0 : 1);
+                QTC::TC("qpdf", "QPDFJob copy same page more than once", this_file ? 0 : 1);
                 to_copy = to_copy.shallowCopyPage();
             } else {
                 input.copied_pages[page.idx] = true;
@@ -2637,7 +2637,7 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
             input.cfis->stayOpen(false);
         }
     }
-    if (any_page_labels) {
+    if (m->inputs.any_page_labels) {
         pdf.getRoot().replaceKey("/PageLabels", Dictionary({{"/Nums", Array(new_labels)}}));
     }
 

@@ -87,6 +87,8 @@ struct QPDFJob::Inputs
     std::map<std::string, Input> files;
     std::vector<Selection> selections;
 
+    bool any_page_labels{false};
+
   private:
     QPDFJob& job;
 };
