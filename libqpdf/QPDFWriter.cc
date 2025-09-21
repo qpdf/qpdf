@@ -258,7 +258,79 @@ Pl_stack::Popper::pop()
     stack = nullptr;
 }
 
-class QPDFWriter::Members
+// Writer class is restricted to QPDFWriter so that only it can call certain methods.
+class QPDF::Writer
+{
+    friend class QPDFWriter;
+    Writer(QPDF& pdf) :
+        pdf(pdf)
+    {
+    }
+
+  protected:
+    static void
+    optimize(
+        QPDF& qpdf,
+        QPDFWriter::ObjTable const& obj,
+        std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
+    {
+        qpdf.optimize(obj, skip_stream_parameters);
+    }
+
+    static void
+    getLinearizedParts(
+        QPDF& qpdf,
+        QPDFWriter::ObjTable const& obj,
+        std::vector<QPDFObjectHandle>& part4,
+        std::vector<QPDFObjectHandle>& part6,
+        std::vector<QPDFObjectHandle>& part7,
+        std::vector<QPDFObjectHandle>& part8,
+        std::vector<QPDFObjectHandle>& part9)
+    {
+        qpdf.getLinearizedParts(obj, part4, part6, part7, part8, part9);
+    }
+
+    static void
+    generateHintStream(
+        QPDF& qpdf,
+        QPDFWriter::NewObjTable const& new_obj,
+        QPDFWriter::ObjTable const& obj,
+        std::string& hint_stream,
+        int& S,
+        int& O,
+        bool compressed)
+    {
+        qpdf.generateHintStream(new_obj, obj, hint_stream, S, O, compressed);
+    }
+
+    static std::vector<QPDFObjGen>
+    getCompressibleObjGens(QPDF& qpdf)
+    {
+        return qpdf.getCompressibleObjVector();
+    }
+
+    static std::vector<bool>
+    getCompressibleObjSet(QPDF& qpdf)
+    {
+        return qpdf.getCompressibleObjSet();
+    }
+
+    static std::map<QPDFObjGen, QPDFXRefEntry> const&
+    getXRefTable(QPDF& qpdf)
+    {
+        return qpdf.getXRefTableInternal();
+    }
+
+    static size_t
+    tableSize(QPDF& qpdf)
+    {
+        return qpdf.tableSize();
+    }
+
+    QPDF& pdf;
+};
+
+class QPDFWriter::Members: QPDF::Writer
 {
     friend class QPDFWriter;
 
@@ -273,8 +345,8 @@ class QPDFWriter::Members
     enum trailer_e { t_normal, t_lin_first, t_lin_second };
 
     Members(QPDFWriter& w, QPDF& pdf) :
+        QPDF::Writer(pdf),
         w(w),
-        pdf(pdf),
         root_og(
             pdf.getRoot().getObjGen().isIndirect() ? pdf.getRoot().getObjGen() : QPDFObjGen(-1, 0)),
         pipeline_stack(pipeline)
@@ -409,7 +481,6 @@ class QPDFWriter::Members
 
   private:
     QPDFWriter& w;
-    QPDF& pdf;
     QPDFObjGen root_og{-1, 0};
     char const* filename{"unspecified"};
     FILE* file{nullptr};
