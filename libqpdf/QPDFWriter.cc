@@ -2573,7 +2573,7 @@ QPDFWriter::Members::writeHintStream(int hint_id)
     std::string hint_buffer;
     int S = 0;
     int O = 0;
-    bool compressed = compress_streams && !qdf_mode;
+    bool compressed = compress_streams;
     generateHintStream(new_obj, obj, hint_buffer, S, O, compressed);
 
     openObject(hint_id);
