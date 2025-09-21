@@ -874,6 +874,8 @@ class QPDF
     std::shared_ptr<QPDFObject> const& resolve(QPDFObjGen og);
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
+    inline void
+    no_ci_stop_if(bool condition, std::string const& message, std::string const& context = {});
     QPDFObjGen nextObjGen();
     QPDFObjectHandle newIndirect(QPDFObjGen, std::shared_ptr<QPDFObject> const&);
     QPDFObjectHandle makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj);

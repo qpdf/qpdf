@@ -10,8 +10,6 @@ QPDF object stream contains id < 1 0
 QPDF hint table length direct 0
 QPDF P absent in lindict 1
 QPDF expected n n obj 0
-QPDF err /T mismatch 0
-QPDF err /O mismatch 0
 QPDF opt direct pages resource 1
 QPDF opt inheritable keys 0
 QPDF opt no inheritable keys 0
@@ -22,7 +20,6 @@ QPDF opt key ancestors depth > 1 0
 QPDF opt loop detected 0
 QPDF categorize pagemode present 1
 QPDF categorize pagemode outlines 1
-QPDF warn /E mismatch 0
 QPDF lin outlines in part 1
 QPDF lin nshared_total > nshared_first_page 1
 QPDF lin part 8 empty 1

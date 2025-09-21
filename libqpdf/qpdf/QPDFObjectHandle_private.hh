@@ -624,6 +624,33 @@ namespace qpdf
         return obj ? obj->og.isIndirect() : false;
     }
 
+    inline void
+    BaseHandle::no_ci_stop_if(bool condition, std::string const& message) const
+    {
+        if (condition) {
+            if (qpdf()) {
+                throw QPDFExc(qpdf_e_damaged_pdf, "", description(), 0, message);
+            }
+            throw std::runtime_error(message);
+        }
+    }
+
+    inline void
+    BaseHandle::no_ci_stop_damaged_if(bool condition, std::string const& message) const
+    {
+        if (condition) {
+            throw std::runtime_error(message);
+        }
+    }
+
+    inline void
+    BaseHandle::no_ci_warn_if(bool condition, std::string const& warning) const
+    {
+        if (condition) {
+            warn(warning);
+        }
+    }
+
     inline bool
     BaseHandle::null() const
     {

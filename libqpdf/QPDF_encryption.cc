@@ -1,7 +1,4 @@
-// This file implements methods from the QPDF class that involve
-// encryption.
-
-#include <qpdf/assert_debug.h>
+// This file implements methods from the QPDF class that involve encryption.
 
 #include <qpdf/QPDF_private.hh>
 
