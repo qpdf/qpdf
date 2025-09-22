@@ -1522,7 +1522,7 @@ QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream, std::string* st
     bool compress_stream = false;
     const bool is_root_metadata = stream.isRootMetadata();
 
-    QPDFObjectHandle stream_dict = stream.getDict();
+    Dictionary stream_dict = stream.getDict();
 
     bool filter = false;
     bool normalize = false;
@@ -1535,9 +1535,9 @@ QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream, std::string* st
             // make it worse if the original file used a better Flate algorithm, and we don't spend
             // time and CPU cycles uncompressing and recompressing stuff. This can be overridden
             // with setRecompressFlate(true).
-            QPDFObjectHandle filter_obj = stream_dict.getKey("/Filter");
-            if (!recompress_flate && !stream.isDataModified() && filter_obj.isName() &&
-                (filter_obj.getName() == "/FlateDecode" || filter_obj.getName() == "/Fl")) {
+            Name Filter = stream_dict["/Filter"];
+            if (Filter && !recompress_flate && !stream.isDataModified() &&
+                (Filter == "/FlateDecode" || Filter == "/Fl")) {
                 filter = false;
             }
         }
@@ -1554,8 +1554,7 @@ QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream, std::string* st
     }
 
     // Disable compression for empty streams to improve compatibility
-    if (stream_dict.getKey("/Length").isInteger() &&
-        stream_dict.getKey("/Length").getIntValue() == 0) {
+    if (Integer(stream_dict["/Length"]) == 0) {
         filter = true;
         compress_stream = false;
     }
@@ -1597,7 +1596,7 @@ QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream, std::string* st
         }
     }
     if (!filtered) {
-        compress_stream = false;
+        return {false, false, is_root_metadata};
     }
     return {filtered, compress_stream, is_root_metadata};
 }
