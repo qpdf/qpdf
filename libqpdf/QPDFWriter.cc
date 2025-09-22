@@ -22,6 +22,7 @@
 #include <concepts>
 #include <cstdlib>
 #include <stdexcept>
+#include <tuple>
 
 using namespace std::literals;
 using namespace qpdf;
@@ -394,11 +395,12 @@ class QPDFWriter::Members: QPDF::Writer
     void assignCompressedObjectNumbers(QPDFObjGen og);
     Dictionary trimmed_trailer();
 
-    bool willFilterStream(
-        QPDFObjectHandle stream,
-        bool& compress_stream,
-        bool& is_metadata,
-        std::string* stream_data);
+    // Returns tuple<filter, compress_stream, is_root_metadata>
+    std::tuple<const bool, const bool, const bool>
+    will_filter_stream(QPDFObjectHandle stream, std::string* stream_data);
+
+    // Test whether stream would be filtered if it were written.
+    bool will_filter_stream(QPDFObjectHandle stream);
     unsigned int bytesNeeded(long long n);
     void writeBinary(unsigned long long val, unsigned int bytes);
     Members& write(std::string_view str);
@@ -1507,14 +1509,18 @@ QPDFWriter::Members::writeTrailer(
 }
 
 bool
-QPDFWriter::Members::willFilterStream(
-    QPDFObjectHandle stream,
-    bool& compress_stream,  // out only
-    bool& is_root_metadata, // out only
-    std::string* stream_data)
+QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream)
 {
-    compress_stream = false;
-    is_root_metadata = false;
+    std::string s;
+    [[maybe_unused]] auto [filter, ignore1, ignore2] = will_filter_stream(stream, &s);
+    return filter;
+}
+
+std::tuple<const bool, const bool, const bool>
+QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream, std::string* stream_data)
+{
+    bool compress_stream = false;
+    bool is_root_metadata = false;
 
     QPDFObjGen old_og = stream.getObjGen();
     QPDFObjectHandle stream_dict = stream.getDict();
@@ -1522,7 +1528,8 @@ QPDFWriter::Members::willFilterStream(
     if (stream.isRootMetadata()) {
         is_root_metadata = true;
     }
-    bool filter = stream.isDataModified() || compress_streams || stream_decode_level;
+    bool filter =
+        stream.isDataModified() || compress_streams || stream_decode_level != qpdf_dl_none;
     bool filter_on_write = stream.getFilterOnWrite();
     if (!filter_on_write) {
         filter = false;
@@ -1597,7 +1604,7 @@ QPDFWriter::Members::willFilterStream(
     if (!filtered) {
         compress_stream = false;
     }
-    return filtered;
+    return {filtered, compress_stream, is_root_metadata};
 }
 
 void
@@ -1792,16 +1799,15 @@ QPDFWriter::Members::unparseObject(
         }
 
         flags |= f_stream;
-        bool compress_stream = false;
-        bool is_metadata = false;
         std::string stream_data;
-        if (willFilterStream(object, compress_stream, is_metadata, &stream_data)) {
+        auto [filter, compress_stream, is_root_metadata] = will_filter_stream(object, &stream_data);
+        if (filter) {
             flags |= f_filtered;
         }
         QPDFObjectHandle stream_dict = object.getDict();
 
         cur_stream_length = stream_data.size();
-        if (is_metadata && encryption && !encryption->getEncryptMetadata()) {
+        if (is_root_metadata && encryption && !encryption->getEncryptMetadata()) {
             // Don't encrypt stream data for the metadata stream
             cur_data_key.clear();
         }
@@ -2770,17 +2776,11 @@ QPDFWriter::Members::writeLinearized()
     std::map<int, int> stream_cache;
 
     auto skip_stream_parameters = [this, &stream_cache](QPDFObjectHandle& stream) {
-        auto& result = stream_cache[stream.getObjectID()];
-        if (result == 0) {
-            bool compress_stream;
-            bool is_metadata;
-            if (willFilterStream(stream, compress_stream, is_metadata, nullptr)) {
-                result = 2;
-            } else {
-                result = 1;
-            }
+        if (auto& result = stream_cache[stream.getObjectID()]) {
+            return result;
+        } else {
+            return result = will_filter_stream(stream) ? 2 : 1;
         }
-        return result;
     };
 
     optimize(obj, skip_stream_parameters);
