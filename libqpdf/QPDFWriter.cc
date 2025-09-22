@@ -1520,42 +1520,37 @@ std::tuple<const bool, const bool, const bool>
 QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream, std::string* stream_data)
 {
     bool compress_stream = false;
-    bool is_root_metadata = false;
+    const bool is_root_metadata = stream.isRootMetadata();
 
-    QPDFObjGen old_og = stream.getObjGen();
     QPDFObjectHandle stream_dict = stream.getDict();
 
-    if (stream.isRootMetadata()) {
-        is_root_metadata = true;
-    }
-    bool filter =
-        stream.isDataModified() || compress_streams || stream_decode_level != qpdf_dl_none;
-    bool filter_on_write = stream.getFilterOnWrite();
-    if (!filter_on_write) {
-        filter = false;
-    }
-    if (filter_on_write && compress_streams) {
-        // Don't filter if the stream is already compressed with FlateDecode. This way we don't make
-        // it worse if the original file used a better Flate algorithm, and we don't spend time and
-        // CPU cycles uncompressing and recompressing stuff. This can be overridden with
-        // setRecompressFlate(true).
-        QPDFObjectHandle filter_obj = stream_dict.getKey("/Filter");
-        if (!recompress_flate && !stream.isDataModified() && filter_obj.isName() &&
-            (filter_obj.getName() == "/FlateDecode" || filter_obj.getName() == "/Fl")) {
-            filter = false;
-        }
-    }
+    bool filter = false;
     bool normalize = false;
     bool uncompress = false;
-    if (filter_on_write && is_root_metadata && (!encryption || !encryption->getEncryptMetadata())) {
-        filter = true;
-        compress_stream = false;
-        uncompress = true;
-    } else if (filter_on_write && normalize_content && normalized_streams.contains(old_og)) {
-        normalize = true;
-        filter = true;
-    } else if (filter_on_write && filter && compress_streams) {
-        compress_stream = true;
+
+    if (stream.getFilterOnWrite()) {
+        filter = stream.isDataModified() || compress_streams || stream_decode_level != qpdf_dl_none;
+        if (compress_streams) {
+            // Don't filter if the stream is already compressed with FlateDecode. This way we don't
+            // make it worse if the original file used a better Flate algorithm, and we don't spend
+            // time and CPU cycles uncompressing and recompressing stuff. This can be overridden
+            // with setRecompressFlate(true).
+            QPDFObjectHandle filter_obj = stream_dict.getKey("/Filter");
+            if (!recompress_flate && !stream.isDataModified() && filter_obj.isName() &&
+                (filter_obj.getName() == "/FlateDecode" || filter_obj.getName() == "/Fl")) {
+                filter = false;
+            }
+        }
+        if (is_root_metadata && (!encryption || !encryption->getEncryptMetadata())) {
+            filter = true;
+            compress_stream = false;
+            uncompress = true;
+        } else if (normalize_content && normalized_streams.contains(stream)) {
+            normalize = true;
+            filter = true;
+        } else if (filter && compress_streams) {
+            compress_stream = true;
+        }
     }
 
     // Disable compression for empty streams to improve compatibility
