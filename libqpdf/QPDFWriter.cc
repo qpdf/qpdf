@@ -392,7 +392,7 @@ class QPDFWriter::Members: QPDF::Writer
     void enqueueObjectsPCLm();
     void enqueuePart(std::vector<QPDFObjectHandle>& part);
     void assignCompressedObjectNumbers(QPDFObjGen og);
-    QPDFObjectHandle getTrimmedTrailer();
+    Dictionary trimmed_trailer();
 
     bool willFilterStream(
         QPDFObjectHandle stream,
@@ -1443,7 +1443,7 @@ void
 QPDFWriter::Members::writeTrailer(
     trailer_e which, int size, bool xref_stream, qpdf_offset_t prev, int linearization_pass)
 {
-    QPDFObjectHandle trailer = getTrimmedTrailer();
+    auto trailer = trimmed_trailer();
     if (xref_stream) {
         cur_data_key.clear();
     } else {
@@ -1453,7 +1453,7 @@ QPDFWriter::Members::writeTrailer(
     if (which == t_lin_second) {
         write(" /Size ").write(size);
     } else {
-        for (auto const& [key, value]: trailer.as_dictionary()) {
+        for (auto const& [key, value]: trailer) {
             if (value.null()) {
                 continue;
             }
@@ -2241,28 +2241,28 @@ QPDFWriter::Members::generateObjectStreams()
     }
 }
 
-QPDFObjectHandle
-QPDFWriter::Members::getTrimmedTrailer()
+Dictionary
+QPDFWriter::Members::trimmed_trailer()
 {
     // Remove keys from the trailer that necessarily have to be replaced when writing the file.
 
-    QPDFObjectHandle trailer = pdf.getTrailer().unsafeShallowCopy();
+    Dictionary trailer = pdf.getTrailer().unsafeShallowCopy();
 
     // Remove encryption keys
-    trailer.removeKey("/ID");
-    trailer.removeKey("/Encrypt");
+    trailer.erase("/ID");
+    trailer.erase("/Encrypt");
 
     // Remove modification information
-    trailer.removeKey("/Prev");
+    trailer.erase("/Prev");
 
     // Remove all trailer keys that potentially come from a cross-reference stream
-    trailer.removeKey("/Index");
-    trailer.removeKey("/W");
-    trailer.removeKey("/Length");
-    trailer.removeKey("/Filter");
-    trailer.removeKey("/DecodeParms");
-    trailer.removeKey("/Type");
-    trailer.removeKey("/XRefStm");
+    trailer.erase("/Index");
+    trailer.erase("/W");
+    trailer.erase("/Length");
+    trailer.erase("/Filter");
+    trailer.erase("/DecodeParms");
+    trailer.erase("/Type");
+    trailer.erase("/XRefStm");
 
     return trailer;
 }
@@ -3128,12 +3128,12 @@ QPDFWriter::Members::enqueueObjectsStandard()
     }
 
     // Put root first on queue.
-    QPDFObjectHandle trailer = getTrimmedTrailer();
-    enqueueObject(trailer.getKey("/Root"));
+    auto trailer = trimmed_trailer();
+    enqueueObject(trailer["/Root"]);
 
     // Next place any other objects referenced from the trailer dictionary into the queue, handling
     // direct objects recursively. Root is already there, so enqueuing it a second time is a no-op.
-    for (auto& item: trailer.as_dictionary()) {
+    for (auto& item: trailer) {
         if (!item.second.null()) {
             enqueueObject(item.second);
         }
@@ -3166,9 +3166,7 @@ QPDFWriter::Members::enqueueObjectsPCLm()
         }
     }
 
-    // Put root in queue.
-    QPDFObjectHandle trailer = getTrimmedTrailer();
-    enqueueObject(trailer.getKey("/Root"));
+    enqueueObject(trimmed_trailer()["/Root"]);
 }
 
 void
