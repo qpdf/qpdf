@@ -1519,17 +1519,14 @@ QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream)
 std::tuple<const bool, const bool, const bool>
 QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream, std::string* stream_data)
 {
-    bool compress_stream = false;
     const bool is_root_metadata = stream.isRootMetadata();
-
+    bool filter = false;
+    auto decode_level = stream_decode_level;
+    int encode_flags = 0;
     Dictionary stream_dict = stream.getDict();
 
-    bool filter = false;
-    bool normalize = false;
-    bool uncompress = false;
-
     if (stream.getFilterOnWrite()) {
-        filter = stream.isDataModified() || compress_streams || stream_decode_level != qpdf_dl_none;
+        filter = stream.isDataModified() || compress_streams || decode_level != qpdf_dl_none;
         if (compress_streams) {
             // Don't filter if the stream is already compressed with FlateDecode. This way we don't
             // make it worse if the original file used a better Flate algorithm, and we don't spend
@@ -1543,20 +1540,19 @@ QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream, std::string* st
         }
         if (is_root_metadata && (!encryption || !encryption->getEncryptMetadata())) {
             filter = true;
-            compress_stream = false;
-            uncompress = true;
+            decode_level = qpdf_dl_all;
         } else if (normalize_content && normalized_streams.contains(stream)) {
-            normalize = true;
+            encode_flags = qpdf_ef_normalize;
             filter = true;
         } else if (filter && compress_streams) {
-            compress_stream = true;
+            encode_flags = qpdf_ef_compress;
         }
     }
 
     // Disable compression for empty streams to improve compatibility
     if (Integer(stream_dict["/Length"]) == 0) {
         filter = true;
-        compress_stream = false;
+        encode_flags = 0;
     }
 
     bool filtered = false;
@@ -1567,10 +1563,8 @@ QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream, std::string* st
         try {
             filtered = stream.pipeStreamData(
                 pipeline,
-                !filter ? 0
-                        : ((normalize ? qpdf_ef_normalize : 0) |
-                           (compress_stream ? qpdf_ef_compress : 0)),
-                !filter ? qpdf_dl_none : (uncompress ? qpdf_dl_all : stream_decode_level),
+                filter ? encode_flags : 0,
+                filter ? decode_level : qpdf_dl_none,
                 false,
                 first_attempt);
             if (filter && !filtered) {
@@ -1598,7 +1592,7 @@ QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream, std::string* st
     if (!filtered) {
         return {false, false, is_root_metadata};
     }
-    return {filtered, compress_stream, is_root_metadata};
+    return {filtered, encode_flags & qpdf_ef_compress, is_root_metadata};
 }
 
 void
