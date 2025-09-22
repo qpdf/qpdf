@@ -1555,44 +1555,38 @@ QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream, std::string* st
         encode_flags = 0;
     }
 
-    bool filtered = false;
     for (bool first_attempt: {true, false}) {
         auto pp_stream_data =
             stream_data ? pipeline_stack.activate(*stream_data) : pipeline_stack.activate(true);
 
         try {
-            filtered = stream.pipeStreamData(
-                pipeline,
-                filter ? encode_flags : 0,
-                filter ? decode_level : qpdf_dl_none,
-                false,
-                first_attempt);
-            if (filter && !filtered) {
-                // Try again
-                filter = false;
-                stream.setFilterOnWrite(false);
-            } else {
+            if (stream.pipeStreamData(
+                    pipeline,
+                    filter ? encode_flags : 0,
+                    filter ? decode_level : qpdf_dl_none,
+                    false,
+                    first_attempt)) {
+                return {true, encode_flags & qpdf_ef_compress, is_root_metadata};
+            }
+            if (!filter) {
                 break;
             }
         } catch (std::runtime_error& e) {
-            if (filter && first_attempt) {
-                stream.warn("error while getting stream data: "s + e.what());
-                stream.warn("qpdf will attempt to write the damaged stream unchanged");
-                filter = false;
-                stream.setFilterOnWrite(false);
-                continue;
+            if (!(filter && first_attempt)) {
+                throw std::runtime_error(
+                    "error while getting stream data for " + stream.unparse() + ": " + e.what());
             }
-            throw std::runtime_error(
-                "error while getting stream data for " + stream.unparse() + ": " + e.what());
+            stream.warn("error while getting stream data: "s + e.what());
+            stream.warn("qpdf will attempt to write the damaged stream unchanged");
         }
+        // Try again
+        filter = false;
+        stream.setFilterOnWrite(false);
         if (stream_data) {
             stream_data->clear();
         }
     }
-    if (!filtered) {
-        return {false, false, is_root_metadata};
-    }
-    return {filtered, encode_flags & qpdf_ef_compress, is_root_metadata};
+    return {false, false, is_root_metadata};
 }
 
 void
