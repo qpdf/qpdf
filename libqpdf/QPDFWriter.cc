@@ -22,6 +22,7 @@
 #include <concepts>
 #include <cstdlib>
 #include <stdexcept>
+#include <tuple>
 
 using namespace std::literals;
 using namespace qpdf;
@@ -258,7 +259,76 @@ Pl_stack::Popper::pop()
     stack = nullptr;
 }
 
-class QPDFWriter::Members
+// Writer class is restricted to QPDFWriter so that only it can call certain methods.
+class QPDF::Writer
+{
+    friend class QPDFWriter;
+    Writer(QPDF& pdf) :
+        pdf(pdf)
+    {
+    }
+
+  protected:
+    void
+    optimize(
+        QPDFWriter::ObjTable const& obj,
+        std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
+    {
+        pdf.optimize(obj, skip_stream_parameters);
+    }
+
+    void
+    getLinearizedParts(
+        QPDFWriter::ObjTable const& obj,
+        std::vector<QPDFObjectHandle>& part4,
+        std::vector<QPDFObjectHandle>& part6,
+        std::vector<QPDFObjectHandle>& part7,
+        std::vector<QPDFObjectHandle>& part8,
+        std::vector<QPDFObjectHandle>& part9)
+    {
+        pdf.getLinearizedParts(obj, part4, part6, part7, part8, part9);
+    }
+
+    void
+    generateHintStream(
+        QPDFWriter::NewObjTable const& new_obj,
+        QPDFWriter::ObjTable const& obj,
+        std::string& hint_stream,
+        int& S,
+        int& O,
+        bool compressed)
+    {
+        pdf.generateHintStream(new_obj, obj, hint_stream, S, O, compressed);
+    }
+
+    std::vector<QPDFObjGen>
+    getCompressibleObjGens()
+    {
+        return pdf.getCompressibleObjVector();
+    }
+
+    std::vector<bool>
+    getCompressibleObjSet()
+    {
+        return pdf.getCompressibleObjSet();
+    }
+
+    std::map<QPDFObjGen, QPDFXRefEntry> const&
+    getXRefTable()
+    {
+        return pdf.getXRefTableInternal();
+    }
+
+    size_t
+    tableSize()
+    {
+        return pdf.tableSize();
+    }
+
+    QPDF& pdf;
+};
+
+class QPDFWriter::Members: QPDF::Writer
 {
     friend class QPDFWriter;
 
@@ -273,8 +343,8 @@ class QPDFWriter::Members
     enum trailer_e { t_normal, t_lin_first, t_lin_second };
 
     Members(QPDFWriter& w, QPDF& pdf) :
+        QPDF::Writer(pdf),
         w(w),
-        pdf(pdf),
         root_og(
             pdf.getRoot().getObjGen().isIndirect() ? pdf.getRoot().getObjGen() : QPDFObjGen(-1, 0)),
         pipeline_stack(pipeline)
@@ -323,13 +393,14 @@ class QPDFWriter::Members
     void enqueueObjectsPCLm();
     void enqueuePart(std::vector<QPDFObjectHandle>& part);
     void assignCompressedObjectNumbers(QPDFObjGen og);
-    QPDFObjectHandle getTrimmedTrailer();
+    Dictionary trimmed_trailer();
 
-    bool willFilterStream(
-        QPDFObjectHandle stream,
-        bool& compress_stream,
-        bool& is_metadata,
-        std::string* stream_data);
+    // Returns tuple<filter, compress_stream, is_root_metadata>
+    std::tuple<const bool, const bool, const bool>
+    will_filter_stream(QPDFObjectHandle stream, std::string* stream_data);
+
+    // Test whether stream would be filtered if it were written.
+    bool will_filter_stream(QPDFObjectHandle stream);
     unsigned int bytesNeeded(long long n);
     void writeBinary(unsigned long long val, unsigned int bytes);
     Members& write(std::string_view str);
@@ -409,7 +480,6 @@ class QPDFWriter::Members
 
   private:
     QPDFWriter& w;
-    QPDF& pdf;
     QPDFObjGen root_og{-1, 0};
     char const* filename{"unspecified"};
     FILE* file{nullptr};
@@ -1375,7 +1445,7 @@ void
 QPDFWriter::Members::writeTrailer(
     trailer_e which, int size, bool xref_stream, qpdf_offset_t prev, int linearization_pass)
 {
-    QPDFObjectHandle trailer = getTrimmedTrailer();
+    auto trailer = trimmed_trailer();
     if (xref_stream) {
         cur_data_key.clear();
     } else {
@@ -1385,7 +1455,7 @@ QPDFWriter::Members::writeTrailer(
     if (which == t_lin_second) {
         write(" /Size ").write(size);
     } else {
-        for (auto const& [key, value]: trailer.as_dictionary()) {
+        for (auto const& [key, value]: trailer) {
             if (value.null()) {
                 continue;
             }
@@ -1439,97 +1509,84 @@ QPDFWriter::Members::writeTrailer(
 }
 
 bool
-QPDFWriter::Members::willFilterStream(
-    QPDFObjectHandle stream,
-    bool& compress_stream,  // out only
-    bool& is_root_metadata, // out only
-    std::string* stream_data)
+QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream)
 {
-    compress_stream = false;
-    is_root_metadata = false;
+    std::string s;
+    [[maybe_unused]] auto [filter, ignore1, ignore2] = will_filter_stream(stream, &s);
+    return filter;
+}
 
-    QPDFObjGen old_og = stream.getObjGen();
-    QPDFObjectHandle stream_dict = stream.getDict();
+std::tuple<const bool, const bool, const bool>
+QPDFWriter::Members::will_filter_stream(QPDFObjectHandle stream, std::string* stream_data)
+{
+    const bool is_root_metadata = stream.isRootMetadata();
+    bool filter = false;
+    auto decode_level = stream_decode_level;
+    int encode_flags = 0;
+    Dictionary stream_dict = stream.getDict();
 
-    if (stream.isRootMetadata()) {
-        is_root_metadata = true;
-    }
-    bool filter = stream.isDataModified() || compress_streams || stream_decode_level;
-    bool filter_on_write = stream.getFilterOnWrite();
-    if (!filter_on_write) {
-        filter = false;
-    }
-    if (filter_on_write && compress_streams) {
-        // Don't filter if the stream is already compressed with FlateDecode. This way we don't make
-        // it worse if the original file used a better Flate algorithm, and we don't spend time and
-        // CPU cycles uncompressing and recompressing stuff. This can be overridden with
-        // setRecompressFlate(true).
-        QPDFObjectHandle filter_obj = stream_dict.getKey("/Filter");
-        if (!recompress_flate && !stream.isDataModified() && filter_obj.isName() &&
-            (filter_obj.getName() == "/FlateDecode" || filter_obj.getName() == "/Fl")) {
-            filter = false;
+    if (stream.getFilterOnWrite()) {
+        filter = stream.isDataModified() || compress_streams || decode_level != qpdf_dl_none;
+        if (compress_streams) {
+            // Don't filter if the stream is already compressed with FlateDecode. This way we don't
+            // make it worse if the original file used a better Flate algorithm, and we don't spend
+            // time and CPU cycles uncompressing and recompressing stuff. This can be overridden
+            // with setRecompressFlate(true).
+            Name Filter = stream_dict["/Filter"];
+            if (Filter && !recompress_flate && !stream.isDataModified() &&
+                (Filter == "/FlateDecode" || Filter == "/Fl")) {
+                filter = false;
+            }
         }
-    }
-    bool normalize = false;
-    bool uncompress = false;
-    if (filter_on_write && is_root_metadata && (!encryption || !encryption->getEncryptMetadata())) {
-        filter = true;
-        compress_stream = false;
-        uncompress = true;
-    } else if (filter_on_write && normalize_content && normalized_streams.contains(old_og)) {
-        normalize = true;
-        filter = true;
-    } else if (filter_on_write && filter && compress_streams) {
-        compress_stream = true;
+        if (is_root_metadata && (!encryption || !encryption->getEncryptMetadata())) {
+            filter = true;
+            decode_level = qpdf_dl_all;
+        } else if (normalize_content && normalized_streams.contains(stream)) {
+            encode_flags = qpdf_ef_normalize;
+            filter = true;
+        } else if (filter && compress_streams) {
+            encode_flags = qpdf_ef_compress;
+        }
     }
 
     // Disable compression for empty streams to improve compatibility
-    if (stream_dict.getKey("/Length").isInteger() &&
-        stream_dict.getKey("/Length").getIntValue() == 0) {
+    if (Integer(stream_dict["/Length"]) == 0) {
         filter = true;
-        compress_stream = false;
+        encode_flags = 0;
     }
 
-    bool filtered = false;
     for (bool first_attempt: {true, false}) {
         auto pp_stream_data =
             stream_data ? pipeline_stack.activate(*stream_data) : pipeline_stack.activate(true);
 
         try {
-            filtered = stream.pipeStreamData(
-                pipeline,
-                !filter ? 0
-                        : ((normalize ? qpdf_ef_normalize : 0) |
-                           (compress_stream ? qpdf_ef_compress : 0)),
-                !filter ? qpdf_dl_none : (uncompress ? qpdf_dl_all : stream_decode_level),
-                false,
-                first_attempt);
-            if (filter && !filtered) {
-                // Try again
-                filter = false;
-                stream.setFilterOnWrite(false);
-            } else {
+            if (stream.pipeStreamData(
+                    pipeline,
+                    filter ? encode_flags : 0,
+                    filter ? decode_level : qpdf_dl_none,
+                    false,
+                    first_attempt)) {
+                return {true, encode_flags & qpdf_ef_compress, is_root_metadata};
+            }
+            if (!filter) {
                 break;
             }
         } catch (std::runtime_error& e) {
-            if (filter && first_attempt) {
-                stream.warn("error while getting stream data: "s + e.what());
-                stream.warn("qpdf will attempt to write the damaged stream unchanged");
-                filter = false;
-                stream.setFilterOnWrite(false);
-                continue;
+            if (!(filter && first_attempt)) {
+                throw std::runtime_error(
+                    "error while getting stream data for " + stream.unparse() + ": " + e.what());
             }
-            throw std::runtime_error(
-                "error while getting stream data for " + stream.unparse() + ": " + e.what());
+            stream.warn("error while getting stream data: "s + e.what());
+            stream.warn("qpdf will attempt to write the damaged stream unchanged");
         }
+        // Try again
+        filter = false;
+        stream.setFilterOnWrite(false);
         if (stream_data) {
             stream_data->clear();
         }
     }
-    if (!filtered) {
-        compress_stream = false;
-    }
-    return filtered;
+    return {false, false, is_root_metadata};
 }
 
 void
@@ -1724,16 +1781,15 @@ QPDFWriter::Members::unparseObject(
         }
 
         flags |= f_stream;
-        bool compress_stream = false;
-        bool is_metadata = false;
         std::string stream_data;
-        if (willFilterStream(object, compress_stream, is_metadata, &stream_data)) {
+        auto [filter, compress_stream, is_root_metadata] = will_filter_stream(object, &stream_data);
+        if (filter) {
             flags |= f_filtered;
         }
         QPDFObjectHandle stream_dict = object.getDict();
 
         cur_stream_length = stream_data.size();
-        if (is_metadata && encryption && !encryption->getEncryptMetadata()) {
+        if (is_root_metadata && encryption && !encryption->getEncryptMetadata()) {
             // Don't encrypt stream data for the metadata stream
             cur_data_key.clear();
         }
@@ -2089,7 +2145,7 @@ QPDFWriter::Members::initializeSpecialStreams()
 void
 QPDFWriter::Members::preserveObjectStreams()
 {
-    auto const& xref = QPDF::Writer::getXRefTable(pdf);
+    auto const& xref = getXRefTable();
     // Our object_to_object_stream map has to map ObjGen -> ObjGen since we may be generating object
     // streams out of old objects that have generation numbers greater than zero. However in an
     // existing PDF, all object stream objects and all objects in them must have generation 0
@@ -2114,7 +2170,7 @@ QPDFWriter::Members::preserveObjectStreams()
             if (iter->second.getType() == 2) {
                 // Pdf contains object streams.
                 obj.streams_empty = false;
-                auto eligible = QPDF::Writer::getCompressibleObjSet(pdf);
+                auto eligible = getCompressibleObjSet();
                 // The object pointed to by iter may be a previous generation, in which case it is
                 // removed by getCompressibleObjSet. We need to restart the loop (while the object
                 // table may contain multiple generations of an object).
@@ -2145,7 +2201,7 @@ QPDFWriter::Members::generateObjectStreams()
 
     // This code doesn't do anything with /Extends.
 
-    std::vector<QPDFObjGen> eligible = QPDF::Writer::getCompressibleObjGens(pdf);
+    std::vector<QPDFObjGen> eligible = getCompressibleObjGens();
     size_t n_object_streams = (eligible.size() + 99U) / 100U;
 
     initializeTables(2U * n_object_streams);
@@ -2173,28 +2229,28 @@ QPDFWriter::Members::generateObjectStreams()
     }
 }
 
-QPDFObjectHandle
-QPDFWriter::Members::getTrimmedTrailer()
+Dictionary
+QPDFWriter::Members::trimmed_trailer()
 {
     // Remove keys from the trailer that necessarily have to be replaced when writing the file.
 
-    QPDFObjectHandle trailer = pdf.getTrailer().unsafeShallowCopy();
+    Dictionary trailer = pdf.getTrailer().unsafeShallowCopy();
 
     // Remove encryption keys
-    trailer.removeKey("/ID");
-    trailer.removeKey("/Encrypt");
+    trailer.erase("/ID");
+    trailer.erase("/Encrypt");
 
     // Remove modification information
-    trailer.removeKey("/Prev");
+    trailer.erase("/Prev");
 
     // Remove all trailer keys that potentially come from a cross-reference stream
-    trailer.removeKey("/Index");
-    trailer.removeKey("/W");
-    trailer.removeKey("/Length");
-    trailer.removeKey("/Filter");
-    trailer.removeKey("/DecodeParms");
-    trailer.removeKey("/Type");
-    trailer.removeKey("/XRefStm");
+    trailer.erase("/Index");
+    trailer.erase("/W");
+    trailer.erase("/Length");
+    trailer.erase("/Filter");
+    trailer.erase("/DecodeParms");
+    trailer.erase("/Type");
+    trailer.erase("/XRefStm");
 
     return trailer;
 }
@@ -2226,7 +2282,7 @@ QPDFWriter::Members::prepareFileForWrite()
 void
 QPDFWriter::Members::initializeTables(size_t extra)
 {
-    auto size = QIntC::to_size(QPDF::Writer::tableSize(pdf) + 100) + extra;
+    auto size = QIntC::to_size(tableSize() + 100) + extra;
     obj.resize(size);
     new_obj.resize(size);
 }
@@ -2505,8 +2561,8 @@ QPDFWriter::Members::writeHintStream(int hint_id)
     std::string hint_buffer;
     int S = 0;
     int O = 0;
-    bool compressed = compress_streams && !qdf_mode;
-    QPDF::Writer::generateHintStream(pdf, new_obj, obj, hint_buffer, S, O, compressed);
+    bool compressed = compress_streams;
+    generateHintStream(new_obj, obj, hint_buffer, S, O, compressed);
 
     openObject(hint_id);
     setDataKey(hint_id);
@@ -2702,27 +2758,21 @@ QPDFWriter::Members::writeLinearized()
     std::map<int, int> stream_cache;
 
     auto skip_stream_parameters = [this, &stream_cache](QPDFObjectHandle& stream) {
-        auto& result = stream_cache[stream.getObjectID()];
-        if (result == 0) {
-            bool compress_stream;
-            bool is_metadata;
-            if (willFilterStream(stream, compress_stream, is_metadata, nullptr)) {
-                result = 2;
-            } else {
-                result = 1;
-            }
+        if (auto& result = stream_cache[stream.getObjectID()]) {
+            return result;
+        } else {
+            return result = will_filter_stream(stream) ? 2 : 1;
         }
-        return result;
     };
 
-    QPDF::Writer::optimize(pdf, obj, skip_stream_parameters);
+    optimize(obj, skip_stream_parameters);
 
     std::vector<QPDFObjectHandle> part4;
     std::vector<QPDFObjectHandle> part6;
     std::vector<QPDFObjectHandle> part7;
     std::vector<QPDFObjectHandle> part8;
     std::vector<QPDFObjectHandle> part9;
-    QPDF::Writer::getLinearizedParts(pdf, obj, part4, part6, part7, part8, part9);
+    getLinearizedParts(obj, part4, part6, part7, part8, part9);
 
     // Object number sequence:
     //
@@ -3060,12 +3110,12 @@ QPDFWriter::Members::enqueueObjectsStandard()
     }
 
     // Put root first on queue.
-    QPDFObjectHandle trailer = getTrimmedTrailer();
-    enqueueObject(trailer.getKey("/Root"));
+    auto trailer = trimmed_trailer();
+    enqueueObject(trailer["/Root"]);
 
     // Next place any other objects referenced from the trailer dictionary into the queue, handling
     // direct objects recursively. Root is already there, so enqueuing it a second time is a no-op.
-    for (auto& item: trailer.as_dictionary()) {
+    for (auto& item: trailer) {
         if (!item.second.null()) {
             enqueueObject(item.second);
         }
@@ -3098,9 +3148,7 @@ QPDFWriter::Members::enqueueObjectsPCLm()
         }
     }
 
-    // Put root in queue.
-    QPDFObjectHandle trailer = getTrimmedTrailer();
-    enqueueObject(trailer.getKey("/Root"));
+    enqueueObject(trimmed_trailer()["/Root"]);
 }
 
 void
