@@ -69,8 +69,6 @@ class Buffer
   private:
     class Members;
 
-    void copy(Buffer const&);
-
     std::unique_ptr<Members> m;
 };
 

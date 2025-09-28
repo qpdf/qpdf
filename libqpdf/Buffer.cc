@@ -88,17 +88,6 @@ Buffer::operator=(Buffer&& rhs) noexcept
 
 Buffer::~Buffer() = default;
 
-void
-Buffer::copy(Buffer const& rhs)
-{
-    if (this != &rhs) {
-        m = std::make_unique<Members>(rhs.m->size, nullptr, true);
-        if (m->size) {
-            memcpy(m->buf, rhs.m->buf, m->size);
-        }
-    }
-}
-
 size_t
 Buffer::getSize() const
 {
