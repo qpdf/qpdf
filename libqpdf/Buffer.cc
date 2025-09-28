@@ -11,7 +11,7 @@ class Buffer::Members
   public:
     Members() = default;
     // Constructor for Buffers that don't own the memory.
-    Members(size_t size, unsigned char* buf) :
+    Members(size_t size, char* buf) :
         size(size),
         buf(buf)
     {
@@ -19,7 +19,7 @@ class Buffer::Members
     Members(std::string&& content) :
         str(std::move(content)),
         size(str.size()),
-        buf(reinterpret_cast<unsigned char*>(str.data()))
+        buf(str.data())
     {
     }
     Members(Members const&) = delete;
@@ -28,7 +28,7 @@ class Buffer::Members
   private:
     std::string str;
     size_t size;
-    unsigned char* buf;
+    char* buf;
 };
 
 Buffer::Buffer() :
@@ -47,12 +47,12 @@ Buffer::Buffer(std::string&& content) :
 }
 
 Buffer::Buffer(unsigned char* buf, size_t size) :
-    m(std::make_unique<Members>(size, buf))
+    m(std::make_unique<Members>(size, reinterpret_cast<char*>(buf)))
 {
 }
 
 Buffer::Buffer(std::string& content) :
-    m(std::make_unique<Members>(content.size(), reinterpret_cast<unsigned char*>(content.data())))
+    m(std::make_unique<Members>(content.size(), content.data()))
 {
 }
 
@@ -79,13 +79,13 @@ Buffer::getSize() const
 unsigned char const*
 Buffer::getBuffer() const
 {
-    return m->buf;
+    return reinterpret_cast<unsigned char*>(m->buf);
 }
 
 unsigned char*
 Buffer::getBuffer()
 {
-    return m->buf;
+    return reinterpret_cast<unsigned char*>(m->buf);
 }
 
 Buffer
@@ -94,5 +94,5 @@ Buffer::copy() const
     if (m->size == 0) {
         return {};
     }
-    return {std::string(reinterpret_cast<char const*>(m->buf), m->size)};
+    return {std::string(m->buf, m->size)};
 }
