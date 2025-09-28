@@ -9,12 +9,12 @@ class Buffer::Members
     friend class Buffer;
 
   public:
-    ~Members();
-
-  private:
     Members(size_t size, unsigned char* buf, bool own_memory);
     Members(std::string&& content);
     Members(Members const&) = delete;
+    ~Members();
+
+  private:
 
     std::string str;
     bool own_memory;
@@ -50,27 +50,27 @@ Buffer::Members::~Members()
 }
 
 Buffer::Buffer() :
-    m(new Members(0, nullptr, true))
+    m(std::make_unique<Members>(0, nullptr, true))
 {
 }
 
 Buffer::Buffer(size_t size) :
-    m(new Members(size, nullptr, true))
+    m(std::make_unique<Members>(size, nullptr, true))
 {
 }
 
 Buffer::Buffer(std::string&& content) :
-    m(new Members(std::move(content)))
+    m(std::make_unique<Members>(std::move(content)))
 {
 }
 
 Buffer::Buffer(unsigned char* buf, size_t size) :
-    m(new Members(size, buf, false))
+    m(std::make_unique<Members>(size, buf, false))
 {
 }
 
 Buffer::Buffer(std::string& content) :
-    m(new Members(content.size(), reinterpret_cast<unsigned char*>(content.data()), false))
+    m(std::make_unique<Members>(content.size(), reinterpret_cast<unsigned char*>(content.data()), false))
 {
 }
 
@@ -92,7 +92,7 @@ void
 Buffer::copy(Buffer const& rhs)
 {
     if (this != &rhs) {
-        m = std::unique_ptr<Members>(new Members(rhs.m->size, nullptr, true));
+        m = std::make_unique<Members>(rhs.m->size, nullptr, true);
         if (m->size) {
             memcpy(m->buf, rhs.m->buf, m->size);
         }
