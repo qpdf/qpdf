@@ -9,53 +9,35 @@ class Buffer::Members
     friend class Buffer;
 
   public:
-    Members(size_t size, unsigned char* buf, bool own_memory);
-    Members(std::string&& content);
+    Members() = default;
+    // Constructor for Buffers that don't own the memory.
+    Members(size_t size, unsigned char* buf) :
+        size(size),
+        buf(buf)
+    {
+    }
+    Members(std::string&& content) :
+        str(std::move(content)),
+        size(str.size()),
+        buf(reinterpret_cast<unsigned char*>(str.data()))
+    {
+    }
     Members(Members const&) = delete;
-    ~Members();
+    ~Members() = default;
 
   private:
-
     std::string str;
-    bool own_memory;
     size_t size;
     unsigned char* buf;
 };
 
-Buffer::Members::Members(size_t size, unsigned char* buf, bool own_memory) :
-    own_memory(own_memory),
-    size(size),
-    buf(nullptr)
-{
-    if (own_memory) {
-        this->buf = (size ? new unsigned char[size] : nullptr);
-    } else {
-        this->buf = buf;
-    }
-}
-
-Buffer::Members::Members(std::string&& content) :
-    str(std::move(content)),
-    own_memory(false),
-    size(str.size()),
-    buf(reinterpret_cast<unsigned char*>(str.data()))
-{
-}
-
-Buffer::Members::~Members()
-{
-    if (this->own_memory) {
-        delete[] this->buf;
-    }
-}
-
 Buffer::Buffer() :
-    m(std::make_unique<Members>(0, nullptr, true))
+    m(std::make_unique<Members>())
 {
 }
 
 Buffer::Buffer(size_t size) :
-    m(std::make_unique<Members>(size, nullptr, true))
+    m(std::make_unique<Members>(std::string(size, '\0')))
 {
 }
 
@@ -65,12 +47,12 @@ Buffer::Buffer(std::string&& content) :
 }
 
 Buffer::Buffer(unsigned char* buf, size_t size) :
-    m(std::make_unique<Members>(size, buf, false))
+    m(std::make_unique<Members>(size, buf))
 {
 }
 
 Buffer::Buffer(std::string& content) :
-    m(std::make_unique<Members>(content.size(), reinterpret_cast<unsigned char*>(content.data()), false))
+    m(std::make_unique<Members>(content.size(), reinterpret_cast<unsigned char*>(content.data())))
 {
 }
 
@@ -109,9 +91,8 @@ Buffer::getBuffer()
 Buffer
 Buffer::copy() const
 {
-    auto result = Buffer(m->size);
-    if (m->size) {
-        memcpy(result.m->buf, m->buf, m->size);
+    if (m->size == 0) {
+        return {};
     }
-    return result;
+    return {std::string(reinterpret_cast<char const*>(m->buf), m->size)};
 }
