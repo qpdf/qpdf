@@ -76,6 +76,22 @@ class Buffer
     QPDF_DLL
     std::string_view view() const;
 
+    // Return a pointer to the data. NB: Unlike getBuffer, this method returns a valid pointer even
+    // if the Buffer is empty.
+    QPDF_DLL
+    char const* data() const;
+
+    // Return a pointer to the data. NB: Unlike getBuffer, this method returns a valid pointer even
+    // if the Buffer is empty.
+    QPDF_DLL
+    char* data();
+
+    QPDF_DLL
+    bool empty() const;
+
+    QPDF_DLL
+    size_t size() const;
+
   private:
     class Members;
 

@@ -38,8 +38,14 @@ more detail.
       overhead of repeatedly validating the underlying document structure
       and/or building internal caches. If the underlying document structure
       is directly modified (without the use of DocumentHelpers), the
-      ``validate`` methods revalidates the structure and resynchronizes any
+      ``validate`` methods revalidate the structure and resynchronize any
       internal caches.
+
+    - Add new ``Buffer`` methods ``move``, ``view``, ``data``, ``size`` and
+      ``empty``. The new methods present the ``Buffer`` as a ``char`` (rather
+      than ``unsigned char``) container and facilitate the efficient moving
+      of its content into a `std::string``.
+
 
   - CLI Enhancements
 

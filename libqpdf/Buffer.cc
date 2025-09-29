@@ -117,3 +117,27 @@ Buffer::view() const
     }
     return {m->buf, m->size};
 }
+
+char const*
+Buffer::data() const
+{
+    return m->buf ? m->buf : m->str.data();
+}
+
+char*
+Buffer::data()
+{
+    return m->buf ? m->buf : m->str.data();
+}
+
+bool
+Buffer::empty() const
+{
+    return m->size == 0;
+}
+
+size_t
+Buffer::size() const
+{
+    return m->size;
+}
