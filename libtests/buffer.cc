@@ -35,11 +35,13 @@ main()
     assert(bc2p[0] == 'R');
     assert(bc2p[1] == 'W');
 
-    // Test move method
+    // Test move and view method
+    assert(bc1.view() == "RW");
     auto s1 = bc1.move();
     assert(bc1.getBuffer() == nullptr);
     assert(bc1.getSize() == 0);
     assert(s1 == "RW");
+    assert(bc1.view().empty());
 
     // Test Buffer(std:string&&)
     Buffer bc3("QW");

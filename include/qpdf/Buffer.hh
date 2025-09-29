@@ -25,6 +25,7 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <string_view>
 
 class Buffer
 {
@@ -70,6 +71,10 @@ class Buffer
     // buffer owns its memory. Otherwise, the Buffer will be unchanged.
     QPDF_DLL
     std::string move();
+
+    // Return a string_view to the data.
+    QPDF_DLL
+    std::string_view view() const;
 
   private:
     class Members;

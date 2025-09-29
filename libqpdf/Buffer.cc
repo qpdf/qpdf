@@ -108,3 +108,12 @@ Buffer::move()
     }
     return {m->buf, m->size};
 }
+
+std::string_view
+Buffer::view() const
+{
+    if (!m->buf) {
+        return {};
+    }
+    return {m->buf, m->size};
+}
