@@ -2,8 +2,6 @@
 
 #include <qpdf/Buffer.hh>
 
-#include <cstring>
-
 class Buffer::Members
 {
     friend class Buffer;
@@ -95,4 +93,18 @@ Buffer::copy() const
         return {};
     }
     return {std::string(m->buf, m->size)};
+}
+
+std::string
+Buffer::move()
+{
+    if (m->size == 0) {
+        return {};
+    }
+    if (!m->str.empty()) {
+        m->size = 0;
+        m->buf = nullptr;
+        return std::move(m->str);
+    }
+    return {m->buf, m->size};
 }

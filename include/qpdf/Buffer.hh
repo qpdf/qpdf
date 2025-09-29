@@ -66,6 +66,11 @@ class Buffer
     QPDF_DLL
     Buffer copy() const;
 
+    // Move the content of the Buffer. After calling this method, the Buffer will be empty if the
+    // buffer owns its memory. Otherwise, the Buffer will be unchanged.
+    QPDF_DLL
+    std::string move();
+
   private:
     class Members;
 
