@@ -2,75 +2,55 @@
 
 #include <qpdf/Buffer.hh>
 
-#include <cstring>
-
 class Buffer::Members
 {
     friend class Buffer;
 
   public:
-    ~Members();
+    Members() = default;
+    // Constructor for Buffers that don't own the memory.
+    Members(size_t size, char* buf) :
+        size(size),
+        buf(buf)
+    {
+    }
+    Members(std::string&& content) :
+        str(std::move(content)),
+        size(str.size()),
+        buf(str.data())
+    {
+    }
+    Members(Members const&) = delete;
+    ~Members() = default;
 
   private:
-    Members(size_t size, unsigned char* buf, bool own_memory);
-    Members(std::string&& content);
-    Members(Members const&) = delete;
-
     std::string str;
-    bool own_memory;
     size_t size;
-    unsigned char* buf;
+    char* buf;
 };
 
-Buffer::Members::Members(size_t size, unsigned char* buf, bool own_memory) :
-    own_memory(own_memory),
-    size(size),
-    buf(nullptr)
-{
-    if (own_memory) {
-        this->buf = (size ? new unsigned char[size] : nullptr);
-    } else {
-        this->buf = buf;
-    }
-}
-
-Buffer::Members::Members(std::string&& content) :
-    str(std::move(content)),
-    own_memory(false),
-    size(str.size()),
-    buf(reinterpret_cast<unsigned char*>(str.data()))
-{
-}
-
-Buffer::Members::~Members()
-{
-    if (this->own_memory) {
-        delete[] this->buf;
-    }
-}
-
 Buffer::Buffer() :
-    m(new Members(0, nullptr, true))
+    m(std::make_unique<Members>())
 {
 }
 
 Buffer::Buffer(size_t size) :
-    m(new Members(size, nullptr, true))
+    m(std::make_unique<Members>(std::string(size, '\0')))
 {
 }
 
 Buffer::Buffer(std::string&& content) :
-    m(new Members(std::move(content)))
+    m(std::make_unique<Members>(std::move(content)))
 {
 }
 
 Buffer::Buffer(unsigned char* buf, size_t size) :
-    m(new Members(size, buf, false))
+    m(std::make_unique<Members>(size, reinterpret_cast<char*>(buf)))
 {
 }
 
 Buffer::Buffer(std::string& content) :
-    m(new Members(content.size(), reinterpret_cast<unsigned char*>(content.data()), false))
+    m(std::make_unique<Members>(content.size(), content.data()))
 {
 }
 
@@ -88,17 +68,6 @@ Buffer::operator=(Buffer&& rhs) noexcept
 
 Buffer::~Buffer() = default;
 
-void
-Buffer::copy(Buffer const& rhs)
-{
-    if (this != &rhs) {
-        m = std::unique_ptr<Members>(new Members(rhs.m->size, nullptr, true));
-        if (m->size) {
-            memcpy(m->buf, rhs.m->buf, m->size);
-        }
-    }
-}
-
 size_t
 Buffer::getSize() const
 {
@@ -108,21 +77,67 @@ Buffer::getSize() const
 unsigned char const*
 Buffer::getBuffer() const
 {
-    return m->buf;
+    return reinterpret_cast<unsigned char*>(m->buf);
 }
 
 unsigned char*
 Buffer::getBuffer()
 {
-    return m->buf;
+    return reinterpret_cast<unsigned char*>(m->buf);
 }
 
 Buffer
 Buffer::copy() const
 {
-    auto result = Buffer(m->size);
-    if (m->size) {
-        memcpy(result.m->buf, m->buf, m->size);
+    if (m->size == 0) {
+        return {};
     }
-    return result;
+    return {std::string(m->buf, m->size)};
+}
+
+std::string
+Buffer::move()
+{
+    if (m->size == 0) {
+        return {};
+    }
+    if (!m->str.empty()) {
+        m->size = 0;
+        m->buf = nullptr;
+        return std::move(m->str);
+    }
+    return {m->buf, m->size};
+}
+
+std::string_view
+Buffer::view() const
+{
+    if (!m->buf) {
+        return {};
+    }
+    return {m->buf, m->size};
+}
+
+char const*
+Buffer::data() const
+{
+    return m->buf ? m->buf : m->str.data();
+}
+
+char*
+Buffer::data()
+{
+    return m->buf ? m->buf : m->str.data();
+}
+
+bool
+Buffer::empty() const
+{
+    return m->size == 0;
+}
+
+size_t
+Buffer::size() const
+{
+    return m->size;
 }

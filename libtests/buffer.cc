@@ -35,6 +35,37 @@ main()
     assert(bc2p[0] == 'R');
     assert(bc2p[1] == 'W');
 
+    // Test move, view, data, empty and size methods
+    assert(bc1.view() == "RW");
+    assert(std::string_view(bc1.data(), bc1.getSize()) == "RW");
+    *bc1.data() = 'Z';
+    assert(!bc1.empty());
+    assert(bc1.size() == 2);
+    auto s1 = bc1.move();
+    assert(bc1.empty());
+    assert(bc1.size() == 0);
+    assert(!bc1.getBuffer());
+    assert(bc1.getSize() == 0);
+    assert(s1 == "ZW");
+    assert(bc1.view().empty());
+    assert(bc1.data());
+    assert(Buffer(s1).move() == "ZW");
+    assert(s1 == "ZW");
+
+    // Test const methods
+    const Buffer cb(s1);
+    assert(*cb.data() == 'Z');
+    assert(*(cb.getBuffer() + 1) == 'W');
+
+    // Test constructors
+    assert(Buffer().empty());
+    assert(Buffer().copy().empty());
+    assert(!Buffer().getBuffer());
+    assert(Buffer().data());
+    assert(Buffer().move().empty());
+    assert(Buffer(s1).size() == 2);
+    assert(*Buffer(s1).data() == 'Z');
+
     // Test Buffer(std:string&&)
     Buffer bc3("QW");
     unsigned char* bc3p = bc3.getBuffer();
