@@ -680,65 +680,56 @@ QPDF::replaceForeignIndirectObjects(QPDFObjectHandle foreign, ObjCopier& obj_cop
 }
 
 void
-QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
+QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign_oh)
 {
     // This method was originally written for copying foreign streams, but it is used by
-    // QPDFObjectHandle to copy streams from the same QPDF object as well.
+    // Stream::copy to copy streams from the same QPDF object as well.
 
-    QPDFObjectHandle dict = result.getDict();
-    QPDFObjectHandle old_dict = foreign.getDict();
-    if (m->copied_stream_data_provider == nullptr) {
-        m->copied_stream_data_provider = new CopiedStreamDataProvider(*this);
-        m->copied_streams =
-            std::shared_ptr<QPDFObjectHandle::StreamDataProvider>(m->copied_stream_data_provider);
+    Dictionary dict = result.getDict();
+    Dictionary old_dict = foreign_oh.getDict();
+    if (!m->copied_stream_data_provider) {
+        m->copied_stream_data_provider = std::make_shared<CopiedStreamDataProvider>(*this);
     }
     QPDFObjGen local_og(result.getObjGen());
     // Copy information from the foreign stream so we can pipe its data later without keeping the
     // original QPDF object around.
 
     QPDF& foreign_stream_qpdf =
-        foreign.getQPDF("unable to retrieve owning qpdf from foreign stream");
+        foreign_oh.getQPDF("unable to retrieve owning qpdf from foreign stream");
 
-    auto stream = foreign.as_stream();
-    if (!stream) {
+    Stream foreign = foreign_oh;
+    if (!foreign) {
         throw std::logic_error("unable to retrieve underlying stream object from foreign stream");
     }
-    std::shared_ptr<Buffer> stream_buffer = stream.getStreamDataBuffer();
-    if ((foreign_stream_qpdf.m->immediate_copy_from) && (stream_buffer == nullptr)) {
+    std::shared_ptr<Buffer> stream_buffer = foreign.getStreamDataBuffer();
+    if (foreign_stream_qpdf.m->immediate_copy_from && !stream_buffer) {
         // Pull the stream data into a buffer before attempting the copy operation. Do it on the
         // source stream so that if the source stream is copied multiple times, we don't have to
         // keep duplicating the memory.
-        QTC::TC("qpdf", "QPDF immediate copy stream data");
         foreign.replaceStreamData(
-            foreign.getRawStreamData(),
-            old_dict.getKey("/Filter"),
-            old_dict.getKey("/DecodeParms"));
-        stream_buffer = stream.getStreamDataBuffer();
+            foreign.getRawStreamData(), old_dict["/Filter"], old_dict["/DecodeParms"]);
+        stream_buffer = foreign.getStreamDataBuffer();
     }
-    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> stream_provider =
-        stream.getStreamDataProvider();
-    if (stream_buffer.get()) {
-        QTC::TC("qpdf", "QPDF copy foreign stream with buffer");
-        result.replaceStreamData(
-            stream_buffer, dict.getKey("/Filter"), dict.getKey("/DecodeParms"));
-    } else if (stream_provider.get()) {
+    auto stream_provider = foreign.getStreamDataProvider();
+    if (stream_buffer) {
+        result.replaceStreamData(stream_buffer, dict["/Filter"], dict["/DecodeParms"]);
+    } else if (stream_provider) {
         // In this case, the remote stream's QPDF must stay in scope.
-        QTC::TC("qpdf", "QPDF copy foreign stream with provider");
-        m->copied_stream_data_provider->registerForeignStream(local_og, foreign);
+        m->copied_stream_data_provider->registerForeignStream(local_og, foreign_oh);
         result.replaceStreamData(
-            m->copied_streams, dict.getKey("/Filter"), dict.getKey("/DecodeParms"));
+            m->copied_stream_data_provider, dict["/Filter"], dict["/DecodeParms"]);
     } else {
         auto foreign_stream_data = std::make_shared<ForeignStreamData>(
             foreign_stream_qpdf.m->encp,
             foreign_stream_qpdf.m->file,
             foreign,
             foreign.offset(),
-            stream.getLength(),
+            foreign.getLength(),
             dict,
-            stream.isRootMetadata());
+            foreign.isRootMetadata());
         m->copied_stream_data_provider->registerForeignStream(local_og, foreign_stream_data);
         result.replaceStreamData(
-            m->copied_streams, dict.getKey("/Filter"), dict.getKey("/DecodeParms"));
+            m->copied_stream_data_provider, dict["/Filter"], dict["/DecodeParms"]);
     }
 }
 

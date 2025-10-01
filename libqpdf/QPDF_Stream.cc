@@ -628,6 +628,16 @@ Stream::pipeStreamData(
 
 void
 Stream::replaceStreamData(
+    std::string&& data, QPDFObjectHandle const& filter, QPDFObjectHandle const& decode_parms)
+{
+    auto s = stream();
+    s->stream_data = std::make_shared<Buffer>(std::move(data));
+    s->stream_provider = nullptr;
+    replaceFilterData(filter, decode_parms, s->stream_data->getSize());
+}
+
+void
+Stream::replaceStreamData(
     std::shared_ptr<Buffer> data,
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
@@ -635,7 +645,7 @@ Stream::replaceStreamData(
     auto s = stream();
     s->stream_data = data;
     s->stream_provider = nullptr;
-    replaceFilterData(filter, decode_parms, data->getSize());
+    replaceFilterData(filter, decode_parms, data->size());
 }
 
 void
@@ -781,12 +791,8 @@ void
 QPDFObjectHandle::replaceStreamData(
     std::string const& data, QPDFObjectHandle const& filter, QPDFObjectHandle const& decode_parms)
 {
-    auto b = std::make_shared<Buffer>(data.length());
-    unsigned char* bp = b->getBuffer();
-    if (bp) {
-        memcpy(bp, data.c_str(), data.length());
-    }
-    as_stream(error).replaceStreamData(b, filter, decode_parms);
+    std::string s(data);
+    as_stream(error).replaceStreamData(std::move(s), filter, decode_parms);
 }
 
 void

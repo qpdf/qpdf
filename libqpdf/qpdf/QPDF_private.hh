@@ -846,9 +846,7 @@ class QPDF::Members
     bool ever_called_get_all_pages{false};
     std::vector<QPDFExc> warnings;
     std::map<unsigned long long, ObjCopier> object_copiers;
-    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> copied_streams;
-    // copied_stream_data_provider is owned by copied_streams
-    CopiedStreamDataProvider* copied_stream_data_provider{nullptr};
+    std::shared_ptr<CopiedStreamDataProvider> copied_stream_data_provider;
     bool reconstructed_xref{false};
     bool in_read_xref_stream{false};
     bool fixed_dangling_refs{false};

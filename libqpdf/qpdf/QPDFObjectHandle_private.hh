@@ -520,6 +520,10 @@ namespace qpdf
         std::string getStreamData(qpdf_stream_decode_level_e level);
         std::string getRawStreamData();
         void replaceStreamData(
+            std::string&& data,
+            QPDFObjectHandle const& filter,
+            QPDFObjectHandle const& decode_parms);
+        void replaceStreamData(
             std::shared_ptr<Buffer> data,
             QPDFObjectHandle const& filter,
             QPDFObjectHandle const& decode_parms);
