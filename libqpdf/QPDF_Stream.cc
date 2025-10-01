@@ -44,6 +44,12 @@ class QPDF::Doc::Streams
         return qpdf->pipeStreamData(
             og, offset, length, dict, is_root_metadata, pipeline, suppress_warnings, will_retry);
     }
+
+    static void
+    copyStreamData(QPDF* qpdf, QPDFObjectHandle const& dest, QPDFObjectHandle const& src)
+    {
+        qpdf->copyStreamData(dest, src);
+    }
 };
 
 namespace
@@ -204,6 +210,15 @@ Stream::Stream(
         qpdf.getFilename() + ", stream object " + og.unparse(' '));
     obj->setDescription(&qpdf, descr, offset);
     setDictDescription();
+}
+
+Stream
+Stream::copy() const
+{
+    Stream result = qpdf()->newStream();
+    result.stream()->stream_dict = getDict().copy();
+    QPDF::Doc::Streams::copyStreamData(qpdf(), result, *this);
+    return result;
 }
 
 void
@@ -849,4 +864,10 @@ QPDFObjectHandle::getStreamJSON(
     std::string const& data_filename)
 {
     return as_stream(error).getStreamJSON(json_version, json_data, decode_level, p, data_filename);
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::copyStream()
+{
+    return as_stream(error).copy();
 }

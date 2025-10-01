@@ -13,10 +13,14 @@
 
 using namespace qpdf;
 
-namespace qpdf::is
+namespace qpdf
 {
-    class OffsetBuffer;
-} // namespace qpdf::is
+    class Stream;
+    namespace is
+    {
+        class OffsetBuffer;
+    } // namespace is
+} // namespace qpdf
 
 class BitStream;
 class BitWriter;
@@ -699,19 +703,6 @@ class QPDF::Doc
         QPDF& qpdf;
         QPDF::Members* m;
     }; // class QPDF::Doc::Pages
-
-    // StreamCopier class is restricted to QPDFObjectHandle so it can copy stream data.
-    class StreamCopier
-    {
-        friend class QPDFObjectHandle;
-
-      private:
-        static void
-        copyStreamData(QPDF* qpdf, QPDFObjectHandle const& dest, QPDFObjectHandle const& src)
-        {
-            qpdf->copyStreamData(dest, src);
-        }
-    };
 
     Doc() = delete;
     Doc(Doc const&) = delete;
