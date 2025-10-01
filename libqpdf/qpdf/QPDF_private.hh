@@ -121,20 +121,29 @@ class QPDF::ForeignStreamData
     bool is_root_metadata{false};
 };
 
-class QPDF::CopiedStreamDataProvider: public QPDFObjectHandle::StreamDataProvider
+class QPDF::CopiedStreamDataProvider final: public QPDFObjectHandle::StreamDataProvider
 {
   public:
     CopiedStreamDataProvider(QPDF& destination_qpdf);
-    ~CopiedStreamDataProvider() override = default;
+    ~CopiedStreamDataProvider() final = default;
     bool provideStreamData(
-        QPDFObjGen const& og, Pipeline* pipeline, bool suppress_warnings, bool will_retry) override;
-    void registerForeignStream(QPDFObjGen const& local_og, QPDFObjectHandle foreign_stream);
-    void registerForeignStream(QPDFObjGen const& local_og, std::shared_ptr<ForeignStreamData>);
+        QPDFObjGen const& og, Pipeline* pipeline, bool suppress_warnings, bool will_retry) final;
+    void
+    registerForeignStream(QPDFObjGen const& local_og, QPDFObjectHandle foreign_stream)
+    {
+        foreign_streams.insert_or_assign(local_og, foreign_stream);
+    }
+
+    void
+    registerForeignStream(QPDFObjGen local_og, ForeignStreamData foreign_stream)
+    {
+        foreign_stream_data.insert_or_assign(local_og, foreign_stream);
+    }
 
   private:
     QPDF& destination_qpdf;
     std::map<QPDFObjGen, QPDFObjectHandle> foreign_streams;
-    std::map<QPDFObjGen, std::shared_ptr<ForeignStreamData>> foreign_stream_data;
+    std::map<QPDFObjGen, ForeignStreamData> foreign_stream_data;
 };
 
 class QPDF::StringDecrypter final: public QPDFObjectHandle::StringDecrypter

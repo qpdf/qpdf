@@ -775,8 +775,8 @@ class QPDF
         Pipeline* pipeline,
         bool suppress_warnings,
         bool will_retry);
-    bool pipeForeignStreamData(
-        std::shared_ptr<ForeignStreamData>, Pipeline*, bool suppress_warnings, bool will_retry);
+    bool
+    pipeForeignStreamData(ForeignStreamData&, Pipeline*, bool suppress_warnings, bool will_retry);
     static bool pipeStreamData(
         std::shared_ptr<QPDF::EncryptionParameters> encp,
         std::shared_ptr<InputSource> file,
