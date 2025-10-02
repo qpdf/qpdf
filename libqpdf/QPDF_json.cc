@@ -883,7 +883,7 @@ QPDF::writeJSON(
             } else {
                 jw << "\n      },\n      \"" << key;
             }
-            if (auto stream = obj.as_stream()) {
+            if (Stream stream = obj) {
                 jw << "\": {\n        \"stream\": ";
                 if (json_stream_data == qpdf_sj_file) {
                     writeJSONStreamFile(
