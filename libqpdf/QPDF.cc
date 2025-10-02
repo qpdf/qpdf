@@ -567,7 +567,7 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
     if (!obj_copier.object_map.contains(og)) {
         warn(damagedPDF(
             other.getFilename() + " object " + og.unparse(' '),
-            foreign.getParsedOffset(),
+            foreign.offset(),
             "unexpected reference to /Pages object while copying foreign object; replacing with "
             "null"));
         return QPDFObjectHandle::newNull();
@@ -732,7 +732,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
             foreign_stream_qpdf.m->encp,
             foreign_stream_qpdf.m->file,
             foreign,
-            foreign.getParsedOffset(),
+            foreign.offset(),
             stream.getLength(),
             dict,
             stream.isRootMetadata());
