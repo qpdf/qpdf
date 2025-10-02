@@ -1634,7 +1634,7 @@ Objects::resolveObjectsInStream(int obj_stream_number)
     }
     m->resolved_object_streams.insert(obj_stream_number);
     // Force resolution of object stream
-    auto obj_stream = qpdf.getObject(obj_stream_number, 0).as_stream();
+    Stream obj_stream = qpdf.getObject(obj_stream_number, 0);
     if (!obj_stream) {
         throw qpdf.damagedPDF(
             "object " + std::to_string(obj_stream_number) + " 0",
