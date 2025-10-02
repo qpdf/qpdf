@@ -102,14 +102,7 @@ class QPDF::ForeignStreamData
     friend class QPDF;
 
   public:
-    ForeignStreamData(
-        std::shared_ptr<EncryptionParameters> encp,
-        std::shared_ptr<InputSource> file,
-        QPDFObjGen foreign_og,
-        qpdf_offset_t offset,
-        size_t length,
-        QPDFObjectHandle local_dict,
-        bool is_root_metadata);
+    ForeignStreamData(Stream& foreign, qpdf_offset_t offset, QPDFObjectHandle local_dict);
 
   private:
     std::shared_ptr<EncryptionParameters> encp;

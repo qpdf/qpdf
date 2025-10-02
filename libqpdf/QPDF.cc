@@ -111,20 +111,14 @@ namespace
 } // namespace
 
 QPDF::ForeignStreamData::ForeignStreamData(
-    std::shared_ptr<EncryptionParameters> encp,
-    std::shared_ptr<InputSource> file,
-    QPDFObjGen foreign_og,
-    qpdf_offset_t offset,
-    size_t length,
-    QPDFObjectHandle local_dict,
-    bool is_root_metadata) :
-    encp(encp),
-    file(file),
-    foreign_og(foreign_og),
+    Stream& foreign, qpdf_offset_t offset, QPDFObjectHandle local_dict) :
+    encp(foreign.qpdf()->m->encp),
+    file(foreign.qpdf()->m->file),
+    foreign_og(foreign.id_gen()),
     offset(offset),
-    length(length),
+    length(foreign.getLength()),
     local_dict(local_dict),
-    is_root_metadata(is_root_metadata)
+    is_root_metadata(foreign.isRootMetadata())
 {
 }
 
@@ -705,14 +699,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign_oh)
         result.replaceStreamData(
             m->copied_stream_data_provider, dict["/Filter"], dict["/DecodeParms"]);
     } else {
-        auto foreign_stream_data = ForeignStreamData(
-            foreign_stream_qpdf.m->encp,
-            foreign_stream_qpdf.m->file,
-            foreign,
-            foreign.offset(),
-            foreign.getLength(),
-            dict,
-            foreign.isRootMetadata());
+        auto foreign_stream_data = ForeignStreamData(foreign, foreign_oh.offset(), dict);
         m->copied_stream_data_provider->registerForeignStream(local_og, foreign_stream_data);
         result.replaceStreamData(
             m->copied_stream_data_provider, dict["/Filter"], dict["/DecodeParms"]);
