@@ -4,7 +4,6 @@
 #include <qpdf/JSON_writer.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Pipeline_private.hh>
-#include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Count.hh>
 #include <qpdf/Pl_Discard.hh>
