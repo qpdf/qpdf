@@ -423,8 +423,7 @@ QPDF::JSONReactor::replaceObject(QPDFObjectHandle&& replacement, JSON const& val
     auto og = tos.object.getObjGen();
     if (replacement.isIndirect() && !(replacement.isStream() && replacement.getObjGen() == og)) {
         error(
-            replacement.getParsedOffset(),
-            "the value of an object may not be an indirect object reference");
+            replacement.offset(), "the value of an object may not be an indirect object reference");
         return;
     }
     pdf.replaceObject(og, replacement);

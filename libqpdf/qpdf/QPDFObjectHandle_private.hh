@@ -657,6 +657,12 @@ namespace qpdf
         return !obj || type_code() == ::ot_null;
     }
 
+    inline qpdf_offset_t
+    BaseHandle::offset() const
+    {
+        return obj ? obj->parsed_offset : -1;
+    }
+
     inline QPDF*
     BaseHandle::qpdf() const
     {

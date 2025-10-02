@@ -1690,7 +1690,7 @@ QPDFObjectHandle::parse(
 qpdf_offset_t
 QPDFObjectHandle::getParsedOffset() const
 {
-    return obj ? obj->getParsedOffset() : -1;
+    return offset();
 }
 
 QPDFObjectHandle

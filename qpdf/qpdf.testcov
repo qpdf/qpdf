@@ -137,16 +137,12 @@ QPDF ERR object stream with wrong type 0
 QPDF object gone after xref reconstruction 0
 qpdf-c called qpdf_has_error 0
 qpdf-c called qpdf_get_qpdf_version 0
-QPDF_Stream pipe original stream data 0
 QPDF_Stream pipe replaced stream data 0
 QPDF_Stream provider length mismatch 0
 QPDFObjectHandle newStream 0
 QPDFObjectHandle newStream with data 0
-QPDF_Stream pipe no stream data 0
 QPDFObjectHandle prepend page contents 0
 QPDFObjectHandle append page contents 0
-QPDF_Stream getRawStreamData 0
-QPDF_Stream getStreamData 0
 qpdf-c called qpdf_read_memory 0
 QPDF stream without newline 0
 QPDF stream with CR only 0
