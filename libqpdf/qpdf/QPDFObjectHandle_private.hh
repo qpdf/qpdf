@@ -469,10 +469,10 @@ namespace qpdf
             qpdf_offset_t offset,
             size_t length);
 
-        QPDFObjectHandle
+        Dictionary
         getDict() const
         {
-            return stream()->stream_dict;
+            return {stream()->stream_dict};
         }
         bool
         isDataModified() const

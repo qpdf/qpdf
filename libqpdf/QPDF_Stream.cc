@@ -376,11 +376,10 @@ Stream::getRawStreamData()
 bool
 Stream::isRootMetadata() const
 {
-    if (!getDict().isDictionaryOfType("/Metadata", "/XML")) {
+    if (!stream()->stream_dict.isDictionaryOfType("/Metadata", "/XML")) {
         return false;
     }
-    auto root_metadata = qpdf()->getRoot().getKey("/Metadata");
-    return root_metadata.isSameObjectAs(obj);
+    return qpdf()->getRoot()["/Metadata"].isSameObjectAs(obj);
 }
 
 bool
