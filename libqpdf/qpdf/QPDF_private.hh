@@ -47,6 +47,8 @@ class QPDF::ObjCache
 class QPDF::ObjCopier
 {
   public:
+    QPDFObjectHandle
+    replace_indirect_object(QPDF& target, QPDFObjectHandle const& oh, bool top = true);
     std::map<QPDFObjGen, QPDFObjectHandle> object_map;
     std::vector<QPDFObjectHandle> to_copy;
     QPDFObjGen::set visiting;

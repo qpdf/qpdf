@@ -535,7 +535,7 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
 
     // Copy any new objects and replace the reservations.
     for (auto& to_copy: obj_copier.to_copy) {
-        QPDFObjectHandle copy = replaceForeignIndirectObjects(to_copy, obj_copier, true);
+        auto copy = obj_copier.replace_indirect_object(*this, to_copy);
         if (!to_copy.isStream()) {
             QPDFObjGen og(to_copy.getObjGen());
             replaceReserved(obj_copier.object_map[og], copy);
@@ -606,13 +606,13 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
 }
 
 QPDFObjectHandle
-QPDF::replaceForeignIndirectObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
+QPDF::ObjCopier::replace_indirect_object(QPDF& target, QPDFObjectHandle const& foreign, bool top)
 {
     auto foreign_tc = foreign.getTypeCode();
 
     if (!top && foreign.indirect()) {
-        auto mapping = obj_copier.object_map.find(foreign.id_gen());
-        if (mapping == obj_copier.object_map.end()) {
+        auto mapping = object_map.find(foreign.id_gen());
+        if (mapping == object_map.end()) {
             // This case would occur if this is a reference to a Pages object that we didn't
             // traverse into.
             return QPDFObjectHandle::newNull();
@@ -625,7 +625,7 @@ QPDF::replaceForeignIndirectObjects(QPDFObjectHandle foreign, ObjCopier& obj_cop
         std::vector<QPDFObjectHandle> result;
         result.reserve(array.size());
         for (auto const& item: array) {
-            result.emplace_back(replaceForeignIndirectObjects(item, obj_copier, false));
+            result.emplace_back(replace_indirect_object(target, item, false));
         }
         return Array(std::move(result));
     }
@@ -634,7 +634,7 @@ QPDF::replaceForeignIndirectObjects(QPDFObjectHandle foreign, ObjCopier& obj_cop
         auto result = Dictionary::empty();
         for (auto const& [key, value]: Dictionary(foreign)) {
             if (!value.null()) {
-                result.replaceKey(key, replaceForeignIndirectObjects(value, obj_copier, false));
+                result.replaceKey(key, replace_indirect_object(target, value, false));
             }
         }
         return result;
@@ -642,14 +642,14 @@ QPDF::replaceForeignIndirectObjects(QPDFObjectHandle foreign, ObjCopier& obj_cop
 
     if (foreign_tc == ::ot_stream) {
         Stream stream = foreign;
-        Stream result = obj_copier.object_map[foreign];
+        Stream result = object_map[foreign];
         auto dict = result.getDict();
         for (auto const& [key, value]: stream.getDict()) {
             if (!value.null()) {
-                dict.replaceKey(key, replaceForeignIndirectObjects(value, obj_copier, false));
+                dict.replaceKey(key, replace_indirect_object(target, value, false));
             }
         }
-        copyStreamData(result, foreign);
+        target.copyStreamData(result, foreign);
         return result;
     }
 
