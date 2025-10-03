@@ -527,7 +527,7 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
     // obj_copier.object_map maps foreign QPDFObjGen to local objects.  For everything new that we
     // have to copy, the local object will be a reservation, unless it is a stream, in which case
     // the local object will already be a stream.
-    reserveObjects(foreign, obj_copier, true);
+    obj_copier.reserve_objects(*this, foreign);
 
     if (!obj_copier.visiting.empty()) {
         throw std::logic_error("obj_copier.visiting is not empty after reserving objects");
@@ -556,53 +556,52 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
 }
 
 void
-QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top)
+QPDF::ObjCopier::reserve_objects(QPDF& target, QPDFObjectHandle const& foreign, bool top)
 {
-    auto foreign_tc = foreign.getTypeCode();
-    if (foreign_tc == ::ot_reserved) {
-        throw std::logic_error("QPDF: attempting to copy a foreign reserved object");
-    }
+    auto foreign_tc = foreign.type_code();
+    util::assertion(
+        foreign_tc != ::ot_reserved, "QPDF: attempting to copy a foreign reserved object");
 
     if (foreign.isPagesObject()) {
         return;
     }
 
-    if (foreign.isIndirect()) {
+    if (foreign.indirect()) {
         QPDFObjGen foreign_og(foreign.getObjGen());
-        if (!obj_copier.visiting.add(foreign_og)) {
+        if (!visiting.add(foreign_og)) {
             return;
         }
-        if (obj_copier.object_map.contains(foreign_og)) {
-            if (!(top && foreign.isPageObject() && obj_copier.object_map[foreign_og].null())) {
-                obj_copier.visiting.erase(foreign);
+        if (object_map.contains(foreign_og)) {
+            if (!(top && foreign.isPageObject() && object_map[foreign_og].null())) {
+                visiting.erase(foreign);
                 return;
             }
         } else {
-            obj_copier.object_map[foreign_og] =
-                foreign.isStream() ? newStream() : newIndirectNull();
+            object_map[foreign_og] =
+                foreign.isStream() ? target.newStream() : target.newIndirectNull();
             if (!top && foreign.isPageObject()) {
-                obj_copier.visiting.erase(foreign_og);
+                visiting.erase(foreign_og);
                 return;
             }
         }
-        obj_copier.to_copy.emplace_back(foreign);
+        to_copy.emplace_back(foreign);
     }
 
     if (foreign_tc == ::ot_array) {
         for (auto const& item: foreign.as_array()) {
-            reserveObjects(item, obj_copier, false);
+            reserve_objects(target, item, false);
         }
     } else if (foreign_tc == ::ot_dictionary) {
-        for (auto const& item: foreign.as_dictionary()) {
+        for (auto const& item: Dictionary(foreign)) {
             if (!item.second.null()) {
-                reserveObjects(item.second, obj_copier, false);
+                reserve_objects(target, item.second, false);
             }
         }
     } else if (foreign_tc == ::ot_stream) {
-        reserveObjects(foreign.getDict(), obj_copier, false);
+        reserve_objects(target, foreign.getDict(), false);
     }
 
-    obj_copier.visiting.erase(foreign);
+    visiting.erase(foreign);
 }
 
 QPDFObjectHandle

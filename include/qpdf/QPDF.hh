@@ -806,7 +806,6 @@ class QPDF
         std::unique_ptr<Pipeline>& heap);
 
     // Methods to support object copying
-    void reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top);
     void copyStreamData(QPDFObjectHandle dest_stream, QPDFObjectHandle src_stream);
 
     struct HPageOffsetEntry;
