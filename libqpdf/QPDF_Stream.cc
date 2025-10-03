@@ -4,7 +4,6 @@
 #include <qpdf/JSON_writer.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Pipeline_private.hh>
-#include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Count.hh>
 #include <qpdf/Pl_Discard.hh>
@@ -329,12 +328,11 @@ Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
     if (!filtered) {
         throw QPDFExc(
             qpdf_e_unsupported,
-            obj->getQPDF()->getFilename(),
+            qpdf()->getFilename(),
             "",
-            obj->getParsedOffset(),
+            offset(),
             "getStreamData called on unfilterable stream");
     }
-    QTC::TC("qpdf", "QPDF_Stream getStreamData");
     return result;
 }
 
@@ -346,12 +344,11 @@ Stream::getRawStreamData()
     if (!pipeStreamData(&buf, nullptr, 0, qpdf_dl_none, false, false)) {
         throw QPDFExc(
             qpdf_e_unsupported,
-            obj->getQPDF()->getFilename(),
+            qpdf()->getFilename(),
             "",
-            obj->getParsedOffset(),
+            offset(),
             "error getting raw stream data");
     }
-    QTC::TC("qpdf", "QPDF_Stream getRawStreamData");
     return result;
 }
 
@@ -558,15 +555,13 @@ Stream::pipeStreamData(
             s->stream_dict.replaceKey("/Length", QPDFObjectHandle::newInteger(actual_length));
         }
     } else {
-        if (obj->getParsedOffset() == 0) {
-            QTC::TC("qpdf", "QPDF_Stream pipe no stream data");
+        if (offset() == 0) {
             throw std::logic_error("pipeStreamData called for stream with no data");
         }
-        QTC::TC("qpdf", "QPDF_Stream pipe original stream data");
         if (!QPDF::Pipe::pipeStreamData(
-                obj->getQPDF(),
-                obj->getObjGen(),
-                obj->getParsedOffset(),
+                qpdf(),
+                id_gen(),
+                offset(),
                 s->length,
                 s->stream_dict,
                 isRootMetadata(),
@@ -643,7 +638,7 @@ Stream::replaceFilterData(
 void
 Stream::warn(std::string const& message)
 {
-    obj->getQPDF()->warn(qpdf_e_damaged_pdf, "", obj->getParsedOffset(), message);
+    qpdf()->warn(qpdf_e_damaged_pdf, "", offset(), message);
 }
 
 QPDFObjectHandle

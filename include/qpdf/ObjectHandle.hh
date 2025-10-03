@@ -94,6 +94,7 @@ namespace qpdf
         inline QPDFObjGen id_gen() const;
         inline bool indirect() const;
         inline bool null() const;
+        inline qpdf_offset_t offset() const;
         inline QPDF* qpdf() const;
         inline qpdf_object_type_e raw_type_code() const;
         inline qpdf_object_type_e resolved_type_code() const;

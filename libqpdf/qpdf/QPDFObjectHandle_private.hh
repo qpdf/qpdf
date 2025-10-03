@@ -445,6 +445,23 @@ namespace qpdf
         {
         }
 
+        Stream() = default;
+        Stream(Stream const&) = default;
+        Stream(Stream&&) = default;
+        Stream& operator=(Stream const&) = default;
+        Stream& operator=(Stream&&) = default;
+        ~Stream() = default;
+
+        Stream(QPDFObjectHandle const& oh) :
+            BaseHandle(oh.type_code() == ::ot_stream ? oh : QPDFObjectHandle())
+        {
+        }
+
+        Stream(QPDFObjectHandle&& oh) :
+            BaseHandle(oh.type_code() == ::ot_stream ? std::move(oh) : QPDFObjectHandle())
+        {
+        }
+
         Stream(
             QPDF& qpdf,
             QPDFObjGen og,
@@ -655,6 +672,12 @@ namespace qpdf
     BaseHandle::null() const
     {
         return !obj || type_code() == ::ot_null;
+    }
+
+    inline qpdf_offset_t
+    BaseHandle::offset() const
+    {
+        return obj ? obj->parsed_offset : -1;
     }
 
     inline QPDF*
