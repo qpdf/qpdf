@@ -126,11 +126,6 @@ QPDF_Stream unknown stream length 0
 QPDF replaceReserved 0
 QPDF copyForeign direct 0
 QPDF copyForeign not foreign 0
-QPDF replace indirect 0
-QPDF replace array 0
-QPDF replace dictionary 0
-QPDF replace stream 0
-QPDF replace foreign indirect with null 0
 QPDFWriter copy use_aes 1
 QPDFParser indirect without context 0
 QPDFObjectHandle trailing data in parse 0
