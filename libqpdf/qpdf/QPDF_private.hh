@@ -46,7 +46,6 @@ class QPDF::ObjCache
 
 class QPDF::ObjCopier
 {
-  public:
     class Copier
     {
       public:
@@ -55,9 +54,11 @@ class QPDF::ObjCopier
         {
         }
 
-        QPDFObjectHandle replace_indirect_object(QPDFObjectHandle const& foreign, bool top = true);
+        QPDFObjectHandle copied(QPDFObjectHandle const& foreign);
 
-        void reserve_objects(QPDFObjectHandle const& foreign, bool top = true);
+      private:
+        QPDFObjectHandle replace_indirect_object(QPDFObjectHandle const& foreign, bool top = false);
+        void reserve_objects(QPDFObjectHandle const& foreign, bool top = false);
 
         QPDF& qpdf;
         std::map<QPDFObjGen, QPDFObjectHandle> object_map;
@@ -65,11 +66,27 @@ class QPDF::ObjCopier
         QPDFObjGen::set visiting;
     };
 
+  public:
     ObjCopier(QPDF& qpdf) :
         qpdf(qpdf)
     {
     }
 
+    ObjCopier() = delete;
+    ObjCopier(ObjCopier const&) = delete;
+    ObjCopier(ObjCopier&&) = delete;
+    ObjCopier& operator=(ObjCopier const&) = delete;
+    ObjCopier& operator=(ObjCopier&&) = delete;
+    ~ObjCopier() = default;
+
+    // Return a local handle to the foreign object. Copy the foreign object if necessary.
+    QPDFObjectHandle
+    copied(QPDFObjectHandle const& foreign)
+    {
+        return copier(foreign).copied(foreign);
+    }
+
+  private:
     Copier& copier(QPDFObjectHandle const& foreign);
 
     QPDF& qpdf;
