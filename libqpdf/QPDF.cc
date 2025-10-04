@@ -166,8 +166,9 @@ QPDF::Members::Members(QPDF& qpdf) :
     objects(doc.objects()),
     pages(doc.pages()),
     log(QPDFLogger::defaultLogger()),
-    file(new InvalidInputSource()),
-    encp(new EncryptionParameters)
+    file(std::make_shared<InvalidInputSource>()),
+    encp(std::make_shared<EncryptionParameters>()),
+    obj_copier(qpdf)
 {
 }
 
@@ -470,6 +471,19 @@ QPDF::getObjectByID(int objid, int generation)
     return getObject(QPDFObjGen(objid, generation));
 }
 
+QPDF::ObjCopier::Copier&
+QPDF::ObjCopier::copier(QPDFObjectHandle const& foreign)
+{
+    if (!foreign.isIndirect()) {
+        throw std::logic_error("QPDF::copyForeign called with direct object handle");
+    }
+    QPDF& other = *foreign.qpdf();
+    if (&other == &qpdf) {
+        throw std::logic_error("QPDF::copyForeign called with object from this QPDF");
+    }
+    return copiers.insert({other.getUniqueId(), {qpdf}}).first->second;
+}
+
 QPDFObjectHandle
 QPDF::copyForeignObject(QPDFObjectHandle foreign)
 {
@@ -507,17 +521,8 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
 
     // Note that we explicitly allow use of copyForeignObject on page objects. It is a documented
     // use case to copy pages this way if the intention is to not update the pages tree.
-    if (!foreign.isIndirect()) {
-        QTC::TC("qpdf", "QPDF copyForeign direct");
-        throw std::logic_error("QPDF::copyForeign called with direct object handle");
-    }
-    QPDF& other = foreign.getQPDF();
-    if (&other == this) {
-        QTC::TC("qpdf", "QPDF copyForeign not foreign");
-        throw std::logic_error("QPDF::copyForeign called with object from this QPDF");
-    }
 
-    ObjCopier& obj_copier = m->object_copiers[other.m->unique_id];
+    auto& obj_copier = m->obj_copier.copier(foreign);
     if (!obj_copier.visiting.empty()) {
         throw std::logic_error(
             "obj_copier.visiting is not empty at the beginning of copyForeignObject");
@@ -527,7 +532,7 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
     // obj_copier.object_map maps foreign QPDFObjGen to local objects.  For everything new that we
     // have to copy, the local object will be a reservation, unless it is a stream, in which case
     // the local object will already be a stream.
-    obj_copier.reserve_objects(*this, foreign);
+    obj_copier.reserve_objects(foreign);
 
     if (!obj_copier.visiting.empty()) {
         throw std::logic_error("obj_copier.visiting is not empty after reserving objects");
@@ -535,7 +540,7 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
 
     // Copy any new objects and replace the reservations.
     for (auto& to_copy: obj_copier.to_copy) {
-        auto copy = obj_copier.replace_indirect_object(*this, to_copy);
+        auto copy = obj_copier.replace_indirect_object(to_copy);
         if (!to_copy.isStream()) {
             QPDFObjGen og(to_copy.getObjGen());
             replaceReserved(obj_copier.object_map[og], copy);
@@ -546,7 +551,7 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
     auto og = foreign.getObjGen();
     if (!obj_copier.object_map.contains(og)) {
         warn(damagedPDF(
-            other.getFilename() + " object " + og.unparse(' '),
+            foreign.qpdf()->getFilename() + " object " + og.unparse(' '),
             foreign.offset(),
             "unexpected reference to /Pages object while copying foreign object; replacing with "
             "null"));
@@ -556,7 +561,7 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign)
 }
 
 void
-QPDF::ObjCopier::reserve_objects(QPDF& target, QPDFObjectHandle const& foreign, bool top)
+QPDF::ObjCopier::Copier::reserve_objects(QPDFObjectHandle const& foreign, bool top)
 {
     auto foreign_tc = foreign.type_code();
     util::assertion(
@@ -577,8 +582,7 @@ QPDF::ObjCopier::reserve_objects(QPDF& target, QPDFObjectHandle const& foreign, 
                 return;
             }
         } else {
-            object_map[foreign_og] =
-                foreign.isStream() ? target.newStream() : target.newIndirectNull();
+            object_map[foreign_og] = foreign.isStream() ? qpdf.newStream() : qpdf.newIndirectNull();
             if (!top && foreign.isPageObject()) {
                 visiting.erase(foreign_og);
                 return;
@@ -589,23 +593,23 @@ QPDF::ObjCopier::reserve_objects(QPDF& target, QPDFObjectHandle const& foreign, 
 
     if (foreign_tc == ::ot_array) {
         for (auto const& item: foreign.as_array()) {
-            reserve_objects(target, item, false);
+            reserve_objects(item, false);
         }
     } else if (foreign_tc == ::ot_dictionary) {
         for (auto const& item: Dictionary(foreign)) {
             if (!item.second.null()) {
-                reserve_objects(target, item.second, false);
+                reserve_objects(item.second, false);
             }
         }
     } else if (foreign_tc == ::ot_stream) {
-        reserve_objects(target, foreign.getDict(), false);
+        reserve_objects(foreign.getDict(), false);
     }
 
     visiting.erase(foreign);
 }
 
 QPDFObjectHandle
-QPDF::ObjCopier::replace_indirect_object(QPDF& target, QPDFObjectHandle const& foreign, bool top)
+QPDF::ObjCopier::Copier::replace_indirect_object(QPDFObjectHandle const& foreign, bool top)
 {
     auto foreign_tc = foreign.getTypeCode();
 
@@ -624,7 +628,7 @@ QPDF::ObjCopier::replace_indirect_object(QPDF& target, QPDFObjectHandle const& f
         std::vector<QPDFObjectHandle> result;
         result.reserve(array.size());
         for (auto const& item: array) {
-            result.emplace_back(replace_indirect_object(target, item, false));
+            result.emplace_back(replace_indirect_object(item, false));
         }
         return Array(std::move(result));
     }
@@ -633,7 +637,7 @@ QPDF::ObjCopier::replace_indirect_object(QPDF& target, QPDFObjectHandle const& f
         auto result = Dictionary::empty();
         for (auto const& [key, value]: Dictionary(foreign)) {
             if (!value.null()) {
-                result.replaceKey(key, replace_indirect_object(target, value, false));
+                result.replaceKey(key, replace_indirect_object(value, false));
             }
         }
         return result;
@@ -645,10 +649,10 @@ QPDF::ObjCopier::replace_indirect_object(QPDF& target, QPDFObjectHandle const& f
         auto dict = result.getDict();
         for (auto const& [key, value]: stream.getDict()) {
             if (!value.null()) {
-                dict.replaceKey(key, replace_indirect_object(target, value, false));
+                dict.replaceKey(key, replace_indirect_object(value, false));
             }
         }
-        target.copyStreamData(result, foreign);
+        qpdf.copyStreamData(result, foreign);
         return result;
     }
 

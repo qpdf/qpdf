@@ -47,14 +47,33 @@ class QPDF::ObjCache
 class QPDF::ObjCopier
 {
   public:
-    QPDFObjectHandle
-    replace_indirect_object(QPDF& target, QPDFObjectHandle const& oh, bool top = true);
+    class Copier
+    {
+      public:
+        Copier(QPDF& qpdf) :
+            qpdf(qpdf)
+        {
+        }
 
-    void reserve_objects(QPDF& target, QPDFObjectHandle const& oh, bool top = true);
+        QPDFObjectHandle replace_indirect_object(QPDFObjectHandle const& foreign, bool top = true);
 
-    std::map<QPDFObjGen, QPDFObjectHandle> object_map;
-    std::vector<QPDFObjectHandle> to_copy;
-    QPDFObjGen::set visiting;
+        void reserve_objects(QPDFObjectHandle const& foreign, bool top = true);
+
+        QPDF& qpdf;
+        std::map<QPDFObjGen, QPDFObjectHandle> object_map;
+        std::vector<QPDFObjectHandle> to_copy;
+        QPDFObjGen::set visiting;
+    };
+
+    ObjCopier(QPDF& qpdf) :
+        qpdf(qpdf)
+    {
+    }
+
+    Copier& copier(QPDFObjectHandle const& foreign);
+
+    QPDF& qpdf;
+    std::map<unsigned long long, Copier> copiers;
 };
 
 class QPDF::EncryptionParameters
@@ -852,7 +871,7 @@ class QPDF::Members
     bool ever_pushed_inherited_attributes_to_pages{false};
     bool ever_called_get_all_pages{false};
     std::vector<QPDFExc> warnings;
-    std::map<unsigned long long, ObjCopier> object_copiers;
+    QPDF::ObjCopier obj_copier;
     std::shared_ptr<CopiedStreamDataProvider> copied_stream_data_provider;
     bool reconstructed_xref{false};
     bool in_read_xref_stream{false};
