@@ -338,6 +338,123 @@ class QPDF::Doc
     class Streams;
     class Writer;
 
+    class Encryption
+    {
+      public:
+        // This class holds data read from the encryption dictionary.
+        Encryption(
+            int V,
+            int R,
+            int Length_bytes,
+            int P,
+            std::string const& O,
+            std::string const& U,
+            std::string const& OE,
+            std::string const& UE,
+            std::string const& Perms,
+            std::string const& id1,
+            bool encrypt_metadata) :
+            V(V),
+            R(R),
+            Length_bytes(Length_bytes),
+            P(static_cast<unsigned long long>(P)),
+            O(O),
+            U(U),
+            OE(OE),
+            UE(UE),
+            Perms(Perms),
+            id1(id1),
+            encrypt_metadata(encrypt_metadata)
+        {
+        }
+        Encryption(int V, int R, int Length_bytes, bool encrypt_metadata) :
+            V(V),
+            R(R),
+            Length_bytes(Length_bytes),
+            encrypt_metadata(encrypt_metadata)
+        {
+        }
+
+        int getV() const;
+        int getR() const;
+        int getLengthBytes() const;
+        int getP() const;
+        //  Bits in P are numbered from 1 as in the PDF spec.
+        bool getP(size_t bit) const;
+        std::string const& getO() const;
+        std::string const& getU() const;
+        std::string const& getOE() const;
+        std::string const& getUE() const;
+        std::string const& getPerms() const;
+        std::string const& getId1() const;
+        bool getEncryptMetadata() const;
+        //  Bits in P are numbered from 1 as in the PDF spec.
+        void setP(size_t bit, bool val);
+        void setP(unsigned long val);
+        void setO(std::string const&);
+        void setU(std::string const&);
+        void setId1(std::string const& val);
+        void setV5EncryptionParameters(
+            std::string const& O,
+            std::string const& OE,
+            std::string const& U,
+            std::string const& UE,
+            std::string const& Perms);
+
+        std::string compute_encryption_key(std::string const& password) const;
+
+        bool
+        check_owner_password(std::string& user_password, std::string const& owner_password) const;
+
+        bool check_user_password(std::string const& user_password) const;
+
+        std::string
+        recover_encryption_key_with_password(std::string const& password, bool& perms_valid) const;
+
+        void compute_encryption_O_U(char const* user_password, char const* owner_password);
+
+        std::string
+        compute_encryption_parameters_V5(char const* user_password, char const* owner_password);
+
+        std::string compute_parameters(char const* user_password, char const* owner_password);
+
+      private:
+        static constexpr unsigned int OU_key_bytes_V4 = 16; // ( == sizeof(MD5::Digest)
+
+        Encryption(Encryption const&) = delete;
+        Encryption& operator=(Encryption const&) = delete;
+
+        std::string hash_V5(
+            std::string const& password, std::string const& salt, std::string const& udata) const;
+        std::string
+        compute_O_value(std::string const& user_password, std::string const& owner_password) const;
+        std::string compute_U_value(std::string const& user_password) const;
+        std::string compute_encryption_key_from_password(std::string const& password) const;
+        std::string recover_encryption_key_with_password(std::string const& password) const;
+        bool check_owner_password_V4(
+            std::string& user_password, std::string const& owner_password) const;
+        bool check_owner_password_V5(std::string const& owner_passworda) const;
+        std::string compute_Perms_value_V5_clear() const;
+        std::string compute_O_rc4_key(
+            std::string const& user_password, std::string const& owner_password) const;
+        std::string compute_U_value_R2(std::string const& user_password) const;
+        std::string compute_U_value_R3(std::string const& user_password) const;
+        bool check_user_password_V4(std::string const& user_password) const;
+        bool check_user_password_V5(std::string const& user_password) const;
+
+        int V;
+        int R;
+        int Length_bytes;
+        std::bitset<32> P{0xfffffffc}; // Specification always requires bits 1 and 2 to be cleared.
+        std::string O;
+        std::string U;
+        std::string OE;
+        std::string UE;
+        std::string Perms;
+        std::string id1;
+        bool encrypt_metadata;
+    };
+
     // StreamCopier class is restricted to QPDFObjectHandle so it can copy stream data.
     class StreamCopier
     {

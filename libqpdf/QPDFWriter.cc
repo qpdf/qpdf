@@ -27,6 +27,8 @@
 using namespace std::literals;
 using namespace qpdf;
 
+using Encryption = QPDF::Doc::Encryption;
+
 QPDFWriter::ProgressReporter::~ProgressReporter() // NOLINT (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
@@ -504,7 +506,7 @@ class QPDFWriter::Members: QPDF::Doc::Writer
     bool pclm{false};
     qpdf_object_stream_e object_stream_mode{qpdf_o_preserve};
 
-    std::unique_ptr<QPDF::EncryptionData> encryption;
+    std::unique_ptr<QPDF::Doc::Encryption> encryption;
     std::string encryption_key;
     bool encrypt_use_aes{false};
 
@@ -829,7 +831,7 @@ QPDFWriter::setR2EncryptionParametersInsecure(
     bool allow_extract,
     bool allow_annotate)
 {
-    m->encryption = std::make_unique<QPDF::EncryptionData>(1, 2, 5, true);
+    m->encryption = std::make_unique<Encryption>(1, 2, 5, true);
     if (!allow_print) {
         m->encryption->setP(3, false);
     }
@@ -857,7 +859,7 @@ QPDFWriter::setR3EncryptionParametersInsecure(
     bool allow_modify_other,
     qpdf_r3_print_e print)
 {
-    m->encryption = std::make_unique<QPDF::EncryptionData>(2, 3, 16, true);
+    m->encryption = std::make_unique<Encryption>(2, 3, 16, true);
     m->interpretR3EncryptionParameters(
         allow_accessibility,
         allow_extract,
@@ -884,7 +886,7 @@ QPDFWriter::setR4EncryptionParametersInsecure(
     bool encrypt_metadata,
     bool use_aes)
 {
-    m->encryption = std::make_unique<QPDF::EncryptionData>(4, 4, 16, encrypt_metadata);
+    m->encryption = std::make_unique<Encryption>(4, 4, 16, encrypt_metadata);
     m->encrypt_use_aes = use_aes;
     m->interpretR3EncryptionParameters(
         allow_accessibility,
@@ -911,7 +913,7 @@ QPDFWriter::setR5EncryptionParameters(
     qpdf_r3_print_e print,
     bool encrypt_metadata)
 {
-    m->encryption = std::make_unique<QPDF::EncryptionData>(5, 5, 32, encrypt_metadata);
+    m->encryption = std::make_unique<Encryption>(5, 5, 32, encrypt_metadata);
     m->encrypt_use_aes = true;
     m->interpretR3EncryptionParameters(
         allow_accessibility,
@@ -938,7 +940,7 @@ QPDFWriter::setR6EncryptionParameters(
     qpdf_r3_print_e print,
     bool encrypt_metadata)
 {
-    m->encryption = std::make_unique<QPDF::EncryptionData>(5, 6, 32, encrypt_metadata);
+    m->encryption = std::make_unique<Encryption>(5, 6, 32, encrypt_metadata);
     m->interpretR3EncryptionParameters(
         allow_accessibility,
         allow_extract,
@@ -1094,7 +1096,7 @@ QPDFWriter::Members::copyEncryptionParameters(QPDF& qpdf)
         QTC::TC("qpdf", "QPDFWriter copy encrypt metadata", encrypt_metadata ? 0 : 1);
         QTC::TC("qpdf", "QPDFWriter copy use_aes", encrypt_use_aes ? 0 : 1);
 
-        encryption = std::make_unique<QPDF::EncryptionData>(
+        encryption = std::make_unique<Encryption>(
             V,
             encrypt.getKey("/R").getIntValueAsInt(),
             key_len,
