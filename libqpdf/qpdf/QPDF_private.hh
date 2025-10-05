@@ -364,6 +364,8 @@ class QPDF::Doc
     {
     }
 
+    bool reconstructed_xref() const;
+
     QPDFAcroFormDocumentHelper&
     acroform()
     {
@@ -523,9 +525,9 @@ class QPDF::Doc::Resolver
 };
 
 inline bool
-QPDF::reconstructed_xref() const
+QPDF::Doc::reconstructed_xref() const
 {
-    return m->reconstructed_xref;
+    return m.reconstructed_xref;
 }
 
 inline QPDF::Doc&

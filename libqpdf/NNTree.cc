@@ -30,7 +30,7 @@ void
 NNTreeImpl::warn(QPDFObjectHandle const& node, std::string const& msg)
 {
     qpdf.warn(qpdf_e_damaged_pdf, get_description(node), 0, msg);
-    if (++error_count > 5 && qpdf.reconstructed_xref()) {
+    if (++error_count > 5 && qpdf.doc().reconstructed_xref()) {
         error(node, "too many errors - giving up");
     }
 }

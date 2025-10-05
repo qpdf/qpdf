@@ -79,7 +79,7 @@ QPDFParser::parse_content(
                true,
                0,
                0,
-               context && context->reconstructed_xref())
+               context && context->doc().reconstructed_xref())
         .parse(empty, true);
 }
 

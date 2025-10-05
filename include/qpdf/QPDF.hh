@@ -791,7 +791,6 @@ class QPDF
 
     class Doc;
 
-    inline bool reconstructed_xref() const;
     inline Doc& doc();
 
     // For testing only -- do not add to DLL
