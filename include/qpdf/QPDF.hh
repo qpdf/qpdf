@@ -791,7 +791,6 @@ class QPDF
 
     class Doc;
     class StreamCopier;
-    class JobSetter;
 
     inline bool reconstructed_xref() const;
     inline Doc& doc();

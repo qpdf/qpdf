@@ -344,6 +344,7 @@ class QPDF::PatternFinder final: public InputSource::Finder
 class QPDF::Doc
 {
   public:
+    class JobSetter;
     class ParseGuard;
     class Resolver;
     class Streams;
@@ -517,20 +518,6 @@ class QPDF::Doc::Resolver
     resolved(QPDF* qpdf, QPDFObjGen og)
     {
         return qpdf->resolve(og);
-    }
-};
-
-// JobSetter class is restricted to QPDFJob.
-class QPDF::JobSetter
-{
-    friend class QPDFJob;
-
-  private:
-    // Enable enhanced warnings for pdf file checking.
-    static void
-    setCheckMode(QPDF& qpdf, bool val)
-    {
-        qpdf.m->check_mode = val;
     }
 };
 
