@@ -13,19 +13,6 @@
 
 using namespace qpdf;
 
-// StreamCopier class is restricted to QPDFObjectHandle so it can copy stream data.
-class QPDF::StreamCopier
-{
-    friend class QPDFObjectHandle;
-
-  private:
-    static void
-    copyStreamData(QPDF* qpdf, QPDFObjectHandle const& dest, QPDFObjectHandle const& src)
-    {
-        qpdf->copyStreamData(dest, src);
-    }
-};
-
 class QPDF::ObjCache
 {
   public:
@@ -347,8 +334,22 @@ class QPDF::Doc
     class JobSetter;
     class ParseGuard;
     class Resolver;
+    class StreamCopier;
     class Streams;
     class Writer;
+
+    // StreamCopier class is restricted to QPDFObjectHandle so it can copy stream data.
+    class StreamCopier
+    {
+        friend class QPDFObjectHandle;
+
+      private:
+        static void
+        copyStreamData(QPDF* qpdf, QPDFObjectHandle const& dest, QPDFObjectHandle const& src)
+        {
+            qpdf->copyStreamData(dest, src);
+        }
+    };
 
     Doc() = delete;
     Doc(Doc const&) = delete;

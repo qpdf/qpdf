@@ -790,7 +790,6 @@ class QPDF
     // End of the public API. The following classes and methods are for qpdf internal use only.
 
     class Doc;
-    class StreamCopier;
 
     inline bool reconstructed_xref() const;
     inline Doc& doc();
