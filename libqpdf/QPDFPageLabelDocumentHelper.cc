@@ -26,7 +26,7 @@ QPDFPageLabelDocumentHelper::QPDFPageLabelDocumentHelper(QPDF& qpdf) :
 QPDFPageLabelDocumentHelper&
 QPDFPageLabelDocumentHelper::get(QPDF& qpdf)
 {
-    return qpdf.page_labels();
+    return qpdf.doc().page_labels();
 }
 
 void

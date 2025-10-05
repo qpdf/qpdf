@@ -751,12 +751,13 @@ QPDFJob::doCheck(QPDF& pdf)
         }
 
         // Create all document helper to trigger any validations they carry out.
-        auto& pages = pdf.pages();
-        (void)pdf.acroform();
-        (void)pdf.embedded_files();
-        (void)pdf.page_labels();
-        (void)pdf.outlines().resolveNamedDest(QPDFObjectHandle::newString("dummy"));
-        (void)pdf.outlines().getOutlinesForPage(pages.getAllPages().at(0));
+        auto& doc = pdf.doc();
+        auto& pages = doc.pages();
+        (void)doc.acroform();
+        (void)doc.embedded_files();
+        (void)doc.page_labels();
+        (void)doc.outlines().resolveNamedDest(QPDFObjectHandle::newString("dummy"));
+        (void)doc.outlines().getOutlinesForPage(pages.getAllPages().at(0));
 
         // Write the file to nowhere, uncompressing streams.  This causes full file traversal and
         // decoding of all streams we can decode.
@@ -839,8 +840,8 @@ QPDFJob::doShowPages(QPDF& pdf)
 {
     int pageno = 0;
     auto& cout = *m->log->getInfo();
-    for (auto& ph: pdf.pages().getAllPages()) {
-        QPDFObjectHandle page = ph.getObjectHandle();
+    for (auto& page: pdf.getAllPages()) {
+        QPDFPageObjectHelper ph(page);
         ++pageno;
 
         cout << "page " << pageno << ": " << page.getObjectID() << " " << page.getGeneration()
@@ -871,7 +872,7 @@ QPDFJob::doShowPages(QPDF& pdf)
 void
 QPDFJob::doListAttachments(QPDF& pdf)
 {
-    auto& efdh = pdf.embedded_files();
+    auto& efdh = pdf.doc().embedded_files();
     if (efdh.hasEmbeddedFiles()) {
         for (auto const& i: efdh.getEmbeddedFiles()) {
             std::string const& key = i.first;
@@ -911,7 +912,7 @@ QPDFJob::doListAttachments(QPDF& pdf)
 void
 QPDFJob::doShowAttachment(QPDF& pdf)
 {
-    auto& efdh = pdf.embedded_files();
+    auto& efdh = pdf.doc().embedded_files();
     auto fs = efdh.getEmbeddedFile(m->attachment_to_show);
     if (!fs) {
         throw std::runtime_error("attachment " + m->attachment_to_show + " not found");
@@ -1030,13 +1031,13 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
     JSON::writeDictionaryKey(p, first, "pages", 1);
     bool first_page = true;
     JSON::writeArrayOpen(p, first_page, 2);
-    auto& pldh = pdf.page_labels();
-    auto& odh = pdf.outlines();
+    auto& pldh = pdf.doc().page_labels();
+    auto& odh = pdf.doc().outlines();
     int pageno = -1;
-    for (auto& ph: pdf.pages().getAllPages()) {
+    for (auto& page: pdf.getAllPages()) {
         ++pageno;
         JSON j_page = JSON::makeDictionary();
-        QPDFObjectHandle page = ph.getObjectHandle();
+        QPDFPageObjectHelper ph(page);
         j_page.addDictionaryMember("object", page.getJSON(m->json_version));
         JSON j_images = j_page.addDictionaryMember("images", JSON::makeArray());
         for (auto const& iter2: ph.getImages()) {
@@ -1093,8 +1094,8 @@ void
 QPDFJob::doJSONPageLabels(Pipeline* p, bool& first, QPDF& pdf)
 {
     JSON j_labels = JSON::makeArray();
-    auto& pldh = pdf.page_labels();
-    long long npages = QIntC::to_longlong(pdf.pages().getAllPages().size());
+    auto& pldh = pdf.doc().page_labels();
+    long long npages = QIntC::to_longlong(pdf.getAllPages().size());
     if (pldh.hasPageLabels()) {
         std::vector<QPDFObjectHandle> labels;
         pldh.getLabelsForPageRange(0, npages - 1, 0, labels);
@@ -1142,13 +1143,12 @@ QPDFJob::doJSONOutlines(Pipeline* p, bool& first, QPDF& pdf)
 {
     std::map<QPDFObjGen, int> page_numbers;
     int n = 0;
-    for (auto const& ph: pdf.pages().getAllPages()) {
-        QPDFObjectHandle oh = ph.getObjectHandle();
-        page_numbers[oh.getObjGen()] = ++n;
+    for (auto const& oh: pdf.getAllPages()) {
+        page_numbers[oh] = ++n;
     }
 
     JSON j_outlines = JSON::makeArray();
-    addOutlinesToJson(pdf.outlines().getTopLevelOutlines(), j_outlines, page_numbers);
+    addOutlinesToJson(pdf.doc().outlines().getTopLevelOutlines(), j_outlines, page_numbers);
     JSON::writeDictionaryItem(p, first, "outlines", j_outlines, 1);
 }
 
@@ -1156,14 +1156,14 @@ void
 QPDFJob::doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf)
 {
     JSON j_acroform = JSON::makeDictionary();
-    auto& afdh = pdf.acroform();
+    auto& afdh = pdf.doc().acroform();
     j_acroform.addDictionaryMember("hasacroform", JSON::makeBool(afdh.hasAcroForm()));
     j_acroform.addDictionaryMember("needappearances", JSON::makeBool(afdh.getNeedAppearances()));
     JSON j_fields = j_acroform.addDictionaryMember("fields", JSON::makeArray());
     int pagepos1 = 0;
-    for (auto const& page: pdf.pages().getAllPages()) {
+    for (auto const& page: pdf.getAllPages()) {
         ++pagepos1;
-        for (auto& aoh: afdh.getWidgetAnnotationsForPage(page)) {
+        for (auto& aoh: afdh.getWidgetAnnotationsForPage({page})) {
             QPDFFormFieldObjectHelper ffh = afdh.getFieldForAnnotation(aoh);
             if (!ffh.getObjectHandle().isDictionary()) {
                 continue;
@@ -1297,7 +1297,7 @@ QPDFJob::doJSONAttachments(Pipeline* p, bool& first, QPDF& pdf)
     };
 
     JSON j_attachments = JSON::makeDictionary();
-    auto& efdh = pdf.embedded_files();
+    auto& efdh = pdf.doc().embedded_files();
     for (auto const& iter: efdh.getEmbeddedFiles()) {
         std::string const& key = iter.first;
         auto fsoh = iter.second;
@@ -1873,7 +1873,7 @@ QPDFJob::doUnderOverlayForPage(
     if (!(uo.pdf && pagenos[pageno.idx].contains(uo_idx))) {
         return "";
     }
-    auto& dest_afdh = dest_page.qpdf()->acroform();
+    auto& dest_afdh = dest_page.qpdf()->doc().acroform();
 
     auto const& pages = uo.pdf->getAllPages();
     std::string content;
@@ -1894,7 +1894,7 @@ QPDFJob::doUnderOverlayForPage(
         QPDFMatrix cm;
         std::string new_content = dest_page.placeFormXObject(
             fo[from_no.no][uo_idx], name, dest_page.getTrimBox().getArrayAsRectangle(), cm);
-        dest_page.copyAnnotations(from_page, cm, &dest_afdh, &from_page.qpdf()->acroform());
+        dest_page.copyAnnotations(from_page, cm, &dest_afdh, &from_page.qpdf()->doc().acroform());
         if (!new_content.empty()) {
             resources.mergeResources("<< /XObject << >> >>"_qpdf);
             auto xobject = resources.getKey("/XObject");
@@ -2019,7 +2019,7 @@ void
 QPDFJob::addAttachments(QPDF& pdf)
 {
     maybe_set_pagemode(pdf, "/UseAttachments");
-    auto& efdh = pdf.embedded_files();
+    auto& efdh = pdf.doc().embedded_files();
     std::vector<std::string> duplicated_keys;
     for (auto const& to_add: m->attachments_to_add) {
         if ((!to_add.replace) && efdh.getEmbeddedFile(to_add.key)) {
@@ -2063,7 +2063,7 @@ void
 QPDFJob::copyAttachments(QPDF& pdf)
 {
     maybe_set_pagemode(pdf, "/UseAttachments");
-    auto& efdh = pdf.embedded_files();
+    auto& efdh = pdf.doc().embedded_files();
     std::vector<std::string> duplicates;
     for (auto const& to_copy: m->attachments_to_copy) {
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -2071,7 +2071,7 @@ QPDFJob::copyAttachments(QPDF& pdf)
         });
         std::unique_ptr<QPDF> other;
         processFile(other, to_copy.path.c_str(), to_copy.password.c_str(), false, false);
-        auto& other_efdh = other->embedded_files();
+        auto& other_efdh = other->doc().embedded_files();
         auto other_attachments = other_efdh.getEmbeddedFiles();
         for (auto const& iter: other_attachments) {
             std::string new_key = to_copy.prefix + iter.first;
@@ -2114,7 +2114,7 @@ QPDFJob::handleTransformations(QPDF& pdf)
     QPDFAcroFormDocumentHelper* afdh_ptr = nullptr;
     auto afdh = [&]() -> QPDFAcroFormDocumentHelper& {
         if (!afdh_ptr) {
-            afdh_ptr = &pdf.acroform();
+            afdh_ptr = &pdf.doc().acroform();
         }
         return *afdh_ptr;
     };
@@ -2205,7 +2205,7 @@ QPDFJob::handleTransformations(QPDF& pdf)
         pdf.getRoot().replaceKey("/PageLabels", page_labels);
     }
     if (!m->attachments_to_remove.empty()) {
-        auto& efdh = pdf.embedded_files();
+        auto& efdh = pdf.doc().embedded_files();
         for (auto const& key: m->attachments_to_remove) {
             if (efdh.removeEmbeddedFile(key)) {
                 doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -2344,7 +2344,7 @@ QPDFJob::Input::initialize(Inputs& in, QPDF* a_qpdf)
         if (in.job.m->remove_unreferenced_page_resources != QPDFJob::re_no) {
             remove_unreferenced = in.job.shouldRemoveUnreferencedResources(*qpdf);
         }
-        if (qpdf->page_labels().hasPageLabels()) {
+        if (qpdf->doc().page_labels().hasPageLabels()) {
             in.any_page_labels = true;
         }
     }
@@ -2574,15 +2574,15 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     // original file that we are selecting.
     std::vector<QPDFObjectHandle> new_labels;
     int out_pageno = 0;
-    auto& this_afdh = pdf.acroform();
+    auto& this_afdh = pdf.doc().acroform();
     std::set<QPDFObjGen> referenced_fields;
     for (auto& selection: new_specs.empty() ? m->inputs.selections : new_specs) {
         auto& input = selection.input();
         if (input.cfis) {
             input.cfis->stayOpen(true);
         }
-        auto* pldh = m->inputs.any_page_labels ? &input.qpdf->page_labels() : nullptr;
-        auto& other_afdh = input.qpdf->acroform();
+        auto* pldh = m->inputs.any_page_labels ? &input.qpdf->doc().page_labels() : nullptr;
+        auto& other_afdh = input.qpdf->doc().acroform();
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << prefix << ": adding pages from " << selection.filename() << "\n";
         });
@@ -3012,8 +3012,8 @@ QPDFJob::doSplitPages(QPDF& pdf)
         QPDFPageDocumentHelper dh(pdf);
         dh.removeUnreferencedResources();
     }
-    auto& pldh = pdf.page_labels();
-    auto& afdh = pdf.acroform();
+    auto& pldh = pdf.doc().page_labels();
+    auto& afdh = pdf.doc().acroform();
     std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
     size_t pageno_len = std::to_string(pages.size()).length();
     size_t num_pages = pages.size();
@@ -3025,7 +3025,8 @@ QPDFJob::doSplitPages(QPDF& pdf)
         }
         QPDF outpdf;
         outpdf.emptyPDF();
-        QPDFAcroFormDocumentHelper* out_afdh = afdh.hasAcroForm() ? &outpdf.acroform() : nullptr;
+        QPDFAcroFormDocumentHelper* out_afdh =
+            afdh.hasAcroForm() ? &outpdf.doc().acroform() : nullptr;
         if (m->suppress_warnings) {
             outpdf.setSuppressWarnings(true);
         }

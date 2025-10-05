@@ -34,7 +34,7 @@ QPDFOutlineDocumentHelper::QPDFOutlineDocumentHelper(QPDF& qpdf) :
 QPDFOutlineDocumentHelper&
 QPDFOutlineDocumentHelper::get(QPDF& qpdf)
 {
-    return qpdf.outlines();
+    return qpdf.doc().outlines();
 }
 
 void

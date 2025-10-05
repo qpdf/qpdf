@@ -425,9 +425,61 @@ class QPDF::Doc
     {
     }
 
+    QPDFAcroFormDocumentHelper&
+    acroform()
+    {
+        if (!acroform_) {
+            acroform_ = std::make_unique<QPDFAcroFormDocumentHelper>(qpdf);
+        }
+        return *acroform_;
+    }
+
+    QPDFEmbeddedFileDocumentHelper&
+    embedded_files()
+    {
+        if (!embedded_files_) {
+            embedded_files_ = std::make_unique<QPDFEmbeddedFileDocumentHelper>(qpdf);
+        }
+        return *embedded_files_;
+    }
+
+    QPDFOutlineDocumentHelper&
+    outlines()
+    {
+        if (!outlines_) {
+            outlines_ = std::make_unique<QPDFOutlineDocumentHelper>(qpdf);
+        }
+        return *outlines_;
+    }
+
+    QPDFPageDocumentHelper&
+    pages()
+    {
+        if (!pages_) {
+            pages_ = std::make_unique<QPDFPageDocumentHelper>(qpdf);
+        }
+        return *pages_;
+    }
+
+    QPDFPageLabelDocumentHelper&
+    page_labels()
+    {
+        if (!page_labels_) {
+            page_labels_ = std::make_unique<QPDFPageLabelDocumentHelper>(qpdf);
+        }
+        return *page_labels_;
+    }
+
   private:
     QPDF& qpdf;
     QPDF::Members& m;
+
+    // Document Helpers;
+    std::unique_ptr<QPDFAcroFormDocumentHelper> acroform_;
+    std::unique_ptr<QPDFEmbeddedFileDocumentHelper> embedded_files_;
+    std::unique_ptr<QPDFOutlineDocumentHelper> outlines_;
+    std::unique_ptr<QPDFPageDocumentHelper> pages_;
+    std::unique_ptr<QPDFPageLabelDocumentHelper> page_labels_;
 };
 
 class QPDF::Members
@@ -514,13 +566,6 @@ class QPDF::Members
     // Optimization data
     std::map<ObjUser, std::set<QPDFObjGen>> obj_user_to_objects;
     std::map<QPDFObjGen, std::set<ObjUser>> object_to_obj_users;
-
-    // Document Helpers;
-    std::unique_ptr<QPDFAcroFormDocumentHelper> acroform;
-    std::unique_ptr<QPDFEmbeddedFileDocumentHelper> embedded_files;
-    std::unique_ptr<QPDFOutlineDocumentHelper> outlines;
-    std::unique_ptr<QPDFPageDocumentHelper> pages;
-    std::unique_ptr<QPDFPageLabelDocumentHelper> page_labels;
 };
 
 // JobSetter class is restricted to QPDFJob.
@@ -541,51 +586,6 @@ inline bool
 QPDF::reconstructed_xref() const
 {
     return m->reconstructed_xref;
-}
-
-inline QPDFAcroFormDocumentHelper&
-QPDF::acroform()
-{
-    if (!m->acroform) {
-        m->acroform = std::make_unique<QPDFAcroFormDocumentHelper>(*this);
-    }
-    return *m->acroform;
-}
-
-inline QPDFEmbeddedFileDocumentHelper&
-QPDF::embedded_files()
-{
-    if (!m->embedded_files) {
-        m->embedded_files = std::make_unique<QPDFEmbeddedFileDocumentHelper>(*this);
-    }
-    return *m->embedded_files;
-}
-
-inline QPDFOutlineDocumentHelper&
-QPDF::outlines()
-{
-    if (!m->outlines) {
-        m->outlines = std::make_unique<QPDFOutlineDocumentHelper>(*this);
-    }
-    return *m->outlines;
-}
-
-inline QPDFPageDocumentHelper&
-QPDF::pages()
-{
-    if (!m->pages) {
-        m->pages = std::make_unique<QPDFPageDocumentHelper>(*this);
-    }
-    return *m->pages;
-}
-
-inline QPDFPageLabelDocumentHelper&
-QPDF::page_labels()
-{
-    if (!m->page_labels) {
-        m->page_labels = std::make_unique<QPDFPageLabelDocumentHelper>(*this);
-    }
-    return *m->page_labels;
 }
 
 inline QPDF::Doc&

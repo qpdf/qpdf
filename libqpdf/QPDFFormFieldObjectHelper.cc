@@ -337,7 +337,7 @@ QPDFFormFieldObjectHelper::setV(QPDFObjectHandle value, bool need_appearances)
         QPDF& qpdf = oh().getQPDF(
             "QPDFFormFieldObjectHelper::setV called with need_appearances = "
             "true on an object that is not associated with an owning QPDF");
-        qpdf.acroform().setNeedAppearances(true);
+        qpdf.doc().acroform().setNeedAppearances(true);
     }
 }
 

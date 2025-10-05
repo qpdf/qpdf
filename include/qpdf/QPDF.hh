@@ -62,11 +62,6 @@ class BitWriter;
 class BufferInputSource;
 class QPDFLogger;
 class QPDFParser;
-class QPDFAcroFormDocumentHelper;
-class QPDFEmbeddedFileDocumentHelper;
-class QPDFOutlineDocumentHelper;
-class QPDFPageDocumentHelper;
-class QPDFPageLabelDocumentHelper;
 
 class QPDF
 {
@@ -803,11 +798,6 @@ class QPDF
     class JobSetter;
 
     inline bool reconstructed_xref() const;
-    inline QPDFAcroFormDocumentHelper& acroform();
-    inline QPDFEmbeddedFileDocumentHelper& embedded_files();
-    inline QPDFOutlineDocumentHelper& outlines();
-    inline QPDFPageDocumentHelper& pages();
-    inline QPDFPageLabelDocumentHelper& page_labels();
     inline Doc& doc();
 
     // For testing only -- do not add to DLL
