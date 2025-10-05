@@ -13,21 +13,6 @@
 
 using namespace qpdf;
 
-// The Resolver class is restricted to QPDFObject so that only it can resolve indirect
-// references.
-class QPDF::Resolver
-{
-    friend class QPDFObject;
-    friend class qpdf::BaseHandle;
-
-  private:
-    static std::shared_ptr<QPDFObject> const&
-    resolved(QPDF* qpdf, QPDFObjGen og)
-    {
-        return qpdf->resolve(og);
-    }
-};
-
 // StreamCopier class is restricted to QPDFObjectHandle so it can copy stream data.
 class QPDF::StreamCopier
 {
@@ -383,6 +368,7 @@ class QPDF::Doc
 {
   public:
     class ParseGuard;
+    class Resolver;
 
     Doc() = delete;
     Doc(Doc const&) = delete;
@@ -538,6 +524,21 @@ class QPDF::Members
     // Optimization data
     std::map<ObjUser, std::set<QPDFObjGen>> obj_user_to_objects;
     std::map<QPDFObjGen, std::set<ObjUser>> object_to_obj_users;
+};
+
+// The Resolver class is restricted to QPDFObject and BaseHandle so that only it can resolve
+// indirect references.
+class QPDF::Doc::Resolver
+{
+    friend class QPDFObject;
+    friend class qpdf::BaseHandle;
+
+  private:
+    static std::shared_ptr<QPDFObject> const&
+    resolved(QPDF* qpdf, QPDFObjGen og)
+    {
+        return qpdf->resolve(og);
+    }
 };
 
 // JobSetter class is restricted to QPDFJob.
