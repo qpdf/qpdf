@@ -490,7 +490,6 @@ class QPDF::Doc
         std::shared_ptr<QPDFObject> getObjectForParser(int id, int gen, bool parse_pdf);
         std::shared_ptr<QPDFObject> getObjectForJSON(int id, int gen);
         size_t tableSize();
-        void setLastObjectDescription(std::string const& description, QPDFObjGen og);
 
         // For QPDFWriter:
 
@@ -541,6 +540,7 @@ class QPDF::Doc
         void resolveObjectsInStream(int obj_stream_number);
         bool isCached(QPDFObjGen og);
         bool isUnresolved(QPDFObjGen og);
+        void setLastObjectDescription(std::string const& description, QPDFObjGen og);
 
       private:
         QPDF& qpdf;

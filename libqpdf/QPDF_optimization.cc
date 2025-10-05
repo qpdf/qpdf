@@ -215,15 +215,13 @@ QPDF::pushInheritedAttributesToPageInternal(
             }
             // Remove this resource from this node.  It will be reattached at the page level.
             cur_pages.removeKey(key);
-        } else if (!((key == "/Type") || (key == "/Parent") || (key == "/Kids") ||
-                     (key == "/Count"))) {
+        } else if (!(key == "/Type" || key == "/Parent" || key == "/Kids" || key == "/Count")) {
             // Warn when flattening, but not if the key is at the top level (i.e. "/Parent" not
             // set), as we don't change these; but flattening removes intermediate /Pages nodes.
-            if ((warn_skipped_keys) && (cur_pages.hasKey("/Parent"))) {
-                m->objects.setLastObjectDescription("Pages object", cur_pages.getObjGen());
+            if (warn_skipped_keys && cur_pages.hasKey("/Parent")) {
                 warn(
                     qpdf_e_pages,
-                    m->last_object_description,
+                    "Pages object: object " + cur_pages.id_gen().unparse(' '),
                     0,
                     ("Unknown key " + key +
                      " in /Pages object is being discarded as a result of flattening the /Pages "
