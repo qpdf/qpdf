@@ -26,29 +26,6 @@ class QPDF::StreamCopier
     }
 };
 
-// Pipe class is restricted to QPDF_Stream.
-class QPDF::Pipe
-{
-    friend class qpdf::Stream;
-
-  private:
-    static bool
-    pipeStreamData(
-        QPDF* qpdf,
-        QPDFObjGen og,
-        qpdf_offset_t offset,
-        size_t length,
-        QPDFObjectHandle dict,
-        bool is_root_metadata,
-        Pipeline* pipeline,
-        bool suppress_warnings,
-        bool will_retry)
-    {
-        return qpdf->pipeStreamData(
-            og, offset, length, dict, is_root_metadata, pipeline, suppress_warnings, will_retry);
-    }
-};
-
 class QPDF::ObjCache
 {
   public:
@@ -369,6 +346,7 @@ class QPDF::Doc
   public:
     class ParseGuard;
     class Resolver;
+    class Streams;
 
     Doc() = delete;
     Doc(Doc const&) = delete;

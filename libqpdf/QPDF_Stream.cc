@@ -26,6 +26,27 @@
 using namespace std::literals;
 using namespace qpdf;
 
+// Pipe class is restricted to QPDF_Stream.
+class QPDF::Doc::Streams
+{
+  public:
+    static bool
+    pipeStreamData(
+        QPDF* qpdf,
+        QPDFObjGen og,
+        qpdf_offset_t offset,
+        size_t length,
+        QPDFObjectHandle dict,
+        bool is_root_metadata,
+        Pipeline* pipeline,
+        bool suppress_warnings,
+        bool will_retry)
+    {
+        return qpdf->pipeStreamData(
+            og, offset, length, dict, is_root_metadata, pipeline, suppress_warnings, will_retry);
+    }
+};
+
 namespace
 {
     class SF_Crypt final: public QPDFStreamFilter
@@ -563,7 +584,7 @@ Stream::pipeStreamData(
             throw std::logic_error("pipeStreamData called for stream with no data");
         }
         QTC::TC("qpdf", "QPDF_Stream pipe original stream data");
-        if (!QPDF::Pipe::pipeStreamData(
+        if (!QPDF::Doc::Streams::pipeStreamData(
                 obj->getQPDF(),
                 obj->getObjGen(),
                 obj->getParsedOffset(),
