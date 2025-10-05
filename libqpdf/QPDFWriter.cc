@@ -260,7 +260,7 @@ Pl_stack::Popper::pop()
 }
 
 // Writer class is restricted to QPDFWriter so that only it can call certain methods.
-class QPDF::Writer
+class QPDF::Doc::Writer
 {
     friend class QPDFWriter;
     Writer(QPDF& pdf) :
@@ -328,7 +328,7 @@ class QPDF::Writer
     QPDF& pdf;
 };
 
-class QPDFWriter::Members: QPDF::Writer
+class QPDFWriter::Members: QPDF::Doc::Writer
 {
     friend class QPDFWriter;
 
@@ -343,7 +343,7 @@ class QPDFWriter::Members: QPDF::Writer
     enum trailer_e { t_normal, t_lin_first, t_lin_second };
 
     Members(QPDFWriter& w, QPDF& pdf) :
-        QPDF::Writer(pdf),
+        QPDF::Doc::Writer(pdf),
         w(w),
         root_og(
             pdf.getRoot().getObjGen().isIndirect() ? pdf.getRoot().getObjGen() : QPDFObjGen(-1, 0)),

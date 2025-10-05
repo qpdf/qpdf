@@ -347,6 +347,7 @@ class QPDF::Doc
     class ParseGuard;
     class Resolver;
     class Streams;
+    class Writer;
 
     Doc() = delete;
     Doc(Doc const&) = delete;
