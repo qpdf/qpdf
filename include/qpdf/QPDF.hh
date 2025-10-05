@@ -794,6 +794,7 @@ class QPDF
 
     // End of the public API. The following classes and methods are for qpdf internal use only.
 
+    class Doc;
     class Writer;
     class Resolver;
     class StreamCopier;
@@ -807,6 +808,7 @@ class QPDF
     inline QPDFOutlineDocumentHelper& outlines();
     inline QPDFPageDocumentHelper& pages();
     inline QPDFPageLabelDocumentHelper& page_labels();
+    inline Doc& doc();
 
     // For testing only -- do not add to DLL
     static bool test_json_validators();

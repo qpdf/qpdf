@@ -178,7 +178,8 @@ QPDF::QPDFVersion()
     return QPDF::qpdf_version;
 }
 
-QPDF::Members::Members() :
+QPDF::Members::Members(QPDF& qpdf) :
+    doc(qpdf, *this),
     log(QPDFLogger::defaultLogger()),
     file(new InvalidInputSource()),
     encp(new EncryptionParameters)
@@ -186,7 +187,7 @@ QPDF::Members::Members() :
 }
 
 QPDF::QPDF() :
-    m(std::make_unique<Members>())
+    m(std::make_unique<Members>(*this))
 {
     m->tokenizer.allowEOF();
     // Generate a unique ID. It just has to be unique among all QPDF objects allocated throughout

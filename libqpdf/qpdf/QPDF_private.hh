@@ -405,17 +405,43 @@ class QPDF::PatternFinder final: public InputSource::Finder
     bool (QPDF::*checker)();
 };
 
+// This class is used to represent a PDF document.
+//
+// The main function of the QPDF class is to represent a PDF document. Doc is the implementation
+// class for this aspect of QPDF.
+class QPDF::Doc
+{
+  public:
+    Doc() = delete;
+    Doc(Doc const&) = delete;
+    Doc(Doc&&) = delete;
+    Doc& operator=(Doc const&) = delete;
+    Doc& operator=(Doc&&) = delete;
+    ~Doc() = default;
+
+    Doc(QPDF& qpdf, QPDF::Members& m) :
+        qpdf(qpdf),
+        m(m)
+    {
+    }
+
+  private:
+    QPDF& qpdf;
+    QPDF::Members& m;
+};
+
 class QPDF::Members
 {
     friend class QPDF;
     friend class ResolveRecorder;
 
   public:
-    Members();
+    Members(QPDF& qpdf);
     Members(Members const&) = delete;
     ~Members() = default;
 
   private:
+    Doc doc;
     std::shared_ptr<QPDFLogger> log;
     unsigned long long unique_id{0};
     qpdf::Tokenizer tokenizer;
@@ -560,6 +586,12 @@ QPDF::page_labels()
         m->page_labels = std::make_unique<QPDFPageLabelDocumentHelper>(*this);
     }
     return *m->page_labels;
+}
+
+inline QPDF::Doc&
+QPDF::doc()
+{
+    return m->doc;
 }
 
 // Throw a generic exception for unusual error conditions that do not be covered during CI testing.
