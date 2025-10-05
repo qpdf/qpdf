@@ -266,7 +266,8 @@ class QPDF::Doc::Writer
 {
     friend class QPDFWriter;
     Writer(QPDF& pdf) :
-        pdf(pdf)
+        pdf(pdf),
+        objects(pdf.m->objects)
     {
     }
 
@@ -306,13 +307,13 @@ class QPDF::Doc::Writer
     std::vector<QPDFObjGen>
     getCompressibleObjGens()
     {
-        return pdf.getCompressibleObjVector();
+        return objects.getCompressibleObjVector();
     }
 
     std::vector<bool>
     getCompressibleObjSet()
     {
-        return pdf.getCompressibleObjSet();
+        return objects.getCompressibleObjSet();
     }
 
     std::map<QPDFObjGen, QPDFXRefEntry> const&
@@ -324,10 +325,11 @@ class QPDF::Doc::Writer
     size_t
     tableSize()
     {
-        return pdf.tableSize();
+        return pdf.m->objects.tableSize();
     }
 
     QPDF& pdf;
+    QPDF::Doc::Objects& objects;
 };
 
 class QPDFWriter::Members: QPDF::Doc::Writer

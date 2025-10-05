@@ -180,6 +180,7 @@ QPDF::QPDFVersion()
 
 QPDF::Members::Members(QPDF& qpdf) :
     doc(qpdf, *this),
+    objects(doc.objects()),
     log(QPDFLogger::defaultLogger()),
     file(new InvalidInputSource()),
     encp(new EncryptionParameters)
@@ -267,7 +268,7 @@ void
 QPDF::processInputSource(std::shared_ptr<InputSource> source, char const* password)
 {
     m->file = source;
-    parse(password);
+    m->objects.parse(password);
 }
 
 void
@@ -435,20 +436,20 @@ QPDF::warn(
 QPDFObjectHandle
 QPDF::newReserved()
 {
-    return makeIndirectFromQPDFObject(QPDFObject::create<QPDF_Reserved>());
+    return m->objects.makeIndirectFromQPDFObject(QPDFObject::create<QPDF_Reserved>());
 }
 
 QPDFObjectHandle
 QPDF::newIndirectNull()
 {
-    return makeIndirectFromQPDFObject(QPDFObject::create<QPDF_Null>());
+    return m->objects.makeIndirectFromQPDFObject(QPDFObject::create<QPDF_Null>());
 }
 
 QPDFObjectHandle
 QPDF::newStream()
 {
     return makeIndirectObject(
-        qpdf::Stream(*this, nextObjGen(), QPDFObjectHandle::newDictionary(), 0, 0));
+        qpdf::Stream(*this, m->objects.nextObjGen(), Dictionary::empty(), 0, 0));
 }
 
 QPDFObjectHandle

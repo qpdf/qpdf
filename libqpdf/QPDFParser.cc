@@ -21,26 +21,26 @@ class QPDF::Doc::ParseGuard
 {
   public:
     ParseGuard(QPDF* qpdf) :
-        qpdf(qpdf)
+        objects(qpdf ? &qpdf->m->objects : nullptr)
     {
-        if (qpdf) {
-            qpdf->inParse(true);
+        if (objects) {
+            objects->inParse(true);
         }
     }
 
     static std::shared_ptr<QPDFObject>
     getObject(QPDF* qpdf, int id, int gen, bool parse_pdf)
     {
-        return qpdf->getObjectForParser(id, gen, parse_pdf);
+        return qpdf->m->objects.getObjectForParser(id, gen, parse_pdf);
     }
 
     ~ParseGuard()
     {
-        if (qpdf) {
-            qpdf->inParse(false);
+        if (objects) {
+            objects->inParse(false);
         }
     }
-    QPDF* qpdf;
+    QPDF::Doc::Objects* objects;
 };
 
 using ParseGuard = QPDF::Doc::ParseGuard;
@@ -422,7 +422,6 @@ QPDFParser::parseRemainder(bool content_stream)
                 frame = &stack.back();
                 add(std::move(object));
             } else {
-                QTC::TC("qpdf", "QPDFParser bad dictionary close in parseRemainder");
                 if (sanity_checks) {
                     // During sanity checks, assume nesting of containers is corrupt and object is
                     // unusable.

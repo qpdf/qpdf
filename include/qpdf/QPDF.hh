@@ -765,66 +765,10 @@ class QPDF
     class ResolveRecorder;
     class JSONReactor;
 
-    void parse(char const* password);
-    void inParse(bool);
-    void setTrailer(QPDFObjectHandle obj);
-    void read_xref(qpdf_offset_t offset, bool in_stream_recovery = false);
-    bool resolveXRefTable();
-    void reconstruct_xref(QPDFExc& e, bool found_startxref = true);
-    bool parse_xrefFirst(std::string const& line, int& obj, int& num, int& bytes);
-    bool read_xrefEntry(qpdf_offset_t& f1, int& f2, char& type);
-    bool read_bad_xrefEntry(qpdf_offset_t& f1, int& f2, char& type);
-    qpdf_offset_t read_xrefTable(qpdf_offset_t offset);
-    qpdf_offset_t read_xrefStream(qpdf_offset_t offset, bool in_stream_recovery = false);
-    qpdf_offset_t processXRefStream(
-        qpdf_offset_t offset, QPDFObjectHandle& xref_stream, bool in_stream_recovery = false);
-    std::pair<int, std::array<int, 3>>
-    processXRefW(QPDFObjectHandle& dict, std::function<QPDFExc(std::string_view)> damaged);
-    int processXRefSize(
-        QPDFObjectHandle& dict, int entry_size, std::function<QPDFExc(std::string_view)> damaged);
-    std::pair<int, std::vector<std::pair<int, int>>> processXRefIndex(
-        QPDFObjectHandle& dict,
-        int max_num_entries,
-        std::function<QPDFExc(std::string_view)> damaged);
-    void insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2);
-    void insertFreeXrefEntry(QPDFObjGen);
-    void setLastObjectDescription(std::string const& description, QPDFObjGen og);
-    QPDFObjectHandle readTrailer();
-    QPDFObjectHandle readObject(std::string const& description, QPDFObjGen og);
-    void readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset);
-    void validateStreamLineEnd(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset);
-    QPDFObjectHandle readObjectInStream(qpdf::is::OffsetBuffer& input, int stream_id, int obj_id);
-    size_t recoverStreamLength(
-        std::shared_ptr<InputSource> input, QPDFObjGen og, qpdf_offset_t stream_offset);
-    QPDFTokenizer::Token readToken(InputSource&, size_t max_len = 0);
-
-    QPDFObjGen read_object_start(qpdf_offset_t offset);
-    void readObjectAtOffset(
-        bool attempt_recovery,
-        qpdf_offset_t offset,
-        std::string const& description,
-        QPDFObjGen exp_og);
-    QPDFObjectHandle readObjectAtOffset(
-        qpdf_offset_t offset, std::string const& description, bool skip_cache_if_in_xref);
-    std::shared_ptr<QPDFObject> const& resolve(QPDFObjGen og);
-    void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
     inline void
     no_ci_stop_if(bool condition, std::string const& message, std::string const& context = {});
-    QPDFObjGen nextObjGen();
-    QPDFObjectHandle newIndirect(QPDFObjGen, std::shared_ptr<QPDFObject> const&);
-    QPDFObjectHandle makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj);
-    bool isCached(QPDFObjGen og);
-    bool isUnresolved(QPDFObjGen og);
-    std::shared_ptr<QPDFObject> getObjectForParser(int id, int gen, bool parse_pdf);
-    std::shared_ptr<QPDFObject> getObjectForJSON(int id, int gen);
     void removeObject(QPDFObjGen og);
-    void updateCache(
-        QPDFObjGen og,
-        std::shared_ptr<QPDFObject> const& object,
-        qpdf_offset_t end_before_space,
-        qpdf_offset_t end_after_space,
-        bool destroy = true);
     static QPDFExc damagedPDF(
         InputSource& input,
         std::string const& object,
@@ -872,7 +816,6 @@ class QPDF
     void optimize(
         QPDFWriter::ObjTable const& obj,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
-    size_t tableSize();
 
     // Get lists of all objects in order according to the part of a linearized file that they belong
     // to.
@@ -891,12 +834,6 @@ class QPDF
         int& S,
         int& O,
         bool compressed);
-
-    // Get a list of objects that would be permitted in an object stream.
-    template <typename T>
-    std::vector<T> getCompressibleObjGens();
-    std::vector<QPDFObjGen> getCompressibleObjVector();
-    std::vector<bool> getCompressibleObjSet();
 
     // methods to support page handling
 

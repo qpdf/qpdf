@@ -112,9 +112,9 @@ QPDF::isLinearized()
         // next iteration.
         m->file->seek(toO(pos), SEEK_SET);
 
-        auto t1 = readToken(*m->file, 20);
-        if (!(t1.isInteger() && readToken(*m->file, 6).isInteger() &&
-              readToken(*m->file, 4).isWord("obj"))) {
+        auto t1 = m->objects.readToken(*m->file, 20);
+        if (!(t1.isInteger() && m->objects.readToken(*m->file, 6).isInteger() &&
+              m->objects.readToken(*m->file, 4).isWord("obj"))) {
             pos = buffer.find_first_not_of("0123456789"sv, pos);
             if (pos == std::string::npos) {
                 return false;
@@ -250,7 +250,7 @@ QPDF::readLinearizationData()
 Dictionary
 QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
 {
-    auto H = readObjectAtOffset(offset, "linearization hint stream", false);
+    auto H = m->objects.readObjectAtOffset(offset, "linearization hint stream", false);
     ObjCache& oc = m->obj_cache[H];
     qpdf_offset_t min_end_offset = oc.end_before_space;
     qpdf_offset_t max_end_offset = oc.end_after_space;
