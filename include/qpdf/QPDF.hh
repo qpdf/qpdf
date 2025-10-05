@@ -793,7 +793,6 @@ class QPDF
     class Writer;
     class Resolver;
     class StreamCopier;
-    class ParseGuard;
     class Pipe;
     class JobSetter;
 

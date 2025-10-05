@@ -41,36 +41,6 @@ class QPDF::StreamCopier
     }
 };
 
-// The ParseGuard class allows QPDFParser to detect re-entrant parsing. It also provides
-// special access to allow the parser to create unresolved objects and dangling references.
-class QPDF::ParseGuard
-{
-    friend class QPDFParser;
-
-  private:
-    ParseGuard(QPDF* qpdf) :
-        qpdf(qpdf)
-    {
-        if (qpdf) {
-            qpdf->inParse(true);
-        }
-    }
-
-    static std::shared_ptr<QPDFObject>
-    getObject(QPDF* qpdf, int id, int gen, bool parse_pdf)
-    {
-        return qpdf->getObjectForParser(id, gen, parse_pdf);
-    }
-
-    ~ParseGuard()
-    {
-        if (qpdf) {
-            qpdf->inParse(false);
-        }
-    }
-    QPDF* qpdf;
-};
-
 // Pipe class is restricted to QPDF_Stream.
 class QPDF::Pipe
 {
@@ -412,6 +382,8 @@ class QPDF::PatternFinder final: public InputSource::Finder
 class QPDF::Doc
 {
   public:
+    class ParseGuard;
+
     Doc() = delete;
     Doc(Doc const&) = delete;
     Doc(Doc&&) = delete;

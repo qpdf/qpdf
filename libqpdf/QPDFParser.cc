@@ -15,6 +15,36 @@ using namespace qpdf;
 
 using ObjectPtr = std::shared_ptr<QPDFObject>;
 
+// The ParseGuard class allows QPDFParser to detect re-entrant parsing. It also provides
+// special access to allow the parser to create unresolved objects and dangling references.
+class QPDF::Doc::ParseGuard
+{
+  public:
+    ParseGuard(QPDF* qpdf) :
+        qpdf(qpdf)
+    {
+        if (qpdf) {
+            qpdf->inParse(true);
+        }
+    }
+
+    static std::shared_ptr<QPDFObject>
+    getObject(QPDF* qpdf, int id, int gen, bool parse_pdf)
+    {
+        return qpdf->getObjectForParser(id, gen, parse_pdf);
+    }
+
+    ~ParseGuard()
+    {
+        if (qpdf) {
+            qpdf->inParse(false);
+        }
+    }
+    QPDF* qpdf;
+};
+
+using ParseGuard = QPDF::Doc::ParseGuard;
+
 QPDFObjectHandle
 QPDFParser::parse(InputSource& input, std::string const& object_description, QPDF* context)
 {
@@ -126,7 +156,7 @@ QPDFParser::parse(bool& empty, bool content_stream)
     // effect of reading the object and changing the file pointer. If you do this, it will cause a
     // logic error to be thrown from QPDF::inParse().
 
-    QPDF::ParseGuard pg(context);
+    ParseGuard pg(context);
     empty = false;
     start = input.tell();
 
@@ -262,7 +292,7 @@ QPDFParser::parseRemainder(bool content_stream)
                 auto id = QIntC::to_int(int_buffer[(int_count - 1) % 2]);
                 auto gen = QIntC::to_int(int_buffer[(int_count) % 2]);
                 if (!(id < 1 || gen < 0 || gen >= 65535)) {
-                    add(QPDF::ParseGuard::getObject(context, id, gen, parse_pdf));
+                    add(ParseGuard::getObject(context, id, gen, parse_pdf));
                 } else {
                     QTC::TC("qpdf", "QPDFParser invalid objgen");
                     addNull();
