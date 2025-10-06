@@ -13,6 +13,11 @@
 
 using namespace qpdf;
 
+namespace qpdf::is
+{
+    class OffsetBuffer;
+} // namespace qpdf::is
+
 class QPDF::ObjCache
 {
   public:
@@ -610,12 +615,12 @@ class QPDF::Doc
     }
 
     QPDFPageDocumentHelper&
-    pages()
+    page_dh()
     {
-        if (!pages_) {
-            pages_ = std::make_unique<QPDFPageDocumentHelper>(qpdf);
+        if (!page_dh_) {
+            page_dh_ = std::make_unique<QPDFPageDocumentHelper>(qpdf);
         }
-        return *pages_;
+        return *page_dh_;
     }
 
     QPDFPageLabelDocumentHelper&
@@ -637,7 +642,7 @@ class QPDF::Doc
     std::unique_ptr<QPDFAcroFormDocumentHelper> acroform_;
     std::unique_ptr<QPDFEmbeddedFileDocumentHelper> embedded_files_;
     std::unique_ptr<QPDFOutlineDocumentHelper> outlines_;
-    std::unique_ptr<QPDFPageDocumentHelper> pages_;
+    std::unique_ptr<QPDFPageDocumentHelper> page_dh_;
     std::unique_ptr<QPDFPageLabelDocumentHelper> page_labels_;
 };
 

@@ -764,7 +764,7 @@ QPDFJob::doCheck(QPDF& pdf)
 
         // Create all document helper to trigger any validations they carry out.
         auto& doc = pdf.doc();
-        auto& pages = doc.pages();
+        auto& pages = doc.page_dh();
         (void)doc.acroform();
         (void)doc.embedded_files();
         (void)doc.page_labels();

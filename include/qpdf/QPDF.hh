@@ -49,19 +49,11 @@
 namespace qpdf
 {
     class Dictionary;
-
-    namespace is
-    {
-        class OffsetBuffer;
-    }
 } // namespace qpdf
 
-class QPDF_Stream;
 class BitStream;
 class BitWriter;
-class BufferInputSource;
 class QPDFLogger;
-class QPDFParser;
 
 class QPDF
 {

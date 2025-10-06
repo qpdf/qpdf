@@ -18,7 +18,7 @@ QPDFPageDocumentHelper::QPDFPageDocumentHelper(QPDF& qpdf) :
 QPDFPageDocumentHelper&
 QPDFPageDocumentHelper::get(QPDF& qpdf)
 {
-    return qpdf.doc().pages();
+    return qpdf.doc().page_dh();
 }
 
 void
