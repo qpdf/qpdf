@@ -2,12 +2,8 @@ ignored-scope: libtests
 QPDF hint table length direct 0
 QPDF P absent in lindict 1
 QPDF opt direct pages resource 1
-QPDF opt inheritable keys 0
 QPDF opt no inheritable keys 0
-QPDF opt erase empty key ancestor 0
-QPDF opt resource inherited 0
 QPDF opt page resource hides ancestor 0
-QPDF opt key ancestors depth > 1 0
 QPDF opt loop detected 0
 QPDF categorize pagemode present 1
 QPDF categorize pagemode outlines 1
@@ -30,7 +26,6 @@ main QTest dictionary indirect 1
 main QTest stream 0
 QPDF lin write nshared_total > nshared_first_page 1
 QPDFWriter encrypted hint stream 0
-QPDF opt inherited scalar 0
 QPDF xref gen > 0 1
 QPDF startxref more than 1024 before end 0
 QPDFParser bad brace 0
@@ -127,8 +122,6 @@ exercise processFile(FILE*) 0
 exercise processMemoryFile 0
 QPDF remove page 2
 QPDF insert page 2
-QPDF updateAllPagesCache 0
-QPDF insert non-indirect page 0
 QPDF insert indirect page 0
 QPDF_Stream ERR shallow copy stream 0
 QPDFObjectHandle newStream with string 0
@@ -142,7 +135,6 @@ QPDF replace array 0
 QPDF replace dictionary 0
 QPDF replace stream 0
 QPDF replace foreign indirect with null 0
-QPDF insert foreign page 0
 QPDFWriter copy use_aes 1
 QPDFParser indirect without context 0
 QPDFObjectHandle trailing data in parse 0
@@ -162,7 +154,6 @@ qpdf-c called qpdf_set_r6_encryption_parameters 0
 QPDFObjectHandle EOF in inline image 0
 QPDFObjectHandle inline image token 0
 QPDF not caching overridden objstm object 0
-QPDF_optimization indirect outlines 0
 QPDF xref space 2
 QPDFJob pages range omitted in middle 0
 QPDFWriter standard deterministic ID 1
@@ -282,9 +273,6 @@ QPDFPageDocumentHelper ignore annotation with no appearance 0
 QPDFFormFieldObjectHelper replaced BMC at EOF 0
 QPDFFormFieldObjectHelper fallback Tf 0
 QPDFPageObjectHelper copy shared attribute 1
-QPDF resolve duplicated page object 0
-QPDF handle direct page object 0
-QPDF missing mediabox 0
 QPDF inherit mediabox 1
 QPDFTokenizer finder found wrong word 0
 QPDFTokenizer found EI by byte count 0
@@ -402,7 +390,6 @@ QPDFAcroFormDocumentHelper /DA parse error 0
 QPDFAcroFormDocumentHelper AP parse error 1
 QPDFJob copy fields not this file 0
 QPDFJob copy fields non-first from orig 0
-QPDF resolve duplicated page in insert 0
 QPDFWriter exclude from object stream 0
 QPDFJob weak crypto error 0
 qpdf-c called qpdf_oh_is_initialized 0

@@ -37,6 +37,8 @@
 // insertPage, and removePage, along with methods they call, are concerned with it.  Everything else
 // goes through one of those methods.
 
+using Pages = QPDF::Doc::Pages;
+
 std::vector<QPDFObjectHandle> const&
 QPDF::getAllPages()
 {
@@ -75,14 +77,14 @@ QPDF::getAllPages()
                 qpdf_e_pages, m->file->getName(), "", 0, "root of pages tree has no /Kids array");
         }
         try {
-            getAllPagesInternal(pages, visited, seen, false, false);
+            m->pages.getAllPagesInternal(pages, visited, seen, false, false);
         } catch (...) {
             m->all_pages.clear();
             m->invalid_page_found = false;
             throw;
         }
         if (m->invalid_page_found) {
-            flattenPagesTree();
+            m->pages.flattenPagesTree();
             m->invalid_page_found = false;
         }
     }
@@ -90,7 +92,7 @@ QPDF::getAllPages()
 }
 
 void
-QPDF::getAllPagesInternal(
+Pages::getAllPagesInternal(
     QPDFObjectHandle cur_node,
     QPDFObjGen::set& visited,
     QPDFObjGen::set& seen,
@@ -139,17 +141,15 @@ QPDF::getAllPagesInternal(
             continue;
         }
         if (!kid.isIndirect()) {
-            QTC::TC("qpdf", "QPDF handle direct page object");
             cur_node.warn(
                 "kid " + std::to_string(i) + " (from 0) is direct; converting to indirect");
-            kid = makeIndirectObject(kid);
+            kid = qpdf.makeIndirectObject(kid);
             ++errors;
         }
         if (kid.hasKey("/Kids")) {
             getAllPagesInternal(kid, visited, seen, media_box, resources);
         } else {
             if (!media_box && !kid.getKey("/MediaBox").isRectangle()) {
-                QTC::TC("qpdf", "QPDF missing mediabox");
                 kid.warn(
                     "kid " + std::to_string(i) +
                     " (from 0) MediaBox is undefined; setting to letter / ANSI A");
@@ -193,7 +193,6 @@ QPDF::getAllPagesInternal(
             if (!seen.add(kid)) {
                 // Make a copy of the page. This does the same as shallowCopyPage in
                 // QPDFPageObjectHelper.
-                QTC::TC("qpdf", "QPDF resolve duplicated page object");
                 if (!m->reconstructed_xref) {
                     cur_node.warn(
                         "kid " + std::to_string(i) +
@@ -201,7 +200,7 @@ QPDF::getAllPagesInternal(
                         " creating a new page object as a copy");
                     // This needs to be fixed. shallowCopy does not necessarily produce a valid
                     // page.
-                    kid = makeIndirectObject(QPDFObjectHandle(kid).shallowCopy());
+                    kid = qpdf.makeIndirectObject(QPDFObjectHandle(kid).shallowCopy());
                     seen.add(kid);
                 } else {
                     cur_node.warn(
@@ -239,7 +238,6 @@ QPDF::updateAllPagesCache()
     // Force regeneration of the pages cache.  We force immediate recalculation of all_pages since
     // users may have references to it that they got from calls to getAllPages().  We can defer
     // recalculation of pageobj_to_pages_pos until needed.
-    QTC::TC("qpdf", "QPDF updateAllPagesCache");
     m->all_pages.clear();
     m->pageobj_to_pages_pos.clear();
     m->pushed_inherited_attributes_to_pages = false;
@@ -247,7 +245,7 @@ QPDF::updateAllPagesCache()
 }
 
 void
-QPDF::flattenPagesTree()
+Pages::flattenPagesTree()
 {
     // If not already done, flatten the /Pages structure and initialize pageobj_to_pages_pos.
 
@@ -259,7 +257,7 @@ QPDF::flattenPagesTree()
     // generated.
     pushInheritedAttributesToPage(true, true);
 
-    QPDFObjectHandle pages = getRoot().getKey("/Pages");
+    QPDFObjectHandle pages = qpdf.getRoot().getKey("/Pages");
 
     size_t const len = m->all_pages.size();
     for (size_t pos = 0; pos < len; ++pos) {
@@ -282,7 +280,7 @@ QPDF::flattenPagesTree()
 }
 
 void
-QPDF::insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_duplicate)
+Pages::insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_duplicate)
 {
     QPDFObjGen og(obj.getObjGen());
     if (check_duplicate) {
@@ -301,24 +299,22 @@ QPDF::insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_dupli
 }
 
 void
-QPDF::insertPage(QPDFObjectHandle newpage, int pos)
+Pages::insertPage(QPDFObjectHandle newpage, int pos)
 {
     // pos is numbered from 0, so pos = 0 inserts at the beginning and pos = npages adds to the end.
 
     flattenPagesTree();
 
     if (!newpage.isIndirect()) {
-        QTC::TC("qpdf", "QPDF insert non-indirect page");
-        newpage = makeIndirectObject(newpage);
-    } else if (newpage.getOwningQPDF() != this) {
-        QTC::TC("qpdf", "QPDF insert foreign page");
+        newpage = qpdf.makeIndirectObject(newpage);
+    } else if (newpage.getOwningQPDF() != &qpdf) {
         newpage.getQPDF().pushInheritedAttributesToPage();
-        newpage = copyForeignObject(newpage);
+        newpage = qpdf.copyForeignObject(newpage);
     } else {
         QTC::TC("qpdf", "QPDF insert indirect page");
     }
 
-    if ((pos < 0) || (toS(pos) > m->all_pages.size())) {
+    if (pos < 0 || toS(pos) > m->all_pages.size()) {
         throw std::runtime_error("QPDF::insertPage called with pos out of range");
     }
 
@@ -331,11 +327,10 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
 
     auto og = newpage.getObjGen();
     if (m->pageobj_to_pages_pos.contains(og)) {
-        QTC::TC("qpdf", "QPDF resolve duplicated page in insert");
-        newpage = makeIndirectObject(QPDFObjectHandle(newpage).shallowCopy());
+        newpage = qpdf.makeIndirectObject(QPDFObjectHandle(newpage).shallowCopy());
     }
 
-    QPDFObjectHandle pages = getRoot().getKey("/Pages");
+    QPDFObjectHandle pages = qpdf.getRoot().getKey("/Pages");
     QPDFObjectHandle kids = pages.getKey("/Kids");
 
     newpage.replaceKey("/Parent", pages);
@@ -369,7 +364,7 @@ QPDF::removePage(QPDFObjectHandle page)
     m->all_pages.erase(m->all_pages.begin() + pos);
     m->pageobj_to_pages_pos.erase(page.getObjGen());
     for (int i = pos; i < npages; ++i) {
-        insertPageobjToPage(m->all_pages.at(toS(i)), i, false);
+        m->pages.insertPageobjToPage(m->all_pages.at(toS(i)), i, false);
     }
 }
 
@@ -380,16 +375,17 @@ QPDF::addPageAt(QPDFObjectHandle newpage, bool before, QPDFObjectHandle refpage)
     if (!before) {
         ++refpos;
     }
-    insertPage(newpage, refpos);
+    m->pages.insertPage(newpage, refpos);
 }
 
 void
 QPDF::addPage(QPDFObjectHandle newpage, bool first)
 {
     if (first) {
-        insertPage(newpage, 0);
+        m->pages.insertPage(newpage, 0);
     } else {
-        insertPage(newpage, getRoot().getKey("/Pages").getKey("/Count").getIntValueAsInt());
+        m->pages.insertPage(
+            newpage, getRoot().getKey("/Pages").getKey("/Count").getIntValueAsInt());
     }
 }
 
@@ -402,7 +398,7 @@ QPDF::findPage(QPDFObjectHandle& page)
 int
 QPDF::findPage(QPDFObjGen og)
 {
-    flattenPagesTree();
+    m->pages.flattenPagesTree();
     auto it = m->pageobj_to_pages_pos.find(og);
     if (it == m->pageobj_to_pages_pos.end()) {
         throw QPDFExc(

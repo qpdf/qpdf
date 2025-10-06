@@ -181,6 +181,7 @@ QPDF::QPDFVersion()
 QPDF::Members::Members(QPDF& qpdf) :
     doc(qpdf, *this),
     objects(doc.objects()),
+    pages(doc.pages()),
     log(QPDFLogger::defaultLogger()),
     file(new InvalidInputSource()),
     encp(new EncryptionParameters)

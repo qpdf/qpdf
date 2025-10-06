@@ -827,6 +827,12 @@ class QPDF
         int& O,
         bool compressed);
 
+    // Get a list of objects that would be permitted in an object stream.
+    template <typename T>
+    std::vector<T> getCompressibleObjGens();
+    std::vector<QPDFObjGen> getCompressibleObjVector();
+    std::vector<bool> getCompressibleObjSet();
+
     // methods to support page handling
 
     void getAllPagesInternal(
@@ -927,12 +933,6 @@ class QPDF
 
     // Methods to support optimization
 
-    void pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys);
-    void pushInheritedAttributesToPageInternal(
-        QPDFObjectHandle,
-        std::map<std::string, std::vector<QPDFObjectHandle>>&,
-        bool allow_changes,
-        bool warn_skipped_keys);
     void updateObjectMaps(
         ObjUser const& ou,
         QPDFObjectHandle oh,

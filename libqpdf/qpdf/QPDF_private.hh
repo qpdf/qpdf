@@ -550,7 +550,45 @@ class QPDF::Doc
       private:
         QPDF& qpdf;
         QPDF::Members* m;
-    }; // class Objects
+    }; // class QPDF::Doc::Objects
+
+    // This class is used to represent a PDF Pages tree.
+    class Pages
+    {
+      public:
+        Pages() = delete;
+        Pages(Pages const&) = delete;
+        Pages(Pages&&) = delete;
+        Pages& operator=(Pages const&) = delete;
+        Pages& operator=(Pages&&) = delete;
+        ~Pages() = default;
+
+        Pages(QPDF& qpdf, QPDF::Members* m) :
+            qpdf(qpdf),
+            m(m)
+        {
+        }
+
+        void getAllPagesInternal(
+            QPDFObjectHandle cur_pages,
+            QPDFObjGen::set& visited,
+            QPDFObjGen::set& seen,
+            bool media_box,
+            bool resources);
+        void insertPage(QPDFObjectHandle newpage, int pos);
+        void flattenPagesTree();
+        void insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_duplicate);
+        void pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys);
+        void pushInheritedAttributesToPageInternal(
+            QPDFObjectHandle,
+            std::map<std::string, std::vector<QPDFObjectHandle>>&,
+            bool allow_changes,
+            bool warn_skipped_keys);
+
+      private:
+        QPDF& qpdf;
+        QPDF::Members* m;
+    }; // class QPDF::Doc::Pages
 
     // StreamCopier class is restricted to QPDFObjectHandle so it can copy stream data.
     class StreamCopier
@@ -575,7 +613,8 @@ class QPDF::Doc
     Doc(QPDF& qpdf, QPDF::Members& m) :
         qpdf(qpdf),
         m(m),
-        objects_(qpdf, &m)
+        objects_(qpdf, &m),
+        pages_(qpdf, &m)
     {
     }
 
@@ -584,6 +623,12 @@ class QPDF::Doc
     {
         return objects_;
     };
+
+    Pages&
+    pages()
+    {
+        return pages_;
+    }
 
     bool reconstructed_xref() const;
 
@@ -637,6 +682,7 @@ class QPDF::Doc
     QPDF::Members& m;
 
     Objects objects_;
+    Pages pages_;
 
     // Document Helpers;
     std::unique_ptr<QPDFAcroFormDocumentHelper> acroform_;
@@ -659,6 +705,7 @@ class QPDF::Members
   private:
     Doc doc;
     Doc::Objects& objects;
+    Doc::Pages& pages;
     std::shared_ptr<QPDFLogger> log;
     unsigned long long unique_id{0};
     qpdf::Tokenizer tokenizer;
