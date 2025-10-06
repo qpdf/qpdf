@@ -167,8 +167,7 @@ QPDF::Members::Members(QPDF& qpdf) :
     pages(doc.pages()),
     log(QPDFLogger::defaultLogger()),
     file(std::make_shared<InvalidInputSource>()),
-    encp(std::make_shared<EncryptionParameters>()),
-    obj_copier(qpdf)
+    encp(std::make_shared<EncryptionParameters>())
 {
 }
 
@@ -474,11 +473,11 @@ QPDF::getObjectByID(int objid, int generation)
 QPDFObjectHandle
 QPDF::copyForeignObject(QPDFObjectHandle foreign)
 {
-    return m->obj_copier.copied(foreign);
+    return m->objects.foreign().copied(foreign);
 }
 
-QPDF::ObjCopier::Copier&
-QPDF::ObjCopier::copier(QPDFObjectHandle const& foreign)
+Objects ::Foreign::Copier&
+Objects::Foreign::copier(QPDFObjectHandle const& foreign)
 {
     if (!foreign.isIndirect()) {
         throw std::logic_error("QPDF::copyForeign called with direct object handle");
@@ -491,7 +490,7 @@ QPDF::ObjCopier::copier(QPDFObjectHandle const& foreign)
 }
 
 QPDFObjectHandle
-QPDF::ObjCopier::Copier::copied(QPDFObjectHandle const& foreign)
+Objects::Foreign::Copier::copied(QPDFObjectHandle const& foreign)
 {
     // Here's an explanation of what's going on here.
     //
@@ -501,7 +500,7 @@ QPDF::ObjCopier::Copier::copied(QPDFObjectHandle const& foreign)
     // references to the corresponding object in the local file.
     //
     // To do this, we maintain mappings from foreign object IDs to local object IDs for each foreign
-    // QPDF that we are copying from. The mapping is stored in an ObjCopier, which contains a
+    // QPDF that we are copying from. The mapping is stored in an Foreign::Copier, which contains a
     // mapping from the foreign ObjGen to the local QPDFObjectHandle.
     //
     // To copy, we do a deep traversal of the foreign object with loop detection to discover all
@@ -561,7 +560,7 @@ QPDF::ObjCopier::Copier::copied(QPDFObjectHandle const& foreign)
 }
 
 void
-QPDF::ObjCopier::Copier::reserve_objects(QPDFObjectHandle const& foreign, bool top)
+Objects::Foreign::Copier::reserve_objects(QPDFObjectHandle const& foreign, bool top)
 {
     auto foreign_tc = foreign.type_code();
     util::assertion(
@@ -609,7 +608,7 @@ QPDF::ObjCopier::Copier::reserve_objects(QPDFObjectHandle const& foreign, bool t
 }
 
 QPDFObjectHandle
-QPDF::ObjCopier::Copier::replace_indirect_object(QPDFObjectHandle const& foreign, bool top)
+Objects::Foreign::Copier::replace_indirect_object(QPDFObjectHandle const& foreign, bool top)
 {
     auto foreign_tc = foreign.type_code();
 

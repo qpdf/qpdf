@@ -44,55 +44,6 @@ class QPDF::ObjCache
     qpdf_offset_t end_after_space{0};
 };
 
-class QPDF::ObjCopier
-{
-    class Copier
-    {
-      public:
-        Copier(QPDF& qpdf) :
-            qpdf(qpdf)
-        {
-        }
-
-        QPDFObjectHandle copied(QPDFObjectHandle const& foreign);
-
-      private:
-        QPDFObjectHandle replace_indirect_object(QPDFObjectHandle const& foreign, bool top = false);
-        void reserve_objects(QPDFObjectHandle const& foreign, bool top = false);
-
-        QPDF& qpdf;
-        std::map<QPDFObjGen, QPDFObjectHandle> object_map;
-        std::vector<QPDFObjectHandle> to_copy;
-        QPDFObjGen::set visiting;
-    };
-
-  public:
-    ObjCopier(QPDF& qpdf) :
-        qpdf(qpdf)
-    {
-    }
-
-    ObjCopier() = delete;
-    ObjCopier(ObjCopier const&) = delete;
-    ObjCopier(ObjCopier&&) = delete;
-    ObjCopier& operator=(ObjCopier const&) = delete;
-    ObjCopier& operator=(ObjCopier&&) = delete;
-    ~ObjCopier() = default;
-
-    // Return a local handle to the foreign object. Copy the foreign object if necessary.
-    QPDFObjectHandle
-    copied(QPDFObjectHandle const& foreign)
-    {
-        return copier(foreign).copied(foreign);
-    }
-
-  private:
-    Copier& copier(QPDFObjectHandle const& foreign);
-
-    QPDF& qpdf;
-    std::map<unsigned long long, Copier> copiers;
-};
-
 class QPDF::EncryptionParameters
 {
     friend class QPDF;
@@ -619,6 +570,57 @@ class QPDF::Doc
     class Objects
     {
       public:
+        class Foreign
+        {
+            class Copier
+            {
+              public:
+                Copier(QPDF& qpdf) :
+                    qpdf(qpdf)
+                {
+                }
+
+                QPDFObjectHandle copied(QPDFObjectHandle const& foreign);
+
+              private:
+                QPDFObjectHandle
+                replace_indirect_object(QPDFObjectHandle const& foreign, bool top = false);
+                void reserve_objects(QPDFObjectHandle const& foreign, bool top = false);
+
+                QPDF& qpdf;
+                std::map<QPDFObjGen, QPDFObjectHandle> object_map;
+                std::vector<QPDFObjectHandle> to_copy;
+                QPDFObjGen::set visiting;
+            };
+
+          public:
+            Foreign(QPDF& qpdf) :
+                qpdf(qpdf)
+            {
+            }
+
+            Foreign() = delete;
+            Foreign(Foreign const&) = delete;
+            Foreign(Foreign&&) = delete;
+            Foreign& operator=(Foreign const&) = delete;
+            Foreign& operator=(Foreign&&) = delete;
+            ~Foreign() = default;
+
+            // Return a local handle to the foreign object. Copy the foreign object if necessary.
+            QPDFObjectHandle
+            copied(QPDFObjectHandle const& foreign)
+            {
+                return copier(foreign).copied(foreign);
+            }
+
+          private:
+            Copier& copier(QPDFObjectHandle const& foreign);
+
+            QPDF& qpdf;
+            std::map<unsigned long long, Copier> copiers;
+        }; // class QPDF::Doc::Objects::Foreign
+
+      public:
         Objects() = delete;
         Objects(Objects const&) = delete;
         Objects(Objects&&) = delete;
@@ -628,8 +630,15 @@ class QPDF::Doc
 
         Objects(QPDF& qpdf, QPDF::Members* m) :
             qpdf(qpdf),
-            m(m)
+            m(m),
+            foreign_(qpdf)
         {
+        }
+
+        Foreign&
+        foreign()
+        {
+            return foreign_;
         }
 
         void parse(char const* password);
@@ -704,9 +713,10 @@ class QPDF::Doc
         bool isUnresolved(QPDFObjGen og);
         void setLastObjectDescription(std::string const& description, QPDFObjGen og);
 
-      private:
         QPDF& qpdf;
         QPDF::Members* m;
+
+        Foreign foreign_;
     }; // class QPDF::Doc::Objects
 
     // This class is used to represent a PDF Pages tree.
@@ -888,7 +898,6 @@ class QPDF::Members
     bool ever_pushed_inherited_attributes_to_pages{false};
     bool ever_called_get_all_pages{false};
     std::vector<QPDFExc> warnings;
-    QPDF::ObjCopier obj_copier;
     std::shared_ptr<CopiedStreamDataProvider> copied_stream_data_provider;
     bool reconstructed_xref{false};
     bool in_read_xref_stream{false};
