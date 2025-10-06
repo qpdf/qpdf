@@ -742,7 +742,6 @@ class QPDF
     static std::string const qpdf_version;
 
     class ObjCache;
-    class ObjCopier;
     class EncryptionParameters;
     class ForeignStreamData;
     class CopiedStreamDataProvider;
@@ -775,8 +774,8 @@ class QPDF
         Pipeline* pipeline,
         bool suppress_warnings,
         bool will_retry);
-    bool pipeForeignStreamData(
-        std::shared_ptr<ForeignStreamData>, Pipeline*, bool suppress_warnings, bool will_retry);
+    bool
+    pipeForeignStreamData(ForeignStreamData&, Pipeline*, bool suppress_warnings, bool will_retry);
     static bool pipeStreamData(
         std::shared_ptr<QPDF::EncryptionParameters> encp,
         std::shared_ptr<InputSource> file,
@@ -789,27 +788,6 @@ class QPDF
         Pipeline* pipeline,
         bool suppress_warnings,
         bool will_retry);
-
-    // For QPDFWriter:
-
-    std::map<QPDFObjGen, QPDFXRefEntry> const& getXRefTableInternal();
-    // Get a list of objects that would be permitted in an object stream.
-    template <typename T>
-    std::vector<T> getCompressibleObjGens();
-    std::vector<QPDFObjGen> getCompressibleObjVector();
-    std::vector<bool> getCompressibleObjSet();
-
-    // methods to support page handling
-
-    void getAllPagesInternal(
-        QPDFObjectHandle cur_pages,
-        QPDFObjGen::set& visited,
-        QPDFObjGen::set& seen,
-        bool media_box,
-        bool resources);
-    void insertPage(QPDFObjectHandle newpage, int pos);
-    void flattenPagesTree();
-    void insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_duplicate);
 
     // methods to support encryption -- implemented in QPDF_encryption.cc
     void initializeEncryption();
@@ -827,9 +805,6 @@ class QPDF
         std::unique_ptr<Pipeline>& heap);
 
     // Methods to support object copying
-    void reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top);
-    QPDFObjectHandle
-    replaceForeignIndirectObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top);
     void copyStreamData(QPDFObjectHandle dest_stream, QPDFObjectHandle src_stream);
 
     struct HPageOffsetEntry;

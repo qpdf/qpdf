@@ -4,7 +4,6 @@
 #include <qpdf/JSON_writer.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Pipeline_private.hh>
-#include <qpdf/Pl_Base64.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Count.hh>
 #include <qpdf/Pl_Discard.hh>
@@ -44,6 +43,12 @@ class QPDF::Doc::Streams
     {
         return qpdf->pipeStreamData(
             og, offset, length, dict, is_root_metadata, pipeline, suppress_warnings, will_retry);
+    }
+
+    static void
+    copyStreamData(QPDF* qpdf, QPDFObjectHandle const& dest, QPDFObjectHandle const& src)
+    {
+        qpdf->copyStreamData(dest, src);
     }
 };
 
@@ -207,6 +212,15 @@ Stream::Stream(
     setDictDescription();
 }
 
+Stream
+Stream::copy() const
+{
+    Stream result = qpdf()->newStream();
+    result.stream()->stream_dict = getDict().copy();
+    QPDF::Doc::Streams::copyStreamData(qpdf(), result, *this);
+    return result;
+}
+
 void
 Stream::registerStreamFilter(
     std::string const& filter_name, std::function<std::shared_ptr<QPDFStreamFilter>()> factory)
@@ -350,12 +364,11 @@ Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
     if (!filtered) {
         throw QPDFExc(
             qpdf_e_unsupported,
-            obj->getQPDF()->getFilename(),
+            qpdf()->getFilename(),
             "",
-            obj->getParsedOffset(),
+            offset(),
             "getStreamData called on unfilterable stream");
     }
-    QTC::TC("qpdf", "QPDF_Stream getStreamData");
     return result;
 }
 
@@ -367,23 +380,21 @@ Stream::getRawStreamData()
     if (!pipeStreamData(&buf, nullptr, 0, qpdf_dl_none, false, false)) {
         throw QPDFExc(
             qpdf_e_unsupported,
-            obj->getQPDF()->getFilename(),
+            qpdf()->getFilename(),
             "",
-            obj->getParsedOffset(),
+            offset(),
             "error getting raw stream data");
     }
-    QTC::TC("qpdf", "QPDF_Stream getRawStreamData");
     return result;
 }
 
 bool
 Stream::isRootMetadata() const
 {
-    if (!getDict().isDictionaryOfType("/Metadata", "/XML")) {
+    if (!stream()->stream_dict.isDictionaryOfType("/Metadata", "/XML")) {
         return false;
     }
-    auto root_metadata = qpdf()->getRoot().getKey("/Metadata");
-    return root_metadata.isSameObjectAs(obj);
+    return qpdf()->getRoot()["/Metadata"].isSameObjectAs(obj);
 }
 
 bool
@@ -579,15 +590,13 @@ Stream::pipeStreamData(
             s->stream_dict.replaceKey("/Length", QPDFObjectHandle::newInteger(actual_length));
         }
     } else {
-        if (obj->getParsedOffset() == 0) {
-            QTC::TC("qpdf", "QPDF_Stream pipe no stream data");
+        if (offset() == 0) {
             throw std::logic_error("pipeStreamData called for stream with no data");
         }
-        QTC::TC("qpdf", "QPDF_Stream pipe original stream data");
         if (!QPDF::Doc::Streams::pipeStreamData(
-                obj->getQPDF(),
-                obj->getObjGen(),
-                obj->getParsedOffset(),
+                qpdf(),
+                id_gen(),
+                offset(),
                 s->length,
                 s->stream_dict,
                 isRootMetadata(),
@@ -619,6 +628,16 @@ Stream::pipeStreamData(
 
 void
 Stream::replaceStreamData(
+    std::string&& data, QPDFObjectHandle const& filter, QPDFObjectHandle const& decode_parms)
+{
+    auto s = stream();
+    s->stream_data = std::make_shared<Buffer>(std::move(data));
+    s->stream_provider = nullptr;
+    replaceFilterData(filter, decode_parms, s->stream_data->getSize());
+}
+
+void
+Stream::replaceStreamData(
     std::shared_ptr<Buffer> data,
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
@@ -626,7 +645,7 @@ Stream::replaceStreamData(
     auto s = stream();
     s->stream_data = data;
     s->stream_provider = nullptr;
-    replaceFilterData(filter, decode_parms, data->getSize());
+    replaceFilterData(filter, decode_parms, data->size());
 }
 
 void
@@ -664,7 +683,7 @@ Stream::replaceFilterData(
 void
 Stream::warn(std::string const& message)
 {
-    obj->getQPDF()->warn(qpdf_e_damaged_pdf, "", obj->getParsedOffset(), message);
+    qpdf()->warn(qpdf_e_damaged_pdf, "", offset(), message);
 }
 
 QPDFObjectHandle
@@ -772,12 +791,8 @@ void
 QPDFObjectHandle::replaceStreamData(
     std::string const& data, QPDFObjectHandle const& filter, QPDFObjectHandle const& decode_parms)
 {
-    auto b = std::make_shared<Buffer>(data.length());
-    unsigned char* bp = b->getBuffer();
-    if (bp) {
-        memcpy(bp, data.c_str(), data.length());
-    }
-    as_stream(error).replaceStreamData(b, filter, decode_parms);
+    std::string s(data);
+    as_stream(error).replaceStreamData(std::move(s), filter, decode_parms);
 }
 
 void
@@ -855,4 +870,10 @@ QPDFObjectHandle::getStreamJSON(
     std::string const& data_filename)
 {
     return as_stream(error).getStreamJSON(json_version, json_data, decode_level, p, data_filename);
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::copyStream()
+{
+    return as_stream(error).copy();
 }

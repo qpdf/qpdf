@@ -424,8 +424,7 @@ QPDF::JSONReactor::replaceObject(QPDFObjectHandle&& replacement, JSON const& val
     auto og = tos.object.getObjGen();
     if (replacement.isIndirect() && !(replacement.isStream() && replacement.getObjGen() == og)) {
         error(
-            replacement.getParsedOffset(),
-            "the value of an object may not be an indirect object reference");
+            replacement.offset(), "the value of an object may not be an indirect object reference");
         return;
     }
     pdf.replaceObject(og, replacement);
@@ -885,7 +884,7 @@ QPDF::writeJSON(
             } else {
                 jw << "\n      },\n      \"" << key;
             }
-            if (auto stream = obj.as_stream()) {
+            if (Stream stream = obj) {
                 jw << "\": {\n        \"stream\": ";
                 if (json_stream_data == qpdf_sj_file) {
                     writeJSONStreamFile(

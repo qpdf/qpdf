@@ -98,16 +98,12 @@ qpdf-c called qpdf_set_r4_encryption_parameters_insecure 0
 qpdf-c called qpdf_set_static_aes_IV 0
 qpdf-c called qpdf_has_error 0
 qpdf-c called qpdf_get_qpdf_version 0
-QPDF_Stream pipe original stream data 0
 QPDF_Stream pipe replaced stream data 0
 QPDF_Stream provider length mismatch 0
 QPDFObjectHandle newStream 0
 QPDFObjectHandle newStream with data 0
-QPDF_Stream pipe no stream data 0
 QPDFObjectHandle prepend page contents 0
 QPDFObjectHandle append page contents 0
-QPDF_Stream getRawStreamData 0
-QPDF_Stream getStreamData 0
 qpdf-c called qpdf_read_memory 0
 QPDF stream with CRNL 0
 QPDFWriter copy encrypt metadata 1
@@ -128,13 +124,6 @@ QPDFObjectHandle newStream with string 0
 QPDF_Stream provider length not provided 0
 QPDF_Stream unknown stream length 0
 QPDF replaceReserved 0
-QPDF copyForeign direct 0
-QPDF copyForeign not foreign 0
-QPDF replace indirect 0
-QPDF replace array 0
-QPDF replace dictionary 0
-QPDF replace stream 0
-QPDF replace foreign indirect with null 0
 QPDFWriter copy use_aes 1
 QPDFParser indirect without context 0
 QPDFObjectHandle trailing data in parse 0
@@ -256,9 +245,6 @@ QPDFJob image optimize no pipeline 0
 QPDFJob image optimize no shrink 0
 QPDFJob image optimize too small 0
 QPDF pipe foreign encrypted stream 0
-QPDF copy foreign stream with provider 0
-QPDF copy foreign stream with buffer 0
-QPDF immediate copy stream data 0
 QPDFJob copy same page more than once 1
 QPDFPageObjectHelper bad token finding names 0
 QPDFJob password mode bytes 0

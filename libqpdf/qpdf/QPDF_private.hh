@@ -13,10 +13,14 @@
 
 using namespace qpdf;
 
-namespace qpdf::is
+namespace qpdf
 {
-    class OffsetBuffer;
-} // namespace qpdf::is
+    class Stream;
+    namespace is
+    {
+        class OffsetBuffer;
+    } // namespace is
+} // namespace qpdf
 
 class BitStream;
 class BitWriter;
@@ -38,14 +42,6 @@ class QPDF::ObjCache
     std::shared_ptr<QPDFObject> object;
     qpdf_offset_t end_before_space{0};
     qpdf_offset_t end_after_space{0};
-};
-
-class QPDF::ObjCopier
-{
-  public:
-    std::map<QPDFObjGen, QPDFObjectHandle> object_map;
-    std::vector<QPDFObjectHandle> to_copy;
-    QPDFObjGen::set visiting;
 };
 
 class QPDF::EncryptionParameters
@@ -98,14 +94,7 @@ class QPDF::ForeignStreamData
     friend class QPDF;
 
   public:
-    ForeignStreamData(
-        std::shared_ptr<EncryptionParameters> encp,
-        std::shared_ptr<InputSource> file,
-        QPDFObjGen foreign_og,
-        qpdf_offset_t offset,
-        size_t length,
-        QPDFObjectHandle local_dict,
-        bool is_root_metadata);
+    ForeignStreamData(Stream& foreign, qpdf_offset_t offset, QPDFObjectHandle local_dict);
 
   private:
     std::shared_ptr<EncryptionParameters> encp;
@@ -117,20 +106,29 @@ class QPDF::ForeignStreamData
     bool is_root_metadata{false};
 };
 
-class QPDF::CopiedStreamDataProvider: public QPDFObjectHandle::StreamDataProvider
+class QPDF::CopiedStreamDataProvider final: public QPDFObjectHandle::StreamDataProvider
 {
   public:
     CopiedStreamDataProvider(QPDF& destination_qpdf);
-    ~CopiedStreamDataProvider() override = default;
+    ~CopiedStreamDataProvider() final = default;
     bool provideStreamData(
-        QPDFObjGen const& og, Pipeline* pipeline, bool suppress_warnings, bool will_retry) override;
-    void registerForeignStream(QPDFObjGen const& local_og, QPDFObjectHandle foreign_stream);
-    void registerForeignStream(QPDFObjGen const& local_og, std::shared_ptr<ForeignStreamData>);
+        QPDFObjGen const& og, Pipeline* pipeline, bool suppress_warnings, bool will_retry) final;
+    void
+    registerForeignStream(QPDFObjGen const& local_og, QPDFObjectHandle foreign_stream)
+    {
+        foreign_streams.insert_or_assign(local_og, foreign_stream);
+    }
+
+    void
+    registerForeignStream(QPDFObjGen local_og, ForeignStreamData foreign_stream)
+    {
+        foreign_stream_data.insert_or_assign(local_og, foreign_stream);
+    }
 
   private:
     QPDF& destination_qpdf;
     std::map<QPDFObjGen, QPDFObjectHandle> foreign_streams;
-    std::map<QPDFObjGen, std::shared_ptr<ForeignStreamData>> foreign_stream_data;
+    std::map<QPDFObjGen, ForeignStreamData> foreign_stream_data;
 };
 
 class QPDF::StringDecrypter final: public QPDFObjectHandle::StringDecrypter
@@ -572,6 +570,57 @@ class QPDF::Doc
     class Objects
     {
       public:
+        class Foreign
+        {
+            class Copier
+            {
+              public:
+                Copier(QPDF& qpdf) :
+                    qpdf(qpdf)
+                {
+                }
+
+                QPDFObjectHandle copied(QPDFObjectHandle const& foreign);
+
+              private:
+                QPDFObjectHandle
+                replace_indirect_object(QPDFObjectHandle const& foreign, bool top = false);
+                void reserve_objects(QPDFObjectHandle const& foreign, bool top = false);
+
+                QPDF& qpdf;
+                std::map<QPDFObjGen, QPDFObjectHandle> object_map;
+                std::vector<QPDFObjectHandle> to_copy;
+                QPDFObjGen::set visiting;
+            };
+
+          public:
+            Foreign(QPDF& qpdf) :
+                qpdf(qpdf)
+            {
+            }
+
+            Foreign() = delete;
+            Foreign(Foreign const&) = delete;
+            Foreign(Foreign&&) = delete;
+            Foreign& operator=(Foreign const&) = delete;
+            Foreign& operator=(Foreign&&) = delete;
+            ~Foreign() = default;
+
+            // Return a local handle to the foreign object. Copy the foreign object if necessary.
+            QPDFObjectHandle
+            copied(QPDFObjectHandle const& foreign)
+            {
+                return copier(foreign).copied(foreign);
+            }
+
+          private:
+            Copier& copier(QPDFObjectHandle const& foreign);
+
+            QPDF& qpdf;
+            std::map<unsigned long long, Copier> copiers;
+        }; // class QPDF::Doc::Objects::Foreign
+
+      public:
         Objects() = delete;
         Objects(Objects const&) = delete;
         Objects(Objects&&) = delete;
@@ -581,8 +630,15 @@ class QPDF::Doc
 
         Objects(QPDF& qpdf, QPDF::Members* m) :
             qpdf(qpdf),
-            m(m)
+            m(m),
+            foreign_(qpdf)
         {
+        }
+
+        Foreign&
+        foreign()
+        {
+            return foreign_;
         }
 
         void parse(char const* password);
@@ -607,6 +663,7 @@ class QPDF::Doc
 
         // For QPDFWriter:
 
+        std::map<QPDFObjGen, QPDFXRefEntry> const& getXRefTableInternal();
         // Get a list of objects that would be permitted in an object stream.
         template <typename T>
         std::vector<T> getCompressibleObjGens();
@@ -656,9 +713,10 @@ class QPDF::Doc
         bool isUnresolved(QPDFObjGen og);
         void setLastObjectDescription(std::string const& description, QPDFObjGen og);
 
-      private:
         QPDF& qpdf;
         QPDF::Members* m;
+
+        Foreign foreign_;
     }; // class QPDF::Doc::Objects
 
     // This class is used to represent a PDF Pages tree.
@@ -698,19 +756,6 @@ class QPDF::Doc
         QPDF& qpdf;
         QPDF::Members* m;
     }; // class QPDF::Doc::Pages
-
-    // StreamCopier class is restricted to QPDFObjectHandle so it can copy stream data.
-    class StreamCopier
-    {
-        friend class QPDFObjectHandle;
-
-      private:
-        static void
-        copyStreamData(QPDF* qpdf, QPDFObjectHandle const& dest, QPDFObjectHandle const& src)
-        {
-            qpdf->copyStreamData(dest, src);
-        }
-    };
 
     Doc() = delete;
     Doc(Doc const&) = delete;
@@ -853,10 +898,7 @@ class QPDF::Members
     bool ever_pushed_inherited_attributes_to_pages{false};
     bool ever_called_get_all_pages{false};
     std::vector<QPDFExc> warnings;
-    std::map<unsigned long long, ObjCopier> object_copiers;
-    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> copied_streams;
-    // copied_stream_data_provider is owned by copied_streams
-    CopiedStreamDataProvider* copied_stream_data_provider{nullptr};
+    std::shared_ptr<CopiedStreamDataProvider> copied_stream_data_provider;
     bool reconstructed_xref{false};
     bool in_read_xref_stream{false};
     bool fixed_dangling_refs{false};

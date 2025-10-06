@@ -438,11 +438,6 @@ class QPDFObject
             parsed_offset = offset;
         }
     }
-    qpdf_offset_t
-    getParsedOffset()
-    {
-        return parsed_offset;
-    }
     QPDF*
     getQPDF()
     {

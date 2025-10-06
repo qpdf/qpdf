@@ -445,6 +445,23 @@ namespace qpdf
         {
         }
 
+        Stream() = default;
+        Stream(Stream const&) = default;
+        Stream(Stream&&) = default;
+        Stream& operator=(Stream const&) = default;
+        Stream& operator=(Stream&&) = default;
+        ~Stream() = default;
+
+        Stream(QPDFObjectHandle const& oh) :
+            BaseHandle(oh.type_code() == ::ot_stream ? oh : QPDFObjectHandle())
+        {
+        }
+
+        Stream(QPDFObjectHandle&& oh) :
+            BaseHandle(oh.type_code() == ::ot_stream ? std::move(oh) : QPDFObjectHandle())
+        {
+        }
+
         Stream(
             QPDF& qpdf,
             QPDFObjGen og,
@@ -452,10 +469,12 @@ namespace qpdf
             qpdf_offset_t offset,
             size_t length);
 
-        QPDFObjectHandle
+        Stream copy() const;
+
+        Dictionary
         getDict() const
         {
-            return stream()->stream_dict;
+            return {stream()->stream_dict};
         }
         bool
         isDataModified() const
@@ -500,6 +519,10 @@ namespace qpdf
             bool will_retry);
         std::string getStreamData(qpdf_stream_decode_level_e level);
         std::string getRawStreamData();
+        void replaceStreamData(
+            std::string&& data,
+            QPDFObjectHandle const& filter,
+            QPDFObjectHandle const& decode_parms);
         void replaceStreamData(
             std::shared_ptr<Buffer> data,
             QPDFObjectHandle const& filter,
@@ -655,6 +678,12 @@ namespace qpdf
     BaseHandle::null() const
     {
         return !obj || type_code() == ::ot_null;
+    }
+
+    inline qpdf_offset_t
+    BaseHandle::offset() const
+    {
+        return obj ? obj->parsed_offset : -1;
     }
 
     inline QPDF*

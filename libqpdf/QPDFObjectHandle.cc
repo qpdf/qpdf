@@ -1690,7 +1690,7 @@ QPDFObjectHandle::parse(
 qpdf_offset_t
 QPDFObjectHandle::getParsedOffset() const
 {
-    return obj ? obj->getParsedOffset() : -1;
+    return offset();
 }
 
 QPDFObjectHandle
@@ -1933,24 +1933,6 @@ QPDFObjectHandle::makeDirect(QPDFObjGen::set& visited, bool stop_at_streams)
     }
 
     visited.erase(cur_og);
-}
-
-QPDFObjectHandle
-QPDFObjectHandle::copyStream()
-{
-    assertStream();
-    QPDFObjectHandle result = newStream(getOwningQPDF());
-    QPDFObjectHandle dict = result.getDict();
-    QPDFObjectHandle old_dict = getDict();
-    for (auto& iter: QPDFDictItems(old_dict)) {
-        if (iter.second.isIndirect()) {
-            dict.replaceKey(iter.first, iter.second);
-        } else {
-            dict.replaceKey(iter.first, iter.second.shallowCopy());
-        }
-    }
-    QPDF::Doc::StreamCopier::copyStreamData(getOwningQPDF(), result, *this);
-    return result;
 }
 
 void
