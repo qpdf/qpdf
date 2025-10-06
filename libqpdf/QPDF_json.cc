@@ -277,6 +277,7 @@ class QPDF::JSONReactor: public JSON::Reactor
     void replaceObject(QPDFObjectHandle&& replacement, JSON const& value);
 
     QPDF& pdf;
+    QPDF::Doc::Objects& objects = pdf.m->objects;
     std::shared_ptr<InputSource> is;
     bool must_be_complete{true};
     std::shared_ptr<QPDFObject::Description> descr;
@@ -541,7 +542,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
         } else if (is_obj_key(key, obj, gen)) {
             this->cur_object = key;
             if (setNextStateIfDictionary(key, value, st_object_top)) {
-                next_obj = pdf.getObjectForJSON(obj, gen);
+                next_obj = objects.getObjectForJSON(obj, gen);
             }
         } else {
             QTC::TC("qpdf", "QPDF_json bad object key");
@@ -743,7 +744,7 @@ QPDF::JSONReactor::makeObject(JSON const& value)
         int gen = 0;
         std::string str;
         if (is_indirect_object(str_v, obj, gen)) {
-            result = pdf.getObjectForJSON(obj, gen);
+            result = objects.getObjectForJSON(obj, gen);
         } else if (is_unicode_string(str_v, str)) {
             result = QPDFObjectHandle::newUnicodeString(str);
         } else if (is_binary_string(str_v, str)) {

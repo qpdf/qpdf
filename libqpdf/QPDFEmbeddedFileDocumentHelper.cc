@@ -53,7 +53,7 @@ QPDFEmbeddedFileDocumentHelper::QPDFEmbeddedFileDocumentHelper(QPDF& qpdf) :
 QPDFEmbeddedFileDocumentHelper&
 QPDFEmbeddedFileDocumentHelper::get(QPDF& qpdf)
 {
-    return qpdf.embedded_files();
+    return qpdf.doc().embedded_files();
 }
 
 void

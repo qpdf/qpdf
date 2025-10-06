@@ -577,7 +577,7 @@ namespace qpdf
             return &std::get<T>(obj->value);
         }
         if (std::holds_alternative<QPDF_Unresolved>(obj->value)) {
-            return BaseHandle(QPDF::Resolver::resolved(obj->qpdf, obj->og)).as<T>();
+            return BaseHandle(QPDF::Doc::Resolver::resolved(obj->qpdf, obj->og)).as<T>();
         }
         if (std::holds_alternative<QPDF_Reference>(obj->value)) {
             // see comment in QPDF_Reference.
@@ -676,7 +676,7 @@ namespace qpdf
             return ::ot_uninitialized;
         }
         if (raw_type_code() == ::ot_unresolved) {
-            return QPDF::Resolver::resolved(obj->qpdf, obj->og)->getTypeCode();
+            return QPDF::Doc::Resolver::resolved(obj->qpdf, obj->og)->getTypeCode();
         }
         return raw_type_code();
     }
@@ -688,7 +688,7 @@ namespace qpdf
             return ::ot_uninitialized;
         }
         if (raw_type_code() == ::ot_unresolved) {
-            return QPDF::Resolver::resolved(obj->qpdf, obj->og)->getTypeCode();
+            return QPDF::Doc::Resolver::resolved(obj->qpdf, obj->og)->getTypeCode();
         }
         if (raw_type_code() == ::ot_reference) {
             return std::get<QPDF_Reference>(obj->value).obj->getTypeCode();
@@ -728,7 +728,7 @@ inline qpdf_object_type_e
 QPDFObject::getResolvedTypeCode() const
 {
     if (getTypeCode() == ::ot_unresolved) {
-        return QPDF::Resolver::resolved(qpdf, og)->getTypeCode();
+        return QPDF::Doc::Resolver::resolved(qpdf, og)->getTypeCode();
     }
     if (getTypeCode() == ::ot_reference) {
         return std::get<QPDF_Reference>(value).obj->getTypeCode();

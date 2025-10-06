@@ -13,86 +13,13 @@
 
 using namespace qpdf;
 
-// The Resolver class is restricted to QPDFObject so that only it can resolve indirect
-// references.
-class QPDF::Resolver
+namespace qpdf::is
 {
-    friend class QPDFObject;
-    friend class qpdf::BaseHandle;
+    class OffsetBuffer;
+} // namespace qpdf::is
 
-  private:
-    static std::shared_ptr<QPDFObject> const&
-    resolved(QPDF* qpdf, QPDFObjGen og)
-    {
-        return qpdf->resolve(og);
-    }
-};
-
-// StreamCopier class is restricted to QPDFObjectHandle so it can copy stream data.
-class QPDF::StreamCopier
-{
-    friend class QPDFObjectHandle;
-
-  private:
-    static void
-    copyStreamData(QPDF* qpdf, QPDFObjectHandle const& dest, QPDFObjectHandle const& src)
-    {
-        qpdf->copyStreamData(dest, src);
-    }
-};
-
-// The ParseGuard class allows QPDFParser to detect re-entrant parsing. It also provides
-// special access to allow the parser to create unresolved objects and dangling references.
-class QPDF::ParseGuard
-{
-    friend class QPDFParser;
-
-  private:
-    ParseGuard(QPDF* qpdf) :
-        qpdf(qpdf)
-    {
-        if (qpdf) {
-            qpdf->inParse(true);
-        }
-    }
-
-    static std::shared_ptr<QPDFObject>
-    getObject(QPDF* qpdf, int id, int gen, bool parse_pdf)
-    {
-        return qpdf->getObjectForParser(id, gen, parse_pdf);
-    }
-
-    ~ParseGuard()
-    {
-        if (qpdf) {
-            qpdf->inParse(false);
-        }
-    }
-    QPDF* qpdf;
-};
-
-// Pipe class is restricted to QPDF_Stream.
-class QPDF::Pipe
-{
-    friend class qpdf::Stream;
-
-  private:
-    static bool
-    pipeStreamData(
-        QPDF* qpdf,
-        QPDFObjGen og,
-        qpdf_offset_t offset,
-        size_t length,
-        QPDFObjectHandle dict,
-        bool is_root_metadata,
-        Pipeline* pipeline,
-        bool suppress_warnings,
-        bool will_retry)
-    {
-        return qpdf->pipeStreamData(
-            og, offset, length, dict, is_root_metadata, pipeline, suppress_warnings, will_retry);
-    }
-};
+class BitStream;
+class BitWriter;
 
 class QPDF::ObjCache
 {
@@ -405,17 +332,498 @@ class QPDF::PatternFinder final: public InputSource::Finder
     bool (QPDF::*checker)();
 };
 
+// This class is used to represent a PDF document.
+//
+// The main function of the QPDF class is to represent a PDF document. Doc is the implementation
+// class for this aspect of QPDF.
+class QPDF::Doc
+{
+  public:
+    class JobSetter;
+    class ParseGuard;
+    class Resolver;
+    class StreamCopier;
+    class Streams;
+    class Writer;
+
+    class Encryption
+    {
+      public:
+        // This class holds data read from the encryption dictionary.
+        Encryption(
+            int V,
+            int R,
+            int Length_bytes,
+            int P,
+            std::string const& O,
+            std::string const& U,
+            std::string const& OE,
+            std::string const& UE,
+            std::string const& Perms,
+            std::string const& id1,
+            bool encrypt_metadata) :
+            V(V),
+            R(R),
+            Length_bytes(Length_bytes),
+            P(static_cast<unsigned long long>(P)),
+            O(O),
+            U(U),
+            OE(OE),
+            UE(UE),
+            Perms(Perms),
+            id1(id1),
+            encrypt_metadata(encrypt_metadata)
+        {
+        }
+        Encryption(int V, int R, int Length_bytes, bool encrypt_metadata) :
+            V(V),
+            R(R),
+            Length_bytes(Length_bytes),
+            encrypt_metadata(encrypt_metadata)
+        {
+        }
+
+        int getV() const;
+        int getR() const;
+        int getLengthBytes() const;
+        int getP() const;
+        //  Bits in P are numbered from 1 as in the PDF spec.
+        bool getP(size_t bit) const;
+        std::string const& getO() const;
+        std::string const& getU() const;
+        std::string const& getOE() const;
+        std::string const& getUE() const;
+        std::string const& getPerms() const;
+        std::string const& getId1() const;
+        bool getEncryptMetadata() const;
+        //  Bits in P are numbered from 1 as in the PDF spec.
+        void setP(size_t bit, bool val);
+        void setP(unsigned long val);
+        void setO(std::string const&);
+        void setU(std::string const&);
+        void setId1(std::string const& val);
+        void setV5EncryptionParameters(
+            std::string const& O,
+            std::string const& OE,
+            std::string const& U,
+            std::string const& UE,
+            std::string const& Perms);
+
+        std::string compute_encryption_key(std::string const& password) const;
+
+        bool
+        check_owner_password(std::string& user_password, std::string const& owner_password) const;
+
+        bool check_user_password(std::string const& user_password) const;
+
+        std::string
+        recover_encryption_key_with_password(std::string const& password, bool& perms_valid) const;
+
+        void compute_encryption_O_U(char const* user_password, char const* owner_password);
+
+        std::string
+        compute_encryption_parameters_V5(char const* user_password, char const* owner_password);
+
+        std::string compute_parameters(char const* user_password, char const* owner_password);
+
+      private:
+        static constexpr unsigned int OU_key_bytes_V4 = 16; // ( == sizeof(MD5::Digest)
+
+        Encryption(Encryption const&) = delete;
+        Encryption& operator=(Encryption const&) = delete;
+
+        std::string hash_V5(
+            std::string const& password, std::string const& salt, std::string const& udata) const;
+        std::string
+        compute_O_value(std::string const& user_password, std::string const& owner_password) const;
+        std::string compute_U_value(std::string const& user_password) const;
+        std::string compute_encryption_key_from_password(std::string const& password) const;
+        std::string recover_encryption_key_with_password(std::string const& password) const;
+        bool check_owner_password_V4(
+            std::string& user_password, std::string const& owner_password) const;
+        bool check_owner_password_V5(std::string const& owner_passworda) const;
+        std::string compute_Perms_value_V5_clear() const;
+        std::string compute_O_rc4_key(
+            std::string const& user_password, std::string const& owner_password) const;
+        std::string compute_U_value_R2(std::string const& user_password) const;
+        std::string compute_U_value_R3(std::string const& user_password) const;
+        bool check_user_password_V4(std::string const& user_password) const;
+        bool check_user_password_V5(std::string const& user_password) const;
+
+        int V;
+        int R;
+        int Length_bytes;
+        std::bitset<32> P{0xfffffffc}; // Specification always requires bits 1 and 2 to be cleared.
+        std::string O;
+        std::string U;
+        std::string OE;
+        std::string UE;
+        std::string Perms;
+        std::string id1;
+        bool encrypt_metadata;
+    }; // class QPDF::Doc::Encryption
+
+    class Linearization
+    {
+      public:
+        Linearization() = delete;
+        Linearization(Linearization const&) = delete;
+        Linearization(Linearization&&) = delete;
+        Linearization& operator=(Linearization const&) = delete;
+        Linearization& operator=(Linearization&&) = delete;
+        ~Linearization() = default;
+
+        Linearization(QPDF& qpdf, QPDF::Members* m) :
+            qpdf(qpdf),
+            m(m)
+        {
+        }
+
+        // For QPDFWriter:
+
+        template <typename T>
+        void optimize_internal(
+            T const& object_stream_data,
+            bool allow_changes = true,
+            std::function<int(QPDFObjectHandle&)> skip_stream_parameters = nullptr);
+        void optimize(
+            QPDFWriter::ObjTable const& obj,
+            std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
+
+        // Get lists of all objects in order according to the part of a linearized file that they
+        // belong to.
+        void getLinearizedParts(
+            QPDFWriter::ObjTable const& obj,
+            std::vector<QPDFObjectHandle>& part4,
+            std::vector<QPDFObjectHandle>& part6,
+            std::vector<QPDFObjectHandle>& part7,
+            std::vector<QPDFObjectHandle>& part8,
+            std::vector<QPDFObjectHandle>& part9);
+
+        void generateHintStream(
+            QPDFWriter::NewObjTable const& new_obj,
+            QPDFWriter::ObjTable const& obj,
+            std::string& hint_stream,
+            int& S,
+            int& O,
+            bool compressed);
+
+        // methods to support linearization checking -- implemented in QPDF_linearization.cc
+
+        void readLinearizationData();
+        void checkLinearizationInternal();
+        void dumpLinearizationDataInternal();
+        void linearizationWarning(std::string_view);
+        qpdf::Dictionary readHintStream(Pipeline&, qpdf_offset_t offset, size_t length);
+        void readHPageOffset(BitStream);
+        void readHSharedObject(BitStream);
+        void readHGeneric(BitStream, HGeneric&);
+        qpdf_offset_t maxEnd(ObjUser const& ou);
+        qpdf_offset_t getLinearizationOffset(QPDFObjGen);
+        QPDFObjectHandle
+        getUncompressedObject(QPDFObjectHandle&, std::map<int, int> const& object_stream_data);
+        QPDFObjectHandle getUncompressedObject(QPDFObjectHandle&, QPDFWriter::ObjTable const& obj);
+        int lengthNextN(int first_object, int n);
+        void checkHPageOffset(
+            std::vector<QPDFObjectHandle> const& pages, std::map<int, int>& idx_to_obj);
+        void checkHSharedObject(
+            std::vector<QPDFObjectHandle> const& pages, std::map<int, int>& idx_to_obj);
+        void checkHOutlines();
+        void dumpHPageOffset();
+        void dumpHSharedObject();
+        void dumpHGeneric(HGeneric&);
+        qpdf_offset_t adjusted_offset(qpdf_offset_t offset);
+        template <typename T>
+        void calculateLinearizationData(T const& object_stream_data);
+        template <typename T>
+        void pushOutlinesToPart(
+            std::vector<QPDFObjectHandle>& part,
+            std::set<QPDFObjGen>& lc_outlines,
+            T const& object_stream_data);
+        int outputLengthNextN(
+            int in_object,
+            int n,
+            QPDFWriter::NewObjTable const& new_obj,
+            QPDFWriter::ObjTable const& obj);
+        void calculateHPageOffset(
+            QPDFWriter::NewObjTable const& new_obj, QPDFWriter::ObjTable const& obj);
+        void calculateHSharedObject(
+            QPDFWriter::NewObjTable const& new_obj, QPDFWriter::ObjTable const& obj);
+        void
+        calculateHOutline(QPDFWriter::NewObjTable const& new_obj, QPDFWriter::ObjTable const& obj);
+        void writeHPageOffset(BitWriter&);
+        void writeHSharedObject(BitWriter&);
+        void writeHGeneric(BitWriter&, HGeneric&);
+
+        // Methods to support optimization
+
+        void updateObjectMaps(
+            ObjUser const& ou,
+            QPDFObjectHandle oh,
+            std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
+        void filterCompressedObjects(std::map<int, int> const& object_stream_data);
+        void filterCompressedObjects(QPDFWriter::ObjTable const& object_stream_data);
+
+      private:
+        QPDF& qpdf;
+        QPDF::Members* m;
+    };
+
+    class Objects
+    {
+      public:
+        Objects() = delete;
+        Objects(Objects const&) = delete;
+        Objects(Objects&&) = delete;
+        Objects& operator=(Objects const&) = delete;
+        Objects& operator=(Objects&&) = delete;
+        ~Objects() = default;
+
+        Objects(QPDF& qpdf, QPDF::Members* m) :
+            qpdf(qpdf),
+            m(m)
+        {
+        }
+
+        void parse(char const* password);
+        std::shared_ptr<QPDFObject> const& resolve(QPDFObjGen og);
+        void inParse(bool);
+        QPDFObjGen nextObjGen();
+        QPDFObjectHandle newIndirect(QPDFObjGen, std::shared_ptr<QPDFObject> const&);
+        void updateCache(
+            QPDFObjGen og,
+            std::shared_ptr<QPDFObject> const& object,
+            qpdf_offset_t end_before_space,
+            qpdf_offset_t end_after_space,
+            bool destroy = true);
+        bool resolveXRefTable();
+        QPDFObjectHandle readObjectAtOffset(
+            qpdf_offset_t offset, std::string const& description, bool skip_cache_if_in_xref);
+        QPDFTokenizer::Token readToken(InputSource& input, size_t max_len = 0);
+        QPDFObjectHandle makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj);
+        std::shared_ptr<QPDFObject> getObjectForParser(int id, int gen, bool parse_pdf);
+        std::shared_ptr<QPDFObject> getObjectForJSON(int id, int gen);
+        size_t tableSize();
+
+        // For QPDFWriter:
+
+        // Get a list of objects that would be permitted in an object stream.
+        template <typename T>
+        std::vector<T> getCompressibleObjGens();
+        std::vector<QPDFObjGen> getCompressibleObjVector();
+        std::vector<bool> getCompressibleObjSet();
+
+      private:
+        void setTrailer(QPDFObjectHandle obj);
+        void reconstruct_xref(QPDFExc& e, bool found_startxref = true);
+        void read_xref(qpdf_offset_t offset, bool in_stream_recovery = false);
+        bool parse_xrefFirst(std::string const& line, int& obj, int& num, int& bytes);
+        bool read_xrefEntry(qpdf_offset_t& f1, int& f2, char& type);
+        bool read_bad_xrefEntry(qpdf_offset_t& f1, int& f2, char& type);
+        qpdf_offset_t read_xrefTable(qpdf_offset_t offset);
+        qpdf_offset_t read_xrefStream(qpdf_offset_t offset, bool in_stream_recovery = false);
+        qpdf_offset_t processXRefStream(
+            qpdf_offset_t offset, QPDFObjectHandle& xref_stream, bool in_stream_recovery = false);
+        std::pair<int, std::array<int, 3>>
+        processXRefW(QPDFObjectHandle& dict, std::function<QPDFExc(std::string_view)> damaged);
+        int processXRefSize(
+            QPDFObjectHandle& dict,
+            int entry_size,
+            std::function<QPDFExc(std::string_view)> damaged);
+        std::pair<int, std::vector<std::pair<int, int>>> processXRefIndex(
+            QPDFObjectHandle& dict,
+            int max_num_entries,
+            std::function<QPDFExc(std::string_view)> damaged);
+        void insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2);
+        void insertFreeXrefEntry(QPDFObjGen);
+        QPDFObjectHandle readTrailer();
+        QPDFObjectHandle readObject(std::string const& description, QPDFObjGen og);
+        void readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset);
+        void validateStreamLineEnd(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offset);
+        QPDFObjectHandle
+        readObjectInStream(qpdf::is::OffsetBuffer& input, int stream_id, int obj_id);
+        size_t recoverStreamLength(
+            std::shared_ptr<InputSource> input, QPDFObjGen og, qpdf_offset_t stream_offset);
+
+        QPDFObjGen read_object_start(qpdf_offset_t offset);
+        void readObjectAtOffset(
+            bool attempt_recovery,
+            qpdf_offset_t offset,
+            std::string const& description,
+            QPDFObjGen exp_og);
+        void resolveObjectsInStream(int obj_stream_number);
+        bool isCached(QPDFObjGen og);
+        bool isUnresolved(QPDFObjGen og);
+        void setLastObjectDescription(std::string const& description, QPDFObjGen og);
+
+      private:
+        QPDF& qpdf;
+        QPDF::Members* m;
+    }; // class QPDF::Doc::Objects
+
+    // This class is used to represent a PDF Pages tree.
+    class Pages
+    {
+      public:
+        Pages() = delete;
+        Pages(Pages const&) = delete;
+        Pages(Pages&&) = delete;
+        Pages& operator=(Pages const&) = delete;
+        Pages& operator=(Pages&&) = delete;
+        ~Pages() = default;
+
+        Pages(QPDF& qpdf, QPDF::Members* m) :
+            qpdf(qpdf),
+            m(m)
+        {
+        }
+
+        void getAllPagesInternal(
+            QPDFObjectHandle cur_pages,
+            QPDFObjGen::set& visited,
+            QPDFObjGen::set& seen,
+            bool media_box,
+            bool resources);
+        void insertPage(QPDFObjectHandle newpage, int pos);
+        void flattenPagesTree();
+        void insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_duplicate);
+        void pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys);
+        void pushInheritedAttributesToPageInternal(
+            QPDFObjectHandle,
+            std::map<std::string, std::vector<QPDFObjectHandle>>&,
+            bool allow_changes,
+            bool warn_skipped_keys);
+
+      private:
+        QPDF& qpdf;
+        QPDF::Members* m;
+    }; // class QPDF::Doc::Pages
+
+    // StreamCopier class is restricted to QPDFObjectHandle so it can copy stream data.
+    class StreamCopier
+    {
+        friend class QPDFObjectHandle;
+
+      private:
+        static void
+        copyStreamData(QPDF* qpdf, QPDFObjectHandle const& dest, QPDFObjectHandle const& src)
+        {
+            qpdf->copyStreamData(dest, src);
+        }
+    };
+
+    Doc() = delete;
+    Doc(Doc const&) = delete;
+    Doc(Doc&&) = delete;
+    Doc& operator=(Doc const&) = delete;
+    Doc& operator=(Doc&&) = delete;
+    ~Doc() = default;
+
+    Doc(QPDF& qpdf, QPDF::Members& m) :
+        qpdf(qpdf),
+        m(m),
+        lin_(qpdf, &m),
+        objects_(qpdf, &m),
+        pages_(qpdf, &m)
+    {
+    }
+
+    Linearization&
+    linearization()
+    {
+        return lin_;
+    };
+
+    Objects&
+    objects()
+    {
+        return objects_;
+    };
+
+    Pages&
+    pages()
+    {
+        return pages_;
+    }
+
+    bool reconstructed_xref() const;
+
+    QPDFAcroFormDocumentHelper&
+    acroform()
+    {
+        if (!acroform_) {
+            acroform_ = std::make_unique<QPDFAcroFormDocumentHelper>(qpdf);
+        }
+        return *acroform_;
+    }
+
+    QPDFEmbeddedFileDocumentHelper&
+    embedded_files()
+    {
+        if (!embedded_files_) {
+            embedded_files_ = std::make_unique<QPDFEmbeddedFileDocumentHelper>(qpdf);
+        }
+        return *embedded_files_;
+    }
+
+    QPDFOutlineDocumentHelper&
+    outlines()
+    {
+        if (!outlines_) {
+            outlines_ = std::make_unique<QPDFOutlineDocumentHelper>(qpdf);
+        }
+        return *outlines_;
+    }
+
+    QPDFPageDocumentHelper&
+    page_dh()
+    {
+        if (!page_dh_) {
+            page_dh_ = std::make_unique<QPDFPageDocumentHelper>(qpdf);
+        }
+        return *page_dh_;
+    }
+
+    QPDFPageLabelDocumentHelper&
+    page_labels()
+    {
+        if (!page_labels_) {
+            page_labels_ = std::make_unique<QPDFPageLabelDocumentHelper>(qpdf);
+        }
+        return *page_labels_;
+    }
+
+  private:
+    QPDF& qpdf;
+    QPDF::Members& m;
+
+    Linearization lin_;
+    Objects objects_;
+    Pages pages_;
+
+    // Document Helpers;
+    std::unique_ptr<QPDFAcroFormDocumentHelper> acroform_;
+    std::unique_ptr<QPDFEmbeddedFileDocumentHelper> embedded_files_;
+    std::unique_ptr<QPDFOutlineDocumentHelper> outlines_;
+    std::unique_ptr<QPDFPageDocumentHelper> page_dh_;
+    std::unique_ptr<QPDFPageLabelDocumentHelper> page_labels_;
+};
+
 class QPDF::Members
 {
     friend class QPDF;
     friend class ResolveRecorder;
 
   public:
-    Members();
+    Members(QPDF& qpdf);
     Members(Members const&) = delete;
     ~Members() = default;
 
   private:
+    Doc doc;
+    Doc::Linearization& lin;
+    Doc::Objects& objects;
+    Doc::Pages& pages;
     std::shared_ptr<QPDFLogger> log;
     unsigned long long unique_id{0};
     qpdf::Tokenizer tokenizer;
@@ -488,78 +896,33 @@ class QPDF::Members
     // Optimization data
     std::map<ObjUser, std::set<QPDFObjGen>> obj_user_to_objects;
     std::map<QPDFObjGen, std::set<ObjUser>> object_to_obj_users;
-
-    // Document Helpers;
-    std::unique_ptr<QPDFAcroFormDocumentHelper> acroform;
-    std::unique_ptr<QPDFEmbeddedFileDocumentHelper> embedded_files;
-    std::unique_ptr<QPDFOutlineDocumentHelper> outlines;
-    std::unique_ptr<QPDFPageDocumentHelper> pages;
-    std::unique_ptr<QPDFPageLabelDocumentHelper> page_labels;
 };
 
-// JobSetter class is restricted to QPDFJob.
-class QPDF::JobSetter
+// The Resolver class is restricted to QPDFObject and BaseHandle so that only it can resolve
+// indirect references.
+class QPDF::Doc::Resolver
 {
-    friend class QPDFJob;
+    friend class QPDFObject;
+    friend class qpdf::BaseHandle;
 
   private:
-    // Enable enhanced warnings for pdf file checking.
-    static void
-    setCheckMode(QPDF& qpdf, bool val)
+    static std::shared_ptr<QPDFObject> const&
+    resolved(QPDF* qpdf, QPDFObjGen og)
     {
-        qpdf.m->check_mode = val;
+        return qpdf->m->objects.resolve(og);
     }
 };
 
 inline bool
-QPDF::reconstructed_xref() const
+QPDF::Doc::reconstructed_xref() const
 {
-    return m->reconstructed_xref;
+    return m.reconstructed_xref;
 }
 
-inline QPDFAcroFormDocumentHelper&
-QPDF::acroform()
+inline QPDF::Doc&
+QPDF::doc()
 {
-    if (!m->acroform) {
-        m->acroform = std::make_unique<QPDFAcroFormDocumentHelper>(*this);
-    }
-    return *m->acroform;
-}
-
-inline QPDFEmbeddedFileDocumentHelper&
-QPDF::embedded_files()
-{
-    if (!m->embedded_files) {
-        m->embedded_files = std::make_unique<QPDFEmbeddedFileDocumentHelper>(*this);
-    }
-    return *m->embedded_files;
-}
-
-inline QPDFOutlineDocumentHelper&
-QPDF::outlines()
-{
-    if (!m->outlines) {
-        m->outlines = std::make_unique<QPDFOutlineDocumentHelper>(*this);
-    }
-    return *m->outlines;
-}
-
-inline QPDFPageDocumentHelper&
-QPDF::pages()
-{
-    if (!m->pages) {
-        m->pages = std::make_unique<QPDFPageDocumentHelper>(*this);
-    }
-    return *m->pages;
-}
-
-inline QPDFPageLabelDocumentHelper&
-QPDF::page_labels()
-{
-    if (!m->page_labels) {
-        m->page_labels = std::make_unique<QPDFPageLabelDocumentHelper>(*this);
-    }
-    return *m->page_labels;
+    return m->doc;
 }
 
 // Throw a generic exception for unusual error conditions that do not be covered during CI testing.

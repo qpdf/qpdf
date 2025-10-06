@@ -45,7 +45,7 @@ QPDFAcroFormDocumentHelper::QPDFAcroFormDocumentHelper(QPDF& qpdf) :
 QPDFAcroFormDocumentHelper&
 QPDFAcroFormDocumentHelper::get(QPDF& qpdf)
 {
-    return qpdf.acroform();
+    return qpdf.doc().acroform();
 }
 
 void

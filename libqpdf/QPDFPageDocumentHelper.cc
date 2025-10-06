@@ -18,7 +18,7 @@ QPDFPageDocumentHelper::QPDFPageDocumentHelper(QPDF& qpdf) :
 QPDFPageDocumentHelper&
 QPDFPageDocumentHelper::get(QPDF& qpdf)
 {
-    return qpdf.pages();
+    return qpdf.doc().page_dh();
 }
 
 void
@@ -72,7 +72,7 @@ QPDFPageDocumentHelper::removePage(QPDFPageObjectHelper page)
 void
 QPDFPageDocumentHelper::flattenAnnotations(int required_flags, int forbidden_flags)
 {
-    auto& afdh = qpdf.acroform();
+    auto& afdh = qpdf.doc().acroform();
     if (afdh.getNeedAppearances()) {
         qpdf.getRoot()
             .getKey("/AcroForm")

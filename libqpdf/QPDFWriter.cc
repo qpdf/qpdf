@@ -27,6 +27,8 @@
 using namespace std::literals;
 using namespace qpdf;
 
+using Encryption = QPDF::Doc::Encryption;
+
 QPDFWriter::ProgressReporter::~ProgressReporter() // NOLINT (modernize-use-equals-default)
 {
     // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
@@ -260,11 +262,13 @@ Pl_stack::Popper::pop()
 }
 
 // Writer class is restricted to QPDFWriter so that only it can call certain methods.
-class QPDF::Writer
+class QPDF::Doc::Writer
 {
     friend class QPDFWriter;
     Writer(QPDF& pdf) :
-        pdf(pdf)
+        pdf(pdf),
+        lin(pdf.m->lin),
+        objects(pdf.m->objects)
     {
     }
 
@@ -274,7 +278,7 @@ class QPDF::Writer
         QPDFWriter::ObjTable const& obj,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
     {
-        pdf.optimize(obj, skip_stream_parameters);
+        lin.optimize(obj, skip_stream_parameters);
     }
 
     void
@@ -286,7 +290,7 @@ class QPDF::Writer
         std::vector<QPDFObjectHandle>& part8,
         std::vector<QPDFObjectHandle>& part9)
     {
-        pdf.getLinearizedParts(obj, part4, part6, part7, part8, part9);
+        lin.getLinearizedParts(obj, part4, part6, part7, part8, part9);
     }
 
     void
@@ -298,19 +302,19 @@ class QPDF::Writer
         int& O,
         bool compressed)
     {
-        pdf.generateHintStream(new_obj, obj, hint_stream, S, O, compressed);
+        lin.generateHintStream(new_obj, obj, hint_stream, S, O, compressed);
     }
 
     std::vector<QPDFObjGen>
     getCompressibleObjGens()
     {
-        return pdf.getCompressibleObjVector();
+        return objects.getCompressibleObjVector();
     }
 
     std::vector<bool>
     getCompressibleObjSet()
     {
-        return pdf.getCompressibleObjSet();
+        return objects.getCompressibleObjSet();
     }
 
     std::map<QPDFObjGen, QPDFXRefEntry> const&
@@ -322,13 +326,15 @@ class QPDF::Writer
     size_t
     tableSize()
     {
-        return pdf.tableSize();
+        return pdf.m->objects.tableSize();
     }
 
     QPDF& pdf;
+    QPDF::Doc::Linearization& lin;
+    QPDF::Doc::Objects& objects;
 };
 
-class QPDFWriter::Members: QPDF::Writer
+class QPDFWriter::Members: QPDF::Doc::Writer
 {
     friend class QPDFWriter;
 
@@ -343,7 +349,7 @@ class QPDFWriter::Members: QPDF::Writer
     enum trailer_e { t_normal, t_lin_first, t_lin_second };
 
     Members(QPDFWriter& w, QPDF& pdf) :
-        QPDF::Writer(pdf),
+        QPDF::Doc::Writer(pdf),
         w(w),
         root_og(
             pdf.getRoot().getObjGen().isIndirect() ? pdf.getRoot().getObjGen() : QPDFObjGen(-1, 0)),
@@ -504,7 +510,7 @@ class QPDFWriter::Members: QPDF::Writer
     bool pclm{false};
     qpdf_object_stream_e object_stream_mode{qpdf_o_preserve};
 
-    std::unique_ptr<QPDF::EncryptionData> encryption;
+    std::unique_ptr<QPDF::Doc::Encryption> encryption;
     std::string encryption_key;
     bool encrypt_use_aes{false};
 
@@ -829,7 +835,7 @@ QPDFWriter::setR2EncryptionParametersInsecure(
     bool allow_extract,
     bool allow_annotate)
 {
-    m->encryption = std::make_unique<QPDF::EncryptionData>(1, 2, 5, true);
+    m->encryption = std::make_unique<Encryption>(1, 2, 5, true);
     if (!allow_print) {
         m->encryption->setP(3, false);
     }
@@ -857,7 +863,7 @@ QPDFWriter::setR3EncryptionParametersInsecure(
     bool allow_modify_other,
     qpdf_r3_print_e print)
 {
-    m->encryption = std::make_unique<QPDF::EncryptionData>(2, 3, 16, true);
+    m->encryption = std::make_unique<Encryption>(2, 3, 16, true);
     m->interpretR3EncryptionParameters(
         allow_accessibility,
         allow_extract,
@@ -884,7 +890,7 @@ QPDFWriter::setR4EncryptionParametersInsecure(
     bool encrypt_metadata,
     bool use_aes)
 {
-    m->encryption = std::make_unique<QPDF::EncryptionData>(4, 4, 16, encrypt_metadata);
+    m->encryption = std::make_unique<Encryption>(4, 4, 16, encrypt_metadata);
     m->encrypt_use_aes = use_aes;
     m->interpretR3EncryptionParameters(
         allow_accessibility,
@@ -911,7 +917,7 @@ QPDFWriter::setR5EncryptionParameters(
     qpdf_r3_print_e print,
     bool encrypt_metadata)
 {
-    m->encryption = std::make_unique<QPDF::EncryptionData>(5, 5, 32, encrypt_metadata);
+    m->encryption = std::make_unique<Encryption>(5, 5, 32, encrypt_metadata);
     m->encrypt_use_aes = true;
     m->interpretR3EncryptionParameters(
         allow_accessibility,
@@ -938,7 +944,7 @@ QPDFWriter::setR6EncryptionParameters(
     qpdf_r3_print_e print,
     bool encrypt_metadata)
 {
-    m->encryption = std::make_unique<QPDF::EncryptionData>(5, 6, 32, encrypt_metadata);
+    m->encryption = std::make_unique<Encryption>(5, 6, 32, encrypt_metadata);
     m->interpretR3EncryptionParameters(
         allow_accessibility,
         allow_extract,
@@ -1094,7 +1100,7 @@ QPDFWriter::Members::copyEncryptionParameters(QPDF& qpdf)
         QTC::TC("qpdf", "QPDFWriter copy encrypt metadata", encrypt_metadata ? 0 : 1);
         QTC::TC("qpdf", "QPDFWriter copy use_aes", encrypt_use_aes ? 0 : 1);
 
-        encryption = std::make_unique<QPDF::EncryptionData>(
+        encryption = std::make_unique<Encryption>(
             V,
             encrypt.getKey("/R").getIntValueAsInt(),
             key_len,

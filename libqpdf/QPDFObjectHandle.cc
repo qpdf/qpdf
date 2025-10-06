@@ -1949,7 +1949,7 @@ QPDFObjectHandle::copyStream()
             dict.replaceKey(iter.first, iter.second.shallowCopy());
         }
     }
-    QPDF::StreamCopier::copyStreamData(getOwningQPDF(), result, *this);
+    QPDF::Doc::StreamCopier::copyStreamData(getOwningQPDF(), result, *this);
     return result;
 }
 

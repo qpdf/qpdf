@@ -178,7 +178,11 @@ QPDF::QPDFVersion()
     return QPDF::qpdf_version;
 }
 
-QPDF::Members::Members() :
+QPDF::Members::Members(QPDF& qpdf) :
+    doc(qpdf, *this),
+    lin(doc.linearization()),
+    objects(doc.objects()),
+    pages(doc.pages()),
     log(QPDFLogger::defaultLogger()),
     file(new InvalidInputSource()),
     encp(new EncryptionParameters)
@@ -186,7 +190,7 @@ QPDF::Members::Members() :
 }
 
 QPDF::QPDF() :
-    m(std::make_unique<Members>())
+    m(std::make_unique<Members>(*this))
 {
     m->tokenizer.allowEOF();
     // Generate a unique ID. It just has to be unique among all QPDF objects allocated throughout
@@ -266,7 +270,7 @@ void
 QPDF::processInputSource(std::shared_ptr<InputSource> source, char const* password)
 {
     m->file = source;
-    parse(password);
+    m->objects.parse(password);
 }
 
 void
@@ -434,20 +438,20 @@ QPDF::warn(
 QPDFObjectHandle
 QPDF::newReserved()
 {
-    return makeIndirectFromQPDFObject(QPDFObject::create<QPDF_Reserved>());
+    return m->objects.makeIndirectFromQPDFObject(QPDFObject::create<QPDF_Reserved>());
 }
 
 QPDFObjectHandle
 QPDF::newIndirectNull()
 {
-    return makeIndirectFromQPDFObject(QPDFObject::create<QPDF_Null>());
+    return m->objects.makeIndirectFromQPDFObject(QPDFObject::create<QPDF_Null>());
 }
 
 QPDFObjectHandle
 QPDF::newStream()
 {
     return makeIndirectObject(
-        qpdf::Stream(*this, nextObjGen(), QPDFObjectHandle::newDictionary(), 0, 0));
+        qpdf::Stream(*this, m->objects.nextObjGen(), Dictionary::empty(), 0, 0));
 }
 
 QPDFObjectHandle
