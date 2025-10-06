@@ -180,6 +180,7 @@ QPDF::QPDFVersion()
 
 QPDF::Members::Members(QPDF& qpdf) :
     doc(qpdf, *this),
+    lin(doc.linearization()),
     objects(doc.objects()),
     pages(doc.pages()),
     log(QPDFLogger::defaultLogger()),

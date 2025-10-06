@@ -18,6 +18,9 @@ namespace qpdf::is
     class OffsetBuffer;
 } // namespace qpdf::is
 
+class BitStream;
+class BitWriter;
+
 class QPDF::ObjCache
 {
   public:
@@ -458,7 +461,113 @@ class QPDF::Doc
         std::string Perms;
         std::string id1;
         bool encrypt_metadata;
-    }; // class Encryption
+    }; // class QPDF::Doc::Encryption
+
+    class Linearization
+    {
+      public:
+        Linearization() = delete;
+        Linearization(Linearization const&) = delete;
+        Linearization(Linearization&&) = delete;
+        Linearization& operator=(Linearization const&) = delete;
+        Linearization& operator=(Linearization&&) = delete;
+        ~Linearization() = default;
+
+        Linearization(QPDF& qpdf, QPDF::Members* m) :
+            qpdf(qpdf),
+            m(m)
+        {
+        }
+
+        // For QPDFWriter:
+
+        template <typename T>
+        void optimize_internal(
+            T const& object_stream_data,
+            bool allow_changes = true,
+            std::function<int(QPDFObjectHandle&)> skip_stream_parameters = nullptr);
+        void optimize(
+            QPDFWriter::ObjTable const& obj,
+            std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
+
+        // Get lists of all objects in order according to the part of a linearized file that they
+        // belong to.
+        void getLinearizedParts(
+            QPDFWriter::ObjTable const& obj,
+            std::vector<QPDFObjectHandle>& part4,
+            std::vector<QPDFObjectHandle>& part6,
+            std::vector<QPDFObjectHandle>& part7,
+            std::vector<QPDFObjectHandle>& part8,
+            std::vector<QPDFObjectHandle>& part9);
+
+        void generateHintStream(
+            QPDFWriter::NewObjTable const& new_obj,
+            QPDFWriter::ObjTable const& obj,
+            std::string& hint_stream,
+            int& S,
+            int& O,
+            bool compressed);
+
+        // methods to support linearization checking -- implemented in QPDF_linearization.cc
+
+        void readLinearizationData();
+        void checkLinearizationInternal();
+        void dumpLinearizationDataInternal();
+        void linearizationWarning(std::string_view);
+        qpdf::Dictionary readHintStream(Pipeline&, qpdf_offset_t offset, size_t length);
+        void readHPageOffset(BitStream);
+        void readHSharedObject(BitStream);
+        void readHGeneric(BitStream, HGeneric&);
+        qpdf_offset_t maxEnd(ObjUser const& ou);
+        qpdf_offset_t getLinearizationOffset(QPDFObjGen);
+        QPDFObjectHandle
+        getUncompressedObject(QPDFObjectHandle&, std::map<int, int> const& object_stream_data);
+        QPDFObjectHandle getUncompressedObject(QPDFObjectHandle&, QPDFWriter::ObjTable const& obj);
+        int lengthNextN(int first_object, int n);
+        void checkHPageOffset(
+            std::vector<QPDFObjectHandle> const& pages, std::map<int, int>& idx_to_obj);
+        void checkHSharedObject(
+            std::vector<QPDFObjectHandle> const& pages, std::map<int, int>& idx_to_obj);
+        void checkHOutlines();
+        void dumpHPageOffset();
+        void dumpHSharedObject();
+        void dumpHGeneric(HGeneric&);
+        qpdf_offset_t adjusted_offset(qpdf_offset_t offset);
+        template <typename T>
+        void calculateLinearizationData(T const& object_stream_data);
+        template <typename T>
+        void pushOutlinesToPart(
+            std::vector<QPDFObjectHandle>& part,
+            std::set<QPDFObjGen>& lc_outlines,
+            T const& object_stream_data);
+        int outputLengthNextN(
+            int in_object,
+            int n,
+            QPDFWriter::NewObjTable const& new_obj,
+            QPDFWriter::ObjTable const& obj);
+        void calculateHPageOffset(
+            QPDFWriter::NewObjTable const& new_obj, QPDFWriter::ObjTable const& obj);
+        void calculateHSharedObject(
+            QPDFWriter::NewObjTable const& new_obj, QPDFWriter::ObjTable const& obj);
+        void
+        calculateHOutline(QPDFWriter::NewObjTable const& new_obj, QPDFWriter::ObjTable const& obj);
+        void writeHPageOffset(BitWriter&);
+        void writeHSharedObject(BitWriter&);
+        void writeHGeneric(BitWriter&, HGeneric&);
+
+        // Methods to support optimization
+
+        void updateObjectMaps(
+            ObjUser const& ou,
+            QPDFObjectHandle oh,
+            std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
+        void filterCompressedObjects(std::map<int, int> const& object_stream_data);
+        void filterCompressedObjects(QPDFWriter::ObjTable const& object_stream_data);
+
+      private:
+        QPDF& qpdf;
+        QPDF::Members* m;
+    };
 
     class Objects
     {
@@ -613,10 +722,17 @@ class QPDF::Doc
     Doc(QPDF& qpdf, QPDF::Members& m) :
         qpdf(qpdf),
         m(m),
+        lin_(qpdf, &m),
         objects_(qpdf, &m),
         pages_(qpdf, &m)
     {
     }
+
+    Linearization&
+    linearization()
+    {
+        return lin_;
+    };
 
     Objects&
     objects()
@@ -681,6 +797,7 @@ class QPDF::Doc
     QPDF& qpdf;
     QPDF::Members& m;
 
+    Linearization lin_;
     Objects objects_;
     Pages pages_;
 
@@ -704,6 +821,7 @@ class QPDF::Members
 
   private:
     Doc doc;
+    Doc::Linearization& lin;
     Doc::Objects& objects;
     Doc::Pages& pages;
     std::shared_ptr<QPDFLogger> log;

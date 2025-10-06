@@ -267,6 +267,7 @@ class QPDF::Doc::Writer
     friend class QPDFWriter;
     Writer(QPDF& pdf) :
         pdf(pdf),
+        lin(pdf.m->lin),
         objects(pdf.m->objects)
     {
     }
@@ -277,7 +278,7 @@ class QPDF::Doc::Writer
         QPDFWriter::ObjTable const& obj,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
     {
-        pdf.optimize(obj, skip_stream_parameters);
+        lin.optimize(obj, skip_stream_parameters);
     }
 
     void
@@ -289,7 +290,7 @@ class QPDF::Doc::Writer
         std::vector<QPDFObjectHandle>& part8,
         std::vector<QPDFObjectHandle>& part9)
     {
-        pdf.getLinearizedParts(obj, part4, part6, part7, part8, part9);
+        lin.getLinearizedParts(obj, part4, part6, part7, part8, part9);
     }
 
     void
@@ -301,7 +302,7 @@ class QPDF::Doc::Writer
         int& O,
         bool compressed)
     {
-        pdf.generateHintStream(new_obj, obj, hint_stream, S, O, compressed);
+        lin.generateHintStream(new_obj, obj, hint_stream, S, O, compressed);
     }
 
     std::vector<QPDFObjGen>
@@ -329,6 +330,7 @@ class QPDF::Doc::Writer
     }
 
     QPDF& pdf;
+    QPDF::Doc::Linearization& lin;
     QPDF::Doc::Objects& objects;
 };
 

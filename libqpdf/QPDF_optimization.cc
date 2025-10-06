@@ -7,6 +7,7 @@
 #include <qpdf/QPDFWriter_private.hh>
 #include <qpdf/QTC.hh>
 
+using Lin = QPDF::Doc::Linearization;
 using Pages = QPDF::Doc::Pages;
 
 QPDF::ObjUser::ObjUser(user_e type) :
@@ -60,11 +61,11 @@ QPDF::optimize(
     bool allow_changes,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
-    optimize_internal(object_stream_data, allow_changes, skip_stream_parameters);
+    m->lin.optimize_internal(object_stream_data, allow_changes, skip_stream_parameters);
 }
 
 void
-QPDF::optimize(
+Lin::optimize(
     QPDFWriter::ObjTable const& obj, std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
     optimize_internal(obj, true, skip_stream_parameters);
@@ -72,7 +73,7 @@ QPDF::optimize(
 
 template <typename T>
 void
-QPDF::optimize_internal(
+Lin::optimize_internal(
     T const& object_stream_data,
     bool allow_changes,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
@@ -84,11 +85,11 @@ QPDF::optimize_internal(
 
     // The PDF specification indicates that /Outlines is supposed to be an indirect reference. Force
     // it to be so if it exists and is direct.  (This has been seen in the wild.)
-    QPDFObjectHandle root = getRoot();
+    QPDFObjectHandle root = qpdf.getRoot();
     if (root.getKey("/Outlines").isDictionary()) {
         QPDFObjectHandle outlines = root.getKey("/Outlines");
         if (!outlines.isIndirect()) {
-            root.replaceKey("/Outlines", makeIndirectObject(outlines));
+            root.replaceKey("/Outlines", qpdf.makeIndirectObject(outlines));
         }
     }
 
@@ -265,7 +266,7 @@ Pages ::pushInheritedAttributesToPageInternal(
 }
 
 void
-QPDF::updateObjectMaps(
+Lin::updateObjectMaps(
     ObjUser const& first_ou,
     QPDFObjectHandle first_oh,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
@@ -338,7 +339,7 @@ QPDF::updateObjectMaps(
 }
 
 void
-QPDF::filterCompressedObjects(std::map<int, int> const& object_stream_data)
+Lin::filterCompressedObjects(std::map<int, int> const& object_stream_data)
 {
     if (object_stream_data.empty()) {
         return;
@@ -382,7 +383,7 @@ QPDF::filterCompressedObjects(std::map<int, int> const& object_stream_data)
 }
 
 void
-QPDF::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
+Lin::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
 {
     if (obj.getStreamsEmpty()) {
         return;
