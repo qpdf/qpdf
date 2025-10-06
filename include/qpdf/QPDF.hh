@@ -790,27 +790,6 @@ class QPDF
         bool suppress_warnings,
         bool will_retry);
 
-    // For QPDFWriter:
-
-    std::map<QPDFObjGen, QPDFXRefEntry> const& getXRefTableInternal();
-    // Get a list of objects that would be permitted in an object stream.
-    template <typename T>
-    std::vector<T> getCompressibleObjGens();
-    std::vector<QPDFObjGen> getCompressibleObjVector();
-    std::vector<bool> getCompressibleObjSet();
-
-    // methods to support page handling
-
-    void getAllPagesInternal(
-        QPDFObjectHandle cur_pages,
-        QPDFObjGen::set& visited,
-        QPDFObjGen::set& seen,
-        bool media_box,
-        bool resources);
-    void insertPage(QPDFObjectHandle newpage, int pos);
-    void flattenPagesTree();
-    void insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_duplicate);
-
     // methods to support encryption -- implemented in QPDF_encryption.cc
     void initializeEncryption();
     static std::string

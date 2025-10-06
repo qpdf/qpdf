@@ -320,7 +320,7 @@ class QPDF::Doc::Writer
     std::map<QPDFObjGen, QPDFXRefEntry> const&
     getXRefTable()
     {
-        return pdf.getXRefTableInternal();
+        return objects.getXRefTableInternal();
     }
 
     size_t

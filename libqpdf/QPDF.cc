@@ -27,6 +27,8 @@
 using namespace qpdf;
 using namespace std::literals;
 
+using Objects = QPDF::Doc::Objects;
+
 // This must be a fixed value. This API returns a const reference to it, and the C API relies on its
 // being static as well.
 std::string const QPDF::qpdf_version(QPDF_VERSION);
@@ -820,11 +822,11 @@ QPDF::getRoot()
 std::map<QPDFObjGen, QPDFXRefEntry>
 QPDF::getXRefTable()
 {
-    return getXRefTableInternal();
+    return m->objects.getXRefTableInternal();
 }
 
 std::map<QPDFObjGen, QPDFXRefEntry> const&
-QPDF::getXRefTableInternal()
+Objects::getXRefTableInternal()
 {
     if (!m->parsed) {
         throw std::logic_error("QPDF::getXRefTable called before parsing.");

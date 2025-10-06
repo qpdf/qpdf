@@ -607,6 +607,7 @@ class QPDF::Doc
 
         // For QPDFWriter:
 
+        std::map<QPDFObjGen, QPDFXRefEntry> const& getXRefTableInternal();
         // Get a list of objects that would be permitted in an object stream.
         template <typename T>
         std::vector<T> getCompressibleObjGens();
