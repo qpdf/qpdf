@@ -277,8 +277,6 @@ QPDFPageObjectHelper filter form xobject 0
 QPDFJob found resources in non-leaf 0
 QPDFJob found shared resources in leaf 0
 QPDFJob found shared xobject in leaf 0
-QPDF copy foreign with data 1
-QPDF copy foreign with foreign_stream 1
 QPDFObjectHandle need_newline 1
 QPDFJob pages range omitted with . 0
 qpdf-c invalid object handle 0
