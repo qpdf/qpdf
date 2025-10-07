@@ -743,7 +743,6 @@ class QPDF
 
     class ObjCache;
     class EncryptionParameters;
-    class ForeignStreamData;
     class StringDecrypter;
     class ResolveRecorder;
     class JSONReactor;

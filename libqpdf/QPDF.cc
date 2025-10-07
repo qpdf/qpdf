@@ -112,8 +112,7 @@ namespace
     };
 } // namespace
 
-QPDF::ForeignStreamData::ForeignStreamData(
-    Stream& foreign, qpdf_offset_t offset, QPDFObjectHandle local_dict) :
+Streams::Copier::Data::Data(Stream& foreign, qpdf_offset_t offset, QPDFObjectHandle local_dict) :
     encp(foreign.qpdf()->m->encp),
     file(foreign.qpdf()->m->file),
     foreign_og(foreign.id_gen()),
@@ -715,8 +714,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign_oh)
         result.replaceStreamData(
             m->objects.streams().copier(), dict["/Filter"], dict["/DecodeParms"]);
     } else {
-        auto foreign_stream_data = ForeignStreamData(foreign, foreign_oh.offset(), dict);
-        m->objects.streams().copier()->register_copy(local_og, foreign_stream_data);
+        m->objects.streams().copier()->register_copy(local_og, foreign, foreign_oh.offset(), dict);
         result.replaceStreamData(
             m->objects.streams().copier(), dict["/Filter"], dict["/DecodeParms"]);
     }

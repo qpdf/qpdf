@@ -89,23 +89,6 @@ class QPDF::EncryptionParameters
     bool owner_password_matched{false};
 };
 
-class QPDF::ForeignStreamData
-{
-    friend class QPDF;
-
-  public:
-    ForeignStreamData(Stream& foreign, qpdf_offset_t offset, QPDFObjectHandle local_dict);
-
-  private:
-    std::shared_ptr<EncryptionParameters> encp;
-    std::shared_ptr<InputSource> file;
-    QPDFObjGen foreign_og;
-    qpdf_offset_t offset;
-    size_t length;
-    QPDFObjectHandle local_dict;
-    bool is_root_metadata{false};
-};
-
 class QPDF::StringDecrypter final: public QPDFObjectHandle::StringDecrypter
 {
     friend class QPDF;
@@ -599,6 +582,23 @@ class QPDF::Doc
             // local and foreign streams.
             class Copier final: public QPDFObjectHandle::StreamDataProvider
             {
+                class Data
+                {
+                    friend class Streams;
+
+                  public:
+                    Data(Stream& foreign, qpdf_offset_t offset, QPDFObjectHandle local_dict);
+
+                  private:
+                    std::shared_ptr<EncryptionParameters> encp;
+                    std::shared_ptr<InputSource> file;
+                    QPDFObjGen foreign_og;
+                    qpdf_offset_t offset;
+                    size_t length;
+                    QPDFObjectHandle local_dict;
+                    bool is_root_metadata{false};
+                };
+
               public:
                 Copier() = delete;
                 Copier(StreamDataProvider const&) = delete;
@@ -616,21 +616,25 @@ class QPDF::Doc
                     bool will_retry) final;
 
                 void
-                register_copy(QPDFObjGen local_og, QPDFObjectHandle foreign_stream)
+                register_copy(QPDFObjGen local_og, QPDFObjectHandle const& foreign_stream)
                 {
                     copied_streams.insert_or_assign(local_og, foreign_stream);
                 }
 
                 void
-                register_copy(QPDFObjGen local_og, ForeignStreamData foreign_stream)
+                register_copy(
+                    QPDFObjGen local_og,
+                    Stream& foreign,
+                    qpdf_offset_t offset,
+                    QPDFObjectHandle const& local_dict)
                 {
-                    copied_data.insert_or_assign(local_og, foreign_stream);
+                    copied_data.insert_or_assign(local_og, Data(foreign, offset, local_dict));
                 }
 
               private:
                 Streams& streams;
                 std::map<QPDFObjGen, QPDFObjectHandle> copied_streams;
-                std::map<QPDFObjGen, ForeignStreamData> copied_data;
+                std::map<QPDFObjGen, Data> copied_data;
             };
 
           public:
