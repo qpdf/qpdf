@@ -606,7 +606,7 @@ class QPDF::Doc
                 Copier& operator=(StreamDataProvider const&) = delete;
                 Copier& operator=(StreamDataProvider&&) = delete;
 
-                Copier(QPDF& qpdf);
+                Copier(Streams& streams);
                 ~Copier() final = default;
 
                 bool provideStreamData(
@@ -628,14 +628,15 @@ class QPDF::Doc
                 }
 
               private:
-                QPDF& qpdf;
+                Streams& streams;
                 std::map<QPDFObjGen, QPDFObjectHandle> copied_streams;
                 std::map<QPDFObjGen, ForeignStreamData> copied_data;
             };
 
           public:
             Streams(QPDF& qpdf) :
-                qpdf(qpdf)
+                qpdf_(qpdf),
+                copier_(std::make_shared<Copier>(*this))
             {
             }
 
@@ -676,17 +677,20 @@ class QPDF::Doc
                 qpdf->copyStreamData(dest, src);
             }
 
+            QPDF&
+            qpdf() const
+            {
+                return qpdf_;
+            }
+
             std::shared_ptr<Copier>&
             copier()
             {
-                if (!copier_) {
-                    copier_ = std::make_shared<Copier>(qpdf);
-                }
                 return copier_;
             }
 
           private:
-            QPDF& qpdf;
+            QPDF& qpdf_;
 
             std::shared_ptr<Copier> copier_;
         };

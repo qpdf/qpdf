@@ -124,9 +124,9 @@ QPDF::ForeignStreamData::ForeignStreamData(
 {
 }
 
-Streams::Copier::Copier(QPDF& qpdf) :
+Streams::Copier::Copier(Streams& streams) :
     QPDFObjectHandle::StreamDataProvider(true),
-    qpdf(qpdf)
+    streams(streams)
 {
 }
 
@@ -134,15 +134,15 @@ bool
 Streams::Copier::provideStreamData(
     QPDFObjGen const& og, Pipeline* pipeline, bool suppress_warnings, bool will_retry)
 {
-    auto foreign_data = copied_data.find(og);
+    auto data = copied_data.find(og);
     bool result = false;
-    if (foreign_data != copied_data.end()) {
-        result = qpdf.pipeForeignStreamData(
-            foreign_data->second, pipeline, suppress_warnings, will_retry);
+    if (data != copied_data.end()) {
+        result = streams.qpdf().pipeForeignStreamData(
+            data->second, pipeline, suppress_warnings, will_retry);
         QTC::TC("qpdf", "QPDF copy foreign with data", result ? 0 : 1);
     } else {
-        auto foreign_stream = copied_streams[og];
-        result = foreign_stream.pipeStreamData(
+        auto stream = copied_streams[og];
+        result = stream.pipeStreamData(
             pipeline, nullptr, 0, qpdf_dl_none, suppress_warnings, will_retry);
         QTC::TC("qpdf", "QPDF copy foreign with foreign_stream", result ? 0 : 1);
     }
