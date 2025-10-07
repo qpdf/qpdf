@@ -197,6 +197,49 @@ Stream::copy() const
 }
 
 void
+QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign_oh)
+{
+    // This method was originally written for copying foreign streams, but it is used by
+    // Stream::copy to copy streams from the same QPDF object as well.
+
+    Dictionary dict = result.getDict();
+    Dictionary old_dict = foreign_oh.getDict();
+    QPDFObjGen local_og(result.getObjGen());
+    // Copy information from the foreign stream so we can pipe its data later without keeping the
+    // original QPDF object around.
+
+    QPDF& foreign_stream_qpdf =
+        foreign_oh.getQPDF("unable to retrieve owning qpdf from foreign stream");
+
+    Stream foreign = foreign_oh;
+    if (!foreign) {
+        throw std::logic_error("unable to retrieve underlying stream object from foreign stream");
+    }
+    std::shared_ptr<Buffer> stream_buffer = foreign.getStreamDataBuffer();
+    if (foreign_stream_qpdf.m->immediate_copy_from && !stream_buffer) {
+        // Pull the stream data into a buffer before attempting the copy operation. Do it on the
+        // source stream so that if the source stream is copied multiple times, we don't have to
+        // keep duplicating the memory.
+        foreign.replaceStreamData(
+            foreign.getRawStreamData(), old_dict["/Filter"], old_dict["/DecodeParms"]);
+        stream_buffer = foreign.getStreamDataBuffer();
+    }
+    auto stream_provider = foreign.getStreamDataProvider();
+    if (stream_buffer) {
+        result.replaceStreamData(stream_buffer, dict["/Filter"], dict["/DecodeParms"]);
+    } else if (stream_provider) {
+        // In this case, the remote stream's QPDF must stay in scope.
+        m->objects.streams().copier()->register_copy(local_og, foreign_oh);
+        result.replaceStreamData(
+            m->objects.streams().copier(), dict["/Filter"], dict["/DecodeParms"]);
+    } else {
+        m->objects.streams().copier()->register_copy(local_og, foreign, foreign_oh.offset(), dict);
+        result.replaceStreamData(
+            m->objects.streams().copier(), dict["/Filter"], dict["/DecodeParms"]);
+    }
+}
+
+void
 Stream::registerStreamFilter(
     std::string const& filter_name, std::function<std::shared_ptr<QPDFStreamFilter>()> factory)
 {
