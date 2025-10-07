@@ -136,8 +136,20 @@ Streams::Copier::provideStreamData(
 {
     auto data = copied_data.find(og);
     if (data != copied_data.end()) {
-        if (streams.qpdf().pipeForeignStreamData(
-                data->second, pipeline, suppress_warnings, will_retry)) {
+        auto& fd = data->second;
+        QTC::TC("qpdf", "QPDF pipe foreign encrypted stream", fd.encp->encrypted ? 0 : 1);
+        if (streams.qpdf().pipeStreamData(
+                fd.encp,
+                fd.file,
+                streams.qpdf(),
+                fd.foreign_og,
+                fd.offset,
+                fd.length,
+                fd.local_dict,
+                fd.is_root_metadata,
+                pipeline,
+                suppress_warnings,
+                will_retry)) {
             return true; // for CI coverage
         } else {
             return false;
@@ -890,27 +902,6 @@ QPDF::pipeStreamData(
         length,
         stream_dict,
         is_root_metadata,
-        pipeline,
-        suppress_warnings,
-        will_retry);
-}
-
-bool
-QPDF::pipeForeignStreamData(
-    ForeignStreamData& foreign, Pipeline* pipeline, bool suppress_warnings, bool will_retry)
-{
-    if (foreign.encp->encrypted) {
-        QTC::TC("qpdf", "QPDF pipe foreign encrypted stream");
-    }
-    return pipeStreamData(
-        foreign.encp,
-        foreign.file,
-        *this,
-        foreign.foreign_og,
-        foreign.offset,
-        foreign.length,
-        foreign.local_dict,
-        foreign.is_root_metadata,
         pipeline,
         suppress_warnings,
         will_retry);
