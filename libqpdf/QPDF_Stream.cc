@@ -25,32 +25,7 @@
 using namespace std::literals;
 using namespace qpdf;
 
-// Pipe class is restricted to QPDF_Stream.
-class QPDF::Doc::Streams
-{
-  public:
-    static bool
-    pipeStreamData(
-        QPDF* qpdf,
-        QPDFObjGen og,
-        qpdf_offset_t offset,
-        size_t length,
-        QPDFObjectHandle dict,
-        bool is_root_metadata,
-        Pipeline* pipeline,
-        bool suppress_warnings,
-        bool will_retry)
-    {
-        return qpdf->pipeStreamData(
-            og, offset, length, dict, is_root_metadata, pipeline, suppress_warnings, will_retry);
-    }
-
-    static void
-    copyStreamData(QPDF* qpdf, QPDFObjectHandle const& dest, QPDFObjectHandle const& src)
-    {
-        qpdf->copyStreamData(dest, src);
-    }
-};
+using Streams = QPDF::Doc::Objects::Streams;
 
 namespace
 {
@@ -217,7 +192,7 @@ Stream::copy() const
 {
     Stream result = qpdf()->newStream();
     result.stream()->stream_dict = getDict().copy();
-    QPDF::Doc::Streams::copyStreamData(qpdf(), result, *this);
+    Streams::copyStreamData(qpdf(), result, *this);
     return result;
 }
 
@@ -593,7 +568,7 @@ Stream::pipeStreamData(
         if (offset() == 0) {
             throw std::logic_error("pipeStreamData called for stream with no data");
         }
-        if (!QPDF::Doc::Streams::pipeStreamData(
+        if (!Streams::pipeStreamData(
                 qpdf(),
                 id_gen(),
                 offset(),

@@ -340,8 +340,6 @@ class QPDF::Doc
     class JobSetter;
     class ParseGuard;
     class Resolver;
-    class StreamCopier;
-    class Streams;
     class Writer;
 
     class Encryption
@@ -619,6 +617,39 @@ class QPDF::Doc
             QPDF& qpdf;
             std::map<unsigned long long, Copier> copiers;
         }; // class QPDF::Doc::Objects::Foreign
+
+        class Streams
+        {
+          public:
+            static bool
+            pipeStreamData(
+                QPDF* qpdf,
+                QPDFObjGen og,
+                qpdf_offset_t offset,
+                size_t length,
+                QPDFObjectHandle dict,
+                bool is_root_metadata,
+                Pipeline* pipeline,
+                bool suppress_warnings,
+                bool will_retry)
+            {
+                return qpdf->pipeStreamData(
+                    og,
+                    offset,
+                    length,
+                    dict,
+                    is_root_metadata,
+                    pipeline,
+                    suppress_warnings,
+                    will_retry);
+            }
+
+            static void
+            copyStreamData(QPDF* qpdf, QPDFObjectHandle const& dest, QPDFObjectHandle const& src)
+            {
+                qpdf->copyStreamData(dest, src);
+            }
+        };
 
       public:
         Objects() = delete;
