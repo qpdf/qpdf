@@ -469,7 +469,9 @@ namespace qpdf
             qpdf_offset_t offset,
             size_t length);
 
-        Stream copy() const;
+        Stream copy();
+
+        void copy_data_to(Stream& target);
 
         Dictionary
         getDict() const

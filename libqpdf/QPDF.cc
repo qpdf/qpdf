@@ -112,14 +112,14 @@ namespace
     };
 } // namespace
 
-Streams::Copier::Data::Data(Stream& foreign, qpdf_offset_t offset, QPDFObjectHandle local_dict) :
-    encp(foreign.qpdf()->m->encp),
-    file(foreign.qpdf()->m->file),
-    foreign_og(foreign.id_gen()),
-    offset(offset),
-    length(foreign.getLength()),
-    local_dict(local_dict),
-    is_root_metadata(foreign.isRootMetadata())
+Streams::Copier::Data::Data(Stream& source, QPDFObjectHandle const& dest_dict) :
+    encp(source.qpdf()->m->encp),
+    file(source.qpdf()->m->file),
+    source_og(source.id_gen()),
+    offset(source.offset()),
+    length(source.getLength()),
+    dest_dict(dest_dict),
+    is_root_metadata(source.isRootMetadata())
 {
 }
 
@@ -141,10 +141,10 @@ Streams::Copier::provideStreamData(
                 fd.encp,
                 fd.file,
                 streams.qpdf(),
-                fd.foreign_og,
+                fd.source_og,
                 fd.offset,
                 fd.length,
-                fd.local_dict,
+                fd.dest_dict,
                 fd.is_root_metadata,
                 pipeline,
                 suppress_warnings,
@@ -667,7 +667,7 @@ Objects::Foreign::Copier::replace_indirect_object(QPDFObjectHandle const& foreig
                 dict.replaceKey(key, replace_indirect_object(value));
             }
         }
-        qpdf.copyStreamData(result, foreign);
+        stream.copy_data_to(result);
         return result;
     }
 

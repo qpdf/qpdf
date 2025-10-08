@@ -587,15 +587,15 @@ class QPDF::Doc
                     friend class Streams;
 
                   public:
-                    Data(Stream& foreign, qpdf_offset_t offset, QPDFObjectHandle local_dict);
+                    Data(Stream& source, QPDFObjectHandle const& dest_dict);
 
                   private:
                     std::shared_ptr<EncryptionParameters> encp;
                     std::shared_ptr<InputSource> file;
-                    QPDFObjGen foreign_og;
+                    QPDFObjGen source_og;
                     qpdf_offset_t offset;
                     size_t length;
-                    QPDFObjectHandle local_dict;
+                    QPDFObjectHandle dest_dict;
                     bool is_root_metadata{false};
                 };
 
@@ -628,7 +628,7 @@ class QPDF::Doc
                     qpdf_offset_t offset,
                     QPDFObjectHandle const& local_dict)
                 {
-                    copied_data.insert_or_assign(local_og, Data(foreign, offset, local_dict));
+                    copied_data.insert_or_assign(local_og, Data(foreign, local_dict));
                 }
 
               private:
@@ -675,12 +675,6 @@ class QPDF::Doc
                     will_retry);
             }
 
-            static void
-            copyStreamData(QPDF* qpdf, QPDFObjectHandle const& dest, QPDFObjectHandle const& src)
-            {
-                qpdf->copyStreamData(dest, src);
-            }
-
             QPDF&
             qpdf() const
             {
@@ -693,11 +687,13 @@ class QPDF::Doc
                 return copier_;
             }
 
+            bool immediate_copy_from() const;
+
           private:
             QPDF& qpdf_;
 
             std::shared_ptr<Copier> copier_;
-        };
+        }; // class QPDF::Doc::Objects::Streams
 
       public:
         Objects() = delete;

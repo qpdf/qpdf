@@ -800,9 +800,6 @@ class QPDF
         bool is_root_metadata,
         std::unique_ptr<Pipeline>& heap);
 
-    // Methods to support object copying
-    void copyStreamData(QPDFObjectHandle dest_stream, QPDFObjectHandle src_stream);
-
     struct HPageOffsetEntry;
     struct HPageOffset;
     struct HSharedObjectEntry;

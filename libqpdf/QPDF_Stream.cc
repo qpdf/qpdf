@@ -27,6 +27,12 @@ using namespace qpdf;
 
 using Streams = QPDF::Doc::Objects::Streams;
 
+bool
+Streams::immediate_copy_from() const
+{
+    return qpdf_.m->immediate_copy_from;
+}
+
 namespace
 {
     class SF_Crypt final: public QPDFStreamFilter
@@ -188,50 +194,42 @@ Stream::Stream(
 }
 
 Stream
-Stream::copy() const
+Stream::copy()
 {
     Stream result = qpdf()->newStream();
     result.stream()->stream_dict = getDict().copy();
-    Streams::copyStreamData(qpdf(), result, *this);
+    copy_data_to(result);
     return result;
 }
 
 void
-QPDF::copyStreamData(QPDFObjectHandle dest, QPDFObjectHandle source_oh)
+Stream::copy_data_to(Stream& dest)
 {
-    Dictionary dict = dest.getDict();
-    Dictionary old_dict = source_oh.getDict();
-    QPDFObjGen local_og(dest.getObjGen());
+    qpdf_expect(dest);
+    auto s = stream();
+    auto& streams = qpdf()->doc().objects().streams();
+    auto& d_streams = dest.qpdf()->doc().objects().streams();
+
+    auto dict = dest.getDict();
+
     // Copy information from the foreign stream so we can pipe its data later without keeping the
     // original QPDF object around.
-
-    QPDF& source_qpdf = source_oh.getQPDF("unable to retrieve owning qpdf from foreign stream");
-
-    Stream source = source_oh;
-    if (!source) {
-        throw std::logic_error("unable to retrieve underlying stream object from foreign stream");
-    }
-    std::shared_ptr<Buffer> stream_buffer = source.getStreamDataBuffer();
-    if (source_qpdf.m->immediate_copy_from && !stream_buffer) {
+    if (streams.immediate_copy_from() && !s->stream_data) {
         // Pull the stream data into a buffer before attempting the copy operation. Do it on the
         // source stream so that if the source stream is copied multiple times, we don't have to
         // keep duplicating the memory.
-        source.replaceStreamData(
-            source.getRawStreamData(), old_dict["/Filter"], old_dict["/DecodeParms"]);
-        stream_buffer = source.getStreamDataBuffer();
+        replaceStreamData(
+            getRawStreamData(), s->stream_dict["/Filter"], s->stream_dict["/DecodeParms"]);
     }
-    auto stream_provider = source.getStreamDataProvider();
-    if (stream_buffer) {
-        dest.replaceStreamData(stream_buffer, dict["/Filter"], dict["/DecodeParms"]);
-    } else if (stream_provider) {
-        // In this case, the remote stream's QPDF must stay in scope.
-        m->objects.streams().copier()->register_copy(local_og, source_oh);
-        dest.replaceStreamData(
-            m->objects.streams().copier(), dict["/Filter"], dict["/DecodeParms"]);
+    if (s->stream_data) {
+        dest.replaceStreamData(s->stream_data, dict["/Filter"], dict["/DecodeParms"]);
+    } else if (s->stream_provider) {
+        // In this case, the source stream's QPDF must stay in scope.
+        d_streams.copier()->register_copy(dest, *this);
+        dest.replaceStreamData(d_streams.copier(), dict["/Filter"], dict["/DecodeParms"]);
     } else {
-        m->objects.streams().copier()->register_copy(local_og, source, source.offset(), dict);
-        dest.replaceStreamData(
-            m->objects.streams().copier(), dict["/Filter"], dict["/DecodeParms"]);
+        d_streams.copier()->register_copy(dest, *this, offset(), dict);
+        dest.replaceStreamData(d_streams.copier(), dict["/Filter"], dict["/DecodeParms"]);
     }
 }
 
