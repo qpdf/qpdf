@@ -580,69 +580,10 @@ class QPDF::Doc
         {
             // Copier manages the copying of streams into this PDF. It is used both for copying
             // local and foreign streams.
-            class Copier final: public QPDFObjectHandle::StreamDataProvider
-            {
-                class Data
-                {
-                    friend class Streams;
-
-                  public:
-                    Data(Stream& source, QPDFObjectHandle const& dest_dict);
-
-                  private:
-                    std::shared_ptr<EncryptionParameters> encp;
-                    std::shared_ptr<InputSource> file;
-                    QPDFObjGen source_og;
-                    qpdf_offset_t offset;
-                    size_t length;
-                    QPDFObjectHandle dest_dict;
-                    bool is_root_metadata{false};
-                };
-
-              public:
-                Copier() = delete;
-                Copier(StreamDataProvider const&) = delete;
-                Copier(StreamDataProvider&&) = delete;
-                Copier& operator=(StreamDataProvider const&) = delete;
-                Copier& operator=(StreamDataProvider&&) = delete;
-
-                Copier(Streams& streams);
-                ~Copier() final = default;
-
-                bool provideStreamData(
-                    QPDFObjGen const& og,
-                    Pipeline* pipeline,
-                    bool suppress_warnings,
-                    bool will_retry) final;
-
-                void
-                register_copy(QPDFObjGen local_og, QPDFObjectHandle const& foreign_stream)
-                {
-                    copied_streams.insert_or_assign(local_og, foreign_stream);
-                }
-
-                void
-                register_copy(
-                    QPDFObjGen local_og,
-                    Stream& foreign,
-                    qpdf_offset_t offset,
-                    QPDFObjectHandle const& local_dict)
-                {
-                    copied_data.insert_or_assign(local_og, Data(foreign, local_dict));
-                }
-
-              private:
-                Streams& streams;
-                std::map<QPDFObjGen, QPDFObjectHandle> copied_streams;
-                std::map<QPDFObjGen, Data> copied_data;
-            };
+            class Copier;
 
           public:
-            Streams(QPDF& qpdf) :
-                qpdf_(qpdf),
-                copier_(std::make_shared<Copier>(*this))
-            {
-            }
+            Streams(QPDF& qpdf);
 
             Streams() = delete;
             Streams(Streams const&) = delete;

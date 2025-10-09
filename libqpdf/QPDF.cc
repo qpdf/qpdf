@@ -112,57 +112,6 @@ namespace
     };
 } // namespace
 
-Streams::Copier::Data::Data(Stream& source, QPDFObjectHandle const& dest_dict) :
-    encp(source.qpdf()->m->encp),
-    file(source.qpdf()->m->file),
-    source_og(source.id_gen()),
-    offset(source.offset()),
-    length(source.getLength()),
-    dest_dict(dest_dict),
-    is_root_metadata(source.isRootMetadata())
-{
-}
-
-Streams::Copier::Copier(Streams& streams) :
-    QPDFObjectHandle::StreamDataProvider(true),
-    streams(streams)
-{
-}
-
-bool
-Streams::Copier::provideStreamData(
-    QPDFObjGen const& og, Pipeline* pipeline, bool suppress_warnings, bool will_retry)
-{
-    auto data = copied_data.find(og);
-    if (data != copied_data.end()) {
-        auto& fd = data->second;
-        QTC::TC("qpdf", "QPDF pipe foreign encrypted stream", fd.encp->encrypted ? 0 : 1);
-        if (streams.qpdf().pipeStreamData(
-                fd.encp,
-                fd.file,
-                streams.qpdf(),
-                fd.source_og,
-                fd.offset,
-                fd.length,
-                fd.dest_dict,
-                fd.is_root_metadata,
-                pipeline,
-                suppress_warnings,
-                will_retry)) {
-            return true; // for CI coverage
-        } else {
-            return false;
-        }
-    }
-    auto stream = copied_streams.find(og);
-    if (stream != copied_streams.end() &&
-        stream->second.pipeStreamData(
-            pipeline, nullptr, 0, qpdf_dl_none, suppress_warnings, will_retry)) {
-        return true; // for CI coverage
-    }
-    return false;
-}
-
 QPDF::StringDecrypter::StringDecrypter(QPDF* qpdf, QPDFObjGen og) :
     qpdf(qpdf),
     og(og)
