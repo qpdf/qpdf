@@ -40,7 +40,7 @@ class Streams::Copier final: public QPDFObjectHandle::StreamDataProvider
         friend class Streams;
 
       public:
-        Data(Stream& source, QPDFObjectHandle const& dest_dict) :
+        Data(Stream& source, Dictionary const& dest_dict) :
             encp(source.qpdf()->m->encp),
             file(source.qpdf()->m->file),
             source_og(source.id_gen()),
@@ -101,6 +101,7 @@ class Streams::Copier final: public QPDFObjectHandle::StreamDataProvider
             }
         }
         auto stream = copied_streams.find(og);
+        qpdf_invariant(stream == copied_streams.end() || stream->second);
         if (stream != copied_streams.end() &&
             stream->second.pipeStreamData(
                 pipeline, nullptr, 0, qpdf_dl_none, suppress_warnings, will_retry)) {
@@ -110,24 +111,20 @@ class Streams::Copier final: public QPDFObjectHandle::StreamDataProvider
     }
 
     void
-    register_copy(QPDFObjGen local_og, QPDFObjectHandle const& foreign_stream)
+    register_copy(Stream& dest, Stream& source, bool provider)
     {
-        copied_streams.insert_or_assign(local_og, foreign_stream);
-    }
-
-    void
-    register_copy(
-        QPDFObjGen local_og,
-        Stream& foreign,
-        qpdf_offset_t offset,
-        QPDFObjectHandle const& local_dict)
-    {
-        copied_data.insert_or_assign(local_og, Data(foreign, local_dict));
+        qpdf_expect(source);
+        qpdf_expect(dest);
+        if (provider) {
+            copied_streams.insert_or_assign(dest, source);
+        } else {
+            copied_data.insert_or_assign(dest, Data(source, dest.getDict()));
+        }
     }
 
   private:
     Streams& streams;
-    std::map<QPDFObjGen, QPDFObjectHandle> copied_streams;
+    std::map<QPDFObjGen, Stream> copied_streams;
     std::map<QPDFObjGen, Data> copied_data;
 };
 
@@ -327,12 +324,8 @@ Stream::copy_data_to(Stream& dest)
     }
     if (s->stream_data) {
         dest.replaceStreamData(s->stream_data, dict["/Filter"], dict["/DecodeParms"]);
-    } else if (s->stream_provider) {
-        // In this case, the source stream's QPDF must stay in scope.
-        d_streams.copier()->register_copy(dest, *this);
-        dest.replaceStreamData(d_streams.copier(), dict["/Filter"], dict["/DecodeParms"]);
     } else {
-        d_streams.copier()->register_copy(dest, *this, offset(), dict);
+        d_streams.copier()->register_copy(dest, *this, s->stream_provider.get());
         dest.replaceStreamData(d_streams.copier(), dict["/Filter"], dict["/DecodeParms"]);
     }
 }
