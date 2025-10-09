@@ -244,7 +244,7 @@ QPDFFormFieldObjectHelper list last too high 0
 QPDFJob image optimize no pipeline 0
 QPDFJob image optimize no shrink 0
 QPDFJob image optimize too small 0
-QPDF pipe foreign encrypted stream 0
+QPDF pipe foreign encrypted stream 1
 QPDFJob copy same page more than once 1
 QPDFPageObjectHelper bad token finding names 0
 QPDFJob password mode bytes 0
@@ -277,8 +277,6 @@ QPDFPageObjectHelper filter form xobject 0
 QPDFJob found resources in non-leaf 0
 QPDFJob found shared resources in leaf 0
 QPDFJob found shared xobject in leaf 0
-QPDF copy foreign with data 1
-QPDF copy foreign with foreign_stream 1
 QPDFObjectHandle need_newline 1
 QPDFJob pages range omitted with . 0
 qpdf-c invalid object handle 0

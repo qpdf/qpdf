@@ -89,48 +89,6 @@ class QPDF::EncryptionParameters
     bool owner_password_matched{false};
 };
 
-class QPDF::ForeignStreamData
-{
-    friend class QPDF;
-
-  public:
-    ForeignStreamData(Stream& foreign, qpdf_offset_t offset, QPDFObjectHandle local_dict);
-
-  private:
-    std::shared_ptr<EncryptionParameters> encp;
-    std::shared_ptr<InputSource> file;
-    QPDFObjGen foreign_og;
-    qpdf_offset_t offset;
-    size_t length;
-    QPDFObjectHandle local_dict;
-    bool is_root_metadata{false};
-};
-
-class QPDF::CopiedStreamDataProvider final: public QPDFObjectHandle::StreamDataProvider
-{
-  public:
-    CopiedStreamDataProvider(QPDF& destination_qpdf);
-    ~CopiedStreamDataProvider() final = default;
-    bool provideStreamData(
-        QPDFObjGen const& og, Pipeline* pipeline, bool suppress_warnings, bool will_retry) final;
-    void
-    registerForeignStream(QPDFObjGen const& local_og, QPDFObjectHandle foreign_stream)
-    {
-        foreign_streams.insert_or_assign(local_og, foreign_stream);
-    }
-
-    void
-    registerForeignStream(QPDFObjGen local_og, ForeignStreamData foreign_stream)
-    {
-        foreign_stream_data.insert_or_assign(local_og, foreign_stream);
-    }
-
-  private:
-    QPDF& destination_qpdf;
-    std::map<QPDFObjGen, QPDFObjectHandle> foreign_streams;
-    std::map<QPDFObjGen, ForeignStreamData> foreign_stream_data;
-};
-
 class QPDF::StringDecrypter final: public QPDFObjectHandle::StringDecrypter
 {
     friend class QPDF;
@@ -340,8 +298,6 @@ class QPDF::Doc
     class JobSetter;
     class ParseGuard;
     class Resolver;
-    class StreamCopier;
-    class Streams;
     class Writer;
 
     class Encryption
@@ -620,6 +576,66 @@ class QPDF::Doc
             std::map<unsigned long long, Copier> copiers;
         }; // class QPDF::Doc::Objects::Foreign
 
+        class Streams
+        {
+            // Copier manages the copying of streams into this PDF. It is used both for copying
+            // local and foreign streams.
+            class Copier;
+
+          public:
+            Streams(QPDF& qpdf);
+
+            Streams() = delete;
+            Streams(Streams const&) = delete;
+            Streams(Streams&&) = delete;
+            Streams& operator=(Streams const&) = delete;
+            Streams& operator=(Streams&&) = delete;
+            ~Streams() = default;
+
+          public:
+            static bool
+            pipeStreamData(
+                QPDF* qpdf,
+                QPDFObjGen og,
+                qpdf_offset_t offset,
+                size_t length,
+                QPDFObjectHandle dict,
+                bool is_root_metadata,
+                Pipeline* pipeline,
+                bool suppress_warnings,
+                bool will_retry)
+            {
+                return qpdf->pipeStreamData(
+                    og,
+                    offset,
+                    length,
+                    dict,
+                    is_root_metadata,
+                    pipeline,
+                    suppress_warnings,
+                    will_retry);
+            }
+
+            QPDF&
+            qpdf() const
+            {
+                return qpdf_;
+            }
+
+            std::shared_ptr<Copier>&
+            copier()
+            {
+                return copier_;
+            }
+
+            bool immediate_copy_from() const;
+
+          private:
+            QPDF& qpdf_;
+
+            std::shared_ptr<Copier> copier_;
+        }; // class QPDF::Doc::Objects::Streams
+
       public:
         Objects() = delete;
         Objects(Objects const&) = delete;
@@ -631,7 +647,8 @@ class QPDF::Doc
         Objects(QPDF& qpdf, QPDF::Members* m) :
             qpdf(qpdf),
             m(m),
-            foreign_(qpdf)
+            foreign_(qpdf),
+            streams_(qpdf)
         {
         }
 
@@ -639,6 +656,12 @@ class QPDF::Doc
         foreign()
         {
             return foreign_;
+        }
+
+        Streams&
+        streams()
+        {
+            return streams_;
         }
 
         void parse(char const* password);
@@ -717,6 +740,7 @@ class QPDF::Doc
         QPDF::Members* m;
 
         Foreign foreign_;
+        Streams streams_;
     }; // class QPDF::Doc::Objects
 
     // This class is used to represent a PDF Pages tree.
@@ -898,7 +922,6 @@ class QPDF::Members
     bool ever_pushed_inherited_attributes_to_pages{false};
     bool ever_called_get_all_pages{false};
     std::vector<QPDFExc> warnings;
-    std::shared_ptr<CopiedStreamDataProvider> copied_stream_data_provider;
     bool reconstructed_xref{false};
     bool in_read_xref_stream{false};
     bool fixed_dangling_refs{false};

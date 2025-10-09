@@ -25,32 +25,114 @@
 using namespace std::literals;
 using namespace qpdf;
 
-// Pipe class is restricted to QPDF_Stream.
-class QPDF::Doc::Streams
+using Streams = QPDF::Doc::Objects::Streams;
+
+bool
+Streams::immediate_copy_from() const
 {
-  public:
-    static bool
-    pipeStreamData(
-        QPDF* qpdf,
-        QPDFObjGen og,
-        qpdf_offset_t offset,
-        size_t length,
-        QPDFObjectHandle dict,
-        bool is_root_metadata,
-        Pipeline* pipeline,
-        bool suppress_warnings,
-        bool will_retry)
+    return qpdf_.m->immediate_copy_from;
+}
+
+class Streams::Copier final: public QPDFObjectHandle::StreamDataProvider
+{
+    class Data
     {
-        return qpdf->pipeStreamData(
-            og, offset, length, dict, is_root_metadata, pipeline, suppress_warnings, will_retry);
+        friend class Streams;
+
+      public:
+        Data(Stream& source, Dictionary const& dest_dict) :
+            encp(source.qpdf()->m->encp),
+            file(source.qpdf()->m->file),
+            source_og(source.id_gen()),
+            offset(source.offset()),
+            length(source.getLength()),
+            dest_dict(dest_dict),
+            is_root_metadata(source.isRootMetadata())
+        {
+        }
+
+      private:
+        std::shared_ptr<EncryptionParameters> encp;
+        std::shared_ptr<InputSource> file;
+        QPDFObjGen source_og;
+        qpdf_offset_t offset;
+        size_t length;
+        QPDFObjectHandle dest_dict;
+        bool is_root_metadata{false};
+    };
+
+  public:
+    Copier() = delete;
+    Copier(StreamDataProvider const&) = delete;
+    Copier(StreamDataProvider&&) = delete;
+    Copier& operator=(StreamDataProvider const&) = delete;
+    Copier& operator=(StreamDataProvider&&) = delete;
+    ~Copier() final = default;
+
+    Copier(Streams& streams) :
+        QPDFObjectHandle::StreamDataProvider(true),
+        streams(streams)
+    {
     }
 
-    static void
-    copyStreamData(QPDF* qpdf, QPDFObjectHandle const& dest, QPDFObjectHandle const& src)
+    bool
+    provideStreamData(
+        QPDFObjGen const& og, Pipeline* pipeline, bool suppress_warnings, bool will_retry) final
     {
-        qpdf->copyStreamData(dest, src);
+        auto data = copied_data.find(og);
+        if (data != copied_data.end()) {
+            auto& fd = data->second;
+            QTC::TC("qpdf", "QPDF pipe foreign encrypted stream", fd.encp->encrypted ? 0 : 1);
+            if (streams.qpdf().pipeStreamData(
+                    fd.encp,
+                    fd.file,
+                    streams.qpdf(),
+                    fd.source_og,
+                    fd.offset,
+                    fd.length,
+                    fd.dest_dict,
+                    fd.is_root_metadata,
+                    pipeline,
+                    suppress_warnings,
+                    will_retry)) {
+                return true; // for CI coverage
+            } else {
+                return false;
+            }
+        }
+        auto stream = copied_streams.find(og);
+        qpdf_invariant(stream == copied_streams.end() || stream->second);
+        if (stream != copied_streams.end() &&
+            stream->second.pipeStreamData(
+                pipeline, nullptr, 0, qpdf_dl_none, suppress_warnings, will_retry)) {
+            return true; // for CI coverage
+        }
+        return false;
     }
+
+    void
+    register_copy(Stream& dest, Stream& source, bool provider)
+    {
+        qpdf_expect(source);
+        qpdf_expect(dest);
+        if (provider) {
+            copied_streams.insert_or_assign(dest, source);
+        } else {
+            copied_data.insert_or_assign(dest, Data(source, dest.getDict()));
+        }
+    }
+
+  private:
+    Streams& streams;
+    std::map<QPDFObjGen, Stream> copied_streams;
+    std::map<QPDFObjGen, Data> copied_data;
 };
+
+Streams::Streams(QPDF& qpdf) :
+    qpdf_(qpdf),
+    copier_(std::make_shared<Copier>(*this))
+{
+}
 
 namespace
 {
@@ -213,12 +295,39 @@ Stream::Stream(
 }
 
 Stream
-Stream::copy() const
+Stream::copy()
 {
     Stream result = qpdf()->newStream();
     result.stream()->stream_dict = getDict().copy();
-    QPDF::Doc::Streams::copyStreamData(qpdf(), result, *this);
+    copy_data_to(result);
     return result;
+}
+
+void
+Stream::copy_data_to(Stream& dest)
+{
+    qpdf_expect(dest);
+    auto s = stream();
+    auto& streams = qpdf()->doc().objects().streams();
+    auto& d_streams = dest.qpdf()->doc().objects().streams();
+
+    auto dict = dest.getDict();
+
+    // Copy information from the foreign stream so we can pipe its data later without keeping the
+    // original QPDF object around.
+    if (streams.immediate_copy_from() && !s->stream_data) {
+        // Pull the stream data into a buffer before attempting the copy operation. Do it on the
+        // source stream so that if the source stream is copied multiple times, we don't have to
+        // keep duplicating the memory.
+        replaceStreamData(
+            getRawStreamData(), s->stream_dict["/Filter"], s->stream_dict["/DecodeParms"]);
+    }
+    if (s->stream_data) {
+        dest.replaceStreamData(s->stream_data, dict["/Filter"], dict["/DecodeParms"]);
+    } else {
+        d_streams.copier()->register_copy(dest, *this, s->stream_provider.get());
+        dest.replaceStreamData(d_streams.copier(), dict["/Filter"], dict["/DecodeParms"]);
+    }
 }
 
 void
@@ -593,7 +702,7 @@ Stream::pipeStreamData(
         if (offset() == 0) {
             throw std::logic_error("pipeStreamData called for stream with no data");
         }
-        if (!QPDF::Doc::Streams::pipeStreamData(
+        if (!Streams::pipeStreamData(
                 qpdf(),
                 id_gen(),
                 offset(),

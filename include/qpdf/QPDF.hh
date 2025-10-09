@@ -743,8 +743,6 @@ class QPDF
 
     class ObjCache;
     class EncryptionParameters;
-    class ForeignStreamData;
-    class CopiedStreamDataProvider;
     class StringDecrypter;
     class ResolveRecorder;
     class JSONReactor;
@@ -774,8 +772,6 @@ class QPDF
         Pipeline* pipeline,
         bool suppress_warnings,
         bool will_retry);
-    bool
-    pipeForeignStreamData(ForeignStreamData&, Pipeline*, bool suppress_warnings, bool will_retry);
     static bool pipeStreamData(
         std::shared_ptr<QPDF::EncryptionParameters> encp,
         std::shared_ptr<InputSource> file,
@@ -803,9 +799,6 @@ class QPDF
         QPDFObjectHandle& stream_dict,
         bool is_root_metadata,
         std::unique_ptr<Pipeline>& heap);
-
-    // Methods to support object copying
-    void copyStreamData(QPDFObjectHandle dest_stream, QPDFObjectHandle src_stream);
 
     struct HPageOffsetEntry;
     struct HPageOffset;
