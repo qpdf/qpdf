@@ -28,6 +28,8 @@ using namespace qpdf;
 using namespace std::literals;
 
 using Objects = QPDF::Doc::Objects;
+using Foreign = Objects::Foreign;
+using Streams = Objects::Streams;
 
 // This must be a fixed value. This API returns a const reference to it, and the C API relies on its
 // being static as well.
@@ -122,24 +124,24 @@ QPDF::ForeignStreamData::ForeignStreamData(
 {
 }
 
-QPDF::CopiedStreamDataProvider::CopiedStreamDataProvider(QPDF& destination_qpdf) :
+Streams::Copier::Copier(QPDF& qpdf) :
     QPDFObjectHandle::StreamDataProvider(true),
-    destination_qpdf(destination_qpdf)
+    qpdf(qpdf)
 {
 }
 
 bool
-QPDF::CopiedStreamDataProvider::provideStreamData(
+Streams::Copier::provideStreamData(
     QPDFObjGen const& og, Pipeline* pipeline, bool suppress_warnings, bool will_retry)
 {
-    auto foreign_data = foreign_stream_data.find(og);
+    auto foreign_data = copied_data.find(og);
     bool result = false;
-    if (foreign_data != foreign_stream_data.end()) {
-        result = destination_qpdf.pipeForeignStreamData(
+    if (foreign_data != copied_data.end()) {
+        result = qpdf.pipeForeignStreamData(
             foreign_data->second, pipeline, suppress_warnings, will_retry);
         QTC::TC("qpdf", "QPDF copy foreign with data", result ? 0 : 1);
     } else {
-        auto foreign_stream = foreign_streams[og];
+        auto foreign_stream = copied_streams[og];
         result = foreign_stream.pipeStreamData(
             pipeline, nullptr, 0, qpdf_dl_none, suppress_warnings, will_retry);
         QTC::TC("qpdf", "QPDF copy foreign with foreign_stream", result ? 0 : 1);
@@ -669,9 +671,6 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign_oh)
 
     Dictionary dict = result.getDict();
     Dictionary old_dict = foreign_oh.getDict();
-    if (!m->copied_stream_data_provider) {
-        m->copied_stream_data_provider = std::make_shared<CopiedStreamDataProvider>(*this);
-    }
     QPDFObjGen local_og(result.getObjGen());
     // Copy information from the foreign stream so we can pipe its data later without keeping the
     // original QPDF object around.
@@ -697,14 +696,14 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign_oh)
         result.replaceStreamData(stream_buffer, dict["/Filter"], dict["/DecodeParms"]);
     } else if (stream_provider) {
         // In this case, the remote stream's QPDF must stay in scope.
-        m->copied_stream_data_provider->registerForeignStream(local_og, foreign_oh);
+        m->objects.streams().copier()->register_copy(local_og, foreign_oh);
         result.replaceStreamData(
-            m->copied_stream_data_provider, dict["/Filter"], dict["/DecodeParms"]);
+            m->objects.streams().copier(), dict["/Filter"], dict["/DecodeParms"]);
     } else {
         auto foreign_stream_data = ForeignStreamData(foreign, foreign_oh.offset(), dict);
-        m->copied_stream_data_provider->registerForeignStream(local_og, foreign_stream_data);
+        m->objects.streams().copier()->register_copy(local_og, foreign_stream_data);
         result.replaceStreamData(
-            m->copied_stream_data_provider, dict["/Filter"], dict["/DecodeParms"]);
+            m->objects.streams().copier(), dict["/Filter"], dict["/DecodeParms"]);
     }
 }
 
