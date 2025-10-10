@@ -30,12 +30,7 @@ std::vector<QPDFPageObjectHelper>
 QPDFPageDocumentHelper::getAllPages()
 {
     auto& pp = qpdf.doc().pages();
-    std::vector<QPDFPageObjectHelper> pages;
-    pages.reserve(pp.size());
-    for (auto const& iter: pp.all()) {
-        pages.emplace_back(iter);
-    }
-    return pages;
+    return {pp.begin(), pp.end()};
 }
 
 void

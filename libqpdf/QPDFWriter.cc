@@ -2128,7 +2128,7 @@ QPDFWriter::Members::initializeSpecialStreams()
 {
     // Mark all page content streams in case we are filtering or normalizing.
     int num = 0;
-    for (auto& page: pages.all()) {
+    for (auto& page: pages) {
         page_object_to_seq[page.getObjGen()] = ++num;
         QPDFObjectHandle contents = page.getKey("/Contents");
         std::vector<QPDFObjGen> contents_objects;
@@ -2380,7 +2380,7 @@ QPDFWriter::Members::doWriteSetup()
     if (!obj.streams_empty) {
         if (linearized) {
             // Page dictionaries are not allowed to be compressed objects.
-            for (auto& page: qpdf.doc().pages().all()) {
+            for (auto& page: pages) {
                 if (obj[page].object_stream > 0) {
                     obj[page].object_stream = 0;
                 }
@@ -3133,7 +3133,7 @@ QPDFWriter::Members::enqueueObjectsPCLm()
     std::string image_transform_content = "q /image Do Q\n";
 
     // enqueue all pages first
-    for (auto& page: pages.all()) {
+    for (auto& page: pages) {
         // enqueue page
         enqueueObject(page);
 

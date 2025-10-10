@@ -1108,7 +1108,7 @@ Lin::calculateLinearizationData(T const& object_stream_data)
     { // local scope
         // Map all page objects to the containing object stream.  This should be a no-op in a
         // properly linearized file.
-        for (auto oh: pages.all()) {
+        for (auto oh: pages) {
             uc_pages.emplace_back(getUncompressedObject(oh, object_stream_data));
         }
     }

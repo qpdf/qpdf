@@ -853,6 +853,8 @@ class QPDF::Doc::Objects: Common
 class QPDF::Doc::Pages: Common
 {
   public:
+    using iterator = std::vector<QPDFObjectHandle>::const_iterator;
+
     Pages() = delete;
     Pages(Pages const&) = delete;
     Pages(Pages&&) = delete;
@@ -881,6 +883,18 @@ class QPDF::Doc::Pages: Common
     size()
     {
         return all().size();
+    }
+
+    iterator
+    begin()
+    {
+        return all().cbegin();
+    }
+
+    iterator
+    end()
+    {
+        return all().cend();
     }
 
     int find(QPDFObjGen og);

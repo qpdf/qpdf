@@ -99,7 +99,7 @@ Lin::optimize_internal(
     // Traverse pages
 
     size_t n = 0;
-    for (auto const& page: m->pages.all()) {
+    for (auto const& page: m->pages) {
         updateObjectMaps(ObjUser(ObjUser::ou_page, n), page, skip_stream_parameters);
         ++n;
     }

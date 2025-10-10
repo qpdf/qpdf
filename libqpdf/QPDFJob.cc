@@ -855,7 +855,7 @@ QPDFJob::doShowPages(QPDF& pdf)
 {
     int pageno = 0;
     auto& cout = *m->log->getInfo();
-    for (auto& page: pdf.doc().pages().all()) {
+    for (auto& page: pdf.doc().pages()) {
         QPDFPageObjectHelper ph(page);
         ++pageno;
 
@@ -1050,7 +1050,7 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
     auto& pldh = doc.page_labels();
     auto& odh = doc.outlines();
     int pageno = -1;
-    for (auto& page: doc.pages().all()) {
+    for (auto& page: doc.pages()) {
         ++pageno;
         JSON j_page = JSON::makeDictionary();
         QPDFPageObjectHelper ph(page);
@@ -1112,7 +1112,7 @@ QPDFJob::doJSONPageLabels(Pipeline* p, bool& first, QPDF& pdf)
     auto& doc = pdf.doc();
     JSON j_labels = JSON::makeArray();
     auto& pldh = doc.page_labels();
-    long long npages = QIntC::to_longlong(doc.pages().all().size());
+    long long npages = QIntC::to_longlong(doc.pages().size());
     if (pldh.hasPageLabels()) {
         std::vector<QPDFObjectHandle> labels;
         pldh.getLabelsForPageRange(0, npages - 1, 0, labels);
@@ -1161,7 +1161,7 @@ QPDFJob::doJSONOutlines(Pipeline* p, bool& first, QPDF& pdf)
     auto& doc = pdf.doc();
     std::map<QPDFObjGen, int> page_numbers;
     int n = 0;
-    for (auto const& oh: doc.pages().all()) {
+    for (auto const& oh: doc.pages()) {
         page_numbers[oh] = ++n;
     }
 
@@ -1180,7 +1180,7 @@ QPDFJob::doJSONAcroform(Pipeline* p, bool& first, QPDF& pdf)
     j_acroform.addDictionaryMember("needappearances", JSON::makeBool(afdh.getNeedAppearances()));
     JSON j_fields = j_acroform.addDictionaryMember("fields", JSON::makeArray());
     int pagepos1 = 0;
-    for (auto const& page: doc.pages().all()) {
+    for (auto const& page: doc.pages()) {
         ++pagepos1;
         for (auto& aoh: afdh.getWidgetAnnotationsForPage({page})) {
             QPDFFormFieldObjectHelper ffh = afdh.getFieldForAnnotation(aoh);
@@ -1858,8 +1858,8 @@ QPDFJob::validateUnderOverlay(QPDF& pdf, UnderOverlay* uo)
 {
     processFile(uo->pdf, uo->filename.data(), uo->password.data(), true, false);
     try {
-        uo->to_pagenos = QUtil::parse_numrange(
-            uo->to_nr.data(), static_cast<int>(pdf.doc().pages().all().size()));
+        uo->to_pagenos =
+            QUtil::parse_numrange(uo->to_nr.data(), static_cast<int>(pdf.doc().pages().size()));
     } catch (std::runtime_error& e) {
         throw std::runtime_error(
             "parsing numeric range for " + uo->which + " \"to\" pages: " + e.what());
@@ -2355,8 +2355,8 @@ void
 QPDFJob::Input::initialize(Inputs& in, QPDF* a_qpdf)
 {
     qpdf = a_qpdf ? a_qpdf : qpdf_p.get();
-    auto& doc = qpdf->doc();
     if (qpdf) {
+        auto& doc = qpdf->doc();
         orig_pages = doc.pages().all();
         n_pages = static_cast<int>(orig_pages.size());
         copied_pages = std::vector<bool>(orig_pages.size(), false);

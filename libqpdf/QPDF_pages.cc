@@ -494,7 +494,7 @@ QPDF::removePage(QPDFObjectHandle page)
 }
 
 void
-Pages ::erase(QPDFObjectHandle& page)
+Pages::erase(QPDFObjectHandle& page)
 {
     int pos = qpdf.findPage(page); // also ensures flat /Pages
     QTC::TC(
@@ -551,7 +551,7 @@ QPDF::findPage(QPDFObjGen og)
 }
 
 int
-Pages ::find(QPDFObjGen og)
+Pages::find(QPDFObjGen og)
 {
     flattenPagesTree();
     auto it = pageobj_to_pages_pos.find(og);
