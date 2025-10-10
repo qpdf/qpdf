@@ -865,7 +865,11 @@ class QPDF::Doc::Pages: Common
     {
     }
 
-    std::vector<QPDFObjectHandle> const& all();
+    std::vector<QPDFObjectHandle> const&
+    all()
+    {
+        return !all_pages.empty() ? all_pages : cache();
+    }
 
     bool
     empty()
@@ -906,7 +910,7 @@ class QPDF::Doc::Pages: Common
         std::map<std::string, std::vector<QPDFObjectHandle>>&,
         bool allow_changes,
         bool warn_skipped_keys);
-
+    std::vector<QPDFObjectHandle> const& cache();
     void getAllPagesInternal(
         QPDFObjectHandle cur_pages,
         QPDFObjGen::set& visited,

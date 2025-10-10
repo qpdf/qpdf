@@ -4,6 +4,7 @@
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 
 // In support of page manipulation APIs, these methods internally maintain state about pages in a
 // pair of data structures: all_pages, which is a vector of page objects, and pageobj_to_pages_pos,
@@ -46,7 +47,7 @@ QPDF::getAllPages()
 }
 
 std::vector<QPDFObjectHandle> const&
-Pages::all()
+Pages::cache()
 {
     // Note that pushInheritedAttributesToPage may also be used to initialize m->all_pages.
     if (all_pages.empty() && !invalid_page_found) {
@@ -253,7 +254,7 @@ Pages::update_cache()
     all_pages.clear();
     pageobj_to_pages_pos.clear();
     pushed_inherited_attributes_to_pages = false;
-    all();
+    cache();
 }
 
 void
@@ -309,9 +310,9 @@ Pages::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
         return;
     }
 
-    // Calling getAllPages() resolves any duplicated page objects, repairs broken nodes, and detects
+    // Calling cache() resolves any duplicated page objects, repairs broken nodes, and detects
     // loops, so we don't have to do those activities here.
-    (void)all();
+    (void)cache();
 
     // key_ancestors is a mapping of page attribute keys to a stack of Pages nodes that contain
     // values for them.
@@ -321,10 +322,9 @@ Pages::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
         key_ancestors,
         allow_changes,
         warn_skipped_keys);
-    if (!key_ancestors.empty()) {
-        throw std::logic_error(
-            "key_ancestors not empty after pushing inherited attributes to pages");
-    }
+    util::assertion(
+        key_ancestors.empty(),
+        "key_ancestors not empty after pushing inherited attributes to pages");
     pushed_inherited_attributes_to_pages = true;
     ever_pushed_inherited_attributes_to_pages_ = true;
 }
