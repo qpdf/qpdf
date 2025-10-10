@@ -96,12 +96,12 @@ Lin::optimize_internal(
     // Traverse pages tree pushing all inherited resources down to the page level.  This also
     // initializes m->all_pages.
     m->pages.pushInheritedAttributesToPage(allow_changes, false);
-
     // Traverse pages
-    size_t n = m->all_pages.size();
-    for (size_t pageno = 0; pageno < n; ++pageno) {
-        updateObjectMaps(
-            ObjUser(ObjUser::ou_page, pageno), m->all_pages.at(pageno), skip_stream_parameters);
+
+    size_t n = 0;
+    for (auto const& page: m->pages.all()) {
+        updateObjectMaps(ObjUser(ObjUser::ou_page, n), page, skip_stream_parameters);
+        ++n;
     }
 
     // Traverse document-level items

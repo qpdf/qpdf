@@ -883,6 +883,18 @@ class QPDF::Doc::Pages: Common
     void erase(QPDFObjectHandle& page);
     void update_cache();
 
+    bool
+    ever_pushed_inherited_attributes_to_pages() const
+    {
+        return ever_pushed_inherited_attributes_to_pages_;
+    }
+
+    bool
+    ever_called_get_all_pages() const
+    {
+        return ever_called_get_all_pages_;
+    }
+
     void insertPage(QPDFObjectHandle newpage, int pos);
     void pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys);
 
@@ -901,6 +913,14 @@ class QPDF::Doc::Pages: Common
         QPDFObjGen::set& seen,
         bool media_box,
         bool resources);
+
+    std::vector<QPDFObjectHandle> all_pages;
+    std::map<QPDFObjGen, int> pageobj_to_pages_pos;
+
+    bool pushed_inherited_attributes_to_pages{false};
+    bool invalid_page_found{false};
+    bool ever_pushed_inherited_attributes_to_pages_{false};
+    bool ever_called_get_all_pages_{false};
 
 }; // class QPDF::Doc::Pages
 
@@ -941,12 +961,6 @@ class QPDF::Members: Doc
     std::map<QPDFObjGen, ObjCache> obj_cache;
     std::set<QPDFObjGen> resolving;
     QPDFObjectHandle trailer;
-    std::vector<QPDFObjectHandle> all_pages;
-    bool invalid_page_found{false};
-    std::map<QPDFObjGen, int> pageobj_to_pages_pos;
-    bool pushed_inherited_attributes_to_pages{false};
-    bool ever_pushed_inherited_attributes_to_pages{false};
-    bool ever_called_get_all_pages{false};
     std::vector<QPDFExc> warnings;
     bool reconstructed_xref{false};
     bool in_read_xref_stream{false};

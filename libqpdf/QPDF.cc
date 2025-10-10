@@ -889,13 +889,13 @@ Common::damagedPDF(std::string const& message) const
 bool
 QPDF::everCalledGetAllPages() const
 {
-    return m->ever_called_get_all_pages;
+    return m->pages.ever_called_get_all_pages();
 }
 
 bool
 QPDF::everPushedInheritedAttributesToPages() const
 {
-    return m->ever_pushed_inherited_attributes_to_pages;
+    return m->pages.ever_pushed_inherited_attributes_to_pages();
 }
 
 void
