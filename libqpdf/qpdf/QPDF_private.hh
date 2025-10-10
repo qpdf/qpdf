@@ -316,11 +316,7 @@ class QPDF::Doc
         Common& operator=(Common&&) = delete;
         ~Common() = default;
 
-        Common(QPDF& qpdf, QPDF::Members* m) :
-            qpdf(qpdf),
-            m(m)
-        {
-        }
+        inline Common(QPDF& qpdf, QPDF::Members* m);
 
         void stopOnError(std::string const& message);
         void warn(QPDFExc const& e);
@@ -355,6 +351,8 @@ class QPDF::Doc
       protected:
         QPDF& qpdf;
         QPDF::Members* m;
+
+        QPDF::Doc::Pages& pages;
     };
 
     Doc() = delete;
@@ -1000,6 +998,13 @@ class QPDF::Doc::Resolver
         return qpdf->m->objects.resolve(og);
     }
 };
+
+inline QPDF::Doc::Common::Common(QPDF& qpdf, QPDF::Members* m) :
+    qpdf(qpdf),
+    m(m),
+    pages(m->pages)
+{
+}
 
 inline QPDF::Doc::Linearization&
 QPDF::Doc::linearization()

@@ -2127,9 +2127,8 @@ void
 QPDFWriter::Members::initializeSpecialStreams()
 {
     // Mark all page content streams in case we are filtering or normalizing.
-    std::vector<QPDFObjectHandle> pages = qpdf.getAllPages();
     int num = 0;
-    for (auto& page: pages) {
+    for (auto& page: pages.all()) {
         page_object_to_seq[page.getObjGen()] = ++num;
         QPDFObjectHandle contents = page.getKey("/Contents");
         std::vector<QPDFObjGen> contents_objects;
@@ -2381,7 +2380,7 @@ QPDFWriter::Members::doWriteSetup()
     if (!obj.streams_empty) {
         if (linearized) {
             // Page dictionaries are not allowed to be compressed objects.
-            for (auto& page: qpdf.getAllPages()) {
+            for (auto& page: qpdf.doc().pages().all()) {
                 if (obj[page].object_stream > 0) {
                     obj[page].object_stream = 0;
                 }
@@ -2911,14 +2910,11 @@ QPDFWriter::Members::writeLinearized()
         openObject(lindict_id);
         write("<<");
         if (pass == 2) {
-            std::vector<QPDFObjectHandle> const& pages = qpdf.getAllPages();
-            int first_page_object = obj[pages.at(0)].renumber;
-
             write(" /Linearized 1 /L ").write(file_size + hint_length);
             // Implementation note 121 states that a space is mandatory after this open bracket.
             write(" /H [ ").write(new_obj[hint_id].xref.getOffset()).write(" ");
             write(hint_length);
-            write(" ] /O ").write(first_page_object);
+            write(" ] /O ").write(obj[pages.all().at(0)].renumber);
             write(" /E ").write(part6_end_offset + hint_length);
             write(" /N ").write(pages.size());
             write(" /T ").write(space_before_zero + hint_length);
@@ -3137,17 +3133,15 @@ QPDFWriter::Members::enqueueObjectsPCLm()
     std::string image_transform_content = "q /image Do Q\n";
 
     // enqueue all pages first
-    std::vector<QPDFObjectHandle> all = qpdf.getAllPages();
-    for (auto& page: all) {
+    for (auto& page: pages.all()) {
         // enqueue page
         enqueueObject(page);
 
         // enqueue page contents stream
-        enqueueObject(page.getKey("/Contents"));
+        enqueueObject(page["/Contents"]);
 
         // enqueue all the strips for each page
-        QPDFObjectHandle strips = page.getKey("/Resources").getKey("/XObject");
-        for (auto& image: strips.as_dictionary()) {
+        for (auto& image: Dictionary(page["/Resources"]["/XObject"])) {
             if (!image.second.null()) {
                 enqueueObject(image.second);
                 enqueueObject(QPDFObjectHandle::newStream(&qpdf, image_transform_content));
