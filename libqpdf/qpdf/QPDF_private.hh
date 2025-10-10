@@ -867,12 +867,20 @@ class QPDF::Doc::Pages: Common
     {
     }
 
-    void getAllPagesInternal(
-        QPDFObjectHandle cur_pages,
-        QPDFObjGen::set& visited,
-        QPDFObjGen::set& seen,
-        bool media_box,
-        bool resources);
+    std::vector<QPDFObjectHandle> const& all();
+
+    bool
+    empty()
+    {
+        return all().empty();
+    }
+
+    size_t
+    size()
+    {
+        return all().size();
+    }
+
     void insertPage(QPDFObjectHandle newpage, int pos);
     void flattenPagesTree();
     void insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_duplicate);
@@ -882,6 +890,15 @@ class QPDF::Doc::Pages: Common
         std::map<std::string, std::vector<QPDFObjectHandle>>&,
         bool allow_changes,
         bool warn_skipped_keys);
+
+  private:
+    void getAllPagesInternal(
+        QPDFObjectHandle cur_pages,
+        QPDFObjGen::set& visited,
+        QPDFObjGen::set& seen,
+        bool media_box,
+        bool resources);
+
 }; // class QPDF::Doc::Pages
 
 class QPDF::Members: Doc

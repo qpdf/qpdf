@@ -42,10 +42,16 @@ using Pages = QPDF::Doc::Pages;
 std::vector<QPDFObjectHandle> const&
 QPDF::getAllPages()
 {
+    return m->pages.all();
+}
+
+std::vector<QPDFObjectHandle> const&
+Pages::all()
+{
     // Note that pushInheritedAttributesToPage may also be used to initialize m->all_pages.
     if (m->all_pages.empty() && !m->invalid_page_found) {
         m->ever_called_get_all_pages = true;
-        auto root = getRoot();
+        auto root = qpdf.getRoot();
         QPDFObjGen::set visited;
         QPDFObjGen::set seen;
         QPDFObjectHandle pages = root.getKey("/Pages");
@@ -77,14 +83,14 @@ QPDF::getAllPages()
                 qpdf_e_pages, m->file->getName(), "", 0, "root of pages tree has no /Kids array");
         }
         try {
-            m->pages.getAllPagesInternal(pages, visited, seen, false, false);
+            getAllPagesInternal(pages, visited, seen, false, false);
         } catch (...) {
             m->all_pages.clear();
             m->invalid_page_found = false;
             throw;
         }
         if (m->invalid_page_found) {
-            m->pages.flattenPagesTree();
+            flattenPagesTree();
             m->invalid_page_found = false;
         }
     }
