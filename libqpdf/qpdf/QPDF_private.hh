@@ -879,17 +879,22 @@ class QPDF::Doc::Pages: Common
         return all().size();
     }
 
+    int find(QPDFObjGen og);
+    void erase(QPDFObjectHandle& page);
+    void update_cache();
+
     void insertPage(QPDFObjectHandle newpage, int pos);
+    void pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys);
+
+  private:
     void flattenPagesTree();
     void insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_duplicate);
-    void pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys);
     void pushInheritedAttributesToPageInternal(
         QPDFObjectHandle,
         std::map<std::string, std::vector<QPDFObjectHandle>>&,
         bool allow_changes,
         bool warn_skipped_keys);
 
-  private:
     void getAllPagesInternal(
         QPDFObjectHandle cur_pages,
         QPDFObjGen::set& visited,

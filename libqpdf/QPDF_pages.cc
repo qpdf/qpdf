@@ -241,13 +241,19 @@ Pages::getAllPagesInternal(
 void
 QPDF::updateAllPagesCache()
 {
+    m->pages.update_cache();
+}
+
+void
+Pages::update_cache()
+{
     // Force regeneration of the pages cache.  We force immediate recalculation of all_pages since
     // users may have references to it that they got from calls to getAllPages().  We can defer
     // recalculation of pageobj_to_pages_pos until needed.
     m->all_pages.clear();
     m->pageobj_to_pages_pos.clear();
     m->pushed_inherited_attributes_to_pages = false;
-    getAllPages();
+    all();
 }
 
 void
@@ -274,11 +280,11 @@ Pages::flattenPagesTree()
         m->all_pages.at(pos).replaceKey("/Parent", pages);
     }
 
-    pages.replaceKey("/Kids", QPDFObjectHandle::newArray(m->all_pages));
+    pages.replaceKey("/Kids", Array(m->all_pages));
     // /Count has not changed
     if (pages.getKey("/Count").getUIntValue() != len) {
         if (m->invalid_page_found && pages.getKey("/Count").getUIntValue() > len) {
-            pages.replaceKey("/Count", QPDFObjectHandle::newInteger(toI(len)));
+            pages.replaceKey("/Count", Integer(len));
         } else {
             throw std::runtime_error("/Count is wrong after flattening pages tree");
         }
@@ -484,7 +490,13 @@ Pages::insertPage(QPDFObjectHandle newpage, int pos)
 void
 QPDF::removePage(QPDFObjectHandle page)
 {
-    int pos = findPage(page); // also ensures flat /Pages
+    m->pages.erase(page);
+}
+
+void
+Pages ::erase(QPDFObjectHandle& page)
+{
+    int pos = qpdf.findPage(page); // also ensures flat /Pages
     QTC::TC(
         "qpdf",
         "QPDF remove page",
@@ -492,7 +504,7 @@ QPDF::removePage(QPDFObjectHandle page)
             (pos == toI(m->all_pages.size() - 1)) ? 1   // end
                                                   : 2); // remove in middle
 
-    QPDFObjectHandle pages = getRoot().getKey("/Pages");
+    QPDFObjectHandle pages = qpdf.getRoot().getKey("/Pages");
     QPDFObjectHandle kids = pages.getKey("/Kids");
 
     kids.eraseItem(pos);
@@ -535,7 +547,13 @@ QPDF::findPage(QPDFObjectHandle& page)
 int
 QPDF::findPage(QPDFObjGen og)
 {
-    m->pages.flattenPagesTree();
+    return m->pages.find(og);
+}
+
+int
+Pages ::find(QPDFObjGen og)
+{
+    flattenPagesTree();
     auto it = m->pageobj_to_pages_pos.find(og);
     if (it == m->pageobj_to_pages_pos.end()) {
         throw QPDFExc(
