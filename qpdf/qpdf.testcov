@@ -383,8 +383,6 @@ qpdf-c warn about oh error 1
 qpdf-c cleanup warned about unhandled error 0
 qpdf-c called qpdf_get_object_by_id 0
 qpdf-c called qpdf_replace_object 0
-qpdf-c called qpdf_num_pages 0
-qpdf-c called qpdf_get_page_n 0
 qpdf-c called qpdf_update_all_pages_cache 0
 qpdf-c called qpdf_find_page_by_id 0
 qpdf-c called qpdf_find_page_by_oh 0
@@ -422,10 +420,7 @@ qpdf-c called qpdf_empty_pdf 0
 QPDF_json missing qpdf 0
 QPDF_json missing pdf version 0
 QPDF_json top-level scalar 0
-QPDF_json bad pdf version 0
 QPDF_json top-level array 0
-QPDF_json bad object key 0
-QPDF_json trailer stream 0
 QPDF_json missing trailer 0
 QPDF_json missing objects 0
 QPDF_json ignoring in st_ignore 0
@@ -446,17 +441,12 @@ QPDF_json ignore unknown key in stream 0
 QPDF_json data and datafile 0
 QPDF_json no stream data in update mode 0
 QPDF_json updating existing stream 0
-QPDF_json qpdf not array 0
 QPDF_json more than two qpdf elements 0
 QPDF_json missing json version 0
-QPDF_json bad json version 0
-QPDF_json bad calledgetallpages 0
-QPDF_json bad pushedinheritedpageresources 0
 QPDFPageObjectHelper used fallback without copying 0
 QPDF skipping cache for known unchecked object 0
 QPDF recover xref stream 0
 QPDFJob json over/under no file 0
 QPDF_Array copy 1
-QPDF_json stream data not string 0
 QPDF_json stream datafile not string 0
 QPDF_json stream not a dictionary 0

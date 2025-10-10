@@ -29,8 +29,10 @@ QPDFPageDocumentHelper::validate(bool repair)
 std::vector<QPDFPageObjectHelper>
 QPDFPageDocumentHelper::getAllPages()
 {
+    auto& pp = qpdf.doc().pages();
     std::vector<QPDFPageObjectHelper> pages;
-    for (auto const& iter: qpdf.getAllPages()) {
+    pages.reserve(pp.size());
+    for (auto const& iter: pp.all()) {
         pages.emplace_back(iter);
     }
     return pages;

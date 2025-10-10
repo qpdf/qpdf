@@ -305,7 +305,7 @@ Pages::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
 
     // Calling getAllPages() resolves any duplicated page objects, repairs broken nodes, and detects
     // loops, so we don't have to do those activities here.
-    qpdf.getAllPages();
+    (void)all();
 
     // key_ancestors is a mapping of page attribute keys to a stack of Pages nodes that contain
     // values for them.

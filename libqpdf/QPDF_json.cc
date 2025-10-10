@@ -466,7 +466,6 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
         if (key == "qpdf") {
             this->saw_qpdf = true;
             if (!value.isArray()) {
-                QTC::TC("qpdf", "QPDF_json qpdf not array");
                 error(value.getStart(), "\"qpdf\" must be an array");
             } else {
                 next_state = st_qpdf;
@@ -489,7 +488,6 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                 }
             }
             if (!okay) {
-                QTC::TC("qpdf", "QPDF_json bad pdf version");
                 error(value.getStart(), "invalid PDF version (must be \"x.y\")");
             }
         } else if (key == "jsonversion") {
@@ -503,7 +501,6 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                 }
             }
             if (!okay) {
-                QTC::TC("qpdf", "QPDF_json bad json version");
                 error(value.getStart(), "invalid JSON version (must be numeric value 2)");
             }
         } else if (key == "pushedinheritedpageresources") {
@@ -513,17 +510,15 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                     this->pdf.pushInheritedAttributesToPage();
                 }
             } else {
-                QTC::TC("qpdf", "QPDF_json bad pushedinheritedpageresources");
                 error(value.getStart(), "pushedinheritedpageresources must be a boolean");
             }
         } else if (key == "calledgetallpages") {
             bool v;
             if (value.getBool(v)) {
                 if (!this->must_be_complete && v) {
-                    this->pdf.getAllPages();
+                    (void)pdf.doc().pages().all();
                 }
             } else {
-                QTC::TC("qpdf", "QPDF_json bad calledgetallpages");
                 error(value.getStart(), "calledgetallpages must be a boolean");
             }
         } else {
@@ -544,7 +539,6 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
                 next_obj = objects.getObjectForJSON(obj, gen);
             }
         } else {
-            QTC::TC("qpdf", "QPDF_json bad object key");
             error(value.getStart(), "object key should be \"trailer\" or \"obj:n n R\"");
         }
     } else if (state == st_object_top) {
@@ -592,7 +586,6 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             }
         } else if (key == "stream") {
             // Don't need to set saw_stream here since there's already an error.
-            QTC::TC("qpdf", "QPDF_json trailer stream");
             error(value.getStart(), "the trailer may not be a stream");
         } else {
             // Ignore unknown keys for forward compatibility
@@ -618,7 +611,6 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             this->saw_data = true;
             std::string v;
             if (!value.getString(v)) {
-                QTC::TC("qpdf", "QPDF_json stream data not string");
                 error(value.getStart(), "\"stream.data\" must be a string");
                 tos.object.replaceStreamData("", {}, {});
             } else {

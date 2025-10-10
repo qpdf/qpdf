@@ -389,13 +389,11 @@ Objects::reconstruct_xref(QPDFExc& e, bool found_startxref)
     }
     check_warnings();
     if (!m->parsed) {
-        m->parsed = true;
-        qpdf.getAllPages();
-        check_warnings();
-        if (m->all_pages.empty()) {
-            m->parsed = false;
+        m->parsed = !m->pages.empty();
+        if (!m->parsed) {
             throw damagedPDF("", -1, "unable to find any pages while recovering damaged file");
         }
+        check_warnings();
     }
 
     // We could iterate through the objects looking for streams and try to find objects inside of

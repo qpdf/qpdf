@@ -2099,22 +2099,22 @@ bool
 QPDFObjectHandle::isPageObject() const
 {
     // See comments in QPDFObjectHandle.hh.
-    if (getOwningQPDF() == nullptr) {
+    if (!qpdf()) {
         return false;
     }
     // getAllPages repairs /Type when traversing the page tree.
-    getOwningQPDF()->getAllPages();
+    (void)qpdf()->doc().pages().all();
     return isDictionaryOfType("/Page");
 }
 
 bool
 QPDFObjectHandle::isPagesObject() const
 {
-    if (getOwningQPDF() == nullptr) {
+    if (!qpdf()) {
         return false;
     }
     // getAllPages repairs /Type when traversing the page tree.
-    getOwningQPDF()->getAllPages();
+    (void)qpdf()->doc().pages().all();
     return isDictionaryOfType("/Pages");
 }
 
