@@ -224,14 +224,8 @@ QPDFAnnotationObjectHelper default matrix 0
 QPDFAnnotationObjectHelper rotate 90 0
 QPDFAnnotationObjectHelper rotate 180 0
 QPDFAnnotationObjectHelper rotate 270 0
-QPDFPageDocumentHelper skip widget need appearances 0
-QPDFPageDocumentHelper merge DR 0
 QPDFPageDocumentHelper non-widget annotation 0
-QPDFPageDocumentHelper remove annots 0
-QPDFPageDocumentHelper replace indirect annots 0
-QPDFPageDocumentHelper replace direct annots 0
 QPDFObjectHandle replace with copy 0
-QPDFPageDocumentHelper indirect as resources 0
 QPDFAnnotationObjectHelper forbidden flags 0
 QPDFAnnotationObjectHelper missing required flags 0
 QPDFFormFieldObjectHelper checkbox kid widget 0
@@ -255,7 +249,6 @@ QPDFJob auto-encode password 0
 QPDFJob bytes fallback warning 0
 QPDFJob invalid utf-8 in auto 0
 QPDFJob input password hex-bytes 0
-QPDFPageDocumentHelper ignore annotation with no appearance 0
 QPDFFormFieldObjectHelper replaced BMC at EOF 0
 QPDFFormFieldObjectHelper fallback Tf 0
 QPDFPageObjectHelper copy shared attribute 1

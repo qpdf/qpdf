@@ -631,6 +631,12 @@ QPDFPageDocumentHelper::removePage(QPDFPageObjectHelper page)
 void
 QPDFPageDocumentHelper::flattenAnnotations(int required_flags, int forbidden_flags)
 {
+    qpdf.doc().pages().flatten_annotations(required_flags, forbidden_flags);
+}
+
+void
+Pages::flatten_annotations(int required_flags, int forbidden_flags)
+{
     auto& afdh = qpdf.doc().acroform();
     if (afdh.getNeedAppearances()) {
         qpdf.getRoot()
@@ -639,14 +645,13 @@ QPDFPageDocumentHelper::flattenAnnotations(int required_flags, int forbidden_fla
                 "document does not have updated appearance streams, so form fields "
                 "will not be flattened");
     }
-    for (auto& ph: getAllPages()) {
+    for (QPDFPageObjectHelper ph: all()) {
         QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
         if (!resources.isDictionary()) {
             // As of #1521, this should be impossible unless a user inserted an invalid page.
-            resources = ph.getObjectHandle().replaceKeyAndGetNew(
-                "/Resources", QPDFObjectHandle::newDictionary());
+            resources = ph.getObjectHandle().replaceKeyAndGetNew("/Resources", Dictionary::empty());
         }
-        flattenAnnotationsForPage(ph, resources, afdh, required_flags, forbidden_flags);
+        flatten_annotations_for_page(ph, resources, afdh, required_flags, forbidden_flags);
     }
     if (!afdh.getNeedAppearances()) {
         qpdf.getRoot().removeKey("/AcroForm");
@@ -654,7 +659,7 @@ QPDFPageDocumentHelper::flattenAnnotations(int required_flags, int forbidden_fla
 }
 
 void
-QPDFPageDocumentHelper::flattenAnnotationsForPage(
+Pages::flatten_annotations_for_page(
     QPDFPageObjectHelper& page,
     QPDFObjectHandle& resources,
     QPDFAcroFormDocumentHelper& afdh,
@@ -676,16 +681,14 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
         bool is_widget = (aoh.getSubtype() == "/Widget");
         bool process = true;
         if (need_appearances && is_widget) {
-            QTC::TC("qpdf", "QPDFPageDocumentHelper skip widget need appearances");
             process = false;
         }
         if (process && as.isStream()) {
             if (is_widget) {
-                QTC::TC("qpdf", "QPDFPageDocumentHelper merge DR");
                 QPDFFormFieldObjectHelper ff = afdh.getFieldForAnnotation(aoh);
                 QPDFObjectHandle as_resources = as.getDict().getKey("/Resources");
                 if (as_resources.isIndirect()) {
-                    QTC::TC("qpdf", "QPDFPageDocumentHelper indirect as resources");
+                    ;
                     as.getDict().replaceKey("/Resources", as_resources.shallowCopy());
                     as_resources = as.getDict().getKey("/Resources");
                 }
@@ -708,7 +711,6 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
             // associated with comments that aren't visible, and other types of annotations that
             // aren't visible. Annotations that have no appearance streams at all, such as Link,
             // Popup, and Projection, should be preserved.
-            QTC::TC("qpdf", "QPDFPageDocumentHelper ignore annotation with no appearance");
         } else {
             new_annots.push_back(aoh.getObjectHandle());
         }
@@ -716,16 +718,13 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
     if (new_annots.size() != annots.size()) {
         QPDFObjectHandle page_oh = page.getObjectHandle();
         if (new_annots.empty()) {
-            QTC::TC("qpdf", "QPDFPageDocumentHelper remove annots");
             page_oh.removeKey("/Annots");
         } else {
             QPDFObjectHandle old_annots = page_oh.getKey("/Annots");
             QPDFObjectHandle new_annots_oh = QPDFObjectHandle::newArray(new_annots);
             if (old_annots.isIndirect()) {
-                QTC::TC("qpdf", "QPDFPageDocumentHelper replace indirect annots");
                 qpdf.replaceObject(old_annots.getObjGen(), new_annots_oh);
             } else {
-                QTC::TC("qpdf", "QPDFPageDocumentHelper replace direct annots");
                 page_oh.replaceKey("/Annots", new_annots_oh);
             }
         }

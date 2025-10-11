@@ -900,6 +900,7 @@ class QPDF::Doc::Pages: Common
     int find(QPDFObjGen og);
     void erase(QPDFObjectHandle& page);
     void update_cache();
+    void flatten_annotations(int required_flags, int forbidden_flags);
 
     bool
     ever_pushed_inherited_attributes_to_pages() const
@@ -931,6 +932,12 @@ class QPDF::Doc::Pages: Common
         QPDFObjGen::set& seen,
         bool media_box,
         bool resources);
+    void flatten_annotations_for_page(
+        QPDFPageObjectHelper& page,
+        QPDFObjectHandle& resources,
+        QPDFAcroFormDocumentHelper& afdh,
+        int required_flags,
+        int forbidden_flags);
 
     std::vector<QPDFObjectHandle> all_pages;
     std::map<QPDFObjGen, int> pageobj_to_pages_pos;
