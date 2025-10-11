@@ -1,5 +1,7 @@
+#include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDF_private.hh>
 
+#include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QTC.hh>
@@ -564,4 +566,170 @@ Pages::find(QPDFObjGen og)
             "page object not referenced in /Pages tree");
     }
     return (*it).second;
+}
+
+class QPDFPageDocumentHelper::Members
+{
+};
+
+QPDFPageDocumentHelper::QPDFPageDocumentHelper(QPDF& qpdf) :
+    QPDFDocumentHelper(qpdf)
+{
+}
+
+QPDFPageDocumentHelper&
+QPDFPageDocumentHelper::get(QPDF& qpdf)
+{
+    return qpdf.doc().page_dh();
+}
+
+void
+QPDFPageDocumentHelper::validate(bool repair)
+{
+}
+
+std::vector<QPDFPageObjectHelper>
+QPDFPageDocumentHelper::getAllPages()
+{
+    auto& pp = qpdf.doc().pages();
+    return {pp.begin(), pp.end()};
+}
+
+void
+QPDFPageDocumentHelper::pushInheritedAttributesToPage()
+{
+    qpdf.pushInheritedAttributesToPage();
+}
+
+void
+QPDFPageDocumentHelper::removeUnreferencedResources()
+{
+    for (auto& ph: getAllPages()) {
+        ph.removeUnreferencedResources();
+    }
+}
+
+void
+QPDFPageDocumentHelper::addPage(QPDFPageObjectHelper newpage, bool first)
+{
+    qpdf.addPage(newpage.getObjectHandle(), first);
+}
+
+void
+QPDFPageDocumentHelper::addPageAt(
+    QPDFPageObjectHelper newpage, bool before, QPDFPageObjectHelper refpage)
+{
+    qpdf.addPageAt(newpage.getObjectHandle(), before, refpage.getObjectHandle());
+}
+
+void
+QPDFPageDocumentHelper::removePage(QPDFPageObjectHelper page)
+{
+    qpdf.removePage(page.getObjectHandle());
+}
+
+void
+QPDFPageDocumentHelper::flattenAnnotations(int required_flags, int forbidden_flags)
+{
+    auto& afdh = qpdf.doc().acroform();
+    if (afdh.getNeedAppearances()) {
+        qpdf.getRoot()
+            .getKey("/AcroForm")
+            .warn(
+                "document does not have updated appearance streams, so form fields "
+                "will not be flattened");
+    }
+    for (auto& ph: getAllPages()) {
+        QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
+        if (!resources.isDictionary()) {
+            // As of #1521, this should be impossible unless a user inserted an invalid page.
+            resources = ph.getObjectHandle().replaceKeyAndGetNew(
+                "/Resources", QPDFObjectHandle::newDictionary());
+        }
+        flattenAnnotationsForPage(ph, resources, afdh, required_flags, forbidden_flags);
+    }
+    if (!afdh.getNeedAppearances()) {
+        qpdf.getRoot().removeKey("/AcroForm");
+    }
+}
+
+void
+QPDFPageDocumentHelper::flattenAnnotationsForPage(
+    QPDFPageObjectHelper& page,
+    QPDFObjectHandle& resources,
+    QPDFAcroFormDocumentHelper& afdh,
+    int required_flags,
+    int forbidden_flags)
+{
+    bool need_appearances = afdh.getNeedAppearances();
+    std::vector<QPDFAnnotationObjectHelper> annots = page.getAnnotations();
+    std::vector<QPDFObjectHandle> new_annots;
+    std::string new_content;
+    int rotate = 0;
+    QPDFObjectHandle rotate_obj = page.getObjectHandle().getKey("/Rotate");
+    if (rotate_obj.isInteger() && rotate_obj.getIntValue()) {
+        rotate = rotate_obj.getIntValueAsInt();
+    }
+    int next_fx = 1;
+    for (auto& aoh: annots) {
+        QPDFObjectHandle as = aoh.getAppearanceStream("/N");
+        bool is_widget = (aoh.getSubtype() == "/Widget");
+        bool process = true;
+        if (need_appearances && is_widget) {
+            QTC::TC("qpdf", "QPDFPageDocumentHelper skip widget need appearances");
+            process = false;
+        }
+        if (process && as.isStream()) {
+            if (is_widget) {
+                QTC::TC("qpdf", "QPDFPageDocumentHelper merge DR");
+                QPDFFormFieldObjectHelper ff = afdh.getFieldForAnnotation(aoh);
+                QPDFObjectHandle as_resources = as.getDict().getKey("/Resources");
+                if (as_resources.isIndirect()) {
+                    QTC::TC("qpdf", "QPDFPageDocumentHelper indirect as resources");
+                    as.getDict().replaceKey("/Resources", as_resources.shallowCopy());
+                    as_resources = as.getDict().getKey("/Resources");
+                }
+                as_resources.mergeResources(ff.getDefaultResources());
+            } else {
+                QTC::TC("qpdf", "QPDFPageDocumentHelper non-widget annotation");
+            }
+            std::string name = resources.getUniqueResourceName("/Fxo", next_fx);
+            std::string content =
+                aoh.getPageContentForAppearance(name, rotate, required_flags, forbidden_flags);
+            if (!content.empty()) {
+                resources.mergeResources("<< /XObject << >> >>"_qpdf);
+                resources.getKey("/XObject").replaceKey(name, as);
+                ++next_fx;
+            }
+            new_content += content;
+        } else if (process && !aoh.getAppearanceDictionary().null()) {
+            // If an annotation has no selected appearance stream, just drop the annotation when
+            // flattening. This can happen for unchecked checkboxes and radio buttons, popup windows
+            // associated with comments that aren't visible, and other types of annotations that
+            // aren't visible. Annotations that have no appearance streams at all, such as Link,
+            // Popup, and Projection, should be preserved.
+            QTC::TC("qpdf", "QPDFPageDocumentHelper ignore annotation with no appearance");
+        } else {
+            new_annots.push_back(aoh.getObjectHandle());
+        }
+    }
+    if (new_annots.size() != annots.size()) {
+        QPDFObjectHandle page_oh = page.getObjectHandle();
+        if (new_annots.empty()) {
+            QTC::TC("qpdf", "QPDFPageDocumentHelper remove annots");
+            page_oh.removeKey("/Annots");
+        } else {
+            QPDFObjectHandle old_annots = page_oh.getKey("/Annots");
+            QPDFObjectHandle new_annots_oh = QPDFObjectHandle::newArray(new_annots);
+            if (old_annots.isIndirect()) {
+                QTC::TC("qpdf", "QPDFPageDocumentHelper replace indirect annots");
+                qpdf.replaceObject(old_annots.getObjGen(), new_annots_oh);
+            } else {
+                QTC::TC("qpdf", "QPDFPageDocumentHelper replace direct annots");
+                page_oh.replaceKey("/Annots", new_annots_oh);
+            }
+        }
+        page.addPageContents(qpdf.newStream("q\n"), true);
+        page.addPageContents(qpdf.newStream("\nQ\n" + new_content), false);
+    }
 }
