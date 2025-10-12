@@ -126,10 +126,10 @@ QPDF::QPDFVersion()
 }
 
 QPDF::Members::Members(QPDF& qpdf) :
-    doc(qpdf, *this),
-    lin(doc.linearization()),
-    objects(doc.objects()),
-    pages(doc.pages()),
+    Doc(qpdf, this),
+    lin(qpdf, this),
+    objects(qpdf, this),
+    pages(qpdf, this),
     log(QPDFLogger::defaultLogger()),
     file(std::make_shared<InvalidInputSource>()),
     encp(std::make_shared<EncryptionParameters>())
