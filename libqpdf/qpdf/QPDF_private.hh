@@ -304,6 +304,29 @@ class QPDF::Doc
     class Resolver;
     class Writer;
 
+    // This is the common base-class for all document components. It is used by the other document
+    // components to access common functionality. It is not meant to be used directly by the user.
+    class Common
+    {
+      public:
+        Common() = delete;
+        Common(Common const&) = default;
+        Common(Common&&) = delete;
+        Common& operator=(Common const&) = delete;
+        Common& operator=(Common&&) = delete;
+        ~Common() = default;
+
+        Common(QPDF& qpdf, QPDF::Members* m) :
+            qpdf(qpdf),
+            m(m)
+        {
+        }
+
+      protected:
+        QPDF& qpdf;
+        QPDF::Members* m;
+    };
+
     Doc() = delete;
     Doc(Doc const&) = delete;
     Doc(Doc&&) = delete;
@@ -498,7 +521,7 @@ class QPDF::Doc::Encryption
     bool encrypt_metadata;
 }; // class QPDF::Doc::Encryption
 
-class QPDF::Doc::Linearization
+class QPDF::Doc::Linearization: Common
 {
   public:
     Linearization() = delete;
@@ -508,9 +531,8 @@ class QPDF::Doc::Linearization
     Linearization& operator=(Linearization&&) = delete;
     ~Linearization() = default;
 
-    Linearization(QPDF& qpdf, QPDF::Members* m) :
-        qpdf(qpdf),
-        m(m)
+    Linearization(Doc& doc) :
+        Common(doc.qpdf, doc.m)
     {
     }
 
@@ -597,13 +619,9 @@ class QPDF::Doc::Linearization
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
     void filterCompressedObjects(QPDFWriter::ObjTable const& object_stream_data);
-
-  private:
-    QPDF& qpdf;
-    QPDF::Members* m;
 };
 
-class QPDF::Doc::Objects
+class QPDF::Doc::Objects: Common
 {
   public:
     class Foreign
@@ -724,11 +742,10 @@ class QPDF::Doc::Objects
     Objects& operator=(Objects&&) = delete;
     ~Objects() = default;
 
-    Objects(QPDF& qpdf, QPDF::Members* m) :
-        qpdf(qpdf),
-        m(m),
-        foreign_(qpdf),
-        streams_(qpdf)
+    Objects(Doc& doc) :
+        Common(doc.qpdf, doc.m),
+        foreign_(doc.qpdf),
+        streams_(doc.qpdf)
     {
     }
 
@@ -813,15 +830,12 @@ class QPDF::Doc::Objects
     bool isUnresolved(QPDFObjGen og);
     void setLastObjectDescription(std::string const& description, QPDFObjGen og);
 
-    QPDF& qpdf;
-    QPDF::Members* m;
-
     Foreign foreign_;
     Streams streams_;
 }; // class QPDF::Doc::Objects
 
 // This class is used to represent a PDF Pages tree.
-class QPDF::Doc::Pages
+class QPDF::Doc::Pages: Common
 {
   public:
     Pages() = delete;
@@ -831,9 +845,8 @@ class QPDF::Doc::Pages
     Pages& operator=(Pages&&) = delete;
     ~Pages() = default;
 
-    Pages(QPDF& qpdf, QPDF::Members* m) :
-        qpdf(qpdf),
-        m(m)
+    Pages(Doc& doc) :
+        Common(doc.qpdf, doc.m)
     {
     }
 
@@ -852,13 +865,9 @@ class QPDF::Doc::Pages
         std::map<std::string, std::vector<QPDFObjectHandle>>&,
         bool allow_changes,
         bool warn_skipped_keys);
-
-  private:
-    QPDF& qpdf;
-    QPDF::Members* m;
 }; // class QPDF::Doc::Pages
 
-class QPDF::Members: QPDF::Doc
+class QPDF::Members: Doc
 {
     friend class QPDF;
     friend class ResolveRecorder;
@@ -869,6 +878,7 @@ class QPDF::Members: QPDF::Doc
     ~Members() = default;
 
   private:
+    Doc::Common c;
     Doc::Linearization lin;
     Doc::Objects objects;
     Doc::Pages pages;

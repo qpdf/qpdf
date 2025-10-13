@@ -127,9 +127,10 @@ QPDF::QPDFVersion()
 
 QPDF::Members::Members(QPDF& qpdf) :
     Doc(qpdf, this),
-    lin(qpdf, this),
-    objects(qpdf, this),
-    pages(qpdf, this),
+    c(qpdf, this),
+    lin(*this),
+    objects(*this),
+    pages(*this),
     log(QPDFLogger::defaultLogger()),
     file(std::make_shared<InvalidInputSource>()),
     encp(std::make_shared<EncryptionParameters>())
