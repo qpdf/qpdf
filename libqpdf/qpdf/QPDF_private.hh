@@ -322,6 +322,36 @@ class QPDF::Doc
         {
         }
 
+        void stopOnError(std::string const& message);
+        void warn(QPDFExc const& e);
+        void warn(
+            qpdf_error_code_e error_code,
+            std::string const& object,
+            qpdf_offset_t offset,
+            std::string const& message);
+
+        static QPDFExc damagedPDF(
+            InputSource& input,
+            std::string const& object,
+            qpdf_offset_t offset,
+            std::string const& message);
+        QPDFExc
+        damagedPDF(InputSource& input, qpdf_offset_t offset, std::string const& message) const;
+        QPDFExc damagedPDF(
+            std::string const& object, qpdf_offset_t offset, std::string const& message) const;
+        QPDFExc damagedPDF(std::string const& object, std::string const& message) const;
+        QPDFExc damagedPDF(qpdf_offset_t offset, std::string const& message) const;
+        QPDFExc damagedPDF(std::string const& message) const;
+
+        void
+        no_ci_stop_if(
+            bool condition, std::string const& message, std::string const& context = {}) const
+        {
+            if (condition) {
+                throw damagedPDF(context, message);
+            }
+        }
+
       protected:
         QPDF& qpdf;
         QPDF::Members* m;
@@ -987,15 +1017,6 @@ QPDF::doc()
 inline QPDF::Doc::Objects::Foreign::Copier::Copier(QPDF& qpdf) :
     Common(qpdf, qpdf.doc().m)
 {
-}
-
-// Throw a generic exception for unusual error conditions that do not be covered during CI testing.
-inline void
-QPDF::no_ci_stop_if(bool condition, std::string const& message, std::string const& context)
-{
-    if (condition) {
-        throw damagedPDF(context, message);
-    }
 }
 
 #endif // QPDF_PRIVATE_HH

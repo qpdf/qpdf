@@ -218,7 +218,7 @@ Pages ::pushInheritedAttributesToPageInternal(
             // Warn when flattening, but not if the key is at the top level (i.e. "/Parent" not
             // set), as we don't change these; but flattening removes intermediate /Pages nodes.
             if (warn_skipped_keys && cur_pages.hasKey("/Parent")) {
-                qpdf.warn(
+                warn(
                     qpdf_e_pages,
                     "Pages object: object " + cur_pages.id_gen().unparse(' '),
                     0,

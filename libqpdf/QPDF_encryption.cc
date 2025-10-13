@@ -734,15 +734,16 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
     }
     encryption_initialized = true;
 
+    auto& c = qpdf.m->c;
     auto& qm = *qpdf.m;
     auto& trailer = qm.trailer;
     auto& file = qm.file;
 
-    auto warn_damaged_pdf = [&qpdf](std::string const& msg) {
-        qpdf.warn(qpdf.damagedPDF("encryption dictionary", msg));
+    auto warn_damaged_pdf = [&qpdf, c](std::string const& msg) {
+        qpdf.warn(c.damagedPDF("encryption dictionary", msg));
     };
     auto throw_damaged_pdf = [&qpdf](std::string const& msg) {
-        throw qpdf.damagedPDF("encryption dictionary", msg);
+        throw qpdf.m->c.damagedPDF("encryption dictionary", msg);
     };
     auto unsupported = [&file](std::string const& msg) -> QPDFExc {
         return {
@@ -770,14 +771,14 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
     if (id_obj.size() != 2 || !id_obj.getArrayItem(0).isString()) {
         // Treating a missing ID as the empty string enables qpdf to decrypt some invalid encrypted
         // files with no /ID that poppler can read but Adobe Reader can't.
-        qpdf.warn(qpdf.damagedPDF("trailer", "invalid /ID in trailer dictionary"));
+        qpdf.warn(qpdf.m->c.damagedPDF("trailer", "invalid /ID in trailer dictionary"));
     } else {
         id1 = id_obj.getArrayItem(0).getStringValue();
     }
 
     auto encryption_dict = trailer.getKey("/Encrypt");
     if (!encryption_dict.isDictionary()) {
-        throw qpdf.damagedPDF("/Encrypt in trailer dictionary is not a dictionary");
+        throw qpdf.m->c.damagedPDF("/Encrypt in trailer dictionary is not a dictionary");
     }
 
     if (Name(encryption_dict["/Filter"]) != "/Standard") {
@@ -984,7 +985,7 @@ QPDF::decryptString(std::string& str, QPDFObjGen og)
             break;
 
         default:
-            warn(damagedPDF(
+            warn(m->c.damagedPDF(
                 "unknown encryption filter for strings (check /StrF in "
                 "/Encrypt dictionary); strings may be decrypted improperly"));
             // To avoid repeated warnings, reset cf_string.  Assume we'd want to use AES if V == 4.
@@ -1017,7 +1018,8 @@ QPDF::decryptString(std::string& str, QPDFObjGen og)
     } catch (QPDFExc&) {
         throw;
     } catch (std::runtime_error& e) {
-        throw damagedPDF("error decrypting string for object " + og.unparse() + ": " + e.what());
+        throw m->c.damagedPDF(
+            "error decrypting string for object " + og.unparse() + ": " + e.what());
     }
 }
 

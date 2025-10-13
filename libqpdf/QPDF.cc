@@ -27,7 +27,9 @@
 using namespace qpdf;
 using namespace std::literals;
 
-using Objects = QPDF::Doc::Objects;
+using Doc = QPDF::Doc;
+using Common = Doc::Common;
+using Objects = Doc::Objects;
 using Foreign = Objects::Foreign;
 using Streams = Objects::Streams;
 
@@ -364,6 +366,12 @@ QPDF::findHeader()
 void
 QPDF::warn(QPDFExc const& e)
 {
+    m->c.warn(e);
+}
+
+void
+Common::warn(QPDFExc const& e)
+{
     if (m->max_warnings > 0 && m->warnings.size() >= m->max_warnings) {
         stopOnError("Too many warnings - file is too badly damaged");
     }
@@ -380,7 +388,17 @@ QPDF::warn(
     qpdf_offset_t offset,
     std::string const& message)
 {
-    warn(QPDFExc(error_code, getFilename(), object, offset, message));
+    m->c.warn(QPDFExc(error_code, getFilename(), object, offset, message));
+}
+
+void
+Common::warn(
+    qpdf_error_code_e error_code,
+    std::string const& object,
+    qpdf_offset_t offset,
+    std::string const& message)
+{
+    warn(QPDFExc(error_code, qpdf.getFilename(), object, offset, message));
 }
 
 QPDFObjectHandle
@@ -515,7 +533,7 @@ Objects::Foreign::Copier::copied(QPDFObjectHandle const& foreign)
 
     auto og = foreign.getObjGen();
     if (!object_map.contains(og)) {
-        qpdf.warn(qpdf.damagedPDF(
+        warn(damagedPDF(
             foreign.qpdf()->getFilename() + " object " + og.unparse(' '),
             foreign.offset(),
             "unexpected reference to /Pages object while copying foreign object; replacing with "
@@ -693,12 +711,12 @@ QPDF::getRoot()
 {
     QPDFObjectHandle root = m->trailer.getKey("/Root");
     if (!root.isDictionary()) {
-        throw damagedPDF("", -1, "unable to find /Root dictionary");
+        throw m->c.damagedPDF("", -1, "unable to find /Root dictionary");
     } else if (
         // Check_mode is an interim solution to request #810 pending a more comprehensive review of
         // the approach to more extensive checks and warning levels.
         m->check_mode && !root.getKey("/Type").isNameAndEquals("/Catalog")) {
-        warn(damagedPDF("", -1, "catalog /Type entry missing or invalid"));
+        warn(m->c.damagedPDF("", -1, "catalog /Type entry missing or invalid"));
         root.replaceKey("/Type", "/Catalog"_qpdf);
     }
     return root;
@@ -744,7 +762,7 @@ QPDF::pipeStreamData(
     try {
         auto buf = file->read(length, offset);
         if (buf.size() != length) {
-            throw damagedPDF(
+            throw qpdf_for_warning.m->c.damagedPDF(
                 *file, "", offset + toO(buf.size()), "unexpected EOF reading stream data");
         }
         pipeline->write(buf.data(), length);
@@ -760,7 +778,7 @@ QPDF::pipeStreamData(
             QTC::TC("qpdf", "QPDF decoding error warning");
             qpdf_for_warning.warn(
                 // line-break
-                damagedPDF(
+                qpdf_for_warning.m->c.damagedPDF(
                     *file,
                     "",
                     file->getLastOffset(),
@@ -769,7 +787,7 @@ QPDF::pipeStreamData(
             if (will_retry) {
                 qpdf_for_warning.warn(
                     // line-break
-                    damagedPDF(
+                    qpdf_for_warning.m->c.damagedPDF(
                         *file,
                         "",
                         file->getLastOffset(),
@@ -815,14 +833,14 @@ QPDF::pipeStreamData(
 // Throw a generic exception when we lack context for something more specific. New code should not
 // use this.
 void
-QPDF::stopOnError(std::string const& message)
+Common::stopOnError(std::string const& message)
 {
     throw damagedPDF("", message);
 }
 
 // Return an exception of type qpdf_e_damaged_pdf.
 QPDFExc
-QPDF::damagedPDF(
+Common::damagedPDF(
     InputSource& input, std::string const& object, qpdf_offset_t offset, std::string const& message)
 {
     return {qpdf_e_damaged_pdf, input.getName(), object, offset, message, true};
@@ -831,14 +849,15 @@ QPDF::damagedPDF(
 // Return an exception of type qpdf_e_damaged_pdf.  The object is taken from
 // m->last_object_description.
 QPDFExc
-QPDF::damagedPDF(InputSource& input, qpdf_offset_t offset, std::string const& message)
+Common::damagedPDF(InputSource& input, qpdf_offset_t offset, std::string const& message) const
 {
     return damagedPDF(input, m->last_object_description, offset, message);
 }
 
 // Return an exception of type qpdf_e_damaged_pdf.  The filename is taken from m->file.
 QPDFExc
-QPDF::damagedPDF(std::string const& object, qpdf_offset_t offset, std::string const& message)
+Common::damagedPDF(
+    std::string const& object, qpdf_offset_t offset, std::string const& message) const
 {
     return {qpdf_e_damaged_pdf, m->file->getName(), object, offset, message, true};
 }
@@ -846,7 +865,7 @@ QPDF::damagedPDF(std::string const& object, qpdf_offset_t offset, std::string co
 // Return an exception of type qpdf_e_damaged_pdf.  The filename is taken from m->file and the
 // offset from .m->file->getLastOffset().
 QPDFExc
-QPDF::damagedPDF(std::string const& object, std::string const& message)
+Common::damagedPDF(std::string const& object, std::string const& message) const
 {
     return damagedPDF(object, m->file->getLastOffset(), message);
 }
@@ -854,7 +873,7 @@ QPDF::damagedPDF(std::string const& object, std::string const& message)
 // Return an exception of type qpdf_e_damaged_pdf. The filename is taken from m->file and the object
 // from .m->last_object_description.
 QPDFExc
-QPDF::damagedPDF(qpdf_offset_t offset, std::string const& message)
+Common::damagedPDF(qpdf_offset_t offset, std::string const& message) const
 {
     return damagedPDF(m->last_object_description, offset, message);
 }
@@ -862,7 +881,7 @@ QPDF::damagedPDF(qpdf_offset_t offset, std::string const& message)
 // Return an exception of type qpdf_e_damaged_pdf.  The filename is taken from m->file, the object
 // from m->last_object_description and the offset from m->file->getLastOffset().
 QPDFExc
-QPDF::damagedPDF(std::string const& message)
+Common::damagedPDF(std::string const& message) const
 {
     return damagedPDF(m->last_object_description, m->file->getLastOffset(), message);
 }
