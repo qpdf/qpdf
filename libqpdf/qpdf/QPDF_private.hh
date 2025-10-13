@@ -624,15 +624,12 @@ class QPDF::Doc::Linearization: Common
 class QPDF::Doc::Objects: Common
 {
   public:
-    class Foreign
+    class Foreign: Common
     {
-        class Copier
+        class Copier: Common
         {
           public:
-            Copier(QPDF& qpdf) :
-                qpdf(qpdf)
-            {
-            }
+            inline Copier(QPDF& qpdf);
 
             QPDFObjectHandle copied(QPDFObjectHandle const& foreign);
 
@@ -641,15 +638,14 @@ class QPDF::Doc::Objects: Common
             replace_indirect_object(QPDFObjectHandle const& foreign, bool top = false);
             void reserve_objects(QPDFObjectHandle const& foreign, bool top = false);
 
-            QPDF& qpdf;
             std::map<QPDFObjGen, QPDFObjectHandle> object_map;
             std::vector<QPDFObjectHandle> to_copy;
             QPDFObjGen::set visiting;
         };
 
       public:
-        Foreign(QPDF& qpdf) :
-            qpdf(qpdf)
+        Foreign(Common& common) :
+            Common(common)
         {
         }
 
@@ -670,18 +666,17 @@ class QPDF::Doc::Objects: Common
       private:
         Copier& copier(QPDFObjectHandle const& foreign);
 
-        QPDF& qpdf;
         std::map<unsigned long long, Copier> copiers;
     }; // class QPDF::Doc::Objects::Foreign
 
-    class Streams
+    class Streams: Common
     {
         // Copier manages the copying of streams into this PDF. It is used both for copying
         // local and foreign streams.
         class Copier;
 
       public:
-        Streams(QPDF& qpdf);
+        Streams(Common& common);
 
         Streams() = delete;
         Streams(Streams const&) = delete;
@@ -714,12 +709,6 @@ class QPDF::Doc::Objects: Common
                 will_retry);
         }
 
-        QPDF&
-        qpdf() const
-        {
-            return qpdf_;
-        }
-
         std::shared_ptr<Copier>&
         copier()
         {
@@ -729,8 +718,6 @@ class QPDF::Doc::Objects: Common
         bool immediate_copy_from() const;
 
       private:
-        QPDF& qpdf_;
-
         std::shared_ptr<Copier> copier_;
     }; // class QPDF::Doc::Objects::Streams
 
@@ -744,8 +731,8 @@ class QPDF::Doc::Objects: Common
 
     Objects(Doc& doc) :
         Common(doc.qpdf, doc.m),
-        foreign_(doc.qpdf),
-        streams_(doc.qpdf)
+        foreign_(*this),
+        streams_(*this)
     {
     }
 
@@ -995,6 +982,11 @@ inline QPDF::Doc&
 QPDF::doc()
 {
     return *m;
+}
+
+inline QPDF::Doc::Objects::Foreign::Copier::Copier(QPDF& qpdf) :
+    Common(qpdf, qpdf.doc().m)
+{
 }
 
 // Throw a generic exception for unusual error conditions that do not be covered during CI testing.
