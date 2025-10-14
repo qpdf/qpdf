@@ -120,13 +120,6 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     void flattenAnnotations(int required_flags = 0, int forbidden_flags = an_invisible | an_hidden);
 
   private:
-    void flattenAnnotationsForPage(
-        QPDFPageObjectHelper& page,
-        QPDFObjectHandle& resources,
-        QPDFAcroFormDocumentHelper& afdh,
-        int required_flags,
-        int forbidden_flags);
-
     class Members;
 
     std::shared_ptr<Members> m;

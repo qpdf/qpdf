@@ -1,9 +1,12 @@
+#include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDF_private.hh>
 
+#include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 
 // In support of page manipulation APIs, these methods internally maintain state about pages in a
 // pair of data structures: all_pages, which is a vector of page objects, and pageobj_to_pages_pos,
@@ -42,10 +45,16 @@ using Pages = QPDF::Doc::Pages;
 std::vector<QPDFObjectHandle> const&
 QPDF::getAllPages()
 {
+    return m->pages.all();
+}
+
+std::vector<QPDFObjectHandle> const&
+Pages::cache()
+{
     // Note that pushInheritedAttributesToPage may also be used to initialize m->all_pages.
-    if (m->all_pages.empty() && !m->invalid_page_found) {
-        m->ever_called_get_all_pages = true;
-        auto root = getRoot();
+    if (all_pages.empty() && !invalid_page_found) {
+        ever_called_get_all_pages_ = true;
+        auto root = qpdf.getRoot();
         QPDFObjGen::set visited;
         QPDFObjGen::set seen;
         QPDFObjectHandle pages = root.getKey("/Pages");
@@ -77,18 +86,18 @@ QPDF::getAllPages()
                 qpdf_e_pages, m->file->getName(), "", 0, "root of pages tree has no /Kids array");
         }
         try {
-            m->pages.getAllPagesInternal(pages, visited, seen, false, false);
+            getAllPagesInternal(pages, visited, seen, false, false);
         } catch (...) {
-            m->all_pages.clear();
-            m->invalid_page_found = false;
+            all_pages.clear();
+            invalid_page_found = false;
             throw;
         }
-        if (m->invalid_page_found) {
-            m->pages.flattenPagesTree();
-            m->invalid_page_found = false;
+        if (invalid_page_found) {
+            flattenPagesTree();
+            invalid_page_found = false;
         }
     }
-    return m->all_pages;
+    return all_pages;
 }
 
 void
@@ -137,7 +146,7 @@ Pages::getAllPagesInternal(
 
         if (!kid.isDictionary()) {
             kid.warn("Pages tree includes non-dictionary object; ignoring");
-            m->invalid_page_found = true;
+            invalid_page_found = true;
             continue;
         }
         if (!kid.isIndirect()) {
@@ -206,7 +215,7 @@ Pages::getAllPagesInternal(
                     cur_node.warn(
                         "kid " + std::to_string(i) +
                         " (from 0) appears more than once in the pages tree; ignoring duplicate");
-                    m->invalid_page_found = true;
+                    invalid_page_found = true;
                     kid = QPDFObjectHandle::newNull();
                     continue;
                 }
@@ -223,11 +232,11 @@ Pages::getAllPagesInternal(
             if (m->reconstructed_xref && errors > 2) {
                 cur_node.warn(
                     "kid " + std::to_string(i) + " (from 0) has too many errors; ignoring page");
-                m->invalid_page_found = true;
+                invalid_page_found = true;
                 kid = QPDFObjectHandle::newNull();
                 continue;
             }
-            m->all_pages.emplace_back(kid);
+            all_pages.emplace_back(kid);
         }
     }
 }
@@ -235,13 +244,19 @@ Pages::getAllPagesInternal(
 void
 QPDF::updateAllPagesCache()
 {
+    m->pages.update_cache();
+}
+
+void
+Pages::update_cache()
+{
     // Force regeneration of the pages cache.  We force immediate recalculation of all_pages since
     // users may have references to it that they got from calls to getAllPages().  We can defer
     // recalculation of pageobj_to_pages_pos until needed.
-    m->all_pages.clear();
-    m->pageobj_to_pages_pos.clear();
-    m->pushed_inherited_attributes_to_pages = false;
-    getAllPages();
+    all_pages.clear();
+    pageobj_to_pages_pos.clear();
+    pushed_inherited_attributes_to_pages = false;
+    cache();
 }
 
 void
@@ -249,33 +264,163 @@ Pages::flattenPagesTree()
 {
     // If not already done, flatten the /Pages structure and initialize pageobj_to_pages_pos.
 
-    if (!m->pageobj_to_pages_pos.empty()) {
+    if (!pageobj_to_pages_pos.empty()) {
         return;
     }
 
-    // Push inherited objects down to the /Page level.  As a side effect m->all_pages will also be
+    // Push inherited objects down to the /Page level.  As a side effect all_pages will also be
     // generated.
     pushInheritedAttributesToPage(true, true);
 
     QPDFObjectHandle pages = qpdf.getRoot().getKey("/Pages");
 
-    size_t const len = m->all_pages.size();
+    size_t const len = all_pages.size();
     for (size_t pos = 0; pos < len; ++pos) {
         // Populate pageobj_to_pages_pos and fix parent pointer. There should be no duplicates at
         // this point because pushInheritedAttributesToPage calls getAllPages which resolves
         // duplicates.
-        insertPageobjToPage(m->all_pages.at(pos), toI(pos), true);
-        m->all_pages.at(pos).replaceKey("/Parent", pages);
+        insertPageobjToPage(all_pages.at(pos), toI(pos), true);
+        all_pages.at(pos).replaceKey("/Parent", pages);
     }
 
-    pages.replaceKey("/Kids", QPDFObjectHandle::newArray(m->all_pages));
+    pages.replaceKey("/Kids", Array(all_pages));
     // /Count has not changed
     if (pages.getKey("/Count").getUIntValue() != len) {
-        if (m->invalid_page_found && pages.getKey("/Count").getUIntValue() > len) {
-            pages.replaceKey("/Count", QPDFObjectHandle::newInteger(toI(len)));
+        if (invalid_page_found && pages.getKey("/Count").getUIntValue() > len) {
+            pages.replaceKey("/Count", Integer(len));
         } else {
             throw std::runtime_error("/Count is wrong after flattening pages tree");
         }
+    }
+}
+
+void
+QPDF::pushInheritedAttributesToPage()
+{
+    // Public API should not have access to allow_changes.
+    m->pages.pushInheritedAttributesToPage(true, false);
+}
+
+void
+Pages::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
+{
+    // Traverse pages tree pushing all inherited resources down to the page level.
+
+    // The record of whether we've done this is cleared by updateAllPagesCache().  If we're warning
+    // for skipped keys, re-traverse unconditionally.
+    if (pushed_inherited_attributes_to_pages && !warn_skipped_keys) {
+        return;
+    }
+
+    // Calling cache() resolves any duplicated page objects, repairs broken nodes, and detects
+    // loops, so we don't have to do those activities here.
+    (void)cache();
+
+    // key_ancestors is a mapping of page attribute keys to a stack of Pages nodes that contain
+    // values for them.
+    std::map<std::string, std::vector<QPDFObjectHandle>> key_ancestors;
+    pushInheritedAttributesToPageInternal(
+        m->trailer.getKey("/Root").getKey("/Pages"),
+        key_ancestors,
+        allow_changes,
+        warn_skipped_keys);
+    util::assertion(
+        key_ancestors.empty(),
+        "key_ancestors not empty after pushing inherited attributes to pages");
+    pushed_inherited_attributes_to_pages = true;
+    ever_pushed_inherited_attributes_to_pages_ = true;
+}
+
+void
+Pages::pushInheritedAttributesToPageInternal(
+    QPDFObjectHandle cur_pages,
+    std::map<std::string, std::vector<QPDFObjectHandle>>& key_ancestors,
+    bool allow_changes,
+    bool warn_skipped_keys)
+{
+    // Make a list of inheritable keys. Only the keys /MediaBox, /CropBox, /Resources, and /Rotate
+    // are inheritable attributes. Push this object onto the stack of pages nodes that have values
+    // for this attribute.
+
+    std::set<std::string> inheritable_keys;
+    for (auto const& key: cur_pages.getKeys()) {
+        if (key == "/MediaBox" || key == "/CropBox" || key == "/Resources" || key == "/Rotate") {
+            if (!allow_changes) {
+                throw QPDFExc(
+                    qpdf_e_internal,
+                    m->file->getName(),
+                    m->last_object_description,
+                    m->file->getLastOffset(),
+                    "optimize detected an inheritable attribute when called in no-change mode");
+            }
+
+            // This is an inheritable resource
+            inheritable_keys.insert(key);
+            QPDFObjectHandle oh = cur_pages.getKey(key);
+            QTC::TC("qpdf", "QPDF opt direct pages resource", oh.indirect() ? 0 : 1);
+            if (!oh.indirect()) {
+                if (!oh.isScalar()) {
+                    // Replace shared direct object non-scalar resources with indirect objects to
+                    // avoid copying large structures around.
+                    cur_pages.replaceKey(key, qpdf.makeIndirectObject(oh));
+                    oh = cur_pages.getKey(key);
+                } else {
+                    // It's okay to copy scalars.
+                }
+            }
+            key_ancestors[key].push_back(oh);
+            if (key_ancestors[key].size() > 1) {
+            }
+            // Remove this resource from this node.  It will be reattached at the page level.
+            cur_pages.removeKey(key);
+        } else if (!(key == "/Type" || key == "/Parent" || key == "/Kids" || key == "/Count")) {
+            // Warn when flattening, but not if the key is at the top level (i.e. "/Parent" not
+            // set), as we don't change these; but flattening removes intermediate /Pages nodes.
+            if (warn_skipped_keys && cur_pages.hasKey("/Parent")) {
+                warn(
+                    qpdf_e_pages,
+                    "Pages object: object " + cur_pages.id_gen().unparse(' '),
+                    0,
+                    ("Unknown key " + key +
+                     " in /Pages object is being discarded as a result of flattening the /Pages "
+                     "tree"));
+            }
+        }
+    }
+
+    // Process descendant nodes. This method does not perform loop detection because all code paths
+    // that lead here follow a call to getAllPages, which already throws an exception in the event
+    // of a loop in the pages tree.
+    for (auto& kid: cur_pages.getKey("/Kids").aitems()) {
+        if (kid.isDictionaryOfType("/Pages")) {
+            pushInheritedAttributesToPageInternal(
+                kid, key_ancestors, allow_changes, warn_skipped_keys);
+        } else {
+            // Add all available inheritable attributes not present in this object to this object.
+            for (auto const& iter: key_ancestors) {
+                std::string const& key = iter.first;
+                if (!kid.hasKey(key)) {
+                    kid.replaceKey(key, iter.second.back());
+                } else {
+                    QTC::TC("qpdf", "QPDF opt page resource hides ancestor");
+                }
+            }
+        }
+    }
+
+    // For each inheritable key, pop the stack.  If the stack becomes empty, remove it from the map.
+    // That way, the invariant that the list of keys in key_ancestors is exactly those keys for
+    // which inheritable attributes are available.
+
+    if (!inheritable_keys.empty()) {
+        for (auto const& key: inheritable_keys) {
+            key_ancestors[key].pop_back();
+            if (key_ancestors[key].empty()) {
+                key_ancestors.erase(key);
+            }
+        }
+    } else {
+        QTC::TC("qpdf", "QPDF opt no inheritable keys");
     }
 }
 
@@ -284,7 +429,7 @@ Pages::insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_dupl
 {
     QPDFObjGen og(obj.getObjGen());
     if (check_duplicate) {
-        if (!m->pageobj_to_pages_pos.insert(std::make_pair(og, pos)).second) {
+        if (!pageobj_to_pages_pos.insert(std::make_pair(og, pos)).second) {
             // The library never calls insertPageobjToPage in a way that causes this to happen.
             throw QPDFExc(
                 qpdf_e_pages,
@@ -294,52 +439,51 @@ Pages::insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_dupl
                 "duplicate page reference found; this would cause loss of data");
         }
     } else {
-        m->pageobj_to_pages_pos[og] = pos;
+        pageobj_to_pages_pos[og] = pos;
     }
 }
 
 void
-Pages::insertPage(QPDFObjectHandle newpage, int pos)
+Pages::insert(QPDFObjectHandle newpage, int pos)
 {
     // pos is numbered from 0, so pos = 0 inserts at the beginning and pos = npages adds to the end.
 
     flattenPagesTree();
 
-    if (!newpage.isIndirect()) {
+    if (!newpage.indirect()) {
         newpage = qpdf.makeIndirectObject(newpage);
-    } else if (newpage.getOwningQPDF() != &qpdf) {
-        newpage.getQPDF().pushInheritedAttributesToPage();
+    } else if (newpage.qpdf() != &qpdf) {
+        newpage.qpdf()->pushInheritedAttributesToPage();
         newpage = qpdf.copyForeignObject(newpage);
     } else {
         QTC::TC("qpdf", "QPDF insert indirect page");
     }
 
-    if (pos < 0 || toS(pos) > m->all_pages.size()) {
+    if (pos < 0 || std::cmp_greater(pos, all_pages.size())) {
         throw std::runtime_error("QPDF::insertPage called with pos out of range");
     }
 
     QTC::TC(
         "qpdf",
         "QPDF insert page",
-        (pos == 0) ? 0 :                            // insert at beginning
-            (pos == toI(m->all_pages.size())) ? 1   // at end
-                                              : 2); // insert in middle
+        pos == 0 ? 0 :                        // insert at beginning
+            std::cmp_equal(pos, size()) ? 1   // at end
+                                        : 2); // insert in middle
 
-    auto og = newpage.getObjGen();
-    if (m->pageobj_to_pages_pos.contains(og)) {
-        newpage = qpdf.makeIndirectObject(QPDFObjectHandle(newpage).shallowCopy());
+    if (pageobj_to_pages_pos.contains(newpage)) {
+        newpage = qpdf.makeIndirectObject(newpage.copy());
     }
 
-    QPDFObjectHandle pages = qpdf.getRoot().getKey("/Pages");
-    QPDFObjectHandle kids = pages.getKey("/Kids");
+    auto pages = qpdf.getRoot()["/Pages"];
+    Array kids = pages["/Kids"];
 
     newpage.replaceKey("/Parent", pages);
-    kids.insertItem(pos, newpage);
-    int npages = static_cast<int>(kids.size());
-    pages.replaceKey("/Count", QPDFObjectHandle::newInteger(npages));
-    m->all_pages.insert(m->all_pages.begin() + pos, newpage);
-    for (int i = pos + 1; i < npages; ++i) {
-        insertPageobjToPage(m->all_pages.at(toS(i)), i, false);
+    kids.insert(pos, newpage);
+    size_t npages = kids.size();
+    pages.replaceKey("/Count", Integer(npages));
+    all_pages.insert(all_pages.begin() + pos, newpage);
+    for (size_t i = static_cast<size_t>(pos) + 1; i < npages; ++i) {
+        insertPageobjToPage(all_pages.at(i), static_cast<int>(i), false);
     }
     insertPageobjToPage(newpage, pos, true);
 }
@@ -347,24 +491,30 @@ Pages::insertPage(QPDFObjectHandle newpage, int pos)
 void
 QPDF::removePage(QPDFObjectHandle page)
 {
-    int pos = findPage(page); // also ensures flat /Pages
+    m->pages.erase(page);
+}
+
+void
+Pages::erase(QPDFObjectHandle& page)
+{
+    int pos = qpdf.findPage(page); // also ensures flat /Pages
     QTC::TC(
         "qpdf",
         "QPDF remove page",
-        (pos == 0) ? 0 :                                // remove at beginning
-            (pos == toI(m->all_pages.size() - 1)) ? 1   // end
-                                                  : 2); // remove in middle
+        (pos == 0) ? 0 :                             // remove at beginning
+            (pos == toI(all_pages.size() - 1)) ? 1   // end
+                                               : 2); // remove in middle
 
-    QPDFObjectHandle pages = getRoot().getKey("/Pages");
+    QPDFObjectHandle pages = qpdf.getRoot().getKey("/Pages");
     QPDFObjectHandle kids = pages.getKey("/Kids");
 
     kids.eraseItem(pos);
     int npages = static_cast<int>(kids.size());
     pages.replaceKey("/Count", QPDFObjectHandle::newInteger(npages));
-    m->all_pages.erase(m->all_pages.begin() + pos);
-    m->pageobj_to_pages_pos.erase(page.getObjGen());
+    all_pages.erase(all_pages.begin() + pos);
+    pageobj_to_pages_pos.erase(page.getObjGen());
     for (int i = pos; i < npages; ++i) {
-        m->pages.insertPageobjToPage(m->all_pages.at(toS(i)), i, false);
+        m->pages.insertPageobjToPage(all_pages.at(toS(i)), i, false);
     }
 }
 
@@ -375,17 +525,16 @@ QPDF::addPageAt(QPDFObjectHandle newpage, bool before, QPDFObjectHandle refpage)
     if (!before) {
         ++refpos;
     }
-    m->pages.insertPage(newpage, refpos);
+    m->pages.insert(newpage, refpos);
 }
 
 void
 QPDF::addPage(QPDFObjectHandle newpage, bool first)
 {
     if (first) {
-        m->pages.insertPage(newpage, 0);
+        m->pages.insert(newpage, 0);
     } else {
-        m->pages.insertPage(
-            newpage, getRoot().getKey("/Pages").getKey("/Count").getIntValueAsInt());
+        m->pages.insert(newpage, getRoot()["/Pages"]["/Count"].getIntValueAsInt());
     }
 }
 
@@ -398,9 +547,15 @@ QPDF::findPage(QPDFObjectHandle& page)
 int
 QPDF::findPage(QPDFObjGen og)
 {
-    m->pages.flattenPagesTree();
-    auto it = m->pageobj_to_pages_pos.find(og);
-    if (it == m->pageobj_to_pages_pos.end()) {
+    return m->pages.find(og);
+}
+
+int
+Pages::find(QPDFObjGen og)
+{
+    flattenPagesTree();
+    auto it = pageobj_to_pages_pos.find(og);
+    if (it == pageobj_to_pages_pos.end()) {
         throw QPDFExc(
             qpdf_e_pages,
             m->file->getName(),
@@ -409,4 +564,169 @@ QPDF::findPage(QPDFObjGen og)
             "page object not referenced in /Pages tree");
     }
     return (*it).second;
+}
+
+class QPDFPageDocumentHelper::Members
+{
+};
+
+QPDFPageDocumentHelper::QPDFPageDocumentHelper(QPDF& qpdf) :
+    QPDFDocumentHelper(qpdf)
+{
+}
+
+QPDFPageDocumentHelper&
+QPDFPageDocumentHelper::get(QPDF& qpdf)
+{
+    return qpdf.doc().page_dh();
+}
+
+void
+QPDFPageDocumentHelper::validate(bool repair)
+{
+}
+
+std::vector<QPDFPageObjectHelper>
+QPDFPageDocumentHelper::getAllPages()
+{
+    auto& pp = qpdf.doc().pages();
+    return {pp.begin(), pp.end()};
+}
+
+void
+QPDFPageDocumentHelper::pushInheritedAttributesToPage()
+{
+    qpdf.pushInheritedAttributesToPage();
+}
+
+void
+QPDFPageDocumentHelper::removeUnreferencedResources()
+{
+    for (auto& ph: getAllPages()) {
+        ph.removeUnreferencedResources();
+    }
+}
+
+void
+QPDFPageDocumentHelper::addPage(QPDFPageObjectHelper newpage, bool first)
+{
+    qpdf.doc().pages().insert(newpage, first ? 0 : qpdf.doc().pages().size());
+}
+
+void
+QPDFPageDocumentHelper::addPageAt(
+    QPDFPageObjectHelper newpage, bool before, QPDFPageObjectHelper refpage)
+{
+    qpdf.addPageAt(newpage.getObjectHandle(), before, refpage.getObjectHandle());
+}
+
+void
+QPDFPageDocumentHelper::removePage(QPDFPageObjectHelper page)
+{
+    qpdf.removePage(page.getObjectHandle());
+}
+
+void
+QPDFPageDocumentHelper::flattenAnnotations(int required_flags, int forbidden_flags)
+{
+    qpdf.doc().pages().flatten_annotations(required_flags, forbidden_flags);
+}
+
+void
+Pages::flatten_annotations(int required_flags, int forbidden_flags)
+{
+    auto& afdh = qpdf.doc().acroform();
+    if (afdh.getNeedAppearances()) {
+        qpdf.getRoot()
+            .getKey("/AcroForm")
+            .warn(
+                "document does not have updated appearance streams, so form fields "
+                "will not be flattened");
+    }
+    for (QPDFPageObjectHelper ph: all()) {
+        QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
+        if (!resources.isDictionary()) {
+            // As of #1521, this should be impossible unless a user inserted an invalid page.
+            resources = ph.getObjectHandle().replaceKeyAndGetNew("/Resources", Dictionary::empty());
+        }
+        flatten_annotations_for_page(ph, resources, afdh, required_flags, forbidden_flags);
+    }
+    if (!afdh.getNeedAppearances()) {
+        qpdf.getRoot().removeKey("/AcroForm");
+    }
+}
+
+void
+Pages::flatten_annotations_for_page(
+    QPDFPageObjectHelper& page,
+    QPDFObjectHandle& resources,
+    QPDFAcroFormDocumentHelper& afdh,
+    int required_flags,
+    int forbidden_flags)
+{
+    bool need_appearances = afdh.getNeedAppearances();
+    std::vector<QPDFAnnotationObjectHelper> annots = page.getAnnotations();
+    std::vector<QPDFObjectHandle> new_annots;
+    std::string new_content;
+    int rotate = 0;
+    QPDFObjectHandle rotate_obj = page.getObjectHandle().getKey("/Rotate");
+    if (rotate_obj.isInteger() && rotate_obj.getIntValue()) {
+        rotate = rotate_obj.getIntValueAsInt();
+    }
+    int next_fx = 1;
+    for (auto& aoh: annots) {
+        QPDFObjectHandle as = aoh.getAppearanceStream("/N");
+        bool is_widget = (aoh.getSubtype() == "/Widget");
+        bool process = true;
+        if (need_appearances && is_widget) {
+            process = false;
+        }
+        if (process && as.isStream()) {
+            if (is_widget) {
+                QPDFFormFieldObjectHelper ff = afdh.getFieldForAnnotation(aoh);
+                QPDFObjectHandle as_resources = as.getDict().getKey("/Resources");
+                if (as_resources.isIndirect()) {
+                    ;
+                    as.getDict().replaceKey("/Resources", as_resources.shallowCopy());
+                    as_resources = as.getDict().getKey("/Resources");
+                }
+                as_resources.mergeResources(ff.getDefaultResources());
+            } else {
+                QTC::TC("qpdf", "QPDFPageDocumentHelper non-widget annotation");
+            }
+            std::string name = resources.getUniqueResourceName("/Fxo", next_fx);
+            std::string content =
+                aoh.getPageContentForAppearance(name, rotate, required_flags, forbidden_flags);
+            if (!content.empty()) {
+                resources.mergeResources("<< /XObject << >> >>"_qpdf);
+                resources.getKey("/XObject").replaceKey(name, as);
+                ++next_fx;
+            }
+            new_content += content;
+        } else if (process && !aoh.getAppearanceDictionary().null()) {
+            // If an annotation has no selected appearance stream, just drop the annotation when
+            // flattening. This can happen for unchecked checkboxes and radio buttons, popup windows
+            // associated with comments that aren't visible, and other types of annotations that
+            // aren't visible. Annotations that have no appearance streams at all, such as Link,
+            // Popup, and Projection, should be preserved.
+        } else {
+            new_annots.push_back(aoh.getObjectHandle());
+        }
+    }
+    if (new_annots.size() != annots.size()) {
+        QPDFObjectHandle page_oh = page.getObjectHandle();
+        if (new_annots.empty()) {
+            page_oh.removeKey("/Annots");
+        } else {
+            QPDFObjectHandle old_annots = page_oh.getKey("/Annots");
+            QPDFObjectHandle new_annots_oh = QPDFObjectHandle::newArray(new_annots);
+            if (old_annots.isIndirect()) {
+                qpdf.replaceObject(old_annots.getObjGen(), new_annots_oh);
+            } else {
+                page_oh.replaceKey("/Annots", new_annots_oh);
+            }
+        }
+        page.addPageContents(qpdf.newStream("q\n"), true);
+        page.addPageContents(qpdf.newStream("\nQ\n" + new_content), false);
+    }
 }

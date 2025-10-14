@@ -27,7 +27,8 @@
 using namespace std::literals;
 using namespace qpdf;
 
-using Encryption = QPDF::Doc::Encryption;
+using Doc = QPDF::Doc;
+using Encryption = Doc::Encryption;
 
 QPDFWriter::ProgressReporter::~ProgressReporter() // NOLINT (modernize-use-equals-default)
 {
@@ -262,13 +263,13 @@ Pl_stack::Popper::pop()
 }
 
 // Writer class is restricted to QPDFWriter so that only it can call certain methods.
-class QPDF::Doc::Writer
+class Doc::Writer: Doc::Common
 {
     friend class QPDFWriter;
-    Writer(QPDF& pdf) :
-        pdf(pdf),
-        lin(pdf.m->lin),
-        objects(pdf.m->objects)
+    Writer(QPDF& qpdf) :
+        Common(qpdf, qpdf.doc().m),
+        lin(m->lin),
+        objects(m->objects)
     {
     }
 
@@ -326,10 +327,9 @@ class QPDF::Doc::Writer
     size_t
     tableSize()
     {
-        return pdf.m->objects.tableSize();
+        return qpdf.m->objects.tableSize();
     }
 
-    QPDF& pdf;
     QPDF::Doc::Linearization& lin;
     QPDF::Doc::Objects& objects;
 };
@@ -352,7 +352,8 @@ class QPDFWriter::Members: QPDF::Doc::Writer
         QPDF::Doc::Writer(pdf),
         w(w),
         root_og(
-            pdf.getRoot().getObjGen().isIndirect() ? pdf.getRoot().getObjGen() : QPDFObjGen(-1, 0)),
+            qpdf.getRoot().getObjGen().isIndirect() ? qpdf.getRoot().getObjGen()
+                                                    : QPDFObjGen(-1, 0)),
         pipeline_stack(pipeline)
     {
     }
@@ -1372,7 +1373,7 @@ QPDFWriter::Members::enqueueObject(QPDFObjectHandle object)
         // object to have an owning QPDF that is from another file if a direct QPDFObjectHandle from
         // one file was insert into another file without copying. Doing that is safe even if the
         // original QPDF gets destroyed, which just disconnects the QPDFObjectHandle from its owner.
-        if (object.getOwningQPDF() != &pdf) {
+        if (object.getOwningQPDF() != &qpdf) {
             throw std::logic_error(
                 "QPDFObjectHandle from different QPDF found while writing.  Use "
                 "QPDF::copyForeignObject to add objects from another file.");
@@ -1396,7 +1397,7 @@ QPDFWriter::Members::enqueueObject(QPDFObjectHandle object)
                 // stream.  Object streams always have generation 0.
                 // Detect loops by storing invalid object ID -1, which will get overwritten later.
                 o.renumber = -1;
-                enqueueObject(pdf.getObject(o.object_stream, 0));
+                enqueueObject(qpdf.getObject(o.object_stream, 0));
             } else {
                 object_queue.emplace_back(object);
                 o.renumber = next_objid++;
@@ -1907,7 +1908,7 @@ QPDFWriter::Members::writeObjectStream(QPDFObjectHandle object)
             // reporting, decrement in pass 1.
             indicateProgress(true, false);
 
-            QPDFObjectHandle obj_to_write = pdf.getObject(og);
+            QPDFObjectHandle obj_to_write = qpdf.getObject(og);
             if (obj_to_write.isStream()) {
                 // This condition occurred in a fuzz input. Ideally we should block it at parse
                 // time, but it's not clear to me how to construct a case for this.
@@ -2024,7 +2025,7 @@ QPDFWriter::Members::writeObject(QPDFObjectHandle object, int object_stream_inde
 std::string
 QPDFWriter::Members::getOriginalID1()
 {
-    QPDFObjectHandle trailer = pdf.getTrailer();
+    QPDFObjectHandle trailer = qpdf.getTrailer();
     if (trailer.hasKey("/ID")) {
         return trailer.getKey("/ID").getArrayItem(0).getStringValue();
     } else {
@@ -2042,7 +2043,7 @@ QPDFWriter::Members::generateID(bool encrypted)
         return;
     }
 
-    QPDFObjectHandle trailer = pdf.getTrailer();
+    QPDFObjectHandle trailer = qpdf.getTrailer();
 
     std::string result;
 
@@ -2126,7 +2127,6 @@ void
 QPDFWriter::Members::initializeSpecialStreams()
 {
     // Mark all page content streams in case we are filtering or normalizing.
-    std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
     int num = 0;
     for (auto& page: pages) {
         page_object_to_seq[page.getObjGen()] = ++num;
@@ -2220,13 +2220,13 @@ QPDFWriter::Members::generateObjectStreams()
         ++n_per;
     }
     unsigned int n = 0;
-    int cur_ostream = pdf.newIndirectNull().getObjectID();
+    int cur_ostream = qpdf.newIndirectNull().getObjectID();
     for (auto const& item: eligible) {
         if (n == n_per) {
             n = 0;
             // Construct a new null object as the "original" object stream.  The rest of the code
             // knows that this means we're creating the object stream from scratch.
-            cur_ostream = pdf.newIndirectNull().getObjectID();
+            cur_ostream = qpdf.newIndirectNull().getObjectID();
         }
         auto& o = obj[item];
         o.object_stream = cur_ostream;
@@ -2240,7 +2240,7 @@ QPDFWriter::Members::trimmed_trailer()
 {
     // Remove keys from the trailer that necessarily have to be replaced when writing the file.
 
-    Dictionary trailer = pdf.getTrailer().unsafeShallowCopy();
+    Dictionary trailer = qpdf.getTrailer().unsafeShallowCopy();
 
     // Remove encryption keys
     trailer.erase("/ID");
@@ -2265,8 +2265,8 @@ QPDFWriter::Members::trimmed_trailer()
 void
 QPDFWriter::Members::prepareFileForWrite()
 {
-    pdf.fixDanglingReferences();
-    auto root = pdf.getRoot();
+    qpdf.fixDanglingReferences();
+    auto root = qpdf.getRoot();
     auto oh = root.getKey("/Extensions");
     if (oh.isDictionary()) {
         const bool extensions_indirect = oh.isIndirect();
@@ -2335,7 +2335,7 @@ QPDFWriter::Members::doWriteSetup()
     }
 
     if (preserve_encryption) {
-        copyEncryptionParameters(pdf);
+        copyEncryptionParameters(qpdf);
     }
 
     if (!forced_pdf_version.empty()) {
@@ -2380,7 +2380,7 @@ QPDFWriter::Members::doWriteSetup()
     if (!obj.streams_empty) {
         if (linearized) {
             // Page dictionaries are not allowed to be compressed objects.
-            for (auto& page: pdf.getAllPages()) {
+            for (auto& page: pages) {
                 if (obj[page].object_stream > 0) {
                     obj[page].object_stream = 0;
                 }
@@ -2416,7 +2416,7 @@ QPDFWriter::Members::doWriteSetup()
         }
     }
 
-    setMinimumPDFVersion(pdf.getPDFVersion(), pdf.getExtensionLevel());
+    setMinimumPDFVersion(qpdf.getPDFVersion(), qpdf.getExtensionLevel());
     final_pdf_version = min_pdf_version;
     final_extension_level = min_extension_level;
     if (!forced_pdf_version.empty()) {
@@ -2438,7 +2438,7 @@ QPDFWriter::Members::write()
 
     // Set up progress reporting. For linearized files, we write two passes. events_expected is an
     // approximation, but it's good enough for progress reporting, which is mostly a guess anyway.
-    events_expected = QIntC::to_int(pdf.getObjectCount() * (linearized ? 2 : 1));
+    events_expected = QIntC::to_int(qpdf.getObjectCount() * (linearized ? 2 : 1));
 
     prepareFileForWrite();
 
@@ -2910,14 +2910,11 @@ QPDFWriter::Members::writeLinearized()
         openObject(lindict_id);
         write("<<");
         if (pass == 2) {
-            std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
-            int first_page_object = obj[pages.at(0)].renumber;
-
             write(" /Linearized 1 /L ").write(file_size + hint_length);
             // Implementation note 121 states that a space is mandatory after this open bracket.
             write(" /H [ ").write(new_obj[hint_id].xref.getOffset()).write(" ");
             write(hint_length);
-            write(" ] /O ").write(first_page_object);
+            write(" ] /O ").write(obj[pages.all().at(0)].renumber);
             write(" /E ").write(part6_end_offset + hint_length);
             write(" /N ").write(pages.size());
             write(" /T ").write(space_before_zero + hint_length);
@@ -3110,7 +3107,7 @@ void
 QPDFWriter::Members::enqueueObjectsStandard()
 {
     if (preserve_unreferenced_objects) {
-        for (auto const& oh: pdf.getAllObjects()) {
+        for (auto const& oh: qpdf.getAllObjects()) {
             enqueueObject(oh);
         }
     }
@@ -3136,20 +3133,18 @@ QPDFWriter::Members::enqueueObjectsPCLm()
     std::string image_transform_content = "q /image Do Q\n";
 
     // enqueue all pages first
-    std::vector<QPDFObjectHandle> all = pdf.getAllPages();
-    for (auto& page: all) {
+    for (auto& page: pages) {
         // enqueue page
         enqueueObject(page);
 
         // enqueue page contents stream
-        enqueueObject(page.getKey("/Contents"));
+        enqueueObject(page["/Contents"]);
 
         // enqueue all the strips for each page
-        QPDFObjectHandle strips = page.getKey("/Resources").getKey("/XObject");
-        for (auto& image: strips.as_dictionary()) {
+        for (auto& image: Dictionary(page["/Resources"]["/XObject"])) {
             if (!image.second.null()) {
                 enqueueObject(image.second);
-                enqueueObject(QPDFObjectHandle::newStream(&pdf, image_transform_content));
+                enqueueObject(QPDFObjectHandle::newStream(&qpdf, image_transform_content));
             }
         }
     }

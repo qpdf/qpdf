@@ -30,7 +30,7 @@ using Streams = QPDF::Doc::Objects::Streams;
 bool
 Streams::immediate_copy_from() const
 {
-    return qpdf_.m->immediate_copy_from;
+    return qpdf.m->immediate_copy_from;
 }
 
 class Streams::Copier final: public QPDFObjectHandle::StreamDataProvider
@@ -83,10 +83,10 @@ class Streams::Copier final: public QPDFObjectHandle::StreamDataProvider
         if (data != copied_data.end()) {
             auto& fd = data->second;
             QTC::TC("qpdf", "QPDF pipe foreign encrypted stream", fd.encp->encrypted ? 0 : 1);
-            if (streams.qpdf().pipeStreamData(
+            if (streams.qpdf.pipeStreamData(
                     fd.encp,
                     fd.file,
-                    streams.qpdf(),
+                    streams.qpdf,
                     fd.source_og,
                     fd.offset,
                     fd.length,
@@ -128,8 +128,8 @@ class Streams::Copier final: public QPDFObjectHandle::StreamDataProvider
     std::map<QPDFObjGen, Data> copied_data;
 };
 
-Streams::Streams(QPDF& qpdf) :
-    qpdf_(qpdf),
+Streams::Streams(Common& common) :
+    Common(common),
     copier_(std::make_shared<Copier>(*this))
 {
 }

@@ -224,14 +224,8 @@ QPDFAnnotationObjectHelper default matrix 0
 QPDFAnnotationObjectHelper rotate 90 0
 QPDFAnnotationObjectHelper rotate 180 0
 QPDFAnnotationObjectHelper rotate 270 0
-QPDFPageDocumentHelper skip widget need appearances 0
-QPDFPageDocumentHelper merge DR 0
 QPDFPageDocumentHelper non-widget annotation 0
-QPDFPageDocumentHelper remove annots 0
-QPDFPageDocumentHelper replace indirect annots 0
-QPDFPageDocumentHelper replace direct annots 0
 QPDFObjectHandle replace with copy 0
-QPDFPageDocumentHelper indirect as resources 0
 QPDFAnnotationObjectHelper forbidden flags 0
 QPDFAnnotationObjectHelper missing required flags 0
 QPDFFormFieldObjectHelper checkbox kid widget 0
@@ -255,7 +249,6 @@ QPDFJob auto-encode password 0
 QPDFJob bytes fallback warning 0
 QPDFJob invalid utf-8 in auto 0
 QPDFJob input password hex-bytes 0
-QPDFPageDocumentHelper ignore annotation with no appearance 0
 QPDFFormFieldObjectHelper replaced BMC at EOF 0
 QPDFFormFieldObjectHelper fallback Tf 0
 QPDFPageObjectHelper copy shared attribute 1
@@ -383,8 +376,6 @@ qpdf-c warn about oh error 1
 qpdf-c cleanup warned about unhandled error 0
 qpdf-c called qpdf_get_object_by_id 0
 qpdf-c called qpdf_replace_object 0
-qpdf-c called qpdf_num_pages 0
-qpdf-c called qpdf_get_page_n 0
 qpdf-c called qpdf_update_all_pages_cache 0
 qpdf-c called qpdf_find_page_by_id 0
 qpdf-c called qpdf_find_page_by_oh 0
@@ -422,14 +413,9 @@ qpdf-c called qpdf_empty_pdf 0
 QPDF_json missing qpdf 0
 QPDF_json missing pdf version 0
 QPDF_json top-level scalar 0
-QPDF_json bad pdf version 0
 QPDF_json top-level array 0
-QPDF_json bad object key 0
-QPDF_json trailer stream 0
 QPDF_json missing trailer 0
 QPDF_json missing objects 0
-QPDF_json ignoring in st_ignore 0
-QPDF_json stream dict not dict 0
 QPDF_json unrecognized string value 0
 QPDF_json data datafile both or neither 0
 QPDF_json stream no dict 0
@@ -438,25 +424,13 @@ QPDF_json value stream both or neither 0
 QPDFJob need json-stream-prefix for stdout 0
 QPDFJob write json to stdout 0
 QPDFJob write json to file 0
-QPDF_json ignoring unknown top-level key 0
-QPDF_json ignore second-level key 0
-QPDF_json ignore unknown key in object_top 0
-QPDF_json ignore unknown key in trailer 0
-QPDF_json ignore unknown key in stream 0
 QPDF_json data and datafile 0
 QPDF_json no stream data in update mode 0
 QPDF_json updating existing stream 0
-QPDF_json qpdf not array 0
 QPDF_json more than two qpdf elements 0
 QPDF_json missing json version 0
-QPDF_json bad json version 0
-QPDF_json bad calledgetallpages 0
-QPDF_json bad pushedinheritedpageresources 0
 QPDFPageObjectHelper used fallback without copying 0
 QPDF skipping cache for known unchecked object 0
 QPDF recover xref stream 0
 QPDFJob json over/under no file 0
 QPDF_Array copy 1
-QPDF_json stream data not string 0
-QPDF_json stream datafile not string 0
-QPDF_json stream not a dictionary 0

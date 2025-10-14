@@ -747,20 +747,7 @@ class QPDF
     class ResolveRecorder;
     class JSONReactor;
 
-    void stopOnError(std::string const& message);
-    inline void
-    no_ci_stop_if(bool condition, std::string const& message, std::string const& context = {});
     void removeObject(QPDFObjGen og);
-    static QPDFExc damagedPDF(
-        InputSource& input,
-        std::string const& object,
-        qpdf_offset_t offset,
-        std::string const& message);
-    QPDFExc damagedPDF(InputSource& input, qpdf_offset_t offset, std::string const& message);
-    QPDFExc damagedPDF(std::string const& object, qpdf_offset_t offset, std::string const& message);
-    QPDFExc damagedPDF(std::string const& object, std::string const& message);
-    QPDFExc damagedPDF(qpdf_offset_t offset, std::string const& message);
-    QPDFExc damagedPDF(std::string const& message);
 
     // Calls finish() on the pipeline when done but does not delete it
     bool pipeStreamData(

@@ -305,10 +305,10 @@ namespace qpdf
         explicit Integer(std::integral auto value) :
             Integer(static_cast<long long>(value))
         {
-            if constexpr (
-                std::numeric_limits<decltype(value)>::max() >
-                std::numeric_limits<long long>::max()) {
-                if (value > std::numeric_limits<long long>::max()) {
+            if constexpr (std::cmp_greater(
+                              std::numeric_limits<decltype(value)>::max(),
+                              std::numeric_limits<long long>::max())) {
+                if (std::cmp_greater(value, std::numeric_limits<long long>::max())) {
                     throw std::overflow_error("overflow constructing Integer");
                 }
             }

@@ -1,6 +1,6 @@
 #include <qpdf/qpdf-c.h>
 
-#include <qpdf/QPDF.hh>
+#include <qpdf/QPDF_private.hh>
 
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/Pl_Buffer.hh>
@@ -1804,10 +1804,9 @@ qpdf_oh_replace_stream_data(
 int
 qpdf_get_num_pages(qpdf_data qpdf)
 {
-    QTC::TC("qpdf", "qpdf-c called qpdf_num_pages");
     int n = -1;
     QPDF_ERROR_CODE code =
-        trap_errors(qpdf, [&n](qpdf_data q) { n = QIntC::to_int(q->qpdf->getAllPages().size()); });
+        trap_errors(qpdf, [&n](qpdf_data q) { n = QIntC::to_int(q->qpdf->doc().pages().size()); });
     if (code & QPDF_ERRORS) {
         return -1;
     }
@@ -1817,10 +1816,10 @@ qpdf_get_num_pages(qpdf_data qpdf)
 qpdf_oh
 qpdf_get_page_n(qpdf_data qpdf, size_t i)
 {
-    QTC::TC("qpdf", "qpdf-c called qpdf_get_page_n");
     qpdf_oh result = 0;
-    QPDF_ERROR_CODE code = trap_errors(
-        qpdf, [&result, i](qpdf_data q) { result = new_object(q, q->qpdf->getAllPages().at(i)); });
+    QPDF_ERROR_CODE code = trap_errors(qpdf, [&result, i](qpdf_data q) {
+        result = new_object(q, q->qpdf->doc().pages().all().at(i));
+    });
     if ((code & QPDF_ERRORS) || (result == 0)) {
         return qpdf_oh_new_uninitialized(qpdf);
     }
