@@ -898,6 +898,12 @@ class QPDF::Doc::Pages: Common
     }
 
     int find(QPDFObjGen og);
+    void insert(QPDFObjectHandle newpage, int pos);
+    void
+    insert(QPDFObjectHandle const& newpage, size_t pos)
+    {
+        insert(newpage, static_cast<int>(pos));
+    }
     void erase(QPDFObjectHandle& page);
     void update_cache();
     void flatten_annotations(int required_flags, int forbidden_flags);
@@ -914,7 +920,6 @@ class QPDF::Doc::Pages: Common
         return ever_called_get_all_pages_;
     }
 
-    void insertPage(QPDFObjectHandle newpage, int pos);
     void pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys);
 
   private:

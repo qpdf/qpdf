@@ -444,47 +444,46 @@ Pages::insertPageobjToPage(QPDFObjectHandle const& obj, int pos, bool check_dupl
 }
 
 void
-Pages::insertPage(QPDFObjectHandle newpage, int pos)
+Pages::insert(QPDFObjectHandle newpage, int pos)
 {
     // pos is numbered from 0, so pos = 0 inserts at the beginning and pos = npages adds to the end.
 
     flattenPagesTree();
 
-    if (!newpage.isIndirect()) {
+    if (!newpage.indirect()) {
         newpage = qpdf.makeIndirectObject(newpage);
-    } else if (newpage.getOwningQPDF() != &qpdf) {
-        newpage.getQPDF().pushInheritedAttributesToPage();
+    } else if (newpage.qpdf() != &qpdf) {
+        newpage.qpdf()->pushInheritedAttributesToPage();
         newpage = qpdf.copyForeignObject(newpage);
     } else {
         QTC::TC("qpdf", "QPDF insert indirect page");
     }
 
-    if (pos < 0 || toS(pos) > all_pages.size()) {
+    if (pos < 0 || std::cmp_greater(pos, all_pages.size())) {
         throw std::runtime_error("QPDF::insertPage called with pos out of range");
     }
 
     QTC::TC(
         "qpdf",
         "QPDF insert page",
-        (pos == 0) ? 0 :                         // insert at beginning
-            (pos == toI(all_pages.size())) ? 1   // at end
-                                           : 2); // insert in middle
+        pos == 0 ? 0 :                        // insert at beginning
+            std::cmp_equal(pos, size()) ? 1   // at end
+                                        : 2); // insert in middle
 
-    auto og = newpage.getObjGen();
-    if (pageobj_to_pages_pos.contains(og)) {
-        newpage = qpdf.makeIndirectObject(QPDFObjectHandle(newpage).shallowCopy());
+    if (pageobj_to_pages_pos.contains(newpage)) {
+        newpage = qpdf.makeIndirectObject(newpage.copy());
     }
 
-    QPDFObjectHandle pages = qpdf.getRoot().getKey("/Pages");
-    QPDFObjectHandle kids = pages.getKey("/Kids");
+    auto pages = qpdf.getRoot()["/Pages"];
+    Array kids = pages["/Kids"];
 
     newpage.replaceKey("/Parent", pages);
-    kids.insertItem(pos, newpage);
-    int npages = static_cast<int>(kids.size());
-    pages.replaceKey("/Count", QPDFObjectHandle::newInteger(npages));
+    kids.insert(pos, newpage);
+    size_t npages = kids.size();
+    pages.replaceKey("/Count", Integer(npages));
     all_pages.insert(all_pages.begin() + pos, newpage);
-    for (int i = pos + 1; i < npages; ++i) {
-        insertPageobjToPage(all_pages.at(toS(i)), i, false);
+    for (size_t i = static_cast<size_t>(pos) + 1; i < npages; ++i) {
+        insertPageobjToPage(all_pages.at(i), static_cast<int>(i), false);
     }
     insertPageobjToPage(newpage, pos, true);
 }
@@ -526,17 +525,16 @@ QPDF::addPageAt(QPDFObjectHandle newpage, bool before, QPDFObjectHandle refpage)
     if (!before) {
         ++refpos;
     }
-    m->pages.insertPage(newpage, refpos);
+    m->pages.insert(newpage, refpos);
 }
 
 void
 QPDF::addPage(QPDFObjectHandle newpage, bool first)
 {
     if (first) {
-        m->pages.insertPage(newpage, 0);
+        m->pages.insert(newpage, 0);
     } else {
-        m->pages.insertPage(
-            newpage, getRoot().getKey("/Pages").getKey("/Count").getIntValueAsInt());
+        m->pages.insert(newpage, getRoot()["/Pages"]["/Count"].getIntValueAsInt());
     }
 }
 
@@ -612,7 +610,7 @@ QPDFPageDocumentHelper::removeUnreferencedResources()
 void
 QPDFPageDocumentHelper::addPage(QPDFPageObjectHelper newpage, bool first)
 {
-    qpdf.addPage(newpage.getObjectHandle(), first);
+    qpdf.doc().pages().insert(newpage, first ? 0 : qpdf.doc().pages().size());
 }
 
 void
