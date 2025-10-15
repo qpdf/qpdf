@@ -157,7 +157,7 @@ Objects::parse(char const* password)
             throw damagedPDF("", -1, std::string("error reading xref: ") + e.what());
         }
     } catch (QPDFExc& e) {
-        if (cf.attempt_recovery()) {
+        if (!cf.surpress_recovery()) {
             reconstruct_xref(e, xref_offset > 0);
         } else {
             throw;
@@ -1248,7 +1248,7 @@ Objects::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offse
             throw damagedPDF("expected endstream");
         }
     } catch (QPDFExc& e) {
-        if (cf.attempt_recovery()) {
+        if (!cf.surpress_recovery()) {
             warn(e);
             length = recoverStreamLength(m->file, og, stream_offset);
         } else {
@@ -1431,7 +1431,7 @@ Objects::readObjectAtOffset(
     QPDFObjGen og;
     setLastObjectDescription(description, exp_og);
 
-    if (!cf.attempt_recovery()) {
+    if (cf.surpress_recovery()) {
         try_recovery = false;
     }
 

@@ -1739,7 +1739,7 @@ QPDFJob::doProcess(
     // was incorrectly encoded, there's a good chance we'd succeed here.
 
     std::string ptemp;
-    if (password && !m->qcf.provided_password_is_hex_key()) {
+    if (password && !m->qcf.password_is_hex_key()) {
         if (m->password_mode == QPDFJob::pm_hex_bytes) {
             // Special case: handle --password-mode=hex-bytes for input password as well as output
             // password
@@ -1747,8 +1747,7 @@ QPDFJob::doProcess(
             password = ptemp.c_str();
         }
     }
-    if (!password || empty || m->qcf.provided_password_is_hex_key() ||
-        m->suppress_password_recovery) {
+    if (!password || empty || m->qcf.password_is_hex_key() || m->suppress_password_recovery) {
         // There is no password, or we're not doing recovery, so just do the normal processing with
         // the supplied password.
         doProcessOnce(pdf, fn, password, empty, used_for_input, main_input);

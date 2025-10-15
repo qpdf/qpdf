@@ -904,7 +904,7 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
     }
 
     Encryption data(V, R, Length / 8, p, O, U, OE, UE, Perms, id1, encrypt_metadata);
-    if (qm.cf.provided_password_is_hex_key()) {
+    if (qm.cf.password_is_hex_key()) {
         // ignore passwords in file
         encryption_key = QUtil::hex_decode(provided_password);
         return;

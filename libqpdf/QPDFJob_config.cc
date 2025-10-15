@@ -466,7 +466,7 @@ QPDFJob::Config::password(std::string const& parameter)
 QPDFJob::Config*
 QPDFJob::Config::passwordIsHexKey()
 {
-    o.m->qcf.provided_password_is_hex_key(true);
+    o.m->qcf.password_is_hex_key(true);
     return this;
 }
 
@@ -663,7 +663,7 @@ QPDFJob::Config::suppressPasswordRecovery()
 QPDFJob::Config*
 QPDFJob::Config::suppressRecovery()
 {
-    o.m->qcf.attempt_recovery(false);
+    o.m->qcf.surpress_recovery(true);
     return this;
 }
 

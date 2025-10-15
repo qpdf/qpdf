@@ -231,7 +231,7 @@ QPDF::closeInputSource()
 void
 QPDF::setPasswordIsHexKey(bool val)
 {
-    m->cf.provided_password_is_hex_key(val);
+    m->cf.password_is_hex_key(val);
 }
 
 void
@@ -250,7 +250,7 @@ QPDF::registerStreamFilter(
 void
 QPDF::setIgnoreXRefStreams(bool val)
 {
-    m->cf.ignore_xref_streams(val);
+    (void)m->cf.ignore_xref_streams(val);
 }
 
 std::shared_ptr<QPDFLogger>
@@ -275,19 +275,19 @@ QPDF::setOutputStreams(std::ostream* out, std::ostream* err)
 void
 QPDF::setSuppressWarnings(bool val)
 {
-    m->cf.suppress_warnings(val);
+    (void)m->cf.suppress_warnings(val);
 }
 
 void
 QPDF::setMaxWarnings(size_t val)
 {
-    m->cf.max_warnings(val);
+    (void)m->cf.max_warnings(val);
 }
 
 void
 QPDF::setAttemptRecovery(bool val)
 {
-    (void)m->cf.attempt_recovery(val);
+    (void)m->cf.surpress_recovery(!val);
 }
 
 void

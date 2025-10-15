@@ -34,15 +34,15 @@ namespace qpdf
             }
 
             bool
-            provided_password_is_hex_key() const
+            password_is_hex_key() const
             {
-                return provided_password_is_hex_key_;
+                return password_is_hex_key_;
             }
 
             Config&
-            provided_password_is_hex_key(bool val)
+            password_is_hex_key(bool val)
             {
-                provided_password_is_hex_key_ = val;
+                password_is_hex_key_ = val;
                 return *this;
             }
 
@@ -99,15 +99,15 @@ namespace qpdf
             }
 
             bool
-            attempt_recovery() const
+            surpress_recovery() const
             {
-                return attempt_recovery_;
+                return surpress_recovery_;
             }
 
             Config&
-            attempt_recovery(bool val)
+            surpress_recovery(bool val)
             {
-                attempt_recovery_ = val;
+                surpress_recovery_ = val;
                 return *this;
             }
 
@@ -142,10 +142,10 @@ namespace qpdf
 
             size_t max_warnings_{0};
 
-            bool provided_password_is_hex_key_{false};
+            bool password_is_hex_key_{false};
             bool ignore_xref_streams_{false};
             bool suppress_warnings_{false};
-            bool attempt_recovery_{true};
+            bool surpress_recovery_{false};
             bool check_mode_{false};
             bool immediate_copy_from_{false};
         }; // Class Config
