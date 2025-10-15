@@ -787,16 +787,6 @@ class QPDF
         bool is_root_metadata,
         std::unique_ptr<Pipeline>& heap);
 
-    struct HPageOffsetEntry;
-    struct HPageOffset;
-    struct HSharedObjectEntry;
-    struct HSharedObject;
-    struct HGeneric;
-    struct LinParameters;
-    struct CHPageOffsetEntry;
-    struct CHPageOffset;
-    struct CHSharedObjectEntry;
-    struct CHSharedObject;
     class PatternFinder;
 
     // Methods to support pattern finding
