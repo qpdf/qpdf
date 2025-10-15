@@ -460,7 +460,6 @@ class QPDFJob
         bool main_input);
 
     // Transformations
-    void setQPDFOptions(QPDF& pdf);
     void handlePageSpecs(QPDF& pdf);
     bool shouldRemoveUnreferencedResources(QPDF& pdf);
     void handleRotations(QPDF& pdf);

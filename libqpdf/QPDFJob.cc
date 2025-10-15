@@ -477,7 +477,7 @@ QPDFJob::writeQPDF(QPDF& pdf)
     if (!pdf.getWarnings().empty()) {
         m->warnings = true;
     }
-    if (m->warnings && (!m->suppress_warnings)) {
+    if (m->warnings && !m->qcf.suppress_warnings()) {
         if (createsOutput()) {
             *m->log->getWarn()
                 << m->message_prefix
@@ -635,24 +635,6 @@ QPDFJob::getEncryptionStatus()
     return m->encryption_status;
 }
 
-void
-QPDFJob::setQPDFOptions(QPDF& pdf)
-{
-    pdf.setLogger(m->log);
-    if (m->ignore_xref_streams) {
-        pdf.setIgnoreXRefStreams(true);
-    }
-    if (m->suppress_recovery) {
-        pdf.setAttemptRecovery(false);
-    }
-    if (m->password_is_hex_key) {
-        pdf.setPasswordIsHexKey(true);
-    }
-    if (m->suppress_warnings) {
-        pdf.setSuppressWarnings(true);
-    }
-}
-
 static std::string
 show_bool(bool v)
 {
@@ -737,7 +719,6 @@ QPDFJob::doCheck(QPDF& pdf)
     bool okay = true;
     auto& cout = *m->log->getInfo();
     cout << "checking " << m->infile_name() << "\n";
-    pdf.doc().config().check_mode(true);
     try {
         int extension_level = pdf.getExtensionLevel();
         cout << "PDF Version: " << pdf.getPDFVersion();
@@ -1728,7 +1709,7 @@ QPDFJob::doProcessOnce(
     bool main_input)
 {
     pdf = std::make_unique<QPDF>();
-    setQPDFOptions(*pdf);
+    pdf->doc().config(m->qcf.log(m->log));
     if (empty) {
         pdf->emptyPDF();
     } else if (main_input && m->json_input) {
@@ -1758,16 +1739,16 @@ QPDFJob::doProcess(
     // was incorrectly encoded, there's a good chance we'd succeed here.
 
     std::string ptemp;
-    if (password && (!m->password_is_hex_key)) {
+    if (password && !m->qcf.provided_password_is_hex_key()) {
         if (m->password_mode == QPDFJob::pm_hex_bytes) {
             // Special case: handle --password-mode=hex-bytes for input password as well as output
             // password
-            QTC::TC("qpdf", "QPDFJob input password hex-bytes");
             ptemp = QUtil::hex_decode(password);
             password = ptemp.c_str();
         }
     }
-    if ((password == nullptr) || empty || m->password_is_hex_key || m->suppress_password_recovery) {
+    if (!password || empty || m->qcf.provided_password_is_hex_key() ||
+        m->suppress_password_recovery) {
         // There is no password, or we're not doing recovery, so just do the normal processing with
         // the supplied password.
         doProcessOnce(pdf, fn, password, empty, used_for_input, main_input);
@@ -3034,12 +3015,10 @@ QPDFJob::doSplitPages(QPDF& pdf)
             last = num_pages;
         }
         QPDF outpdf;
+        outpdf.doc().config(m->qcf);
         outpdf.emptyPDF();
         QPDFAcroFormDocumentHelper* out_afdh =
             afdh.hasAcroForm() ? &outpdf.doc().acroform() : nullptr;
-        if (m->suppress_warnings) {
-            outpdf.setSuppressWarnings(true);
-        }
         for (size_t pageno = first; pageno <= last; ++pageno) {
             QPDFObjectHandle page = pages.at(pageno - 1);
             outpdf.addPage(page, false);

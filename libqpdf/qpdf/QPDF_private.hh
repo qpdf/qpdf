@@ -504,6 +504,12 @@ class QPDF::Doc
         return cf;
     }
 
+    void
+    config(qpdf::Doc::Config val)
+    {
+        cf = val;
+    }
+
     inline Linearization& linearization();
 
     inline Objects& objects();
