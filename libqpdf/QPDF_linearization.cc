@@ -69,20 +69,20 @@ load_vector_vector(
     bit_stream.skipToNextByte();
 }
 
-QPDF::ObjUser::ObjUser(user_e type) :
+Lin::ObjUser::ObjUser(user_e type) :
     ou_type(type)
 {
     qpdf_expect(type == ou_root);
 }
 
-QPDF::ObjUser::ObjUser(user_e type, size_t pageno) :
+Lin::ObjUser::ObjUser(user_e type, size_t pageno) :
     ou_type(type),
     pageno(pageno)
 {
     qpdf_expect(type == ou_page || type == ou_thumb);
 }
 
-QPDF::ObjUser::ObjUser(user_e type, std::string const& key) :
+Lin::ObjUser::ObjUser(user_e type, std::string const& key) :
     ou_type(type),
     key(key)
 {
@@ -90,7 +90,7 @@ QPDF::ObjUser::ObjUser(user_e type, std::string const& key) :
 }
 
 bool
-QPDF::ObjUser::operator<(ObjUser const& rhs) const
+Lin::ObjUser::operator<(ObjUser const& rhs) const
 {
     if (ou_type < rhs.ou_type) {
         return true;
@@ -106,8 +106,8 @@ QPDF::ObjUser::operator<(ObjUser const& rhs) const
     return false;
 }
 
-QPDF::UpdateObjectMapsFrame::UpdateObjectMapsFrame(
-    QPDF::ObjUser const& ou, QPDFObjectHandle oh, bool top) :
+Lin::UpdateObjectMapsFrame::UpdateObjectMapsFrame(
+    ObjUser const& ou, QPDFObjectHandle oh, bool top) :
     ou(ou),
     oh(oh),
     top(top)
@@ -137,7 +137,7 @@ Lin::optimize_internal(
     bool allow_changes,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
-    if (!m->obj_user_to_objects.empty()) {
+    if (!obj_user_to_objects_.empty()) {
         // already optimized
         return;
     }
@@ -186,9 +186,9 @@ Lin::optimize_internal(
     }
 
     ObjUser root_ou = ObjUser(ObjUser::ou_root);
-    auto root_og = QPDFObjGen(root.getObjGen());
-    m->obj_user_to_objects[root_ou].insert(root_og);
-    m->object_to_obj_users[root_og].insert(root_ou);
+    auto root_og =root.id_gen();
+    obj_user_to_objects_[root_ou].insert(root_og);
+    object_to_obj_users_[root_og].insert(root_ou);
 
     filterCompressedObjects(object_stream_data);
 }
@@ -217,14 +217,14 @@ Lin::updateObjectMaps(
             }
         }
 
-        if (cur.oh.isIndirect()) {
+        if (cur.oh.indirect()) {
             QPDFObjGen og(cur.oh.getObjGen());
             if (!visited.add(og)) {
                 QTC::TC("qpdf", "QPDF opt loop detected");
                 continue;
             }
-            m->obj_user_to_objects[cur.ou].insert(og);
-            m->object_to_obj_users[og].insert(cur.ou);
+            obj_user_to_objects_[cur.ou].insert(og);
+            object_to_obj_users_[og].insert(cur.ou);
         }
 
         if (cur.oh.isArray()) {
@@ -280,34 +280,30 @@ Lin::filterCompressedObjects(std::map<int, int> const& object_stream_data)
     std::map<ObjUser, std::set<QPDFObjGen>> t_obj_user_to_objects;
     std::map<QPDFObjGen, std::set<ObjUser>> t_object_to_obj_users;
 
-    for (auto const& i1: m->obj_user_to_objects) {
-        ObjUser const& ou = i1.first;
-        // Loop over objects.
-        for (auto const& og: i1.second) {
+    for (auto const& [ou, ogs]: obj_user_to_objects_) {
+        for (auto const& og: ogs) {
             auto i2 = object_stream_data.find(og.getObj());
             if (i2 == object_stream_data.end()) {
                 t_obj_user_to_objects[ou].insert(og);
             } else {
-                t_obj_user_to_objects[ou].insert(QPDFObjGen(i2->second, 0));
+                t_obj_user_to_objects[ou].insert({i2->second, 0});
             }
         }
     }
 
-    for (auto const& i1: m->object_to_obj_users) {
-        QPDFObjGen const& og = i1.first;
-        // Loop over obj_users.
-        for (auto const& ou: i1.second) {
+    for (auto const& [og, ous]: object_to_obj_users_) {
+        for (auto const& ou: ous) {
             auto i2 = object_stream_data.find(og.getObj());
             if (i2 == object_stream_data.end()) {
                 t_object_to_obj_users[og].insert(ou);
             } else {
-                t_object_to_obj_users[QPDFObjGen(i2->second, 0)].insert(ou);
+                t_object_to_obj_users[{i2->second, 0}].insert(ou);
             }
         }
     }
 
-    m->obj_user_to_objects = t_obj_user_to_objects;
-    m->object_to_obj_users = t_object_to_obj_users;
+    obj_user_to_objects_ = std::move(t_obj_user_to_objects);
+    object_to_obj_users_ = std::move(t_object_to_obj_users);
 }
 
 void
@@ -324,10 +320,8 @@ Lin::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
     std::map<ObjUser, std::set<QPDFObjGen>> t_obj_user_to_objects;
     std::map<QPDFObjGen, std::set<ObjUser>> t_object_to_obj_users;
 
-    for (auto const& i1: m->obj_user_to_objects) {
-        ObjUser const& ou = i1.first;
-        // Loop over objects.
-        for (auto const& og: i1.second) {
+    for (auto const& [ou, ogs]: obj_user_to_objects_) {
+        for (auto const& og: ogs) {
             if (obj.contains(og)) {
                 if (auto const& i2 = obj[og].object_stream; i2 <= 0) {
                     t_obj_user_to_objects[ou].insert(og);
@@ -338,22 +332,21 @@ Lin::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
         }
     }
 
-    for (auto const& i1: m->object_to_obj_users) {
-        QPDFObjGen const& og = i1.first;
+    for (auto const& [og, ous]: object_to_obj_users_) {
         if (obj.contains(og)) {
             // Loop over obj_users.
-            for (auto const& ou: i1.second) {
+            for (auto const& ou: ous) {
                 if (auto i2 = obj[og].object_stream; i2 <= 0) {
                     t_object_to_obj_users[og].insert(ou);
                 } else {
-                    t_object_to_obj_users[QPDFObjGen(i2, 0)].insert(ou);
+                    t_object_to_obj_users[{i2, 0}].insert(ou);
                 }
             }
         }
     }
 
-    m->obj_user_to_objects = t_obj_user_to_objects;
-    m->object_to_obj_users = t_object_to_obj_users;
+    obj_user_to_objects_ = std::move(t_obj_user_to_objects);
+    object_to_obj_users_ = std::move(t_object_to_obj_users);
 }
 
 void
@@ -793,12 +786,12 @@ qpdf_offset_t
 Lin::maxEnd(ObjUser const& ou)
 {
     no_ci_stop_if(
-        !m->obj_user_to_objects.contains(ou),
+        !obj_user_to_objects_.contains(ou),
         "no entry in object user table for requested object user" //
     );
 
     qpdf_offset_t end = 0;
-    for (auto const& og: m->obj_user_to_objects[ou]) {
+    for (auto const& og: obj_user_to_objects_[ou]) {
         no_ci_stop_if(
             !m->obj_cache.contains(og), "unknown object referenced in object user table" //
         );
@@ -1233,7 +1226,7 @@ Lin::calculateLinearizationData(T const& object_stream_data)
     // actual offsets and lengths are not computed here, but anything related to object ordering is.
 
     util::assertion(
-        !m->object_to_obj_users.empty(),
+        !object_to_obj_users_.empty(),
         "INTERNAL ERROR: QPDF::calculateLinearizationData called before optimize()" //
     );
     // Note that we can't call optimize here because we don't know whether it should be called
@@ -1325,10 +1318,7 @@ Lin::calculateLinearizationData(T const& object_stream_data)
     std::set<QPDFObjGen> lc_outlines;
     std::set<QPDFObjGen> lc_root;
 
-    for (auto& oiter: m->object_to_obj_users) {
-        QPDFObjGen const& og = oiter.first;
-        std::set<ObjUser>& ous = oiter.second;
-
+    for (auto& [og, ous]: object_to_obj_users_) {
         bool in_open_document = false;
         bool in_first_page = false;
         int other_pages = 0;
@@ -1500,11 +1490,11 @@ Lin::calculateLinearizationData(T const& object_stream_data)
 
         ObjUser ou(ObjUser::ou_page, i);
         no_ci_stop_if(
-            !m->obj_user_to_objects.contains(ou),
+            !obj_user_to_objects_.contains(ou),
             "found unreferenced page while calculating linearization data" //
         );
 
-        for (auto const& og: m->obj_user_to_objects[ou]) {
+        for (auto const& og: obj_user_to_objects_[ou]) {
             if (lc_other_page_private.erase(og)) {
                 m->part7.emplace_back(qpdf.getObject(og));
                 ++m->c_page_offset_data.entries.at(i).nobjects;
@@ -1533,8 +1523,7 @@ Lin::calculateLinearizationData(T const& object_stream_data)
     // we throw all remaining objects in arbitrary order.
 
     // Place the pages tree.
-    std::set<QPDFObjGen> pages_ogs =
-        m->obj_user_to_objects[ObjUser(ObjUser::ou_root_key, "/Pages")];
+    auto& pages_ogs = obj_user_to_objects_[{ObjUser::ou_root_key, "/Pages"}];
     no_ci_stop_if(
         pages_ogs.empty(), "found empty pages tree while calculating linearization data" //
     );
@@ -1559,8 +1548,7 @@ Lin::calculateLinearizationData(T const& object_stream_data)
             // there's nothing to prevent it from having been in some set other than
             // lc_thumbnail_private.
         }
-        std::set<QPDFObjGen>& ogs = m->obj_user_to_objects[ObjUser(ObjUser::ou_thumb, i)];
-        for (auto const& og: ogs) {
+        for (auto const& og: obj_user_to_objects_[{ObjUser::ou_thumb, i}]) {
             if (lc_thumbnail_private.erase(og)) {
                 m->part9.emplace_back(qpdf.getObject(og));
             }
@@ -1591,7 +1579,7 @@ Lin::calculateLinearizationData(T const& object_stream_data)
 
     size_t num_placed =
         m->part4.size() + m->part6.size() + m->part7.size() + m->part8.size() + m->part9.size();
-    size_t num_wanted = m->object_to_obj_users.size();
+    size_t num_wanted = object_to_obj_users_.size();
     no_ci_stop_if(
         // This can happen with damaged files, e.g. if the root is part of the the pages tree.
         num_placed != num_wanted,
@@ -1642,12 +1630,12 @@ Lin::calculateLinearizationData(T const& object_stream_data)
         CHPageOffsetEntry& pe = m->c_page_offset_data.entries.at(i);
         ObjUser ou(ObjUser::ou_page, i);
         no_ci_stop_if(
-            !m->obj_user_to_objects.contains(ou),
+            !obj_user_to_objects_.contains(ou),
             "found unreferenced page while calculating linearization data" //
         );
 
-        for (auto const& og: m->obj_user_to_objects[ou]) {
-            if ((m->object_to_obj_users[og].size() > 1) && (obj_to_index.contains(og.getObj()))) {
+        for (auto const& og: obj_user_to_objects_[ou]) {
+            if (object_to_obj_users_[og].size() > 1 && obj_to_index.contains(og.getObj())) {
                 int idx = obj_to_index[og.getObj()];
                 ++pe.nshared_objects;
                 pe.shared_identifiers.push_back(idx);

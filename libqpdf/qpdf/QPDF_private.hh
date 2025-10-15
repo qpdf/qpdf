@@ -364,40 +364,6 @@ struct QPDF::CHSharedObject
 
 // No need for CHGeneric -- HGeneric is fine as is.
 
-// Data structures to support optimization -- implemented in QPDF_optimization.cc
-
-class QPDF::ObjUser
-{
-  public:
-    enum user_e { ou_page = 1, ou_thumb, ou_trailer_key, ou_root_key, ou_root };
-
-    ObjUser() = delete;
-
-    // type must be ou_root
-    ObjUser(user_e type);
-
-    // type must be one of ou_page or ou_thumb
-    ObjUser(user_e type, size_t pageno);
-
-    // type must be one of ou_trailer_key or ou_root_key
-    ObjUser(user_e type, std::string const& key);
-
-    bool operator<(ObjUser const&) const;
-
-    user_e ou_type;
-    size_t pageno{0}; // if ou_page;
-    std::string key;  // if ou_trailer_key or ou_root_key
-};
-
-struct QPDF::UpdateObjectMapsFrame
-{
-    UpdateObjectMapsFrame(ObjUser const& ou, QPDFObjectHandle oh, bool top);
-
-    ObjUser const& ou;
-    QPDFObjectHandle oh;
-    bool top;
-};
-
 class QPDF::PatternFinder final: public InputSource::Finder
 {
   public:
@@ -743,6 +709,40 @@ class QPDF::Doc::Linearization: Common
         bool compressed);
 
   private:
+    // Data structures to support optimization -- implemented in QPDF_optimization.cc
+
+    class ObjUser
+    {
+      public:
+        enum user_e { ou_page = 1, ou_thumb, ou_trailer_key, ou_root_key, ou_root };
+
+        ObjUser() = delete;
+
+        // type must be ou_root
+        ObjUser(user_e type);
+
+        // type must be one of ou_page or ou_thumb
+        ObjUser(user_e type, size_t pageno);
+
+        // type must be one of ou_trailer_key or ou_root_key
+        ObjUser(user_e type, std::string const& key);
+
+        bool operator<(ObjUser const&) const;
+
+        user_e ou_type;
+        size_t pageno{0}; // if ou_page;
+        std::string key;  // if ou_trailer_key or ou_root_key
+    };
+
+    struct UpdateObjectMapsFrame
+    {
+        UpdateObjectMapsFrame(ObjUser const& ou, QPDFObjectHandle oh, bool top) ;
+
+        ObjUser const& ou;
+        QPDFObjectHandle oh;
+        bool top;
+    };
+
     // methods to support linearization checking -- implemented in QPDF_linearization.cc
 
     void readLinearizationData();
@@ -797,6 +797,10 @@ class QPDF::Doc::Linearization: Common
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
     void filterCompressedObjects(QPDFWriter::ObjTable const& object_stream_data);
+
+    // Optimization data
+    std::map<ObjUser, std::set<QPDFObjGen>> obj_user_to_objects_;
+    std::map<QPDFObjGen, std::set<ObjUser>> object_to_obj_users_;
 };
 
 class QPDF::Doc::Objects: Common
@@ -1169,10 +1173,6 @@ class QPDF::Members: Doc
     std::vector<QPDFObjectHandle> part7;
     std::vector<QPDFObjectHandle> part8;
     std::vector<QPDFObjectHandle> part9;
-
-    // Optimization data
-    std::map<ObjUser, std::set<QPDFObjGen>> obj_user_to_objects;
-    std::map<QPDFObjGen, std::set<ObjUser>> object_to_obj_users;
 };
 
 // The Resolver class is restricted to QPDFObject and BaseHandle so that only it can resolve

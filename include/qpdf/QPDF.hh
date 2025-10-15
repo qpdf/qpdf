@@ -797,8 +797,6 @@ class QPDF
     struct CHPageOffset;
     struct CHSharedObjectEntry;
     struct CHSharedObject;
-    class ObjUser;
-    struct UpdateObjectMapsFrame;
     class PatternFinder;
 
     // Methods to support pattern finding
