@@ -366,12 +366,18 @@ Lin::linearizationWarning(std::string_view msg)
 bool
 QPDF::checkLinearization()
 {
+    return m->lin.check();
+}
+
+bool
+Lin::check()
+{
     try {
-        m->lin.readLinearizationData();
-        m->lin.checkLinearizationInternal();
+        readLinearizationData();
+        checkLinearizationInternal();
         return !m->linearization_warnings;
     } catch (std::runtime_error& e) {
-        m->lin.linearizationWarning(
+        linearizationWarning(
             "error encountered while checking linearization data: " + std::string(e.what()));
         return false;
     }
@@ -379,6 +385,12 @@ QPDF::checkLinearization()
 
 bool
 QPDF::isLinearized()
+{
+    return m->lin.linearized();
+}
+
+bool
+Lin::linearized()
 {
     // If the first object in the file is a dictionary with a suitable /Linearized key and has an /L
     // key that accurately indicates the file size, initialize m->lindict and return true.
@@ -411,7 +423,7 @@ QPDF::isLinearized()
             continue;
         }
 
-        Dictionary candidate = getObject(toI(QUtil::string_to_ll(t1.getValue().data())), 0);
+        Dictionary candidate = qpdf.getObject(toI(QUtil::string_to_ll(t1.getValue().data())), 0);
         auto linkey = candidate["/Linearized"];
         if (!(linkey.isNumber() && toI(floor(linkey.getNumericValue())) == 1)) {
             return false;
@@ -432,7 +444,7 @@ void
 Lin::readLinearizationData()
 {
     util::assertion(
-        qpdf.isLinearized(), "called readLinearizationData for file that is not linearized" //
+        linearized(), "called readLinearizationData for file that is not linearized" //
     );
 
     // This function throws an exception (which is trapped by checkLinearization()) for any errors
@@ -1083,12 +1095,18 @@ Lin::checkHOutlines()
 void
 QPDF::showLinearizationData()
 {
+    m->lin.show_data();
+}
+
+void
+Lin::show_data()
+{
     try {
-        m->lin.readLinearizationData();
-        m->lin.checkLinearizationInternal();
-        m->lin.dumpLinearizationDataInternal();
+        readLinearizationData();
+        checkLinearizationInternal();
+        dumpLinearizationDataInternal();
     } catch (QPDFExc& e) {
-        m->lin.linearizationWarning(e.what());
+        linearizationWarning(e.what());
     }
 }
 

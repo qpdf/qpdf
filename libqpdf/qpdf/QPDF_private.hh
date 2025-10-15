@@ -709,6 +709,10 @@ class QPDF::Doc::Linearization: Common
     {
     }
 
+    bool linearized();
+    bool check();
+    void show_data();
+
     // For QPDFWriter:
 
     template <typename T>
@@ -738,6 +742,7 @@ class QPDF::Doc::Linearization: Common
         int& O,
         bool compressed);
 
+  private:
     // methods to support linearization checking -- implemented in QPDF_linearization.cc
 
     void readLinearizationData();
