@@ -33,18 +33,6 @@ using namespace qpdf;
 using QDoc = QPDF::Doc;
 using Pages = QDoc::Pages;
 
-// JobSetter class is restricted to QPDFJob.
-class QDoc::JobSetter
-{
-  public:
-    // Enable enhanced warnings for pdf file checking.
-    static void
-    setCheckMode(QPDF& qpdf, bool val)
-    {
-        qpdf.m->cf.check_mode_ = val;
-    }
-};
-
 namespace
 {
     class ImageOptimizer final: public QPDFObjectHandle::StreamDataProvider
@@ -749,7 +737,7 @@ QPDFJob::doCheck(QPDF& pdf)
     bool okay = true;
     auto& cout = *m->log->getInfo();
     cout << "checking " << m->infile_name() << "\n";
-    QDoc::JobSetter::setCheckMode(pdf, true);
+    pdf.doc().config().check_mode(true);
     try {
         int extension_level = pdf.getExtensionLevel();
         cout << "PDF Version: " << pdf.getPDFVersion();

@@ -27,13 +27,117 @@ namespace qpdf
       public:
         class Config
         {
-            friend class QPDF;
-
+          public:
             Config() :
                 log_(QPDFLogger::defaultLogger())
             {
             }
 
+            bool
+            provided_password_is_hex_key() const
+            {
+                return provided_password_is_hex_key_;
+            }
+
+            Config&
+            provided_password_is_hex_key(bool val)
+            {
+                provided_password_is_hex_key_ = val;
+                return *this;
+            }
+
+            bool
+            ignore_xref_streams() const
+            {
+                return ignore_xref_streams_;
+            }
+
+            Config&
+            ignore_xref_streams(bool val)
+            {
+                ignore_xref_streams_ = val;
+                return *this;
+            }
+
+            std::shared_ptr<QPDFLogger>
+            log() const
+            {
+                return log_;
+            }
+
+            Config&
+            log(std::shared_ptr<QPDFLogger> val)
+            {
+                log_ = val;
+                return *this;
+            }
+
+            bool
+            suppress_warnings() const
+            {
+                return suppress_warnings_;
+            }
+
+            Config&
+            suppress_warnings(bool val)
+            {
+                suppress_warnings_ = val;
+                return *this;
+            }
+
+            size_t
+            max_warnings() const
+            {
+                return max_warnings_;
+            }
+
+            Config&
+            max_warnings(size_t val)
+            {
+                max_warnings_ = val;
+                return *this;
+            }
+
+            bool
+            attempt_recovery() const
+            {
+                return attempt_recovery_;
+            }
+
+            Config&
+            attempt_recovery(bool val)
+            {
+                attempt_recovery_ = val;
+                return *this;
+            }
+
+            bool
+            immediate_copy_from() const
+            {
+                return immediate_copy_from_;
+            }
+
+            Config&
+            immediate_copy_from(bool val)
+            {
+                immediate_copy_from_ = val;
+                return *this;
+            }
+
+            bool
+            check_mode() const
+            {
+                return check_mode_;
+            }
+
+            Config&
+            check_mode(bool val)
+            {
+                check_mode_ = val;
+                return *this;
+            }
+
+          private:
             std::shared_ptr<QPDFLogger> log_;
 
             size_t max_warnings_{0};
@@ -322,7 +426,6 @@ class QPDF::Doc
 {
   public:
     class Encryption;
-    class JobSetter;
     class Linearization;
     class Objects;
     class Pages;
@@ -378,6 +481,7 @@ class QPDF::Doc
         QPDF& qpdf;
         QPDF::Members* m;
 
+        qpdf::Doc::Config& cf;
         QPDF::Doc::Pages& pages;
     };
 
@@ -392,6 +496,12 @@ class QPDF::Doc
         qpdf(qpdf),
         m(m)
     {
+    }
+
+    qpdf::Doc::Config&
+    config()
+    {
+        return cf;
     }
 
     inline Linearization& linearization();
@@ -772,7 +882,7 @@ class QPDF::Doc::Objects: Common
             return copier_;
         }
 
-        bool immediate_copy_from() const;
+        //        bool immediate_copy_from() const;
 
       private:
         std::shared_ptr<Copier> copier_;
@@ -1072,6 +1182,7 @@ class QPDF::Doc::Resolver
 inline QPDF::Doc::Common::Common(QPDF& qpdf, QPDF::Members* m) :
     qpdf(qpdf),
     m(m),
+    cf(m->cf),
     pages(m->pages)
 {
 }

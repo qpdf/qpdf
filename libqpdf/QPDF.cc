@@ -231,7 +231,7 @@ QPDF::closeInputSource()
 void
 QPDF::setPasswordIsHexKey(bool val)
 {
-    m->cf.provided_password_is_hex_key_ = val;
+    m->cf.provided_password_is_hex_key(val);
 }
 
 void
@@ -250,50 +250,50 @@ QPDF::registerStreamFilter(
 void
 QPDF::setIgnoreXRefStreams(bool val)
 {
-    m->cf.ignore_xref_streams_ = val;
+    m->cf.ignore_xref_streams(val);
 }
 
 std::shared_ptr<QPDFLogger>
 QPDF::getLogger()
 {
-    return m->cf.log_;
+    return m->cf.log();
 }
 
 void
 QPDF::setLogger(std::shared_ptr<QPDFLogger> l)
 {
-    m->cf.log_ = l;
+    m->cf.log(l);
 }
 
 void
 QPDF::setOutputStreams(std::ostream* out, std::ostream* err)
 {
     setLogger(QPDFLogger::create());
-    m->cf.log_->setOutputStreams(out, err);
+    m->cf.log()->setOutputStreams(out, err);
 }
 
 void
 QPDF::setSuppressWarnings(bool val)
 {
-    m->cf.suppress_warnings_ = val;
+    m->cf.suppress_warnings(val);
 }
 
 void
 QPDF::setMaxWarnings(size_t val)
 {
-    m->cf.max_warnings_ = val;
+    m->cf.max_warnings(val);
 }
 
 void
 QPDF::setAttemptRecovery(bool val)
 {
-    m->cf.attempt_recovery_ = val;
+    (void)m->cf.attempt_recovery(val);
 }
 
 void
 QPDF::setImmediateCopyFrom(bool val)
 {
-    m->cf.immediate_copy_from_ = val;
+    (void)m->cf.immediate_copy_from(val);
 }
 
 std::vector<QPDFExc>
@@ -371,12 +371,12 @@ QPDF::warn(QPDFExc const& e)
 void
 Common::warn(QPDFExc const& e)
 {
-    if (m->cf.max_warnings_ > 0 && m->warnings.size() >= m->cf.max_warnings_) {
+    if (cf.max_warnings() > 0 && m->warnings.size() >= cf.max_warnings()) {
         stopOnError("Too many warnings - file is too badly damaged");
     }
     m->warnings.emplace_back(e);
-    if (!m->cf.suppress_warnings_) {
-        *m->cf.log_->getWarn() << "WARNING: " << m->warnings.back().what() << "\n";
+    if (!cf.suppress_warnings()) {
+        *cf.log()->getWarn() << "WARNING: " << m->warnings.back().what() << "\n";
     }
 }
 
@@ -714,7 +714,7 @@ QPDF::getRoot()
     } else if (
         // Check_mode is an interim solution to request #810 pending a more comprehensive review of
         // the approach to more extensive checks and warning levels.
-        m->cf.check_mode_ && !root.getKey("/Type").isNameAndEquals("/Catalog")) {
+        m->cf.check_mode() && !root.getKey("/Type").isNameAndEquals("/Catalog")) {
         warn(m->c.damagedPDF("", -1, "catalog /Type entry missing or invalid"));
         root.replaceKey("/Type", "/Catalog"_qpdf);
     }

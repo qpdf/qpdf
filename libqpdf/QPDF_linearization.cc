@@ -1095,7 +1095,7 @@ QPDF::showLinearizationData()
 void
 Lin::dumpLinearizationDataInternal()
 {
-    auto& info = *m->cf.log_->getInfo();
+    auto& info = *cf.log()->getInfo();
 
     info << m->file->getName() << ": linearization data:\n\n";
 
@@ -1134,7 +1134,7 @@ Lin::adjusted_offset(qpdf_offset_t offset)
 void
 Lin::dumpHPageOffset()
 {
-    auto& info = *m->cf.log_->getInfo();
+    auto& info = *cf.log()->getInfo();
     HPageOffset& t = m->page_offset_hints;
     info << "min_nobjects: " << t.min_nobjects << "\n"
          << "first_page_offset: " << adjusted_offset(t.first_page_offset) << "\n"
@@ -1170,7 +1170,7 @@ Lin::dumpHPageOffset()
 void
 Lin::dumpHSharedObject()
 {
-    auto& info = *m->cf.log_->getInfo();
+    auto& info = *cf.log()->getInfo();
     HSharedObject& t = m->shared_object_hints;
     info << "first_shared_obj: " << t.first_shared_obj << "\n"
          << "first_shared_offset: " << adjusted_offset(t.first_shared_offset) << "\n"
@@ -1198,11 +1198,11 @@ Lin::dumpHSharedObject()
 void
 Lin::dumpHGeneric(HGeneric& t)
 {
-    *m->cf.log_->getInfo() << "first_object: " << t.first_object << "\n"
-                           << "first_object_offset: " << adjusted_offset(t.first_object_offset)
-                           << "\n"
-                           << "nobjects: " << t.nobjects << "\n"
-                           << "group_length: " << t.group_length << "\n";
+    *cf.log()->getInfo() << "first_object: " << t.first_object << "\n"
+                         << "first_object_offset: " << adjusted_offset(t.first_object_offset)
+                         << "\n"
+                         << "nobjects: " << t.nobjects << "\n"
+                         << "group_length: " << t.group_length << "\n";
 }
 
 template <typename T>
