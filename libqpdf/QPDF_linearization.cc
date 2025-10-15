@@ -1095,25 +1095,27 @@ QPDF::showLinearizationData()
 void
 Lin::dumpLinearizationDataInternal()
 {
-    *m->log->getInfo() << m->file->getName() << ": linearization data:\n\n";
+    auto& info = *m->cf.log_->getInfo();
 
-    *m->log->getInfo() << "file_size: " << m->linp.file_size << "\n"
-                       << "first_page_object: " << m->linp.first_page_object << "\n"
-                       << "first_page_end: " << m->linp.first_page_end << "\n"
-                       << "npages: " << m->linp.npages << "\n"
-                       << "xref_zero_offset: " << m->linp.xref_zero_offset << "\n"
-                       << "first_page: " << m->linp.first_page << "\n"
-                       << "H_offset: " << m->linp.H_offset << "\n"
-                       << "H_length: " << m->linp.H_length << "\n"
-                       << "\n";
+    info << m->file->getName() << ": linearization data:\n\n";
 
-    *m->log->getInfo() << "Page Offsets Hint Table\n\n";
+    info << "file_size: " << m->linp.file_size << "\n"
+         << "first_page_object: " << m->linp.first_page_object << "\n"
+         << "first_page_end: " << m->linp.first_page_end << "\n"
+         << "npages: " << m->linp.npages << "\n"
+         << "xref_zero_offset: " << m->linp.xref_zero_offset << "\n"
+         << "first_page: " << m->linp.first_page << "\n"
+         << "H_offset: " << m->linp.H_offset << "\n"
+         << "H_length: " << m->linp.H_length << "\n"
+         << "\n";
+
+    info << "Page Offsets Hint Table\n\n";
     dumpHPageOffset();
-    *m->log->getInfo() << "\nShared Objects Hint Table\n\n";
+    info << "\nShared Objects Hint Table\n\n";
     dumpHSharedObject();
 
     if (m->outline_hints.nobjects > 0) {
-        *m->log->getInfo() << "\nOutlines Hint Table\n\n";
+        info << "\nOutlines Hint Table\n\n";
         dumpHGeneric(m->outline_hints);
     }
 }
@@ -1132,38 +1134,35 @@ Lin::adjusted_offset(qpdf_offset_t offset)
 void
 Lin::dumpHPageOffset()
 {
+    auto& info = *m->cf.log_->getInfo();
     HPageOffset& t = m->page_offset_hints;
-    *m->log->getInfo() << "min_nobjects: " << t.min_nobjects << "\n"
-                       << "first_page_offset: " << adjusted_offset(t.first_page_offset) << "\n"
-                       << "nbits_delta_nobjects: " << t.nbits_delta_nobjects << "\n"
-                       << "min_page_length: " << t.min_page_length << "\n"
-                       << "nbits_delta_page_length: " << t.nbits_delta_page_length << "\n"
-                       << "min_content_offset: " << t.min_content_offset << "\n"
-                       << "nbits_delta_content_offset: " << t.nbits_delta_content_offset << "\n"
-                       << "min_content_length: " << t.min_content_length << "\n"
-                       << "nbits_delta_content_length: " << t.nbits_delta_content_length << "\n"
-                       << "nbits_nshared_objects: " << t.nbits_nshared_objects << "\n"
-                       << "nbits_shared_identifier: " << t.nbits_shared_identifier << "\n"
-                       << "nbits_shared_numerator: " << t.nbits_shared_numerator << "\n"
-                       << "shared_denominator: " << t.shared_denominator << "\n";
+    info << "min_nobjects: " << t.min_nobjects << "\n"
+         << "first_page_offset: " << adjusted_offset(t.first_page_offset) << "\n"
+         << "nbits_delta_nobjects: " << t.nbits_delta_nobjects << "\n"
+         << "min_page_length: " << t.min_page_length << "\n"
+         << "nbits_delta_page_length: " << t.nbits_delta_page_length << "\n"
+         << "min_content_offset: " << t.min_content_offset << "\n"
+         << "nbits_delta_content_offset: " << t.nbits_delta_content_offset << "\n"
+         << "min_content_length: " << t.min_content_length << "\n"
+         << "nbits_delta_content_length: " << t.nbits_delta_content_length << "\n"
+         << "nbits_nshared_objects: " << t.nbits_nshared_objects << "\n"
+         << "nbits_shared_identifier: " << t.nbits_shared_identifier << "\n"
+         << "nbits_shared_numerator: " << t.nbits_shared_numerator << "\n"
+         << "shared_denominator: " << t.shared_denominator << "\n";
 
     for (size_t i1 = 0; i1 < m->linp.npages; ++i1) {
         HPageOffsetEntry& pe = t.entries.at(i1);
-        *m->log->getInfo() << "Page " << i1 << ":\n"
-                           << "  nobjects: " << pe.delta_nobjects + t.min_nobjects << "\n"
-                           << "  length: " << pe.delta_page_length + t.min_page_length
-                           << "\n"
-                           // content offset is relative to page, not file
-                           << "  content_offset: " << pe.delta_content_offset + t.min_content_offset
-                           << "\n"
-                           << "  content_length: " << pe.delta_content_length + t.min_content_length
-                           << "\n"
-                           << "  nshared_objects: " << pe.nshared_objects << "\n";
+        info << "Page " << i1 << ":\n"
+             << "  nobjects: " << pe.delta_nobjects + t.min_nobjects << "\n"
+             << "  length: " << pe.delta_page_length + t.min_page_length
+             << "\n"
+             // content offset is relative to page, not file
+             << "  content_offset: " << pe.delta_content_offset + t.min_content_offset << "\n"
+             << "  content_length: " << pe.delta_content_length + t.min_content_length << "\n"
+             << "  nshared_objects: " << pe.nshared_objects << "\n";
         for (size_t i2 = 0; i2 < toS(pe.nshared_objects); ++i2) {
-            *m->log->getInfo() << "    identifier " << i2 << ": " << pe.shared_identifiers.at(i2)
-                               << "\n";
-            *m->log->getInfo() << "    numerator " << i2 << ": " << pe.shared_numerators.at(i2)
-                               << "\n";
+            info << "    identifier " << i2 << ": " << pe.shared_identifiers.at(i2) << "\n";
+            info << "    numerator " << i2 << ": " << pe.shared_numerators.at(i2) << "\n";
         }
     }
 }
@@ -1171,27 +1170,27 @@ Lin::dumpHPageOffset()
 void
 Lin::dumpHSharedObject()
 {
+    auto& info = *m->cf.log_->getInfo();
     HSharedObject& t = m->shared_object_hints;
-    *m->log->getInfo() << "first_shared_obj: " << t.first_shared_obj << "\n"
-                       << "first_shared_offset: " << adjusted_offset(t.first_shared_offset) << "\n"
-                       << "nshared_first_page: " << t.nshared_first_page << "\n"
-                       << "nshared_total: " << t.nshared_total << "\n"
-                       << "nbits_nobjects: " << t.nbits_nobjects << "\n"
-                       << "min_group_length: " << t.min_group_length << "\n"
-                       << "nbits_delta_group_length: " << t.nbits_delta_group_length << "\n";
+    info << "first_shared_obj: " << t.first_shared_obj << "\n"
+         << "first_shared_offset: " << adjusted_offset(t.first_shared_offset) << "\n"
+         << "nshared_first_page: " << t.nshared_first_page << "\n"
+         << "nshared_total: " << t.nshared_total << "\n"
+         << "nbits_nobjects: " << t.nbits_nobjects << "\n"
+         << "min_group_length: " << t.min_group_length << "\n"
+         << "nbits_delta_group_length: " << t.nbits_delta_group_length << "\n";
 
     for (size_t i = 0; i < toS(t.nshared_total); ++i) {
         HSharedObjectEntry& se = t.entries.at(i);
-        *m->log->getInfo() << "Shared Object " << i << ":\n"
-                           << "  group length: " << se.delta_group_length + t.min_group_length
-                           << "\n";
+        info << "Shared Object " << i << ":\n"
+             << "  group length: " << se.delta_group_length + t.min_group_length << "\n";
         // PDF spec says signature present nobjects_minus_one are always 0, so print them only if
         // they have a non-zero value.
         if (se.signature_present) {
-            *m->log->getInfo() << "  signature present\n";
+            info << "  signature present\n";
         }
         if (se.nobjects_minus_one != 0) {
-            *m->log->getInfo() << "  nobjects: " << se.nobjects_minus_one + 1 << "\n";
+            info << "  nobjects: " << se.nobjects_minus_one + 1 << "\n";
         }
     }
 }
@@ -1199,10 +1198,11 @@ Lin::dumpHSharedObject()
 void
 Lin::dumpHGeneric(HGeneric& t)
 {
-    *m->log->getInfo() << "first_object: " << t.first_object << "\n"
-                       << "first_object_offset: " << adjusted_offset(t.first_object_offset) << "\n"
-                       << "nobjects: " << t.nobjects << "\n"
-                       << "group_length: " << t.group_length << "\n";
+    *m->cf.log_->getInfo() << "first_object: " << t.first_object << "\n"
+                           << "first_object_offset: " << adjusted_offset(t.first_object_offset)
+                           << "\n"
+                           << "nobjects: " << t.nobjects << "\n"
+                           << "group_length: " << t.group_length << "\n";
 }
 
 template <typename T>

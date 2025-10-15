@@ -30,18 +30,18 @@
 
 using namespace qpdf;
 
-using Doc = QPDF::Doc;
-using Pages = Doc::Pages;
+using QDoc = QPDF::Doc;
+using Pages = QDoc::Pages;
 
 // JobSetter class is restricted to QPDFJob.
-class Doc::JobSetter
+class QDoc::JobSetter
 {
   public:
     // Enable enhanced warnings for pdf file checking.
     static void
     setCheckMode(QPDF& qpdf, bool val)
     {
-        qpdf.m->check_mode = val;
+        qpdf.m->cf.check_mode_ = val;
     }
 };
 
@@ -749,7 +749,7 @@ QPDFJob::doCheck(QPDF& pdf)
     bool okay = true;
     auto& cout = *m->log->getInfo();
     cout << "checking " << m->infile_name() << "\n";
-    Doc::JobSetter::setCheckMode(pdf, true);
+    QDoc::JobSetter::setCheckMode(pdf, true);
     try {
         int extension_level = pdf.getExtensionLevel();
         cout << "PDF Version: " << pdf.getPDFVersion();

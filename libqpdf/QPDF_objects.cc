@@ -157,7 +157,7 @@ Objects::parse(char const* password)
             throw damagedPDF("", -1, std::string("error reading xref: ") + e.what());
         }
     } catch (QPDFExc& e) {
-        if (m->attempt_recovery) {
+        if (m->cf.attempt_recovery_) {
             reconstruct_xref(e, xref_offset > 0);
         } else {
             throw;
@@ -736,7 +736,7 @@ Objects::read_xrefTable(qpdf_offset_t xref_offset)
     }
 
     if (cur_trailer.hasKey("/XRefStm")) {
-        if (m->ignore_xref_streams) {
+        if (m->cf.ignore_xref_streams_) {
             QTC::TC("qpdf", "QPDF ignoring XRefStm in trailer");
         } else {
             if (cur_trailer.getKey("/XRefStm").isInteger()) {
@@ -763,7 +763,7 @@ Objects::read_xrefTable(qpdf_offset_t xref_offset)
 qpdf_offset_t
 Objects::read_xrefStream(qpdf_offset_t xref_offset, bool in_stream_recovery)
 {
-    if (!m->ignore_xref_streams) {
+    if (!m->cf.ignore_xref_streams_) {
         QPDFObjectHandle xref_obj;
         try {
             m->in_read_xref_stream = true;
@@ -1073,7 +1073,7 @@ Objects::insertFreeXrefEntry(QPDFObjGen og)
 void
 QPDF::showXRefTable()
 {
-    auto& cout = *m->log->getInfo();
+    auto& cout = *m->cf.log_->getInfo();
     for (auto const& iter: m->xref_table) {
         QPDFObjGen const& og = iter.first;
         QPDFXRefEntry const& entry = iter.second;
@@ -1084,15 +1084,15 @@ QPDF::showXRefTable()
             break;
 
         case 2:
-            *m->log->getInfo() << "compressed; stream = " << entry.getObjStreamNumber()
-                               << ", index = " << entry.getObjStreamIndex();
+            *m->cf.log_->getInfo() << "compressed; stream = " << entry.getObjStreamNumber()
+                                   << ", index = " << entry.getObjStreamIndex();
             break;
 
         default:
             throw std::logic_error("unknown cross-reference table type while showing xref_table");
             break;
         }
-        m->log->info("\n");
+        m->cf.log_->info("\n");
     }
 }
 
@@ -1248,7 +1248,7 @@ Objects::readStream(QPDFObjectHandle& object, QPDFObjGen og, qpdf_offset_t offse
             throw damagedPDF("expected endstream");
         }
     } catch (QPDFExc& e) {
-        if (m->attempt_recovery) {
+        if (m->cf.attempt_recovery_) {
             warn(e);
             length = recoverStreamLength(m->file, og, stream_offset);
         } else {
@@ -1431,7 +1431,7 @@ Objects::readObjectAtOffset(
     QPDFObjGen og;
     setLastObjectDescription(description, exp_og);
 
-    if (!m->attempt_recovery) {
+    if (!m->cf.attempt_recovery_) {
         try_recovery = false;
     }
 

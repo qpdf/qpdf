@@ -5,6 +5,7 @@
 
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
+#include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
@@ -20,6 +21,31 @@ namespace qpdf
     {
         class OffsetBuffer;
     } // namespace is
+
+    class Doc: public QPDF
+    {
+      public:
+        class Config
+        {
+            friend class QPDF;
+
+            Config() :
+                log_(QPDFLogger::defaultLogger())
+            {
+            }
+
+            std::shared_ptr<QPDFLogger> log_;
+
+            size_t max_warnings_{0};
+
+            bool provided_password_is_hex_key_{false};
+            bool ignore_xref_streams_{false};
+            bool suppress_warnings_{false};
+            bool attempt_recovery_{true};
+            bool check_mode_{false};
+            bool immediate_copy_from_{false};
+        }; // Class Config
+    }; // class Doc
 } // namespace qpdf
 
 class BitStream;
@@ -421,10 +447,13 @@ class QPDF::Doc
         return *page_labels_;
     }
 
-  private:
+  protected:
     QPDF& qpdf;
     QPDF::Members* m;
 
+    qpdf::Doc::Config cf;
+
+  private:
     // Document Helpers;
     std::unique_ptr<QPDFAcroFormDocumentHelper> acroform_;
     std::unique_ptr<QPDFEmbeddedFileDocumentHelper> embedded_files_;
@@ -969,18 +998,11 @@ class QPDF::Members: Doc
     Doc::Linearization lin;
     Doc::Objects objects;
     Doc::Pages pages;
-    std::shared_ptr<QPDFLogger> log;
     unsigned long long unique_id{0};
     qpdf::Tokenizer tokenizer;
     std::shared_ptr<InputSource> file;
     std::string last_object_description;
     std::shared_ptr<QPDFObject::Description> last_ostream_description;
-    bool provided_password_is_hex_key{false};
-    bool ignore_xref_streams{false};
-    bool suppress_warnings{false};
-    size_t max_warnings{0};
-    bool attempt_recovery{true};
-    bool check_mode{false};
     std::shared_ptr<EncryptionParameters> encp;
     std::string pdf_version;
     std::map<QPDFObjGen, QPDFXRefEntry> xref_table;
@@ -995,7 +1017,6 @@ class QPDF::Members: Doc
     bool reconstructed_xref{false};
     bool in_read_xref_stream{false};
     bool fixed_dangling_refs{false};
-    bool immediate_copy_from{false};
     bool in_parse{false};
     bool parsed{false};
     std::set<int> resolved_object_streams;

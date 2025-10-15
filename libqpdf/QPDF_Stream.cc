@@ -30,7 +30,7 @@ using Streams = QPDF::Doc::Objects::Streams;
 bool
 Streams::immediate_copy_from() const
 {
-    return qpdf.m->immediate_copy_from;
+    return qpdf.m->cf.immediate_copy_from_;
 }
 
 class Streams::Copier final: public QPDFObjectHandle::StreamDataProvider
