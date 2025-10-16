@@ -804,6 +804,7 @@ class QPDF::Doc::Linearization: Common
     std::map<QPDFObjGen, std::set<ObjUser>> object_to_obj_users_;
 
     // Linearization data
+    bool linearization_warnings_{false}; // set by linearizationWarning, used by checkLinearization
 
     // Linearization parameter dictionary and hint table data: may be read from file or computed
     // prior to writing a linearized file
@@ -819,6 +820,14 @@ class QPDF::Doc::Linearization: Common
     CHPageOffset c_page_offset_data_;
     CHSharedObject c_shared_object_data_;
     HGeneric c_outline_data_;
+
+    // Object ordering data for linearized files: initialized by calculateLinearizationData().
+    // Part numbers refer to the PDF 1.4 specification.
+    std::vector<QPDFObjectHandle> part4_;
+    std::vector<QPDFObjectHandle> part6_;
+    std::vector<QPDFObjectHandle> part7_;
+    std::vector<QPDFObjectHandle> part8_;
+    std::vector<QPDFObjectHandle> part9_;
 };
 
 class QPDF::Doc::Objects: Common
@@ -1167,15 +1176,6 @@ class QPDF::Members: Doc
     // Linearization data
     qpdf_offset_t first_xref_item_offset{0}; // actual value from file
     bool uncompressed_after_compressed{false};
-    bool linearization_warnings{false}; // set by linearizationWarning, used by checkLinearization
-
-    // Object ordering data for linearized files: initialized by calculateLinearizationData().
-    // Part numbers refer to the PDF 1.4 specification.
-    std::vector<QPDFObjectHandle> part4;
-    std::vector<QPDFObjectHandle> part6;
-    std::vector<QPDFObjectHandle> part7;
-    std::vector<QPDFObjectHandle> part8;
-    std::vector<QPDFObjectHandle> part9;
 };
 
 // The Resolver class is restricted to QPDFObject and BaseHandle so that only it can resolve

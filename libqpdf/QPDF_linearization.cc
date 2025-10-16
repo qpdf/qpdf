@@ -352,7 +352,7 @@ Lin::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
 void
 Lin::linearizationWarning(std::string_view msg)
 {
-    m->linearization_warnings = true;
+    linearization_warnings_ = true;
     warn(qpdf_e_linearization, "", 0, std::string(msg));
 }
 
@@ -368,7 +368,7 @@ Lin::check()
     try {
         readLinearizationData();
         checkLinearizationInternal();
-        return !m->linearization_warnings;
+        return !linearization_warnings_;
     } catch (std::runtime_error& e) {
         linearizationWarning(
             "error encountered while checking linearization data: " + std::string(e.what()));
@@ -756,11 +756,11 @@ Lin::checkLinearizationInternal()
     // suite doesn't contain any files with threads.
 
     no_ci_stop_if(
-        m->part6.empty(), "linearization part 6 unexpectedly empty" //
+        part6_.empty(), "linearization part 6 unexpectedly empty" //
     );
     qpdf_offset_t min_E = -1;
     qpdf_offset_t max_E = -1;
-    for (auto const& oh: m->part6) {
+    for (auto const& oh: part6_) {
         QPDFObjGen og(oh.getObjGen());
         // All objects have to have been dereferenced to be classified.
         util::assertion(m->obj_cache.contains(og), "linearization part6 object not in cache");
@@ -993,10 +993,10 @@ Lin::checkHSharedObject(std::vector<QPDFObjectHandle> const& pages, std::map<int
         for (int i = 0; i < so.nshared_total; ++i) {
             if (i == so.nshared_first_page) {
                 QTC::TC("qpdf", "QPDF lin check shared past first page");
-                if (m->part8.empty()) {
+                if (part8_.empty()) {
                     linearizationWarning("part 8 is empty but nshared_total > nshared_first_page");
                 } else {
-                    int obj = m->part8.at(0).getObjectID();
+                    int obj = part8_.at(0).getObjectID();
                     if (obj != so.first_shared_obj) {
                         linearizationWarning(
                             "first shared object number mismatch: hint table = " +
@@ -1275,11 +1275,11 @@ Lin::calculateLinearizationData(T const& object_stream_data)
 
     //   * outlines: part 6 or 9
 
-    m->part4.clear();
-    m->part6.clear();
-    m->part7.clear();
-    m->part8.clear();
-    m->part9.clear();
+    part4_.clear();
+    part6_.clear();
+    part7_.clear();
+    part8_.clear();
+    part9_.clear();
     c_linp_ = LinParameters();
     c_page_offset_data_ = CHPageOffset();
     c_shared_object_data_ = CHSharedObject();
@@ -1426,9 +1426,9 @@ Lin::calculateLinearizationData(T const& object_stream_data)
         lc_root.size() != 1, "found other than one root while calculating linearization data" //
     );
 
-    m->part4.emplace_back(qpdf.getObject(*(lc_root.begin())));
+    part4_.emplace_back(qpdf.getObject(*(lc_root.begin())));
     for (auto const& og: lc_open_document) {
-        m->part4.emplace_back(qpdf.getObject(og));
+        part4_.emplace_back(qpdf.getObject(og));
     }
 
     // Part 6: first page objects.  Note: implementation note 124 states that Acrobat always treats
@@ -1444,30 +1444,30 @@ Lin::calculateLinearizationData(T const& object_stream_data)
         !lc_first_page_private.erase(first_page_og), "unable to linearize first page" //
     );
     c_linp_.first_page_object = uc_pages.at(0).getObjectID();
-    m->part6.emplace_back(uc_pages.at(0));
+    part6_.emplace_back(uc_pages.at(0));
 
     // The PDF spec "recommends" an order for the rest of the objects, but we are going to disregard
     // it except to the extent that it groups private and shared objects contiguously for the sake
     // of hint tables.
 
     for (auto const& og: lc_first_page_private) {
-        m->part6.emplace_back(qpdf.getObject(og));
+        part6_.emplace_back(qpdf.getObject(og));
     }
 
     for (auto const& og: lc_first_page_shared) {
-        m->part6.emplace_back(qpdf.getObject(og));
+        part6_.emplace_back(qpdf.getObject(og));
     }
 
     // Place the outline dictionary if it goes in the first page section.
     if (outlines_in_first_page) {
-        pushOutlinesToPart(m->part6, lc_outlines, object_stream_data);
+        pushOutlinesToPart(part6_, lc_outlines, object_stream_data);
     }
 
     // Fill in page offset hint table information for the first page. The PDF spec says that
     // nshared_objects should be zero for the first page.  pdlin does not appear to obey this, but
     // it fills in garbage values for all the shared object identifiers on the first page.
 
-    c_page_offset_data_.entries.at(0).nobjects = toI(m->part6.size());
+    c_page_offset_data_.entries.at(0).nobjects = toI(part6_.size());
 
     // Part 7: other pages' private objects
 
@@ -1481,7 +1481,7 @@ Lin::calculateLinearizationData(T const& object_stream_data)
             "unable to linearize page " + std::to_string(i) //
         );
 
-        m->part7.emplace_back(uc_pages.at(i));
+        part7_.emplace_back(uc_pages.at(i));
 
         // Place all non-shared objects referenced by this page, updating the page object count for
         // the hint table.
@@ -1496,7 +1496,7 @@ Lin::calculateLinearizationData(T const& object_stream_data)
 
         for (auto const& og: obj_user_to_objects_[ou]) {
             if (lc_other_page_private.erase(og)) {
-                m->part7.emplace_back(qpdf.getObject(og));
+                part7_.emplace_back(qpdf.getObject(og));
                 ++c_page_offset_data_.entries.at(i).nobjects;
             }
         }
@@ -1512,7 +1512,7 @@ Lin::calculateLinearizationData(T const& object_stream_data)
 
     // Order is unimportant.
     for (auto const& og: lc_other_page_shared) {
-        m->part8.emplace_back(qpdf.getObject(og));
+        part8_.emplace_back(qpdf.getObject(og));
     }
 
     // Part 9: other objects
@@ -1529,7 +1529,7 @@ Lin::calculateLinearizationData(T const& object_stream_data)
     );
     for (auto const& og: pages_ogs) {
         if (lc_other.erase(og)) {
-            m->part9.emplace_back(qpdf.getObject(og));
+            part9_.emplace_back(qpdf.getObject(og));
         }
     }
 
@@ -1541,7 +1541,7 @@ Lin::calculateLinearizationData(T const& object_stream_data)
         QPDFObjGen thumb_og(thumb.getObjGen());
         // Output the thumbnail itself
         if (lc_thumbnail_private.erase(thumb_og) && !thumb.null()) {
-            m->part9.emplace_back(thumb);
+            part9_.emplace_back(thumb);
         } else {
             // No internal error this time...there's nothing to stop this object from having
             // been referred to somewhere else outside of a page's /Thumb, and if it had been,
@@ -1550,7 +1550,7 @@ Lin::calculateLinearizationData(T const& object_stream_data)
         }
         for (auto const& og: obj_user_to_objects_[{ObjUser::ou_thumb, i}]) {
             if (lc_thumbnail_private.erase(og)) {
-                m->part9.emplace_back(qpdf.getObject(og));
+                part9_.emplace_back(qpdf.getObject(og));
             }
         }
     }
@@ -1562,23 +1562,23 @@ Lin::calculateLinearizationData(T const& object_stream_data)
 
     // Place shared thumbnail objects
     for (auto const& og: lc_thumbnail_shared) {
-        m->part9.emplace_back(qpdf.getObject(og));
+        part9_.emplace_back(qpdf.getObject(og));
     }
 
     // Place outlines unless in first page
     if (!outlines_in_first_page) {
-        pushOutlinesToPart(m->part9, lc_outlines, object_stream_data);
+        pushOutlinesToPart(part9_, lc_outlines, object_stream_data);
     }
 
     // Place all remaining objects
     for (auto const& og: lc_other) {
-        m->part9.emplace_back(qpdf.getObject(og));
+        part9_.emplace_back(qpdf.getObject(og));
     }
 
     // Make sure we got everything exactly once.
 
     size_t num_placed =
-        m->part4.size() + m->part6.size() + m->part7.size() + m->part8.size() + m->part9.size();
+        part4_.size() + part6_.size() + part7_.size() + part8_.size() + part9_.size();
     size_t num_wanted = object_to_obj_users_.size();
     no_ci_stop_if(
         // This can happen with damaged files, e.g. if the root is part of the the pages tree.
@@ -1599,20 +1599,20 @@ Lin::calculateLinearizationData(T const& object_stream_data)
     // only without regards to generation.
     std::map<int, int> obj_to_index;
 
-    c_shared_object_data_.nshared_first_page = toI(m->part6.size());
+    c_shared_object_data_.nshared_first_page = toI(part6_.size());
     c_shared_object_data_.nshared_total =
-        c_shared_object_data_.nshared_first_page + toI(m->part8.size());
+        c_shared_object_data_.nshared_first_page + toI(part8_.size());
 
     std::vector<CHSharedObjectEntry>& shared = c_shared_object_data_.entries;
-    for (auto& oh: m->part6) {
+    for (auto& oh: part6_) {
         int obj = oh.getObjectID();
         obj_to_index[obj] = toI(shared.size());
         shared.emplace_back(obj);
     }
-    QTC::TC("qpdf", "QPDF lin part 8 empty", m->part8.empty() ? 1 : 0);
-    if (!m->part8.empty()) {
-        c_shared_object_data_.first_shared_obj = m->part8.at(0).getObjectID();
-        for (auto& oh: m->part8) {
+    QTC::TC("qpdf", "QPDF lin part 8 empty", part8_.empty() ? 1 : 0);
+    if (!part8_.empty()) {
+        c_shared_object_data_.first_shared_obj = part8_.at(0).getObjectID();
+        for (auto& oh: part8_) {
             int obj = oh.getObjectID();
             obj_to_index[obj] = toI(shared.size());
             shared.emplace_back(obj);
@@ -1661,9 +1661,9 @@ Lin::pushOutlinesToPart(
     QTC::TC(
         "qpdf",
         "QPDF lin outlines in part",
-        &part == &m->part6         ? 0
-            : (&part == &m->part9) ? 1
-                                   : 9999); // can't happen
+        &part == &part6_         ? 0
+            : (&part == &part9_) ? 1
+                                 : 9999); // can't happen
     if (lc_outlines.erase(outlines_og)) {
         // Make sure outlines is in lc_outlines in case the file is damaged. in which case it may be
         // included in an earlier part.
@@ -1690,11 +1690,11 @@ Lin::getLinearizedParts(
     std::vector<QPDFObjectHandle>& part9)
 {
     calculateLinearizationData(obj);
-    part4 = m->part4;
-    part6 = m->part6;
-    part7 = m->part7;
-    part8 = m->part8;
-    part9 = m->part9;
+    part4 = part4_;
+    part6 = part6_;
+    part7 = part7_;
+    part8 = part8_;
+    part9 = part9_;
 }
 
 static inline int
