@@ -276,7 +276,6 @@ class QPDF::Doc
     class Pages;
     class ParseGuard;
     class Resolver;
-    class Writer;
 
     // This is the common base-class for all document components. It is used by the other document
     // components to access common functionality. It is not meant to be used directly by the user.

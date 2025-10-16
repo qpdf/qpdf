@@ -261,21 +261,24 @@ Pl_stack::Popper::pop()
     stack = nullptr;
 }
 
-// Writer class is restricted to QPDFWriter so that only it can call certain methods.
-class impl::Doc::Writer: impl::Doc::Common
+namespace qpdf::impl
 {
-    friend class QPDFWriter;
-    Writer(QPDF& qpdf) :
-        Common(qpdf, qpdf.doc().m),
-        lin(m->lin)
+    // Writer class is restricted to QPDFWriter so that only it can call certain methods.
+    class Writer: protected Doc::Common
     {
-    }
+      public:
+        Writer(QPDF& qpdf) :
+            Common(qpdf.doc()),
+            lin(qpdf.doc().linearization())
+        {
+        }
 
-  protected:
-    impl::Doc::Linearization& lin;
-};
+      protected:
+        Doc::Linearization& lin;
+    };
+} // namespace qpdf::impl
 
-class QPDFWriter::Members: QPDF::Doc::Writer
+class QPDFWriter::Members: impl::Writer
 {
     friend class QPDFWriter;
 
@@ -289,8 +292,8 @@ class QPDFWriter::Members: QPDF::Doc::Writer
 
     enum trailer_e { t_normal, t_lin_first, t_lin_second };
 
-    Members(QPDFWriter& w, QPDF& pdf) :
-        QPDF::Doc::Writer(pdf),
+    Members(QPDFWriter& w, QPDF& qpdf) :
+        impl::Writer(qpdf),
         w(w),
         root_og(
             qpdf.getRoot().getObjGen().isIndirect() ? qpdf.getRoot().getObjGen()
