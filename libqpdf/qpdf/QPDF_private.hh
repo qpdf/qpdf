@@ -573,7 +573,7 @@ class QPDF::Doc::Linearization: Common
 
     // Get lists of all objects in order according to the part of a linearized file that they
     // belong to.
-    void getLinearizedParts(
+    void parts(
         QPDFWriter::ObjTable const& obj,
         std::vector<QPDFObjectHandle>& part4,
         std::vector<QPDFObjectHandle>& part6,
@@ -993,18 +993,19 @@ class QPDF::Doc::Objects: Common
     QPDFObjectHandle makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj);
     std::shared_ptr<QPDFObject> getObjectForParser(int id, int gen, bool parse_pdf);
     std::shared_ptr<QPDFObject> getObjectForJSON(int id, int gen);
-    size_t tableSize();
+    size_t table_size();
 
     // For QPDFWriter:
 
-    std::map<QPDFObjGen, QPDFXRefEntry> const& getXRefTableInternal();
-    // Get a list of objects that would be permitted in an object stream.
-    template <typename T>
-    std::vector<T> getCompressibleObjGens();
-    std::vector<QPDFObjGen> getCompressibleObjVector();
-    std::vector<bool> getCompressibleObjSet();
+    std::map<QPDFObjGen, QPDFXRefEntry> const& xref_table();
+    std::vector<QPDFObjGen> compressible_vector();
+    std::vector<bool> compressible_set();
 
   private:
+    // Get a list of objects that would be permitted in an object stream.
+    template <typename T>
+    std::vector<T> compressible();
+
     void setTrailer(QPDFObjectHandle obj);
     void reconstruct_xref(QPDFExc& e, bool found_startxref = true);
     void read_xref(qpdf_offset_t offset, bool in_stream_recovery = false);

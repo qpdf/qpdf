@@ -1916,7 +1916,7 @@ QPDF::swapObjects(QPDFObjGen og1, QPDFObjGen og2)
 }
 
 size_t
-Objects::tableSize()
+Objects::table_size()
 {
     // If obj_cache is dense, accommodate all object in tables,else accommodate only original
     // objects.
@@ -1936,20 +1936,20 @@ Objects::tableSize()
 }
 
 std::vector<QPDFObjGen>
-Objects::getCompressibleObjVector()
+Objects::compressible_vector()
 {
-    return getCompressibleObjGens<QPDFObjGen>();
+    return compressible<QPDFObjGen>();
 }
 
 std::vector<bool>
-Objects::getCompressibleObjSet()
+Objects::compressible_set()
 {
-    return getCompressibleObjGens<bool>();
+    return compressible<bool>();
 }
 
 template <typename T>
 std::vector<T>
-Objects::getCompressibleObjGens()
+Objects::compressible()
 {
     // Return a list of objects that are allowed to be in object streams.  Walk through the objects
     // by traversing the document from the root, including a traversal of the pages tree.  This
@@ -1969,10 +1969,9 @@ Objects::getCompressibleObjGens()
     std::vector<T> result;
     if constexpr (std::is_same_v<T, QPDFObjGen>) {
         result.reserve(m->obj_cache.size());
-    } else if constexpr (std::is_same_v<T, bool>) {
-        result.resize(max_obj + 1U, false);
     } else {
-        throw std::logic_error("Unsupported type in QPDF::getCompressibleObjGens");
+        qpdf_static_expect(std::is_same_v<T, bool>);
+        result.resize(max_obj + 1U, false);
     }
     while (!queue.empty()) {
         auto obj = queue.back();

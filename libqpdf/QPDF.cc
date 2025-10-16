@@ -723,11 +723,11 @@ QPDF::getRoot()
 std::map<QPDFObjGen, QPDFXRefEntry>
 QPDF::getXRefTable()
 {
-    return m->objects.getXRefTableInternal();
+    return m->objects.xref_table();
 }
 
 std::map<QPDFObjGen, QPDFXRefEntry> const&
-Objects::getXRefTableInternal()
+Objects::xref_table()
 {
     if (!m->parsed) {
         throw std::logic_error("QPDF::getXRefTable called before parsing.");

@@ -262,75 +262,17 @@ Pl_stack::Popper::pop()
 }
 
 // Writer class is restricted to QPDFWriter so that only it can call certain methods.
-class QPDF::Doc::Writer: QPDF::Doc::Common
+class impl::Doc::Writer: impl::Doc::Common
 {
     friend class QPDFWriter;
     Writer(QPDF& qpdf) :
         Common(qpdf, qpdf.doc().m),
-        lin(m->lin),
-        objects(m->objects)
+        lin(m->lin)
     {
     }
 
   protected:
-    void
-    optimize(
-        QPDFWriter::ObjTable const& obj,
-        std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
-    {
-        lin.optimize(obj, skip_stream_parameters);
-    }
-
-    void
-    getLinearizedParts(
-        QPDFWriter::ObjTable const& obj,
-        std::vector<QPDFObjectHandle>& part4,
-        std::vector<QPDFObjectHandle>& part6,
-        std::vector<QPDFObjectHandle>& part7,
-        std::vector<QPDFObjectHandle>& part8,
-        std::vector<QPDFObjectHandle>& part9)
-    {
-        lin.getLinearizedParts(obj, part4, part6, part7, part8, part9);
-    }
-
-    void
-    generateHintStream(
-        QPDFWriter::NewObjTable const& new_obj,
-        QPDFWriter::ObjTable const& obj,
-        std::string& hint_stream,
-        int& S,
-        int& O,
-        bool compressed)
-    {
-        lin.generateHintStream(new_obj, obj, hint_stream, S, O, compressed);
-    }
-
-    std::vector<QPDFObjGen>
-    getCompressibleObjGens()
-    {
-        return objects.getCompressibleObjVector();
-    }
-
-    std::vector<bool>
-    getCompressibleObjSet()
-    {
-        return objects.getCompressibleObjSet();
-    }
-
-    std::map<QPDFObjGen, QPDFXRefEntry> const&
-    getXRefTable()
-    {
-        return objects.getXRefTableInternal();
-    }
-
-    size_t
-    tableSize()
-    {
-        return qpdf.m->objects.tableSize();
-    }
-
-    QPDF::Doc::Linearization& lin;
-    QPDF::Doc::Objects& objects;
+    impl::Doc::Linearization& lin;
 };
 
 class QPDFWriter::Members: QPDF::Doc::Writer
@@ -2151,7 +2093,7 @@ QPDFWriter::Members::initializeSpecialStreams()
 void
 QPDFWriter::Members::preserveObjectStreams()
 {
-    auto const& xref = getXRefTable();
+    auto const& xref = objects.xref_table();
     // Our object_to_object_stream map has to map ObjGen -> ObjGen since we may be generating object
     // streams out of old objects that have generation numbers greater than zero. However in an
     // existing PDF, all object stream objects and all objects in them must have generation 0
@@ -2176,9 +2118,9 @@ QPDFWriter::Members::preserveObjectStreams()
             if (iter->second.getType() == 2) {
                 // Pdf contains object streams.
                 obj.streams_empty = false;
-                auto eligible = getCompressibleObjSet();
+                auto eligible = objects.compressible_set();
                 // The object pointed to by iter may be a previous generation, in which case it is
-                // removed by getCompressibleObjSet. We need to restart the loop (while the object
+                // removed by compressible_set. We need to restart the loop (while the object
                 // table may contain multiple generations of an object).
                 for (iter = xref.cbegin(); iter != end; ++iter) {
                     if (iter->second.getType() == 2) {
@@ -2207,7 +2149,7 @@ QPDFWriter::Members::generateObjectStreams()
 
     // This code doesn't do anything with /Extends.
 
-    std::vector<QPDFObjGen> eligible = getCompressibleObjGens();
+    auto eligible = objects.compressible_vector();
     size_t n_object_streams = (eligible.size() + 99U) / 100U;
 
     initializeTables(2U * n_object_streams);
@@ -2288,7 +2230,7 @@ QPDFWriter::Members::prepareFileForWrite()
 void
 QPDFWriter::Members::initializeTables(size_t extra)
 {
-    auto size = QIntC::to_size(tableSize() + 100) + extra;
+    auto size = objects.table_size() + 100u + extra;
     obj.resize(size);
     new_obj.resize(size);
 }
@@ -2568,7 +2510,7 @@ QPDFWriter::Members::writeHintStream(int hint_id)
     int S = 0;
     int O = 0;
     bool compressed = compress_streams;
-    generateHintStream(new_obj, obj, hint_buffer, S, O, compressed);
+    lin.generateHintStream(new_obj, obj, hint_buffer, S, O, compressed);
 
     openObject(hint_id);
     setDataKey(hint_id);
@@ -2771,14 +2713,14 @@ QPDFWriter::Members::writeLinearized()
         }
     };
 
-    optimize(obj, skip_stream_parameters);
+    lin.optimize(obj, skip_stream_parameters);
 
     std::vector<QPDFObjectHandle> part4;
     std::vector<QPDFObjectHandle> part6;
     std::vector<QPDFObjectHandle> part7;
     std::vector<QPDFObjectHandle> part8;
     std::vector<QPDFObjectHandle> part9;
-    getLinearizedParts(obj, part4, part6, part7, part8, part9);
+    lin.parts(obj, part4, part6, part7, part8, part9);
 
     // Object number sequence:
     //
