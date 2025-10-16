@@ -291,7 +291,6 @@ namespace qpdf::impl
         Writer(QPDF& qpdf, QPDFWriter& w) :
             Common(qpdf.doc()),
             lin(qpdf.doc().linearization()),
-            w(w),
             root_og(
                 qpdf.getRoot().getObjGen().isIndirect() ? qpdf.getRoot().getObjGen()
                                                         : QPDFObjGen(-1, 0)),
@@ -301,7 +300,7 @@ namespace qpdf::impl
 
         void write();
         std::map<QPDFObjGen, QPDFXRefEntry> getWrittenXRefTable();
-        void setMinimumPDFVersion(std::string const& version, int extension_level);
+        void setMinimumPDFVersion(std::string const& version, int extension_level = 0);
         void copyEncryptionParameters(QPDF&);
         void doWriteSetup();
         void prepareFileForWrite();
@@ -425,7 +424,6 @@ namespace qpdf::impl
 
         qpdf::Writer::Config cfg;
 
-        QPDFWriter& w;
         QPDFObjGen root_og{-1, 0};
         char const* filename{"unspecified"};
         FILE* file{nullptr};
@@ -1120,15 +1118,15 @@ impl::Writer::setEncryptionMinimumVersion()
 {
     auto const R = encryption->getR();
     if (R >= 6) {
-        w.setMinimumPDFVersion("1.7", 8);
+        setMinimumPDFVersion("1.7", 8);
     } else if (R == 5) {
-        w.setMinimumPDFVersion("1.7", 3);
+        setMinimumPDFVersion("1.7", 3);
     } else if (R == 4) {
-        w.setMinimumPDFVersion(cfg.encrypt_use_aes_ ? "1.6" : "1.5");
+        setMinimumPDFVersion(cfg.encrypt_use_aes_ ? "1.6" : "1.5");
     } else if (R == 3) {
-        w.setMinimumPDFVersion("1.4");
+        setMinimumPDFVersion("1.4");
     } else {
-        w.setMinimumPDFVersion("1.3");
+        setMinimumPDFVersion("1.3");
     }
 }
 
@@ -2340,7 +2338,7 @@ impl::Writer::doWriteSetup()
         if (object_stream_to_objects.empty()) {
             obj.streams_empty = true;
         } else {
-            w.setMinimumPDFVersion("1.5");
+            setMinimumPDFVersion("1.5");
         }
     }
 
