@@ -291,6 +291,7 @@ class QPDF::Doc
         ~Common() = default;
 
         inline Common(QPDF& qpdf, QPDF::Members* m);
+        inline Common(Doc& doc);
 
         void stopOnError(std::string const& message);
         void warn(QPDFExc const& e);
@@ -551,7 +552,7 @@ class QPDF::Doc::Linearization: Common
     ~Linearization() = default;
 
     Linearization(Doc& doc) :
-        Common(doc.qpdf, doc.m)
+        Common(doc)
     {
     }
 
@@ -945,7 +946,7 @@ class QPDF::Doc::Objects: Common
     ~Objects() = default;
 
     Objects(Doc& doc) :
-        Common(doc.qpdf, doc.m),
+        Common(doc),
         foreign_(*this),
         streams_(*this)
     {
@@ -1065,7 +1066,7 @@ class QPDF::Doc::Pages: Common
     ~Pages() = default;
 
     Pages(Doc& doc) :
-        Common(doc.qpdf, doc.m)
+        Common(doc)
     {
     }
 
@@ -1219,6 +1220,11 @@ inline QPDF::Doc::Common::Common(QPDF& qpdf, QPDF::Members* m) :
 {
 }
 
+inline QPDF::Doc::Common::Common(Doc& doc) :
+    Common(doc.qpdf, doc.m)
+{
+}
+
 inline QPDF::Doc::Linearization&
 QPDF::Doc::linearization()
 {
@@ -1250,7 +1256,7 @@ QPDF::doc()
 }
 
 inline QPDF::Doc::Objects::Foreign::Copier::Copier(QPDF& qpdf) :
-    Common(qpdf, qpdf.doc().m)
+    Common(qpdf.doc())
 {
 }
 
