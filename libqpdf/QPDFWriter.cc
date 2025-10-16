@@ -27,8 +27,8 @@
 using namespace std::literals;
 using namespace qpdf;
 
-using Doc = QPDF::Doc;
-using Encryption = Doc::Encryption;
+using QDoc = QPDF::Doc;
+using Encryption = QDoc::Encryption;
 
 QPDFWriter::ProgressReporter::~ProgressReporter() // NOLINT (modernize-use-equals-default)
 {
@@ -263,7 +263,7 @@ Pl_stack::Popper::pop()
 }
 
 // Writer class is restricted to QPDFWriter so that only it can call certain methods.
-class Doc::Writer: Doc::Common
+class QPDF::Doc::Writer: QPDF::Doc::Common
 {
     friend class QPDFWriter;
     Writer(QPDF& qpdf) :

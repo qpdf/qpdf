@@ -5,6 +5,7 @@
 
 #include <qpdf/ClosedFileInputSource.hh>
 #include <qpdf/QPDFLogger.hh>
+#include <qpdf/QPDF_private.hh>
 
 // A selection of pages from a single input PDF to be included in the output. This corresponds to a
 // single clause in the --pages option.
@@ -149,7 +150,7 @@ class QPDFJob::Members
 
   public:
     Members(QPDFJob& job) :
-        log(QPDFLogger::defaultLogger()),
+        log(qcf.log()),
         inputs(job)
     {
     }
@@ -167,6 +168,7 @@ class QPDFJob::Members
     static int constexpr DEFAULT_OI_MIN_AREA = 16384;
     static int constexpr DEFAULT_II_MIN_BYTES = 1024;
 
+    qpdf::Doc::Config qcf;
     std::shared_ptr<QPDFLogger> log;
     std::string message_prefix{"qpdf"};
     bool warnings{false};
@@ -179,11 +181,9 @@ class QPDFJob::Members
     int split_pages{0};
     bool progress{false};
     std::function<void(int)> progress_handler{nullptr};
-    bool suppress_warnings{false};
     bool warnings_exit_zero{false};
     bool copy_encryption{false};
     bool encrypt{false};
-    bool password_is_hex_key{false};
     bool suppress_password_recovery{false};
     password_mode_e password_mode{pm_auto};
     bool allow_insecure{false};
@@ -218,10 +218,8 @@ class QPDFJob::Members
     bool decode_level_set{false};
     bool normalize_set{false};
     bool normalize{false};
-    bool suppress_recovery{false};
     bool object_stream_set{false};
     qpdf_object_stream_e object_stream_mode{qpdf_o_preserve};
-    bool ignore_xref_streams{false};
     bool qdf_mode{false};
     bool preserve_unreferenced_objects{false};
     remove_unref_e remove_unreferenced_page_resources{re_auto};

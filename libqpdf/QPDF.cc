@@ -27,9 +27,9 @@
 using namespace qpdf;
 using namespace std::literals;
 
-using Doc = QPDF::Doc;
-using Common = Doc::Common;
-using Objects = Doc::Objects;
+using QDoc = QPDF::Doc;
+using Common = QDoc::Common;
+using Objects = QDoc::Objects;
 using Foreign = Objects::Foreign;
 using Streams = Objects::Streams;
 
@@ -133,7 +133,6 @@ QPDF::Members::Members(QPDF& qpdf) :
     lin(*this),
     objects(*this),
     pages(*this),
-    log(QPDFLogger::defaultLogger()),
     file(std::make_shared<InvalidInputSource>()),
     encp(std::make_shared<EncryptionParameters>())
 {
@@ -232,7 +231,7 @@ QPDF::closeInputSource()
 void
 QPDF::setPasswordIsHexKey(bool val)
 {
-    m->provided_password_is_hex_key = val;
+    m->cf.password_is_hex_key(val);
 }
 
 void
@@ -251,56 +250,56 @@ QPDF::registerStreamFilter(
 void
 QPDF::setIgnoreXRefStreams(bool val)
 {
-    m->ignore_xref_streams = val;
+    (void)m->cf.ignore_xref_streams(val);
 }
 
 std::shared_ptr<QPDFLogger>
 QPDF::getLogger()
 {
-    return m->log;
+    return m->cf.log();
 }
 
 void
 QPDF::setLogger(std::shared_ptr<QPDFLogger> l)
 {
-    m->log = l;
+    m->cf.log(l);
 }
 
 void
 QPDF::setOutputStreams(std::ostream* out, std::ostream* err)
 {
     setLogger(QPDFLogger::create());
-    m->log->setOutputStreams(out, err);
+    m->cf.log()->setOutputStreams(out, err);
 }
 
 void
 QPDF::setSuppressWarnings(bool val)
 {
-    m->suppress_warnings = val;
+    (void)m->cf.suppress_warnings(val);
 }
 
 void
 QPDF::setMaxWarnings(size_t val)
 {
-    m->max_warnings = val;
+    (void)m->cf.max_warnings(val);
 }
 
 void
 QPDF::setAttemptRecovery(bool val)
 {
-    m->attempt_recovery = val;
+    (void)m->cf.surpress_recovery(!val);
 }
 
 void
 QPDF::setImmediateCopyFrom(bool val)
 {
-    m->immediate_copy_from = val;
+    (void)m->cf.immediate_copy_from(val);
 }
 
 std::vector<QPDFExc>
 QPDF::getWarnings()
 {
-    std::vector<QPDFExc> result = m->warnings;
+    std::vector<QPDFExc> result = std::move(m->warnings);
     m->warnings.clear();
     return result;
 }
@@ -372,12 +371,12 @@ QPDF::warn(QPDFExc const& e)
 void
 Common::warn(QPDFExc const& e)
 {
-    if (m->max_warnings > 0 && m->warnings.size() >= m->max_warnings) {
+    if (cf.max_warnings() > 0 && m->warnings.size() >= cf.max_warnings()) {
         stopOnError("Too many warnings - file is too badly damaged");
     }
-    m->warnings.push_back(e);
-    if (!m->suppress_warnings) {
-        *m->log->getWarn() << "WARNING: " << m->warnings.back().what() << "\n";
+    m->warnings.emplace_back(e);
+    if (!cf.suppress_warnings()) {
+        *cf.log()->getWarn() << "WARNING: " << m->warnings.back().what() << "\n";
     }
 }
 
@@ -715,7 +714,7 @@ QPDF::getRoot()
     } else if (
         // Check_mode is an interim solution to request #810 pending a more comprehensive review of
         // the approach to more extensive checks and warning levels.
-        m->check_mode && !root.getKey("/Type").isNameAndEquals("/Catalog")) {
+        m->cf.check_mode() && !root.getKey("/Type").isNameAndEquals("/Catalog")) {
         warn(m->c.damagedPDF("", -1, "catalog /Type entry missing or invalid"));
         root.replaceKey("/Type", "/Catalog"_qpdf);
     }

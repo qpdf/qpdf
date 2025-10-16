@@ -5,6 +5,7 @@
 
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
+#include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
@@ -20,6 +21,135 @@ namespace qpdf
     {
         class OffsetBuffer;
     } // namespace is
+
+    class Doc: public QPDF
+    {
+      public:
+        class Config
+        {
+          public:
+            Config() :
+                log_(QPDFLogger::defaultLogger())
+            {
+            }
+
+            bool
+            password_is_hex_key() const
+            {
+                return password_is_hex_key_;
+            }
+
+            Config&
+            password_is_hex_key(bool val)
+            {
+                password_is_hex_key_ = val;
+                return *this;
+            }
+
+            bool
+            ignore_xref_streams() const
+            {
+                return ignore_xref_streams_;
+            }
+
+            Config&
+            ignore_xref_streams(bool val)
+            {
+                ignore_xref_streams_ = val;
+                return *this;
+            }
+
+            std::shared_ptr<QPDFLogger>
+            log() const
+            {
+                return log_;
+            }
+
+            Config&
+            log(std::shared_ptr<QPDFLogger> val)
+            {
+                log_ = val;
+                return *this;
+            }
+
+            bool
+            suppress_warnings() const
+            {
+                return suppress_warnings_;
+            }
+
+            Config&
+            suppress_warnings(bool val)
+            {
+                suppress_warnings_ = val;
+                return *this;
+            }
+
+            size_t
+            max_warnings() const
+            {
+                return max_warnings_;
+            }
+
+            Config&
+            max_warnings(size_t val)
+            {
+                max_warnings_ = val;
+                return *this;
+            }
+
+            bool
+            surpress_recovery() const
+            {
+                return surpress_recovery_;
+            }
+
+            Config&
+            surpress_recovery(bool val)
+            {
+                surpress_recovery_ = val;
+                return *this;
+            }
+
+            bool
+            immediate_copy_from() const
+            {
+                return immediate_copy_from_;
+            }
+
+            Config&
+            immediate_copy_from(bool val)
+            {
+                immediate_copy_from_ = val;
+                return *this;
+            }
+
+            bool
+            check_mode() const
+            {
+                return check_mode_;
+            }
+
+            Config&
+            check_mode(bool val)
+            {
+                check_mode_ = val;
+                return *this;
+            }
+
+          private:
+            std::shared_ptr<QPDFLogger> log_;
+
+            size_t max_warnings_{0};
+
+            bool password_is_hex_key_{false};
+            bool ignore_xref_streams_{false};
+            bool suppress_warnings_{false};
+            bool surpress_recovery_{false};
+            bool check_mode_{false};
+            bool immediate_copy_from_{false};
+        }; // Class Config
+    }; // class Doc
 } // namespace qpdf
 
 class BitStream;
@@ -106,167 +236,7 @@ class QPDF::StringDecrypter final: public QPDFObjectHandle::StringDecrypter
     QPDF* qpdf;
     QPDFObjGen og;
 };
-
-// PDF 1.4: Table F.4
-struct QPDF::HPageOffsetEntry
-{
-    int delta_nobjects{0};              // 1
-    qpdf_offset_t delta_page_length{0}; // 2
-    // vectors' sizes = nshared_objects
-    int nshared_objects{0};                // 3
-    std::vector<int> shared_identifiers;   // 4
-    std::vector<int> shared_numerators;    // 5
-    qpdf_offset_t delta_content_offset{0}; // 6
-    qpdf_offset_t delta_content_length{0}; // 7
-};
-
-// PDF 1.4: Table F.3
-struct QPDF::HPageOffset
-{
-    int min_nobjects{0};                // 1
-    qpdf_offset_t first_page_offset{0}; // 2
-    int nbits_delta_nobjects{0};        // 3
-    int min_page_length{0};             // 4
-    int nbits_delta_page_length{0};     // 5
-    int min_content_offset{0};          // 6
-    int nbits_delta_content_offset{0};  // 7
-    int min_content_length{0};          // 8
-    int nbits_delta_content_length{0};  // 9
-    int nbits_nshared_objects{0};       // 10
-    int nbits_shared_identifier{0};     // 11
-    int nbits_shared_numerator{0};      // 12
-    int shared_denominator{0};          // 13
-    // vector size is npages
-    std::vector<HPageOffsetEntry> entries;
-};
-
-// PDF 1.4: Table F.6
-struct QPDF::HSharedObjectEntry
-{
-    // Item 3 is a 128-bit signature (unsupported by Acrobat)
-    int delta_group_length{0}; // 1
-    int signature_present{0};  // 2 -- always 0
-    int nobjects_minus_one{0}; // 4 -- always 0
-};
-
-// PDF 1.4: Table F.5
-struct QPDF::HSharedObject
-{
-    int first_shared_obj{0};              // 1
-    qpdf_offset_t first_shared_offset{0}; // 2
-    int nshared_first_page{0};            // 3
-    int nshared_total{0};                 // 4
-    int nbits_nobjects{0};                // 5
-    int min_group_length{0};              // 6
-    int nbits_delta_group_length{0};      // 7
-    // vector size is nshared_total
-    std::vector<HSharedObjectEntry> entries;
-};
-
-// PDF 1.4: Table F.9
-struct QPDF::HGeneric
-{
-    int first_object{0};                  // 1
-    qpdf_offset_t first_object_offset{0}; // 2
-    int nobjects{0};                      // 3
-    int group_length{0};                  // 4
-};
-
 // Other linearization data structures
-
-// Initialized from Linearization Parameter dictionary
-struct QPDF::LinParameters
-{
-    qpdf_offset_t file_size{0};        // /L
-    int first_page_object{0};          // /O
-    qpdf_offset_t first_page_end{0};   // /E
-    size_t npages{0};                  // /N
-    qpdf_offset_t xref_zero_offset{0}; // /T
-    int first_page{0};                 // /P
-    qpdf_offset_t H_offset{0};         // offset of primary hint stream
-    qpdf_offset_t H_length{0};         // length of primary hint stream
-};
-
-// Computed hint table value data structures.  These tables contain the computed values on which
-// the hint table values are based.  They exclude things like number of bits and store actual
-// values instead of mins and deltas.  File offsets are also absolute rather than being offset
-// by the size of the primary hint table.  We populate the hint table structures from these
-// during writing and compare the hint table values with these during validation.  We ignore
-// some values for various reasons described in the code.  Those values are omitted from these
-// structures.  Note also that object numbers are object numbers from the input file, not the
-// output file.
-
-// Naming convention: CHSomething is analogous to HSomething above.  "CH" is computed hint.
-
-struct QPDF::CHPageOffsetEntry
-{
-    int nobjects{0};
-    int nshared_objects{0};
-    // vectors' sizes = nshared_objects
-    std::vector<int> shared_identifiers;
-};
-
-struct QPDF::CHPageOffset
-{
-    // vector size is npages
-    std::vector<CHPageOffsetEntry> entries;
-};
-
-struct QPDF::CHSharedObjectEntry
-{
-    CHSharedObjectEntry(int object) :
-        object(object)
-    {
-    }
-
-    int object;
-};
-
-// PDF 1.4: Table F.5
-struct QPDF::CHSharedObject
-{
-    int first_shared_obj{0};
-    int nshared_first_page{0};
-    int nshared_total{0};
-    // vector size is nshared_total
-    std::vector<CHSharedObjectEntry> entries;
-};
-
-// No need for CHGeneric -- HGeneric is fine as is.
-
-// Data structures to support optimization -- implemented in QPDF_optimization.cc
-
-class QPDF::ObjUser
-{
-  public:
-    enum user_e { ou_page = 1, ou_thumb, ou_trailer_key, ou_root_key, ou_root };
-
-    ObjUser() = delete;
-
-    // type must be ou_root
-    ObjUser(user_e type);
-
-    // type must be one of ou_page or ou_thumb
-    ObjUser(user_e type, size_t pageno);
-
-    // type must be one of ou_trailer_key or ou_root_key
-    ObjUser(user_e type, std::string const& key);
-
-    bool operator<(ObjUser const&) const;
-
-    user_e ou_type;
-    size_t pageno{0}; // if ou_page;
-    std::string key;  // if ou_trailer_key or ou_root_key
-};
-
-struct QPDF::UpdateObjectMapsFrame
-{
-    UpdateObjectMapsFrame(ObjUser const& ou, QPDFObjectHandle oh, bool top);
-
-    ObjUser const& ou;
-    QPDFObjectHandle oh;
-    bool top;
-};
 
 class QPDF::PatternFinder final: public InputSource::Finder
 {
@@ -296,7 +266,6 @@ class QPDF::Doc
 {
   public:
     class Encryption;
-    class JobSetter;
     class Linearization;
     class Objects;
     class Pages;
@@ -352,7 +321,9 @@ class QPDF::Doc
         QPDF& qpdf;
         QPDF::Members* m;
 
+        qpdf::Doc::Config& cf;
         QPDF::Doc::Pages& pages;
+        QPDF::Doc::Objects& objects;
     };
 
     Doc() = delete;
@@ -366,6 +337,18 @@ class QPDF::Doc
         qpdf(qpdf),
         m(m)
     {
+    }
+
+    qpdf::Doc::Config&
+    config()
+    {
+        return cf;
+    }
+
+    void
+    config(qpdf::Doc::Config val)
+    {
+        cf = val;
     }
 
     inline Linearization& linearization();
@@ -421,10 +404,13 @@ class QPDF::Doc
         return *page_labels_;
     }
 
-  private:
+  protected:
     QPDF& qpdf;
     QPDF::Members* m;
 
+    qpdf::Doc::Config cf;
+
+  private:
     // Document Helpers;
     std::unique_ptr<QPDFAcroFormDocumentHelper> acroform_;
     std::unique_ptr<QPDFEmbeddedFileDocumentHelper> embedded_files_;
@@ -564,6 +550,10 @@ class QPDF::Doc::Linearization: Common
     {
     }
 
+    bool linearized();
+    bool check();
+    void show_data();
+
     // For QPDFWriter:
 
     template <typename T>
@@ -592,6 +582,168 @@ class QPDF::Doc::Linearization: Common
         int& S,
         int& O,
         bool compressed);
+
+  private:
+    // Data structures to support optimization -- implemented in QPDF_optimization.cc
+
+    class ObjUser
+    {
+      public:
+        enum user_e { ou_page = 1, ou_thumb, ou_trailer_key, ou_root_key, ou_root };
+
+        ObjUser() = delete;
+
+        // type must be ou_root
+        ObjUser(user_e type);
+
+        // type must be one of ou_page or ou_thumb
+        ObjUser(user_e type, size_t pageno);
+
+        // type must be one of ou_trailer_key or ou_root_key
+        ObjUser(user_e type, std::string const& key);
+
+        bool operator<(ObjUser const&) const;
+
+        user_e ou_type;
+        size_t pageno{0}; // if ou_page;
+        std::string key;  // if ou_trailer_key or ou_root_key
+    };
+
+    struct UpdateObjectMapsFrame
+    {
+        UpdateObjectMapsFrame(ObjUser const& ou, QPDFObjectHandle oh, bool top);
+
+        ObjUser const& ou;
+        QPDFObjectHandle oh;
+        bool top;
+    };
+
+    // PDF 1.4: Table F.4
+    struct HPageOffsetEntry
+    {
+        int delta_nobjects{0};              // 1
+        qpdf_offset_t delta_page_length{0}; // 2
+        // vectors' sizes = nshared_objects
+        int nshared_objects{0};                // 3
+        std::vector<int> shared_identifiers;   // 4
+        std::vector<int> shared_numerators;    // 5
+        qpdf_offset_t delta_content_offset{0}; // 6
+        qpdf_offset_t delta_content_length{0}; // 7
+    };
+
+    // PDF 1.4: Table F.3
+    struct HPageOffset
+    {
+        int min_nobjects{0};                // 1
+        qpdf_offset_t first_page_offset{0}; // 2
+        int nbits_delta_nobjects{0};        // 3
+        int min_page_length{0};             // 4
+        int nbits_delta_page_length{0};     // 5
+        int min_content_offset{0};          // 6
+        int nbits_delta_content_offset{0};  // 7
+        int min_content_length{0};          // 8
+        int nbits_delta_content_length{0};  // 9
+        int nbits_nshared_objects{0};       // 10
+        int nbits_shared_identifier{0};     // 11
+        int nbits_shared_numerator{0};      // 12
+        int shared_denominator{0};          // 13
+        // vector size is npages
+        std::vector<HPageOffsetEntry> entries;
+    };
+
+    // PDF 1.4: Table F.6
+    struct HSharedObjectEntry
+    {
+        // Item 3 is a 128-bit signature (unsupported by Acrobat)
+        int delta_group_length{0}; // 1
+        int signature_present{0};  // 2 -- always 0
+        int nobjects_minus_one{0}; // 4 -- always 0
+    };
+
+    // PDF 1.4: Table F.5
+    struct HSharedObject
+    {
+        int first_shared_obj{0};              // 1
+        qpdf_offset_t first_shared_offset{0}; // 2
+        int nshared_first_page{0};            // 3
+        int nshared_total{0};                 // 4
+        int nbits_nobjects{0};                // 5
+        int min_group_length{0};              // 6
+        int nbits_delta_group_length{0};      // 7
+        // vector size is nshared_total
+        std::vector<HSharedObjectEntry> entries;
+    };
+
+    // PDF 1.4: Table F.9
+    struct HGeneric
+    {
+        int first_object{0};                  // 1
+        qpdf_offset_t first_object_offset{0}; // 2
+        int nobjects{0};                      // 3
+        int group_length{0};                  // 4
+    };
+
+    // Other linearization data structures
+
+    // Initialized from Linearization Parameter dictionary
+    struct LinParameters
+    {
+        qpdf_offset_t file_size{0};        // /L
+        int first_page_object{0};          // /O
+        qpdf_offset_t first_page_end{0};   // /E
+        size_t npages{0};                  // /N
+        qpdf_offset_t xref_zero_offset{0}; // /T
+        int first_page{0};                 // /P
+        qpdf_offset_t H_offset{0};         // offset of primary hint stream
+        qpdf_offset_t H_length{0};         // length of primary hint stream
+    };
+
+    // Computed hint table value data structures.  These tables contain the computed values on which
+    // the hint table values are based.  They exclude things like number of bits and store actual
+    // values instead of mins and deltas.  File offsets are also absolute rather than being offset
+    // by the size of the primary hint table.  We populate the hint table structures from these
+    // during writing and compare the hint table values with these during validation.  We ignore
+    // some values for various reasons described in the code.  Those values are omitted from these
+    // structures.  Note also that object numbers are object numbers from the input file, not the
+    // output file.
+
+    // Naming convention: CHSomething is analogous to HSomething above.  "CH" is computed hint.
+
+    struct CHPageOffsetEntry
+    {
+        int nobjects{0};
+        int nshared_objects{0};
+        // vectors' sizes = nshared_objects
+        std::vector<int> shared_identifiers;
+    };
+
+    struct CHPageOffset
+    {
+        // vector size is npages
+        std::vector<CHPageOffsetEntry> entries;
+    };
+
+    struct CHSharedObjectEntry
+    {
+        CHSharedObjectEntry(int object) :
+            object(object)
+        {
+        }
+
+        int object;
+    };
+
+    // PDF 1.4: Table F.5
+    struct CHSharedObject
+    {
+        int first_shared_obj{0};
+        int nshared_first_page{0};
+        int nshared_total{0};
+        // vector size is nshared_total
+        std::vector<CHSharedObjectEntry> entries;
+    };
+
+    // No need for CHGeneric -- HGeneric is fine as is.
 
     // methods to support linearization checking -- implemented in QPDF_linearization.cc
 
@@ -647,6 +799,36 @@ class QPDF::Doc::Linearization: Common
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
     void filterCompressedObjects(QPDFWriter::ObjTable const& object_stream_data);
+
+    // Optimization data
+    std::map<ObjUser, std::set<QPDFObjGen>> obj_user_to_objects_;
+    std::map<QPDFObjGen, std::set<ObjUser>> object_to_obj_users_;
+
+    // Linearization data
+    bool linearization_warnings_{false}; // set by linearizationWarning, used by checkLinearization
+
+    // Linearization parameter dictionary and hint table data: may be read from file or computed
+    // prior to writing a linearized file
+    QPDFObjectHandle lindict_;
+    LinParameters linp_;
+    HPageOffset page_offset_hints_;
+    HSharedObject shared_object_hints_;
+    HGeneric outline_hints_;
+
+    // Computed linearization data: used to populate above tables during writing and to compare
+    // with them during validation. c_ means computed.
+    LinParameters c_linp_;
+    CHPageOffset c_page_offset_data_;
+    CHSharedObject c_shared_object_data_;
+    HGeneric c_outline_data_;
+
+    // Object ordering data for linearized files: initialized by calculateLinearizationData().
+    // Part numbers refer to the PDF 1.4 specification.
+    std::vector<QPDFObjectHandle> part4_;
+    std::vector<QPDFObjectHandle> part6_;
+    std::vector<QPDFObjectHandle> part7_;
+    std::vector<QPDFObjectHandle> part8_;
+    std::vector<QPDFObjectHandle> part9_;
 };
 
 class QPDF::Doc::Objects: Common
@@ -743,7 +925,7 @@ class QPDF::Doc::Objects: Common
             return copier_;
         }
 
-        bool immediate_copy_from() const;
+        //        bool immediate_copy_from() const;
 
       private:
         std::shared_ptr<Copier> copier_;
@@ -776,6 +958,17 @@ class QPDF::Doc::Objects: Common
         return streams_;
     }
 
+    // actual value from file
+    qpdf_offset_t
+    first_xref_item_offset() const
+    {
+        return first_xref_item_offset_;
+    }
+    bool
+    uncompressed_after_compressed() const
+    {
+        return uncompressed_after_compressed_;
+    }
     void parse(char const* password);
     std::shared_ptr<QPDFObject> const& resolve(QPDFObjGen og);
     void inParse(bool);
@@ -847,6 +1040,10 @@ class QPDF::Doc::Objects: Common
 
     Foreign foreign_;
     Streams streams_;
+
+    // Linearization data
+    qpdf_offset_t first_xref_item_offset_{0}; // actual value from file
+    bool uncompressed_after_compressed_{false};
 }; // class QPDF::Doc::Objects
 
 // This class is used to represent a PDF Pages tree.
@@ -969,18 +1166,11 @@ class QPDF::Members: Doc
     Doc::Linearization lin;
     Doc::Objects objects;
     Doc::Pages pages;
-    std::shared_ptr<QPDFLogger> log;
     unsigned long long unique_id{0};
     qpdf::Tokenizer tokenizer;
     std::shared_ptr<InputSource> file;
     std::string last_object_description;
     std::shared_ptr<QPDFObject::Description> last_ostream_description;
-    bool provided_password_is_hex_key{false};
-    bool ignore_xref_streams{false};
-    bool suppress_warnings{false};
-    size_t max_warnings{0};
-    bool attempt_recovery{true};
-    bool check_mode{false};
     std::shared_ptr<EncryptionParameters> encp;
     std::string pdf_version;
     std::map<QPDFObjGen, QPDFXRefEntry> xref_table;
@@ -995,42 +1185,9 @@ class QPDF::Members: Doc
     bool reconstructed_xref{false};
     bool in_read_xref_stream{false};
     bool fixed_dangling_refs{false};
-    bool immediate_copy_from{false};
     bool in_parse{false};
     bool parsed{false};
     std::set<int> resolved_object_streams;
-
-    // Linearization data
-    qpdf_offset_t first_xref_item_offset{0}; // actual value from file
-    bool uncompressed_after_compressed{false};
-    bool linearization_warnings{false}; // set by linearizationWarning, used by checkLinearization
-
-    // Linearization parameter dictionary and hint table data: may be read from file or computed
-    // prior to writing a linearized file
-    QPDFObjectHandle lindict;
-    LinParameters linp;
-    HPageOffset page_offset_hints;
-    HSharedObject shared_object_hints;
-    HGeneric outline_hints;
-
-    // Computed linearization data: used to populate above tables during writing and to compare
-    // with them during validation. c_ means computed.
-    LinParameters c_linp;
-    CHPageOffset c_page_offset_data;
-    CHSharedObject c_shared_object_data;
-    HGeneric c_outline_data;
-
-    // Object ordering data for linearized files: initialized by calculateLinearizationData().
-    // Part numbers refer to the PDF 1.4 specification.
-    std::vector<QPDFObjectHandle> part4;
-    std::vector<QPDFObjectHandle> part6;
-    std::vector<QPDFObjectHandle> part7;
-    std::vector<QPDFObjectHandle> part8;
-    std::vector<QPDFObjectHandle> part9;
-
-    // Optimization data
-    std::map<ObjUser, std::set<QPDFObjGen>> obj_user_to_objects;
-    std::map<QPDFObjGen, std::set<ObjUser>> object_to_obj_users;
 };
 
 // The Resolver class is restricted to QPDFObject and BaseHandle so that only it can resolve
@@ -1051,7 +1208,9 @@ class QPDF::Doc::Resolver
 inline QPDF::Doc::Common::Common(QPDF& qpdf, QPDF::Members* m) :
     qpdf(qpdf),
     m(m),
-    pages(m->pages)
+    cf(m->cf),
+    pages(m->pages),
+    objects(m->objects)
 {
 }
 

@@ -68,6 +68,7 @@ QPDFJob::Config*
 QPDFJob::Config::check()
 {
     o.m->check = true;
+    o.m->qcf.check_mode(true);
     o.m->require_outfile = false;
     return this;
 }
@@ -233,7 +234,7 @@ QPDFJob::Config::generateAppearances()
 QPDFJob::Config*
 QPDFJob::Config::ignoreXrefStreams()
 {
-    o.m->ignore_xref_streams = true;
+    o.m->qcf.ignore_xref_streams(true);
     return this;
 }
 
@@ -415,7 +416,7 @@ QPDFJob::Config::noOriginalObjectIds()
 QPDFJob::Config*
 QPDFJob::Config::noWarn()
 {
-    o.m->suppress_warnings = true;
+    o.m->qcf.suppress_warnings(true);
     return this;
 }
 
@@ -465,7 +466,7 @@ QPDFJob::Config::password(std::string const& parameter)
 QPDFJob::Config*
 QPDFJob::Config::passwordIsHexKey()
 {
-    o.m->password_is_hex_key = true;
+    o.m->qcf.password_is_hex_key(true);
     return this;
 }
 
@@ -662,7 +663,7 @@ QPDFJob::Config::suppressPasswordRecovery()
 QPDFJob::Config*
 QPDFJob::Config::suppressRecovery()
 {
-    o.m->suppress_recovery = true;
+    o.m->qcf.surpress_recovery(true);
     return this;
 }
 

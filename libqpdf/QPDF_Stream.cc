@@ -27,12 +27,6 @@ using namespace qpdf;
 
 using Streams = QPDF::Doc::Objects::Streams;
 
-bool
-Streams::immediate_copy_from() const
-{
-    return qpdf.m->immediate_copy_from;
-}
-
 class Streams::Copier final: public QPDFObjectHandle::StreamDataProvider
 {
     class Data
@@ -308,14 +302,13 @@ Stream::copy_data_to(Stream& dest)
 {
     qpdf_expect(dest);
     auto s = stream();
-    auto& streams = qpdf()->doc().objects().streams();
     auto& d_streams = dest.qpdf()->doc().objects().streams();
 
     auto dict = dest.getDict();
 
     // Copy information from the foreign stream so we can pipe its data later without keeping the
     // original QPDF object around.
-    if (streams.immediate_copy_from() && !s->stream_data) {
+    if (qpdf()->doc().config().immediate_copy_from() && !s->stream_data) {
         // Pull the stream data into a buffer before attempting the copy operation. Do it on the
         // source stream so that if the source stream is copied multiple times, we don't have to
         // keep duplicating the memory.
