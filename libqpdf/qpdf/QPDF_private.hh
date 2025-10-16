@@ -22,6 +22,11 @@ namespace qpdf
         class OffsetBuffer;
     } // namespace is
 
+    namespace impl
+    {
+        using Doc = QPDF::Doc;
+    }
+
     class Doc: public QPDF
     {
       public:

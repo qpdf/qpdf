@@ -30,8 +30,7 @@
 
 using namespace qpdf;
 
-using QDoc = QPDF::Doc;
-using Pages = QDoc::Pages;
+using Pages = impl::Doc::Pages;
 
 namespace
 {

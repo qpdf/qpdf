@@ -27,8 +27,7 @@
 using namespace std::literals;
 using namespace qpdf;
 
-using QDoc = QPDF::Doc;
-using Encryption = QDoc::Encryption;
+using Encryption = impl::Doc::Encryption;
 
 QPDFWriter::ProgressReporter::~ProgressReporter() // NOLINT (modernize-use-equals-default)
 {

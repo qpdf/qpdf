@@ -27,9 +27,8 @@
 using namespace qpdf;
 using namespace std::literals;
 
-using QDoc = QPDF::Doc;
-using Common = QDoc::Common;
-using Objects = QDoc::Objects;
+using Common = impl::Doc::Common;
+using Objects = impl::Doc::Objects;
 using Foreign = Objects::Foreign;
 using Streams = Objects::Streams;
 
