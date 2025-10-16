@@ -713,10 +713,10 @@ Lin::checkLinearizationInternal()
             break;
         }
     }
-    if (m->file->tell() != m->first_xref_item_offset) {
+    if (m->file->tell() != objects.first_xref_item_offset()) {
         linearizationWarning(
             "space before first xref item (/T) mismatch (computed = " +
-            std::to_string(m->first_xref_item_offset) +
+            std::to_string(objects.first_xref_item_offset()) +
             "; file = " + std::to_string(m->file->tell()));
     }
 
@@ -727,7 +727,7 @@ Lin::checkLinearizationInternal()
     // compressed objects are supposed to be at the end of the containing xref section if any object
     // streams are in use.
 
-    if (m->uncompressed_after_compressed) {
+    if (objects.uncompressed_after_compressed()) {
         linearizationWarning(
             "linearized file contains an uncompressed object after a compressed "
             "one in a cross-reference stream");

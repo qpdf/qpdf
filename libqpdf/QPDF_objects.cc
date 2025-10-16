@@ -694,7 +694,7 @@ Objects::read_xrefTable(qpdf_offset_t xref_offset)
         for (qpdf_offset_t i = obj; i - num < obj; ++i) {
             if (i == 0) {
                 // This is needed by checkLinearization()
-                m->first_xref_item_offset = m->file->tell();
+                first_xref_item_offset_ = m->file->tell();
             }
             // For xref_table, these will always be small enough to be ints
             qpdf_offset_t f1 = 0;
@@ -956,14 +956,14 @@ Objects::processXRefStream(
             // object record, in which case the generation number appears as the third field.
             if (saw_first_compressed_object) {
                 if (fields[0] != 2) {
-                    m->uncompressed_after_compressed = true;
+                    uncompressed_after_compressed_ = true;
                 }
             } else if (fields[0] == 2) {
                 saw_first_compressed_object = true;
             }
             if (obj == 0) {
                 // This is needed by checkLinearization()
-                m->first_xref_item_offset = xref_offset;
+                first_xref_item_offset_ = xref_offset;
             } else if (fields[0] == 0) {
                 // Ignore fields[2], which we don't care about in this case. This works around the
                 // issue of some PDF files that put invalid values, like -1, here for deleted

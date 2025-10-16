@@ -323,6 +323,7 @@ class QPDF::Doc
 
         qpdf::Doc::Config& cf;
         QPDF::Doc::Pages& pages;
+        QPDF::Doc::Objects& objects;
     };
 
     Doc() = delete;
@@ -957,6 +958,17 @@ class QPDF::Doc::Objects: Common
         return streams_;
     }
 
+    // actual value from file
+    qpdf_offset_t
+    first_xref_item_offset() const
+    {
+        return first_xref_item_offset_;
+    }
+    bool
+    uncompressed_after_compressed() const
+    {
+        return uncompressed_after_compressed_;
+    }
     void parse(char const* password);
     std::shared_ptr<QPDFObject> const& resolve(QPDFObjGen og);
     void inParse(bool);
@@ -1028,6 +1040,10 @@ class QPDF::Doc::Objects: Common
 
     Foreign foreign_;
     Streams streams_;
+
+    // Linearization data
+    qpdf_offset_t first_xref_item_offset_{0}; // actual value from file
+    bool uncompressed_after_compressed_{false};
 }; // class QPDF::Doc::Objects
 
 // This class is used to represent a PDF Pages tree.
@@ -1172,10 +1188,6 @@ class QPDF::Members: Doc
     bool in_parse{false};
     bool parsed{false};
     std::set<int> resolved_object_streams;
-
-    // Linearization data
-    qpdf_offset_t first_xref_item_offset{0}; // actual value from file
-    bool uncompressed_after_compressed{false};
 };
 
 // The Resolver class is restricted to QPDFObject and BaseHandle so that only it can resolve
@@ -1197,7 +1209,8 @@ inline QPDF::Doc::Common::Common(QPDF& qpdf, QPDF::Members* m) :
     qpdf(qpdf),
     m(m),
     cf(m->cf),
-    pages(m->pages)
+    pages(m->pages),
+    objects(m->objects)
 {
 }
 
