@@ -349,38 +349,39 @@ Pages::pushInheritedAttributesToPageInternal(
                 throw QPDFExc(
                     qpdf_e_internal,
                     m->file->getName(),
-                    m->last_object_description,
-                    m->file->getLastOffset(),
-                    "optimize detected an inheritable attribute when called in no-change mode");
+                    "/Pages object " + cur_pages.id_gen().unparse(' '),
+                    cur_pages.offset(),
+                    "pushInheritedAttributesToPage detected an inheritable attribute when called "
+                    "in no-change mode");
             }
 
             // This is an inheritable resource
             inheritable_keys.insert(key);
-            QPDFObjectHandle oh = cur_pages.getKey(key);
+            auto oh = cur_pages[key];
             QTC::TC("qpdf", "QPDF opt direct pages resource", oh.indirect() ? 0 : 1);
             if (!oh.indirect()) {
                 if (!oh.isScalar()) {
                     // Replace shared direct object non-scalar resources with indirect objects to
                     // avoid copying large structures around.
                     cur_pages.replaceKey(key, qpdf.makeIndirectObject(oh));
-                    oh = cur_pages.getKey(key);
+                    oh = cur_pages[key];
                 } else {
                     // It's okay to copy scalars.
                 }
             }
-            key_ancestors[key].push_back(oh);
+            key_ancestors[key].emplace_back(oh);
             if (key_ancestors[key].size() > 1) {
             }
             // Remove this resource from this node.  It will be reattached at the page level.
-            cur_pages.removeKey(key);
+            cur_pages.erase(key);
         } else if (!(key == "/Type" || key == "/Parent" || key == "/Kids" || key == "/Count")) {
             // Warn when flattening, but not if the key is at the top level (i.e. "/Parent" not
             // set), as we don't change these; but flattening removes intermediate /Pages nodes.
-            if (warn_skipped_keys && cur_pages.hasKey("/Parent")) {
+            if (warn_skipped_keys && cur_pages.contains("/Parent")) {
                 warn(
                     qpdf_e_pages,
                     "Pages object: object " + cur_pages.id_gen().unparse(' '),
-                    0,
+                    cur_pages.offset(),
                     ("Unknown key " + key +
                      " in /Pages object is being discarded as a result of flattening the /Pages "
                      "tree"));
@@ -391,16 +392,15 @@ Pages::pushInheritedAttributesToPageInternal(
     // Process descendant nodes. This method does not perform loop detection because all code paths
     // that lead here follow a call to getAllPages, which already throws an exception in the event
     // of a loop in the pages tree.
-    for (auto& kid: cur_pages.getKey("/Kids").aitems()) {
+    for (auto& kid: Array(cur_pages["/Kids"])) {
         if (kid.isDictionaryOfType("/Pages")) {
             pushInheritedAttributesToPageInternal(
                 kid, key_ancestors, allow_changes, warn_skipped_keys);
         } else {
             // Add all available inheritable attributes not present in this object to this object.
-            for (auto const& iter: key_ancestors) {
-                std::string const& key = iter.first;
-                if (!kid.hasKey(key)) {
-                    kid.replaceKey(key, iter.second.back());
+            for (auto const& [key, values]: key_ancestors) {
+                if (!kid.contains(key)) {
+                    kid.replaceKey(key, values.back());
                 } else {
                     QTC::TC("qpdf", "QPDF opt page resource hides ancestor");
                 }

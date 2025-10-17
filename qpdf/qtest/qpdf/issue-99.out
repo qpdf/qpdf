@@ -19,6 +19,5 @@ WARNING: issue-99.pdf (object 11 0, offset 4497): unexpected array close token; 
 WARNING: issue-99.pdf (object 11 0, offset 4499): expected endobj
 WARNING: issue-99.pdf: unable to find trailer dictionary while recovering damaged file
 WARNING: object 1 0: Pages tree includes non-dictionary object; ignoring
-WARNING: object 1 0: operation for dictionary attempted on object of type null: returning false for a key containment request
 WARNING: object 1 0: operation for dictionary attempted on object of type null: ignoring key replacement request
 qpdf: issue-99.pdf: unable to find any pages while recovering damaged file
