@@ -267,9 +267,35 @@ namespace qpdf::impl
     class Writer: protected Doc::Common
     {
       public:
-        Writer(QPDF& qpdf) :
+        // flags used by unparseObject
+        static int const f_stream = 1 << 0;
+        static int const f_filtered = 1 << 1;
+        static int const f_in_ostream = 1 << 2;
+        static int const f_hex_string = 1 << 3;
+        static int const f_no_encryption = 1 << 4;
+
+        enum trailer_e { t_normal, t_lin_first, t_lin_second };
+
+        Writer() = delete;
+        Writer(Writer const&) = delete;
+        Writer(Writer&&) = delete;
+        Writer& operator=(Writer const&) = delete;
+        Writer& operator=(Writer&&) = delete;
+        ~Writer()
+        {
+            if (file && close_file) {
+                fclose(file);
+            }
+            delete output_buffer;
+        }
+        Writer(QPDF& qpdf, QPDFWriter& w) :
             Common(qpdf.doc()),
-            lin(qpdf.doc().linearization())
+            lin(qpdf.doc().linearization()),
+            w(w),
+            root_og(
+                qpdf.getRoot().getObjGen().isIndirect() ? qpdf.getRoot().getObjGen()
+                                                        : QPDFObjGen(-1, 0)),
+            pipeline_stack(pipeline)
         {
         }
 
@@ -277,6 +303,50 @@ namespace qpdf::impl
         Doc::Linearization& lin;
 
         qpdf::Writer::Config cfg;
+
+        QPDFWriter& w;
+        QPDFObjGen root_og{-1, 0};
+        char const* filename{"unspecified"};
+        FILE* file{nullptr};
+        bool close_file{false};
+        std::unique_ptr<Pl_Buffer> buffer_pipeline{nullptr};
+        Buffer* output_buffer{nullptr};
+
+        std::unique_ptr<QPDF::Doc::Encryption> encryption;
+        std::string encryption_key;
+
+        std::string id1; // for /ID key of
+        std::string id2; // trailer dictionary
+        std::string final_pdf_version;
+        int final_extension_level{0};
+        std::string min_pdf_version;
+        int min_extension_level{0};
+        int encryption_dict_objid{0};
+        std::string cur_data_key;
+        std::unique_ptr<Pipeline> file_pl;
+        qpdf::pl::Count* pipeline{nullptr};
+        std::vector<QPDFObjectHandle> object_queue;
+        size_t object_queue_front{0};
+        QPDFWriter::ObjTable obj;
+        QPDFWriter::NewObjTable new_obj;
+        int next_objid{1};
+        int cur_stream_length_id{0};
+        size_t cur_stream_length{0};
+        bool added_newline{false};
+        size_t max_ostream_index{0};
+        std::set<QPDFObjGen> normalized_streams;
+        std::map<QPDFObjGen, int> page_object_to_seq;
+        std::map<QPDFObjGen, int> contents_to_page_seq;
+        std::map<int, std::vector<QPDFObjGen>> object_stream_to_objects;
+        Pl_stack pipeline_stack;
+        std::string deterministic_id_data;
+        bool did_write_setup{false};
+
+        // For progress reporting
+        std::shared_ptr<QPDFWriter::ProgressReporter> progress_reporter;
+        int events_expected{0};
+        int events_seen{0};
+        int next_progress_report{0};
     };
 } // namespace qpdf::impl
 
@@ -285,33 +355,9 @@ class QPDFWriter::Members: impl::Writer
     friend class QPDFWriter;
 
   public:
-    // flags used by unparseObject
-    static int const f_stream = 1 << 0;
-    static int const f_filtered = 1 << 1;
-    static int const f_in_ostream = 1 << 2;
-    static int const f_hex_string = 1 << 3;
-    static int const f_no_encryption = 1 << 4;
-
-    enum trailer_e { t_normal, t_lin_first, t_lin_second };
-
     Members(QPDFWriter& w, QPDF& qpdf) :
-        impl::Writer(qpdf),
-        w(w),
-        root_og(
-            qpdf.getRoot().getObjGen().isIndirect() ? qpdf.getRoot().getObjGen()
-                                                    : QPDFObjGen(-1, 0)),
-        pipeline_stack(pipeline)
+        impl::Writer(qpdf, w)
     {
-    }
-
-    Members(Members const&) = delete;
-
-    ~Members()
-    {
-        if (file && close_file) {
-            fclose(file);
-        }
-        delete output_buffer;
     }
 
     void write();
@@ -430,51 +476,6 @@ class QPDFWriter::Members: impl::Writer
 
     void adjustAESStreamLength(size_t& length);
     void computeDeterministicIDData();
-
-  private:
-    QPDFWriter& w;
-    QPDFObjGen root_og{-1, 0};
-    char const* filename{"unspecified"};
-    FILE* file{nullptr};
-    bool close_file{false};
-    std::unique_ptr<Pl_Buffer> buffer_pipeline{nullptr};
-    Buffer* output_buffer{nullptr};
-
-    std::unique_ptr<QPDF::Doc::Encryption> encryption;
-    std::string encryption_key;
-
-    std::string id1; // for /ID key of
-    std::string id2; // trailer dictionary
-    std::string final_pdf_version;
-    int final_extension_level{0};
-    std::string min_pdf_version;
-    int min_extension_level{0};
-    int encryption_dict_objid{0};
-    std::string cur_data_key;
-    std::unique_ptr<Pipeline> file_pl;
-    qpdf::pl::Count* pipeline{nullptr};
-    std::vector<QPDFObjectHandle> object_queue;
-    size_t object_queue_front{0};
-    QPDFWriter::ObjTable obj;
-    QPDFWriter::NewObjTable new_obj;
-    int next_objid{1};
-    int cur_stream_length_id{0};
-    size_t cur_stream_length{0};
-    bool added_newline{false};
-    size_t max_ostream_index{0};
-    std::set<QPDFObjGen> normalized_streams;
-    std::map<QPDFObjGen, int> page_object_to_seq;
-    std::map<QPDFObjGen, int> contents_to_page_seq;
-    std::map<int, std::vector<QPDFObjGen>> object_stream_to_objects;
-    Pl_stack pipeline_stack;
-    std::string deterministic_id_data;
-    bool did_write_setup{false};
-
-    // For progress reporting
-    std::shared_ptr<QPDFWriter::ProgressReporter> progress_reporter;
-    int events_expected{0};
-    int events_seen{0};
-    int next_progress_report{0};
 };
 
 QPDFWriter::QPDFWriter(QPDF& pdf) :
