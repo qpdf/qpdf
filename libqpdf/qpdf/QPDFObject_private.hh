@@ -30,6 +30,11 @@ namespace qpdf
     class Integer;
     class Name;
     class Stream;
+
+    namespace impl
+    {
+        class Writer;
+    }
 } // namespace qpdf
 
 class QPDF_Array final
@@ -256,7 +261,7 @@ class QPDF_String final
 {
     friend class QPDFObject;
     friend class qpdf::BaseHandle;
-    friend class QPDFWriter;
+    friend class qpdf::impl::Writer;
 
   public:
     static std::shared_ptr<QPDFObject> create_utf16(std::string const& utf8_val);
