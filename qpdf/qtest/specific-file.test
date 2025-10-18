@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('specific-file');
 
-my $n_tests = 11;
+my $n_tests = 12;
 
 # Special PDF files that caused problems at some point
 
@@ -63,6 +63,11 @@ $td->runtest("Acroform /DR with indirect subkey",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "dr-with-indirect-item-out.pdf"});
+$td->runtest("Bad direct Root",
+             {$td->COMMAND =>
+                  "qpdf --static-id bad-direct-root.pdf --linearize a.pdf"},
+             {$td->FILE => "bad-direct-root.out", $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
 
 cleanup();
 $td->report($n_tests);
