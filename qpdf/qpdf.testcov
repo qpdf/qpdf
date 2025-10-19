@@ -46,7 +46,6 @@ QPDFObjectHandle copy stream 1
 QPDF ignoring XRefStm in trailer 0
 SF_FlateLzwDecode PNG filter 0
 QPDF xref /Index is array 1
-QPDFWriter encrypt object stream 0
 QPDF exclude indirect length 0
 QPDF exclude encryption dictionary 0
 QPDF_Stream pipeStreamData with null pipeline 0

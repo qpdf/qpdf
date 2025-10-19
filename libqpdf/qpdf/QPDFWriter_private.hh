@@ -23,14 +23,252 @@ namespace qpdf
         class Config
         {
             friend class impl::Writer;
-            friend class ::QPDFWriter;
+
+          public:
+            bool
+            linearize() const
+            {
+                return linearize_;
+            }
+
+            Config& linearize(bool val);
+
+            std::string const&
+            lin_pass1_filename() const
+            {
+                return lin_pass1_filename_;
+            }
+
+            Config&
+            lin_pass1_filename(std::string const& val)
+            {
+                lin_pass1_filename_ = val;
+                return *this;
+            }
+
+            bool
+            preserve_encryption() const
+            {
+                return preserve_encryption_;
+            }
+
+            Config&
+            preserve_encryption(bool val)
+            {
+                preserve_encryption_ = val;
+                return *this;
+            }
+
+            bool
+            encrypt_use_aes() const
+            {
+                return encrypt_use_aes_;
+            }
+
+            Config&
+            encrypt_use_aes(bool val)
+            {
+                encrypt_use_aes_ = val;
+                return *this;
+            }
+
+            qpdf_stream_decode_level_e
+            stream_decode_level() const
+            {
+                return stream_decode_level_;
+            }
+
+            Config& stream_decode_level(qpdf_stream_decode_level_e val);
+
+            qpdf_object_stream_e
+            object_streams() const
+            {
+                return object_streams_;
+            }
+
+            Config&
+            object_streams(qpdf_object_stream_e val)
+            {
+                object_streams_ = val;
+                return *this;
+            }
+
+            bool
+            compress_streams() const
+            {
+                return compress_streams_;
+            }
+
+            Config& compress_streams(bool val);
+
+            bool
+            direct_stream_lengths() const
+            {
+                return direct_stream_lengths_;
+            }
+
+            bool
+            newline_before_endstream() const
+            {
+                return newline_before_endstream_;
+            }
+
+            Config&
+            newline_before_endstream(bool val)
+            {
+                newline_before_endstream_ = val;
+                return *this;
+            }
+
+            bool
+            recompress_flate() const
+            {
+                return recompress_flate_;
+            }
+
+            Config&
+            recompress_flate(bool val)
+            {
+                recompress_flate_ = val;
+                return *this;
+            }
+
+            Config& stream_data(qpdf_stream_data_e val);
+
+            std::string const&
+            forced_pdf_version() const
+            {
+                return forced_pdf_version_;
+            }
+
+            Config&
+            forced_pdf_version(std::string const& val)
+            {
+                forced_pdf_version_ = val;
+                return *this;
+            }
+
+            Config&
+            forced_pdf_version(std::string const& val, int ext)
+            {
+                forced_pdf_version_ = val;
+                forced_extension_level_ = ext;
+                return *this;
+            }
+
+            int
+            forced_extension_level() const
+            {
+                return forced_extension_level_;
+            }
+
+            Config&
+            forced_extension_level(int val)
+            {
+                forced_extension_level_ = val;
+                return *this;
+            }
+
+            std::string const&
+            extra_header_text()
+            {
+                return extra_header_text_;
+            }
+
+            Config& extra_header_text(std::string const& val);
+
+            bool
+            preserve_unreferenced() const
+            {
+                return preserve_unreferenced_;
+            }
+
+            Config&
+            preserve_unreferenced(bool val)
+            {
+                preserve_unreferenced_ = val;
+                return *this;
+            }
+
+            bool
+            suppress_original_object_ids() const
+            {
+                return suppress_original_object_ids_;
+            }
+
+            Config&
+            suppress_original_object_ids(bool val)
+            {
+                suppress_original_object_ids_ = val;
+                return *this;
+            }
+
+            bool
+            qdf() const
+            {
+                return qdf_;
+            }
+
+            Config& qdf(bool val);
+
+            bool
+            normalize_content() const
+            {
+                return normalize_content_;
+            }
+
+            Config&
+            normalize_content(bool val)
+            {
+                normalize_content_ = val;
+                normalize_content_set_ = true;
+                return *this;
+            }
+
+            bool
+            deterministic_id() const
+            {
+                return deterministic_id_;
+            }
+
+            Config&
+            deterministic_id(bool val)
+            {
+                deterministic_id_ = val;
+                return *this;
+            }
+
+            bool
+            static_id() const
+            {
+                return static_id_;
+            }
+
+            Config&
+            static_id(bool val)
+            {
+                static_id_ = val;
+                return *this;
+            }
+
+            bool
+            pclm() const
+            {
+                return pclm_;
+            }
+
+            Config& pclm(bool val);
+
+          private:
+            void usage(std::string_view msg) const {};
 
             std::string forced_pdf_version_;
             std::string extra_header_text_;
             // For linearization only
             std::string lin_pass1_filename_;
 
-            qpdf_object_stream_e object_stream_mode_{qpdf_o_preserve};
+            qpdf_object_stream_e object_streams_{qpdf_o_preserve};
+            qpdf_stream_decode_level_e stream_decode_level_{qpdf_dl_generalized};
 
             int forced_extension_level_{0};
 
@@ -38,18 +276,17 @@ namespace qpdf
             bool normalize_content_{false};
             bool compress_streams_{true};
             bool compress_streams_set_{false};
-            qpdf_stream_decode_level_e stream_decode_level_{qpdf_dl_generalized};
             bool stream_decode_level_set_{false};
             bool recompress_flate_{false};
-            bool qdf_mode_{false};
-            bool preserve_unreferenced_objects_{false};
+            bool qdf_{false};
+            bool preserve_unreferenced_{false};
             bool newline_before_endstream_{false};
             bool deterministic_id_{false};
             bool static_id_{false};
             bool suppress_original_object_ids_{false};
             bool direct_stream_lengths_{true};
             bool preserve_encryption_{true};
-            bool linearized_{false};
+            bool linearize_{false};
             bool pclm_{false};
             bool encrypt_use_aes_{false};
         }; // class Writer::Config
