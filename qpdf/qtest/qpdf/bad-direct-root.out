@@ -1,0 +1,16 @@
+WARNING: bad-direct-root.pdf: can't find PDF header
+WARNING: bad-direct-root.pdf: file is damaged
+WARNING: bad-direct-root.pdf: can't find startxref
+WARNING: bad-direct-root.pdf: Attempting to reconstruct cross-reference table
+WARNING: bad-direct-root.pdf (trailer, offset 249): unknown token while reading object; treating as null
+WARNING: bad-direct-root.pdf (trailer, offset 261): unknown token while reading object; treating as null
+WARNING: bad-direct-root.pdf (trailer, offset 186): expected dictionary keys but found non-name objects; ignoring
+WARNING: bad-direct-root.pdf (object 1 0, offset 65): expected endobj
+WARNING: bad-direct-root.pdf (object 2 0, offset 114): unknown token while reading object; treating as null
+WARNING: bad-direct-root.pdf (object 2 0, offset 122): invalid character (/) in hexstring
+WARNING: bad-direct-root.pdf (object 2 0, offset 125): unknown token while reading object; treating as null
+WARNING: bad-direct-root.pdf (object 2 0, offset 114): expected dictionary keys but found non-name objects; ignoring
+WARNING: bad-direct-root.pdf (object 2 0, offset 141): expected endobj
+WARNING: bad-direct-root.pdf, object 2 0 at offset 85: kid 0 (from 0) MediaBox is undefined; setting to letter / ANSI A
+WARNING: bad-direct-root.pdf, object 2 0 at offset 85: /Type key should be /Page but is not; overriding
+qpdf: error encountered after writing part 4 of linearized data

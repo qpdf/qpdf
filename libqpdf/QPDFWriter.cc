@@ -395,7 +395,7 @@ class QPDFWriter::Members: QPDF::Doc::Writer
     void preserveObjectStreams();
     void generateObjectStreams();
     void initializeSpecialStreams();
-    void enqueueObject(QPDFObjectHandle object);
+    void enqueue(QPDFObjectHandle const& object);
     void enqueueObjectsStandard();
     void enqueueObjectsPCLm();
     void enqueuePart(std::vector<QPDFObjectHandle>& part);
@@ -1366,18 +1366,19 @@ QPDFWriter::Members::assignCompressedObjectNumbers(QPDFObjGen og)
 }
 
 void
-QPDFWriter::Members::enqueueObject(QPDFObjectHandle object)
+QPDFWriter::Members::enqueue(QPDFObjectHandle const& object)
 {
-    if (object.isIndirect()) {
-        // This owner check can only be done for indirect objects. It is possible for a direct
-        // object to have an owning QPDF that is from another file if a direct QPDFObjectHandle from
-        // one file was insert into another file without copying. Doing that is safe even if the
-        // original QPDF gets destroyed, which just disconnects the QPDFObjectHandle from its owner.
-        if (object.getOwningQPDF() != &qpdf) {
-            throw std::logic_error(
-                "QPDFObjectHandle from different QPDF found while writing.  Use "
-                "QPDF::copyForeignObject to add objects from another file.");
-        }
+    if (object.indirect()) {
+        util::assertion(
+            // This owner check can only be done for indirect objects. It is possible for a direct
+            // object to have an owning QPDF that is from another file if a direct QPDFObjectHandle
+            // from one file was insert into another file without copying. Doing that is safe even
+            // if the original QPDF gets destroyed, which just disconnects the QPDFObjectHandle from
+            // its owner.
+            object.qpdf() == &qpdf,
+            "QPDFObjectHandle from different QPDF found while writing.  "
+            "Use QPDF::copyForeignObject to add objects from another file." //
+        );
 
         if (qdf_mode && object.isStreamOfType("/XRef")) {
             // As a special case, do not output any extraneous XRef streams in QDF mode. Doing so
@@ -1397,7 +1398,7 @@ QPDFWriter::Members::enqueueObject(QPDFObjectHandle object)
                 // stream.  Object streams always have generation 0.
                 // Detect loops by storing invalid object ID -1, which will get overwritten later.
                 o.renumber = -1;
-                enqueueObject(qpdf.getObject(o.object_stream, 0));
+                enqueue(qpdf.getObject(o.object_stream, 0));
             } else {
                 object_queue.emplace_back(object);
                 o.renumber = next_objid++;
@@ -1413,25 +1414,25 @@ QPDFWriter::Members::enqueueObject(QPDFObjectHandle object)
                     ++next_objid;
                 }
             }
-        } else if (o.renumber == -1) {
-            // This can happen if a specially constructed file indicates that an object stream is
-            // inside itself.
         }
         return;
-    } else if (!linearized) {
-        if (object.isArray()) {
-            for (auto& item: object.as_array()) {
-                enqueueObject(item);
-            }
-        } else if (auto d = object.as_dictionary()) {
-            for (auto const& item: d) {
-                if (!item.second.null()) {
-                    enqueueObject(item.second);
-                }
-            }
+    }
+
+    if (linearized) {
+        return;
+    }
+
+    if (Array array = object) {
+        for (auto& item: array) {
+            enqueue(item);
         }
-    } else {
-        // ignore
+        return;
+    }
+
+    for (auto const& item: Dictionary(object)) {
+        if (!item.second.null()) {
+            enqueue(item.second);
+        }
     }
 }
 
@@ -1439,9 +1440,9 @@ void
 QPDFWriter::Members::unparseChild(QPDFObjectHandle const& child, size_t level, int flags)
 {
     if (!linearized) {
-        enqueueObject(child);
+        enqueue(child);
     }
-    if (child.isIndirect()) {
+    if (child.indirect()) {
         write(obj[child].renumber).write(" 0 R");
     } else {
         unparseObject(child, level, flags);
@@ -2490,7 +2491,7 @@ void
 QPDFWriter::Members::enqueuePart(std::vector<QPDFObjectHandle>& part)
 {
     for (auto const& oh: part) {
-        enqueueObject(oh);
+        enqueue(oh);
     }
 }
 
@@ -2504,7 +2505,7 @@ QPDFWriter::Members::writeEncryptionDictionary()
     write("<<");
     if (V >= 4) {
         write(" /CF << /StdCF << /AuthEvent /DocOpen /CFM ");
-        write(encrypt_use_aes ? ((V < 5) ? "/AESV2" : "/AESV3") : "/V2");
+        write(encrypt_use_aes ? (V < 5 ? "/AESV2" : "/AESV3") : "/V2");
         // The PDF spec says the /Length key is optional, but the PDF previewer on some versions of
         // MacOS won't open encrypted files without it.
         write((V < 5) ? " /Length 16 >> >>" : " /Length 32 >> >>");
@@ -3108,19 +3109,19 @@ QPDFWriter::Members::enqueueObjectsStandard()
 {
     if (preserve_unreferenced_objects) {
         for (auto const& oh: qpdf.getAllObjects()) {
-            enqueueObject(oh);
+            enqueue(oh);
         }
     }
 
     // Put root first on queue.
     auto trailer = trimmed_trailer();
-    enqueueObject(trailer["/Root"]);
+    enqueue(trailer["/Root"]);
 
     // Next place any other objects referenced from the trailer dictionary into the queue, handling
     // direct objects recursively. Root is already there, so enqueuing it a second time is a no-op.
     for (auto& item: trailer) {
         if (!item.second.null()) {
-            enqueueObject(item.second);
+            enqueue(item.second);
         }
     }
 }
@@ -3134,22 +3135,19 @@ QPDFWriter::Members::enqueueObjectsPCLm()
 
     // enqueue all pages first
     for (auto& page: pages) {
-        // enqueue page
-        enqueueObject(page);
-
-        // enqueue page contents stream
-        enqueueObject(page["/Contents"]);
+        enqueue(page);
+        enqueue(page["/Contents"]);
 
         // enqueue all the strips for each page
         for (auto& image: Dictionary(page["/Resources"]["/XObject"])) {
             if (!image.second.null()) {
-                enqueueObject(image.second);
-                enqueueObject(QPDFObjectHandle::newStream(&qpdf, image_transform_content));
+                enqueue(image.second);
+                enqueue(qpdf.newStream(image_transform_content));
             }
         }
     }
 
-    enqueueObject(trimmed_trailer()["/Root"]);
+    enqueue(trimmed_trailer()["/Root"]);
 }
 
 void
