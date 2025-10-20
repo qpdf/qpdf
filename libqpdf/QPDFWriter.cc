@@ -648,7 +648,26 @@ Config::qdf(bool val)
     if (pclm_ || linearize_) {
         usage("qdf cannot be set when linearize or pclm are set");
     }
+    if (preserve_encryption_) {
+        usage("preserve_encryption cannot be set when qdf is set");
+    }
     qdf_ = val;
+    if (val) {
+        if (!normalize_content_set_) {
+            normalize_content(true);
+        }
+        if (!compress_streams_set_) {
+            compress_streams(false);
+        }
+        if (!stream_decode_level_set_) {
+            stream_decode_level(qpdf_dl_generalized);
+        }
+        preserve_encryption_ = false;
+        // Generate indirect stream lengths for qdf mode since fix-qdf uses them for storing
+        // recomputed stream length data. Certain streams such as object streams, xref streams, and
+        // hint streams always get direct stream lengths.
+        direct_stream_lengths_ = false;
+    }
     return *this;
 }
 
@@ -2307,22 +2326,10 @@ impl::Writer::doWriteSetup()
         encryption = nullptr;
     }
 
-    if (cfg.qdf()) {
-        if (!cfg.normalize_content_set_) {
-            cfg.normalize_content(true);
-        }
-        if (!cfg.compress_streams_set_) {
-            cfg.compress_streams(false);
-        }
-        if (!cfg.stream_decode_level_set_) {
-            cfg.stream_decode_level(qpdf_dl_generalized);
-        }
-    }
-
     if (encryption) {
         // Encryption has been explicitly set
         cfg.preserve_encryption(false);
-    } else if (cfg.normalize_content() || cfg.pclm() || cfg.qdf()) {
+    } else if (cfg.normalize_content() || cfg.pclm()) {
         // Encryption makes looking at contents pretty useless.  If the user explicitly encrypted
         // though, we still obey that.
         cfg.preserve_encryption(false);
@@ -2344,13 +2351,6 @@ impl::Writer::doWriteSetup()
 
     if (cfg.qdf() || cfg.normalize_content()) {
         initializeSpecialStreams();
-    }
-
-    if (cfg.qdf()) {
-        // Generate indirect stream lengths for qdf mode since fix-qdf uses them for storing
-        // recomputed stream length data. Certain streams such as object streams, xref streams, and
-        // hint streams always get direct stream lengths.
-        cfg.direct_stream_lengths_ = false;
     }
 
     switch (cfg.object_streams()) {

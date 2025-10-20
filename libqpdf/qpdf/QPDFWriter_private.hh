@@ -22,8 +22,6 @@ namespace qpdf
       public:
         class Config
         {
-            friend class impl::Writer;
-
           public:
             bool
             linearize() const
