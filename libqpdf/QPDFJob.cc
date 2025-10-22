@@ -20,7 +20,7 @@
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QPDFUsage.hh>
-#include <qpdf/QPDFWriter.hh>
+#include <qpdf/QPDFWriter_private.hh>
 #include <qpdf/QPDF_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -476,7 +476,7 @@ QPDFJob::writeQPDF(QPDF& pdf)
     if (!pdf.getWarnings().empty()) {
         m->warnings = true;
     }
-    if (m->warnings && !m->qcf.suppress_warnings()) {
+    if (m->warnings && !m->d_cfg.suppress_warnings()) {
         if (createsOutput()) {
             *m->log->getWarn()
                 << m->message_prefix
@@ -744,7 +744,8 @@ QPDFJob::doCheck(QPDF& pdf)
 
         // Write the file to nowhere, uncompressing streams.  This causes full file traversal and
         // decoding of all streams we can decode.
-        QPDFWriter w(pdf);
+        Writer::Config cfg;
+        Writer w(pdf, cfg);
         Pl_Discard discard;
         w.setOutputPipeline(&discard);
         w.setDecodeLevel(qpdf_dl_all);
@@ -1708,7 +1709,7 @@ QPDFJob::doProcessOnce(
     bool main_input)
 {
     pdf = std::make_unique<QPDF>();
-    pdf->doc().config(m->qcf.log(m->log));
+    pdf->doc().config(m->d_cfg.log(m->log));
     if (empty) {
         pdf->emptyPDF();
     } else if (main_input && m->json_input) {
@@ -1738,7 +1739,7 @@ QPDFJob::doProcess(
     // was incorrectly encoded, there's a good chance we'd succeed here.
 
     std::string ptemp;
-    if (password && !m->qcf.password_is_hex_key()) {
+    if (password && !m->d_cfg.password_is_hex_key()) {
         if (m->password_mode == QPDFJob::pm_hex_bytes) {
             // Special case: handle --password-mode=hex-bytes for input password as well as output
             // password
@@ -1746,7 +1747,7 @@ QPDFJob::doProcess(
             password = ptemp.c_str();
         }
     }
-    if (!password || empty || m->qcf.password_is_hex_key() || m->suppress_password_recovery) {
+    if (!password || empty || m->d_cfg.password_is_hex_key() || m->suppress_password_recovery) {
         // There is no password, or we're not doing recovery, so just do the normal processing with
         // the supplied password.
         doProcessOnce(pdf, fn, password, empty, used_for_input, main_input);
@@ -2878,7 +2879,7 @@ parse_version(std::string const& full_version_string, std::string& version, int&
 }
 
 void
-QPDFJob::setWriterOptions(QPDFWriter& w)
+QPDFJob::setWriterOptions(Writer& w)
 {
     if (m->compression_level >= 0) {
         Pl_Flate::setCompressionLevel(m->compression_level);
@@ -3011,7 +3012,7 @@ QPDFJob::doSplitPages(QPDF& pdf)
             last = num_pages;
         }
         QPDF outpdf;
-        outpdf.doc().config(m->qcf);
+        outpdf.doc().config(m->d_cfg);
         outpdf.emptyPDF();
         QPDFAcroFormDocumentHelper* out_afdh =
             afdh.hasAcroForm() ? &outpdf.doc().acroform() : nullptr;
@@ -3049,7 +3050,8 @@ QPDFJob::doSplitPages(QPDF& pdf)
         if (QUtil::same_file(m->infile_nm(), outfile.data())) {
             throw std::runtime_error("split pages would overwrite input file with " + outfile);
         }
-        QPDFWriter w(outpdf, outfile.c_str());
+        Writer w(outpdf, m->w_cfg);
+        w.setOutputFilename(outfile.data());
         setWriterOptions(w);
         w.write();
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -3074,9 +3076,8 @@ QPDFJob::writeOutfile(QPDF& pdf)
     if (m->json_version) {
         writeJSON(pdf);
     } else {
-        // QPDFWriter must have block scope so the output file will be closed after write()
-        // finishes.
-        QPDFWriter w(pdf);
+        // Writer must have block scope so the output file will be closed after write() finishes.
+        Writer w(pdf, m->w_cfg);
         if (!m->outfilename.empty()) {
             w.setOutputFilename(m->outfilename.data());
         } else {

@@ -6,6 +6,7 @@
 #include <qpdf/ObjTable.hh>
 #include <qpdf/Pipeline_private.hh>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFUsage.hh>
 
 // This file is intended for inclusion by QPDFWriter, QPDF, QPDF_optimization and QPDF_linearization
 // only.
@@ -17,12 +18,24 @@ namespace qpdf
         class Writer;
     }
 
-    class Writer
+    class Writer: public QPDFWriter
     {
       public:
         class Config
         {
           public:
+            Config() = default;
+            Config(Config const&) = default;
+            Config(Config&&) = delete;
+            Config& operator=(Config const&) = default;
+            Config& operator=(Config&&) = delete;
+            ~Config() = default;
+
+            Config(bool permissive) :
+                permissive_(permissive)
+            {
+            }
+
             bool
             linearize() const
             {
@@ -258,7 +271,13 @@ namespace qpdf
             Config& pclm(bool val);
 
           private:
-            void usage(std::string_view msg) const {};
+            void
+            usage(std::string const& msg) const
+            {
+                if (!permissive_) {
+                    throw QPDFUsage(msg);
+                }
+            }
 
             std::string forced_pdf_version_;
             std::string extra_header_text_;
@@ -287,7 +306,19 @@ namespace qpdf
             bool linearize_{false};
             bool pclm_{false};
             bool encrypt_use_aes_{false};
+
+            bool permissive_{true};
         }; // class Writer::Config
+
+        Writer() = delete;
+        Writer(Writer const&) = delete;
+        Writer(Writer&&) = delete;
+        Writer& operator=(Writer const&) = delete;
+        Writer& operator=(Writer&&) = delete;
+        ~Writer() = default;
+
+        Writer(QPDF& qpdf, Config cfg);
+
     }; // class Writer
 } // namespace qpdf
 

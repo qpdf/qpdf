@@ -292,9 +292,8 @@ namespace qpdf::impl
         Writer(QPDF& qpdf, QPDFWriter& w) :
             Common(qpdf.doc()),
             lin(qpdf.doc().linearization()),
-            root_og(
-                qpdf.getRoot().getObjGen().isIndirect() ? qpdf.getRoot().getObjGen()
-                                                        : QPDFObjGen(-1, 0)),
+            cfg(true),
+            root_og(qpdf.getRoot().indirect() ? qpdf.getRoot().id_gen() : QPDFObjGen(-1, 0)),
             pipeline_stack(pipeline)
         {
         }
@@ -474,6 +473,7 @@ namespace qpdf::impl
 class QPDFWriter::Members: impl::Writer
 {
     friend class QPDFWriter;
+    friend class qpdf::Writer;
 
   public:
     Members(QPDFWriter& w, QPDF& qpdf) :
@@ -482,6 +482,11 @@ class QPDFWriter::Members: impl::Writer
     }
 };
 
+qpdf::Writer::Writer(QPDF& qpdf, Config cfg) :
+    QPDFWriter(qpdf)
+{
+    m->cfg = cfg;
+}
 QPDFWriter::QPDFWriter(QPDF& pdf) :
     m(std::make_shared<Members>(*this, pdf))
 {

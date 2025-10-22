@@ -5,6 +5,7 @@
 
 #include <qpdf/ClosedFileInputSource.hh>
 #include <qpdf/QPDFLogger.hh>
+#include <qpdf/QPDFWriter_private.hh>
 #include <qpdf/QPDF_private.hh>
 
 // A selection of pages from a single input PDF to be included in the output. This corresponds to a
@@ -150,7 +151,7 @@ class QPDFJob::Members
 
   public:
     Members(QPDFJob& job) :
-        log(qcf.log()),
+        log(d_cfg.log()),
         inputs(job)
     {
     }
@@ -168,7 +169,8 @@ class QPDFJob::Members
     static int constexpr DEFAULT_OI_MIN_AREA = 16384;
     static int constexpr DEFAULT_II_MIN_BYTES = 1024;
 
-    qpdf::Doc::Config qcf;
+    qpdf::Doc::Config d_cfg;
+    qpdf::Writer::Config w_cfg;
     std::shared_ptr<QPDFLogger> log;
     std::string message_prefix{"qpdf"};
     bool warnings{false};

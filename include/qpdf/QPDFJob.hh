@@ -490,7 +490,7 @@ class QPDFJob
 
     // Output generation
     void doSplitPages(QPDF& pdf);
-    void setWriterOptions(QPDFWriter&);
+    void setWriterOptions(qpdf::Writer&);
     void setEncryptionOptions(QPDFWriter&);
     void maybeFixWritePassword(int R, std::string& password);
     void writeOutfile(QPDF& pdf);
