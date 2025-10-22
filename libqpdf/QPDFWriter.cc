@@ -577,17 +577,17 @@ Config::stream_data(qpdf_stream_data_e mode)
 {
     switch (mode) {
     case qpdf_s_uncompress:
-        stream_decode_level(std::max(qpdf_dl_generalized, stream_decode_level_));
+        decode_level(std::max(qpdf_dl_generalized, decode_level_));
         compress_streams(false);
         return *this;
 
     case qpdf_s_preserve:
-        stream_decode_level(qpdf_dl_none);
+        decode_level(qpdf_dl_none);
         compress_streams(false);
         return *this;
 
     case qpdf_s_compress:
-        stream_decode_level(std::max(qpdf_dl_generalized, stream_decode_level_));
+        decode_level(std::max(qpdf_dl_generalized, decode_level_));
         compress_streams(true);
     }
     return *this;
@@ -614,18 +614,18 @@ Config::compress_streams(bool val)
 void
 QPDFWriter::setDecodeLevel(qpdf_stream_decode_level_e val)
 {
-    m->cfg.stream_decode_level(val);
+    m->cfg.decode_level(val);
 }
 
 Config&
-Config::stream_decode_level(qpdf_stream_decode_level_e val)
+Config::decode_level(qpdf_stream_decode_level_e val)
 {
     if (pclm_) {
         usage("stream_decode_level cannot be set when pclm is set");
         return *this;
     }
-    stream_decode_level_set_ = true;
-    stream_decode_level_ = val;
+    decode_level_set_ = true;
+    decode_level_ = val;
     return *this;
 }
 
@@ -664,8 +664,8 @@ Config::qdf(bool val)
         if (!compress_streams_set_) {
             compress_streams(false);
         }
-        if (!stream_decode_level_set_) {
-            stream_decode_level(qpdf_dl_generalized);
+        if (!decode_level_set_) {
+            decode_level(qpdf_dl_generalized);
         }
         preserve_encryption_ = false;
         // Generate indirect stream lengths for qdf mode since fix-qdf uses them for storing
@@ -785,7 +785,7 @@ QPDFWriter::setStaticAesIV(bool val)
 void
 QPDFWriter::setSuppressOriginalObjectIDs(bool val)
 {
-    m->cfg.suppress_original_object_ids(val);
+    m->cfg.no_original_object_ids(val);
 }
 
 void
@@ -814,7 +814,7 @@ Config::linearize(bool val)
 void
 QPDFWriter::setLinearizationPass1Filename(std::string const& filename)
 {
-    m->cfg.lin_pass1_filename(filename);
+    m->cfg.linearize_pass1(filename);
 }
 
 void
@@ -826,7 +826,7 @@ QPDFWriter::setPCLm(bool val)
 Config&
 Config::pclm(bool val)
 {
-    if (stream_decode_level_set_ || compress_streams_set_ || linearize_) {
+    if (decode_level_set_ || compress_streams_set_ || linearize_) {
         usage(
             "pclm cannot be set when stream_decode_level, compress_streams, linearize or qdf are "
             "set");
@@ -834,7 +834,7 @@ Config::pclm(bool val)
     }
     pclm_ = val;
     if (val) {
-        stream_decode_level_ = qpdf_dl_none;
+        decode_level_ = qpdf_dl_none;
         compress_streams_ = false;
         linearize_ = false;
     }
@@ -1549,7 +1549,7 @@ impl::Writer::will_filter_stream(QPDFObjectHandle stream, std::string* stream_da
 {
     const bool is_root_metadata = stream.isRootMetadata();
     bool filter = false;
-    auto decode_level = cfg.stream_decode_level();
+    auto decode_level = cfg.decode_level();
     int encode_flags = 0;
     Dictionary stream_dict = stream.getDict();
 
@@ -1912,7 +1912,7 @@ impl::Writer::writeObjectStream(QPDFObjectHandle object)
             }
             if (cfg.qdf()) {
                 write("%% Object stream: object ").write(new_o).write(", index ").write(count);
-                if (!cfg.suppress_original_object_ids()) {
+                if (!cfg.no_original_object_ids()) {
                     write("; original object ID: ").write(og.getObj());
                     // For compatibility, only write the generation if non-zero.  While object
                     // streams only allow objects with generation 0, if we are generating object
@@ -2017,7 +2017,7 @@ impl::Writer::writeObject(QPDFObjectHandle object, int object_stream_index)
         }
     }
     if (object_stream_index == -1) {
-        if (cfg.qdf() && !cfg.suppress_original_object_ids()) {
+        if (cfg.qdf() && !cfg.no_original_object_ids()) {
             write("%% Original object ID: ").write(object.getObjGen().unparse(' ')).write("\n");
         }
         openObject(new_id);
@@ -2880,8 +2880,8 @@ impl::Writer::writeLinearized()
     auto pp_md5 = pipeline_stack.popper();
     for (int pass: {1, 2}) {
         if (pass == 1) {
-            if (!cfg.lin_pass1_filename().empty()) {
-                lin_pass1_file = QUtil::safe_fopen(cfg.lin_pass1_filename().data(), "wb");
+            if (!cfg.linearize_pass1().empty()) {
+                lin_pass1_file = QUtil::safe_fopen(cfg.linearize_pass1().data(), "wb");
                 pipeline_stack.activate(
                     pp_pass1,
                     std::make_unique<Pl_StdioFile>("linearization pass1", lin_pass1_file));

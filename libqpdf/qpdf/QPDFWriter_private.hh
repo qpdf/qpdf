@@ -45,15 +45,15 @@ namespace qpdf
             Config& linearize(bool val);
 
             std::string const&
-            lin_pass1_filename() const
+            linearize_pass1() const
             {
-                return lin_pass1_filename_;
+                return linearize_pass1_;
             }
 
             Config&
-            lin_pass1_filename(std::string const& val)
+            linearize_pass1(std::string const& val)
             {
-                lin_pass1_filename_ = val;
+                linearize_pass1_ = val;
                 return *this;
             }
 
@@ -83,13 +83,22 @@ namespace qpdf
                 return *this;
             }
 
-            qpdf_stream_decode_level_e
-            stream_decode_level() const
+            Config&
+            default_decode_level(qpdf_stream_decode_level_e val)
             {
-                return stream_decode_level_;
+                if (!decode_level_set_) {
+                    decode_level_ = val;
+                }
+                return *this;
             }
 
-            Config& stream_decode_level(qpdf_stream_decode_level_e val);
+            qpdf_stream_decode_level_e
+            decode_level() const
+            {
+                return decode_level_;
+            }
+
+            Config& decode_level(qpdf_stream_decode_level_e val);
 
             qpdf_object_stream_e
             object_streams() const
@@ -202,15 +211,15 @@ namespace qpdf
             }
 
             bool
-            suppress_original_object_ids() const
+            no_original_object_ids() const
             {
-                return suppress_original_object_ids_;
+                return no_original_object_ids_;
             }
 
             Config&
-            suppress_original_object_ids(bool val)
+            no_original_object_ids(bool val)
             {
-                suppress_original_object_ids_ = val;
+                no_original_object_ids_ = val;
                 return *this;
             }
 
@@ -282,10 +291,10 @@ namespace qpdf
             std::string forced_pdf_version_;
             std::string extra_header_text_;
             // For linearization only
-            std::string lin_pass1_filename_;
+            std::string linearize_pass1_;
 
             qpdf_object_stream_e object_streams_{qpdf_o_preserve};
-            qpdf_stream_decode_level_e stream_decode_level_{qpdf_dl_generalized};
+            qpdf_stream_decode_level_e decode_level_{qpdf_dl_generalized};
 
             int forced_extension_level_{0};
 
@@ -293,14 +302,14 @@ namespace qpdf
             bool normalize_content_{false};
             bool compress_streams_{true};
             bool compress_streams_set_{false};
-            bool stream_decode_level_set_{false};
+            bool decode_level_set_{false};
             bool recompress_flate_{false};
             bool qdf_{false};
             bool preserve_unreferenced_{false};
             bool newline_before_endstream_{false};
             bool deterministic_id_{false};
             bool static_id_{false};
-            bool suppress_original_object_ids_{false};
+            bool no_original_object_ids_{false};
             bool direct_stream_lengths_{true};
             bool preserve_encryption_{true};
             bool linearize_{false};

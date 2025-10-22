@@ -804,7 +804,7 @@ QPDFJob::doShowObj(QPDF& pdf)
                 m->log->saveToStandardOutput(true);
                 obj.pipeStreamData(
                     m->log->getSave().get(),
-                    (filter && m->normalize) ? qpdf_ef_normalize : 0,
+                    filter && m->w_cfg.normalize_content() ? qpdf_ef_normalize : 0,
                     filter ? qpdf_dl_all : qpdf_dl_none);
             }
         } else {
@@ -974,7 +974,7 @@ QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
             p,
             false,
             first,
-            m->decode_level,
+            m->w_cfg.decode_level(),
             m->json_stream_data,
             m->json_stream_prefix,
             json_objects);
@@ -1052,7 +1052,7 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
             j_image.addDictionaryMember("decodeparms", dp_array.getJSON(m->json_version));
             j_image.addDictionaryMember(
                 "filterable",
-                JSON::makeBool(image.pipeStreamData(nullptr, 0, m->decode_level, true)));
+                JSON::makeBool(image.pipeStreamData(nullptr, 0, m->w_cfg.decode_level(), true)));
         }
         j_page.addDictionaryMember("images", j_images);
         JSON j_contents = j_page.addDictionaryMember("contents", JSON::makeArray());
@@ -1569,7 +1569,7 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
         JSON::writeDictionaryItem(p, first, "version", JSON::makeInt(m->json_version), 1);
         JSON j_params = JSON::makeDictionary();
         std::string decode_level_str;
-        switch (m->decode_level) {
+        switch (m->w_cfg.decode_level()) {
         case qpdf_dl_none:
             decode_level_str = "none";
             break;
@@ -2884,44 +2884,11 @@ QPDFJob::setWriterOptions(Writer& w)
     if (m->compression_level >= 0) {
         Pl_Flate::setCompressionLevel(m->compression_level);
     }
-    if (m->qdf_mode) {
-        w.setQDFMode(true);
-    }
-    if (m->preserve_unreferenced_objects) {
-        w.setPreserveUnreferencedObjects(true);
-    }
-    if (m->newline_before_endstream) {
-        w.setNewlineBeforeEndstream(true);
-    }
-    if (m->normalize_set) {
-        w.setContentNormalization(m->normalize);
-    }
-    if (m->stream_data_set) {
-        w.setStreamDataMode(m->stream_data_mode);
-    }
-    if (m->compress_streams_set) {
-        w.setCompressStreams(m->compress_streams);
-    }
-    if (m->recompress_flate_set) {
-        w.setRecompressFlate(m->recompress_flate);
-    }
-    if (m->decode_level_set) {
-        w.setDecodeLevel(m->decode_level);
-    }
     if (m->decrypt) {
         w.setPreserveEncryption(false);
     }
-    if (m->deterministic_id) {
-        w.setDeterministicID(true);
-    }
-    if (m->static_id) {
-        w.setStaticID(true);
-    }
     if (m->static_aes_iv) {
         w.setStaticAesIV(true);
-    }
-    if (m->suppress_original_object_id) {
-        w.setSuppressOriginalObjectIDs(true);
     }
     if (m->copy_encryption) {
         std::unique_ptr<QPDF> encryption_pdf;
@@ -2935,15 +2902,6 @@ QPDFJob::setWriterOptions(Writer& w)
     }
     if (m->encrypt) {
         setEncryptionOptions(w);
-    }
-    if (m->linearize) {
-        w.setLinearization(true);
-    }
-    if (!m->linearize_pass1.empty()) {
-        w.setLinearizationPass1Filename(m->linearize_pass1);
-    }
-    if (m->object_stream_set) {
-        w.setObjectStreamMode(m->object_stream_mode);
     }
     w.setMinimumPDFVersion(m->max_input_version);
     if (!m->min_version.empty()) {
