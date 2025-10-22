@@ -2960,15 +2960,13 @@ QPDFJob::setWriterOptions(QPDFWriter& w)
     if (m->progress) {
         if (m->progress_handler) {
             w.registerProgressReporter(
-                std::shared_ptr<QPDFWriter::ProgressReporter>(
-                    new QPDFWriter::FunctionProgressReporter(m->progress_handler)));
+                std::make_shared<QPDFWriter::FunctionProgressReporter>(m->progress_handler));
         } else {
             char const* outfilename =
                 !m->outfilename.empty() ? m->outfilename.data() : "standard output";
             w.registerProgressReporter(
-                std::shared_ptr<QPDFWriter::ProgressReporter>(
-                    // line-break
-                    new ProgressReporter(*m->log->getInfo(), m->message_prefix, outfilename)));
+                std::make_shared<ProgressReporter>(
+                    *m->log->getInfo(), m->message_prefix, outfilename));
         }
     }
 }
