@@ -22,6 +22,11 @@ namespace qpdf
         class OffsetBuffer;
     } // namespace is
 
+    namespace impl
+    {
+        using Doc = QPDF::Doc;
+    }
+
     class Doc: public QPDF
     {
       public:
@@ -271,7 +276,6 @@ class QPDF::Doc
     class Pages;
     class ParseGuard;
     class Resolver;
-    class Writer;
 
     // This is the common base-class for all document components. It is used by the other document
     // components to access common functionality. It is not meant to be used directly by the user.
@@ -286,6 +290,7 @@ class QPDF::Doc
         ~Common() = default;
 
         inline Common(QPDF& qpdf, QPDF::Members* m);
+        inline Common(Doc& doc);
 
         void stopOnError(std::string const& message);
         void warn(QPDFExc const& e);
@@ -546,7 +551,7 @@ class QPDF::Doc::Linearization: Common
     ~Linearization() = default;
 
     Linearization(Doc& doc) :
-        Common(doc.qpdf, doc.m)
+        Common(doc)
     {
     }
 
@@ -567,7 +572,7 @@ class QPDF::Doc::Linearization: Common
 
     // Get lists of all objects in order according to the part of a linearized file that they
     // belong to.
-    void getLinearizedParts(
+    void parts(
         QPDFWriter::ObjTable const& obj,
         std::vector<QPDFObjectHandle>& part4,
         std::vector<QPDFObjectHandle>& part6,
@@ -940,7 +945,7 @@ class QPDF::Doc::Objects: Common
     ~Objects() = default;
 
     Objects(Doc& doc) :
-        Common(doc.qpdf, doc.m),
+        Common(doc),
         foreign_(*this),
         streams_(*this)
     {
@@ -987,18 +992,19 @@ class QPDF::Doc::Objects: Common
     QPDFObjectHandle makeIndirectFromQPDFObject(std::shared_ptr<QPDFObject> const& obj);
     std::shared_ptr<QPDFObject> getObjectForParser(int id, int gen, bool parse_pdf);
     std::shared_ptr<QPDFObject> getObjectForJSON(int id, int gen);
-    size_t tableSize();
+    size_t table_size();
 
     // For QPDFWriter:
 
-    std::map<QPDFObjGen, QPDFXRefEntry> const& getXRefTableInternal();
-    // Get a list of objects that would be permitted in an object stream.
-    template <typename T>
-    std::vector<T> getCompressibleObjGens();
-    std::vector<QPDFObjGen> getCompressibleObjVector();
-    std::vector<bool> getCompressibleObjSet();
+    std::map<QPDFObjGen, QPDFXRefEntry> const& xref_table();
+    std::vector<QPDFObjGen> compressible_vector();
+    std::vector<bool> compressible_set();
 
   private:
+    // Get a list of objects that would be permitted in an object stream.
+    template <typename T>
+    std::vector<T> compressible();
+
     void setTrailer(QPDFObjectHandle obj);
     void reconstruct_xref(QPDFExc& e, bool found_startxref = true);
     void read_xref(qpdf_offset_t offset, bool in_stream_recovery = false);
@@ -1060,7 +1066,7 @@ class QPDF::Doc::Pages: Common
     ~Pages() = default;
 
     Pages(Doc& doc) :
-        Common(doc.qpdf, doc.m)
+        Common(doc)
     {
     }
 
@@ -1214,6 +1220,11 @@ inline QPDF::Doc::Common::Common(QPDF& qpdf, QPDF::Members* m) :
 {
 }
 
+inline QPDF::Doc::Common::Common(Doc& doc) :
+    Common(doc.qpdf, doc.m)
+{
+}
+
 inline QPDF::Doc::Linearization&
 QPDF::Doc::linearization()
 {
@@ -1245,7 +1256,7 @@ QPDF::doc()
 }
 
 inline QPDF::Doc::Objects::Foreign::Copier::Copier(QPDF& qpdf) :
-    Common(qpdf, qpdf.doc().m)
+    Common(qpdf.doc())
 {
 }
 

@@ -75,7 +75,6 @@ class ObjTable: public std::vector<T>
         return contains(static_cast<size_t>(oh.getObjectID()));
     }
 
-  protected:
     inline T&
     operator[](int id)
     {

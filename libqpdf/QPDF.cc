@@ -27,9 +27,8 @@
 using namespace qpdf;
 using namespace std::literals;
 
-using QDoc = QPDF::Doc;
-using Common = QDoc::Common;
-using Objects = QDoc::Objects;
+using Common = impl::Doc::Common;
+using Objects = impl::Doc::Objects;
 using Foreign = Objects::Foreign;
 using Streams = Objects::Streams;
 
@@ -724,11 +723,11 @@ QPDF::getRoot()
 std::map<QPDFObjGen, QPDFXRefEntry>
 QPDF::getXRefTable()
 {
-    return m->objects.getXRefTableInternal();
+    return m->objects.xref_table();
 }
 
 std::map<QPDFObjGen, QPDFXRefEntry> const&
-Objects::getXRefTableInternal()
+Objects::xref_table()
 {
     if (!m->parsed) {
         throw std::logic_error("QPDF::getXRefTable called before parsing.");

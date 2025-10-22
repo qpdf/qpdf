@@ -1681,7 +1681,7 @@ Lin::pushOutlinesToPart(
 }
 
 void
-Lin::getLinearizedParts(
+Lin::parts(
     QPDFWriter::ObjTable const& obj,
     std::vector<QPDFObjectHandle>& part4,
     std::vector<QPDFObjectHandle>& part6,

@@ -43,6 +43,11 @@
 #include <string_view>
 #include <vector>
 
+namespace qpdf
+{
+    class Writer;
+}
+
 class QPDF;
 
 // This class implements a simple writer for saving QPDF objects to new PDF files.  See comments
@@ -440,6 +445,8 @@ class QPDFWriter
     class NewObjTable;
 
   private:
+    friend class qpdf::Writer;
+
     class Members;
 
     std::shared_ptr<Members> m;

@@ -20,7 +20,7 @@
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QPDFUsage.hh>
-#include <qpdf/QPDFWriter.hh>
+#include <qpdf/QPDFWriter_private.hh>
 #include <qpdf/QPDF_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -30,8 +30,7 @@
 
 using namespace qpdf;
 
-using QDoc = QPDF::Doc;
-using Pages = QDoc::Pages;
+using Pages = impl::Doc::Pages;
 
 namespace
 {
@@ -477,7 +476,7 @@ QPDFJob::writeQPDF(QPDF& pdf)
     if (!pdf.getWarnings().empty()) {
         m->warnings = true;
     }
-    if (m->warnings && !m->qcf.suppress_warnings()) {
+    if (m->warnings && !m->d_cfg.suppress_warnings()) {
         if (createsOutput()) {
             *m->log->getWarn()
                 << m->message_prefix
@@ -745,7 +744,8 @@ QPDFJob::doCheck(QPDF& pdf)
 
         // Write the file to nowhere, uncompressing streams.  This causes full file traversal and
         // decoding of all streams we can decode.
-        QPDFWriter w(pdf);
+        Writer::Config cfg;
+        Writer w(pdf, cfg);
         Pl_Discard discard;
         w.setOutputPipeline(&discard);
         w.setDecodeLevel(qpdf_dl_all);
@@ -804,7 +804,7 @@ QPDFJob::doShowObj(QPDF& pdf)
                 m->log->saveToStandardOutput(true);
                 obj.pipeStreamData(
                     m->log->getSave().get(),
-                    (filter && m->normalize) ? qpdf_ef_normalize : 0,
+                    filter && m->w_cfg.normalize_content() ? qpdf_ef_normalize : 0,
                     filter ? qpdf_dl_all : qpdf_dl_none);
             }
         } else {
@@ -974,7 +974,7 @@ QPDFJob::doJSONObjects(Pipeline* p, bool& first, QPDF& pdf)
             p,
             false,
             first,
-            m->decode_level,
+            m->w_cfg.decode_level(),
             m->json_stream_data,
             m->json_stream_prefix,
             json_objects);
@@ -1052,7 +1052,7 @@ QPDFJob::doJSONPages(Pipeline* p, bool& first, QPDF& pdf)
             j_image.addDictionaryMember("decodeparms", dp_array.getJSON(m->json_version));
             j_image.addDictionaryMember(
                 "filterable",
-                JSON::makeBool(image.pipeStreamData(nullptr, 0, m->decode_level, true)));
+                JSON::makeBool(image.pipeStreamData(nullptr, 0, m->w_cfg.decode_level(), true)));
         }
         j_page.addDictionaryMember("images", j_images);
         JSON j_contents = j_page.addDictionaryMember("contents", JSON::makeArray());
@@ -1569,7 +1569,7 @@ QPDFJob::doJSON(QPDF& pdf, Pipeline* p)
         JSON::writeDictionaryItem(p, first, "version", JSON::makeInt(m->json_version), 1);
         JSON j_params = JSON::makeDictionary();
         std::string decode_level_str;
-        switch (m->decode_level) {
+        switch (m->w_cfg.decode_level()) {
         case qpdf_dl_none:
             decode_level_str = "none";
             break;
@@ -1709,7 +1709,7 @@ QPDFJob::doProcessOnce(
     bool main_input)
 {
     pdf = std::make_unique<QPDF>();
-    pdf->doc().config(m->qcf.log(m->log));
+    pdf->doc().config(m->d_cfg.log(m->log));
     if (empty) {
         pdf->emptyPDF();
     } else if (main_input && m->json_input) {
@@ -1739,7 +1739,7 @@ QPDFJob::doProcess(
     // was incorrectly encoded, there's a good chance we'd succeed here.
 
     std::string ptemp;
-    if (password && !m->qcf.password_is_hex_key()) {
+    if (password && !m->d_cfg.password_is_hex_key()) {
         if (m->password_mode == QPDFJob::pm_hex_bytes) {
             // Special case: handle --password-mode=hex-bytes for input password as well as output
             // password
@@ -1747,7 +1747,7 @@ QPDFJob::doProcess(
             password = ptemp.c_str();
         }
     }
-    if (!password || empty || m->qcf.password_is_hex_key() || m->suppress_password_recovery) {
+    if (!password || empty || m->d_cfg.password_is_hex_key() || m->suppress_password_recovery) {
         // There is no password, or we're not doing recovery, so just do the normal processing with
         // the supplied password.
         doProcessOnce(pdf, fn, password, empty, used_for_input, main_input);
@@ -2879,49 +2879,16 @@ parse_version(std::string const& full_version_string, std::string& version, int&
 }
 
 void
-QPDFJob::setWriterOptions(QPDFWriter& w)
+QPDFJob::setWriterOptions(Writer& w)
 {
     if (m->compression_level >= 0) {
         Pl_Flate::setCompressionLevel(m->compression_level);
     }
-    if (m->qdf_mode) {
-        w.setQDFMode(true);
-    }
-    if (m->preserve_unreferenced_objects) {
-        w.setPreserveUnreferencedObjects(true);
-    }
-    if (m->newline_before_endstream) {
-        w.setNewlineBeforeEndstream(true);
-    }
-    if (m->normalize_set) {
-        w.setContentNormalization(m->normalize);
-    }
-    if (m->stream_data_set) {
-        w.setStreamDataMode(m->stream_data_mode);
-    }
-    if (m->compress_streams_set) {
-        w.setCompressStreams(m->compress_streams);
-    }
-    if (m->recompress_flate_set) {
-        w.setRecompressFlate(m->recompress_flate);
-    }
-    if (m->decode_level_set) {
-        w.setDecodeLevel(m->decode_level);
-    }
     if (m->decrypt) {
         w.setPreserveEncryption(false);
     }
-    if (m->deterministic_id) {
-        w.setDeterministicID(true);
-    }
-    if (m->static_id) {
-        w.setStaticID(true);
-    }
     if (m->static_aes_iv) {
         w.setStaticAesIV(true);
-    }
-    if (m->suppress_original_object_id) {
-        w.setSuppressOriginalObjectIDs(true);
     }
     if (m->copy_encryption) {
         std::unique_ptr<QPDF> encryption_pdf;
@@ -2935,15 +2902,6 @@ QPDFJob::setWriterOptions(QPDFWriter& w)
     }
     if (m->encrypt) {
         setEncryptionOptions(w);
-    }
-    if (m->linearize) {
-        w.setLinearization(true);
-    }
-    if (!m->linearize_pass1.empty()) {
-        w.setLinearizationPass1Filename(m->linearize_pass1);
-    }
-    if (m->object_stream_set) {
-        w.setObjectStreamMode(m->object_stream_mode);
     }
     w.setMinimumPDFVersion(m->max_input_version);
     if (!m->min_version.empty()) {
@@ -2961,15 +2919,13 @@ QPDFJob::setWriterOptions(QPDFWriter& w)
     if (m->progress) {
         if (m->progress_handler) {
             w.registerProgressReporter(
-                std::shared_ptr<QPDFWriter::ProgressReporter>(
-                    new QPDFWriter::FunctionProgressReporter(m->progress_handler)));
+                std::make_shared<QPDFWriter::FunctionProgressReporter>(m->progress_handler));
         } else {
             char const* outfilename =
                 !m->outfilename.empty() ? m->outfilename.data() : "standard output";
             w.registerProgressReporter(
-                std::shared_ptr<QPDFWriter::ProgressReporter>(
-                    // line-break
-                    new ProgressReporter(*m->log->getInfo(), m->message_prefix, outfilename)));
+                std::make_shared<ProgressReporter>(
+                    *m->log->getInfo(), m->message_prefix, outfilename));
         }
     }
 }
@@ -3014,7 +2970,7 @@ QPDFJob::doSplitPages(QPDF& pdf)
             last = num_pages;
         }
         QPDF outpdf;
-        outpdf.doc().config(m->qcf);
+        outpdf.doc().config(m->d_cfg);
         outpdf.emptyPDF();
         QPDFAcroFormDocumentHelper* out_afdh =
             afdh.hasAcroForm() ? &outpdf.doc().acroform() : nullptr;
@@ -3052,7 +3008,8 @@ QPDFJob::doSplitPages(QPDF& pdf)
         if (QUtil::same_file(m->infile_nm(), outfile.data())) {
             throw std::runtime_error("split pages would overwrite input file with " + outfile);
         }
-        QPDFWriter w(outpdf, outfile.c_str());
+        Writer w(outpdf, m->w_cfg);
+        w.setOutputFilename(outfile.data());
         setWriterOptions(w);
         w.write();
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
@@ -3077,9 +3034,8 @@ QPDFJob::writeOutfile(QPDF& pdf)
     if (m->json_version) {
         writeJSON(pdf);
     } else {
-        // QPDFWriter must have block scope so the output file will be closed after write()
-        // finishes.
-        QPDFWriter w(pdf);
+        // Writer must have block scope so the output file will be closed after write() finishes.
+        Writer w(pdf, m->w_cfg);
         if (!m->outfilename.empty()) {
             w.setOutputFilename(m->outfilename.data());
         } else {

@@ -5,6 +5,7 @@
 
 #include <qpdf/ClosedFileInputSource.hh>
 #include <qpdf/QPDFLogger.hh>
+#include <qpdf/QPDFWriter_private.hh>
 #include <qpdf/QPDF_private.hh>
 
 // A selection of pages from a single input PDF to be included in the output. This corresponds to a
@@ -150,7 +151,7 @@ class QPDFJob::Members
 
   public:
     Members(QPDFJob& job) :
-        log(qcf.log()),
+        log(d_cfg.log()),
         inputs(job)
     {
     }
@@ -168,14 +169,14 @@ class QPDFJob::Members
     static int constexpr DEFAULT_OI_MIN_AREA = 16384;
     static int constexpr DEFAULT_II_MIN_BYTES = 1024;
 
-    qpdf::Doc::Config qcf;
+    qpdf::Doc::Config d_cfg;
+    qpdf::Writer::Config w_cfg;
     std::shared_ptr<QPDFLogger> log;
     std::string message_prefix{"qpdf"};
     bool warnings{false};
     unsigned long encryption_status{0};
     bool verbose{false};
     std::string password;
-    bool linearize{false};
     bool decrypt{false};
     bool remove_restrictions{false};
     int split_pages{0};
@@ -206,25 +207,9 @@ class QPDFJob::Members
     bool force_R5{false};
     bool cleartext_metadata{false};
     bool use_aes{false};
-    bool stream_data_set{false};
-    qpdf_stream_data_e stream_data_mode{qpdf_s_compress};
-    bool compress_streams{true};
-    bool compress_streams_set{false};
-    bool recompress_flate{false};
-    bool recompress_flate_set{false};
     int compression_level{-1};
     int jpeg_quality{-1};
-    qpdf_stream_decode_level_e decode_level{qpdf_dl_generalized};
-    bool decode_level_set{false};
-    bool normalize_set{false};
-    bool normalize{false};
-    bool object_stream_set{false};
-    qpdf_object_stream_e object_stream_mode{qpdf_o_preserve};
-    bool qdf_mode{false};
-    bool preserve_unreferenced_objects{false};
     remove_unref_e remove_unreferenced_page_resources{re_auto};
-    bool newline_before_endstream{false};
-    std::string linearize_pass1;
     bool coalesce_contents{false};
     bool flatten_annotations{false};
     int flatten_annotations_required{0};
@@ -234,10 +219,7 @@ class QPDFJob::Members
     std::string min_version;
     std::string force_version;
     bool show_npages{false};
-    bool deterministic_id{false};
-    bool static_id{false};
     bool static_aes_iv{false};
-    bool suppress_original_object_id{false};
     bool show_encryption{false};
     bool show_encryption_key{false};
     bool check_linearization{false};
