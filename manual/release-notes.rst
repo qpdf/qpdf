@@ -16,7 +16,10 @@ more detail.
 12.3.0: not yet released
   - Build changes
 
-    - A C++-20 compiler is now required.
+    - A C++-20 compiler is now required to build or test ``qpdf``. All public header
+      files remain C++-17 compatible. Until further notice, any future header files
+      that require C++-20 will be flagged in the release notes and their use will be
+      optional.
 
     - The AppImage and Linux standalone binary distributions are now
       built with Ubuntu 22.04 to support C++-20, which means they will
