@@ -65,6 +65,15 @@ more detail.
 
   - Other changes
 
+.. _r12-3-0-deprecate:
+
+    - The following are believed to be not in use and have been deprecated.
+      If you are relying on them please open a ticket_.
+
+      - QPDF::compute_encryption_key
+      - All QPDF::EncryptionData methods. These methods are not exported in the
+        shared library and are only useable in statically linked programs.
+
     - Setting :qpdf:ref:`--compress-streams` to ``n`` or
       ``QPDFWriter::setCompressStreams(false)`` no longer automatically
       causes the outputfile to be decrypted. Set :qpdf:ref:`--decrypt` if this
