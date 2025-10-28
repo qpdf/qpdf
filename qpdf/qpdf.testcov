@@ -204,11 +204,6 @@ QPDFAnnotationObjectHelper AP stream 0
 QPDFAnnotationObjectHelper AP dictionary 0
 QPDFAnnotationObjectHelper AP sub stream 0
 QPDFAnnotationObjectHelper AP null 0
-QPDFAcroFormDocumentHelper fields not array 0
-QPDFAcroFormDocumentHelper orphaned widget 0
-QPDFAcroFormDocumentHelper direct field 0
-QPDFAcroFormDocumentHelper non-dictionary field 0
-QPDFAcroFormDocumentHelper loop 0
 QPDFAcroFormDocumentHelper field found 1
 QPDFAcroFormDocumentHelper annotation found 1
 QPDFJob automatically set keep files open 1
