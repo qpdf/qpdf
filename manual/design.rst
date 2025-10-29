@@ -35,6 +35,38 @@ behind the initial creation of qpdf. That said, qpdf is not a strict
 PDF checker. There are many ways in which a PDF file can be out of
 conformance to the spec that qpdf doesn't notice or report.
 
+.. _inspection-mode:
+
+Inspection Mode
+---------------
+
+The approach as described above has shifted somewhat over time for
+pragmatic reasons. A large number of essential repairs that can be
+carried out safely are now happening even with ``setAttemptRecovery(false)``.
+At the same time a number of minor infractions of the PDF standards are quietly
+dealt with to avoid creating distracting noise. This has been helpful to users
+who use qpdf to perform content-preserving transformations and who usually
+want qpdf to work reliably and to produce correct PDF output files that comply
+with the PDF standards even if the input files are somewhat less than perfect.
+
+However, there is another stated purpose of qpdf - to provide a tool for the
+study and analysis of PDF files. When used in this way, repairing the faults
+in input files or preventing the creation of unusable output files, often with
+unacceptable resource usage, is counter-productive rather than useful.
+
+To accommodate the needs of those who use qpdf as a tool for inspecting and
+investigating PDF files, qpdf version 12.3 introduced a special
+``ìnspection mode`` which is enabled using the
+``qpdf::global::options::inspection_mode`` function. In inspection mode, only a
+very limited set of basic operations is supported and a number of automatic
+repairs are disabled. Transformations of the input files such as linearizing files,
+creating object streams or encrypting files are not supported, as is the use of
+document and object helpers.
+
+Inspection mode is intended for manual investigations and repairs. As such,
+stability is less of a concern than for other uses of qpdf. The exact effect
+of specifying inspection mode will evolve from version to version.
+
 .. _design-goals:
 
 Design Goals
