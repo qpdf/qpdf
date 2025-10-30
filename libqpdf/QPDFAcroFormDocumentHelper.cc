@@ -315,7 +315,7 @@ QPDFAcroFormDocumentHelper::analyze()
 
 void
 QPDFAcroFormDocumentHelper::traverseField(
-    QPDFObjectHandle const& field, QPDFObjectHandle const& parent, int depth)
+    QPDFObjectHandle field, QPDFObjectHandle const& parent, int depth)
 {
     if (depth > 100) {
         // Arbitrarily cut off recursion at a fixed depth to avoid specially crafted files that
@@ -360,7 +360,18 @@ QPDFAcroFormDocumentHelper::traverseField(
         m->annotation_to_field[og] = QPDFFormFieldObjectHelper(our_field);
     }
 
-    if (is_field && (field.hasKey("/T"))) {
+    if (is_field && depth != 0 && field["/Parent"] != parent) {
+        for (auto const& kid: Array(field["/Parent"]["/Kids"])) {
+            if (kid == parent) {
+                field.warn("loop detected while traversing /AcroForm");
+                return;
+            }
+        }
+        field.warn("encountered invalid /Parent entry while traversing /AcroForm; correcting");
+        field.replaceKey("/Parent", parent);
+    }
+
+    if (is_field && field.hasKey("/T")) {
         QPDFFormFieldObjectHelper foh(field);
         std::string name = foh.getFullyQualifiedName();
         auto old = m->field_to.find(og);
