@@ -227,7 +227,7 @@ Objects::parse(char const* password)
         }
     }
 
-    qpdf.initializeEncryption();
+    m->encp->initialize(qpdf);
     m->parsed = true;
     if (!m->xref_table.empty() && !qpdf.getRoot().getKey("/Pages").isDictionary()) {
         // QPDFs created from JSON have an empty xref table and no root object yet.
@@ -334,15 +334,13 @@ Objects::reconstruct_xref(QPDFExc& e, bool found_startxref)
         auto xref_backup{m->xref_table};
         try {
             m->file->seek(startxrefs.back(), SEEK_SET);
-            if (auto offset =
-                    QUtil::string_to_ll(m->objects.readToken(*m->file).getValue().data())) {
-                m->objects.read_xref(offset);
+            if (auto offset = QUtil::string_to_ll(readToken(*m->file).getValue().data())) {
+                read_xref(offset);
 
                 if (qpdf.getRoot().getKey("/Pages").isDictionary()) {
-                    QTC::TC("qpdf", "QPDF startxref more than 1024 before end");
                     warn(damagedPDF(
                         "", -1, "startxref was more than 1024 bytes before end of file"));
-                    qpdf.initializeEncryption();
+                    m->encp->initialize(qpdf);
                     m->parsed = true;
                     m->reconstructed_xref = false;
                     return;
