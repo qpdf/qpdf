@@ -27,7 +27,6 @@ main QTest stream 0
 QPDF lin write nshared_total > nshared_first_page 1
 QPDFWriter encrypted hint stream 0
 QPDF xref gen > 0 1
-QPDF startxref more than 1024 before end 0
 QPDFParser bad brace 0
 QPDFParser bad brace in parseRemainder 0
 QPDFParser bad array close 0
@@ -129,7 +128,6 @@ QPDFObjectHandle trailing data in parse 0
 QPDFTokenizer EOF reading token 0
 QPDFTokenizer EOF reading appendable token 0
 QPDFWriter extra header text no newline 0
-QPDF global offset 0
 QPDFWriter make Extensions direct 0
 QPDFWriter make ADBE direct 1
 QPDFWriter preserve Extensions 0

@@ -3,6 +3,7 @@
 
 #include <qpdf/QPDF.hh>
 
+#include <qpdf/QIntC.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
 #include <qpdf/QPDFLogger.hh>
@@ -241,27 +242,6 @@ class QPDF::StringDecrypter final: public QPDFObjectHandle::StringDecrypter
     QPDF* qpdf;
     QPDFObjGen og;
 };
-// Other linearization data structures
-
-class QPDF::PatternFinder final: public InputSource::Finder
-{
-  public:
-    PatternFinder(QPDF& qpdf, bool (QPDF::*checker)()) :
-        qpdf(qpdf),
-        checker(checker)
-    {
-    }
-    ~PatternFinder() final = default;
-    bool
-    check() final
-    {
-        return (this->qpdf.*checker)();
-    }
-
-  private:
-    QPDF& qpdf;
-    bool (QPDF::*checker)();
-};
 
 // This class is used to represent a PDF document.
 //
@@ -323,13 +303,39 @@ class QPDF::Doc
         }
 
       protected:
+        // Type conversion helper methods
+        template <typename T>
+        static qpdf_offset_t
+        toO(T const& i)
+        {
+            return QIntC::to_offset(i);
+        }
+        template <typename T>
+        static size_t
+        toS(T const& i)
+        {
+            return QIntC::to_size(i);
+        }
+        template <typename T>
+        static int
+        toI(T const& i)
+        {
+            return QIntC::to_int(i);
+        }
+        template <typename T>
+        static unsigned long long
+        toULL(T const& i)
+        {
+            return QIntC::to_ulonglong(i);
+        }
+
         QPDF& qpdf;
         QPDF::Members* m;
 
         qpdf::Doc::Config& cf;
         QPDF::Doc::Pages& pages;
         QPDF::Doc::Objects& objects;
-    };
+    }; // class qpdf::Doc::Common
 
     Doc() = delete;
     Doc(Doc const&) = delete;
@@ -994,6 +1000,8 @@ class QPDF::Doc::Objects: Common
     std::shared_ptr<QPDFObject> getObjectForJSON(int id, int gen);
     size_t table_size();
 
+    static bool validatePDFVersion(char const*&, std::string& version);
+
     // For QPDFWriter:
 
     std::map<QPDFObjGen, QPDFXRefEntry> const& xref_table();
@@ -1001,6 +1009,8 @@ class QPDF::Doc::Objects: Common
     std::vector<bool> compressible_set();
 
   private:
+    class PatternFinder;
+
     // Get a list of objects that would be permitted in an object stream.
     template <typename T>
     std::vector<T> compressible();
@@ -1043,6 +1053,11 @@ class QPDF::Doc::Objects: Common
     bool isCached(QPDFObjGen og);
     bool isUnresolved(QPDFObjGen og);
     void setLastObjectDescription(std::string const& description, QPDFObjGen og);
+
+    // Methods to support pattern finding
+    bool findHeader();
+    bool findStartxref();
+    bool findEndstream();
 
     Foreign foreign_;
     Streams streams_;
