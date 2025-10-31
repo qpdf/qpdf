@@ -791,8 +791,6 @@ class QPDF
         bool is_root_metadata,
         std::unique_ptr<Pipeline>& heap);
 
-    static bool validatePDFVersion(char const*&, std::string& version);
-
     // JSON import
     void importJSON(std::shared_ptr<InputSource>, bool must_be_complete);
 

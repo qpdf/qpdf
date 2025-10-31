@@ -315,25 +315,6 @@ QPDF::numWarnings() const
     return m->warnings.size();
 }
 
-bool
-QPDF::validatePDFVersion(char const*& p, std::string& version)
-{
-    if (!util::is_digit(*p)) {
-        return false;
-    }
-    while (util::is_digit(*p)) {
-        version.append(1, *p++);
-    }
-    if (!(*p == '.' && util::is_digit(*(p + 1)))) {
-        return false;
-    }
-    version.append(1, *p++);
-    while (util::is_digit(*p)) {
-        version.append(1, *p++);
-    }
-    return true;
-}
-
 void
 QPDF::warn(QPDFExc const& e)
 {

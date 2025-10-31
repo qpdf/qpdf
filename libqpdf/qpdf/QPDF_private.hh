@@ -1000,6 +1000,8 @@ class QPDF::Doc::Objects: Common
     std::shared_ptr<QPDFObject> getObjectForJSON(int id, int gen);
     size_t table_size();
 
+    static bool validatePDFVersion(char const*&, std::string& version);
+
     // For QPDFWriter:
 
     std::map<QPDFObjGen, QPDFXRefEntry> const& xref_table();

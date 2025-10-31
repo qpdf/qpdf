@@ -482,7 +482,7 @@ QPDF::JSONReactor::dictionaryItem(std::string const& key, JSON const& value)
             if (value.getString(v)) {
                 std::string version;
                 char const* p = v.c_str();
-                if (QPDF::validatePDFVersion(p, version) && (*p == '\0')) {
+                if (objects.validatePDFVersion(p, version) && *p == '\0') {
                     pdf.m->pdf_version = version;
                     return true;
                 }
