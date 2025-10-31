@@ -23,6 +23,12 @@ more detail.
       not work on some older Linux distributions. If you need support
       for an older distribution, please use version 12.2.0 or below.
 
+  - Bug fixes
+
+    - Set `is_different` flag in `QPDFFormFieldObjectHelper::getTopLevelField` to
+      false if the field is a top-level field. Previously the flag was only set
+      if the field is a top-level field.
+
   - Library Enhancements
 
     - Add ``QPDFNameTreeObjectHelper`` and ``QPDFNumberTreeObjectHelper``

@@ -60,6 +60,9 @@ QPDFFormFieldObjectHelper::getTopLevelField(bool* is_different)
 FormField
 FormField::root_field(bool* is_different)
 {
+    if (is_different) {
+        *is_different = false;
+    }
     if (!obj) {
         return {};
     }
