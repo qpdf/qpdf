@@ -1010,7 +1010,7 @@ QPDF::decryptString(std::string& str, QPDFObjGen og)
             // Using std::shared_ptr guarantees that tmp will be freed even if rc4.process throws an
             // exception.
             auto tmp = QUtil::make_unique_cstr(str);
-            RC4 rc4(QUtil::unsigned_char_pointer(key), toI(key.length()));
+            RC4 rc4(QUtil::unsigned_char_pointer(key), QIntC::to_int(key.length()));
             auto data = QUtil::unsigned_char_pointer(tmp.get());
             rc4.process(data, vlen, data);
             str = std::string(tmp.get(), vlen);

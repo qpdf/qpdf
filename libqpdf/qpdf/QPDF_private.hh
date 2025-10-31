@@ -3,6 +3,7 @@
 
 #include <qpdf/QPDF.hh>
 
+#include <qpdf/QIntC.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
 #include <qpdf/QPDFLogger.hh>
@@ -323,13 +324,39 @@ class QPDF::Doc
         }
 
       protected:
+        // Type conversion helper methods
+        template <typename T>
+        static qpdf_offset_t
+        toO(T const& i)
+        {
+            return QIntC::to_offset(i);
+        }
+        template <typename T>
+        static size_t
+        toS(T const& i)
+        {
+            return QIntC::to_size(i);
+        }
+        template <typename T>
+        static int
+        toI(T const& i)
+        {
+            return QIntC::to_int(i);
+        }
+        template <typename T>
+        static unsigned long long
+        toULL(T const& i)
+        {
+            return QIntC::to_ulonglong(i);
+        }
+
         QPDF& qpdf;
         QPDF::Members* m;
 
         qpdf::Doc::Config& cf;
         QPDF::Doc::Pages& pages;
         QPDF::Doc::Objects& objects;
-    };
+    }; // class qpdf::Doc::Common
 
     Doc() = delete;
     Doc(Doc const&) = delete;

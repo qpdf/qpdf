@@ -1138,7 +1138,7 @@ QPDF::getObjectCount()
     if (!m->obj_cache.empty()) {
         og = (*(m->obj_cache.rbegin())).first;
     }
-    return toS(og.getObj());
+    return QIntC::to_size(og.getObj());
 }
 
 std::vector<QPDFObjectHandle>

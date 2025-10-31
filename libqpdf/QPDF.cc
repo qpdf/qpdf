@@ -761,7 +761,10 @@ QPDF::pipeStreamData(
         auto buf = file->read(length, offset);
         if (buf.size() != length) {
             throw qpdf_for_warning.m->c.damagedPDF(
-                *file, "", offset + toO(buf.size()), "unexpected EOF reading stream data");
+                *file,
+                "",
+                offset + QIntC::to_offset(buf.size()),
+                "unexpected EOF reading stream data");
         }
         pipeline->write(buf.data(), length);
         attempted_finish = true;

@@ -37,7 +37,6 @@
 #include <qpdf/Buffer.hh>
 #include <qpdf/InputSource.hh>
 #include <qpdf/PDFVersion.hh>
-#include <qpdf/QIntC.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFObjectHandle.hh>
@@ -802,32 +801,6 @@ class QPDF
 
     // JSON import
     void importJSON(std::shared_ptr<InputSource>, bool must_be_complete);
-
-    // Type conversion helper methods
-    template <typename T>
-    static qpdf_offset_t
-    toO(T const& i)
-    {
-        return QIntC::to_offset(i);
-    }
-    template <typename T>
-    static size_t
-    toS(T const& i)
-    {
-        return QIntC::to_size(i);
-    }
-    template <typename T>
-    static int
-    toI(T const& i)
-    {
-        return QIntC::to_int(i);
-    }
-    template <typename T>
-    static unsigned long long
-    toULL(T const& i)
-    {
-        return QIntC::to_ulonglong(i);
-    }
 
     class Members;
 
