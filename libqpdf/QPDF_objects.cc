@@ -3,6 +3,7 @@
 #include <qpdf/QPDF_private.hh>
 
 #include <qpdf/InputSource_private.hh>
+#include <qpdf/OffsetInputSource.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
@@ -101,11 +102,54 @@ class QPDF::ResolveRecorder final
     std::set<QPDFObjGen>::const_iterator iter;
 };
 
-bool
-QPDF::findStartxref()
+class Objects::PatternFinder final: public InputSource::Finder
 {
-    if (m->objects.readToken(*m->file).isWord("startxref") &&
-        m->objects.readToken(*m->file).isInteger()) {
+  public:
+    PatternFinder(Objects& o, bool (Objects::*checker)()) :
+        o(o),
+        checker(checker)
+    {
+    }
+    ~PatternFinder() final = default;
+    bool
+    check() final
+    {
+        return (this->o.*checker)();
+    }
+
+  private:
+    Objects& o;
+    bool (Objects::*checker)();
+};
+
+bool
+Objects::findHeader()
+{
+    qpdf_offset_t global_offset = m->file->tell();
+    std::string line = m->file->readLine(1024);
+    char const* p = line.data();
+    util::assertion(strncmp(p, "%PDF-", 5) == 0, "findHeader is not looking at %PDF-");
+    p += 5;
+    std::string version;
+    // Note: The string returned by line.data() is always null-terminated. The code below never
+    // overruns the buffer because a null character always short-circuits further advancement.
+    if (!validatePDFVersion(p, version)) {
+        return false;
+    }
+    m->pdf_version = version;
+    if (global_offset != 0) {
+        // Empirical evidence strongly suggests (codified in PDF 2.0 spec) that when there is
+        // leading material prior to the PDF header, all explicit offsets in the file are such that
+        // 0 points to the beginning of the header.
+        m->file = std::make_shared<OffsetInputSource>(m->file, global_offset);
+    }
+    return true;
+}
+
+bool
+Objects ::findStartxref()
+{
+    if (readToken(*m->file).isWord("startxref") && readToken(*m->file).isInteger()) {
         // Position in front of offset token
         m->file->seek(m->file->getLastOffset(), SEEK_SET);
         return true;
@@ -121,7 +165,7 @@ Objects::parse(char const* password)
     }
 
     // Find the header anywhere in the first 1024 bytes of the file.
-    PatternFinder hf(qpdf, &QPDF::findHeader);
+    PatternFinder hf(*this, &Objects::findHeader);
     if (!m->file->findFirst("%PDF-", 0, 1024, hf)) {
         warn(damagedPDF("", -1, "can't find PDF header"));
         // QPDFWriter writes files that usually require at least version 1.2 for /FlateDecode
@@ -139,7 +183,7 @@ Objects::parse(char const* password)
         m->xref_table_max_id = static_cast<int>(m->xref_table_max_offset / 3);
     }
     qpdf_offset_t start_offset = (end_offset > 1054 ? end_offset - 1054 : 0);
-    PatternFinder sf(qpdf, &QPDF::findStartxref);
+    PatternFinder sf(*this, &Objects::findStartxref);
     qpdf_offset_t xref_offset = 0;
     if (m->file->findLast("startxref", start_offset, 0, sf)) {
         xref_offset = QUtil::string_to_ll(readToken(*m->file).getValue().c_str());
@@ -1324,10 +1368,10 @@ Objects::readObjectInStream(is::OffsetBuffer& input, int stream_id, int obj_id)
 }
 
 bool
-QPDF::findEndstream()
+Objects ::findEndstream()
 {
     // Find endstream or endobj. Position the input at that token.
-    auto t = m->objects.readToken(*m->file, 20);
+    auto t = readToken(*m->file, 20);
     if (t.isWord("endobj") || t.isWord("endstream")) {
         m->file->seek(m->file->getLastOffset(), SEEK_SET);
         return true;
@@ -1342,7 +1386,7 @@ Objects::recoverStreamLength(
     // Try to reconstruct stream length by looking for endstream or endobj
     warn(damagedPDF(*input, stream_offset, "attempting to recover stream length"));
 
-    PatternFinder ef(qpdf, &QPDF::findEndstream);
+    PatternFinder ef(*this, &Objects::findEndstream);
     size_t length = 0;
     if (m->file->findFirst("end", stream_offset, 0, ef)) {
         length = toS(m->file->tell() - stream_offset);

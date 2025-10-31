@@ -242,27 +242,6 @@ class QPDF::StringDecrypter final: public QPDFObjectHandle::StringDecrypter
     QPDF* qpdf;
     QPDFObjGen og;
 };
-// Other linearization data structures
-
-class QPDF::PatternFinder final: public InputSource::Finder
-{
-  public:
-    PatternFinder(QPDF& qpdf, bool (QPDF::*checker)()) :
-        qpdf(qpdf),
-        checker(checker)
-    {
-    }
-    ~PatternFinder() final = default;
-    bool
-    check() final
-    {
-        return (this->qpdf.*checker)();
-    }
-
-  private:
-    QPDF& qpdf;
-    bool (QPDF::*checker)();
-};
 
 // This class is used to represent a PDF document.
 //
@@ -1028,6 +1007,8 @@ class QPDF::Doc::Objects: Common
     std::vector<bool> compressible_set();
 
   private:
+    class PatternFinder;
+
     // Get a list of objects that would be permitted in an object stream.
     template <typename T>
     std::vector<T> compressible();
@@ -1070,6 +1051,11 @@ class QPDF::Doc::Objects: Common
     bool isCached(QPDFObjGen og);
     bool isUnresolved(QPDFObjGen og);
     void setLastObjectDescription(std::string const& description, QPDFObjGen og);
+
+    // Methods to support pattern finding
+    bool findHeader();
+    bool findStartxref();
+    bool findEndstream();
 
     Foreign foreign_;
     Streams streams_;

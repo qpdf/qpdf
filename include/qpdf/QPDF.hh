@@ -791,13 +791,7 @@ class QPDF
         bool is_root_metadata,
         std::unique_ptr<Pipeline>& heap);
 
-    class PatternFinder;
-
-    // Methods to support pattern finding
     static bool validatePDFVersion(char const*&, std::string& version);
-    bool findHeader();
-    bool findStartxref();
-    bool findEndstream();
 
     // JSON import
     void importJSON(std::shared_ptr<InputSource>, bool must_be_complete);
