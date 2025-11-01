@@ -295,6 +295,12 @@ QPDF::setImmediateCopyFrom(bool val)
     (void)m->cf.immediate_copy_from(val);
 }
 
+void
+QPDF::setInspectionMode(bool val)
+{
+    (void)m->cf.inspection_mode(val);
+}
+
 std::vector<QPDFExc>
 QPDF::getWarnings()
 {

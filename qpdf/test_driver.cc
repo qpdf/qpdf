@@ -3559,6 +3559,44 @@ test_100(QPDF& pdf, char const* arg2)
     }
 }
 
+static void
+test_101(QPDF& pdf, char const* arg2)
+{
+    // Test inspection mode
+    QPDF qpdf;
+    qpdf.setInspectionMode(true);
+    qpdf.processFile("inspect.pdf");
+    for (auto& oh: qpdf.getAllObjects()) {
+        std::cout << oh.getObjGen().unparse(' ') << '\n';
+        std::cout << oh.unparseResolved() << '\n';
+    }
+    try {
+        (void)QPDFAcroFormDocumentHelper::get(qpdf);
+        assert(false);
+    } catch (std::logic_error&) {
+    }
+    try {
+        (void)QPDFEmbeddedFileDocumentHelper::get(qpdf);
+        assert(false);
+    } catch (std::logic_error&) {
+    }
+    try {
+        (void)QPDFOutlineDocumentHelper::get(qpdf);
+        assert(false);
+    } catch (std::logic_error&) {
+    }
+    try {
+        (void)QPDFPageDocumentHelper::get(qpdf);
+        assert(false);
+    } catch (std::logic_error&) {
+    }
+    try {
+        (void)QPDFPageLabelDocumentHelper::get(qpdf);
+        assert(false);
+    } catch (std::logic_error&) {
+    }
+}
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -3566,7 +3604,7 @@ runtest(int n, char const* filename1, char const* arg2)
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
 
-    std::set<int> ignore_filename = {61, 81, 83, 84, 85, 86, 87, 92, 95, 96};
+    std::set<int> ignore_filename = {61, 81, 83, 84, 85, 86, 87, 92, 95, 96, 101};
 
     if (n == 0) {
         // Throw in some random test cases that don't fit anywhere
@@ -3640,23 +3678,27 @@ runtest(int n, char const* filename1, char const* arg2)
     }
 
     std::map<int, void (*)(QPDF&, char const*)> test_functions = {
-        {0, test_0_1}, {1, test_0_1}, {2, test_2},   {3, test_3},   {4, test_4},    {5, test_5},
-        {6, test_6},   {7, test_7},   {8, test_8},   {9, test_9},   {10, test_10},  {11, test_11},
-        {12, test_12}, {13, test_13}, {14, test_14}, {15, test_15}, {16, test_16},  {17, test_17},
-        {18, test_18}, {19, test_19}, {20, test_20}, {21, test_21}, {22, test_22},  {23, test_23},
-        {24, test_24}, {25, test_25}, {26, test_26}, {27, test_27}, {28, test_28},  {29, test_29},
-        {30, test_30}, {31, test_31}, {32, test_32}, {33, test_33}, {34, test_34},  {35, test_35},
-        {36, test_36}, {37, test_37}, {38, test_38}, {39, test_39}, {40, test_40},  {41, test_41},
-        {42, test_42}, {43, test_43}, {44, test_44}, {45, test_45}, {46, test_46},  {47, test_47},
-        {48, test_48}, {49, test_49}, {50, test_50}, {51, test_51}, {52, test_52},  {53, test_53},
-        {54, test_54}, {55, test_55}, {56, test_56}, {57, test_57}, {58, test_58},  {59, test_59},
-        {60, test_60}, {61, test_61}, {62, test_62}, {63, test_63}, {64, test_64},  {65, test_65},
-        {66, test_66}, {67, test_67}, {68, test_68}, {69, test_69}, {70, test_70},  {71, test_71},
-        {72, test_72}, {73, test_73}, {74, test_74}, {75, test_75}, {76, test_76},  {77, test_77},
-        {78, test_78}, {79, test_79}, {80, test_80}, {81, test_81}, {82, test_82},  {83, test_83},
-        {84, test_84}, {85, test_85}, {86, test_86}, {87, test_87}, {88, test_88},  {89, test_89},
-        {90, test_90}, {91, test_91}, {92, test_92}, {93, test_93}, {94, test_94},  {95, test_95},
-        {96, test_96}, {97, test_97}, {98, test_98}, {99, test_99}, {100, test_100}};
+        {0, test_0_1},   {1, test_0_1},  {2, test_2},   {3, test_3},   {4, test_4},
+        {5, test_5},     {6, test_6},    {7, test_7},   {8, test_8},   {9, test_9},
+        {10, test_10},   {11, test_11},  {12, test_12}, {13, test_13}, {14, test_14},
+        {15, test_15},   {16, test_16},  {17, test_17}, {18, test_18}, {19, test_19},
+        {20, test_20},   {21, test_21},  {22, test_22}, {23, test_23}, {24, test_24},
+        {25, test_25},   {26, test_26},  {27, test_27}, {28, test_28}, {29, test_29},
+        {30, test_30},   {31, test_31},  {32, test_32}, {33, test_33}, {34, test_34},
+        {35, test_35},   {36, test_36},  {37, test_37}, {38, test_38}, {39, test_39},
+        {40, test_40},   {41, test_41},  {42, test_42}, {43, test_43}, {44, test_44},
+        {45, test_45},   {46, test_46},  {47, test_47}, {48, test_48}, {49, test_49},
+        {50, test_50},   {51, test_51},  {52, test_52}, {53, test_53}, {54, test_54},
+        {55, test_55},   {56, test_56},  {57, test_57}, {58, test_58}, {59, test_59},
+        {60, test_60},   {61, test_61},  {62, test_62}, {63, test_63}, {64, test_64},
+        {65, test_65},   {66, test_66},  {67, test_67}, {68, test_68}, {69, test_69},
+        {70, test_70},   {71, test_71},  {72, test_72}, {73, test_73}, {74, test_74},
+        {75, test_75},   {76, test_76},  {77, test_77}, {78, test_78}, {79, test_79},
+        {80, test_80},   {81, test_81},  {82, test_82}, {83, test_83}, {84, test_84},
+        {85, test_85},   {86, test_86},  {87, test_87}, {88, test_88}, {89, test_89},
+        {90, test_90},   {91, test_91},  {92, test_92}, {93, test_93}, {94, test_94},
+        {95, test_95},   {96, test_96},  {97, test_97}, {98, test_98}, {99, test_99},
+        {100, test_100}, {101, test_101}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {

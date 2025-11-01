@@ -25,6 +25,13 @@ more detail.
 
   - Library Enhancements
 
+    - Add new ``QPDF`` method ``setInspectionMode`` to replace the exceptions
+      thrown if a PDF file is damaged and unrepairable with warnings and to
+      disable certain repairs in order to facilitate the inspection and
+      manual repair of severely damanged PDF files. Only a very limited
+      range of operations are supported in ``inspection_mode``. For more
+      detail see :ref:`inspection-mode`.
+
     - Add ``QPDFNameTreeObjectHelper`` and ``QPDFNumberTreeObjectHelper``
       constructor overloads that allow a function to be passed to
       validate the values in the tree.

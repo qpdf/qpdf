@@ -259,6 +259,14 @@ class QPDF
     QPDF_DLL
     void setImmediateCopyFrom(bool);
 
+    // Setting inspect mode to true surpresses the exceptions normally thrown when a damaged file
+    // cannot be successfully parsed and disables certain automatic repairs. Only a limited range of
+    // operations useful for inspecting a file are allowed when inspection mode is enabled. All
+    // transformations and use of object and document helpers is unsupported. For more detail see
+    // the "Inspection Mode" section of the manual.
+    QPDF_DLL
+    void setInspectionMode(bool);
+
     // Other public methods
 
     // Return the list of warnings that have been issued so far and clear the list.  This method may
