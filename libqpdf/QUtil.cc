@@ -1688,19 +1688,13 @@ QUtil::utf8_to_pdf_doc(std::string const& utf8, std::string& pdfdoc, char unknow
 bool
 QUtil::is_utf16(std::string const& val)
 {
-    return (
-        (val.length() >= 2) &&
-        (((val.at(0) == '\xfe') && (val.at(1) == '\xff')) ||
-         ((val.at(0) == '\xff') && (val.at(1) == '\xfe'))));
+    return util::is_utf16(val);
 }
 
 bool
 QUtil::is_explicit_utf8(std::string const& val)
 {
-    // QPDF_String.cc knows that this is a 3-byte sequence.
-    return (
-        (val.length() >= 3) && (val.at(0) == '\xef') && (val.at(1) == '\xbb') &&
-        (val.at(2) == '\xbf'));
+    return util::is_explicit_utf8(val);
 }
 
 std::string

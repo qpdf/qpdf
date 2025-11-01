@@ -2,6 +2,7 @@
 
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 
 // DO NOT USE ctype -- it is locale dependent for some things, and it's not worth the risk of
 // including it in case it may accidentally be used.
@@ -9,7 +10,7 @@
 static bool
 is_iso_latin1_printable(char ch)
 {
-    return (((ch >= 32) && (ch <= 126)) || (static_cast<unsigned char>(ch) >= 160));
+    return (ch >= 32 && ch <= 126) || static_cast<unsigned char>(ch) >= 160;
 }
 
 std::shared_ptr<QPDFObject>
@@ -30,7 +31,7 @@ QPDF_String::writeJSON(int json_version, JSON::Writer& p)
         p << "\"" << JSON::Writer::encode_string(candidate) << "\"";
     } else {
         // See if we can unambiguously represent as Unicode.
-        if (QUtil::is_utf16(val) || QUtil::is_explicit_utf8(val)) {
+        if (util::is_utf16(val) || util::is_explicit_utf8(val)) {
             p << "\"u:" << JSON::Writer::encode_string(candidate) << "\"";
             return;
         } else if (!useHexString()) {
@@ -137,13 +138,13 @@ QPDF_String::unparse(bool force_binary)
 std::string
 QPDF_String::getUTF8Val() const
 {
-    if (QUtil::is_utf16(val)) {
+    if (util::is_utf16(val)) {
         return QUtil::utf16_to_utf8(val);
-    } else if (QUtil::is_explicit_utf8(val)) {
+    }
+    if (util::is_explicit_utf8(val)) {
         // PDF 2.0 allows UTF-8 strings when explicitly prefixed with the three-byte representation
         // of U+FEFF.
         return val.substr(3);
-    } else {
-        return QUtil::pdf_doc_to_utf8(val);
     }
+    return QUtil::pdf_doc_to_utf8(val);
 }
