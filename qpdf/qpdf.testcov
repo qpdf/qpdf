@@ -263,10 +263,6 @@ QPDFJob found shared resources in leaf 0
 QPDFJob found shared xobject in leaf 0
 QPDFObjectHandle need_newline 1
 QPDFJob pages range omitted with . 0
-qpdf-c invalid object handle 0
-qpdf-c called qpdf_oh_release 0
-qpdf-c called qpdf_oh_release_all 0
-qpdf-c called qpdf_new_object 0
 qpdf-c called qpdf_get_trailer 0
 qpdf-c called qpdf_get_root 0
 qpdf-c called qpdf_oh_is_bool 0
@@ -365,7 +361,6 @@ qpdf-c registered progress reporter 0
 qpdf-c called qpdf_oh_new_uninitialized 0
 qpdf-c warn about oh error 1
 qpdf-c cleanup warned about unhandled error 0
-qpdf-c called qpdf_get_object_by_id 0
 qpdf-c called qpdf_replace_object 0
 qpdf-c called qpdf_update_all_pages_cache 0
 qpdf-c called qpdf_find_page_by_id 0

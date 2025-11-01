@@ -833,28 +833,25 @@ static qpdf_oh
 new_object(qpdf_data qpdf, QPDFObjectHandle const& qoh)
 {
     qpdf_oh oh = ++qpdf->next_oh; // never return 0
-    qpdf->oh_cache[oh] = std::make_shared<QPDFObjectHandle>(qoh);
+    qpdf->oh_cache[oh] = qoh;
     return oh;
 }
 
 qpdf_oh
 qpdf_oh_new_object(qpdf_data qpdf, qpdf_oh oh)
 {
-    QTC::TC("qpdf", "qpdf-c called qpdf_new_object");
-    return new_object(qpdf, *(qpdf->oh_cache[oh]));
+    return new_object(qpdf, qpdf->oh_cache[oh]);
 }
 
 void
 qpdf_oh_release(qpdf_data qpdf, qpdf_oh oh)
 {
-    QTC::TC("qpdf", "qpdf-c called qpdf_oh_release");
     qpdf->oh_cache.erase(oh);
 }
 
 void
 qpdf_oh_release_all(qpdf_data qpdf)
 {
-    QTC::TC("qpdf", "qpdf-c called qpdf_oh_release_all");
     qpdf->oh_cache.clear();
 }
 
@@ -904,8 +901,7 @@ qpdf_get_root(qpdf_data qpdf)
 qpdf_oh
 qpdf_get_object_by_id(qpdf_data qpdf, int objid, int generation)
 {
-    QTC::TC("qpdf", "qpdf-c called qpdf_get_object_by_id");
-    return new_object(qpdf, qpdf->qpdf->getObjectByID(objid, generation));
+    return new_object(qpdf, qpdf->qpdf->getObject(objid, generation));
 }
 
 template <class RET>
@@ -918,9 +914,7 @@ do_with_oh(
 {
     return trap_oh_errors<RET>(qpdf, fallback, [fn, oh](qpdf_data q) {
         auto i = q->oh_cache.find(oh);
-        bool result = ((i != q->oh_cache.end()) && (i->second).get());
-        if (!result) {
-            QTC::TC("qpdf", "qpdf-c invalid object handle");
+        if (i == q->oh_cache.end()) {
             throw QPDFExc(
                 qpdf_e_internal,
                 q->qpdf->getFilename(),
@@ -928,7 +922,7 @@ do_with_oh(
                 0,
                 "attempted access to unknown object handle");
         }
-        return fn(*(q->oh_cache[oh]));
+        return fn(i->second);
     });
 }
 

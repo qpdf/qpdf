@@ -39,7 +39,7 @@ struct _qpdf_data
     // QPDFObjectHandle support
     bool silence_errors{false};
     bool oh_error_occurred{false};
-    std::map<qpdf_oh, std::shared_ptr<QPDFObjectHandle>> oh_cache;
+    std::map<qpdf_oh, QPDFObjectHandle> oh_cache;
     qpdf_oh next_oh{0};
     std::set<std::string> cur_iter_dict_keys;
     std::set<std::string>::const_iterator dict_iter;
