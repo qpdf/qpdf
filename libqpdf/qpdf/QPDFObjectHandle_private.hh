@@ -614,6 +614,8 @@ namespace qpdf
         {
         }
 
+        static String utf16(std::string const&);
+
         // Return the string value. If the object is not a valid string, throw a
         // std::invalid_argument exception.
         operator std::string() const&

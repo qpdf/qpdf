@@ -1010,7 +1010,7 @@ QPDFObjectHandle::newString(std::string const& str)
 QPDFObjectHandle
 QPDFObjectHandle::newUnicodeString(std::string const& utf8_str)
 {
-    return {QPDF_String::create_utf16(utf8_str)};
+    return {String::utf16(utf8_str).obj_sp()};
 }
 
 String::String(std::string const& str) :
@@ -1021,6 +1021,16 @@ String::String(std::string const& str) :
 String::String(std::string&& str) :
     BaseHandle(QPDFObject::create<QPDF_String>(std::move(str)))
 {
+}
+
+String
+String::utf16(std::string const& utf8_str)
+{
+    std::string result;
+    if (QUtil::utf8_to_pdf_doc(utf8_str, result, '?')) {
+        return String(result);
+    }
+    return String(QUtil::utf8_to_utf16(utf8_str));
 }
 
 std::string const&

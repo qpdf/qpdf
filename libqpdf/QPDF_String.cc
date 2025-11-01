@@ -13,16 +13,6 @@ is_iso_latin1_printable(char ch)
     return (ch >= 32 && ch <= 126) || static_cast<unsigned char>(ch) >= 160;
 }
 
-std::shared_ptr<QPDFObject>
-QPDF_String::create_utf16(std::string const& utf8_val)
-{
-    std::string result;
-    if (!QUtil::utf8_to_pdf_doc(utf8_val, result, '?')) {
-        result = QUtil::utf8_to_utf16(utf8_val);
-    }
-    return QPDFObject::create<QPDF_String>(result);
-}
-
 void
 QPDF_String::writeJSON(int json_version, JSON::Writer& p)
 {

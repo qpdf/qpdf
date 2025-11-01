@@ -266,7 +266,6 @@ class QPDF_String final
     friend class qpdf::impl::Writer;
 
   public:
-    static std::shared_ptr<QPDFObject> create_utf16(std::string const& utf8_val);
     std::string unparse(bool force_binary = false);
     void writeJSON(int json_version, JSON::Writer& p);
 
