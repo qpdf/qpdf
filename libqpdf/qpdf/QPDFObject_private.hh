@@ -281,6 +281,7 @@ class QPDF_String final
     {
     }
     bool useHexString() const;
+
     std::string val;
 };
 

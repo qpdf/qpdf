@@ -38,7 +38,7 @@ my @json_files = (
     ['page-labels-and-outlines',
      ['--json-key=objects', '--json-object=trailer', '--json-object=2 0 R']],
     ['field-types', ['--json-key=acroform']],
-    ['need-appearances', ['--json-key=acroform']],
+    ['need-appearances-utf8', ['--json-key=acroform']],
     ['V4-aes', ['--json-key=encrypt']],
     ['V4-aes', ['--json-key=encrypt', '--show-encryption-key']],
 );

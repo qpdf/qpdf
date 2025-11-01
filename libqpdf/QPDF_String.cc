@@ -26,24 +26,40 @@ QPDF_String::create_utf16(std::string const& utf8_val)
 void
 QPDF_String::writeJSON(int json_version, JSON::Writer& p)
 {
-    auto candidate = getUTF8Val();
     if (json_version == 1) {
-        p << "\"" << JSON::Writer::encode_string(candidate) << "\"";
-    } else {
-        // See if we can unambiguously represent as Unicode.
-        if (util::is_utf16(val) || util::is_explicit_utf8(val)) {
+        if (util::is_utf16(val)) {
+            p << "\"" << JSON::Writer::encode_string(QUtil::utf16_to_utf8(val)) << "\"";
+            return;
+        }
+        if (util::is_explicit_utf8(val)) {
+            // PDF 2.0 allows UTF-8 strings when explicitly prefixed with the three-byte
+            // representation of U+FEFF.
+            p << "\"" << JSON::Writer::encode_string(val.substr(3)) << "\"";
+            return;
+        }
+        p << "\"" << JSON::Writer::encode_string(QUtil::pdf_doc_to_utf8(val)) << "\"";
+        return;
+    }
+    // See if we can unambiguously represent as Unicode.
+    if (util::is_utf16(val)) {
+        p << "\"u:" << JSON::Writer::encode_string(QUtil::utf16_to_utf8(val)) << "\"";
+        return;
+    }
+    // See if we can unambiguously represent as Unicode.
+    if (util::is_explicit_utf8(val)) {
+        p << "\"u:" << JSON::Writer::encode_string(val.substr(3)) << "\"";
+        return;
+    }
+    if (!useHexString()) {
+        auto candidate = QUtil::pdf_doc_to_utf8(val);
+        std::string test;
+        if (QUtil::utf8_to_pdf_doc(candidate, test, '?') && test == val) {
+            // This is a PDF-doc string that can be losslessly encoded as Unicode.
             p << "\"u:" << JSON::Writer::encode_string(candidate) << "\"";
             return;
-        } else if (!useHexString()) {
-            std::string test;
-            if (QUtil::utf8_to_pdf_doc(candidate, test, '?') && (test == val)) {
-                // This is a PDF-doc string that can be losslessly encoded as Unicode.
-                p << "\"u:" << JSON::Writer::encode_string(candidate) << "\"";
-                return;
-            }
         }
-        p << "\"b:" << QUtil::hex_encode(val) << "\"";
     }
+    p << "\"b:" << QUtil::hex_encode(val) << "\"";
 }
 
 bool
