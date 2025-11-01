@@ -999,50 +999,92 @@ QPDFObjectHandle::getValueAsName(std::string& value) const
     return true;
 }
 
-// String accessors
+// String methods
+
+QPDFObjectHandle
+QPDFObjectHandle::newString(std::string const& str)
+{
+    return {QPDFObject::create<QPDF_String>(str)};
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::newUnicodeString(std::string const& utf8_str)
+{
+    return {QPDF_String::create_utf16(utf8_str)};
+}
+
+String::String(std::string const& str) :
+    BaseHandle(QPDFObject::create<QPDF_String>(str))
+{
+}
+
+String::String(std::string&& str) :
+    BaseHandle(QPDFObject::create<QPDF_String>(std::move(str)))
+{
+}
+
+std::string const&
+String::value() const
+{
+    auto* s = as<QPDF_String>();
+    if (!s) {
+        throw invalid_error("String");
+    }
+    return s->val;
+}
+
+std::string
+String::utf8_value() const
+{
+    auto* s = as<QPDF_String>();
+    if (!s) {
+        throw invalid_error("String");
+    }
+    return s->getUTF8Val();
+}
 
 std::string
 QPDFObjectHandle::getStringValue() const
 {
-    if (isString()) {
-        return obj->getStringValue();
-    } else {
+    try {
+        return String(obj).value();
+    } catch (std::invalid_argument&) {
         typeWarning("string", "returning empty string");
-        QTC::TC("qpdf", "QPDFObjectHandle string returning empty string");
-        return "";
+        return {};
     }
 }
 
 bool
 QPDFObjectHandle::getValueAsString(std::string& value) const
 {
-    if (!isString()) {
+    try {
+        value = String(obj).value();
+        return true;
+    } catch (std::invalid_argument&) {
         return false;
     }
-    value = obj->getStringValue();
-    return true;
 }
 
 std::string
 QPDFObjectHandle::getUTF8Value() const
 {
-    if (auto str = as<QPDF_String>()) {
-        return str->getUTF8Val();
-    } else {
+    try {
+        return String(obj).utf8_value();
+    } catch (std::invalid_argument&) {
         typeWarning("string", "returning empty string");
-        QTC::TC("qpdf", "QPDFObjectHandle string returning empty utf8");
-        return "";
+        return {};
     }
 }
 
 bool
 QPDFObjectHandle::getValueAsUTF8(std::string& value) const
 {
-    if (auto str = as<QPDF_String>()) {
-        value = str->getUTF8Val();
+    try {
+        value = String(obj).utf8_value();
         return true;
+    } catch (std::invalid_argument&) {
+        return false;
     }
-    return false;
 }
 
 // Operator and Inline Image accessors
@@ -1715,18 +1757,6 @@ QPDFObjectHandle
 QPDFObjectHandle::newReal(double value, int decimal_places, bool trim_trailing_zeroes)
 {
     return {QPDFObject::create<QPDF_Real>(value, decimal_places, trim_trailing_zeroes)};
-}
-
-QPDFObjectHandle
-QPDFObjectHandle::newString(std::string const& str)
-{
-    return {QPDFObject::create<QPDF_String>(str)};
-}
-
-QPDFObjectHandle
-QPDFObjectHandle::newUnicodeString(std::string const& utf8_str)
-{
-    return {QPDF_String::create_utf16(utf8_str)};
 }
 
 QPDFObjectHandle

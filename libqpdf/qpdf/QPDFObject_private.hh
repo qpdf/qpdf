@@ -30,6 +30,7 @@ namespace qpdf
     class Integer;
     class Name;
     class Stream;
+    class String;
 
     namespace impl
     {
@@ -261,6 +262,7 @@ class QPDF_String final
 {
     friend class QPDFObject;
     friend class qpdf::BaseHandle;
+    friend class qpdf::String;
     friend class qpdf::impl::Writer;
 
   public:
@@ -270,7 +272,11 @@ class QPDF_String final
     std::string getUTF8Val() const;
 
   private:
-    QPDF_String(std::string val) :
+    QPDF_String(std::string const& val) :
+        val(val)
+    {
+    }
+    QPDF_String(std::string&& val) :
         val(std::move(val))
     {
     }

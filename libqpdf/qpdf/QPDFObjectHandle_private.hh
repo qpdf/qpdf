@@ -412,15 +412,15 @@ namespace qpdf
         {
         }
 
-        // Return the name value. If the object is not a valid Name, throw a
-        // std::invalid_argument exception.
+        // Return the name value. If the object is not a valid Name, throw a std::invalid_argument
+        // exception.
         operator std::string() const&
         {
             return value();
         }
 
-        // Return the integer value. If the object is not a valid integer, throw a
-        // std::invalid_argument exception.
+        // Return the name value. If the object is not a valid name, throw a std::invalid_argument
+        // exception.
         std::string const& value() const;
 
         // Return true if object value is equal to the 'rhs' value. Return false if the object is
@@ -589,7 +589,54 @@ namespace qpdf
         void warn(std::string const& message);
 
         static std::map<std::string, std::string> filter_abbreviations;
-    };
+    }; // class Stream
+
+    class String final: public BaseHandle
+    {
+      public:
+        String() = default;
+        String(String const&) = default;
+        String(String&&) = default;
+        String& operator=(String const&) = default;
+        String& operator=(String&&) = default;
+        ~String() = default;
+
+        explicit String(std::string const&);
+        explicit String(std::string&&);
+
+        String(QPDFObjectHandle const& oh) :
+            BaseHandle(oh.type_code() == ::ot_string ? oh : QPDFObjectHandle())
+        {
+        }
+
+        String(QPDFObjectHandle&& oh) :
+            BaseHandle(oh.type_code() == ::ot_string ? std::move(oh) : QPDFObjectHandle())
+        {
+        }
+
+        // Return the string value. If the object is not a valid string, throw a
+        // std::invalid_argument exception.
+        operator std::string() const&
+        {
+            return value();
+        }
+
+        // Return the string value. If the object is not a valid string, throw a
+        // std::invalid_argument exception.
+        std::string const& value() const;
+
+        // Return the string value. If the object is not a valid string, throw a
+        // std::invalid_argument exception.
+        std::string utf8_value() const;
+
+        // Return true if object value is equal to the 'rhs' value. Return false if the object is
+        // not a valid String.
+        friend bool
+        operator==(String const& lhs, std::string_view rhs)
+        {
+            return lhs && lhs.value() == rhs;
+        }
+    }; // class String
 
     template <typename T>
     T*
