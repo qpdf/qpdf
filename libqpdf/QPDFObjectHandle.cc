@@ -1040,7 +1040,15 @@ String::utf8_value() const
     if (!s) {
         throw invalid_error("String");
     }
-    return s->getUTF8Val();
+    if (util::is_utf16(s->val)) {
+        return QUtil::utf16_to_utf8(s->val);
+    }
+    if (util::is_explicit_utf8(s->val)) {
+        // PDF 2.0 allows UTF-8 strings when explicitly prefixed with the three-byte representation
+        // of U+FEFF.
+        return s->val.substr(3);
+    }
+    return QUtil::pdf_doc_to_utf8(s->val);
 }
 
 std::string

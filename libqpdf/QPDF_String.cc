@@ -150,17 +150,3 @@ QPDF_String::unparse(bool force_binary)
 
     return result;
 }
-
-std::string
-QPDF_String::getUTF8Val() const
-{
-    if (util::is_utf16(val)) {
-        return QUtil::utf16_to_utf8(val);
-    }
-    if (util::is_explicit_utf8(val)) {
-        // PDF 2.0 allows UTF-8 strings when explicitly prefixed with the three-byte representation
-        // of U+FEFF.
-        return val.substr(3);
-    }
-    return QUtil::pdf_doc_to_utf8(val);
-}
