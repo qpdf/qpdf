@@ -2,14 +2,6 @@
 
 #include <stdexcept>
 
-Pl_MD5::Pl_MD5(char const* identifier, Pipeline* next) :
-    Pipeline(identifier, next)
-{
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_MD5 with nullptr as next");
-    }
-}
-
 void
 Pl_MD5::write(unsigned char const* buf, size_t len)
 {
@@ -31,36 +23,7 @@ Pl_MD5::write(unsigned char const* buf, size_t len)
         }
     }
 
-    next()->write(buf, len);
-}
-
-void
-Pl_MD5::finish()
-{
-    next()->finish();
-    if (!persist_across_finish) {
-        in_progress = false;
+    if (next()) {
+        next()->write(buf, len);
     }
-}
-
-void
-Pl_MD5::enable(bool is_enabled)
-{
-    enabled = is_enabled;
-}
-
-void
-Pl_MD5::persistAcrossFinish(bool persist)
-{
-    persist_across_finish = persist;
-}
-
-std::string
-Pl_MD5::getHexDigest()
-{
-    if (!enabled) {
-        throw std::logic_error("digest requested for a disabled MD5 Pipeline");
-    }
-    in_progress = false;
-    return md5.unparse();
 }
