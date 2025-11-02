@@ -5,7 +5,10 @@
 #include <qpdf/Pl_MD5.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QUtil.hh>
+
+using namespace qpdf;
 
 class QPDFEFStreamObjectHelper::Members
 {
@@ -19,41 +22,38 @@ QPDFEFStreamObjectHelper::QPDFEFStreamObjectHelper(QPDFObjectHandle oh) :
 QPDFObjectHandle
 QPDFEFStreamObjectHelper::getParam(std::string const& pkey)
 {
-    auto params = oh().getDict().getKey("/Params");
-    if (params.isDictionary()) {
-        return params.getKey(pkey);
+    if (auto result = oh().getDict()["/Params"][pkey]) {
+        return result;
     }
-    return QPDFObjectHandle::newNull();
+    return {};
 }
 
 void
 QPDFEFStreamObjectHelper::setParam(std::string const& pkey, QPDFObjectHandle const& pval)
 {
-    auto params = oh().getDict().getKey("/Params");
-    if (!params.isDictionary()) {
-        params = oh().getDict().replaceKeyAndGetNew("/Params", QPDFObjectHandle::newDictionary());
+    if (Dictionary Params = oh().getDict()["/Params"]) {
+        Params.replaceKey(pkey, pval);
+        return;
     }
-    params.replaceKey(pkey, pval);
+    oh().getDict().replaceKey("/Params", Dictionary({{pkey, pval}}));
 }
 
 std::string
 QPDFEFStreamObjectHelper::getCreationDate()
 {
-    auto val = getParam("/CreationDate");
-    if (val.isString()) {
-        return val.getUTF8Value();
+    if (String CreationDate = getParam("/CreationDate")) {
+        return CreationDate.utf8_value();
     }
-    return "";
+    return {};
 }
 
 std::string
 QPDFEFStreamObjectHelper::getModDate()
 {
-    auto val = getParam("/ModDate");
-    if (val.isString()) {
-        return val.getUTF8Value();
+    if (String ModDate = getParam("/ModDate")) {
+        return ModDate.utf8_value();
     }
-    return "";
+    return {};
 }
 
 size_t
@@ -82,11 +82,10 @@ QPDFEFStreamObjectHelper::getSubtype()
 std::string
 QPDFEFStreamObjectHelper::getChecksum()
 {
-    auto val = getParam("/CheckSum");
-    if (val.isString()) {
-        return val.getStringValue();
+    if (String CheckSum = getParam("/CheckSum")) {
+        return CheckSum.value();
     }
-    return "";
+    return {};
 }
 
 QPDFEFStreamObjectHelper
