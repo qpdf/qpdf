@@ -7,9 +7,12 @@
 #include <qpdf/QPDF.hh>
 #include <qpdf/QUtil.hh>
 
+class QPDFEFStreamObjectHelper::Members
+{
+};
+
 QPDFEFStreamObjectHelper::QPDFEFStreamObjectHelper(QPDFObjectHandle oh) :
-    QPDFObjectHelper(oh),
-    m(new Members())
+    QPDFObjectHelper(oh)
 {
 }
 

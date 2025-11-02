@@ -92,17 +92,7 @@ class QPDFEFStreamObjectHelper: public QPDFObjectHelper
     void setParam(std::string const& pkey, QPDFObjectHandle const&);
     static QPDFEFStreamObjectHelper newFromStream(QPDFObjectHandle stream);
 
-    class Members
-    {
-        friend class QPDFEFStreamObjectHelper;
-
-      public:
-        ~Members() = default;
-
-      private:
-        Members() = default;
-        Members(Members const&) = delete;
-    };
+    class Members;
 
     std::shared_ptr<Members> m;
 };
