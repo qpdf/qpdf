@@ -376,7 +376,7 @@ QPDFObjectHandle
 QPDF::newStream(std::shared_ptr<Buffer> data)
 {
     auto result = newStream();
-    result.replaceStreamData(data, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+    result.replaceStreamData(data, {}, {});
     return result;
 }
 
@@ -384,14 +384,14 @@ QPDFObjectHandle
 QPDF::newStream(std::string const& data)
 {
     auto result = newStream();
-    result.replaceStreamData(data, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+    result.replaceStreamData(data, {}, {});
     return result;
 }
 
 QPDFObjectHandle
 QPDF::getObject(int objid, int generation)
 {
-    return getObject(QPDFObjGen(objid, generation));
+    return getObject({objid, generation});
 }
 
 QPDFObjectHandle
