@@ -318,7 +318,7 @@ BaseHandle::copy(bool shallow) const
         throw std::logic_error("attempted to shallow copy QPDFObjectHandle from destroyed QPDF");
         return {}; // does not return
     case ::ot_reference:
-        return obj->qpdf->getObject(obj->og).getObj();
+        return obj->qpdf->getObject(obj->og).obj_sp();
     }
     return {}; // unreachable
 }
@@ -470,7 +470,7 @@ BaseHandle::write_json(int json_version, JSON::Writer& p) const
                         p.writeNext() << "null";
                     }
                     p.writeNext();
-                    auto item_og = value.getObj()->getObjGen();
+                    auto item_og = value.id_gen();
                     if (item_og.isIndirect()) {
                         p << "\"" << item_og.unparse(' ') << " R\"";
                     } else {

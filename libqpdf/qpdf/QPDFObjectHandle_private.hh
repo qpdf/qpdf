@@ -621,6 +621,18 @@ namespace qpdf
     {
     }
 
+    inline std::shared_ptr<QPDFObject> const&
+    BaseHandle::obj_sp() const
+    {
+        return obj;
+    }
+
+    inline QPDFObjectHandle
+    BaseHandle::oh() const
+    {
+        return {obj};
+    }
+
     inline void
     BaseHandle::assign(qpdf_object_type_e required, BaseHandle const& other)
     {

@@ -1321,21 +1321,6 @@ class QPDFObjectHandle: public qpdf::BaseHandle
     {
         return obj;
     }
-    std::shared_ptr<QPDFObject>
-    getObj() const
-    {
-        return obj;
-    }
-    QPDFObject*
-    getObjectPtr()
-    {
-        return obj.get();
-    }
-    QPDFObject* const
-    getObjectPtr() const
-    {
-        return obj.get();
-    }
 
     void writeJSON(int json_version, JSON::Writer& p, bool dereference_indirect = false) const;
 

@@ -626,8 +626,8 @@ QPDFParser::fixMissingKeys()
 {
     std::set<std::string> names;
     for (auto& obj: frame->olist) {
-        if (obj.getObj()->getTypeCode() == ::ot_name) {
-            names.insert(obj.getObj()->getStringValue());
+        if (obj.raw_type_code() == ::ot_name) {
+            names.insert(obj.obj_sp()->getStringValue());
         }
     }
     int next_fake_key = 1;

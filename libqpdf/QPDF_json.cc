@@ -693,7 +693,7 @@ QPDF::JSONReactor::setObjectDescription(QPDFObjectHandle& oh, JSON const& value)
             QPDFObject::JSON_Descr(j_descr.input, cur_object));
     }
 
-    oh.getObjectPtr()->setDescription(&pdf, descr, value.getStart());
+    oh.obj_sp()->setDescription(&pdf, descr, value.getStart());
 }
 
 QPDFObjectHandle
