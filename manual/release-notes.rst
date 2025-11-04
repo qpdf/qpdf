@@ -65,6 +65,10 @@ more detail.
 
   - Other changes
 
+    - Calling ``QPDF::getRoot`` on a file with invalid trailer now throws a
+      ``damaged_pdf`` error with message "unable to find /Root dictionary"
+      rather than an internal error.
+
 .. _r12-3-0-deprecate:
 
     - The following are believed to be not in use and have been deprecated.
