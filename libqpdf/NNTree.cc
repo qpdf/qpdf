@@ -872,7 +872,7 @@ QPDFNameTreeObjectHelper::QPDFNameTreeObjectHelper(
 QPDFNameTreeObjectHelper
 QPDFNameTreeObjectHelper::newEmpty(QPDF& qpdf, bool auto_repair)
 {
-    return {qpdf.makeIndirectObject("<< /Names [] >>"_qpdf), qpdf, auto_repair};
+    return {qpdf.makeIndirectObject(Dictionary({{"/Names", Array::empty()}})), qpdf, auto_repair};
 }
 
 QPDFNameTreeObjectHelper::iterator::iterator(std::shared_ptr<NNTreeIterator> const& i) :
@@ -1068,7 +1068,7 @@ QPDFNumberTreeObjectHelper::QPDFNumberTreeObjectHelper(
 QPDFNumberTreeObjectHelper
 QPDFNumberTreeObjectHelper::newEmpty(QPDF& qpdf, bool auto_repair)
 {
-    return {qpdf.makeIndirectObject("<< /Nums [] >>"_qpdf), qpdf, auto_repair};
+    return {qpdf.makeIndirectObject(Dictionary({{"/Nums", Array::empty()}})), qpdf, auto_repair};
 }
 
 QPDFNumberTreeObjectHelper::iterator::iterator(std::shared_ptr<NNTreeIterator> const& i) :
