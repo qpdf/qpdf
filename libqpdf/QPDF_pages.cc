@@ -121,7 +121,7 @@ Pages::getAllPagesInternal(
         // Unconditionally setting the /Type to /Pages could cause problems, but trying to
         // accommodate the possibility may be excessive.
         cur_node.warn("/Type key should be /Pages but is not; overriding");
-        cur_node.replaceKey("/Type", "/Pages"_qpdf);
+        cur_node.replaceKey("/Type", Name("/Pages"));
     }
     if (!media_box) {
         media_box = cur_node.getKey("/MediaBox").isRectangle();
@@ -226,7 +226,7 @@ Pages::getAllPagesInternal(
             }
             if (!kid.isDictionaryOfType("/Page")) {
                 kid.warn("/Type key should be /Page but is not; overriding");
-                kid.replaceKey("/Type", "/Page"_qpdf);
+                kid.replaceKey("/Type", Name("/Page"));
                 ++errors;
             }
             if (m->reconstructed_xref && errors > 2) {
@@ -698,7 +698,7 @@ Pages::flatten_annotations_for_page(
             std::string content =
                 aoh.getPageContentForAppearance(name, rotate, required_flags, forbidden_flags);
             if (!content.empty()) {
-                resources.mergeResources("<< /XObject << >> >>"_qpdf);
+                resources.mergeResources(Dictionary({{"/XObject", Dictionary({{name, as}})}}));
                 resources.getKey("/XObject").replaceKey(name, as);
                 ++next_fx;
             }

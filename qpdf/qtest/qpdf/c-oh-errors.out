@@ -1,8 +1,8 @@
-get root: attempted to dereference an uninitialized QPDFObjectHandle
-  code: 1
-  file: 
+get root: closed input source: unable to find /Root dictionary
+  code: 5
+  file: closed input source
   pos: 0
-  text: attempted to dereference an uninitialized QPDFObjectHandle
+  text: unable to find /Root dictionary
 bad parse: parsed object (offset 1): unknown token while reading object; treating as string
   code: 5
   file: parsed object

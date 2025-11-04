@@ -635,21 +635,11 @@ QPDF::getPDFVersion() const
 int
 QPDF::getExtensionLevel()
 {
-    int result = 0;
-    QPDFObjectHandle obj = getRoot();
-    if (obj.hasKey("/Extensions")) {
-        obj = obj.getKey("/Extensions");
-        if (obj.isDictionary() && obj.hasKey("/ADBE")) {
-            obj = obj.getKey("/ADBE");
-            if (obj.isDictionary() && obj.hasKey("/ExtensionLevel")) {
-                obj = obj.getKey("/ExtensionLevel");
-                if (obj.isInteger()) {
-                    result = obj.getIntValueAsInt();
-                }
-            }
-        }
+    if (Integer ExtensionLevel = getRoot()["/Extensions"]["/ADBE"]["/ExtensionLevel"]) {
+        int result = ExtensionLevel;
+        return result;
     }
-    return result;
+    return 0;
 }
 
 QPDFObjectHandle
@@ -661,17 +651,17 @@ QPDF::getTrailer()
 QPDFObjectHandle
 QPDF::getRoot()
 {
-    QPDFObjectHandle root = m->trailer.getKey("/Root");
-    if (!root.isDictionary()) {
+    Dictionary Root = m->trailer["/Root"];
+    if (!Root) {
         throw m->c.damagedPDF("", -1, "unable to find /Root dictionary");
-    } else if (
-        // Check_mode is an interim solution to request #810 pending a more comprehensive review of
-        // the approach to more extensive checks and warning levels.
-        m->cf.check_mode() && !root.getKey("/Type").isNameAndEquals("/Catalog")) {
-        warn(m->c.damagedPDF("", -1, "catalog /Type entry missing or invalid"));
-        root.replaceKey("/Type", "/Catalog"_qpdf);
     }
-    return root;
+    // Check_mode is an interim solution to request #810 pending a more comprehensive review of the
+    // approach to more extensive checks and warning levels.
+    if (m->cf.check_mode() && Name(Root["/Type"]) != "/Catalog") {
+        warn(m->c.damagedPDF("", -1, "catalog /Type entry missing or invalid"));
+        Root.replaceKey("/Type", Name("/Catalog"));
+    }
+    return Root.oh();
 }
 
 std::map<QPDFObjGen, QPDFXRefEntry>

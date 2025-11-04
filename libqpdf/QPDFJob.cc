@@ -1883,7 +1883,7 @@ QPDFJob::doUnderOverlayForPage(
             fo[from_no.no][uo_idx], name, dest_page.getTrimBox().getArrayAsRectangle(), cm);
         dest_page.copyAnnotations(from_page, cm, &dest_afdh, &from_page.qpdf()->doc().acroform());
         if (!new_content.empty()) {
-            resources.mergeResources("<< /XObject << >> >>"_qpdf);
+            resources.mergeResources(Dictionary({{"/XObject", Dictionary::empty()}}));
             auto xobject = resources.getKey("/XObject");
             if (xobject.isDictionary()) {
                 xobject.replaceKey(name, fo[from_no.no][uo_idx]);

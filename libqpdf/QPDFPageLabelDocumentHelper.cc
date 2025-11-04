@@ -131,19 +131,19 @@ QPDFPageLabelDocumentHelper::pageLabelDict(
     case pl_none:
         break;
     case pl_digits:
-        num.replaceKey("/S", "/D"_qpdf);
+        num.replaceKey("/S", Name("/D"));
         break;
     case pl_alpha_lower:
-        num.replaceKey("/S", "/a"_qpdf);
+        num.replaceKey("/S", Name("/a"));
         break;
     case pl_alpha_upper:
-        num.replaceKey("/S", "/A"_qpdf);
+        num.replaceKey("/S", Name("/A"));
         break;
     case pl_roman_lower:
-        num.replaceKey("/S", "/r"_qpdf);
+        num.replaceKey("/S", Name("/r"));
         break;
     case pl_roman_upper:
-        num.replaceKey("/S", "/R"_qpdf);
+        num.replaceKey("/S", Name("/R"));
         break;
     }
     if (!prefix.empty()) {
