@@ -765,7 +765,7 @@ QPDFFormFieldObjectHelper::generateTextAppearance(QPDFAnnotationObjectHelper& ao
         return;
     }
 
-    if (AS.getObj().use_count() > 4) {
+    if (AS.obj_sp().use_count() > 3) {
         aoh.warn("unable to generate text appearance from shared appearance stream for update");
         return;
     }

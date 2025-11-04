@@ -105,6 +105,9 @@ namespace qpdf
         void warn(QPDFExc&&) const;
         void warn(std::string const& warning) const;
 
+        inline std::shared_ptr<QPDFObject> const& obj_sp() const;
+        inline QPDFObjectHandle oh() const;
+
       protected:
         BaseHandle() = default;
         BaseHandle(std::shared_ptr<QPDFObject> const& obj) :

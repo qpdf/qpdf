@@ -74,6 +74,19 @@ namespace qpdf::util
         s.insert(0, 1, '1');
     }
 
+    inline bool
+    is_utf16(std::string const& str)
+    {
+        return str.starts_with("\xfe\xff") || str.starts_with("\xff\xfe");
+    }
+
+    inline bool
+    is_explicit_utf8(std::string const& str)
+    {
+        // QPDF_String.cc knows that this is a 3-byte sequence.
+        return str.starts_with("\xef\xbb\xbf");
+    }
+
     std::string random_string(size_t len);
 
 } // namespace qpdf::util

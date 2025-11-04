@@ -1554,7 +1554,7 @@ Objects::readObjectAtOffset(
             break;
         }
     }
-    m->objects.updateCache(og, oh.getObj(), end_before_space, m->file->tell());
+    m->objects.updateCache(og, oh.obj_sp(), end_before_space, m->file->tell());
 }
 
 QPDFObjectHandle
@@ -1613,7 +1613,7 @@ Objects::readObjectAtOffset(
             break;
         }
     }
-    m->objects.updateCache(og, oh.getObj(), end_before_space, m->file->tell());
+    m->objects.updateCache(og, oh.obj_sp(), end_before_space, m->file->tell());
 
     return oh;
 }
@@ -1805,7 +1805,7 @@ Objects::resolveObjectsInStream(int obj_stream_number)
             entry->second.getObjStreamNumber() == obj_stream_number) {
             is::OffsetBuffer in("", {b_start + obj_offset, obj_size}, obj_offset);
             auto oh = readObjectInStream(in, obj_stream_number, obj_id);
-            updateCache(og, oh.getObj(), end_before_space, end_after_space);
+            updateCache(og, oh.obj_sp(), end_before_space, end_after_space);
         } else {
             QTC::TC("qpdf", "QPDF not caching overridden objstm object");
         }
@@ -1874,7 +1874,7 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
     if (!oh) {
         throw std::logic_error("attempted to make an uninitialized QPDFObjectHandle indirect");
     }
-    return m->objects.makeIndirectFromQPDFObject(oh.getObj());
+    return m->objects.makeIndirectFromQPDFObject(oh.obj_sp());
 }
 
 std::shared_ptr<QPDFObject>
@@ -1935,7 +1935,7 @@ QPDF::replaceObject(QPDFObjGen og, QPDFObjectHandle oh)
     if (!oh || (oh.isIndirect() && !(oh.isStream() && oh.getObjGen() == og))) {
         throw std::logic_error("QPDF::replaceObject called with indirect object handle");
     }
-    m->objects.updateCache(og, oh.getObj(), -1, -1, false);
+    m->objects.updateCache(og, oh.obj_sp(), -1, -1, false);
 }
 
 void

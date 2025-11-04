@@ -30,6 +30,7 @@ namespace qpdf
     class Integer;
     class Name;
     class Stream;
+    class String;
 
     namespace impl
     {
@@ -261,20 +262,24 @@ class QPDF_String final
 {
     friend class QPDFObject;
     friend class qpdf::BaseHandle;
+    friend class qpdf::String;
     friend class qpdf::impl::Writer;
 
   public:
-    static std::shared_ptr<QPDFObject> create_utf16(std::string const& utf8_val);
     std::string unparse(bool force_binary = false);
     void writeJSON(int json_version, JSON::Writer& p);
-    std::string getUTF8Val() const;
 
   private:
-    QPDF_String(std::string val) :
+    QPDF_String(std::string const& val) :
+        val(val)
+    {
+    }
+    QPDF_String(std::string&& val) :
         val(std::move(val))
     {
     }
     bool useHexString() const;
+
     std::string val;
 };
 
