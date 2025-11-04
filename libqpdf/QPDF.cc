@@ -635,21 +635,11 @@ QPDF::getPDFVersion() const
 int
 QPDF::getExtensionLevel()
 {
-    int result = 0;
-    QPDFObjectHandle obj = getRoot();
-    if (obj.hasKey("/Extensions")) {
-        obj = obj.getKey("/Extensions");
-        if (obj.isDictionary() && obj.hasKey("/ADBE")) {
-            obj = obj.getKey("/ADBE");
-            if (obj.isDictionary() && obj.hasKey("/ExtensionLevel")) {
-                obj = obj.getKey("/ExtensionLevel");
-                if (obj.isInteger()) {
-                    result = obj.getIntValueAsInt();
-                }
-            }
-        }
+    if (Integer ExtensionLevel = getRoot()["/Extensions"]["/ADBE"]["/ExtensionLevel"]) {
+        int result = ExtensionLevel;
+        return result;
     }
-    return result;
+    return 0;
 }
 
 QPDFObjectHandle
