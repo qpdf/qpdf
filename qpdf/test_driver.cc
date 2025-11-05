@@ -2644,6 +2644,8 @@ test_76(QPDF& pdf, char const* arg2)
         "att2", QPDFFileSpecObjectHelper::createFileSpec(pdf, "att2.txt", efs2));
     auto fs3 = QPDFFileSpecObjectHelper::createFileSpec(pdf, "att3.txt", efs3);
     efdh.replaceEmbeddedFile("att3", fs3);
+    fs3.setFilename("\xcf\x80.txt");
+    assert(fs3.getFilename() == "\xcf\x80.txt");
     fs3.setFilename("\xcf\x80.txt", "att3.txt");
 
     assert(efs1.getCreationDate() == "D:20210207191121-05'00'");
