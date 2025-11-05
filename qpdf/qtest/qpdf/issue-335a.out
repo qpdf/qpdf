@@ -39,12 +39,14 @@ WARNING: issue-335a.pdf (trailer, offset 22844): expected dictionary keys but fo
 WARNING: issue-335a.pdf (trailer, offset 22880): stream keyword found in trailer
 WARNING: issue-335a.pdf (trailer, offset 22840): recovered trailer has no /Root entry
 WARNING: issue-335a.pdf (trailer, offset 22702): unknown token while reading object; treating as null
+WARNING: issue-335a.pdf (trailer, offset 22713): treating bad indirect reference (0 0 R) as null
 WARNING: issue-335a.pdf (trailer, offset 22701): expected dictionary keys but found non-name objects; ignoring
 WARNING: issue-335a.pdf (trailer, offset 22746): stream keyword found in trailer
 WARNING: issue-335a.pdf (trailer, offset 22697): recovered trailer has no /Root entry
 WARNING: issue-335a.pdf (trailer, offset 22687): unknown token while reading object; treating as null
 WARNING: issue-335a.pdf (trailer, offset 22690): unknown token while reading object; treating as null
 WARNING: issue-335a.pdf (trailer, offset 22702): unknown token while reading object; treating as null
+WARNING: issue-335a.pdf (trailer, offset 22713): treating bad indirect reference (0 0 R) as null
 WARNING: issue-335a.pdf (trailer, offset 22701): expected dictionary keys but found non-name objects; ignoring
 WARNING: issue-335a.pdf (trailer, offset 22740): unknown token while reading object; treating as null
 WARNING: issue-335a.pdf (trailer, offset 22748): unknown token while reading object; treating as null
@@ -58,6 +60,7 @@ WARNING: issue-335a.pdf (trailer, offset 22675): unknown token while reading obj
 WARNING: issue-335a.pdf (trailer, offset 22687): unknown token while reading object; treating as null
 WARNING: issue-335a.pdf (trailer, offset 22690): unknown token while reading object; treating as null
 WARNING: issue-335a.pdf (trailer, offset 22702): unknown token while reading object; treating as null
+WARNING: issue-335a.pdf (trailer, offset 22713): treating bad indirect reference (0 0 R) as null
 WARNING: issue-335a.pdf (trailer, offset 22701): expected dictionary keys but found non-name objects; ignoring
 WARNING: issue-335a.pdf (trailer, offset 22740): unknown token while reading object; treating as null
 WARNING: issue-335a.pdf (trailer, offset 22748): unknown token while reading object; treating as null
@@ -66,6 +69,8 @@ WARNING: issue-335a.pdf (trailer, offset 22791): unknown token while reading obj
 WARNING: issue-335a.pdf (trailer, offset 22794): unexpected >
 WARNING: issue-335a.pdf (trailer, offset 22794): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 22437): unknown token while reading object; treating as null
+WARNING: issue-335a.pdf (trailer, offset 22448): treating bad indirect reference (0 0 R) as null
+WARNING: issue-335a.pdf (trailer, offset 22471): treating bad indirect reference (20 -1 R) as null
 WARNING: issue-335a.pdf (trailer, offset 22436): expected dictionary keys but found non-name objects; ignoring
 WARNING: issue-335a.pdf (trailer, offset 22482): stream keyword found in trailer
 WARNING: issue-335a.pdf (trailer, offset 22432): recovered trailer has no /Root entry
@@ -98,27 +103,30 @@ WARNING: issue-335a.pdf (trailer, offset 22134): stream keyword found in trailer
 WARNING: issue-335a.pdf (trailer, offset 22083): recovered trailer has no /Root entry
 WARNING: issue-335a.pdf (trailer, offset 22000): invalid character (t) in hexstring
 WARNING: issue-335a.pdf (trailer, offset 21937): unknown token while reading object; treating as null
+WARNING: issue-335a.pdf (trailer, offset 21948): treating bad indirect reference (0 0 R) as null
 WARNING: issue-335a.pdf (trailer, offset 21962): unknown token while reading object; treating as null
 WARNING: issue-335a.pdf (trailer, offset 21991): unknown token while reading object; treating as null
 WARNING: issue-335a.pdf (trailer, offset 22000): invalid character (t) in hexstring
 WARNING: issue-335a.pdf (trailer, offset 22003): unknown token while reading object; treating as null
-WARNING: issue-335a.pdf (trailer, offset 21936): dictionary has duplicated key /Length; last occurrence overrides earlier ones
-WARNING: issue-335a.pdf (trailer, offset 22028): unexpected >
-WARNING: issue-335a.pdf (trailer, offset 22030): unknown token while reading object; treating as null
-WARNING: issue-335a.pdf (trailer, offset 22038): unknown token while reading object; treating as null
-WARNING: issue-335a.pdf (trailer, offset 22038): too many errors; giving up on reading object
-WARNING: issue-335a.pdf (trailer, offset 21918): unknown token while reading object; treating as null
-WARNING: issue-335a.pdf (trailer, offset 21925): unknown token while reading object; treating as null
-WARNING: issue-335a.pdf (trailer, offset 21937): unknown token while reading object; treating as null
-WARNING: issue-335a.pdf (trailer, offset 21962): unknown token while reading object; treating as null
-WARNING: issue-335a.pdf (trailer, offset 21991): unknown token while reading object; treating as null
-WARNING: issue-335a.pdf (trailer, offset 22000): invalid character (t) in hexstring
-WARNING: issue-335a.pdf (trailer, offset 22003): unknown token while reading object; treating as null
+WARNING: issue-335a.pdf (trailer, offset 22026): treating bad indirect reference (-4 0 R) as null
 WARNING: issue-335a.pdf (trailer, offset 21936): dictionary has duplicated key /Length; last occurrence overrides earlier ones
 WARNING: issue-335a.pdf (trailer, offset 22028): unexpected >
 WARNING: issue-335a.pdf (trailer, offset 22030): unknown token while reading object; treating as null
 WARNING: issue-335a.pdf (trailer, offset 22030): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 21918): unknown token while reading object; treating as null
+WARNING: issue-335a.pdf (trailer, offset 21925): unknown token while reading object; treating as null
+WARNING: issue-335a.pdf (trailer, offset 21937): unknown token while reading object; treating as null
+WARNING: issue-335a.pdf (trailer, offset 21948): treating bad indirect reference (0 0 R) as null
+WARNING: issue-335a.pdf (trailer, offset 21962): unknown token while reading object; treating as null
+WARNING: issue-335a.pdf (trailer, offset 21991): unknown token while reading object; treating as null
+WARNING: issue-335a.pdf (trailer, offset 22000): invalid character (t) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 22003): unknown token while reading object; treating as null
+WARNING: issue-335a.pdf (trailer, offset 22026): treating bad indirect reference (-4 0 R) as null
+WARNING: issue-335a.pdf (trailer, offset 21936): dictionary has duplicated key /Length; last occurrence overrides earlier ones
+WARNING: issue-335a.pdf (trailer, offset 22028): unexpected >
+WARNING: issue-335a.pdf (trailer, offset 22028): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 21837): unknown token while reading object; treating as null
+WARNING: issue-335a.pdf (trailer, offset 21861): treating bad indirect reference (0 0 R) as null
 WARNING: issue-335a.pdf (trailer, offset 21850): expected dictionary keys but found non-name objects; ignoring
 WARNING: issue-335a.pdf (trailer, offset 21892): unknown token while reading object; treating as null
 WARNING: issue-335a.pdf (trailer, offset 21900): unknown token while reading object; treating as null

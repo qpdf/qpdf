@@ -6,11 +6,8 @@ WARNING: issue-1503.pdf (object 31 0, offset 813): unknown token while reading o
 WARNING: issue-1503.pdf (object 31 0, offset 851): unknown token while reading object; treating as null
 WARNING: issue-1503.pdf (object 31 0, offset 856): unknown token while reading object; treating as null
 WARNING: issue-1503.pdf (object 31 0, offset 861): unexpected 'endobj' or 'endstream' while reading object; giving up on reading object
-WARNING: issue-1503.pdf (object 31 0, offset 871): expected endobj
 WARNING: issue-1503.pdf (object 38 0, offset 1126): unexpected 'endobj' or 'endstream' while reading object; giving up on reading object
-WARNING: issue-1503.pdf (object 38 0, offset 1133): expected endobj
 WARNING: issue-1503.pdf (object 40 0, offset 1195): unexpected array close token; giving up on reading object
-WARNING: issue-1503.pdf (object 40 0, offset 1198): expected endobj
 WARNING: issue-1503.pdf (object 41 0, offset 1359): stream dictionary lacks /Length key
 WARNING: issue-1503.pdf (object 41 0, offset 1411): attempting to recover stream length
 WARNING: issue-1503.pdf (object 41 0, offset 1411): recovered stream length: 54
@@ -22,9 +19,7 @@ WARNING: issue-1503.pdf (object 44 0, offset 1814): name with stray # will not w
 WARNING: issue-1503.pdf (object 44 0, offset 1821): unknown token while reading object; treating as null
 WARNING: issue-1503.pdf (object 44 0, offset 1826): unknown token while reading object; treating as null
 WARNING: issue-1503.pdf (object 44 0, offset 1826): too many errors; giving up on reading object
-WARNING: issue-1503.pdf (object 44 0, offset 1829): expected endobj
 WARNING: issue-1503.pdf (object 46 0, offset 1923): unexpected array close token; giving up on reading object
-WARNING: issue-1503.pdf (object 46 0, offset 1926): expected endobj
 WARNING: issue-1503.pdf (object 47 0, offset 2087): stream dictionary lacks /Length key
 WARNING: issue-1503.pdf (object 47 0, offset 2139): attempting to recover stream length
 WARNING: issue-1503.pdf (object 47 0, offset 2139): recovered stream length: 54
@@ -59,8 +54,6 @@ WARNING: issue-1503.pdf (object 151 0, offset 3836): unknown token while reading
 WARNING: issue-1503.pdf (object 151 0, offset 3958): unknown token while reading object; treating as null
 WARNING: issue-1503.pdf (object 152 0, offset 4088): parse error while reading object
 WARNING: issue-1503.pdf (object 152 0, offset 4088): unexpected EOF
-WARNING: issue-1503.pdf (object 152 0, offset 4088): expected endobj
-WARNING: issue-1503.pdf (object 152 0, offset 4088): EOF after endobj
 WARNING: issue-1503.pdf (object 155 0, offset 162): unknown token while reading object; treating as null
 WARNING: issue-1503.pdf (object 155 0, offset 342): unknown token while reading object; treating as null
 WARNING: issue-1503.pdf (object 155 0, offset 345): unknown token while reading object; treating as null

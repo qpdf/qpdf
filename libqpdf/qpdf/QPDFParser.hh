@@ -5,13 +5,24 @@
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDFTokenizer_private.hh>
+#include <qpdf/global_private.hh>
 
 #include <memory>
 #include <string>
 
+using namespace qpdf;
+using namespace qpdf::global;
+
 class QPDFParser
 {
   public:
+    class Error: public std::exception
+    {
+      public:
+        Error() = default;
+        virtual ~Error() noexcept = default;
+    };
+
     static QPDFObjectHandle
     parse(InputSource& input, std::string const& object_description, QPDF* context);
 
@@ -30,8 +41,8 @@ class QPDFParser
         QPDFObjectHandle::StringDecrypter* decrypter,
         QPDF* context);
 
-    // For use by QPDF. Return parsed object and whether it is empty.
-    static std::pair<QPDFObjectHandle, bool> parse(
+    // For use by QPDF.
+    static QPDFObjectHandle parse(
         InputSource& input,
         std::string const& object_description,
         qpdf::Tokenizer& tokenizer,
@@ -39,7 +50,7 @@ class QPDFParser
         QPDF& context,
         bool sanity_checks);
 
-    static std::pair<QPDFObjectHandle, bool> parse(
+    static QPDFObjectHandle parse(
         qpdf::is::OffsetBuffer& input,
         int stream_id,
         int obj_id,
@@ -101,14 +112,16 @@ class QPDFParser
         int null_count{0};
     };
 
-    QPDFObjectHandle parse(bool& empty, bool content_stream);
+    QPDFObjectHandle parse(bool content_stream = false);
+    QPDFObjectHandle parse_first(bool content_stream);
     QPDFObjectHandle parseRemainder(bool content_stream);
     void add(std::shared_ptr<QPDFObject>&& obj);
     void addNull();
+    void add_bad_null(std::string const& msg);
     void addInt(int count);
     template <typename T, typename... Args>
     void addScalar(Args&&... args);
-    bool tooManyBadTokens();
+    void check_too_many_bad_tokens();
     void warnDuplicateKey();
     void fixMissingKeys();
     void warn(qpdf_offset_t offset, std::string const& msg) const;
@@ -136,7 +149,7 @@ class QPDFParser
     // it only gets incremented or reset when a bad token is encountered.
     int bad_count{0};
     // Number of bad tokens (remaining) before giving up.
-    int max_bad_count{15};
+    uint32_t max_bad_count{Limits::objects_max_errors()};
     // Number of good tokens since last bad token. Irrelevant if bad_count == 0.
     int good_count{0};
     // Start offset including any leading whitespace.
@@ -145,6 +158,7 @@ class QPDFParser
     int int_count{0};
     long long int_buffer[2]{0, 0};
     qpdf_offset_t last_offset_buffer[2]{0, 0};
+    bool empty_{false};
 };
 
 #endif // QPDFPARSER_HH

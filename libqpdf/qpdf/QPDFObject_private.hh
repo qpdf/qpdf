@@ -5,11 +5,12 @@
 // include/qpdf/QPDFObject.hh. See comments there for an explanation.
 
 #include <qpdf/Constants.h>
+#include <qpdf/Types.h>
+
 #include <qpdf/JSON.hh>
 #include <qpdf/JSON_writer.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjGen.hh>
-#include <qpdf/Types.h>
 
 #include <map>
 #include <memory>
