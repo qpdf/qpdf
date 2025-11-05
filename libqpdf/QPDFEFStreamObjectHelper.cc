@@ -58,9 +58,9 @@ QPDFEFStreamObjectHelper::getModDate()
 size_t
 QPDFEFStreamObjectHelper::getSize()
 {
-    auto val = getParam("/Size");
-    if (val.isInteger()) {
-        return QIntC::to_size(val.getUIntValueAsUInt());
+    if (Integer Size = getParam("/Size")) {
+        size_t result = Size;
+        return result;
     }
     return 0;
 }
@@ -68,14 +68,12 @@ QPDFEFStreamObjectHelper::getSize()
 std::string
 QPDFEFStreamObjectHelper::getSubtype()
 {
-    auto val = oh().getDict().getKey("/Subtype");
-    if (val.isName()) {
-        auto n = val.getName();
-        if (n.length() > 1) {
-            return n.substr(1);
+    if (Name Subtype = oh().getDict()["/Subtype"]) {
+        if (Subtype.value().size() > 1) {
+            return Subtype.value().substr(1);
         }
     }
-    return "";
+    return {};
 }
 
 std::string
@@ -110,14 +108,14 @@ QPDFEFStreamObjectHelper::createEFStream(QPDF& qpdf, std::function<void(Pipeline
 QPDFEFStreamObjectHelper&
 QPDFEFStreamObjectHelper::setCreationDate(std::string const& date)
 {
-    setParam("/CreationDate", QPDFObjectHandle::newString(date));
+    setParam("/CreationDate", String(date));
     return *this;
 }
 
 QPDFEFStreamObjectHelper&
 QPDFEFStreamObjectHelper::setModDate(std::string const& date)
 {
-    setParam("/ModDate", QPDFObjectHandle::newString(date));
+    setParam("/ModDate", String(date));
     return *this;
 }
 
