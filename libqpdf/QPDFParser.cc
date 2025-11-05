@@ -51,7 +51,6 @@ QPDFObjectHandle
 QPDFParser::parse(InputSource& input, std::string const& object_description, QPDF* context)
 {
     qpdf::Tokenizer tokenizer;
-    bool empty = false;
     if (auto result = QPDFParser(
                           input,
                           make_description(input.getName(), object_description),
@@ -60,7 +59,7 @@ QPDFParser::parse(InputSource& input, std::string const& object_description, QPD
                           nullptr,
                           context,
                           false)
-                          .parse(empty, false)) {
+                          .parse()) {
         return result;
     }
     return {QPDFObject::create<QPDF_Null>()};
@@ -73,23 +72,24 @@ QPDFParser::parse_content(
     qpdf::Tokenizer& tokenizer,
     QPDF* context)
 {
-    bool empty = false;
-    if (auto result = QPDFParser(
-                          input,
-                          std::move(sp_description),
-                          "content",
-                          tokenizer,
-                          nullptr,
-                          context,
-                          true,
-                          0,
-                          0,
-                          context && context->doc().reconstructed_xref())
-                          .parse(empty, true)) {
+    static const std::string content("content"); // GCC12 - make constexpr
+    auto p = QPDFParser(
+        input,
+        std::move(sp_description),
+        content,
+        tokenizer,
+        nullptr,
+        context,
+        true,
+        0,
+        0,
+        context && context->doc().reconstructed_xref());
+    auto result = p.parse(true);
+    if (result || p.empty_) {
+        // In content stream mode, leave object uninitialized to indicate EOF
         return result;
     }
-    // In content stream mode, leave object uninitialized to indicate EOF
-    return {empty ? nullptr : QPDFObject::create<QPDF_Null>()};
+    return {QPDFObject::create<QPDF_Null>()};
 }
 
 QPDFObjectHandle
@@ -101,21 +101,25 @@ QPDFParser::parse(
     QPDFObjectHandle::StringDecrypter* decrypter,
     QPDF* context)
 {
-    if (auto result = QPDFParser(
-                          input,
-                          make_description(input.getName(), object_description),
-                          object_description,
-                          *tokenizer.m,
-                          decrypter,
-                          context,
-                          false)
-                          .parse(empty, false)) {
+    // ABI: This parse overload is only used by the deprecated QPDFObjectHandle::parse. It is the
+    // only user of the 'empty' member. When removing this overload also remove 'empty'.
+    auto p = QPDFParser(
+        input,
+        make_description(input.getName(), object_description),
+        object_description,
+        *tokenizer.m,
+        decrypter,
+        context,
+        false);
+    auto result = p.parse();
+    empty = p.empty_;
+    if (result) {
         return result;
     }
     return {QPDFObject::create<QPDF_Null>()};
 }
 
-std::pair<QPDFObjectHandle, bool>
+QPDFObjectHandle
 QPDFParser::parse(
     InputSource& input,
     std::string const& object_description,
@@ -124,55 +128,44 @@ QPDFParser::parse(
     QPDF& context,
     bool sanity_checks)
 {
-    bool empty{false};
-    auto result = QPDFParser(
-                      input,
-                      make_description(input.getName(), object_description),
-                      object_description,
-                      tokenizer,
-                      decrypter,
-                      &context,
-                      true,
-                      0,
-                      0,
-                      sanity_checks)
-                      .parse(empty, false);
-    if (result) {
-        return {result, empty};
-    }
-    return {QPDFObject::create<QPDF_Null>(), empty};
-}
-
-std::pair<QPDFObjectHandle, bool>
-QPDFParser::parse(
-    is::OffsetBuffer& input, int stream_id, int obj_id, qpdf::Tokenizer& tokenizer, QPDF& context)
-{
-    bool empty{false};
-    auto result = QPDFParser(
-                      input,
-                      std::make_shared<QPDFObject::Description>(
-                          QPDFObject::ObjStreamDescr(stream_id, obj_id)),
-                      "",
-                      tokenizer,
-                      nullptr,
-                      &context,
-                      true,
-                      stream_id,
-                      obj_id)
-                      .parse(empty, false);
-
-    if (result) {
-        return {result, empty};
-    }
-    return {QPDFObject::create<QPDF_Null>(), empty};
+    return QPDFParser(
+               input,
+               make_description(input.getName(), object_description),
+               object_description,
+               tokenizer,
+               decrypter,
+               &context,
+               true,
+               0,
+               0,
+               sanity_checks)
+        .parse();
 }
 
 QPDFObjectHandle
-QPDFParser::parse(bool& empty, bool content_stream)
+QPDFParser::parse(
+    is::OffsetBuffer& input, int stream_id, int obj_id, qpdf::Tokenizer& tokenizer, QPDF& context)
+{
+    return QPDFParser(
+               input,
+               std::make_shared<QPDFObject::Description>(
+                   QPDFObject::ObjStreamDescr(stream_id, obj_id)),
+               "",
+               tokenizer,
+               nullptr,
+               &context,
+               true,
+               stream_id,
+               obj_id)
+        .parse();
+}
+
+QPDFObjectHandle
+QPDFParser::parse(bool content_stream)
 {
     try {
-        return parse_first(empty, content_stream);
-    } catch (Error& e) {
+        return parse_first(content_stream);
+    } catch (Error&) {
         return {};
     } catch (QPDFExc& e) {
         throw e;
@@ -185,15 +178,14 @@ QPDFParser::parse(bool& empty, bool content_stream)
 }
 
 QPDFObjectHandle
-QPDFParser::parse_first(bool& empty, bool content_stream)
+QPDFParser::parse_first(bool content_stream)
 {
     // This method must take care not to resolve any objects. Don't check the type of any object
     // without first ensuring that it is a direct object. Otherwise, doing so may have the side
     // effect of reading the object and changing the file pointer. If you do this, it will cause a
     // logic error to be thrown from QPDF::inParse().
 
-    ParseGuard pg(context);
-    empty = false;
+    QPDF::Doc::ParseGuard pg(context);
     start = input.tell();
     if (!tokenizer.nextToken(input, object_description)) {
         warn(tokenizer.getErrorMessage());
@@ -203,7 +195,7 @@ QPDFParser::parse_first(bool& empty, bool content_stream)
     case QPDFTokenizer::tt_eof:
         if (content_stream) {
             // In content stream mode, leave object uninitialized to indicate EOF
-            empty = true;
+            empty_ = true;
             return {};
         }
         warn("unexpected EOF");
@@ -255,10 +247,15 @@ QPDFParser::parse_first(bool& empty, bool content_stream)
             if (content_stream) {
                 return withDescription<QPDF_Operator>(value);
             } else if (value == "endobj") {
-                // We just saw endobj without having read anything.  Treat this as a null and do
-                // not move the input source's offset.
+                // We just saw endobj without having read anything. Nothing in the PDF spec appears
+                // to allow empty objects, but they have been encountered in actual PDF files and
+                // Adobe Reader appears to ignore them. Treat this as a null and do not move the
+                // input source's offset.
+                empty_ = true;
                 input.seek(input.getLastOffset(), SEEK_SET);
-                empty = true;
+                if (!content_stream) {
+                    warn("empty object treated as null");
+                }
                 return {};
             } else {
                 warn("unknown token while reading object; treating as string");

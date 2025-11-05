@@ -8,7 +8,6 @@ WARNING: issue-101.pdf (object 11 0, offset 637): unknown token while reading ob
 WARNING: issue-101.pdf (object 11 0, offset 639): unknown token while reading object; treating as null
 WARNING: issue-101.pdf (object 11 0, offset 644): unknown token while reading object; treating as null
 WARNING: issue-101.pdf (object 11 0, offset 644): too many errors; giving up on reading object
-WARNING: issue-101.pdf (object 11 0, offset 647): expected endobj
 WARNING: issue-101.pdf (trailer, offset 4433): recovered trailer has no /Root entry
 WARNING: issue-101.pdf (trailer, offset 4183): stream keyword found in trailer
 WARNING: issue-101.pdf (trailer, offset 4113): recovered trailer has no /Root entry
@@ -40,9 +39,7 @@ WARNING: issue-101.pdf (object 7 0, offset 3866): unknown token while reading ob
 WARNING: issue-101.pdf (object 7 0, offset 3873): unknown token while reading object; treating as null
 WARNING: issue-101.pdf (object 7 0, offset 3879): unknown token while reading object; treating as null
 WARNING: issue-101.pdf (object 7 0, offset 3879): too many errors; giving up on reading object
-WARNING: issue-101.pdf (object 7 0, offset 3888): expected endobj
 WARNING: issue-101.pdf (object 8 0, offset 4067): invalid character ()) in hexstring
-WARNING: issue-101.pdf (object 8 0, offset 4069): expected endobj
 WARNING: issue-101.pdf (object 9 0, offset 2832): unknown token while reading object; treating as string
 WARNING: issue-101.pdf (object 9 0, offset 2834): expected endobj
 qpdf: issue-101.pdf: unable to find trailer dictionary while recovering damaged file

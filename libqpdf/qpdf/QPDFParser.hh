@@ -41,8 +41,8 @@ class QPDFParser
         QPDFObjectHandle::StringDecrypter* decrypter,
         QPDF* context);
 
-    // For use by QPDF. Return parsed object and whether it is empty.
-    static std::pair<QPDFObjectHandle, bool> parse(
+    // For use by QPDF.
+    static QPDFObjectHandle parse(
         InputSource& input,
         std::string const& object_description,
         qpdf::Tokenizer& tokenizer,
@@ -50,7 +50,7 @@ class QPDFParser
         QPDF& context,
         bool sanity_checks);
 
-    static std::pair<QPDFObjectHandle, bool> parse(
+    static QPDFObjectHandle parse(
         qpdf::is::OffsetBuffer& input,
         int stream_id,
         int obj_id,
@@ -112,8 +112,8 @@ class QPDFParser
         int null_count{0};
     };
 
-    QPDFObjectHandle parse(bool& empty, bool content_stream);
-    QPDFObjectHandle parse_first(bool& empty, bool content_stream);
+    QPDFObjectHandle parse(bool content_stream = false);
+    QPDFObjectHandle parse_first(bool content_stream);
     QPDFObjectHandle parseRemainder(bool content_stream);
     void add(std::shared_ptr<QPDFObject>&& obj);
     void addNull();
@@ -158,6 +158,7 @@ class QPDFParser
     int int_count{0};
     long long int_buffer[2]{0, 0};
     qpdf_offset_t last_offset_buffer[2]{0, 0};
+    bool empty_{false};
 };
 
 #endif // QPDFPARSER_HH
