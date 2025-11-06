@@ -87,18 +87,7 @@ class QPDFFileSpecObjectHelper: public QPDFObjectHelper
     setFilename(std::string const& unicode_name, std::string const& compat_name = "");
 
   private:
-    class Members
-    {
-        friend class QPDFFileSpecObjectHelper;
-
-      public:
-        ~Members() = default;
-
-      private:
-        Members() = default;
-        Members(Members const&) = delete;
-    };
-
+    class Members;
     std::shared_ptr<Members> m;
 };
 
