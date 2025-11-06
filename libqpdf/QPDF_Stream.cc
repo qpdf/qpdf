@@ -311,9 +311,9 @@ Stream::copy_data_to(Stream& dest)
     if (qpdf()->doc().config().immediate_copy_from() && !s->stream_data) {
         // Pull the stream data into a buffer before attempting the copy operation. Do it on the
         // source stream so that if the source stream is copied multiple times, we don't have to
-        // keep duplicating the memory.
-        replaceStreamData(
-            getRawStreamData(), s->stream_dict["/Filter"], s->stream_dict["/DecodeParms"]);
+        // keep duplicating the memory. Passing uninitialised object handles will preserve the
+        // existing filters and decode parameters.
+        replaceStreamData(getRawStreamData(), {}, {});
     }
     if (s->stream_data) {
         dest.replaceStreamData(s->stream_data, dict["/Filter"], dict["/DecodeParms"]);
