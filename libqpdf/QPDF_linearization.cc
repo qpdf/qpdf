@@ -487,20 +487,20 @@ Lin::readLinearizationData()
     );
 
     // file_size initialized by isLinearized()
-    linp_.first_page_object = O;
+    linp_.first_page_object = O.value<int>();
     linp_.first_page_end = E;
-    linp_.npages = N;
+    linp_.npages = N.value<size_t>();
     linp_.xref_zero_offset = T;
-    linp_.first_page = P ? P : 0;
+    linp_.first_page = P ? P.value<int>() : 0;
     linp_.H_offset = H_0;
     linp_.H_length = H_1;
 
     // Read hint streams
 
     Pl_Buffer pb("hint buffer");
-    auto H0 = readHintStream(pb, H_0, H_1);
+    auto H0 = readHintStream(pb, H_0, H_1.value<size_t>());
     if (H_2) {
-        (void)readHintStream(pb, H_2, H_3);
+        (void)readHintStream(pb, H_2, H_3.value<size_t>());
     }
 
     // PDF 1.4 hint tables that we ignore:
@@ -524,7 +524,7 @@ Lin::readLinearizationData()
 
     readHPageOffset(BitStream(h_buf, h_size));
 
-    size_t HSi = HS;
+    size_t HSi = HS.value<size_t>();
     if (HSi < 0 || HSi >= h_size) {
         throw damagedPDF("linearization hint table", "/S (shared object) offset is out of bounds");
     }
@@ -536,7 +536,7 @@ Lin::readLinearizationData()
             "/O (outline) offset is out of bounds",
             "linearization dictionary" //
         );
-        size_t HOi = HO;
+        size_t HOi = HO.value<size_t>();
         readHGeneric(BitStream(h_buf + HO, h_size - HOi), outline_hints_);
     }
 }

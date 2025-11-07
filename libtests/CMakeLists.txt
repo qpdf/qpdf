@@ -24,6 +24,7 @@ set(TEST_PROGRAMS
   md5
   nntree
   numrange
+  objects
   obj_table
   pdf_version
   pl_function

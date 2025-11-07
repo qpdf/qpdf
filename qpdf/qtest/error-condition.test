@@ -109,17 +109,12 @@ $td->runtest("C API: no recovery",
              {$td->FILE => "c-no-recovery.out",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
-
-$td->runtest("integer type checks",
-             {$td->COMMAND => "test_driver 62 minimal.pdf"},
-             {$td->FILE => "test62.out", $td->EXIT_STATUS => 0},
-             $td->NORMALIZE_NEWLINES);
 $td->runtest("getValueAs... accessor checks",
              {$td->COMMAND => "test_driver 85 -"},
              {$td->FILE => "test85.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
-$n_tests += @badfiles + 11;
+$n_tests += @badfiles + 10;
 
 # Recovery tests.  These are mostly after-the-fact -- when recovery
 # was implemented, some degree of recovery was possible on many of the

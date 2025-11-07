@@ -59,8 +59,7 @@ size_t
 QPDFEFStreamObjectHelper::getSize()
 {
     if (Integer Size = getParam("/Size")) {
-        size_t result = Size;
-        return result;
+        return Size.value<size_t>();
     }
     return 0;
 }

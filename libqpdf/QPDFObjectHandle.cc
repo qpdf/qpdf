@@ -852,13 +852,7 @@ int
 QPDFObjectHandle::getIntValueAsInt() const
 {
     try {
-        return Integer(*this);
-    } catch (std::underflow_error&) {
-        warn("requested value of integer is too small; returning INT_MIN");
-        return INT_MIN;
-    } catch (std::overflow_error&) {
-        warn("requested value of integer is too big; returning INT_MAX");
-        return INT_MAX;
+        return Integer(*this).value<int>();
     } catch (std::invalid_argument&) {
         typeWarning("integer", "returning 0");
         return 0;
@@ -879,10 +873,7 @@ unsigned long long
 QPDFObjectHandle::getUIntValue() const
 {
     try {
-        return Integer(*this);
-    } catch (std::underflow_error&) {
-        warn("unsigned value request for negative number; returning 0");
-        return 0;
+        return Integer(*this).value<unsigned long long>();
     } catch (std::invalid_argument&) {
         typeWarning("integer", "returning 0");
         return 0;
@@ -903,13 +894,7 @@ unsigned int
 QPDFObjectHandle::getUIntValueAsUInt() const
 {
     try {
-        return Integer(*this);
-    } catch (std::underflow_error&) {
-        warn("unsigned integer value request for negative number; returning 0");
-        return 0;
-    } catch (std::overflow_error&) {
-        warn("requested value of unsigned integer is too big; returning UINT_MAX");
-        return UINT_MAX;
+        return Integer(*this).value<unsigned int>();
     } catch (std::invalid_argument&) {
         typeWarning("integer", "returning 0");
         return 0;

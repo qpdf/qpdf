@@ -17,6 +17,7 @@
 #include <qpdf/QPDFJob.hh>
 #include <qpdf/QPDFNameTreeObjectHelper.hh>
 #include <qpdf/QPDFNumberTreeObjectHelper.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
@@ -189,8 +190,7 @@ static void
 compare_numbers(char const* description, T1 const& expected, T2 const& actual)
 {
     if (expected != actual) {
-        std::cerr << description << ": expected = " << expected << "; actual = " << actual
-                  << std::endl;
+        std::cerr << description << ": expected = " << expected << "; actual = " << actual << '\n';
     }
 }
 
@@ -2279,28 +2279,8 @@ test_61(QPDF& pdf, char const* arg2)
 static void
 test_62(QPDF& pdf, char const* arg2)
 {
-    // Test int size checks. This test will fail if int and long
-    // long are the same size.
-    QPDFObjectHandle t = pdf.getTrailer();
-    unsigned long long q1_l = 3ULL * QIntC::to_ulonglong(INT_MAX);
-    long long q1 = QIntC::to_longlong(q1_l);
-    long long q2_l = 3LL * QIntC::to_longlong(INT_MIN);
-    long long q2 = QIntC::to_longlong(q2_l);
-    unsigned int q3_i = UINT_MAX;
-    long long q3 = QIntC::to_longlong(q3_i);
-    t.replaceKey("/Q1", QPDFObjectHandle::newInteger(q1));
-    t.replaceKey("/Q2", QPDFObjectHandle::newInteger(q2));
-    t.replaceKey("/Q3", QPDFObjectHandle::newInteger(q3));
-    assert_compare_numbers(q1, t.getKey("/Q1").getIntValue());
-    assert_compare_numbers(q1_l, t.getKey("/Q1").getUIntValue());
-    assert_compare_numbers(INT_MAX, t.getKey("/Q1").getIntValueAsInt());
-    assert_compare_numbers(UINT_MAX, t.getKey("/Q1").getUIntValueAsUInt());
-    assert_compare_numbers(q2_l, t.getKey("/Q2").getIntValue());
-    assert_compare_numbers(0U, t.getKey("/Q2").getUIntValue());
-    assert_compare_numbers(INT_MIN, t.getKey("/Q2").getIntValueAsInt());
-    assert_compare_numbers(0U, t.getKey("/Q2").getUIntValueAsUInt());
-    assert_compare_numbers(INT_MAX, t.getKey("/Q3").getIntValueAsInt());
-    assert_compare_numbers(UINT_MAX, t.getKey("/Q3").getUIntValueAsUInt());
+    // Test int size checks. This test will fail if int and long long are the same size.
+    // Moved to libtests/objects
 }
 
 static void

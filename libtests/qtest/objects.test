@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+
+chdir("objects") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+
+my $td = new TestDriver('objects');
+
+my $n_tests = 1;
+
+
+$td->runtest("integer type checks",
+             {$td->COMMAND => "objects 0 minimal.pdf"},
+             {$td->FILE => "test0.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->report($n_tests);
