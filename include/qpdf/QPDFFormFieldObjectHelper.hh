@@ -187,12 +187,6 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     void generateAppearance(QPDFAnnotationObjectHelper&);
 
   private:
-    QPDFObjectHandle getFieldFromAcroForm(std::string const& name);
-    void setRadioButtonValue(QPDFObjectHandle name);
-    void setCheckBoxValue(bool value);
-    void generateTextAppearance(QPDFAnnotationObjectHelper&);
-    QPDFObjectHandle getFontFromResource(QPDFObjectHandle resources, std::string const& font_name);
-
     class Members;
 
     std::shared_ptr<Members> m;
