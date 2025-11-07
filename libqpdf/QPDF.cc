@@ -636,8 +636,7 @@ int
 QPDF::getExtensionLevel()
 {
     if (Integer ExtensionLevel = getRoot()["/Extensions"]["/ADBE"]["/ExtensionLevel"]) {
-        int result = ExtensionLevel;
-        return result;
+        return ExtensionLevel.value<int>();
     }
     return 0;
 }

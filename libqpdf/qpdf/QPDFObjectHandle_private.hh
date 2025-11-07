@@ -345,6 +345,42 @@ namespace qpdf
         // std::invalid_argument exception.
         int64_t value() const;
 
+        // Return the integer value. If the object is not a valid integer, throw a
+        // std::invalid_argument exception. If the object is out of range for the target type,
+        // replicate the existing QPDFObjectHandle behavior.
+        template <std::integral T>
+        T
+        value() const
+        {
+            try {
+                return static_cast<T>(*this);
+            } catch (std::underflow_error&) {
+                if constexpr (std::is_same_v<T, int>) {
+                    warn("requested value of integer is too small; returning INT_MIN");
+                } else if constexpr (std::is_same_v<T, unsigned int>) {
+                    warn("unsigned integer value request for negative number; returning 0");
+                } else if constexpr (std::is_same_v<T, unsigned long long>) {
+                    warn("unsigned value request for negative number; returning 0");
+                } else {
+                    warn(
+                        "underflow while converting integer object; returning smallest possible "
+                        "value");
+                }
+                return std::numeric_limits<T>::min();
+            } catch (std::overflow_error&) {
+                if constexpr (std::is_same_v<T, int>) {
+                    warn("requested value of integer is too big; returning INT_MAX");
+                } else if constexpr (std::is_same_v<T, unsigned int>) {
+                    warn("requested value of unsigned integer is too big; returning UINT_MAX");
+                } else {
+                    warn(
+                        "overflow while converting integer object; returning largest possible "
+                        "value");
+                }
+                return std::numeric_limits<T>::max();
+            }
+        }
+
         // Return true if object value is equal to the 'rhs' value. Return false if the object is
         // not a valid Integer.
         friend bool
@@ -367,7 +403,7 @@ namespace qpdf
             return std::cmp_greater(lhs.value(), rhs) ? std::strong_ordering::greater
                                                       : std::strong_ordering::equal;
         }
-    };
+    }; // class Integer
 
     bool
     operator==(std::integral auto lhs, Integer const& rhs)
