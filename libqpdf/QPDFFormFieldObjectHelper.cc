@@ -10,17 +10,23 @@
 #include <qpdf/QUtil.hh>
 #include <cstdlib>
 
+#include <memory>
+
 using namespace qpdf;
+
+class QPDFFormFieldObjectHelper::Members
+{
+};
 
 QPDFFormFieldObjectHelper::QPDFFormFieldObjectHelper(QPDFObjectHandle oh) :
     QPDFObjectHelper(oh),
-    m(new Members())
+    m(std::make_shared<Members>())
 {
 }
 
 QPDFFormFieldObjectHelper::QPDFFormFieldObjectHelper() :
     QPDFObjectHelper(QPDFObjectHandle::newNull()),
-    m(new Members())
+    m(std::make_shared<Members>())
 {
 }
 

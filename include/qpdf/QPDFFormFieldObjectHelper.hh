@@ -193,17 +193,7 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     void generateTextAppearance(QPDFAnnotationObjectHelper&);
     QPDFObjectHandle getFontFromResource(QPDFObjectHandle resources, std::string const& font_name);
 
-    class Members
-    {
-        friend class QPDFFormFieldObjectHelper;
-
-      public:
-        ~Members() = default;
-
-      private:
-        Members() = default;
-        Members(Members const&) = delete;
-    };
+    class Members;
 
     std::shared_ptr<Members> m;
 };
