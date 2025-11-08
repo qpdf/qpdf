@@ -18,7 +18,7 @@ using namespace qpdf;
 
 using FormField = qpdf::impl::FormField;
 
-class QPDFFormFieldObjectHelper::Members: public qpdf::impl::FormField
+class QPDFFormFieldObjectHelper::Members: public FormField
 {
   public:
     Members(QPDFObjectHandle const& oh) :
@@ -34,44 +34,41 @@ QPDFFormFieldObjectHelper::QPDFFormFieldObjectHelper(QPDFObjectHandle o) :
 }
 
 QPDFFormFieldObjectHelper::QPDFFormFieldObjectHelper() :
-    QPDFObjectHelper(QPDFObjectHandle::newNull()),
-    m(std::make_shared<Members>(oh()))
+    QPDFObjectHelper(Null::temp()),
+    m(std::make_shared<Members>(QPDFObjectHandle()))
 {
 }
 
 bool
 QPDFFormFieldObjectHelper::isNull()
 {
-    return m->isNull();
-}
-
-bool
-FormField::isNull()
-{
-    return oh().null();
+    return m->null();
 }
 
 QPDFFormFieldObjectHelper
 QPDFFormFieldObjectHelper::getParent()
 {
-    return {m->getParent()};
+    return {Null::if_null(m->getParent().oh())};
 }
 
 FormField
 FormField::getParent()
 {
-    return oh().getKey("/Parent"); // may be null
+    return {oh()["/Parent"]}; // maybe null
 }
 
 QPDFFormFieldObjectHelper
 QPDFFormFieldObjectHelper::getTopLevelField(bool* is_different)
 {
-    return {m->getTopLevelField(is_different)};
+    return Null::if_null(m->getTopLevelField(is_different).oh());
 }
 
 FormField
 FormField::getTopLevelField(bool* is_different)
 {
+    if (!obj) {
+        return {};
+    }
     auto top_field = oh();
     QPDFObjGen::set seen;
     while (seen.add(top_field) && !top_field.getKeyIfDict("/Parent").null()) {

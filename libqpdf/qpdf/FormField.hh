@@ -12,19 +12,25 @@ namespace qpdf::impl
 {
     // This object helper helps with form fields for interactive forms. Please see comments in
     // QPDFAcroFormDocumentHelper.hh for additional details.
-    class FormField: public QPDFObjectHelper
+    class FormField: public qpdf::BaseDictionary
     {
       public:
-        FormField() = delete;
+        FormField() = default;
+        FormField(FormField const&) = default;
+        FormField& operator=(FormField const&) = default;
+        FormField(FormField&&) = default;
+        FormField& operator=(FormField&&) = default;
+        ~FormField() = default;
 
         FormField(QPDFObjectHandle const& oh) :
-            QPDFObjectHelper(oh)
+            BaseDictionary(oh)
         {
         }
 
-        ~FormField() override = default;
-
-        bool isNull();
+        FormField(QPDFObjectHandle&& oh) :
+            BaseDictionary(std::move(oh))
+        {
+        }
 
         // Return the field's parent. A form field object helper whose underlying object is null is
         // returned if there is no parent. This condition may be tested by calling isNull().
