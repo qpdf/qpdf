@@ -328,6 +328,10 @@ QPDFAcroFormDocumentHelper::traverseField(
             "ignoring field or annotation");
         return;
     }
+    if (field == parent) {
+        field.warn("loop detected while traversing /AcroForm");
+        return;
+    }
     if (!field.isDictionary()) {
         field.warn(
             "encountered a non-dictionary as a field or annotation while traversing /AcroForm; "
