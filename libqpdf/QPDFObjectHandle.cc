@@ -25,6 +25,8 @@
 using namespace std::literals;
 using namespace qpdf;
 
+const Null Null::temp_;
+
 BaseHandle::
 operator QPDFObjGen() const
 {

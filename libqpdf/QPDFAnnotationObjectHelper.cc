@@ -56,20 +56,16 @@ QPDFAnnotationObjectHelper::getAppearanceStream(std::string const& which, std::s
             // appearance stream when /AP is a dictionary, but files have been seen in the wild
             // where Appearance State is `/N` and `/AP` is a stream. Therefore, if `which` points to
             // a stream, disregard state and just use the stream. See qpdf issue #949 for details.
-            QTC::TC("qpdf", "QPDFAnnotationObjectHelper AP stream");
             return ap_sub;
         }
-        if (ap_sub.isDictionary() && (!desired_state.empty())) {
-            QTC::TC("qpdf", "QPDFAnnotationObjectHelper AP dictionary");
+        if (ap_sub.isDictionary() && !desired_state.empty()) {
             QPDFObjectHandle ap_sub_val = ap_sub.getKey(desired_state);
             if (ap_sub_val.isStream()) {
-                QTC::TC("qpdf", "QPDFAnnotationObjectHelper AP sub stream");
                 return ap_sub_val;
             }
         }
     }
-    QTC::TC("qpdf", "QPDFAnnotationObjectHelper AP null");
-    return QPDFObjectHandle::newNull();
+    return Null::temp();
 }
 
 std::string

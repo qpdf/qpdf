@@ -468,6 +468,39 @@ namespace qpdf
         }
     };
 
+    class Null final: public BaseHandle
+    {
+      public:
+        // Unlike other types, the Null default constructor creates a valid null object.
+        Null() :
+            BaseHandle(QPDFObject::create<QPDF_Null>())
+        {
+        }
+
+        Null(Null const&) = default;
+        Null(Null&&) = default;
+        Null& operator=(Null const&) = default;
+        Null& operator=(Null&&) = default;
+        ~Null() = default;
+
+        // For legacy support, return a Null object to be used as a temporary return value.
+        static QPDFObjectHandle
+        temp()
+        {
+            return temp_.oh();
+        }
+
+        // For legacy support, return an explicit temporary Null object if oh is null.
+        static QPDFObjectHandle
+        if_null(QPDFObjectHandle oh)
+        {
+            return oh ? std::move(oh) : Null::temp();
+        }
+
+      private:
+        static const Null temp_;
+    }; // class Null
+
     class Stream final: public BaseHandle
     {
       public:
