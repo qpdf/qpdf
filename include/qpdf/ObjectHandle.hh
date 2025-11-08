@@ -130,6 +130,8 @@ namespace qpdf
         inline void assign(qpdf_object_type_e required, BaseHandle const& other);
         inline void assign(qpdf_object_type_e required, BaseHandle&& other);
 
+        inline void nullify();
+
         std::string description() const;
 
         void no_ci_warn_if(bool condition, std::string const& warning) const;

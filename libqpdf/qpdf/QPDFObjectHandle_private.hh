@@ -812,6 +812,14 @@ namespace qpdf
         return !obj || type_code() == ::ot_null;
     }
 
+    inline void
+    BaseHandle::nullify()
+    {
+        if (obj) {
+            obj = QPDFObject::create<QPDF_Null>();
+        }
+    }
+
     inline qpdf_offset_t
     BaseHandle::offset() const
     {
