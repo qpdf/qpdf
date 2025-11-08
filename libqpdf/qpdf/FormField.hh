@@ -3,6 +3,7 @@
 
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObjectHelper.hh>
+#include <qpdf/QPDF_private.hh>
 
 #include <vector>
 
@@ -10,6 +11,34 @@ class QPDFAnnotationObjectHelper;
 
 namespace qpdf::impl
 {
+    class AcroForm: public Doc::Common
+    {
+      public:
+        AcroForm() = delete;
+        AcroForm(AcroForm const&) = delete;
+        AcroForm(AcroForm&&) = delete;
+        AcroForm& operator=(AcroForm const&) = delete;
+        AcroForm& operator=(AcroForm&&) = delete;
+        ~AcroForm() = default;
+
+        AcroForm(impl::Doc& doc) :
+            Common(doc)
+        {
+        }
+
+        struct FieldData
+        {
+            std::vector<QPDFAnnotationObjectHelper> annotations;
+            std::string name;
+        };
+
+        bool cache_valid{false};
+        std::map<QPDFObjGen, FieldData> field_to;
+        std::map<QPDFObjGen, QPDFFormFieldObjectHelper> annotation_to_field;
+        std::map<std::string, std::set<QPDFObjGen>> name_to_fields;
+        std::set<QPDFObjGen> bad_fields;
+    }; // class AcroForm
+
     /// @class FormNode
     /// @brief Represents a node in the interactive forms tree of a PDF document.
     ///
@@ -390,7 +419,7 @@ namespace qpdf::impl
         getFontFromResource(QPDFObjectHandle resources, std::string const& font_name);
 
         static const QPDFObjectHandle null_oh;
-    };
+    }; // class FormNode
 } // namespace qpdf::impl
 
 #endif // FORMFIELD_HH

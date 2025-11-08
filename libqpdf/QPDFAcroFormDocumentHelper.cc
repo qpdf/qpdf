@@ -1,5 +1,7 @@
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 
+#include <qpdf/FormField.hh>
+
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
@@ -14,29 +16,20 @@
 using namespace qpdf;
 using namespace std::literals;
 
-class QPDFAcroFormDocumentHelper::Members
+using AcroForm = impl::AcroForm;
+
+class QPDFAcroFormDocumentHelper::Members: public AcroForm
 {
   public:
-    Members() = default;
-    Members(Members const&) = delete;
-    ~Members() = default;
-
-    struct FieldData
+    Members(QPDF& qpdf) :
+        AcroForm(qpdf.doc())
     {
-        std::vector<QPDFAnnotationObjectHelper> annotations;
-        std::string name;
-    };
-
-    bool cache_valid{false};
-    std::map<QPDFObjGen, FieldData> field_to;
-    std::map<QPDFObjGen, QPDFFormFieldObjectHelper> annotation_to_field;
-    std::map<std::string, std::set<QPDFObjGen>> name_to_fields;
-    std::set<QPDFObjGen> bad_fields;
+    }
 };
 
 QPDFAcroFormDocumentHelper::QPDFAcroFormDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
-    m(std::make_shared<Members>())
+    m(std::make_shared<Members>(qpdf))
 {
     // We have to analyze up front. Otherwise, when we are adding annotations and fields, we are in
     // a temporarily unstable configuration where some widget annotations are not reachable.
@@ -62,6 +55,7 @@ QPDFAcroFormDocumentHelper::invalidateCache()
     m->cache_valid = false;
     m->field_to.clear();
     m->annotation_to_field.clear();
+    m->bad_fields.clear();
 }
 
 bool
