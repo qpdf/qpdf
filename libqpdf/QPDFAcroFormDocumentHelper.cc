@@ -252,16 +252,15 @@ QPDFFormFieldObjectHelper
 QPDFAcroFormDocumentHelper::getFieldForAnnotation(QPDFAnnotationObjectHelper h)
 {
     QPDFObjectHandle oh = h.getObjectHandle();
-    QPDFFormFieldObjectHelper result(QPDFObjectHandle::newNull());
     if (!oh.isDictionaryOfType("", "/Widget")) {
-        return result;
+        return Null::temp();
     }
     analyze();
     QPDFObjGen og(oh.getObjGen());
     if (m->annotation_to_field.contains(og)) {
-        result = m->annotation_to_field[og];
+        return m->annotation_to_field[og];
     }
-    return result;
+    return Null::temp();
 }
 
 void

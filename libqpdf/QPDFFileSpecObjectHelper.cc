@@ -76,7 +76,7 @@ QPDFFileSpecObjectHelper::getEmbeddedFileStream(std::string const& key)
             }
         }
     }
-    return QPDFObjectHandle::newNull();
+    return Null::temp();
 }
 
 QPDFObjectHandle

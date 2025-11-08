@@ -1,6 +1,7 @@
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
 
 #include <qpdf/QPDFNameTreeObjectHelper.hh>
+#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDF_private.hh>
 
 // File attachments are stored in the /EmbeddedFiles (name tree) key of the /Names dictionary from
@@ -143,11 +144,10 @@ QPDFEmbeddedFileDocumentHelper::removeEmbeddedFile(std::string const& name)
     if (iter == m->embedded_files->end()) {
         return false;
     }
-    auto oh = iter->second;
-    iter.remove();
-    if (oh.isIndirect()) {
-        qpdf.replaceObject(oh.getObjGen(), QPDFObjectHandle::newNull());
+    if (iter->second.indirect()) {
+        qpdf.replaceObject(iter->second, Null());
     }
+    iter.remove();
 
     return true;
 }
