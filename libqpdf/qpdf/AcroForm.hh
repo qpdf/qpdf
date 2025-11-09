@@ -47,7 +47,8 @@ namespace qpdf::impl
         ///
         /// @return A vector of `QPDFAnnotationObjectHelper` objects corresponding to
         ///         the widget annotations found on the specified page.
-        std::vector<QPDFAnnotationObjectHelper> getWidgetAnnotationsForPage(QPDFPageObjectHelper page);
+        std::vector<QPDFAnnotationObjectHelper>
+        getWidgetAnnotationsForPage(QPDFPageObjectHelper page);
 
         /// Analyzes the AcroForm structure in the PDF document and updates the internal
         /// cache with the form fields and their corresponding widget annotations.
@@ -179,12 +180,13 @@ namespace qpdf::impl
             QPDFObjectHandle stream,
             std::map<std::string, std::map<std::string, std::string>> dr_map);
 
-        bool cache_valid{false};
-        std::map<QPDFObjGen, FieldData> field_to;
-        std::map<QPDFObjGen, QPDFFormFieldObjectHelper> annotation_to_field;
-        std::map<std::string, std::set<QPDFObjGen>> name_to_fields;
-        std::set<QPDFObjGen> bad_fields;
-    }; // class AcroForm
+        std::map<QPDFObjGen, FieldData> fields_;
+        std::map<QPDFObjGen, QPDFFormFieldObjectHelper> annotation_to_field_;
+        std::map<std::string, std::set<QPDFObjGen>> name_to_fields_;
+        std::set<QPDFObjGen> bad_fields_;
+        bool cache_valid_{false};
+
+    }; // class Acroform
 
     /// @class FormNode
     /// @brief Represents a node in the interactive forms tree of a PDF document.

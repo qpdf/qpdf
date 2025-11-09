@@ -49,10 +49,11 @@ QPDFAcroFormDocumentHelper::validate(bool repair)
 void
 QPDFAcroFormDocumentHelper::invalidateCache()
 {
-    m->cache_valid = false;
-    m->field_to.clear();
-    m->annotation_to_field.clear();
-    m->bad_fields.clear();
+    m->cache_valid_ = false;
+    m->fields_.clear();
+    m->annotation_to_field_.clear();
+    m->bad_fields_.clear();
+    m->name_to_fields_.clear();
 }
 
 bool
@@ -148,19 +149,19 @@ QPDFAcroFormDocumentHelper::removeFormFields(std::set<QPDFObjGen> const& to_remo
     }
 
     for (auto const& og: to_remove) {
-        auto it = m->field_to.find(og);
-        if (it != m->field_to.end()) {
+        auto it = m->fields_.find(og);
+        if (it != m->fields_.end()) {
             for (auto aoh: it->second.annotations) {
-                m->annotation_to_field.erase(aoh.getObjectHandle().getObjGen());
+                m->annotation_to_field_.erase(aoh.getObjectHandle().getObjGen());
             }
             auto const& name = it->second.name;
             if (!name.empty()) {
-                m->name_to_fields[name].erase(og);
-                if (m->name_to_fields[name].empty()) {
-                    m->name_to_fields.erase(name);
+                m->name_to_fields_[name].erase(og);
+                if (m->name_to_fields_[name].empty()) {
+                    m->name_to_fields_.erase(name);
                 }
             }
-            m->field_to.erase(og);
+            m->fields_.erase(og);
         }
     }
 
@@ -187,7 +188,7 @@ QPDFAcroFormDocumentHelper::getFormFields()
 {
     m->analyze();
     std::vector<QPDFFormFieldObjectHelper> result;
-    for (auto const& [og, data]: m->field_to) {
+    for (auto const& [og, data]: m->fields_) {
         if (!data.annotations.empty()) {
             result.emplace_back(qpdf.getObject(og));
         }
@@ -200,8 +201,8 @@ QPDFAcroFormDocumentHelper::getFieldsWithQualifiedName(std::string const& name)
 {
     m->analyze();
     // Keep from creating an empty entry
-    auto iter = m->name_to_fields.find(name);
-    if (iter != m->name_to_fields.end()) {
+    auto iter = m->name_to_fields_.find(name);
+    if (iter != m->name_to_fields_.end()) {
         return iter->second;
     }
     return {};
@@ -213,8 +214,8 @@ QPDFAcroFormDocumentHelper::getAnnotationsForField(QPDFFormFieldObjectHelper h)
     m->analyze();
     std::vector<QPDFAnnotationObjectHelper> result;
     QPDFObjGen og(h.getObjectHandle().getObjGen());
-    if (m->field_to.contains(og)) {
-        result = m->field_to[og].annotations;
+    if (m->fields_.contains(og)) {
+        result = m->fields_[og].annotations;
     }
     return result;
 }
@@ -255,8 +256,8 @@ QPDFAcroFormDocumentHelper::getFieldForAnnotation(QPDFAnnotationObjectHelper h)
     }
     m->analyze();
     QPDFObjGen og(oh.getObjGen());
-    if (m->annotation_to_field.contains(og)) {
-        return m->annotation_to_field[og];
+    if (m->annotation_to_field_.contains(og)) {
+        return m->annotation_to_field_[og];
     }
     return Null::temp();
 }
@@ -264,10 +265,10 @@ QPDFAcroFormDocumentHelper::getFieldForAnnotation(QPDFAnnotationObjectHelper h)
 void
 AcroForm::analyze()
 {
-    if (cache_valid) {
+    if (cache_valid_) {
         return;
     }
-    cache_valid = true;
+    cache_valid_ = true;
     QPDFObjectHandle acroform = qpdf.getRoot().getKey("/AcroForm");
     if (!(acroform.isDictionary() && acroform.hasKey("/Fields"))) {
         return;
@@ -294,7 +295,7 @@ AcroForm::analyze()
         for (auto const& iter: getWidgetAnnotationsForPage(ph)) {
             QPDFObjectHandle annot(iter.getObjectHandle());
             QPDFObjGen og(annot.getObjGen());
-            if (!annotation_to_field.contains(og)) {
+            if (!annotation_to_field_.contains(og)) {
                 // This is not supposed to happen, but it's easy enough for us to handle this case.
                 // Treat the annotation as its own field. This could allow qpdf to sensibly handle a
                 // case such as a PDF creator adding a self-contained annotation (merged with the
@@ -303,8 +304,8 @@ AcroForm::analyze()
                 annot.warn(
                     "this widget annotation is not reachable from /AcroForm in the document "
                     "catalog");
-                annotation_to_field[og] = QPDFFormFieldObjectHelper(annot);
-                field_to[og].annotations.emplace_back(annot);
+                annotation_to_field_[og] = QPDFFormFieldObjectHelper(annot);
+                fields_[og].annotations.emplace_back(annot);
             }
         }
     }
@@ -335,7 +336,7 @@ AcroForm::traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, 
         return false;
     }
     QPDFObjGen og(field.getObjGen());
-    if (field_to.contains(og) || annotation_to_field.contains(og) || bad_fields.contains(og)) {
+    if (fields_.contains(og) || annotation_to_field_.contains(og) || bad_fields_.contains(og)) {
         field.warn("loop detected while traversing /AcroForm");
         return false;
     }
@@ -363,8 +364,8 @@ AcroForm::traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, 
 
     if (is_annotation) {
         QPDFObjectHandle our_field = (is_field ? field : parent);
-        field_to[our_field.getObjGen()].annotations.emplace_back(field);
-        annotation_to_field[og] = QPDFFormFieldObjectHelper(our_field);
+        fields_[our_field.getObjGen()].annotations.emplace_back(field);
+        annotation_to_field_[og] = QPDFFormFieldObjectHelper(our_field);
     }
 
     if (is_field && depth != 0 && field["/Parent"] != parent) {
@@ -387,22 +388,22 @@ AcroForm::traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, 
     if (is_field && field.hasKey("/T")) {
         QPDFFormFieldObjectHelper foh(field);
         std::string name = foh.getFullyQualifiedName();
-        auto old = field_to.find(og);
-        if (old != field_to.end() && !old->second.name.empty()) {
+        auto old = fields_.find(og);
+        if (old != fields_.end() && !old->second.name.empty()) {
             // We might be updating after a name change, so remove any old information
-            name_to_fields[old->second.name].erase(og);
+            name_to_fields_[old->second.name].erase(og);
         }
-        field_to[og].name = name;
-        name_to_fields[name].insert(og);
+        fields_[og].name = name;
+        name_to_fields_[name].insert(og);
     }
 
     for (auto const& kid: Kids) {
-        if (bad_fields.contains(kid)) {
+        if (bad_fields_.contains(kid)) {
             continue;
         }
 
         if (!traverseField(kid, field, 1 + depth)) {
-            bad_fields.insert(kid);
+            bad_fields_.insert(kid);
         }
     }
     return true;
