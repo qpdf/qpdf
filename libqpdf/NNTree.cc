@@ -168,7 +168,7 @@ NNTreeIterator::resetLimits(Dictionary a_node, std::list<PathElement>::iterator 
                 }
             }
             if (a_node != path.begin()->node) {
-                a_node.replaceKey("/Limits", Array({first, last}));
+                a_node.replace("/Limits", Array({first, last}));
             }
         }
 
@@ -266,7 +266,7 @@ NNTreeIterator::split(Dictionary to_split, std::list<PathElement>::iterator pare
         new_kids.push_back(first_node);
         to_split.erase("/Limits"); // already shouldn't be there for root
         to_split.erase(impl.itemsKey());
-        to_split.replaceKey("/Kids", new_kids);
+        to_split.replace("/Kids", new_kids);
         if (is_leaf) {
             node = first_node;
         } else {
@@ -446,7 +446,7 @@ NNTreeIterator::remove()
         if (parent == path.end()) {
             // We erased the very last item. Convert the root to an empty items array.
             element->node.erase("/Kids");
-            element->node.replaceKey(impl.itemsKey(), Array::empty());
+            element->node.replace(impl.itemsKey(), Array::empty());
             path.clear();
             setItemNumber(impl.tree_root, -1);
             return;
@@ -673,8 +673,8 @@ NNTreeImpl::repair()
     for (auto const& [key, value]: items) {
         repl.insert(key, value);
     }
-    tree_root.replaceKey("/Kids", new_node["/Kids"]);
-    tree_root.replaceKey(itemsKey(), new_node[itemsKey()]);
+    tree_root.replace("/Kids", new_node["/Kids"]);
+    tree_root.replace(itemsKey(), new_node[itemsKey()]);
 }
 
 NNTreeImpl::iterator

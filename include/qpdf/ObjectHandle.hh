@@ -85,6 +85,7 @@ namespace qpdf
 
         bool contains(std::string const& key) const;
         size_t erase(std::string const& key);
+        bool replace(std::string const& key, QPDFObjectHandle value);
         QPDFObjectHandle const& operator[](std::string const& key) const;
 
         std::shared_ptr<QPDFObject> copy(bool shallow = false) const;

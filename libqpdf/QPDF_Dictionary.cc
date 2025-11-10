@@ -63,18 +63,29 @@ BaseHandle::erase(const std::string& key)
     return 0;
 }
 
-void
-BaseDictionary::replaceKey(std::string const& key, QPDFObjectHandle value)
+bool
+BaseHandle::replace(std::string const& key, QPDFObjectHandle value)
 {
-    auto d = dict();
-    if (value.null() && !value.indirect()) {
-        // The PDF spec doesn't distinguish between keys with null values and missing keys.
-        // Allow indirect nulls which are equivalent to a dangling reference, which is
-        // permitted by the spec.
-        d->items.erase(key);
-    } else {
-        // add or replace value
-        d->items[key] = value;
+    if (auto d = as<QPDF_Dictionary>()) {
+        if (value.null() && !value.indirect()) {
+            // The PDF spec doesn't distinguish between keys with null values and missing keys.
+            // Allow indirect nulls which are equivalent to a dangling reference, which is permitted
+            // by the spec.
+            d->items.erase(key);
+        } else {
+            // add or replace value
+            d->items[key] = value;
+        }
+        return true;
+    }
+    return false;
+}
+
+void
+BaseDictionary::replace(std::string const& key, QPDFObjectHandle value)
+{
+    if (!BaseHandle::replace(key, value)) {
+        (void)dict();
     }
 }
 
@@ -166,11 +177,10 @@ QPDFObjectHandle::replaceKey(std::string const& key, QPDFObjectHandle const& val
 {
     if (auto dict = as_dictionary(strict)) {
         checkOwnership(value);
-        dict.replaceKey(key, value);
+        dict.replace(key, value);
         return;
     }
     typeWarning("dictionary", "ignoring key replacement request");
-    QTC::TC("qpdf", "QPDFObjectHandle dictionary ignoring replaceKey");
 }
 
 QPDFObjectHandle

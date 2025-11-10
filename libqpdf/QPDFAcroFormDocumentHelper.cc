@@ -799,7 +799,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             }
             QPDFObjectHandle(dr).makeResourcesIndirect(qpdf);
             if (!dr.indirect()) {
-                acroform.replaceKey("/DR", qpdf.makeIndirectObject(dr));
+                acroform.replace("/DR", qpdf.makeIndirectObject(dr));
                 dr = acroform["/DR"];
             }
             // Merge the other document's /DR, creating a conflict map. mergeResources checks to
@@ -839,7 +839,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                 if (parent.indirect()) {
                     auto parent_og = parent.id_gen();
                     if (orig_to_copy.contains(parent_og)) {
-                        obj.replaceKey("/Parent", orig_to_copy[parent_og]);
+                        obj.replace("/Parent", orig_to_copy[parent_og]);
                     } else {
                         parent.warn(
                             "while traversing field " + obj.id_gen().unparse(',') +
@@ -869,7 +869,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                     // chrome, firefox, the mac Preview application, and several of the free
                     // readers on Linux all ignore /DR at the field level.
                     if (obj.contains("/DR")) {
-                        obj.replaceKey("/DR", dr);
+                        obj.replace("/DR", dr);
                     }
                     if (obj["/DA"].isString() && !dr_map.empty()) {
                         adjustDefaultAppearances(obj, dr_map);
@@ -988,7 +988,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         Dictionary apdict = ah.getAppearanceDictionary();
         std::vector<QPDFObjectHandle> streams;
         auto replace_stream = [](auto& dict, auto& key, auto& old) {
-            dict.replaceKey(key, old.copyStream());
+            dict.replace(key, old.copyStream());
             return dict[key];
         };
 
@@ -1015,7 +1015,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             }
             apcm.concat(cm);
             if (omatrix || apcm != QPDFMatrix()) {
-                dict.replaceKey("/Matrix", QPDFObjectHandle::newFromMatrix(apcm));
+                dict.replace("/Matrix", QPDFObjectHandle::newFromMatrix(apcm));
             }
             Dictionary resources = dict["/Resources"];
             if (!dr_map.empty() && resources) {

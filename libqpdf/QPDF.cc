@@ -572,7 +572,7 @@ Objects::Foreign::Copier::replace_indirect_object(QPDFObjectHandle const& foreig
         auto result = Dictionary::empty();
         for (auto const& [key, value]: Dictionary(foreign)) {
             if (!value.null()) {
-                result.replaceKey(key, replace_indirect_object(value));
+                result.replace(key, replace_indirect_object(value));
             }
         }
         return result;
@@ -584,7 +584,7 @@ Objects::Foreign::Copier::replace_indirect_object(QPDFObjectHandle const& foreig
         auto dict = result.getDict();
         for (auto const& [key, value]: stream.getDict()) {
             if (!value.null()) {
-                dict.replaceKey(key, replace_indirect_object(value));
+                dict.replace(key, replace_indirect_object(value));
             }
         }
         stream.copy_data_to(result);
@@ -658,7 +658,7 @@ QPDF::getRoot()
     // approach to more extensive checks and warning levels.
     if (m->cf.check_mode() && Name(Root["/Type"]) != "/Catalog") {
         warn(m->c.damagedPDF("", -1, "catalog /Type entry missing or invalid"));
-        Root.replaceKey("/Type", Name("/Catalog"));
+        Root.replace("/Type", Name("/Catalog"));
     }
     return Root.oh();
 }
