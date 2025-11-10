@@ -806,6 +806,20 @@ namespace qpdf
         }
     }
 
+    /// @brief Retrieves the QPDFObjectHandle const& associated with the given key.
+    ///
+    /// This method provides a convenience alternative to the direct use of the subscript operator
+    /// "(*this)[key]" or "oh()[key]" in derived classes, enabling a simplified and readable way to
+    /// access object handles by key.
+    ///
+    /// @param key The string key used to look up the corresponding QPDFObjectHandle.
+    /// @return A constant reference to the QPDFObjectHandle associated with the specified key.
+    inline QPDFObjectHandle const&
+    BaseHandle::get(std::string const& key) const
+    {
+        return (*this)[key];
+    }
+
     inline bool
     BaseHandle::null() const
     {

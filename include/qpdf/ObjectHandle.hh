@@ -137,6 +137,8 @@ namespace qpdf
 
         std::string description() const;
 
+        inline QPDFObjectHandle const& get(std::string const& key) const;
+
         void no_ci_warn_if(bool condition, std::string const& warning) const;
         void no_ci_stop_if(bool condition, std::string const& warning) const;
         void no_ci_stop_damaged_if(bool condition, std::string const& warning) const;
