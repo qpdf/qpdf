@@ -122,13 +122,7 @@ FormField::inheritable_string(std::string const& name) const
 std::string
 QPDFFormFieldObjectHelper::getInheritableFieldValueAsName(std::string const& name)
 {
-    return m->getInheritableFieldValueAsName(name);
-}
-
-std::string
-FormField::getInheritableFieldValueAsName(std::string const& name)
-{
-    if (auto fv = inheritable_value<Name>(name)) {
+    if (auto fv = m->inheritable_value<Name>(name)) {
         return fv;
     }
     return {};
@@ -137,13 +131,10 @@ FormField::getInheritableFieldValueAsName(std::string const& name)
 std::string
 QPDFFormFieldObjectHelper::getFieldType()
 {
-    return m->getFieldType();
-}
-
-std::string
-FormField::getFieldType()
-{
-    return getInheritableFieldValueAsName("/FT");
+    if (auto ft = m->FT()) {
+        return ft;
+    }
+    return {};
 }
 
 std::string
@@ -346,7 +337,7 @@ QPDFFormFieldObjectHelper::isText()
 bool
 FormField::isText()
 {
-    return getFieldType() == "/Tx";
+    return FT() == "/Tx";
 }
 
 bool
@@ -358,7 +349,7 @@ QPDFFormFieldObjectHelper::isCheckbox()
 bool
 FormField::isCheckbox()
 {
-    return getFieldType() == "/Btn" && (getFlags() & (ff_btn_radio | ff_btn_pushbutton)) == 0;
+    return FT() == "/Btn" && (getFlags() & (ff_btn_radio | ff_btn_pushbutton)) == 0;
 }
 
 bool
@@ -382,7 +373,7 @@ QPDFFormFieldObjectHelper::isRadioButton()
 bool
 FormField::isRadioButton()
 {
-    return getFieldType() == "/Btn" && (getFlags() & ff_btn_radio) == ff_btn_radio;
+    return FT() == "/Btn" && (getFlags() & ff_btn_radio) == ff_btn_radio;
 }
 
 bool
@@ -394,7 +385,7 @@ QPDFFormFieldObjectHelper::isPushbutton()
 bool
 FormField::isPushbutton()
 {
-    return getFieldType() == "/Btn" && (getFlags() & ff_btn_pushbutton) == ff_btn_pushbutton;
+    return FT() == "/Btn" && (getFlags() & ff_btn_pushbutton) == ff_btn_pushbutton;
 }
 
 bool
@@ -406,7 +397,7 @@ QPDFFormFieldObjectHelper::isChoice()
 bool
 FormField::isChoice()
 {
-    return getFieldType() == "/Ch";
+    return FT() == "/Ch";
 }
 
 std::vector<std::string>
@@ -469,7 +460,7 @@ void
 FormField::setV(QPDFObjectHandle value, bool need_appearances)
 {
     Name name = value;
-    if (getFieldType() == "/Btn") {
+    if (FT() == "/Btn") {
         if (isCheckbox()) {
             if (!name) {
                 warn("ignoring attempt to set a checkbox field to a value whose type is not name");
@@ -632,10 +623,9 @@ QPDFFormFieldObjectHelper::generateAppearance(QPDFAnnotationObjectHelper& aoh)
 void
 FormField::generateAppearance(QPDFAnnotationObjectHelper& aoh)
 {
-    std::string ft = getFieldType();
     // Ignore field types we don't know how to generate appearances for. Button fields don't really
     // need them -- see code in QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded.
-    if ((ft == "/Tx") || (ft == "/Ch")) {
+    if (FT() == "/Tx" || FT() == "/Ch") {
         generateTextAppearance(aoh);
     }
 }

@@ -104,12 +104,16 @@ namespace qpdf::impl
         ///         value does not exist or is not of String type.
         std::string inheritable_string(std::string const& name) const;
 
-        // Get an inherited field value of type name as a string representing the name. If it is not
-        // a name, silently return the empty string.
-        std::string getInheritableFieldValueAsName(std::string const& name);
-
-        // Returns the value of /FT if present, otherwise returns the empty string.
-        std::string getFieldType();
+        /// @brief Retrieves the field type (/FT attribute).
+        /// @param inherit If set to `true`, the function will attempt to retrieve the value by
+        ///        inheritance from the parent hierarchy of the form field. Defaults to `true`.
+        /// @return Returns the field  type if found; otherwise, returns a default-constructed
+        ///         `Name`.
+        Name
+        FT(bool inherit = true) const
+        {
+            return inheritable_value<Name>("/FT");
+        }
 
         std::string getFullyQualifiedName();
 
