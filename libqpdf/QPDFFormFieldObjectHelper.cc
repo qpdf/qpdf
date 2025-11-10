@@ -210,23 +210,17 @@ FormField::mapping_name() const
 QPDFObjectHandle
 QPDFFormFieldObjectHelper::getValue()
 {
-    return Null::if_null(m->getValue());
-}
-
-QPDFObjectHandle
-FormField::getValue()
-{
-    return inheritable_value<QPDFObjectHandle>("/V");
+    return Null::if_null(m->V<QPDFObjectHandle>());
 }
 
 std::string
 QPDFFormFieldObjectHelper::getValueAsString()
 {
-    return m->getValueAsString();
+    return m->value();
 }
 
 std::string
-FormField::getValueAsString()
+FormField::value() const
 {
     return inheritable_string("/V");
 }
@@ -353,7 +347,7 @@ QPDFFormFieldObjectHelper::isChecked()
 bool
 FormField::isChecked()
 {
-    return isCheckbox() && Name(getValue()) != "/Off";
+    return isCheckbox() && V<Name>() != "/Off";
 }
 
 bool
@@ -936,7 +930,7 @@ FormField::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
     }
     QPDFObjectHandle::Rectangle bbox = bbox_obj.getArrayAsRectangle();
     std::string DA = default_appearance();
-    std::string V = getValueAsString();
+    std::string V = value();
     std::vector<std::string> opt;
     if (isChoice() && (getFlags() & ff_ch_combo) == 0) {
         opt = getChoices();

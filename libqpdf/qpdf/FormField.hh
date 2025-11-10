@@ -189,10 +189,59 @@ namespace qpdf::impl
         /// if the mapping name is absent.
         std::string mapping_name() const;
 
-        QPDFObjectHandle getValue();
+        /// @brief Retrieves the field value (`/V` attribute) of a specified field, accounting for
+        ///        inheritance through thehierarchy of ancestor nodes in the form field tree.
+        ///
+        /// This function attempts to retrieve the `/V` attribute. If the `inherit`
+        /// parameter is set to `true` and the `/V` is not found at the current level, the
+        /// method traverses up the parent hierarchy to find the value. The traversal stops when
+        /// `/V` is found, when the root node is reached, or when a loop detection mechanism
+        /// prevents further traversal.
+        ///
+        /// @tparam T The return type.
+        /// @param inherit If set to `true`, the function will attempt to retrieve `/V` by
+        ///        inheritance from the parent hierarchy of the form field. Defaults to `true`.
+        /// @return Returns the field's value if found; otherwise, returns a default-constructed
+        /// value of type `T`.
+        template <class T>
+        T
+        V(bool inherit = true) const
+        {
+            return inheritable_value<T>("/V", inherit);
+        }
 
-        // Return the field's value as a string. If this is called with a field whose value is not a
-        std::string getValueAsString();
+        /// @brief Retrieves the field value (`/V` attribute) of a specified field, accounting for
+        ///        inheritance through the hierarchy of ancestor nodes in the form field tree.
+        ///
+        /// This function attempts to retrieve the `/V` attribute. If the `inherit`
+        /// parameter is set to `true` and the `/V` is not found at the current level, the
+        /// method traverses up the parent hierarchy to find the value. The traversal stops when
+        /// `/V` is found, when the root node is reached, or when a loop detection mechanism
+        /// prevents further traversal.
+        ///
+        /// @param inherit If set to `true`, the function will attempt to retrieve `/V` by
+        ///        inheritance from the parent hierarchy of the form field. Defaults to `true`.
+        /// @return Returns the field's value if found; otherwise, returns a default-constructed
+        /// object handle.
+        QPDFObjectHandle const&
+        V(bool inherit = true) const
+        {
+            if (auto& v = get("/V")) {
+                return v;
+            }
+            return {inherit ? inherited("/V") : null_oh};
+        }
+
+        /// @brief Retrieves the field value `/V` attribute of the form field, considering
+        ///        inheritance, if the value is  a String.
+        ///
+        /// This function extracts the value of the form field, accounting for potential inheritance
+        /// through the form hierarchy. It returns the value if it is a String, and an empty string
+        /// otherwise.
+        ///
+        /// @return A string containing the actual or inherited `/V` attribute of the form field, or
+        ///         an empty string if the value is not present or not a String.
+        std::string value() const;
 
         QPDFObjectHandle getDefaultValue();
 
