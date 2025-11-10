@@ -54,24 +54,25 @@ QPDFFormFieldObjectHelper::getParent()
 QPDFFormFieldObjectHelper
 QPDFFormFieldObjectHelper::getTopLevelField(bool* is_different)
 {
-    return Null::if_null(m->getTopLevelField(is_different).oh());
+    return Null::if_null(m->root_field(is_different).oh());
 }
 
 FormField
-FormField::getTopLevelField(bool* is_different)
+FormField::root_field(bool* is_different)
 {
     if (!obj) {
         return {};
     }
-    auto top_field = oh();
+    auto rf = *this;
+    size_t depth = 0; // Don't bother with loop detection until depth becomes suspicious
     QPDFObjGen::set seen;
-    while (seen.add(top_field) && !top_field.getKeyIfDict("/Parent").null()) {
-        top_field = top_field.getKey("/Parent");
+    while (rf.Parent() && (++depth < 10 || seen.add(rf))) {
+        rf = rf.Parent();
         if (is_different) {
             *is_different = true;
         }
     }
-    return {top_field};
+    return rf;
 }
 
 QPDFObjectHandle

@@ -46,10 +46,19 @@ namespace qpdf::impl
             return {get("/Parent")};
         }
 
-        // Return the top-level field for this field. Typically this will be the field itself or its
-        // parent. If is_different is provided, it is set to true if the top-level field is
-        // different from the field itself; otherwise it is set to false.
-        FormField getTopLevelField(bool* is_different = nullptr);
+        /// @brief Returns the top-level field associated with the current field.
+        ///
+        /// The function traverses the hierarchy of parent fields to identify the highest-level
+        /// field in the tree. Typically, this will be the current field itself unless it has a
+        /// parent field. Optionally, it can indicate whether the top-level field is different from
+        /// the current field.
+        ///
+        /// @param is_different A pointer to a boolean that, if provided, will be set to true if the
+        ///        top-level field differs from the current field; otherwise, it will be set to
+        ///        false.
+        ///
+        /// @return The top-level field in the form field hierarchy.
+        FormField root_field(bool* is_different = nullptr);
 
         // Get a field value, possibly inheriting the value from an ancestor node.
         QPDFObjectHandle getInheritableFieldValue(std::string const& name);
