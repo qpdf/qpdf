@@ -83,6 +83,7 @@ namespace qpdf
         QPDFObjectHandle operator[](size_t n) const;
         QPDFObjectHandle operator[](int n) const;
 
+        QPDFObjectHandle& at(std::string const& key) const;
         bool contains(std::string const& key) const;
         size_t erase(std::string const& key);
         QPDFObjectHandle& find(std::string const& key) const;

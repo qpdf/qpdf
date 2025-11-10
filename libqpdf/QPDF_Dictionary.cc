@@ -30,6 +30,27 @@ BaseHandle::operator[](std::string const& key) const
     return null_obj;
 }
 
+/// Retrieves a reference to the QPDFObjectHandle associated with the given key in the
+/// dictionary object contained within this instance.
+///
+/// If the current object is not of dictionary type, a `std::runtime_error` is thrown.
+/// According to the PDF specification, missing keys in the dictionary are treated as
+/// keys with a `null` value. This behavior is reflected in this function's implementation,
+/// where a missing key will still return a reference to a newly inserted null value entry.
+///
+/// @param key The key for which the corresponding value in the dictionary is retrieved.
+/// @return A reference to the QPDFObjectHandle associated with the specified key.
+/// @throws std::runtime_error if the current object is not a dictionary.
+QPDFObjectHandle&
+BaseHandle::at(std::string const& key) const
+{
+    auto d = as<QPDF_Dictionary>();
+    if (!d) {
+        throw std::runtime_error("Expected a dictionary but found a non-dictionary object");
+    }
+    return d->items[key];
+}
+
 /// @brief Checks if the specified key exists in the object.
 ///
 /// This method determines whether the given key is present in the object by verifying if the
