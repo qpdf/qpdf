@@ -191,7 +191,7 @@ QPDFObjectHandle::hasKey(std::string const& key) const
 QPDFObjectHandle
 QPDFObjectHandle::getKey(std::string const& key) const
 {
-    if (auto result = (*this)[key]) {
+    if (auto result = get(key)) {
         return result;
     }
     if (isDictionary()) {
@@ -269,7 +269,7 @@ QPDFObjectHandle::removeKey(std::string const& key)
 QPDFObjectHandle
 QPDFObjectHandle::removeKeyAndGetOld(std::string const& key)
 {
-    auto result = (*this)[key];
+    auto result = get(key);
     erase(key);
     return result ? result : newNull();
 }

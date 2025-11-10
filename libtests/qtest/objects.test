@@ -11,12 +11,16 @@ require TestDriver;
 
 my $td = new TestDriver('objects');
 
-my $n_tests = 1;
-
+my $n_tests = 2;
 
 $td->runtest("integer type checks",
              {$td->COMMAND => "objects 0 minimal.pdf"},
              {$td->FILE => "test0.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("dictionary checks",
+             {$td->COMMAND => "objects 1 -"},
+             {$td->STRING =>  => "test 1 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 $td->report($n_tests);
