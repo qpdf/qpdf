@@ -32,9 +32,19 @@ namespace qpdf::impl
         {
         }
 
-        // Return the field's parent. A form field object helper whose underlying object is null is
-        // returned if there is no parent. This condition may be tested by calling isNull().
-        FormField getParent();
+        /// Retrieves the /Parent form field of the current field.
+        ///
+        /// This function accesses the parent field in the hierarchical structure of form fields, if
+        /// it exists. The parent is determined based on the /Parent attribute in the field
+        /// dictionary.
+        ///
+        /// @return A FormField object representing the parent field. If the current field has no
+        ///         parent, an empty FormField object is returned.
+        FormField
+        Parent()
+        {
+            return {get("/Parent")};
+        }
 
         // Return the top-level field for this field. Typically this will be the field itself or its
         // parent. If is_different is provided, it is set to true if the top-level field is

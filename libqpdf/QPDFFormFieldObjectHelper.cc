@@ -48,13 +48,7 @@ QPDFFormFieldObjectHelper::isNull()
 QPDFFormFieldObjectHelper
 QPDFFormFieldObjectHelper::getParent()
 {
-    return {Null::if_null(m->getParent().oh())};
-}
-
-FormField
-FormField::getParent()
-{
-    return {oh()["/Parent"]}; // maybe null
+    return {Null::if_null(m->Parent().oh())};
 }
 
 QPDFFormFieldObjectHelper
