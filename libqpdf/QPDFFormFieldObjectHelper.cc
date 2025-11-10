@@ -107,15 +107,14 @@ FormField::inherited(std::string const& name, bool acroform) const
 std::string
 QPDFFormFieldObjectHelper::getInheritableFieldValueAsString(std::string const& name)
 {
-    return m->getInheritableFieldValueAsString(name);
+    return m->inheritable_string(name);
 }
 
 std::string
-FormField::getInheritableFieldValueAsString(std::string const& name)
+FormField::inheritable_string(std::string const& name) const
 {
-    auto fv = inheritable_value<QPDFObjectHandle>(name);
-    if (fv.isString()) {
-        return fv.getUTF8Value();
+    if (auto fv = inheritable_value<String>(name)) {
+        return fv.utf8_value();
     }
     return {};
 }
@@ -236,13 +235,13 @@ FormField::getValue()
 std::string
 QPDFFormFieldObjectHelper::getValueAsString()
 {
-    return getInheritableFieldValueAsString("/V");
+    return m->getValueAsString();
 }
 
 std::string
 FormField::getValueAsString()
 {
-    return getInheritableFieldValueAsString("/V");
+    return inheritable_string("/V");
 }
 
 QPDFObjectHandle
@@ -266,7 +265,7 @@ QPDFFormFieldObjectHelper::getDefaultValueAsString()
 std::string
 FormField::getDefaultValueAsString()
 {
-    return getInheritableFieldValueAsString("/DV");
+    return inheritable_string("/DV");
 }
 
 QPDFObjectHandle

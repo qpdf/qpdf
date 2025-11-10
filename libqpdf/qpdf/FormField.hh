@@ -97,9 +97,12 @@ namespace qpdf::impl
             return {inherit ? inherited(name, acroform) : null_oh};
         }
 
-        // Get an inherited field value as a string. If it is not a string, silently return the
-        // empty string.
-        std::string getInheritableFieldValueAsString(std::string const& name);
+        /// @brief Retrieves an inherited field string attribute as a string.
+        ///
+        /// @param name The name of the field for which the value is to be retrieved.
+        /// @return The inherited field value as a UTF-8 encoded string, or an empty string if the
+        ///         value does not exist or is not of String type.
+        std::string inheritable_string(std::string const& name) const;
 
         // Get an inherited field value of type name as a string representing the name. If it is not
         // a name, silently return the empty string.
