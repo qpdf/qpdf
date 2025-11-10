@@ -105,9 +105,10 @@ namespace qpdf::impl
         std::string inheritable_string(std::string const& name) const;
 
         /// @brief Retrieves the field type (/FT attribute).
+        ///
         /// @param inherit If set to `true`, the function will attempt to retrieve the value by
         ///        inheritance from the parent hierarchy of the form field. Defaults to `true`.
-        /// @return Returns the field  type if found; otherwise, returns a default-constructed
+        /// @return Returns the field type if found; otherwise, returns a default-constructed
         ///         `Name`.
         Name
         FT(bool inherit = true) const
@@ -115,17 +116,78 @@ namespace qpdf::impl
             return inheritable_value<Name>("/FT");
         }
 
-        std::string getFullyQualifiedName();
+        /// @brief Retrieves the partial field name (/T attribute).
+        ///
+        /// @return Returns the partial field name if found; otherwise, returns a
+        ///         default-constructed `String`.
+        String
+        T() const
+        {
+            return {get("/T")};
+        }
 
-        std::string getPartialName();
+        /// @brief Retrieves the alternative name (/TU attribute).
+        ///
+        /// @return Returns the alternative name if found; otherwise, returns a default-constructed
+        ///         `String`.
+        String
+        TU() const
+        {
+            return {get("/TU")};
+        }
 
-        // Return the alternative field name (/TU), which is the field name intended to be presented
-        // to users. If not present, fall back to the fully qualified name.
-        std::string getAlternativeName();
+        /// @brief Retrieves the mapping name (/TM attribute).
+        ///
+        /// @return Returns the mapping name if found; otherwise, returns a default-constructed
+        ///         `String`.
+        String
+        TM() const
+        {
+            return {get("/TM")};
+        }
 
-        // Return the mapping field name (/TM). If not present, fall back to the alternative name,
-        // then to the partial name.
-        std::string getMappingName();
+        /// @brief Retrieves the fully qualified name of the form field.
+        ///
+        /// This method constructs the fully qualified name of the form field by traversing through
+        /// its parent hierarchy. The fully qualified name is constructed by concatenating the /T
+        /// (field name) attribute of each parent node with periods as separators, starting from the
+        /// root of the hierarchy.
+        ///
+        /// If the field has no parent hierarchy, the result will simply be the /T attribute of the
+        /// current field. In cases of potential circular references, loop detection is applied.
+        ///
+        /// @return A string representing the fully qualified name of the field.
+        std::string fully_qualified_name() const;
+
+        /// @brief Retrieves the partial name (/T attribute) of the form field.
+        ///
+        /// This method returns the value of the field's /T attribute, which is the partial name
+        /// used to identify the field within its parent hierarchy. If the attribute is not set, an
+        /// empty string is returned.
+        ///
+        /// @return A string representing the partial name of the field in UTF-8 encoding, or an
+        ///         empty string if the /T attribute is not present.
+        std::string partial_name() const;
+
+        /// @brief Retrieves the alternative name for the form field.
+        ///
+        /// This method attempts to return the alternative name (/TU) of the form field, which is
+        /// the field name intended to be presented, to users as a UTF-8 string, if it exists. If
+        /// the alternative name is not present, the method falls back to the fully qualified name
+        /// of the form field.
+        ///
+        /// @return The alternative name of the form field as a string, or the
+        /// fully qualified name if the alternative name is unavailable.
+        std::string alternative_name() const;
+
+        /// @brief Retrieves the mapping field name (/TM) for the form field.
+        ///
+        /// If the mapping name (/TM) is present, it is returned as a UTF-8 string. If not, it falls
+        /// back to the 'alternative name', which is obtained using the `alternative_name()` method.
+        ///
+        /// @return The mapping field name (/TM) as a UTF-8 string or the alternative name
+        /// if the mapping name is absent.
+        std::string mapping_name() const;
 
         QPDFObjectHandle getValue();
 

@@ -140,23 +140,24 @@ QPDFFormFieldObjectHelper::getFieldType()
 std::string
 QPDFFormFieldObjectHelper::getFullyQualifiedName()
 {
-    return m->getFullyQualifiedName();
+    return m->fully_qualified_name();
 }
 
 std::string
-FormField::getFullyQualifiedName()
+FormField::fully_qualified_name() const
 {
     std::string result;
-    QPDFObjectHandle node = oh();
+    auto node = *this;
     QPDFObjGen::set seen;
-    while (!node.null() && seen.add(node)) {
-        if (node.getKey("/T").isString()) {
+    size_t depth = 0; // Don't bother with loop detection until depth becomes suspicious
+    while (node && (++depth < 10 || seen.add(node))) {
+        if (auto T = node.T()) {
             if (!result.empty()) {
-                result = "." + result;
+                result.insert(0, 1, '.');
             }
-            result = node.getKey("/T").getUTF8Value() + result;
+            result.insert(0, T.utf8_value());
         }
-        node = node.getKey("/Parent");
+        node = node.Parent();
     }
     return result;
 }
@@ -164,51 +165,46 @@ FormField::getFullyQualifiedName()
 std::string
 QPDFFormFieldObjectHelper::getPartialName()
 {
-    return m->getPartialName();
+    return m->partial_name();
 }
 
 std::string
-FormField::getPartialName()
+FormField::partial_name() const
 {
-    std::string result;
-    if (oh().getKey("/T").isString()) {
-        result = oh().getKey("/T").getUTF8Value();
+    if (auto pn = T()) {
+        return pn.utf8_value();
     }
-    return result;
+    return {};
 }
 
 std::string
 QPDFFormFieldObjectHelper::getAlternativeName()
 {
-    return m->getAlternativeName();
+    return m->alternative_name();
 }
 
 std::string
-FormField::getAlternativeName()
+FormField::alternative_name() const
 {
-    if (oh().getKey("/TU").isString()) {
-        QTC::TC("qpdf", "QPDFFormFieldObjectHelper TU present");
-        return oh().getKey("/TU").getUTF8Value();
+    if (auto an = TU()) {
+        return an.utf8_value();
     }
-    QTC::TC("qpdf", "QPDFFormFieldObjectHelper TU absent");
-    return getFullyQualifiedName();
+    return fully_qualified_name();
 }
 
 std::string
 QPDFFormFieldObjectHelper::getMappingName()
 {
-    return m->getMappingName();
+    return m->mapping_name();
 }
 
 std::string
-FormField::getMappingName()
+FormField::mapping_name() const
 {
-    if (oh().getKey("/TM").isString()) {
-        QTC::TC("qpdf", "QPDFFormFieldObjectHelper TM present");
-        return oh().getKey("/TM").getUTF8Value();
+    if (auto mn = TM()) {
+        return mn.utf8_value();
     }
-    QTC::TC("qpdf", "QPDFFormFieldObjectHelper TM absent");
-    return getAlternativeName();
+    return alternative_name();
 }
 
 QPDFObjectHandle

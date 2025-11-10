@@ -174,10 +174,6 @@ QPDFObjectHandle dictionary empty map for asMap 0
 QPDFObjectHandle numeric non-numeric 0
 QPDFObjectHandle erase array bounds 0
 qpdf-c called qpdf_check_pdf 0
-QPDFFormFieldObjectHelper TU present 0
-QPDFFormFieldObjectHelper TM present 0
-QPDFFormFieldObjectHelper TU absent 0
-QPDFFormFieldObjectHelper TM absent 0
 QPDFFormFieldObjectHelper Q present 1
 QPDFFormFieldObjectHelper DA present 1
 QPDFAcroFormDocumentHelper field found 1
