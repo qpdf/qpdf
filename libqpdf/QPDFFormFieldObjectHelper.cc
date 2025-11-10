@@ -18,6 +18,8 @@ using namespace qpdf;
 
 using FormField = qpdf::impl::FormField;
 
+const QPDFObjectHandle FormField::null_oh;
+
 class QPDFFormFieldObjectHelper::Members: public FormField
 {
   public:
@@ -76,22 +78,6 @@ FormField::root_field(bool* is_different)
         }
     }
     return rf;
-}
-
-QPDFObjectHandle
-FormField::getFieldFromAcroForm(std::string const& name)
-{
-    QPDFObjectHandle result = QPDFObjectHandle::newNull();
-    // Fields are supposed to be indirect, so this should work.
-    QPDF* q = oh().getOwningQPDF();
-    if (!q) {
-        return result;
-    }
-    auto acroform = q->getRoot().getKey("/AcroForm");
-    if (!acroform.isDictionary()) {
-        return result;
-    }
-    return acroform.getKey(name);
 }
 
 QPDFObjectHandle
@@ -289,13 +275,13 @@ FormField::getDefaultValueAsString()
 QPDFObjectHandle
 QPDFFormFieldObjectHelper::getDefaultResources()
 {
-    return m->getDefaultResources();
+    return Null::if_null(m->getDefaultResources());
 }
 
 QPDFObjectHandle
 FormField::getDefaultResources()
 {
-    return getFieldFromAcroForm("/DR");
+    return from_AcroForm("/DR");
 }
 
 std::string
@@ -310,7 +296,7 @@ FormField::getDefaultAppearance()
     auto value = getInheritableFieldValue("/DA");
     bool looked_in_acroform = false;
     if (!value.isString()) {
-        value = getFieldFromAcroForm("/DA");
+        value = from_AcroForm("/DA");
         looked_in_acroform = true;
     }
     if (value.isString()) {
@@ -332,7 +318,7 @@ FormField::getQuadding()
     QPDFObjectHandle fv = getInheritableFieldValue("/Q");
     bool looked_in_acroform = false;
     if (!fv.isInteger()) {
-        fv = getFieldFromAcroForm("/Q");
+        fv = from_AcroForm("/Q");
         looked_in_acroform = true;
     }
     if (fv.isInteger()) {

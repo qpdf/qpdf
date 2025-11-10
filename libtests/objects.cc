@@ -90,7 +90,6 @@ test_0(QPDF& pdf, char const* arg2)
     assert_compare_numbers(UINT_MAX, t.getKey("/Q3").getUIntValueAsUInt());
 }
 
-
 static void
 test_1(QPDF& pdf, char const* arg2)
 {
@@ -121,7 +120,7 @@ test_1(QPDF& pdf, char const* arg2)
 
     bool thrown = false;
     try {
-       i.at("/A");
+        i.at("/A");
     } catch (std::runtime_error const&) {
         thrown = true;
     }
@@ -161,7 +160,9 @@ runtest(int n, char const* filename1, char const* arg2)
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
 
-    std::set<int> ignore_filename = {1,};
+    std::set<int> ignore_filename = {
+        1,
+    };
 
     QPDF pdf;
     std::shared_ptr<char> file_buf;
@@ -175,7 +176,8 @@ runtest(int n, char const* filename1, char const* arg2)
     }
 
     std::map<int, void (*)(QPDF&, char const*)> test_functions = {
-        {0, test_0}, {1, test_1},
+        {0, test_0},
+        {1, test_1},
     };
 
     auto fn = test_functions.find(n);

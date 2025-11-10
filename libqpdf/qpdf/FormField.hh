@@ -173,12 +173,29 @@ namespace qpdf::impl
         void generateAppearance(QPDFAnnotationObjectHelper&);
 
       private:
-        QPDFObjectHandle getFieldFromAcroForm(std::string const& name);
+        /// @brief Retrieves an entry from the document's /AcroForm dictionary using the specified
+        /// name.
+        ///
+        /// The method accesses the AcroForm dictionary within the root object of the PDF document.
+        /// If the the AcroForm dictionary contains the given field name, it retrieves the
+        /// corresponding entry. Otherwise, it returns a default-constructed object handle.
+        ///
+        /// @param name The name of the form field to retrieve.
+        /// @return A object handle corresponding to the specified name within the AcroForm
+        /// dictionary.
+        QPDFObjectHandle const&
+        from_AcroForm(std::string const& name) const
+        {
+            return {qpdf() ? qpdf()->getRoot()["/AcroForm"][name] : null_oh};
+        }
+
         void setRadioButtonValue(QPDFObjectHandle name);
         void setCheckBoxValue(bool value);
         void generateTextAppearance(QPDFAnnotationObjectHelper&);
         QPDFObjectHandle
         getFontFromResource(QPDFObjectHandle resources, std::string const& font_name);
+
+        static const QPDFObjectHandle null_oh;
     };
 } // namespace qpdf::impl
 
