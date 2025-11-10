@@ -60,8 +60,42 @@ namespace qpdf::impl
         /// @return The top-level field in the form field hierarchy.
         FormField root_field(bool* is_different = nullptr);
 
-        // Get a field value, possibly inheriting the value from an ancestor node.
-        QPDFObjectHandle getInheritableFieldValue(std::string const& name);
+        /// @brief Retrieves the inherited value of the specified attribute.
+        ///
+        /// @param name The name of the attribute to retrieve.
+        /// @param acroform If true, checks the document's /AcroForm dictionary for the attribute
+        ///                 if it is not found in the field hierarchy.
+        ///
+        /// @return A constant reference to the QPDFObjectHandle representing the value of the
+        ///         specified attribute, if found. If the attribute is not found in the field
+        ///         hierarchy or the /AcroForm dictionary (when `acroform` is true), returns a
+        ///         reference to a static null object handle.
+        QPDFObjectHandle const& inherited(std::string const& name, bool acroform = false) const;
+
+        /// @brief Retrieves the value of a specified field, accounting for inheritance through the
+        ///        hierarchy of ancestor nodes in the form field tree.
+        ///
+        /// This function attempts to retrieve the value of the specified field. If the `inherit`
+        /// parameter is set to `true` and the field value is not found at the current level, the
+        /// method traverses up the parent hierarchy to find the value. The traversal stops when a
+        /// value is found, when the root node is reached, or when a loop detection mechanism
+        /// prevents further traversal.
+        ///
+        /// @tparam T The return type of the field value.
+        /// @param name The name of the field to retrieve the value for.
+        /// @param inherit If set to `true`, the function will attempt to retrieve the value by
+        ///        inheritance from the parent hierarchy of the form field. Defaults to `true`.
+        /// @return Returns the field's value if found; otherwise, returns a default-constructed
+        ///         value of type `T`.
+        template <class T>
+        T
+        inheritable_value(std::string const& name, bool inherit = true, bool acroform = false) const
+        {
+            if (auto& v = get(name)) {
+                return {v};
+            }
+            return {inherit ? inherited(name, acroform) : null_oh};
+        }
 
         // Get an inherited field value as a string. If it is not a string, silently return the
         // empty string.
