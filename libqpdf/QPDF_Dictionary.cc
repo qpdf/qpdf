@@ -2,6 +2,7 @@
 
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/Util.hh>
 
 using namespace std::literals;
 using namespace qpdf;
@@ -29,10 +30,47 @@ BaseHandle::operator[](std::string const& key) const
     return null_obj;
 }
 
+/// @brief Checks if the specified key exists in the object.
+///
+/// This method determines whether the given key is present in the object by verifying if the
+/// associated value is non-null.
+///
+/// @param key The key to look for in the object.
+/// @return True if the key exists and its associated value is non-null. Otherwise, returns false.
 bool
 BaseHandle::contains(std::string const& key) const
 {
     return !(*this)[key].null();
+}
+
+/// @brief Retrieves the value associated with the given key from  dictionary.
+///
+/// This method attempts to find the value corresponding to the specified key for objects that can
+/// be interpreted as dictionaries.
+///
+/// - If the object is a dictionary and the specified key exists, it returns a reference
+///   to the associated value.
+/// - If the object is not a dictionary or the specified key does not exist, it returns
+///   a reference to a static uninitialized object handle.
+///
+/// @note Modifying the uninitialized object returned when the key is not found is strictly
+/// prohibited.
+///
+/// @param key The key whose associated value should be retrieved.
+/// @return A reference to the associated value if the key is found or a reference to a static
+/// uninitialized object if the key is not found.
+QPDFObjectHandle&
+BaseHandle::find(std::string const& key) const
+{
+    static const QPDFObjectHandle null_obj;
+    qpdf_invariant(!null_obj);
+    if (auto d = as<QPDF_Dictionary>()) {
+        auto it = d->items.find(key);
+        if (it != d->items.end()) {
+            return it->second;
+        }
+    }
+    return const_cast<QPDFObjectHandle&>(null_obj);
 }
 
 std::set<std::string>

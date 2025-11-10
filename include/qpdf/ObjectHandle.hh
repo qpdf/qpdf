@@ -85,6 +85,7 @@ namespace qpdf
 
         bool contains(std::string const& key) const;
         size_t erase(std::string const& key);
+        QPDFObjectHandle& find(std::string const& key) const;
         bool replace(std::string const& key, QPDFObjectHandle value);
         QPDFObjectHandle const& operator[](std::string const& key) const;
 
