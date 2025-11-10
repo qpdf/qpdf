@@ -200,11 +200,18 @@ namespace qpdf::impl
         // is not a string, the empty string will be silently returned.
         std::string getDefaultValueAsString();
 
-        // Return the default appearance string, taking inheritance from the field tree into
-        // account. Returns the empty string if the default appearance string is not available
-        // (because it's erroneously absent or because this is not a variable text field). If not
-        // found in the field hierarchy, look in /AcroForm.
-        std::string getDefaultAppearance();
+        /// @brief Returns the default appearance string for the form field, considering inheritance
+        ///        from the field tree hierarchy and the document's /AcroForm dictionary.
+        ///
+        /// This method retrieves the field's /DA (default appearance) attribute. If the attribute
+        /// is not directly available, it checks the parent fields in the hierarchy for an inherited
+        /// value. If no value is found in the field hierarchy, it attempts to retrieve the /DA
+        /// attribute from the document's /AcroForm dictionary. The method returns an empty string
+        /// if no default appearance string is available or applicable.
+        ///
+        /// @return A string representing the default appearance, or an empty string if
+        ///         no value is found.
+        std::string default_appearance() const;
 
         // Return the default resource dictionary for the field. This comes not from the field but
         // from the document-level /AcroForm dictionary. While several PDF generates put a /DR key

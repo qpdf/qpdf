@@ -270,21 +270,17 @@ FormField::getDefaultResources()
 std::string
 QPDFFormFieldObjectHelper::getDefaultAppearance()
 {
-    return m->getDefaultAppearance();
+    return m->default_appearance();
 }
 
 std::string
-FormField::getDefaultAppearance()
+FormField::default_appearance() const
 {
-    auto value = inheritable_value<QPDFObjectHandle>("/DA");
-    bool looked_in_acroform = false;
-    if (!value.isString()) {
-        value = from_AcroForm("/DA");
-        looked_in_acroform = true;
+    if (auto DA = inheritable_value<String>("/DA")) {
+        return DA.utf8_value();
     }
-    if (value.isString()) {
-        QTC::TC("qpdf", "QPDFFormFieldObjectHelper DA present", looked_in_acroform ? 0 : 1);
-        return value.getUTF8Value();
+    if (String DA = from_AcroForm("/DA")) {
+        return DA.utf8_value();
     }
     return {};
 }
@@ -939,7 +935,7 @@ FormField::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
         return;
     }
     QPDFObjectHandle::Rectangle bbox = bbox_obj.getArrayAsRectangle();
-    std::string DA = getDefaultAppearance();
+    std::string DA = default_appearance();
     std::string V = getValueAsString();
     std::vector<std::string> opt;
     if (isChoice() && (getFlags() & ff_ch_combo) == 0) {

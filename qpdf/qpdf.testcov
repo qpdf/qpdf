@@ -175,7 +175,6 @@ QPDFObjectHandle numeric non-numeric 0
 QPDFObjectHandle erase array bounds 0
 qpdf-c called qpdf_check_pdf 0
 QPDFFormFieldObjectHelper Q present 1
-QPDFFormFieldObjectHelper DA present 1
 QPDFAcroFormDocumentHelper field found 1
 QPDFAcroFormDocumentHelper annotation found 1
 QPDFJob automatically set keep files open 1
