@@ -54,35 +54,30 @@ test_0(QPDF& pdf, char const* arg2)
     assert_compare_numbers(INT_MAX, t.getKey("/Q1").getIntValueAsInt());
     try {
         assert_compare_numbers(0u, QPDFObjectHandle::newNull().getUIntValueAsUInt());
-        std::cerr << "convert null to uint did not throw\n";
     } catch (QPDFExc const&) {
         std::cerr << "caught expected type error\n";
     }
     assert_compare_numbers(std::numeric_limits<int8_t>::max(), Integer(q1).value<int8_t>());
     assert_compare_numbers(std::numeric_limits<int8_t>::min(), Integer(-q1).value<int8_t>());
     try {
-        int8_t q1_8 = Integer(q1);
-        std::cerr << "q1_8: " << std::to_string(q1_8) << '\n';
+        [[maybe_unused]] int8_t q1_8 = Integer(q1);
     } catch (std::overflow_error const&) {
         std::cerr << "caught expected int8_t overflow error\n";
     }
     try {
-        int8_t q1_8 = Integer(-q1);
-        std::cerr << "q1_8: " << std::to_string(q1_8) << '\n';
+        [[maybe_unused]] int8_t q1_8 = Integer(-q1);
     } catch (std::underflow_error const&) {
         std::cerr << "caught expected int8_t underflow error\n";
     }
     assert_compare_numbers(std::numeric_limits<uint8_t>::max(), Integer(q1).value<uint8_t>());
     assert_compare_numbers(0, Integer(-q1).value<uint8_t>());
     try {
-        uint8_t q1_u8 = Integer(q1);
-        std::cerr << "q1_u8: " << std::to_string(q1_u8) << '\n';
+        [[maybe_unused]] uint8_t q1_u8 = Integer(q1);
     } catch (std::overflow_error const&) {
         std::cerr << "caught expected uint8_t overflow error\n";
     }
     try {
-        uint8_t q1_u8 = Integer(-q1);
-        std::cerr << "q1_u8: " << std::to_string(q1_u8) << '\n';
+        [[maybe_unused]] uint8_t q1_u8 = Integer(-q1);
     } catch (std::underflow_error const&) {
         std::cerr << "caught expected uint8_t underflow error\n";
     }
@@ -95,6 +90,70 @@ test_0(QPDF& pdf, char const* arg2)
     assert_compare_numbers(UINT_MAX, t.getKey("/Q3").getUIntValueAsUInt());
 }
 
+
+static void
+test_1(QPDF& pdf, char const* arg2)
+{
+    // Test new dictionary methods.
+    using namespace qpdf;
+    auto d = Dictionary({{"/A", {}}, {"/B", Null()}, {"/C", Dictionary::empty()}});
+
+    // contains
+    assert(!d.contains("/A"));
+    assert(!d.contains("/B"));
+    assert(d.contains("/C"));
+
+    auto i = Integer(42);
+    assert(!i.contains("/A"));
+
+    // at
+    assert(!d.at("/A"));
+    assert(d.at("/B"));
+    assert(d.at("/B").null());
+    assert(d.at("/C"));
+    assert(!d.at("/C").null());
+    d.at("/C") = Integer(42);
+    assert(d.at("/C") == 42);
+    assert(!d.at("/D"));
+    assert(d.at("/D").null());
+    assert(QPDFObjectHandle(d).getDictAsMap().contains("/D"));
+    assert(QPDFObjectHandle(d).getDictAsMap().size() == 4);
+
+    bool thrown = false;
+    try {
+       i.at("/A");
+    } catch (std::runtime_error const&) {
+        thrown = true;
+    }
+    assert(thrown);
+
+    // find
+    assert(!d.find("/A"));
+    assert(d.find("/B"));
+    assert(d.find("/B").null());
+    assert(d.find("/C"));
+    assert(Integer(d.find("/C")) == 42);
+    d.find("/C") = Name("/DontPanic");
+    assert(Name(d.find("/C")) == "/DontPanic");
+    assert(!d.find("/E"));
+    assert(!QPDFObjectHandle(d).getDictAsMap().contains("/E"));
+    assert(QPDFObjectHandle(d).getDictAsMap().size() == 4);
+
+    // replace
+    assert(!i.replace("/A", Name("/DontPanic")));
+    Dictionary di = i.oh();
+    thrown = false;
+    try {
+        di.replace("/A", Name("/DontPanic"));
+    } catch (std::runtime_error const&) {
+        thrown = true;
+    }
+    assert(thrown);
+    d.replace("/C", Integer(42));
+    assert(Integer(d["/C"]) == 42);
+    assert(QPDFObjectHandle(d).getDictAsMap().size() == 4);
+}
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -102,7 +161,7 @@ runtest(int n, char const* filename1, char const* arg2)
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
 
-    std::set<int> ignore_filename = {};
+    std::set<int> ignore_filename = {1,};
 
     QPDF pdf;
     std::shared_ptr<char> file_buf;
@@ -116,7 +175,7 @@ runtest(int n, char const* filename1, char const* arg2)
     }
 
     std::map<int, void (*)(QPDF&, char const*)> test_functions = {
-        {0, test_0},
+        {0, test_0}, {1, test_1},
     };
 
     auto fn = test_functions.find(n);

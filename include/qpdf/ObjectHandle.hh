@@ -83,8 +83,11 @@ namespace qpdf
         QPDFObjectHandle operator[](size_t n) const;
         QPDFObjectHandle operator[](int n) const;
 
+        QPDFObjectHandle& at(std::string const& key) const;
         bool contains(std::string const& key) const;
         size_t erase(std::string const& key);
+        QPDFObjectHandle& find(std::string const& key) const;
+        bool replace(std::string const& key, QPDFObjectHandle value);
         QPDFObjectHandle const& operator[](std::string const& key) const;
 
         std::shared_ptr<QPDFObject> copy(bool shallow = false) const;
@@ -133,6 +136,8 @@ namespace qpdf
         inline void nullify();
 
         std::string description() const;
+
+        inline QPDFObjectHandle const& get(std::string const& key) const;
 
         void no_ci_warn_if(bool condition, std::string const& warning) const;
         void no_ci_stop_if(bool condition, std::string const& warning) const;

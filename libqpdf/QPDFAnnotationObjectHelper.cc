@@ -33,14 +33,14 @@ QPDFAnnotationObjectHelper::getAppearanceDictionary()
 std::string
 QPDFAnnotationObjectHelper::getAppearanceState()
 {
-    Name AS = (*this)["/AS"];
+    Name AS = get("/AS");
     return AS ? AS.value() : "";
 }
 
 int
 QPDFAnnotationObjectHelper::getFlags()
 {
-    Integer flags_obj = (*this)["/F"];
+    Integer flags_obj = get("/F");
     return flags_obj ? flags_obj : 0;
 }
 

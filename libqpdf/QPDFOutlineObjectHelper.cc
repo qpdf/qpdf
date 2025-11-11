@@ -53,9 +53,9 @@ QPDFOutlineObjectHelper::getKids()
 QPDFObjectHandle
 QPDFOutlineObjectHelper::getDest()
 {
-    auto dest = (*this)["/Dest"];
+    auto dest = get("/Dest");
     if (dest.null()) {
-        auto const& A = (*this)["/A"];
+        auto const& A = get("/A");
         if (Name(A["/S"]) == "/GoTo") {
             dest = A["/D"];
         }

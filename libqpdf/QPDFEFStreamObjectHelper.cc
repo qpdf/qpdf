@@ -31,7 +31,7 @@ void
 QPDFEFStreamObjectHelper::setParam(std::string const& pkey, QPDFObjectHandle const& pval)
 {
     if (Dictionary Params = oh().getDict()["/Params"]) {
-        Params.replaceKey(pkey, pval);
+        Params.replace(pkey, pval);
         return;
     }
     oh().getDict().replaceKey("/Params", Dictionary({{pkey, pval}}));

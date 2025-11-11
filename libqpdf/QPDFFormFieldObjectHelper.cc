@@ -956,7 +956,7 @@ FormField::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
             aoh.getObjectHandle().replaceKey("/AP", Dictionary::empty());
             AP = aoh.getAppearanceDictionary();
         }
-        AP.replaceKey("/N", AS);
+        AP.replace("/N", AS);
     }
     if (!AS.isStream()) {
         aoh.warn("unable to get normal appearance stream for update");
