@@ -1,6 +1,6 @@
 #include <qpdf/QPDFFormFieldObjectHelper.hh>
 
-#include <qpdf/FormField.hh>
+#include <qpdf/AcroForm.hh>
 
 #include <qpdf/Pl_QPDFTokenizer.hh>
 #include <qpdf/QIntC.hh>

@@ -1,5 +1,5 @@
-#ifndef FORMFIELD_HH
-#define FORMFIELD_HH
+#ifndef ACRO_FORM_HH
+#define ACRO_FORM_HH
 
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFObjectHelper.hh>
@@ -422,4 +422,4 @@ namespace qpdf::impl
     }; // class FormNode
 } // namespace qpdf::impl
 
-#endif // FORMFIELD_HH
+#endif // ACRO_FORM_HH

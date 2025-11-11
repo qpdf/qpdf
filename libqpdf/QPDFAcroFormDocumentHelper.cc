@@ -1,6 +1,6 @@
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 
-#include <qpdf/FormField.hh>
+#include <qpdf/AcroForm.hh>
 
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
