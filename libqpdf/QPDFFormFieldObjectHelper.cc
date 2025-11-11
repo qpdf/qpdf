@@ -228,23 +228,17 @@ FormField::value() const
 QPDFObjectHandle
 QPDFFormFieldObjectHelper::getDefaultValue()
 {
-    return Null::if_null(m->getDefaultValue());
-}
-
-QPDFObjectHandle
-FormField::getDefaultValue()
-{
-    return inheritable_value<QPDFObjectHandle>("/DV");
+    return Null::if_null(m->DV());
 }
 
 std::string
 QPDFFormFieldObjectHelper::getDefaultValueAsString()
 {
-    return m->getDefaultValueAsString();
+    return m->default_value();
 }
 
 std::string
-FormField::getDefaultValueAsString()
+FormField::default_value() const
 {
     return inheritable_string("/DV");
 }

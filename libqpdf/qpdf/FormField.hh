@@ -185,8 +185,8 @@ namespace qpdf::impl
         /// If the mapping name (/TM) is present, it is returned as a UTF-8 string. If not, it falls
         /// back to the 'alternative name', which is obtained using the `alternative_name()` method.
         ///
-        /// @return The mapping field name (/TM) as a UTF-8 string or the alternative name
-        /// if the mapping name is absent.
+        /// @return The mapping field name (/TM) as a UTF-8 string or the alternative name if the
+        ///         mapping name is absent.
         std::string mapping_name() const;
 
         /// @brief Retrieves the field value (`/V` attribute) of a specified field, accounting for
@@ -243,11 +243,40 @@ namespace qpdf::impl
         ///         an empty string if the value is not present or not a String.
         std::string value() const;
 
-        QPDFObjectHandle getDefaultValue();
+        /// @brief Retrieves the field  default value (`/DV` attribute) of a specified field,
+        ///        accounting for inheritance through the hierarchy of ancestor nodes in the form
+        ///        field tree.
+        ///
+        /// This function attempts to retrieve the `/DV` attribute. If the `inherit` parameter is
+        /// set to `true` and the `/DV` is not found at the current level, the method traverses up
+        /// the parent hierarchy to find the value. The traversal stops when
+        /// `/DV` is found, when the root node is reached, or when a loop detection mechanism
+        /// prevents further traversal.
+        ///
+        /// @tparam T The return type.
+        /// @param inherit If set to `true`, the function will attempt to retrieve `/DV` by
+        ///        inheritance from the parent hierarchy of the form field. Defaults to `true`.
+        /// @return Returns the field's default value if found; otherwise, returns a
+        ///         default-constructed value of type `T`.
+        QPDFObjectHandle const&
+        DV(bool inherit = true) const
+        {
+            if (auto& v = get("/DV")) {
+                return v;
+            }
+            return {inherit ? inherited("/DV") : null_oh};
+        }
 
-        // Return the field's default value as a string. If this is called with a field whose value
-        // is not a string, the empty string will be silently returned.
-        std::string getDefaultValueAsString();
+        /// @brief Retrieves the default value `/DV` attribute of the form field, considering
+        ///        inheritance, if the default value is  a String.
+        ///
+        /// This function extracts the default value of the form field, accounting for potential
+        /// inheritance through the form hierarchy. It returns the value if it is a String, and an
+        /// empty string otherwise.
+        ///
+        /// @return A string containing the actual or inherited `/V` attribute of the form field, or
+        ///         an empty string if the value is not present or not a String.
+        std::string default_value() const;
 
         /// @brief Returns the default appearance string for the form field, considering inheritance
         ///        from the field tree hierarchy and the document's /AcroForm dictionary.
