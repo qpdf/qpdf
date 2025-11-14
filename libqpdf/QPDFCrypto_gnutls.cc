@@ -43,7 +43,11 @@ void
 QPDFCrypto_gnutls::MD5_init()
 {
     MD5_finalize();
+
+    GNUTLS_FIPS140_SET_LAX_MODE();
     int code = gnutls_hash_init(&hash_ctx, GNUTLS_DIG_MD5);
+    GNUTLS_FIPS140_SET_STRICT_MODE();
+
     if (code < 0) {
         hash_ctx = nullptr;
         throw std::runtime_error(
