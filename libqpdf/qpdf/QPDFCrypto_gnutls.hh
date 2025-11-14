@@ -53,6 +53,7 @@ class QPDFCrypto_gnutls: public QPDFCryptoImpl
     char digest[64];
     unsigned char const* aes_key_data;
     size_t aes_key_len;
+    unsigned fips_mode;
 };
 
 #endif // QPDFCRYPTO_GNUTLS_HH
