@@ -7,6 +7,7 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/global.hh>
 
 #include <climits>
 #include <cstdio>
@@ -153,6 +154,75 @@ test_1(QPDF& pdf, char const* arg2)
     assert(QPDFObjectHandle(d).getDictAsMap().size() == 4);
 }
 
+static void
+test_2(QPDF& pdf, char const* arg2)
+{
+    // Test global limits.
+    using namespace qpdf::global::options;
+    using namespace qpdf::global::limits;
+
+    // Check default values
+    assert(objects_max_nesting() == 499);
+    assert(objects_max_errors() == 15);
+    assert(objects_max_container_size() == std::numeric_limits<uint32_t>::max());
+    assert(objects_max_container_size_damaged() == 5'000);
+    assert(default_limits());
+
+    // Test disabling optional default limits
+    default_limits(false);
+    assert(objects_max_nesting() == 499);
+    assert(objects_max_errors() == 0);
+    assert(objects_max_container_size() == std::numeric_limits<uint32_t>::max());
+    assert(objects_max_container_size_damaged() == std::numeric_limits<uint32_t>::max());
+    assert(!default_limits());
+
+    // Check disabling default limits is irreversible
+    default_limits(true);
+    assert(!default_limits());
+
+    // Test setting limits
+    objects_max_nesting(11);
+    objects_max_errors(12);
+    objects_max_container_size(13);
+    objects_max_container_size_damaged(14);
+
+    assert(objects_max_nesting() == 11);
+    assert(objects_max_errors() == 12);
+    assert(objects_max_container_size() == 13);
+    assert(objects_max_container_size_damaged() == 14);
+
+    // Check disabling default limits does not override explicit limits
+    default_limits(false);
+    assert(objects_max_nesting() == 11);
+    assert(objects_max_errors() == 12);
+    assert(objects_max_container_size() == 13);
+    assert(objects_max_container_size_damaged() == 14);
+
+    // Test parameter checking
+    QUtil::handle_result_code(qpdf_r_ok, "");
+    bool thrown = false;
+    try {
+        qpdf::global::handle_result(qpdf_r_success_mask);
+    } catch (std::logic_error const&) {
+        thrown = true;
+    }
+    assert(thrown);
+    thrown = false;
+    try {
+        qpdf::global::get_uint32(qpdf_param_e(42));
+    } catch (std::logic_error const&) {
+        thrown = true;
+    }
+    assert(thrown);
+    thrown = false;
+    try {
+        qpdf::global::set_uint32(qpdf_param_e(42), 42);
+    } catch (std::logic_error const&) {
+        thrown = true;
+    }
+    assert(thrown);
+}
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -160,9 +230,7 @@ runtest(int n, char const* filename1, char const* arg2)
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
 
-    std::set<int> ignore_filename = {
-        1,
-    };
+    std::set<int> ignore_filename = {1, 2};
 
     QPDF pdf;
     std::shared_ptr<char> file_buf;
@@ -176,9 +244,7 @@ runtest(int n, char const* filename1, char const* arg2)
     }
 
     std::map<int, void (*)(QPDF&, char const*)> test_functions = {
-        {0, test_0},
-        {1, test_1},
-    };
+        {0, test_0}, {1, test_1}, {2, test_2}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {

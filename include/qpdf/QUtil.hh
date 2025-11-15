@@ -20,8 +20,10 @@
 #ifndef QUTIL_HH
 #define QUTIL_HH
 
+#include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
+
 #include <cstdio>
 #include <cstring>
 #include <ctime>
@@ -440,6 +442,25 @@ namespace QUtil
 
     QPDF_DLL
     bool is_number(char const*);
+
+    /// @brief  Handles the result code from qpdf functions.
+    ///
+    ///         **For qpdf internal use only - not part of the public API**
+    /// @par
+    ///         Depending on the result code, either continues execution, checks  or throws an
+    ///         exception in case of an invalid parameter.
+    ///
+    /// @param  result The result code of type qpdf_result_e, indicating success or failure status.
+    /// @param context A string describing the context where this function is invoked, used for
+    ///                error reporting if an exception is thrown.
+    ///
+    /// @throws std::logic_error If the result code is `qpdf_bad_parameter`, indicating an invalid
+    ///                          parameter was supplied to a function. The exception message will
+    ///                          include the provided context for easier debugging.
+    ///
+    /// @since 12.3
+    QPDF_DLL
+    void handle_result_code(qpdf_result_e result, std::string_view context);
 
     // This method parses the numeric range syntax used by the qpdf command-line tool. May throw
     // std::runtime_error. A numeric range is as comma-separated list of groups. A group may be a

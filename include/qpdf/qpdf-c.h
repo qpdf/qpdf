@@ -119,6 +119,8 @@
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
 #include <qpdf/qpdflogger-c.h>
+
+#include <stdint.h>
 #include <string.h>
 
 #ifdef __cplusplus
@@ -1000,6 +1002,50 @@ extern "C" {
     /* removePage() */
     QPDF_DLL
     QPDF_ERROR_CODE qpdf_remove_page(qpdf_data qpdf, qpdf_oh page);
+
+    /* GLOBAL OPTIONS AND SETTINGS */
+
+    QPDF_DLL
+    /**
+     * @brief   Retrieves a 32-bit unsigned integer value associated with a global option or limit.
+     *
+     * This function allows querying of specific parameters, identified by the qpdf_param_e enum,
+     * and retrieves their associated unsigned 32-bit integer values. The result will be stored in
+     * the variable pointed to by `value`. For details about the available parameters and their
+     * meanings see `qpdf/global.hh`.
+     *
+     * @param param[in] The parameter for which the value is being retrieved. This must be a valid
+     *                  value from the qpdf_param_e enumeration.
+     * @param value[out] A pointer to a uint32_t to store the retrieved value. This must be a valid,
+     *                   non-null pointer.
+     *
+     * @return An enumeration of type qpdf_result_e indicating the result of the operation. Possible
+     *         values include success or specific error statuses related to the retrieval process.
+     *
+     * @since 12.3
+     */
+    enum qpdf_result_e qpdf_global_get_uint32(enum qpdf_param_e param, uint32_t* value);
+
+    QPDF_DLL
+    /**
+     * @brief   Sets a global option or limit for the qpdf library to a specified value.
+     *
+     * This function is used to configure global options or limits for the qpdf library based on the
+     * provided parameter and value. The behavior depends on the specific `param` provided and its
+     * valid range of values. For details about the available parameters and their meanings see
+     * `qpdf/global.hh`.
+     *
+     * @param param[in] The parameter to be set. Must be one of the values defined in the
+     *                  qpdf_param_e enumeration.
+     * @param value[in] The value to assign to the specified parameter. Interpretation of this value
+     *                  depends on the parameter being set.
+     *
+     * @return An enumeration of type qpdf_result_e indicating the result of the operation. Possible
+     *         values include success or specific error statuses related to the retrieval process.
+     *
+     * @since 12.3
+     */
+    enum qpdf_result_e qpdf_global_set_uint32(enum qpdf_param_e param, uint32_t value);
 #ifdef __cplusplus
 }
 
