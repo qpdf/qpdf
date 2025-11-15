@@ -244,4 +244,47 @@ enum qpdf_page_label_e {
     pl_roman_upper,
 };
 
+/**
+ * @enum    qpdf_result_e
+ * @brief   Enum representing result codes for qpdf C-API functions.
+ *
+ *          Results <= qpdf_r_no_warn indicate success without warnings,
+ *          qpdf_r_no_warn < result <= qpdf_r_success indicates success with warnings, and
+ *          qpdf_r_success < result indicates failure.
+ */
+enum qpdf_result_e {
+    /* success */
+    qpdf_r_ok = 0,
+    qpdf_r_no_warn = 0xff,   /// any result <= qpdf_no_warn indicates success without warning
+    qpdf_r_success = 0xffff, /// any result <= qpdf_no_warn indicates success
+    /* failure */
+    qpdf_r_bad_parameter = 0x10000,
+
+    qpdf_r_no_warn_mask = 0x7fffff00,
+    qpdf_r_success_mask = 0x7fff0000,
+};
+
+/**
+ * @enum    qpdf_param_e
+ * @brief   This enumeration defines various parameters and configuration options for qpdf C-API
+ *          functions.
+ *
+ *          The enum values are grouped into sections based on their functionality, such as global
+ *          options or global limits.For the meaning of individual parameters see `qpdf/global.cc`
+ */
+enum qpdf_param_e {
+    /* global options */
+    qpdf_p_default_limits = 0x10100,
+    /* global limits */
+
+    /* object - parser limits */
+    qpdf_p_objects_max_nesting = 0x11000,
+    qpdf_p_objects_max_errors,
+    qpdf_p_objects_max_container_size,
+    qpdf_p_objects_max_container_size_damaged,
+
+    /* next section = 0x20000 */
+    qpdf_enum_max = 0x7fffffff,
+};
+
 #endif /* QPDFCONSTANTS_H */
