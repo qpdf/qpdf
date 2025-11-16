@@ -38,6 +38,9 @@ qpdf_global_get_uint32(qpdf_param_e param, uint32_t* value)
     case qpdf_p_default_limits:
         *value = Options::default_limits();
         return qpdf_r_ok;
+    case qpdf_p_limit_errors:
+        *value = Limits::errors();
+        return qpdf_r_ok;
     case qpdf_p_objects_max_nesting:
         *value = Limits::objects_max_nesting();
         return qpdf_r_ok;

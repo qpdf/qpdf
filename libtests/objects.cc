@@ -221,6 +221,22 @@ test_2(QPDF& pdf, char const* arg2)
         thrown = true;
     }
     assert(thrown);
+
+    /* Test limit errors */
+    assert(qpdf::global::limit_errors() == 0);
+    QPDFObjectHandle::parse("[[[[]]]]");
+    assert(qpdf::global::limit_errors() == 0);
+    objects_max_nesting(3);
+    try {
+        QPDFObjectHandle::parse("[[[[[]]]]]");
+    } catch (std::exception&) {
+    }
+    assert(qpdf::global::limit_errors() == 1);
+    try {
+        QPDFObjectHandle::parse("[[[[[]]]]]");
+    } catch (std::exception&) {
+    }
+    assert(qpdf::global::limit_errors() == 2);
 }
 
 void
