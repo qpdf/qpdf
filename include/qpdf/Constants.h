@@ -277,10 +277,11 @@ enum qpdf_param_e {
     qpdf_p_limit_errors = 0x10020,
 
     /* global options */
+    qpdf_p_inspection_mode = 0x11000,
     qpdf_p_default_limits = 0x11100,
     /* global limits */
 
-    /* object - parser limits */
+    /* parser limits */
     qpdf_p_parser_max_nesting = 0x13000,
     qpdf_p_parser_max_errors,
     qpdf_p_parser_max_container_size,
