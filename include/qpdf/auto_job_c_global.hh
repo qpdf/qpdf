@@ -10,3 +10,4 @@ QPDF_DLL GlobalConfig* parserMaxContainerSize(std::string const& parameter);
 QPDF_DLL GlobalConfig* parserMaxContainerSizeDamaged(std::string const& parameter);
 QPDF_DLL GlobalConfig* parserMaxErrors(std::string const& parameter);
 QPDF_DLL GlobalConfig* parserMaxNesting(std::string const& parameter);
+QPDF_DLL GlobalConfig* maxStreamFilters(std::string const& parameter);

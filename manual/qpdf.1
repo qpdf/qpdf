@@ -1236,6 +1236,14 @@ parsing. The limit applies when the PDF document's xref table is damaged
 or the object itself is damaged. The limit also applies when parsing
 xref streams. The default limit is 5,000.
 See also --parser-max-container-size.
+.TP
+.B --max-stream-filters \-\- set the maximum number of filters allowed when filtering streams
+--max-stream-filters=n
+
+An excessive number of stream filters is usually a sign that a file
+is damaged or specially constructed. If the maximum is exceeded for
+a stream the stream is treated as unfilterable.
+The default limit is 25.
 .SH TESTING (options for testing or debugging)
 The options below are useful when writing automated test code that
 includes files created by qpdf or when testing qpdf itself.

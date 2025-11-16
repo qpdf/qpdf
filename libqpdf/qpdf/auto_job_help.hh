@@ -1044,6 +1044,13 @@ See also --parser-max-container-size.
 }
 static void add_help_9(QPDFArgParser& ap)
 {
+ap.addOptionHelp("--max-stream-filters", "global", "set the maximum number of filters allowed when filtering streams", R"(--max-stream-filters=n
+
+An excessive number of stream filters is usually a sign that a file
+is damaged or specially constructed. If the maximum is exceeded for
+a stream the stream is treated as unfilterable.
+The default limit is 25.
+)");
 ap.addHelpTopic("testing", "options for testing or debugging", R"(The options below are useful when writing automated test code that
 includes files created by qpdf or when testing qpdf itself.
 )");

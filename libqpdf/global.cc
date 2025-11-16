@@ -28,6 +28,9 @@ Limits::disable_defaults()
     if (!l.parser_max_container_size_damaged_set_) {
         l.parser_max_container_size_damaged_ = std::numeric_limits<uint32_t>::max();
     }
+    if (!l.max_stream_filters_set_) {
+        l.max_stream_filters_ = std::numeric_limits<uint32_t>::max();
+    }
 }
 
 qpdf_result_e
@@ -56,6 +59,9 @@ qpdf_global_get_uint32(qpdf_param_e param, uint32_t* value)
     case qpdf_p_parser_max_container_size_damaged:
         *value = Limits::parser_max_container_size(true);
         return qpdf_r_ok;
+    case qpdf_p_max_stream_filters:
+        *value = Limits::max_stream_filters();
+        return qpdf_r_ok;
     default:
         return qpdf_r_bad_parameter;
     }
@@ -82,6 +88,9 @@ qpdf_global_set_uint32(qpdf_param_e param, uint32_t value)
         return qpdf_r_ok;
     case qpdf_p_parser_max_container_size_damaged:
         Limits::parser_max_container_size(true, value);
+        return qpdf_r_ok;
+    case qpdf_p_max_stream_filters:
+        Limits::max_stream_filters(value);
         return qpdf_r_ok;
     default:
         return qpdf_r_bad_parameter;

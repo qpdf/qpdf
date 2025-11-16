@@ -289,6 +289,9 @@ popHandler(); // key: parserMaxErrors
 pushKey("parserMaxNesting");
 addParameter([this](std::string const& p) { c_global->parserMaxNesting(p); });
 popHandler(); // key: parserMaxNesting
+pushKey("maxStreamFilters");
+addParameter([this](std::string const& p) { c_global->maxStreamFilters(p); });
+popHandler(); // key: maxStreamFilters
 popHandler(); // key: global
 pushKey("updateFromJson");
 addParameter([this](std::string const& p) { c_main->updateFromJson(p); });

@@ -287,6 +287,9 @@ enum qpdf_param_e {
     qpdf_p_parser_max_container_size,
     qpdf_p_parser_max_container_size_damaged,
 
+    /* stream and filter limits */
+    qpdf_p_max_stream_filters = 0x14000,
+
     /* next section = 0x20000 */
     qpdf_enum_max = 0x7fffffff,
 };

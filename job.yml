@@ -95,6 +95,7 @@ options:
       parser-max-container-size-damaged: level
       parser-max-errors: level
       parser-max-nesting: level
+      max-stream-filters: level
   - table: main
     config: c_main
     manual:
@@ -419,6 +420,7 @@ json:
       parser-max-container-size-damaged:
       parser-max-errors:
       parser-max-nesting:
+      max-stream-filters:
   # other options
   update-from-json:
   allow-weak-crypto:

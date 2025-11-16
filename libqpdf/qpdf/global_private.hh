@@ -48,6 +48,19 @@ namespace qpdf::global
 
         static void parser_max_container_size(bool damaged, uint32_t value);
 
+        static uint32_t const&
+        max_stream_filters()
+        {
+            return l.max_stream_filters_;
+        }
+
+        static void
+        max_stream_filters(uint32_t value)
+        {
+            l.max_stream_filters_set_ = true;
+            l.max_stream_filters_ = value;
+        }
+
         /// Record a limit error.
         static void
         error()
@@ -79,6 +92,8 @@ namespace qpdf::global
         uint32_t parser_max_container_size_{std::numeric_limits<uint32_t>::max()};
         uint32_t parser_max_container_size_damaged_{5'000};
         bool parser_max_container_size_damaged_set_{false};
+        uint32_t max_stream_filters_{25};
+        bool max_stream_filters_set_{false};
     };
 
     class Options
