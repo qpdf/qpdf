@@ -48,6 +48,21 @@ namespace qpdf::global
 
         static void objects_max_container_size(bool damaged, uint32_t value);
 
+        /// Record a limit error.
+        static void
+        error()
+        {
+            if (l.errors_ < std::numeric_limits<uint32_t>::max()) {
+                ++l.errors_;
+            }
+        }
+
+        static uint32_t const&
+        errors()
+        {
+            return l.errors_;
+        }
+
         static void disable_defaults();
 
       private:
@@ -55,6 +70,8 @@ namespace qpdf::global
         ~Limits() = default;
 
         static Limits l;
+
+        uint32_t errors_{0};
 
         uint32_t objects_max_nesting_{499};
         uint32_t objects_max_errors_{15};

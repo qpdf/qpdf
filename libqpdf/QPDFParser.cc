@@ -437,7 +437,8 @@ QPDFParser::parseRemainder(bool content_stream)
         case QPDFTokenizer::tt_array_open:
         case QPDFTokenizer::tt_dict_open:
             if (stack.size() > max_nesting) {
-                warn("ignoring excessively deeply nested data structure");
+                global::Limits::error();
+                warn("limits error: ignoring excessively deeply nested data structure");
                 return {};
             } else {
                 b_contents = false;
@@ -647,8 +648,10 @@ QPDFParser::check_too_many_bad_tokens()
     auto limit = Limits::objects_max_container_size(bad_count || sanity_checks);
     if (frame->olist.size() > limit || frame->dict.size() > limit) {
         if (bad_count) {
+            Limits::error();
             warn(
-                "encountered errors while parsing an array or dictionary with more than " +
+                "limits error: encountered errors while parsing an array or dictionary with more "
+                "than " +
                 std::to_string(limit) + " elements; giving up on reading object");
             throw Error();
         }

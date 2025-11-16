@@ -54,6 +54,18 @@ namespace qpdf::global
         handle_result(qpdf_global_set_uint32(param, value));
     }
 
+    /// @brief Retrieves the number of limit errors.
+    ///
+    /// Returns the number a global limit was exceeded. This item is reaf only.
+    ///
+    /// @return The number of limit errors.
+    ///
+    /// @since 12.3
+    uint32_t inline limit_errors()
+    {
+        return get_uint32(qpdf_p_limit_errors);
+    }
+
     namespace options
     {
         /// @brief  Retrieves whether default limits are enabled.
