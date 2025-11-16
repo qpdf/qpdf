@@ -35,6 +35,9 @@ qpdf_global_get_uint32(qpdf_param_e param, uint32_t* value)
 {
     qpdf_expect(value);
     switch (param) {
+    case qpdf_p_inspection_mode:
+        *value = Options::inspection_mode();
+        return qpdf_r_ok;
     case qpdf_p_default_limits:
         *value = Options::default_limits();
         return qpdf_r_ok;
@@ -62,6 +65,9 @@ qpdf_result_e
 qpdf_global_set_uint32(qpdf_param_e param, uint32_t value)
 {
     switch (param) {
+    case qpdf_p_inspection_mode:
+        Options::inspection_mode(value);
+        return qpdf_r_ok;
     case qpdf_p_default_limits:
         Options::default_limits(value);
         return qpdf_r_ok;
