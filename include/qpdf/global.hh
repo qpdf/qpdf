@@ -69,7 +69,8 @@ namespace qpdf::global
         /// @brief  Set inspection mode if `true` is passed.
         ///
         /// This function enables restrictive inspection mode if `true` is passed. Inspection mode
-        /// must be enabled before a QPDF object is created. By default inspection mode is off. Calling `inspection_mode(false)` is not supported and currently is a no-op.
+        /// must be enabled before a QPDF object is created. By default inspection mode is off.
+        /// Calling `inspection_mode(false)` is not supported and currently is a no-op.
         ///
         /// @param value A boolean indicating whether to enable (true) inspection mode.
         ///
@@ -147,7 +148,7 @@ namespace qpdf::global
         ///
         /// A value of 0 means that there is no maximum imposed.
         ///
-        /// @param value The maximum number of errors allowed while parsing objects.
+        /// @param value The maximum number of errors allowed while parsing objects to set.
         ///
         /// @since 12.3
         void inline objects_max_errors(uint32_t value)
@@ -175,8 +176,9 @@ namespace qpdf::global
         /// The limit applies when the PDF document's xref table is undamaged and the object itself
         /// can be parsed without errors. The default limit is 4,294,967,295.
         ///
-        /// @return The maximum number of top-level objects allowed in a container while parsing
-        ///         objects.
+        ///  @param value  The maximum number of top-level objects allowed in a container while
+        ///  parsing
+        ///         objects to set.
         ///
         /// @since 12.3
         void inline objects_max_container_size(uint32_t value)
@@ -184,8 +186,8 @@ namespace qpdf::global
             set_uint32(qpdf_p_objects_max_container_size, value);
         }
 
-        /// @brief Retrieves the maximum number of objects allowed in a container while parsing
-        ///        objects.
+        /// @brief Retrieves the maximum number of top-level objects allowed in a container while
+        ///        parsing objects.
         ///
         /// The limit applies when the PDF document's xref table is damaged or the object itself is
         /// damaged. The limit also applies when parsing trailer dictionaries and xref streams. The
@@ -200,19 +202,49 @@ namespace qpdf::global
             return get_uint32(qpdf_p_objects_max_container_size_damaged);
         }
 
-        /// @brief Sets the maximum number oftop-level objects allowed in a container while parsing.
+        /// @brief Sets the maximum number of top-level objects allowed in a container while
+        /// parsing.
         ///
         /// The limit applies when the PDF document's xref table is damaged or the object itself is
         /// damaged. The limit also applies when parsing trailer dictionaries and xref streams. The
         /// default limit is 5,000.
         ///
-        /// @return The maximum number of top-level objects allowed in a container while parsing
-        ///         objects.
+        /// @param value  The maximum number of top-level objects allowed in a container while
+        /// parsing
+        ///         objects to set.
         ///
         /// @since 12.3
         void inline objects_max_container_size_damaged(uint32_t value)
         {
             set_uint32(qpdf_p_objects_max_container_size_damaged, value);
+        }
+
+        /// @brief Retrieves the maximum number of filters allowed when filtering streams.
+        ///
+        /// An excessive number of stream filters is usually a sign that a file is damaged or
+        /// specially constructed. If the maximum is exceeded for a stream the stream is treated as
+        /// unfilterable. The default maximum is 25.
+        ///
+        /// @return The maximum number of filters allowed when filtering streams.
+        ///
+        /// @since 12.3
+        uint32_t inline streams_max_filters()
+        {
+            return get_uint32(qpdf_p_streams_max_filters);
+        }
+
+        /// @brief Sets the maximum number of filters allowed when filtering streams.
+        ///
+        /// An excessive number of stream filters is usually a sign that a file is damaged or
+        /// specially constructed. If the maximum is exceeded for a stream the stream is treated as
+        /// unfilterable. The default maximum is 25.
+        ///
+        /// @param value  The maximum number of filters allowed when filtering streams to set.
+        ///
+        /// @since 12.3
+        void inline streams_max_filters(uint32_t value)
+        {
+            set_uint32(qpdf_p_streams_max_filters, value);
         }
     } // namespace limits
 

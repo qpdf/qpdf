@@ -25,7 +25,7 @@ $td->runtest("dictionary checks",
 
 $td->runtest("global object limits",
              {$td->COMMAND => "objects 2 -"},
-             {$td->STRING =>  => "test 2 done\n", $td->EXIT_STATUS => 0},
+             {$td->FILE => "test2.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 $td->report($n_tests);

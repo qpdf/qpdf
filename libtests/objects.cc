@@ -4,6 +4,7 @@
 
 #include <qpdf/QPDF.hh>
 
+#include <qpdf/Pl_Discard.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QUtil.hh>
@@ -166,6 +167,7 @@ test_2(QPDF& pdf, char const* arg2)
     assert(objects_max_errors() == 15);
     assert(objects_max_container_size() == std::numeric_limits<uint32_t>::max());
     assert(objects_max_container_size_damaged() == 5'000);
+    assert(streams_max_filters() == 25);
     assert(default_limits());
 
     // Test disabling optional default limits
@@ -174,6 +176,7 @@ test_2(QPDF& pdf, char const* arg2)
     assert(objects_max_errors() == 0);
     assert(objects_max_container_size() == std::numeric_limits<uint32_t>::max());
     assert(objects_max_container_size_damaged() == std::numeric_limits<uint32_t>::max());
+    assert(streams_max_filters() == std::numeric_limits<uint32_t>::max());
     assert(!default_limits());
 
     // Check disabling default limits is irreversible
@@ -185,11 +188,13 @@ test_2(QPDF& pdf, char const* arg2)
     objects_max_errors(12);
     objects_max_container_size(13);
     objects_max_container_size_damaged(14);
+    streams_max_filters(15);
 
     assert(objects_max_nesting() == 11);
     assert(objects_max_errors() == 12);
     assert(objects_max_container_size() == 13);
     assert(objects_max_container_size_damaged() == 14);
+    assert(streams_max_filters() == 15);
 
     // Check disabling default limits does not override explicit limits
     default_limits(false);
@@ -197,6 +202,7 @@ test_2(QPDF& pdf, char const* arg2)
     assert(objects_max_errors() == 12);
     assert(objects_max_container_size() == 13);
     assert(objects_max_container_size_damaged() == 14);
+    assert(streams_max_filters() == 15);
 
     // Test parameter checking
     QUtil::handle_result_code(qpdf_r_ok, "");
@@ -221,6 +227,19 @@ test_2(QPDF& pdf, char const* arg2)
         thrown = true;
     }
     assert(thrown);
+
+    // Test streams_max_filters
+    QPDF qpdf;
+    qpdf.emptyPDF();
+    auto s = qpdf.newStream("\x01\x01\x01A");
+    s.getDict().replace("/Filter", Array({Name("/RL"), Name("/RL"), Name("/RL")}));
+    Pl_Discard p;
+    auto x = s.pipeStreamData(&p, 0, qpdf_dl_all, true);
+    assert(x);
+    streams_max_filters(2);
+    assert(!s.pipeStreamData(&p, 0, qpdf_dl_all, true));
+    streams_max_filters(3);
+    assert(s.pipeStreamData(&p, 0, qpdf_dl_all, true));
 }
 
 void

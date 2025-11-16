@@ -3,7 +3,6 @@
 
 #include <qpdf/QPDF.hh>
 
-#include <qpdf/global_private.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
@@ -13,6 +12,7 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
 #include <qpdf/QPDFTokenizer_private.hh>
+#include <qpdf/global_private.hh>
 
 #include <exception>
 

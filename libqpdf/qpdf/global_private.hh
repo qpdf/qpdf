@@ -48,6 +48,19 @@ namespace qpdf::global
 
         static void objects_max_container_size(bool damaged, uint32_t value);
 
+        static uint32_t const&
+        streams_max_filters()
+        {
+            return l.streams_max_filters_;
+        }
+
+        static void
+        streams_max_filters(uint32_t value)
+        {
+            l.streams_max_filters_set_ = true;
+            l.streams_max_filters_ = value;
+        }
+
         static void disable_defaults();
 
       private:
@@ -62,6 +75,8 @@ namespace qpdf::global
         uint32_t objects_max_container_size_{std::numeric_limits<uint32_t>::max()};
         uint32_t objects_max_container_size_damaged_{5'000};
         bool objects_max_container_size_damaged_set_{false};
+        uint32_t streams_max_filters_{25};
+        bool streams_max_filters_set_{false};
     };
 
     class Options
