@@ -12,6 +12,9 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
 #include <qpdf/QPDFTokenizer_private.hh>
+#include <qpdf/global_private.hh>
+
+#include <exception>
 
 using namespace qpdf;
 
@@ -374,6 +377,7 @@ class QPDF::Doc
     acroform()
     {
         if (!acroform_) {
+            no_inspection();
             acroform_ = std::make_unique<QPDFAcroFormDocumentHelper>(qpdf);
         }
         return *acroform_;
@@ -383,6 +387,7 @@ class QPDF::Doc
     embedded_files()
     {
         if (!embedded_files_) {
+            no_inspection();
             embedded_files_ = std::make_unique<QPDFEmbeddedFileDocumentHelper>(qpdf);
         }
         return *embedded_files_;
@@ -392,6 +397,7 @@ class QPDF::Doc
     outlines()
     {
         if (!outlines_) {
+            no_inspection();
             outlines_ = std::make_unique<QPDFOutlineDocumentHelper>(qpdf);
         }
         return *outlines_;
@@ -401,6 +407,7 @@ class QPDF::Doc
     page_dh()
     {
         if (!page_dh_) {
+            no_inspection();
             page_dh_ = std::make_unique<QPDFPageDocumentHelper>(qpdf);
         }
         return *page_dh_;
@@ -410,12 +417,21 @@ class QPDF::Doc
     page_labels()
     {
         if (!page_labels_) {
+            no_inspection();
             page_labels_ = std::make_unique<QPDFPageLabelDocumentHelper>(qpdf);
         }
         return *page_labels_;
     }
 
   protected:
+    void
+    no_inspection()
+    {
+        if (global::Options::inspection_mode()) {
+            throw std::logic_error("Attempted unsupported operation in inspection mode");
+        }
+    }
+
     QPDF& qpdf;
     QPDF::Members* m;
 

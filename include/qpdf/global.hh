@@ -68,6 +68,30 @@ namespace qpdf::global
 
     namespace options
     {
+        /// @brief  Retrieves whether inspection mode is set.
+        ///
+        /// @return True if inspection mode is set.
+        ///
+        /// @since 12.3
+        bool inline inspection_mode()
+        {
+            return get_uint32(qpdf_p_inspection_mode) != 0;
+        }
+
+        /// @brief  Set inspection mode if `true` is passed.
+        ///
+        /// This function enables restrictive inspection mode if `true` is passed. Inspection mode
+        /// must be enabled before a QPDF object is created. By default inspection mode is off.
+        /// Calling `inspection_mode(false)` is not supported and currently is a no-op.
+        ///
+        /// @param value A boolean indicating whether to enable (true) inspection mode.
+        ///
+        /// @since 12.3
+        void inline inspection_mode(bool value)
+        {
+            set_uint32(qpdf_p_inspection_mode, value ? QPDF_TRUE : QPDF_FALSE);
+        }
+
         /// @brief  Retrieves whether default limits are enabled.
         ///
         /// @return True if default limits are enabled.

@@ -1,0 +1,27 @@
+WARNING: inspect.pdf: can't find PDF header
+WARNING: inspect.pdf: file is damaged
+WARNING: inspect.pdf: can't find startxref
+WARNING: inspect.pdf: Attempting to reconstruct cross-reference table
+WARNING: inspect.pdf (trailer, offset 38): unknown token while reading object; treating as null
+WARNING: inspect.pdf (trailer, offset 60): unknown token while reading object; treating as null
+WARNING: inspect.pdf (trailer, offset 82): treating bad indirect reference (0 0 R) as null
+WARNING: inspect.pdf (trailer, offset 90): unknown token while reading object; treating as null
+WARNING: inspect.pdf (trailer, offset 100): unexpected >
+WARNING: inspect.pdf (trailer, offset 71): expected dictionary keys but found non-name objects; ignoring
+WARNING: inspect.pdf (trailer, offset 202): unexpected 'endobj' or 'endstream' while reading object; giving up on reading object
+WARNING: inspect.pdf: error reconstructing xref: inspect.pdf: unable to find trailer dictionary while recovering damaged file
+5 0
+null
+20 0
+<< /Fields [ 21 0 R ] >>
+21 0
+<< /Kids [ 22 0 R 23 0 R 24 0 R 25 0 R ] /Rect [ 100 100 500 500 ] /Subtype /Widget /T (MyFie\224d) /Type /Annot >>
+22 0
+null
+23 0
+<< /FT /Tx /Rect [ 401 401 421 421 ] /Subtype /Widget /T (Sub_RightTop) /Type /Annot >>
+24 0
+<< /FT /Tx /Rect [ 201 400 221 420 ] /Subtype /Widget /T (Sub_LeftTop) /Type /Annot >>
+25 0
+<< /FT /Tx /Rect [ 400 201 420 221 ] /Subtype /Widget /T (Sub_RightBottom) /Type /Annot >>
+test 101 done

@@ -257,11 +257,21 @@ Objects::parse(char const* password)
             throw damagedPDF("", -1, std::string("error reading xref: ") + e.what());
         }
     } catch (QPDFExc& e) {
-        if (!cf.surpress_recovery()) {
-            reconstruct_xref(e, xref_offset > 0);
-        } else {
+        if (global::Options::inspection_mode()) {
+            try {
+                reconstruct_xref(e, xref_offset > 0);
+            } catch (std::exception& er) {
+                warn(damagedPDF("", -1, "error reconstructing xref: "s + er.what()));
+            }
+            if (!m->trailer) {
+                m->trailer = Dictionary::empty();
+            }
+            return;
+        }
+        if (cf.surpress_recovery()) {
             throw;
         }
+        reconstruct_xref(e, xref_offset > 0);
     }
 
     m->encp->initialize(qpdf);

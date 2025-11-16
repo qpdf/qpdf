@@ -758,7 +758,7 @@ QPDF::EncryptionParameters::initialize(QPDF& qpdf)
     // at /Encrypt again.  Otherwise, things could go wrong if someone mutates the encryption
     // dictionary.
 
-    if (!trailer.hasKey("/Encrypt")) {
+    if (!trailer.contains("/Encrypt")) {
         return;
     }
 
