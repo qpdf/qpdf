@@ -10,8 +10,6 @@
 #include <sstream>
 #include <stdexcept>
 
-static JSON JOB_SCHEMA = JSON::parse(QPDFJob::job_json_schema(1).c_str());
-
 namespace
 {
     class Handlers
@@ -625,8 +623,9 @@ void
 QPDFJob::initializeFromJson(std::string const& json, bool partial)
 {
     std::list<std::string> errors;
+    static const JSON schema = JSON::parse(job_json_schema(1).data());
     JSON j = JSON::parse(json);
-    if (!j.checkSchema(JOB_SCHEMA, JSON::f_optional, errors)) {
+    if (!j.checkSchema(schema, JSON::f_optional, errors)) {
         std::ostringstream msg;
         msg << m->message_prefix << ": job json has errors:";
         for (auto const& error: errors) {
