@@ -71,6 +71,12 @@ more detail.
 
   - Other changes
 
+    - When running in a FIPS environment using the GnuTLS crypto provider,
+      calls to GnuTLS now use 'LAX' mode as the use of weak algorithms is
+      required to decrypt existing files and is specified by the PDF standards
+      for purposes unrelated to encryption. It is up to users to ensure
+      they comply with FIPS where required.
+
     - Calling ``QPDF::getRoot`` on a file with invalid trailer now throws a
       ``damaged_pdf`` error with message "unable to find /Root dictionary"
       rather than an internal error.
