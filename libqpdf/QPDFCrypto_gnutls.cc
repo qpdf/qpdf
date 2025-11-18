@@ -11,9 +11,17 @@ QPDFCrypto_gnutls::QPDFCrypto_gnutls() :
     encrypt(false),
     cbc_mode(false),
     aes_key_data(nullptr),
-    aes_key_len(0)
+    aes_key_len(0),
+    fips_mode(gnutls_fips140_mode_enabled())
 {
     memset(digest, 0, sizeof(digest));
+
+    if (fips_mode) {
+        // Relax FIPS mode for the lifetime of this object
+        gnutls_fips140_set_mode(
+            GNUTLS_FIPS140_LAX,
+            GNUTLS_FIPS140_SET_MODE_THREAD);
+    }
 }
 
 QPDFCrypto_gnutls::~QPDFCrypto_gnutls()
@@ -26,6 +34,13 @@ QPDFCrypto_gnutls::~QPDFCrypto_gnutls()
     }
     aes_key_data = nullptr;
     aes_key_len = 0;
+
+    if (fips_mode) {
+        // Restore saved FIPS mode
+        gnutls_fips140_set_mode(
+            static_cast<gnutls_fips_mode_t>(fips_mode),
+            GNUTLS_FIPS140_SET_MODE_THREAD);
+    }
 }
 
 void
