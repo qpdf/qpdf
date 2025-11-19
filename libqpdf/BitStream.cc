@@ -1,10 +1,13 @@
 #include <qpdf/BitStream.hh>
 
 #include <qpdf/QIntC.hh>
+#include <qpdf/Util.hh>
 
 // See comments in bits_functions.hh
 #define BITS_READ 1
 #include <qpdf/bits_functions.hh>
+
+using namespace qpdf;
 
 BitStream::BitStream(unsigned char const* p, size_t nbytes) :
     start(p),
@@ -56,9 +59,8 @@ BitStream::skipToNextByte()
 {
     if (bit_offset != 7) {
         size_t bits_to_skip = bit_offset + 1;
-        if (bits_available < bits_to_skip) {
-            throw std::logic_error("INTERNAL ERROR: overflow skipping to next byte in bitstream");
-        }
+        util::internal_error_if(
+            bits_available < bits_to_skip, "overflow skipping to next byte in bitstream");
         bit_offset = 7;
         ++p;
         bits_available -= bits_to_skip;

@@ -7,6 +7,8 @@
 #include <string>
 #include <utility>
 
+using namespace std::literals;
+
 namespace qpdf::util
 {
     // qpdf::util is a collection of useful utility functions for qpdf internal use. It includes
@@ -17,10 +19,19 @@ namespace qpdf::util
     //
     // DO NOT USE unless it is impractical or unnecessary to cover violations during CI Testing.
     inline void
-    assertion(bool cond, std::string const msg)
+    assertion(bool cond, std::string const& msg)
     {
         if (!cond) {
             throw std::logic_error(msg);
+        }
+    }
+
+    inline void
+    internal_error_if(bool cond, std::string const& msg)
+    {
+        if (cond) {
+            throw std::logic_error("INTERNAL ERROR: "s.append(msg).append(
+                "\nThis is a qpdf bug. Please report at https://github.com/qpdf/qpdf/issues"));
         }
     }
 
