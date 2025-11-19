@@ -219,13 +219,19 @@ Building docs from pull requests is also enabled.
   serves to
 
   * remind us that assert in release code disappears and so should only
-    be used for debugging; when doing so use a Debug build
-    configuration
+    be used to document pre/post conditions and invariants, and for
+    sanity checks during development and testing; when doing so use
+    a Debug build configuration.
 
   * protect us from using assert in test code without explicitly
     removing the NDEBUG definition, since that would cause the assert
     not to actually be testing anything in non-Debug build
     configurations.
+  
+  Prior to 12.3 assert_test.h and assert_debug.h shared the same header
+  guard, which prevented the simultaneous inclusion of both headers.
+  This was changed to permit the CI testing of private-API methods
+  without loosing the use of assertions in private header files.
 
 * In a source file, include the header file that declares the source
   class first followed by a blank line. If a config file is needed
