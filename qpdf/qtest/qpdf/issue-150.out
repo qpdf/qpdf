@@ -3,5 +3,5 @@ WARNING: issue-150.pdf (xref stream: object 8 0, offset 56): treating object as 
 WARNING: issue-150.pdf: file is damaged
 WARNING: issue-150.pdf (offset 4): xref not found
 WARNING: issue-150.pdf: Attempting to reconstruct cross-reference table
-WARNING: issue-150.pdf (object 8 0): object has offset 0
+WARNING: issue-150.pdf (object 8 0): object has offset 0 - a common error handled correctly by qpdf and most other applications
 qpdf: issue-150.pdf: unable to find trailer dictionary while recovering damaged file

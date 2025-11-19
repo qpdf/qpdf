@@ -534,12 +534,20 @@ Objects::read_xref(qpdf_offset_t xref_offset, bool in_stream_recovery)
     if (!m->deleted_objects.empty()) {
         max_obj = std::max(max_obj, *(m->deleted_objects.rbegin()));
     }
-    if ((size < 1) || (size - 1 != max_obj)) {
-        warn(damagedPDF(
-            "",
-            -1,
-            ("reported number of objects (" + std::to_string(size) +
-             ") is not one plus the highest object number (" + std::to_string(max_obj) + ")")));
+    if (size < 1 || (size - 1) != max_obj) {
+        if ((size - 2) == max_obj ){//&& qpdf.getObject(max_obj, 0).isStreamOfType("/XRef")) {
+            warn(damagedPDF(
+                "",
+                -1,
+                "xref entry for the xref stream itself is missing - a common error handled "
+                "correctly by qpdf and most other applications"));
+        } else {
+            warn(damagedPDF(
+                "",
+                -1,
+                ("reported number of objects (" + std::to_string(size) +
+                 ") is not one plus the highest object number (" + std::to_string(max_obj) + ")")));
+        }
     }
 
     // We no longer need the deleted_objects table, so go ahead and clear it out to make sure we
@@ -1475,7 +1483,10 @@ Objects::readObjectAtOffset(
     // "0000000000 00000 n", which is not correct, but it won't hurt anything for us to ignore
     // these.
     if (offset == 0) {
-        warn(damagedPDF(-1, "object has offset 0"));
+        warn(damagedPDF(
+            -1,
+            "object has offset 0 - a common error handled correctly by qpdf and most other "
+            "applications"));
         return;
     }
 
