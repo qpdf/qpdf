@@ -41,9 +41,7 @@ BufferInputSource::~BufferInputSource()
 qpdf_offset_t
 BufferInputSource::findAndSkipNextEOL()
 {
-    if (cur_offset < 0) {
-        throw std::logic_error("INTERNAL ERROR: BufferInputSource offset < 0");
-    }
+    util::internal_error_if(cur_offset < 0, "BufferInputSource offset < 0");
     qpdf_offset_t end_pos = max_offset;
     if (cur_offset >= end_pos) {
         last_offset = end_pos;
@@ -99,14 +97,10 @@ BufferInputSource::seek(qpdf_offset_t offset, int whence)
         cur_offset = max_offset + offset;
         break;
 
-    case SEEK_CUR:
+    default:
+        util::assertion(whence == SEEK_CUR, "invalid argument to BufferInputSource::seek");
         QIntC::range_check(cur_offset, offset);
         cur_offset += offset;
-        break;
-
-    default:
-        throw std::logic_error("INTERNAL ERROR: invalid argument to BufferInputSource::seek");
-        break;
     }
 
     if (cur_offset < 0) {
@@ -123,9 +117,7 @@ BufferInputSource::rewind()
 size_t
 BufferInputSource::read(char* buffer, size_t length)
 {
-    if (cur_offset < 0) {
-        throw std::logic_error("INTERNAL ERROR: BufferInputSource offset < 0");
-    }
+    util::internal_error_if(cur_offset < 0, "BufferInputSource offset < 0");
     qpdf_offset_t end_pos = max_offset;
     if (cur_offset >= end_pos) {
         last_offset = end_pos;
@@ -230,9 +222,7 @@ BufferInputSource::unreadCh(char ch)
 qpdf_offset_t
 is::OffsetBuffer::findAndSkipNextEOL()
 {
-    if (pos < 0) {
-        throw std::logic_error("INTERNAL ERROR: is::OffsetBuffer offset < 0");
-    }
+    util::internal_error_if(pos < 0, "is::OffsetBuffer offset < 0");
     auto end_pos = static_cast<qpdf_offset_t>(view_.size());
     if (pos >= end_pos) {
         last_offset = end_pos + global_offset;
@@ -276,14 +266,10 @@ is::OffsetBuffer::seek(qpdf_offset_t offset, int whence)
         pos = static_cast<qpdf_offset_t>(view_.size()) + offset;
         break;
 
-    case SEEK_CUR:
+    default:
+        util::assertion(whence == SEEK_CUR, "invalid argument to BufferInputSource::seek");
         QIntC::range_check(pos, offset);
         pos += offset;
-        break;
-
-    default:
-        throw std::logic_error("INTERNAL ERROR: invalid argument to BufferInputSource::seek");
-        break;
     }
 
     if (pos < 0) {
@@ -294,9 +280,7 @@ is::OffsetBuffer::seek(qpdf_offset_t offset, int whence)
 size_t
 is::OffsetBuffer::read(char* buffer, size_t length)
 {
-    if (pos < 0) {
-        throw std::logic_error("INTERNAL ERROR: is::OffsetBuffer offset < 0");
-    }
+    util::internal_error_if(pos < 0, "is::OffsetBuffer offset < 0");
     auto end_pos = static_cast<qpdf_offset_t>(view_.size());
     if (pos >= end_pos) {
         last_offset = end_pos + global_offset;
