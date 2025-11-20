@@ -1,17 +1,18 @@
 #include <qpdf/Pl_ASCIIHexDecoder.hh>
 
 #include <qpdf/QTC.hh>
+#include <qpdf/Util.hh>
+
 #include <cctype>
 #include <stdexcept>
 
+using namespace qpdf;
 using namespace std::literals;
 
 Pl_ASCIIHexDecoder::Pl_ASCIIHexDecoder(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next)
 {
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_ASCIIHexDecoder with nullptr as next");
-    }
+    util::assertion(next, "Attempt to create Pl_ASCIIHexDecoder with nullptr as next");
 }
 
 void

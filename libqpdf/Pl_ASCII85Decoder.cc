@@ -1,15 +1,17 @@
 #include <qpdf/Pl_ASCII85Decoder.hh>
 
 #include <qpdf/QTC.hh>
+#include <qpdf/Util.hh>
+
 #include <cstring>
 #include <stdexcept>
+
+using namespace qpdf;
 
 Pl_ASCII85Decoder::Pl_ASCII85Decoder(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next)
 {
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_ASCII85Decoder with nullptr as next");
-    }
+    util::assertion(next, "Attempt to create Pl_ASCII85Decoder with nullptr as next");
 }
 
 void
@@ -33,12 +35,9 @@ Pl_ASCII85Decoder::write(unsigned char const* buf, size_t len)
         if (eod > 1) {
             break;
         } else if (eod == 1) {
-            if (buf[i] == '>') {
-                flush();
-                eod = 2;
-            } else {
-                throw std::runtime_error("broken end-of-data sequence in base 85 data");
-            }
+            util::no_ci_rt_error_if(buf[i] != '>', "broken end-of-data sequence in base 85 data");
+            flush();
+            eod = 2;
         } else {
             switch (buf[i]) {
             case '~':
@@ -48,12 +47,10 @@ Pl_ASCII85Decoder::write(unsigned char const* buf, size_t len)
             case 'z':
                 if (pos != 0) {
                     throw std::runtime_error("unexpected z during base 85 decode");
-                } else {
-                    QTC::TC("libtests", "Pl_ASCII85Decoder read z");
-                    unsigned char zeroes[4];
-                    memset(zeroes, '\0', 4);
-                    next()->write(zeroes, 4);
                 }
+                unsigned char zeroes[4];
+                memset(zeroes, '\0', 4);
+                next()->write(zeroes, 4);
                 break;
 
             default:
@@ -76,7 +73,6 @@ void
 Pl_ASCII85Decoder::flush()
 {
     if (this->pos == 0) {
-        QTC::TC("libtests", "Pl_ASCII85Decoder no-op flush");
         return;
     }
     unsigned long lval = 0;

@@ -3,9 +3,12 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFCryptoProvider.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
+
 #include <cstring>
-#include <stdexcept>
 #include <string>
+
+using namespace qpdf;
 
 bool Pl_AES_PDF::use_static_iv = false;
 
@@ -15,12 +18,8 @@ Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next, bool encrypt, std
     crypto(QPDFCryptoProvider::getImpl()),
     encrypt(encrypt)
 {
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_AES_PDF with nullptr as next");
-    }
-    if (!(key.size() == 32 || key.size() == 16)) {
-        throw std::runtime_error("unsupported key length");
-    }
+    util::assertion(next, "Attempt to create Pl_AES_PDF with nullptr as next");
+    util::no_ci_rt_error_if(!(key.size() == 32 || key.size() == 16), "unsupported key length");
     std::memset(this->inbuf, 0, this->buf_size);
     std::memset(this->outbuf, 0, this->buf_size);
     std::memset(this->cbc_block, 0, this->buf_size);
@@ -41,12 +40,10 @@ Pl_AES_PDF::disablePadding()
 void
 Pl_AES_PDF::setIV(unsigned char const* iv, size_t bytes)
 {
-    if (bytes != buf_size) {
-        throw std::logic_error(
-            "Pl_AES_PDF: specified initialization vector"
-            " size in bytes must be " +
+    util::assertion(
+        bytes == buf_size,
+        "Pl_AES_PDF: specified initialization vector size in bytes must be " +
             std::to_string(bytes));
-    }
     use_specified_iv = true;
     memcpy(specified_iv, iv, bytes);
 }
@@ -103,9 +100,7 @@ Pl_AES_PDF::finish()
             // This is never supposed to happen as the output is always supposed to be padded.
             // However, we have encountered files for which the output is not a multiple of the
             // block size.  In this case, pad with zeroes and hope for the best.
-            if (offset >= buf_size) {
-                throw std::logic_error("buffer overflow in AES encryption pipeline");
-            }
+            util::assertion(offset < buf_size, "buffer overflow in AES encryption pipeline");
             std::memset(inbuf + offset, 0, buf_size - offset);
             offset = buf_size;
         }
@@ -136,9 +131,7 @@ Pl_AES_PDF::initializeVector()
 void
 Pl_AES_PDF::flush(bool strip_padding)
 {
-    if (offset != buf_size) {
-        throw std::logic_error("AES pipeline: flush called when buffer was not full");
-    }
+    util::assertion(offset == buf_size, "AES pipeline: flush called when buffer was not full");
 
     if (first) {
         first = false;

@@ -1,9 +1,13 @@
 #include <qpdf/Pl_Buffer.hh>
 
+#include <qpdf/Util.hh>
+
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
+
+using namespace qpdf;
 
 class Pl_Buffer::Members
 {
@@ -50,9 +54,7 @@ Pl_Buffer::finish()
 Buffer*
 Pl_Buffer::getBuffer()
 {
-    if (!m->ready) {
-        throw std::logic_error("Pl_Buffer::getBuffer() called when not ready");
-    }
+    util::assertion(m->ready, "Pl_Buffer::getBuffer() called when not ready");
     auto* b = new Buffer(std::move(m->data));
     m->data.clear();
     return b;
@@ -61,9 +63,7 @@ Pl_Buffer::getBuffer()
 std::string
 Pl_Buffer::getString()
 {
-    if (!m->ready) {
-        throw std::logic_error("Pl_Buffer::getString() called when not ready");
-    }
+    util::assertion(m->ready, "Pl_Buffer::getString() called when not ready");
     auto s = std::move(m->data);
     m->data.clear();
     return s;
@@ -78,9 +78,7 @@ Pl_Buffer::getBufferSharedPointer()
 void
 Pl_Buffer::getMallocBuffer(unsigned char** buf, size_t* len)
 {
-    if (!m->ready) {
-        throw std::logic_error("Pl_Buffer::getMallocBuffer() called when not ready");
-    }
+    util::assertion(m->ready, "Pl_Buffer::getMallocBuffer() called when not ready");
     auto size = m->data.size();
     *len = size;
     if (size > 0) {
