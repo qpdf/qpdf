@@ -3,6 +3,8 @@
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
+
 #include <climits>
 #include <cstdio>
 #include <cstring>
@@ -743,6 +745,29 @@ memory_usage_test()
     std::cout << "memory usage okay" << '\n';
 }
 
+void
+error_handler_test()
+{
+    qpdf::util::assertion(true, "msg1");
+    try {
+        qpdf::util::assertion(false, "msg2");
+    } catch (std::logic_error const& e) {
+        std::cout << "caught exception: " << e.what() << '\n';
+    }
+    qpdf::util::internal_error_if(false, "msg3");
+    try {
+        qpdf::util::internal_error_if(true, "msg4");
+    } catch (std::logic_error const& e) {
+        std::cout << "caught exception: " << e.what() << '\n';
+    }
+    qpdf::util::no_ci_rt_error_if(false, "msg5");
+    try {
+        qpdf::util::no_ci_rt_error_if(true, "msg6");
+    } catch (std::runtime_error const& e) {
+        std::cout << "caught exception: " << e.what() << '\n';
+    }
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -782,6 +807,8 @@ main(int argc, char* argv[])
         is_long_long_test();
         std::cout << "---- memory usage" << '\n';
         memory_usage_test();
+        std::cout << "---- error handlers" << '\n';
+        error_handler_test();
     } catch (std::exception& e) {
         std::cout << "unexpected exception: " << e.what() << '\n';
     }

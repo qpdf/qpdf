@@ -2,17 +2,17 @@
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
-#include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 #include <cstring>
 #include <stdexcept>
+
+using namespace qpdf;
 
 Pl_LZWDecoder::Pl_LZWDecoder(char const* identifier, Pipeline* next, bool early_code_change) :
     Pipeline(identifier, next),
     code_change_delta(early_code_change)
 {
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_LZWDecoder with nullptr as next");
-    }
+    util::assertion(next, "Attempt to create Pl_LZWDecoder with nullptr as next");
 }
 
 void
@@ -78,21 +78,17 @@ Pl_LZWDecoder::sendNextCode()
 unsigned char
 Pl_LZWDecoder::getFirstChar(unsigned int code)
 {
-    unsigned char result = '\0';
     if (code < 256) {
-        result = static_cast<unsigned char>(code);
-    } else if (code > 257) {
-        unsigned int idx = code - 258;
-        if (idx >= table.size()) {
-            throw std::runtime_error("Pl_LZWDecoder::getFirstChar: table overflow");
-        }
-        Buffer& b = table.at(idx);
-        result = b.getBuffer()[0];
-    } else {
-        throw std::runtime_error(
-            "Pl_LZWDecoder::getFirstChar called with invalid code (" + std::to_string(code) + ")");
+        return static_cast<unsigned char>(code);
     }
-    return result;
+    util::no_ci_rt_error_if(
+        code <= 257,
+        "Pl_LZWDecoder::getFirstChar called with invalid code (" + std::to_string(code) + ")");
+
+    unsigned int idx = code - 258;
+    util::no_ci_rt_error_if(idx >= table.size(), "Pl_LZWDecoder::getFirstChar: table overflow");
+    Buffer& b = table.at(idx);
+    return b.getBuffer()[0];
 }
 
 void
@@ -106,18 +102,16 @@ Pl_LZWDecoder::addToTable(unsigned char c)
         tmp[0] = static_cast<unsigned char>(last_code);
         last_data = tmp;
         last_size = 1;
-    } else if (last_code > 257) {
+    } else {
+        util::no_ci_rt_error_if(
+            last_code <= 257,
+            "Pl_LZWDecoder::addToTable called with invalid code (" + std::to_string(last_code) +
+                ")");
         unsigned int idx = last_code - 258;
-        if (idx >= table.size()) {
-            throw std::runtime_error("Pl_LZWDecoder::addToTable: table overflow");
-        }
+        util::no_ci_rt_error_if(idx >= table.size(), "Pl_LZWDecoder::addToTable: table overflow");
         Buffer& b = table.at(idx);
         last_data = b.getBuffer();
         last_size = QIntC::to_uint(b.getSize());
-    } else {
-        throw std::runtime_error(
-            "Pl_LZWDecoder::addToTable called with invalid code (" + std::to_string(last_code) +
-            ")");
     }
 
     Buffer entry(1 + last_size);
@@ -158,19 +152,16 @@ Pl_LZWDecoder::handleCode(unsigned int code)
                 } else if (idx == table_size) {
                     // The encoder would have just created this entry, so the first character of
                     // this entry would have been the same as the first character of the last entry.
-                    QTC::TC("libtests", "Pl_LZWDecoder last was table size");
                     next_c = getFirstChar(last_code);
                 } else {
                     next_c = getFirstChar(code);
                 }
             }
             unsigned int new_idx = 258 + table_size;
-            if (new_idx == 4096) {
-                throw std::runtime_error("LZWDecoder: table full");
-            }
+            util::no_ci_rt_error_if(new_idx == 4096, "LZWDecoder: table full");
             addToTable(next_c);
             unsigned int change_idx = new_idx + code_change_delta;
-            if ((change_idx == 511) || (change_idx == 1023) || (change_idx == 2047)) {
+            if (change_idx == 511 || change_idx == 1023 || change_idx == 2047) {
                 ++code_size;
             }
         }

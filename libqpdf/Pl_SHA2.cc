@@ -2,8 +2,9 @@
 
 #include <qpdf/QPDFCryptoProvider.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 
-#include <stdexcept>
+using namespace qpdf;
 
 Pl_SHA2::Pl_SHA2(int bits, Pipeline* next) :
     Pipeline("sha2", next)
@@ -49,9 +50,7 @@ Pl_SHA2::finish()
 void
 Pl_SHA2::resetBits(int bits)
 {
-    if (in_progress) {
-        throw std::logic_error("bit reset requested for in-progress SHA2 Pipeline");
-    }
+    util::assertion(!in_progress, "bit reset requested for in-progress SHA2 Pipeline");
     crypto = QPDFCryptoProvider::getImpl();
     crypto->SHA2_init(bits);
 }
@@ -59,17 +58,13 @@ Pl_SHA2::resetBits(int bits)
 std::string
 Pl_SHA2::getRawDigest()
 {
-    if (in_progress) {
-        throw std::logic_error("digest requested for in-progress SHA2 Pipeline");
-    }
+    util::assertion(!in_progress, "digest requested for in-progress SHA2 Pipeline");
     return crypto->SHA2_digest();
 }
 
 std::string
 Pl_SHA2::getHexDigest()
 {
-    if (in_progress) {
-        throw std::logic_error("digest requested for in-progress SHA2 Pipeline");
-    }
+    util::assertion(!in_progress, "digest requested for in-progress SHA2 Pipeline");
     return QUtil::hex_encode(getRawDigest());
 }

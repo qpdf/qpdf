@@ -56,7 +56,6 @@ QPDFArgParser::selectOptionTable(std::string const& name)
 {
     auto t = m->option_tables.find(name);
     if (t == m->option_tables.end()) {
-        QTC::TC("libtests", "QPDFArgParser select unregistered table");
         throw std::logic_error("QPDFArgParser: selecting unregistered option table " + name);
     }
     m->option_table = &(t->second);
@@ -67,7 +66,6 @@ void
 QPDFArgParser::registerOptionTable(std::string const& name, bare_arg_handler_t end_handler)
 {
     if (m->option_tables.contains(name)) {
-        QTC::TC("libtests", "QPDFArgParser register registered table");
         throw std::logic_error(
             "QPDFArgParser: registering already registered option table " + name);
     }
@@ -80,7 +78,6 @@ QPDFArgParser::OptionEntry&
 QPDFArgParser::registerArg(std::string const& arg)
 {
     if (m->option_table->contains(arg)) {
-        QTC::TC("libtests", "QPDFArgParser duplicate handler");
         throw std::logic_error(
             "QPDFArgParser: adding a duplicate handler for option " + arg + " in " +
             m->option_table_name + " option table");
@@ -138,7 +135,6 @@ QPDFArgParser::addInvalidChoiceHandler(std::string const& arg, param_arg_handler
 {
     auto i = m->option_table->find(arg);
     if (i == m->option_table->end()) {
-        QTC::TC("libtests", "QPDFArgParser invalid choice handler to unknown");
         throw std::logic_error(
             "QPDFArgParser: attempt to add invalid choice handler to unknown argument");
     }
@@ -448,11 +444,9 @@ QPDFArgParser::parseArgs()
             // Special case for -- option, which is used to break out of subparsers.
             oep = m->option_table->find("--");
             end_option = true;
-            if (oep == m->option_table->end()) {
-                // This is registered automatically, so this can't happen.
-                throw std::logic_error("QPDFArgParser: -- handler not registered");
-            }
-        } else if ((arg[0] == '-') && (strcmp(arg, "-") != 0)) {
+            util::internal_error_if(
+                oep == m->option_table->end(), "QPDFArgParser: -- handler not registered");
+        } else if (arg[0] == '-' && strcmp(arg, "-") != 0) {
             ++arg;
             if (arg[0] == '-') {
                 // Be lax about -arg vs --arg
@@ -678,15 +672,12 @@ QPDFArgParser::addHelpTopic(
     std::string const& topic, std::string const& short_text, std::string const& long_text)
 {
     if (topic == "all") {
-        QTC::TC("libtests", "QPDFArgParser add reserved help topic");
         throw std::logic_error("QPDFArgParser: can't register reserved help topic " + topic);
     }
     if (topic.empty() || topic.at(0) == '-') {
-        QTC::TC("libtests", "QPDFArgParser bad topic for help");
         throw std::logic_error("QPDFArgParser: help topics must not start with -");
     }
     if (m->help_topics.contains(topic)) {
-        QTC::TC("libtests", "QPDFArgParser add existing topic");
         throw std::logic_error("QPDFArgParser: topic " + topic + " has already been added");
     }
 
@@ -701,17 +692,14 @@ QPDFArgParser::addOptionHelp(
     std::string const& short_text,
     std::string const& long_text)
 {
-    if (!((option_name.length() > 2) && (option_name.at(0) == '-') && (option_name.at(1) == '-'))) {
-        QTC::TC("libtests", "QPDFArgParser bad option for help");
+    if (!(option_name.length() > 2 && option_name.starts_with("--"))) {
         throw std::logic_error("QPDFArgParser: options for help must start with --");
     }
     if (m->option_help.contains(option_name)) {
-        QTC::TC("libtests", "QPDFArgParser duplicate option help");
         throw std::logic_error("QPDFArgParser: option " + option_name + " already has help");
     }
     auto ht = m->help_topics.find(topic);
     if (ht == m->help_topics.end()) {
-        QTC::TC("libtests", "QPDFArgParser add to unknown topic");
         throw std::logic_error(
             "QPDFArgParser: unable to add option " + option_name + " to unknown help topic " +
             topic);

@@ -35,6 +35,14 @@ namespace qpdf::util
         }
     }
 
+    inline void
+    no_ci_rt_error_if(bool cond, std::string const& msg)
+    {
+        if (cond) {
+            throw std::runtime_error(msg);
+        }
+    }
+
     inline constexpr char
     hex_decode_char(char digit)
     {

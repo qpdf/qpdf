@@ -672,10 +672,7 @@ QPDF::getXRefTable()
 std::map<QPDFObjGen, QPDFXRefEntry> const&
 Objects::xref_table()
 {
-    if (!m->parsed) {
-        throw std::logic_error("QPDF::getXRefTable called before parsing.");
-    }
-
+    util::assertion(m->parsed, "QPDF::getXRefTable called before parsing");
     return m->xref_table;
 }
 

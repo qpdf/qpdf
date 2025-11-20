@@ -137,3 +137,8 @@ D:20210209191925Z
 done
 ---- memory usage
 memory usage okay
+---- error handlers
+caught exception: msg2
+caught exception: INTERNAL ERROR: msg4
+This is a qpdf bug. Please report at https://github.com/qpdf/qpdf/issues
+caught exception: msg6
