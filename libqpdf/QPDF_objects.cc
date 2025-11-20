@@ -533,7 +533,7 @@ Objects::read_xref(qpdf_offset_t xref_offset, bool in_stream_recovery)
         max_obj = std::max(max_obj, *(m->deleted_objects.rbegin()));
     }
     if (size < 1 || (size - 1) != max_obj) {
-        if ((size - 2) == max_obj) { //&& qpdf.getObject(max_obj, 0).isStreamOfType("/XRef")) {
+        if (size  == (max_obj + 2) && qpdf.getObject(max_obj +1, 0).isStreamOfType("/XRef")) {
             warn(damagedPDF(
                 "",
                 -1,
