@@ -1,0 +1,8 @@
+WARNING: bad40.pdf: xref entry for the xref stream itself is missing - a common error handled correctly by qpdf and most other applications
+WARNING: bad40.pdf object stream 1 (object 1 0, offset 0): object stream claims to contain itself
+/QTest is implicit
+/QTest is direct and has type null (2)
+/QTest is null
+unparse: null
+unparseResolved: null
+test 1 done
