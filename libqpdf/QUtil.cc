@@ -40,6 +40,7 @@
 #endif
 
 using namespace qpdf;
+using namespace std::literals;
 
 // First element is 24
 static unsigned short pdf_doc_low_to_unicode[] = {
@@ -2067,4 +2068,16 @@ bool
 QUtil::is_hex_digit(char c)
 {
     return util::is_hex_digit(c);
+}
+
+void
+QUtil::handle_result_code(qpdf_result_e result, std::string_view context)
+{
+    if (result == qpdf_r_ok) {
+        return;
+    }
+    qpdf::util::assertion(
+        result == qpdf_r_bad_parameter,
+        "unexpected result code received from function in "s.append(context));
+    throw std::logic_error("invalid parameter supplied to function in "s.append(context));
 }
