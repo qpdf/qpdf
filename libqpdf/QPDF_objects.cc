@@ -533,7 +533,7 @@ Objects::read_xref(qpdf_offset_t xref_offset, bool in_stream_recovery)
         max_obj = std::max(max_obj, *(m->deleted_objects.rbegin()));
     }
     if (size < 1 || (size - 1) != max_obj) {
-        if (size  == (max_obj + 2) && qpdf.getObject(max_obj +1, 0).isStreamOfType("/XRef")) {
+        if (size == (max_obj + 2) && qpdf.getObject(max_obj + 1, 0).isStreamOfType("/XRef")) {
             warn(damagedPDF(
                 "",
                 -1,
@@ -1132,7 +1132,7 @@ Objects::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2)
 void
 Objects::insertFreeXrefEntry(QPDFObjGen og)
 {
-    if (!m->xref_table.contains(og)) {
+    if (!m->xref_table.contains(og) && og.getObj() <= m->xref_table_max_id) {
         m->deleted_objects.insert(og.getObj());
     }
 }
