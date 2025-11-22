@@ -31,6 +31,14 @@ more detail.
 
   - Library Enhancements
 
+    - Add new ``inspection mode`` to help with the inspection and manual repair
+      of damaged PDF files. In this mode some of the exceptions thrown if a PDF
+      file is damaged and unrepairable are replaced with warnings and some automatic
+      repairs are suppressed. Only a very limited range of operations are supported.
+      Inspection mode is selected with the new function
+      ``pdf::global::options::inspection_mode``. For more detail see
+      :ref:`inspection-mode`.
+
     - Add ``QPDFNameTreeObjectHelper`` and ``QPDFNumberTreeObjectHelper``
       constructor overloads that allow a function to be passed to
       validate the values in the tree.
@@ -96,7 +104,7 @@ more detail.
       is the intended behaviour.
 
     - There has been some refactoring of stream filtering. These are optimized
-      for the common case where no user provided stream filters  are
+      for the common case where no user provided stream filters are
       registered by calling ``QPDF::registerStreamFilter``. If you are
       providing your own stream filters please open a ticket_.
 
