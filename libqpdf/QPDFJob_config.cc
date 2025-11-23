@@ -1,10 +1,35 @@
 #include <qpdf/QPDFJob_private.hh>
 
-#include <regex>
-
 #include <qpdf/QPDFLogger.hh>
+#include <qpdf/QPDFUsage.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+
+#include <concepts>
+#include <regex>
+
+static void
+int_usage(std::string_view option, std::integral auto min, std::integral auto max)
+{
+    throw QPDFUsage(
+        "invalid "s.append(option) + ": must be a number between " + std::to_string(min) + " and " +
+        std::to_string(max));
+}
+
+static int
+to_int(std::string_view option, std::string const& value, int min, int max)
+{
+    int result = 0;
+    try {
+        result = std::stoi(value);
+        if (result < min || result > max) {
+            int_usage(option, min, max);
+        }
+    } catch (std::exception&) {
+        int_usage(option, min, max);
+    }
+    return result;
+}
 
 void
 QPDFJob::Config::checkConfiguration()
@@ -131,14 +156,14 @@ QPDFJob::Config::compressStreams(std::string const& parameter)
 QPDFJob::Config*
 QPDFJob::Config::compressionLevel(std::string const& parameter)
 {
-    o.m->compression_level = QUtil::string_to_int(parameter.c_str());
+    o.m->compression_level = to_int("compression-level", parameter, 1, 9);
     return this;
 }
 
 QPDFJob::Config*
 QPDFJob::Config::jpegQuality(std::string const& parameter)
 {
-    o.m->jpeg_quality = QUtil::string_to_int(parameter.c_str());
+    o.m->jpeg_quality = to_int("jpeg-quality", parameter, 0, 100);
     return this;
 }
 
