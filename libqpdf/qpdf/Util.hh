@@ -18,28 +18,33 @@ namespace qpdf::util
     // Throw a logic_error if 'cond' does not hold.
     //
     // DO NOT USE unless it is impractical or unnecessary to cover violations during CI Testing.
+    template <typename T>
     inline void
-    assertion(bool cond, std::string const& msg)
+    assertion(bool cond, T&& msg)
     {
         if (!cond) {
-            throw std::logic_error(msg);
+            throw std::logic_error(std::forward<T>(msg));
         }
     }
 
+    template <typename T>
     inline void
-    internal_error_if(bool cond, std::string const& msg)
+    internal_error_if(bool cond, T&& msg)
     {
         if (cond) {
-            throw std::logic_error("INTERNAL ERROR: "s.append(msg).append(
-                "\nThis is a qpdf bug. Please report at https://github.com/qpdf/qpdf/issues"));
+            throw std::logic_error("INTERNAL ERROR: "s.append(std::forward<T>(msg))
+                                       .append(
+                                           "\nThis is a qpdf bug. Please report at "
+                                           "https://github.com/qpdf/qpdf/issues"));
         }
     }
 
+    template <typename T>
     inline void
-    no_ci_rt_error_if(bool cond, std::string const& msg)
+    no_ci_rt_error_if(bool cond, T&& msg)
     {
         if (cond) {
-            throw std::runtime_error(msg);
+            throw std::runtime_error(std::forward<T>(msg));
         }
     }
 
