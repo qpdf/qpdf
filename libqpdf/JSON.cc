@@ -442,16 +442,24 @@ JSON::forEachArrayItem(std::function<void(JSON value)> fn) const
 bool
 JSON::checkSchema(JSON schema, std::list<std::string>& errors)
 {
-    return m && checkSchemaInternal(m->value.get(), schema.m->value.get(), 0, errors, "");
+    if (!m || !schema.m) {
+        return false;
+    }
+    checkSchemaInternal(m->value.get(), schema.m->value.get(), 0, errors, "");
+    return errors.empty();
 }
 
 bool
 JSON::checkSchema(JSON schema, unsigned long flags, std::list<std::string>& errors)
 {
-    return m && checkSchemaInternal(m->value.get(), schema.m->value.get(), flags, errors, "");
+    if (!m || !schema.m) {
+        return false;
+    }
+    checkSchemaInternal(m->value.get(), schema.m->value.get(), flags, errors, "");
+    return errors.empty();
 }
 
-bool
+void
 JSON::checkSchemaInternal(
     JSON_value* this_v,
     JSON_value* sch_v,
@@ -459,44 +467,33 @@ JSON::checkSchemaInternal(
     std::list<std::string>& errors,
     std::string prefix)
 {
-    auto* this_arr = dynamic_cast<JSON_array*>(this_v);
-    auto* this_dict = dynamic_cast<JSON_dictionary*>(this_v);
+    auto error = [&errors, prefix](std::string const& msg) {
+        if (prefix.empty()) {
+            errors.emplace_back("top-level object" + msg);
+        } else {
+            errors.emplace_back("json key \"" + prefix + "\"" + msg);
+        }
+    };
 
-    auto* sch_arr = dynamic_cast<JSON_array*>(sch_v);
-    auto* sch_dict = dynamic_cast<JSON_dictionary*>(sch_v);
-
-    auto* sch_str = dynamic_cast<JSON_string*>(sch_v);
-
-    std::string err_prefix;
-    if (prefix.empty()) {
-        err_prefix = "top-level object";
-    } else {
-        err_prefix = "json key \"" + prefix + "\"";
-    }
-
-    std::string pattern_key;
-    if (sch_dict) {
+    if (auto* sch_dict = dynamic_cast<JSON_dictionary*>(sch_v)) {
+        auto* this_dict = dynamic_cast<JSON_dictionary*>(this_v);
         if (!this_dict) {
-            QTC::TC("libtests", "JSON wanted dictionary");
-            errors.push_back(err_prefix + " is supposed to be a dictionary");
-            return false;
+            error(" is supposed to be a dictionary");
+            return;
         }
-        auto members = sch_dict->members;
-        std::string key;
-        if ((members.size() == 1) &&
-            ((key = members.begin()->first, key.length() > 2) && (key.at(0) == '<') &&
-             (key.at(key.length() - 1) == '>'))) {
-            pattern_key = key;
+        auto const& members = sch_dict->members;
+        if (members.size() == 1) {
+            auto const& pattern_key = members.begin()->first;
+            if (pattern_key.starts_with('<') && pattern_key.ends_with('>')) {
+                auto pattern_schema = sch_dict->members[pattern_key].m->value.get();
+                for (auto const& [key, val]: this_dict->members) {
+                    checkSchemaInternal(
+                        val.m->value.get(), pattern_schema, flags, errors, prefix + "." + key);
+                }
+                return;
+            }
         }
-    }
 
-    if (sch_dict && !pattern_key.empty()) {
-        auto pattern_schema = sch_dict->members[pattern_key].m->value.get();
-        for (auto const& [key, val]: this_dict->members) {
-            checkSchemaInternal(
-                val.m->value.get(), pattern_schema, flags, errors, prefix + "." + key);
-        }
-    } else if (sch_dict) {
         for (auto& [key, val]: sch_dict->members) {
             if (this_dict->members.contains(key)) {
                 checkSchemaInternal(
@@ -509,22 +506,21 @@ JSON::checkSchemaInternal(
                 if (flags & f_optional) {
                     QTC::TC("libtests", "JSON optional key");
                 } else {
-                    QTC::TC("libtests", "JSON key missing in object");
-                    errors.emplace_back(
-                        err_prefix + ": key \"" + key +
-                        "\" is present in schema but missing in object");
+                    error(": key \"" + key + "\" is present in schema but missing in object");
                 }
             }
         }
         for (auto const& item: this_dict->members) {
             if (!sch_dict->members.contains(item.first)) {
-                QTC::TC("libtests", "JSON key extra in object");
-                errors.emplace_back(
-                    err_prefix + ": key \"" + item.first +
-                    "\" is not present in schema but appears in object");
+                error(
+                    ": key \"" + item.first + "\" is not present in schema but appears in object");
             }
         }
-    } else if (sch_arr) {
+        return;
+    }
+
+    if (auto* sch_arr = dynamic_cast<JSON_array*>(sch_v)) {
+        auto* this_arr = dynamic_cast<JSON_array*>(this_v);
         auto n_elements = sch_arr->elements.size();
         if (n_elements == 1) {
             // A single-element array in the schema allows a single element in the object or a
@@ -543,15 +539,12 @@ JSON::checkSchemaInternal(
                     ++i;
                 }
             } else {
-                QTC::TC("libtests", "JSON schema array for single item");
                 checkSchemaInternal(
                     this_v, sch_arr->elements.at(0).m->value.get(), flags, errors, prefix);
             }
         } else if (!this_arr || this_arr->elements.size() != n_elements) {
-            QTC::TC("libtests", "JSON schema array length mismatch");
-            errors.emplace_back(
-                err_prefix + " is supposed to be an array of length " + std::to_string(n_elements));
-            return false;
+            error(" is supposed to be an array of length " + std::to_string(n_elements));
+            return;
         } else {
             // A multi-element array in the schema must correspond to an element of the same length
             // in the object. Each element in the object is validated against the corresponding
@@ -567,13 +560,12 @@ JSON::checkSchemaInternal(
                 ++i;
             }
         }
-    } else if (!sch_str) {
-        QTC::TC("libtests", "JSON schema other type");
-        errors.emplace_back(err_prefix + " schema value is not dictionary, array, or string");
-        return false;
+        return;
     }
 
-    return errors.empty();
+    if (!dynamic_cast<JSON_string*>(sch_v)) {
+        error(" schema value is not dictionary, array, or string");
+    }
 }
 
 namespace

@@ -363,7 +363,7 @@ class JSON
 
     JSON(std::unique_ptr<JSON_value>);
 
-    static bool checkSchemaInternal(
+    static void checkSchemaInternal(
         JSON_value* this_v,
         JSON_value* sch_v,
         unsigned long flags,
