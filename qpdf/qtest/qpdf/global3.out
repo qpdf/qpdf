@@ -1,0 +1,5 @@
+WARNING: global.pdf (trailer, offset 770): limits error(parser-max-container-size): encountered an array or dictionary with more than 3 elements during xref recovery; giving up on reading object
+WARNING: global.pdf: file is damaged
+WARNING: global.pdf (offset 712): expected trailer dictionary
+WARNING: global.pdf: Attempting to reconstruct cross-reference table
+qpdf: operation succeeded with warnings; resulting file may have some problems

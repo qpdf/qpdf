@@ -3762,6 +3762,110 @@ Related Options
    For a information about how to use this option, please see
    :ref:`json`.
 
+.. _global-options:
+
+Global Options
+--------------
+
+.. help-topic global: options for changing the behaviour of qpdf
+
+   The options below modify the overall behaviour of qpdf. This includes modifying
+   implementation limits and changing modes of operation.
+
+The options below modify the overall behaviour of qpdf. This includes modifying implementation
+limits and changing modes of operation.
+
+Related Options
+~~~~~~~~~~~~~~~
+
+.. qpdf:option:: --global [options] --
+
+   .. help: begin setting global options and limits
+
+      Begin setting global options and limits.
+
+Begin setting global options and limits.
+
+
+Global Limits
+~~~~~~~~~~~~~
+
+qpdf uses a number of global limits to protect itself from damaged and specially constructed PDF
+files. Without these limits such files can cause qpdf to crash and/or to consume excessive
+processor and memory resources. Very few legitimate PDF files exceed these limits, however
+where necessary the limits can be modified or entirely removed by the following options.
+
+.. qpdf:option:: --no-default-limits
+
+   .. help: disable optional default limits
+
+      Disables all optional default limits. Explicitly set limits are unaffected. Some
+      limits, especially limits designed to prevent stack overflow, cannot be removed
+      with this option but can be modified. Where this is the case it is mentioned
+      in the entry for the relevant option.
+
+Disables all optional default limits. Explicitly set limits are unaffected. Some limits,
+especially limits designed to prevent stack overflow, cannot be removed with this option
+but can be modified. Where this is the case it is mentioned in the entry for the relevant
+option.
+
+Parser Limits
+.............
+
+.. qpdf:option:: --parser-max-nesting=n
+
+   .. help: set the maximum nesting level while parsing objects
+
+      Set the maximum nesting level while parsing objects. The maximum nesting level
+      is not disabled by --no-default-limits. Defaults to 499.
+
+Set the maximum nesting level while parsing objects. The maximum nesting level is not
+disabled by :qpdf:ref:`--no-default-limits`. Defaults to 499.
+
+
+.. qpdf:option:: --parser-max-errors=n
+
+   .. help: set the maximum number of errors while parsing
+
+      Set the maximum number of errors allowed while parsing an indirect object.
+      A value of 0 means that no maximum is imposed. Defaults to 15.
+
+Set the maximum number of errors allowed while parsing an indirect object.
+A value of 0 means that no maximum is imposed. Defaults to 15.
+
+.. qpdf:option:: --parser-max-container-size=n
+
+   .. help: set the maximum container size while parsing
+
+      Set the maximum number of top-level objects allowed in a container while
+      parsing. The limit applies when the PDF document's xref table is undamaged
+      and the object itself can be parsed without errors. The default limit
+      is 4,294,967,295. See also --parser-max-container-size-damaged.
+
+
+Set the maximum number of top-level objects allowed in a container while
+parsing. The limit applies when the PDF document's xref table is undamaged
+and the object itself can be parsed without errors. The default limit
+is 4,294,967,295. See also :qpdf:ref:`--parser-max-container-size-damaged`.
+
+
+.. qpdf:option:: --parser-max-container-size-damaged=n
+
+   .. help: set the maximum container size while parsing damaged files
+
+      Set the maximum number of top-level objects allowed in a container while
+      parsing. The limit applies when the PDF document's xref table is damaged
+      or the object itself is damaged. The limit also applies when parsing
+      xref streams. The default limit is 5,000.
+      See also --parser-max-container-size.
+
+
+Set the maximum number of top-level objects allowed in a container while
+parsing. The limit applies when the PDF document's xref table is damaged
+or the object itself is damaged. The limit also applies when parsing
+xref streams. The default limit is 5,000.
+See also :qpdf:ref:`--parser-max-container-size`.
+
 .. _test-options:
 
 Options for Testing or Debugging

@@ -90,6 +90,13 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   ],
   "jsonStreamData": "how to handle streams in json output",
   "jsonStreamPrefix": "prefix for json stream data files",
+  "global": {
+    "noDefaultLimits": "disable optional default limits",
+    "parserMaxContainerSize": "set the maximum container size while parsing",
+    "parserMaxContainerSizeDamaged": "set the maximum container size while parsing damaged files",
+    "parserMaxErrors": "set the maximum number of errors while parsing",
+    "parserMaxNesting": "set the maximum nesting level while parsing objects"
+  },
   "updateFromJson": "update a PDF from qpdf JSON",
   "allowWeakCrypto": "allow insecure cryptographic algorithms",
   "keepFilesOpen": "manage keeping multiple files open",

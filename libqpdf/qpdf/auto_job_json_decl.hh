@@ -24,6 +24,8 @@ void beginJsonKeyArray(JSON);
 void endJsonKeyArray();
 void beginJsonObjectArray(JSON);
 void endJsonObjectArray();
+void beginGlobal(JSON);
+void endGlobal();
 void beginAddAttachmentArray(JSON);
 void endAddAttachmentArray();
 void beginAddAttachment(JSON);
