@@ -437,18 +437,16 @@ QPDFParser::parseRemainder(bool content_stream)
         case QPDFTokenizer::tt_array_open:
         case QPDFTokenizer::tt_dict_open:
             if (stack.size() > max_nesting) {
-                global::Limits::error();
-                warn("limits error: ignoring excessively deeply nested data structure");
-                return {};
-            } else {
-                b_contents = false;
-                stack.emplace_back(
-                    input,
-                    (tokenizer.getType() == QPDFTokenizer::tt_array_open) ? st_array
-                                                                          : st_dictionary_key);
-                frame = &stack.back();
-                continue;
+                limits_error(
+                    "parser-max-nesting", "ignoring excessively deeply nested data structure");
             }
+            b_contents = false;
+            stack.emplace_back(
+                input,
+                (tokenizer.getType() == QPDFTokenizer::tt_array_open) ? st_array
+                                                                      : st_dictionary_key);
+            frame = &stack.back();
+            continue;
 
         case QPDFTokenizer::tt_bool:
             addScalar<QPDF_Bool>(tokenizer.getValue() == "true");
@@ -588,10 +586,10 @@ void
 QPDFParser::addScalar(Args&&... args)
 {
     auto limit = Limits::parser_max_container_size(bad_count || sanity_checks);
-    if (frame->olist.size() > limit || frame->dict.size() > limit) {
+    if (frame->olist.size() >= limit || frame->dict.size() >= limit) {
         // Stop adding scalars. We are going to abort when the close token or a bad token is
         // encountered.
-        max_bad_count = 0;
+        max_bad_count = 1;
         check_too_many_bad_tokens(); // always throws Error()
     }
     auto obj = QPDFObject::create<T>(std::forward<Args>(args)...);
@@ -646,32 +644,43 @@ void
 QPDFParser::check_too_many_bad_tokens()
 {
     auto limit = Limits::parser_max_container_size(bad_count || sanity_checks);
-    if (frame->olist.size() > limit || frame->dict.size() > limit) {
+    if (frame->olist.size() >= limit || frame->dict.size() >= limit) {
         if (bad_count) {
-            Limits::error();
-            warn(
-                "limits error: encountered errors while parsing an array or dictionary with more "
-                "than " +
-                std::to_string(limit) + " elements; giving up on reading object");
-            throw Error();
+            limits_error(
+                "parser-max-container-size-damaged",
+                "encountered errors while parsing an array or dictionary with more than " +
+                    std::to_string(limit) + " elements; giving up on reading object");
         }
-        warn(
+        limits_error(
+            "parser-max-container-size",
             "encountered an array or dictionary with more than " + std::to_string(limit) +
-            " elements during xref recovery; giving up on reading object");
+                " elements during xref recovery; giving up on reading object");
     }
-    if (max_bad_count && --max_bad_count > 0 && good_count > 4) {
+    if (max_bad_count && --max_bad_count == 0) {
+        limits_error(
+            "parser-max-errors", "too many errors during parsing; treating object as null");
+    }
+    if (good_count > 4) {
         good_count = 0;
         bad_count = 1;
         return;
     }
     if (++bad_count > 5 ||
-        (frame->state != st_array && QIntC::to_size(max_bad_count) < frame->olist.size())) {
+        (frame->state != st_array && std::cmp_less(max_bad_count, frame->olist.size()))) {
         // Give up after 5 errors in close proximity or if the number of missing dictionary keys
         // exceeds the remaining number of allowable total errors.
         warn("too many errors; giving up on reading object");
         throw Error();
     }
     good_count = 0;
+}
+
+void
+QPDFParser::limits_error(std::string const& limit, std::string const& msg)
+{
+    Limits::error();
+    warn("limits error("s + limit + "): " + msg);
+    throw Error();
 }
 
 void
