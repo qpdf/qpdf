@@ -162,18 +162,18 @@ test_2(QPDF& pdf, char const* arg2)
     using namespace qpdf::global::limits;
 
     // Check default values
-    assert(objects_max_nesting() == 499);
-    assert(objects_max_errors() == 15);
-    assert(objects_max_container_size() == std::numeric_limits<uint32_t>::max());
-    assert(objects_max_container_size_damaged() == 5'000);
+    assert(parser_max_nesting() == 499);
+    assert(parser_max_errors() == 15);
+    assert(parser_max_container_size() == std::numeric_limits<uint32_t>::max());
+    assert(parser_max_container_size_damaged() == 5'000);
     assert(default_limits());
 
     // Test disabling optional default limits
     default_limits(false);
-    assert(objects_max_nesting() == 499);
-    assert(objects_max_errors() == 0);
-    assert(objects_max_container_size() == std::numeric_limits<uint32_t>::max());
-    assert(objects_max_container_size_damaged() == std::numeric_limits<uint32_t>::max());
+    assert(parser_max_nesting() == 499);
+    assert(parser_max_errors() == 0);
+    assert(parser_max_container_size() == std::numeric_limits<uint32_t>::max());
+    assert(parser_max_container_size_damaged() == std::numeric_limits<uint32_t>::max());
     assert(!default_limits());
 
     // Check disabling default limits is irreversible
@@ -181,22 +181,22 @@ test_2(QPDF& pdf, char const* arg2)
     assert(!default_limits());
 
     // Test setting limits
-    objects_max_nesting(11);
-    objects_max_errors(12);
-    objects_max_container_size(13);
-    objects_max_container_size_damaged(14);
+    parser_max_nesting(11);
+    parser_max_errors(12);
+    parser_max_container_size(13);
+    parser_max_container_size_damaged(14);
 
-    assert(objects_max_nesting() == 11);
-    assert(objects_max_errors() == 12);
-    assert(objects_max_container_size() == 13);
-    assert(objects_max_container_size_damaged() == 14);
+    assert(parser_max_nesting() == 11);
+    assert(parser_max_errors() == 12);
+    assert(parser_max_container_size() == 13);
+    assert(parser_max_container_size_damaged() == 14);
 
     // Check disabling default limits does not override explicit limits
     default_limits(false);
-    assert(objects_max_nesting() == 11);
-    assert(objects_max_errors() == 12);
-    assert(objects_max_container_size() == 13);
-    assert(objects_max_container_size_damaged() == 14);
+    assert(parser_max_nesting() == 11);
+    assert(parser_max_errors() == 12);
+    assert(parser_max_container_size() == 13);
+    assert(parser_max_container_size_damaged() == 14);
 
     // Test parameter checking
     QUtil::handle_result_code(qpdf_r_ok, "");
@@ -226,7 +226,7 @@ test_2(QPDF& pdf, char const* arg2)
     assert(qpdf::global::limit_errors() == 0);
     QPDFObjectHandle::parse("[[[[]]]]");
     assert(qpdf::global::limit_errors() == 0);
-    objects_max_nesting(3);
+    parser_max_nesting(3);
     try {
         QPDFObjectHandle::parse("[[[[[]]]]]");
     } catch (std::exception&) {

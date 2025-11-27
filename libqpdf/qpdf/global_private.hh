@@ -16,37 +16,37 @@ namespace qpdf::global
         Limits& operator=(Limits&&) = delete;
 
         static uint32_t const&
-        objects_max_nesting()
+        parser_max_nesting()
         {
-            return l.objects_max_nesting_;
+            return l.parser_max_nesting_;
         }
 
         static void
-        objects_max_nesting(uint32_t value)
+        parser_max_nesting(uint32_t value)
         {
-            l.objects_max_nesting_ = value;
+            l.parser_max_nesting_ = value;
         }
 
         static uint32_t const&
-        objects_max_errors()
+        parser_max_errors()
         {
-            return l.objects_max_errors_;
+            return l.parser_max_errors_;
         }
 
         static void
-        objects_max_errors(uint32_t value)
+        parser_max_errors(uint32_t value)
         {
-            l.objects_max_errors_set_ = true;
-            l.objects_max_errors_ = value;
+            l.parser_max_errors_set_ = true;
+            l.parser_max_errors_ = value;
         }
 
         static uint32_t const&
-        objects_max_container_size(bool damaged)
+        parser_max_container_size(bool damaged)
         {
-            return damaged ? l.objects_max_container_size_damaged_ : l.objects_max_container_size_;
+            return damaged ? l.parser_max_container_size_damaged_ : l.parser_max_container_size_;
         }
 
-        static void objects_max_container_size(bool damaged, uint32_t value);
+        static void parser_max_container_size(bool damaged, uint32_t value);
 
         /// Record a limit error.
         static void
@@ -73,12 +73,12 @@ namespace qpdf::global
 
         uint32_t errors_{0};
 
-        uint32_t objects_max_nesting_{499};
-        uint32_t objects_max_errors_{15};
-        bool objects_max_errors_set_{false};
-        uint32_t objects_max_container_size_{std::numeric_limits<uint32_t>::max()};
-        uint32_t objects_max_container_size_damaged_{5'000};
-        bool objects_max_container_size_damaged_set_{false};
+        uint32_t parser_max_nesting_{499};
+        uint32_t parser_max_errors_{15};
+        bool parser_max_errors_set_{false};
+        uint32_t parser_max_container_size_{std::numeric_limits<uint32_t>::max()};
+        uint32_t parser_max_container_size_damaged_{5'000};
+        bool parser_max_container_size_damaged_set_{false};
     };
 
     class Options
