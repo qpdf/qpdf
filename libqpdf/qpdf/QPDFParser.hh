@@ -149,7 +149,7 @@ class QPDFParser
     // it only gets incremented or reset when a bad token is encountered.
     int bad_count{0};
     // Number of bad tokens (remaining) before giving up.
-    uint32_t max_bad_count{Limits::objects_max_errors()};
+    uint32_t max_bad_count{Limits::parser_max_errors()};
     // Number of good tokens since last bad token. Irrelevant if bad_count == 0.
     int good_count{0};
     // Start offset including any leading whitespace.

@@ -104,9 +104,9 @@ namespace qpdf::global
         /// @note The maximum nesting level cannot be disabled by calling `default_limit(false)`.
         ///
         /// @since 12.3
-        uint32_t inline objects_max_nesting()
+        uint32_t inline parser_max_nesting()
         {
-            return get_uint32(qpdf_p_objects_max_nesting);
+            return get_uint32(qpdf_p_parser_max_nesting);
         }
 
         /// @brief Sets the maximum nesting level while parsing objects.
@@ -116,9 +116,9 @@ namespace qpdf::global
         /// @note The maximum nesting level cannot be disabled by calling `default_limit(false)`.
         ///
         /// @since 12.3
-        void inline objects_max_nesting(uint32_t value)
+        void inline parser_max_nesting(uint32_t value)
         {
-            set_uint32(qpdf_p_objects_max_nesting, value);
+            set_uint32(qpdf_p_parser_max_nesting, value);
         }
 
         /// @brief Retrieves the maximum number of errors allowed while parsing objects.
@@ -128,9 +128,9 @@ namespace qpdf::global
         /// @return The maximum number of errors allowed while parsing objects.
         ///
         /// @since 12.3
-        uint32_t inline objects_max_errors()
+        uint32_t inline parser_max_errors()
         {
-            return get_uint32(qpdf_p_objects_max_errors);
+            return get_uint32(qpdf_p_parser_max_errors);
         }
 
         /// Sets the maximum number of errors allowed while parsing objects.
@@ -140,9 +140,9 @@ namespace qpdf::global
         /// @param value The maximum number of errors allowed while parsing objects to set.
         ///
         /// @since 12.3
-        void inline objects_max_errors(uint32_t value)
+        void inline parser_max_errors(uint32_t value)
         {
-            set_uint32(qpdf_p_objects_max_errors, value);
+            set_uint32(qpdf_p_parser_max_errors, value);
         }
 
         /// @brief Retrieves the maximum number of objectstop-level allowed in a container while
@@ -155,9 +155,9 @@ namespace qpdf::global
         ///         objects.
         ///
         /// @since 12.3
-        uint32_t inline objects_max_container_size()
+        uint32_t inline parser_max_container_size()
         {
-            return get_uint32(qpdf_p_objects_max_container_size);
+            return get_uint32(qpdf_p_parser_max_container_size);
         }
 
         /// @brief Sets the maximum number oftop-level objects allowed in a container while parsing.
@@ -169,9 +169,9 @@ namespace qpdf::global
         ///               parsing objects to set.
         ///
         /// @since 12.3
-        void inline objects_max_container_size(uint32_t value)
+        void inline parser_max_container_size(uint32_t value)
         {
-            set_uint32(qpdf_p_objects_max_container_size, value);
+            set_uint32(qpdf_p_parser_max_container_size, value);
         }
 
         /// @brief Retrieves the maximum number of top-level objects allowed in a container while
@@ -185,9 +185,9 @@ namespace qpdf::global
         ///         objects.
         ///
         /// @since 12.3
-        uint32_t inline objects_max_container_size_damaged()
+        uint32_t inline parser_max_container_size_damaged()
         {
-            return get_uint32(qpdf_p_objects_max_container_size_damaged);
+            return get_uint32(qpdf_p_parser_max_container_size_damaged);
         }
 
         /// @brief Sets the maximum number of top-level objects allowed in a container while
@@ -201,9 +201,9 @@ namespace qpdf::global
         ///               parsing objects to set.
         ///
         /// @since 12.3
-        void inline objects_max_container_size_damaged(uint32_t value)
+        void inline parser_max_container_size_damaged(uint32_t value)
         {
-            set_uint32(qpdf_p_objects_max_container_size_damaged, value);
+            set_uint32(qpdf_p_parser_max_container_size_damaged, value);
         }
     } // namespace limits
 
