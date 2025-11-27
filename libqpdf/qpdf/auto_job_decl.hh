@@ -5,6 +5,7 @@
 //
 // clang-format off
 //
+static constexpr char const* O_GLOBAL = "global";
 static constexpr char const* O_PAGES = "pages";
 static constexpr char const* O_ENCRYPTION = "encryption";
 static constexpr char const* O_40_BIT_ENCRYPTION = "40-bit encryption";
@@ -21,11 +22,13 @@ void argShowCrypto();
 void argJobJsonHelp();
 void argZopfli();
 void argJsonHelp(std::string const&);
+void argEndGlobal();
 void argPositional(std::string const&);
 void argAddAttachment();
 void argCopyAttachmentsFrom();
 void argEmpty();
 void argEncrypt();
+void argGlobal();
 void argOverlay();
 void argPages();
 void argReplaceInput();

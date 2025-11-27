@@ -4,31 +4,53 @@
 #include <qpdf/QPDFUsage.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
+#include <qpdf/global_private.hh>
 
 #include <concepts>
 #include <regex>
 
-static void
-int_usage(std::string_view option, std::integral auto min, std::integral auto max)
+[[noreturn]] static void
+int_usage(std::string_view option, std::integral auto max, std::integral auto min)
 {
+    qpdf_expect(min < max);
     throw QPDFUsage(
         "invalid "s.append(option) + ": must be a number between " + std::to_string(min) + " and " +
         std::to_string(max));
 }
 
 static int
-to_int(std::string_view option, std::string const& value, int min, int max)
+to_int(std::string_view option, std::string const& value, int max, int min)
 {
-    int result = 0;
+    qpdf_expect(min < max);
     try {
-        result = std::stoi(value);
+        int result = std::stoi(value);
         if (result < min || result > max) {
-            int_usage(option, min, max);
+            int_usage(option, max, min);
         }
+        return result;
     } catch (std::exception&) {
-        int_usage(option, min, max);
+        int_usage(option, max, min);
     }
-    return result;
+}
+
+static uint32_t
+to_uint32(
+    std::string_view option,
+    std::string const& value,
+    uint32_t max = std::numeric_limits<uint32_t>::max(),
+    uint32_t min = 0)
+{
+    qpdf_expect(min < max);
+    try {
+        auto result = std::stoll(value);
+        if (std::cmp_less(result, min) || std::cmp_greater(result, max)) {
+            int_usage(option, max, min);
+        }
+        return static_cast<uint32_t>(result);
+    } catch (std::exception&) {
+        int_usage(option, max, min);
+    }
 }
 
 void
@@ -156,14 +178,14 @@ QPDFJob::Config::compressStreams(std::string const& parameter)
 QPDFJob::Config*
 QPDFJob::Config::compressionLevel(std::string const& parameter)
 {
-    o.m->compression_level = to_int("compression-level", parameter, 1, 9);
+    o.m->compression_level = to_int("compression-level", parameter, 9, 1);
     return this;
 }
 
 QPDFJob::Config*
 QPDFJob::Config::jpegQuality(std::string const& parameter)
 {
-    o.m->jpeg_quality = to_int("jpeg-quality", parameter, 0, 100);
+    o.m->jpeg_quality = to_int("jpeg-quality", parameter, 100, 0);
     return this;
 }
 
@@ -1138,6 +1160,60 @@ QPDFJob::Config::encrypt(
     o.m->user_password = user_password;
     o.m->owner_password = owner_password;
     return std::shared_ptr<EncConfig>(new EncConfig(this));
+}
+
+QPDFJob::GlobalConfig::GlobalConfig(Config* c) :
+    config(c)
+{
+}
+
+std::shared_ptr<QPDFJob::GlobalConfig>
+QPDFJob::Config::global()
+{
+    return std::make_shared<GlobalConfig>(this);
+}
+
+QPDFJob::Config*
+QPDFJob::GlobalConfig::endGlobal()
+{
+    return config;
+}
+
+QPDFJob::GlobalConfig*
+QPDFJob::GlobalConfig::noDefaultLimits()
+{
+    global::Options::default_limits(false);
+    return this;
+}
+
+QPDFJob::GlobalConfig*
+QPDFJob::GlobalConfig::parserMaxContainerSize(const std::string& parameter)
+{
+    global::Limits::parser_max_container_size(
+        false, to_uint32("parser-max-container-size", parameter, 4'294'967'295));
+    return this;
+}
+
+QPDFJob::GlobalConfig*
+QPDFJob::GlobalConfig::parserMaxContainerSizeDamaged(const std::string& parameter)
+{
+    global::Limits::parser_max_container_size(
+        true, to_uint32("parser-max-container-size-damaged", parameter, 4'294'967'295));
+    return this;
+}
+
+QPDFJob::GlobalConfig*
+QPDFJob::GlobalConfig::parserMaxErrors(const std::string& parameter)
+{
+    global::Limits::parser_max_errors(to_uint32("parser-max-errors", parameter));
+    return this;
+}
+
+QPDFJob::GlobalConfig*
+QPDFJob::GlobalConfig::parserMaxNesting(const std::string& parameter)
+{
+    global::Limits::parser_max_nesting(to_uint32("parser-max-nesting", parameter));
+    return this;
 }
 
 QPDFJob::Config*

@@ -5,6 +5,7 @@
 #include <qpdf/QPDF.hh>
 
 #include <qpdf/QIntC.hh>
+#include <qpdf/QPDFJob.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/global.hh>
@@ -237,6 +238,47 @@ test_2(QPDF& pdf, char const* arg2)
     } catch (std::exception&) {
     }
     assert(qpdf::global::limit_errors() == 2);
+
+    // Test global settings using the QPDFJob interface
+    QPDFJob j;
+    j.config()
+        ->inputFile("minimal.pdf")
+        ->global()
+        ->parserMaxNesting("111")
+        ->parserMaxErrors("112")
+        ->parserMaxContainerSize("113")
+        ->parserMaxContainerSizeDamaged("114")
+        ->noDefaultLimits()
+        ->endGlobal()
+        ->outputFile("a.pdf");
+    auto qpdf = j.createQPDF();
+    assert(parser_max_nesting() == 111);
+    assert(parser_max_errors() == 112);
+    assert(parser_max_container_size() == 113);
+    assert(parser_max_container_size_damaged() == 114);
+    assert(!default_limits());
+
+    // Test global settings using the JobJSON
+    QPDFJob jj;
+    jj.initializeFromJson(R"(
+        {
+            "inputFile": "minimal.pdf",
+            "global": {
+                "parserMaxNesting": "211",
+                "parserMaxErrors": "212",
+                "parserMaxContainerSize": "213",
+                "parserMaxContainerSizeDamaged": "214",
+                "noDefaultLimits": ""
+            },
+            "outputFile": "a.pdf"
+        }
+    )");
+    qpdf = j.createQPDF();
+    assert(parser_max_nesting() == 211);
+    assert(parser_max_errors() == 212);
+    assert(parser_max_container_size() == 213);
+    assert(parser_max_container_size_damaged() == 214);
+    assert(!default_limits());
 }
 
 void

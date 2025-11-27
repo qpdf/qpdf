@@ -145,7 +145,7 @@ namespace qpdf::global
             set_uint32(qpdf_p_parser_max_errors, value);
         }
 
-        /// @brief Retrieves the maximum number of objectstop-level allowed in a container while
+        /// @brief Retrieves the maximum number of top-level objects allowed in a container while
         ///        parsing.
         ///
         /// The limit applies when the PDF document's xref table is undamaged and the object itself
@@ -160,7 +160,8 @@ namespace qpdf::global
             return get_uint32(qpdf_p_parser_max_container_size);
         }
 
-        /// @brief Sets the maximum number oftop-level objects allowed in a container while parsing.
+        /// @brief Sets the maximum number of top-level objects allowed in a container while
+        ///        parsing.
         ///
         /// The limit applies when the PDF document's xref table is undamaged and the object itself
         /// can be parsed without errors. The default limit is 4,294,967,295.
@@ -178,8 +179,7 @@ namespace qpdf::global
         ///        parsing objects.
         ///
         /// The limit applies when the PDF document's xref table is damaged or the object itself is
-        /// damaged. The limit also applies when parsing trailer dictionaries and xref streams. The
-        /// default limit is 5,000.
+        /// damaged. The limit also applies when parsing xref streams. The default limit is 5,000.
         ///
         /// @return The maximum number of top-level objects allowed in a container while parsing
         ///         objects.

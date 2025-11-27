@@ -1004,6 +1004,46 @@ Update a PDF file from a JSON file. Please see the "qpdf JSON"
 chapter of the manual for information about how to use this
 option.
 )");
+ap.addHelpTopic("global", "options for changing the behaviour of qpdf", R"(The options below modify the overall behaviour of qpdf. This includes modifying
+implementation limits and changing modes of operation.
+)");
+ap.addOptionHelp("--global", "global", "begin setting global options and limits", R"(--global [options] --
+
+Begin setting global options and limits.
+)");
+ap.addOptionHelp("--no-default-limits", "global", "disable optional default limits", R"(Disables all optional default limits. Explicitly set limits are unaffected. Some
+limits, especially limits designed to prevent stack overflow, cannot be removed
+with this option but can be modified. Where this is the case it is mentioned
+in the entry for the relevant option.
+)");
+ap.addOptionHelp("--parser-max-nesting", "global", "set the maximum nesting level while parsing objects", R"(--parser-max-nesting=n
+
+Set the maximum nesting level while parsing objects. The maximum nesting level
+is not disabled by --no-default-limits. Defaults to 499.
+)");
+ap.addOptionHelp("--parser-max-errors", "global", "set the maximum number of errors while parsing", R"(--parser-max-errors=n
+
+Set the maximum number of errors allowed while parsing an indirect object.
+A value of 0 means that no maximum is imposed. Defaults to 15.
+)");
+ap.addOptionHelp("--parser-max-container-size", "global", "set the maximum container size while parsing", R"(--parser-max-container-size=n
+
+Set the maximum number of top-level objects allowed in a container while
+parsing. The limit applies when the PDF document's xref table is undamaged
+and the object itself can be parsed without errors. The default limit
+is 4,294,967,295. See also --parser-max-container-size-damaged.
+)");
+ap.addOptionHelp("--parser-max-container-size-damaged", "global", "set the maximum container size while parsing damaged files", R"(--parser-max-container-size-damaged=n
+
+Set the maximum number of top-level objects allowed in a container while
+parsing. The limit applies when the PDF document's xref table is damaged
+or the object itself is damaged. The limit also applies when parsing
+xref streams. The default limit is 5,000.
+See also --parser-max-container-size.
+)");
+}
+static void add_help_9(QPDFArgParser& ap)
+{
 ap.addHelpTopic("testing", "options for testing or debugging", R"(The options below are useful when writing automated test code that
 includes files created by qpdf or when testing qpdf itself.
 )");
@@ -1039,6 +1079,7 @@ static void add_help(QPDFArgParser& ap)
     add_help_6(ap);
     add_help_7(ap);
     add_help_8(ap);
+    add_help_9(ap);
 ap.addHelpFooter("For detailed help, visit the qpdf manual: https://qpdf.readthedocs.io\n");
 }
 
