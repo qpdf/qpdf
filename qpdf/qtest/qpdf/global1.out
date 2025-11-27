@@ -5,3 +5,4 @@ WARNING: global.pdf: Attempting to reconstruct cross-reference table
 WARNING: global.pdf (trailer, offset 759): limits error(parser-max-nesting): ignoring excessively deeply nested data structure
 WARNING: global.pdf: unable to find trailer dictionary while recovering damaged file
 qpdf: operation succeeded with warnings; resulting file may have some problems
+qpdf: some configurable limits were exceeded; for more details see https://qpdf.readthedocs.io/en/stable/cli.html#global-limits

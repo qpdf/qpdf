@@ -623,7 +623,7 @@ Handlers::beginSetPageLabelsArray(JSON)
 void
 Handlers::beginGlobal(JSON)
 {
-    this->c_global = c_main->global();
+    c_global = c_main->global();
 }
 
 void
