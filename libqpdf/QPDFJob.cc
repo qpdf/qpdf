@@ -25,6 +25,7 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/Util.hh>
+#include <qpdf/global_private.hh>
 
 #include <qpdf/auto_job_schema.hh> // JOB_SCHEMA_DATA
 
@@ -484,6 +485,11 @@ QPDFJob::writeQPDF(QPDF& pdf)
         } else {
             *m->log->getWarn() << m->message_prefix << ": operation succeeded with warnings\n";
         }
+    }
+    if (!m->d_cfg.suppress_warnings() && global::Limits::errors()) {
+        *m->log->getWarn() << m->message_prefix
+                           << ": some configurable limits were exceeded; for more details "
+                              "see https://qpdf.readthedocs.io/en/stable/cli.html#global-limits\n";
     }
     if (m->report_mem_usage) {
         // Call get_max_memory_usage before generating output. When debugging, it's easier if print
