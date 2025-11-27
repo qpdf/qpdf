@@ -1,0 +1,7 @@
+WARNING: global.pdf (trailer, offset 759): limits error(parser-max-nesting): ignoring excessively deeply nested data structure
+WARNING: global.pdf: file is damaged
+WARNING: global.pdf (offset 712): expected trailer dictionary
+WARNING: global.pdf: Attempting to reconstruct cross-reference table
+WARNING: global.pdf (trailer, offset 759): limits error(parser-max-nesting): ignoring excessively deeply nested data structure
+WARNING: global.pdf: unable to find trailer dictionary while recovering damaged file
+qpdf: operation succeeded with warnings; resulting file may have some problems

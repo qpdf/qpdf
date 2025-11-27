@@ -1,0 +1,9 @@
+WARNING: global_damaged.pdf: file is damaged
+WARNING: global_damaged.pdf (offset 55): xref not found
+WARNING: global_damaged.pdf: Attempting to reconstruct cross-reference table
+WARNING: global_damaged.pdf (trailer, offset 764): unknown token while reading object; treating as null
+WARNING: global_damaged.pdf (trailer, offset 767): unknown token while reading object; treating as null
+WARNING: global_damaged.pdf (trailer, offset 770): unknown token while reading object; treating as null
+WARNING: global_damaged.pdf (trailer, offset 788): limits error(parser-max-container-size-damaged): encountered errors while parsing an array or dictionary with more than 9 elements; giving up on reading object
+WARNING: global_damaged.pdf: unable to find trailer dictionary while recovering damaged file
+qpdf: operation succeeded with warnings; resulting file may have some problems

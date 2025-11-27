@@ -306,6 +306,24 @@ class QPDFJob
         Config* config;
     };
 
+    class GlobalConfig
+    {
+        friend class QPDFJob;
+        friend class Config;
+
+      public:
+        QPDF_DLL
+        Config* endGlobal();
+
+#include <qpdf/auto_job_c_global.hh>
+
+        GlobalConfig(Config*); // for qpdf internal use only
+        GlobalConfig(GlobalConfig const&) = delete;
+
+      private:
+        Config* config;
+    };
+
     class Config
     {
         friend class QPDFJob;
@@ -330,6 +348,8 @@ class QPDFJob
         std::shared_ptr<CopyAttConfig> copyAttachmentsFrom();
         QPDF_DLL
         std::shared_ptr<AttConfig> addAttachment();
+        QPDF_DLL
+        std::shared_ptr<GlobalConfig> global();
         QPDF_DLL
         std::shared_ptr<PagesConfig> pages();
         QPDF_DLL

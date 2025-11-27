@@ -1191,6 +1191,51 @@ how to use this option.
 Update a PDF file from a JSON file. Please see the "qpdf JSON"
 chapter of the manual for information about how to use this
 option.
+.SH GLOBAL (options for changing the behaviour of qpdf)
+The options below modify the overall behaviour of qpdf. This includes modifying
+implementation limits and changing modes of operation.
+.PP
+Related Options:
+.TP
+.B --global \-\- begin setting global options and limits
+--global [options] --
+
+Begin setting global options and limits.
+.TP
+.B --no-default-limits \-\- disable optional default limits
+Disables all optional default limits. Explicitly set limits are unaffected. Some
+limits, especially limits designed to prevent stack overflow, cannot be removed
+with this option but can be modified. Where this is the case it is mentioned
+in the entry for the relevant option.
+.TP
+.B --parser-max-nesting \-\- set the maximum nesting level while parsing objects
+--parser-max-nesting=n
+
+Set the maximum nesting level while parsing objects. The maximum nesting level
+is not disabled by --no-default-limits. Defaults to 499.
+.TP
+.B --parser-max-errors \-\- set the maximum number of errors while parsing
+--parser-max-errors=n
+
+Set the maximum number of errors allowed while parsing an indirect object.
+A value of 0 means that no maximum is imposed. Defaults to 15.
+.TP
+.B --parser-max-container-size \-\- set the maximum container size while parsing
+--parser-max-container-size=n
+
+Set the maximum number of top-level objects allowed in a container while
+parsing. The limit applies when the PDF document's xref table is undamaged
+and the object itself can be parsed without errors. The default limit
+is 4,294,967,295. See also --parser-max-container-size-damaged.
+.TP
+.B --parser-max-container-size-damaged \-\- set the maximum container size while parsing damaged files
+--parser-max-container-size-damaged=n
+
+Set the maximum number of top-level objects allowed in a container while
+parsing. The limit applies when the PDF document's xref table is damaged
+or the object itself is damaged. The limit also applies when parsing
+xref streams. The default limit is 5,000.
+See also --parser-max-container-size.
 .SH TESTING (options for testing or debugging)
 The options below are useful when writing automated test code that
 includes files created by qpdf or when testing qpdf itself.
