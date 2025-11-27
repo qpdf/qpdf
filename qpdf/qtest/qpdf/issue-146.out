@@ -1,7 +1,7 @@
 WARNING: issue-146.pdf: file is damaged
 WARNING: issue-146.pdf: can't find startxref
 WARNING: issue-146.pdf: Attempting to reconstruct cross-reference table
-WARNING: issue-146.pdf (trailer, offset 695): limits error: ignoring excessively deeply nested data structure
+WARNING: issue-146.pdf (trailer, offset 695): limits error(parser-max-nesting): ignoring excessively deeply nested data structure
 WARNING: issue-146.pdf (object 1 0, offset 92): expected endobj
 WARNING: issue-146.pdf (object 7 0, offset 146): unknown token while reading object; treating as null
 WARNING: issue-146.pdf (object 7 0, offset 168): expected endobj
