@@ -15,7 +15,7 @@ using namespace qpdf;
 
 using ObjectPtr = std::shared_ptr<QPDFObject>;
 
-static uint32_t const& max_nesting{global::Limits::objects_max_nesting()};
+static uint32_t const& max_nesting{global::Limits::parser_max_nesting()};
 
 // The ParseGuard class allows QPDFParser to detect re-entrant parsing. It also provides
 // special access to allow the parser to create unresolved objects and dangling references.
@@ -587,7 +587,7 @@ template <typename T, typename... Args>
 void
 QPDFParser::addScalar(Args&&... args)
 {
-    auto limit = Limits::objects_max_container_size(bad_count || sanity_checks);
+    auto limit = Limits::parser_max_container_size(bad_count || sanity_checks);
     if (frame->olist.size() > limit || frame->dict.size() > limit) {
         // Stop adding scalars. We are going to abort when the close token or a bad token is
         // encountered.
@@ -645,7 +645,7 @@ QPDFParser::fixMissingKeys()
 void
 QPDFParser::check_too_many_bad_tokens()
 {
-    auto limit = Limits::objects_max_container_size(bad_count || sanity_checks);
+    auto limit = Limits::parser_max_container_size(bad_count || sanity_checks);
     if (frame->olist.size() > limit || frame->dict.size() > limit) {
         if (bad_count) {
             Limits::error();
