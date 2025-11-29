@@ -25,9 +25,21 @@ more detail.
 
   - Bug fixes
 
-    - Set `is_different` flag in `QPDFFormFieldObjectHelper::getTopLevelField` to
+    - Set ``is_different`` flag in ``QPDFFormFieldObjectHelper::getTopLevelField`` to
       false if the field is a top-level field. Previously the flag was only set
-      if the field is a top-level field.
+      if the field is not a top-level field.
+
+  - CLI Enhancements
+
+   - Disallow option :qpdf:ref:`--deterministic-id` to be used together
+     with the incompatible options :qpdf:ref:`--encrypt` or
+     :qpdf:ref:`--copy-encryption`.
+
+   - Option :qpdf:ref:`--check` now includes additional basic checks of the
+     AcroForm, Dests, Outlines, and PageLabels structures.
+
+   - Add new option :qpdf:ref:`--global` to set or modify various global
+     options and limits. See :ref:`global-options` for further detail.
 
   - Library Enhancements
 
@@ -52,15 +64,13 @@ more detail.
       than ``unsigned char``) container and facilitate the efficient moving
       of its content into a `std::string``.
 
+    - Add various new functions in the ``qpdf::`global`` namespace to access
+      and set/modify global settings and limits. See :ref:`global-options`
+      and header file ``qpdf\global.hh`` for further detail.
 
-  - CLI Enhancements
-
-   - Disallow option :qpdf:ref:`--deterministic-id` to be used together
-     with the incompatible options :qpdf:ref:`--encrypt` or
-     :qpdf:ref:`--copy-encryption`.
-
-   - Option :qpdf:ref:`--check` now includes additional basic checks of the
-     AcroForm, Dests, Outlines, and PageLabels structures.
+    - Add new C-API functions ``qpdf_global_get_uint32`` and
+      ``qpdf_global_set_uint32`` to access and set/modify various global
+      settings and limits.
 
   - Other enhancements
 
