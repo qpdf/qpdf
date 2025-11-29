@@ -1,7 +1,11 @@
 #include <qpdf/Pipeline.hh>
 
+#include <qpdf/Util.hh>
+
 #include <cstring>
 #include <stdexcept>
+
+using namespace qpdf;
 
 Pipeline::Pipeline(char const* identifier, Pipeline* next) :
     identifier(identifier),
@@ -12,10 +16,8 @@ Pipeline::Pipeline(char const* identifier, Pipeline* next) :
 Pipeline*
 Pipeline::getNext(bool allow_null)
 {
-    if (!next_ && !allow_null) {
-        throw std::logic_error(
-            identifier + ": Pipeline::getNext() called on pipeline with no next");
-    }
+    util::assertion(
+        next_ || allow_null, identifier + ": Pipeline::getNext() called on pipeline with no next");
     return next_;
 }
 

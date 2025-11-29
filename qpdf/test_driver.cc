@@ -2279,8 +2279,17 @@ test_61(QPDF& pdf, char const* arg2)
 static void
 test_62(QPDF& pdf, char const* arg2)
 {
-    // Test int size checks. This test will fail if int and long long are the same size.
-    // Moved to libtests/objects
+    // Was test int size checks - Moved to libtests/objects.
+    // Test Pipeline methods
+    std::string out;
+    Pl_String pl("", nullptr, out);
+    unsigned short us = 1;
+    unsigned int ui = 2;
+    unsigned long long ull = 3;
+    long l = 4;
+    short s = 5;
+    pl << us << ui << ull << l << s;
+    assert(out == "12345");
 }
 
 static void
@@ -3548,7 +3557,7 @@ runtest(int n, char const* filename1, char const* arg2)
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
 
-    std::set<int> ignore_filename = {61, 81, 83, 84, 85, 86, 87, 92, 95, 96};
+    std::set<int> ignore_filename = {61, 62, 81, 83, 84, 85, 86, 87, 92, 95, 96};
 
     if (n == 0) {
         // Throw in some random test cases that don't fit anywhere
