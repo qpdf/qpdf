@@ -83,7 +83,6 @@ set(libqpdf_SOURCES
   QPDFTokenizer.cc
   QPDFUsage.cc
   QPDFWriter.cc
-  QPDFXRefEntry.cc
   QPDF_Array.cc
   QPDF_Dictionary.cc
   QPDF_Stream.cc
