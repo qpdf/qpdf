@@ -31,6 +31,7 @@ class QPDFAcroFormDocumentHelper::Members
     std::map<QPDFObjGen, FieldData> field_to;
     std::map<QPDFObjGen, QPDFFormFieldObjectHelper> annotation_to_field;
     std::map<std::string, std::set<QPDFObjGen>> name_to_fields;
+    std::set<QPDFObjGen> bad_fields;
 };
 
 QPDFAcroFormDocumentHelper::QPDFAcroFormDocumentHelper(QPDF& qpdf) :
@@ -312,35 +313,36 @@ QPDFAcroFormDocumentHelper::analyze()
     }
 }
 
-void
+bool
 QPDFAcroFormDocumentHelper::traverseField(
     QPDFObjectHandle field, QPDFObjectHandle const& parent, int depth)
 {
     if (depth > 100) {
         // Arbitrarily cut off recursion at a fixed depth to avoid specially crafted files that
         // could cause stack overflow.
-        return;
+        return false;
     }
     if (!field.indirect()) {
         field.warn(
             "encountered a direct object as a field or annotation while traversing /AcroForm; "
             "ignoring field or annotation");
-        return;
+        return false;
     }
     if (field == parent) {
         field.warn("loop detected while traversing /AcroForm");
-        return;
+        return false;
     }
     if (!field.isDictionary()) {
         field.warn(
             "encountered a non-dictionary as a field or annotation while traversing /AcroForm; "
             "ignoring field or annotation");
-        return;
+        return false;
     }
     QPDFObjGen og(field.getObjGen());
-    if (m->field_to.contains(og) || m->annotation_to_field.contains(og)) {
+    if (m->field_to.contains(og) || m->annotation_to_field.contains(og) ||
+        m->bad_fields.contains(og)) {
         field.warn("loop detected while traversing /AcroForm");
-        return;
+        return false;
     }
 
     // A dictionary encountered while traversing the /AcroForm field may be a form field, an
@@ -357,6 +359,13 @@ QPDFAcroFormDocumentHelper::traverseField(
     QTC::TC("qpdf", "QPDFAcroFormDocumentHelper field found", (depth == 0) ? 0 : 1);
     QTC::TC("qpdf", "QPDFAcroFormDocumentHelper annotation found", (is_field ? 0 : 1));
 
+    if (!is_field && !is_annotation) {
+        field.warn(
+            "encountered an object that is neither field nor annotation while traversing "
+            "/AcroForm");
+        return false;
+    }
+
     if (is_annotation) {
         QPDFObjectHandle our_field = (is_field ? field : parent);
         m->field_to[our_field.getObjGen()].annotations.emplace_back(field);
@@ -365,9 +374,15 @@ QPDFAcroFormDocumentHelper::traverseField(
 
     if (is_field && depth != 0 && field["/Parent"] != parent) {
         for (auto const& kid: Array(field["/Parent"]["/Kids"])) {
+            if (kid == field) {
+                field.warn("while traversing /AcroForm found field with two parents");
+                return true;
+            }
+        }
+        for (auto const& kid: Array(field["/Parent"]["/Kids"])) {
             if (kid == parent) {
                 field.warn("loop detected while traversing /AcroForm");
-                return;
+                return false;
             }
         }
         field.warn("encountered invalid /Parent entry while traversing /AcroForm; correcting");
@@ -387,8 +402,15 @@ QPDFAcroFormDocumentHelper::traverseField(
     }
 
     for (auto const& kid: Kids) {
-        traverseField(kid, field, 1 + depth);
+        if (m->bad_fields.contains(kid)) {
+            continue;
+        }
+
+        if (!traverseField(kid, field, 1 + depth)) {
+            m->bad_fields.insert(kid);
+        }
     }
+    return true;
 }
 
 bool

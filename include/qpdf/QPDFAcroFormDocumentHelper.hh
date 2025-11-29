@@ -226,7 +226,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
 
   private:
     void analyze();
-    void traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, int depth);
+    bool traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, int depth);
     QPDFObjectHandle getOrCreateAcroForm();
     void adjustInheritedFields(
         QPDFObjectHandle obj,
