@@ -1,0 +1,11 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=/usr/local/lib
+includedir=/usr/local/include
+
+Name: libqpdf
+Description: PDF transformation library
+Version: 12.3.0
+Requires.private: zlib, libjpeg, openssl >= 1.1.0, gnutls
+Libs: -L${libdir} -lqpdf
+Cflags: -I${includedir} -std=c++20

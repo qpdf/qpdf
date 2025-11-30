@@ -1,0 +1,1 @@
+/home/runner/work/qpdf/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/test_char_sign.dir/link.d CMakeFiles/test_char_sign.dir/test_char_sign.cc.o -o test_char_sign  -Wl,-rpath,/home/runner/work/qpdf/qpdf/_codeql_build_dir/libqpdf ../libqpdf/libqpdf.so.30.3.0

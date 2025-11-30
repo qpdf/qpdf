@@ -1,0 +1,1 @@
+/home/runner/work/qpdf/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/pdf-parse-content.dir/link.d "CMakeFiles/pdf-parse-content.dir/pdf-parse-content.cc.o" -o pdf-parse-content  -Wl,-rpath,/home/runner/work/qpdf/qpdf/_codeql_build_dir/libqpdf ../libqpdf/libqpdf.so.30.3.0

@@ -1,0 +1,1 @@
+/home/runner/work/qpdf/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/qpdfjob-c.dir/link.d "CMakeFiles/qpdfjob-c.dir/qpdfjob-c.c.o" -o qpdfjob-c  -Wl,-rpath,/home/runner/work/qpdf/qpdf/_codeql_build_dir/libqpdf ../libqpdf/libqpdf.so.30.3.0
