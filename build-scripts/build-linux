@@ -18,6 +18,8 @@ for i in $(./qpdf/qpdf --show-crypto | tail -n +2); do
     env QPDF_CRYPTO_PROVIDER=$i ctest --verbose -R '^qpdf$'
 done
 cd ..
+# Perform additional tests on header files.
+./build-scripts/check-headers
 export TMPDIR=$PWD/dist-tmp
 rm -rf $TMPDIR
 ./make_dist --ci
