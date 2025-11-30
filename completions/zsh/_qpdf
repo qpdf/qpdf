@@ -1,2 +1,12 @@
 #compdef qpdf
+if (( ! $+functions[_bash_complete] && ! $+functions[complete] && ! $+functions[compgen] )); then
+    # If the user has not loaded bashcompinit and hasn't otherwise
+    # defined the functions it defines, load it. This enables zsh
+    # completion to work out of the box for users with no custom
+    # configuration. See
+    # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1111509 for
+    # additional discussion.
+    autoload -U +X bashcompinit && bashcompinit
+fi
 eval "$(/usr/bin/qpdf --completion-zsh)"
+_bash_complete
