@@ -1,1 +1,1 @@
-eval $(/usr/bin/qpdf --completion-bash)
+eval "$(/usr/bin/qpdf --completion-bash)"
