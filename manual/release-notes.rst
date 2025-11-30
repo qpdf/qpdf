@@ -14,6 +14,14 @@ more detail.
 .. x.y.z: not yet released
 
 12.3.0: not yet released
+  - Release changes
+
+    - Starting with version 12.3.0, we use
+      `cosign<https://docs.sigstore.dev/cosign/>__`, rather than GPG,
+      to sign releases. See the top-level README.md for instructions.
+      We will continue to use GPG for the 12.x series. Starting with
+      qpdf version 13, only cosign will be used.
+
   - Build changes
 
     - A C++-20 compiler is now required.

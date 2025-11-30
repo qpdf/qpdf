@@ -3,7 +3,10 @@
 Building and Installing qpdf
 ============================
 
-This chapter describes how to build and install qpdf.
+This chapter describes how to build and install qpdf. For information
+about installing a pre-built copy of qpdf, see
+[README.md](https://github.com/qpdf/qpdf/blob/main/README.md), the
+top-level README.md in the repository and source distribution.
 
 .. _prerequisites:
 
