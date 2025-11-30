@@ -2,10 +2,13 @@
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/Util.hh>
+
 #include <cstring>
 #include <stdexcept>
 
 using namespace std::literals;
+using namespace qpdf;
 
 void
 InputSource::setLastOffset(qpdf_offset_t offset)
@@ -73,10 +76,10 @@ InputSource::findFirst(char const* start_chars, qpdf_offset_t offset, size_t len
     // To enable us to guarantee null-termination, save an extra byte so that buf[size] is valid
     // memory.
     size_t size = sizeof(buf) - 1;
-    if ((strlen(start_chars) < 1) || (strlen(start_chars) > size)) {
-        throw std::logic_error(
-            "InputSource::findSource called with too small or too large of a character sequence");
-    }
+    util::assertion(
+        !(strlen(start_chars) < 1 || strlen(start_chars) > size),
+        "InputSource::findSource called with too small or too large of a character sequence" //
+    );
 
     char* p = nullptr;
     qpdf_offset_t buf_offset = offset;
@@ -155,7 +158,6 @@ InputSource::findFirst(char const* start_chars, qpdf_offset_t offset, size_t len
             p = buf + bytes_read;
         }
     }
-    throw std::logic_error("InputSource after while (true)");
 }
 
 bool
