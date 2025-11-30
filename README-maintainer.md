@@ -607,31 +607,33 @@ When done, the following should happen:
 
 ## CREATING A RELEASE
 
+* Releases are signed using
+  [cosign](https://docs.sigstore.dev/quickstart/quickstart-cosign/)
+  using your GitHub identity. If you are creating a release, please
+  make sure your correct identity is listed in README.md under
+  "Verifying Distributions."
+
 * Push to main. This will create an artifact called distribution
   which will contain all the distribution files. Download these,
   verify the checksums from the job output, rename to remove -ci from
-  the names, and extract to the release archive area.
+  the names, and extract to an empty directory, which we will call the
+  "release directory."
 
-* From the release area, sign the source distribution:
+* Set the shell variable `version`, which is used in several steps.
 
-```
+```sh
 version=x.y.z
-gpg --detach-sign --armor qpdf-$version.tar.gz
 ```
 
-* Build and test the debian package. This includes running autopkgtest.
+* From the release directory, sign the releases. You need
+  [cosign](https://docs.sigstore.dev/cosign/system_config/installation/).
+  When prompted, use your GitHub identity to sign the release.
 
-* Add a calendar reminder to check the status of the debian package to
-  make sure it is transitioning properly and to resolve any issues.
-
-* From the release archive area, sign the releases.
-
-```
+```sh
 \rm -f *.sha256
 files=(*)
 sha256sum ${files[*]} >| qpdf-$version.sha256
-gpg --clearsign --armor qpdf-$version.sha256
-mv qpdf-$version.sha256.asc qpdf-$version.sha256
+cosign sign-blob qpdf-$version.sha256 --bundle qpdf-$version.sha256.sigstore
 chmod 444 *
 chmod 555 *.AppImage
 ```
@@ -645,7 +647,7 @@ chmod 555 *.AppImage
   for all its arguments. Create and push a signed tag. This should be
   run with HEAD pointing to the tip of main.
 
-```
+```sh
 git rev-parse qpdf/main @
 git tag -s v$version @ -m"qpdf $version"
 git push qpdf v$version
@@ -653,7 +655,7 @@ git push qpdf v$version
 
 * Update documentation branches
 
-```
+```sh
 git push qpdf @:$(echo $version | sed -E 's/\.[^\.]+$//')
 git push qpdf @:stable
 ```
@@ -665,13 +667,13 @@ git push qpdf @:stable
 * Create a github release after pushing the tag. `gcurl` is an alias
   that includes the auth token.
 
-```
+```sh
 # Create release
 
 GITHUB_TOKEN=$(qdata-show cred github-token)
 function gcurl() { curl -H "Authorization: token $GITHUB_TOKEN" ${1+"$@"}; }
 
-url=$(gcurl -s -XPOST https://api.github.com/repos/qpdf/qpdf/releases -d'{"tag_name": "v'$version'", "name": "qpdf '$version'", "draft": true}' | jq -r '.url')
+url=$(gcurl -s -XPOST https://api.github.com/repos/qpdf/qpdf/releases -d'{"tag_name": "v'$version'", "name": "qpdf '$ver
 
 # Get upload url
 upload_url=$(gcurl -s $url | jq -r '.upload_url' | sed -E -e 's/\{.*\}//')
@@ -680,7 +682,7 @@ echo $upload_url
 
 * From the release area, Upload all the files.
 
-```
+```sh
 for i in *; do
   mime=$(file -b --mime-type $i)
   gcurl -H "Content-Type: $mime" --data-binary @$i "$upload_url?name=$i"
@@ -694,22 +696,24 @@ Here is a template for the release notes. Change
 `README-what-to-download` to just a file reference for SourceForge
 since there is no relative link target from the news area.
 
-```
+```markdown
 This is qpdf version x.y.z. (Brief description, summary of highlights)
 
 For a full list of changes from previous releases, please see the [release notes](https://qpdf.readthedocs.io/en/stable/release-notes.html). See also [README-what-to-download](./README-what-to-download.md) for details about the available source and binary distributions.
 ```
 
-* Publish release.
+* Publish release. This can be done most easily directly from the
+  GitHub UI. As an alternative, or you can run
 
-```
+```sh
 gcurl -XPOST $url -d'{"draft": false}'
 ```
 
-* Upload files to sourceforge.
+* Upload files to sourceforge. Replace `sourceforge_login` with your
+  SourceForge login.
 
-```
-rsync -vrlcO ./ jay_berkenbilt,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/qpdf/qpdf/$version/
+```sh
+rsync -vrlcO ./ sourceforge_login,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/qpdf/qpdf/$version/
 ```
 
 * On sourceforge, make the source package the default for all but
