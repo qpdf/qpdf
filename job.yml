@@ -84,12 +84,24 @@ options:
       - zopfli
     optional_choices:
       json-help: json_version
+  - table: global
+    prefix: Global
+    config: c_global
+    positional: false
+    bare:
+      - no-default-limits
+    required_parameter:
+      parser-max-container-size:  level
+      parser-max-container-size-damaged: level
+      parser-max-errors: level
+      parser-max-nesting: level
   - table: main
     config: c_main
     manual:
       - add-attachment
       - copy-attachments-from
       - encrypt
+      - global
       - overlay
       - pages
       - underlay
@@ -112,6 +124,7 @@ options:
       - filtered-stream-data
       - flatten-rotation
       - generate-appearances
+      - global
       - ignore-xref-streams
       - is-encrypted
       - json-input
@@ -399,6 +412,13 @@ json:
     - null
   json-stream-data:
   json-stream-prefix:
+  # global options
+  global:
+      no-default-limits:
+      parser-max-container-size:
+      parser-max-container-size-damaged:
+      parser-max-errors:
+      parser-max-nesting:
   # other options
   update-from-json:
   allow-weak-crypto:

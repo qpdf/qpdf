@@ -25,7 +25,7 @@ more detail.
 
   - Bug fixes
 
-    - Set `is_different` flag in `QPDFFormFieldObjectHelper::getTopLevelField` to
+    - Set ``is_different`` flag in ``QPDFFormFieldObjectHelper::getTopLevelField`` to
       false if the field is a top-level field. Previously the flag was only set
       if the field is a top-level field.
 
@@ -52,6 +52,14 @@ more detail.
       than ``unsigned char``) container and facilitate the efficient moving
       of its content into a `std::string``.
 
+    - Add various new functions in the ``qpdf::`global`` namespace to access
+      and set/modify global settings and limits. See :ref:`global-options`
+      and header file ``qpdf/global.hh`` for further detail.
+
+    - Add new C-API functions ``qpdf_global_get_uint32`` and
+      ``qpdf_global_set_uint32`` to access and set/modify various global
+      settings and limits.
+
 
   - CLI Enhancements
 
@@ -62,11 +70,22 @@ more detail.
     - Option :qpdf:ref:`--check` now includes additional basic checks of the
       AcroForm, Dests, Outlines, and PageLabels structures.
 
+    - Add new option :qpdf:ref:`--global` to set or modify various global
+      options and limits. See :ref:`global-options` for further detail.
+
     - Fix completion scripts and handling to avoid leaking arguments
       into the environment during completion and to correctly handle
       ``bashcompinit`` for zsh users.
 
   - Other enhancements
+
+    - Add new ``inspection mode`` to help with the inspection and manual repair
+      of damaged PDF files. In this mode some of the exceptions thrown if a PDF
+      file is damaged and unrepairable are replaced with warnings and some automatic
+      repairs are suppressed. Only a very limited range of operations are supported.
+      Inspection mode is selected with the new function
+      ``pdf::global::options::inspection_mode``. For more detail see
+      :ref:`inspection-mode`.
 
     - ``QPDFWriter`` will no longer add filters when writing empty streams.
 
@@ -100,7 +119,7 @@ more detail.
       is the intended behaviour.
 
     - There has been some refactoring of stream filtering. These are optimized
-      for the common case where no user provided stream filters  are
+      for the common case where no user provided stream filters are
       registered by calling ``QPDF::registerStreamFilter``. If you are
       providing your own stream filters please open a ticket_.
 
