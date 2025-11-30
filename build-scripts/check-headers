@@ -1,0 +1,41 @@
+#!/bin/bash
+set -eo pipefail
+cd $(dirname $0)/..
+
+trap "rm -f a.cc" EXIT
+declare -a headers
+cd include
+for i in qpdf/*.hh; do
+    if [[ ! $i =~ .*auto_.* ]] && ! grep -q >/dev/null 2>&1 QPDFOBJECT_OLD_HH $i; then
+        headers+=($i)
+    fi
+done
+cd ..
+# Make sure each header file can be included in isolation and that the
+# result can be compiled with the intended version of the C++
+# standard, which may be older than one we build with internally.
+declare -a errors
+for i in "${headers[@]}"; do
+    rm -f a.cc
+    cat > a.cc <<EOF
+#include "$i"
+int main() { return 0; }
+EOF
+    echo "Checking $i"
+    if ! g++ -std=c++17 -pedantic-errors -c -Iinclude a.cc -o /dev/null; then
+        errors+=("$i doesn't compile")
+    fi
+    # Fail if any C++20 headers are included. Modern g++/clang treat
+    # these as empty if the compiler standard is too old.
+    if grep -q >/dev/null 2>&1 -E "#\s*include\s*[<\"](concepts|coroutine|compare|ranges|format|source_location|version|span|bit|numbers|barrier|latch|semaphore|stop_token|syncstream)[>\"]" "include/$i"; then
+        errors+=("$i includes a non-C++-17 standard header")
+    fi
+done
+if [[ ${#errors[@]} -gt 0 ]]; then
+    echo ""
+    echo "Some header files had errors"
+    for i in "${errors[@]}"; do
+        echo "$i"
+    done
+    exit 2
+fi
