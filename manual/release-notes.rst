@@ -52,6 +52,10 @@ more detail.
       than ``unsigned char``) container and facilitate the efficient moving
       of its content into a `std::string``.
 
+  - Build fixes
+
+    - Attempt to detect if any > C++-17 changes snuck into any public
+      headers.
 
   - CLI Enhancements
 
