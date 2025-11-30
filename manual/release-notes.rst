@@ -62,7 +62,7 @@ more detail.
 
     - Add various new functions in the ``qpdf::`global`` namespace to access
       and set/modify global settings and limits. See :ref:`global-options`
-      and header file ``qpdf\global.hh`` for further detail.
+      and header file ``qpdf/global.hh`` for further detail.
 
     - Add new C-API functions ``qpdf_global_get_uint32`` and
       ``qpdf_global_set_uint32`` to access and set/modify various global

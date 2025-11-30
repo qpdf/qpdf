@@ -56,7 +56,7 @@ namespace qpdf::global
 
     /// @brief Retrieves the number of limit errors.
     ///
-    /// Returns the number a global limit was exceeded. This item is reaf only.
+    /// Returns the number a global limit was exceeded. This item is read only.
     ///
     /// @return The number of limit errors.
     ///
