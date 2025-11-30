@@ -183,13 +183,26 @@ QPDFArgParser::completionCommon(bool zsh)
         }
     }
     if (zsh) {
-        std::cout << "autoload -U +X bashcompinit && bashcompinit && ";
+        // FIXME: we assume progname doesn't contain single quote
+        // characters. 's in progname like in "/opt/joe's software/qpdf"
+        // should ideally be escaped as '\''. Unlikely to be a problem
+        // in practice. '...' is preferable over "..." as inside the
+        // latter more characters ("$`\) are a problem and it's
+        // virtually impossible to escape those in a locale-independent
+        // way.
+        std::cout << "complete -o bashdefault -o default -C '" << progname << "' " << m->whoami
+                  << "\n";
+    } else {
+        // we need a function wrapper that discards arguments to avoid
+        // leaking sensitive information in the process argument list
+        // which is public on most systems. Here putting the code on one
+        // line as old versions of the documentation were instructing
+        // users to do eval $(qpdf --completion-bash) instead of the
+        // correct eval "$(qpdf --completion-bash)"
+        std::cout << "qpdf_completer() { '" << progname << "'; }; "
+                  << "complete -o bashdefault -o default -o nospace -F qpdf_completer " << m->whoami
+                  << "\n";
     }
-    std::cout << "complete -o bashdefault -o default";
-    if (!zsh) {
-        std::cout << " -o nospace";
-    }
-    std::cout << " -C \"" << progname << "\" " << m->whoami << '\n';
     // Put output before error so calling from zsh works properly
     std::string path = progname;
     size_t slash = path.find('/');
@@ -376,9 +389,19 @@ QPDFArgParser::checkCompletion()
         if (p > m->bash_line.length()) {
             p = m->bash_line.length();
         }
-        // Set bash_cur and bash_prev based on bash_line rather than relying on argv. This enables
-        // us to use bashcompinit to get completion in zsh too since bashcompinit sets COMP_LINE and
-        // COMP_POINT but doesn't invoke the command with options like bash does.
+        // Set bash_cur and bash_prev based on bash_line rather than relying on
+        // argv. Using argv is unsafe as process argument lists are public on
+        // most systems. zsh doesn't pass information there, and we actively
+        // discard them for bash with our qpdf_completer to avoid that
+        // information disclosure vulnerability. Both bash and zsh set
+        // COMP_LINE and COMP_POINT which we can rely on instead.
+        //
+        // FIXME. For both bash and zsh, COMP_POINT is an offset in terms of
+        // *characters*, with characters decoded as per the shell's own locale.
+        // Here we interpret it as a *byte* offset which means it won't work
+        // properly if there are multibyte characters to the left of the
+        // cursor, but saves us having to decode the command line (which is hard
+        // to do in the same way the shell does in all cases).
 
         // p is equal to length of the string. Walk backwards looking for the first separator.
         // bash_cur is everything after the last separator, possibly empty.

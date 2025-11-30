@@ -55,12 +55,16 @@ more detail.
 
   - CLI Enhancements
 
-   - Disallow option :qpdf:ref:`--deterministic-id` to be used together
-     with the incompatible options :qpdf:ref:`--encrypt` or
-     :qpdf:ref:`--copy-encryption`.
+    - Disallow option :qpdf:ref:`--deterministic-id` to be used together
+      with the incompatible options :qpdf:ref:`--encrypt` or
+      :qpdf:ref:`--copy-encryption`.
 
-   - Option :qpdf:ref:`--check` now includes additional basic checks of the
-     AcroForm, Dests, Outlines, and PageLabels structures.
+    - Option :qpdf:ref:`--check` now includes additional basic checks of the
+      AcroForm, Dests, Outlines, and PageLabels structures.
+
+    - Fix completion scripts and handling to avoid leaking arguments
+      into the environment during completion and to correctly handle
+      ``bashcompinit`` for zsh users.
 
   - Other enhancements
 

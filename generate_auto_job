@@ -351,6 +351,16 @@ class Main:
             for k, v in hashes.items():
                 print(f'{k} {v}', file=f)
 
+    @staticmethod
+    def quotes(long_text):
+        if '"(' in long_text or ')"' in long_text:
+            r_quote_open = 'R"/('
+            r_quote_close = ')/"'
+        else:
+            r_quote_open = 'R"('
+            r_quote_close = ')"'
+        return (r_quote_open, r_quote_close)
+
     def generate_doc(self, df, f, f_man):
         """
         Generates documentation and help-related functionalities for a given parser.
@@ -498,8 +508,10 @@ class Main:
             elif state == st_topic:
                 if append_long_text(line, topic):
                     self.all_topics.add(topic)
+                    r_quote_open, r_quote_close = self.quotes(long_text)
                     print(f'ap.addHelpTopic("{topic}", "{short_text}",'
-                          f' R"({long_text})");', file=f)
+                          f' {r_quote_open}{long_text}{r_quote_close});',
+                          file=f)
                     print(f'.SH {topic.upper()} ({short_text})', file=f_man)
                     print(manify(long_text), file=f_man, end='')
                     help_lines += 1
@@ -523,8 +535,11 @@ class Main:
                             f' lineno={lineno}')
                     if option not in self.help_options:
                         self.jdata[option[2:]]['help'] = short_text
+                    r_quote_open, r_quote_close = self.quotes(long_text)
                     print(f'ap.addOptionHelp("{option}", "{topic}",'
-                          f' "{short_text}", R"({long_text})");', file=f)
+                          f' "{short_text}",'
+                          f' {r_quote_open}{long_text}{r_quote_close});',
+                          file=f)
                     if last_option_topic != topic:
                         print('.PP\nRelated Options:', file=f_man)
                     last_option_topic = topic

@@ -443,6 +443,9 @@ Quick reminder:
 * Add an entry to the bottom half of job.yml for the job JSON field
 * Add documentation for the new option to cli.rst
 * Implement the QPDFJob::Config method in QPDFJob_config.cc
+* Pass the build option `-DGENERATE_AUTO_JOB=1` to `cmake`
+  (see [here](https://qpdf.readthedocs.io/en/stable/installation.html#options-for-working-on-qpdf))
+  or run `generate_auto_job` manually.
 * Adding new options tables is harder -- see below
 
 QPDFJob is documented in three places:
@@ -458,13 +461,14 @@ QPDFJob is documented in three places:
 
 Command-line arguments are closely coupled with QPDFJob. To add a new
 command-line argument, add the option to the appropriate table in
-job.yml. This will automatically declare a method in the private
-ArgParser class in QPDFJob_argv.cc which you have to implement. The
-implementation should make calls to methods in QPDFJob via its Config
-classes. Then, add the same option to either the no-json section of
-job.yml if it is to be excluded from the job json structure, or add it
-under the json structure to the place where it should appear in the
-json structure.
+job.yml. After `generate_auto_job` is run (either manually or as part
+of the build process, when `GENERATE_AUTO_JOB` is set), this will
+automatically declare a method in the private ArgParser class in
+QPDFJob_argv.cc which you have to implement. The implementation should
+make calls to methods in QPDFJob via its Config classes. Then, add the
+same option to either the no-json section of job.yml if it is to be
+excluded from the job json structure, or add it under the json
+structure to the place where it should appear in the json structure.
 
 In most cases, adding a new option will automatically declare and call
 the appropriate Config method, which you then have to implement. If
