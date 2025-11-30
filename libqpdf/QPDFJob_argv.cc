@@ -31,6 +31,7 @@ namespace
         std::shared_ptr<QPDFJob::Config> c_main;
         std::shared_ptr<QPDFJob::CopyAttConfig> c_copy_att;
         std::shared_ptr<QPDFJob::AttConfig> c_att;
+        std::shared_ptr<QPDFJob::GlobalConfig> c_global;
         std::shared_ptr<QPDFJob::PagesConfig> c_pages;
         std::shared_ptr<QPDFJob::UOConfig> c_uo;
         std::shared_ptr<QPDFJob::EncConfig> c_enc;
@@ -415,6 +416,21 @@ ArgParser::argEndSetPageLabels()
 {
     c_main->setPageLabels(accumulated_args);
     accumulated_args.clear();
+}
+
+void
+ArgParser::argGlobal()
+{
+    accumulated_args.clear();
+    c_global = c_main->global();
+    ap.selectOptionTable(O_GLOBAL);
+}
+
+void
+ArgParser::argEndGlobal()
+{
+    c_global->endGlobal();
+    c_global = nullptr;
 }
 
 void

@@ -25,9 +25,21 @@ more detail.
 
   - Bug fixes
 
-    - Set `is_different` flag in `QPDFFormFieldObjectHelper::getTopLevelField` to
+    - Set ``is_different`` flag in ``QPDFFormFieldObjectHelper::getTopLevelField`` to
       false if the field is a top-level field. Previously the flag was only set
-      if the field is a top-level field.
+      if the field is not a top-level field.
+
+  - CLI Enhancements
+
+   - Disallow option :qpdf:ref:`--deterministic-id` to be used together
+     with the incompatible options :qpdf:ref:`--encrypt` or
+     :qpdf:ref:`--copy-encryption`.
+
+   - Option :qpdf:ref:`--check` now includes additional basic checks of the
+     AcroForm, Dests, Outlines, and PageLabels structures.
+
+   - Add new option :qpdf:ref:`--global` to set or modify various global
+     options and limits. See :ref:`global-options` for further detail.
 
   - Library Enhancements
 
@@ -52,17 +64,23 @@ more detail.
       than ``unsigned char``) container and facilitate the efficient moving
       of its content into a `std::string``.
 
+    - Add various new functions in the ``qpdf::`global`` namespace to access
+      and set/modify global settings and limits. See :ref:`global-options`
+      and header file ``qpdf\global.hh`` for further detail.
 
-  - CLI Enhancements
-
-   - Disallow option :qpdf:ref:`--deterministic-id` to be used together
-     with the incompatible options :qpdf:ref:`--encrypt` or
-     :qpdf:ref:`--copy-encryption`.
-
-   - Option :qpdf:ref:`--check` now includes additional basic checks of the
-     AcroForm, Dests, Outlines, and PageLabels structures.
+    - Add new C-API functions ``qpdf_global_get_uint32`` and
+      ``qpdf_global_set_uint32`` to access and set/modify various global
+      settings and limits.
 
   - Other enhancements
+
+    - Add new ``inspection mode`` to help with the inspection and manual repair
+      of damaged PDF files. In this mode some of the exceptions thrown if a PDF
+      file is damaged and unrepairable are replaced with warnings and some automatic
+      repairs are suppressed. Only a very limited range of operations are supported.
+      Inspection mode is selected with the new function
+      ``pdf::global::options::inspection_mode``. For more detail see
+      :ref:`inspection-mode`.
 
     - ``QPDFWriter`` will no longer add filters when writing empty streams.
 
@@ -70,6 +88,12 @@ more detail.
       are recovered.
 
   - Other changes
+
+    - By default, streams with more than 25 filters are now treated unfilterable.
+      A large number of filters typically occur in damaged or specially constructed
+      files and can cause excessive use of resources and/or stack overflows. The
+      limit can be changed if necessary with the new :qpdf:ref:`--max-stream-filters`
+      CLI option or the new ``qpdf::global::max_stream_filters`` function.
 
     - When running in a FIPS environment using the GnuTLS crypto provider,
       calls to GnuTLS now use 'LAX' mode as the use of weak algorithms is
@@ -96,7 +120,7 @@ more detail.
       is the intended behaviour.
 
     - There has been some refactoring of stream filtering. These are optimized
-      for the common case where no user provided stream filters  are
+      for the common case where no user provided stream filters are
       registered by calling ``QPDF::registerStreamFilter``. If you are
       providing your own stream filters please open a ticket_.
 
