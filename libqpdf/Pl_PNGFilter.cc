@@ -2,10 +2,13 @@
 
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 
 #include <climits>
 #include <cstring>
 #include <stdexcept>
+
+using namespace qpdf;
 
 namespace
 {
@@ -28,25 +31,19 @@ Pl_PNGFilter::Pl_PNGFilter(
     Pipeline(identifier, next),
     action(action)
 {
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_PNGFilter with nullptr as next");
-    }
-    if (samples_per_pixel < 1) {
-        throw std::runtime_error("PNGFilter created with invalid samples_per_pixel");
-    }
-    if (!((bits_per_sample == 1) || (bits_per_sample == 2) || (bits_per_sample == 4) ||
-          (bits_per_sample == 8) || (bits_per_sample == 16))) {
-        throw std::runtime_error(
-            "PNGFilter created with invalid bits_per_sample not 1, 2, 4, 8, or 16");
-    }
+    util::assertion(next, "Attempt to create Pl_PNGFilter with nullptr as next");
+    util::no_ci_rt_error_if(
+        samples_per_pixel < 1, "PNGFilter created with invalid samples_per_pixel");
+    util::no_ci_rt_error_if(
+        !(bits_per_sample == 1 || bits_per_sample == 2 || bits_per_sample == 4 ||
+          bits_per_sample == 8 || bits_per_sample == 16),
+        "PNGFilter created with invalid bits_per_sample not 1, 2, 4, 8, or 16");
     bytes_per_pixel = ((bits_per_sample * samples_per_pixel) + 7) / 8;
     unsigned long long bpr = ((columns * bits_per_sample * samples_per_pixel) + 7) / 8;
-    if ((bpr == 0) || (bpr > (UINT_MAX - 1))) {
-        throw std::runtime_error("PNGFilter created with invalid columns value");
-    }
-    if (memory_limit > 0 && bpr > (memory_limit / 2U)) {
-        throw std::runtime_error("PNGFilter memory limit exceeded");
-    }
+    util::no_ci_rt_error_if(
+        bpr == 0 || bpr > (UINT_MAX - 1), "PNGFilter created with invalid columns value");
+    util::no_ci_rt_error_if(
+        memory_limit > 0 && bpr > (memory_limit / 2U), "PNGFilter memory limit exceeded");
     bytes_per_row = bpr & UINT_MAX;
     buf1 = QUtil::make_shared_array<unsigned char>(bytes_per_row + 1);
     buf2 = QUtil::make_shared_array<unsigned char>(bytes_per_row + 1);

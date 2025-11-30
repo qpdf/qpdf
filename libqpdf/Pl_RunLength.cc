@@ -1,7 +1,9 @@
 #include <qpdf/Pl_RunLength.hh>
 
 #include <qpdf/QTC.hh>
-#include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
+
+using namespace qpdf;
 
 namespace
 {
@@ -29,9 +31,7 @@ Pl_RunLength::Pl_RunLength(char const* identifier, Pipeline* next, action_e acti
     Pipeline(identifier, next),
     m(std::make_unique<Members>(action))
 {
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_RunLength with nullptr as next");
-    }
+    util::assertion(next, "Attempt to create Pl_RunLength with nullptr as next");
 }
 
 void
@@ -40,10 +40,7 @@ Pl_RunLength::setMemoryLimit(unsigned long long limit)
     memory_limit = limit;
 }
 
-Pl_RunLength::~Pl_RunLength() // NOLINT (modernize-use-equals-default)
-{
-    // Must be explicit and not inline -- see QPDF_DLL_CLASS in README-maintainer
-}
+Pl_RunLength::~Pl_RunLength() = default;
 
 void
 Pl_RunLength::write(unsigned char const* data, size_t len)
@@ -59,12 +56,12 @@ void
 Pl_RunLength::encode(unsigned char const* data, size_t len)
 {
     for (size_t i = 0; i < len; ++i) {
-        if ((m->state == st_top) != (m->length <= 1)) {
-            throw std::logic_error("Pl_RunLength::encode: state/length inconsistency");
-        }
+        util::assertion(
+            (m->state == st_top) == (m->length <= 1),
+            "Pl_RunLength::encode: state/length inconsistency");
         unsigned char ch = data[i];
-        if ((m->length > 0) && ((m->state == st_copying) || (m->length < 128)) &&
-            (ch == m->buf[m->length - 1])) {
+        if (m->length > 0 && (m->state == st_copying || m->length < 128) &&
+            ch == m->buf[m->length - 1]) {
             QTC::TC("libtests", "Pl_RunLength: switch to run", (m->length == 128) ? 0 : 1);
             if (m->state == st_copying) {
                 --m->length;
@@ -76,7 +73,7 @@ Pl_RunLength::encode(unsigned char const* data, size_t len)
             m->buf[m->length] = ch;
             ++m->length;
         } else {
-            if ((m->length == 128) || (m->state == st_run)) {
+            if (m->length == 128 || m->state == st_run) {
                 flush_encode();
             } else if (m->length > 0) {
                 m->state = st_copying;
@@ -90,9 +87,8 @@ Pl_RunLength::encode(unsigned char const* data, size_t len)
 void
 Pl_RunLength::decode(unsigned char const* data, size_t len)
 {
-    if (memory_limit && (len + m->out.size()) > memory_limit) {
-        throw std::runtime_error("Pl_RunLength memory limit exceeded");
-    }
+    util::no_ci_rt_error_if(
+        memory_limit && (len + m->out.size()) > memory_limit, "Pl_RunLength memory limit exceeded");
     m->out.reserve(len);
     for (size_t i = 0; i < len; ++i) {
         unsigned char const& ch = data[i];
@@ -142,9 +138,9 @@ Pl_RunLength::flush_encode()
         QTC::TC("libtests", "Pl_RunLength flush empty buffer");
     }
     if (m->state == st_run) {
-        if ((m->length < 2) || (m->length > 128)) {
-            throw std::logic_error("Pl_RunLength: invalid length in flush_encode for run");
-        }
+        util::assertion(
+            !(m->length < 2 || m->length > 128),
+            "Pl_RunLength: invalid length in flush_encode for run");
         auto ch = static_cast<unsigned char>(257 - m->length);
         next()->write(&ch, 1);
         next()->write(&m->buf[0], 1);

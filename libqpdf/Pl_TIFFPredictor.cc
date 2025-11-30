@@ -3,9 +3,12 @@
 #include <qpdf/BitStream.hh>
 #include <qpdf/BitWriter.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/Util.hh>
 
 #include <climits>
 #include <stdexcept>
+
+using namespace qpdf;
 
 namespace
 {
@@ -25,22 +28,17 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(
     samples_per_pixel(samples_per_pixel),
     bits_per_sample(bits_per_sample)
 {
-    if (!next) {
-        throw std::logic_error("Attempt to create Pl_TIFFPredictor with nullptr as next");
-    }
-    if (samples_per_pixel < 1) {
-        throw std::runtime_error("TIFFPredictor created with invalid samples_per_pixel");
-    }
-    if ((bits_per_sample < 1) || (bits_per_sample > (8 * (sizeof(unsigned long long))))) {
-        throw std::runtime_error("TIFFPredictor created with invalid bits_per_sample");
-    }
+    util::assertion(next, "Attempt to create Pl_TIFFPredictor with nullptr as next");
+    util::no_ci_rt_error_if(
+        samples_per_pixel < 1, "TIFFPredictor created with invalid samples_per_pixel");
+    util::no_ci_rt_error_if(
+        bits_per_sample < 1 || bits_per_sample > (8 * (sizeof(unsigned long long))),
+        "TIFFPredictor created with invalid bits_per_sample");
     unsigned long long bpr = ((columns * bits_per_sample * samples_per_pixel) + 7) / 8;
-    if ((bpr == 0) || (bpr > (UINT_MAX - 1))) {
-        throw std::runtime_error("TIFFPredictor created with invalid columns value");
-    }
-    if (memory_limit > 0 && bpr > (memory_limit / 2U)) {
-        throw std::runtime_error("TIFFPredictor memory limit exceeded");
-    }
+    util::no_ci_rt_error_if(
+        bpr == 0 || bpr > (UINT_MAX - 1), "TIFFPredictor created with invalid columns value");
+    util::no_ci_rt_error_if(
+        memory_limit > 0 && bpr > (memory_limit / 2U), "TIFFPredictor memory limit exceeded");
     this->bytes_per_row = bpr & UINT_MAX;
 }
 

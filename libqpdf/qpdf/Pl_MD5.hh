@@ -3,12 +3,11 @@
 
 #include <qpdf/MD5.hh>
 #include <qpdf/Pipeline.hh>
-
-#include <stdexcept>
+#include <qpdf/Util.hh>
 
 // This pipeline sends its output to its successor unmodified.  After calling finish, the MD5
 // checksum of the data that passed through the pipeline is available.
-
+//
 // This pipeline is reusable; i.e., it is safe to call write() after calling finish().  The first
 // call to write() after a call to finish() initializes a new MD5 object.
 class Pl_MD5 final: public Pipeline
@@ -34,9 +33,7 @@ class Pl_MD5 final: public Pipeline
     std::string
     getHexDigest()
     {
-        if (!enabled) {
-            throw std::logic_error("digest requested for a disabled MD5 Pipeline");
-        }
+        qpdf::util::assertion(enabled, "digest requested for a disabled MD5 Pipeline");
         in_progress = false;
         return md5.unparse();
     }
