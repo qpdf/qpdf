@@ -272,6 +272,24 @@ popHandler(); // key: jsonStreamData
 pushKey("jsonStreamPrefix");
 addParameter([this](std::string const& p) { c_main->jsonStreamPrefix(p); });
 popHandler(); // key: jsonStreamPrefix
+pushKey("global");
+beginDict(bindJSON(&Handlers::beginGlobal), bindBare(&Handlers::endGlobal)); // .global
+pushKey("noDefaultLimits");
+addBare([this]() { c_global->noDefaultLimits(); });
+popHandler(); // key: noDefaultLimits
+pushKey("parserMaxContainerSize");
+addParameter([this](std::string const& p) { c_global->parserMaxContainerSize(p); });
+popHandler(); // key: parserMaxContainerSize
+pushKey("parserMaxContainerSizeDamaged");
+addParameter([this](std::string const& p) { c_global->parserMaxContainerSizeDamaged(p); });
+popHandler(); // key: parserMaxContainerSizeDamaged
+pushKey("parserMaxErrors");
+addParameter([this](std::string const& p) { c_global->parserMaxErrors(p); });
+popHandler(); // key: parserMaxErrors
+pushKey("parserMaxNesting");
+addParameter([this](std::string const& p) { c_global->parserMaxNesting(p); });
+popHandler(); // key: parserMaxNesting
+popHandler(); // key: global
 pushKey("updateFromJson");
 addParameter([this](std::string const& p) { c_main->updateFromJson(p); });
 popHandler(); // key: updateFromJson

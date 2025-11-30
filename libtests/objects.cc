@@ -5,8 +5,10 @@
 #include <qpdf/QPDF.hh>
 
 #include <qpdf/QIntC.hh>
+#include <qpdf/QPDFJob.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/global.hh>
 
 #include <climits>
 #include <cstdio>
@@ -153,6 +155,132 @@ test_1(QPDF& pdf, char const* arg2)
     assert(QPDFObjectHandle(d).getDictAsMap().size() == 4);
 }
 
+static void
+test_2(QPDF& pdf, char const* arg2)
+{
+    // Test global limits.
+    using namespace qpdf::global::options;
+    using namespace qpdf::global::limits;
+
+    // Check default values
+    assert(parser_max_nesting() == 499);
+    assert(parser_max_errors() == 15);
+    assert(parser_max_container_size() == std::numeric_limits<uint32_t>::max());
+    assert(parser_max_container_size_damaged() == 5'000);
+    assert(default_limits());
+
+    // Test disabling optional default limits
+    default_limits(false);
+    assert(parser_max_nesting() == 499);
+    assert(parser_max_errors() == 0);
+    assert(parser_max_container_size() == std::numeric_limits<uint32_t>::max());
+    assert(parser_max_container_size_damaged() == std::numeric_limits<uint32_t>::max());
+    assert(!default_limits());
+
+    // Check disabling default limits is irreversible
+    default_limits(true);
+    assert(!default_limits());
+
+    // Test setting limits
+    parser_max_nesting(11);
+    parser_max_errors(12);
+    parser_max_container_size(13);
+    parser_max_container_size_damaged(14);
+
+    assert(parser_max_nesting() == 11);
+    assert(parser_max_errors() == 12);
+    assert(parser_max_container_size() == 13);
+    assert(parser_max_container_size_damaged() == 14);
+
+    // Check disabling default limits does not override explicit limits
+    default_limits(false);
+    assert(parser_max_nesting() == 11);
+    assert(parser_max_errors() == 12);
+    assert(parser_max_container_size() == 13);
+    assert(parser_max_container_size_damaged() == 14);
+
+    // Test parameter checking
+    QUtil::handle_result_code(qpdf_r_ok, "");
+    bool thrown = false;
+    try {
+        qpdf::global::handle_result(qpdf_r_success_mask);
+    } catch (std::logic_error const&) {
+        thrown = true;
+    }
+    assert(thrown);
+    thrown = false;
+    try {
+        qpdf::global::get_uint32(qpdf_param_e(42));
+    } catch (std::logic_error const&) {
+        thrown = true;
+    }
+    assert(thrown);
+    thrown = false;
+    try {
+        qpdf::global::set_uint32(qpdf_param_e(42), 42);
+    } catch (std::logic_error const&) {
+        thrown = true;
+    }
+    assert(thrown);
+
+    /* Test limit errors */
+    assert(qpdf::global::limit_errors() == 0);
+    QPDFObjectHandle::parse("[[[[]]]]");
+    assert(qpdf::global::limit_errors() == 0);
+    parser_max_nesting(3);
+    try {
+        QPDFObjectHandle::parse("[[[[[]]]]]");
+    } catch (std::exception&) {
+    }
+    assert(qpdf::global::limit_errors() == 1);
+    try {
+        QPDFObjectHandle::parse("[[[[[]]]]]");
+    } catch (std::exception&) {
+    }
+    assert(qpdf::global::limit_errors() == 2);
+
+    // Test global settings using the QPDFJob interface
+    QPDFJob j;
+    j.config()
+        ->inputFile("minimal.pdf")
+        ->global()
+        ->parserMaxNesting("111")
+        ->parserMaxErrors("112")
+        ->parserMaxContainerSize("113")
+        ->parserMaxContainerSizeDamaged("114")
+        ->noDefaultLimits()
+        ->endGlobal()
+        ->outputFile("a.pdf");
+    auto qpdf = j.createQPDF();
+    assert(parser_max_nesting() == 111);
+    assert(parser_max_errors() == 112);
+    assert(parser_max_container_size() == 113);
+    assert(parser_max_container_size_damaged() == 114);
+    assert(!default_limits());
+
+    // Test global settings using the JobJSON
+    QPDFJob jj;
+    jj.initializeFromJson(R"(
+        {
+            "inputFile": "minimal.pdf",
+            "global": {
+                "parserMaxNesting": "211",
+                "parserMaxErrors": "212",
+                "parserMaxContainerSize": "213",
+                "parserMaxContainerSizeDamaged": "214",
+                "noDefaultLimits": ""
+            },
+            "outputFile": "a.pdf"
+        }
+    )");
+    qpdf = j.createQPDF();
+    assert(parser_max_nesting() == 211);
+    assert(parser_max_errors() == 212);
+    assert(parser_max_container_size() == 213);
+    assert(parser_max_container_size_damaged() == 214);
+    assert(!default_limits());
+}
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -160,9 +288,7 @@ runtest(int n, char const* filename1, char const* arg2)
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
 
-    std::set<int> ignore_filename = {
-        1,
-    };
+    std::set<int> ignore_filename = {1, 2};
 
     QPDF pdf;
     std::shared_ptr<char> file_buf;
@@ -176,9 +302,7 @@ runtest(int n, char const* filename1, char const* arg2)
     }
 
     std::map<int, void (*)(QPDF&, char const*)> test_functions = {
-        {0, test_0},
-        {1, test_1},
-    };
+        {0, test_0}, {1, test_1}, {2, test_2}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {

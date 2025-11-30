@@ -1,9 +1,10 @@
-WARNING: issue-202.pdf (trailer, offset 55770): ignoring excessively deeply nested data structure
+WARNING: issue-202.pdf (trailer, offset 55770): limits error(parser-max-nesting): ignoring excessively deeply nested data structure
 WARNING: issue-202.pdf: file is damaged
 WARNING: issue-202.pdf (offset 54769): expected trailer dictionary
 WARNING: issue-202.pdf: Attempting to reconstruct cross-reference table
-WARNING: issue-202.pdf (trailer, offset 55770): ignoring excessively deeply nested data structure
+WARNING: issue-202.pdf (trailer, offset 55770): limits error(parser-max-nesting): ignoring excessively deeply nested data structure
 WARNING: issue-202.pdf (object 222 0, offset 50101): dictionary has duplicated key /Creator; last occurrence overrides earlier ones
 WARNING: issue-202.pdf (object 222 0, offset 50101): dictionary has duplicated key /Producer; last occurrence overrides earlier ones
 WARNING: issue-202.pdf: unable to find trailer dictionary while recovering damaged file
 qpdf: operation succeeded with warnings; resulting file may have some problems
+qpdf: some configurable limits were exceeded; for more details see https://qpdf.readthedocs.io/en/stable/cli.html#global-limits

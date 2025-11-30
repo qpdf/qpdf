@@ -15,7 +15,7 @@ cleanup();
 
 my $td = new TestDriver('arg-parsing');
 
-my $n_tests = 32;
+my $n_tests = 33;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -184,6 +184,13 @@ $td->runtest("bad compression-level",
 $td->runtest("bad jpeg-quality",
              {$td->COMMAND => "qpdf --jpeg-quality=101 minimal.pdf"},
              {$td->REGEXP => "invalid jpeg-quality: must be a number between 0 and 100",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("bad objects-container-max-container-size",
+             {$td->COMMAND => "qpdf --global --parser-max-container-size=-1 -- minimal.pdf"},
+             {$td->REGEXP =>
+                "invalid parser-max-container-size: must be a number between 0 and 4294967295",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 

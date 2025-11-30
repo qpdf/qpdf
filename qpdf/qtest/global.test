@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+use File::Copy;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('global');
+
+my $n_tests = 4;
+
+$td->runtest("parser-max-nesting",
+             {$td->COMMAND => "qpdf --global --parser-max-nesting=4 -- global.pdf a.pdf"},
+             {$td->FILE => "global1.out",
+                  $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("parser-max-errors",
+             {$td->COMMAND => "qpdf --global --parser-max-errors=2 -- global_damaged.pdf a.pdf"},
+             {$td->FILE => "global2.out",
+                  $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("parser-max-container-size",
+             {$td->COMMAND => "qpdf --global --parser-max-container-size=3 -- global.pdf a.pdf"},
+             {$td->FILE => "global3.out",
+                  $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("parser-max-container-size-damaged",
+             {$td->COMMAND => "qpdf --global --parser-max-container-size-damaged=9 -- global_damaged.pdf a.pdf"},
+             {$td->FILE => "global4.out",
+                  $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+$td->report($n_tests);

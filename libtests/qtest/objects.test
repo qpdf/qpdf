@@ -11,7 +11,7 @@ require TestDriver;
 
 my $td = new TestDriver('objects');
 
-my $n_tests = 2;
+my $n_tests = 3;
 
 $td->runtest("integer type checks",
              {$td->COMMAND => "objects 0 minimal.pdf"},
@@ -21,6 +21,11 @@ $td->runtest("integer type checks",
 $td->runtest("dictionary checks",
              {$td->COMMAND => "objects 1 -"},
              {$td->STRING =>  => "test 1 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("global object limits",
+             {$td->COMMAND => "objects 2 -"},
+             {$td->STRING =>  => "test 2 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 $td->report($n_tests);

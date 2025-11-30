@@ -124,6 +124,7 @@ class QPDFParser
     void check_too_many_bad_tokens();
     void warnDuplicateKey();
     void fixMissingKeys();
+    [[noreturn]] void limits_error(std::string const& limit, std::string const& msg);
     void warn(qpdf_offset_t offset, std::string const& msg) const;
     void warn(std::string const& msg) const;
     void warn(QPDFExc const&) const;
@@ -149,7 +150,7 @@ class QPDFParser
     // it only gets incremented or reset when a bad token is encountered.
     int bad_count{0};
     // Number of bad tokens (remaining) before giving up.
-    uint32_t max_bad_count{Limits::objects_max_errors()};
+    uint32_t max_bad_count{Limits::parser_max_errors()};
     // Number of good tokens since last bad token. Irrelevant if bad_count == 0.
     int good_count{0};
     // Start offset including any leading whitespace.
