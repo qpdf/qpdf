@@ -447,7 +447,7 @@ namespace QUtil
     ///
     ///         **For qpdf internal use only - not part of the public API**
     /// @par
-    ///         Depending on the result code, either continues execution, checks  or throws an
+    ///         Depending on the result code, either continues execution or throws an
     ///         exception in case of an invalid parameter.
     ///
     /// @param  result The result code of type qpdf_result_e, indicating success or failure status.

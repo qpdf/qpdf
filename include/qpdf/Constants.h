@@ -256,7 +256,7 @@ enum qpdf_result_e {
     /* success */
     qpdf_r_ok = 0,
     qpdf_r_no_warn = 0xff,   /// any result <= qpdf_no_warn indicates success without warning
-    qpdf_r_success = 0xffff, /// any result <= qpdf_no_warn indicates success
+    qpdf_r_success = 0xffff, /// any result <= qpdf_r_success indicates success
     /* failure */
     qpdf_r_bad_parameter = 0x10000,
 
@@ -270,7 +270,7 @@ enum qpdf_result_e {
  *          functions.
  *
  *          The enum values are grouped into sections based on their functionality, such as global
- *          options or global limits.For the meaning of individual parameters see `qpdf/global.cc`
+ *          options or global limits. For the meaning of individual parameters see `qpdf/global.cc`
  */
 enum qpdf_param_e {
     /* global state */
