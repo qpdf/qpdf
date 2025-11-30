@@ -1,1 +1,0 @@
-/home/runner/work/qpdf/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/pdf-overlay-page.dir/link.d "CMakeFiles/pdf-overlay-page.dir/pdf-overlay-page.cc.o" -o pdf-overlay-page  -Wl,-rpath,/home/runner/work/qpdf/qpdf/_codeql_build_dir/libqpdf ../libqpdf/libqpdf.so.30.3.0

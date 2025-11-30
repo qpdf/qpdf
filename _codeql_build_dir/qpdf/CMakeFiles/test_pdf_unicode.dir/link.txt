@@ -1,1 +1,0 @@
-/home/runner/work/qpdf/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/test_pdf_unicode.dir/link.d CMakeFiles/test_pdf_unicode.dir/test_pdf_unicode.cc.o -o test_pdf_unicode  -Wl,-rpath,/home/runner/work/qpdf/qpdf/_codeql_build_dir/libqpdf ../libqpdf/libqpdf.so.30.3.0

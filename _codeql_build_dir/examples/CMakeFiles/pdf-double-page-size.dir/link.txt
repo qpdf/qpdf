@@ -1,1 +1,0 @@
-/home/runner/work/qpdf/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/pdf-double-page-size.dir/link.d "CMakeFiles/pdf-double-page-size.dir/pdf-double-page-size.cc.o" -o pdf-double-page-size  -Wl,-rpath,/home/runner/work/qpdf/qpdf/_codeql_build_dir/libqpdf ../libqpdf/libqpdf.so.30.3.0

@@ -1,1 +1,0 @@
-/home/runner/work/qpdf/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/pdf_from_scratch.dir/link.d CMakeFiles/pdf_from_scratch.dir/pdf_from_scratch.cc.o -o pdf_from_scratch  -Wl,-rpath,/home/runner/work/qpdf/qpdf/_codeql_build_dir/libqpdf ../libqpdf/libqpdf.so.30.3.0

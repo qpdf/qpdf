@@ -16,3 +16,6 @@ Doxyfile
 # macOS junk files
 .DS_Store
 ._*
+_codeql_build_dir/
+cmake-build-*/
+_codeql_detected_source_root

@@ -1,4 +1,0 @@
-LIBQPDF_30 {
-  global:
-    *;
-};

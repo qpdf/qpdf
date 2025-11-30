@@ -1,2 +1,0 @@
-/usr/bin/ar qc libstandalone_fuzzer.a CMakeFiles/standalone_fuzzer.dir/standalone_fuzz_target_runner.cc.o
-/usr/bin/ranlib libstandalone_fuzzer.a

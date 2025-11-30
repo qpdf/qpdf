@@ -1,1 +1,0 @@
-/home/runner/work/qpdf/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/pdf-mod-info.dir/link.d "CMakeFiles/pdf-mod-info.dir/pdf-mod-info.cc.o" -o pdf-mod-info  -Wl,-rpath,/home/runner/work/qpdf/qpdf/_codeql_build_dir/libqpdf ../libqpdf/libqpdf.so.30.3.0
