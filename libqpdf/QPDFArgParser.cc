@@ -190,8 +190,7 @@ QPDFArgParser::completionCommon(bool zsh)
         // latter more characters ("$`\) are a problem and it's
         // virtually impossible to escape those in a locale-independent
         // way.
-        std::cout << "autoload -U +X bashcompinit && bashcompinit &&"
-                  << "complete -o bashdefault -o default -C '" << progname << "' " << m->whoami
+        std::cout << "complete -o bashdefault -o default -C '" << progname << "' " << m->whoami
                   << "\n";
     } else {
         // we need a function wrapper that discards arguments to avoid

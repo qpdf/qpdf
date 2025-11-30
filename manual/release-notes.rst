@@ -63,7 +63,8 @@ more detail.
       AcroForm, Dests, Outlines, and PageLabels structures.
 
     - Fix completion scripts and handling to avoid leaking arguments
-      into the environment during completion.
+      into the environment during completion and to correct handle
+      ``bashcompinit`` for zsh users.
 
   - Other enhancements
 
