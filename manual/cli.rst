@@ -244,14 +244,14 @@ Shell Completion
 .. help-topic completion: shell completion
 
    Shell completion is supported with bash and zsh. Use
-   eval $(qpdf --completion-bash) or eval $(qpdf --completion-zsh)
+   eval "$(qpdf --completion-bash)" or eval "$(qpdf --completion-zsh)"
    to enable. The QPDF_EXECUTABLE environment variable overrides the
    path to qpdf that these commands output.
 
 :command:`qpdf` provides its own completion support for zsh and bash.
-You can enable bash completion with :command:`eval $(qpdf
---completion-bash)` and zsh completion with :command:`eval $(qpdf
---completion-zsh)`. If :command:`qpdf` is not in your path, you should
+You can enable bash completion with :command:`eval "$(qpdf
+--completion-bash)"` and zsh completion with :command:`eval "$(qpdf
+--completion-zsh)"`. If :command:`qpdf` is not in your path, you should
 use an absolute path to qpdf in the above invocation. If you invoke it
 with a relative path, it will warn you, and the completion won't work
 if you're in a different directory.

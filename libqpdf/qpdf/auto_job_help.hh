@@ -45,11 +45,11 @@ ap.addHelpTopic("exit-status", "meanings of qpdf's exit codes", R"(Meaning of ex
 ap.addOptionHelp("--warning-exit-0", "exit-status", "exit 0 even with warnings", R"(Use exit status 0 instead of 3 when warnings are present. When
 combined with --no-warn, warnings are completely ignored.
 )");
-ap.addHelpTopic("completion", "shell completion", R"(Shell completion is supported with bash and zsh. Use
-eval $(qpdf --completion-bash) or eval $(qpdf --completion-zsh)
+ap.addHelpTopic("completion", "shell completion", R"/(Shell completion is supported with bash and zsh. Use
+eval "$(qpdf --completion-bash)" or eval "$(qpdf --completion-zsh)"
 to enable. The QPDF_EXECUTABLE environment variable overrides the
 path to qpdf that these commands output.
-)");
+)/");
 ap.addOptionHelp("--completion-bash", "completion", "enable bash completion", R"(Output a command that enables bash completion
 )");
 ap.addOptionHelp("--completion-zsh", "completion", "enable zsh completion", R"(Output a command that enables zsh completion

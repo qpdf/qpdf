@@ -1,2 +1,2 @@
 #compdef qpdf
-eval $(/usr/bin/qpdf --completion-zsh)
+eval "$(/usr/bin/qpdf --completion-zsh)"
