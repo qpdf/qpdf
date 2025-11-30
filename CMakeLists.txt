@@ -169,6 +169,7 @@ endif()
 if(CXX_NEXT)
   set(CMAKE_CXX_STANDARD 23)
 else()
+  # See also build-scripts/check-headers
   set(CMAKE_CXX_STANDARD 20)
 endif()
 set(CMAKE_CXX_EXTENSIONS OFF)

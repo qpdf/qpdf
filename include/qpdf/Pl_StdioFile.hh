@@ -45,8 +45,6 @@ class QPDF_DLL_CLASS Pl_StdioFile: public Pipeline
 
   private:
     class Members;
-    ;
-
     std::unique_ptr<Members> m;
 };
 
