@@ -106,6 +106,12 @@ more detail.
 
   - Other changes
 
+    - By default, streams with more than 25 filters are now treated as unfilterable.
+      A large number of filters typically occur in damaged or specially constructed
+      files and can cause excessive use of resources and/or stack overflows. The
+      limit can be changed if necessary with the new :qpdf:ref:`--max-stream-filters`
+      CLI option or the new ``qpdf::global::max_stream_filters`` function.
+
     - When running in a FIPS environment using the GnuTLS crypto provider,
       calls to GnuTLS now use 'LAX' mode as the use of weak algorithms is
       required to decrypt existing files and is specified by the PDF standards

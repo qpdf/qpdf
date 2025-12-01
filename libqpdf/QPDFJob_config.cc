@@ -1216,6 +1216,13 @@ QPDFJob::GlobalConfig::parserMaxNesting(const std::string& parameter)
     return this;
 }
 
+QPDFJob::GlobalConfig*
+QPDFJob::GlobalConfig::maxStreamFilters(const std::string& parameter)
+{
+    global::Limits::max_stream_filters(to_uint32("max-stream-filters", parameter));
+    return this;
+}
+
 QPDFJob::Config*
 QPDFJob::Config::setPageLabels(const std::vector<std::string>& specs)
 {

@@ -56,7 +56,7 @@ namespace qpdf::global
 
     /// @brief Retrieves the number of limit errors.
     ///
-    /// Returns the number a global limit was exceeded. This item is read only.
+    /// Returns the number of times a global limit was exceeded. This item is read only.
     ///
     /// @return The number of limit errors.
     ///
@@ -228,6 +228,34 @@ namespace qpdf::global
         void inline parser_max_container_size_damaged(uint32_t value)
         {
             set_uint32(qpdf_p_parser_max_container_size_damaged, value);
+        }
+
+        /// @brief Retrieves the maximum number of filters allowed when filtering streams.
+        ///
+        /// An excessive number of stream filters is usually a sign that a file is damaged or
+        /// specially constructed. If the maximum is exceeded for a stream the stream is treated as
+        /// unfilterable. The default maximum is 25.
+        ///
+        /// @return The maximum number of filters allowed when filtering streams.
+        ///
+        /// @since 12.3
+        uint32_t inline max_stream_filters()
+        {
+            return get_uint32(qpdf_p_max_stream_filters);
+        }
+
+        /// @brief Sets the maximum number of filters allowed when filtering streams.
+        ///
+        /// An excessive number of stream filters is usually a sign that a file is damaged or
+        /// specially constructed. If the maximum is exceeded for a stream the stream is treated as
+        /// unfilterable. The default maximum is 25.
+        ///
+        /// @param value  The maximum number of filters allowed when filtering streams to set.
+        ///
+        /// @since 12.3
+        void inline max_stream_filters(uint32_t value)
+        {
+            set_uint32(qpdf_p_max_stream_filters, value);
         }
     } // namespace limits
 

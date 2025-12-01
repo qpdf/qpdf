@@ -513,6 +513,13 @@ Stream::filterable(
         // No filters
         return true;
     }
+    if (filter_obj.size() > global::Limits::max_stream_filters()) {
+        global::Limits::error();
+        warn(
+            "limits error(max-stream-filters): too many filters for stream; treating stream as "
+            "not filterable");
+        return false;
+    }
     if (filter_obj.isName()) {
         // One filter
         auto ff = s->filter_factory(filter_obj.getName());

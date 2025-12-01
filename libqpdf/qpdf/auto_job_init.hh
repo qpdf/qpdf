@@ -40,6 +40,7 @@ this->ap.addRequiredParameter("parser-max-container-size", [this](std::string co
 this->ap.addRequiredParameter("parser-max-container-size-damaged", [this](std::string const& x){c_global->parserMaxContainerSizeDamaged(x);}, "level");
 this->ap.addRequiredParameter("parser-max-errors", [this](std::string const& x){c_global->parserMaxErrors(x);}, "level");
 this->ap.addRequiredParameter("parser-max-nesting", [this](std::string const& x){c_global->parserMaxNesting(x);}, "level");
+this->ap.addRequiredParameter("max-stream-filters", [this](std::string const& x){c_global->maxStreamFilters(x);}, "level");
 this->ap.selectMainOptionTable();
 this->ap.addPositional(p(&ArgParser::argPositional));
 this->ap.addBare("add-attachment", b(&ArgParser::argAddAttachment));

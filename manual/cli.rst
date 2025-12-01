@@ -3822,7 +3822,6 @@ Parser Limits
 Set the maximum nesting level while parsing objects. The maximum nesting level is not
 disabled by :qpdf:ref:`--no-default-limits`. Defaults to 499.
 
-
 .. qpdf:option:: --parser-max-errors=n
 
    .. help: set the maximum number of errors while parsing
@@ -3848,7 +3847,6 @@ parsing. The limit applies when the PDF document's xref table is undamaged
 and the object itself can be parsed without errors. The default limit
 is 4,294,967,295. See also :qpdf:ref:`--parser-max-container-size-damaged`.
 
-
 .. qpdf:option:: --parser-max-container-size-damaged=n
 
    .. help: set the maximum container size while parsing damaged files
@@ -3865,6 +3863,25 @@ parsing. The limit applies when the PDF document's xref table is damaged
 or the object itself is damaged. The limit also applies when parsing
 xref streams. The default limit is 5,000.
 See also :qpdf:ref:`--parser-max-container-size`.
+
+
+Stream and Filter Limits
+.........................
+
+.. qpdf:option:: --max-stream-filters=n
+
+   .. help: set the maximum number of filters allowed when filtering streams
+
+      An excessive number of stream filters is usually a sign that a file
+      is damaged or specially constructed. If the maximum is exceeded for
+      a stream the stream is treated as unfilterable.
+      The default limit is 25.
+
+Set the maximum number of filters allowed when filtering streams. An excessive
+number of stream filters is usually a sign that a file is damaged or specially
+constructed. If the maximum is exceeded for a stream the stream is treated as
+unfilterable. The default limit is 25.
+
 
 .. _test-options:
 
