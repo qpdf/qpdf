@@ -4,6 +4,7 @@
 
 #include <qpdf/QPDF.hh>
 
+#include <qpdf/Pl_Discard.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFJob.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
@@ -167,6 +168,7 @@ test_2(QPDF& pdf, char const* arg2)
     assert(parser_max_errors() == 15);
     assert(parser_max_container_size() == std::numeric_limits<uint32_t>::max());
     assert(parser_max_container_size_damaged() == 5'000);
+    assert(max_stream_filters() == 25);
     assert(default_limits());
 
     // Test disabling optional default limits
@@ -175,6 +177,7 @@ test_2(QPDF& pdf, char const* arg2)
     assert(parser_max_errors() == 0);
     assert(parser_max_container_size() == std::numeric_limits<uint32_t>::max());
     assert(parser_max_container_size_damaged() == std::numeric_limits<uint32_t>::max());
+    assert(max_stream_filters() == std::numeric_limits<uint32_t>::max());
     assert(!default_limits());
 
     // Check disabling default limits is irreversible
@@ -186,11 +189,13 @@ test_2(QPDF& pdf, char const* arg2)
     parser_max_errors(12);
     parser_max_container_size(13);
     parser_max_container_size_damaged(14);
+    max_stream_filters(15);
 
     assert(parser_max_nesting() == 11);
     assert(parser_max_errors() == 12);
     assert(parser_max_container_size() == 13);
     assert(parser_max_container_size_damaged() == 14);
+    assert(max_stream_filters() == 15);
 
     // Check disabling default limits does not override explicit limits
     default_limits(false);
@@ -198,6 +203,7 @@ test_2(QPDF& pdf, char const* arg2)
     assert(parser_max_errors() == 12);
     assert(parser_max_container_size() == 13);
     assert(parser_max_container_size_damaged() == 14);
+    assert(max_stream_filters() == 15);
 
     // Test parameter checking
     QUtil::handle_result_code(qpdf_r_ok, "");
@@ -239,6 +245,19 @@ test_2(QPDF& pdf, char const* arg2)
     }
     assert(qpdf::global::limit_errors() == 2);
 
+    // Test max_stream_filters
+    QPDF qpdf;
+    qpdf.emptyPDF();
+    auto s = qpdf.newStream("\x01\x01\x01A");
+    s.getDict().replace("/Filter", Array({Name("/RL"), Name("/RL"), Name("/RL")}));
+    Pl_Discard p;
+    auto x = s.pipeStreamData(&p, 0, qpdf_dl_all, true);
+    assert(x);
+    max_stream_filters(2);
+    assert(!s.pipeStreamData(&p, 0, qpdf_dl_all, true));
+    max_stream_filters(3);
+    assert(s.pipeStreamData(&p, 0, qpdf_dl_all, true));
+
     // Test global settings using the QPDFJob interface
     QPDFJob j;
     j.config()
@@ -248,14 +267,16 @@ test_2(QPDF& pdf, char const* arg2)
         ->parserMaxErrors("112")
         ->parserMaxContainerSize("113")
         ->parserMaxContainerSizeDamaged("114")
+        ->maxStreamFilters("115")
         ->noDefaultLimits()
         ->endGlobal()
         ->outputFile("a.pdf");
-    auto qpdf = j.createQPDF();
+    auto qpdf_uptr = j.createQPDF();
     assert(parser_max_nesting() == 111);
     assert(parser_max_errors() == 112);
     assert(parser_max_container_size() == 113);
     assert(parser_max_container_size_damaged() == 114);
+    assert(max_stream_filters() == 115);
     assert(!default_limits());
 
     // Test global settings using the JobJSON
@@ -268,16 +289,18 @@ test_2(QPDF& pdf, char const* arg2)
                 "parserMaxErrors": "212",
                 "parserMaxContainerSize": "213",
                 "parserMaxContainerSizeDamaged": "214",
+                "maxStreamFilters": "215",
                 "noDefaultLimits": ""
             },
             "outputFile": "a.pdf"
         }
     )");
-    qpdf = j.createQPDF();
+    qpdf_uptr = jj.createQPDF();
     assert(parser_max_nesting() == 211);
     assert(parser_max_errors() == 212);
     assert(parser_max_container_size() == 213);
     assert(parser_max_container_size_damaged() == 214);
+    assert(max_stream_filters() == 215);
     assert(!default_limits());
 }
 

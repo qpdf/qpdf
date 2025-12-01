@@ -20,12 +20,12 @@ $td->runtest("integer type checks",
 
 $td->runtest("dictionary checks",
              {$td->COMMAND => "objects 1 -"},
-             {$td->STRING =>  => "test 1 done\n", $td->EXIT_STATUS => 0},
+             {$td->STRING => "test 1 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
-$td->runtest("global object limits",
+$td->runtest("global limits",
              {$td->COMMAND => "objects 2 -"},
-             {$td->STRING =>  => "test 2 done\n", $td->EXIT_STATUS => 0},
+             {$td->FILE => "test2.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 $td->report($n_tests);

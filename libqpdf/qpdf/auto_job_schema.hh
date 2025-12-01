@@ -95,7 +95,8 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
     "parserMaxContainerSize": "set the maximum container size while parsing",
     "parserMaxContainerSizeDamaged": "set the maximum container size while parsing damaged files",
     "parserMaxErrors": "set the maximum number of errors while parsing",
-    "parserMaxNesting": "set the maximum nesting level while parsing objects"
+    "parserMaxNesting": "set the maximum nesting level while parsing objects",
+    "maxStreamFilters": "set the maximum number of filters allowed when filtering streams"
   },
   "updateFromJson": "update a PDF from qpdf JSON",
   "allowWeakCrypto": "allow insecure cryptographic algorithms",
