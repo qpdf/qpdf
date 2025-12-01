@@ -85,6 +85,20 @@ namespace qpdf::global
     {
       public:
         static bool
+        inspection_mode()
+        {
+            return static_cast<bool>(o.inspection_mode_);
+        }
+
+        static void
+        inspection_mode(bool value)
+        {
+            if (value) {
+                o.inspection_mode_ = true;
+            }
+        }
+
+        static bool
         default_limits()
         {
             return static_cast<bool>(o.default_limits_);
@@ -102,6 +116,7 @@ namespace qpdf::global
       private:
         static Options o;
 
+        bool inspection_mode_{false};
         bool default_limits_{true};
     };
 } // namespace qpdf::global
