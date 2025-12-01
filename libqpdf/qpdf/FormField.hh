@@ -10,24 +10,30 @@ class QPDFAnnotationObjectHelper;
 
 namespace qpdf::impl
 {
-    // This object helper helps with form fields for interactive forms. Please see comments in
-    // QPDFAcroFormDocumentHelper.hh for additional details.
-    class FormField: public qpdf::BaseDictionary
+    /// @class FormNode
+    /// @brief Represents a node in the interactive forms tree of a PDF document.
+    ///
+    /// This class models nodes that may be either form field dictionaries or widget annotation
+    /// dictionaries, as defined in the PDF specification (sections 12.7 and 12.5.6.19).
+    ///
+    /// For a detailed description of the attributes that this class can expose, refer to the
+    /// corresponding tables in the PDF 2.0 (Table 226) or PDF 1.7 (Table 220) specifications.
+    class FormNode: public qpdf::BaseDictionary
     {
       public:
-        FormField() = default;
-        FormField(FormField const&) = default;
-        FormField& operator=(FormField const&) = default;
-        FormField(FormField&&) = default;
-        FormField& operator=(FormField&&) = default;
-        ~FormField() = default;
+        FormNode() = default;
+        FormNode(FormNode const&) = default;
+        FormNode& operator=(FormNode const&) = default;
+        FormNode(FormNode&&) = default;
+        FormNode& operator=(FormNode&&) = default;
+        ~FormNode() = default;
 
-        FormField(QPDFObjectHandle const& oh) :
+        FormNode(QPDFObjectHandle const& oh) :
             BaseDictionary(oh)
         {
         }
 
-        FormField(QPDFObjectHandle&& oh) :
+        FormNode(QPDFObjectHandle&& oh) :
             BaseDictionary(std::move(oh))
         {
         }
@@ -38,9 +44,9 @@ namespace qpdf::impl
         /// it exists. The parent is determined based on the /Parent attribute in the field
         /// dictionary.
         ///
-        /// @return A FormField object representing the parent field. If the current field has no
-        ///         parent, an empty FormField object is returned.
-        FormField
+        /// @return A FormNode object representing the parent field. If the current field has no
+        ///         parent, an empty FormNode object is returned.
+        FormNode
         Parent()
         {
             return {get("/Parent")};
@@ -58,7 +64,7 @@ namespace qpdf::impl
         ///        false.
         ///
         /// @return The top-level field in the form field hierarchy.
-        FormField root_field(bool* is_different = nullptr);
+        FormNode root_field(bool* is_different = nullptr);
 
         /// @brief Retrieves the inherited value of the specified attribute.
         ///
