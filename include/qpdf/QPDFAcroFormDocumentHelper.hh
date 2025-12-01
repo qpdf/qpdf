@@ -225,6 +225,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
         std::set<QPDFObjGen>* new_fields = nullptr);
 
   private:
+    friend class QPDF::Doc;
     class Members;
 
     std::shared_ptr<Members> m;

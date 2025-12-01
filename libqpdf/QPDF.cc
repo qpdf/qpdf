@@ -11,6 +11,7 @@
 #include <sstream>
 #include <vector>
 
+#include <qpdf/AcroForm.hh>
 #include <qpdf/FileInputSource.hh>
 #include <qpdf/InputSource_private.hh>
 #include <qpdf/OffsetInputSource.hh>
@@ -145,6 +146,21 @@ QPDF::QPDF() :
     // the lifetime of this running application.
     static std::atomic<unsigned long long> unique_id{0};
     m->unique_id = unique_id.fetch_add(1ULL);
+}
+
+/// @brief  Initializes the AcroForm functionality for the document.
+/// @par
+///         This method creates a unique instance of QPDFAcroFormDocumentHelper and associates it
+///         with the document. It also updates the `acroform_` pointer to reference the AcroForm
+///         instance managed by the helper.
+///
+///         The method has been separated out from `acroform` to avoid it being inlined
+///         unnecessarily.
+void
+QPDF::Doc::init_acroform()
+{
+    acroform_dh_ = std::make_unique<QPDFAcroFormDocumentHelper>(qpdf);
+    acroform_ = acroform_dh_->m.get();
 }
 
 // Provide access to disconnect(). Disconnect will in due course be merged into the current ObjCache

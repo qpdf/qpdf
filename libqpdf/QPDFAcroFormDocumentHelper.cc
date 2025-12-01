@@ -18,14 +18,7 @@ using namespace qpdf;
 using namespace qpdf::impl;
 using namespace std::literals;
 
-class QPDFAcroFormDocumentHelper::Members: public AcroForm
-{
-  public:
-    Members(QPDF& qpdf) :
-        AcroForm(qpdf.doc())
-    {
-    }
-};
+using AcroForm = impl::AcroForm;
 
 QPDFAcroFormDocumentHelper::QPDFAcroFormDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
@@ -36,7 +29,7 @@ QPDFAcroFormDocumentHelper::QPDFAcroFormDocumentHelper(QPDF& qpdf) :
 QPDFAcroFormDocumentHelper&
 QPDFAcroFormDocumentHelper::get(QPDF& qpdf)
 {
-    return qpdf.doc().acroform();
+    return qpdf.doc().acroform_dh();
 }
 
 void

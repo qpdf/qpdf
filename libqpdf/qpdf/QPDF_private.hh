@@ -28,8 +28,9 @@ namespace qpdf
 
     namespace impl
     {
+        class AcroForm;
         using Doc = QPDF::Doc;
-    }
+    } // namespace impl
 
     class Doc: public QPDF
     {
@@ -374,11 +375,33 @@ class QPDF::Doc
     bool reconstructed_xref() const;
 
     QPDFAcroFormDocumentHelper&
+    acroform_dh()
+    {
+        if (!acroform_) {
+            no_inspection();
+            init_acroform();
+        }
+        return *acroform_dh_;
+    }
+
+    /// @brief  Retrieves the shared impl::AcroForm instance associated with the document.
+    ///
+    /// @note   The AcroForm class caches the form field structure for efficiency. If any part
+    ///         of the form field structure is modified directly the `validate` method MUST be
+    ///         called before calling any other AcroForm methods in order to refresh the cache.
+    ///
+    ///         If the AcroForm instance has not already been initialized, the `init_acroform()`
+    ///         function is called to initialize it.
+    ///
+    /// @return A reference to the shared AcroForm object of the document.
+    ///
+    /// @since 12.3
+    impl::AcroForm&
     acroform()
     {
         if (!acroform_) {
             no_inspection();
-            acroform_ = std::make_unique<QPDFAcroFormDocumentHelper>(qpdf);
+            init_acroform();
         }
         return *acroform_;
     }
@@ -438,8 +461,11 @@ class QPDF::Doc
     qpdf::Doc::Config cf;
 
   private:
+    void init_acroform();
+
     // Document Helpers;
-    std::unique_ptr<QPDFAcroFormDocumentHelper> acroform_;
+    std::unique_ptr<QPDFAcroFormDocumentHelper> acroform_dh_;
+    impl::AcroForm* acroform_{nullptr};
     std::unique_ptr<QPDFEmbeddedFileDocumentHelper> embedded_files_;
     std::unique_ptr<QPDFOutlineDocumentHelper> outlines_;
     std::unique_ptr<QPDFPageDocumentHelper> page_dh_;
@@ -1173,7 +1199,7 @@ class QPDF::Doc::Pages: Common
     void flatten_annotations_for_page(
         QPDFPageObjectHelper& page,
         QPDFObjectHandle& resources,
-        QPDFAcroFormDocumentHelper& afdh,
+        impl::AcroForm& afdh,
         int required_flags,
         int forbidden_flags);
 

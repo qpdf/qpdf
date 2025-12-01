@@ -1,7 +1,7 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDF_private.hh>
 
-#include <qpdf/QPDFAcroFormDocumentHelper.hh>
+#include <qpdf/AcroForm.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QTC.hh>
@@ -660,7 +660,7 @@ void
 Pages::flatten_annotations_for_page(
     QPDFPageObjectHelper& page,
     QPDFObjectHandle& resources,
-    QPDFAcroFormDocumentHelper& afdh,
+    impl::AcroForm& afdh,
     int required_flags,
     int forbidden_flags)
 {

@@ -546,7 +546,7 @@ namespace qpdf::impl
         /// @param inherit If set to `true`, the function will attempt to retrieve `/V` by
         ///        inheritance from the parent hierarchy of the form field. Defaults to `true`.
         /// @return Returns the field's value if found; otherwise, returns a default-constructed
-        /// object handle.
+        ///         object handle.
         QPDFObjectHandle const&
         V(bool inherit = true) const
         {
@@ -557,7 +557,7 @@ namespace qpdf::impl
         }
 
         /// @brief Retrieves the field value `/V` attribute of the form field, considering
-        ///        inheritance, if the value is  a String.
+        ///        inheritance, if the value is a String.
         ///
         /// This function extracts the value of the form field, accounting for potential inheritance
         /// through the form hierarchy. It returns the value if it is a String, and an empty string
@@ -567,7 +567,7 @@ namespace qpdf::impl
         ///         an empty string if the value is not present or not a String.
         std::string value() const;
 
-        /// @brief Retrieves the field  default value (`/DV` attribute) of a specified field,
+        /// @brief Retrieves the field default value (`/DV` attribute) of a specified field,
         ///        accounting for inheritance through the hierarchy of ancestor nodes in the form
         ///        field tree.
         ///
@@ -592,14 +592,14 @@ namespace qpdf::impl
         }
 
         /// @brief Retrieves the default value `/DV` attribute of the form field, considering
-        ///        inheritance, if the default value is  a String.
+        ///        inheritance, if the default value is a String.
         ///
         /// This function extracts the default value of the form field, accounting for potential
         /// inheritance through the form hierarchy. It returns the value if it is a String, and an
         /// empty string otherwise.
         ///
-        /// @return A string containing the actual or inherited `/V` attribute of the form field, or
-        ///         an empty string if the value is not present or not a String.
+        /// @return A string containing the actual or inherited `/DV` attribute of the form field,
+        ///         or an empty string if the value is not present or not a String.
         std::string default_value() const;
 
         /// @brief Returns the default appearance string for the form field, considering inheritance
@@ -710,5 +710,14 @@ namespace qpdf::impl
         static const QPDFObjectHandle null_oh;
     }; // class FormNode
 } // namespace qpdf::impl
+
+class QPDFAcroFormDocumentHelper::Members: public qpdf::impl::AcroForm
+{
+  public:
+    Members(QPDF& qpdf) :
+        AcroForm(qpdf.doc())
+    {
+    }
+};
 
 #endif // ACRO_FORM_HH
