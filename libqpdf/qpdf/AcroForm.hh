@@ -11,6 +11,19 @@ class QPDFAnnotationObjectHelper;
 
 namespace qpdf::impl
 {
+    /// @class  AcroForm
+    /// @brief  Represents the interactive form dictionary and the interactive form tree within a
+    ///         PDF document.
+    /// @par
+    ///         The AcroForm class deals with interactive forms defined in section 12.7 of the PDF
+    ///         specification. This defines a tree structure consisting of an interactive form or
+    ///         `/AcroForm` dictionary (section 12.7.3) at its root. The attributes of the
+    ///         `/AcroForm` dictionary are defined in table 224 of the PDF 2.0 / table 220 of the
+    ///         PDF 1.7 specification.
+    /// @par
+    ///         The nodes of the interactive forms tree are represented by the FormNode class.
+    ///
+    /// @since 12.3
     class AcroForm: public Doc::Common
     {
       public:
@@ -27,14 +40,61 @@ namespace qpdf::impl
             // We have to analyze up front. Otherwise, when we are adding annotations and fields, we
             // are in a temporarily unstable configuration where some widget annotations are not
             // reachable.
-            analyze();
+            validate();
         }
 
-        struct FieldData
-        {
-            std::vector<QPDFAnnotationObjectHelper> annotations;
-            std::string name;
-        };
+        // Re-validate the AcroForm structure. This is useful if you have modified the structure of
+        // the AcroForm dictionary in a way that would invalidate the cache.
+        //
+        // If repair is true, the document will be repaired if possible if the validation encounters
+        // errors.
+        void validate(bool repair = true);
+
+        // This class lazily creates an internal cache of the mapping among form fields,
+        // annotations, and pages. Methods within this class preserve the validity of this cache.
+        // However, if you modify pages' annotation dictionaries, the document's /AcroForm
+        // dictionary, or any form fields manually in a way that alters the association between
+        // forms, fields, annotations, and pages, it may cause this cache to become invalid. This
+        // method marks the cache invalid and forces it to be regenerated the next time it is
+        // needed.
+        void invalidateCache();
+
+        bool hasAcroForm();
+
+        // Add a form field, initializing the document's AcroForm dictionary if needed, updating the
+        // cache if necessary. Note that if you are adding fields that are copies of other fields,
+        // this method may result in multiple fields existing with the same qualified name, which
+        // can have unexpected side effects. In that case, you should use addAndRenameFormFields()
+        // instead.
+        void addFormField(QPDFFormFieldObjectHelper);
+
+        // Add a collection of form fields making sure that their fully qualified names don't
+        // conflict with already present form fields. Fields within the collection of new fields
+        // that have the same name as each other will continue to do so.
+        void addAndRenameFormFields(std::vector<QPDFObjectHandle> fields);
+
+        // Remove fields from the fields array
+        void removeFormFields(std::set<QPDFObjGen> const&);
+
+        // Set the name of a field, updating internal records of field names. Name should be UTF-8
+        // encoded.
+        void setFormFieldName(QPDFFormFieldObjectHelper, std::string const& name);
+
+        // Return a vector of all terminal fields in a document. Terminal fields are fields that
+        // have no children that are also fields. Terminal fields may still have children that are
+        // annotations. Intermediate nodes in the fields tree are not included in this list, but you
+        // can still reach them through the getParent method of the field object helper.
+        std::vector<QPDFFormFieldObjectHelper> getFormFields();
+
+        // Return all the form fields that have the given fully-qualified name and also have an
+        // explicit "/T" attribute. For this information to be accurate, any changes to field names
+        // must be done through setFormFieldName() above.
+        std::set<QPDFObjGen> getFieldsWithQualifiedName(std::string const& name);
+
+        // Return the annotations associated with a terminal field. Note that in the case of a field
+        // having a single annotation, the underlying object will typically be the same as the
+        // underlying object for the field.
+        std::vector<QPDFAnnotationObjectHelper> getAnnotationsForField(QPDFFormFieldObjectHelper);
 
         /// Retrieves a list of widget annotations for the specified page.
         ///
@@ -49,6 +109,86 @@ namespace qpdf::impl
         ///         the widget annotations found on the specified page.
         std::vector<QPDFAnnotationObjectHelper>
         getWidgetAnnotationsForPage(QPDFPageObjectHelper page);
+
+        // Return top-level form fields for a page.
+        std::vector<QPDFFormFieldObjectHelper> getFormFieldsForPage(QPDFPageObjectHelper);
+
+        // Return the terminal field that is associated with this annotation. If the annotation
+        // dictionary is merged with the field dictionary, the underlying object will be the same,
+        // but this is not always the case. Note that if you call this method with an annotation
+        // that is not a widget annotation, there will not be an associated field, and this method
+        // will return a helper associated with a null object (isNull() == true).
+        QPDFFormFieldObjectHelper getFieldForAnnotation(QPDFAnnotationObjectHelper);
+
+        // Return the current value of /NeedAppearances. If /NeedAppearances is missing, return
+        // false as that is how PDF viewers are supposed to interpret it.
+        bool getNeedAppearances();
+
+        // Indicate whether appearance streams must be regenerated. If you modify a field value, you
+        // should call setNeedAppearances(true) unless you also generate an appearance stream for
+        // the corresponding annotation at the same time. If you generate appearance streams for all
+        // fields, you can call setNeedAppearances(false). If you use
+        // QPDFFormFieldObjectHelper::setV, it will automatically call this method unless you tell
+        // it not to.
+        void setNeedAppearances(bool);
+
+        // If /NeedAppearances is false, do nothing. Otherwise generate appearance streams for all
+        // widget annotations that need them. See comments in QPDFFormFieldObjectHelper.hh for
+        // generateAppearance for limitations. For checkbox and radio button fields, this code
+        // ensures that appearance state is consistent with the field's value and uses any
+        // pre-existing appearance streams.
+        void generateAppearancesIfNeeded();
+
+        // Disable Digital Signature Fields. Remove all digital signature fields from the document,
+        // leaving any annotation showing the content of the field intact. This also calls
+        // QPDF::removeSecurityRestrictions.
+        void disableDigitalSignatures();
+
+        // Note: this method works on all annotations, not just ones with associated fields. For
+        // each annotation in old_annots, apply the given transformation matrix to create a new
+        // annotation. New annotations are appended to new_annots. If the annotation is associated
+        // with a form field, a new form field is created that points to the new annotation and is
+        // appended to new_fields, and the old field is added to old_fields.
+        //
+        // old_annots may belong to a different QPDF object. In that case, you should pass in
+        // from_qpdf, and copyForeignObject will be called automatically. If this is the case, for
+        // efficiency, you may pass in a QPDFAcroFormDocumentHelper for the other file to avoid the
+        // expensive process of creating one for each call to transformAnnotations. New fields and
+        // annotations are not added to the document or pages. You have to do that yourself after
+        // calling transformAnnotations. If this operation will leave orphaned fields behind, such
+        // as if you are replacing the old annotations with the new ones on the same page and the
+        // fields and annotations are not shared, you will also need to remove the old fields to
+        // prevent them from hanging around unreferenced.
+        void transformAnnotations(
+            QPDFObjectHandle old_annots,
+            std::vector<QPDFObjectHandle>& new_annots,
+            std::vector<QPDFObjectHandle>& new_fields,
+            std::set<QPDFObjGen>& old_fields,
+            QPDFMatrix const& cm,
+            QPDF* from_qpdf,
+            AcroForm* from_afdh);
+
+        // Copy form fields and annotations from one page to another, allowing the from page to be
+        // in a different QPDF or in the same QPDF. This would typically be called after calling
+        // addPage to add field/annotation awareness. When just copying the page by itself,
+        // annotations end up being shared, and fields end up being omitted because there is no
+        // reference to the field from the page. This method ensures that each separate copy of a
+        // page has private annotations and that fields and annotations are properly updated to
+        // resolve conflicts that may occur from common resource and field names across documents.
+        // It is basically a wrapper around transformAnnotations that handles updating the receiving
+        // page. If new_fields is non-null, any newly created fields are added to it.
+        void fixCopiedAnnotations(
+            QPDFObjectHandle to_page,
+            QPDFObjectHandle from_page,
+            AcroForm& from_afdh,
+            std::set<QPDFObjGen>* new_fields = nullptr);
+
+      private:
+        struct FieldData
+        {
+            std::vector<QPDFAnnotationObjectHelper> annotations;
+            std::string name;
+        };
 
         /// Analyzes the AcroForm structure in the PDF document and updates the internal
         /// cache with the form fields and their corresponding widget annotations.
@@ -374,7 +514,7 @@ namespace qpdf::impl
         std::string mapping_name() const;
 
         /// @brief Retrieves the field value (`/V` attribute) of a specified field, accounting for
-        ///        inheritance through thehierarchy of ancestor nodes in the form field tree.
+        ///        inheritance through the hierarchy of ancestor nodes in the form field tree.
         ///
         /// This function attempts to retrieve the `/V` attribute. If the `inherit`
         /// parameter is set to `true` and the `/V` is not found at the current level, the
@@ -549,11 +689,11 @@ namespace qpdf::impl
         /// name.
         ///
         /// The method accesses the AcroForm dictionary within the root object of the PDF document.
-        /// If the the AcroForm dictionary contains the given field name, it retrieves the
+        /// If the AcroForm dictionary contains the given field name, it retrieves the
         /// corresponding entry. Otherwise, it returns a default-constructed object handle.
         ///
         /// @param name The name of the form field to retrieve.
-        /// @return A object handle corresponding to the specified name within the AcroForm
+        /// @return An object handle corresponding to the specified name within the AcroForm
         /// dictionary.
         QPDFObjectHandle const&
         from_AcroForm(std::string const& name) const
