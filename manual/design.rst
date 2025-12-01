@@ -67,6 +67,61 @@ Inspection mode is intended for manual investigations and repairs. As such,
 stability is less of a concern than for other uses of qpdf. The exact effect
 of specifying inspection mode will evolve from version to version.
 
+.. _permissive-mode:
+
+Permissive Mode
+---------------
+
+Historically, the qpdf library has been highly permissive, allowing users to
+directly manipulate PDF documents at a low level. This includes manipulations
+that may not comply with the official PDF specification. This design choice
+serves two primary purposes:
+
+* **Flexibility:** It allows for advanced manipulations for which qpdf does
+  not provide high-level API calls.
+
+* **Experimentation:** It establishes qpdf as a versatile tool for users who
+  need to explore the intricacies of PDF files, test hypotheses, or recover data
+  from malformed documents.
+
+While this flexibility is a powerful feature, it comes with significant
+disadvantages:
+
+* **Inability to Detect Programming Errors**
+
+  The PDF specification is vast and complex. Because qpdf deliberately allows
+  invalid manipulations, it cannot distinguish between intentional
+  non-compliance and accidental programming errors. This places a greater
+  burden on the programmer to have a deep understanding of the PDF
+  specification and ensure their manipulations are correct.
+
+* **Performance Overhead**
+
+  PDF files contain complex data structures that are computationally expensive
+  to analyze and validate. To optimize performance, qpdf caches the results of
+  these operations. However, because low-level access is permitted, qpdf must
+  assume that these structures may have been altered, forcing it to repeatedly
+  invalidate its caches and re-run expensive operations.
+
+To address these disadvantages, qpdf 12.x introduced an explicit *permissive mode*.
+
+* For backward compatibility, this mode is **on by default**, preserving qpdf's
+  historical behavior.
+
+* When permissive mode is **switched off**, qpdf will treat invalid operations
+  and the direct manipulation of complex internal structures as illegal. **Such
+  actions are a violation of the API contract and will result in undefined
+  behavior.** Over time, qpdf will move away from re-validating structures and
+  repairing invalid operations before every operation. Instead, it will throw
+  logic errors at the point an invalid operation or manipulation is attempted.
+  The release notes for future versions will document these changes.
+
+For users who only need to produce valid PDF files using qpdf's higher-level
+APIs, turning permissive mode off will, over time, provide better protection
+against programming errors and enable significant performance improvements.
+Operating with permissive mode disabled is the recommended approach for most
+use cases.
+
 .. _design-goals:
 
 Design Goals
