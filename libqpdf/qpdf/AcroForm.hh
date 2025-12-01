@@ -24,6 +24,10 @@ namespace qpdf::impl
         AcroForm(impl::Doc& doc) :
             Common(doc)
         {
+            // We have to analyze up front. Otherwise, when we are adding annotations and fields, we
+            // are in a temporarily unstable configuration where some widget annotations are not
+            // reachable.
+            analyze();
         }
 
         struct FieldData
@@ -31,6 +35,149 @@ namespace qpdf::impl
             std::vector<QPDFAnnotationObjectHelper> annotations;
             std::string name;
         };
+
+        /// Retrieves a list of widget annotations for the specified page.
+        ///
+        /// A widget annotation represents the visual part of a form field in a PDF.
+        /// This function filters annotations on the given page, returning only those
+        /// annotations whose subtype is "/Widget".
+        ///
+        /// @param page A `QPDFPageObjectHelper` representing the page from which to
+        ///             extract widget annotations.
+        ///
+        /// @return A vector of `QPDFAnnotationObjectHelper` objects corresponding to
+        ///         the widget annotations found on the specified page.
+        std::vector<QPDFAnnotationObjectHelper> getWidgetAnnotationsForPage(QPDFPageObjectHelper page);
+
+        /// Analyzes the AcroForm structure in the PDF document and updates the internal
+        /// cache with the form fields and their corresponding widget annotations.
+        ///
+        /// The function performs the following steps:
+        /// - Checks if the cache is valid. If it is, the function exits early.
+        /// - Retrieves the `/AcroForm` dictionary from the PDF and checks if it contains
+        ///   a `/Fields` key.
+        /// - If `/Fields` exist and is an array, iterates through the fields and traverses
+        ///   them to map annotations bidirectionally to form fields.
+        /// - Logs a warning if the `/Fields` key is present but not an array, and initializes
+        ///   it to an empty array.
+        /// - Ensures that all widget annotations are processed, including any annotations
+        ///   that might not be reachable from the `/AcroForm`. Treats such annotations as
+        ///   their own fields.
+        /// - Provides a workaround for PDF documents containing inconsistencies, such as
+        ///   widget annotations on a page not being referenced in `/AcroForm`.
+        ///
+        /// This function allows precise navigation and manipulation of form fields and
+        /// their related annotations, facilitating advanced PDF document processing.
+        void analyze();
+
+        /// Recursively traverses the structure of form fields and annotations in a PDF's /AcroForm.
+        ///
+        /// The method is designed to process form fields in a hierarchical /AcroForm structure.
+        /// It captures field and annotation data, resolves parent-child relationships, detects
+        /// loops, and avoids stack overflow from excessive recursion depth.
+        ///
+        /// @param field The current field or annotation to process.
+        /// @param parent The parent field object. If the current field is a top-level field, parent
+        ///               will be a null object.
+        /// @param depth The current recursion depth to limit stack usage and avoid infinite loops.
+        ///
+        /// @return True if the field was processed successfully, false otherwise.
+        ///
+        /// - Recursion is limited to a depth of 100 to prevent stack overflow with maliciously
+        ///   crafted files.
+        /// - The function skips non-indirect and invalid objects (e.g., non-dictionaries or objects
+        ///   with invalid parent references).
+        /// - Detects and warns about loops in the /AcroForm hierarchy.
+        /// - Differentiates between terminal fields, annotations, and composite fields based on
+        ///   dictionary keys.
+        /// - Tracks processed fields and annotations using internal maps to prevent reprocessing
+        ///   and detect loops.
+        /// - Updates name-to-field mappings for terminal fields with a valid fully qualified name.
+        /// - Ensures the integrity of parent-child relationships within the field hierarchy.
+        /// - Any invalid child objects are logged and skipped during traversal.
+        bool traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, int depth);
+
+        /// Retrieves or creates the /AcroForm dictionary in the PDF document's root.
+        ///
+        /// - If the /AcroForm key exists in the document root and is a dictionary,
+        ///   it is returned as is.
+        /// - If the /AcroForm key does not exist or is not a dictionary, a new
+        ///   dictionary is created, stored as the /AcroForm entry in the document root,
+        ///   and then returned.
+        ///
+        /// @return A QPDFObjectHandle representing the /AcroForm dictionary.
+        QPDFObjectHandle getOrCreateAcroForm();
+
+        /// Adjusts inherited field properties for an AcroForm field object.
+        ///
+        /// This method ensures that the `/DA` (default appearance) and `/Q` (quadding) keys
+        /// of the specified field object are overridden if necessary, based on the provided
+        /// parameters. The overriding is performed only if the respective `override_da` or
+        /// `override_q` flags are set to true, and when the original object's values differ from
+        /// the provided defaults. No changes are made to fields that have explicit values for `/DA`
+        /// or `/Q`.
+        ///
+        /// The function is primarily used for adjusting inherited form field properties in cases
+        /// where the document structure or inherited values have changed (e.g., when working with
+        /// fields in a PDF document).
+        ///
+        /// @param obj The `QPDFObjectHandle` instance representing the form field object to be
+        ///            adjusted.
+        /// @param override_da A boolean flag indicating whether to override the `/DA` key.
+        /// @param from_default_da The default appearance string to apply if overriding the `/DA`
+        ///                        key.
+        /// @param override_q A boolean flag indicating whether to override the `/Q` key.
+        /// @param from_default_q The default quadding value (alignment) to apply if overriding the
+        ///                       `/Q` key.
+        void adjustInheritedFields(
+            QPDFObjectHandle obj,
+            bool override_da,
+            std::string const& from_default_da,
+            bool override_q,
+            int from_default_q);
+
+        /// Adjusts the default appearances (/DA) of an AcroForm field object.
+        ///
+        /// This method ensures that form fields copied from another PDF document
+        /// have their default appearances resource references updated to correctly
+        /// point to the appropriate resources in the current document's resource
+        /// dictionary (/DR). It resolves name conflicts between the dictionaries
+        /// of the source and destination documents by using a mapping provided in
+        /// `dr_map`.
+        ///
+        /// The method parses the /DA string, processes its resource references,
+        /// and regenerates the /DA with updated references.
+        ///
+        /// @param obj The AcroForm field object whose /DA is being adjusted.
+        /// @param dr_map A mapping between resource names in the source document's
+        ///        resource dictionary and their corresponding names in the current
+        ///        document's resource dictionary.
+        void adjustDefaultAppearances(
+            QPDFObjectHandle obj,
+            std::map<std::string, std::map<std::string, std::string>> const& dr_map);
+
+        /// Modifies the appearance stream of an AcroForm field to ensure its resources
+        /// align with the resource dictionary and appearance settings. This method
+        /// ensures proper resource handling to avoid any conflicts when regenerating
+        /// the appearance stream.
+        ///
+        /// Adjustments include:
+        /// - Creating a private resource dictionary for the stream if not already present.
+        /// - Merging top-level resource keys into the stream's resource dictionary.
+        /// - Resolving naming conflicts between existing and remapped resource keys.
+        /// - Removing empty sub-dictionaries from the resource dictionary.
+        /// - Attaching a token filter to rewrite resource references in the stream content.
+        ///
+        /// If conflicts between keys are encountered or the stream cannot be parsed successfully,
+        /// appropriate warnings will be generated instead of halting execution.
+        ///
+        /// @param stream The QPDFObjectHandle representation of the PDF appearance stream to be
+        ///               adjusted.
+        /// @param dr_map A mapping of resource types and their corresponding name remappings
+        ///               used for resolving resource conflicts and regenerating appearances.
+        void adjustAppearanceStream(
+            QPDFObjectHandle stream,
+            std::map<std::string, std::map<std::string, std::string>> dr_map);
 
         bool cache_valid{false};
         std::map<QPDFObjGen, FieldData> field_to;

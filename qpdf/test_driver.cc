@@ -3567,7 +3567,6 @@ test_101(QPDF& pdf, char const* arg2)
         std::cout << oh.unparseResolved() << '\n';
     }
 
-
     auto test_helper_throws = [&qpdf](auto helper_func) {
         bool thrown = false;
         try {
