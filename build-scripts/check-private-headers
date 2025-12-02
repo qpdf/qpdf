@@ -1,0 +1,35 @@
+#!/bin/bash
+set -eo pipefail
+cd "$(dirname $0)/.."
+
+trap "rm -f a.cc" EXIT
+declare -a pheaders
+cd libqpdf
+for i in qpdf/*.hh; do
+    if [[ ! $i =~ .*auto_.* ]] && ! grep -q >/dev/null 2>&1 QPDFOBJECT_OLD_HH $i; then
+        pheaders+=($i)
+    fi
+done
+cd ..
+# Make sure each header file can be included in isolation and that the
+# result can be compiled with the version of the C++ standard used by the qpdf project, currently C++-20.
+declare -a perrors
+for i in "${pheaders[@]}"; do
+    rm -f a.cc
+    cat > a.cc <<EOF
+#include "$i"
+int main() { return 0; }
+EOF
+    echo "Checking $i"
+    if ! g++ -std=c++20 -pedantic-errors -c -Iinclude -Ilibqpdf -Ibuild/libqpdf a.cc -o /dev/null; then
+        perrors+=("$i doesn't compile")
+    fi
+done
+if [[ ${#perrors[@]} -gt 0 ]]; then
+    echo ""
+    echo "Some header files had errors"
+    for i in "${perrors[@]}"; do
+        echo "$i"
+    done
+    exit 2
+fi

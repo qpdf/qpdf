@@ -1,7 +1,6 @@
 .. _ticket: https://issues.qpdf.org
 .. _shared null: https://wiki.qpdf.org/PDF-null-objects-vs-qpdf-null-objects
 
-
 .. _release-notes:
 
 Release Notes
@@ -79,8 +78,8 @@ more detail.
 
   - Build fixes
 
-    - Attempt to detect if any > C++-17 changes snuck into any public
-      headers.
+    - Attempt to detect if any > C++17 changes snuck into any public
+      headers and check all private headers compile stand-alone.
 
   - CLI Enhancements
 
