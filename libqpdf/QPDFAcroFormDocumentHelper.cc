@@ -1,5 +1,7 @@
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 
+#include <qpdf/AcroForm.hh>
+
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
@@ -7,50 +9,37 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/ResourceFinder.hh>
+#include <qpdf/Util.hh>
 
 #include <deque>
 #include <utility>
 
 using namespace qpdf;
+using namespace qpdf::impl;
 using namespace std::literals;
 
-class QPDFAcroFormDocumentHelper::Members
-{
-  public:
-    Members() = default;
-    Members(Members const&) = delete;
-    ~Members() = default;
-
-    struct FieldData
-    {
-        std::vector<QPDFAnnotationObjectHelper> annotations;
-        std::string name;
-    };
-
-    bool cache_valid{false};
-    std::map<QPDFObjGen, FieldData> field_to;
-    std::map<QPDFObjGen, QPDFFormFieldObjectHelper> annotation_to_field;
-    std::map<std::string, std::set<QPDFObjGen>> name_to_fields;
-    std::set<QPDFObjGen> bad_fields;
-};
+using AcroForm = impl::AcroForm;
 
 QPDFAcroFormDocumentHelper::QPDFAcroFormDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
-    m(std::make_shared<Members>())
+    m(std::make_shared<Members>(qpdf))
 {
-    // We have to analyze up front. Otherwise, when we are adding annotations and fields, we are in
-    // a temporarily unstable configuration where some widget annotations are not reachable.
-    analyze();
 }
 
 QPDFAcroFormDocumentHelper&
 QPDFAcroFormDocumentHelper::get(QPDF& qpdf)
 {
-    return qpdf.doc().acroform();
+    return qpdf.doc().acroform_dh();
 }
 
 void
 QPDFAcroFormDocumentHelper::validate(bool repair)
+{
+    m->validate(repair);
+}
+
+void
+AcroForm::validate(bool repair)
 {
     invalidateCache();
     analyze();
@@ -59,19 +48,33 @@ QPDFAcroFormDocumentHelper::validate(bool repair)
 void
 QPDFAcroFormDocumentHelper::invalidateCache()
 {
-    m->cache_valid = false;
-    m->field_to.clear();
-    m->annotation_to_field.clear();
+    m->invalidateCache();
+}
+
+void
+AcroForm::invalidateCache()
+{
+    cache_valid_ = false;
+    fields_.clear();
+    annotation_to_field_.clear();
+    bad_fields_.clear();
+    name_to_fields_.clear();
 }
 
 bool
 QPDFAcroFormDocumentHelper::hasAcroForm()
 {
+    return m->hasAcroForm();
+}
+
+bool
+AcroForm::hasAcroForm()
+{
     return qpdf.getRoot().hasKey("/AcroForm");
 }
 
 QPDFObjectHandle
-QPDFAcroFormDocumentHelper::getOrCreateAcroForm()
+AcroForm::getOrCreateAcroForm()
 {
     auto acroform = qpdf.getRoot().getKey("/AcroForm");
     if (!acroform.isDictionary()) {
@@ -84,6 +87,12 @@ QPDFAcroFormDocumentHelper::getOrCreateAcroForm()
 void
 QPDFAcroFormDocumentHelper::addFormField(QPDFFormFieldObjectHelper ff)
 {
+    m->addFormField(ff);
+}
+
+void
+AcroForm::addFormField(QPDFFormFieldObjectHelper ff)
+{
     auto acroform = getOrCreateAcroForm();
     auto fields = acroform.getKey("/Fields");
     if (!fields.isArray()) {
@@ -95,6 +104,12 @@ QPDFAcroFormDocumentHelper::addFormField(QPDFFormFieldObjectHelper ff)
 
 void
 QPDFAcroFormDocumentHelper::addAndRenameFormFields(std::vector<QPDFObjectHandle> fields)
+{
+    m->addAndRenameFormFields(fields);
+}
+
+void
+AcroForm::addAndRenameFormFields(std::vector<QPDFObjectHandle> fields)
 {
     analyze();
     std::map<std::string, std::string> renames;
@@ -147,6 +162,12 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(std::vector<QPDFObjectHandle>
 void
 QPDFAcroFormDocumentHelper::removeFormFields(std::set<QPDFObjGen> const& to_remove)
 {
+    m->removeFormFields(to_remove);
+}
+
+void
+AcroForm::removeFormFields(std::set<QPDFObjGen> const& to_remove)
+{
     auto acroform = qpdf.getRoot().getKey("/AcroForm");
     if (!acroform.isDictionary()) {
         return;
@@ -157,19 +178,19 @@ QPDFAcroFormDocumentHelper::removeFormFields(std::set<QPDFObjGen> const& to_remo
     }
 
     for (auto const& og: to_remove) {
-        auto it = m->field_to.find(og);
-        if (it != m->field_to.end()) {
+        auto it = fields_.find(og);
+        if (it != fields_.end()) {
             for (auto aoh: it->second.annotations) {
-                m->annotation_to_field.erase(aoh.getObjectHandle().getObjGen());
+                annotation_to_field_.erase(aoh.getObjectHandle().getObjGen());
             }
             auto const& name = it->second.name;
             if (!name.empty()) {
-                m->name_to_fields[name].erase(og);
-                if (m->name_to_fields[name].empty()) {
-                    m->name_to_fields.erase(name);
+                name_to_fields_[name].erase(og);
+                if (name_to_fields_[name].empty()) {
+                    name_to_fields_.erase(name);
                 }
             }
-            m->field_to.erase(og);
+            fields_.erase(og);
         }
     }
 
@@ -187,6 +208,12 @@ QPDFAcroFormDocumentHelper::removeFormFields(std::set<QPDFObjGen> const& to_remo
 void
 QPDFAcroFormDocumentHelper::setFormFieldName(QPDFFormFieldObjectHelper ff, std::string const& name)
 {
+    m->setFormFieldName(ff, name);
+}
+
+void
+AcroForm::setFormFieldName(QPDFFormFieldObjectHelper ff, std::string const& name)
+{
     ff.setFieldAttribute("/T", name);
     traverseField(ff, ff["/Parent"], 0);
 }
@@ -194,9 +221,15 @@ QPDFAcroFormDocumentHelper::setFormFieldName(QPDFFormFieldObjectHelper ff, std::
 std::vector<QPDFFormFieldObjectHelper>
 QPDFAcroFormDocumentHelper::getFormFields()
 {
+    return m->getFormFields();
+}
+
+std::vector<QPDFFormFieldObjectHelper>
+AcroForm::getFormFields()
+{
     analyze();
     std::vector<QPDFFormFieldObjectHelper> result;
-    for (auto const& [og, data]: m->field_to) {
+    for (auto const& [og, data]: fields_) {
         if (!data.annotations.empty()) {
             result.emplace_back(qpdf.getObject(og));
         }
@@ -207,10 +240,16 @@ QPDFAcroFormDocumentHelper::getFormFields()
 std::set<QPDFObjGen>
 QPDFAcroFormDocumentHelper::getFieldsWithQualifiedName(std::string const& name)
 {
+    return m->getFieldsWithQualifiedName(name);
+}
+
+std::set<QPDFObjGen>
+AcroForm::getFieldsWithQualifiedName(std::string const& name)
+{
     analyze();
     // Keep from creating an empty entry
-    auto iter = m->name_to_fields.find(name);
-    if (iter != m->name_to_fields.end()) {
+    auto iter = name_to_fields_.find(name);
+    if (iter != name_to_fields_.end()) {
         return iter->second;
     }
     return {};
@@ -219,11 +258,17 @@ QPDFAcroFormDocumentHelper::getFieldsWithQualifiedName(std::string const& name)
 std::vector<QPDFAnnotationObjectHelper>
 QPDFAcroFormDocumentHelper::getAnnotationsForField(QPDFFormFieldObjectHelper h)
 {
+    return m->getAnnotationsForField(h);
+}
+
+std::vector<QPDFAnnotationObjectHelper>
+AcroForm::getAnnotationsForField(QPDFFormFieldObjectHelper h)
+{
     analyze();
     std::vector<QPDFAnnotationObjectHelper> result;
     QPDFObjGen og(h.getObjectHandle().getObjGen());
-    if (m->field_to.contains(og)) {
-        result = m->field_to[og].annotations;
+    if (fields_.contains(og)) {
+        result = fields_[og].annotations;
     }
     return result;
 }
@@ -231,11 +276,23 @@ QPDFAcroFormDocumentHelper::getAnnotationsForField(QPDFFormFieldObjectHelper h)
 std::vector<QPDFAnnotationObjectHelper>
 QPDFAcroFormDocumentHelper::getWidgetAnnotationsForPage(QPDFPageObjectHelper h)
 {
+    return m->getWidgetAnnotationsForPage(h);
+}
+
+std::vector<QPDFAnnotationObjectHelper>
+AcroForm::getWidgetAnnotationsForPage(QPDFPageObjectHelper h)
+{
     return h.getAnnotations("/Widget");
 }
 
 std::vector<QPDFFormFieldObjectHelper>
 QPDFAcroFormDocumentHelper::getFormFieldsForPage(QPDFPageObjectHelper ph)
+{
+    return m->getFormFieldsForPage(ph);
+}
+
+std::vector<QPDFFormFieldObjectHelper>
+AcroForm::getFormFieldsForPage(QPDFPageObjectHelper ph)
 {
     analyze();
     QPDFObjGen::set todo;
@@ -252,25 +309,31 @@ QPDFAcroFormDocumentHelper::getFormFieldsForPage(QPDFPageObjectHelper ph)
 QPDFFormFieldObjectHelper
 QPDFAcroFormDocumentHelper::getFieldForAnnotation(QPDFAnnotationObjectHelper h)
 {
+    return m->getFieldForAnnotation(h);
+}
+
+QPDFFormFieldObjectHelper
+AcroForm::getFieldForAnnotation(QPDFAnnotationObjectHelper h)
+{
     QPDFObjectHandle oh = h.getObjectHandle();
     if (!oh.isDictionaryOfType("", "/Widget")) {
         return Null::temp();
     }
     analyze();
     QPDFObjGen og(oh.getObjGen());
-    if (m->annotation_to_field.contains(og)) {
-        return m->annotation_to_field[og];
+    if (annotation_to_field_.contains(og)) {
+        return annotation_to_field_[og];
     }
     return Null::temp();
 }
 
 void
-QPDFAcroFormDocumentHelper::analyze()
+AcroForm::analyze()
 {
-    if (m->cache_valid) {
+    if (cache_valid_) {
         return;
     }
-    m->cache_valid = true;
+    cache_valid_ = true;
     QPDFObjectHandle acroform = qpdf.getRoot().getKey("/AcroForm");
     if (!(acroform.isDictionary() && acroform.hasKey("/Fields"))) {
         return;
@@ -293,11 +356,11 @@ QPDFAcroFormDocumentHelper::analyze()
     // a file that contains this kind of error will probably not
     // actually work with most viewers.
 
-    for (auto const& ph: QPDFPageDocumentHelper(qpdf).getAllPages()) {
+    for (QPDFPageObjectHelper ph: pages) {
         for (auto const& iter: getWidgetAnnotationsForPage(ph)) {
             QPDFObjectHandle annot(iter.getObjectHandle());
             QPDFObjGen og(annot.getObjGen());
-            if (!m->annotation_to_field.contains(og)) {
+            if (!annotation_to_field_.contains(og)) {
                 // This is not supposed to happen, but it's easy enough for us to handle this case.
                 // Treat the annotation as its own field. This could allow qpdf to sensibly handle a
                 // case such as a PDF creator adding a self-contained annotation (merged with the
@@ -306,16 +369,15 @@ QPDFAcroFormDocumentHelper::analyze()
                 annot.warn(
                     "this widget annotation is not reachable from /AcroForm in the document "
                     "catalog");
-                m->annotation_to_field[og] = QPDFFormFieldObjectHelper(annot);
-                m->field_to[og].annotations.emplace_back(annot);
+                annotation_to_field_[og] = QPDFFormFieldObjectHelper(annot);
+                fields_[og].annotations.emplace_back(annot);
             }
         }
     }
 }
 
 bool
-QPDFAcroFormDocumentHelper::traverseField(
-    QPDFObjectHandle field, QPDFObjectHandle const& parent, int depth)
+AcroForm::traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, int depth)
 {
     if (depth > 100) {
         // Arbitrarily cut off recursion at a fixed depth to avoid specially crafted files that
@@ -339,8 +401,7 @@ QPDFAcroFormDocumentHelper::traverseField(
         return false;
     }
     QPDFObjGen og(field.getObjGen());
-    if (m->field_to.contains(og) || m->annotation_to_field.contains(og) ||
-        m->bad_fields.contains(og)) {
+    if (fields_.contains(og) || annotation_to_field_.contains(og) || bad_fields_.contains(og)) {
         field.warn("loop detected while traversing /AcroForm");
         return false;
     }
@@ -368,8 +429,8 @@ QPDFAcroFormDocumentHelper::traverseField(
 
     if (is_annotation) {
         QPDFObjectHandle our_field = (is_field ? field : parent);
-        m->field_to[our_field.getObjGen()].annotations.emplace_back(field);
-        m->annotation_to_field[og] = QPDFFormFieldObjectHelper(our_field);
+        fields_[our_field.getObjGen()].annotations.emplace_back(field);
+        annotation_to_field_[og] = QPDFFormFieldObjectHelper(our_field);
     }
 
     if (is_field && depth != 0 && field["/Parent"] != parent) {
@@ -392,22 +453,22 @@ QPDFAcroFormDocumentHelper::traverseField(
     if (is_field && field.hasKey("/T")) {
         QPDFFormFieldObjectHelper foh(field);
         std::string name = foh.getFullyQualifiedName();
-        auto old = m->field_to.find(og);
-        if (old != m->field_to.end() && !old->second.name.empty()) {
+        auto old = fields_.find(og);
+        if (old != fields_.end() && !old->second.name.empty()) {
             // We might be updating after a name change, so remove any old information
-            m->name_to_fields[old->second.name].erase(og);
+            name_to_fields_[old->second.name].erase(og);
         }
-        m->field_to[og].name = name;
-        m->name_to_fields[name].insert(og);
+        fields_[og].name = name;
+        name_to_fields_[name].insert(og);
     }
 
     for (auto const& kid: Kids) {
-        if (m->bad_fields.contains(kid)) {
+        if (bad_fields_.contains(kid)) {
             continue;
         }
 
         if (!traverseField(kid, field, 1 + depth)) {
-            m->bad_fields.insert(kid);
+            bad_fields_.insert(kid);
         }
     }
     return true;
@@ -415,6 +476,12 @@ QPDFAcroFormDocumentHelper::traverseField(
 
 bool
 QPDFAcroFormDocumentHelper::getNeedAppearances()
+{
+    return m->getNeedAppearances();
+}
+
+bool
+AcroForm::getNeedAppearances()
 {
     bool result = false;
     QPDFObjectHandle acroform = qpdf.getRoot().getKey("/AcroForm");
@@ -426,6 +493,12 @@ QPDFAcroFormDocumentHelper::getNeedAppearances()
 
 void
 QPDFAcroFormDocumentHelper::setNeedAppearances(bool val)
+{
+    m->setNeedAppearances(val);
+}
+
+void
+AcroForm::setNeedAppearances(bool val)
 {
     QPDFObjectHandle acroform = qpdf.getRoot().getKey("/AcroForm");
     if (!acroform.isDictionary()) {
@@ -443,6 +516,12 @@ QPDFAcroFormDocumentHelper::setNeedAppearances(bool val)
 
 void
 QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded()
+{
+    m->generateAppearancesIfNeeded();
+}
+
+void
+AcroForm::generateAppearancesIfNeeded()
 {
     if (!getNeedAppearances()) {
         return;
@@ -470,6 +549,12 @@ QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded()
 void
 QPDFAcroFormDocumentHelper::disableDigitalSignatures()
 {
+    m->disableDigitalSignatures();
+}
+
+void
+AcroForm::disableDigitalSignatures()
+{
     qpdf.removeSecurityRestrictions();
     std::set<QPDFObjGen> to_remove;
     auto fields = getFormFields();
@@ -491,7 +576,7 @@ QPDFAcroFormDocumentHelper::disableDigitalSignatures()
 }
 
 void
-QPDFAcroFormDocumentHelper::adjustInheritedFields(
+AcroForm::adjustInheritedFields(
     QPDFObjectHandle obj,
     bool override_da,
     std::string const& from_default_da,
@@ -598,7 +683,7 @@ ResourceReplacer::handleToken(QPDFTokenizer::Token const& token)
 }
 
 void
-QPDFAcroFormDocumentHelper::adjustDefaultAppearances(
+AcroForm::adjustDefaultAppearances(
     QPDFObjectHandle obj, std::map<std::string, std::map<std::string, std::string>> const& dr_map)
 {
     // This method is called on a field that has been copied from another file but whose /DA still
@@ -656,7 +741,7 @@ QPDFAcroFormDocumentHelper::adjustDefaultAppearances(
 }
 
 void
-QPDFAcroFormDocumentHelper::adjustAppearanceStream(
+AcroForm::adjustAppearanceStream(
     QPDFObjectHandle stream, std::map<std::string, std::map<std::string, std::string>> dr_map)
 {
     // We don't have to modify appearance streams or their resource dictionaries for them to display
@@ -748,7 +833,6 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     QPDF* from_qpdf,
     QPDFAcroFormDocumentHelper* from_afdh)
 {
-    Array old_annots = std::move(a_old_annots);
     if (!from_qpdf) {
         // Assume these are from the same QPDF.
         from_qpdf = &qpdf;
@@ -756,6 +840,23 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     } else if (from_qpdf != &qpdf && !from_afdh) {
         from_afdh = &QPDFAcroFormDocumentHelper::get(*from_qpdf);
     }
+    m->transformAnnotations(
+        a_old_annots, new_annots, new_fields, old_fields, cm, from_qpdf, from_afdh->m.get());
+}
+
+void
+AcroForm::transformAnnotations(
+    QPDFObjectHandle a_old_annots,
+    std::vector<QPDFObjectHandle>& new_annots,
+    std::vector<QPDFObjectHandle>& new_fields,
+    std::set<QPDFObjGen>& old_fields,
+    QPDFMatrix const& cm,
+    QPDF* from_qpdf,
+    AcroForm* from_afdh)
+{
+    qpdf_expect(from_qpdf);
+    qpdf_expect(from_afdh);
+    Array old_annots = std::move(a_old_annots);
     const bool foreign = from_qpdf != &qpdf;
 
     // It's possible that we will transform annotations that don't include any form fields. This
@@ -1056,6 +1157,16 @@ QPDFAcroFormDocumentHelper::fixCopiedAnnotations(
     QPDFAcroFormDocumentHelper& from_afdh,
     std::set<QPDFObjGen>* added_fields)
 {
+    m->fixCopiedAnnotations(to_page, from_page, *from_afdh.m, added_fields);
+}
+
+void
+AcroForm::fixCopiedAnnotations(
+    QPDFObjectHandle to_page,
+    QPDFObjectHandle from_page,
+    AcroForm& from_afdh,
+    std::set<QPDFObjGen>* added_fields)
+{
     auto old_annots = from_page.getKey("/Annots");
     if (old_annots.empty() || !old_annots.isArray()) {
         return;
@@ -1070,7 +1181,7 @@ QPDFAcroFormDocumentHelper::fixCopiedAnnotations(
         new_fields,
         old_fields,
         QPDFMatrix(),
-        &(from_afdh.getQPDF()),
+        &(from_afdh.qpdf),
         &from_afdh);
 
     to_page.replaceKey("/Annots", QPDFObjectHandle::newArray(new_annots));

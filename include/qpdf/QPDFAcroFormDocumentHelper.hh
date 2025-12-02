@@ -225,21 +225,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
         std::set<QPDFObjGen>* new_fields = nullptr);
 
   private:
-    void analyze();
-    bool traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, int depth);
-    QPDFObjectHandle getOrCreateAcroForm();
-    void adjustInheritedFields(
-        QPDFObjectHandle obj,
-        bool override_da,
-        std::string const& from_default_da,
-        bool override_q,
-        int from_default_q);
-    void adjustDefaultAppearances(
-        QPDFObjectHandle obj,
-        std::map<std::string, std::map<std::string, std::string>> const& dr_map);
-    void adjustAppearanceStream(
-        QPDFObjectHandle stream, std::map<std::string, std::map<std::string, std::string>> dr_map);
-
+    friend class QPDF::Doc;
     class Members;
 
     std::shared_ptr<Members> m;

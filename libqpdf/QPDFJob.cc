@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 
+#include <qpdf/AcroForm.hh>
 #include <qpdf/ClosedFileInputSource.hh>
 #include <qpdf/FileInputSource.hh>
 #include <qpdf/Pipeline_private.hh>
@@ -1866,7 +1867,7 @@ QPDFJob::doUnderOverlayForPage(
     if (!(uo.pdf && pagenos[pageno.idx].contains(uo_idx))) {
         return "";
     }
-    auto& dest_afdh = dest_page.qpdf()->doc().acroform();
+    auto& dest_afdh = dest_page.qpdf()->doc().acroform_dh();
 
     auto const& pages = uo.pdf->doc().pages().all();
     std::string content;
@@ -1887,7 +1888,8 @@ QPDFJob::doUnderOverlayForPage(
         QPDFMatrix cm;
         std::string new_content = dest_page.placeFormXObject(
             fo[from_no.no][uo_idx], name, dest_page.getTrimBox().getArrayAsRectangle(), cm);
-        dest_page.copyAnnotations(from_page, cm, &dest_afdh, &from_page.qpdf()->doc().acroform());
+        dest_page.copyAnnotations(
+            from_page, cm, &dest_afdh, &from_page.qpdf()->doc().acroform_dh());
         if (!new_content.empty()) {
             resources.mergeResources(Dictionary({{"/XObject", Dictionary::empty()}}));
             auto xobject = resources.getKey("/XObject");
@@ -2107,7 +2109,7 @@ QPDFJob::handleTransformations(QPDF& pdf)
     QPDFAcroFormDocumentHelper* afdh_ptr = nullptr;
     auto afdh = [&]() -> QPDFAcroFormDocumentHelper& {
         if (!afdh_ptr) {
-            afdh_ptr = &pdf.doc().acroform();
+            afdh_ptr = &pdf.doc().acroform_dh();
         }
         return *afdh_ptr;
     };
@@ -2978,8 +2980,7 @@ QPDFJob::doSplitPages(QPDF& pdf)
         QPDF outpdf;
         outpdf.doc().config(m->d_cfg);
         outpdf.emptyPDF();
-        QPDFAcroFormDocumentHelper* out_afdh =
-            afdh.hasAcroForm() ? &outpdf.doc().acroform() : nullptr;
+        impl::AcroForm* out_afdh = afdh.hasAcroForm() ? &outpdf.doc().acroform() : nullptr;
         for (size_t pageno = first; pageno <= last; ++pageno) {
             QPDFObjectHandle page = pages.at(pageno - 1);
             outpdf.addPage(page, false);
