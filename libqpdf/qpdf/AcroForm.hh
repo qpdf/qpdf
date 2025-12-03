@@ -356,6 +356,20 @@ namespace qpdf::impl
         {
         }
 
+        /// @brief Retrieves the /Kids array.
+        ///
+        /// This method returns the /Kids entry, which is an array of the immediate descendants of
+        /// this node. It is only present if the node is a form field rather than a pure widget
+        /// annotation.
+        ///
+        /// @return An `Array` object containing the /Kids elements. If the /Kids entry
+        ///         does not exist or is not a valid array, the returned `Array` will be invalid.
+        Array
+        Kids() const
+        {
+            return {get("/Kids")};
+        }
+
         /// Retrieves the /Parent form field of the current field.
         ///
         /// This function accesses the parent field in the hierarchical structure of form fields, if
