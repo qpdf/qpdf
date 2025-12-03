@@ -670,11 +670,15 @@ QPDF::getRoot()
     if (!Root) {
         throw m->c.damagedPDF("", -1, "unable to find /Root dictionary");
     }
-    // Check_mode is an interim solution to request #810 pending a more comprehensive review of the
-    // approach to more extensive checks and warning levels.
-    if (m->cf.check_mode() && Name(Root["/Type"]) != "/Catalog") {
-        warn(m->c.damagedPDF("", -1, "catalog /Type entry missing or invalid"));
-        Root.replace("/Type", Name("/Catalog"));
+    if (!m->objects.root_checked()) {
+        m->objects.root_checked(true);
+        if (Name(Root["/Type"]) != "/Catalog") {
+            warn(m->c.damagedPDF(
+                "", -1, "Catalog: setting missing or invalid /Type entry to /Catalog"));
+            if (!global::Options::inspection_mode()) {
+                Root.replace("/Type", Name("/Catalog"));
+            }
+        }
     }
     return Root.oh();
 }

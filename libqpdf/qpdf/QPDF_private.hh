@@ -1022,6 +1022,19 @@ class QPDF::Doc::Objects: Common
     {
         return uncompressed_after_compressed_;
     }
+
+    bool
+    root_checked() const
+    {
+        return root_checked_;
+    }
+
+    void
+    root_checked(bool val)
+    {
+        root_checked_ = val;
+    }
+
     void parse(char const* password);
     std::shared_ptr<QPDFObject> const& resolve(QPDFObjGen og);
     void inParse(bool);
@@ -1106,6 +1119,7 @@ class QPDF::Doc::Objects: Common
     // Linearization data
     qpdf_offset_t first_xref_item_offset_{0}; // actual value from file
     bool uncompressed_after_compressed_{false};
+    bool root_checked_{false};
 }; // class QPDF::Doc::Objects
 
 // This class is used to represent a PDF Pages tree.

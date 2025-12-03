@@ -1,6 +1,7 @@
 .. _ticket: https://issues.qpdf.org
 .. _shared null: https://wiki.qpdf.org/PDF-null-objects-vs-qpdf-null-objects
 
+
 .. _release-notes:
 
 Release Notes
@@ -17,7 +18,7 @@ more detail.
   - Release changes
 
     - Starting with version 12.3.0, we use
-      `cosign<https://docs.sigstore.dev/cosign/>__`, rather than GPG,
+      `cosign <https://docs.sigstore.dev/cosign/>`__, rather than GPG,
       to sign releases. See the top-level README.md for instructions.
       We will continue to use GPG for the 12.x series. Starting with
       qpdf version 13, only cosign will be used.
@@ -122,14 +123,8 @@ more detail.
       ``damaged_pdf`` error with message "unable to find /Root dictionary"
       rather than an internal error.
 
-.. _r12-3-0-deprecate:
-
-    - The following are believed to be not in use and have been deprecated.
-      If you are relying on them please open a ticket_.
-
-      - QPDF::compute_encryption_key
-      - All QPDF::EncryptionData methods. These methods are not exported in the
-        shared library and are only useable in statically linked programs.
+    - Invalid root object `/Type` entries are now unconditionally repaired [#inspect]_.
+      Previously they were only repaired if the :qpdf:ref:`--check` option was used.
 
     - Setting :qpdf:ref:`--compress-streams` to ``n`` or
       ``QPDFWriter::setCompressStreams(false)`` no longer automatically
@@ -140,6 +135,18 @@ more detail.
       for the common case where no user provided stream filters are
       registered by calling ``QPDF::registerStreamFilter``. If you are
       providing your own stream filters please open a ticket_.
+
+.. _r12-3-0-deprecate:
+
+    - The following are believed to be not in use and have been deprecated.
+      If you are relying on them please open a ticket_.
+
+      - QPDF::compute_encryption_key
+
+      - All QPDF::EncryptionData methods. These methods are not exported in the
+        shared library and are only useable in statically linked programs.
+
+.. [#inspect] not in :ref:`inspection-mode`
 
 12.2.0: May 4, 2025
   - Upcoming C++ Version Change
