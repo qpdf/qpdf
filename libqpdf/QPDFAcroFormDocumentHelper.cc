@@ -412,10 +412,9 @@ AcroForm::traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, 
     // fields can be merged with terminal field dictionaries. Otherwise, the annotation fields might
     // be there to be inherited by annotations below it.
 
-    Array Kids = field["/Kids"];
-    const bool is_field = depth == 0 || Kids || field.hasKey("/Parent");
-    const bool is_annotation =
-        !Kids && (field.hasKey("/Subtype") || field.hasKey("/Rect") || field.hasKey("/AP"));
+    FormNode node = field;
+    const bool is_field = depth == 0 || node.field();
+    const bool is_annotation = node.widget();
 
     QTC::TC("qpdf", "QPDFAcroFormDocumentHelper field found", (depth == 0) ? 0 : 1);
     QTC::TC("qpdf", "QPDFAcroFormDocumentHelper annotation found", (is_field ? 0 : 1));
@@ -428,8 +427,8 @@ AcroForm::traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, 
     }
 
     if (is_annotation) {
-        QPDFObjectHandle our_field = (is_field ? field : parent);
-        fields_[our_field.getObjGen()].annotations.emplace_back(field);
+        auto our_field = (is_field ? field : parent);
+        fields_[our_field].annotations.emplace_back(field);
         annotation_to_field_[og] = QPDFFormFieldObjectHelper(our_field);
     }
 
@@ -462,7 +461,7 @@ AcroForm::traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, 
         name_to_fields_[name].insert(og);
     }
 
-    for (auto const& kid: Kids) {
+    for (auto const& kid: node.Kids()) {
         if (bad_fields_.contains(kid)) {
             continue;
         }

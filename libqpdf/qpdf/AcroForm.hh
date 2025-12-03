@@ -644,6 +644,41 @@ namespace qpdf::impl
         ///         no value is found.
         std::string default_appearance() const;
 
+        /// @brief Determines whether the form node represents a field (does not apply to root
+        /// fields).
+        ///
+        /// This method checks if the current node represents a field by examining two conditions:
+        /// 1. The presence of children nodes (via the `/Kids` array).
+        /// 2. Whether it contains the `/Parent` key.
+        ///
+        /// @return `true` if the node represents a field (either has children or contains a
+        /// `/Parent` key), otherwise `false`.
+        bool
+        field() const
+        {
+            return Kids() || contains("/Parent");
+        }
+
+        /// @brief Determines if the form node represents a widget annotation.
+        ///
+        /// This method checks whether the current form node is a widget annotation
+        /// by verifying the following conditions:
+        ///
+        /// - The node does not have any /Kids entries (i.e., it is not a parent node with
+        /// descendants).
+        /// - The node contains any of the following attributes commonly associated with widget
+        /// annotations:
+        ///   - `/Subtype`
+        ///   - `/Rect`
+        ///   - `/AP`
+        ///
+        /// @return `true` if the form node is a widget annotation; otherwise, `false`.
+        bool
+        widget() const
+        {
+            return !Kids() && (contains("/Subtype") || contains("/Rect") || contains("/AP"));
+        }
+
         // Return the default resource dictionary for the field. This comes not from the field but
         // from the document-level /AcroForm dictionary. While several PDF generators put a /DR key
         // in the form field's dictionary, experimentation suggests that many popular readers,
