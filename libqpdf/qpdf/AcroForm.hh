@@ -644,19 +644,19 @@ namespace qpdf::impl
         ///         no value is found.
         std::string default_appearance() const;
 
-        /// @brief Determines whether the form node represents a field (does not apply to root
-        /// fields).
+        /// @brief Determines if the current node represents a valid form field node.
         ///
-        /// This method checks if the current node represents a field by examining two conditions:
-        /// 1. The presence of children nodes (via the `/Kids` array).
-        /// 2. Whether it contains the `/Parent` key.
+        /// This function evaluates whether the current node is valid by combining
+        /// checks for the node's partial name (/T attribute), its immediate descendants
+        /// (/Kids array), and its field type (/FT attribute). It ensures that at least
+        /// one of these properties exists or returns a valid value.
         ///
-        /// @return `true` if the node represents a field (either has children or contains a
-        /// `/Parent` key), otherwise `false`.
+        /// @return true if the form node contains a valid /T attribute, /Kids array,
+        ///         or /FT attribute; otherwise, false.
         bool
         field() const
         {
-            return Kids() || contains("/Parent");
+            return T() || Kids() || FT();
         }
 
         /// @brief Determines if the form node represents a widget annotation.

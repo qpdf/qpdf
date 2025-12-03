@@ -413,7 +413,7 @@ AcroForm::traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, 
     // be there to be inherited by annotations below it.
 
     FormNode node = field;
-    const bool is_field = depth == 0 || node.field();
+    const bool is_field = node.field();
     const bool is_annotation = node.widget();
 
     QTC::TC("qpdf", "QPDFAcroFormDocumentHelper field found", (depth == 0) ? 0 : 1);
