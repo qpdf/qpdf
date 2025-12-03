@@ -1,2 +1,3 @@
 WARNING: issue-120.pdf (xref stream, offset 712): self-referential object stream 3
+WARNING: issue-120.pdf: Catalog: setting missing or invalid /Type entry to /Catalog
 qpdf: issue-120.pdf: unable to find page tree

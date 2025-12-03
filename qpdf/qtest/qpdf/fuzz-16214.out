@@ -6,6 +6,7 @@ WARNING: fuzz-16214.pdf (xref stream, offset 116): Cross-reference stream data h
 WARNING: fuzz-16214.pdf: reported number of objects (6) is not one plus the highest object number (35)
 WARNING: fuzz-16214.pdf (object 14 0, offset 652): expected dictionary key but found non-name object; inserting key /QPDFFake1
 WARNING: fuzz-16214.pdf (object 14 0, offset 734): expected endobj
+WARNING: fuzz-16214.pdf: Catalog: setting missing or invalid /Type entry to /Catalog
 WARNING: fuzz-16214.pdf: file is damaged
 WARNING: fuzz-16214.pdf (object 1 0, offset 7189): expected n n obj
 WARNING: fuzz-16214.pdf: Attempting to reconstruct cross-reference table

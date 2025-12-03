@@ -3,4 +3,5 @@ WARNING: issue-51.pdf: reported number of objects (0) is not one plus the highes
 WARNING: issue-51.pdf (object 7 0, offset 500): treating bad indirect reference (0 0 R) as null
 WARNING: issue-51.pdf (object 7 0, offset 476): dictionary has duplicated key /0000; last occurrence overrides earlier ones
 WARNING: issue-51.pdf (object 7 0, offset 553): expected endobj
+WARNING: issue-51.pdf: Catalog: setting missing or invalid /Type entry to /Catalog
 issue-51.pdf: unable to find page tree
