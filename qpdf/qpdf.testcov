@@ -193,8 +193,6 @@ QPDFPageDocumentHelper non-widget annotation 0
 QPDFObjectHandle replace with copy 0
 QPDFAnnotationObjectHelper forbidden flags 0
 QPDFAnnotationObjectHelper missing required flags 0
-QPDFFormFieldObjectHelper set checkbox AS 0
-QPDFObjectHandle broken checkbox 0
 QPDFFormFieldObjectHelper list not found 0
 QPDFFormFieldObjectHelper list found 0
 QPDFFormFieldObjectHelper list first too low 0

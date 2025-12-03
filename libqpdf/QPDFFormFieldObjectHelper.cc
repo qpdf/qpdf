@@ -415,7 +415,13 @@ QPDFFormFieldObjectHelper::setFieldAttribute(std::string const& key, QPDFObjectH
 void
 FormNode::setFieldAttribute(std::string const& key, QPDFObjectHandle value)
 {
-    oh().replaceKey(key, value);
+    replace(key, value);
+}
+
+void
+FormNode::setFieldAttribute(std::string const& key, Name const& value)
+{
+    replace(key, value);
 }
 
 void
@@ -427,7 +433,7 @@ QPDFFormFieldObjectHelper::setFieldAttribute(std::string const& key, std::string
 void
 FormNode::setFieldAttribute(std::string const& key, std::string const& utf8_value)
 {
-    oh().replaceKey(key, QPDFObjectHandle::newUnicodeString(utf8_value));
+    replace(key, String::utf16(utf8_value));
 }
 
 void
@@ -517,13 +523,13 @@ FormNode::setRadioButtonValue(QPDFObjectHandle name)
     }
     setFieldAttribute("/V", name);
     for (FormNode kid: kids) {
-        QPDFObjectHandle AP = kid["/AP"];
+        auto ap = kid.AP();
         QPDFObjectHandle annot;
-        if (AP.null()) {
+        if (!ap) {
             // The widget may be below. If there is more than one, just find the first one.
-            for (auto const& grandkid: kid.Kids()) {
-                AP = grandkid.getKey("/AP");
-                if (!AP.null()) {
+            for (FormNode grandkid: kid.Kids()) {
+                ap = grandkid.AP();
+                if (ap) {
                     annot = grandkid;
                     break;
                 }
@@ -535,11 +541,10 @@ FormNode::setRadioButtonValue(QPDFObjectHandle name)
             warn("unable to set the value of this radio button");
             continue;
         }
-        if (AP.isDictionary() && AP.getKey("/N").isDictionary() &&
-            AP.getKey("/N").hasKey(name.getName())) {
-            annot.replaceKey("/AS", name);
+        if (ap["/N"].contains(name.getName())) {
+            annot.replace("/AS", name);
         } else {
-            annot.replaceKey("/AS", QPDFObjectHandle::newName("/Off"));
+            annot.replace("/AS", Name("/Off"));
         }
     }
 }
@@ -547,27 +552,26 @@ FormNode::setRadioButtonValue(QPDFObjectHandle name)
 void
 FormNode::setCheckBoxValue(bool value)
 {
-    QPDFObjectHandle AP = oh().getKey("/AP");
+    auto ap = AP();
     QPDFObjectHandle annot;
-    if (AP.null()) {
-        // The widget may be below. If there is more than one, just
-        // find the first one.
-        for (auto const& kid: Kids()) {
-            AP = kid.getKey("/AP");
-            if (!AP.null()) {
+    if (ap) {
+        annot = oh();
+    } else {
+        // The widget may be below. If there is more than one, just find the first one.
+        for (FormNode kid: Kids()) {
+            ap = kid.AP();
+            if (ap) {
                 annot = kid;
                 break;
             }
         }
-    } else {
-        annot = oh();
     }
     std::string on_value;
     if (value) {
         // Set the "on" value to the first value in the appearance stream's normal state dictionary
         // that isn't /Off. If not found, fall back to /Yes.
-        if (AP.isDictionary()) {
-            for (auto const& item: AP.getKey("/N").as_dictionary()) {
+        if (ap) {
+            for (auto const& item: Dictionary(ap["/N"])) {
                 if (item.first != "/Off") {
                     on_value = item.first;
                     break;
@@ -580,15 +584,13 @@ FormNode::setCheckBoxValue(bool value)
     }
 
     // Set /AS to the on value or /Off in addition to setting /V.
-    QPDFObjectHandle name = QPDFObjectHandle::newName(value ? on_value : "/Off");
+    auto name = Name(value ? on_value : "/Off");
     setFieldAttribute("/V", name);
     if (!annot) {
-        QTC::TC("qpdf", "QPDFObjectHandle broken checkbox");
         warn("unable to set the value of this checkbox");
         return;
     }
-    QTC::TC("qpdf", "QPDFFormFieldObjectHelper set checkbox AS");
-    annot.replaceKey("/AS", name);
+    annot.replace("/AS", name);
 }
 
 void
@@ -899,12 +901,11 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
              {"/Subtype", Name("/Form")}});
         AS = QPDFObjectHandle::newStream(oh().getOwningQPDF(), "/Tx BMC\nEMC\n");
         AS.replaceDict(dict);
-        Dictionary AP = aoh.getAppearanceDictionary();
-        if (!AP) {
-            aoh.getObjectHandle().replaceKey("/AP", Dictionary::empty());
-            AP = aoh.getAppearanceDictionary();
+        if (auto ap = AP()) {
+            ap.replace("/N", AS);
+        } else {
+            aoh.replace("/AP", Dictionary({{"/N", AS}}));
         }
-        AP.replace("/N", AS);
     }
     if (!AS.isStream()) {
         aoh.warn("unable to get normal appearance stream for update");

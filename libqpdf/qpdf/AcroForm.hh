@@ -356,18 +356,19 @@ namespace qpdf::impl
         {
         }
 
-        /// @brief Retrieves the /Kids array.
+        // Widget and annotation attributes
+
+        /// @brief Retrieves the /AP attribute of the form node as a Dictionary.
         ///
-        /// This method returns the /Kids entry, which is an array of the immediate descendants of
-        /// this node. It is only present if the node is a form field rather than a pure widget
-        /// annotation.
+        /// The /AP attribute, short for "appearance dictionary," defines how an annotation is
+        /// presented visually on a page. See section 12.5.5 of the PDF specification for more
+        /// details.
         ///
-        /// @return An `Array` object containing the /Kids elements. If the /Kids entry
-        ///         does not exist or is not a valid array, the returned `Array` will be invalid.
-        Array
-        Kids() const
+        /// @return A Dictionary containing the /AP attribute of the form node.
+        Dictionary
+        AP() const
         {
-            return {get("/Kids")};
+            return {get("/AP")};
         }
 
         /// Retrieves the /Parent form field of the current field.
@@ -382,6 +383,20 @@ namespace qpdf::impl
         Parent()
         {
             return {get("/Parent")};
+        }
+
+        /// @brief Retrieves the /Kids array.
+        ///
+        /// This method returns the /Kids entry, which is an array of the immediate descendants of
+        /// this node. It is only present if the node is a form field rather than a pure widget
+        /// annotation.
+        ///
+        /// @return An `Array` object containing the /Kids elements. If the /Kids entry
+        ///         does not exist or is not a valid array, the returned `Array` will be invalid.
+        Array
+        Kids() const
+        {
+            return {get("/Kids")};
         }
 
         /// @brief Returns the top-level field associated with the current field.
@@ -670,6 +685,7 @@ namespace qpdf::impl
         // want to set the name of a field, use QPDFAcroFormDocumentHelper::setFormFieldName
         // instead.
         void setFieldAttribute(std::string const& key, QPDFObjectHandle value);
+        void setFieldAttribute(std::string const& key, Name const& value);
 
         // Set an attribute to the given value as a Unicode string (UTF-16 BE encoded). The input
         // string should be UTF-8 encoded. If you have a QPDFAcroFormDocumentHelper and you want to
