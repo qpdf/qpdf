@@ -26,7 +26,7 @@ cosign verify-blob qpdf-x.y.z.sha256 --bundle qpdf-x.y.z.sha256.sigstore \
 The identity `signer-identity@qpdf.org` should be replaced with the name of the person who signed the release. This will be indicated in the release notes. Valid signers are
 
 * Jay Berkenbilt <ejb@ql.org>
-* Manfred Holger <manfred.holger@qpdf.org>
+* Manfred Holger <m.holger@qpdf.org>
 
 qpdf versions prior to version 13 were also signed using Jay Berkenbilt's GPG key, which has fingerprint `C2C9 6B10 011F E009 E6D1  DF82 8A75 D109 9801 2C7E` and can be found at https://q.ql.org/pubkey.asc or downloaded from a public key server. Starting with qpdf 13, releases are signed only using cosign.
 
