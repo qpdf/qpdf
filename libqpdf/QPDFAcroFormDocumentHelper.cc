@@ -955,8 +955,8 @@ AcroForm::transformAnnotations(
     auto traverse_field = [&](QPDFObjectHandle& top_field) -> void {
         std::deque<Dictionary> queue({top_field});
         QPDFObjGen::set seen;
-        for (auto it = queue.begin(); it != queue.end(); ++it) {
-            auto& obj = *it;
+        for (; !queue.empty(); queue.pop_front()) {
+            auto& obj = queue.front();
             if (seen.add(obj)) {
                 Dictionary parent = obj["/Parent"];
                 if (parent.indirect()) {
