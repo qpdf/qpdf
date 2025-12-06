@@ -2385,7 +2385,7 @@ impl::Writer::doWriteSetup()
         }
 
         if (cfg.linearize() || encryption) {
-            // The document catalog is not allowed to be compressed in cfg.linearized_ files either.
+            // The document catalog is not allowed to be compressed in linearized files either.
             // It also appears that Adobe Reader 8.0.0 has a bug that prevents it from being able to
             // handle encrypted files with compressed document catalogs, so we disable them in that
             // case as well.
@@ -2859,16 +2859,17 @@ impl::Writer::writeLinearized()
     }
     next_objid = part6_first_obj;
     enqueuePart(part6);
-    if (next_objid != after_part6) {
-        throw std::runtime_error("error encountered after writing part 6 of linearized data");
-    }
+    util::no_ci_rt_error_if(
+        next_objid != after_part6, "error encountered after writing part 6 of linearized data" //
+    );
     next_objid = second_half_first_obj;
     enqueuePart(part7);
     enqueuePart(part8);
     enqueuePart(part9);
-    if (next_objid != after_second_half) {
-        throw std::runtime_error("error encountered after writing part 9 of cfg.linearized_ data");
-    }
+    util::no_ci_rt_error_if(
+        next_objid != after_second_half,
+        "error encountered after writing part 9 of linearized data" //
+    );
 
     qpdf_offset_t hint_length = 0;
     std::string hint_buffer;

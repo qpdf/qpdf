@@ -356,7 +356,7 @@ main(int argc, char* argv[])
     try {
         int n = QUtil::string_to_int(argv[1]);
         char const* filename1 = argv[2];
-        char const* arg2 = argv[3];
+        char const* arg2 = (argc >= 4) ? argv[3] : "";
         runtest(n, filename1, arg2);
     } catch (std::exception& e) {
         std::cerr << e.what() << '\n';

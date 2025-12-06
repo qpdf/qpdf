@@ -1,4 +1,3 @@
-
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFStreamFilter.hh>

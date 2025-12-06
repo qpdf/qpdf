@@ -203,7 +203,7 @@ Objects::findHeader()
 }
 
 bool
-Objects ::findStartxref()
+Objects::findStartxref()
 {
     if (readToken(*m->file).isWord("startxref") && readToken(*m->file).isInteger()) {
         // Position in front of offset token
@@ -1412,7 +1412,7 @@ Objects::validateStreamLineEnd(QPDFObjectHandle& object, QPDFObjGen og, qpdf_off
 }
 
 bool
-Objects ::findEndstream()
+Objects::findEndstream()
 {
     // Find endstream or endobj. Position the input at that token.
     auto t = readToken(*m->file, 20);
