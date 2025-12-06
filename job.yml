@@ -145,6 +145,7 @@ options:
       - qdf
       - raw-stream-data
       - recompress-flate
+      - remove-acroform
       - remove-info
       - remove-metadata
       - remove-page-labels
@@ -468,6 +469,7 @@ json:
     - Pages.file:
       Pages.password:
       range:
+  remove-acroform:
   remove-info:
   remove-metadata:
   remove-page-labels:

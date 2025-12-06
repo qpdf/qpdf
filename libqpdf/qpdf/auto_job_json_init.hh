@@ -436,6 +436,9 @@ addParameter([this](std::string const& p) { c_pages->range(p); });
 popHandler(); // key: range
 popHandler(); // array: .pages[]
 popHandler(); // key: pages
+pushKey("removeAcroform");
+addBare([this]() { c_main->removeAcroform(); });
+popHandler(); // key: removeAcroform
 pushKey("removeInfo");
 addBare([this]() { c_main->removeInfo(); });
 popHandler(); // key: removeInfo

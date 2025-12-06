@@ -250,6 +250,7 @@ class QPDFJob::Members
     bool optimize_images{false};
     bool externalize_inline_images{false};
     bool keep_inline_images{false};
+    bool remove_acroform{false};
     bool remove_info{false};
     bool remove_metadata{false};
     bool remove_page_labels{false};

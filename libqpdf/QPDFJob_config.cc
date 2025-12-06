@@ -563,6 +563,13 @@ QPDFJob::Config::removeAttachment(std::string const& parameter)
 }
 
 QPDFJob::Config*
+QPDFJob::Config::removeAcroform()
+{
+    o.m->remove_acroform = true;
+    return this;
+}
+
+QPDFJob::Config*
 QPDFJob::Config::removeInfo()
 {
     o.m->remove_info = true;

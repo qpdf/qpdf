@@ -154,6 +154,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
       "range": "page range"
     }
   ],
+  "removeAcroform": "remove the interactive form dictionary",
   "removeInfo": "remove file information",
   "removeMetadata": "remove metadata",
   "removePageLabels": "remove explicit page numbers",

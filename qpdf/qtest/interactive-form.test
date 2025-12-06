@@ -26,7 +26,7 @@ my @form_tests = (
     'form-document-defaults',
     );
 
-my $n_tests = scalar(@form_tests) + 6;
+my $n_tests = scalar(@form_tests) + 8;
 
 # Many of the form*.pdf files were created by converting the
 # LibreOffice document storage/form.odt to PDF and then manually
@@ -69,6 +69,14 @@ $td->runtest("broken button fields",
 $td->runtest("compare files",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "button-set-broken-out.pdf"});
+
+$td->runtest("remove-acroform",
+             {$td->COMMAND => "qpdf form-filled-with-atril.pdf --qdf --static-id --remove-acroform a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "remove-acroform-out.pdf"});
 
 cleanup();
 $td->report($n_tests);

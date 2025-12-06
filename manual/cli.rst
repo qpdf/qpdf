@@ -1641,6 +1641,14 @@ Related Options
    appearances with some limitations. See the
    :qpdf:ref:`--generate-appearances` option for details.
 
+   In some damaged files with interactive form fields the form fields
+   in the document's AcroForm structure may be out-of-sync with the
+   corresponding widget annotations on the page. In this case, some
+   viewers may after flattening show some field values twice with
+   a slight offset. In this situation it may help to remove the
+   AcroForm entry in the document catalog using the
+   :qpdf:ref:`--remove-acroform` option after flattening.
+
 .. qpdf:option:: --rotate=[+|-]angle[:page-range]
 
    .. help: rotate pages
@@ -1809,6 +1817,30 @@ Related Options
 
    Prevent inline images from being included in image optimization
    done by :qpdf:ref:`--optimize-images`.
+
+.. qpdf:option:: --remove-acroform
+
+   .. help: remove the interactive form dictionary
+
+      Exclude the interactive form dictionary from the output file. This
+      option only removes the interactive form dictionary from the
+      document catalog. It does not remove form field dictionaries or
+      widget annotations. See the manual for more detail.
+
+Exclude the interactive form dictionary from the output file. This
+option only removes the interactive form dictionary from the
+document catalog. It does not remove form field dictionaries or the
+associated widget annotations.
+
+In some damaged files with interactive form fields the form fields
+in the document's AcroForm structure may be out-of-sync with the
+corresponding widget annotations on the page. In this case,
+different viewers may display different field values, and after flattening
+annotations with the :qpdf:ref:`--flatten-annotations` option,
+some viewers may show some field values twice with
+a slight offset. In this situation it may help to remove the
+AcroForm entry in the document catalog using this option. **Users should
+check the output file carefully after using this option**.
 
 .. qpdf:option:: --remove-info
 
