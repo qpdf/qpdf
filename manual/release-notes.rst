@@ -25,18 +25,20 @@ more detail.
 
   - Build changes
 
-    - A C++-20 compiler is now required.
+    - A C++20 compiler is now required to build or test qpdf. All public
+      header files remain C++17 compatible.
 
     - The AppImage and Linux standalone binary distributions are now
-      built with Ubuntu 22.04 to support C++-20, which means they will
+      built with Ubuntu 22.04 to support C++20, which means they will
       not work on some older Linux distributions. If you need support
       for an older distribution, please use version 12.2.0 or below.
 
   - Bug fixes
 
-    - Set ``is_different`` flag in ``QPDFFormFieldObjectHelper::getTopLevelField`` to
-      false if the field is a top-level field. Previously the flag was only set
-      if the field is a top-level field.
+    - Always set the ``is_different`` flag in
+      ``QPDFFormFieldObjectHelper::getTopLevelField``. Previously the
+      flag was only set to true if the field is not a top-level field,
+      and remained unchanged otherwise.
 
   - Library Enhancements
 
@@ -107,6 +109,13 @@ more detail.
 
   - Other changes
 
+    - There has been significant internal refactoring affecting most parts of
+      qpdf's code base.
+
+    - When flattening widget annotations further checks have been added to detect
+      when qpdf cannot reliably generate the necessary appearance streams. As in
+      other such cases a warning is issued and the annotation remains unflattened.
+
     - By default, streams with more than 25 filters are now treated as unfilterable.
       A large number of filters typically occur in damaged or specially constructed
       files and can cause excessive use of resources and/or stack overflows. The
@@ -152,7 +161,7 @@ more detail.
   - Upcoming C++ Version Change
 
     - This is expected to be the last minor release of qpdf to work
-      with C++-17. We will be switching to C++-20 for 12.3.0.
+      with C++17. We will be switching to C++20 for 12.3.0.
 
   - Bug fixes
 
