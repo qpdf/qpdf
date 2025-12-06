@@ -114,16 +114,16 @@ class QPDFParser
 
     QPDFObjectHandle parse(bool content_stream = false);
     QPDFObjectHandle parse_first(bool content_stream);
-    QPDFObjectHandle parseRemainder(bool content_stream);
+    QPDFObjectHandle parse_remainder(bool content_stream);
     void add(std::shared_ptr<QPDFObject>&& obj);
-    void addNull();
+    void add_null();
     void add_bad_null(std::string const& msg);
-    void addInt(int count);
+    void add_int(int count);
     template <typename T, typename... Args>
-    void addScalar(Args&&... args);
+    void add_scalar(Args&&... args);
     void check_too_many_bad_tokens();
-    void warnDuplicateKey();
-    void fixMissingKeys();
+    void warn_duplicate_key();
+    void fix_missing_keys();
     [[noreturn]] void limits_error(std::string const& limit, std::string const& msg);
     void warn(qpdf_offset_t offset, std::string const& msg) const;
     void warn(std::string const& msg) const;
@@ -131,8 +131,8 @@ class QPDFParser
     template <typename T, typename... Args>
     // Create a new scalar object complete with parsed offset and description.
     // NB the offset includes any leading whitespace.
-    QPDFObjectHandle withDescription(Args&&... args);
-    void setDescription(std::shared_ptr<QPDFObject>& obj, qpdf_offset_t parsed_offset);
+    QPDFObjectHandle with_description(Args&&... args);
+    void set_description(std::shared_ptr<QPDFObject>& obj, qpdf_offset_t parsed_offset);
     InputSource& input_;
     std::string const& object_description_;
     qpdf::Tokenizer& tokenizer_;

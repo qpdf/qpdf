@@ -224,28 +224,28 @@ QPDFParser::parse_first(bool content_stream)
             input_,
             (tokenizer_.getType() == QPDFTokenizer::tt_array_open) ? st_array : st_dictionary_key);
         frame_ = &stack_.back();
-        return parseRemainder(content_stream);
+        return parse_remainder(content_stream);
 
     case QPDFTokenizer::tt_bool:
-        return withDescription<QPDF_Bool>(tokenizer_.getValue() == "true");
+        return with_description<QPDF_Bool>(tokenizer_.getValue() == "true");
 
     case QPDFTokenizer::tt_null:
         return {QPDFObject::create<QPDF_Null>()};
 
     case QPDFTokenizer::tt_integer:
-        return withDescription<QPDF_Integer>(QUtil::string_to_ll(tokenizer_.getValue().c_str()));
+        return with_description<QPDF_Integer>(QUtil::string_to_ll(tokenizer_.getValue().c_str()));
 
     case QPDFTokenizer::tt_real:
-        return withDescription<QPDF_Real>(tokenizer_.getValue());
+        return with_description<QPDF_Real>(tokenizer_.getValue());
 
     case QPDFTokenizer::tt_name:
-        return withDescription<QPDF_Name>(tokenizer_.getValue());
+        return with_description<QPDF_Name>(tokenizer_.getValue());
 
     case QPDFTokenizer::tt_word:
         {
             auto const& value = tokenizer_.getValue();
             if (content_stream) {
-                return withDescription<QPDF_Operator>(value);
+                return with_description<QPDF_Operator>(value);
             } else if (value == "endobj") {
                 // We just saw endobj without having read anything. Nothing in the PDF spec appears
                 // to allow empty objects, but they have been encountered in actual PDF files and
@@ -259,7 +259,7 @@ QPDFParser::parse_first(bool content_stream)
                 return {};
             } else {
                 warn("unknown token while reading object; treating as string");
-                return withDescription<QPDF_String>(value);
+                return with_description<QPDF_String>(value);
             }
         }
 
@@ -267,9 +267,9 @@ QPDFParser::parse_first(bool content_stream)
         if (decrypter_) {
             std::string s{tokenizer_.getValue()};
             decrypter_->decryptString(s);
-            return withDescription<QPDF_String>(s);
+            return with_description<QPDF_String>(s);
         } else {
-            return withDescription<QPDF_String>(tokenizer_.getValue());
+            return with_description<QPDF_String>(tokenizer_.getValue());
         }
 
     default:
@@ -279,7 +279,7 @@ QPDFParser::parse_first(bool content_stream)
 }
 
 QPDFObjectHandle
-QPDFParser::parseRemainder(bool content_stream)
+QPDFParser::parse_remainder(bool content_stream)
 {
     // This method must take care not to resolve any objects. Don't check the type of any object
     // without first ensuring that it is a direct object. Otherwise, doing so may have the side
@@ -301,7 +301,7 @@ QPDFParser::parseRemainder(bool content_stream)
             if (tokenizer_.getType() == QPDFTokenizer::tt_integer) {
                 if (++int_count_ > 2) {
                     // Process the oldest buffered integer.
-                    addInt(int_count_);
+                    add_int(int_count_);
                 }
                 last_offset_buffer_[int_count_ % 2] = input_.getLastOffset();
                 int_buffer_[int_count_ % 2] = QUtil::string_to_ll(tokenizer_.getValue().c_str());
@@ -330,9 +330,9 @@ QPDFParser::parseRemainder(bool content_stream)
             } else if (int_count_ > 0) {
                 // Process the buffered integers before processing the current token.
                 if (int_count_ > 1) {
-                    addInt(int_count_ - 1);
+                    add_int(int_count_ - 1);
                 }
-                addInt(int_count_);
+                add_int(int_count_);
                 int_count_ = 0;
             }
         }
@@ -349,7 +349,7 @@ QPDFParser::parseRemainder(bool content_stream)
 
         case QPDFTokenizer::tt_bad:
             check_too_many_bad_tokens();
-            addNull();
+            add_null();
             continue;
 
         case QPDFTokenizer::tt_brace_open:
@@ -362,7 +362,7 @@ QPDFParser::parseRemainder(bool content_stream)
                 auto object = frame_->null_count > 100
                     ? QPDFObject::create<QPDF_Array>(std::move(frame_->olist), true)
                     : QPDFObject::create<QPDF_Array>(std::move(frame_->olist));
-                setDescription(object, frame_->offset - 1);
+                set_description(object, frame_->offset - 1);
                 // The `offset` points to the next of "[".  Set the rewind offset to point to the
                 // beginning of "[". This has been explicitly tested with whitespace surrounding the
                 // array start delimiter. getLastOffset points to the array end token and therefore
@@ -401,7 +401,7 @@ QPDFParser::parseRemainder(bool content_stream)
                             frame_->offset,
                             "expected dictionary keys but found non-name objects; ignoring");
                     } else {
-                        fixMissingKeys();
+                        fix_missing_keys();
                     }
                 }
 
@@ -412,7 +412,7 @@ QPDFParser::parseRemainder(bool content_stream)
                     dict["/Contents"].setParsedOffset(frame_->contents_offset);
                 }
                 auto object = QPDFObject::create<QPDF_Dictionary>(std::move(dict));
-                setDescription(object, frame_->offset - 2);
+                set_description(object, frame_->offset - 2);
                 // The `offset` points to the next of "<<". Set the rewind offset to point to the
                 // beginning of "<<". This has been explicitly tested with whitespace surrounding
                 // the dictionary start delimiter. getLastOffset points to the dictionary end token
@@ -449,11 +449,11 @@ QPDFParser::parseRemainder(bool content_stream)
             continue;
 
         case QPDFTokenizer::tt_bool:
-            addScalar<QPDF_Bool>(tokenizer_.getValue() == "true");
+            add_scalar<QPDF_Bool>(tokenizer_.getValue() == "true");
             continue;
 
         case QPDFTokenizer::tt_null:
-            addNull();
+            add_null();
             continue;
 
         case QPDFTokenizer::tt_integer:
@@ -463,12 +463,12 @@ QPDFParser::parseRemainder(bool content_stream)
                 int_buffer_[1] = QUtil::string_to_ll(tokenizer_.getValue().c_str());
                 int_count_ = 1;
             } else {
-                addScalar<QPDF_Integer>(QUtil::string_to_ll(tokenizer_.getValue().c_str()));
+                add_scalar<QPDF_Integer>(QUtil::string_to_ll(tokenizer_.getValue().c_str()));
             }
             continue;
 
         case QPDFTokenizer::tt_real:
-            addScalar<QPDF_Real>(tokenizer_.getValue());
+            add_scalar<QPDF_Real>(tokenizer_.getValue());
             continue;
 
         case QPDFTokenizer::tt_name:
@@ -478,13 +478,13 @@ QPDFParser::parseRemainder(bool content_stream)
                 b_contents = decrypter_ && frame_->key == "/Contents";
                 continue;
             } else {
-                addScalar<QPDF_Name>(tokenizer_.getValue());
+                add_scalar<QPDF_Name>(tokenizer_.getValue());
             }
             continue;
 
         case QPDFTokenizer::tt_word:
             if (content_stream) {
-                addScalar<QPDF_Operator>(tokenizer_.getValue());
+                add_scalar<QPDF_Operator>(tokenizer_.getValue());
                 continue;
             }
 
@@ -504,7 +504,7 @@ QPDFParser::parseRemainder(bool content_stream)
 
             warn("unknown token while reading object; treating as string");
             check_too_many_bad_tokens();
-            addScalar<QPDF_String>(tokenizer_.getValue());
+            add_scalar<QPDF_String>(tokenizer_.getValue());
 
             continue;
 
@@ -519,9 +519,9 @@ QPDFParser::parseRemainder(bool content_stream)
                     }
                     std::string s{val};
                     decrypter_->decryptString(s);
-                    addScalar<QPDF_String>(s);
+                    add_scalar<QPDF_String>(s);
                 } else {
-                    addScalar<QPDF_String>(val);
+                    add_scalar<QPDF_String>(val);
                 }
             }
             continue;
@@ -541,14 +541,14 @@ QPDFParser::add(std::shared_ptr<QPDFObject>&& obj)
         frame_->olist.emplace_back(std::move(obj));
     } else {
         if (auto res = frame_->dict.insert_or_assign(frame_->key, std::move(obj)); !res.second) {
-            warnDuplicateKey();
+            warn_duplicate_key();
         }
         frame_->state = st_dictionary_key;
     }
 }
 
 void
-QPDFParser::addNull()
+QPDFParser::add_null()
 {
     const static ObjectPtr null_obj = QPDFObject::create<QPDF_Null>();
 
@@ -558,7 +558,7 @@ QPDFParser::addNull()
         frame_->olist.emplace_back(null_obj);
     } else {
         if (auto res = frame_->dict.insert_or_assign(frame_->key, null_obj); !res.second) {
-            warnDuplicateKey();
+            warn_duplicate_key();
         }
         frame_->state = st_dictionary_key;
     }
@@ -570,11 +570,11 @@ QPDFParser::add_bad_null(std::string const& msg)
 {
     warn(msg);
     check_too_many_bad_tokens();
-    addNull();
+    add_null();
 }
 
 void
-QPDFParser::addInt(int count)
+QPDFParser::add_int(int count)
 {
     auto obj = QPDFObject::create<QPDF_Integer>(int_buffer_[count % 2]);
     obj->setDescription(context_, description_, last_offset_buffer_[count % 2]);
@@ -583,7 +583,7 @@ QPDFParser::addInt(int count)
 
 template <typename T, typename... Args>
 void
-QPDFParser::addScalar(Args&&... args)
+QPDFParser::add_scalar(Args&&... args)
 {
     auto limit = Limits::parser_max_container_size(bad_count_ || sanity_checks_);
     if (frame_->olist.size() >= limit || frame_->dict.size() >= limit) {
@@ -599,7 +599,7 @@ QPDFParser::addScalar(Args&&... args)
 
 template <typename T, typename... Args>
 QPDFObjectHandle
-QPDFParser::withDescription(Args&&... args)
+QPDFParser::with_description(Args&&... args)
 {
     auto obj = QPDFObject::create<T>(std::forward<Args>(args)...);
     obj->setDescription(context_, description_, start_);
@@ -607,7 +607,7 @@ QPDFParser::withDescription(Args&&... args)
 }
 
 void
-QPDFParser::setDescription(ObjectPtr& obj, qpdf_offset_t parsed_offset)
+QPDFParser::set_description(ObjectPtr& obj, qpdf_offset_t parsed_offset)
 {
     if (obj) {
         obj->setDescription(context_, description_, parsed_offset);
@@ -615,7 +615,7 @@ QPDFParser::setDescription(ObjectPtr& obj, qpdf_offset_t parsed_offset)
 }
 
 void
-QPDFParser::fixMissingKeys()
+QPDFParser::fix_missing_keys()
 {
     std::set<std::string> names;
     for (auto& obj: frame_->olist) {
@@ -697,7 +697,7 @@ QPDFParser::warn(QPDFExc const& e) const
 }
 
 void
-QPDFParser::warnDuplicateKey()
+QPDFParser::warn_duplicate_key()
 {
     warn(
         frame_->offset,
