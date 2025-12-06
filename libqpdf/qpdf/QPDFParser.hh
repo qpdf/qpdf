@@ -77,16 +77,16 @@ class QPDFParser
         int stream_id = 0,
         int obj_id = 0,
         bool sanity_checks = false) :
-        input(input),
-        object_description(object_description),
-        tokenizer(tokenizer),
-        decrypter(decrypter),
-        context(context),
-        description(std::move(sp_description)),
-        parse_pdf(parse_pdf),
-        stream_id(stream_id),
-        obj_id(obj_id),
-        sanity_checks(sanity_checks)
+        input_(input),
+        object_description_(object_description),
+        tokenizer_(tokenizer),
+        decrypter_(decrypter),
+        context_(context),
+        description_(std::move(sp_description)),
+        parse_pdf_(parse_pdf),
+        stream_id_(stream_id),
+        obj_id_(obj_id),
+        sanity_checks_(sanity_checks)
     {
     }
 
@@ -133,32 +133,32 @@ class QPDFParser
     // NB the offset includes any leading whitespace.
     QPDFObjectHandle withDescription(Args&&... args);
     void setDescription(std::shared_ptr<QPDFObject>& obj, qpdf_offset_t parsed_offset);
-    InputSource& input;
-    std::string const& object_description;
-    qpdf::Tokenizer& tokenizer;
-    QPDFObjectHandle::StringDecrypter* decrypter;
-    QPDF* context;
-    std::shared_ptr<QPDFObject::Description> description;
-    bool parse_pdf{false};
-    int stream_id{0};
-    int obj_id{0};
-    bool sanity_checks{false};
+    InputSource& input_;
+    std::string const& object_description_;
+    qpdf::Tokenizer& tokenizer_;
+    QPDFObjectHandle::StringDecrypter* decrypter_;
+    QPDF* context_;
+    std::shared_ptr<QPDFObject::Description> description_;
+    bool parse_pdf_{false};
+    int stream_id_{0};
+    int obj_id_{0};
+    bool sanity_checks_{false};
 
-    std::vector<StackFrame> stack;
-    StackFrame* frame{nullptr};
+    std::vector<StackFrame> stack_;
+    StackFrame* frame_{nullptr};
     // Number of recent bad tokens. This will always be > 0 once a bad token has been encountered as
     // it only gets incremented or reset when a bad token is encountered.
-    int bad_count{0};
+    int bad_count_{0};
     // Number of bad tokens (remaining) before giving up.
-    uint32_t max_bad_count{Limits::parser_max_errors()};
+    uint32_t max_bad_count_{Limits::parser_max_errors()};
     // Number of good tokens since last bad token. Irrelevant if bad_count == 0.
-    int good_count{0};
+    int good_count_{0};
     // Start offset including any leading whitespace.
-    qpdf_offset_t start{0};
+    qpdf_offset_t start_{0};
     // Number of successive integer tokens.
-    int int_count{0};
-    long long int_buffer[2]{0, 0};
-    qpdf_offset_t last_offset_buffer[2]{0, 0};
+    int int_count_{0};
+    long long int_buffer_[2]{0, 0};
+    qpdf_offset_t last_offset_buffer_[2]{0, 0};
     bool empty_{false};
 };
 
