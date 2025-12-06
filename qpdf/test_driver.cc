@@ -17,7 +17,6 @@
 #include <qpdf/QPDFJob.hh>
 #include <qpdf/QPDFNameTreeObjectHelper.hh>
 #include <qpdf/QPDFNumberTreeObjectHelper.hh>
-#include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
@@ -27,6 +26,7 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/global.hh>
 #include <climits>
 #include <cstdio>
 #include <cstdlib>

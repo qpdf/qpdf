@@ -616,7 +616,7 @@ namespace qpdf::impl
         std::string default_appearance() const;
 
         // Return the default resource dictionary for the field. This comes not from the field but
-        // from the document-level /AcroForm dictionary. While several PDF generates put a /DR key
+        // from the document-level /AcroForm dictionary. While several PDF generators put a /DR key
         // in the form field's dictionary, experimentation suggests that many popular readers,
         // including Adobe Acrobat and Acrobat Reader, ignore any /DR item on the field.
         QPDFObjectHandle getDefaultResources();
@@ -626,7 +626,7 @@ namespace qpdf::impl
         int getQuadding();
 
         // Return field flags from /Ff. The value is a logical or of pdf_form_field_flag_e as
-        // defined in qpdf/Constants.h//
+        // defined in qpdf/Constants.h
         int getFlags();
 
         // Methods for testing for particular types of form fields
@@ -646,7 +646,7 @@ namespace qpdf::impl
         // Returns true if field is of type /Btn and flags indicate that it is a pushbutton
         bool isPushbutton();
 
-        // Returns true if fields if of type /Ch
+        // Returns true if field is of type /Ch
         bool isChoice();
 
         // Returns choices display values as UTF-8 strings

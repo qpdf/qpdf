@@ -2385,7 +2385,7 @@ impl::Writer::doWriteSetup()
         }
 
         if (cfg.linearize() || encryption) {
-            // The document catalog is not allowed to be compressed in cfg.linearized_ files either.
+            // The document catalog is not allowed to be compressed in linearized files either.
             // It also appears that Adobe Reader 8.0.0 has a bug that prevents it from being able to
             // handle encrypted files with compressed document catalogs, so we disable them in that
             // case as well.

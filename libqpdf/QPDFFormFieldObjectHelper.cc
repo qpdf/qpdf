@@ -605,7 +605,8 @@ FormNode::generateAppearance(QPDFAnnotationObjectHelper& aoh)
 {
     // Ignore field types we don't know how to generate appearances for. Button fields don't really
     // need them -- see code in QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded.
-    if (FT() == "/Tx" || FT() == "/Ch") {
+    auto ft = FT();
+    if (ft == "/Tx" || ft == "/Ch") {
         generateTextAppearance(aoh);
     }
 }
@@ -914,6 +915,17 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
     }
 
     if (AS.obj_sp().use_count() > 3) {
+        // The following check ensures that we only update the appearance stream if it is not
+        // shared. The threshold of 3 is based on the current implementation details:
+        // - One reference from the local variable AS
+        // - One reference from the appearance dictionary (/AP)
+        // - One reference from the object table
+        // If use_count() is greater than 3, it means the appearance stream is shared elsewhere,
+        // and updating it could have unintended side effects. This threshold may need to be updated
+        // if the internal reference counting changes in the future.
+        // The long-term solution will we to replace appearance streams at the point of flattening
+        // annotations rather than attaching token filters that modify the streams at time of
+        // writing.
         aoh.warn("unable to generate text appearance from shared appearance stream for update");
         return;
     }

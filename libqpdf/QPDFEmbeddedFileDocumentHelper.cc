@@ -4,6 +4,8 @@
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QPDF_private.hh>
 
+using namespace qpdf;
+
 // File attachments are stored in the /EmbeddedFiles (name tree) key of the /Names dictionary from
 // the document catalog. Each entry points to a /FileSpec, which in turn points to one more Embedded
 // File Streams. Note that file specs can appear in other places as well, such as file attachment

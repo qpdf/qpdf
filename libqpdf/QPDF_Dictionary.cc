@@ -64,7 +64,7 @@ BaseHandle::contains(std::string const& key) const
     return !(*this)[key].null();
 }
 
-/// @brief Retrieves the value associated with the given key from  dictionary.
+/// @brief Retrieves the value associated with the given key from a dictionary.
 ///
 /// This method attempts to find the value corresponding to the specified key for objects that can
 /// be interpreted as dictionaries.
@@ -122,6 +122,19 @@ BaseHandle::erase(const std::string& key)
     return 0;
 }
 
+/// @brief Replaces or removes the value associated with the given key in a dictionary.
+///
+/// If the current object is a dictionary, this method updates the value at the specified key.
+/// If the value is a direct null object, the key is removed from the dictionary (since the PDF
+/// specification doesn't distinguish between keys with null values and missing keys). Indirect
+/// null values are preserved as they represent dangling references, which are permitted by the
+/// specification.
+///
+/// @param key The key for which the value should be replaced.
+/// @param value The new value to associate with the key. If this is a direct null, the key is
+///              removed instead.
+/// @return Returns true if the operation was performed (i.e., the current object is a dictionary).
+///         Returns false if the current object is not a dictionary.
 bool
 BaseHandle::replace(std::string const& key, QPDFObjectHandle value)
 {
@@ -140,6 +153,20 @@ BaseHandle::replace(std::string const& key, QPDFObjectHandle value)
     return false;
 }
 
+/// @brief Replaces or removes the value associated with the given key in a dictionary.
+///
+/// This method provides a stricter version of `BaseHandle::replace()` that throws an exception
+/// if the current object is not a dictionary, instead of silently returning false. It delegates
+/// to `BaseHandle::replace()` for the actual replacement logic.
+///
+/// If the value is a direct null object, the key is removed from the dictionary (since the PDF
+/// specification doesn't distinguish between keys with null values and missing keys). Indirect
+/// null values are preserved as they represent dangling references.
+///
+/// @param key The key for which the value should be replaced.
+/// @param value The new value to associate with the key. If this is a direct null, the key is
+///              removed instead.
+/// @throws std::runtime_error if the current object is not a dictionary.
 void
 BaseDictionary::replace(std::string const& key, QPDFObjectHandle value)
 {
