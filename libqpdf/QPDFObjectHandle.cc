@@ -25,6 +25,8 @@
 using namespace std::literals;
 using namespace qpdf;
 
+using Parser = impl::Parser;
+
 const Null Null::temp_;
 
 BaseHandle::
@@ -1540,7 +1542,7 @@ QPDFObjectHandle::parse(
     QPDF* context, std::string const& object_str, std::string const& object_description)
 {
     auto input = is::OffsetBuffer("parsed object", object_str);
-    auto result = QPDFParser::parse(input, object_description, context);
+    auto result = Parser::parse(input, object_description, context);
     size_t offset = QIntC::to_size(input.tell());
     while (offset < object_str.length()) {
         if (!isspace(object_str.at(offset))) {
@@ -1661,7 +1663,7 @@ QPDFObjectHandle::parseContentStream_data(
     auto input = is::OffsetBuffer(description, stream_data);
     Tokenizer tokenizer;
     tokenizer.allowEOF();
-    auto sp_description = QPDFParser::make_description(description, "content");
+    auto sp_description = Parser::make_description(description, "content");
     while (QIntC::to_size(input.tell()) < stream_length) {
         // Read a token and seek to the beginning. The offset we get from this process is the
         // beginning of the next non-ignorable (space, comment) token. This way, the offset and
@@ -1669,7 +1671,7 @@ QPDFObjectHandle::parseContentStream_data(
         tokenizer.nextToken(input, "content", true);
         qpdf_offset_t offset = input.getLastOffset();
         input.seek(offset, SEEK_SET);
-        auto obj = QPDFParser::parse_content(input, sp_description, tokenizer, context);
+        auto obj = Parser::parse_content(input, sp_description, tokenizer, context);
         if (!obj) {
             // EOF
             break;
@@ -1678,7 +1680,7 @@ QPDFObjectHandle::parseContentStream_data(
         if (callbacks) {
             callbacks->handleObject(obj, QIntC::to_size(offset), length);
         }
-        if (obj.isOperator() && (obj.getOperatorValue() == "ID")) {
+        if (obj.isOperator() && obj.getOperatorValue() == "ID") {
             // Discard next character; it is the space after ID that terminated the token.  Read
             // until end of inline image.
             char ch;
@@ -1731,7 +1733,7 @@ QPDFObjectHandle::parse(
     StringDecrypter* decrypter,
     QPDF* context)
 {
-    return QPDFParser::parse(*input, object_description, tokenizer, empty, decrypter, context);
+    return Parser::parse(*input, object_description, tokenizer, empty, decrypter, context);
 }
 
 qpdf_offset_t

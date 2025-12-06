@@ -25,6 +25,7 @@ using namespace qpdf;
 using namespace std::literals;
 
 using Objects = QPDF::Doc::Objects;
+using Parser = impl::Parser;
 
 QPDFXRefEntry::QPDFXRefEntry() = default;
 
@@ -1287,7 +1288,7 @@ Objects::readTrailer()
 {
     qpdf_offset_t offset = m->file->tell();
     auto object =
-        QPDFParser::parse(*m->file, "trailer", m->tokenizer, nullptr, qpdf, m->reconstructed_xref);
+        Parser::parse(*m->file, "trailer", m->tokenizer, nullptr, qpdf, m->reconstructed_xref);
     if (object.isDictionary() && m->objects.readToken(*m->file).isWord("stream")) {
         warn(damagedPDF("trailer", m->file->tell(), "stream keyword found in trailer"));
     }
@@ -1304,7 +1305,7 @@ Objects::readObject(std::string const& description, QPDFObjGen og)
 
     StringDecrypter decrypter{&qpdf, og};
     StringDecrypter* decrypter_ptr = m->encp->encrypted ? &decrypter : nullptr;
-    auto object = QPDFParser::parse(
+    auto object = Parser::parse(
         *m->file,
         m->last_object_description,
         m->tokenizer,
@@ -1834,7 +1835,7 @@ Objects::resolveObjectsInStream(int obj_stream_number)
         if (entry != m->xref_table.end() && entry->second.getType() == 2 &&
             entry->second.getObjStreamNumber() == obj_stream_number) {
             is::OffsetBuffer in("", {b_start + obj_offset, obj_size}, obj_offset);
-            if (auto oh = QPDFParser::parse(in, obj_stream_number, obj_id, m->tokenizer, qpdf)) {
+            if (auto oh = Parser::parse(in, obj_stream_number, obj_id, m->tokenizer, qpdf)) {
                 updateCache(og, oh.obj_sp(), end_before_space, end_after_space);
             }
         } else {

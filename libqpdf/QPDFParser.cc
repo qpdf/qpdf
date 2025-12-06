@@ -46,12 +46,13 @@ class QPDF::Doc::ParseGuard
 };
 
 using ParseGuard = QPDF::Doc::ParseGuard;
+using Parser = qpdf::impl::Parser;
 
 QPDFObjectHandle
-QPDFParser::parse(InputSource& input, std::string const& object_description, QPDF* context)
+Parser::parse(InputSource& input, std::string const& object_description, QPDF* context)
 {
     qpdf::Tokenizer tokenizer;
-    if (auto result = QPDFParser(
+    if (auto result = Parser(
                           input,
                           make_description(input.getName(), object_description),
                           object_description,
@@ -66,14 +67,14 @@ QPDFParser::parse(InputSource& input, std::string const& object_description, QPD
 }
 
 QPDFObjectHandle
-QPDFParser::parse_content(
+Parser::parse_content(
     InputSource& input,
     std::shared_ptr<QPDFObject::Description> sp_description,
     qpdf::Tokenizer& tokenizer,
     QPDF* context)
 {
     static const std::string content("content"); // GCC12 - make constexpr
-    auto p = QPDFParser(
+    auto p = Parser(
         input,
         std::move(sp_description),
         content,
@@ -93,7 +94,7 @@ QPDFParser::parse_content(
 }
 
 QPDFObjectHandle
-QPDFParser::parse(
+Parser::parse(
     InputSource& input,
     std::string const& object_description,
     QPDFTokenizer& tokenizer,
@@ -103,7 +104,7 @@ QPDFParser::parse(
 {
     // ABI: This parse overload is only used by the deprecated QPDFObjectHandle::parse. It is the
     // only user of the 'empty' member. When removing this overload also remove 'empty'.
-    auto p = QPDFParser(
+    auto p = Parser(
         input,
         make_description(input.getName(), object_description),
         object_description,
@@ -120,7 +121,7 @@ QPDFParser::parse(
 }
 
 QPDFObjectHandle
-QPDFParser::parse(
+Parser::parse(
     InputSource& input,
     std::string const& object_description,
     qpdf::Tokenizer& tokenizer,
@@ -128,7 +129,7 @@ QPDFParser::parse(
     QPDF& context,
     bool sanity_checks)
 {
-    return QPDFParser(
+    return Parser(
                input,
                make_description(input.getName(), object_description),
                object_description,
@@ -143,10 +144,10 @@ QPDFParser::parse(
 }
 
 QPDFObjectHandle
-QPDFParser::parse(
+Parser::parse(
     is::OffsetBuffer& input, int stream_id, int obj_id, qpdf::Tokenizer& tokenizer, QPDF& context)
 {
-    return QPDFParser(
+    return Parser(
                input,
                std::make_shared<QPDFObject::Description>(
                    QPDFObject::ObjStreamDescr(stream_id, obj_id)),
@@ -161,7 +162,7 @@ QPDFParser::parse(
 }
 
 QPDFObjectHandle
-QPDFParser::parse(bool content_stream)
+Parser::parse(bool content_stream)
 {
     try {
         return parse_first(content_stream);
@@ -178,7 +179,7 @@ QPDFParser::parse(bool content_stream)
 }
 
 QPDFObjectHandle
-QPDFParser::parse_first(bool content_stream)
+Parser::parse_first(bool content_stream)
 {
     // This method must take care not to resolve any objects. Don't check the type of any object
     // without first ensuring that it is a direct object. Otherwise, doing so may have the side
@@ -279,7 +280,7 @@ QPDFParser::parse_first(bool content_stream)
 }
 
 QPDFObjectHandle
-QPDFParser::parse_remainder(bool content_stream)
+Parser::parse_remainder(bool content_stream)
 {
     // This method must take care not to resolve any objects. Don't check the type of any object
     // without first ensuring that it is a direct object. Otherwise, doing so may have the side
@@ -312,7 +313,7 @@ QPDFParser::parse_remainder(bool content_stream)
                 tokenizer_.getValue() == "R") {
                 if (!context_) {
                     throw std::logic_error(
-                        "QPDFParser::parse called without context on an object with indirect "
+                        "Parser::parse called without context on an object with indirect "
                         "references");
                 }
                 auto id = QIntC::to_int(int_buffer_[(int_count_ - 1) % 2]);
@@ -533,7 +534,7 @@ QPDFParser::parse_remainder(bool content_stream)
 }
 
 void
-QPDFParser::add(std::shared_ptr<QPDFObject>&& obj)
+Parser::add(std::shared_ptr<QPDFObject>&& obj)
 {
     if (frame_->state != st_dictionary_value) {
         // If state is st_dictionary_key then there is a missing key. Push onto olist for
@@ -548,7 +549,7 @@ QPDFParser::add(std::shared_ptr<QPDFObject>&& obj)
 }
 
 void
-QPDFParser::add_null()
+Parser::add_null()
 {
     const static ObjectPtr null_obj = QPDFObject::create<QPDF_Null>();
 
@@ -566,7 +567,7 @@ QPDFParser::add_null()
 }
 
 void
-QPDFParser::add_bad_null(std::string const& msg)
+Parser::add_bad_null(std::string const& msg)
 {
     warn(msg);
     check_too_many_bad_tokens();
@@ -574,7 +575,7 @@ QPDFParser::add_bad_null(std::string const& msg)
 }
 
 void
-QPDFParser::add_int(int count)
+Parser::add_int(int count)
 {
     auto obj = QPDFObject::create<QPDF_Integer>(int_buffer_[count % 2]);
     obj->setDescription(context_, description_, last_offset_buffer_[count % 2]);
@@ -583,7 +584,7 @@ QPDFParser::add_int(int count)
 
 template <typename T, typename... Args>
 void
-QPDFParser::add_scalar(Args&&... args)
+Parser::add_scalar(Args&&... args)
 {
     auto limit = Limits::parser_max_container_size(bad_count_ || sanity_checks_);
     if (frame_->olist.size() >= limit || frame_->dict.size() >= limit) {
@@ -599,7 +600,7 @@ QPDFParser::add_scalar(Args&&... args)
 
 template <typename T, typename... Args>
 QPDFObjectHandle
-QPDFParser::with_description(Args&&... args)
+Parser::with_description(Args&&... args)
 {
     auto obj = QPDFObject::create<T>(std::forward<Args>(args)...);
     obj->setDescription(context_, description_, start_);
@@ -607,7 +608,7 @@ QPDFParser::with_description(Args&&... args)
 }
 
 void
-QPDFParser::set_description(ObjectPtr& obj, qpdf_offset_t parsed_offset)
+Parser::set_description(ObjectPtr& obj, qpdf_offset_t parsed_offset)
 {
     if (obj) {
         obj->setDescription(context_, description_, parsed_offset);
@@ -615,7 +616,7 @@ QPDFParser::set_description(ObjectPtr& obj, qpdf_offset_t parsed_offset)
 }
 
 void
-QPDFParser::fix_missing_keys()
+Parser::fix_missing_keys()
 {
     std::set<std::string> names;
     for (auto& obj: frame_->olist) {
@@ -641,7 +642,7 @@ QPDFParser::fix_missing_keys()
 }
 
 void
-QPDFParser::check_too_many_bad_tokens()
+Parser::check_too_many_bad_tokens()
 {
     auto limit = Limits::parser_max_container_size(bad_count_ || sanity_checks_);
     if (frame_->olist.size() >= limit || frame_->dict.size() >= limit) {
@@ -676,7 +677,7 @@ QPDFParser::check_too_many_bad_tokens()
 }
 
 void
-QPDFParser::limits_error(std::string const& limit, std::string const& msg)
+Parser::limits_error(std::string const& limit, std::string const& msg)
 {
     Limits::error();
     warn("limits error("s + limit + "): " + msg);
@@ -684,7 +685,7 @@ QPDFParser::limits_error(std::string const& limit, std::string const& msg)
 }
 
 void
-QPDFParser::warn(QPDFExc const& e) const
+Parser::warn(QPDFExc const& e) const
 {
     // If parsing on behalf of a QPDF object and want to give a warning, we can warn through the
     // object. If parsing for some other reason, such as an explicit creation of an object from a
@@ -697,7 +698,7 @@ QPDFParser::warn(QPDFExc const& e) const
 }
 
 void
-QPDFParser::warn_duplicate_key()
+Parser::warn_duplicate_key()
 {
     warn(
         frame_->offset,
@@ -706,7 +707,7 @@ QPDFParser::warn_duplicate_key()
 }
 
 void
-QPDFParser::warn(qpdf_offset_t offset, std::string const& msg) const
+Parser::warn(qpdf_offset_t offset, std::string const& msg) const
 {
     if (stream_id_) {
         std::string descr = "object "s + std::to_string(obj_id_) + " 0";
@@ -718,7 +719,7 @@ QPDFParser::warn(qpdf_offset_t offset, std::string const& msg) const
 }
 
 void
-QPDFParser::warn(std::string const& msg) const
+Parser::warn(std::string const& msg) const
 {
     warn(input_.getLastOffset(), msg);
 }

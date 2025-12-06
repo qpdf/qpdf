@@ -13,153 +13,157 @@
 using namespace qpdf;
 using namespace qpdf::global;
 
-class QPDFParser
+namespace qpdf::impl
 {
-  public:
-    class Error: public std::exception
+    class Parser
     {
       public:
-        Error() = default;
-        virtual ~Error() noexcept = default;
-    };
+        class Error: public std::exception
+        {
+          public:
+            Error() = default;
+            virtual ~Error() noexcept = default;
+        };
 
-    static QPDFObjectHandle
-    parse(InputSource& input, std::string const& object_description, QPDF* context);
+        static QPDFObjectHandle
+        parse(InputSource& input, std::string const& object_description, QPDF* context);
 
-    static QPDFObjectHandle parse_content(
-        InputSource& input,
-        std::shared_ptr<QPDFObject::Description> sp_description,
-        qpdf::Tokenizer& tokenizer,
-        QPDF* context);
+        static QPDFObjectHandle parse_content(
+            InputSource& input,
+            std::shared_ptr<QPDFObject::Description> sp_description,
+            qpdf::Tokenizer& tokenizer,
+            QPDF* context);
 
-    // For use by deprecated QPDFObjectHandle::parse.
-    static QPDFObjectHandle parse(
-        InputSource& input,
-        std::string const& object_description,
-        QPDFTokenizer& tokenizer,
-        bool& empty,
-        QPDFObjectHandle::StringDecrypter* decrypter,
-        QPDF* context);
+        // For use by deprecated QPDFObjectHandle::parse.
+        static QPDFObjectHandle parse(
+            InputSource& input,
+            std::string const& object_description,
+            QPDFTokenizer& tokenizer,
+            bool& empty,
+            QPDFObjectHandle::StringDecrypter* decrypter,
+            QPDF* context);
 
-    // For use by QPDF.
-    static QPDFObjectHandle parse(
-        InputSource& input,
-        std::string const& object_description,
-        qpdf::Tokenizer& tokenizer,
-        QPDFObjectHandle::StringDecrypter* decrypter,
-        QPDF& context,
-        bool sanity_checks);
+        // For use by QPDF.
+        static QPDFObjectHandle parse(
+            InputSource& input,
+            std::string const& object_description,
+            qpdf::Tokenizer& tokenizer,
+            QPDFObjectHandle::StringDecrypter* decrypter,
+            QPDF& context,
+            bool sanity_checks);
 
-    static QPDFObjectHandle parse(
-        qpdf::is::OffsetBuffer& input,
-        int stream_id,
-        int obj_id,
-        qpdf::Tokenizer& tokenizer,
-        QPDF& context);
+        static QPDFObjectHandle parse(
+            qpdf::is::OffsetBuffer& input,
+            int stream_id,
+            int obj_id,
+            qpdf::Tokenizer& tokenizer,
+            QPDF& context);
 
-    static std::shared_ptr<QPDFObject::Description>
-    make_description(std::string const& input_name, std::string const& object_description)
-    {
-        using namespace std::literals;
-        return std::make_shared<QPDFObject::Description>(
-            input_name + ", " + object_description + " at offset $PO");
-    }
+        static std::shared_ptr<QPDFObject::Description>
+        make_description(std::string const& input_name, std::string const& object_description)
+        {
+            using namespace std::literals;
+            return std::make_shared<QPDFObject::Description>(
+                input_name + ", " + object_description + " at offset $PO");
+        }
 
-  private:
-    QPDFParser(
-        InputSource& input,
-        std::shared_ptr<QPDFObject::Description> sp_description,
-        std::string const& object_description,
-        qpdf::Tokenizer& tokenizer,
-        QPDFObjectHandle::StringDecrypter* decrypter,
-        QPDF* context,
-        bool parse_pdf,
-        int stream_id = 0,
-        int obj_id = 0,
-        bool sanity_checks = false) :
-        input_(input),
-        object_description_(object_description),
-        tokenizer_(tokenizer),
-        decrypter_(decrypter),
-        context_(context),
-        description_(std::move(sp_description)),
-        parse_pdf_(parse_pdf),
-        stream_id_(stream_id),
-        obj_id_(obj_id),
-        sanity_checks_(sanity_checks)
-    {
-    }
-
-    // Parser state.  Note:
-    // state <= st_dictionary_value == (state = st_dictionary_key || state = st_dictionary_value)
-    enum parser_state_e { st_dictionary_key, st_dictionary_value, st_array };
-
-    struct StackFrame
-    {
-        StackFrame(InputSource& input, parser_state_e state) :
-            state(state),
-            offset(input.tell())
+      private:
+        Parser(
+            InputSource& input,
+            std::shared_ptr<QPDFObject::Description> sp_description,
+            std::string const& object_description,
+            qpdf::Tokenizer& tokenizer,
+            QPDFObjectHandle::StringDecrypter* decrypter,
+            QPDF* context,
+            bool parse_pdf,
+            int stream_id = 0,
+            int obj_id = 0,
+            bool sanity_checks = false) :
+            input_(input),
+            object_description_(object_description),
+            tokenizer_(tokenizer),
+            decrypter_(decrypter),
+            context_(context),
+            description_(std::move(sp_description)),
+            parse_pdf_(parse_pdf),
+            stream_id_(stream_id),
+            obj_id_(obj_id),
+            sanity_checks_(sanity_checks)
         {
         }
 
-        std::vector<QPDFObjectHandle> olist;
-        std::map<std::string, QPDFObjectHandle> dict;
-        parser_state_e state;
-        std::string key;
-        qpdf_offset_t offset;
-        std::string contents_string;
-        qpdf_offset_t contents_offset{-1};
-        int null_count{0};
+        // Parser state.  Note:
+        // state <= st_dictionary_value == (state = st_dictionary_key || state =
+        // st_dictionary_value)
+        enum parser_state_e { st_dictionary_key, st_dictionary_value, st_array };
+
+        struct StackFrame
+        {
+            StackFrame(InputSource& input, parser_state_e state) :
+                state(state),
+                offset(input.tell())
+            {
+            }
+
+            std::vector<QPDFObjectHandle> olist;
+            std::map<std::string, QPDFObjectHandle> dict;
+            parser_state_e state;
+            std::string key;
+            qpdf_offset_t offset;
+            std::string contents_string;
+            qpdf_offset_t contents_offset{-1};
+            int null_count{0};
+        };
+
+        QPDFObjectHandle parse(bool content_stream = false);
+        QPDFObjectHandle parse_first(bool content_stream);
+        QPDFObjectHandle parse_remainder(bool content_stream);
+        void add(std::shared_ptr<QPDFObject>&& obj);
+        void add_null();
+        void add_bad_null(std::string const& msg);
+        void add_int(int count);
+        template <typename T, typename... Args>
+        void add_scalar(Args&&... args);
+        void check_too_many_bad_tokens();
+        void warn_duplicate_key();
+        void fix_missing_keys();
+        [[noreturn]] void limits_error(std::string const& limit, std::string const& msg);
+        void warn(qpdf_offset_t offset, std::string const& msg) const;
+        void warn(std::string const& msg) const;
+        void warn(QPDFExc const&) const;
+        template <typename T, typename... Args>
+        // Create a new scalar object complete with parsed offset and description.
+        // NB the offset includes any leading whitespace.
+        QPDFObjectHandle with_description(Args&&... args);
+        void set_description(std::shared_ptr<QPDFObject>& obj, qpdf_offset_t parsed_offset);
+        InputSource& input_;
+        std::string const& object_description_;
+        qpdf::Tokenizer& tokenizer_;
+        QPDFObjectHandle::StringDecrypter* decrypter_;
+        QPDF* context_;
+        std::shared_ptr<QPDFObject::Description> description_;
+        bool parse_pdf_{false};
+        int stream_id_{0};
+        int obj_id_{0};
+        bool sanity_checks_{false};
+
+        std::vector<StackFrame> stack_;
+        StackFrame* frame_{nullptr};
+        // Number of recent bad tokens. This will always be > 0 once a bad token has been
+        // encountered as it only gets incremented or reset when a bad token is encountered.
+        int bad_count_{0};
+        // Number of bad tokens (remaining) before giving up.
+        uint32_t max_bad_count_{Limits::parser_max_errors()};
+        // Number of good tokens since last bad token. Irrelevant if bad_count == 0.
+        int good_count_{0};
+        // Start offset including any leading whitespace.
+        qpdf_offset_t start_{0};
+        // Number of successive integer tokens.
+        int int_count_{0};
+        long long int_buffer_[2]{0, 0};
+        qpdf_offset_t last_offset_buffer_[2]{0, 0};
+        bool empty_{false};
     };
-
-    QPDFObjectHandle parse(bool content_stream = false);
-    QPDFObjectHandle parse_first(bool content_stream);
-    QPDFObjectHandle parse_remainder(bool content_stream);
-    void add(std::shared_ptr<QPDFObject>&& obj);
-    void add_null();
-    void add_bad_null(std::string const& msg);
-    void add_int(int count);
-    template <typename T, typename... Args>
-    void add_scalar(Args&&... args);
-    void check_too_many_bad_tokens();
-    void warn_duplicate_key();
-    void fix_missing_keys();
-    [[noreturn]] void limits_error(std::string const& limit, std::string const& msg);
-    void warn(qpdf_offset_t offset, std::string const& msg) const;
-    void warn(std::string const& msg) const;
-    void warn(QPDFExc const&) const;
-    template <typename T, typename... Args>
-    // Create a new scalar object complete with parsed offset and description.
-    // NB the offset includes any leading whitespace.
-    QPDFObjectHandle with_description(Args&&... args);
-    void set_description(std::shared_ptr<QPDFObject>& obj, qpdf_offset_t parsed_offset);
-    InputSource& input_;
-    std::string const& object_description_;
-    qpdf::Tokenizer& tokenizer_;
-    QPDFObjectHandle::StringDecrypter* decrypter_;
-    QPDF* context_;
-    std::shared_ptr<QPDFObject::Description> description_;
-    bool parse_pdf_{false};
-    int stream_id_{0};
-    int obj_id_{0};
-    bool sanity_checks_{false};
-
-    std::vector<StackFrame> stack_;
-    StackFrame* frame_{nullptr};
-    // Number of recent bad tokens. This will always be > 0 once a bad token has been encountered as
-    // it only gets incremented or reset when a bad token is encountered.
-    int bad_count_{0};
-    // Number of bad tokens (remaining) before giving up.
-    uint32_t max_bad_count_{Limits::parser_max_errors()};
-    // Number of good tokens since last bad token. Irrelevant if bad_count == 0.
-    int good_count_{0};
-    // Start offset including any leading whitespace.
-    qpdf_offset_t start_{0};
-    // Number of successive integer tokens.
-    int int_count_{0};
-    long long int_buffer_[2]{0, 0};
-    qpdf_offset_t last_offset_buffer_[2]{0, 0};
-    bool empty_{false};
-};
+} // namespace qpdf::impl
 
 #endif // QPDFPARSER_HH
