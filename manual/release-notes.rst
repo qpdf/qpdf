@@ -73,8 +73,8 @@ more detail.
 
   - Build fixes
 
-    - Attempt to detect if any > C++-17 changes snuck into any public
-      headers.
+    - Attempt to detect if any > C++17 changes snuck into any public
+      headers and check all private headers compile stand-alone.
 
   - CLI Enhancements
 
