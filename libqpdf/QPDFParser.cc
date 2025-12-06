@@ -172,7 +172,7 @@ QPDFParser::parse(bool content_stream)
     } catch (std::logic_error& e) {
         throw e;
     } catch (std::exception& e) {
-        warn("treating object as null because of error during parsing : "s + e.what());
+        warn("treating object as null because of error during parsing: "s + e.what());
         return {};
     }
 }
