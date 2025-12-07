@@ -276,7 +276,7 @@ more detail.
     - The file ``.idea/cmake.xml`` has been removed. Instead of
       shipping with some CMake profiles in the CLion-specific
       configuration, we now include a ``CMakePresets.json``. There is
-      information about using it in ``README-maintainer.md``. For
+      information about using it in ``README-contributor.md``. For
       most users, running ``cmake`` in the normal way is fine.
       Suggestions are welcome. None of the official builds use cmake
       presets at the time of initial introduction.
@@ -627,7 +627,7 @@ more detail.
       alternative ``zlib`` implementation. There are no dependencies
       anywhere in the qpdf test suite on any particular ``zlib``
       output. Consult the ``ZLIB COMPATIBILITY`` section of
-      ``README-maintainer.md`` for a detailed explanation of how to
+      ``README-contributor.md`` for a detailed explanation of how to
       maintain this.
 
     - The official Windows installers now offers to modify ``PATH``

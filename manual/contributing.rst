@@ -55,9 +55,8 @@ partial summary of the formatting rules:
 - Closing parentheses are attached to the previous material, not not
   their own lines.
 
-The :file:`README-maintainer` file has a few additional notes that are
-probably not important to anyone who is not making deep changes to
-qpdf.
+The :file:`README-developer` file has a few additional notes that are
+probably not important to anyone who is making small changes to qpdf.
 
 .. _automated-testing:
 

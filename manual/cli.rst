@@ -1,6 +1,6 @@
 .. NOTES
 
-   See "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-maintainer.
+   See "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-developer.
 
    This file contains text that is used for help file generation.
    Lines that start with the magic comment ".. help topic x: y"

@@ -20,7 +20,7 @@ if [ "$zopfli" != "11" ]; then
     exit 2
 fi
 
-# If this fails, please see ZLIB COMPATIBILITY in README-maintainer.md.
+# If this fails, please see ZLIB COMPATIBILITY in README-developer.md.
 # The tests are very slow with this option. Just run essential tests.
 # If zlib-flate and qpdf tests all pass, we can be pretty sure it works.
 (cd build; ctest --verbose -R zlib-flate)

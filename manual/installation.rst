@@ -312,7 +312,7 @@ Options for Working on qpdf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ENABLE_COVERAGE
-  Compile with ``--coverage``. See README-maintainer.md for
+  Compile with ``--coverage``. See README-developer.md for
   information about generating coverage reports.
 
 ENABLE_QTC

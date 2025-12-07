@@ -187,7 +187,7 @@ This section describes some of the design rationale and history behind
 
 Documentation of ``QPDFJob`` is divided among three places:
 
-- "HOW TO ADD A COMMAND-LINE ARGUMENT" in :file:`README-maintainer`
+- "HOW TO ADD A COMMAND-LINE ARGUMENT" in :file:`README-developer`
   provides a quick reminder of how to add a command-line argument.
 
 - The source file :file:`generate_auto_job` has a detailed explanation

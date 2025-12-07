@@ -1,4 +1,4 @@
-# See "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-maintainer.
+# See "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-developer.
 
 # REMEMBER: if you add an optional_choices or optional_parameter, you
 # have to explicitly remember to implement the overloaded config
