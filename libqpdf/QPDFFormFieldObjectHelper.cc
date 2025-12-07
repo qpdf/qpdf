@@ -877,7 +877,6 @@ namespace
     };
 } // namespace
 
-
 void
 FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
 {
@@ -914,7 +913,7 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
         // and updating it could have unintended side effects. This threshold may need to be updated
         // if the internal reference counting changes in the future.
         //
-        // There is currently no explicit CI test for this code> I has been manually tested bu
+        // There is currently no explicit CI test for this code. It has been manually tested by
         // running it through CI with a threshold of 0, unconditionally copying streams.
         auto data = AS.getStreamData(qpdf_dl_all);
         AS = AS.copy();
@@ -934,10 +933,6 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
     QPDFObjectHandle::Rectangle bbox = bbox_obj.getArrayAsRectangle();
     std::string DA = default_appearance();
     std::string V = value();
-    std::vector<std::string> opt;
-    if (isChoice() && (getFlags() & ff_ch_combo) == 0) {
-        opt = getChoices();
-    }
 
     TfFinder tff;
     Pl_QPDFTokenizer tok("tf", &tff);
@@ -976,8 +971,13 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
     }
 
     V = (*encoder)(V, '?');
-    for (size_t i = 0; i < opt.size(); ++i) {
-        opt.at(i) = (*encoder)(opt.at(i), '?');
+
+    std::vector<std::string> opt;
+    if (isChoice() && (getFlags() & ff_ch_combo) == 0) {
+        opt = getChoices();
+        for (auto& o: opt) {
+            o = (*encoder)(o, '?');
+        }
     }
 
     std::string result;
