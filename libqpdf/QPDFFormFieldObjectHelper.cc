@@ -2,6 +2,7 @@
 
 #include <qpdf/AcroForm.hh>
 
+#include <qpdf/Pipeline_private.hh>
 #include <qpdf/Pl_QPDFTokenizer.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
@@ -912,13 +913,6 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
             aoh.replace("/AP", Dictionary({{"/N", AS}}));
         }
     }
-    if (!AS) {
-        // This could only have happened if aoh.getAppearanceStream("/N") did not return a stream.
-        // The only way creation of a new AS could have failed is if getOwningQPDF returned a
-        // nullptr, but this would throw a runtime error in newStream. So this should be impossible
-        aoh.warn("unable to get normal appearance stream for update");
-        return;
-    }
 
     if (AS.obj_sp().use_count() > 3) {
         // The following check ensures that we only update the appearance stream if it is not
@@ -988,6 +982,12 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
     for (size_t i = 0; i < opt.size(); ++i) {
         opt.at(i) = (*encoder)(opt.at(i), '?');
     }
-    AS.addTokenFilter(
-        std::shared_ptr<QPDFObjectHandle::TokenFilter>(new ValueSetter(DA, V, opt, tf, bbox)));
+
+    std::string result;
+    pl::String pl(result);
+    ValueSetter vs(DA, V, opt, tf, bbox);
+    Pl_QPDFTokenizer vs_tok("", &vs, &pl);
+    vs_tok.writeString(AS.getStreamData(qpdf_dl_all));
+    vs_tok.finish();
+    AS.replaceStreamData(std::move(result), Null::temp(), Null::temp());
 }
