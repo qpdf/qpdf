@@ -769,8 +769,6 @@ namespace qpdf::impl
         void setRadioButtonValue(QPDFObjectHandle name);
         void setCheckBoxValue(bool value);
         void generateTextAppearance(QPDFAnnotationObjectHelper&);
-        QPDFObjectHandle
-        getFontFromResource(QPDFObjectHandle resources, std::string const& font_name);
 
         static const QPDFObjectHandle null_oh;
     }; // class FormNode

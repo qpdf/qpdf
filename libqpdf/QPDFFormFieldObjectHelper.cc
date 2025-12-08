@@ -877,16 +877,6 @@ namespace
     };
 } // namespace
 
-QPDFObjectHandle
-FormNode::getFontFromResource(QPDFObjectHandle resources, std::string const& name)
-{
-    QPDFObjectHandle result;
-    if (resources.isDictionary() && resources.getKey("/Font").isDictionary() &&
-        resources.getKey("/Font").hasKey(name)) {
-        result = resources.getKey("/Font").getKey(name);
-    }
-    return result;
-}
 
 void
 FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
@@ -961,9 +951,9 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
     if (!font_name.empty()) {
         // See if the font is encoded with something we know about.
         Dictionary resources = AS.getDict()["/Resources"];
-        Dictionary font = getFontFromResource(resources, font_name);
+        Dictionary font = resources["/Font"][font_name];
         if (!font) {
-            font = getFontFromResource(getDefaultResources(), font_name);
+            font = getDefaultResources()["/Font"][font_name];
             if (resources) {
                 if (resources.indirect()) {
                     resources = resources.qpdf()->makeIndirectObject(resources.copy());
@@ -972,7 +962,7 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
                 // Use mergeResources to force /Font to be local
                 QPDFObjectHandle res = resources;
                 res.mergeResources(Dictionary({{"/Font", Dictionary::empty()}}));
-                res.getKey("/Font").replaceKey(font_name, font);
+                res.getKey("/Font").replace(font_name, font);
             }
         }
 
