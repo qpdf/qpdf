@@ -890,24 +890,32 @@ FormNode::getFontFromResource(QPDFObjectHandle resources, std::string const& nam
 void
 FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
 {
-    QPDFObjectHandle AS = aoh.getAppearanceStream("/N");
-    if (AS.null()) {
-        QPDFObjectHandle::Rectangle rect = aoh.getRect();
+    no_ci_warn_if(
+        !Dictionary(aoh), // There is no guarantee that aoh is a dictionary
+        "cannot generate appearance for non-dictionary annotation" //
+    );
+    Stream AS = aoh.getAppearanceStream("/N"); // getAppearanceStream returns a stream or null.
+    if (!AS) {
+        QPDFObjectHandle::Rectangle rect = aoh.getRect(); // may silently be invalid / all zeros
         QPDFObjectHandle::Rectangle bbox(0, 0, rect.urx - rect.llx, rect.ury - rect.lly);
-        auto dict = Dictionary(
+        auto* pdf = qpdf();
+        no_ci_stop_damaged_if(!pdf, "unable to get owning QPDF for appearance generation");
+        AS = pdf->newStream("/Tx BMC\nEMC\n");
+        AS.replaceDict(Dictionary(
             {{"/BBox", QPDFObjectHandle::newFromRectangle(bbox)},
              {"/Resources", Dictionary({{"/ProcSet", Array({Name("/PDF"), Name("/Text")})}})},
              {"/Type", Name("/XObject")},
-             {"/Subtype", Name("/Form")}});
-        AS = QPDFObjectHandle::newStream(oh().getOwningQPDF(), "/Tx BMC\nEMC\n");
-        AS.replaceDict(dict);
+             {"/Subtype", Name("/Form")}}));
         if (auto ap = AP()) {
             ap.replace("/N", AS);
         } else {
             aoh.replace("/AP", Dictionary({{"/N", AS}}));
         }
     }
-    if (!AS.isStream()) {
+    if (!AS) {
+        // This could only have happened if aoh.getAppearanceStream("/N") did not return a stream.
+        // The only way creation of a new AS could have failed is if getOwningQPDF returned a
+        // nullptr, but this would throw a runtime error in newStream. So this should be impossible
         aoh.warn("unable to get normal appearance stream for update");
         return;
     }
@@ -927,7 +935,7 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
         aoh.warn("unable to generate text appearance from shared appearance stream for update");
         return;
     }
-    QPDFObjectHandle bbox_obj = AS.getDict().getKey("/BBox");
+    QPDFObjectHandle bbox_obj = AS.getDict()["/BBox"];
     if (!bbox_obj.isRectangle()) {
         aoh.warn("unable to get appearance stream bounding box");
         return;
@@ -958,7 +966,7 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
             if (resources) {
                 if (resources.indirect()) {
                     resources = resources.qpdf()->makeIndirectObject(resources.copy());
-                    AS.getDict().replaceKey("/Resources", resources);
+                    AS.getDict().replace("/Resources", resources);
                 }
                 // Use mergeResources to force /Font to be local
                 QPDFObjectHandle res = resources;
