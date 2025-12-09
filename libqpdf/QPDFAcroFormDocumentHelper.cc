@@ -412,10 +412,9 @@ AcroForm::traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, 
     // fields can be merged with terminal field dictionaries. Otherwise, the annotation fields might
     // be there to be inherited by annotations below it.
 
-    Array Kids = field["/Kids"];
-    const bool is_field = depth == 0 || Kids || field.hasKey("/Parent");
-    const bool is_annotation =
-        !Kids && (field.hasKey("/Subtype") || field.hasKey("/Rect") || field.hasKey("/AP"));
+    FormNode node = field;
+    const bool is_field = node.field();
+    const bool is_annotation = node.widget();
 
     QTC::TC("qpdf", "QPDFAcroFormDocumentHelper field found", (depth == 0) ? 0 : 1);
     QTC::TC("qpdf", "QPDFAcroFormDocumentHelper annotation found", (is_field ? 0 : 1));
@@ -428,12 +427,16 @@ AcroForm::traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, 
     }
 
     if (is_annotation) {
-        QPDFObjectHandle our_field = (is_field ? field : parent);
-        fields_[our_field.getObjGen()].annotations.emplace_back(field);
+        auto our_field = (is_field ? field : parent);
+        fields_[our_field].annotations.emplace_back(field);
         annotation_to_field_[og] = QPDFFormFieldObjectHelper(our_field);
     }
 
-    if (is_field && depth != 0 && field["/Parent"] != parent) {
+    if (!is_field) {
+        return true;
+    }
+
+    if (depth != 0 && field["/Parent"] != parent) {
         for (auto const& kid: Array(field["/Parent"]["/Kids"])) {
             if (kid == field) {
                 field.warn("while traversing /AcroForm found field with two parents");
@@ -450,19 +453,18 @@ AcroForm::traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, 
         field.replaceKey("/Parent", parent);
     }
 
-    if (is_field && field.hasKey("/T")) {
-        QPDFFormFieldObjectHelper foh(field);
-        std::string name = foh.getFullyQualifiedName();
+    if (node.T()) {
         auto old = fields_.find(og);
         if (old != fields_.end() && !old->second.name.empty()) {
             // We might be updating after a name change, so remove any old information
             name_to_fields_[old->second.name].erase(og);
         }
+        std::string name = node.fully_qualified_name();
         fields_[og].name = name;
         name_to_fields_[name].insert(og);
     }
 
-    for (auto const& kid: Kids) {
+    for (auto const& kid: node.Kids()) {
         if (bad_fields_.contains(kid)) {
             continue;
         }
