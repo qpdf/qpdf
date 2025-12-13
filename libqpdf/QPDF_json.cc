@@ -146,13 +146,13 @@ is_binary_string(std::string const& v, std::string& str)
 static bool
 is_name(std::string const& v)
 {
-    return ((v.length() > 1) && (v.at(0) == '/'));
+    return v.starts_with('/');
 }
 
 static bool
 is_pdf_name(std::string const& v)
 {
-    return ((v.length() > 3) && (v.substr(0, 3) == "n:/"));
+    return v.starts_with("n:/");
 }
 
 bool
@@ -203,10 +203,15 @@ QPDF::test_json_validators()
     check(is_binary_string("b:12", str));
     check(is_binary_string("b:123aBC", str));
     check(!is_name(""));
-    check(!is_name("/"));
+    check(is_name("/"));
     check(!is_name("xyz"));
     check(is_name("/Potato"));
     check(is_name("/Potato Salad"));
+    check(!is_pdf_name("n:"));
+    check(is_pdf_name("n:/"));
+    check(!is_pdf_name("n:xyz"));
+    check(is_pdf_name("n:/Potato"));
+    check(is_pdf_name("n:/Potato Salad"));
 
     return passed;
 #undef check_arg

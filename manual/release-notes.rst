@@ -40,6 +40,9 @@ more detail.
       flag was only set to true if the field is not a top-level field,
       and remained unchanged otherwise.
 
+    - When parsing qpdf JSON input files allow empty name objects. These are
+      allowed by the PDF specification but were previously rejected.
+
   - Library Enhancements
 
     - Add ``QPDFNameTreeObjectHelper`` and ``QPDFNumberTreeObjectHelper``
