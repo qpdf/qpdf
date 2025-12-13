@@ -1668,7 +1668,7 @@ Related Options
    If neither ``+`` or ``-`` is prepended, the rotation angle is set
    exactly. You almost always want ``+`` or ``-`` since, without
    inspecting the actual PDF code, it is impossible to know whether a
-   page that appears to be rotate is rotated "naturally" or has been
+   page that appears to be rotated is rotated "naturally" or has been
    rotated by specifying rotation. For example, if a page appears to
    contain a portrait-mode image rotated by 90 degrees so that the top
    of the image is on the right edge of the page, there is no way to
