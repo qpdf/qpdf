@@ -43,7 +43,6 @@
 #include <qpdf/QPDFTokenizer.hh>
 
 class Pipeline;
-class QPDF;
 class QPDF_Array;
 class QPDF_Bool;
 class QPDF_Dictionary;
