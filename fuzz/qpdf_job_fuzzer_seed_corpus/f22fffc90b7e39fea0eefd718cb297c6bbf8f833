@@ -1,0 +1,9 @@
+{
+  "decrypt": "",
+  "inputFile": "20-pages.pdf",
+  "password": "user",
+  "outputFile": "a.pdf",
+  "staticId": "",
+  "staticAesIv": "",
+  "compressStreams": "n"
+}

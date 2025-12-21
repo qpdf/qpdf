@@ -1,0 +1,361 @@
+%PDF-1.3
+%¿÷¢þ
+%QDF-1.0
+
+%
+% This file exercises several special conditions in the linearization
+% and optimization code including various cases of shared resources,
+% inherited page attributes, indirect null objects (resolution of
+% which is a qpdf feature), null dictionary keys, and indirect scalar
+% objects.
+%
+% The page tree is
+%
+%  (A)--- page 1
+%   |
+%   +---- page 2
+%   |
+%   +---(B)--- page 3
+%        |
+%        +---- page 4
+%        |
+%        +---- page 5
+%
+% Node (A) defines /MediaBox (direct) and /Resources (indirect)
+% Node (B) overrides /MediaBox and defines /Rotate
+% Node (B) defines /Quack, a non-standard key, which is not inherited
+% Page 1 overrides /Resources
+% Page 4 overrides /Resources
+% Page 5 overrides /MediaBox and /Rotate
+%
+% Page 5 provides the case of two levels of shadowing on a resource.
+%
+% Node (B)'s overriding of /Rotate exercises inheriting a scalar.
+%
+% The /MediaBox defined in node (B) is shared between pages 3 and 4
+% but not page 1.  The /MediaBox defined in node (A) is shared between
+% pages 1 and 2 only.
+%
+% The document catalog has two non-standard keys /Moo and /Quack each
+% of which contains (directly or indirectly) an indirect null object.
+%
+% The /Moo object, which is a dictionary, is shared between the
+% document level and page 3 where it appears as a resource.
+%
+
+1 0 obj
+<<
+  /Moo 2 0 R
+  /Pages 3 0 R
+  /Quack 26 0 R
+  /Type /Catalog
+>>
+endobj
+
+2 0 obj
+<<
+  /Null1 27 0 R
+  /Null2 null
+  /One 1
+  /Two 28 0 R
+>>
+endobj
+
+% Node (A)
+3 0 obj
+<<
+  /Count 5
+  /Kids [
+    4 0 R
+    5 0 R
+    6 0 R
+  ]
+  /MediaBox [
+    0
+    0
+    576
+    792
+  ]
+  /Resources 7 0 R
+  /Type /Pages
+>>
+endobj
+
+%% Page 1
+4 0 obj
+<<
+  /Contents 8 0 R
+  /Parent 3 0 R
+  /Resources 10 0 R
+  /Type /Page
+>>
+endobj
+
+%% Page 2
+5 0 obj
+<<
+  /Contents 11 0 R
+  /Parent 3 0 R
+  /Type /Page
+>>
+endobj
+
+% Node (B)
+6 0 obj
+<<
+  /Count 3
+  /Kids [
+    13 0 R
+    14 0 R
+    15 0 R
+  ]
+  /MediaBox [
+    0
+    0
+    576
+    396
+  ]
+  /Parent 3 0 R
+  /Rotate 0
+  /Quack 16059
+  /Type /Pages
+>>
+endobj
+
+7 0 obj
+<<
+  /Font <<
+    /F1 16 0 R
+  >>
+  /ProcSet 17 0 R
+>>
+endobj
+
+%% Contents for page 1
+8 0 obj
+<<
+  /Length 9 0 R
+>>
+stream
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato 1) Tj
+ET
+endstream
+endobj
+
+9 0 obj
+46
+endobj
+
+10 0 obj
+<<
+  /Font <<
+    /F1 18 0 R
+  >>
+  /ProcSet 17 0 R
+>>
+endobj
+
+%% Contents for page 2
+11 0 obj
+<<
+  /Length 12 0 R
+>>
+stream
+BT
+  /F1 24 Tf
+  72 322 Td
+  (Potato 2) Tj
+ET
+endstream
+endobj
+
+12 0 obj
+46
+endobj
+
+%% Page 3
+13 0 obj
+<<
+  /Contents 19 0 R
+  /Moo 2 0 R
+  /Parent 6 0 R
+  /Type /Page
+>>
+endobj
+
+%% Page 4
+14 0 obj
+<<
+  /Contents 21 0 R
+  /Parent 6 0 R
+  /Resources <<
+    /Font <<
+      /F1 23 0 R
+    >>
+    /ProcSet 17 0 R
+  >>
+  /Type /Page
+>>
+endobj
+
+%% Page 5
+15 0 obj
+<<
+  /Contents 24 0 R
+  /MediaBox [
+    0
+    0
+    306
+    396
+  ]
+  /Rotate 180
+  /Parent 6 0 R
+  /Type /Page
+>>
+endobj
+
+16 0 obj
+<<
+  /BaseFont /Helvetica
+  /Encoding /WinAnsiEncoding
+  /Name /F1
+  /Subtype /Type1
+  /Type /Font
+>>
+endobj
+
+17 0 obj
+[
+  /PDF
+  /Text
+]
+endobj
+
+18 0 obj
+<<
+  /BaseFont /Courier-Oblique
+  /Encoding /WinAnsiEncoding
+  /Name /F1
+  /Subtype /Type1
+  /Type /Font
+>>
+endobj
+
+%% Contents for page 3
+19 0 obj
+<<
+  /Length 20 0 R
+>>
+stream
+BT
+  /F1 24 Tf
+  72 322 Td
+  (Potato 3) Tj
+ET
+endstream
+endobj
+
+20 0 obj
+46
+endobj
+
+%% Contents for page 4
+21 0 obj
+<<
+  /Length 22 0 R
+>>
+stream
+BT
+  /F1 24 Tf
+  72 322 Td
+  (Potato 4) Tj
+ET
+endstream
+endobj
+
+22 0 obj
+46
+endobj
+
+23 0 obj
+<<
+  /BaseFont /Times-Bold
+  /Encoding /WinAnsiEncoding
+  /Name /F1
+  /Subtype /Type1
+  /Type /Font
+>>
+endobj
+
+%% Contents for page 5
+24 0 obj
+<<
+  /Length 25 0 R
+>>
+stream
+BT
+  /F1 24 Tf
+  72 322 Td
+  (Potato 5) Tj
+ET
+endstream
+endobj
+
+25 0 obj
+46
+endobj
+
+26 0 obj
+null
+endobj
+
+27 0 obj
+null
+endobj
+
+28 0 obj
+2
+endobj
+
+xref
+0 29
+0000000000 65535 f 
+0000001331 00000 n 
+0000001414 00000 n 
+0000001500 00000 n 
+0000001667 00000 n 
+0000001767 00000 n 
+0000001849 00000 n 
+0000002033 00000 n 
+0000002127 00000 n 
+0000002228 00000 n 
+0000002247 00000 n 
+0000002342 00000 n 
+0000002445 00000 n 
+0000002475 00000 n 
+0000002570 00000 n 
+0000002730 00000 n 
+0000002862 00000 n 
+0000002981 00000 n 
+0000003017 00000 n 
+0000003165 00000 n 
+0000003268 00000 n 
+0000003311 00000 n 
+0000003414 00000 n 
+0000003434 00000 n 
+0000003577 00000 n 
+0000003680 00000 n 
+0000003700 00000 n 
+0000003722 00000 n 
+0000003744 00000 n 
+trailer <<
+  /Root 1 0 R
+  /Size 29
+  /ID [<ce9551b56c5a7e3b5b0ba6fa0d281296><a74aa55a69070b600e39f9ed1ed6c4df>]
+>>
+startxref
+3763
+%%EOF

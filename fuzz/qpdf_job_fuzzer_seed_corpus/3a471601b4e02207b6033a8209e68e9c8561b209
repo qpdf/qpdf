@@ -1,0 +1,13 @@
+{
+  "inputFile": "fxo-blue.pdf",
+  "outputFile": "a.pdf",
+  "staticId": "",
+  "staticAesIv": "",
+  "encrypt": {
+    "userPassword": "u",
+    "ownerPassword": "o",
+    "128bit": {
+      "useAes": "y"
+    }
+  }
+}

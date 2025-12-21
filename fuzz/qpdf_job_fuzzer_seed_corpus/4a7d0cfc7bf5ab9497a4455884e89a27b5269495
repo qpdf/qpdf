@@ -1,0 +1,15 @@
+{
+  "inputFile": "minimal.pdf",
+  "outputFile": "a.pdf",
+  "staticId": "",
+  "underlay": {
+    "file": "20-pages.pdf",
+    "password": "user",
+    "from": "5"
+  },
+  "overlay": {
+    "file": "job-json-encrypt-128.pdf",
+    "password": "o",
+    "from": "7"
+  }
+}

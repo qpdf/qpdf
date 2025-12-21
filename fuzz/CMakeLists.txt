@@ -8,6 +8,12 @@ set(FUZZERS
   qpdf_lin_fuzzer
   qpdf_pages_fuzzer
   qpdf_outlines_fuzzer
+  qpdf_job_fuzzer
+  qpdf_transform_fuzzer
+  qpdf_embed_fuzzer
+  qpdf_annot_fuzzer
+  qpdf_linearization_fuzzer
+  qpdf_object_fuzzer
   ascii85_fuzzer
   dct_fuzzer
   flate_fuzzer
@@ -235,6 +241,14 @@ if(OSS_FUZZ)
     FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/pdf.dict
     ${CMAKE_CURRENT_SOURCE_DIR}/qpdf_fuzzer.options
+    ${CMAKE_CURRENT_SOURCE_DIR}/qpdf_job_fuzzer.dict
+    ${CMAKE_CURRENT_SOURCE_DIR}/qpdf_job_fuzzer.options
+    ${CMAKE_CURRENT_SOURCE_DIR}/qpdf_transform_fuzzer.options
+    ${CMAKE_CURRENT_SOURCE_DIR}/qpdf_embed_fuzzer.options
+    ${CMAKE_CURRENT_SOURCE_DIR}/qpdf_annot_fuzzer.dict
+    ${CMAKE_CURRENT_SOURCE_DIR}/qpdf_annot_fuzzer.options
+    ${CMAKE_CURRENT_SOURCE_DIR}/qpdf_linearization_fuzzer.options
+    ${CMAKE_CURRENT_SOURCE_DIR}/qpdf_object_fuzzer.options
     ${SEED_CORPUS_ZIPS}
     DESTINATION ${FUZZ_OUT}
     EXCLUDE_FROM_ALL
