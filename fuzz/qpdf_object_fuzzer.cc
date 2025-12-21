@@ -200,8 +200,7 @@ FuzzHelper::testTrees()
                             // Iterate through the tree to exercise traversal logic
                             int count = 0;
                             for (auto it = nth.begin(); it != nth.end() && count < 50; ++it, ++count) {
-                                it->first;  // Get key
-                                it->second; // Get value
+                                continue;
                             }
                         } catch (...) {
                             // Name tree errors expected
@@ -228,8 +227,7 @@ FuzzHelper::testTrees()
             // Iterate through the tree to exercise traversal logic
             int count = 0;
             for (auto it = nth.begin(); it != nth.end() && count < 50; ++it, ++count) {
-                it->first;  // Get key (page number)
-                it->second; // Get value (label dict)
+                continue;
             }
         }
     } catch (QPDFExc const& e) {

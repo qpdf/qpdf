@@ -56,13 +56,10 @@ FuzzHelper::testLinearization()
     std::cerr << "info: isLinearized\n";
     bool is_linearized = q->isLinearized();
 
-    std::cerr << "info: checkLinearization\n";
-    q->checkLinearization();
-
     if (is_linearized) {
-        // Note: showLinearizationData() outputs to cout which creates noise,
-        // so we skip calling it. checkLinearization() exercises similar code paths.
-        std::cerr << "info: PDF is linearized, skipping showLinearizationData\n";
+        // checkLinearization() is only valid if isLinearized() returns true
+        std::cerr << "info: checkLinearization\n";
+        q->checkLinearization();
     }
 
     // Test writing with linearization enabled
