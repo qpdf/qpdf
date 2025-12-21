@@ -213,11 +213,19 @@ add_test(
   --color ${QTEST_COLOR}
   --show-on-failure ${SHOW_FAILED_TEST_OUTPUT})
 
-# cSpell:ignore qpdg
+# Fuzzers that use the shared qpdf_corpus (generic PDF fuzzers)
+set(SHARED_CORPUS_FUZZERS
+  qpdf_fuzzer
+  qpdf_crypt_fuzzer
+  qpdf_crypt_insecure_fuzzer
+  qpdf_lin_fuzzer
+  qpdf_pages_fuzzer
+  qpdf_outlines_fuzzer)
+
 if(OSS_FUZZ)
   list(APPEND SEED_CORPUS_ZIPS)
   foreach(F ${FUZZERS})
-    if((F STRGREATER qpdf_) AND (F STRLESS qpdg))
+    if(F IN_LIST SHARED_CORPUS_FUZZERS)
       set(SEED_DIR ${CORPUS_DIR})
     else()
       set(SEED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${F}_seed_corpus)
