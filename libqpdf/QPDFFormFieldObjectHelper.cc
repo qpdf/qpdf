@@ -915,19 +915,26 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
     }
 
     if (AS.obj_sp().use_count() > 3) {
-        // The following check ensures that we only update the appearance stream if it is not
-        // shared. The threshold of 3 is based on the current implementation details:
+        // Ensures that the appearance stream is not shared by copying it if the threshold of 3 is
+        // exceeded. The threshold is based on the current implementation details:
         // - One reference from the local variable AS
         // - One reference from the appearance dictionary (/AP)
         // - One reference from the object table
         // If use_count() is greater than 3, it means the appearance stream is shared elsewhere,
         // and updating it could have unintended side effects. This threshold may need to be updated
         // if the internal reference counting changes in the future.
-        // The long-term solution will we to replace appearance streams at the point of flattening
-        // annotations rather than attaching token filters that modify the streams at time of
-        // writing.
-        aoh.warn("unable to generate text appearance from shared appearance stream for update");
-        return;
+        //
+        // There is currently no explicit CI test for this code> I has been manually tested bu
+        // running it through CI with a threshold of 0, unconditionally copying streams.
+        auto data = AS.getStreamData(qpdf_dl_all);
+        AS = AS.copy();
+        AS.replaceStreamData(std::move(data), Null::temp(), Null::temp());
+        if (Dictionary AP = aoh.getAppearanceDictionary()) {
+            AP.replace("/N", AS);
+        } else {
+            aoh.replace("/AP", Dictionary({{"/N", AS}}));
+            // aoh is a dictionary, so insertion will succeed. No need to check by retrieving it.
+        }
     }
     QPDFObjectHandle bbox_obj = AS.getDict()["/BBox"];
     if (!bbox_obj.isRectangle()) {
