@@ -1,0 +1,6 @@
+{
+  "inputFile": "minimal.pdf",
+  "outputFile": "a.pdf",
+  "deterministicId": "",
+  "objectStreams": "generate"
+}

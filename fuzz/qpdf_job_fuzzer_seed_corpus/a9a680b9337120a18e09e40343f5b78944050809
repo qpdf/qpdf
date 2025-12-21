@@ -1,0 +1,15 @@
+{
+  "empty": "",
+  "outputFile": "a.pdf",
+  "staticId": "",
+  "pages": [
+    {
+      "file": "minimal.pdf"
+    },
+    {
+      "file": "20-pages.pdf",
+      "password": "user",
+      "range": "1-5"
+    }
+  ]
+}

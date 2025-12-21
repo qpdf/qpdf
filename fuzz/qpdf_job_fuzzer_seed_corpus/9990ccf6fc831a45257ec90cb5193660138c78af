@@ -1,0 +1,24 @@
+{
+  "inputFile": "20-pages.pdf",
+  "password": "owner",
+  "outputFile": "a.pdf",
+  "staticId": "",
+  "decrypt": "",
+  "underlay": [
+    {
+      "file": "fxo-green.pdf"
+    },
+    {
+      "file": "minimal.pdf",
+      "repeat": "1",
+      "to": "5-7"
+    }
+  ],
+  "overlay": [
+    {
+      "file": "fxo-red.pdf",
+      "from": "1,2",
+      "repeat": "3"
+    }
+  ]
+}
