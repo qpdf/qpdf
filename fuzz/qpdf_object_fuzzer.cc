@@ -194,10 +194,15 @@ FuzzHelper::testTrees()
                         try {
                             std::cerr << "info: name tree " << key << '\n';
                             QPDFNameTreeObjectHelper nth(names.getKey(key), *q);
-                            nth.begin();
-                            nth.end();
                             nth.find("test");
                             nth.hasName("test");
+
+                            // Iterate through the tree to exercise traversal logic
+                            int count = 0;
+                            for (auto it = nth.begin(); it != nth.end() && count < 50; ++it, ++count) {
+                                it->first;  // Get key
+                                it->second; // Get value
+                            }
                         } catch (...) {
                             // Name tree errors expected
                         }
@@ -217,10 +222,15 @@ FuzzHelper::testTrees()
         if (root.hasKey("/PageLabels")) {
             std::cerr << "info: testing page labels number tree\n";
             QPDFNumberTreeObjectHelper nth(root.getKey("/PageLabels"), *q);
-            nth.begin();
-            nth.end();
             nth.find(0);
             nth.find(1);
+
+            // Iterate through the tree to exercise traversal logic
+            int count = 0;
+            for (auto it = nth.begin(); it != nth.end() && count < 50; ++it, ++count) {
+                it->first;  // Get key (page number)
+                it->second; // Get value (label dict)
+            }
         }
     } catch (QPDFExc const& e) {
         std::cerr << "numbertree QPDFExc: " << e.what() << '\n';
