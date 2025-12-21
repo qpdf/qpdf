@@ -51,7 +51,7 @@ namespace qpdf
     // QPDFObjGen and bool.
     class BaseHandle
     {
-        friend class QPDF;
+        friend class ::QPDF;
 
       public:
         explicit inline operator bool() const;
