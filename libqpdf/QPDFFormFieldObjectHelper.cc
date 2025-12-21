@@ -2,6 +2,7 @@
 
 #include <qpdf/AcroForm.hh>
 
+#include <qpdf/Pipeline_private.hh>
 #include <qpdf/Pl_QPDFTokenizer.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
@@ -876,58 +877,55 @@ namespace
     };
 } // namespace
 
-QPDFObjectHandle
-FormNode::getFontFromResource(QPDFObjectHandle resources, std::string const& name)
-{
-    QPDFObjectHandle result;
-    if (resources.isDictionary() && resources.getKey("/Font").isDictionary() &&
-        resources.getKey("/Font").hasKey(name)) {
-        result = resources.getKey("/Font").getKey(name);
-    }
-    return result;
-}
-
 void
 FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
 {
-    QPDFObjectHandle AS = aoh.getAppearanceStream("/N");
-    if (AS.null()) {
-        QPDFObjectHandle::Rectangle rect = aoh.getRect();
+    no_ci_warn_if(
+        !Dictionary(aoh), // There is no guarantee that aoh is a dictionary
+        "cannot generate appearance for non-dictionary annotation" //
+    );
+    Stream AS = aoh.getAppearanceStream("/N"); // getAppearanceStream returns a stream or null.
+    if (!AS) {
+        QPDFObjectHandle::Rectangle rect = aoh.getRect(); // may silently be invalid / all zeros
         QPDFObjectHandle::Rectangle bbox(0, 0, rect.urx - rect.llx, rect.ury - rect.lly);
-        auto dict = Dictionary(
+        auto* pdf = qpdf();
+        no_ci_stop_damaged_if(!pdf, "unable to get owning QPDF for appearance generation");
+        AS = pdf->newStream("/Tx BMC\nEMC\n");
+        AS.replaceDict(Dictionary(
             {{"/BBox", QPDFObjectHandle::newFromRectangle(bbox)},
              {"/Resources", Dictionary({{"/ProcSet", Array({Name("/PDF"), Name("/Text")})}})},
              {"/Type", Name("/XObject")},
-             {"/Subtype", Name("/Form")}});
-        AS = QPDFObjectHandle::newStream(oh().getOwningQPDF(), "/Tx BMC\nEMC\n");
-        AS.replaceDict(dict);
+             {"/Subtype", Name("/Form")}}));
         if (auto ap = AP()) {
             ap.replace("/N", AS);
         } else {
             aoh.replace("/AP", Dictionary({{"/N", AS}}));
         }
     }
-    if (!AS.isStream()) {
-        aoh.warn("unable to get normal appearance stream for update");
-        return;
-    }
 
     if (AS.obj_sp().use_count() > 3) {
-        // The following check ensures that we only update the appearance stream if it is not
-        // shared. The threshold of 3 is based on the current implementation details:
+        // Ensures that the appearance stream is not shared by copying it if the threshold of 3 is
+        // exceeded. The threshold is based on the current implementation details:
         // - One reference from the local variable AS
         // - One reference from the appearance dictionary (/AP)
         // - One reference from the object table
         // If use_count() is greater than 3, it means the appearance stream is shared elsewhere,
         // and updating it could have unintended side effects. This threshold may need to be updated
         // if the internal reference counting changes in the future.
-        // The long-term solution will we to replace appearance streams at the point of flattening
-        // annotations rather than attaching token filters that modify the streams at time of
-        // writing.
-        aoh.warn("unable to generate text appearance from shared appearance stream for update");
-        return;
+        //
+        // There is currently no explicit CI test for this code. It has been manually tested by
+        // running it through CI with a threshold of 0, unconditionally copying streams.
+        auto data = AS.getStreamData(qpdf_dl_all);
+        AS = AS.copy();
+        AS.replaceStreamData(std::move(data), Null::temp(), Null::temp());
+        if (Dictionary AP = aoh.getAppearanceDictionary()) {
+            AP.replace("/N", AS);
+        } else {
+            aoh.replace("/AP", Dictionary({{"/N", AS}}));
+            // aoh is a dictionary, so insertion will succeed. No need to check by retrieving it.
+        }
     }
-    QPDFObjectHandle bbox_obj = AS.getDict().getKey("/BBox");
+    QPDFObjectHandle bbox_obj = AS.getDict()["/BBox"];
     if (!bbox_obj.isRectangle()) {
         aoh.warn("unable to get appearance stream bounding box");
         return;
@@ -935,10 +933,6 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
     QPDFObjectHandle::Rectangle bbox = bbox_obj.getArrayAsRectangle();
     std::string DA = default_appearance();
     std::string V = value();
-    std::vector<std::string> opt;
-    if (isChoice() && (getFlags() & ff_ch_combo) == 0) {
-        opt = getChoices();
-    }
 
     TfFinder tff;
     Pl_QPDFTokenizer tok("tf", &tff);
@@ -952,18 +946,18 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
     if (!font_name.empty()) {
         // See if the font is encoded with something we know about.
         Dictionary resources = AS.getDict()["/Resources"];
-        Dictionary font = getFontFromResource(resources, font_name);
+        Dictionary font = resources["/Font"][font_name];
         if (!font) {
-            font = getFontFromResource(getDefaultResources(), font_name);
+            font = getDefaultResources()["/Font"][font_name];
             if (resources) {
                 if (resources.indirect()) {
                     resources = resources.qpdf()->makeIndirectObject(resources.copy());
-                    AS.getDict().replaceKey("/Resources", resources);
+                    AS.getDict().replace("/Resources", resources);
                 }
                 // Use mergeResources to force /Font to be local
                 QPDFObjectHandle res = resources;
                 res.mergeResources(Dictionary({{"/Font", Dictionary::empty()}}));
-                res.getKey("/Font").replaceKey(font_name, font);
+                res.getKey("/Font").replace(font_name, font);
             }
         }
 
@@ -977,9 +971,20 @@ FormNode::generateTextAppearance(QPDFAnnotationObjectHelper& aoh)
     }
 
     V = (*encoder)(V, '?');
-    for (size_t i = 0; i < opt.size(); ++i) {
-        opt.at(i) = (*encoder)(opt.at(i), '?');
+
+    std::vector<std::string> opt;
+    if (isChoice() && (getFlags() & ff_ch_combo) == 0) {
+        opt = getChoices();
+        for (auto& o: opt) {
+            o = (*encoder)(o, '?');
+        }
     }
-    AS.addTokenFilter(
-        std::shared_ptr<QPDFObjectHandle::TokenFilter>(new ValueSetter(DA, V, opt, tf, bbox)));
+
+    std::string result;
+    pl::String pl(result);
+    ValueSetter vs(DA, V, opt, tf, bbox);
+    Pl_QPDFTokenizer vs_tok("", &vs, &pl);
+    vs_tok.writeString(AS.getStreamData(qpdf_dl_all));
+    vs_tok.finish();
+    AS.replaceStreamData(std::move(result), Null::temp(), Null::temp());
 }

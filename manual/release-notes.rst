@@ -115,10 +115,6 @@ more detail.
     - There has been significant internal refactoring affecting most parts of
       qpdf's code base.
 
-    - When flattening widget annotations further checks have been added to detect
-      when qpdf cannot reliably generate the necessary appearance streams. As in
-      other such cases a warning is issued and the annotation remains unflattened.
-
     - By default, streams with more than 25 filters are now treated as unfilterable.
       A large number of filters typically occur in damaged or specially constructed
       files and can cause excessive use of resources and/or stack overflows. The
