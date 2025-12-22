@@ -24,11 +24,17 @@ my @fuzzers = (
     ['runlength' => 6],
     ['tiffpredictor' => 2],
     ['qpdf' => $n_qpdf_files],
+    ['qpdf_annot' => 23],
     ['qpdf_crypt' => $n_qpdf_files],
     ['qpdf_crypt_insecure' => $n_qpdf_files],
+    ['qpdf_embed' => 7],
+    ['qpdf_job' => 16],
     ['qpdf_lin' => $n_qpdf_files],
-    ['qpdf_pages' => $n_qpdf_files],
+    ['qpdf_linearization' => 20],
+    ['qpdf_object' => 30],
     ['qpdf_outlines' => $n_qpdf_files],
+    ['qpdf_pages' => $n_qpdf_files],
+    ['qpdf_transform' => 12],
     );
 
 my $n_tests = 0;
