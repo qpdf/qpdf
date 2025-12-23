@@ -43,6 +43,9 @@ more detail.
     - When parsing qpdf JSON input files allow empty name objects. These are
       allowed by the PDF specification but were previously rejected.
 
+    - ``QPDFAcroFormDocumentHelper::fixCopiedAnnotations`` now correctly
+      updates any annotation's ``/P`` entries to point to the owning page.
+
   - Library Enhancements
 
     - Add ``QPDFNameTreeObjectHelper`` and ``QPDFNumberTreeObjectHelper``

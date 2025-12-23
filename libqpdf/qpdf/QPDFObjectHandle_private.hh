@@ -324,6 +324,12 @@ namespace qpdf
         {
         }
 
+        explicit
+        operator bool() const
+        {
+            return obj != nullptr;
+        }
+
         // Return the integer value. If the object is not a valid Integer, throw a
         // std::invalid_argument exception. If the object is out of range for the target type,
         // throw a std::overflow_error or std::underflow_error exception.
