@@ -71,8 +71,7 @@ $td->runtest("copy annotations with /P entry",
 
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
-             {$td->FILE => "annotations-no-acroform-with-p.out.pdf"},
-             $td->EXPECT_FAILURE);
+             {$td->FILE => "annotations-no-acroform-with-p.out.pdf"});
 
 $td->runtest("copy annotations no acroform from foreign file",
              {$td->COMMAND =>
@@ -167,7 +166,7 @@ $td->runtest("check output",
 # field-resource-conflict.pdf was crafted so that an appearance stream
 # had an existing resource that it actually referenced in the
 # appearance stream whose name, /F1_1, clashed with the result of
-# resolving conflicts in /DR. It's a crazy corner case, but it if it
+# resolving conflicts in /DR. It's a crazy corner case, but if it
 # ever happened, it would be really hard to track down, and it could
 # arise through multiple passes through qpdf with intervening edits.
 $td->runtest("appearance stream resource conflict",

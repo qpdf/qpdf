@@ -843,7 +843,14 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         from_afdh = &QPDFAcroFormDocumentHelper::get(*from_qpdf);
     }
     m->transformAnnotations(
-        a_old_annots, new_annots, new_fields, old_fields, cm, from_qpdf, from_afdh->m.get());
+        a_old_annots,
+        new_annots,
+        new_fields,
+        old_fields,
+        cm,
+        from_qpdf,
+        from_afdh->m.get(),
+        nullptr);
 }
 
 void
@@ -854,7 +861,8 @@ AcroForm::transformAnnotations(
     std::set<QPDFObjGen>& old_fields,
     QPDFMatrix const& cm,
     QPDF* from_qpdf,
-    AcroForm* from_afdh)
+    AcroForm* from_afdh,
+    QPDFObjectHandle* new_page)
 {
     qpdf_expect(from_qpdf);
     qpdf_expect(from_afdh);
@@ -1149,6 +1157,9 @@ AcroForm::transformAnnotations(
         }
         auto rect = cm.transformRectangle(annot["/Rect"].getArrayAsRectangle());
         annot.replaceKey("/Rect", QPDFObjectHandle::newFromRectangle(rect));
+        if (new_page && annot.contains("/P")) {
+            annot.replace("/P", *new_page);
+        }
     }
 }
 
@@ -1169,7 +1180,7 @@ AcroForm::fixCopiedAnnotations(
     AcroForm& from_afdh,
     std::set<QPDFObjGen>* added_fields)
 {
-    auto old_annots = from_page.getKey("/Annots");
+    auto const& old_annots = from_page.getKey("/Annots");
     if (old_annots.empty() || !old_annots.isArray()) {
         return;
     }
@@ -1184,7 +1195,8 @@ AcroForm::fixCopiedAnnotations(
         old_fields,
         QPDFMatrix(),
         &(from_afdh.qpdf),
-        &from_afdh);
+        &from_afdh,
+        &to_page);
 
     to_page.replaceKey("/Annots", QPDFObjectHandle::newArray(new_annots));
     addAndRenameFormFields(new_fields);
