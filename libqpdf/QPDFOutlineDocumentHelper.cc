@@ -119,7 +119,7 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
                     dests,
                     qpdf,
                     [](QPDFObjectHandle const& o) -> bool {
-                        return o.isArray() || o.isDictionary();
+                        return o.isArray() || o.contains("/D");
                     },
                     true);
                 m->names_dest->validate();
