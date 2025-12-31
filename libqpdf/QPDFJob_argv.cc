@@ -141,7 +141,7 @@ ArgParser::argCopyright()
         << " version " << QPDF::QPDFVersion() << "\n"
         << "\n"
         << "Copyright (c) 2005-2021 Jay Berkenbilt\n"
-        << "Copyright (c) 2022-2025 Jay Berkenbilt and Manfred Holger\n"
+        << "Copyright (c) 2022-2026 Jay Berkenbilt and Manfred Holger\n"
         << "\n"
         << "qpdf is licensed under the Apache License, Version 2.0 (the \"License\");\n"
         << "you may not use this file except in compliance with the License.\n"
