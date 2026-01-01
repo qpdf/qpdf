@@ -32,7 +32,7 @@ qpdf versions prior to version 13 were also signed using Jay Berkenbilt's GPG ke
 
 # Copyright, License
 
-qpdf is copyright (c) 2005-2021 Jay Berkenbilt, 2022-2025 Jay Berkenbilt and Manfred Holger
+qpdf is copyright (c) 2005-2021 Jay Berkenbilt, 2022-2026 Jay Berkenbilt and Manfred Holger
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
 License. You may obtain a copy of the License at
